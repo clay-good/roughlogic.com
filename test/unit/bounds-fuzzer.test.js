@@ -9984,6 +9984,7 @@ import {
 } from "../../calc-construction.js";
 import {
   computeHorizontalCurve as _ce4, computeVerticalCurve as _ce5, computeEarthworkEndArea as _ce6, computeSlopeStakeCutFill as _ce7,
+  computeCurveDeflectionStakeout as _v767,
 } from "../../calc-civil.js";
 import { computeRollingOffset as _cg1 } from "../../calc-cross.js";
 import { computeTankVolume as _ctv } from "../../calc-cross.js";
@@ -10140,6 +10141,41 @@ test("bounds: spec-v24/v25 conduit, civil, audio, and surveying tiles pin consta
   assert.strictEqual(_rect.relative_precision_denominator, null);
   assert.ok(Number.isFinite(_rect.sum_lat) && Number.isFinite(_rect.sum_dep));
   assert.ok("error" in _cp2({ courses: [{ azimuth_deg: 0, distance: 100 }] }));
+});
+
+test("bounds: spec-v767 curve-deflection-stakeout pins the deflection/chord, the degree mode, cross-checks horizontal-curve, and error seams", () => {
+  // Spec example: R 500, arc 100 -> delta = (100/1000)(180/pi) = 5.72958 deg; chord = 1000 sin(0.1) = 99.833; D = 11.4592.
+  const r = _v767({ mode: "radius", radius_ft: 500, arc_length_ft: 100 });
+  assert.ok(Math.abs(r.deflection_deg - (0.1 * 180 / Math.PI)) < 1e-9);
+  assert.ok(Math.abs(r.deflection_deg - 5.729578) < 1e-4);
+  assert.ok(Math.abs(r.chord_ft - 1000 * Math.sin(0.1)) < 1e-9);
+  assert.ok(Math.abs(r.chord_ft - 99.83342) < 1e-4);
+  assert.ok(Math.abs(r.degree_of_curve - 5729.58 / 500) < 1e-9);
+  // Degree mode resolves the same radius: D = 11.45916 -> R = 500.
+  const d = _v767({ mode: "degree", degree_of_curve: 5729.58 / 500, arc_length_ft: 100 });
+  assert.ok(Math.abs(d.radius_ft - 500) < 1e-6);
+  assert.ok(Math.abs(d.deflection_deg - r.deflection_deg) < 1e-9);
+  // Cross-check horizontal-curve: an arc length equal to the full curve length L = R*delta_rad gives a
+  // deflection of exactly half the central angle (the PT closure property of the deflection method).
+  for (let i = 0; i < 120; i++) {
+    const R = 100 + i * 25;
+    const centralDeg = 5 + (i % 60);          // total central angle 5..64 deg
+    const L = R * (centralDeg * Math.PI / 180); // full curve length
+    const st = _v767({ mode: "radius", radius_ft: R, arc_length_ft: L });
+    assert.ok(!st.error);
+    assert.ok(Math.abs(st.deflection_deg - centralDeg / 2) < 1e-9, "PT deflection = half the central angle");
+    // The full-curve sub-chord equals horizontal-curve's long chord for the same delta.
+    const hc = _ce4({ mode: "radius", radius_ft: R, delta_deg: centralDeg });
+    assert.ok(Math.abs(st.chord_ft - hc.long_chord_ft) < 1e-6, "full-arc chord = long chord");
+  }
+  // Monotonicity: a longer arc from the same PC turns a larger deflection.
+  assert.ok(_v767({ mode: "radius", radius_ft: 500, arc_length_ft: 200 }).deflection_deg
+    > _v767({ mode: "radius", radius_ft: 500, arc_length_ft: 100 }).deflection_deg);
+  // Error seams.
+  assert.ok("error" in _v767({ mode: "radius", radius_ft: 0, arc_length_ft: 100 }));
+  assert.ok("error" in _v767({ mode: "degree", degree_of_curve: 0, arc_length_ft: 100 }));
+  assert.ok("error" in _v767({ mode: "radius", radius_ft: 500, arc_length_ft: 0 }));
+  assert.ok("error" in _v767({ mode: "radius", radius_ft: Infinity, arc_length_ft: 100 }));
 });
 
 // ---------------------------------------------------------------------------

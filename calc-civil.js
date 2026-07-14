@@ -140,6 +140,77 @@ function renderHorizontalCurve(inputRegion, outputRegion, citationEl) {
 }
 CIVIL_RENDERERS["horizontal-curve"] = renderHorizontalCurve;
 
+// --- v766+ E.x: Curve deflection-angle stakeout (`curve-deflection-stakeout`) ---
+// The deflection-angle method of setting a circular curve: from the PC, an arc
+// length l along the curve subtends a deflection angle (from the back tangent)
+// of delta = (l / 2R) x (180/pi) deg, and the sub-chord from the PC to that
+// point is c = 2R sin(l / 2R). Arc definition D = 5729.58 / R. The instrument
+// turns delta and the chainman pulls the chord c to set each station.
+// dims: in { radius_ft: L, degree_of_curve: dimensionless, arc_length_ft: L } out: { deflection_deg: dimensionless, chord_ft: L, radius_ft: L, degree_of_curve: dimensionless }
+export function computeCurveDeflectionStakeout({ mode, radius_ft, degree_of_curve, arc_length_ft } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  let R;
+  if (mode === "degree") {
+    const D = Number(degree_of_curve) || 0;
+    if (!(D > 0)) return { error: "Degree of curve must be greater than zero." };
+    R = 5729.58 / D;
+  } else {
+    R = Number(radius_ft) || 0;
+    if (!(R > 0)) return { error: "Radius must be greater than zero." };
+  }
+  const l = Number(arc_length_ft) || 0;
+  if (!(l > 0)) return { error: "Arc length from the PC must be greater than zero." };
+  const delta_rad = l / (2 * R);
+  const deflection_deg = (delta_rad * 180) / Math.PI;
+  const chord_ft = 2 * R * Math.sin(delta_rad);
+  const D = 5729.58 / R;
+  return {
+    deflection_deg,
+    chord_ft,
+    radius_ft: R,
+    degree_of_curve: D,
+    note: "Deflection-angle method (arc definition D = 5729.58 / R): the angle is turned from the back tangent at the PC, and the sub-chord is pulled from the PC to the station. Set intermediate points from the running total of the deflection; the deflection at the PT equals half the curve's total central angle (the field closure check). Simple circular curve, no spiral/superelevation. A computational aid; the design of record and engineer of record govern.",
+  };
+}
+export const curveDeflectionStakeoutExample = { inputs: { mode: "radius", radius_ft: 500, arc_length_ft: 100 } };
+
+function renderCurveDeflectionStakeout(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: deflection-angle curve stakeout - deflection from the back tangent delta = (l / 2R)(180/pi) deg, sub-chord c = 2R sin(l / 2R), arc definition D = 5729.58 / R. First-principles route surveying per FM 5-233 Construction Surveying and AASHTO A Policy on Geometric Design (the Green Book), by name. Simple circular curve, no spiral/superelevation transition. A computational aid; the design of record governs.";
+  const mode = makeSelect("Definition mode", "cds-mode", [
+    { value: "radius", label: "By radius (ft)" }, { value: "degree", label: "By degree of curve" },
+  ]);
+  inputRegion.appendChild(mode.wrap);
+  const rad = makeNumber("Radius R (ft)", "cds-r", { step: "any", min: "0", value: "500" });
+  rad.input.value = "500";
+  const deg = makeNumber("Degree of curve D", "cds-d", { step: "any", min: "0" });
+  const arc = makeNumber("Arc length from PC (ft)", "cds-l", { step: "any", min: "0", value: "100" });
+  arc.input.value = "100";
+  for (const f of [rad, deg, arc]) inputRegion.appendChild(f.wrap);
+  const oDef = makeOutputLine(outputRegion, "Deflection angle from PC", "cds-out-def");
+  const oChord = makeOutputLine(outputRegion, "Sub-chord from PC", "cds-out-chord");
+  const oD = makeOutputLine(outputRegion, "Degree of curve", "cds-out-degree");
+  const oNote = makeOutputLine(outputRegion, "Note", "cds-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  function syncFields() {
+    const isDeg = mode.select.value === "degree";
+    rad.wrap.style.display = isDeg ? "none" : "";
+    deg.wrap.style.display = isDeg ? "" : "none";
+  }
+  const update = debounce(() => {
+    const r = computeCurveDeflectionStakeout({ mode: mode.select.value, radius_ft: readNum(rad.input), degree_of_curve: readNum(deg.input), arc_length_ft: readNum(arc.input) });
+    if (r.error) { oDef.textContent = r.error; oChord.textContent = ""; oD.textContent = ""; oNote.textContent = ""; return; }
+    oDef.textContent = fmt(r.deflection_deg, 4) + " deg (R = " + fmt(r.radius_ft, 2) + " ft)";
+    oChord.textContent = fmt(r.chord_ft, 3) + " ft";
+    oD.textContent = fmt(r.degree_of_curve, 4) + " deg";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { mode.select.value = "radius"; syncFields(); rad.input.value = "500"; deg.input.value = ""; arc.input.value = "100"; update(); });
+  mode.select.addEventListener("input", () => { syncFields(); update(); });
+  for (const f of [rad.input, deg.input, arc.input]) f.addEventListener("input", update);
+  syncFields();
+}
+CIVIL_RENDERERS["curve-deflection-stakeout"] = renderCurveDeflectionStakeout;
+
 // --- v25 E.x: Vertical (equal-tangent parabolic) curve (`vertical-curve`) ---
 // Equal-tangent parabola measured from the BVC. BVC = PVI - L/2, EVC = PVI + L/2.
 // elev(x) = bvc_elev + (g1/100)*x + ((g2-g1)/100)/(2L) * x^2 for x ft from BVC.

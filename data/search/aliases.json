@@ -40892,6 +40892,31 @@
       "kind": "question"
     },
     {
+      "term": "curve deflection angle",
+      "target": "curve-deflection-stakeout",
+      "kind": "question"
+    },
+    {
+      "term": "stake out a horizontal curve",
+      "target": "curve-deflection-stakeout",
+      "kind": "question"
+    },
+    {
+      "term": "deflection angle for a curve station",
+      "target": "curve-deflection-stakeout",
+      "kind": "question"
+    },
+    {
+      "term": "sub-chord for a curve",
+      "target": "curve-deflection-stakeout",
+      "kind": "question"
+    },
+    {
+      "term": "how to stake a curve",
+      "target": "curve-deflection-stakeout",
+      "kind": "question"
+    },
+    {
       "term": "pc and pt stations for a curve",
       "target": "horizontal-curve",
       "kind": "question"

@@ -552,6 +552,7 @@ const TOOL_MODULES = (() => {
   // per the v28/v30/v36/v39/v70..v79 precedent); no tile or output changed.
   declare("./calc-civil.js", "CIVIL_RENDERERS", [
     "horizontal-curve", "vertical-curve", "earthwork-end-area", "slope-stake-cut-fill",
+    "curve-deflection-stakeout",
     "superelevation", "superelevation-safe-curve-speed", "vertical-curve-sight-distance", "horizontal-sightline-offset",
     "sag-vertical-curve", "sag-vertical-curve-comfort",
   ]);

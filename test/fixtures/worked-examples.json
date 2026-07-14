@@ -19842,6 +19842,40 @@
    }
   },
   {
+   "tile_id": "curve-deflection-stakeout",
+   "source_publisher": "AASHTO Green Book / FM 5-233 (by name)",
+   "source_title": "Deflection angle and sub-chord for a 100 ft arc on a 500 ft radius",
+   "source_edition_or_year": "FM 5-233 deflection-angle method",
+   "source_section_or_page": "delta = (100/1000)(180/pi) = 5.7296 deg; chord = 1000 sin(0.1) = 99.833 ft; D = 5729.58/500 = 11.4592",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "mode": "radius",
+    "radius_ft": 500,
+    "arc_length_ft": 100
+   },
+   "outputs": {
+    "deflection_deg": {
+     "value": 5.72958,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "chord_ft": {
+     "value": 99.8334,
+     "tolerance": {
+      "abs": 0.002
+     }
+    },
+    "degree_of_curve": {
+     "value": 11.45916,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "vertical-curve",
    "source_publisher": "AASHTO Green Book / FM 5-233 (by name)",
    "source_title": "Equal-tangent parabola elevations and the high/low point",

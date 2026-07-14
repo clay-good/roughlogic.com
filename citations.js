@@ -6847,6 +6847,17 @@ export const CITATIONS = {
       { name: "Degree definition", value: "arc definition D = 5729.58 / R unless the chord toggle is set", source: "AASHTO / FM 5-233" },
     ],
   },
+  "curve-deflection-stakeout": {
+    formula: "deflection from the back tangent at the PC: delta = (l / (2R)) x (180/pi) deg for an arc length l; sub-chord from the PC c = 2R sin(l / (2R)); arc-definition D = 5729.58 / R. The deflection at the PT equals half the curve's total central angle.",
+    edition: "Deflection-angle curve-stakeout method per FM 5-233 Construction Surveying and the AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book), by name; first-principles trig.",
+    freeAccess: "FM 5-233 is public-domain US Government work, free at US Army publication archives. The design of record and the engineer of record govern the alignment.",
+    governance: GOVERNANCE.engineer_of_record,
+    editionNote: "Single-edition (first-principles curve trig). The deflection-angle method sets each station by turning the running-total deflection from the back tangent and pulling the sub-chord; the deflection at the PT closes on half the total central angle. Simple circular curve only - no spiral (transition) or superelevation.",
+    assumptions: [
+      { name: "Degree definition", value: "arc definition D = 5729.58 / R", source: "AASHTO / FM 5-233" },
+      { name: "Reference", value: "deflection measured from the back tangent at the PC; chord is the straight sub-chord from the PC", source: "FM 5-233 deflection-angle method" },
+    ],
+  },
   "vertical-curve": {
     formula: "Equal-tangent parabola from the BVC: elev(x) = bvc_elev + (g1/100)*x + ((g2-g1)/100)/(2L)*x^2, x in ft from BVC. Turning point at x = -g1*L/(g2-g1) when it lies in [0, L].",
     edition: "Equal-tangent parabolic vertical-curve elevations and the high/low-point location per the AASHTO Green Book vertical-alignment relations and FM 5-233, by name; first-principles.",

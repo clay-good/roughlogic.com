@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(civil): spec-v767 curve deflection-angle stakeout; 2026-07-14
+
+- New tile `curve-deflection-stakeout` (Group E, calc-civil.js): the deflection-angle method horizontal-curve leaves out
+  -- an arc length `l` from the PC turns a deflection from the back tangent `delta = (l/2R)(180/pi)` and a sub-chord
+  `c = 2R sin(l/2R)`; arc-definition `D = 5729.58/R`. On a 500 ft radius, 100 ft of arc is 5.7296 deg and a 99.83 ft
+  chord. Enter radius or degree of curve. Fuzzer cross-checks horizontal-curve (full-arc deflection = half the central
+  angle, full-arc chord = long chord). calc-civil.js gzip cap 12500 -> 14000 B. Home count 1,215 -> 1,216.
+
 ### feat(survey): spec-v766 COGO forward locate from bearing and distance; 2026-07-14
 
 - New tile `cogo-forward-point` (Group P, calc-survey.js): the coordinate-geometry forward step -- from a known point, an
