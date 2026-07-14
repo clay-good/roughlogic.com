@@ -182,7 +182,7 @@ const _TILES = [
   ["hydrostatic-test", "B"], ["grease-trap", "B"], ["glycol-mix", "B"],
   ["expansion-tank", "B"], ["backflow-loss", "B"], ["water-hammer-surge", "B"],
   ["pump-operating-point", "B"], ["septic-drainfield", "B"], ["pipe-expansion-loop", "B"],
-  ["water-heater-recovery", "B"], ["wh-expansion-tank", "B"],
+  ["water-heater-recovery", "B"], ["water-heater-input", "B"], ["wh-expansion-tank", "B"],
   ["sanitary-dfu", "B"], ["trap-primer", "B"], ["backflow-sizing", "B"],
   ["cross-connection-air-gap", "B"], ["hydronic-fill-pressure", "B"],
   ["septic-dose-tank", "B"], ["septic-pumpout-interval", "B"], ["septic-lpp-orifice", "B"],

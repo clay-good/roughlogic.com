@@ -3243,6 +3243,18 @@ export const CITATIONS = {
       { name: "Water energy constant", value: "8.33 BTU per gallon per degree F", source: "first-principles water properties" },
     ],
   },
+  "water-heater-input": {
+    formula: "input BTU/hr = (recovery_gph × 8.33 × delta-T) / recovery efficiency; electric kW = input / 3412. The inverse of gph = (input × efficiency) / (8.33 × delta-T).",
+    edition: "DOE 10 CFR 430 water-heater efficiency test procedure; AHRI 1300 (residential water heaters).",
+    freeAccess: "Free at energy.gov/eere for DOE test procedures and ahri.org for the AHRI directory / TOC.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "The burner or element input a water heater needs to sustain a target recovery rate, the inverse of water-heater-recovery: input = recovery_gph × 8.33 × rise / efficiency, and for an electric heater the kW output is the input divided by 3412 BTU/hr per kW. This is the steady recovery input; the AHRI first-hour rating also credits the stored tank volume, so a tank can meet a short peak with less input than this. Recovery-efficiency defaults (0.98 electric / 0.80 atmospheric gas / 0.94 condensing gas) are test-procedure conventions; the nameplate governs. AHJ governs.",
+    assumptions: [
+      { name: "Recovery efficiency", value: "0.98 electric / 0.80 atmospheric gas / 0.94 condensing gas unless the user enters the nameplate value", source: "DOE 10 CFR 430 / AHRI 1300 typical" },
+      { name: "Steady recovery only", value: "sizes the steady input; the first-hour rating credits stored volume, so a tank meets short peaks with less input", source: "DOE 10 CFR 430 FHR test" },
+      { name: "Water energy constant", value: "8.33 BTU per gallon per degree F", source: "first-principles water properties" },
+    ],
+  },
   "wh-expansion-tank": {
     formula: "expansion factor = (rho_cold − rho_hot) / rho_hot from public steam-table densities; V_expansion = heater volume × factor; V_tank = V_expansion / acceptance factor; pre-charge = incoming pressure. Recommended size = smallest standard diaphragm tank (2 / 4.4 / 8.5 / 14 / 20 gal) ≥ required volume.",
     edition: "ASPE Plumbing Engineering Design Handbook (2nd ed.) Chapter 6; ASME B40.1 steam tables. IPC 2021 §604.8 (PRV) and §607 (thermal expansion control).",

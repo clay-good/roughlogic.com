@@ -3207,6 +3207,31 @@
       "kind": "redirect"
     },
     {
+      "term": "water heater input for recovery",
+      "target": "water-heater-input",
+      "kind": "industry"
+    },
+    {
+      "term": "btu for target recovery rate",
+      "target": "water-heater-input",
+      "kind": "industry"
+    },
+    {
+      "term": "what size water heater burner",
+      "target": "water-heater-input",
+      "kind": "adjacent"
+    },
+    {
+      "term": "kw for water heater recovery",
+      "target": "water-heater-input",
+      "kind": "adjacent"
+    },
+    {
+      "term": "input rating from recovery gph",
+      "target": "water-heater-input",
+      "kind": "adjacent"
+    },
+    {
       "term": "thermal expansion tank",
       "target": "wh-expansion-tank",
       "kind": "industry"

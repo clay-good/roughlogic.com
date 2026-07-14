@@ -13291,6 +13291,54 @@
    }
   },
   {
+   "tile_id": "water-heater-input",
+   "source_publisher": "DOE / AHRI (inverse)",
+   "source_title": "input = recovery_gph * 8.33 * delta-T / efficiency (54.879 gph, 70 F, 0.80 -> 40,000 BTU/hr)",
+   "source_edition_or_year": "spec-v678 worked example (machine-verified)",
+   "source_section_or_page": "round-trips the water-heater-recovery pinned example: 40000 BTU/hr atmospheric gas",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "heater_type": "gas_atmospheric",
+    "target_recovery_gph": 54.879,
+    "efficiency": 0.8,
+    "incoming_F": 50,
+    "setpoint_F": 120
+   },
+   "outputs": {
+    "input_btu_hr": {
+     "value": 40000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "water-heater-input",
+   "source_publisher": "DOE / AHRI (inverse)",
+   "source_title": "cross-check: an electric heater at 0.98 efficiency needs 4.5 kW for the same recovery duty",
+   "source_edition_or_year": "spec-v678 cross-check (machine-verified)",
+   "source_section_or_page": "25.8 gph over 70 F at 0.98 -> 15,354 BTU/hr = 4.5 kW",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "heater_type": "electric",
+    "target_recovery_gph": 25.805042,
+    "efficiency": 0.98,
+    "incoming_F": 50,
+    "setpoint_F": 120
+   },
+   "outputs": {
+    "input_kw": {
+     "value": 4.5,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wh-expansion-tank",
    "source_publisher": "ASPE / ASME",
    "source_title": "Potable thermal expansion: 40 gal heater, 60 psi, 50->120 F, acceptance 0.46",

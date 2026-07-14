@@ -2258,6 +2258,71 @@ function _v16p_renderWaterHeaterRecovery(inputRegion, outputRegion, citationEl) 
 }
 PLUMBING_RENDERERS["water-heater-recovery"] = _v16p_renderWaterHeaterRecovery;
 
+// dims: in { args: dimensionless } out: { input_btu_hr: dimensionless, input_kw: dimensionless, delta_T_F: T }
+export function computeWaterHeaterInput({
+  heater_type = "gas_atmospheric",
+  target_recovery_gph = 0,
+  efficiency = null,
+  incoming_F = 50,
+  setpoint_F = 120,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const isElectric = heater_type === "electric";
+  const eff = efficiency != null && Number.isFinite(Number(efficiency))
+    ? Number(efficiency)
+    : (WATER_HEATER_EFFICIENCY[heater_type] ?? 0.80);
+  const Ti = Number(incoming_F);
+  const Ts = Number(setpoint_F);
+  const rec = Number(target_recovery_gph) || 0;
+  if (!(rec > 0)) return { error: "Target recovery rate must be positive (gph)." };
+  if (!Number.isFinite(Ti) || !Number.isFinite(Ts)) return { error: "Enter incoming and set-point temperatures." };
+  const delta_T_F = Ts - Ti;
+  if (!(delta_T_F > 0)) return { error: "Set-point temperature must exceed incoming temperature." };
+  if (!(eff > 0)) return { error: "Recovery efficiency must be positive." };
+  // Inverse of recovery_gph = input_btu x eff / (8.33 x delta_T):
+  // input_btu = recovery_gph x 8.33 x delta_T / eff. Electric: kW = input_btu / 3412.
+  const input_btu_hr = rec * 8.33 * delta_T_F / eff;
+  const input_kw = input_btu_hr / 3412;
+  if (![input_btu_hr, input_kw].every(Number.isFinite) || !(input_btu_hr > 0)) return { error: "Water-heater-input math is not a finite positive value." };
+  const warnings = [];
+  if (delta_T_F < 20 || delta_T_F > 130) warnings.push("Temperature rise outside the 20-130 F residential range; confirm incoming and set-point values.");
+  if (eff < 0.50 || eff > 1.05) warnings.push("Recovery efficiency outside (0.50, 1.05) is non-physical for a single heater; confirm the test-procedure value.");
+  return {
+    heater_type, isElectric, efficiency: eff, delta_T_F,
+    target_recovery_gph: rec, input_btu_hr, input_kw, warnings,
+    note: "The burner (or element) input a water heater needs to sustain a target recovery rate, the inverse of the water-heater-recovery tile: input = recovery_gph x 8.33 x rise / efficiency, with the useful heat 8.33 BTU per gallon per degree F. For an electric heater the kW output is the input divided by 3412 BTU/hr per kW. This is the steady recovery input; the AHRI first-hour rating also credits the stored tank volume, so a tank can meet a short peak with less input than this. Per DOE 10 CFR 430 / AHRI 1300. A sizing estimate; the appliance rating and the gas or electrical service govern."
+  };
+}
+export const waterHeaterInputExample = { inputs: { heater_type: "gas_atmospheric", target_recovery_gph: 54.9, efficiency: 0.80, incoming_F: 50, setpoint_F: 120 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderWaterHeaterInput(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: input = (recovery_gph x 8.33 x delta-T) / efficiency, from gph = (input BTU/hr x efficiency) / (8.33 x delta-T); electric kW = input / 3412. 8.33 BTU per gallon per degree F is first-principles water properties. Per DOE 10 CFR 430 and AHRI 1300. Free at energy.gov/eere and ahri.org.";
+  const type = makeSelect("Heater type", "whi-type", [
+    { value: "gas_atmospheric", label: "Gas, atmospheric (0.80)", selected: true },
+    { value: "gas_condensing", label: "Gas, condensing (0.94)" },
+    { value: "electric", label: "Electric (0.98)" },
+  ]);
+  const rec = makeNumber("Target recovery rate (gph)", "whi-rec", { step: "any", min: "0", value: "54.9" });
+  const eff = makeNumber("Recovery efficiency (blank = default)", "whi-eff", { step: "any", min: "0", max: "1.05" });
+  const tin = makeNumber("Incoming water temp (F)", "whi-tin", { step: "any", value: "50" });
+  const tset = makeNumber("Set-point temp (F)", "whi-tset", { step: "any", value: "120" });
+  for (const f of [type, rec, eff, tin, tset]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { type.select.value = "gas_atmospheric"; rec.input.value = "54.9"; eff.input.value = "0.80"; tin.input.value = "50"; tset.input.value = "120"; update(); });
+  const oInput = makeOutputLine(outputRegion, "Required input rating", "whi-out-input");
+  const oNote = makeOutputLine(outputRegion, "Note", "whi-out-n");
+  const update = debounce(() => {
+    const effVal = eff.input.value === "" ? null : _v16p_readNum(eff.input);
+    const r = computeWaterHeaterInput({ heater_type: type.select.value, target_recovery_gph: _v16p_readNum(rec.input), efficiency: effVal, incoming_F: _v16p_readNum(tin.input), setpoint_F: _v16p_readNum(tset.input) });
+    if (r.error) { oInput.textContent = r.error; oNote.textContent = ""; return; }
+    oInput.textContent = r.isElectric ? (fmt(r.input_kw, 2) + " kW (" + fmt(r.input_btu_hr, 0) + " BTU/hr)") : (fmt(r.input_btu_hr, 0) + " BTU/hr (" + fmt(r.input_kw, 2) + " kW)");
+    oNote.textContent = (r.warnings.length ? r.warnings.join(" ") + " " : "") + r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [rec.input, eff.input, tin.input, tset.input]) el.addEventListener("input", update);
+  type.select.addEventListener("change", update);
+}
+PLUMBING_RENDERERS["water-heater-input"] = renderWaterHeaterInput;
+
 // --- B.2 Potable thermal expansion tank sizing -----------------------
 
 // Water density (lb/ft^3) vs temperature (F), public steam-table values

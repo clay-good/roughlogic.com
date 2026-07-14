@@ -561,6 +561,7 @@ import {
   computeWaterHammerArrestor,
   computeWaterHammerSurge,
   computeWaterHeaterRecovery,
+  computeWaterHeaterInput,
   computeWhExpansionTank,
   computeSanitaryDfu,
   computeTrapPrimer,
@@ -7480,6 +7481,33 @@ test("bounds: calc-plumbing computeWaterHeaterRecovery pins gph = input*eff/(8.3
   // Rejections.
   assert.ok("error" in computeWaterHeaterRecovery({ input_btu_hr: 0 }));
   assert.ok("error" in computeWaterHeaterRecovery({ input_btu_hr: 40000, incoming_F: 120, setpoint_F: 120 }));
+});
+
+test("bounds: spec-v678 computeWaterHeaterInput pins input = recovery*8.33*dT/eff, round-trips through computeWaterHeaterRecovery for gas and electric, and error seams", () => {
+  const r = computeWaterHeaterInput({ heater_type: "gas_atmospheric", target_recovery_gph: 54.879, efficiency: 0.80, incoming_F: 50, setpoint_F: 120 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.input_btu_hr - (54.879 * 8.33 * 70 / 0.80)) < 1e-6, `input identity: ${r.input_btu_hr}`);
+  assert.ok(Math.abs(r.input_btu_hr - 40000) < 5, `pinned ~40000: ${r.input_btu_hr}`);
+  assert.ok(Math.abs(r.input_kw - r.input_btu_hr / 3412) < 1e-9, `kw conversion: ${r.input_kw}`);
+  // Default efficiency by heater type (condensing gas 0.94).
+  assert.strictEqual(computeWaterHeaterInput({ heater_type: "gas_condensing", target_recovery_gph: 40, incoming_F: 50, setpoint_F: 120 }).efficiency, 0.94);
+  // Round-trip: the required input, fed back through the forward tile, reproduces the target recovery, for gas and electric.
+  for (const [heater_type, eff] of [["gas_atmospheric", 0.80], ["electric", 0.98]]) {
+    for (const target_recovery_gph of [20, 40, 60]) {
+      const m = computeWaterHeaterInput({ heater_type, target_recovery_gph, efficiency: eff, incoming_F: 50, setpoint_F: 120 });
+      assert.ok(!m.error, `sweep ${heater_type} gph=${target_recovery_gph}: ${JSON.stringify(m)}`);
+      assertFinite(m.input_btu_hr, "input"); assert.ok(m.input_btu_hr > 0, "input positive");
+      const back = heater_type === "electric"
+        ? computeWaterHeaterRecovery({ heater_type, input_kw: m.input_kw, efficiency: eff, incoming_F: 50, setpoint_F: 120 })
+        : computeWaterHeaterRecovery({ heater_type, input_btu_hr: m.input_btu_hr, efficiency: eff, incoming_F: 50, setpoint_F: 120 });
+      assert.ok(Math.abs(back.recovery_gph - target_recovery_gph) < 1e-6, `round-trip ${heater_type} gph=${target_recovery_gph}: ${back.recovery_gph}`);
+    }
+  }
+  // Error seams: non-positive recovery, set-point not above incoming, non-positive efficiency, non-finite.
+  assert.ok("error" in computeWaterHeaterInput({ target_recovery_gph: 0 }));
+  assert.ok("error" in computeWaterHeaterInput({ target_recovery_gph: 50, incoming_F: 120, setpoint_F: 120 }));
+  assert.ok("error" in computeWaterHeaterInput({ target_recovery_gph: 50, efficiency: 0 }));
+  assert.ok("error" in computeWaterHeaterInput({ target_recovery_gph: NaN }));
 });
 
 test("bounds: calc-plumbing computeWhExpansionTank pins V_exp = vol*factor and V_tank = V_exp/acceptance with standard sizing", () => {
