@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(cross): NIOSH lifting distance multiplier floored at the wrong threshold; 2026-07-15
+
+- `computeNIOSHLifting` (calc-cross.js) computed the distance multiplier as `D <= 0 ? 1 : 0.82 + 1.8/D`, but the NIOSH
+  1991 equation defines `DM = 0.82 + 1.8/D` only for `10 <= D <= 70` in: below 10 in the travel distance is set to the
+  10 in floor (DM = 1.0) and above 70 in the lift is outside the equation's range (DM = 0, RWL = 0). Every NIOSH
+  multiplier is <= 1 by construction, so the old `D <= 0` floor let any `0 < D < 10` produce a non-physical `DM > 1`
+  (e.g. D = 5 in gave DM = 1.18), overstating the Recommended Weight Limit by up to ~18% in the unsafe direction.
+  Corrected to `D <= 10 ? 1 : D > 70 ? 0 : 0.82 + 1.8/D`. The bundled example (D = 20 in) and all existing pins are in
+  the 10-70 in range and unchanged. Found by the same formula-correctness audit.
+
 ### fix(electrical): arc-flash-screen Lee incident-energy constant had wrong units (off by ~10^9); 2026-07-15
 
 - `computeArcFlashScreen` (calc-electrical.js) used the Lee (IEEE 1584) constant `2.142e6` directly, but that value is

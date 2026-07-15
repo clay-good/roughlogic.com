@@ -1159,7 +1159,11 @@ export function computeNIOSHLifting({
   // Multipliers per NIOSH 1991 publication.
   const HM = 10 / H_in;
   const VM = 1 - 0.0075 * Math.abs(V_in - 30);
-  const DM = D_in <= 0 ? 1 : 0.82 + 1.8 / D_in;
+  // NIOSH DM is defined only for 10 <= D <= 70 in: below 10 in D is set to the
+  // 10 in floor (DM = 1.0), above 70 in the lift is outside the equation's range
+  // (DM = 0, RWL = 0). The old D_in <= 0 floor let 0 < D < 10 produce a
+  // non-physical DM > 1, overstating the RWL in the unsafe direction.
+  const DM = D_in <= 10 ? 1 : D_in > 70 ? 0 : 0.82 + 1.8 / D_in;
   const AM = 1 - 0.0032 * asymmetry_deg;
   // Frequency multiplier (very rough piecewise). Public NIOSH FM-table approximation:
   let FM;
