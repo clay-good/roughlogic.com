@@ -66,8 +66,9 @@ export const pacingExample = { inputs: { calibration_distance_ft: 200, calibrati
 
 // --- 228: Magnetic Declination and Bearing Conversion ---
 //
-// "East is least, west is best" - east declination subtracts when
-// converting magnetic bearing -> true; west declination adds.
+// "East is least, west is best" applies to true -> magnetic (compass): east
+// declination subtracts, west adds. Converting the other way, magnetic -> true
+// (this tile's default), reverses it: add east declination, subtract west.
 
 // dims: in { declination_deg: dimensionless, bearing_deg: dimensionless, direction: dimensionless }
 //        out: { result_deg: dimensionless, memo: dimensionless }
