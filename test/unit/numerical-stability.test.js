@@ -1041,14 +1041,14 @@ test("computeDrawbarPower: bit-stable drawbar_hp + pto_hp_estimate at the spec e
 });
 
 test("computeRiggingCheck: bit-stable tension_per_leg + safety_factor at the spec example (5000 lb load, 60 deg, 2-leg basket)", () => {
-  // Group N. Two-leg sling: tension_per_leg = (load / n_legs) / sin(angle/2);
-  // at 60 deg included angle on a 2-leg basket the geometry gives
-  // tension = load/n_legs (1.0 multiplier from the basket configuration's
-  // axial vs included-angle setup). safety_factor = wll / tension. Pins
-  // the sling-geometry arithmetic.
+  // Group N. Two-leg sling: tension_per_leg = load / (n_legs * cos(angle/2))
+  // for the included (apex) angle; at 60 deg included on a 2-leg basket the
+  // geometry gives 5000 / (2 * cos 30) = 2886.75 lb/leg. safety_factor =
+  // effective_wll / tension = 6700 / 2886.75 = 2.32. Pins the sling-geometry
+  // arithmetic.
   const r = computeRiggingCheck(riggingExample.inputs);
-  assert.equal(bits(r.tension_per_leg_lb), "40b3880000000001", `tension_per_leg=${r.tension_per_leg_lb}`);
-  assert.equal(bits(r.safety_factor), "3ff570a3d70a3d70", `safety_factor=${r.safety_factor}`);
+  assert.equal(bits(r.tension_per_leg_lb), "40a68d80b06a8664", `tension_per_leg=${r.tension_per_leg_lb}`);
+  assert.equal(bits(r.safety_factor), "4002914d3a641ee3", `safety_factor=${r.safety_factor}`);
 });
 
 test("computeYieldEP: bit-stable yield_pct + ep_weight + ep_cost_per_lb at the spec example (10 lb AP, 1.5 trim, 15% cooking loss, $8.50)", () => {

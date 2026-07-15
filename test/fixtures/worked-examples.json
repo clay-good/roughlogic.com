@@ -12068,7 +12068,7 @@
   {
    "tile_id": "rigging-check",
    "source_publisher": "OSHA 1926.251 + ASME B30.9 sling capacity tables",
-   "source_title": "WLL lookup; tension_per_leg = load / (n_legs * sin(angle/2)); pass if WLL >= tension * derate",
+   "source_title": "WLL lookup; tension_per_leg = load / (n_legs * cos(angle/2)); pass if WLL >= tension * derate",
    "source_edition_or_year": "ASME B30.9 5/8 in 6x19 IWRC steel sling vertical WLL 6700 lb",
    "source_section_or_page": "5/8 in steel / vertical / 1500 lb / 2 legs -> WLL 6700 / 750 lb per leg / SF 8.93 / pass",
    "verified_by": "rl",

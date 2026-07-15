@@ -6005,7 +6005,7 @@ export const CITATIONS = {
     ],
   },
   "rigging-check": {
-    formula: "WLL at angle: leg tension L = W / (n × sin(θ/2)) for basket / bridle slings; choker derate 0.75. WLL by component class (shackles per ASME B30.26; slings per ASME B30.9; span sets / hoists per manufacturer specs).",
+    formula: "WLL at angle: leg tension L = W / (n × cos(θ/2)) for basket / bridle slings at included (apex) angle θ (W/n with legs vertical, diverging as they open toward horizontal); choker derate 0.75. WLL by component class (shackles per ASME B30.26; slings per ASME B30.9; span sets / hoists per manufacturer specs).",
     edition: "ASME B30.9 (Slings) + ASME B30.26 (Rigging Hardware) + ASME B30.16 (Overhead Underhung and Stationary Hoists) by name and section. Manufacturer hoist data sheets (CM Lodestar, Columbus McKinnon, Chain Master) by name.",
     freeAccess: "ASME B30 series licensed; principles free at most rigging-manufacturer training pages.",
     governance: GOVERNANCE.rigging,

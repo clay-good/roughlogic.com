@@ -271,7 +271,8 @@ export const splExample = { inputs: { L1_dB: 110, d1: 1, d2: 30, mode: "free_fie
 
 // --- 221: Rigging Capacity Quick Check ---
 //
-// WLL at angle: per-leg tension = load / (n * sin(theta/2))
+// WLL at angle: per-leg tension = load / (n * cos(theta/2)) for the included
+// (apex) angle -- W/n with legs vertical, diverging as they open to horizontal.
 // Choker reduction factor 0.75 (matches v3 utility 161).
 
 export const RIGGING_HARDWARE = {
@@ -298,11 +299,11 @@ export function computeRiggingCheck({ hardware = "sling_5_8_steel", configuratio
   if (configuration === "vertical") tension_per_leg = load_lb / n_legs;
   else if (configuration === "basket" || configuration === "bridle") {
     if (!(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be 0-180 deg." };
-    tension_per_leg = load_lb / (n_legs * Math.sin((included_angle_deg / 2) * Math.PI / 180));
+    tension_per_leg = load_lb / (n_legs * Math.cos((included_angle_deg / 2) * Math.PI / 180));
   } else if (configuration === "choker") {
     if (!(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be 0-180 deg." };
     derate_factor = 0.75;
-    tension_per_leg = load_lb / (n_legs * Math.sin((included_angle_deg / 2) * Math.PI / 180) * derate_factor);
+    tension_per_leg = load_lb / (n_legs * Math.cos((included_angle_deg / 2) * Math.PI / 180) * derate_factor);
   } else {
     return { error: "Unknown configuration." };
   }

@@ -1868,7 +1868,7 @@ test("bounds: calc-kitchen computeSousVidePasteurization rejects unknown categor
 // missing scaffolding; per-function pin pattern: documented sweep +
 // boundary rejections + closed-form identity pins (speed-of-sound
 // c = 331.3 + 0.606 * T, inverse-square law -6 dB per doubling,
-// per-leg sling tension at the included-angle sin(theta/2), neutral-
+// per-leg sling tension at the included-angle cos(theta/2), neutral-
 // imbalance balanced-zero identity, DMX overflow at end > 512).
 // --------------------------------------------------------------------
 
@@ -1994,7 +1994,7 @@ test("bounds: calc-stage computeNeutralImbalance rejects negative currents (docu
   assert.ok("error" in computeNeutralImbalance({ I_A: 10, I_B: 10, I_C: -1 }));
 });
 
-test("bounds: calc-stage computeRiggingCheck pins per-leg tension = load / n in vertical and load / (n * sin(theta/2)) in basket configurations", () => {
+test("bounds: calc-stage computeRiggingCheck pins per-leg tension = load / n in vertical and load / (n * cos(theta/2)) in basket configurations", () => {
   for (const load_lb of [500, 2000, 5000, 10000]) {
     for (const n_legs of [1, 2, 4]) {
       const v = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "vertical", load_lb, n_legs });
@@ -2004,7 +2004,7 @@ test("bounds: calc-stage computeRiggingCheck pins per-leg tension = load / n in 
     }
     for (const included_angle_deg of [30, 60, 90, 120]) {
       const b = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "basket", load_lb, included_angle_deg, n_legs: 2 });
-      const expected = load_lb / (2 * Math.sin((included_angle_deg / 2) * Math.PI / 180));
+      const expected = load_lb / (2 * Math.cos((included_angle_deg / 2) * Math.PI / 180));
       assert.ok(Math.abs(b.tension_per_leg_lb - expected) < 1e-9, `basket identity L=${load_lb} a=${included_angle_deg}`);
     }
     // Choker derate: 0.75 reduction on the per-leg-tension denominator AND on effective_wll.

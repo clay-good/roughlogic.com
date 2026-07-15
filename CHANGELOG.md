@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(stage): rigging-check per-leg tension used sin(theta/2) where the included angle needs cos(theta/2); 2026-07-15
+
+- `computeRiggingCheck` (calc-stage.js) had the same inverted included-angle sling formula as the rescue sling-angle tile:
+  basket/bridle/choker per-leg tension was `W / (n * sin(theta/2))` instead of `W / (n * cos(theta/2))`. On the tile's
+  own example (5000 lb, 60 deg included, 2-leg basket) it reported 5000 lb/leg instead of the correct 2886.75 lb/leg
+  (safety factor 1.34 -> 2.32 against the 6700 lb sling WLL). The sin form is only correct at exactly 90 deg included
+  (where sin45 = cos45) and diverges in the wrong direction elsewhere. Corrected to cos(theta/2); updated the header
+  comment, the citation, the worked-example formula string (vertical example value unchanged), and the sin-based test
+  pins including the bit-stable numerical-stability pin. Found by a first-principles formula-correctness audit.
+
 ### fix(rescue): sling-angle per-leg tension used sin(theta/2) where the included angle needs cos(theta/2); 2026-07-15
 
 - `computeSlingAngle` (calc-rescue.js) computed basket/bridle/choker per-leg tension as `W / (n * sin(theta/2))` for the

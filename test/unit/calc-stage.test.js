@@ -78,7 +78,7 @@ test("SPL: greater distance smaller SPL", () => { const a = computeSPL({ L1_dB: 
 test("Rigging: example pass", () => { const r = computeRiggingCheck(riggingExample.inputs); assert.ok(typeof r.pass === "boolean"); });
 test("Rigging: vertical = load / n", () => { const r = computeRiggingCheck({ hardware: "shackle_3_4_5T", configuration: "vertical", load_lb: 1000, included_angle_deg: 0, n_legs: 2 }); assert.equal(r.tension_per_leg_lb, 500); });
 test("Rigging: choker derate 0.75", () => { const r = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "choker", load_lb: 1000, included_angle_deg: 60, n_legs: 2 }); assert.equal(r.derate_factor, 0.75); });
-test("Rigging: small angle blows up tension", () => { const r = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "basket", load_lb: 1000, included_angle_deg: 1, n_legs: 2 }); assert.ok(r.tension_per_leg_lb > 30000); });
+test("Rigging: wide angle blows up tension", () => { const r = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "basket", load_lb: 1000, included_angle_deg: 179, n_legs: 2 }); assert.ok(r.tension_per_leg_lb > 30000); });
 test("Rigging: unknown hardware errors", () => { const r = computeRiggingCheck({ hardware: "x", configuration: "vertical", load_lb: 1000, included_angle_deg: 0, n_legs: 2 }); assert.ok(r.error); });
 test("Rigging: unknown config errors", () => { const r = computeRiggingCheck({ hardware: "shackle_3_4_5T", configuration: "swag", load_lb: 1000, included_angle_deg: 0, n_legs: 2 }); assert.ok(r.error); });
 test("Rigging: 180 deg angle errors", () => { const r = computeRiggingCheck({ hardware: "sling_5_8_steel", configuration: "basket", load_lb: 1000, included_angle_deg: 180, n_legs: 2 }); assert.ok(r.error); });
