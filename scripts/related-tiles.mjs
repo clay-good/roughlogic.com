@@ -783,6 +783,7 @@ const RELATED = {
   "bend-allowance": ["speeds-feeds", "weld-usage"],
   "intermittent-fillet-weld": ["fillet-weld-strength", "steel-fillet-weld-size", "weld-metal-volume", "weld-cost-per-foot"],
   "multi-bend-flat-pattern": ["bend-allowance", "rolled-blank", "min-bend-radius", "cone-flat-pattern"],
+  "coil-length": ["metal-weight", "multi-bend-flat-pattern", "rolled-blank"],
   "speeds-feeds": ["bend-allowance", "weld-usage"],
   "weld-usage": ["bend-allowance", "speeds-feeds"],
   "shielding-gas-runtime": ["weld-usage", "weld-cost-per-foot", "weld-duty-cycle"],

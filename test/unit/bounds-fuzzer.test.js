@@ -20923,6 +20923,25 @@ test("bounds: spec-v801 computeSprocketPitchDiameter pins the pitch diameter, th
   assert.ok("error" in _v801({ chain_pitch_in: 0.5, tooth_count_n: 17.5 }));
 });
 
+import { computeCoilLength as _v802 } from "../../calc-fab.js";
+
+test("bounds: spec-v802 computeCoilLength pins the annulus length, the ft conversion, monotonicity, and error seams", () => {
+  const r = _v802({ outside_diameter_in: 48, inside_diameter_in: 16, material_thickness_in: 0.024 });
+  assert.ok(Math.abs(r.length_in - 67020.6) < 1); // L = pi (OD^2 - ID^2) / (4 t)
+  assert.ok(Math.abs(r.length_ft - r.length_in / 12) < 1e-9); // ft = in / 12
+  assert.ok(Math.abs(r.length_ft - 5585.1) < 0.1);
+  // Halving the thickness doubles the length in the same coil OD.
+  const thin = _v802({ outside_diameter_in: 48, inside_diameter_in: 16, material_thickness_in: 0.012 });
+  assert.ok(Math.abs(thin.length_in - 2 * r.length_in) < 1e-6);
+  // A larger core (less material) at the same OD gives a shorter coil.
+  assert.ok(_v802({ outside_diameter_in: 48, inside_diameter_in: 24, material_thickness_in: 0.024 }).length_in < r.length_in);
+  // Error seams: non-finite, non-positive OD, core >= OD, non-positive thickness.
+  assert.ok("error" in _v802({ outside_diameter_in: Infinity, inside_diameter_in: 16, material_thickness_in: 0.024 }));
+  assert.ok("error" in _v802({ outside_diameter_in: 0, inside_diameter_in: 16, material_thickness_in: 0.024 }));
+  assert.ok("error" in _v802({ outside_diameter_in: 16, inside_diameter_in: 16, material_thickness_in: 0.024 }));
+  assert.ok("error" in _v802({ outside_diameter_in: 48, inside_diameter_in: 16, material_thickness_in: 0 }));
+});
+
 import { computeKeyseatKeySize as _v513 } from "../../calc-machining.js";
 
 test("bounds: spec-v513 computeKeyseatKeySize pins the band-table width, the H/2 depth, the key stresses, and error seams", () => {

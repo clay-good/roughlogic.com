@@ -414,6 +414,8 @@ const _TILES = [
   ["weld-metal-volume", "E"], ["wire-feed-deposition", "E"], ["wire-feed-speed-for-deposition", "E"], ["weld-transverse-shrinkage", "E"],
   ["weld-group-eccentric", "E"], ["min-bend-radius", "E"], ["shrink-fit", "G"],
   ["weld-dilution", "E"], ["weld-passes-arc-time", "E"], ["weld-travel-speed", "E"],
+  // spec-v802 coil / roll stock length (calc-fab.js, group E)
+  ["coil-length", "E"],
   // v135 machining cut-planning (calc-machining.js)
   ["spindle-power-torque", "K"], ["spindle-max-mrr", "K"],
 

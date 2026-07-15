@@ -33622,6 +33622,56 @@
    }
   },
   {
+   "tile_id": "coil-length",
+   "source_publisher": "coil / roll stock annulus identity",
+   "source_title": "48 in coil OD on a 16 in core at 0.024 in (24 ga) -> 67,021 in = 5,585 ft",
+   "source_edition_or_year": "spec-v802 worked example (machine-verified)",
+   "source_section_or_page": "spec-v802 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "outside_diameter_in": 48,
+    "inside_diameter_in": 16,
+    "material_thickness_in": 0.024
+   },
+   "outputs": {
+    "length_in": {
+     "value": 67020.6,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "length_ft": {
+     "value": 5585.1,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "coil-length",
+   "source_publisher": "coil / roll stock annulus identity",
+   "source_title": "cross-check: 40 in coil OD on a 20 in core at 0.018 in -> 4,363 ft",
+   "source_edition_or_year": "spec-v802 worked example (machine-verified)",
+   "source_section_or_page": "spec-v802 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "outside_diameter_in": 40,
+    "inside_diameter_in": 20,
+    "material_thickness_in": 0.018
+   },
+   "outputs": {
+    "length_ft": {
+     "value": 4363.3,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spindle-power-torque",
    "source_publisher": "first-principles specific-cutting-energy with Machinery's Handbook unit power",
    "source_title": "cutting_hp = MRR x unit power; motor_hp = cutting_hp / eff; torque = 5252 x cutting_hp / rpm",

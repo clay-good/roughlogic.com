@@ -1354,3 +1354,48 @@ function _v358renderWeldTravelSpeed(inputRegion, outputRegion, citationEl) {
   for (const f of [v, i, e, hi]) f.input.addEventListener("input", update);
 }
 FAB_RENDERERS["weld-travel-speed"] = _v358renderWeldTravelSpeed;
+
+// =====================================================================
+// spec-v802 - Group E: coil / roll stock length (sheet-metal, cable, strip)
+// The annulus identity L = pi (OD^2 - ID^2) / (4 t); first-principles.
+// =====================================================================
+
+// dims: in { outside_diameter_in: L, inside_diameter_in: L, material_thickness_in: L } out: { length_in: L, length_ft: L }
+export function computeCoilLength({ outside_diameter_in = 0, inside_diameter_in = 0, material_thickness_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const od = Number(outside_diameter_in) || 0;
+  const id = Number(inside_diameter_in) || 0;
+  const t = Number(material_thickness_in) || 0;
+  if (!(od > 0)) return { error: "Coil outside diameter must be positive (in)." };
+  if (!(id >= 0)) return { error: "Core (inside) diameter must be non-negative (in)." };
+  if (!(od > id)) return { error: "Coil outside diameter must exceed the core diameter." };
+  if (!(t > 0)) return { error: "Material thickness must be positive (in)." };
+  const length_in = Math.PI * (od * od - id * id) / (4 * t);
+  const length_ft = length_in / 12;
+  if (![length_in, length_ft].every(Number.isFinite)) return { error: "Coil-length math is not a finite value." };
+  return {
+    length_in, length_ft,
+    note: "Coil/roll stock length from the annulus identity. The wound material, seen end-on, is an annulus of area pi/4 (OD^2 - ID^2); unwound it is a strip of the same cross-section = length x thickness, so L = pi (OD^2 - ID^2) / (4 t). OD is the full coil outside diameter, ID the core (mandrel) diameter, and t the material thickness -- all in the same units. Halving the thickness doubles the length wound to the same coil OD. Exact for a tightly wound coil with no air gaps or telescoping; the usable length runs slightly short after the last wrap and any core stub. A layout aid; weigh or measure-off to confirm before a critical cut.",
+  };
+}
+export const coilLengthExample = { inputs: { outside_diameter_in: 48, inside_diameter_in: 16, material_thickness_in: 0.024 } };
+function _v802renderCoilLength(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Coil / roll stock length from the annulus identity L = pi (OD^2 - ID^2) / (4 t), for coil outside diameter OD, core diameter ID, and material thickness t (same units). First-principles. A layout aid; measure or weigh to confirm before a critical cut.";
+  const od = makeNumber("Coil outside diameter OD (in)", "coil-od", { step: "any", min: "0" }); od.input.value = "48";
+  const id = makeNumber("Core / mandrel diameter ID (in)", "coil-id", { step: "any", min: "0" }); id.input.value = "16";
+  const t = makeNumber("Material thickness t (in)", "coil-t", { step: "any", min: "0" }); t.input.value = "0.024";
+  for (const f of [od, id, t]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { od.input.value = "48"; id.input.value = "16"; t.input.value = "0.024"; update(); });
+  const oFt = makeOutputLine(outputRegion, "Coil length", "coil-out-ft");
+  const oIn = makeOutputLine(outputRegion, "Coil length (in)", "coil-out-in");
+  const oNote = makeOutputLine(outputRegion, "Note", "coil-out-n");
+  const update = debounce(() => {
+    const r = computeCoilLength({ outside_diameter_in: Number(od.input.value) || 0, inside_diameter_in: Number(id.input.value) || 0, material_thickness_in: Number(t.input.value) || 0 });
+    if (r.error) { oFt.textContent = r.error; oIn.textContent = "-"; oNote.textContent = ""; return; }
+    oFt.textContent = fmt(r.length_ft, 1) + " ft";
+    oIn.textContent = fmt(r.length_in, 0) + " in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [od, id, t]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["coil-length"] = _v802renderCoilLength;

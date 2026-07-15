@@ -8658,6 +8658,18 @@ export const CITATIONS = {
       { name: "Grain direction", value: "transverse bends tolerate tighter radii than longitudinal; screen only", source: "forming practice" },
     ],
   },
+  "coil-length": {
+    formula: "L = pi (OD^2 - ID^2) / (4 t); L_ft = L / 12.",
+    edition: "The coil / roll stock length annulus identity, first-principles; the coil OD, core ID, and thickness come from the material.",
+    freeAccess: "The coil-length relation is a first-principles geometric identity (annulus cross-section = length x thickness); the coil OD, core diameter, and material thickness come from the coil.",
+    governance: GOVERNANCE.general,
+    editionNote: "Coil / roll stock length from the annulus identity. The wound material, seen end-on, is an annulus of area pi/4 (OD^2 - ID^2); unwound it is a strip of the same cross-section = length x thickness, so L = pi (OD^2 - ID^2) / (4 t), with OD the coil outside diameter, ID the core (mandrel) diameter, and t the material thickness in the same units. Halving the thickness doubles the length wound to the same coil OD. It is exact for a tightly wound coil with no air gaps or telescoping; the usable length runs slightly short after the last wrap and the core stub. A layout aid; weigh or measure-off to confirm before a critical cut.",
+    assumptions: [
+      { name: "Annulus identity", value: "wound cross-section pi/4 (OD^2 - ID^2) equals unwound length x thickness", source: "geometry" },
+      { name: "Tight coil", value: "assumes no air gaps or telescoping between wraps", source: "scope of this tile" },
+      { name: "Usable length", value: "the last wrap and core stub trim the usable length slightly", source: "shop practice" },
+    ],
+  },
   "weld-dilution": {
     formula: "dilution = A_base / (A_base + A_filler) x 100; filler_share = 100 - dilution.",
     edition: "The standard welding-metallurgy weld-dilution definition, by name.",

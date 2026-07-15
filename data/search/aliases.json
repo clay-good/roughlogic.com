@@ -987,6 +987,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "coil length",
+      "target": "coil-length",
+      "kind": "industry"
+    },
+    {
+      "term": "roll stock length",
+      "target": "coil-length",
+      "kind": "industry"
+    },
+    {
+      "term": "coil stock length",
+      "target": "coil-length",
+      "kind": "industry"
+    },
+    {
+      "term": "strip length on a coil",
+      "target": "coil-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "remaining coil footage",
+      "target": "coil-length",
+      "kind": "adjacent"
+    },
+    {
       "term": "bolt proof load",
       "target": "bolt-proof-load",
       "kind": "industry"

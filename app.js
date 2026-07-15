@@ -763,6 +763,8 @@ const TOOL_MODULES = (() => {
     "weld-metal-volume", "wire-feed-deposition", "wire-feed-speed-for-deposition", "weld-transverse-shrinkage",
     "weld-group-eccentric", "min-bend-radius", "shrink-fit",
     "weld-dilution", "weld-passes-arc-time", "weld-travel-speed",
+    // spec-v802 coil / roll stock length (group E)
+    "coil-length",
   ]);
   // Group G (cont.): the layout & shop-geometry bench, split out of
   // calc-fab.js into calc-layout.js (spec-v56) once calc-fab hit 96% of its
