@@ -4,6 +4,79 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): spec-v808 tire contact patch from load and pressure; 2026-07-15
+
+- New tile `tire-contact-patch` (Group K, calc-mechanic.js): the tire footprint and the flotation / soil-compaction
+  lever behind airing down. `A = W / p` (corner load / inflation pressure); the average ground pressure roughly equals
+  the inflation pressure independent of load. A 900 lb corner at 35 psi rides on 25.7 in^2; airing down to 15 psi grows
+  the patch to 60 in^2 (2.3x) at the same load. An idealization -- the sidewall and tread carry a little load, so the
+  real patch runs a bit smaller than W/p. Serves mechanic (off-road flotation) and agriculture (compaction). Fuzzer pins
+  A = W/p, the metric area, the inverse-pressure flotation, and the error seams. Bumps the Group K citations audit
+  12 -> 13. Explore sweep #25. Home count 1,256 -> 1,257.
+
+### feat(mechanic): spec-v807 belt power from tension and speed; 2026-07-15
+
+- New tile `belt-hp-transmitted` (Group G, calc-cross.js): the power a belt actually transmits, completing the
+  belt-drive cluster beside `vbelt-drive` and `belt-pulley`. `P = (T1 - T2) V / 33000` with belt speed `V = pi D N / 12`.
+  Only the effective tension `Te = T1 - T2` does work; a 250/100 lb drive on a 6 in sheave at 1,750 rpm runs 2,749 ft/min
+  and passes 12.5 HP, and a tighter 400/250 lb drive keeps the same Te and 12.5 HP while loading the bearings harder --
+  over-tensioning buys wear, not capacity. Fuzzer pins the power, the belt speed, the effective-tension invariance, and
+  the error seams. Bumps the Group G citations audit 32 -> 33. Explore sweep #25. Home count 1,255 -> 1,256.
+
+### feat(electrical): spec-v806 transformer turns / voltage / current / impedance ratio; 2026-07-15
+
+- New tile `transformer-turns-ratio` (Group A, calc-electrical.js): the ideal-transformer nameplate ratio the 8-tile
+  transformer family never computed. `a = Np/Ns = Vp/Vs = Is/Ip`, with impedance reflecting as `a^2`. A 480-to-120 V unit
+  is 4:1; 50 A on the secondary is 12.5 A on the primary, and an 8 ohm load looks like 128 ohm to the source (the a^2
+  transformation behind 70 V speaker-line and audio impedance matching). The lossless ratio; winding resistance and
+  leakage reactance stay in `transformer-voltage-regulation`. Fuzzer pins the three ratios, the step-up / isolation
+  labels, the null optional outputs, and the error seams. Explore sweep #25. Home count 1,254 -> 1,255.
+
+### feat(machining): spec-v805 tailstock setover for taper turning; 2026-07-15
+
+- New tile `tailstock-setover` (Group K, calc-shop.js): the lathe tailstock offset to turn a taper between centers,
+  completing the taper cluster beside `taper-calc` and `taper-diameter`. `S = OAL x (D - d) / (2 L)` -- the offset scales
+  with the OVERALL length between centers, not the taper length, because the whole part pivots about the headstock
+  center; it reduces to `(D - d)/2` when the taper runs the full length. A 12 in part with a 1.500-to-1.000 in taper over
+  8 in needs 0.375 in of setover. Shallow tapers only. Fuzzer pins the OAL-scaled offset, the full-length reduction, and
+  the error seams. Explore sweep #25. Home count 1,253 -> 1,254.
+
+### feat(electrical): spec-v804 AWG conductor geometry; 2026-07-15
+
+- New tile `awg-wire-geometry` (Group A, calc-electrical.js): surfaces the AWG gauge geometry the module already computed
+  internally for ampacity and voltage drop but never showed. `d = 0.005 x 92^((36 - n)/39)` in, circular mils
+  `= (d in mils)^2`, and the true `pi (d/2)^2` metric area; each 6-gauge step nearly doubles the diameter, and the aught
+  sizes 1/0-4/0 are n = 0, -1, -2, -3. #12 AWG is 0.0808 in, 6,530 cmil, 3.31 mm^2; 4/0 is exactly 0.460 in and 211,600
+  cmil. Reuses the existing pure-math AWG helpers. Fuzzer pins the diameter / area, the aught sizes, the 6-gauge ratio,
+  and the error seams. Explore sweep #24. Home count 1,252 -> 1,253.
+
+### feat(construction): spec-v803 ASCE 7 live load reduction; 2026-07-15
+
+- New tile `asce-live-load-reduction` (Group E, calc-construction.js): the routine ASCE 7 section 4.7 reduction a large
+  tributary area earns, joining the ASCE 7 load family. `L = L0 (0.25 + 15/sqrt(KLL x AT))`, permitted only where
+  `KLL x AT >= 400 ft^2` and floored at `0.50 L0` (one floor) or `0.40 L0` (two or more), with KLL from Table 4.7-1. A
+  50 psf office load on an interior column (KLL 4) with 400 ft^2 tributary reduces 37.5% to 31.25 psf; a 1,000 ft^2 area
+  hits the 0.50 floor at 25 psf. Loads over 100 psf, garages, and assembly spaces are flagged non-reducible. Fuzzer pins
+  the reduction, the two floors, the 400 ft^2 gate, and the error seams. Raises the Group E group-shell gzip cap
+  54 -> 56 KB. Explore sweep #24. Home count 1,251 -> 1,252.
+
+### feat(sheet-metal): spec-v802 coil / roll stock length; 2026-07-15
+
+- New tile `coil-length` (Group E, calc-fab.js): the strip length still on a coil without unrolling it, from the annulus
+  identity `L = pi (OD^2 - ID^2) / (4 t)` (coil OD, core ID, material thickness). A 48 in coil on a 16 in core at
+  0.024 in (24 ga) holds 5,585 ft; halving the thickness doubles the length at the same coil OD. Exact for a tightly
+  wound coil; distinct from the HVAC cooling-coil tiles. Fuzzer pins the annulus length, the ft conversion, the
+  thickness / core monotonicity, and the error seams. Explore sweep #24. Home count 1,250 -> 1,251.
+
+### feat(machining): spec-v801 sprocket pitch diameter (ANSI B29.1); 2026-07-15
+
+- New tile `sprocket-pitch-diameter` (Group K, calc-shop.js): the pitch diameter a sprocket blank is laid out from,
+  beside `roller-chain-length`, closing the chain-drive cluster. `PD = p / sin(180 deg / N)` and the maximum outside
+  diameter `OD = p (0.6 + cot(180 deg / N))` (chain pitch p, tooth count N). A 17-tooth #40 sprocket (0.5 in pitch) is
+  2.7211 in pitch diameter -- matching the published ANSI table -- and 2.9748 in tip diameter. Fuzzer pins both
+  diameters, the tip-outside-pitch ordering, the pitch / tooth monotonicity, and the error seams. Explore sweep #24.
+  Home count 1,249 -> 1,250.
+
 ### feat(concrete): spec-v800 water-cementitious ratio and exposure cap (ACI 318); 2026-07-14
 
 - New tile `water-cement-ratio` (Group E, calc-construction.js): the single strongest lever on concrete strength and
