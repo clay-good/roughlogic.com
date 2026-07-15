@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(shop): press-fit inverse note/citation had a spurious D in the interference formula; 2026-07-15
+
+- The `press-fit-interference-for-force` tile's displayed note, renderer citation, and citations.js formula/editionNote
+  wrote the inverse as `i = holding x 2 Do^2 / (E x (Do^2 - D^2) x pi x D x L x mu)` -- with a spurious `x D`. Since the
+  holding force `p x pi x D x L x mu` is linear in interference and the interface diameter D cancels from the
+  pressure/force ratio (which the note text itself states), the correct inverse is
+  `i = holding x 2 Do^2 / (E x (Do^2 - D^2) x pi x L x mu)`. The compute code and the code comment were already correct;
+  only the four displayed strings carried the extra D. Removed it. Found by the formula-correctness audit.
+
 ### fix(water): filter-loading high-rate band label said 4-8 gpm/ft^2 but the band is 5-8; 2026-07-15
 
 - `computeFilterLoading` / `computeFilterAreaForLoading` (calc-water.js) classify loading into disjoint bands: rapid sand
