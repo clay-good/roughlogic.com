@@ -4,6 +4,28 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(test): repair 6 worked-example fixtures whose input keys did not match their compute signature; 2026-07-15
+
+- Six worked-example rows in test/fixtures/worked-examples.json used input keys the compute function does not accept, so
+  the runner silently exercised parameter defaults while pinning outputs written to match those defaults (the same class
+  as the crane-lift fixture repaired earlier) -- meaning those tiles were not actually validated. Found by a script that
+  cross-checks every fixture's input keys against its function's destructured parameters. Repaired each to the correct
+  keys and re-pinned the real outputs (the compute functions themselves were already correct):
+  - `npsh-a`: fixture used an obsolete psi-based parameterization (`fluid_temp_F`, `atmospheric_psi`, `suction_lift_ft`);
+    synced to the current elevation/temperature model (`elevation_ft`, `water_temp_F`, `source_elevation_relative_ft`),
+    NPSHa 36.31 ft.
+  - `srt-fm-ratio`: keys `eff_tss_mg_l` / `eff_flow_mgd` / `bod_load_lb_d` didn't match `effluent_tss_mg_l` /
+    `effluent_flow_mgd` / `bod_load_lb_day`, so effluent solids loss defaulted to zero and the pinned SRT was 6.25 d;
+    the correct SRT including effluent loss is 6.11 d.
+  - `formwork-pressure`: was missing `wall_height_ft`, defaulting to a 100 ft wall (wet-head 15,000 psf); corrected to a
+    12 ft wall (1,800 psf).
+  - `plywood-span`, `generator-motor-starting`, `stair-stringer-layout`: synced to correct keys / the authoritative code
+    example, outputs re-pinned.
+- Repairing the `generator-motor-starting` fixture then exposed a real contract leak the mis-wired fixture had hidden:
+  `computeGeneratorMotorStarting` guarded `non_motor_kW >= 0` (which `Infinity` passes) but never checked finiteness, so a
+  non-finite `non_motor_kW` (or motor `hp`) leaked `Infinity` into `running_kW` / `required_kW`. Added the standard
+  `_finiteGuard` and a `Number.isFinite` check on `hp`.
+
 ### fix(mechanic): chamber-cc-for-cr dome/dish input label had the sign backwards; 2026-07-15
 
 - The `chamber-cc-for-cr` tile (calc-mechanic.js) labeled its piston-volume input "Piston dome (-) / dish (+)", but the

@@ -9503,32 +9503,33 @@
    "tile_id": "plywood-span",
    "source_publisher": "APA Engineered Wood Span Ratings (project bundled)",
    "source_title": "APA panel span lookup: spacing_ok if support_spacing_in <= published max for the rating; load_ok if load_psf <= published total",
-   "source_edition_or_year": "APA Engineered Wood Construction Guide (48/24 -> 48 in roof spacing, 25 psf live, 35 psf total)",
-   "source_section_or_page": "0.75 in / 48/24 / perpendicular / 24 in support / 30 psf load -> 48 in allowable spacing, 35 psf total, all flags pass",
+   "source_edition_or_year": "APA Engineered Wood Construction Guide (24/16 -> 24 in roof spacing, 40 psf live, 50 psf total)",
+   "source_section_or_page": "24/16 / 0.5 in / roof / 24 in support / 30 psf live + 8 psf dead -> 24 in allowable spacing, 40 psf live, 50 psf total, all flags pass",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
-    "panel_thickness_in": 0.75,
-    "span_rating": "48/24",
-    "orientation": "perpendicular",
+    "panel_thickness_in": 0.5,
+    "span_rating": "24/16",
+    "application": "roof",
     "support_spacing_in": 24,
-    "load_psf": 30
+    "live_load_psf": 30,
+    "dead_load_psf": 8
    },
    "outputs": {
     "allowable_spacing_in": {
-     "value": 48,
+     "value": 24,
      "tolerance": {
       "abs": 0
      }
     },
     "allowable_live_psf": {
-     "value": 25,
+     "value": 40,
      "tolerance": {
       "abs": 0
      }
     },
     "allowable_total_psf": {
-     "value": 35,
+     "value": 50,
      "tolerance": {
       "abs": 0
      }
@@ -9973,14 +9974,15 @@
    "source_publisher": "ACI 347 Guide to Formwork for Concrete",
    "source_title": "ACI 347 lateral pressure on wall forms: P = Cw * Cc * (150 + 9000 R / T) for R <= 7 ft/hr",
    "source_edition_or_year": "ACI 347 (Class I mix Cc = 1.0; weight factor Cw = 1.0 for ordinary concrete)",
-   "source_section_or_page": "Pour 5 ft/hr / 70 F / 4 in slump / Class I -> 792.86 psf design pressure (capped at wet-head 15,000 psf for the deep wall)",
+   "source_section_or_page": "Pour 5 ft/hr / 70 F / normal-weight 150 pcf / 12 ft wall -> 792.86 psf design pressure (below the 1,800 psf wet-concrete head)",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
     "pour_rate_ft_per_hr": 5,
     "concrete_temp_F": 70,
-    "slump_in": 4,
-    "mix_class": "I"
+    "weight_factor": "normal",
+    "unit_weight_pcf": 150,
+    "wall_height_ft": 12
    },
    "outputs": {
     "pressure_psf": {
@@ -9996,7 +9998,7 @@
      }
     },
     "wet_head_psf": {
-     "value": 15000,
+     "value": 1800,
      "tolerance": {
       "abs": 1
      }
@@ -10012,27 +10014,27 @@
   {
    "tile_id": "npsh-a",
    "source_publisher": "Hydraulic Institute / centrifugal-pump cavitation practice",
-   "source_title": "NPSH_a = (P_atm - P_vapor) * 2.31 / SG +/- static_head - friction_loss",
-   "source_edition_or_year": "Hydraulic Institute Standards (water vapor pressure 0.36 psi @ 70 F; 14.7 psi atmospheric)",
-   "source_section_or_page": "70 F water / 14.7 psi atm / 8 ft suction lift / 2 ft friction -> 33.90 ft atm head, 0.59 ft vapor head, 31.31 ft NPSHa",
+   "source_title": "NPSHa (ft) = H_atm(elevation) - H_vapor(water temp) + source_elevation_relative - friction_loss",
+   "source_edition_or_year": "Hydraulic Institute Standards (H_atm 33.90 ft at sea level; water vapor head 0.59 ft at 60 F)",
+   "source_section_or_page": "0 ft elevation / 60 F water / +5 ft flooded source / 2 ft friction / NPSHr 8 ft -> 33.90 ft atm head, 0.59 ft vapor head, 36.31 ft NPSHa (no cavitation)",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
-    "fluid_temp_F": 70,
-    "atmospheric_psi": 14.7,
-    "suction_lift_ft": 8,
+    "elevation_ft": 0,
+    "water_temp_F": 60,
+    "source_elevation_relative_ft": 5,
     "friction_loss_ft": 2,
-    "vapor_psi": null
+    "npsh_required_ft": 8
    },
    "outputs": {
     "H_atm_ft": {
-     "value": 33.9,
+     "value": 33.899,
      "tolerance": {
       "abs": 0.01
      }
     },
     "H_vapor_ft": {
-     "value": 0.59,
+     "value": 0.591,
      "tolerance": {
       "abs": 0.01
      }
@@ -10044,7 +10046,7 @@
      }
     },
     "NPSHa_ft": {
-     "value": 31.31,
+     "value": 36.308,
      "tolerance": {
       "abs": 0.01
      }
@@ -10752,23 +10754,31 @@
    "source_publisher": "NEC 430.110 + manufacturer locked-rotor schedule (project bundled)",
    "source_title": "Generator sizing for motor starting: required_kVA = LRA at code letter; recommended kW = next ANSI step above required",
    "source_edition_or_year": "NEC 430.110 + NEMA MG 1 code-letter table (Code F = 5.0-5.59 kVA/hp locked-rotor)",
-   "source_section_or_page": "25 hp / 480 V / Code F single motor on 100 kVA generator at X 0.18 -> running 18.65 kW, worst LRA 140 kVA, required 466.67 kVA / 373.33 kW, recommended 400 kW",
+   "source_section_or_page": "25 hp Code G + 10 hp Code F + 5 hp Code B motors, 15 kW non-motor, 0.3 dip, frequent starts -> running 44.84 kW, worst LRA 140 kVA, required 536.67 kVA / 429.33 kW, recommended 500 kW",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
     "motors": [
      {
       "hp": 25,
-      "voltage_V": 480,
-      "code": "F"
+      "code_letter": "G"
+     },
+     {
+      "hp": 10,
+      "code_letter": "F"
+     },
+     {
+      "hp": 5,
+      "code_letter": "B"
      }
     ],
-    "generator_kVA": 100,
-    "generator_X_per_unit": 0.18
+    "non_motor_kW": 15,
+    "dip_factor": 0.3,
+    "starts_per_hour": "frequent"
    },
    "outputs": {
     "running_kW": {
-     "value": 18.65,
+     "value": 44.84,
      "tolerance": {
       "abs": 0.05
      }
@@ -10780,19 +10790,19 @@
      }
     },
     "required_starting_kVA": {
-     "value": 466.67,
+     "value": 536.67,
      "tolerance": {
       "abs": 0.5
      }
     },
     "required_kW": {
-     "value": 373.33,
+     "value": 429.33,
      "tolerance": {
       "abs": 0.5
      }
     },
     "recommended_kW": {
-     "value": 400,
+     "value": 500,
      "tolerance": {
       "abs": 0
      }
@@ -11382,13 +11392,12 @@
    "source_publisher": "IRC R311 (residential stair geometry; project bundled defaults)",
    "source_title": "Stair-layout solver: riser_count = ceil(rise/preferred); tread = run/(risers-1); throat per IRC R311",
    "source_edition_or_year": "IRC R311 default tread depth 11 in; preferred riser height 6.75-7.5 in",
-   "source_section_or_page": "108 in rise / 144 in run / 14-riser preference -> 16 risers / 6.75 in / 11 in tread / 165 in run / 33.21 deg / both flags pass",
+   "source_section_or_page": "108 in rise / 6.75 in preferred riser -> 16 risers / 6.75 in / 11 in tread / 15 treads / 165 in run / 33.21 deg / both flags pass",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
     "total_rise_in": 108,
-    "total_run_in": 144,
-    "riser_count": 14
+    "target_rise_in": 6.75
    },
    "outputs": {
     "riser_count": {
@@ -12001,17 +12010,18 @@
    "source_publisher": "WEF MOP 11 + Metcalf & Eddy activated-sludge identity",
    "source_title": "SRT = MLSS_lb / (WAS_TSS_lb_d + Eff_TSS_lb_d); F:M = BOD_load / MLVSS_lb",
    "source_edition_or_year": "WEF MOP 11 / Metcalf & Eddy activated-sludge chapter",
-   "source_section_or_page": "1 MG aeration / 2500 mg/L MLSS / 0.05 MGD WAS / 8000 mg/L WAS TSS / 10 mg/L eff TSS / 0.95 MGD eff -> MLSS 20,850 lb / SRT 6.25 days",
+   "source_section_or_page": "1 MG aeration / 2500 mg/L MLSS / 2000 mg/L MLVSS / 0.05 MGD WAS at 8000 mg/L / 10 mg/L eff TSS at 0.95 MGD -> MLSS 20,850 lb / SRT 6.11 days (effluent solids loss included)",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
     "aeration_volume_gal": 1000000,
     "mlss_mg_l": 2500,
+    "mlvss_mg_l": 2000,
     "was_flow_mgd": 0.05,
     "was_tss_mg_l": 8000,
-    "eff_tss_mg_l": 10,
-    "eff_flow_mgd": 0.95,
-    "bod_load_lb_d": 1500
+    "effluent_tss_mg_l": 10,
+    "effluent_flow_mgd": 0.95,
+    "bod_load_lb_day": 1500
    },
    "outputs": {
     "mlss_lb": {
@@ -12021,9 +12031,9 @@
      }
     },
     "srt_days": {
-     "value": 6.25,
+     "value": 6.105,
      "tolerance": {
-      "abs": 0.05
+      "abs": 0.01
      }
     }
    }

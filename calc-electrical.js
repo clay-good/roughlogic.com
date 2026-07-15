@@ -2100,6 +2100,7 @@ export function computeGeneratorMotorStarting({
   dip_factor = 0.30,
   starts_per_hour = "occasional",
 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(motors) || motors.length === 0) return { error: "Provide at least one motor." };
   if (!(non_motor_kW >= 0)) return { error: "Non-motor steady load must be non-negative." };
   if (!(dip_factor > 0 && dip_factor < 1)) return { error: "Dip factor must be between 0 and 1." };
@@ -2107,7 +2108,7 @@ export function computeGeneratorMotorStarting({
   let worst_starting_kVA = 0;
   for (const m of motors) {
     const hp = Number(m.hp);
-    if (!(hp > 0)) return { error: "Each motor needs a positive hp." };
+    if (!(Number.isFinite(hp) && hp > 0)) return { error: "Each motor needs a positive hp." };
     const motor_kW = Number(m.running_kW) || hp * 0.746;
     running_kW += motor_kW;
     let starting_kVA;
