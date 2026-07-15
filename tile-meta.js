@@ -878,6 +878,7 @@ const _TILES = [
   ["generator-fuel-runtime", "A"],
   // spec-v494 transformer voltage regulation from %R and %X
   ["transformer-voltage-regulation", "A"],
+  ["transformer-turns-ratio", "A"],
   // spec-v495 capacitor discharge time and bleed resistor
   ["capacitor-discharge-time", "A"],
   // spec-v496 asymmetrical and peak fault current from X/R

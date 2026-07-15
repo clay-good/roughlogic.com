@@ -1087,6 +1087,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "transformer turns ratio",
+      "target": "transformer-turns-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "transformer voltage ratio",
+      "target": "transformer-turns-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "reflected impedance transformer",
+      "target": "transformer-turns-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "impedance matching transformer ratio",
+      "target": "transformer-turns-ratio",
+      "kind": "adjacent"
+    },
+    {
+      "term": "primary current from secondary current transformer",
+      "target": "transformer-turns-ratio",
+      "kind": "adjacent"
+    },
+    {
       "term": "bolt proof load",
       "target": "bolt-proof-load",
       "kind": "industry"

@@ -55,6 +55,7 @@ const TOOL_MODULES = (() => {
     "generator-fuel-runtime",
     // spec-v494 transformer voltage regulation from %R and %X
     "transformer-voltage-regulation",
+    "transformer-turns-ratio",
     // spec-v495 capacitor discharge time and bleed resistor
     "capacitor-discharge-time",
     // spec-v496 asymmetrical and peak fault current from X/R

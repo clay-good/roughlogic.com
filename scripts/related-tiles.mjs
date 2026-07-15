@@ -1118,6 +1118,7 @@ const RELATED = {
   "economic-conductor-sizing": ["voltage-drop", "min-conductor-for-vd", "motor-efficiency-upgrade-savings", "transformer-loading-efficiency"],
   "generator-fuel-runtime": ["generator-sizing", "battery-runtime", "generator-motor-starting"],
   "transformer-voltage-regulation": ["transformer-loading-efficiency", "buck-boost-sizing", "voltage-drop"],
+  "transformer-turns-ratio": ["transformer-voltage-regulation", "buck-boost-sizing", "ohms-law"],
   "capacitor-discharge-time": ["pf-correction", "motor-capacitor-max", "power-factor-billing-savings"],
   "asymmetrical-fault-xr": ["short-circuit-pp", "conductor-short-circuit-withstand", "arc-flash-screen"],
   "battery-hydrogen-vent": ["battery-vent-max-current", "standby-battery-sizing", "off-grid-battery", "battery-runtime"],

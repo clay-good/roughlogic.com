@@ -891,6 +891,7 @@ export const COMPUTE_MAP = {
   "asce-live-load-reduction": { module: "../../calc-construction.js", fn: "computeAsceLiveLoadReduction" },
   "awg-wire-geometry": { module: "../../calc-electrical.js", fn: "computeAwgWireGeometry" },
   "tailstock-setover": { module: "../../calc-shop.js", fn: "computeTailstockSetover" },
+  "transformer-turns-ratio": { module: "../../calc-electrical.js", fn: "computeTransformerTurnsRatio" },
   "keyseat-key-size": { module: "../../calc-machining.js", fn: "computeKeyseatKeySize" },
   "brake-pedal-hydraulic": { module: "../../calc-mechanic.js", fn: "computeBrakePedalHydraulic" },
   "dyno-correction-sae": { module: "../../calc-mechanic.js", fn: "computeDynoCorrectionSae" },

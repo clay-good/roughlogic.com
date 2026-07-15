@@ -5438,3 +5438,49 @@ function _v804renderAwgWireGeometry(inputRegion, outputRegion, citationEl) {
   update();
 }
 ELECTRICAL_RENDERERS["awg-wire-geometry"] = _v804renderAwgWireGeometry;
+
+// ===================== spec-v806: ideal transformer turns / voltage / current / impedance ratio =====================
+// dims: in { primary_voltage_v: M L^2 T^-3 I^-1, secondary_voltage_v: M L^2 T^-3 I^-1, secondary_current_a: I, load_impedance_ohm: M L^2 T^-3 I^-2 } out: { turns_ratio: dimensionless, primary_current_a: I, reflected_impedance_ohm: M L^2 T^-3 I^-2 }
+export function computeTransformerTurnsRatio({ primary_voltage_v = 0, secondary_voltage_v = 0, secondary_current_a = 0, load_impedance_ohm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Vp = Number(primary_voltage_v) || 0;
+  const Vs = Number(secondary_voltage_v) || 0;
+  const Is = Number(secondary_current_a) || 0;
+  const Zs = Number(load_impedance_ohm) || 0;
+  if (!(Vp > 0)) return { error: "Primary voltage must be positive (V)." };
+  if (!(Vs > 0)) return { error: "Secondary voltage must be positive (V)." };
+  if (Is < 0) return { error: "Secondary current cannot be negative (A)." };
+  if (Zs < 0) return { error: "Load impedance cannot be negative (ohm)." };
+  const turns_ratio = Vp / Vs;
+  if (!Number.isFinite(turns_ratio)) return { error: "Turns-ratio math is not a finite value." };
+  const primary_current_a = Is > 0 ? Is / turns_ratio : null;
+  const reflected_impedance_ohm = Zs > 0 ? turns_ratio * turns_ratio * Zs : null;
+  return {
+    turns_ratio, primary_current_a, reflected_impedance_ohm, step: turns_ratio > 1 ? "step-down" : turns_ratio < 1 ? "step-up" : "isolation (1:1)",
+    note: "Ideal (lossless, unity-coupling) transformer ratios: the turns ratio a = Np/Ns equals the voltage ratio Vp/Vs, the INVERSE current ratio Is/Ip, and the SQUARE ROOT of the impedance ratio -- so a load Zs on the secondary looks like a^2 x Zs from the primary. A 480-to-120 V transformer is a = 4 (a 4:1 step-down); 50 A drawn on the secondary reflects to 50/4 = 12.5 A on the primary, and an 8 ohm secondary load looks like 4^2 x 8 = 128 ohm to the source. The a^2 impedance transformation is why a 70 V constant-voltage speaker line or an audio output stage uses a matching transformer to hit a target load. This is the nameplate ratio assuming no losses; the winding resistance and leakage reactance that drop real secondary voltage under load are the separate transformer-voltage-regulation tile. A design aid; the nameplate and the manufacturer's data govern.",
+  };
+}
+export const transformerTurnsRatioExample = { inputs: { primary_voltage_v: 480, secondary_voltage_v: 120, secondary_current_a: 50, load_impedance_ohm: 8 } };
+function _v806renderTransformerTurnsRatio(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ideal transformer identities a = Np/Ns = Vp/Vs = Is/Ip, impedance ratio Zp/Zs = a^2, by name; the lossless nameplate ratio (winding resistance and leakage reactance are the separate voltage-regulation tile). A design aid; the nameplate governs.";
+  const vp = makeNumber("Primary voltage Vp (V)", "ttr-vp", { step: "any", min: "0" }); vp.input.value = "480";
+  const vs = makeNumber("Secondary voltage Vs (V)", "ttr-vs", { step: "any", min: "0" }); vs.input.value = "120";
+  const is = makeNumber("Secondary current Is (A, optional)", "ttr-is", { step: "any", min: "0" }); is.input.value = "50";
+  const zs = makeNumber("Secondary / load impedance (ohm, optional)", "ttr-zs", { step: "any", min: "0" }); zs.input.value = "8";
+  for (const f of [vp, vs, is, zs]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { vp.input.value = "480"; vs.input.value = "120"; is.input.value = "50"; zs.input.value = "8"; update(); });
+  const oA = makeOutputLine(outputRegion, "Turns ratio", "ttr-out-a");
+  const oIp = makeOutputLine(outputRegion, "Primary current Ip", "ttr-out-ip");
+  const oZp = makeOutputLine(outputRegion, "Reflected primary impedance", "ttr-out-zp");
+  const oNote = makeOutputLine(outputRegion, "Note", "ttr-out-note");
+  const update = debounce(() => {
+    const r = computeTransformerTurnsRatio({ primary_voltage_v: Number(vp.input.value) || 0, secondary_voltage_v: Number(vs.input.value) || 0, secondary_current_a: Number(is.input.value) || 0, load_impedance_ohm: Number(zs.input.value) || 0 });
+    if (r.error) { oA.textContent = r.error; oIp.textContent = "-"; oZp.textContent = "-"; oNote.textContent = ""; return; }
+    oA.textContent = fmt(r.turns_ratio, 4) + " : 1 (" + r.step + ")";
+    oIp.textContent = r.primary_current_a === null ? "(enter secondary current)" : fmt(r.primary_current_a, 3) + " A";
+    oZp.textContent = r.reflected_impedance_ohm === null ? "(enter load impedance)" : fmt(r.reflected_impedance_ohm, 2) + " ohm";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [vp, vs, is, zs]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["transformer-turns-ratio"] = _v806renderTransformerTurnsRatio;

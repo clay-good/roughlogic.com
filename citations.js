@@ -1559,6 +1559,18 @@ export const CITATIONS = {
       { name: "Continuous power", value: "the resistor dissipates V0^2/R while the bank is energized; rate it with margin", source: "first-principles" },
     ],
   },
+  "transformer-turns-ratio": {
+    formula: "a = Np/Ns = Vp/Vs = Is/Ip; Ip = Is/a; Zp = a^2 x Zs.",
+    edition: "The ideal (lossless) transformer turns / voltage / current / impedance relations, first-principles; the nameplate and the manufacturer's data govern.",
+    freeAccess: "The ideal-transformer ratios are standard first-principles circuit relations; the voltages come from the nameplate.",
+    governance: GOVERNANCE.general,
+    editionNote: "Ideal (lossless, unity-coupling) transformer relations. The turns ratio a = Np/Ns equals the voltage ratio Vp/Vs and the INVERSE current ratio Is/Ip, so the primary current is Ip = Is/a. Impedance transforms as the SQUARE of the ratio: a secondary load Zs is reflected to the primary as Zp = a^2 x Zs, which is why a matching transformer sets the load a source sees (a 70 V constant-voltage speaker tap, an audio output stage). These are the nameplate ratios with no losses assumed; the winding resistance and leakage reactance that actually drop the secondary voltage under load are the separate transformer-voltage-regulation quantity. A design aid, not a substitute for the nameplate and the manufacturer's data.",
+    assumptions: [
+      { name: "Ideal transformer", value: "lossless, unity coupling; a = Np/Ns = Vp/Vs = Is/Ip", source: "circuit theory" },
+      { name: "Impedance ratio", value: "a load reflects to the primary as a^2 times its value", source: "circuit theory" },
+      { name: "Nameplate ratio", value: "no winding resistance or leakage reactance; those are the voltage-regulation tile", source: "scope of this tile" },
+    ],
+  },
   "transformer-voltage-regulation": {
     formula: "cos = pf; sin = sqrt(1 - pf^2) x (leading ? -1 : +1); VR% = load x (%R cos + %X sin) + load^2 x (%X cos - %R sin)^2 / 200.",
     edition: "Transformer voltage-regulation approximation from %R, %X, and load power factor (an IEEE C57 test-report quantity), first-principles; the utility's voltage study governs the actual profile.",

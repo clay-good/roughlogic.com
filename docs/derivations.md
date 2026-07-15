@@ -1882,6 +1882,7 @@ cross-check.
 | calc-electrical.js | `computeTransformerKvaSizing` | `{ loads = [], primary_V = 480, secondary_V = 208, phase = "three", growth_res...` | _ | _ | _ |
 | calc-electrical.js | `computeTransformerLoadingEfficiency` | `{ kva_rating = 0, noload_w = 0, loadloss_w = 0, load = 0, pf = 1.0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeTransformerSize` | `{ load_kW, power_factor = 1, primary_V, secondary_V, phase = "three" }` | _ | _ | _ |
+| calc-electrical.js | `computeTransformerTurnsRatio` | `{ primary_voltage_v = 0, secondary_voltage_v = 0, secondary_current_a = 0, lo...` | _ | _ | _ |
 | calc-electrical.js | `computeTransformerVoltageRegulation` | `{ percent_r = 0, percent_x = 0, power_factor = 0.85, leading = false, load_fr...` | _ | _ | _ |
 | calc-electrical.js | `computeVoltageDrop` | `{ phase, material, awg, length_ft, current_A, source_voltage_V }` | _ | _ | _ |
 | calc-electrical.js | `computeVoltageDropReactance` | `{ system_voltage_v = 0, current_a = 0, length_ft = 0, r_ohm_per_kft = 0, x_oh...` | _ | _ | _ |
@@ -2915,7 +2916,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1501.
+Row count: 1502.
 
 <!-- END function-corpus-v14 -->
 
@@ -2996,7 +2997,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (160 tiles)
+### Group A Electrical (161 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3151,6 +3152,7 @@ per spec-v14 §13.1 second paragraph.
 | `transformer-kva-sizing` | Transformer kVA Sizing and FLA | NFPA / ANSI/IEEE C57; Loads {25 kVA, 18 kVA, 7500 W @ 0.85 pf = 8.82 kVA, 15 kV... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-loading-efficiency` | Transformer Loading Efficiency and Losses | transformer loss model; spec-v472 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `transformer-sizing` | Transformer Sizing | Project (first-principles); 90 kW @ 0.9 pf -> 100 kVA required; next ANSI standard st... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `transformer-turns-ratio` | Transformer Turns / Voltage / Current / Impedance Ratio | ideal transformer circuit relations; spec-v806 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `transformer-voltage-regulation` | Transformer Voltage Regulation from %R and %X | transformer voltage-regulation approx...; spec-v494 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `vfd-energy-savings` | VFD Retrofit Energy and Cost Savings (Affinity Cube Law) | US DOE motor/pump-system energy method; spec-v230 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `vfd-reflected-wave` | VFD Reflected-Wave Cable Length Limit | VFD reflected-wave cable-length limit...; 480 V, 0.1 us rise, 50% velocity, 100 ft -> L_crit 24.6 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4355,6 +4357,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1254. Fixture-covered or reference-cadence: 1254 / 1254.
+Tile count: 1255. Fixture-covered or reference-cadence: 1255 / 1255.
 
 <!-- END tile-index-v14 -->

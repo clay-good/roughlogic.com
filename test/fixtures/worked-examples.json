@@ -33834,6 +33834,62 @@
    }
   },
   {
+   "tile_id": "transformer-turns-ratio",
+   "source_publisher": "ideal transformer circuit relations",
+   "source_title": "480-to-120 V -> 4:1 turns ratio; 50 A secondary -> 12.5 A primary; 8 ohm load -> 128 ohm reflected",
+   "source_edition_or_year": "spec-v806 worked example (machine-verified)",
+   "source_section_or_page": "spec-v806 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "primary_voltage_v": 480,
+    "secondary_voltage_v": 120,
+    "secondary_current_a": 50,
+    "load_impedance_ohm": 8
+   },
+   "outputs": {
+    "turns_ratio": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "primary_current_a": {
+     "value": 12.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "reflected_impedance_ohm": {
+     "value": 128,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transformer-turns-ratio",
+   "source_publisher": "ideal transformer circuit relations",
+   "source_title": "cross-check: 120-to-480 V step-up -> 0.25:1 turns ratio",
+   "source_edition_or_year": "spec-v806 worked example (machine-verified)",
+   "source_section_or_page": "spec-v806 section 2.1 cross-check (step-up)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "primary_voltage_v": 120,
+    "secondary_voltage_v": 480
+   },
+   "outputs": {
+    "turns_ratio": {
+     "value": 0.25,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spindle-power-torque",
    "source_publisher": "first-principles specific-cutting-energy with Machinery's Handbook unit power",
    "source_title": "cutting_hp = MRR x unit power; motor_hp = cutting_hp / eff; torque = 5252 x cutting_hp / rpm",

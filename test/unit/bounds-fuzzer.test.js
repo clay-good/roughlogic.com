@@ -21009,6 +21009,29 @@ test("bounds: spec-v805 computeTailstockSetover pins the OAL-scaled offset, the 
   assert.ok("error" in _v805({ overall_length_in: 8, large_dia_in: 1.5, small_dia_in: 1.0, taper_length_in: 12 }));
 });
 
+import { computeTransformerTurnsRatio as _v806 } from "../../calc-electrical.js";
+
+test("bounds: spec-v806 computeTransformerTurnsRatio pins the turns/current/impedance ratios, the optional outputs, and error seams", () => {
+  const r = _v806({ primary_voltage_v: 480, secondary_voltage_v: 120, secondary_current_a: 50, load_impedance_ohm: 8 });
+  assert.ok(Math.abs(r.turns_ratio - 4) < 1e-9); // a = Vp/Vs
+  assert.ok(Math.abs(r.primary_current_a - 12.5) < 1e-9); // Ip = Is/a
+  assert.ok(Math.abs(r.reflected_impedance_ohm - 128) < 1e-9); // Zp = a^2 Zs
+  assert.strictEqual(r.step, "step-down");
+  // A step-up (Vp < Vs) gives a < 1 and is labeled step-up; optional outputs are null when not supplied.
+  const up = _v806({ primary_voltage_v: 120, secondary_voltage_v: 480 });
+  assert.ok(Math.abs(up.turns_ratio - 0.25) < 1e-9 && up.step === "step-up");
+  assert.ok(up.primary_current_a === null && up.reflected_impedance_ohm === null);
+  // 1:1 isolation is labeled and reflects impedance unchanged.
+  const iso = _v806({ primary_voltage_v: 240, secondary_voltage_v: 240, load_impedance_ohm: 50 });
+  assert.ok(iso.turns_ratio === 1 && iso.step === "isolation (1:1)" && Math.abs(iso.reflected_impedance_ohm - 50) < 1e-9);
+  // Error seams: non-finite, non-positive voltages, negative current/impedance.
+  assert.ok("error" in _v806({ primary_voltage_v: Infinity, secondary_voltage_v: 120 }));
+  assert.ok("error" in _v806({ primary_voltage_v: 0, secondary_voltage_v: 120 }));
+  assert.ok("error" in _v806({ primary_voltage_v: 480, secondary_voltage_v: 0 }));
+  assert.ok("error" in _v806({ primary_voltage_v: 480, secondary_voltage_v: 120, secondary_current_a: -1 }));
+  assert.ok("error" in _v806({ primary_voltage_v: 480, secondary_voltage_v: 120, load_impedance_ohm: -1 }));
+});
+
 import { computeKeyseatKeySize as _v513 } from "../../calc-machining.js";
 
 test("bounds: spec-v513 computeKeyseatKeySize pins the band-table width, the H/2 depth, the key stresses, and error seams", () => {
