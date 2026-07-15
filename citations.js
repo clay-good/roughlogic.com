@@ -8267,6 +8267,19 @@ export const CITATIONS = {
       { name: "Wrap", value: "the center distance should be at least about 30 pitches for good wrap", source: "chain-drive practice" },
     ],
   },
+
+  "sprocket-pitch-diameter": {
+    formula: "PD = p / sin(180 deg / N); OD = p (0.6 + cot(180 deg / N)).",
+    edition: "The ANSI B29.1 roller-chain sprocket pitch-diameter and maximum-outside-diameter relations, by name; the manufacturer's tooth form and hub govern.",
+    freeAccess: "The sprocket pitch-diameter and outside-diameter relations are published ANSI B29.1 / machine-design results; the chain pitch and tooth count come from the drive selection.",
+    governance: GOVERNANCE.general,
+    editionNote: "ANSI B29.1 sprocket geometry. The pitch diameter -- the diameter of the circle through the chain-pin centers when the chain wraps the sprocket -- is PD = p / sin(180 deg / N), for chain pitch p and tooth count N. The maximum outside (tip) diameter used to turn the blank is OD = p (0.6 + cot(180 deg / N)). Both grow with pitch and tooth count. It is the pitch diameter, not the outside diameter, that sets the drive's speed ratio and the required center distance. A design aid, not the manufacturer's chart; the tooth form, tolerance, and hub dimensions govern the sprocket you actually cut.",
+    assumptions: [
+      { name: "Pitch diameter", value: "the pitch diameter runs through the chain-pin centers and sets the speed ratio and center distance", source: "ANSI B29.1" },
+      { name: "Outside diameter", value: "the maximum tip diameter to turn the blank is OD = p(0.6 + cot(180 deg / N))", source: "ANSI B29.1" },
+      { name: "Design aid", value: "the manufacturer's tooth form, tolerance, and hub dimensions govern the finished sprocket", source: "scope of this tile" },
+    ],
+  },
   "press-fit-pressure": {
     formula: "p = (E x interference / D) x (Do^2 - D^2) / (2 Do^2); holding_force = p x pi x D x length x friction; hub_bore_stress = p x (Do^2 + D^2) / (Do^2 - D^2).",
     edition: "Lame interference-fit model (Machinery's Handbook 'Forces and Fits'; the Lame thick-cylinder equations, same-material solid shaft), by name; the actual materials, surface finish, and assembly method govern.",

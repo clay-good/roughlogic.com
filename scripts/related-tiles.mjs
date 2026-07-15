@@ -200,6 +200,7 @@ const RELATED = {
   "press-fit-pressure": ["shrink-fit", "bearing-l10-life", "bolt-proof-load"],
   "press-fit-interference-for-force": ["press-fit-pressure", "shrink-fit", "bearing-l10-life", "bolt-proof-load"],
   "roller-chain-length": ["vbelt-drive", "bearing-l10-life", "gear-mph-rpm"],
+  "sprocket-pitch-diameter": ["roller-chain-length", "spur-gear-geometry", "gear-mph-rpm"],
   "spur-gear-geometry": ["gear-identification", "gear-cascade", "cutting-speed-rpm", "dividing-head"],
   "gear-identification": ["spur-gear-geometry", "gear-cascade", "dividing-head", "cutting-speed-rpm"],
   "gear-chordal-thickness": ["spur-gear-geometry", "gear-identification", "dividing-head"],

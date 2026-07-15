@@ -20902,6 +20902,27 @@ test("bounds: spec-v512 computeRollerChainLength pins the pitch count, the even 
   assert.ok("error" in _v512({ small_teeth_n1: 17, large_teeth_n2: 51, center_distance_in: 30, pitch_in: 0 }));
 });
 
+import { computeSprocketPitchDiameter as _v801 } from "../../calc-shop.js";
+
+test("bounds: spec-v801 computeSprocketPitchDiameter pins the pitch diameter, the outside diameter, monotonicity, and error seams", () => {
+  const r = _v801({ chain_pitch_in: 0.5, tooth_count_n: 17 });
+  assert.ok(Math.abs(r.pitch_diameter_in - 2.7211) < 0.001); // PD = p / sin(180/N)
+  assert.ok(Math.abs(r.outside_diameter_in - 2.9748) < 0.001); // OD = p (0.6 + cot(180/N))
+  assert.ok(r.outside_diameter_in > r.pitch_diameter_in); // the tip circle sits outside the pitch circle
+  // Cross-check a #50 sprocket against the published table (25T = 4.9862 in pitch dia).
+  const fifty = _v801({ chain_pitch_in: 0.625, tooth_count_n: 25 });
+  assert.ok(Math.abs(fifty.pitch_diameter_in - 4.9867) < 0.001);
+  // More teeth at the same pitch grows the pitch diameter.
+  assert.ok(_v801({ chain_pitch_in: 0.5, tooth_count_n: 40 }).pitch_diameter_in > r.pitch_diameter_in);
+  // A bigger pitch at the same tooth count grows the pitch diameter proportionally.
+  assert.ok(Math.abs(_v801({ chain_pitch_in: 1.0, tooth_count_n: 17 }).pitch_diameter_in - 2 * r.pitch_diameter_in) < 1e-9);
+  // Error seams: non-finite, non-positive pitch, non-integer or sub-3 tooth count.
+  assert.ok("error" in _v801({ chain_pitch_in: Infinity, tooth_count_n: 17 }));
+  assert.ok("error" in _v801({ chain_pitch_in: 0, tooth_count_n: 17 }));
+  assert.ok("error" in _v801({ chain_pitch_in: 0.5, tooth_count_n: 2 }));
+  assert.ok("error" in _v801({ chain_pitch_in: 0.5, tooth_count_n: 17.5 }));
+});
+
 import { computeKeyseatKeySize as _v513 } from "../../calc-machining.js";
 
 test("bounds: spec-v513 computeKeyseatKeySize pins the band-table width, the H/2 depth, the key stresses, and error seams", () => {

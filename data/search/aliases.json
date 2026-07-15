@@ -962,6 +962,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "sprocket pitch diameter",
+      "target": "sprocket-pitch-diameter",
+      "kind": "industry"
+    },
+    {
+      "term": "sprocket diameter",
+      "target": "sprocket-pitch-diameter",
+      "kind": "industry"
+    },
+    {
+      "term": "sprocket outside diameter",
+      "target": "sprocket-pitch-diameter",
+      "kind": "adjacent"
+    },
+    {
+      "term": "chain sprocket size",
+      "target": "sprocket-pitch-diameter",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sprocket blank diameter",
+      "target": "sprocket-pitch-diameter",
+      "kind": "adjacent"
+    },
+    {
       "term": "bolt proof load",
       "target": "bolt-proof-load",
       "kind": "industry"

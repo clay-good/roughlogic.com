@@ -33574,6 +33574,54 @@
    }
   },
   {
+   "tile_id": "sprocket-pitch-diameter",
+   "source_publisher": "ANSI B29.1 sprocket geometry",
+   "source_title": "17-tooth #40 sprocket (0.5 in pitch) -> 2.7211 in pitch diameter, 2.9748 in max outside diameter",
+   "source_edition_or_year": "spec-v801 worked example (machine-verified)",
+   "source_section_or_page": "spec-v801 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "chain_pitch_in": 0.5,
+    "tooth_count_n": 17
+   },
+   "outputs": {
+    "pitch_diameter_in": {
+     "value": 2.7211,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "outside_diameter_in": {
+     "value": 2.9748,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sprocket-pitch-diameter",
+   "source_publisher": "ANSI B29.1 sprocket geometry",
+   "source_title": "cross-check: 25-tooth #50 sprocket (0.625 in pitch) -> 4.9867 in pitch diameter",
+   "source_edition_or_year": "spec-v801 worked example (machine-verified)",
+   "source_section_or_page": "spec-v801 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "chain_pitch_in": 0.625,
+    "tooth_count_n": 25
+   },
+   "outputs": {
+    "pitch_diameter_in": {
+     "value": 4.9867,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spindle-power-torque",
    "source_publisher": "first-principles specific-cutting-energy with Machinery's Handbook unit power",
    "source_title": "cutting_hp = MRR x unit power; motor_hp = cutting_hp / eff; torque = 5252 x cutting_hp / rpm",

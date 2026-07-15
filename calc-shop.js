@@ -1322,3 +1322,41 @@ function _v512renderRollerChainLength(inputRegion, outputRegion, citationEl) {
   for (const f of [n1, n2, c, p]) f.input.addEventListener("input", update);
 }
 SHOP_RENDERERS["roller-chain-length"] = _v512renderRollerChainLength;
+
+// ===================== spec-v801: sprocket pitch diameter (ANSI B29.1) =====================
+// dims: in { chain_pitch_in: L, tooth_count_n: dimensionless } out: { pitch_diameter_in: L, outside_diameter_in: L }
+export function computeSprocketPitchDiameter({ chain_pitch_in = 0, tooth_count_n = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const p = Number(chain_pitch_in) || 0;
+  const n = Number(tooth_count_n) || 0;
+  if (!(p > 0)) return { error: "Chain pitch must be positive (in)." };
+  if (!Number.isInteger(n) || !(n >= 3)) return { error: "Tooth count must be a whole number of at least 3." };
+  const half = Math.PI / n;
+  const pitch_diameter_in = p / Math.sin(half);
+  const outside_diameter_in = p * (0.6 + 1 / Math.tan(half));
+  if (![pitch_diameter_in, outside_diameter_in].every(Number.isFinite)) return { error: "Sprocket geometry is not a finite value." };
+  return {
+    pitch_diameter_in, outside_diameter_in,
+    note: "ANSI B29.1 sprocket geometry. The pitch diameter -- the diameter of the circle through the chain-pin centers when the chain wraps the sprocket -- is PD = p / sin(180 deg / N), for chain pitch p and tooth count N. The maximum outside (tip) diameter used to turn the blank is OD = p (0.6 + cot(180 deg / N)). Both grow with pitch and tooth count. It is the pitch diameter, not the OD, that sets the drive's speed ratio and center distance. A design aid; the manufacturer's tooth form and hub dimensions govern the sprocket you actually cut.",
+  };
+}
+export const sprocketPitchDiameterExample = { inputs: { chain_pitch_in: 0.5, tooth_count_n: 17 } };
+function _v801renderSprocketPitchDiameter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ANSI B29.1 sprocket pitch diameter PD = p / sin(180 deg / N) and maximum outside diameter OD = p (0.6 + cot(180 deg / N)), for chain pitch p and tooth count N. A design aid; the manufacturer's tooth form and hub govern.";
+  const p = makeNumber("Chain pitch p (in, #40 = 0.5)", "spd-p", { step: "any", min: "0" }); p.input.value = "0.5";
+  const n = makeNumber("Sprocket teeth N", "spd-n", { step: "1", min: "3" }); n.input.value = "17";
+  for (const f of [p, n]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { p.input.value = "0.5"; n.input.value = "17"; update(); });
+  const oPd = makeOutputLine(outputRegion, "Pitch diameter", "spd-out-pd");
+  const oOd = makeOutputLine(outputRegion, "Max outside (tip) diameter", "spd-out-od");
+  const oNote = makeOutputLine(outputRegion, "Note", "spd-out-n");
+  const update = debounce(() => {
+    const r = computeSprocketPitchDiameter({ chain_pitch_in: _readNum(p.input), tooth_count_n: _readNum(n.input) });
+    if (r.error) { oPd.textContent = r.error; oOd.textContent = "-"; oNote.textContent = ""; return; }
+    oPd.textContent = fmt(r.pitch_diameter_in, 4) + " in";
+    oOd.textContent = fmt(r.outside_diameter_in, 4) + " in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [p, n]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["sprocket-pitch-diameter"] = _v801renderSprocketPitchDiameter;

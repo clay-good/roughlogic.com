@@ -809,6 +809,8 @@ const TOOL_MODULES = (() => {
     "press-fit-pressure", "press-fit-interference-for-force",
     // spec-v512 roller chain length in pitches (ANSI B29.1)
     "roller-chain-length",
+    // spec-v801 sprocket pitch diameter (ANSI B29.1)
+    "sprocket-pitch-diameter",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [

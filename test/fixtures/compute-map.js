@@ -886,6 +886,7 @@ export const COMPUTE_MAP = {
   "press-fit-pressure": { module: "../../calc-shop.js", fn: "computePressFitPressure" },
   "press-fit-interference-for-force": { module: "../../calc-shop.js", fn: "computePressFitInterferenceForForce" },
   "roller-chain-length": { module: "../../calc-shop.js", fn: "computeRollerChainLength" },
+  "sprocket-pitch-diameter": { module: "../../calc-shop.js", fn: "computeSprocketPitchDiameter" },
   "keyseat-key-size": { module: "../../calc-machining.js", fn: "computeKeyseatKeySize" },
   "brake-pedal-hydraulic": { module: "../../calc-mechanic.js", fn: "computeBrakePedalHydraulic" },
   "dyno-correction-sae": { module: "../../calc-mechanic.js", fn: "computeDynoCorrectionSae" },
