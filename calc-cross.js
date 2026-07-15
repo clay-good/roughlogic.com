@@ -2424,6 +2424,58 @@ function renderVbeltDrive(inputRegion, outputRegion, citationEl) {
 
 CROSS_RENDERERS["vbelt-drive"] = renderVbeltDrive;
 
+// =====================================================================
+// spec-v807 belt-hp-transmitted - power a belt drive transmits from the
+// tight- and slack-side tensions and the belt speed.
+// P = (T1 - T2) V / 33000, with belt speed V = pi D N / 12.
+// =====================================================================
+// dims: in { tight_side_tension_lb: M L T^-2, slack_side_tension_lb: M L T^-2, sheave_diameter_in: L, sheave_rpm: T^-1 } out: { belt_speed_fpm: L T^-1, effective_tension_lb: M L T^-2, power_hp: M L^2 T^-3 }
+export function computeBeltHpTransmitted({ tight_side_tension_lb = 0, slack_side_tension_lb = 0, sheave_diameter_in = 0, sheave_rpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const T1 = Number(tight_side_tension_lb) || 0;
+  const T2 = Number(slack_side_tension_lb) || 0;
+  const D = Number(sheave_diameter_in) || 0;
+  const N = Number(sheave_rpm) || 0;
+  if (!(D > 0)) return { error: "Sheave diameter must be positive (in)." };
+  if (!(N > 0)) return { error: "Sheave speed must be positive (rpm)." };
+  if (T1 < 0 || T2 < 0) return { error: "Belt tensions cannot be negative (lb)." };
+  if (T1 < T2) return { error: "Tight-side tension must be at least the slack-side tension." };
+  const belt_speed_fpm = (Math.PI * D * N) / 12;
+  const effective_tension_lb = T1 - T2;
+  const power_hp = (effective_tension_lb * belt_speed_fpm) / 33000;
+  if (![belt_speed_fpm, effective_tension_lb, power_hp].every(Number.isFinite)) return { error: "Belt-power math is not a finite value." };
+  return {
+    belt_speed_fpm, effective_tension_lb, power_hp,
+    note: "Power a belt transmits: P = (T1 - T2) V / 33000 hp, where T1 is the tight-side tension, T2 the slack-side tension, and V the belt speed in ft/min = pi D N / 12 (sheave diameter D in inches, speed N in rpm). Only the DIFFERENCE in the two tensions (the effective, or net driving, tension Te = T1 - T2) does work -- the average tension (T1 + T2)/2 just clamps the belt to the sheave for friction grip and transmits no power. So two drives with the same Te transmit the same power even at very different total tensions; over-tensioning raises bearing load and belt wear without adding capacity. The 33000 is ft-lb per minute per horsepower. Use the pitch diameter and the driver (or driven) sheave consistently. A design aid; the belt and sheave ratings, the wrap angle, and the manufacturer's data govern.",
+  };
+}
+export const beltHpTransmittedExample = { inputs: { tight_side_tension_lb: 250, slack_side_tension_lb: 100, sheave_diameter_in: 6, sheave_rpm: 1750 } };
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderBeltHpTransmitted(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: belt power P = (T1 - T2) V / 33000 hp with belt speed V = pi D N / 12 ft/min; only the effective tension Te = T1 - T2 does work. First-principles as in Machinery's Handbook / Gates Industrial Drive Design Manual, by name. A design aid; the belt/sheave ratings and wrap angle govern.";
+  const t1 = makeNumber("Tight-side tension T1 (lb)", "bht-t1", { step: "any", min: "0" }); t1.input.value = "250";
+  const t2 = makeNumber("Slack-side tension T2 (lb)", "bht-t2", { step: "any", min: "0" }); t2.input.value = "100";
+  const d = makeNumber("Sheave pitch diameter D (in)", "bht-d", { step: "any", min: "0" }); d.input.value = "6";
+  const n = makeNumber("Sheave speed N (rpm)", "bht-n", { step: "any", min: "0" }); n.input.value = "1750";
+  for (const f of [t1, t2, d, n]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { t1.input.value = "250"; t2.input.value = "100"; d.input.value = "6"; n.input.value = "1750"; update(); });
+  const oP = makeOutputLine(outputRegion, "Power transmitted", "bht-out-p");
+  const oV = makeOutputLine(outputRegion, "Belt speed", "bht-out-v");
+  const oTe = makeOutputLine(outputRegion, "Effective (net) tension", "bht-out-te");
+  const oNote = makeOutputLine(outputRegion, "Note", "bht-out-note");
+  function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
+  const update = debounce(() => {
+    const r = computeBeltHpTransmitted({ tight_side_tension_lb: readNum(t1.input), slack_side_tension_lb: readNum(t2.input), sheave_diameter_in: readNum(d.input), sheave_rpm: readNum(n.input) });
+    if (r.error) { oP.textContent = r.error; oV.textContent = "-"; oTe.textContent = "-"; oNote.textContent = ""; return; }
+    oP.textContent = fmt(r.power_hp, 2) + " HP";
+    oV.textContent = fmt(r.belt_speed_fpm, 0) + " ft/min";
+    oTe.textContent = fmt(r.effective_tension_lb, 1) + " lb";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [t1.input, t2.input, d.input, n.input]) f.addEventListener("input", update);
+}
+CROSS_RENDERERS["belt-hp-transmitted"] = renderBeltHpTransmitted;
+
 // --- v15 G.8: Gear ratio and RPM cascade ---
 // A gear train multiplies the per-stage tooth-count ratios. Output RPM is the
 // input divided by the overall ratio; output torque is the input multiplied by

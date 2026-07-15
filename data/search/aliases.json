@@ -1112,6 +1112,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "belt power transmitted",
+      "target": "belt-hp-transmitted",
+      "kind": "industry"
+    },
+    {
+      "term": "belt horsepower from tension",
+      "target": "belt-hp-transmitted",
+      "kind": "industry"
+    },
+    {
+      "term": "effective belt tension",
+      "target": "belt-hp-transmitted",
+      "kind": "industry"
+    },
+    {
+      "term": "belt drive power capacity",
+      "target": "belt-hp-transmitted",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tight side slack side tension power",
+      "target": "belt-hp-transmitted",
+      "kind": "adjacent"
+    },
+    {
       "term": "bolt proof load",
       "target": "bolt-proof-load",
       "kind": "industry"

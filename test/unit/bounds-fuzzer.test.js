@@ -21032,6 +21032,28 @@ test("bounds: spec-v806 computeTransformerTurnsRatio pins the turns/current/impe
   assert.ok("error" in _v806({ primary_voltage_v: 480, secondary_voltage_v: 120, load_impedance_ohm: -1 }));
 });
 
+import { computeBeltHpTransmitted as _v807 } from "../../calc-cross.js";
+
+test("bounds: spec-v807 computeBeltHpTransmitted pins the power, the belt speed, the effective-tension invariance, and error seams", () => {
+  const r = _v807({ tight_side_tension_lb: 250, slack_side_tension_lb: 100, sheave_diameter_in: 6, sheave_rpm: 1750 });
+  assert.ok(Math.abs(r.power_hp - 12.495) < 0.01); // P = (T1-T2) V / 33000
+  assert.ok(Math.abs(r.belt_speed_fpm - 2748.9) < 1); // V = pi D N / 12
+  assert.ok(Math.abs(r.effective_tension_lb - 150) < 1e-9);
+  // Only the tension DIFFERENCE does work: a higher-total drive with the SAME Te transmits the same power.
+  const higherTotal = _v807({ tight_side_tension_lb: 400, slack_side_tension_lb: 250, sheave_diameter_in: 6, sheave_rpm: 1750 });
+  assert.ok(Math.abs(higherTotal.power_hp - r.power_hp) < 1e-9 && Math.abs(higherTotal.effective_tension_lb - 150) < 1e-9);
+  // Power scales linearly with speed.
+  const faster = _v807({ tight_side_tension_lb: 250, slack_side_tension_lb: 100, sheave_diameter_in: 6, sheave_rpm: 3500 });
+  assert.ok(Math.abs(faster.power_hp - 2 * r.power_hp) < 1e-6);
+  // Equal tensions -> zero net tension -> zero power.
+  assert.ok(_v807({ tight_side_tension_lb: 200, slack_side_tension_lb: 200, sheave_diameter_in: 6, sheave_rpm: 1750 }).power_hp === 0);
+  // Error seams: non-finite, non-positive diameter/rpm, tight < slack.
+  assert.ok("error" in _v807({ tight_side_tension_lb: Infinity, slack_side_tension_lb: 100, sheave_diameter_in: 6, sheave_rpm: 1750 }));
+  assert.ok("error" in _v807({ tight_side_tension_lb: 250, slack_side_tension_lb: 100, sheave_diameter_in: 0, sheave_rpm: 1750 }));
+  assert.ok("error" in _v807({ tight_side_tension_lb: 250, slack_side_tension_lb: 100, sheave_diameter_in: 6, sheave_rpm: 0 }));
+  assert.ok("error" in _v807({ tight_side_tension_lb: 100, slack_side_tension_lb: 250, sheave_diameter_in: 6, sheave_rpm: 1750 }));
+});
+
 import { computeKeyseatKeySize as _v513 } from "../../calc-machining.js";
 
 test("bounds: spec-v513 computeKeyseatKeySize pins the band-table width, the H/2 depth, the key stresses, and error seams", () => {

@@ -2057,6 +2057,18 @@ export const CITATIONS = {
     ],
   },
 
+  "belt-hp-transmitted": {
+    formula: "V = pi D N / 12 (ft/min); Te = T1 - T2; P = Te V / 33000 (hp).",
+    edition: "The belt power relation P = (T1 - T2) V / 33000, first-principles as in Machinery's Handbook / the Gates Industrial Drive Design Manual, by name.",
+    freeAccess: "The power-from-effective-tension relation is a standard first-principles result; the tensions and speed come from the drive. Free at gates.com/literature.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Power transmitted by a belt: P = (T1 - T2) V / 33000 hp, with the belt speed V = pi D N / 12 ft/min (sheave diameter D in inches, speed N in rpm). Only the effective (net driving) tension Te = T1 - T2 does work; the average tension (T1 + T2)/2 merely clamps the belt to the sheave for friction grip and transmits no power, so two drives with the same Te transmit the same power regardless of their total tension -- over-tensioning adds bearing load and belt wear without capacity. The 33000 is ft-lb per minute per horsepower. Use the pitch diameter and a consistent sheave. A design aid, not a substitute for the belt and sheave ratings, the wrap-angle correction, and the manufacturer's power tables.",
+    assumptions: [
+      { name: "Effective tension", value: "only Te = T1 - T2 does work; the average tension is grip, not power", source: "belt-drive mechanics" },
+      { name: "Belt speed", value: "V = pi D N / 12 ft/min from the sheave pitch diameter and rpm", source: "first-principles geometry" },
+      { name: "Design aid", value: "the belt/sheave ratings, wrap angle, and manufacturer power tables govern the selection", source: "scope of this tile" },
+    ],
+  },
   "gear-cascade": {
     formula: "stage_ratio = N_out / N_in; overall_ratio = product of stage ratios; RPM_out = RPM_in / overall_ratio; T_out = T_in * overall_ratio * efficiency^stages.",
     edition: "First-principles gear math; AGMA 2000 (gear classification) for tolerance by name.",

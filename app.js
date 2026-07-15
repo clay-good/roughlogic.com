@@ -741,7 +741,7 @@ const TOOL_MODULES = (() => {
     // v9
     "noise-dose",
     // v15
-    "pump-tdh", "hydraulic-cylinder", "vbelt-drive", "gear-cascade",
+    "pump-tdh", "hydraulic-cylinder", "vbelt-drive", "belt-hp-transmitted", "gear-cascade",
     // v24 rolling offset
     "rolling-offset",
     // v43 tank gauging

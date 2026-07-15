@@ -864,6 +864,7 @@ const RELATED = {
   "pump-tdh": ["pump-sizing", "friction-loss", "pump-operating-point"],
   "hydraulic-cylinder": ["gear-cascade", "vbelt-drive", "pulley-ma-gen"],
   "vbelt-drive": ["gear-cascade", "hydraulic-cylinder", "pulley-ma-gen"],
+  "belt-hp-transmitted": ["vbelt-drive", "gear-cascade", "roller-chain-length"],
   "gear-cascade": ["vbelt-drive", "hydraulic-cylinder", "pulley-ma-gen"],
 
   // Group H: References (fill-in).

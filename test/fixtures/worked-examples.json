@@ -33890,6 +33890,64 @@
    }
   },
   {
+   "tile_id": "belt-hp-transmitted",
+   "source_publisher": "belt-drive power relation (Machinery's Handbook / Gates)",
+   "source_title": "250/100 lb tensions, 6 in sheave at 1750 rpm -> 2749 ft/min, 150 lb effective, 12.5 HP",
+   "source_edition_or_year": "spec-v807 worked example (machine-verified)",
+   "source_section_or_page": "spec-v807 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "tight_side_tension_lb": 250,
+    "slack_side_tension_lb": 100,
+    "sheave_diameter_in": 6,
+    "sheave_rpm": 1750
+   },
+   "outputs": {
+    "power_hp": {
+     "value": 12.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "belt_speed_fpm": {
+     "value": 2748.9,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "effective_tension_lb": {
+     "value": 150,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "belt-hp-transmitted",
+   "source_publisher": "belt-drive power relation (Machinery's Handbook / Gates)",
+   "source_title": "cross-check: a higher-total 400/250 lb drive with the same Te=150 transmits the same 12.5 HP",
+   "source_edition_or_year": "spec-v807 worked example (machine-verified)",
+   "source_section_or_page": "spec-v807 section 2.1 cross-check (effective tension)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "tight_side_tension_lb": 400,
+    "slack_side_tension_lb": 250,
+    "sheave_diameter_in": 6,
+    "sheave_rpm": 1750
+   },
+   "outputs": {
+    "power_hp": {
+     "value": 12.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spindle-power-torque",
    "source_publisher": "first-principles specific-cutting-energy with Machinery's Handbook unit power",
    "source_title": "cutting_hp = MRR x unit power; motor_hp = cutting_hp / eff; torque = 5252 x cutting_hp / rpm",

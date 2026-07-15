@@ -892,6 +892,7 @@ export const COMPUTE_MAP = {
   "awg-wire-geometry": { module: "../../calc-electrical.js", fn: "computeAwgWireGeometry" },
   "tailstock-setover": { module: "../../calc-shop.js", fn: "computeTailstockSetover" },
   "transformer-turns-ratio": { module: "../../calc-electrical.js", fn: "computeTransformerTurnsRatio" },
+  "belt-hp-transmitted": { module: "../../calc-cross.js", fn: "computeBeltHpTransmitted" },
   "keyseat-key-size": { module: "../../calc-machining.js", fn: "computeKeyseatKeySize" },
   "brake-pedal-hydraulic": { module: "../../calc-mechanic.js", fn: "computeBrakePedalHydraulic" },
   "dyno-correction-sae": { module: "../../calc-mechanic.js", fn: "computeDynoCorrectionSae" },

@@ -112,7 +112,7 @@ test("Group F all 18 tiles use the fire governance variant", () => {
 
 test("Group G audit coverage: every cross-trade tile has a CITATIONS entry", async () => {
   const ids = await _groupIds("// Group G: Cross-Trade", "// Group H:");
-  assert.ok(ids.length === 32, "expected 32 Group G tile ids, got " + ids.length);
+  assert.ok(ids.length === 33, "expected 33 Group G tile ids, got " + ids.length);
   for (const id of ids) assert.ok(CITATIONS[id], "Group G tile '" + id + "' missing CITATIONS entry");
 });
 
