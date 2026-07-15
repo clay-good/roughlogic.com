@@ -2311,12 +2311,12 @@ test("bounds: calc-restoration computeThermalDeltaTReference returns the bundled
   }
 });
 
-test("bounds: calc-restoration computeContainmentAirBalance pins required_cfm = 2610 * A * sqrt(dp) orifice-flow identity", () => {
+test("bounds: calc-restoration computeContainmentAirBalance pins required_cfm = 2610 * (A/144) * sqrt(dp) orifice-flow identity", () => {
   for (const leakage_area_in2 of [4, 12, 36]) {
     for (const target_dp_in_wc of [0.01, 0.02, 0.05]) {
       const r = computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc, leakage_area_in2 });
       assert.ok(!r.error, `A=${leakage_area_in2} dp=${target_dp_in_wc}: ${JSON.stringify(r)}`);
-      const expected = 2610 * leakage_area_in2 * Math.sqrt(target_dp_in_wc);
+      const expected = 2610 * (leakage_area_in2 / 144) * Math.sqrt(target_dp_in_wc);
       assert.ok(Math.abs(r.required_cfm - expected) < 1e-9, `orifice-flow identity`);
       assert.strictEqual(r.recommendations.length, 3, `NAM unit recommendations`);
     }

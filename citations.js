@@ -5157,7 +5157,7 @@ export const CITATIONS = {
     assumptions: [],
   },
   "containment-air-balance": {
-    formula: "Orifice flow Q = 2610 × A × sqrt(ΔP) (cfm; A in ft², ΔP in inches WC). Recommended NAM count = required_negative_flow / per-NAM rated CFM.",
+    formula: "Orifice flow Q = 2610 × A × sqrt(ΔP) (cfm; A in ft², ΔP in inches WC). Leakage area is entered in in² and converted to ft² (/144). Recommended NAM count = required_negative_flow / per-NAM rated CFM.",
     edition: "Classical orifice-flow theory; constant 2610 from ASHRAE Fundamentals derivation. IICRC S520-2024 §12 for containment guidance.",
     freeAccess: "Orifice-flow derivations free in published engineering texts.",
     governance: GOVERNANCE.general,

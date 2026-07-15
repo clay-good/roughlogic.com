@@ -11358,9 +11358,9 @@
   {
    "tile_id": "containment-air-balance",
    "source_publisher": "IICRC S520 negative-pressure-containment air-balance practice",
-   "source_title": "Negative-pressure CFM: required = leakage_in2 * sqrt(dP/0.005) * 1.07; staged unit recommendations",
+   "source_title": "Negative-pressure orifice makeup CFM: required = 2610 * (leakage_in2/144 ft^2) * sqrt(dP in WC)",
    "source_edition_or_year": "IICRC S520-2024 (target dP 0.02 in WC typical; 8 in^2 leakage moderate-tight)",
-   "source_section_or_page": "5400 ft^3 / 0.02 in WC target / 8 in^2 leakage -> 2952.88 cfm required",
+   "source_section_or_page": "5400 ft^3 / 0.02 in WC target / 8 in^2 leakage -> 2610 * (8/144) * sqrt(0.02) = 20.51 cfm required",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -11370,9 +11370,9 @@
    },
    "outputs": {
     "required_cfm": {
-     "value": 2952.88,
+     "value": 20.51,
      "tolerance": {
-      "abs": 0.5
+      "abs": 0.05
      }
     }
    }

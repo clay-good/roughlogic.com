@@ -3348,9 +3348,9 @@ test("monotonicity: computeContainmentAirBalance required_cfm is strictly increa
   const b = computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc: 0.02, leakage_area_in2: 12 });
   assert.ok(Math.abs(b.required_cfm - 2 * a.required_cfm) / a.required_cfm < 1e-12,
     `cfm(A=12) = ${b.required_cfm} != 2 * cfm(A=6) = ${2 * a.required_cfm}`);
-  // 2610 constant exact pin: A=1 / dP=0.02 -> Q = 2610 * sqrt(0.02).
+  // 2610 constant exact pin: A=1 in^2 / dP=0.02 -> Q = 2610 * (1/144) * sqrt(0.02).
   const ref = computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc: 0.02, leakage_area_in2: 1 });
-  const expected = 2610 * Math.sqrt(0.02);
+  const expected = 2610 * (1 / 144) * Math.sqrt(0.02);
   assert.ok(Math.abs(ref.required_cfm - expected) < 1e-9,
     `cfm(A=1, dP=0.02) = ${ref.required_cfm}, expected ${expected} (2610 orifice constant)`);
 });

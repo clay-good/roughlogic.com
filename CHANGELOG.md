@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(restoration): containment-air-balance applied the ft^2 orifice constant to an in^2 area (144x high); 2026-07-15
+
+- `computeContainmentAirBalance` (calc-restoration.js) computed `required_cfm = 2610 * leakage_area_in2 * sqrt(dP)`, but
+  the orifice constant 2610 (= 0.65 * 4005, the discharge-coefficient x velocity-pressure factor for standard air) is
+  defined for area in ft^2, while the tile's input is in in^2. With no in^2 -> ft^2 conversion the required negative-air
+  makeup CFM ran 144x too high: a 12 in^2 leak at 0.02 in WC reported 4,429 cfm instead of the correct ~30.8 cfm, hugely
+  over-recommending negative-air machines. The citation already stated "A in ft^2"; the code and the code comments did
+  not convert. Divided the entered area by 144. Updated the code comments, renderer citation, worked example (2,952.88 ->
+  20.51 cfm for the 8 in^2 example), and the three test pins. Found by a first-principles formula-correctness audit.
+
 ### fix(mechanic): prop-slip used the statute-mile constant while labeled in knots; 2026-07-15
 
 - `computePropSlip` (calc-mechanic.js) computed theoretical boat speed as `(rpm/gear) * pitch / 1056`, but 1056 =

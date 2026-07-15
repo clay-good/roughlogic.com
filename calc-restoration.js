@@ -717,16 +717,18 @@ export function renderThermalDeltaT(inputRegion, outputRegion, citationEl) {
 
 // --- Utility 145: Containment Air Balance ---
 //
-// Q (cfm) = 2610 * A (in^2) * sqrt(delta_P (in wc))
-// (orifice flow form for negative-pressure containment).
+// Q (cfm) = 2610 * A (ft^2) * sqrt(delta_P (in wc))
+// (orifice flow form for negative-pressure containment; 2610 = 0.65 * 4005,
+//  the discharge-coefficient x velocity-pressure constant for standard air).
+// The leakage area is entered in in^2, so it is divided by 144 to ft^2.
 
 // dims: in { containment_volume_ft3: L^3, target_dp_in_wc: M L^-1 T^-2, leakage_area_in2: L^2 }
 //        out: { required_cfm: L^3 T^-1, recommendations: dimensionless }
-// (Public orifice-flow form Q (cfm) = 2610 * A (in^2) * sqrt(dP
+// (Public orifice-flow form Q (cfm) = 2610 * A (ft^2) * sqrt(dP
 //  (in wc)). Pressure in inches-water-column is `M L^-1 T^-2`;
-//  leakage area is `L^2`; the 2610 constant absorbs the cfm + in^2
-//  + in-WC unit conversions. Required CFM surfaces as volume-per-
-//  time `L^3 T^-1`.)
+//  leakage area is entered as `L^2` in in^2 and converted to ft^2 (/144);
+//  the 2610 constant absorbs the cfm + ft^2 + in-WC unit conversions.
+//  Required CFM surfaces as volume-per-time `L^3 T^-1`.)
 export function computeContainmentAirBalance({
   containment_volume_ft3 = 0, target_dp_in_wc = 0.02, leakage_area_in2 = 0,
 }) {
@@ -734,7 +736,7 @@ export function computeContainmentAirBalance({
   if (!(containment_volume_ft3 > 0)) return { error: "Containment volume must be positive." };
   if (!(target_dp_in_wc > 0)) return { error: "Target pressure differential must be positive." };
   if (!(leakage_area_in2 >= 0)) return { error: "Leakage area must be non-negative." };
-  const required_cfm = 2610 * leakage_area_in2 * Math.sqrt(target_dp_in_wc);
+  const required_cfm = 2610 * (leakage_area_in2 / 144) * Math.sqrt(target_dp_in_wc);
   // Recommend NAM count from typical 500 / 1000 / 2000 CFM units (reuse u87 logic).
   const recommendations = NAM_UNIT_SIZES_CFM.map((unit) => ({
     unit_cfm: unit,
@@ -783,7 +785,7 @@ import {
 } from "./ui-fields.js";
 
 function renderContainmentAirBalance(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Public orifice-flow form Q (cfm) = 2610 * A (in^2) * sqrt(delta_P (in wc)). Engineering practice.";
+  citationEl.textContent = "Citation: Public orifice-flow form Q (cfm) = 2610 * A (ft^2) * sqrt(delta_P (in wc)); leakage area entered in in^2 is converted to ft^2 (/144). Engineering practice.";
   _ae3(inputRegion, () => fillExample(containmentAirBalanceExample.inputs));
   const v = _mn3("Containment volume (ft^3)", "cb-v", { step: "any", min: "0" });
   const dp = _mn3("Target pressure differential (in wc)", "cb-dp", { step: "any", min: "0", value: "0.02" });

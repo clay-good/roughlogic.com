@@ -58,9 +58,9 @@ test("Containment: NAM rec total CFM >= required CFM", () => {
   }
 });
 
-test("Containment: 12 in^2 at 0.02 in wc ~ 4429 cfm", () => {
+test("Containment: 12 in^2 at 0.02 in wc ~ 30.76 cfm", () => {
   const r = computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc: 0.02, leakage_area_in2: 12 });
-  assert.ok(close(r.required_cfm, 2610 * 12 * Math.sqrt(0.02), 0.5));
+  assert.ok(close(r.required_cfm, 2610 * (12 / 144) * Math.sqrt(0.02), 0.5));
 });
 
 test("Containment: smaller NAM unit needs more units than larger", () => {
