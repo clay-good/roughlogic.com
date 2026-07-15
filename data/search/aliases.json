@@ -1037,6 +1037,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "awg wire diameter",
+      "target": "awg-wire-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "wire gauge to diameter",
+      "target": "awg-wire-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "awg to circular mils",
+      "target": "awg-wire-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "conductor area by gauge",
+      "target": "awg-wire-geometry",
+      "kind": "adjacent"
+    },
+    {
+      "term": "awg to square mm",
+      "target": "awg-wire-geometry",
+      "kind": "adjacent"
+    },
+    {
       "term": "bolt proof load",
       "target": "bolt-proof-load",
       "kind": "industry"

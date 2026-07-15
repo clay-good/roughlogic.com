@@ -33724,6 +33724,64 @@
    }
   },
   {
+   "tile_id": "awg-wire-geometry",
+   "source_publisher": "AWG geometric definition (ASTM B258)",
+   "source_title": "#12 AWG -> 0.0808 in diameter, 6,530 circular mils, 3.31 mm2",
+   "source_edition_or_year": "spec-v804 worked example (machine-verified)",
+   "source_section_or_page": "spec-v804 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "awg": "12"
+   },
+   "outputs": {
+    "diameter_in": {
+     "value": 0.0808,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "area_cmils": {
+     "value": 6530,
+     "tolerance": {
+      "abs": 2
+     }
+    },
+    "area_mm2": {
+     "value": 3.309,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "awg-wire-geometry",
+   "source_publisher": "AWG geometric definition (ASTM B258)",
+   "source_title": "cross-check: 4/0 AWG -> exactly 0.460 in diameter and 211,600 circular mils",
+   "source_edition_or_year": "spec-v804 worked example (machine-verified)",
+   "source_section_or_page": "spec-v804 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "awg": "4/0"
+   },
+   "outputs": {
+    "diameter_in": {
+     "value": 0.46,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "area_cmils": {
+     "value": 211600,
+     "tolerance": {
+      "abs": 50
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spindle-power-torque",
    "source_publisher": "first-principles specific-cutting-energy with Machinery's Handbook unit power",
    "source_title": "cutting_hp = MRR x unit power; motor_hp = cutting_hp / eff; torque = 5252 x cutting_hp / rpm",

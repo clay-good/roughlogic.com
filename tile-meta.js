@@ -149,6 +149,7 @@ const _TILES = [
   ["vent-sizing-stack", "B"],
   ["gas-pipe-pressure-drop", "B"], ["gas-pipe-max-flow", "B"],
   ["ohms-law", "A"], ["wire-ampacity", "A"], ["voltage-drop", "A"],
+  ["awg-wire-geometry", "A"],
   ["conduit-fill", "A"], ["box-fill", "A"], ["breaker-sizing", "A"],
   ["motor-fla", "A"], ["transformer-sizing", "A"], ["three-phase", "A"],
   ["copper-resistance", "A"], ["egc-sizing", "A"], ["service-load", "A"],

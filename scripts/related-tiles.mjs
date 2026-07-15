@@ -242,6 +242,7 @@ const RELATED = {
   // spec.md §10 worked examples.
   "ohms-law": ["voltage-drop", "wire-ampacity", "three-phase", "copper-resistance"],
   "wire-ampacity": ["ohms-law", "voltage-drop", "conduit-fill", "breaker-sizing", "motor-fla"],
+  "awg-wire-geometry": ["wire-ampacity", "conduit-fill", "voltage-drop"],
   "voltage-drop": ["ohms-law", "wire-ampacity", "copper-resistance", "three-phase"],
   "conduit-fill": ["box-fill", "wire-ampacity", "cable-bend-radius"],
   "breaker-sizing": ["wire-ampacity", "motor-fla", "service-load"],

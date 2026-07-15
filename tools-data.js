@@ -13,6 +13,7 @@ export const TOOLS = [
   // Group A: Electrical
   { id: "ohms-law", name: "Ohm's Law", group: "A", trades: ["electrical"], desc: "Compute V, I, R, or P from any two known values." },
   { id: "wire-ampacity", name: "Wire Ampacity", group: "A", trades: ["electrical"], desc: "Ampacity by gauge, conductor material, insulation rating, ambient." },
+  { id: "awg-wire-geometry", name: "AWG Conductor Geometry (Diameter, Circular Mils, mm^2)", group: "A", trades: ["electrical"], desc: "The bare-conductor size behind a gauge number, from the AWG definition: d = 0.005 x 92^((36 - n)/39) inches, so every 6 gauges roughly doubles the diameter. #12 AWG is 0.0808 in (2.05 mm), 6,530 circular mils, 3.31 mm^2; 4/0 is exactly 0.460 in and 211,600 cmil. Circular mils are (diameter in mils)^2, the diameter-squared area unit NEC tables use; the mm^2 is the true pi (d/2)^2 cross-section. Bare copper/aluminum, solid-equivalent -- not the over-insulation diameter (see conduit-fill). A reference; the manufacturer's conductor dimensions govern." },
   { id: "voltage-drop", name: "Voltage Drop", group: "A", trades: ["electrical"], desc: "Single-phase or three-phase voltage drop over length." },
   { id: "conduit-fill", name: "Conduit Fill", group: "A", trades: ["electrical"], desc: "Percent fill by conduit type and conductor count." },
   { id: "box-fill", name: "Box Fill", group: "A", trades: ["electrical"], desc: "Cubic-inch fill by box volume and conductor count." },

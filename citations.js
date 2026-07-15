@@ -1310,6 +1310,18 @@ export const CITATIONS = {
       { name: "Current-carrying conductors per raceway", value: "≤ 3 unless user supplies", source: "NEC 310.15(C)(1) base case" },
     ],
   },
+  "awg-wire-geometry": {
+    formula: "d_in = 0.005 * 92^((36 - n)/39); d_mm = 25.4 d_in; area_cmils = (1000 d_in)^2; area_mm2 = pi (25.4 d_in / 2)^2. Aught sizes 1/0..4/0 use n = 0, -1, -2, -3.",
+    edition: "The American Wire Gauge geometric definition (ASTM B258), by name; a bare, solid-conductor size.",
+    freeAccess: "The AWG size-to-diameter relation is a public geometric definition (ASTM B258); the gauge number is the only input.",
+    governance: GOVERNANCE.general,
+    editionNote: "AWG (American Wire Gauge) bare-conductor geometry. The gauge scale is geometric: d = 0.005 * 92^((36 - n)/39) inches, so each 6-gauge step scales the diameter by 92^(6/39) ~= 2.005 (very close to 2) and a 10-gauge step by ~= 10.16 in area. The aught sizes 1/0, 2/0, 3/0, 4/0 extend the scale as n = 0, -1, -2, -3 (4/0 is exactly 0.460 in). The circular-mil area is (diameter in mils)^2 -- a diameter-squared unit that folds pi/4 into the unit, which is why NEC ampacity and conductor tables are in cmils; the metric area is the true cross-section pi (d/2)^2. This is the bare copper/aluminum solid-conductor size, not the over-insulation diameter (that depends on the insulation type -- see conduit-fill) and not the slightly larger overall diameter of a stranded build. A reference; the manufacturer's conductor dimensions govern the built wire.",
+    assumptions: [
+      { name: "AWG definition", value: "d = 0.005 * 92^((36 - n)/39) inches; each 6 gauges ~ doubles the diameter", source: "ASTM B258 / AWG geometric definition" },
+      { name: "Circular mils", value: "area in cmils = (diameter in mils)^2, the NEC-table area unit", source: "AWG / NEC convention" },
+      { name: "Bare solid conductor", value: "not the over-insulation or stranded overall diameter", source: "scope of this tile" },
+    ],
+  },
   "voltage-drop": {
     formula: "VD = 2 * I * R * L for single-phase; VD = √3 * I * R * L for three-phase. R from NEC Chapter 9 Table 8 (DC ohm/kFT) with temperature correction; reactance per IEEE 141 for long runs.",
     edition: NEC_2023 + " Chapter 9 Tables 8 and 9; IEEE 141 by name.",

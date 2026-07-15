@@ -16,7 +16,9 @@ import {
   threePhasePower,
   singlePhasePower,
   awgAreaCmils,
+  awgAreaM2,
   awgDiameterInches,
+  awgToNumber,
 } from "./pure-math.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
@@ -5395,3 +5397,44 @@ function _v562renderTerminationTempAmpacity(inputRegion, outputRegion, citationE
   for (const s of [tr, over]) s.select.addEventListener("change", update);
 }
 ELECTRICAL_RENDERERS["termination-temp-ampacity"] = _v562renderTerminationTempAmpacity;
+
+// ===================== spec-v804: AWG conductor geometry (diameter, circular mils, mm^2) =====================
+// dims: in { awg: dimensionless } out: { diameter_in: L, diameter_mm: L, area_cmils: L^2, area_mm2: L^2 }
+export function computeAwgWireGeometry({ awg = "12" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  let n;
+  try { n = awgToNumber(awg); } catch { return { error: "Choose a valid AWG size (e.g. 12, or 4/0)." }; }
+  if (!Number.isFinite(n)) return { error: "Choose a valid AWG size (e.g. 12, or 4/0)." };
+  const diameter_in = awgDiameterInches(awg);
+  const diameter_mm = diameter_in * 25.4;
+  const area_cmils = awgAreaCmils(awg);
+  const area_mm2 = awgAreaM2(awg) * 1e6;
+  if (![diameter_in, diameter_mm, area_cmils, area_mm2].every(Number.isFinite)) return { error: "AWG geometry is not a finite value." };
+  return {
+    diameter_in, diameter_mm, area_cmils, area_mm2,
+    note: "AWG (American Wire Gauge) bare-conductor geometry from the defining ratio: each 6-gauge step changes the diameter by very close to a factor of 2 (exactly 92^(6/39) ~= 2.005), so d = 0.005 x 92^((36 - n)/39) inches, with n the gauge number and the aught sizes 1/0, 2/0, 3/0, 4/0 counting as n = 0, -1, -2, -3. The circular-mil area is (d in mils)^2 -- a diameter-squared area unit that folds the pi/4 into the unit itself, which is why NEC ampacity and conductor tables are stated in cmils rather than in^2. The metric area is the true cross-section pi (d/2)^2. This is the bare copper/aluminum conductor size, not the over-insulation diameter (that depends on the insulation type -- see conduit-fill), and a solid-conductor equivalent, not the slightly larger overall diameter of a stranded build. A reference; the manufacturer's conductor dimensions govern the built wire.",
+  };
+}
+export const awgWireGeometryExample = { inputs: { awg: "12" } };
+function _v804renderAwgWireGeometry(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AWG geometric definition d = 0.005 x 92^((36 - n)/39) inches; circular mils = (d in mils)^2; metric area = pi (d/2)^2. Bare-conductor, solid-equivalent geometry. A reference; the manufacturer's conductor dimensions govern the built wire.";
+  const awg = makeSelect("AWG size", "awgg-awg", awgOptions());
+  awg.select.value = "12";
+  inputRegion.appendChild(awg.wrap);
+  attachExampleButton(inputRegion, () => { awg.select.value = "12"; update(); });
+  const oDin = makeOutputLine(outputRegion, "Diameter", "awgg-out-din");
+  const oCm = makeOutputLine(outputRegion, "Area (circular mils)", "awgg-out-cm");
+  const oMm2 = makeOutputLine(outputRegion, "Area (mm^2)", "awgg-out-mm2");
+  const oNote = makeOutputLine(outputRegion, "Note", "awgg-out-n");
+  const update = debounce(() => {
+    const r = computeAwgWireGeometry({ awg: awg.select.value });
+    if (r.error) { oDin.textContent = r.error; oCm.textContent = "-"; oMm2.textContent = "-"; oNote.textContent = ""; return; }
+    oDin.textContent = fmt(r.diameter_in, 4) + " in (" + fmt(r.diameter_mm, 3) + " mm)";
+    oCm.textContent = fmt(r.area_cmils, 0) + " cmil";
+    oMm2.textContent = fmt(r.area_mm2, 3) + " mm^2";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  awg.select.addEventListener("input", update);
+  update();
+}
+ELECTRICAL_RENDERERS["awg-wire-geometry"] = _v804renderAwgWireGeometry;

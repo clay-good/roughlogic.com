@@ -20966,6 +20966,27 @@ test("bounds: spec-v803 computeAsceLiveLoadReduction pins the reduction, the flo
   assert.ok("error" in _v803({ unreduced_load_psf: 50, tributary_area_ft2: 0, member_type: "interior_column", floors_supported: "one" }));
 });
 
+import { computeAwgWireGeometry as _v804 } from "../../calc-electrical.js";
+
+test("bounds: spec-v804 computeAwgWireGeometry pins the AWG diameter/area, the aught sizes, the 6-gauge ratio, and error seams", () => {
+  const r = _v804({ awg: "12" });
+  assert.ok(Math.abs(r.diameter_in - 0.0808) < 0.0005); // d = 0.005 * 92^((36-n)/39)
+  assert.ok(Math.abs(r.area_cmils - 6530) < 2); // cmil = (d in mils)^2
+  assert.ok(Math.abs(r.area_mm2 - 3.309) < 0.01); // true pi (d/2)^2 in mm^2
+  assert.ok(Math.abs(r.diameter_mm - r.diameter_in * 25.4) < 1e-9);
+  // 4/0 is a defined round value: exactly 0.460 in and 211,600 cmil.
+  const aught = _v804({ awg: "4/0" });
+  assert.ok(Math.abs(aught.diameter_in - 0.46) < 0.0005 && Math.abs(aught.area_cmils - 211600) < 50);
+  // The 6-gauge ratio: a #6 conductor is ~2x the #12 diameter (92^(6/39) ~ 2.005).
+  const six = _v804({ awg: "6" });
+  assert.ok(Math.abs(six.diameter_in / r.diameter_in - Math.pow(92, 6 / 39)) < 1e-6);
+  // A smaller gauge number is a larger conductor (monotonic).
+  assert.ok(_v804({ awg: "10" }).area_cmils > r.area_cmils);
+  // Error seams: invalid AWG string, non-finite numeric AWG.
+  assert.ok("error" in _v804({ awg: "bogus" }));
+  assert.ok("error" in _v804({ awg: Infinity }));
+});
+
 import { computeKeyseatKeySize as _v513 } from "../../calc-machining.js";
 
 test("bounds: spec-v513 computeKeyseatKeySize pins the band-table width, the H/2 depth, the key stresses, and error seams", () => {
