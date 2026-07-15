@@ -38,7 +38,10 @@ export function computePropSlip({ rpm = 0, gear_ratio = 1, pitch_in = 0, gps_spe
   if (!(gear_ratio > 0)) return { error: "Gear ratio must be positive." };
   if (!(pitch_in > 0)) return { error: "Pitch must be positive." };
   if (!(gps_speed_kt >= 0)) return { error: "Speed must be non-negative." };
-  const theoretical_kt = (rpm / gear_ratio) * pitch_in / 1056;
+  // 1215.2 = inches per nautical mile / minutes per hour = (12 * 6076.12) / 60.
+  // (The old 1056 = 12 * 5280 / 60 is the statute-mile constant, which yields
+  // mph, not the knots this tile's inputs and output are labeled in.)
+  const theoretical_kt = (rpm / gear_ratio) * pitch_in / 1215.2;
   const slip_percent = theoretical_kt > 0 ? ((theoretical_kt - gps_speed_kt) / theoretical_kt) * 100 : 0;
   let category = "unknown";
   if (slip_percent >= 8 && slip_percent <= 18) category = "planing-typical (10-15%)";
@@ -491,7 +494,7 @@ function _simpleRenderer(spec) {
 }
 
 const renderPropSlip = _simpleRenderer({
-  citation: "Citation: Public marine engineering practice. Theoretical kt = (RPM/gear) * pitch / 1056. Slip percent = (theoretical - actual) / theoretical * 100.",
+  citation: "Citation: Public marine engineering practice. Theoretical kt = (RPM/gear) * pitch / 1215.2. Slip percent = (theoretical - actual) / theoretical * 100.",
   example: propSlipExample.inputs,
   fields: [
     { key: "rpm", label: "Engine RPM", kind: "number" },

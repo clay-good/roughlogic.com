@@ -4716,13 +4716,13 @@ export const CITATIONS = {
   // manual); the rest use general / structural as appropriate.
 
   "prop-slip": {
-    formula: "Theoretical knots = (RPM / gear_ratio) × pitch_in / 1056. Slip % = (theoretical − actual) / theoretical × 100. Planing 10–15% / displacement 25–30% category bands.",
+    formula: "Theoretical knots = (RPM / gear_ratio) × pitch_in / 1215.2. Slip % = (theoretical − actual) / theoretical × 100. Planing 10–15% / displacement 25–30% category bands.",
     edition: "Classical marine-propeller theory; ABYC P-17 (Boat Propeller Selection) by name.",
     freeAccess: "ABYC standards licensed; principles free in published marine-engineering texts and at boatus.org.",
     governance: GOVERNANCE.marine,
     editionNote: "Single-edition (ABYC P-17 + classical propeller theory).",
     assumptions: [
-      { name: "Constant 1056", value: "in/min × min/hr / (12 × 6076 ft/nm) = 1056", source: "knots-from-RPM derivation" },
+      { name: "Constant 1215.2", value: "inches per nautical mile / min per hr = (12 × 6076.12 ft/nm) / 60 = 1215.2 (the earlier 1056 was the statute-mile value, which gives mph, not knots)", source: "knots-from-RPM derivation" },
     ],
   },
   "displacement-cr": {

@@ -2802,7 +2802,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "4500 RPM, 1.85 gear, 19 in pitch, 35 kt GPS",
    "source_edition_or_year": "Mercury Marine / Yamaha typical prop-slip method",
-   "source_section_or_page": "theoretical_kt = (4500/1.85) * 19 / 1056 = 43.77; slip = (43.77-35)/43.77 = 20.0 percent",
+   "source_section_or_page": "theoretical_kt = (4500/1.85) * 19 / 1215.2 = 38.03; slip = (38.03-35)/38.03 = 8.0 percent",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -2813,15 +2813,15 @@
    },
    "outputs": {
     "theoretical_kt": {
-     "value": 43.77,
+     "value": 38.03,
      "tolerance": {
       "pct": 0.5
      }
     },
     "slip_percent": {
-     "value": 20,
+     "value": 7.97,
      "tolerance": {
-      "pct": 2
+      "abs": 0.15
      }
     }
    }

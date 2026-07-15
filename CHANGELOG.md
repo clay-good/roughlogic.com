@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(mechanic): prop-slip used the statute-mile constant while labeled in knots; 2026-07-15
+
+- `computePropSlip` (calc-mechanic.js) computed theoretical boat speed as `(rpm/gear) * pitch / 1056`, but 1056 =
+  12 * 5280 / 60 is the statute-mile constant, giving mph. The tile's input (`gps_speed_kt`), output (`theoretical_kt`),
+  and slip comparison are all in knots, so the theoretical speed was ~15% too high and the resulting slip percentage was
+  ~2.5x off (the 4500 rpm / 1.85 / 19 in / 35 kt example reported 43.77 kt and 20% slip instead of the correct 38.03 kt
+  and 8.0%, flipping the category). The citation's own derivation note gave the correct chain (12 * 6076.12 ft/nm) but
+  the wrong result. Corrected the constant to `1215.2 = (12 * 6076.12) / 60` (inches per nautical mile / minutes per
+  hour). Updated the citation, the worked example, and the prop-slip test pins (including the bit-stable pin).
+
 ### fix(cross): NIOSH lifting distance multiplier floored at the wrong threshold; 2026-07-15
 
 - `computeNIOSHLifting` (calc-cross.js) computed the distance multiplier as `D <= 0 ? 1 : 0.82 + 1.8/D`, but the NIOSH

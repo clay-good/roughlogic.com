@@ -1021,13 +1021,13 @@ import { computeRiggingCheck, riggingExample } from "../../calc-stage.js";
 import { computeYieldEP, yieldEPExample } from "../../calc-kitchen.js";
 
 test("computePropSlip: bit-stable theoretical_kt + slip_percent at the spec example (4500 rpm, 1.85:1, 19 in pitch, 35 kt GPS)", () => {
-  // Group K. Theoretical boat speed = (rpm / gear_ratio) * pitch / (12 *
-  // 6076.12 nm-conversion) -> 43.765... kt. slip = 1 - actual/theoretical.
-  // Pins the marine prop-slip arithmetic chain including the 6076.12
-  // ft/nm conversion.
+  // Group K. Theoretical boat speed = (rpm / gear_ratio) * pitch / 1215.2,
+  // where 1215.2 = (12 * 6076.12 in/nm) / 60 -> 38.032 kt. slip = 1 -
+  // actual/theoretical. Pins the marine prop-slip arithmetic chain including
+  // the 6076.12 ft/nm (knots) conversion.
   const r = computePropSlip(propSlipExample.inputs);
-  assert.equal(bits(r.theoretical_kt), "4045e1f731b0bf37", `theoretical_kt=${r.theoretical_kt}`);
-  assert.equal(bits(r.slip_percent), "4034072f9b658074", `slip_percent=${r.slip_percent}`);
+  assert.equal(bits(r.theoretical_kt), "404304114a5be8bc", `theoretical_kt=${r.theoretical_kt}`);
+  assert.equal(bits(r.slip_percent), "401fe304406f249a", `slip_percent=${r.slip_percent}`);
 });
 
 test("computeDrawbarPower: bit-stable drawbar_hp + pto_hp_estimate at the spec example (4500 lb pull, 4.5 mph, firm_soil)", () => {

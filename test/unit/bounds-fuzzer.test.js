@@ -4054,7 +4054,7 @@ test("bounds: calc-lab computeHemocytometer rejects negative cell count / non-po
 // nine computes). Same warn-on-missing scaffolding; per-function
 // pin pattern: documented sweep + boundary rejections + closed-form
 // identity pins (W&B cg = total_moment / total_weight, prop
-// theoretical = rpm/gear * pitch/1056, compression ratio
+// theoretical = rpm/gear * pitch/1215.2, compression ratio
 // (V_cyl + V_TDC) / V_TDC, F = stretch*A*E/L Hooke's law, fuel range
 // = tank * mpg * load_factor, tire diameter from metric / imperial
 // sidewall, brake KE = 0.5*m*v^2 with rotor-temp-rise pin).
@@ -4074,14 +4074,14 @@ import {
   computeValveFlowCoefficient,
 } from "../../calc-mechanic.js";
 
-test("bounds: calc-mechanic computePropSlip pins theoretical = (rpm/gear) * pitch / 1056 and slip = (theoretical - gps) / theoretical * 100", () => {
+test("bounds: calc-mechanic computePropSlip pins theoretical = (rpm/gear) * pitch / 1215.2 and slip = (theoretical - gps) / theoretical * 100", () => {
   for (const rpm of [3000, 4500, 6000]) {
     for (const gear_ratio of [1.0, 1.5, 1.85, 2.0]) {
       for (const pitch_in of [15, 19, 23]) {
         for (const gps_speed_kt of [10, 25, 40]) {
           const r = computePropSlip({ rpm, gear_ratio, pitch_in, gps_speed_kt });
           assert.ok(!r.error, `rpm=${rpm} gr=${gear_ratio} p=${pitch_in} gps=${gps_speed_kt}: ${JSON.stringify(r)}`);
-          const expected_theoretical = (rpm / gear_ratio) * pitch_in / 1056;
+          const expected_theoretical = (rpm / gear_ratio) * pitch_in / 1215.2;
           assert.ok(Math.abs(r.theoretical_kt - expected_theoretical) < 1e-9, `theoretical identity`);
           const expected_slip = ((expected_theoretical - gps_speed_kt) / expected_theoretical) * 100;
           assert.ok(Math.abs(r.slip_percent - expected_slip) < 1e-9, `slip identity`);

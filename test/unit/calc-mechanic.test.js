@@ -23,7 +23,7 @@ const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 
 // 196 Prop slip
 test("Prop slip: example planing-typical", () => { const r = computePropSlip(propSlipExample.inputs); assert.ok(r.theoretical_kt > 0); assert.ok(typeof r.category === "string"); });
-test("Prop slip: theoretical = (RPM/gear) * pitch / 1056", () => { const r = computePropSlip({ rpm: 5000, gear_ratio: 2, pitch_in: 21, gps_speed_kt: 40 }); assert.ok(close(r.theoretical_kt, (5000 / 2 * 21) / 1056, 0.01)); });
+test("Prop slip: theoretical = (RPM/gear) * pitch / 1215.2", () => { const r = computePropSlip({ rpm: 5000, gear_ratio: 2, pitch_in: 21, gps_speed_kt: 40 }); assert.ok(close(r.theoretical_kt, (5000 / 2 * 21) / 1215.2, 0.01)); });
 test("Prop slip: 0 GPS speed -> 100% slip", () => { const r = computePropSlip({ rpm: 5000, gear_ratio: 2, pitch_in: 21, gps_speed_kt: 0 }); assert.equal(r.slip_percent, 100); });
 test("Prop slip: negative slip detected", () => { const r = computePropSlip({ rpm: 1000, gear_ratio: 1, pitch_in: 5, gps_speed_kt: 100 }); assert.match(r.category, /over-pitched|GPS error/); });
 test("Prop slip: zero RPM errors", () => { const r = computePropSlip({ rpm: 0, gear_ratio: 1, pitch_in: 21, gps_speed_kt: 30 }); assert.ok(r.error); });
