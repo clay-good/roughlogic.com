@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(lint): add check-fixture-keys gate to catch mis-wired worked-example fixtures; 2026-07-15
+
+- New `scripts/check-fixture-keys.mjs` (wired into `npm run lint`) parses each compute function's top-level destructured
+  parameter names and asserts every worked-example fixture input key is one of them. A key that is not a parameter is
+  silently ignored by the function, so the fixture ends up pinning the default computation rather than the scenario it
+  describes -- a gap that neither the worked-example runner (passes on defaults) nor the tile-contract fuzzer (seeds from
+  the signature) can catch. This class had hidden a real formula bug (crane-lift) and a real contract leak
+  (generator-motor-starting). Functions with a rest element or a non-destructured (positional) signature are skipped
+  (1,835 fixtures checked, 31 skipped). Guards against future mis-wiring.
+
 ### fix(test): repair 6 worked-example fixtures whose input keys did not match their compute signature; 2026-07-15
 
 - Six worked-example rows in test/fixtures/worked-examples.json used input keys the compute function does not accept, so
