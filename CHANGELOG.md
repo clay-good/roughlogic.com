@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(mechanic): chamber-cc-for-cr dome/dish input label had the sign backwards; 2026-07-15
+
+- The `chamber-cc-for-cr` tile (calc-mechanic.js) labeled its piston-volume input "Piston dome (-) / dish (+)", but the
+  compute -- like its sibling `displacement-cr`, its own citation, and its note -- treats a dome as a POSITIVE
+  `dome_dish_cc` (`chamber = TDC - gasket - deck + dome`). A user entering a domed piston as a negative value per the
+  label got a chamber volume wrong by twice the dome cc, in the wrong direction. Corrected the label to "Dome (+) /
+  dish (-) volume (cc)" so the two paired CR tiles share one convention and round-trip exactly (verified: forward
+  CR with +8 cc dome, inverse recovers the 64 cc chamber). Label-only change; the compute was already correct. Found by
+  the formula-correctness audit (renderer-label / dead-input class).
+
 ### fix(construction): crane-lift-quick per-leg sling tension used sin(theta/2) where the from-horizontal angle needs sin(theta); 2026-07-15
 
 - `computeCraneLiftCheck` (calc-construction.js) computed per-leg sling tension as `W / (n * sin(theta/2))`, but its

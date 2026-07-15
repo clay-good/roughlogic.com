@@ -542,7 +542,7 @@ const renderChamberCcForCr = _simpleRenderer({
     { key: "gasket_bore_in", label: "Head-gasket bore (in)", kind: "number" },
     { key: "gasket_thickness_in", label: "Head-gasket thickness (in)", kind: "number" },
     { key: "deck_clearance_in", label: "Deck clearance (in)", kind: "number" },
-    { key: "dome_dish_cc", label: "Piston dome (-) / dish (+) volume (cc)", kind: "number" },
+    { key: "dome_dish_cc", label: "Dome (+) / dish (-) volume (cc)", kind: "number" },
   ],
   outputs: [
     { key: "ch", id: "cccr-out-ch", label: "Required chamber volume", value: (r) => fmt(r.chamber_cc, 1) + " cc" },
