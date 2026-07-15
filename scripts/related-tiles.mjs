@@ -181,6 +181,7 @@ const RELATED = {
   "feed-for-surface-finish": ["turning-surface-finish", "material-removal-rate", "cutting-speed-rpm", "ballnose-scallop-height"],
   "taper-calc": ["taper-diameter", "sine-bar", "cutting-speed-rpm", "decimal-to-fraction"],
   "taper-diameter": ["taper-calc", "sine-bar", "cutting-speed-rpm", "decimal-to-fraction"],
+  "tailstock-setover": ["taper-calc", "taper-diameter", "sine-bar"],
   "dividing-head": ["bolt-circle", "cutting-speed-rpm", "machining-time"],
   "thread-measure-wire": ["thread-pitch", "sine-bar", "decimal-to-fraction"],
   "thread-pitch-dia-from-wires": ["thread-measure-wire", "thread-pitch", "bolt-proof-load", "sine-bar"],

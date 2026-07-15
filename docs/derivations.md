@@ -2696,6 +2696,7 @@ cross-check.
 | calc-shop.js | `computeRolledBlank` | `{ reference = "od", diameter_in = 0, thickness_in = 0, k_factor = 0.5 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeRollerChainLength` | `{ small_teeth_n1 = 0, large_teeth_n2 = 0, center_distance_in = 0, pitch_in = ...` | _ | _ | _ |
 | calc-shop.js | `computeSprocketPitchDiameter` | `{ chain_pitch_in = 0, tooth_count_n = 0 } = {}` | _ | _ | _ |
+| calc-shop.js | `computeTailstockSetover` | `{ overall_length_in = 0, large_dia_in = 0, small_dia_in = 0, taper_length_in ...` | _ | _ | _ |
 | calc-shop.js | `computeTapDrillSize` | `{ thread_standard = "inch", major_dia_in = 0, tpi = 0, pitch_mm = 0, thread_p...` | _ | _ | _ |
 | calc-shop.js | `computeTaperCalc` | `{ large_dia_in = 0, small_dia_in = 0, length_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeTaperDiameter` | `{ known_dia_in = 0, known_end = "large", taper_per_foot = 0, length_in = 0 } ...` | _ | _ | _ |
@@ -2914,7 +2915,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1500.
+Row count: 1501.
 
 <!-- END function-corpus-v14 -->
 
@@ -3900,7 +3901,7 @@ per spec-v14 §13.1 second paragraph.
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group K Mechanic (81 tiles)
+### Group K Mechanic (82 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3971,6 +3972,7 @@ per spec-v14 §13.1 second paragraph.
 | `spindle-power-torque` | Cutting Power and Spindle Torque | first-principles specific-cutting-ene...; 3.0 in3/min steel, 80% eff, 800 rpm -> 3.0 cutting hp, 3.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sprocket-pitch-diameter` | Sprocket Pitch Diameter (ANSI B29.1) | ANSI B29.1 sprocket geometry; spec-v801 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spur-gear-geometry` | Spur Gear Tooth Geometry (Diametral Pitch) | Machinery's Handbook / AGMA; spec-v401 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `tailstock-setover` | Tailstock Setover for Taper Turning | Machinery's Handbook (Industrial Press); spec-v805 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tap-drill-size` | Tap Drill Size | First-principles 60-degree thread geo...; 1/4-20 UNC at 75% -> 0.201286 in (#7 drill 0.201 in); nea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `taper-calc` | Taper per Foot and Angle | First-principles taper trigonometry +...; D 1.0, d 0.75, L 3.0 -> TPF 1.0 in/ft, angle/side 2.38594... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `taper-diameter` | Taper Missing Diameter (Lathe Setup) | First-principles taper trigonometry (...; spec-v650 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4353,6 +4355,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1253. Fixture-covered or reference-cadence: 1253 / 1253.
+Tile count: 1254. Fixture-covered or reference-cadence: 1254 / 1254.
 
 <!-- END tile-index-v14 -->

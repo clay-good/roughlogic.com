@@ -1062,6 +1062,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "tailstock setover",
+      "target": "tailstock-setover",
+      "kind": "industry"
+    },
+    {
+      "term": "tailstock offset for taper",
+      "target": "tailstock-setover",
+      "kind": "industry"
+    },
+    {
+      "term": "taper turning between centers",
+      "target": "tailstock-setover",
+      "kind": "industry"
+    },
+    {
+      "term": "lathe taper offset",
+      "target": "tailstock-setover",
+      "kind": "adjacent"
+    },
+    {
+      "term": "set over tailstock",
+      "target": "tailstock-setover",
+      "kind": "adjacent"
+    },
+    {
       "term": "bolt proof load",
       "target": "bolt-proof-load",
       "kind": "industry"

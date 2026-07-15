@@ -20987,6 +20987,28 @@ test("bounds: spec-v804 computeAwgWireGeometry pins the AWG diameter/area, the a
   assert.ok("error" in _v804({ awg: Infinity }));
 });
 
+import { computeTailstockSetover as _v805 } from "../../calc-shop.js";
+
+test("bounds: spec-v805 computeTailstockSetover pins the OAL-scaled offset, the full-length reduction, and error seams", () => {
+  const r = _v805({ overall_length_in: 12, large_dia_in: 1.5, small_dia_in: 1.0, taper_length_in: 8 });
+  assert.ok(Math.abs(r.setover_in - 0.375) < 1e-9); // S = OAL (D-d)/(2L)
+  assert.ok(Math.abs(r.per_inch_setover_in - 0.03125) < 1e-9);
+  // The offset scales with OVERALL length: doubling OAL (taper length fixed) doubles the setover.
+  const longer = _v805({ overall_length_in: 24, large_dia_in: 1.5, small_dia_in: 1.0, taper_length_in: 8 });
+  assert.ok(Math.abs(longer.setover_in - 2 * r.setover_in) < 1e-9);
+  // Taper over the full length reduces to (D - d)/2.
+  const full = _v805({ overall_length_in: 10, large_dia_in: 1.0, small_dia_in: 0.8, taper_length_in: 10 });
+  assert.ok(Math.abs(full.setover_in - (1.0 - 0.8) / 2) < 1e-9);
+  // Equal diameters -> zero setover (straight cylinder).
+  assert.ok(_v805({ overall_length_in: 12, large_dia_in: 1.0, small_dia_in: 1.0, taper_length_in: 8 }).setover_in === 0);
+  // Error seams: non-finite, non-positive OAL/L, D < d, taper longer than the part.
+  assert.ok("error" in _v805({ overall_length_in: Infinity, large_dia_in: 1.5, small_dia_in: 1.0, taper_length_in: 8 }));
+  assert.ok("error" in _v805({ overall_length_in: 0, large_dia_in: 1.5, small_dia_in: 1.0, taper_length_in: 8 }));
+  assert.ok("error" in _v805({ overall_length_in: 12, large_dia_in: 1.5, small_dia_in: 1.0, taper_length_in: 0 }));
+  assert.ok("error" in _v805({ overall_length_in: 12, large_dia_in: 1.0, small_dia_in: 1.5, taper_length_in: 8 }));
+  assert.ok("error" in _v805({ overall_length_in: 8, large_dia_in: 1.5, small_dia_in: 1.0, taper_length_in: 12 }));
+});
+
 import { computeKeyseatKeySize as _v513 } from "../../calc-machining.js";
 
 test("bounds: spec-v513 computeKeyseatKeySize pins the band-table width, the H/2 depth, the key stresses, and error seams", () => {

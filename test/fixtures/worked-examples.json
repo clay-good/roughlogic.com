@@ -33782,6 +33782,58 @@
    }
   },
   {
+   "tile_id": "tailstock-setover",
+   "source_publisher": "Machinery's Handbook (Industrial Press)",
+   "source_title": "12 in part, 1.500-to-1.000 in taper over 8 in -> 0.375 in tailstock setover",
+   "source_edition_or_year": "spec-v805 worked example (machine-verified)",
+   "source_section_or_page": "spec-v805 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "overall_length_in": 12,
+    "large_dia_in": 1.5,
+    "small_dia_in": 1.0,
+    "taper_length_in": 8
+   },
+   "outputs": {
+    "setover_in": {
+     "value": 0.375,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "per_inch_setover_in": {
+     "value": 0.03125,
+     "tolerance": {
+      "abs": 0.00001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tailstock-setover",
+   "source_publisher": "Machinery's Handbook (Industrial Press)",
+   "source_title": "cross-check: taper over the full length (L = OAL) reduces to (D - d)/2 = 0.100 in",
+   "source_edition_or_year": "spec-v805 worked example (machine-verified)",
+   "source_section_or_page": "spec-v805 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "overall_length_in": 10,
+    "large_dia_in": 1.0,
+    "small_dia_in": 0.8,
+    "taper_length_in": 10
+   },
+   "outputs": {
+    "setover_in": {
+     "value": 0.1,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spindle-power-torque",
    "source_publisher": "first-principles specific-cutting-energy with Machinery's Handbook unit power",
    "source_title": "cutting_hp = MRR x unit power; motor_hp = cutting_hp / eff; torque = 5252 x cutting_hp / rpm",

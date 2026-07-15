@@ -8441,6 +8441,17 @@ export const CITATIONS = {
       { name: "Theoretical only", value: "built-up edge, tool wear, deflection, and vibration roughen the measured finish; leave feed margin", source: "machining practice" },
     ],
   },
+  "tailstock-setover": {
+    formula: "S = OAL x (D - d) / (2 L); per-inch setover = (D - d) / (2 L). When L = OAL it reduces to S = (D - d) / 2.",
+    edition: "Lathe tailstock setover for taper turning between centers - first-principles as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure geometry, public; the offset comes from the part length and the taper diameters.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles setup geometry. The tailstock setover S = OAL x (D - d) / (2 L) offsets the tailstock center so a part turned between centers cuts a taper. The offset scales with the OVERALL length between centers, not the taper length, because the whole workpiece pivots about the headstock center; when the taper runs the full length it reduces to (D - d)/2. The tailstock is offset away from the tool to put the small diameter at the tailstock end. The method suits shallow tapers only - it swings the center holes off the true axis, so the produced angle is slightly off and center-hole/contact wear grows with the offset; a taper attachment or the compound slide governs steep or precise tapers. A machine-setup aid; check the first part.",
+    assumptions: [
+      { name: "Overall length", value: "OAL is the full length between centers; the setover scales with it, not the taper length", source: "tailstock-offset geometry" },
+      { name: "Shallow tapers", value: "the method swings the centers off axis, so it suits shallow tapers; steep tapers need a taper attachment or compound", source: "machine practice" },
+    ],
+  },
   "taper-calc": {
     formula: "Taper per inch = (D - d) / L; taper per foot = TPI x 12; angle per side = atan((D - d) / (2L)); included angle = 2 x (angle per side).",
     edition: "Taper definitions and the taper-per-foot / angle relations - first-principles trigonometry as in Machinery's Handbook (Industrial Press), by name; public domain.",

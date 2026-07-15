@@ -368,6 +368,54 @@ function _v650renderTaperDiameter(inputRegion, outputRegion, citationEl) {
 SHOP_RENDERERS["taper-diameter"] = _v650renderTaperDiameter;
 
 // =====================================================================
+// spec-v805 tailstock-setover - lathe tailstock offset for taper turning.
+// S = OAL x (D - d) / (2 L): the whole part swings about the headstock
+// center, so the offset scales with the OVERALL length, not the taper length.
+// =====================================================================
+// dims: in { overall_length_in: L, large_dia_in: L, small_dia_in: L, taper_length_in: L } out: { setover_in: L, per_inch_setover_in: dimensionless }
+export function computeTailstockSetover({ overall_length_in = 0, large_dia_in = 0, small_dia_in = 0, taper_length_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const OAL = Number(overall_length_in) || 0;
+  const D = Number(large_dia_in) || 0;
+  const d = Number(small_dia_in) || 0;
+  const L = Number(taper_length_in) || 0;
+  if (!(OAL > 0)) return { error: "Overall length between centers must be positive (in)." };
+  if (!(L > 0)) return { error: "Taper length must be positive (in)." };
+  if (!(D >= 0) || !(d >= 0)) return { error: "Diameters must be zero or positive (in)." };
+  if (D < d) return { error: "Large diameter must be greater than or equal to the small diameter." };
+  if (L > OAL + 1e-9) return { error: "Taper length cannot exceed the overall length between centers." };
+  const per_inch_setover_in = (D - d) / (2 * L);
+  const setover_in = OAL * per_inch_setover_in;
+  if (![setover_in, per_inch_setover_in].every(Number.isFinite)) return { error: "Setover math is not a finite value." };
+  return {
+    setover_in, per_inch_setover_in,
+    note: "Tailstock setover for taper turning between centers: S = OAL x (D - d) / (2 L), where OAL is the overall length between centers, D and d the large and small taper diameters, and L the axial length over which the taper runs. The tell people get wrong: the offset scales with the OVERALL part length, not the taper length -- the whole workpiece pivots about the headstock center, so a taper cut over part of a long bar needs a proportionally larger setover. When the taper runs the full length (L = OAL) it reduces to S = (D - d) / 2. Offset the tailstock this far AWAY from the tool to make the tailstock end the small diameter. The method suits shallow tapers only: it swings the center holes off the true axis, so the angle is slightly off and center-hole/contact wear grows with steeper offsets -- use a taper attachment or the compound for steep or precise tapers. A machine-setup aid; check the first part and dial in.",
+  };
+}
+export const tailstockSetoverExample = { inputs: { overall_length_in: 12, large_dia_in: 1.5, small_dia_in: 1.0, taper_length_in: 8 } };
+function _v805renderTailstockSetover(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Lathe tailstock setover for taper turning S = OAL x (D - d) / (2 L), for overall length between centers OAL, taper diameters D and d, and taper length L; first-principles as in Machinery's Handbook (Industrial Press), by name. Suits shallow tapers; a taper attachment or the compound governs steep or precise work.";
+  const oal = makeNumber("Overall length between centers OAL (in)", "tso-oal", { step: "any", min: "0" });
+  const big = makeNumber("Large diameter D (in)", "tso-big", { step: "any", min: "0" });
+  const small = makeNumber("Small diameter d (in)", "tso-small", { step: "any", min: "0" });
+  const len = makeNumber("Length over taper L (in)", "tso-len", { step: "any", min: "0" });
+  for (const f of [oal, big, small, len]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { oal.input.value = "12"; big.input.value = "1.5"; small.input.value = "1.0"; len.input.value = "8"; update(); });
+  const oS = makeOutputLine(outputRegion, "Tailstock setover", "tso-out-s");
+  const oRate = makeOutputLine(outputRegion, "Setover per inch of length", "tso-out-rate");
+  const oNote = makeOutputLine(outputRegion, "Note", "tso-out-note");
+  const update = debounce(() => {
+    const r = computeTailstockSetover({ overall_length_in: _readNum(oal.input), large_dia_in: _readNum(big.input), small_dia_in: _readNum(small.input), taper_length_in: _readNum(len.input) });
+    if (r.error) { oS.textContent = r.error; oRate.textContent = "-"; oNote.textContent = ""; return; }
+    oS.textContent = fmt(r.setover_in, 4) + " in";
+    oRate.textContent = fmt(r.per_inch_setover_in, 6) + " in/in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [oal.input, big.input, small.input, len.input]) f.addEventListener("input", update);
+}
+SHOP_RENDERERS["tailstock-setover"] = _v805renderTailstockSetover;
+
+// =====================================================================
 // spec-v40 2.5 - dividing-head (Simple Indexing) - Group K
 // Turns per division = ratio / N (40/N for the standard head). The
 // fractional part times a hole-circle count gives the hole move when

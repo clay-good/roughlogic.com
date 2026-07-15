@@ -799,7 +799,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-shop.js", "SHOP_RENDERERS", [
     // Group K (machinist)
     "machining-time", "material-removal-rate", "turning-surface-finish", "feed-for-surface-finish",
-    "taper-calc", "taper-diameter", "dividing-head",
+    "taper-calc", "taper-diameter", "tailstock-setover", "dividing-head",
     // Group G (cross-trade)
     "thread-measure-wire", "thread-pitch-dia-from-wires", "punch-force", "punch-capacity",
     // Group E (welding / sheet-metal)
