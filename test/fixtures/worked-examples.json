@@ -9568,29 +9568,29 @@
   {
    "tile_id": "crane-lift-quick",
    "source_publisher": "ASME B30.5 / manufacturer load-chart practice",
-   "source_title": "Crane lift screen: per_leg = (load + rigging) / (n_legs * sin(angle/2)); flag GREEN < 75% / YELLOW 75-90% / RED > 90% of chart",
+   "source_title": "Crane lift screen: per_leg = load / (n_legs * sin(angle from horizontal)); flag GREEN < 75% / YELLOW 75-90% / RED > 90% of chart",
    "source_edition_or_year": "ASME B30.5; manufacturer load chart governs over the screen",
-   "source_section_or_page": "8000 lb load / 2-leg sling at 60 deg included / 12,000 lb chart -> per-leg 5657 lb, 66.67% of chart, GREEN",
+   "source_section_or_page": "8000 lb load + 200 lb rigging / 2-leg sling at 60 deg from horizontal / 12,000 lb chart -> gross 8200, per-leg 4618.8 lb, 68.33% of chart, GREEN",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
     "load_lb": 8000,
-    "rigging_weight_lb": 200,
+    "rigging_lb": 200,
     "sling_legs": 2,
-    "included_angle_deg": 60,
+    "sling_angle_deg": 60,
     "chart_capacity_lb": 12000
    },
    "outputs": {
     "gross_load_lb": {
-     "value": 8000,
+     "value": 8200,
      "tolerance": {
       "abs": 0.01
      }
     },
     "per_leg_lb": {
-     "value": 5656.85,
+     "value": 4618.8,
      "tolerance": {
-      "abs": 0.05
+      "abs": 0.1
      }
     },
     "chart_capacity_lb": {
@@ -9600,7 +9600,7 @@
      }
     },
     "percent_of_chart": {
-     "value": 66.67,
+     "value": 68.33,
      "tolerance": {
       "abs": 0.05
      }

@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(construction): crane-lift-quick per-leg sling tension used sin(theta/2) where the from-horizontal angle needs sin(theta); 2026-07-15
+
+- `computeCraneLiftCheck` (calc-construction.js) computed per-leg sling tension as `W / (n * sin(theta/2))`, but its
+  `sling_angle_deg` input is measured from horizontal (validated 0-90, default 90 = vertical pick, and the citation
+  states "vertical pick L = W/n"). The correct relation is `W / (n * sin(theta))`, which gives W/n at the 90 deg vertical
+  default; the sin(theta/2) form returned 1.41*W/n there instead. Corrected to sin(theta). Also repaired the tile's
+  worked example, whose input keys did not match the function signature (`rigging_weight_lb` -> `rigging_lb`,
+  `included_angle_deg` -> `sling_angle_deg`), so it had silently been exercising the 90 deg default with no rigging; it
+  now pins a real 60-deg-from-horizontal lift (gross 8,200 lb, 4,618.8 lb/leg, 68.3% of chart, GREEN). Updated the
+  citation and the sin(theta/2) test pins. Found by a first-principles formula-correctness audit.
+
 ### fix(stage): rigging-check per-leg tension used sin(theta/2) where the included angle needs cos(theta/2); 2026-07-15
 
 - `computeRiggingCheck` (calc-stage.js) had the same inverted included-angle sling formula as the rescue sling-angle tile:

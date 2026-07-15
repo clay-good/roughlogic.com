@@ -8918,8 +8918,8 @@ test("bounds: spec-v681 computeHelicalPileTorque pins torque = allowable*FS/Kt =
 test("bounds: calc-construction computeCraneLiftCheck pins gross_load, per-leg sling tension, and RED/YELLOW/GREEN flag", () => {
   const r = computeCraneLiftCheck({ load_lb: 8000, rigging_lb: 600, block_lb: 250, jib_deduct_lb: 0, sling_legs: 4, sling_angle_deg: 60, chart_capacity_lb: 12000 });
   assert.strictEqual(r.gross_load_lb, 8850);
-  // per_leg = load / (legs * sin(theta/2)).
-  const per_leg_expected = 8000 / (4 * Math.sin(60 * Math.PI / 360));
+  // per_leg = load / (legs * sin(theta)), theta measured from horizontal.
+  const per_leg_expected = 8000 / (4 * Math.sin(60 * Math.PI / 180));
   assert.ok(Math.abs(r.per_leg_lb - per_leg_expected) < 1e-9);
   assert.strictEqual(r.percent_of_chart, (8850 / 12000) * 100);
   assert.strictEqual(r.flag, "GREEN"); // 73.75% < 75.

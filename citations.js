@@ -3199,13 +3199,13 @@ export const CITATIONS = {
     ],
   },
   "crane-lift-quick": {
-    formula: "Gross load = load + rigging + block + jib_deduct. Per-leg sling tension L = W / (n × sin(theta/2)) (basket / bridle form). Percent of chart = gross / chart_capacity × 100. Flags: < 75% green, 75-90% yellow, ≥ 90% red. Refuses to render an output without the user-entered chart capacity (the tool never reproduces a load chart).",
+    formula: "Gross load = load + rigging + block + jib_deduct. Per-leg sling tension L = W / (n × sin(theta)) with the sling angle theta measured from horizontal (vertical pick theta = 90 deg gives W/n; tension diverges as the sling flattens). Percent of chart = gross / chart_capacity × 100. Flags: < 75% green, 75-90% yellow, ≥ 90% red. Refuses to render an output without the user-entered chart capacity (the tool never reproduces a load chart).",
     edition: "ASME B30.5 (Mobile and Locomotive Cranes) by name and section. ASME B30.9 (Slings) for the per-leg formula. OSHA 29 CFR 1926 Subpart CC (cranes and derricks) by section.",
     freeAccess: "ASME B30 series licensed; OSHA 29 CFR 1926 free at ecfr.gov.",
     governance: GOVERNANCE.engineer_of_record,
     editionNote: "Single-edition (ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC). The crane manufacturer's load chart and the qualified lift director govern.",
     assumptions: [
-      { name: "Per-leg formula", value: "L = W / (n × sin(theta/2)) for bridle / basket; vertical pick L = W / n", source: "ASME B30.9" },
+      { name: "Per-leg formula", value: "L = W / (n × sin(theta)) with theta the sling angle from horizontal; vertical pick (theta = 90 deg) L = W / n", source: "ASME B30.9" },
       { name: "Critical-lift threshold", value: "75% of chart capacity (engineering-practice critical-lift trigger)", source: "engineering practice" },
     ],
   },

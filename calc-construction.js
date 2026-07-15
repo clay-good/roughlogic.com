@@ -2301,8 +2301,12 @@ export function computeCraneLiftCheck({
   if (!(sling_legs >= 1)) return { error: "Sling legs ≥ 1." };
   if (!(sling_angle_deg > 0 && sling_angle_deg <= 90)) return { error: "Sling angle in (0, 90] degrees." };
   const gross_load_lb = (Number(load_lb) || 0) + (Number(rigging_lb) || 0) + (Number(block_lb) || 0) + (Number(jib_deduct_lb) || 0);
+  // sling_angle_deg is measured from horizontal (90 deg = vertical pick). Per-leg
+  // tension T = W / (n * sin(angle)): at 90 deg this is the vertical W/n, and it
+  // diverges as the sling flattens toward horizontal. (A prior sin(angle/2) form
+  // gave 1.41*W/n at the vertical default instead of W/n.)
   const theta = sling_angle_deg * Math.PI / 180;
-  const per_leg_lb = (Number(load_lb) || 0) / (sling_legs * Math.sin(theta / 2));
+  const per_leg_lb = (Number(load_lb) || 0) / (sling_legs * Math.sin(theta));
   if (!(chart_capacity_lb > 0)) {
     return {
       gross_load_lb, per_leg_lb, input_complete: false,

@@ -255,9 +255,9 @@ test("251 gross load = load + rigging + block + jib_deduct", () => {
   assert.equal(r.gross_load_lb, 8950);
 });
 
-test("251 per-leg tension matches W / (n × sin(theta/2))", () => {
+test("251 per-leg tension matches W / (n × sin(theta)), theta from horizontal", () => {
   const r = computeCraneLiftCheck({ load_lb: 8000, sling_legs: 4, sling_angle_deg: 60, chart_capacity_lb: 12000 });
-  const expected = 8000 / (4 * Math.sin(30 * Math.PI / 180));
+  const expected = 8000 / (4 * Math.sin(60 * Math.PI / 180));
   assert.ok(close(r.per_leg_lb, expected, 1));
 });
 
