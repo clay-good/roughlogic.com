@@ -4084,7 +4084,7 @@
   {
    "tile_id": "arc-flash-screen",
    "source_publisher": "Lee 1982 / NFPA",
-   "source_title": "Ralph Lee closed-form: E = 2.142e6 * V * I * t / D^2",
+   "source_title": "Ralph Lee closed-form: E(cal/cm^2) = 7.935e-4 * V(volts) * I(amps) * t / D(in)^2 (Lee 2.142e6 J/kV.kA.mm re-expressed)",
    "source_edition_or_year": "Lee, IEEE Trans. on Industry Applications, 1982",
    "source_section_or_page": "Closed-form Lee equation; NFPA 70E-2024 §130.5 governs the risk assessment",
    "verified_by": "rl",
@@ -4098,15 +4098,15 @@
    },
    "outputs": {
     "incident_energy_cal_cm2": {
-     "value": 7933333333.333,
+     "value": 2.9389,
      "tolerance": {
-      "pct": 0.01
+      "abs": 0.01
      }
     },
     "boundary_distance_in": {
-     "value": 1463557.3,
+     "value": 28.169,
      "tolerance": {
-      "pct": 0.01
+      "abs": 0.05
      }
     }
    }

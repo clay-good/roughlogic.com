@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(electrical): arc-flash-screen Lee incident-energy constant had wrong units (off by ~10^9); 2026-07-15
+
+- `computeArcFlashScreen` (calc-electrical.js) used the Lee (IEEE 1584) constant `2.142e6` directly, but that value is
+  defined for voltage in kV, bolted-fault current in kA, and distance in mm and returns J/cm^2. This tile's inputs are
+  volts, amps, and inches with a cal/cm^2 output, so the constant was ~10^9 too large: the 480 V / 25 kA / 0.1 s / 18 in
+  example reported 7.9e9 cal/cm^2 with a 23-mile arc-flash boundary instead of the correct ~2.94 cal/cm^2 (CAT 1 PPE)
+  and 28 in boundary. Every result pinned to "> 40 cal/cm^2, no PPE rated." Corrected the coefficient to the properly
+  unit-converted `7.935e-4 = 2.142e6 / (1000 * 1000 * 25.4^2 * 4.184)`, which fixes both the incident energy and the
+  boundary distance. Found by a first-principles formula-correctness audit (the dimensional and finiteness gates pass
+  either way since the constant is dimensionless in the code's unit system). Updated the citation string, the worked
+  example (7.9e9 -> 2.94 cal/cm^2), and the four tests that had pinned the pre-fix numerator.
+
 ### feat(mechanic): spec-v808 tire contact patch from load and pressure; 2026-07-15
 
 - New tile `tire-contact-patch` (Group K, calc-mechanic.js): the tire footprint and the flotation / soil-compaction

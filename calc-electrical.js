@@ -2598,12 +2598,18 @@ ELECTRICAL_RENDERERS["panel-rebalance"] = _v8e_renderPanelRebalance;
 // that explicit; this comment reiterates it for future maintainers.
 //
 //   E_lee (cal/cm^2 at distance D inches) =
-//     (2.142e6 * V * I_bf * t_seconds) / D^2
+//     (7.935e-4 * V * I_bf * t_seconds) / D^2
+//
+// The 7.935e-4 coefficient is the Lee (IEEE 1584) constant 2.142e6 --
+// which is stated for V in kV, I_bf in kA, and D in mm and returns J/cm^2 --
+// re-expressed for this tile's inputs (V in volts, I_bf in amps, D in inches)
+// and a cal/cm^2 output:
+//   2.142e6 / (1000 * 1000 * 25.4^2 * 4.184) = 7.935e-4.
 //
 // Boundary distance is the distance at which E_lee = 1.2 cal/cm^2
 // (NFPA 70E threshold for second-degree burn):
 //
-//   D_boundary = sqrt((2.142e6 * V * I_bf * t) / 1.2)
+//   D_boundary = sqrt((7.935e-4 * V * I_bf * t) / 1.2)
 //
 // PPE category bands cited by name only (NFPA 70E Table 130.7(C)(15)(c)
 // is not reproduced):
@@ -2645,7 +2651,7 @@ export function computeArcFlashScreen({
     return { error: "Equipment configuration must be 'open_air' or 'box'." };
   }
 
-  const numerator = 2.142e6 * V * I * t;
+  const numerator = 7.935e-4 * V * I * t;
   const incident_energy_cal_cm2 = numerator / (D * D);
   const boundary_in = Math.sqrt(numerator / _LEE_THRESHOLD_CAL_CM2);
 

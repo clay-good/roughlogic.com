@@ -45,8 +45,8 @@ test("arc-flash-screen: closed-form math at 480 V / 25 kA / 100 ms / 18 in", () 
     voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 0.1,
     working_distance_in: 18, equipment_config: "open_air",
   });
-  // E = 2.142e6 * 480 * 25000 * 0.1 / 324 = 7,933,333,333 (literal Lee).
-  const expected_E = (2.142e6 * 480 * 25000 * 0.1) / (18 * 18);
+  // E = 7.935e-4 * 480 * 25000 * 0.1 / 324 = 2.939 cal/cm^2 (Lee, unit-corrected).
+  const expected_E = (7.935e-4 * 480 * 25000 * 0.1) / (18 * 18);
   assert.ok(closePct(r.incident_energy_cal_cm2, expected_E, 0.001));
 });
 
@@ -56,7 +56,7 @@ test("arc-flash-screen: boundary distance at the 1.2 cal/cm^2 second-degree thre
     working_distance_in: 18, equipment_config: "open_air",
   });
   // D_boundary = sqrt(numerator / 1.2)
-  const num = 2.142e6 * 480 * 25000 * 0.1;
+  const num = 7.935e-4 * 480 * 25000 * 0.1;
   const expected_D = Math.sqrt(num / 1.2);
   assert.ok(closePct(r.boundary_distance_in, expected_D, 0.001));
 });

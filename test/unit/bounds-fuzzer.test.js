@@ -9370,10 +9370,10 @@ test("bounds: calc-electrical computePanelRebalance pins (max-min)/mean*100 imba
   assert.ok("error" in computePanelRebalance({ circuits: [{ amps: -1, phase: "A" }] }));
 });
 
-test("bounds: calc-electrical computeArcFlashScreen pins Lee E = (2.142e6 * V * I * t) / D^2 + < 208 V rejection", () => {
+test("bounds: calc-electrical computeArcFlashScreen pins Lee E = (7.935e-4 * V * I * t) / D^2 + < 208 V rejection", () => {
   const r = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 18, equipment_config: "open_air" });
-  // E = 2.142e6 * 480 * 25000 * 0.1 / (18*18)
-  const expected_E = (2.142e6 * 480 * 25000 * 0.1) / (18 * 18);
+  // E = 7.935e-4 * 480 * 25000 * 0.1 / (18*18) (Lee, unit-corrected to volts/amps/inches -> cal/cm^2)
+  const expected_E = (7.935e-4 * 480 * 25000 * 0.1) / (18 * 18);
   assert.ok(Math.abs(r.incident_energy_cal_cm2 - expected_E) / expected_E < 1e-9);
   assert.ok(r.boundary_distance_in > 0 && Number.isFinite(r.boundary_distance_in));
   assert.ok(typeof r.ppe_band === "string");

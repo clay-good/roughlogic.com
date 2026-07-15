@@ -8421,7 +8421,7 @@ import { computeWaterHammerArrestor } from "../../calc-plumbing.js";
 import { computeNPSHa } from "../../calc-hvac.js";
 
 test("monotonicity: computeArcFlashScreen incident_energy_cal_cm2 is strictly increasing in voltage_V, bolted_fault_A, AND clearing_time_s (Lee 1982 numerator pin); strictly decreasing in working_distance_in (1/D^2 pin); 2x current -> 2x energy exact; 4x distance -> 1/16 energy exact", () => {
-  // Group A. E = (2.142e6 * V * I * t) / D^2. Strictly increasing in V, I, t;
+  // Group A. E = (7.935e-4 * V * I * t) / D^2. Strictly increasing in V, I, t;
   // strictly decreasing in D^2.
   let prev = -Infinity;
   for (const voltage_V of [240, 480, 600, 1000, 2400, 4160, 13800]) {
@@ -8466,9 +8466,9 @@ test("monotonicity: computeArcFlashScreen incident_energy_cal_cm2 is strictly in
   const d4 = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 36, equipment_config: "open_air" });
   assert.ok(Math.abs(d4.incident_energy_cal_cm2 - d1.incident_energy_cal_cm2 / 16) < 1e-9,
     `4x D: E = ${d4.incident_energy_cal_cm2}, expected ${d1.incident_energy_cal_cm2 / 16}`);
-  // Closed-form pin: E = (2.142e6 * 480 * 25000 * 0.1) / (18 * 18).
+  // Closed-form pin: E = (7.935e-4 * 480 * 25000 * 0.1) / (18 * 18) (Lee, unit-corrected).
   const ref = computeArcFlashScreen({ voltage_V: 480, bolted_fault_A: 25000, clearing_time_s: 0.1, working_distance_in: 18, equipment_config: "open_air" });
-  const expectedE = (2.142e6 * 480 * 25000 * 0.1) / (18 * 18);
+  const expectedE = (7.935e-4 * 480 * 25000 * 0.1) / (18 * 18);
   assert.ok(Math.abs(ref.incident_energy_cal_cm2 - expectedE) / expectedE < 1e-12,
     `E = ${ref.incident_energy_cal_cm2}, expected ${expectedE}`);
   // boundary_distance_in increases as energy grows.

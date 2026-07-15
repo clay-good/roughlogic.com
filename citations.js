@@ -3117,7 +3117,7 @@ export const CITATIONS = {
   },
 
   "arc-flash-screen": {
-    formula: "E_lee (cal/cm^2 at distance D in inches) = (2.142e6 * V * I_bf * t) / D^2. Boundary distance D_b = sqrt((2.142e6 * V * I_bf * t) / 1.2). PPE category band looked up against the NFPA 70E Table 130.7(C)(15)(c) ranges (table cited by name only; not reproduced).",
+    formula: "E_lee (cal/cm^2 at distance D in inches) = (7.935e-4 * V * I_bf * t) / D^2, with V in volts, I_bf in amps. The 7.935e-4 coefficient is the Lee (IEEE 1584) constant 2.142e6 (stated for kV, kA, mm and J/cm^2) re-expressed for volts, amps, inches and cal/cm^2: 2.142e6 / (1000 * 1000 * 25.4^2 * 4.184). Boundary distance D_b = sqrt((7.935e-4 * V * I_bf * t) / 1.2). PPE category band looked up against the NFPA 70E Table 130.7(C)(15)(c) ranges (table cited by name only; not reproduced).",
     edition: "NFPA 70E-2024 §130.5 governs the arc-flash risk assessment. IEEE 1584-2018 is the study-grade method.",
     freeAccess: NEC_FREE + " for NFPA 70E TOC and Annex D.",
     governance: GOVERNANCE.electrical,
