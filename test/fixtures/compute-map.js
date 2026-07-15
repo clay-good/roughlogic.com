@@ -893,6 +893,7 @@ export const COMPUTE_MAP = {
   "tailstock-setover": { module: "../../calc-shop.js", fn: "computeTailstockSetover" },
   "transformer-turns-ratio": { module: "../../calc-electrical.js", fn: "computeTransformerTurnsRatio" },
   "belt-hp-transmitted": { module: "../../calc-cross.js", fn: "computeBeltHpTransmitted" },
+  "tire-contact-patch": { module: "../../calc-mechanic.js", fn: "computeTireContactPatch" },
   "keyseat-key-size": { module: "../../calc-machining.js", fn: "computeKeyseatKeySize" },
   "brake-pedal-hydraulic": { module: "../../calc-mechanic.js", fn: "computeBrakePedalHydraulic" },
   "dyno-correction-sae": { module: "../../calc-mechanic.js", fn: "computeDynoCorrectionSae" },

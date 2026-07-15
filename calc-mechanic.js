@@ -2508,3 +2508,36 @@ MECHANIC_RENDERERS["climb-gradient-roc"] = _simpleRenderer({
   ],
   compute: computeClimbGradientRoc,
 });
+
+// =====================================================================
+// spec-v808 tire-contact-patch - contact-patch area from load and pressure.
+// A = W / p (an ideal-membrane first-order estimate).
+// =====================================================================
+// dims: in { corner_load_lb: M L T^-2, inflation_pressure_psi: M L^-1 T^-2 } out: { contact_area_in2: L^2, contact_area_cm2: L^2 }
+export function computeTireContactPatch({ corner_load_lb = 0, inflation_pressure_psi = 0 } = {}) {
+  const W = Number(corner_load_lb) || 0;
+  const p = Number(inflation_pressure_psi) || 0;
+  if (!(W > 0 && Number.isFinite(W))) return { error: "Corner load must be positive (lb)." };
+  if (!(p > 0 && Number.isFinite(p))) return { error: "Inflation pressure must be positive (psi)." };
+  const contact_area_in2 = W / p;
+  const contact_area_cm2 = contact_area_in2 * 6.4516;
+  if (![contact_area_in2, contact_area_cm2].every(Number.isFinite)) return { error: "Contact-patch math is not a finite value." };
+  return {
+    contact_area_in2, contact_area_cm2,
+    note: "First-order tire contact-patch area: A = W / p, the corner load divided by the inflation pressure. It falls out of treating the tire as an ideal air-pressure membrane -- the patch carries the load at the inflation pressure, so W = p x A. The useful corollary: the average ground pressure under the tire roughly EQUALS the inflation pressure, independent of load, which is why airing down is the lever for flotation and for limiting soil compaction. A 900 lb corner at 35 psi rides on about 25.7 in^2; drop to 15 psi and the patch grows to 60 in^2 (2.3x) at the same load, spreading the weight and floating over soft ground. This is an idealization: the tire's sidewall and tread stiffness carry a little of the load, so the real patch runs a bit smaller than W/p (more so at high pressure and on stiff sidewalls), and the shape is set by the tire and rim. A field estimate, not a measured footprint; the tire, load, and surface govern.",
+  };
+}
+export const tireContactPatchExample = { inputs: { corner_load_lb: 900, inflation_pressure_psi: 35 } };
+MECHANIC_RENDERERS["tire-contact-patch"] = _simpleRenderer({
+  citation: "Citation: first-order tire contact-patch area A = W / p (corner load / inflation pressure), the ideal-membrane relation where average ground pressure ~ inflation pressure. A field estimate; sidewall/tread stiffness make the real patch a bit smaller. The tire, load, and surface govern.",
+  example: tireContactPatchExample.inputs,
+  fields: [
+    { key: "corner_load_lb", label: "Corner load W (lb)", kind: "number", default: 900 },
+    { key: "inflation_pressure_psi", label: "Inflation pressure p (psi)", kind: "number", default: 35 },
+  ],
+  outputs: [
+    { key: "a", id: "tcp-out-a", label: "Contact patch area", value: (r) => fmt(r.contact_area_in2, 1) + " in^2 (" + fmt(r.contact_area_cm2, 0) + " cm^2)" },
+    { key: "n", id: "tcp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTireContactPatch,
+});

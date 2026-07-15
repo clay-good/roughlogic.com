@@ -21054,6 +21054,24 @@ test("bounds: spec-v807 computeBeltHpTransmitted pins the power, the belt speed,
   assert.ok("error" in _v807({ tight_side_tension_lb: 100, slack_side_tension_lb: 250, sheave_diameter_in: 6, sheave_rpm: 1750 }));
 });
 
+import { computeTireContactPatch as _v808 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v808 computeTireContactPatch pins A = W/p, the metric area, the inverse-pressure flotation, and error seams", () => {
+  const r = _v808({ corner_load_lb: 900, inflation_pressure_psi: 35 });
+  assert.ok(Math.abs(r.contact_area_in2 - 25.714) < 0.01); // A = W / p
+  assert.ok(Math.abs(r.contact_area_cm2 - r.contact_area_in2 * 6.4516) < 1e-9);
+  // Airing down at the same load grows the patch in inverse proportion to pressure.
+  const low = _v808({ corner_load_lb: 900, inflation_pressure_psi: 15 });
+  assert.ok(Math.abs(low.contact_area_in2 - 60) < 0.01);
+  assert.ok(Math.abs(low.contact_area_in2 / r.contact_area_in2 - 35 / 15) < 1e-9);
+  // Patch scales linearly with load at fixed pressure.
+  assert.ok(Math.abs(_v808({ corner_load_lb: 1800, inflation_pressure_psi: 35 }).contact_area_in2 - 2 * r.contact_area_in2) < 1e-6);
+  // Error seams: non-finite, non-positive load / pressure.
+  assert.ok("error" in _v808({ corner_load_lb: Infinity, inflation_pressure_psi: 35 }));
+  assert.ok("error" in _v808({ corner_load_lb: 0, inflation_pressure_psi: 35 }));
+  assert.ok("error" in _v808({ corner_load_lb: 900, inflation_pressure_psi: 0 }));
+});
+
 import { computeKeyseatKeySize as _v513 } from "../../calc-machining.js";
 
 test("bounds: spec-v513 computeKeyseatKeySize pins the band-table width, the H/2 depth, the key stresses, and error seams", () => {

@@ -887,6 +887,7 @@ const RELATED = {
   "driveshaft-crit": ["driveshaft-max-length", "shaft-torsion", "displacement-cr"],
   "driveshaft-max-length": ["driveshaft-crit", "shaft-torsion", "displacement-cr"],
   "tire-gearing": ["fuel-range", "displacement-cr"],
+  "tire-contact-patch": ["tire-gearing", "tire-load-check", "gear-mph-rpm"],
   "brake-pad-life": ["braking-distance", "fuel-range"],
   "valve-flow-coefficient": ["pump-tdh", "hydraulic-cylinder"],
 

@@ -4789,6 +4789,18 @@ export const CITATIONS = {
       { name: "LHV table", value: "gasoline E10 ~ 112 000 BTU/gal; gasoline E85 ~ 81 800; diesel #2 ~ 129 500; LPG ~ 84 250; CNG ~ 33 800 BTU/cf; jet A ~ 124 000 BTU/gal", source: "DOE AFDC fuel-properties data sheet" },
     ],
   },
+  "tire-contact-patch": {
+    formula: "A = W / p; A_cm2 = 6.4516 A. Average ground pressure ~ p.",
+    edition: "The first-order tire contact-patch relation A = W / p (ideal air-pressure membrane), first-principles; the tire, load, and surface govern.",
+    freeAccess: "The load = pressure x area relation for a pneumatic tire is a standard first-principles estimate; the load and inflation pressure come from the vehicle.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-order tire contact-patch area: A = W / p, the corner load divided by the inflation pressure, from treating the tire as an ideal air-pressure membrane (W = p x A). The corollary is the useful part: the average ground pressure under the tire is roughly the inflation pressure, independent of load, which makes airing down the lever for flotation on soft ground and for limiting soil compaction. Lowering the pressure at a fixed load grows the patch in inverse proportion. It is an idealization -- the sidewall and tread stiffness carry a portion of the load, so the real patch is somewhat smaller than W/p (more so at high pressure and with stiff sidewalls), and the patch shape is set by the tire and rim. A field estimate, not a measured footprint; the tire, load, and surface govern.",
+    assumptions: [
+      { name: "Ideal membrane", value: "W = p x A; the patch carries the load at the inflation pressure", source: "pneumatic-tire first principles" },
+      { name: "Ground pressure", value: "average ground pressure ~ inflation pressure, independent of load", source: "the A = W/p relation" },
+      { name: "Idealization", value: "sidewall/tread stiffness make the real patch a bit smaller than W/p", source: "scope of this tile" },
+    ],
+  },
   "tire-gearing": {
     formula: "Effective tire diameter from metric size (e.g., 285/75R17): D_in = (W_mm × ratio/100 × 2 + R_in × 25.4) / 25.4. Revs/mile = 63 360 / (π × D). Effective ratio = axle_ratio × (rev/mi_stock / rev/mi_new).",
     edition: "Tire & Rim Association (TRA) Yearbook by name; ETRTO Standards Manual by name; SAE J267 metric-tire size convention.",

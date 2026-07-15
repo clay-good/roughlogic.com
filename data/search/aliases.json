@@ -1137,6 +1137,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "tire contact patch",
+      "target": "tire-contact-patch",
+      "kind": "industry"
+    },
+    {
+      "term": "tire footprint area",
+      "target": "tire-contact-patch",
+      "kind": "industry"
+    },
+    {
+      "term": "tire ground pressure",
+      "target": "tire-contact-patch",
+      "kind": "industry"
+    },
+    {
+      "term": "airing down flotation patch",
+      "target": "tire-contact-patch",
+      "kind": "adjacent"
+    },
+    {
+      "term": "load over inflation pressure area",
+      "target": "tire-contact-patch",
+      "kind": "adjacent"
+    },
+    {
       "term": "bolt proof load",
       "target": "bolt-proof-load",
       "kind": "industry"

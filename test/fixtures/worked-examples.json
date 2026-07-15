@@ -33948,6 +33948,54 @@
    }
   },
   {
+   "tile_id": "tire-contact-patch",
+   "source_publisher": "first-order pneumatic-tire relation A = W / p",
+   "source_title": "900 lb corner at 35 psi -> 25.7 in^2 contact patch",
+   "source_edition_or_year": "spec-v808 worked example (machine-verified)",
+   "source_section_or_page": "spec-v808 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "corner_load_lb": 900,
+    "inflation_pressure_psi": 35
+   },
+   "outputs": {
+    "contact_area_in2": {
+     "value": 25.71,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "contact_area_cm2": {
+     "value": 165.9,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tire-contact-patch",
+   "source_publisher": "first-order pneumatic-tire relation A = W / p",
+   "source_title": "cross-check: airing down to 15 psi at the same 900 lb grows the patch to 60 in^2",
+   "source_edition_or_year": "spec-v808 worked example (machine-verified)",
+   "source_section_or_page": "spec-v808 section 2.1 cross-check (airing down)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "corner_load_lb": 900,
+    "inflation_pressure_psi": 15
+   },
+   "outputs": {
+    "contact_area_in2": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spindle-power-torque",
    "source_publisher": "first-principles specific-cutting-energy with Machinery's Handbook unit power",
    "source_title": "cutting_hp = MRR x unit power; motor_hp = cutting_hp / eff; torque = 5252 x cutting_hp / rpm",
