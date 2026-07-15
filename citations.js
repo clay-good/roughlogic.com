@@ -4902,7 +4902,7 @@ export const CITATIONS = {
     ],
   },
   "filter-loading": {
-    formula: "Loading rate (gpm/ft²) = filter_flow / filter_area. Backwash flow = backwash_rate × area. Categories: rapid sand 2-5 gpm/ft², high-rate 4-8 gpm/ft².",
+    formula: "Loading rate (gpm/ft²) = filter_flow / filter_area. Backwash flow = backwash_rate × area. Categories: rapid sand 2-5 gpm/ft², high-rate 5-8 gpm/ft².",
     edition: "Ten States Standards (Recommended Standards for Water Works), Great Lakes - Upper Mississippi River Board of State and Provincial Public Health and Environmental Managers, current edition by name. AWWA B100 / B130 (filter media) by name.",
     freeAccess: "Ten States Standards licensed; principles free in published water-treatment texts.",
     governance: GOVERNANCE.water,
@@ -4912,7 +4912,7 @@ export const CITATIONS = {
     ],
   },
   "filter-area-for-loading": {
-    formula: "Required filter area (ft²) = design_flow / target_loading. Backwash flow = backwash_rate × area. Bands: rapid sand 2-5 gpm/ft², high-rate 4-8 gpm/ft².",
+    formula: "Required filter area (ft²) = design_flow / target_loading. Backwash flow = backwash_rate × area. Bands: rapid sand 2-5 gpm/ft², high-rate 5-8 gpm/ft².",
     edition: "Ten States Standards (Recommended Standards for Water Works), Great Lakes - Upper Mississippi River Board of State and Provincial Public Health and Environmental Managers, current edition by name. AWWA B100 / B130 (filter media) by name.",
     freeAccess: "Ten States Standards licensed; principles free in published water-treatment texts.",
     governance: GOVERNANCE.water,

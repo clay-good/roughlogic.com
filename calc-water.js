@@ -75,7 +75,7 @@ export function computeFilterLoading({ filter_area_ft2 = 0, flow_gpm = 0, backwa
   const backwash_gpm = backwash_rate_gpm_ft2 * filter_area_ft2;
   let category = "outside typical bands";
   if (loading >= 2 && loading <= 5) category = "rapid sand (2-5 gpm/ft^2)";
-  else if (loading > 5 && loading <= 8) category = "high-rate (4-8 gpm/ft^2)";
+  else if (loading > 5 && loading <= 8) category = "high-rate (5-8 gpm/ft^2)";
   else if (loading < 2) category = "below typical (low loading)";
   else category = "above high-rate (verify design)";
   return { loading_gpm_per_ft2: loading, backwash_gpm, category };
@@ -98,7 +98,7 @@ export function computeFilterAreaForLoading({ flow_gpm = 0, target_loading_gpm_f
   const backwash_gpm = backwash_rate_gpm_ft2 * required_area_ft2;
   let category = "outside typical bands";
   if (loading >= 2 && loading <= 5) category = "rapid sand (2-5 gpm/ft^2)";
-  else if (loading > 5 && loading <= 8) category = "high-rate (4-8 gpm/ft^2)";
+  else if (loading > 5 && loading <= 8) category = "high-rate (5-8 gpm/ft^2)";
   else if (loading < 2) category = "below typical (low loading)";
   else category = "above high-rate (verify design)";
   return { required_area_ft2, backwash_gpm, category };

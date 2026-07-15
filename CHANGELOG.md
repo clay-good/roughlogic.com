@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(water): filter-loading high-rate band label said 4-8 gpm/ft^2 but the band is 5-8; 2026-07-15
+
+- `computeFilterLoading` / `computeFilterAreaForLoading` (calc-water.js) classify loading into disjoint bands: rapid sand
+  `2 <= loading <= 5`, then high-rate `5 < loading <= 8`. The high-rate category string read "high-rate (4-8 gpm/ft^2)",
+  a range that both overlaps the rapid-sand band and disagrees with the code's own 5 gpm/ft^2 boundary (a 4.5 loading is
+  labeled rapid sand, yet the high-rate label claims to include it). Relabeled to "high-rate (5-8 gpm/ft^2)" in the two
+  computes and the two citation strings so the displayed range matches the actual classification boundary. Label-only;
+  the band logic and computed values are unchanged. Found by the formula-correctness audit.
+
 ### feat(lint): add check-fixture-keys gate to catch mis-wired worked-example fixtures; 2026-07-15
 
 - New `scripts/check-fixture-keys.mjs` (wired into `npm run lint`) parses each compute function's top-level destructured
