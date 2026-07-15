@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(rescue): sling-angle per-leg tension used sin(theta/2) where the included angle needs cos(theta/2); 2026-07-15
+
+- `computeSlingAngle` (calc-rescue.js) computed basket/bridle/choker per-leg tension as `W / (n * sin(theta/2))` for the
+  included (apex) angle theta, but the correct relation is `W / (n * cos(theta/2))`: each leg sits theta/2 off vertical,
+  so vertical equilibrium is `n * T * cos(theta/2) = W`. The sin form inverted the physics -- it fell to the minimum W/n
+  as the legs opened toward horizontal (where tension actually diverges) and blew up as the legs approached vertical
+  (where tension is actually minimal). It also made the low-angle-hazard flag fire backwards. On the tile's own basket
+  example (2000 lb, 60 deg included, 2 legs) it reported 2000 lb/leg (factor 2.0, "hazard") instead of the correct
+  1154.7 lb/leg (factor 1.15, safe steep lift); the load factor correctly reaches 2.0 at a 120 deg included angle (30 deg
+  from horizontal), matching the standard rigging rule the code comment already described. Corrected to cos(theta/2) and
+  updated the citation and the sin-based test pins. Found by a first-principles formula-correctness audit.
+
 ### fix(restoration): containment-air-balance applied the ft^2 orifice constant to an in^2 area (144x high); 2026-07-15
 
 - `computeContainmentAirBalance` (calc-restoration.js) computed `required_cfm = 2610 * leakage_area_in2 * sqrt(dP)`, but

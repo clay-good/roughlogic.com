@@ -5504,7 +5504,7 @@ export const CITATIONS = {
     ],
   },
   "sling-angle": {
-    formula: "Per-leg tension L = W / (n × sin(θ/2)) for basket / bridle slings; vertical L = W / n; choker reduction factor 0.75 applied per ASME B30.9.",
+    formula: "Per-leg tension L = W / (n × cos(θ/2)) for basket / bridle slings at included (apex) angle θ (tension is W/n with legs vertical and diverges as the legs open toward horizontal); vertical L = W / n; choker reduction factor 0.75 applied per ASME B30.9.",
     edition: "ASME B30.9 (Slings) by name and section.",
     freeAccess: "ASME B30.9 licensed; principles free at OSHA 29 CFR 1910.184 (free at ecfr.gov) and at major manufacturer (Crosby, Lift-It) technical pages.",
     governance: GOVERNANCE.fire,

@@ -117,6 +117,11 @@ export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", incl
   if (!(load_lb >= 0)) return { error: "Load must be non-negative." };
   if (!(n_legs >= 1)) return { error: "At least one leg required." };
   if (!(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be 0-180 deg." };
+  // Included (apex) angle: each leg sits included_angle/2 off the vertical, so
+  // vertical equilibrium is n * T * cos(theta/2) = W and T = W / (n cos(theta/2)).
+  // Tension is W/n when the legs are vertical (theta -> 0) and diverges as the
+  // legs open toward horizontal (theta -> 180). (A prior sin(theta/2) form
+  // inverted this: it fell to W/n at a flat, dangerous spread.)
   const theta_rad = (included_angle_deg / 2) * Math.PI / 180;
   let tension_per_leg;
   let factor;
@@ -124,10 +129,10 @@ export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", incl
     tension_per_leg = load_lb / n_legs;
     factor = 1;
   } else if (sling_config === "basket" || sling_config === "bridle") {
-    tension_per_leg = load_lb / (n_legs * Math.sin(theta_rad));
+    tension_per_leg = load_lb / (n_legs * Math.cos(theta_rad));
     factor = 1;
   } else if (sling_config === "choker") {
-    tension_per_leg = load_lb / (n_legs * Math.sin(theta_rad));
+    tension_per_leg = load_lb / (n_legs * Math.cos(theta_rad));
     factor = 0.75;
     tension_per_leg = tension_per_leg / factor; // applied capacity reduction = effective tension increase
   } else {

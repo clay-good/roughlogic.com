@@ -38,7 +38,7 @@ test("Rope MA: T-method ~ 5", () => { const r = computeRopeMA({ rig: "T_method",
 
 // 161 Sling angle
 test("Sling: example basket 60 deg yields tension > load/2", () => { const r = computeSlingAngle(slingAngleExample.inputs); assert.ok(r.tension_per_leg_lb > 1000); });
-test("Sling: small angle blows up tension (limit case)", () => { const r = computeSlingAngle({ load_lb: 1000, sling_config: "basket", included_angle_deg: 1, n_legs: 2 }); assert.ok(r.tension_per_leg_lb > 50000); });
+test("Sling: wide angle blows up tension (limit case)", () => { const r = computeSlingAngle({ load_lb: 1000, sling_config: "basket", included_angle_deg: 179, n_legs: 2 }); assert.ok(r.tension_per_leg_lb > 50000); });
 test("Sling: vertical = load/n", () => { const r = computeSlingAngle({ load_lb: 1000, sling_config: "vertical", included_angle_deg: 60, n_legs: 2 }); assert.equal(r.tension_per_leg_lb, 500); });
 test("Sling: choker has reduction factor 0.75", () => { const a = computeSlingAngle({ load_lb: 1000, sling_config: "basket", included_angle_deg: 60, n_legs: 2 }); const b = computeSlingAngle({ load_lb: 1000, sling_config: "choker", included_angle_deg: 60, n_legs: 2 }); assert.ok(close(b.tension_per_leg_lb / a.tension_per_leg_lb, 1 / 0.75, 0.001)); });
 test("Sling: 180 deg out of range", () => { const r = computeSlingAngle({ load_lb: 1000, sling_config: "basket", included_angle_deg: 180, n_legs: 2 }); assert.ok(r.error); });
@@ -46,4 +46,4 @@ test("Sling: zero angle errors", () => { const r = computeSlingAngle({ load_lb: 
 test("Sling: zero legs errors", () => { const r = computeSlingAngle({ load_lb: 1000, sling_config: "basket", included_angle_deg: 60, n_legs: 0 }); assert.ok(r.error); });
 test("Sling: negative load errors", () => { const r = computeSlingAngle({ load_lb: -1, sling_config: "basket", included_angle_deg: 60, n_legs: 2 }); assert.ok(r.error); });
 test("Sling: unknown config errors", () => { const r = computeSlingAngle({ load_lb: 1000, sling_config: "x", included_angle_deg: 60, n_legs: 2 }); assert.ok(r.error); });
-test("Sling: 60 deg basket scales 1/sin(30) per leg", () => { const r = computeSlingAngle({ load_lb: 1000, sling_config: "basket", included_angle_deg: 60, n_legs: 2 }); assert.ok(close(r.tension_per_leg_lb, 1000 / (2 * Math.sin(Math.PI / 6)), 0.001)); });
+test("Sling: 60 deg basket scales 1/cos(30) per leg", () => { const r = computeSlingAngle({ load_lb: 1000, sling_config: "basket", included_angle_deg: 60, n_legs: 2 }); assert.ok(close(r.tension_per_leg_lb, 1000 / (2 * Math.cos(Math.PI / 6)), 0.001)); });

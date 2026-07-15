@@ -103,14 +103,14 @@ test("superheat-subcool EN: subcool target verdict, backward-compatible", () => 
 test("sling-angle EN: D/d efficiency, min capacity, low-angle hazard, backward-compatible", () => {
   // backward compatible: prior fields unchanged
   const base = computeSlingAngle({ load_lb: 2000, sling_config: "basket", included_angle_deg: 60, n_legs: 2 });
-  assert.ok(near(base.tension_per_leg_lb, 2000));
+  assert.ok(near(base.tension_per_leg_lb, 1154.7)); // 2000 / (2 cos 30)
   assert.strictEqual(base.choker_factor, 1);
   // new additive fields
-  assert.ok(near(base.min_required_capacity_lb, 2000));
-  assert.strictEqual(base.low_angle_hazard, true); // angle factor 2.0 at this geometry
+  assert.ok(near(base.min_required_capacity_lb, 1154.7));
+  assert.strictEqual(base.low_angle_hazard, false); // angle factor 1.15 at a steep 60-deg included angle
   // D/d efficiency de-rates the rated capacity
   const dd = computeSlingAngle({ load_lb: 2000, sling_config: "basket", included_angle_deg: 60, n_legs: 2, sling_rated_capacity_lb: 5000, dd_ratio: 4 });
   assert.ok(near(dd.dd_efficiency, 0.80));
   assert.ok(near(dd.effective_capacity_lb, 4000));
-  assert.ok(near(dd.utilization, 0.5));
+  assert.ok(near(dd.utilization, 0.2887)); // 1154.7 / 4000
 });

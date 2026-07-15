@@ -8344,8 +8344,10 @@ test("monotonicity: computeRoofingSquares squares is strictly increasing in roof
   assert.ok(badProd.error, `expected error for unknown product, got ${JSON.stringify(badProd)}`);
 });
 
-test("monotonicity: computeSlingAngle tension_per_leg_lb is strictly increasing in load_lb (linear pin); strictly decreasing in n_legs (1/n pin); strictly increasing as included_angle_deg shrinks toward 0 for basket/bridle/choker (1/sin(theta/2) pin); choker derate factor 0.75 pin (ASME B30.9)", () => {
-  // Group F. Vertical: tension = load / n. Basket/bridle: tension = load / (n * sin(theta/2)).
+test("monotonicity: computeSlingAngle tension_per_leg_lb is strictly increasing in load_lb (linear pin); strictly decreasing in n_legs (1/n pin); strictly increasing as included_angle_deg grows toward 180 for basket/bridle/choker (1/cos(theta/2) pin); choker derate factor 0.75 pin (ASME B30.9)", () => {
+  // Group F. Vertical: tension = load / n. Basket/bridle: tension = load / (n * cos(theta/2))
+  // for the included (apex) angle theta -- tension is minimum W/n at theta -> 0 (vertical legs)
+  // and diverges as theta -> 180 (legs opening toward horizontal).
   // Choker: same as basket but with 0.75 derate (effective tension higher).
   // Strictly increasing in load (linear).
   let prev = -Infinity;
@@ -8365,28 +8367,24 @@ test("monotonicity: computeSlingAngle tension_per_leg_lb is strictly increasing 
       `T at n=${n_legs} = ${r.tension_per_leg_lb} not less than prev=${prevN}`);
     prevN = r.tension_per_leg_lb;
   }
-  // Strictly increasing as included_angle_deg shrinks toward 0 (1/sin(theta/2) -> Infinity).
-  let prevTh = Infinity;
-  for (const included_angle_deg of [170, 150, 120, 90, 60, 45, 30, 10]) {
+  // Strictly increasing as included_angle_deg grows toward 180 (1/cos(theta/2) -> Infinity).
+  let prevTh = -Infinity;
+  for (const included_angle_deg of [10, 30, 45, 60, 90, 120, 150, 170]) {
     const r = computeSlingAngle({ load_lb: 2000, sling_config: "basket", included_angle_deg, n_legs: 2 });
-    assert.ok(r.tension_per_leg_lb > prevTh || prevTh === Infinity,
-      `T at theta=${included_angle_deg} = ${r.tension_per_leg_lb} not > prev=${prevTh}`);
-    if (prevTh !== Infinity) {
-      assert.ok(r.tension_per_leg_lb > prevTh,
-        `T at theta=${included_angle_deg} = ${r.tension_per_leg_lb} not strictly > prev=${prevTh}`);
-    }
+    assert.ok(r.tension_per_leg_lb > prevTh,
+      `T at theta=${included_angle_deg} = ${r.tension_per_leg_lb} not strictly > prev=${prevTh}`);
     prevTh = r.tension_per_leg_lb;
   }
   // Vertical-config pin: tension = load / n exact (no angle factor).
   const vert = computeSlingAngle({ load_lb: 2000, sling_config: "vertical", n_legs: 2 });
   assert.equal(vert.tension_per_leg_lb, 1000);
   assert.equal(vert.choker_factor, 1);
-  // slingAngleExample basket-60 pin: 2000 / (2 * sin(30)) = 2000 / 1 = 2000.
+  // slingAngleExample basket-60 pin: 2000 / (2 * cos(30)) = 2000 / 1.732 ~ 1154.7.
   const ref = computeSlingAngle({ load_lb: 2000, sling_config: "basket", included_angle_deg: 60, n_legs: 2 });
-  const expectedRef = 2000 / (2 * Math.sin(30 * Math.PI / 180));
+  const expectedRef = 2000 / (2 * Math.cos(30 * Math.PI / 180));
   assert.ok(Math.abs(ref.tension_per_leg_lb - expectedRef) < 1e-9,
     `basket T = ${ref.tension_per_leg_lb}, expected ${expectedRef}`);
-  // Basket at 90 deg pin: T = 2000 / (2 * sin(45)) = 2000 / sqrt(2) ~ 1414.
+  // Basket at 90 deg pin: T = 2000 / (2 * cos(45)) = 2000 / sqrt(2) ~ 1414.
   const basket90 = computeSlingAngle({ load_lb: 2000, sling_config: "basket", included_angle_deg: 90, n_legs: 2 });
   assert.ok(Math.abs(basket90.tension_per_leg_lb - 2000 / Math.sqrt(2)) < 1e-9,
     `basket-90 T = ${basket90.tension_per_leg_lb}, expected ${2000 / Math.sqrt(2)}`);
