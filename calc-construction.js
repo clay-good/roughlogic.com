@@ -7247,3 +7247,75 @@ const _v800renderWaterCementRatio = _simpleRenderer({
   compute: computeWaterCementRatio,
 });
 CONSTRUCTION_RENDERERS["water-cement-ratio"] = _v800renderWaterCementRatio;
+
+const _LL_MEMBER_KLL = {
+  interior_column: { kll: 4, label: "Interior column (KLL 4)" },
+  exterior_column: { kll: 4, label: "Exterior column, no cantilever slab (KLL 4)" },
+  edge_column_cant: { kll: 3, label: "Edge column w/ cantilever slab (KLL 3)" },
+  corner_column_cant: { kll: 2, label: "Corner column w/ cantilever slab (KLL 2)" },
+  edge_beam: { kll: 2, label: "Edge beam, no cantilever slab (KLL 2)" },
+  interior_beam: { kll: 2, label: "Interior beam (KLL 2)" },
+  other: { kll: 1, label: "Other members / one- & two-way slabs (KLL 1)" },
+};
+// dims: in { unreduced_load_psf: M L^-1 T^-2, tributary_area_ft2: L^2, member_type: dimensionless, floors_supported: dimensionless } out: { reduced_load_psf: M L^-1 T^-2, kll_at_ft2: L^2, reduction_percent: dimensionless }
+export function computeAsceLiveLoadReduction({ unreduced_load_psf = 0, tributary_area_ft2 = 0, member_type = "interior_column", floors_supported = "one" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L0 = Number(unreduced_load_psf) || 0;
+  const AT = Number(tributary_area_ft2) || 0;
+  const m = _LL_MEMBER_KLL[member_type];
+  if (!m) return { error: "Choose a valid member type (sets KLL)." };
+  if (floors_supported !== "one" && floors_supported !== "two_plus") return { error: "Choose one or two-or-more floors supported." };
+  if (!(L0 > 0)) return { error: "Unreduced live load must be positive (psf)." };
+  if (!(AT > 0)) return { error: "Tributary area must be positive (ft^2)." };
+  const KLL = m.kll;
+  const kll_at_ft2 = KLL * AT;
+  const floor_fraction = floors_supported === "two_plus" ? 0.40 : 0.50;
+  let reduced_load_psf, multiplier, floored = false;
+  const applies = kll_at_ft2 >= 400;
+  if (!applies) {
+    multiplier = 1;
+    reduced_load_psf = L0;
+  } else {
+    multiplier = 0.25 + 15 / Math.sqrt(kll_at_ft2);
+    reduced_load_psf = L0 * multiplier;
+    const floor_psf = L0 * floor_fraction;
+    if (reduced_load_psf < floor_psf) { reduced_load_psf = floor_psf; floored = true; }
+  }
+  if (![reduced_load_psf, kll_at_ft2, multiplier].every(Number.isFinite)) return { error: "Live-load-reduction math is not a finite value." };
+  const reduction_percent = (1 - reduced_load_psf / L0) * 100;
+  return {
+    reduced_load_psf, kll_at_ft2, KLL, multiplier, applies, floored, floor_fraction, reduction_percent,
+    high_load: L0 > 100,
+    note: "ASCE 7 §4.7 live load reduction: a member with enough tributary area is unlikely to see the full design live load everywhere at once, so L = L0 (0.25 + 15/sqrt(KLL x AT)), where L0 is the unreduced (tabulated) live load, AT the tributary area, and KLL the live-load element factor from Table 4.7-1 (interior/exterior columns 4, edge/interior beams and cantilever-slab edge columns 2-3, other members 1). The reduction is permitted ONLY where KLL x AT >= 400 ft^2, and the reduced L must not fall below 0.50 L0 for a member supporting one floor or 0.40 L0 for two or more floors. Live loads over 100 psf, passenger-vehicle garages, and assembly occupancies are generally NOT reducible (with narrow multi-floor exceptions) -- verify the occupancy before applying this. A design aid; the adopted code and the engineer of record govern.",
+  };
+}
+export const asceLiveLoadReductionExample = { inputs: { unreduced_load_psf: 50, tributary_area_ft2: 400, member_type: "interior_column", floors_supported: "one" } };
+const _v803renderAsceLiveLoadReduction = _simpleRenderer({
+  citation: "Citation: ASCE 7 §4.7 live load reduction: L = L0 (0.25 + 15/sqrt(KLL x AT)), permitted where KLL x AT >= 400 ft^2, floored at 0.50 L0 (one floor) or 0.40 L0 (two+ floors). KLL from Table 4.7-1. Loads over 100 psf, garages, and assembly occupancies are generally not reducible. A design aid; the adopted code and the engineer of record govern.",
+  example: asceLiveLoadReductionExample.inputs,
+  fields: [
+    { key: "unreduced_load_psf", label: "Unreduced live load L0 (psf)", kind: "number", default: 50 },
+    { key: "tributary_area_ft2", label: "Tributary area AT (ft^2)", kind: "number", default: 400 },
+    { key: "member_type", label: "Member type (KLL, Table 4.7-1)", kind: "select", options: [
+      { value: "interior_column", label: "Interior column (KLL 4)" },
+      { value: "exterior_column", label: "Exterior column, no cantilever slab (KLL 4)" },
+      { value: "edge_column_cant", label: "Edge column w/ cantilever slab (KLL 3)" },
+      { value: "corner_column_cant", label: "Corner column w/ cantilever slab (KLL 2)" },
+      { value: "edge_beam", label: "Edge beam, no cantilever slab (KLL 2)" },
+      { value: "interior_beam", label: "Interior beam (KLL 2)" },
+      { value: "other", label: "Other members / one- & two-way slabs (KLL 1)" },
+    ] },
+    { key: "floors_supported", label: "Floors supported", kind: "select", options: [
+      { value: "one", label: "One floor (floor 0.50 L0)" },
+      { value: "two_plus", label: "Two or more floors (floor 0.40 L0)" },
+    ] },
+  ],
+  outputs: [
+    { key: "l", id: "llr-out-l", label: "Reduced live load L", value: (r) => fmt(r.reduced_load_psf, 2) + " psf" + (!r.applies ? " (no reduction; KLL x AT < 400)" : r.floored ? " (at the floor)" : "") },
+    { key: "k", id: "llr-out-k", label: "KLL x AT / reduction", value: (r) => fmt(r.kll_at_ft2, 0) + " ft^2 (KLL " + r.KLL + "), " + fmt(r.reduction_percent, 1) + "% reduction" },
+    { key: "h", id: "llr-out-h", label: "Reducibility", value: (r) => r.high_load ? "L0 > 100 psf -- generally NOT reducible; verify the occupancy" : "verify the occupancy is not a garage or assembly space" },
+    { key: "n", id: "llr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAsceLiveLoadReduction,
+});
+CONSTRUCTION_RENDERERS["asce-live-load-reduction"] = _v803renderAsceLiveLoadReduction;

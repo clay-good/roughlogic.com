@@ -33672,6 +33672,58 @@
    }
   },
   {
+   "tile_id": "asce-live-load-reduction",
+   "source_publisher": "ASCE 7 minimum design loads",
+   "source_title": "50 psf office live load, interior column (KLL 4), 400 ft2 tributary, one floor -> 31.25 psf (37.5% reduction)",
+   "source_edition_or_year": "ASCE 7-22 section 4.7",
+   "source_section_or_page": "spec-v803 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "unreduced_load_psf": 50,
+    "tributary_area_ft2": 400,
+    "member_type": "interior_column",
+    "floors_supported": "one"
+   },
+   "outputs": {
+    "reduced_load_psf": {
+     "value": 31.25,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "kll_at_ft2": {
+     "value": 1600,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asce-live-load-reduction",
+   "source_publisher": "ASCE 7 minimum design loads",
+   "source_title": "cross-check: same column with 1,000 ft2 tributary hits the 0.50 L0 floor at 25 psf",
+   "source_edition_or_year": "ASCE 7-22 section 4.7",
+   "source_section_or_page": "spec-v803 section 2.1 cross-check (floor governs)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-15",
+   "inputs": {
+    "unreduced_load_psf": 50,
+    "tributary_area_ft2": 1000,
+    "member_type": "interior_column",
+    "floors_supported": "one"
+   },
+   "outputs": {
+    "reduced_load_psf": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spindle-power-torque",
    "source_publisher": "first-principles specific-cutting-energy with Machinery's Handbook unit power",
    "source_title": "cutting_hp = MRR x unit power; motor_hp = cutting_hp / eff; torque = 5252 x cutting_hp / rpm",

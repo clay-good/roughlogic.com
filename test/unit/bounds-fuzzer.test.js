@@ -20942,6 +20942,30 @@ test("bounds: spec-v802 computeCoilLength pins the annulus length, the ft conver
   assert.ok("error" in _v802({ outside_diameter_in: 48, inside_diameter_in: 16, material_thickness_in: 0 }));
 });
 
+import { computeAsceLiveLoadReduction as _v803 } from "../../calc-construction.js";
+
+test("bounds: spec-v803 computeAsceLiveLoadReduction pins the reduction, the floor, the 400 ft2 gate, and error seams", () => {
+  const r = _v803({ unreduced_load_psf: 50, tributary_area_ft2: 400, member_type: "interior_column", floors_supported: "one" });
+  assert.ok(Math.abs(r.reduced_load_psf - 31.25) < 0.01); // L = L0 (0.25 + 15/sqrt(KLL x AT)), KLL=4
+  assert.ok(Math.abs(r.kll_at_ft2 - 1600) < 1e-9 && r.KLL === 4);
+  assert.ok(r.applies && !r.floored);
+  assert.ok(Math.abs(r.reduction_percent - 37.5) < 0.1);
+  // A large tributary area drives the reduction into the 0.50 L0 floor (one floor).
+  const floored = _v803({ unreduced_load_psf: 50, tributary_area_ft2: 1000, member_type: "interior_column", floors_supported: "one" });
+  assert.ok(Math.abs(floored.reduced_load_psf - 25) < 0.01 && floored.floored);
+  // Two-or-more floors uses the lower 0.40 L0 floor, so the same case is not yet floored.
+  const twoFloor = _v803({ unreduced_load_psf: 50, tributary_area_ft2: 1000, member_type: "interior_column", floors_supported: "two_plus" });
+  assert.ok(twoFloor.reduced_load_psf < 25 && !twoFloor.floored);
+  // Below the 400 ft2 gate there is no reduction (a KLL-2 beam on 150 ft2 -> 300 < 400).
+  const noReduce = _v803({ unreduced_load_psf: 40, tributary_area_ft2: 150, member_type: "interior_beam", floors_supported: "one" });
+  assert.ok(!noReduce.applies && Math.abs(noReduce.reduced_load_psf - 40) < 1e-9);
+  // Error seams: non-finite, bad member type, non-positive load / area.
+  assert.ok("error" in _v803({ unreduced_load_psf: Infinity, tributary_area_ft2: 400, member_type: "interior_column", floors_supported: "one" }));
+  assert.ok("error" in _v803({ unreduced_load_psf: 50, tributary_area_ft2: 400, member_type: "bogus", floors_supported: "one" }));
+  assert.ok("error" in _v803({ unreduced_load_psf: 0, tributary_area_ft2: 400, member_type: "interior_column", floors_supported: "one" }));
+  assert.ok("error" in _v803({ unreduced_load_psf: 50, tributary_area_ft2: 0, member_type: "interior_column", floors_supported: "one" }));
+});
+
 import { computeKeyseatKeySize as _v513 } from "../../calc-machining.js";
 
 test("bounds: spec-v513 computeKeyseatKeySize pins the band-table width, the H/2 depth, the key stresses, and error seams", () => {

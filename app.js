@@ -464,6 +464,8 @@ const TOOL_MODULES = (() => {
     "concrete-maturity",
     // spec-v430..v431 concrete field-work (v429 cut as dupe)
     "rebar-weight-takeoff", "ready-mix-concrete-order", "concrete-yield", "water-cement-ratio",
+    // spec-v803 ASCE 7 live load reduction
+    "asce-live-load-reduction",
     // spec-v439..v440 finish-carpentry takeoff (v438 cut as dupe)
     "insulation-batt-coverage", "trim-linear-footage",
     "glulam-volume-factor",

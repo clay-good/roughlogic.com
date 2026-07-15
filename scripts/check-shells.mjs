@@ -81,7 +81,9 @@ const TILE_GZIP_CAP = 6 * 1024;
 // Bumped 52 -> 54 KB on 2026-07-14: spec-v793 fresh-concrete-temp (Group E concrete)
 // added a bidirectional related-tiles chip to the construction group members, taking
 // construction/index.html to ~52.2 KB gz (over the 52 KB cap); 54 KB restores ~3.5% headroom.
-const GROUP_GZIP_CAP = 54 * 1024;
+// Bumped 54 -> 56 KB on 2026-07-15: spec-v803 asce-live-load-reduction (Group E ASCE 7)
+// took construction/index.html to ~54.1 KB gz (over the 54 KB cap); 56 KB restores ~3.4% headroom.
+const GROUP_GZIP_CAP = 56 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

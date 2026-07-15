@@ -1012,6 +1012,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "live load reduction",
+      "target": "asce-live-load-reduction",
+      "kind": "industry"
+    },
+    {
+      "term": "asce 7 live load reduction",
+      "target": "asce-live-load-reduction",
+      "kind": "industry"
+    },
+    {
+      "term": "reduced live load",
+      "target": "asce-live-load-reduction",
+      "kind": "industry"
+    },
+    {
+      "term": "tributary area load reduction",
+      "target": "asce-live-load-reduction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "kll live load element factor",
+      "target": "asce-live-load-reduction",
+      "kind": "adjacent"
+    },
+    {
       "term": "bolt proof load",
       "target": "bolt-proof-load",
       "kind": "industry"

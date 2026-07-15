@@ -521,6 +521,8 @@ const _TILES = [
   ["glass-weight", "E"],
   ["fineness-modulus", "E"],
   ["water-cement-ratio", "E"],
+  // spec-v803 ASCE 7 live load reduction
+  ["asce-live-load-reduction", "E"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

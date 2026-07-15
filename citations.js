@@ -11036,6 +11036,19 @@ export const CITATIONS = {
       { name: "Conductor", value: "the conductor's pre-adjustment ampacity must also meet the same 125% + 100% sum", source: "NEC 210.19(A) / 215.2(A)" },
     ],
   },
+  "asce-live-load-reduction": {
+    formula: "L = L0 (0.25 + 15/sqrt(KLL x AT)) where KLL x AT >= 400 ft^2; L >= 0.50 L0 (one floor) or 0.40 L0 (two or more); otherwise L = L0.",
+    edition: "The ASCE 7 §4.7 reduction in uniform live loads, L = L0 (0.25 + 15/sqrt(KLL x AT)), with KLL from Table 4.7-1, by name; the equation is unchanged across ASCE 7-05 through 7-22.",
+    freeAccess: "ASCE 7 is available through the ASCE Library at ascelibrary.org; the §4.7 reduction equation and the Table 4.7-1 KLL factors are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ASCE 7 §4.7 reduction in uniformly distributed live loads: L = L0 (0.25 + 15/sqrt(KLL x AT)), where L0 is the unreduced (tabulated) live load, AT the tributary area, and KLL the live-load element factor from Table 4.7-1 (interior and exterior columns 4, edge columns with cantilever slabs 3, corner columns with cantilever slabs and edge/interior beams 2, other members including one- and two-way slabs 1). The reduction is permitted only where KLL x AT >= 400 ft^2, and the reduced load must not fall below 0.50 L0 for a member supporting a single floor or 0.40 L0 for members supporting two or more floors. Live loads exceeding 100 psf, passenger-vehicle garages, and assembly occupancies are generally not reducible (with a narrow multi-floor exception) - verify the occupancy before applying this. This returns the reduced uniform live load for the entered member type and area; it does not reduce roof live loads (§4.8) or apply the special one-way-slab area limit. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Reduction equation", value: "L = L0 (0.25 + 15/sqrt(KLL x AT)), applied only where KLL x AT >= 400 ft^2", source: "ASCE 7 §4.7.2" },
+      { name: "KLL factor", value: "the live-load element factor from Table 4.7-1 (1 to 4 by member type)", source: "ASCE 7 Table 4.7-1" },
+      { name: "Floor limits", value: "L >= 0.50 L0 for one floor, 0.40 L0 for two or more floors", source: "ASCE 7 §4.7.2" },
+      { name: "Non-reducible", value: "loads over 100 psf, garages, and assembly occupancies are generally not reduced", source: "ASCE 7 §4.7.3-4.7.6" },
+    ],
+  },
   "wind-cc-pressure": {
     formula: "qh = 0.00256 Kz Kzt Kd Ke V^2; p_a = qh (GCp - GCpi); p_b = qh (GCp + GCpi); governing = the larger magnitude of p_a, p_b.",
     edition: "The ASCE 7-22 Chapter 30 components-and-cladding design pressure p = qh [(GCp) - (GCpi)], with the velocity pressure qh = 0.00256 Kz Kzt Kd Ke V^2 (Kd = 0.85, V in mph) and GCpi = +/-0.18 for an enclosed building, by name; GCp is read from the Chapter 30 zone figures.",

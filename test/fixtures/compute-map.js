@@ -888,6 +888,7 @@ export const COMPUTE_MAP = {
   "roller-chain-length": { module: "../../calc-shop.js", fn: "computeRollerChainLength" },
   "sprocket-pitch-diameter": { module: "../../calc-shop.js", fn: "computeSprocketPitchDiameter" },
   "coil-length": { module: "../../calc-fab.js", fn: "computeCoilLength" },
+  "asce-live-load-reduction": { module: "../../calc-construction.js", fn: "computeAsceLiveLoadReduction" },
   "keyseat-key-size": { module: "../../calc-machining.js", fn: "computeKeyseatKeySize" },
   "brake-pedal-hydraulic": { module: "../../calc-mechanic.js", fn: "computeBrakePedalHydraulic" },
   "dyno-correction-sae": { module: "../../calc-mechanic.js", fn: "computeDynoCorrectionSae" },
