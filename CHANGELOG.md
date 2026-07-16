@@ -4,6 +4,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(hvac): correct the psia refrigerant-charging P-T tables (R-32/R-22 systematically wrong); 2026-07-16
+
+- The second bundled P-T table, `REFRIGERANT_PT_TABLES_v7` (psia-based, feeding the `refrigerant-charging` superheat/
+  subcool tile), had its own transcription errors -- separate from the psig `REFRIGERANTS` table fixed above. R-32 was
+  wrong by 5-12 degF across the entire range and even read *warmer* than R-410A at equal pressure (physically backwards
+  -- R-32 runs a touch colder), and R-22 was off 2-10 degF. A tech reading suction saturation for a charge would have
+  been misled: R-32 at 100 psia returned 28 degF vs 23 degF actual; R-22 at 250 psia returned 117 degF vs 113 degF.
+- Re-derived all five tables (R-410A, R-32, R-454B, R-22, R-134a) against the Hudson Technologies published charts
+  (R-454B newly sourced; psia = psig + 14.696). All are strictly monotonic and now order correctly by pressure. The
+  R-410A spec example shifts within ~1 degF (superheat 4.12 -> 5.12 F, subcool 7.76 -> 6.94 F, both still "low"); the
+  worked-example pins and a stale fuzzer comment were updated to match. Propagated to the generator const in
+  scripts/build-data.mjs, the generated data/hvac/refrigerant-pt-tables.json shard, and its full hash chain
+  (manifest gzip-size + hash, scripts/expected-hashes.json, and the runtime data/integrity.json), dates frozen.
+
 ### fix(hvac): update runtime data/integrity.json for the hand-patched hvac manifest; 2026-07-16
 
 - The previous refrigerant-provenance commit hand-patched data/hvac/manifest.json (new gzip-size + hash) and updated

@@ -7216,8 +7216,8 @@ test("bounds: calc-hvac computeRefrigerantCharging pins psia conversion + superh
   // Superheat = 50 - T_sat_suction, subcool = T_sat_liquid - 100.
   assert.ok(Math.abs(r.superheat_F - (50 - r.T_sat_suction_F)) < 1e-9);
   assert.ok(Math.abs(r.subcool_F - (r.T_sat_liquid_F - 100)) < 1e-9);
-  assert.strictEqual(r.superheat_flag, "low");  // ~4.1 F < 8.
-  assert.strictEqual(r.subcool_flag, "low");    // ~7.75 F < 8.
+  assert.strictEqual(r.superheat_flag, "low");  // ~5.1 F < 8.
+  assert.strictEqual(r.subcool_flag, "low");    // ~6.9 F < 8.
   // psia unit mode.
   const psia = computeRefrigerantCharging({
     refrigerant: "R_410A",

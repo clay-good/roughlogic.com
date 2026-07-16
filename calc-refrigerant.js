@@ -305,31 +305,31 @@ export const refrigerantChargeExample = {
 
 export const REFRIGERANT_PT_TABLES_v7 = {
   R_410A: [
-    { psia: 30,  T_F: -25 }, { psia: 50,  T_F: -8 }, { psia: 80,  T_F: 13 },
-    { psia: 100, T_F: 25 },  { psia: 130, T_F: 40 }, { psia: 170, T_F: 56 },
-    { psia: 220, T_F: 73 },  { psia: 280, T_F: 90 }, { psia: 350, T_F: 105 },
-    { psia: 430, T_F: 120 }, { psia: 520, T_F: 134 },
+    { psia: 30,  T_F: -34 }, { psia: 50,  T_F: -11 }, { psia: 80,  T_F: 12 },
+    { psia: 100, T_F: 24 },  { psia: 130, T_F: 39 }, { psia: 170, T_F: 55 },
+    { psia: 220, T_F: 71 },  { psia: 280, T_F: 88 }, { psia: 350, T_F: 104 },
+    { psia: 430, T_F: 120 }, { psia: 520, T_F: 135 },
   ],
   R_32: [
-    { psia: 30,  T_F: -22 }, { psia: 50,  T_F: -5 }, { psia: 80,  T_F: 16 },
-    { psia: 100, T_F: 28 },  { psia: 130, T_F: 43 }, { psia: 170, T_F: 59 },
-    { psia: 220, T_F: 76 },  { psia: 280, T_F: 93 }, { psia: 350, T_F: 109 },
-    { psia: 430, T_F: 124 }, { psia: 520, T_F: 138 },
+    { psia: 30,  T_F: -34 }, { psia: 50,  T_F: -12 }, { psia: 80,  T_F: 11 },
+    { psia: 100, T_F: 23 },  { psia: 130, T_F: 37 }, { psia: 170, T_F: 53 },
+    { psia: 220, T_F: 70 },  { psia: 280, T_F: 86 }, { psia: 350, T_F: 102 },
+    { psia: 430, T_F: 117 }, { psia: 520, T_F: 132 },
   ],
   R_454B: [
-    { psia: 30,  T_F: -23 }, { psia: 50,  T_F: -6 }, { psia: 80,  T_F: 14 },
-    { psia: 100, T_F: 26 },  { psia: 130, T_F: 41 }, { psia: 170, T_F: 57 },
-    { psia: 220, T_F: 74 },  { psia: 280, T_F: 91 }, { psia: 350, T_F: 107 },
+    { psia: 30,  T_F: -31 }, { psia: 50,  T_F: -9 }, { psia: 80,  T_F: 15 },
+    { psia: 100, T_F: 27 },  { psia: 130, T_F: 42 }, { psia: 170, T_F: 58 },
+    { psia: 220, T_F: 75 },  { psia: 280, T_F: 91 }, { psia: 350, T_F: 108 },
   ],
   R_22: [
-    { psia: 25,  T_F: -10 }, { psia: 50,  T_F: 18 }, { psia: 75,  T_F: 38 },
-    { psia: 100, T_F: 53 },  { psia: 150, T_F: 78 }, { psia: 200, T_F: 99 },
-    { psia: 250, T_F: 117 }, { psia: 300, T_F: 132 }, { psia: 350, T_F: 146 },
+    { psia: 25,  T_F: -20 }, { psia: 50,  T_F: 13 }, { psia: 75,  T_F: 34 },
+    { psia: 100, T_F: 51 },  { psia: 150, T_F: 76 }, { psia: 200, T_F: 96 },
+    { psia: 250, T_F: 113 }, { psia: 300, T_F: 127 }, { psia: 350, T_F: 140 },
   ],
   R_134a: [
-    { psia: 15,  T_F: -10 }, { psia: 25,  T_F: 8 },  { psia: 40,  T_F: 28 },
-    { psia: 60,  T_F: 50 },  { psia: 80,  T_F: 67 }, { psia: 100, T_F: 79 },
-    { psia: 130, T_F: 95 },  { psia: 170, T_F: 110 }, { psia: 220, T_F: 128 },
+    { psia: 15,  T_F: -16 }, { psia: 25,  T_F: 7 },  { psia: 40,  T_F: 29 },
+    { psia: 60,  T_F: 50 },  { psia: 80,  T_F: 66 }, { psia: 100, T_F: 79 },
+    { psia: 130, T_F: 96 },  { psia: 170, T_F: 113 }, { psia: 220, T_F: 132 },
   ],
 };
 

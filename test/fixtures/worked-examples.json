@@ -11047,7 +11047,7 @@
    "source_publisher": "ACCA / NATE refrigerant-charging method (project bundled P-T tables)",
    "source_title": "Superheat = suction_line_temp - T_sat_suction; subcool = T_sat_liquid - liquid_line_temp; flag in-range / low / high",
    "source_edition_or_year": "Chemours R-410A bulletin (P-T interpolation; in-range superheat 8-12 F, subcool 8-15 F)",
-   "source_section_or_page": "R_410A / 130 psig suction / 50 F suction-line / 350 psig liquid / 100 F liquid-line -> superheat 4.12 F (low), subcool 7.76 F (low)",
+   "source_section_or_page": "R_410A / 130 psig suction / 50 F suction-line / 350 psig liquid / 100 F liquid-line -> superheat 5.12 F (low), subcool 6.94 F (low)",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -11061,13 +11061,13 @@
    },
    "outputs": {
     "superheat_F": {
-     "value": 4.12,
+     "value": 5.12,
      "tolerance": {
       "abs": 0.05
      }
     },
     "subcool_F": {
-     "value": 7.76,
+     "value": 6.94,
      "tolerance": {
       "abs": 0.05
      }
