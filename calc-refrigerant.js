@@ -62,9 +62,9 @@ export const REFRIGERANTS = {
   "R-410A": {
     manufacturer: "Chemours / Honeywell published bulletins",
     pt_pairs: [
-      { pressure_psig: 50, temperature_F: 14 },
-      { pressure_psig: 75, temperature_F: 31 },
-      { pressure_psig: 100, temperature_F: 30 },
+      { pressure_psig: 50, temperature_F: 1 },
+      { pressure_psig: 75, temperature_F: 18 },
+      { pressure_psig: 100, temperature_F: 32 },
       { pressure_psig: 118, temperature_F: 40 },
       { pressure_psig: 156, temperature_F: 55 },
       { pressure_psig: 200, temperature_F: 70 },
@@ -76,11 +76,11 @@ export const REFRIGERANTS = {
   "R-32": {
     manufacturer: "Daikin / Honeywell published bulletins",
     pt_pairs: [
-      { pressure_psig: 50, temperature_F: 8 },
-      { pressure_psig: 100, temperature_F: 36 },
-      { pressure_psig: 150, temperature_F: 56 },
-      { pressure_psig: 200, temperature_F: 72 },
-      { pressure_psig: 300, temperature_F: 100 },
+      { pressure_psig: 50, temperature_F: 1 },
+      { pressure_psig: 100, temperature_F: 30 },
+      { pressure_psig: 150, temperature_F: 52 },
+      { pressure_psig: 200, temperature_F: 68 },
+      { pressure_psig: 300, temperature_F: 94 },
     ],
   },
   "R-22": {
@@ -97,31 +97,31 @@ export const REFRIGERANTS = {
   "R-134a": {
     manufacturer: "Chemours / Honeywell bulletins",
     pt_pairs: [
-      { pressure_psig: 10, temperature_F: 16 },
+      { pressure_psig: 10, temperature_F: 7 },
       { pressure_psig: 30, temperature_F: 35 },
-      { pressure_psig: 50, temperature_F: 50 },
-      { pressure_psig: 100, temperature_F: 79 },
-      { pressure_psig: 150, temperature_F: 104 },
+      { pressure_psig: 50, temperature_F: 54 },
+      { pressure_psig: 100, temperature_F: 88 },
+      { pressure_psig: 150, temperature_F: 111 },
     ],
   },
   "R-404A": {
     manufacturer: "Chemours / Honeywell bulletins",
     pt_pairs: [
-      { pressure_psig: 30, temperature_F: 16 },
-      { pressure_psig: 60, temperature_F: 14 },
-      { pressure_psig: 100, temperature_F: 37 },
-      { pressure_psig: 150, temperature_F: 58 },
-      { pressure_psig: 200, temperature_F: 75 },
+      { pressure_psig: 30, temperature_F: -2 },
+      { pressure_psig: 60, temperature_F: 24 },
+      { pressure_psig: 100, temperature_F: 48 },
+      { pressure_psig: 150, temperature_F: 71 },
+      { pressure_psig: 200, temperature_F: 89 },
     ],
   },
   "R-407C": {
     manufacturer: "Chemours / Honeywell bulletins",
     pt_pairs: [
-      { pressure_psig: 30, temperature_F: 6 },
-      { pressure_psig: 60, temperature_F: 22 },
-      { pressure_psig: 100, temperature_F: 47 },
-      { pressure_psig: 150, temperature_F: 68 },
-      { pressure_psig: 200, temperature_F: 86 },
+      { pressure_psig: 30, temperature_F: 12 },
+      { pressure_psig: 60, temperature_F: 38 },
+      { pressure_psig: 100, temperature_F: 62 },
+      { pressure_psig: 150, temperature_F: 84 },
+      { pressure_psig: 200, temperature_F: 101 },
     ],
   },
 };

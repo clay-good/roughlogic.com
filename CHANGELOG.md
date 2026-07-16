@@ -4,6 +4,23 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(hvac): correct bundled refrigerant P-T tables for R-410A, R-404A, R-407C, R-32, R-134a; 2026-07-16
+
+- The bundled `REFRIGERANTS` P-T data in calc-refrigerant.js (feeding the `refrigerant-pt`, `superheat-subcool`, and
+  `compare-refrigerants` tiles) carried saturation temperatures that were wrong by up to 20 degF, including two
+  physically impossible non-monotonic points (R-410A `75 psig -> 31 degF` sitting above `100 psig -> 30 degF`, and
+  R-404A `30 psig -> 16 degF` above `60 psig -> 14 degF` -- temperature falling as pressure rises). A tech reading
+  suction saturation for a superheat charge would have been misled: e.g. R-404A at 100 psig returned 37 degF when the
+  true saturation is 48 degF, and R-134a at 100 psig returned 79 degF versus 88 degF actual.
+- Re-derived every pair against the Hudson Technologies published P-T charts (manufacturer-attributed saturated vapor
+  pressure): R-410A low end (`50 -> 1`, `75 -> 18`, `100 -> 32`), and full rebuilds of R-404A (`30 -> -2`, `60 -> 24`,
+  `100 -> 48`, `150 -> 71`, `200 -> 89`), R-407C on its vapor/dew column (`30 -> 12`, `60 -> 38`, `100 -> 62`,
+  `150 -> 84`, `200 -> 101`), R-32 (`50 -> 1`, `100 -> 30`, `150 -> 52`, `200 -> 68`, `300 -> 94`), and R-134a
+  (`10 -> 7`, `50 -> 54`, `100 -> 88`, `150 -> 111`). R-22 was already within ~2 degF and left unchanged. All six
+  tables are now strictly monotonic and agree with the authoritative charts to within rounding. The R-410A worked
+  example (`118 psig -> 40 degF`) is exact and unchanged. Completes the item deferred by the 2026-07-15 formula
+  audit; the earlier belief that R-410A `100 psig` saturates at 30 degF was itself ~2 degF low (true 32 degF).
+
 ### fix(shop): press-fit inverse note/citation had a spurious D in the interference formula; 2026-07-15
 
 - The `press-fit-interference-for-force` tile's displayed note, renderer citation, and citations.js formula/editionNote
