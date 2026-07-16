@@ -3989,7 +3989,7 @@ export const CITATIONS = {
     ],
   },
   "refrigerant-pt": {
-    formula: "Saturated pressure or temperature lookup against manufacturer-published P-T data for R-22, R-410A, R-32, R-454B, R-744 (CO2), and R-1234yf.",
+    formula: "Saturated pressure or temperature lookup against manufacturer-published P-T data for R-410A, R-32, R-22, R-134a, R-404A, and R-407C.",
     edition: "Manufacturer P-T tables (DuPont, Honeywell, Chemours, Arkema) by name.",
     freeAccess: "Free at each manufacturer site (chemours.com, honeywell-refrigerants.com).",
     governance: GOVERNANCE.mechanical,

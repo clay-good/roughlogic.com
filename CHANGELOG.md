@@ -20,6 +20,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
   tables are now strictly monotonic and agree with the authoritative charts to within rounding. The R-410A worked
   example (`118 psig -> 40 degF`) is exact and unchanged. Completes the item deferred by the 2026-07-15 formula
   audit; the earlier belief that R-410A `100 psig` saturates at 30 degF was itself ~2 degF low (true 32 degF).
+- Propagated the same corrections to the provenance copy that feeds the data-stamp display: the generator const in
+  scripts/build-data.mjs and the generated data/hvac/refrigerants.json shard (with its manifest gzip-size + hash and
+  the two scripts/expected-hashes.json entries updated by hand so the date stamps stay frozen, avoiding a full
+  data:refresh churn). Also fixed the `refrigerant-pt` citation formula string, which listed refrigerants not in the
+  table (R-454B, R-744, R-1234yf) and omitted three that are (R-134a, R-404A, R-407C); it now names the actual six
+  (R-410A, R-32, R-22, R-134a, R-404A, R-407C).
 
 ### fix(shop): press-fit inverse note/citation had a spurious D in the interference formula; 2026-07-15
 

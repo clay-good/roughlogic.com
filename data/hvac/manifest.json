@@ -9,7 +9,7 @@
     {
       "file": "refrigerants.json",
       "name": "Refrigerant P-T tables",
-      "gzip_size_bytes": 500
+      "gzip_size_bytes": 493
     },
     {
       "file": "duct-friction.json",
@@ -73,7 +73,7 @@
     }
   ],
   "hashes": {
-    "refrigerants.json": "381e90279841a500cb5d5900c432b9e9c2689d638906a58fc45d8515d85bf48f",
+    "refrigerants.json": "b31aac3059f4bde2617b4a7cceaa353ba0b73282e2f3f0f87888f1f0a61f4e23",
     "duct-friction.json": "6125423dd611cc820a8a7052385b5889480f172607512f46cca72bf9fb000bdb",
     "climate-data.json": "f6ba8aad7d059a3ebe307ac7b69300204cf1eab811798d9c8564a255a4b14310",
     "charge-per-foot.json": "b10b873f3ce417b7725e419515ba6a07033f6d93d5e1c4074b2358a93b1a7e68",
