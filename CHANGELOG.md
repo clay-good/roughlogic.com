@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(hvac): update runtime data/integrity.json for the hand-patched hvac manifest; 2026-07-16
+
+- The previous refrigerant-provenance commit hand-patched data/hvac/manifest.json (new gzip-size + hash) and updated
+  scripts/expected-hashes.json (the build/CI check), but missed data/integrity.json -- a separate RUNTIME source that
+  integrity.js fetches to verify each per-folder manifest's SHA-256 in the browser. Its hvac entry still held the old
+  manifest hash, so on every page load the runtime check logged "integrity: 1 manifest(s) failed verification" (a
+  global console error affecting all tiles, which would also fail the render-no-nan e2e gate). Updated the hvac entry
+  to the current manifest hash; dates left frozen. verify-integrity and the render-no-nan suite pass again.
+
 ### fix(hvac): correct bundled refrigerant P-T tables for R-410A, R-404A, R-407C, R-32, R-134a; 2026-07-16
 
 - The bundled `REFRIGERANTS` P-T data in calc-refrigerant.js (feeding the `refrigerant-pt`, `superheat-subcool`, and
