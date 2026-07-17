@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fencing): chain-link-fence-takeoff -- chain-link fabric, post, and tension-band takeoff (spec-v901); 2026-07-17
+
+- New Group E tile `chain-link-fence-takeoff` (calc-construction.js), the fencing takeoff beside `fence-estimate`. fabric
+  = perimeter - gates; total posts = ceil(perimeter / spacing); terminals = corners + gate jambs; line posts = total -
+  terminals; tension bands = terminals x (height - 1). A 200 ft run of 4 ft fence with one gate is 196 LF of fabric, 20
+  posts (14 line, 6 terminal), 200 LF each of top rail and tension wire, and 18 tension bands; a taller 6 ft fence raises
+  the bands to 30. Height drives the bands, the run drives the posts. Catalog crosses 1,350. Home count 1,349 -> 1,350.
+
 ### feat(roofing): gutter-downspout-takeoff -- gutter LF and downspout count takeoff (spec-v900); 2026-07-17
 
 - New Group E tile `gutter-downspout-takeoff` (calc-finish.js), the roofing takeoff beside `gutter-downspout`. gutter =

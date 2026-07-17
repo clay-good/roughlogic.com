@@ -8365,6 +8365,17 @@ export const CITATIONS = {
       { name: "Hanger spacing", value: "~2 ft on center (tighter in snow country)", source: "installation practice" },
     ],
   },
+  "chain-link-fence-takeoff": {
+    formula: "fabric_lf = perimeter_ft - gate_width_ft; total_posts = ceil(perimeter_ft / line_post_spacing_ft); terminals = corners + (gate jambs); line_posts = total_posts - terminals; tension_bands = terminals x (height_ft - 1).",
+    edition: "Chain-link takeoff identity by name (fabric net of gates; posts over the run; bands per terminal per foot of height); first-principles count arithmetic.",
+    freeAccess: "The count arithmetic is public first-principles; the fabric gauge, post schedule, and hardware follow the fence spec.",
+    governance: GOVERNANCE.general,
+    editionNote: "Line posts run about 10 ft on center. Terminals (corners, ends, gate jambs) each get tension bands, a rail end, and a brace. The fabric is stretched against a tension wire and bar. Gate hardware is taken off separately. Distinct from the generic fence-estimate.",
+    assumptions: [
+      { name: "Line post spacing", value: "~10 ft on center (default); the fence spec governs", source: "chain-link fence spec" },
+      { name: "Tension bands", value: "one per foot of height less one at each terminal (terminals x (height - 1))", source: "installation practice" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

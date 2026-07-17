@@ -18577,6 +18577,31 @@
       "kind": "industry"
     },
     {
+      "term": "chain link fence takeoff",
+      "target": "chain-link-fence-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "chain link fabric",
+      "target": "chain-link-fence-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "fence post count",
+      "target": "chain-link-fence-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "tension band count",
+      "target": "chain-link-fence-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "chain link parts",
+      "target": "chain-link-fence-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

@@ -53351,6 +53351,72 @@
    }
   },
   {
+   "tile_id": "chain-link-fence-takeoff",
+   "source_publisher": "Chain-link takeoff identity (first-principles)",
+   "source_title": "200 ft, 4 ft, one 4 ft gate, 4 corners, 10 ft spacing -> 196 LF fabric, 20 posts (14 line, 6 terminal), 18 bands",
+   "source_edition_or_year": "spec-v901 worked example",
+   "source_section_or_page": "fabric=200-4=196; terminals=4+2=6; posts=ceil(200/10)=20; line=20-6=14; bands=6*(4-1)=18",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "perimeter_ft": 200,
+    "height_ft": 4,
+    "gate_width_ft": 4,
+    "corners": 4,
+    "line_post_spacing_ft": 10
+   },
+   "outputs": {
+    "fabric_lf": {
+     "value": 196,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_posts": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "line_posts": {
+     "value": 14,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "tension_bands": {
+     "value": 18,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "chain-link-fence-takeoff",
+   "source_publisher": "Chain-link takeoff identity (first-principles)",
+   "source_title": "cross-check: a taller 6 ft fence raises the bands to 30 while posts and fabric hold",
+   "source_edition_or_year": "spec-v901 worked example",
+   "source_section_or_page": "bands = 6*(6-1) = 30; posts 20, fabric 196 unchanged",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "perimeter_ft": 200,
+    "height_ft": 6,
+    "gate_width_ft": 4,
+    "corners": 4,
+    "line_post_spacing_ft": 10
+   },
+   "outputs": {
+    "tension_bands": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

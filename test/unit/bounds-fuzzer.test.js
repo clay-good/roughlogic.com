@@ -26504,3 +26504,29 @@ test("bounds: spec-v900 computeGutterDownspoutTakeoff pins the gutter, downspout
   assert.ok("error" in _v900({ eave_length_ft: 140, roof_area_sf: 2400, max_area_per_downspout_sf: 800, wall_height_ft: 10, hanger_spacing_ft: 0 }));
   assert.ok("error" in _v900({ eave_length_ft: Infinity, roof_area_sf: 2400, max_area_per_downspout_sf: 800, wall_height_ft: 10, hanger_spacing_ft: 2 }));
 });
+
+import { computeChainLinkFenceTakeoff as _v901 } from "../../calc-construction.js";
+
+test("bounds: spec-v901 computeChainLinkFenceTakeoff pins the fabric, posts, terminals, bands, and error seams", () => {
+  const r = _v901({ perimeter_ft: 200, height_ft: 4, gate_width_ft: 4, corners: 4, line_post_spacing_ft: 10 });
+  assert.equal(r.fabric_lf, 196); // 200 - 4
+  assert.equal(r.rail_wire_lf, 200); // perimeter
+  assert.equal(r.terminals, 6); // 4 corners + 2 gate jambs
+  assert.equal(r.total_posts, 20); // ceil(200/10)
+  assert.equal(r.line_posts, 14); // 20 - 6
+  assert.equal(r.tension_bands, 18); // 6 * (4-1)
+  // Height drives the bands, the run drives the posts: a taller fence adds bands only.
+  const tall = _v901({ perimeter_ft: 200, height_ft: 6, gate_width_ft: 4, corners: 4, line_post_spacing_ft: 10 });
+  assert.equal(tall.tension_bands, 30); // 6 * (6-1)
+  assert.equal(tall.total_posts, 20); // unchanged
+  // With no gate, terminals are just the corners.
+  assert.equal(_v901({ perimeter_ft: 200, height_ft: 4, gate_width_ft: 0, corners: 4, line_post_spacing_ft: 10 }).terminals, 4);
+  // Error seams: non-finite, non-positive perimeter / height / spacing, negative gate / corners, gate >= perimeter.
+  assert.ok("error" in _v901({ perimeter_ft: 0, height_ft: 4, gate_width_ft: 4, corners: 4, line_post_spacing_ft: 10 }));
+  assert.ok("error" in _v901({ perimeter_ft: 200, height_ft: 0, gate_width_ft: 4, corners: 4, line_post_spacing_ft: 10 }));
+  assert.ok("error" in _v901({ perimeter_ft: 200, height_ft: 4, gate_width_ft: 4, corners: 4, line_post_spacing_ft: 0 }));
+  assert.ok("error" in _v901({ perimeter_ft: 200, height_ft: 4, gate_width_ft: -4, corners: 4, line_post_spacing_ft: 10 }));
+  assert.ok("error" in _v901({ perimeter_ft: 200, height_ft: 4, gate_width_ft: 4, corners: -1, line_post_spacing_ft: 10 }));
+  assert.ok("error" in _v901({ perimeter_ft: 200, height_ft: 4, gate_width_ft: 200, corners: 4, line_post_spacing_ft: 10 }));
+  assert.ok("error" in _v901({ perimeter_ft: Infinity, height_ft: 4, gate_width_ft: 4, corners: 4, line_post_spacing_ft: 10 }));
+});

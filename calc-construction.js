@@ -9772,3 +9772,56 @@ const _v895renderHousewrapRolls = _simpleRenderer({
   compute: computeHousewrapRolls,
 });
 CONSTRUCTION_RENDERERS["housewrap-rolls"] = _v895renderHousewrapRolls;
+
+// --- chain-link-fence-takeoff: Chain-Link Fabric, Post, and Tension-Band Takeoff ---
+//
+// Fabric, rail/wire, posts (line vs terminal), and tension bands for a chain-link run.
+//   fabric = perimeter - gates; posts = ceil(perimeter / spacing); bands = terminals x (height - 1)
+// dims: in { perimeter_ft: L, height_ft: L, gate_width_ft: L, corners: dimensionless, line_post_spacing_ft: L } out: { fabric_lf: L, rail_wire_lf: L, terminals: dimensionless, total_posts: dimensionless, line_posts: dimensionless, tension_bands: dimensionless }
+export function computeChainLinkFenceTakeoff({ perimeter_ft = 200, height_ft = 4, gate_width_ft = 0, corners = 4, line_post_spacing_ft = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(perimeter_ft > 0)) return { error: "Perimeter must be positive (ft)." };
+  if (!(height_ft > 0)) return { error: "Fence height must be positive (ft)." };
+  if (!(line_post_spacing_ft > 0)) return { error: "Line post spacing must be positive (ft)." };
+  if (gate_width_ft < 0) return { error: "Gate width cannot be negative (ft)." };
+  if (corners < 0) return { error: "Corner count cannot be negative." };
+  if (gate_width_ft >= perimeter_ft) return { error: "Gate width meets or exceeds the perimeter." };
+  const fabric_lf = perimeter_ft - gate_width_ft;
+  const rail_wire_lf = perimeter_ft;
+  const terminals = corners + (gate_width_ft > 0 ? 2 : 0);
+  const total_posts = Math.ceil(perimeter_ft / line_post_spacing_ft);
+  const line_posts = Math.max(0, total_posts - terminals);
+  const tension_bands = terminals * (height_ft - 1);
+  if (![fabric_lf, rail_wire_lf, terminals, total_posts, line_posts, tension_bands].every(Number.isFinite)) return { error: "Chain-link math is not a finite value." };
+  return {
+    fabric_lf,
+    rail_wire_lf,
+    terminals,
+    total_posts,
+    line_posts,
+    tension_bands,
+    note: "Line posts run about 10 ft on center. Terminals (corners, ends, gate jambs) each get tension bands, a rail end, and a brace. The fabric is stretched against a tension wire and bar. Gate hardware is taken off separately. Distinct from the generic fence-estimate.",
+  };
+}
+
+export const chainLinkFenceTakeoffExample = { inputs: { perimeter_ft: 200, height_ft: 4, gate_width_ft: 4, corners: 4, line_post_spacing_ft: 10 } };
+
+const _v901renderChainLinkFenceTakeoff = _simpleRenderer({
+  citation: "Citation: takeoff identity by name. fabric = perimeter - gates; total posts = ceil(perimeter / spacing); terminals = corners + gate jambs; line posts = total - terminals; bands = terminals x (height - 1).",
+  example: chainLinkFenceTakeoffExample.inputs,
+  fields: [
+    { key: "perimeter_ft", label: "Fence run / perimeter (ft)", kind: "number", default: 200 },
+    { key: "height_ft", label: "Fence height (ft)", kind: "number", default: 4 },
+    { key: "gate_width_ft", label: "Total gate width (ft)", kind: "number", default: 0 },
+    { key: "corners", label: "Corner + end terminal posts", kind: "number", default: 4 },
+    { key: "line_post_spacing_ft", label: "Line post spacing (ft)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "fab", id: "clf-out-fab", label: "Fabric / rail / wire", value: (r) => _fmtC(r.fabric_lf, 0) + " LF fabric, " + _fmtC(r.rail_wire_lf, 0) + " LF rail + wire each" },
+    { key: "p", id: "clf-out-p", label: "Posts", value: (r) => _fmtC(r.total_posts, 0) + " posts (" + _fmtC(r.line_posts, 0) + " line, " + _fmtC(r.terminals, 0) + " terminal)" },
+    { key: "b", id: "clf-out-b", label: "Tension bands", value: (r) => _fmtC(r.tension_bands, 0) + " bands" },
+    { key: "note", id: "clf-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeChainLinkFenceTakeoff,
+});
+CONSTRUCTION_RENDERERS["chain-link-fence-takeoff"] = _v901renderChainLinkFenceTakeoff;
