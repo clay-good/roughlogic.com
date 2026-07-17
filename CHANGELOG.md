@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): sediment-basin-volume -- sediment basin / trap storage (spec-v827); 2026-07-16
+
+- New Group E tile `sediment-basin-volume` (calc-earthwork.js), sizing the settling storage a construction general
+  permit requires per disturbed acre (distinct from flood-control detention): required volume = disturbed acres x
+  per-acre rule (commonly ~3,600 cf/acre wet storage); surface = volume / depth. A 5-acre disturbance needs 18,000 cf
+  (667 cy), a 6,000 sf pond at 3 ft; a wet+dry permit (7,200 cf/acre) doubles it to 36,000 cf. Home count 1,275 -> 1,276.
+
 ### feat(earthwork): check-dam-spacing -- rock check dam spacing (spec-v826); 2026-07-16
 
 - New Group E tile `check-dam-spacing` (calc-earthwork.js), the in-channel erosion-control practice. The toe of each

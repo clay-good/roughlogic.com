@@ -1002,6 +1002,7 @@ const RELATED = {
   "riprap-tonnage": ["riprap-d50", "aggregate", "stockpile-volume"],
   "silt-fence-drainage": ["rusle-soil-loss", "check-dam-spacing", "spoil-setback"],
   "check-dam-spacing": ["silt-fence-drainage", "riprap-d50", "rusle-soil-loss"],
+  "sediment-basin-volume": ["rusle-soil-loss", "stormwater-detention-volume", "silt-fence-drainage"],
   "haul-cycle-production": ["soil-swell-shrink", "excavation", "axle-load-distribution"],
   "loader-production": ["haul-cycle-production", "soil-swell-shrink", "relative-compaction"],
   "dozer-production": ["loader-production", "haul-cycle-production", "soil-swell-shrink"],

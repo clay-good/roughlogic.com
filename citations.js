@@ -8012,6 +8012,17 @@ export const CITATIONS = {
       { name: "Scope", value: "small channels and swales only; not a perennial stream without a permit", source: "AHJ" },
     ],
   },
+  "sediment-basin-volume": {
+    formula: "required_cf = disturbed_ac x storage_rule_cf_per_ac; required_cy = required_cf / 27; surface_area_sf = required_cf / basin_depth_ft.",
+    edition: "Sediment-basin storage identity by name (per-acre wet-storage rule); first-principles volume arithmetic.",
+    freeAccess: "The per-acre storage rule is set by the construction general permit or AHJ and entered here (no copyrighted table reproduced).",
+    governance: GOVERNANCE.general,
+    editionNote: "The per-acre storage figure (commonly around 3,600 cf/acre of wet storage, doubled where dry storage is also required) is set by the construction general permit or the AHJ. This sizes settling storage only - the principal spillway, dewatering device, and emergency spillway are designed separately. The basin is cleaned out at about half its capacity.",
+    assumptions: [
+      { name: "Per-acre storage", value: "~3,600 cf/acre wet storage default (doubled for wet+dry); the general permit / AHJ governs", source: "construction general permit / AHJ" },
+      { name: "Scope", value: "settling storage only; spillways, dewatering device, and emergency spillway designed separately", source: "sediment-basin design practice" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

@@ -17097,6 +17097,7 @@ import { computeRiprapD50 as _v823rr } from "../../calc-earthwork.js";
 import { computeRiprapTonnage as _v824rt } from "../../calc-earthwork.js";
 import { computeSiltFenceDrainage as _v825sf } from "../../calc-earthwork.js";
 import { computeCheckDamSpacing as _v826cd } from "../../calc-earthwork.js";
+import { computeSedimentBasinVolume as _v827sb } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17212,6 +17213,20 @@ test("bounds: spec-v826 computeCheckDamSpacing pins the crest-to-toe spacing, da
   assert.ok("error" in _v826cd({ dam_height_ft: 0, channel_slope_pct: 4, reach_length_ft: 300 }));
   assert.ok("error" in _v826cd({ dam_height_ft: 2, channel_slope_pct: 0, reach_length_ft: 300 }));
   assert.ok("error" in _v826cd({ dam_height_ft: 2, channel_slope_pct: 4, reach_length_ft: 0 }));
+});
+
+test("bounds: spec-v827 computeSedimentBasinVolume pins the required volumes, surface area, and error seams", () => {
+  // 5 ac, 3600 cf/ac, 3 ft -> 18,000 cf, 666.67 cy, 6,000 sf
+  const r = _v827sb({ disturbed_ac: 5, storage_rule_cf_per_ac: 3600, basin_depth_ft: 3 });
+  assert.strictEqual(r.required_cf, 18000);
+  assert.ok(Math.abs(r.required_cy - 666.667) < 1e-2);
+  assert.strictEqual(r.surface_area_sf, 6000);
+  // Wet + dry storage (7200 cf/ac) doubles the volume.
+  assert.strictEqual(_v827sb({ disturbed_ac: 5, storage_rule_cf_per_ac: 7200, basin_depth_ft: 3 }).required_cf, 36000);
+  // Error seams.
+  assert.ok("error" in _v827sb({ disturbed_ac: 0, storage_rule_cf_per_ac: 3600, basin_depth_ft: 3 }));
+  assert.ok("error" in _v827sb({ disturbed_ac: 5, storage_rule_cf_per_ac: 0, basin_depth_ft: 3 }));
+  assert.ok("error" in _v827sb({ disturbed_ac: 5, storage_rule_cf_per_ac: 3600, basin_depth_ft: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

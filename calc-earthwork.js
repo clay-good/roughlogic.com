@@ -15,6 +15,7 @@
 //   - riprap-tonnage          Riprap layer volume and tonnage
 //   - silt-fence-drainage     Silt fence drainage-area and length check
 //   - check-dam-spacing       Rock check dam spacing
+//   - sediment-basin-volume   Sediment basin / trap storage volume
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
@@ -714,6 +715,54 @@ function _v826renderCheckDamSpacing(inputRegion, outputRegion, citationEl) {
   for (const f of [h, s, reach]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["check-dam-spacing"] = _v826renderCheckDamSpacing;
+
+// --- sediment-basin-volume: Sediment Basin / Trap Storage Volume ---
+//
+// The settling storage a construction general permit requires per disturbed
+// acre: required volume = disturbed acres x per-acre rule; surface = volume / depth.
+// dims: in { disturbed_ac: L^2, storage_rule_cf_per_ac: L, basin_depth_ft: L } out: { required_cf: L^3, required_cy: L^3, surface_area_sf: L^2 }
+// (Disturbed area is L^2; the per-acre cf/acre rule reduces to a length L; the
+//  depth L; the required volumes L^3 and the surface area L^2.)
+export function computeSedimentBasinVolume({ disturbed_ac = 0, storage_rule_cf_per_ac = 3600, basin_depth_ft = 3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(disturbed_ac > 0)) return { error: "Disturbed area must be positive (acres)." };
+  if (!(storage_rule_cf_per_ac > 0)) return { error: "Storage rule must be positive (cf/acre)." };
+  if (!(basin_depth_ft > 0)) return { error: "Basin depth must be positive (ft)." };
+  const required_cf = disturbed_ac * storage_rule_cf_per_ac;
+  const required_cy = required_cf / 27;
+  const surface_area_sf = required_cf / basin_depth_ft;
+  if (![required_cf, required_cy, surface_area_sf].every(Number.isFinite)) return { error: "Basin-volume math is not a finite value." };
+  return {
+    required_cf,
+    required_cy,
+    surface_area_sf,
+    note: "The per-acre storage figure (commonly around 3,600 cf/acre of wet storage, doubled where dry storage is also required) is set by the construction general permit or the AHJ and is entered here. This sizes settling storage only - the principal spillway, dewatering device, and emergency spillway are designed separately. The basin is cleaned out at about half its capacity.",
+  };
+}
+
+function _v827renderSedimentBasinVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: sediment-basin storage identity by name. required volume = disturbed acres x per-acre storage rule (commonly ~3,600 cf/acre wet storage); surface area = volume / usable depth. The construction general permit or AHJ sets the per-acre rule.";
+  const ac = makeNumber("Disturbed drainage area (acres)", "sbv-ac", { step: "any", min: "0" });
+  const rule = makeNumber("Required storage per acre (cf/acre)", "sbv-rule", { step: "any", min: "0", value: "3600" });
+  rule.input.value = "3600";
+  const depth = makeNumber("Usable settling depth (ft)", "sbv-depth", { step: "any", min: "0", value: "3" });
+  depth.input.value = "3";
+  for (const f of [ac, rule, depth]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ac.input.value = "5"; rule.input.value = "3600"; depth.input.value = "3"; update(); });
+  const oVol = makeOutputLine(outputRegion, "Required storage", "sbv-out-vol");
+  const oSurf = makeOutputLine(outputRegion, "Pond footprint at depth", "sbv-out-surf");
+  const update = debounce(() => {
+    const r = computeSedimentBasinVolume({
+      disturbed_ac: Number(ac.input.value) || 0, storage_rule_cf_per_ac: rule.input.value === "" ? 3600 : Number(rule.input.value),
+      basin_depth_ft: depth.input.value === "" ? 3 : Number(depth.input.value),
+    });
+    if (r.error) { oVol.textContent = r.error; oSurf.textContent = "-"; return; }
+    oVol.textContent = fmt(r.required_cf, 0) + " cf (" + fmt(r.required_cy, 0) + " cy)";
+    oSurf.textContent = fmt(r.surface_area_sf, 0) + " sf";
+  }, DEBOUNCE_MS);
+  for (const f of [ac, rule, depth]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["sediment-basin-volume"] = _v827renderSedimentBasinVolume;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

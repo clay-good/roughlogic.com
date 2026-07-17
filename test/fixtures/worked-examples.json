@@ -48893,6 +48893,62 @@
    }
   },
   {
+   "tile_id": "sediment-basin-volume",
+   "source_publisher": "Sediment-basin storage identity (construction general permit)",
+   "source_title": "5-acre disturbance, 3,600 cf/acre wet storage, 3 ft depth",
+   "source_edition_or_year": "spec-v827 worked example",
+   "source_section_or_page": "required = 5*3600 = 18,000 cf (667 cy); surface = 18000/3 = 6,000 sf",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "disturbed_ac": 5,
+    "storage_rule_cf_per_ac": 3600,
+    "basin_depth_ft": 3
+   },
+   "outputs": {
+    "required_cf": {
+     "value": 18000,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "required_cy": {
+     "value": 666.667,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "surface_area_sf": {
+     "value": 6000,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sediment-basin-volume",
+   "source_publisher": "Sediment-basin storage identity (construction general permit)",
+   "source_title": "cross-check: a permit requiring wet and dry storage (7,200 cf/acre) doubles it",
+   "source_edition_or_year": "spec-v827 worked example",
+   "source_section_or_page": "required = 5*7200 = 36,000 cf (1,333 cy)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "disturbed_ac": 5,
+    "storage_rule_cf_per_ac": 7200,
+    "basin_depth_ft": 3
+   },
+   "outputs": {
+    "required_cf": {
+     "value": 36000,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

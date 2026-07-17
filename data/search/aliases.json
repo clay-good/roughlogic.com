@@ -16727,6 +16727,31 @@
       "kind": "industry"
     },
     {
+      "term": "sediment basin volume",
+      "target": "sediment-basin-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "sediment trap sizing",
+      "target": "sediment-basin-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "settling basin storage",
+      "target": "sediment-basin-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "sediment pond volume",
+      "target": "sediment-basin-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "construction basin storage",
+      "target": "sediment-basin-volume",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"
