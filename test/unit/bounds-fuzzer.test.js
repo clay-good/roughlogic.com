@@ -26126,3 +26126,25 @@ test("bounds: spec-v881 computeBalusterPicketCount pins the picket count, actual
   assert.ok("error" in _v881({ rail_clear_in: 96, picket_width_in: 120, max_gap_in: 4 }));
   assert.ok("error" in _v881({ rail_clear_in: Infinity, picket_width_in: 1.5, max_gap_in: 4 }));
 });
+
+import { computeTrafficTaperLength as _v882 } from "../../calc-construction.js";
+
+test("bounds: spec-v882 computeTrafficTaperLength pins both speed branches, device count, and error seams", () => {
+  const r = _v882({ offset_width_ft: 12, speed_mph: 55, device_spacing_ft: 40 });
+  assert.equal(r.taper_length_ft, 660); // high-speed branch: 12 * 55
+  assert.equal(r.devices, 18); // ceil(660/40) + 1 = 17 + 1
+  assert.ok(r.branch.includes("high speed"));
+  // The low-speed branch (<= 40 mph) uses the squared speed, so the same lane needs far less taper.
+  const slow = _v882({ offset_width_ft: 12, speed_mph: 30, device_spacing_ft: 40 });
+  assert.equal(slow.taper_length_ft, 180); // 12 * 30^2 / 60 = 12 * 15
+  assert.equal(slow.devices, 6); // ceil(180/40) + 1 = 5 + 1
+  assert.ok(slow.branch.includes("low speed"));
+  // 40 mph is the top of the low-speed branch (squared); 45 is the bottom of the high-speed branch (linear).
+  assert.equal(_v882({ offset_width_ft: 12, speed_mph: 40, device_spacing_ft: 40 }).taper_length_ft, 320); // 12*1600/60
+  assert.equal(_v882({ offset_width_ft: 12, speed_mph: 45, device_spacing_ft: 40 }).taper_length_ft, 540); // 12*45
+  // Error seams: non-finite, non-positive offset, speed, spacing.
+  assert.ok("error" in _v882({ offset_width_ft: 0, speed_mph: 55, device_spacing_ft: 40 }));
+  assert.ok("error" in _v882({ offset_width_ft: 12, speed_mph: 0, device_spacing_ft: 40 }));
+  assert.ok("error" in _v882({ offset_width_ft: 12, speed_mph: 55, device_spacing_ft: 0 }));
+  assert.ok("error" in _v882({ offset_width_ft: Infinity, speed_mph: 55, device_spacing_ft: 40 }));
+});

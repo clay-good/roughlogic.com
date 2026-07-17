@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): traffic-taper-length -- work-zone merging taper length and device count (MUTCD) (spec-v882); 2026-07-17
+
+- New Group E tile `traffic-taper-length` (calc-construction.js), the traffic-control takeoff beside the paving and
+  striping tiles. MUTCD merging-taper length for a lane closure and the channelizing devices it takes: for 40 mph or less
+  L = W x S^2 / 60, for 45 mph or more L = W x S; devices = ceil(L / spacing) + 1. Closing a 12 ft lane at 55 mph needs a
+  660 ft taper and 18 cones at 40 ft spacing; at 30 mph the same lane shortens to a 180 ft taper (6 devices) because the
+  low-speed branch uses the speed squared. The low- and high-speed branches are a deliberate step; shifting, shoulder, and
+  downstream tapers use fractions of L. The MUTCD and the agency traffic-control plan govern. Home count 1,330 -> 1,331.
+
 ### feat(construction): baluster-picket-count -- guard baluster / picket count (4-in sphere rule) (spec-v881); 2026-07-17
 
 - New Group E tile `baluster-picket-count` (calc-construction.js), the guard/fence spacing takeoff beside

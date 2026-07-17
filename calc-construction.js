@@ -9263,3 +9263,44 @@ const _v881renderBalusterPicketCount = _simpleRenderer({
   compute: computeBalusterPicketCount,
 });
 CONSTRUCTION_RENDERERS["baluster-picket-count"] = _v881renderBalusterPicketCount;
+
+// --- traffic-taper-length: Work-Zone Merging Taper Length and Device Count (MUTCD) ---
+//
+// MUTCD merging taper: low speed (<=40) uses the squared speed, high speed (>=45) is linear.
+//   L = speed <= 40 ? W x S^2 / 60 : W x S; devices = ceil(L / spacing) + 1
+// dims: in { offset_width_ft: L, speed_mph: L/T, device_spacing_ft: L } out: { taper_length_ft: L, devices: dimensionless }
+export function computeTrafficTaperLength({ offset_width_ft = 12, speed_mph = 55, device_spacing_ft = 40 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(offset_width_ft > 0)) return { error: "Offset / lane width must be positive (ft)." };
+  if (!(speed_mph > 0)) return { error: "Speed must be positive (mph)." };
+  if (!(device_spacing_ft > 0)) return { error: "Device spacing must be positive (ft)." };
+  const taper_length_ft = speed_mph <= 40 ? offset_width_ft * speed_mph * speed_mph / 60 : offset_width_ft * speed_mph;
+  const devices = Math.ceil(taper_length_ft / device_spacing_ft) + 1;
+  const branch = speed_mph <= 40 ? "low speed (W x S^2 / 60)" : "high speed (W x S)";
+  if (![taper_length_ft, devices].every(Number.isFinite)) return { error: "Taper math is not a finite value." };
+  return {
+    taper_length_ft,
+    devices,
+    branch,
+    note: "MUTCD merging-taper length for a lane closure. W is the lateral offset (the lane width for a full-lane closure). The low-speed branch (<= 40 mph) uses the speed squared, the high-speed branch (>= 45 mph) is linear, a deliberate step that gives a longer taper at higher speed. The channelizing-device spacing in a taper is roughly the speed in feet. Shifting, shoulder, and downstream tapers use fractions of L; the MUTCD and the agency traffic-control plan govern.",
+  };
+}
+
+export const trafficTaperLengthExample = { inputs: { offset_width_ft: 12, speed_mph: 55, device_spacing_ft: 40 } };
+
+const _v882renderTrafficTaperLength = _simpleRenderer({
+  citation: "Citation: MUTCD merging-taper identity by name. For 40 mph or less, L = W x S^2 / 60; for 45 mph or more, L = W x S. devices = ceil(L / spacing) + 1. The low-speed and high-speed branches are a deliberate step in the formula.",
+  example: trafficTaperLengthExample.inputs,
+  fields: [
+    { key: "offset_width_ft", label: "Lateral offset / lane width (ft)", kind: "number", default: 12 },
+    { key: "speed_mph", label: "Posted / operating speed (mph)", kind: "number", default: 55 },
+    { key: "device_spacing_ft", label: "Channelizing device spacing (ft)", kind: "number", default: 40 },
+  ],
+  outputs: [
+    { key: "L", id: "ttl-out-L", label: "Merging taper length", value: (r) => _fmtC(r.taper_length_ft, 0) + " ft (" + r.branch + ")" },
+    { key: "d", id: "ttl-out-d", label: "Channelizing devices", value: (r) => _fmtC(r.devices, 0) + " devices" },
+    { key: "note", id: "ttl-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTrafficTaperLength,
+});
+CONSTRUCTION_RENDERERS["traffic-taper-length"] = _v882renderTrafficTaperLength;

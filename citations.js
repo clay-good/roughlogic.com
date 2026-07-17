@@ -8156,6 +8156,17 @@ export const CITATIONS = {
       { name: "Bead rate", value: "~6 lb/gal default; set by the retroreflectivity spec", source: "retroreflectivity specification" },
     ],
   },
+  "traffic-taper-length": {
+    formula: "taper_length_ft = speed_mph <= 40 ? offset_width_ft x speed_mph^2 / 60 : offset_width_ft x speed_mph; devices = ceil(taper_length_ft / device_spacing_ft) + 1.",
+    edition: "MUTCD merging-taper identity by name (L = W S^2/60 for S <= 40, L = W S for S >= 45); first-principles device-count arithmetic.",
+    freeAccess: "The MUTCD merging-taper relation is public-domain federal guidance; the device spacing comes from the traffic-control plan.",
+    governance: GOVERNANCE.general,
+    editionNote: "W is the lateral offset (the lane width for a full-lane closure). The low-speed branch (<= 40 mph) uses the speed squared and the high-speed branch (>= 45 mph) is linear, a deliberate step that gives a longer taper at higher speed. The channelizing-device spacing in a taper is roughly the speed in feet. Shifting, shoulder, and downstream tapers use fractions of L; the MUTCD and the agency traffic-control plan govern.",
+    assumptions: [
+      { name: "Speed branch", value: "L = W S^2/60 for 40 mph or less, L = W S for 45 mph or more (MUTCD)", source: "MUTCD" },
+      { name: "Device spacing", value: "channelizing-device spacing in a taper roughly the speed in feet (entered here)", source: "traffic-control plan" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",
