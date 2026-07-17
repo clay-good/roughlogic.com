@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): rebar-chair-count -- rebar chair / bar-support count (spec-v905); 2026-07-17
+
+- New Group E tile `rebar-chair-count` (calc-construction.js), the rebar accessory takeoff beside `rebar-tie-wire` and
+  `rebar-weight-takeoff`. chairs = ceil(slab area / support spacing^2 x (1 + waste)). A 1,000 sf mat on a 4 ft support
+  grid is 66 chairs with waste; a tighter 3 ft grid under heavier bars is 117 (the spacing enters squared, so a foot
+  tighter nearly doubles the count). The support spacing comes from the spec and CRSI practice. Home count 1,353 -> 1,354.
+
 ### feat(construction): curb-gutter-volume -- curb-and-gutter concrete volume (spec-v904); 2026-07-17
 
 - New Group E tile `curb-gutter-volume` (calc-construction.js), the concrete flatwork takeoff beside `concrete` and

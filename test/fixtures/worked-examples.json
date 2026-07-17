@@ -53593,6 +53593,50 @@
    }
   },
   {
+   "tile_id": "rebar-chair-count",
+   "source_publisher": "Bar-support count identity (first-principles)",
+   "source_title": "1,000 sf mat, 4 ft support grid, 5% waste -> 66 chairs",
+   "source_edition_or_year": "spec-v905 worked example",
+   "source_section_or_page": "chairs = ceil(1000/4^2*1.05) = ceil(65.6) = 66",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "slab_area_sf": 1000,
+    "support_spacing_ft": 4,
+    "waste_pct": 5
+   },
+   "outputs": {
+    "chairs": {
+     "value": 66,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rebar-chair-count",
+   "source_publisher": "Bar-support count identity (first-principles)",
+   "source_title": "cross-check: a tighter 3 ft grid nearly doubles the count to 117 (spacing enters squared)",
+   "source_edition_or_year": "spec-v905 worked example",
+   "source_section_or_page": "chairs = ceil(1000/3^2*1.05) = ceil(116.7) = 117",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "slab_area_sf": 1000,
+    "support_spacing_ft": 3,
+    "waste_pct": 5
+   },
+   "outputs": {
+    "chairs": {
+     "value": 117,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

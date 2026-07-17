@@ -1653,6 +1653,7 @@ cross-check.
 | calc-construction.js | `computeRainOnSnowSurcharge` | `{ pf_psf = 0, pg_psf = 0, slope_deg = 0, eave_to_ridge_ft = 0, surcharge_psf ...` | _ | _ | _ |
 | calc-construction.js | `computeReadyMixConcreteOrder` | `{ volume_yd3 = 0, waste_pct = 8, load_yd3 = 10, min_yd3 = 10, price_per_yd3 =...` | _ | _ | _ |
 | calc-construction.js | `computeRebar` | `{ length_ft, width_ft, spacing_in, edge_clearance_in = 3, bar_size = "#4" }` | _ | _ | _ |
+| calc-construction.js | `computeRebarChairCount` | `{ slab_area_sf = 1000, support_spacing_ft = 4, waste_pct = 5 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeRebarLapSplice` | `{ bar_size = "#5", lap_factor = 48, min_lap_in = 12 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeRebarSchedule` | `{ rows = [] } = {}` | _ | _ | _ |
 | calc-construction.js | `computeRebarTieWire` | `{ length_ft = 30, width_ft = 20, spacing_in = 12, tie_fraction = 0.5, tie_len...` | _ | _ | _ |
@@ -3014,7 +3015,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1600.
+Row count: 1601.
 
 <!-- END function-corpus-v14 -->
 
@@ -3576,7 +3577,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (346 tiles)
+### Group E Construction (347 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3781,6 +3782,7 @@ per spec-v14 §13.1 second paragraph.
 | `rc-slender-column-magnify` | Slender Column Moment Magnifier, Nonsway (ACI 318-19 6.6.4) | ACI 318-19 Section 6.6.4.5 (nonsway m...; Pu 200, M2 80, M1 50, lu 14 ft, k 1, EI 1.5e6, h 16 -> Cm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ready-mix-concrete-order` | Ready-Mix Concrete Order (Trucks, Waste, Short Load) | concrete-supply practice; spec-v431 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rebar` | Rebar Spacing and Quantity | Project (first-principles slab grid l...; 20 ft x 10 ft slab / 12 in spacing / 3 in edge clearance ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rebar-chair-count` | Rebar Chair / Bar-Support Count | Bar-support count identity (first-pri...; chairs = ceil(1000/4^2*1.05) = ceil(65.6) = 66 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rebar-lap-splice` | Rebar Lap-Splice Length | ACI 318 development-and-splice basis ...; spec-v96 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rebar-schedule` | Rebar Bend and Weight Schedule | ACI Detailing Manual / CRSI (project ...; 12 #5 @ 20 ft + 2x 90 + 30 #4 @ 16 ft + 1 stirrup + 8 #6 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rebar-tie-wire` | Rebar Tie-Wire Count and Weight | Rebar tie-wire identity (first-princi...; bars = 21 x 31 = 651 intersections; ties = round(651*0.5)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4553,6 +4555,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1353. Fixture-covered or reference-cadence: 1353 / 1353.
+Tile count: 1354. Fixture-covered or reference-cadence: 1354 / 1354.
 
 <!-- END tile-index-v14 -->

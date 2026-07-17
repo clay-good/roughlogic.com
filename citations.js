@@ -8409,6 +8409,17 @@ export const CITATIONS = {
       { name: "Ordering rate", value: "cy per 100 LF = cross-section x 100 / 27 (rule of thumb)", source: "flatwork practice" },
     ],
   },
+  "rebar-chair-count": {
+    formula: "chairs = ceil(slab_area_sf / support_spacing_ft^2 x (1 + waste_pct/100)).",
+    edition: "Bar-support count identity by name (chairs on a square grid over the slab area, plus waste); first-principles count arithmetic.",
+    freeAccess: "The count arithmetic is public first-principles; the support spacing comes from the spec and CRSI practice.",
+    governance: GOVERNANCE.general,
+    editionNote: "Bar supports (chairs and bolsters) hold the rebar or mesh at the specified cover. The support spacing (about 3 to 4 ft each way, tighter under heavy bars to stop sag) comes from the spec and CRSI practice. Distinct from the ties (rebar-tie-wire) and the bars (rebar-weight-takeoff).",
+    assumptions: [
+      { name: "Support spacing", value: "~3 to 4 ft each way (default 4 ft); tighter under heavy bars per CRSI", source: "CRSI / project spec" },
+      { name: "Grid", value: "square grid: chairs per unit area = 1 / spacing^2", source: "first principles" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

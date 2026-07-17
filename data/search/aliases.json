@@ -18677,6 +18677,31 @@
       "kind": "industry"
     },
     {
+      "term": "rebar chair count",
+      "target": "rebar-chair-count",
+      "kind": "industry"
+    },
+    {
+      "term": "bar support count",
+      "target": "rebar-chair-count",
+      "kind": "industry"
+    },
+    {
+      "term": "rebar bolster count",
+      "target": "rebar-chair-count",
+      "kind": "industry"
+    },
+    {
+      "term": "rebar chairs quantity",
+      "target": "rebar-chair-count",
+      "kind": "industry"
+    },
+    {
+      "term": "rebar support spacing",
+      "target": "rebar-chair-count",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

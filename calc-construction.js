@@ -9864,3 +9864,41 @@ const _v904renderCurbGutterVolume = _simpleRenderer({
   compute: computeCurbGutterVolume,
 });
 CONSTRUCTION_RENDERERS["curb-gutter-volume"] = _v904renderCurbGutterVolume;
+
+// --- rebar-chair-count: Rebar Chair / Bar-Support Count ---
+//
+// Bar supports on a square grid that hold the steel at the design cover.
+//   chairs = ceil(slab_area / support_spacing^2 x (1 + waste/100))
+// dims: in { slab_area_sf: L^2, support_spacing_ft: L, waste_pct: dimensionless } out: { chairs: dimensionless }
+export function computeRebarChairCount({ slab_area_sf = 1000, support_spacing_ft = 4, waste_pct = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(slab_area_sf > 0)) return { error: "Slab area must be positive (ft^2)." };
+  if (!(support_spacing_ft > 0)) return { error: "Support spacing must be positive (ft)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const raw_chairs = slab_area_sf / (support_spacing_ft * support_spacing_ft) * (1 + waste_pct / 100);
+  const chairs = Math.ceil(raw_chairs);
+  if (![raw_chairs, chairs].every(Number.isFinite)) return { error: "Chair-count math is not a finite value." };
+  return {
+    chairs,
+    raw_chairs,
+    note: "Bar supports (chairs and bolsters) hold the rebar or mesh at the specified cover. The support spacing (about 3 to 4 ft each way, tighter under heavy bars to stop sag) comes from the spec and CRSI practice. Distinct from the ties (rebar-tie-wire) and the bars (rebar-weight-takeoff).",
+  };
+}
+
+export const rebarChairCountExample = { inputs: { slab_area_sf: 1000, support_spacing_ft: 4, waste_pct: 5 } };
+
+const _v905renderRebarChairCount = _simpleRenderer({
+  citation: "Citation: chair-count identity by name. chairs = ceil(slab area / support spacing^2 x (1 + waste/100)). The spacing enters squared; the support spacing (~3 to 4 ft) comes from the spec and CRSI practice.",
+  example: rebarChairCountExample.inputs,
+  fields: [
+    { key: "slab_area_sf", label: "Slab / mat area (ft^2)", kind: "number", default: 1000 },
+    { key: "support_spacing_ft", label: "Chair spacing each way (ft)", kind: "number", default: 4 },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
+  ],
+  outputs: [
+    { key: "c", id: "rcc-out-c", label: "Rebar chairs / bar supports", value: (r) => _fmtC(r.chairs, 0) + " chairs (" + _fmtC(r.raw_chairs, 1) + " before rounding)" },
+    { key: "note", id: "rcc-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRebarChairCount,
+});
+CONSTRUCTION_RENDERERS["rebar-chair-count"] = _v905renderRebarChairCount;

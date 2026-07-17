@@ -26590,3 +26590,18 @@ test("bounds: spec-v904 computeCurbGutterVolume pins the volume, cy-per-100LF, a
   assert.ok("error" in _v904({ cross_section_ft2: 2.0, length_ft: 300, waste_pct: -8 }));
   assert.ok("error" in _v904({ cross_section_ft2: Infinity, length_ft: 300, waste_pct: 8 }));
 });
+
+import { computeRebarChairCount as _v905 } from "../../calc-construction.js";
+
+test("bounds: spec-v905 computeRebarChairCount pins the chair count, squared-spacing lever, and error seams", () => {
+  const r = _v905({ slab_area_sf: 1000, support_spacing_ft: 4, waste_pct: 5 });
+  assert.equal(r.chairs, 66); // ceil(1000/16*1.05) = ceil(65.625)
+  // The spacing enters squared, so a foot tighter nearly doubles the count.
+  const tight = _v905({ slab_area_sf: 1000, support_spacing_ft: 3, waste_pct: 5 });
+  assert.equal(tight.chairs, 117); // ceil(1000/9*1.05) = ceil(116.67)
+  // Error seams: non-finite, non-positive area / spacing, negative waste.
+  assert.ok("error" in _v905({ slab_area_sf: 0, support_spacing_ft: 4, waste_pct: 5 }));
+  assert.ok("error" in _v905({ slab_area_sf: 1000, support_spacing_ft: 0, waste_pct: 5 }));
+  assert.ok("error" in _v905({ slab_area_sf: 1000, support_spacing_ft: 4, waste_pct: -5 }));
+  assert.ok("error" in _v905({ slab_area_sf: Infinity, support_spacing_ft: 4, waste_pct: 5 }));
+});
