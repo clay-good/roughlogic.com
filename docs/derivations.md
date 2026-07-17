@@ -1644,6 +1644,7 @@ cross-check.
 | calc-construction.js | `computeRebar` | `{ length_ft, width_ft, spacing_in, edge_clearance_in = 3, bar_size = "#4" }` | _ | _ | _ |
 | calc-construction.js | `computeRebarLapSplice` | `{ bar_size = "#5", lap_factor = 48, min_lap_in = 12 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeRebarSchedule` | `{ rows = [] } = {}` | _ | _ | _ |
+| calc-construction.js | `computeRebarTieWire` | `{ length_ft = 30, width_ft = 20, spacing_in = 12, tie_fraction = 0.5, tie_len...` | _ | _ | _ |
 | calc-construction.js | `computeRebarWeightTakeoff` | `{ bar_size = "5", total_len_ft = 0, price_per_lb = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeResidentialFraming` | `{ footprint_ft2 = 0, perimeter_ft = 0, wall_height_ft = 8, stud_oc_in = 16, j...` | _ | _ | _ |
 | calc-construction.js | `computeRidgeCapFasteners` | `{ ridge_lf = 0, hip_lf = 0, cap_lf_per_bundle = 20, cap_exposure_in = 5, squa...` | _ | _ | _ |
@@ -2987,7 +2988,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1573.
+Row count: 1574.
 
 <!-- END function-corpus-v14 -->
 
@@ -3543,7 +3544,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (327 tiles)
+### Group E Construction (328 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3738,6 +3739,7 @@ per spec-v14 §13.1 second paragraph.
 | `rebar` | Rebar Spacing and Quantity | Project (first-principles slab grid l...; 20 ft x 10 ft slab / 12 in spacing / 3 in edge clearance ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rebar-lap-splice` | Rebar Lap-Splice Length | ACI 318 development-and-splice basis ...; spec-v96 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rebar-schedule` | Rebar Bend and Weight Schedule | ACI Detailing Manual / CRSI (project ...; 12 #5 @ 20 ft + 2x 90 + 30 #4 @ 16 ft + 1 stirrup + 8 #6 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rebar-tie-wire` | Rebar Tie-Wire Count and Weight | Rebar tie-wire identity (first-princi...; bars = 21 x 31 = 651 intersections; ties = round(651*0.5)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rebar-weight-takeoff` | Rebar Weight Takeoff | ASTM A615; spec-v430 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `relative-compaction` | Relative Compaction from Field Density and Proctor Maximum | Relative compaction (earthwork QC); spec-v326 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `required-section-modulus` | Required Plastic Section Modulus for a Steel Beam | AISC 360-22 Chapter F (Mp = Fy Zx, in...; spec-v634 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4499,6 +4501,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1326. Fixture-covered or reference-cadence: 1326 / 1326.
+Tile count: 1327. Fixture-covered or reference-cadence: 1327 / 1327.
 
 <!-- END tile-index-v14 -->

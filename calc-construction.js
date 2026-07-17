@@ -9065,3 +9065,57 @@ const _v877renderMetalDeckTakeoff = _simpleRenderer({
   compute: computeMetalDeckTakeoff,
 });
 CONSTRUCTION_RENDERERS["metal-deck-takeoff"] = _v877renderMetalDeckTakeoff;
+
+// --- rebar-tie-wire: Rebar Tie-Wire Count and Weight ---
+//
+// Takes off the tie wire for a rebar mat - the intersections tied and the wire
+// consumed (distinct from the bar weight):
+//   bars each way = floor(span x 12 / spacing) + 1; intersections = product
+//   ties = round(intersections x tie_fraction); wire_ft = ties x tie_length_in / 12
+//   wire_lb = wire_ft x wire_lb_per_ft
+// dims: in { length_ft: L, width_ft: L, spacing_in: L, tie_fraction: dimensionless, tie_length_in: L, wire_lb_per_ft: M L^-1 } out: { intersections: dimensionless, ties: dimensionless, wire_ft: L, wire_lb: M }
+export function computeRebarTieWire({ length_ft = 30, width_ft = 20, spacing_in = 12, tie_fraction = 0.5, tie_length_in = 8, wire_lb_per_ft = 0.0181 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(length_ft > 0)) return { error: "Mat length must be positive (ft)." };
+  if (!(width_ft > 0)) return { error: "Mat width must be positive (ft)." };
+  if (!(spacing_in > 0)) return { error: "Bar spacing must be positive (in)." };
+  if (!(tie_length_in > 0)) return { error: "Tie length must be positive (in)." };
+  if (!(wire_lb_per_ft > 0)) return { error: "Wire weight per foot must be positive (lb/ft)." };
+  if (!(tie_fraction >= 0 && tie_fraction <= 1)) return { error: "Tie fraction must be between 0 and 1." };
+  const bars_along_length = Math.floor((width_ft * 12) / spacing_in) + 1;
+  const bars_along_width = Math.floor((length_ft * 12) / spacing_in) + 1;
+  const intersections = bars_along_length * bars_along_width;
+  const ties = Math.round(intersections * tie_fraction);
+  const wire_ft = (ties * tie_length_in) / 12;
+  const wire_lb = wire_ft * wire_lb_per_ft;
+  if (![intersections, ties, wire_ft, wire_lb].every(Number.isFinite)) return { error: "Tie-wire math is not a finite value." };
+  return {
+    intersections,
+    ties,
+    wire_ft,
+    wire_lb,
+    note: "The tie fraction follows the spec - every intersection along the mat perimeter and about half in the field per CRSI practice. The tie length depends on the bar size (about 6-9 in), and the wire weight per foot comes from the gauge (16 to 16.5 ga annealed). Distinct from the bar rebar-weight-takeoff; the spec sets the tie fraction.",
+  };
+}
+
+export const rebarTieWireExample = { inputs: { length_ft: 30, width_ft: 20, spacing_in: 12, tie_fraction: 0.5, tie_length_in: 8, wire_lb_per_ft: 0.0181 } };
+
+const _v878renderRebarTieWire = _simpleRenderer({
+  citation: "Citation: tie-wire identity by name. bars each way = floor(span / spacing) + 1; intersections = product; ties = round(intersections x fraction); wire = ties x tie length / 12; weight = wire x wire per foot. The spec sets the tie fraction.",
+  example: rebarTieWireExample.inputs,
+  fields: [
+    { key: "length_ft", label: "Mat length (ft)", kind: "number", default: 30 },
+    { key: "width_ft", label: "Mat width (ft)", kind: "number", default: 20 },
+    { key: "spacing_in", label: "Bar spacing each way (in)", kind: "number", default: 12 },
+    { key: "tie_fraction", label: "Fraction of intersections tied (0-1)", kind: "number", default: 0.5 },
+    { key: "tie_length_in", label: "Wire per tie (in)", kind: "number", default: 8 },
+    { key: "wire_lb_per_ft", label: "Tie wire weight (lb/ft, ~0.0181 for 16.5 ga)", kind: "number", default: 0.0181 },
+  ],
+  outputs: [
+    { key: "w", id: "rtw-out-w", label: "Tie wire", value: (r) => _fmtC(r.wire_lb, 1) + " lb (" + _fmtC(r.wire_ft, 0) + " ft)" },
+    { key: "t", id: "rtw-out-t", label: "Ties / intersections", value: (r) => _fmtC(r.ties, 0) + " ties of " + _fmtC(r.intersections, 0) + " intersections" },
+    { key: "note", id: "rtw-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRebarTieWire,
+});
+CONSTRUCTION_RENDERERS["rebar-tie-wire"] = _v878renderRebarTieWire;

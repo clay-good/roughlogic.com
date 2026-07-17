@@ -18002,6 +18002,31 @@
       "kind": "industry"
     },
     {
+      "term": "rebar tie wire",
+      "target": "rebar-tie-wire",
+      "kind": "industry"
+    },
+    {
+      "term": "tie wire weight",
+      "target": "rebar-tie-wire",
+      "kind": "industry"
+    },
+    {
+      "term": "rebar ties count",
+      "target": "rebar-tie-wire",
+      "kind": "industry"
+    },
+    {
+      "term": "rebar tie wire quantity",
+      "target": "rebar-tie-wire",
+      "kind": "industry"
+    },
+    {
+      "term": "reinforcement tie wire",
+      "target": "rebar-tie-wire",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

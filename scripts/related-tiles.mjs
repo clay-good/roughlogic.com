@@ -1045,6 +1045,7 @@ const RELATED = {
   "sfrm-takeoff": ["char-depth-capacity", "shotcrete-rebound-quantity", "coating-coverage-dft"],
   "spray-foam-board-feet": ["insulation-batt-coverage", "blown-insulation-coverage", "assembly-r-value"],
   "metal-deck-takeoff": ["metal-roof-panels", "metal-weight", "welded-wire-mesh"],
+  "rebar-tie-wire": ["rebar-weight-takeoff", "rebar-schedule", "welded-wire-mesh"],
   "refrigerant-lineset-charge-adjust": ["refrigerant-charge", "refrigerant-line-size", "refrigerant-velocity"],
   "asphalt-spread-rate": ["asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity"],
   "pavement-milling-production": ["asphalt-paving-speed", "asphalt-spread-rate", "haul-cycle-production"],

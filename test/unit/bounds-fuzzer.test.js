@@ -17148,6 +17148,7 @@ import { computeCarpetTakeoff as _v874cpt } from "../../calc-construction.js";
 import { computeSfrmTakeoff as _v875sfr } from "../../calc-construction.js";
 import { computeSprayFoamBoardFeet as _v876sfb } from "../../calc-construction.js";
 import { computeMetalDeckTakeoff as _v877mdt } from "../../calc-construction.js";
+import { computeRebarTieWire as _v878rtw } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -18134,6 +18135,27 @@ test("bounds: spec-v877 computeMetalDeckTakeoff pins the cover area, sheet count
   assert.ok("error" in _v877mdt({ area_sf: 10000, cover_width_in: 0, sheet_length_ft: 30, waste_pct: 5 }));
   assert.ok("error" in _v877mdt({ area_sf: 10000, cover_width_in: 36, sheet_length_ft: 0, waste_pct: 5 }));
   assert.ok("error" in _v877mdt({ area_sf: 10000, cover_width_in: 36, sheet_length_ft: 30, waste_pct: -1 }));
+});
+
+test("bounds: spec-v878 computeRebarTieWire pins the intersections, ties, wire length, weight, and error seams", () => {
+  // 30 x 20 ft, #4 at 12 in, 50% tied, 8 in ties, 0.0181 lb/ft -> 651 intersections, 326 ties, ~3.9 lb.
+  const r = _v878rtw({ length_ft: 30, width_ft: 20, spacing_in: 12, tie_fraction: 0.5, tie_length_in: 8, wire_lb_per_ft: 0.0181 });
+  assert.strictEqual(r.intersections, 651);
+  assert.strictEqual(r.ties, 326);
+  assert.ok(Math.abs(r.wire_lb - 3.934) < 2e-2);
+  // A full-tie spec (fraction 1.0) nearly doubles the wire.
+  const full = _v878rtw({ length_ft: 30, width_ft: 20, spacing_in: 12, tie_fraction: 1.0, tie_length_in: 8, wire_lb_per_ft: 0.0181 });
+  assert.strictEqual(full.ties, 651);
+  assert.ok(Math.abs(full.wire_lb - 7.855) < 2e-2);
+  // Error seams.
+  assert.ok("error" in _v878rtw({ length_ft: 0, width_ft: 20, spacing_in: 12, tie_length_in: 8, wire_lb_per_ft: 0.0181 }));
+  assert.ok("error" in _v878rtw({ length_ft: 30, width_ft: 0, spacing_in: 12, tie_length_in: 8, wire_lb_per_ft: 0.0181 }));
+  assert.ok("error" in _v878rtw({ length_ft: 30, width_ft: 20, spacing_in: 0, tie_length_in: 8, wire_lb_per_ft: 0.0181 }));
+  assert.ok("error" in _v878rtw({ length_ft: 30, width_ft: 20, spacing_in: 12, tie_length_in: 0, wire_lb_per_ft: 0.0181 }));
+  assert.ok("error" in _v878rtw({ length_ft: 30, width_ft: 20, spacing_in: 12, tie_length_in: 8, wire_lb_per_ft: 0 }));
+  // Tie fraction out of 0-1.
+  assert.ok("error" in _v878rtw({ length_ft: 30, width_ft: 20, spacing_in: 12, tie_fraction: 1.5, tie_length_in: 8, wire_lb_per_ft: 0.0181 }));
+  assert.ok("error" in _v878rtw({ length_ft: 30, width_ft: 20, spacing_in: 12, tie_fraction: -0.1, tie_length_in: 8, wire_lb_per_ft: 0.0181 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

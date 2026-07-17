@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): rebar-tie-wire -- rebar tie-wire count and weight (spec-v878); 2026-07-17
+
+- New Group E tile `rebar-tie-wire` (calc-construction.js), the rebar takeoff beside `rebar-weight-takeoff` (bars) and
+  `welded-wire-mesh`. bars each way = floor(span / spacing) + 1; intersections = product; ties = round(intersections x
+  fraction); weight = ties x tie length / 12 x wire per foot. A 30 x 20 ft mat of #4 bars at 12 in each way has 651
+  intersections, and tying half with 8 in ties is about 3.9 lb of wire; a full-tie spec (fraction 1.0) nearly doubles it
+  to 7.9 lb -- the tie fraction is the lever the spec sets. Distinct from the bar rebar-weight-takeoff. Home count 1,326
+  -> 1,327.
+
 ### feat(construction): metal-deck-takeoff -- steel roof / floor deck sheet takeoff (spec-v877); 2026-07-17
 
 - New Group E tile `metal-deck-takeoff` (calc-construction.js), the steel-erection takeoff beside `metal-roof-panels`

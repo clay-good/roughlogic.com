@@ -8574,6 +8574,17 @@ export const CITATIONS = {
       { name: "Fastening", value: "side-lap (button punch/screws) and support welds/screws follow the SDI and drawings, counted separately", source: "SDI / structural drawings" },
     ],
   },
+  "rebar-tie-wire": {
+    formula: "bars_each_way = floor(span_in / spacing_in) + 1; intersections = bars_x x bars_y; ties = round(intersections x tie_fraction); wire_ft = ties x tie_length_in / 12; wire_lb = wire_ft x wire_lb_per_ft.",
+    edition: "Rebar tie-wire identity by name (grid intersections, a tied fraction, and the wire per tie); first-principles count arithmetic.",
+    freeAccess: "The intersection-count geometry is public first-principles; the tie fraction and wire gauge come from the spec and CRSI practice.",
+    governance: GOVERNANCE.general,
+    editionNote: "The tie fraction follows the spec - every intersection along the mat perimeter and about half in the field per CRSI practice. The tie length depends on the bar size (about 6-9 in), and the wire weight per foot comes from the gauge (16 to 16.5 ga annealed). Distinct from the bar rebar-weight-takeoff.",
+    assumptions: [
+      { name: "Tie fraction", value: "perimeter fully tied, ~50% in the field per CRSI practice; the spec governs", source: "CRSI / project spec" },
+      { name: "Wire", value: "~8 in per tie, ~0.0181 lb/ft for 16.5 ga annealed tie wire", source: "tie-wire gauge" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",
