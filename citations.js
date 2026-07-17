@@ -8387,6 +8387,17 @@ export const CITATIONS = {
       { name: "Per-foot weight", value: "from duct-metal-weight, plus wrap and any water in a coil", source: "duct-metal-weight" },
     ],
   },
+  "refrigerant-lineset-charge-adjust": {
+    formula: "extra_oz = max(0, lineset_length_ft - factory_charge_length_ft) x rate_oz_per_ft; extra_lb = extra_oz / 16.",
+    edition: "Line-set charge-adder identity by name (extra past the factory pre-charge length, at a per-foot rate); first-principles arithmetic.",
+    freeAccess: "The linear charge-adder arithmetic is public first-principles; the per-foot rate and factory length come from the equipment nameplate.",
+    governance: GOVERNANCE.general,
+    editionNote: "The per-foot rate and the factory pre-charge length come from the equipment nameplate - they vary by refrigerant and liquid-line size (R-410A on a 3/8 in liquid line runs about 0.6 oz/ft). Only the liquid line adds meaningful charge. Over- or under-charging cuts capacity and drives callbacks; the total is weighed in, not guessed.",
+    assumptions: [
+      { name: "Per-foot rate", value: "from the nameplate; ~0.6 oz/ft for R-410A on a 3/8 in liquid line", source: "equipment nameplate" },
+      { name: "Factory length", value: "the factory pre-charge line-set length from the nameplate (~15 ft typical)", source: "equipment nameplate" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

@@ -17131,6 +17131,7 @@ import { computePipeInsulationTakeoff as _v857pit } from "../../calc-plumbing.js
 import { computeHeatTraceSizing as _v858hts } from "../../calc-plumbing.js";
 import { computeDuctWrapTakeoff as _v859dwt } from "../../calc-construction.js";
 import { computeDuctHangerLoad as _v860dhl } from "../../calc-construction.js";
+import { computeRefrigerantLinesetChargeAdjust as _v861rlc } from "../../calc-refrigerant.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17843,6 +17844,22 @@ test("bounds: spec-v860 computeDuctHangerLoad pins the per-hanger load, count, u
   assert.ok("error" in _v860dhl({ duct_lb_per_ft: 5.5, spacing_ft: 0, run_ft: 40 }));
   assert.ok("error" in _v860dhl({ duct_lb_per_ft: 5.5, spacing_ft: 8, run_ft: 0 }));
   assert.ok("error" in _v860dhl({ duct_lb_per_ft: 5.5, spacing_ft: 8, run_ft: 40, hanger_swl_lb: -1 }));
+});
+
+test("bounds: spec-v861 computeRefrigerantLinesetChargeAdjust pins the ounce/pound adder (incl clamp) and error seams", () => {
+  // 60 ft, 15 ft factory, 0.6 oz/ft -> 27 oz, 1.6875 lb.
+  const r = _v861rlc({ lineset_length_ft: 60, factory_charge_length_ft: 15, rate_oz_per_ft: 0.6 });
+  assert.ok(Math.abs(r.extra_oz - 27) < 1e-9);
+  assert.ok(Math.abs(r.extra_lb - 1.6875) < 1e-9);
+  // A run at or under the factory length clamps to zero.
+  assert.strictEqual(_v861rlc({ lineset_length_ft: 15, factory_charge_length_ft: 15, rate_oz_per_ft: 0.6 }).extra_oz, 0);
+  assert.strictEqual(_v861rlc({ lineset_length_ft: 10, factory_charge_length_ft: 15, rate_oz_per_ft: 0.6 }).extra_oz, 0);
+  // A 100 ft run adds linearly past the factory length.
+  assert.ok(Math.abs(_v861rlc({ lineset_length_ft: 100, factory_charge_length_ft: 15, rate_oz_per_ft: 0.6 }).extra_oz - 51) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v861rlc({ lineset_length_ft: 0, factory_charge_length_ft: 15, rate_oz_per_ft: 0.6 }));
+  assert.ok("error" in _v861rlc({ lineset_length_ft: 60, factory_charge_length_ft: 15, rate_oz_per_ft: 0 }));
+  assert.ok("error" in _v861rlc({ lineset_length_ft: 60, factory_charge_length_ft: -1, rate_oz_per_ft: 0.6 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

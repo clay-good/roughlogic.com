@@ -323,7 +323,7 @@ const TOOL_MODULES = (() => {
   // annotations, and behavior unchanged.
   declare("./calc-refrigerant.js", "REFRIGERANT_RENDERERS", [
     // v2
-    "refrigerant-pt", "superheat-subcool", "compare-refrigerants", "refrigerant-charge",
+    "refrigerant-pt", "superheat-subcool", "compare-refrigerants", "refrigerant-charge", "refrigerant-lineset-charge-adjust",
     // v7
     "refrigerant-charging",
     // spec-v320..v322 refrigeration-cycle batch

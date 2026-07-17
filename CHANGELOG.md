@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(refrigerant): refrigerant-lineset-charge-adjust -- line-set length charge adder (spec-v861); 2026-07-17
+
+- New Group C tile `refrigerant-lineset-charge-adjust` (calc-refrigerant.js), the HVAC service adder beside
+  `refrigerant-charge` (total weigh-in). The extra refrigerant a longer-than-factory line set needs: extra = max(0,
+  actual - factory) x rate (oz/ft). A 60 ft line set on a unit pre-charged for 15 ft, at 0.6 oz/ft, needs 27 oz (1.69
+  lb) added; a run at or under the factory length adds nothing, and a 100 ft run adds 51 oz -- linear past the factory
+  length, zero below it. The rate and factory length come from the nameplate; getting it wrong is a low-capacity
+  callback. Home count 1,309 -> 1,310. This tile crossed the calc-refrigerant.js gzip cap, raised 18000 -> 20000
+  (ledger in check-module-sizes.mjs).
+
 ### feat(construction): duct-hanger-load -- duct hanger load and count (spec-v860); 2026-07-17
 
 - New Group E tile `duct-hanger-load` (calc-construction.js), completing the HVAC sheet-metal trio (`duct-metal-weight`

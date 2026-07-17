@@ -196,7 +196,7 @@ const _TILES = [
   ["static-pressure-hvac", "C"], ["refrigerant-pt", "C"], ["superheat-subcool", "C"],
   ["seer-eer", "C"], ["balance-point", "C"], ["shr", "C"],
   ["cfm-per-ton", "C"], ["combustion-air", "C"], ["combustion-air-max-input", "C"], ["compare-refrigerants", "C"],
-  ["refrigerant-charge", "C"], ["approach-delta-t", "C"], ["outdoor-air-mix", "C"],
+  ["refrigerant-charge", "C"], ["refrigerant-lineset-charge-adjust", "C"], ["approach-delta-t", "C"], ["outdoor-air-mix", "C"],
   ["equivalent-length", "C"], ["wet-bulb-psychrometer", "C"], ["insulation-thickness", "C"],
   ["evaporative-cooling", "C"], ["evaporative-cooler-effectiveness", "C"], ["affinity-laws", "C"], ["belt-pulley", "C"],
   ["air-receiver", "C"], ["geothermal-loop", "C"], ["baseboard-output", "C"], ["baseboard-length-for-load", "C"],

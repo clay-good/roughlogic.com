@@ -50947,6 +50947,78 @@
    }
   },
   {
+   "tile_id": "refrigerant-lineset-charge-adjust",
+   "source_publisher": "Line-set charge-adder identity (first-principles)",
+   "source_title": "60 ft line set, 15 ft factory, 0.6 oz/ft",
+   "source_edition_or_year": "spec-v861 worked example",
+   "source_section_or_page": "extra = max(0, 60-15)*0.6 = 27 oz (1.69 lb)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "lineset_length_ft": 60,
+    "factory_charge_length_ft": 15,
+    "rate_oz_per_ft": 0.6
+   },
+   "outputs": {
+    "extra_oz": {
+     "value": 27,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "extra_lb": {
+     "value": 1.6875,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "refrigerant-lineset-charge-adjust",
+   "source_publisher": "Line-set charge-adder identity (first-principles)",
+   "source_title": "cross-check: a short run at the factory length adds nothing",
+   "source_edition_or_year": "spec-v861 worked example",
+   "source_section_or_page": "extra = max(0, 15-15)*0.6 = 0 oz (clamped to zero below the factory length)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "lineset_length_ft": 15,
+    "factory_charge_length_ft": 15,
+    "rate_oz_per_ft": 0.6
+   },
+   "outputs": {
+    "extra_oz": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "refrigerant-lineset-charge-adjust",
+   "source_publisher": "Line-set charge-adder identity (first-principles)",
+   "source_title": "cross-check: a 100 ft run adds linearly past the factory length",
+   "source_edition_or_year": "spec-v861 worked example",
+   "source_section_or_page": "extra = max(0, 100-15)*0.6 = 85*0.6 = 51 oz",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "lineset_length_ft": 100,
+    "factory_charge_length_ft": 15,
+    "rate_oz_per_ft": 0.6
+   },
+   "outputs": {
+    "extra_oz": {
+     "value": 51,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

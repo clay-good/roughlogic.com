@@ -1054,3 +1054,45 @@ function _v792renderCompressorDisplacement(inputRegion, outputRegion, citationEl
   for (const f of [bore, stroke, cyl, rpm]) f.input.addEventListener("input", update);
 }
 REFRIGERANT_RENDERERS["compressor-displacement"] = _v792renderCompressorDisplacement;
+
+// ===================== spec-v861: line-set length refrigerant charge adder =====================
+// dims: in { lineset_length_ft: L, factory_charge_length_ft: L, rate_oz_per_ft: M L^-1 } out: { extra_oz: M, extra_lb: M }
+export function computeRefrigerantLinesetChargeAdjust({ lineset_length_ft = 60, factory_charge_length_ft = 15, rate_oz_per_ft = 0.6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(lineset_length_ft > 0)) return { error: "Line-set length must be positive (ft)." };
+  if (!(rate_oz_per_ft > 0)) return { error: "Charge rate must be positive (oz/ft)." };
+  if (factory_charge_length_ft < 0) return { error: "Factory length cannot be negative (ft)." };
+  const extra_oz = Math.max(0, lineset_length_ft - factory_charge_length_ft) * rate_oz_per_ft;
+  const extra_lb = extra_oz / 16;
+  if (![extra_oz, extra_lb].every(Number.isFinite)) return { error: "Charge-adder math is not a finite value." };
+  return {
+    extra_oz,
+    extra_lb,
+    note: "The per-foot rate and the factory pre-charge length come from the equipment nameplate - they vary by refrigerant and liquid-line size (R-410A on a 3/8 in liquid line runs about 0.6 oz/ft). Only the liquid line adds meaningful charge. Over- or under-charging cuts capacity and drives callbacks; the total is weighed in, not guessed.",
+  };
+}
+
+export const refrigerantLinesetChargeAdjustExample = { inputs: { lineset_length_ft: 60, factory_charge_length_ft: 15, rate_oz_per_ft: 0.6 } };
+
+function _v861renderRefrigerantLinesetChargeAdjust(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: charge-adder identity by name. extra = max(0, actual line-set length - factory pre-charge length) x rate (oz/ft). The rate and factory length come from the nameplate; only the liquid line adds meaningful charge, and the total is weighed in.";
+  const ll = makeNumber("Actual line-set length (ft)", "rlc-ll", { step: "any", min: "0", value: "60" });
+  ll.input.value = "60";
+  const fl = makeNumber("Factory pre-charge length (ft)", "rlc-fl", { step: "any", min: "0", value: "15" });
+  fl.input.value = "15";
+  const rt = makeNumber("Charge rate (oz/ft)", "rlc-rt", { step: "any", min: "0", value: "0.6" });
+  rt.input.value = "0.6";
+  for (const f of [ll, fl, rt]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ll.input.value = "60"; fl.input.value = "15"; rt.input.value = "0.6"; update(); });
+  const oOz = makeOutputLine(outputRegion, "Refrigerant to add", "rlc-out-oz");
+  const update = debounce(() => {
+    const r = computeRefrigerantLinesetChargeAdjust({
+      lineset_length_ft: ll.input.value === "" ? 60 : Number(ll.input.value), factory_charge_length_ft: fl.input.value === "" ? 0 : Number(fl.input.value),
+      rate_oz_per_ft: rt.input.value === "" ? 0.6 : Number(rt.input.value),
+    });
+    if (r.error) { oOz.textContent = r.error; return; }
+    oOz.textContent = fmt(r.extra_oz, 1) + " oz (" + fmt(r.extra_lb, 2) + " lb)";
+  }, DEBOUNCE_MS);
+  for (const f of [ll, fl, rt]) f.input.addEventListener("input", update);
+}
+REFRIGERANT_RENDERERS["refrigerant-lineset-charge-adjust"] = _v861renderRefrigerantLinesetChargeAdjust;

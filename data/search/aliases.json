@@ -17577,6 +17577,31 @@
       "kind": "industry"
     },
     {
+      "term": "line set charge adder",
+      "target": "refrigerant-lineset-charge-adjust",
+      "kind": "industry"
+    },
+    {
+      "term": "refrigerant line length charge",
+      "target": "refrigerant-lineset-charge-adjust",
+      "kind": "industry"
+    },
+    {
+      "term": "lineset charge adjustment",
+      "target": "refrigerant-lineset-charge-adjust",
+      "kind": "industry"
+    },
+    {
+      "term": "extra refrigerant per foot",
+      "target": "refrigerant-lineset-charge-adjust",
+      "kind": "industry"
+    },
+    {
+      "term": "long line set charge",
+      "target": "refrigerant-lineset-charge-adjust",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"
