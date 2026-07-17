@@ -17129,6 +17129,7 @@ import { computeLvCablePullFootage as _v855lvf } from "../../calc-lowvoltage.js"
 import { computeSolderJointQuantity as _v856sjq } from "../../calc-plumbing.js";
 import { computePipeInsulationTakeoff as _v857pit } from "../../calc-plumbing.js";
 import { computeHeatTraceSizing as _v858hts } from "../../calc-plumbing.js";
+import { computeDuctWrapTakeoff as _v859dwt } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17804,6 +17805,24 @@ test("bounds: spec-v858 computeHeatTraceSizing pins the cable length, watts, amp
   assert.ok("error" in _v858hts({ pipe_ft: 150, rated_w_per_ft: 5, voltage: 120, breaker_a: 0 }));
   assert.ok("error" in _v858hts({ pipe_ft: 150, allowance_pct: -1, rated_w_per_ft: 5, voltage: 120, breaker_a: 20 }));
   assert.ok("error" in _v858hts({ pipe_ft: 150, num_valves: -1, rated_w_per_ft: 5, voltage: 120, breaker_a: 20 }));
+});
+
+test("bounds: spec-v859 computeDuctWrapTakeoff pins the perimeter, wrap area, roll count, and error seams", () => {
+  // 20 x 12 in, 40 ft, 1.15 factor, 100 sf rolls -> 5.33 ft, 245 sf, 3 rolls.
+  const r = _v859dwt({ width_in: 20, height_in: 12, length_ft: 40, overlap_waste_factor: 1.15, roll_coverage_sf: 100 });
+  assert.ok(Math.abs(r.perimeter_ft - 5.333) < 5e-3);
+  assert.ok(Math.abs(r.wrap_sf - 245.33) < 0.5);
+  assert.strictEqual(r.rolls, 3);
+  // A larger duct raises the wrap (perimeter drives it).
+  const big = _v859dwt({ width_in: 30, height_in: 20, length_ft: 40, overlap_waste_factor: 1.15, roll_coverage_sf: 100 });
+  assert.ok(Math.abs(big.wrap_sf - 383.33) < 0.5);
+  assert.strictEqual(big.rolls, 4);
+  // Error seams.
+  assert.ok("error" in _v859dwt({ width_in: 0, height_in: 12, length_ft: 40, overlap_waste_factor: 1.15, roll_coverage_sf: 100 }));
+  assert.ok("error" in _v859dwt({ width_in: 20, height_in: 0, length_ft: 40, overlap_waste_factor: 1.15, roll_coverage_sf: 100 }));
+  assert.ok("error" in _v859dwt({ width_in: 20, height_in: 12, length_ft: 0, overlap_waste_factor: 1.15, roll_coverage_sf: 100 }));
+  assert.ok("error" in _v859dwt({ width_in: 20, height_in: 12, length_ft: 40, overlap_waste_factor: 0, roll_coverage_sf: 100 }));
+  assert.ok("error" in _v859dwt({ width_in: 20, height_in: 12, length_ft: 40, overlap_waste_factor: 1.15, roll_coverage_sf: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

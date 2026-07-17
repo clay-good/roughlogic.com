@@ -8365,6 +8365,17 @@ export const CITATIONS = {
       { name: "Continuous limit", value: "load must stay under 80% of the breaker (NEC continuous load); a cold start draws 2-3x", source: "NEC / manufacturer" },
     ],
   },
+  "duct-wrap-takeoff": {
+    formula: "perimeter_ft = 2 x (width_in + height_in) / 12; wrap_sf = perimeter_ft x length_ft x overlap_waste_factor; rolls = ceil(wrap_sf / roll_coverage_sf).",
+    edition: "Duct-wrap takeoff identity by name (developed area x overlap/waste factor; rolls from wrap / coverage); first-principles takeoff arithmetic.",
+    freeAccess: "The developed-area geometry is public first-principles; the product's installed coverage comes from the manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "The overlap/waste factor (about 1.15) covers the stapled and taped 2 in overlap and compression at the corners. The roll coverage is the product's installed coverage (less than its nominal square feet). This is external wrap - internal liner is taken off on the interior perimeter.",
+    assumptions: [
+      { name: "Overlap/waste factor", value: "~1.15 for the taped 2 in overlap and corner compression", source: "insulation practice" },
+      { name: "Roll coverage", value: "the product's installed coverage per roll (less than nominal), from the manufacturer", source: "wrap manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

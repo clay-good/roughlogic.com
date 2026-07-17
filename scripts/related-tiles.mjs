@@ -1027,6 +1027,7 @@ const RELATED = {
   "shingle-nails": ["roofing-squares", "ridge-cap-fasteners", "metal-roof-panels"],
   "duct-metal-weight": ["metal-weight", "bend-allowance", "duct-sizing"],
   "duct-bank-concrete": ["post-hole-concrete", "annular-grout-volume", "concrete"],
+  "duct-wrap-takeoff": ["duct-metal-weight", "insulation-batt-coverage", "duct-sizing"],
   "asphalt-spread-rate": ["asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity"],
   "pavement-milling-production": ["asphalt-paving-speed", "asphalt-spread-rate", "haul-cycle-production"],
   "striping-paint-quantity": ["paint-coverage", "asphalt-tonnage", "coating-coverage-dft"],

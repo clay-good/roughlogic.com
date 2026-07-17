@@ -8259,3 +8259,51 @@ const _v853renderDuctBankConcrete = _simpleRenderer({
   compute: computeDuctBankConcrete,
 });
 CONSTRUCTION_RENDERERS["duct-bank-concrete"] = _v853renderDuctBankConcrete;
+
+// --- duct-wrap-takeoff: Duct Wrap / Liner Material Takeoff ---
+//
+// The external duct-wrap insulation area and rolls, where the overlap and corner
+// compression add to the bare surface:
+//   perimeter_ft = 2 x (width_in + height_in) / 12
+//   wrap_sf = perimeter_ft x length_ft x overlap_waste_factor
+//   rolls = ceil(wrap_sf / roll_coverage_sf)
+// dims: in { width_in: L, height_in: L, length_ft: L, overlap_waste_factor: dimensionless, roll_coverage_sf: L^2 } out: { perimeter_ft: L, wrap_sf: L^2, rolls: dimensionless }
+export function computeDuctWrapTakeoff({ width_in = 20, height_in = 12, length_ft = 40, overlap_waste_factor = 1.15, roll_coverage_sf = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(width_in > 0)) return { error: "Duct width must be positive (in)." };
+  if (!(height_in > 0)) return { error: "Duct height must be positive (in)." };
+  if (!(length_ft > 0)) return { error: "Run length must be positive (ft)." };
+  if (!(overlap_waste_factor > 0)) return { error: "Overlap/waste factor must be positive." };
+  if (!(roll_coverage_sf > 0)) return { error: "Roll coverage must be positive (ft^2)." };
+  const perimeter_ft = (2 * (width_in + height_in)) / 12;
+  const wrap_sf = perimeter_ft * length_ft * overlap_waste_factor;
+  const rolls = Math.ceil(wrap_sf / roll_coverage_sf);
+  if (![perimeter_ft, wrap_sf, rolls].every(Number.isFinite)) return { error: "Duct-wrap math is not a finite value." };
+  return {
+    perimeter_ft,
+    wrap_sf,
+    rolls,
+    note: "The overlap/waste factor (about 1.15) covers the stapled and taped 2 in overlap and compression at the corners. The roll coverage is the product's installed coverage (less than its nominal square feet). This is external wrap - internal liner is taken off on the interior perimeter.",
+  };
+}
+
+export const ductWrapTakeoffExample = { inputs: { width_in: 20, height_in: 12, length_ft: 40, overlap_waste_factor: 1.15, roll_coverage_sf: 100 } };
+
+const _v859renderDuctWrapTakeoff = _simpleRenderer({
+  citation: "Citation: wrap-takeoff identity by name. perimeter = 2 x (width + height); wrap = perimeter x length x overlap/waste factor; rolls = ceil(wrap / roll coverage). The factor (~1.15) covers the taped overlap and corner compression; the roll coverage is the installed coverage.",
+  example: ductWrapTakeoffExample.inputs,
+  fields: [
+    { key: "width_in", label: "Duct width (in)", kind: "number", default: 20 },
+    { key: "height_in", label: "Duct height (in)", kind: "number", default: 12 },
+    { key: "length_ft", label: "Run length (ft)", kind: "number", default: 40 },
+    { key: "overlap_waste_factor", label: "Overlap + waste multiplier", kind: "number", default: 1.15 },
+    { key: "roll_coverage_sf", label: "Installed coverage per roll (ft^2)", kind: "number", default: 100 },
+  ],
+  outputs: [
+    { key: "r", id: "dwt-out-r", label: "Wrap rolls to order", value: (r) => _fmtC(r.rolls, 0) + " rolls" },
+    { key: "a", id: "dwt-out-a", label: "Wrap area", value: (r) => _fmtC(r.wrap_sf, 0) + " sf (" + _fmtC(r.perimeter_ft, 2) + " ft girth)" },
+    { key: "note", id: "dwt-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDuctWrapTakeoff,
+});
+CONSTRUCTION_RENDERERS["duct-wrap-takeoff"] = _v859renderDuctWrapTakeoff;

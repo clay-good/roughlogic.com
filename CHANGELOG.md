@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): duct-wrap-takeoff -- duct wrap / liner material takeoff (spec-v859); 2026-07-17
+
+- New Group E tile `duct-wrap-takeoff` (calc-construction.js), the HVAC sheet-metal insulation takeoff beside
+  `duct-metal-weight` (metal). External duct-wrap area and rolls, where the overlap and corner compression add to the
+  bare surface: perimeter = 2 x (width + height); wrap = perimeter x length x overlap/waste factor; rolls = ceil(wrap /
+  roll coverage). A 20 x 12 in duct, 40 ft long, needs 245 sf of wrap (3 rolls of 100 sf); a larger 30 x 20 in duct
+  needs 383 sf (4 rolls) -- the perimeter, not the length, drives the wrap. The factor (~1.15) covers the taped overlap;
+  internal liner is taken off on the interior perimeter. Home count 1,307 -> 1,308.
+
 ### feat(plumbing): heat-trace-sizing -- freeze-protection heat-trace cable and circuit (spec-v858); 2026-07-17
 
 - New Group B tile `heat-trace-sizing` (calc-plumbing.js), fed by `insulation-heat-loss` (the W/ft) and paired with

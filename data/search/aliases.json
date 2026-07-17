@@ -17527,6 +17527,31 @@
       "kind": "industry"
     },
     {
+      "term": "duct wrap takeoff",
+      "target": "duct-wrap-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "duct insulation rolls",
+      "target": "duct-wrap-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "duct wrap coverage",
+      "target": "duct-wrap-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "duct liner takeoff",
+      "target": "duct-wrap-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "ductwork insulation",
+      "target": "duct-wrap-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"
