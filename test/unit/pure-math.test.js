@@ -160,10 +160,11 @@ test("Single-phase power: 120 V, 10 A, pf 1 -> 1200 W", () => {
 
 test("Hazen-Williams: 1-inch PVC (C=150), 100 ft, 10 gpm produces small head loss", () => {
   // For Schedule 40 PVC nominal 1 in, ID approx 1.049 in.
-  // h_f = 4.52 * 10^1.852 / (150^1.852 * 1.049^4.87) * 100 -> ~2.4 ft -> ~1 psi.
+  // h_f = 10.44 * 10^1.852 / (150^1.852 * 1.049^4.87) * 100 -> ~5.5 ft -> ~2.4 psi
+  // (Darcy-Weisbach cross-check at Re~30k, f~0.023 gives ~5.7 ft; the 10.44 coefficient returns feet of head).
   const hf = hazenWilliamsFrictionLoss({ flow_gpm: 10, internal_diameter_in: 1.049, length_ft: 100, C: 150 });
   const psi = feetOfHeadToPsi(hf);
-  assert.ok(psi > 0.5 && psi < 2.0, "got psi " + psi);
+  assert.ok(psi > 2.0 && psi < 2.8, "got psi " + psi);
 });
 
 test("Hazen-Williams scales linearly with length", () => {

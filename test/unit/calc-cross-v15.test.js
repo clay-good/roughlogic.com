@@ -21,10 +21,10 @@ import {
 // G.1 Pump total dynamic head
 // ---------------------------------------------------------------------------
 
-test("tdh: worked example (100 GPM, 4.026 in, C=150, 10 ft lift, 50 ft head) ~ 60.6 ft", () => {
+test("tdh: worked example (100 GPM, 4.026 in, C=150, 10 ft lift, 50 ft head) ~ 61.4 ft", () => {
   const r = computePumpTdh(pumpTdhExample.inputs);
   assert.strictEqual(r.static_head_ft, 60);
-  assert.ok(Math.abs(r.tdh_ft - 60.604257666) < 1e-3);
+  assert.ok(Math.abs(r.tdh_ft - 61.395674787) < 1e-3);
   assert.ok(r.discharge_friction_ft > r.suction_friction_ft); // longer run, more loss
 });
 

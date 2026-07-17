@@ -166,7 +166,10 @@ export function singlePhasePower({ V, I, pf }) {
 //        out: headLoss_ft: L
 export function hazenWilliamsFrictionLoss({ flow_gpm, internal_diameter_in, length_ft, C }) {
   if (flow_gpm <= 0 || internal_diameter_in <= 0 || length_ft <= 0 || C <= 0) return 0;
-  const headLoss_ft = (4.52 * Math.pow(flow_gpm, 1.852)) /
+  // Hazen-Williams head loss in FEET of head (Q in gpm, d in inches, L in ft).
+  // The coefficient is 10.44; the NFPA-13 4.52 coefficient gives psi, not feet
+  // (feet = psi x 2.307). Every caller uses this as feet of head.
+  const headLoss_ft = (10.44 * Math.pow(flow_gpm, 1.852)) /
     (Math.pow(C, 1.852) * Math.pow(internal_diameter_in, 4.87)) *
     length_ft;
   return headLoss_ft;

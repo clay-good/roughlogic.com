@@ -238,9 +238,9 @@ test("boiler-pipe-sizing: velocity matches GPM / (2.448 * ID^2)", () => {
   assert.ok(close(r.velocity_fps, r.gpm / (2.44778 * r.recommended_id_in * r.recommended_id_in), 1e-6));
 });
 
-test("boiler-pipe-sizing: Hazen-Williams head per 100 ft is ~1.48 ft for the example main", () => {
+test("boiler-pipe-sizing: Hazen-Williams head per 100 ft is ~3.42 ft for the example main", () => {
   const r = computeBoilerPipeSizing(boilerPipeSizingExample.inputs);
-  assert.ok(closePct(r.friction_ft_per_100ft, 1.479, 1));
+  assert.ok(closePct(r.friction_ft_per_100ft, 3.416, 1));
 });
 
 test("boiler-pipe-sizing: pump head scales linearly with run length", () => {

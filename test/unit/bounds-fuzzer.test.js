@@ -7584,7 +7584,7 @@ test("bounds: calc-plumbing computeFrictionLoss pins HW + DW methods and rejecti
   const d = 1.049;
   const expected_v = 10 * 0.4085 / (d * d);
   assert.ok(Math.abs(r.velocity_ft_s - expected_v) < 1e-9);
-  assert.ok(r.headLoss_ft > 1 && r.headLoss_ft < 5);
+  assert.ok(r.headLoss_ft > 5 && r.headLoss_ft < 6); // ~5.49 ft (Hazen-Williams feet-of-head, 10.44 coefficient)
   assert.ok(r.pressureLoss_psi > 0);
   assert.strictEqual(r.velocity_flag, "within typical (≤5 ft/s)");
   // Darcy-Weisbach branch is callable and finite.

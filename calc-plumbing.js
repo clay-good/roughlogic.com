@@ -252,7 +252,7 @@ export function computeFrictionLoss({ method, material, nominal_size, length_ft,
 
 export const frictionLossExample = {
   inputs: { method: "hazen-williams", material: "PVC", nominal_size: "1", length_ft: 100, flow_gpm: 10 },
-  expectedRange: { pressureLoss_psi: { min: 0.5, max: 2.0 } },
+  expectedRange: { pressureLoss_psi: { min: 2.0, max: 2.8 } },
 };
 
 // --- Utility 14: Pipe Volume ---
@@ -642,7 +642,7 @@ export function computeRecircPumpHead({
 
 export const recircPumpHeadExample = {
   inputs: { pipe_length_ft: 100, fittings_count: 8, target_flow_gpm: 4, internal_diameter_in: 0.75, material: "copper" },
-  expectedRange: { head_ft: { min: 0.2, max: 5 } },
+  expectedRange: { head_ft: { min: 0.2, max: 10 } },
 };
 
 // --- Utility 74: Septic Tank Sizing -> relocated to calc-septic.js (spec-v86 split) ---

@@ -60,14 +60,14 @@ test("first-principles: copper ampacity at 75 C / 30 C ambient within tolerance 
 });
 
 // --- Hazen-Williams: representative published worked example ---
-// 1-inch Schedule 40 PVC (ID 1.049 in), C=150, 100 ft, 10 gpm: published
-// worked examples produce ~ 1 psi friction loss for these inputs.
+// 1-inch Schedule 40 PVC (ID 1.049 in), C=150, 100 ft, 10 gpm: the Hazen-Williams
+// and Darcy-Weisbach friction loss for these inputs is ~ 5.5 ft of head ~ 2.4 psi.
 
 test("first-principles: Hazen-Williams matches public worked examples within 25%", () => {
   const hf = hazenWilliamsFrictionLoss({ flow_gpm: 10, internal_diameter_in: 1.049, length_ft: 100, C: 150 });
   const psi = feetOfHeadToPsi(hf);
-  // Public engineering references for these inputs: ~ 1 psi.
-  within(psi, 1.0, 25, "1-inch PVC at 10 gpm, 100 ft");
+  // Hazen-Williams (10.44 ft coefficient) and Darcy-Weisbach both give ~ 2.4 psi for these inputs.
+  within(psi, 2.4, 25, "1-inch PVC at 10 gpm, 100 ft");
 });
 
 // --- Refrigerant P-T: bundled manufacturer values, exact at table points ---

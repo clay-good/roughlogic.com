@@ -4,6 +4,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(hydraulics): Hazen-Williams friction helper returned psi mislabeled as feet (2.31x low) across pump-tdh, friction-loss, recirc-pump-head, boiler-pipe-sizing; 2026-07-17
+
+- The shared `hazenWilliamsFrictionLoss` helper (pure-math.js) returned `4.52 * Q^1.852 / (C^1.852 * d^4.87) * L` and named
+  it `headLoss_ft`, but 4.52 is the NFPA-13 Hazen-Williams coefficient for PSI per foot, not feet of head; the feet
+  coefficient is 10.44 (= 4.52 x 2.307 ft/psi). Every consumer treats the output as feet -- `pump-tdh` (calc-cross) sums
+  it into TDH, `friction-loss` (calc-plumbing) reports it as "ft of head" and derives psi from it, `recirc-pump-head`
+  (calc-plumbing) and `boiler-pipe-sizing` (calc-hvacsystems) use it as feet -- so all four under-reported friction head
+  loss by 2.31x, and the plumbing tiles' derived pressureLoss_psi was also 2.31x low (a non-conservative error that
+  undersizes pumps). For 1 in PVC, 10 gpm, 100 ft the tiles read ~2.4 ft / ~1.0 psi where the true loss is ~5.5 ft /
+  ~2.4 psi (confirmed by an independent Darcy-Weisbach cross-check and the 0.2083-form Hazen-Williams). The bundled
+  fixtures and unit pins (including two physics tests that claimed a "~1 psi public reference") mirrored the buggy value.
+  Fixed the coefficient to 10.44 and updated every affected fixture, bit-pin, and citation. Caught by a first-principles
+  re-derivation of calc-cross.js.
+
 ### fix(agriculture): timber-cruise International 1/4-inch rule scaled by L/16 instead of L/4 (~4x underestimate); 2026-07-17
 
 - `timber-cruise` (calc-agriculture.js) computed the International 1/4-inch board-foot volume as

@@ -2021,7 +2021,7 @@ export const CITATIONS = {
   },
 
   "pump-tdh": {
-    formula: "TDH = (static_discharge_head + static_suction_lift) + suction_friction + discharge_friction + fittings_friction. Friction = Hazen-Williams h_f = 4.52*Q^1.852 / (C^1.852 * d^4.87) * L. Pipe velocity v (ft/s) = 0.4085 * GPM / d^2.",
+    formula: "TDH = (static_discharge_head + static_suction_lift) + suction_friction + discharge_friction + fittings_friction. Friction (feet of head) = Hazen-Williams h_f = 10.44*Q^1.852 / (C^1.852 * d^4.87) * L. Pipe velocity v (ft/s) = 0.4085 * GPM / d^2.",
     edition: "Hazen-Williams (1905, public domain); Crane Technical Paper No. 410 (fittings equivalent length).",
     freeAccess: "Free at flowoffluids.com for Crane TP-410 excerpts.",
     governance: GOVERNANCE.mechanical,
@@ -3392,7 +3392,7 @@ export const CITATIONS = {
     ],
   },
   "friction-loss": {
-    formula: "Hazen-Williams: hL = 4.52 × Q^1.852 / (C^1.852 × D^4.87) per 100 ft (water; English units). Darcy-Weisbach for gas and other fluids.",
+    formula: "Hazen-Williams head loss (feet of head): hL = 10.44 × Q^1.852 / (C^1.852 × D^4.87) per 100 ft (water; English units; the NFPA-13 4.52 coefficient gives psi, feet = psi × 2.307). Darcy-Weisbach for gas and other fluids.",
     edition: "Hazen-Williams (AWWA M11, 5th ed., by name). Darcy-Weisbach: classical fluid mechanics.",
     freeAccess: "AWWA M11 licensed; principles free at engineering OCW. NIST fluid-property tables free at nist.gov.",
     governance: GOVERNANCE.plumbing,

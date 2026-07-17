@@ -748,13 +748,13 @@ import { computeBridgeFormula } from "../../calc-trucking.js";
 import { computeGPA } from "../../calc-agriculture.js";
 
 test("computeFrictionLoss: bit-stable Hazen-Williams pressureLoss_psi at the spec example (1 in PVC, 100 ft, 10 gpm)", () => {
-  // Group B. Hazen-Williams head-loss formula h = 10.67 * L * (Q/C)^1.852 / D^4.87
-  // converted to psi via the 62.4 lb/ft^3 / 144 in^2/ft^2 water-density
-  // chain. Pins both the head-loss arithmetic and the psi conversion
+  // Group B. Hazen-Williams head-loss in feet (coefficient 10.44 for Q in gpm,
+  // d in inches) converted to psi via the 62.4 lb/ft^3 / 144 in^2/ft^2 water-
+  // density chain. Pins both the head-loss arithmetic and the psi conversion
   // primitive; an inadvertent edit to either surfaces here.
   const r = computeFrictionLoss({ method: "hazen-williams", material: "PVC", nominal_size: "1", length_ft: 100, flow_gpm: 10 });
-  assert.equal(bits(r.headLoss_ft), "400301fc1bc038f9", `headLoss_ft=${r.headLoss_ft}`);
-  assert.equal(bits(r.pressureLoss_psi), "3ff0792fd3c8b9e9", `pressureLoss_psi=${r.pressureLoss_psi}`);
+  assert.equal(bits(r.headLoss_ft), "4015f3910720d2ca", `headLoss_ft=${r.headLoss_ft}`);
+  assert.equal(bits(r.pressureLoss_psi), "4003064a7da4faf4", `pressureLoss_psi=${r.pressureLoss_psi}`);
 });
 
 test("computeMileageCost: bit-stable at the spec example (100 mi, 25 mpg, $4.00/gal)", () => {
@@ -1092,8 +1092,8 @@ test("computeRecircPumpHead: bit-stable head_ft + pressure_psi at the spec examp
   // primitive (bit-equal pin already in place). This third Group B pin
   // covers the second consumer of the primitive at bit precision.
   const r = computeRecircPumpHead(recircPumpHeadExample.inputs);
-  assert.equal(bits(r.head_ft), "400786528c8771bb", `head_ft=${r.head_ft}`);
-  assert.equal(bits(r.pressure_psi), "3ff463589becda08", `pressure_psi=${r.pressure_psi}`);
+  assert.equal(bits(r.head_ft), "401b2afba6d2cab5", `head_ft=${r.head_ft}`);
+  assert.equal(bits(r.pressure_psi), "40078ba6e5e9e2e1", `pressure_psi=${r.pressure_psi}`);
 });
 
 test("computeSeerEer: bit-stable SEER + SEER2_estimate at the spec example (EER 12)", () => {

@@ -1734,7 +1734,7 @@
    "source_publisher": "Crane / Hazen-Williams",
    "source_title": "Pump TDH: 100 GPM, 4.026 in ID, C=150, 10 ft lift, 50 ft discharge head, 20/200 ft runs, 30 ft fittings",
    "source_edition_or_year": "Hazen-Williams 1905; Crane TP-410",
-   "source_section_or_page": "TDH = static + suction + discharge + fittings friction; h_f = 4.52 Q^1.852 / (C^1.852 d^4.87) L",
+   "source_section_or_page": "TDH = static + suction + discharge + fittings friction; h_f = 10.44 Q^1.852 / (C^1.852 d^4.87) L (feet of head)",
    "verified_by": "rl",
    "verified_on": "2026-06-01",
    "inputs": {
@@ -1755,7 +1755,7 @@
      }
     },
     "tdh_ft": {
-     "value": 60.6,
+     "value": 61.4,
      "tolerance": {
       "pct": 1
      }
@@ -6267,7 +6267,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Hazen-Williams head loss: hf = 0.2083 * (100/C)^1.852 * Q^1.852 / d^4.8655 (ft per 100 ft)",
    "source_edition_or_year": "n/a; classical Hazen-Williams identity (PVC C=150, SCH40 ID for 1 in = 1.049 in)",
-   "source_section_or_page": "10 gpm through 100 ft of 1 in SCH40 PVC -> ~2.38 ft head / ~1.03 psi at ~3.7 ft/s velocity (within typical)",
+   "source_section_or_page": "10 gpm through 100 ft of 1 in SCH40 PVC -> ~5.49 ft head / ~2.38 psi at ~3.7 ft/s velocity (within typical)",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -6279,13 +6279,13 @@
    },
    "outputs": {
     "headLoss_ft": {
-     "value": 2.38,
+     "value": 5.49,
      "tolerance": {
       "abs": 0.1
      }
     },
     "pressureLoss_psi": {
-     "value": 1.03,
+     "value": 2.38,
      "tolerance": {
       "abs": 0.05
      }
@@ -7104,7 +7104,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Recirculation pump head: friction loss over (pipe length + fittings equivalent length) at target flow",
    "source_edition_or_year": "n/a; ASHRAE Handbook fitting equivalent-length tables over copper pipe (0.75 in ID)",
-   "source_section_or_page": "100 ft of 0.75 in copper / 8 fittings (eq. ~16 ft) / 4 gpm target -> ~2.94 ft head / ~1.27 psi",
+   "source_section_or_page": "100 ft of 0.75 in copper / 8 fittings (eq. ~16 ft) / 4 gpm target -> ~6.79 ft head / ~2.94 psi",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -7116,13 +7116,13 @@
    },
    "outputs": {
     "head_ft": {
-     "value": 2.94,
+     "value": 6.79,
      "tolerance": {
       "abs": 0.1
      }
     },
     "pressure_psi": {
-     "value": 1.27,
+     "value": 2.94,
      "tolerance": {
       "abs": 0.05
      }
@@ -14610,7 +14610,7 @@
    "source_publisher": "ASHRAE / Bell & Gossett",
    "source_title": "Hydronic main: 200,000 BTU/hr boiler, 20 F delta-T, copper Type L at a 4 ft/s ceiling",
    "source_edition_or_year": "ASHRAE Systems and Equipment 2020 Ch. 13; Hazen-Williams (1905)",
-   "source_section_or_page": "GPM = 200000/(500*20) = 20; v(1.265 in) = 5.11 > 4 -> step to 1-1/2 in (ID 1.505), v = 3.61 ft/s; H-W head = 1.48 ft/100 ft",
+   "source_section_or_page": "GPM = 200000/(500*20) = 20; v(1.265 in) = 5.11 > 4 -> step to 1-1/2 in (ID 1.505), v = 3.61 ft/s; H-W head = 3.42 ft/100 ft (feet of head)",
    "verified_by": "rl",
    "verified_on": "2026-06-04",
    "inputs": {
@@ -14634,13 +14634,13 @@
      }
     },
     "friction_ft_per_100ft": {
-     "value": 1.479,
+     "value": 3.416,
      "tolerance": {
       "pct": 1
      }
     },
     "head_ft": {
-     "value": 1.479,
+     "value": 3.416,
      "tolerance": {
       "pct": 1
      }
