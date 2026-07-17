@@ -52665,6 +52665,66 @@
    }
   },
   {
+   "tile_id": "cable-support-jhook",
+   "source_publisher": "J-hook support identity (first-principles / TIA-569)",
+   "source_title": "400 ft run, 4 ft spacing, 50 cables, 0.035 lb/ft -> 100 hooks, 7 lb/hook",
+   "source_edition_or_year": "spec-v890 worked example",
+   "source_section_or_page": "hooks = ceil(400/4) = 100; load = 50*0.035*4 = 7 lb/hook",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "run_ft": 400,
+    "spacing_ft": 4,
+    "num_cables": 50,
+    "cable_lb_per_ft": 0.035,
+    "hook_wll_lb": 0
+   },
+   "outputs": {
+    "hooks": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "load_per_hook_lb": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cable-support-jhook",
+   "source_publisher": "J-hook support identity (first-principles / TIA-569)",
+   "source_title": "cross-check: a heavy 200-cable bundle puts 28 lb on each hook (0.93 of a 30-lb hook)",
+   "source_edition_or_year": "spec-v890 worked example",
+   "source_section_or_page": "load = 200*0.035*4 = 28 lb; utilization = 28/30 = 0.933",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "run_ft": 400,
+    "spacing_ft": 4,
+    "num_cables": 200,
+    "cable_lb_per_ft": 0.035,
+    "hook_wll_lb": 30
+   },
+   "outputs": {
+    "load_per_hook_lb": {
+     "value": 28,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "utilization": {
+     "value": 0.933,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

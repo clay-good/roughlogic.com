@@ -1,6 +1,6 @@
 # roughlogic.com Specification v890 -- J-Hook / Bridle-Ring Count and Bundle Weight (calc-lowvoltage.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED (2026-07-17). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-lowvoltage.js`** (Group A),
 > no new module, group, or dependency. Inherits spec.md through spec-v889.md. Low-voltage install-ops sweep, beside
 > `lv-cable-pull-footage` and `structured-cabling-channel`.

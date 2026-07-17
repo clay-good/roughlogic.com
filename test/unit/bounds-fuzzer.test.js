@@ -26284,3 +26284,23 @@ test("bounds: spec-v889 computeGlassVacuumLift pins the glass weight, cup count,
   assert.ok("error" in _v889({ area_sf: 32, glass_thickness_in: 0.5, safety_factor: 4, cup_wll_lb: 150, glass_density_psf_in: 0 }));
   assert.ok("error" in _v889({ area_sf: Infinity, glass_thickness_in: 0.5, safety_factor: 4, cup_wll_lb: 150, glass_density_psf_in: 13.0 }));
 });
+
+import { computeCableSupportJhook as _v890 } from "../../calc-lowvoltage.js";
+
+test("bounds: spec-v890 computeCableSupportJhook pins the hook count, per-hook load, utilization, and error seams", () => {
+  const r = _v890({ run_ft: 400, spacing_ft: 4, num_cables: 50, cable_lb_per_ft: 0.035, hook_wll_lb: 0 });
+  assert.equal(r.hooks, 100); // ceil(400/4)
+  assert.ok(Math.abs(r.load_per_hook_lb - 7) < 1e-9); // 50 * 0.035 * 4
+  assert.equal(r.utilization, null); // hook WLL 0 -> skipped
+  // A heavy bundle against a rated hook returns a utilization near the limit.
+  const heavy = _v890({ run_ft: 400, spacing_ft: 4, num_cables: 200, cable_lb_per_ft: 0.035, hook_wll_lb: 30 });
+  assert.ok(Math.abs(heavy.load_per_hook_lb - 28) < 1e-9); // 200 * 0.035 * 4
+  assert.ok(Math.abs(heavy.utilization - 0.9333333333333333) < 1e-9); // 28 / 30
+  // Error seams: non-finite, non-positive run / spacing / cables / cable weight, negative hook WLL.
+  assert.ok("error" in _v890({ run_ft: 0, spacing_ft: 4, num_cables: 50, cable_lb_per_ft: 0.035, hook_wll_lb: 0 }));
+  assert.ok("error" in _v890({ run_ft: 400, spacing_ft: 0, num_cables: 50, cable_lb_per_ft: 0.035, hook_wll_lb: 0 }));
+  assert.ok("error" in _v890({ run_ft: 400, spacing_ft: 4, num_cables: 0, cable_lb_per_ft: 0.035, hook_wll_lb: 0 }));
+  assert.ok("error" in _v890({ run_ft: 400, spacing_ft: 4, num_cables: 50, cable_lb_per_ft: 0, hook_wll_lb: 0 }));
+  assert.ok("error" in _v890({ run_ft: 400, spacing_ft: 4, num_cables: 50, cable_lb_per_ft: 0.035, hook_wll_lb: -5 }));
+  assert.ok("error" in _v890({ run_ft: Infinity, spacing_ft: 4, num_cables: 50, cable_lb_per_ft: 0.035, hook_wll_lb: 0 }));
+});

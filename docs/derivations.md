@@ -2323,6 +2323,7 @@ cross-check.
 | calc-layout.js | `computePolygonMiter` | `{ sides = 0, size_mode = "side", size_in = 0 } = {}` | _ | _ | _ |
 | calc-layout.js | `computeSineBar` | `{ solve_for = "angle", bar_length_in = 5, stack_height_in = 0, target_angle_d...` | _ | _ | _ |
 | calc-layout.js | `computeThreadPitch` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, starts = 1 } = {}` | _ | _ | _ |
+| calc-lowvoltage.js | `computeCableSupportJhook` | `{ run_ft = 400, spacing_ft = 4, num_cables = 50, cable_lb_per_ft = 0.035, hoo...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCableTrayFill` | `{ tray_type = "ladder", tray_width_in = 0, cables = [] } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCameraLensFov` | `{ sensor_width_mm = 0, focal_length_mm = 0, distance_ft = 0, h_pixels = 0 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCameraMaxDistanceForPpf` | `{ sensor_width_mm = 0, focal_length_mm = 0, h_pixels = 0, target_ppf = 76 } = {}` | _ | _ | _ |
@@ -2999,7 +3000,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1585.
+Row count: 1586.
 
 <!-- END function-corpus-v14 -->
 
@@ -3080,7 +3081,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (165 tiles)
+### Group A Electrical (166 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3103,6 +3104,7 @@ per spec-v14 §13.1 second paragraph.
 | `burial-depth-300-5` | Underground Burial Cover-Depth Lookup (NEC Table 300.5) | NEC 2023 (NFPA 70); nonmetallic raceway (PVC), general earth -> 18 in cover | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cable-bend-radius` | Cable Bend Radius Minimum | Southwire; Single-conductor THHN: 8x multiple; 0.5 in OD -> 4 in min... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cable-reel-capacity` | Cable Reel Capacity / Length on Reel | Reel-capacity identity (first-princip...; length = 0.9*PI*(900-144)*18/(48*1) = 801 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `cable-support-jhook` | J-Hook / Bridle-Ring Count and Bundle Weight | J-hook support identity (first-princi...; hooks = ceil(400/4) = 100; load = 50*0.035*4 = 7 lb/hook | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cable-tray-fill` | Cable Tray Fill | NEC Article 392.22(A) (by name); six 1.5 in 4/0 cables in a 12 in ladder tray -> 9 in of 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `camera-lens-fov` | Camera Lens FOV and Pixel Density (DORI) | IEC 62676-4 DORI; spec-v456 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `camera-max-distance-for-ppf` | Camera Max Distance for a Pixel Density (DORI) | IEC 62676-4 DORI (solved for the dist...; spec-v741 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4523,6 +4525,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1338. Fixture-covered or reference-cadence: 1338 / 1338.
+Tile count: 1339. Fixture-covered or reference-cadence: 1339 / 1339.
 
 <!-- END tile-index-v14 -->

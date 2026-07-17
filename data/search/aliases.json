@@ -18302,6 +18302,31 @@
       "kind": "industry"
     },
     {
+      "term": "j-hook count",
+      "target": "cable-support-jhook",
+      "kind": "industry"
+    },
+    {
+      "term": "cable j hooks",
+      "target": "cable-support-jhook",
+      "kind": "industry"
+    },
+    {
+      "term": "bridle ring count",
+      "target": "cable-support-jhook",
+      "kind": "industry"
+    },
+    {
+      "term": "cable pathway supports",
+      "target": "cable-support-jhook",
+      "kind": "industry"
+    },
+    {
+      "term": "j-hook bundle weight",
+      "target": "cable-support-jhook",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

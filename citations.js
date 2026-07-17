@@ -8244,6 +8244,17 @@ export const CITATIONS = {
       { name: "Safety factor / cup WLL", value: "~4:1 on the per-cup working load; the lifter manufacturer governs", source: "ANSI/ASME lifter rating" },
     ],
   },
+  "cable-support-jhook": {
+    formula: "hooks = ceil(run_ft / spacing_ft); load_per_hook_lb = num_cables x cable_lb_per_ft x spacing_ft; utilization = hook_wll_lb > 0 ? load_per_hook_lb / hook_wll_lb : null.",
+    edition: "J-hook support identity by name (hook count over the run; bundle load over one span; utilization on the hook WLL); first-principles arithmetic.",
+    freeAccess: "The count and load arithmetic is public first-principles; the support spacing follows TIA-569 and the hook rating comes from the manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "TIA-569 non-continuous support runs about 4 to 5 ft on center. The bundle load is the cables times the weight per foot over one span. The bundle fill is also limited so the lower cables are not crushed (roughly 40 to 50 cables per hook). Distinct from the NEC power-raceway support-spacing.",
+    assumptions: [
+      { name: "Support spacing", value: "~4 to 5 ft on center for TIA-569 non-continuous support", source: "TIA-569" },
+      { name: "Cable weight", value: "~0.035 lb/ft per Cat 6 cable (default); the cable datasheet governs", source: "cable manufacturer" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

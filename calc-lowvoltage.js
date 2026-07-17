@@ -863,3 +863,58 @@ function _v855renderLvCablePullFootage(inputRegion, outputRegion, citationEl) {
   for (const f of [d, ar, sl, bx]) f.input.addEventListener("input", update);
 }
 LOWVOLTAGE_RENDERERS["lv-cable-pull-footage"] = _v855renderLvCablePullFootage;
+
+// ===================== spec-v890: J-hook / bridle-ring count and bundle weight =====================
+// dims: in { run_ft: L, spacing_ft: L, num_cables: dimensionless, cable_lb_per_ft: M T^-2, hook_wll_lb: M L T^-2 } out: { hooks: dimensionless, load_per_hook_lb: M L T^-2, utilization: dimensionless }
+export function computeCableSupportJhook({ run_ft = 400, spacing_ft = 4, num_cables = 50, cable_lb_per_ft = 0.035, hook_wll_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(run_ft > 0)) return { error: "Pathway length must be positive (ft)." };
+  if (!(spacing_ft > 0)) return { error: "Hook spacing must be positive (ft)." };
+  if (!(num_cables > 0)) return { error: "Cable count must be positive." };
+  if (!(cable_lb_per_ft > 0)) return { error: "Cable weight must be positive (lb/ft)." };
+  if (hook_wll_lb < 0) return { error: "Hook working load cannot be negative (lb)." };
+  const hooks = Math.ceil(run_ft / spacing_ft);
+  const load_per_hook_lb = num_cables * cable_lb_per_ft * spacing_ft;
+  const utilization = hook_wll_lb > 0 ? load_per_hook_lb / hook_wll_lb : null;
+  if (![hooks, load_per_hook_lb].every(Number.isFinite)) return { error: "J-hook math is not a finite value." };
+  return {
+    hooks,
+    load_per_hook_lb,
+    utilization,
+    note: "TIA-569 non-continuous support runs about 4 to 5 ft on center. The bundle load is the cables times the weight per foot over one span. The bundle fill is also limited so the lower cables are not crushed (roughly 40 to 50 cables per hook). Distinct from the NEC power-raceway support-spacing.",
+  };
+}
+
+export const cableSupportJhookExample = { inputs: { run_ft: 400, spacing_ft: 4, num_cables: 50, cable_lb_per_ft: 0.035, hook_wll_lb: 0 } };
+
+function _v890renderCableSupportJhook(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: support identity by name. hooks = ceil(run / spacing); load per hook = cables x weight per foot x spacing. TIA-569 non-continuous support runs about 4 to 5 ft on center.";
+  const rn = makeNumber("Pathway length (ft)", "jhk-rn", { step: "any", min: "0", value: "400" });
+  rn.input.value = "400";
+  const sp = makeNumber("Hook spacing (ft)", "jhk-sp", { step: "any", min: "0", value: "4" });
+  sp.input.value = "4";
+  const nc = makeNumber("Cables in the bundle", "jhk-nc", { step: "any", min: "0", value: "50" });
+  nc.input.value = "50";
+  const cw = makeNumber("Weight per cable (lb/ft)", "jhk-cw", { step: "any", min: "0", value: "0.035" });
+  cw.input.value = "0.035";
+  const hw = makeNumber("Hook safe working load (lb, 0 = skip)", "jhk-hw", { step: "any", min: "0", value: "0" });
+  hw.input.value = "0";
+  for (const f of [rn, sp, nc, cw, hw]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { rn.input.value = "400"; sp.input.value = "4"; nc.input.value = "50"; cw.input.value = "0.035"; hw.input.value = "0"; update(); });
+  const oHooks = makeOutputLine(outputRegion, "J-hooks / bridle rings", "jhk-out-hooks");
+  const oLoad = makeOutputLine(outputRegion, "Bundle load per hook", "jhk-out-load");
+  const oUtil = makeOutputLine(outputRegion, "Hook utilization", "jhk-out-util");
+  const update = debounce(() => {
+    const r = computeCableSupportJhook({
+      run_ft: rn.input.value === "" ? 400 : Number(rn.input.value), spacing_ft: sp.input.value === "" ? 4 : Number(sp.input.value),
+      num_cables: nc.input.value === "" ? 50 : Number(nc.input.value), cable_lb_per_ft: cw.input.value === "" ? 0.035 : Number(cw.input.value),
+      hook_wll_lb: hw.input.value === "" ? 0 : Number(hw.input.value),
+    });
+    if (r.error) { oHooks.textContent = r.error; oLoad.textContent = "-"; oUtil.textContent = "-"; return; }
+    oHooks.textContent = fmt(r.hooks, 0) + " hooks";
+    oLoad.textContent = fmt(r.load_per_hook_lb, 1) + " lb/hook";
+    oUtil.textContent = r.utilization === null ? "-- (enter a hook WLL to check)" : (fmt(r.utilization * 100, 0) + "% of the hook WLL" + (r.utilization > 1 ? " (OVER -- split the bundle or upsize)" : ""));
+  }, DEBOUNCE_MS);
+  for (const f of [rn, sp, nc, cw, hw]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["cable-support-jhook"] = _v890renderCableSupportJhook;

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(low-voltage): cable-support-jhook -- j-hook / bridle-ring count and bundle weight (spec-v890); 2026-07-17
+
+- New Group A tile `cable-support-jhook` (calc-lowvoltage.js), the low-voltage pathway takeoff beside
+  `lv-cable-pull-footage` and `structured-cabling-channel`. hooks = ceil(run / spacing); load per hook = cables x weight
+  per foot x spacing. A 400 ft run at 4 ft spacing is 100 hooks, and a 50-cable bundle at 0.035 lb/ft puts 7 lb on each; a
+  heavy 200-cable bundle puts 28 lb on each hook (0.93 of a 30-lb hook -- split or upsize). TIA-569 non-continuous support
+  runs about 4 to 5 ft on center. Home count 1,338 -> 1,339.
+
 ### feat(construction): glass-vacuum-lift -- glass weight and suction-cup lifter count (spec-v889); 2026-07-17
 
 - New Group E tile `glass-vacuum-lift` (calc-construction.js), the glazing rigging check beside `glass-weight` and the
