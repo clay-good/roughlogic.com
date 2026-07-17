@@ -8552,6 +8552,17 @@ export const CITATIONS = {
       { name: "Waste", value: "~15%+ in-place from overspray and rebound; higher than most material takeoffs", source: "SFRM applicator" },
     ],
   },
+  "spray-foam-board-feet": {
+    formula: "board_feet = area_sf x thickness_in; sets = ceil(board_feet x (1 + waste_pct/100) / yield_bd_ft_per_set).",
+    edition: "Spray-foam board-feet identity by name (area x thickness gives board-feet; sets from board-feet over the per-set yield); first-principles arithmetic.",
+    freeAccess: "The board-feet arithmetic is public first-principles; the set yield comes from the product's rating.",
+    governance: GOVERNANCE.general,
+    editionNote: "A board-foot is one square foot one inch thick. The set yield comes from the product (closed-cell about 4,800 board-feet, open-cell far more), and both yield less in the field. Temperature and substrate cut the yield. Distinct from insulation-batt-coverage.",
+    assumptions: [
+      { name: "Set yield", value: "~4,800 board-feet for closed-cell, far more for open-cell; both less in the field", source: "SPF manufacturer" },
+      { name: "Field factors", value: "temperature and substrate cut the yield below the rated value", source: "field conditions" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

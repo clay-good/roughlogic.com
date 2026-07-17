@@ -17952,6 +17952,31 @@
       "kind": "industry"
     },
     {
+      "term": "spray foam board feet",
+      "target": "spray-foam-board-feet",
+      "kind": "industry"
+    },
+    {
+      "term": "spf set count",
+      "target": "spray-foam-board-feet",
+      "kind": "industry"
+    },
+    {
+      "term": "spray foam sets",
+      "target": "spray-foam-board-feet",
+      "kind": "industry"
+    },
+    {
+      "term": "closed cell foam quantity",
+      "target": "spray-foam-board-feet",
+      "kind": "industry"
+    },
+    {
+      "term": "spray foam coverage",
+      "target": "spray-foam-board-feet",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

@@ -51843,6 +51843,58 @@
    }
   },
   {
+   "tile_id": "spray-foam-board-feet",
+   "source_publisher": "Spray-foam board-feet identity (first-principles)",
+   "source_title": "2,000 sf, 3 in closed-cell, 4,800 bd-ft/set, 10% waste",
+   "source_edition_or_year": "spec-v876 worked example",
+   "source_section_or_page": "board-feet = 2000*3 = 6,000; sets = ceil(6000*1.10/4800) = 2",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "area_sf": 2000,
+    "thickness_in": 3,
+    "yield_bd_ft_per_set": 4800,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "board_feet": {
+     "value": 6000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "sets": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spray-foam-board-feet",
+   "source_publisher": "Spray-foam board-feet identity (first-principles)",
+   "source_title": "cross-check: open-cell's higher yield covers the thicker fill in fewer sets",
+   "source_edition_or_year": "spec-v876 worked example",
+   "source_section_or_page": "board-feet = 2000*5.5 = 11,000; sets = ceil(11000*1.10/16000) = 1",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "area_sf": 2000,
+    "thickness_in": 5.5,
+    "yield_bd_ft_per_set": 16000,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "sets": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

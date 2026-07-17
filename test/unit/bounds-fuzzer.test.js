@@ -17146,6 +17146,7 @@ import { computeSealantJointYield as _v872sjy } from "../../calc-construction.js
 import { computeSelfLevelerBags as _v873slb } from "../../calc-construction.js";
 import { computeCarpetTakeoff as _v874cpt } from "../../calc-construction.js";
 import { computeSfrmTakeoff as _v875sfr } from "../../calc-construction.js";
+import { computeSprayFoamBoardFeet as _v876sfb } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -18101,6 +18102,20 @@ test("bounds: spec-v875 computeSfrmTakeoff pins the volume, weight, bag count, a
   assert.ok("error" in _v875sfr({ area_sf: 5000, thickness_in: 1.5, density_pcf: 0, bag_lb: 44, waste_pct: 15 }));
   assert.ok("error" in _v875sfr({ area_sf: 5000, thickness_in: 1.5, density_pcf: 15, bag_lb: 0, waste_pct: 15 }));
   assert.ok("error" in _v875sfr({ area_sf: 5000, thickness_in: 1.5, density_pcf: 15, bag_lb: 44, waste_pct: -1 }));
+});
+
+test("bounds: spec-v876 computeSprayFoamBoardFeet pins the board-feet, set count, and error seams", () => {
+  // 2,000 sf, 3 in, 4,800 bd-ft/set, 10% waste -> 6,000 bd-ft, 2 sets.
+  const r = _v876sfb({ area_sf: 2000, thickness_in: 3, yield_bd_ft_per_set: 4800, waste_pct: 10 });
+  assert.strictEqual(r.board_feet, 6000);
+  assert.strictEqual(r.sets, 2);
+  // Open-cell's higher yield covers the thicker fill in fewer sets.
+  assert.strictEqual(_v876sfb({ area_sf: 2000, thickness_in: 5.5, yield_bd_ft_per_set: 16000, waste_pct: 10 }).sets, 1);
+  // Error seams.
+  assert.ok("error" in _v876sfb({ area_sf: 0, thickness_in: 3, yield_bd_ft_per_set: 4800, waste_pct: 10 }));
+  assert.ok("error" in _v876sfb({ area_sf: 2000, thickness_in: 0, yield_bd_ft_per_set: 4800, waste_pct: 10 }));
+  assert.ok("error" in _v876sfb({ area_sf: 2000, thickness_in: 3, yield_bd_ft_per_set: 0, waste_pct: 10 }));
+  assert.ok("error" in _v876sfb({ area_sf: 2000, thickness_in: 3, yield_bd_ft_per_set: 4800, waste_pct: -1 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

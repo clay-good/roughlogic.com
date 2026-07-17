@@ -8977,3 +8977,46 @@ const _v875renderSfrmTakeoff = _simpleRenderer({
   compute: computeSfrmTakeoff,
 });
 CONSTRUCTION_RENDERERS["sfrm-takeoff"] = _v875renderSfrmTakeoff;
+
+// --- spray-foam-board-feet: Spray Foam Board-Feet and Set Count ---
+//
+// Sizes spray foam in the board-feet and sets it is ordered by (a board-foot is
+// one square foot one inch thick):
+//   board_feet = area_sf x thickness_in
+//   sets = ceil(board_feet x (1 + waste_pct/100) / yield_bd_ft_per_set)
+// dims: in { area_sf: L^2, thickness_in: L, yield_bd_ft_per_set: L^3, waste_pct: dimensionless } out: { board_feet: L^3, sets: dimensionless }
+export function computeSprayFoamBoardFeet({ area_sf = 2000, thickness_in = 3, yield_bd_ft_per_set = 4800, waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
+  if (!(thickness_in > 0)) return { error: "Thickness must be positive (in)." };
+  if (!(yield_bd_ft_per_set > 0)) return { error: "Set yield must be positive (board-feet)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const board_feet = area_sf * thickness_in;
+  const sets = Math.ceil((board_feet * (1 + waste_pct / 100)) / yield_bd_ft_per_set);
+  if (![board_feet, sets].every(Number.isFinite)) return { error: "Board-feet math is not a finite value." };
+  return {
+    board_feet,
+    sets,
+    note: "A board-foot is one square foot one inch thick. The set yield comes from the product (closed-cell about 4,800 board-feet, open-cell far more), and both yield less in the field - temperature and substrate cut the yield. Distinct from insulation-batt-coverage; the product set yield governs.",
+  };
+}
+
+export const sprayFoamBoardFeetExample = { inputs: { area_sf: 2000, thickness_in: 3, yield_bd_ft_per_set: 4800, waste_pct: 10 } };
+
+const _v876renderSprayFoamBoardFeet = _simpleRenderer({
+  citation: "Citation: board-feet identity by name. board-feet = area x thickness; sets = ceil(board-feet x (1 + waste) / set yield). A board-foot is one square foot one inch thick; the set yield comes from the product (closed-cell ~4,800 bd-ft, open-cell far more).",
+  example: sprayFoamBoardFeetExample.inputs,
+  fields: [
+    { key: "area_sf", label: "Area to spray (ft^2)", kind: "number", default: 2000 },
+    { key: "thickness_in", label: "Applied thickness (in)", kind: "number", default: 3 },
+    { key: "yield_bd_ft_per_set", label: "Board-feet per set (~4800 closed-cell)", kind: "number", default: 4800 },
+    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "s", id: "sfb-out-s", label: "Foam sets to order", value: (r) => _fmtC(r.sets, 0) + " sets" },
+    { key: "b", id: "sfb-out-b", label: "Board-feet", value: (r) => _fmtC(r.board_feet, 0) + " bd-ft" },
+    { key: "note", id: "sfb-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSprayFoamBoardFeet,
+});
+CONSTRUCTION_RENDERERS["spray-foam-board-feet"] = _v876renderSprayFoamBoardFeet;

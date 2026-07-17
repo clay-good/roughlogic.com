@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): spray-foam-board-feet -- spray foam board-feet and set count (spec-v876); 2026-07-17
+
+- New Group E tile `spray-foam-board-feet` (calc-construction.js), the insulation takeoff beside
+  `insulation-batt-coverage` and `blown-insulation-coverage`. board-feet = area x thickness; sets = ceil(bd-ft x (1 +
+  waste) / set yield). 2,000 sf at 3 in of closed-cell is 6,000 board-feet, which on a 4,800 bd-ft set (with waste) is 2
+  sets; open-cell at a thicker 5.5 in still fits in 1 set because it yields far more per set. A board-foot is one square
+  foot one inch thick; temperature and substrate cut the field yield. Home count 1,324 -> 1,325.
+
 ### feat(construction): sfrm-takeoff -- spray fireproofing (SFRM) material takeoff (spec-v875); 2026-07-17
 
 - New Group E tile `sfrm-takeoff` (calc-construction.js), the fireproofing takeoff sharing the rebound-heavy pattern

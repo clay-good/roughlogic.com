@@ -1674,6 +1674,7 @@ cross-check.
 | calc-construction.js | `computeSnowLoad` | `{ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0, Cs = 1.0, drift_upwind_length_ft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeSnowUnbalancedGable` | `{ ground_snow_pg_psf = 0, flat_roof_ps_psf = 0, roof_rise_on_12 = 0, eave_to_...` | _ | _ | _ |
 | calc-construction.js | `computeSpeedsAndFeeds` | `{ tool = "drill", material = "steel", diameter_in = 0, flutes = 1 }` | _ | _ | _ |
+| calc-construction.js | `computeSprayFoamBoardFeet` | `{ area_sf = 2000, thickness_in = 3, yield_bd_ft_per_set = 4800, waste_pct = 1...` | _ | _ | _ |
 | calc-construction.js | `computeStairCodeCheck` | `{ occupancy = "commercial", riser_height_in = 0, tread_depth_in = 0, stair_wi...` | _ | _ | _ |
 | calc-construction.js | `computeStairStringer` | `{ total_rise_in, total_run_in, tread_cut_depth_in = 1 }` | _ | _ | _ |
 | calc-construction.js | `computeStairStringerV7` | `{ total_rise_in = 0, target_rise_in = 7.0, target_tread_in = 11.0, nosing_in ...` | _ | _ | _ |
@@ -2985,7 +2986,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1571.
+Row count: 1572.
 
 <!-- END function-corpus-v14 -->
 
@@ -3541,7 +3542,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (325 tiles)
+### Group E Construction (326 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3797,6 +3798,7 @@ per spec-v14 §13.1 second paragraph.
 | `soil-swell-shrink` | Soil Swell / Shrinkage Volume Conversion | Caterpillar Performance Handbook soil...; 100 bank cy common earth, swell 25%, shrink 15% -> 125 lo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `speeds-feeds` | Shop Speeds and Feeds | Machining Data Handbook / project bun...; drill / steel / 0.5 in / 2 flutes -> SFM 80, chipload 0.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spoil-setback` | Trench Spoil Pile Setback and Surcharge | OSHA 29 CFR 1926.651(j) / Subpart P; 10 ft trench, 4 ft pile at 34 deg, 2 ft minimum -> 5.93 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `spray-foam-board-feet` | Spray Foam Board-Feet and Set Count | Spray-foam board-feet identity (first...; board-feet = 2000*3 = 6,000; sets = ceil(6000*1.10/4800) = 2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spt-bearing-capacity` | SPT Allowable Bearing on Sand (Meyerhof) | Meyerhof / Das; spec-v415 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spt-required-n60` | Required SPT N60 for a Target Bearing (Meyerhof) | Meyerhof / Das; 5 ksf target, B 6 ft, D 2 ft -> N60 ~19.86 (design 20) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `square-footage` | Square Footage | Project (first-principles); 10 ft x 12 ft rectangle -> 120 ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4495,6 +4497,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1324. Fixture-covered or reference-cadence: 1324 / 1324.
+Tile count: 1325. Fixture-covered or reference-cadence: 1325 / 1325.
 
 <!-- END tile-index-v14 -->
