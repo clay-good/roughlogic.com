@@ -40072,6 +40072,31 @@
       "kind": "industry"
     },
     {
+      "term": "tack coat quantity",
+      "target": "asphalt-tack-coat-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "prime coat gallons",
+      "target": "asphalt-tack-coat-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "asphalt emulsion coverage",
+      "target": "asphalt-tack-coat-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "tack coat application rate",
+      "target": "asphalt-tack-coat-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "residual to emulsion gallons",
+      "target": "asphalt-tack-coat-quantity",
+      "kind": "industry"
+    },
+    {
       "term": "how much blacktop do i need",
       "target": "asphalt-tonnage",
       "kind": "question"

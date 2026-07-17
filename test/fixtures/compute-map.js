@@ -244,6 +244,7 @@ export const COMPUTE_MAP = {
   "drywall": { module: "../../calc-construction.js", fn: "computeDrywall" },
   "asphalt-tonnage": { module: "../../calc-construction.js", fn: "computeAsphaltTonnage" },
   "asphalt-paving-speed": { module: "../../calc-construction.js", fn: "computeAsphaltPavingSpeed" },
+  "asphalt-tack-coat-quantity": { module: "../../calc-construction.js", fn: "computeAsphaltTackCoatQuantity" },
   "prop-slip": { module: "../../calc-mechanic.js", fn: "computePropSlip" },
   "fuel-range": { module: "../../calc-mechanic.js", fn: "computeFuelRange" },
   "aggregate": { module: "../../calc-construction.js", fn: "computeAggregate" },

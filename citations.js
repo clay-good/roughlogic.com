@@ -4524,6 +4524,17 @@ export const CITATIONS = {
       { name: "Working minutes", value: "50-minute hour (efficiency factor for real-world delays)", source: "paving practice" },
     ],
   },
+  "asphalt-tack-coat-quantity": {
+    formula: "area_sy = area_sf / 9; undiluted_gal_sy = residual_rate_gal_sy / (residue_pct / 100); emulsion_gallons = undiluted_gal_sy x area_sy; residual_gallons = residual_rate_gal_sy x area_sy.",
+    edition: "Coverage identity by name (residual-to-emulsion gross-up); DOT tack/prime-coat application-rate practice.",
+    freeAccess: "The residual-over-residue-fraction coverage identity is public paving practice; state DOT tack-coat specs are free.",
+    governance: GOVERNANCE.general,
+    editionNote: "The DOT specification or the engineer sets the residual application rate (typically 0.02-0.08 gal/sy for tack, higher for prime). The emulsion residue fraction (roughly 0.55-0.65 for common SS / CSS grades) comes from the supplier's data sheet and grosses the order above the residual figure. The sprayed rate governs bond: too much tack bleeds and slips, too little delaminates.",
+    assumptions: [
+      { name: "Residual rate", value: "0.04 gal/sy default tack (the DOT spec or engineer governs; prime is higher)", source: "DOT paving spec" },
+      { name: "Residue fraction", value: "60% default (SS/CSS emulsions run ~55-65%); the supplier data sheet governs", source: "emulsion data sheet" },
+    ],
+  },
   "aggregate": {
     formula: "Volume = L × W × D (cubic yards via /27); tonnage = volume × density. Density per material (3/4" + "″" + " gravel ~ 2700 lb/yd³, sand ~ 2700, river rock ~ 2900).",
     edition: "USGS / NSSGA aggregate density references by name.",

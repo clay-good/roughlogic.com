@@ -613,6 +613,7 @@ import {
   computeArea,
   computeAsphaltTonnage,
   computeAsphaltPavingSpeed,
+  computeAsphaltTackCoatQuantity,
   computeBeamLoading,
   computeBendAllowance,
   computeBoardFootage,
@@ -8688,6 +8689,22 @@ test("bounds: calc-construction computeAsphaltPavingSpeed pins tons/hr, lane-ft/
   assert.ok("error" in computeAsphaltPavingSpeed({ speed_fpm: 20, width_ft: 12, depth_in: 2, density_pcf: 0 }));
   assert.ok("error" in computeAsphaltPavingSpeed({ speed_fpm: 20, width_ft: 12, depth_in: 2, eff_min_per_hr: 0 }));
   assert.ok("error" in computeAsphaltPavingSpeed({ speed_fpm: 20, width_ft: 12, depth_in: 2, hours_per_day: 0 }));
+});
+
+test("bounds: spec-v815 computeAsphaltTackCoatQuantity pins area, undiluted rate, both gallon totals, and error seams", () => {
+  // 10,000 sf, 0.04 gal/sy residual, 60% residue -> 1111.1 sy, 0.0667 gal/sy undiluted, 74.07 emulsion, 44.44 residual
+  const r = computeAsphaltTackCoatQuantity({ area_sf: 10000, residual_rate_gal_sy: 0.04, residue_pct: 60 });
+  assert.ok(Math.abs(r.area_sy - 1111.111) < 1e-2);
+  assert.ok(Math.abs(r.undiluted_gal_sy - 0.0666667) < 1e-5);
+  assert.ok(Math.abs(r.emulsion_gallons - 74.074) < 1e-2);
+  assert.ok(Math.abs(r.residual_gallons - 44.444) < 1e-2);
+  // A lighter 0.03 gal/sy tack drops the emulsion order.
+  assert.ok(Math.abs(computeAsphaltTackCoatQuantity({ area_sf: 10000, residual_rate_gal_sy: 0.03, residue_pct: 60 }).emulsion_gallons - 55.556) < 1e-2);
+  // Error seams.
+  assert.ok("error" in computeAsphaltTackCoatQuantity({ area_sf: 0, residual_rate_gal_sy: 0.04 }));
+  assert.ok("error" in computeAsphaltTackCoatQuantity({ area_sf: 10000, residual_rate_gal_sy: 0 }));
+  assert.ok("error" in computeAsphaltTackCoatQuantity({ area_sf: 10000, residual_rate_gal_sy: 0.04, residue_pct: 0 }));
+  assert.ok("error" in computeAsphaltTackCoatQuantity({ area_sf: 10000, residual_rate_gal_sy: 0.04, residue_pct: 120 }));
 });
 
 test("bounds: calc-construction computeAggregate pins cubic_yards = area*depth_ft/27 and tons = volume*pcf/2000", () => {

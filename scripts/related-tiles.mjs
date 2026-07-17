@@ -779,6 +779,7 @@ const RELATED = {
   "roofing-squares": ["roof-pitch", "square-footage", "snow-load"],
   "asphalt-tonnage": ["aggregate", "material-quantity"],
   "asphalt-paving-speed": ["asphalt-tonnage", "aggregate", "haul-cycle-production"],
+  "asphalt-tack-coat-quantity": ["asphalt-tonnage", "asphalt-paving-speed", "coating-coverage-dft"],
   "aggregate": ["concrete", "asphalt-tonnage", "concrete-mix-design"],
   "mortar-mix": ["masonry-count", "concrete-mix-design"],
   "concrete-mix-design": ["concrete", "aggregate", "mortar-mix"],

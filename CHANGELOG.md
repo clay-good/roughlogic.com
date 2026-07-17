@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): asphalt-tack-coat-quantity -- tack / prime coat emulsion order (spec-v815); 2026-07-16
+
+- New Group E tile `asphalt-tack-coat-quantity` (calc-construction.js), extending the paving family to the tack / prime
+  coat a crew shoots between lifts. The DOT spec sets a residual (asphalt) rate but the truck meters emulsion, so the
+  residue fraction grosses the order up: emulsion gallons = area/9 x residual rate / residue fraction. A 0.04 gal/sy
+  residual over a 10,000 sf lane needs 74 gal of a 60%-residue emulsion, not the 44 the residual figure alone suggests.
+  Home count 1,263 -> 1,264.
+
 ### feat(construction): concrete-pour-rate -- pour rate, rate of rise, and delivery cadence (spec-v814); 2026-07-16
 
 - New Group E tile `concrete-pour-rate` (calc-construction.js), the placement-logistics complement to formwork-pressure,

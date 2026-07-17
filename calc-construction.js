@@ -1918,6 +1918,47 @@ const renderAsphaltPavingSpeed = _simpleRenderer({
   compute: computeAsphaltPavingSpeed,
 });
 
+// --- asphalt-tack-coat-quantity: Asphalt Tack / Prime Coat Quantity (spec-v815) ---
+//
+// The DOT spec sets a RESIDUAL rate (asphalt left after the water breaks) but the
+// truck meters EMULSION; the residue fraction grosses the residual up to the order.
+// dims: in { area_sf: L^2, residual_rate_gal_sy: L, residue_pct: dimensionless } out: { area_sy: L^2, undiluted_gal_sy: L, emulsion_gallons: L^3, residual_gallons: L^3 }
+export function computeAsphaltTackCoatQuantity({ area_sf = 0, residual_rate_gal_sy = 0.04, residue_pct = 60 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
+  if (!(residual_rate_gal_sy > 0)) return { error: "Residual application rate must be positive (gal/sy)." };
+  if (!(residue_pct > 0) || residue_pct > 100) return { error: "Residue must be between 0 and 100 percent." };
+  const area_sy = area_sf / 9;
+  const undiluted_gal_sy = residual_rate_gal_sy / (residue_pct / 100);
+  const emulsion_gallons = undiluted_gal_sy * area_sy;
+  const residual_gallons = residual_rate_gal_sy * area_sy;
+  if (![area_sy, undiluted_gal_sy, emulsion_gallons, residual_gallons].every(Number.isFinite)) return { error: "Coverage math is not a finite value." };
+  return {
+    area_sy,
+    undiluted_gal_sy,
+    emulsion_gallons,
+    residual_gallons,
+    note: "The DOT specification or the engineer sets the residual application rate (typically 0.02-0.08 gal/sy for tack, higher for prime). The emulsion residue fraction (roughly 0.55-0.65 for common SS / CSS grades) comes from the supplier's data sheet - it grosses the order up above the residual figure. The sprayed rate governs bond: too much tack bleeds and slips, too little delaminates.",
+  };
+}
+export const asphaltTackCoatQuantityExample = { inputs: { area_sf: 10000, residual_rate_gal_sy: 0.04, residue_pct: 60 } };
+const _v815renderAsphaltTackCoatQuantity = _simpleRenderer({
+  citation: "Citation: coverage identity by name. emulsion gallons = area / 9 (sy) x residual rate / residue fraction; residual gallons = area / 9 x residual rate. The DOT spec sets the residual rate; the supplier's data sheet sets the residue fraction.",
+  example: asphaltTackCoatQuantityExample.inputs,
+  fields: [
+    { key: "area_sf", label: "Area to shoot (ft^2)", kind: "number" },
+    { key: "residual_rate_gal_sy", label: "Residual application rate (gal/sy)", kind: "number", default: 0.04 },
+    { key: "residue_pct", label: "Emulsion asphalt residue (%)", kind: "number", default: 60 },
+  ],
+  outputs: [
+    { key: "e", id: "atc-out-e", label: "Emulsion to order", value: (r) => _fmtC(r.emulsion_gallons, 1) + " gal (" + _fmtC(r.undiluted_gal_sy, 4) + " gal/sy undiluted)" },
+    { key: "r", id: "atc-out-r", label: "Residual asphalt", value: (r) => _fmtC(r.residual_gallons, 1) + " gal" },
+    { key: "a", id: "atc-out-a", label: "Area", value: (r) => _fmtC(r.area_sy, 1) + " sy" },
+    { key: "n", id: "atc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAsphaltTackCoatQuantity,
+});
+
 const renderAggregate = _simpleRenderer({
   citation: "Citation: Cubic yards from area * depth / 27; tons from volume * pcf / 2000. Densities from public engineering tables.",
   example: aggregateExample.inputs,
@@ -2099,6 +2140,7 @@ export const CONSTRUCTION_RENDERERS = {
   "roofing-squares": renderRoofingSquares,
   "asphalt-tonnage": renderAsphaltTonnage,
   "asphalt-paving-speed": renderAsphaltPavingSpeed,
+  "asphalt-tack-coat-quantity": _v815renderAsphaltTackCoatQuantity,
   "aggregate": renderAggregate,
   "mortar-mix": renderMortarMix,
   "concrete-mix-design": renderConcreteMixDesign,

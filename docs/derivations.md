@@ -1555,6 +1555,7 @@ cross-check.
 | calc-construction.js | `computeAsce7LoadCombinations` | `{ dead_psf = 0, live_psf = 0, snow_psf = 0, wind_psf = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAsceLiveLoadReduction` | `{ unreduced_load_psf = 0, tributary_area_ft2 = 0, member_type = "interior_col...` | _ | _ | _ |
 | calc-construction.js | `computeAsphaltPavingSpeed` | `{ speed_fpm = 0, width_ft = 0, depth_in = 0, density_pcf = 145, eff_min_per_h...` | _ | _ | _ |
+| calc-construction.js | `computeAsphaltTackCoatQuantity` | `{ area_sf = 0, residual_rate_gal_sy = 0.04, residue_pct = 60 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAsphaltTonnage` | `{ area_ft2 = 0, depth_in = 0, density_pcf = 145, paving_width_ft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeBeamLoading` | `{ load_type, load_value, length_ft, E_psi, b_in, d_in }` | _ | _ | _ |
 | calc-construction.js | `computeBeamReactions` | `{ span_ft = 0, w_plf = 0, point_lb = 0, a_ft = 0 } = {}` | _ | _ | _ |
@@ -2924,7 +2925,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1510.
+Row count: 1511.
 
 <!-- END function-corpus-v14 -->
 
@@ -3472,7 +3473,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (272 tiles)
+### Group E Construction (273 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3484,6 +3485,7 @@ per spec-v14 §13.1 second paragraph.
 | `asce-live-load-reduction` | Live Load Reduction (ASCE 7 Ch. 4) | ASCE 7 minimum design loads; spec-v803 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `asce7-load-combinations` | ASCE 7 ASD Load Combinations: Governing Demand and Net Uplift | ASCE 7 §2.4.1 basic ASD combinations; spec-v225 section 2.1 pinned example (roof uplift) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `asphalt-paving-speed` | Asphalt Paver Speed and Production Rate | Paving production identity (first-pri...; tons/hr = 20 * 50 * 12 * (2/12) * 145 / 2000 = 145; lane-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `asphalt-tack-coat-quantity` | Asphalt Tack / Prime Coat Quantity | Coverage identity / DOT tack-coat pra...; area = 10000/9 = 1,111.1 sy; undiluted = 0.04/0.60 = 0.06... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `asphalt-tonnage` | Asphalt Tonnage | Project (first-principles); volume = 5000 * 3/12 = 1250 ft^3; tons = 1250 * 145 / 200... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `at-rest-earth-pressure` | At-Rest Earth Pressure on a Braced Wall (Jaky K0) | Jaky (1944) as compiled in Das / NAVF...; spec-v624 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `atterberg-indices` | Atterberg Plasticity Indices and A-Line Classification | Atterberg limits / USCS A-line; spec-v328 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4373,6 +4375,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1263. Fixture-covered or reference-cadence: 1263 / 1263.
+Tile count: 1264. Fixture-covered or reference-cadence: 1264 / 1264.
 
 <!-- END tile-index-v14 -->
