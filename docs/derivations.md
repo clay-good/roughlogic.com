@@ -1772,6 +1772,7 @@ cross-check.
 | calc-earthwork.js | `computeErosionBlanketCoverage` | `{ area_sf = 0, overlap_pct = 10, roll_width_ft = 8, roll_length_ft = 112.5, s...` | _ | _ | _ |
 | calc-earthwork.js | `computeFinenessModulus` | `{ r4 = 0, r8 = 0, r16 = 0, r30 = 0, r50 = 0, r100 = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeHaulCycleProduction` | `{ truck_cap_lcy, load_min, haul_min = 0, dump_min = 0, return_min = 0, spot_m...` | _ | _ | _ |
+| calc-earthwork.js | `computeHydroseedMix` | `{ area_ac = 0, seed_rate_lb_ac = 5, mulch_rate_lb_ac = 2000, tackifier_rate_l...` | _ | _ | _ |
 | calc-earthwork.js | `computeLoaderProduction` | `{ bucket_cap_lcy, fill_factor = 0.95, cycle_min, eff_min_per_hr = 50, hours_p...` | _ | _ | _ |
 | calc-earthwork.js | `computePipeBeddingBackfill` | `{ trench_width_ft, pipe_od_in, bedding_depth_in = 0, cover_ft = 0, length_ft,...` | _ | _ | _ |
 | calc-earthwork.js | `computeRelativeCompaction` | `{ wet_pcf = 0, w_pct = 0, max_pcf = 0, spec_pct = 95 } = {}` | _ | _ | _ |
@@ -2938,7 +2939,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1524.
+Row count: 1525.
 
 <!-- END function-corpus-v14 -->
 
@@ -3486,7 +3487,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (286 tiles)
+### Group E Construction (287 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3598,6 +3599,7 @@ per spec-v14 §13.1 second paragraph.
 | `hoop-stress-thin-wall` | Thin-Wall Pressure Vessel Hoop and Longitudinal Stress | thin-wall / Barlow; spec-v361 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `horizontal-curve` | Horizontal Curve Layout | AASHTO Green Book / FM 5-233 (by name); R = 1000 ft, delta = 30 deg -> T 267.95, L 523.60, LC 517... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `horizontal-sightline-offset` | Horizontal Sightline Offset on a Curve (AASHTO) | AASHTO Green Book; spec-v337 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `hydroseed-mix` | Hydroseed Slurry Mix and Tank Count | Slurry loading identity (first-princi...; solids = 3*(5+2000+50) = 6,165 lb; tanks = ceil(6165/(300... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ice-barrier-coverage` | Eave Ice-Barrier Membrane Courses and Rolls | IRC R905.1.2 eave ice-barrier extent ...; spec-v215 section 2.1 pinned example (typical 4/12, 12 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `insulation-batt-coverage` | Insulation Batt Coverage and Count | manufacturer label; spec-v439 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `intermittent-fillet-weld` | Intermittent Fillet Weld Schedule (AISC J2 / AWS) | AISC 360 J2.2b / AWS D1.1; spec-v453 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4401,6 +4403,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1277. Fixture-covered or reference-cadence: 1277 / 1277.
+Tile count: 1278. Fixture-covered or reference-cadence: 1278 / 1278.
 
 <!-- END tile-index-v14 -->

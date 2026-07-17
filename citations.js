@@ -8034,6 +8034,17 @@ export const CITATIONS = {
       { name: "Staple rate", value: "1.5 staples/sy default; steeper and higher-flow slopes take more (up to ~3.5/sy)", source: "RECP manufacturer" },
     ],
   },
+  "hydroseed-mix": {
+    formula: "seed_lb = area_ac x seed_rate_lb_ac; mulch_lb = area_ac x mulch_rate_lb_ac; tackifier_lb = area_ac x tackifier_rate_lb_ac; total_solids_lb = seed_lb + mulch_lb + tackifier_lb; tanks = ceil(total_solids_lb / (tank_gal x max_load_lb_per_gal)).",
+    edition: "Slurry loading identity by name (per-acre solids over the machine loading limit); first-principles arithmetic.",
+    freeAccess: "The slurry loading takeoff is public hydroseeding practice; the rates come from the spec or agronomist.",
+    governance: GOVERNANCE.general,
+    editionNote: "The seed, mulch, and tackifier rates come from the spec or agronomist - a bonded fiber matrix on a steep slope runs a much higher mulch rate. The maximum solids loading is an agitation limit of the machine. The seed rate here is a slurry weight, not an agricultural planting density.",
+    assumptions: [
+      { name: "Mulch rate", value: "2,000 lb/acre default (bonded fiber matrix on steep slopes runs 3,000-4,000+); the spec governs", source: "hydroseed spec / agronomist" },
+      { name: "Solids loading", value: "0.4 lb/gal max default; the machine's agitation limit governs", source: "hydroseeder manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

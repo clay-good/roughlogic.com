@@ -17,6 +17,7 @@
 //   - check-dam-spacing       Rock check dam spacing
 //   - sediment-basin-volume   Sediment basin / trap storage volume
 //   - erosion-blanket-coverage  Erosion blanket (RECP) roll and staple takeoff
+//   - hydroseed-mix           Hydroseed slurry mix and tank count
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
@@ -819,6 +820,66 @@ function _v828renderErosionBlanketCoverage(inputRegion, outputRegion, citationEl
   for (const f of [area, overlap, w, l, sr]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["erosion-blanket-coverage"] = _v828renderErosionBlanketCoverage;
+
+// --- hydroseed-mix: Hydroseed Slurry Mix and Tank Count ---
+//
+// Seed + mulch + tackifier solids for an area, and the tank loads to shoot it;
+// the mulch dominates the solids and the machine's loading limit sets the count.
+// dims: in { area_ac: L^2, seed_rate_lb_ac: dimensionless, mulch_rate_lb_ac: dimensionless, tackifier_rate_lb_ac: dimensionless, tank_gal: L^3, max_load_lb_per_gal: dimensionless } out: { seed_lb: M, mulch_lb: M, tackifier_lb: M, total_solids_lb: M, tanks: dimensionless }
+export function computeHydroseedMix({ area_ac = 0, seed_rate_lb_ac = 5, mulch_rate_lb_ac = 2000, tackifier_rate_lb_ac = 50, tank_gal = 3000, max_load_lb_per_gal = 0.4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_ac > 0)) return { error: "Area must be positive (acres)." };
+  if (!(tank_gal > 0)) return { error: "Tank capacity must be positive (gal)." };
+  if (!(max_load_lb_per_gal > 0)) return { error: "Maximum solids loading must be positive (lb/gal)." };
+  for (const [v, n] of [[seed_rate_lb_ac, "Seed"], [mulch_rate_lb_ac, "Mulch"], [tackifier_rate_lb_ac, "Tackifier"]]) {
+    if (!(v >= 0)) return { error: n + " rate must be non-negative (lb/acre)." };
+  }
+  const seed_lb = area_ac * seed_rate_lb_ac;
+  const mulch_lb = area_ac * mulch_rate_lb_ac;
+  const tackifier_lb = area_ac * tackifier_rate_lb_ac;
+  const total_solids_lb = seed_lb + mulch_lb + tackifier_lb;
+  const tanks = Math.ceil(total_solids_lb / (tank_gal * max_load_lb_per_gal));
+  if (![seed_lb, mulch_lb, tackifier_lb, total_solids_lb, tanks].every(Number.isFinite)) return { error: "Hydroseed math is not a finite value." };
+  return {
+    seed_lb,
+    mulch_lb,
+    tackifier_lb,
+    total_solids_lb,
+    tanks,
+    note: "The seed, mulch, and tackifier rates come from the spec or agronomist - a bonded fiber matrix on a steep slope runs a much higher mulch rate. The maximum solids loading is an agitation limit of the machine. The seed rate here is a slurry weight, not an agricultural planting density.",
+  };
+}
+
+function _v829renderHydroseedMix(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: slurry loading identity by name. solids = area x (seed + mulch + tackifier rates); tanks = ceil(solids / (tank gallons x max loading)). The spec / agronomist sets the rates; the loading is the machine's agitation limit.";
+  const ac = makeNumber("Area to hydroseed (acres)", "hsm-ac", { step: "any", min: "0" });
+  const seed = makeNumber("Seed rate (lb/acre)", "hsm-seed", { step: "any", min: "0", value: "5" });
+  seed.input.value = "5";
+  const mulch = makeNumber("Mulch rate (lb/acre)", "hsm-mulch", { step: "any", min: "0", value: "2000" });
+  mulch.input.value = "2000";
+  const tack = makeNumber("Tackifier rate (lb/acre)", "hsm-tack", { step: "any", min: "0", value: "50" });
+  tack.input.value = "50";
+  const tank = makeNumber("Hydroseeder tank capacity (gal)", "hsm-tank", { step: "any", min: "0", value: "3000" });
+  tank.input.value = "3000";
+  const load = makeNumber("Max solids loading (lb/gal)", "hsm-load", { step: "any", min: "0", value: "0.4" });
+  load.input.value = "0.4";
+  for (const f of [ac, seed, mulch, tack, tank, load]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ac.input.value = "3"; seed.input.value = "5"; mulch.input.value = "2000"; tack.input.value = "50"; tank.input.value = "3000"; load.input.value = "0.4"; update(); });
+  const oTanks = makeOutputLine(outputRegion, "Tank loads to shoot", "hsm-out-tanks");
+  const oSolids = makeOutputLine(outputRegion, "Total slurry solids", "hsm-out-solids");
+  const update = debounce(() => {
+    const r = computeHydroseedMix({
+      area_ac: Number(ac.input.value) || 0, seed_rate_lb_ac: seed.input.value === "" ? 5 : Number(seed.input.value),
+      mulch_rate_lb_ac: mulch.input.value === "" ? 2000 : Number(mulch.input.value), tackifier_rate_lb_ac: tack.input.value === "" ? 50 : Number(tack.input.value),
+      tank_gal: tank.input.value === "" ? 3000 : Number(tank.input.value), max_load_lb_per_gal: load.input.value === "" ? 0.4 : Number(load.input.value),
+    });
+    if (r.error) { oTanks.textContent = r.error; oSolids.textContent = "-"; return; }
+    oTanks.textContent = r.tanks + " tank loads";
+    oSolids.textContent = fmt(r.total_solids_lb, 0) + " lb (mulch " + fmt(r.mulch_lb, 0) + " lb, seed " + fmt(r.seed_lb, 0) + " lb, tackifier " + fmt(r.tackifier_lb, 0) + " lb)";
+  }, DEBOUNCE_MS);
+  for (const f of [ac, seed, mulch, tack, tank, load]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["hydroseed-mix"] = _v829renderHydroseedMix;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

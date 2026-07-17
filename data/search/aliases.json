@@ -16777,6 +16777,31 @@
       "kind": "industry"
     },
     {
+      "term": "hydroseed mix",
+      "target": "hydroseed-mix",
+      "kind": "industry"
+    },
+    {
+      "term": "hydroseeder tank count",
+      "target": "hydroseed-mix",
+      "kind": "industry"
+    },
+    {
+      "term": "hydroseed slurry",
+      "target": "hydroseed-mix",
+      "kind": "industry"
+    },
+    {
+      "term": "hydromulch quantity",
+      "target": "hydroseed-mix",
+      "kind": "industry"
+    },
+    {
+      "term": "hydroseed seed mulch",
+      "target": "hydroseed-mix",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

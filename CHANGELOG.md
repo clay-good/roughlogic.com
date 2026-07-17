@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): hydroseed-mix -- hydroseed slurry mix and tank count (spec-v829); 2026-07-16
+
+- New Group E tile `hydroseed-mix` (calc-earthwork.js), the final-stabilization BMP. Seed, mulch, and tackifier solids
+  for an area and the tank loads to shoot it: solids = area x (seed + mulch + tackifier rates), tanks = ceil(solids /
+  (tank gallons x loading limit)). A 3-acre stabilization at 2,000 lb/acre mulch is 6,165 lb of solids, 6 loads in a
+  3,000-gallon tank; a steep-slope bonded-fiber rate (3,000 lb/acre) pushes it to 8 loads. Home count 1,277 -> 1,278.
+
 ### feat(earthwork): erosion-blanket-coverage -- RECP roll and staple takeoff (spec-v828); 2026-07-16
 
 - New Group E tile `erosion-blanket-coverage` (calc-earthwork.js), the cover-BMP takeoff that drops the RUSLE C factor.

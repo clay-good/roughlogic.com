@@ -17099,6 +17099,7 @@ import { computeSiltFenceDrainage as _v825sf } from "../../calc-earthwork.js";
 import { computeCheckDamSpacing as _v826cd } from "../../calc-earthwork.js";
 import { computeSedimentBasinVolume as _v827sb } from "../../calc-earthwork.js";
 import { computeErosionBlanketCoverage as _v828eb } from "../../calc-earthwork.js";
+import { computeHydroseedMix as _v829hs } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17245,6 +17246,23 @@ test("bounds: spec-v828 computeErosionBlanketCoverage pins coverage, rolls, stap
   assert.ok("error" in _v828eb({ area_sf: 18000, roll_width_ft: 8, roll_length_ft: 0, staples_per_sy: 1.5 }));
   assert.ok("error" in _v828eb({ area_sf: 18000, roll_width_ft: 8, roll_length_ft: 112.5, staples_per_sy: 0 }));
   assert.ok("error" in _v828eb({ area_sf: 18000, overlap_pct: -1, roll_width_ft: 8, roll_length_ft: 112.5, staples_per_sy: 1.5 }));
+});
+
+test("bounds: spec-v829 computeHydroseedMix pins the component/total solids, tank count, and error seams", () => {
+  // 3 ac, 5/2000/50 lb/ac, 3000 gal, 0.4 lb/gal -> 6165 lb solids, 6 tanks
+  const r = _v829hs({ area_ac: 3, seed_rate_lb_ac: 5, mulch_rate_lb_ac: 2000, tackifier_rate_lb_ac: 50, tank_gal: 3000, max_load_lb_per_gal: 0.4 });
+  assert.strictEqual(r.seed_lb, 15);
+  assert.strictEqual(r.mulch_lb, 6000);
+  assert.strictEqual(r.tackifier_lb, 150);
+  assert.strictEqual(r.total_solids_lb, 6165);
+  assert.strictEqual(r.tanks, 6);
+  // A steep-slope bonded-fiber rate (3000 lb/ac mulch) pushes to 8 tanks.
+  assert.strictEqual(_v829hs({ area_ac: 3, seed_rate_lb_ac: 5, mulch_rate_lb_ac: 3000, tackifier_rate_lb_ac: 50, tank_gal: 3000, max_load_lb_per_gal: 0.4 }).tanks, 8);
+  // Error seams.
+  assert.ok("error" in _v829hs({ area_ac: 0, tank_gal: 3000, max_load_lb_per_gal: 0.4 }));
+  assert.ok("error" in _v829hs({ area_ac: 3, tank_gal: 0, max_load_lb_per_gal: 0.4 }));
+  assert.ok("error" in _v829hs({ area_ac: 3, tank_gal: 3000, max_load_lb_per_gal: 0 }));
+  assert.ok("error" in _v829hs({ area_ac: 3, mulch_rate_lb_ac: -1, tank_gal: 3000, max_load_lb_per_gal: 0.4 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {
