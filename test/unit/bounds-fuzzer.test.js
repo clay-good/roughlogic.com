@@ -17121,6 +17121,7 @@ import { computeSoilStabilizationQuantity as _v847ssq } from "../../calc-earthwo
 import { computeFlexiblePipeDeflection as _v848fpd } from "../../calc-earthwork.js";
 import { computeCableReelCapacity as _v849crc } from "../../calc-electrical.js";
 import { computeShingleNails as _v850shn } from "../../calc-construction.js";
+import { computeDuctMetalWeight as _v851dmw } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17656,6 +17657,22 @@ test("bounds: spec-v850 computeShingleNails pins the nail count, weight, and err
   assert.ok("error" in _v850shn({ squares: 30, shingles_per_square: 0, nails_per_shingle: 6, nails_per_lb: 140 }));
   assert.ok("error" in _v850shn({ squares: 30, shingles_per_square: 80, nails_per_shingle: 0, nails_per_lb: 140 }));
   assert.ok("error" in _v850shn({ squares: 30, shingles_per_square: 80, nails_per_shingle: 6, nails_per_lb: 0 }));
+});
+
+test("bounds: spec-v851 computeDuctMetalWeight pins the perimeter, area, weight, and error seams", () => {
+  // 24 x 12 in, 100 ft, 24-ga (1.156), 1.15 seam -> 6 ft perimeter, 600 sf, 797.6 lb.
+  const r = _v851dmw({ width_in: 24, height_in: 12, length_ft: 100, lb_per_sf: 1.156, seam_factor: 1.15 });
+  assert.ok(Math.abs(r.perimeter_ft - 6) < 1e-9);
+  assert.ok(Math.abs(r.area_sf - 600) < 1e-9);
+  assert.ok(Math.abs(r.weight_lb - 797.64) < 1e-1);
+  // The same run in heavier 20-gauge weighs more.
+  assert.ok(Math.abs(_v851dmw({ width_in: 24, height_in: 12, length_ft: 100, lb_per_sf: 1.656, seam_factor: 1.15 }).weight_lb - 1142.64) < 1e-1);
+  // Error seams.
+  assert.ok("error" in _v851dmw({ width_in: 0, height_in: 12, length_ft: 100, lb_per_sf: 1.156, seam_factor: 1.15 }));
+  assert.ok("error" in _v851dmw({ width_in: 24, height_in: 0, length_ft: 100, lb_per_sf: 1.156, seam_factor: 1.15 }));
+  assert.ok("error" in _v851dmw({ width_in: 24, height_in: 12, length_ft: 0, lb_per_sf: 1.156, seam_factor: 1.15 }));
+  assert.ok("error" in _v851dmw({ width_in: 24, height_in: 12, length_ft: 100, lb_per_sf: 0, seam_factor: 1.15 }));
+  assert.ok("error" in _v851dmw({ width_in: 24, height_in: 12, length_ft: 100, lb_per_sf: 1.156, seam_factor: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

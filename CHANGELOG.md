@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): duct-metal-weight -- galvanized duct sheet-metal weight takeoff (spec-v851); 2026-07-17
+
+- New Group E tile `duct-metal-weight` (calc-construction.js), opening the HVAC sheet-metal ops vein beside
+  `bend-allowance` and `metal-weight`. Duct sheet-metal weight from the perimeter, run, and gauge: perimeter = 2 x
+  (width + height); weight = perimeter x length x sheet weight x seam factor. A 24 x 12 in run, 100 ft long in 24-gauge
+  galvanized, is about 798 lb once the SMACNA seam-and-reinforcement allowance (~1.15) is counted; a heavier 20-gauge
+  run of the same duct is over 1,140 lb -- the gauge is the lever. The per-gauge sheet weight is user-entered (no
+  copyrighted table); fittings are taken off separately. Home count 1,299 -> 1,300 (catalog crosses 1,300 tiles).
+
 ### feat(construction): shingle-nails -- roofing nail count by wind zone (spec-v850); 2026-07-17
 
 - New Group E tile `shingle-nails` (calc-construction.js), the roofing install-ops tile beside `roofing-squares`

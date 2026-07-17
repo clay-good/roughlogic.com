@@ -8160,3 +8160,51 @@ const _v850renderShingleNails = _simpleRenderer({
   compute: computeShingleNails,
 });
 CONSTRUCTION_RENDERERS["shingle-nails"] = _v850renderShingleNails;
+
+// --- duct-metal-weight: Galvanized Duct Sheet-Metal Weight Takeoff ---
+//
+// Duct sheet-metal weight from the perimeter, run, and gauge - the number that
+// sizes the coil order and the hangers:
+//   perimeter_ft = 2 x (width_in + height_in) / 12
+//   area_sf = perimeter_ft x length_ft
+//   weight_lb = area_sf x lb_per_sf x seam_factor
+// dims: in { width_in: L, height_in: L, length_ft: L, lb_per_sf: M L^-2, seam_factor: dimensionless } out: { perimeter_ft: L, area_sf: L^2, weight_lb: M }
+export function computeDuctMetalWeight({ width_in = 24, height_in = 12, length_ft = 100, lb_per_sf = 1.156, seam_factor = 1.15 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(width_in > 0)) return { error: "Duct width must be positive (in)." };
+  if (!(height_in > 0)) return { error: "Duct height must be positive (in)." };
+  if (!(length_ft > 0)) return { error: "Run length must be positive (ft)." };
+  if (!(lb_per_sf > 0)) return { error: "Sheet weight must be positive (lb/ft^2)." };
+  if (!(seam_factor > 0)) return { error: "Seam factor must be positive." };
+  const perimeter_ft = (2 * (width_in + height_in)) / 12;
+  const area_sf = perimeter_ft * length_ft;
+  const weight_lb = area_sf * lb_per_sf * seam_factor;
+  if (![perimeter_ft, area_sf, weight_lb].every(Number.isFinite)) return { error: "Duct-weight math is not a finite value." };
+  return {
+    perimeter_ft,
+    area_sf,
+    weight_lb,
+    note: "The per-gauge sheet weight is entered from the metal - about 0.906 lb/ft^2 for 26-gauge, 1.156 for 24-gauge, 1.656 for 20-gauge galvanized. The seam factor (about 1.15) covers seams, laps, and reinforcement per SMACNA. Fittings are taken off separately. The spec's gauge schedule drives the coil order.",
+  };
+}
+
+export const ductMetalWeightExample = { inputs: { width_in: 24, height_in: 12, length_ft: 100, lb_per_sf: 1.156, seam_factor: 1.15 } };
+
+const _v851renderDuctMetalWeight = _simpleRenderer({
+  citation: "Citation: duct-weight identity by name. perimeter = 2 x (width + height); weight = perimeter x length x sheet weight x seam factor. The per-gauge sheet weight is entered from the metal; the seam factor (~1.15) covers seams and reinforcement per SMACNA.",
+  example: ductMetalWeightExample.inputs,
+  fields: [
+    { key: "width_in", label: "Duct width (in)", kind: "number", default: 24 },
+    { key: "height_in", label: "Duct height (in)", kind: "number", default: 12 },
+    { key: "length_ft", label: "Run length (ft)", kind: "number", default: 100 },
+    { key: "lb_per_sf", label: "Sheet weight for the gauge (lb/ft^2)", kind: "number", default: 1.156 },
+    { key: "seam_factor", label: "Seam / reinforcement allowance", kind: "number", default: 1.15 },
+  ],
+  outputs: [
+    { key: "w", id: "dmw-out-w", label: "Sheet metal to order", value: (r) => _fmtC(r.weight_lb, 0) + " lb" },
+    { key: "a", id: "dmw-out-a", label: "Developed sheet area", value: (r) => _fmtC(r.area_sf, 0) + " sf (" + _fmtC(r.perimeter_ft, 1) + " ft girth)" },
+    { key: "note", id: "dmw-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDuctMetalWeight,
+});
+CONSTRUCTION_RENDERERS["duct-metal-weight"] = _v851renderDuctMetalWeight;

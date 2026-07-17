@@ -50345,6 +50345,66 @@
    }
   },
   {
+   "tile_id": "duct-metal-weight",
+   "source_publisher": "Duct sheet-metal weight identity (first-principles)",
+   "source_title": "24 x 12 in run, 100 ft, 24-gauge (1.156 lb/ft^2), 1.15 seam",
+   "source_edition_or_year": "spec-v851 worked example",
+   "source_section_or_page": "perimeter = 2*(24+12)/12 = 6 ft; area = 600 sf; weight = 600*1.156*1.15 = 797.6 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "width_in": 24,
+    "height_in": 12,
+    "length_ft": 100,
+    "lb_per_sf": 1.156,
+    "seam_factor": 1.15
+   },
+   "outputs": {
+    "perimeter_ft": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "area_sf": {
+     "value": 600,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "weight_lb": {
+     "value": 797.64,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-metal-weight",
+   "source_publisher": "Duct sheet-metal weight identity (first-principles)",
+   "source_title": "cross-check: the same run in heavier 20-gauge",
+   "source_edition_or_year": "spec-v851 worked example",
+   "source_section_or_page": "weight = 600*1.656*1.15 = 1,142.6 lb (gauge is the lever)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "width_in": 24,
+    "height_in": 12,
+    "length_ft": 100,
+    "lb_per_sf": 1.656,
+    "seam_factor": 1.15
+   },
+   "outputs": {
+    "weight_lb": {
+     "value": 1142.64,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

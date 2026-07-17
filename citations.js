@@ -8277,6 +8277,17 @@ export const CITATIONS = {
       { name: "Shingles per square", value: "~80 for three-tab, ~64 for many architectural shingles; the product governs", source: "shingle manufacturer" },
     ],
   },
+  "duct-metal-weight": {
+    formula: "perimeter_ft = 2 x (width_in + height_in) / 12; area_sf = perimeter_ft x length_ft; weight_lb = area_sf x lb_per_sf x seam_factor.",
+    edition: "Duct sheet-metal weight identity by name (developed area x per-gauge sheet weight x seam allowance); first-principles takeoff arithmetic.",
+    freeAccess: "The developed-area geometry is public first-principles; the per-gauge sheet weight is entered from the metal (no copyrighted table reproduced).",
+    governance: GOVERNANCE.general,
+    editionNote: "The per-gauge sheet weight is entered from the metal - about 0.906 lb/ft^2 for 26-gauge, 1.156 for 24-gauge, 1.656 for 20-gauge galvanized. The seam factor (about 1.15) covers seams, laps, and reinforcement per SMACNA. Fittings are taken off separately.",
+    assumptions: [
+      { name: "Sheet weight", value: "user-entered per-gauge weight (~1.156 lb/ft^2 24-ga, 1.656 20-ga galvanized); the metal governs", source: "sheet-metal supplier" },
+      { name: "Seam factor", value: "~1.15 for seams, laps, and reinforcement per SMACNA duct construction standards", source: "SMACNA" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",
