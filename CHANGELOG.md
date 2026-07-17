@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): haul-road-resistance -- haul-road total resistance and required rimpull (spec-v844); 2026-07-17
+
+- New Group E tile `haul-road-resistance` (calc-earthwork.js), the equipment/site-logistics resistance side beside
+  `haul-cycle-production`. The resistance a loaded hauler fights and the rimpull to climb it: total resistance = grade +
+  rolling resistance; rimpull = total x GVW (20 lb/ton per 1%). A 150,000 lb hauler on a 5% grade over a 4%
+  rolling-resistance road fights 9% and needs 13,500 lb of rimpull (180 lb/ton); running downhill at -5% the resistance
+  goes to -1% and the operator is on the retarder. Grading the road cuts rolling resistance -- the cheapest horsepower
+  there is. The manufacturer's rimpull-speed curve gives the available rimpull in gear. Home count 1,292 -> 1,293.
+
 ### feat(construction): concrete-washout-volume -- concrete washout containment volume (spec-v843); 2026-07-17
 
 - New Group E tile `concrete-washout-volume` (calc-construction.js), the concrete-operations / SWPPP tile linking the

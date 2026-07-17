@@ -17152,6 +17152,31 @@
       "kind": "industry"
     },
     {
+      "term": "haul road resistance",
+      "target": "haul-road-resistance",
+      "kind": "industry"
+    },
+    {
+      "term": "required rimpull",
+      "target": "haul-road-resistance",
+      "kind": "industry"
+    },
+    {
+      "term": "grade plus rolling resistance",
+      "target": "haul-road-resistance",
+      "kind": "industry"
+    },
+    {
+      "term": "total resistance hauler",
+      "target": "haul-road-resistance",
+      "kind": "industry"
+    },
+    {
+      "term": "rimpull per ton",
+      "target": "haul-road-resistance",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

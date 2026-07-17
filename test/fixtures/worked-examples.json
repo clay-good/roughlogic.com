@@ -49949,6 +49949,68 @@
    }
   },
   {
+   "tile_id": "haul-road-resistance",
+   "source_publisher": "Haul-road resistance identity (first-principles)",
+   "source_title": "150,000 lb hauler, +5% grade, 4% rolling resistance",
+   "source_edition_or_year": "spec-v844 worked example",
+   "source_section_or_page": "total = 5+4 = 9%; rimpull = 0.09*150000 = 13,500 lb; per ton = 20*9 = 180 lb/ton",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "gvw_lb": 150000,
+    "grade_pct": 5,
+    "rolling_resistance_pct": 4
+   },
+   "outputs": {
+    "total_resistance_pct": {
+     "value": 9,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "required_rimpull_lb": {
+     "value": 13500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "rimpull_per_ton_lb": {
+     "value": 180,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "haul-road-resistance",
+   "source_publisher": "Haul-road resistance identity (first-principles)",
+   "source_title": "cross-check: the same hauler running downhill at -5% grade",
+   "source_edition_or_year": "spec-v844 worked example",
+   "source_section_or_page": "total = -5+4 = -1%; rimpull = -0.01*150000 = -1,500 lb (on the retarder)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "gvw_lb": 150000,
+    "grade_pct": -5,
+    "rolling_resistance_pct": 4
+   },
+   "outputs": {
+    "total_resistance_pct": {
+     "value": -1,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "required_rimpull_lb": {
+     "value": -1500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

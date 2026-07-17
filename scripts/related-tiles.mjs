@@ -1012,6 +1012,7 @@ const RELATED = {
   "scaffold-leg-load": ["scaffold-mudsill-bearing", "guard-handrail-check", "shore-post-load"],
   "scaffold-takeoff": ["scaffold-leg-load", "scaffold-mudsill-bearing", "material-quantity"],
   "dust-control-water": ["water-for-compaction", "dewatering-rate", "haul-cycle-production"],
+  "haul-road-resistance": ["haul-cycle-production", "drawbar-pull", "dozer-production"],
   "asphalt-spread-rate": ["asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity"],
   "pavement-milling-production": ["asphalt-paving-speed", "asphalt-spread-rate", "haul-cycle-production"],
   "striping-paint-quantity": ["paint-coverage", "asphalt-tonnage", "coating-coverage-dft"],

@@ -8200,6 +8200,17 @@ export const CITATIONS = {
       { name: "Containment", value: "lined pit or container per the SWPPP / CGP, cleaned out at ~three-quarters full; no discharge to ground or storm", source: "SWPPP / construction general permit" },
     ],
   },
+  "haul-road-resistance": {
+    formula: "total_resistance_pct = grade_pct + rolling_resistance_pct; required_rimpull_lb = total_resistance_pct / 100 x gvw_lb; rimpull_per_ton_lb = 20 x total_resistance_pct.",
+    edition: "Haul-road resistance identity by name (total = grade + rolling; rimpull = total x GVW; 20 lb/ton per 1%); first-principles tractive-effort statics.",
+    freeAccess: "The resistance statics are public first-principles; the available rimpull in gear comes from the manufacturer's rimpull-speed curve.",
+    governance: GOVERNANCE.general,
+    editionNote: "Rolling resistance depends on the road surface - about 2% for a hard maintained haul road, 10% or more for soft or rutted ground. A downhill grade subtracts and can call for the retarder rather than rimpull. Compare the required rimpull to the machine's available rimpull in gear from the manufacturer's rimpull-speed curve; road maintenance is the cheapest way to cut it.",
+    assumptions: [
+      { name: "Rolling resistance", value: "~2% for a hard maintained haul road, 10%+ for soft or rutted ground (~4% default)", source: "Caterpillar Performance Handbook" },
+      { name: "Rimpull rule", value: "20 lb/ton per 1% of total resistance; required rimpull = total resistance x GVW", source: "first-principles tractive effort" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

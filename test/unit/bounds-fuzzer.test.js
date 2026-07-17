@@ -17114,6 +17114,7 @@ import { computeConcreteVibratorSpacing as _v840cvs } from "../../calc-construct
 import { computeFormworkTieLoad as _v841ftl } from "../../calc-construction.js";
 import { computeMassConcreteTempRise as _v842mctr } from "../../calc-construction.js";
 import { computeConcreteWashoutVolume as _v843cwv } from "../../calc-construction.js";
+import { computeHaulRoadResistance as _v844hrr } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17532,6 +17533,22 @@ test("bounds: spec-v843 computeConcreteWashoutVolume pins the gallons, required 
   assert.ok("error" in _v843cwv({ trucks: 20, washout_gal_per_truck: 0, freeboard_pct: 15, pit_depth_ft: 2 }));
   assert.ok("error" in _v843cwv({ trucks: 20, washout_gal_per_truck: 50, freeboard_pct: 15, pit_depth_ft: 0 }));
   assert.ok("error" in _v843cwv({ trucks: 20, washout_gal_per_truck: 50, freeboard_pct: -1, pit_depth_ft: 2 }));
+});
+
+test("bounds: spec-v844 computeHaulRoadResistance pins the total resistance, rimpull (incl downhill), per-ton, and error seams", () => {
+  // 150,000 lb, +5% grade, 4% rolling -> 9%, 13,500 lb, 180 lb/ton.
+  const r = _v844hrr({ gvw_lb: 150000, grade_pct: 5, rolling_resistance_pct: 4 });
+  assert.strictEqual(r.total_resistance_pct, 9);
+  assert.strictEqual(r.required_rimpull_lb, 13500);
+  assert.strictEqual(r.rimpull_per_ton_lb, 180);
+  // Downhill at -5% grade drives the resistance and rimpull negative (on the retarder).
+  const down = _v844hrr({ gvw_lb: 150000, grade_pct: -5, rolling_resistance_pct: 4 });
+  assert.strictEqual(down.total_resistance_pct, -1);
+  assert.strictEqual(down.required_rimpull_lb, -1500);
+  // Error seams (GVW positive; grade/rolling must be finite).
+  assert.ok("error" in _v844hrr({ gvw_lb: 0, grade_pct: 5, rolling_resistance_pct: 4 }));
+  assert.ok("error" in _v844hrr({ gvw_lb: 150000, grade_pct: Infinity, rolling_resistance_pct: 4 }));
+  assert.ok("error" in _v844hrr({ gvw_lb: 150000, grade_pct: 5, rolling_resistance_pct: NaN }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

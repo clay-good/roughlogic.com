@@ -26,6 +26,7 @@
 //   - restrained-pipe-length  Restrained-joint length at a pipe bend
 //   - hdd-pullback            HDD pullback force first-order estimate (ASTM F1962)
 //   - dust-control-water      Dust-control watering volume and truck trips
+//   - haul-road-resistance    Haul-road total resistance and required rimpull
 //
 // Group letters are independent of the module (the spec-v28/v30/v36/v39
 // precedent): all five KEEP group "E"; only the on-disk module changes.
@@ -1168,6 +1169,55 @@ function _v836renderDustControlWater(inputRegion, outputRegion, citationEl) {
   for (const f of [l, w, rt, tc, ap]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["dust-control-water"] = _v836renderDustControlWater;
+
+// --- haul-road-resistance: Haul-Road Total Resistance and Required Rimpull ---
+//
+// The resistance a loaded hauler fights (grade plus rolling) and the rimpull to
+// climb it, the number that picks the gear and confirms the grade is climbable:
+//   total_resistance_pct = grade_pct + rolling_resistance_pct
+//   required_rimpull_lb = total_resistance_pct / 100 x gvw_lb
+//   rimpull_per_ton_lb = 20 x total_resistance_pct  (20 lb/ton per 1%)
+// dims: in { gvw_lb: M L T^-2, grade_pct: dimensionless, rolling_resistance_pct: dimensionless } out: { total_resistance_pct: dimensionless, required_rimpull_lb: M L T^-2, rimpull_per_ton_lb: L T^-2 }
+export function computeHaulRoadResistance({ gvw_lb = 150000, grade_pct = 5, rolling_resistance_pct = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(gvw_lb > 0)) return { error: "Gross vehicle weight must be positive (lb)." };
+  const total_resistance_pct = grade_pct + rolling_resistance_pct;
+  const required_rimpull_lb = (total_resistance_pct / 100) * gvw_lb;
+  const rimpull_per_ton_lb = 20 * total_resistance_pct;
+  if (![total_resistance_pct, required_rimpull_lb, rimpull_per_ton_lb].every(Number.isFinite)) return { error: "Resistance math is not a finite value." };
+  return {
+    total_resistance_pct,
+    required_rimpull_lb,
+    rimpull_per_ton_lb,
+    note: "Rolling resistance depends on the road surface - about 2% for a hard maintained haul road, 10% or more for soft or rutted ground. A downhill grade subtracts and can call for the retarder rather than rimpull. Compare the required rimpull to the machine's available rimpull in gear from the manufacturer's rimpull-speed curve. Road maintenance is the cheapest way to cut it.",
+  };
+}
+
+function _v844renderHaulRoadResistance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: resistance identity by name. total resistance (%) = grade + rolling resistance; required rimpull = total resistance x GVW; 20 lb/ton per 1%. The manufacturer's rimpull-speed curve gives the available rimpull in gear.";
+  const g = makeNumber("Gross vehicle weight, loaded (lb)", "hrr-g", { step: "any", min: "0", value: "150000" });
+  g.input.value = "150000";
+  const gr = makeNumber("Road grade (%, negative downhill)", "hrr-gr", { step: "any", value: "5" });
+  gr.input.value = "5";
+  const rr = makeNumber("Rolling resistance (%)", "hrr-rr", { step: "any", value: "4" });
+  rr.input.value = "4";
+  for (const f of [g, gr, rr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { g.input.value = "150000"; gr.input.value = "5"; rr.input.value = "4"; update(); });
+  const oRimpull = makeOutputLine(outputRegion, "Required rimpull", "hrr-out-rimpull");
+  const oTotal = makeOutputLine(outputRegion, "Total resistance", "hrr-out-total");
+  const update = debounce(() => {
+    const r = computeHaulRoadResistance({
+      gvw_lb: g.input.value === "" ? 150000 : Number(g.input.value),
+      grade_pct: gr.input.value === "" ? 0 : Number(gr.input.value),
+      rolling_resistance_pct: rr.input.value === "" ? 0 : Number(rr.input.value),
+    });
+    if (r.error) { oRimpull.textContent = r.error; oTotal.textContent = "-"; return; }
+    oRimpull.textContent = fmt(r.required_rimpull_lb, 0) + " lb (" + fmt(r.rimpull_per_ton_lb, 0) + " lb/ton)" + (r.required_rimpull_lb < 0 ? " - downhill, on the retarder" : "");
+    oTotal.textContent = fmt(r.total_resistance_pct, 1) + "% (grade + rolling)";
+  }, DEBOUNCE_MS);
+  for (const f of [g, gr, rr]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["haul-road-resistance"] = _v844renderHaulRoadResistance;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //
