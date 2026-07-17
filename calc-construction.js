@@ -6853,6 +6853,51 @@ const _v816renderShotcreteReboundQuantity = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["shotcrete-rebound-quantity"] = _v816renderShotcreteReboundQuantity;
 
+// ----- spec-v817: Annular Grout Volume for Cased Bore / Pipe-in-Casing (Group E) -----
+//
+// The grout in the ring between a bored casing and the carrier pipe: annular
+// area = pi/4 (bore^2 - carrier^2); volume = area x length, grossed for waste.
+// dims: in { bore_dia_in: L, carrier_od_in: L, length_ft: L, waste_pct: dimensionless } out: { annular_area_in2: L^2, neat_ft3: L^3, grout_cy: L^3, grout_gal: L^3 }
+export function computeAnnularGroutVolume({ bore_dia_in = 0, carrier_od_in = 0, length_ft = 0, waste_pct = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(bore_dia_in > 0)) return { error: "Bore diameter must be positive (in)." };
+  if (!(carrier_od_in > 0)) return { error: "Carrier diameter must be positive (in)." };
+  if (!(length_ft > 0)) return { error: "Length must be positive (ft)." };
+  if (carrier_od_in >= bore_dia_in) return { error: "Carrier diameter must be smaller than the bore (a positive annulus)." };
+  if (!(waste_pct >= 0)) return { error: "Waste must be non-negative (%)." };
+  const annular_area_in2 = (Math.PI / 4) * (bore_dia_in * bore_dia_in - carrier_od_in * carrier_od_in);
+  const neat_ft3 = (annular_area_in2 / 144) * length_ft;
+  const grout_cy = (neat_ft3 / 27) * (1 + waste_pct / 100);
+  const grout_gal = neat_ft3 * 7.48052 * (1 + waste_pct / 100);
+  if (![annular_area_in2, neat_ft3, grout_cy, grout_gal].every(Number.isFinite)) return { error: "Grout-volume math is not a finite value." };
+  return {
+    annular_area_in2,
+    neat_ft3,
+    grout_cy,
+    grout_gal,
+    note: "The grout fills the void so the carrier neither floats during the pour nor settles after. The theoretical volume assumes a clean concentric annulus; the field always overruns it (voids, overcut, an out-of-round bore), so the waste factor is a floor, not a ceiling. The mix design and the AHJ / owner spec govern.",
+  };
+}
+export const annularGroutVolumeExample = { inputs: { bore_dia_in: 24, carrier_od_in: 16, length_ft: 100, waste_pct: 5 } };
+const _v817renderAnnularGroutVolume = _simpleRenderer({
+  citation: "Citation: annular-area identity by name. area = pi/4 x (bore^2 - carrier^2); neat volume = area / 144 x length; ordered = neat x (1 + waste). The field always overruns the neat annulus.",
+  example: annularGroutVolumeExample.inputs,
+  fields: [
+    { key: "bore_dia_in", label: "Bore / casing inside diameter (in)", kind: "number" },
+    { key: "carrier_od_in", label: "Carrier pipe outside diameter (in)", kind: "number" },
+    { key: "length_ft", label: "Run length (ft)", kind: "number" },
+    { key: "waste_pct", label: "Pumping / overcut waste (%)", kind: "number", default: 5 },
+  ],
+  outputs: [
+    { key: "cy", id: "agv-out-cy", label: "Grout to order", value: (r) => _fmtC(r.grout_cy, 2) + " cy (" + _fmtC(r.grout_gal, 0) + " gal)" },
+    { key: "n0", id: "agv-out-n0", label: "Neat annulus volume", value: (r) => _fmtC(r.neat_ft3, 1) + " ft^3" },
+    { key: "a", id: "agv-out-a", label: "Annular area", value: (r) => _fmtC(r.annular_area_in2, 1) + " in^2" },
+    { key: "n", id: "agv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAnnularGroutVolume,
+});
+CONSTRUCTION_RENDERERS["annular-grout-volume"] = _v817renderAnnularGroutVolume;
+
 // ----- spec-v814: Concrete Pour Rate, Rate of Rise, and Delivery Cadence (Group E) -----
 //
 // The placement-logistics complement to formwork-pressure, which takes the rate

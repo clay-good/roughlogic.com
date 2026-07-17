@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): annular-grout-volume -- cased-bore / pipe-in-casing grout (spec-v817); 2026-07-16
+
+- New Group E tile `annular-grout-volume` (calc-construction.js), the grout in the ring between a bored casing and the
+  carrier pipe (distinct from the masonry-cell cmu-grout-volume). Annular-area identity: area = pi/4 (bore^2 - carrier^2),
+  volume = area x length grossed for waste. A 24 in bore around a 16 in carrier over 100 ft is a 6.46 cy ring (1,306 gal
+  neat), ~6.79 cy ordered at 5% waste; a snug 20 in bore shrinks it to 3.06 cy. Home count 1,266 -> 1,267.
+
 ### feat(construction): shotcrete-rebound-quantity -- shotcrete / gunite order with rebound (spec-v816); 2026-07-16
 
 - New Group E tile `shotcrete-rebound-quantity` (calc-construction.js), the shotcrete/gunite order beside the cast-concrete

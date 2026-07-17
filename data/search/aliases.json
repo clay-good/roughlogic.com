@@ -10617,6 +10617,31 @@
       "kind": "industry"
     },
     {
+      "term": "annular grout volume",
+      "target": "annular-grout-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "pipe in casing grout",
+      "target": "annular-grout-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "cased bore grout",
+      "target": "annular-grout-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "casing annulus fill",
+      "target": "annular-grout-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "carrier pipe grout",
+      "target": "annular-grout-volume",
+      "kind": "industry"
+    },
+    {
       "term": "cmu grout",
       "target": "cmu-grout-volume",
       "kind": "industry"

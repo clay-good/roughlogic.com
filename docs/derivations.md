@@ -1551,6 +1551,7 @@ cross-check.
 | calc-construction.js | `computeAggregate` | `{ area_ft2 = 0, depth_in = 0, material = "crushed_stone" }` | _ | _ | _ |
 | calc-construction.js | `computeAllowableArea` | `{ tabular_area = 0, ns_area = 0, frontage_ft = 0, perimeter_ft = 0, open_widt...` | _ | _ | _ |
 | calc-construction.js | `computeAnchorEmbedment` | `{ uplift_lb, bolt_diameter_in, fc_psi, cracked = false, edge_distance_in = 0 }` | _ | _ | _ |
+| calc-construction.js | `computeAnnularGroutVolume` | `{ bore_dia_in = 0, carrier_od_in = 0, length_ft = 0, waste_pct = 5 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeArea` | `{ shape, ...dims }` | _ | _ | _ |
 | calc-construction.js | `computeAsce7LoadCombinations` | `{ dead_psf = 0, live_psf = 0, snow_psf = 0, wind_psf = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAsceLiveLoadReduction` | `{ unreduced_load_psf = 0, tributary_area_ft2 = 0, member_type = "interior_col...` | _ | _ | _ |
@@ -2927,7 +2928,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1513.
+Row count: 1514.
 
 <!-- END function-corpus-v14 -->
 
@@ -3475,7 +3476,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (275 tiles)
+### Group E Construction (276 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3484,6 +3485,7 @@ per spec-v14 §13.1 second paragraph.
 | `aggregate` | Aggregate / Gravel Cubic Yards | Project (first-principles); volume = 1000 * 4/12 = 333.33 ft^3; cubic_yards = 333.33/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `allowable-area` | Allowable Building Area per Story (IBC Chapter 5) | IBC 2021 §506.2 / §506.3 and Table 506.2; spec-v251 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `anchor-embedment` | Anchor Bolt Embedment | Project (public bond-strength formula); 5000 lb uplift / 5/8 in bolt / 3000 psi concrete -> 66.42... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `annular-grout-volume` | Annular Grout Volume for Cased Bore / Pipe-in-Casing | Annular-area identity (first-principles); area = (PI/4)(24^2-16^2) = 251.3 in^2; neat = 251.3/144*1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `asce-live-load-reduction` | Live Load Reduction (ASCE 7 Ch. 4) | ASCE 7 minimum design loads; spec-v803 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `asce7-load-combinations` | ASCE 7 ASD Load Combinations: Governing Demand and Net Uplift | ASCE 7 §2.4.1 basic ASD combinations; spec-v225 section 2.1 pinned example (roof uplift) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `asphalt-paving-speed` | Asphalt Paver Speed and Production Rate | Paving production identity (first-pri...; tons/hr = 20 * 50 * 12 * (2/12) * 145 / 2000 = 145; lane-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4379,6 +4381,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1266. Fixture-covered or reference-cadence: 1266 / 1266.
+Tile count: 1267. Fixture-covered or reference-cadence: 1267 / 1267.
 
 <!-- END tile-index-v14 -->

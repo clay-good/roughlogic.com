@@ -758,7 +758,7 @@ const _TILES = [
   ["plant-spacing-count", "L"],
   ["sod-takeoff", "L"],
   // spec-v212..v214 masonry grout / coursing and wallcovering (Group E)
-  ["cmu-grout-volume", "E"],
+  ["cmu-grout-volume", "E"], ["annular-grout-volume", "E"],
   ["masonry-coursing", "E"],
   ["wallpaper-rolls", "E"],
   // spec-v215..v217 roofing material-takeoff batch

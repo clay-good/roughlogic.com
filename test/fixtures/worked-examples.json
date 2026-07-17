@@ -30030,6 +30030,70 @@
    }
   },
   {
+   "tile_id": "annular-grout-volume",
+   "source_publisher": "Annular-area identity (first-principles)",
+   "source_title": "24 in bore, 16 in carrier, 100 ft, 5% waste",
+   "source_edition_or_year": "spec-v817 worked example",
+   "source_section_or_page": "area = (PI/4)(24^2-16^2) = 251.3 in^2; neat = 251.3/144*100 = 174.5 ft^3 (6.46 cy); ordered = 6.46*1.05 = 6.79 cy",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "bore_dia_in": 24,
+    "carrier_od_in": 16,
+    "length_ft": 100,
+    "waste_pct": 5
+   },
+   "outputs": {
+    "annular_area_in2": {
+     "value": 251.327,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "neat_ft3": {
+     "value": 174.533,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "grout_cy": {
+     "value": 6.7874,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "annular-grout-volume",
+   "source_publisher": "Annular-area identity (first-principles)",
+   "source_title": "cross-check: a snug 20 in bore around the same 16 in carrier shrinks the ring",
+   "source_edition_or_year": "spec-v817 worked example",
+   "source_section_or_page": "(PI/4)(400-256) = 113.1 in^2; 113.1/144*100 = 78.5 ft^3; 3.06 cy with 5% waste",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "bore_dia_in": 20,
+    "carrier_od_in": 16,
+    "length_ft": 100,
+    "waste_pct": 5
+   },
+   "outputs": {
+    "annular_area_in2": {
+     "value": 113.097,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "grout_cy": {
+     "value": 3.0543,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "masonry-coursing",
    "source_publisher": "BIA Technical Notes / NCMA TEK",
    "source_title": "96 in with 7.625 in block + 3/8 joint -> 12 courses, on module",

@@ -10726,6 +10726,17 @@ export const CITATIONS = {
       { name: "Cross-sections", value: "the grouted-core (~24 in^2 for an 8 in unit) and bond-beam (~30 in^2) areas come from the block manufacturer's data", source: "unit manufacturer data" },
     ],
   },
+  "annular-grout-volume": {
+    formula: "annular_area_in2 = (pi/4) x (bore_dia_in^2 - carrier_od_in^2); neat_ft3 = annular_area_in2 / 144 x length_ft; grout_cy = neat_ft3 / 27 x (1 + waste_pct/100); grout_gal = neat_ft3 x 7.48052 x (1 + waste_pct/100).",
+    edition: "Annular-area identity by name (ring between two concentric circles); first-principles volume arithmetic.",
+    freeAccess: "The annular-area identity is public geometry; the 7.48052 gal/ft^3 constant is exact.",
+    governance: GOVERNANCE.general,
+    editionNote: "The grout fills the void so the carrier neither floats during the pour nor settles after. The theoretical volume assumes a clean concentric annulus; the field always overruns it (voids, overcut, an out-of-round bore), so the waste factor is a floor, not a ceiling. The mix design and the AHJ / owner spec govern.",
+    assumptions: [
+      { name: "Waste factor", value: "5% pumping / overcut default; the field always overruns the neat annulus", source: "boring / grouting practice" },
+      { name: "Volume constants", value: "144 in^2/ft^2, 27 ft^3/cy, 7.48052 gal/ft^3 (exact)", source: "physical fact" },
+    ],
+  },
   "masonry-coursing": {
     formula: "course_in = unit_in + joint_in; courses = round(target_in / course_in); built_in = courses x course_in; off_in = target_in - built_in; on_module = |off_in| < 0.0625.",
     edition: "First-principles coursing relation with the Brick Industry Association (BIA) Technical Notes on modular masonry and the NCMA TEK dimensioning references (by name).",

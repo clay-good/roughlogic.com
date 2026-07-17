@@ -13825,6 +13825,7 @@ test("bounds: spec-v211 sod-takeoff pins order/slabs/pallets, the partial-pallet
 
 import {
   computeCmuGroutVolume as _v212, computeMasonryCoursing as _v213, computeWallpaperRolls as _v214,
+  computeAnnularGroutVolume as _v817agv,
 } from "../../calc-construction.js";
 
 test("bounds: spec-v212 cmu-grout-volume pins cores/volume, the no-bond-beam path, and error seams", () => {
@@ -13839,6 +13840,24 @@ test("bounds: spec-v212 cmu-grout-volume pins cores/volume, the no-bond-beam pat
   assert.ok("error" in _v212({ wall_len_ft: 20, wall_ht_ft: 0, core_spacing_in: 24 }));
   assert.ok("error" in _v212({ wall_len_ft: 20, wall_ht_ft: 8, core_spacing_in: 0 }));
   assert.ok("error" in _v212({ wall_len_ft: 20, wall_ht_ft: 8, core_spacing_in: 24, core_area_in2: 0 }));
+});
+
+test("bounds: spec-v817 computeAnnularGroutVolume pins annular area, neat volume, both grout figures, and error seams", () => {
+  // 24 in bore, 16 in carrier, 100 ft, 5% waste -> 251.3 in^2, 174.5 ft^3, 6.79 cy, 1371 gal
+  const r = _v817agv({ bore_dia_in: 24, carrier_od_in: 16, length_ft: 100, waste_pct: 5 });
+  assert.ok(Math.abs(r.annular_area_in2 - 251.327) < 1e-2);
+  assert.ok(Math.abs(r.neat_ft3 - 174.533) < 1e-2);
+  assert.ok(Math.abs(r.grout_cy - 6.7874) < 1e-3);
+  assert.ok(Math.abs(r.grout_gal - 1370.84) < 0.2);
+  // Snug 20 in bore shrinks the ring.
+  assert.ok(Math.abs(_v817agv({ bore_dia_in: 20, carrier_od_in: 16, length_ft: 100, waste_pct: 5 }).grout_cy - 3.0543) < 1e-3);
+  // Error seams (incl. carrier >= bore).
+  assert.ok("error" in _v817agv({ bore_dia_in: 0, carrier_od_in: 16, length_ft: 100 }));
+  assert.ok("error" in _v817agv({ bore_dia_in: 24, carrier_od_in: 0, length_ft: 100 }));
+  assert.ok("error" in _v817agv({ bore_dia_in: 24, carrier_od_in: 16, length_ft: 0 }));
+  assert.ok("error" in _v817agv({ bore_dia_in: 16, carrier_od_in: 16, length_ft: 100 }));
+  assert.ok("error" in _v817agv({ bore_dia_in: 16, carrier_od_in: 24, length_ft: 100 }));
+  assert.ok("error" in _v817agv({ bore_dia_in: 24, carrier_od_in: 16, length_ft: 100, waste_pct: -5 }));
 });
 
 test("bounds: spec-v213 masonry-coursing pins on-module and off-module both ways + error seams", () => {

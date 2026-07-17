@@ -449,7 +449,7 @@ const TOOL_MODULES = (() => {
     // spec-v481 stair geometry code check (IBC 1011 / IRC R311).
     "stair-code-check",
     // spec-v212..v214 masonry grout / coursing and wallcovering takeoffs.
-    "cmu-grout-volume", "masonry-coursing", "wallpaper-rolls",
+    "cmu-grout-volume", "annular-grout-volume", "masonry-coursing", "wallpaper-rolls",
     // spec-v215..v217 roofing material-takeoff batch.
     "ice-barrier-coverage", "metal-roof-panels", "ridge-cap-fasteners",
     // spec-v224..v226 ASCE 7 structural design-loads batch.

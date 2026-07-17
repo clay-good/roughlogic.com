@@ -1163,6 +1163,7 @@ export const COMPUTE_MAP = {
   "plant-spacing-count": { module: "../../calc-agriculture.js", fn: "computePlantSpacingCount" },
   "sod-takeoff": { module: "../../calc-agriculture.js", fn: "computeSodTakeoff" },
   "cmu-grout-volume": { module: "../../calc-construction.js", fn: "computeCmuGroutVolume" },
+  "annular-grout-volume": { module: "../../calc-construction.js", fn: "computeAnnularGroutVolume" },
   "masonry-coursing": { module: "../../calc-construction.js", fn: "computeMasonryCoursing" },
   "wallpaper-rolls": { module: "../../calc-construction.js", fn: "computeWallpaperRolls" },
   // spec-v215..v217 roofing material-takeoff batch (3 tiles)

@@ -1195,6 +1195,7 @@ const RELATED = {
   "sod-takeoff": ["plant-spacing-count","square-footage","sprinkler-precip-rate"],
   // spec-v212..v214 masonry grout / coursing and wallcovering (Group E)
   "cmu-grout-volume": ["masonry-count","mortar-mix","rebar-schedule"],
+  "annular-grout-volume": ["cmu-grout-volume","pipe-bedding-backfill","concrete"],
   "masonry-coursing": ["masonry-count","cmu-grout-volume","mortar-mix"],
   "wallpaper-rolls": ["paint-coverage","square-footage","flooring-takeoff"],
   // spec-v215..v217 roofing material-takeoff batch
