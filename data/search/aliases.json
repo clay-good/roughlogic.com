@@ -17052,6 +17052,31 @@
       "kind": "industry"
     },
     {
+      "term": "vibrator spacing",
+      "target": "concrete-vibrator-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete consolidation spacing",
+      "target": "concrete-vibrator-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "internal vibrator insertions",
+      "target": "concrete-vibrator-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "aci 309 vibration",
+      "target": "concrete-vibrator-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "radius of action spacing",
+      "target": "concrete-vibrator-spacing",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

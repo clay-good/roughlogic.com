@@ -5617,6 +5617,49 @@ const _renderStripingPaintQuantity = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["striping-paint-quantity"] = _renderStripingPaintQuantity;
 
+// --- concrete-vibrator-spacing: Internal Vibrator Spacing (ACI 309) ---
+//
+// Spaces the internal-vibrator insertions that consolidate fresh concrete, per
+// ACI 309: spacing at 1.5 x radius of action, head within 0.75 R of the form:
+//   max_spacing_in = 1.5 x radius_of_action_in
+//   edge_max_in    = 0.75 x radius_of_action_in
+//   insertions     = ceil(lift_length_ft x 12 / max_spacing_in)
+// dims: in { radius_of_action_in: L, lift_length_ft: L } out: { max_spacing_in: L, edge_max_in: L, insertions: dimensionless }
+export function computeConcreteVibratorSpacing({ radius_of_action_in = 12, lift_length_ft = 20 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(radius_of_action_in > 0)) return { error: "Radius of action must be positive (in)." };
+  if (!(lift_length_ft > 0)) return { error: "Lift length must be positive (ft)." };
+  const max_spacing_in = 1.5 * radius_of_action_in;
+  const edge_max_in = 0.75 * radius_of_action_in;
+  const insertions = Math.ceil((lift_length_ft * 12) / max_spacing_in);
+  if (![max_spacing_in, edge_max_in, insertions].every(Number.isFinite)) return { error: "Vibrator-spacing math is not a finite value." };
+  return {
+    max_spacing_in,
+    edge_max_in,
+    insertions,
+    note: "The radius of action comes from the vibrator manufacturer for the head diameter and the mix. The head is inserted vertically with the action circles overlapping and withdrawn slowly; over-vibration segregates the mix. ACI 309 governs the practice - this is a spacing plan, not a substitute for a competent finisher.",
+  };
+}
+
+export const concreteVibratorSpacingExample = { inputs: { radius_of_action_in: 12, lift_length_ft: 20 } };
+
+const _renderConcreteVibratorSpacing = _simpleRenderer({
+  citation: "Citation: ACI 309 spacing rule by name. max spacing = 1.5 x radius of action; edge distance <= 0.75 x radius of action; insertions = ceil(lift length x 12 / spacing). The radius of action comes from the vibrator manufacturer.",
+  example: concreteVibratorSpacingExample.inputs,
+  fields: [
+    { key: "radius_of_action_in", label: "Vibrator radius of action R (in)", kind: "number", default: 12 },
+    { key: "lift_length_ft", label: "Lift / run length to consolidate (ft)", kind: "number", default: 20 },
+  ],
+  outputs: [
+    { key: "s", id: "cvs-out-s", label: "Max insertion spacing", value: (r) => _fmtC(r.max_spacing_in, 1) + " in" },
+    { key: "e", id: "cvs-out-e", label: "Max distance from the form", value: (r) => _fmtC(r.edge_max_in, 1) + " in" },
+    { key: "i", id: "cvs-out-i", label: "Insertion points", value: (r) => _fmtC(r.insertions, 0) },
+    { key: "n", id: "cvs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteVibratorSpacing,
+});
+CONSTRUCTION_RENDERERS["concrete-vibrator-spacing"] = _renderConcreteVibratorSpacing;
+
 // ----- spec-v246: Concrete Surface Evaporation Rate and Plastic-Shrinkage Risk (ACI 305) -----
 
 // dims: in { air_temp_f: T, concrete_temp_f: T, rh_pct: dimensionless, wind_mph: L T^-1 } out: { E_metric: M L^-2 T^-1, E_us: M L^-2 T^-1 }

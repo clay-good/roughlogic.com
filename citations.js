@@ -8156,6 +8156,17 @@ export const CITATIONS = {
       { name: "Bead rate", value: "~6 lb/gal default; set by the retroreflectivity spec", source: "retroreflectivity specification" },
     ],
   },
+  "concrete-vibrator-spacing": {
+    formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
+    edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",
+    freeAccess: "The 1.5 R / 0.75 R spacing rule is public ACI 309 guidance; the radius of action comes from the vibrator manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "The radius of action comes from the vibrator manufacturer for the head diameter and the mix. The head is inserted vertically with the action circles overlapping and withdrawn slowly; over-vibration segregates the mix. ACI 309 governs the practice.",
+    assumptions: [
+      { name: "Radius of action", value: "from the vibrator manufacturer for the head diameter and the mix (~12 in default)", source: "vibrator manufacturer" },
+      { name: "Spacing rule", value: "max spacing 1.5 x radius of action, head within 0.75 R of the form, overlapping circles", source: "ACI 309" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

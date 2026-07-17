@@ -17110,6 +17110,7 @@ import { computeDustControlWater as _v836dcw } from "../../calc-earthwork.js";
 import { computeAsphaltSpreadRate as _v837asr } from "../../calc-construction.js";
 import { computePavementMillingProduction as _v838pmp } from "../../calc-construction.js";
 import { computeStripingPaintQuantity as _v839spq } from "../../calc-construction.js";
+import { computeConcreteVibratorSpacing as _v840cvs } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17458,6 +17459,21 @@ test("bounds: spec-v839 computeStripingPaintQuantity pins the stripe area, paint
   assert.ok("error" in _v839spq({ length_ft: 5280, width_in: 0, coverage_sf_per_gal: 320, bead_rate_lb_per_gal: 6 }));
   assert.ok("error" in _v839spq({ length_ft: 5280, width_in: 4, coverage_sf_per_gal: 0, bead_rate_lb_per_gal: 6 }));
   assert.ok("error" in _v839spq({ length_ft: 5280, width_in: 4, coverage_sf_per_gal: 320, bead_rate_lb_per_gal: 0 }));
+});
+
+test("bounds: spec-v840 computeConcreteVibratorSpacing pins the spacing, edge distance, insertions, and error seams", () => {
+  // 12 in radius, 20 ft lift -> 18 in spacing, 9 in edge, 14 insertions.
+  const r = _v840cvs({ radius_of_action_in: 12, lift_length_ft: 20 });
+  assert.strictEqual(r.max_spacing_in, 18);
+  assert.strictEqual(r.edge_max_in, 9);
+  assert.strictEqual(r.insertions, 14);
+  // A smaller 8 in head tightens the spacing and raises the count.
+  const small = _v840cvs({ radius_of_action_in: 8, lift_length_ft: 20 });
+  assert.strictEqual(small.max_spacing_in, 12);
+  assert.strictEqual(small.insertions, 20);
+  // Error seams.
+  assert.ok("error" in _v840cvs({ radius_of_action_in: 0, lift_length_ft: 20 }));
+  assert.ok("error" in _v840cvs({ radius_of_action_in: 12, lift_length_ft: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

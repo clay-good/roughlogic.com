@@ -461,7 +461,7 @@ const TOOL_MODULES = (() => {
     // spec-v242..v244 IBC/IPC occupancy trio.
     "occupant-load", "egress-capacity", "plumbing-fixture-count",
     // spec-v245..v247 cast-in-place placing-and-curing trio.
-    "shore-post-load", "scaffold-mudsill-bearing", "scaffold-leg-load", "scaffold-takeoff", "asphalt-spread-rate", "pavement-milling-production", "striping-paint-quantity", "concrete-evaporation-rate", "concrete-strength-gain",
+    "shore-post-load", "scaffold-mudsill-bearing", "scaffold-leg-load", "scaffold-takeoff", "asphalt-spread-rate", "pavement-milling-production", "striping-paint-quantity", "concrete-vibrator-spacing", "concrete-evaporation-rate", "concrete-strength-gain",
     // spec-v476 maturity method (the v247 follow-on).
     "concrete-maturity",
     // spec-v430..v431 concrete field-work (v429 cut as dupe)

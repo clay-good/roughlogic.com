@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): concrete-vibrator-spacing -- internal vibrator spacing per ACI 309 (spec-v840); 2026-07-17
+
+- New Group E tile `concrete-vibrator-spacing` (calc-construction.js), the concrete-operations tile beside
+  `concrete-pour-rate` and the formwork family. Spaces the internal-vibrator insertions that consolidate fresh concrete
+  (ACI 309): max spacing = 1.5 x radius of action; edge distance <= 0.75 R; insertions = ceil(lift length x 12 /
+  spacing). A 12 in radius head spaces at 18 in, stays within 9 in of the form, and a 20 ft lift takes 14 stabs; a
+  smaller 8 in head tightens to 12 in and 20 stabs -- the head's radius of action, not the wall, sets the count. ACI 309
+  and the vibrator manufacturer govern. Home count 1,288 -> 1,289.
+
 ### feat(construction): striping-paint-quantity -- pavement marking paint and glass bead quantity (spec-v839); 2026-07-17
 
 - New Group E tile `striping-paint-quantity` (calc-construction.js), the pavement-marking quantity distinct from the
