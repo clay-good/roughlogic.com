@@ -17602,6 +17602,31 @@
       "kind": "industry"
     },
     {
+      "term": "roof underlayment rolls",
+      "target": "roof-underlayment-rolls",
+      "kind": "industry"
+    },
+    {
+      "term": "felt roll count",
+      "target": "roof-underlayment-rolls",
+      "kind": "industry"
+    },
+    {
+      "term": "synthetic underlayment rolls",
+      "target": "roof-underlayment-rolls",
+      "kind": "industry"
+    },
+    {
+      "term": "roof deck underlayment",
+      "target": "roof-underlayment-rolls",
+      "kind": "industry"
+    },
+    {
+      "term": "underlayment coverage",
+      "target": "roof-underlayment-rolls",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

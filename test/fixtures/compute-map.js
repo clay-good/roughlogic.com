@@ -782,6 +782,7 @@ export const COMPUTE_MAP = {
   "duct-bank-concrete": { module: "../../calc-construction.js", fn: "computeDuctBankConcrete" },
   "duct-wrap-takeoff": { module: "../../calc-construction.js", fn: "computeDuctWrapTakeoff" },
   "duct-hanger-load": { module: "../../calc-construction.js", fn: "computeDuctHangerLoad" },
+  "roof-underlayment-rolls": { module: "../../calc-construction.js", fn: "computeRoofUnderlaymentRolls" },
   "refrigerant-lineset-charge-adjust": { module: "../../calc-refrigerant.js", fn: "computeRefrigerantLinesetChargeAdjust" },
   "asphalt-spread-rate": { module: "../../calc-construction.js", fn: "computeAsphaltSpreadRate" },
   "pavement-milling-production": { module: "../../calc-construction.js", fn: "computePavementMillingProduction" },

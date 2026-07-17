@@ -8398,6 +8398,17 @@ export const CITATIONS = {
       { name: "Factory length", value: "the factory pre-charge line-set length from the nameplate (~15 ft typical)", source: "equipment nameplate" },
     ],
   },
+  "roof-underlayment-rolls": {
+    formula: "rolls = ceil(roof_area_sf x (1 + lap_waste_pct/100) / roll_coverage_sf).",
+    edition: "Roofing underlayment roll-count identity by name (area with lap/waste over roll coverage); first-principles count arithmetic.",
+    freeAccess: "The roll-count arithmetic is public quantity geometry; the underlayment type and lap requirements come from the code and manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "This is full-deck field underlayment (synthetic at about 10 squares a roll, or 15-lb felt at about 4 squares). The lap and waste allowance covers the head and side laps plus offcuts. It is distinct from the eave/valley ice-barrier-coverage; the code and manufacturer set the underlayment and lap requirements.",
+    assumptions: [
+      { name: "Roll coverage", value: "~1,000 sf for synthetic (10 squares), ~400 sf for 15-lb felt (4 squares); the product governs", source: "underlayment manufacturer" },
+      { name: "Lap + waste", value: "~10% for head and side laps plus offcuts; the code sets the lap", source: "code / manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

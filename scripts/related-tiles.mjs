@@ -1029,6 +1029,7 @@ const RELATED = {
   "duct-bank-concrete": ["post-hole-concrete", "annular-grout-volume", "concrete"],
   "duct-wrap-takeoff": ["duct-metal-weight", "insulation-batt-coverage", "duct-sizing"],
   "duct-hanger-load": ["duct-metal-weight", "duct-wrap-takeoff", "pipe-support-spacing"],
+  "roof-underlayment-rolls": ["roofing-squares", "ice-barrier-coverage", "shingle-nails"],
   "refrigerant-lineset-charge-adjust": ["refrigerant-charge", "refrigerant-line-size", "refrigerant-velocity"],
   "asphalt-spread-rate": ["asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity"],
   "pavement-milling-production": ["asphalt-paving-speed", "asphalt-spread-rate", "haul-cycle-production"],

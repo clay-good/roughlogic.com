@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): roof-underlayment-rolls -- roof underlayment roll count (spec-v862); 2026-07-17
+
+- New Group E tile `roof-underlayment-rolls` (calc-construction.js), the roofing takeoff beside `roofing-squares`
+  (shingles) and `shingle-nails` (fasteners), distinct from the eave-only `ice-barrier-coverage`. rolls = ceil(area x (1
+  + lap + waste) / roll coverage). A 2,500 sf deck with 10% laps and waste, on 10-square synthetic rolls (1,000 sf),
+  takes 3 rolls; on 15-lb felt (4 squares, 400 sf) the same deck takes 7 -- the roll coverage, set by the product,
+  drives the count. Home count 1,310 -> 1,311.
+
 ### feat(refrigerant): refrigerant-lineset-charge-adjust -- line-set length charge adder (spec-v861); 2026-07-17
 
 - New Group C tile `refrigerant-lineset-charge-adjust` (calc-refrigerant.js), the HVAC service adder beside

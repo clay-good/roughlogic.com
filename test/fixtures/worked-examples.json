@@ -51019,6 +51019,50 @@
    }
   },
   {
+   "tile_id": "roof-underlayment-rolls",
+   "source_publisher": "Roofing underlayment roll-count identity (first-principles)",
+   "source_title": "2,500 sf deck, 1,000 sf synthetic rolls, 10% laps and waste",
+   "source_edition_or_year": "spec-v862 worked example",
+   "source_section_or_page": "rolls = ceil(2500*1.10/1000) = ceil(2.75) = 3",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "roof_area_sf": 2500,
+    "roll_coverage_sf": 1000,
+    "lap_waste_pct": 10
+   },
+   "outputs": {
+    "rolls": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "roof-underlayment-rolls",
+   "source_publisher": "Roofing underlayment roll-count identity (first-principles)",
+   "source_title": "cross-check: 15-lb felt (400 sf/roll) takes more rolls",
+   "source_edition_or_year": "spec-v862 worked example",
+   "source_section_or_page": "rolls = ceil(2500*1.10/400) = ceil(6.875) = 7 (roll coverage drives the count)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "roof_area_sf": 2500,
+    "roll_coverage_sf": 400,
+    "lap_waste_pct": 10
+   },
+   "outputs": {
+    "rolls": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

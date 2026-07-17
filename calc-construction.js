@@ -8353,3 +8353,40 @@ const _v860renderDuctHangerLoad = _simpleRenderer({
   compute: computeDuctHangerLoad,
 });
 CONSTRUCTION_RENDERERS["duct-hanger-load"] = _v860renderDuctHangerLoad;
+
+// --- roof-underlayment-rolls: Roof Underlayment Roll Count ---
+//
+// The field underlayment rolls over the whole deck (distinct from the eave/valley
+// ice-and-water membrane):
+//   rolls = ceil(roof_area_sf x (1 + lap_waste_pct/100) / roll_coverage_sf)
+// dims: in { roof_area_sf: L^2, roll_coverage_sf: L^2, lap_waste_pct: dimensionless } out: { rolls: dimensionless }
+export function computeRoofUnderlaymentRolls({ roof_area_sf = 2500, roll_coverage_sf = 1000, lap_waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(roof_area_sf > 0)) return { error: "Roof area must be positive (ft^2)." };
+  if (!(roll_coverage_sf > 0)) return { error: "Roll coverage must be positive (ft^2)." };
+  if (lap_waste_pct < 0) return { error: "Lap/waste cannot be negative (percent)." };
+  const rolls = Math.ceil((roof_area_sf * (1 + lap_waste_pct / 100)) / roll_coverage_sf);
+  if (!Number.isFinite(rolls)) return { error: "Underlayment-roll math is not a finite value." };
+  return {
+    rolls,
+    note: "Full-deck field underlayment: synthetic runs about 10 squares a roll (1,000 sf), 15-lb felt about 4 squares (400 sf). The lap and waste allowance covers the head and side laps plus offcuts. This is distinct from the eave/valley ice-barrier-coverage; the code and manufacturer set the underlayment and lap requirements.",
+  };
+}
+
+export const roofUnderlaymentRollsExample = { inputs: { roof_area_sf: 2500, roll_coverage_sf: 1000, lap_waste_pct: 10 } };
+
+const _v862renderRoofUnderlaymentRolls = _simpleRenderer({
+  citation: "Citation: roll-count identity by name. rolls = ceil(roof area x (1 + lap + waste) / roll coverage). Full-deck field underlayment (synthetic ~10 squares/roll, 15-lb felt ~4); distinct from the eave/valley ice-barrier-coverage.",
+  example: roofUnderlaymentRollsExample.inputs,
+  fields: [
+    { key: "roof_area_sf", label: "Roof deck area (ft^2)", kind: "number", default: 2500 },
+    { key: "roll_coverage_sf", label: "Coverage per roll (ft^2, ~1000 synthetic, ~400 felt)", kind: "number", default: 1000 },
+    { key: "lap_waste_pct", label: "Lap + waste allowance (percent)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "r", id: "rur-out-r", label: "Underlayment rolls to order", value: (r) => _fmtC(r.rolls, 0) + " rolls" },
+    { key: "note", id: "rur-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRoofUnderlaymentRolls,
+});
+CONSTRUCTION_RENDERERS["roof-underlayment-rolls"] = _v862renderRoofUnderlaymentRolls;

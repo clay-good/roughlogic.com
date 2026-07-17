@@ -17132,6 +17132,7 @@ import { computeHeatTraceSizing as _v858hts } from "../../calc-plumbing.js";
 import { computeDuctWrapTakeoff as _v859dwt } from "../../calc-construction.js";
 import { computeDuctHangerLoad as _v860dhl } from "../../calc-construction.js";
 import { computeRefrigerantLinesetChargeAdjust as _v861rlc } from "../../calc-refrigerant.js";
+import { computeRoofUnderlaymentRolls as _v862rur } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17860,6 +17861,19 @@ test("bounds: spec-v861 computeRefrigerantLinesetChargeAdjust pins the ounce/pou
   assert.ok("error" in _v861rlc({ lineset_length_ft: 0, factory_charge_length_ft: 15, rate_oz_per_ft: 0.6 }));
   assert.ok("error" in _v861rlc({ lineset_length_ft: 60, factory_charge_length_ft: 15, rate_oz_per_ft: 0 }));
   assert.ok("error" in _v861rlc({ lineset_length_ft: 60, factory_charge_length_ft: -1, rate_oz_per_ft: 0.6 }));
+});
+
+test("bounds: spec-v862 computeRoofUnderlaymentRolls pins the roll count and error seams", () => {
+  // 2,500 sf, 1,000 sf rolls, 10% -> ceil(2.75) = 3 rolls.
+  assert.strictEqual(_v862rur({ roof_area_sf: 2500, roll_coverage_sf: 1000, lap_waste_pct: 10 }).rolls, 3);
+  // 15-lb felt (400 sf) takes more rolls.
+  assert.strictEqual(_v862rur({ roof_area_sf: 2500, roll_coverage_sf: 400, lap_waste_pct: 10 }).rolls, 7);
+  // Zero lap/waste is allowed.
+  assert.strictEqual(_v862rur({ roof_area_sf: 2000, roll_coverage_sf: 1000, lap_waste_pct: 0 }).rolls, 2);
+  // Error seams.
+  assert.ok("error" in _v862rur({ roof_area_sf: 0, roll_coverage_sf: 1000, lap_waste_pct: 10 }));
+  assert.ok("error" in _v862rur({ roof_area_sf: 2500, roll_coverage_sf: 0, lap_waste_pct: 10 }));
+  assert.ok("error" in _v862rur({ roof_area_sf: 2500, roll_coverage_sf: 1000, lap_waste_pct: -1 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {
