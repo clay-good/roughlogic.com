@@ -10,6 +10,7 @@
 //   - compaction-roller-production  Roller compaction production rate
 //   - ripper-production       Dozer ripper loosening production rate
 //   - water-for-compaction    Water to reach optimum moisture for compaction
+//   - rusle-soil-loss         RUSLE annual soil loss (erosion / SWPPP)
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
@@ -461,6 +462,61 @@ function _v821renderWaterForCompaction(inputRegion, outputRegion, citationEl) {
   for (const f of [vol, dd, omc, field]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["water-for-compaction"] = _v821renderWaterForCompaction;
+
+// --- rusle-soil-loss: RUSLE Annual Soil Loss ---
+//
+// RUSLE (USDA public-domain): A = R x K x LS x C x P (tons/acre/yr);
+// site loss = A x acres. Every factor is user-entered (no chart reproduced).
+// dims: in { r_factor: dimensionless, k_factor: dimensionless, ls_factor: dimensionless, c_factor: dimensionless, p_factor: dimensionless, acres: L^2 } out: { a_tons_ac_yr: M, site_tons_yr: M }
+// (The five RUSLE factors are dimensionless; the area is L^2; both soil-loss
+//  figures are a mass M, with the per-acre-year implicit on the rate.)
+export function computeRusleSoilLoss({ r_factor, k_factor, ls_factor, c_factor, p_factor, acres } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R = Number(r_factor);
+  const K = Number(k_factor);
+  const LS = Number(ls_factor);
+  const C = Number(c_factor);
+  const P = Number(p_factor);
+  const ac = Number(acres);
+  for (const [v, n] of [[R, "R (rainfall erosivity)"], [K, "K (soil erodibility)"], [LS, "LS (slope length-steepness)"], [C, "C (cover-management)"], [P, "P (support-practice)"]]) {
+    if (!Number.isFinite(v) || v < 0) return { error: n + " must be a non-negative finite number." };
+  }
+  if (!Number.isFinite(ac) || ac <= 0) return { error: "Disturbed area must be a positive finite number (acres)." };
+  const aTonsAcYr = R * K * LS * C * P;
+  const siteTonsYr = aTonsAcYr * ac;
+  if (![aTonsAcYr, siteTonsYr].every(Number.isFinite)) return { error: "Soil-loss math is not a finite value." };
+  return {
+    a_tons_ac_yr: aTonsAcYr,
+    site_tons_yr: siteTonsYr,
+    note: "RUSLE is the USDA public-domain replacement for USLE. Every factor comes from the SWPPP designer or published state guidance you enter (this tile reproduces no isoerodent map or nomograph). It estimates long-term average sheet-and-rill loss only, not gully or channel erosion. The cover factor C is the lever a contractor controls with mulch, a blanket, or seed. The permitting AHJ governs the plan.",
+  };
+}
+
+function _v822renderRusleSoilLoss(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: RUSLE identity by name (USDA public-domain). A = R x K x LS x C x P (tons/acre/yr); site loss = A x acres. Every factor is user-entered from the SWPPP designer or state guidance.";
+  const r = makeNumber("Rainfall-runoff erosivity R", "rsl-r", { step: "any", min: "0" });
+  const k = makeNumber("Soil erodibility K", "rsl-k", { step: "any", min: "0" });
+  const ls = makeNumber("Slope length-steepness LS", "rsl-ls", { step: "any", min: "0" });
+  const c = makeNumber("Cover-management C", "rsl-c", { step: "any", min: "0" });
+  const p = makeNumber("Support-practice P", "rsl-p", { step: "any", min: "0" });
+  const ac = makeNumber("Disturbed area (acres)", "rsl-ac", { step: "any", min: "0" });
+  for (const f of [r, k, ls, c, p, ac]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { r.input.value = "150"; k.input.value = "0.32"; ls.input.value = "1.5"; c.input.value = "1.0"; p.input.value = "1.0"; ac.input.value = "5"; update(); });
+  const oA = makeOutputLine(outputRegion, "Soil loss rate", "rsl-out-a");
+  const oSite = makeOutputLine(outputRegion, "Site soil loss", "rsl-out-site");
+  const update = debounce(() => {
+    const res = computeRusleSoilLoss({
+      r_factor: Number(r.input.value) || 0, k_factor: Number(k.input.value) || 0, ls_factor: Number(ls.input.value) || 0,
+      c_factor: c.input.value === "" ? 0 : Number(c.input.value), p_factor: p.input.value === "" ? 0 : Number(p.input.value),
+      acres: Number(ac.input.value) || 0,
+    });
+    if (res.error) { oA.textContent = res.error; oSite.textContent = "-"; return; }
+    oA.textContent = fmt(res.a_tons_ac_yr, 1) + " tons/acre/yr";
+    oSite.textContent = fmt(res.site_tons_yr, 0) + " tons/yr";
+  }, DEBOUNCE_MS);
+  for (const f of [r, k, ls, c, p, ac]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["rusle-soil-loss"] = _v822renderRusleSoilLoss;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

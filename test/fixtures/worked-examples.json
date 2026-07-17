@@ -48621,6 +48621,68 @@
    }
   },
   {
+   "tile_id": "rusle-soil-loss",
+   "source_publisher": "RUSLE (USDA Agriculture Handbook 703)",
+   "source_title": "bare 5-acre site: R 150, K 0.32, LS 1.5, C 1.0, P 1.0",
+   "source_edition_or_year": "spec-v822 worked example; USDA public-domain method",
+   "source_section_or_page": "A = 150*0.32*1.5*1.0*1.0 = 72 tons/acre/yr; site = 72*5 = 360 tons/yr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "r_factor": 150,
+    "k_factor": 0.32,
+    "ls_factor": 1.5,
+    "c_factor": 1.0,
+    "p_factor": 1.0,
+    "acres": 5
+   },
+   "outputs": {
+    "a_tons_ac_yr": {
+     "value": 72,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "site_tons_yr": {
+     "value": 360,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rusle-soil-loss",
+   "source_publisher": "RUSLE (USDA Agriculture Handbook 703)",
+   "source_title": "cross-check: an erosion blanket dropping C to 0.10 cuts the loss to a tenth",
+   "source_edition_or_year": "spec-v822 worked example",
+   "source_section_or_page": "A = 150*0.32*1.5*0.10*1.0 = 7.2 tons/acre/yr; site = 36 tons/yr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "r_factor": 150,
+    "k_factor": 0.32,
+    "ls_factor": 1.5,
+    "c_factor": 0.10,
+    "p_factor": 1.0,
+    "acres": 5
+   },
+   "outputs": {
+    "a_tons_ac_yr": {
+     "value": 7.2,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "site_tons_yr": {
+     "value": 36,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

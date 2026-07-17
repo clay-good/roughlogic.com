@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): rusle-soil-loss -- RUSLE annual soil loss (spec-v822); 2026-07-16
+
+- New Group E tile `rusle-soil-loss` (calc-earthwork.js), opening the erosion-control / SWPPP vein. The USDA
+  public-domain RUSLE method A = R x K x LS x C x P gives tons/acre/yr and the site total - the driver that sizes every
+  downstream BMP. A bare 5-acre site (R 150, K 0.32, LS 1.5, C 1.0, P 1.0) loses 72 tons/acre/yr (360 tons/yr); an
+  erosion blanket dropping C to 0.10 pulls it to 7.2 (36 tons/yr). Every factor is user-entered, so no copyrighted chart
+  is reproduced. Home count 1,270 -> 1,271.
+
 ### feat(earthwork): water-for-compaction -- water to reach optimum moisture (spec-v821); 2026-07-16
 
 - New Group E tile `water-for-compaction` (calc-earthwork.js), the moisture-conditioning step between the loosening/

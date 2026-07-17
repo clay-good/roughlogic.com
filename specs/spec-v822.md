@@ -1,6 +1,9 @@
 # roughlogic.com Specification v822 -- RUSLE Annual Soil Loss (calc-earthwork.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-16 (package 0.398.0).** Executed against the live catalog (1,270 -> 1,271 tiles). NOTE the
+> spec's blanket cross-check had an arithmetic slip (said "C to 0.10" but computed 10.8, which is C=0.15); landed with
+> the correct C=0.10 -> 7.2 tons/acre/yr. Related tiles retargeted to existing earthwork tiles (the proposed
+> erosion-blanket/silt-fence/sediment-basin siblings are not yet landed). Single-tile spec.
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-earthwork.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v821.md. Opens the erosion-control / SWPPP vein
 > (entry 1) -- the catalog has deep stormwater hydrology but no erosion-BMP tiles.

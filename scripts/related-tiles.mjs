@@ -997,6 +997,7 @@ const RELATED = {
 
   // spec-v67 Group E earthwork and excavation deepening
   "soil-swell-shrink": ["excavation", "haul-cycle-production", "aggregate"],
+  "rusle-soil-loss": ["soil-swell-shrink", "water-for-compaction", "relative-compaction"],
   "haul-cycle-production": ["soil-swell-shrink", "excavation", "axle-load-distribution"],
   "loader-production": ["haul-cycle-production", "soil-swell-shrink", "relative-compaction"],
   "dozer-production": ["loader-production", "haul-cycle-production", "soil-swell-shrink"],

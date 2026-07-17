@@ -17092,6 +17092,7 @@ test("bounds: spec-v662 computeEtHorsepower inverts the ET relation, round-trips
 // ===================== spec-v326..v328 soil characterization / QC batch =====================
 import { computeRelativeCompaction as _v326, computeSoilPhaseRelations as _v327, computeAtterbergIndices as _v328 } from "../../calc-earthwork.js";
 import { computeWaterForCompaction as _v821wfc } from "../../calc-earthwork.js";
+import { computeRusleSoilLoss as _v822rsl } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17128,6 +17129,22 @@ test("bounds: spec-v821 computeWaterForCompaction pins dry weight, water lb/gal,
   assert.ok("error" in _v821wfc({ volume_bcy: 100, dry_density_pcf: 0, omc_pct: 14, field_pct: 9 }));
   assert.ok("error" in _v821wfc({ volume_bcy: 100, dry_density_pcf: 105, omc_pct: -1, field_pct: 9 }));
   assert.ok("error" in _v821wfc({ volume_bcy: 100, dry_density_pcf: 105, omc_pct: 14, field_pct: -1 }));
+});
+
+test("bounds: spec-v822 computeRusleSoilLoss pins A = R K LS C P, the site total, and error seams", () => {
+  // R 150, K 0.32, LS 1.5, C 1.0, P 1.0, 5 ac -> 72 tons/acre/yr, 360 tons/yr
+  const r = _v822rsl({ r_factor: 150, k_factor: 0.32, ls_factor: 1.5, c_factor: 1.0, p_factor: 1.0, acres: 5 });
+  assert.ok(Math.abs(r.a_tons_ac_yr - 72) < 1e-9);
+  assert.ok(Math.abs(r.site_tons_yr - 360) < 1e-9);
+  // An erosion blanket dropping C to 0.10 cuts it proportionally.
+  assert.ok(Math.abs(_v822rsl({ r_factor: 150, k_factor: 0.32, ls_factor: 1.5, c_factor: 0.10, p_factor: 1.0, acres: 5 }).a_tons_ac_yr - 7.2) < 1e-9);
+  // Full cover (C=0) gives zero loss - a zero factor is allowed.
+  assert.strictEqual(_v822rsl({ r_factor: 150, k_factor: 0.32, ls_factor: 1.5, c_factor: 0, p_factor: 1.0, acres: 5 }).a_tons_ac_yr, 0);
+  // Error seams (negative factor or acreage; non-positive acreage).
+  assert.ok("error" in _v822rsl({ r_factor: -1, k_factor: 0.32, ls_factor: 1.5, c_factor: 1, p_factor: 1, acres: 5 }));
+  assert.ok("error" in _v822rsl({ r_factor: 150, k_factor: -0.1, ls_factor: 1.5, c_factor: 1, p_factor: 1, acres: 5 }));
+  assert.ok("error" in _v822rsl({ r_factor: 150, k_factor: 0.32, ls_factor: 1.5, c_factor: 1, p_factor: 1, acres: 0 }));
+  assert.ok("error" in _v822rsl({ r_factor: 150, k_factor: 0.32, ls_factor: 1.5, c_factor: 1, p_factor: 1, acres: -5 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

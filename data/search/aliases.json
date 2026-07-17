@@ -16602,6 +16602,31 @@
       "kind": "industry"
     },
     {
+      "term": "rusle soil loss",
+      "target": "rusle-soil-loss",
+      "kind": "industry"
+    },
+    {
+      "term": "annual soil loss",
+      "target": "rusle-soil-loss",
+      "kind": "industry"
+    },
+    {
+      "term": "erosion rate estimate",
+      "target": "rusle-soil-loss",
+      "kind": "industry"
+    },
+    {
+      "term": "usle a factor",
+      "target": "rusle-soil-loss",
+      "kind": "industry"
+    },
+    {
+      "term": "sheet rill erosion",
+      "target": "rusle-soil-loss",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

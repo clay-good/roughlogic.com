@@ -7957,6 +7957,17 @@ export const CITATIONS = {
       { name: "Soil percentages", value: "swell (sand ~12, common earth ~25, clay ~30, rock ~50+) and shrinkage (~10-20) from the geotech report", source: "Caterpillar Performance Handbook / geotech" },
     ],
   },
+  "rusle-soil-loss": {
+    formula: "a_tons_ac_yr = r_factor x k_factor x ls_factor x c_factor x p_factor; site_tons_yr = a_tons_ac_yr x acres.",
+    edition: "RUSLE (Revised Universal Soil Loss Equation) by name - the USDA public-domain method (Agriculture Handbook 703); every factor user-entered.",
+    freeAccess: "RUSLE is USDA public-domain; the factors come from the SWPPP designer or published state guidance the user enters (no isoerodent map or nomograph reproduced).",
+    governance: GOVERNANCE.general,
+    editionNote: "RUSLE is the USDA public-domain replacement for USLE. It estimates long-term average sheet-and-rill loss only, not gully or channel erosion. The cover factor C is the lever a contractor controls with mulch, a blanket, or seed. The permitting AHJ governs the plan.",
+    assumptions: [
+      { name: "Factors", value: "R (rainfall erosivity), K (soil erodibility), LS (slope length-steepness), C (cover-management), P (support-practice) all user-entered", source: "USDA Agriculture Handbook 703 / state SWPPP guidance" },
+      { name: "Scope", value: "sheet-and-rill loss only; not gully, channel, or streambank erosion", source: "RUSLE method" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

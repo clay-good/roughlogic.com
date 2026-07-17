@@ -750,6 +750,7 @@ export const COMPUTE_MAP = {
   "block-redirect-max-angle": { module: "../../calc-rigging.js", fn: "computeBlockRedirectMaxAngle" },
   // spec-v67 Group E earthwork and excavation deepening.
   "soil-swell-shrink": { module: "../../calc-earthwork.js", fn: "computeSoilSwellShrink" },
+  "rusle-soil-loss": { module: "../../calc-earthwork.js", fn: "computeRusleSoilLoss" },
   "haul-cycle-production": { module: "../../calc-earthwork.js", fn: "computeHaulCycleProduction" },
   "loader-production": { module: "../../calc-earthwork.js", fn: "computeLoaderProduction" },
   "dozer-production": { module: "../../calc-earthwork.js", fn: "computeDozerProduction" },
