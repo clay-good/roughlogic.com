@@ -8233,6 +8233,17 @@ export const CITATIONS = {
       { name: "Scope", value: "fasteners only; sheets and mud are in the drywall tile", source: "takeoff convention" },
     ],
   },
+  "glass-vacuum-lift": {
+    formula: "weight_lb = area_sf x glass_thickness_in x glass_density_psf_in; cups = ceil(weight_lb x safety_factor / cup_wll_lb).",
+    edition: "Suction-cup lifter identity by name (glass weight from area x thickness x density; cups from weight at a safety factor over the cup WLL); first-principles arithmetic.",
+    freeAccess: "The weight and count arithmetic is public first-principles; the safety factor and cup working load come from the lifter manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "Soda-lime glass weighs about 13 lb/ft^2 per inch of thickness; an insulated unit sums the lite thicknesses. The safety factor (typically 4:1) and the cup working load come from the lifter manufacturer (ANSI/ASME). A competent person and the rated lifter govern the pick. Distinct from glass-weight, which gives only the weight.",
+    assumptions: [
+      { name: "Glass density", value: "~13 lb/ft^2 per inch of thickness for soda-lime glass", source: "glass properties" },
+      { name: "Safety factor / cup WLL", value: "~4:1 on the per-cup working load; the lifter manufacturer governs", source: "ANSI/ASME lifter rating" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

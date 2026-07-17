@@ -18277,6 +18277,31 @@
       "kind": "industry"
     },
     {
+      "term": "glass vacuum lift",
+      "target": "glass-vacuum-lift",
+      "kind": "industry"
+    },
+    {
+      "term": "glass suction cups",
+      "target": "glass-vacuum-lift",
+      "kind": "industry"
+    },
+    {
+      "term": "glass lifter count",
+      "target": "glass-vacuum-lift",
+      "kind": "industry"
+    },
+    {
+      "term": "glazing lifter cups",
+      "target": "glass-vacuum-lift",
+      "kind": "industry"
+    },
+    {
+      "term": "glass weight lifter",
+      "target": "glass-vacuum-lift",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

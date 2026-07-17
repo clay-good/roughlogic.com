@@ -26265,3 +26265,22 @@ test("bounds: spec-v888 computeDrywallFastenerTakeoff pins screws/sheet, total, 
   assert.ok("error" in _v888({ sheets: 100, sheet_length_ft: 8, sheet_width_ft: 4, stud_spacing_in: 16, field_screw_spacing_in: 0 }));
   assert.ok("error" in _v888({ sheets: Infinity, sheet_length_ft: 8, sheet_width_ft: 4, stud_spacing_in: 16, field_screw_spacing_in: 12 }));
 });
+
+import { computeGlassVacuumLift as _v889 } from "../../calc-construction.js";
+
+test("bounds: spec-v889 computeGlassVacuumLift pins the glass weight, cup count, and error seams", () => {
+  const r = _v889({ area_sf: 32, glass_thickness_in: 0.5, safety_factor: 4, cup_wll_lb: 150, glass_density_psf_in: 13.0 });
+  assert.equal(r.weight_lb, 208); // 32 * 0.5 * 13
+  assert.equal(r.cups, 6); // ceil(208*4/150) = ceil(5.55)
+  // Half the glass, half the cups: a monolithic 1/4 in lite of the same size.
+  const mono = _v889({ area_sf: 32, glass_thickness_in: 0.25, safety_factor: 4, cup_wll_lb: 150, glass_density_psf_in: 13.0 });
+  assert.equal(mono.weight_lb, 104); // 32 * 0.25 * 13
+  assert.equal(mono.cups, 3); // ceil(104*4/150) = ceil(2.77)
+  // Error seams: non-finite, non-positive area / thickness / safety / cup WLL / density.
+  assert.ok("error" in _v889({ area_sf: 0, glass_thickness_in: 0.5, safety_factor: 4, cup_wll_lb: 150, glass_density_psf_in: 13.0 }));
+  assert.ok("error" in _v889({ area_sf: 32, glass_thickness_in: 0, safety_factor: 4, cup_wll_lb: 150, glass_density_psf_in: 13.0 }));
+  assert.ok("error" in _v889({ area_sf: 32, glass_thickness_in: 0.5, safety_factor: 0, cup_wll_lb: 150, glass_density_psf_in: 13.0 }));
+  assert.ok("error" in _v889({ area_sf: 32, glass_thickness_in: 0.5, safety_factor: 4, cup_wll_lb: 0, glass_density_psf_in: 13.0 }));
+  assert.ok("error" in _v889({ area_sf: 32, glass_thickness_in: 0.5, safety_factor: 4, cup_wll_lb: 150, glass_density_psf_in: 0 }));
+  assert.ok("error" in _v889({ area_sf: Infinity, glass_thickness_in: 0.5, safety_factor: 4, cup_wll_lb: 150, glass_density_psf_in: 13.0 }));
+});

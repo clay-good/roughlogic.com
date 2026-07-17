@@ -9564,3 +9564,46 @@ const _v888renderDrywallFastenerTakeoff = _simpleRenderer({
   compute: computeDrywallFastenerTakeoff,
 });
 CONSTRUCTION_RENDERERS["drywall-fastener-takeoff"] = _v888renderDrywallFastenerTakeoff;
+
+// --- glass-vacuum-lift: Glass Weight and Suction-Cup Lifter Count ---
+//
+// Glass weight from area x thickness x density, then cups at a safety factor over the cup WLL.
+//   weight = area x thickness x density; cups = ceil(weight x safety_factor / cup_wll)
+// dims: in { area_sf: L^2, glass_thickness_in: L, safety_factor: dimensionless, cup_wll_lb: M L T^-2, glass_density_psf_in: M L^-2 T^-2 } out: { weight_lb: M L T^-2, cups: dimensionless }
+export function computeGlassVacuumLift({ area_sf = 32, glass_thickness_in = 0.5, safety_factor = 4, cup_wll_lb = 150, glass_density_psf_in = 13.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
+  if (!(glass_thickness_in > 0)) return { error: "Glass thickness must be positive (in)." };
+  if (!(safety_factor > 0)) return { error: "Safety factor must be positive." };
+  if (!(cup_wll_lb > 0)) return { error: "Cup working load must be positive (lb)." };
+  if (!(glass_density_psf_in > 0)) return { error: "Glass density must be positive (lb/ft^2 per in)." };
+  const weight_lb = area_sf * glass_thickness_in * glass_density_psf_in;
+  const cups = Math.ceil(weight_lb * safety_factor / cup_wll_lb);
+  if (![weight_lb, cups].every(Number.isFinite)) return { error: "Glass-lift math is not a finite value." };
+  return {
+    weight_lb,
+    cups,
+    note: "Soda-lime glass weighs about 13 lb/ft^2 per inch of thickness; an insulated unit sums the lite thicknesses. The safety factor (typically 4:1) and the cup working load come from the lifter manufacturer (ANSI/ASME). A competent person and the rated lifter govern the pick. Distinct from glass-weight, which gives only the weight.",
+  };
+}
+
+export const glassVacuumLiftExample = { inputs: { area_sf: 32, glass_thickness_in: 0.5, safety_factor: 4, cup_wll_lb: 150, glass_density_psf_in: 13.0 } };
+
+const _v889renderGlassVacuumLift = _simpleRenderer({
+  citation: "Citation: lifter identity by name. weight = area x thickness x density; cups = ceil(weight x safety factor / cup working load). Soda-lime glass weighs about 13 lb/ft^2 per inch; the safety factor and cup WLL come from the lifter manufacturer.",
+  example: glassVacuumLiftExample.inputs,
+  fields: [
+    { key: "area_sf", label: "Lite / unit area (ft^2)", kind: "number", default: 32 },
+    { key: "glass_thickness_in", label: "Total glass thickness, all lites (in)", kind: "number", default: 0.5 },
+    { key: "safety_factor", label: "Lifter safety factor", kind: "number", default: 4 },
+    { key: "cup_wll_lb", label: "Per-cup working load (lb)", kind: "number", default: 150 },
+    { key: "glass_density_psf_in", label: "Glass weight (lb/ft^2 per in)", kind: "number", default: 13.0 },
+  ],
+  outputs: [
+    { key: "w", id: "gvl-out-w", label: "Glass weight", value: (r) => _fmtC(r.weight_lb, 0) + " lb" },
+    { key: "c", id: "gvl-out-c", label: "Suction cups", value: (r) => _fmtC(r.cups, 0) + " cups" },
+    { key: "note", id: "gvl-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGlassVacuumLift,
+});
+CONSTRUCTION_RENDERERS["glass-vacuum-lift"] = _v889renderGlassVacuumLift;

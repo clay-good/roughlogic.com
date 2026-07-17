@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): glass-vacuum-lift -- glass weight and suction-cup lifter count (spec-v889); 2026-07-17
+
+- New Group E tile `glass-vacuum-lift` (calc-construction.js), the glazing rigging check beside `glass-weight` and the
+  `rigging-check` family. weight = area x thickness x density (~13 lb/ft^2 per in for soda-lime); cups = ceil(weight x
+  safety factor / cup working load). A 4 x 8 ft insulated unit with a half-inch of total glass weighs 208 lb and at a 4:1
+  safety factor on 150-lb cups needs 6 cups; a monolithic 1/4 in lite is 104 lb and 3 cups. The safety factor and cup WLL
+  come from the lifter manufacturer; a competent person and the rated lifter govern the pick. Home count 1,337 -> 1,338.
+
 ### feat(construction): drywall-fastener-takeoff -- drywall screw fastener takeoff (spec-v888); 2026-07-17
 
 - New Group E tile `drywall-fastener-takeoff` (calc-construction.js), the drywall fastener takeoff beside `drywall` and
