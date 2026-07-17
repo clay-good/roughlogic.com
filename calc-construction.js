@@ -8307,3 +8307,49 @@ const _v859renderDuctWrapTakeoff = _simpleRenderer({
   compute: computeDuctWrapTakeoff,
 });
 CONSTRUCTION_RENDERERS["duct-wrap-takeoff"] = _v859renderDuctWrapTakeoff;
+
+// --- duct-hanger-load: Duct Hanger Load and Count ---
+//
+// The weight each duct hanger carries at a chosen spacing and the number a run
+// needs, completing the HVAC sheet-metal trio (metal, wrap, support):
+//   load_per_hanger_lb = duct_lb_per_ft x spacing_ft
+//   count = ceil(run_ft / spacing_ft) + 1
+//   utilization = hanger SWL > 0 ? load / SWL : null
+// dims: in { duct_lb_per_ft: M T^-2, spacing_ft: L, run_ft: L, hanger_swl_lb: M L T^-2 } out: { load_per_hanger_lb: M L T^-2, count: dimensionless }
+export function computeDuctHangerLoad({ duct_lb_per_ft = 5.5, spacing_ft = 8, run_ft = 40, hanger_swl_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(duct_lb_per_ft > 0)) return { error: "Duct weight per foot must be positive (lb/ft)." };
+  if (!(spacing_ft > 0)) return { error: "Hanger spacing must be positive (ft)." };
+  if (!(run_ft > 0)) return { error: "Run length must be positive (ft)." };
+  if (hanger_swl_lb < 0) return { error: "Hanger SWL cannot be negative (lb)." };
+  const load_per_hanger_lb = duct_lb_per_ft * spacing_ft;
+  const count = Math.ceil(run_ft / spacing_ft) + 1;
+  if (![load_per_hanger_lb, count].every(Number.isFinite)) return { error: "Hanger math is not a finite value." };
+  const utilization = hanger_swl_lb > 0 ? load_per_hanger_lb / hanger_swl_lb : null;
+  return {
+    load_per_hanger_lb,
+    count,
+    utilization,
+    note: "The maximum spacing follows SMACNA (about 8-10 ft for rectangular duct). The per-foot weight comes from duct-metal-weight, plus wrap and any water in a coil. The hanger, rod, or strap safe working load is the manufacturer's. Large duct goes on a trapeze; wider spacing means fewer hangers but more load on each.",
+  };
+}
+
+export const ductHangerLoadExample = { inputs: { duct_lb_per_ft: 5.5, spacing_ft: 8, run_ft: 40, hanger_swl_lb: 0 } };
+
+const _v860renderDuctHangerLoad = _simpleRenderer({
+  citation: "Citation: duct-hanger identity by name. load per hanger = per-foot weight x spacing; count = ceil(run / spacing) + 1. The max spacing follows SMACNA (~8-10 ft rectangular); the per-foot weight comes from duct-metal-weight; the hanger SWL is the manufacturer's.",
+  example: ductHangerLoadExample.inputs,
+  fields: [
+    { key: "duct_lb_per_ft", label: "Duct weight per foot (lb/ft)", kind: "number", default: 5.5 },
+    { key: "spacing_ft", label: "Hanger spacing (ft)", kind: "number", default: 8 },
+    { key: "run_ft", label: "Run length (ft)", kind: "number", default: 40 },
+    { key: "hanger_swl_lb", label: "Hanger safe working load (lb, 0 = skip)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "l", id: "dhl-out-l", label: "Load per hanger", value: (r) => _fmtC(r.load_per_hanger_lb, 0) + " lb" + (r.utilization === null ? "" : " (" + _fmtC(r.utilization * 100, 0) + "% of SWL)") },
+    { key: "c", id: "dhl-out-c", label: "Hangers for the run", value: (r) => _fmtC(r.count, 0) },
+    { key: "note", id: "dhl-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDuctHangerLoad,
+});
+CONSTRUCTION_RENDERERS["duct-hanger-load"] = _v860renderDuctHangerLoad;

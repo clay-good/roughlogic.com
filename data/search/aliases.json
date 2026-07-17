@@ -17552,6 +17552,31 @@
       "kind": "industry"
     },
     {
+      "term": "duct hanger load",
+      "target": "duct-hanger-load",
+      "kind": "industry"
+    },
+    {
+      "term": "duct strap spacing",
+      "target": "duct-hanger-load",
+      "kind": "industry"
+    },
+    {
+      "term": "duct hanger count",
+      "target": "duct-hanger-load",
+      "kind": "industry"
+    },
+    {
+      "term": "duct support load",
+      "target": "duct-hanger-load",
+      "kind": "industry"
+    },
+    {
+      "term": "ductwork hangers",
+      "target": "duct-hanger-load",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

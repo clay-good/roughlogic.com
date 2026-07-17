@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): duct-hanger-load -- duct hanger load and count (spec-v860); 2026-07-17
+
+- New Group E tile `duct-hanger-load` (calc-construction.js), completing the HVAC sheet-metal trio (`duct-metal-weight`
+  metal, `duct-wrap-takeoff` insulation, `duct-hanger-load` support). load = per-foot weight x spacing; count = ceil(run
+  / spacing) + 1. A duct weighing 5.5 lb/ft on 8 ft centers puts 44 lb on each hanger, and a 40 ft run takes 6 hangers;
+  a heavier lined duct at 9 lb/ft on 10 ft centers is 90 lb/hanger over 5 hangers -- wider spacing means fewer hangers
+  but more load on each, which the hanger SWL check catches. SMACNA sets the max spacing (~8-10 ft rectangular). Home
+  count 1,308 -> 1,309. This tile crossed the calc-construction.js gzip cap, raised 140000 -> 150000 (ledger in
+  check-module-sizes.mjs).
+
 ### feat(construction): duct-wrap-takeoff -- duct wrap / liner material takeoff (spec-v859); 2026-07-17
 
 - New Group E tile `duct-wrap-takeoff` (calc-construction.js), the HVAC sheet-metal insulation takeoff beside

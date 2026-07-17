@@ -17130,6 +17130,7 @@ import { computeSolderJointQuantity as _v856sjq } from "../../calc-plumbing.js";
 import { computePipeInsulationTakeoff as _v857pit } from "../../calc-plumbing.js";
 import { computeHeatTraceSizing as _v858hts } from "../../calc-plumbing.js";
 import { computeDuctWrapTakeoff as _v859dwt } from "../../calc-construction.js";
+import { computeDuctHangerLoad as _v860dhl } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17823,6 +17824,25 @@ test("bounds: spec-v859 computeDuctWrapTakeoff pins the perimeter, wrap area, ro
   assert.ok("error" in _v859dwt({ width_in: 20, height_in: 12, length_ft: 0, overlap_waste_factor: 1.15, roll_coverage_sf: 100 }));
   assert.ok("error" in _v859dwt({ width_in: 20, height_in: 12, length_ft: 40, overlap_waste_factor: 0, roll_coverage_sf: 100 }));
   assert.ok("error" in _v859dwt({ width_in: 20, height_in: 12, length_ft: 40, overlap_waste_factor: 1.15, roll_coverage_sf: 0 }));
+});
+
+test("bounds: spec-v860 computeDuctHangerLoad pins the per-hanger load, count, utilization (and null seam), and error seams", () => {
+  // 5.5 lb/ft, 8 ft spacing, 40 ft run, SWL skipped -> 44 lb, 6 hangers, null utilization.
+  const r = _v860dhl({ duct_lb_per_ft: 5.5, spacing_ft: 8, run_ft: 40, hanger_swl_lb: 0 });
+  assert.strictEqual(r.load_per_hanger_lb, 44);
+  assert.strictEqual(r.count, 6);
+  assert.strictEqual(r.utilization, null);
+  // A heavier lined duct on wider centers: fewer hangers, more load each.
+  const heavy = _v860dhl({ duct_lb_per_ft: 9, spacing_ft: 10, run_ft: 40, hanger_swl_lb: 0 });
+  assert.strictEqual(heavy.load_per_hanger_lb, 90);
+  assert.strictEqual(heavy.count, 5);
+  // A hanger SWL fills in the utilization.
+  assert.ok(Math.abs(_v860dhl({ duct_lb_per_ft: 5.5, spacing_ft: 8, run_ft: 40, hanger_swl_lb: 200 }).utilization - 0.22) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v860dhl({ duct_lb_per_ft: 0, spacing_ft: 8, run_ft: 40 }));
+  assert.ok("error" in _v860dhl({ duct_lb_per_ft: 5.5, spacing_ft: 0, run_ft: 40 }));
+  assert.ok("error" in _v860dhl({ duct_lb_per_ft: 5.5, spacing_ft: 8, run_ft: 0 }));
+  assert.ok("error" in _v860dhl({ duct_lb_per_ft: 5.5, spacing_ft: 8, run_ft: 40, hanger_swl_lb: -1 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

@@ -8376,6 +8376,17 @@ export const CITATIONS = {
       { name: "Roll coverage", value: "the product's installed coverage per roll (less than nominal), from the manufacturer", source: "wrap manufacturer" },
     ],
   },
+  "duct-hanger-load": {
+    formula: "load_per_hanger_lb = duct_lb_per_ft x spacing_ft; count = ceil(run_ft / spacing_ft) + 1; utilization = load_per_hanger_lb / hanger_swl_lb.",
+    edition: "Duct-hanger load / count identity by name (tributary weight per hanger; count from run and spacing); first-principles statics.",
+    freeAccess: "The tributary-load statics are public first-principles; the max spacing (SMACNA) and hanger SWL come from SMACNA and the manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "The maximum spacing follows SMACNA (about 8-10 ft for rectangular duct). The per-foot weight comes from duct-metal-weight, plus wrap and any water in a coil. The hanger, rod, or strap safe working load is the manufacturer's. Large duct goes on a trapeze.",
+    assumptions: [
+      { name: "Max spacing", value: "~8-10 ft for rectangular duct per SMACNA; entered here", source: "SMACNA duct construction standards" },
+      { name: "Per-foot weight", value: "from duct-metal-weight, plus wrap and any water in a coil", source: "duct-metal-weight" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",
