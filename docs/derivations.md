@@ -2110,6 +2110,7 @@ cross-check.
 | calc-fire.js | `renderSprinklerKFactor` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderStandpipeFriction` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-firesprinkler.js | `computeFirePumpCurve` | `{ rated_gpm = 0, rated_psi = 0, churn_psi = 0, overload_psi = 0 } = {}` | _ | _ | _ |
+| calc-firesprinkler.js | `computeSmokeDetectorSpacingCount` | `{ room_length_ft = 60, room_width_ft = 40, listed_spacing_ft = 30 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerHeadLayout` | `{ room_length = 0, room_width = 0, area_per_head = 130, max_spacing = 15 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerPressureDemand` | `{ q_head_gpm = 0, k_factor = 5.6, q_total_gpm = 0, pipe_id_in = 0, c_factor =...` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerProtectionAreaForSupply` | `{ available_supply_gpm = 0, density = 0.20, hose_gpm = 250 } = {}` | _ | _ | _ |
@@ -3017,7 +3018,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1603.
+Row count: 1604.
 
 <!-- END function-corpus-v14 -->
 
@@ -3933,7 +3934,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (45 tiles)
+### Group F Fire-ground (46 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3965,6 +3966,7 @@ per spec-v14 §13.1 second paragraph.
 | `rope-ma` | Rope Rescue Mechanical Advantage | Project (first-principles); 4:1 rig (3 pulleys), efficiency 0.9, 600 lb load -> theor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `scba-cylinder-time` | SCBA Cylinder Work Time | NFPA / NIOSH; Manufacturer rated scf / pressure; 33% low-air alarm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sling-angle` | Sling Angle Load Multiplier | OSHA 1926.251 + ASME B30.9 sling-angl...; 4000 lb / vertical / 2 legs -> 2000 lb per leg / choker_f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `smoke-detector-spacing-count` | Spot Smoke / Heat Detector Count (Smooth Ceiling) | NFPA 72 spot-detector grid identity (...; rows=ceil(60/30)=2; cols=ceil(40/30)=2; detectors=4; wall... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `smoke-ejector-cfm` | Smoke Ejector / Ventilation CFM (NFPA 1500) | NFPA 1500 / IFSTA; CFM = 12000 x 5 / 60 = 1000; 1 fan; time = 12000 / 4000 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `smoke-reading` | Smoke Reading Reference | IFSTA Building Construction for the F...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `smooth-bore-diameter-for-flow` | Smooth-Bore Tip Diameter for a Target Flow | IFSTA Pumping Apparatus Driver/Operat...; spec-v738 section 2.1 pinned example (250 gpm, 50 psi -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4559,6 +4561,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1356. Fixture-covered or reference-cadence: 1356 / 1356.
+Tile count: 1357. Fixture-covered or reference-cadence: 1357 / 1357.
 
 <!-- END tile-index-v14 -->

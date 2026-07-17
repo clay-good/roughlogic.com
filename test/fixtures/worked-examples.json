@@ -53759,6 +53759,56 @@
    }
   },
   {
+   "tile_id": "smoke-detector-spacing-count",
+   "source_publisher": "NFPA 72 spot-detector grid identity (first-principles)",
+   "source_title": "60 x 40 ft room, 30 ft listed spacing -> 4 detectors (2 x 2 grid), 15 ft off each wall",
+   "source_edition_or_year": "spec-v908 worked example",
+   "source_section_or_page": "rows=ceil(60/30)=2; cols=ceil(40/30)=2; detectors=4; wall max=30/2=15",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "room_length_ft": 60,
+    "room_width_ft": 40,
+    "listed_spacing_ft": 30
+   },
+   "outputs": {
+    "detectors": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "wall_max_ft": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "smoke-detector-spacing-count",
+   "source_publisher": "NFPA 72 spot-detector grid identity (first-principles)",
+   "source_title": "cross-check: a 100 x 80 ft open area is a 4 x 3 grid -> 12 detectors",
+   "source_edition_or_year": "spec-v908 worked example",
+   "source_section_or_page": "rows=ceil(100/30)=4; cols=ceil(80/30)=3; detectors=12",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "room_length_ft": 100,
+    "room_width_ft": 80,
+    "listed_spacing_ft": 30
+   },
+   "outputs": {
+    "detectors": {
+     "value": 12,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

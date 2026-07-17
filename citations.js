@@ -8442,6 +8442,17 @@ export const CITATIONS = {
       { name: "Product NFA", value: "per soffit vent (~26 in^2) and per foot of ridge (~18 in^2/ft) from the manufacturer", source: "vent manufacturer" },
     ],
   },
+  "smoke-detector-spacing-count": {
+    formula: "rows = ceil(room_length_ft / listed_spacing_ft); cols = ceil(room_width_ft / listed_spacing_ft); detectors = rows x cols; wall_max_ft = listed_spacing_ft / 2.",
+    edition: "NFPA 72 spot-detector grid identity by name (grid count over the listed spacing; wall maximum at half the spacing); first-principles grid arithmetic.",
+    freeAccess: "The grid arithmetic is public first-principles; the listed spacing comes from the device listing and the reductions from NFPA 72.",
+    governance: GOVERNANCE.general,
+    editionNote: "The listed spacing (about 30 ft for spot smoke on a smooth ceiling) comes from the device listing. The 0.7-times-spacing rule confirms no point is farther than that from a detector; the first detector sits within half the spacing of each wall. Beams, high ceilings, and HVAC reduce the spacing per NFPA 72. Like sprinkler-head-layout, this is an install estimate the stamped fire-alarm plan and the AHJ plan-review govern.",
+    assumptions: [
+      { name: "Listed spacing", value: "~30 ft for spot smoke on a smooth ceiling; the device listing governs", source: "device listing / NFPA 72" },
+      { name: "Coverage", value: "0.7 x spacing to the farthest point; first detector within spacing/2 of each wall", source: "NFPA 72" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

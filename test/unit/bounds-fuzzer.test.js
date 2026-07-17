@@ -26647,3 +26647,25 @@ test("bounds: spec-v907 computeSoffitRidgeVentCount pins the NFA, soffit vents, 
   assert.ok("error" in _v907({ attic_area_sf: 1500, vent_ratio: 300, soffit_vent_nfa_in2: 26, ridge_nfa_per_ft_in2: 0 }));
   assert.ok("error" in _v907({ attic_area_sf: Infinity, vent_ratio: 300, soffit_vent_nfa_in2: 26, ridge_nfa_per_ft_in2: 18 }));
 });
+
+import { computeSmokeDetectorSpacingCount as _v908 } from "../../calc-firesprinkler.js";
+
+test("bounds: spec-v908 computeSmokeDetectorSpacingCount pins the grid, detector count, wall max, and error seams", () => {
+  const r = _v908({ room_length_ft: 60, room_width_ft: 40, listed_spacing_ft: 30 });
+  assert.equal(r.rows, 2); // ceil(60/30)
+  assert.equal(r.cols, 2); // ceil(40/30)
+  assert.equal(r.detectors, 4); // 2 x 2
+  assert.equal(r.wall_max_ft, 15); // 30 / 2
+  // The grid grows with the room: a large open area needs a bigger grid.
+  const big = _v908({ room_length_ft: 100, room_width_ft: 80, listed_spacing_ft: 30 });
+  assert.equal(big.rows, 4); // ceil(100/30)
+  assert.equal(big.cols, 3); // ceil(80/30)
+  assert.equal(big.detectors, 12); // 4 x 3
+  // A room within one listed spacing still needs one detector.
+  assert.equal(_v908({ room_length_ft: 20, room_width_ft: 15, listed_spacing_ft: 30 }).detectors, 1);
+  // Error seams: non-finite, non-positive length / width / spacing.
+  assert.ok("error" in _v908({ room_length_ft: 0, room_width_ft: 40, listed_spacing_ft: 30 }));
+  assert.ok("error" in _v908({ room_length_ft: 60, room_width_ft: 0, listed_spacing_ft: 30 }));
+  assert.ok("error" in _v908({ room_length_ft: 60, room_width_ft: 40, listed_spacing_ft: 0 }));
+  assert.ok("error" in _v908({ room_length_ft: Infinity, room_width_ft: 40, listed_spacing_ft: 30 }));
+});

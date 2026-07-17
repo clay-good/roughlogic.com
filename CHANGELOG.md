@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fire): smoke-detector-spacing-count -- spot smoke / heat detector count (smooth ceiling) (spec-v908); 2026-07-17
+
+- New Group F tile `smoke-detector-spacing-count` (calc-firesprinkler.js), the fire-alarm install estimate beside
+  `sprinkler-head-layout`. rows = ceil(length / listed spacing); columns = ceil(width / spacing); detectors = rows x
+  columns; wall maximum = spacing / 2. A 60 x 40 ft room at a 30 ft listed spacing takes 4 detectors (a 2 x 2 grid, 15 ft
+  off each wall); a 100 x 80 ft open area takes 12. The 0.7-times-spacing rule confirms every point is covered; beams,
+  high ceilings, and HVAC tighten it per NFPA 72. An install estimate the stamped fire-alarm plan and AHJ govern.
+  **Completes the construction-operations campaign at 100 new specs (v809-v908).** Home count 1,356 -> 1,357.
+
 ### feat(roofing): soffit-ridge-vent-count -- soffit vent and ridge-vent count from required NFA (spec-v907); 2026-07-17
 
 - New Group E tile `soffit-ridge-vent-count` (calc-finish.js), the ventilation takeoff beside `attic-ventilation`. total

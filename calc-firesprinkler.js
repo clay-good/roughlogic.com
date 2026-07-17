@@ -278,3 +278,41 @@ FIRESPRINKLER_RENDERERS["sprinkler-pressure-demand"] = _simpleRenderer({
   ],
   compute: computeSprinklerPressureDemand,
 });
+
+// smoke-detector-spacing-count (spec-v908): spot smoke / heat detector count on a smooth ceiling (NFPA 72).
+// dims: in { room_length_ft: L, room_width_ft: L, listed_spacing_ft: L } out: { rows: dimensionless, cols: dimensionless, detectors: dimensionless, wall_max_ft: L }
+export function computeSmokeDetectorSpacingCount({ room_length_ft = 60, room_width_ft = 40, listed_spacing_ft = 30 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(room_length_ft > 0)) return { error: "Room length must be positive (ft)." };
+  if (!(room_width_ft > 0)) return { error: "Room width must be positive (ft)." };
+  if (!(listed_spacing_ft > 0)) return { error: "Listed spacing must be positive (ft)." };
+  const rows = Math.ceil(room_length_ft / listed_spacing_ft);
+  const cols = Math.ceil(room_width_ft / listed_spacing_ft);
+  const detectors = rows * cols;
+  const wall_max_ft = listed_spacing_ft / 2;
+  if (![rows, cols, detectors, wall_max_ft].every(Number.isFinite)) return { error: "Detector-count math is not a finite value." };
+  return {
+    rows,
+    cols,
+    detectors,
+    wall_max_ft,
+    note: "The listed spacing (about 30 ft for spot smoke on a smooth ceiling) comes from the device listing. The 0.7-times-spacing rule confirms no point is farther than that from a detector; the first detector sits within half the spacing of each wall. Beams, high ceilings, and HVAC reduce the spacing per NFPA 72. Like sprinkler-head-layout, this is an install estimate the stamped fire-alarm plan and the AHJ plan-review govern.",
+  };
+}
+
+const smokeDetectorSpacingCountExample = { inputs: { room_length_ft: 60, room_width_ft: 40, listed_spacing_ft: 30 } };
+FIRESPRINKLER_RENDERERS["smoke-detector-spacing-count"] = _simpleRenderer({
+  citation: "Citation: NFPA 72 spot-detector grid by name. rows = ceil(length / spacing); columns = ceil(width / spacing); detectors = rows x columns; wall maximum = spacing / 2. The 0.7-times-spacing rule confirms every point is covered.",
+  example: smokeDetectorSpacingCountExample.inputs,
+  fields: [
+    { key: "room_length_ft", label: "Room length (ft)", kind: "number", default: 60 },
+    { key: "room_width_ft", label: "Room width (ft)", kind: "number", default: 40 },
+    { key: "listed_spacing_ft", label: "Device listed spacing (ft)", kind: "number", default: 30 },
+  ],
+  outputs: [
+    { key: "d", id: "sds-out-d", label: "Detectors", value: (r) => fmt(r.detectors, 0) + " detectors (" + fmt(r.rows, 0) + " x " + fmt(r.cols, 0) + " grid)" },
+    { key: "w", id: "sds-out-w", label: "Max off each wall", value: (r) => fmt(r.wall_max_ft, 1) + " ft" },
+    { key: "note", id: "sds-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSmokeDetectorSpacingCount,
+});

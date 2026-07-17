@@ -1,6 +1,6 @@
 # roughlogic.com Specification v908 -- Spot Smoke / Heat Detector Count (Smooth Ceiling) (calc-firesprinkler.js, Group F, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED (2026-07-17). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-firesprinkler.js`** (Group F),
 > no new module, group, or dependency. Inherits spec.md through spec-v907.md. Fire-alarm install-ops sweep, mirroring the
 > accepted `sprinkler-head-layout` install-estimate precedent.

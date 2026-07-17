@@ -18752,6 +18752,31 @@
       "kind": "industry"
     },
     {
+      "term": "smoke detector count",
+      "target": "smoke-detector-spacing-count",
+      "kind": "industry"
+    },
+    {
+      "term": "spot detector spacing",
+      "target": "smoke-detector-spacing-count",
+      "kind": "industry"
+    },
+    {
+      "term": "smoke detector layout",
+      "target": "smoke-detector-spacing-count",
+      "kind": "industry"
+    },
+    {
+      "term": "heat detector spacing",
+      "target": "smoke-detector-spacing-count",
+      "kind": "industry"
+    },
+    {
+      "term": "nfpa 72 detector count",
+      "target": "smoke-detector-spacing-count",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"
