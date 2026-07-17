@@ -18502,6 +18502,31 @@
       "kind": "industry"
     },
     {
+      "term": "pool waterline tile",
+      "target": "pool-tile-coping-perimeter",
+      "kind": "industry"
+    },
+    {
+      "term": "pool coping takeoff",
+      "target": "pool-tile-coping-perimeter",
+      "kind": "industry"
+    },
+    {
+      "term": "pool tile count",
+      "target": "pool-tile-coping-perimeter",
+      "kind": "industry"
+    },
+    {
+      "term": "pool perimeter tile",
+      "target": "pool-tile-coping-perimeter",
+      "kind": "industry"
+    },
+    {
+      "term": "waterline tile coping",
+      "target": "pool-tile-coping-perimeter",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

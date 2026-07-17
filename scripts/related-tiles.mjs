@@ -1069,6 +1069,7 @@ const RELATED = {
   "housewrap-rolls": ["siding-takeoff", "vapor-barrier-rolls", "roof-underlayment-rolls"],
   "pv-rail-clamp-takeoff": ["pv-row-spacing", "pv-array-sizing", "metal-weight"],
   "pv-ballast-weight": ["pv-rail-clamp-takeoff", "pv-row-spacing", "snow-load"],
+  "pool-tile-coping-perimeter": ["pool-volume", "tile-count", "thinset-coverage"],
   "concrete-vibrator-spacing": ["concrete-pour-rate", "formwork-pressure", "concrete"],
   "formwork-tie-load": ["formwork-pressure", "shore-post-load", "concrete-pour-rate"],
   "mass-concrete-temp-rise": ["concrete-maturity", "fresh-concrete-temp", "concrete-evaporation-rate"],

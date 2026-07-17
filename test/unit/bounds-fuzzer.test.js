@@ -26440,3 +26440,24 @@ test("bounds: spec-v897 computePvBallastWeight pins the total, added psf, pass f
   assert.ok("error" in _v897({ modules: 30, module_wt_lb: 50, ballast_per_module_lb: 40, racking_wt_lb: -1, array_area_sf: 630, allowable_psf: 5 }));
   assert.ok("error" in _v897({ modules: Infinity, module_wt_lb: 50, ballast_per_module_lb: 40, racking_wt_lb: 150, array_area_sf: 630, allowable_psf: 5 }));
 });
+
+import { computePoolTileCopingPerimeter as _v898 } from "../../calc-treatment.js";
+
+test("bounds: spec-v898 computePoolTileCopingPerimeter pins the perimeter, tile and coping counts, and error seams", () => {
+  const r = _v898({ length_ft: 32, width_ft: 16, tile_length_in: 6, courses: 1, coping_length_in: 12, waste_pct: 10 });
+  assert.equal(r.perimeter_ft, 96); // 2 * (32 + 16)
+  assert.equal(r.waterline_tiles, 212); // ceil(96/0.5 * 1 * 1.10) = ceil(211.2)
+  assert.equal(r.coping_units, 106); // ceil(96/1 * 1.10) = ceil(105.6)
+  // Courses drive the tile, not the coping: a second course doubles the tile while coping holds.
+  const twoCourse = _v898({ length_ft: 32, width_ft: 16, tile_length_in: 6, courses: 2, coping_length_in: 12, waste_pct: 10 });
+  assert.equal(twoCourse.waterline_tiles, 423); // ceil(96/0.5 * 2 * 1.10) = ceil(422.4)
+  assert.equal(twoCourse.coping_units, 106); // unchanged
+  // Error seams: non-finite, non-positive length / width / tile length / courses / coping length, negative waste.
+  assert.ok("error" in _v898({ length_ft: 0, width_ft: 16, tile_length_in: 6, courses: 1, coping_length_in: 12, waste_pct: 10 }));
+  assert.ok("error" in _v898({ length_ft: 32, width_ft: 0, tile_length_in: 6, courses: 1, coping_length_in: 12, waste_pct: 10 }));
+  assert.ok("error" in _v898({ length_ft: 32, width_ft: 16, tile_length_in: 0, courses: 1, coping_length_in: 12, waste_pct: 10 }));
+  assert.ok("error" in _v898({ length_ft: 32, width_ft: 16, tile_length_in: 6, courses: 0, coping_length_in: 12, waste_pct: 10 }));
+  assert.ok("error" in _v898({ length_ft: 32, width_ft: 16, tile_length_in: 6, courses: 1, coping_length_in: 0, waste_pct: 10 }));
+  assert.ok("error" in _v898({ length_ft: 32, width_ft: 16, tile_length_in: 6, courses: 1, coping_length_in: 12, waste_pct: -10 }));
+  assert.ok("error" in _v898({ length_ft: Infinity, width_ft: 16, tile_length_in: 6, courses: 1, coping_length_in: 12, waste_pct: 10 }));
+});

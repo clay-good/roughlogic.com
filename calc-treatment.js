@@ -1239,3 +1239,61 @@ function renderChlorineCylinderWithdrawal(inputRegion, outputRegion, citationEl)
   type.select.addEventListener("change", update);
 }
 TREATMENT_RENDERERS["chlorine-cylinder-withdrawal"] = renderChlorineCylinderWithdrawal;
+
+// pool-tile-coping-perimeter (spec-v898): pool waterline tile and coping perimeter takeoff.
+// dims: in { length_ft: L, width_ft: L, tile_length_in: L, courses: dimensionless, coping_length_in: L, waste_pct: dimensionless } out: { perimeter_ft: L, waterline_tiles: dimensionless, coping_units: dimensionless }
+export function computePoolTileCopingPerimeter({ length_ft = 32, width_ft = 16, tile_length_in = 6, courses = 1, coping_length_in = 12, waste_pct = 10 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  if (!(length_ft > 0)) return { error: "Pool length must be positive (ft)." };
+  if (!(width_ft > 0)) return { error: "Pool width must be positive (ft)." };
+  if (!(tile_length_in > 0)) return { error: "Tile length must be positive (in)." };
+  if (!(courses > 0)) return { error: "Course count must be positive." };
+  if (!(coping_length_in > 0)) return { error: "Coping length must be positive (in)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const perimeter_ft = 2 * (length_ft + width_ft);
+  const waterline_tiles = Math.ceil(perimeter_ft / (tile_length_in / 12) * courses * (1 + waste_pct / 100));
+  const coping_units = Math.ceil(perimeter_ft / (coping_length_in / 12) * (1 + waste_pct / 100));
+  if (![perimeter_ft, waterline_tiles, coping_units].every(Number.isFinite)) return { error: "Perimeter-takeoff math is not a finite value." };
+  return {
+    perimeter_ft,
+    waterline_tiles,
+    coping_units,
+    note: "The perimeter is the rectangular case; a freeform pool is measured on the tape. The waterline tile runs in courses (commonly one course of 6 in tile). Coping caps the bond beam. The waste covers cuts at corners and steps. Distinct from the water-volume pool-volume.",
+  };
+}
+
+export const poolTileCopingPerimeterExample = { inputs: { length_ft: 32, width_ft: 16, tile_length_in: 6, courses: 1, coping_length_in: 12, waste_pct: 10 } };
+
+function _v898renderPoolTileCopingPerimeter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: perimeter-takeoff identity by name. perimeter = 2 x (length + width); tiles = ceil(perimeter / tile length x courses x (1 + waste)); coping = ceil(perimeter / coping length x (1 + waste)).";
+  const ln = makeNumber("Pool length (ft)", "ptc-ln", { step: "any", min: "0", value: "32" });
+  ln.input.value = "32";
+  const wd = makeNumber("Pool width (ft)", "ptc-wd", { step: "any", min: "0", value: "16" });
+  wd.input.value = "16";
+  const tl = makeNumber("Waterline tile length (in)", "ptc-tl", { step: "any", min: "0", value: "6" });
+  tl.input.value = "6";
+  const cs = makeNumber("Waterline tile courses", "ptc-cs", { step: "any", min: "0", value: "1" });
+  cs.input.value = "1";
+  const cl = makeNumber("Coping unit length (in)", "ptc-cl", { step: "any", min: "0", value: "12" });
+  cl.input.value = "12";
+  const ws = makeNumber("Waste allowance (%)", "ptc-ws", { step: "any", min: "0", value: "10" });
+  ws.input.value = "10";
+  for (const f of [ln, wd, tl, cs, cl, ws]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ln.input.value = "32"; wd.input.value = "16"; tl.input.value = "6"; cs.input.value = "1"; cl.input.value = "12"; ws.input.value = "10"; update(); });
+  const oPerim = makeOutputLine(outputRegion, "Pool perimeter", "ptc-out-perim");
+  const oTiles = makeOutputLine(outputRegion, "Waterline tiles", "ptc-out-tiles");
+  const oCoping = makeOutputLine(outputRegion, "Coping units", "ptc-out-coping");
+  const update = debounce(() => {
+    const r = computePoolTileCopingPerimeter({
+      length_ft: ln.input.value === "" ? 32 : Number(ln.input.value), width_ft: wd.input.value === "" ? 16 : Number(wd.input.value),
+      tile_length_in: tl.input.value === "" ? 6 : Number(tl.input.value), courses: cs.input.value === "" ? 1 : Number(cs.input.value),
+      coping_length_in: cl.input.value === "" ? 12 : Number(cl.input.value), waste_pct: ws.input.value === "" ? 10 : Number(ws.input.value),
+    });
+    if (r.error) { oPerim.textContent = r.error; oTiles.textContent = "-"; oCoping.textContent = "-"; return; }
+    oPerim.textContent = fmt(r.perimeter_ft, 0) + " ft";
+    oTiles.textContent = fmt(r.waterline_tiles, 0) + " tiles";
+    oCoping.textContent = fmt(r.coping_units, 0) + " units";
+  }, DEBOUNCE_MS);
+  for (const f of [ln, wd, tl, cs, cl, ws]) f.input.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["pool-tile-coping-perimeter"] = _v898renderPoolTileCopingPerimeter;

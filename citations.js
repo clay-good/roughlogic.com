@@ -8332,6 +8332,17 @@ export const CITATIONS = {
       { name: "Allowable pressure", value: "the allowable added dead load from the structural engineer (entered)", source: "structural engineer" },
     ],
   },
+  "pool-tile-coping-perimeter": {
+    formula: "perimeter_ft = 2 x (length_ft + width_ft); waterline_tiles = ceil(perimeter_ft / (tile_length_in/12) x courses x (1 + waste_pct/100)); coping_units = ceil(perimeter_ft / (coping_length_in/12) x (1 + waste_pct/100)).",
+    edition: "Pool perimeter-takeoff identity by name (perimeter from the rectangle; tile and coping counts over their unit lengths with waste); first-principles arithmetic.",
+    freeAccess: "The perimeter arithmetic is public first-principles; the tile size, course count, and coping unit come from the layout.",
+    governance: GOVERNANCE.general,
+    editionNote: "The perimeter is the rectangular case; a freeform pool is measured on the tape. The waterline tile runs in courses (commonly one course of 6 in tile). Coping caps the bond beam. The waste covers cuts at corners and steps. Distinct from the water-volume pool-volume.",
+    assumptions: [
+      { name: "Perimeter", value: "2 x (length + width) for a rectangular pool; a freeform is taped", source: "layout" },
+      { name: "Waterline tile", value: "commonly one course of 6 in tile at the waterline; coping ~12 in units", source: "pool finish schedule" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

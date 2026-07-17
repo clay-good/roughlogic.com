@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(pool-service): pool-tile-coping-perimeter -- pool waterline tile and coping perimeter takeoff (spec-v898); 2026-07-17
+
+- New Group M tile `pool-tile-coping-perimeter` (calc-treatment.js), the pool install-ops takeoff beside `pool-volume`.
+  perimeter = 2 x (length + width); tiles = ceil(perimeter / tile length x courses x (1 + waste)); coping = ceil(perimeter
+  / coping length x (1 + waste)). A 16 x 32 ft pool has a 96 ft perimeter, so one course of 6 in tile is 212 tiles (192
+  neat) and 12 in coping is 106 units (96 neat) at 10% waste; a second course doubles the tile to 423 while the coping
+  holds. The perimeter is the rectangular case; a freeform pool is taped. Home count 1,346 -> 1,347.
+
 ### feat(solar): pv-ballast-weight -- PV flat-roof ballast weight and roof PSF screen (spec-v897); 2026-07-17
 
 - New Group A tile `pv-ballast-weight` (calc-solar.js), the solar dead-load screen beside `pv-rail-clamp-takeoff`. total =
