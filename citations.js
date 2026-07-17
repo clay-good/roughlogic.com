@@ -4627,6 +4627,17 @@ export const CITATIONS = {
       { name: "Concrete unit weight", value: "150 pcf normal-weight unless user supplies", source: "ACI 347" },
     ],
   },
+  "concrete-pour-rate": {
+    formula: "rate_of_rise_ft_hr = placement_rate_cyhr x 27 / form_plan_area_ft2; pour_hours = total_volume_cy / placement_rate_cyhr; trucks_per_hour = placement_rate_cyhr / truck_load_cy.",
+    edition: "Rate-of-rise identity by name (volumetric placement rate over the form footprint); first-principles cubic-yard arithmetic; the rate of rise feeds ACI 347 formwork-pressure.",
+    freeAccess: "The rate-of-rise identity is public concrete-placement practice; the 27 ft^3/yd^3 constant is exact.",
+    governance: GOVERNANCE.general,
+    editionNote: "The rate of rise is the input formwork-pressure uses to set the design lateral pressure - placing faster than the forms are designed for is how a form blowout happens. The pour must stay continuous to avoid a cold joint. The delivery cadence assumes the plant can sustain the trucks-per-hour. The form design governs the safe rate of rise.",
+    assumptions: [
+      { name: "Truck load", value: "10 cy ready-mix load (default; the supplier's truck size governs)", source: "concrete-supply practice" },
+      { name: "Volume constant", value: "27 ft^3 per cubic yard (exact)", source: "physical fact" },
+    ],
+  },
 
   // --- Group J: Trucking and Logistics (priority 6 per spec-v6.md §6) ---
   // Tiles cite FMCSA 49 CFR 395 (HOS), 23 CFR 658.17 (Federal Bridge Formula),

@@ -6771,6 +6771,49 @@ const _v431renderReadyMixConcreteOrder = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["ready-mix-concrete-order"] = _v431renderReadyMixConcreteOrder;
 
+// ----- spec-v814: Concrete Pour Rate, Rate of Rise, and Delivery Cadence (Group E) -----
+//
+// The placement-logistics complement to formwork-pressure, which takes the rate
+// of rise as an input this tile produces from the crew's placement rate and the
+// form footprint, plus the pour duration and the ready-mix delivery cadence.
+// dims: in { placement_rate_cyhr: L^3 T^-1, form_plan_area_ft2: L^2, total_volume_cy: L^3, truck_load_cy: L^3 } out: { rate_of_rise_ft_hr: L T^-1, pour_hours: T, trucks_per_hour: dimensionless }
+export function computeConcretePourRate({ placement_rate_cyhr = 0, form_plan_area_ft2 = 0, total_volume_cy = 0, truck_load_cy = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(placement_rate_cyhr > 0)) return { error: "Placement rate must be positive (cy/hr)." };
+  if (!(form_plan_area_ft2 > 0)) return { error: "Form plan area must be positive (ft^2)." };
+  if (!(total_volume_cy > 0)) return { error: "Total volume must be positive (cy)." };
+  if (!(truck_load_cy > 0)) return { error: "Truck load must be positive (cy)." };
+  const rate_of_rise_ft_hr = (placement_rate_cyhr * 27) / form_plan_area_ft2;
+  const pour_hours = total_volume_cy / placement_rate_cyhr;
+  const trucks_per_hour = placement_rate_cyhr / truck_load_cy;
+  if (![rate_of_rise_ft_hr, pour_hours, trucks_per_hour].every(Number.isFinite)) return { error: "Pour-rate math is not a finite value." };
+  return {
+    rate_of_rise_ft_hr,
+    pour_hours,
+    trucks_per_hour,
+    note: "The rate of rise is the input formwork-pressure uses to set the design lateral pressure - placing faster than the forms are designed for is how a form blowout happens, so feed this number back into formwork-pressure before speeding up. The pour must stay continuous to avoid a cold joint. The delivery cadence assumes the plant can sustain the trucks-per-hour; standby and short-load fees are separate. The form design governs the safe rate of rise.",
+  };
+}
+export const concretePourRateExample = { inputs: { placement_rate_cyhr: 20, form_plan_area_ft2: 100, total_volume_cy: 44.44, truck_load_cy: 10 } };
+const _v814renderConcretePourRate = _simpleRenderer({
+  citation: "Citation: rate-of-rise identity by name. rate of rise = placement rate (cy/hr) x 27 / form plan footprint area (ft^2); pour duration = total volume / placement rate; trucks per hour = placement rate / truck load. The rate of rise is the input formwork-pressure consumes.",
+  example: concretePourRateExample.inputs,
+  fields: [
+    { key: "placement_rate_cyhr", label: "Crew placement rate (cy/hr)", kind: "number" },
+    { key: "form_plan_area_ft2", label: "Form plan footprint (ft^2, wall = length x thickness)", kind: "number" },
+    { key: "total_volume_cy", label: "Total pour volume (cy)", kind: "number" },
+    { key: "truck_load_cy", label: "Ready-mix truck load (cy)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "ror", id: "cpr-out-ror", label: "Rate of rise", value: (r) => _fmtC(r.rate_of_rise_ft_hr, 2) + " ft/hr" },
+    { key: "ph", id: "cpr-out-ph", label: "Pour duration", value: (r) => _fmtC(r.pour_hours, 2) + " hr" },
+    { key: "tph", id: "cpr-out-tph", label: "Delivery cadence", value: (r) => _fmtC(r.trucks_per_hour, 2) + " trucks/hr" },
+    { key: "n", id: "cpr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcretePourRate,
+});
+CONSTRUCTION_RENDERERS["concrete-pour-rate"] = _v814renderConcretePourRate;
+
 // ===================== spec-v439..v440: finish-carpentry takeoff pair (Group E) [v438 CUT as dupe of flooring-takeoff] =====================
 
 // dims: in { area_ft2: L^2, coverage_per_batt: L^2, coverage_per_bag: L^2, waste_pct: dimensionless } out: { net_ft2: L^2, batts: dimensionless, bags: dimensionless }

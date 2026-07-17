@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): concrete-pour-rate -- pour rate, rate of rise, and delivery cadence (spec-v814); 2026-07-16
+
+- New Group E tile `concrete-pour-rate` (calc-construction.js), the placement-logistics complement to formwork-pressure,
+  which takes the rate of rise as an input this tile produces. Rate-of-rise identity: rate of rise = placement rate x 27
+  / form footprint area; pour duration = total volume / placement rate; trucks/hr = placement rate / truck load. Placing
+  20 cy/hr into a 100 ft^2 wall footprint rises 5.4 ft/hr (the number formwork-pressure wants), fills a 12 ft wall in
+  ~2.2 hr, and needs 2 trucks/hr. Home count 1,262 -> 1,263.
+
 ### feat(construction): scaffold-mudsill-bearing -- scaffold mudsill bearing pressure and sill length (spec-v812); 2026-07-16
 
 - New Group E tile `scaffold-mudsill-bearing` (calc-construction.js), the scaffold-access companion to the

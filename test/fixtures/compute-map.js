@@ -482,6 +482,7 @@ export const COMPUTE_MAP = {
   "utm-conversion": { module: "../../calc-field.js", fn: "computeUTM" },
   "ladder-pipe-reach": { module: "../../calc-fire.js", fn: "computeLadderPipeReach" },
   "formwork-pressure": { module: "../../calc-construction.js", fn: "computeFormworkPressure" },
+  "concrete-pour-rate": { module: "../../calc-construction.js", fn: "computeConcretePourRate" },
   "npsh-a": { module: "../../calc-hvac.js", fn: "computeNPSHa" },
   "compare-refrigerants": { module: "../../calc-refrigerant.js", fn: "computeCompareRefrigerants" },
   "driveshaft-crit": { module: "../../calc-mechanic.js", fn: "computeDriveshaftCritical" },

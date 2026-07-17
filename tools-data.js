@@ -270,6 +270,7 @@ export const TOOLS = [
   { id: "weld-usage", name: "Welding Rod and Wire Usage", group: "E", trades: ["carpentry"], desc: "Deposit weight, consumable weight, time, and shielding gas by process." },
   { id: "demo-debris", name: "Demolition Debris Weight", group: "E", trades: ["carpentry", "restoration"], desc: "Tons of debris and recommended dumpster size by structure type." },
   { id: "formwork-pressure", name: "Formwork Pressure", group: "E", trades: ["carpentry"], desc: "Lateral form pressure (ACI 347 short form) capped at wet head." },
+  { id: "concrete-pour-rate", name: "Concrete Pour Rate, Rate of Rise, and Delivery Cadence", group: "E", trades: ["concrete", "construction", "carpentry"], desc: "The rate of rise (ft/hr) a placement rate produces in a given form footprint - the input formwork-pressure consumes - plus the pour duration and the ready-mix trucks-per-hour delivery cadence. Placing faster than the forms are designed for is how a blowout happens." },
   // v8 Phase E.4 (utility 256).
   { id: "residential-framing", name: "Residential Framing Package", group: "E", trades: ["carpentry"], desc: "Stud + plate + joist + rafter rollup with board-feet totals from footprint, perimeter, wall height, joist span, rafter span, and pitch." },
   // v9 Group E extensions.

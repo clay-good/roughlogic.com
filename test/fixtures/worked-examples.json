@@ -10086,6 +10086,70 @@
    }
   },
   {
+   "tile_id": "concrete-pour-rate",
+   "source_publisher": "Rate-of-rise identity (first-principles)",
+   "source_title": "20 cy/hr into a 100 ft^2 wall footprint, 44.44 cy total, 10 cy trucks",
+   "source_edition_or_year": "spec-v814 worked example; feeds ACI 347 formwork-pressure",
+   "source_section_or_page": "rate of rise = 20*27/100 = 5.4 ft/hr; pour = 44.44/20 = 2.22 hr; trucks = 20/10 = 2/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "placement_rate_cyhr": 20,
+    "form_plan_area_ft2": 100,
+    "total_volume_cy": 44.44,
+    "truck_load_cy": 10
+   },
+   "outputs": {
+    "rate_of_rise_ft_hr": {
+     "value": 5.4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pour_hours": {
+     "value": 2.222,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "trucks_per_hour": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-pour-rate",
+   "source_publisher": "Rate-of-rise identity (first-principles)",
+   "source_title": "cross-check: speeding to 30 cy/hr raises the rate of rise the forms must carry",
+   "source_edition_or_year": "spec-v814 worked example",
+   "source_section_or_page": "rate of rise = 30*27/100 = 8.1 ft/hr (feed into formwork-pressure); pour = 44.44/30 = 1.48 hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "placement_rate_cyhr": 30,
+    "form_plan_area_ft2": 100,
+    "total_volume_cy": 44.44,
+    "truck_load_cy": 10
+   },
+   "outputs": {
+    "rate_of_rise_ft_hr": {
+     "value": 8.1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pour_hours": {
+     "value": 1.481,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "npsh-a",
    "source_publisher": "Hydraulic Institute / centrifugal-pump cavitation practice",
    "source_title": "NPSHa (ft) = H_atm(elevation) - H_vapor(water temp) + source_elevation_relative - friction_loss",

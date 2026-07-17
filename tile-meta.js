@@ -240,7 +240,7 @@ const _TILES = [
   ["aggregate", "E"], ["mortar-mix", "E"], ["concrete-mix-design", "E"],
   ["bolt-torque", "E"], ["bend-allowance", "E"], ["speeds-feeds", "E"],
   ["intermittent-fillet-weld", "E"], ["multi-bend-flat-pattern", "E"],
-  ["weld-usage", "E"], ["demo-debris", "E"], ["formwork-pressure", "E"],
+  ["weld-usage", "E"], ["demo-debris", "E"], ["formwork-pressure", "E"], ["concrete-pour-rate", "E"],
   ["residential-framing", "E"], ["stair-stringer-layout", "E"],
   ["hip-valley-rafter", "E"], ["rebar-schedule", "E"], ["plywood-span", "E"],
   ["helical-pile", "E"], ["helical-pile-torque", "E"], ["crane-lift-quick", "E"],

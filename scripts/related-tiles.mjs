@@ -805,6 +805,7 @@ const RELATED = {
   "spindle-max-mrr": ["spindle-power-torque", "material-removal-rate", "machining-time", "cutting-speed-rpm"],
   "demo-debris": ["excavation", "material-quantity"],
   "formwork-pressure": ["concrete", "wind-pressure"],
+  "concrete-pour-rate": ["formwork-pressure", "ready-mix-concrete-order", "concrete-yield"],
   "residential-framing": ["lumber-spans", "rafter", "joist-deflection"],
   "stair-stringer-layout": ["stair-stringer", "stairs"],
   "hip-valley-rafter": ["rafter", "roof-pitch"],

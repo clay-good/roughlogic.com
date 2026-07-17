@@ -40652,6 +40652,31 @@
       "kind": "question"
     },
     {
+      "term": "concrete pour rate",
+      "target": "concrete-pour-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete rate of rise",
+      "target": "concrete-pour-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "form fill rate",
+      "target": "concrete-pour-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete pour duration",
+      "target": "concrete-pour-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "ready mix trucks per hour",
+      "target": "concrete-pour-rate",
+      "kind": "industry"
+    },
+    {
       "term": "lateral pressure from a wall pour",
       "target": "formwork-pressure",
       "kind": "question"

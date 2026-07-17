@@ -626,6 +626,7 @@ import {
   computeExcavationVolume,
   computeFootingArea,
   computeFormworkPressure,
+  computeConcretePourRate,
   computeHelicalPile,
   computeHelicalPileTorque,
   computeHipValleyRafter,
@@ -8821,6 +8822,21 @@ test("bounds: calc-construction computeFormworkPressure pins ACI P=Cw*(150+9000R
   assert.ok("error" in computeFormworkPressure({ pour_rate_ft_per_hr: 0 }));
   assert.ok("error" in computeFormworkPressure({ pour_rate_ft_per_hr: 5, concrete_temp_F: 0 }));
   assert.ok("error" in computeFormworkPressure({ pour_rate_ft_per_hr: 5, weight_factor: "moon" }));
+});
+
+test("bounds: spec-v814 computeConcretePourRate pins rate of rise, pour duration, delivery cadence, and error seams", () => {
+  // 20 cy/hr into a 100 ft^2 footprint, 44.44 cy total, 10 cy trucks -> 5.4 ft/hr, 2.222 hr, 2 trucks/hr
+  const r = computeConcretePourRate({ placement_rate_cyhr: 20, form_plan_area_ft2: 100, total_volume_cy: 44.44, truck_load_cy: 10 });
+  assert.ok(Math.abs(r.rate_of_rise_ft_hr - 5.4) < 1e-9);
+  assert.ok(Math.abs(r.pour_hours - 2.222) < 1e-3);
+  assert.ok(Math.abs(r.trucks_per_hour - 2) < 1e-9);
+  // Speeding to 30 cy/hr raises the rate of rise proportionally.
+  assert.ok(Math.abs(computeConcretePourRate({ placement_rate_cyhr: 30, form_plan_area_ft2: 100, total_volume_cy: 44.44, truck_load_cy: 10 }).rate_of_rise_ft_hr - 8.1) < 1e-9);
+  // Error seams.
+  assert.ok("error" in computeConcretePourRate({ placement_rate_cyhr: 0, form_plan_area_ft2: 100, total_volume_cy: 44.44 }));
+  assert.ok("error" in computeConcretePourRate({ placement_rate_cyhr: 20, form_plan_area_ft2: 0, total_volume_cy: 44.44 }));
+  assert.ok("error" in computeConcretePourRate({ placement_rate_cyhr: 20, form_plan_area_ft2: 100, total_volume_cy: 0 }));
+  assert.ok("error" in computeConcretePourRate({ placement_rate_cyhr: 20, form_plan_area_ft2: 100, total_volume_cy: 44.44, truck_load_cy: 0 }));
 });
 
 test("bounds: calc-construction computeStairStringerV7 pins riser_count = ceil(rise/target) and pass/fail flags", () => {
