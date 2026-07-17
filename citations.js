@@ -7990,6 +7990,17 @@ export const CITATIONS = {
       { name: "Layer thickness", value: "at least 1.5 x D50 (from riprap-d50); the plan sets it", source: "USACE riprap practice" },
     ],
   },
+  "silt-fence-drainage": {
+    formula: "required_fence_len_ft = tributary_area_ac x 400 (a quarter acre of drainage per 100 ft of fence); max_area_ac = fence_length_ft / 400; length_adequate = fence_length_ft >= required_fence_len_ft; slope_ok = slope_length_ft <= max_slope_length_ft.",
+    edition: "Silt-fence drainage-area guideline by name (quarter acre per 100 ft); first-principles arithmetic; the AHJ slope-length limit is user-entered.",
+    freeAccess: "The quarter-acre-per-100-ft figure is a generic published guideline; the AHJ maximum slope length is entered, not reproduced from a copyrighted table.",
+    governance: GOVERNANCE.general,
+    editionNote: "The quarter-acre-per-100-ft figure is a generic published guideline. The SWPPP designer and the permitting AHJ set the actual maximum slope length and fence spacing. Silt fence is for sheet flow only - never across a channel or in concentrated flow, where a rock check dam belongs.",
+    assumptions: [
+      { name: "Drainage guideline", value: "quarter acre of drainage per 100 ft of fence (required length = acres x 400)", source: "generic SWPPP guidance" },
+      { name: "Slope length", value: "100 ft AHJ maximum default; the SWPPP spec and permitting AHJ govern", source: "AHJ / SWPPP" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

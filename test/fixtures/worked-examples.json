@@ -48785,6 +48785,58 @@
    }
   },
   {
+   "tile_id": "silt-fence-drainage",
+   "source_publisher": "Silt-fence drainage-area guideline (generic SWPPP)",
+   "source_title": "0.5-acre tributary, 250 ft fence, 60 ft slope, 100 ft AHJ max",
+   "source_edition_or_year": "spec-v825 worked example; quarter acre per 100 ft",
+   "source_section_or_page": "required = 0.5*400 = 200 ft (250 adequate); max area = 250/400 = 0.625 acre; slope 60 <= 100 ok",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "tributary_area_ac": 0.5,
+    "fence_length_ft": 250,
+    "slope_length_ft": 60,
+    "max_slope_length_ft": 100
+   },
+   "outputs": {
+    "required_fence_len_ft": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "max_area_ac": {
+     "value": 0.625,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "silt-fence-drainage",
+   "source_publisher": "Silt-fence drainage-area guideline (generic SWPPP)",
+   "source_title": "cross-check: a 1.0-acre tributary needs 400 ft, so the 250 ft fence is short",
+   "source_edition_or_year": "spec-v825 worked example",
+   "source_section_or_page": "required = 1.0*400 = 400 ft; length_adequate flips to false",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "tributary_area_ac": 1.0,
+    "fence_length_ft": 250,
+    "slope_length_ft": 60,
+    "max_slope_length_ft": 100
+   },
+   "outputs": {
+    "required_fence_len_ft": {
+     "value": 400,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

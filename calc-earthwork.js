@@ -13,6 +13,7 @@
 //   - rusle-soil-loss         RUSLE annual soil loss (erosion / SWPPP)
 //   - riprap-d50              Riprap median stone size (Isbash)
 //   - riprap-tonnage          Riprap layer volume and tonnage
+//   - silt-fence-drainage     Silt fence drainage-area and length check
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
@@ -617,6 +618,58 @@ function _v824renderRiprapTonnage(inputRegion, outputRegion, citationEl) {
   for (const f of [area, thick, uw]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["riprap-tonnage"] = _v824renderRiprapTonnage;
+
+// --- silt-fence-drainage: Silt Fence Drainage-Area and Length Check ---
+//
+// Guideline: a quarter acre of drainage per 100 ft of fence, so required
+// length = tributary acres x 400; the slope length behind must stay under the
+// AHJ limit. Silt fence is for sheet flow only.
+// dims: in { tributary_area_ac: L^2, fence_length_ft: L, slope_length_ft: L, max_slope_length_ft: L } out: { required_fence_len_ft: L, max_area_ac: L^2 }
+// (Tributary and max area are L^2; the fence and slope lengths L; the two
+//  adequacy outputs are dimensionless booleans, omitted from the dims list.)
+export function computeSiltFenceDrainage({ tributary_area_ac = 0, fence_length_ft = 0, slope_length_ft = 0, max_slope_length_ft = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tributary_area_ac > 0)) return { error: "Tributary area must be positive (acres)." };
+  if (!(fence_length_ft > 0)) return { error: "Fence length must be positive (ft)." };
+  if (!(slope_length_ft > 0)) return { error: "Slope length must be positive (ft)." };
+  if (!(max_slope_length_ft > 0)) return { error: "Maximum slope length must be positive (ft)." };
+  const required_fence_len_ft = tributary_area_ac * 400;
+  const max_area_ac = fence_length_ft / 400;
+  const length_adequate = fence_length_ft >= required_fence_len_ft;
+  const slope_ok = slope_length_ft <= max_slope_length_ft;
+  if (![required_fence_len_ft, max_area_ac].every(Number.isFinite)) return { error: "Silt-fence math is not a finite value." };
+  return {
+    required_fence_len_ft,
+    max_area_ac,
+    length_adequate,
+    slope_ok,
+    note: "The quarter-acre-per-100-ft figure is a generic published guideline. The SWPPP designer and the permitting AHJ set the actual maximum slope length and fence spacing (entered here, not reproduced from a copyrighted table). Silt fence is for sheet flow only - never across a channel or in concentrated flow, where a rock check dam belongs.",
+  };
+}
+
+function _v825renderSiltFenceDrainage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: silt-fence drainage-area guideline by name. required length = tributary acres x 400 (a quarter acre of drainage per 100 ft of fence); the AHJ-entered maximum slope length governs the spacing. Sheet flow only.";
+  const area = makeNumber("Drainage area behind the fence (acres)", "sfd-area", { step: "any", min: "0" });
+  const fence = makeNumber("Silt fence length provided (ft)", "sfd-fence", { step: "any", min: "0" });
+  const slope = makeNumber("Slope length behind the fence (ft)", "sfd-slope", { step: "any", min: "0" });
+  const maxSlope = makeNumber("AHJ maximum slope length (ft)", "sfd-maxslope", { step: "any", min: "0", value: "100" });
+  maxSlope.input.value = "100";
+  for (const f of [area, fence, slope, maxSlope]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "0.5"; fence.input.value = "250"; slope.input.value = "60"; maxSlope.input.value = "100"; update(); });
+  const oLen = makeOutputLine(outputRegion, "Required fence length", "sfd-out-len");
+  const oSlope = makeOutputLine(outputRegion, "Slope length check", "sfd-out-slope");
+  const update = debounce(() => {
+    const r = computeSiltFenceDrainage({
+      tributary_area_ac: Number(area.input.value) || 0, fence_length_ft: Number(fence.input.value) || 0,
+      slope_length_ft: Number(slope.input.value) || 0, max_slope_length_ft: maxSlope.input.value === "" ? 100 : Number(maxSlope.input.value),
+    });
+    if (r.error) { oLen.textContent = r.error; oSlope.textContent = "-"; return; }
+    oLen.textContent = fmt(r.required_fence_len_ft, 0) + " ft (" + (r.length_adequate ? "provided fence OK, catches up to " + fmt(r.max_area_ac, 3) + " acre" : "PROVIDED FENCE SHORT") + ")";
+    oSlope.textContent = r.slope_ok ? "OK (within the AHJ slope-length limit)" : "OVER the AHJ slope-length limit";
+  }, DEBOUNCE_MS);
+  for (const f of [area, fence, slope, maxSlope]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["silt-fence-drainage"] = _v825renderSiltFenceDrainage;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

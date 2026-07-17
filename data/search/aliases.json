@@ -16677,6 +16677,31 @@
       "kind": "industry"
     },
     {
+      "term": "silt fence length",
+      "target": "silt-fence-drainage",
+      "kind": "industry"
+    },
+    {
+      "term": "silt fence drainage area",
+      "target": "silt-fence-drainage",
+      "kind": "industry"
+    },
+    {
+      "term": "silt fence check",
+      "target": "silt-fence-drainage",
+      "kind": "industry"
+    },
+    {
+      "term": "sediment fence sizing",
+      "target": "silt-fence-drainage",
+      "kind": "industry"
+    },
+    {
+      "term": "perimeter control fence",
+      "target": "silt-fence-drainage",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

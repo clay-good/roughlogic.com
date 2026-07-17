@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): silt-fence-drainage -- silt fence drainage-area and length check (spec-v825); 2026-07-16
+
+- New Group E tile `silt-fence-drainage` (calc-earthwork.js), the perimeter-control check in the erosion-control cluster.
+  Whether a silt fence is long enough for the drainage area behind it (required length = tributary acres x 400, the
+  quarter-acre-per-100-ft guideline) and whether the slope length stays under the AHJ limit. A 0.5-acre tributary needs
+  200 ft of fence; a 250 ft run catches up to 0.625 acre; a full acre needs 400 ft and the short fence flips to
+  inadequate. Sheet flow only. Home count 1,273 -> 1,274.
+
 ### feat(earthwork): riprap-tonnage -- riprap layer volume and tonnage (spec-v824); 2026-07-16
 
 - New Group E tile `riprap-tonnage` (calc-earthwork.js), the order-quantity companion to riprap-d50. Layer take-off:

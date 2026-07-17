@@ -17095,6 +17095,7 @@ import { computeWaterForCompaction as _v821wfc } from "../../calc-earthwork.js";
 import { computeRusleSoilLoss as _v822rsl } from "../../calc-earthwork.js";
 import { computeRiprapD50 as _v823rr } from "../../calc-earthwork.js";
 import { computeRiprapTonnage as _v824rt } from "../../calc-earthwork.js";
+import { computeSiltFenceDrainage as _v825sf } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17175,6 +17176,26 @@ test("bounds: spec-v824 computeRiprapTonnage pins the layer volume, tonnage, and
   assert.ok("error" in _v824rt({ area_sf: 0, thickness_ft: 2, unit_wt_pcf: 165 }));
   assert.ok("error" in _v824rt({ area_sf: 500, thickness_ft: 0, unit_wt_pcf: 165 }));
   assert.ok("error" in _v824rt({ area_sf: 500, thickness_ft: 2, unit_wt_pcf: 0 }));
+});
+
+test("bounds: spec-v825 computeSiltFenceDrainage pins required length, max area, both flags, and error seams", () => {
+  // 0.5 ac, 250 ft fence, 60 ft slope, 100 ft max -> 200 ft required (adequate), 0.625 ac max, slope ok
+  const r = _v825sf({ tributary_area_ac: 0.5, fence_length_ft: 250, slope_length_ft: 60, max_slope_length_ft: 100 });
+  assert.strictEqual(r.required_fence_len_ft, 200);
+  assert.strictEqual(r.max_area_ac, 0.625);
+  assert.strictEqual(r.length_adequate, true);
+  assert.strictEqual(r.slope_ok, true);
+  // A 1.0-acre tributary needs 400 ft, so the same 250 ft fence is short.
+  const big = _v825sf({ tributary_area_ac: 1.0, fence_length_ft: 250, slope_length_ft: 60, max_slope_length_ft: 100 });
+  assert.strictEqual(big.required_fence_len_ft, 400);
+  assert.strictEqual(big.length_adequate, false);
+  // Over the AHJ slope-length limit.
+  assert.strictEqual(_v825sf({ tributary_area_ac: 0.5, fence_length_ft: 250, slope_length_ft: 150, max_slope_length_ft: 100 }).slope_ok, false);
+  // Error seams.
+  assert.ok("error" in _v825sf({ tributary_area_ac: 0, fence_length_ft: 250, slope_length_ft: 60 }));
+  assert.ok("error" in _v825sf({ tributary_area_ac: 0.5, fence_length_ft: 0, slope_length_ft: 60 }));
+  assert.ok("error" in _v825sf({ tributary_area_ac: 0.5, fence_length_ft: 250, slope_length_ft: 0 }));
+  assert.ok("error" in _v825sf({ tributary_area_ac: 0.5, fence_length_ft: 250, slope_length_ft: 60, max_slope_length_ft: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {
