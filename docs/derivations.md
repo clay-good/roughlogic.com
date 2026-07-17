@@ -1587,6 +1587,7 @@ cross-check.
 | calc-construction.js | `computeConstructionAdhesiveTubes` | `{ total_lf = 1200, tube_volume_in3 = 50.6, bead_dia_in = 0.375 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeControlJointSpacing` | `{ slab_thickness_in = 0, spacing_factor = 2.5, max_spacing_ft = 18, slab_leng...` | _ | _ | _ |
 | calc-construction.js | `computeCraneLiftCheck` | `{ load_lb = 0, rigging_lb = 0, block_lb = 0, jib_deduct_lb = 0, sling_legs = ...` | _ | _ | _ |
+| calc-construction.js | `computeCurbGutterVolume` | `{ cross_section_ft2 = 2.0, length_ft = 300, waste_pct = 8 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeDeckBeamPost` | `{ joist_span_ft = 0, beam_span_ft = 0, post_height_ft = 8, live_load_psf = 40...` | _ | _ | _ |
 | calc-construction.js | `computeDeckLedgerFasteners` | `{ joist_span_ft = 0, spacing_in = 0, ledger_length_ft = 0, fastener = "lag" }...` | _ | _ | _ |
 | calc-construction.js | `computeDemoDebris` | `{ structure_type = "wood_frame", volume_yd3 = 0 }` | _ | _ | _ |
@@ -3013,7 +3014,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1599.
+Row count: 1600.
 
 <!-- END function-corpus-v14 -->
 
@@ -3575,7 +3576,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (345 tiles)
+### Group E Construction (346 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3655,6 +3656,7 @@ per spec-v14 §13.1 second paragraph.
 | `control-joint-spacing` | Concrete Control Joint Spacing | ACI 302.1R / 360R slab-on-ground guid...; spec-v96 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `coulomb-earth-pressure` | Coulomb Active Earth Pressure (Wall Friction and Batter) | Coulomb (1776) as compiled in Das / N...; spec-v628 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `crane-lift-quick` | Crane Lift Plan Quick-Math | ASME B30.5 / manufacturer load-chart ...; 8000 lb load + 200 lb rigging / 2-leg sling at 60 deg fro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `curb-gutter-volume` | Curb-and-Gutter Concrete Volume | Linear-pour identity (first-principles); volume = 2.0*300/27*1.08 = 24.0; cy/100LF = 2.0*100/27 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `curve-deflection-stakeout` | Curve Deflection-Angle Stakeout | AASHTO Green Book / FM 5-233 (by name); delta = (100/1000)(180/pi) = 5.7296 deg; chord = 1000 sin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deck-beam-post` | Deck Beam and Post Sizing (IRC R507) | IRC / AWC NDS; trib = 6 ft; w = 50 x 6 = 300 plf; double 2x8 beam, 4x4 p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deck-board-takeoff` | Deck Board and Fastener Takeoff | First-principles deck-surface takeoff; 12 x 16 ft deck, 5.5 in boards, 0.25 in gap, 16 in OC, 10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4551,6 +4553,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1352. Fixture-covered or reference-cadence: 1352 / 1352.
+Tile count: 1353. Fixture-covered or reference-cadence: 1353 / 1353.
 
 <!-- END tile-index-v14 -->

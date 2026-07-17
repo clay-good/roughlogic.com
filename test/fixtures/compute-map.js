@@ -828,6 +828,7 @@ export const COMPUTE_MAP = {
   "chain-link-fence-takeoff": { module: "../../calc-construction.js", fn: "computeChainLinkFenceTakeoff" },
   "leach-field-aggregate": { module: "../../calc-septic.js", fn: "computeLeachFieldAggregate" },
   "hydronic-system-volume": { module: "../../calc-plumbing.js", fn: "computeHydronicSystemVolume" },
+  "curb-gutter-volume": { module: "../../calc-construction.js", fn: "computeCurbGutterVolume" },
   "concrete-vibrator-spacing": { module: "../../calc-construction.js", fn: "computeConcreteVibratorSpacing" },
   "formwork-tie-load": { module: "../../calc-construction.js", fn: "computeFormworkTieLoad" },
   "mass-concrete-temp-rise": { module: "../../calc-construction.js", fn: "computeMassConcreteTempRise" },

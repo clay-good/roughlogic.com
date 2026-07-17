@@ -8398,6 +8398,17 @@ export const CITATIONS = {
       { name: "Glycol fraction", value: "from the freeze-protection target (glycol-mix gives the ratio)", source: "glycol-mix / freeze target" },
     ],
   },
+  "curb-gutter-volume": {
+    formula: "volume_cy = cross_section_ft2 x length_ft / 27 x (1 + waste_pct/100); cy_per_100lf = cross_section_ft2 x 100 / 27.",
+    edition: "Linear-pour identity by name (fixed cross-section over a run to cubic yards, plus the per-100-LF ordering rate); first-principles volume arithmetic.",
+    freeAccess: "The volume arithmetic is public first-principles; the cross-section comes from the standard curb-and-gutter detail (no copyrighted section reproduced).",
+    governance: GOVERNANCE.general,
+    editionNote: "The cross-sectional area comes from the DOT or municipal standard curb-and-gutter detail (the user computes or measures it). The cy per 100 LF is the ordering rule of thumb. A linear per-station pour distinct from the shape presets in concrete.",
+    assumptions: [
+      { name: "Cross-section", value: "from the DOT or municipal standard curb-and-gutter detail (measured or computed)", source: "DOT / municipal standard" },
+      { name: "Ordering rate", value: "cy per 100 LF = cross-section x 100 / 27 (rule of thumb)", source: "flatwork practice" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

@@ -18652,6 +18652,31 @@
       "kind": "industry"
     },
     {
+      "term": "curb and gutter volume",
+      "target": "curb-gutter-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "curb concrete cy",
+      "target": "curb-gutter-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "curb gutter pour",
+      "target": "curb-gutter-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete curb volume",
+      "target": "curb-gutter-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "curb machine concrete",
+      "target": "curb-gutter-volume",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

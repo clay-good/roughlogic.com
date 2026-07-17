@@ -9825,3 +9825,42 @@ const _v901renderChainLinkFenceTakeoff = _simpleRenderer({
   compute: computeChainLinkFenceTakeoff,
 });
 CONSTRUCTION_RENDERERS["chain-link-fence-takeoff"] = _v901renderChainLinkFenceTakeoff;
+
+// --- curb-gutter-volume: Curb-and-Gutter Concrete Volume ---
+//
+// Linear per-station pour: a fixed cross-section run over a length, plus the ordering rate.
+//   volume = cross_section x length / 27 x (1 + waste/100); cy per 100 LF = cross_section x 100 / 27
+// dims: in { cross_section_ft2: L^2, length_ft: L, waste_pct: dimensionless } out: { volume_cy: L^3, cy_per_100lf: L^3 }
+export function computeCurbGutterVolume({ cross_section_ft2 = 2.0, length_ft = 300, waste_pct = 8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(cross_section_ft2 > 0)) return { error: "Cross-section must be positive (ft^2)." };
+  if (!(length_ft > 0)) return { error: "Run length must be positive (ft)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const volume_cy = cross_section_ft2 * length_ft / 27 * (1 + waste_pct / 100);
+  const cy_per_100lf = cross_section_ft2 * 100 / 27;
+  if (![volume_cy, cy_per_100lf].every(Number.isFinite)) return { error: "Curb-gutter math is not a finite value." };
+  return {
+    volume_cy,
+    cy_per_100lf,
+    note: "The cross-sectional area comes from the DOT or municipal standard curb-and-gutter detail (the user computes or measures it). The cy per 100 LF is the ordering rule of thumb. A linear per-station pour distinct from the shape presets in concrete.",
+  };
+}
+
+export const curbGutterVolumeExample = { inputs: { cross_section_ft2: 2.0, length_ft: 300, waste_pct: 8 } };
+
+const _v904renderCurbGutterVolume = _simpleRenderer({
+  citation: "Citation: linear-pour identity by name. volume = cross-section x length / 27 x (1 + waste/100); cy per 100 LF = cross-section x 100 / 27. The cross-section comes from the DOT or municipal standard detail.",
+  example: curbGutterVolumeExample.inputs,
+  fields: [
+    { key: "cross_section_ft2", label: "Curb + gutter cross-section (ft^2)", kind: "number", default: 2.0 },
+    { key: "length_ft", label: "Run length (ft)", kind: "number", default: 300 },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 8 },
+  ],
+  outputs: [
+    { key: "v", id: "cgv-out-v", label: "Concrete volume", value: (r) => _fmtC(r.volume_cy, 1) + " cy" },
+    { key: "r", id: "cgv-out-r", label: "Ordering rate", value: (r) => _fmtC(r.cy_per_100lf, 1) + " cy per 100 LF" },
+    { key: "note", id: "cgv-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCurbGutterVolume,
+});
+CONSTRUCTION_RENDERERS["curb-gutter-volume"] = _v904renderCurbGutterVolume;

@@ -26571,3 +26571,22 @@ test("bounds: spec-v903 computeHydronicSystemVolume pins the pipe, system, glyco
   assert.ok("error" in _v903({ pipe_length_ft: 500, gal_per_ft: 0.023, terminal_gal: 8, boiler_tank_gal: 5, glycol_fraction: 1.5 }));
   assert.ok("error" in _v903({ pipe_length_ft: Infinity, gal_per_ft: 0.023, terminal_gal: 8, boiler_tank_gal: 5, glycol_fraction: 0.30 }));
 });
+
+import { computeCurbGutterVolume as _v904 } from "../../calc-construction.js";
+
+test("bounds: spec-v904 computeCurbGutterVolume pins the volume, cy-per-100LF, and error seams", () => {
+  const r = _v904({ cross_section_ft2: 2.0, length_ft: 300, waste_pct: 8 });
+  assert.ok(Math.abs(r.volume_cy - 24) < 1e-9); // 2.0*300/27*1.08
+  assert.ok(Math.abs(r.cy_per_100lf - 7.407407407407407) < 1e-9); // 2.0*100/27
+  // The cross-section is the lever; the length just scales the total, not the rate.
+  const heavy = _v904({ cross_section_ft2: 2.5, length_ft: 300, waste_pct: 8 });
+  assert.ok(Math.abs(heavy.volume_cy - 30) < 1e-9); // 2.5*300/27*1.08
+  assert.ok(Math.abs(heavy.cy_per_100lf - 9.25925925925926) < 1e-9); // 2.5*100/27
+  // The cy-per-100LF does not depend on the run length.
+  assert.ok(Math.abs(_v904({ cross_section_ft2: 2.0, length_ft: 900, waste_pct: 8 }).cy_per_100lf - 7.407407407407407) < 1e-9);
+  // Error seams: non-finite, non-positive cross-section / length, negative waste.
+  assert.ok("error" in _v904({ cross_section_ft2: 0, length_ft: 300, waste_pct: 8 }));
+  assert.ok("error" in _v904({ cross_section_ft2: 2.0, length_ft: 0, waste_pct: 8 }));
+  assert.ok("error" in _v904({ cross_section_ft2: 2.0, length_ft: 300, waste_pct: -8 }));
+  assert.ok("error" in _v904({ cross_section_ft2: Infinity, length_ft: 300, waste_pct: 8 }));
+});

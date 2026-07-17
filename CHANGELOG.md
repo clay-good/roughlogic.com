@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): curb-gutter-volume -- curb-and-gutter concrete volume (spec-v904); 2026-07-17
+
+- New Group E tile `curb-gutter-volume` (calc-construction.js), the concrete flatwork takeoff beside `concrete` and
+  `concrete-sawcut-footage`. volume = cross-section x length / 27 x (1 + waste); cy per 100 LF = cross-section x 100 / 27.
+  A 2.0 ft^2 curb-and-gutter section over 300 LF is 24 cy with waste (7.4 cy per 100 LF); a heavier 2.5 ft^2 section is 30
+  cy (9.3 cy/100 LF). The cross-section comes from the DOT or municipal standard detail; the cy per 100 LF is the ordering
+  rule of thumb. Home count 1,352 -> 1,353.
+
 ### feat(plumbing): hydronic-system-volume -- hydronic system water and glycol volume (spec-v903); 2026-07-17
 
 - New Group B tile `hydronic-system-volume` (calc-plumbing.js), the hydronics install-ops takeoff beside `glycol-mix` and
