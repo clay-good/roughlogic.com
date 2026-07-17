@@ -17852,6 +17852,31 @@
       "kind": "industry"
     },
     {
+      "term": "sealant cartridge yield",
+      "target": "sealant-joint-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "caulk coverage",
+      "target": "sealant-joint-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "sealant joint quantity",
+      "target": "sealant-joint-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "caulk tubes per foot",
+      "target": "sealant-joint-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "sealant linear feet per tube",
+      "target": "sealant-joint-yield",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

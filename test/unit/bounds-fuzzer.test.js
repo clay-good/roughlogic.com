@@ -17142,6 +17142,7 @@ import { computeMetalStudTakeoff as _v868mst } from "../../calc-construction.js"
 import { computeSuspendedCeilingGrid as _v869scg } from "../../calc-construction.js";
 import { computeMasonryControlJointLayout as _v870mcj } from "../../calc-construction.js";
 import { computeDumpsterCount as _v871dmp } from "../../calc-construction.js";
+import { computeSealantJointYield as _v872sjy } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -18036,6 +18037,21 @@ test("bounds: spec-v871 computeDumpsterCount pins the by-volume/by-weight counts
   assert.ok("error" in _v871dmp({ debris_cy: 60, debris_tons: 45, container_cy: 0, fill_efficiency: 0.7, weight_cap_tons: 8 }));
   assert.ok("error" in _v871dmp({ debris_cy: 60, debris_tons: 45, container_cy: 30, fill_efficiency: 0, weight_cap_tons: 8 }));
   assert.ok("error" in _v871dmp({ debris_cy: 60, debris_tons: 45, container_cy: 30, fill_efficiency: 0.7, weight_cap_tons: 0 }));
+});
+
+test("bounds: spec-v872 computeSealantJointYield pins the cross-section, length per cartridge, cartridge count, and error seams", () => {
+  // 500 LF, 20.5 in^3, 3/8 x 1/4 in -> 0.09375 in^2, 18.2 ft/cart, 28 cartridges.
+  const r = _v872sjy({ joint_lf: 500, cartridge_in3: 20.5, joint_width_in: 0.375, joint_depth_in: 0.25 });
+  assert.ok(Math.abs(r.cross_in2 - 0.09375) < 1e-6);
+  assert.ok(Math.abs(r.lf_per_cart - 18.2) < 0.1);
+  assert.strictEqual(r.cartridges, 28);
+  // A big 1/2 x 1/2 in joint burns cartridges faster (cross-section is the lever).
+  assert.strictEqual(_v872sjy({ joint_lf: 500, cartridge_in3: 20.5, joint_width_in: 0.5, joint_depth_in: 0.5 }).cartridges, 74);
+  // Error seams.
+  assert.ok("error" in _v872sjy({ joint_lf: 0, cartridge_in3: 20.5, joint_width_in: 0.375, joint_depth_in: 0.25 }));
+  assert.ok("error" in _v872sjy({ joint_lf: 500, cartridge_in3: 0, joint_width_in: 0.375, joint_depth_in: 0.25 }));
+  assert.ok("error" in _v872sjy({ joint_lf: 500, cartridge_in3: 20.5, joint_width_in: 0, joint_depth_in: 0.25 }));
+  assert.ok("error" in _v872sjy({ joint_lf: 500, cartridge_in3: 20.5, joint_width_in: 0.375, joint_depth_in: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

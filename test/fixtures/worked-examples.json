@@ -51617,6 +51617,64 @@
    }
   },
   {
+   "tile_id": "sealant-joint-yield",
+   "source_publisher": "Sealant cartridge-yield identity (first-principles)",
+   "source_title": "500 LF joint, 10.1 oz cartridge (20.5 in^3), 3/8 x 1/4 in joint",
+   "source_edition_or_year": "spec-v872 worked example",
+   "source_section_or_page": "cross = 0.375*0.25 = 0.09375 in^2; lf/cart = 20.5/0.09375/12 = 18.2 ft; cartridges = ceil(500/18.2) = 28",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "joint_lf": 500,
+    "cartridge_in3": 20.5,
+    "joint_width_in": 0.375,
+    "joint_depth_in": 0.25
+   },
+   "outputs": {
+    "cross_in2": {
+     "value": 0.09375,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "lf_per_cart": {
+     "value": 18.2,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "cartridges": {
+     "value": 28,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sealant-joint-yield",
+   "source_publisher": "Sealant cartridge-yield identity (first-principles)",
+   "source_title": "cross-check: a big 1/2 x 1/2 in joint burns cartridges faster",
+   "source_edition_or_year": "spec-v872 worked example",
+   "source_section_or_page": "cross = 0.25 in^2; lf/cart = 20.5/0.25/12 = 6.83 ft; cartridges = ceil(500/6.83) = 74",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "joint_lf": 500,
+    "cartridge_in3": 20.5,
+    "joint_width_in": 0.5,
+    "joint_depth_in": 0.5
+   },
+   "outputs": {
+    "cartridges": {
+     "value": 74,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

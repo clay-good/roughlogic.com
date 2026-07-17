@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): sealant-joint-yield -- caulk / sealant cartridge yield from joint size (spec-v872); 2026-07-17
+
+- New Group E tile `sealant-joint-yield` (calc-construction.js), the glazing/sealant tile sharing the bead-volume
+  method with `construction-adhesive-tubes`. length per cartridge = cartridge volume / (width x depth) / 12; cartridges
+  = ceil(joint / length per cartridge). A 10.1 oz cartridge (20.5 in^3) on a 3/8 x 1/4 in joint does 18 ft, so 500 LF
+  of joint takes 28 cartridges; a big 1/2 x 1/2 in joint burns them at more than double the rate (74) -- the joint
+  cross-section is the lever. The manufacturer's joint design governs. Home count 1,320 -> 1,321.
+
 ### feat(construction): dumpster-count -- roll-off dumpster / haul count (spec-v871); 2026-07-17
 
 - New Group E tile `dumpster-count` (calc-construction.js), the demolition tile beside `demo-debris` (the debris) and

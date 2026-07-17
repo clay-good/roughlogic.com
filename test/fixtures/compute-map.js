@@ -792,6 +792,7 @@ export const COMPUTE_MAP = {
   "suspended-ceiling-grid": { module: "../../calc-construction.js", fn: "computeSuspendedCeilingGrid" },
   "masonry-control-joint-layout": { module: "../../calc-construction.js", fn: "computeMasonryControlJointLayout" },
   "dumpster-count": { module: "../../calc-construction.js", fn: "computeDumpsterCount" },
+  "sealant-joint-yield": { module: "../../calc-construction.js", fn: "computeSealantJointYield" },
   "refrigerant-lineset-charge-adjust": { module: "../../calc-refrigerant.js", fn: "computeRefrigerantLinesetChargeAdjust" },
   "asphalt-spread-rate": { module: "../../calc-construction.js", fn: "computeAsphaltSpreadRate" },
   "pavement-milling-production": { module: "../../calc-construction.js", fn: "computePavementMillingProduction" },

@@ -8508,6 +8508,17 @@ export const CITATIONS = {
       { name: "Fill efficiency", value: "usable fraction of the box, below one for bulky debris (~0.7 default)", source: "field judgment" },
     ],
   },
+  "sealant-joint-yield": {
+    formula: "cross_in2 = joint_width_in x joint_depth_in; lf_per_cart = cartridge_in3 / cross_in2 / 12; cartridges = ceil(joint_lf / lf_per_cart).",
+    edition: "Sealant cartridge-yield identity by name (cartridge volume divided by the joint cross-section gives the run per cartridge); first-principles geometry.",
+    freeAccess: "The bead-volume geometry is public first-principles; the cartridge volume and joint design come from the manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "The bead is approximated as a rectangle (a tooled concave joint uses a little less). Elastomeric sealant runs about a 2:1 width-to-depth with a backer rod setting the depth. The cartridge volume comes from the product (a 10.1 oz cartridge is ~20.5 in^3, a 20 oz sausage ~40 in^3). The manufacturer's joint design governs.",
+    assumptions: [
+      { name: "Joint cross-section", value: "width x depth as a rectangle; ~2:1 width-to-depth with a backer rod for elastomeric sealant", source: "manufacturer joint design" },
+      { name: "Cartridge volume", value: "~20.5 in^3 for a 10.1 oz cartridge, ~40 in^3 for a 20 oz sausage", source: "sealant manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

@@ -8798,3 +8798,49 @@ const _v871renderDumpsterCount = _simpleRenderer({
   compute: computeDumpsterCount,
 });
 CONSTRUCTION_RENDERERS["dumpster-count"] = _v871renderDumpsterCount;
+
+// --- sealant-joint-yield: Caulk / Sealant Cartridge Yield from Joint Size ---
+//
+// How many linear feet a cartridge does for a joint size, and the cartridges for
+// a run (shares the bead-volume method with construction-adhesive-tubes):
+//   cross_in2 = joint_width_in x joint_depth_in
+//   lf_per_cart = cartridge_in3 / cross_in2 / 12
+//   cartridges = ceil(joint_lf / lf_per_cart)
+// dims: in { joint_lf: L, cartridge_in3: L^3, joint_width_in: L, joint_depth_in: L } out: { cross_in2: L^2, lf_per_cart: L, cartridges: dimensionless }
+export function computeSealantJointYield({ joint_lf = 500, cartridge_in3 = 20.5, joint_width_in = 0.375, joint_depth_in = 0.25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(joint_lf > 0)) return { error: "Joint length must be positive (ft)." };
+  if (!(cartridge_in3 > 0)) return { error: "Cartridge volume must be positive (in^3)." };
+  if (!(joint_width_in > 0)) return { error: "Joint width must be positive (in)." };
+  if (!(joint_depth_in > 0)) return { error: "Joint depth must be positive (in)." };
+  const cross_in2 = joint_width_in * joint_depth_in;
+  const lf_per_cart = cartridge_in3 / cross_in2 / 12;
+  const cartridges = Math.ceil(joint_lf / lf_per_cart);
+  if (![cross_in2, lf_per_cart, cartridges].every(Number.isFinite)) return { error: "Sealant-yield math is not a finite value." };
+  return {
+    cross_in2,
+    lf_per_cart,
+    cartridges,
+    note: "The bead is approximated as a rectangle (a tooled concave joint uses a little less). Elastomeric sealant runs about a 2:1 width-to-depth with a backer rod setting the depth. The cartridge volume comes from the product (a 10.1 oz cartridge is ~20.5 in^3, a 20 oz sausage ~40 in^3). The joint cross-section is the lever; the manufacturer's joint design governs.",
+  };
+}
+
+export const sealantJointYieldExample = { inputs: { joint_lf: 500, cartridge_in3: 20.5, joint_width_in: 0.375, joint_depth_in: 0.25 } };
+
+const _v872renderSealantJointYield = _simpleRenderer({
+  citation: "Citation: sealant-yield identity by name. cross-section = width x depth; length per cartridge = cartridge volume / cross-section / 12; cartridges = ceil(joint / length per cartridge). The bead is a rectangle; the manufacturer's joint design governs.",
+  example: sealantJointYieldExample.inputs,
+  fields: [
+    { key: "joint_lf", label: "Joint length (ft)", kind: "number", default: 500 },
+    { key: "cartridge_in3", label: "Cartridge volume (in^3, ~20.5 for 10.1 oz)", kind: "number", default: 20.5 },
+    { key: "joint_width_in", label: "Joint width (in)", kind: "number", default: 0.375 },
+    { key: "joint_depth_in", label: "Joint depth (in)", kind: "number", default: 0.25 },
+  ],
+  outputs: [
+    { key: "c", id: "sjy-out-c", label: "Cartridges", value: (r) => _fmtC(r.cartridges, 0) + " cartridges" },
+    { key: "l", id: "sjy-out-l", label: "Yield per cartridge", value: (r) => _fmtC(r.lf_per_cart, 1) + " ft" },
+    { key: "note", id: "sjy-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSealantJointYield,
+});
+CONSTRUCTION_RENDERERS["sealant-joint-yield"] = _v872renderSealantJointYield;
