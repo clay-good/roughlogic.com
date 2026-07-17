@@ -17093,6 +17093,7 @@ test("bounds: spec-v662 computeEtHorsepower inverts the ET relation, round-trips
 import { computeRelativeCompaction as _v326, computeSoilPhaseRelations as _v327, computeAtterbergIndices as _v328 } from "../../calc-earthwork.js";
 import { computeWaterForCompaction as _v821wfc } from "../../calc-earthwork.js";
 import { computeRusleSoilLoss as _v822rsl } from "../../calc-earthwork.js";
+import { computeRiprapD50 as _v823rr } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17145,6 +17146,21 @@ test("bounds: spec-v822 computeRusleSoilLoss pins A = R K LS C P, the site total
   assert.ok("error" in _v822rsl({ r_factor: 150, k_factor: -0.1, ls_factor: 1.5, c_factor: 1, p_factor: 1, acres: 5 }));
   assert.ok("error" in _v822rsl({ r_factor: 150, k_factor: 0.32, ls_factor: 1.5, c_factor: 1, p_factor: 1, acres: 0 }));
   assert.ok("error" in _v822rsl({ r_factor: 150, k_factor: 0.32, ls_factor: 1.5, c_factor: 1, p_factor: 1, acres: -5 }));
+});
+
+test("bounds: spec-v823 computeRiprapD50 pins the Isbash stone size, the C-squared lever, and error seams", () => {
+  // V 8, Ss 2.65, C 0.86, SF 1.2 -> 0.977 ft (11.7 in)
+  const r = _v823rr({ velocity_fps: 8, specific_gravity: 2.65, turbulence_coeff: 0.86, safety_factor: 1.2 });
+  assert.ok(Math.abs(r.d50_ft - 0.97722) < 1e-3);
+  assert.ok(Math.abs(r.d50_in - 11.727) < 1e-2);
+  // Low-turbulence straight reach (C 1.20) roughly halves it (C enters squared).
+  assert.ok(Math.abs(_v823rr({ velocity_fps: 8, specific_gravity: 2.65, turbulence_coeff: 1.20, safety_factor: 1.2 }).d50_ft - 0.50193) < 1e-3);
+  // Error seams (incl. Ss <= 1).
+  assert.ok("error" in _v823rr({ velocity_fps: 0, turbulence_coeff: 0.86, safety_factor: 1.2 }));
+  assert.ok("error" in _v823rr({ velocity_fps: 8, turbulence_coeff: 0, safety_factor: 1.2 }));
+  assert.ok("error" in _v823rr({ velocity_fps: 8, turbulence_coeff: 0.86, safety_factor: 0 }));
+  assert.ok("error" in _v823rr({ velocity_fps: 8, specific_gravity: 1, turbulence_coeff: 0.86, safety_factor: 1.2 }));
+  assert.ok("error" in _v823rr({ velocity_fps: 8, specific_gravity: 0.9, turbulence_coeff: 0.86, safety_factor: 1.2 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

@@ -7968,6 +7968,17 @@ export const CITATIONS = {
       { name: "Scope", value: "sheet-and-rill loss only; not gully, channel, or streambank erosion", source: "RUSLE method" },
     ],
   },
+  "riprap-d50": {
+    formula: "d50_ft = safety_factor x velocity_fps^2 / (2 x 32.2 x turbulence_coeff^2 x (specific_gravity - 1)); d50_in = d50_ft x 12.",
+    edition: "Isbash riprap-sizing equation by name (public-domain field estimate); first-principles unit arithmetic (g = 32.2 ft/s^2).",
+    freeAccess: "The Isbash equation is public-domain; every input is user-entered (no gradation table or design chart reproduced).",
+    governance: GOVERNANCE.general,
+    editionNote: "The turbulence coefficient C is about 0.86 for high-turbulence zones (below outlets, at bends) and about 1.20 for low-turbulence straight channels - it enters squared, so it moves the answer as much as velocity. Isbash is a public-domain field estimate; the hydraulic engineer and the AHJ govern the channel design. The layer thickness (at least 1.5 x D50) and the gradation are taken off separately.",
+    assumptions: [
+      { name: "Turbulence coefficient", value: "C ~ 0.86 high-turbulence (below outlets, bends), ~1.20 low-turbulence (straight channels)", source: "Isbash / USACE riprap practice" },
+      { name: "Stone specific gravity", value: "2.65 default (typical quarried stone); the stone source governs", source: "materials practice" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

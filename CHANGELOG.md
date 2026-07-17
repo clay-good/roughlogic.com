@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): riprap-d50 -- riprap median stone size (Isbash) (spec-v823); 2026-07-16
+
+- New Group E tile `riprap-d50` (calc-earthwork.js), sizing the stone that armors a channel or outlet against a scouring
+  velocity by the public-domain Isbash equation: D50 = SF x V^2 / (2 g C^2 (Ss - 1)). An 8 ft/s flow in turbulent water
+  (C 0.86) wants a 12 in stone; the same flow in a calm straight reach (C 1.20) needs only 6 in - the turbulence
+  coefficient enters squared, so turbulence sets the rock as much as velocity. Home count 1,271 -> 1,272. The 15 citation
+  blocks the spec-v809-v823 batch added took citations.js past its gzip cap here; the cap was raised 440 -> 470 KB
+  (lazy-loaded, prerendered into shells at build, not in the home-view payload).
+
 ### feat(earthwork): rusle-soil-loss -- RUSLE annual soil loss (spec-v822); 2026-07-16
 
 - New Group E tile `rusle-soil-loss` (calc-earthwork.js), opening the erosion-control / SWPPP vein. The USDA

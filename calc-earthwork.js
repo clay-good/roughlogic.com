@@ -11,6 +11,7 @@
 //   - ripper-production       Dozer ripper loosening production rate
 //   - water-for-compaction    Water to reach optimum moisture for compaction
 //   - rusle-soil-loss         RUSLE annual soil loss (erosion / SWPPP)
+//   - riprap-d50              Riprap median stone size (Isbash)
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
@@ -517,6 +518,59 @@ function _v822renderRusleSoilLoss(inputRegion, outputRegion, citationEl) {
   for (const f of [r, k, ls, c, p, ac]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["rusle-soil-loss"] = _v822renderRusleSoilLoss;
+
+// --- riprap-d50: Riprap Median Stone Size (Isbash) ---
+//
+// Isbash: D50 = SF x V^2 / (2 g C^2 (Ss - 1)). The turbulence coefficient C
+// enters squared, so turbulence -- not just velocity -- sets the rock.
+// dims: in { velocity_fps: L T^-1, specific_gravity: dimensionless, turbulence_coeff: dimensionless, safety_factor: dimensionless } out: { d50_ft: L, d50_in: L }
+// (Velocity is L T^-1; Ss, C, and SF dimensionless; V^2/g reduces to a length,
+//  so both stone sizes are L.)
+export function computeRiprapD50({ velocity_fps, specific_gravity = 2.65, turbulence_coeff = 0.86, safety_factor = 1.2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const V = Number(velocity_fps);
+  const Ss = Number(specific_gravity);
+  const C = Number(turbulence_coeff);
+  const SF = Number(safety_factor);
+  if (!Number.isFinite(V) || V <= 0) return { error: "Velocity must be a positive finite number (ft/s)." };
+  if (!Number.isFinite(C) || C <= 0) return { error: "Turbulence coefficient must be a positive finite number." };
+  if (!Number.isFinite(SF) || SF <= 0) return { error: "Safety factor must be a positive finite number." };
+  if (!Number.isFinite(Ss) || Ss <= 1) return { error: "Specific gravity must be greater than 1 (stone denser than water)." };
+  const d50_ft = (SF * V * V) / (2 * 32.2 * C * C * (Ss - 1));
+  const d50_in = d50_ft * 12;
+  if (![d50_ft, d50_in].every(Number.isFinite)) return { error: "Stone-size math is not a finite value." };
+  return {
+    d50_ft,
+    d50_in,
+    note: "The turbulence coefficient C is about 0.86 for high-turbulence zones (below outlets, at bends) and about 1.20 for low-turbulence straight channels - it enters squared, so it moves the answer as much as velocity. Isbash is a public-domain field estimate; the hydraulic engineer and the AHJ govern the channel design. The layer thickness (at least 1.5 x D50) and the gradation are taken off separately.",
+  };
+}
+
+function _v823renderRiprapD50(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Isbash riprap-sizing identity by name. D50 = SF x V^2 / (2 g C^2 (Ss - 1)), g = 32.2 ft/s^2; C ~ 0.86 high-turbulence, ~1.20 low-turbulence. A public-domain field estimate; the hydraulic engineer governs.";
+  const v = makeNumber("Flow velocity against the stone (ft/s)", "rrd-v", { step: "any", min: "0" });
+  const ss = makeNumber("Stone specific gravity Ss", "rrd-ss", { step: "any", min: "0", value: "2.65" });
+  ss.input.value = "2.65";
+  const c = makeNumber("Isbash turbulence coefficient C", "rrd-c", { step: "any", min: "0", value: "0.86" });
+  c.input.value = "0.86";
+  const sf = makeNumber("Safety factor SF", "rrd-sf", { step: "any", min: "0", value: "1.2" });
+  sf.input.value = "1.2";
+  for (const f of [v, ss, c, sf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { v.input.value = "8"; ss.input.value = "2.65"; c.input.value = "0.86"; sf.input.value = "1.2"; update(); });
+  const oD50 = makeOutputLine(outputRegion, "Median stone D50", "rrd-out-d50");
+  const oLayer = makeOutputLine(outputRegion, "Minimum layer thickness (1.5 x D50)", "rrd-out-layer");
+  const update = debounce(() => {
+    const r = computeRiprapD50({
+      velocity_fps: Number(v.input.value) || 0, specific_gravity: ss.input.value === "" ? 2.65 : Number(ss.input.value),
+      turbulence_coeff: c.input.value === "" ? 0.86 : Number(c.input.value), safety_factor: sf.input.value === "" ? 1.2 : Number(sf.input.value),
+    });
+    if (r.error) { oD50.textContent = r.error; oLayer.textContent = "-"; return; }
+    oD50.textContent = fmt(r.d50_in, 1) + " in (" + fmt(r.d50_ft, 3) + " ft)";
+    oLayer.textContent = fmt(r.d50_in * 1.5, 1) + " in";
+  }, DEBOUNCE_MS);
+  for (const f of [v, ss, c, sf]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["riprap-d50"] = _v823renderRiprapD50;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

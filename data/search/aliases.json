@@ -16627,6 +16627,31 @@
       "kind": "industry"
     },
     {
+      "term": "riprap size",
+      "target": "riprap-d50",
+      "kind": "industry"
+    },
+    {
+      "term": "isbash stone size",
+      "target": "riprap-d50",
+      "kind": "industry"
+    },
+    {
+      "term": "riprap d50",
+      "target": "riprap-d50",
+      "kind": "industry"
+    },
+    {
+      "term": "scour stone sizing",
+      "target": "riprap-d50",
+      "kind": "industry"
+    },
+    {
+      "term": "channel armor stone",
+      "target": "riprap-d50",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

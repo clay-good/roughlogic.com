@@ -1,6 +1,8 @@
 # roughlogic.com Specification v823 -- Riprap Median Stone Size (Isbash) (calc-earthwork.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-16 (package 0.398.0).** Executed against the live catalog (1,271 -> 1,272 tiles). Related
+> tiles retargeted to existing tiles (channel-normal-depth, hydraulic-jump, rusle-soil-loss; the proposed riprap-tonnage
+> and check-dam siblings are not yet landed). Single-tile spec.
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-earthwork.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v822.md. Erosion-control sweep (entry 2), pairing
 > with the coming `riprap-tonnage` layer-volume tile.
