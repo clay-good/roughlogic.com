@@ -8475,6 +8475,17 @@ export const CITATIONS = {
       { name: "Opening allowance", value: "extra studs per opening for jack/king/cripple plus corners and intersections (~2 each)", source: "framing practice" },
     ],
   },
+  "suspended-ceiling-grid": {
+    formula: "area_sf = room_length_ft x room_width_ft; panels = ceil(area_sf/8); main_tee_lf = area_sf/4; cross_tee_lf = area_sf/2; wall_angle_lf = 2 x (room_length_ft + room_width_ft); hangers = ceil(area_sf/16).",
+    edition: "Suspended-ceiling 2x4 grid takeoff ratios by name (panels, tees, wall angle, and hangers from the area and perimeter); first-principles geometry.",
+    freeAccess: "The grid takeoff ratios are public quantity geometry; the reflected ceiling plan and seismic bracing come from the plans and code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ratios are for a standard 2x4 lay-in grid. A 2x2 grid adds the 2-ft cross tees (doubling the cross-tee run). Hangers are on the mains at 4 ft on center. Seismic areas add bracing and clips per code; the reflected ceiling plan governs the layout.",
+    assumptions: [
+      { name: "Grid", value: "standard 2x4 lay-in (4 sf panel); a 2x2 grid doubles the cross-tee run", source: "grid manufacturer" },
+      { name: "Hangers", value: "on the mains at 4 ft on center; seismic areas add bracing and clips per code", source: "ASTM C635/C636 / seismic code" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

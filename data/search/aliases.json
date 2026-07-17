@@ -17777,6 +17777,31 @@
       "kind": "industry"
     },
     {
+      "term": "suspended ceiling grid",
+      "target": "suspended-ceiling-grid",
+      "kind": "industry"
+    },
+    {
+      "term": "acoustical ceiling takeoff",
+      "target": "suspended-ceiling-grid",
+      "kind": "industry"
+    },
+    {
+      "term": "drop ceiling grid",
+      "target": "suspended-ceiling-grid",
+      "kind": "industry"
+    },
+    {
+      "term": "ceiling tee takeoff",
+      "target": "suspended-ceiling-grid",
+      "kind": "industry"
+    },
+    {
+      "term": "lay in ceiling grid",
+      "target": "suspended-ceiling-grid",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

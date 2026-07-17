@@ -51405,6 +51405,90 @@
    }
   },
   {
+   "tile_id": "suspended-ceiling-grid",
+   "source_publisher": "Suspended-ceiling 2x4 grid takeoff ratios (first-principles)",
+   "source_title": "24 x 40 ft room (960 sf), 2x4 lay-in grid",
+   "source_edition_or_year": "spec-v869 worked example",
+   "source_section_or_page": "panels = ceil(960/8) = 120; main = 240; cross = 480; wall angle = 128; hangers = 60",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "room_length_ft": 24,
+    "room_width_ft": 40
+   },
+   "outputs": {
+    "area_sf": {
+     "value": 960,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "panels": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "main_tee_lf": {
+     "value": 240,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "cross_tee_lf": {
+     "value": 480,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "wall_angle_lf": {
+     "value": 128,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "hangers": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "suspended-ceiling-grid",
+   "source_publisher": "Suspended-ceiling 2x4 grid takeoff ratios (first-principles)",
+   "source_title": "cross-check: a smaller 12 x 20 ft room scales with the area",
+   "source_edition_or_year": "spec-v869 worked example",
+   "source_section_or_page": "240 sf: 30 panels, 60 LF main, 120 LF cross, 64 LF wall angle, 15 hangers",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "room_length_ft": 12,
+    "room_width_ft": 20
+   },
+   "outputs": {
+    "panels": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "wall_angle_lf": {
+     "value": 64,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "hangers": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

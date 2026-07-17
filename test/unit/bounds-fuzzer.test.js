@@ -17139,6 +17139,7 @@ import { computeSheathingTakeoff as _v865sht } from "../../calc-construction.js"
 import { computeConstructionAdhesiveTubes as _v866cat } from "../../calc-construction.js";
 import { computeSillPlateAnchorCount as _v867spa } from "../../calc-construction.js";
 import { computeMetalStudTakeoff as _v868mst } from "../../calc-construction.js";
+import { computeSuspendedCeilingGrid as _v869scg } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17976,6 +17977,25 @@ test("bounds: spec-v868 computeMetalStudTakeoff pins the stud count, track lengt
   assert.ok("error" in _v868mst({ wall_length_ft: 50, spacing_in: 0, openings: 2, extra_per_opening: 2 }));
   assert.ok("error" in _v868mst({ wall_length_ft: 50, spacing_in: 16, openings: -1, extra_per_opening: 2 }));
   assert.ok("error" in _v868mst({ wall_length_ft: 50, spacing_in: 16, openings: 2, extra_per_opening: -1 }));
+});
+
+test("bounds: spec-v869 computeSuspendedCeilingGrid pins the area, panels, tees, wall angle, hangers, and error seams", () => {
+  // 24 x 40 ft (960 sf) -> 120 panels, 240 LF main, 480 LF cross, 128 LF wall angle, 60 hangers.
+  const r = _v869scg({ room_length_ft: 24, room_width_ft: 40 });
+  assert.strictEqual(r.area_sf, 960);
+  assert.strictEqual(r.panels, 120);
+  assert.strictEqual(r.main_tee_lf, 240);
+  assert.strictEqual(r.cross_tee_lf, 480);
+  assert.strictEqual(r.wall_angle_lf, 128);
+  assert.strictEqual(r.hangers, 60);
+  // A smaller 12 x 20 ft room scales with the area.
+  const small = _v869scg({ room_length_ft: 12, room_width_ft: 20 });
+  assert.strictEqual(small.panels, 30);
+  assert.strictEqual(small.wall_angle_lf, 64);
+  assert.strictEqual(small.hangers, 15);
+  // Error seams.
+  assert.ok("error" in _v869scg({ room_length_ft: 0, room_width_ft: 40 }));
+  assert.ok("error" in _v869scg({ room_length_ft: 24, room_width_ft: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

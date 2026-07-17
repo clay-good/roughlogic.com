@@ -8655,3 +8655,51 @@ const _v868renderMetalStudTakeoff = _simpleRenderer({
   compute: computeMetalStudTakeoff,
 });
 CONSTRUCTION_RENDERERS["metal-stud-takeoff"] = _v868renderMetalStudTakeoff;
+
+// --- suspended-ceiling-grid: Suspended Acoustical Ceiling Grid Takeoff ---
+//
+// Takes off a suspended acoustical (lay-in) ceiling for a 2x4 grid: panels,
+// main tees, cross tees, wall angle, and hanger wires.
+//   panels = ceil(area/8); main = area/4; cross = area/2;
+//   wall angle = perimeter; hangers = ceil(area/16)
+// dims: in { room_length_ft: L, room_width_ft: L } out: { area_sf: L^2, panels: dimensionless, main_tee_lf: L, cross_tee_lf: L, wall_angle_lf: L, hangers: dimensionless }
+export function computeSuspendedCeilingGrid({ room_length_ft = 24, room_width_ft = 40 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(room_length_ft > 0)) return { error: "Room length must be positive (ft)." };
+  if (!(room_width_ft > 0)) return { error: "Room width must be positive (ft)." };
+  const area_sf = room_length_ft * room_width_ft;
+  const panels = Math.ceil(area_sf / 8);
+  const main_tee_lf = area_sf / 4;
+  const cross_tee_lf = area_sf / 2;
+  const wall_angle_lf = 2 * (room_length_ft + room_width_ft);
+  const hangers = Math.ceil(area_sf / 16);
+  if (![area_sf, panels, main_tee_lf, cross_tee_lf, wall_angle_lf, hangers].every(Number.isFinite)) return { error: "Ceiling-grid math is not a finite value." };
+  return {
+    area_sf,
+    panels,
+    main_tee_lf,
+    cross_tee_lf,
+    wall_angle_lf,
+    hangers,
+    note: "The ratios are for a standard 2x4 lay-in grid (2x2 ft panel is 4 sf, so panels = area/8 for 2x4). A 2x2 grid adds the 2-ft cross tees (doubling the cross-tee run). Hangers are on the mains at 4 ft on center. Seismic areas add bracing and clips per code; the reflected ceiling plan governs the layout.",
+  };
+}
+
+export const suspendedCeilingGridExample = { inputs: { room_length_ft: 24, room_width_ft: 40 } };
+
+const _v869renderSuspendedCeilingGrid = _simpleRenderer({
+  citation: "Citation: 2x4 grid takeoff ratios by name. panels = area / 8; main tee = area / 4; cross tee = area / 2; wall angle = perimeter; hangers = area / 16 (mains at 4 ft on center). Seismic areas add bracing per code.",
+  example: suspendedCeilingGridExample.inputs,
+  fields: [
+    { key: "room_length_ft", label: "Room length (ft)", kind: "number", default: 24 },
+    { key: "room_width_ft", label: "Room width (ft)", kind: "number", default: 40 },
+  ],
+  outputs: [
+    { key: "p", id: "scg-out-p", label: "Ceiling panels (2x4)", value: (r) => _fmtC(r.panels, 0) + " panels" },
+    { key: "t", id: "scg-out-t", label: "Main + cross tee", value: (r) => _fmtC(r.main_tee_lf, 0) + " LF main / " + _fmtC(r.cross_tee_lf, 0) + " LF cross" },
+    { key: "w", id: "scg-out-w", label: "Wall angle + hangers", value: (r) => _fmtC(r.wall_angle_lf, 0) + " LF angle / " + _fmtC(r.hangers, 0) + " hangers" },
+    { key: "note", id: "scg-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSuspendedCeilingGrid,
+});
+CONSTRUCTION_RENDERERS["suspended-ceiling-grid"] = _v869renderSuspendedCeilingGrid;

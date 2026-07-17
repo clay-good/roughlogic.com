@@ -789,6 +789,7 @@ export const COMPUTE_MAP = {
   "construction-adhesive-tubes": { module: "../../calc-construction.js", fn: "computeConstructionAdhesiveTubes" },
   "sill-plate-anchor-count": { module: "../../calc-construction.js", fn: "computeSillPlateAnchorCount" },
   "metal-stud-takeoff": { module: "../../calc-construction.js", fn: "computeMetalStudTakeoff" },
+  "suspended-ceiling-grid": { module: "../../calc-construction.js", fn: "computeSuspendedCeilingGrid" },
   "refrigerant-lineset-charge-adjust": { module: "../../calc-refrigerant.js", fn: "computeRefrigerantLinesetChargeAdjust" },
   "asphalt-spread-rate": { module: "../../calc-construction.js", fn: "computeAsphaltSpreadRate" },
   "pavement-milling-production": { module: "../../calc-construction.js", fn: "computePavementMillingProduction" },

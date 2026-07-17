@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): suspended-ceiling-grid -- suspended acoustical ceiling grid takeoff (spec-v869); 2026-07-17
+
+- New Group E tile `suspended-ceiling-grid` (calc-construction.js), the ceilings takeoff beside `metal-stud-takeoff`
+  (walls) and `tile-count` (floors), distinct from floor tile. For a 2x4 lay-in grid: panels = area/8; main tee =
+  area/4; cross tee = area/2; wall angle = perimeter; hangers = area/16. A 24 x 40 ft room (960 sf) is 120 panels, 240
+  LF of main tee, 480 LF of cross tee, 128 LF of wall angle, and 60 hanger wires -- the whole grid order. Every quantity
+  but the wall angle tracks the area; hangers are on the mains at 4 ft on center, and seismic areas add bracing per
+  code. Home count 1,317 -> 1,318.
+
 ### feat(construction): metal-stud-takeoff -- light-gauge steel stud and track takeoff (spec-v868); 2026-07-17
 
 - New Group E tile `metal-stud-takeoff` (calc-construction.js), the steel-framing takeoff beside `drywall` and the wood
