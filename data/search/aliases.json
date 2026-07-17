@@ -18727,6 +18727,31 @@
       "kind": "industry"
     },
     {
+      "term": "soffit vent count",
+      "target": "soffit-ridge-vent-count",
+      "kind": "industry"
+    },
+    {
+      "term": "ridge vent feet",
+      "target": "soffit-ridge-vent-count",
+      "kind": "industry"
+    },
+    {
+      "term": "attic vent count",
+      "target": "soffit-ridge-vent-count",
+      "kind": "industry"
+    },
+    {
+      "term": "intake exhaust vents",
+      "target": "soffit-ridge-vent-count",
+      "kind": "industry"
+    },
+    {
+      "term": "roof ventilation vents",
+      "target": "soffit-ridge-vent-count",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

@@ -8431,6 +8431,17 @@ export const CITATIONS = {
       { name: "Average run", value: "the average manifold-to-fixture home-run length from the plan", source: "rough-in layout" },
     ],
   },
+  "soffit-ridge-vent-count": {
+    formula: "total_nfa_in2 = attic_area_sf / vent_ratio x 144; intake_nfa_in2 = exhaust_nfa_in2 = total_nfa_in2 / 2; soffit_vents = ceil(intake_nfa_in2 / soffit_vent_nfa_in2); ridge_lf = ceil(exhaust_nfa_in2 / ridge_nfa_per_ft_in2).",
+    edition: "Attic vent-count identity by name (required NFA split balanced, then soffit vents and ridge feet over the product NFA); first-principles count arithmetic.",
+    freeAccess: "The count arithmetic is public first-principles; the 1/300 or 1/150 ratio is IRC and the product NFA comes from the manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "The required NFA and the 1/300 (balanced, with a vapor retarder) or 1/150 ratio come from the IRC (attic-ventilation gives the NFA). The product NFA per vent and per foot of ridge come from the manufacturer (entered here). Intake should meet or exceed exhaust. Distinct from the required-NFA attic-ventilation.",
+    assumptions: [
+      { name: "Vent ratio", value: "1/300 with a vapor retarder / balanced venting, else 1/150 (IRC R806)", source: "IRC" },
+      { name: "Product NFA", value: "per soffit vent (~26 in^2) and per foot of ridge (~18 in^2/ft) from the manufacturer", source: "vent manufacturer" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

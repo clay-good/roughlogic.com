@@ -26626,3 +26626,24 @@ test("bounds: spec-v906 computePexHomerunTakeoff pins the ports, tubing footage,
   assert.ok("error" in _v906({ fixtures: 8, hot_fixtures: 9, avg_run_ft: 35, waste_pct: 10 }));
   assert.ok("error" in _v906({ fixtures: Infinity, hot_fixtures: 6, avg_run_ft: 35, waste_pct: 10 }));
 });
+
+import { computeSoffitRidgeVentCount as _v907 } from "../../calc-finish.js";
+
+test("bounds: spec-v907 computeSoffitRidgeVentCount pins the NFA, soffit vents, ridge feet, and error seams", () => {
+  const r = _v907({ attic_area_sf: 1500, vent_ratio: 300, soffit_vent_nfa_in2: 26, ridge_nfa_per_ft_in2: 18 });
+  assert.equal(r.total_nfa_in2, 720); // 1500/300*144
+  assert.equal(r.intake_nfa_in2, 360); // 720/2
+  assert.equal(r.soffit_vents, 14); // ceil(360/26)
+  assert.equal(r.ridge_lf, 20); // ceil(360/18)
+  // The ratio, set by the assembly, drives both counts: 1/150 doubles the NFA and the counts.
+  const noRetarder = _v907({ attic_area_sf: 1500, vent_ratio: 150, soffit_vent_nfa_in2: 26, ridge_nfa_per_ft_in2: 18 });
+  assert.equal(noRetarder.total_nfa_in2, 1440); // 1500/150*144
+  assert.equal(noRetarder.soffit_vents, 28); // ceil(720/26)
+  assert.equal(noRetarder.ridge_lf, 40); // ceil(720/18)
+  // Error seams: non-finite, non-positive area / ratio / per-vent NFA / ridge NFA per ft.
+  assert.ok("error" in _v907({ attic_area_sf: 0, vent_ratio: 300, soffit_vent_nfa_in2: 26, ridge_nfa_per_ft_in2: 18 }));
+  assert.ok("error" in _v907({ attic_area_sf: 1500, vent_ratio: 0, soffit_vent_nfa_in2: 26, ridge_nfa_per_ft_in2: 18 }));
+  assert.ok("error" in _v907({ attic_area_sf: 1500, vent_ratio: 300, soffit_vent_nfa_in2: 0, ridge_nfa_per_ft_in2: 18 }));
+  assert.ok("error" in _v907({ attic_area_sf: 1500, vent_ratio: 300, soffit_vent_nfa_in2: 26, ridge_nfa_per_ft_in2: 0 }));
+  assert.ok("error" in _v907({ attic_area_sf: Infinity, vent_ratio: 300, soffit_vent_nfa_in2: 26, ridge_nfa_per_ft_in2: 18 }));
+});

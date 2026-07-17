@@ -548,7 +548,7 @@ const _TILES = [
   ["paver-patio", "E"],
   ["retaining-wall-block", "E"],
   ["attic-ventilation", "E"], ["powered-attic-ventilator", "E"],
-  ["gutter-downspout", "E"], ["gutter-downspout-takeoff", "E"],
+  ["gutter-downspout", "E"], ["gutter-downspout-takeoff", "E"], ["soffit-ridge-vent-count", "E"],
   ["assembly-r-value", "C"],
   ["blown-insulation-coverage", "C"],
   // spec-v233..v235 heat-pump heating-mode batch

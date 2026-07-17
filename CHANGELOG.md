@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(roofing): soffit-ridge-vent-count -- soffit vent and ridge-vent count from required NFA (spec-v907); 2026-07-17
+
+- New Group E tile `soffit-ridge-vent-count` (calc-finish.js), the ventilation takeoff beside `attic-ventilation`. total
+  NFA = attic area / ratio x 144; intake = exhaust = total / 2; soffit vents = ceil(intake / per-vent NFA); ridge =
+  ceil(exhaust / ridge NFA per ft). A 1,500 sf attic at 1/300 needs 720 in^2 of NFA (360 each way), so 14 soffit vents at
+  26 in^2 and 20 LF of ridge at 18 in^2/ft; the 1/150 ratio (no vapor retarder) doubles it to 28 vents and 40 LF. The
+  ratio comes from the IRC (attic-ventilation gives the NFA); the product NFA from the manufacturer. Home count 1,355 ->
+  1,356.
+- Raised two module gzip caps (check-module-sizes.mjs): calc-finish.js 10000 -> 12000 B (the gutter and soffit/ridge vent
+  takeoffs took it to ~10.0 KB gz) and tools-data.js 215000 -> 228000 B (the v881-v907 batch's 27 catalog rows took the
+  registry to ~215.1 KB gz). Both are lazy-loaded and not in the home-view payload.
+
 ### feat(plumbing): pex-homerun-takeoff -- PEX home-run manifold port and tubing takeoff (spec-v906); 2026-07-17
 
 - New Group B tile `pex-homerun-takeoff` (calc-plumbing.js), the plumbing rough-in takeoff beside `pipe-sizing`. cold

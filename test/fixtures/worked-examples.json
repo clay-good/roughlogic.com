@@ -53695,6 +53695,70 @@
    }
   },
   {
+   "tile_id": "soffit-ridge-vent-count",
+   "source_publisher": "Attic vent-count identity (first-principles / IRC R806)",
+   "source_title": "1,500 sf attic, 1/300, 26 in^2 soffit vents, 18 in^2/ft ridge -> 720 in^2, 14 vents, 20 LF",
+   "source_edition_or_year": "spec-v907 worked example",
+   "source_section_or_page": "total=1500/300*144=720; intake=360; soffit=ceil(360/26)=14; ridge=ceil(360/18)=20",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "attic_area_sf": 1500,
+    "vent_ratio": 300,
+    "soffit_vent_nfa_in2": 26,
+    "ridge_nfa_per_ft_in2": 18
+   },
+   "outputs": {
+    "total_nfa_in2": {
+     "value": 720,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "soffit_vents": {
+     "value": 14,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ridge_lf": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soffit-ridge-vent-count",
+   "source_publisher": "Attic vent-count identity (first-principles / IRC R806)",
+   "source_title": "cross-check: without a vapor retarder the 1/150 ratio doubles it to 28 vents and 40 LF",
+   "source_edition_or_year": "spec-v907 worked example",
+   "source_section_or_page": "total=1500/150*144=1440; intake=720; soffit=ceil(720/26)=28; ridge=ceil(720/18)=40",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "attic_area_sf": 1500,
+    "vent_ratio": 150,
+    "soffit_vent_nfa_in2": 26,
+    "ridge_nfa_per_ft_in2": 18
+   },
+   "outputs": {
+    "soffit_vents": {
+     "value": 28,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ridge_lf": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

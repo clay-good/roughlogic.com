@@ -2055,6 +2055,7 @@ cross-check.
 | calc-finish.js | `computeGutterDownspoutTakeoff` | `{ eave_length_ft = 140, roof_area_sf = 2400, max_area_per_downspout_sf = 800,...` | _ | _ | _ |
 | calc-finish.js | `computePaverPatio` | `{ area_sqft = 0, paver_length_in = 0, paver_width_in = 0, base_depth_in = 6, ...` | _ | _ | _ |
 | calc-finish.js | `computeRetainingWallBlock` | `{ wall_length_ft = 0, exposed_height_ft = 0, block_length_in = 18, block_heig...` | _ | _ | _ |
+| calc-finish.js | `computeSoffitRidgeVentCount` | `{ attic_area_sf = 1500, vent_ratio = 300, soffit_vent_nfa_in2 = 26, ridge_nfa...` | _ | _ | _ |
 | calc-finish.js | `computeThinsetCoverage` | `{ area_sqft = 0, trowel = "quarter_three_eighths", coverage_per_bag = 0, bag_...` | _ | _ | _ |
 | calc-fire.js | `computeAerialLadderReach` | `{ angle_deg, extension_ft }` | _ | _ | _ |
 | calc-fire.js | `computeBrakingDistance` | `{ speed_mph, friction_coefficient, grade_percent = 0, reaction_time_s = 1.5 }` | _ | _ | _ |
@@ -3016,7 +3017,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1602.
+Row count: 1603.
 
 <!-- END function-corpus-v14 -->
 
@@ -3579,7 +3580,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (347 tiles)
+### Group E Construction (348 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3845,6 +3846,7 @@ per spec-v14 §13.1 second paragraph.
 | `snow-drift-load` | Snow Drift Surcharge at a Roof Step or Parapet (ASCE 7 Ch. 7) | ASCE 7-22 Chapter 7; spec-v297 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `snow-load` | Flat-Roof Snow Load | ASCE; Pg=30 psf ground snow / Ce=Ct=Is=1.0 -> Pf=21 psf flat-ro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `snow-unbalanced-gable` | Unbalanced Snow Load on Gable Roof (ASCE 7 7.6.1) | ASCE 7-22 Section 7.6.1 (unbalanced s...; pg 30, ps 25, 4:12, W 30 ft -> applies; windward 7.5, lee... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `soffit-ridge-vent-count` | Soffit Vent and Ridge-Vent Count from Required NFA | Attic vent-count identity (first-prin...; total=1500/300*144=720; intake=360; soffit=ceil(360/26)=1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-bearing-capacity` | Shallow Foundation Bearing Capacity (Vesic) | Das, Principles of Foundation Enginee...; spec-v260 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-consolidation-settlement` | Primary Consolidation Settlement (NC Clay) | Terzaghi primary consolidation (Das /...; spec-v308 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-phase-relations` | Soil Phase Relations (Void Ratio, Porosity, Saturation) | Soil phase relations (Das / NAVFAC); spec-v327 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4557,6 +4559,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1355. Fixture-covered or reference-cadence: 1355 / 1355.
+Tile count: 1356. Fixture-covered or reference-cadence: 1356 / 1356.
 
 <!-- END tile-index-v14 -->

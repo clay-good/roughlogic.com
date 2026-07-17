@@ -474,3 +474,46 @@ FINISH_RENDERERS["gutter-downspout-takeoff"] = _simpleRenderer({
   ],
   compute: computeGutterDownspoutTakeoff,
 });
+
+// soffit-ridge-vent-count (spec-v907): soffit vent and ridge-vent count from required NFA.
+// dims: in { attic_area_sf: L^2, vent_ratio: dimensionless, soffit_vent_nfa_in2: L^2, ridge_nfa_per_ft_in2: L } out: { total_nfa_in2: L^2, intake_nfa_in2: L^2, exhaust_nfa_in2: L^2, soffit_vents: dimensionless, ridge_lf: L }
+export function computeSoffitRidgeVentCount({ attic_area_sf = 1500, vent_ratio = 300, soffit_vent_nfa_in2 = 26, ridge_nfa_per_ft_in2 = 18 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(attic_area_sf > 0)) return { error: "Attic area must be positive (ft^2)." };
+  if (!(vent_ratio > 0)) return { error: "Vent ratio must be positive." };
+  if (!(soffit_vent_nfa_in2 > 0)) return { error: "Per-vent NFA must be positive (in^2)." };
+  if (!(ridge_nfa_per_ft_in2 > 0)) return { error: "Ridge NFA per foot must be positive (in^2/ft)." };
+  const total_nfa_in2 = attic_area_sf / vent_ratio * 144;
+  const intake_nfa_in2 = total_nfa_in2 / 2;
+  const exhaust_nfa_in2 = total_nfa_in2 / 2;
+  const soffit_vents = Math.ceil(intake_nfa_in2 / soffit_vent_nfa_in2);
+  const ridge_lf = Math.ceil(exhaust_nfa_in2 / ridge_nfa_per_ft_in2);
+  if (![total_nfa_in2, intake_nfa_in2, exhaust_nfa_in2, soffit_vents, ridge_lf].every(Number.isFinite)) return { error: "Vent-count math is not a finite value." };
+  return {
+    total_nfa_in2,
+    intake_nfa_in2,
+    exhaust_nfa_in2,
+    soffit_vents,
+    ridge_lf,
+    note: "The required NFA and the 1/300 (balanced, with a vapor retarder) or 1/150 ratio come from the IRC (attic-ventilation gives the NFA). The product NFA per vent and per foot of ridge come from the manufacturer (entered here). Intake should meet or exceed exhaust. Distinct from the required-NFA attic-ventilation.",
+  };
+}
+
+const soffitRidgeVentCountExample = { inputs: { attic_area_sf: 1500, vent_ratio: 300, soffit_vent_nfa_in2: 26, ridge_nfa_per_ft_in2: 18 } };
+FINISH_RENDERERS["soffit-ridge-vent-count"] = _simpleRenderer({
+  citation: "Citation: vent-count identity by name. total NFA = attic area / ratio x 144; intake = exhaust = total / 2; soffit vents = ceil(intake / per-vent NFA); ridge = ceil(exhaust / ridge NFA per ft). The ratio comes from the IRC; the product NFA from the manufacturer.",
+  example: soffitRidgeVentCountExample.inputs,
+  fields: [
+    { key: "attic_area_sf", label: "Attic floor area (ft^2)", kind: "number", default: 1500 },
+    { key: "vent_ratio", label: "NFA ratio denominator (1/N)", kind: "number", default: 300 },
+    { key: "soffit_vent_nfa_in2", label: "NFA per soffit vent (in^2)", kind: "number", default: 26 },
+    { key: "ridge_nfa_per_ft_in2", label: "NFA per foot of ridge vent (in^2/ft)", kind: "number", default: 18 },
+  ],
+  outputs: [
+    { key: "n", id: "srv-out-n", label: "Total net free area", value: (r) => fmt(r.total_nfa_in2, 0) + " in^2 (" + fmt(r.intake_nfa_in2, 0) + " each way)" },
+    { key: "s", id: "srv-out-s", label: "Soffit (intake) vents", value: (r) => fmt(r.soffit_vents, 0) + " vents" },
+    { key: "r", id: "srv-out-r", label: "Ridge (exhaust) vent", value: (r) => fmt(r.ridge_lf, 0) + " LF" },
+    { key: "note", id: "srv-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSoffitRidgeVentCount,
+});
