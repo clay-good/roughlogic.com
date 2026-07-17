@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): vapor-barrier-rolls -- under-slab vapor barrier rolls and seam tape (spec-v885); 2026-07-17
+
+- New Group E tile `vapor-barrier-rolls` (calc-construction.js), the concrete / waterproofing takeoff beside the flatwork
+  tiles. rolls = ceil(area x (1 + overlap + waste) / roll coverage); seam tape = area / roll width. A 3,000 sf slab on
+  1,000 sf rolls with 6 in laps and waste takes 4 rolls and about 300 LF of seam tape; a 6,000 sf slab takes 7 rolls and
+  600 LF. Under-slab retarders follow ASTM E1745 (a Class A membrane is common under conditioned slabs); penetrations and
+  the perimeter seal are added separately. Home count 1,333 -> 1,334.
+
 ### feat(construction): stucco-coverage -- portland-cement plaster (stucco) material takeoff (spec-v884); 2026-07-17
 
 - New Group E tile `stucco-coverage` (calc-construction.js), the plaster takeoff beside `mortar-mix` and

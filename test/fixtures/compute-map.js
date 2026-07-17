@@ -809,6 +809,7 @@ export const COMPUTE_MAP = {
   "traffic-taper-length": { module: "../../calc-construction.js", fn: "computeTrafficTaperLength" },
   "siding-takeoff": { module: "../../calc-construction.js", fn: "computeSidingTakeoff" },
   "stucco-coverage": { module: "../../calc-construction.js", fn: "computeStuccoCoverage" },
+  "vapor-barrier-rolls": { module: "../../calc-construction.js", fn: "computeVaporBarrierRolls" },
   "concrete-vibrator-spacing": { module: "../../calc-construction.js", fn: "computeConcreteVibratorSpacing" },
   "formwork-tie-load": { module: "../../calc-construction.js", fn: "computeFormworkTieLoad" },
   "mass-concrete-temp-rise": { module: "../../calc-construction.js", fn: "computeMassConcreteTempRise" },

@@ -18177,6 +18177,31 @@
       "kind": "industry"
     },
     {
+      "term": "vapor barrier rolls",
+      "target": "vapor-barrier-rolls",
+      "kind": "industry"
+    },
+    {
+      "term": "under slab vapor barrier",
+      "target": "vapor-barrier-rolls",
+      "kind": "industry"
+    },
+    {
+      "term": "poly vapor retarder",
+      "target": "vapor-barrier-rolls",
+      "kind": "industry"
+    },
+    {
+      "term": "vapor barrier tape",
+      "target": "vapor-barrier-rolls",
+      "kind": "industry"
+    },
+    {
+      "term": "slab vapor barrier takeoff",
+      "target": "vapor-barrier-rolls",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

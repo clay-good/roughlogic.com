@@ -52373,6 +52373,64 @@
    }
   },
   {
+   "tile_id": "vapor-barrier-rolls",
+   "source_publisher": "Roll-takeoff identity (first-principles)",
+   "source_title": "3,000 sf slab, 1,000 sf rolls, 10% overlap+waste, 10 ft roll -> 4 rolls, 300 LF tape",
+   "source_edition_or_year": "spec-v885 worked example",
+   "source_section_or_page": "rolls = ceil(3000*1.10/1000) = ceil(3.3) = 4; seam tape = 3000/10 = 300",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "area_sf": 3000,
+    "roll_coverage_sf": 1000,
+    "overlap_waste_pct": 10,
+    "roll_width_ft": 10
+   },
+   "outputs": {
+    "rolls": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "seam_tape_lf": {
+     "value": 300,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vapor-barrier-rolls",
+   "source_publisher": "Roll-takeoff identity (first-principles)",
+   "source_title": "cross-check: a 6,000 sf slab takes 7 rolls and 600 LF of tape",
+   "source_edition_or_year": "spec-v885 worked example",
+   "source_section_or_page": "rolls = ceil(6000*1.10/1000) = ceil(6.6) = 7; seam tape = 6000/10 = 600",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "area_sf": 6000,
+    "roll_coverage_sf": 1000,
+    "overlap_waste_pct": 10,
+    "roll_width_ft": 10
+   },
+   "outputs": {
+    "rolls": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "seam_tape_lf": {
+     "value": 600,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

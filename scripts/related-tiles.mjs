@@ -1056,6 +1056,7 @@ const RELATED = {
   "traffic-taper-length": ["striping-paint-quantity", "asphalt-paving-speed", "ada-ramp-slope"],
   "siding-takeoff": ["metal-roof-panels", "fence-estimate", "sheathing-takeoff"],
   "stucco-coverage": ["mortar-mix", "thinset-coverage", "masonry-count"],
+  "vapor-barrier-rolls": ["roof-underlayment-rolls", "concrete", "welded-wire-mesh"],
   "concrete-vibrator-spacing": ["concrete-pour-rate", "formwork-pressure", "concrete"],
   "formwork-tie-load": ["formwork-pressure", "shore-post-load", "concrete-pour-rate"],
   "mass-concrete-temp-rise": ["concrete-maturity", "fresh-concrete-temp", "concrete-evaporation-rate"],

@@ -26184,3 +26184,23 @@ test("bounds: spec-v884 computeStuccoCoverage pins the bag count, both coat syst
   assert.ok("error" in _v884({ area_sf: 1000, total_thickness_in: 0.875, bag_yield_sf_in: 10.1, waste_pct: -5 }));
   assert.ok("error" in _v884({ area_sf: Infinity, total_thickness_in: 0.875, bag_yield_sf_in: 10.1, waste_pct: 10 }));
 });
+
+import { computeVaporBarrierRolls as _v885 } from "../../calc-construction.js";
+
+test("bounds: spec-v885 computeVaporBarrierRolls pins the roll count, seam tape, and error seams", () => {
+  const r = _v885({ area_sf: 3000, roll_coverage_sf: 1000, overlap_waste_pct: 10, roll_width_ft: 10 });
+  assert.equal(r.rolls, 4); // ceil(3000*1.10/1000) = ceil(3.3)
+  assert.equal(r.seam_tape_lf, 300); // 3000 / 10
+  // Both track the area: double the slab, double the tape and about double the rolls.
+  const big = _v885({ area_sf: 6000, roll_coverage_sf: 1000, overlap_waste_pct: 10, roll_width_ft: 10 });
+  assert.equal(big.rolls, 7); // ceil(6600/1000)
+  assert.equal(big.seam_tape_lf, 600); // 6000 / 10
+  // A wider roll cuts the seams: 20 ft roll halves the tape.
+  assert.equal(_v885({ area_sf: 3000, roll_coverage_sf: 1000, overlap_waste_pct: 10, roll_width_ft: 20 }).seam_tape_lf, 150);
+  // Error seams: non-finite, non-positive area / coverage / width, negative overlap-waste.
+  assert.ok("error" in _v885({ area_sf: 0, roll_coverage_sf: 1000, overlap_waste_pct: 10, roll_width_ft: 10 }));
+  assert.ok("error" in _v885({ area_sf: 3000, roll_coverage_sf: 0, overlap_waste_pct: 10, roll_width_ft: 10 }));
+  assert.ok("error" in _v885({ area_sf: 3000, roll_coverage_sf: 1000, overlap_waste_pct: 10, roll_width_ft: 0 }));
+  assert.ok("error" in _v885({ area_sf: 3000, roll_coverage_sf: 1000, overlap_waste_pct: -5, roll_width_ft: 10 }));
+  assert.ok("error" in _v885({ area_sf: Infinity, roll_coverage_sf: 1000, overlap_waste_pct: 10, roll_width_ft: 10 }));
+});

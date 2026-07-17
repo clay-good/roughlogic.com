@@ -8189,6 +8189,17 @@ export const CITATIONS = {
       { name: "Bag yield", value: "~10.1 square-foot-inches per 80-lb bag (default); the product sets it", source: "plaster manufacturer" },
     ],
   },
+  "vapor-barrier-rolls": {
+    formula: "rolls = ceil(area_sf x (1 + overlap_waste_pct/100) / roll_coverage_sf); seam_tape_lf = area_sf / roll_width_ft.",
+    edition: "Roll-takeoff identity by name (rolls from area over coverage with lap and waste; seam tape one seam per roll width); first-principles arithmetic.",
+    freeAccess: "The roll-takeoff arithmetic is public quantity-survey math; the vapor-retarder class follows ASTM E1745 and the design.",
+    governance: GOVERNANCE.general,
+    editionNote: "Under-slab vapor retarders follow ASTM E1745; a Class A membrane is common under conditioned slabs. The laps (about 6 in) are taped. The seam-tape estimate is one seam per roll width; penetrations and the perimeter seal are added separately. The design and AHJ set the class.",
+    assumptions: [
+      { name: "Vapor-retarder class", value: "ASTM E1745 Class A common under conditioned slabs; the design and AHJ govern", source: "ASTM E1745" },
+      { name: "Seam tape", value: "one taped seam per roll width; penetrations and perimeter seal separate", source: "installation practice" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

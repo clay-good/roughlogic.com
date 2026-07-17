@@ -9388,3 +9388,44 @@ const _v884renderStuccoCoverage = _simpleRenderer({
   compute: computeStuccoCoverage,
 });
 CONSTRUCTION_RENDERERS["stucco-coverage"] = _v884renderStuccoCoverage;
+
+// --- vapor-barrier-rolls: Under-Slab Vapor Barrier Rolls and Seam Tape ---
+//
+// Poly rolls for a slab (with lap + waste) and the seam tape (one seam per roll width).
+//   rolls = ceil(area x (1 + overlap_waste/100) / roll_coverage); seam_tape = area / roll_width
+// dims: in { area_sf: L^2, roll_coverage_sf: L^2, overlap_waste_pct: dimensionless, roll_width_ft: L } out: { rolls: dimensionless, seam_tape_lf: L }
+export function computeVaporBarrierRolls({ area_sf = 3000, roll_coverage_sf = 1000, overlap_waste_pct = 10, roll_width_ft = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Slab area must be positive (ft^2)." };
+  if (!(roll_coverage_sf > 0)) return { error: "Roll coverage must be positive (ft^2)." };
+  if (!(roll_width_ft > 0)) return { error: "Roll width must be positive (ft)." };
+  if (overlap_waste_pct < 0) return { error: "Overlap / waste cannot be negative (percent)." };
+  const rolls = Math.ceil(area_sf * (1 + overlap_waste_pct / 100) / roll_coverage_sf);
+  const seam_tape_lf = area_sf / roll_width_ft;
+  if (![rolls, seam_tape_lf].every(Number.isFinite)) return { error: "Vapor-barrier math is not a finite value." };
+  return {
+    rolls,
+    seam_tape_lf,
+    note: "Under-slab vapor retarders follow ASTM E1745; a Class A membrane is common under conditioned slabs. The laps (about 6 in) are taped. The seam-tape estimate is one seam per roll width; penetrations and the perimeter seal are added separately. The design and AHJ set the class.",
+  };
+}
+
+export const vaporBarrierRollsExample = { inputs: { area_sf: 3000, roll_coverage_sf: 1000, overlap_waste_pct: 10, roll_width_ft: 10 } };
+
+const _v885renderVaporBarrierRolls = _simpleRenderer({
+  citation: "Citation: roll-takeoff identity by name. rolls = ceil(area x (1 + overlap + waste) / roll coverage); seam tape = area / roll width. Under-slab vapor retarders follow ASTM E1745; the laps are taped.",
+  example: vaporBarrierRollsExample.inputs,
+  fields: [
+    { key: "area_sf", label: "Slab area (ft^2)", kind: "number", default: 3000 },
+    { key: "roll_coverage_sf", label: "Coverage per roll (ft^2)", kind: "number", default: 1000 },
+    { key: "overlap_waste_pct", label: "Overlap + waste (%)", kind: "number", default: 10 },
+    { key: "roll_width_ft", label: "Roll width (ft)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "rolls", id: "vbr-out-rolls", label: "Vapor barrier rolls", value: (r) => _fmtC(r.rolls, 0) + " rolls" },
+    { key: "tape", id: "vbr-out-tape", label: "Seam tape", value: (r) => _fmtC(r.seam_tape_lf, 0) + " LF" },
+    { key: "note", id: "vbr-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeVaporBarrierRolls,
+});
+CONSTRUCTION_RENDERERS["vapor-barrier-rolls"] = _v885renderVaporBarrierRolls;
