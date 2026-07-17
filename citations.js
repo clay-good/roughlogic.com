@@ -8023,6 +8023,17 @@ export const CITATIONS = {
       { name: "Scope", value: "settling storage only; spillways, dewatering device, and emergency spillway designed separately", source: "sediment-basin design practice" },
     ],
   },
+  "erosion-blanket-coverage": {
+    formula: "coverage_sy = area_sf / 9; roll_sy = roll_width_ft x roll_length_ft / 9; rolls = ceil(coverage_sy x (1 + overlap_pct/100) / roll_sy); staples = ceil(coverage_sy x staples_per_sy).",
+    edition: "Lapped-roll takeoff identity by name (RECP install); first-principles area arithmetic; the manufacturer's guide sets overlap and staples.",
+    freeAccess: "The lapped-roll takeoff is public erosion-control practice; the overlap and staple pattern come from the manufacturer's installation guide.",
+    governance: GOVERNANCE.general,
+    editionNote: "The overlap and the staple pattern come from the manufacturer's installation guide - steeper and higher-flow slopes take more staples. The roll is anchored in a trench at the top of the slope. This is a purchase quantity, not an installation plan.",
+    assumptions: [
+      { name: "Overlap", value: "10% side/end overlap default; the manufacturer's guide governs", source: "RECP manufacturer" },
+      { name: "Staple rate", value: "1.5 staples/sy default; steeper and higher-flow slopes take more (up to ~3.5/sy)", source: "RECP manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

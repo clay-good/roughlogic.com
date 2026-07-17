@@ -48949,6 +48949,66 @@
    }
   },
   {
+   "tile_id": "erosion-blanket-coverage",
+   "source_publisher": "Lapped-roll takeoff identity (RECP install)",
+   "source_title": "18,000 sf slope, 10% overlap, 8x112.5 ft roll (100 sy), 1.5 staples/sy",
+   "source_edition_or_year": "spec-v828 worked example",
+   "source_section_or_page": "coverage = 18000/9 = 2,000 sy; roll = 100 sy; rolls = ceil(2000*1.10/100) = 22; staples = ceil(2000*1.5) = 3,000",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "area_sf": 18000,
+    "overlap_pct": 10,
+    "roll_width_ft": 8,
+    "roll_length_ft": 112.5,
+    "staples_per_sy": 1.5
+   },
+   "outputs": {
+    "coverage_sy": {
+     "value": 2000,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "rolls": {
+     "value": 22,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "staples": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "erosion-blanket-coverage",
+   "source_publisher": "Lapped-roll takeoff identity (RECP install)",
+   "source_title": "cross-check: a steeper slope at 15% overlap needs one more roll",
+   "source_edition_or_year": "spec-v828 worked example",
+   "source_section_or_page": "rolls = ceil(2000*1.15/100) = 23 -- the overlap sets the last roll",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "area_sf": 18000,
+    "overlap_pct": 15,
+    "roll_width_ft": 8,
+    "roll_length_ft": 112.5,
+    "staples_per_sy": 1.5
+   },
+   "outputs": {
+    "rolls": {
+     "value": 23,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

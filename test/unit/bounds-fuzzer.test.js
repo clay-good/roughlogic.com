@@ -17098,6 +17098,7 @@ import { computeRiprapTonnage as _v824rt } from "../../calc-earthwork.js";
 import { computeSiltFenceDrainage as _v825sf } from "../../calc-earthwork.js";
 import { computeCheckDamSpacing as _v826cd } from "../../calc-earthwork.js";
 import { computeSedimentBasinVolume as _v827sb } from "../../calc-earthwork.js";
+import { computeErosionBlanketCoverage as _v828eb } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17227,6 +17228,23 @@ test("bounds: spec-v827 computeSedimentBasinVolume pins the required volumes, su
   assert.ok("error" in _v827sb({ disturbed_ac: 0, storage_rule_cf_per_ac: 3600, basin_depth_ft: 3 }));
   assert.ok("error" in _v827sb({ disturbed_ac: 5, storage_rule_cf_per_ac: 0, basin_depth_ft: 3 }));
   assert.ok("error" in _v827sb({ disturbed_ac: 5, storage_rule_cf_per_ac: 3600, basin_depth_ft: 0 }));
+});
+
+test("bounds: spec-v828 computeErosionBlanketCoverage pins coverage, rolls, staples, and error seams", () => {
+  // 18,000 sf, 10% overlap, 8x112.5 roll (100 sy), 1.5 staples/sy -> 2000 sy, 22 rolls, 3000 staples
+  const r = _v828eb({ area_sf: 18000, overlap_pct: 10, roll_width_ft: 8, roll_length_ft: 112.5, staples_per_sy: 1.5 });
+  assert.strictEqual(r.coverage_sy, 2000);
+  assert.strictEqual(r.roll_sy, 100);
+  assert.strictEqual(r.rolls, 22);
+  assert.strictEqual(r.staples, 3000);
+  // A steeper 15% overlap needs one more roll.
+  assert.strictEqual(_v828eb({ area_sf: 18000, overlap_pct: 15, roll_width_ft: 8, roll_length_ft: 112.5, staples_per_sy: 1.5 }).rolls, 23);
+  // Error seams.
+  assert.ok("error" in _v828eb({ area_sf: 0, roll_width_ft: 8, roll_length_ft: 112.5, staples_per_sy: 1.5 }));
+  assert.ok("error" in _v828eb({ area_sf: 18000, roll_width_ft: 0, roll_length_ft: 112.5, staples_per_sy: 1.5 }));
+  assert.ok("error" in _v828eb({ area_sf: 18000, roll_width_ft: 8, roll_length_ft: 0, staples_per_sy: 1.5 }));
+  assert.ok("error" in _v828eb({ area_sf: 18000, roll_width_ft: 8, roll_length_ft: 112.5, staples_per_sy: 0 }));
+  assert.ok("error" in _v828eb({ area_sf: 18000, overlap_pct: -1, roll_width_ft: 8, roll_length_ft: 112.5, staples_per_sy: 1.5 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

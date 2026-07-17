@@ -650,7 +650,7 @@ const TOOL_MODULES = (() => {
   // of the group letter, per the v28/v30/v36/v39 precedent); no tile or output
   // changed.
   declare("./calc-earthwork.js", "EARTHWORK_RENDERERS", [
-    "soil-swell-shrink", "haul-cycle-production", "loader-production", "dozer-production", "compaction-roller-production", "ripper-production", "rusle-soil-loss", "riprap-d50", "riprap-tonnage", "silt-fence-drainage", "check-dam-spacing", "sediment-basin-volume", "dewatering-rate",
+    "soil-swell-shrink", "haul-cycle-production", "loader-production", "dozer-production", "compaction-roller-production", "ripper-production", "rusle-soil-loss", "riprap-d50", "riprap-tonnage", "silt-fence-drainage", "check-dam-spacing", "sediment-basin-volume", "erosion-blanket-coverage", "dewatering-rate",
     "spoil-setback", "pipe-bedding-backfill",
     // spec-v326..v328 soil characterization / QC batch
     "relative-compaction", "water-for-compaction", "soil-phase-relations", "atterberg-indices", "fineness-modulus",

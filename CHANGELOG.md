@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): erosion-blanket-coverage -- RECP roll and staple takeoff (spec-v828); 2026-07-16
+
+- New Group E tile `erosion-blanket-coverage` (calc-earthwork.js), the cover-BMP takeoff that drops the RUSLE C factor.
+  Rolls and staples for a slope blanket, where the side/end overlap drives the roll count: rolls = ceil(area x (1 +
+  overlap) / roll area), staples = ceil(area sy x staples per sy). An 18,000 sf slope at 10% overlap with 100 sy rolls
+  needs 22 rolls and ~3,000 staples at 1.5/sy; a steeper 15% overlap needs 23. Home count 1,276 -> 1,277.
+
 ### feat(earthwork): sediment-basin-volume -- sediment basin / trap storage (spec-v827); 2026-07-16
 
 - New Group E tile `sediment-basin-volume` (calc-earthwork.js), sizing the settling storage a construction general

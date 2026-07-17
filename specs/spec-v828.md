@@ -1,6 +1,7 @@
 # roughlogic.com Specification v828 -- Erosion Blanket (RECP) Roll and Staple Takeoff (calc-earthwork.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-16 (package 0.398.0).** Executed against the live catalog (1,276 -> 1,277 tiles). Related
+> tiles retargeted to existing tiles (the proposed hydroseed-mix and geotextile-takeoff siblings are not yet landed). Single-tile spec.
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-earthwork.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v827.md. Erosion-control sweep (entry 7), the cover
 > BMP that drops the RUSLE C factor.

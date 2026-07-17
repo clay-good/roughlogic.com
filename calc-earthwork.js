@@ -16,6 +16,7 @@
 //   - silt-fence-drainage     Silt fence drainage-area and length check
 //   - check-dam-spacing       Rock check dam spacing
 //   - sediment-basin-volume   Sediment basin / trap storage volume
+//   - erosion-blanket-coverage  Erosion blanket (RECP) roll and staple takeoff
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
@@ -763,6 +764,61 @@ function _v827renderSedimentBasinVolume(inputRegion, outputRegion, citationEl) {
   for (const f of [ac, rule, depth]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["sediment-basin-volume"] = _v827renderSedimentBasinVolume;
+
+// --- erosion-blanket-coverage: Erosion Blanket (RECP) Roll and Staple Takeoff ---
+//
+// Rolls and staples for a slope-cover blanket; the side/end overlap drives the
+// roll count above the nominal roll area.
+// dims: in { area_sf: L^2, overlap_pct: dimensionless, roll_width_ft: L, roll_length_ft: L, staples_per_sy: dimensionless } out: { coverage_sy: L^2, roll_sy: L^2, rolls: dimensionless, staples: dimensionless }
+export function computeErosionBlanketCoverage({ area_sf = 0, overlap_pct = 10, roll_width_ft = 8, roll_length_ft = 112.5, staples_per_sy = 1.5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Slope area must be positive (ft^2)." };
+  if (!(roll_width_ft > 0)) return { error: "Roll width must be positive (ft)." };
+  if (!(roll_length_ft > 0)) return { error: "Roll length must be positive (ft)." };
+  if (!(staples_per_sy > 0)) return { error: "Staple rate must be positive (per sy)." };
+  if (!(overlap_pct >= 0)) return { error: "Overlap must be non-negative (%)." };
+  const coverage_sy = area_sf / 9;
+  const roll_sy = (roll_width_ft * roll_length_ft) / 9;
+  const rolls = Math.ceil((coverage_sy * (1 + overlap_pct / 100)) / roll_sy);
+  const staples = Math.ceil(coverage_sy * staples_per_sy);
+  if (![coverage_sy, roll_sy, rolls, staples].every(Number.isFinite)) return { error: "Blanket-takeoff math is not a finite value." };
+  return {
+    coverage_sy,
+    roll_sy,
+    rolls,
+    staples,
+    note: "The overlap and the staple pattern come from the manufacturer's installation guide - steeper and higher-flow slopes take more staples. The roll is anchored in a trench at the top of the slope. This is a purchase quantity, not an installation plan.",
+  };
+}
+
+function _v828renderErosionBlanketCoverage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: lapped-roll takeoff identity by name. rolls = ceil(area x (1 + overlap) / roll area); staples = ceil(area (sy) x staples per sy). The manufacturer's guide sets the overlap and staple pattern.";
+  const area = makeNumber("Slope area to cover (ft^2)", "ebc-area", { step: "any", min: "0" });
+  const overlap = makeNumber("Side/end overlap allowance (%)", "ebc-overlap", { step: "any", min: "0", value: "10" });
+  overlap.input.value = "10";
+  const w = makeNumber("Blanket roll width (ft)", "ebc-w", { step: "any", min: "0", value: "8" });
+  w.input.value = "8";
+  const l = makeNumber("Blanket roll length (ft)", "ebc-l", { step: "any", min: "0", value: "112.5" });
+  l.input.value = "112.5";
+  const sr = makeNumber("Staples per square yard", "ebc-sr", { step: "any", min: "0", value: "1.5" });
+  sr.input.value = "1.5";
+  for (const f of [area, overlap, w, l, sr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "18000"; overlap.input.value = "10"; w.input.value = "8"; l.input.value = "112.5"; sr.input.value = "1.5"; update(); });
+  const oRolls = makeOutputLine(outputRegion, "Rolls to order", "ebc-out-rolls");
+  const oStaples = makeOutputLine(outputRegion, "Staples to order", "ebc-out-staples");
+  const update = debounce(() => {
+    const r = computeErosionBlanketCoverage({
+      area_sf: Number(area.input.value) || 0, overlap_pct: overlap.input.value === "" ? 10 : Number(overlap.input.value),
+      roll_width_ft: w.input.value === "" ? 8 : Number(w.input.value), roll_length_ft: l.input.value === "" ? 112.5 : Number(l.input.value),
+      staples_per_sy: sr.input.value === "" ? 1.5 : Number(sr.input.value),
+    });
+    if (r.error) { oRolls.textContent = r.error; oStaples.textContent = "-"; return; }
+    oRolls.textContent = r.rolls + " rolls (" + fmt(r.coverage_sy, 0) + " sy slope, " + fmt(r.roll_sy, 0) + " sy/roll)";
+    oStaples.textContent = fmt(r.staples, 0) + " staples";
+  }, DEBOUNCE_MS);
+  for (const f of [area, overlap, w, l, sr]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["erosion-blanket-coverage"] = _v828renderErosionBlanketCoverage;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

@@ -16752,6 +16752,31 @@
       "kind": "industry"
     },
     {
+      "term": "erosion blanket rolls",
+      "target": "erosion-blanket-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "recp takeoff",
+      "target": "erosion-blanket-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "erosion control blanket",
+      "target": "erosion-blanket-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "slope blanket staples",
+      "target": "erosion-blanket-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "erosion mat coverage",
+      "target": "erosion-blanket-coverage",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

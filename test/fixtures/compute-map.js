@@ -756,6 +756,7 @@ export const COMPUTE_MAP = {
   "silt-fence-drainage": { module: "../../calc-earthwork.js", fn: "computeSiltFenceDrainage" },
   "check-dam-spacing": { module: "../../calc-earthwork.js", fn: "computeCheckDamSpacing" },
   "sediment-basin-volume": { module: "../../calc-earthwork.js", fn: "computeSedimentBasinVolume" },
+  "erosion-blanket-coverage": { module: "../../calc-earthwork.js", fn: "computeErosionBlanketCoverage" },
   "haul-cycle-production": { module: "../../calc-earthwork.js", fn: "computeHaulCycleProduction" },
   "loader-production": { module: "../../calc-earthwork.js", fn: "computeLoaderProduction" },
   "dozer-production": { module: "../../calc-earthwork.js", fn: "computeDozerProduction" },
