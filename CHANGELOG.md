@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): membrane-roof-takeoff -- single-ply membrane rolls and seam length (spec-v863); 2026-07-17
+
+- New Group E tile `membrane-roof-takeoff` (calc-construction.js), the single-ply membrane (TPO/EPDM/PVC) takeoff beside
+  the shingle and metal-panel tiles. usable = roll width - side lap; rolls = ceil(area x (1 + waste) / (usable x roll
+  length)); seam = area / usable. An 8,000 sf roof on 10 ft x 100 ft rolls with a 6 in side lap takes 9 rolls and ~842
+  LF of seam (the welding day); a wider 12 ft roll cuts it to 8 rolls and 696 LF -- a wider sheet cuts both the rolls
+  and the welding. The seam length sizes the hot-air welding; fasteners and cover tape are separate. Home count 1,311 ->
+  1,312.
+
 ### feat(construction): roof-underlayment-rolls -- roof underlayment roll count (spec-v862); 2026-07-17
 
 - New Group E tile `roof-underlayment-rolls` (calc-construction.js), the roofing takeoff beside `roofing-squares`

@@ -8390,3 +8390,51 @@ const _v862renderRoofUnderlaymentRolls = _simpleRenderer({
   compute: computeRoofUnderlaymentRolls,
 });
 CONSTRUCTION_RENDERERS["roof-underlayment-rolls"] = _v862renderRoofUnderlaymentRolls;
+
+// --- membrane-roof-takeoff: Single-Ply Membrane Roof Rolls and Seam Length ---
+//
+// Takes off a single-ply membrane (TPO/EPDM/PVC) - the rolls, where the side lap
+// eats the usable width, and the seam length that sizes the welding:
+//   usable_w_ft = roll_width_ft - sidelap_in/12
+//   rolls = ceil(roof_area_sf x (1 + waste_pct/100) / (usable_w_ft x roll_length_ft))
+//   seam_lf = roof_area_sf / usable_w_ft
+// dims: in { roof_area_sf: L^2, roll_width_ft: L, roll_length_ft: L, sidelap_in: L, waste_pct: dimensionless } out: { usable_w_ft: L, rolls: dimensionless, seam_lf: L }
+export function computeMembraneRoofTakeoff({ roof_area_sf = 8000, roll_width_ft = 10, roll_length_ft = 100, sidelap_in = 6, waste_pct = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(roof_area_sf > 0)) return { error: "Roof area must be positive (ft^2)." };
+  if (!(roll_width_ft > 0)) return { error: "Roll width must be positive (ft)." };
+  if (!(roll_length_ft > 0)) return { error: "Roll length must be positive (ft)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const usable_w_ft = roll_width_ft - sidelap_in / 12;
+  if (!(usable_w_ft > 0)) return { error: "Side lap exceeds the roll width (no usable width)." };
+  const rolls = Math.ceil((roof_area_sf * (1 + waste_pct / 100)) / (usable_w_ft * roll_length_ft));
+  const seam_lf = roof_area_sf / usable_w_ft;
+  if (![usable_w_ft, rolls, seam_lf].every(Number.isFinite)) return { error: "Membrane-takeoff math is not a finite value." };
+  return {
+    usable_w_ft,
+    rolls,
+    seam_lf,
+    note: "The usable width nets out the side lap. The seam length sizes the hot-air welding or adhesive and the labor. Fasteners, plates, and cover tape are taken off separately. The membrane and lap are set by the manufacturer and the wind-uplift design; a wider sheet cuts both the rolls and the welding.",
+  };
+}
+
+export const membraneRoofTakeoffExample = { inputs: { roof_area_sf: 8000, roll_width_ft: 10, roll_length_ft: 100, sidelap_in: 6, waste_pct: 5 } };
+
+const _v863renderMembraneRoofTakeoff = _simpleRenderer({
+  citation: "Citation: membrane-takeoff identity by name. usable width = roll width - side lap; rolls = ceil(area x (1 + waste) / (usable width x roll length)); seam = area / usable width. The usable width nets out the side lap; the seam sizes the welding.",
+  example: membraneRoofTakeoffExample.inputs,
+  fields: [
+    { key: "roof_area_sf", label: "Roof area (ft^2)", kind: "number", default: 8000 },
+    { key: "roll_width_ft", label: "Membrane roll width (ft)", kind: "number", default: 10 },
+    { key: "roll_length_ft", label: "Membrane roll length (ft)", kind: "number", default: 100 },
+    { key: "sidelap_in", label: "Side lap (in)", kind: "number", default: 6 },
+    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 5 },
+  ],
+  outputs: [
+    { key: "r", id: "mrt-out-r", label: "Membrane rolls", value: (r) => _fmtC(r.rolls, 0) + " rolls" },
+    { key: "s", id: "mrt-out-s", label: "Seam length to weld", value: (r) => _fmtC(r.seam_lf, 0) + " LF (" + _fmtC(r.usable_w_ft, 1) + " ft usable width)" },
+    { key: "note", id: "mrt-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMembraneRoofTakeoff,
+});
+CONSTRUCTION_RENDERERS["membrane-roof-takeoff"] = _v863renderMembraneRoofTakeoff;

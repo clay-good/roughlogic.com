@@ -8409,6 +8409,17 @@ export const CITATIONS = {
       { name: "Lap + waste", value: "~10% for head and side laps plus offcuts; the code sets the lap", source: "code / manufacturer" },
     ],
   },
+  "membrane-roof-takeoff": {
+    formula: "usable_w_ft = roll_width_ft - sidelap_in/12; rolls = ceil(roof_area_sf x (1 + waste_pct/100) / (usable_w_ft x roll_length_ft)); seam_lf = roof_area_sf / usable_w_ft.",
+    edition: "Single-ply membrane takeoff identity by name (usable width nets the side lap; rolls from area / usable coverage; seam from area / usable width); first-principles takeoff arithmetic.",
+    freeAccess: "The membrane takeoff is public quantity geometry; the membrane and lap come from the manufacturer and the wind-uplift design.",
+    governance: GOVERNANCE.general,
+    editionNote: "The usable width nets out the side lap. The seam length sizes the hot-air welding or adhesive and the labor. Fasteners, plates, and cover tape are taken off separately. The membrane and lap are set by the manufacturer and the wind-uplift design.",
+    assumptions: [
+      { name: "Usable width", value: "roll width minus the side lap (a 10 ft roll with a 6 in lap nets 9.5 ft)", source: "membrane manufacturer" },
+      { name: "Side lap", value: "set by the manufacturer and the wind-uplift design (~6 in typical)", source: "manufacturer / uplift design" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

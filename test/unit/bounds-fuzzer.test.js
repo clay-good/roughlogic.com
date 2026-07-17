@@ -17133,6 +17133,7 @@ import { computeDuctWrapTakeoff as _v859dwt } from "../../calc-construction.js";
 import { computeDuctHangerLoad as _v860dhl } from "../../calc-construction.js";
 import { computeRefrigerantLinesetChargeAdjust as _v861rlc } from "../../calc-refrigerant.js";
 import { computeRoofUnderlaymentRolls as _v862rur } from "../../calc-construction.js";
+import { computeMembraneRoofTakeoff as _v863mrt } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17874,6 +17875,25 @@ test("bounds: spec-v862 computeRoofUnderlaymentRolls pins the roll count and err
   assert.ok("error" in _v862rur({ roof_area_sf: 0, roll_coverage_sf: 1000, lap_waste_pct: 10 }));
   assert.ok("error" in _v862rur({ roof_area_sf: 2500, roll_coverage_sf: 0, lap_waste_pct: 10 }));
   assert.ok("error" in _v862rur({ roof_area_sf: 2500, roll_coverage_sf: 1000, lap_waste_pct: -1 }));
+});
+
+test("bounds: spec-v863 computeMembraneRoofTakeoff pins the usable width, rolls, seam length, and error seams", () => {
+  // 8,000 sf, 10 ft x 100 ft, 6 in lap, 5% waste -> 9.5 ft usable, 9 rolls, 842 LF.
+  const r = _v863mrt({ roof_area_sf: 8000, roll_width_ft: 10, roll_length_ft: 100, sidelap_in: 6, waste_pct: 5 });
+  assert.ok(Math.abs(r.usable_w_ft - 9.5) < 1e-9);
+  assert.strictEqual(r.rolls, 9);
+  assert.ok(Math.abs(r.seam_lf - 842.1) < 0.5);
+  // A wider 12 ft roll cuts both the rolls and the seam.
+  const wide = _v863mrt({ roof_area_sf: 8000, roll_width_ft: 12, roll_length_ft: 100, sidelap_in: 6, waste_pct: 5 });
+  assert.strictEqual(wide.rolls, 8);
+  assert.ok(Math.abs(wide.seam_lf - 695.65) < 0.5);
+  // Error seams.
+  assert.ok("error" in _v863mrt({ roof_area_sf: 0, roll_width_ft: 10, roll_length_ft: 100, sidelap_in: 6, waste_pct: 5 }));
+  assert.ok("error" in _v863mrt({ roof_area_sf: 8000, roll_width_ft: 0, roll_length_ft: 100, sidelap_in: 6, waste_pct: 5 }));
+  assert.ok("error" in _v863mrt({ roof_area_sf: 8000, roll_width_ft: 10, roll_length_ft: 0, sidelap_in: 6, waste_pct: 5 }));
+  assert.ok("error" in _v863mrt({ roof_area_sf: 8000, roll_width_ft: 10, roll_length_ft: 100, sidelap_in: 6, waste_pct: -1 }));
+  // Side lap at or above the roll width (no usable width).
+  assert.ok("error" in _v863mrt({ roof_area_sf: 8000, roll_width_ft: 0.4, roll_length_ft: 100, sidelap_in: 6, waste_pct: 5 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

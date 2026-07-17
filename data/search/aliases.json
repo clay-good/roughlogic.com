@@ -17627,6 +17627,31 @@
       "kind": "industry"
     },
     {
+      "term": "membrane roof takeoff",
+      "target": "membrane-roof-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "tpo roll count",
+      "target": "membrane-roof-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "epdm rolls",
+      "target": "membrane-roof-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "single ply membrane",
+      "target": "membrane-roof-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "roof membrane seam length",
+      "target": "membrane-roof-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"
