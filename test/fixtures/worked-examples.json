@@ -44300,9 +44300,9 @@
   {
    "tile_id": "concrete-anchor-breakout",
    "source_publisher": "ACI 318-19 Section 17.6.2 (concrete breakout in tension, CCD method)",
-   "source_title": "Nb = kc lambda sqrt(f'c) hef^1.5; Ncb = (ANc/ANco) psi_ed Nb; phiNcb = 0.65 Ncb",
+   "source_title": "Nb = kc lambda sqrt(f'c) hef^1.5; Ncb = (ANc/ANco) psi_ed Nb; phiNcb = 0.70 Ncb (Condition B)",
    "source_edition_or_year": "ACI 318-19",
-   "source_section_or_page": "6 in cast-in, 4000 psi, away from edges -> Nb 22308 lb, Ncb 22308 lb, phiNcb 14500 lb",
+   "source_section_or_page": "6 in cast-in, 4000 psi, away from edges -> Nb 22308 lb, Ncb 22308 lb, phiNcb 15616 lb",
    "verified_by": "rl",
    "verified_on": "2026-07-09",
    "inputs": {
@@ -44320,7 +44320,7 @@
      }
     },
     "phi_ncb_lb": {
-     "value": 14500,
+     "value": 15616,
      "tolerance": {
       "abs": 5
      }
@@ -44332,7 +44332,7 @@
    "source_publisher": "ACI 318-19 Section 17.6.2 (concrete breakout in tension, CCD method)",
    "source_title": "a near edge cuts capacity via psi_ed and a truncated projected area",
    "source_edition_or_year": "ACI 318-19",
-   "source_section_or_page": "Same anchor 6 in from a free edge -> psi_ed 0.90, area ratio 0.833, phiNcb 10875 lb (25% loss)",
+   "source_section_or_page": "Same anchor 6 in from a free edge -> psi_ed 0.90, area ratio 0.833, phiNcb 11712 lb (25% loss)",
    "verified_by": "rl",
    "verified_on": "2026-07-09",
    "inputs": {
@@ -44344,7 +44344,7 @@
    },
    "outputs": {
     "phi_ncb_lb": {
-     "value": 10875,
+     "value": 11712,
      "tolerance": {
       "abs": 10
      }

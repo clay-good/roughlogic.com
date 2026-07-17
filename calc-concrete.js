@@ -1148,10 +1148,10 @@ export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, ed
   const ANc = Math.min(ca1 + 1.5 * hef, 3 * hef) * (2 * 1.5 * hef);
   const area_ratio = Math.min(ANc / ANco, 1.0);
   const ncb_lb = area_ratio * psi_ed * nb_lb;
-  const phi_ncb_lb = 0.65 * ncb_lb;
+  const phi_ncb_lb = 0.70 * ncb_lb;
   return {
     nb_lb, ANco, psi_ed, ANc, area_ratio, ncb_lb, phi_ncb_lb, kc,
-    note: "The basic strength scales with the embedment to the 1.5 power (a deeper anchor gains fast); a near-edge anchor loses capacity to the edge factor psi_ed and a truncated projected area (a full cone needs 1.5 hef of edge on all sides). Cast-in (kc = 24) and post-installed (kc = 17) anchors differ; the cracked-vs-uncracked factor psi_c also applies (taken as 1.0 here). ACI 318-19 Chapter 17 and the engineer of record govern.",
+    note: "The basic strength scales with the embedment to the 1.5 power (a deeper anchor gains fast); a near-edge anchor loses capacity to the edge factor psi_ed and a truncated projected area (a full cone needs 1.5 hef of edge on all sides). Cast-in (kc = 24) and post-installed (kc = 17) anchors differ; the cracked-vs-uncracked factor psi_c also applies (taken as 1.0 here). phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318-19 Chapter 17 and the engineer of record govern.",
   };
 }
 
@@ -1276,7 +1276,7 @@ CONCRETE_RENDERERS["concrete-corbel-bracket"] = _simpleRenderer({
 });
 
 CONCRETE_RENDERERS["concrete-anchor-breakout"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Section 17.6.2 concrete breakout in tension (CCD method): Nb = kc lambda sqrt(f'c) hef^1.5 (kc = 24 cast-in, 17 post-installed), ANco = 9 hef^2, edge factor psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef, Ncb = (ANc/ANco) psi_ed Nb, phiNcb = 0.65 Ncb. The basic strength scales with embedment^1.5; a near-edge anchor loses capacity to the edge factor and a truncated projected area. Cracked-vs-uncracked psi_c applies (1.0 here). ACI 318 Chapter 17 and the engineer of record govern.",
+  citation: "Citation: ACI 318-19 Section 17.6.2 concrete breakout in tension (CCD method): Nb = kc lambda sqrt(f'c) hef^1.5 (kc = 24 cast-in, 17 post-installed), ANco = 9 hef^2, edge factor psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef, Ncb = (ANc/ANco) psi_ed Nb, phiNcb = 0.70 Ncb (Condition B, no supplementary reinforcement). The basic strength scales with embedment^1.5; a near-edge anchor loses capacity to the edge factor and a truncated projected area. Cracked-vs-uncracked psi_c applies (1.0 here). ACI 318 Chapter 17 and the engineer of record govern.",
   example: concreteAnchorBreakoutExample.inputs,
   fields: [
     { key: "embedment_in", label: "Effective embedment hef (in)", kind: "number" },

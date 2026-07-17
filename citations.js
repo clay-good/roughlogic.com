@@ -13827,7 +13827,7 @@ export const CITATIONS = {
     ],
   },
   "concrete-anchor-breakout": {
-    formula: "Nb = kc lambda sqrt(f'c) hef^1.5 (kc 24 cast-in, 17 post-installed); ANco = 9 hef^2; psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef; Ncb = (ANc/ANco) psi_ed Nb; phiNcb = 0.65 Ncb.",
+    formula: "Nb = kc lambda sqrt(f'c) hef^1.5 (kc 24 cast-in, 17 post-installed); ANco = 9 hef^2; psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef; Ncb = (ANc/ANco) psi_ed Nb; phiNcb = 0.70 Ncb (Condition B, no supplementary reinforcement).",
     edition: "The ACI 318-19 Section 17.6.2 concrete breakout strength in tension (CCD method), by name.",
     freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Chapter 17 anchoring provisions are in the published code.",
     governance: GOVERNANCE.general,

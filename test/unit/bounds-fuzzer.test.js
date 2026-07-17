@@ -23591,12 +23591,12 @@ test("bounds: spec-v548 computeConcreteAnchorBreakout pins the hef^1.5 cone, the
   assert.ok(Math.abs(far.nb_lb - 22308) < 5); // 24*sqrt(4000)*6^1.5
   assert.equal(far.psi_ed, 1.0); // away from edges
   assert.ok(Math.abs(far.area_ratio - 1.0) < 1e-9);
-  assert.ok(Math.abs(far.phi_ncb_lb - 14500) < 5); // 0.65 * Ncb
+  assert.ok(Math.abs(far.phi_ncb_lb - 15616) < 5); // 0.70 * Ncb (Condition B, no supplementary reinforcement)
   // A near edge cuts capacity through psi_ed and a truncated projected area.
   const near = _v548({ embedment_in: 6, fc_psi: 4000, edge_distance_in: 6, anchor_type: "cast-in", lambda: 1.0 });
   assert.ok(Math.abs(near.psi_ed - 0.90) < 0.01);
   assert.ok(Math.abs(near.area_ratio - 0.833) < 0.005);
-  assert.ok(Math.abs(near.phi_ncb_lb - 10875) < 10);
+  assert.ok(Math.abs(near.phi_ncb_lb - 11712) < 10);
   assert.ok(near.phi_ncb_lb < far.phi_ncb_lb);
   // Post-installed uses kc = 17, weaker than cast-in's 24.
   assert.equal(_v548({ embedment_in: 6, fc_psi: 4000, edge_distance_in: 100, anchor_type: "post-installed" }).kc, 17);

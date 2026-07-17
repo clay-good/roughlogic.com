@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(concrete): concrete-anchor-breakout used phi 0.65 (brittle-steel) for a concrete breakout mode -> 0.70; 2026-07-17
+
+- `concrete-anchor-breakout` (calc-concrete.js) applied `phiNcb = 0.65 x Ncb`. Per ACI 318-19 Table 17.5.3,
+  concrete breakout in tension (a concrete-governed mode) takes phi = 0.75 (Condition A, supplementary reinforcement)
+  or 0.70 (Condition B, none); 0.65 is the factor for a brittle steel element, not a concrete-side mode. The two
+  sibling concrete-side tiles in the same file -- headed-anchor pullout and side-face blowout -- already use 0.70 and
+  cite "Condition B," so the breakout tile was self-inconsistent and under-reported the design capacity ~7% (a 6 in
+  cast-in anchor at 4000 psi away from edges: phiNcb 14,500 lb instead of the correct 15,616 lb). Fixed to 0.70
+  (Condition B) to match ACI 318-19 and the sibling tiles; updated the citation, note, and both worked-example pins.
+  Caught by a first-principles ACI 318 re-derivation of calc-concrete.js.
+
 ### fix(construction): joist-hanger-count undercounted joists on a partial-bay run (floor -> ceil); 2026-07-17
 
 - `joist-hanger-count` (calc-construction.js) computed `joists = floor(run_width_ft x 12 / spacing_in) + 1`. A member
