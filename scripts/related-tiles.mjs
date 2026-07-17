@@ -1018,6 +1018,7 @@ const RELATED = {
   "soil-stabilization-quantity": ["relative-compaction", "water-for-compaction", "aggregate"],
   "flexible-pipe-deflection": ["pipe-flotation", "pipe-bedding-backfill", "relative-compaction"],
   "cable-reel-capacity": ["pulling-tension", "conduit-fill", "cable-tray-fill"],
+  "wire-pulling-lubricant": ["pulling-tension", "cable-reel-capacity", "conduit-fill"],
   "shingle-nails": ["roofing-squares", "ridge-cap-fasteners", "metal-roof-panels"],
   "duct-metal-weight": ["metal-weight", "bend-allowance", "duct-sizing"],
   "asphalt-spread-rate": ["asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity"],

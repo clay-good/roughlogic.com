@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): wire-pulling-lubricant -- cable-pulling lubricant quantity (spec-v852); 2026-07-17
+
+- New Group A tile `wire-pulling-lubricant` (calc-electrical.js), the install-ops estimate beside `pulling-tension`
+  (the force) and `cable-reel-capacity` (the reel). Estimates the pulling lubricant a conduit run takes, so the crew
+  does not run short mid-pull: gallons = K x length x conduit ID^2 x bend factor. A 400 ft run in 3 in conduit wants
+  about 5.4 gallons (round to a full pail); a bend-heavy, high-fill pull at a 1.3 bend factor pushes that past 7 -- the
+  bends, not the length alone, decide whether one pail does it. K is the common Polywater film-coating rule (~0.0015).
+  Home count 1,300 -> 1,301. This Group A tile crossed the calc-electrical.js gzip cap, raised 82000 -> 88000 (ledger
+  in check-module-sizes.mjs).
+
 ### feat(construction): duct-metal-weight -- galvanized duct sheet-metal weight takeoff (spec-v851); 2026-07-17
 
 - New Group E tile `duct-metal-weight` (calc-construction.js), opening the HVAC sheet-metal ops vein beside

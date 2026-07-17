@@ -50405,6 +50405,52 @@
    }
   },
   {
+   "tile_id": "wire-pulling-lubricant",
+   "source_publisher": "Film-coating lubricant estimate (rule of thumb)",
+   "source_title": "400 ft run, 3 in conduit, K 0.0015, bend factor 1.0",
+   "source_edition_or_year": "spec-v852 worked example",
+   "source_section_or_page": "gallons = 0.0015*400*9*1.0 = 5.4 gal",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "length_ft": 400,
+    "conduit_id_in": 3,
+    "k_factor": 0.0015,
+    "bend_factor": 1.0
+   },
+   "outputs": {
+    "gallons": {
+     "value": 5.4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wire-pulling-lubricant",
+   "source_publisher": "Film-coating lubricant estimate (rule of thumb)",
+   "source_title": "cross-check: a bend-heavy, high-fill pull at 1.3 bend factor",
+   "source_edition_or_year": "spec-v852 worked example",
+   "source_section_or_page": "gallons = 0.0015*400*9*1.3 = 7.02 gal (bends decide whether one pail does it)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "length_ft": 400,
+    "conduit_id_in": 3,
+    "k_factor": 0.0015,
+    "bend_factor": 1.3
+   },
+   "outputs": {
+    "gallons": {
+     "value": 7.02,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

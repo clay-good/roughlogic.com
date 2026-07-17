@@ -5538,3 +5538,46 @@ function _v849renderCableReelCapacity(inputRegion, outputRegion, citationEl) {
   for (const f of [fl, dr, tw, od, ff]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["cable-reel-capacity"] = _v849renderCableReelCapacity;
+
+// ===================== spec-v852: cable-pulling lubricant quantity =====================
+// dims: in { length_ft: L, conduit_id_in: L, k_factor: dimensionless, bend_factor: dimensionless } out: { gallons: L^3 }
+export function computeWirePullingLubricant({ length_ft = 400, conduit_id_in = 3, k_factor = 0.0015, bend_factor = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(length_ft > 0)) return { error: "Run length must be positive (ft)." };
+  if (!(conduit_id_in > 0)) return { error: "Conduit inside diameter must be positive (in)." };
+  if (!(k_factor > 0)) return { error: "K factor must be positive." };
+  if (!(bend_factor > 0)) return { error: "Bend factor must be positive." };
+  const gallons = k_factor * length_ft * conduit_id_in * conduit_id_in * bend_factor;
+  if (!Number.isFinite(gallons)) return { error: "Lubricant math is not a finite value." };
+  return {
+    gallons,
+    note: "K is a film-coating rule from the lubricant manufacturer (about 0.0015 for the common Polywater rule). More bends and higher conduit fill raise the demand through the bend factor. Under-lubing risks a stuck pull, so round up and keep a spare pail.",
+  };
+}
+
+export const wirePullingLubricantExample = { inputs: { length_ft: 400, conduit_id_in: 3, k_factor: 0.0015, bend_factor: 1.0 } };
+
+function _v852renderWirePullingLubricant(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: film-coating estimate by name. gallons = K x length x conduit ID^2 x bend factor. K is a film-coating rule from the lubricant manufacturer (~0.0015 for the common Polywater rule); more bends and fill raise the bend factor.";
+  const l = makeNumber("Conduit run length (ft)", "wpl-l", { step: "any", min: "0", value: "400" });
+  l.input.value = "400";
+  const id = makeNumber("Conduit inside diameter (in)", "wpl-id", { step: "any", min: "0", value: "3" });
+  id.input.value = "3";
+  const k = makeNumber("Film-coating K factor", "wpl-k", { step: "any", min: "0", value: "0.0015" });
+  k.input.value = "0.0015";
+  const bf = makeNumber("Bend / fill multiplier", "wpl-bf", { step: "any", min: "0", value: "1.0" });
+  bf.input.value = "1.0";
+  for (const f of [l, id, k, bf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { l.input.value = "400"; id.input.value = "3"; k.input.value = "0.0015"; bf.input.value = "1.0"; update(); });
+  const oGal = makeOutputLine(outputRegion, "Lubricant to bring", "wpl-out-gal");
+  const update = debounce(() => {
+    const r = computeWirePullingLubricant({
+      length_ft: l.input.value === "" ? 400 : Number(l.input.value), conduit_id_in: id.input.value === "" ? 3 : Number(id.input.value),
+      k_factor: k.input.value === "" ? 0.0015 : Number(k.input.value), bend_factor: bf.input.value === "" ? 1.0 : Number(bf.input.value),
+    });
+    if (r.error) { oGal.textContent = r.error; return; }
+    oGal.textContent = fmt(r.gallons, 1) + " gal";
+  }, DEBOUNCE_MS);
+  for (const f of [l, id, k, bf]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["wire-pulling-lubricant"] = _v852renderWirePullingLubricant;

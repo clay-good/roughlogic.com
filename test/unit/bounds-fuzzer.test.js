@@ -17122,6 +17122,7 @@ import { computeFlexiblePipeDeflection as _v848fpd } from "../../calc-earthwork.
 import { computeCableReelCapacity as _v849crc } from "../../calc-electrical.js";
 import { computeShingleNails as _v850shn } from "../../calc-construction.js";
 import { computeDuctMetalWeight as _v851dmw } from "../../calc-construction.js";
+import { computeWirePullingLubricant as _v852wpl } from "../../calc-electrical.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17673,6 +17674,21 @@ test("bounds: spec-v851 computeDuctMetalWeight pins the perimeter, area, weight,
   assert.ok("error" in _v851dmw({ width_in: 24, height_in: 12, length_ft: 0, lb_per_sf: 1.156, seam_factor: 1.15 }));
   assert.ok("error" in _v851dmw({ width_in: 24, height_in: 12, length_ft: 100, lb_per_sf: 0, seam_factor: 1.15 }));
   assert.ok("error" in _v851dmw({ width_in: 24, height_in: 12, length_ft: 100, lb_per_sf: 1.156, seam_factor: 0 }));
+});
+
+test("bounds: spec-v852 computeWirePullingLubricant pins the gallons and error seams", () => {
+  // 400 ft, 3 in conduit, K 0.0015, bend 1.0 -> 5.4 gal.
+  const r = _v852wpl({ length_ft: 400, conduit_id_in: 3, k_factor: 0.0015, bend_factor: 1.0 });
+  assert.ok(Math.abs(r.gallons - 5.4) < 1e-6);
+  // A bend-heavy pull at 1.3 raises it (bends, not length alone, decide the pail count).
+  assert.ok(Math.abs(_v852wpl({ length_ft: 400, conduit_id_in: 3, k_factor: 0.0015, bend_factor: 1.3 }).gallons - 7.02) < 1e-6);
+  // Conduit ID enters squared.
+  assert.ok(Math.abs(_v852wpl({ length_ft: 400, conduit_id_in: 6, k_factor: 0.0015, bend_factor: 1.0 }).gallons - 21.6) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v852wpl({ length_ft: 0, conduit_id_in: 3, k_factor: 0.0015, bend_factor: 1.0 }));
+  assert.ok("error" in _v852wpl({ length_ft: 400, conduit_id_in: 0, k_factor: 0.0015, bend_factor: 1.0 }));
+  assert.ok("error" in _v852wpl({ length_ft: 400, conduit_id_in: 3, k_factor: 0, bend_factor: 1.0 }));
+  assert.ok("error" in _v852wpl({ length_ft: 400, conduit_id_in: 3, k_factor: 0.0015, bend_factor: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

@@ -8288,6 +8288,17 @@ export const CITATIONS = {
       { name: "Seam factor", value: "~1.15 for seams, laps, and reinforcement per SMACNA duct construction standards", source: "SMACNA" },
     ],
   },
+  "wire-pulling-lubricant": {
+    formula: "gallons = k_factor x length_ft x conduit_id_in^2 x bend_factor.",
+    edition: "Film-coating lubricant estimate by name (gallons proportional to length x conduit ID^2, scaled by a bend/fill factor); rule-of-thumb.",
+    freeAccess: "The film-coating rule of thumb (~0.0015 gal per foot per square inch of conduit) is public; the lubricant manufacturer's rate governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "K is a film-coating rule from the lubricant manufacturer (about 0.0015 for the common Polywater rule). More bends and higher conduit fill raise the demand through the bend factor. Under-lubing risks a stuck pull, so round up and keep a spare pail.",
+    assumptions: [
+      { name: "K factor", value: "~0.0015 gal per foot per square inch of conduit (the common Polywater film-coating rule)", source: "lubricant manufacturer" },
+      { name: "Bend factor", value: "1.0 for a straight run; raise it for multiple sweeps and high conduit fill", source: "field judgment" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

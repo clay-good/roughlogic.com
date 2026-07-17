@@ -17352,6 +17352,31 @@
       "kind": "industry"
     },
     {
+      "term": "cable pulling lubricant",
+      "target": "wire-pulling-lubricant",
+      "kind": "industry"
+    },
+    {
+      "term": "wire pulling lube",
+      "target": "wire-pulling-lubricant",
+      "kind": "industry"
+    },
+    {
+      "term": "conduit lube quantity",
+      "target": "wire-pulling-lubricant",
+      "kind": "industry"
+    },
+    {
+      "term": "pulling compound gallons",
+      "target": "wire-pulling-lubricant",
+      "kind": "industry"
+    },
+    {
+      "term": "wire lube estimate",
+      "target": "wire-pulling-lubricant",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"
