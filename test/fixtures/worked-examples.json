@@ -49763,6 +49763,64 @@
    }
   },
   {
+   "tile_id": "formwork-tie-load",
+   "source_publisher": "Formwork tie-load identity (first-principles)",
+   "source_title": "600 psf, 2 ft x 2 ft tie grid, 3,000 lb tie SWL",
+   "source_edition_or_year": "spec-v841 worked example",
+   "source_section_or_page": "tie load = 600*2*2 = 2,400 lb; util = 2400/3000 = 0.80 (pass); max trib = 3000/600 = 5.0 sf",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "lateral_pressure_psf": 600,
+    "h_spacing_ft": 2,
+    "v_spacing_ft": 2,
+    "tie_swl_lb": 3000
+   },
+   "outputs": {
+    "tie_load_lb": {
+     "value": 2400,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "utilization": {
+     "value": 0.8,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "max_trib_area_ft2": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "formwork-tie-load",
+   "source_publisher": "Formwork tie-load identity (first-principles)",
+   "source_title": "cross-check: a faster pour at 900 psf overloads the tie",
+   "source_edition_or_year": "spec-v841 worked example",
+   "source_section_or_page": "tie load = 900*2*2 = 3,600 lb > 3,000 SWL (fail)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "lateral_pressure_psf": 900,
+    "h_spacing_ft": 2,
+    "v_spacing_ft": 2,
+    "tie_swl_lb": 3000
+   },
+   "outputs": {
+    "tie_load_lb": {
+     "value": 3600,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

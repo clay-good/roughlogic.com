@@ -769,6 +769,7 @@ export const COMPUTE_MAP = {
   "pavement-milling-production": { module: "../../calc-construction.js", fn: "computePavementMillingProduction" },
   "striping-paint-quantity": { module: "../../calc-construction.js", fn: "computeStripingPaintQuantity" },
   "concrete-vibrator-spacing": { module: "../../calc-construction.js", fn: "computeConcreteVibratorSpacing" },
+  "formwork-tie-load": { module: "../../calc-construction.js", fn: "computeFormworkTieLoad" },
   "haul-cycle-production": { module: "../../calc-earthwork.js", fn: "computeHaulCycleProduction" },
   "loader-production": { module: "../../calc-earthwork.js", fn: "computeLoaderProduction" },
   "dozer-production": { module: "../../calc-earthwork.js", fn: "computeDozerProduction" },

@@ -5660,6 +5660,55 @@ const _renderConcreteVibratorSpacing = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["concrete-vibrator-spacing"] = _renderConcreteVibratorSpacing;
 
+// --- formwork-tie-load: Formwork Tie Load and Spacing ---
+//
+// Sizes the wall-form ties that take the lateral concrete pressure in tension,
+// completing the formwork family (pressure, vertical shores, horizontal ties):
+//   tie_load_lb = lateral_pressure_psf x h_spacing_ft x v_spacing_ft
+//   utilization = tie_load_lb / tie_swl_lb; pass = tie_load_lb <= tie_swl_lb
+//   max_trib_area_ft2 = tie_swl_lb / lateral_pressure_psf
+// dims: in { lateral_pressure_psf: M L^-1 T^-2, h_spacing_ft: L, v_spacing_ft: L, tie_swl_lb: M L T^-2 } out: { tie_load_lb: M L T^-2, utilization: dimensionless, max_trib_area_ft2: L^2 }
+export function computeFormworkTieLoad({ lateral_pressure_psf = 600, h_spacing_ft = 2, v_spacing_ft = 2, tie_swl_lb = 3000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(lateral_pressure_psf > 0)) return { error: "Lateral pressure must be positive (psf)." };
+  if (!(h_spacing_ft > 0)) return { error: "Horizontal spacing must be positive (ft)." };
+  if (!(v_spacing_ft > 0)) return { error: "Vertical spacing must be positive (ft)." };
+  if (!(tie_swl_lb > 0)) return { error: "Tie safe working load must be positive (lb)." };
+  const tie_load_lb = lateral_pressure_psf * h_spacing_ft * v_spacing_ft;
+  const utilization = tie_load_lb / tie_swl_lb;
+  const pass = tie_load_lb <= tie_swl_lb;
+  const max_trib_area_ft2 = tie_swl_lb / lateral_pressure_psf;
+  if (![tie_load_lb, utilization, max_trib_area_ft2].every(Number.isFinite)) return { error: "Tie-load math is not a finite value." };
+  return {
+    tie_load_lb,
+    utilization,
+    pass,
+    max_trib_area_ft2,
+    note: "The lateral pressure comes from formwork-pressure (ACI 347); the tie safe working load is the manufacturer's rating with its own safety factor. Wales and studs are sized separately. A tie failure is a form blowout - pour faster (higher pressure) and the grid has to tighten. A quick-check estimator like formwork-pressure and shore-post-load, not the engineered design.",
+  };
+}
+
+export const formworkTieLoadExample = { inputs: { lateral_pressure_psf: 600, h_spacing_ft: 2, v_spacing_ft: 2, tie_swl_lb: 3000 } };
+
+const _renderFormworkTieLoad = _simpleRenderer({
+  citation: "Citation: tie-load identity by name. tie load = lateral pressure x horizontal spacing x vertical spacing; max tributary = tie SWL / pressure. The lateral pressure comes from formwork-pressure (ACI 347); the tie SWL is the manufacturer's rating.",
+  example: formworkTieLoadExample.inputs,
+  fields: [
+    { key: "lateral_pressure_psf", label: "Design lateral form pressure (psf)", kind: "number", default: 600 },
+    { key: "h_spacing_ft", label: "Tie horizontal spacing (ft)", kind: "number", default: 2 },
+    { key: "v_spacing_ft", label: "Tie vertical spacing (ft)", kind: "number", default: 2 },
+    { key: "tie_swl_lb", label: "Tie safe working load (lb)", kind: "number", default: 3000 },
+  ],
+  outputs: [
+    { key: "t", id: "ftl-out-t", label: "Load per tie", value: (r) => _fmtC(r.tie_load_lb, 0) + " lb" + (r.pass ? " (OK)" : " (OVER the tie SWL)") },
+    { key: "u", id: "ftl-out-u", label: "Utilization", value: (r) => _fmtC(r.utilization * 100, 0) + "% of SWL" },
+    { key: "a", id: "ftl-out-a", label: "Max tributary per tie", value: (r) => _fmtC(r.max_trib_area_ft2, 2) + " sf" },
+    { key: "n", id: "ftl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFormworkTieLoad,
+});
+CONSTRUCTION_RENDERERS["formwork-tie-load"] = _renderFormworkTieLoad;
+
 // ----- spec-v246: Concrete Surface Evaporation Rate and Plastic-Shrinkage Risk (ACI 305) -----
 
 // dims: in { air_temp_f: T, concrete_temp_f: T, rh_pct: dimensionless, wind_mph: L T^-1 } out: { E_metric: M L^-2 T^-1, E_us: M L^-2 T^-1 }

@@ -17077,6 +17077,31 @@
       "kind": "industry"
     },
     {
+      "term": "formwork tie load",
+      "target": "formwork-tie-load",
+      "kind": "industry"
+    },
+    {
+      "term": "form tie spacing",
+      "target": "formwork-tie-load",
+      "kind": "industry"
+    },
+    {
+      "term": "snap tie load",
+      "target": "formwork-tie-load",
+      "kind": "industry"
+    },
+    {
+      "term": "wall form tie",
+      "target": "formwork-tie-load",
+      "kind": "industry"
+    },
+    {
+      "term": "form tie capacity",
+      "target": "formwork-tie-load",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

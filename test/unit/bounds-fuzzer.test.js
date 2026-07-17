@@ -17111,6 +17111,7 @@ import { computeAsphaltSpreadRate as _v837asr } from "../../calc-construction.js
 import { computePavementMillingProduction as _v838pmp } from "../../calc-construction.js";
 import { computeStripingPaintQuantity as _v839spq } from "../../calc-construction.js";
 import { computeConcreteVibratorSpacing as _v840cvs } from "../../calc-construction.js";
+import { computeFormworkTieLoad as _v841ftl } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17474,6 +17475,23 @@ test("bounds: spec-v840 computeConcreteVibratorSpacing pins the spacing, edge di
   // Error seams.
   assert.ok("error" in _v840cvs({ radius_of_action_in: 0, lift_length_ft: 20 }));
   assert.ok("error" in _v840cvs({ radius_of_action_in: 12, lift_length_ft: 0 }));
+});
+
+test("bounds: spec-v841 computeFormworkTieLoad pins the tie load, utilization, pass, max tributary, and error seams", () => {
+  // 600 psf, 2x2 ft grid, 3,000 lb SWL -> 2,400 lb, 0.80, pass, 5.0 sf.
+  const r = _v841ftl({ lateral_pressure_psf: 600, h_spacing_ft: 2, v_spacing_ft: 2, tie_swl_lb: 3000 });
+  assert.strictEqual(r.tie_load_lb, 2400);
+  assert.ok(Math.abs(r.utilization - 0.8) < 1e-9);
+  assert.strictEqual(r.pass, true);
+  assert.ok(Math.abs(r.max_trib_area_ft2 - 5) < 1e-9);
+  // A faster pour at 900 psf overloads the tie; tightening the grid brings it back.
+  assert.strictEqual(_v841ftl({ lateral_pressure_psf: 900, h_spacing_ft: 2, v_spacing_ft: 2, tie_swl_lb: 3000 }).pass, false);
+  assert.strictEqual(_v841ftl({ lateral_pressure_psf: 900, h_spacing_ft: 1.5, v_spacing_ft: 1.5, tie_swl_lb: 3000 }).pass, true);
+  // Error seams.
+  assert.ok("error" in _v841ftl({ lateral_pressure_psf: 0, h_spacing_ft: 2, v_spacing_ft: 2, tie_swl_lb: 3000 }));
+  assert.ok("error" in _v841ftl({ lateral_pressure_psf: 600, h_spacing_ft: 0, v_spacing_ft: 2, tie_swl_lb: 3000 }));
+  assert.ok("error" in _v841ftl({ lateral_pressure_psf: 600, h_spacing_ft: 2, v_spacing_ft: 0, tie_swl_lb: 3000 }));
+  assert.ok("error" in _v841ftl({ lateral_pressure_psf: 600, h_spacing_ft: 2, v_spacing_ft: 2, tie_swl_lb: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

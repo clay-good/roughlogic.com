@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): formwork-tie-load -- formwork tie load and spacing (spec-v841); 2026-07-17
+
+- New Group E tile `formwork-tie-load` (calc-construction.js), completing the formwork family (`formwork-pressure` the
+  pressure, `shore-post-load` the vertical shores, `formwork-tie-load` the horizontal ties). Sizes the wall-form ties
+  that take the lateral concrete pressure in tension: tie load = pressure x h spacing x v spacing; max tributary = SWL /
+  pressure. At 600 psf on a 24 x 24 in grid, each tie carries 2,400 lb -- inside a 3,000 lb tie (80%, 5 sf max
+  tributary). A faster pour at 900 psf hits 3,600 lb, over the tie, so tightening the grid to 18 in brings it to 2,025
+  lb. A tie failure is a form blowout; the tie manufacturer and ACI 347 govern. Home count 1,289 -> 1,290.
+
 ### feat(construction): concrete-vibrator-spacing -- internal vibrator spacing per ACI 309 (spec-v840); 2026-07-17
 
 - New Group E tile `concrete-vibrator-spacing` (calc-construction.js), the concrete-operations tile beside

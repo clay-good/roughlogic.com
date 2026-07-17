@@ -8167,6 +8167,17 @@ export const CITATIONS = {
       { name: "Spacing rule", value: "max spacing 1.5 x radius of action, head within 0.75 R of the form, overlapping circles", source: "ACI 309" },
     ],
   },
+  "formwork-tie-load": {
+    formula: "tie_load_lb = lateral_pressure_psf x h_spacing_ft x v_spacing_ft; utilization = tie_load_lb / tie_swl_lb; max_trib_area_ft2 = tie_swl_lb / lateral_pressure_psf.",
+    edition: "Formwork tie-load identity by name (tie load = pressure x tributary area; max tributary = SWL / pressure); first-principles statics.",
+    freeAccess: "The tributary-load statics are public first-principles; the lateral pressure (ACI 347) and the tie rating come from formwork-pressure and the tie manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "The lateral pressure comes from formwork-pressure (ACI 347); the tie safe working load is the manufacturer's rating with its own safety factor. Wales and studs are sized separately. A tie failure is a form blowout - pour faster (higher pressure) and the grid has to tighten.",
+    assumptions: [
+      { name: "Lateral pressure", value: "the design form pressure from formwork-pressure (ACI 347 rate-of-rise)", source: "ACI 347 / formwork-pressure" },
+      { name: "Tie SWL", value: "the manufacturer's rated safe working load, with its own safety factor", source: "tie manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",
