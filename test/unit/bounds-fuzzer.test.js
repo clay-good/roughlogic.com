@@ -17120,6 +17120,7 @@ import { computeUnitCostEarthwork as _v846uce } from "../../calc-earthwork.js";
 import { computeSoilStabilizationQuantity as _v847ssq } from "../../calc-earthwork.js";
 import { computeFlexiblePipeDeflection as _v848fpd } from "../../calc-earthwork.js";
 import { computeCableReelCapacity as _v849crc } from "../../calc-electrical.js";
+import { computeShingleNails as _v850shn } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17641,6 +17642,20 @@ test("bounds: spec-v849 computeCableReelCapacity pins the reel length and error 
   // Drum at or above the flange (no winding annulus).
   assert.ok("error" in _v849crc({ flange_dia_in: 12, drum_dia_in: 12, traverse_width_in: 18, cable_od_in: 1, fill_factor: 0.9 }));
   assert.ok("error" in _v849crc({ flange_dia_in: 12, drum_dia_in: 30, traverse_width_in: 18, cable_od_in: 1, fill_factor: 0.9 }));
+});
+
+test("bounds: spec-v850 computeShingleNails pins the nail count, weight, and error seams", () => {
+  // 30 squares, 80 shingles/sq, 6 nails (high wind), 140 nails/lb -> 14,400 nails, 102.9 lb.
+  const r = _v850shn({ squares: 30, shingles_per_square: 80, nails_per_shingle: 6, nails_per_lb: 140 });
+  assert.strictEqual(r.nails_total, 14400);
+  assert.ok(Math.abs(r.nail_weight_lb - 102.857) < 1e-2);
+  // The standard four-nail pattern is fewer.
+  assert.strictEqual(_v850shn({ squares: 30, shingles_per_square: 80, nails_per_shingle: 4, nails_per_lb: 140 }).nails_total, 9600);
+  // Error seams.
+  assert.ok("error" in _v850shn({ squares: 0, shingles_per_square: 80, nails_per_shingle: 6, nails_per_lb: 140 }));
+  assert.ok("error" in _v850shn({ squares: 30, shingles_per_square: 0, nails_per_shingle: 6, nails_per_lb: 140 }));
+  assert.ok("error" in _v850shn({ squares: 30, shingles_per_square: 80, nails_per_shingle: 0, nails_per_lb: 140 }));
+  assert.ok("error" in _v850shn({ squares: 30, shingles_per_square: 80, nails_per_shingle: 6, nails_per_lb: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

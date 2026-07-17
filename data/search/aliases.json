@@ -17302,6 +17302,31 @@
       "kind": "industry"
     },
     {
+      "term": "shingle nails",
+      "target": "shingle-nails",
+      "kind": "industry"
+    },
+    {
+      "term": "roofing nail count",
+      "target": "shingle-nails",
+      "kind": "industry"
+    },
+    {
+      "term": "roof fastener count",
+      "target": "shingle-nails",
+      "kind": "industry"
+    },
+    {
+      "term": "nails per square roofing",
+      "target": "shingle-nails",
+      "kind": "industry"
+    },
+    {
+      "term": "roofing nail pounds",
+      "target": "shingle-nails",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

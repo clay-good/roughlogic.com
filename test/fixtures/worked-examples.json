@@ -50293,6 +50293,58 @@
    }
   },
   {
+   "tile_id": "shingle-nails",
+   "source_publisher": "Roofing fastener-count identity (first-principles)",
+   "source_title": "30 squares, 80 shingles/sq, 6 nails/shingle (high wind), 140 nails/lb",
+   "source_edition_or_year": "spec-v850 worked example",
+   "source_section_or_page": "nails = 30*80*6 = 14,400; weight = 14400/140 = 102.9 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "squares": 30,
+    "shingles_per_square": 80,
+    "nails_per_shingle": 6,
+    "nails_per_lb": 140
+   },
+   "outputs": {
+    "nails_total": {
+     "value": 14400,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "nail_weight_lb": {
+     "value": 102.86,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shingle-nails",
+   "source_publisher": "Roofing fastener-count identity (first-principles)",
+   "source_title": "cross-check: the standard four-nail pattern",
+   "source_edition_or_year": "spec-v850 worked example",
+   "source_section_or_page": "nails = 30*80*4 = 9,600; weight = 9600/140 = 68.6 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "squares": 30,
+    "shingles_per_square": 80,
+    "nails_per_shingle": 4,
+    "nails_per_lb": 140
+   },
+   "outputs": {
+    "nails_total": {
+     "value": 9600,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

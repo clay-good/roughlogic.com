@@ -8266,6 +8266,17 @@ export const CITATIONS = {
       { name: "Cable OD", value: "the cable outside diameter; it enters squared, so a fatter cable cuts the reel sharply", source: "cable manufacturer" },
     ],
   },
+  "shingle-nails": {
+    formula: "nails_total = squares x shingles_per_square x nails_per_shingle; nail_weight_lb = nails_total / nails_per_lb.",
+    edition: "Roofing fastener-count identity by name (nails from squares x shingles x pattern; weight from nails / nails-per-pound); first-principles count arithmetic.",
+    freeAccess: "The fastener count is public quantity arithmetic; the nailing pattern comes from the IRC wind zone and the shingle manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "The nails-per-shingle comes from the manufacturer and the wind zone - IRC and most manufacturers require six on steep or high-wind roofs and along the eaves and rakes, four elsewhere. The shingles-per-square depends on the product (about 80 for three-tab, 64 for many architectural shingles). This counts field fasteners, not the ridge and hip caps.",
+    assumptions: [
+      { name: "Nailing pattern", value: "4 nails/shingle standard, 6 on steep/high-wind roofs and at eaves/rakes; the wind zone governs", source: "IRC / shingle manufacturer" },
+      { name: "Shingles per square", value: "~80 for three-tab, ~64 for many architectural shingles; the product governs", source: "shingle manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

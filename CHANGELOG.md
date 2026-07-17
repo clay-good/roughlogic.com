@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): shingle-nails -- roofing nail count by wind zone (spec-v850); 2026-07-17
+
+- New Group E tile `shingle-nails` (calc-construction.js), the roofing install-ops tile beside `roofing-squares`
+  (bundles) and `ridge-cap-fasteners`. Field fasteners for an asphalt-shingle roof, where the wind zone drives the
+  pattern: nails = squares x shingles-per-square x nails-per-shingle; weight = nails / nails-per-pound. A 30-square roof
+  at 80 shingles per square, six-nailed for high wind, takes 14,400 nails -- about 103 lb of 1-1/4 in roofing nails,
+  half again the standard four-nail pattern's 9,600 nails (69 lb). The manufacturer and wind zone set the pattern; the
+  eaves and rakes get six regardless. Home count 1,298 -> 1,299.
+
 ### feat(electrical): cable-reel-capacity -- cable reel capacity / length on reel (spec-v849); 2026-07-17
 
 - New Group A tile `cable-reel-capacity` (calc-electrical.js), opening the electrical install-ops vein beside

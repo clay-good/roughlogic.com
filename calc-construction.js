@@ -8117,3 +8117,46 @@ const _v803renderAsceLiveLoadReduction = _simpleRenderer({
   compute: computeAsceLiveLoadReduction,
 });
 CONSTRUCTION_RENDERERS["asce-live-load-reduction"] = _v803renderAsceLiveLoadReduction;
+
+// --- shingle-nails: Roofing Nail Count by Wind Zone ---
+//
+// Counts the field fasteners for an asphalt-shingle roof, where the wind zone
+// drives the nailing pattern (four per shingle standard, six on steep/high-wind):
+//   nails_total = squares x shingles_per_square x nails_per_shingle
+//   nail_weight_lb = nails_total / nails_per_lb
+// dims: in { squares: dimensionless, shingles_per_square: dimensionless, nails_per_shingle: dimensionless, nails_per_lb: dimensionless } out: { nails_total: dimensionless, nail_weight_lb: M }
+export function computeShingleNails({ squares = 30, shingles_per_square = 80, nails_per_shingle = 4, nails_per_lb = 140 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(squares > 0)) return { error: "Squares must be positive." };
+  if (!(shingles_per_square > 0)) return { error: "Shingles per square must be positive." };
+  if (!(nails_per_shingle > 0)) return { error: "Nails per shingle must be positive." };
+  if (!(nails_per_lb > 0)) return { error: "Nails per pound must be positive." };
+  const nails_total = squares * shingles_per_square * nails_per_shingle;
+  const nail_weight_lb = nails_total / nails_per_lb;
+  if (![nails_total, nail_weight_lb].every(Number.isFinite)) return { error: "Nail-count math is not a finite value." };
+  return {
+    nails_total,
+    nail_weight_lb,
+    note: "The nails-per-shingle comes from the manufacturer and the wind zone - IRC and most manufacturers require six on steep or high-wind roofs and along the eaves and rakes, four elsewhere. The shingles-per-square depends on the product (about 80 for three-tab, 64 for many architectural shingles). This counts field fasteners, not the ridge and hip caps.",
+  };
+}
+
+export const shingleNailsExample = { inputs: { squares: 30, shingles_per_square: 80, nails_per_shingle: 6, nails_per_lb: 140 } };
+
+const _v850renderShingleNails = _simpleRenderer({
+  citation: "Citation: fastener-count identity by name. nails = squares x shingles-per-square x nails-per-shingle; weight = nails / nails-per-pound. The nails-per-shingle comes from the manufacturer and the wind zone (six on steep/high-wind, four elsewhere).",
+  example: shingleNailsExample.inputs,
+  fields: [
+    { key: "squares", label: "Roof area (squares)", kind: "number", default: 30 },
+    { key: "shingles_per_square", label: "Shingles per square (~80 three-tab, ~64 architectural)", kind: "number", default: 80 },
+    { key: "nails_per_shingle", label: "Nails per shingle (4 standard, 6 high-wind)", kind: "number", default: 6 },
+    { key: "nails_per_lb", label: "Nails per pound", kind: "number", default: 140 },
+  ],
+  outputs: [
+    { key: "n", id: "shn-out-n", label: "Nails to order", value: (r) => _fmtC(r.nails_total, 0) },
+    { key: "w", id: "shn-out-w", label: "Nail weight", value: (r) => _fmtC(r.nail_weight_lb, 1) + " lb" },
+    { key: "note", id: "shn-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeShingleNails,
+});
+CONSTRUCTION_RENDERERS["shingle-nails"] = _v850renderShingleNails;
