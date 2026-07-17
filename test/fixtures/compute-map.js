@@ -762,6 +762,7 @@ export const COMPUTE_MAP = {
   "pipe-flotation": { module: "../../calc-earthwork.js", fn: "computePipeFlotation" },
   "restrained-pipe-length": { module: "../../calc-earthwork.js", fn: "computeRestrainedPipeLength" },
   "hdd-pullback": { module: "../../calc-earthwork.js", fn: "computeHddPullback" },
+  "scaffold-leg-load": { module: "../../calc-construction.js", fn: "computeScaffoldLegLoad" },
   "haul-cycle-production": { module: "../../calc-earthwork.js", fn: "computeHaulCycleProduction" },
   "loader-production": { module: "../../calc-earthwork.js", fn: "computeLoaderProduction" },
   "dozer-production": { module: "../../calc-earthwork.js", fn: "computeDozerProduction" },

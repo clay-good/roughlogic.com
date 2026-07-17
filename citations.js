@@ -8090,6 +8090,17 @@ export const CITATIONS = {
       { name: "Effective weight", value: "the pipe weight in the drilling fluid (buoyancy already accounted for); a ballasted or empty pipe can be near neutral", source: "drilling contractor" },
     ],
   },
+  "scaffold-leg-load": {
+    formula: "total_load_lb = platform_dead_lb + num_workers x worker_lb + material_lb; leg_load_lb = total_load_lb / n_legs; swl_lb = component_rating_lb / 4; pass = leg_load_lb <= swl_lb.",
+    edition: "OSHA capacity rule by name (safe working load = rating / 4; leg load = total intended load / legs); first-principles load distribution.",
+    freeAccess: "The 4:1 rule and 250-lb-per-person basis are public OSHA requirements; the component rating comes from the manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "The component rating is the manufacturer's. OSHA 1926.451(a)(1) sets the 4:1 minimum and counts 250 lb per person. The distribution to legs depends on the configuration and any stacked lifts; this assumes an even share. A competent person verifies. The leg load feeds scaffold-mudsill-bearing for the foundation check.",
+    assumptions: [
+      { name: "Intended load", value: "platform/scaffold dead load + 250 lb per worker (with tools) + stored material", source: "OSHA 1926.451(a)(1)" },
+      { name: "Safe working load", value: "the manufacturer component rating divided by the OSHA 4:1 safety factor, shared evenly over the legs", source: "OSHA 1926.451(a)(1) / manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

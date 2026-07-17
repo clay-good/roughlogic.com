@@ -49297,6 +49297,74 @@
    }
   },
   {
+   "tile_id": "scaffold-leg-load",
+   "source_publisher": "OSHA 1926.451(a)(1) capacity rule (first-principles)",
+   "source_title": "100 lb platform, 2 workers at 250, 500 lb material, 4 legs, 2,500 lb frame",
+   "source_edition_or_year": "spec-v834 worked example",
+   "source_section_or_page": "total = 100+500+500 = 1,100; leg = 1100/4 = 275; SWL = 2500/4 = 625; util = 0.44 (pass)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "platform_dead_lb": 100,
+    "num_workers": 2,
+    "worker_lb": 250,
+    "material_lb": 500,
+    "n_legs": 4,
+    "component_rating_lb": 2500
+   },
+   "outputs": {
+    "total_load_lb": {
+     "value": 1100,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "leg_load_lb": {
+     "value": 275,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "swl_lb": {
+     "value": 625,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "utilization": {
+     "value": 0.44,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "scaffold-leg-load",
+   "source_publisher": "OSHA 1926.451(a)(1) capacity rule (first-principles)",
+   "source_title": "cross-check: 4 workers and 1,500 lb material overloads the leg",
+   "source_edition_or_year": "spec-v834 worked example",
+   "source_section_or_page": "total = 100+1000+1500 = 2,600; leg = 2600/4 = 650 > 625 SWL (fail)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "platform_dead_lb": 100,
+    "num_workers": 4,
+    "worker_lb": 250,
+    "material_lb": 1500,
+    "n_legs": 4,
+    "component_rating_lb": 2500
+   },
+   "outputs": {
+    "leg_load_lb": {
+     "value": 650,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

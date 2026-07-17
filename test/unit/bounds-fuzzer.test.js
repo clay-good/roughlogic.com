@@ -17104,6 +17104,7 @@ import { computeRockConstructionEntrance as _v830rce } from "../../calc-earthwor
 import { computePipeFlotation as _v831pf } from "../../calc-earthwork.js";
 import { computeRestrainedPipeLength as _v832rpl } from "../../calc-earthwork.js";
 import { computeHddPullback as _v833hdd } from "../../calc-earthwork.js";
+import { computeScaffoldLegLoad as _v834sll } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17340,6 +17341,27 @@ test("bounds: spec-v833 computeHddPullback pins the pullback, the utilization (a
   assert.ok("error" in _v833hdd({ eff_weight_plf: 5, length_ft: 800, friction_coeff: 0.3, bend_factor: 0 }));
   assert.ok("error" in _v833hdd({ eff_weight_plf: 5, length_ft: 800, friction_coeff: 0.3, bend_factor: 1.5, fluid_drag_lb: -1 }));
   assert.ok("error" in _v833hdd({ eff_weight_plf: 5, length_ft: 800, friction_coeff: 0.3, bend_factor: 1.5, pipe_safe_pull_lb: -1 }));
+});
+
+test("bounds: spec-v834 computeScaffoldLegLoad pins the total/leg load, SWL, utilization, pass flag, and error seams", () => {
+  // 100 + 2*250 + 500 = 1,100; leg 275; SWL 625; util 0.44; pass.
+  const r = _v834sll({ platform_dead_lb: 100, num_workers: 2, worker_lb: 250, material_lb: 500, n_legs: 4, component_rating_lb: 2500 });
+  assert.strictEqual(r.total_load_lb, 1100);
+  assert.strictEqual(r.leg_load_lb, 275);
+  assert.strictEqual(r.swl_lb, 625);
+  assert.ok(Math.abs(r.utilization - 0.44) < 1e-9);
+  assert.strictEqual(r.pass, true);
+  // 4 workers + 1,500 lb material -> 650 lb/leg, over the 625 SWL (fail).
+  const over = _v834sll({ platform_dead_lb: 100, num_workers: 4, worker_lb: 250, material_lb: 1500, n_legs: 4, component_rating_lb: 2500 });
+  assert.strictEqual(over.leg_load_lb, 650);
+  assert.strictEqual(over.pass, false);
+  // Error seams.
+  assert.ok("error" in _v834sll({ platform_dead_lb: 100, num_workers: 2, worker_lb: 250, material_lb: 500, n_legs: 0, component_rating_lb: 2500 }));
+  assert.ok("error" in _v834sll({ platform_dead_lb: 100, num_workers: 2, worker_lb: 250, material_lb: 500, n_legs: 4, component_rating_lb: 0 }));
+  assert.ok("error" in _v834sll({ platform_dead_lb: 100, num_workers: 2, worker_lb: 0, material_lb: 500, n_legs: 4, component_rating_lb: 2500 }));
+  assert.ok("error" in _v834sll({ platform_dead_lb: -1, num_workers: 2, worker_lb: 250, material_lb: 500, n_legs: 4, component_rating_lb: 2500 }));
+  assert.ok("error" in _v834sll({ platform_dead_lb: 100, num_workers: 2, worker_lb: 250, material_lb: -1, n_legs: 4, component_rating_lb: 2500 }));
+  assert.ok("error" in _v834sll({ platform_dead_lb: 100, num_workers: -1, worker_lb: 250, material_lb: 500, n_legs: 4, component_rating_lb: 2500 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

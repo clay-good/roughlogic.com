@@ -773,7 +773,7 @@ const _TILES = [
   // spec-v242..v244 IBC/IPC occupancy trio
   ["occupant-load", "E"], ["egress-capacity", "E"], ["plumbing-fixture-count", "E"],
   // spec-v245..v247 cast-in-place placing-and-curing trio
-  ["shore-post-load", "E"], ["scaffold-mudsill-bearing", "E"], ["concrete-evaporation-rate", "E"], ["concrete-strength-gain", "E"],
+  ["shore-post-load", "E"], ["scaffold-mudsill-bearing", "E"], ["scaffold-leg-load", "E"], ["concrete-evaporation-rate", "E"], ["concrete-strength-gain", "E"],
   // spec-v476 maturity method
   ["concrete-maturity", "E"],
   ["rebar-weight-takeoff", "E"], ["ready-mix-concrete-order", "E"],

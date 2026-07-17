@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): scaffold-leg-load -- scaffold per-leg load and OSHA 4:1 check (spec-v834); 2026-07-17
+
+- New Group E tile `scaffold-leg-load` (calc-construction.js), the load-side companion to `scaffold-mudsill-bearing`.
+  Total intended bay load over the legs, checked against the OSHA 4:1 safe working load: total = platform dead + workers
+  x 250 lb + material; leg load = total / legs; SWL = component rating / 4. A bay with two workers, 500 lb of material,
+  and a 100 lb platform puts 275 lb on each of four legs (44% of a 625 lb SWL, pass); bump to 4 workers and 1,500 lb and
+  the leg load hits 650 lb, over the SWL. OSHA 1926.451(a)(1) sets the 4:1 minimum; a competent person verifies. Home
+  count 1,282 -> 1,283.
+
 ### feat(earthwork): hdd-pullback -- HDD pullback force first-order estimate (spec-v833); 2026-07-17
 
 - New Group E tile `hdd-pullback` (calc-earthwork.js), completing the buried-pipe check trio (`pipe-flotation`,

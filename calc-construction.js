@@ -5375,6 +5375,61 @@ const _renderScaffoldMudsillBearing = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["scaffold-mudsill-bearing"] = _renderScaffoldMudsillBearing;
 
+// --- scaffold-leg-load: Scaffold Per-Leg Load and OSHA 4:1 Check ---
+//
+// The load-side companion to scaffold-mudsill-bearing: total intended bay load
+// divided over the legs, checked against the OSHA 4:1 safe working load.
+//   total_load_lb = platform_dead_lb + num_workers x worker_lb + material_lb
+//   leg_load_lb = total_load_lb / n_legs; swl_lb = component_rating_lb / 4
+//   pass = leg_load_lb <= swl_lb
+// dims: in { platform_dead_lb: M L T^-2, num_workers: dimensionless, worker_lb: M L T^-2, material_lb: M L T^-2, n_legs: dimensionless, component_rating_lb: M L T^-2 } out: { total_load_lb: M L T^-2, leg_load_lb: M L T^-2, swl_lb: M L T^-2, utilization: dimensionless }
+export function computeScaffoldLegLoad({ platform_dead_lb = 100, num_workers = 2, worker_lb = 250, material_lb = 500, n_legs = 4, component_rating_lb = 2500 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(n_legs > 0)) return { error: "Leg count must be positive." };
+  if (!(component_rating_lb > 0)) return { error: "Component rating must be positive (lb)." };
+  if (!(worker_lb > 0)) return { error: "Worker weight must be positive (lb)." };
+  if (platform_dead_lb < 0) return { error: "Platform dead load cannot be negative (lb)." };
+  if (material_lb < 0) return { error: "Material load cannot be negative (lb)." };
+  if (num_workers < 0) return { error: "Worker count cannot be negative." };
+  const total_load_lb = platform_dead_lb + num_workers * worker_lb + material_lb;
+  const leg_load_lb = total_load_lb / n_legs;
+  const swl_lb = component_rating_lb / 4;
+  const utilization = leg_load_lb / swl_lb;
+  const pass = leg_load_lb <= swl_lb;
+  if (![total_load_lb, leg_load_lb, swl_lb, utilization].every(Number.isFinite)) return { error: "Scaffold-load math is not a finite value." };
+  return {
+    total_load_lb,
+    leg_load_lb,
+    swl_lb,
+    utilization,
+    pass,
+    note: "The component rating is the manufacturer's; OSHA 1926.451(a)(1) sets the 4:1 minimum and counts 250 lb per person. The distribution to legs depends on the configuration and any stacked lifts above - this assumes an even share. A competent person verifies the load and setup. The leg load feeds scaffold-mudsill-bearing for the foundation check.",
+  };
+}
+
+export const scaffoldLegLoadExample = { inputs: { platform_dead_lb: 100, num_workers: 2, worker_lb: 250, material_lb: 500, n_legs: 4, component_rating_lb: 2500 } };
+
+const _renderScaffoldLegLoad = _simpleRenderer({
+  citation: "Citation: OSHA capacity rule by name. safe working load = component rating / 4; leg load = total intended load / legs; total = platform dead + workers x weight + material. OSHA 1926.451(a)(1) requires 4x the intended load and counts 250 lb per person.",
+  example: scaffoldLegLoadExample.inputs,
+  fields: [
+    { key: "platform_dead_lb", label: "Platform + scaffold dead load in the bay (lb)", kind: "number", default: 100 },
+    { key: "num_workers", label: "Workers on the bay (count)", kind: "number", default: 2 },
+    { key: "worker_lb", label: "Weight per worker with tools (lb)", kind: "number", default: 250 },
+    { key: "material_lb", label: "Stored material load (lb)", kind: "number", default: 500 },
+    { key: "n_legs", label: "Legs sharing the bay (count)", kind: "number", default: 4 },
+    { key: "component_rating_lb", label: "Manufacturer leg / frame rating (lb)", kind: "number", default: 2500 },
+  ],
+  outputs: [
+    { key: "leg", id: "sll-out-leg", label: "Load per leg", value: (r) => _fmtC(r.leg_load_lb, 0) + " lb" + (r.pass ? " (OK)" : " (OVER the 4:1 SWL)") },
+    { key: "swl", id: "sll-out-swl", label: "Safe working load per leg", value: (r) => _fmtC(r.swl_lb, 0) + " lb" },
+    { key: "u", id: "sll-out-u", label: "Utilization", value: (r) => _fmtC(r.utilization * 100, 0) + "% of SWL" },
+    { key: "n", id: "sll-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeScaffoldLegLoad,
+});
+CONSTRUCTION_RENDERERS["scaffold-leg-load"] = _renderScaffoldLegLoad;
+
 // ----- spec-v246: Concrete Surface Evaporation Rate and Plastic-Shrinkage Risk (ACI 305) -----
 
 // dims: in { air_temp_f: T, concrete_temp_f: T, rh_pct: dimensionless, wind_mph: L T^-1 } out: { E_metric: M L^-2 T^-1, E_us: M L^-2 T^-1 }

@@ -16902,6 +16902,31 @@
       "kind": "industry"
     },
     {
+      "term": "scaffold leg load",
+      "target": "scaffold-leg-load",
+      "kind": "industry"
+    },
+    {
+      "term": "scaffold capacity check",
+      "target": "scaffold-leg-load",
+      "kind": "industry"
+    },
+    {
+      "term": "scaffold 4 to 1",
+      "target": "scaffold-leg-load",
+      "kind": "industry"
+    },
+    {
+      "term": "scaffold safe working load",
+      "target": "scaffold-leg-load",
+      "kind": "industry"
+    },
+    {
+      "term": "frame scaffold load",
+      "target": "scaffold-leg-load",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"
