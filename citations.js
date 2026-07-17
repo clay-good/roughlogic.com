@@ -8212,7 +8212,7 @@ export const CITATIONS = {
     ],
   },
   "joist-hanger-count": {
-    formula: "joists = floor(run_width_ft x 12 / spacing_in) + 1; hangers = joists x ends_per_joist; hanger_nails = hangers x nails_per_hanger.",
+    formula: "joists = ceil(run_width_ft x 12 / spacing_in) + 1; hangers = joists x ends_per_joist; hanger_nails = hangers x nails_per_hanger.",
     edition: "Joist-hanger count identity by name (joists across the run, hangers on the hung ends, filled holes); first-principles count arithmetic.",
     freeAccess: "The count arithmetic is public first-principles; the hanger model and nailing come from the connector manufacturer.",
     governance: GOVERNANCE.general,

@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(construction): joist-hanger-count undercounted joists on a partial-bay run (floor -> ceil); 2026-07-17
+
+- `joist-hanger-count` (calc-construction.js) computed `joists = floor(run_width_ft x 12 / spacing_in) + 1`. A member
+  count across a fixed run must round the bay count UP: the far end of the run always carries a joist regardless of the
+  remainder bay. The `floor` form dropped a joist -- and with it a hanger pair and its connector nails -- on every run
+  that is not an even multiple of the spacing (a 15 ft run at 16 in o.c. returned 12 joists / 24 hangers / 240 nails
+  instead of 13 / 26 / 260). Even-divisor inputs (the 16 ft / 16 in default) masked it, so the pinned fixture and CI
+  stayed green. Fixed to `ceil` -- matching the sibling `metal-stud-takeoff` -- and added a 15 ft partial-bay worked
+  example that pins the corrected count. Caught by a first-principles audit of the v809-v908 construction batch.
+
 ### feat(fire): smoke-detector-spacing-count -- spot smoke / heat detector count (smooth ceiling) (spec-v908); 2026-07-17
 
 - New Group F tile `smoke-detector-spacing-count` (calc-firesprinkler.js), the fire-alarm install estimate beside

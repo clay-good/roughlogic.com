@@ -18,7 +18,7 @@ The v14 dimensional lint, bounds-fuzzer, worked-example registry, and reviewer-s
 framing siblings (`deck-ledger-fasteners`, `residential-framing`): the joist-run width and spacing carry `L`, and the
 joist, hanger, ends-per-joist, nails-per-hanger, and nail counts are dimensionless. The v18/v21 contract: a non-finite or
 non-positive width or spacing returns `{ error }`; a negative ends-per-joist or nails-per-hanger returns `{ error }`.
-Citation discipline (v19/v22): the hanger-count identity by name (joists = floor(width / spacing) + 1; hangers = joists x
+Citation discipline (v19/v22): the hanger-count identity by name (joists = ceil(width / spacing) + 1; hangers = joists x
 ends; nails = hangers x nails per hanger), `GOVERNANCE.general`; the note states that a hanger goes on each joist end that
 lands in a ledger or beam face (a joist bearing on top of a beam needs no hanger that end -- set ends to 1), that every
 hanger hole is filled with the specified structural connector nails or screws (not roofing nails), and that the hanger
@@ -35,13 +35,13 @@ inputs:
   ends_per_joist   hung ends per joist (count, default 2)
   nails_per_hanger connector nails per hanger (count, default 10)
 
-joists       = floor(run_width_ft * 12 / spacing_in) + 1
+joists       = ceil(run_width_ft * 12 / spacing_in) + 1
 hangers      = joists * ends_per_joist
 hanger_nails = hangers * nails_per_hanger
 ```
 
 **Pinned worked example.** Run width 16 ft, 16 in spacing, 2 hung ends, 10 nails/hanger:
-`joists = floor(16*12/16) + 1 = 12 + 1 = ` **13**; `hangers = 13*2 = ` **26**; `nails = 26*10 = ` **260**. Cross-check:
+`joists = ceil(16*12/16) + 1 = 12 + 1 = ` **13**; `hangers = 13*2 = ` **26**; `nails = 26*10 = ` **260**. Cross-check:
 if one end bears on a beam (ends = 1), it is `13*1 = ` **13 hangers** and 130 nails -- half the hardware, because only the
 ledger end is hung.
 
@@ -66,7 +66,7 @@ post-build. Lazy-loaded, absent from home first paint. Home tile count 1,335 -> 
 Standard green bar: `npm run lint`; `npm test` (+2 fixtures, the new fuzzer block, the Group E audit bump); `npm run build`;
 `node scripts/check-shells.mjs` and `check-shell-mobile.mjs`; `node scripts/check-module-sizes.mjs` post-build;
 `npm run data:verify`; worked-examples runner; 320 px audit; render + output read to the value
-(floor(16*12/16)+1 -> 13 joists, 26 hangers).
+(ceil(16*12/16)+1 -> 13 joists, 26 hangers).
 
 ## 5. Roadmap position
 
