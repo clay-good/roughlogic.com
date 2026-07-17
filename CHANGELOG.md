@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(hvac): combustion-air had the outdoor/indoor opening rules transposed (undersized indoor combustion air 4x); 2026-07-17
+
+- `combustion-air` (calc-hvac.js) computed the outdoor opening as `btu/1000` and the indoor communicating opening as
+  `btu/4000` -- exactly backwards. Per IFGC 2021 / NFPA 54 §304, an outdoor opening (two openings, direct or vertical to
+  outdoors) is 1 sq in per 4,000 Btu/hr, and an indoor opening communicating with another interior space is the LARGER
+  1 sq in per 1,000 Btu/hr (the adjacent room's air is a limited reservoir, so it needs more free area). For a 100,000
+  Btu/hr appliance the tile reported a 25 sq in indoor opening when code requires 100 sq in -- a 4x undersize of indoor
+  combustion air, a non-conservative error that risks oxygen depletion and CO. Swapped the divisors (outdoor 25, indoor
+  100) and corrected the comment, the sibling combustion-air-max-input note, both citations, the worked-example pins, and
+  the bounds-fuzzer assertions (which mirrored the transposition). Caught by a first-principles re-derivation of calc-hvac.js.
+
 ### fix(electrical): service-load-standard range demand (NEC 220.55 Note 1) undersized a >12 kW range ~8x on the increment; 2026-07-17
 
 - `service-load-standard` (calc-electrical.js) computed a >12 kW range's demand as `8000 + (range_W - 12000) x 0.05`,

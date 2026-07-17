@@ -4059,7 +4059,7 @@ export const CITATIONS = {
     ],
   },
   "combustion-air": {
-    formula: "Required combustion-air opening per IFGC 2021 §304 (standard method): 1 sq inch per 1000 BTU/hr for outdoor air, 1 sq inch per 4000 BTU/hr for indoor air with two openings.",
+    formula: "Required combustion-air opening per IFGC 2021 §304 (standard method): 1 sq inch per 4000 BTU/hr for outdoor air (two openings), and the larger 1 sq inch per 1000 BTU/hr for indoor communicating air.",
     edition: IFGC_2021 + " §304.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.mechanical,

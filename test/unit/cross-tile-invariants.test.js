@@ -3300,12 +3300,12 @@ test("monotonicity: computeBulkDensity bulk_density is strictly increasing in dr
 // closed-form compute functions, four distinct groups; brings §10.3
 // surface to 135+ sweeps.
 
-test("monotonicity: computeCombustionAir required_volume_ft3 + opening_outdoor_in2 are strictly increasing in btu_input (NFGC 50-ft^3-per-1000-BTU + 1-in^2-per-1000-BTU pins)", () => {
+test("monotonicity: computeCombustionAir required_volume_ft3 + opening_outdoor_in2 are strictly increasing in btu_input (NFGC 50-ft^3-per-1000-BTU + 1-in^2-per-4000-BTU outdoor pins)", () => {
   // Group C. required_volume_ft3 = (btu / 1000) * 50; opening_outdoor_in2 =
-  // btu / 1000. Both linear in btu_input. Pin both monotonicities AND
+  // btu / 4000. Both linear in btu_input. Pin both monotonicities AND
   // the NFGC (NFPA 54) rule-of-thumb constants 50 ft^3/1000 BTU and
-  // 1 in^2/1000 BTU outdoor opening; the indoor opening is 1 in^2 per
-  // 4000 BTU (4x denser communicating-space ratio).
+  // 1 in^2/4000 BTU outdoor opening; the indoor communicating opening is the
+  // LARGER 1 in^2 per 1000 BTU (that reservoir of air is limited).
   let prevVol = -Infinity;
   let prevOpen = -Infinity;
   for (const btu of [20000, 40000, 80000, 100000, 200000, 400000]) {
@@ -3317,11 +3317,11 @@ test("monotonicity: computeCombustionAir required_volume_ft3 + opening_outdoor_i
     prevOpen = r.opening_outdoor_in2;
   }
   // NFGC closed-form pin: 100000 BTU -> 5000 ft^3 required (50/1000 * 100000);
-  // outdoor opening = 100 in^2 (1/1000 * 100000); indoor opening = 25 in^2.
+  // outdoor opening = 25 in^2 (1/4000 * 100000); indoor opening = 100 in^2 (1/1000 * 100000, the larger).
   const ref = computeCombustionAir({ btu_input: 100000, room_volume_ft3: 50000 });
   assert.equal(ref.required_volume_ft3, 5000);
-  assert.equal(ref.opening_outdoor_in2, 100);
-  assert.equal(ref.opening_indoor_in2, 25);
+  assert.equal(ref.opening_outdoor_in2, 25);
+  assert.equal(ref.opening_indoor_in2, 100);
 });
 
 test("monotonicity: computeContainmentAirBalance required_cfm is strictly increasing in leakage_area_in2 (Q = 2610*A*sqrt(dP) linear-in-A pin) and in target_dp_in_wc (sqrt pin)", () => {

@@ -2509,7 +2509,7 @@
    "source_publisher": "ICC",
    "source_title": "100,000 Btu/hr appliance in a 4,000 ft^3 room",
    "source_edition_or_year": "IFGC 2021 §304 (combustion-air standard rules)",
-   "source_section_or_page": "required_volume = 50 ft^3 per 1000 Btu/hr = 5000 ft^3; 4000 < 5000 -> not adequate by volume; outdoor opening = 100 in^2 (1 in^2 per 1000 Btu/hr); indoor opening = 25 in^2",
+   "source_section_or_page": "required_volume = 50 ft^3 per 1000 Btu/hr = 5000 ft^3; 4000 < 5000 -> not adequate by volume; outdoor opening = 25 in^2 (1 in^2 per 4000 Btu/hr); indoor communicating opening = 100 in^2 (the larger, 1 in^2 per 1000 Btu/hr)",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -2524,13 +2524,13 @@
      }
     },
     "opening_outdoor_in2": {
-     "value": 100,
+     "value": 25,
      "tolerance": {
       "abs": 1e-06
      }
     },
     "opening_indoor_in2": {
-     "value": 25,
+     "value": 100,
      "tolerance": {
       "abs": 1e-06
      }

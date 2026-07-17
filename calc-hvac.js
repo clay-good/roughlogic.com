@@ -385,12 +385,13 @@ export function computeCombustionAir({ btu_input, room_volume_ft3 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // If room volume >= 50 ft^3 per 1000 BTU/hr, combustion air is "adequate
   // by volume" (standard rule of thumb). Otherwise combustion air must be
-  // supplied; opening size approx 1 in^2 per 1000 BTU/hr from outside,
-  // or 1 in^2 per 4000 BTU/hr from indoor adjacent communicating spaces.
+  // supplied; opening size approx 1 in^2 per 4000 BTU/hr from outdoors (two
+  // openings, direct/vertical), or the larger 1 in^2 per 1000 BTU/hr from
+  // indoor adjacent communicating spaces (that reservoir of air is limited).
   const required_volume_ft3 = (btu_input / 1000) * 50;
   const adequate_by_volume = room_volume_ft3 >= required_volume_ft3;
-  const opening_outdoor_in2 = btu_input / 1000;
-  const opening_indoor_in2 = btu_input / 4000;
+  const opening_outdoor_in2 = btu_input / 4000;
+  const opening_indoor_in2 = btu_input / 1000;
   return { required_volume_ft3, adequate_by_volume, opening_outdoor_in2, opening_indoor_in2 };
 }
 
@@ -411,7 +412,7 @@ export function computeCombustionAirMaxInput({ room_volume_ft3 } = {}) {
   return {
     max_btu_input,
     max_kbtu_input: max_btu_input / 1000,
-    note: "Standard (volume) method: 50 ft^3 per 1000 BTU/hr. Above this input the space is 'confined' and needs combustion-air openings (1 in^2 per 1000 BTU/hr from outdoors, 1 in^2 per 4000 BTU/hr from adjacent indoor spaces), or use the known-air-infiltration-rate method. AHJ governs.",
+    note: "Standard (volume) method: 50 ft^3 per 1000 BTU/hr. Above this input the space is 'confined' and needs combustion-air openings (1 in^2 per 4000 BTU/hr from outdoors, the larger 1 in^2 per 1000 BTU/hr from adjacent indoor spaces), or use the known-air-infiltration-rate method. AHJ governs.",
   };
 }
 
@@ -1182,7 +1183,7 @@ export function renderCfmPerTon(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IMC 2021 §304 (combustion air). 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 1000 BTU/hr or indoor opening 1 in^2 per 4000 BTU/hr. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IMC 2021 §304 (combustion air). 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. AHJ governs. Free at codes.iccsafe.org.";
   const btu = makeNumber("Appliance BTU input", "ca-b", { step: "any", min: "0" });
   const vol = makeNumber("Room volume (ft^3)", "ca-v", { step: "any", min: "0" });
   for (const f of [btu, vol]) inputRegion.appendChild(f.wrap);

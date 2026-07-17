@@ -1106,8 +1106,8 @@ test("bounds: calc-hvac computeCombustionAir pins the 50/1000 volume threshold a
       );
       assert.strictEqual(r.adequate_by_volume, room_volume_ft3 >= expected_required);
       // Opening rules: outdoor = btu/1000, indoor = btu/4000.
-      assert.ok(Math.abs(r.opening_outdoor_in2 - btu_input / 1000) < 1e-9, `outdoor opening`);
-      assert.ok(Math.abs(r.opening_indoor_in2 - btu_input / 4000) < 1e-9, `indoor opening`);
+      assert.ok(Math.abs(r.opening_outdoor_in2 - btu_input / 4000) < 1e-9, `outdoor opening (1 in^2 per 4000 BTU/hr)`);
+      assert.ok(Math.abs(r.opening_indoor_in2 - btu_input / 1000) < 1e-9, `indoor communicating opening (larger, 1 in^2 per 1000 BTU/hr)`);
     }
   }
 });
