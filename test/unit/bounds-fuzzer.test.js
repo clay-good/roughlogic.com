@@ -17123,6 +17123,7 @@ import { computeCableReelCapacity as _v849crc } from "../../calc-electrical.js";
 import { computeShingleNails as _v850shn } from "../../calc-construction.js";
 import { computeDuctMetalWeight as _v851dmw } from "../../calc-construction.js";
 import { computeWirePullingLubricant as _v852wpl } from "../../calc-electrical.js";
+import { computeDuctBankConcrete as _v853dbc } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17689,6 +17690,25 @@ test("bounds: spec-v852 computeWirePullingLubricant pins the gallons and error s
   assert.ok("error" in _v852wpl({ length_ft: 400, conduit_id_in: 0, k_factor: 0.0015, bend_factor: 1.0 }));
   assert.ok("error" in _v852wpl({ length_ft: 400, conduit_id_in: 3, k_factor: 0, bend_factor: 1.0 }));
   assert.ok("error" in _v852wpl({ length_ft: 400, conduit_id_in: 3, k_factor: 0.0015, bend_factor: 0 }));
+});
+
+test("bounds: spec-v853 computeDuctBankConcrete pins the net area, both volumes, and error seams", () => {
+  // 2.0 x 1.5 ft, 100 ft, six 4.5 in conduits, 5% waste -> 2.337 ft^2, 8.66 cy, 9.09 cy.
+  const r = _v853dbc({ bank_width_ft: 2.0, bank_height_ft: 1.5, length_ft: 100, num_conduits: 6, conduit_od_in: 4.5, waste_pct: 5 });
+  assert.ok(Math.abs(r.net_area_ft2 - 2.337) < 5e-3);
+  assert.ok(Math.abs(r.volume_cy - 8.66) < 2e-2);
+  assert.ok(Math.abs(r.ordered_cy - 9.09) < 2e-2);
+  // A bigger envelope drives the pour (not the conduits).
+  assert.ok(Math.abs(_v853dbc({ bank_width_ft: 2.5, bank_height_ft: 2.0, length_ft: 100, num_conduits: 6, conduit_od_in: 4.5, waste_pct: 5 }).volume_cy - 16.06) < 5e-2);
+  // Error seams.
+  assert.ok("error" in _v853dbc({ bank_width_ft: 0, bank_height_ft: 1.5, length_ft: 100, num_conduits: 6, conduit_od_in: 4.5 }));
+  assert.ok("error" in _v853dbc({ bank_width_ft: 2.0, bank_height_ft: 0, length_ft: 100, num_conduits: 6, conduit_od_in: 4.5 }));
+  assert.ok("error" in _v853dbc({ bank_width_ft: 2.0, bank_height_ft: 1.5, length_ft: 0, num_conduits: 6, conduit_od_in: 4.5 }));
+  assert.ok("error" in _v853dbc({ bank_width_ft: 2.0, bank_height_ft: 1.5, length_ft: 100, num_conduits: 6, conduit_od_in: 0 }));
+  assert.ok("error" in _v853dbc({ bank_width_ft: 2.0, bank_height_ft: 1.5, length_ft: 100, num_conduits: -1, conduit_od_in: 4.5 }));
+  assert.ok("error" in _v853dbc({ bank_width_ft: 2.0, bank_height_ft: 1.5, length_ft: 100, num_conduits: 6, conduit_od_in: 4.5, waste_pct: -1 }));
+  // Conduit area exceeding the bank area (no net concrete).
+  assert.ok("error" in _v853dbc({ bank_width_ft: 1.0, bank_height_ft: 1.0, length_ft: 100, num_conduits: 20, conduit_od_in: 6 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

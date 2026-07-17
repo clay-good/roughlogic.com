@@ -17377,6 +17377,31 @@
       "kind": "industry"
     },
     {
+      "term": "duct bank concrete",
+      "target": "duct-bank-concrete",
+      "kind": "industry"
+    },
+    {
+      "term": "electrical duct bank volume",
+      "target": "duct-bank-concrete",
+      "kind": "industry"
+    },
+    {
+      "term": "conduit encasement concrete",
+      "target": "duct-bank-concrete",
+      "kind": "industry"
+    },
+    {
+      "term": "duct bank pour",
+      "target": "duct-bank-concrete",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete encased duct",
+      "target": "duct-bank-concrete",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

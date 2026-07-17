@@ -8208,3 +8208,54 @@ const _v851renderDuctMetalWeight = _simpleRenderer({
   compute: computeDuctMetalWeight,
 });
 CONSTRUCTION_RENDERERS["duct-metal-weight"] = _v851renderDuctMetalWeight;
+
+// --- duct-bank-concrete: Electrical Duct-Bank Concrete Encasement Volume ---
+//
+// The concrete for an electrical duct bank - the encasement around a bundle of
+// conduits, the cross-section minus the conduits times the run:
+//   net_area_ft2 = bank_width_ft x bank_height_ft - num_conduits x (PI/4) x (conduit_od_in/12)^2
+//   volume_cy = net_area_ft2 x length_ft / 27; ordered_cy = volume_cy x (1 + waste_pct/100)
+// dims: in { bank_width_ft: L, bank_height_ft: L, length_ft: L, num_conduits: dimensionless, conduit_od_in: L, waste_pct: dimensionless } out: { net_area_ft2: L^2, volume_cy: L^3, ordered_cy: L^3 }
+export function computeDuctBankConcrete({ bank_width_ft = 2.0, bank_height_ft = 1.5, length_ft = 100, num_conduits = 6, conduit_od_in = 4.5, waste_pct = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(bank_width_ft > 0)) return { error: "Bank width must be positive (ft)." };
+  if (!(bank_height_ft > 0)) return { error: "Bank height must be positive (ft)." };
+  if (!(length_ft > 0)) return { error: "Run length must be positive (ft)." };
+  if (!(conduit_od_in > 0)) return { error: "Conduit OD must be positive (in)." };
+  if (num_conduits < 0) return { error: "Conduit count cannot be negative." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const conduit_area_ft2 = num_conduits * (Math.PI / 4) * Math.pow(conduit_od_in / 12, 2);
+  const net_area_ft2 = bank_width_ft * bank_height_ft - conduit_area_ft2;
+  if (!(net_area_ft2 > 0)) return { error: "Conduit area exceeds the bank area (no net concrete)." };
+  const volume_cy = (net_area_ft2 * length_ft) / 27;
+  const ordered_cy = volume_cy * (1 + waste_pct / 100);
+  if (![net_area_ft2, volume_cy, ordered_cy].every(Number.isFinite)) return { error: "Duct-bank math is not a finite value." };
+  return {
+    net_area_ft2,
+    volume_cy,
+    ordered_cy,
+    note: "The conduit OD is the actual outside diameter (a 4-in conduit runs about 4.5 in OD). The mix (often red-dyed concrete or flowable fill) and the encasement dimensions come from the engineer and AHJ. Rebar and spacers are taken off separately. Pour in one continuous lift to avoid a cold joint.",
+  };
+}
+
+export const ductBankConcreteExample = { inputs: { bank_width_ft: 2.0, bank_height_ft: 1.5, length_ft: 100, num_conduits: 6, conduit_od_in: 4.5, waste_pct: 5 } };
+
+const _v853renderDuctBankConcrete = _simpleRenderer({
+  citation: "Citation: encasement identity by name. net area = bank width x height - conduits x pi/4 x OD^2; volume = net area x length / 27. The conduit OD is the actual outside diameter; the engineer and AHJ set the encasement.",
+  example: ductBankConcreteExample.inputs,
+  fields: [
+    { key: "bank_width_ft", label: "Duct-bank envelope width (ft)", kind: "number", default: 2.0 },
+    { key: "bank_height_ft", label: "Duct-bank envelope height (ft)", kind: "number", default: 1.5 },
+    { key: "length_ft", label: "Run length (ft)", kind: "number", default: 100 },
+    { key: "num_conduits", label: "Number of conduits in the bank", kind: "number", default: 6 },
+    { key: "conduit_od_in", label: "Conduit actual outside diameter (in)", kind: "number", default: 4.5 },
+    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 5 },
+  ],
+  outputs: [
+    { key: "o", id: "dbc-out-o", label: "Concrete to order", value: (r) => _fmtC(r.ordered_cy, 2) + " cy (with waste)" },
+    { key: "v", id: "dbc-out-v", label: "Neat encasement volume", value: (r) => _fmtC(r.volume_cy, 2) + " cy (" + _fmtC(r.net_area_ft2, 3) + " ft^2 net)" },
+    { key: "note", id: "dbc-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDuctBankConcrete,
+});
+CONSTRUCTION_RENDERERS["duct-bank-concrete"] = _v853renderDuctBankConcrete;

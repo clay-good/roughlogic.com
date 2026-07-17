@@ -50451,6 +50451,68 @@
    }
   },
   {
+   "tile_id": "duct-bank-concrete",
+   "source_publisher": "Duct-bank encasement identity (first-principles)",
+   "source_title": "2.0 x 1.5 ft bank, 100 ft, six 4.5 in-OD conduits, 5% waste",
+   "source_edition_or_year": "spec-v853 worked example",
+   "source_section_or_page": "net = 3.0 - 6*(PI/4)*(4.5/12)^2 = 2.337 ft^2; volume = 2.337*100/27 = 8.66 cy; ordered = 9.09 cy",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "bank_width_ft": 2.0,
+    "bank_height_ft": 1.5,
+    "length_ft": 100,
+    "num_conduits": 6,
+    "conduit_od_in": 4.5,
+    "waste_pct": 5
+   },
+   "outputs": {
+    "net_area_ft2": {
+     "value": 2.337,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "volume_cy": {
+     "value": 8.66,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "ordered_cy": {
+     "value": 9.09,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-bank-concrete",
+   "source_publisher": "Duct-bank encasement identity (first-principles)",
+   "source_title": "cross-check: a bigger 2.5 x 2.0 ft bank around the same conduits",
+   "source_edition_or_year": "spec-v853 worked example",
+   "source_section_or_page": "net = 5.0 - 0.663 = 4.337 ft^2; volume = 4.337*100/27 = 16.06 cy",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "bank_width_ft": 2.5,
+    "bank_height_ft": 2.0,
+    "length_ft": 100,
+    "num_conduits": 6,
+    "conduit_od_in": 4.5,
+    "waste_pct": 5
+   },
+   "outputs": {
+    "volume_cy": {
+     "value": 16.06,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

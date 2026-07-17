@@ -8299,6 +8299,17 @@ export const CITATIONS = {
       { name: "Bend factor", value: "1.0 for a straight run; raise it for multiple sweeps and high conduit fill", source: "field judgment" },
     ],
   },
+  "duct-bank-concrete": {
+    formula: "net_area_ft2 = bank_width_ft x bank_height_ft - num_conduits x (PI/4) x (conduit_od_in/12)^2; volume_cy = net_area_ft2 x length_ft / 27; ordered_cy = volume_cy x (1 + waste_pct/100).",
+    edition: "Duct-bank encasement identity by name (bank cross-section minus conduits, times the run); first-principles volume arithmetic.",
+    freeAccess: "The encasement geometry is public quantity-survey arithmetic; the mix and encasement dimensions come from the engineer and AHJ.",
+    governance: GOVERNANCE.general,
+    editionNote: "The conduit OD is the actual outside diameter (a 4-in conduit runs about 4.5 in OD). The mix (often red-dyed concrete or flowable fill) and the encasement dimensions come from the engineer and AHJ. Rebar and spacers are taken off separately. Pour in one continuous lift to avoid a cold joint.",
+    assumptions: [
+      { name: "Conduit OD", value: "the actual outside diameter, not the trade size (a 4-in conduit is ~4.5 in OD)", source: "conduit manufacturer" },
+      { name: "Encasement", value: "the bank envelope and mix (often red-dyed concrete or flowable fill) come from the engineer and AHJ", source: "engineer / AHJ" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

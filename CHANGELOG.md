@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): duct-bank-concrete -- electrical duct-bank concrete encasement volume (spec-v853); 2026-07-17
+
+- New Group E tile `duct-bank-concrete` (calc-construction.js), the electrical / underground tile beside
+  `post-hole-concrete` and `annular-grout-volume`. Concrete for an electrical duct bank -- the encasement around a
+  bundle of conduits: net area = bank width x height - conduits x pi/4 x OD^2; volume = net area x length / 27. A 24 x
+  18 in bank around six 4.5 in-OD conduits over 100 ft is 8.66 cy (9.09 cy with 5% waste); a bigger 30 x 24 in bank is
+  16 cy -- the envelope, not the conduits, drives the pour. The order has to be right so the pour finishes in one
+  continuous lift with no cold joint; the engineer sets the encasement. Home count 1,301 -> 1,302.
+
 ### feat(electrical): wire-pulling-lubricant -- cable-pulling lubricant quantity (spec-v852); 2026-07-17
 
 - New Group A tile `wire-pulling-lubricant` (calc-electrical.js), the install-ops estimate beside `pulling-tension`

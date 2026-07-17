@@ -774,6 +774,7 @@ export const COMPUTE_MAP = {
   "wire-pulling-lubricant": { module: "../../calc-electrical.js", fn: "computeWirePullingLubricant" },
   "shingle-nails": { module: "../../calc-construction.js", fn: "computeShingleNails" },
   "duct-metal-weight": { module: "../../calc-construction.js", fn: "computeDuctMetalWeight" },
+  "duct-bank-concrete": { module: "../../calc-construction.js", fn: "computeDuctBankConcrete" },
   "asphalt-spread-rate": { module: "../../calc-construction.js", fn: "computeAsphaltSpreadRate" },
   "pavement-milling-production": { module: "../../calc-construction.js", fn: "computePavementMillingProduction" },
   "striping-paint-quantity": { module: "../../calc-construction.js", fn: "computeStripingPaintQuantity" },
