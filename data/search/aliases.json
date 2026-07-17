@@ -18152,6 +18152,31 @@
       "kind": "industry"
     },
     {
+      "term": "stucco coverage",
+      "target": "stucco-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "portland cement plaster",
+      "target": "stucco-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "stucco bag count",
+      "target": "stucco-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "three coat stucco",
+      "target": "stucco-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "plaster material takeoff",
+      "target": "stucco-coverage",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

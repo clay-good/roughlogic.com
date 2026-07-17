@@ -9348,3 +9348,43 @@ const _v883renderSidingTakeoff = _simpleRenderer({
   compute: computeSidingTakeoff,
 });
 CONSTRUCTION_RENDERERS["siding-takeoff"] = _v883renderSidingTakeoff;
+
+// --- stucco-coverage: Portland-Cement Plaster (Stucco) Material Takeoff ---
+//
+// Bags of plaster for a multi-coat thickness over an area, with waste.
+//   bags = ceil(area x thickness / bag_yield x (1 + waste/100))
+// dims: in { area_sf: L^2, total_thickness_in: L, bag_yield_sf_in: L^3, waste_pct: dimensionless } out: { bags: dimensionless }
+export function computeStuccoCoverage({ area_sf = 1000, total_thickness_in = 0.875, bag_yield_sf_in = 10.1, waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
+  if (!(total_thickness_in > 0)) return { error: "Total thickness must be positive (in)." };
+  if (!(bag_yield_sf_in > 0)) return { error: "Bag yield must be positive (square-foot-inches)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const raw_bags = area_sf * total_thickness_in / bag_yield_sf_in * (1 + waste_pct / 100);
+  const bags = Math.ceil(raw_bags);
+  if (![raw_bags, bags].every(Number.isFinite)) return { error: "Stucco-coverage math is not a finite value." };
+  return {
+    bags,
+    raw_bags,
+    note: "The coat thicknesses (scratch, brown, finish -- about 3/8 + 3/8 + 1/8 = 7/8 in over metal lath) come from the spec; a two-coat system runs about 5/8 in. The bag yield is the product's coverage at a reference thickness (square-foot-inches per bag). The sand and lime are batched per the mix design. Distinct from the masonry mortar-mix and thinset-coverage.",
+  };
+}
+
+export const stuccoCoverageExample = { inputs: { area_sf: 1000, total_thickness_in: 0.875, bag_yield_sf_in: 10.1, waste_pct: 10 } };
+
+const _v884renderStuccoCoverage = _simpleRenderer({
+  citation: "Citation: stucco bag-count identity by name. bags = ceil(area x thickness / bag yield x (1 + waste/100)). A three-coat system is about 7/8 in over metal lath; the bag yield is the product's coverage in square-foot-inches.",
+  example: stuccoCoverageExample.inputs,
+  fields: [
+    { key: "area_sf", label: "Area to plaster (ft^2)", kind: "number", default: 1000 },
+    { key: "total_thickness_in", label: "Total coat thickness (in)", kind: "number", default: 0.875 },
+    { key: "bag_yield_sf_in", label: "Bag yield (square-foot-inches)", kind: "number", default: 10.1 },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "bags", id: "stu-out-bags", label: "Plaster bags", value: (r) => _fmtC(r.bags, 0) + " bags (" + _fmtC(r.raw_bags, 1) + " before rounding)" },
+    { key: "note", id: "stu-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeStuccoCoverage,
+});
+CONSTRUCTION_RENDERERS["stucco-coverage"] = _v884renderStuccoCoverage;

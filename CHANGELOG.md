@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): stucco-coverage -- portland-cement plaster (stucco) material takeoff (spec-v884); 2026-07-17
+
+- New Group E tile `stucco-coverage` (calc-construction.js), the plaster takeoff beside `mortar-mix` and
+  `thinset-coverage`. bags = ceil(area x thickness / bag yield x (1 + waste/100)). 1,000 sf of a three-coat 7/8 in system
+  on an 80-lb bag yielding 10.1 square-foot-inches is about 96 bags with waste; a two-coat 5/8 in system drops to 69. The
+  coats (scratch + brown + finish over metal lath) come from the spec; the sand and lime are batched per the mix design.
+  Home count 1,332 -> 1,333.
+
 ### feat(construction): siding-takeoff -- lap / panel siding squares and linear footage (spec-v883); 2026-07-17
 
 - New Group E tile `siding-takeoff` (calc-construction.js), the exterior takeoff beside `metal-roof-panels` and

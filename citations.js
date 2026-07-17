@@ -8178,6 +8178,17 @@ export const CITATIONS = {
       { name: "Exposure", value: "the lap reveal to the weather in inches (~4 in default); the product sets it", source: "siding manufacturer" },
     ],
   },
+  "stucco-coverage": {
+    formula: "bags = ceil(area_sf x total_thickness_in / bag_yield_sf_in x (1 + waste_pct/100)).",
+    edition: "Portland-cement plaster bag-count identity by name (volume in square-foot-inches over the bag yield, plus waste); first-principles arithmetic.",
+    freeAccess: "The bag-count arithmetic is public quantity-survey math; the bag yield and the coat schedule come from the product and the spec.",
+    governance: GOVERNANCE.general,
+    editionNote: "The coat thicknesses (scratch, brown, finish -- about 3/8 + 3/8 + 1/8 = 7/8 in over metal lath) come from the spec; a two-coat system runs about 5/8 in. The bag yield is the product's coverage at a reference thickness (square-foot-inches per bag). The sand and lime are batched per the mix design. Distinct from the masonry mortar-mix and thinset-coverage.",
+    assumptions: [
+      { name: "Coat thickness", value: "~7/8 in three-coat over metal lath (3/8 scratch + 3/8 brown + 1/8 finish); the spec governs", source: "plaster specification" },
+      { name: "Bag yield", value: "~10.1 square-foot-inches per 80-lb bag (default); the product sets it", source: "plaster manufacturer" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

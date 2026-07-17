@@ -26168,3 +26168,19 @@ test("bounds: spec-v883 computeSidingTakeoff pins net area, squares, linear feet
   assert.ok("error" in _v883({ wall_area_sf: 2000, opening_area_sf: 2000, waste_pct: 12, exposure_in: 4 }));
   assert.ok("error" in _v883({ wall_area_sf: Infinity, opening_area_sf: 0, waste_pct: 12, exposure_in: 4 }));
 });
+
+import { computeStuccoCoverage as _v884 } from "../../calc-construction.js";
+
+test("bounds: spec-v884 computeStuccoCoverage pins the bag count, both coat systems, and error seams", () => {
+  const r = _v884({ area_sf: 1000, total_thickness_in: 0.875, bag_yield_sf_in: 10.1, waste_pct: 10 });
+  assert.equal(r.bags, 96); // ceil(1000*0.875/10.1*1.10) = ceil(95.30)
+  // The total thickness, set by the number of coats, drives the order: a thinner two-coat system needs fewer bags.
+  const twoCoat = _v884({ area_sf: 1000, total_thickness_in: 0.625, bag_yield_sf_in: 10.1, waste_pct: 10 });
+  assert.equal(twoCoat.bags, 69); // ceil(1000*0.625/10.1*1.10) = ceil(68.07)
+  // Error seams: non-finite, non-positive area / thickness / bag yield, negative waste.
+  assert.ok("error" in _v884({ area_sf: 0, total_thickness_in: 0.875, bag_yield_sf_in: 10.1, waste_pct: 10 }));
+  assert.ok("error" in _v884({ area_sf: 1000, total_thickness_in: 0, bag_yield_sf_in: 10.1, waste_pct: 10 }));
+  assert.ok("error" in _v884({ area_sf: 1000, total_thickness_in: 0.875, bag_yield_sf_in: 0, waste_pct: 10 }));
+  assert.ok("error" in _v884({ area_sf: 1000, total_thickness_in: 0.875, bag_yield_sf_in: 10.1, waste_pct: -5 }));
+  assert.ok("error" in _v884({ area_sf: Infinity, total_thickness_in: 0.875, bag_yield_sf_in: 10.1, waste_pct: 10 }));
+});
