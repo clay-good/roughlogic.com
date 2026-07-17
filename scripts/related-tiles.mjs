@@ -1032,6 +1032,7 @@ const RELATED = {
   "roof-underlayment-rolls": ["roofing-squares", "ice-barrier-coverage", "shingle-nails"],
   "membrane-roof-takeoff": ["roofing-squares", "metal-roof-panels", "roof-underlayment-rolls"],
   "tapered-roof-insulation": ["assembly-r-value", "membrane-roof-takeoff", "roof-underlayment-rolls"],
+  "sheathing-takeoff": ["plywood-span", "residential-framing", "material-quantity"],
   "refrigerant-lineset-charge-adjust": ["refrigerant-charge", "refrigerant-line-size", "refrigerant-velocity"],
   "asphalt-spread-rate": ["asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity"],
   "pavement-milling-production": ["asphalt-paving-speed", "asphalt-spread-rate", "haul-cycle-production"],

@@ -8485,3 +8485,45 @@ const _v864renderTaperedRoofInsulation = _simpleRenderer({
   compute: computeTaperedRoofInsulation,
 });
 CONSTRUCTION_RENDERERS["tapered-roof-insulation"] = _v864renderTaperedRoofInsulation;
+
+// --- sheathing-takeoff: Wall / Roof Sheathing Panel and Nail Takeoff ---
+//
+// Takes off the sheathing panels and nails for a wall or roof:
+//   sheets = ceil(area_sf x (1 + waste_pct/100) / sheet_sf)
+//   nails = sheets x nails_per_sheet
+// dims: in { area_sf: L^2, waste_pct: dimensionless, sheet_sf: L^2, nails_per_sheet: dimensionless } out: { sheets: dimensionless, nails: dimensionless }
+export function computeSheathingTakeoff({ area_sf = 1600, waste_pct = 8, sheet_sf = 32, nails_per_sheet = 60 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
+  if (!(sheet_sf > 0)) return { error: "Panel area must be positive (ft^2)." };
+  if (!(nails_per_sheet > 0)) return { error: "Nails per sheet must be positive." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const sheets = Math.ceil((area_sf * (1 + waste_pct / 100)) / sheet_sf);
+  const nails = sheets * nails_per_sheet;
+  if (![sheets, nails].every(Number.isFinite)) return { error: "Sheathing-takeoff math is not a finite value." };
+  return {
+    sheets,
+    nails,
+    note: "The nails-per-sheet comes from the nailing schedule the carpenter reads off the plans - a 6-in edge / 12-in field pattern is about 60 nails on a 4x8, a 4-in / 6-in shear panel far more. Distinct from the plywood-span rating and the residential-framing lumber rollup; the nailing schedule, not the area, drives the fastener order.",
+  };
+}
+
+export const sheathingTakeoffExample = { inputs: { area_sf: 1600, waste_pct: 8, sheet_sf: 32, nails_per_sheet: 60 } };
+
+const _v865renderSheathingTakeoff = _simpleRenderer({
+  citation: "Citation: sheathing-takeoff identity by name. sheets = ceil(area x (1 + waste) / sheet area); nails = sheets x nails-per-sheet. The nails-per-sheet comes from the nailing schedule on the plans (~60 for a 6/12 pattern, far more for a shear panel).",
+  example: sheathingTakeoffExample.inputs,
+  fields: [
+    { key: "area_sf", label: "Area to sheathe (ft^2)", kind: "number", default: 1600 },
+    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 8 },
+    { key: "sheet_sf", label: "Panel area (ft^2, 32 for a 4x8)", kind: "number", default: 32 },
+    { key: "nails_per_sheet", label: "Nails per panel from the schedule", kind: "number", default: 60 },
+  ],
+  outputs: [
+    { key: "s", id: "sht-out-s", label: "Sheathing panels", value: (r) => _fmtC(r.sheets, 0) + " sheets" },
+    { key: "n", id: "sht-out-n", label: "Nails to order", value: (r) => _fmtC(r.nails, 0) },
+    { key: "note", id: "sht-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSheathingTakeoff,
+});
+CONSTRUCTION_RENDERERS["sheathing-takeoff"] = _v865renderSheathingTakeoff;

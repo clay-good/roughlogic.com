@@ -8431,6 +8431,17 @@ export const CITATIONS = {
       { name: "R per inch", value: "the insulation's R-value per inch (~5.7 for polyiso, aged)", source: "insulation manufacturer" },
     ],
   },
+  "sheathing-takeoff": {
+    formula: "sheets = ceil(area_sf x (1 + waste_pct/100) / sheet_sf); nails = sheets x nails_per_sheet.",
+    edition: "Sheathing panel / nail takeoff identity by name (sheets from area over panel area; nails from the schedule); first-principles count arithmetic.",
+    freeAccess: "The takeoff is public quantity arithmetic; the nailing schedule comes from the plans and the code (entered here, not reproduced).",
+    governance: GOVERNANCE.general,
+    editionNote: "The nails-per-sheet comes from the nailing schedule the carpenter reads off the plans - a 6-in edge / 12-in field pattern is about 60 nails on a 4x8, a 4-in / 6-in shear panel far more (the value is entered, not reproduced from a code table). Distinct from the plywood-span rating and the residential-framing lumber rollup.",
+    assumptions: [
+      { name: "Panel area", value: "32 sf for a 4x8 sheet; the sheet size governs", source: "panel size" },
+      { name: "Nails per sheet", value: "from the nailing schedule on the plans (~60 for a 6/12 field pattern, ~100+ for a shear panel)", source: "nailing schedule / plans" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

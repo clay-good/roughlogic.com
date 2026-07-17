@@ -94,7 +94,11 @@ const TILE_GZIP_CAP = 6 * 1024;
 // pavement-milling-production, striping-paint-quantity), taking construction/index.html to ~60.1 KB gz
 // (over the 60 KB cap at striping-paint-quantity); 64 KB restores ~6% headroom (this gate runs only in
 // CI's integration job, so push lint stays green while CI goes red -- run check-shells.mjs locally).
-const GROUP_GZIP_CAP = 64 * 1024;
+// Bumped 64 -> 68 KB on 2026-07-17: the spec-v850-v865 construction-ops batch added ~11 more Group E tiles
+// (shingle-nails, duct trio, roofing/insulation quartet, sheathing-takeoff), taking construction/index.html
+// to ~64.2 KB gz (over the 64 KB cap at sheathing-takeoff); 68 KB restores ~6% headroom (this gate runs only
+// in CI's integration job, so push lint stays green while CI goes red -- run check-shells.mjs locally).
+const GROUP_GZIP_CAP = 68 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

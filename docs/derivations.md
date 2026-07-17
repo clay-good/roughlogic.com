@@ -1656,6 +1656,7 @@ cross-check.
 | calc-construction.js | `computeSeismicVerticalDistribution` | `{ base_shear_kip = 0, period_s = 0, stories = [] } = {}` | _ | _ | _ |
 | calc-construction.js | `computeShaftDiameterForTorsion` | `{ T_lbin = 0, tau_allow_psi = 0, L_in = 0, G_psi = 11.5e6 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeShaftTorsion` | `{ T_lbin = 0, d_in = 0, di_in = 0, L_in = 0, G_psi = 11.5e6 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeSheathingTakeoff` | `{ area_sf = 1600, waste_pct = 8, sheet_sf = 32, nails_per_sheet = 60 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeShingleNails` | `{ squares = 30, shingles_per_square = 80, nails_per_shingle = 4, nails_per_lb...` | _ | _ | _ |
 | calc-construction.js | `computeShorePostLoad` | `{ slab_in = 0, unit_weight = 150, form_load = 10, live_load = 50, spacing_x =...` | _ | _ | _ |
 | calc-construction.js | `computeShotcreteReboundQuantity` | `{ area_sf = 0, thickness_in = 0, rebound_pct = 20 } = {}` | _ | _ | _ |
@@ -2974,7 +2975,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1560.
+Row count: 1561.
 
 <!-- END function-corpus-v14 -->
 
@@ -3530,7 +3531,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (314 tiles)
+### Group E Construction (315 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3754,6 +3755,7 @@ per spec-v14 §13.1 second paragraph.
 | `shear-stud-strength` | Composite Shear Stud Strength and Count (AISC 360-22 I8) | AISC 360-22 I8; spec-v411 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shearwall-deflection` | Wood Shear Wall Deflection (SDPWS Eq 4.3-1) | AWC SDPWS Equation 4.3-1 (AWC/APA des...; spec-v274 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shearwall-overturning` | Wood Shear Wall Unit Shear and Holdown (SDPWS / ASD) | AWC SDPWS segmented shear wall + ASCE...; spec-v273 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `sheathing-takeoff` | Wall / Roof Sheathing Panel and Nail Takeoff | Sheathing takeoff identity (first-pri...; sheets = ceil(1600*1.08/32) = ceil(54.0) = 54; nails = 54... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shielding-gas-runtime` | Shielding-Gas Cylinder Runtime and Cost | Torch / regulator maker's flow charts...; 35 cfh, 120 min arc-on, 251 ft3 cylinder, $60/cylinder ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `shingle-nails` | Roofing Nail Count by Wind Zone | Roofing fastener-count identity (firs...; nails = 30*80*6 = 14,400; weight = 14400/140 = 102.9 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shore-post-load` | Formwork Shore Post Load and Spacing (ACI 347) | ACI 347 Guide to Formwork for Concrete; spec-v245 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4473,6 +4475,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1313. Fixture-covered or reference-cadence: 1313 / 1313.
+Tile count: 1314. Fixture-covered or reference-cadence: 1314 / 1314.
 
 <!-- END tile-index-v14 -->

@@ -17677,6 +17677,31 @@
       "kind": "industry"
     },
     {
+      "term": "sheathing takeoff",
+      "target": "sheathing-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "plywood sheet count",
+      "target": "sheathing-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "osb panel count",
+      "target": "sheathing-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "sheathing nails",
+      "target": "sheathing-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "wall sheathing estimate",
+      "target": "sheathing-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

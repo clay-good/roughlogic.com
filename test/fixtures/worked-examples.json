@@ -51195,6 +51195,58 @@
    }
   },
   {
+   "tile_id": "sheathing-takeoff",
+   "source_publisher": "Sheathing takeoff identity (first-principles)",
+   "source_title": "1,600 sf wall, 8% waste, 32 sf panels, 60 nails/sheet",
+   "source_edition_or_year": "spec-v865 worked example",
+   "source_section_or_page": "sheets = ceil(1600*1.08/32) = ceil(54.0) = 54; nails = 54*60 = 3,240",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "area_sf": 1600,
+    "waste_pct": 8,
+    "sheet_sf": 32,
+    "nails_per_sheet": 60
+   },
+   "outputs": {
+    "sheets": {
+     "value": 54,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "nails": {
+     "value": 3240,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sheathing-takeoff",
+   "source_publisher": "Sheathing takeoff identity (first-principles)",
+   "source_title": "cross-check: a shear-panel nailing schedule doubles the nails",
+   "source_edition_or_year": "spec-v865 worked example",
+   "source_section_or_page": "nails = 54*104 = 5,616 on the same 54 sheets (schedule drives the fastener order)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "area_sf": 1600,
+    "waste_pct": 8,
+    "sheet_sf": 32,
+    "nails_per_sheet": 104
+   },
+   "outputs": {
+    "nails": {
+     "value": 5616,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

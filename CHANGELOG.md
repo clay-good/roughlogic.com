@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): sheathing-takeoff -- wall / roof sheathing panel and nail takeoff (spec-v865); 2026-07-17
+
+- New Group E tile `sheathing-takeoff` (calc-construction.js), the framing takeoff beside `plywood-span` (rating) and
+  `residential-framing` (lumber). sheets = ceil(area x (1 + waste) / sheet area); nails = sheets x nails-per-sheet. A
+  1,600 sf wall at 8% waste is 54 sheets, and at a 6-in edge / 12-in field pattern (~60 nails a sheet) that is 3,240
+  nails; a tight shear-panel schedule (~104 nails) roughly doubles it to 5,616 on the same 54 sheets -- the nailing
+  schedule, not the area, drives the fastener order. Home count 1,313 -> 1,314. The Group E construction group-shell
+  gzip cap was raised 64 -> 68 KB (ledger in check-shells.mjs) as the batch's tiles grew the hub.
+
 ### feat(construction): tapered-roof-insulation -- tapered roof insulation average thickness and quantity (spec-v864); 2026-07-17
 
 - New Group E tile `tapered-roof-insulation` (calc-construction.js), the slope-to-drain insulation tile beside

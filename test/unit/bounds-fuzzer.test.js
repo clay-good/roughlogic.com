@@ -17135,6 +17135,7 @@ import { computeRefrigerantLinesetChargeAdjust as _v861rlc } from "../../calc-re
 import { computeRoofUnderlaymentRolls as _v862rur } from "../../calc-construction.js";
 import { computeMembraneRoofTakeoff as _v863mrt } from "../../calc-construction.js";
 import { computeTaperedRoofInsulation as _v864tri } from "../../calc-construction.js";
+import { computeSheathingTakeoff as _v865sht } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17913,6 +17914,20 @@ test("bounds: spec-v864 computeTaperedRoofInsulation pins the average thickness,
   assert.ok("error" in _v864tri({ run_ft: 40, slope_in_per_ft: 0.25, start_thk_in: 0.5, area_sf: 2000, r_per_in: 0 }));
   assert.ok("error" in _v864tri({ run_ft: 40, slope_in_per_ft: -1, start_thk_in: 0.5, area_sf: 2000, r_per_in: 5.7 }));
   assert.ok("error" in _v864tri({ run_ft: 40, slope_in_per_ft: 0.25, start_thk_in: -1, area_sf: 2000, r_per_in: 5.7 }));
+});
+
+test("bounds: spec-v865 computeSheathingTakeoff pins the sheet count, nail count, and error seams", () => {
+  // 1,600 sf, 8% waste, 32 sf panels, 60 nails -> 54 sheets, 3,240 nails.
+  const r = _v865sht({ area_sf: 1600, waste_pct: 8, sheet_sf: 32, nails_per_sheet: 60 });
+  assert.strictEqual(r.sheets, 54);
+  assert.strictEqual(r.nails, 3240);
+  // A shear-panel schedule doubles the nails on the same sheets.
+  assert.strictEqual(_v865sht({ area_sf: 1600, waste_pct: 8, sheet_sf: 32, nails_per_sheet: 104 }).nails, 5616);
+  // Error seams.
+  assert.ok("error" in _v865sht({ area_sf: 0, waste_pct: 8, sheet_sf: 32, nails_per_sheet: 60 }));
+  assert.ok("error" in _v865sht({ area_sf: 1600, waste_pct: 8, sheet_sf: 0, nails_per_sheet: 60 }));
+  assert.ok("error" in _v865sht({ area_sf: 1600, waste_pct: 8, sheet_sf: 32, nails_per_sheet: 0 }));
+  assert.ok("error" in _v865sht({ area_sf: 1600, waste_pct: -1, sheet_sf: 32, nails_per_sheet: 60 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {
