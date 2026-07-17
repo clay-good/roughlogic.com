@@ -49177,6 +49177,70 @@
    }
   },
   {
+   "tile_id": "restrained-pipe-length",
+   "source_publisher": "Thrust / restrained-length identity (first-principles)",
+   "source_title": "12 in main, 150 psi, 90-degree bend, 600 lb/ft soil resistance",
+   "source_edition_or_year": "spec-v832 worked example",
+   "source_section_or_page": "area = (PI/4)*12^2 = 113.1; thrust = 2*150*113.1*sin(45) = 23,992; length = 23,992/600 = 40 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "pipe_od_in": 12,
+    "pressure_psi": 150,
+    "bend_angle_deg": 90,
+    "unit_resistance_plf": 600
+   },
+   "outputs": {
+    "area_in2": {
+     "value": 113.097,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "thrust_lb": {
+     "value": 23991.6,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "length_each_side_ft": {
+     "value": 39.99,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "restrained-pipe-length",
+   "source_publisher": "Thrust / restrained-length identity (first-principles)",
+   "source_title": "cross-check: a 45-degree bend needs half the restraint",
+   "source_edition_or_year": "spec-v832 worked example",
+   "source_section_or_page": "thrust = 2*150*113.1*sin(22.5) = 12,984; length = 12,984/600 = 21.6 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "pipe_od_in": 12,
+    "pressure_psi": 150,
+    "bend_angle_deg": 45,
+    "unit_resistance_plf": 600
+   },
+   "outputs": {
+    "thrust_lb": {
+     "value": 12984.1,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "length_each_side_ft": {
+     "value": 21.64,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

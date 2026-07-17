@@ -8068,6 +8068,17 @@ export const CITATIONS = {
       { name: "Target factor of safety", value: "1.5 default; the project specification governs", source: "project specification" },
     ],
   },
+  "restrained-pipe-length": {
+    formula: "area_in2 = (PI/4) x od_in^2; thrust_lb = 2 x pressure_psi x area_in2 x sin(bend_angle_deg/2); length_each_side_ft = thrust_lb / unit_resistance_plf.",
+    edition: "Thrust and restrained-length identity by name (thrust = 2 P A sin(bend/2); length = thrust / unit resistance); first-principles statics.",
+    freeAccess: "The thrust geometry is public first-principles statics; the unit soil resistance comes from the restraint manufacturer's tables.",
+    governance: GOVERNANCE.general,
+    editionNote: "The unit soil resistance (pipe friction plus fitting bearing per foot) comes from the restraint manufacturer's tables (EBAA / AWWA M41) with the site soil parameters. This is the restrained-joint alternative to a concrete thrust block. The engineer and AHJ govern.",
+    assumptions: [
+      { name: "Thrust", value: "the unbalanced hydrostatic thrust at the bend, 2 x pressure x pipe area x sin(bend/2)", source: "first-principles statics" },
+      { name: "Unit resistance", value: "soil resistance per foot of restrained pipe (pipe friction + fitting bearing), from the restraint manufacturer's tables", source: "EBAA / AWWA M41" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

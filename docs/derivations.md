@@ -1777,6 +1777,7 @@ cross-check.
 | calc-earthwork.js | `computePipeBeddingBackfill` | `{ trench_width_ft, pipe_od_in, bedding_depth_in = 0, cover_ft = 0, length_ft,...` | _ | _ | _ |
 | calc-earthwork.js | `computePipeFlotation` | `{ pipe_od_in = 48, pipe_weight_plf = 200, backfill_weight_plf = 900, target_f...` | _ | _ | _ |
 | calc-earthwork.js | `computeRelativeCompaction` | `{ wet_pcf = 0, w_pct = 0, max_pcf = 0, spec_pct = 95 } = {}` | _ | _ | _ |
+| calc-earthwork.js | `computeRestrainedPipeLength` | `{ pipe_od_in = 12, pressure_psi = 150, bend_angle_deg = 90, unit_resistance_p...` | _ | _ | _ |
 | calc-earthwork.js | `computeRipperProduction` | `{ spacing_ft, penetration_ft, speed_fpm, efficiency = 0.75 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeRiprapD50` | `{ velocity_fps, specific_gravity = 2.65, turbulence_coeff = 0.86, safety_fact...` | _ | _ | _ |
 | calc-earthwork.js | `computeRiprapTonnage` | `{ area_sf = 0, thickness_ft = 0, unit_wt_pcf = 165 } = {}` | _ | _ | _ |
@@ -2941,7 +2942,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1527.
+Row count: 1528.
 
 <!-- END function-corpus-v14 -->
 
@@ -3489,7 +3490,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (289 tiles)
+### Group E Construction (290 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3666,6 +3667,7 @@ per spec-v14 §13.1 second paragraph.
 | `relative-compaction` | Relative Compaction from Field Density and Proctor Maximum | Relative compaction (earthwork QC); spec-v326 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `required-section-modulus` | Required Plastic Section Modulus for a Steel Beam | AISC 360-22 Chapter F (Mp = Fy Zx, in...; spec-v634 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `residential-framing` | Residential Framing Package | IRC framing practice + AWC NDS (proje...; 1500 ft^2 / 160 ft perim / 9 ft walls / 2x4 / 2x10 joists... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `restrained-pipe-length` | Restrained-Joint Length at a Pipe Bend | Thrust / restrained-length identity (...; area = (PI/4)*12^2 = 113.1; thrust = 2*150*113.1*sin(45) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `retaining-wall-block` | Segmental Retaining Wall Takeoff | Segmental retaining-wall maker guidan...; spec-v97 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `retaining-wall-stability` | Cantilever Retaining Wall Stability (Overturning / Sliding / Bearing) | Das / NAVFAC DM-7.02 stability checks...; spec-v262 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ridge-cap-fasteners` | Hip / Ridge Cap Bundles and Roofing Nails by the Pound | IRC R905.2.6 asphalt-shingle fastenin...; spec-v217 section 2.1 pinned example (24-square, 40 ft ri... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4407,6 +4409,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1280. Fixture-covered or reference-cadence: 1280 / 1280.
+Tile count: 1281. Fixture-covered or reference-cadence: 1281 / 1281.
 
 <!-- END tile-index-v14 -->

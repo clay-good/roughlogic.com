@@ -760,6 +760,7 @@ export const COMPUTE_MAP = {
   "hydroseed-mix": { module: "../../calc-earthwork.js", fn: "computeHydroseedMix" },
   "rock-construction-entrance": { module: "../../calc-earthwork.js", fn: "computeRockConstructionEntrance" },
   "pipe-flotation": { module: "../../calc-earthwork.js", fn: "computePipeFlotation" },
+  "restrained-pipe-length": { module: "../../calc-earthwork.js", fn: "computeRestrainedPipeLength" },
   "haul-cycle-production": { module: "../../calc-earthwork.js", fn: "computeHaulCycleProduction" },
   "loader-production": { module: "../../calc-earthwork.js", fn: "computeLoaderProduction" },
   "dozer-production": { module: "../../calc-earthwork.js", fn: "computeDozerProduction" },

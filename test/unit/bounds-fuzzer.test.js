@@ -17102,6 +17102,7 @@ import { computeErosionBlanketCoverage as _v828eb } from "../../calc-earthwork.j
 import { computeHydroseedMix as _v829hs } from "../../calc-earthwork.js";
 import { computeRockConstructionEntrance as _v830rce } from "../../calc-earthwork.js";
 import { computePipeFlotation as _v831pf } from "../../calc-earthwork.js";
+import { computeRestrainedPipeLength as _v832rpl } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17300,6 +17301,24 @@ test("bounds: spec-v831 computePipeFlotation pins the uplift, the factor of safe
   assert.ok("error" in _v831pf({ pipe_od_in: 48, pipe_weight_plf: 200, backfill_weight_plf: 900, target_fs: 0, water_unit_wt_pcf: 62.4 }));
   assert.ok("error" in _v831pf({ pipe_od_in: 48, pipe_weight_plf: -1, backfill_weight_plf: 900, target_fs: 1.5, water_unit_wt_pcf: 62.4 }));
   assert.ok("error" in _v831pf({ pipe_od_in: 48, pipe_weight_plf: 200, backfill_weight_plf: -1, target_fs: 1.5, water_unit_wt_pcf: 62.4 }));
+});
+
+test("bounds: spec-v832 computeRestrainedPipeLength pins the area, the thrust, the restrained length, and error seams", () => {
+  // 12 in, 150 psi, 90-degree bend, 600 lb/ft -> 113.1 in^2, 23,992 lb, 40 ft.
+  const r = _v832rpl({ pipe_od_in: 12, pressure_psi: 150, bend_angle_deg: 90, unit_resistance_plf: 600 });
+  assert.ok(Math.abs(r.area_in2 - 113.097) < 1e-2);
+  assert.ok(Math.abs(r.thrust_lb - 23991.6) < 1);
+  assert.ok(Math.abs(r.length_each_side_ft - 39.99) < 1e-2);
+  // A 45-degree bend needs half the restraint (sin of the half-angle governs).
+  const b45 = _v832rpl({ pipe_od_in: 12, pressure_psi: 150, bend_angle_deg: 45, unit_resistance_plf: 600 });
+  assert.ok(Math.abs(b45.thrust_lb - 12984.1) < 1);
+  assert.ok(Math.abs(b45.length_each_side_ft - 21.64) < 1e-2);
+  // Error seams.
+  assert.ok("error" in _v832rpl({ pipe_od_in: 0, pressure_psi: 150, bend_angle_deg: 90, unit_resistance_plf: 600 }));
+  assert.ok("error" in _v832rpl({ pipe_od_in: 12, pressure_psi: 0, bend_angle_deg: 90, unit_resistance_plf: 600 }));
+  assert.ok("error" in _v832rpl({ pipe_od_in: 12, pressure_psi: 150, bend_angle_deg: 90, unit_resistance_plf: 0 }));
+  assert.ok("error" in _v832rpl({ pipe_od_in: 12, pressure_psi: 150, bend_angle_deg: 0, unit_resistance_plf: 600 }));
+  assert.ok("error" in _v832rpl({ pipe_od_in: 12, pressure_psi: 150, bend_angle_deg: 180, unit_resistance_plf: 600 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

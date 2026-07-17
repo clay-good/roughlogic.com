@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): restrained-pipe-length -- restrained-joint length at a pipe bend (spec-v832); 2026-07-17
+
+- New Group E tile `restrained-pipe-length` (calc-earthwork.js), the restrained-joint alternative to `thrust-block-sizing`
+  beside `pipe-flotation`. The run of restrained pipe each side of a bend that holds the thrust when a block will not fit:
+  thrust = 2 x pressure x area x sin(bend/2); length each side = thrust / soil resistance per foot. A 12 in main at 150
+  psi through a 90-degree bend throws 24,000 lb, so at 600 lb/ft the crew restrains ~40 ft each side; a 45-degree bend
+  needs half that. The restraint manufacturer's tables (EBAA / AWWA M41) set the unit resistance. Home count 1,280 -> 1,281.
+
 ### feat(earthwork): pipe-flotation -- buried pipe flotation / anti-flotation backfill (spec-v831); 2026-07-17
 
 - New Group E tile `pipe-flotation` (calc-earthwork.js), the underground-utility flotation check beside

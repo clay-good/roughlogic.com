@@ -16852,6 +16852,31 @@
       "kind": "industry"
     },
     {
+      "term": "restrained joint length",
+      "target": "restrained-pipe-length",
+      "kind": "industry"
+    },
+    {
+      "term": "restrained pipe length",
+      "target": "restrained-pipe-length",
+      "kind": "industry"
+    },
+    {
+      "term": "thrust restraint length",
+      "target": "restrained-pipe-length",
+      "kind": "industry"
+    },
+    {
+      "term": "pipe bend restraint",
+      "target": "restrained-pipe-length",
+      "kind": "industry"
+    },
+    {
+      "term": "no thrust block length",
+      "target": "restrained-pipe-length",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

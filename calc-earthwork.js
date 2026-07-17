@@ -23,6 +23,7 @@
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
 //   - pipe-flotation          Buried pipe flotation / anti-flotation backfill
+//   - restrained-pipe-length  Restrained-joint length at a pipe bend
 //
 // Group letters are independent of the module (the spec-v28/v30/v36/v39
 // precedent): all five KEEP group "E"; only the on-disk module changes.
@@ -993,6 +994,59 @@ function _v831renderPipeFlotation(inputRegion, outputRegion, citationEl) {
   for (const f of [od, pw, bw, tf, uw]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["pipe-flotation"] = _v831renderPipeFlotation;
+
+// --- restrained-pipe-length: Restrained-Joint Length at a Pipe Bend ---
+//
+// The run of restrained pipe on each side of a bend that mobilizes enough soil
+// friction to hold the thrust when a concrete block will not fit.
+//   area_in2 = (PI/4) x od_in^2
+//   thrust_lb = 2 x pressure_psi x area_in2 x sin(bend_angle_deg/2)
+//   length_each_side_ft = thrust_lb / unit_resistance_plf
+// dims: in { pipe_od_in: L, pressure_psi: M L^-1 T^-2, bend_angle_deg: dimensionless, unit_resistance_plf: M T^-2 } out: { area_in2: L^2, thrust_lb: M L T^-2, length_each_side_ft: L }
+export function computeRestrainedPipeLength({ pipe_od_in = 12, pressure_psi = 150, bend_angle_deg = 90, unit_resistance_plf = 600 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(pipe_od_in > 0)) return { error: "Pipe outside diameter must be positive (in)." };
+  if (!(pressure_psi > 0)) return { error: "Pressure must be positive (psi)." };
+  if (!(unit_resistance_plf > 0)) return { error: "Unit resistance must be positive (lb/ft)." };
+  if (!(bend_angle_deg > 0 && bend_angle_deg < 180)) return { error: "Bend angle must be between 0 and 180 degrees." };
+  const area_in2 = (Math.PI / 4) * pipe_od_in * pipe_od_in;
+  const thrust_lb = 2 * pressure_psi * area_in2 * Math.sin((bend_angle_deg / 2) * (Math.PI / 180));
+  const length_each_side_ft = thrust_lb / unit_resistance_plf;
+  if (![area_in2, thrust_lb, length_each_side_ft].every(Number.isFinite)) return { error: "Restrained-length math is not a finite value." };
+  return {
+    area_in2,
+    thrust_lb,
+    length_each_side_ft,
+    note: "The unit soil resistance (pipe friction plus fitting bearing per foot) comes from the restraint manufacturer's tables (EBAA / AWWA M41) with the site soil parameters; enter that value here. This is the restrained-joint alternative to a concrete thrust block. The sine of the half-angle sets how hard the bend pulls. The engineer and AHJ govern.",
+  };
+}
+
+function _v832renderRestrainedPipeLength(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: thrust / restrained-length identity by name. thrust (lb) = 2 x pressure x area x sin(bend/2); length each side (ft) = thrust / unit resistance. The unit resistance comes from the restraint manufacturer's tables (EBAA / AWWA M41).";
+  const od = makeNumber("Pipe outside diameter (in)", "rpl-od", { step: "any", min: "0", value: "12" });
+  od.input.value = "12";
+  const p = makeNumber("Design (test) pressure (psi)", "rpl-p", { step: "any", min: "0", value: "150" });
+  p.input.value = "150";
+  const ba = makeNumber("Horizontal bend angle (deg)", "rpl-ba", { step: "any", min: "0", value: "90" });
+  ba.input.value = "90";
+  const ur = makeNumber("Soil resistance per foot (lb/ft)", "rpl-ur", { step: "any", min: "0", value: "600" });
+  ur.input.value = "600";
+  for (const f of [od, p, ba, ur]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { od.input.value = "12"; p.input.value = "150"; ba.input.value = "90"; ur.input.value = "600"; update(); });
+  const oLen = makeOutputLine(outputRegion, "Restrained length each side", "rpl-out-len");
+  const oThrust = makeOutputLine(outputRegion, "Thrust at the bend", "rpl-out-thrust");
+  const update = debounce(() => {
+    const r = computeRestrainedPipeLength({
+      pipe_od_in: od.input.value === "" ? 12 : Number(od.input.value), pressure_psi: p.input.value === "" ? 150 : Number(p.input.value),
+      bend_angle_deg: ba.input.value === "" ? 90 : Number(ba.input.value), unit_resistance_plf: ur.input.value === "" ? 600 : Number(ur.input.value),
+    });
+    if (r.error) { oLen.textContent = r.error; oThrust.textContent = "-"; return; }
+    oLen.textContent = fmt(r.length_each_side_ft, 1) + " ft each side";
+    oThrust.textContent = fmt(r.thrust_lb, 0) + " lb";
+  }, DEBOUNCE_MS);
+  for (const f of [od, p, ba, ur]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["restrained-pipe-length"] = _v832renderRestrainedPipeLength;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //
