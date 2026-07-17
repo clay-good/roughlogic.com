@@ -2487,6 +2487,7 @@ cross-check.
 | calc-plumbing.js | `computeMixedWaterTemp` | `{ mode = "find-blend", hot_temp_F = 0, cold_temp_F = 0, hot_gpm = 0, cold_gpm...` | _ | _ | _ |
 | calc-plumbing.js | `computeOrificeDiameterForFlow` | `{ q_cfs = 0, h_ft = 0, cd = 0.60 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeOrificeFlow` | `{ d_in = 0, h_ft = 0, cd = 0.60 } = {}` | _ | _ | _ |
+| calc-plumbing.js | `computePexHomerunTakeoff` | `{ fixtures = 8, hot_fixtures = 6, avg_run_ft = 35, waste_pct = 10 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computePipeExpansion` | `{ material, length_ft, delta_T_F }` | _ | _ | _ |
 | calc-plumbing.js | `computePipeExpansionLoop` | `{ material = "copper", length_ft = 0, delta_T_F = 0, pipe_OD_in = 1.315, } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computePipeInsulationTakeoff` | `{ pipe_ft = 250, waste_pct = 5, num_fittings = 12, fitting_allow_ft = 1, sect...` | _ | _ | _ |
@@ -3015,7 +3016,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1601.
+Row count: 1602.
 
 <!-- END function-corpus-v14 -->
 
@@ -3269,7 +3270,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (111 tiles)
+### Group B Plumbing (112 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3317,6 +3318,7 @@ per spec-v14 §13.1 second paragraph.
 | `orifice-diameter-for-flow` | Orifice Diameter for a Target Flow | Inverse orifice sizing A = Q / (Cd sq...; spec-v639 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `orifice-flow` | Orifice Discharge Flow | Orifice discharge Q = Cd A sqrt(2 g h); spec-v303 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `overflow-scupper-sizing` | Overflow Scupper Sizing (Weir Flow) | Francis weir / IPC 1108; spec-v426 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pex-homerun-takeoff` | PEX Home-Run Manifold Port and Tubing Takeoff | PEX home-run takeoff identity (first-...; total ports = 8 + 6 = 14; tubing = ceil(14*35*1.10) = 539 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pipe-cold-spring` | Pipe Cold Spring (Cut-Short) | ASME B31.1 §119 / B31.9 (by name); 100 ft carbon steel (alpha 6.5e-6), 50 F to 250 F (dT 200... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-expansion` | Pipe Thermal Expansion | ASHRAE / ASTM; Copper alpha = 9.4e-6 in/in/F; 100 ft of copper x 100 F d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-expansion-loop` | Pipe Thermal Expansion and Loop Sizing | Project (first-principles); Carbon steel A53 4.5 in OD / 200 ft run / 100 F dT -> 1.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4555,6 +4557,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1354. Fixture-covered or reference-cadence: 1354 / 1354.
+Tile count: 1355. Fixture-covered or reference-cadence: 1355 / 1355.
 
 <!-- END tile-index-v14 -->

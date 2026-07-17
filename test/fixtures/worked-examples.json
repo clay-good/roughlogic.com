@@ -53637,6 +53637,64 @@
    }
   },
   {
+   "tile_id": "pex-homerun-takeoff",
+   "source_publisher": "PEX home-run takeoff identity (first-principles)",
+   "source_title": "8 fixtures, 6 hot, 35 ft average run, 10% waste -> 14 ports, 539 LF",
+   "source_edition_or_year": "spec-v906 worked example",
+   "source_section_or_page": "total ports = 8 + 6 = 14; tubing = ceil(14*35*1.10) = 539",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "fixtures": 8,
+    "hot_fixtures": 6,
+    "avg_run_ft": 35,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "total_ports": {
+     "value": 14,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "tubing_lf": {
+     "value": 539,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pex-homerun-takeoff",
+   "source_publisher": "PEX home-run takeoff identity (first-principles)",
+   "source_title": "cross-check: a 12-fixture house (10 hot) needs 22 ports and 847 LF",
+   "source_edition_or_year": "spec-v906 worked example",
+   "source_section_or_page": "total ports = 12 + 10 = 22; tubing = ceil(22*35*1.10) = 847",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "fixtures": 12,
+    "hot_fixtures": 10,
+    "avg_run_ft": 35,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "total_ports": {
+     "value": 22,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "tubing_lf": {
+     "value": 847,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

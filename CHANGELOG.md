@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): pex-homerun-takeoff -- PEX home-run manifold port and tubing takeoff (spec-v906); 2026-07-17
+
+- New Group B tile `pex-homerun-takeoff` (calc-plumbing.js), the plumbing rough-in takeoff beside `pipe-sizing`. cold
+  ports = fixtures; hot ports = hot fixtures; tubing = (cold + hot) x average run x (1 + waste). 8 fixtures with 6 hot
+  needs a 14-port manifold and about 539 LF of PEX at a 35 ft average run; a 12-fixture house (10 hot) needs 22 ports and
+  847 LF. The manifold is sized to the total ports plus spares. The tubing formula uses `(100 + waste)/100` rather than
+  `(1 + waste/100)` to avoid a floating-point artifact (770 * 1.1 = 847.0000000000001, which would ceil to 848). Home
+  count 1,354 -> 1,355.
+
 ### feat(construction): rebar-chair-count -- rebar chair / bar-support count (spec-v905); 2026-07-17
 
 - New Group E tile `rebar-chair-count` (calc-construction.js), the rebar accessory takeoff beside `rebar-tie-wire` and

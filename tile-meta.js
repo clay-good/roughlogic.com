@@ -176,7 +176,7 @@ const _TILES = [
   ["outdoor-air-ventilation", "C"], ["hood-exhaust", "C"],
   ["shr-latent", "C"],
 
-  ["pipe-sizing", "B"], ["friction-loss", "B"], ["pipe-volume", "B"],
+  ["pipe-sizing", "B"], ["pex-homerun-takeoff", "B"], ["friction-loss", "B"], ["pipe-volume", "B"],
   ["pump-sizing", "B"], ["static-pressure-piping", "B"], ["gas-pipe-sizing", "B"],
   ["slope", "B"], ["pressure-conversion", "B"], ["backflow", "B"],
   ["water-hammer-arrestor", "B"], ["recirc-pump-head", "B"], ["septic-tank", "B"],

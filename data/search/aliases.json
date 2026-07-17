@@ -18702,6 +18702,31 @@
       "kind": "industry"
     },
     {
+      "term": "pex homerun takeoff",
+      "target": "pex-homerun-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "pex manifold ports",
+      "target": "pex-homerun-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "pex tubing footage",
+      "target": "pex-homerun-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "home run plumbing",
+      "target": "pex-homerun-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "manifold port count",
+      "target": "pex-homerun-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

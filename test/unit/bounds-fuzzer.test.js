@@ -26605,3 +26605,24 @@ test("bounds: spec-v905 computeRebarChairCount pins the chair count, squared-spa
   assert.ok("error" in _v905({ slab_area_sf: 1000, support_spacing_ft: 4, waste_pct: -5 }));
   assert.ok("error" in _v905({ slab_area_sf: Infinity, support_spacing_ft: 4, waste_pct: 5 }));
 });
+
+import { computePexHomerunTakeoff as _v906 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v906 computePexHomerunTakeoff pins the ports, tubing footage, and error seams", () => {
+  const r = _v906({ fixtures: 8, hot_fixtures: 6, avg_run_ft: 35, waste_pct: 10 });
+  assert.equal(r.cold_ports, 8); // fixtures
+  assert.equal(r.hot_ports, 6); // hot fixtures
+  assert.equal(r.total_ports, 14); // 8 + 6
+  assert.equal(r.tubing_lf, 539); // ceil(14*35*1.10); (100+waste)/100 form avoids the 1.1 float artifact
+  // The fixture count drives both the manifold and the tubing.
+  const big = _v906({ fixtures: 12, hot_fixtures: 10, avg_run_ft: 35, waste_pct: 10 });
+  assert.equal(big.total_ports, 22); // 12 + 10
+  assert.equal(big.tubing_lf, 847); // ceil(22*35*1.10) = 847 exactly, NOT 848 (float dust guarded)
+  // Error seams: non-finite, non-positive fixtures / run, negative hot / waste, hot exceeding total.
+  assert.ok("error" in _v906({ fixtures: 0, hot_fixtures: 6, avg_run_ft: 35, waste_pct: 10 }));
+  assert.ok("error" in _v906({ fixtures: 8, hot_fixtures: 6, avg_run_ft: 0, waste_pct: 10 }));
+  assert.ok("error" in _v906({ fixtures: 8, hot_fixtures: -1, avg_run_ft: 35, waste_pct: 10 }));
+  assert.ok("error" in _v906({ fixtures: 8, hot_fixtures: 6, avg_run_ft: 35, waste_pct: -10 }));
+  assert.ok("error" in _v906({ fixtures: 8, hot_fixtures: 9, avg_run_ft: 35, waste_pct: 10 }));
+  assert.ok("error" in _v906({ fixtures: Infinity, hot_fixtures: 6, avg_run_ft: 35, waste_pct: 10 }));
+});

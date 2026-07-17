@@ -4779,3 +4779,57 @@ function _v903renderHydronicSystemVolume(inputRegion, outputRegion, citationEl) 
   for (const f of [pl, gf, tg, bg, gc]) f.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["hydronic-system-volume"] = _v903renderHydronicSystemVolume;
+
+// ===================== spec-v906: PEX home-run manifold port and tubing takeoff =====================
+// dims: in { fixtures: dimensionless, hot_fixtures: dimensionless, avg_run_ft: L, waste_pct: dimensionless } out: { cold_ports: dimensionless, hot_ports: dimensionless, total_ports: dimensionless, tubing_lf: L }
+export function computePexHomerunTakeoff({ fixtures = 8, hot_fixtures = 6, avg_run_ft = 35, waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fixtures > 0)) return { error: "Fixture count must be positive." };
+  if (!(avg_run_ft > 0)) return { error: "Average run must be positive (ft)." };
+  if (hot_fixtures < 0) return { error: "Hot-fixture count cannot be negative." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  if (hot_fixtures > fixtures) return { error: "Hot fixtures cannot exceed total fixtures." };
+  const cold_ports = fixtures;
+  const hot_ports = hot_fixtures;
+  const total_ports = cold_ports + hot_ports;
+  // (100 + waste)/100 rather than (1 + waste/100): the latter's 1.1 is not exactly
+  // representable, so 770 * 1.1 = 847.0000000000001 and ceils to 848 not 847.
+  const tubing_lf = Math.ceil(total_ports * avg_run_ft * (100 + waste_pct) / 100);
+  if (![cold_ports, hot_ports, total_ports, tubing_lf].every(Number.isFinite)) return { error: "Home-run math is not a finite value." };
+  return {
+    cold_ports,
+    hot_ports,
+    total_ports,
+    tubing_lf,
+    note: "Home-run (manifold) plumbing runs one line per fixture from a central manifold. The manifold is sized to the total ports plus spares. The tubing footage uses the average home-run length. A port count and footage distinct from the flow-sizing pipe-sizing.",
+  };
+}
+
+export const pexHomerunTakeoffExample = { inputs: { fixtures: 8, hot_fixtures: 6, avg_run_ft: 35, waste_pct: 10 } };
+
+function _v906renderPexHomerunTakeoff(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: takeoff identity by name. cold ports = fixtures; hot ports = hot fixtures; tubing = (cold + hot) x average run x (1 + waste). Home-run plumbing runs one line per fixture from a central manifold.";
+  const fx = makeNumber("Total fixtures", "phr-fx", { step: "1", min: "0", value: "8" });
+  fx.input.value = "8";
+  const hf = makeNumber("Fixtures needing hot", "phr-hf", { step: "1", min: "0", value: "6" });
+  hf.input.value = "6";
+  const ar = makeNumber("Average home-run length (ft)", "phr-ar", { step: "any", min: "0", value: "35" });
+  ar.input.value = "35";
+  const ws = makeNumber("Waste allowance (%)", "phr-ws", { step: "any", min: "0", value: "10" });
+  ws.input.value = "10";
+  for (const f of [fx, hf, ar, ws]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fx.input.value = "8"; hf.input.value = "6"; ar.input.value = "35"; ws.input.value = "10"; update(); });
+  const oPorts = makeOutputLine(outputRegion, "Manifold ports", "phr-out-ports");
+  const oTubing = makeOutputLine(outputRegion, "PEX tubing", "phr-out-tubing");
+  const update = debounce(() => {
+    const r = computePexHomerunTakeoff({
+      fixtures: fx.input.value === "" ? 8 : Number(fx.input.value), hot_fixtures: hf.input.value === "" ? 6 : Number(hf.input.value),
+      avg_run_ft: ar.input.value === "" ? 35 : Number(ar.input.value), waste_pct: ws.input.value === "" ? 10 : Number(ws.input.value),
+    });
+    if (r.error) { oPorts.textContent = r.error; oTubing.textContent = "-"; return; }
+    oPorts.textContent = fmt(r.total_ports, 0) + " ports (" + fmt(r.cold_ports, 0) + " cold, " + fmt(r.hot_ports, 0) + " hot)";
+    oTubing.textContent = fmt(r.tubing_lf, 0) + " LF";
+  }, DEBOUNCE_MS);
+  for (const f of [fx, hf, ar, ws]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["pex-homerun-takeoff"] = _v906renderPexHomerunTakeoff;

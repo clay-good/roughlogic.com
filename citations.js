@@ -8420,6 +8420,17 @@ export const CITATIONS = {
       { name: "Grid", value: "square grid: chairs per unit area = 1 / spacing^2", source: "first principles" },
     ],
   },
+  "pex-homerun-takeoff": {
+    formula: "cold_ports = fixtures; hot_ports = hot_fixtures; total_ports = cold_ports + hot_ports; tubing_lf = ceil(total_ports x avg_run_ft x (100 + waste_pct) / 100).",
+    edition: "PEX home-run takeoff identity by name (one port per fixture line; tubing over the average run with waste); first-principles count arithmetic.",
+    freeAccess: "The count arithmetic is public first-principles; the fixture layout and average run come from the rough-in plan.",
+    governance: GOVERNANCE.general,
+    editionNote: "Home-run (manifold) plumbing runs one line per fixture from a central manifold. The manifold is sized to the total ports plus spares. The tubing footage uses the average home-run length. A port count and footage distinct from the flow-sizing pipe-sizing.",
+    assumptions: [
+      { name: "Ports", value: "one cold port per fixture and one hot port per hot fixture, plus spares at the manifold", source: "home-run practice" },
+      { name: "Average run", value: "the average manifold-to-fixture home-run length from the plan", source: "rough-in layout" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

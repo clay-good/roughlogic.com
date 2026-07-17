@@ -181,7 +181,7 @@ const TOOL_MODULES = (() => {
     "groove-weld-strength", "groove-weld-length-for-load", "duct-static-pressure-total", "compression-ratio-refrig",
   ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
-    "pipe-sizing", "friction-loss", "pipe-volume", "pump-sizing",
+    "pipe-sizing", "pex-homerun-takeoff", "friction-loss", "pipe-volume", "pump-sizing",
     "static-pressure-piping", "slope",
     "pressure-conversion", "backflow",
     // v2
