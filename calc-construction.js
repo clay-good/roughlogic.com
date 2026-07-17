@@ -5570,6 +5570,53 @@ const _renderPavementMillingProduction = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["pavement-milling-production"] = _renderPavementMillingProduction;
 
+// --- striping-paint-quantity: Pavement Marking Paint and Glass Bead Quantity ---
+//
+// The paint and the glass beads dropped into it for a striping run - the order
+// that architectural wall-paint coverage never touches:
+//   stripe_sf = length_ft x width_in / 12
+//   paint_gal = stripe_sf / coverage_sf_per_gal
+//   beads_lb = paint_gal x bead_rate_lb_per_gal
+// dims: in { length_ft: L, width_in: L, coverage_sf_per_gal: L^-1, bead_rate_lb_per_gal: M L^-3 } out: { stripe_sf: L^2, paint_gal: L^3, beads_lb: M }
+export function computeStripingPaintQuantity({ length_ft = 5280, width_in = 4, coverage_sf_per_gal = 320, bead_rate_lb_per_gal = 6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(length_ft > 0)) return { error: "Length must be positive (ft)." };
+  if (!(width_in > 0)) return { error: "Width must be positive (in)." };
+  if (!(coverage_sf_per_gal > 0)) return { error: "Coverage must be positive (sf/gal)." };
+  if (!(bead_rate_lb_per_gal > 0)) return { error: "Bead rate must be positive (lb/gal)." };
+  const stripe_sf = (length_ft * width_in) / 12;
+  const paint_gal = stripe_sf / coverage_sf_per_gal;
+  const beads_lb = paint_gal * bead_rate_lb_per_gal;
+  if (![stripe_sf, paint_gal, beads_lb].every(Number.isFinite)) return { error: "Striping math is not a finite value." };
+  return {
+    stripe_sf,
+    paint_gal,
+    beads_lb,
+    note: "The coverage (sf/gal) follows the specified wet-mil thickness - a waterborne line near 15 mil runs about 320-360 sf/gal. The glass-bead drop rate is set by the retroreflectivity spec. A skip (dashed) line applies a duty-cycle fraction of the length, so enter the painted length, not the run. Distinct from architectural wall-paint coverage.",
+  };
+}
+
+export const stripingPaintQuantityExample = { inputs: { length_ft: 5280, width_in: 4, coverage_sf_per_gal: 320, bead_rate_lb_per_gal: 6 } };
+
+const _renderStripingPaintQuantity = _simpleRenderer({
+  citation: "Citation: marking quantity identity by name. stripe area (sf) = length x width / 12; paint (gal) = area / coverage (sf/gal); beads (lb) = gallons x bead rate (lb/gal). The coverage follows the wet-mil thickness; the bead rate follows the retroreflectivity spec.",
+  example: stripingPaintQuantityExample.inputs,
+  fields: [
+    { key: "length_ft", label: "Stripe length (ft)", kind: "number", default: 5280 },
+    { key: "width_in", label: "Stripe width (in)", kind: "number", default: 4 },
+    { key: "coverage_sf_per_gal", label: "Paint coverage (sf/gal)", kind: "number", default: 320 },
+    { key: "bead_rate_lb_per_gal", label: "Glass bead rate (lb/gal)", kind: "number", default: 6 },
+  ],
+  outputs: [
+    { key: "p", id: "spq-out-p", label: "Paint", value: (r) => _fmtC(r.paint_gal, 2) + " gal" },
+    { key: "b", id: "spq-out-b", label: "Glass beads", value: (r) => _fmtC(r.beads_lb, 1) + " lb" },
+    { key: "a", id: "spq-out-a", label: "Stripe area", value: (r) => _fmtC(r.stripe_sf, 0) + " sf" },
+    { key: "n", id: "spq-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeStripingPaintQuantity,
+});
+CONSTRUCTION_RENDERERS["striping-paint-quantity"] = _renderStripingPaintQuantity;
+
 // ----- spec-v246: Concrete Surface Evaporation Rate and Plastic-Shrinkage Risk (ACI 305) -----
 
 // dims: in { air_temp_f: T, concrete_temp_f: T, rh_pct: dimensionless, wind_mph: L T^-1 } out: { E_metric: M L^-2 T^-1, E_us: M L^-2 T^-1 }

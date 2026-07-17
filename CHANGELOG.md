@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): striping-paint-quantity -- pavement marking paint and glass bead quantity (spec-v839); 2026-07-17
+
+- New Group E tile `striping-paint-quantity` (calc-construction.js), the pavement-marking quantity distinct from the
+  architectural `paint-coverage`. Paint and the glass beads dropped into it for a striping run: stripe area = length x
+  width / 12; gallons = area / coverage (sf/gal); beads = gallons x rate (lb/gal). A mile of 4-in line is 1,760 sf -
+  5.5 gal of paint and 33 lb of beads; a 6-in edge line takes 8.25 gal and 49.5 lb (width scales the whole order). The
+  coverage follows the wet-mil thickness and the bead rate the retroreflectivity spec. Home count 1,287 -> 1,288. This
+  paving tile crossed the calc-construction.js gzip cap, raised 132000 -> 140000 (ledger in check-module-sizes.mjs), and
+  the Group E construction group-shell gzip cap, raised 60 -> 64 KB (ledger in check-shells.mjs).
+
 ### feat(construction): pavement-milling-production -- cold-planing production and RAP tonnage (spec-v838); 2026-07-17
 
 - New Group E tile `pavement-milling-production` (calc-construction.js), the milling side of paving beside

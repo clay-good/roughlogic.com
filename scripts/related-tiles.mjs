@@ -1014,6 +1014,7 @@ const RELATED = {
   "dust-control-water": ["water-for-compaction", "dewatering-rate", "haul-cycle-production"],
   "asphalt-spread-rate": ["asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity"],
   "pavement-milling-production": ["asphalt-paving-speed", "asphalt-spread-rate", "haul-cycle-production"],
+  "striping-paint-quantity": ["paint-coverage", "asphalt-tonnage", "coating-coverage-dft"],
   "haul-cycle-production": ["soil-swell-shrink", "excavation", "axle-load-distribution"],
   "loader-production": ["haul-cycle-production", "soil-swell-shrink", "relative-compaction"],
   "dozer-production": ["loader-production", "haul-cycle-production", "soil-swell-shrink"],

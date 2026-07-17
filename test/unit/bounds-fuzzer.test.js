@@ -17109,6 +17109,7 @@ import { computeScaffoldTakeoff as _v835sto } from "../../calc-construction.js";
 import { computeDustControlWater as _v836dcw } from "../../calc-earthwork.js";
 import { computeAsphaltSpreadRate as _v837asr } from "../../calc-construction.js";
 import { computePavementMillingProduction as _v838pmp } from "../../calc-construction.js";
+import { computeStripingPaintQuantity as _v839spq } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17440,6 +17441,23 @@ test("bounds: spec-v838 computePavementMillingProduction pins the area rate, spr
   assert.ok("error" in _v838pmp({ drum_width_ft: 7, speed_fpm: 30, depth_in: 0, density_pcf: 148, efficiency: 0.7 }));
   assert.ok("error" in _v838pmp({ drum_width_ft: 7, speed_fpm: 30, depth_in: 4, density_pcf: 0, efficiency: 0.7 }));
   assert.ok("error" in _v838pmp({ drum_width_ft: 7, speed_fpm: 30, depth_in: 4, density_pcf: 148, efficiency: 0 }));
+});
+
+test("bounds: spec-v839 computeStripingPaintQuantity pins the stripe area, paint gallons, bead weight, and error seams", () => {
+  // 1 mile of 4-in line, 320 sf/gal, 6 lb/gal -> 1,760 sf, 5.5 gal, 33 lb.
+  const r = _v839spq({ length_ft: 5280, width_in: 4, coverage_sf_per_gal: 320, bead_rate_lb_per_gal: 6 });
+  assert.ok(Math.abs(r.stripe_sf - 1760) < 1e-9);
+  assert.ok(Math.abs(r.paint_gal - 5.5) < 1e-9);
+  assert.ok(Math.abs(r.beads_lb - 33) < 1e-9);
+  // A wide 6-in edge line scales the whole order.
+  const wide = _v839spq({ length_ft: 5280, width_in: 6, coverage_sf_per_gal: 320, bead_rate_lb_per_gal: 6 });
+  assert.ok(Math.abs(wide.paint_gal - 8.25) < 1e-9);
+  assert.ok(Math.abs(wide.beads_lb - 49.5) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v839spq({ length_ft: 0, width_in: 4, coverage_sf_per_gal: 320, bead_rate_lb_per_gal: 6 }));
+  assert.ok("error" in _v839spq({ length_ft: 5280, width_in: 0, coverage_sf_per_gal: 320, bead_rate_lb_per_gal: 6 }));
+  assert.ok("error" in _v839spq({ length_ft: 5280, width_in: 4, coverage_sf_per_gal: 0, bead_rate_lb_per_gal: 6 }));
+  assert.ok("error" in _v839spq({ length_ft: 5280, width_in: 4, coverage_sf_per_gal: 320, bead_rate_lb_per_gal: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

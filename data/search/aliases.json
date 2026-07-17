@@ -17027,6 +17027,31 @@
       "kind": "industry"
     },
     {
+      "term": "striping paint quantity",
+      "target": "striping-paint-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "pavement marking paint",
+      "target": "striping-paint-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "line striping gallons",
+      "target": "striping-paint-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "glass bead quantity",
+      "target": "striping-paint-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "road stripe paint",
+      "target": "striping-paint-quantity",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

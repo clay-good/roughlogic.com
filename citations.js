@@ -8145,6 +8145,17 @@ export const CITATIONS = {
       { name: "RAP density", value: "the density of the existing pavement being cut, ~148 pcf default", source: "existing pavement" },
     ],
   },
+  "striping-paint-quantity": {
+    formula: "stripe_sf = length_ft x width_in / 12; paint_gal = stripe_sf / coverage_sf_per_gal; beads_lb = paint_gal x bead_rate_lb_per_gal.",
+    edition: "Pavement-marking quantity identity by name (area from length x width; gallons from area / coverage; beads from gallons x rate); first-principles arithmetic.",
+    freeAccess: "The marking quantity is public quantity-survey arithmetic; the coverage and bead rate come from the marking specification.",
+    governance: GOVERNANCE.general,
+    editionNote: "The coverage (sf/gal) follows the specified wet-mil thickness - a waterborne line near 15 mil runs about 320-360 sf/gal. The glass-bead drop rate is set by the retroreflectivity spec. A skip (dashed) line applies a duty-cycle fraction of the length. Distinct from architectural wall-paint coverage.",
+    assumptions: [
+      { name: "Coverage", value: "~320 sf/gal default for a waterborne line near 15 wet mil; the marking spec's thickness governs", source: "marking specification" },
+      { name: "Bead rate", value: "~6 lb/gal default; set by the retroreflectivity spec", source: "retroreflectivity specification" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

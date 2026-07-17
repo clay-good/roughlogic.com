@@ -89,7 +89,12 @@ const TILE_GZIP_CAP = 6 * 1024;
 // taking construction/index.html to ~56.1 KB gz (over the 56 KB cap at welded-wire-mesh); 60 KB
 // restores ~6.5% headroom for the campaign's remaining Group E landings (this gate runs only in
 // CI's integration job, so push lint stays green while CI goes red -- run check-shells.mjs locally).
-const GROUP_GZIP_CAP = 60 * 1024;
+// Bumped 60 -> 64 KB on 2026-07-17: the spec-v831-v839 construction-ops landing batch added 9 Group E
+// tiles (underground-utility trio, scaffold trio, dust-control-water, asphalt-spread-rate,
+// pavement-milling-production, striping-paint-quantity), taking construction/index.html to ~60.1 KB gz
+// (over the 60 KB cap at striping-paint-quantity); 64 KB restores ~6% headroom (this gate runs only in
+// CI's integration job, so push lint stays green while CI goes red -- run check-shells.mjs locally).
+const GROUP_GZIP_CAP = 64 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

@@ -49639,6 +49639,70 @@
    }
   },
   {
+   "tile_id": "striping-paint-quantity",
+   "source_publisher": "Pavement-marking quantity identity (first-principles)",
+   "source_title": "1 mile of 4-in line, 320 sf/gal, 6 lb/gal beads",
+   "source_edition_or_year": "spec-v839 worked example",
+   "source_section_or_page": "area = 5280*4/12 = 1,760 sf; paint = 1760/320 = 5.5 gal; beads = 5.5*6 = 33 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "length_ft": 5280,
+    "width_in": 4,
+    "coverage_sf_per_gal": 320,
+    "bead_rate_lb_per_gal": 6
+   },
+   "outputs": {
+    "stripe_sf": {
+     "value": 1760,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "paint_gal": {
+     "value": 5.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "beads_lb": {
+     "value": 33,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "striping-paint-quantity",
+   "source_publisher": "Pavement-marking quantity identity (first-principles)",
+   "source_title": "cross-check: a wide 6-in edge line scales the whole order",
+   "source_edition_or_year": "spec-v839 worked example",
+   "source_section_or_page": "area = 5280*6/12 = 2,640 sf; paint = 2640/320 = 8.25 gal; beads = 49.5 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "length_ft": 5280,
+    "width_in": 6,
+    "coverage_sf_per_gal": 320,
+    "bead_rate_lb_per_gal": 6
+   },
+   "outputs": {
+    "paint_gal": {
+     "value": 8.25,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "beads_lb": {
+     "value": 49.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

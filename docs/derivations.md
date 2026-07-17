@@ -1658,6 +1658,7 @@ cross-check.
 | calc-construction.js | `computeStairStringerV7` | `{ total_rise_in = 0, target_rise_in = 7.0, target_tread_in = 11.0, nosing_in ...` | _ | _ | _ |
 | calc-construction.js | `computeStairs` | `{ total_rise_in, preferred_riser_height_in = 7.5 }` | _ | _ | _ |
 | calc-construction.js | `computeStockpileVolume` | `{ base_diameter_ft = 0, repose_angle_deg = 37, density_pcf = 100 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeStripingPaintQuantity` | `{ length_ft = 5280, width_in = 4, coverage_sf_per_gal = 320, bead_rate_lb_per...` | _ | _ | _ |
 | calc-construction.js | `computeThermalStressMaxDeltaT` | `{ allowable_stress_psi = 0, E_psi = 0, alpha = 0, restraint = 1 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeThermalStressRestrained` | `{ E_psi = 0, alpha = 0, dT_F = 0, A_in2 = 0, L_in = 0, restraint = 1 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeTileCount` | `{ area_ft2, tile_width_in, tile_height_in, grout_joint_width_in = 0.125, tile...` | _ | _ | _ |
@@ -2948,7 +2949,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1534.
+Row count: 1535.
 
 <!-- END function-corpus-v14 -->
 
@@ -3496,7 +3497,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (296 tiles)
+### Group E Construction (297 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3753,6 +3754,7 @@ per spec-v14 §13.1 second paragraph.
 | `steel-tension-member` | Steel Tension Member: Yield and Rupture with Shear Lag (AISC 360 D2/D3) | AISC 360-22 Chapter D (D2 / D3, Table...; spec-v283 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-web-local-strength` | Steel Web Local Yielding and Crippling (AISC 360 J10) | AISC 360-22 J10.2 / J10.3; spec-v293 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stockpile-volume` | Conical Stockpile Volume and Tonnage | Right-circular-cone identity (first-p...; radius = 30; height = 30*tan(37) = 22.6 ft; volume = (1/3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `striping-paint-quantity` | Pavement Marking Paint and Glass Bead Quantity | Pavement-marking quantity identity (f...; area = 5280*4/12 = 1,760 sf; paint = 1760/320 = 5.5 gal; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `submerged-earth-pressure` | Submerged-Backfill Earth Pressure (Buoyant + Hydrostatic) | Rankine effective-stress as compiled ...; spec-v625 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `superelevation` | Superelevation / Min Curve Radius (AASHTO) | AASHTO Green Book; spec-v335 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `superelevation-safe-curve-speed` | Safe Curve Speed from Radius and Superelevation | AASHTO Green Book (solved for speed); spec-v756 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4421,6 +4423,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1287. Fixture-covered or reference-cadence: 1287 / 1287.
+Tile count: 1288. Fixture-covered or reference-cadence: 1288 / 1288.
 
 <!-- END tile-index-v14 -->
