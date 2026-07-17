@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): anchor-epoxy-volume -- adhesive-anchor epoxy cartridge volume (spec-v879); 2026-07-17
+
+- New Group E tile `anchor-epoxy-volume` (calc-construction.js), the anchoring takeoff beside the concrete-anchor
+  capacity tiles. per hole = pi/4 x (hole^2 - bar^2) x embedment; cartridges = ceil(holes x per hole x (1 + waste) /
+  cartridge volume). 40 holes of a 5/8 in bar in a 3/4 in hole at 6 in embedment is 0.81 in^3 each -- about 3 cartridges
+  with waste; a deeper 9 in embedment is 1.215 in^3 per hole and 4 cartridges (embedment scales the fill linearly). The
+  annular fill hole diameter comes from the adhesive manufacturer's printed installation instructions. Home count 1,327
+  -> 1,328.
+
 ### feat(construction): rebar-tie-wire -- rebar tie-wire count and weight (spec-v878); 2026-07-17
 
 - New Group E tile `rebar-tie-wire` (calc-construction.js), the rebar takeoff beside `rebar-weight-takeoff` (bars) and

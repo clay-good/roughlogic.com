@@ -17149,6 +17149,7 @@ import { computeSfrmTakeoff as _v875sfr } from "../../calc-construction.js";
 import { computeSprayFoamBoardFeet as _v876sfb } from "../../calc-construction.js";
 import { computeMetalDeckTakeoff as _v877mdt } from "../../calc-construction.js";
 import { computeRebarTieWire as _v878rtw } from "../../calc-construction.js";
+import { computeAnchorEpoxyVolume as _v879aev } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -18156,6 +18157,24 @@ test("bounds: spec-v878 computeRebarTieWire pins the intersections, ties, wire l
   // Tie fraction out of 0-1.
   assert.ok("error" in _v878rtw({ length_ft: 30, width_ft: 20, spacing_in: 12, tie_fraction: 1.5, tie_length_in: 8, wire_lb_per_ft: 0.0181 }));
   assert.ok("error" in _v878rtw({ length_ft: 30, width_ft: 20, spacing_in: 12, tie_fraction: -0.1, tie_length_in: 8, wire_lb_per_ft: 0.0181 }));
+});
+
+test("bounds: spec-v879 computeAnchorEpoxyVolume pins the per-hole and total volume, cartridge count, and error seams", () => {
+  // 40 holes, 3/4 in hole, 5/8 in bar, 6 in embed, 15.3 in^3, 10% waste -> 0.810 in^3/hole, 35.6 total, 3 cartridges.
+  const r = _v879aev({ holes: 40, hole_dia_in: 0.75, bar_dia_in: 0.625, embed_in: 6, cartridge_in3: 15.3, waste_pct: 10 });
+  assert.ok(Math.abs(r.per_hole_in3 - 0.810) < 5e-3);
+  assert.ok(Math.abs(r.total_in3 - 35.6) < 0.2);
+  assert.strictEqual(r.cartridges, 3);
+  // A deeper 9 in embedment scales the fill linearly.
+  assert.strictEqual(_v879aev({ holes: 40, hole_dia_in: 0.75, bar_dia_in: 0.625, embed_in: 9, cartridge_in3: 15.3, waste_pct: 10 }).cartridges, 4);
+  // Error seams.
+  assert.ok("error" in _v879aev({ holes: 0, hole_dia_in: 0.75, bar_dia_in: 0.625, embed_in: 6, cartridge_in3: 15.3 }));
+  assert.ok("error" in _v879aev({ holes: 40, hole_dia_in: 0, bar_dia_in: 0.625, embed_in: 6, cartridge_in3: 15.3 }));
+  assert.ok("error" in _v879aev({ holes: 40, hole_dia_in: 0.75, bar_dia_in: 0.625, embed_in: 0, cartridge_in3: 15.3 }));
+  assert.ok("error" in _v879aev({ holes: 40, hole_dia_in: 0.75, bar_dia_in: 0.625, embed_in: 6, cartridge_in3: 0 }));
+  assert.ok("error" in _v879aev({ holes: 40, hole_dia_in: 0.75, bar_dia_in: 0.625, embed_in: 6, cartridge_in3: 15.3, waste_pct: -1 }));
+  // Bar at or above the hole (no annulus).
+  assert.ok("error" in _v879aev({ holes: 40, hole_dia_in: 0.625, bar_dia_in: 0.625, embed_in: 6, cartridge_in3: 15.3 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

@@ -9119,3 +9119,53 @@ const _v878renderRebarTieWire = _simpleRenderer({
   compute: computeRebarTieWire,
 });
 CONSTRUCTION_RENDERERS["rebar-tie-wire"] = _v878renderRebarTieWire;
+
+// --- anchor-epoxy-volume: Adhesive-Anchor Epoxy Cartridge Volume ---
+//
+// The epoxy to set adhesive anchors - the annular volume per hole and the
+// cartridges:
+//   per_hole_in3 = (PI/4) x (hole_dia_in^2 - bar_dia_in^2) x embed_in
+//   total_in3 = holes x per_hole_in3 x (1 + waste_pct/100)
+//   cartridges = ceil(total_in3 / cartridge_in3)
+// dims: in { holes: dimensionless, hole_dia_in: L, bar_dia_in: L, embed_in: L, cartridge_in3: L^3, waste_pct: dimensionless } out: { per_hole_in3: L^3, total_in3: L^3, cartridges: dimensionless }
+export function computeAnchorEpoxyVolume({ holes = 40, hole_dia_in = 0.75, bar_dia_in = 0.625, embed_in = 6, cartridge_in3 = 15.3, waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(holes > 0)) return { error: "Hole count must be positive." };
+  if (!(hole_dia_in > 0)) return { error: "Hole diameter must be positive (in)." };
+  if (!(embed_in > 0)) return { error: "Embedment must be positive (in)." };
+  if (!(cartridge_in3 > 0)) return { error: "Cartridge volume must be positive (in^3)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  if (!(hole_dia_in > bar_dia_in)) return { error: "Bar diameter exceeds the hole (no annulus to fill)." };
+  const per_hole_in3 = (Math.PI / 4) * (hole_dia_in * hole_dia_in - bar_dia_in * bar_dia_in) * embed_in;
+  const total_in3 = holes * per_hole_in3 * (1 + waste_pct / 100);
+  const cartridges = Math.ceil(total_in3 / cartridge_in3);
+  if (![per_hole_in3, total_in3, cartridges].every(Number.isFinite)) return { error: "Epoxy-volume math is not a finite value." };
+  return {
+    per_hole_in3,
+    total_in3,
+    cartridges,
+    note: "This is the annular fill between the bar and the hole. The hole diameter comes from the adhesive manufacturer's printed installation instructions (oversized relative to the bar). The waste covers the mixing-nozzle purge at each cartridge start. Embedment scales the fill linearly. Distinct from the concrete-anchor capacity calcs.",
+  };
+}
+
+export const anchorEpoxyVolumeExample = { inputs: { holes: 40, hole_dia_in: 0.75, bar_dia_in: 0.625, embed_in: 6, cartridge_in3: 15.3, waste_pct: 10 } };
+
+const _v879renderAnchorEpoxyVolume = _simpleRenderer({
+  citation: "Citation: epoxy-volume identity by name. per hole = pi/4 x (hole^2 - bar^2) x embedment; cartridges = ceil(holes x per hole x (1 + waste) / cartridge volume). The hole diameter comes from the adhesive manufacturer's installation instructions.",
+  example: anchorEpoxyVolumeExample.inputs,
+  fields: [
+    { key: "holes", label: "Number of anchors (count)", kind: "number", default: 40 },
+    { key: "hole_dia_in", label: "Drilled hole diameter (in)", kind: "number", default: 0.75 },
+    { key: "bar_dia_in", label: "Anchor / rebar diameter (in)", kind: "number", default: 0.625 },
+    { key: "embed_in", label: "Embedment depth (in)", kind: "number", default: 6 },
+    { key: "cartridge_in3", label: "Cartridge volume (in^3)", kind: "number", default: 15.3 },
+    { key: "waste_pct", label: "Nozzle-purge waste (percent)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "c", id: "aev-out-c", label: "Epoxy cartridges", value: (r) => _fmtC(r.cartridges, 0) + " cartridges" },
+    { key: "v", id: "aev-out-v", label: "Epoxy volume", value: (r) => _fmtC(r.total_in3, 1) + " in^3 (" + _fmtC(r.per_hole_in3, 3) + " per hole)" },
+    { key: "note", id: "aev-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAnchorEpoxyVolume,
+});
+CONSTRUCTION_RENDERERS["anchor-epoxy-volume"] = _v879renderAnchorEpoxyVolume;

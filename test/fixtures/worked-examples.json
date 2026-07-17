@@ -52027,6 +52027,68 @@
    }
   },
   {
+   "tile_id": "anchor-epoxy-volume",
+   "source_publisher": "Adhesive-anchor epoxy-volume identity (first-principles)",
+   "source_title": "40 holes, 3/4 in hole, 5/8 in bar, 6 in embed, 15.3 in^3 cartridge, 10% waste",
+   "source_edition_or_year": "spec-v879 worked example",
+   "source_section_or_page": "per hole = (PI/4)*(0.75^2-0.625^2)*6 = 0.810 in^3; total = 35.6 in^3; cartridges = ceil(35.6/15.3) = 3",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "holes": 40,
+    "hole_dia_in": 0.75,
+    "bar_dia_in": 0.625,
+    "embed_in": 6,
+    "cartridge_in3": 15.3,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "per_hole_in3": {
+     "value": 0.810,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "total_in3": {
+     "value": 35.6,
+     "tolerance": {
+      "abs": 0.2
+     }
+    },
+    "cartridges": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "anchor-epoxy-volume",
+   "source_publisher": "Adhesive-anchor epoxy-volume identity (first-principles)",
+   "source_title": "cross-check: a deeper 9 in embedment scales the fill linearly",
+   "source_edition_or_year": "spec-v879 worked example",
+   "source_section_or_page": "per hole = 1.215 in^3; total = 53.5 in^3; cartridges = ceil(53.5/15.3) = 4",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "holes": 40,
+    "hole_dia_in": 0.75,
+    "bar_dia_in": 0.625,
+    "embed_in": 9,
+    "cartridge_in3": 15.3,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "cartridges": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

@@ -18027,6 +18027,31 @@
       "kind": "industry"
     },
     {
+      "term": "anchor epoxy volume",
+      "target": "anchor-epoxy-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "adhesive anchor cartridges",
+      "target": "anchor-epoxy-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "epoxy anchor quantity",
+      "target": "anchor-epoxy-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "rebar dowel epoxy",
+      "target": "anchor-epoxy-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "anchor adhesive volume",
+      "target": "anchor-epoxy-volume",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

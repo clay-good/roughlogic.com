@@ -8585,6 +8585,17 @@ export const CITATIONS = {
       { name: "Wire", value: "~8 in per tie, ~0.0181 lb/ft for 16.5 ga annealed tie wire", source: "tie-wire gauge" },
     ],
   },
+  "anchor-epoxy-volume": {
+    formula: "per_hole_in3 = (PI/4) x (hole_dia_in^2 - bar_dia_in^2) x embed_in; total_in3 = holes x per_hole_in3 x (1 + waste_pct/100); cartridges = ceil(total_in3 / cartridge_in3).",
+    edition: "Adhesive-anchor epoxy-volume identity by name (annular fill per hole, times the holes, over the cartridge volume); first-principles geometry.",
+    freeAccess: "The annular-volume geometry is public first-principles; the hole diameter comes from the adhesive manufacturer's printed installation instructions.",
+    governance: GOVERNANCE.general,
+    editionNote: "This is the annular fill between the bar and the hole. The hole diameter comes from the adhesive manufacturer's printed installation instructions (oversized relative to the bar). The waste covers the mixing-nozzle purge at each cartridge start. Distinct from the concrete-anchor capacity calcs.",
+    assumptions: [
+      { name: "Hole diameter", value: "from the adhesive manufacturer's MPII, oversized relative to the bar (e.g. 3/4 in hole for a 5/8 in bar)", source: "adhesive manufacturer MPII" },
+      { name: "Waste", value: "~10% for the mixing-nozzle purge at each cartridge start", source: "installation practice" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",
