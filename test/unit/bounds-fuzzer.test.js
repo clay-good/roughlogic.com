@@ -17126,6 +17126,7 @@ import { computeWirePullingLubricant as _v852wpl } from "../../calc-electrical.j
 import { computeDuctBankConcrete as _v853dbc } from "../../calc-construction.js";
 import { computeBranchCircuitWireFootage as _v854bcw } from "../../calc-electrical.js";
 import { computeLvCablePullFootage as _v855lvf } from "../../calc-lowvoltage.js";
+import { computeSolderJointQuantity as _v856sjq } from "../../calc-plumbing.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17744,6 +17745,24 @@ test("bounds: spec-v855 computeLvCablePullFootage pins the total footage, box co
   assert.ok("error" in _v855lvf({ drops: 48, avg_run_ft: 0, slack_ft: 15, box_ft: 1000 }));
   assert.ok("error" in _v855lvf({ drops: 48, avg_run_ft: 120, slack_ft: 15, box_ft: 0 }));
   assert.ok("error" in _v855lvf({ drops: 48, avg_run_ft: 120, slack_ft: -1, box_ft: 1000 }));
+});
+
+test("bounds: spec-v856 computeSolderJointQuantity pins the weight per inch, solder weight, spool count, and error seams", () => {
+  // 200 joints, 0.75 in/joint, 1/8 in wire, 0.30 lb/in^3 -> 0.003682 lb/in, 0.55 lb, 1 spool.
+  const r = _v856sjq({ joints: 200, wire_in_per_joint: 0.75, wire_dia_in: 0.125, solder_density_lb_in3: 0.30, spool_lb: 1 });
+  assert.ok(Math.abs(r.w_per_in - 0.003682) < 1e-5);
+  assert.ok(Math.abs(r.solder_lb - 0.552) < 5e-3);
+  assert.strictEqual(r.spools, 1);
+  // A 2,000-joint job of 1 in pipe scales it to 8 spools.
+  const big = _v856sjq({ joints: 2000, wire_in_per_joint: 1, wire_dia_in: 0.125, solder_density_lb_in3: 0.30, spool_lb: 1 });
+  assert.ok(Math.abs(big.solder_lb - 7.363) < 1e-2);
+  assert.strictEqual(big.spools, 8);
+  // Error seams.
+  assert.ok("error" in _v856sjq({ joints: 0, wire_in_per_joint: 0.75, wire_dia_in: 0.125, solder_density_lb_in3: 0.30, spool_lb: 1 }));
+  assert.ok("error" in _v856sjq({ joints: 200, wire_in_per_joint: 0, wire_dia_in: 0.125, solder_density_lb_in3: 0.30, spool_lb: 1 }));
+  assert.ok("error" in _v856sjq({ joints: 200, wire_in_per_joint: 0.75, wire_dia_in: 0, solder_density_lb_in3: 0.30, spool_lb: 1 }));
+  assert.ok("error" in _v856sjq({ joints: 200, wire_in_per_joint: 0.75, wire_dia_in: 0.125, solder_density_lb_in3: 0, spool_lb: 1 }));
+  assert.ok("error" in _v856sjq({ joints: 200, wire_in_per_joint: 0.75, wire_dia_in: 0.125, solder_density_lb_in3: 0.30, spool_lb: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

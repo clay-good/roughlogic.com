@@ -17452,6 +17452,31 @@
       "kind": "industry"
     },
     {
+      "term": "solder per joint",
+      "target": "solder-joint-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "sweat joint solder",
+      "target": "solder-joint-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "copper solder takeoff",
+      "target": "solder-joint-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "solder wire quantity",
+      "target": "solder-joint-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "plumbing solder spools",
+      "target": "solder-joint-quantity",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

@@ -8332,6 +8332,17 @@ export const CITATIONS = {
       { name: "Channel limit", value: "each run is length-limited separately by TIA-568 (the 100 m channel), checked by structured-cabling-channel", source: "TIA-568" },
     ],
   },
+  "solder-joint-quantity": {
+    formula: "w_per_in = (PI/4) x wire_dia_in^2 x solder_density_lb_in3; solder_lb = joints x wire_in_per_joint x w_per_in; spools = ceil(solder_lb / spool_lb).",
+    edition: "Solder-weight identity by name (solid-wire cross-section x density x length); first-principles geometry.",
+    freeAccess: "The wire weight is pure geometry (a length of solid wire of known diameter and density); the field wire-per-joint rule is public practice.",
+    governance: GOVERNANCE.general,
+    editionNote: "The wire length per joint is a field rule of thumb (roughly the pipe diameter in inches of 1/8 in solid wire) that varies with cup depth and technique. Lead-free solder runs about 0.30 lb/in^3. The crew buys spools with a spare.",
+    assumptions: [
+      { name: "Wire per joint", value: "~the pipe diameter in inches of 1/8 in solid wire; varies with cup depth and technique", source: "field rule of thumb" },
+      { name: "Solder density", value: "~0.30 lb/in^3 for lead-free solder", source: "solder manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

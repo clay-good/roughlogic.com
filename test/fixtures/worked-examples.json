@@ -50631,6 +50631,72 @@
    }
   },
   {
+   "tile_id": "solder-joint-quantity",
+   "source_publisher": "Solder-weight identity (first-principles)",
+   "source_title": "200 joints, 0.75 in/joint, 1/8 in wire, 0.30 lb/in^3, 1 lb spools",
+   "source_edition_or_year": "spec-v856 worked example",
+   "source_section_or_page": "w/in = (PI/4)*0.125^2*0.30 = 0.003682; solder = 200*0.75*0.003682 = 0.55 lb; spools = 1",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "joints": 200,
+    "wire_in_per_joint": 0.75,
+    "wire_dia_in": 0.125,
+    "solder_density_lb_in3": 0.30,
+    "spool_lb": 1
+   },
+   "outputs": {
+    "w_per_in": {
+     "value": 0.003682,
+     "tolerance": {
+      "abs": 0.00001
+     }
+    },
+    "solder_lb": {
+     "value": 0.552,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "spools": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "solder-joint-quantity",
+   "source_publisher": "Solder-weight identity (first-principles)",
+   "source_title": "cross-check: a 2,000-joint job of 1 in pipe (1 in wire per joint)",
+   "source_edition_or_year": "spec-v856 worked example",
+   "source_section_or_page": "solder = 2000*1*0.003682 = 7.36 lb; spools = ceil(7.36) = 8",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "joints": 2000,
+    "wire_in_per_joint": 1,
+    "wire_dia_in": 0.125,
+    "solder_density_lb_in3": 0.30,
+    "spool_lb": 1
+   },
+   "outputs": {
+    "solder_lb": {
+     "value": 7.363,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "spools": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

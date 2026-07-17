@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): solder-joint-quantity -- solder and flux per sweat-joint takeoff (spec-v856); 2026-07-17
+
+- New Group B tile `solder-joint-quantity` (calc-plumbing.js), opening the plumbing install-ops vein. Solder for a
+  copper rough-in from the joint count: weight per inch = pi/4 x diameter^2 x density; solder = joints x wire per joint
+  x weight per inch. 200 three-quarter-inch joints at about 0.75 in of 1/8 in solid wire each is 0.55 lb (one spool),
+  and a 2,000-joint job of 1 in pipe is over 7.36 lb, eight spools. The wire per joint is a field rule (~the pipe
+  diameter in inches); lead-free solder runs ~0.30 lb/in^3. Home count 1,304 -> 1,305.
+
 ### feat(lowvoltage): lv-cable-pull-footage -- low-voltage cable footage and box count (spec-v855); 2026-07-17
 
 - New Group A tile `lv-cable-pull-footage` (calc-lowvoltage.js), the LV install-ops takeoff beside
