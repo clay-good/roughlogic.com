@@ -9,6 +9,7 @@
 //   - dozer-production        Dozer slot / blade production rate
 //   - compaction-roller-production  Roller compaction production rate
 //   - ripper-production       Dozer ripper loosening production rate
+//   - water-for-compaction    Water to reach optimum moisture for compaction
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
@@ -402,6 +403,64 @@ function _v820renderRipperProduction(inputRegion, outputRegion, citationEl) {
   for (const f of [spacing, pen, speed, eff]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["ripper-production"] = _v820renderRipperProduction;
+
+// --- water-for-compaction: Water to Reach Optimum Moisture for Compaction ---
+//
+// dry_weight = volume x 27 x dry_density; water_lb = (omc - field)/100 x dry_weight;
+// gallons = water_lb / 8.34. A negative result (field > omc) signals aerate, not water.
+// dims: in { volume_bcy: L^3, dry_density_pcf: M L^-3, omc_pct: dimensionless, field_pct: dimensionless } out: { dry_weight_lb: M, water_lb: M, water_gal: L^3 }
+// (Lift volume is L^3; dry density M L^-3; both moisture contents dimensionless;
+//  the dry and water weights M and the water gallons a volume L^3.)
+export function computeWaterForCompaction({ volume_bcy, dry_density_pcf, omc_pct, field_pct } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const vol = Number(volume_bcy);
+  const dd = Number(dry_density_pcf);
+  const omc = Number(omc_pct);
+  const field = Number(field_pct);
+  if (!Number.isFinite(vol) || vol <= 0) return { error: "Lift volume must be a positive finite number (bcy)." };
+  if (!Number.isFinite(dd) || dd <= 0) return { error: "Dry density must be a positive finite number (pcf)." };
+  if (!Number.isFinite(omc) || omc < 0) return { error: "Optimum moisture must be a non-negative finite percent." };
+  if (!Number.isFinite(field) || field < 0) return { error: "Field moisture must be a non-negative finite percent." };
+  const dryWeightLb = vol * 27 * dd;
+  const waterLb = ((omc - field) / 100) * dryWeightLb;
+  const waterGal = waterLb / 8.34;
+  const needsDrying = field > omc;
+  if (![dryWeightLb, waterLb, waterGal].every(Number.isFinite)) return { error: "Moisture math is not a finite value." };
+  return {
+    dry_weight_lb: dryWeightLb,
+    water_lb: waterLb,
+    water_gal: waterGal,
+    needs_drying: needsDrying,
+    note: "The optimum moisture and maximum dry density come from the Proctor (the geotech governs); the field moisture comes from a field test. Water is added and mixed before the roller - a dry surface skin over a wet core still fails. A lift wetter than optimum must be aerated and dried, not watered (a negative water figure is that signal).",
+  };
+}
+
+function _v821renderWaterForCompaction(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: gravimetric water-content identity by name. water to add = (optimum - field)/100 x dry soil weight; dry weight = volume x 27 x dry density; gallons = pounds / 8.34 (weight of a gallon of water).";
+  const vol = makeNumber("Lift volume, bank measure (cy)", "wfc-vol", { step: "any", min: "0" });
+  const dd = makeNumber("Maximum dry density, Proctor (pcf)", "wfc-dd", { step: "any", min: "0" });
+  const omc = makeNumber("Optimum moisture content (%)", "wfc-omc", { step: "any", min: "0" });
+  const field = makeNumber("Current field moisture (%)", "wfc-field", { step: "any", min: "0" });
+  for (const f of [vol, dd, omc, field]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { vol.input.value = "100"; dd.input.value = "105"; omc.input.value = "14"; field.input.value = "9"; update(); });
+  const oWater = makeOutputLine(outputRegion, "Water to add", "wfc-out-water");
+  const oDry = makeOutputLine(outputRegion, "Dry soil weight", "wfc-out-dry");
+  const update = debounce(() => {
+    const r = computeWaterForCompaction({
+      volume_bcy: Number(vol.input.value) || 0, dry_density_pcf: Number(dd.input.value) || 0,
+      omc_pct: omc.input.value === "" ? 0 : Number(omc.input.value), field_pct: field.input.value === "" ? 0 : Number(field.input.value),
+    });
+    if (r.error) { oWater.textContent = r.error; oDry.textContent = "-"; return; }
+    if (r.needs_drying) {
+      oWater.textContent = "Aerate and dry (field moisture is above optimum by " + fmt(-(r.water_lb) / (r.dry_weight_lb) * 100, 1) + "%)";
+    } else {
+      oWater.textContent = fmt(r.water_gal, 0) + " gal (" + fmt(r.water_lb, 0) + " lb)";
+    }
+    oDry.textContent = fmt(r.dry_weight_lb, 0) + " lb";
+  }, DEBOUNCE_MS);
+  for (const f of [vol, dd, omc, field]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["water-for-compaction"] = _v821renderWaterForCompaction;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

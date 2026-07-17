@@ -17091,6 +17091,7 @@ test("bounds: spec-v662 computeEtHorsepower inverts the ET relation, round-trips
 
 // ===================== spec-v326..v328 soil characterization / QC batch =====================
 import { computeRelativeCompaction as _v326, computeSoilPhaseRelations as _v327, computeAtterbergIndices as _v328 } from "../../calc-earthwork.js";
+import { computeWaterForCompaction as _v821wfc } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17107,6 +17108,26 @@ test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, th
   assert.ok("error" in _v326({ wet_pcf: 128, w_pct: -1, max_pcf: 120 }));
   assert.ok("error" in _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 0 }));
   assert.ok("error" in _v326({ wet_pcf: Infinity, w_pct: 12, max_pcf: 120 }));
+});
+
+test("bounds: spec-v821 computeWaterForCompaction pins dry weight, water lb/gal, needs_drying, and error seams", () => {
+  // 100 bcy, 105 pcf dry, omc 14, field 9 -> 283,500 lb dry, 14,175 lb water, 1,700 gal
+  const r = _v821wfc({ volume_bcy: 100, dry_density_pcf: 105, omc_pct: 14, field_pct: 9 });
+  assert.strictEqual(r.dry_weight_lb, 283500);
+  assert.ok(Math.abs(r.water_lb - 14175) < 1e-6);
+  assert.ok(Math.abs(r.water_gal - 1699.64) < 1e-1);
+  assert.strictEqual(r.needs_drying, false);
+  // Near optimum: less water.
+  assert.ok(Math.abs(_v821wfc({ volume_bcy: 100, dry_density_pcf: 105, omc_pct: 14, field_pct: 12 }).water_gal - 679.86) < 1e-1);
+  // Above optimum: needs_drying true, negative water figure.
+  const wet = _v821wfc({ volume_bcy: 100, dry_density_pcf: 105, omc_pct: 14, field_pct: 16 });
+  assert.strictEqual(wet.needs_drying, true);
+  assert.ok(wet.water_lb < 0);
+  // Error seams.
+  assert.ok("error" in _v821wfc({ volume_bcy: 0, dry_density_pcf: 105, omc_pct: 14, field_pct: 9 }));
+  assert.ok("error" in _v821wfc({ volume_bcy: 100, dry_density_pcf: 0, omc_pct: 14, field_pct: 9 }));
+  assert.ok("error" in _v821wfc({ volume_bcy: 100, dry_density_pcf: 105, omc_pct: -1, field_pct: 9 }));
+  assert.ok("error" in _v821wfc({ volume_bcy: 100, dry_density_pcf: 105, omc_pct: 14, field_pct: -1 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

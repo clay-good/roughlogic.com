@@ -1,6 +1,7 @@
 # roughlogic.com Specification v821 -- Water to Reach Optimum Moisture for Compaction (calc-earthwork.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-16 (package 0.398.0).** Executed against the live catalog (1,269 -> 1,270 tiles). The
+> calc-earthwork.js module gzip cap was raised 15 -> 20 KB for the erosion/compaction cluster. Single-tile spec.
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-earthwork.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v820.md. Earthwork/compaction sweep, beside
 > `relative-compaction` and `compaction-roller-production`.

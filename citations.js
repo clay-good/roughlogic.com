@@ -11778,6 +11778,17 @@ export const CITATIONS = {
       { name: "Proctor basis", value: "maximum dry density from ASTM D698 (standard) or D1557 (modified)", source: "ASTM D698 / D1557" },
     ],
   },
+  "water-for-compaction": {
+    formula: "dry_weight_lb = volume_bcy x 27 x dry_density_pcf; water_lb = (omc_pct - field_pct)/100 x dry_weight_lb; water_gal = water_lb / 8.34; needs_drying = field_pct > omc_pct.",
+    edition: "Gravimetric water-content identity by name (water added = moisture deficit x dry soil mass); first-principles arithmetic.",
+    freeAccess: "The gravimetric water-content relation is public soil-mechanics practice; the 8.34 lb/gal water weight is a physical fact.",
+    governance: GOVERNANCE.general,
+    editionNote: "The optimum moisture and maximum dry density come from the Proctor (the geotech governs); the field moisture comes from a field test. Water is added and mixed before the roller - a dry surface skin over a wet core still fails. A lift wetter than optimum must be aerated and dried, not watered (a negative water figure is that signal).",
+    assumptions: [
+      { name: "Optimum moisture", value: "from the ASTM D698 / D1557 Proctor (the geotech governs)", source: "geotechnical report" },
+      { name: "Water weight", value: "8.34 lb per gallon (water at ~60 F)", source: "physical fact" },
+    ],
+  },
   "soil-phase-relations": {
     formula: "gamma_d = gamma/(1 + w/100); e = Gs gamma_w/gamma_d - 1; n = e/(1 + e); S = w Gs/e. (gamma_w = 62.4 pcf)",
     edition: "The soil three-phase relations - dry unit weight, void ratio, porosity, and degree of saturation - as compiled in the Das and NAVFAC geotechnical references, by name.",

@@ -653,7 +653,7 @@ const TOOL_MODULES = (() => {
     "soil-swell-shrink", "haul-cycle-production", "loader-production", "dozer-production", "compaction-roller-production", "ripper-production", "dewatering-rate",
     "spoil-setback", "pipe-bedding-backfill",
     // spec-v326..v328 soil characterization / QC batch
-    "relative-compaction", "soil-phase-relations", "atterberg-indices", "fineness-modulus",
+    "relative-compaction", "water-for-compaction", "soil-phase-relations", "atterberg-indices", "fineness-modulus",
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",

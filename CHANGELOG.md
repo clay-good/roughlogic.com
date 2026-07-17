@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): water-for-compaction -- water to reach optimum moisture (spec-v821); 2026-07-16
+
+- New Group E tile `water-for-compaction` (calc-earthwork.js), the moisture-conditioning step between the loosening/
+  placing tiles and relative-compaction. Gravimetric water-content identity: water = (optimum - field)/100 x dry soil
+  weight, gallons = lb / 8.34. A 100 bcy lift at 105 pcf dry, sitting at 9% when optimum is 14%, needs ~1,700 gal (one
+  water truck); a lift above optimum returns a negative water figure and needs_drying = true (aerate, not water). The
+  calc-earthwork.js per-module gzip cap was raised 15 -> 20 KB for the erosion/compaction cluster. Home count 1,269 -> 1,270.
+
 ### feat(construction): welded-wire-mesh -- WWF slab mesh sheet takeoff (spec-v819); 2026-07-16
 
 - New Group E tile `welded-wire-mesh` (calc-construction.js), the mesh takeoff beside the bar-based rebar-schedule.

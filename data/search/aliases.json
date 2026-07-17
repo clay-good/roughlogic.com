@@ -16602,6 +16602,31 @@
       "kind": "industry"
     },
     {
+      "term": "water for compaction",
+      "target": "water-for-compaction",
+      "kind": "industry"
+    },
+    {
+      "term": "optimum moisture water",
+      "target": "water-for-compaction",
+      "kind": "industry"
+    },
+    {
+      "term": "add water to soil",
+      "target": "water-for-compaction",
+      "kind": "industry"
+    },
+    {
+      "term": "moisture conditioning gallons",
+      "target": "water-for-compaction",
+      "kind": "industry"
+    },
+    {
+      "term": "proctor moisture water",
+      "target": "water-for-compaction",
+      "kind": "industry"
+    },
+    {
       "term": "percent compaction",
       "target": "relative-compaction",
       "kind": "industry"
