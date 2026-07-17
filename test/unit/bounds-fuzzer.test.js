@@ -17127,6 +17127,7 @@ import { computeDuctBankConcrete as _v853dbc } from "../../calc-construction.js"
 import { computeBranchCircuitWireFootage as _v854bcw } from "../../calc-electrical.js";
 import { computeLvCablePullFootage as _v855lvf } from "../../calc-lowvoltage.js";
 import { computeSolderJointQuantity as _v856sjq } from "../../calc-plumbing.js";
+import { computePipeInsulationTakeoff as _v857pit } from "../../calc-plumbing.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17763,6 +17764,25 @@ test("bounds: spec-v856 computeSolderJointQuantity pins the weight per inch, sol
   assert.ok("error" in _v856sjq({ joints: 200, wire_in_per_joint: 0.75, wire_dia_in: 0, solder_density_lb_in3: 0.30, spool_lb: 1 }));
   assert.ok("error" in _v856sjq({ joints: 200, wire_in_per_joint: 0.75, wire_dia_in: 0.125, solder_density_lb_in3: 0, spool_lb: 1 }));
   assert.ok("error" in _v856sjq({ joints: 200, wire_in_per_joint: 0.75, wire_dia_in: 0.125, solder_density_lb_in3: 0.30, spool_lb: 0 }));
+});
+
+test("bounds: spec-v857 computePipeInsulationTakeoff pins the cut length, section count, jacket area, and error seams", () => {
+  // 250 ft, 5% waste, 12 fittings at 1 ft, 3 ft sections, 4.5 in OD -> 274.5 ft, 92 sections, 323 sf.
+  const r = _v857pit({ pipe_ft: 250, waste_pct: 5, num_fittings: 12, fitting_allow_ft: 1, section_len_ft: 3, insul_od_in: 4.5 });
+  assert.ok(Math.abs(r.cut_ft - 274.5) < 1e-9);
+  assert.strictEqual(r.sections, 92);
+  assert.ok(Math.abs(r.jacket_sf - 323.4) < 0.5);
+  // Thicker insulation at a 6 in OD raises the jacket, sections hold.
+  const thick = _v857pit({ pipe_ft: 250, waste_pct: 5, num_fittings: 12, fitting_allow_ft: 1, section_len_ft: 3, insul_od_in: 6 });
+  assert.ok(Math.abs(thick.jacket_sf - 431.2) < 0.5);
+  assert.strictEqual(thick.sections, 92);
+  // Error seams.
+  assert.ok("error" in _v857pit({ pipe_ft: 0, waste_pct: 5, num_fittings: 12, fitting_allow_ft: 1, section_len_ft: 3, insul_od_in: 4.5 }));
+  assert.ok("error" in _v857pit({ pipe_ft: 250, waste_pct: 5, num_fittings: 12, fitting_allow_ft: 0, section_len_ft: 3, insul_od_in: 4.5 }));
+  assert.ok("error" in _v857pit({ pipe_ft: 250, waste_pct: 5, num_fittings: 12, fitting_allow_ft: 1, section_len_ft: 0, insul_od_in: 4.5 }));
+  assert.ok("error" in _v857pit({ pipe_ft: 250, waste_pct: 5, num_fittings: 12, fitting_allow_ft: 1, section_len_ft: 3, insul_od_in: 0 }));
+  assert.ok("error" in _v857pit({ pipe_ft: 250, waste_pct: -1, num_fittings: 12, fitting_allow_ft: 1, section_len_ft: 3, insul_od_in: 4.5 }));
+  assert.ok("error" in _v857pit({ pipe_ft: 250, waste_pct: 5, num_fittings: -1, fitting_allow_ft: 1, section_len_ft: 3, insul_od_in: 4.5 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

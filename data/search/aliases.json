@@ -17477,6 +17477,31 @@
       "kind": "industry"
     },
     {
+      "term": "pipe insulation takeoff",
+      "target": "pipe-insulation-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "pipe insulation quantity",
+      "target": "pipe-insulation-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "insulation jacket area",
+      "target": "pipe-insulation-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "insulation sections count",
+      "target": "pipe-insulation-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "mechanical insulation takeoff",
+      "target": "pipe-insulation-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

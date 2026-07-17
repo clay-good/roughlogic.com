@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): pipe-insulation-takeoff -- pipe insulation and jacket material takeoff (spec-v857); 2026-07-17
+
+- New Group B tile `pipe-insulation-takeoff` (calc-plumbing.js), the mechanical-insulation material takeoff distinct
+  from the thermal `insulation-thickness`. cut = pipe x (1 + waste) + fittings x allowance; sections = ceil(cut /
+  section length); jacket = pi x insulation OD x cut. 250 ft of 2 in pipe with a dozen ells at 5% waste is 274.5 ft of
+  insulation -- 92 three-foot sections and 323 sf of jacket; thicker insulation at a 6 in OD raises the jacket to 431 sf
+  while the section count holds (the OD drives the jacket, the length drives the sections). Home count 1,305 -> 1,306.
+
 ### feat(plumbing): solder-joint-quantity -- solder and flux per sweat-joint takeoff (spec-v856); 2026-07-17
 
 - New Group B tile `solder-joint-quantity` (calc-plumbing.js), opening the plumbing install-ops vein. Solder for a

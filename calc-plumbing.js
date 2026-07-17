@@ -4553,3 +4553,59 @@ function _v856renderSolderJointQuantity(inputRegion, outputRegion, citationEl) {
   for (const f of [j, wj, wd, dn, sp]) f.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["solder-joint-quantity"] = _v856renderSolderJointQuantity;
+
+// ===================== spec-v857: pipe insulation and jacket material takeoff =====================
+// dims: in { pipe_ft: L, waste_pct: dimensionless, num_fittings: dimensionless, fitting_allow_ft: L, section_len_ft: L, insul_od_in: L } out: { cut_ft: L, sections: dimensionless, jacket_sf: L^2 }
+export function computePipeInsulationTakeoff({ pipe_ft = 250, waste_pct = 5, num_fittings = 12, fitting_allow_ft = 1, section_len_ft = 3, insul_od_in = 4.5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(pipe_ft > 0)) return { error: "Pipe length must be positive (ft)." };
+  if (!(fitting_allow_ft > 0)) return { error: "Fitting allowance must be positive (ft)." };
+  if (!(section_len_ft > 0)) return { error: "Section length must be positive (ft)." };
+  if (!(insul_od_in > 0)) return { error: "Insulation OD must be positive (in)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  if (num_fittings < 0) return { error: "Fitting count cannot be negative." };
+  const cut_ft = pipe_ft * (1 + waste_pct / 100) + num_fittings * fitting_allow_ft;
+  const sections = Math.ceil(cut_ft / section_len_ft);
+  const jacket_sf = Math.PI * (insul_od_in / 12) * cut_ft;
+  if (![cut_ft, sections, jacket_sf].every(Number.isFinite)) return { error: "Insulation-takeoff math is not a finite value." };
+  return {
+    cut_ft,
+    sections,
+    jacket_sf,
+    note: "The fitting allowance covers ells, tees, and valves (a valve is several feet of equivalent length). The jacket area uses the insulation outside diameter (not the pipe). This is a material takeoff distinct from the thermal insulation-thickness; the spec sets the thickness and jacket type.",
+  };
+}
+
+export const pipeInsulationTakeoffExample = { inputs: { pipe_ft: 250, waste_pct: 5, num_fittings: 12, fitting_allow_ft: 1, section_len_ft: 3, insul_od_in: 4.5 } };
+
+function _v857renderPipeInsulationTakeoff(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: insulation-takeoff identity by name. cut = pipe x (1 + waste) + fittings x allowance; sections = ceil(cut / section length); jacket = pi x insulation OD x cut. The jacket area uses the insulation OD, not the pipe.";
+  const p = makeNumber("Pipe run length (ft)", "pit-p", { step: "any", min: "0", value: "250" });
+  p.input.value = "250";
+  const w = makeNumber("Waste allowance (percent)", "pit-w", { step: "any", min: "0", value: "5" });
+  w.input.value = "5";
+  const nf = makeNumber("Ells / tees / valves (count)", "pit-nf", { step: "any", min: "0", value: "12" });
+  nf.input.value = "12";
+  const fa = makeNumber("Insulation allowance per fitting (ft)", "pit-fa", { step: "any", min: "0", value: "1" });
+  fa.input.value = "1";
+  const sl = makeNumber("Insulation section length (ft)", "pit-sl", { step: "any", min: "0", value: "3" });
+  sl.input.value = "3";
+  const od = makeNumber("Insulation outside diameter (in)", "pit-od", { step: "any", min: "0", value: "4.5" });
+  od.input.value = "4.5";
+  for (const f of [p, w, nf, fa, sl, od]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { p.input.value = "250"; w.input.value = "5"; nf.input.value = "12"; fa.input.value = "1"; sl.input.value = "3"; od.input.value = "4.5"; update(); });
+  const oSections = makeOutputLine(outputRegion, "Insulation sections", "pit-out-sections");
+  const oJacket = makeOutputLine(outputRegion, "Jacket area", "pit-out-jacket");
+  const update = debounce(() => {
+    const r = computePipeInsulationTakeoff({
+      pipe_ft: p.input.value === "" ? 250 : Number(p.input.value), waste_pct: w.input.value === "" ? 0 : Number(w.input.value),
+      num_fittings: nf.input.value === "" ? 0 : Number(nf.input.value), fitting_allow_ft: fa.input.value === "" ? 1 : Number(fa.input.value),
+      section_len_ft: sl.input.value === "" ? 3 : Number(sl.input.value), insul_od_in: od.input.value === "" ? 4.5 : Number(od.input.value),
+    });
+    if (r.error) { oSections.textContent = r.error; oJacket.textContent = "-"; return; }
+    oSections.textContent = fmt(r.sections, 0) + " sections (" + fmt(r.cut_ft, 1) + " ft cut)";
+    oJacket.textContent = fmt(r.jacket_sf, 0) + " sf";
+  }, DEBOUNCE_MS);
+  for (const f of [p, w, nf, fa, sl, od]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["pipe-insulation-takeoff"] = _v857renderPipeInsulationTakeoff;

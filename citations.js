@@ -8343,6 +8343,17 @@ export const CITATIONS = {
       { name: "Solder density", value: "~0.30 lb/in^3 for lead-free solder", source: "solder manufacturer" },
     ],
   },
+  "pipe-insulation-takeoff": {
+    formula: "cut_ft = pipe_ft x (1 + waste_pct/100) + num_fittings x fitting_allow_ft; sections = ceil(cut_ft / section_len_ft); jacket_sf = PI x (insul_od_in/12) x cut_ft.",
+    edition: "Mechanical-insulation takeoff identity by name (cut length with fitting allowances; sections and jacket from the cut); first-principles takeoff arithmetic.",
+    freeAccess: "The takeoff is public quantity-survey arithmetic; the insulation thickness and jacket type come from the mechanical specification.",
+    governance: GOVERNANCE.general,
+    editionNote: "The fitting allowance covers ells, tees, and valves (a valve is several feet of equivalent length). The jacket area uses the insulation outside diameter (not the pipe). This is a material takeoff distinct from the thermal insulation-thickness; the spec sets the thickness and jacket type.",
+    assumptions: [
+      { name: "Fitting allowance", value: "insulation length per ell/tee/valve (~1 ft default; a valve is several feet)", source: "insulation practice" },
+      { name: "Jacket diameter", value: "the insulation outside diameter (pipe OD + 2 x thickness), not the pipe", source: "insulation spec" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

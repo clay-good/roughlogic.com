@@ -2448,6 +2448,7 @@ cross-check.
 | calc-plumbing.js | `computeOrificeFlow` | `{ d_in = 0, h_ft = 0, cd = 0.60 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computePipeExpansion` | `{ material, length_ft, delta_T_F }` | _ | _ | _ |
 | calc-plumbing.js | `computePipeExpansionLoop` | `{ material = "copper", length_ft = 0, delta_T_F = 0, pipe_OD_in = 1.315, } = {}` | _ | _ | _ |
+| calc-plumbing.js | `computePipeInsulationTakeoff` | `{ pipe_ft = 250, waste_pct = 5, num_fittings = 12, fitting_allow_ft = 1, sect...` | _ | _ | _ |
 | calc-plumbing.js | `computePipeSizing` | `{ fixtures, slope_in_per_ft = 0.25 }` | _ | _ | _ |
 | calc-plumbing.js | `computePipeVelocity` | `{ mode = "velocity-from-flow", flow_gpm = 0, diameter_in = 0, material = "cop...` | _ | _ | _ |
 | calc-plumbing.js | `computePipeVolume` | `{ internal_diameter_in, length_ft, nominal_size }` | _ | _ | _ |
@@ -2966,7 +2967,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1552.
+Row count: 1553.
 
 <!-- END function-corpus-v14 -->
 
@@ -3217,7 +3218,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (106 tiles)
+### Group B Plumbing (107 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3266,6 +3267,7 @@ per spec-v14 §13.1 second paragraph.
 | `pipe-expansion` | Pipe Thermal Expansion | ASHRAE / ASTM; Copper alpha = 9.4e-6 in/in/F; 100 ft of copper x 100 F d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-expansion-loop` | Pipe Thermal Expansion and Loop Sizing | Project (first-principles); Carbon steel A53 4.5 in OD / 200 ft run / 100 F dT -> 1.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-filled-support-load` | Filled Pipe Support Load per Hanger | First-principles cross-section x dens...; spec-v161 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pipe-insulation-takeoff` | Pipe Insulation and Jacket Material Takeoff | Mechanical-insulation takeoff identit...; cut = 250*1.05 + 12 = 274.5 ft; sections = ceil(274.5/3) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pipe-pressure-rating` | Pipe Pressure Rating and Required Wall (ASME B31.1) | ASME B31.1 Power Piping (by name); spec-v160 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pipe-sizing` | Pipe Sizing | IPC / UPC fixture-unit tables (projec...; 2x lavatory + 2x WC flush-tank + 1x shower + 1x kitchen s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-support-spacing` | Pipe Hanger Spacing and Count | IPC 2021 Table 308.5 / MSS SP-58; 1 in type-L copper, horizontal, 24 ft run -> 6 ft max spa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4457,6 +4459,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1305. Fixture-covered or reference-cadence: 1305 / 1305.
+Tile count: 1306. Fixture-covered or reference-cadence: 1306 / 1306.
 
 <!-- END tile-index-v14 -->

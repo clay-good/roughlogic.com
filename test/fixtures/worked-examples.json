@@ -50697,6 +50697,68 @@
    }
   },
   {
+   "tile_id": "pipe-insulation-takeoff",
+   "source_publisher": "Mechanical-insulation takeoff identity (first-principles)",
+   "source_title": "250 ft pipe, 5% waste, 12 fittings at 1 ft, 3 ft sections, 4.5 in OD",
+   "source_edition_or_year": "spec-v857 worked example",
+   "source_section_or_page": "cut = 250*1.05 + 12 = 274.5 ft; sections = ceil(274.5/3) = 92; jacket = PI*(4.5/12)*274.5 = 323 sf",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "pipe_ft": 250,
+    "waste_pct": 5,
+    "num_fittings": 12,
+    "fitting_allow_ft": 1,
+    "section_len_ft": 3,
+    "insul_od_in": 4.5
+   },
+   "outputs": {
+    "cut_ft": {
+     "value": 274.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "sections": {
+     "value": 92,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "jacket_sf": {
+     "value": 323.4,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-insulation-takeoff",
+   "source_publisher": "Mechanical-insulation takeoff identity (first-principles)",
+   "source_title": "cross-check: thicker insulation at a 6 in OD raises the jacket",
+   "source_edition_or_year": "spec-v857 worked example",
+   "source_section_or_page": "jacket = PI*(6/12)*274.5 = 431 sf (OD drives the jacket, length drives sections)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "pipe_ft": 250,
+    "waste_pct": 5,
+    "num_fittings": 12,
+    "fitting_allow_ft": 1,
+    "section_len_ft": 3,
+    "insul_od_in": 6
+   },
+   "outputs": {
+    "jacket_sf": {
+     "value": 431.2,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",
