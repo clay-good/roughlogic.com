@@ -17105,6 +17105,7 @@ import { computePipeFlotation as _v831pf } from "../../calc-earthwork.js";
 import { computeRestrainedPipeLength as _v832rpl } from "../../calc-earthwork.js";
 import { computeHddPullback as _v833hdd } from "../../calc-earthwork.js";
 import { computeScaffoldLegLoad as _v834sll } from "../../calc-construction.js";
+import { computeScaffoldTakeoff as _v835sto } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17362,6 +17363,26 @@ test("bounds: spec-v834 computeScaffoldLegLoad pins the total/leg load, SWL, uti
   assert.ok("error" in _v834sll({ platform_dead_lb: -1, num_workers: 2, worker_lb: 250, material_lb: 500, n_legs: 4, component_rating_lb: 2500 }));
   assert.ok("error" in _v834sll({ platform_dead_lb: 100, num_workers: 2, worker_lb: 250, material_lb: -1, n_legs: 4, component_rating_lb: 2500 }));
   assert.ok("error" in _v834sll({ platform_dead_lb: 100, num_workers: -1, worker_lb: 250, material_lb: 500, n_legs: 4, component_rating_lb: 2500 }));
+});
+
+test("bounds: spec-v835 computeScaffoldTakeoff pins the bay/frame/brace/plank/base-plate counts and error seams", () => {
+  // 40 ft on 7 ft bays, 3 lifts, 4 planks -> 6 bays, 21 frames, 36 braces, 24 planks, 14 base plates.
+  const r = _v835sto({ run_length_ft: 40, bay_length_ft: 7, lifts: 3, planks_per_bay: 4 });
+  assert.strictEqual(r.bays, 6);
+  assert.strictEqual(r.frames, 21);
+  assert.strictEqual(r.braces, 36);
+  assert.strictEqual(r.planks, 24);
+  assert.strictEqual(r.base_plates, 14);
+  // 5 lifts multiplies frames and braces, not the footprint.
+  const tall = _v835sto({ run_length_ft: 40, bay_length_ft: 7, lifts: 5, planks_per_bay: 4 });
+  assert.strictEqual(tall.bays, 6);
+  assert.strictEqual(tall.frames, 35);
+  assert.strictEqual(tall.braces, 60);
+  // Error seams.
+  assert.ok("error" in _v835sto({ run_length_ft: 0, bay_length_ft: 7, lifts: 3, planks_per_bay: 4 }));
+  assert.ok("error" in _v835sto({ run_length_ft: 40, bay_length_ft: 0, lifts: 3, planks_per_bay: 4 }));
+  assert.ok("error" in _v835sto({ run_length_ft: 40, bay_length_ft: 7, lifts: 0, planks_per_bay: 4 }));
+  assert.ok("error" in _v835sto({ run_length_ft: 40, bay_length_ft: 7, lifts: 3, planks_per_bay: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

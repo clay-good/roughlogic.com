@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): scaffold-takeoff -- frame scaffold material takeoff (spec-v835); 2026-07-17
+
+- New Group E tile `scaffold-takeoff` (calc-construction.js), completing the scaffold trio (`scaffold-leg-load`,
+  `scaffold-mudsill-bearing`, `scaffold-takeoff`: capacity, foundation, material count). Frames, cross braces, planks,
+  and base plates off the bay layout and lifts: bays = ceil(run / bay length); frames = (bays+1) x lifts; braces = 2 x
+  bays x lifts; base plates = (bays+1) x 2. A 40 ft run on 7 ft bays, three lifts high, is 6 bays - 21 frames, 36
+  braces, 24 planks, 14 base plates; 5 lifts takes it to 35 frames and 60 braces (height multiplies frames/braces, not
+  the footprint). Guardrails, ties, and access are taken off separately. Home count 1,283 -> 1,284.
+
 ### feat(construction): scaffold-leg-load -- scaffold per-leg load and OSHA 4:1 check (spec-v834); 2026-07-17
 
 - New Group E tile `scaffold-leg-load` (calc-construction.js), the load-side companion to `scaffold-mudsill-bearing`.

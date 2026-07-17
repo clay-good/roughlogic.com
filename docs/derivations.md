@@ -1634,6 +1634,7 @@ cross-check.
 | calc-construction.js | `computeRoofingSquares` | `{ roof_area_ft2 = 0, pitch_rise = 0, shingle_product = "architectural", perim...` | _ | _ | _ |
 | calc-construction.js | `computeScaffoldLegLoad` | `{ platform_dead_lb = 100, num_workers = 2, worker_lb = 250, material_lb = 500...` | _ | _ | _ |
 | calc-construction.js | `computeScaffoldMudsillBearing` | `{ leg_load_lb = 0, plank_width_in = 0, plank_length_in = 0, allowable_psf = 0...` | _ | _ | _ |
+| calc-construction.js | `computeScaffoldTakeoff` | `{ run_length_ft = 40, bay_length_ft = 7, lifts = 1, planks_per_bay = 4 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSectionProperties` | `{ shape = "rectangle", b_in = 0, h_in = 0, d_in = 0, di_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSeismicBaseShear` | `{ weight_kip = 0, sds = 0, sd1 = 0, r_factor = 0, ie = 1.0, period_s = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSeismicDesignSpectralAcceleration` | `{ ss = 0, s1 = 0, fa = 0, fv = 0 } = {}` | _ | _ | _ |
@@ -2944,7 +2945,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1530.
+Row count: 1531.
 
 <!-- END function-corpus-v14 -->
 
@@ -3492,7 +3493,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (292 tiles)
+### Group E Construction (293 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3685,6 +3686,7 @@ per spec-v14 §13.1 second paragraph.
 | `sag-vertical-curve-comfort` | Sag Vertical Curve Comfort and Drainage (AASHTO) | AASHTO Green Book (sag comfort criter...; spec-v638 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `scaffold-leg-load` | Scaffold Per-Leg Load and OSHA 4:1 Check | OSHA 1926.451(a)(1) capacity rule (fi...; total = 100+500+500 = 1,100; leg = 1100/4 = 275; SWL = 25... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `scaffold-mudsill-bearing` | Scaffold Mudsill Bearing Pressure and Sill Length | Bearing-pressure identity / OSHA 1926...; area = 9.25*24/144 = 1.542 ft^2; bearing = 4000/1.542 = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `scaffold-takeoff` | Frame Scaffold Material Takeoff | Frame-scaffold takeoff geometry (firs...; bays = ceil(40/7) = 6; frames = 7*3 = 21; braces = 2*6*3 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `section-properties` | Cross-Section Properties (A, I, S, r) | mechanics of materials; spec-v342 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sediment-basin-volume` | Sediment Basin / Trap Storage Volume | Sediment-basin storage identity (cons...; required = 5*3600 = 18,000 cf (667 cy); surface = 18000/3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seismic-base-shear` | Seismic Base Shear (ASCE 7 §12.8 Equivalent Lateral Force) | ASCE 7 §12.8 equivalent lateral force; spec-v226 section 2.1 pinned example (short period) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4413,6 +4415,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1283. Fixture-covered or reference-cadence: 1283 / 1283.
+Tile count: 1284. Fixture-covered or reference-cadence: 1284 / 1284.
 
 <!-- END tile-index-v14 -->

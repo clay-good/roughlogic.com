@@ -49365,6 +49365,82 @@
    }
   },
   {
+   "tile_id": "scaffold-takeoff",
+   "source_publisher": "Frame-scaffold takeoff geometry (first-principles)",
+   "source_title": "40 ft run, 7 ft bays, 3 lifts, 4 planks per bay",
+   "source_edition_or_year": "spec-v835 worked example",
+   "source_section_or_page": "bays = ceil(40/7) = 6; frames = 7*3 = 21; braces = 2*6*3 = 36; planks = 6*4 = 24; base plates = 7*2 = 14",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "run_length_ft": 40,
+    "bay_length_ft": 7,
+    "lifts": 3,
+    "planks_per_bay": 4
+   },
+   "outputs": {
+    "bays": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "frames": {
+     "value": 21,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "braces": {
+     "value": 36,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "planks": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "base_plates": {
+     "value": 14,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "scaffold-takeoff",
+   "source_publisher": "Frame-scaffold takeoff geometry (first-principles)",
+   "source_title": "cross-check: 5 lifts multiplies frames and braces, not the footprint",
+   "source_edition_or_year": "spec-v835 worked example",
+   "source_section_or_page": "bays stay 6; frames = 7*5 = 35; braces = 2*6*5 = 60",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "run_length_ft": 40,
+    "bay_length_ft": 7,
+    "lifts": 5,
+    "planks_per_bay": 4
+   },
+   "outputs": {
+    "frames": {
+     "value": 35,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "braces": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

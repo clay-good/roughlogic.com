@@ -5430,6 +5430,59 @@ const _renderScaffoldLegLoad = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["scaffold-leg-load"] = _renderScaffoldLegLoad;
 
+// --- scaffold-takeoff: Frame Scaffold Material Takeoff ---
+//
+// The frames, cross braces, planks, and base plates a frame-scaffold run takes,
+// off the bay layout and the number of lifts:
+//   bays = ceil(run / bay length); frames = (bays + 1) x lifts
+//   braces = 2 x bays x lifts; planks = bays x planks_per_bay
+//   base_plates = (bays + 1) x 2
+// dims: in { run_length_ft: L, bay_length_ft: L, lifts: dimensionless, planks_per_bay: dimensionless } out: { bays: dimensionless, frames: dimensionless, braces: dimensionless, planks: dimensionless, base_plates: dimensionless }
+export function computeScaffoldTakeoff({ run_length_ft = 40, bay_length_ft = 7, lifts = 1, planks_per_bay = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(run_length_ft > 0)) return { error: "Run length must be positive (ft)." };
+  if (!(bay_length_ft > 0)) return { error: "Bay length must be positive (ft)." };
+  if (!(lifts > 0)) return { error: "Lifts must be positive." };
+  if (!(planks_per_bay > 0)) return { error: "Planks per bay must be positive." };
+  const bays = Math.ceil(run_length_ft / bay_length_ft);
+  const frames = (bays + 1) * lifts;
+  const braces = 2 * bays * lifts;
+  const planks = bays * planks_per_bay;
+  const base_plates = (bays + 1) * 2;
+  if (![bays, frames, braces, planks, base_plates].every(Number.isFinite)) return { error: "Takeoff math is not a finite value." };
+  return {
+    bays,
+    frames,
+    braces,
+    planks,
+    base_plates,
+    note: "The counts are for a single-width frame scaffold run. Guardrails, ties, screw jacks, and access (ladders or stair towers) are taken off separately. A competent person designs the erection - this is a material count, not the engineered plan.",
+  };
+}
+
+export const scaffoldTakeoffExample = { inputs: { run_length_ft: 40, bay_length_ft: 7, lifts: 3, planks_per_bay: 4 } };
+
+const _renderScaffoldTakeoff = _simpleRenderer({
+  citation: "Citation: frame-scaffold takeoff geometry by name. bays = ceil(run / bay length); frames = (bays + 1) x lifts; braces = 2 x bays x lifts; planks = bays x planks per bay; base plates = (bays + 1) x 2. A single-width run; a competent person designs the erection.",
+  example: scaffoldTakeoffExample.inputs,
+  fields: [
+    { key: "run_length_ft", label: "Scaffold run length (ft)", kind: "number", default: 40 },
+    { key: "bay_length_ft", label: "Bay / cross-brace length (ft)", kind: "number", default: 7 },
+    { key: "lifts", label: "Frame levels high (count)", kind: "number", default: 3 },
+    { key: "planks_per_bay", label: "Planks per bay platform (count)", kind: "number", default: 4 },
+  ],
+  outputs: [
+    { key: "b", id: "sto-out-b", label: "Bays", value: (r) => _fmtC(r.bays, 0) },
+    { key: "f", id: "sto-out-f", label: "Frames (end frames)", value: (r) => _fmtC(r.frames, 0) },
+    { key: "br", id: "sto-out-br", label: "Cross braces", value: (r) => _fmtC(r.braces, 0) },
+    { key: "p", id: "sto-out-p", label: "Planks", value: (r) => _fmtC(r.planks, 0) },
+    { key: "bp", id: "sto-out-bp", label: "Base plates", value: (r) => _fmtC(r.base_plates, 0) },
+    { key: "n", id: "sto-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeScaffoldTakeoff,
+});
+CONSTRUCTION_RENDERERS["scaffold-takeoff"] = _renderScaffoldTakeoff;
+
 // ----- spec-v246: Concrete Surface Evaporation Rate and Plastic-Shrinkage Risk (ACI 305) -----
 
 // dims: in { air_temp_f: T, concrete_temp_f: T, rh_pct: dimensionless, wind_mph: L T^-1 } out: { E_metric: M L^-2 T^-1, E_us: M L^-2 T^-1 }

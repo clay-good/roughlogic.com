@@ -16927,6 +16927,31 @@
       "kind": "industry"
     },
     {
+      "term": "scaffold takeoff",
+      "target": "scaffold-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "scaffold material count",
+      "target": "scaffold-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "frame scaffold estimate",
+      "target": "scaffold-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "scaffold frames braces",
+      "target": "scaffold-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "scaffold bay count",
+      "target": "scaffold-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

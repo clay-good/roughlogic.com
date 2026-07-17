@@ -8101,6 +8101,17 @@ export const CITATIONS = {
       { name: "Safe working load", value: "the manufacturer component rating divided by the OSHA 4:1 safety factor, shared evenly over the legs", source: "OSHA 1926.451(a)(1) / manufacturer" },
     ],
   },
+  "scaffold-takeoff": {
+    formula: "bays = ceil(run_length_ft / bay_length_ft); frames = (bays + 1) x lifts; braces = 2 x bays x lifts; planks = bays x planks_per_bay; base_plates = (bays + 1) x 2.",
+    edition: "Frame-scaffold takeoff geometry by name (bays from the run, frames/braces from the bays and lifts); first-principles count arithmetic.",
+    freeAccess: "The takeoff is public quantity-survey geometry for a single-width frame run; the erection design comes from a competent person.",
+    governance: GOVERNANCE.general,
+    editionNote: "The counts are for a single-width frame scaffold run. Guardrails, ties, screw jacks, and access (ladders or stair towers) are taken off separately. A competent person designs the erection.",
+    assumptions: [
+      { name: "Bay layout", value: "single-width frame run, 7 ft bays default; bays = ceil(run / bay length)", source: "frame-scaffold practice" },
+      { name: "Components", value: "frames = (bays+1) x lifts, braces = 2 x bays x lifts, base plates = (bays+1) x 2; guardrails/ties/access separate", source: "manufacturer erection guide" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",
