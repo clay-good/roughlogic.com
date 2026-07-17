@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(pool-service): pool-interior-finish-volume -- pool gunite shell and plaster volume (spec-v899); 2026-07-17
+
+- New Group M tile `pool-interior-finish-volume` (calc-treatment.js), the pool takeoff beside `pool-volume` and
+  `pool-tile-coping-perimeter`. interior = length x width + 2 x (length + width) x avg depth; gunite = interior x shell /
+  27 x (1 + waste); plaster = interior x plaster / 27. A 15 x 30 ft pool averaging 5.5 ft deep has 945 sf of interior, so
+  an 8 in gunite shell is 26.8 cy and a 3/8 in plaster coat is 1.1 cy; a deeper 7 ft average grows the interior to 1,080
+  sf and the gunite to 30.6 cy. Gunite rebound is on top (see shotcrete-rebound-quantity). Home count 1,347 -> 1,348.
+
 ### feat(pool-service): pool-tile-coping-perimeter -- pool waterline tile and coping perimeter takeoff (spec-v898); 2026-07-17
 
 - New Group M tile `pool-tile-coping-perimeter` (calc-treatment.js), the pool install-ops takeoff beside `pool-volume`.

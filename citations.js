@@ -8343,6 +8343,17 @@ export const CITATIONS = {
       { name: "Waterline tile", value: "commonly one course of 6 in tile at the waterline; coping ~12 in units", source: "pool finish schedule" },
     ],
   },
+  "pool-interior-finish-volume": {
+    formula: "interior_area_sf = length_ft x width_ft + 2 x (length_ft + width_ft) x avg_depth_ft; gunite_cy = interior_area_sf x (shell_thickness_in/12) / 27 x (1 + waste_pct/100); plaster_cy = interior_area_sf x (plaster_thickness_in/12) / 27.",
+    edition: "Pool interior-finish identity by name (interior from floor plus walls; gunite and plaster volumes over the interior area); first-principles arithmetic.",
+    freeAccess: "The volume arithmetic is public first-principles; the shell and plaster thicknesses come from the spec.",
+    governance: GOVERNANCE.general,
+    editionNote: "The shell (gunite or shotcrete) and plaster thicknesses come from the spec. Gunite rebound is on top of the neat volume (see shotcrete-rebound-quantity). The average depth is the volumetric average of the shallow and deep ends. Distinct from the water pool-volume.",
+    assumptions: [
+      { name: "Interior area", value: "floor (L x W) plus walls (2 x (L + W) x avg depth) for a rectangular pool", source: "first principles" },
+      { name: "Shell / plaster", value: "~8 in gunite shell and ~3/8 in plaster (defaults); the spec governs", source: "pool structural spec" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

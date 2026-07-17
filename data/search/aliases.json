@@ -18527,6 +18527,31 @@
       "kind": "industry"
     },
     {
+      "term": "pool gunite volume",
+      "target": "pool-interior-finish-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "pool shell concrete",
+      "target": "pool-interior-finish-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "pool plaster volume",
+      "target": "pool-interior-finish-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "pool shotcrete cy",
+      "target": "pool-interior-finish-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "pool interior finish",
+      "target": "pool-interior-finish-volume",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

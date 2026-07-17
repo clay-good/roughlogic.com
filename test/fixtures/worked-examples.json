@@ -53211,6 +53211,74 @@
    }
   },
   {
+   "tile_id": "pool-interior-finish-volume",
+   "source_publisher": "Pool interior-finish identity (first-principles)",
+   "source_title": "15 x 30 ft, 5.5 ft avg, 8 in shell, 3/8 in plaster, 15% waste -> 945 sf, 26.8 cy gunite, 1.09 cy plaster",
+   "source_edition_or_year": "spec-v899 worked example",
+   "source_section_or_page": "interior=15*30+2*45*5.5=945; gunite=945*(8/12)/27*1.15=26.83; plaster=945*(0.375/12)/27=1.094",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "length_ft": 30,
+    "width_ft": 15,
+    "avg_depth_ft": 5.5,
+    "shell_thickness_in": 8,
+    "plaster_thickness_in": 0.375,
+    "waste_pct": 15
+   },
+   "outputs": {
+    "interior_area_sf": {
+     "value": 945,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "gunite_cy": {
+     "value": 26.83,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "plaster_cy": {
+     "value": 1.094,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pool-interior-finish-volume",
+   "source_publisher": "Pool interior-finish identity (first-principles)",
+   "source_title": "cross-check: a deeper 7 ft average grows the interior to 1,080 sf and the gunite to 30.6 cy",
+   "source_edition_or_year": "spec-v899 worked example",
+   "source_section_or_page": "interior=450+2*45*7=1080; gunite=1080*(8/12)/27*1.15=30.67",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "length_ft": 30,
+    "width_ft": 15,
+    "avg_depth_ft": 7,
+    "shell_thickness_in": 8,
+    "plaster_thickness_in": 0.375,
+    "waste_pct": 15
+   },
+   "outputs": {
+    "interior_area_sf": {
+     "value": 1080,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "gunite_cy": {
+     "value": 30.67,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

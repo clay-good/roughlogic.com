@@ -1070,6 +1070,7 @@ const RELATED = {
   "pv-rail-clamp-takeoff": ["pv-row-spacing", "pv-array-sizing", "metal-weight"],
   "pv-ballast-weight": ["pv-rail-clamp-takeoff", "pv-row-spacing", "snow-load"],
   "pool-tile-coping-perimeter": ["pool-volume", "tile-count", "thinset-coverage"],
+  "pool-interior-finish-volume": ["pool-volume", "pool-tile-coping-perimeter", "shotcrete-rebound-quantity"],
   "concrete-vibrator-spacing": ["concrete-pour-rate", "formwork-pressure", "concrete"],
   "formwork-tie-load": ["formwork-pressure", "shore-post-load", "concrete-pour-rate"],
   "mass-concrete-temp-rise": ["concrete-maturity", "fresh-concrete-temp", "concrete-evaporation-rate"],

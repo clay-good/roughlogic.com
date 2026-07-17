@@ -2901,6 +2901,7 @@ cross-check.
 | calc-treatment.js | `computePoolCyaDose` | `{ gallons = 0, current_cya_ppm = 0, target_cya_ppm = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolHeaterBtu` | `{ gallons = 0, dT_F = 0, output = 0, eff = 0.80 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolHeaterSize` | `{ gallons = 0, dT_F = 0, target_hours = 0, eff = 0.80 } = {}` | _ | _ | _ |
+| calc-treatment.js | `computePoolInteriorFinishVolume` | `{ length_ft = 30, width_ft = 15, avg_depth_ft = 5.5, shell_thickness_in = 8, ...` | _ | _ | _ |
 | calc-treatment.js | `computePoolSaltDose` | `{ gallons = 0, current_salt_ppm = 0, target_salt_ppm = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolTileCopingPerimeter` | `{ length_ft = 32, width_ft = 16, tile_length_in = 6, courses = 1, coping_leng...` | _ | _ | _ |
 | calc-treatment.js | `computePoolVolume` | `{ shape = "rectangle", length_ft = 0, width_ft = 0, diameter_ft = 0, shallow_...` | _ | _ | _ |
@@ -3008,7 +3009,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1594.
+Row count: 1595.
 
 <!-- END function-corpus-v14 -->
 
@@ -4241,7 +4242,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (51 tiles)
+### Group M Water and wastewater (52 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4275,6 +4276,7 @@ per spec-v14 §13.1 second paragraph.
 | `pool-cya-dose` | Pool Cyanuric Acid Dose | NSPF CPO Handbook / ANSI-APSP-ICC; spec-v93 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pool-heater-btu` | Pool Heater Sizing and Heat-Up Time | thermodynamics; spec-v354 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-heater-size` | Pool Heater Output for a Target Heat-Up Time | thermodynamics (inverse); spec-v677 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pool-interior-finish-volume` | Pool Gunite Shell and Plaster Volume | Pool interior-finish identity (first-...; interior=15*30+2*45*5.5=945; gunite=945*(8/12)/27*1.15=26... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-salt-dose` | Pool Salt Dose | Mass-balance identity (NSPF CPO / ANS...; spec-v93 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pool-tile-coping-perimeter` | Pool Waterline Tile and Coping Perimeter Takeoff | Pool perimeter-takeoff identity (firs...; perimeter=2*(16+32)=96; tiles=ceil(96/0.5*1*1.10)=ceil(21... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-turnover` | Pool Turnover Rate and Chlorine Demand | NSPF; GPM = 20000/(6*60) = 55.56; pure Cl = 20000*2*8.34/1e6 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4541,6 +4543,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1347. Fixture-covered or reference-cadence: 1347 / 1347.
+Tile count: 1348. Fixture-covered or reference-cadence: 1348 / 1348.
 
 <!-- END tile-index-v14 -->

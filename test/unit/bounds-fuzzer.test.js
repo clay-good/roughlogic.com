@@ -26461,3 +26461,24 @@ test("bounds: spec-v898 computePoolTileCopingPerimeter pins the perimeter, tile 
   assert.ok("error" in _v898({ length_ft: 32, width_ft: 16, tile_length_in: 6, courses: 1, coping_length_in: 12, waste_pct: -10 }));
   assert.ok("error" in _v898({ length_ft: Infinity, width_ft: 16, tile_length_in: 6, courses: 1, coping_length_in: 12, waste_pct: 10 }));
 });
+
+import { computePoolInteriorFinishVolume as _v899 } from "../../calc-treatment.js";
+
+test("bounds: spec-v899 computePoolInteriorFinishVolume pins the interior, gunite, plaster, and error seams", () => {
+  const r = _v899({ length_ft: 30, width_ft: 15, avg_depth_ft: 5.5, shell_thickness_in: 8, plaster_thickness_in: 0.375, waste_pct: 15 });
+  assert.equal(r.interior_area_sf, 945); // 15*30 + 2*45*5.5
+  assert.ok(Math.abs(r.gunite_cy - 26.833333333333336) < 1e-6); // 945*(8/12)/27*1.15
+  assert.ok(Math.abs(r.plaster_cy - 1.09375) < 1e-6); // 945*(0.375/12)/27
+  // The wall area, and so the shell, climbs with depth.
+  const deep = _v899({ length_ft: 30, width_ft: 15, avg_depth_ft: 7, shell_thickness_in: 8, plaster_thickness_in: 0.375, waste_pct: 15 });
+  assert.equal(deep.interior_area_sf, 1080); // 450 + 2*45*7
+  assert.ok(Math.abs(deep.gunite_cy - 30.666666666666664) < 1e-6); // 1080*(8/12)/27*1.15
+  // Error seams: non-finite, non-positive length / width / depth / shell / plaster, negative waste.
+  assert.ok("error" in _v899({ length_ft: 0, width_ft: 15, avg_depth_ft: 5.5, shell_thickness_in: 8, plaster_thickness_in: 0.375, waste_pct: 15 }));
+  assert.ok("error" in _v899({ length_ft: 30, width_ft: 0, avg_depth_ft: 5.5, shell_thickness_in: 8, plaster_thickness_in: 0.375, waste_pct: 15 }));
+  assert.ok("error" in _v899({ length_ft: 30, width_ft: 15, avg_depth_ft: 0, shell_thickness_in: 8, plaster_thickness_in: 0.375, waste_pct: 15 }));
+  assert.ok("error" in _v899({ length_ft: 30, width_ft: 15, avg_depth_ft: 5.5, shell_thickness_in: 0, plaster_thickness_in: 0.375, waste_pct: 15 }));
+  assert.ok("error" in _v899({ length_ft: 30, width_ft: 15, avg_depth_ft: 5.5, shell_thickness_in: 8, plaster_thickness_in: 0, waste_pct: 15 }));
+  assert.ok("error" in _v899({ length_ft: 30, width_ft: 15, avg_depth_ft: 5.5, shell_thickness_in: 8, plaster_thickness_in: 0.375, waste_pct: -15 }));
+  assert.ok("error" in _v899({ length_ft: Infinity, width_ft: 15, avg_depth_ft: 5.5, shell_thickness_in: 8, plaster_thickness_in: 0.375, waste_pct: 15 }));
+});

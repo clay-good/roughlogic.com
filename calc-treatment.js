@@ -1297,3 +1297,61 @@ function _v898renderPoolTileCopingPerimeter(inputRegion, outputRegion, citationE
   for (const f of [ln, wd, tl, cs, cl, ws]) f.input.addEventListener("input", update);
 }
 TREATMENT_RENDERERS["pool-tile-coping-perimeter"] = _v898renderPoolTileCopingPerimeter;
+
+// pool-interior-finish-volume (spec-v899): pool gunite shell and plaster volume.
+// dims: in { length_ft: L, width_ft: L, avg_depth_ft: L, shell_thickness_in: L, plaster_thickness_in: L, waste_pct: dimensionless } out: { interior_area_sf: L^2, gunite_cy: L^3, plaster_cy: L^3 }
+export function computePoolInteriorFinishVolume({ length_ft = 30, width_ft = 15, avg_depth_ft = 5.5, shell_thickness_in = 8, plaster_thickness_in = 0.375, waste_pct = 15 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  if (!(length_ft > 0)) return { error: "Pool length must be positive (ft)." };
+  if (!(width_ft > 0)) return { error: "Pool width must be positive (ft)." };
+  if (!(avg_depth_ft > 0)) return { error: "Average depth must be positive (ft)." };
+  if (!(shell_thickness_in > 0)) return { error: "Shell thickness must be positive (in)." };
+  if (!(plaster_thickness_in > 0)) return { error: "Plaster thickness must be positive (in)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const interior_area_sf = length_ft * width_ft + 2 * (length_ft + width_ft) * avg_depth_ft;
+  const gunite_cy = interior_area_sf * (shell_thickness_in / 12) / 27 * (1 + waste_pct / 100);
+  const plaster_cy = interior_area_sf * (plaster_thickness_in / 12) / 27;
+  if (![interior_area_sf, gunite_cy, plaster_cy].every(Number.isFinite)) return { error: "Interior-finish math is not a finite value." };
+  return {
+    interior_area_sf,
+    gunite_cy,
+    plaster_cy,
+    note: "The shell (gunite or shotcrete) and plaster thicknesses come from the spec. Gunite rebound is on top of the neat volume (see shotcrete-rebound-quantity). The average depth is the volumetric average of the shallow and deep ends. Distinct from the water pool-volume.",
+  };
+}
+
+export const poolInteriorFinishVolumeExample = { inputs: { length_ft: 30, width_ft: 15, avg_depth_ft: 5.5, shell_thickness_in: 8, plaster_thickness_in: 0.375, waste_pct: 15 } };
+
+function _v899renderPoolInteriorFinishVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: interior-finish identity by name. interior = length x width + 2 x (length + width) x average depth; gunite = interior x shell / 27 x (1 + waste); plaster = interior x plaster / 27.";
+  const ln = makeNumber("Pool length (ft)", "pif-ln", { step: "any", min: "0", value: "30" });
+  ln.input.value = "30";
+  const wd = makeNumber("Pool width (ft)", "pif-wd", { step: "any", min: "0", value: "15" });
+  wd.input.value = "15";
+  const dp = makeNumber("Average depth (ft)", "pif-dp", { step: "any", min: "0", value: "5.5" });
+  dp.input.value = "5.5";
+  const sh = makeNumber("Gunite shell thickness (in)", "pif-sh", { step: "any", min: "0", value: "8" });
+  sh.input.value = "8";
+  const pl = makeNumber("Plaster thickness (in)", "pif-pl", { step: "any", min: "0", value: "0.375" });
+  pl.input.value = "0.375";
+  const ws = makeNumber("Gunite waste allowance (%)", "pif-ws", { step: "any", min: "0", value: "15" });
+  ws.input.value = "15";
+  for (const f of [ln, wd, dp, sh, pl, ws]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ln.input.value = "30"; wd.input.value = "15"; dp.input.value = "5.5"; sh.input.value = "8"; pl.input.value = "0.375"; ws.input.value = "15"; update(); });
+  const oArea = makeOutputLine(outputRegion, "Interior surface area", "pif-out-area");
+  const oGunite = makeOutputLine(outputRegion, "Gunite shell", "pif-out-gunite");
+  const oPlaster = makeOutputLine(outputRegion, "Plaster coat", "pif-out-plaster");
+  const update = debounce(() => {
+    const r = computePoolInteriorFinishVolume({
+      length_ft: ln.input.value === "" ? 30 : Number(ln.input.value), width_ft: wd.input.value === "" ? 15 : Number(wd.input.value),
+      avg_depth_ft: dp.input.value === "" ? 5.5 : Number(dp.input.value), shell_thickness_in: sh.input.value === "" ? 8 : Number(sh.input.value),
+      plaster_thickness_in: pl.input.value === "" ? 0.375 : Number(pl.input.value), waste_pct: ws.input.value === "" ? 15 : Number(ws.input.value),
+    });
+    if (r.error) { oArea.textContent = r.error; oGunite.textContent = "-"; oPlaster.textContent = "-"; return; }
+    oArea.textContent = fmt(r.interior_area_sf, 0) + " ft^2";
+    oGunite.textContent = fmt(r.gunite_cy, 1) + " cy";
+    oPlaster.textContent = fmt(r.plaster_cy, 2) + " cy";
+  }, DEBOUNCE_MS);
+  for (const f of [ln, wd, dp, sh, pl, ws]) f.input.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["pool-interior-finish-volume"] = _v899renderPoolInteriorFinishVolume;
