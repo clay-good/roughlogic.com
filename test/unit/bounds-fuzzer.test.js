@@ -17140,6 +17140,7 @@ import { computeConstructionAdhesiveTubes as _v866cat } from "../../calc-constru
 import { computeSillPlateAnchorCount as _v867spa } from "../../calc-construction.js";
 import { computeMetalStudTakeoff as _v868mst } from "../../calc-construction.js";
 import { computeSuspendedCeilingGrid as _v869scg } from "../../calc-construction.js";
+import { computeMasonryControlJointLayout as _v870mcj } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17996,6 +17997,25 @@ test("bounds: spec-v869 computeSuspendedCeilingGrid pins the area, panels, tees,
   // Error seams.
   assert.ok("error" in _v869scg({ room_length_ft: 0, room_width_ft: 40 }));
   assert.ok("error" in _v869scg({ room_length_ft: 24, room_width_ft: 0 }));
+});
+
+test("bounds: spec-v870 computeMasonryControlJointLayout pins the max spacing, panels, joints, panel length, and error seams", () => {
+  // 80 ft, 16 ft high, 25 ft cap -> 24 ft spacing, 4 panels, 3 joints, 20 ft panels.
+  const r = _v870mcj({ wall_length_ft: 80, wall_height_ft: 16, max_spacing_cap_ft: 25 });
+  assert.strictEqual(r.max_spacing_ft, 24);
+  assert.strictEqual(r.panels, 4);
+  assert.strictEqual(r.joints, 3);
+  assert.strictEqual(r.panel_length_ft, 20);
+  // A longer wall at the same spacing adds panels/joints.
+  const long = _v870mcj({ wall_length_ft: 120, wall_height_ft: 16, max_spacing_cap_ft: 25 });
+  assert.strictEqual(long.panels, 5);
+  assert.strictEqual(long.joints, 4);
+  // The project cap governs when 1.5x height exceeds it (tall wall).
+  assert.strictEqual(_v870mcj({ wall_length_ft: 100, wall_height_ft: 30, max_spacing_cap_ft: 25 }).max_spacing_ft, 25);
+  // Error seams.
+  assert.ok("error" in _v870mcj({ wall_length_ft: 0, wall_height_ft: 16, max_spacing_cap_ft: 25 }));
+  assert.ok("error" in _v870mcj({ wall_length_ft: 80, wall_height_ft: 0, max_spacing_cap_ft: 25 }));
+  assert.ok("error" in _v870mcj({ wall_length_ft: 80, wall_height_ft: 16, max_spacing_cap_ft: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

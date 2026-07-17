@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): masonry-control-joint-layout -- masonry control-joint layout per NCMA (spec-v870); 2026-07-17
+
+- New Group E tile `masonry-control-joint-layout` (calc-construction.js), the masonry layout tile beside `masonry-count`
+  and the concrete `control-joint-spacing`. max spacing = min(1.5 x wall height, project cap); panels = ceil(length /
+  max spacing); joints = panels - 1. An 80 ft CMU wall 16 ft tall caps at 24 ft, so 4 panels of 20 ft with 3 control
+  joints; a 120 ft wall at the same spacing is 5 panels and 4 joints -- the height sets the spacing, the length sets the
+  count. The NCMA empirical rule keeps shrinkage cracking in the joints, not the field; control joints also go at
+  openings and changes in height/thickness. Home count 1,318 -> 1,319.
+
 ### feat(construction): suspended-ceiling-grid -- suspended acoustical ceiling grid takeoff (spec-v869); 2026-07-17
 
 - New Group E tile `suspended-ceiling-grid` (calc-construction.js), the ceilings takeoff beside `metal-stud-takeoff`

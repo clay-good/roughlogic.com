@@ -17802,6 +17802,31 @@
       "kind": "industry"
     },
     {
+      "term": "masonry control joint layout",
+      "target": "masonry-control-joint-layout",
+      "kind": "industry"
+    },
+    {
+      "term": "cmu control joint spacing",
+      "target": "masonry-control-joint-layout",
+      "kind": "industry"
+    },
+    {
+      "term": "masonry crack control joint",
+      "target": "masonry-control-joint-layout",
+      "kind": "industry"
+    },
+    {
+      "term": "block wall control joints",
+      "target": "masonry-control-joint-layout",
+      "kind": "industry"
+    },
+    {
+      "term": "masonry expansion joint",
+      "target": "masonry-control-joint-layout",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

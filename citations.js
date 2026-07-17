@@ -8486,6 +8486,17 @@ export const CITATIONS = {
       { name: "Hangers", value: "on the mains at 4 ft on center; seismic areas add bracing and clips per code", source: "ASTM C635/C636 / seismic code" },
     ],
   },
+  "masonry-control-joint-layout": {
+    formula: "max_spacing_ft = min(1.5 x wall_height_ft, max_spacing_cap_ft); panels = ceil(wall_length_ft / max_spacing_ft); joints = panels - 1; panel_length_ft = wall_length_ft / panels.",
+    edition: "Masonry control-joint rule by name (spacing the lesser of 1.5x the height or a project cap; panels/joints from the length); NCMA empirical guideline.",
+    freeAccess: "The 1.5x-height rule of thumb is public NCMA guidance; the project cap and reinforcement adjustment come from the project standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "The NCMA empirical guideline: spacing no more than 1.5 times the wall height and no more than a project cap (commonly 25 ft, adjusted by the horizontal reinforcement). Control joints also go at openings and at changes in wall height or thickness. Distinct from the concrete-slab control-joint-spacing.",
+    assumptions: [
+      { name: "Spacing rule", value: "the lesser of 1.5x the wall height or the project cap (~25 ft); horizontal reinforcement adjusts it", source: "NCMA TEK 10-2/10-3" },
+      { name: "Joint locations", value: "also at openings and changes in wall height or thickness (beyond the field spacing)", source: "NCMA / project standard" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

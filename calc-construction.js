@@ -8703,3 +8703,49 @@ const _v869renderSuspendedCeilingGrid = _simpleRenderer({
   compute: computeSuspendedCeilingGrid,
 });
 CONSTRUCTION_RENDERERS["suspended-ceiling-grid"] = _v869renderSuspendedCeilingGrid;
+
+// --- masonry-control-joint-layout: Masonry Control-Joint Layout ---
+//
+// Lays out masonry control joints by the NCMA empirical rule (spacing no more
+// than 1.5x the wall height and a project cap):
+//   max_spacing_ft = min(1.5 x wall_height_ft, max_spacing_cap_ft)
+//   panels = ceil(wall_length_ft / max_spacing_ft); joints = panels - 1
+//   panel_length_ft = wall_length_ft / panels
+// dims: in { wall_length_ft: L, wall_height_ft: L, max_spacing_cap_ft: L } out: { max_spacing_ft: L, panels: dimensionless, joints: dimensionless, panel_length_ft: L }
+export function computeMasonryControlJointLayout({ wall_length_ft = 80, wall_height_ft = 16, max_spacing_cap_ft = 25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(wall_length_ft > 0)) return { error: "Wall length must be positive (ft)." };
+  if (!(wall_height_ft > 0)) return { error: "Wall height must be positive (ft)." };
+  if (!(max_spacing_cap_ft > 0)) return { error: "Spacing cap must be positive (ft)." };
+  const max_spacing_ft = Math.min(1.5 * wall_height_ft, max_spacing_cap_ft);
+  const panels = Math.ceil(wall_length_ft / max_spacing_ft);
+  const joints = panels - 1;
+  const panel_length_ft = wall_length_ft / panels;
+  if (![max_spacing_ft, panels, joints, panel_length_ft].every(Number.isFinite)) return { error: "Control-joint math is not a finite value." };
+  return {
+    max_spacing_ft,
+    panels,
+    joints,
+    panel_length_ft,
+    note: "The NCMA empirical guideline: spacing no more than 1.5 times the wall height and no more than a project cap (commonly 25 ft, adjusted by the horizontal reinforcement - the cap is entered here). Control joints also go at openings and at changes in wall height or thickness. Distinct from the concrete-slab control-joint-spacing.",
+  };
+}
+
+export const masonryControlJointLayoutExample = { inputs: { wall_length_ft: 80, wall_height_ft: 16, max_spacing_cap_ft: 25 } };
+
+const _v870renderMasonryControlJointLayout = _simpleRenderer({
+  citation: "Citation: masonry control-joint rule by name (NCMA empirical). max spacing = min(1.5 x wall height, project cap); panels = ceil(wall length / max spacing); joints = panels - 1. Control joints also go at openings and changes in height or thickness.",
+  example: masonryControlJointLayoutExample.inputs,
+  fields: [
+    { key: "wall_length_ft", label: "Wall length (ft)", kind: "number", default: 80 },
+    { key: "wall_height_ft", label: "Wall height (ft)", kind: "number", default: 16 },
+    { key: "max_spacing_cap_ft", label: "Project spacing cap (ft)", kind: "number", default: 25 },
+  ],
+  outputs: [
+    { key: "j", id: "mcj-out-j", label: "Control joints", value: (r) => _fmtC(r.joints, 0) + " joints (" + _fmtC(r.panels, 0) + " panels)" },
+    { key: "s", id: "mcj-out-s", label: "Max joint spacing", value: (r) => _fmtC(r.max_spacing_ft, 1) + " ft (panels ~" + _fmtC(r.panel_length_ft, 1) + " ft)" },
+    { key: "note", id: "mcj-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMasonryControlJointLayout,
+});
+CONSTRUCTION_RENDERERS["masonry-control-joint-layout"] = _v870renderMasonryControlJointLayout;
