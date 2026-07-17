@@ -701,13 +701,15 @@ const SWTR_GIARDIA_3LOG_FREECL = {
   // commonly cited from the SWTR Guidance Manual operator-training
   // table; see citation. Verify against the state-primacy-agency
   // adopted table before relying on them.
+  // USEPA SWTR Guidance Manual (EPA 815-R-99-014) Table A-1: 3-log Giardia
+  // inactivation by free chlorine, residual <= 0.4 mg/L, at pH 6.0/7.0/8.0/9.0.
   table: [
-    [137, 165, 198, 236], // 0.5 C
-    [99,  116, 139, 165], //   5 C
-    [73,   87, 104, 125], //  10 C
-    [49,   58,  70,  83], //  15 C
-    [36,   44,  52,  62], //  20 C
-    [24,   29,  35,  41], //  25 C
+    [137, 195, 277, 390], // 0.5 C
+    [ 97, 139, 198, 279], //   5 C
+    [ 73, 104, 149, 209], //  10 C
+    [ 49,  70,  99, 140], //  15 C
+    [ 36,  52,  74, 105], //  20 C
+    [ 24,  35,  50,  70], //  25 C
   ],
 };
 
@@ -819,10 +821,10 @@ export function computeDisinfectionCT({
 }
 
 export const disinfectionCTExample = {
-  // Spec-v9 §E.2 worked example: 3-log Giardia at 5 C / pH 7.0 with
-  // CT_required = 116 mg-min/L. Operator achieves C=0.4 mg/L * t10=300
-  // min = 120 mg-min/L -> passes 3-log Giardia.
-  inputs: { chlorine_mg_l: 0.4, t10_minutes: 300, temperature_C: 5, pH: 7.0 },
+  // 3-log Giardia at 5 C / pH 7.0: CT_required = 139 mg-min/L (SWTR Table A-1).
+  // Operator achieves C=1.0 mg/L * t10=150 min = 150 mg-min/L >= 139 -> passes
+  // 3-log Giardia (log_inactivation = 150/139 * 3 = 3.24).
+  inputs: { chlorine_mg_l: 1.0, t10_minutes: 150, temperature_C: 5, pH: 7.0 },
 };
 
 function renderDisinfectionCT(inputRegion, outputRegion, citationEl) {

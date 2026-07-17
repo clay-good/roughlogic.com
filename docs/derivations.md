@@ -4282,7 +4282,7 @@ per spec-v14 §13.1 second paragraph.
 | `detention-time` | Detention Time | USEPA; Standard hydraulic retention identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `digester-gas-production` | Digester Gas and Methane Production | Anaerobic digester gas production (WE...; 10,000 lb/day VS fed at 55% reduction, 15 ft3/lb, 65% met... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `digester-vs-loading` | Anaerobic Digester Volatile Solids Loading | WEF / university operator courses; 15000 gpd, 4% TS, 75% VS, 20000 ft^3 -> 3753 lb/day, 188 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `disinfection-ct` | Disinfection CT (USEPA SWTR) | USEPA; Table A-1 (<=0.4 mg/L band): CT_required = 116 mg-min/L a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `disinfection-ct` | Disinfection CT (USEPA SWTR) | USEPA; Table A-1 (<=0.4 mg/L band): CT_required = 139 mg-min/L a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `filter-area-for-loading` | Filter Area for a Target Loading Rate | USEPA / AWWA general practice; Rapid-sand band 2-5 gpm/ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `filter-loading` | Filter Loading Rate and Backwash | USEPA; Rapid-sand band 2-5 gpm/ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flocculation-g-value` | Mixing Velocity Gradient (G / Gt) | Camp & Stein / Ten States Standards; 300 W, 100 m^3, 10 C, 1200 s -> G 48/s, Gt 57492 (floccul... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |

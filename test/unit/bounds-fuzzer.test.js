@@ -1527,19 +1527,28 @@ test("bounds: calc-water computeSVI rejects out-of-domain SV30 and non-positive 
 });
 
 test("bounds: calc-water computeDisinfectionCT pins CT_achieved = chlorine * t10 and the SWTR 3-log Giardia pass / fail flip", () => {
-  // Spec-v9 §E.2 worked example pins: C=0.4, t10=300, T=5, pH=7 -> CT_achieved=120 vs CT_required~116 -> pass.
-  const passing = computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 300, temperature_C: 5, pH: 7.0 });
+  // SWTR Table A-1 pins (3-log Giardia, free chlorine <= 0.4 mg/L): pH 7.0 / 5 C = 139.
+  // C=1.0, t10=150 -> CT_achieved=150 >= 139 -> pass.
+  const passing = computeDisinfectionCT({ chlorine_mg_l: 1.0, t10_minutes: 150, temperature_C: 5, pH: 7.0 });
   assert.ok(!passing.error, JSON.stringify(passing));
-  assert.ok(Math.abs(passing.CT_achieved - 120) < 1e-9, `CT_achieved identity`);
+  assert.ok(Math.abs(passing.CT_achieved - 150) < 1e-9, `CT_achieved identity`);
+  assert.ok(Math.abs(passing.CT_required_3log_Giardia - 139) < 1e-9, `CT_required table pin (pH 7.0 / 5 C = 139)`);
   assert.strictEqual(passing.pass_3log_giardia, true);
   assert.strictEqual(passing.pass_4log_virus, true);
+  // High-pH table pins (the columns that were historically mislabeled a half-to-full pH unit low):
+  // pH 8.0 / 5 C = 198, pH 9.0 / 5 C = 279. The same 150 mg-min/L that passes at pH 7.0 must FAIL at pH 8.0.
+  const ph8 = computeDisinfectionCT({ chlorine_mg_l: 1.0, t10_minutes: 150, temperature_C: 5, pH: 8.0 });
+  assert.ok(Math.abs(ph8.CT_required_3log_Giardia - 198) < 1e-9, `pH 8.0 / 5 C = 198`);
+  assert.strictEqual(ph8.pass_3log_giardia, false);
+  const ph9 = computeDisinfectionCT({ chlorine_mg_l: 1.0, t10_minutes: 150, temperature_C: 5, pH: 9.0 });
+  assert.ok(Math.abs(ph9.CT_required_3log_Giardia - 279) < 1e-9, `pH 9.0 / 5 C = 279`);
   // Lower the chlorine to below the 0.2 mg/L floor -> SWTR gives zero credit per the documented edge case.
   const zero_credit = computeDisinfectionCT({ chlorine_mg_l: 0.1, t10_minutes: 300, temperature_C: 5, pH: 7.0 });
   assert.strictEqual(zero_credit.CT_achieved, 0);
   assert.strictEqual(zero_credit.pass_3log_giardia, false);
-  // Halve the contact time -> CT drops to 60; fails the ~116 requirement.
-  const failing = computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 150, temperature_C: 5, pH: 7.0 });
-  assert.ok(Math.abs(failing.CT_achieved - 60) < 1e-9, `failing CT identity`);
+  // Drop the contact time -> CT drops to 75; fails the 139 requirement at pH 7.0.
+  const failing = computeDisinfectionCT({ chlorine_mg_l: 0.5, t10_minutes: 150, temperature_C: 5, pH: 7.0 });
+  assert.ok(Math.abs(failing.CT_achieved - 75) < 1e-9, `failing CT identity`);
   assert.strictEqual(failing.pass_3log_giardia, false);
 });
 

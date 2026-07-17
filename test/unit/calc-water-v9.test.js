@@ -77,11 +77,11 @@ test("svi: WATER_RENDERERS exposes svi-sludge-index", () => {
 
 // v9 §E.2 disinfection-CT (SWTR free-chlorine 3-log Giardia)
 
-test("disinfection-ct: example C=0.4, t10=300, T=5, pH=7 -> CT 120 vs 116 -> passes 3-log Giardia", () => {
+test("disinfection-ct: example C=1.0, t10=150, T=5, pH=7 -> CT 150 vs 139 -> passes 3-log Giardia", () => {
   const r = computeDisinfectionCT(disinfectionCTExample.inputs);
   assert.ok(!r.error);
-  assert.ok(close(r.CT_achieved, 120, 1e-9));
-  assert.ok(close(r.CT_required_3log_Giardia, 116, 1e-9));
+  assert.ok(close(r.CT_achieved, 150, 1e-9));
+  assert.ok(close(r.CT_required_3log_Giardia, 139, 1e-9)); // SWTR Table A-1: pH 7.0 / 5 C
   assert.equal(r.pass_3log_giardia, true);
   assert.equal(r.pass_4log_virus, true);
 });
@@ -110,18 +110,18 @@ test("disinfection-ct: t10 must be positive; chlorine non-negative", () => {
 });
 
 test("disinfection-ct: bilinear interpolation matches table corners exactly", () => {
-  // 5 C, pH 6.0 -> 99 from the bundled table.
+  // 5 C, pH 6.0 -> 97 from the SWTR Table A-1.
   const r = computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 1, temperature_C: 5, pH: 6 });
-  assert.ok(close(r.CT_required_3log_Giardia, 99, 1e-9));
-  // 25 C, pH 9.0 -> 41 from the bundled table.
+  assert.ok(close(r.CT_required_3log_Giardia, 97, 1e-9));
+  // 25 C, pH 9.0 -> 70 from the SWTR Table A-1.
   const r2 = computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 1, temperature_C: 25, pH: 9 });
-  assert.ok(close(r2.CT_required_3log_Giardia, 41, 1e-9));
+  assert.ok(close(r2.CT_required_3log_Giardia, 70, 1e-9));
 });
 
 test("disinfection-ct: bilinear interpolation midpoint between known corners", () => {
-  // Midpoint between (5 C, pH 7 = 116) and (10 C, pH 7 = 87) is 101.5 at 7.5 C.
+  // Midpoint between (5 C, pH 7 = 139) and (10 C, pH 7 = 104) is 121.5 at 7.5 C.
   const r = computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 1, temperature_C: 7.5, pH: 7 });
-  assert.ok(closePct(r.CT_required_3log_Giardia, 101.5, 0.5));
+  assert.ok(closePct(r.CT_required_3log_Giardia, 121.5, 0.5));
 });
 
 test("disinfection-ct: high residual (>0.4 mg/L) still computes but warns about band", () => {
@@ -131,7 +131,7 @@ test("disinfection-ct: high residual (>0.4 mg/L) still computes but warns about 
 });
 
 test("disinfection-ct: failing case (low CT achieved) flags 3-log Giardia not met", () => {
-  // C=0.2, t10=60 -> CT=12 mg-min/L vs ~116 at 5/7 -> well under.
+  // C=0.2, t10=60 -> CT=12 mg-min/L vs 139 at 5/7 -> well under.
   const r = computeDisinfectionCT({ chlorine_mg_l: 0.2, t10_minutes: 60, temperature_C: 5, pH: 7 });
   assert.equal(r.pass_3log_giardia, false);
   assert.equal(r.pass_4log_virus, false);
@@ -145,8 +145,8 @@ test("disinfection-ct: log inactivation scales linearly with CT achieved", () =>
 
 test("disinfection-ct: cold-water / high-pH worst corner inflates CT requirement", () => {
   const r = computeDisinfectionCT({ chlorine_mg_l: 0.4, t10_minutes: 1, temperature_C: 0.5, pH: 9 });
-  // 0.5 C, pH 9 corner is 236 mg-min/L.
-  assert.ok(close(r.CT_required_3log_Giardia, 236, 1e-9));
+  // 0.5 C, pH 9 corner is 390 mg-min/L (SWTR Table A-1, the coldest / highest-pH worst case).
+  assert.ok(close(r.CT_required_3log_Giardia, 390, 1e-9));
 });
 
 test("disinfection-ct: WATER_RENDERERS exposes disinfection-ct", () => {

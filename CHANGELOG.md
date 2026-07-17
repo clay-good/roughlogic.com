@@ -4,6 +4,21 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(water): disinfection-ct SWTR Giardia table pH columns were mislabeled a half-to-full unit low (falsely certified inadequate disinfection); 2026-07-17
+
+- `disinfection-ct` (calc-water.js) bundled the USEPA SWTR 3-log Giardia CT table (free chlorine, <=0.4 mg/L) with the pH
+  axis declared 6.0/7.0/8.0/9.0 but the values were actually the EPA figures for pH 6.0/6.5/7.0/7.5 -- the pH 7.0, 8.0,
+  and 9.0 columns each held values a half-to-full pH unit too low. Because required CT rises steeply with pH, the tile
+  badly UNDER-stated the CT required at pH > 7 and could green-light inadequate Giardia inactivation as a PASS. At 5 C /
+  pH 8.0 it returned CT_required 139 (true 198); at 5 C / pH 9.0 it returned 165 (true 279). A system reading C=1.0 mg/L,
+  t10=150 min (CT 150) at 5 C / pH 8.0 was reported PASS when the true requirement is 198 (a real FAIL) -- a public-health
+  safety defect. The bundled worked example (pH 7.0 / 5 C, CT_required "116") itself encoded the error; the true value is
+  139. Replaced the six table rows with the correct EPA 815-R-99-014 Table A-1 values for pH 6.0/7.0/8.0/9.0
+  (5 C row: 97/139/198/279), fixed the example to a genuinely-passing case, and updated the worked-example fixture, the
+  bounds-fuzzer (now pins 139/198/279 and the pH-8 fail), and the calc-water-v9 corner pins. Values verified against
+  EPA 815-R-99-014 Table A-1 (NM-ENV and Oregon OHA state CT tables, pdftotext of the source PDFs). Caught by a
+  first-principles re-derivation of calc-water.js.
+
 ### fix(hvac): duct-leakage normalized to 1 in WC with sqrt(P) instead of the SMACNA P^0.65 flow exponent; 2026-07-17
 
 - `duct-leakage` (calc-hvac.js) normalized a measured leak from the test pressure to the 1 in WC reference by dividing by
