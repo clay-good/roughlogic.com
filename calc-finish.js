@@ -431,3 +431,46 @@ FINISH_RENDERERS["glass-weight"] = _simpleRenderer({
   ],
   compute: computeGlassWeight,
 });
+
+// gutter-downspout-takeoff (spec-v900): gutter LF and downspout count takeoff.
+// dims: in { eave_length_ft: L, roof_area_sf: L^2, max_area_per_downspout_sf: L^2, wall_height_ft: L, hanger_spacing_ft: L } out: { gutter_lf: L, downspouts: dimensionless, downspout_pipe_lf: L, hangers: dimensionless }
+export function computeGutterDownspoutTakeoff({ eave_length_ft = 140, roof_area_sf = 2400, max_area_per_downspout_sf = 800, wall_height_ft = 10, hanger_spacing_ft = 2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(eave_length_ft > 0)) return { error: "Eave length must be positive (ft)." };
+  if (!(roof_area_sf > 0)) return { error: "Roof area must be positive (ft^2)." };
+  if (!(max_area_per_downspout_sf > 0)) return { error: "Area per downspout must be positive (ft^2)." };
+  if (!(wall_height_ft > 0)) return { error: "Wall height must be positive (ft)." };
+  if (!(hanger_spacing_ft > 0)) return { error: "Hanger spacing must be positive (ft)." };
+  const gutter_lf = eave_length_ft;
+  const downspouts = Math.ceil(roof_area_sf / max_area_per_downspout_sf);
+  const downspout_pipe_lf = downspouts * wall_height_ft;
+  const hangers = Math.ceil(eave_length_ft / hanger_spacing_ft);
+  if (![gutter_lf, downspouts, downspout_pipe_lf, hangers].every(Number.isFinite)) return { error: "Gutter-takeoff math is not a finite value." };
+  return {
+    gutter_lf,
+    downspouts,
+    downspout_pipe_lf,
+    hangers,
+    note: "The maximum drainage area per downspout comes from the gutter and downspout size and the rainfall (from gutter-downspout -- entered here). The gutter runs the eave; hangers go about every 2 ft (tighter in snow country). Distinct from the cross-section sizing in gutter-downspout.",
+  };
+}
+
+const gutterDownspoutTakeoffExample = { inputs: { eave_length_ft: 140, roof_area_sf: 2400, max_area_per_downspout_sf: 800, wall_height_ft: 10, hanger_spacing_ft: 2 } };
+FINISH_RENDERERS["gutter-downspout-takeoff"] = _simpleRenderer({
+  citation: "Citation: takeoff identity by name. gutter = eave; downspouts = ceil(roof area / max area per downspout); pipe = downspouts x wall height; hangers = ceil(eave / spacing). The area per downspout comes from gutter-downspout.",
+  example: gutterDownspoutTakeoffExample.inputs,
+  fields: [
+    { key: "eave_length_ft", label: "Total eave / gutter length (ft)", kind: "number", default: 140 },
+    { key: "roof_area_sf", label: "Tributary roof area (ft^2)", kind: "number", default: 2400 },
+    { key: "max_area_per_downspout_sf", label: "Max area per downspout (ft^2)", kind: "number", default: 800 },
+    { key: "wall_height_ft", label: "Downspout drop height (ft)", kind: "number", default: 10 },
+    { key: "hanger_spacing_ft", label: "Gutter hanger spacing (ft)", kind: "number", default: 2 },
+  ],
+  outputs: [
+    { key: "g", id: "gdt-out-g", label: "Gutter footage", value: (r) => fmt(r.gutter_lf, 0) + " LF" },
+    { key: "d", id: "gdt-out-d", label: "Downspouts", value: (r) => fmt(r.downspouts, 0) + " downspouts (" + fmt(r.downspout_pipe_lf, 0) + " LF pipe)" },
+    { key: "h", id: "gdt-out-h", label: "Gutter hangers", value: (r) => fmt(r.hangers, 0) + " hangers" },
+    { key: "n", id: "gdt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGutterDownspoutTakeoff,
+});

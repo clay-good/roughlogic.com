@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(roofing): gutter-downspout-takeoff -- gutter LF and downspout count takeoff (spec-v900); 2026-07-17
+
+- New Group E tile `gutter-downspout-takeoff` (calc-finish.js), the roofing takeoff beside `gutter-downspout`. gutter =
+  eave; downspouts = ceil(roof area / max area per downspout); pipe = downspouts x wall height; hangers = ceil(eave /
+  spacing). 140 LF of eave on a 2,400 sf roof at 800 sf per downspout is 3 downspouts, 30 LF of pipe, and about 70
+  hangers; a 4,000 sf roof needs 5 downspouts and 50 LF of pipe. The roof area drives the downspouts, the eave drives the
+  gutter and hangers. Distinct from the cross-section sizing in gutter-downspout. Home count 1,348 -> 1,349.
+
 ### feat(pool-service): pool-interior-finish-volume -- pool gunite shell and plaster volume (spec-v899); 2026-07-17
 
 - New Group M tile `pool-interior-finish-volume` (calc-treatment.js), the pool takeoff beside `pool-volume` and

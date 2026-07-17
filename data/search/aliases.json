@@ -18552,6 +18552,31 @@
       "kind": "industry"
     },
     {
+      "term": "gutter takeoff",
+      "target": "gutter-downspout-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "downspout count",
+      "target": "gutter-downspout-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "gutter linear feet",
+      "target": "gutter-downspout-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "gutter hanger count",
+      "target": "gutter-downspout-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "downspout pipe footage",
+      "target": "gutter-downspout-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

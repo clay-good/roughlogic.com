@@ -824,6 +824,7 @@ export const COMPUTE_MAP = {
   "pv-ballast-weight": { module: "../../calc-solar.js", fn: "computePvBallastWeight" },
   "pool-tile-coping-perimeter": { module: "../../calc-treatment.js", fn: "computePoolTileCopingPerimeter" },
   "pool-interior-finish-volume": { module: "../../calc-treatment.js", fn: "computePoolInteriorFinishVolume" },
+  "gutter-downspout-takeoff": { module: "../../calc-finish.js", fn: "computeGutterDownspoutTakeoff" },
   "concrete-vibrator-spacing": { module: "../../calc-construction.js", fn: "computeConcreteVibratorSpacing" },
   "formwork-tie-load": { module: "../../calc-construction.js", fn: "computeFormworkTieLoad" },
   "mass-concrete-temp-rise": { module: "../../calc-construction.js", fn: "computeMassConcreteTempRise" },

@@ -26482,3 +26482,25 @@ test("bounds: spec-v899 computePoolInteriorFinishVolume pins the interior, gunit
   assert.ok("error" in _v899({ length_ft: 30, width_ft: 15, avg_depth_ft: 5.5, shell_thickness_in: 8, plaster_thickness_in: 0.375, waste_pct: -15 }));
   assert.ok("error" in _v899({ length_ft: Infinity, width_ft: 15, avg_depth_ft: 5.5, shell_thickness_in: 8, plaster_thickness_in: 0.375, waste_pct: 15 }));
 });
+
+import { computeGutterDownspoutTakeoff as _v900 } from "../../calc-finish.js";
+
+test("bounds: spec-v900 computeGutterDownspoutTakeoff pins the gutter, downspouts, pipe, hangers, and error seams", () => {
+  const r = _v900({ eave_length_ft: 140, roof_area_sf: 2400, max_area_per_downspout_sf: 800, wall_height_ft: 10, hanger_spacing_ft: 2 });
+  assert.equal(r.gutter_lf, 140); // eave
+  assert.equal(r.downspouts, 3); // ceil(2400/800)
+  assert.equal(r.downspout_pipe_lf, 30); // 3 * 10
+  assert.equal(r.hangers, 70); // ceil(140/2)
+  // The roof area drives the downspouts; the eave drives the gutter and hangers.
+  const big = _v900({ eave_length_ft: 140, roof_area_sf: 4000, max_area_per_downspout_sf: 800, wall_height_ft: 10, hanger_spacing_ft: 2 });
+  assert.equal(big.downspouts, 5); // ceil(4000/800)
+  assert.equal(big.downspout_pipe_lf, 50); // 5 * 10
+  assert.equal(big.hangers, 70); // eave unchanged
+  // Error seams: non-finite, non-positive eave / roof area / per-downspout area / wall height / hanger spacing.
+  assert.ok("error" in _v900({ eave_length_ft: 0, roof_area_sf: 2400, max_area_per_downspout_sf: 800, wall_height_ft: 10, hanger_spacing_ft: 2 }));
+  assert.ok("error" in _v900({ eave_length_ft: 140, roof_area_sf: 0, max_area_per_downspout_sf: 800, wall_height_ft: 10, hanger_spacing_ft: 2 }));
+  assert.ok("error" in _v900({ eave_length_ft: 140, roof_area_sf: 2400, max_area_per_downspout_sf: 0, wall_height_ft: 10, hanger_spacing_ft: 2 }));
+  assert.ok("error" in _v900({ eave_length_ft: 140, roof_area_sf: 2400, max_area_per_downspout_sf: 800, wall_height_ft: 0, hanger_spacing_ft: 2 }));
+  assert.ok("error" in _v900({ eave_length_ft: 140, roof_area_sf: 2400, max_area_per_downspout_sf: 800, wall_height_ft: 10, hanger_spacing_ft: 0 }));
+  assert.ok("error" in _v900({ eave_length_ft: Infinity, roof_area_sf: 2400, max_area_per_downspout_sf: 800, wall_height_ft: 10, hanger_spacing_ft: 2 }));
+});

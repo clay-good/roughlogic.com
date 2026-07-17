@@ -2049,6 +2049,7 @@ cross-check.
 | calc-finish.js | `computeFlooringTakeoff` | `{ room_length_ft = 0, room_width_ft = 0, box_coverage_sqft = 20, pattern = "s...` | _ | _ | _ |
 | calc-finish.js | `computeGlassWeight` | `{ width_in = 0, height_in = 0, thickness_in = 0, panes = 1 } = {}` | _ | _ | _ |
 | calc-finish.js | `computeGutterDownspout` | `{ roof_area_sqft = 0, pitch_factor = "1.00", rainfall_in_hr = 5, downspout_sq...` | _ | _ | _ |
+| calc-finish.js | `computeGutterDownspoutTakeoff` | `{ eave_length_ft = 140, roof_area_sf = 2400, max_area_per_downspout_sf = 800,...` | _ | _ | _ |
 | calc-finish.js | `computePaverPatio` | `{ area_sqft = 0, paver_length_in = 0, paver_width_in = 0, base_depth_in = 6, ...` | _ | _ | _ |
 | calc-finish.js | `computeRetainingWallBlock` | `{ wall_length_ft = 0, exposed_height_ft = 0, block_length_in = 18, block_heig...` | _ | _ | _ |
 | calc-finish.js | `computeThinsetCoverage` | `{ area_sqft = 0, trowel = "quarter_three_eighths", coverage_per_bag = 0, bag_...` | _ | _ | _ |
@@ -3009,7 +3010,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1595.
+Row count: 1596.
 
 <!-- END function-corpus-v14 -->
 
@@ -3569,7 +3570,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (343 tiles)
+### Group E Construction (344 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3692,6 +3693,7 @@ per spec-v14 §13.1 second paragraph.
 | `groove-weld-strength` | Groove Weld Strength | AWS D1.1 / AISC 360 §J2 Table J2.5 (b...; PJP throat 0.25 in, 6 in long, E70, LRFD -> 0.75*0.60*70 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `guard-handrail-check` | Guard and Handrail Code Check | IRC R312 / R311.7.8 / IBC 1015 (by se...; spec-v113 section 2.1 pinned example (48 in surface, 36 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gutter-downspout` | Gutter and Downspout Sizing | SMACNA / standard residential gutter ...; spec-v98 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `gutter-downspout-takeoff` | Gutter LF and Downspout Count Takeoff | Gutter takeoff identity (first-princi...; downspouts=ceil(2400/800)=3; pipe=3*10=30; hangers=ceil(1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `haul-cycle-production` | Haul-Cycle Production and Fleet Match | Caterpillar Performance Handbook cycl...; 12 lcy truck, load 2.0, haul 8.0, dump 1.5, return 6.0, s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `haul-road-resistance` | Haul-Road Total Resistance and Required Rimpull | Haul-road resistance identity (first-...; total = 5+4 = 9%; rimpull = 0.09*150000 = 13,500 lb; per ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hdd-pullback` | HDD Pullback Force First-Order Estimate | Simplified HDD pullback identity (AST...; pullback = 0.3*5*800*1.5 = 1,800 lb; utilization = 1800/2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4543,6 +4545,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1348. Fixture-covered or reference-cadence: 1348 / 1348.
+Tile count: 1349. Fixture-covered or reference-cadence: 1349 / 1349.
 
 <!-- END tile-index-v14 -->

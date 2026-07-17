@@ -8354,6 +8354,17 @@ export const CITATIONS = {
       { name: "Shell / plaster", value: "~8 in gunite shell and ~3/8 in plaster (defaults); the spec governs", source: "pool structural spec" },
     ],
   },
+  "gutter-downspout-takeoff": {
+    formula: "gutter_lf = eave_length_ft; downspouts = ceil(roof_area_sf / max_area_per_downspout_sf); downspout_pipe_lf = downspouts x wall_height_ft; hangers = ceil(eave_length_ft / hanger_spacing_ft).",
+    edition: "Gutter takeoff identity by name (gutter runs the eave; downspouts from the roof area over the per-downspout area; pipe and hangers from height and spacing); first-principles arithmetic.",
+    freeAccess: "The takeoff arithmetic is public first-principles; the drainage area per downspout comes from the gutter and downspout size and the rainfall.",
+    governance: GOVERNANCE.general,
+    editionNote: "The maximum drainage area per downspout comes from the gutter and downspout size and the rainfall (from gutter-downspout -- entered here). The gutter runs the eave; hangers go about every 2 ft (tighter in snow country). Distinct from the cross-section sizing in gutter-downspout.",
+    assumptions: [
+      { name: "Area per downspout", value: "~800 sf per downspout default; the downspout size and rainfall govern (from gutter-downspout)", source: "SMACNA / gutter-downspout" },
+      { name: "Hanger spacing", value: "~2 ft on center (tighter in snow country)", source: "installation practice" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",
