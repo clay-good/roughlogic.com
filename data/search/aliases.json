@@ -17927,6 +17927,31 @@
       "kind": "industry"
     },
     {
+      "term": "sfrm takeoff",
+      "target": "sfrm-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "spray fireproofing quantity",
+      "target": "sfrm-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "fireproofing bags",
+      "target": "sfrm-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "spray applied fire resistive",
+      "target": "sfrm-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "fireproofing material takeoff",
+      "target": "sfrm-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

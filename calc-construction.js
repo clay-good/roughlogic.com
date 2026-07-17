@@ -8930,3 +8930,50 @@ const _v874renderCarpetTakeoff = _simpleRenderer({
   compute: computeCarpetTakeoff,
 });
 CONSTRUCTION_RENDERERS["carpet-takeoff"] = _v874renderCarpetTakeoff;
+
+// --- sfrm-takeoff: Spray Fireproofing (SFRM) Material Takeoff ---
+//
+// Takes off spray-applied fire-resistive material - the volume, weight, and bags
+// for a coverage at the design thickness (rebound-heavy waste):
+//   volume_ft3 = area_sf x thickness_in / 12; weight_lb = volume_ft3 x density_pcf
+//   bags = ceil(weight_lb / bag_lb x (1 + waste_pct/100))
+// dims: in { area_sf: L^2, thickness_in: L, density_pcf: M L^-3, bag_lb: M, waste_pct: dimensionless } out: { volume_ft3: L^3, weight_lb: M, bags: dimensionless }
+export function computeSfrmTakeoff({ area_sf = 5000, thickness_in = 1.5, density_pcf = 15, bag_lb = 44, waste_pct = 15 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
+  if (!(thickness_in > 0)) return { error: "Thickness must be positive (in)." };
+  if (!(density_pcf > 0)) return { error: "Density must be positive (pcf)." };
+  if (!(bag_lb > 0)) return { error: "Bag weight must be positive (lb)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const volume_ft3 = (area_sf * thickness_in) / 12;
+  const weight_lb = volume_ft3 * density_pcf;
+  const bags = Math.ceil((weight_lb / bag_lb) * (1 + waste_pct / 100));
+  if (![volume_ft3, weight_lb, bags].every(Number.isFinite)) return { error: "SFRM-takeoff math is not a finite value." };
+  return {
+    volume_ft3,
+    weight_lb,
+    bags,
+    note: "The design thickness comes from the UL/ULC assembly for the required hourly rating (entered here); the density comes from the product. SFRM carries high in-place waste from overspray and rebound (~15%+). The design thickness, set by the fire rating, drives the whole order. Distinct from the wood char-depth-capacity.",
+  };
+}
+
+export const sfrmTakeoffExample = { inputs: { area_sf: 5000, thickness_in: 1.5, density_pcf: 15, bag_lb: 44, waste_pct: 15 } };
+
+const _v875renderSfrmTakeoff = _simpleRenderer({
+  citation: "Citation: SFRM takeoff identity by name. volume = area x thickness / 12; weight = volume x density; bags = ceil(weight / bag weight x (1 + waste)). The design thickness comes from the UL/ULC assembly for the required rating; SFRM carries high rebound waste.",
+  example: sfrmTakeoffExample.inputs,
+  fields: [
+    { key: "area_sf", label: "Area to spray (ft^2)", kind: "number", default: 5000 },
+    { key: "thickness_in", label: "Design thickness (in)", kind: "number", default: 1.5 },
+    { key: "density_pcf", label: "Material density (pcf)", kind: "number", default: 15 },
+    { key: "bag_lb", label: "Bag weight (lb)", kind: "number", default: 44 },
+    { key: "waste_pct", label: "In-place waste / overspray (percent)", kind: "number", default: 15 },
+  ],
+  outputs: [
+    { key: "b", id: "sfr-out-b", label: "Bags to order", value: (r) => _fmtC(r.bags, 0) + " bags" },
+    { key: "w", id: "sfr-out-w", label: "In-place material", value: (r) => _fmtC(r.weight_lb, 0) + " lb (" + _fmtC(r.volume_ft3, 0) + " ft^3)" },
+    { key: "note", id: "sfr-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSfrmTakeoff,
+});
+CONSTRUCTION_RENDERERS["sfrm-takeoff"] = _v875renderSfrmTakeoff;

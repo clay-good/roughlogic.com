@@ -1042,6 +1042,7 @@ const RELATED = {
   "sealant-joint-yield": ["construction-adhesive-tubes", "coating-coverage-dft", "paint-coverage"],
   "self-leveler-bags": ["thinset-coverage", "flooring-takeoff", "concrete"],
   "carpet-takeoff": ["flooring-takeoff", "self-leveler-bags", "carpet-restore-replace"],
+  "sfrm-takeoff": ["char-depth-capacity", "shotcrete-rebound-quantity", "coating-coverage-dft"],
   "refrigerant-lineset-charge-adjust": ["refrigerant-charge", "refrigerant-line-size", "refrigerant-velocity"],
   "asphalt-spread-rate": ["asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity"],
   "pavement-milling-production": ["asphalt-paving-speed", "asphalt-spread-rate", "haul-cycle-production"],

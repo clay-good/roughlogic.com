@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): sfrm-takeoff -- spray fireproofing (SFRM) material takeoff (spec-v875); 2026-07-17
+
+- New Group E tile `sfrm-takeoff` (calc-construction.js), the fireproofing takeoff sharing the rebound-heavy pattern
+  with `shotcrete-rebound-quantity`. volume = area x thickness / 12; weight = volume x density; bags = ceil(weight / bag
+  x (1 + waste)). 5,000 sf of steel at a 1.5 in design thickness in 15 pcf material is 625 ft^3 and 9,375 lb -- about
+  246 44-lb bags with the high SFRM overspray/rebound waste; a 2 in design takes 327 bags. The design thickness, set by
+  the UL/ULC assembly for the required hourly rating, drives the whole order. Home count 1,323 -> 1,324.
+
 ### feat(construction): carpet-takeoff -- carpet square-yard and linear-foot takeoff (spec-v874); 2026-07-17
 
 - New Group E tile `carpet-takeoff` (calc-construction.js), the flooring tile beside the square-foot `flooring-takeoff`,

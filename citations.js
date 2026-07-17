@@ -8541,6 +8541,17 @@ export const CITATIONS = {
       { name: "Roll width", value: "12 ft standard (15 ft available); a wider roll cuts the linear feet and seams", source: "carpet manufacturer" },
     ],
   },
+  "sfrm-takeoff": {
+    formula: "volume_ft3 = area_sf x thickness_in / 12; weight_lb = volume_ft3 x density_pcf; bags = ceil(weight_lb / bag_lb x (1 + waste_pct/100)).",
+    edition: "SFRM material-takeoff identity by name (in-place volume x density gives the weight; bags from weight and waste); first-principles takeoff arithmetic.",
+    freeAccess: "The takeoff arithmetic is public quantity geometry; the design thickness comes from the UL/ULC assembly (no rating table reproduced).",
+    governance: GOVERNANCE.general,
+    editionNote: "The design thickness comes from the UL/ULC assembly for the required hourly rating; the density comes from the product. SFRM carries high in-place waste from overspray and rebound (~15%+). The design thickness, set by the fire rating, drives the whole order. Distinct from the wood char-depth-capacity.",
+    assumptions: [
+      { name: "Design thickness", value: "from the UL/ULC assembly for the required hourly rating (varies by member size)", source: "UL/ULC fire-resistance directory" },
+      { name: "Waste", value: "~15%+ in-place from overspray and rebound; higher than most material takeoffs", source: "SFRM applicator" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

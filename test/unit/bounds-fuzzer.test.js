@@ -17145,6 +17145,7 @@ import { computeDumpsterCount as _v871dmp } from "../../calc-construction.js";
 import { computeSealantJointYield as _v872sjy } from "../../calc-construction.js";
 import { computeSelfLevelerBags as _v873slb } from "../../calc-construction.js";
 import { computeCarpetTakeoff as _v874cpt } from "../../calc-construction.js";
+import { computeSfrmTakeoff as _v875sfr } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -18084,6 +18085,22 @@ test("bounds: spec-v874 computeCarpetTakeoff pins the gross area, square yards, 
   assert.ok("error" in _v874cpt({ area_sf: 0, waste_pct: 10, roll_width_ft: 12 }));
   assert.ok("error" in _v874cpt({ area_sf: 900, waste_pct: 10, roll_width_ft: 0 }));
   assert.ok("error" in _v874cpt({ area_sf: 900, waste_pct: -1, roll_width_ft: 12 }));
+});
+
+test("bounds: spec-v875 computeSfrmTakeoff pins the volume, weight, bag count, and error seams", () => {
+  // 5,000 sf, 1.5 in, 15 pcf, 44-lb bags, 15% waste -> 625 ft^3, 9,375 lb, 246 bags.
+  const r = _v875sfr({ area_sf: 5000, thickness_in: 1.5, density_pcf: 15, bag_lb: 44, waste_pct: 15 });
+  assert.ok(Math.abs(r.volume_ft3 - 625) < 1e-6);
+  assert.ok(Math.abs(r.weight_lb - 9375) < 1e-6);
+  assert.strictEqual(r.bags, 246);
+  // A 2 in design thickness raises the order.
+  assert.strictEqual(_v875sfr({ area_sf: 5000, thickness_in: 2, density_pcf: 15, bag_lb: 44, waste_pct: 15 }).bags, 327);
+  // Error seams.
+  assert.ok("error" in _v875sfr({ area_sf: 0, thickness_in: 1.5, density_pcf: 15, bag_lb: 44, waste_pct: 15 }));
+  assert.ok("error" in _v875sfr({ area_sf: 5000, thickness_in: 0, density_pcf: 15, bag_lb: 44, waste_pct: 15 }));
+  assert.ok("error" in _v875sfr({ area_sf: 5000, thickness_in: 1.5, density_pcf: 0, bag_lb: 44, waste_pct: 15 }));
+  assert.ok("error" in _v875sfr({ area_sf: 5000, thickness_in: 1.5, density_pcf: 15, bag_lb: 0, waste_pct: 15 }));
+  assert.ok("error" in _v875sfr({ area_sf: 5000, thickness_in: 1.5, density_pcf: 15, bag_lb: 44, waste_pct: -1 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {
