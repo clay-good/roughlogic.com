@@ -5709,6 +5709,51 @@ const _renderFormworkTieLoad = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["formwork-tie-load"] = _renderFormworkTieLoad;
 
+// --- mass-concrete-temp-rise: Mass Concrete Adiabatic Temperature Rise Screen (ACI 207) ---
+//
+// Screens mass-concrete heat: the adiabatic temperature rise from the cement's
+// heat of hydration and the peak the placement will reach, per ACI 207:
+//   delta_t_f = cementitious_lb_per_cy x rise_f_per_100lb / 100
+//   peak_temp_f = placing_temp_f + delta_t_f
+//   exceeds_screen = delta_t_f > diff_limit_f
+// dims: in { cementitious_lb_per_cy: dimensionless, rise_f_per_100lb: dimensionless, placing_temp_f: T, diff_limit_f: T } out: { delta_t_f: T, peak_temp_f: T }
+export function computeMassConcreteTempRise({ cementitious_lb_per_cy = 600, rise_f_per_100lb = 12, placing_temp_f = 70, diff_limit_f = 35 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(cementitious_lb_per_cy > 0)) return { error: "Cementitious content must be positive (lb/cy)." };
+  if (!(rise_f_per_100lb > 0)) return { error: "Rise coefficient must be positive (degF/100lb)." };
+  if (!(diff_limit_f > 0)) return { error: "Differential limit must be positive (degF)." };
+  const delta_t_f = (cementitious_lb_per_cy * rise_f_per_100lb) / 100;
+  const peak_temp_f = placing_temp_f + delta_t_f;
+  const exceeds_screen = delta_t_f > diff_limit_f;
+  if (![delta_t_f, peak_temp_f].every(Number.isFinite)) return { error: "Temperature-rise math is not a finite value." };
+  return {
+    delta_t_f,
+    peak_temp_f,
+    exceeds_screen,
+    note: "This is a SCREEN, not a thermal analysis. The rise coefficient depends on the cement type and the supplementary cementitious materials (slag and fly ash lower it) - enter it from the mix data. The ~35 degF surface-to-core differential is the crack-control target a thermal-control plan enforces through modeling. The engineer of record governs; a wrong number here means thermal cracking (repair), not injury.",
+  };
+}
+
+export const massConcreteTempRiseExample = { inputs: { cementitious_lb_per_cy: 600, rise_f_per_100lb: 12, placing_temp_f: 70, diff_limit_f: 35 } };
+
+const _renderMassConcreteTempRise = _simpleRenderer({
+  citation: "Citation: ACI 207 adiabatic-rise identity by name. rise = cementitious x coefficient / 100; peak = placing + rise. A screen, not a thermal analysis; the rise coefficient comes from the mix data and the engineer of record governs the thermal-control plan.",
+  example: massConcreteTempRiseExample.inputs,
+  fields: [
+    { key: "cementitious_lb_per_cy", label: "Total cementitious content (lb/cy)", kind: "number", default: 600 },
+    { key: "rise_f_per_100lb", label: "Adiabatic rise per 100 lb cementitious (degF)", kind: "number", default: 12 },
+    { key: "placing_temp_f", label: "Concrete placing temperature (degF)", kind: "number", default: 70 },
+    { key: "diff_limit_f", label: "Surface-core differential target (degF)", kind: "number", default: 35 },
+  ],
+  outputs: [
+    { key: "d", id: "mctr-out-d", label: "Adiabatic temperature rise", value: (r) => _fmtC(r.delta_t_f, 0) + " degF" + (r.exceeds_screen ? " (over screen - thermal plan)" : " (under screen)") },
+    { key: "p", id: "mctr-out-p", label: "Estimated peak temperature", value: (r) => _fmtC(r.peak_temp_f, 0) + " degF" },
+    { key: "n", id: "mctr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMassConcreteTempRise,
+});
+CONSTRUCTION_RENDERERS["mass-concrete-temp-rise"] = _renderMassConcreteTempRise;
+
 // ----- spec-v246: Concrete Surface Evaporation Rate and Plastic-Shrinkage Risk (ACI 305) -----
 
 // dims: in { air_temp_f: T, concrete_temp_f: T, rh_pct: dimensionless, wind_mph: L T^-1 } out: { E_metric: M L^-2 T^-1, E_us: M L^-2 T^-1 }

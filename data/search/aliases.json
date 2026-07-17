@@ -17102,6 +17102,31 @@
       "kind": "industry"
     },
     {
+      "term": "mass concrete temperature rise",
+      "target": "mass-concrete-temp-rise",
+      "kind": "industry"
+    },
+    {
+      "term": "adiabatic temperature rise",
+      "target": "mass-concrete-temp-rise",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete heat of hydration",
+      "target": "mass-concrete-temp-rise",
+      "kind": "industry"
+    },
+    {
+      "term": "mass concrete peak temp",
+      "target": "mass-concrete-temp-rise",
+      "kind": "industry"
+    },
+    {
+      "term": "thermal control screen",
+      "target": "mass-concrete-temp-rise",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

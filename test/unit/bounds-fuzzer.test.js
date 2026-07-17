@@ -17112,6 +17112,7 @@ import { computePavementMillingProduction as _v838pmp } from "../../calc-constru
 import { computeStripingPaintQuantity as _v839spq } from "../../calc-construction.js";
 import { computeConcreteVibratorSpacing as _v840cvs } from "../../calc-construction.js";
 import { computeFormworkTieLoad as _v841ftl } from "../../calc-construction.js";
+import { computeMassConcreteTempRise as _v842mctr } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17492,6 +17493,24 @@ test("bounds: spec-v841 computeFormworkTieLoad pins the tie load, utilization, p
   assert.ok("error" in _v841ftl({ lateral_pressure_psf: 600, h_spacing_ft: 0, v_spacing_ft: 2, tie_swl_lb: 3000 }));
   assert.ok("error" in _v841ftl({ lateral_pressure_psf: 600, h_spacing_ft: 2, v_spacing_ft: 0, tie_swl_lb: 3000 }));
   assert.ok("error" in _v841ftl({ lateral_pressure_psf: 600, h_spacing_ft: 2, v_spacing_ft: 2, tie_swl_lb: 0 }));
+});
+
+test("bounds: spec-v842 computeMassConcreteTempRise pins the rise, peak, exceed flag, and error seams", () => {
+  // 600 lb/cy at 12 degF/100lb, placed at 70 degF -> 72 degF rise, 142 degF peak, exceeds 35.
+  const r = _v842mctr({ cementitious_lb_per_cy: 600, rise_f_per_100lb: 12, placing_temp_f: 70, diff_limit_f: 35 });
+  assert.strictEqual(r.delta_t_f, 72);
+  assert.strictEqual(r.peak_temp_f, 142);
+  assert.strictEqual(r.exceeds_screen, true);
+  // A leaner 400 lb/cy slag mix at 8 degF/100lb stays under the screen.
+  const lean = _v842mctr({ cementitious_lb_per_cy: 400, rise_f_per_100lb: 8, placing_temp_f: 70, diff_limit_f: 35 });
+  assert.strictEqual(lean.delta_t_f, 32);
+  assert.strictEqual(lean.peak_temp_f, 102);
+  assert.strictEqual(lean.exceeds_screen, false);
+  // Error seams.
+  assert.ok("error" in _v842mctr({ cementitious_lb_per_cy: 0, rise_f_per_100lb: 12, placing_temp_f: 70, diff_limit_f: 35 }));
+  assert.ok("error" in _v842mctr({ cementitious_lb_per_cy: 600, rise_f_per_100lb: 0, placing_temp_f: 70, diff_limit_f: 35 }));
+  assert.ok("error" in _v842mctr({ cementitious_lb_per_cy: 600, rise_f_per_100lb: 12, placing_temp_f: 70, diff_limit_f: 0 }));
+  assert.ok("error" in _v842mctr({ cementitious_lb_per_cy: 600, rise_f_per_100lb: 12, placing_temp_f: Infinity, diff_limit_f: 35 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): mass-concrete-temp-rise -- mass concrete adiabatic temp rise screen per ACI 207 (spec-v842); 2026-07-17
+
+- New Group E tile `mass-concrete-temp-rise` (calc-construction.js), the concrete-operations heat screen beside
+  `concrete-maturity` and `fresh-concrete-temp`. Adiabatic temperature rise from the cement's heat of hydration and the
+  peak the placement reaches (ACI 207): rise = cementitious x coefficient / 100; peak = placing + rise. A rich 600 lb/cy
+  mix at 12 degF/100lb gains 72 degF and, placed at 70 degF, peaks near 142 degF -- past the ~35 degF differential that
+  governs cracking, so it needs cooling; a leaner 400 lb/cy slag mix at 8 degF/100lb gains only 32 degF. A screen, not a
+  thermal analysis; the mix data sets the coefficient and the EOR governs. Home count 1,290 -> 1,291.
+
 ### feat(construction): formwork-tie-load -- formwork tie load and spacing (spec-v841); 2026-07-17
 
 - New Group E tile `formwork-tie-load` (calc-construction.js), completing the formwork family (`formwork-pressure` the

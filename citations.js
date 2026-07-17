@@ -8178,6 +8178,17 @@ export const CITATIONS = {
       { name: "Tie SWL", value: "the manufacturer's rated safe working load, with its own safety factor", source: "tie manufacturer" },
     ],
   },
+  "mass-concrete-temp-rise": {
+    formula: "delta_t_f = cementitious_lb_per_cy x rise_f_per_100lb / 100; peak_temp_f = placing_temp_f + delta_t_f; exceeds_screen = delta_t_f > diff_limit_f.",
+    edition: "ACI 207 adiabatic temperature-rise identity by name (rise = cementitious x coefficient; peak = placing + rise); a first-order screen.",
+    freeAccess: "The adiabatic-rise screen is public first-order arithmetic; the rise coefficient and the thermal-control plan come from the mix data and the engineer of record.",
+    governance: GOVERNANCE.general,
+    editionNote: "This is a SCREEN, not a thermal analysis. The rise coefficient depends on the cement type and the supplementary cementitious materials (slag and fly ash lower it). The ~35 degF surface-to-core differential is the crack-control target a thermal-control plan enforces through modeling. The engineer of record governs; a wrong number means thermal cracking (repair), not injury.",
+    assumptions: [
+      { name: "Rise coefficient", value: "degF per 100 lb cementitious from the mix data; SCMs (slag, fly ash) lower it (~12 default, ~8 with slag)", source: "mix data / ACI 207" },
+      { name: "Differential target", value: "~35 degF surface-to-core crack-control target the thermal-control plan enforces", source: "ACI 207 / engineer of record" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",
