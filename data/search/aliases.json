@@ -17202,6 +17202,31 @@
       "kind": "industry"
     },
     {
+      "term": "earthwork unit cost",
+      "target": "unit-cost-earthwork",
+      "kind": "industry"
+    },
+    {
+      "term": "dollar per cy",
+      "target": "unit-cost-earthwork",
+      "kind": "industry"
+    },
+    {
+      "term": "production unit cost",
+      "target": "unit-cost-earthwork",
+      "kind": "industry"
+    },
+    {
+      "term": "cost per cubic yard",
+      "target": "unit-cost-earthwork",
+      "kind": "industry"
+    },
+    {
+      "term": "equipment unit cost",
+      "target": "unit-cost-earthwork",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

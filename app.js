@@ -651,7 +651,7 @@ const TOOL_MODULES = (() => {
   // changed.
   declare("./calc-earthwork.js", "EARTHWORK_RENDERERS", [
     "soil-swell-shrink", "haul-cycle-production", "loader-production", "dozer-production", "compaction-roller-production", "ripper-production", "rusle-soil-loss", "riprap-d50", "riprap-tonnage", "silt-fence-drainage", "check-dam-spacing", "sediment-basin-volume", "erosion-blanket-coverage", "hydroseed-mix", "rock-construction-entrance", "dewatering-rate",
-    "spoil-setback", "pipe-bedding-backfill", "pipe-flotation", "restrained-pipe-length", "hdd-pullback", "dust-control-water", "haul-road-resistance", "dump-truck-loads",
+    "spoil-setback", "pipe-bedding-backfill", "pipe-flotation", "restrained-pipe-length", "hdd-pullback", "dust-control-water", "haul-road-resistance", "dump-truck-loads", "unit-cost-earthwork",
     // spec-v326..v328 soil characterization / QC batch
     "relative-compaction", "water-for-compaction", "soil-phase-relations", "atterberg-indices", "fineness-modulus",
   ]);

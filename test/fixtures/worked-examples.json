@@ -50075,6 +50075,60 @@
    }
   },
   {
+   "tile_id": "unit-cost-earthwork",
+   "source_publisher": "Production unit-cost identity (first-principles)",
+   "source_title": "$150/hr equipment, $65/hr operator, 656 cy/hr production",
+   "source_edition_or_year": "spec-v846 worked example",
+   "source_section_or_page": "hourly = 150+65 = 215; unit cost = 215/656 = $0.328/cy",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "equipment_rate_per_hr": 150,
+    "operator_rate_per_hr": 65,
+    "support_rate_per_hr": 0,
+    "production_cy_per_hr": 656,
+    "total_cy": 0
+   },
+   "outputs": {
+    "hourly_cost": {
+     "value": 215,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "unit_cost_per_cy": {
+     "value": 0.3277,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "unit-cost-earthwork",
+   "source_publisher": "Production unit-cost identity (first-principles)",
+   "source_title": "cross-check: production sliding to 400 cy/hr on soft ground",
+   "source_edition_or_year": "spec-v846 worked example",
+   "source_section_or_page": "unit cost = 215/400 = $0.538/cy (63% more per yard)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "equipment_rate_per_hr": 150,
+    "operator_rate_per_hr": 65,
+    "support_rate_per_hr": 0,
+    "production_cy_per_hr": 400,
+    "total_cy": 0
+   },
+   "outputs": {
+    "unit_cost_per_cy": {
+     "value": 0.5375,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

@@ -8222,6 +8222,17 @@ export const CITATIONS = {
       { name: "Legal payload", value: "weight limit from the axle and GVW limits (~40,000 lb default); the axle limits govern the weight", source: "axle / GVW limits" },
     ],
   },
+  "unit-cost-earthwork": {
+    formula: "hourly_cost = equipment_rate_per_hr + operator_rate_per_hr + support_rate_per_hr; unit_cost_per_cy = hourly_cost / production_cy_per_hr; total_cost = unit_cost_per_cy x total_cy.",
+    edition: "Production unit-cost identity by name (unit cost = hourly cost / production); first-principles cost arithmetic.",
+    freeAccess: "The unit-cost arithmetic is public first-principles; the hourly rates come from the cost records and the production from the production tiles.",
+    governance: GOVERNANCE.general,
+    editionNote: "The equipment rate is the ownership-plus-operating rate from equipment-hourly-rate or the machine's cost records; the production comes from the production tiles. Low production (soft ground, long haul, poor match) is what blows up the unit price - the number to attack is the production, not the rate.",
+    assumptions: [
+      { name: "Hourly rates", value: "equipment ownership + operating, operator wage + burden, and support, from the cost records", source: "equipment-hourly-rate / cost records" },
+      { name: "Production", value: "the hourly production rate from the production tiles (dozer, haul-cycle, loader)", source: "production tiles" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

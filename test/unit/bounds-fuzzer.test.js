@@ -17116,6 +17116,7 @@ import { computeMassConcreteTempRise as _v842mctr } from "../../calc-constructio
 import { computeConcreteWashoutVolume as _v843cwv } from "../../calc-construction.js";
 import { computeHaulRoadResistance as _v844hrr } from "../../calc-earthwork.js";
 import { computeDumpTruckLoads as _v845dtl } from "../../calc-earthwork.js";
+import { computeUnitCostEarthwork as _v846uce } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17569,6 +17570,22 @@ test("bounds: spec-v845 computeDumpTruckLoads pins the weight-limited volume, go
   assert.ok("error" in _v845dtl({ total_lcy: 625, box_vol_cy: 0, weight_limit_lb: 40000, material_density_lb_per_lcy: 2800 }));
   assert.ok("error" in _v845dtl({ total_lcy: 625, box_vol_cy: 12, weight_limit_lb: 0, material_density_lb_per_lcy: 2800 }));
   assert.ok("error" in _v845dtl({ total_lcy: 625, box_vol_cy: 12, weight_limit_lb: 40000, material_density_lb_per_lcy: 0 }));
+});
+
+test("bounds: spec-v846 computeUnitCostEarthwork pins the hourly cost, unit cost, total (and null seam), and error seams", () => {
+  // $150 + $65 equipment/operator, 656 cy/hr -> $215/hr, $0.328/cy, null total.
+  const r = _v846uce({ equipment_rate_per_hr: 150, operator_rate_per_hr: 65, support_rate_per_hr: 0, production_cy_per_hr: 656, total_cy: 0 });
+  assert.strictEqual(r.hourly_cost, 215);
+  assert.ok(Math.abs(r.unit_cost_per_cy - 0.3277) < 1e-3);
+  assert.strictEqual(r.total_cost, null);
+  // Production sliding to 400 cy/hr raises the unit cost sharply.
+  assert.ok(Math.abs(_v846uce({ equipment_rate_per_hr: 150, operator_rate_per_hr: 65, production_cy_per_hr: 400 }).unit_cost_per_cy - 0.5375) < 1e-3);
+  // A quantity totals the cost.
+  assert.ok(Math.abs(_v846uce({ equipment_rate_per_hr: 150, operator_rate_per_hr: 65, production_cy_per_hr: 656, total_cy: 1000 }).total_cost - 327.74) < 1);
+  // Error seams.
+  assert.ok("error" in _v846uce({ equipment_rate_per_hr: 150, operator_rate_per_hr: 65, production_cy_per_hr: 0 }));
+  assert.ok("error" in _v846uce({ equipment_rate_per_hr: -1, operator_rate_per_hr: 65, production_cy_per_hr: 656 }));
+  assert.ok("error" in _v846uce({ equipment_rate_per_hr: 150, operator_rate_per_hr: 65, production_cy_per_hr: 656, total_cy: -1 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

@@ -28,6 +28,7 @@
 //   - dust-control-water      Dust-control watering volume and truck trips
 //   - haul-road-resistance    Haul-road total resistance and required rimpull
 //   - dump-truck-loads        Dump truck governing payload and load count
+//   - unit-cost-earthwork     Earthwork production unit cost ($/cy)
 //
 // Group letters are independent of the module (the spec-v28/v30/v36/v39
 // precedent): all five KEEP group "E"; only the on-disk module changes.
@@ -1273,6 +1274,63 @@ function _v845renderDumpTruckLoads(inputRegion, outputRegion, citationEl) {
   for (const f of [t, b, wl, d]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["dump-truck-loads"] = _v845renderDumpTruckLoads;
+
+// --- unit-cost-earthwork: Earthwork Production Unit Cost ---
+//
+// Joins the equipment hourly rate to the hourly production into the unit cost
+// ($/cy) a bid needs - low production, not the rate, is what blows up the price:
+//   hourly_cost = equipment_rate_per_hr + operator_rate_per_hr + support_rate_per_hr
+//   unit_cost_per_cy = hourly_cost / production_cy_per_hr
+//   total_cost = total_cy > 0 ? unit_cost_per_cy x total_cy : null
+// dims: in { equipment_rate_per_hr: dimensionless, operator_rate_per_hr: dimensionless, support_rate_per_hr: dimensionless, production_cy_per_hr: dimensionless, total_cy: L^3 } out: { hourly_cost: dimensionless, unit_cost_per_cy: dimensionless }
+export function computeUnitCostEarthwork({ equipment_rate_per_hr = 150, operator_rate_per_hr = 65, support_rate_per_hr = 0, production_cy_per_hr = 656, total_cy = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(production_cy_per_hr > 0)) return { error: "Production rate must be positive (cy/hr)." };
+  if (equipment_rate_per_hr < 0) return { error: "Equipment rate cannot be negative ($/hr)." };
+  if (operator_rate_per_hr < 0) return { error: "Operator rate cannot be negative ($/hr)." };
+  if (support_rate_per_hr < 0) return { error: "Support rate cannot be negative ($/hr)." };
+  if (total_cy < 0) return { error: "Total quantity cannot be negative (cy)." };
+  const hourly_cost = equipment_rate_per_hr + operator_rate_per_hr + support_rate_per_hr;
+  const unit_cost_per_cy = hourly_cost / production_cy_per_hr;
+  if (![hourly_cost, unit_cost_per_cy].every(Number.isFinite)) return { error: "Unit-cost math is not a finite value." };
+  const total_cost = total_cy > 0 ? unit_cost_per_cy * total_cy : null;
+  return {
+    hourly_cost,
+    unit_cost_per_cy,
+    total_cost,
+    note: "The equipment rate is the ownership-plus-operating rate from equipment-hourly-rate or the machine's cost records; the production comes from the production tiles. Low production (soft ground, long haul, poor match) is what blows up the unit price - the number to attack is the production, not the rate.",
+  };
+}
+
+function _v846renderUnitCostEarthwork(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: unit-cost identity by name. unit cost ($/cy) = (equipment + operator + support hourly rates) / production per hour. The equipment rate is the ownership-plus-operating rate; the production comes from the production tiles.";
+  const eq = makeNumber("Equipment ownership + operating rate ($/hr)", "uce-eq", { step: "any", min: "0", value: "150" });
+  eq.input.value = "150";
+  const op = makeNumber("Operator wage + burden ($/hr)", "uce-op", { step: "any", min: "0", value: "65" });
+  op.input.value = "65";
+  const su = makeNumber("Support equipment / labor ($/hr)", "uce-su", { step: "any", min: "0", value: "0" });
+  su.input.value = "0";
+  const pr = makeNumber("Production rate (cy/hr)", "uce-pr", { step: "any", min: "0", value: "656" });
+  pr.input.value = "656";
+  const tc = makeNumber("Total quantity (cy, 0 = skip)", "uce-tc", { step: "any", min: "0", value: "0" });
+  tc.input.value = "0";
+  for (const f of [eq, op, su, pr, tc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { eq.input.value = "150"; op.input.value = "65"; su.input.value = "0"; pr.input.value = "656"; tc.input.value = "0"; update(); });
+  const oUnit = makeOutputLine(outputRegion, "Unit cost", "uce-out-unit");
+  const oTotal = makeOutputLine(outputRegion, "Total cost for the quantity", "uce-out-total");
+  const update = debounce(() => {
+    const r = computeUnitCostEarthwork({
+      equipment_rate_per_hr: eq.input.value === "" ? 0 : Number(eq.input.value), operator_rate_per_hr: op.input.value === "" ? 0 : Number(op.input.value),
+      support_rate_per_hr: su.input.value === "" ? 0 : Number(su.input.value), production_cy_per_hr: pr.input.value === "" ? 656 : Number(pr.input.value),
+      total_cy: tc.input.value === "" ? 0 : Number(tc.input.value),
+    });
+    if (r.error) { oUnit.textContent = r.error; oTotal.textContent = "-"; return; }
+    oUnit.textContent = "$" + fmt(r.unit_cost_per_cy, 3) + "/cy (at $" + fmt(r.hourly_cost, 0) + "/hr)";
+    oTotal.textContent = r.total_cost === null ? "- (enter a quantity to total)" : "$" + fmt(r.total_cost, 0);
+  }, DEBOUNCE_MS);
+  for (const f of [eq, op, su, pr, tc]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["unit-cost-earthwork"] = _v846renderUnitCostEarthwork;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

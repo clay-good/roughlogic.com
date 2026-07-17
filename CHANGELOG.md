@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): unit-cost-earthwork -- earthwork production unit cost (spec-v846); 2026-07-17
+
+- New Group E tile `unit-cost-earthwork` (calc-earthwork.js), the estimating tile joining `equipment-hourly-rate` (cost)
+  with the production tiles (rate) into the bid unit price. unit cost ($/cy) = (equipment + operator + support $/hr) /
+  production (cy/hr). A dozer at $215/hr all-in moving 656 cy/hr costs $0.328/cy, but let production fall to 400 cy/hr
+  on soft ground and the same machine costs $0.538/cy -- a 63% jump the rate alone never shows. Low production, not the
+  rate, is what blows up the unit price. Home count 1,294 -> 1,295. This tile crossed the calc-earthwork.js gzip cap,
+  raised 30000 -> 34000 (ledger in check-module-sizes.mjs).
+
 ### feat(earthwork): dump-truck-loads -- dump truck governing payload and load count (spec-v845); 2026-07-17
 
 - New Group E tile `dump-truck-loads` (calc-earthwork.js), the site-logistics payload tile beside
