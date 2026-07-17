@@ -7935,6 +7935,17 @@ export const CITATIONS = {
       { name: "Working minutes", value: "50-minute hour (efficiency factor for real-world delays)", source: "Caterpillar Performance Handbook" },
     ],
   },
+  "compaction-roller-production": {
+    formula: "area_sf_hr = drum_width x speed x 5280 x efficiency / passes; area_sy_hr = area_sf_hr / 9; production_ccy_hr = area_sf_hr x (lift/12) / 27 = 16.3 x width x speed x lift x efficiency / passes (16.3 = 5280 / (12 x 27)).",
+    edition: "Roller production identity by name (compacted volume rate from coverage and lift); first-principles unit-folding arithmetic.",
+    freeAccess: "The roller coverage-rate identity is published earthmoving practice; the 5280 / 12 / 27 unit constant is exact.",
+    governance: GOVERNANCE.general,
+    editionNote: "The number of passes comes from a project test strip and the spec density, not the formula - it is the lever that moves the answer. The lift thickness is limited by the roller's ability to compact to the bottom of the lift. The 0.75 efficiency is a planning default. The surface-area rate is independent of lift thickness.",
+    assumptions: [
+      { name: "Efficiency", value: "0.75 job efficiency (default; real-world delays)", source: "earthmoving practice" },
+      { name: "Unit constant", value: "16.3 = 5280 / (12 x 27) folds mile, inch, and cubic yard (exact 16.2963)", source: "physical fact" },
+    ],
+  },
   "dewatering-rate": {
     formula: "drawdown_gal = pit_len x pit_wid x drawdown x 7.48052; pump_gpm = drawdown_gal / drawdown_min + inflow; sized_gpm = pump_gpm x (1 + safety/100).",
     edition: "First-principles volume and pumping-rate arithmetic by name; defers total dynamic head to the pump-tdh tile.",

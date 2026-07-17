@@ -5232,6 +5232,31 @@
       "kind": "industry"
     },
     {
+      "term": "roller compaction production",
+      "target": "compaction-roller-production",
+      "kind": "industry"
+    },
+    {
+      "term": "compactor production rate",
+      "target": "compaction-roller-production",
+      "kind": "industry"
+    },
+    {
+      "term": "compacted cy per hour",
+      "target": "compaction-roller-production",
+      "kind": "industry"
+    },
+    {
+      "term": "roller coverage rate",
+      "target": "compaction-roller-production",
+      "kind": "industry"
+    },
+    {
+      "term": "passes for compaction production",
+      "target": "compaction-roller-production",
+      "kind": "industry"
+    },
+    {
       "term": "dewatering",
       "target": "dewatering-rate",
       "kind": "industry"

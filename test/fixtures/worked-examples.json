@@ -22478,6 +22478,72 @@
    }
   },
   {
+   "tile_id": "compaction-roller-production",
+   "source_publisher": "Roller production identity (first-principles)",
+   "source_title": "7 ft drum, 3 mph, 8 in lift, 6 passes, 0.75 efficiency",
+   "source_edition_or_year": "earthmoving practice; 16.3 = 5280/(12*27)",
+   "source_section_or_page": "area = 7*3*5280*0.75/6 = 13,860 sf/hr (1,540 sy/hr); production = 13,860*(8/12)/27 = 342.2 compacted cy/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "drum_width_ft": 7,
+    "speed_mph": 3,
+    "lift_in": 8,
+    "passes": 6,
+    "efficiency": 0.75
+   },
+   "outputs": {
+    "area_sf_hr": {
+     "value": 13860,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "area_sy_hr": {
+     "value": 1540,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "production_ccy_hr": {
+     "value": 342.22,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "compaction-roller-production",
+   "source_publisher": "Roller production identity (first-principles)",
+   "source_title": "a stiffer spec needing 12 passes halves the output",
+   "source_edition_or_year": "earthmoving practice",
+   "source_section_or_page": "7 ft drum, 3 mph, 8 in lift, 12 passes, 0.75 efficiency -> 6,930 sf/hr, 171.1 compacted cy/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "drum_width_ft": 7,
+    "speed_mph": 3,
+    "lift_in": 8,
+    "passes": 12,
+    "efficiency": 0.75
+   },
+   "outputs": {
+    "area_sf_hr": {
+     "value": 6930,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "production_ccy_hr": {
+     "value": 171.11,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dewatering-rate",
    "source_publisher": "First-principles volume / pumping rate",
    "source_title": "drawdown_gal = L x W x H x 7.48052; pump = drawdown_gal/time + inflow; sized = pump x (1 + margin)",

@@ -748,6 +748,7 @@ export const COMPUTE_MAP = {
   "haul-cycle-production": { module: "../../calc-earthwork.js", fn: "computeHaulCycleProduction" },
   "loader-production": { module: "../../calc-earthwork.js", fn: "computeLoaderProduction" },
   "dozer-production": { module: "../../calc-earthwork.js", fn: "computeDozerProduction" },
+  "compaction-roller-production": { module: "../../calc-earthwork.js", fn: "computeCompactionRollerProduction" },
   "dewatering-rate": { module: "../../calc-earthwork.js", fn: "computeDewateringRate" },
   "spoil-setback": { module: "../../calc-earthwork.js", fn: "computeSpoilSetback" },
   "pipe-bedding-backfill": { module: "../../calc-earthwork.js", fn: "computePipeBeddingBackfill" },

@@ -1,6 +1,7 @@
 # roughlogic.com Specification v813 -- Roller Compaction Production Rate (calc-earthwork.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-16 (package 0.398.0).** Executed against the live catalog (1,260 -> 1,261 tiles; spec-v812
+> not yet landed, so the anchored count differs from this spec's assumed 1,261 -> 1,262). Single-tile spec.
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-earthwork.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v812.md. Construction-equipment production sweep
 > (entry 4), beside `loader-production`, `dozer-production`, and the QA-side `relative-compaction`.

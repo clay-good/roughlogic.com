@@ -1758,6 +1758,7 @@ cross-check.
 | calc-drainage.js | `computeSewageForceMainVelocity` | `{ gpm = 0, id_in = 0 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeSumpBasinSizing` | `{ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeAtterbergIndices` | `{ ll = 0, pl = 0, w_pct = 0 } = {}` | _ | _ | _ |
+| calc-earthwork.js | `computeCompactionRollerProduction` | `{ drum_width_ft, speed_mph, lift_in, passes, efficiency = 0.75 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeDewateringRate` | `{ pit_len_ft, pit_wid_ft, drawdown_ft = 0, drawdown_min, inflow_gpm = 0, safe...` | _ | _ | _ |
 | calc-earthwork.js | `computeDozerProduction` | `{ blade_cap_lcy, push_dist_ft, push_speed_fpm, return_speed_fpm, fixed_min = ...` | _ | _ | _ |
 | calc-earthwork.js | `computeFinenessModulus` | `{ r4 = 0, r8 = 0, r16 = 0, r30 = 0, r50 = 0, r100 = 0 } = {}` | _ | _ | _ |
@@ -2921,7 +2922,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1507.
+Row count: 1508.
 
 <!-- END function-corpus-v14 -->
 
@@ -3469,7 +3470,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (269 tiles)
+### Group E Construction (270 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3505,6 +3506,7 @@ per spec-v14 §13.1 second paragraph.
 | `column-base-plate` | Column Base Plate under Axial Load (AISC Design Guide 1) | AISC Design Guide 1 §3.1 / AISC 360-2...; spec-v268 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `column-buckling-wood` | Wood Column Capacity (Slenderness) | NDS column-stability (Cp / Euler buck...; 3.5x3.5 in, le 96 in, Fc* 1150, Emin 580,000 -> capacity ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `combined-stress-axial-bending` | Combined Axial and Bending Stress (P/A +/- Mc/I) | mechanics of materials; spec-v343 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `compaction-roller-production` | Roller Compaction Production Rate | Roller production identity (first-pri...; area = 7*3*5280*0.75/6 = 13,860 sf/hr (1,540 sy/hr); prod... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `composite-beam-flexure` | Composite Beam Flexural Strength (AISC 360-22 I3) | AISC 360-22 I3; spec-v412 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compound-miter` | Compound Miter (Crown Molding) | First-principles compound-miter trigo...; 38 deg spring crown at a 90 deg corner -> 31.62 deg miter... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `concrete` | Concrete Volume | Project (first-principles); Volume identity; 20x10 footing 4 in deep | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4367,6 +4369,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1260. Fixture-covered or reference-cadence: 1260 / 1260.
+Tile count: 1261. Fixture-covered or reference-cadence: 1261 / 1261.
 
 <!-- END tile-index-v14 -->

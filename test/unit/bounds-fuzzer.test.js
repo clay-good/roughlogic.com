@@ -10929,7 +10929,7 @@ test("bounds: spec-v744 spreader beam minimum top-point height (inverse of sprea
 import {
   computeSoilSwellShrink as _v67a, computeHaulCycleProduction as _v67b, computeDewateringRate as _v67c,
   computeSpoilSetback as _v67d, computePipeBeddingBackfill as _v67e, computeLoaderProduction as _v809lp,
-  computeDozerProduction as _v810dz,
+  computeDozerProduction as _v810dz, computeCompactionRollerProduction as _v813cr,
 } from "../../calc-earthwork.js";
 test("bounds: calc-construction v67 earthwork tiles pin volume conversion, production, dewatering, setback, and bedding", () => {
   // soil-swell-shrink: 100 bank, swell 25, shrink 15 -> 125 loose, 0.80 LF, 85 compacted
@@ -10972,6 +10972,17 @@ test("bounds: calc-construction v67 earthwork tiles pin volume conversion, produ
   assert.ok("error" in _v810dz({ blade_cap_lcy: 8, push_dist_ft: 100, push_speed_fpm: 0, return_speed_fpm: 400 }));
   assert.ok("error" in _v810dz({ blade_cap_lcy: 8, push_dist_ft: 100, push_speed_fpm: 200, return_speed_fpm: 0 }));
   assert.ok("error" in _v810dz({ blade_cap_lcy: 8, push_dist_ft: 100, push_speed_fpm: 200, return_speed_fpm: 400, fixed_min: -1 }));
+  // compaction-roller-production: 7 ft drum, 3 mph, 8 in lift, 6 passes, 0.75 eff -> 13860 sf/hr, 1540 sy/hr, 342.2 ccy/hr
+  const cr = _v813cr({ drum_width_ft: 7, speed_mph: 3, lift_in: 8, passes: 6, efficiency: 0.75 });
+  assert.ok(Math.abs(cr.area_sf_hr - 13860) < 1e-9);
+  assert.ok(Math.abs(cr.area_sy_hr - 1540) < 1e-9);
+  assert.ok(Math.abs(cr.production_ccy_hr - 342.2222) < 1e-3);
+  assert.ok(Math.abs(_v813cr({ drum_width_ft: 7, speed_mph: 3, lift_in: 8, passes: 12, efficiency: 0.75 }).production_ccy_hr - 171.1111) < 1e-3); // doubled passes
+  assert.ok("error" in _v813cr({ drum_width_ft: 0, speed_mph: 3, lift_in: 8, passes: 6 }));
+  assert.ok("error" in _v813cr({ drum_width_ft: 7, speed_mph: 0, lift_in: 8, passes: 6 }));
+  assert.ok("error" in _v813cr({ drum_width_ft: 7, speed_mph: 3, lift_in: 0, passes: 6 }));
+  assert.ok("error" in _v813cr({ drum_width_ft: 7, speed_mph: 3, lift_in: 8, passes: 0 }));
+  assert.ok("error" in _v813cr({ drum_width_ft: 7, speed_mph: 3, lift_in: 8, passes: 6, efficiency: 0 }));
   // dewatering-rate: 20x12 pit, 3 ft in 30 min, inflow 40, 25% -> 5386 gal, 219.5, 274.4
   const dw = _v67c({ pit_len_ft: 20, pit_wid_ft: 12, drawdown_ft: 3, drawdown_min: 30, inflow_gpm: 40, safety_pct: 25 });
   assert.ok(Math.abs(dw.drawdown_gal - 5386.0) < 1);

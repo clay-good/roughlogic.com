@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): compaction-roller-production -- roller compaction production rate (spec-v813); 2026-07-16
+
+- New Group E tile `compaction-roller-production` (calc-earthwork.js), the compaction-side production that closes the
+  load-haul-place loop (loader-production, dozer-production, haul-cycle-production) and complements the QA-side
+  relative-compaction. Roller production identity: compacted cy/hr = 16.3 x width x speed x lift x efficiency / passes
+  (16.3 = 5280 / (12 x 27) folds the mile, inch, and cubic yard). A 7 ft drum at 3 mph over 6 passes on an 8 in lift
+  covers 13,860 sf/hr and turns out ~342 compacted cy/hr; doubling the passes for a stiffer spec halves it. Home count
+  1,260 -> 1,261.
+
 ### feat(construction): asphalt-paving-speed -- paver speed and production rate (spec-v811); 2026-07-16
 
 - New Group E tile `asphalt-paving-speed` (calc-construction.js), the production-rate companion to the `asphalt-tonnage`

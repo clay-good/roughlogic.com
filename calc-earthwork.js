@@ -7,6 +7,7 @@
 //   - haul-cycle-production   Truck/loader haul-cycle production + fleet match
 //   - loader-production       Wheel-loader / excavator bucket production rate
 //   - dozer-production        Dozer slot / blade production rate
+//   - compaction-roller-production  Roller compaction production rate
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
@@ -292,6 +293,63 @@ function _v810renderDozerProduction(inputRegion, outputRegion, citationEl) {
   for (const f of [blade, push, pushSpeed, retSpeed, fixed, eff]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["dozer-production"] = _v810renderDozerProduction;
+
+// --- compaction-roller-production: Roller Compaction Production Rate ---
+//
+// area_sf/hr = width x speed x 5280 x efficiency / passes; area_sy/hr = area_sf/9;
+// production_ccy/hr = area_sf/hr x (lift/12) / 27.
+// dims: in { drum_width_ft: L, speed_mph: L T^-1, lift_in: L, passes: dimensionless, efficiency: dimensionless } out: { area_sf_hr: L^2 T^-1, area_sy_hr: L^2 T^-1, production_ccy_hr: L^3 T^-1 }
+// (Drum width and lift are L; speed L T^-1; passes and efficiency dimensionless;
+//  both area rates are L^2 T^-1 and the compacted-volume rate L^3 T^-1.)
+export function computeCompactionRollerProduction({ drum_width_ft, speed_mph, lift_in, passes, efficiency = 0.75 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const width = Number(drum_width_ft);
+  const speed = Number(speed_mph);
+  const lift = Number(lift_in);
+  const np = Number(passes);
+  const eff = Number(efficiency);
+  if (!Number.isFinite(width) || width <= 0) return { error: "Drum width must be a positive finite number (ft)." };
+  if (!Number.isFinite(speed) || speed <= 0) return { error: "Roller speed must be a positive finite number (mph)." };
+  if (!Number.isFinite(lift) || lift <= 0) return { error: "Lift thickness must be a positive finite number (in)." };
+  if (!Number.isFinite(np) || np <= 0) return { error: "Passes must be a positive finite number." };
+  if (!Number.isFinite(eff) || eff <= 0) return { error: "Efficiency must be a positive finite number." };
+  const areaSfHr = width * speed * 5280 * eff / np;
+  const areaSyHr = areaSfHr / 9;
+  const productionCcyHr = areaSfHr * (lift / 12) / 27;
+  if (![areaSfHr, areaSyHr, productionCcyHr].every(Number.isFinite)) return { error: "Production math is not a finite value." };
+  return {
+    area_sf_hr: areaSfHr,
+    area_sy_hr: areaSyHr,
+    production_ccy_hr: productionCcyHr,
+    note: "The number of passes comes from a project test strip and the spec density, not the formula - it is the lever that moves the answer. The lift thickness is limited by the roller's ability to compact to the bottom of the lift. The 0.75 efficiency is a planning default for real-world delays. The surface-area rate is independent of lift thickness; only the volume rate scales with it.",
+  };
+}
+
+function _v813renderCompactionRollerProduction(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: roller production identity by name. compacted cy/hr = 16.3 x width x speed x lift x efficiency / passes, where 16.3 = 5280 / (12 x 27) folds the mile, the inch, and the cubic yard; area/hr = width x speed x 5280 x efficiency / passes.";
+  const width = makeNumber("Compacting drum width (ft)", "cr-width", { step: "any", min: "0" });
+  const speed = makeNumber("Roller speed (mph)", "cr-speed", { step: "any", min: "0" });
+  const lift = makeNumber("Compacted lift thickness (in)", "cr-lift", { step: "any", min: "0" });
+  const passes = makeNumber("Passes to reach spec density", "cr-passes", { step: "any", min: "0" });
+  const eff = makeNumber("Job efficiency", "cr-eff", { step: "any", min: "0", value: "0.75" });
+  eff.input.value = "0.75";
+  for (const f of [width, speed, lift, passes, eff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { width.input.value = "7"; speed.input.value = "3"; lift.input.value = "8"; passes.input.value = "6"; eff.input.value = "0.75"; update(); });
+  const oArea = makeOutputLine(outputRegion, "Surface coverage", "cr-out-area");
+  const oProd = makeOutputLine(outputRegion, "Compacted production", "cr-out-prod");
+  const update = debounce(() => {
+    const r = computeCompactionRollerProduction({
+      drum_width_ft: Number(width.input.value) || 0, speed_mph: Number(speed.input.value) || 0,
+      lift_in: Number(lift.input.value) || 0, passes: Number(passes.input.value) || 0,
+      efficiency: eff.input.value === "" ? 0.75 : Number(eff.input.value),
+    });
+    if (r.error) { oArea.textContent = r.error; oProd.textContent = "-"; return; }
+    oArea.textContent = fmt(r.area_sf_hr, 0) + " sf/hr (" + fmt(r.area_sy_hr, 0) + " sy/hr)";
+    oProd.textContent = fmt(r.production_ccy_hr, 1) + " compacted cy/hr";
+  }, DEBOUNCE_MS);
+  for (const f of [width, speed, lift, passes, eff]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["compaction-roller-production"] = _v813renderCompactionRollerProduction;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //
