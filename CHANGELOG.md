@@ -4,6 +4,19 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(electrical): service-load-standard range demand (NEC 220.55 Note 1) undersized a >12 kW range ~8x on the increment; 2026-07-17
+
+- `service-load-standard` (calc-electrical.js) computed a >12 kW range's demand as `8000 + (range_W - 12000) x 0.05`,
+  i.e. 5% of the excess WATTS. NEC 220.55, Table 220.55 Column C, Note 1 requires the 8 kW Column-C base to be increased
+  5% for each additional kW (or major fraction) over 12 -- i.e. 5% of 8,000 W per kW, about 8x larger than the excess-watt
+  reading. A 16 kW range returned 8,200 W instead of the correct 9,600 W (8000 x 1.20); a 27 kW range returned 8,750 W
+  instead of 14,000 W -- undersizing the service (a non-conservative error). Fixed to
+  `8000 x (1 + 0.05 x round((range_W - 12000) / 1000))`, using round-half-up for the code's "major fraction thereof".
+  The tile's default example (12 kW range) hits the not-over-12 branch, so the fixture and the bounds-fuzzer never
+  exercised the buggy path; added Note-1 regression assertions (16 kW -> 9,600, 16.6 kW -> 10,000). The older
+  `service-load` tile uses a different, self-documented conservative range rule and is unaffected. Caught by a
+  first-principles NEC re-derivation of calc-electrical.js.
+
 ### fix(mechanic): driveshaft-crit used the wrong first-mode eigenvalue (4.7 -> pi^2), critical speed was ~2x low; 2026-07-17
 
 - `driveshaft-crit` (calc-mechanic.js) computed the whirl critical speed with `omega_n = (4.7 / L^2) x sqrt(EI/(rho A))`.

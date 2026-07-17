@@ -9449,6 +9449,10 @@ test("bounds: calc-electrical computeServiceLoadStandard pins NEC 220.42 tiered 
   assert.strictEqual(r.breakdown.lighting_general_demand_VA, 6150);
   // Range 12000 -> 8000 (NEC 220.55 simplified)
   assert.strictEqual(r.breakdown.range_demand_VA, 8000);
+  // NEC 220.55 Note 1: a 16 kW range is 4 kW over 12 -> 8000 x (1 + 0.05*4) = 9600 (not 8200);
+  // and a 16.6 kW range's major fraction rounds up to +5 increments -> 10000.
+  assert.strictEqual(computeServiceLoadStandard({ area_ft2: 2500, range_W: 16000, service_voltage: 240 }).breakdown.range_demand_VA, 9600);
+  assert.strictEqual(computeServiceLoadStandard({ area_ft2: 2500, range_W: 16600, service_voltage: 240 }).breakdown.range_demand_VA, 10000);
   // Dryer max(5000, 5000) = 5000
   assert.strictEqual(r.breakdown.dryer_demand_VA, 5000);
   // 5 fixed appliances >= 4 -> 75% demand = 6000

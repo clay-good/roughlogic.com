@@ -9427,7 +9427,7 @@ test("monotonicity: computeServiceLoadStandard total_VA is strictly non-decreasi
     prevR = r.total_VA;
   }
   // NEC 220.55 range-demand pin: 0 -> 0; <=8000 -> nameplate; 8000-12000 ->
-  // capped at 8000; >12000 -> 8000 + 0.05 * (range_W - 12000).
+  // capped at 8000; >12000 (Note 1) -> 8000 * (1 + 0.05 * round((range_W - 12000)/1000)).
   const r0 = computeServiceLoadStandard({ area_ft2: 2000, range_W: 0 });
   assert.equal(r0.breakdown.range_demand_VA, 0);
   const r6000 = computeServiceLoadStandard({ area_ft2: 2000, range_W: 6000 });
@@ -9435,7 +9435,7 @@ test("monotonicity: computeServiceLoadStandard total_VA is strictly non-decreasi
   const r10000 = computeServiceLoadStandard({ area_ft2: 2000, range_W: 10000 });
   assert.equal(r10000.breakdown.range_demand_VA, 8000);
   const r16000 = computeServiceLoadStandard({ area_ft2: 2000, range_W: 16000 });
-  assert.equal(r16000.breakdown.range_demand_VA, 8000 + (16000 - 12000) * 0.05);
+  assert.equal(r16000.breakdown.range_demand_VA, 8000 * (1 + 0.05 * Math.round((16000 - 12000) / 1000))); // 9600
   // NEC 220.54 dryer pin: 0 -> 0; >0 -> max(5000, nameplate).
   const d0 = computeServiceLoadStandard({ area_ft2: 2000, dryer_W: 0 });
   assert.equal(d0.breakdown.dryer_demand_VA, 0);

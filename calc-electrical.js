@@ -2178,13 +2178,14 @@ export function computeServiceLoadStandard({
   if (general <= 3000) general_demand = general;
   else if (general <= 120000) general_demand = 3000 + (general - 3000) * 0.35;
   else general_demand = 3000 + 117000 * 0.35 + (general - 120000) * 0.25;
-  // Range demand per NEC 220.55 (simplified single 8-12 kW range = 8000 W).
+  // Range demand per NEC 220.55, Table 220.55 Column C (single range): not over 12 kW = 8000 W.
+  // Note 1: for 12-27 kW, increase the 8000 W base 5% for each additional kW (or major fraction) over 12.
   const r = Number(range_W) || 0;
   let range_demand;
   if (r === 0) range_demand = 0;
   else if (r <= 8000) range_demand = r;
   else if (r <= 12000) range_demand = 8000;
-  else range_demand = 8000 + (r - 12000) * 0.05;
+  else range_demand = 8000 * (1 + 0.05 * Math.round((r - 12000) / 1000));
   // Dryer per NEC 220.54: 5000 W or nameplate (whichever is greater).
   const d = Number(dryer_W) || 0;
   const dryer_demand = d === 0 ? 0 : Math.max(5000, d);

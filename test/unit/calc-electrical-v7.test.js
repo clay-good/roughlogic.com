@@ -234,8 +234,8 @@ test("237 range 12 kW uses 8 kW demand", () => {
 
 test("237 range above 12 kW adds 5% per kW", () => {
   const r = computeServiceLoadStandard({ area_ft2: 1000, range_W: 16000 });
-  // 8000 + (16000-12000) × 0.05 = 8000 + 200 = 8200
-  assert.equal(r.breakdown.range_demand_VA, 8200);
+  // NEC 220.55 Note 1: 4 kW over 12 -> increase the 8000 W Column-C base 5% per kW = 8000 × (1 + 0.05×4) = 9600
+  assert.equal(r.breakdown.range_demand_VA, 9600);
 });
 
 test("237 fixed-appliance 75% kicks in at 4+ items", () => {
