@@ -8112,6 +8112,17 @@ export const CITATIONS = {
       { name: "Components", value: "frames = (bays+1) x lifts, braces = 2 x bays x lifts, base plates = (bays+1) x 2; guardrails/ties/access separate", source: "manufacturer erection guide" },
     ],
   },
+  "dust-control-water": {
+    formula: "area_sy = length_ft x width_ft / 9; gal_per_app = area_sy x rate_gal_per_sy; trips_per_app = ceil(gal_per_app / truck_cap_gal); daily_gal = gal_per_app x applications_per_day.",
+    edition: "Dust-control watering identity by name (gallons = area x rate; trips = ceil(gallons / capacity)); first-principles volume arithmetic.",
+    freeAccess: "The watering arithmetic is public quantity geometry; the application rate and frequency come from the site's fugitive-dust plan and AHJ air permit.",
+    governance: GOVERNANCE.general,
+    editionNote: "The application rate (commonly around 0.5 gal/sy) and the frequency come from the site's fugitive-dust plan and the AHJ air permit. Over-watering makes mud and tracks out; under-watering fails the permit. The frequency climbs with wind and heat, and that (not the road area) drives the daily water budget.",
+    assumptions: [
+      { name: "Application rate", value: "~0.5 gal/sy default; the site's fugitive-dust plan and AHJ air permit govern", source: "fugitive-dust plan / AHJ air permit" },
+      { name: "Frequency", value: "passes per day set by wind, heat, and traffic; drives the daily water budget", source: "site dust plan" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

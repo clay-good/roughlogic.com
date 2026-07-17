@@ -25,6 +25,7 @@
 //   - pipe-flotation          Buried pipe flotation / anti-flotation backfill
 //   - restrained-pipe-length  Restrained-joint length at a pipe bend
 //   - hdd-pullback            HDD pullback force first-order estimate (ASTM F1962)
+//   - dust-control-water      Dust-control watering volume and truck trips
 //
 // Group letters are independent of the module (the spec-v28/v30/v36/v39
 // precedent): all five KEEP group "E"; only the on-disk module changes.
@@ -1106,6 +1107,67 @@ function _v833renderHddPullback(inputRegion, outputRegion, citationEl) {
   for (const f of [ew, ln, fc, bf, fd, sp]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["hdd-pullback"] = _v833renderHddPullback;
+
+// --- dust-control-water: Dust-Control Watering Volume and Truck Trips ---
+//
+// The gallons a water truck spreads on a haul road and the trips it takes to
+// keep the fugitive-dust permit satisfied:
+//   area_sy = length_ft x width_ft / 9; gal_per_app = area_sy x rate_gal_per_sy
+//   trips_per_app = ceil(gal_per_app / truck_cap_gal)
+//   daily_gal = gal_per_app x applications_per_day
+// dims: in { length_ft: L, width_ft: L, rate_gal_per_sy: L, truck_cap_gal: L^3, applications_per_day: dimensionless } out: { area_sy: L^2, gal_per_app: L^3, trips_per_app: dimensionless, daily_gal: L^3, daily_trips: dimensionless }
+export function computeDustControlWater({ length_ft = 2000, width_ft = 20, rate_gal_per_sy = 0.5, truck_cap_gal = 4000, applications_per_day = 6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(length_ft > 0)) return { error: "Length must be positive (ft)." };
+  if (!(width_ft > 0)) return { error: "Width must be positive (ft)." };
+  if (!(rate_gal_per_sy > 0)) return { error: "Application rate must be positive (gal/sy)." };
+  if (!(truck_cap_gal > 0)) return { error: "Truck capacity must be positive (gal)." };
+  if (!(applications_per_day > 0)) return { error: "Applications per day must be positive." };
+  const area_sy = (length_ft * width_ft) / 9;
+  const gal_per_app = area_sy * rate_gal_per_sy;
+  const trips_per_app = Math.ceil(gal_per_app / truck_cap_gal);
+  const daily_gal = gal_per_app * applications_per_day;
+  const daily_trips = trips_per_app * applications_per_day;
+  if (![area_sy, gal_per_app, trips_per_app, daily_gal, daily_trips].every(Number.isFinite)) return { error: "Watering math is not a finite value." };
+  return {
+    area_sy,
+    gal_per_app,
+    trips_per_app,
+    daily_gal,
+    daily_trips,
+    note: "The application rate (commonly around 0.5 gal/sy) and the frequency come from the site's fugitive-dust plan and the AHJ air permit - enter those here. Over-watering makes mud and tracks out; under-watering fails the permit. The frequency climbs with wind and heat, and that (not the road area) drives the daily water budget.",
+  };
+}
+
+function _v836renderDustControlWater(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: watering identity by name. gallons per application = area (sy) x rate (gal/sy); area = length x width / 9; trips = ceil(gallons / truck capacity). The rate and frequency come from the site's fugitive-dust plan and AHJ air permit.";
+  const l = makeNumber("Watered length (ft)", "dcw-l", { step: "any", min: "0", value: "2000" });
+  l.input.value = "2000";
+  const w = makeNumber("Watered width (ft)", "dcw-w", { step: "any", min: "0", value: "20" });
+  w.input.value = "20";
+  const rt = makeNumber("Application rate (gal/sy)", "dcw-rt", { step: "any", min: "0", value: "0.5" });
+  rt.input.value = "0.5";
+  const tc = makeNumber("Water truck capacity (gal)", "dcw-tc", { step: "any", min: "0", value: "4000" });
+  tc.input.value = "4000";
+  const ap = makeNumber("Passes per day (count)", "dcw-ap", { step: "any", min: "0", value: "6" });
+  ap.input.value = "6";
+  for (const f of [l, w, rt, tc, ap]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { l.input.value = "2000"; w.input.value = "20"; rt.input.value = "0.5"; tc.input.value = "4000"; ap.input.value = "6"; update(); });
+  const oApp = makeOutputLine(outputRegion, "Gallons per application", "dcw-out-app");
+  const oDaily = makeOutputLine(outputRegion, "Daily water and trips", "dcw-out-daily");
+  const update = debounce(() => {
+    const r = computeDustControlWater({
+      length_ft: l.input.value === "" ? 2000 : Number(l.input.value), width_ft: w.input.value === "" ? 20 : Number(w.input.value),
+      rate_gal_per_sy: rt.input.value === "" ? 0.5 : Number(rt.input.value), truck_cap_gal: tc.input.value === "" ? 4000 : Number(tc.input.value),
+      applications_per_day: ap.input.value === "" ? 6 : Number(ap.input.value),
+    });
+    if (r.error) { oApp.textContent = r.error; oDaily.textContent = "-"; return; }
+    oApp.textContent = fmt(r.gal_per_app, 0) + " gal (" + fmt(r.trips_per_app, 0) + " trip" + (r.trips_per_app === 1 ? "" : "s") + ")";
+    oDaily.textContent = fmt(r.daily_gal, 0) + " gal/day over " + fmt(r.daily_trips, 0) + " trips";
+  }, DEBOUNCE_MS);
+  for (const f of [l, w, rt, tc, ap]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["dust-control-water"] = _v836renderDustControlWater;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

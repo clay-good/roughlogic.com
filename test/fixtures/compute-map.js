@@ -764,6 +764,7 @@ export const COMPUTE_MAP = {
   "hdd-pullback": { module: "../../calc-earthwork.js", fn: "computeHddPullback" },
   "scaffold-leg-load": { module: "../../calc-construction.js", fn: "computeScaffoldLegLoad" },
   "scaffold-takeoff": { module: "../../calc-construction.js", fn: "computeScaffoldTakeoff" },
+  "dust-control-water": { module: "../../calc-earthwork.js", fn: "computeDustControlWater" },
   "haul-cycle-production": { module: "../../calc-earthwork.js", fn: "computeHaulCycleProduction" },
   "loader-production": { module: "../../calc-earthwork.js", fn: "computeLoaderProduction" },
   "dozer-production": { module: "../../calc-earthwork.js", fn: "computeDozerProduction" },

@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): dust-control-water -- dust-control watering volume and truck trips (spec-v836); 2026-07-17
+
+- New Group E tile `dust-control-water` (calc-earthwork.js), the site-logistics companion to `water-for-compaction`.
+  Gallons a water truck spreads on a haul road and the trips to keep the fugitive-dust permit satisfied: gallons =
+  area/9 x rate (gal/sy); trips = ceil(gallons / truck capacity). A 2,000 ft x 20 ft road at 0.5 gal/sy is 2,222 gal an
+  application (one 4,000-gal load); at six passes a day that is ~13,300 gal over six trips, and a hot windy day at 10
+  passes takes 22,220 gal -- frequency, not area, drives the water budget. The dust plan and AHJ air permit set the rate
+  and frequency. Home count 1,284 -> 1,285.
+
 ### feat(construction): scaffold-takeoff -- frame scaffold material takeoff (spec-v835); 2026-07-17
 
 - New Group E tile `scaffold-takeoff` (calc-construction.js), completing the scaffold trio (`scaffold-leg-load`,

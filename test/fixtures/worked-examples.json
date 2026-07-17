@@ -49441,6 +49441,84 @@
    }
   },
   {
+   "tile_id": "dust-control-water",
+   "source_publisher": "Dust-control watering identity (first-principles)",
+   "source_title": "2,000 ft x 20 ft haul road, 0.5 gal/sy, 4,000-gal truck, 6 passes/day",
+   "source_edition_or_year": "spec-v836 worked example",
+   "source_section_or_page": "area = 2000*20/9 = 4,444 sy; gal/app = 4444*0.5 = 2,222; trips = ceil(2222/4000) = 1; daily = 13,333 gal / 6 trips",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "length_ft": 2000,
+    "width_ft": 20,
+    "rate_gal_per_sy": 0.5,
+    "truck_cap_gal": 4000,
+    "applications_per_day": 6
+   },
+   "outputs": {
+    "area_sy": {
+     "value": 4444.44,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "gal_per_app": {
+     "value": 2222.22,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "trips_per_app": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "daily_gal": {
+     "value": 13333.33,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "daily_trips": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dust-control-water",
+   "source_publisher": "Dust-control watering identity (first-principles)",
+   "source_title": "cross-check: a hot windy day at 10 passes raises the budget",
+   "source_edition_or_year": "spec-v836 worked example",
+   "source_section_or_page": "gal/app stays 2,222; daily = 2222*10 = 22,220 gal over 10 trips",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "length_ft": 2000,
+    "width_ft": 20,
+    "rate_gal_per_sy": 0.5,
+    "truck_cap_gal": 4000,
+    "applications_per_day": 10
+   },
+   "outputs": {
+    "daily_gal": {
+     "value": 22222.22,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "daily_trips": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

@@ -16952,6 +16952,31 @@
       "kind": "industry"
     },
     {
+      "term": "dust control water",
+      "target": "dust-control-water",
+      "kind": "industry"
+    },
+    {
+      "term": "water truck dust",
+      "target": "dust-control-water",
+      "kind": "industry"
+    },
+    {
+      "term": "haul road watering",
+      "target": "dust-control-water",
+      "kind": "industry"
+    },
+    {
+      "term": "dust suppression gallons",
+      "target": "dust-control-water",
+      "kind": "industry"
+    },
+    {
+      "term": "fugitive dust watering",
+      "target": "dust-control-water",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

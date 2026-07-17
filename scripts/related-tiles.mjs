@@ -1011,6 +1011,7 @@ const RELATED = {
   "hdd-pullback": ["pipe-flotation", "restrained-pipe-length", "pipe-bedding-backfill"],
   "scaffold-leg-load": ["scaffold-mudsill-bearing", "guard-handrail-check", "shore-post-load"],
   "scaffold-takeoff": ["scaffold-leg-load", "scaffold-mudsill-bearing", "material-quantity"],
+  "dust-control-water": ["water-for-compaction", "dewatering-rate", "haul-cycle-production"],
   "haul-cycle-production": ["soil-swell-shrink", "excavation", "axle-load-distribution"],
   "loader-production": ["haul-cycle-production", "soil-swell-shrink", "relative-compaction"],
   "dozer-production": ["loader-production", "haul-cycle-production", "soil-swell-shrink"],

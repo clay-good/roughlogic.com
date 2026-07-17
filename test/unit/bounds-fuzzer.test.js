@@ -17106,6 +17106,7 @@ import { computeRestrainedPipeLength as _v832rpl } from "../../calc-earthwork.js
 import { computeHddPullback as _v833hdd } from "../../calc-earthwork.js";
 import { computeScaffoldLegLoad as _v834sll } from "../../calc-construction.js";
 import { computeScaffoldTakeoff as _v835sto } from "../../calc-construction.js";
+import { computeDustControlWater as _v836dcw } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17383,6 +17384,26 @@ test("bounds: spec-v835 computeScaffoldTakeoff pins the bay/frame/brace/plank/ba
   assert.ok("error" in _v835sto({ run_length_ft: 40, bay_length_ft: 0, lifts: 3, planks_per_bay: 4 }));
   assert.ok("error" in _v835sto({ run_length_ft: 40, bay_length_ft: 7, lifts: 0, planks_per_bay: 4 }));
   assert.ok("error" in _v835sto({ run_length_ft: 40, bay_length_ft: 7, lifts: 3, planks_per_bay: 0 }));
+});
+
+test("bounds: spec-v836 computeDustControlWater pins the area, gallons, trips, daily totals, and error seams", () => {
+  // 2,000 x 20 ft, 0.5 gal/sy, 4,000-gal truck, 6 passes -> 4,444 sy, 2,222 gal/app, 1 trip, 13,333 gal/day.
+  const r = _v836dcw({ length_ft: 2000, width_ft: 20, rate_gal_per_sy: 0.5, truck_cap_gal: 4000, applications_per_day: 6 });
+  assert.ok(Math.abs(r.area_sy - 4444.44) < 0.1);
+  assert.ok(Math.abs(r.gal_per_app - 2222.22) < 0.1);
+  assert.strictEqual(r.trips_per_app, 1);
+  assert.ok(Math.abs(r.daily_gal - 13333.33) < 0.5);
+  assert.strictEqual(r.daily_trips, 6);
+  // A hot windy day at 10 passes raises the budget (frequency drives it).
+  const busy = _v836dcw({ length_ft: 2000, width_ft: 20, rate_gal_per_sy: 0.5, truck_cap_gal: 4000, applications_per_day: 10 });
+  assert.ok(Math.abs(busy.daily_gal - 22222.22) < 0.5);
+  assert.strictEqual(busy.daily_trips, 10);
+  // Error seams.
+  assert.ok("error" in _v836dcw({ length_ft: 0, width_ft: 20, rate_gal_per_sy: 0.5, truck_cap_gal: 4000, applications_per_day: 6 }));
+  assert.ok("error" in _v836dcw({ length_ft: 2000, width_ft: 0, rate_gal_per_sy: 0.5, truck_cap_gal: 4000, applications_per_day: 6 }));
+  assert.ok("error" in _v836dcw({ length_ft: 2000, width_ft: 20, rate_gal_per_sy: 0, truck_cap_gal: 4000, applications_per_day: 6 }));
+  assert.ok("error" in _v836dcw({ length_ft: 2000, width_ft: 20, rate_gal_per_sy: 0.5, truck_cap_gal: 0, applications_per_day: 6 }));
+  assert.ok("error" in _v836dcw({ length_ft: 2000, width_ft: 20, rate_gal_per_sy: 0.5, truck_cap_gal: 4000, applications_per_day: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {
