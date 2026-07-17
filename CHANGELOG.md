@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): pavement-milling-production -- cold-planing production and RAP tonnage (spec-v838); 2026-07-17
+
+- New Group E tile `pavement-milling-production` (calc-construction.js), the milling side of paving beside
+  `asphalt-paving-speed` and `asphalt-spread-rate`. Square yards per hour a cold planer cuts and the RAP tonnage it
+  makes, which sizes the haul fleet: sy/hr = drum width x speed x 60 x efficiency / 9; RAP tph = sy/hr x depth x density
+  x 0.75 / 2000. A 7 ft drum at 30 ft/min covers 980 sy/hr, and a 4 in cut of 148 pcf pavement is ~218 tph of RAP -- a
+  truck every three minutes, or the mill stops; 45 ft/min lifts it to 1,470 sy/hr and 326 tph. Field conditions govern
+  the efficiency. Home count 1,286 -> 1,287.
+
 ### feat(construction): asphalt-spread-rate -- asphalt spread rate and yield check (spec-v837); 2026-07-17
 
 - New Group E tile `asphalt-spread-rate` (calc-construction.js), the paving QC yield metric beside `asphalt-tonnage`

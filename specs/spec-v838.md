@@ -1,6 +1,6 @@
 # roughlogic.com Specification v838 -- Cold-Planing (Milling) Production and RAP Tonnage (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED (2026-07-17). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-construction.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v837.md. Paving sweep (entry 4), beside
 > `asphalt-paving-speed` and `asphalt-spread-rate`.

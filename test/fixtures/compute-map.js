@@ -766,6 +766,7 @@ export const COMPUTE_MAP = {
   "scaffold-takeoff": { module: "../../calc-construction.js", fn: "computeScaffoldTakeoff" },
   "dust-control-water": { module: "../../calc-earthwork.js", fn: "computeDustControlWater" },
   "asphalt-spread-rate": { module: "../../calc-construction.js", fn: "computeAsphaltSpreadRate" },
+  "pavement-milling-production": { module: "../../calc-construction.js", fn: "computePavementMillingProduction" },
   "haul-cycle-production": { module: "../../calc-earthwork.js", fn: "computeHaulCycleProduction" },
   "loader-production": { module: "../../calc-earthwork.js", fn: "computeLoaderProduction" },
   "dozer-production": { module: "../../calc-earthwork.js", fn: "computeDozerProduction" },

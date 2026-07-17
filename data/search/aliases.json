@@ -17002,6 +17002,31 @@
       "kind": "industry"
     },
     {
+      "term": "milling production",
+      "target": "pavement-milling-production",
+      "kind": "industry"
+    },
+    {
+      "term": "cold planing production",
+      "target": "pavement-milling-production",
+      "kind": "industry"
+    },
+    {
+      "term": "pavement milling rate",
+      "target": "pavement-milling-production",
+      "kind": "industry"
+    },
+    {
+      "term": "rap tonnage",
+      "target": "pavement-milling-production",
+      "kind": "industry"
+    },
+    {
+      "term": "milling sy per hour",
+      "target": "pavement-milling-production",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

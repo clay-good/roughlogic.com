@@ -17108,6 +17108,7 @@ import { computeScaffoldLegLoad as _v834sll } from "../../calc-construction.js";
 import { computeScaffoldTakeoff as _v835sto } from "../../calc-construction.js";
 import { computeDustControlWater as _v836dcw } from "../../calc-earthwork.js";
 import { computeAsphaltSpreadRate as _v837asr } from "../../calc-construction.js";
+import { computePavementMillingProduction as _v838pmp } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17421,6 +17422,24 @@ test("bounds: spec-v837 computeAsphaltSpreadRate pins the spread rate, the yield
   // Error seams.
   assert.ok("error" in _v837asr({ thickness_in: 0, density_pcf: 145 }));
   assert.ok("error" in _v837asr({ thickness_in: 2, density_pcf: 0 }));
+});
+
+test("bounds: spec-v838 computePavementMillingProduction pins the area rate, spread, RAP tph, and error seams", () => {
+  // 7 ft drum, 30 fpm, 4 in, 148 pcf, 0.7 -> 980 sy/hr, 444 lb/sy, 217.56 tph.
+  const r = _v838pmp({ drum_width_ft: 7, speed_fpm: 30, depth_in: 4, density_pcf: 148, efficiency: 0.7 });
+  assert.ok(Math.abs(r.sy_per_hr - 980) < 1e-6);
+  assert.ok(Math.abs(r.spread_lb_per_sy - 444) < 1e-9);
+  assert.ok(Math.abs(r.rap_tph - 217.56) < 1e-2);
+  // 45 fpm scales the area rate and RAP linearly.
+  const fast = _v838pmp({ drum_width_ft: 7, speed_fpm: 45, depth_in: 4, density_pcf: 148, efficiency: 0.7 });
+  assert.ok(Math.abs(fast.sy_per_hr - 1470) < 1e-6);
+  assert.ok(Math.abs(fast.rap_tph - 326.34) < 1e-2);
+  // Error seams.
+  assert.ok("error" in _v838pmp({ drum_width_ft: 0, speed_fpm: 30, depth_in: 4, density_pcf: 148, efficiency: 0.7 }));
+  assert.ok("error" in _v838pmp({ drum_width_ft: 7, speed_fpm: 0, depth_in: 4, density_pcf: 148, efficiency: 0.7 }));
+  assert.ok("error" in _v838pmp({ drum_width_ft: 7, speed_fpm: 30, depth_in: 0, density_pcf: 148, efficiency: 0.7 }));
+  assert.ok("error" in _v838pmp({ drum_width_ft: 7, speed_fpm: 30, depth_in: 4, density_pcf: 0, efficiency: 0.7 }));
+  assert.ok("error" in _v838pmp({ drum_width_ft: 7, speed_fpm: 30, depth_in: 4, density_pcf: 148, efficiency: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

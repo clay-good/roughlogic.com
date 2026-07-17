@@ -1615,6 +1615,7 @@ cross-check.
 | calc-construction.js | `computeMultiBendFlatPattern` | `{ mold_line_in = 0, n_bends = 0, bd_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeOccupantLoad` | `{ spaces = [] } = {}` | _ | _ | _ |
 | calc-construction.js | `computePaintCoverage` | `{ area_ft2, coats = 2, primer_needed = false, surface_porosity = "smooth" }` | _ | _ | _ |
+| calc-construction.js | `computePavementMillingProduction` | `{ drum_width_ft = 7, speed_fpm = 30, depth_in = 4, density_pcf = 148, efficie...` | _ | _ | _ |
 | calc-construction.js | `computePlumbingFixtureCount` | `{ occupant_load = 0, wc_ratio = 25, wc_ratio_over = 50, wc_tier = 50, lav_rat...` | _ | _ | _ |
 | calc-construction.js | `computePlywoodSpan` | `{ span_rating = "24/16", panel_thickness_in = 0, application = "roof", suppor...` | _ | _ | _ |
 | calc-construction.js | `computePointLoadBearing` | `{ load_lb = 0, width_in = 0, fc_perp_psi = 0, cb = 1, provided_length_in = 0 ...` | _ | _ | _ |
@@ -2947,7 +2948,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1533.
+Row count: 1534.
 
 <!-- END function-corpus-v14 -->
 
@@ -3495,7 +3496,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (295 tiles)
+### Group E Construction (296 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3637,6 +3638,7 @@ per spec-v14 §13.1 second paragraph.
 | `occupant-load` | Building Occupant Load from Area and Use (IBC Table 1004.5) | IBC 2021 Table 1004.5 occupant-load f...; spec-v242 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `oxyfuel-cutting-gas` | Oxy-Fuel Cutting Gas Consumption | Torch maker's tip charts; 1/2 in tip: 55 cfh oxygen, 12 cfh acetylene, 240 in at 16... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `paint-coverage` | Paint Coverage | Project (first-principles); 700 ft^2 smooth wall, 2 coats, primer needed -> 2.0 gal/c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pavement-milling-production` | Cold-Planing (Milling) Production and RAP Tonnage | Cold-planing production identity (fir...; sy/hr = 7*30*60*0.7/9 = 980; spread = 4*148*0.75 = 444; R... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `paver-patio` | Paver Patio Takeoff | ICPI interlocking-paver base and bedd...; spec-v97 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pile-axial-capacity` | Deep Pile Axial Capacity in Clay (Alpha Method) | Alpha (total-stress) pile method (FHW...; spec-v288 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pile-group-efficiency` | Pile Group Efficiency (Converse-Labarre) | Converse-Labarre pile-group efficiency; spec-v498 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4419,6 +4421,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1286. Fixture-covered or reference-cadence: 1286 / 1286.
+Tile count: 1287. Fixture-covered or reference-cadence: 1287 / 1287.
 
 <!-- END tile-index-v14 -->

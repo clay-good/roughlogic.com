@@ -5522,6 +5522,54 @@ const _renderAsphaltSpreadRate = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["asphalt-spread-rate"] = _renderAsphaltSpreadRate;
 
+// --- pavement-milling-production: Cold-Planing (Milling) Production and RAP Tonnage ---
+//
+// The sy/hr a cold planer cuts and the reclaimed-asphalt (RAP) tonnage it makes,
+// which sizes the haul fleet that keeps the mill moving:
+//   sy_per_hr = drum_width_ft x speed_fpm x 60 x efficiency / 9
+//   spread_lb_per_sy = depth_in x density_pcf x 0.75
+//   rap_tph = sy_per_hr x spread_lb_per_sy / 2000
+// dims: in { drum_width_ft: L, speed_fpm: L T^-1, depth_in: L, density_pcf: M L^-3, efficiency: dimensionless } out: { sy_per_hr: L^2 T^-1, spread_lb_per_sy: M L^-2, rap_tph: M T^-1 }
+export function computePavementMillingProduction({ drum_width_ft = 7, speed_fpm = 30, depth_in = 4, density_pcf = 148, efficiency = 0.7 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(drum_width_ft > 0)) return { error: "Drum width must be positive (ft)." };
+  if (!(speed_fpm > 0)) return { error: "Speed must be positive (ft/min)." };
+  if (!(depth_in > 0)) return { error: "Cut depth must be positive (in)." };
+  if (!(density_pcf > 0)) return { error: "Density must be positive (pcf)." };
+  if (!(efficiency > 0)) return { error: "Efficiency must be positive." };
+  const sy_per_hr = (drum_width_ft * speed_fpm * 60 * efficiency) / 9;
+  const spread_lb_per_sy = depth_in * density_pcf * 0.75;
+  const rap_tph = (sy_per_hr * spread_lb_per_sy) / 2000;
+  if (![sy_per_hr, spread_lb_per_sy, rap_tph].every(Number.isFinite)) return { error: "Milling-production math is not a finite value." };
+  return {
+    sy_per_hr,
+    spread_lb_per_sy,
+    rap_tph,
+    note: "Milling efficiency runs lower than paving (frequent truck changes and repositioning), so field conditions govern the efficiency factor. The RAP density is that of the existing pavement being cut. The RAP tonnage sizes the haul fleet that keeps the mill cutting - if the trucks fall behind, the mill stops.",
+  };
+}
+
+export const pavementMillingProductionExample = { inputs: { drum_width_ft: 7, speed_fpm: 30, depth_in: 4, density_pcf: 148, efficiency: 0.7 } };
+
+const _renderPavementMillingProduction = _simpleRenderer({
+  citation: "Citation: milling production identity by name. sy/hr = drum width x speed x 60 x efficiency / 9; RAP tph = sy/hr x spread / 2000, where spread = depth x density x 0.75. Milling efficiency runs lower than paving; field conditions govern.",
+  example: pavementMillingProductionExample.inputs,
+  fields: [
+    { key: "drum_width_ft", label: "Cutting drum width (ft)", kind: "number", default: 7 },
+    { key: "speed_fpm", label: "Milling forward speed (ft/min)", kind: "number", default: 30 },
+    { key: "depth_in", label: "Cut depth (in)", kind: "number", default: 4 },
+    { key: "density_pcf", label: "Existing pavement density (pcf)", kind: "number", default: 148 },
+    { key: "efficiency", label: "Job efficiency (0-1)", kind: "number", default: 0.7 },
+  ],
+  outputs: [
+    { key: "a", id: "pmp-out-a", label: "Milling production", value: (r) => _fmtC(r.sy_per_hr, 0) + " sy/hr" },
+    { key: "r", id: "pmp-out-r", label: "RAP generated", value: (r) => _fmtC(r.rap_tph, 1) + " tph" },
+    { key: "n", id: "pmp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePavementMillingProduction,
+});
+CONSTRUCTION_RENDERERS["pavement-milling-production"] = _renderPavementMillingProduction;
+
 // ----- spec-v246: Concrete Surface Evaporation Rate and Plastic-Shrinkage Risk (ACI 305) -----
 
 // dims: in { air_temp_f: T, concrete_temp_f: T, rh_pct: dimensionless, wind_mph: L T^-1 } out: { E_metric: M L^-2 T^-1, E_us: M L^-2 T^-1 }

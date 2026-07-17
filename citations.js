@@ -8134,6 +8134,17 @@ export const CITATIONS = {
       { name: "Conversion", value: "0.75 = 9 sf/sy divided by 12 in/ft; yield = 2000 lb/ton / spread", source: "first-principles" },
     ],
   },
+  "pavement-milling-production": {
+    formula: "sy_per_hr = drum_width_ft x speed_fpm x 60 x efficiency / 9; spread_lb_per_sy = depth_in x density_pcf x 0.75; rap_tph = sy_per_hr x spread_lb_per_sy / 2000.",
+    edition: "Cold-planing production identity by name (area rate from drum/speed/efficiency; RAP from area rate x spread); first-principles production arithmetic.",
+    freeAccess: "The production and RAP geometry are public first-principles arithmetic; the efficiency comes from field conditions.",
+    governance: GOVERNANCE.general,
+    editionNote: "Milling efficiency runs lower than paving (frequent truck changes and repositioning), so field conditions govern the efficiency factor. The RAP density is that of the existing pavement being cut. The RAP tonnage sizes the haul fleet that keeps the mill cutting.",
+    assumptions: [
+      { name: "Efficiency", value: "job efficiency ~0.7 default, lower than paving; field conditions (truck changes, repositioning) govern", source: "field conditions" },
+      { name: "RAP density", value: "the density of the existing pavement being cut, ~148 pcf default", source: "existing pavement" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

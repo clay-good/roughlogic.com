@@ -49573,6 +49573,72 @@
    }
   },
   {
+   "tile_id": "pavement-milling-production",
+   "source_publisher": "Cold-planing production identity (first-principles)",
+   "source_title": "7 ft drum, 30 ft/min, 4 in cut, 148 pcf, 0.7 efficiency",
+   "source_edition_or_year": "spec-v838 worked example",
+   "source_section_or_page": "sy/hr = 7*30*60*0.7/9 = 980; spread = 4*148*0.75 = 444; RAP = 980*444/2000 = 217.6 tph",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "drum_width_ft": 7,
+    "speed_fpm": 30,
+    "depth_in": 4,
+    "density_pcf": 148,
+    "efficiency": 0.7
+   },
+   "outputs": {
+    "sy_per_hr": {
+     "value": 980,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "spread_lb_per_sy": {
+     "value": 444,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "rap_tph": {
+     "value": 217.56,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pavement-milling-production",
+   "source_publisher": "Cold-planing production identity (first-principles)",
+   "source_title": "cross-check: 45 ft/min outruns the haul without more trucks",
+   "source_edition_or_year": "spec-v838 worked example",
+   "source_section_or_page": "sy/hr = 7*45*60*0.7/9 = 1,470; RAP = 1470*444/2000 = 326.3 tph",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "drum_width_ft": 7,
+    "speed_fpm": 45,
+    "depth_in": 4,
+    "density_pcf": 148,
+    "efficiency": 0.7
+   },
+   "outputs": {
+    "sy_per_hr": {
+     "value": 1470,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "rap_tph": {
+     "value": 326.34,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",
