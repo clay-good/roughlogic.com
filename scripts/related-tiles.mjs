@@ -998,6 +998,7 @@ const RELATED = {
   "loader-production": ["haul-cycle-production", "soil-swell-shrink", "relative-compaction"],
   "dozer-production": ["loader-production", "haul-cycle-production", "soil-swell-shrink"],
   "compaction-roller-production": ["relative-compaction", "haul-cycle-production", "loader-production"],
+  "ripper-production": ["dozer-production", "loader-production", "soil-swell-shrink"],
   "dewatering-rate": ["pump-tdh", "pump-sizing", "excavation"],
   "spoil-setback": ["trench-slope", "excavation-bench-plan", "crane-ground-bearing"],
   "pipe-bedding-backfill": ["aggregate", "trench-slope", "excavation"],

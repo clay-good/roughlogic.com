@@ -7968,6 +7968,17 @@ export const CITATIONS = {
       { name: "Unit constant", value: "16.3 = 5280 / (12 x 27) folds mile, inch, and cubic yard (exact 16.2963)", source: "physical fact" },
     ],
   },
+  "ripper-production": {
+    formula: "cross_section_ft2 = spacing_ft x penetration_ft; production_bcy_hr = cross_section_ft2 x speed_fpm x 60 x efficiency / 27 (60 min/hr, 27 ft^3/cy fold the units).",
+    edition: "Swept-prism production identity by name (loosened volume = ripped cross-section x travel rate); first-principles unit-folding arithmetic.",
+    freeAccess: "The swept-prism production identity is published earthmoving practice; the 60 and 27 unit constants are exact.",
+    governance: GOVERNANCE.general,
+    editionNote: "Ripping only loosens the material in place - pair it with dozer-production to move it. Whether the ground is rippable at all comes from a seismic-velocity judgment the operator makes, not from this tile. Overlapping passes and tooth wear cut the real number below the swept-prism ideal. Speed, which the rock's hardness limits, is the lever.",
+    assumptions: [
+      { name: "Efficiency", value: "0.75 job efficiency (default; overlap, tooth wear, real-world delays)", source: "earthmoving practice" },
+      { name: "Unit constants", value: "60 min/hr and 27 ft^3/cy (exact)", source: "physical fact" },
+    ],
+  },
   "dewatering-rate": {
     formula: "drawdown_gal = pit_len x pit_wid x drawdown x 7.48052; pump_gpm = drawdown_gal / drawdown_min + inflow; sized_gpm = pump_gpm x (1 + safety/100).",
     edition: "First-principles volume and pumping-rate arithmetic by name; defers total dynamic head to the pump-tdh tile.",

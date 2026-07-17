@@ -22670,6 +22670,58 @@
    }
   },
   {
+   "tile_id": "ripper-production",
+   "source_publisher": "Swept-prism production identity (first-principles)",
+   "source_title": "shank on 3 ft centers, 1.5 ft deep, 132 ft/min (1.5 mph), 0.75 efficiency",
+   "source_edition_or_year": "earthmoving practice; 60 min/hr, 27 ft^3/cy",
+   "source_section_or_page": "cross-section = 3*1.5 = 4.5 ft^2; production = 4.5*132*60*0.75/27 = 990 bank cy/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "spacing_ft": 3,
+    "penetration_ft": 1.5,
+    "speed_fpm": 132,
+    "efficiency": 0.75
+   },
+   "outputs": {
+    "cross_section_ft2": {
+     "value": 4.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "production_bcy_hr": {
+     "value": 990,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ripper-production",
+   "source_publisher": "Swept-prism production identity (first-principles)",
+   "source_title": "cross-check: easing to 88 ft/min (1.0 mph) in tougher rock drops the rate",
+   "source_edition_or_year": "earthmoving practice",
+   "source_section_or_page": "4.5*88*60*0.75/27 = 660 bank cy/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "spacing_ft": 3,
+    "penetration_ft": 1.5,
+    "speed_fpm": 88,
+    "efficiency": 0.75
+   },
+   "outputs": {
+    "production_bcy_hr": {
+     "value": 660,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dewatering-rate",
    "source_publisher": "First-principles volume / pumping rate",
    "source_title": "drawdown_gal = L x W x H x 7.48052; pump = drawdown_gal/time + inflow; sized = pump x (1 + margin)",

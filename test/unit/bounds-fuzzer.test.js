@@ -10963,6 +10963,7 @@ import {
   computeSoilSwellShrink as _v67a, computeHaulCycleProduction as _v67b, computeDewateringRate as _v67c,
   computeSpoilSetback as _v67d, computePipeBeddingBackfill as _v67e, computeLoaderProduction as _v809lp,
   computeDozerProduction as _v810dz, computeCompactionRollerProduction as _v813cr,
+  computeRipperProduction as _v820rp,
 } from "../../calc-earthwork.js";
 test("bounds: calc-construction v67 earthwork tiles pin volume conversion, production, dewatering, setback, and bedding", () => {
   // soil-swell-shrink: 100 bank, swell 25, shrink 15 -> 125 loose, 0.80 LF, 85 compacted
@@ -11016,6 +11017,15 @@ test("bounds: calc-construction v67 earthwork tiles pin volume conversion, produ
   assert.ok("error" in _v813cr({ drum_width_ft: 7, speed_mph: 3, lift_in: 0, passes: 6 }));
   assert.ok("error" in _v813cr({ drum_width_ft: 7, speed_mph: 3, lift_in: 8, passes: 0 }));
   assert.ok("error" in _v813cr({ drum_width_ft: 7, speed_mph: 3, lift_in: 8, passes: 6, efficiency: 0 }));
+  // ripper-production: 3 ft spacing, 1.5 ft deep, 132 fpm, 0.75 eff -> 4.5 ft^2, 990 bank cy/hr
+  const rp = _v820rp({ spacing_ft: 3, penetration_ft: 1.5, speed_fpm: 132, efficiency: 0.75 });
+  assert.ok(Math.abs(rp.cross_section_ft2 - 4.5) < 1e-9);
+  assert.ok(Math.abs(rp.production_bcy_hr - 990) < 1e-9);
+  assert.ok(Math.abs(_v820rp({ spacing_ft: 3, penetration_ft: 1.5, speed_fpm: 88, efficiency: 0.75 }).production_bcy_hr - 660) < 1e-9); // tougher rock
+  assert.ok("error" in _v820rp({ spacing_ft: 0, penetration_ft: 1.5, speed_fpm: 132 }));
+  assert.ok("error" in _v820rp({ spacing_ft: 3, penetration_ft: 0, speed_fpm: 132 }));
+  assert.ok("error" in _v820rp({ spacing_ft: 3, penetration_ft: 1.5, speed_fpm: 0 }));
+  assert.ok("error" in _v820rp({ spacing_ft: 3, penetration_ft: 1.5, speed_fpm: 132, efficiency: 0 }));
   // dewatering-rate: 20x12 pit, 3 ft in 30 min, inflow 40, 25% -> 5386 gal, 219.5, 274.4
   const dw = _v67c({ pit_len_ft: 20, pit_wid_ft: 12, drawdown_ft: 3, drawdown_min: 30, inflow_gpm: 40, safety_pct: 25 });
   assert.ok(Math.abs(dw.drawdown_gal - 5386.0) < 1);

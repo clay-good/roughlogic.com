@@ -8,6 +8,7 @@
 //   - loader-production       Wheel-loader / excavator bucket production rate
 //   - dozer-production        Dozer slot / blade production rate
 //   - compaction-roller-production  Roller compaction production rate
+//   - ripper-production       Dozer ripper loosening production rate
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
@@ -350,6 +351,57 @@ function _v813renderCompactionRollerProduction(inputRegion, outputRegion, citati
   for (const f of [width, speed, lift, passes, eff]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["compaction-roller-production"] = _v813renderCompactionRollerProduction;
+
+// --- ripper-production: Dozer Ripper Loosening Production Rate ---
+//
+// cross_section = spacing x penetration; production_bcy/hr = cross_section x
+// speed x 60 x efficiency / 27 (60 min/hr, 27 ft^3/cy fold the units).
+// dims: in { spacing_ft: L, penetration_ft: L, speed_fpm: L T^-1, efficiency: dimensionless } out: { cross_section_ft2: L^2, production_bcy_hr: L^3 T^-1 }
+// (Shank spacing and penetration are L; ripping speed L T^-1; efficiency
+//  dimensionless; the ripped cross-section L^2 and the loosened rate L^3 T^-1.)
+export function computeRipperProduction({ spacing_ft, penetration_ft, speed_fpm, efficiency = 0.75 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const spacing = Number(spacing_ft);
+  const pen = Number(penetration_ft);
+  const speed = Number(speed_fpm);
+  const eff = Number(efficiency);
+  if (!Number.isFinite(spacing) || spacing <= 0) return { error: "Shank spacing must be a positive finite number (ft)." };
+  if (!Number.isFinite(pen) || pen <= 0) return { error: "Penetration must be a positive finite number (ft)." };
+  if (!Number.isFinite(speed) || speed <= 0) return { error: "Ripping speed must be a positive finite number (ft/min)." };
+  if (!Number.isFinite(eff) || eff <= 0) return { error: "Efficiency must be a positive finite number." };
+  const crossSectionFt2 = spacing * pen;
+  const productionBcyHr = (crossSectionFt2 * speed * 60 * eff) / 27;
+  if (![crossSectionFt2, productionBcyHr].every(Number.isFinite)) return { error: "Production math is not a finite value." };
+  return {
+    cross_section_ft2: crossSectionFt2,
+    production_bcy_hr: productionBcyHr,
+    note: "Ripping only loosens the material in place - pair it with dozer-production to move it. Whether the ground is rippable at all comes from a seismic-velocity judgment the operator makes, not from this tile. Overlapping passes and tooth wear cut the real number below the swept-prism ideal. Speed, which the rock's hardness limits, is the lever; deeper or wider passes rarely pay when they stall the tractor.",
+  };
+}
+
+function _v820renderRipperProduction(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: swept-prism production identity by name. production (bank cy/hr) = shank spacing x penetration x speed x 60 / 27 x efficiency, where 60 folds minutes to the hour and 27 the cubic yard.";
+  const spacing = makeNumber("Shank spacing / pass width (ft)", "rp-spacing", { step: "any", min: "0" });
+  const pen = makeNumber("Ripping depth (ft)", "rp-pen", { step: "any", min: "0" });
+  const speed = makeNumber("Ripping speed (ft/min)", "rp-speed", { step: "any", min: "0" });
+  const eff = makeNumber("Job efficiency", "rp-eff", { step: "any", min: "0", value: "0.75" });
+  eff.input.value = "0.75";
+  for (const f of [spacing, pen, speed, eff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { spacing.input.value = "3"; pen.input.value = "1.5"; speed.input.value = "132"; eff.input.value = "0.75"; update(); });
+  const oCross = makeOutputLine(outputRegion, "Ripped cross-section", "rp-out-cross");
+  const oProd = makeOutputLine(outputRegion, "Loosened production", "rp-out-prod");
+  const update = debounce(() => {
+    const r = computeRipperProduction({
+      spacing_ft: Number(spacing.input.value) || 0, penetration_ft: Number(pen.input.value) || 0,
+      speed_fpm: Number(speed.input.value) || 0, efficiency: eff.input.value === "" ? 0.75 : Number(eff.input.value),
+    });
+    if (r.error) { oCross.textContent = r.error; oProd.textContent = "-"; return; }
+    oCross.textContent = fmt(r.cross_section_ft2, 2) + " ft^2";
+    oProd.textContent = fmt(r.production_bcy_hr, 0) + " bank cy/hr";
+  }, DEBOUNCE_MS);
+  for (const f of [spacing, pen, speed, eff]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["ripper-production"] = _v820renderRipperProduction;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

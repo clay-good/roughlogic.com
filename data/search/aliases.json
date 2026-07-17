@@ -5257,6 +5257,31 @@
       "kind": "industry"
     },
     {
+      "term": "ripper production",
+      "target": "ripper-production",
+      "kind": "industry"
+    },
+    {
+      "term": "dozer ripping rate",
+      "target": "ripper-production",
+      "kind": "industry"
+    },
+    {
+      "term": "rock ripping production",
+      "target": "ripper-production",
+      "kind": "industry"
+    },
+    {
+      "term": "loosened cy per hour",
+      "target": "ripper-production",
+      "kind": "industry"
+    },
+    {
+      "term": "ripping shank production",
+      "target": "ripper-production",
+      "kind": "industry"
+    },
+    {
       "term": "dewatering",
       "target": "dewatering-rate",
       "kind": "industry"

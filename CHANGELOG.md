@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): ripper-production -- dozer ripper loosening production rate (spec-v820); 2026-07-16
+
+- New Group E tile `ripper-production` (calc-earthwork.js), the loosening step that feeds the push, load, haul, and
+  compact production tiles. Swept-prism identity: production (bank cy/hr) = shank spacing x penetration x speed x 60 x
+  efficiency / 27. A shank on 3 ft centers at 1.5 ft deep, ripping at 132 ft/min (1.5 mph), loosens ~990 bank cy/hr;
+  easing to 88 ft/min in tougher rock drops it to 660. Ripping fractures rock in place; it does not move it. Home count
+  1,264 -> 1,265.
+
 ### feat(construction): asphalt-tack-coat-quantity -- tack / prime coat emulsion order (spec-v815); 2026-07-16
 
 - New Group E tile `asphalt-tack-coat-quantity` (calc-construction.js), extending the paving family to the tack / prime
