@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): shotcrete-rebound-quantity -- shotcrete / gunite order with rebound (spec-v816); 2026-07-16
+
+- New Group E tile `shotcrete-rebound-quantity` (calc-construction.js), the shotcrete/gunite order beside the cast-concrete
+  takeoff. A large fraction of shotcrete bounces off (rebound) and never stays, so the order grosses up: shot = in-place
+  / (1 - rebound fraction). A 500 sf face at 4 in holds 6.17 cy in place but needs 7.72 cy shot at 20% rebound, 8.82 cy
+  at a 30% dry-mix overhead job. Home count 1,265 -> 1,266.
+
 ### feat(earthwork): ripper-production -- dozer ripper loosening production rate (spec-v820); 2026-07-16
 
 - New Group E tile `ripper-production` (calc-earthwork.js), the loosening step that feeds the push, load, haul, and

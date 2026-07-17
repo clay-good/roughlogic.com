@@ -176,6 +176,7 @@ export const COMPUTE_MAP = {
   "breakeven": { module: "../../calc-accounting.js", fn: "computeBreakeven" },
   "cfm-per-ton": { module: "../../calc-hvac.js", fn: "computeCfmPerTon" },
   "concrete": { module: "../../calc-construction.js", fn: "computeConcreteVolume" },
+  "shotcrete-rebound-quantity": { module: "../../calc-construction.js", fn: "computeShotcreteReboundQuantity" },
   "time-and-materials": { module: "../../calc-cross.js", fn: "computeTimeAndMaterials" },
   "molecular-weight": { module: "../../calc-lab.js", fn: "computeMolecularWeight" },
   "mass-moles": { module: "../../calc-lab.js", fn: "computeMassMoles" },

@@ -119,6 +119,62 @@
    }
   },
   {
+   "tile_id": "shotcrete-rebound-quantity",
+   "source_publisher": "Rebound gross-up identity (first-principles)",
+   "source_title": "500 sf face, 4 in thick, 20% rebound (wet-mix)",
+   "source_edition_or_year": "ACI 506 shotcrete practice",
+   "source_section_or_page": "in-place = 500*(4/12)/27 = 6.173 cy; shot = 6.173/0.80 = 7.716 cy; rebound = 1.543 cy",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "area_sf": 500,
+    "thickness_in": 4,
+    "rebound_pct": 20
+   },
+   "outputs": {
+    "in_place_cy": {
+     "value": 6.1728,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "shot_cy": {
+     "value": 7.716,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "rebound_cy": {
+     "value": 1.5432,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shotcrete-rebound-quantity",
+   "source_publisher": "Rebound gross-up identity (first-principles)",
+   "source_title": "cross-check: dry-mix overhead face at 30% rebound climbs the order",
+   "source_edition_or_year": "ACI 506 shotcrete practice",
+   "source_section_or_page": "6.173/0.70 = 8.819 cy shot for the same section",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "area_sf": 500,
+    "thickness_in": 4,
+    "rebound_pct": 30
+   },
+   "outputs": {
+    "shot_cy": {
+     "value": 8.8183,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cfm-per-ton",
    "source_publisher": "Project (first-principles)",
    "source_title": "cfm ~ 400 * tons (typical residential cooling)",

@@ -4296,6 +4296,17 @@ export const CITATIONS = {
       { name: "Default waste factor", value: "10% unless user supplies", source: "ACI 301 / engineering practice" },
     ],
   },
+  "shotcrete-rebound-quantity": {
+    formula: "in_place_cy = area_sf x (thickness_in/12) / 27; shot_cy = in_place_cy / (1 - rebound_pct/100); rebound_cy = shot_cy - in_place_cy.",
+    edition: "Rebound gross-up identity by name (ACI 506 shotcrete practice); first-principles volume arithmetic.",
+    freeAccess: "The rebound gross-up identity is public shotcrete practice; ACI 506R describes rebound ranges.",
+    governance: GOVERNANCE.general,
+    editionNote: "Rebound depends on process and orientation - roughly 5-15% for wet-mix vertical work and 15-30% for dry-mix (gunite) overhead. The value comes from the applicator's field record or the spec, not a constant. Rebound must be cleaned out and never worked back into the section.",
+    assumptions: [
+      { name: "Rebound loss", value: "20% default (wet-mix ~5-15%, dry-mix/overhead ~15-30%); the applicator's field record governs", source: "ACI 506 / field practice" },
+      { name: "Volume constant", value: "27 ft^3 per cubic yard (exact)", source: "physical fact" },
+    ],
+  },
   "rebar": {
     formula: "Bars per direction = floor((dimension - 2 × cover) / spacing) + 1; total length = bars × dimension + lap-splice allowance per ACI 318 §25.5.",
     edition: "ACI 318-19 (Building Code Requirements for Structural Concrete) by name. " + IBC_2021 + " §1905 references ACI 318.",

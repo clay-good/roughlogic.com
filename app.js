@@ -409,7 +409,7 @@ const TOOL_MODULES = (() => {
   ]);
   declare("./calc-construction.js", "CONSTRUCTION_RENDERERS", [
     "stairs", "roof-pitch", "rafter", "square-footage", "board-footage",
-    "concrete", "rebar", "lumber-spans", "fastener-pullout",
+    "concrete", "shotcrete-rebound-quantity", "rebar", "lumber-spans", "fastener-pullout",
     "beam-loading", "material-quantity",
     // v2
     "stair-stringer", "joist-deflection", "footing-area", "tile-count",

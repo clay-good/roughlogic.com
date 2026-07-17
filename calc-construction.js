@@ -6813,6 +6813,46 @@ const _v431renderReadyMixConcreteOrder = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["ready-mix-concrete-order"] = _v431renderReadyMixConcreteOrder;
 
+// ----- spec-v816: Shotcrete / Gunite Order Quantity with Rebound (Group E) -----
+//
+// A large fraction of shotcrete/gunite bounces off the work (rebound) and never
+// stays, so the order grosses up: shot = in-place / (1 - rebound fraction).
+// dims: in { area_sf: L^2, thickness_in: L, rebound_pct: dimensionless } out: { in_place_cy: L^3, shot_cy: L^3, rebound_cy: L^3 }
+export function computeShotcreteReboundQuantity({ area_sf = 0, thickness_in = 0, rebound_pct = 20 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
+  if (!(thickness_in > 0)) return { error: "Thickness must be positive (in)." };
+  if (!(rebound_pct >= 0) || rebound_pct >= 100) return { error: "Rebound must be between 0 and 100 percent (100 would order infinite material)." };
+  const in_place_cy = (area_sf * (thickness_in / 12)) / 27;
+  const shot_cy = in_place_cy / (1 - rebound_pct / 100);
+  const rebound_cy = shot_cy - in_place_cy;
+  if (![in_place_cy, shot_cy, rebound_cy].every(Number.isFinite)) return { error: "Shotcrete math is not a finite value." };
+  return {
+    in_place_cy,
+    shot_cy,
+    rebound_cy,
+    note: "Rebound depends on process and orientation - roughly 5-15% for wet-mix vertical work and 15-30% for dry-mix (gunite) overhead. The value comes from the applicator's field record or the spec, not a constant. Rebound must be cleaned out and never worked back into the section. The shot volume is what you order; the in-place volume is what stays on the wall.",
+  };
+}
+export const shotcreteReboundQuantityExample = { inputs: { area_sf: 500, thickness_in: 4, rebound_pct: 20 } };
+const _v816renderShotcreteReboundQuantity = _simpleRenderer({
+  citation: "Citation: rebound gross-up identity by name. shot volume = in-place volume / (1 - rebound fraction), where in-place = area x thickness/12 / 27 and rebound = shot minus in-place over shot. The applicator's field rebound governs.",
+  example: shotcreteReboundQuantityExample.inputs,
+  fields: [
+    { key: "area_sf", label: "Area to shoot (ft^2)", kind: "number" },
+    { key: "thickness_in", label: "In-place section thickness (in)", kind: "number" },
+    { key: "rebound_pct", label: "Rebound loss (% of material shot)", kind: "number", default: 20 },
+  ],
+  outputs: [
+    { key: "s", id: "src-out-s", label: "Shotcrete to order", value: (r) => _fmtC(r.shot_cy, 2) + " cy shot" },
+    { key: "i", id: "src-out-i", label: "In-place volume", value: (r) => _fmtC(r.in_place_cy, 2) + " cy" },
+    { key: "r", id: "src-out-r", label: "Rebound (lost)", value: (r) => _fmtC(r.rebound_cy, 2) + " cy" },
+    { key: "n", id: "src-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeShotcreteReboundQuantity,
+});
+CONSTRUCTION_RENDERERS["shotcrete-rebound-quantity"] = _v816renderShotcreteReboundQuantity;
+
 // ----- spec-v814: Concrete Pour Rate, Rate of Rise, and Delivery Cadence (Group E) -----
 //
 // The placement-logistics complement to formwork-pressure, which takes the rate

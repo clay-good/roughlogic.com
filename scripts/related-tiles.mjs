@@ -341,6 +341,7 @@ const RELATED = {
   // concrete -> rebar -> footing-area; the spec.md §E narrative walks
   // both and the calc-construction.test.js fixtures record them.
   "concrete": ["rebar", "footing-area", "concrete-mix-design", "aggregate"],
+  "shotcrete-rebound-quantity": ["concrete", "aggregate", "ready-mix-concrete-order"],
   "rebar": ["concrete", "rebar-schedule", "footing-area"],
   "rafter": ["roof-pitch", "hip-valley-rafter", "lumber-spans"],
   "roof-pitch": ["rafter", "roofing-squares", "snow-load"],

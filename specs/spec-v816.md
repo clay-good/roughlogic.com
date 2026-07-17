@@ -1,6 +1,7 @@
 # roughlogic.com Specification v816 -- Shotcrete / Gunite Order Quantity with Rebound (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-16 (package 0.398.0).** Executed against the live catalog (1,265 -> 1,266 tiles), via the
+> `_simpleRenderer` factory in calc-construction.js. Single-tile spec.
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-construction.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v815.md. Concrete-placement sweep, beside the
 > `concrete` and `aggregate` takeoff tiles.

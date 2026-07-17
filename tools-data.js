@@ -239,6 +239,7 @@ export const TOOLS = [
   { id: "square-footage", name: "Square Footage", group: "E", trades: ["carpentry"], desc: "Area for rectangle, triangle, trapezoid, circle." },
   { id: "board-footage", name: "Lumber Board Footage", group: "E", trades: ["carpentry"], desc: "Total board feet from thickness, width, length, count." },
   { id: "concrete", name: "Concrete Volume", group: "E", trades: ["carpentry"], desc: "Cubic yards for slab, footing, column, footing-with-stem." },
+  { id: "shotcrete-rebound-quantity", name: "Shotcrete / Gunite Order Quantity with Rebound", group: "E", trades: ["construction", "concrete"], desc: "Cubic yards of shotcrete or gunite to order once rebound (the fraction that bounces off and never stays) is grossed up: shot = in-place / (1 - rebound). A 500 sf face at 4 in holds 6.17 cy but needs 7.72 cy shot at 20% rebound, 8.82 cy at 30%. The applicator's field rebound governs." },
   { id: "rebar", name: "Rebar Spacing and Quantity", group: "E", trades: ["carpentry"], desc: "Linear feet of rebar from slab dimensions and spacing." },
   { id: "lumber-spans", name: "Lumber Spans", group: "E", trades: ["carpentry"], desc: "Maximum span from species, grade, size, load." },
   { id: "fastener-pullout", name: "Nail and Screw Pull-Out", group: "E", trades: ["carpentry"], desc: "Typical pull-out resistance by fastener and species." },

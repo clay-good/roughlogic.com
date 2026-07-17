@@ -3042,6 +3042,31 @@
       "kind": "industry"
     },
     {
+      "term": "shotcrete quantity",
+      "target": "shotcrete-rebound-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "gunite order volume",
+      "target": "shotcrete-rebound-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "shotcrete rebound",
+      "target": "shotcrete-rebound-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "sprayed concrete order",
+      "target": "shotcrete-rebound-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "gunite waste factor",
+      "target": "shotcrete-rebound-quantity",
+      "kind": "industry"
+    },
+    {
       "term": "yards of concrete",
       "target": "concrete",
       "kind": "redirect"

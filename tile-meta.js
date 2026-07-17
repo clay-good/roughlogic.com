@@ -230,7 +230,7 @@ const _TILES = [
   ["drying-log", "D"], ["equipment-power-draw", "D"],
 
   ["stairs", "E"], ["roof-pitch", "E"], ["rafter", "E"],
-  ["square-footage", "E"], ["board-footage", "E"], ["concrete", "E"],
+  ["square-footage", "E"], ["board-footage", "E"], ["concrete", "E"], ["shotcrete-rebound-quantity", "E"],
   ["rebar", "E"], ["lumber-spans", "E"], ["fastener-pullout", "E"],
   ["beam-loading", "E"], ["material-quantity", "E"], ["stair-stringer", "E"],
   ["joist-deflection", "E"], ["footing-area", "E"], ["tile-count", "E"],

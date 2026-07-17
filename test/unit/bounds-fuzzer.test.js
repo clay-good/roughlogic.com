@@ -620,6 +620,7 @@ import {
   computeBoltTorque,
   computeConcreteMixDesign,
   computeConcreteVolume,
+  computeShotcreteReboundQuantity,
   computeCraneLiftCheck,
   computeDemoDebris,
   computeDrywall,
@@ -8308,6 +8309,24 @@ test("bounds: calc-construction computeConcreteVolume pins slab/footing/column/f
   assert.ok(Math.abs(fws.cubic_feet - (20 * 2 * 1 + 20 * (8 / 12) * 4)) < 1e-9);
   // Rejection.
   assert.ok("error" in computeConcreteVolume({ shape: "moon" }));
+});
+
+test("bounds: spec-v816 computeShotcreteReboundQuantity pins in-place, shot, rebound volumes, and error seams", () => {
+  // 500 sf, 4 in, 20% rebound -> 6.173 in-place, 7.716 shot, 1.543 rebound
+  const r = computeShotcreteReboundQuantity({ area_sf: 500, thickness_in: 4, rebound_pct: 20 });
+  assert.ok(Math.abs(r.in_place_cy - 6.17284) < 1e-4);
+  assert.ok(Math.abs(r.shot_cy - 7.71605) < 1e-4);
+  assert.ok(Math.abs(r.rebound_cy - 1.54321) < 1e-4);
+  // Dry-mix overhead at 30% rebound climbs the order.
+  assert.ok(Math.abs(computeShotcreteReboundQuantity({ area_sf: 500, thickness_in: 4, rebound_pct: 30 }).shot_cy - 8.81834) < 1e-4);
+  // Zero rebound: shot equals in-place.
+  const z = computeShotcreteReboundQuantity({ area_sf: 500, thickness_in: 4, rebound_pct: 0 });
+  assert.ok(Math.abs(z.shot_cy - z.in_place_cy) < 1e-9);
+  // Error seams (incl. the 100% divide-by-zero seam).
+  assert.ok("error" in computeShotcreteReboundQuantity({ area_sf: 0, thickness_in: 4 }));
+  assert.ok("error" in computeShotcreteReboundQuantity({ area_sf: 500, thickness_in: 0 }));
+  assert.ok("error" in computeShotcreteReboundQuantity({ area_sf: 500, thickness_in: 4, rebound_pct: 100 }));
+  assert.ok("error" in computeShotcreteReboundQuantity({ area_sf: 500, thickness_in: 4, rebound_pct: -5 }));
 });
 
 test("bounds: calc-construction computeRebar pins per-direction bar counts and total_length on the 20x10 example", () => {
