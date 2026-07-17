@@ -1,6 +1,6 @@
 # roughlogic.com Specification v854 -- Branch-Circuit Conductor Footage Takeoff (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED (2026-07-17). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-electrical.js`** (Group A;
 > at landing may move to a less-full electrical module -- calc-electrical is near its gzip cap), no new module, group, or
 > dependency. Inherits spec.md through spec-v853.md. Electrical rough-in sweep, beside `voltage-drop` and

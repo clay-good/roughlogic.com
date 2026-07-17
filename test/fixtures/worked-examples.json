@@ -50513,6 +50513,66 @@
    }
   },
   {
+   "tile_id": "branch-circuit-wire-footage",
+   "source_publisher": "Branch-circuit footage takeoff identity (first-principles)",
+   "source_title": "20 circuits, 45 ft home run, 15 ft makeup, 3 conductors, 1,000 ft rolls",
+   "source_edition_or_year": "spec-v854 worked example",
+   "source_section_or_page": "total = 20*(45+15)*3 = 3,600 ft; rolls = ceil(3600/1000) = 4",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "circuits": 20,
+    "avg_homerun_ft": 45,
+    "makeup_ft": 15,
+    "conductors_per_circuit": 3,
+    "roll_ft": 1000
+   },
+   "outputs": {
+    "total_ft": {
+     "value": 3600,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "rolls": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "branch-circuit-wire-footage",
+   "source_publisher": "Branch-circuit footage takeoff identity (first-principles)",
+   "source_title": "cross-check: a bigger 30-circuit job at a 60 ft home run",
+   "source_edition_or_year": "spec-v854 worked example",
+   "source_section_or_page": "total = 30*(60+15)*3 = 6,750 ft; rolls = ceil(6750/1000) = 7",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "circuits": 30,
+    "avg_homerun_ft": 60,
+    "makeup_ft": 15,
+    "conductors_per_circuit": 3,
+    "roll_ft": 1000
+   },
+   "outputs": {
+    "total_ft": {
+     "value": 6750,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "rolls": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

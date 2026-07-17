@@ -17402,6 +17402,31 @@
       "kind": "industry"
     },
     {
+      "term": "branch circuit wire footage",
+      "target": "branch-circuit-wire-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "homerun wire takeoff",
+      "target": "branch-circuit-wire-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "rough-in wire footage",
+      "target": "branch-circuit-wire-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "branch wire rolls",
+      "target": "branch-circuit-wire-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "conductor footage estimate",
+      "target": "branch-circuit-wire-footage",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

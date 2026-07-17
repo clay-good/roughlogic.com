@@ -772,6 +772,7 @@ export const COMPUTE_MAP = {
   "flexible-pipe-deflection": { module: "../../calc-earthwork.js", fn: "computeFlexiblePipeDeflection" },
   "cable-reel-capacity": { module: "../../calc-electrical.js", fn: "computeCableReelCapacity" },
   "wire-pulling-lubricant": { module: "../../calc-electrical.js", fn: "computeWirePullingLubricant" },
+  "branch-circuit-wire-footage": { module: "../../calc-electrical.js", fn: "computeBranchCircuitWireFootage" },
   "shingle-nails": { module: "../../calc-construction.js", fn: "computeShingleNails" },
   "duct-metal-weight": { module: "../../calc-construction.js", fn: "computeDuctMetalWeight" },
   "duct-bank-concrete": { module: "../../calc-construction.js", fn: "computeDuctBankConcrete" },

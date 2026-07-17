@@ -17124,6 +17124,7 @@ import { computeShingleNails as _v850shn } from "../../calc-construction.js";
 import { computeDuctMetalWeight as _v851dmw } from "../../calc-construction.js";
 import { computeWirePullingLubricant as _v852wpl } from "../../calc-electrical.js";
 import { computeDuctBankConcrete as _v853dbc } from "../../calc-construction.js";
+import { computeBranchCircuitWireFootage as _v854bcw } from "../../calc-electrical.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17709,6 +17710,23 @@ test("bounds: spec-v853 computeDuctBankConcrete pins the net area, both volumes,
   assert.ok("error" in _v853dbc({ bank_width_ft: 2.0, bank_height_ft: 1.5, length_ft: 100, num_conduits: 6, conduit_od_in: 4.5, waste_pct: -1 }));
   // Conduit area exceeding the bank area (no net concrete).
   assert.ok("error" in _v853dbc({ bank_width_ft: 1.0, bank_height_ft: 1.0, length_ft: 100, num_conduits: 20, conduit_od_in: 6 }));
+});
+
+test("bounds: spec-v854 computeBranchCircuitWireFootage pins the total footage, roll count, and error seams", () => {
+  // 20 circuits, 45 ft home run, 15 ft makeup, 3 conductors, 1,000 ft rolls -> 3,600 ft, 4 rolls.
+  const r = _v854bcw({ circuits: 20, avg_homerun_ft: 45, makeup_ft: 15, conductors_per_circuit: 3, roll_ft: 1000 });
+  assert.strictEqual(r.total_ft, 3600);
+  assert.strictEqual(r.rolls, 4);
+  // A bigger 30-circuit job scales it.
+  const big = _v854bcw({ circuits: 30, avg_homerun_ft: 60, makeup_ft: 15, conductors_per_circuit: 3, roll_ft: 1000 });
+  assert.strictEqual(big.total_ft, 6750);
+  assert.strictEqual(big.rolls, 7);
+  // Error seams.
+  assert.ok("error" in _v854bcw({ circuits: 0, avg_homerun_ft: 45, makeup_ft: 15, conductors_per_circuit: 3, roll_ft: 1000 }));
+  assert.ok("error" in _v854bcw({ circuits: 20, avg_homerun_ft: 0, makeup_ft: 15, conductors_per_circuit: 3, roll_ft: 1000 }));
+  assert.ok("error" in _v854bcw({ circuits: 20, avg_homerun_ft: 45, makeup_ft: 15, conductors_per_circuit: 0, roll_ft: 1000 }));
+  assert.ok("error" in _v854bcw({ circuits: 20, avg_homerun_ft: 45, makeup_ft: 15, conductors_per_circuit: 3, roll_ft: 0 }));
+  assert.ok("error" in _v854bcw({ circuits: 20, avg_homerun_ft: 45, makeup_ft: -1, conductors_per_circuit: 3, roll_ft: 1000 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

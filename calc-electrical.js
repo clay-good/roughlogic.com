@@ -5581,3 +5581,54 @@ function _v852renderWirePullingLubricant(inputRegion, outputRegion, citationEl) 
   for (const f of [l, id, k, bf]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["wire-pulling-lubricant"] = _v852renderWirePullingLubricant;
+
+// ===================== spec-v854: branch-circuit conductor footage takeoff =====================
+// dims: in { circuits: dimensionless, avg_homerun_ft: L, makeup_ft: L, conductors_per_circuit: dimensionless, roll_ft: L } out: { total_ft: L, rolls: dimensionless }
+export function computeBranchCircuitWireFootage({ circuits = 20, avg_homerun_ft = 45, makeup_ft = 15, conductors_per_circuit = 3, roll_ft = 1000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(circuits > 0)) return { error: "Circuit count must be positive." };
+  if (!(avg_homerun_ft > 0)) return { error: "Home-run length must be positive (ft)." };
+  if (!(conductors_per_circuit > 0)) return { error: "Conductors per circuit must be positive." };
+  if (!(roll_ft > 0)) return { error: "Roll length must be positive (ft)." };
+  if (makeup_ft < 0) return { error: "Makeup cannot be negative (ft)." };
+  const total_ft = circuits * (avg_homerun_ft + makeup_ft) * conductors_per_circuit;
+  const rolls = Math.ceil(total_ft / roll_ft);
+  if (![total_ft, rolls].every(Number.isFinite)) return { error: "Footage math is not a finite value." };
+  return {
+    total_ft,
+    rolls,
+    note: "For individual conductors in conduit, each conductor is counted (set conductors-per-circuit). For cable (NM / romex), set conductors-per-circuit to 1 to tally the cable itself. The home run is panel-to-first-device; the makeup is the per-box slack summed. Wire is bought per color, so this is the per-color roll count.",
+  };
+}
+
+export const branchCircuitWireFootageExample = { inputs: { circuits: 20, avg_homerun_ft: 45, makeup_ft: 15, conductors_per_circuit: 3, roll_ft: 1000 } };
+
+function _v854renderBranchCircuitWireFootage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: footage takeoff identity by name. total = circuits x (home run + makeup) x conductors; rolls = ceil(total / roll length). Each conductor is counted in conduit; set conductors to 1 for cable (NM / romex). Wire is bought per color.";
+  const c = makeNumber("Number of branch circuits", "bcw-c", { step: "any", min: "0", value: "20" });
+  c.input.value = "20";
+  const hr = makeNumber("Average home-run length (ft)", "bcw-hr", { step: "any", min: "0", value: "45" });
+  hr.input.value = "45";
+  const mu = makeNumber("Box makeup / slack per circuit (ft)", "bcw-mu", { step: "any", min: "0", value: "15" });
+  mu.input.value = "15";
+  const cp = makeNumber("Conductors per circuit (1 for cable)", "bcw-cp", { step: "any", min: "0", value: "3" });
+  cp.input.value = "3";
+  const rf = makeNumber("Roll / spool length (ft)", "bcw-rf", { step: "any", min: "0", value: "1000" });
+  rf.input.value = "1000";
+  for (const f of [c, hr, mu, cp, rf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { c.input.value = "20"; hr.input.value = "45"; mu.input.value = "15"; cp.input.value = "3"; rf.input.value = "1000"; update(); });
+  const oTotal = makeOutputLine(outputRegion, "Total conductor footage", "bcw-out-total");
+  const oRolls = makeOutputLine(outputRegion, "Rolls per color", "bcw-out-rolls");
+  const update = debounce(() => {
+    const r = computeBranchCircuitWireFootage({
+      circuits: c.input.value === "" ? 20 : Number(c.input.value), avg_homerun_ft: hr.input.value === "" ? 45 : Number(hr.input.value),
+      makeup_ft: mu.input.value === "" ? 0 : Number(mu.input.value), conductors_per_circuit: cp.input.value === "" ? 3 : Number(cp.input.value),
+      roll_ft: rf.input.value === "" ? 1000 : Number(rf.input.value),
+    });
+    if (r.error) { oTotal.textContent = r.error; oRolls.textContent = "-"; return; }
+    oTotal.textContent = fmt(r.total_ft, 0) + " ft";
+    oRolls.textContent = fmt(r.rolls, 0) + " rolls";
+  }, DEBOUNCE_MS);
+  for (const f of [c, hr, mu, cp, rf]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["branch-circuit-wire-footage"] = _v854renderBranchCircuitWireFootage;

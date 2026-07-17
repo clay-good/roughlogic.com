@@ -8310,6 +8310,17 @@ export const CITATIONS = {
       { name: "Encasement", value: "the bank envelope and mix (often red-dyed concrete or flowable fill) come from the engineer and AHJ", source: "engineer / AHJ" },
     ],
   },
+  "branch-circuit-wire-footage": {
+    formula: "total_ft = circuits x (avg_homerun_ft + makeup_ft) x conductors_per_circuit; rolls = ceil(total_ft / roll_ft).",
+    edition: "Branch-circuit footage takeoff identity by name (circuits x per-circuit length x conductors; rolls from total / roll); first-principles count arithmetic.",
+    freeAccess: "The footage takeoff is public quantity arithmetic; the circuit count and home runs come from the panel schedule and the plan.",
+    governance: GOVERNANCE.general,
+    editionNote: "For individual conductors in conduit, each conductor is counted. For cable (NM / romex), set conductors-per-circuit to 1 to tally the cable itself. The home run is panel-to-first-device and the makeup is the per-box slack summed. Wire is bought per color.",
+    assumptions: [
+      { name: "Per-circuit length", value: "average home-run length plus box makeup/slack; the panel schedule and plan govern", source: "panel schedule / plan" },
+      { name: "Conductor count", value: "conductors per circuit for conduit (e.g. hot/neutral/ground = 3), or 1 for cable", source: "wiring method" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

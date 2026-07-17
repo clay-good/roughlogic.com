@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): branch-circuit-wire-footage -- branch-circuit conductor footage takeoff (spec-v854); 2026-07-17
+
+- New Group A tile `branch-circuit-wire-footage` (calc-electrical.js), the rough-in takeoff beside `voltage-drop` and
+  `wire-pulling-lubricant`. Takes off the branch-circuit wire to order and the roll count: total = circuits x (home run
+  + makeup) x conductors; rolls = ceil(total / roll length). 20 circuits at a 45 ft average home run, three conductors
+  each, with 15 ft of box makeup, is 3,600 ft -- 4 thousand-foot rolls per color; a 30-circuit job at a 60 ft home run
+  is 6,750 ft and 7 rolls. Set conductors to 1 for cable (NM / romex). The panel schedule drives the count. Home count
+  1,302 -> 1,303.
+
 ### feat(construction): duct-bank-concrete -- electrical duct-bank concrete encasement volume (spec-v853); 2026-07-17
 
 - New Group E tile `duct-bank-concrete` (calc-construction.js), the electrical / underground tile beside
