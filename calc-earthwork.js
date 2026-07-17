@@ -30,6 +30,7 @@
 //   - dump-truck-loads        Dump truck governing payload and load count
 //   - unit-cost-earthwork     Earthwork production unit cost ($/cy)
 //   - soil-stabilization-quantity  Lime / cement subgrade stabilizer takeoff
+//   - flexible-pipe-deflection  Buried flexible pipe deflection (Modified Iowa)
 //
 // Group letters are independent of the module (the spec-v28/v30/v36/v39
 // precedent): all five KEEP group "E"; only the on-disk module changes.
@@ -1382,6 +1383,70 @@ function _v847renderSoilStabilizationQuantity(inputRegion, outputRegion, citatio
   for (const f of [ap, d, dp, a]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["soil-stabilization-quantity"] = _v847renderSoilStabilizationQuantity;
+
+// --- flexible-pipe-deflection: Buried Flexible Pipe Deflection (Modified Iowa) ---
+//
+// How much a plastic or thin-wall pipe ovals under its soil load, per the
+// public-domain Modified Iowa formula (Spangler / Watkins):
+//   soil_load_psi = cover_ft x soil_density_pcf / 144
+//   deflection_pct = DL x K x Wc / (0.149 x PS + 0.061 x E') x 100
+//   pass = deflection_pct <= allowable_pct
+// dims: in { cover_ft: L, soil_density_pcf: M L^-3, deflection_lag: dimensionless, bedding_constant: dimensionless, pipe_stiffness_psi: M L^-1 T^-2, soil_modulus_psi: M L^-1 T^-2, allowable_pct: dimensionless } out: { soil_load_psi: M L^-1 T^-2, deflection_pct: dimensionless }
+export function computeFlexiblePipeDeflection({ cover_ft = 12, soil_density_pcf = 120, deflection_lag = 1.5, bedding_constant = 0.1, pipe_stiffness_psi = 46, soil_modulus_psi = 1000, allowable_pct = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(cover_ft > 0)) return { error: "Cover must be positive (ft)." };
+  if (!(soil_density_pcf > 0)) return { error: "Soil density must be positive (pcf)." };
+  if (!(deflection_lag > 0)) return { error: "Deflection lag factor must be positive." };
+  if (!(bedding_constant > 0)) return { error: "Bedding constant must be positive." };
+  if (!(pipe_stiffness_psi > 0)) return { error: "Pipe stiffness must be positive (psi)." };
+  if (!(soil_modulus_psi > 0)) return { error: "Modulus of soil reaction must be positive (psi)." };
+  if (!(allowable_pct > 0)) return { error: "Allowable deflection must be positive (percent)." };
+  const soil_load_psi = (cover_ft * soil_density_pcf) / 144;
+  const deflection_pct = (deflection_lag * bedding_constant * soil_load_psi) / (0.149 * pipe_stiffness_psi + 0.061 * soil_modulus_psi) * 100;
+  const pass = deflection_pct <= allowable_pct;
+  if (![soil_load_psi, deflection_pct].every(Number.isFinite)) return { error: "Deflection math is not a finite value." };
+  return {
+    soil_load_psi,
+    deflection_pct,
+    pass,
+    note: "The Modified Iowa formula is public-domain (Spangler / Watkins). The modulus of soil reaction E' is the field-controllable variable - better bedding compaction beside the pipe stiffens the support and cuts deflection. The pipe stiffness PS comes from the manufacturer; the limit (commonly 5% or 7.5%) is set by the spec. A mandrel test confirms it later. The pipe manufacturer and design engineer govern.",
+  };
+}
+
+function _v848renderFlexiblePipeDeflection(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Modified Iowa (Spangler) deflection identity by name. deflection % = DL x K x Wc / (0.149 x PS + 0.061 x E') x 100, where Wc = cover x density / 144. E' (soil support) is the field-controllable variable; the pipe manufacturer and engineer govern the limit.";
+  const c = makeNumber("Soil cover over the pipe (ft)", "fpd-c", { step: "any", min: "0", value: "12" });
+  c.input.value = "12";
+  const d = makeNumber("Backfill density (pcf)", "fpd-d", { step: "any", min: "0", value: "120" });
+  d.input.value = "120";
+  const dl = makeNumber("Deflection lag factor DL", "fpd-dl", { step: "any", min: "0", value: "1.5" });
+  dl.input.value = "1.5";
+  const k = makeNumber("Bedding constant K", "fpd-k", { step: "any", min: "0", value: "0.1" });
+  k.input.value = "0.1";
+  const ps = makeNumber("Pipe stiffness PS (psi)", "fpd-ps", { step: "any", min: "0", value: "46" });
+  ps.input.value = "46";
+  const em = makeNumber("Modulus of soil reaction E' (psi)", "fpd-em", { step: "any", min: "0", value: "1000" });
+  em.input.value = "1000";
+  const al = makeNumber("Allowable deflection (%)", "fpd-al", { step: "any", min: "0", value: "5" });
+  al.input.value = "5";
+  for (const f of [c, d, dl, k, ps, em, al]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { c.input.value = "12"; d.input.value = "120"; dl.input.value = "1.5"; k.input.value = "0.1"; ps.input.value = "46"; em.input.value = "1000"; al.input.value = "5"; update(); });
+  const oDefl = makeOutputLine(outputRegion, "Predicted deflection", "fpd-out-defl");
+  const oLoad = makeOutputLine(outputRegion, "Soil load on the pipe", "fpd-out-load");
+  const update = debounce(() => {
+    const r = computeFlexiblePipeDeflection({
+      cover_ft: c.input.value === "" ? 12 : Number(c.input.value), soil_density_pcf: d.input.value === "" ? 120 : Number(d.input.value),
+      deflection_lag: dl.input.value === "" ? 1.5 : Number(dl.input.value), bedding_constant: k.input.value === "" ? 0.1 : Number(k.input.value),
+      pipe_stiffness_psi: ps.input.value === "" ? 46 : Number(ps.input.value), soil_modulus_psi: em.input.value === "" ? 1000 : Number(em.input.value),
+      allowable_pct: al.input.value === "" ? 5 : Number(al.input.value),
+    });
+    if (r.error) { oDefl.textContent = r.error; oLoad.textContent = "-"; return; }
+    oDefl.textContent = fmt(r.deflection_pct, 2) + "% - " + (r.pass ? "PASS" : "FAIL") + " (allowable " + fmt(Number(al.input.value) || 5, 1) + "%)";
+    oLoad.textContent = fmt(r.soil_load_psi, 2) + " psi";
+  }, DEBOUNCE_MS);
+  for (const f of [c, d, dl, k, ps, em, al]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["flexible-pipe-deflection"] = _v848renderFlexiblePipeDeflection;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

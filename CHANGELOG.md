@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): flexible-pipe-deflection -- buried flexible pipe deflection, Modified Iowa (spec-v848); 2026-07-17
+
+- New Group E tile `flexible-pipe-deflection` (calc-earthwork.js), closing the buried-pipe check set (`pipe-flotation`,
+  `restrained-pipe-length`, `hdd-pullback`, `flexible-pipe-deflection`). How much a plastic or thin-wall pipe ovals under
+  its soil load, by the public-domain Modified Iowa formula (Spangler / Watkins): deflection % = DL x K x Wc / (0.149 PS
+  + 0.061 E') x 100, Wc = cover x density / 144. A pipe under 12 ft of 120 pcf soil on good bedding (E' = 1,000) deflects
+  2.21% (pass), but drop the bedding support to E' = 200 and it jumps to 7.87%, past the 5% limit -- purely from the
+  bedding, which is why the compaction beside the pipe is the whole game. Home count 1,296 -> 1,297.
+
 ### feat(earthwork): soil-stabilization-quantity -- lime / cement subgrade stabilizer takeoff (spec-v847); 2026-07-17
 
 - New Group E tile `soil-stabilization-quantity` (calc-earthwork.js), the subgrade tile beside `relative-compaction`

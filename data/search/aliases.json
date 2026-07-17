@@ -17252,6 +17252,31 @@
       "kind": "industry"
     },
     {
+      "term": "flexible pipe deflection",
+      "target": "flexible-pipe-deflection",
+      "kind": "industry"
+    },
+    {
+      "term": "modified iowa formula",
+      "target": "flexible-pipe-deflection",
+      "kind": "industry"
+    },
+    {
+      "term": "pipe ovality deflection",
+      "target": "flexible-pipe-deflection",
+      "kind": "industry"
+    },
+    {
+      "term": "buried pipe deflection",
+      "target": "flexible-pipe-deflection",
+      "kind": "industry"
+    },
+    {
+      "term": "spangler deflection",
+      "target": "flexible-pipe-deflection",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

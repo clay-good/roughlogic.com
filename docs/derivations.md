@@ -1782,6 +1782,7 @@ cross-check.
 | calc-earthwork.js | `computeDustControlWater` | `{ length_ft = 2000, width_ft = 20, rate_gal_per_sy = 0.5, truck_cap_gal = 400...` | _ | _ | _ |
 | calc-earthwork.js | `computeErosionBlanketCoverage` | `{ area_sf = 0, overlap_pct = 10, roll_width_ft = 8, roll_length_ft = 112.5, s...` | _ | _ | _ |
 | calc-earthwork.js | `computeFinenessModulus` | `{ r4 = 0, r8 = 0, r16 = 0, r30 = 0, r50 = 0, r100 = 0 } = {}` | _ | _ | _ |
+| calc-earthwork.js | `computeFlexiblePipeDeflection` | `{ cover_ft = 12, soil_density_pcf = 120, deflection_lag = 1.5, bedding_consta...` | _ | _ | _ |
 | calc-earthwork.js | `computeHaulCycleProduction` | `{ truck_cap_lcy, load_min, haul_min = 0, dump_min = 0, return_min = 0, spot_m...` | _ | _ | _ |
 | calc-earthwork.js | `computeHaulRoadResistance` | `{ gvw_lb = 150000, grade_pct = 5, rolling_resistance_pct = 4 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeHddPullback` | `{ eff_weight_plf = 5, length_ft = 800, friction_coeff = 0.3, bend_factor = 1....` | _ | _ | _ |
@@ -2957,7 +2958,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1543.
+Row count: 1544.
 
 <!-- END function-corpus-v14 -->
 
@@ -3505,7 +3506,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (305 tiles)
+### Group E Construction (306 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3602,6 +3603,7 @@ per spec-v14 §13.1 second paragraph.
 | `fence-estimate` | Fence Material Takeoff | Standard fence-layout identities.; spec-v94 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fillet-weld-strength` | Fillet Weld Strength and Size | AWS D1.1 / AISC 360 §J2 (by name); 1/4 in E70 fillet, 6 in long, ASD -> throat 0.1768 in, 21... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fineness-modulus` | Aggregate Fineness Modulus (ASTM C136) | ASTM C136 / C125 (aggregate fineness ...; cumulative retained 2/12/32/57/82/95 -> sum 280 -> FM 2.8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `flexible-pipe-deflection` | Buried Flexible Pipe Deflection (Modified Iowa) | Modified Iowa (Spangler) deflection f...; Wc = 12*120/144 = 10 psi; deflection = 1.5*0.1*10/(0.149*... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flooring-takeoff` | Resilient / LVP Flooring Takeoff | Published flooring waste rules of thu...; spec-v95 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `footing-area` | Footing Area for Soil Bearing | Project (first-principles); ASCE 7 / IRC R401 conceptual basis; bundled allowable bea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `footing-eccentric-pressure` | Eccentric Footing Bearing Pressure and Kern Check | Eccentric footing bearing pressure (k...; spec-v309 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4439,6 +4441,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1296. Fixture-covered or reference-cadence: 1296 / 1296.
+Tile count: 1297. Fixture-covered or reference-cadence: 1297 / 1297.
 
 <!-- END tile-index-v14 -->

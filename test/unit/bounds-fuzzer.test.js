@@ -17118,6 +17118,7 @@ import { computeHaulRoadResistance as _v844hrr } from "../../calc-earthwork.js";
 import { computeDumpTruckLoads as _v845dtl } from "../../calc-earthwork.js";
 import { computeUnitCostEarthwork as _v846uce } from "../../calc-earthwork.js";
 import { computeSoilStabilizationQuantity as _v847ssq } from "../../calc-earthwork.js";
+import { computeFlexiblePipeDeflection as _v848fpd } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17603,6 +17604,26 @@ test("bounds: spec-v847 computeSoilStabilizationQuantity pins the spread rate, t
   assert.ok("error" in _v847ssq({ application_pct: 6, soil_density_pcf: 0, depth_in: 8, area_sy: 10000 }));
   assert.ok("error" in _v847ssq({ application_pct: 6, soil_density_pcf: 110, depth_in: 0, area_sy: 10000 }));
   assert.ok("error" in _v847ssq({ application_pct: 6, soil_density_pcf: 110, depth_in: 8, area_sy: 0 }));
+});
+
+test("bounds: spec-v848 computeFlexiblePipeDeflection pins the soil load, deflection (pass and fail), pass flag, and error seams", () => {
+  // 12 ft, 120 pcf, DL 1.5, K 0.1, PS 46, E' 1,000 -> Wc 10 psi, 2.21%, pass.
+  const r = _v848fpd({ cover_ft: 12, soil_density_pcf: 120, deflection_lag: 1.5, bedding_constant: 0.1, pipe_stiffness_psi: 46, soil_modulus_psi: 1000, allowable_pct: 5 });
+  assert.ok(Math.abs(r.soil_load_psi - 10) < 1e-9);
+  assert.ok(Math.abs(r.deflection_pct - 2.211) < 1e-2);
+  assert.strictEqual(r.pass, true);
+  // Poor haunch compaction (E' = 200) fails the 5% limit on the same pipe.
+  const poor = _v848fpd({ cover_ft: 12, soil_density_pcf: 120, deflection_lag: 1.5, bedding_constant: 0.1, pipe_stiffness_psi: 46, soil_modulus_psi: 200, allowable_pct: 5 });
+  assert.ok(Math.abs(poor.deflection_pct - 7.872) < 1e-2);
+  assert.strictEqual(poor.pass, false);
+  // Error seams.
+  assert.ok("error" in _v848fpd({ cover_ft: 0, soil_density_pcf: 120, deflection_lag: 1.5, bedding_constant: 0.1, pipe_stiffness_psi: 46, soil_modulus_psi: 1000, allowable_pct: 5 }));
+  assert.ok("error" in _v848fpd({ cover_ft: 12, soil_density_pcf: 0, deflection_lag: 1.5, bedding_constant: 0.1, pipe_stiffness_psi: 46, soil_modulus_psi: 1000, allowable_pct: 5 }));
+  assert.ok("error" in _v848fpd({ cover_ft: 12, soil_density_pcf: 120, deflection_lag: 0, bedding_constant: 0.1, pipe_stiffness_psi: 46, soil_modulus_psi: 1000, allowable_pct: 5 }));
+  assert.ok("error" in _v848fpd({ cover_ft: 12, soil_density_pcf: 120, deflection_lag: 1.5, bedding_constant: 0, pipe_stiffness_psi: 46, soil_modulus_psi: 1000, allowable_pct: 5 }));
+  assert.ok("error" in _v848fpd({ cover_ft: 12, soil_density_pcf: 120, deflection_lag: 1.5, bedding_constant: 0.1, pipe_stiffness_psi: 0, soil_modulus_psi: 1000, allowable_pct: 5 }));
+  assert.ok("error" in _v848fpd({ cover_ft: 12, soil_density_pcf: 120, deflection_lag: 1.5, bedding_constant: 0.1, pipe_stiffness_psi: 46, soil_modulus_psi: 0, allowable_pct: 5 }));
+  assert.ok("error" in _v848fpd({ cover_ft: 12, soil_density_pcf: 120, deflection_lag: 1.5, bedding_constant: 0.1, pipe_stiffness_psi: 46, soil_modulus_psi: 1000, allowable_pct: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

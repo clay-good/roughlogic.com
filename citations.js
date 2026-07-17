@@ -8244,6 +8244,17 @@ export const CITATIONS = {
       { name: "Soil density", value: "the dry density of the subgrade being treated (~110 pcf default)", source: "geotechnical report" },
     ],
   },
+  "flexible-pipe-deflection": {
+    formula: "soil_load_psi = cover_ft x soil_density_pcf / 144; deflection_pct = DL x K x soil_load_psi / (0.149 x pipe_stiffness_psi + 0.061 x soil_modulus_psi) x 100.",
+    edition: "Modified Iowa (Spangler) deflection formula by name (deflection = DL K Wc / (0.149 PS + 0.061 E')); public-domain (Spangler / Watkins).",
+    freeAccess: "The Modified Iowa formula is public-domain (Spangler / Watkins); the pipe stiffness and E' come from the manufacturer and the field compaction.",
+    governance: GOVERNANCE.general,
+    editionNote: "The modulus of soil reaction E' is the field-controllable variable - better bedding compaction beside the pipe stiffens the support and cuts deflection. The pipe stiffness PS comes from the manufacturer; the limit (commonly 5% or 7.5%) is set by the spec. A mandrel test confirms it later. The pipe manufacturer and design engineer govern.",
+    assumptions: [
+      { name: "Modulus of soil reaction E'", value: "the field-controllable support stiffness from the haunch/bedding compaction (~1,000 psi good, ~200 psi poor)", source: "field compaction / AASHTO" },
+      { name: "Pipe stiffness PS", value: "the pipe's stiffness from the manufacturer; DL ~1.5, K ~0.1 typical", source: "pipe manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",
