@@ -5754,6 +5754,55 @@ const _renderMassConcreteTempRise = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["mass-concrete-temp-rise"] = _renderMassConcreteTempRise;
 
+// --- concrete-washout-volume: Concrete Washout Containment Volume ---
+//
+// Sizes the lined pit or container that catches chute and pump rinse so high-pH
+// slurry never reaches the ground or a storm drain (required by the CGP):
+//   total_gal = trucks x washout_gal_per_truck
+//   required_cf = total_gal / 7.48052 x (1 + freeboard_pct/100); required_cy = required_cf / 27
+//   pit_side_ft = sqrt(required_cf / pit_depth_ft)
+// dims: in { trucks: dimensionless, washout_gal_per_truck: L^3, freeboard_pct: dimensionless, pit_depth_ft: L } out: { total_gal: L^3, required_cf: L^3, required_cy: L^3, pit_side_ft: L }
+export function computeConcreteWashoutVolume({ trucks = 20, washout_gal_per_truck = 50, freeboard_pct = 15, pit_depth_ft = 2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(trucks > 0)) return { error: "Truck count must be positive." };
+  if (!(washout_gal_per_truck > 0)) return { error: "Washout per truck must be positive (gal)." };
+  if (!(pit_depth_ft > 0)) return { error: "Pit depth must be positive (ft)." };
+  if (freeboard_pct < 0) return { error: "Freeboard cannot be negative (percent)." };
+  const total_gal = trucks * washout_gal_per_truck;
+  const required_cf = (total_gal / 7.48052) * (1 + freeboard_pct / 100);
+  const required_cy = required_cf / 27;
+  const pit_side_ft = Math.sqrt(required_cf / pit_depth_ft);
+  if (![total_gal, required_cf, required_cy, pit_side_ft].every(Number.isFinite)) return { error: "Washout-volume math is not a finite value." };
+  return {
+    total_gal,
+    required_cf,
+    required_cy,
+    pit_side_ft,
+    note: "Washout captures chute and pump rinse plus returned slurry and must be contained per the SWPPP / CGP - no discharge to ground or storm. The slurry is caustic (high pH). Clean out the container at about three-quarters full and dispose per the plan. The per-truck figure is a planning estimate the crew tunes to the actual chute-rinse practice.",
+  };
+}
+
+export const concreteWashoutVolumeExample = { inputs: { trucks: 20, washout_gal_per_truck: 50, freeboard_pct: 15, pit_depth_ft: 2 } };
+
+const _renderConcreteWashoutVolume = _simpleRenderer({
+  citation: "Citation: washout-containment identity by name. required volume (cf) = trucks x washout (gal) / 7.48 x (1 + freeboard); pit side = sqrt(volume / depth). Washout must be contained per the SWPPP / CGP - no discharge to ground or storm.",
+  example: concreteWashoutVolumeExample.inputs,
+  fields: [
+    { key: "trucks", label: "Ready-mix trucks (or pump washes)", kind: "number", default: 20 },
+    { key: "washout_gal_per_truck", label: "Washout volume per truck (gal)", kind: "number", default: 50 },
+    { key: "freeboard_pct", label: "Freeboard allowance (percent)", kind: "number", default: 15 },
+    { key: "pit_depth_ft", label: "Usable pit depth (ft)", kind: "number", default: 2 },
+  ],
+  outputs: [
+    { key: "v", id: "cwv-out-v", label: "Required containment", value: (r) => _fmtC(r.required_cf, 1) + " cf (" + _fmtC(r.required_cy, 2) + " cy)" },
+    { key: "s", id: "cwv-out-s", label: "Square pit side at that depth", value: (r) => _fmtC(r.pit_side_ft, 1) + " ft" },
+    { key: "g", id: "cwv-out-g", label: "Total washout collected", value: (r) => _fmtC(r.total_gal, 0) + " gal" },
+    { key: "n", id: "cwv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteWashoutVolume,
+});
+CONSTRUCTION_RENDERERS["concrete-washout-volume"] = _renderConcreteWashoutVolume;
+
 // ----- spec-v246: Concrete Surface Evaporation Rate and Plastic-Shrinkage Risk (ACI 305) -----
 
 // dims: in { air_temp_f: T, concrete_temp_f: T, rh_pct: dimensionless, wind_mph: L T^-1 } out: { E_metric: M L^-2 T^-1, E_us: M L^-2 T^-1 }

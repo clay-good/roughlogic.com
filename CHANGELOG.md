@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): concrete-washout-volume -- concrete washout containment volume (spec-v843); 2026-07-17
+
+- New Group E tile `concrete-washout-volume` (calc-construction.js), the concrete-operations / SWPPP tile linking the
+  concrete crew to the erosion-control set. Sizes the lined pit or container that catches chute and pump rinse so
+  high-pH slurry never reaches the ground or a storm drain (required by the CGP): required volume = trucks x washout /
+  7.48 x (1 + freeboard); pit side = sqrt(volume / depth). 20 trucks at 50 gal each is 1,000 gal -- 153.7 cf (5.69 cy),
+  a ~8.8 ft square pit at 2 ft deep; a 40-truck pour doubles it to 307 cf and a 12.4 ft pit. Built for the day's
+  washouts, not one truck; the CGP governs containment. Home count 1,291 -> 1,292.
+
 ### feat(construction): mass-concrete-temp-rise -- mass concrete adiabatic temp rise screen per ACI 207 (spec-v842); 2026-07-17
 
 - New Group E tile `mass-concrete-temp-rise` (calc-construction.js), the concrete-operations heat screen beside

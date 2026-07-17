@@ -17127,6 +17127,31 @@
       "kind": "industry"
     },
     {
+      "term": "concrete washout volume",
+      "target": "concrete-washout-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "washout pit sizing",
+      "target": "concrete-washout-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete washout containment",
+      "target": "concrete-washout-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "ready mix washout",
+      "target": "concrete-washout-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "swppp washout",
+      "target": "concrete-washout-volume",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

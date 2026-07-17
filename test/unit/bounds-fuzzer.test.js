@@ -17113,6 +17113,7 @@ import { computeStripingPaintQuantity as _v839spq } from "../../calc-constructio
 import { computeConcreteVibratorSpacing as _v840cvs } from "../../calc-construction.js";
 import { computeFormworkTieLoad as _v841ftl } from "../../calc-construction.js";
 import { computeMassConcreteTempRise as _v842mctr } from "../../calc-construction.js";
+import { computeConcreteWashoutVolume as _v843cwv } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17511,6 +17512,26 @@ test("bounds: spec-v842 computeMassConcreteTempRise pins the rise, peak, exceed 
   assert.ok("error" in _v842mctr({ cementitious_lb_per_cy: 600, rise_f_per_100lb: 0, placing_temp_f: 70, diff_limit_f: 35 }));
   assert.ok("error" in _v842mctr({ cementitious_lb_per_cy: 600, rise_f_per_100lb: 12, placing_temp_f: 70, diff_limit_f: 0 }));
   assert.ok("error" in _v842mctr({ cementitious_lb_per_cy: 600, rise_f_per_100lb: 12, placing_temp_f: Infinity, diff_limit_f: 35 }));
+});
+
+test("bounds: spec-v843 computeConcreteWashoutVolume pins the gallons, required volumes, pit side, and error seams", () => {
+  // 20 trucks x 50 gal, 15% freeboard, 2 ft -> 1,000 gal, 153.7 cf, 5.69 cy, 8.77 ft.
+  const r = _v843cwv({ trucks: 20, washout_gal_per_truck: 50, freeboard_pct: 15, pit_depth_ft: 2 });
+  assert.strictEqual(r.total_gal, 1000);
+  assert.ok(Math.abs(r.required_cf - 153.73) < 0.05);
+  assert.ok(Math.abs(r.required_cy - 5.69) < 0.01);
+  assert.ok(Math.abs(r.pit_side_ft - 8.77) < 0.02);
+  // A 40-truck pour doubles the containment.
+  const big = _v843cwv({ trucks: 40, washout_gal_per_truck: 50, freeboard_pct: 15, pit_depth_ft: 2 });
+  assert.ok(Math.abs(big.required_cf - 307.47) < 0.05);
+  assert.ok(Math.abs(big.pit_side_ft - 12.4) < 0.02);
+  // Zero freeboard is allowed (no error).
+  assert.ok(!("error" in _v843cwv({ trucks: 20, washout_gal_per_truck: 50, freeboard_pct: 0, pit_depth_ft: 2 })));
+  // Error seams.
+  assert.ok("error" in _v843cwv({ trucks: 0, washout_gal_per_truck: 50, freeboard_pct: 15, pit_depth_ft: 2 }));
+  assert.ok("error" in _v843cwv({ trucks: 20, washout_gal_per_truck: 0, freeboard_pct: 15, pit_depth_ft: 2 }));
+  assert.ok("error" in _v843cwv({ trucks: 20, washout_gal_per_truck: 50, freeboard_pct: 15, pit_depth_ft: 0 }));
+  assert.ok("error" in _v843cwv({ trucks: 20, washout_gal_per_truck: 50, freeboard_pct: -1, pit_depth_ft: 2 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

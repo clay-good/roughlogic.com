@@ -8189,6 +8189,17 @@ export const CITATIONS = {
       { name: "Differential target", value: "~35 degF surface-to-core crack-control target the thermal-control plan enforces", source: "ACI 207 / engineer of record" },
     ],
   },
+  "concrete-washout-volume": {
+    formula: "total_gal = trucks x washout_gal_per_truck; required_cf = total_gal / 7.48052 x (1 + freeboard_pct/100); required_cy = required_cf / 27; pit_side_ft = sqrt(required_cf / pit_depth_ft).",
+    edition: "Washout-containment identity by name (volume from trucks x per-truck washout, plus freeboard; pit side from volume / depth); first-principles volume arithmetic.",
+    freeAccess: "The containment volume is public quantity geometry; the SWPPP / CGP requires the containment and the disposal.",
+    governance: GOVERNANCE.general,
+    editionNote: "Washout captures chute and pump rinse plus returned slurry and must be contained per the SWPPP / CGP - no discharge to ground or storm. The slurry is caustic (high pH). Clean out the container at about three-quarters full and dispose per the plan. The per-truck figure is a planning estimate the crew tunes.",
+    assumptions: [
+      { name: "Per-truck washout", value: "~50 gal/truck default (chute and pump rinse plus returned slurry); the crew tunes it to practice", source: "planning estimate" },
+      { name: "Containment", value: "lined pit or container per the SWPPP / CGP, cleaned out at ~three-quarters full; no discharge to ground or storm", source: "SWPPP / construction general permit" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",
