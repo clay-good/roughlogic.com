@@ -26319,3 +26319,20 @@ test("bounds: spec-v891 computePolymericSandBags pins the bag count, coverage le
   assert.ok("error" in _v891({ area_sf: 400, coverage_per_bag_sf: 75, waste_pct: -5 }));
   assert.ok("error" in _v891({ area_sf: Infinity, coverage_per_bag_sf: 75, waste_pct: 5 }));
 });
+
+import { computeRigidFoamBoardCount as _v892 } from "../../calc-construction.js";
+
+test("bounds: spec-v892 computeRigidFoamBoardCount pins the board count, layer multiplier, and error seams", () => {
+  const r = _v892({ area_sf: 1600, board_area_sf: 32, layers: 2, waste_pct: 8 });
+  assert.equal(r.boards_per_layer, 54); // ceil(1600*1.08/32) = ceil(54.0)
+  assert.equal(r.boards, 108); // 54 * 2
+  // The layer count, set by the required continuous-insulation R, is the multiplier.
+  const single = _v892({ area_sf: 1600, board_area_sf: 32, layers: 1, waste_pct: 8 });
+  assert.equal(single.boards, 54); // 54 * 1
+  // Error seams: non-finite, non-positive area / board area / layers, negative waste.
+  assert.ok("error" in _v892({ area_sf: 0, board_area_sf: 32, layers: 2, waste_pct: 8 }));
+  assert.ok("error" in _v892({ area_sf: 1600, board_area_sf: 0, layers: 2, waste_pct: 8 }));
+  assert.ok("error" in _v892({ area_sf: 1600, board_area_sf: 32, layers: 0, waste_pct: 8 }));
+  assert.ok("error" in _v892({ area_sf: 1600, board_area_sf: 32, layers: 2, waste_pct: -8 }));
+  assert.ok("error" in _v892({ area_sf: Infinity, board_area_sf: 32, layers: 2, waste_pct: 8 }));
+});

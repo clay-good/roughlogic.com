@@ -8266,6 +8266,17 @@ export const CITATIONS = {
       { name: "Waste", value: "~5% default for the sweep-in and activation", source: "installation practice" },
     ],
   },
+  "rigid-foam-board-count": {
+    formula: "boards = ceil(area_sf x (1 + waste_pct/100) / board_area_sf) x layers.",
+    edition: "Rigid-insulation board-count identity by name (boards per layer from area over board area with waste, times the layers); first-principles arithmetic.",
+    freeAccess: "The board-count arithmetic is public first-principles; the continuous-insulation R and layers come from the energy code.",
+    governance: GOVERNANCE.general,
+    editionNote: "This is continuous rigid insulation (XPS, polyiso, or EPS). The layers cover a multi-layer install with offset seams for the continuous-insulation requirement. The fasteners, plates, and tape are taken off separately per the wind zone. Distinct from spray-foam-board-feet and insulation-batt-coverage.",
+    assumptions: [
+      { name: "Board area", value: "~32 sf for a 4 x 8 board (default); the product size governs", source: "insulation manufacturer" },
+      { name: "Layers", value: "set by the required continuous-insulation R with offset seams", source: "IECC / energy code" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

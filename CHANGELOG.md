@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): rigid-foam-board-count -- rigid / continuous insulation board count (spec-v892); 2026-07-17
+
+- New Group E tile `rigid-foam-board-count` (calc-construction.js), the insulation takeoff beside
+  `insulation-batt-coverage` and `spray-foam-board-feet`. boards = ceil(area x (1 + waste/100) / board area) x layers. A
+  1,600 sf wall in 4 x 8 boards at 8% waste is 54 boards a layer, so a two-layer continuous-insulation assembly with
+  offset seams is 108 boards; a single layer is 54. The layer count, set by the required continuous-insulation R, is the
+  multiplier; fasteners, plates, and tape are taken off separately. Home count 1,340 -> 1,341.
+
 ### feat(construction): polymeric-sand-bags -- polymeric paver joint sand bag count (spec-v891); 2026-07-17
 
 - New Group E tile `polymeric-sand-bags` (calc-construction.js), the hardscape takeoff beside `paver-patio` and

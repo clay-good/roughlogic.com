@@ -1,6 +1,6 @@
 # roughlogic.com Specification v892 -- Rigid / Continuous Insulation Board Count (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED (2026-07-17). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-construction.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v891.md. Insulation sweep, beside
 > `insulation-batt-coverage` and `spray-foam-board-feet`.

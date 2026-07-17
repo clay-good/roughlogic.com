@@ -18352,6 +18352,31 @@
       "kind": "industry"
     },
     {
+      "term": "rigid foam board count",
+      "target": "rigid-foam-board-count",
+      "kind": "industry"
+    },
+    {
+      "term": "continuous insulation boards",
+      "target": "rigid-foam-board-count",
+      "kind": "industry"
+    },
+    {
+      "term": "xps board count",
+      "target": "rigid-foam-board-count",
+      "kind": "industry"
+    },
+    {
+      "term": "polyiso board count",
+      "target": "rigid-foam-board-count",
+      "kind": "industry"
+    },
+    {
+      "term": "rigid insulation quantity",
+      "target": "rigid-foam-board-count",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

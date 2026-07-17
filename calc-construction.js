@@ -9645,3 +9645,43 @@ const _v891renderPolymericSandBags = _simpleRenderer({
   compute: computePolymericSandBags,
 });
 CONSTRUCTION_RENDERERS["polymeric-sand-bags"] = _v891renderPolymericSandBags;
+
+// --- rigid-foam-board-count: Rigid / Continuous Insulation Board Count ---
+//
+// Boards per layer from area over board area (with waste), times the layer count.
+//   boards = ceil(area x (1 + waste/100) / board_area) x layers
+// dims: in { area_sf: L^2, board_area_sf: L^2, layers: dimensionless, waste_pct: dimensionless } out: { boards: dimensionless }
+export function computeRigidFoamBoardCount({ area_sf = 1600, board_area_sf = 32, layers = 1, waste_pct = 8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
+  if (!(board_area_sf > 0)) return { error: "Board area must be positive (ft^2)." };
+  if (!(layers > 0)) return { error: "Layer count must be positive." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const boards_per_layer = Math.ceil(area_sf * (1 + waste_pct / 100) / board_area_sf);
+  const boards = boards_per_layer * layers;
+  if (![boards_per_layer, boards].every(Number.isFinite)) return { error: "Board-count math is not a finite value." };
+  return {
+    boards,
+    boards_per_layer,
+    note: "This is continuous rigid insulation (XPS, polyiso, or EPS). The layers cover a multi-layer install with offset seams for the continuous-insulation requirement. The fasteners, plates, and tape are taken off separately per the wind zone. Distinct from spray-foam-board-feet and insulation-batt-coverage.",
+  };
+}
+
+export const rigidFoamBoardCountExample = { inputs: { area_sf: 1600, board_area_sf: 32, layers: 2, waste_pct: 8 } };
+
+const _v892renderRigidFoamBoardCount = _simpleRenderer({
+  citation: "Citation: board-count identity by name. boards = ceil(area x (1 + waste/100) / board area) x layers. The layers cover a multi-layer install with offset seams for the continuous-insulation requirement.",
+  example: rigidFoamBoardCountExample.inputs,
+  fields: [
+    { key: "area_sf", label: "Area to insulate (ft^2)", kind: "number", default: 1600 },
+    { key: "board_area_sf", label: "Board area (ft^2)", kind: "number", default: 32 },
+    { key: "layers", label: "Number of layers", kind: "number", default: 1 },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 8 },
+  ],
+  outputs: [
+    { key: "b", id: "rfb-out-b", label: "Rigid insulation boards", value: (r) => _fmtC(r.boards, 0) + " boards (" + _fmtC(r.boards_per_layer, 0) + " per layer)" },
+    { key: "note", id: "rfb-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRigidFoamBoardCount,
+});
+CONSTRUCTION_RENDERERS["rigid-foam-board-count"] = _v892renderRigidFoamBoardCount;
