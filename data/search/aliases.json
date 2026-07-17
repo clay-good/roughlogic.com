@@ -18227,6 +18227,31 @@
       "kind": "industry"
     },
     {
+      "term": "joist hanger count",
+      "target": "joist-hanger-count",
+      "kind": "industry"
+    },
+    {
+      "term": "joist hanger nails",
+      "target": "joist-hanger-count",
+      "kind": "industry"
+    },
+    {
+      "term": "hanger takeoff",
+      "target": "joist-hanger-count",
+      "kind": "industry"
+    },
+    {
+      "term": "framing connector count",
+      "target": "joist-hanger-count",
+      "kind": "industry"
+    },
+    {
+      "term": "deck joist hangers",
+      "target": "joist-hanger-count",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): joist-hanger-count -- joist hanger and connector-nail count (spec-v887); 2026-07-17
+
+- New Group E tile `joist-hanger-count` (calc-construction.js), the framing-hardware takeoff beside
+  `deck-ledger-fasteners` and `residential-framing`. joists = floor(width x 12 / spacing) + 1; hangers = joists x hung
+  ends; nails = hangers x nails per hanger. A 16 ft-wide floor at 16 in on center is 13 joists, hung both ends, so 26
+  hangers and about 260 connector nails; if one end bears on a beam (ends = 1) it is 13 hangers and 130 nails. Every hanger
+  hole is filled with the specified structural connector nails; the manufacturer sets the model. Home count 1,335 -> 1,336.
+
 ### feat(construction): concrete-sawcut-footage -- concrete control-joint saw-cut footage (spec-v886); 2026-07-17
 
 - New Group E tile `concrete-sawcut-footage` (calc-construction.js), the concrete flatwork takeoff beside

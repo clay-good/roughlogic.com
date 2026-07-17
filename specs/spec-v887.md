@@ -1,6 +1,6 @@
 # roughlogic.com Specification v887 -- Joist Hanger and Connector-Nail Count (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED (2026-07-17). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-construction.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v886.md. Framing sweep, beside `deck-ledger-fasteners`
 > and `residential-framing`.

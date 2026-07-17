@@ -1058,6 +1058,7 @@ const RELATED = {
   "stucco-coverage": ["mortar-mix", "thinset-coverage", "masonry-count"],
   "vapor-barrier-rolls": ["roof-underlayment-rolls", "concrete", "welded-wire-mesh"],
   "concrete-sawcut-footage": ["control-joint-spacing", "concrete", "concrete-pour-rate"],
+  "joist-hanger-count": ["deck-ledger-fasteners", "residential-framing", "deck-board-takeoff"],
   "concrete-vibrator-spacing": ["concrete-pour-rate", "formwork-pressure", "concrete"],
   "formwork-tie-load": ["formwork-pressure", "shore-post-load", "concrete-pour-rate"],
   "mass-concrete-temp-rise": ["concrete-maturity", "fresh-concrete-temp", "concrete-evaporation-rate"],

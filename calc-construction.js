@@ -9473,3 +9473,46 @@ const _v886renderConcreteSawcutFootage = _simpleRenderer({
   compute: computeConcreteSawcutFootage,
 });
 CONSTRUCTION_RENDERERS["concrete-sawcut-footage"] = _v886renderConcreteSawcutFootage;
+
+// --- joist-hanger-count: Joist Hanger and Connector-Nail Count ---
+//
+// Joists across a run, hangers on the hung ends, and the connector nails that fill them.
+//   joists = floor(width x 12 / spacing) + 1; hangers = joists x ends; nails = hangers x nails_per_hanger
+// dims: in { run_width_ft: L, spacing_in: L, ends_per_joist: dimensionless, nails_per_hanger: dimensionless } out: { joists: dimensionless, hangers: dimensionless, hanger_nails: dimensionless }
+export function computeJoistHangerCount({ run_width_ft = 16, spacing_in = 16, ends_per_joist = 2, nails_per_hanger = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(run_width_ft > 0)) return { error: "Joist-run width must be positive (ft)." };
+  if (!(spacing_in > 0)) return { error: "Joist spacing must be positive (in)." };
+  if (ends_per_joist < 0) return { error: "Ends per joist cannot be negative." };
+  if (nails_per_hanger < 0) return { error: "Nails per hanger cannot be negative." };
+  const joists = Math.floor(run_width_ft * 12 / spacing_in) + 1;
+  const hangers = joists * ends_per_joist;
+  const hanger_nails = hangers * nails_per_hanger;
+  if (![joists, hangers, hanger_nails].every(Number.isFinite)) return { error: "Hanger-count math is not a finite value." };
+  return {
+    joists,
+    hangers,
+    hanger_nails,
+    note: "A hanger goes on each joist end that lands in a ledger or beam face; a joist bearing on top of a beam needs no hanger that end (set ends to 1). Every hanger hole is filled with the specified structural connector nails or screws (not roofing nails). The hanger model follows the manufacturer for the joist size and load.",
+  };
+}
+
+export const joistHangerCountExample = { inputs: { run_width_ft: 16, spacing_in: 16, ends_per_joist: 2, nails_per_hanger: 10 } };
+
+const _v887renderJoistHangerCount = _simpleRenderer({
+  citation: "Citation: hanger-count identity by name. joists = floor(width x 12 / spacing) + 1; hangers = joists x ends; nails = hangers x nails per hanger. Every hanger hole is filled with the specified structural connector nails.",
+  example: joistHangerCountExample.inputs,
+  fields: [
+    { key: "run_width_ft", label: "Joist-run width (ft)", kind: "number", default: 16 },
+    { key: "spacing_in", label: "Joist spacing (in)", kind: "number", default: 16 },
+    { key: "ends_per_joist", label: "Hung ends per joist", kind: "number", default: 2 },
+    { key: "nails_per_hanger", label: "Connector nails per hanger", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "h", id: "jhc-out-h", label: "Hangers", value: (r) => _fmtC(r.hangers, 0) + " hangers (" + _fmtC(r.joists, 0) + " joists)" },
+    { key: "n", id: "jhc-out-n", label: "Connector nails", value: (r) => _fmtC(r.hanger_nails, 0) + " nails" },
+    { key: "note", id: "jhc-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeJoistHangerCount,
+});
+CONSTRUCTION_RENDERERS["joist-hanger-count"] = _v887renderJoistHangerCount;

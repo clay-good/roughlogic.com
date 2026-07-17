@@ -8211,6 +8211,17 @@ export const CITATIONS = {
       { name: "Joint spacing", value: "~24 to 36 times the slab thickness (from control-joint-spacing)", source: "ACI 302 / PCA guidance" },
     ],
   },
+  "joist-hanger-count": {
+    formula: "joists = floor(run_width_ft x 12 / spacing_in) + 1; hangers = joists x ends_per_joist; hanger_nails = hangers x nails_per_hanger.",
+    edition: "Joist-hanger count identity by name (joists across the run, hangers on the hung ends, filled holes); first-principles count arithmetic.",
+    freeAccess: "The count arithmetic is public first-principles; the hanger model and nailing come from the connector manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "A hanger goes on each joist end that lands in a ledger or beam face; a joist bearing on top of a beam needs no hanger that end (set ends to 1). Every hanger hole is filled with the specified structural connector nails or screws (not roofing nails). The hanger model follows the manufacturer for the joist size and load.",
+    assumptions: [
+      { name: "Hung ends", value: "2 for a joist hung both ends; 1 if one end bears on a beam", source: "framing layout" },
+      { name: "Nails per hanger", value: "~10 filled holes with structural connector nails (default); the manufacturer's schedule governs", source: "connector manufacturer" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

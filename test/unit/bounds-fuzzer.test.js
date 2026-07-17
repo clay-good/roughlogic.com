@@ -26225,3 +26225,22 @@ test("bounds: spec-v886 computeConcreteSawcutFootage pins the panel grid, joint 
   assert.ok("error" in _v886({ length_ft: 60, width_ft: 40, spacing_ft: 0 }));
   assert.ok("error" in _v886({ length_ft: Infinity, width_ft: 40, spacing_ft: 12 }));
 });
+
+import { computeJoistHangerCount as _v887 } from "../../calc-construction.js";
+
+test("bounds: spec-v887 computeJoistHangerCount pins the joist, hanger, nail counts, and error seams", () => {
+  const r = _v887({ run_width_ft: 16, spacing_in: 16, ends_per_joist: 2, nails_per_hanger: 10 });
+  assert.equal(r.joists, 13); // floor(16*12/16) + 1
+  assert.equal(r.hangers, 26); // 13 * 2
+  assert.equal(r.hanger_nails, 260); // 26 * 10
+  // One end bearing on a beam halves the hardware.
+  const oneEnd = _v887({ run_width_ft: 16, spacing_in: 16, ends_per_joist: 1, nails_per_hanger: 10 });
+  assert.equal(oneEnd.hangers, 13); // 13 * 1
+  assert.equal(oneEnd.hanger_nails, 130); // 13 * 10
+  // Error seams: non-finite, non-positive width / spacing, negative ends / nails.
+  assert.ok("error" in _v887({ run_width_ft: 0, spacing_in: 16, ends_per_joist: 2, nails_per_hanger: 10 }));
+  assert.ok("error" in _v887({ run_width_ft: 16, spacing_in: 0, ends_per_joist: 2, nails_per_hanger: 10 }));
+  assert.ok("error" in _v887({ run_width_ft: 16, spacing_in: 16, ends_per_joist: -1, nails_per_hanger: 10 }));
+  assert.ok("error" in _v887({ run_width_ft: 16, spacing_in: 16, ends_per_joist: 2, nails_per_hanger: -5 }));
+  assert.ok("error" in _v887({ run_width_ft: Infinity, spacing_in: 16, ends_per_joist: 2, nails_per_hanger: 10 }));
+});

@@ -52481,6 +52481,70 @@
    }
   },
   {
+   "tile_id": "joist-hanger-count",
+   "source_publisher": "Joist-hanger count identity (first-principles)",
+   "source_title": "16 ft run, 16 in o.c., 2 hung ends, 10 nails/hanger -> 13 joists, 26 hangers, 260 nails",
+   "source_edition_or_year": "spec-v887 worked example",
+   "source_section_or_page": "joists = floor(16*12/16)+1 = 13; hangers = 13*2 = 26; nails = 26*10 = 260",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "run_width_ft": 16,
+    "spacing_in": 16,
+    "ends_per_joist": 2,
+    "nails_per_hanger": 10
+   },
+   "outputs": {
+    "joists": {
+     "value": 13,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "hangers": {
+     "value": 26,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "hanger_nails": {
+     "value": 260,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "joist-hanger-count",
+   "source_publisher": "Joist-hanger count identity (first-principles)",
+   "source_title": "cross-check: one end bearing on a beam (ends = 1) halves the hardware to 13 hangers, 130 nails",
+   "source_edition_or_year": "spec-v887 worked example",
+   "source_section_or_page": "joists = 13; hangers = 13*1 = 13; nails = 13*10 = 130",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "run_width_ft": 16,
+    "spacing_in": 16,
+    "ends_per_joist": 1,
+    "nails_per_hanger": 10
+   },
+   "outputs": {
+    "hangers": {
+     "value": 13,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "hanger_nails": {
+     "value": 130,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",
