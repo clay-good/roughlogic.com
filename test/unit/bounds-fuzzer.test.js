@@ -17117,6 +17117,7 @@ import { computeConcreteWashoutVolume as _v843cwv } from "../../calc-constructio
 import { computeHaulRoadResistance as _v844hrr } from "../../calc-earthwork.js";
 import { computeDumpTruckLoads as _v845dtl } from "../../calc-earthwork.js";
 import { computeUnitCostEarthwork as _v846uce } from "../../calc-earthwork.js";
+import { computeSoilStabilizationQuantity as _v847ssq } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17586,6 +17587,22 @@ test("bounds: spec-v846 computeUnitCostEarthwork pins the hourly cost, unit cost
   assert.ok("error" in _v846uce({ equipment_rate_per_hr: 150, operator_rate_per_hr: 65, production_cy_per_hr: 0 }));
   assert.ok("error" in _v846uce({ equipment_rate_per_hr: -1, operator_rate_per_hr: 65, production_cy_per_hr: 656 }));
   assert.ok("error" in _v846uce({ equipment_rate_per_hr: 150, operator_rate_per_hr: 65, production_cy_per_hr: 656, total_cy: -1 }));
+});
+
+test("bounds: spec-v847 computeSoilStabilizationQuantity pins the spread rate, tonnage, and error seams", () => {
+  // 6% lime, 110 pcf, 8 in, 10,000 sy -> 39.6 lb/sy, 198 tons.
+  const r = _v847ssq({ application_pct: 6, soil_density_pcf: 110, depth_in: 8, area_sy: 10000 });
+  assert.ok(Math.abs(r.spread_lb_per_sy - 39.6) < 1e-6);
+  assert.ok(Math.abs(r.tons - 198) < 1e-6);
+  // A 4% cement treatment scales down proportionally.
+  const cement = _v847ssq({ application_pct: 4, soil_density_pcf: 110, depth_in: 8, area_sy: 10000 });
+  assert.ok(Math.abs(cement.spread_lb_per_sy - 26.4) < 1e-6);
+  assert.ok(Math.abs(cement.tons - 132) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v847ssq({ application_pct: 0, soil_density_pcf: 110, depth_in: 8, area_sy: 10000 }));
+  assert.ok("error" in _v847ssq({ application_pct: 6, soil_density_pcf: 0, depth_in: 8, area_sy: 10000 }));
+  assert.ok("error" in _v847ssq({ application_pct: 6, soil_density_pcf: 110, depth_in: 0, area_sy: 10000 }));
+  assert.ok("error" in _v847ssq({ application_pct: 6, soil_density_pcf: 110, depth_in: 8, area_sy: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

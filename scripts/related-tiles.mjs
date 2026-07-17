@@ -1015,6 +1015,7 @@ const RELATED = {
   "haul-road-resistance": ["haul-cycle-production", "drawbar-pull", "dozer-production"],
   "dump-truck-loads": ["haul-cycle-production", "soil-swell-shrink", "haul-road-resistance"],
   "unit-cost-earthwork": ["equipment-hourly-rate", "dozer-production", "haul-cycle-production"],
+  "soil-stabilization-quantity": ["relative-compaction", "water-for-compaction", "aggregate"],
   "asphalt-spread-rate": ["asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity"],
   "pavement-milling-production": ["asphalt-paving-speed", "asphalt-spread-rate", "haul-cycle-production"],
   "striping-paint-quantity": ["paint-coverage", "asphalt-tonnage", "coating-coverage-dft"],

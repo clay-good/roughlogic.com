@@ -29,6 +29,7 @@
 //   - haul-road-resistance    Haul-road total resistance and required rimpull
 //   - dump-truck-loads        Dump truck governing payload and load count
 //   - unit-cost-earthwork     Earthwork production unit cost ($/cy)
+//   - soil-stabilization-quantity  Lime / cement subgrade stabilizer takeoff
 //
 // Group letters are independent of the module (the spec-v28/v30/v36/v39
 // precedent): all five KEEP group "E"; only the on-disk module changes.
@@ -1331,6 +1332,56 @@ function _v846renderUnitCostEarthwork(inputRegion, outputRegion, citationEl) {
   for (const f of [eq, op, su, pr, tc]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["unit-cost-earthwork"] = _v846renderUnitCostEarthwork;
+
+// --- soil-stabilization-quantity: Soil Stabilization (Lime / Cement) Quantity ---
+//
+// The spread rate (lb/sy) and tonnage of lime or cement for subgrade
+// stabilization, from a percent-by-dry-weight mix design:
+//   spread_lb_per_sy = application_pct/100 x soil_density_pcf x (depth_in/12) x 9
+//   tons = spread_lb_per_sy x area_sy / 2000
+// dims: in { application_pct: dimensionless, soil_density_pcf: M L^-3, depth_in: L, area_sy: L^2 } out: { spread_lb_per_sy: M L^-2, tons: M }
+export function computeSoilStabilizationQuantity({ application_pct = 6, soil_density_pcf = 110, depth_in = 8, area_sy = 10000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(application_pct > 0)) return { error: "Application percent must be positive." };
+  if (!(soil_density_pcf > 0)) return { error: "Soil density must be positive (pcf)." };
+  if (!(depth_in > 0)) return { error: "Treatment depth must be positive (in)." };
+  if (!(area_sy > 0)) return { error: "Treated area must be positive (sy)." };
+  const spread_lb_per_sy = (application_pct / 100) * soil_density_pcf * (depth_in / 12) * 9;
+  const tons = (spread_lb_per_sy * area_sy) / 2000;
+  if (![spread_lb_per_sy, tons].every(Number.isFinite)) return { error: "Stabilizer-quantity math is not a finite value." };
+  return {
+    spread_lb_per_sy,
+    tons,
+    note: "The application percent is by dry soil weight from the geotech's mix design - lime for plastic clays, cement for granular subgrades. The factor of 9 converts square feet to square yards. Verify the field spread rate with a check (a scale pan or a bag count over a known area). The geotech governs the percent.",
+  };
+}
+
+function _v847renderSoilStabilizationQuantity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: stabilizer-quantity identity by name. spread (lb/sy) = percent/100 x density x depth/12 x 9; tons = spread x area / 2000. The application percent is by dry soil weight from the geotech's mix design.";
+  const ap = makeNumber("Stabilizer content by dry soil weight (%)", "ssq-ap", { step: "any", min: "0", value: "6" });
+  ap.input.value = "6";
+  const d = makeNumber("Soil dry density (pcf)", "ssq-d", { step: "any", min: "0", value: "110" });
+  d.input.value = "110";
+  const dp = makeNumber("Treatment depth (in)", "ssq-dp", { step: "any", min: "0", value: "8" });
+  dp.input.value = "8";
+  const a = makeNumber("Treated area (sy)", "ssq-a", { step: "any", min: "0", value: "10000" });
+  a.input.value = "10000";
+  for (const f of [ap, d, dp, a]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ap.input.value = "6"; d.input.value = "110"; dp.input.value = "8"; a.input.value = "10000"; update(); });
+  const oTons = makeOutputLine(outputRegion, "Stabilizer to order", "ssq-out-tons");
+  const oSpread = makeOutputLine(outputRegion, "Spread rate", "ssq-out-spread");
+  const update = debounce(() => {
+    const r = computeSoilStabilizationQuantity({
+      application_pct: ap.input.value === "" ? 6 : Number(ap.input.value), soil_density_pcf: d.input.value === "" ? 110 : Number(d.input.value),
+      depth_in: dp.input.value === "" ? 8 : Number(dp.input.value), area_sy: a.input.value === "" ? 10000 : Number(a.input.value),
+    });
+    if (r.error) { oTons.textContent = r.error; oSpread.textContent = "-"; return; }
+    oTons.textContent = fmt(r.tons, 1) + " tons";
+    oSpread.textContent = fmt(r.spread_lb_per_sy, 1) + " lb/sy";
+  }, DEBOUNCE_MS);
+  for (const f of [ap, d, dp, a]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["soil-stabilization-quantity"] = _v847renderSoilStabilizationQuantity;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

@@ -50129,6 +50129,64 @@
    }
   },
   {
+   "tile_id": "soil-stabilization-quantity",
+   "source_publisher": "Stabilizer-quantity identity (first-principles)",
+   "source_title": "6% lime, 110 pcf soil, 8 in deep, 10,000 sy pad",
+   "source_edition_or_year": "spec-v847 worked example",
+   "source_section_or_page": "spread = 0.06*110*(8/12)*9 = 39.6 lb/sy; tons = 39.6*10000/2000 = 198",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "application_pct": 6,
+    "soil_density_pcf": 110,
+    "depth_in": 8,
+    "area_sy": 10000
+   },
+   "outputs": {
+    "spread_lb_per_sy": {
+     "value": 39.6,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "tons": {
+     "value": 198,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soil-stabilization-quantity",
+   "source_publisher": "Stabilizer-quantity identity (first-principles)",
+   "source_title": "cross-check: a 4% cement treatment on a granular subgrade",
+   "source_edition_or_year": "spec-v847 worked example",
+   "source_section_or_page": "spread = 0.04*110*(8/12)*9 = 26.4 lb/sy; tons = 26.4*10000/2000 = 132",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "application_pct": 4,
+    "soil_density_pcf": 110,
+    "depth_in": 8,
+    "area_sy": 10000
+   },
+   "outputs": {
+    "spread_lb_per_sy": {
+     "value": 26.4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "tons": {
+     "value": 132,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

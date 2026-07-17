@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): soil-stabilization-quantity -- lime / cement subgrade stabilizer takeoff (spec-v847); 2026-07-17
+
+- New Group E tile `soil-stabilization-quantity` (calc-earthwork.js), the subgrade tile beside `relative-compaction`
+  and `water-for-compaction`. Lime or cement takeoff from a percent-by-dry-weight mix design: spread (lb/sy) = percent/100
+  x density x depth/12 x 9; tons = spread x area / 2000. A 6% lime treatment 8 in deep in 110 pcf soil is 39.6 lb/sy, so
+  a 10,000 sy pad needs 198 tons; a 4% cement treatment on a granular subgrade is 26.4 lb/sy and 132 tons. The geotech's
+  mix design sets the percent -- lime for plastic clays, cement for granular subgrades. Home count 1,295 -> 1,296.
+
 ### feat(earthwork): unit-cost-earthwork -- earthwork production unit cost (spec-v846); 2026-07-17
 
 - New Group E tile `unit-cost-earthwork` (calc-earthwork.js), the estimating tile joining `equipment-hourly-rate` (cost)

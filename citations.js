@@ -8233,6 +8233,17 @@ export const CITATIONS = {
       { name: "Production", value: "the hourly production rate from the production tiles (dozer, haul-cycle, loader)", source: "production tiles" },
     ],
   },
+  "soil-stabilization-quantity": {
+    formula: "spread_lb_per_sy = application_pct/100 x soil_density_pcf x (depth_in/12) x 9; tons = spread_lb_per_sy x area_sy / 2000.",
+    edition: "Stabilizer-quantity identity by name (spread from percent x density x depth; tons from spread x area); first-principles takeoff arithmetic.",
+    freeAccess: "The stabilizer takeoff is public quantity geometry; the application percent comes from the geotech's mix design.",
+    governance: GOVERNANCE.general,
+    editionNote: "The application percent is by dry soil weight from the geotech's mix design - lime for plastic clays, cement for granular subgrades. The factor of 9 converts square feet to square yards. Verify the field spread rate with a check (a scale pan or a bag count over a known area). The geotech governs the percent.",
+    assumptions: [
+      { name: "Application percent", value: "stabilizer by dry soil weight from the geotech's mix design (lime ~6%, cement ~4% typical)", source: "geotechnical mix design" },
+      { name: "Soil density", value: "the dry density of the subgrade being treated (~110 pcf default)", source: "geotechnical report" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

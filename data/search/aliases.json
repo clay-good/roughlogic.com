@@ -17227,6 +17227,31 @@
       "kind": "industry"
     },
     {
+      "term": "soil stabilization quantity",
+      "target": "soil-stabilization-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "lime treatment rate",
+      "target": "soil-stabilization-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "cement stabilization tonnage",
+      "target": "soil-stabilization-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "subgrade stabilizer rate",
+      "target": "soil-stabilization-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "lime cement lb per sy",
+      "target": "soil-stabilization-quantity",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"
