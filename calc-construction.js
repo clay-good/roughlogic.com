@@ -8887,3 +8887,46 @@ const _v873renderSelfLevelerBags = _simpleRenderer({
   compute: computeSelfLevelerBags,
 });
 CONSTRUCTION_RENDERERS["self-leveler-bags"] = _v873renderSelfLevelerBags;
+
+// --- carpet-takeoff: Carpet Square-Yard and Linear-Foot Takeoff ---
+//
+// Takes off carpet in the units it is bought (square yards off a 12 ft roll),
+// with the higher waste for seam layout and pattern:
+//   gross_sf = area_sf x (1 + waste_pct/100)
+//   carpet_sy = gross_sf / 9; linear_ft = gross_sf / roll_width_ft
+// dims: in { area_sf: L^2, waste_pct: dimensionless, roll_width_ft: L } out: { gross_sf: L^2, carpet_sy: L^2, linear_ft: L }
+export function computeCarpetTakeoff({ area_sf = 900, waste_pct = 10, roll_width_ft = 12 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
+  if (!(roll_width_ft > 0)) return { error: "Roll width must be positive (ft)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const gross_sf = area_sf * (1 + waste_pct / 100);
+  const carpet_sy = gross_sf / 9;
+  const linear_ft = gross_sf / roll_width_ft;
+  if (![gross_sf, carpet_sy, linear_ft].every(Number.isFinite)) return { error: "Carpet-takeoff math is not a finite value." };
+  return {
+    gross_sf,
+    carpet_sy,
+    linear_ft,
+    note: "Carpet is sold by the square yard off 12 ft (or 15 ft) rolls. The waste runs higher than hard flooring because of the seam layout, pattern match, and pile direction - a detailed seam plan on the reflected floor plan tightens it. A wider roll cuts the length and often the seams, but not the square yards. Distinct from the square-foot flooring-takeoff.",
+  };
+}
+
+export const carpetTakeoffExample = { inputs: { area_sf: 900, waste_pct: 10, roll_width_ft: 12 } };
+
+const _v874renderCarpetTakeoff = _simpleRenderer({
+  citation: "Citation: carpet takeoff identity by name. gross = area x (1 + waste); square yards = gross / 9; linear feet = gross / roll width. Carpet is sold by the square yard off 12 ft (or 15 ft) rolls; the seam plan governs the waste.",
+  example: carpetTakeoffExample.inputs,
+  fields: [
+    { key: "area_sf", label: "Area to carpet (ft^2)", kind: "number", default: 900 },
+    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 10 },
+    { key: "roll_width_ft", label: "Carpet roll width (ft)", kind: "number", default: 12 },
+  ],
+  outputs: [
+    { key: "s", id: "cpt-out-s", label: "Carpet to order", value: (r) => _fmtC(r.carpet_sy, 1) + " SY" },
+    { key: "l", id: "cpt-out-l", label: "Linear feet off the roll", value: (r) => _fmtC(r.linear_ft, 1) + " LF (" + _fmtC(r.gross_sf, 0) + " gross sf)" },
+    { key: "note", id: "cpt-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCarpetTakeoff,
+});
+CONSTRUCTION_RENDERERS["carpet-takeoff"] = _v874renderCarpetTakeoff;

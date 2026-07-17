@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): carpet-takeoff -- carpet square-yard and linear-foot takeoff (spec-v874); 2026-07-17
+
+- New Group E tile `carpet-takeoff` (calc-construction.js), the flooring tile beside the square-foot `flooring-takeoff`,
+  distinct from `carpet-restore-replace`. gross = area x (1 + waste); SY = gross / 9; linear feet = gross / roll width.
+  A 900 sf room at 10% waste is 110 SY, or 82.5 linear feet off a 12 ft roll -- the order in the units carpet is
+  actually bought in. A 15 ft roll cuts it to 66 LF at the same 110 SY: a wider roll cuts the length and often the
+  seams, but not the square yards. Carpet carries higher waste than hard flooring for seam layout and pattern match.
+  Home count 1,322 -> 1,323.
+
 ### feat(construction): self-leveler-bags -- self-leveling underlayment bag count (spec-v873); 2026-07-17
 
 - New Group E tile `self-leveler-bags` (calc-construction.js), the flooring tile beside the troweled `thinset-coverage`.

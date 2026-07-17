@@ -17144,6 +17144,7 @@ import { computeMasonryControlJointLayout as _v870mcj } from "../../calc-constru
 import { computeDumpsterCount as _v871dmp } from "../../calc-construction.js";
 import { computeSealantJointYield as _v872sjy } from "../../calc-construction.js";
 import { computeSelfLevelerBags as _v873slb } from "../../calc-construction.js";
+import { computeCarpetTakeoff as _v874cpt } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -18067,6 +18068,22 @@ test("bounds: spec-v873 computeSelfLevelerBags pins the neat and rounded bag cou
   assert.ok("error" in _v873slb({ area_sf: 500, avg_thickness_in: 0, bag_yield_sf_in: 6.25, waste_pct: 5 }));
   assert.ok("error" in _v873slb({ area_sf: 500, avg_thickness_in: 0.25, bag_yield_sf_in: 0, waste_pct: 5 }));
   assert.ok("error" in _v873slb({ area_sf: 500, avg_thickness_in: 0.25, bag_yield_sf_in: 6.25, waste_pct: -1 }));
+});
+
+test("bounds: spec-v874 computeCarpetTakeoff pins the gross area, square yards, linear feet, and error seams", () => {
+  // 900 sf, 10% waste, 12 ft roll -> 990 gross, 110 SY, 82.5 LF.
+  const r = _v874cpt({ area_sf: 900, waste_pct: 10, roll_width_ft: 12 });
+  assert.ok(Math.abs(r.gross_sf - 990) < 1e-6);
+  assert.ok(Math.abs(r.carpet_sy - 110) < 1e-6);
+  assert.ok(Math.abs(r.linear_ft - 82.5) < 1e-6);
+  // A wider 15 ft roll cuts the linear feet, same square yards.
+  const wide = _v874cpt({ area_sf: 900, waste_pct: 10, roll_width_ft: 15 });
+  assert.ok(Math.abs(wide.linear_ft - 66) < 1e-6);
+  assert.ok(Math.abs(wide.carpet_sy - 110) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v874cpt({ area_sf: 0, waste_pct: 10, roll_width_ft: 12 }));
+  assert.ok("error" in _v874cpt({ area_sf: 900, waste_pct: 10, roll_width_ft: 0 }));
+  assert.ok("error" in _v874cpt({ area_sf: 900, waste_pct: -1, roll_width_ft: 12 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

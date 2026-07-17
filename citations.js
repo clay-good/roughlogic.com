@@ -8530,6 +8530,17 @@ export const CITATIONS = {
       { name: "Average thickness", value: "the average pour depth from a floor-flatness survey; deep spots raise it", source: "field survey" },
     ],
   },
+  "carpet-takeoff": {
+    formula: "gross_sf = area_sf x (1 + waste_pct/100); carpet_sy = gross_sf / 9; linear_ft = gross_sf / roll_width_ft.",
+    edition: "Carpet takeoff identity by name (gross area with waste, then square yards and roll length); first-principles unit conversion.",
+    freeAccess: "The unit conversions are public first-principles; the seam plan and roll width come from the installer and the product.",
+    governance: GOVERNANCE.general,
+    editionNote: "Carpet is sold by the square yard off 12 ft (or 15 ft) rolls. The waste runs higher than hard flooring because of the seam layout, pattern match, and pile direction. A wider roll cuts the length and often the seams, but not the square yards. Distinct from the square-foot flooring-takeoff.",
+    assumptions: [
+      { name: "Waste", value: "~10%+ for seam layout, pattern match, and pile direction (higher than hard flooring)", source: "seam plan" },
+      { name: "Roll width", value: "12 ft standard (15 ft available); a wider roll cuts the linear feet and seams", source: "carpet manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

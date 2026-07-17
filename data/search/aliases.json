@@ -17902,6 +17902,31 @@
       "kind": "industry"
     },
     {
+      "term": "carpet takeoff",
+      "target": "carpet-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "carpet square yards",
+      "target": "carpet-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "carpet linear feet",
+      "target": "carpet-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "carpet roll estimate",
+      "target": "carpet-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "carpet quantity",
+      "target": "carpet-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"
