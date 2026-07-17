@@ -9429,3 +9429,47 @@ const _v885renderVaporBarrierRolls = _simpleRenderer({
   compute: computeVaporBarrierRolls,
 });
 CONSTRUCTION_RENDERERS["vapor-barrier-rolls"] = _v885renderVaporBarrierRolls;
+
+// --- concrete-sawcut-footage: Concrete Control-Joint Saw-Cut Footage ---
+//
+// Panel grid from the joint spacing, then the interior saw-cut footage.
+//   panels_l = ceil(length/spacing); panels_w = ceil(width/spacing)
+//   joint = (panels_l - 1) x width + (panels_w - 1) x length
+// dims: in { length_ft: L, width_ft: L, spacing_ft: L } out: { panels: dimensionless, joint_lf: L }
+export function computeConcreteSawcutFootage({ length_ft = 60, width_ft = 40, spacing_ft = 12 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(length_ft > 0)) return { error: "Slab length must be positive (ft)." };
+  if (!(width_ft > 0)) return { error: "Slab width must be positive (ft)." };
+  if (!(spacing_ft > 0)) return { error: "Joint spacing must be positive (ft)." };
+  const panels_l = Math.ceil(length_ft / spacing_ft);
+  const panels_w = Math.ceil(width_ft / spacing_ft);
+  const panels = panels_l * panels_w;
+  const joint_lf = (panels_l - 1) * width_ft + (panels_w - 1) * length_ft;
+  if (![panels, joint_lf].every(Number.isFinite)) return { error: "Saw-cut math is not a finite value." };
+  return {
+    panels,
+    panels_l,
+    panels_w,
+    joint_lf,
+    note: "The panels are sized with a ceiling so no panel exceeds the spacing. The spacing comes from control-joint-spacing (control joints run about 24 to 36 times the slab thickness apart). The cut is made early -- a soft cut within hours or a conventional cut before shrinkage cracks -- to a depth of about a quarter of the slab thickness. Distinct from control-joint-spacing, which gives only the spacing.",
+  };
+}
+
+export const concreteSawcutFootageExample = { inputs: { length_ft: 60, width_ft: 40, spacing_ft: 12 } };
+
+const _v886renderConcreteSawcutFootage = _simpleRenderer({
+  citation: "Citation: saw-cut-footage identity by name. panels each way = ceil(dimension / spacing); joint footage = (panels_L - 1) x width + (panels_W - 1) x length. The spacing comes from control-joint-spacing.",
+  example: concreteSawcutFootageExample.inputs,
+  fields: [
+    { key: "length_ft", label: "Slab length (ft)", kind: "number", default: 60 },
+    { key: "width_ft", label: "Slab width (ft)", kind: "number", default: 40 },
+    { key: "spacing_ft", label: "Joint spacing (ft)", kind: "number", default: 12 },
+  ],
+  outputs: [
+    { key: "panels", id: "csf-out-p", label: "Panel grid", value: (r) => _fmtC(r.panels_l, 0) + " x " + _fmtC(r.panels_w, 0) + " = " + _fmtC(r.panels, 0) + " panels" },
+    { key: "joint", id: "csf-out-j", label: "Saw-cut footage", value: (r) => _fmtC(r.joint_lf, 0) + " LF" },
+    { key: "note", id: "csf-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteSawcutFootage,
+});
+CONSTRUCTION_RENDERERS["concrete-sawcut-footage"] = _v886renderConcreteSawcutFootage;

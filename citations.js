@@ -8200,6 +8200,17 @@ export const CITATIONS = {
       { name: "Seam tape", value: "one taped seam per roll width; penetrations and perimeter seal separate", source: "installation practice" },
     ],
   },
+  "concrete-sawcut-footage": {
+    formula: "panels_l = ceil(length_ft / spacing_ft); panels_w = ceil(width_ft / spacing_ft); joint_lf = (panels_l - 1) x width_ft + (panels_w - 1) x length_ft.",
+    edition: "Control-joint saw-cut-footage identity by name (panel grid by ceiling, interior joint length); first-principles grid arithmetic.",
+    freeAccess: "The cut-footage arithmetic is public first-principles; the joint spacing follows the slab thickness per control-joint-spacing.",
+    governance: GOVERNANCE.general,
+    editionNote: "The panels are sized with a ceiling so no panel exceeds the spacing. The spacing comes from control-joint-spacing (control joints run about 24 to 36 times the slab thickness apart). The cut is made early -- a soft cut within hours or a conventional cut before shrinkage cracks -- to a depth of about a quarter of the slab thickness. Distinct from control-joint-spacing, which gives only the spacing.",
+    assumptions: [
+      { name: "Panel grid", value: "ceil(dimension / spacing) each way so no panel exceeds the spacing", source: "first principles" },
+      { name: "Joint spacing", value: "~24 to 36 times the slab thickness (from control-joint-spacing)", source: "ACI 302 / PCA guidance" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

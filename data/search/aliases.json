@@ -18202,6 +18202,31 @@
       "kind": "industry"
     },
     {
+      "term": "concrete saw cut footage",
+      "target": "concrete-sawcut-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "control joint cut length",
+      "target": "concrete-sawcut-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "slab saw cut linear feet",
+      "target": "concrete-sawcut-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "joint saw cut takeoff",
+      "target": "concrete-sawcut-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "control joint footage",
+      "target": "concrete-sawcut-footage",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

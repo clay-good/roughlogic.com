@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): concrete-sawcut-footage -- concrete control-joint saw-cut footage (spec-v886); 2026-07-17
+
+- New Group E tile `concrete-sawcut-footage` (calc-construction.js), the concrete flatwork takeoff beside
+  `control-joint-spacing`. panels each way = ceil(dimension / spacing); joint footage = (panels_L - 1) x width +
+  (panels_W - 1) x length. A 60 x 40 ft slab on a 12 ft grid is a 5 x 4 panel layout and 340 LF of saw cut; a tighter 10
+  ft grid gives 380 LF. The cut is made early (soft cut within hours or conventional before shrinkage cracks) to about a
+  quarter of the slab depth. Takes control-joint-spacing to the blade footage. Home count 1,334 -> 1,335.
+
 ### feat(construction): vapor-barrier-rolls -- under-slab vapor barrier rolls and seam tape (spec-v885); 2026-07-17
 
 - New Group E tile `vapor-barrier-rolls` (calc-construction.js), the concrete / waterproofing takeoff beside the flatwork

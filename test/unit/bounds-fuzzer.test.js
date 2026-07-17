@@ -26204,3 +26204,24 @@ test("bounds: spec-v885 computeVaporBarrierRolls pins the roll count, seam tape,
   assert.ok("error" in _v885({ area_sf: 3000, roll_coverage_sf: 1000, overlap_waste_pct: -5, roll_width_ft: 10 }));
   assert.ok("error" in _v885({ area_sf: Infinity, roll_coverage_sf: 1000, overlap_waste_pct: 10, roll_width_ft: 10 }));
 });
+
+import { computeConcreteSawcutFootage as _v886 } from "../../calc-construction.js";
+
+test("bounds: spec-v886 computeConcreteSawcutFootage pins the panel grid, joint footage, and error seams", () => {
+  const r = _v886({ length_ft: 60, width_ft: 40, spacing_ft: 12 });
+  assert.equal(r.panels_l, 5); // ceil(60/12)
+  assert.equal(r.panels_w, 4); // ceil(40/12)
+  assert.equal(r.panels, 20);
+  assert.equal(r.joint_lf, 340); // (5-1)*40 + (4-1)*60
+  // A tighter grid adds a panel row and more blade footage.
+  const tight = _v886({ length_ft: 60, width_ft: 40, spacing_ft: 10 });
+  assert.equal(tight.panels_l, 6); // ceil(60/10)
+  assert.equal(tight.joint_lf, 380); // (6-1)*40 + (4-1)*60
+  // A single-panel slab (spacing >= both dimensions) needs no interior cut.
+  assert.equal(_v886({ length_ft: 10, width_ft: 10, spacing_ft: 12 }).joint_lf, 0);
+  // Error seams: non-finite, non-positive length / width / spacing.
+  assert.ok("error" in _v886({ length_ft: 0, width_ft: 40, spacing_ft: 12 }));
+  assert.ok("error" in _v886({ length_ft: 60, width_ft: 0, spacing_ft: 12 }));
+  assert.ok("error" in _v886({ length_ft: 60, width_ft: 40, spacing_ft: 0 }));
+  assert.ok("error" in _v886({ length_ft: Infinity, width_ft: 40, spacing_ft: 12 }));
+});
