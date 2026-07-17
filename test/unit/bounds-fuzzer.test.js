@@ -17096,6 +17096,7 @@ import { computeRusleSoilLoss as _v822rsl } from "../../calc-earthwork.js";
 import { computeRiprapD50 as _v823rr } from "../../calc-earthwork.js";
 import { computeRiprapTonnage as _v824rt } from "../../calc-earthwork.js";
 import { computeSiltFenceDrainage as _v825sf } from "../../calc-earthwork.js";
+import { computeCheckDamSpacing as _v826cd } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17196,6 +17197,21 @@ test("bounds: spec-v825 computeSiltFenceDrainage pins required length, max area,
   assert.ok("error" in _v825sf({ tributary_area_ac: 0.5, fence_length_ft: 0, slope_length_ft: 60 }));
   assert.ok("error" in _v825sf({ tributary_area_ac: 0.5, fence_length_ft: 250, slope_length_ft: 0 }));
   assert.ok("error" in _v825sf({ tributary_area_ac: 0.5, fence_length_ft: 250, slope_length_ft: 60, max_slope_length_ft: 0 }));
+});
+
+test("bounds: spec-v826 computeCheckDamSpacing pins the crest-to-toe spacing, dam count, and error seams", () => {
+  // 2 ft dam, 4% slope, 300 ft reach -> 50 ft spacing, 6 dams
+  const r = _v826cd({ dam_height_ft: 2, channel_slope_pct: 4, reach_length_ft: 300 });
+  assert.strictEqual(r.spacing_ft, 50);
+  assert.strictEqual(r.dams, 6);
+  // Steeper 8% grade halves the spacing and doubles the count.
+  const steep = _v826cd({ dam_height_ft: 2, channel_slope_pct: 8, reach_length_ft: 300 });
+  assert.strictEqual(steep.spacing_ft, 25);
+  assert.strictEqual(steep.dams, 12);
+  // Error seams.
+  assert.ok("error" in _v826cd({ dam_height_ft: 0, channel_slope_pct: 4, reach_length_ft: 300 }));
+  assert.ok("error" in _v826cd({ dam_height_ft: 2, channel_slope_pct: 0, reach_length_ft: 300 }));
+  assert.ok("error" in _v826cd({ dam_height_ft: 2, channel_slope_pct: 4, reach_length_ft: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

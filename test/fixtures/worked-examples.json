@@ -48837,6 +48837,62 @@
    }
   },
   {
+   "tile_id": "check-dam-spacing",
+   "source_publisher": "Crest-to-toe check-dam spacing identity (first-principles)",
+   "source_title": "2 ft dam, 4% channel, 300 ft reach",
+   "source_edition_or_year": "spec-v826 worked example; erosion-control practice",
+   "source_section_or_page": "spacing = 2 / 0.04 = 50 ft; dams = ceil(300/50) = 6",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "dam_height_ft": 2,
+    "channel_slope_pct": 4,
+    "reach_length_ft": 300
+   },
+   "outputs": {
+    "spacing_ft": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "dams": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "check-dam-spacing",
+   "source_publisher": "Crest-to-toe check-dam spacing identity (first-principles)",
+   "source_title": "cross-check: a steeper 8% grade halves the spacing and doubles the count",
+   "source_edition_or_year": "spec-v826 worked example",
+   "source_section_or_page": "spacing = 2 / 0.08 = 25 ft; dams = ceil(300/25) = 12",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "dam_height_ft": 2,
+    "channel_slope_pct": 8,
+    "reach_length_ft": 300
+   },
+   "outputs": {
+    "spacing_ft": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "dams": {
+     "value": 12,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

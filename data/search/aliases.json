@@ -16702,6 +16702,31 @@
       "kind": "industry"
     },
     {
+      "term": "check dam spacing",
+      "target": "check-dam-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "rock check dam",
+      "target": "check-dam-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "ditch check spacing",
+      "target": "check-dam-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "channel check dam",
+      "target": "check-dam-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "sediment check dam",
+      "target": "check-dam-spacing",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

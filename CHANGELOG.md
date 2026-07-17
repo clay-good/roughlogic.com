@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): check-dam-spacing -- rock check dam spacing (spec-v826); 2026-07-16
+
+- New Group E tile `check-dam-spacing` (calc-earthwork.js), the in-channel erosion-control practice. The toe of each
+  upper dam sits at the crest of the next one down, so spacing = dam effective height / channel slope; dams = ceil(reach
+  / spacing). A 2 ft dam in a 4% channel spaces at 50 ft (6 dams over 300 ft); an 8% grade halves the spacing to 25 ft
+  and doubles the count to 12. Small channels and swales only. The calc-earthwork.js module gzip cap was raised 20 -> 26
+  KB for the SWPPP BMP cluster. Home count 1,274 -> 1,275.
+
 ### feat(earthwork): silt-fence-drainage -- silt fence drainage-area and length check (spec-v825); 2026-07-16
 
 - New Group E tile `silt-fence-drainage` (calc-earthwork.js), the perimeter-control check in the erosion-control cluster.

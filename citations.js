@@ -8001,6 +8001,17 @@ export const CITATIONS = {
       { name: "Slope length", value: "100 ft AHJ maximum default; the SWPPP spec and permitting AHJ govern", source: "AHJ / SWPPP" },
     ],
   },
+  "check-dam-spacing": {
+    formula: "spacing_ft = dam_height_ft / (channel_slope_pct / 100); dams = ceil(reach_length_ft / spacing_ft).",
+    edition: "Crest-to-toe check-dam spacing identity by name (the toe of each upper dam at the crest of the next); first-principles geometry.",
+    freeAccess: "The crest-to-toe spacing rule is public erosion-control practice.",
+    governance: GOVERNANCE.general,
+    editionNote: "Check dams belong only in small channels and swales, not a perennial stream without a permit. The center of each dam is built lower than its edges so flow passes over the middle and not around the ends. The AHJ governs the practice.",
+    assumptions: [
+      { name: "Spacing rule", value: "spacing = dam effective height / channel slope (toe of each upper dam at the crest of the next)", source: "erosion-control practice" },
+      { name: "Scope", value: "small channels and swales only; not a perennial stream without a permit", source: "AHJ" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

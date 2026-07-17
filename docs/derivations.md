@@ -1765,6 +1765,7 @@ cross-check.
 | calc-drainage.js | `computeSewageForceMainVelocity` | `{ gpm = 0, id_in = 0 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeSumpBasinSizing` | `{ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeAtterbergIndices` | `{ ll = 0, pl = 0, w_pct = 0 } = {}` | _ | _ | _ |
+| calc-earthwork.js | `computeCheckDamSpacing` | `{ dam_height_ft = 0, channel_slope_pct = 0, reach_length_ft = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeCompactionRollerProduction` | `{ drum_width_ft, speed_mph, lift_in, passes, efficiency = 0.75 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeDewateringRate` | `{ pit_len_ft, pit_wid_ft, drawdown_ft = 0, drawdown_min, inflow_gpm = 0, safe...` | _ | _ | _ |
 | calc-earthwork.js | `computeDozerProduction` | `{ blade_cap_lcy, push_dist_ft, push_speed_fpm, return_speed_fpm, fixed_min = ...` | _ | _ | _ |
@@ -2935,7 +2936,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1521.
+Row count: 1522.
 
 <!-- END function-corpus-v14 -->
 
@@ -3483,7 +3484,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (283 tiles)
+### Group E Construction (284 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3512,6 +3513,7 @@ per spec-v14 §13.1 second paragraph.
 | `brick-veneer-anchor-spacing` | Brick Veneer Anchor Spacing and Count (TMS 402 / IBC 1405) | TMS 402 / IBC 1405; spec-v369 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cantilever-beam` | Cantilever Beam Moment, Shear, and Deflection | Roark / AISC beam diagrams; spec-v341 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `carbon-equivalent` | Carbon Equivalent and Preheat Screen | IIW / AWS D1.1 carbon-equivalent formula; A36-type C 0.25, Mn 0.80 -> CE 0.38333 (0.35-0.55 band) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `check-dam-spacing` | Rock Check Dam Spacing | Crest-to-toe check-dam spacing identi...; spacing = 2 / 0.04 = 50 ft; dams = ceil(300/50) = 6 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cmu-grout-volume` | CMU Grout Volume (Partial and Full Grout) | TMS 602 / ACI 530.1, NCMA TEK; spec-v212 section 2.1 pinned example (partial grout, 24 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cmu-shear-wall` | Reinforced CMU Shear Wall In-Plane Shear (TMS 402 ASD) | TMS 402-16 (ACI 530 / ASCE 5) via Mas...; spec-v270 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cmu-wall-axial` | Reinforced CMU Wall Axial Compression (TMS 402 ASD) | TMS 402-16 (ACI 530 / ASCE 5) via Mas...; spec-v271 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4395,6 +4397,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1274. Fixture-covered or reference-cadence: 1274 / 1274.
+Tile count: 1275. Fixture-covered or reference-cadence: 1275 / 1275.
 
 <!-- END tile-index-v14 -->

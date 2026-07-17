@@ -14,6 +14,7 @@
 //   - riprap-d50              Riprap median stone size (Isbash)
 //   - riprap-tonnage          Riprap layer volume and tonnage
 //   - silt-fence-drainage     Silt fence drainage-area and length check
+//   - check-dam-spacing       Rock check dam spacing
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
@@ -670,6 +671,49 @@ function _v825renderSiltFenceDrainage(inputRegion, outputRegion, citationEl) {
   for (const f of [area, fence, slope, maxSlope]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["silt-fence-drainage"] = _v825renderSiltFenceDrainage;
+
+// --- check-dam-spacing: Rock Check Dam Spacing ---
+//
+// The toe of each upper dam sits at the crest of the next one down, so
+// spacing = dam effective height / channel slope; dams = ceil(reach / spacing).
+// dims: in { dam_height_ft: L, channel_slope_pct: dimensionless, reach_length_ft: L } out: { spacing_ft: L, dams: dimensionless }
+// (Dam height and reach are L; channel slope dimensionless; spacing L and the
+//  dam count dimensionless.)
+export function computeCheckDamSpacing({ dam_height_ft = 0, channel_slope_pct = 0, reach_length_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(dam_height_ft > 0)) return { error: "Dam height must be positive (ft)." };
+  if (!(channel_slope_pct > 0)) return { error: "Channel slope must be positive (percent)." };
+  if (!(reach_length_ft > 0)) return { error: "Reach length must be positive (ft)." };
+  const spacing_ft = dam_height_ft / (channel_slope_pct / 100);
+  const dams = Math.ceil(reach_length_ft / spacing_ft);
+  if (![spacing_ft, dams].every(Number.isFinite)) return { error: "Check-dam math is not a finite value." };
+  return {
+    spacing_ft,
+    dams,
+    note: "Check dams belong only in small channels and swales, not a perennial stream without a permit. The center of each dam is built lower than its edges so flow passes over the middle and not around the ends. The spacing rule sets the toe of each upper dam at the crest of the next one down. The AHJ governs the practice.",
+  };
+}
+
+function _v826renderCheckDamSpacing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: crest-to-toe spacing identity by name. spacing = dam effective height / channel slope (the toe of each upper dam at the crest of the next); dams = ceil(reach / spacing). Small channels and swales only.";
+  const h = makeNumber("Effective dam height, crest above channel (ft)", "cds-h", { step: "any", min: "0" });
+  const s = makeNumber("Channel longitudinal slope (%)", "cds-s", { step: "any", min: "0" });
+  const reach = makeNumber("Channel reach to protect (ft)", "cds-reach", { step: "any", min: "0" });
+  for (const f of [h, s, reach]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { h.input.value = "2"; s.input.value = "4"; reach.input.value = "300"; update(); });
+  const oSpacing = makeOutputLine(outputRegion, "Spacing (crest to toe)", "cds-out-spacing");
+  const oDams = makeOutputLine(outputRegion, "Dams for the reach", "cds-out-dams");
+  const update = debounce(() => {
+    const r = computeCheckDamSpacing({
+      dam_height_ft: Number(h.input.value) || 0, channel_slope_pct: Number(s.input.value) || 0, reach_length_ft: Number(reach.input.value) || 0,
+    });
+    if (r.error) { oSpacing.textContent = r.error; oDams.textContent = "-"; return; }
+    oSpacing.textContent = fmt(r.spacing_ft, 1) + " ft";
+    oDams.textContent = r.dams + " dams";
+  }, DEBOUNCE_MS);
+  for (const f of [h, s, reach]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["check-dam-spacing"] = _v826renderCheckDamSpacing;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //
