@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(lowvoltage): lv-cable-pull-footage -- low-voltage cable footage and box count (spec-v855); 2026-07-17
+
+- New Group A tile `lv-cable-pull-footage` (calc-lowvoltage.js), the LV install-ops takeoff beside
+  `structured-cabling-channel` (length limit) and `cable-reel-capacity`. Cable footage and box count for a drop count:
+  total = drops x (average run + slack); boxes = ceil(total / box length). 48 drops at a 120 ft average run plus 15 ft
+  of slack is 6,480 ft -- 7 thousand-foot boxes; a denser 100-drop job at a shorter 90 ft run is 10,500 ft and 11 boxes
+  (the drop count carries the order once the runs are short). The slack covers service loops and rack dressing; each run
+  is length-limited separately by structured-cabling-channel. Home count 1,303 -> 1,304.
+
 ### feat(electrical): branch-circuit-wire-footage -- branch-circuit conductor footage takeoff (spec-v854); 2026-07-17
 
 - New Group A tile `branch-circuit-wire-footage` (calc-electrical.js), the rough-in takeoff beside `voltage-drop` and

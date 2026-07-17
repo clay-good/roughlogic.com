@@ -8321,6 +8321,17 @@ export const CITATIONS = {
       { name: "Conductor count", value: "conductors per circuit for conduit (e.g. hot/neutral/ground = 3), or 1 for cable", source: "wiring method" },
     ],
   },
+  "lv-cable-pull-footage": {
+    formula: "total_ft = drops x (avg_run_ft + slack_ft); boxes = ceil(total_ft / box_ft).",
+    edition: "Low-voltage cable footage takeoff identity by name (drops x per-drop length; boxes from total / box); first-principles count arithmetic.",
+    freeAccess: "The footage takeoff is public quantity arithmetic; the drop count and runs come from the drop schedule and the plan.",
+    governance: GOVERNANCE.general,
+    editionNote: "The slack covers service loops at both ends plus rack dressing. Each run's length is limited separately by structured-cabling-channel (the 100 m channel). Cable is bought by the box.",
+    assumptions: [
+      { name: "Per-drop length", value: "average run plus service-loop/dressing slack (~15 ft); the drop schedule governs", source: "drop schedule / plan" },
+      { name: "Channel limit", value: "each run is length-limited separately by TIA-568 (the 100 m channel), checked by structured-cabling-channel", source: "TIA-568" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

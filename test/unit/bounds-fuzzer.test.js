@@ -17125,6 +17125,7 @@ import { computeDuctMetalWeight as _v851dmw } from "../../calc-construction.js";
 import { computeWirePullingLubricant as _v852wpl } from "../../calc-electrical.js";
 import { computeDuctBankConcrete as _v853dbc } from "../../calc-construction.js";
 import { computeBranchCircuitWireFootage as _v854bcw } from "../../calc-electrical.js";
+import { computeLvCablePullFootage as _v855lvf } from "../../calc-lowvoltage.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17727,6 +17728,22 @@ test("bounds: spec-v854 computeBranchCircuitWireFootage pins the total footage, 
   assert.ok("error" in _v854bcw({ circuits: 20, avg_homerun_ft: 45, makeup_ft: 15, conductors_per_circuit: 0, roll_ft: 1000 }));
   assert.ok("error" in _v854bcw({ circuits: 20, avg_homerun_ft: 45, makeup_ft: 15, conductors_per_circuit: 3, roll_ft: 0 }));
   assert.ok("error" in _v854bcw({ circuits: 20, avg_homerun_ft: 45, makeup_ft: -1, conductors_per_circuit: 3, roll_ft: 1000 }));
+});
+
+test("bounds: spec-v855 computeLvCablePullFootage pins the total footage, box count, and error seams", () => {
+  // 48 drops, 120 ft run, 15 ft slack, 1,000 ft boxes -> 6,480 ft, 7 boxes.
+  const r = _v855lvf({ drops: 48, avg_run_ft: 120, slack_ft: 15, box_ft: 1000 });
+  assert.strictEqual(r.total_ft, 6480);
+  assert.strictEqual(r.boxes, 7);
+  // A denser 100-drop job scales it.
+  const dense = _v855lvf({ drops: 100, avg_run_ft: 90, slack_ft: 15, box_ft: 1000 });
+  assert.strictEqual(dense.total_ft, 10500);
+  assert.strictEqual(dense.boxes, 11);
+  // Error seams.
+  assert.ok("error" in _v855lvf({ drops: 0, avg_run_ft: 120, slack_ft: 15, box_ft: 1000 }));
+  assert.ok("error" in _v855lvf({ drops: 48, avg_run_ft: 0, slack_ft: 15, box_ft: 1000 }));
+  assert.ok("error" in _v855lvf({ drops: 48, avg_run_ft: 120, slack_ft: 15, box_ft: 0 }));
+  assert.ok("error" in _v855lvf({ drops: 48, avg_run_ft: 120, slack_ft: -1, box_ft: 1000 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

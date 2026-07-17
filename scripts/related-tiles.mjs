@@ -1020,6 +1020,7 @@ const RELATED = {
   "cable-reel-capacity": ["pulling-tension", "conduit-fill", "cable-tray-fill"],
   "wire-pulling-lubricant": ["pulling-tension", "cable-reel-capacity", "conduit-fill"],
   "branch-circuit-wire-footage": ["voltage-drop", "wire-pulling-lubricant", "conduit-fill"],
+  "lv-cable-pull-footage": ["structured-cabling-channel", "cable-tray-fill", "cable-reel-capacity"],
   "shingle-nails": ["roofing-squares", "ridge-cap-fasteners", "metal-roof-panels"],
   "duct-metal-weight": ["metal-weight", "bend-allowance", "duct-sizing"],
   "duct-bank-concrete": ["post-hole-concrete", "annular-grout-volume", "concrete"],

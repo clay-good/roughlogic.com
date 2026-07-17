@@ -816,3 +816,50 @@ function _renderStructuredCablingChannel(inputRegion, outputRegion, citationEl) 
   for (const f of [pl, cd, tc, dr]) f.input.addEventListener("input", update);
 }
 LOWVOLTAGE_RENDERERS["structured-cabling-channel"] = _renderStructuredCablingChannel;
+
+// ===================== spec-v855: low-voltage cable footage and box count =====================
+// dims: in { drops: dimensionless, avg_run_ft: L, slack_ft: L, box_ft: L } out: { total_ft: L, boxes: dimensionless }
+export function computeLvCablePullFootage({ drops = 48, avg_run_ft = 120, slack_ft = 15, box_ft = 1000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(drops > 0)) return { error: "Drop count must be positive." };
+  if (!(avg_run_ft > 0)) return { error: "Average run must be positive (ft)." };
+  if (!(box_ft > 0)) return { error: "Box length must be positive (ft)." };
+  if (slack_ft < 0) return { error: "Slack cannot be negative (ft)." };
+  const total_ft = drops * (avg_run_ft + slack_ft);
+  const boxes = Math.ceil(total_ft / box_ft);
+  if (![total_ft, boxes].every(Number.isFinite)) return { error: "Footage math is not a finite value." };
+  return {
+    total_ft,
+    boxes,
+    note: "The slack covers service loops at both ends plus rack dressing. Each run's length is limited separately by structured-cabling-channel (the 100 m channel). Cable is bought by the box, so this is the box count to order.",
+  };
+}
+
+export const lvCablePullFootageExample = { inputs: { drops: 48, avg_run_ft: 120, slack_ft: 15, box_ft: 1000 } };
+
+function _v855renderLvCablePullFootage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: footage takeoff identity by name. total = drops x (average run + slack); boxes = ceil(total / box length). The slack covers service loops and rack dressing; each run is length-limited by structured-cabling-channel.";
+  const d = makeNumber("Number of cable drops", "lvf-d", { step: "any", min: "0", value: "48" });
+  d.input.value = "48";
+  const ar = makeNumber("Average run length (ft)", "lvf-ar", { step: "any", min: "0", value: "120" });
+  ar.input.value = "120";
+  const sl = makeNumber("Service-loop / dressing slack per drop (ft)", "lvf-sl", { step: "any", min: "0", value: "15" });
+  sl.input.value = "15";
+  const bx = makeNumber("Cable box / spool length (ft)", "lvf-bx", { step: "any", min: "0", value: "1000" });
+  bx.input.value = "1000";
+  for (const f of [d, ar, sl, bx]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { d.input.value = "48"; ar.input.value = "120"; sl.input.value = "15"; bx.input.value = "1000"; update(); });
+  const oTotal = makeOutputLine(outputRegion, "Total cable footage", "lvf-out-total");
+  const oBoxes = makeOutputLine(outputRegion, "Cable boxes to order", "lvf-out-boxes");
+  const update = debounce(() => {
+    const r = computeLvCablePullFootage({
+      drops: d.input.value === "" ? 48 : Number(d.input.value), avg_run_ft: ar.input.value === "" ? 120 : Number(ar.input.value),
+      slack_ft: sl.input.value === "" ? 0 : Number(sl.input.value), box_ft: bx.input.value === "" ? 1000 : Number(bx.input.value),
+    });
+    if (r.error) { oTotal.textContent = r.error; oBoxes.textContent = "-"; return; }
+    oTotal.textContent = fmt(r.total_ft, 0) + " ft";
+    oBoxes.textContent = fmt(r.boxes, 0) + " boxes";
+  }, DEBOUNCE_MS);
+  for (const f of [d, ar, sl, bx]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["lv-cable-pull-footage"] = _v855renderLvCablePullFootage;

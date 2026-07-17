@@ -17427,6 +17427,31 @@
       "kind": "industry"
     },
     {
+      "term": "low voltage cable footage",
+      "target": "lv-cable-pull-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "cabling drop footage",
+      "target": "lv-cable-pull-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "structured cabling takeoff",
+      "target": "lv-cable-pull-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "cable box count",
+      "target": "lv-cable-pull-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "network cable footage",
+      "target": "lv-cable-pull-footage",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

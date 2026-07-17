@@ -461,7 +461,7 @@ const _TILES = [
   // v28 low-voltage / data / security cabling (Group A pending Group-Z signoff)
   ["fiber-loss-budget", "A"], ["fiber-max-length", "A"], ["cable-tray-fill", "A"], ["cctv-storage", "A"], ["cctv-retention-days", "A"],
   ["speaker-70v-line", "A"], ["standby-battery-sizing", "A"], ["standby-battery-runtime", "A"], ["coax-rg-loss", "A"],
-  ["camera-lens-fov", "A"], ["camera-max-distance-for-ppf", "A"], ["ceiling-speaker-coverage", "A"], ["ceiling-speaker-coverage-angle", "A"], ["structured-cabling-channel", "A"],
+  ["camera-lens-fov", "A"], ["camera-max-distance-for-ppf", "A"], ["ceiling-speaker-coverage", "A"], ["ceiling-speaker-coverage-angle", "A"], ["structured-cabling-channel", "A"], ["lv-cable-pull-footage", "A"],
 
   // v29 pipe / raceway field-layout bench (deepens Groups B, A, G)
   ["pipe-cold-spring", "B"], ["raceway-expansion-fitting", "A"], ["pipe-spacing-rack", "G"],

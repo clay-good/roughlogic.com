@@ -50573,6 +50573,64 @@
    }
   },
   {
+   "tile_id": "lv-cable-pull-footage",
+   "source_publisher": "Low-voltage footage takeoff identity (first-principles)",
+   "source_title": "48 drops, 120 ft average run, 15 ft slack, 1,000 ft boxes",
+   "source_edition_or_year": "spec-v855 worked example",
+   "source_section_or_page": "total = 48*(120+15) = 6,480 ft; boxes = ceil(6480/1000) = 7",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "drops": 48,
+    "avg_run_ft": 120,
+    "slack_ft": 15,
+    "box_ft": 1000
+   },
+   "outputs": {
+    "total_ft": {
+     "value": 6480,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "boxes": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lv-cable-pull-footage",
+   "source_publisher": "Low-voltage footage takeoff identity (first-principles)",
+   "source_title": "cross-check: a denser 100-drop job at a shorter 90 ft run",
+   "source_edition_or_year": "spec-v855 worked example",
+   "source_section_or_page": "total = 100*(90+15) = 10,500 ft; boxes = ceil(10500/1000) = 11",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "drops": 100,
+    "avg_run_ft": 90,
+    "slack_ft": 15,
+    "box_ft": 1000
+   },
+   "outputs": {
+    "total_ft": {
+     "value": 10500,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "boxes": {
+     "value": 11,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",
