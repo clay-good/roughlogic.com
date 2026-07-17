@@ -1560,6 +1560,7 @@ cross-check.
 | calc-construction.js | `computeAsphaltSpreadRate` | `{ thickness_in = 2, density_pcf = 145 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAsphaltTackCoatQuantity` | `{ area_sf = 0, residual_rate_gal_sy = 0.04, residue_pct = 60 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAsphaltTonnage` | `{ area_ft2 = 0, depth_in = 0, density_pcf = 145, paving_width_ft = 0 }` | _ | _ | _ |
+| calc-construction.js | `computeBaseplateGroutVolume` | `{ plate_length_in = 18, plate_width_in = 18, column_area_in2 = 64, grout_thic...` | _ | _ | _ |
 | calc-construction.js | `computeBeamLoading` | `{ load_type, load_value, length_ft, E_psi, b_in, d_in }` | _ | _ | _ |
 | calc-construction.js | `computeBeamReactions` | `{ span_ft = 0, w_plf = 0, point_lb = 0, a_ft = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeBendAllowance` | `{ thickness_in = 0, bend_angle_deg = 0, inside_radius_in = 0, k_factor = 0.44...` | _ | _ | _ |
@@ -2989,7 +2990,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1575.
+Row count: 1576.
 
 <!-- END function-corpus-v14 -->
 
@@ -3545,7 +3546,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (329 tiles)
+### Group E Construction (330 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3565,6 +3566,7 @@ per spec-v14 §13.1 second paragraph.
 | `at-rest-earth-pressure` | At-Rest Earth Pressure on a Braced Wall (Jaky K0) | Jaky (1944) as compiled in Das / NAVF...; spec-v624 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `atterberg-indices` | Atterberg Plasticity Indices and A-Line Classification | Atterberg limits / USCS A-line; spec-v328 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `attic-ventilation` | Attic Ventilation Net Free Area | IRC R806 attic-ventilation rule; spec-v98 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `baseplate-grout-volume` | Non-Shrink Grout Volume Under a Base Plate | Base-plate grout-volume identity (fir...; grout = (324-64)*1.5 = 390 in^3; ft^3 = 390/1728*1.10 = 0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `beam-loading` | Beam Loading | Project (first-principles); 200 plf / 12 ft / E = 1.6e6 psi / 4x10 -> M = 3600 lb-ft,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `beam-reactions` | Simple-Span Beam Reactions and Max Moment | Statics / AISC simple-beam diagrams; L 16 ft, w 200 plf -> R 1600 lb, M_max 6400 ft-lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bend-allowance` | Sheet Metal Bend Allowance | Project (first-principles); BA = (pi/180) * 90 * (0.125 + 0.44 * 0.06) = 0.2378; setb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4503,6 +4505,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1328. Fixture-covered or reference-cadence: 1328 / 1328.
+Tile count: 1329. Fixture-covered or reference-cadence: 1329 / 1329.
 
 <!-- END tile-index-v14 -->

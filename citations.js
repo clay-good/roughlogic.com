@@ -8596,6 +8596,17 @@ export const CITATIONS = {
       { name: "Waste", value: "~10% for the mixing-nozzle purge at each cartridge start", source: "installation practice" },
     ],
   },
+  "baseplate-grout-volume": {
+    formula: "grout_in3 = (plate_length_in x plate_width_in - column_area_in2) x grout_thickness_in; grout_ft3 = grout_in3 / 1728 x (1 + waste_pct/100); bags = ceil(grout_ft3 / bag_yield_ft3).",
+    edition: "Base-plate grout-volume identity by name (net plate area x bed thickness, plus waste; bags over the bag yield); first-principles volume arithmetic.",
+    freeAccess: "The grout-volume geometry is public first-principles; the bag yield comes from the product's coverage.",
+    governance: GOVERNANCE.general,
+    editionNote: "The column area is the steel footprint (or the leave-out for a grout hole). The grout is placed with a head and dam so it flows fully under the plate. The bag yield comes from the product. Distinct from the pipe-casing annular-grout-volume.",
+    assumptions: [
+      { name: "Net area", value: "the plate footprint minus the column steel (or grout-hole leave-out)", source: "steel drawings" },
+      { name: "Bag yield", value: "the product's per-bag yield in ft^3 (~0.45 ft^3 typical for non-shrink grout)", source: "grout manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

@@ -800,6 +800,7 @@ export const COMPUTE_MAP = {
   "metal-deck-takeoff": { module: "../../calc-construction.js", fn: "computeMetalDeckTakeoff" },
   "rebar-tie-wire": { module: "../../calc-construction.js", fn: "computeRebarTieWire" },
   "anchor-epoxy-volume": { module: "../../calc-construction.js", fn: "computeAnchorEpoxyVolume" },
+  "baseplate-grout-volume": { module: "../../calc-construction.js", fn: "computeBaseplateGroutVolume" },
   "refrigerant-lineset-charge-adjust": { module: "../../calc-refrigerant.js", fn: "computeRefrigerantLinesetChargeAdjust" },
   "asphalt-spread-rate": { module: "../../calc-construction.js", fn: "computeAsphaltSpreadRate" },
   "pavement-milling-production": { module: "../../calc-construction.js", fn: "computePavementMillingProduction" },

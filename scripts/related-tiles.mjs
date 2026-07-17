@@ -1047,6 +1047,7 @@ const RELATED = {
   "metal-deck-takeoff": ["metal-roof-panels", "metal-weight", "welded-wire-mesh"],
   "rebar-tie-wire": ["rebar-weight-takeoff", "rebar-schedule", "welded-wire-mesh"],
   "anchor-epoxy-volume": ["concrete-anchor-pullout", "annular-grout-volume", "concrete-anchor-breakout"],
+  "baseplate-grout-volume": ["anchor-epoxy-volume", "annular-grout-volume", "column-base-plate"],
   "refrigerant-lineset-charge-adjust": ["refrigerant-charge", "refrigerant-line-size", "refrigerant-velocity"],
   "asphalt-spread-rate": ["asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity"],
   "pavement-milling-production": ["asphalt-paving-speed", "asphalt-spread-rate", "haul-cycle-production"],

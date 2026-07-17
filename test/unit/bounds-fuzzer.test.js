@@ -17150,6 +17150,7 @@ import { computeSprayFoamBoardFeet as _v876sfb } from "../../calc-construction.j
 import { computeMetalDeckTakeoff as _v877mdt } from "../../calc-construction.js";
 import { computeRebarTieWire as _v878rtw } from "../../calc-construction.js";
 import { computeAnchorEpoxyVolume as _v879aev } from "../../calc-construction.js";
+import { computeBaseplateGroutVolume as _v880bgv } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -18175,6 +18176,25 @@ test("bounds: spec-v879 computeAnchorEpoxyVolume pins the per-hole and total vol
   assert.ok("error" in _v879aev({ holes: 40, hole_dia_in: 0.75, bar_dia_in: 0.625, embed_in: 6, cartridge_in3: 15.3, waste_pct: -1 }));
   // Bar at or above the hole (no annulus).
   assert.ok("error" in _v879aev({ holes: 40, hole_dia_in: 0.625, bar_dia_in: 0.625, embed_in: 6, cartridge_in3: 15.3 }));
+});
+
+test("bounds: spec-v880 computeBaseplateGroutVolume pins the grout volumes, bag count, and error seams", () => {
+  // 18 x 18 in, 64 in^2 column, 1.5 in grout, 0.45 ft^3/bag, 10% waste -> 390 in^3, 0.248 ft^3, 1 bag.
+  const r = _v880bgv({ plate_length_in: 18, plate_width_in: 18, column_area_in2: 64, grout_thickness_in: 1.5, bag_yield_ft3: 0.45, waste_pct: 10 });
+  assert.ok(Math.abs(r.grout_in3 - 390) < 1e-6);
+  assert.ok(Math.abs(r.grout_ft3 - 0.248) < 2e-3);
+  assert.strictEqual(r.bags, 1);
+  // A bigger 24 x 24 in plate at 2 in takes 2 bags.
+  assert.strictEqual(_v880bgv({ plate_length_in: 24, plate_width_in: 24, column_area_in2: 100, grout_thickness_in: 2, bag_yield_ft3: 0.45, waste_pct: 10 }).bags, 2);
+  // Error seams.
+  assert.ok("error" in _v880bgv({ plate_length_in: 0, plate_width_in: 18, column_area_in2: 64, grout_thickness_in: 1.5, bag_yield_ft3: 0.45 }));
+  assert.ok("error" in _v880bgv({ plate_length_in: 18, plate_width_in: 0, column_area_in2: 64, grout_thickness_in: 1.5, bag_yield_ft3: 0.45 }));
+  assert.ok("error" in _v880bgv({ plate_length_in: 18, plate_width_in: 18, column_area_in2: 64, grout_thickness_in: 0, bag_yield_ft3: 0.45 }));
+  assert.ok("error" in _v880bgv({ plate_length_in: 18, plate_width_in: 18, column_area_in2: 64, grout_thickness_in: 1.5, bag_yield_ft3: 0 }));
+  assert.ok("error" in _v880bgv({ plate_length_in: 18, plate_width_in: 18, column_area_in2: -1, grout_thickness_in: 1.5, bag_yield_ft3: 0.45 }));
+  assert.ok("error" in _v880bgv({ plate_length_in: 18, plate_width_in: 18, column_area_in2: 64, grout_thickness_in: 1.5, bag_yield_ft3: 0.45, waste_pct: -1 }));
+  // Column area exceeding the plate (no net grout).
+  assert.ok("error" in _v880bgv({ plate_length_in: 10, plate_width_in: 10, column_area_in2: 200, grout_thickness_in: 1.5, bag_yield_ft3: 0.45 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

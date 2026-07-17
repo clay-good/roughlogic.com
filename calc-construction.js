@@ -9169,3 +9169,54 @@ const _v879renderAnchorEpoxyVolume = _simpleRenderer({
   compute: computeAnchorEpoxyVolume,
 });
 CONSTRUCTION_RENDERERS["anchor-epoxy-volume"] = _v879renderAnchorEpoxyVolume;
+
+// --- baseplate-grout-volume: Non-Shrink Grout Volume Under a Base Plate ---
+//
+// The non-shrink grout under a column base plate - the gap volume minus the
+// steel footprint, and the bags:
+//   grout_in3 = (plate_length_in x plate_width_in - column_area_in2) x grout_thickness_in
+//   grout_ft3 = grout_in3 / 1728 x (1 + waste_pct/100); bags = ceil(grout_ft3 / bag_yield_ft3)
+// dims: in { plate_length_in: L, plate_width_in: L, column_area_in2: L^2, grout_thickness_in: L, bag_yield_ft3: L^3, waste_pct: dimensionless } out: { grout_in3: L^3, grout_ft3: L^3, bags: dimensionless }
+export function computeBaseplateGroutVolume({ plate_length_in = 18, plate_width_in = 18, column_area_in2 = 64, grout_thickness_in = 1.5, bag_yield_ft3 = 0.45, waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(plate_length_in > 0)) return { error: "Plate length must be positive (in)." };
+  if (!(plate_width_in > 0)) return { error: "Plate width must be positive (in)." };
+  if (!(grout_thickness_in > 0)) return { error: "Grout thickness must be positive (in)." };
+  if (!(bag_yield_ft3 > 0)) return { error: "Bag yield must be positive (ft^3)." };
+  if (column_area_in2 < 0) return { error: "Column area cannot be negative (in^2)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const net_area_in2 = plate_length_in * plate_width_in - column_area_in2;
+  if (!(net_area_in2 > 0)) return { error: "Column area exceeds the plate area (no net grout)." };
+  const grout_in3 = net_area_in2 * grout_thickness_in;
+  const grout_ft3 = (grout_in3 / 1728) * (1 + waste_pct / 100);
+  const bags = Math.ceil(grout_ft3 / bag_yield_ft3);
+  if (![grout_in3, grout_ft3, bags].every(Number.isFinite)) return { error: "Grout-volume math is not a finite value." };
+  return {
+    grout_in3,
+    grout_ft3,
+    bags,
+    note: "The column area is the steel footprint (or the leave-out for a grout hole). The grout is placed with a head and dam so it flows fully under the plate. The bag yield comes from the product. Both the plate area and the bed thickness drive the volume. Distinct from the pipe-casing annular-grout-volume.",
+  };
+}
+
+export const baseplateGroutVolumeExample = { inputs: { plate_length_in: 18, plate_width_in: 18, column_area_in2: 64, grout_thickness_in: 1.5, bag_yield_ft3: 0.45, waste_pct: 10 } };
+
+const _v880renderBaseplateGroutVolume = _simpleRenderer({
+  citation: "Citation: grout-volume identity by name. grout = (plate length x plate width - column area) x thickness; bags = ceil(grout / bag yield). The column area is the steel footprint; the grout flows fully under the plate with a head and dam.",
+  example: baseplateGroutVolumeExample.inputs,
+  fields: [
+    { key: "plate_length_in", label: "Base plate length (in)", kind: "number", default: 18 },
+    { key: "plate_width_in", label: "Base plate width (in)", kind: "number", default: 18 },
+    { key: "column_area_in2", label: "Column steel footprint (in^2)", kind: "number", default: 64 },
+    { key: "grout_thickness_in", label: "Grout bed thickness (in)", kind: "number", default: 1.5 },
+    { key: "bag_yield_ft3", label: "Bag yield (ft^3)", kind: "number", default: 0.45 },
+    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "b", id: "bgv-out-b", label: "Non-shrink grout bags", value: (r) => _fmtC(r.bags, 0) + " bags" },
+    { key: "v", id: "bgv-out-v", label: "Grout volume", value: (r) => _fmtC(r.grout_in3, 0) + " in^3 (" + _fmtC(r.grout_ft3, 3) + " ft^3 with waste)" },
+    { key: "note", id: "bgv-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBaseplateGroutVolume,
+});
+CONSTRUCTION_RENDERERS["baseplate-grout-volume"] = _v880renderBaseplateGroutVolume;

@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): baseplate-grout-volume -- non-shrink grout volume under a base plate (spec-v880); 2026-07-17
+
+- New Group E tile `baseplate-grout-volume` (calc-construction.js), the anchoring / steel-erection takeoff beside
+  `anchor-epoxy-volume` and the `column-base-plate` design tile. grout = (plate length x plate width - column area) x
+  thickness; bags = ceil(grout / bag yield). An 18 x 18 in plate over an 8 x 8 in column on a 1.5 in grout bed is 390
+  in^3 -- 1 bag of non-shrink grout with waste; a big 24 x 24 in plate over a 100 in^2 column at 2 in is 952 in^3 and 2
+  bags. The plate area and bed thickness both drive it; distinct from the pipe-casing annular-grout-volume. Home count
+  1,328 -> 1,329.
+
 ### feat(construction): anchor-epoxy-volume -- adhesive-anchor epoxy cartridge volume (spec-v879); 2026-07-17
 
 - New Group E tile `anchor-epoxy-volume` (calc-construction.js), the anchoring takeoff beside the concrete-anchor

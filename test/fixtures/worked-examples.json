@@ -52089,6 +52089,68 @@
    }
   },
   {
+   "tile_id": "baseplate-grout-volume",
+   "source_publisher": "Base-plate grout-volume identity (first-principles)",
+   "source_title": "18 x 18 in plate, 64 in^2 column, 1.5 in grout, 0.45 ft^3/bag, 10% waste",
+   "source_edition_or_year": "spec-v880 worked example",
+   "source_section_or_page": "grout = (324-64)*1.5 = 390 in^3; ft^3 = 390/1728*1.10 = 0.248; bags = ceil(0.248/0.45) = 1",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "plate_length_in": 18,
+    "plate_width_in": 18,
+    "column_area_in2": 64,
+    "grout_thickness_in": 1.5,
+    "bag_yield_ft3": 0.45,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "grout_in3": {
+     "value": 390,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "grout_ft3": {
+     "value": 0.248,
+     "tolerance": {
+      "abs": 0.002
+     }
+    },
+    "bags": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "baseplate-grout-volume",
+   "source_publisher": "Base-plate grout-volume identity (first-principles)",
+   "source_title": "cross-check: a bigger 24 x 24 in plate at 2 in takes 2 bags",
+   "source_edition_or_year": "spec-v880 worked example",
+   "source_section_or_page": "grout = (576-100)*2 = 952 in^3; ft^3 = 0.606; bags = ceil(0.606/0.45) = 2",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "plate_length_in": 24,
+    "plate_width_in": 24,
+    "column_area_in2": 100,
+    "grout_thickness_in": 2,
+    "bag_yield_ft3": 0.45,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "bags": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",
