@@ -51247,6 +51247,62 @@
    }
   },
   {
+   "tile_id": "construction-adhesive-tubes",
+   "source_publisher": "Adhesive bead-yield identity (first-principles)",
+   "source_title": "1,200 LF, 28-oz tube (50.6 in^3), 3/8 in bead",
+   "source_edition_or_year": "spec-v866 worked example",
+   "source_section_or_page": "bead area = (PI/4)*0.375^2 = 0.1105 in^2; lf/tube = 50.6/0.1105/12 = 38.2 ft; tubes = ceil(1200/38.2) = 32",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "total_lf": 1200,
+    "tube_volume_in3": 50.6,
+    "bead_dia_in": 0.375
+   },
+   "outputs": {
+    "bead_area_in2": {
+     "value": 0.1105,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "lf_per_tube": {
+     "value": 38.2,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "tubes": {
+     "value": 32,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "construction-adhesive-tubes",
+   "source_publisher": "Adhesive bead-yield identity (first-principles)",
+   "source_title": "cross-check: a 1/2 in bead nearly doubles the tubes",
+   "source_edition_or_year": "spec-v866 worked example",
+   "source_section_or_page": "bead area = 0.1963 in^2; lf/tube = 21.5 ft; tubes = ceil(1200/21.5) = 56",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "total_lf": 1200,
+    "tube_volume_in3": 50.6,
+    "bead_dia_in": 0.5
+   },
+   "outputs": {
+    "tubes": {
+     "value": 56,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

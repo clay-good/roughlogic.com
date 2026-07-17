@@ -17136,6 +17136,7 @@ import { computeRoofUnderlaymentRolls as _v862rur } from "../../calc-constructio
 import { computeMembraneRoofTakeoff as _v863mrt } from "../../calc-construction.js";
 import { computeTaperedRoofInsulation as _v864tri } from "../../calc-construction.js";
 import { computeSheathingTakeoff as _v865sht } from "../../calc-construction.js";
+import { computeConstructionAdhesiveTubes as _v866cat } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17928,6 +17929,20 @@ test("bounds: spec-v865 computeSheathingTakeoff pins the sheet count, nail count
   assert.ok("error" in _v865sht({ area_sf: 1600, waste_pct: 8, sheet_sf: 0, nails_per_sheet: 60 }));
   assert.ok("error" in _v865sht({ area_sf: 1600, waste_pct: 8, sheet_sf: 32, nails_per_sheet: 0 }));
   assert.ok("error" in _v865sht({ area_sf: 1600, waste_pct: -1, sheet_sf: 32, nails_per_sheet: 60 }));
+});
+
+test("bounds: spec-v866 computeConstructionAdhesiveTubes pins the bead area, length per tube, tube count, and error seams", () => {
+  // 1,200 LF, 50.6 in^3, 3/8 in bead -> 0.1105 in^2, 38.2 ft/tube, 32 tubes.
+  const r = _v866cat({ total_lf: 1200, tube_volume_in3: 50.6, bead_dia_in: 0.375 });
+  assert.ok(Math.abs(r.bead_area_in2 - 0.1105) < 5e-4);
+  assert.ok(Math.abs(r.lf_per_tube - 38.2) < 0.1);
+  assert.strictEqual(r.tubes, 32);
+  // A 1/2 in bead nearly doubles the tubes (bead diameter enters squared).
+  assert.strictEqual(_v866cat({ total_lf: 1200, tube_volume_in3: 50.6, bead_dia_in: 0.5 }).tubes, 56);
+  // Error seams.
+  assert.ok("error" in _v866cat({ total_lf: 0, tube_volume_in3: 50.6, bead_dia_in: 0.375 }));
+  assert.ok("error" in _v866cat({ total_lf: 1200, tube_volume_in3: 0, bead_dia_in: 0.375 }));
+  assert.ok("error" in _v866cat({ total_lf: 1200, tube_volume_in3: 50.6, bead_dia_in: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

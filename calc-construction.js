@@ -8527,3 +8527,47 @@ const _v865renderSheathingTakeoff = _simpleRenderer({
   compute: computeSheathingTakeoff,
 });
 CONSTRUCTION_RENDERERS["sheathing-takeoff"] = _v865renderSheathingTakeoff;
+
+// --- construction-adhesive-tubes: Construction Adhesive Tube Count ---
+//
+// Counts adhesive tubes for a subfloor or panel job, where the bead size sets
+// how far a tube goes:
+//   bead_area_in2 = (PI/4) x bead_dia_in^2
+//   lf_per_tube = tube_volume_in3 / bead_area_in2 / 12
+//   tubes = ceil(total_lf / lf_per_tube)
+// dims: in { total_lf: L, tube_volume_in3: L^3, bead_dia_in: L } out: { bead_area_in2: L^2, lf_per_tube: L, tubes: dimensionless }
+export function computeConstructionAdhesiveTubes({ total_lf = 1200, tube_volume_in3 = 50.6, bead_dia_in = 0.375 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(total_lf > 0)) return { error: "Total bead length must be positive (ft)." };
+  if (!(tube_volume_in3 > 0)) return { error: "Tube volume must be positive (in^3)." };
+  if (!(bead_dia_in > 0)) return { error: "Bead diameter must be positive (in)." };
+  const bead_area_in2 = (Math.PI / 4) * bead_dia_in * bead_dia_in;
+  const lf_per_tube = tube_volume_in3 / bead_area_in2 / 12;
+  const tubes = Math.ceil(total_lf / lf_per_tube);
+  if (![bead_area_in2, lf_per_tube, tubes].every(Number.isFinite)) return { error: "Adhesive-tube math is not a finite value." };
+  return {
+    bead_area_in2,
+    lf_per_tube,
+    tubes,
+    note: "The bead diameter follows the manufacturer's nozzle cut and the spec (subfloor adhesive is commonly a 3/8 in bead). A fatter bead or a second bead on wide members uses more. A 28 fluid-ounce cartridge is about 50.6 in^3. The bead diameter enters squared, so a step up in bead size dominates; keep a spare.",
+  };
+}
+
+export const constructionAdhesiveTubesExample = { inputs: { total_lf: 1200, tube_volume_in3: 50.6, bead_dia_in: 0.375 } };
+
+const _v866renderConstructionAdhesiveTubes = _simpleRenderer({
+  citation: "Citation: bead-yield identity by name. bead area = pi/4 x diameter^2; length per tube = tube volume / bead area / 12; tubes = ceil(total / length per tube). The bead diameter follows the nozzle cut and the spec; a 28 oz cartridge is ~50.6 in^3.",
+  example: constructionAdhesiveTubesExample.inputs,
+  fields: [
+    { key: "total_lf", label: "Total bead length (ft)", kind: "number", default: 1200 },
+    { key: "tube_volume_in3", label: "Cartridge volume (in^3, ~50.6 for 28 oz)", kind: "number", default: 50.6 },
+    { key: "bead_dia_in", label: "Bead diameter (in)", kind: "number", default: 0.375 },
+  ],
+  outputs: [
+    { key: "t", id: "cat-out-t", label: "Adhesive tubes", value: (r) => _fmtC(r.tubes, 0) + " tubes" },
+    { key: "l", id: "cat-out-l", label: "Coverage per tube", value: (r) => _fmtC(r.lf_per_tube, 1) + " ft" },
+    { key: "note", id: "cat-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConstructionAdhesiveTubes,
+});
+CONSTRUCTION_RENDERERS["construction-adhesive-tubes"] = _v866renderConstructionAdhesiveTubes;

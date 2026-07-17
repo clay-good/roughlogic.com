@@ -8442,6 +8442,17 @@ export const CITATIONS = {
       { name: "Nails per sheet", value: "from the nailing schedule on the plans (~60 for a 6/12 field pattern, ~100+ for a shear panel)", source: "nailing schedule / plans" },
     ],
   },
+  "construction-adhesive-tubes": {
+    formula: "bead_area_in2 = (PI/4) x bead_dia_in^2; lf_per_tube = tube_volume_in3 / bead_area_in2 / 12; tubes = ceil(total_lf / lf_per_tube).",
+    edition: "Adhesive bead-yield identity by name (tube volume divided by the bead cross-section gives the run per tube); first-principles geometry.",
+    freeAccess: "The bead-yield geometry is public first-principles; the bead diameter follows the manufacturer's nozzle cut and the spec.",
+    governance: GOVERNANCE.general,
+    editionNote: "The bead diameter follows the manufacturer's nozzle cut and the spec (subfloor adhesive is commonly a 3/8 in bead). A fatter bead or a second bead on wide members uses more. A 28 fluid-ounce cartridge is about 50.6 in^3, and the crew keeps a spare.",
+    assumptions: [
+      { name: "Bead diameter", value: "~3/8 in for subfloor adhesive; the nozzle cut and spec govern (enters squared)", source: "manufacturer / spec" },
+      { name: "Tube volume", value: "~50.6 in^3 for a 28 fl-oz cartridge", source: "adhesive manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

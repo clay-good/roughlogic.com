@@ -786,6 +786,7 @@ export const COMPUTE_MAP = {
   "membrane-roof-takeoff": { module: "../../calc-construction.js", fn: "computeMembraneRoofTakeoff" },
   "tapered-roof-insulation": { module: "../../calc-construction.js", fn: "computeTaperedRoofInsulation" },
   "sheathing-takeoff": { module: "../../calc-construction.js", fn: "computeSheathingTakeoff" },
+  "construction-adhesive-tubes": { module: "../../calc-construction.js", fn: "computeConstructionAdhesiveTubes" },
   "refrigerant-lineset-charge-adjust": { module: "../../calc-refrigerant.js", fn: "computeRefrigerantLinesetChargeAdjust" },
   "asphalt-spread-rate": { module: "../../calc-construction.js", fn: "computeAsphaltSpreadRate" },
   "pavement-milling-production": { module: "../../calc-construction.js", fn: "computePavementMillingProduction" },

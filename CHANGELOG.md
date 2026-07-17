@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): construction-adhesive-tubes -- construction adhesive tube count (spec-v866); 2026-07-17
+
+- New Group E tile `construction-adhesive-tubes` (calc-construction.js), the framing takeoff beside `sheathing-takeoff`,
+  sharing the bead-volume method. length per tube = tube volume / (pi/4 x bead dia^2) / 12; tubes = ceil(total / length
+  per tube). A 28 oz tube run as a 3/8 in bead covers 38 ft, so 1,200 LF of joist tops takes 32 tubes; going to a 1/2
+  in bead cuts coverage to 21.5 ft and takes 56 tubes -- the bead diameter enters squared, so a step up in bead size
+  dominates. The spec sets the bead. Home count 1,314 -> 1,315.
+
 ### feat(construction): sheathing-takeoff -- wall / roof sheathing panel and nail takeoff (spec-v865); 2026-07-17
 
 - New Group E tile `sheathing-takeoff` (calc-construction.js), the framing takeoff beside `plywood-span` (rating) and

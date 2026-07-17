@@ -17702,6 +17702,31 @@
       "kind": "industry"
     },
     {
+      "term": "construction adhesive tubes",
+      "target": "construction-adhesive-tubes",
+      "kind": "industry"
+    },
+    {
+      "term": "subfloor adhesive count",
+      "target": "construction-adhesive-tubes",
+      "kind": "industry"
+    },
+    {
+      "term": "liquid nails tubes",
+      "target": "construction-adhesive-tubes",
+      "kind": "industry"
+    },
+    {
+      "term": "adhesive tube coverage",
+      "target": "construction-adhesive-tubes",
+      "kind": "industry"
+    },
+    {
+      "term": "panel adhesive quantity",
+      "target": "construction-adhesive-tubes",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"
