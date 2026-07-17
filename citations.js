@@ -8056,6 +8056,18 @@ export const CITATIONS = {
       { name: "Stone", value: "1-4 in clean stone at ~100 pcf placed over a geotextile separator (taken off separately)", source: "erosion-control practice" },
     ],
   },
+  "pipe-flotation": {
+    formula: "uplift_plf = water_unit_wt_pcf x (PI/4) x (od_in/12)^2; FS = (pipe_weight_plf + backfill_weight_plf) / uplift_plf; required_backfill_plf = target_fs x uplift_plf - pipe_weight_plf.",
+    edition: "Archimedes flotation identity by name (uplift = weight of displaced water; FS = resisting weight / uplift); first-principles buoyancy arithmetic.",
+    freeAccess: "Buoyancy is public first-principles physics; the design factor of safety comes from the project specification.",
+    governance: GOVERNANCE.general,
+    editionNote: "Flotation is critical when the pipe is empty and the trench is flooded - a high water table or saturated backfill. Submerged backfill counts only its buoyant (effective) weight. The fixes are more cover, concrete anti-flotation collars, or ballasting the empty pipe until the backfill is complete. The design engineer governs.",
+    assumptions: [
+      { name: "Uplift", value: "the full buoyant uplift of the empty pipe (water unit weight x displaced volume per foot)", source: "Archimedes' principle" },
+      { name: "Resisting weight", value: "pipe self-weight plus backfill over the pipe; submerged backfill counts only its buoyant weight", source: "design engineer" },
+      { name: "Target factor of safety", value: "1.5 default; the project specification governs", source: "project specification" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

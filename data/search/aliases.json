@@ -16827,6 +16827,31 @@
       "kind": "industry"
     },
     {
+      "term": "pipe flotation",
+      "target": "pipe-flotation",
+      "kind": "industry"
+    },
+    {
+      "term": "buried pipe buoyancy",
+      "target": "pipe-flotation",
+      "kind": "industry"
+    },
+    {
+      "term": "anti-flotation backfill",
+      "target": "pipe-flotation",
+      "kind": "industry"
+    },
+    {
+      "term": "empty pipe float",
+      "target": "pipe-flotation",
+      "kind": "industry"
+    },
+    {
+      "term": "pipe uplift check",
+      "target": "pipe-flotation",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

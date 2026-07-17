@@ -1,6 +1,6 @@
 # roughlogic.com Specification v831 -- Buried Pipe Flotation and Anti-Flotation Backfill (calc-earthwork.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED (2026-07-17). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-earthwork.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v830.md. Underground-utility sweep, beside
 > `pipe-bedding-backfill` and the `annular-grout-volume` tile.

@@ -22,6 +22,7 @@
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
+//   - pipe-flotation          Buried pipe flotation / anti-flotation backfill
 //
 // Group letters are independent of the module (the spec-v28/v30/v36/v39
 // precedent): all five KEEP group "E"; only the on-disk module changes.
@@ -929,6 +930,69 @@ function _v830renderRockConstructionEntrance(inputRegion, outputRegion, citation
   for (const f of [l, w, d, uw]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["rock-construction-entrance"] = _v830renderRockConstructionEntrance;
+
+// --- pipe-flotation: Buried Pipe Flotation and Anti-Flotation Backfill ---
+//
+// An empty large-diameter pipe in a flooded trench is a boat: the buoyant
+// uplift per foot is the weight of water it displaces (Archimedes), resisted
+// by the pipe self-weight plus the backfill over it.
+//   uplift_plf = water_unit_wt_pcf x (PI/4) x (od_in/12)^2
+//   fs = (pipe_weight_plf + backfill_weight_plf) / uplift_plf
+//   required_backfill_plf = target_fs x uplift_plf - pipe_weight_plf
+// dims: in { pipe_od_in: L, pipe_weight_plf: M T^-2, backfill_weight_plf: M T^-2, target_fs: dimensionless, water_unit_wt_pcf: M L^-2 T^-2 } out: { uplift_plf: M T^-2, resisting_plf: M T^-2, fs: dimensionless, required_backfill_plf: M T^-2 }
+export function computePipeFlotation({ pipe_od_in = 48, pipe_weight_plf = 200, backfill_weight_plf = 900, target_fs = 1.5, water_unit_wt_pcf = 62.4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(pipe_od_in > 0)) return { error: "Pipe outside diameter must be positive (in)." };
+  if (!(water_unit_wt_pcf > 0)) return { error: "Water unit weight must be positive (pcf)." };
+  if (!(target_fs > 0)) return { error: "Target factor of safety must be positive." };
+  if (pipe_weight_plf < 0) return { error: "Pipe weight cannot be negative (lb/ft)." };
+  if (backfill_weight_plf < 0) return { error: "Backfill weight cannot be negative (lb/ft)." };
+  const uplift_plf = water_unit_wt_pcf * (Math.PI / 4) * Math.pow(pipe_od_in / 12, 2);
+  const resisting_plf = pipe_weight_plf + backfill_weight_plf;
+  const fs = resisting_plf / uplift_plf;
+  const required_backfill_plf = target_fs * uplift_plf - pipe_weight_plf;
+  if (![uplift_plf, resisting_plf, fs, required_backfill_plf].every(Number.isFinite)) return { error: "Flotation math is not a finite value." };
+  return {
+    uplift_plf,
+    resisting_plf,
+    fs,
+    required_backfill_plf,
+    pass: fs >= target_fs,
+    note: "Flotation is critical when the pipe is empty and the trench is flooded - a high water table or saturated backfill. Submerged backfill counts only its buoyant (effective) weight, so use the submerged unit weight for any material below the water table. The fixes are more cover, concrete anti-flotation collars, or holding the empty pipe down (ballast) until the backfill is complete. The design engineer governs.",
+  };
+}
+
+function _v831renderPipeFlotation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Archimedes flotation identity by name. uplift (lb/ft) = water unit weight x pi/4 x OD^2; FS = resisting weight / uplift. Submerged backfill counts only its buoyant weight; the design engineer governs.";
+  const od = makeNumber("Pipe outside diameter (in)", "pf-od", { step: "any", min: "0", value: "48" });
+  od.input.value = "48";
+  const pw = makeNumber("Empty pipe weight (lb/ft)", "pf-pw", { step: "any", min: "0", value: "200" });
+  pw.input.value = "200";
+  const bw = makeNumber("Resisting backfill weight (lb/ft)", "pf-bw", { step: "any", min: "0", value: "900" });
+  bw.input.value = "900";
+  const tf = makeNumber("Target factor of safety", "pf-tf", { step: "any", min: "0", value: "1.5" });
+  tf.input.value = "1.5";
+  const uw = makeNumber("Water unit weight (pcf)", "pf-uw", { step: "any", min: "0", value: "62.4" });
+  uw.input.value = "62.4";
+  for (const f of [od, pw, bw, tf, uw]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { od.input.value = "48"; pw.input.value = "200"; bw.input.value = "900"; tf.input.value = "1.5"; uw.input.value = "62.4"; update(); });
+  const oFs = makeOutputLine(outputRegion, "Factor of safety", "pf-out-fs");
+  const oUplift = makeOutputLine(outputRegion, "Buoyant uplift", "pf-out-uplift");
+  const oReq = makeOutputLine(outputRegion, "Backfill to meet the target", "pf-out-req");
+  const update = debounce(() => {
+    const r = computePipeFlotation({
+      pipe_od_in: od.input.value === "" ? 48 : Number(od.input.value), pipe_weight_plf: pw.input.value === "" ? 200 : Number(pw.input.value),
+      backfill_weight_plf: bw.input.value === "" ? 900 : Number(bw.input.value), target_fs: tf.input.value === "" ? 1.5 : Number(tf.input.value),
+      water_unit_wt_pcf: uw.input.value === "" ? 62.4 : Number(uw.input.value),
+    });
+    if (r.error) { oFs.textContent = r.error; oUplift.textContent = "-"; oReq.textContent = "-"; return; }
+    oFs.textContent = fmt(r.fs, 2) + " - " + (r.pass ? "PASS" : "FAIL") + " (target " + fmt(Number(tf.input.value) || 1.5, 2) + ")";
+    oUplift.textContent = fmt(r.uplift_plf, 0) + " lb/ft";
+    oReq.textContent = r.required_backfill_plf > 0 ? fmt(r.required_backfill_plf, 0) + " lb/ft" : "0 lb/ft (pipe self-weight alone holds it)";
+  }, DEBOUNCE_MS);
+  for (const f of [od, pw, bw, tf, uw]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["pipe-flotation"] = _v831renderPipeFlotation;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

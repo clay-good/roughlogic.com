@@ -17101,6 +17101,7 @@ import { computeSedimentBasinVolume as _v827sb } from "../../calc-earthwork.js";
 import { computeErosionBlanketCoverage as _v828eb } from "../../calc-earthwork.js";
 import { computeHydroseedMix as _v829hs } from "../../calc-earthwork.js";
 import { computeRockConstructionEntrance as _v830rce } from "../../calc-earthwork.js";
+import { computePipeFlotation as _v831pf } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17278,6 +17279,27 @@ test("bounds: spec-v830 computeRockConstructionEntrance pins the pad volume, ton
   assert.ok("error" in _v830rce({ length_ft: 50, width_ft: 0, depth_in: 6, unit_wt_pcf: 100 }));
   assert.ok("error" in _v830rce({ length_ft: 50, width_ft: 14, depth_in: 0, unit_wt_pcf: 100 }));
   assert.ok("error" in _v830rce({ length_ft: 50, width_ft: 14, depth_in: 6, unit_wt_pcf: 0 }));
+});
+
+test("bounds: spec-v831 computePipeFlotation pins the uplift, the factor of safety, the required backfill, and error seams", () => {
+  // 48 in empty pipe, 200 + 900 lb/ft resisting, water 62.4 pcf.
+  const r = _v831pf({ pipe_od_in: 48, pipe_weight_plf: 200, backfill_weight_plf: 900, target_fs: 1.5, water_unit_wt_pcf: 62.4 });
+  assert.ok(Math.abs(r.uplift_plf - 784.14) < 0.05);
+  assert.ok(Math.abs(r.fs - 1.4028) < 1e-3);
+  assert.ok(Math.abs(r.required_backfill_plf - 976.21) < 0.05);
+  assert.strictEqual(r.pass, false); // 1.40 < 1.5
+  // The same empty pipe with no backfill floats (FS < 1).
+  const bare = _v831pf({ pipe_od_in: 48, pipe_weight_plf: 200, backfill_weight_plf: 0, target_fs: 1.5, water_unit_wt_pcf: 62.4 });
+  assert.ok(Math.abs(bare.fs - 0.2551) < 1e-3);
+  assert.ok(bare.fs < 1);
+  // Meeting the target flips pass to true.
+  assert.strictEqual(_v831pf({ pipe_od_in: 48, pipe_weight_plf: 200, backfill_weight_plf: 977, target_fs: 1.5, water_unit_wt_pcf: 62.4 }).pass, true);
+  // Error seams.
+  assert.ok("error" in _v831pf({ pipe_od_in: 0, pipe_weight_plf: 200, backfill_weight_plf: 900, target_fs: 1.5, water_unit_wt_pcf: 62.4 }));
+  assert.ok("error" in _v831pf({ pipe_od_in: 48, pipe_weight_plf: 200, backfill_weight_plf: 900, target_fs: 1.5, water_unit_wt_pcf: 0 }));
+  assert.ok("error" in _v831pf({ pipe_od_in: 48, pipe_weight_plf: 200, backfill_weight_plf: 900, target_fs: 0, water_unit_wt_pcf: 62.4 }));
+  assert.ok("error" in _v831pf({ pipe_od_in: 48, pipe_weight_plf: -1, backfill_weight_plf: 900, target_fs: 1.5, water_unit_wt_pcf: 62.4 }));
+  assert.ok("error" in _v831pf({ pipe_od_in: 48, pipe_weight_plf: 200, backfill_weight_plf: -1, target_fs: 1.5, water_unit_wt_pcf: 62.4 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): pipe-flotation -- buried pipe flotation / anti-flotation backfill (spec-v831); 2026-07-17
+
+- New Group E tile `pipe-flotation` (calc-earthwork.js), the underground-utility flotation check beside
+  `pipe-bedding-backfill`. An empty large-diameter pipe in a flooded trench is a boat: uplift = water unit weight x
+  pi/4 x OD^2; FS = (pipe + backfill weight) / uplift. A 48 in empty pipe sees 784 lb/ft of uplift, so 200 lb/ft of
+  pipe plus 900 lb/ft of backfill gives only FS 1.40 - short of 1.5, needing ~976 lb/ft of backfill to hold it down.
+  Submerged backfill counts only its buoyant weight; the design engineer governs. Home count 1,279 -> 1,280.
+
 ### feat(earthwork): rock-construction-entrance -- stabilized entrance stone (spec-v830); 2026-07-16
 
 - New Group E tile `rock-construction-entrance` (calc-earthwork.js), the track-out BMP that closes the SWPPP set. Stone

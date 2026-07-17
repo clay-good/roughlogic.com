@@ -49117,6 +49117,66 @@
    }
   },
   {
+   "tile_id": "pipe-flotation",
+   "source_publisher": "Archimedes flotation identity (first-principles)",
+   "source_title": "48 in empty pipe, 200 lb/ft, 900 lb/ft backfill, target FS 1.5",
+   "source_edition_or_year": "spec-v831 worked example",
+   "source_section_or_page": "uplift = 62.4*(PI/4)*4^2 = 784.1; FS = 1100/784.1 = 1.40; req backfill = 1.5*784.1-200 = 976.2",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "pipe_od_in": 48,
+    "pipe_weight_plf": 200,
+    "backfill_weight_plf": 900,
+    "target_fs": 1.5,
+    "water_unit_wt_pcf": 62.4
+   },
+   "outputs": {
+    "uplift_plf": {
+     "value": 784.14,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "fs": {
+     "value": 1.4028,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "required_backfill_plf": {
+     "value": 976.21,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-flotation",
+   "source_publisher": "Archimedes flotation identity (first-principles)",
+   "source_title": "cross-check: the same empty pipe with no backfill floats",
+   "source_edition_or_year": "spec-v831 worked example",
+   "source_section_or_page": "FS = 200/784.1 = 0.26 (< 1) - the empty pipe floats",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "pipe_od_in": 48,
+    "pipe_weight_plf": 200,
+    "backfill_weight_plf": 0,
+    "target_fs": 1.5,
+    "water_unit_wt_pcf": 62.4
+   },
+   "outputs": {
+    "fs": {
+     "value": 0.2551,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",
