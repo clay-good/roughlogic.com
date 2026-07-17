@@ -758,6 +758,7 @@ export const COMPUTE_MAP = {
   "sediment-basin-volume": { module: "../../calc-earthwork.js", fn: "computeSedimentBasinVolume" },
   "erosion-blanket-coverage": { module: "../../calc-earthwork.js", fn: "computeErosionBlanketCoverage" },
   "hydroseed-mix": { module: "../../calc-earthwork.js", fn: "computeHydroseedMix" },
+  "rock-construction-entrance": { module: "../../calc-earthwork.js", fn: "computeRockConstructionEntrance" },
   "haul-cycle-production": { module: "../../calc-earthwork.js", fn: "computeHaulCycleProduction" },
   "loader-production": { module: "../../calc-earthwork.js", fn: "computeLoaderProduction" },
   "dozer-production": { module: "../../calc-earthwork.js", fn: "computeDozerProduction" },

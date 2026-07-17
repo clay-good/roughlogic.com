@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): rock-construction-entrance -- stabilized entrance stone (spec-v830); 2026-07-16
+
+- New Group E tile `rock-construction-entrance` (calc-earthwork.js), the track-out BMP that closes the SWPPP set. Stone
+  takeoff for a stabilized construction entrance pad: tons = length x width x depth x unit weight / 2000. The common 50
+  ft x 14 ft x 6 in pad is 13 cy (~17.5 tons) - the load on site before the first truck rolls out; a 70 ft entrance
+  raises it to 24.5 tons. The geotextile separator under the pad is taken off separately. Home count 1,278 -> 1,279.
+
 ### feat(earthwork): hydroseed-mix -- hydroseed slurry mix and tank count (spec-v829); 2026-07-16
 
 - New Group E tile `hydroseed-mix` (calc-earthwork.js), the final-stabilization BMP. Seed, mulch, and tackifier solids

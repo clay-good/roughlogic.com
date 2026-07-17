@@ -17100,6 +17100,7 @@ import { computeCheckDamSpacing as _v826cd } from "../../calc-earthwork.js";
 import { computeSedimentBasinVolume as _v827sb } from "../../calc-earthwork.js";
 import { computeErosionBlanketCoverage as _v828eb } from "../../calc-earthwork.js";
 import { computeHydroseedMix as _v829hs } from "../../calc-earthwork.js";
+import { computeRockConstructionEntrance as _v830rce } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17263,6 +17264,20 @@ test("bounds: spec-v829 computeHydroseedMix pins the component/total solids, tan
   assert.ok("error" in _v829hs({ area_ac: 3, tank_gal: 0, max_load_lb_per_gal: 0.4 }));
   assert.ok("error" in _v829hs({ area_ac: 3, tank_gal: 3000, max_load_lb_per_gal: 0 }));
   assert.ok("error" in _v829hs({ area_ac: 3, mulch_rate_lb_ac: -1, tank_gal: 3000, max_load_lb_per_gal: 0.4 }));
+});
+
+test("bounds: spec-v830 computeRockConstructionEntrance pins the pad volume, tonnage, and error seams", () => {
+  // 50x14x6in x 100 pcf -> 12.96 cy, 17.5 tons
+  const r = _v830rce({ length_ft: 50, width_ft: 14, depth_in: 6, unit_wt_pcf: 100 });
+  assert.ok(Math.abs(r.volume_cy - 12.963) < 1e-2);
+  assert.strictEqual(r.tons, 17.5);
+  // A longer 70 ft entrance raises it.
+  assert.strictEqual(_v830rce({ length_ft: 70, width_ft: 14, depth_in: 6, unit_wt_pcf: 100 }).tons, 24.5);
+  // Error seams.
+  assert.ok("error" in _v830rce({ length_ft: 0, width_ft: 14, depth_in: 6, unit_wt_pcf: 100 }));
+  assert.ok("error" in _v830rce({ length_ft: 50, width_ft: 0, depth_in: 6, unit_wt_pcf: 100 }));
+  assert.ok("error" in _v830rce({ length_ft: 50, width_ft: 14, depth_in: 0, unit_wt_pcf: 100 }));
+  assert.ok("error" in _v830rce({ length_ft: 50, width_ft: 14, depth_in: 6, unit_wt_pcf: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

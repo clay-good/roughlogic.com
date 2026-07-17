@@ -8045,6 +8045,17 @@ export const CITATIONS = {
       { name: "Solids loading", value: "0.4 lb/gal max default; the machine's agitation limit governs", source: "hydroseeder manufacturer" },
     ],
   },
+  "rock-construction-entrance": {
+    formula: "volume_cy = length_ft x width_ft x (depth_in/12) / 27; tons = length_ft x width_ft x (depth_in/12) x unit_wt_pcf / 2000.",
+    edition: "Pad take-off identity by name (length x width x depth x unit weight); first-principles volume arithmetic.",
+    freeAccess: "The pad take-off is public quantity-survey geometry; the pad dimensions come from the general permit or AHJ.",
+    governance: GOVERNANCE.general,
+    editionNote: "The general permit or AHJ sets the pad dimensions - commonly at least 50 ft long, the full width of the exit, and 6 in of 1-4 in clean stone over a geotextile separator. The geotextile under the pad is taken off separately. The pad is topped up as it works into the subgrade.",
+    assumptions: [
+      { name: "Pad dimensions", value: "50 ft x 14 ft x 6 in default (>= 50 ft long, full exit width); the general permit / AHJ governs", source: "construction general permit / AHJ" },
+      { name: "Stone", value: "1-4 in clean stone at ~100 pcf placed over a geotextile separator (taken off separately)", source: "erosion-control practice" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

@@ -16802,6 +16802,31 @@
       "kind": "industry"
     },
     {
+      "term": "construction entrance stone",
+      "target": "rock-construction-entrance",
+      "kind": "industry"
+    },
+    {
+      "term": "stabilized entrance tonnage",
+      "target": "rock-construction-entrance",
+      "kind": "industry"
+    },
+    {
+      "term": "rock entrance pad",
+      "target": "rock-construction-entrance",
+      "kind": "industry"
+    },
+    {
+      "term": "track-out pad stone",
+      "target": "rock-construction-entrance",
+      "kind": "industry"
+    },
+    {
+      "term": "site entrance aggregate",
+      "target": "rock-construction-entrance",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

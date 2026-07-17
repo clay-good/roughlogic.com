@@ -476,7 +476,7 @@ const _TILES = [
   ["shackle-eyebolt-wll", "Z"], ["spreader-beam", "Z"], ["spreader-beam-min-height", "Z"], ["forklift-capacity-derate", "Z"],
   ["roller-jack-force", "Z"], ["chain-lever-hoist", "Z"], ["block-redirect-load", "Z"], ["block-redirect-max-angle", "Z"],
   // v67 Group E earthwork and excavation deepening
-  ["soil-swell-shrink", "E"], ["haul-cycle-production", "E"], ["loader-production", "E"], ["dozer-production", "E"], ["compaction-roller-production", "E"], ["ripper-production", "E"], ["rusle-soil-loss", "E"], ["riprap-d50", "E"], ["riprap-tonnage", "E"], ["silt-fence-drainage", "E"], ["check-dam-spacing", "E"], ["sediment-basin-volume", "E"], ["erosion-blanket-coverage", "E"], ["hydroseed-mix", "E"], ["dewatering-rate", "E"],
+  ["soil-swell-shrink", "E"], ["haul-cycle-production", "E"], ["loader-production", "E"], ["dozer-production", "E"], ["compaction-roller-production", "E"], ["ripper-production", "E"], ["rusle-soil-loss", "E"], ["riprap-d50", "E"], ["riprap-tonnage", "E"], ["silt-fence-drainage", "E"], ["check-dam-spacing", "E"], ["sediment-basin-volume", "E"], ["erosion-blanket-coverage", "E"], ["hydroseed-mix", "E"], ["rock-construction-entrance", "E"], ["dewatering-rate", "E"],
   ["spoil-setback", "E"], ["pipe-bedding-backfill", "E"],
   // v68 Group L tree care and arborist rigging
   ["log-limb-weight", "L"], ["tree-rigging-shock", "L"], ["felling-notch-hinge", "L"],

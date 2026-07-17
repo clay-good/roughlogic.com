@@ -1005,6 +1005,7 @@ const RELATED = {
   "sediment-basin-volume": ["rusle-soil-loss", "stormwater-detention-volume", "silt-fence-drainage"],
   "erosion-blanket-coverage": ["rusle-soil-loss", "hydroseed-mix", "silt-fence-drainage"],
   "hydroseed-mix": ["erosion-blanket-coverage", "rusle-soil-loss", "seed-rate"],
+  "rock-construction-entrance": ["aggregate", "riprap-tonnage", "stockpile-volume"],
   "haul-cycle-production": ["soil-swell-shrink", "excavation", "axle-load-distribution"],
   "loader-production": ["haul-cycle-production", "soil-swell-shrink", "relative-compaction"],
   "dozer-production": ["loader-production", "haul-cycle-production", "soil-swell-shrink"],

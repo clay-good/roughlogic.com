@@ -18,6 +18,7 @@
 //   - sediment-basin-volume   Sediment basin / trap storage volume
 //   - erosion-blanket-coverage  Erosion blanket (RECP) roll and staple takeoff
 //   - hydroseed-mix           Hydroseed slurry mix and tank count
+//   - rock-construction-entrance  Stabilized construction entrance stone
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
@@ -880,6 +881,54 @@ function _v829renderHydroseedMix(inputRegion, outputRegion, citationEl) {
   for (const f of [ac, seed, mulch, tack, tank, load]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["hydroseed-mix"] = _v829renderHydroseedMix;
+
+// --- rock-construction-entrance: Stabilized Construction Entrance Stone ---
+//
+// The pad of coarse stone at a site exit that knocks mud off tires:
+// volume = L x W x depth / 27; tons = L x W x depth x unit weight / 2000.
+// dims: in { length_ft: L, width_ft: L, depth_in: L, unit_wt_pcf: M L^-3 } out: { volume_cy: L^3, tons: M }
+export function computeRockConstructionEntrance({ length_ft = 50, width_ft = 14, depth_in = 6, unit_wt_pcf = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(length_ft > 0)) return { error: "Length must be positive (ft)." };
+  if (!(width_ft > 0)) return { error: "Width must be positive (ft)." };
+  if (!(depth_in > 0)) return { error: "Depth must be positive (in)." };
+  if (!(unit_wt_pcf > 0)) return { error: "Unit weight must be positive (pcf)." };
+  const volume_cy = (length_ft * width_ft * (depth_in / 12)) / 27;
+  const tons = (length_ft * width_ft * (depth_in / 12) * unit_wt_pcf) / 2000;
+  if (![volume_cy, tons].every(Number.isFinite)) return { error: "Entrance-stone math is not a finite value." };
+  return {
+    volume_cy,
+    tons,
+    note: "The general permit or AHJ sets the pad dimensions - commonly at least 50 ft long, the full width of the exit, and 6 in of 1-4 in clean stone over a geotextile separator. The geotextile under the pad is taken off separately. The pad is topped up as it works into the subgrade.",
+  };
+}
+
+function _v830renderRockConstructionEntrance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: pad take-off identity by name. volume (cy) = length x width x depth/12 / 27; tons = length x width x depth/12 x placed unit weight / 2000. The general permit / AHJ sets the pad dimensions.";
+  const l = makeNumber("Entrance length (ft)", "rce-l", { step: "any", min: "0", value: "50" });
+  l.input.value = "50";
+  const w = makeNumber("Entrance width (ft)", "rce-w", { step: "any", min: "0", value: "14" });
+  w.input.value = "14";
+  const d = makeNumber("Stone depth (in)", "rce-d", { step: "any", min: "0", value: "6" });
+  d.input.value = "6";
+  const uw = makeNumber("Placed stone unit weight (pcf)", "rce-uw", { step: "any", min: "0", value: "100" });
+  uw.input.value = "100";
+  for (const f of [l, w, d, uw]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { l.input.value = "50"; w.input.value = "14"; d.input.value = "6"; uw.input.value = "100"; update(); });
+  const oTons = makeOutputLine(outputRegion, "Stone to order", "rce-out-tons");
+  const oVol = makeOutputLine(outputRegion, "Pad volume", "rce-out-vol");
+  const update = debounce(() => {
+    const r = computeRockConstructionEntrance({
+      length_ft: l.input.value === "" ? 50 : Number(l.input.value), width_ft: w.input.value === "" ? 14 : Number(w.input.value),
+      depth_in: d.input.value === "" ? 6 : Number(d.input.value), unit_wt_pcf: uw.input.value === "" ? 100 : Number(uw.input.value),
+    });
+    if (r.error) { oTons.textContent = r.error; oVol.textContent = "-"; return; }
+    oTons.textContent = fmt(r.tons, 1) + " tons";
+    oVol.textContent = fmt(r.volume_cy, 1) + " cy";
+  }, DEBOUNCE_MS);
+  for (const f of [l, w, d, uw]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["rock-construction-entrance"] = _v830renderRockConstructionEntrance;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //
