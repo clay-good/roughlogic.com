@@ -26304,3 +26304,18 @@ test("bounds: spec-v890 computeCableSupportJhook pins the hook count, per-hook l
   assert.ok("error" in _v890({ run_ft: 400, spacing_ft: 4, num_cables: 50, cable_lb_per_ft: 0.035, hook_wll_lb: -5 }));
   assert.ok("error" in _v890({ run_ft: Infinity, spacing_ft: 4, num_cables: 50, cable_lb_per_ft: 0.035, hook_wll_lb: 0 }));
 });
+
+import { computePolymericSandBags as _v891 } from "../../calc-construction.js";
+
+test("bounds: spec-v891 computePolymericSandBags pins the bag count, coverage lever, and error seams", () => {
+  const r = _v891({ area_sf: 400, coverage_per_bag_sf: 75, waste_pct: 5 });
+  assert.equal(r.bags, 6); // ceil(400*1.05/75) = ceil(5.6)
+  // The joint width, through the product's coverage, is the lever: wide joints cut coverage and push the count up.
+  const wide = _v891({ area_sf: 400, coverage_per_bag_sf: 45, waste_pct: 5 });
+  assert.equal(wide.bags, 10); // ceil(400*1.05/45) = ceil(9.33)
+  // Error seams: non-finite, non-positive area / coverage, negative waste.
+  assert.ok("error" in _v891({ area_sf: 0, coverage_per_bag_sf: 75, waste_pct: 5 }));
+  assert.ok("error" in _v891({ area_sf: 400, coverage_per_bag_sf: 0, waste_pct: 5 }));
+  assert.ok("error" in _v891({ area_sf: 400, coverage_per_bag_sf: 75, waste_pct: -5 }));
+  assert.ok("error" in _v891({ area_sf: Infinity, coverage_per_bag_sf: 75, waste_pct: 5 }));
+});

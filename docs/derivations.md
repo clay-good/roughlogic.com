@@ -1641,6 +1641,7 @@ cross-check.
 | calc-construction.js | `computePlumbingFixtureCount` | `{ occupant_load = 0, wc_ratio = 25, wc_ratio_over = 50, wc_tier = 50, lav_rat...` | _ | _ | _ |
 | calc-construction.js | `computePlywoodSpan` | `{ span_rating = "24/16", panel_thickness_in = 0, application = "roof", suppor...` | _ | _ | _ |
 | calc-construction.js | `computePointLoadBearing` | `{ load_lb = 0, width_in = 0, fc_perp_psi = 0, cb = 1, provided_length_in = 0 ...` | _ | _ | _ |
+| calc-construction.js | `computePolymericSandBags` | `{ area_sf = 400, coverage_per_bag_sf = 75, waste_pct = 5 } = {}` | _ | _ | _ |
 | calc-construction.js | `computePostHoleConcrete` | `{ num_posts = 0, hole_diameter_in = 0, hole_depth_in = 0, post_side_in = 0, b...` | _ | _ | _ |
 | calc-construction.js | `computePoweredAtticVentilator` | `{ attic_area_ft2 = 0, cfm_per_ft2 = 0.7, dark_roof = "no" } = {}` | _ | _ | _ |
 | calc-construction.js | `computePullout` | `{ fastener_type, fastener_size, species, penetration_in }` | _ | _ | _ |
@@ -3000,7 +3001,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1586.
+Row count: 1587.
 
 <!-- END function-corpus-v14 -->
 
@@ -3557,7 +3558,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (339 tiles)
+### Group E Construction (340 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3735,6 +3736,7 @@ per spec-v14 §13.1 second paragraph.
 | `plumbing-fixture-count` | Minimum Plumbing Fixtures by Occupancy (IBC Table 2902.1) | IBC 2021 Table 2902.1 (mirrored in IP...; spec-v244 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `plywood-span` | Plywood and OSB Sheathing Span Rating | APA Engineered Wood Span Ratings (pro...; 24/16 / 0.5 in / roof / 24 in support / 30 psf live + 8 p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `point-load-bearing` | Bearing Length on a Wood Plate | NDS compression perpendicular to grai...; 4000 lb, 3.0-in width, Fc-perp 625 psi -> ~2.133 in bearing | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `polymeric-sand-bags` | Polymeric Paver Joint Sand Bag Count | Polymeric joint-sand bag-count identi...; bags = ceil(400*1.05/75) = ceil(5.6) = 6 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `post-hole-concrete` | Concrete per Post Hole | Cylinder-volume geometry less post di...; spec-v94 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `powered-attic-ventilator` | Powered Attic Ventilator Sizing | attic-fan sizing practice; spec-v467 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `press-brake-max-thickness` | Press-Brake Max Bendable Thickness | Press-brake air-bend tonnage chart + ...; 100 tons, V 0.5 in, L 4 ft, mild steel -> 0.1474 in max t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4525,6 +4527,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1339. Fixture-covered or reference-cadence: 1339 / 1339.
+Tile count: 1340. Fixture-covered or reference-cadence: 1340 / 1340.
 
 <!-- END tile-index-v14 -->

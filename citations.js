@@ -8255,6 +8255,17 @@ export const CITATIONS = {
       { name: "Cable weight", value: "~0.035 lb/ft per Cat 6 cable (default); the cable datasheet governs", source: "cable manufacturer" },
     ],
   },
+  "polymeric-sand-bags": {
+    formula: "bags = ceil(area_sf x (1 + waste_pct/100) / coverage_per_bag_sf).",
+    edition: "Polymeric joint-sand bag-count identity by name (area over the per-bag coverage, plus waste); first-principles arithmetic.",
+    freeAccess: "The bag-count arithmetic is public first-principles; the coverage per bag comes from the product chart.",
+    governance: GOVERNANCE.general,
+    editionNote: "The coverage per bag comes from the product chart and drops sharply with wider joints and larger pavers. Polymeric sand is swept in, compacted, and activated with a light water mist. Distinct from the paver and base takeoff in paver-patio.",
+    assumptions: [
+      { name: "Coverage per bag", value: "~75 sf/bag for tight joints, dropping to ~45 sf/bag with wide joints and large pavers; the product chart governs", source: "polymeric sand manufacturer" },
+      { name: "Waste", value: "~5% default for the sweep-in and activation", source: "installation practice" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

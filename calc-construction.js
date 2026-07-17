@@ -9607,3 +9607,41 @@ const _v889renderGlassVacuumLift = _simpleRenderer({
   compute: computeGlassVacuumLift,
 });
 CONSTRUCTION_RENDERERS["glass-vacuum-lift"] = _v889renderGlassVacuumLift;
+
+// --- polymeric-sand-bags: Polymeric Paver Joint Sand Bag Count ---
+//
+// Bags of polymeric joint sand for a paver area, with waste; coverage swings with joint width.
+//   bags = ceil(area x (1 + waste/100) / coverage_per_bag)
+// dims: in { area_sf: L^2, coverage_per_bag_sf: L^2, waste_pct: dimensionless } out: { bags: dimensionless }
+export function computePolymericSandBags({ area_sf = 400, coverage_per_bag_sf = 75, waste_pct = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Paver area must be positive (ft^2)." };
+  if (!(coverage_per_bag_sf > 0)) return { error: "Coverage per bag must be positive (ft^2)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const raw_bags = area_sf * (1 + waste_pct / 100) / coverage_per_bag_sf;
+  const bags = Math.ceil(raw_bags);
+  if (![raw_bags, bags].every(Number.isFinite)) return { error: "Polymeric-sand math is not a finite value." };
+  return {
+    bags,
+    raw_bags,
+    note: "The coverage per bag comes from the product chart and drops sharply with wider joints and larger pavers. Polymeric sand is swept in, compacted, and activated with a light water mist. Distinct from the paver and base takeoff in paver-patio.",
+  };
+}
+
+export const polymericSandBagsExample = { inputs: { area_sf: 400, coverage_per_bag_sf: 75, waste_pct: 5 } };
+
+const _v891renderPolymericSandBags = _simpleRenderer({
+  citation: "Citation: bag-count identity by name. bags = ceil(area x (1 + waste/100) / coverage per bag). The coverage per bag comes from the product chart and drops sharply with wider joints and larger pavers.",
+  example: polymericSandBagsExample.inputs,
+  fields: [
+    { key: "area_sf", label: "Paver surface area (ft^2)", kind: "number", default: 400 },
+    { key: "coverage_per_bag_sf", label: "Coverage per bag (ft^2)", kind: "number", default: 75 },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
+  ],
+  outputs: [
+    { key: "bags", id: "psb-out-bags", label: "Polymeric sand bags", value: (r) => _fmtC(r.bags, 0) + " bags (" + _fmtC(r.raw_bags, 1) + " before rounding)" },
+    { key: "note", id: "psb-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePolymericSandBags,
+});
+CONSTRUCTION_RENDERERS["polymeric-sand-bags"] = _v891renderPolymericSandBags;

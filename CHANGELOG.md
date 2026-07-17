@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): polymeric-sand-bags -- polymeric paver joint sand bag count (spec-v891); 2026-07-17
+
+- New Group E tile `polymeric-sand-bags` (calc-construction.js), the hardscape takeoff beside `paver-patio` and
+  `retaining-wall-block`. bags = ceil(area x (1 + waste/100) / coverage per bag). A 400 sf patio at 75 sf per bag is 6
+  bags, but wide joints around large-format pavers cut the coverage to about 45 sf/bag and push it to 10. The coverage
+  comes from the product chart and drops with wider joints and larger pavers; the sand is swept in, compacted, and misted.
+  Home count 1,339 -> 1,340.
+
 ### feat(low-voltage): cable-support-jhook -- j-hook / bridle-ring count and bundle weight (spec-v890); 2026-07-17
 
 - New Group A tile `cable-support-jhook` (calc-lowvoltage.js), the low-voltage pathway takeoff beside

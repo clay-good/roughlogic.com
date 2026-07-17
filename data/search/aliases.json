@@ -18327,6 +18327,31 @@
       "kind": "industry"
     },
     {
+      "term": "polymeric sand bags",
+      "target": "polymeric-sand-bags",
+      "kind": "industry"
+    },
+    {
+      "term": "paver joint sand",
+      "target": "polymeric-sand-bags",
+      "kind": "industry"
+    },
+    {
+      "term": "polymeric sand coverage",
+      "target": "polymeric-sand-bags",
+      "kind": "industry"
+    },
+    {
+      "term": "paver sand bag count",
+      "target": "polymeric-sand-bags",
+      "kind": "industry"
+    },
+    {
+      "term": "joint stabilizing sand",
+      "target": "polymeric-sand-bags",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

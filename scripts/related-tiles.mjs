@@ -1062,6 +1062,7 @@ const RELATED = {
   "drywall-fastener-takeoff": ["drywall", "metal-stud-takeoff", "sheathing-takeoff"],
   "glass-vacuum-lift": ["glass-weight", "rigging-check", "sling-angle"],
   "cable-support-jhook": ["lv-cable-pull-footage", "cable-tray-fill", "structured-cabling-channel"],
+  "polymeric-sand-bags": ["paver-patio", "retaining-wall-block", "aggregate"],
   "concrete-vibrator-spacing": ["concrete-pour-rate", "formwork-pressure", "concrete"],
   "formwork-tie-load": ["formwork-pressure", "shore-post-load", "concrete-pour-rate"],
   "mass-concrete-temp-rise": ["concrete-maturity", "fresh-concrete-temp", "concrete-evaporation-rate"],
