@@ -8211,6 +8211,17 @@ export const CITATIONS = {
       { name: "Rimpull rule", value: "20 lb/ton per 1% of total resistance; required rimpull = total resistance x GVW", source: "first-principles tractive effort" },
     ],
   },
+  "dump-truck-loads": {
+    formula: "weight_limited_cy = weight_limit_lb / material_density_lb_per_lcy; payload_cy = min(weight_limited_cy, box_vol_cy); loads = ceil(total_lcy / payload_cy).",
+    edition: "Governing-payload identity by name (weight-limited volume vs box; loads from total / payload); first-principles min-constraint arithmetic.",
+    freeAccess: "The governing-payload logic is public first-principles arithmetic; the box capacity and legal payload come from the truck and the axle/GVW limits.",
+    governance: GOVERNANCE.general,
+    editionNote: "The box heaped capacity comes from the truck; the legal payload comes from the axle and GVW limits. Weight governs heavy material (wet clay, rock) while volume governs light material (wood chips, dry loam). Pairs with haul-cycle-production for the cycle time.",
+    assumptions: [
+      { name: "Box capacity", value: "heaped box volume from the truck (~12 cy default)", source: "truck manufacturer" },
+      { name: "Legal payload", value: "weight limit from the axle and GVW limits (~40,000 lb default); the axle limits govern the weight", source: "axle / GVW limits" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

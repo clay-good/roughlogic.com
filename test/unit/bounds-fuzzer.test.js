@@ -17115,6 +17115,7 @@ import { computeFormworkTieLoad as _v841ftl } from "../../calc-construction.js";
 import { computeMassConcreteTempRise as _v842mctr } from "../../calc-construction.js";
 import { computeConcreteWashoutVolume as _v843cwv } from "../../calc-construction.js";
 import { computeHaulRoadResistance as _v844hrr } from "../../calc-earthwork.js";
+import { computeDumpTruckLoads as _v845dtl } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17549,6 +17550,25 @@ test("bounds: spec-v844 computeHaulRoadResistance pins the total resistance, rim
   assert.ok("error" in _v844hrr({ gvw_lb: 0, grade_pct: 5, rolling_resistance_pct: 4 }));
   assert.ok("error" in _v844hrr({ gvw_lb: 150000, grade_pct: Infinity, rolling_resistance_pct: 4 }));
   assert.ok("error" in _v844hrr({ gvw_lb: 150000, grade_pct: 5, rolling_resistance_pct: NaN }));
+});
+
+test("bounds: spec-v845 computeDumpTruckLoads pins the weight-limited volume, governing payload, load count (both cases), and error seams", () => {
+  // 625 lcy, 12 cy box, 40,000 lb, 2,800 lb/cy -> 14.29 cy weight-limited, 12 cy payload (volume), 53 loads.
+  const r = _v845dtl({ total_lcy: 625, box_vol_cy: 12, weight_limit_lb: 40000, material_density_lb_per_lcy: 2800 });
+  assert.ok(Math.abs(r.weight_limited_cy - 14.286) < 1e-2);
+  assert.strictEqual(r.payload_cy, 12);
+  assert.strictEqual(r.governs, "volume");
+  assert.strictEqual(r.loads, 53);
+  // Wet 3,600 lb/cy material makes weight govern and adds loads.
+  const wet = _v845dtl({ total_lcy: 625, box_vol_cy: 12, weight_limit_lb: 40000, material_density_lb_per_lcy: 3600 });
+  assert.ok(Math.abs(wet.payload_cy - 11.111) < 1e-2);
+  assert.strictEqual(wet.governs, "weight");
+  assert.strictEqual(wet.loads, 57);
+  // Error seams.
+  assert.ok("error" in _v845dtl({ total_lcy: 0, box_vol_cy: 12, weight_limit_lb: 40000, material_density_lb_per_lcy: 2800 }));
+  assert.ok("error" in _v845dtl({ total_lcy: 625, box_vol_cy: 0, weight_limit_lb: 40000, material_density_lb_per_lcy: 2800 }));
+  assert.ok("error" in _v845dtl({ total_lcy: 625, box_vol_cy: 12, weight_limit_lb: 0, material_density_lb_per_lcy: 2800 }));
+  assert.ok("error" in _v845dtl({ total_lcy: 625, box_vol_cy: 12, weight_limit_lb: 40000, material_density_lb_per_lcy: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

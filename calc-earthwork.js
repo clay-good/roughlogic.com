@@ -27,6 +27,7 @@
 //   - hdd-pullback            HDD pullback force first-order estimate (ASTM F1962)
 //   - dust-control-water      Dust-control watering volume and truck trips
 //   - haul-road-resistance    Haul-road total resistance and required rimpull
+//   - dump-truck-loads        Dump truck governing payload and load count
 //
 // Group letters are independent of the module (the spec-v28/v30/v36/v39
 // precedent): all five KEEP group "E"; only the on-disk module changes.
@@ -1218,6 +1219,60 @@ function _v844renderHaulRoadResistance(inputRegion, outputRegion, citationEl) {
   for (const f of [g, gr, rr]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["haul-road-resistance"] = _v844renderHaulRoadResistance;
+
+// --- dump-truck-loads: Dump Truck Governing Payload and Load Count ---
+//
+// Works out whether the box volume or the legal weight limit fills the truck
+// first, and the resulting load count:
+//   weight_limited_cy = weight_limit_lb / material_density_lb_per_lcy
+//   payload_cy = min(weight_limited_cy, box_vol_cy); loads = ceil(total_lcy / payload_cy)
+// dims: in { total_lcy: L^3, box_vol_cy: L^3, weight_limit_lb: M L T^-2, material_density_lb_per_lcy: M L^-2 T^-2 } out: { weight_limited_cy: L^3, payload_cy: L^3, loads: dimensionless }
+export function computeDumpTruckLoads({ total_lcy = 625, box_vol_cy = 12, weight_limit_lb = 40000, material_density_lb_per_lcy = 2800 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(total_lcy > 0)) return { error: "Total volume must be positive (cy)." };
+  if (!(box_vol_cy > 0)) return { error: "Box capacity must be positive (cy)." };
+  if (!(weight_limit_lb > 0)) return { error: "Weight limit must be positive (lb)." };
+  if (!(material_density_lb_per_lcy > 0)) return { error: "Material density must be positive (lb/cy)." };
+  const weight_limited_cy = weight_limit_lb / material_density_lb_per_lcy;
+  const payload_cy = Math.min(weight_limited_cy, box_vol_cy);
+  const governs = weight_limited_cy < box_vol_cy ? "weight" : "volume";
+  const loads = Math.ceil(total_lcy / payload_cy);
+  if (![weight_limited_cy, payload_cy, loads].every(Number.isFinite)) return { error: "Load-count math is not a finite value." };
+  return {
+    weight_limited_cy,
+    payload_cy,
+    governs,
+    loads,
+    note: "The box heaped capacity comes from the truck; the legal payload comes from the axle and GVW limits. Weight governs heavy material (wet clay, rock) while volume governs light material (wood chips, dry loam). Pairs with haul-cycle-production for the cycle time and haul-road-resistance for the rimpull.",
+  };
+}
+
+function _v845renderDumpTruckLoads(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: governing-payload identity by name. weight-limited volume = weight limit / density; payload = min(weight-limited, box); loads = ceil(total / payload). The box capacity comes from the truck; the legal payload comes from the axle and GVW limits.";
+  const t = makeNumber("Total loose volume to haul (cy)", "dtl-t", { step: "any", min: "0", value: "625" });
+  t.input.value = "625";
+  const b = makeNumber("Heaped box capacity (cy)", "dtl-b", { step: "any", min: "0", value: "12" });
+  b.input.value = "12";
+  const wl = makeNumber("Legal payload weight limit (lb)", "dtl-wl", { step: "any", min: "0", value: "40000" });
+  wl.input.value = "40000";
+  const d = makeNumber("Loose material density (lb/cy)", "dtl-d", { step: "any", min: "0", value: "2800" });
+  d.input.value = "2800";
+  for (const f of [t, b, wl, d]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { t.input.value = "625"; b.input.value = "12"; wl.input.value = "40000"; d.input.value = "2800"; update(); });
+  const oLoads = makeOutputLine(outputRegion, "Truck loads", "dtl-out-loads");
+  const oPayload = makeOutputLine(outputRegion, "Governing payload", "dtl-out-payload");
+  const update = debounce(() => {
+    const r = computeDumpTruckLoads({
+      total_lcy: t.input.value === "" ? 625 : Number(t.input.value), box_vol_cy: b.input.value === "" ? 12 : Number(b.input.value),
+      weight_limit_lb: wl.input.value === "" ? 40000 : Number(wl.input.value), material_density_lb_per_lcy: d.input.value === "" ? 2800 : Number(d.input.value),
+    });
+    if (r.error) { oLoads.textContent = r.error; oPayload.textContent = "-"; return; }
+    oLoads.textContent = fmt(r.loads, 0) + " loads";
+    oPayload.textContent = fmt(r.payload_cy, 2) + " cy per truck (" + r.governs + " governs)";
+  }, DEBOUNCE_MS);
+  for (const f of [t, b, wl, d]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["dump-truck-loads"] = _v845renderDumpTruckLoads;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): dump-truck-loads -- dump truck governing payload and load count (spec-v845); 2026-07-17
+
+- New Group E tile `dump-truck-loads` (calc-earthwork.js), the site-logistics payload tile beside
+  `haul-cycle-production` (time) and `haul-road-resistance` (rimpull). Whether the box volume or the legal weight limit
+  fills the truck first, and the load count: weight-limited volume = weight limit / density; payload = min(weight-limited,
+  box); loads = ceil(total / payload). 625 loose cy in 12 cy boxes is 53 loads when the box governs, but haul wet 3,600
+  lb/cy material and the 40,000 lb limit caps each truck at 11.1 cy -- 57 loads, and loading to the box would put every
+  truck over legal weight. Weight governs heavy material, volume governs light. Home count 1,293 -> 1,294.
+
 ### feat(earthwork): haul-road-resistance -- haul-road total resistance and required rimpull (spec-v844); 2026-07-17
 
 - New Group E tile `haul-road-resistance` (calc-earthwork.js), the equipment/site-logistics resistance side beside

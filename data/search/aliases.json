@@ -17177,6 +17177,31 @@
       "kind": "industry"
     },
     {
+      "term": "dump truck loads",
+      "target": "dump-truck-loads",
+      "kind": "industry"
+    },
+    {
+      "term": "truck payload governing",
+      "target": "dump-truck-loads",
+      "kind": "industry"
+    },
+    {
+      "term": "weight vs volume payload",
+      "target": "dump-truck-loads",
+      "kind": "industry"
+    },
+    {
+      "term": "haul load count",
+      "target": "dump-truck-loads",
+      "kind": "industry"
+    },
+    {
+      "term": "truck load count",
+      "target": "dump-truck-loads",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"
