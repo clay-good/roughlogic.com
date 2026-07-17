@@ -8277,6 +8277,17 @@ export const CITATIONS = {
       { name: "Layers", value: "set by the required continuous-insulation R with offset seams", source: "IECC / energy code" },
     ],
   },
+  "roof-insulation-fasteners": {
+    formula: "fasteners = field_boards x field_per_board + perimeter_boards x perimeter_per_board + corner_boards x corner_per_board; plates = fasteners.",
+    edition: "Roof-board fastener identity by name (sum of zone boards x zone rate; one plate per fastener); first-principles count arithmetic.",
+    freeAccess: "The count arithmetic is public first-principles; the zone fastening densities come from the manufacturer's wind-uplift design (no copyrighted uplift table reproduced).",
+    governance: GOVERNANCE.general,
+    editionNote: "The field, perimeter, and corner fastening densities come from the manufacturer's wind-uplift design (FM or UL -- the user enters the pattern). Mechanically-attached membrane and board use one plate per fastener. Distinct from the shingle and panel fastener tiles.",
+    assumptions: [
+      { name: "Zone rates", value: "field / perimeter / corner fasteners per board from the FM or UL uplift design (entered)", source: "membrane manufacturer" },
+      { name: "Plates", value: "one plate per fastener for mechanically-attached board and membrane", source: "installation practice" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

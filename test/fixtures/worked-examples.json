@@ -52815,6 +52815,62 @@
    }
   },
   {
+   "tile_id": "roof-insulation-fasteners",
+   "source_publisher": "Roof-board fastener identity (first-principles)",
+   "source_title": "100 field at 8, 20 perimeter at 12, 5 corner at 16 -> 1,120 fasteners and plates",
+   "source_edition_or_year": "spec-v893 worked example",
+   "source_section_or_page": "fasteners = 100*8 + 20*12 + 5*16 = 800 + 240 + 80 = 1120; plates = 1120",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "field_boards": 100,
+    "field_per_board": 8,
+    "perimeter_boards": 20,
+    "perimeter_per_board": 12,
+    "corner_boards": 5,
+    "corner_per_board": 16
+   },
+   "outputs": {
+    "fasteners": {
+     "value": 1120,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "plates": {
+     "value": 1120,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "roof-insulation-fasteners",
+   "source_publisher": "Roof-board fastener identity (first-principles)",
+   "source_title": "cross-check: a high-wind field pattern of 12 raises the total to 1,520 fasteners",
+   "source_edition_or_year": "spec-v893 worked example",
+   "source_section_or_page": "fasteners = 100*12 + 20*12 + 5*16 = 1200 + 240 + 80 = 1520",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "field_boards": 100,
+    "field_per_board": 12,
+    "perimeter_boards": 20,
+    "perimeter_per_board": 12,
+    "corner_boards": 5,
+    "corner_per_board": 16
+   },
+   "outputs": {
+    "fasteners": {
+     "value": 1520,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

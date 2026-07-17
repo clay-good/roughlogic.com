@@ -9685,3 +9685,44 @@ const _v892renderRigidFoamBoardCount = _simpleRenderer({
   compute: computeRigidFoamBoardCount,
 });
 CONSTRUCTION_RENDERERS["rigid-foam-board-count"] = _v892renderRigidFoamBoardCount;
+
+// --- roof-insulation-fasteners: Roof Board Fastener and Plate Count by Zone ---
+//
+// Field + perimeter + corner zone fastening; one plate per fastener.
+//   fasteners = field*fieldRate + perimeter*perimRate + corner*cornerRate; plates = fasteners
+// dims: in { field_boards: dimensionless, field_per_board: dimensionless, perimeter_boards: dimensionless, perimeter_per_board: dimensionless, corner_boards: dimensionless, corner_per_board: dimensionless } out: { fasteners: dimensionless, plates: dimensionless }
+export function computeRoofInsulationFasteners({ field_boards = 100, field_per_board = 8, perimeter_boards = 20, perimeter_per_board = 12, corner_boards = 5, corner_per_board = 16 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const vals = { field_boards, field_per_board, perimeter_boards, perimeter_per_board, corner_boards, corner_per_board };
+  for (const [k, v] of Object.entries(vals)) if (v < 0) return { error: k + " cannot be negative." };
+  const fasteners = field_boards * field_per_board + perimeter_boards * perimeter_per_board + corner_boards * corner_per_board;
+  const plates = fasteners;
+  if (![fasteners, plates].every(Number.isFinite)) return { error: "Fastener math is not a finite value." };
+  return {
+    fasteners,
+    plates,
+    note: "The field, perimeter, and corner fastening densities come from the manufacturer's wind-uplift design (FM or UL). Mechanically-attached membrane and board use one plate per fastener. Distinct from the shingle and panel fastener tiles.",
+  };
+}
+
+export const roofInsulationFastenersExample = { inputs: { field_boards: 100, field_per_board: 8, perimeter_boards: 20, perimeter_per_board: 12, corner_boards: 5, corner_per_board: 16 } };
+
+const _v893renderRoofInsulationFasteners = _simpleRenderer({
+  citation: "Citation: fastener identity by name. fasteners = field boards x field rate + perimeter boards x perimeter rate + corner boards x corner rate; plates = fasteners. The zone densities come from the manufacturer's wind-uplift design.",
+  example: roofInsulationFastenersExample.inputs,
+  fields: [
+    { key: "field_boards", label: "Field-zone boards", kind: "number", default: 100 },
+    { key: "field_per_board", label: "Fasteners per field board", kind: "number", default: 8 },
+    { key: "perimeter_boards", label: "Perimeter-zone boards", kind: "number", default: 20 },
+    { key: "perimeter_per_board", label: "Fasteners per perimeter board", kind: "number", default: 12 },
+    { key: "corner_boards", label: "Corner-zone boards", kind: "number", default: 5 },
+    { key: "corner_per_board", label: "Fasteners per corner board", kind: "number", default: 16 },
+  ],
+  outputs: [
+    { key: "f", id: "rif-out-f", label: "Fasteners", value: (r) => _fmtC(r.fasteners, 0) + " fasteners" },
+    { key: "p", id: "rif-out-p", label: "Plates", value: (r) => _fmtC(r.plates, 0) + " plates (one per fastener)" },
+    { key: "note", id: "rif-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRoofInsulationFasteners,
+});
+CONSTRUCTION_RENDERERS["roof-insulation-fasteners"] = _v893renderRoofInsulationFasteners;

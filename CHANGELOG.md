@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): roof-insulation-fasteners -- roof board fastener and plate count by zone (spec-v893); 2026-07-17
+
+- New Group E tile `roof-insulation-fasteners` (calc-construction.js), the roofing fastener takeoff beside
+  `membrane-roof-takeoff` and `tapered-roof-insulation`. fasteners = field boards x field rate + perimeter boards x
+  perimeter rate + corner boards x corner rate; plates = fasteners. 100 field boards at 8, 20 perimeter at 12, and 5
+  corner at 16 is 1,120 fasteners and plates; a high-wind field pattern of 12 raises it to 1,520. The zone densities come
+  from the manufacturer's FM or UL uplift design. Home count 1,341 -> 1,342.
+
 ### feat(construction): rigid-foam-board-count -- rigid / continuous insulation board count (spec-v892); 2026-07-17
 
 - New Group E tile `rigid-foam-board-count` (calc-construction.js), the insulation takeoff beside

@@ -18377,6 +18377,31 @@
       "kind": "industry"
     },
     {
+      "term": "roof insulation fasteners",
+      "target": "roof-insulation-fasteners",
+      "kind": "industry"
+    },
+    {
+      "term": "iso board fasteners",
+      "target": "roof-insulation-fasteners",
+      "kind": "industry"
+    },
+    {
+      "term": "roof fastener plate count",
+      "target": "roof-insulation-fasteners",
+      "kind": "industry"
+    },
+    {
+      "term": "membrane fasteners by zone",
+      "target": "roof-insulation-fasteners",
+      "kind": "industry"
+    },
+    {
+      "term": "roof board screws",
+      "target": "roof-insulation-fasteners",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

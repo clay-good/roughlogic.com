@@ -26336,3 +26336,20 @@ test("bounds: spec-v892 computeRigidFoamBoardCount pins the board count, layer m
   assert.ok("error" in _v892({ area_sf: 1600, board_area_sf: 32, layers: 2, waste_pct: -8 }));
   assert.ok("error" in _v892({ area_sf: Infinity, board_area_sf: 32, layers: 2, waste_pct: 8 }));
 });
+
+import { computeRoofInsulationFasteners as _v893 } from "../../calc-construction.js";
+
+test("bounds: spec-v893 computeRoofInsulationFasteners pins the fastener/plate totals and error seams", () => {
+  const r = _v893({ field_boards: 100, field_per_board: 8, perimeter_boards: 20, perimeter_per_board: 12, corner_boards: 5, corner_per_board: 16 });
+  assert.equal(r.fasteners, 1120); // 100*8 + 20*12 + 5*16
+  assert.equal(r.plates, 1120); // one plate per fastener
+  // The field zone is the largest, so its pattern dominates: a high-wind field rate of 12 drives the box count.
+  const highWind = _v893({ field_boards: 100, field_per_board: 12, perimeter_boards: 20, perimeter_per_board: 12, corner_boards: 5, corner_per_board: 16 });
+  assert.equal(highWind.fasteners, 1520); // 100*12 + 240 + 80
+  // A zone can be empty (0 boards) without error.
+  assert.equal(_v893({ field_boards: 50, field_per_board: 8, perimeter_boards: 0, perimeter_per_board: 12, corner_boards: 0, corner_per_board: 16 }).fasteners, 400);
+  // Error seams: non-finite and negative board counts or rates.
+  assert.ok("error" in _v893({ field_boards: -1, field_per_board: 8, perimeter_boards: 20, perimeter_per_board: 12, corner_boards: 5, corner_per_board: 16 }));
+  assert.ok("error" in _v893({ field_boards: 100, field_per_board: -8, perimeter_boards: 20, perimeter_per_board: 12, corner_boards: 5, corner_per_board: 16 }));
+  assert.ok("error" in _v893({ field_boards: Infinity, field_per_board: 8, perimeter_boards: 20, perimeter_per_board: 12, corner_boards: 5, corner_per_board: 16 }));
+});

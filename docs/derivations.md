@@ -1657,6 +1657,7 @@ cross-check.
 | calc-construction.js | `computeResidentialFraming` | `{ footprint_ft2 = 0, perimeter_ft = 0, wall_height_ft = 8, stud_oc_in = 16, j...` | _ | _ | _ |
 | calc-construction.js | `computeRidgeCapFasteners` | `{ ridge_lf = 0, hip_lf = 0, cap_lf_per_bundle = 20, cap_exposure_in = 5, squa...` | _ | _ | _ |
 | calc-construction.js | `computeRigidFoamBoardCount` | `{ area_sf = 1600, board_area_sf = 32, layers = 1, waste_pct = 8 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeRoofInsulationFasteners` | `{ field_boards = 100, field_per_board = 8, perimeter_boards = 20, perimeter_p...` | _ | _ | _ |
 | calc-construction.js | `computeRoofPitch` | `{ rise = null, run = 12, mode = "rise_run" }` | _ | _ | _ |
 | calc-construction.js | `computeRoofUnderlaymentRolls` | `{ roof_area_sf = 2500, roll_coverage_sf = 1000, lap_waste_pct = 10 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeRoofingSquares` | `{ roof_area_ft2 = 0, pitch_rise = 0, shingle_product = "architectural", perim...` | _ | _ | _ |
@@ -3002,7 +3003,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1588.
+Row count: 1589.
 
 <!-- END function-corpus-v14 -->
 
@@ -3559,7 +3560,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (341 tiles)
+### Group E Construction (342 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3776,6 +3777,7 @@ per spec-v14 §13.1 second paragraph.
 | `riprap-d50` | Riprap Median Stone Size (Isbash) | Isbash riprap-sizing equation (public...; D50 = 1.2*64 / (2*32.2*0.86^2*1.65) = 76.8/78.59 = 0.977 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `riprap-tonnage` | Riprap Layer Volume and Tonnage | Layer take-off identity (first-princi...; volume = 500*2/27 = 37.0 cy; tons = 500*2*165/2000 = 82.5 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rock-construction-entrance` | Stabilized Construction Entrance Stone | Pad take-off identity (first-principles); volume = 50*14*0.5/27 = 13.0 cy; tons = 50*14*0.5*100/200... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `roof-insulation-fasteners` | Roof Board Fastener and Plate Count by Zone | Roof-board fastener identity (first-p...; fasteners = 100*8 + 20*12 + 5*16 = 800 + 240 + 80 = 1120;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `roof-pitch` | Roof Pitch | Project (first-principles); Pitch (rise / 12 run); angle = atan(rise/run) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `roof-underlayment-rolls` | Roof Underlayment Roll Count | Roofing underlayment roll-count ident...; rolls = ceil(2500*1.10/1000) = ceil(2.75) = 3 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `roofing-squares` | Roofing Squares and Bundles | Project (industry rule of thumb); 2200 ft^2 roof / 6:12 pitch (12% waste) / architectural s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4529,6 +4531,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1341. Fixture-covered or reference-cadence: 1341 / 1341.
+Tile count: 1342. Fixture-covered or reference-cadence: 1342 / 1342.
 
 <!-- END tile-index-v14 -->
