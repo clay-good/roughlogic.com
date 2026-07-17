@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): dozer-production -- dozer slot / blade production rate (spec-v810); 2026-07-16
+
+- New Group E tile `dozer-production` (calc-earthwork.js), the push-distance-driven counterpart to `loader-production`.
+  Caterpillar Performance Handbook slot-dozing cycle-time method: cycle = push/push_speed + push/return_speed + fixed;
+  production = blade_cap x (working_min / cycle). An 8 lcy blade on a 100 ft push at 200 ft/min (400 ft/min return),
+  0.05 min fixed, 50-minute hour makes 500 lcy/hr; doubling the push to 200 ft roughly halves it to 258 lcy/hr -- the
+  reason dozing is a short-haul tool. Home count 1,258 -> 1,259. The two production tiles took calc-earthwork.js to
+  ~12.7 KB gz, so its per-module gzip cap was raised 12,500 -> 15,000 B with headroom for the remaining production vein.
+
 ### feat(earthwork): loader-production -- wheel-loader / excavator bucket production rate (spec-v809); 2026-07-16
 
 - New Group E tile `loader-production` (calc-earthwork.js), the load-side counterpart the `haul-cycle-production`

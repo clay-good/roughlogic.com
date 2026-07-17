@@ -5207,6 +5207,31 @@
       "kind": "industry"
     },
     {
+      "term": "dozer production rate",
+      "target": "dozer-production",
+      "kind": "industry"
+    },
+    {
+      "term": "bulldozer blade production",
+      "target": "dozer-production",
+      "kind": "industry"
+    },
+    {
+      "term": "slot dozing loose cy per hour",
+      "target": "dozer-production",
+      "kind": "industry"
+    },
+    {
+      "term": "dozer push production",
+      "target": "dozer-production",
+      "kind": "industry"
+    },
+    {
+      "term": "blade cycle production",
+      "target": "dozer-production",
+      "kind": "industry"
+    },
+    {
       "term": "dewatering",
       "target": "dewatering-rate",
       "kind": "industry"

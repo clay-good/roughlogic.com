@@ -1,6 +1,7 @@
 # roughlogic.com Specification v810 -- Dozer Slot / Blade Production Rate (calc-earthwork.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-16 (package 0.398.0).** Executed against the live catalog (1,258 -> 1,259 tiles),
+> beside the just-landed `loader-production` (spec-v809). Single-tile spec.
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-earthwork.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v809.md. Construction-equipment production sweep
 > (entry 2), beside `haul-cycle-production` and the new `loader-production` (spec-v809).

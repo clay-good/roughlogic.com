@@ -1758,6 +1758,7 @@ cross-check.
 | calc-drainage.js | `computeSumpBasinSizing` | `{ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeAtterbergIndices` | `{ ll = 0, pl = 0, w_pct = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeDewateringRate` | `{ pit_len_ft, pit_wid_ft, drawdown_ft = 0, drawdown_min, inflow_gpm = 0, safe...` | _ | _ | _ |
+| calc-earthwork.js | `computeDozerProduction` | `{ blade_cap_lcy, push_dist_ft, push_speed_fpm, return_speed_fpm, fixed_min = ...` | _ | _ | _ |
 | calc-earthwork.js | `computeFinenessModulus` | `{ r4 = 0, r8 = 0, r16 = 0, r30 = 0, r50 = 0, r100 = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeHaulCycleProduction` | `{ truck_cap_lcy, load_min, haul_min = 0, dump_min = 0, return_min = 0, spot_m...` | _ | _ | _ |
 | calc-earthwork.js | `computeLoaderProduction` | `{ bucket_cap_lcy, fill_factor = 0.95, cycle_min, eff_min_per_hr = 50, hours_p...` | _ | _ | _ |
@@ -2919,7 +2920,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1505.
+Row count: 1506.
 
 <!-- END function-corpus-v14 -->
 
@@ -3467,7 +3468,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (267 tiles)
+### Group E Construction (268 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3539,6 +3540,7 @@ per spec-v14 §13.1 second paragraph.
 | `dewatering-rate` | Excavation Dewatering Pump Rate | First-principles volume / pumping rate; 20 x 12 pit, draw 3 ft in 30 min, inflow 40 gpm, 25% marg... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `diaphragm-collector-force` | Collector / Drag Strut Axial Force (ASCE 7 12.10) | ASCE 7-22 Section 12.10 (collectors a...; 300 plf dragged 40 ft -> 12000 lb; Omega0 2.5 -> 30000 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `diaphragm-shear` | Wood Diaphragm Unit Shear and Chord Force (SDPWS) | AWC SDPWS flexible-diaphragm model (A...; spec-v272 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `dozer-production` | Dozer Slot / Blade Production Rate | Caterpillar Performance Handbook slot...; 8 lcy blade, 100 ft push at 200 fpm, return 400 fpm, 0.05... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drywall` | Drywall Sheet Count and Mud | Project (first-principles); sheets = ceil(1.10 * 1800 / 32) = 62; mud = 0.053 * 1800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `earthwork-end-area` | Earthwork Volume (End-Area) | FHWA / state-DOT earthwork references...; two 100 ft^2 sections 100 ft apart -> 10000 ft^3 (370.37 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `egress-capacity` | Egress Exit Count and Required Width (IBC 1005.3 / 1006.2) | IBC 2021 §1005.3 / §1006.2 / §1010.1.1; spec-v243 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4363,6 +4365,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1258. Fixture-covered or reference-cadence: 1258 / 1258.
+Tile count: 1259. Fixture-covered or reference-cadence: 1259 / 1259.
 
 <!-- END tile-index-v14 -->

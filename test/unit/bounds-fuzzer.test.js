@@ -10908,6 +10908,7 @@ test("bounds: spec-v744 spreader beam minimum top-point height (inverse of sprea
 import {
   computeSoilSwellShrink as _v67a, computeHaulCycleProduction as _v67b, computeDewateringRate as _v67c,
   computeSpoilSetback as _v67d, computePipeBeddingBackfill as _v67e, computeLoaderProduction as _v809lp,
+  computeDozerProduction as _v810dz,
 } from "../../calc-earthwork.js";
 test("bounds: calc-construction v67 earthwork tiles pin volume conversion, production, dewatering, setback, and bedding", () => {
   // soil-swell-shrink: 100 bank, swell 25, shrink 15 -> 125 loose, 0.80 LF, 85 compacted
@@ -10939,6 +10940,17 @@ test("bounds: calc-construction v67 earthwork tiles pin volume conversion, produ
   assert.ok("error" in _v809lp({ bucket_cap_lcy: 3.5, cycle_min: 0 }));
   assert.ok("error" in _v809lp({ bucket_cap_lcy: 3.5, fill_factor: 0, cycle_min: 0.5 }));
   assert.ok("error" in _v809lp({ bucket_cap_lcy: 3.5, cycle_min: 0.5, eff_min_per_hr: 0 }));
+  // dozer-production: 8 lcy blade, 100 ft push @200/400 fpm, 0.05 fixed, 50-min hr -> 0.80 cycle, 62.5/hr, 500 lcy/hr
+  const dz = _v810dz({ blade_cap_lcy: 8, push_dist_ft: 100, push_speed_fpm: 200, return_speed_fpm: 400, fixed_min: 0.05, eff_min_per_hr: 50 });
+  assert.ok(Math.abs(dz.cycle_min - 0.8) < 1e-9);
+  assert.ok(Math.abs(dz.cycles_per_hour - 62.5) < 1e-9);
+  assert.ok(Math.abs(dz.production_lcy_hr - 500) < 1e-9);
+  assert.ok(Math.abs(_v810dz({ blade_cap_lcy: 8, push_dist_ft: 200, push_speed_fpm: 200, return_speed_fpm: 400, fixed_min: 0.05, eff_min_per_hr: 50 }).production_lcy_hr - 258.0645) < 1e-3); // doubled push
+  assert.ok("error" in _v810dz({ blade_cap_lcy: 0, push_dist_ft: 100, push_speed_fpm: 200, return_speed_fpm: 400 }));
+  assert.ok("error" in _v810dz({ blade_cap_lcy: 8, push_dist_ft: 0, push_speed_fpm: 200, return_speed_fpm: 400 }));
+  assert.ok("error" in _v810dz({ blade_cap_lcy: 8, push_dist_ft: 100, push_speed_fpm: 0, return_speed_fpm: 400 }));
+  assert.ok("error" in _v810dz({ blade_cap_lcy: 8, push_dist_ft: 100, push_speed_fpm: 200, return_speed_fpm: 0 }));
+  assert.ok("error" in _v810dz({ blade_cap_lcy: 8, push_dist_ft: 100, push_speed_fpm: 200, return_speed_fpm: 400, fixed_min: -1 }));
   // dewatering-rate: 20x12 pit, 3 ft in 30 min, inflow 40, 25% -> 5386 gal, 219.5, 274.4
   const dw = _v67c({ pit_len_ft: 20, pit_wid_ft: 12, drawdown_ft: 3, drawdown_min: 30, inflow_gpm: 40, safety_pct: 25 });
   assert.ok(Math.abs(dw.drawdown_gal - 5386.0) < 1);

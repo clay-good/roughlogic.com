@@ -22336,6 +22336,74 @@
    }
   },
   {
+   "tile_id": "dozer-production",
+   "source_publisher": "Caterpillar Performance Handbook slot-dozing method",
+   "source_title": "cycle = push/push_speed + push/return_speed + fixed; cycles/hr = 50 / cycle; production = blade x cycles/hr",
+   "source_edition_or_year": "Caterpillar Performance Handbook; SAE J1265 blade rating",
+   "source_section_or_page": "8 lcy blade, 100 ft push at 200 fpm, return 400 fpm, 0.05 fixed, 50-min hour -> 0.80 min cycle, 62.5 cycles/hr, 500 lcy/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "blade_cap_lcy": 8,
+    "push_dist_ft": 100,
+    "push_speed_fpm": 200,
+    "return_speed_fpm": 400,
+    "fixed_min": 0.05,
+    "eff_min_per_hr": 50
+   },
+   "outputs": {
+    "cycle_min": {
+     "value": 0.8,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "cycles_per_hour": {
+     "value": 62.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "production_lcy_hr": {
+     "value": 500,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dozer-production",
+   "source_publisher": "Caterpillar Performance Handbook slot-dozing method",
+   "source_title": "doubling the push to 200 ft roughly halves production",
+   "source_edition_or_year": "Caterpillar Performance Handbook",
+   "source_section_or_page": "8 lcy blade, 200 ft push at 200 fpm, return 400 fpm, 0.05 fixed, 50-min hour -> 1.55 min cycle, 258.1 lcy/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "blade_cap_lcy": 8,
+    "push_dist_ft": 200,
+    "push_speed_fpm": 200,
+    "return_speed_fpm": 400,
+    "fixed_min": 0.05,
+    "eff_min_per_hr": 50
+   },
+   "outputs": {
+    "cycle_min": {
+     "value": 1.55,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "production_lcy_hr": {
+     "value": 258.06,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dewatering-rate",
    "source_publisher": "First-principles volume / pumping rate",
    "source_title": "drawdown_gal = L x W x H x 7.48052; pump = drawdown_gal/time + inflow; sized = pump x (1 + margin)",

@@ -6,6 +6,7 @@
 //   - soil-swell-shrink       Bank / loose / compacted volume conversion
 //   - haul-cycle-production   Truck/loader haul-cycle production + fleet match
 //   - loader-production       Wheel-loader / excavator bucket production rate
+//   - dozer-production        Dozer slot / blade production rate
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
@@ -229,6 +230,68 @@ function _v809renderLoaderProduction(inputRegion, outputRegion, citationEl) {
   for (const f of [cap, fill, cycle, eff, hours]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["loader-production"] = _v809renderLoaderProduction;
+
+// --- dozer-production: Dozer Slot / Blade Production Rate ---
+//
+// cycle = push_dist/push_speed + push_dist/return_speed + fixed;
+// cycles/hr = eff_min / cycle; production = blade x cycles/hr.
+// dims: in { blade_cap_lcy: L^3, push_dist_ft: L, push_speed_fpm: L T^-1, return_speed_fpm: L T^-1, fixed_min: T, eff_min_per_hr: T } out: { cycle_min: T, cycles_per_hour: dimensionless, production_lcy_hr: L^3 T^-1 }
+// (Blade capacity is L^3; push distance L; both speeds L T^-1; every time is T;
+//  cycles-per-hour is dimensionless and production a volume-rate L^3 T^-1.)
+export function computeDozerProduction({ blade_cap_lcy, push_dist_ft, push_speed_fpm, return_speed_fpm, fixed_min = 0.05, eff_min_per_hr = 50 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const blade = Number(blade_cap_lcy);
+  const push = Number(push_dist_ft);
+  const pushSpeed = Number(push_speed_fpm);
+  const retSpeed = Number(return_speed_fpm);
+  const fixed = Number(fixed_min);
+  const eff = Number(eff_min_per_hr);
+  if (!Number.isFinite(blade) || blade <= 0) return { error: "Blade capacity must be a positive finite number (lcy)." };
+  if (!Number.isFinite(push) || push <= 0) return { error: "Push distance must be a positive finite number (ft)." };
+  if (!Number.isFinite(pushSpeed) || pushSpeed <= 0) return { error: "Push speed must be a positive finite number (ft/min)." };
+  if (!Number.isFinite(retSpeed) || retSpeed <= 0) return { error: "Return speed must be a positive finite number (ft/min)." };
+  if (!Number.isFinite(fixed) || fixed < 0) return { error: "Fixed time must be a non-negative finite number (min)." };
+  if (!Number.isFinite(eff) || eff <= 0) return { error: "Working minutes per hour must be a positive finite number." };
+  const cycleMin = push / pushSpeed + push / retSpeed + fixed;
+  const cyclesPerHour = eff / cycleMin;
+  const productionLcyHr = blade * cyclesPerHour;
+  if (![cycleMin, cyclesPerHour, productionLcyHr].every(Number.isFinite)) return { error: "Production math is not a finite value." };
+  return {
+    cycle_min: cycleMin,
+    cycles_per_hour: cyclesPerHour,
+    production_lcy_hr: productionLcyHr,
+    note: "The SAE J1265 blade capacity is manufacturer-rated. Grade helps or hurts: a downhill push boosts the blade load, an uphill push cuts it. Push distance is the variable that governs - production falls off fast as the push lengthens, which is why long moves belong to scrapers and trucks, not a dozer. The 50-minute hour is a planning default, not a guarantee. Convert the loose yards back to bank (earned) quantity with soil-swell-shrink.",
+  };
+}
+
+function _v810renderDozerProduction(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Caterpillar Performance Handbook slot-dozing cycle-time production method by name. cycle = push/push-speed + push/return-speed + fixed; cycles/hr = working minutes / cycle; production = blade capacity x cycles/hr.";
+  const blade = makeNumber("Heaped blade capacity (loose cy)", "dz-blade", { step: "any", min: "0" });
+  const push = makeNumber("One-way push distance (ft)", "dz-push", { step: "any", min: "0" });
+  const pushSpeed = makeNumber("Loaded push speed (ft/min)", "dz-pspeed", { step: "any", min: "0" });
+  const retSpeed = makeNumber("Empty return speed (ft/min)", "dz-rspeed", { step: "any", min: "0" });
+  const fixed = makeNumber("Fixed gear-shift time (min)", "dz-fixed", { step: "any", min: "0", value: "0.05" });
+  fixed.input.value = "0.05";
+  const eff = makeNumber("Working minutes per hour", "dz-eff", { step: "any", min: "0", value: "50" });
+  eff.input.value = "50";
+  for (const f of [blade, push, pushSpeed, retSpeed, fixed, eff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { blade.input.value = "8"; push.input.value = "100"; pushSpeed.input.value = "200"; retSpeed.input.value = "400"; fixed.input.value = "0.05"; eff.input.value = "50"; update(); });
+  const oCycle = makeOutputLine(outputRegion, "Cycle time", "dz-out-cycle");
+  const oProd = makeOutputLine(outputRegion, "Production", "dz-out-prod");
+  const update = debounce(() => {
+    const r = computeDozerProduction({
+      blade_cap_lcy: Number(blade.input.value) || 0, push_dist_ft: Number(push.input.value) || 0,
+      push_speed_fpm: Number(pushSpeed.input.value) || 0, return_speed_fpm: Number(retSpeed.input.value) || 0,
+      fixed_min: fixed.input.value === "" ? 0.05 : Number(fixed.input.value),
+      eff_min_per_hr: eff.input.value === "" ? 50 : Number(eff.input.value),
+    });
+    if (r.error) { oCycle.textContent = r.error; oProd.textContent = "-"; return; }
+    oCycle.textContent = fmt(r.cycle_min, 2) + " min (" + fmt(r.cycles_per_hour, 1) + " cycles/hr)";
+    oProd.textContent = fmt(r.production_lcy_hr, 1) + " lcy/hr";
+  }, DEBOUNCE_MS);
+  for (const f of [blade, push, pushSpeed, retSpeed, fixed, eff]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["dozer-production"] = _v810renderDozerProduction;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

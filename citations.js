@@ -7913,6 +7913,17 @@ export const CITATIONS = {
       { name: "Working minutes", value: "50-minute hour (efficiency factor for real-world delays)", source: "Caterpillar Performance Handbook" },
     ],
   },
+  "dozer-production": {
+    formula: "cycle = push_dist/push_speed + push_dist/return_speed + fixed; cycles_per_hour = working_min / cycle; production = blade_cap x cycles_per_hour.",
+    edition: "Caterpillar Performance Handbook slot-dozing cycle-time production-estimating method by name; SAE J1265 blade rating; first-principles cycle arithmetic.",
+    freeAccess: "The slot-dozing cycle-time production method is published earthmoving practice.",
+    governance: GOVERNANCE.general,
+    editionNote: "The SAE J1265 blade capacity is manufacturer-rated. Grade helps or hurts: a downhill push boosts the blade load, an uphill push cuts it. Push distance governs - production falls off fast as the push lengthens. The 50-minute hour is a planning default, not a guarantee. Convert the loose yards back to bank quantity with soil-swell-shrink.",
+    assumptions: [
+      { name: "Fixed time", value: "0.05 min gear-shift / maneuver per cycle (default)", source: "earthmoving practice" },
+      { name: "Working minutes", value: "50-minute hour (efficiency factor for real-world delays)", source: "Caterpillar Performance Handbook" },
+    ],
+  },
   "dewatering-rate": {
     formula: "drawdown_gal = pit_len x pit_wid x drawdown x 7.48052; pump_gpm = drawdown_gal / drawdown_min + inflow; sized_gpm = pump_gpm x (1 + safety/100).",
     edition: "First-principles volume and pumping-rate arithmetic by name; defers total dynamic head to the pump-tdh tile.",
