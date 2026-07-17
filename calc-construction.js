@@ -1471,6 +1471,38 @@ export function computeAsphaltTonnage({ area_ft2 = 0, depth_in = 0, density_pcf 
 
 export const asphaltTonnageExample = { inputs: { area_ft2: 5000, depth_in: 3, density_pcf: 145 } };
 
+// --- asphalt-paving-speed: Asphalt Paver Speed and Production Rate (spec-v811) ---
+//
+// tons/hr = speed x eff_min x width x (depth/12) x density / 2000;
+// lane_ft/hr = speed x eff_min; daily = hourly x hours.
+// dims: in { speed_fpm: L T^-1, width_ft: L, depth_in: L, density_pcf: M L^-3, eff_min_per_hr: T, hours_per_day: T } out: { tons_per_hour: M T^-1, lane_ft_per_hour: L T^-1, daily_tons: M, daily_lane_ft: L }
+// (Paver speed is L T^-1; width and depth L; compacted density M L^-3; the
+//  working-minutes and day-hours T; both hourly figures are rates and the daily
+//  figures a mass M and a length L, with the "per hour" implicit.)
+export function computeAsphaltPavingSpeed({ speed_fpm = 0, width_ft = 0, depth_in = 0, density_pcf = 145, eff_min_per_hr = 50, hours_per_day = 8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(speed_fpm > 0)) return { error: "Paver speed must be positive (ft/min)." };
+  if (!(width_ft > 0)) return { error: "Mat width must be positive (ft)." };
+  if (!(depth_in > 0)) return { error: "Mat depth must be positive (in)." };
+  if (!(density_pcf > 0)) return { error: "Density must be positive (pcf)." };
+  if (!(eff_min_per_hr > 0)) return { error: "Working minutes per hour must be positive." };
+  if (!(hours_per_day > 0)) return { error: "Hours per day must be positive." };
+  const lane_ft_per_hour = speed_fpm * eff_min_per_hr;
+  const tons_per_hour = lane_ft_per_hour * width_ft * (depth_in / 12) * density_pcf / 2000;
+  const daily_tons = tons_per_hour * hours_per_day;
+  const daily_lane_ft = lane_ft_per_hour * hours_per_day;
+  if (![lane_ft_per_hour, tons_per_hour, daily_tons, daily_lane_ft].every(Number.isFinite)) return { error: "Production math is not a finite value." };
+  return {
+    tons_per_hour,
+    lane_ft_per_hour,
+    daily_tons,
+    daily_lane_ft,
+    note: "The compacted HMA density (typically ~145 pcf for a dense-graded mix) and the laydown temperature govern the real tonnage. The 50-minute hour is a planning default, not a guarantee. To keep the paver moving without starving the hopper or stacking trucks, match the forward speed to the plant delivery: required speed = delivery rate / tons per lane-foot / working minutes.",
+  };
+}
+
+export const asphaltPavingSpeedExample = { inputs: { speed_fpm: 20, width_ft: 12, depth_in: 2, density_pcf: 145, eff_min_per_hr: 50, hours_per_day: 8 } };
+
 // --- Utility 150: Aggregate / Gravel Cubic Yards ---
 
 export const AGGREGATE_DENSITIES_PCF = {
@@ -1865,6 +1897,27 @@ const renderAsphaltTonnage = _simpleRenderer({
   compute: computeAsphaltTonnage,
 });
 
+const renderAsphaltPavingSpeed = _simpleRenderer({
+  citation: "Citation: paving production identity by name. tons/hr = speed x working-minutes x width x depth x compacted density over the ton (2000 lb); lane-ft/hr = speed x working-minutes.",
+  example: asphaltPavingSpeedExample.inputs,
+  fields: [
+    { key: "speed_fpm", label: "Paver forward speed (ft/min)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "width_ft", label: "Mat / screed width (ft)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "depth_in", label: "Compacted mat thickness (in)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "density_pcf", label: "Compacted HMA density (pcf)", kind: "number", default: 145 },
+    { key: "eff_min_per_hr", label: "Working minutes per hour", kind: "number", default: 50 },
+    { key: "hours_per_day", label: "Productive hours per day", kind: "number", default: 8 },
+  ],
+  outputs: [
+    { key: "tph", id: "aps-out-tph", label: "Production", value: (r) => _fmtC(r.tons_per_hour, 1) + " tons/hr" },
+    { key: "lph", id: "aps-out-lph", label: "Lane feet per hour", value: (r) => _fmtC(r.lane_ft_per_hour, 0) + " lane-ft/hr" },
+    { key: "dt", id: "aps-out-dt", label: "Daily tonnage", value: (r) => _fmtC(r.daily_tons, 0) + " tons/day" },
+    { key: "dl", id: "aps-out-dl", label: "Daily lane feet", value: (r) => _fmtC(r.daily_lane_ft, 0) + " lane-ft/day" },
+    { key: "n", id: "aps-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAsphaltPavingSpeed,
+});
+
 const renderAggregate = _simpleRenderer({
   citation: "Citation: Cubic yards from area * depth / 27; tons from volume * pcf / 2000. Densities from public engineering tables.",
   example: aggregateExample.inputs,
@@ -2045,6 +2098,7 @@ export const CONSTRUCTION_RENDERERS = {
   "drywall": renderDrywall,
   "roofing-squares": renderRoofingSquares,
   "asphalt-tonnage": renderAsphaltTonnage,
+  "asphalt-paving-speed": renderAsphaltPavingSpeed,
   "aggregate": renderAggregate,
   "mortar-mix": renderMortarMix,
   "concrete-mix-design": renderConcreteMixDesign,

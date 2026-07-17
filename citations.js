@@ -4513,6 +4513,17 @@ export const CITATIONS = {
       { name: "Default HMA density", value: "145 pcf unless user supplies mix-specific value", source: "NAPA typical" },
     ],
   },
+  "asphalt-paving-speed": {
+    formula: "tons_per_hour = speed x working_min x width x (depth/12) x density / 2000; lane_ft_per_hour = speed x working_min; daily = hourly x hours.",
+    edition: "Paving production identity by name (production = laydown area rate x compacted density); NAPA laydown-rate practice.",
+    freeAccess: "The paving production identity is published earthmoving / paving practice; NAPA guides free at asphaltpavement.org.",
+    governance: GOVERNANCE.general,
+    editionNote: "The compacted HMA density (typically ~145 pcf for a dense-graded mix) and the laydown temperature govern the real tonnage. The 50-minute hour is a planning default, not a guarantee. Match the forward speed to the plant delivery rate divided by the tons per lane-foot to keep the paver moving.",
+    assumptions: [
+      { name: "Default HMA density", value: "145 pcf unless the user supplies a mix-specific value", source: "NAPA typical" },
+      { name: "Working minutes", value: "50-minute hour (efficiency factor for real-world delays)", source: "paving practice" },
+    ],
+  },
   "aggregate": {
     formula: "Volume = L × W × D (cubic yards via /27); tonnage = volume × density. Density per material (3/4" + "″" + " gravel ~ 2700 lb/yd³, sand ~ 2700, river rock ~ 2900).",
     edition: "USGS / NSSGA aggregate density references by name.",

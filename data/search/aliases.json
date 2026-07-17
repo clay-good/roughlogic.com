@@ -39997,6 +39997,31 @@
       "kind": "question"
     },
     {
+      "term": "asphalt paving speed",
+      "target": "asphalt-paving-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "paver production rate",
+      "target": "asphalt-paving-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "tons per hour paving",
+      "target": "asphalt-paving-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "lane feet per hour paver",
+      "target": "asphalt-paving-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "hma laydown rate",
+      "target": "asphalt-paving-speed",
+      "kind": "industry"
+    },
+    {
       "term": "how much blacktop do i need",
       "target": "asphalt-tonnage",
       "kind": "question"

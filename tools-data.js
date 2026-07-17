@@ -258,6 +258,7 @@ export const TOOLS = [
   { id: "drywall", name: "Drywall Sheet Count and Mud", group: "E", trades: ["carpentry"], desc: "Sheets, mud gallons, tape lf, and screws from wall and ceiling area." },
   { id: "roofing-squares", name: "Roofing Squares and Bundles", group: "E", trades: ["carpentry"], desc: "Squares, bundles per shingle product, underlayment rolls, drip edge." },
   { id: "asphalt-tonnage", name: "Asphalt Tonnage", group: "E", trades: ["carpentry"], desc: "Tons of mix and truck loads at typical 20 tons per haul." },
+  { id: "asphalt-paving-speed", name: "Asphalt Paver Speed and Production Rate", group: "E", trades: ["construction", "carpentry"], desc: "Tons per hour and lane-feet per hour a paver lays at a given screed width, depth, and forward speed, with the daily output - the production the asphalt-tonnage takeoff assumes and that sizes the plant delivery and truck rotation." },
   { id: "aggregate", name: "Aggregate / Gravel Cubic Yards", group: "E", trades: ["carpentry"], desc: "Cubic yards and tons from area, depth, and material density." },
   { id: "mortar-mix", name: "Mortar Mix and Yield", group: "E", trades: ["carpentry"], desc: "Bags of mortar mix from brick / CMU count and joint thickness." },
   { id: "concrete-mix-design", name: "Concrete Mix Design (Simplified)", group: "E", trades: ["carpentry"], desc: "Water-to-cement ratio interpolated from ACI 211-style curves; cement, coarse, fine aggregate per cubic yard." },

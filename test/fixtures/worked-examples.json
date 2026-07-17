@@ -2798,6 +2798,80 @@
    }
   },
   {
+   "tile_id": "asphalt-paving-speed",
+   "source_publisher": "Paving production identity (first-principles)",
+   "source_title": "12 ft screed, 2 in mat, 145 pcf, 20 ft/min, 50-min hour, 8 hr day",
+   "source_edition_or_year": "NAPA laydown-rate practice",
+   "source_section_or_page": "tons/hr = 20 * 50 * 12 * (2/12) * 145 / 2000 = 145; lane-ft/hr = 20 * 50 = 1000; daily 1,160 tons over 8,000 lane-ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "speed_fpm": 20,
+    "width_ft": 12,
+    "depth_in": 2,
+    "density_pcf": 145,
+    "eff_min_per_hr": 50,
+    "hours_per_day": 8
+   },
+   "outputs": {
+    "tons_per_hour": {
+     "value": 145,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "lane_ft_per_hour": {
+     "value": 1000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "daily_tons": {
+     "value": 1160,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "daily_lane_ft": {
+     "value": 8000,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "asphalt-paving-speed",
+   "source_publisher": "Paving production identity (first-principles)",
+   "source_title": "doubling the mat depth to 4 in doubles the tonnage rate",
+   "source_edition_or_year": "NAPA laydown-rate practice",
+   "source_section_or_page": "12 ft screed, 4 in mat, 145 pcf, 20 ft/min, 50-min hour -> 290 tons/hr, lane-ft/hr unchanged at 1000",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "speed_fpm": 20,
+    "width_ft": 12,
+    "depth_in": 4,
+    "density_pcf": 145,
+    "eff_min_per_hr": 50,
+    "hours_per_day": 8
+   },
+   "outputs": {
+    "tons_per_hour": {
+     "value": 290,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "lane_ft_per_hour": {
+     "value": 1000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "prop-slip",
    "source_publisher": "Project (first-principles)",
    "source_title": "4500 RPM, 1.85 gear, 19 in pitch, 35 kt GPS",

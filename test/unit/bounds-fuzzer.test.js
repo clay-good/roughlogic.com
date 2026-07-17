@@ -612,6 +612,7 @@ import {
   computeAnchorEmbedment,
   computeArea,
   computeAsphaltTonnage,
+  computeAsphaltPavingSpeed,
   computeBeamLoading,
   computeBendAllowance,
   computeBoardFootage,
@@ -8666,6 +8667,26 @@ test("bounds: calc-construction computeAsphaltTonnage pins tons = (area*depth_ft
   assert.ok("error" in computeAsphaltTonnage({ area_ft2: 0, depth_in: 3 }));
   assert.ok("error" in computeAsphaltTonnage({ area_ft2: 100, depth_in: 0 }));
   assert.ok("error" in computeAsphaltTonnage({ area_ft2: 100, depth_in: 3, density_pcf: 0 }));
+});
+
+test("bounds: calc-construction computeAsphaltPavingSpeed pins tons/hr, lane-ft/hr, and daily rollups (spec-v811)", () => {
+  // 20 ft/min, 12 ft, 2 in, 145 pcf, 50-min hour, 8 hr -> 145 tons/hr, 1000 lane-ft/hr, 1160 tons, 8000 lane-ft
+  const r = computeAsphaltPavingSpeed({ speed_fpm: 20, width_ft: 12, depth_in: 2, density_pcf: 145, eff_min_per_hr: 50, hours_per_day: 8 });
+  assert.ok(Math.abs(r.tons_per_hour - 145) < 1e-9);
+  assert.ok(Math.abs(r.lane_ft_per_hour - 1000) < 1e-9);
+  assert.ok(Math.abs(r.daily_tons - 1160) < 1e-9);
+  assert.ok(Math.abs(r.daily_lane_ft - 8000) < 1e-9);
+  // Doubling depth doubles the tonnage rate; lane-ft rate unchanged.
+  const d = computeAsphaltPavingSpeed({ speed_fpm: 20, width_ft: 12, depth_in: 4, density_pcf: 145, eff_min_per_hr: 50, hours_per_day: 8 });
+  assert.ok(Math.abs(d.tons_per_hour - 290) < 1e-9);
+  assert.ok(Math.abs(d.lane_ft_per_hour - 1000) < 1e-9);
+  // Rejections.
+  assert.ok("error" in computeAsphaltPavingSpeed({ speed_fpm: 0, width_ft: 12, depth_in: 2 }));
+  assert.ok("error" in computeAsphaltPavingSpeed({ speed_fpm: 20, width_ft: 0, depth_in: 2 }));
+  assert.ok("error" in computeAsphaltPavingSpeed({ speed_fpm: 20, width_ft: 12, depth_in: 0 }));
+  assert.ok("error" in computeAsphaltPavingSpeed({ speed_fpm: 20, width_ft: 12, depth_in: 2, density_pcf: 0 }));
+  assert.ok("error" in computeAsphaltPavingSpeed({ speed_fpm: 20, width_ft: 12, depth_in: 2, eff_min_per_hr: 0 }));
+  assert.ok("error" in computeAsphaltPavingSpeed({ speed_fpm: 20, width_ft: 12, depth_in: 2, hours_per_day: 0 }));
 });
 
 test("bounds: calc-construction computeAggregate pins cubic_yards = area*depth_ft/27 and tons = volume*pcf/2000", () => {

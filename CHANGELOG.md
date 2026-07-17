@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): asphalt-paving-speed -- paver speed and production rate (spec-v811); 2026-07-16
+
+- New Group E tile `asphalt-paving-speed` (calc-construction.js), the production-rate companion to the `asphalt-tonnage`
+  takeoff. Paving production identity: tons/hr = speed x working-minutes x width x (depth/12) x density / 2000;
+  lane-ft/hr = speed x working-minutes. A 12 ft screed laying a 2 in mat at 20 ft/min (145 pcf, 50-minute hour) makes
+  145 tons/hr and 1,000 lane-ft/hr, so an 8-hour day places ~1,160 tons over 8,000 lane-ft -- the figure that sizes the
+  plant delivery and truck rotation. Home count 1,259 -> 1,260.
+
 ### feat(earthwork): dozer-production -- dozer slot / blade production rate (spec-v810); 2026-07-16
 
 - New Group E tile `dozer-production` (calc-earthwork.js), the push-distance-driven counterpart to `loader-production`.

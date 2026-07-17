@@ -1,6 +1,7 @@
 # roughlogic.com Specification v811 -- Asphalt Paver Speed and Production Rate (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-16 (package 0.398.0).** Executed against the live catalog (1,259 -> 1,260 tiles), via the
+> `_simpleRenderer` factory beside `asphalt-tonnage` in calc-construction.js. Single-tile spec.
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-construction.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v810.md. Construction-equipment production sweep
 > (entry 3), beside the existing `asphalt-tonnage` takeoff tile.
