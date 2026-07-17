@@ -8464,6 +8464,17 @@ export const CITATIONS = {
       { name: "End distance", value: "a bolt within 12 in of each end and corner; minimum two bolts per plate", source: "IRC R403.1.6" },
     ],
   },
+  "metal-stud-takeoff": {
+    formula: "studs = ceil(wall_length_ft / (spacing_in/12)) + 1 + openings x extra_per_opening; track_lf = 2 x wall_length_ft.",
+    edition: "Steel stud/track takeoff identity by name (field studs from wall over spacing, plus one and the opening allowance; track twice the wall); first-principles count arithmetic.",
+    freeAccess: "The takeoff is public quantity arithmetic; the spacing and opening details come from the plans.",
+    governance: GOVERNANCE.general,
+    editionNote: "Light-gauge steel framing. Extra studs go at openings (jack, king, cripple), corners, and wall intersections - entered as the opening allowance. The track is the top and bottom runners (twice the wall length). Distinct from the wood residential-framing.",
+    assumptions: [
+      { name: "Spacing", value: "16 or 24 in on center per the plans; the spacing sets the field-stud count", source: "plans" },
+      { name: "Opening allowance", value: "extra studs per opening for jack/king/cripple plus corners and intersections (~2 each)", source: "framing practice" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

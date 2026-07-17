@@ -8613,3 +8613,45 @@ const _v867renderSillPlateAnchorCount = _simpleRenderer({
   compute: computeSillPlateAnchorCount,
 });
 CONSTRUCTION_RENDERERS["sill-plate-anchor-count"] = _v867renderSillPlateAnchorCount;
+
+// --- metal-stud-takeoff: Light-Gauge Steel Stud and Track Takeoff ---
+//
+// Takes off light-gauge steel studs and track for a partition:
+//   studs = ceil(wall_length_ft / (spacing_in/12)) + 1 + openings x extra_per_opening
+//   track_lf = 2 x wall_length_ft
+// dims: in { wall_length_ft: L, spacing_in: L, openings: dimensionless, extra_per_opening: dimensionless } out: { studs: dimensionless, track_lf: L }
+export function computeMetalStudTakeoff({ wall_length_ft = 50, spacing_in = 16, openings = 2, extra_per_opening = 2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(wall_length_ft > 0)) return { error: "Wall length must be positive (ft)." };
+  if (!(spacing_in > 0)) return { error: "Stud spacing must be positive (in)." };
+  if (openings < 0) return { error: "Opening count cannot be negative." };
+  if (extra_per_opening < 0) return { error: "Extra studs per opening cannot be negative." };
+  const studs = Math.ceil(wall_length_ft / (spacing_in / 12)) + 1 + openings * extra_per_opening;
+  const track_lf = 2 * wall_length_ft;
+  if (![studs, track_lf].every(Number.isFinite)) return { error: "Metal-stud math is not a finite value." };
+  return {
+    studs,
+    track_lf,
+    note: "Light-gauge steel framing. Extra studs go at openings (jack, king, cripple), corners, and wall intersections - entered as the opening allowance. The track is the top and bottom runners (twice the wall length). Distinct from the wood residential-framing; the plans set the spacing.",
+  };
+}
+
+export const metalStudTakeoffExample = { inputs: { wall_length_ft: 50, spacing_in: 16, openings: 2, extra_per_opening: 2 } };
+
+const _v868renderMetalStudTakeoff = _simpleRenderer({
+  citation: "Citation: stud/track takeoff identity by name. studs = ceil(wall / spacing) + 1 + openings x extra; track = 2 x wall (top and bottom runners). Extra studs go at openings, corners, and intersections; the plans set the spacing.",
+  example: metalStudTakeoffExample.inputs,
+  fields: [
+    { key: "wall_length_ft", label: "Partition length (ft)", kind: "number", default: 50 },
+    { key: "spacing_in", label: "Stud spacing (in)", kind: "number", default: 16 },
+    { key: "openings", label: "Door / window openings (count)", kind: "number", default: 2 },
+    { key: "extra_per_opening", label: "Extra studs per opening", kind: "number", default: 2 },
+  ],
+  outputs: [
+    { key: "s", id: "mst-out-s", label: "Steel studs", value: (r) => _fmtC(r.studs, 0) + " studs" },
+    { key: "t", id: "mst-out-t", label: "Track (top + bottom runners)", value: (r) => _fmtC(r.track_lf, 0) + " LF" },
+    { key: "note", id: "mst-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMetalStudTakeoff,
+});
+CONSTRUCTION_RENDERERS["metal-stud-takeoff"] = _v868renderMetalStudTakeoff;

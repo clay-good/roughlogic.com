@@ -17138,6 +17138,7 @@ import { computeTaperedRoofInsulation as _v864tri } from "../../calc-constructio
 import { computeSheathingTakeoff as _v865sht } from "../../calc-construction.js";
 import { computeConstructionAdhesiveTubes as _v866cat } from "../../calc-construction.js";
 import { computeSillPlateAnchorCount as _v867spa } from "../../calc-construction.js";
+import { computeMetalStudTakeoff as _v868mst } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17961,6 +17962,20 @@ test("bounds: spec-v867 computeSillPlateAnchorCount pins the effective length, b
   assert.ok("error" in _v867spa({ wall_length_ft: 40, max_spacing_ft: 6, end_distance_in: -1 }));
   // End distances exceeding the wall length (no span).
   assert.ok("error" in _v867spa({ wall_length_ft: 1, max_spacing_ft: 6, end_distance_in: 9 }));
+});
+
+test("bounds: spec-v868 computeMetalStudTakeoff pins the stud count, track length, and error seams", () => {
+  // 50 ft, 16 in oc, 2 openings, 2 extra -> 43 studs, 100 LF track.
+  const r = _v868mst({ wall_length_ft: 50, spacing_in: 16, openings: 2, extra_per_opening: 2 });
+  assert.strictEqual(r.studs, 43);
+  assert.strictEqual(r.track_lf, 100);
+  // 24 in on center drops the field studs.
+  assert.strictEqual(_v868mst({ wall_length_ft: 50, spacing_in: 24, openings: 2, extra_per_opening: 2 }).studs, 30);
+  // Error seams.
+  assert.ok("error" in _v868mst({ wall_length_ft: 0, spacing_in: 16, openings: 2, extra_per_opening: 2 }));
+  assert.ok("error" in _v868mst({ wall_length_ft: 50, spacing_in: 0, openings: 2, extra_per_opening: 2 }));
+  assert.ok("error" in _v868mst({ wall_length_ft: 50, spacing_in: 16, openings: -1, extra_per_opening: 2 }));
+  assert.ok("error" in _v868mst({ wall_length_ft: 50, spacing_in: 16, openings: 2, extra_per_opening: -1 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

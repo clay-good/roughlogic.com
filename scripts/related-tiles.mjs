@@ -1035,6 +1035,7 @@ const RELATED = {
   "sheathing-takeoff": ["plywood-span", "residential-framing", "material-quantity"],
   "construction-adhesive-tubes": ["sheathing-takeoff", "residential-framing", "material-quantity"],
   "sill-plate-anchor-count": ["deck-ledger-fasteners", "anchor-embedment", "wall-bracing-length"],
+  "metal-stud-takeoff": ["drywall", "residential-framing", "sheathing-takeoff"],
   "refrigerant-lineset-charge-adjust": ["refrigerant-charge", "refrigerant-line-size", "refrigerant-velocity"],
   "asphalt-spread-rate": ["asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity"],
   "pavement-milling-production": ["asphalt-paving-speed", "asphalt-spread-rate", "haul-cycle-production"],

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): metal-stud-takeoff -- light-gauge steel stud and track takeoff (spec-v868); 2026-07-17
+
+- New Group E tile `metal-stud-takeoff` (calc-construction.js), the steel-framing takeoff beside `drywall` and the wood
+  `residential-framing`. studs = ceil(wall / spacing) + 1 + openings x extra; track = 2 x wall (top and bottom runners).
+  A 50 ft partition at 16 in on center with two door openings is 43 studs and 100 LF of track; at 24 in on center the
+  field studs drop and it is 30 studs on the same 100 LF -- the spacing sets the field count, the openings add on top.
+  Extra studs go at openings, corners, and intersections. Home count 1,316 -> 1,317.
+
 ### feat(construction): sill-plate-anchor-count -- sill-plate anchor bolt count per IRC R403.1.6 (spec-v867); 2026-07-17
 
 - New Group E tile `sill-plate-anchor-count` (calc-construction.js), the framing layout tile beside

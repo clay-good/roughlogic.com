@@ -17752,6 +17752,31 @@
       "kind": "industry"
     },
     {
+      "term": "metal stud takeoff",
+      "target": "metal-stud-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "steel stud count",
+      "target": "metal-stud-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "light gauge framing",
+      "target": "metal-stud-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "stud and track takeoff",
+      "target": "metal-stud-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "partition stud count",
+      "target": "metal-stud-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

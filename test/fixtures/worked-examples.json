@@ -51353,6 +51353,58 @@
    }
   },
   {
+   "tile_id": "metal-stud-takeoff",
+   "source_publisher": "Steel stud/track takeoff identity (first-principles)",
+   "source_title": "50 ft partition, 16 in on center, 2 openings, 2 extra each",
+   "source_edition_or_year": "spec-v868 worked example",
+   "source_section_or_page": "studs = ceil(50/(16/12)) + 1 + 2*2 = 38 + 1 + 4 = 43; track = 2*50 = 100 LF",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "wall_length_ft": 50,
+    "spacing_in": 16,
+    "openings": 2,
+    "extra_per_opening": 2
+   },
+   "outputs": {
+    "studs": {
+     "value": 43,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "track_lf": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "metal-stud-takeoff",
+   "source_publisher": "Steel stud/track takeoff identity (first-principles)",
+   "source_title": "cross-check: 24 in on center drops the field studs",
+   "source_edition_or_year": "spec-v868 worked example",
+   "source_section_or_page": "studs = ceil(50/2) + 1 + 4 = 30 on the same 100 LF of track",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "wall_length_ft": 50,
+    "spacing_in": 24,
+    "openings": 2,
+    "extra_per_opening": 2
+   },
+   "outputs": {
+    "studs": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",
