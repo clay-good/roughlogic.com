@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): metal-deck-takeoff -- steel roof / floor deck sheet takeoff (spec-v877); 2026-07-17
+
+- New Group E tile `metal-deck-takeoff` (calc-construction.js), the steel-erection takeoff beside `metal-roof-panels`
+  and `metal-weight`. cover area = cover width x sheet length; sheets = ceil(area x (1 + waste) / cover area); side lap
+  = area / cover width. 10,000 sf on a 36 in cover, 30 ft-long deck at 5% waste is 117 sheets and about 3,333 LF of side
+  lap; a narrower 24 in cover deck is 175 sheets and 5,000 LF -- more sheets and more button-punch/weld fastening. The
+  cover width is the net coverage; the SDI and drawings set the fastening. Home count 1,325 -> 1,326.
+
 ### feat(construction): spray-foam-board-feet -- spray foam board-feet and set count (spec-v876); 2026-07-17
 
 - New Group E tile `spray-foam-board-feet` (calc-construction.js), the insulation takeoff beside

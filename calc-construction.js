@@ -9020,3 +9020,48 @@ const _v876renderSprayFoamBoardFeet = _simpleRenderer({
   compute: computeSprayFoamBoardFeet,
 });
 CONSTRUCTION_RENDERERS["spray-foam-board-feet"] = _v876renderSprayFoamBoardFeet;
+
+// --- metal-deck-takeoff: Steel Roof / Floor Deck Sheet Takeoff ---
+//
+// Takes off structural steel deck - the sheets by net cover, and the side-lap run
+// that sizes the fastening:
+//   cover_sf = (cover_width_in/12) x sheet_length_ft
+//   sheets = ceil(area_sf x (1 + waste_pct/100) / cover_sf); sidelap_lf = area_sf / (cover_width_in/12)
+// dims: in { area_sf: L^2, cover_width_in: L, sheet_length_ft: L, waste_pct: dimensionless } out: { cover_sf: L^2, sheets: dimensionless, sidelap_lf: L }
+export function computeMetalDeckTakeoff({ area_sf = 10000, cover_width_in = 36, sheet_length_ft = 30, waste_pct = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Deck area must be positive (ft^2)." };
+  if (!(cover_width_in > 0)) return { error: "Cover width must be positive (in)." };
+  if (!(sheet_length_ft > 0)) return { error: "Sheet length must be positive (ft)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const cover_sf = (cover_width_in / 12) * sheet_length_ft;
+  const sheets = Math.ceil((area_sf * (1 + waste_pct / 100)) / cover_sf);
+  const sidelap_lf = area_sf / (cover_width_in / 12);
+  if (![cover_sf, sheets, sidelap_lf].every(Number.isFinite)) return { error: "Deck-takeoff math is not a finite value." };
+  return {
+    cover_sf,
+    sheets,
+    sidelap_lf,
+    note: "The cover width is the net coverage, not the overall sheet width. The side-lap and support fastening (button punch, screws, or welds with washers) follow the SDI and the drawings and are counted separately. Distinct from the exposed metal-roof-panels; a narrower sheet means more sheets and more fastening.",
+  };
+}
+
+export const metalDeckTakeoffExample = { inputs: { area_sf: 10000, cover_width_in: 36, sheet_length_ft: 30, waste_pct: 5 } };
+
+const _v877renderMetalDeckTakeoff = _simpleRenderer({
+  citation: "Citation: deck-takeoff identity by name. cover area = cover width x sheet length; sheets = ceil(area x (1 + waste) / cover area); side lap = area / cover width. The cover width is the net coverage; the fastening follows the SDI and the drawings.",
+  example: metalDeckTakeoffExample.inputs,
+  fields: [
+    { key: "area_sf", label: "Deck area (ft^2)", kind: "number", default: 10000 },
+    { key: "cover_width_in", label: "Net cover width (in)", kind: "number", default: 36 },
+    { key: "sheet_length_ft", label: "Sheet length (ft)", kind: "number", default: 30 },
+    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 5 },
+  ],
+  outputs: [
+    { key: "s", id: "mdt-out-s", label: "Deck sheets", value: (r) => _fmtC(r.sheets, 0) + " sheets" },
+    { key: "l", id: "mdt-out-l", label: "Side-lap run (fastening)", value: (r) => _fmtC(r.sidelap_lf, 0) + " LF" },
+    { key: "note", id: "mdt-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMetalDeckTakeoff,
+});
+CONSTRUCTION_RENDERERS["metal-deck-takeoff"] = _v877renderMetalDeckTakeoff;

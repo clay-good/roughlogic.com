@@ -17977,6 +17977,31 @@
       "kind": "industry"
     },
     {
+      "term": "metal deck takeoff",
+      "target": "metal-deck-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "steel deck sheets",
+      "target": "metal-deck-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "roof deck takeoff",
+      "target": "metal-deck-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "floor deck sheets",
+      "target": "metal-deck-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "metal decking quantity",
+      "target": "metal-deck-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

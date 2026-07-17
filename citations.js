@@ -8563,6 +8563,17 @@ export const CITATIONS = {
       { name: "Field factors", value: "temperature and substrate cut the yield below the rated value", source: "field conditions" },
     ],
   },
+  "metal-deck-takeoff": {
+    formula: "cover_sf = (cover_width_in/12) x sheet_length_ft; sheets = ceil(area_sf x (1 + waste_pct/100) / cover_sf); sidelap_lf = area_sf / (cover_width_in/12).",
+    edition: "Steel deck-takeoff identity by name (sheets from area over net cover coverage; side lap from area over cover width); first-principles takeoff arithmetic.",
+    freeAccess: "The deck takeoff is public quantity geometry; the fastening pattern comes from the SDI and the structural drawings.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cover width is the net coverage, not the overall sheet width. The side-lap and support fastening (button punch, screws, or welds with washers) follow the SDI and the drawings and are counted separately. Distinct from the exposed metal-roof-panels.",
+    assumptions: [
+      { name: "Cover width", value: "the net coverage per sheet (36 in typical), not the overall sheet width", source: "deck manufacturer" },
+      { name: "Fastening", value: "side-lap (button punch/screws) and support welds/screws follow the SDI and drawings, counted separately", source: "SDI / structural drawings" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

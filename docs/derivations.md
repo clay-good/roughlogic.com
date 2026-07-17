@@ -1621,6 +1621,7 @@ cross-check.
 | calc-construction.js | `computeMassConcreteTempRise` | `{ cementitious_lb_per_cy = 600, rise_f_per_100lb = 12, placing_temp_f = 70, d...` | _ | _ | _ |
 | calc-construction.js | `computeMaterialQuantity` | `{ assembly, area_ft2 }` | _ | _ | _ |
 | calc-construction.js | `computeMembraneRoofTakeoff` | `{ roof_area_sf = 8000, roll_width_ft = 10, roll_length_ft = 100, sidelap_in =...` | _ | _ | _ |
+| calc-construction.js | `computeMetalDeckTakeoff` | `{ area_sf = 10000, cover_width_in = 36, sheet_length_ft = 30, waste_pct = 5 }...` | _ | _ | _ |
 | calc-construction.js | `computeMetalRoofPanels` | `{ eave_width_ft = 0, panel_length_ft = 0, panel_net_in = 36, fasteners_per_sq...` | _ | _ | _ |
 | calc-construction.js | `computeMetalStudTakeoff` | `{ wall_length_ft = 50, spacing_in = 16, openings = 2, extra_per_opening = 2 }...` | _ | _ | _ |
 | calc-construction.js | `computeMetalWeight` | `{ shape, dia_in, id_in, side_in, width_in, height_in, thickness_in, wall_in, ...` | _ | _ | _ |
@@ -2986,7 +2987,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1572.
+Row count: 1573.
 
 <!-- END function-corpus-v14 -->
 
@@ -3542,7 +3543,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (326 tiles)
+### Group E Construction (327 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3691,6 +3692,7 @@ per spec-v14 §13.1 second paragraph.
 | `mass-concrete-temp-rise` | Mass Concrete Adiabatic Temperature Rise Screen (ACI 207) | ACI 207 adiabatic temperature-rise sc...; rise = 600*12/100 = 72 degF; peak = 70+72 = 142 degF; 72 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `material-quantity` | Material Quantity | Project (industry coverage rules); 1000 ft^2 / drywall 4x8 (32 ft^2 per sheet, 10% waste) ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `membrane-roof-takeoff` | Single-Ply Membrane Roof Rolls and Seam Length | Single-ply membrane takeoff identity ...; usable = 10 - 0.5 = 9.5 ft; rolls = ceil(8400/950) = 9; s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `metal-deck-takeoff` | Steel Roof / Floor Deck Sheet Takeoff | Steel deck-takeoff identity (first-pr...; cover = (36/12)*30 = 90 sf; sheets = ceil(10500/90) = 117... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `metal-roof-panels` | Metal Roof Panels, Linear Feet, and Fasteners | MCA / MRA install references + manufa...; spec-v216 section 2.1 pinned example (exposed-fastener ag... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `metal-stud-takeoff` | Light-Gauge Steel Stud and Track Takeoff | Steel stud/track takeoff identity (fi...; studs = ceil(50/(16/12)) + 1 + 2*2 = 38 + 1 + 4 = 43; tra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `metal-weight` | Metal Weight by Shape and Alloy | first-principles (volume x density); 1 in x 12 in x 120 in A36 plate -> area 12 in^2, 408.384 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4497,6 +4499,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1325. Fixture-covered or reference-cadence: 1325 / 1325.
+Tile count: 1326. Fixture-covered or reference-cadence: 1326 / 1326.
 
 <!-- END tile-index-v14 -->

@@ -17147,6 +17147,7 @@ import { computeSelfLevelerBags as _v873slb } from "../../calc-construction.js";
 import { computeCarpetTakeoff as _v874cpt } from "../../calc-construction.js";
 import { computeSfrmTakeoff as _v875sfr } from "../../calc-construction.js";
 import { computeSprayFoamBoardFeet as _v876sfb } from "../../calc-construction.js";
+import { computeMetalDeckTakeoff as _v877mdt } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -18116,6 +18117,23 @@ test("bounds: spec-v876 computeSprayFoamBoardFeet pins the board-feet, set count
   assert.ok("error" in _v876sfb({ area_sf: 2000, thickness_in: 0, yield_bd_ft_per_set: 4800, waste_pct: 10 }));
   assert.ok("error" in _v876sfb({ area_sf: 2000, thickness_in: 3, yield_bd_ft_per_set: 0, waste_pct: 10 }));
   assert.ok("error" in _v876sfb({ area_sf: 2000, thickness_in: 3, yield_bd_ft_per_set: 4800, waste_pct: -1 }));
+});
+
+test("bounds: spec-v877 computeMetalDeckTakeoff pins the cover area, sheet count, side-lap run, and error seams", () => {
+  // 10,000 sf, 36 in cover, 30 ft sheets, 5% waste -> 90 sf cover, 117 sheets, 3,333 LF.
+  const r = _v877mdt({ area_sf: 10000, cover_width_in: 36, sheet_length_ft: 30, waste_pct: 5 });
+  assert.ok(Math.abs(r.cover_sf - 90) < 1e-9);
+  assert.strictEqual(r.sheets, 117);
+  assert.ok(Math.abs(r.sidelap_lf - 3333.33) < 0.5);
+  // A narrower 24 in cover means more sheets and fastening.
+  const narrow = _v877mdt({ area_sf: 10000, cover_width_in: 24, sheet_length_ft: 30, waste_pct: 5 });
+  assert.strictEqual(narrow.sheets, 175);
+  assert.ok(Math.abs(narrow.sidelap_lf - 5000) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v877mdt({ area_sf: 0, cover_width_in: 36, sheet_length_ft: 30, waste_pct: 5 }));
+  assert.ok("error" in _v877mdt({ area_sf: 10000, cover_width_in: 0, sheet_length_ft: 30, waste_pct: 5 }));
+  assert.ok("error" in _v877mdt({ area_sf: 10000, cover_width_in: 36, sheet_length_ft: 0, waste_pct: 5 }));
+  assert.ok("error" in _v877mdt({ area_sf: 10000, cover_width_in: 36, sheet_length_ft: 30, waste_pct: -1 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {
