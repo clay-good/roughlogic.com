@@ -17143,6 +17143,7 @@ import { computeSuspendedCeilingGrid as _v869scg } from "../../calc-construction
 import { computeMasonryControlJointLayout as _v870mcj } from "../../calc-construction.js";
 import { computeDumpsterCount as _v871dmp } from "../../calc-construction.js";
 import { computeSealantJointYield as _v872sjy } from "../../calc-construction.js";
+import { computeSelfLevelerBags as _v873slb } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -18052,6 +18053,20 @@ test("bounds: spec-v872 computeSealantJointYield pins the cross-section, length 
   assert.ok("error" in _v872sjy({ joint_lf: 500, cartridge_in3: 0, joint_width_in: 0.375, joint_depth_in: 0.25 }));
   assert.ok("error" in _v872sjy({ joint_lf: 500, cartridge_in3: 20.5, joint_width_in: 0, joint_depth_in: 0.25 }));
   assert.ok("error" in _v872sjy({ joint_lf: 500, cartridge_in3: 20.5, joint_width_in: 0.375, joint_depth_in: 0 }));
+});
+
+test("bounds: spec-v873 computeSelfLevelerBags pins the neat and rounded bag counts and error seams", () => {
+  // 500 sf, 1/4 in, 6.25 sf-in, 5% waste -> 20 neat, 21 bags.
+  const r = _v873slb({ area_sf: 500, avg_thickness_in: 0.25, bag_yield_sf_in: 6.25, waste_pct: 5 });
+  assert.ok(Math.abs(r.neat_bags - 20) < 1e-9);
+  assert.strictEqual(r.bags, 21);
+  // A deeper 1/2 in average pour doubles it.
+  assert.strictEqual(_v873slb({ area_sf: 500, avg_thickness_in: 0.5, bag_yield_sf_in: 6.25, waste_pct: 5 }).bags, 42);
+  // Error seams.
+  assert.ok("error" in _v873slb({ area_sf: 0, avg_thickness_in: 0.25, bag_yield_sf_in: 6.25, waste_pct: 5 }));
+  assert.ok("error" in _v873slb({ area_sf: 500, avg_thickness_in: 0, bag_yield_sf_in: 6.25, waste_pct: 5 }));
+  assert.ok("error" in _v873slb({ area_sf: 500, avg_thickness_in: 0.25, bag_yield_sf_in: 0, waste_pct: 5 }));
+  assert.ok("error" in _v873slb({ area_sf: 500, avg_thickness_in: 0.25, bag_yield_sf_in: 6.25, waste_pct: -1 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

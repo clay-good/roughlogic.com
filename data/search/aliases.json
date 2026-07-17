@@ -17877,6 +17877,31 @@
       "kind": "industry"
     },
     {
+      "term": "self leveler bags",
+      "target": "self-leveler-bags",
+      "kind": "industry"
+    },
+    {
+      "term": "self leveling underlayment",
+      "target": "self-leveler-bags",
+      "kind": "industry"
+    },
+    {
+      "term": "slu bag count",
+      "target": "self-leveler-bags",
+      "kind": "industry"
+    },
+    {
+      "term": "floor leveler quantity",
+      "target": "self-leveler-bags",
+      "kind": "industry"
+    },
+    {
+      "term": "self leveling cement bags",
+      "target": "self-leveler-bags",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

@@ -8519,6 +8519,17 @@ export const CITATIONS = {
       { name: "Cartridge volume", value: "~20.5 in^3 for a 10.1 oz cartridge, ~40 in^3 for a 20 oz sausage", source: "sealant manufacturer" },
     ],
   },
+  "self-leveler-bags": {
+    formula: "neat_bags = area_sf x avg_thickness_in / bag_yield_sf_in; bags = ceil(neat_bags x (1 + waste_pct/100)).",
+    edition: "Self-leveler bag-count identity by name (volume of underlayment over the per-bag yield, plus waste); first-principles arithmetic.",
+    freeAccess: "The bag-count arithmetic is public quantity geometry; the bag yield comes from the product's coverage rating.",
+    governance: GOVERNANCE.general,
+    editionNote: "The bag yield is the product's coverage at a reference thickness (a bag that does 50 sf at 1/8 in yields 6.25 square-foot-inches). A self-leveler is poured so the thickness varies across the floor - use the average from a survey. Distinct from the troweled thinset-coverage.",
+    assumptions: [
+      { name: "Bag yield", value: "the product's coverage in square-foot-inches (~6.25 sf-in, i.e. 50 sf at 1/8 in)", source: "SLU manufacturer" },
+      { name: "Average thickness", value: "the average pour depth from a floor-flatness survey; deep spots raise it", source: "field survey" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

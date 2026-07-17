@@ -8844,3 +8844,46 @@ const _v872renderSealantJointYield = _simpleRenderer({
   compute: computeSealantJointYield,
 });
 CONSTRUCTION_RENDERERS["sealant-joint-yield"] = _v872renderSealantJointYield;
+
+// --- self-leveler-bags: Self-Leveling Underlayment Bag Count ---
+//
+// Counts self-leveling underlayment bags, where the yield depends on the average
+// pour thickness:
+//   neat_bags = area_sf x avg_thickness_in / bag_yield_sf_in
+//   bags = ceil(neat_bags x (1 + waste_pct/100))
+// dims: in { area_sf: L^2, avg_thickness_in: L, bag_yield_sf_in: L^3, waste_pct: dimensionless } out: { neat_bags: dimensionless, bags: dimensionless }
+export function computeSelfLevelerBags({ area_sf = 500, avg_thickness_in = 0.25, bag_yield_sf_in = 6.25, waste_pct = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
+  if (!(avg_thickness_in > 0)) return { error: "Average thickness must be positive (in)." };
+  if (!(bag_yield_sf_in > 0)) return { error: "Bag yield must be positive (sf-in)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const neat_bags = (area_sf * avg_thickness_in) / bag_yield_sf_in;
+  const bags = Math.ceil(neat_bags * (1 + waste_pct / 100));
+  if (![neat_bags, bags].every(Number.isFinite)) return { error: "Bag-count math is not a finite value." };
+  return {
+    neat_bags,
+    bags,
+    note: "The bag yield is the product's coverage at a reference thickness (a bag that does 50 sf at 1/8 in yields 6.25 square-foot-inches). A self-leveler is poured so the thickness varies across the floor - use the average from a survey. SLU sets fast, so stage all the bags before the pour. Distinct from the troweled thinset-coverage.",
+  };
+}
+
+export const selfLevelerBagsExample = { inputs: { area_sf: 500, avg_thickness_in: 0.25, bag_yield_sf_in: 6.25, waste_pct: 5 } };
+
+const _v873renderSelfLevelerBags = _simpleRenderer({
+  citation: "Citation: bag-count identity by name. neat bags = area x average thickness / bag yield (square-foot-inches); bags = ceil(neat x (1 + waste)). The bag yield is the product's coverage at a reference thickness; use the average pour thickness from a survey.",
+  example: selfLevelerBagsExample.inputs,
+  fields: [
+    { key: "area_sf", label: "Area to pour (ft^2)", kind: "number", default: 500 },
+    { key: "avg_thickness_in", label: "Average pour thickness (in)", kind: "number", default: 0.25 },
+    { key: "bag_yield_sf_in", label: "Bag yield (square-foot-inches)", kind: "number", default: 6.25 },
+    { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 5 },
+  ],
+  outputs: [
+    { key: "b", id: "slb-out-b", label: "Bags to order", value: (r) => _fmtC(r.bags, 0) + " bags" },
+    { key: "n", id: "slb-out-n", label: "Neat (no waste)", value: (r) => _fmtC(r.neat_bags, 1) + " bags" },
+    { key: "note", id: "slb-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSelfLevelerBags,
+});
+CONSTRUCTION_RENDERERS["self-leveler-bags"] = _v873renderSelfLevelerBags;

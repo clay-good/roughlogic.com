@@ -1659,6 +1659,7 @@ cross-check.
 | calc-construction.js | `computeSeismicPdeltaStability` | `{ px_kip = 0, delta_in = 0, ie = 1.0, vx_kip = 0, hsx_in = 0, cd = 0, beta = ...` | _ | _ | _ |
 | calc-construction.js | `computeSeismicStoryDrift` | `{ delta_xe_in = 0, cd = 0, ie = 1.0, hsx_in = 0, drift_ratio = 0.020 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSeismicVerticalDistribution` | `{ base_shear_kip = 0, period_s = 0, stories = [] } = {}` | _ | _ | _ |
+| calc-construction.js | `computeSelfLevelerBags` | `{ area_sf = 500, avg_thickness_in = 0.25, bag_yield_sf_in = 6.25, waste_pct =...` | _ | _ | _ |
 | calc-construction.js | `computeShaftDiameterForTorsion` | `{ T_lbin = 0, tau_allow_psi = 0, L_in = 0, G_psi = 11.5e6 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeShaftTorsion` | `{ T_lbin = 0, d_in = 0, di_in = 0, L_in = 0, G_psi = 11.5e6 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSheathingTakeoff` | `{ area_sf = 1600, waste_pct = 8, sheet_sf = 32, nails_per_sheet = 60 } = {}` | _ | _ | _ |
@@ -2982,7 +2983,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1568.
+Row count: 1569.
 
 <!-- END function-corpus-v14 -->
 
@@ -3538,7 +3539,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (322 tiles)
+### Group E Construction (323 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3761,6 +3762,7 @@ per spec-v14 §13.1 second paragraph.
 | `seismic-pdelta-stability` | Seismic P-Delta Stability Coefficient (ASCE 7-22 12.8.7) | ASCE 7-22 12.8.7; spec-v383 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seismic-story-drift` | Seismic Design Story Drift and Allowable Limit (ASCE 7-22 12.8.6 / 12.12) | ASCE 7-22 12.8.6 / 12.12; spec-v382 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seismic-vertical-distribution` | Vertical Distribution of Seismic Forces (ASCE 7 §12.8.3) | ASCE 7-22 §12.8.3 / §12.8.4 (Eqs. 12....; spec-v477 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `self-leveler-bags` | Self-Leveling Underlayment Bag Count | Self-leveler bag-count identity (firs...; neat = 500*0.25/6.25 = 20; bags = ceil(20*1.05) = 21 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `settlement-limit-load` | Allowable Load for a Settlement Limit (NC Clay) | Terzaghi primary consolidation solved...; spec-v648 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shaft-diameter-for-torsion` | Solid Shaft Diameter for an Allowable Torsion | mechanics of materials (solid shaft, ...; spec-v747 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shaft-torsion` | Shaft Torsional Shear Stress and Angle of Twist | mechanics of materials; spec-v359 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4489,6 +4491,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1321. Fixture-covered or reference-cadence: 1321 / 1321.
+Tile count: 1322. Fixture-covered or reference-cadence: 1322 / 1322.
 
 <!-- END tile-index-v14 -->

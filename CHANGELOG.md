@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): self-leveler-bags -- self-leveling underlayment bag count (spec-v873); 2026-07-17
+
+- New Group E tile `self-leveler-bags` (calc-construction.js), the flooring tile beside the troweled `thinset-coverage`.
+  neat bags = area x thickness / bag yield (square-foot-inches); bags = ceil(neat x (1 + waste)). 500 sf poured at 1/4
+  in average, on a 6.25 sf-in bag yield, is 20 bags neat -- 21 with waste; a deeper 1/2 in average pour doubles it to 42.
+  The average thickness drives the order, so a low floor with deep spots eats material. SLU sets fast, so all the bags
+  are staged before the pour. Home count 1,321 -> 1,322. This tile crossed the calc-construction.js gzip cap, raised
+  150000 -> 165000 (ledger in check-module-sizes.mjs).
+
 ### feat(construction): sealant-joint-yield -- caulk / sealant cartridge yield from joint size (spec-v872); 2026-07-17
 
 - New Group E tile `sealant-joint-yield` (calc-construction.js), the glazing/sealant tile sharing the bead-volume

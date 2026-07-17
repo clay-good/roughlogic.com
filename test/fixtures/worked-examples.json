@@ -51675,6 +51675,58 @@
    }
   },
   {
+   "tile_id": "self-leveler-bags",
+   "source_publisher": "Self-leveler bag-count identity (first-principles)",
+   "source_title": "500 sf, 1/4 in average, 6.25 sf-in bag yield, 5% waste",
+   "source_edition_or_year": "spec-v873 worked example",
+   "source_section_or_page": "neat = 500*0.25/6.25 = 20; bags = ceil(20*1.05) = 21",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "area_sf": 500,
+    "avg_thickness_in": 0.25,
+    "bag_yield_sf_in": 6.25,
+    "waste_pct": 5
+   },
+   "outputs": {
+    "neat_bags": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "bags": {
+     "value": 21,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "self-leveler-bags",
+   "source_publisher": "Self-leveler bag-count identity (first-principles)",
+   "source_title": "cross-check: a deeper 1/2 in average pour doubles the count",
+   "source_edition_or_year": "spec-v873 worked example",
+   "source_section_or_page": "neat = 500*0.5/6.25 = 40; bags = ceil(40*1.05) = 42",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "area_sf": 500,
+    "avg_thickness_in": 0.5,
+    "bag_yield_sf_in": 6.25,
+    "waste_pct": 5
+   },
+   "outputs": {
+    "bags": {
+     "value": 42,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",
