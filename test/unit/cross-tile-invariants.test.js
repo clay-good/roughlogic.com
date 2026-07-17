@@ -10849,7 +10849,7 @@ test("monotonicity: computeWaterHammerSurge surge_psi strictly proportional to v
     "expected error for run_length=0");
 });
 
-test("monotonicity: computeDuctLeakage leakage_cfm strictly decreasing in measured_cfm (leak = design - measured); leak_at_1inwc strictly decreasing in test_pressure_inwc (SMACNA sqrt(P) orifice model, leak_at_1inwc*sqrt(P) = leak constant); leak_per_100ft2 strictly decreasing in duct_surface_ft2; SMACNA example pin 1200/1140/600 -> leak 60, pct 5, per_100ft2 10; bad design / pressure / class -> error", () => {
+test("monotonicity: computeDuctLeakage leakage_cfm strictly decreasing in measured_cfm (leak = design - measured); leak_at_1inwc strictly decreasing in test_pressure_inwc (SMACNA P^0.65 flow exponent, leak_at_1inwc*P^0.65 = leak constant); leak_per_100ft2 strictly decreasing in duct_surface_ft2; SMACNA example pin 1200/1140/600 -> leak 60, pct 5, per_100ft2 10; bad design / pressure / class -> error", () => {
   // Group C. leakage_cfm = max(0, design - measured). Strictly decreasing in measured.
   let prev = Infinity;
   for (const measured_cfm of [1000, 1050, 1100, 1140, 1180]) {
@@ -10859,14 +10859,14 @@ test("monotonicity: computeDuctLeakage leakage_cfm strictly decreasing in measur
       `leakage at measured=${measured_cfm} = ${r.leakage_cfm} not less than prev=${prev}`);
     prev = r.leakage_cfm;
   }
-  // leak_at_1inwc = leak / sqrt(P). Strictly decreasing in test pressure; product is invariant.
+  // leak_at_1inwc = leak / P^0.65 (SMACNA flow exponent). Strictly decreasing in test pressure; product is invariant.
   let prevP = Infinity;
   for (const test_pressure_inwc of [1, 2, 4, 9, 16]) {
     const r = computeDuctLeakage({ design_cfm: 1200, measured_cfm: 1140, duct_surface_ft2: 600, test_pressure_inwc, design_class: 6 });
     assert.ok(r.leak_at_1inwc < prevP,
       `leak_at_1inwc at P=${test_pressure_inwc} = ${r.leak_at_1inwc} not less than prev=${prevP}`);
-    assert.ok(Math.abs(r.leak_at_1inwc * Math.sqrt(test_pressure_inwc) - 60) < 1e-9,
-      `sqrt(P) invariant broken at P=${test_pressure_inwc}: ${r.leak_at_1inwc * Math.sqrt(test_pressure_inwc)} != 60`);
+    assert.ok(Math.abs(r.leak_at_1inwc * Math.pow(test_pressure_inwc, 0.65) - 60) < 1e-9,
+      `P^0.65 invariant broken at P=${test_pressure_inwc}: ${r.leak_at_1inwc * Math.pow(test_pressure_inwc, 0.65)} != 60`);
     prevP = r.leak_at_1inwc;
   }
   // leak_per_100ft2 strictly decreasing in duct surface area (same leak spread over more area).

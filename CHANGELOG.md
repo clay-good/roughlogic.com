@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(hvac): duct-leakage normalized to 1 in WC with sqrt(P) instead of the SMACNA P^0.65 flow exponent; 2026-07-17
+
+- `duct-leakage` (calc-hvac.js) normalized a measured leak from the test pressure to the 1 in WC reference by dividing by
+  `sqrt(test_pressure_inwc)` (an orifice-flow exponent 0.5). The SMACNA leakage-class line the tile compares against is
+  `F = C_L x (dP)^0.65`, so the normalization must divide by `P^0.65`, not `P^0.5`. Using 0.5 overstated the normalized
+  leak (and could push the reported effective class / pass-fail across a boundary) at any test pressure above 1 in WC:
+  at 4 in WC the code divided by 2.0 where SMACNA gives 4^0.65 = 2.46, a ~23% overstatement. At the example's 1.0 in WC
+  the two agree, so the fixture and bounds-fuzzer pins (both at 1.0 in WC) were unchanged. Updated the exponent, the
+  comment, the runtime citation, and the citations.js formula/assumption. Caught by a first-principles SMACNA
+  re-derivation of calc-hvac.js.
+
 ### fix(fire): nfpa-1142-water-supply had the formula inverted (occupancy multiplied + phantom /5) and Type IV construction wrong; 2026-07-17
 
 - `nfpa-1142-water-supply` (calc-fire.js) computed `Q = (V x occupancy x construction) / 5`. NFPA 1142 §5 is

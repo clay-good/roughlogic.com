@@ -24,10 +24,10 @@ test("255 example yields finite outputs", () => {
   assert.ok(typeof r.pass === "boolean");
 });
 
-test("255 leak scales with sqrt(P) (orifice-flow regression)", () => {
-  // Same physical leak: 60 CFM lost at 1 in WC vs. 60 / sqrt(2) at 2 in WC normalize to same.
+test("255 leak scales with P^0.65 (SMACNA leakage-class flow exponent)", () => {
+  // Same normalized leak: 60 CFM at 1 in WC vs. 60 * 2^0.65 raw at 2 in WC both normalize to 60 at 1 in WC.
   const a = computeDuctLeakage({ design_cfm: 1200, measured_cfm: 1140, duct_surface_ft2: 600, test_pressure_inwc: 1.0, design_class: 6 });
-  const b = computeDuctLeakage({ design_cfm: 1200, measured_cfm: 1200 - 60 * Math.sqrt(2), duct_surface_ft2: 600, test_pressure_inwc: 2.0, design_class: 6 });
+  const b = computeDuctLeakage({ design_cfm: 1200, measured_cfm: 1200 - 60 * Math.pow(2, 0.65), duct_surface_ft2: 600, test_pressure_inwc: 2.0, design_class: 6 });
   assert.ok(close(a.leak_at_1inwc, b.leak_at_1inwc, 0.5));
 });
 

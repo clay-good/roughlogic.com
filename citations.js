@@ -1865,13 +1865,13 @@ export const CITATIONS = {
   // --- v8 Phase E.3 / E.4 / E.5 (utilities 255 through 257) ---
 
   "duct-leakage": {
-    formula: "leakage_cfm = design_cfm - measured_cfm. leak_at_1inwc = leakage_cfm / sqrt(test_pressure_inwc) (orifice-flow scaling). leak_per_100ft2 = leak_at_1inwc / duct_surface_ft2 × 100. Effective class = smallest SMACNA class (3, 6, 12, 24, 48) whose limit ≥ leak_per_100ft2.",
+    formula: "leakage_cfm = design_cfm - measured_cfm. leak_at_1inwc = leakage_cfm / (test_pressure_inwc)^0.65 (SMACNA leakage-class flow exponent). leak_per_100ft2 = leak_at_1inwc / duct_surface_ft2 × 100. Effective class = smallest SMACNA class (3, 6, 12, 24, 48) whose limit ≥ leak_per_100ft2.",
     edition: "SMACNA Duct Leakage Test Manual (3rd ed.) by name. " + ASHRAE_62_1.replace("ASHRAE 62.1", "ASHRAE 90.1-2022 §6.4.4.2") + " (referenced for the leakage-class system).",
     freeAccess: "SMACNA standards licensed; class-system overview free at smacna.org outreach. " + ASHRAE_FREE,
     governance: GOVERNANCE.mechanical,
     editionNote: "Single-edition (SMACNA Duct Leakage Test Manual 3rd ed.; class numbers stable across editions).",
     assumptions: [
-      { name: "Leakage scales with sqrt(P)", value: "orifice-flow model", source: "physical fact" },
+      { name: "Leakage scales with P^0.65", value: "SMACNA leakage-class flow exponent", source: "SMACNA Duct Leakage Test Manual" },
       { name: "Leakage classes", value: "3 / 6 / 12 / 24 / 48 cfm per 100 ft² at 1 in WC", source: "SMACNA Duct Leakage Test Manual" },
     ],
   },

@@ -2088,8 +2088,10 @@ export function computeDuctLeakage({
   if (!target) return { error: "Unknown SMACNA leakage class. Valid: 3, 6, 12, 24, 48." };
   const leakage_cfm = Math.max(0, design_cfm - measured_cfm);
   const leakage_pct = (leakage_cfm / design_cfm) * 100;
-  // Normalize to SMACNA reference at 1 in WC: leak scales with sqrt(P).
-  const leak_at_1inwc = leakage_cfm / Math.sqrt(test_pressure_inwc);
+  // Normalize to the SMACNA reference at 1 in WC. The SMACNA leakage-class
+  // line is F = C_L * (dP)^0.65, so back out the 1-in-WC-equivalent leak by
+  // dividing by P^0.65 (the SMACNA flow exponent, not the orifice 0.5).
+  const leak_at_1inwc = leakage_cfm / Math.pow(test_pressure_inwc, 0.65);
   const leak_per_100ft2 = (leak_at_1inwc / duct_surface_ft2) * 100;
   // Determine effective class (the smallest class number whose limit
   // exceeds the measured leak).
@@ -2113,7 +2115,7 @@ export const ductLeakageExample = {
 };
 
 function _v8h_renderDuctLeakage(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: SMACNA Duct Leakage Test Manual (3rd ed.) by name. ASHRAE 90.1-2022 §6.4.4.2 references the leakage-class system. Leakage scales with sqrt(P) per the orifice-flow model.";
+  citationEl.textContent = "Citation: SMACNA Duct Leakage Test Manual (3rd ed.) by name. ASHRAE 90.1-2022 §6.4.4.2 references the leakage-class system. Leakage scales with P^0.65 (the SMACNA leakage-class flow exponent).";
   _v7h_attachEx(inputRegion, () => fillExample(ductLeakageExample.inputs));
   const dc = _v7h_makeNumber("Design CFM", "dl-dc", { step: "any", min: "0" });
   const mc = _v7h_makeNumber("Measured CFM at registers", "dl-mc", { step: "any", min: "0" });
