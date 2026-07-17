@@ -9516,3 +9516,51 @@ const _v887renderJoistHangerCount = _simpleRenderer({
   compute: computeJoistHangerCount,
 });
 CONSTRUCTION_RENDERERS["joist-hanger-count"] = _v887renderJoistHangerCount;
+
+// --- drywall-fastener-takeoff: Drywall Screw Fastener Takeoff ---
+//
+// Screws from the framing spacing (studs a sheet crosses) and the field pattern (screws per stud).
+//   studs = floor(width x 12 / stud_spacing) + 1; screws_per_stud = floor(length x 12 / field_spacing) + 1
+//   total = sheets x studs x screws_per_stud
+// dims: in { sheets: dimensionless, sheet_length_ft: L, sheet_width_ft: L, stud_spacing_in: L, field_screw_spacing_in: L } out: { screws_per_sheet: dimensionless, total_screws: dimensionless }
+export function computeDrywallFastenerTakeoff({ sheets = 100, sheet_length_ft = 8, sheet_width_ft = 4, stud_spacing_in = 16, field_screw_spacing_in = 12 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(sheets > 0)) return { error: "Sheet count must be positive." };
+  if (!(sheet_length_ft > 0)) return { error: "Sheet length must be positive (ft)." };
+  if (!(sheet_width_ft > 0)) return { error: "Sheet width must be positive (ft)." };
+  if (!(stud_spacing_in > 0)) return { error: "Stud spacing must be positive (in)." };
+  if (!(field_screw_spacing_in > 0)) return { error: "Field screw spacing must be positive (in)." };
+  const studs_per_sheet = Math.floor(sheet_width_ft * 12 / stud_spacing_in) + 1;
+  const screws_per_stud = Math.floor(sheet_length_ft * 12 / field_screw_spacing_in) + 1;
+  const screws_per_sheet = studs_per_sheet * screws_per_stud;
+  const total_screws = sheets * screws_per_sheet;
+  if (![screws_per_sheet, total_screws].every(Number.isFinite)) return { error: "Fastener math is not a finite value." };
+  return {
+    studs_per_sheet,
+    screws_per_stud,
+    screws_per_sheet,
+    total_screws,
+    note: "The field spacing comes from the code and the assembly (about 12 in on walls, 12 in or tighter on ceilings and fire-rated assemblies -- entered here). This counts fasteners only; the sheets and mud are in the drywall tile. A collated auto-feed screw gun tallies by the strip of about 50.",
+  };
+}
+
+export const drywallFastenerTakeoffExample = { inputs: { sheets: 100, sheet_length_ft: 8, sheet_width_ft: 4, stud_spacing_in: 16, field_screw_spacing_in: 12 } };
+
+const _v888renderDrywallFastenerTakeoff = _simpleRenderer({
+  citation: "Citation: fastener identity by name. studs per sheet = floor(width x 12 / stud spacing) + 1; screws per stud = floor(length x 12 / field spacing) + 1; total = sheets x studs per sheet x screws per stud.",
+  example: drywallFastenerTakeoffExample.inputs,
+  fields: [
+    { key: "sheets", label: "Sheet count", kind: "number", default: 100 },
+    { key: "sheet_length_ft", label: "Sheet length (ft)", kind: "number", default: 8 },
+    { key: "sheet_width_ft", label: "Sheet width (ft)", kind: "number", default: 4 },
+    { key: "stud_spacing_in", label: "Framing spacing (in)", kind: "number", default: 16 },
+    { key: "field_screw_spacing_in", label: "Field screw spacing (in)", kind: "number", default: 12 },
+  ],
+  outputs: [
+    { key: "ps", id: "dft-out-ps", label: "Screws per sheet", value: (r) => _fmtC(r.screws_per_sheet, 0) + " (" + _fmtC(r.studs_per_sheet, 0) + " studs x " + _fmtC(r.screws_per_stud, 0) + ")" },
+    { key: "tot", id: "dft-out-tot", label: "Total screws", value: (r) => _fmtC(r.total_screws, 0) + " screws" },
+    { key: "note", id: "dft-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDrywallFastenerTakeoff,
+});
+CONSTRUCTION_RENDERERS["drywall-fastener-takeoff"] = _v888renderDrywallFastenerTakeoff;

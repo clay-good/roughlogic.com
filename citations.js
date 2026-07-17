@@ -8222,6 +8222,17 @@ export const CITATIONS = {
       { name: "Nails per hanger", value: "~10 filled holes with structural connector nails (default); the manufacturer's schedule governs", source: "connector manufacturer" },
     ],
   },
+  "drywall-fastener-takeoff": {
+    formula: "studs_per_sheet = floor(sheet_width_ft x 12 / stud_spacing_in) + 1; screws_per_stud = floor(sheet_length_ft x 12 / field_screw_spacing_in) + 1; total_screws = sheets x studs_per_sheet x screws_per_stud.",
+    edition: "Drywall fastener identity by name (studs a sheet crosses x screws per stud, over the sheet count); first-principles count arithmetic.",
+    freeAccess: "The fastener count is public first-principles; the field spacing comes from the code and the assembly.",
+    governance: GOVERNANCE.general,
+    editionNote: "The field spacing comes from the code and the assembly (about 12 in on walls, 12 in or tighter on ceilings and fire-rated assemblies -- entered here). This counts fasteners only; the sheets and mud are in the drywall tile. A collated auto-feed screw gun tallies by the strip of about 50.",
+    assumptions: [
+      { name: "Field spacing", value: "~12 in on walls, 12 in or tighter on ceilings / fire-rated (entered); the assembly governs", source: "IBC / GA-216" },
+      { name: "Scope", value: "fasteners only; sheets and mud are in the drywall tile", source: "takeoff convention" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

@@ -52545,6 +52545,66 @@
    }
   },
   {
+   "tile_id": "drywall-fastener-takeoff",
+   "source_publisher": "Drywall fastener identity (first-principles)",
+   "source_title": "100 sheets, 8 x 4 ft, 16 in framing, 12 in field -> 36 screws/sheet, 3,600 total",
+   "source_edition_or_year": "spec-v888 worked example",
+   "source_section_or_page": "studs=floor(48/16)+1=4; screws/stud=floor(96/12)+1=9; per sheet=36; total=100*36=3600",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "sheets": 100,
+    "sheet_length_ft": 8,
+    "sheet_width_ft": 4,
+    "stud_spacing_in": 16,
+    "field_screw_spacing_in": 12
+   },
+   "outputs": {
+    "screws_per_sheet": {
+     "value": 36,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_screws": {
+     "value": 3600,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drywall-fastener-takeoff",
+   "source_publisher": "Drywall fastener identity (first-principles)",
+   "source_title": "cross-check: a tighter 8 in field pattern runs it to 52 screws/sheet, 5,200 total",
+   "source_edition_or_year": "spec-v888 worked example",
+   "source_section_or_page": "screws/stud=floor(96/8)+1=13; per sheet=4*13=52; total=100*52=5200",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "sheets": 100,
+    "sheet_length_ft": 8,
+    "sheet_width_ft": 4,
+    "stud_spacing_in": 16,
+    "field_screw_spacing_in": 8
+   },
+   "outputs": {
+    "screws_per_sheet": {
+     "value": 52,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_screws": {
+     "value": 5200,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

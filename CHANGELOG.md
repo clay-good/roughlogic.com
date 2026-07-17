@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): drywall-fastener-takeoff -- drywall screw fastener takeoff (spec-v888); 2026-07-17
+
+- New Group E tile `drywall-fastener-takeoff` (calc-construction.js), the drywall fastener takeoff beside `drywall` and
+  `metal-stud-takeoff`. studs per sheet = floor(width x 12 / stud spacing) + 1; screws per stud = floor(length x 12 /
+  field spacing) + 1; total = sheets x studs per sheet x screws per stud. 100 sheets on 16 in framing at a 12 in field
+  pattern is 36 screws a sheet (3,600); a tighter 8 in pattern on a fire-rated or ceiling assembly runs it to 5,200.
+  Counts fasteners only -- the sheets and mud are in the drywall tile. Home count 1,336 -> 1,337.
+
 ### feat(construction): joist-hanger-count -- joist hanger and connector-nail count (spec-v887); 2026-07-17
 
 - New Group E tile `joist-hanger-count` (calc-construction.js), the framing-hardware takeoff beside

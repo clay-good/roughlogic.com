@@ -26244,3 +26244,24 @@ test("bounds: spec-v887 computeJoistHangerCount pins the joist, hanger, nail cou
   assert.ok("error" in _v887({ run_width_ft: 16, spacing_in: 16, ends_per_joist: 2, nails_per_hanger: -5 }));
   assert.ok("error" in _v887({ run_width_ft: Infinity, spacing_in: 16, ends_per_joist: 2, nails_per_hanger: 10 }));
 });
+
+import { computeDrywallFastenerTakeoff as _v888 } from "../../calc-construction.js";
+
+test("bounds: spec-v888 computeDrywallFastenerTakeoff pins screws/sheet, total, and error seams", () => {
+  const r = _v888({ sheets: 100, sheet_length_ft: 8, sheet_width_ft: 4, stud_spacing_in: 16, field_screw_spacing_in: 12 });
+  assert.equal(r.studs_per_sheet, 4); // floor(48/16) + 1
+  assert.equal(r.screws_per_stud, 9); // floor(96/12) + 1
+  assert.equal(r.screws_per_sheet, 36); // 4 * 9
+  assert.equal(r.total_screws, 3600); // 100 * 36
+  // The field spacing, set by the assembly, drives the box count: a tighter 8 in pattern needs far more.
+  const tight = _v888({ sheets: 100, sheet_length_ft: 8, sheet_width_ft: 4, stud_spacing_in: 16, field_screw_spacing_in: 8 });
+  assert.equal(tight.screws_per_sheet, 52); // 4 * (floor(96/8)+1)
+  assert.equal(tight.total_screws, 5200); // 100 * 52
+  // Error seams: non-finite, non-positive sheets / sheet dims / spacings.
+  assert.ok("error" in _v888({ sheets: 0, sheet_length_ft: 8, sheet_width_ft: 4, stud_spacing_in: 16, field_screw_spacing_in: 12 }));
+  assert.ok("error" in _v888({ sheets: 100, sheet_length_ft: 0, sheet_width_ft: 4, stud_spacing_in: 16, field_screw_spacing_in: 12 }));
+  assert.ok("error" in _v888({ sheets: 100, sheet_length_ft: 8, sheet_width_ft: 0, stud_spacing_in: 16, field_screw_spacing_in: 12 }));
+  assert.ok("error" in _v888({ sheets: 100, sheet_length_ft: 8, sheet_width_ft: 4, stud_spacing_in: 0, field_screw_spacing_in: 12 }));
+  assert.ok("error" in _v888({ sheets: 100, sheet_length_ft: 8, sheet_width_ft: 4, stud_spacing_in: 16, field_screw_spacing_in: 0 }));
+  assert.ok("error" in _v888({ sheets: Infinity, sheet_length_ft: 8, sheet_width_ft: 4, stud_spacing_in: 16, field_screw_spacing_in: 12 }));
+});

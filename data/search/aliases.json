@@ -18252,6 +18252,31 @@
       "kind": "industry"
     },
     {
+      "term": "drywall screw takeoff",
+      "target": "drywall-fastener-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "drywall fastener count",
+      "target": "drywall-fastener-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "sheetrock screws",
+      "target": "drywall-fastener-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "drywall screws per sheet",
+      "target": "drywall-fastener-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "gypsum board screws",
+      "target": "drywall-fastener-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

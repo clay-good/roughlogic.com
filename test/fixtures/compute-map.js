@@ -812,6 +812,7 @@ export const COMPUTE_MAP = {
   "vapor-barrier-rolls": { module: "../../calc-construction.js", fn: "computeVaporBarrierRolls" },
   "concrete-sawcut-footage": { module: "../../calc-construction.js", fn: "computeConcreteSawcutFootage" },
   "joist-hanger-count": { module: "../../calc-construction.js", fn: "computeJoistHangerCount" },
+  "drywall-fastener-takeoff": { module: "../../calc-construction.js", fn: "computeDrywallFastenerTakeoff" },
   "concrete-vibrator-spacing": { module: "../../calc-construction.js", fn: "computeConcreteVibratorSpacing" },
   "formwork-tie-load": { module: "../../calc-construction.js", fn: "computeFormworkTieLoad" },
   "mass-concrete-temp-rise": { module: "../../calc-construction.js", fn: "computeMassConcreteTempRise" },
