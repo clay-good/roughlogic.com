@@ -4,6 +4,19 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(mechanic): driveshaft-crit used the wrong first-mode eigenvalue (4.7 -> pi^2), critical speed was ~2x low; 2026-07-17
+
+- `driveshaft-crit` (calc-mechanic.js) computed the whirl critical speed with `omega_n = (4.7 / L^2) x sqrt(EI/(rho A))`.
+  The code comment states a **simply-supported** tube, whose Euler-Bernoulli first-mode eigenvalue is `(beta L)^2 = pi^2`
+  (approximately 9.87), not 4.7 -- 4.7 is the *unsquared* `beta L` for a clamped beam, the wrong quantity for any support
+  condition. The reported critical speed was low by the factor `4.7 / pi^2` (approximately 0.48): a 3.5 in OD / 0.083 in
+  wall / 48 in steel tube read 4,678 rpm critical / 3,041 rpm recommended max instead of the correct 9,823 / 6,385 rpm.
+  Cross-checked against the Spicer/Dana industry formula `Nc = 4.76e6 x sqrt(OD^2+ID^2) / L^2` (about 9,987 rpm for the
+  same tube), confirming pi^2. The inverse tile `driveshaft-max-length` reuses this function and inherited the error
+  (max length was about 30% short); the single constant fix corrects both. Updated the comment, citation, and the three
+  worked-example pins (the two max-length round-trips re-keyed to the corrected recommended-max). Caught by a
+  first-principles re-derivation of calc-mechanic.js.
+
 ### fix(concrete): concrete-anchor-breakout used phi 0.65 (brittle-steel) for a concrete breakout mode -> 0.70; 2026-07-17
 
 - `concrete-anchor-breakout` (calc-concrete.js) applied `phiNcb = 0.65 x Ncb`. Per ACI 318-19 Table 17.5.3,

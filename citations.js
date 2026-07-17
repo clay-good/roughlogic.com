@@ -4823,7 +4823,7 @@ export const CITATIONS = {
     ],
   },
   "driveshaft-crit": {
-    formula: "Euler-Bernoulli first-mode whirl: N_crit (RPM) = (4.7 / L²) × sqrt((E × I) / (ρ × A)). Recommended max operating = 0.65 × N_crit (engineering-practice safety margin).",
+    formula: "Euler-Bernoulli first-mode whirl (simply-supported, eigenvalue (βL)² = π²): N_crit (RPM) = (π² / L²) × sqrt((E × I) / (ρ × A)). Recommended max operating = 0.65 × N_crit (engineering-practice safety margin).",
     edition: "Euler-Bernoulli beam theory by name; AAM (American Axle) and Spicer / Dana driveshaft engineering manuals by name.",
     freeAccess: "Beam-theory principles free in mechanics-of-materials texts at university OCW.",
     governance: GOVERNANCE.general,

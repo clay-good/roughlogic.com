@@ -175,8 +175,8 @@ export const boltStretchExample = { inputs: { diameter_in: 0.5, grip_length_in: 
 
 // --- 199: Driveshaft Critical Speed ---
 //
-// Euler-Bernoulli first mode for a simply-supported tube:
-//   N_crit_rpm = (4.7 / L^2) * sqrt((E*I) / (rho*A)) * (60 / (2*pi))
+// Euler-Bernoulli first mode for a simply-supported tube (first-mode eigenvalue (beta*L)^2 = pi^2):
+//   N_crit_rpm = (pi^2 / L^2) * sqrt((E*I) / (rho*A)) * (60 / (2*pi))
 // Convert to standard public engineering form. We compute in SI then output RPM.
 
 export const SHAFT_MATERIALS = {
@@ -202,7 +202,7 @@ export function computeDriveshaftCritical({ od_in = 0, wall_in = 0, length_in = 
   // Polar moment for tube I = pi/64 * (od^4 - id^4); cross-section A = pi/4 * (od^2 - id^2)
   const I = (Math.PI / 64) * (Math.pow(od_m, 4) - Math.pow(id_m, 4));
   const A = (Math.PI / 4) * (Math.pow(od_m, 2) - Math.pow(id_m, 2));
-  const omega_n = (4.7 / Math.pow(L_m, 2)) * Math.sqrt((m.E_pa * I) / (m.rho_kg_m3 * A));
+  const omega_n = (Math.PI * Math.PI / Math.pow(L_m, 2)) * Math.sqrt((m.E_pa * I) / (m.rho_kg_m3 * A));
   const N_crit_rpm = omega_n * 60 / (2 * Math.PI);
   // Public guidance: operate below 0.6-0.75 of critical.
   const safe_rpm = N_crit_rpm * 0.65;
