@@ -4671,3 +4671,54 @@ function _v858renderHeatTraceSizing(inputRegion, outputRegion, citationEl) {
   for (const f of [p, al, nv, va, wf, v, br]) f.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["heat-trace-sizing"] = _v858renderHeatTraceSizing;
+
+// ===================== spec-v894: pipe inert purge volume and time =====================
+// dims: in { pipe_id_in: L, length_ft: L, air_changes: dimensionless, flow_scfh: L^3 T^-1 } out: { pipe_volume_ft3: L^3, purge_volume_ft3: L^3, purge_min: T }
+export function computePipePurgeVolume({ pipe_id_in = 2.067, length_ft = 100, air_changes = 5, flow_scfh = 60 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(pipe_id_in > 0)) return { error: "Pipe inside diameter must be positive (in)." };
+  if (!(length_ft > 0)) return { error: "Run length must be positive (ft)." };
+  if (!(air_changes > 0)) return { error: "Air changes must be positive." };
+  if (!(flow_scfh > 0)) return { error: "Purge flow must be positive (scfh)." };
+  const pipe_volume_ft3 = (Math.PI / 4) * Math.pow(pipe_id_in / 12, 2) * length_ft;
+  const purge_volume_ft3 = pipe_volume_ft3 * air_changes;
+  const purge_min = purge_volume_ft3 / flow_scfh * 60;
+  if (![pipe_volume_ft3, purge_volume_ft3, purge_min].every(Number.isFinite)) return { error: "Purge math is not a finite value." };
+  return {
+    pipe_volume_ft3,
+    purge_volume_ft3,
+    purge_min,
+    note: "A nitrogen purge while brazing keeps scale and oxidation out of the line. The number of volume changes (about five to seven to reach a low oxygen level) and the acceptable oxygen or dew point come from the spec or manufacturer. A flow or oxygen meter confirms the endpoint; this estimates the time. Distinct from the room confined-space-purge.",
+  };
+}
+
+export const pipePurgeVolumeExample = { inputs: { pipe_id_in: 2.067, length_ft: 100, air_changes: 5, flow_scfh: 60 } };
+
+function _v894renderPipePurgeVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: purge identity by name. pipe volume = pi/4 x ID^2 x length; purge volume = pipe volume x air changes; time = purge volume / flow. A nitrogen purge while brazing keeps scale and oxidation out of the line.";
+  const id = makeNumber("Pipe inside diameter (in)", "ppv-id", { step: "any", min: "0", value: "2.067" });
+  id.input.value = "2.067";
+  const ln = makeNumber("Run length (ft)", "ppv-ln", { step: "any", min: "0", value: "100" });
+  ln.input.value = "100";
+  const ac = makeNumber("Volume changes to sweep", "ppv-ac", { step: "any", min: "0", value: "5" });
+  ac.input.value = "5";
+  const fl = makeNumber("Purge gas flow (scfh)", "ppv-fl", { step: "any", min: "0", value: "60" });
+  fl.input.value = "60";
+  for (const f of [id, ln, ac, fl]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { id.input.value = "2.067"; ln.input.value = "100"; ac.input.value = "5"; fl.input.value = "60"; update(); });
+  const oPipe = makeOutputLine(outputRegion, "Pipe volume", "ppv-out-pipe");
+  const oPurge = makeOutputLine(outputRegion, "Purge volume", "ppv-out-purge");
+  const oTime = makeOutputLine(outputRegion, "Purge time", "ppv-out-time");
+  const update = debounce(() => {
+    const r = computePipePurgeVolume({
+      pipe_id_in: id.input.value === "" ? 2.067 : Number(id.input.value), length_ft: ln.input.value === "" ? 100 : Number(ln.input.value),
+      air_changes: ac.input.value === "" ? 5 : Number(ac.input.value), flow_scfh: fl.input.value === "" ? 60 : Number(fl.input.value),
+    });
+    if (r.error) { oPipe.textContent = r.error; oPurge.textContent = "-"; oTime.textContent = "-"; return; }
+    oPipe.textContent = fmt(r.pipe_volume_ft3, 2) + " ft^3";
+    oPurge.textContent = fmt(r.purge_volume_ft3, 2) + " ft^3";
+    oTime.textContent = fmt(r.purge_min, 1) + " min";
+  }, DEBOUNCE_MS);
+  for (const f of [id, ln, ac, fl]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["pipe-purge-volume"] = _v894renderPipePurgeVolume;

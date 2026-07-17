@@ -52871,6 +52871,70 @@
    }
   },
   {
+   "tile_id": "pipe-purge-volume",
+   "source_publisher": "Inert-purge identity (first-principles)",
+   "source_title": "2 in Type L (ID 2.067), 100 ft, 5 changes, 60 scfh -> 2.33 ft^3, 11.65 ft^3, 11.65 min",
+   "source_edition_or_year": "spec-v894 worked example",
+   "source_section_or_page": "pipe = (PI/4)*(2.067/12)^2*100 = 2.33; purge = 2.33*5 = 11.65; time = 11.65/60*60 = 11.65",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "pipe_id_in": 2.067,
+    "length_ft": 100,
+    "air_changes": 5,
+    "flow_scfh": 60
+   },
+   "outputs": {
+    "pipe_volume_ft3": {
+     "value": 2.33,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "purge_volume_ft3": {
+     "value": 11.65,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "purge_min": {
+     "value": 11.65,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-purge-volume",
+   "source_publisher": "Inert-purge identity (first-principles)",
+   "source_title": "cross-check: a 4 in line (ID 4.026) holds 8.84 ft^3, so 44.2 ft^3 over 5 changes is 44 min",
+   "source_edition_or_year": "spec-v894 worked example",
+   "source_section_or_page": "pipe = (PI/4)*(4.026/12)^2*100 = 8.84; purge = 44.2; time = 44.2 min",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "pipe_id_in": 4.026,
+    "length_ft": 100,
+    "air_changes": 5,
+    "flow_scfh": 60
+   },
+   "outputs": {
+    "pipe_volume_ft3": {
+     "value": 8.84,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "purge_min": {
+     "value": 44.2,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

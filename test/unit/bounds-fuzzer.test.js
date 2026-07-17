@@ -26353,3 +26353,22 @@ test("bounds: spec-v893 computeRoofInsulationFasteners pins the fastener/plate t
   assert.ok("error" in _v893({ field_boards: 100, field_per_board: -8, perimeter_boards: 20, perimeter_per_board: 12, corner_boards: 5, corner_per_board: 16 }));
   assert.ok("error" in _v893({ field_boards: Infinity, field_per_board: 8, perimeter_boards: 20, perimeter_per_board: 12, corner_boards: 5, corner_per_board: 16 }));
 });
+
+import { computePipePurgeVolume as _v894 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v894 computePipePurgeVolume pins the pipe/purge volumes, time, and error seams", () => {
+  const r = _v894({ pipe_id_in: 2.067, length_ft: 100, air_changes: 5, flow_scfh: 60 });
+  assert.ok(Math.abs(r.pipe_volume_ft3 - 2.3302812595387508) < 1e-6); // (PI/4)*(2.067/12)^2*100
+  assert.ok(Math.abs(r.purge_volume_ft3 - 11.651406297693754) < 1e-6); // pipe * 5
+  assert.ok(Math.abs(r.purge_min - 11.651406297693754) < 1e-6); // purge / 60 * 60
+  // The diameter squared drives both the volume and the time: a 4 in line takes far longer.
+  const big = _v894({ pipe_id_in: 4.026, length_ft: 100, air_changes: 5, flow_scfh: 60 });
+  assert.ok(Math.abs(big.pipe_volume_ft3 - 8.84046136215576) < 1e-6); // (PI/4)*(4.026/12)^2*100
+  assert.ok(Math.abs(big.purge_min - 44.20230681077881) < 1e-6); // 8.84*5/60*60
+  // Error seams: non-finite, non-positive ID / length / air changes / flow.
+  assert.ok("error" in _v894({ pipe_id_in: 0, length_ft: 100, air_changes: 5, flow_scfh: 60 }));
+  assert.ok("error" in _v894({ pipe_id_in: 2.067, length_ft: 0, air_changes: 5, flow_scfh: 60 }));
+  assert.ok("error" in _v894({ pipe_id_in: 2.067, length_ft: 100, air_changes: 0, flow_scfh: 60 }));
+  assert.ok("error" in _v894({ pipe_id_in: 2.067, length_ft: 100, air_changes: 5, flow_scfh: 0 }));
+  assert.ok("error" in _v894({ pipe_id_in: Infinity, length_ft: 100, air_changes: 5, flow_scfh: 60 }));
+});

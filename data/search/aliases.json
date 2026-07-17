@@ -18402,6 +18402,31 @@
       "kind": "industry"
     },
     {
+      "term": "pipe purge volume",
+      "target": "pipe-purge-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "nitrogen purge time",
+      "target": "pipe-purge-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "brazing purge",
+      "target": "pipe-purge-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "pipe inert purge",
+      "target": "pipe-purge-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "purge gas volume",
+      "target": "pipe-purge-volume",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

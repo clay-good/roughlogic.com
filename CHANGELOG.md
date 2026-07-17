@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): pipe-purge-volume -- pipe inert purge volume and time (spec-v894); 2026-07-17
+
+- New Group B tile `pipe-purge-volume` (calc-plumbing.js), the pipefitting install-ops takeoff beside `pipe-volume` and
+  `nitrogen-pressure-test`. pipe volume = pi/4 x ID^2 x length; purge volume = pipe volume x air changes; time = purge
+  volume / flow. 100 ft of 2 in pipe holds 2.33 ft^3, so five volume changes is 11.65 ft^3 and about 12 minutes at 60
+  scfh; a 4 in line holds 8.84 ft^3 and takes 44 min. The volume changes and endpoint come from the spec; a meter confirms
+  it. Distinct from the room confined-space-purge. Home count 1,342 -> 1,343.
+
 ### feat(construction): roof-insulation-fasteners -- roof board fastener and plate count by zone (spec-v893); 2026-07-17
 
 - New Group E tile `roof-insulation-fasteners` (calc-construction.js), the roofing fastener takeoff beside

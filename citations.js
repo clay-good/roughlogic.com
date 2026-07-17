@@ -8288,6 +8288,17 @@ export const CITATIONS = {
       { name: "Plates", value: "one plate per fastener for mechanically-attached board and membrane", source: "installation practice" },
     ],
   },
+  "pipe-purge-volume": {
+    formula: "pipe_volume_ft3 = (PI/4) x (pipe_id_in/12)^2 x length_ft; purge_volume_ft3 = pipe_volume_ft3 x air_changes; purge_min = purge_volume_ft3 / flow_scfh x 60.",
+    edition: "Inert-purge identity by name (pipe volume from the bore; purge volume over the air changes; time over the flow); first-principles arithmetic.",
+    freeAccess: "The volume and time arithmetic is public first-principles; the volume changes and endpoint come from the spec or manufacturer.",
+    governance: GOVERNANCE.general,
+    editionNote: "A nitrogen purge while brazing keeps scale and oxidation out of the line. The number of volume changes (about five to seven to reach a low oxygen level) and the acceptable oxygen or dew point come from the spec or manufacturer. A flow or oxygen meter confirms the endpoint; this estimates the time. Distinct from the room confined-space-purge.",
+    assumptions: [
+      { name: "Volume changes", value: "~5 to 7 to reach a low oxygen level (default 5); the spec governs", source: "brazing / process spec" },
+      { name: "Purge flow", value: "~60 scfh default; a meter confirms the endpoint", source: "field practice" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",
