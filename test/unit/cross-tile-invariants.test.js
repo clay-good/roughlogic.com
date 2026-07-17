@@ -6619,74 +6619,72 @@ test("monotonicity: computeBendAllowance bend_allowance_in is strictly increasin
   assert.ok(badT.error, `expected error for t=0, got ${JSON.stringify(badT)}`);
 });
 
-test("monotonicity: computeNFPA1142WaterSupply Q_min_gal is strictly increasing in volume_ft3 (linear pin); strictly non-decreasing in occupancy hazard factor and construction-class factor; exposure 1.5x and sprinkler 0.5x multiplier pins (NFPA 1142 §5 pin)", () => {
-  // Group F. Q = (V * occ.factor * con.factor / 5) * exposure_mult * sprinkler_mult.
+test("monotonicity: computeNFPA1142WaterSupply Q_min_gal is strictly increasing in volume_ft3 (linear pin); strictly DECREASING in OHC (severe hazard = smaller divisor = more water); increasing in construction-class factor; exposure 1.5x and sprinkler 0.5x multiplier pins (NFPA 1142 §5 WS = V*CCN/OHC pin)", () => {
+  // Group F. Q = (V * con.factor / occ.factor) * exposure_mult * sprinkler_mult.
   // Strictly increasing in V at fixed occupancy/construction/flags.
   let prev = -Infinity;
   for (const volume_ft3 of [5000, 10000, 20000, 30000, 50000, 100000, 200000]) {
-    const r = computeNFPA1142WaterSupply({ volume_ft3, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: false, sprinkler_listed: false });
+    const r = computeNFPA1142WaterSupply({ volume_ft3, occupancy_class: 7, construction_class: "V", exposure_within_50_ft: false, sprinkler_listed: false });
     assert.ok(Number.isFinite(r.Q_min_gal) && r.Q_min_gal > 0,
       `Q at V=${volume_ft3}: ${JSON.stringify(r)}`);
     assert.ok(r.Q_min_gal > prev,
       `Q at V=${volume_ft3} = ${r.Q_min_gal} not greater than prev=${prev}`);
     prev = r.Q_min_gal;
   }
-  // Occupancy-hazard ordering pin: factors 3 (cls 1) < 4 (cls 7) < 5 (cls 2,5) < 6 (cls 3,6) < 7 (cls 4).
-  const cls1 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V" });
-  const cls7 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V" });
-  const cls2 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 2, construction_class: "V" });
-  const cls3 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 3, construction_class: "V" });
-  const cls4 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 4, construction_class: "V" });
-  assert.equal(cls1.occupancy_factor, 3);
-  assert.equal(cls7.occupancy_factor, 4);
-  assert.equal(cls2.occupancy_factor, 5);
-  assert.equal(cls3.occupancy_factor, 6);
-  assert.equal(cls4.occupancy_factor, 7);
-  assert.ok(cls1.Q_min_gal < cls7.Q_min_gal && cls7.Q_min_gal < cls2.Q_min_gal && cls2.Q_min_gal < cls3.Q_min_gal && cls3.Q_min_gal < cls4.Q_min_gal,
-    `occupancy hazard ordering violated`);
-  // Construction-class ordering pin: I (0.5) < II (0.75) < III/IV (1.0) < V (1.5).
-  const cI = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "I" });
-  const cII = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "II" });
-  const cIII = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "III" });
-  const cIV = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "IV" });
-  const cV = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V" });
+  // Occupancy-hazard ordering pin: OHC is the DIVISOR, so a smaller OHC (more
+  // severe hazard) requires MORE water. Q(OHC3) > Q(OHC4) > Q(OHC5) > Q(OHC6) > Q(OHC7).
+  const ohc3 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 3, construction_class: "V" });
+  const ohc4 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 4, construction_class: "V" });
+  const ohc5 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 5, construction_class: "V" });
+  const ohc6 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 6, construction_class: "V" });
+  const ohc7 = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V" });
+  assert.equal(ohc3.occupancy_factor, 3);
+  assert.equal(ohc7.occupancy_factor, 7);
+  assert.ok(ohc3.Q_min_gal > ohc4.Q_min_gal && ohc4.Q_min_gal > ohc5.Q_min_gal && ohc5.Q_min_gal > ohc6.Q_min_gal && ohc6.Q_min_gal > ohc7.Q_min_gal,
+    `occupancy hazard ordering violated (Q must decrease as OHC rises)`);
+  // Construction-class ordering pin: I (0.5) < II/IV (0.75) < III (1.0) < V (1.5).
+  const cI = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "I" });
+  const cII = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "II" });
+  const cIII = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "III" });
+  const cIV = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "IV" });
+  const cV = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V" });
   assert.equal(cI.construction_factor, 0.5);
   assert.equal(cII.construction_factor, 0.75);
   assert.equal(cIII.construction_factor, 1.0);
-  assert.equal(cIV.construction_factor, 1.0);
+  assert.equal(cIV.construction_factor, 0.75); // heavy timber, NFPA 1142 §5.2.7
   assert.equal(cV.construction_factor, 1.5);
-  assert.ok(cI.Q_min_gal < cII.Q_min_gal && cII.Q_min_gal < cIII.Q_min_gal && cIV.Q_min_gal < cV.Q_min_gal,
+  assert.ok(cI.Q_min_gal < cII.Q_min_gal && cII.Q_min_gal < cIII.Q_min_gal && cIII.Q_min_gal < cV.Q_min_gal,
     `construction-class ordering violated`);
   // Exposure 1.5x multiplier pin.
-  const noExp = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: false });
-  const withExp = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: true });
+  const noExp = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V", exposure_within_50_ft: false });
+  const withExp = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V", exposure_within_50_ft: true });
   assert.ok(Math.abs(withExp.Q_min_gal - noExp.Q_min_gal * 1.5) < 1e-9,
     `exposure: ${withExp.Q_min_gal} != 1.5 * ${noExp.Q_min_gal}`);
   // Sprinkler 0.5x multiplier pin.
-  const noSpr = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V" });
-  const withSpr = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", sprinkler_listed: true });
+  const noSpr = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V" });
+  const withSpr = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V", sprinkler_listed: true });
   assert.ok(Math.abs(withSpr.Q_min_gal - noSpr.Q_min_gal * 0.5) < 1e-9,
     `sprinkler: ${withSpr.Q_min_gal} != 0.5 * ${noSpr.Q_min_gal}`);
-  // nfpa1142Example closed-form pin: 30000 ft^3 / occ 1 / Cls V / no exp /
-  // no spr -> Q = 30000 * 3 * 1.5 / 5 = 27000 gal exact.
-  const ref = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V" });
-  assert.ok(Math.abs(ref.Q_min_gal - 27000) < 1e-9,
-    `Q at example = ${ref.Q_min_gal}, expected 27000`);
+  // nfpa1142Example closed-form pin: 30000 ft^3 / OHC 7 dwelling / Cls V / no exp /
+  // no spr -> WS = 30000 * 1.5 / 7 = 6428.57 gal exact.
+  const ref = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V" });
+  assert.ok(Math.abs(ref.Q_min_gal - 30000 * 1.5 / 7) < 1e-9,
+    `Q at example = ${ref.Q_min_gal}, expected ${30000 * 1.5 / 7}`);
   // Doubling-volume pin: 2x V -> 2x Q exactly (linear in V).
-  const a = computeNFPA1142WaterSupply({ volume_ft3: 15000, occupancy_class: 1, construction_class: "V" });
-  const b = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V" });
+  const a = computeNFPA1142WaterSupply({ volume_ft3: 15000, occupancy_class: 7, construction_class: "V" });
+  const b = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V" });
   assert.ok(Math.abs(b.Q_min_gal - 2 * a.Q_min_gal) < 1e-9,
     `2x V: Q = ${b.Q_min_gal} != 2 * ${a.Q_min_gal}`);
   // Q_pre_sprinkler_gal pin: returned Q before the 0.5x sprinkler step.
   assert.ok(Math.abs(withSpr.Q_pre_sprinkler_gal - noSpr.Q_min_gal) < 1e-9,
     `Q_pre = ${withSpr.Q_pre_sprinkler_gal}, expected ${noSpr.Q_min_gal}`);
-  // tanker_count ceiling pin: e.g. Q=27000 / 3000 gal tanker = 9.
-  assert.equal(ref.tanker_count[3000], 9);
-  assert.equal(ref.tanker_count[1000], 27);
+  // tanker_count ceiling pin: Q=6428.57 -> ceil(/3000)=3, ceil(/1000)=7.
+  assert.equal(ref.tanker_count[3000], 3);
+  assert.equal(ref.tanker_count[1000], 7);
   // Bounds pin: bad occupancy / construction -> error.
   const badOcc = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 99, construction_class: "V" });
   assert.ok(badOcc.error, `expected error for occupancy=99, got ${JSON.stringify(badOcc)}`);
-  const badCon = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "X" });
+  const badCon = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "X" });
   assert.ok(badCon.error, `expected error for construction=X, got ${JSON.stringify(badCon)}`);
 });
 

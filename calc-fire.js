@@ -1075,29 +1075,26 @@ FIRE_RENDERERS["scba-cylinder-time"] = renderScbaCylinder;
 //
 // Standard tanker sizes 1000 / 1500 / 2000 / 3000 gal per spec-v9 §C.1.
 
-// Occupancy hazard categories per NFPA 1142 §5.2. Numeric factors are
-// the published formula coefficients; values are commonly cited.
+// Occupancy Hazard Classification Number (OHC) per NFPA 1142 §5.2. The OHC
+// is a DIVISOR (3 = severe hazard needs the most water; 7 = light hazard needs
+// the least). The key IS the OHC. Example occupancies are from NFPA 1142 §5.2.
 export const NFPA1142_OCCUPANCY = {
-  1: { factor: 3, label: "Light hazard (offices, schools, dwellings)" },
-  2: { factor: 5, label: "Ordinary hazard (small mercantile, light manufacturing)" },
-  3: { factor: 6, label: "Medium hazard (lumber storage, garages)" },
-  4: { factor: 7, label: "High hazard (woodworking, paint shops)" },
-  5: { factor: 5, label: "Storage occupancies (general)" },
-  6: { factor: 6, label: "Storage of flammables" },
-  7: { factor: 4, label: "Apartments / dormitories" },
+  3: { factor: 3, label: "OHC 3 - severe (flour mills, explosives storage, manufactured homes, plywood mfg)" },
+  4: { factor: 4, label: "OHC 4 - high (mercantile, repair garages, paper/rubber mfg, stables)" },
+  5: { factor: 5, label: "OHC 5 - moderate (cold storage, machine shops, libraries, restaurants, textile mfg)" },
+  6: { factor: 6, label: "OHC 6 - low-moderate (bakeries, foundries, canneries, auto/farm-equipment storage, glass mfg)" },
+  7: { factor: 7, label: "OHC 7 - light (dwellings, apartments, hotels, schools, offices, fire stations)" },
 };
 
-// Construction class factors per NFPA 1142 §5.2.7. Lower factor =
+// Construction Classification Number (CCN) per NFPA 1142 §5.2.7. Lower factor =
 // more fire-resistive construction.
 export const NFPA1142_CONSTRUCTION = {
   I:   { factor: 0.5, label: "Class I (fire-resistive)" },
   II:  { factor: 0.75, label: "Class II (noncombustible)" },
   III: { factor: 1.0, label: "Class III (ordinary brick / masonry)" },
-  IV:  { factor: 1.0, label: "Class IV (heavy timber)" },
+  IV:  { factor: 0.75, label: "Class IV (heavy timber)" },
   V:   { factor: 1.5, label: "Class V (wood frame)" },
 };
-
-const NFPA1142_FIRE_FLOW_DIVISOR = 5; // standard NFPA 1142 §5 small-structure divisor
 
 const NFPA1142_TANKER_SIZES_GAL = [1000, 1500, 2000, 3000];
 
@@ -1105,7 +1102,7 @@ const NFPA1142_TANKER_SIZES_GAL = [1000, 1500, 2000, 3000];
 //        out: { Q_min_gal: L^3, Q_pre_sprinkler_gal: L^3, occupancy_factor: dimensionless, construction_factor: dimensionless, tanker_count: dimensionless, warnings: dimensionless }
 export function computeNFPA1142WaterSupply({
   volume_ft3 = 0,
-  occupancy_class = 1,
+  occupancy_class = 7,
   construction_class = "V",
   exposure_within_50_ft = false,
   sprinkler_listed = false,
@@ -1114,11 +1111,12 @@ export function computeNFPA1142WaterSupply({
   const V = Number(volume_ft3) || 0;
   if (!(V > 0)) return { error: "Building volume must be positive (ft^3)." };
   const occ = NFPA1142_OCCUPANCY[occupancy_class];
-  if (!occ) return { error: "Occupancy class must be 1 through 7 per NFPA 1142 §5.2." };
+  if (!occ) return { error: "Occupancy Hazard Classification (OHC) must be 3 through 7 per NFPA 1142 §5.2." };
   const con = NFPA1142_CONSTRUCTION[construction_class];
   if (!con) return { error: "Construction class must be I through V per NFPA 1142 §5.2.7." };
 
-  let Q = (V * occ.factor * con.factor) / NFPA1142_FIRE_FLOW_DIVISOR;
+  // NFPA 1142 §5: WS = (Volume x CCN) / OHC. The OHC divides (severe hazard = small OHC = more water).
+  let Q = (V * con.factor) / occ.factor;
   if (exposure_within_50_ft) Q *= 1.5;
   const Q_after_exposure = Q;
   if (sprinkler_listed) Q *= 0.5;
@@ -1147,18 +1145,17 @@ export function computeNFPA1142WaterSupply({
 }
 
 export const nfpa1142Example = {
-  // Spec-v9 §C.1 worked example: 30,000 ft^3 single-family residence,
-  // Class V construction, occupancy 1, no exposure, no sprinkler.
-  // Q = 30000 * 3 * 1.5 / 5 = 27,000 gal.
-  inputs: { volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: false, sprinkler_listed: false },
+  // 30,000 ft^3 single-family residence (OHC 7 dwelling), Class V wood frame,
+  // no exposure, no sprinkler. WS = (V x CCN) / OHC = 30000 * 1.5 / 7 = 6,429 gal.
+  inputs: { volume_ft3: 30000, occupancy_class: 7, construction_class: "V", exposure_within_50_ft: false, sprinkler_listed: false },
 };
 
 function renderNFPA1142(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per NFPA 1142-2022 (Standard on Water Supplies for Suburban and Rural Firefighting) §5. AHJ governs final water-supply requirement. Free at nfpa.org/freeaccess.";
 
   const v = makeNumber("Building volume (ft^3; footprint x avg ceiling)", "nfpa-v", { step: "any", min: "0" });
-  const occ = makeSelect("Occupancy class (NFPA 1142 §5.2, types 1-7)", "nfpa-occ",
-    Object.keys(NFPA1142_OCCUPANCY).map((k) => ({ value: k, label: "Type " + k + " - " + NFPA1142_OCCUPANCY[k].label, selected: k === "1" })),
+  const occ = makeSelect("Occupancy Hazard Classification (NFPA 1142 §5.2, OHC 3-7)", "nfpa-occ",
+    Object.keys(NFPA1142_OCCUPANCY).map((k) => ({ value: k, label: NFPA1142_OCCUPANCY[k].label, selected: k === "7" })),
   );
   const con = makeSelect("Construction class (NFPA 1142 §5.2.7)", "nfpa-con",
     Object.keys(NFPA1142_CONSTRUCTION).map((k) => ({ value: k, label: NFPA1142_CONSTRUCTION[k].label, selected: k === "V" })),
@@ -1174,7 +1171,7 @@ function renderNFPA1142(inputRegion, outputRegion, citationEl) {
   for (const f of [v, occ, con, exp, spr]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
-    v.input.value = "30000"; occ.select.value = "1"; con.select.value = "V";
+    v.input.value = "30000"; occ.select.value = "7"; con.select.value = "V";
     exp.select.value = "false"; spr.select.value = "false"; update();
   });
 
@@ -1205,7 +1202,7 @@ function renderNFPA1142(inputRegion, outputRegion, citationEl) {
     o1000.textContent = r.tanker_count[1000] + " trips";
     o2000.textContent = r.tanker_count[2000] + " trips";
     o3000.textContent = r.tanker_count[3000] + " trips";
-    oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "Q = (V * occupancy * construction) / 5 per NFPA 1142 §5. AHJ governs final requirement.";
+    oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "WS = (V * CCN) / OHC per NFPA 1142 §5. AHJ governs final requirement.";
   }, DEBOUNCE_MS);
   for (const f of [v.input, occ.select, con.select, exp.select, spr.select]) f.addEventListener("input", update);
 }

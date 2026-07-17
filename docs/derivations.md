@@ -2073,7 +2073,7 @@ cross-check.
 | calc-fire.js | `computeIsoNeededFireFlow` | `{ area_ft2 = 0, stories = 1, construction_class = 3, occupancy_factor = 1.0, ...` | _ | _ | _ |
 | calc-fire.js | `computeLadderPipeReach` | `{ angle_deg, extension_ft, nozzle_type, nozzle_pressure_psi }` | _ | _ | _ |
 | calc-fire.js | `computeMasterStreamReach` | `{ nozzle_type, nozzle_pressure_psi }` | _ | _ | _ |
-| calc-fire.js | `computeNFPA1142WaterSupply` | `{ volume_ft3 = 0, occupancy_class = 1, construction_class = "V", exposure_wit...` | _ | _ | _ |
+| calc-fire.js | `computeNFPA1142WaterSupply` | `{ volume_ft3 = 0, occupancy_class = 7, construction_class = "V", exposure_wit...` | _ | _ | _ |
 | calc-fire.js | `computeNfaFiregroundFlow` | `{ length_ft = 0, width_ft = 0, percent_involved = 0, floors_involved = 1, exp...` | _ | _ | _ |
 | calc-fire.js | `computePDP` | `{ nozzle_pressure_psi, friction_loss_psi, elevation_ft = 0, appliance_loss_ps...` | _ | _ | _ |
 | calc-fire.js | `computeRelayPumpDistance` | `{ target_flow_gpm = 0, hose_coefficient = 0, max_discharge_psi = 0, intake_re...` | _ | _ | _ |
@@ -3958,7 +3958,7 @@ per spec-v14 §13.1 second paragraph.
 | `ladder-pipe-reach` | Ladder Pipe Reach | IFSTA Pumping Apparatus / ladder-pipe...; 70 deg / 100 ft extension / smooth_bore_1_75 / 80 psi -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `master-stream` | Master Stream Reach | IFSTA / fire-stream engineering practice; smooth_bore_1_75 / 80 psi -> 90 ft typical reach; pure ta... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `nfa-fireground-flow` | National Fire Academy Quick Fire-Flow | National Fire Academy / IFSTA; 40 x 60 ft, 50% involved, 1 floor, 2 exposures -> base 40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `nfpa-1142-water-supply` | NFPA 1142 Rural Water Supply | NFPA; §5 Q = (V * O * H) / 5 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `nfpa-1142-water-supply` | NFPA 1142 Rural Water Supply | NFPA; §5 WS = (V * CCN) / OHC = 30000 * 1.5 / 7 = 6,429 gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pdp` | Pump Discharge Pressure | NFPA; PDP = NP + FL + elev_psi + appliance = 100 + 25 + 0.5*20 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `relay-pump-distance` | Relay Pumping Max Distance | IFSTA Pumping Apparatus Driver/Operator; 800 gpm, C 0.08, 200 psi pump, 20 psi intake, 10 ft uphil... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `required-fire-flow` | Required Fire Flow | ISO / NFPA 1142 area-based simplified...; 5000 ft^2 / ordinary / occupancy 1.0 / exposure 1.0 / com... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |

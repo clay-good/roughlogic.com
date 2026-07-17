@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(fire): nfpa-1142-water-supply had the formula inverted (occupancy multiplied + phantom /5) and Type IV construction wrong; 2026-07-17
+
+- `nfpa-1142-water-supply` (calc-fire.js) computed `Q = (V x occupancy x construction) / 5`. NFPA 1142 §5 is
+  `WS = (Volume x CCN) / OHC` -- the Occupancy Hazard Classification Number is a DIVISOR (3 = severe hazard, most water;
+  7 = light hazard, least), there is no `/5`, and the bundled occupancy factors ran the wrong direction (dwellings were
+  3, should be OHC 7). For the tile's own example (30,000 ft^3 wood-frame dwelling) it returned 27,000 gal instead of the
+  correct `30000 x 1.5 / 7 = 6,429` gal (4.2x high). Also `Class IV (heavy timber)` carried CCN 1.0; NFPA 1142 §5.2.7
+  assigns it 0.75 (it had been duplicated from Class III). Re-keyed the occupancy table to the real OHC values (3-7) with
+  the NFPA 1142 §5.2 example occupancies, fixed the formula and the Type IV factor, and updated the renderer dropdown,
+  example, both citations, the worked-example pin, and the bounds-fuzzer sweep (all of which mirrored the inverted
+  formula). Tables verified against NFPA 1142-2022 §5.2 / §5.2.7. Caught by a first-principles re-derivation of calc-fire.js.
+
 ### fix(hvac): combustion-air had the outdoor/indoor opening rules transposed (undersized indoor combustion air 4x); 2026-07-17
 
 - `combustion-air` (calc-hvac.js) computed the outdoor opening as `btu/1000` and the indoor communicating opening as

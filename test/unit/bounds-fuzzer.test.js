@@ -5113,31 +5113,35 @@ test("bounds: calc-fire computeScbaCylinderTime rejects every documented out-of-
   assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 0 }));
 });
 
-test("bounds: calc-fire computeNFPA1142WaterSupply pins Q = V*O*H/5 with 1.5x exposure and 0.5x sprinkler multipliers across the occupancy x construction sweep", () => {
-  // Spec example: 30,000 ft^3 single-family residence, Class V construction,
-  // occupancy 1 (factor 3), no exposure, no sprinkler -> Q = 30000*3*1.5/5 = 27000 gal.
-  const r = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: false, sprinkler_listed: false });
+test("bounds: calc-fire computeNFPA1142WaterSupply pins WS = (V*CCN)/OHC with 1.5x exposure and 0.5x sprinkler multipliers across the occupancy x construction sweep", () => {
+  // NFPA 1142 §5: WS = (Volume x CCN) / OHC. 30,000 ft^3 dwelling (OHC 7),
+  // Class V (CCN 1.5), no exposure, no sprinkler -> Q = 30000*1.5/7 = 6428.57 gal.
+  const Qbase = 30000 * 1.5 / 7;
+  const r = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V", exposure_within_50_ft: false, sprinkler_listed: false });
   assert.ok(!r.error, JSON.stringify(r));
-  assert.strictEqual(r.occupancy_factor, 3);
+  assert.strictEqual(r.occupancy_factor, 7);
   assert.strictEqual(r.construction_factor, 1.5);
-  assert.ok(Math.abs(r.Q_min_gal - 27000) < 1e-9, `Q identity ${r.Q_min_gal}`);
-  assert.ok(Math.abs(r.Q_pre_sprinkler_gal - 27000) < 1e-9, `Q_pre == Q without exposure/sprinkler`);
+  assert.ok(Math.abs(r.Q_min_gal - Qbase) < 1e-9, `Q identity ${r.Q_min_gal}`);
+  assert.ok(Math.abs(r.Q_pre_sprinkler_gal - Qbase) < 1e-9, `Q_pre == Q without exposure/sprinkler`);
   // Exposure 1.5x multiplier: same building with adjacent structure within 50 ft.
-  const exp = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: true });
-  assert.ok(Math.abs(exp.Q_min_gal - 27000 * 1.5) < 1e-9, `exposure 1.5x identity`);
+  const exp = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V", exposure_within_50_ft: true });
+  assert.ok(Math.abs(exp.Q_min_gal - Qbase * 1.5) < 1e-9, `exposure 1.5x identity`);
   // Sprinkler 0.5x reduction: applies AFTER exposure.
-  const spr = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: false, sprinkler_listed: true });
-  assert.ok(Math.abs(spr.Q_min_gal - 27000 * 0.5) < 1e-9, `sprinkler 0.5x identity`);
+  const spr = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V", exposure_within_50_ft: false, sprinkler_listed: true });
+  assert.ok(Math.abs(spr.Q_min_gal - Qbase * 0.5) < 1e-9, `sprinkler 0.5x identity`);
   // Combined exposure + sprinkler.
-  const both = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: true, sprinkler_listed: true });
-  assert.ok(Math.abs(both.Q_min_gal - 27000 * 1.5 * 0.5) < 1e-9, `combined identity`);
+  const both = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V", exposure_within_50_ft: true, sprinkler_listed: true });
+  assert.ok(Math.abs(both.Q_min_gal - Qbase * 1.5 * 0.5) < 1e-9, `combined identity`);
+  // A severe hazard (OHC 3) needs MORE water than a light hazard (OHC 7): smaller divisor.
+  const severe = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 3, construction_class: "V" });
+  assert.ok(severe.Q_min_gal > r.Q_min_gal, `OHC 3 (severe) requires more water than OHC 7 (light)`);
   // Tanker-count ceiling identity: ceil(Q / size) for each bundled tanker size.
   for (const sz of [1000, 1500, 2000, 3000]) {
-    assert.strictEqual(r.tanker_count[sz], Math.ceil(27000 / sz), `tanker ${sz}`);
+    assert.strictEqual(r.tanker_count[sz], Math.ceil(Qbase / sz), `tanker ${sz}`);
   }
-  // Construction-class factor sweep: I=0.5, II=0.75, III=1.0, IV=1.0, V=1.5.
-  for (const [klass, factor] of [["I", 0.5], ["II", 0.75], ["III", 1.0], ["IV", 1.0], ["V", 1.5]]) {
-    const s = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: klass });
+  // Construction-class (CCN) factor sweep: I=0.5, II=0.75, III=1.0, IV=0.75 (heavy timber), V=1.5.
+  for (const [klass, factor] of [["I", 0.5], ["II", 0.75], ["III", 1.0], ["IV", 0.75], ["V", 1.5]]) {
+    const s = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: klass });
     assert.strictEqual(s.construction_factor, factor, `class ${klass}`);
   }
 });

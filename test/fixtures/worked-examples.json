@@ -1673,21 +1673,21 @@
   {
    "tile_id": "nfpa-1142-water-supply",
    "source_publisher": "NFPA",
-   "source_title": "NFPA 1142 rural water-supply: 30,000 ft^3 wood-frame light-occupancy",
+   "source_title": "NFPA 1142 rural water-supply: 30,000 ft^3 wood-frame dwelling (OHC 7)",
    "source_edition_or_year": "NFPA 1142-2022",
-   "source_section_or_page": "§5 Q = (V * O * H) / 5",
+   "source_section_or_page": "§5 WS = (V * CCN) / OHC = 30000 * 1.5 / 7 = 6,429 gal",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-07-17",
    "inputs": {
     "volume_ft3": 30000,
-    "occupancy_class": 1,
+    "occupancy_class": 7,
     "construction_class": "V",
     "exposure_within_50_ft": false,
     "sprinkler_listed": false
    },
    "outputs": {
     "Q_min_gal": {
-     "value": 27000,
+     "value": 6428.57,
      "tolerance": {
       "pct": 0.5
      }

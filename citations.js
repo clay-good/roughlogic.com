@@ -2419,13 +2419,13 @@ export const CITATIONS = {
   },
 
   "nfpa-1142-water-supply": {
-    formula: "Q_total = (V * O * H) / 5 per NFPA 1142 §5. 1.5x exposure multiplier when adjacent structure within 50 ft. 0.5x sprinkler reduction when UL-listed system present.",
+    formula: "WS = (V * CCN) / OHC per NFPA 1142 §5 (Occupancy Hazard Classification Number OHC 3-7 divides; Construction Classification Number CCN 0.5-1.5). 1.5x exposure multiplier when adjacent structure within 50 ft. 0.5x sprinkler reduction when UL-listed system present.",
     edition: "NFPA 1142-2022 (Standard on Water Supplies for Suburban and Rural Firefighting) §5.",
     freeAccess: "nfpa.org/freeaccess.",
     governance: GOVERNANCE.fire,
     editionNote: "Editions available: bundled values follow NFPA 1142-2022 (Water Supplies for Suburban and Rural Fire Fighting). Jurisdictions on an earlier edition differ at the margins; verify the edition adopted by your AHJ.",
     assumptions: [
-      { name: "Occupancy factors", value: "NFPA 1142 §5.2 type 1-7 formula coefficients (cited by name, not reproduced as a table)", source: "NFPA 1142-2022 §5.2" },
+      { name: "Occupancy factors", value: "NFPA 1142 §5.2 Occupancy Hazard Classification Number (OHC 3 severe to 7 light; a divisor)", source: "NFPA 1142-2022 §5.2" },
       { name: "Construction factors", value: "Class I-V per NFPA 1142 §5.2.7", source: "NFPA 1142-2022 §5.2.7" },
       { name: "Exposure multiplier", value: "1.5x when adjacent structure within 50 ft", source: "NFPA 1142-2022 §5.4" },
       { name: "Sprinkler reduction", value: "0.5x contingent on confirmed UL-listed system", source: "NFPA 1142-2022 §5.5; AHJ inspection governs" },

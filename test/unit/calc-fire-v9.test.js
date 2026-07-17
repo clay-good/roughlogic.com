@@ -85,52 +85,52 @@ test("scba-cylinder-time: FIRE_RENDERERS exposes scba-cylinder-time", () => {
 
 // --- §C.1 NFPA 1142 rural water-supply ---
 
-test("nfpa-1142: 30,000 ft^3 wood-frame light-occupancy single-family example -> 27,000 gal", () => {
+test("nfpa-1142: 30,000 ft^3 wood-frame dwelling (OHC 7) example -> 6,429 gal", () => {
   const r = computeNFPA1142WaterSupply(nfpa1142Example.inputs);
   assert.ok(!r.error);
-  // Q = 30000 * 3 * 1.5 / 5 = 27000.
-  assert.ok(closePct(r.Q_min_gal, 27000, 0.5));
+  // WS = (V * CCN) / OHC = 30000 * 1.5 / 7 = 6428.57.
+  assert.ok(closePct(r.Q_min_gal, 6428.57, 0.5));
 });
 
 test("nfpa-1142: 1.5x exposure multiplier applied before sprinkler reduction", () => {
-  const base = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V" });
-  const exp = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: true });
+  const base = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V" });
+  const exp = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V", exposure_within_50_ft: true });
   assert.ok(closePct(exp.Q_min_gal, base.Q_min_gal * 1.5, 0.5));
 });
 
 test("nfpa-1142: 0.5x sprinkler reduction stacks after exposure", () => {
-  const exp_only = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: true });
-  const exp_spr = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", exposure_within_50_ft: true, sprinkler_listed: true });
+  const exp_only = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V", exposure_within_50_ft: true });
+  const exp_spr = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V", exposure_within_50_ft: true, sprinkler_listed: true });
   assert.ok(closePct(exp_spr.Q_min_gal, exp_only.Q_min_gal * 0.5, 0.5));
 });
 
 test("nfpa-1142: tanker-count round up for each standard tanker size", () => {
   const r = computeNFPA1142WaterSupply(nfpa1142Example.inputs);
-  // 27000 gal -> 27 / 1, 18 / 2, 14 / 3, 9 / 3 (10 / 3 = ceil(27/3000) = 9, but 27000/3000 = 9 exact)
-  assert.equal(r.tanker_count[1000], 27);
-  assert.equal(r.tanker_count[2000], 14);
-  assert.equal(r.tanker_count[3000], 9);
+  // 6428.57 gal -> ceil(6428.57/1000)=7, ceil(/2000)=4, ceil(/3000)=3.
+  assert.equal(r.tanker_count[1000], 7);
+  assert.equal(r.tanker_count[2000], 4);
+  assert.equal(r.tanker_count[3000], 3);
 });
 
 test("nfpa-1142: rejects zero / negative volume, unknown occupancy, unknown construction", () => {
-  assert.ok(computeNFPA1142WaterSupply({ volume_ft3: 0, occupancy_class: 1, construction_class: "V" }).error);
+  assert.ok(computeNFPA1142WaterSupply({ volume_ft3: 0, occupancy_class: 7, construction_class: "V" }).error);
   assert.ok(computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 8, construction_class: "V" }).error);
-  assert.ok(computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "VI" }).error);
+  assert.ok(computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "VI" }).error);
 });
 
 test("nfpa-1142: volume under 8,000 ft^3 surfaces an 'AHJ may waive' warning", () => {
-  const r = computeNFPA1142WaterSupply({ volume_ft3: 5000, occupancy_class: 1, construction_class: "V" });
+  const r = computeNFPA1142WaterSupply({ volume_ft3: 5000, occupancy_class: 7, construction_class: "V" });
   assert.ok(r.warnings.some((w) => /AHJ may waive/.test(w)));
 });
 
 test("nfpa-1142: sprinkler reduction surfaces the UL-listed contingency note", () => {
-  const r = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 1, construction_class: "V", sprinkler_listed: true });
+  const r = computeNFPA1142WaterSupply({ volume_ft3: 30000, occupancy_class: 7, construction_class: "V", sprinkler_listed: true });
   assert.ok(r.warnings.some((w) => /UL-listed/.test(w)));
 });
 
-test("nfpa-1142: occupancy and construction factor tables expose all 7 + 5 categories", () => {
-  for (const k of [1, 2, 3, 4, 5, 6, 7]) {
-    assert.ok(NFPA1142_OCCUPANCY[k] && NFPA1142_OCCUPANCY[k].factor > 0);
+test("nfpa-1142: occupancy (OHC 3-7) and construction (5) factor tables expose every category", () => {
+  for (const k of [3, 4, 5, 6, 7]) {
+    assert.ok(NFPA1142_OCCUPANCY[k] && NFPA1142_OCCUPANCY[k].factor === k);
   }
   for (const k of ["I", "II", "III", "IV", "V"]) {
     assert.ok(NFPA1142_CONSTRUCTION[k] && NFPA1142_CONSTRUCTION[k].factor > 0);
