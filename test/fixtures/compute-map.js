@@ -752,6 +752,7 @@ export const COMPUTE_MAP = {
   "soil-swell-shrink": { module: "../../calc-earthwork.js", fn: "computeSoilSwellShrink" },
   "rusle-soil-loss": { module: "../../calc-earthwork.js", fn: "computeRusleSoilLoss" },
   "riprap-d50": { module: "../../calc-earthwork.js", fn: "computeRiprapD50" },
+  "riprap-tonnage": { module: "../../calc-earthwork.js", fn: "computeRiprapTonnage" },
   "haul-cycle-production": { module: "../../calc-earthwork.js", fn: "computeHaulCycleProduction" },
   "loader-production": { module: "../../calc-earthwork.js", fn: "computeLoaderProduction" },
   "dozer-production": { module: "../../calc-earthwork.js", fn: "computeDozerProduction" },

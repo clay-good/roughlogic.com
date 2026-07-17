@@ -1,6 +1,7 @@
 # roughlogic.com Specification v824 -- Riprap Layer Volume and Tonnage (calc-earthwork.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-16 (package 0.398.0).** Executed against the live catalog (1,272 -> 1,273 tiles), beside
+> the just-landed `riprap-d50` (spec-v823); riprap-d50's related-tiles updated to cross-reference this tile. Single-tile spec.
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-earthwork.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v823.md. Erosion-control sweep (entry 3), the
 > order-quantity companion to `riprap-d50`.

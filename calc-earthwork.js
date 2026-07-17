@@ -12,6 +12,7 @@
 //   - water-for-compaction    Water to reach optimum moisture for compaction
 //   - rusle-soil-loss         RUSLE annual soil loss (erosion / SWPPP)
 //   - riprap-d50              Riprap median stone size (Isbash)
+//   - riprap-tonnage          Riprap layer volume and tonnage
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
@@ -571,6 +572,51 @@ function _v823renderRiprapD50(inputRegion, outputRegion, citationEl) {
   for (const f of [v, ss, c, sf]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["riprap-d50"] = _v823renderRiprapD50;
+
+// --- riprap-tonnage: Riprap Layer Volume and Tonnage ---
+//
+// The order-quantity companion to riprap-d50: volume = area x thickness / 27;
+// tons = area x thickness x unit weight / 2000. Order to the PLACED density
+// (voids) or the last loads sit unused.
+// dims: in { area_sf: L^2, thickness_ft: L, unit_wt_pcf: M L^-3 } out: { volume_cy: L^3, tons: M }
+// (Plan area is L^2; thickness L; unit weight M L^-3; the volume L^3 and the tonnage M.)
+export function computeRiprapTonnage({ area_sf = 0, thickness_ft = 0, unit_wt_pcf = 165 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
+  if (!(thickness_ft > 0)) return { error: "Thickness must be positive (ft)." };
+  if (!(unit_wt_pcf > 0)) return { error: "Unit weight must be positive (pcf)." };
+  const volume_cy = (area_sf * thickness_ft) / 27;
+  const tons = (area_sf * thickness_ft * unit_wt_pcf) / 2000;
+  if (![volume_cy, tons].every(Number.isFinite)) return { error: "Riprap-tonnage math is not a finite value." };
+  return {
+    volume_cy,
+    tons,
+    note: "The layer should be at least 1.5 x D50 thick (from riprap-d50). A solid-rock unit weight of about 165 pcf overstates the delivered tonnage because placed riprap holds voids - a placed density near 120-135 pcf is closer for ordering, or the last few loads sit unused. A filter or bedding layer under the riprap is taken off separately.",
+  };
+}
+
+function _v824renderRiprapTonnage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: layer take-off identity by name. volume (cy) = area x thickness / 27; tons = area x thickness x unit weight / 2000. Order to the placed density (voids), not the solid rock.";
+  const area = makeNumber("Plan area of the riprap layer (ft^2)", "rrt-area", { step: "any", min: "0" });
+  const thick = makeNumber("Layer thickness (ft, at least 1.5 x D50)", "rrt-thick", { step: "any", min: "0" });
+  const uw = makeNumber("Stone unit weight (pcf)", "rrt-uw", { step: "any", min: "0", value: "165" });
+  uw.input.value = "165";
+  for (const f of [area, thick, uw]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "500"; thick.input.value = "2"; uw.input.value = "165"; update(); });
+  const oTons = makeOutputLine(outputRegion, "Stone to order", "rrt-out-tons");
+  const oVol = makeOutputLine(outputRegion, "Layer volume", "rrt-out-vol");
+  const update = debounce(() => {
+    const r = computeRiprapTonnage({
+      area_sf: Number(area.input.value) || 0, thickness_ft: Number(thick.input.value) || 0,
+      unit_wt_pcf: uw.input.value === "" ? 165 : Number(uw.input.value),
+    });
+    if (r.error) { oTons.textContent = r.error; oVol.textContent = "-"; return; }
+    oTons.textContent = fmt(r.tons, 1) + " tons";
+    oVol.textContent = fmt(r.volume_cy, 1) + " cy";
+  }, DEBOUNCE_MS);
+  for (const f of [area, thick, uw]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["riprap-tonnage"] = _v824renderRiprapTonnage;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

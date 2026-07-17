@@ -1775,6 +1775,7 @@ cross-check.
 | calc-earthwork.js | `computeRelativeCompaction` | `{ wet_pcf = 0, w_pct = 0, max_pcf = 0, spec_pct = 95 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeRipperProduction` | `{ spacing_ft, penetration_ft, speed_fpm, efficiency = 0.75 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeRiprapD50` | `{ velocity_fps, specific_gravity = 2.65, turbulence_coeff = 0.86, safety_fact...` | _ | _ | _ |
+| calc-earthwork.js | `computeRiprapTonnage` | `{ area_sf = 0, thickness_ft = 0, unit_wt_pcf = 165 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeRusleSoilLoss` | `{ r_factor, k_factor, ls_factor, c_factor, p_factor, acres } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeSoilPhaseRelations` | `{ gamma_pcf = 0, w_pct = 0, gs = 2.70 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeSoilSwellShrink` | `{ bank_cy, swell_pct = 25, shrink_pct = 15 } = {}` | _ | _ | _ |
@@ -2933,7 +2934,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1519.
+Row count: 1520.
 
 <!-- END function-corpus-v14 -->
 
@@ -3481,7 +3482,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (281 tiles)
+### Group E Construction (282 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3659,6 +3660,7 @@ per spec-v14 §13.1 second paragraph.
 | `ridge-cap-fasteners` | Hip / Ridge Cap Bundles and Roofing Nails by the Pound | IRC R905.2.6 asphalt-shingle fastenin...; spec-v217 section 2.1 pinned example (24-square, 40 ft ri... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ripper-production` | Dozer Ripper Loosening Production Rate | Swept-prism production identity (firs...; cross-section = 3*1.5 = 4.5 ft^2; production = 4.5*132*60... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `riprap-d50` | Riprap Median Stone Size (Isbash) | Isbash riprap-sizing equation (public...; D50 = 1.2*64 / (2*32.2*0.86^2*1.65) = 76.8/78.59 = 0.977 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `riprap-tonnage` | Riprap Layer Volume and Tonnage | Layer take-off identity (first-princi...; volume = 500*2/27 = 37.0 cy; tons = 500*2*165/2000 = 82.5 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `roof-pitch` | Roof Pitch | Project (first-principles); Pitch (rise / 12 run); angle = atan(rise/run) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `roofing-squares` | Roofing Squares and Bundles | Project (industry rule of thumb); 2200 ft^2 roof / 6:12 pitch (12% waste) / architectural s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rusle-soil-loss` | RUSLE Annual Soil Loss | RUSLE (USDA Agriculture Handbook 703); A = 150*0.32*1.5*1.0*1.0 = 72 tons/acre/yr; site = 72*5 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4391,6 +4393,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1272. Fixture-covered or reference-cadence: 1272 / 1272.
+Tile count: 1273. Fixture-covered or reference-cadence: 1273 / 1273.
 
 <!-- END tile-index-v14 -->

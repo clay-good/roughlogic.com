@@ -48735,6 +48735,56 @@
    }
   },
   {
+   "tile_id": "riprap-tonnage",
+   "source_publisher": "Layer take-off identity (first-principles)",
+   "source_title": "500 sf outlet apron, 2 ft thick, 165 pcf solid rock",
+   "source_edition_or_year": "spec-v824 worked example",
+   "source_section_or_page": "volume = 500*2/27 = 37.0 cy; tons = 500*2*165/2000 = 82.5",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "area_sf": 500,
+    "thickness_ft": 2,
+    "unit_wt_pcf": 165
+   },
+   "outputs": {
+    "volume_cy": {
+     "value": 37.037,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "tons": {
+     "value": 82.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "riprap-tonnage",
+   "source_publisher": "Layer take-off identity (first-principles)",
+   "source_title": "cross-check: ordering at a placed 130 pcf (voids counted) cuts the delivery",
+   "source_edition_or_year": "spec-v824 worked example",
+   "source_section_or_page": "tons = 500*2*130/2000 = 65 tons -- order to the placed density, not the solid rock",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "area_sf": 500,
+    "thickness_ft": 2,
+    "unit_wt_pcf": 130
+   },
+   "outputs": {
+    "tons": {
+     "value": 65,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

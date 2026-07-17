@@ -16652,6 +16652,31 @@
       "kind": "industry"
     },
     {
+      "term": "riprap tonnage",
+      "target": "riprap-tonnage",
+      "kind": "industry"
+    },
+    {
+      "term": "riprap volume",
+      "target": "riprap-tonnage",
+      "kind": "industry"
+    },
+    {
+      "term": "rock armor tonnage",
+      "target": "riprap-tonnage",
+      "kind": "industry"
+    },
+    {
+      "term": "riprap layer cy",
+      "target": "riprap-tonnage",
+      "kind": "industry"
+    },
+    {
+      "term": "riprap order quantity",
+      "target": "riprap-tonnage",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

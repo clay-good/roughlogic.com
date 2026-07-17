@@ -17094,6 +17094,7 @@ import { computeRelativeCompaction as _v326, computeSoilPhaseRelations as _v327,
 import { computeWaterForCompaction as _v821wfc } from "../../calc-earthwork.js";
 import { computeRusleSoilLoss as _v822rsl } from "../../calc-earthwork.js";
 import { computeRiprapD50 as _v823rr } from "../../calc-earthwork.js";
+import { computeRiprapTonnage as _v824rt } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17161,6 +17162,19 @@ test("bounds: spec-v823 computeRiprapD50 pins the Isbash stone size, the C-squar
   assert.ok("error" in _v823rr({ velocity_fps: 8, turbulence_coeff: 0.86, safety_factor: 0 }));
   assert.ok("error" in _v823rr({ velocity_fps: 8, specific_gravity: 1, turbulence_coeff: 0.86, safety_factor: 1.2 }));
   assert.ok("error" in _v823rr({ velocity_fps: 8, specific_gravity: 0.9, turbulence_coeff: 0.86, safety_factor: 1.2 }));
+});
+
+test("bounds: spec-v824 computeRiprapTonnage pins the layer volume, tonnage, and error seams", () => {
+  // 500 sf, 2 ft, 165 pcf -> 37.04 cy, 82.5 tons
+  const r = _v824rt({ area_sf: 500, thickness_ft: 2, unit_wt_pcf: 165 });
+  assert.ok(Math.abs(r.volume_cy - 37.037) < 1e-2);
+  assert.ok(Math.abs(r.tons - 82.5) < 1e-9);
+  // Order to a placed 130 pcf (voids) drops the delivery.
+  assert.ok(Math.abs(_v824rt({ area_sf: 500, thickness_ft: 2, unit_wt_pcf: 130 }).tons - 65) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v824rt({ area_sf: 0, thickness_ft: 2, unit_wt_pcf: 165 }));
+  assert.ok("error" in _v824rt({ area_sf: 500, thickness_ft: 0, unit_wt_pcf: 165 }));
+  assert.ok("error" in _v824rt({ area_sf: 500, thickness_ft: 2, unit_wt_pcf: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

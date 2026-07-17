@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): riprap-tonnage -- riprap layer volume and tonnage (spec-v824); 2026-07-16
+
+- New Group E tile `riprap-tonnage` (calc-earthwork.js), the order-quantity companion to riprap-d50. Layer take-off:
+  volume = area x thickness / 27, tons = area x thickness x unit weight / 2000. A 500 sf outlet apron 2 ft thick is 37
+  cy and 82.5 tons at solid 165 pcf, but ordering to a placed 130 pcf (voids counted) drops it to 65 tons. Home count
+  1,272 -> 1,273.
+
 ### feat(earthwork): riprap-d50 -- riprap median stone size (Isbash) (spec-v823); 2026-07-16
 
 - New Group E tile `riprap-d50` (calc-earthwork.js), sizing the stone that armors a channel or outlet against a scouring

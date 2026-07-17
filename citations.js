@@ -7979,6 +7979,17 @@ export const CITATIONS = {
       { name: "Stone specific gravity", value: "2.65 default (typical quarried stone); the stone source governs", source: "materials practice" },
     ],
   },
+  "riprap-tonnage": {
+    formula: "volume_cy = area_sf x thickness_ft / 27; tons = area_sf x thickness_ft x unit_wt_pcf / 2000.",
+    edition: "Layer take-off identity by name (plan area x thickness x unit weight); first-principles volume arithmetic.",
+    freeAccess: "The layer take-off is public quantity-survey geometry; the unit weight comes from the stone source.",
+    governance: GOVERNANCE.general,
+    editionNote: "The layer should be at least 1.5 x D50 thick (from riprap-d50). A solid-rock unit weight of about 165 pcf overstates the delivered tonnage because placed riprap holds voids - a placed density near 120-135 pcf is closer for ordering, or the last few loads sit unused. A filter or bedding layer under the riprap is taken off separately.",
+    assumptions: [
+      { name: "Unit weight", value: "165 pcf solid-rock default; order to a placed 120-135 pcf (voids counted)", source: "materials practice" },
+      { name: "Layer thickness", value: "at least 1.5 x D50 (from riprap-d50); the plan sets it", source: "USACE riprap practice" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",
