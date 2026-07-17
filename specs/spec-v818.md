@@ -1,6 +1,7 @@
 # roughlogic.com Specification v818 -- Conical Stockpile Volume and Tonnage (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-16 (package 0.398.0).** Executed against the live catalog (1,267 -> 1,268 tiles), via the
+> `_simpleRenderer` factory in calc-construction.js. Single-tile spec.
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-construction.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v817.md. Materials sweep, beside the `aggregate` and
 > `material-quantity` take-off tiles.

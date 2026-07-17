@@ -416,7 +416,7 @@ const TOOL_MODULES = (() => {
     "paint-coverage", "excavation", "masonry-count", "wind-pressure", "wind-speed-from-velocity-pressure",
     "snow-load", "anchor-embedment",
     // v3
-    "drywall", "roofing-squares", "asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity", "aggregate", "mortar-mix",
+    "drywall", "roofing-squares", "asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity", "aggregate", "stockpile-volume", "mortar-mix",
     "concrete-mix-design", "bolt-torque", "bend-allowance", "speeds-feeds",
     "intermittent-fillet-weld", "multi-bend-flat-pattern",
     "powered-attic-ventilator",

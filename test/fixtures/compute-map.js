@@ -249,6 +249,7 @@ export const COMPUTE_MAP = {
   "prop-slip": { module: "../../calc-mechanic.js", fn: "computePropSlip" },
   "fuel-range": { module: "../../calc-mechanic.js", fn: "computeFuelRange" },
   "aggregate": { module: "../../calc-construction.js", fn: "computeAggregate" },
+  "stockpile-volume": { module: "../../calc-construction.js", fn: "computeStockpileVolume" },
   "bolt-torque": { module: "../../calc-construction.js", fn: "computeBoltTorque" },
   "bend-allowance": { module: "../../calc-construction.js", fn: "computeBendAllowance" },
   "intermittent-fillet-weld": { module: "../../calc-construction.js", fn: "computeIntermittentFilletWeld" },

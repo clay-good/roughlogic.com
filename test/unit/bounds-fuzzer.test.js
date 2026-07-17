@@ -609,6 +609,7 @@ import {
 } from "../../calc-gas.js";
 import {
   computeAggregate,
+  computeStockpileVolume,
   computeAnchorEmbedment,
   computeArea,
   computeAsphaltTonnage,
@@ -8735,6 +8736,24 @@ test("bounds: calc-construction computeAggregate pins cubic_yards = area*depth_f
   assert.ok("error" in computeAggregate({ area_ft2: 0, depth_in: 4 }));
   assert.ok("error" in computeAggregate({ area_ft2: 100, depth_in: 0 }));
   assert.ok("error" in computeAggregate({ area_ft2: 100, depth_in: 4, material: "moon" }));
+});
+
+test("bounds: spec-v818 computeStockpileVolume pins height, cone volume, tonnage, and error seams", () => {
+  // 60 ft base, 37 deg repose, 100 pcf -> 22.6 ft, 21,306 ft^3 (789 cy), 1,065 tons
+  const r = computeStockpileVolume({ base_diameter_ft: 60, repose_angle_deg: 37, density_pcf: 100 });
+  assert.ok(Math.abs(r.height_ft - 22.607) < 1e-2);
+  assert.ok(Math.abs(r.volume_ft3 - 21306.6) < 1);
+  assert.ok(Math.abs(r.volume_cy - 789.13) < 0.1);
+  assert.ok(Math.abs(r.tons - 1065.3) < 0.5);
+  // A wetter pile at 40 deg on the same base rises and holds more.
+  const w = computeStockpileVolume({ base_diameter_ft: 60, repose_angle_deg: 40, density_pcf: 100 });
+  assert.ok(Math.abs(w.height_ft - 25.172) < 1e-2);
+  assert.ok(Math.abs(w.volume_cy - 878.6) < 0.5);
+  // Error seams (incl. repose out of 0-90).
+  assert.ok("error" in computeStockpileVolume({ base_diameter_ft: 0, repose_angle_deg: 37 }));
+  assert.ok("error" in computeStockpileVolume({ base_diameter_ft: 60, density_pcf: 0 }));
+  assert.ok("error" in computeStockpileVolume({ base_diameter_ft: 60, repose_angle_deg: 0 }));
+  assert.ok("error" in computeStockpileVolume({ base_diameter_ft: 60, repose_angle_deg: 90 }));
 });
 
 test("bounds: calc-construction computeMortarMix pins bags = ceil((count/yield)*joint_factor) for brick and CMU", () => {

@@ -2676,6 +2676,74 @@
    }
   },
   {
+   "tile_id": "stockpile-volume",
+   "source_publisher": "Right-circular-cone identity (first-principles)",
+   "source_title": "60 ft base, 37 deg repose, 100 pcf crushed stone",
+   "source_edition_or_year": "cone geometry / angle-of-repose practice",
+   "source_section_or_page": "radius = 30; height = 30*tan(37) = 22.6 ft; volume = (1/3)*PI*30^2*22.6 = 21,306 ft^3 (789 cy); tons = 1,065",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "base_diameter_ft": 60,
+    "repose_angle_deg": 37,
+    "density_pcf": 100
+   },
+   "outputs": {
+    "height_ft": {
+     "value": 22.607,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "volume_ft3": {
+     "value": 21306.6,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "volume_cy": {
+     "value": 789.13,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "tons": {
+     "value": 1065.3,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stockpile-volume",
+   "source_publisher": "Right-circular-cone identity (first-principles)",
+   "source_title": "cross-check: a wetter pile at 40 deg on the same 60 ft base rises and holds more",
+   "source_edition_or_year": "cone geometry / angle-of-repose practice",
+   "source_section_or_page": "height = 30*tan(40) = 25.17 ft; volume = 878.6 cy",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "base_diameter_ft": 60,
+    "repose_angle_deg": 40,
+    "density_pcf": 100
+   },
+   "outputs": {
+    "height_ft": {
+     "value": 25.172,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "volume_cy": {
+     "value": 878.6,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "bolt-torque",
    "source_publisher": "Project (first-principles)",
    "source_title": "SAE Grade 5, 1/2 in, dry, 0.75 preload",

@@ -237,7 +237,7 @@ const _TILES = [
   ["paint-coverage", "E"], ["excavation", "E"], ["masonry-count", "E"],
   ["wind-pressure", "E"], ["wind-speed-from-velocity-pressure", "E"], ["snow-load", "E"], ["anchor-embedment", "E"],
   ["drywall", "E"], ["roofing-squares", "E"], ["asphalt-tonnage", "E"], ["asphalt-paving-speed", "E"], ["asphalt-tack-coat-quantity", "E"],
-  ["aggregate", "E"], ["mortar-mix", "E"], ["concrete-mix-design", "E"],
+  ["aggregate", "E"], ["stockpile-volume", "E"], ["mortar-mix", "E"], ["concrete-mix-design", "E"],
   ["bolt-torque", "E"], ["bend-allowance", "E"], ["speeds-feeds", "E"],
   ["intermittent-fillet-weld", "E"], ["multi-bend-flat-pattern", "E"],
   ["weld-usage", "E"], ["demo-debris", "E"], ["formwork-pressure", "E"], ["concrete-pour-rate", "E"],

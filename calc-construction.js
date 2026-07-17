@@ -6898,6 +6898,50 @@ const _v817renderAnnularGroutVolume = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["annular-grout-volume"] = _v817renderAnnularGroutVolume;
 
+// ----- spec-v818: Conical Stockpile Volume and Tonnage (Group E) -----
+//
+// A free-standing cone of material stands at its angle of repose: height =
+// radius x tan(repose); volume = 1/3 pi r^2 h; tonnage from the bulk density.
+// dims: in { base_diameter_ft: L, repose_angle_deg: dimensionless, density_pcf: M L^-3 } out: { radius_ft: L, height_ft: L, volume_ft3: L^3, volume_cy: L^3, tons: M }
+export function computeStockpileVolume({ base_diameter_ft = 0, repose_angle_deg = 37, density_pcf = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(base_diameter_ft > 0)) return { error: "Base diameter must be positive (ft)." };
+  if (!(density_pcf > 0)) return { error: "Density must be positive (pcf)." };
+  if (!(repose_angle_deg > 0) || repose_angle_deg >= 90) return { error: "Repose angle must be between 0 and 90 degrees (exclusive)." };
+  const radius_ft = base_diameter_ft / 2;
+  const height_ft = radius_ft * Math.tan((repose_angle_deg * Math.PI) / 180);
+  const volume_ft3 = (1 / 3) * Math.PI * radius_ft * radius_ft * height_ft;
+  const volume_cy = volume_ft3 / 27;
+  const tons = (volume_ft3 * density_pcf) / 2000;
+  if (![radius_ft, height_ft, volume_ft3, volume_cy, tons].every(Number.isFinite)) return { error: "Stockpile math is not a finite value." };
+  return {
+    radius_ft,
+    height_ft,
+    volume_ft3,
+    volume_cy,
+    tons,
+    note: "The pile is idealized as a clean cone on flat ground - an irregular base, a flat top, or a pile against a wall all change it. The angle of repose depends on the material and its moisture (roughly 30-40 degrees for granular material) and steepens as the material gets damp or angular. A survey volume governs for payment.",
+  };
+}
+export const stockpileVolumeExample = { inputs: { base_diameter_ft: 60, repose_angle_deg: 37, density_pcf: 100 } };
+const _v818renderStockpileVolume = _simpleRenderer({
+  citation: "Citation: right-circular-cone identity by name. height = radius x tan(repose angle); volume = 1/3 x pi x radius^2 x height; tonnage = volume x bulk density / 2000. The pile is idealized as a clean cone; a survey governs for payment.",
+  example: stockpileVolumeExample.inputs,
+  fields: [
+    { key: "base_diameter_ft", label: "Pile base diameter (ft)", kind: "number" },
+    { key: "repose_angle_deg", label: "Angle of repose (degrees)", kind: "number", default: 37 },
+    { key: "density_pcf", label: "Loose bulk density (pcf)", kind: "number", default: 100 },
+  ],
+  outputs: [
+    { key: "v", id: "spv-out-v", label: "Volume", value: (r) => _fmtC(r.volume_cy, 0) + " cy (" + _fmtC(r.volume_ft3, 0) + " ft^3)" },
+    { key: "t", id: "spv-out-t", label: "Tonnage", value: (r) => _fmtC(r.tons, 0) + " tons" },
+    { key: "h", id: "spv-out-h", label: "Pile height", value: (r) => _fmtC(r.height_ft, 1) + " ft" },
+    { key: "n", id: "spv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeStockpileVolume,
+});
+CONSTRUCTION_RENDERERS["stockpile-volume"] = _v818renderStockpileVolume;
+
 // ----- spec-v814: Concrete Pour Rate, Rate of Rise, and Delivery Cadence (Group E) -----
 //
 // The placement-logistics complement to formwork-pressure, which takes the rate

@@ -782,6 +782,7 @@ const RELATED = {
   "asphalt-paving-speed": ["asphalt-tonnage", "aggregate", "haul-cycle-production"],
   "asphalt-tack-coat-quantity": ["asphalt-tonnage", "asphalt-paving-speed", "coating-coverage-dft"],
   "aggregate": ["concrete", "asphalt-tonnage", "concrete-mix-design"],
+  "stockpile-volume": ["aggregate", "soil-swell-shrink", "material-quantity"],
   "mortar-mix": ["masonry-count", "concrete-mix-design"],
   "concrete-mix-design": ["concrete", "aggregate", "mortar-mix"],
   "bolt-torque": ["bolt-stretch", "fastener-pullout"],

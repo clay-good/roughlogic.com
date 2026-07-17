@@ -4556,6 +4556,17 @@ export const CITATIONS = {
       { name: "Density table", value: "engineering-practice values per material", source: "USGS / NSSGA" },
     ],
   },
+  "stockpile-volume": {
+    formula: "radius_ft = base_diameter_ft / 2; height_ft = radius_ft x tan(repose_angle_deg x pi/180); volume_ft3 = (1/3) x pi x radius_ft^2 x height_ft; volume_cy = volume_ft3 / 27; tons = volume_ft3 x density_pcf / 2000.",
+    edition: "Right-circular-cone identity by name (angle-of-repose pile); first-principles geometry.",
+    freeAccess: "The cone-volume and angle-of-repose relations are public geometry and soil-mechanics practice.",
+    governance: GOVERNANCE.general,
+    editionNote: "The pile is idealized as a clean cone on flat ground - an irregular base, a flat top, or a pile against a wall all change it. The angle of repose depends on the material and its moisture (roughly 30-40 degrees for granular material) and steepens as the material gets damp or angular. A survey volume governs for payment.",
+    assumptions: [
+      { name: "Angle of repose", value: "37 degrees default (granular material runs ~30-40 degrees); moisture and angularity steepen it", source: "soil-mechanics practice" },
+      { name: "Bulk density", value: "100 pcf default loose (the material governs); a survey governs for payment", source: "materials practice" },
+    ],
+  },
   "mortar-mix": {
     formula: "Bag yields per PCA / NCMA: 1 bag (94 lb Type N) yields ~3.0 ft³ mortar; joint volume from joint_thickness × wall_area_per_bag; brick / 8-inch CMU joint-thickness adjustment.",
     edition: "PCA (Portland Cement Association) Design and Control of Concrete Mixtures by name; ASTM C270 mortar specs by name.",

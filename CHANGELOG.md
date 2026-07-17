@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): stockpile-volume -- conical stockpile volume and tonnage (spec-v818); 2026-07-16
+
+- New Group E tile `stockpile-volume` (calc-construction.js), stockpile inventory beside the aggregate and
+  material-quantity takeoffs. A free-standing cone stands at its angle of repose: height = radius x tan(repose),
+  volume = 1/3 pi r^2 h, tonnage from the bulk density. A 60 ft-diameter pile of crushed stone at 37 degrees stands
+  22.6 ft and holds ~789 cy (1,065 tons at 100 pcf); a wetter pile at 40 degrees rises to 878 cy. Home count 1,267 -> 1,268.
+
 ### feat(construction): annular-grout-volume -- cased-bore / pipe-in-casing grout (spec-v817); 2026-07-16
 
 - New Group E tile `annular-grout-volume` (calc-construction.js), the grout in the ring between a bored casing and the
