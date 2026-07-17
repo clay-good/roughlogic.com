@@ -2813,6 +2813,7 @@ cross-check.
 | calc-solar.js | `computePvInverterRatio` | `{ dc_kw = 0, ac_kw = 0, inv_eff = 0.96 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvMaxAmbientForPower` | `{ target_power_W = 0, P_stc_W = 0, G_wm2 = 0, NOCT_C = 45, gamma = -0.35 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvPerformanceRatio` | `inputs = {}` | _ | _ | _ |
+| calc-solar.js | `computePvRailClampTakeoff` | `{ rows = 2, modules_per_row = 12, module_width_ft = 3.42, gap_ft = 0, rails_p...` | _ | _ | _ |
 | calc-solar.js | `computePvRowShadeAngle` | `{ module_length_ft = 0, tilt_deg = 0, row_pitch_ft = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvRowSpacing` | `{ module_length_ft = 0, tilt_deg = 0, profile_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvStringFusing` | `{ Isc_A = 0, max_fuse_A = 0, n_strings = 1 } = {}` | _ | _ | _ |
@@ -3005,7 +3006,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1591.
+Row count: 1592.
 
 <!-- END function-corpus-v14 -->
 
@@ -3086,7 +3087,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (166 tiles)
+### Group A Electrical (167 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3212,6 +3213,7 @@ per spec-v14 §13.1 second paragraph.
 | `pv-inverter-ratio` | PV Inverter Loading Ratio (DC:AC) and Clipping Onset | Inverter loading ratio + NREL guidance; spec-v223 section 2.1 pinned example (in-band) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pv-max-ambient-for-power` | PV Max Ambient Temperature for a Target Power | PV design practice / NREL (solved for...; spec-v743 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pv-performance-ratio` | PV Performance Ratio from Stacked Losses | NREL PVWatts; spec-v351 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pv-rail-clamp-takeoff` | PV Racking Rail, Clamp, and Splice Takeoff | PV racking-takeoff identity (first-pr...; run=12*3.42=41.04; rail=2*2*41.04=164.16; mid=2*2*11=44; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pv-row-shade-angle` | PV Shade-Free Sun Angle from Row Pitch | NREL / Sandia row-spacing geometry; spec-v702 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pv-row-spacing` | PV Inter-Row Spacing and Ground-Coverage Ratio | NREL / Sandia row-spacing geometry; spec-v222 section 2.1 pinned example (30-degree ground mo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pv-string-fusing` | PV Source-Circuit Fuse Sizing (NEC 690.9) | NEC 690.9; spec-v352 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4535,6 +4537,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1344. Fixture-covered or reference-cadence: 1344 / 1344.
+Tile count: 1345. Fixture-covered or reference-cadence: 1345 / 1345.
 
 <!-- END tile-index-v14 -->

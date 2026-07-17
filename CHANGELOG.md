@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(solar): pv-rail-clamp-takeoff -- PV racking rail, clamp, and splice takeoff (spec-v896); 2026-07-17
+
+- New Group A tile `pv-rail-clamp-takeoff` (calc-solar.js), the solar install-ops takeoff beside `pv-row-spacing`. run =
+  modules x (width + gap); rail = rows x rails x run; mid clamps = rails x rows x (modules - 1); end clamps = 2 x rails x
+  rows; splices = (ceil(run / stock) - 1) x rails x rows. A two-row array of twelve 3.42 ft modules on two rails per row is
+  164 LF of rail, 44 mid clamps, 8 end clamps, and 8 splices; a single row halves the rail to 82 LF and the clamps to 22
+  mid / 4 end. The rail layout and clamp type come from the rack manufacturer's engineering. Home count 1,344 -> 1,345.
+
 ### feat(construction): housewrap-rolls -- housewrap (WRB) rolls, cap fasteners, and seam tape (spec-v895); 2026-07-17
 
 - New Group E tile `housewrap-rolls` (calc-construction.js), the weatherization takeoff beside `siding-takeoff` and

@@ -1525,3 +1525,67 @@ function renderShadowLength(inputRegion, outputRegion, citationEl) {
   for (const f of [h, a]) f.input.addEventListener("input", update);
 }
 SOLAR_RENDERERS["shadow-length"] = renderShadowLength;
+
+// pv-rail-clamp-takeoff (spec-v896): PV racking rail, clamp, and splice takeoff.
+// dims: in { rows: dimensionless, modules_per_row: dimensionless, module_width_ft: L, gap_ft: L, rails_per_row: dimensionless, rail_stock_ft: L } out: { run_len_ft: L, rail_lf: L, mid_clamps: dimensionless, end_clamps: dimensionless, splices: dimensionless }
+export function computePvRailClampTakeoff({ rows = 2, modules_per_row = 12, module_width_ft = 3.42, gap_ft = 0, rails_per_row = 2, rail_stock_ft = 14 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(rows > 0)) return { error: "Row count must be positive." };
+  if (!(modules_per_row > 0)) return { error: "Modules per row must be positive." };
+  if (!(module_width_ft > 0)) return { error: "Module width must be positive (ft)." };
+  if (!(rails_per_row > 0)) return { error: "Rails per row must be positive." };
+  if (!(rail_stock_ft > 0)) return { error: "Rail stock length must be positive (ft)." };
+  if (gap_ft < 0) return { error: "Gap cannot be negative (ft)." };
+  const run_len_ft = modules_per_row * (module_width_ft + gap_ft);
+  const rail_lf = rows * rails_per_row * run_len_ft;
+  const mid_clamps = rails_per_row * rows * (modules_per_row - 1);
+  const end_clamps = 2 * rails_per_row * rows;
+  const splices = (Math.ceil(run_len_ft / rail_stock_ft) - 1) * rails_per_row * rows;
+  if (![run_len_ft, rail_lf, mid_clamps, end_clamps, splices].every(Number.isFinite)) return { error: "Racking-takeoff math is not a finite value." };
+  return {
+    run_len_ft,
+    rail_lf,
+    mid_clamps,
+    end_clamps,
+    splices,
+    note: "The rail layout, clamp type, and splice come from the rack manufacturer's engineering. A module shares a mid clamp with its neighbor and gets an end clamp at each row end. This counts hardware, not the array spacing pv-row-spacing gives.",
+  };
+}
+
+export const pvRailClampTakeoffExample = { inputs: { rows: 2, modules_per_row: 12, module_width_ft: 3.42, gap_ft: 0, rails_per_row: 2, rail_stock_ft: 14 } };
+
+function _v896renderPvRailClampTakeoff(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: racking-takeoff identity by name. run = modules x (width + gap); rail = rows x rails x run; mid clamps = rails x rows x (modules - 1); end clamps = 2 x rails x rows; splices = (ceil(run / stock) - 1) x rails x rows.";
+  const rw = makeNumber("Module rows", "prc-rw", { step: "any", min: "0", value: "2" });
+  rw.input.value = "2";
+  const mp = makeNumber("Modules per row", "prc-mp", { step: "any", min: "0", value: "12" });
+  mp.input.value = "12";
+  const mw = makeNumber("Module width along the rail (ft)", "prc-mw", { step: "any", min: "0", value: "3.42" });
+  mw.input.value = "3.42";
+  const gp = makeNumber("Module-to-module gap (ft)", "prc-gp", { step: "any", min: "0", value: "0" });
+  gp.input.value = "0";
+  const rp = makeNumber("Rails per row", "prc-rp", { step: "any", min: "0", value: "2" });
+  rp.input.value = "2";
+  const rs = makeNumber("Rail stock length (ft)", "prc-rs", { step: "any", min: "0", value: "14" });
+  rs.input.value = "14";
+  for (const f of [rw, mp, mw, gp, rp, rs]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { rw.input.value = "2"; mp.input.value = "12"; mw.input.value = "3.42"; gp.input.value = "0"; rp.input.value = "2"; rs.input.value = "14"; update(); });
+  const oRail = makeOutputLine(outputRegion, "Rail footage", "prc-out-rail");
+  const oMid = makeOutputLine(outputRegion, "Mid clamps", "prc-out-mid");
+  const oEnd = makeOutputLine(outputRegion, "End clamps", "prc-out-end");
+  const oSpl = makeOutputLine(outputRegion, "Rail splices", "prc-out-spl");
+  const update = debounce(() => {
+    const r = computePvRailClampTakeoff({
+      rows: rw.input.value === "" ? 2 : Number(rw.input.value), modules_per_row: mp.input.value === "" ? 12 : Number(mp.input.value),
+      module_width_ft: mw.input.value === "" ? 3.42 : Number(mw.input.value), gap_ft: gp.input.value === "" ? 0 : Number(gp.input.value),
+      rails_per_row: rp.input.value === "" ? 2 : Number(rp.input.value), rail_stock_ft: rs.input.value === "" ? 14 : Number(rs.input.value),
+    });
+    if (r.error) { oRail.textContent = r.error; oMid.textContent = "-"; oEnd.textContent = "-"; oSpl.textContent = "-"; return; }
+    oRail.textContent = fmt(r.rail_lf, 1) + " LF (" + fmt(r.run_len_ft, 2) + " ft per run)";
+    oMid.textContent = fmt(r.mid_clamps, 0) + " mid clamps";
+    oEnd.textContent = fmt(r.end_clamps, 0) + " end clamps";
+    oSpl.textContent = fmt(r.splices, 0) + " splices";
+  }, DEBOUNCE_MS);
+  for (const f of [rw, mp, mw, gp, rp, rs]) f.input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["pv-rail-clamp-takeoff"] = _v896renderPvRailClampTakeoff;

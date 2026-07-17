@@ -26394,3 +26394,27 @@ test("bounds: spec-v895 computeHousewrapRolls pins the rolls, cap fasteners, sea
   assert.ok("error" in _v895({ wall_area_sf: 4000, roll_coverage_sf: 1350, overlap_waste_pct: -10, fasteners_per_sf: 0.5, roll_width_ft: 9 }));
   assert.ok("error" in _v895({ wall_area_sf: Infinity, roll_coverage_sf: 1350, overlap_waste_pct: 10, fasteners_per_sf: 0.5, roll_width_ft: 9 }));
 });
+
+import { computePvRailClampTakeoff as _v896 } from "../../calc-solar.js";
+
+test("bounds: spec-v896 computePvRailClampTakeoff pins the run, rail, clamp, splice counts, and error seams", () => {
+  const r = _v896({ rows: 2, modules_per_row: 12, module_width_ft: 3.42, gap_ft: 0, rails_per_row: 2, rail_stock_ft: 14 });
+  assert.ok(Math.abs(r.run_len_ft - 41.04) < 1e-9); // 12 * 3.42
+  assert.ok(Math.abs(r.rail_lf - 164.16) < 1e-9); // 2 * 2 * 41.04
+  assert.equal(r.mid_clamps, 44); // 2 * 2 * 11
+  assert.equal(r.end_clamps, 8); // 2 * 2 * 2
+  assert.equal(r.splices, 8); // (ceil(41.04/14)-1) * 2 * 2 = 2 * 4
+  // The row count multiplies every quantity: a single row halves the rail and clamps.
+  const oneRow = _v896({ rows: 1, modules_per_row: 12, module_width_ft: 3.42, gap_ft: 0, rails_per_row: 2, rail_stock_ft: 14 });
+  assert.ok(Math.abs(oneRow.rail_lf - 82.08) < 1e-9); // 1 * 2 * 41.04
+  assert.equal(oneRow.mid_clamps, 22); // 2 * 1 * 11
+  assert.equal(oneRow.end_clamps, 4); // 2 * 2 * 1
+  // Error seams: non-finite, non-positive rows / modules / width / rails / stock, negative gap.
+  assert.ok("error" in _v896({ rows: 0, modules_per_row: 12, module_width_ft: 3.42, gap_ft: 0, rails_per_row: 2, rail_stock_ft: 14 }));
+  assert.ok("error" in _v896({ rows: 2, modules_per_row: 0, module_width_ft: 3.42, gap_ft: 0, rails_per_row: 2, rail_stock_ft: 14 }));
+  assert.ok("error" in _v896({ rows: 2, modules_per_row: 12, module_width_ft: 0, gap_ft: 0, rails_per_row: 2, rail_stock_ft: 14 }));
+  assert.ok("error" in _v896({ rows: 2, modules_per_row: 12, module_width_ft: 3.42, gap_ft: 0, rails_per_row: 0, rail_stock_ft: 14 }));
+  assert.ok("error" in _v896({ rows: 2, modules_per_row: 12, module_width_ft: 3.42, gap_ft: 0, rails_per_row: 2, rail_stock_ft: 0 }));
+  assert.ok("error" in _v896({ rows: 2, modules_per_row: 12, module_width_ft: 3.42, gap_ft: -1, rails_per_row: 2, rail_stock_ft: 14 }));
+  assert.ok("error" in _v896({ rows: Infinity, modules_per_row: 12, module_width_ft: 3.42, gap_ft: 0, rails_per_row: 2, rail_stock_ft: 14 }));
+});

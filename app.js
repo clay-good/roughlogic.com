@@ -102,7 +102,7 @@ const TOOL_MODULES = (() => {
     // spec-v182 electrician second-pass batch
     "pv-circuit-ampacity",
     // spec-v221..v223 PV system-design batch
-    "pv-energy-yield", "pv-array-sizing", "pv-row-spacing", "pv-row-shade-angle", "pv-inverter-ratio",
+    "pv-energy-yield", "pv-array-sizing", "pv-row-spacing", "pv-row-shade-angle", "pv-inverter-ratio", "pv-rail-clamp-takeoff",
     "pv-cell-temperature-power", "pv-max-ambient-for-power", "pv-performance-ratio", "pv-string-fusing",
     // spec-v236..v238 grid-tied battery-economics batch
     "battery-tou-arbitrage", "battery-peak-shaving", "battery-c-rate",

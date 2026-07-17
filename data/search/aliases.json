@@ -18452,6 +18452,31 @@
       "kind": "industry"
     },
     {
+      "term": "pv rail takeoff",
+      "target": "pv-rail-clamp-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "solar racking clamps",
+      "target": "pv-rail-clamp-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "module clamp count",
+      "target": "pv-rail-clamp-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "solar rail splice",
+      "target": "pv-rail-clamp-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "pv mounting hardware",
+      "target": "pv-rail-clamp-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

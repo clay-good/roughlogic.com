@@ -8310,6 +8310,17 @@ export const CITATIONS = {
       { name: "Roll coverage", value: "~1,350 sf for a 9 x 150 ft roll (default); the product size governs", source: "WRB manufacturer" },
     ],
   },
+  "pv-rail-clamp-takeoff": {
+    formula: "run_len_ft = modules_per_row x (module_width_ft + gap_ft); rail_lf = rows x rails_per_row x run_len_ft; mid_clamps = rails_per_row x rows x (modules_per_row - 1); end_clamps = 2 x rails_per_row x rows; splices = (ceil(run_len_ft / rail_stock_ft) - 1) x rails_per_row x rows.",
+    edition: "PV racking-takeoff identity by name (run from the module pitch; rail, clamps, and splices from the rows and rails); first-principles count arithmetic.",
+    freeAccess: "The count arithmetic is public first-principles; the rail layout, clamp type, and splice come from the rack manufacturer's engineering.",
+    governance: GOVERNANCE.general,
+    editionNote: "The rail layout, clamp type, and splice come from the rack manufacturer's engineering. A module shares a mid clamp with its neighbor and gets an end clamp at each row end. This counts hardware, not the array spacing pv-row-spacing gives.",
+    assumptions: [
+      { name: "Clamp sharing", value: "modules share a mid clamp with a neighbor; an end clamp at each row end", source: "rack manufacturer" },
+      { name: "Rail stock", value: "~14 ft default; a splice joins each stock break", source: "rack manufacturer" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

@@ -53001,6 +53001,86 @@
    }
   },
   {
+   "tile_id": "pv-rail-clamp-takeoff",
+   "source_publisher": "PV racking-takeoff identity (first-principles)",
+   "source_title": "2 rows, 12 modules/row, 3.42 ft wide, 2 rails/row, 14 ft stock -> 164 LF rail, 44 mid, 8 end, 8 splices",
+   "source_edition_or_year": "spec-v896 worked example",
+   "source_section_or_page": "run=12*3.42=41.04; rail=2*2*41.04=164.16; mid=2*2*11=44; end=2*2*2=8; splices=(ceil(41.04/14)-1)*4=8",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "rows": 2,
+    "modules_per_row": 12,
+    "module_width_ft": 3.42,
+    "gap_ft": 0,
+    "rails_per_row": 2,
+    "rail_stock_ft": 14
+   },
+   "outputs": {
+    "rail_lf": {
+     "value": 164.16,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "mid_clamps": {
+     "value": 44,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "end_clamps": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "splices": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pv-rail-clamp-takeoff",
+   "source_publisher": "PV racking-takeoff identity (first-principles)",
+   "source_title": "cross-check: a single-row array halves the rail to 82 LF and the clamps to 22 mid / 4 end",
+   "source_edition_or_year": "spec-v896 worked example",
+   "source_section_or_page": "rail=1*2*41.04=82.08; mid=2*1*11=22; end=2*2*1=4",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "rows": 1,
+    "modules_per_row": 12,
+    "module_width_ft": 3.42,
+    "gap_ft": 0,
+    "rails_per_row": 2,
+    "rail_stock_ft": 14
+   },
+   "outputs": {
+    "rail_lf": {
+     "value": 82.08,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "mid_clamps": {
+     "value": 22,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "end_clamps": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",
