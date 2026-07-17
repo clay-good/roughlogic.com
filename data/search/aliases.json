@@ -16877,6 +16877,31 @@
       "kind": "industry"
     },
     {
+      "term": "hdd pullback force",
+      "target": "hdd-pullback",
+      "kind": "industry"
+    },
+    {
+      "term": "directional drilling pullback",
+      "target": "hdd-pullback",
+      "kind": "industry"
+    },
+    {
+      "term": "bore pull force",
+      "target": "hdd-pullback",
+      "kind": "industry"
+    },
+    {
+      "term": "pipe pullback estimate",
+      "target": "hdd-pullback",
+      "kind": "industry"
+    },
+    {
+      "term": "hdd pull tension",
+      "target": "hdd-pullback",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

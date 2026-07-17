@@ -1008,6 +1008,7 @@ const RELATED = {
   "rock-construction-entrance": ["aggregate", "riprap-tonnage", "stockpile-volume"],
   "pipe-flotation": ["pipe-bedding-backfill", "annular-grout-volume", "submerged-earth-pressure"],
   "restrained-pipe-length": ["thrust-block-sizing", "pipe-flotation", "pipe-bedding-backfill"],
+  "hdd-pullback": ["pipe-flotation", "restrained-pipe-length", "pipe-bedding-backfill"],
   "haul-cycle-production": ["soil-swell-shrink", "excavation", "axle-load-distribution"],
   "loader-production": ["haul-cycle-production", "soil-swell-shrink", "relative-compaction"],
   "dozer-production": ["loader-production", "haul-cycle-production", "soil-swell-shrink"],

@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): hdd-pullback -- HDD pullback force first-order estimate (spec-v833); 2026-07-17
+
+- New Group E tile `hdd-pullback` (calc-earthwork.js), completing the buried-pipe check trio (`pipe-flotation`,
+  `restrained-pipe-length`, `hdd-pullback`). First-order force to draw a product pipe back through a horizontal
+  directional bore (ASTM F1962 basis): pullback = friction x effective weight x length x bend factor + fluid drag. A
+  floated 12 in HDPE at ~5 lb/ft over an 800 ft bore, at 0.3 friction and a 1.5 bend factor, pulls back at ~1,800 lb;
+  a 1,500 ft bore scales it to 3,375 lb. Omits the full F1962 capstan/bend and hydrokinetic drag terms; the drilling
+  contractor and rig thrust govern. Home count 1,281 -> 1,282. The underground-utility trio (v831-v833) took
+  calc-earthwork.js to ~25.4 KB gz, so the module-size cap was raised 26000 -> 30000 (ledger in check-module-sizes.mjs).
+
 ### feat(earthwork): restrained-pipe-length -- restrained-joint length at a pipe bend (spec-v832); 2026-07-17
 
 - New Group E tile `restrained-pipe-length` (calc-earthwork.js), the restrained-joint alternative to `thrust-block-sizing`

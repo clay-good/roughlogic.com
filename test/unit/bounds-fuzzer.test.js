@@ -17103,6 +17103,7 @@ import { computeHydroseedMix as _v829hs } from "../../calc-earthwork.js";
 import { computeRockConstructionEntrance as _v830rce } from "../../calc-earthwork.js";
 import { computePipeFlotation as _v831pf } from "../../calc-earthwork.js";
 import { computeRestrainedPipeLength as _v832rpl } from "../../calc-earthwork.js";
+import { computeHddPullback as _v833hdd } from "../../calc-earthwork.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17319,6 +17320,26 @@ test("bounds: spec-v832 computeRestrainedPipeLength pins the area, the thrust, t
   assert.ok("error" in _v832rpl({ pipe_od_in: 12, pressure_psi: 150, bend_angle_deg: 90, unit_resistance_plf: 0 }));
   assert.ok("error" in _v832rpl({ pipe_od_in: 12, pressure_psi: 150, bend_angle_deg: 0, unit_resistance_plf: 600 }));
   assert.ok("error" in _v832rpl({ pipe_od_in: 12, pressure_psi: 150, bend_angle_deg: 180, unit_resistance_plf: 600 }));
+});
+
+test("bounds: spec-v833 computeHddPullback pins the pullback, the utilization (and the null seam), and error seams", () => {
+  // 5 lb/ft, 800 ft, 0.3, 1.5, no drag, 20,000 lb safe pull -> 1,800 lb, 0.09.
+  const r = _v833hdd({ eff_weight_plf: 5, length_ft: 800, friction_coeff: 0.3, bend_factor: 1.5, fluid_drag_lb: 0, pipe_safe_pull_lb: 20000 });
+  assert.ok(Math.abs(r.pullback_lb - 1800) < 1e-6);
+  assert.ok(Math.abs(r.utilization - 0.09) < 1e-6);
+  // A longer 1,500 ft bore scales the pull linearly.
+  assert.ok(Math.abs(_v833hdd({ eff_weight_plf: 5, length_ft: 1500, friction_coeff: 0.3, bend_factor: 1.5, fluid_drag_lb: 0, pipe_safe_pull_lb: 20000 }).pullback_lb - 3375) < 1e-6);
+  // Drag adds on top.
+  assert.ok(Math.abs(_v833hdd({ eff_weight_plf: 5, length_ft: 800, friction_coeff: 0.3, bend_factor: 1.5, fluid_drag_lb: 500, pipe_safe_pull_lb: 20000 }).pullback_lb - 2300) < 1e-6);
+  // safe pull = 0 skips the utilization (null seam).
+  assert.strictEqual(_v833hdd({ eff_weight_plf: 5, length_ft: 800, friction_coeff: 0.3, bend_factor: 1.5, fluid_drag_lb: 0, pipe_safe_pull_lb: 0 }).utilization, null);
+  // Error seams.
+  assert.ok("error" in _v833hdd({ eff_weight_plf: 0, length_ft: 800, friction_coeff: 0.3, bend_factor: 1.5 }));
+  assert.ok("error" in _v833hdd({ eff_weight_plf: 5, length_ft: 0, friction_coeff: 0.3, bend_factor: 1.5 }));
+  assert.ok("error" in _v833hdd({ eff_weight_plf: 5, length_ft: 800, friction_coeff: 0, bend_factor: 1.5 }));
+  assert.ok("error" in _v833hdd({ eff_weight_plf: 5, length_ft: 800, friction_coeff: 0.3, bend_factor: 0 }));
+  assert.ok("error" in _v833hdd({ eff_weight_plf: 5, length_ft: 800, friction_coeff: 0.3, bend_factor: 1.5, fluid_drag_lb: -1 }));
+  assert.ok("error" in _v833hdd({ eff_weight_plf: 5, length_ft: 800, friction_coeff: 0.3, bend_factor: 1.5, pipe_safe_pull_lb: -1 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

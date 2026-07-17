@@ -24,6 +24,7 @@
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
 //   - pipe-flotation          Buried pipe flotation / anti-flotation backfill
 //   - restrained-pipe-length  Restrained-joint length at a pipe bend
+//   - hdd-pullback            HDD pullback force first-order estimate (ASTM F1962)
 //
 // Group letters are independent of the module (the spec-v28/v30/v36/v39
 // precedent): all five KEEP group "E"; only the on-disk module changes.
@@ -1047,6 +1048,64 @@ function _v832renderRestrainedPipeLength(inputRegion, outputRegion, citationEl) 
   for (const f of [od, p, ba, ur]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["restrained-pipe-length"] = _v832renderRestrainedPipeLength;
+
+// --- hdd-pullback: HDD Pullback Force First-Order Estimate ---
+//
+// A first-order estimate of the force to draw a product pipe back through a
+// horizontal directional bore, per the ASTM F1962 basis (this tile omits the
+// full capstan/bend and hydrokinetic drag terms):
+//   pullback_lb = friction_coeff x eff_weight_plf x length_ft x bend_factor + fluid_drag_lb
+//   utilization = safe pull > 0 ? pullback / safe pull : null
+// dims: in { eff_weight_plf: M T^-2, length_ft: L, friction_coeff: dimensionless, bend_factor: dimensionless, fluid_drag_lb: M L T^-2, pipe_safe_pull_lb: M L T^-2 } out: { pullback_lb: M L T^-2, utilization: dimensionless }
+export function computeHddPullback({ eff_weight_plf = 5, length_ft = 800, friction_coeff = 0.3, bend_factor = 1.5, fluid_drag_lb = 0, pipe_safe_pull_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(eff_weight_plf > 0)) return { error: "Effective pipe weight must be positive (lb/ft)." };
+  if (!(length_ft > 0)) return { error: "Bore length must be positive (ft)." };
+  if (!(friction_coeff > 0)) return { error: "Friction coefficient must be positive." };
+  if (!(bend_factor > 0)) return { error: "Bend factor must be positive." };
+  if (fluid_drag_lb < 0) return { error: "Fluid drag cannot be negative (lb)." };
+  if (pipe_safe_pull_lb < 0) return { error: "Pipe safe pull cannot be negative (lb)." };
+  const pullback_lb = friction_coeff * eff_weight_plf * length_ft * bend_factor + fluid_drag_lb;
+  if (!Number.isFinite(pullback_lb)) return { error: "Pullback math is not a finite value." };
+  const utilization = pipe_safe_pull_lb > 0 ? pullback_lb / pipe_safe_pull_lb : null;
+  return {
+    pullback_lb,
+    utilization,
+    note: "A first-order estimate: the full ASTM F1962 model adds capstan/bend and hydrokinetic drag terms this tile omits, so treat the result as a floor. The effective pipe weight already accounts for buoyancy in the drilling fluid (a ballasted or empty pipe can be near neutral). The drilling contractor and the rig's rated thrust govern the pull.",
+  };
+}
+
+function _v833renderHddPullback(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: simplified pullback identity by name (ASTM F1962 basis). pullback (lb) = friction x effective weight x length x bend factor + fluid drag. A first-order estimate; the drilling contractor and rig thrust govern.";
+  const ew = makeNumber("Effective pipe weight in fluid (lb/ft)", "hdd-ew", { step: "any", min: "0", value: "5" });
+  ew.input.value = "5";
+  const ln = makeNumber("Bore / pull length (ft)", "hdd-ln", { step: "any", min: "0", value: "800" });
+  ln.input.value = "800";
+  const fc = makeNumber("Friction coefficient", "hdd-fc", { step: "any", min: "0", value: "0.3" });
+  fc.input.value = "0.3";
+  const bf = makeNumber("Pull-path bend factor", "hdd-bf", { step: "any", min: "0", value: "1.5" });
+  bf.input.value = "1.5";
+  const fd = makeNumber("Hydrokinetic drag allowance (lb)", "hdd-fd", { step: "any", min: "0", value: "0" });
+  fd.input.value = "0";
+  const sp = makeNumber("Pipe safe pull strength (lb, 0 = skip)", "hdd-sp", { step: "any", min: "0", value: "20000" });
+  sp.input.value = "20000";
+  for (const f of [ew, ln, fc, bf, fd, sp]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ew.input.value = "5"; ln.input.value = "800"; fc.input.value = "0.3"; bf.input.value = "1.5"; fd.input.value = "0"; sp.input.value = "20000"; update(); });
+  const oPull = makeOutputLine(outputRegion, "Estimated pullback force", "hdd-out-pull");
+  const oUtil = makeOutputLine(outputRegion, "Utilization vs safe pull", "hdd-out-util");
+  const update = debounce(() => {
+    const r = computeHddPullback({
+      eff_weight_plf: ew.input.value === "" ? 5 : Number(ew.input.value), length_ft: ln.input.value === "" ? 800 : Number(ln.input.value),
+      friction_coeff: fc.input.value === "" ? 0.3 : Number(fc.input.value), bend_factor: bf.input.value === "" ? 1.5 : Number(bf.input.value),
+      fluid_drag_lb: fd.input.value === "" ? 0 : Number(fd.input.value), pipe_safe_pull_lb: sp.input.value === "" ? 0 : Number(sp.input.value),
+    });
+    if (r.error) { oPull.textContent = r.error; oUtil.textContent = "-"; return; }
+    oPull.textContent = fmt(r.pullback_lb, 0) + " lb";
+    oUtil.textContent = r.utilization === null ? "- (enter a safe pull to check)" : fmt(r.utilization * 100, 0) + "% of safe pull";
+  }, DEBOUNCE_MS);
+  for (const f of [ew, ln, fc, bf, fd, sp]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["hdd-pullback"] = _v833renderHddPullback;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

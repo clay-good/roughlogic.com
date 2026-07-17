@@ -8079,6 +8079,17 @@ export const CITATIONS = {
       { name: "Unit resistance", value: "soil resistance per foot of restrained pipe (pipe friction + fitting bearing), from the restraint manufacturer's tables", source: "EBAA / AWWA M41" },
     ],
   },
+  "hdd-pullback": {
+    formula: "pullback_lb = friction_coeff x eff_weight_plf x length_ft x bend_factor + fluid_drag_lb; utilization = pullback_lb / pipe_safe_pull_lb.",
+    edition: "Simplified HDD pullback identity by name (F = mu x weight x length x bend + drag); ASTM F1962 basis, first-order form.",
+    freeAccess: "The simplified pullback identity is public first-principles friction mechanics; the full model and pipe/rig ratings come from the drilling contractor.",
+    governance: GOVERNANCE.general,
+    editionNote: "A first-order estimate: the full ASTM F1962 model adds capstan/bend and hydrokinetic drag terms this tile omits, so treat the result as a floor. The effective pipe weight already accounts for buoyancy in the drilling fluid. The drilling contractor and the rig's rated thrust govern the pull.",
+    assumptions: [
+      { name: "Pullback", value: "friction x effective weight x length x bend factor, plus a hydrokinetic drag allowance", source: "ASTM F1962 (simplified)" },
+      { name: "Effective weight", value: "the pipe weight in the drilling fluid (buoyancy already accounted for); a ballasted or empty pipe can be near neutral", source: "drilling contractor" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

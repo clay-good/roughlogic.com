@@ -49241,6 +49241,62 @@
    }
   },
   {
+   "tile_id": "hdd-pullback",
+   "source_publisher": "Simplified HDD pullback identity (ASTM F1962 basis)",
+   "source_title": "5 lb/ft effective, 800 ft bore, 0.3 friction, 1.5 bend, 20,000 lb safe pull",
+   "source_edition_or_year": "spec-v833 worked example",
+   "source_section_or_page": "pullback = 0.3*5*800*1.5 = 1,800 lb; utilization = 1800/20000 = 0.09",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "eff_weight_plf": 5,
+    "length_ft": 800,
+    "friction_coeff": 0.3,
+    "bend_factor": 1.5,
+    "fluid_drag_lb": 0,
+    "pipe_safe_pull_lb": 20000
+   },
+   "outputs": {
+    "pullback_lb": {
+     "value": 1800,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "utilization": {
+     "value": 0.09,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hdd-pullback",
+   "source_publisher": "Simplified HDD pullback identity (ASTM F1962 basis)",
+   "source_title": "cross-check: a longer 1,500 ft bore scales the pull linearly",
+   "source_edition_or_year": "spec-v833 worked example",
+   "source_section_or_page": "pullback = 0.3*5*1500*1.5 = 3,375 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "eff_weight_plf": 5,
+    "length_ft": 1500,
+    "friction_coeff": 0.3,
+    "bend_factor": 1.5,
+    "fluid_drag_lb": 0,
+    "pipe_safe_pull_lb": 20000
+   },
+   "outputs": {
+    "pullback_lb": {
+     "value": 3375,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",
