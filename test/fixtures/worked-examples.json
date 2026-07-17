@@ -50759,6 +50759,70 @@
    }
   },
   {
+   "tile_id": "heat-trace-sizing",
+   "source_publisher": "Heat-trace sizing identity (first-principles)",
+   "source_title": "150 ft pipe, 10% allowance, 1 valve at 3 ft, 5 W/ft, 120 V, 20 A breaker",
+   "source_edition_or_year": "spec-v858 worked example",
+   "source_section_or_page": "cable = 150*1.10 + 3 = 168 ft; watts = 5*168 = 840; amps = 840/120 = 7.0 (<= 16, ok)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "pipe_ft": 150,
+    "allowance_pct": 10,
+    "num_valves": 1,
+    "valve_allow_ft": 3,
+    "rated_w_per_ft": 5,
+    "voltage": 120,
+    "breaker_a": 20
+   },
+   "outputs": {
+    "cable_ft": {
+     "value": 168,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "watts": {
+     "value": 840,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "amps": {
+     "value": 7.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "heat-trace-sizing",
+   "source_publisher": "Heat-trace sizing identity (first-principles)",
+   "source_title": "cross-check: a 400 ft line exceeds a single circuit",
+   "source_edition_or_year": "spec-v858 worked example",
+   "source_section_or_page": "cable = 400*1.10 = 440 ft; watts = 2,200; amps = 2200/120 = 18.3 (> 16, split)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "pipe_ft": 400,
+    "allowance_pct": 10,
+    "num_valves": 0,
+    "valve_allow_ft": 3,
+    "rated_w_per_ft": 5,
+    "voltage": 120,
+    "breaker_a": 20
+   },
+   "outputs": {
+    "amps": {
+     "value": 18.333,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

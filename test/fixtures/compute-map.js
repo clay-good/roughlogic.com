@@ -776,6 +776,7 @@ export const COMPUTE_MAP = {
   "lv-cable-pull-footage": { module: "../../calc-lowvoltage.js", fn: "computeLvCablePullFootage" },
   "solder-joint-quantity": { module: "../../calc-plumbing.js", fn: "computeSolderJointQuantity" },
   "pipe-insulation-takeoff": { module: "../../calc-plumbing.js", fn: "computePipeInsulationTakeoff" },
+  "heat-trace-sizing": { module: "../../calc-plumbing.js", fn: "computeHeatTraceSizing" },
   "shingle-nails": { module: "../../calc-construction.js", fn: "computeShingleNails" },
   "duct-metal-weight": { module: "../../calc-construction.js", fn: "computeDuctMetalWeight" },
   "duct-bank-concrete": { module: "../../calc-construction.js", fn: "computeDuctBankConcrete" },

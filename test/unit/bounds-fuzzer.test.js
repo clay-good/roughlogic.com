@@ -17128,6 +17128,7 @@ import { computeBranchCircuitWireFootage as _v854bcw } from "../../calc-electric
 import { computeLvCablePullFootage as _v855lvf } from "../../calc-lowvoltage.js";
 import { computeSolderJointQuantity as _v856sjq } from "../../calc-plumbing.js";
 import { computePipeInsulationTakeoff as _v857pit } from "../../calc-plumbing.js";
+import { computeHeatTraceSizing as _v858hts } from "../../calc-plumbing.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17783,6 +17784,26 @@ test("bounds: spec-v857 computePipeInsulationTakeoff pins the cut length, sectio
   assert.ok("error" in _v857pit({ pipe_ft: 250, waste_pct: 5, num_fittings: 12, fitting_allow_ft: 1, section_len_ft: 3, insul_od_in: 0 }));
   assert.ok("error" in _v857pit({ pipe_ft: 250, waste_pct: -1, num_fittings: 12, fitting_allow_ft: 1, section_len_ft: 3, insul_od_in: 4.5 }));
   assert.ok("error" in _v857pit({ pipe_ft: 250, waste_pct: 5, num_fittings: -1, fitting_allow_ft: 1, section_len_ft: 3, insul_od_in: 4.5 }));
+});
+
+test("bounds: spec-v858 computeHeatTraceSizing pins the cable length, watts, amps, the ok flag, and error seams", () => {
+  // 150 ft, 10% allowance, 1 valve at 3 ft, 5 W/ft, 120 V, 20 A -> 168 ft, 840 W, 7.0 A, ok.
+  const r = _v858hts({ pipe_ft: 150, allowance_pct: 10, num_valves: 1, valve_allow_ft: 3, rated_w_per_ft: 5, voltage: 120, breaker_a: 20 });
+  assert.ok(Math.abs(r.cable_ft - 168) < 1e-9);
+  assert.ok(Math.abs(r.watts - 840) < 1e-9);
+  assert.ok(Math.abs(r.amps - 7.0) < 1e-9);
+  assert.strictEqual(r.breaker_ok, true);
+  // A 400 ft line exceeds the 80% continuous limit (16 A) and must be split.
+  const long = _v858hts({ pipe_ft: 400, allowance_pct: 10, num_valves: 0, valve_allow_ft: 3, rated_w_per_ft: 5, voltage: 120, breaker_a: 20 });
+  assert.ok(Math.abs(long.amps - 18.333) < 1e-2);
+  assert.strictEqual(long.breaker_ok, false);
+  // Error seams.
+  assert.ok("error" in _v858hts({ pipe_ft: 0, rated_w_per_ft: 5, voltage: 120, breaker_a: 20 }));
+  assert.ok("error" in _v858hts({ pipe_ft: 150, rated_w_per_ft: 0, voltage: 120, breaker_a: 20 }));
+  assert.ok("error" in _v858hts({ pipe_ft: 150, rated_w_per_ft: 5, voltage: 0, breaker_a: 20 }));
+  assert.ok("error" in _v858hts({ pipe_ft: 150, rated_w_per_ft: 5, voltage: 120, breaker_a: 0 }));
+  assert.ok("error" in _v858hts({ pipe_ft: 150, allowance_pct: -1, rated_w_per_ft: 5, voltage: 120, breaker_a: 20 }));
+  assert.ok("error" in _v858hts({ pipe_ft: 150, num_valves: -1, rated_w_per_ft: 5, voltage: 120, breaker_a: 20 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

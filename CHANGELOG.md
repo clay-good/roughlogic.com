@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): heat-trace-sizing -- freeze-protection heat-trace cable and circuit (spec-v858); 2026-07-17
+
+- New Group B tile `heat-trace-sizing` (calc-plumbing.js), fed by `insulation-heat-loss` (the W/ft) and paired with
+  `pipe-insulation-takeoff`. cable = pipe x (1 + allowance) + valves x allowance; watts = rated W/ft x cable; amps =
+  watts / voltage; ok when amps <= 80% of the breaker. A 150 ft line with one valve on a 5 W/ft cable needs 168 ft
+  drawing 840 W -- 7.0 A at 120 V, fine on a 20 A circuit -- but a 400 ft run hits 18.3 A, over the 16 A continuous
+  limit, so it splits across two circuits. Valves and supports are heat sinks that add cable; a cold start draws 2-3x.
+  Home count 1,306 -> 1,307.
+
 ### feat(plumbing): pipe-insulation-takeoff -- pipe insulation and jacket material takeoff (spec-v857); 2026-07-17
 
 - New Group B tile `pipe-insulation-takeoff` (calc-plumbing.js), the mechanical-insulation material takeoff distinct

@@ -4609,3 +4609,65 @@ function _v857renderPipeInsulationTakeoff(inputRegion, outputRegion, citationEl)
   for (const f of [p, w, nf, fa, sl, od]) f.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["pipe-insulation-takeoff"] = _v857renderPipeInsulationTakeoff;
+
+// ===================== spec-v858: freeze-protection heat-trace cable and circuit =====================
+// dims: in { pipe_ft: L, allowance_pct: dimensionless, num_valves: dimensionless, valve_allow_ft: L, rated_w_per_ft: dimensionless, voltage: dimensionless, breaker_a: dimensionless } out: { cable_ft: L, watts: dimensionless, amps: dimensionless }
+export function computeHeatTraceSizing({ pipe_ft = 150, allowance_pct = 10, num_valves = 1, valve_allow_ft = 3, rated_w_per_ft = 5, voltage = 120, breaker_a = 20 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(pipe_ft > 0)) return { error: "Pipe length must be positive (ft)." };
+  if (!(rated_w_per_ft > 0)) return { error: "Rated wattage must be positive (W/ft)." };
+  if (!(voltage > 0)) return { error: "Voltage must be positive (V)." };
+  if (!(breaker_a > 0)) return { error: "Breaker rating must be positive (A)." };
+  if (allowance_pct < 0) return { error: "Allowance cannot be negative (percent)." };
+  if (num_valves < 0) return { error: "Valve count cannot be negative." };
+  if (valve_allow_ft < 0) return { error: "Valve allowance cannot be negative (ft)." };
+  const cable_ft = pipe_ft * (1 + allowance_pct / 100) + num_valves * valve_allow_ft;
+  const watts = rated_w_per_ft * cable_ft;
+  const amps = watts / voltage;
+  const breaker_ok = amps <= 0.8 * breaker_a;
+  if (![cable_ft, watts, amps].every(Number.isFinite)) return { error: "Heat-trace math is not a finite value." };
+  return {
+    cable_ft,
+    watts,
+    amps,
+    breaker_ok,
+    note: "The required W/ft (the pipe heat loss) comes from insulation-heat-loss or the manufacturer; the picked cable must be rated at or above it. Valves, flanges, and supports are heat sinks that add cable. A cold start can draw two to three times the steady current on self-regulating cable. The manufacturer's design tables and maximum circuit length govern.",
+  };
+}
+
+export const heatTraceSizingExample = { inputs: { pipe_ft: 150, allowance_pct: 10, num_valves: 1, valve_allow_ft: 3, rated_w_per_ft: 5, voltage: 120, breaker_a: 20 } };
+
+function _v858renderHeatTraceSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: heat-trace identity by name. cable = pipe x (1 + allowance) + valves x allowance; watts = rated W/ft x cable; amps = watts / voltage. Continuous load must stay under 80% of the breaker. The manufacturer's tables and max circuit length govern.";
+  const p = makeNumber("Pipe run length (ft)", "hts-p", { step: "any", min: "0", value: "150" });
+  p.input.value = "150";
+  const al = makeNumber("Support / spiral allowance (percent)", "hts-al", { step: "any", min: "0", value: "10" });
+  al.input.value = "10";
+  const nv = makeNumber("Valves and flanges (count)", "hts-nv", { step: "any", min: "0", value: "1" });
+  nv.input.value = "1";
+  const va = makeNumber("Cable allowance per valve (ft)", "hts-va", { step: "any", min: "0", value: "3" });
+  va.input.value = "3";
+  const wf = makeNumber("Cable rated wattage (W/ft)", "hts-wf", { step: "any", min: "0", value: "5" });
+  wf.input.value = "5";
+  const v = makeNumber("Supply voltage (V)", "hts-v", { step: "any", min: "0", value: "120" });
+  v.input.value = "120";
+  const br = makeNumber("Circuit breaker rating (A)", "hts-br", { step: "any", min: "0", value: "20" });
+  br.input.value = "20";
+  for (const f of [p, al, nv, va, wf, v, br]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { p.input.value = "150"; al.input.value = "10"; nv.input.value = "1"; va.input.value = "3"; wf.input.value = "5"; v.input.value = "120"; br.input.value = "20"; update(); });
+  const oCable = makeOutputLine(outputRegion, "Heat-trace cable", "hts-out-cable");
+  const oCircuit = makeOutputLine(outputRegion, "Circuit load", "hts-out-circuit");
+  const update = debounce(() => {
+    const r = computeHeatTraceSizing({
+      pipe_ft: p.input.value === "" ? 150 : Number(p.input.value), allowance_pct: al.input.value === "" ? 0 : Number(al.input.value),
+      num_valves: nv.input.value === "" ? 0 : Number(nv.input.value), valve_allow_ft: va.input.value === "" ? 3 : Number(va.input.value),
+      rated_w_per_ft: wf.input.value === "" ? 5 : Number(wf.input.value), voltage: v.input.value === "" ? 120 : Number(v.input.value),
+      breaker_a: br.input.value === "" ? 20 : Number(br.input.value),
+    });
+    if (r.error) { oCable.textContent = r.error; oCircuit.textContent = "-"; return; }
+    oCable.textContent = fmt(r.cable_ft, 0) + " ft (" + fmt(r.watts, 0) + " W)";
+    oCircuit.textContent = fmt(r.amps, 1) + " A - " + (r.breaker_ok ? "OK on one circuit" : "OVER 80% - split the run");
+  }, DEBOUNCE_MS);
+  for (const f of [p, al, nv, va, wf, v, br]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["heat-trace-sizing"] = _v858renderHeatTraceSizing;

@@ -1023,6 +1023,7 @@ const RELATED = {
   "lv-cable-pull-footage": ["structured-cabling-channel", "cable-tray-fill", "cable-reel-capacity"],
   "solder-joint-quantity": ["pipe-volume", "pipe-expansion-loop", "pipe-fitting-takeout"],
   "pipe-insulation-takeoff": ["insulation-thickness", "pipe-heat-loss-radial", "solder-joint-quantity"],
+  "heat-trace-sizing": ["insulation-heat-loss", "pipe-insulation-takeoff", "voltage-drop"],
   "shingle-nails": ["roofing-squares", "ridge-cap-fasteners", "metal-roof-panels"],
   "duct-metal-weight": ["metal-weight", "bend-allowance", "duct-sizing"],
   "duct-bank-concrete": ["post-hole-concrete", "annular-grout-volume", "concrete"],

@@ -17502,6 +17502,31 @@
       "kind": "industry"
     },
     {
+      "term": "heat trace sizing",
+      "target": "heat-trace-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "freeze protection heat trace",
+      "target": "heat-trace-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "heat tape length",
+      "target": "heat-trace-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "heat trace circuit",
+      "target": "heat-trace-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "pipe heat trace amps",
+      "target": "heat-trace-sizing",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

@@ -8354,6 +8354,17 @@ export const CITATIONS = {
       { name: "Jacket diameter", value: "the insulation outside diameter (pipe OD + 2 x thickness), not the pipe", source: "insulation spec" },
     ],
   },
+  "heat-trace-sizing": {
+    formula: "cable_ft = pipe_ft x (1 + allowance_pct/100) + num_valves x valve_allow_ft; watts = rated_w_per_ft x cable_ft; amps = watts / voltage; breaker_ok = amps <= 0.8 x breaker_a.",
+    edition: "Heat-trace sizing identity by name (cable length with allowances; wattage and current from the rated W/ft); first-principles electrical arithmetic.",
+    freeAccess: "The cable-length and circuit arithmetic is public first-principles; the required W/ft and max circuit length come from the manufacturer's design tables.",
+    governance: GOVERNANCE.general,
+    editionNote: "The required W/ft (the pipe heat loss) comes from insulation-heat-loss or the manufacturer; the picked cable must be rated at or above it. Valves, flanges, and supports are heat sinks that add cable. A cold start can draw two to three times the steady current on self-regulating cable. The manufacturer's design tables and maximum circuit length govern.",
+    assumptions: [
+      { name: "Rated W/ft", value: "the cable rating, at or above the pipe heat loss from insulation-heat-loss", source: "heat-trace manufacturer" },
+      { name: "Continuous limit", value: "load must stay under 80% of the breaker (NEC continuous load); a cold start draws 2-3x", source: "NEC / manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",
