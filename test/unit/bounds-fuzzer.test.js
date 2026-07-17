@@ -26550,3 +26550,24 @@ test("bounds: spec-v902 computeLeachFieldAggregate pins the stone volume, tonnag
   assert.ok("error" in _v902({ num_trenches: 3, trench_length_ft: 60, trench_width_in: 24, stone_depth_in: 12, waste_pct: -10 }));
   assert.ok("error" in _v902({ num_trenches: Infinity, trench_length_ft: 60, trench_width_in: 24, stone_depth_in: 12, waste_pct: 10 }));
 });
+
+import { computeHydronicSystemVolume as _v903 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v903 computeHydronicSystemVolume pins the pipe, system, glycol, water gallons, and error seams", () => {
+  const r = _v903({ pipe_length_ft: 500, gal_per_ft: 0.023, terminal_gal: 8, boiler_tank_gal: 5, glycol_fraction: 0.30 });
+  assert.ok(Math.abs(r.pipe_gal - 11.5) < 1e-9); // 500 * 0.023
+  assert.ok(Math.abs(r.system_gal - 24.5) < 1e-9); // 11.5 + 8 + 5
+  assert.ok(Math.abs(r.glycol_gal - 7.35) < 1e-9); // 24.5 * 0.30
+  assert.ok(Math.abs(r.water_gal - 17.15) < 1e-9); // 24.5 - 7.35
+  // The fraction, set by the freeze target, splits the same fill: 50% glycol takes 12.25 gal.
+  const harsh = _v903({ pipe_length_ft: 500, gal_per_ft: 0.023, terminal_gal: 8, boiler_tank_gal: 5, glycol_fraction: 0.50 });
+  assert.ok(Math.abs(harsh.glycol_gal - 12.25) < 1e-9); // 24.5 * 0.50
+  // Error seams: non-finite, non-positive pipe / gal-per-ft, negative terminals / boiler / fraction, fraction over 1.
+  assert.ok("error" in _v903({ pipe_length_ft: 0, gal_per_ft: 0.023, terminal_gal: 8, boiler_tank_gal: 5, glycol_fraction: 0.30 }));
+  assert.ok("error" in _v903({ pipe_length_ft: 500, gal_per_ft: 0, terminal_gal: 8, boiler_tank_gal: 5, glycol_fraction: 0.30 }));
+  assert.ok("error" in _v903({ pipe_length_ft: 500, gal_per_ft: 0.023, terminal_gal: -1, boiler_tank_gal: 5, glycol_fraction: 0.30 }));
+  assert.ok("error" in _v903({ pipe_length_ft: 500, gal_per_ft: 0.023, terminal_gal: 8, boiler_tank_gal: -1, glycol_fraction: 0.30 }));
+  assert.ok("error" in _v903({ pipe_length_ft: 500, gal_per_ft: 0.023, terminal_gal: 8, boiler_tank_gal: 5, glycol_fraction: -0.1 }));
+  assert.ok("error" in _v903({ pipe_length_ft: 500, gal_per_ft: 0.023, terminal_gal: 8, boiler_tank_gal: 5, glycol_fraction: 1.5 }));
+  assert.ok("error" in _v903({ pipe_length_ft: Infinity, gal_per_ft: 0.023, terminal_gal: 8, boiler_tank_gal: 5, glycol_fraction: 0.30 }));
+});

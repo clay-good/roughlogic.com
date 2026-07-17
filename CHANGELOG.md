@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): hydronic-system-volume -- hydronic system water and glycol volume (spec-v903); 2026-07-17
+
+- New Group B tile `hydronic-system-volume` (calc-plumbing.js), the hydronics install-ops takeoff beside `glycol-mix` and
+  `expansion-tank`. system = pipe length x gallons per foot + terminals + boiler; glycol = system x fraction; water =
+  system - glycol. 500 ft of 3/4 in pipe (0.023 gal/ft) plus 8 gal terminals and a 5 gal boiler is 24.5 gal, so a 30%
+  glycol charge is 7.35 gal of glycol in 17.15 gal of water; a 50% climate takes 12.25 gal. This fill sizes the expansion
+  tank and the glycol order. Home count 1,351 -> 1,352.
+
 ### feat(plumbing): leach-field-aggregate -- leach-field / trench drainrock volume (spec-v902); 2026-07-17
 
 - New Group B tile `leach-field-aggregate` (calc-septic.js), the septic takeoff beside `septic-drainfield`. stone =

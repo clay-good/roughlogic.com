@@ -53477,6 +53477,66 @@
    }
   },
   {
+   "tile_id": "hydronic-system-volume",
+   "source_publisher": "Hydronic system-volume identity (first-principles)",
+   "source_title": "500 ft at 0.023 gal/ft, 8 gal terminals, 5 gal boiler, 30% glycol -> 24.5 gal, 7.35 glycol, 17.15 water",
+   "source_edition_or_year": "spec-v903 worked example",
+   "source_section_or_page": "pipe=500*0.023=11.5; system=11.5+8+5=24.5; glycol=24.5*0.30=7.35; water=17.15",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "pipe_length_ft": 500,
+    "gal_per_ft": 0.023,
+    "terminal_gal": 8,
+    "boiler_tank_gal": 5,
+    "glycol_fraction": 0.30
+   },
+   "outputs": {
+    "system_gal": {
+     "value": 24.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "glycol_gal": {
+     "value": 7.35,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "water_gal": {
+     "value": 17.15,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydronic-system-volume",
+   "source_publisher": "Hydronic system-volume identity (first-principles)",
+   "source_title": "cross-check: a harsher 50% glycol climate takes 12.25 gal of glycol from the same fill",
+   "source_edition_or_year": "spec-v903 worked example",
+   "source_section_or_page": "glycol = 24.5*0.50 = 12.25 gal",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "pipe_length_ft": 500,
+    "gal_per_ft": 0.023,
+    "terminal_gal": 8,
+    "boiler_tank_gal": 5,
+    "glycol_fraction": 0.50
+   },
+   "outputs": {
+    "glycol_gal": {
+     "value": 12.25,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

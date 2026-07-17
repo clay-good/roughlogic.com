@@ -1,6 +1,6 @@
 # roughlogic.com Specification v903 -- Hydronic System Water and Glycol Volume (calc-plumbing.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED (2026-07-17). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-plumbing.js`** (Group B),
 > no new module, group, or dependency. Inherits spec.md through spec-v902.md. Hydronics install-ops sweep, beside
 > `radiant-loop-sizing`, `glycol-mix`, and `expansion-tank`.

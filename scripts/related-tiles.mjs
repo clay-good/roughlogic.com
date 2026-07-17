@@ -1074,6 +1074,7 @@ const RELATED = {
   "gutter-downspout-takeoff": ["gutter-downspout", "roofing-squares", "rain-load-ponding"],
   "chain-link-fence-takeoff": ["fence-estimate", "post-hole-concrete", "siding-takeoff"],
   "leach-field-aggregate": ["septic-drainfield", "pipe-bedding-backfill", "aggregate"],
+  "hydronic-system-volume": ["glycol-mix", "expansion-tank", "radiant-loop-sizing"],
   "concrete-vibrator-spacing": ["concrete-pour-rate", "formwork-pressure", "concrete"],
   "formwork-tie-load": ["formwork-pressure", "shore-post-load", "concrete-pour-rate"],
   "mass-concrete-temp-rise": ["concrete-maturity", "fresh-concrete-temp", "concrete-evaporation-rate"],
