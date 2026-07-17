@@ -1,6 +1,6 @@
 # roughlogic.com Specification v897 -- PV Flat-Roof Ballast Weight and Roof PSF Screen (calc-solar.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED (2026-07-17). Single-tile spec.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-solar.js`** (Group A),
 > no new module, group, or dependency. Inherits spec.md through spec-v896.md. Solar install-ops sweep, beside
 > `pv-rail-clamp-takeoff`.

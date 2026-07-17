@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(solar): pv-ballast-weight -- PV flat-roof ballast weight and roof PSF screen (spec-v897); 2026-07-17
+
+- New Group A tile `pv-ballast-weight` (calc-solar.js), the solar dead-load screen beside `pv-rail-clamp-takeoff`. total =
+  modules x (module weight + ballast) + racking; added pressure = total / array area, compared to the allowable. 30
+  modules at 50 lb plus 40 lb of ballast each on a 150 lb rack is 2,850 lb over 630 sf -- 4.5 psf under a 5 psf allowable;
+  raising the ballast to 60 lb is 5.48 psf, over the line. A SCREEN, not a design -- the PE-stamped ballast plan and the
+  structural engineer govern. Home count 1,345 -> 1,346.
+
 ### feat(solar): pv-rail-clamp-takeoff -- PV racking rail, clamp, and splice takeoff (spec-v896); 2026-07-17
 
 - New Group A tile `pv-rail-clamp-takeoff` (calc-solar.js), the solar install-ops takeoff beside `pv-row-spacing`. run =

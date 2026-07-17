@@ -53081,6 +53081,74 @@
    }
   },
   {
+   "tile_id": "pv-ballast-weight",
+   "source_publisher": "PV ballast load-screen identity (first-principles)",
+   "source_title": "30 modules, 50 lb each, 40 lb ballast, 150 lb rack, 630 sf, 5 psf -> 2,850 lb, 4.52 psf (pass)",
+   "source_edition_or_year": "spec-v897 worked example",
+   "source_section_or_page": "total = 30*(50+40)+150 = 2850; added = 2850/630 = 4.52 <= 5 (pass)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "modules": 30,
+    "module_wt_lb": 50,
+    "ballast_per_module_lb": 40,
+    "racking_wt_lb": 150,
+    "array_area_sf": 630,
+    "allowable_psf": 5
+   },
+   "outputs": {
+    "total_wt_lb": {
+     "value": 2850,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "added_psf": {
+     "value": 4.52,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "pass": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pv-ballast-weight",
+   "source_publisher": "PV ballast load-screen identity (first-principles)",
+   "source_title": "cross-check: raising the ballast to 60 lb gives 3,450 lb and 5.48 psf -- over the allowable (fail)",
+   "source_edition_or_year": "spec-v897 worked example",
+   "source_section_or_page": "total = 30*(50+60)+150 = 3450; added = 3450/630 = 5.48 > 5 (fail)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "modules": 30,
+    "module_wt_lb": 50,
+    "ballast_per_module_lb": 60,
+    "racking_wt_lb": 150,
+    "array_area_sf": 630,
+    "allowable_psf": 5
+   },
+   "outputs": {
+    "added_psf": {
+     "value": 5.48,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "pass": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

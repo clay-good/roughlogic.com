@@ -1589,3 +1589,61 @@ function _v896renderPvRailClampTakeoff(inputRegion, outputRegion, citationEl) {
   for (const f of [rw, mp, mw, gp, rp, rs]) f.input.addEventListener("input", update);
 }
 SOLAR_RENDERERS["pv-rail-clamp-takeoff"] = _v896renderPvRailClampTakeoff;
+
+// pv-ballast-weight (spec-v897): PV flat-roof ballast weight and roof PSF screen.
+// dims: in { modules: dimensionless, module_wt_lb: M L T^-2, ballast_per_module_lb: M L T^-2, racking_wt_lb: M L T^-2, array_area_sf: L^2, allowable_psf: M L^-1 T^-2 } out: { total_wt_lb: M L T^-2, added_psf: M L^-1 T^-2, pass: dimensionless }
+export function computePvBallastWeight({ modules = 30, module_wt_lb = 50, ballast_per_module_lb = 40, racking_wt_lb = 0, array_area_sf = 630, allowable_psf = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(modules > 0)) return { error: "Module count must be positive." };
+  if (!(module_wt_lb > 0)) return { error: "Module weight must be positive (lb)." };
+  if (!(array_area_sf > 0)) return { error: "Array area must be positive (ft^2)." };
+  if (!(allowable_psf > 0)) return { error: "Allowable pressure must be positive (psf)." };
+  if (ballast_per_module_lb < 0) return { error: "Ballast per module cannot be negative (lb)." };
+  if (racking_wt_lb < 0) return { error: "Racking weight cannot be negative (lb)." };
+  const total_wt_lb = modules * (module_wt_lb + ballast_per_module_lb) + racking_wt_lb;
+  const added_psf = total_wt_lb / array_area_sf;
+  const pass = added_psf <= allowable_psf;
+  if (![total_wt_lb, added_psf].every(Number.isFinite)) return { error: "Ballast-load math is not a finite value." };
+  return {
+    total_wt_lb,
+    added_psf,
+    pass,
+    note: "This is a dead-load SCREEN, not a design. The ballast quantity per module and the allowable roof pressure come from the PE-stamped ballast plan and the structural engineer (entered here); it totals and distributes the given ballast rather than sizing it. Wind uplift and the roof structure govern. A value over the allowable means re-check with the engineer.",
+  };
+}
+
+export const pvBallastWeightExample = { inputs: { modules: 30, module_wt_lb: 50, ballast_per_module_lb: 40, racking_wt_lb: 150, array_area_sf: 630, allowable_psf: 5 } };
+
+function _v897renderPvBallastWeight(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: load-screen identity by name. total = modules x (module weight + ballast) + racking; added pressure = total / array area. A dead-load screen, not a design; the PE-stamped ballast plan and the engineer govern.";
+  const mo = makeNumber("Module count", "pbw-mo", { step: "any", min: "0", value: "30" });
+  mo.input.value = "30";
+  const mw = makeNumber("Module weight (lb)", "pbw-mw", { step: "any", min: "0", value: "50" });
+  mw.input.value = "50";
+  const bl = makeNumber("Ballast per module (lb)", "pbw-bl", { step: "any", min: "0", value: "40" });
+  bl.input.value = "40";
+  const rk = makeNumber("Total racking weight (lb)", "pbw-rk", { step: "any", min: "0", value: "150" });
+  rk.input.value = "150";
+  const ar = makeNumber("Array footprint area (ft^2)", "pbw-ar", { step: "any", min: "0", value: "630" });
+  ar.input.value = "630";
+  const al = makeNumber("Allowable added pressure (psf)", "pbw-al", { step: "any", min: "0", value: "5" });
+  al.input.value = "5";
+  for (const f of [mo, mw, bl, rk, ar, al]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { mo.input.value = "30"; mw.input.value = "50"; bl.input.value = "40"; rk.input.value = "150"; ar.input.value = "630"; al.input.value = "5"; update(); });
+  const oTotal = makeOutputLine(outputRegion, "Total added weight", "pbw-out-total");
+  const oPsf = makeOutputLine(outputRegion, "Added roof pressure", "pbw-out-psf");
+  const oPass = makeOutputLine(outputRegion, "Screen", "pbw-out-pass");
+  const update = debounce(() => {
+    const r = computePvBallastWeight({
+      modules: mo.input.value === "" ? 30 : Number(mo.input.value), module_wt_lb: mw.input.value === "" ? 50 : Number(mw.input.value),
+      ballast_per_module_lb: bl.input.value === "" ? 40 : Number(bl.input.value), racking_wt_lb: rk.input.value === "" ? 0 : Number(rk.input.value),
+      array_area_sf: ar.input.value === "" ? 630 : Number(ar.input.value), allowable_psf: al.input.value === "" ? 5 : Number(al.input.value),
+    });
+    if (r.error) { oTotal.textContent = r.error; oPsf.textContent = "-"; oPass.textContent = "-"; return; }
+    oTotal.textContent = fmt(r.total_wt_lb, 0) + " lb";
+    oPsf.textContent = fmt(r.added_psf, 2) + " psf";
+    oPass.textContent = r.pass ? "PASS (at or under the allowable)" : "OVER -- re-check with the engineer";
+  }, DEBOUNCE_MS);
+  for (const f of [mo, mw, bl, rk, ar, al]) f.input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["pv-ballast-weight"] = _v897renderPvBallastWeight;

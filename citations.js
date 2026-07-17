@@ -8321,6 +8321,17 @@ export const CITATIONS = {
       { name: "Rail stock", value: "~14 ft default; a splice joins each stock break", source: "rack manufacturer" },
     ],
   },
+  "pv-ballast-weight": {
+    formula: "total_wt_lb = modules x (module_wt_lb + ballast_per_module_lb) + racking_wt_lb; added_psf = total_wt_lb / array_area_sf; pass = added_psf <= allowable_psf.",
+    edition: "PV ballast load-screen identity by name (total dead load over the array footprint, screened against the allowable); first-principles arithmetic.",
+    freeAccess: "The load arithmetic is public first-principles; the ballast quantity and allowable pressure come from the PE-stamped ballast plan and the structural engineer.",
+    governance: GOVERNANCE.general,
+    editionNote: "This is a dead-load SCREEN, not a design. The ballast quantity per module and the allowable roof pressure come from the PE-stamped ballast plan and the structural engineer (entered here); it totals and distributes the given ballast rather than sizing it. Wind uplift and the roof structure govern. A value over the allowable means re-check with the engineer.",
+    assumptions: [
+      { name: "Ballast quantity", value: "per module from the PE-stamped ballast plan (entered); not sized here", source: "PE ballast plan" },
+      { name: "Allowable pressure", value: "the allowable added dead load from the structural engineer (entered)", source: "structural engineer" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

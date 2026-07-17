@@ -18477,6 +18477,31 @@
       "kind": "industry"
     },
     {
+      "term": "pv ballast weight",
+      "target": "pv-ballast-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "solar roof load psf",
+      "target": "pv-ballast-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "ballasted array weight",
+      "target": "pv-ballast-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "pv dead load screen",
+      "target": "pv-ballast-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "flat roof solar ballast",
+      "target": "pv-ballast-weight",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

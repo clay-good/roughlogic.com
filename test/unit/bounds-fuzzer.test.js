@@ -26418,3 +26418,25 @@ test("bounds: spec-v896 computePvRailClampTakeoff pins the run, rail, clamp, spl
   assert.ok("error" in _v896({ rows: 2, modules_per_row: 12, module_width_ft: 3.42, gap_ft: -1, rails_per_row: 2, rail_stock_ft: 14 }));
   assert.ok("error" in _v896({ rows: Infinity, modules_per_row: 12, module_width_ft: 3.42, gap_ft: 0, rails_per_row: 2, rail_stock_ft: 14 }));
 });
+
+import { computePvBallastWeight as _v897 } from "../../calc-solar.js";
+
+test("bounds: spec-v897 computePvBallastWeight pins the total, added psf, pass flag, and error seams", () => {
+  const r = _v897({ modules: 30, module_wt_lb: 50, ballast_per_module_lb: 40, racking_wt_lb: 150, array_area_sf: 630, allowable_psf: 5 });
+  assert.equal(r.total_wt_lb, 2850); // 30*(50+40) + 150
+  assert.ok(Math.abs(r.added_psf - 4.523809523809524) < 1e-9); // 2850 / 630
+  assert.equal(r.pass, true); // 4.52 <= 5
+  // Raising the ballast crosses the allowable and the screen fails.
+  const over = _v897({ modules: 30, module_wt_lb: 50, ballast_per_module_lb: 60, racking_wt_lb: 150, array_area_sf: 630, allowable_psf: 5 });
+  assert.equal(over.total_wt_lb, 3450); // 30*(50+60) + 150
+  assert.ok(Math.abs(over.added_psf - 5.476190476190476) < 1e-9); // 3450 / 630
+  assert.equal(over.pass, false); // 5.48 > 5
+  // Error seams: non-finite, non-positive modules / module weight / area / allowable, negative ballast or racking.
+  assert.ok("error" in _v897({ modules: 0, module_wt_lb: 50, ballast_per_module_lb: 40, racking_wt_lb: 150, array_area_sf: 630, allowable_psf: 5 }));
+  assert.ok("error" in _v897({ modules: 30, module_wt_lb: 0, ballast_per_module_lb: 40, racking_wt_lb: 150, array_area_sf: 630, allowable_psf: 5 }));
+  assert.ok("error" in _v897({ modules: 30, module_wt_lb: 50, ballast_per_module_lb: 40, racking_wt_lb: 150, array_area_sf: 0, allowable_psf: 5 }));
+  assert.ok("error" in _v897({ modules: 30, module_wt_lb: 50, ballast_per_module_lb: 40, racking_wt_lb: 150, array_area_sf: 630, allowable_psf: 0 }));
+  assert.ok("error" in _v897({ modules: 30, module_wt_lb: 50, ballast_per_module_lb: -1, racking_wt_lb: 150, array_area_sf: 630, allowable_psf: 5 }));
+  assert.ok("error" in _v897({ modules: 30, module_wt_lb: 50, ballast_per_module_lb: 40, racking_wt_lb: -1, array_area_sf: 630, allowable_psf: 5 }));
+  assert.ok("error" in _v897({ modules: Infinity, module_wt_lb: 50, ballast_per_module_lb: 40, racking_wt_lb: 150, array_area_sf: 630, allowable_psf: 5 }));
+});
