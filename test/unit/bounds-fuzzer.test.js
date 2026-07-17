@@ -17141,6 +17141,7 @@ import { computeSillPlateAnchorCount as _v867spa } from "../../calc-construction
 import { computeMetalStudTakeoff as _v868mst } from "../../calc-construction.js";
 import { computeSuspendedCeilingGrid as _v869scg } from "../../calc-construction.js";
 import { computeMasonryControlJointLayout as _v870mcj } from "../../calc-construction.js";
+import { computeDumpsterCount as _v871dmp } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -18016,6 +18017,25 @@ test("bounds: spec-v870 computeMasonryControlJointLayout pins the max spacing, p
   assert.ok("error" in _v870mcj({ wall_length_ft: 0, wall_height_ft: 16, max_spacing_cap_ft: 25 }));
   assert.ok("error" in _v870mcj({ wall_length_ft: 80, wall_height_ft: 0, max_spacing_cap_ft: 25 }));
   assert.ok("error" in _v870mcj({ wall_length_ft: 80, wall_height_ft: 16, max_spacing_cap_ft: 0 }));
+});
+
+test("bounds: spec-v871 computeDumpsterCount pins the by-volume/by-weight counts, hauls, governing label, and error seams", () => {
+  // 60 cy, 45 tons, 30 cy box, 0.7 fill, 8-ton cap -> 3 by vol, 6 by wt, 6 hauls, weight governs.
+  const r = _v871dmp({ debris_cy: 60, debris_tons: 45, container_cy: 30, fill_efficiency: 0.7, weight_cap_tons: 8 });
+  assert.strictEqual(r.by_vol, 3);
+  assert.strictEqual(r.by_wt, 6);
+  assert.strictEqual(r.hauls, 6);
+  assert.strictEqual(r.governs, "weight");
+  // Lighter debris makes the volume govern.
+  const light = _v871dmp({ debris_cy: 60, debris_tons: 12, container_cy: 30, fill_efficiency: 0.7, weight_cap_tons: 8 });
+  assert.strictEqual(light.hauls, 3);
+  assert.strictEqual(light.governs, "volume");
+  // Error seams.
+  assert.ok("error" in _v871dmp({ debris_cy: 0, debris_tons: 45, container_cy: 30, fill_efficiency: 0.7, weight_cap_tons: 8 }));
+  assert.ok("error" in _v871dmp({ debris_cy: 60, debris_tons: 0, container_cy: 30, fill_efficiency: 0.7, weight_cap_tons: 8 }));
+  assert.ok("error" in _v871dmp({ debris_cy: 60, debris_tons: 45, container_cy: 0, fill_efficiency: 0.7, weight_cap_tons: 8 }));
+  assert.ok("error" in _v871dmp({ debris_cy: 60, debris_tons: 45, container_cy: 30, fill_efficiency: 0, weight_cap_tons: 8 }));
+  assert.ok("error" in _v871dmp({ debris_cy: 60, debris_tons: 45, container_cy: 30, fill_efficiency: 0.7, weight_cap_tons: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

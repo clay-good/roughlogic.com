@@ -51557,6 +51557,66 @@
    }
   },
   {
+   "tile_id": "dumpster-count",
+   "source_publisher": "Roll-off haul-count identity (first-principles)",
+   "source_title": "60 cy, 45 tons, 30 cy box, 0.7 fill, 8-ton cap (weight governs)",
+   "source_edition_or_year": "spec-v871 worked example",
+   "source_section_or_page": "by vol = ceil(60/(30*0.7)) = 3; by wt = ceil(45/8) = 6; hauls = max(3,6) = 6",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "debris_cy": 60,
+    "debris_tons": 45,
+    "container_cy": 30,
+    "fill_efficiency": 0.7,
+    "weight_cap_tons": 8
+   },
+   "outputs": {
+    "by_vol": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "by_wt": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "hauls": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dumpster-count",
+   "source_publisher": "Roll-off haul-count identity (first-principles)",
+   "source_title": "cross-check: lighter 12-ton debris governs by volume",
+   "source_edition_or_year": "spec-v871 worked example",
+   "source_section_or_page": "by wt = ceil(12/8) = 2; hauls = max(3,2) = 3 (volume governs, boxes full not heavy)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "debris_cy": 60,
+    "debris_tons": 12,
+    "container_cy": 30,
+    "fill_efficiency": 0.7,
+    "weight_cap_tons": 8
+   },
+   "outputs": {
+    "hauls": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

@@ -17827,6 +17827,31 @@
       "kind": "industry"
     },
     {
+      "term": "dumpster count",
+      "target": "dumpster-count",
+      "kind": "industry"
+    },
+    {
+      "term": "roll off count",
+      "target": "dumpster-count",
+      "kind": "industry"
+    },
+    {
+      "term": "debris haul count",
+      "target": "dumpster-count",
+      "kind": "industry"
+    },
+    {
+      "term": "dumpster hauls",
+      "target": "dumpster-count",
+      "kind": "industry"
+    },
+    {
+      "term": "demolition container count",
+      "target": "dumpster-count",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

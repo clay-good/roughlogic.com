@@ -8749,3 +8749,52 @@ const _v870renderMasonryControlJointLayout = _simpleRenderer({
   compute: computeMasonryControlJointLayout,
 });
 CONSTRUCTION_RENDERERS["masonry-control-joint-layout"] = _v870renderMasonryControlJointLayout;
+
+// --- dumpster-count: Roll-Off Dumpster / Haul Count ---
+//
+// Turns a demolition debris volume and weight into a haul count, where either
+// the box volume or the container weight cap governs:
+//   by_vol = ceil(debris_cy / (container_cy x fill_efficiency))
+//   by_wt = ceil(debris_tons / weight_cap_tons); hauls = max(by_vol, by_wt)
+// dims: in { debris_cy: L^3, debris_tons: M, container_cy: L^3, fill_efficiency: dimensionless, weight_cap_tons: M } out: { by_vol: dimensionless, by_wt: dimensionless, hauls: dimensionless }
+export function computeDumpsterCount({ debris_cy = 60, debris_tons = 45, container_cy = 30, fill_efficiency = 0.7, weight_cap_tons = 8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(debris_cy > 0)) return { error: "Debris volume must be positive (cy)." };
+  if (!(debris_tons > 0)) return { error: "Debris weight must be positive (tons)." };
+  if (!(container_cy > 0)) return { error: "Container volume must be positive (cy)." };
+  if (!(fill_efficiency > 0)) return { error: "Fill efficiency must be positive." };
+  if (!(weight_cap_tons > 0)) return { error: "Weight cap must be positive (tons)." };
+  const by_vol = Math.ceil(debris_cy / (container_cy * fill_efficiency));
+  const by_wt = Math.ceil(debris_tons / weight_cap_tons);
+  const hauls = Math.max(by_vol, by_wt);
+  const governs = by_wt > by_vol ? "weight" : "volume";
+  if (![by_vol, by_wt, hauls].every(Number.isFinite)) return { error: "Haul-count math is not a finite value." };
+  return {
+    by_vol,
+    by_wt,
+    hauls,
+    governs,
+    note: "The debris volume and weight come from demo-debris; the container size and weight cap come from the hauler. Heavy debris (concrete, masonry) hits the weight cap first, light debris the volume. The fill efficiency is below one for bulky debris. Overweight boxes are a haul-back.",
+  };
+}
+
+export const dumpsterCountExample = { inputs: { debris_cy: 60, debris_tons: 45, container_cy: 30, fill_efficiency: 0.7, weight_cap_tons: 8 } };
+
+const _v871renderDumpsterCount = _simpleRenderer({
+  citation: "Citation: haul-count identity by name. by volume = ceil(cy / (container x fill)); by weight = ceil(tons / cap); hauls = max. Heavy debris hits the weight cap first; the hauler's container size and weight cap govern.",
+  example: dumpsterCountExample.inputs,
+  fields: [
+    { key: "debris_cy", label: "Debris volume (cy)", kind: "number", default: 60 },
+    { key: "debris_tons", label: "Debris weight (tons)", kind: "number", default: 45 },
+    { key: "container_cy", label: "Roll-off box size (cy)", kind: "number", default: 30 },
+    { key: "fill_efficiency", label: "Usable fill fraction", kind: "number", default: 0.7 },
+    { key: "weight_cap_tons", label: "Container weight cap (tons)", kind: "number", default: 8 },
+  ],
+  outputs: [
+    { key: "h", id: "dmp-out-h", label: "Hauls", value: (r) => _fmtC(r.hauls, 0) + " hauls (" + r.governs + " governs)" },
+    { key: "b", id: "dmp-out-b", label: "By volume / by weight", value: (r) => _fmtC(r.by_vol, 0) + " by volume, " + _fmtC(r.by_wt, 0) + " by weight" },
+    { key: "note", id: "dmp-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDumpsterCount,
+});
+CONSTRUCTION_RENDERERS["dumpster-count"] = _v871renderDumpsterCount;

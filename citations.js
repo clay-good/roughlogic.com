@@ -8497,6 +8497,17 @@ export const CITATIONS = {
       { name: "Joint locations", value: "also at openings and changes in wall height or thickness (beyond the field spacing)", source: "NCMA / project standard" },
     ],
   },
+  "dumpster-count": {
+    formula: "by_vol = ceil(debris_cy / (container_cy x fill_efficiency)); by_wt = ceil(debris_tons / weight_cap_tons); hauls = max(by_vol, by_wt).",
+    edition: "Roll-off haul-count identity by name (the greater of the volume-limited and weight-limited counts); first-principles governing-constraint arithmetic.",
+    freeAccess: "The governing-constraint logic is public first-principles; the container size and weight cap come from the hauler.",
+    governance: GOVERNANCE.general,
+    editionNote: "The debris volume and weight come from demo-debris; the container size and weight cap come from the hauler. Heavy debris such as concrete and masonry hits the weight cap first, light debris the volume. The fill efficiency is below one for bulky debris; overweight boxes are a haul-back.",
+    assumptions: [
+      { name: "Container", value: "roll-off box size (~30 cy) and weight cap (~8 tons) from the hauler", source: "hauler" },
+      { name: "Fill efficiency", value: "usable fraction of the box, below one for bulky debris (~0.7 default)", source: "field judgment" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

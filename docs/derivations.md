@@ -1589,6 +1589,7 @@ cross-check.
 | calc-construction.js | `computeDuctHangerLoad` | `{ duct_lb_per_ft = 5.5, spacing_ft = 8, run_ft = 40, hanger_swl_lb = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeDuctMetalWeight` | `{ width_in = 24, height_in = 12, length_ft = 100, lb_per_sf = 1.156, seam_fac...` | _ | _ | _ |
 | calc-construction.js | `computeDuctWrapTakeoff` | `{ width_in = 20, height_in = 12, length_ft = 40, overlap_waste_factor = 1.15,...` | _ | _ | _ |
+| calc-construction.js | `computeDumpsterCount` | `{ debris_cy = 60, debris_tons = 45, container_cy = 30, fill_efficiency = 0.7,...` | _ | _ | _ |
 | calc-construction.js | `computeEgressCapacity` | `{ occupant_load = 0, sprinklered = true, path = "level", min_door_in = 32 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeEgressTravelDistance` | `{ travel_ft = 0, travel_limit_ft = 300, common_path_ft = 0, common_path_limit...` | _ | _ | _ |
 | calc-construction.js | `computeExcavationBenchPlan` | `{ depth_ft = 0, soil_class = "B", surcharge = false, length_ft = 0, bottom_wi...` | _ | _ | _ |
@@ -2980,7 +2981,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1566.
+Row count: 1567.
 
 <!-- END function-corpus-v14 -->
 
@@ -3536,7 +3537,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (320 tiles)
+### Group E Construction (321 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3625,6 +3626,7 @@ per spec-v14 §13.1 second paragraph.
 | `duct-metal-weight` | Galvanized Duct Sheet-Metal Weight Takeoff | Duct sheet-metal weight identity (fir...; perimeter = 2*(24+12)/12 = 6 ft; area = 600 sf; weight = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `duct-wrap-takeoff` | Duct Wrap / Liner Material Takeoff | Duct-wrap takeoff identity (first-pri...; perimeter = 2*(20+12)/12 = 5.33 ft; wrap = 5.33*40*1.15 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dump-truck-loads` | Dump Truck Governing Payload and Load Count | Governing-payload identity (first-pri...; weight-limited = 40000/2800 = 14.29 > 12, payload = 12; l... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `dumpster-count` | Roll-Off Dumpster / Haul Count | Roll-off haul-count identity (first-p...; by vol = ceil(60/(30*0.7)) = 3; by wt = ceil(45/8) = 6; h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dust-control-water` | Dust-Control Watering Volume and Truck Trips | Dust-control watering identity (first...; area = 2000*20/9 = 4,444 sy; gal/app = 4444*0.5 = 2,222; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `earthwork-end-area` | Earthwork Volume (End-Area) | FHWA / state-DOT earthwork references...; two 100 ft^2 sections 100 ft apart -> 10000 ft^3 (370.37 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `egress-capacity` | Egress Exit Count and Required Width (IBC 1005.3 / 1006.2) | IBC 2021 §1005.3 / §1006.2 / §1010.1.1; spec-v243 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4485,6 +4487,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1319. Fixture-covered or reference-cadence: 1319 / 1319.
+Tile count: 1320. Fixture-covered or reference-cadence: 1320 / 1320.
 
 <!-- END tile-index-v14 -->

@@ -1038,6 +1038,7 @@ const RELATED = {
   "metal-stud-takeoff": ["drywall", "residential-framing", "sheathing-takeoff"],
   "suspended-ceiling-grid": ["metal-stud-takeoff", "tile-count", "drywall"],
   "masonry-control-joint-layout": ["control-joint-spacing", "masonry-count", "cmu-grout-volume"],
+  "dumpster-count": ["demo-debris", "dump-truck-loads", "stockpile-volume"],
   "refrigerant-lineset-charge-adjust": ["refrigerant-charge", "refrigerant-line-size", "refrigerant-velocity"],
   "asphalt-spread-rate": ["asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity"],
   "pavement-milling-production": ["asphalt-paving-speed", "asphalt-spread-rate", "haul-cycle-production"],

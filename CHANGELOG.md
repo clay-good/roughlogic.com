@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): dumpster-count -- roll-off dumpster / haul count (spec-v871); 2026-07-17
+
+- New Group E tile `dumpster-count` (calc-construction.js), the demolition tile beside `demo-debris` (the debris) and
+  `dump-truck-loads` (the haul side). Turns a debris volume and weight into a haul count, where the box volume or the
+  weight cap governs: by volume = ceil(cy / (box x fill)); by weight = ceil(tons / cap); hauls = max. 60 cy of debris
+  fills 3 boxes by volume, but at 45 tons the 8-ton cap forces 6 hauls -- for heavy concrete debris the weight always
+  wins; lighter 12-ton debris governs by volume at 3. The hauler's container size and weight cap govern. Home count
+  1,319 -> 1,320.
+
 ### feat(construction): masonry-control-joint-layout -- masonry control-joint layout per NCMA (spec-v870); 2026-07-17
 
 - New Group E tile `masonry-control-joint-layout` (calc-construction.js), the masonry layout tile beside `masonry-count`
