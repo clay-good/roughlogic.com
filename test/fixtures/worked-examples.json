@@ -22264,6 +22264,78 @@
    }
   },
   {
+   "tile_id": "loader-production",
+   "source_publisher": "Caterpillar Performance Handbook cycle-time method",
+   "source_title": "payload = bucket_cap x fill_factor; cycles/hr = 50 / cycle; production = payload x cycles/hr; daily = production x hours",
+   "source_edition_or_year": "Caterpillar Performance Handbook",
+   "source_section_or_page": "3.5 lcy bucket, 0.95 fill, 0.50 min cycle, 50-min hour, 8 hr day -> 3.325 lcy payload, 100 cycles/hr, 332.5 lcy/hr, 2,660 lcy/day",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "bucket_cap_lcy": 3.5,
+    "fill_factor": 0.95,
+    "cycle_min": 0.5,
+    "eff_min_per_hr": 50,
+    "hours_per_day": 8
+   },
+   "outputs": {
+    "bucket_payload_lcy": {
+     "value": 3.325,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "cycles_per_hour": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "production_lcy_hr": {
+     "value": 332.5,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "daily_lcy": {
+     "value": 2660,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "loader-production",
+   "source_publisher": "Caterpillar Performance Handbook cycle-time method",
+   "source_title": "longer 0.60 min cycle (soft floor, long tram) drops production",
+   "source_edition_or_year": "Caterpillar Performance Handbook",
+   "source_section_or_page": "3.5 lcy bucket, 0.95 fill, 0.60 min cycle, 50-min hour, 8 hr day -> 83.33 cycles/hr, 277.08 lcy/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "bucket_cap_lcy": 3.5,
+    "fill_factor": 0.95,
+    "cycle_min": 0.6,
+    "eff_min_per_hr": 50,
+    "hours_per_day": 8
+   },
+   "outputs": {
+    "cycles_per_hour": {
+     "value": 83.333,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "production_lcy_hr": {
+     "value": 277.083,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dewatering-rate",
    "source_publisher": "First-principles volume / pumping rate",
    "source_title": "drawdown_gal = L x W x H x 7.48052; pump = drawdown_gal/time + inflow; sized = pump x (1 + margin)",

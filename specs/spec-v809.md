@@ -1,6 +1,8 @@
 # roughlogic.com Specification v809 -- Wheel-Loader / Excavator Bucket Production Rate (calc-earthwork.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-15). Single-tile spec.**
+> **Status: LANDED 2026-07-16 (package 0.398.0).** Executed against the live catalog (1,257 -> 1,258 tiles);
+> trades landed as `["construction", "surveying"]` and the "bank yards per hour" alias landed as "loose yards per
+> hour loader" (the tile outputs loose, not bank, yards). Single-tile spec.
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to **`calc-earthwork.js`** (Group E),
 > no new module, group, or dependency. Inherits spec.md through spec-v808.md. Construction-equipment production sweep
 > (entry 1), beside the existing `haul-cycle-production` tile.

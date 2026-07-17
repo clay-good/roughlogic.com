@@ -7902,6 +7902,17 @@ export const CITATIONS = {
       { name: "Spot time", value: "0.5 min to spot under the loader (default)", source: "earthmoving practice" },
     ],
   },
+  "loader-production": {
+    formula: "bucket_payload = bucket_cap x fill_factor; cycles_per_hour = working_min / cycle; production = bucket_payload x cycles_per_hour; daily = production x hours.",
+    edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name (production = payload x cycles per hour); first-principles cycle arithmetic.",
+    freeAccess: "The cycle-time production method is published earthmoving practice.",
+    governance: GOVERNANCE.general,
+    editionNote: "The manufacturer's rated bucket capacity, the operator's fill factor, and the machine's rated cycle time govern the answer. The 50-minute hour is a planning default, not a guarantee. Cycle time grows with tram distance and dig conditions. Convert the loose yards back to bank quantity with soil-swell-shrink.",
+    assumptions: [
+      { name: "Fill factor", value: "0.95 heaped-bucket fill (default; material and bucket geometry govern)", source: "Caterpillar Performance Handbook" },
+      { name: "Working minutes", value: "50-minute hour (efficiency factor for real-world delays)", source: "Caterpillar Performance Handbook" },
+    ],
+  },
   "dewatering-rate": {
     formula: "drawdown_gal = pit_len x pit_wid x drawdown x 7.48052; pump_gpm = drawdown_gal / drawdown_min + inflow; sized_gpm = pump_gpm x (1 + safety/100).",
     edition: "First-principles volume and pumping-rate arithmetic by name; defers total dynamic head to the pump-tdh tile.",

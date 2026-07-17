@@ -745,6 +745,7 @@ export const COMPUTE_MAP = {
   // spec-v67 Group E earthwork and excavation deepening.
   "soil-swell-shrink": { module: "../../calc-earthwork.js", fn: "computeSoilSwellShrink" },
   "haul-cycle-production": { module: "../../calc-earthwork.js", fn: "computeHaulCycleProduction" },
+  "loader-production": { module: "../../calc-earthwork.js", fn: "computeLoaderProduction" },
   "dewatering-rate": { module: "../../calc-earthwork.js", fn: "computeDewateringRate" },
   "spoil-setback": { module: "../../calc-earthwork.js", fn: "computeSpoilSetback" },
   "pipe-bedding-backfill": { module: "../../calc-earthwork.js", fn: "computePipeBeddingBackfill" },

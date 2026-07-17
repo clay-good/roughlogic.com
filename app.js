@@ -650,7 +650,7 @@ const TOOL_MODULES = (() => {
   // of the group letter, per the v28/v30/v36/v39 precedent); no tile or output
   // changed.
   declare("./calc-earthwork.js", "EARTHWORK_RENDERERS", [
-    "soil-swell-shrink", "haul-cycle-production", "dewatering-rate",
+    "soil-swell-shrink", "haul-cycle-production", "loader-production", "dewatering-rate",
     "spoil-setback", "pipe-bedding-backfill",
     // spec-v326..v328 soil characterization / QC batch
     "relative-compaction", "soil-phase-relations", "atterberg-indices", "fineness-modulus",

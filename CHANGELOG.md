@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): loader-production -- wheel-loader / excavator bucket production rate (spec-v809); 2026-07-16
+
+- New Group E tile `loader-production` (calc-earthwork.js), the load-side counterpart the `haul-cycle-production`
+  fleet match silently assumes: the loose-yards-per-hour a wheel loader or excavator digs and dumps from its rated
+  bucket capacity, fill factor, and cycle time, plus the daily output. Caterpillar Performance Handbook cycle-time
+  method: production = (bucket_cap x fill_factor) x (working_min / cycle). A 3.5 lcy bucket at a 0.95 fill on a
+  0.50 min cycle, 50-minute hour, 8-hour day makes 332.5 lcy/hr and 2,660 lcy/day. Home count 1,257 -> 1,258.
+
 ### fix(hvac): correct the psia refrigerant-charging P-T tables (R-32/R-22 systematically wrong); 2026-07-16
 
 - The second bundled P-T table, `REFRIGERANT_PT_TABLES_v7` (psia-based, feeding the `refrigerant-charging` superheat/

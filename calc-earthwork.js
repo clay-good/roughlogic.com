@@ -5,6 +5,7 @@
 // Holds the spec-v67 earthwork / excavation production bench (Group E):
 //   - soil-swell-shrink       Bank / loose / compacted volume conversion
 //   - haul-cycle-production   Truck/loader haul-cycle production + fleet match
+//   - loader-production       Wheel-loader / excavator bucket production rate
 //   - dewatering-rate         Excavation dewatering pump rate
 //   - spoil-setback           Spoil pile setback and surcharge (OSHA 1926.651)
 //   - pipe-bedding-backfill   Trench bedding / embedment / backfill (ASTM D2321)
@@ -165,6 +166,69 @@ function _v67renderHaulCycleProduction(inputRegion, outputRegion, citationEl) {
   for (const f of [cap, load, haul, dump, ret, spot, eff]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["haul-cycle-production"] = _v67renderHaulCycleProduction;
+
+// --- loader-production: Wheel-Loader / Excavator Bucket Production Rate ---
+//
+// payload = bucket_cap x fill_factor; cycles/hr = eff_min / cycle;
+// production = payload x cycles/hr; daily = production x hours.
+// dims: in { bucket_cap_lcy: L^3, fill_factor: dimensionless, cycle_min: T, eff_min_per_hr: T, hours_per_day: T } out: { bucket_payload_lcy: L^3, cycles_per_hour: dimensionless, production_lcy_hr: L^3 T^-1, daily_lcy: L^3 }
+// (Bucket capacity is L^3; the fill factor and cycles-per-hour are dimensionless;
+//  every time is T; production is a volume-rate L^3 T^-1 and the daily volume L^3.)
+export function computeLoaderProduction({ bucket_cap_lcy, fill_factor = 0.95, cycle_min, eff_min_per_hr = 50, hours_per_day = 8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cap = Number(bucket_cap_lcy);
+  const fill = Number(fill_factor);
+  const cycle = Number(cycle_min);
+  const eff = Number(eff_min_per_hr);
+  const hours = Number(hours_per_day);
+  if (!Number.isFinite(cap) || cap <= 0) return { error: "Bucket capacity must be a positive finite number (lcy)." };
+  if (!Number.isFinite(fill) || fill <= 0) return { error: "Fill factor must be a positive finite number." };
+  if (!Number.isFinite(cycle) || cycle <= 0) return { error: "Cycle time must be a positive finite number (min)." };
+  if (!Number.isFinite(eff) || eff <= 0) return { error: "Working minutes per hour must be a positive finite number." };
+  if (!Number.isFinite(hours) || hours <= 0) return { error: "Hours per day must be a positive finite number." };
+  const bucketPayloadLcy = cap * fill;
+  const cyclesPerHour = eff / cycle;
+  const productionLcyHr = bucketPayloadLcy * cyclesPerHour;
+  const dailyLcy = productionLcyHr * hours;
+  if (![bucketPayloadLcy, cyclesPerHour, productionLcyHr, dailyLcy].every(Number.isFinite)) return { error: "Production math is not a finite value." };
+  return {
+    bucket_payload_lcy: bucketPayloadLcy,
+    cycles_per_hour: cyclesPerHour,
+    production_lcy_hr: productionLcyHr,
+    daily_lcy: dailyLcy,
+    note: "The manufacturer's rated bucket capacity, the operator's fill factor (the material and bucket geometry set it, not a constant), and the machine's rated cycle time govern the answer. The 50-minute hour is a planning default for real-world delays, not a guarantee. Cycle time grows with tram distance and dig conditions and is the variable that moves the answer. Convert the loose yards back to bank (earned) quantity with soil-swell-shrink.",
+  };
+}
+
+function _v809renderLoaderProduction(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Caterpillar Performance Handbook cycle-time production method by name. production = bucket payload x cycles per hour; payload = rated capacity x fill factor; cycles/hr = working minutes / cycle time.";
+  const cap = makeNumber("Heaped bucket capacity (loose cy)", "lp-cap", { step: "any", min: "0" });
+  const fill = makeNumber("Bucket fill factor", "lp-fill", { step: "any", min: "0", value: "0.95" });
+  fill.input.value = "0.95";
+  const cycle = makeNumber("Dig-dump cycle time (min)", "lp-cycle", { step: "any", min: "0" });
+  const eff = makeNumber("Working minutes per hour", "lp-eff", { step: "any", min: "0", value: "50" });
+  eff.input.value = "50";
+  const hours = makeNumber("Productive hours per day", "lp-hours", { step: "any", min: "0", value: "8" });
+  hours.input.value = "8";
+  for (const f of [cap, fill, cycle, eff, hours]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cap.input.value = "3.5"; fill.input.value = "0.95"; cycle.input.value = "0.50"; eff.input.value = "50"; hours.input.value = "8"; update(); });
+  const oPayload = makeOutputLine(outputRegion, "Bucket payload", "lp-out-payload");
+  const oProd = makeOutputLine(outputRegion, "Production", "lp-out-prod");
+  const oDaily = makeOutputLine(outputRegion, "Daily production", "lp-out-daily");
+  const update = debounce(() => {
+    const r = computeLoaderProduction({
+      bucket_cap_lcy: Number(cap.input.value) || 0, fill_factor: fill.input.value === "" ? 0.95 : Number(fill.input.value),
+      cycle_min: Number(cycle.input.value) || 0, eff_min_per_hr: eff.input.value === "" ? 50 : Number(eff.input.value),
+      hours_per_day: hours.input.value === "" ? 8 : Number(hours.input.value),
+    });
+    if (r.error) { oPayload.textContent = r.error; for (const o of [oProd, oDaily]) o.textContent = "-"; return; }
+    oPayload.textContent = fmt(r.bucket_payload_lcy, 3) + " lcy (" + fmt(r.cycles_per_hour, 1) + " cycles/hr)";
+    oProd.textContent = fmt(r.production_lcy_hr, 1) + " lcy/hr";
+    oDaily.textContent = fmt(r.daily_lcy, 0) + " lcy/day";
+  }, DEBOUNCE_MS);
+  for (const f of [cap, fill, cycle, eff, hours]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["loader-production"] = _v809renderLoaderProduction;
 
 // --- dewatering-rate: Excavation Dewatering Pump Rate ---
 //

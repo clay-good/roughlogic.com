@@ -10907,7 +10907,7 @@ test("bounds: spec-v744 spreader beam minimum top-point height (inverse of sprea
 
 import {
   computeSoilSwellShrink as _v67a, computeHaulCycleProduction as _v67b, computeDewateringRate as _v67c,
-  computeSpoilSetback as _v67d, computePipeBeddingBackfill as _v67e,
+  computeSpoilSetback as _v67d, computePipeBeddingBackfill as _v67e, computeLoaderProduction as _v809lp,
 } from "../../calc-earthwork.js";
 test("bounds: calc-construction v67 earthwork tiles pin volume conversion, production, dewatering, setback, and bedding", () => {
   // soil-swell-shrink: 100 bank, swell 25, shrink 15 -> 125 loose, 0.80 LF, 85 compacted
@@ -10928,6 +10928,17 @@ test("bounds: calc-construction v67 earthwork tiles pin volume conversion, produ
   assert.strictEqual(_v67b({ truck_cap_lcy: 12, load_min: 2.0, haul_min: 4.0, dump_min: 1.5, return_min: 3.0, spot_min: 0.5, eff_min_per_hr: 50 }).trucks_to_match, 6); // shorter haul
   assert.ok("error" in _v67b({ truck_cap_lcy: 0, load_min: 2 }));
   assert.ok("error" in _v67b({ truck_cap_lcy: 12, load_min: 0 }));
+  // loader-production: 3.5 lcy bucket, 0.95 fill, 0.50 min cycle, 50-min hour, 8 hr -> 3.325 payload, 100 cycles/hr, 332.5 lcy/hr, 2660/day
+  const lp = _v809lp({ bucket_cap_lcy: 3.5, fill_factor: 0.95, cycle_min: 0.5, eff_min_per_hr: 50, hours_per_day: 8 });
+  assert.ok(Math.abs(lp.bucket_payload_lcy - 3.325) < 1e-9);
+  assert.strictEqual(lp.cycles_per_hour, 100);
+  assert.ok(Math.abs(lp.production_lcy_hr - 332.5) < 1e-9);
+  assert.strictEqual(lp.daily_lcy, 2660);
+  assert.ok(Math.abs(_v809lp({ bucket_cap_lcy: 3.5, fill_factor: 0.95, cycle_min: 0.6, eff_min_per_hr: 50, hours_per_day: 8 }).production_lcy_hr - 277.0833) < 1e-3); // longer cycle
+  assert.ok("error" in _v809lp({ bucket_cap_lcy: 0, cycle_min: 0.5 }));
+  assert.ok("error" in _v809lp({ bucket_cap_lcy: 3.5, cycle_min: 0 }));
+  assert.ok("error" in _v809lp({ bucket_cap_lcy: 3.5, fill_factor: 0, cycle_min: 0.5 }));
+  assert.ok("error" in _v809lp({ bucket_cap_lcy: 3.5, cycle_min: 0.5, eff_min_per_hr: 0 }));
   // dewatering-rate: 20x12 pit, 3 ft in 30 min, inflow 40, 25% -> 5386 gal, 219.5, 274.4
   const dw = _v67c({ pit_len_ft: 20, pit_wid_ft: 12, drawdown_ft: 3, drawdown_min: 30, inflow_gpm: 40, safety_pct: 25 });
   assert.ok(Math.abs(dw.drawdown_gal - 5386.0) < 1);
