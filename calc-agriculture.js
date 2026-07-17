@@ -79,8 +79,9 @@ export function computeTimberCruise({ small_end_dib_in = 0, log_length_ft = 16, 
   if (rule === "doyle") {
     bf = Math.max(0, Math.pow(small_end_dib_in - 4, 2) * (log_length_ft / 16));
   } else if (rule === "international") {
-    // International is per 16 ft log; scale linearly by length / 16.
-    bf = Math.max(0, (0.22 * small_end_dib_in * small_end_dib_in - 0.71 * small_end_dib_in)) * (log_length_ft / 16);
+    // International 1/4-inch rule: 0.22*D^2 - 0.71*D is the board-foot volume of a
+    // 4-FOOT section, so scale by the number of 4-ft sections (length / 4), not / 16.
+    bf = Math.max(0, (0.22 * small_end_dib_in * small_end_dib_in - 0.71 * small_end_dib_in)) * (log_length_ft / 4);
   } else if (rule === "scribner") {
     const dib = Math.round(small_end_dib_in);
     let raw = SCRIBNER_TABLE_16FT[dib];

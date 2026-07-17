@@ -3375,14 +3375,16 @@ test("bounds: calc-agriculture computeGPA rejects negative GPM / non-positive sp
   assert.ok("error" in computeAgGPA({ gpm: 0.4, spacing_in: 20, speed_mph: 0 }));
 });
 
-test("bounds: calc-agriculture computeTimberCruise pins Doyle BF = (D-4)^2 * L/16 and International 1/4 BF = (0.22*D^2 - 0.71*D) * L/16", () => {
+test("bounds: calc-agriculture computeTimberCruise pins Doyle BF = (D-4)^2 * L/16 and International 1/4 BF = (0.22*D^2 - 0.71*D) * L/4 (4-ft-section rule)", () => {
   // Doyle identity at the spec example (14 in DIB, 16 ft) -> (14-4)^2 = 100 BF.
   const doyle = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "doyle" });
   assert.ok(!doyle.error, JSON.stringify(doyle));
   assert.ok(Math.abs(doyle.board_feet - 100) < 1e-9, `Doyle 14-in 16-ft`);
-  // International 1/4 at the same DIB / length: 0.22 * 196 - 0.71 * 14 = 43.12 - 9.94 = 33.18.
+  // International 1/4 is a 4-ft-section rule: (0.22*196 - 0.71*14) per 4 ft x (16/4) sections = 33.18 * 4 = 132.72 BF.
+  // (Correctly the highest of the three rules for a small log, matching the tile note; the old code used L/16 and read 33.)
   const intl = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "international" });
-  assert.ok(Math.abs(intl.board_feet - (0.22 * 196 - 0.71 * 14)) < 1e-9, `Int'l 1/4 14-in 16-ft`);
+  assert.ok(Math.abs(intl.board_feet - (0.22 * 196 - 0.71 * 14) * (16 / 4)) < 1e-9, `Int'l 1/4 14-in 16-ft`);
+  assert.ok(intl.board_feet > 114 && intl.board_feet > 100, `International reads highest for a small log (> Scribner 114 and Doyle 100)`);
   // Scribner table lookup at 14 in -> 114 BF (per the bundled SCRIBNER_TABLE_16FT).
   const scribner = computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "scribner" });
   assert.strictEqual(scribner.board_feet, 114);

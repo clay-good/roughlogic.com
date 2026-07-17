@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(agriculture): timber-cruise International 1/4-inch rule scaled by L/16 instead of L/4 (~4x underestimate); 2026-07-17
+
+- `timber-cruise` (calc-agriculture.js) computed the International 1/4-inch board-foot volume as
+  `(0.22*D^2 - 0.71*D) * (length_ft / 16)`. The expression `0.22*D^2 - 0.71*D` is the International rule's volume for a
+  4-FOOT log section, so a full log holds `length/4` sections, not `length/16`. A 16 ft log therefore received exactly
+  the volume of a single 4 ft section -- a ~4x underestimate. A 14 in DIB / 16 ft log read 33 BF where the correct
+  no-taper estimate is 133 BF; the tile's sibling Scribner rule reads 114 BF and Doyle 100 BF for the same log, and the
+  tile's own note says International reads highest for small logs -- all contradicting the buggy 33. The worked-example
+  fixture uses only the Doyle rule, so the International branch was never test-covered. Fixed `length_ft / 16` to
+  `length_ft / 4` and updated the two unit tests that mirrored the buggy L/16 scaling. Caught by a first-principles
+  re-derivation of calc-agriculture.js.
+
 ### fix(water): disinfection-ct SWTR Giardia table pH columns were mislabeled a half-to-full unit low (falsely certified inadequate disinfection); 2026-07-17
 
 - `disinfection-ct` (calc-water.js) bundled the USEPA SWTR 3-log Giardia CT table (free chlorine, <=0.4 mg/L) with the pH
