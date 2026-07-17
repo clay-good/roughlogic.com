@@ -52269,6 +52269,64 @@
    }
   },
   {
+   "tile_id": "siding-takeoff",
+   "source_publisher": "Siding-takeoff identity (first-principles)",
+   "source_title": "2,000 sf wall, 200 sf openings, 12% waste, 4 in exposure -> 20.16 squares, 5,400 LF",
+   "source_edition_or_year": "spec-v883 worked example",
+   "source_section_or_page": "net = 2000-200 = 1800; squares = 1800*1.12/100 = 20.16; linear = 1800/(4/12) = 5400",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "wall_area_sf": 2000,
+    "opening_area_sf": 200,
+    "waste_pct": 12,
+    "exposure_in": 4
+   },
+   "outputs": {
+    "net_area_sf": {
+     "value": 1800,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "squares": {
+     "value": 20.16,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "linear_ft": {
+     "value": 5400,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "siding-takeoff",
+   "source_publisher": "Siding-takeoff identity (first-principles)",
+   "source_title": "cross-check: a wider 6 in exposure cuts the board footage to 3,600 LF at the same squares",
+   "source_edition_or_year": "spec-v883 worked example",
+   "source_section_or_page": "linear = 1800/(6/12) = 1800/0.5 = 3600 LF; squares unchanged at 20.16",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "wall_area_sf": 2000,
+    "opening_area_sf": 200,
+    "waste_pct": 12,
+    "exposure_in": 6
+   },
+   "outputs": {
+    "linear_ft": {
+     "value": 3600,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

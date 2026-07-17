@@ -98,7 +98,11 @@ const TILE_GZIP_CAP = 6 * 1024;
 // (shingle-nails, duct trio, roofing/insulation quartet, sheathing-takeoff), taking construction/index.html
 // to ~64.2 KB gz (over the 64 KB cap at sheathing-takeoff); 68 KB restores ~6% headroom (this gate runs only
 // in CI's integration job, so push lint stays green while CI goes red -- run check-shells.mjs locally).
-const GROUP_GZIP_CAP = 68 * 1024;
+// Bumped 68 -> 74 KB on 2026-07-17: the spec-v881-v883 construction-ops landings (baluster-picket-count,
+// traffic-taper-length, siding-takeoff) took construction/index.html to ~68.2 KB gz (over the 68 KB cap at
+// siding-takeoff); 74 KB restores ~8% headroom for the remaining v884-v908 Group E landings (this gate runs
+// only in CI's integration job, so push lint stays green while CI goes red -- run check-shells.mjs locally).
+const GROUP_GZIP_CAP = 74 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

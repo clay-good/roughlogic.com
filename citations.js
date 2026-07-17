@@ -8167,6 +8167,17 @@ export const CITATIONS = {
       { name: "Device spacing", value: "channelizing-device spacing in a taper roughly the speed in feet (entered here)", source: "traffic-control plan" },
     ],
   },
+  "siding-takeoff": {
+    formula: "net_area_sf = wall_area_sf - opening_area_sf; squares = net_area_sf x (1 + waste_pct/100) / 100; linear_ft = net_area_sf / (exposure_in/12).",
+    edition: "Siding-takeoff identity by name (net after openings; squares from net and waste; linear from net over exposure); first-principles quantity arithmetic.",
+    freeAccess: "The siding takeoff is public quantity-survey arithmetic; the exposure and trim schedule come from the product and the drawings.",
+    governance: GOVERNANCE.general,
+    editionNote: "A square is 100 sf. The lap-siding linear footage follows the exposure (the reveal to the weather): a wider reveal covers more wall per board and cuts the linear feet. Starter strip, outside and inside corners, J-channel, and trim are taken off separately. Distinct from fence-estimate and the metal-roof-panels takeoff.",
+    assumptions: [
+      { name: "Square", value: "100 sf of wall (the siding coverage unit)", source: "quantity-survey convention" },
+      { name: "Exposure", value: "the lap reveal to the weather in inches (~4 in default); the product sets it", source: "siding manufacturer" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

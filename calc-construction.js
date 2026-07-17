@@ -9304,3 +9304,47 @@ const _v882renderTrafficTaperLength = _simpleRenderer({
   compute: computeTrafficTaperLength,
 });
 CONSTRUCTION_RENDERERS["traffic-taper-length"] = _v882renderTrafficTaperLength;
+
+// --- siding-takeoff: Lap / Panel Siding Squares and Linear Footage ---
+//
+// Net wall area after openings, the squares (with waste), and the lap linear footage at a reveal.
+//   net = wall - openings; squares = net x (1 + waste/100) / 100; linear = net / (exposure_in/12)
+// dims: in { wall_area_sf: L^2, opening_area_sf: L^2, waste_pct: dimensionless, exposure_in: L } out: { net_area_sf: L^2, squares: dimensionless, linear_ft: L }
+export function computeSidingTakeoff({ wall_area_sf = 2000, opening_area_sf = 0, waste_pct = 12, exposure_in = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(wall_area_sf > 0)) return { error: "Wall area must be positive (ft^2)." };
+  if (!(exposure_in > 0)) return { error: "Exposure must be positive (in)." };
+  if (opening_area_sf < 0) return { error: "Opening area cannot be negative (ft^2)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  if (opening_area_sf >= wall_area_sf) return { error: "Openings meet or exceed the wall area." };
+  const net_area_sf = wall_area_sf - opening_area_sf;
+  const squares = net_area_sf * (1 + waste_pct / 100) / 100;
+  const linear_ft = net_area_sf / (exposure_in / 12);
+  if (![net_area_sf, squares, linear_ft].every(Number.isFinite)) return { error: "Siding-takeoff math is not a finite value." };
+  return {
+    net_area_sf,
+    squares,
+    linear_ft,
+    note: "A square is 100 sf. The lap-siding linear footage follows the exposure (the reveal to the weather): a wider reveal covers more wall per board and cuts the linear feet. Starter strip, outside and inside corners, J-channel, and trim are taken off separately. Distinct from fence-estimate and the metal-roof-panels takeoff.",
+  };
+}
+
+export const sidingTakeoffExample = { inputs: { wall_area_sf: 2000, opening_area_sf: 200, waste_pct: 12, exposure_in: 4 } };
+
+const _v883renderSidingTakeoff = _simpleRenderer({
+  citation: "Citation: siding-takeoff identity by name. net = wall - openings; squares = net x (1 + waste/100) / 100; linear = net / (exposure/12). A square is 100 sf; the lap linear footage follows the exposure.",
+  example: sidingTakeoffExample.inputs,
+  fields: [
+    { key: "wall_area_sf", label: "Gross wall area (ft^2)", kind: "number", default: 2000 },
+    { key: "opening_area_sf", label: "Openings to deduct (ft^2)", kind: "number", default: 0 },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 12 },
+    { key: "exposure_in", label: "Lap exposure / reveal (in)", kind: "number", default: 4 },
+  ],
+  outputs: [
+    { key: "sq", id: "sid-out-sq", label: "Siding", value: (r) => _fmtC(r.squares, 2) + " squares (" + _fmtC(r.net_area_sf, 0) + " net sf)" },
+    { key: "lf", id: "sid-out-lf", label: "Lap board footage", value: (r) => _fmtC(r.linear_ft, 0) + " LF" },
+    { key: "note", id: "sid-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSidingTakeoff,
+});
+CONSTRUCTION_RENDERERS["siding-takeoff"] = _v883renderSidingTakeoff;

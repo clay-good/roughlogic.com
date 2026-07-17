@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): siding-takeoff -- lap / panel siding squares and linear footage (spec-v883); 2026-07-17
+
+- New Group E tile `siding-takeoff` (calc-construction.js), the exterior takeoff beside `metal-roof-panels` and
+  `fence-estimate`. net = wall - openings; squares = net x (1 + waste/100) / 100; linear = net / (exposure/12). 2,000 sf of
+  wall less 200 sf of openings at 12% waste is 20.16 squares, and at a 4 in exposure about 5,400 LF of lap board; a wider 6
+  in reveal cuts it to 3,600 LF at the same squares. A square is 100 sf; the lap linear footage follows the exposure.
+  Starter strip, corners, J-channel, and trim are taken off separately. Home count 1,331 -> 1,332.
+- Raised the Group E construction group-shell gzip cap 68 -> 74 KB (check-shells.mjs): the v881-v883 landings took
+  construction/index.html to ~68.2 KB gz. This gate runs only in CI's integration job.
+
 ### feat(construction): traffic-taper-length -- work-zone merging taper length and device count (MUTCD) (spec-v882); 2026-07-17
 
 - New Group E tile `traffic-taper-length` (calc-construction.js), the traffic-control takeoff beside the paving and

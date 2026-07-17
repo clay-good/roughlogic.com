@@ -18102,6 +18102,56 @@
       "kind": "industry"
     },
     {
+      "term": "work zone taper length",
+      "target": "traffic-taper-length",
+      "kind": "industry"
+    },
+    {
+      "term": "mutcd taper",
+      "target": "traffic-taper-length",
+      "kind": "industry"
+    },
+    {
+      "term": "merging taper cones",
+      "target": "traffic-taper-length",
+      "kind": "industry"
+    },
+    {
+      "term": "lane closure taper",
+      "target": "traffic-taper-length",
+      "kind": "industry"
+    },
+    {
+      "term": "traffic taper devices",
+      "target": "traffic-taper-length",
+      "kind": "industry"
+    },
+    {
+      "term": "siding takeoff",
+      "target": "siding-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "lap siding squares",
+      "target": "siding-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "siding linear feet",
+      "target": "siding-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "siding squares estimate",
+      "target": "siding-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "panel siding quantity",
+      "target": "siding-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

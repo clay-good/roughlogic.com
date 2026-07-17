@@ -26148,3 +26148,23 @@ test("bounds: spec-v882 computeTrafficTaperLength pins both speed branches, devi
   assert.ok("error" in _v882({ offset_width_ft: 12, speed_mph: 55, device_spacing_ft: 0 }));
   assert.ok("error" in _v882({ offset_width_ft: Infinity, speed_mph: 55, device_spacing_ft: 40 }));
 });
+
+import { computeSidingTakeoff as _v883 } from "../../calc-construction.js";
+
+test("bounds: spec-v883 computeSidingTakeoff pins net area, squares, linear feet, and error seams", () => {
+  const r = _v883({ wall_area_sf: 2000, opening_area_sf: 200, waste_pct: 12, exposure_in: 4 });
+  assert.equal(r.net_area_sf, 1800); // 2000 - 200
+  assert.ok(Math.abs(r.squares - 20.16) < 1e-9); // 1800 * 1.12 / 100
+  assert.equal(r.linear_ft, 5400); // 1800 / (4/12)
+  // A wider reveal covers more wall per board: the exposure sets the linear feet, the area sets the squares.
+  const wide = _v883({ wall_area_sf: 2000, opening_area_sf: 200, waste_pct: 12, exposure_in: 6 });
+  assert.equal(wide.linear_ft, 3600); // 1800 / (6/12)
+  assert.ok(Math.abs(wide.squares - 20.16) < 1e-9); // squares unchanged
+  // Error seams: non-finite, non-positive wall / exposure, negative openings / waste, openings exceeding the wall.
+  assert.ok("error" in _v883({ wall_area_sf: 0, opening_area_sf: 0, waste_pct: 12, exposure_in: 4 }));
+  assert.ok("error" in _v883({ wall_area_sf: 2000, opening_area_sf: 0, waste_pct: 12, exposure_in: 0 }));
+  assert.ok("error" in _v883({ wall_area_sf: 2000, opening_area_sf: -50, waste_pct: 12, exposure_in: 4 }));
+  assert.ok("error" in _v883({ wall_area_sf: 2000, opening_area_sf: 0, waste_pct: -5, exposure_in: 4 }));
+  assert.ok("error" in _v883({ wall_area_sf: 2000, opening_area_sf: 2000, waste_pct: 12, exposure_in: 4 }));
+  assert.ok("error" in _v883({ wall_area_sf: Infinity, opening_area_sf: 0, waste_pct: 12, exposure_in: 4 }));
+});

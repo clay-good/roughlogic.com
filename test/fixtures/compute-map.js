@@ -807,6 +807,7 @@ export const COMPUTE_MAP = {
   "pavement-milling-production": { module: "../../calc-construction.js", fn: "computePavementMillingProduction" },
   "striping-paint-quantity": { module: "../../calc-construction.js", fn: "computeStripingPaintQuantity" },
   "traffic-taper-length": { module: "../../calc-construction.js", fn: "computeTrafficTaperLength" },
+  "siding-takeoff": { module: "../../calc-construction.js", fn: "computeSidingTakeoff" },
   "concrete-vibrator-spacing": { module: "../../calc-construction.js", fn: "computeConcreteVibratorSpacing" },
   "formwork-tie-load": { module: "../../calc-construction.js", fn: "computeFormworkTieLoad" },
   "mass-concrete-temp-rise": { module: "../../calc-construction.js", fn: "computeMassConcreteTempRise" },
