@@ -52151,6 +52151,68 @@
    }
   },
   {
+   "tile_id": "baluster-picket-count",
+   "source_publisher": "Guard baluster spacing (IRC 4 in sphere rule, first-principles)",
+   "source_title": "96 in clear span, 1.5 in pickets, 4 in max gap -> 17 pickets, 3.92 in actual gap",
+   "source_edition_or_year": "spec-v881 worked example",
+   "source_section_or_page": "pickets = ceil((96-4)/(1.5+4)) = ceil(16.7) = 17; gaps = 18; gap = (96-17*1.5)/18 = 3.917 in",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "rail_clear_in": 96,
+    "picket_width_in": 1.5,
+    "max_gap_in": 4
+   },
+   "outputs": {
+    "pickets": {
+     "value": 17,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "gaps": {
+     "value": 18,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "actual_gap_in": {
+     "value": 3.917,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "baluster-picket-count",
+   "source_publisher": "Guard baluster spacing (IRC 4 in sphere rule, first-principles)",
+   "source_title": "cross-check: 3.5 in wide pickets on the same 96 in span -> 13 pickets, 3.61 in gap",
+   "source_edition_or_year": "spec-v881 worked example",
+   "source_section_or_page": "pickets = ceil((96-4)/(3.5+4)) = ceil(12.27) = 13; gaps = 14; gap = (96-13*3.5)/14 = 3.607 in",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "rail_clear_in": 96,
+    "picket_width_in": 3.5,
+    "max_gap_in": 4
+   },
+   "outputs": {
+    "pickets": {
+     "value": 13,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "actual_gap_in": {
+     "value": 3.607,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

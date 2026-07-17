@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): baluster-picket-count -- guard baluster / picket count (4-in sphere rule) (spec-v881); 2026-07-17
+
+- New Group E tile `baluster-picket-count` (calc-construction.js), the guard/fence spacing takeoff beside
+  `guard-handrail-check` and `stair-code-check`. pickets = ceil((clear span - max gap) / (picket width + max gap));
+  actual gap = (clear span - pickets x width) / (pickets + 1). A 96 in clear span with 1.5 in pickets holds 17 pickets
+  at a 3.92 in gap (under the IRC 4 in sphere limit); 3.5 in wide pickets on the same span take 13 at a 3.61 in gap. The
+  clear span and picket width both drive the count. The guard height and load are checked by `guard-handrail-check`; the
+  adopted code governs. Home count 1,329 -> 1,330.
+
 ### feat(construction): baseplate-grout-volume -- non-shrink grout volume under a base plate (spec-v880); 2026-07-17
 
 - New Group E tile `baseplate-grout-volume` (calc-construction.js), the anchoring / steel-erection takeoff beside

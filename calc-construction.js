@@ -9220,3 +9220,46 @@ const _v880renderBaseplateGroutVolume = _simpleRenderer({
   compute: computeBaseplateGroutVolume,
 });
 CONSTRUCTION_RENDERERS["baseplate-grout-volume"] = _v880renderBaseplateGroutVolume;
+
+// --- baluster-picket-count: Guard Baluster / Picket Count (4-in Sphere Rule) ---
+//
+// Spaces the balusters on a guard so a 4 in sphere cannot pass:
+//   pickets = ceil((rail_clear_in - max_gap_in) / (picket_width_in + max_gap_in))
+//   gaps = pickets + 1; actual_gap_in = (rail_clear_in - pickets x picket_width_in) / gaps
+// dims: in { rail_clear_in: L, picket_width_in: L, max_gap_in: L } out: { pickets: dimensionless, gaps: dimensionless, actual_gap_in: L }
+export function computeBalusterPicketCount({ rail_clear_in = 96, picket_width_in = 1.5, max_gap_in = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(rail_clear_in > 0)) return { error: "Rail clear span must be positive (in)." };
+  if (!(picket_width_in > 0)) return { error: "Picket width must be positive (in)." };
+  if (!(max_gap_in > 0)) return { error: "Max gap must be positive (in)." };
+  if (!(picket_width_in < rail_clear_in)) return { error: "Picket width exceeds the clear span." };
+  const pickets = Math.ceil((rail_clear_in - max_gap_in) / (picket_width_in + max_gap_in));
+  const gaps = pickets + 1;
+  const actual_gap_in = (rail_clear_in - pickets * picket_width_in) / gaps;
+  if (![pickets, gaps, actual_gap_in].every(Number.isFinite)) return { error: "Picket-count math is not a finite value." };
+  return {
+    pickets,
+    gaps,
+    actual_gap_in,
+    note: "The IRC limits the opening so a 4 in sphere cannot pass through a guard (the triangle at a stair open riser uses a 6 in sphere, and the space below the rail a 4 3/8 in). This holds the actual gap at or under the maximum. The guard height and load are checked by guard-handrail-check; the adopted code governs.",
+  };
+}
+
+export const balusterPicketCountExample = { inputs: { rail_clear_in: 96, picket_width_in: 1.5, max_gap_in: 4 } };
+
+const _v881renderBalusterPicketCount = _simpleRenderer({
+  citation: "Citation: spacing rule by name (IRC 4 in sphere). pickets = ceil((clear - max gap) / (picket width + max gap)); actual gap = (clear - pickets x width) / (pickets + 1). The IRC limits the opening so a 4 in sphere cannot pass through a guard.",
+  example: balusterPicketCountExample.inputs,
+  fields: [
+    { key: "rail_clear_in", label: "Clear span between posts (in)", kind: "number", default: 96 },
+    { key: "picket_width_in", label: "Picket width (in)", kind: "number", default: 1.5 },
+    { key: "max_gap_in", label: "Maximum clear gap (in)", kind: "number", default: 4 },
+  ],
+  outputs: [
+    { key: "p", id: "bpc-out-p", label: "Balusters / pickets", value: (r) => _fmtC(r.pickets, 0) + " pickets (" + _fmtC(r.gaps, 0) + " gaps)" },
+    { key: "g", id: "bpc-out-g", label: "Actual clear gap", value: (r) => _fmtC(r.actual_gap_in, 2) + " in" + (r.actual_gap_in <= 4 ? " (under 4 in)" : " (OVER - add a picket)") },
+    { key: "note", id: "bpc-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBalusterPicketCount,
+});
+CONSTRUCTION_RENDERERS["baluster-picket-count"] = _v881renderBalusterPicketCount;

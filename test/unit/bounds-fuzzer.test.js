@@ -26105,3 +26105,24 @@ test("bounds: spec-v638 computeSagVerticalCurveComfort pins the comfort length, 
   assert.ok("error" in _v638({ A_pct: Infinity, V_mph: 60 }));
   assert.ok("error" in _v638({ A_pct: 4, V_mph: -60 }));
 });
+
+import { computeBalusterPicketCount as _v881 } from "../../calc-construction.js";
+
+test("bounds: spec-v881 computeBalusterPicketCount pins the picket count, actual gap, and error seams", () => {
+  const r = _v881({ rail_clear_in: 96, picket_width_in: 1.5, max_gap_in: 4 });
+  assert.equal(r.pickets, 17); // ceil((96-4)/(1.5+4)) = ceil(16.7)
+  assert.equal(r.gaps, 18);
+  assert.ok(Math.abs(r.actual_gap_in - 3.9166666666666665) < 1e-9); // (96-17*1.5)/18
+  assert.ok(r.actual_gap_in <= 4); // holds under the 4 in sphere
+  // Wider 3.5 in pickets on the same span take fewer of them at a tighter gap.
+  const wide = _v881({ rail_clear_in: 96, picket_width_in: 3.5, max_gap_in: 4 });
+  assert.equal(wide.pickets, 13); // ceil((96-4)/(3.5+4)) = ceil(12.27)
+  assert.equal(wide.gaps, 14);
+  assert.ok(Math.abs(wide.actual_gap_in - 3.607142857142857) < 1e-9); // (96-13*3.5)/14
+  // Error seams: non-finite, non-positive inputs, and a picket wider than the span.
+  assert.ok("error" in _v881({ rail_clear_in: 0, picket_width_in: 1.5, max_gap_in: 4 }));
+  assert.ok("error" in _v881({ rail_clear_in: 96, picket_width_in: 0, max_gap_in: 4 }));
+  assert.ok("error" in _v881({ rail_clear_in: 96, picket_width_in: 1.5, max_gap_in: 0 }));
+  assert.ok("error" in _v881({ rail_clear_in: 96, picket_width_in: 120, max_gap_in: 4 }));
+  assert.ok("error" in _v881({ rail_clear_in: Infinity, picket_width_in: 1.5, max_gap_in: 4 }));
+});

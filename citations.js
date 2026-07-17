@@ -8607,6 +8607,17 @@ export const CITATIONS = {
       { name: "Bag yield", value: "the product's per-bag yield in ft^3 (~0.45 ft^3 typical for non-shrink grout)", source: "grout manufacturer" },
     ],
   },
+  "baluster-picket-count": {
+    formula: "pickets = ceil((rail_clear_in - max_gap_in) / (picket_width_in + max_gap_in)); gaps = pickets + 1; actual_gap_in = (rail_clear_in - pickets x picket_width_in) / gaps.",
+    edition: "Guard baluster spacing by name (the IRC 4 in sphere rule); first-principles equal-spacing arithmetic.",
+    freeAccess: "The equal-spacing geometry is public first-principles; the 4 in sphere limit is the code rule, stated by name.",
+    governance: GOVERNANCE.general,
+    editionNote: "The IRC limits a guard opening so a 4 in sphere cannot pass (the stair triangle at an open riser uses a 6 in sphere, and the space below the rail a 4 3/8 in). Solving the equal-spacing count at or under the maximum gap gives the picket count and the actual gap. The guard height and load are checked by guard-handrail-check; the adopted code governs.",
+    assumptions: [
+      { name: "Sphere rule", value: "4 in maximum guard opening (IRC R312.1.3); 6 in at the stair triangle, 4 3/8 in below the rail", source: "IRC" },
+      { name: "Equal spacing", value: "pickets and gaps evenly distributed across the clear span", source: "first principles" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

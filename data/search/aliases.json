@@ -18077,6 +18077,31 @@
       "kind": "industry"
     },
     {
+      "term": "baluster count",
+      "target": "baluster-picket-count",
+      "kind": "industry"
+    },
+    {
+      "term": "deck railing balusters",
+      "target": "baluster-picket-count",
+      "kind": "industry"
+    },
+    {
+      "term": "guard baluster spacing",
+      "target": "baluster-picket-count",
+      "kind": "industry"
+    },
+    {
+      "term": "4 inch sphere rule",
+      "target": "baluster-picket-count",
+      "kind": "industry"
+    },
+    {
+      "term": "railing picket count",
+      "target": "baluster-picket-count",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"
