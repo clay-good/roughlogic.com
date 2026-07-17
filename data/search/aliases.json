@@ -17727,6 +17727,31 @@
       "kind": "industry"
     },
     {
+      "term": "sill plate anchor count",
+      "target": "sill-plate-anchor-count",
+      "kind": "industry"
+    },
+    {
+      "term": "anchor bolt spacing sill",
+      "target": "sill-plate-anchor-count",
+      "kind": "industry"
+    },
+    {
+      "term": "mudsill anchor bolts",
+      "target": "sill-plate-anchor-count",
+      "kind": "industry"
+    },
+    {
+      "term": "foundation anchor count",
+      "target": "sill-plate-anchor-count",
+      "kind": "industry"
+    },
+    {
+      "term": "sill bolt layout",
+      "target": "sill-plate-anchor-count",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

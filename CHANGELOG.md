@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): sill-plate-anchor-count -- sill-plate anchor bolt count per IRC R403.1.6 (spec-v867); 2026-07-17
+
+- New Group E tile `sill-plate-anchor-count` (calc-construction.js), the framing layout tile beside
+  `deck-ledger-fasteners`, distinct from the `anchor-embedment` capacity calc. bolts = max(2, ceil((wall - 2 x end
+  distance) / max spacing) + 1). A 40 ft wall at 6 ft spacing with 9 in end distances takes 8 bolts; a short 8 ft wall
+  still needs 3 because the 6.5 ft between end bolts exceeds the 6 ft spacing -- a mid bolt the two-bolt minimum alone
+  would miss. IRC R403.1.6 caps the spacing at 6 ft with a bolt within 12 in of each end; the code and engineered plan
+  govern. Home count 1,315 -> 1,316.
+
 ### feat(construction): construction-adhesive-tubes -- construction adhesive tube count (spec-v866); 2026-07-17
 
 - New Group E tile `construction-adhesive-tubes` (calc-construction.js), the framing takeoff beside `sheathing-takeoff`,

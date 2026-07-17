@@ -8453,6 +8453,17 @@ export const CITATIONS = {
       { name: "Tube volume", value: "~50.6 in^3 for a 28 fl-oz cartridge", source: "adhesive manufacturer" },
     ],
   },
+  "sill-plate-anchor-count": {
+    formula: "effective_len_ft = wall_length_ft - 2 x (end_distance_in/12); bolts = max(2, ceil(effective_len_ft / max_spacing_ft) + 1).",
+    edition: "Sill-plate anchor-count rule by name (bolts from the span between end bolts over the max spacing, min two); IRC R403.1.6.",
+    freeAccess: "The anchor-count layout is public IRC R403.1.6 prescriptive geometry; the adopted code edition and any engineered plan govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "IRC R403.1.6 caps the spacing at 6 ft (high-wind and seismic provisions or engineered plans tighten it). Each plate section gets a minimum of two bolts, one within 12 in of each end and corner. A 1/2 in bolt needs at least 7 in of embedment. The adopted code and any engineered plan govern; distinct from the anchor-embedment capacity calc.",
+    assumptions: [
+      { name: "Max spacing", value: "6 ft per IRC R403.1.6; high-wind/seismic or engineered plans tighten it", source: "IRC R403.1.6" },
+      { name: "End distance", value: "a bolt within 12 in of each end and corner; minimum two bolts per plate", source: "IRC R403.1.6" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

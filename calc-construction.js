@@ -8571,3 +8571,45 @@ const _v866renderConstructionAdhesiveTubes = _simpleRenderer({
   compute: computeConstructionAdhesiveTubes,
 });
 CONSTRUCTION_RENDERERS["construction-adhesive-tubes"] = _v866renderConstructionAdhesiveTubes;
+
+// --- sill-plate-anchor-count: Sill-Plate Anchor Bolt Count (IRC R403.1.6) ---
+//
+// Lays out sill-plate anchor bolts at the IRC maximum spacing with a bolt near
+// each end (min two per plate):
+//   effective_len_ft = wall_length_ft - 2 x (end_distance_in/12)
+//   bolts = max(2, ceil(effective_len_ft / max_spacing_ft) + 1)
+// dims: in { wall_length_ft: L, max_spacing_ft: L, end_distance_in: L } out: { effective_len_ft: L, bolts: dimensionless }
+export function computeSillPlateAnchorCount({ wall_length_ft = 40, max_spacing_ft = 6, end_distance_in = 9 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(wall_length_ft > 0)) return { error: "Wall length must be positive (ft)." };
+  if (!(max_spacing_ft > 0)) return { error: "Max spacing must be positive (ft)." };
+  if (end_distance_in < 0) return { error: "End distance cannot be negative (in)." };
+  const effective_len_ft = wall_length_ft - 2 * (end_distance_in / 12);
+  if (!(effective_len_ft > 0)) return { error: "End distances exceed the wall length (no span for bolts)." };
+  const bolts = Math.max(2, Math.ceil(effective_len_ft / max_spacing_ft) + 1);
+  if (![effective_len_ft, bolts].every(Number.isFinite)) return { error: "Anchor-count math is not a finite value." };
+  return {
+    effective_len_ft,
+    bolts,
+    note: "IRC R403.1.6 caps the spacing at 6 ft (high-wind and seismic provisions or engineered plans tighten it - entered here). Each plate section gets a minimum of two bolts, one within 12 in of each end and corner. A 1/2 in bolt needs at least 7 in of embedment. The adopted code and any engineered plan govern; distinct from the anchor-embedment capacity calc.",
+  };
+}
+
+export const sillPlateAnchorCountExample = { inputs: { wall_length_ft: 40, max_spacing_ft: 6, end_distance_in: 9 } };
+
+const _v867renderSillPlateAnchorCount = _simpleRenderer({
+  citation: "Citation: anchor-count identity by name (IRC R403.1.6). bolts = max(2, ceil((wall - 2 x end distance) / max spacing) + 1). The IRC caps the spacing at 6 ft with a bolt within 12 in of each end and a minimum of two per plate.",
+  example: sillPlateAnchorCountExample.inputs,
+  fields: [
+    { key: "wall_length_ft", label: "Wall / plate length (ft)", kind: "number", default: 40 },
+    { key: "max_spacing_ft", label: "Maximum anchor spacing (ft)", kind: "number", default: 6 },
+    { key: "end_distance_in", label: "Bolt distance from each end (in)", kind: "number", default: 9 },
+  ],
+  outputs: [
+    { key: "b", id: "spa-out-b", label: "Anchor bolts", value: (r) => _fmtC(r.bolts, 0) + " bolts" },
+    { key: "e", id: "spa-out-e", label: "Span between end bolts", value: (r) => _fmtC(r.effective_len_ft, 1) + " ft" },
+    { key: "note", id: "spa-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSillPlateAnchorCount,
+});
+CONSTRUCTION_RENDERERS["sill-plate-anchor-count"] = _v867renderSillPlateAnchorCount;

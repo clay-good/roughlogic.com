@@ -17137,6 +17137,7 @@ import { computeMembraneRoofTakeoff as _v863mrt } from "../../calc-construction.
 import { computeTaperedRoofInsulation as _v864tri } from "../../calc-construction.js";
 import { computeSheathingTakeoff as _v865sht } from "../../calc-construction.js";
 import { computeConstructionAdhesiveTubes as _v866cat } from "../../calc-construction.js";
+import { computeSillPlateAnchorCount as _v867spa } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17943,6 +17944,23 @@ test("bounds: spec-v866 computeConstructionAdhesiveTubes pins the bead area, len
   assert.ok("error" in _v866cat({ total_lf: 0, tube_volume_in3: 50.6, bead_dia_in: 0.375 }));
   assert.ok("error" in _v866cat({ total_lf: 1200, tube_volume_in3: 0, bead_dia_in: 0.375 }));
   assert.ok("error" in _v866cat({ total_lf: 1200, tube_volume_in3: 50.6, bead_dia_in: 0 }));
+});
+
+test("bounds: spec-v867 computeSillPlateAnchorCount pins the effective length, bolt count (incl min-2 and mid-bolt), and error seams", () => {
+  // 40 ft wall, 6 ft spacing, 9 in ends -> 38.5 ft effective, 8 bolts.
+  const r = _v867spa({ wall_length_ft: 40, max_spacing_ft: 6, end_distance_in: 9 });
+  assert.ok(Math.abs(r.effective_len_ft - 38.5) < 1e-9);
+  assert.strictEqual(r.bolts, 8);
+  // A short 8 ft wall still needs 3 (the 6.5 ft span exceeds the 6 ft spacing).
+  assert.strictEqual(_v867spa({ wall_length_ft: 8, max_spacing_ft: 6, end_distance_in: 9 }).bolts, 3);
+  // A very short wall floors at the two-bolt minimum.
+  assert.strictEqual(_v867spa({ wall_length_ft: 4, max_spacing_ft: 6, end_distance_in: 9 }).bolts, 2);
+  // Error seams.
+  assert.ok("error" in _v867spa({ wall_length_ft: 0, max_spacing_ft: 6, end_distance_in: 9 }));
+  assert.ok("error" in _v867spa({ wall_length_ft: 40, max_spacing_ft: 0, end_distance_in: 9 }));
+  assert.ok("error" in _v867spa({ wall_length_ft: 40, max_spacing_ft: 6, end_distance_in: -1 }));
+  // End distances exceeding the wall length (no span).
+  assert.ok("error" in _v867spa({ wall_length_ft: 1, max_spacing_ft: 6, end_distance_in: 9 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

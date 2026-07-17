@@ -51303,6 +51303,56 @@
    }
   },
   {
+   "tile_id": "sill-plate-anchor-count",
+   "source_publisher": "IRC R403.1.6 anchor-count rule",
+   "source_title": "40 ft wall, 6 ft max spacing, 9 in end distance",
+   "source_edition_or_year": "spec-v867 worked example",
+   "source_section_or_page": "effective = 40 - 2*(9/12) = 38.5 ft; bolts = max(2, ceil(38.5/6)+1) = 8",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "wall_length_ft": 40,
+    "max_spacing_ft": 6,
+    "end_distance_in": 9
+   },
+   "outputs": {
+    "effective_len_ft": {
+     "value": 38.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "bolts": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sill-plate-anchor-count",
+   "source_publisher": "IRC R403.1.6 anchor-count rule",
+   "source_title": "cross-check: a short 8 ft wall still needs a mid bolt",
+   "source_edition_or_year": "spec-v867 worked example",
+   "source_section_or_page": "effective = 8 - 1.5 = 6.5 ft > 6 ft spacing, so bolts = ceil(6.5/6)+1 = 3",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "wall_length_ft": 8,
+    "max_spacing_ft": 6,
+    "end_distance_in": 9
+   },
+   "outputs": {
+    "bolts": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",
