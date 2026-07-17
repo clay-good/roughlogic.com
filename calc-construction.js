@@ -6942,6 +6942,55 @@ const _v818renderStockpileVolume = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["stockpile-volume"] = _v818renderStockpileVolume;
 
+// ----- spec-v819: Welded-Wire Reinforcement (Mesh) Sheet Takeoff (Group E) -----
+//
+// Slab mesh is lapped one full square at the sides and ends, so the effective
+// coverage per sheet shrinks and drives the purchase count above the nominal.
+// dims: in { slab_area_sf: L^2, sheet_width_ft: L, sheet_length_ft: L, side_lap_in: L, end_lap_in: L, waste_pct: dimensionless } out: { effective_sheet_sf: L^2, gross_area_sf: L^2, sheets: dimensionless, purchased_sf: L^2 }
+export function computeWeldedWireMesh({ slab_area_sf = 0, sheet_width_ft = 5, sheet_length_ft = 10, side_lap_in = 6, end_lap_in = 6, waste_pct = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(slab_area_sf > 0)) return { error: "Slab area must be positive (ft^2)." };
+  if (!(sheet_width_ft > 0)) return { error: "Sheet width must be positive (ft)." };
+  if (!(sheet_length_ft > 0)) return { error: "Sheet length must be positive (ft)." };
+  if (!(waste_pct >= 0)) return { error: "Waste must be non-negative (%)." };
+  const eff_w = sheet_width_ft - side_lap_in / 12;
+  const eff_l = sheet_length_ft - end_lap_in / 12;
+  if (!(eff_w > 0) || !(eff_l > 0)) return { error: "Lap must be smaller than the sheet dimension (a positive effective sheet)." };
+  const effective_sheet_sf = eff_w * eff_l;
+  const gross_area_sf = slab_area_sf * (1 + waste_pct / 100);
+  const sheets = Math.ceil(gross_area_sf / effective_sheet_sf);
+  const purchased_sf = sheets * sheet_width_ft * sheet_length_ft;
+  if (![effective_sheet_sf, gross_area_sf, sheets, purchased_sf].every(Number.isFinite)) return { error: "Mesh-takeoff math is not a finite value." };
+  return {
+    effective_sheet_sf,
+    gross_area_sf,
+    sheets,
+    purchased_sf,
+    note: "Mesh is lapped one full square (6 in minimum) at the sides and ends, so the effective coverage per sheet is less than its nominal area - ignoring the laps under-counts. The ACI / structural drawings set the sheet size and style (for example 6x6 W2.9). This is a purchase quantity, not a placement plan.",
+  };
+}
+export const weldedWireMeshExample = { inputs: { slab_area_sf: 2000, sheet_width_ft: 5, sheet_length_ft: 10, side_lap_in: 6, end_lap_in: 6, waste_pct: 5 } };
+const _v819renderWeldedWireMesh = _simpleRenderer({
+  citation: "Citation: lapped-coverage identity by name. effective sheet = (width - side lap/12) x (length - end lap/12); sheets = ceil(slab area x (1 + waste) / effective sheet). Mesh is lapped one full square at the sides and ends; the structural drawings set the style.",
+  example: weldedWireMeshExample.inputs,
+  fields: [
+    { key: "slab_area_sf", label: "Slab area to reinforce (ft^2)", kind: "number" },
+    { key: "sheet_width_ft", label: "Mesh sheet width (ft)", kind: "number", default: 5 },
+    { key: "sheet_length_ft", label: "Mesh sheet length (ft)", kind: "number", default: 10 },
+    { key: "side_lap_in", label: "Side lap (in)", kind: "number", default: 6 },
+    { key: "end_lap_in", label: "End lap (in)", kind: "number", default: 6 },
+    { key: "waste_pct", label: "Waste / cutting allowance (%)", kind: "number", default: 5 },
+  ],
+  outputs: [
+    { key: "s", id: "wwm-out-s", label: "Sheets to order", value: (r) => String(r.sheets) + " sheets (" + _fmtC(r.purchased_sf, 0) + " sf purchased)" },
+    { key: "e", id: "wwm-out-e", label: "Effective coverage per sheet", value: (r) => _fmtC(r.effective_sheet_sf, 2) + " sf" },
+    { key: "g", id: "wwm-out-g", label: "Gross area with waste", value: (r) => _fmtC(r.gross_area_sf, 0) + " sf" },
+    { key: "n", id: "wwm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWeldedWireMesh,
+});
+CONSTRUCTION_RENDERERS["welded-wire-mesh"] = _v819renderWeldedWireMesh;
+
 // ----- spec-v814: Concrete Pour Rate, Rate of Rise, and Delivery Cadence (Group E) -----
 //
 // The placement-logistics complement to formwork-pressure, which takes the rate

@@ -242,7 +242,7 @@ const _TILES = [
   ["intermittent-fillet-weld", "E"], ["multi-bend-flat-pattern", "E"],
   ["weld-usage", "E"], ["demo-debris", "E"], ["formwork-pressure", "E"], ["concrete-pour-rate", "E"],
   ["residential-framing", "E"], ["stair-stringer-layout", "E"],
-  ["hip-valley-rafter", "E"], ["rebar-schedule", "E"], ["plywood-span", "E"],
+  ["hip-valley-rafter", "E"], ["rebar-schedule", "E"], ["welded-wire-mesh", "E"], ["plywood-span", "E"],
   ["helical-pile", "E"], ["helical-pile-torque", "E"], ["crane-lift-quick", "E"],
   ["excavation-bench-plan", "E"],
   ["header-sizing", "E"], ["deck-beam-post", "E"],

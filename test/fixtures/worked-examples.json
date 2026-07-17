@@ -10230,6 +10230,68 @@
    }
   },
   {
+   "tile_id": "welded-wire-mesh",
+   "source_publisher": "Lapped-coverage identity (first-principles)",
+   "source_title": "2,000 sf slab, 5x10 sheets, 6 in side and end laps, 5% waste",
+   "source_edition_or_year": "spec-v819 worked example; ACI / WRI mesh-lap practice",
+   "source_section_or_page": "effective = (5-0.5)(10-0.5) = 42.75 sf; gross = 2000*1.05 = 2100; sheets = ceil(2100/42.75) = 50 (2,500 sf)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "slab_area_sf": 2000,
+    "sheet_width_ft": 5,
+    "sheet_length_ft": 10,
+    "side_lap_in": 6,
+    "end_lap_in": 6,
+    "waste_pct": 5
+   },
+   "outputs": {
+    "effective_sheet_sf": {
+     "value": 42.75,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "sheets": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "purchased_sf": {
+     "value": 2500,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "welded-wire-mesh",
+   "source_publisher": "Lapped-coverage identity (first-principles)",
+   "source_title": "cross-check: ignoring the laps under-counts the same slab at 42 sheets",
+   "source_edition_or_year": "spec-v819 worked example",
+   "source_section_or_page": "no laps -> effective = 50 sf; sheets = ceil(2100/50) = 42 (the laps cost 8 sheets)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "slab_area_sf": 2000,
+    "sheet_width_ft": 5,
+    "sheet_length_ft": 10,
+    "side_lap_in": 0,
+    "end_lap_in": 0,
+    "waste_pct": 5
+   },
+   "outputs": {
+    "sheets": {
+     "value": 42,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "formwork-pressure",
    "source_publisher": "ACI 347 Guide to Formwork for Concrete",
    "source_title": "ACI 347 lateral pressure on wall forms: P = Cw * Cc * (150 + 9000 R / T) for R <= 7 ft/hr",

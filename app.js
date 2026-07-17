@@ -422,7 +422,7 @@ const TOOL_MODULES = (() => {
     "powered-attic-ventilator",
     "weld-usage", "demo-debris", "formwork-pressure", "concrete-pour-rate",
     // v7
-    "stair-stringer-layout", "hip-valley-rafter", "rebar-schedule",
+    "stair-stringer-layout", "hip-valley-rafter", "rebar-schedule", "welded-wire-mesh",
     "plywood-span", "helical-pile", "helical-pile-torque", "crane-lift-quick",
     // v8
     "residential-framing",

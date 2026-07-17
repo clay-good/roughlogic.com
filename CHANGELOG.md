@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): welded-wire-mesh -- WWF slab mesh sheet takeoff (spec-v819); 2026-07-16
+
+- New Group E tile `welded-wire-mesh` (calc-construction.js), the mesh takeoff beside the bar-based rebar-schedule.
+  Slab mesh laps one full square at the sides and ends, so effective coverage per sheet shrinks: effective = (width -
+  side lap/12)(length - end lap/12); sheets = ceil(area x (1 + waste) / effective). A 2,000 sf slab with 5x10 sheets at
+  6 in laps needs 50 sheets (2,500 sf purchased), not the 42 a no-lap count suggests. Home count 1,268 -> 1,269. The
+  spec-v809-v820 batch added 12 Group E tiles, so the construction group-hub shell crossed its gzip cap here; the
+  GROUP_GZIP_CAP was raised 56 -> 60 KB with headroom for the campaign's remaining Group E landings.
+
 ### feat(construction): stockpile-volume -- conical stockpile volume and tonnage (spec-v818); 2026-07-16
 
 - New Group E tile `stockpile-volume` (calc-construction.js), stockpile inventory beside the aggregate and

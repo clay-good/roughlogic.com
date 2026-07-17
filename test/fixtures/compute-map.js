@@ -478,6 +478,7 @@ export const COMPUTE_MAP = {
   "helical-pile": { module: "../../calc-construction.js", fn: "computeHelicalPile" },
   "helical-pile-torque": { module: "../../calc-construction.js", fn: "computeHelicalPileTorque" },
   "rebar-schedule": { module: "../../calc-construction.js", fn: "computeRebarSchedule" },
+  "welded-wire-mesh": { module: "../../calc-construction.js", fn: "computeWeldedWireMesh" },
   "hip-valley-rafter": { module: "../../calc-construction.js", fn: "computeHipValleyRafter" },
   "plywood-span": { module: "../../calc-construction.js", fn: "computePlywoodSpan" },
   "crane-lift-quick": { module: "../../calc-construction.js", fn: "computeCraneLiftCheck" },

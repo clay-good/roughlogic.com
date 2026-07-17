@@ -813,6 +813,7 @@ const RELATED = {
   "stair-stringer-layout": ["stair-stringer", "stairs"],
   "hip-valley-rafter": ["rafter", "roof-pitch"],
   "rebar-schedule": ["rebar", "concrete", "footing-area"],
+  "welded-wire-mesh": ["rebar-schedule", "rebar-weight-takeoff", "concrete"],
   "plywood-span": ["lumber-spans", "joist-deflection"],
   "helical-pile": ["helical-pile-torque", "footing-area", "anchor-embedment"],
   "helical-pile-torque": ["helical-pile", "pile-axial-capacity", "footing-area"],

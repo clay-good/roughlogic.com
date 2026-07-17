@@ -41337,6 +41337,31 @@
       "kind": "question"
     },
     {
+      "term": "welded wire mesh",
+      "target": "welded-wire-mesh",
+      "kind": "industry"
+    },
+    {
+      "term": "wwf sheet takeoff",
+      "target": "welded-wire-mesh",
+      "kind": "industry"
+    },
+    {
+      "term": "slab mesh reinforcement",
+      "target": "welded-wire-mesh",
+      "kind": "industry"
+    },
+    {
+      "term": "welded wire reinforcement count",
+      "target": "welded-wire-mesh",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete mesh sheets",
+      "target": "welded-wire-mesh",
+      "kind": "industry"
+    },
+    {
       "term": "bend allowance for rebar hooks",
       "target": "rebar-schedule",
       "kind": "question"

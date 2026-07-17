@@ -646,6 +646,7 @@ import {
   computeRafter,
   computeRebar,
   computeRebarSchedule,
+  computeWeldedWireMesh,
   computeResidentialFraming,
   computeRidgeCapFasteners,
   computeRoofPitch,
@@ -8947,6 +8948,24 @@ test("bounds: calc-construction computeRebarSchedule pins bend-allowance ladder 
   assert.ok("error" in computeRebarSchedule({ rows: [] }));
   assert.ok("error" in computeRebarSchedule({ rows: [{ size: "#99", straight_ft: 10 }] }));
   assert.ok("error" in computeRebarSchedule({ rows: [{ size: "#5", straight_ft: 10, bends: ["moonbend"] }] }));
+});
+
+test("bounds: spec-v819 computeWeldedWireMesh pins effective sheet, count, purchased area, and error seams", () => {
+  // 2000 sf slab, 5x10 sheets, 6 in laps, 5% waste -> 42.75 sf effective, 50 sheets, 2500 sf purchased
+  const r = computeWeldedWireMesh({ slab_area_sf: 2000, sheet_width_ft: 5, sheet_length_ft: 10, side_lap_in: 6, end_lap_in: 6, waste_pct: 5 });
+  assert.ok(Math.abs(r.effective_sheet_sf - 42.75) < 1e-9);
+  assert.ok(Math.abs(r.gross_area_sf - 2100) < 1e-9);
+  assert.strictEqual(r.sheets, 50);
+  assert.strictEqual(r.purchased_sf, 2500);
+  // No laps: the same slab drops to 42 sheets.
+  assert.strictEqual(computeWeldedWireMesh({ slab_area_sf: 2000, sheet_width_ft: 5, sheet_length_ft: 10, side_lap_in: 0, end_lap_in: 0, waste_pct: 5 }).sheets, 42);
+  // Error seams (incl. lap >= dimension).
+  assert.ok("error" in computeWeldedWireMesh({ slab_area_sf: 0, sheet_width_ft: 5, sheet_length_ft: 10 }));
+  assert.ok("error" in computeWeldedWireMesh({ slab_area_sf: 2000, sheet_width_ft: 0, sheet_length_ft: 10 }));
+  assert.ok("error" in computeWeldedWireMesh({ slab_area_sf: 2000, sheet_width_ft: 5, sheet_length_ft: 0 }));
+  assert.ok("error" in computeWeldedWireMesh({ slab_area_sf: 2000, sheet_width_ft: 5, sheet_length_ft: 10, side_lap_in: 60 }));
+  assert.ok("error" in computeWeldedWireMesh({ slab_area_sf: 2000, sheet_width_ft: 5, sheet_length_ft: 10, end_lap_in: 120 }));
+  assert.ok("error" in computeWeldedWireMesh({ slab_area_sf: 2000, sheet_width_ft: 5, sheet_length_ft: 10, waste_pct: -5 }));
 });
 
 test("bounds: calc-construction computePlywoodSpan pins APA span-rating pass flags for spacing, live, and total", () => {

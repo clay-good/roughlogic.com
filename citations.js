@@ -3165,6 +3165,17 @@ export const CITATIONS = {
       { name: "Bar-diameter table", value: "data/construction/rebar-unit-weights.json keyed to bar size", source: "ASTM A615 nominal" },
     ],
   },
+  "welded-wire-mesh": {
+    formula: "effective_sheet_sf = (sheet_width_ft - side_lap_in/12) x (sheet_length_ft - end_lap_in/12); gross_area_sf = slab_area_sf x (1 + waste_pct/100); sheets = ceil(gross_area_sf / effective_sheet_sf); purchased_sf = sheets x sheet_width_ft x sheet_length_ft.",
+    edition: "Lapped-coverage identity by name (mesh lapped one full square); ACI / WRI (Wire Reinforcement Institute) practice; first-principles area arithmetic.",
+    freeAccess: "The lapped-coverage takeoff is public flatwork practice; WRI mesh-lap guidance is named.",
+    governance: GOVERNANCE.general,
+    editionNote: "Mesh is lapped one full square (6 in minimum) at the sides and ends, so the effective coverage per sheet is less than its nominal area - ignoring the laps under-counts. The ACI / structural drawings set the sheet size and style (for example 6x6 W2.9). This is a purchase quantity, not a placement plan.",
+    assumptions: [
+      { name: "Lap", value: "6 in side and end lap default (one full square minimum); the drawings govern", source: "ACI / WRI" },
+      { name: "Sheet size", value: "5 x 10 ft sheet default; the structural drawings set the style (e.g. 6x6 W2.9)", source: "structural drawings" },
+    ],
+  },
   "plywood-span": {
     formula: "Allowable uniform load = lookup(span_rating, application). Pass/fail = (support_spacing ≤ allowable_spacing) AND (live_load ≤ allowable_live) AND (live + dead ≤ allowable_total).",
     edition: "APA - The Engineered Wood Association published span-rating tables by name. Cited by APA name only; numeric tables shipped under APA's technical-bulletin reuse policy. " + IRC_2021 + " §R503 / §R803 references the APA tables.",
