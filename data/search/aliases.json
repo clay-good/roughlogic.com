@@ -11252,6 +11252,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "scaffold mudsill bearing",
+      "target": "scaffold-mudsill-bearing",
+      "kind": "industry"
+    },
+    {
+      "term": "scaffold base plate soil pressure",
+      "target": "scaffold-mudsill-bearing",
+      "kind": "industry"
+    },
+    {
+      "term": "mudsill size for scaffold leg",
+      "target": "scaffold-mudsill-bearing",
+      "kind": "industry"
+    },
+    {
+      "term": "scaffold foundation bearing",
+      "target": "scaffold-mudsill-bearing",
+      "kind": "industry"
+    },
+    {
+      "term": "sill plank soil pressure",
+      "target": "scaffold-mudsill-bearing",
+      "kind": "industry"
+    },
+    {
       "term": "formwork shore",
       "target": "shore-post-load",
       "kind": "adjacent"

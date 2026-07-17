@@ -13008,6 +13008,17 @@ export const CITATIONS = {
       { name: "Rated capacity", value: "the manufacturer's allowable for the extended height and bracing governs; reshoring is a separate analysis", source: "ACI 347.2R" },
     ],
   },
+  "scaffold-mudsill-bearing": {
+    formula: "mudsill_area_ft2 = plank_width_in x plank_length_in / 144; bearing_psf = leg_load_lb / mudsill_area_ft2; required_area_ft2 = leg_load_lb / allowable_psf; required_length_in = required_area_ft2 x 144 / plank_width_in; pass = bearing_psf <= allowable_psf.",
+    edition: "Bearing-pressure identity by name (load / area vs allowable); OSHA 1926.451(c)(2) base-plate and mudsill foundation requirement.",
+    freeAccess: "OSHA 1926.451 is free at osha.gov; the load-over-area bearing check is public statics.",
+    governance: GOVERNANCE.general,
+    editionNote: "The manufacturer's allowable base-plate load and the geotechnical allowable soil bearing govern - \"looks solid\" is not a number. OSHA 1926.451(c)(2) requires scaffold legs on base plates and mudsills on a sound, rigid foundation. Frost, voids, backfill, slopes, and adjacent excavations all cut soil capacity. A competent person verifies the setup; this is a first-check estimator, not the engineered design.",
+    assumptions: [
+      { name: "Allowable soil bearing", value: "from the geotechnical report or a presumptive-load table; 2000 psf is only a placeholder default", source: "geotechnical" },
+      { name: "Mudsill board", value: "9.25 in wide default (a nominal 2x10); the actual plank width and length govern", source: "OSHA 1926.451(c)(2)" },
+    ],
+  },
   "fresh-concrete-temp": {
     formula: "T = [0.22(Ta x Wa + Tc x Wc) + Tw x Ww + Ta x Wwa] / [0.22(Wa + Wc) + Ww + Wwa]; solids specific heat 0.22 Btu/lb-F, water 1.0, aggregate free moisture at the aggregate temperature.",
     edition: "ACI 305.1 Specification for Hot Weather Concreting (the batch heat-balance for fresh concrete temperature); PCA Design and Control of Concrete Mixtures, by name; the mix design and project specification govern.",

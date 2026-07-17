@@ -5284,6 +5284,55 @@ const _renderShorePostLoad = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["shore-post-load"] = _renderShorePostLoad;
 
+// ----- spec-v812: Scaffold Mudsill Bearing Pressure and Sill Length (OSHA 1926.451(c)(2)) -----
+//
+// The plank under a scaffold base plate spreads one leg's load onto the soil.
+// bearing = leg load / (width x length / 144), compared to the allowable soil
+// bearing; the required sill length grows the area until bearing <= allowable.
+// dims: in { leg_load_lb: M L T^-2, plank_width_in: L, plank_length_in: L, allowable_psf: M L^-1 T^-2 } out: { mudsill_area_ft2: L^2, bearing_psf: M L^-1 T^-2, required_area_ft2: L^2, required_length_in: L }
+export function computeScaffoldMudsillBearing({ leg_load_lb = 0, plank_width_in = 0, plank_length_in = 0, allowable_psf = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(leg_load_lb > 0)) return { error: "Leg load must be positive (lb)." };
+  if (!(plank_width_in > 0)) return { error: "Plank width must be positive (in)." };
+  if (!(plank_length_in > 0)) return { error: "Plank length must be positive (in)." };
+  if (!(allowable_psf > 0)) return { error: "Allowable soil bearing must be positive (psf)." };
+  const mudsill_area_ft2 = (plank_width_in * plank_length_in) / 144;
+  const bearing_psf = leg_load_lb / mudsill_area_ft2;
+  const required_area_ft2 = leg_load_lb / allowable_psf;
+  const required_length_in = (required_area_ft2 * 144) / plank_width_in;
+  const pass = bearing_psf <= allowable_psf;
+  if (![mudsill_area_ft2, bearing_psf, required_area_ft2, required_length_in].every(Number.isFinite)) return { error: "Bearing math is not a finite value." };
+  return {
+    mudsill_area_ft2,
+    bearing_psf,
+    required_area_ft2,
+    required_length_in,
+    pass,
+    note: "The manufacturer's allowable base-plate load and the geotechnical allowable soil bearing govern - \"looks solid\" is not a number. OSHA 1926.451(c)(2) requires scaffold legs on base plates and mudsills on a sound, rigid foundation. Frost, voids, backfill, slopes, and adjacent excavations all cut soil capacity. A competent person verifies the setup; this is a first-check estimator, not the engineered design.",
+  };
+}
+
+export const scaffoldMudsillBearingExample = { inputs: { leg_load_lb: 4000, plank_width_in: 9.25, plank_length_in: 24, allowable_psf: 2000 } };
+
+const _renderScaffoldMudsillBearing = _simpleRenderer({
+  citation: "Citation: bearing-pressure identity by name. pressure = leg load / mudsill area (width x length / 144), compared to the allowable soil bearing; required length = (leg load / allowable) x 144 / width. OSHA 1926.451(c)(2) requires base plates and mudsills on a sound, rigid foundation.",
+  example: scaffoldMudsillBearingExample.inputs,
+  fields: [
+    { key: "leg_load_lb", label: "Load on one scaffold leg (lb)", kind: "number" },
+    { key: "plank_width_in", label: "Mudsill board width (in, e.g. 9.25 for a 2x10)", kind: "number", default: 9.25 },
+    { key: "plank_length_in", label: "Provided mudsill length (in)", kind: "number" },
+    { key: "allowable_psf", label: "Allowable soil bearing (psf)", kind: "number", default: 2000 },
+  ],
+  outputs: [
+    { key: "a", id: "smb-out-a", label: "Mudsill area", value: (r) => _fmtC(r.mudsill_area_ft2, 3) + " ft^2" },
+    { key: "b", id: "smb-out-b", label: "Bearing pressure", value: (r) => _fmtC(r.bearing_psf, 0) + " psf" + (r.pass ? " (OK)" : " (OVER allowable)") },
+    { key: "rl", id: "smb-out-rl", label: "Required sill length", value: (r) => _fmtC(r.required_length_in, 1) + " in" },
+    { key: "n", id: "smb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeScaffoldMudsillBearing,
+});
+CONSTRUCTION_RENDERERS["scaffold-mudsill-bearing"] = _renderScaffoldMudsillBearing;
+
 // ----- spec-v246: Concrete Surface Evaporation Rate and Plastic-Shrinkage Risk (ACI 305) -----
 
 // dims: in { air_temp_f: T, concrete_temp_f: T, rh_pct: dimensionless, wind_mph: L T^-1 } out: { E_metric: M L^-2 T^-1, E_us: M L^-2 T^-1 }

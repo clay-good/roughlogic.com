@@ -38227,6 +38227,70 @@
    }
   },
   {
+   "tile_id": "scaffold-mudsill-bearing",
+   "source_publisher": "Bearing-pressure identity / OSHA 1926.451(c)(2)",
+   "source_title": "4,000 lb leg on a 2x10 (9.25 in) x 24 in mudsill, 2,000 psf allowable",
+   "source_edition_or_year": "spec-v812 worked example",
+   "source_section_or_page": "area = 9.25*24/144 = 1.542 ft^2; bearing = 4000/1.542 = 2,595 psf (over 2,000, fails); required length = (4000/2000)*144/9.25 = 31.1 in",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "leg_load_lb": 4000,
+    "plank_width_in": 9.25,
+    "plank_length_in": 24,
+    "allowable_psf": 2000
+   },
+   "outputs": {
+    "mudsill_area_ft2": {
+     "value": 1.5417,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "bearing_psf": {
+     "value": 2594.6,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "required_length_in": {
+     "value": 31.135,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "scaffold-mudsill-bearing",
+   "source_publisher": "Bearing-pressure identity / OSHA 1926.451(c)(2)",
+   "source_title": "cross-check: widen to a doubled 2x10 (18.5 in) at 24 in -> bearing under allowable",
+   "source_edition_or_year": "spec-v812 worked example",
+   "source_section_or_page": "area = 18.5*24/144 = 3.083 ft^2; bearing = 4000/3.083 = 1,297 psf (under 2,000, OK)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-16",
+   "inputs": {
+    "leg_load_lb": 4000,
+    "plank_width_in": 18.5,
+    "plank_length_in": 24,
+    "allowable_psf": 2000
+   },
+   "outputs": {
+    "mudsill_area_ft2": {
+     "value": 3.0833,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "bearing_psf": {
+     "value": 1297.3,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-evaporation-rate",
    "source_publisher": "ACI 305 Hot Weather Concreting / Menzel-NRMCA equation",
    "source_title": "90 F, 40% RH, 15 mph pour -> 0.31 lb/ft^2/hr, precautions",

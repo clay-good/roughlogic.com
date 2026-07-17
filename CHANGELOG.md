@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): scaffold-mudsill-bearing -- scaffold mudsill bearing pressure and sill length (spec-v812); 2026-07-16
+
+- New Group E tile `scaffold-mudsill-bearing` (calc-construction.js), the scaffold-access companion to the
+  crane-ground-bearing quick-check. Bearing-pressure identity: pressure = leg load / (plank width x length / 144),
+  compared to the allowable soil bearing; the required sill length grows the area until it clears. A 4,000 lb leg on a
+  2x10 (9.25 in) x 24 in mudsill presses 2,595 psf onto 2,000 psf soil (over, so it fails) and has to grow to ~31 in.
+  OSHA 1926.451(c)(2) requires base plates on sound, rigid mudsills. Home count 1,261 -> 1,262.
+
 ### feat(earthwork): compaction-roller-production -- roller compaction production rate (spec-v813); 2026-07-16
 
 - New Group E tile `compaction-roller-production` (calc-earthwork.js), the compaction-side production that closes the

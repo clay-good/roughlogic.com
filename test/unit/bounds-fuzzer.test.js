@@ -14381,6 +14381,7 @@ test("bounds: spec-v241 computeAirPressureSetpointSavings pins the 15-psi drop, 
 import {
   computeOccupantLoad as _v242, computeEgressCapacity as _v243, computePlumbingFixtureCount as _v244,
   computeShorePostLoad as _v245, computeConcreteEvaporationRate as _v246, computeConcreteStrengthGain as _v247,
+  computeScaffoldMudsillBearing as _v812smb,
   computeAllowableArea as _v251, computeEgressTravelDistance as _v252, computeExteriorOpeningProtection as _v253,
   computeConcreteMaturity as _v476,
   computeSeismicVerticalDistribution as _v477,
@@ -14572,6 +14573,24 @@ test("bounds: spec-v245 computeShorePostLoad pins the design pressure, per-shore
   assert.ok("error" in _v245({ slab_in: 8, spacing_x: 4, spacing_y: 4, shore_capacity: 0 }));
   assert.ok("error" in _v245({ slab_in: 8, unit_weight: 0, spacing_x: 4, spacing_y: 4, shore_capacity: 6000 }));
   assert.ok("error" in _v245({ slab_in: Infinity, spacing_x: 4, spacing_y: 4, shore_capacity: 6000 }));
+});
+
+test("bounds: spec-v812 computeScaffoldMudsillBearing pins the area, bearing, pass flag, required length, and error seams", () => {
+  // 4000 lb leg on a 2x10 (9.25 in) x 24 in mudsill, 2000 psf allowable -> 1.542 ft^2, 2595 psf, FAILS, req 31.1 in
+  const r = _v812smb({ leg_load_lb: 4000, plank_width_in: 9.25, plank_length_in: 24, allowable_psf: 2000 });
+  assert.ok(Math.abs(r.mudsill_area_ft2 - 1.541667) < 1e-4);
+  assert.ok(Math.abs(r.bearing_psf - 2594.59) < 1e-1);
+  assert.strictEqual(r.pass, false);
+  assert.ok(Math.abs(r.required_length_in - 31.1351) < 1e-3);
+  // Widen to a doubled 2x10 (18.5 in): bearing drops under the allowable, passes.
+  const w = _v812smb({ leg_load_lb: 4000, plank_width_in: 18.5, plank_length_in: 24, allowable_psf: 2000 });
+  assert.ok(Math.abs(w.bearing_psf - 1297.30) < 1e-1);
+  assert.strictEqual(w.pass, true);
+  // Error seams.
+  assert.ok("error" in _v812smb({ leg_load_lb: 0, plank_width_in: 9.25, plank_length_in: 24, allowable_psf: 2000 }));
+  assert.ok("error" in _v812smb({ leg_load_lb: 4000, plank_width_in: 0, plank_length_in: 24, allowable_psf: 2000 }));
+  assert.ok("error" in _v812smb({ leg_load_lb: 4000, plank_width_in: 9.25, plank_length_in: 0, allowable_psf: 2000 }));
+  assert.ok("error" in _v812smb({ leg_load_lb: 4000, plank_width_in: 9.25, plank_length_in: 24, allowable_psf: 0 }));
 });
 
 test("bounds: spec-v246 computeConcreteEvaporationRate pins the metric/US rates, the flag, and error seams", () => {

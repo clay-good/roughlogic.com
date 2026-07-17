@@ -1203,6 +1203,7 @@ const RELATED = {
   "plumbing-fixture-count": ["occupant-load","sanitary-dfu","wsfu-demand"],
   // spec-v245..v247 cast-in-place placing-and-curing trio
   "shore-post-load": ["formwork-pressure","concrete-strength-gain","footing-area"],
+  "scaffold-mudsill-bearing": ["crane-ground-bearing","shore-post-load","soil-bearing-capacity"],
   "concrete-evaporation-rate": ["concrete-mix-design","control-joint-spacing","concrete-strength-gain"],
   "concrete-strength-gain": ["shore-post-load","concrete-mix-design","concrete-evaporation-rate"],
   "concrete-maturity": ["concrete-strength-gain","concrete-evaporation-rate","concrete-mix-design"],
