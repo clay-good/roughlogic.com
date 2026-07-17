@@ -16977,6 +16977,31 @@
       "kind": "industry"
     },
     {
+      "term": "asphalt spread rate",
+      "target": "asphalt-spread-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "asphalt yield",
+      "target": "asphalt-spread-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "hma spread rate",
+      "target": "asphalt-spread-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "sy per ton asphalt",
+      "target": "asphalt-spread-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "paving roll-ahead check",
+      "target": "asphalt-spread-rate",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

@@ -8123,6 +8123,17 @@ export const CITATIONS = {
       { name: "Frequency", value: "passes per day set by wind, heat, and traffic; drives the daily water budget", source: "site dust plan" },
     ],
   },
+  "asphalt-spread-rate": {
+    formula: "spread_lb_per_sy = thickness_in x density_pcf x 0.75 (0.75 = 9 sf/sy / 12 in/ft); yield_sy_per_ton = 2000 / spread_lb_per_sy.",
+    edition: "Asphalt spread / yield identity by name (spread = thickness x density x conversion; yield = 2000 / spread); first-principles unit arithmetic.",
+    freeAccess: "The spread and yield are public first-principles unit conversions; the compacted density comes from the mix design.",
+    governance: GOVERNANCE.general,
+    editionNote: "The mix design's compacted density governs (typically about 145 pcf for a dense-graded mix). Crews check the roll-ahead yield load by load against the plan: a low yield means the mat is running thick or the trucks are short.",
+    assumptions: [
+      { name: "Density", value: "compacted HMA density from the mix design, ~145 pcf default for a dense-graded mix", source: "mix design" },
+      { name: "Conversion", value: "0.75 = 9 sf/sy divided by 12 in/ft; yield = 2000 lb/ton / spread", source: "first-principles" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

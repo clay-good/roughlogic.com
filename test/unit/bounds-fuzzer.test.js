@@ -17107,6 +17107,7 @@ import { computeHddPullback as _v833hdd } from "../../calc-earthwork.js";
 import { computeScaffoldLegLoad as _v834sll } from "../../calc-construction.js";
 import { computeScaffoldTakeoff as _v835sto } from "../../calc-construction.js";
 import { computeDustControlWater as _v836dcw } from "../../calc-earthwork.js";
+import { computeAsphaltSpreadRate as _v837asr } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17404,6 +17405,22 @@ test("bounds: spec-v836 computeDustControlWater pins the area, gallons, trips, d
   assert.ok("error" in _v836dcw({ length_ft: 2000, width_ft: 20, rate_gal_per_sy: 0, truck_cap_gal: 4000, applications_per_day: 6 }));
   assert.ok("error" in _v836dcw({ length_ft: 2000, width_ft: 20, rate_gal_per_sy: 0.5, truck_cap_gal: 0, applications_per_day: 6 }));
   assert.ok("error" in _v836dcw({ length_ft: 2000, width_ft: 20, rate_gal_per_sy: 0.5, truck_cap_gal: 4000, applications_per_day: 0 }));
+});
+
+test("bounds: spec-v837 computeAsphaltSpreadRate pins the spread rate, the yield, and error seams", () => {
+  // 2 in at 145 pcf -> 217.5 lb/sy, 9.20 sy/ton.
+  const r = _v837asr({ thickness_in: 2, density_pcf: 145 });
+  assert.ok(Math.abs(r.spread_lb_per_sy - 217.5) < 1e-9);
+  assert.ok(Math.abs(r.yield_sy_per_ton - 9.195) < 1e-2);
+  // A 3 in lift lays a third less area per ton.
+  const t3 = _v837asr({ thickness_in: 3, density_pcf: 145 });
+  assert.ok(Math.abs(t3.spread_lb_per_sy - 326.25) < 1e-9);
+  assert.ok(Math.abs(t3.yield_sy_per_ton - 6.130) < 1e-2);
+  // Spread and yield are inverse: spread x yield = 2000.
+  assert.ok(Math.abs(r.spread_lb_per_sy * r.yield_sy_per_ton - 2000) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v837asr({ thickness_in: 0, density_pcf: 145 }));
+  assert.ok("error" in _v837asr({ thickness_in: 2, density_pcf: 0 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

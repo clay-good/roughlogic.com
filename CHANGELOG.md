@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): asphalt-spread-rate -- asphalt spread rate and yield check (spec-v837); 2026-07-17
+
+- New Group E tile `asphalt-spread-rate` (calc-construction.js), the paving QC yield metric beside `asphalt-tonnage`
+  and `asphalt-paving-speed`. The lb/sy a mat lays and the sy/ton it yields, checked load by load: spread = thickness x
+  density x 0.75; yield = 2000 / spread. A 2 in mat at 145 pcf lays 217.5 lb/sy and yields 9.20 sy/ton; a 3 in lift
+  lays 326 lb/sy at 6.13 sy/ton. A low yield means the mat is running thick or the trucks are short. The mix design's
+  compacted density governs. Home count 1,285 -> 1,286. The construction-ops landing batch (v831-v837) took
+  tools-data.js past its gzip cap, so it was raised 200000 -> 215000 (ledger in check-module-sizes.mjs).
+
 ### feat(earthwork): dust-control-water -- dust-control watering volume and truck trips (spec-v836); 2026-07-17
 
 - New Group E tile `dust-control-water` (calc-earthwork.js), the site-logistics companion to `water-for-compaction`.

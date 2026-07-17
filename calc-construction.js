@@ -5483,6 +5483,45 @@ const _renderScaffoldTakeoff = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["scaffold-takeoff"] = _renderScaffoldTakeoff;
 
+// --- asphalt-spread-rate: Asphalt Spread Rate and Yield Check ---
+//
+// The lb/sy a mat lays and the sy/ton it yields, the roll-ahead QC a paving
+// crew checks load by load:
+//   spread_lb_per_sy = thickness_in x density_pcf x 0.75  (0.75 = 9 sf/sy / 12 in/ft)
+//   yield_sy_per_ton = 2000 / spread_lb_per_sy
+// dims: in { thickness_in: L, density_pcf: M L^-3 } out: { spread_lb_per_sy: M L^-2, yield_sy_per_ton: L^2 M^-1 }
+export function computeAsphaltSpreadRate({ thickness_in = 2, density_pcf = 145 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(thickness_in > 0)) return { error: "Thickness must be positive (in)." };
+  if (!(density_pcf > 0)) return { error: "Density must be positive (pcf)." };
+  const spread_lb_per_sy = thickness_in * density_pcf * 0.75;
+  const yield_sy_per_ton = 2000 / spread_lb_per_sy;
+  if (![spread_lb_per_sy, yield_sy_per_ton].every(Number.isFinite)) return { error: "Spread-rate math is not a finite value." };
+  return {
+    spread_lb_per_sy,
+    yield_sy_per_ton,
+    note: "The mix design's compacted density governs (typically about 145 pcf for a dense-graded mix). Crews check the roll-ahead yield load by load against the plan: a low yield means the mat is running thick or the trucks are short. The 0.75 factor is 9 sf/sy divided by 12 in/ft.",
+  };
+}
+
+export const asphaltSpreadRateExample = { inputs: { thickness_in: 2, density_pcf: 145 } };
+
+const _renderAsphaltSpreadRate = _simpleRenderer({
+  citation: "Citation: spread / yield identity by name. spread (lb/sy) = thickness (in) x density (pcf) x 0.75 (= 9 sf/sy / 12 in/ft); yield (sy/ton) = 2000 / spread. The mix design's compacted density governs.",
+  example: asphaltSpreadRateExample.inputs,
+  fields: [
+    { key: "thickness_in", label: "Compacted mat thickness (in)", kind: "number", default: 2 },
+    { key: "density_pcf", label: "Compacted HMA density (pcf)", kind: "number", default: 145 },
+  ],
+  outputs: [
+    { key: "s", id: "asr-out-s", label: "Spread rate", value: (r) => _fmtC(r.spread_lb_per_sy, 1) + " lb/sy" },
+    { key: "y", id: "asr-out-y", label: "Yield", value: (r) => _fmtC(r.yield_sy_per_ton, 2) + " sy/ton" },
+    { key: "n", id: "asr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAsphaltSpreadRate,
+});
+CONSTRUCTION_RENDERERS["asphalt-spread-rate"] = _renderAsphaltSpreadRate;
+
 // ----- spec-v246: Concrete Surface Evaporation Rate and Plastic-Shrinkage Risk (ACI 305) -----
 
 // dims: in { air_temp_f: T, concrete_temp_f: T, rh_pct: dimensionless, wind_mph: L T^-1 } out: { E_metric: M L^-2 T^-1, E_us: M L^-2 T^-1 }
