@@ -18602,6 +18602,31 @@
       "kind": "industry"
     },
     {
+      "term": "leach field aggregate",
+      "target": "leach-field-aggregate",
+      "kind": "industry"
+    },
+    {
+      "term": "drainfield gravel",
+      "target": "leach-field-aggregate",
+      "kind": "industry"
+    },
+    {
+      "term": "septic trench stone",
+      "target": "leach-field-aggregate",
+      "kind": "industry"
+    },
+    {
+      "term": "leach field drainrock",
+      "target": "leach-field-aggregate",
+      "kind": "industry"
+    },
+    {
+      "term": "septic gravel volume",
+      "target": "leach-field-aggregate",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

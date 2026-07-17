@@ -475,4 +475,57 @@ export const SEPTIC_RENDERERS = {
   "septic-pumpout-interval": renderSepticPumpoutInterval,
   "septic-tank-for-interval": renderSepticTankForInterval,
   "septic-lpp-orifice": renderSepticLppOrifice,
+  "leach-field-aggregate": renderLeachFieldAggregate,
 };
+
+// leach-field-aggregate (spec-v902): leach-field / trench drainrock volume.
+// dims: in { num_trenches: dimensionless, trench_length_ft: L, trench_width_in: L, stone_depth_in: L, waste_pct: dimensionless } out: { stone_cf: L^3, stone_cy: L^3, stone_tons: M }
+export function computeLeachFieldAggregate({ num_trenches = 3, trench_length_ft = 60, trench_width_in = 24, stone_depth_in = 12, waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(num_trenches > 0)) return { error: "Trench count must be positive." };
+  if (!(trench_length_ft > 0)) return { error: "Trench length must be positive (ft)." };
+  if (!(trench_width_in > 0)) return { error: "Trench width must be positive (in)." };
+  if (!(stone_depth_in > 0)) return { error: "Stone depth must be positive (in)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const stone_cf = num_trenches * trench_length_ft * (trench_width_in / 12) * (stone_depth_in / 12);
+  const stone_cy = stone_cf / 27 * (1 + waste_pct / 100);
+  const stone_tons = stone_cy * 1.4;
+  if (![stone_cf, stone_cy, stone_tons].every(Number.isFinite)) return { error: "Drainrock math is not a finite value." };
+  return {
+    stone_cf,
+    stone_cy,
+    stone_tons,
+    note: "The trench count, width, and stone depth come from the AHJ-approved septic design and perc (the required length is septic-drainfield). The stone is washed drainrock (about 3/4 to 2.5 in). The geotextile over the stone is taken off separately. Distinct from the required-length septic-drainfield.",
+  };
+}
+
+export const leachFieldAggregateExample = { inputs: { num_trenches: 3, trench_length_ft: 60, trench_width_in: 24, stone_depth_in: 12, waste_pct: 10 } };
+
+function renderLeachFieldAggregate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: drainrock identity by name. stone = trenches x length x width x depth / 27; tons = stone x drainrock unit weight (~1.4 ton/cy). The trench dimensions come from the AHJ-approved septic design; the required length is septic-drainfield.";
+  const nt = makeNumber("Number of trenches", "lfa-nt", { step: "1", min: "0", value: "3" });
+  nt.input.value = "3";
+  const tl = makeNumber("Trench length (ft)", "lfa-tl", { step: "any", min: "0", value: "60" });
+  tl.input.value = "60";
+  const tw = makeNumber("Trench width (in)", "lfa-tw", { step: "any", min: "0", value: "24" });
+  tw.input.value = "24";
+  const sd = makeNumber("Stone depth (in)", "lfa-sd", { step: "any", min: "0", value: "12" });
+  sd.input.value = "12";
+  const ws = makeNumber("Waste allowance (%)", "lfa-ws", { step: "any", min: "0", value: "10" });
+  ws.input.value = "10";
+  for (const f of [nt, tl, tw, sd, ws]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { nt.input.value = "3"; tl.input.value = "60"; tw.input.value = "24"; sd.input.value = "12"; ws.input.value = "10"; update(); });
+  const oCy = makeOutputLine(outputRegion, "Drainrock volume", "lfa-out-cy");
+  const oTons = makeOutputLine(outputRegion, "Drainrock tonnage", "lfa-out-tons");
+  const update = debounce(() => {
+    const r = computeLeachFieldAggregate({
+      num_trenches: nt.input.value === "" ? 3 : Number(nt.input.value), trench_length_ft: tl.input.value === "" ? 60 : Number(tl.input.value),
+      trench_width_in: tw.input.value === "" ? 24 : Number(tw.input.value), stone_depth_in: sd.input.value === "" ? 12 : Number(sd.input.value),
+      waste_pct: ws.input.value === "" ? 10 : Number(ws.input.value),
+    });
+    if (r.error) { oCy.textContent = r.error; oTons.textContent = "-"; return; }
+    oCy.textContent = fmt(r.stone_cy, 1) + " cy (" + fmt(r.stone_cf, 0) + " ft^3)";
+    oTons.textContent = fmt(r.stone_tons, 1) + " tons";
+  }, DEBOUNCE_MS);
+  for (const f of [nt, tl, tw, sd, ws]) f.input.addEventListener("input", update);
+}

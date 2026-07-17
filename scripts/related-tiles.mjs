@@ -1073,6 +1073,7 @@ const RELATED = {
   "pool-interior-finish-volume": ["pool-volume", "pool-tile-coping-perimeter", "shotcrete-rebound-quantity"],
   "gutter-downspout-takeoff": ["gutter-downspout", "roofing-squares", "rain-load-ponding"],
   "chain-link-fence-takeoff": ["fence-estimate", "post-hole-concrete", "siding-takeoff"],
+  "leach-field-aggregate": ["septic-drainfield", "pipe-bedding-backfill", "aggregate"],
   "concrete-vibrator-spacing": ["concrete-pour-rate", "formwork-pressure", "concrete"],
   "formwork-tie-load": ["formwork-pressure", "shore-post-load", "concrete-pour-rate"],
   "mass-concrete-temp-rise": ["concrete-maturity", "fresh-concrete-temp", "concrete-evaporation-rate"],

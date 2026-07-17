@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): leach-field-aggregate -- leach-field / trench drainrock volume (spec-v902); 2026-07-17
+
+- New Group B tile `leach-field-aggregate` (calc-septic.js), the septic takeoff beside `septic-drainfield`. stone =
+  trenches x length x width x depth / 27; tons = stone x ~1.4 ton/cy. Three 60 ft trenches, 24 in wide with 12 in of
+  stone, is 14.7 cy (about 20 tons) of washed drainrock at 10% waste; a deeper 18 in bed is 22 cy. The trench count,
+  width, and stone depth come from the AHJ-approved septic design (the required length is septic-drainfield). Home count
+  1,350 -> 1,351.
+
 ### feat(fencing): chain-link-fence-takeoff -- chain-link fabric, post, and tension-band takeoff (spec-v901); 2026-07-17
 
 - New Group E tile `chain-link-fence-takeoff` (calc-construction.js), the fencing takeoff beside `fence-estimate`. fabric

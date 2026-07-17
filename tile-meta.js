@@ -190,7 +190,7 @@ const _TILES = [
   ["water-heater-recovery", "B"], ["water-heater-input", "B"], ["wh-expansion-tank", "B"],
   ["sanitary-dfu", "B"], ["trap-primer", "B"], ["backflow-sizing", "B"],
   ["cross-connection-air-gap", "B"], ["hydronic-fill-pressure", "B"], ["solder-joint-quantity", "B"], ["pipe-insulation-takeoff", "B"], ["heat-trace-sizing", "B"], ["pipe-purge-volume", "B"],
-  ["septic-dose-tank", "B"], ["septic-pumpout-interval", "B"], ["septic-tank-for-interval", "B"], ["septic-lpp-orifice", "B"], ["septic-lpp-squirt-head", "B"],
+  ["septic-dose-tank", "B"], ["septic-pumpout-interval", "B"], ["septic-tank-for-interval", "B"], ["septic-lpp-orifice", "B"], ["septic-lpp-squirt-head", "B"], ["leach-field-aggregate", "B"],
 
   ["manual-j-cooling", "C"], ["manual-j-heating", "C"], ["duct-sizing", "C"],
   ["static-pressure-hvac", "C"], ["refrigerant-pt", "C"], ["superheat-subcool", "C"],

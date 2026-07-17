@@ -53417,6 +53417,66 @@
    }
   },
   {
+   "tile_id": "leach-field-aggregate",
+   "source_publisher": "Leach-field drainrock identity (first-principles)",
+   "source_title": "3 trenches, 60 ft, 24 in wide, 12 in stone, 10% waste -> 360 ft^3, 14.7 cy, 20.5 tons",
+   "source_edition_or_year": "spec-v902 worked example",
+   "source_section_or_page": "stone=3*60*2*1=360; cy=360/27*1.10=14.67; tons=14.67*1.4=20.53",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "num_trenches": 3,
+    "trench_length_ft": 60,
+    "trench_width_in": 24,
+    "stone_depth_in": 12,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "stone_cf": {
+     "value": 360,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "stone_cy": {
+     "value": 14.67,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "stone_tons": {
+     "value": 20.53,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "leach-field-aggregate",
+   "source_publisher": "Leach-field drainrock identity (first-principles)",
+   "source_title": "cross-check: a deeper 18 in stone bed grows the order to 22 cy",
+   "source_edition_or_year": "spec-v902 worked example",
+   "source_section_or_page": "stone=3*60*2*1.5=540; cy=540/27*1.10=22.0",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "num_trenches": 3,
+    "trench_length_ft": 60,
+    "trench_width_in": 24,
+    "stone_depth_in": 18,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "stone_cy": {
+     "value": 22.0,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

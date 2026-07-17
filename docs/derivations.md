@@ -2750,6 +2750,7 @@ cross-check.
 | calc-rigging.js | `computeWindOnLoad` | `{ sail_area_ft2, wind_mph, shape_coef = 1.6, load_weight_lb } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeWireRopeDiameterForWll` | `{ wll_required_tons = 0, construction_factor = 46, design_factor = 5 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeWireRopeStrength` | `{ diameter_in = 0, construction_factor = 46, design_factor = 5 } = {}` | _ | _ | _ |
+| calc-septic.js | `computeLeachFieldAggregate` | `{ num_trenches = 3, trench_length_ft = 60, trench_width_in = 24, stone_depth_...` | _ | _ | _ |
 | calc-septic.js | `computeSepticDoseTank` | `{ daily_flow_gpd, doses_per_day = 4, drainback_gal = 0 } = {}` | _ | _ | _ |
 | calc-septic.js | `computeSepticDrainfield` | `{ design_flow_gpd = 0, application_rate_gpd_per_ft2 = 0, trench_width_ft = 3,...` | _ | _ | _ |
 | calc-septic.js | `computeSepticDrainfieldCapacity` | `{ available_trench_ft = 0, application_rate_gpd_per_ft2 = 0, trench_width_ft ...` | _ | _ | _ |
@@ -3011,7 +3012,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1597.
+Row count: 1598.
 
 <!-- END function-corpus-v14 -->
 
@@ -3265,7 +3266,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (109 tiles)
+### Group B Plumbing (110 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3303,6 +3304,7 @@ per spec-v14 §13.1 second paragraph.
 | `hydraulic-jump` | Hydraulic Jump: Sequent Depth and Energy Loss | Belanger sequent depth (Chow, Open-Ch...; spec-v632 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydronic-fill-pressure` | Hydronic Fill Pressure (Static Height) | hydronic practice (static head); spec-v452 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydrostatic-test` | Hydrostatic Test Pressure and Hold | IPC / Plumbing engineering practice; 100 psi working / 200 gal volume / water -> test_pressure... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `leach-field-aggregate` | Leach-Field / Trench Drainrock Volume | Leach-field drainrock identity (first...; stone=3*60*2*1=360; cy=360/27*1.10=14.67; tons=14.67*1.4=... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `main-disinfection-chlorine` | Water Main Chlorination Dose | AWWA C651 Disinfecting Water Mains (b...; spec-v103 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manning-pipe-capacity` | Manning Pipe Capacity (Full-Bore Gravity Flow) | Manning full-bore capacity V = (1.486...; spec-v640 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manning-slope` | Manning's Equation Drainage Slope | Project (first-principles); 4 in PVC sewer at 50 gpm target -> slope ~0.0788 in/ft (s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4547,6 +4549,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1350. Fixture-covered or reference-cadence: 1350 / 1350.
+Tile count: 1351. Fixture-covered or reference-cadence: 1351 / 1351.
 
 <!-- END tile-index-v14 -->

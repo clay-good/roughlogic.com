@@ -26530,3 +26530,23 @@ test("bounds: spec-v901 computeChainLinkFenceTakeoff pins the fabric, posts, ter
   assert.ok("error" in _v901({ perimeter_ft: 200, height_ft: 4, gate_width_ft: 200, corners: 4, line_post_spacing_ft: 10 }));
   assert.ok("error" in _v901({ perimeter_ft: Infinity, height_ft: 4, gate_width_ft: 4, corners: 4, line_post_spacing_ft: 10 }));
 });
+
+import { computeLeachFieldAggregate as _v902 } from "../../calc-septic.js";
+
+test("bounds: spec-v902 computeLeachFieldAggregate pins the stone volume, tonnage, and error seams", () => {
+  const r = _v902({ num_trenches: 3, trench_length_ft: 60, trench_width_in: 24, stone_depth_in: 12, waste_pct: 10 });
+  assert.equal(r.stone_cf, 360); // 3 * 60 * 2 * 1
+  assert.ok(Math.abs(r.stone_cy - 14.666666666666666) < 1e-6); // 360/27*1.10
+  assert.ok(Math.abs(r.stone_tons - 20.533333333333335) < 1e-6); // 14.67 * 1.4
+  // The stone depth, set by the design, drives the order.
+  const deep = _v902({ num_trenches: 3, trench_length_ft: 60, trench_width_in: 24, stone_depth_in: 18, waste_pct: 10 });
+  assert.equal(deep.stone_cf, 540); // 3 * 60 * 2 * 1.5
+  assert.ok(Math.abs(deep.stone_cy - 22) < 1e-6); // 540/27*1.10
+  // Error seams: non-finite, non-positive trenches / length / width / depth, negative waste.
+  assert.ok("error" in _v902({ num_trenches: 0, trench_length_ft: 60, trench_width_in: 24, stone_depth_in: 12, waste_pct: 10 }));
+  assert.ok("error" in _v902({ num_trenches: 3, trench_length_ft: 0, trench_width_in: 24, stone_depth_in: 12, waste_pct: 10 }));
+  assert.ok("error" in _v902({ num_trenches: 3, trench_length_ft: 60, trench_width_in: 0, stone_depth_in: 12, waste_pct: 10 }));
+  assert.ok("error" in _v902({ num_trenches: 3, trench_length_ft: 60, trench_width_in: 24, stone_depth_in: 0, waste_pct: 10 }));
+  assert.ok("error" in _v902({ num_trenches: 3, trench_length_ft: 60, trench_width_in: 24, stone_depth_in: 12, waste_pct: -10 }));
+  assert.ok("error" in _v902({ num_trenches: Infinity, trench_length_ft: 60, trench_width_in: 24, stone_depth_in: 12, waste_pct: 10 }));
+});

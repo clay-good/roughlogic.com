@@ -8376,6 +8376,17 @@ export const CITATIONS = {
       { name: "Tension bands", value: "one per foot of height less one at each terminal (terminals x (height - 1))", source: "installation practice" },
     ],
   },
+  "leach-field-aggregate": {
+    formula: "stone_cf = num_trenches x trench_length_ft x (trench_width_in/12) x (stone_depth_in/12); stone_cy = stone_cf / 27 x (1 + waste_pct/100); stone_tons = stone_cy x 1.4.",
+    edition: "Leach-field drainrock identity by name (trench box volume to cubic yards with waste, then tonnage); first-principles volume arithmetic.",
+    freeAccess: "The volume arithmetic is public first-principles; the trench dimensions come from the AHJ-approved septic design.",
+    governance: GOVERNANCE.general,
+    editionNote: "The trench count, width, and stone depth come from the AHJ-approved septic design and perc (the required length is septic-drainfield). The stone is washed drainrock (about 3/4 to 2.5 in). The geotextile over the stone is taken off separately. Distinct from the required-length septic-drainfield.",
+    assumptions: [
+      { name: "Trench dimensions", value: "count, width, and stone depth from the AHJ-approved septic design", source: "septic design / AHJ" },
+      { name: "Drainrock unit weight", value: "~1.4 ton/cy for washed drainrock (3/4 to 2.5 in)", source: "aggregate supplier" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

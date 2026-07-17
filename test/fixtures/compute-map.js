@@ -826,6 +826,7 @@ export const COMPUTE_MAP = {
   "pool-interior-finish-volume": { module: "../../calc-treatment.js", fn: "computePoolInteriorFinishVolume" },
   "gutter-downspout-takeoff": { module: "../../calc-finish.js", fn: "computeGutterDownspoutTakeoff" },
   "chain-link-fence-takeoff": { module: "../../calc-construction.js", fn: "computeChainLinkFenceTakeoff" },
+  "leach-field-aggregate": { module: "../../calc-septic.js", fn: "computeLeachFieldAggregate" },
   "concrete-vibrator-spacing": { module: "../../calc-construction.js", fn: "computeConcreteVibratorSpacing" },
   "formwork-tie-load": { module: "../../calc-construction.js", fn: "computeFormworkTieLoad" },
   "mass-concrete-temp-rise": { module: "../../calc-construction.js", fn: "computeMassConcreteTempRise" },
