@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(trucking): cargo-securement-wll undercounted tiedowns for articles over 10 ft (49 CFR 393.110); 2026-07-17
+
+- `cargo-securement-wll` (calc-trucking.js) computed the minimum tiedown count as `max(2, ceil(len/10))`. 49 CFR 393.110(b)
+  requires, for an article longer than 10 ft, 2 tiedowns for the first 10 ft PLUS 1 for each additional 10 ft or fraction
+  thereof -- i.e. `2 + ceil((len-10)/10)`, not `ceil(len/10)`. The old form undercounted by one (or more) for every length
+  over 10 ft: a 20 ft article returned 2 required where the reg requires 3, a 25 ft article returned 3 where the reg
+  requires 4. With the aggregate-WLL check passing, the tile certified an under-secured load as compliant -- a
+  safety-relevant false PASS. The bundled example (16 ft, 4 tiedowns) passed against both the buggy 2 and the correct 3, so
+  the fixture never exposed it. Fixed the count rule (<=5 ft -> 1 or 2 by weight; 5-10 ft -> 2; >10 ft -> 2 + ceil((len-10)/10))
+  and updated the one unit test that pinned the old count. Caught by a first-principles re-derivation of calc-trucking.js.
+
 ### fix(hydraulics): Hazen-Williams friction helper returned psi mislabeled as feet (2.31x low) across pump-tdh, friction-loss, recirc-pump-head, boiler-pipe-sizing; 2026-07-17
 
 - The shared `hazenWilliamsFrictionLoss` helper (pure-math.js) returned `4.52 * Q^1.852 / (C^1.852 * d^4.87) * L` and named

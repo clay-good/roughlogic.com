@@ -1024,10 +1024,10 @@ export function computeCargoSecurementWLL({ cargo_weight_lb = 0, tiedown_count =
   if (!(len > 0 && Number.isFinite(len))) return { error: "Cargo length must be positive (ft)." };
   const aggregate_wll_lb = n * wll;
   const required_wll_lb = 0.5 * W;
-  // 393.110: at least 1 tiedown per 10 ft (rounded up) and at least 2 for
-  // articles longer than 5 ft / heavier than 1100 lb; minimum 1 otherwise.
-  const min_for_length = Math.max(1, Math.ceil(len / 10));
-  const min_tiedowns = (len > 5 || W > 1100) ? Math.max(2, min_for_length) : min_for_length;
+  // 49 CFR 393.110(b) count rule: <=5 ft -> 1 tiedown (2 if >1100 lb);
+  // >5 ft to 10 ft -> 2 tiedowns; >10 ft -> 2 for the first 10 ft plus 1 for
+  // each additional 10 ft or fraction thereof.
+  const min_tiedowns = len <= 5 ? (W > 1100 ? 2 : 1) : len <= 10 ? 2 : 2 + Math.ceil((len - 10) / 10);
   const pass = aggregate_wll_lb >= required_wll_lb && n >= min_tiedowns;
   return { aggregate_wll_lb, required_wll_lb, min_tiedowns, tiedown_count: n, pass };
 }

@@ -197,11 +197,12 @@ test("deck-ledger-fasteners: span over 18 ft flags out-of-table; non-positive in
 });
 
 // J.1 cargo-securement-wll
-test("cargo-securement-wll: 4 x 1500 lb -> 6000 aggregate >= 4000 required, 2 min tiedowns, pass", () => {
+test("cargo-securement-wll: 4 x 1500 lb -> 6000 aggregate >= 4000 required, 3 min tiedowns (16 ft > 10 ft), pass", () => {
   const r = computeCargoSecurementWLL({ cargo_weight_lb: 8000, tiedown_count: 4, wll_each_lb: 1500, cargo_length_ft: 16 });
   assert.strictEqual(r.aggregate_wll_lb, 6000);
   assert.strictEqual(r.required_wll_lb, 4000);
-  assert.strictEqual(r.min_tiedowns, 2);
+  // 49 CFR 393.110(b): 16 ft > 10 ft -> 2 + ceil((16-10)/10) = 3 tiedowns required.
+  assert.strictEqual(r.min_tiedowns, 3);
   assert.strictEqual(r.pass, true);
 });
 test("cargo-securement-wll: under-WLL fails; non-positive inputs rejected", () => {
