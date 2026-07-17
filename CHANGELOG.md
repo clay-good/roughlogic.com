@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): tapered-roof-insulation -- tapered roof insulation average thickness and quantity (spec-v864); 2026-07-17
+
+- New Group E tile `tapered-roof-insulation` (calc-construction.js), the slope-to-drain insulation tile beside
+  `membrane-roof-takeoff` and the steady flat `assembly-r-value`. avg = start + slope x run / 2; board-feet = area x avg;
+  avg R = avg x R-per-inch. A 40 ft run at 1/4 in per foot off a 1/2 in start averages 5.5 in, so a 2,000 sf field is
+  11,000 board-feet at ~R-31; a shallower 1/8 in/ft taper averages 3.0 in -- 6,000 bf and only R-17 -- which is why the
+  slope has to serve both drainage (>= 1/4 in/ft) and the code R. Tapered polyiso is ordered by the board-foot. Home
+  count 1,312 -> 1,313.
+
 ### feat(construction): membrane-roof-takeoff -- single-ply membrane rolls and seam length (spec-v863); 2026-07-17
 
 - New Group E tile `membrane-roof-takeoff` (calc-construction.js), the single-ply membrane (TPO/EPDM/PVC) takeoff beside

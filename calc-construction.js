@@ -8438,3 +8438,50 @@ const _v863renderMembraneRoofTakeoff = _simpleRenderer({
   compute: computeMembraneRoofTakeoff,
 });
 CONSTRUCTION_RENDERERS["membrane-roof-takeoff"] = _v863renderMembraneRoofTakeoff;
+
+// --- tapered-roof-insulation: Tapered Roof Insulation Average Thickness and Quantity ---
+//
+// The average thickness across a slope-to-drain layout, the board-feet to order,
+// and the average R the taper delivers (distinct from a steady flat R):
+//   avg_thk_in = start_thk_in + slope_in_per_ft x run_ft / 2
+//   board_feet = area_sf x avg_thk_in; avg_r = avg_thk_in x r_per_in
+// dims: in { run_ft: L, slope_in_per_ft: dimensionless, start_thk_in: L, area_sf: L^2, r_per_in: dimensionless } out: { avg_thk_in: L, board_feet: L^3, avg_r: dimensionless }
+export function computeTaperedRoofInsulation({ run_ft = 40, slope_in_per_ft = 0.25, start_thk_in = 0.5, area_sf = 2000, r_per_in = 5.7 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(run_ft > 0)) return { error: "Taper run must be positive (ft)." };
+  if (!(area_sf > 0)) return { error: "Field area must be positive (ft^2)." };
+  if (!(r_per_in > 0)) return { error: "R per inch must be positive." };
+  if (slope_in_per_ft < 0) return { error: "Slope cannot be negative (in/ft)." };
+  if (start_thk_in < 0) return { error: "Start thickness cannot be negative (in)." };
+  const avg_thk_in = start_thk_in + (slope_in_per_ft * run_ft) / 2;
+  const board_feet = area_sf * avg_thk_in;
+  const avg_r = avg_thk_in * r_per_in;
+  if (![avg_thk_in, board_feet, avg_r].every(Number.isFinite)) return { error: "Tapered-insulation math is not a finite value." };
+  return {
+    avg_thk_in,
+    board_feet,
+    avg_r,
+    note: "The taper layout (slope and start thickness) comes from the manufacturer's design to hit both the code drainage slope (a low-slope roof needs at least 1/4 in per foot) and the design R. Tapered polyiso is ordered by the board-foot (a square foot one inch thick). Distinct from the steady flat assembly-r-value; the slope has to serve both drainage and the code R.",
+  };
+}
+
+export const taperedRoofInsulationExample = { inputs: { run_ft: 40, slope_in_per_ft: 0.25, start_thk_in: 0.5, area_sf: 2000, r_per_in: 5.7 } };
+
+const _v864renderTaperedRoofInsulation = _simpleRenderer({
+  citation: "Citation: tapered-insulation identity by name. average thickness = start + slope x run / 2; board-feet = area x average thickness; average R = average thickness x R-per-inch. The taper layout serves both the code drainage slope and the design R.",
+  example: taperedRoofInsulationExample.inputs,
+  fields: [
+    { key: "run_ft", label: "Taper run length to drain (ft)", kind: "number", default: 40 },
+    { key: "slope_in_per_ft", label: "Taper slope (in/ft)", kind: "number", default: 0.25 },
+    { key: "start_thk_in", label: "Thickness at the low (start) edge (in)", kind: "number", default: 0.5 },
+    { key: "area_sf", label: "Field area (ft^2)", kind: "number", default: 2000 },
+    { key: "r_per_in", label: "Insulation R per inch", kind: "number", default: 5.7 },
+  ],
+  outputs: [
+    { key: "b", id: "tri-out-b", label: "Board-feet to order", value: (r) => _fmtC(r.board_feet, 0) + " bf (" + _fmtC(r.avg_thk_in, 2) + " in average)" },
+    { key: "r", id: "tri-out-r", label: "Average R the taper delivers", value: (r) => "R-" + _fmtC(r.avg_r, 1) },
+    { key: "note", id: "tri-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTaperedRoofInsulation,
+});
+CONSTRUCTION_RENDERERS["tapered-roof-insulation"] = _v864renderTaperedRoofInsulation;

@@ -17652,6 +17652,31 @@
       "kind": "industry"
     },
     {
+      "term": "tapered roof insulation",
+      "target": "tapered-roof-insulation",
+      "kind": "industry"
+    },
+    {
+      "term": "tapered iso board feet",
+      "target": "tapered-roof-insulation",
+      "kind": "industry"
+    },
+    {
+      "term": "roof taper average thickness",
+      "target": "tapered-roof-insulation",
+      "kind": "industry"
+    },
+    {
+      "term": "tapered insulation quantity",
+      "target": "tapered-roof-insulation",
+      "kind": "industry"
+    },
+    {
+      "term": "slope to drain insulation",
+      "target": "tapered-roof-insulation",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

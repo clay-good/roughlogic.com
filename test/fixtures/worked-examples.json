@@ -51129,6 +51129,72 @@
    }
   },
   {
+   "tile_id": "tapered-roof-insulation",
+   "source_publisher": "Tapered-insulation identity (first-principles)",
+   "source_title": "40 ft run, 1/4 in/ft slope, 1/2 in start, 2,000 sf, R 5.7/in",
+   "source_edition_or_year": "spec-v864 worked example",
+   "source_section_or_page": "avg = 0.5 + 0.25*40/2 = 5.5 in; board-feet = 2000*5.5 = 11,000; avg R = 5.5*5.7 = 31.4",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "run_ft": 40,
+    "slope_in_per_ft": 0.25,
+    "start_thk_in": 0.5,
+    "area_sf": 2000,
+    "r_per_in": 5.7
+   },
+   "outputs": {
+    "avg_thk_in": {
+     "value": 5.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "board_feet": {
+     "value": 11000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "avg_r": {
+     "value": 31.35,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tapered-roof-insulation",
+   "source_publisher": "Tapered-insulation identity (first-principles)",
+   "source_title": "cross-check: a shallower 1/8 in/ft taper averages less",
+   "source_edition_or_year": "spec-v864 worked example",
+   "source_section_or_page": "avg = 0.5 + 0.125*40/2 = 3.0 in; board-feet = 6,000; avg R = 17.1",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "run_ft": 40,
+    "slope_in_per_ft": 0.125,
+    "start_thk_in": 0.5,
+    "area_sf": 2000,
+    "r_per_in": 5.7
+   },
+   "outputs": {
+    "avg_thk_in": {
+     "value": 3.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "board_feet": {
+     "value": 6000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

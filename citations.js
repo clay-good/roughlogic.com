@@ -8420,6 +8420,17 @@ export const CITATIONS = {
       { name: "Side lap", value: "set by the manufacturer and the wind-uplift design (~6 in typical)", source: "manufacturer / uplift design" },
     ],
   },
+  "tapered-roof-insulation": {
+    formula: "avg_thk_in = start_thk_in + slope_in_per_ft x run_ft / 2; board_feet = area_sf x avg_thk_in; avg_r = avg_thk_in x r_per_in.",
+    edition: "Tapered-insulation identity by name (average of a linear taper; board-feet and average R from the average thickness); first-principles arithmetic.",
+    freeAccess: "The average-thickness arithmetic is public first-principles; the taper layout and R-per-inch come from the manufacturer's design.",
+    governance: GOVERNANCE.general,
+    editionNote: "The taper layout (slope and start thickness) comes from the manufacturer's design to hit both the code drainage slope (a low-slope roof needs at least 1/4 in per foot) and the design R. Tapered polyiso is ordered by the board-foot (a square foot one inch thick). Distinct from the steady flat assembly-r-value.",
+    assumptions: [
+      { name: "Taper layout", value: "slope (>= 1/4 in/ft for drainage) and start thickness from the manufacturer's design", source: "insulation manufacturer" },
+      { name: "R per inch", value: "the insulation's R-value per inch (~5.7 for polyiso, aged)", source: "insulation manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

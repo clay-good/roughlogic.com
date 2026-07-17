@@ -17134,6 +17134,7 @@ import { computeDuctHangerLoad as _v860dhl } from "../../calc-construction.js";
 import { computeRefrigerantLinesetChargeAdjust as _v861rlc } from "../../calc-refrigerant.js";
 import { computeRoofUnderlaymentRolls as _v862rur } from "../../calc-construction.js";
 import { computeMembraneRoofTakeoff as _v863mrt } from "../../calc-construction.js";
+import { computeTaperedRoofInsulation as _v864tri } from "../../calc-construction.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17894,6 +17895,24 @@ test("bounds: spec-v863 computeMembraneRoofTakeoff pins the usable width, rolls,
   assert.ok("error" in _v863mrt({ roof_area_sf: 8000, roll_width_ft: 10, roll_length_ft: 100, sidelap_in: 6, waste_pct: -1 }));
   // Side lap at or above the roll width (no usable width).
   assert.ok("error" in _v863mrt({ roof_area_sf: 8000, roll_width_ft: 0.4, roll_length_ft: 100, sidelap_in: 6, waste_pct: 5 }));
+});
+
+test("bounds: spec-v864 computeTaperedRoofInsulation pins the average thickness, board-feet, average R, and error seams", () => {
+  // 40 ft, 1/4 in/ft, 1/2 in start, 2,000 sf, R 5.7 -> 5.5 in, 11,000 bf, R-31.4.
+  const r = _v864tri({ run_ft: 40, slope_in_per_ft: 0.25, start_thk_in: 0.5, area_sf: 2000, r_per_in: 5.7 });
+  assert.ok(Math.abs(r.avg_thk_in - 5.5) < 1e-9);
+  assert.ok(Math.abs(r.board_feet - 11000) < 1e-6);
+  assert.ok(Math.abs(r.avg_r - 31.35) < 1e-6);
+  // A shallower 1/8 in/ft taper averages less and delivers less R.
+  const shallow = _v864tri({ run_ft: 40, slope_in_per_ft: 0.125, start_thk_in: 0.5, area_sf: 2000, r_per_in: 5.7 });
+  assert.ok(Math.abs(shallow.avg_thk_in - 3.0) < 1e-9);
+  assert.ok(Math.abs(shallow.board_feet - 6000) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v864tri({ run_ft: 0, slope_in_per_ft: 0.25, start_thk_in: 0.5, area_sf: 2000, r_per_in: 5.7 }));
+  assert.ok("error" in _v864tri({ run_ft: 40, slope_in_per_ft: 0.25, start_thk_in: 0.5, area_sf: 0, r_per_in: 5.7 }));
+  assert.ok("error" in _v864tri({ run_ft: 40, slope_in_per_ft: 0.25, start_thk_in: 0.5, area_sf: 2000, r_per_in: 0 }));
+  assert.ok("error" in _v864tri({ run_ft: 40, slope_in_per_ft: -1, start_thk_in: 0.5, area_sf: 2000, r_per_in: 5.7 }));
+  assert.ok("error" in _v864tri({ run_ft: 40, slope_in_per_ft: 0.25, start_thk_in: -1, area_sf: 2000, r_per_in: 5.7 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {
