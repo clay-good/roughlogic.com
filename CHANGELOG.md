@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): housewrap-rolls -- housewrap (WRB) rolls, cap fasteners, and seam tape (spec-v895); 2026-07-17
+
+- New Group E tile `housewrap-rolls` (calc-construction.js), the weatherization takeoff beside `siding-takeoff` and
+  `vapor-barrier-rolls`. rolls = ceil(area x (1 + overlap + waste) / roll coverage); cap fasteners = ceil(area x fasteners
+  per sf); seam tape = area / roll width. 4,000 sf of wall on 1,350 sf rolls at 10% is 4 rolls, 2,000 cap fasteners, and
+  444 LF of tape; an 8,000 sf job is 7 rolls (the spec's cross-check said 8; re-derived to ceil(8800/1350)=7), 4,000
+  fasteners, and 889 LF. The WRB is the drainage plane behind the cladding; cap spacing and flashing follow the
+  manufacturer. Home count 1,343 -> 1,344.
+
 ### feat(plumbing): pipe-purge-volume -- pipe inert purge volume and time (spec-v894); 2026-07-17
 
 - New Group B tile `pipe-purge-volume` (calc-plumbing.js), the pipefitting install-ops takeoff beside `pipe-volume` and

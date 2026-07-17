@@ -8299,6 +8299,17 @@ export const CITATIONS = {
       { name: "Purge flow", value: "~60 scfh default; a meter confirms the endpoint", source: "field practice" },
     ],
   },
+  "housewrap-rolls": {
+    formula: "rolls = ceil(wall_area_sf x (1 + overlap_waste_pct/100) / roll_coverage_sf); cap_fasteners = ceil(wall_area_sf x fasteners_per_sf); seam_tape_lf = wall_area_sf / roll_width_ft.",
+    edition: "Housewrap takeoff identity by name (rolls over coverage with lap and waste; cap fasteners at an area density; seam tape one seam per roll width); first-principles arithmetic.",
+    freeAccess: "The takeoff arithmetic is public quantity-survey math; the fastening and flashing follow the manufacturer and code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The WRB is the drainage plane behind the cladding per the manufacturer and code. The cap-nail or cap-staple spacing follows the manufacturer (about a 12 to 18 in grid, tighter in high wind). Seam and penetration tape follow the manufacturer's flashing details. Distinct from the under-slab vapor-barrier-rolls.",
+    assumptions: [
+      { name: "Cap fasteners", value: "~0.5 per ft^2 for a 12 to 18 in grid (default); tighter in high wind per the manufacturer", source: "WRB manufacturer" },
+      { name: "Roll coverage", value: "~1,350 sf for a 9 x 150 ft roll (default); the product size governs", source: "WRB manufacturer" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

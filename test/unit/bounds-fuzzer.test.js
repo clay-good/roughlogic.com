@@ -26372,3 +26372,25 @@ test("bounds: spec-v894 computePipePurgeVolume pins the pipe/purge volumes, time
   assert.ok("error" in _v894({ pipe_id_in: 2.067, length_ft: 100, air_changes: 5, flow_scfh: 0 }));
   assert.ok("error" in _v894({ pipe_id_in: Infinity, length_ft: 100, air_changes: 5, flow_scfh: 60 }));
 });
+
+import { computeHousewrapRolls as _v895 } from "../../calc-construction.js";
+
+test("bounds: spec-v895 computeHousewrapRolls pins the rolls, cap fasteners, seam tape, and error seams", () => {
+  const r = _v895({ wall_area_sf: 4000, roll_coverage_sf: 1350, overlap_waste_pct: 10, fasteners_per_sf: 0.5, roll_width_ft: 9 });
+  assert.equal(r.rolls, 4); // ceil(4000*1.10/1350) = ceil(3.26)
+  assert.equal(r.cap_fasteners, 2000); // ceil(4000*0.5)
+  assert.ok(Math.abs(r.seam_tape_lf - 444.44444444444446) < 1e-9); // 4000 / 9
+  // Everything tracks the wall area. NOTE: doubling area does NOT double the ceiling'd roll count
+  // (ceil(8800/1350) = 7, not 8 -- the spec's cross-check said 8; 7 is the correct value).
+  const big = _v895({ wall_area_sf: 8000, roll_coverage_sf: 1350, overlap_waste_pct: 10, fasteners_per_sf: 0.5, roll_width_ft: 9 });
+  assert.equal(big.rolls, 7); // ceil(6.52), re-derived
+  assert.equal(big.cap_fasteners, 4000); // ceil(8000*0.5)
+  assert.ok(Math.abs(big.seam_tape_lf - 888.8888888888889) < 1e-9); // 8000 / 9
+  // Error seams: non-finite, non-positive area / coverage / fasteners-per-sf / roll width, negative overlap-waste.
+  assert.ok("error" in _v895({ wall_area_sf: 0, roll_coverage_sf: 1350, overlap_waste_pct: 10, fasteners_per_sf: 0.5, roll_width_ft: 9 }));
+  assert.ok("error" in _v895({ wall_area_sf: 4000, roll_coverage_sf: 0, overlap_waste_pct: 10, fasteners_per_sf: 0.5, roll_width_ft: 9 }));
+  assert.ok("error" in _v895({ wall_area_sf: 4000, roll_coverage_sf: 1350, overlap_waste_pct: 10, fasteners_per_sf: 0, roll_width_ft: 9 }));
+  assert.ok("error" in _v895({ wall_area_sf: 4000, roll_coverage_sf: 1350, overlap_waste_pct: 10, fasteners_per_sf: 0.5, roll_width_ft: 0 }));
+  assert.ok("error" in _v895({ wall_area_sf: 4000, roll_coverage_sf: 1350, overlap_waste_pct: -10, fasteners_per_sf: 0.5, roll_width_ft: 9 }));
+  assert.ok("error" in _v895({ wall_area_sf: Infinity, roll_coverage_sf: 1350, overlap_waste_pct: 10, fasteners_per_sf: 0.5, roll_width_ft: 9 }));
+});

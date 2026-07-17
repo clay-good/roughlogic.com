@@ -1615,6 +1615,7 @@ cross-check.
 | calc-construction.js | `computeHipValleyRafter` | `{ run_ft = 0, pitch = 6, pitch_irregular = 0, overhang_in = 12, jack_oc_in = ...` | _ | _ | _ |
 | calc-construction.js | `computeHoopStressMawp` | `{ t_in = 0, D_in = 0, S_allow = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeHoopStressThinWall` | `{ P_psi = 0, D_in = 0, t_in = 0, S_allow = 0 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeHousewrapRolls` | `{ wall_area_sf = 4000, roll_coverage_sf = 1350, overlap_waste_pct = 10, faste...` | _ | _ | _ |
 | calc-construction.js | `computeIceBarrierCoverage` | `{ eave_length_ft = 0, overhang_in = 0, pitch_rise = 0, roll_width_in = 36, ro...` | _ | _ | _ |
 | calc-construction.js | `computeInsulationBattCoverage` | `{ area_ft2 = 0, coverage_per_batt = 0, coverage_per_bag = 0, waste_pct = 0 } ...` | _ | _ | _ |
 | calc-construction.js | `computeIntermittentFilletWeld` | `{ w_req_in = 0, w_intermit_in = 0, increment_in = 0 } = {}` | _ | _ | _ |
@@ -3004,7 +3005,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1590.
+Row count: 1591.
 
 <!-- END function-corpus-v14 -->
 
@@ -3562,7 +3563,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (342 tiles)
+### Group E Construction (343 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3696,6 +3697,7 @@ per spec-v14 §13.1 second paragraph.
 | `hoop-stress-thin-wall` | Thin-Wall Pressure Vessel Hoop and Longitudinal Stress | thin-wall / Barlow; spec-v361 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `horizontal-curve` | Horizontal Curve Layout | AASHTO Green Book / FM 5-233 (by name); R = 1000 ft, delta = 30 deg -> T 267.95, L 523.60, LC 517... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `horizontal-sightline-offset` | Horizontal Sightline Offset on a Curve (AASHTO) | AASHTO Green Book; spec-v337 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `housewrap-rolls` | Housewrap (WRB) Rolls, Cap Fasteners, and Seam Tape | Housewrap takeoff identity (first-pri...; rolls = ceil(4000*1.10/1350) = ceil(3.26) = 4; cap = ceil... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydroseed-mix` | Hydroseed Slurry Mix and Tank Count | Slurry loading identity (first-princi...; solids = 3*(5+2000+50) = 6,165 lb; tanks = ceil(6165/(300... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ice-barrier-coverage` | Eave Ice-Barrier Membrane Courses and Rolls | IRC R905.1.2 eave ice-barrier extent ...; spec-v215 section 2.1 pinned example (typical 4/12, 12 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `insulation-batt-coverage` | Insulation Batt Coverage and Count | manufacturer label; spec-v439 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4533,6 +4535,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1343. Fixture-covered or reference-cadence: 1343 / 1343.
+Tile count: 1344. Fixture-covered or reference-cadence: 1344 / 1344.
 
 <!-- END tile-index-v14 -->

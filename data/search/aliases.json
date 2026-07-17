@@ -18427,6 +18427,31 @@
       "kind": "industry"
     },
     {
+      "term": "housewrap rolls",
+      "target": "housewrap-rolls",
+      "kind": "industry"
+    },
+    {
+      "term": "weather resistive barrier",
+      "target": "housewrap-rolls",
+      "kind": "industry"
+    },
+    {
+      "term": "wrb rolls",
+      "target": "housewrap-rolls",
+      "kind": "industry"
+    },
+    {
+      "term": "housewrap fasteners",
+      "target": "housewrap-rolls",
+      "kind": "industry"
+    },
+    {
+      "term": "house wrap takeoff",
+      "target": "housewrap-rolls",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

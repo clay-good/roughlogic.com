@@ -1066,6 +1066,7 @@ const RELATED = {
   "rigid-foam-board-count": ["insulation-batt-coverage", "spray-foam-board-feet", "assembly-r-value"],
   "roof-insulation-fasteners": ["membrane-roof-takeoff", "tapered-roof-insulation", "metal-roof-panels"],
   "pipe-purge-volume": ["pipe-volume", "nitrogen-pressure-test", "confined-space-purge"],
+  "housewrap-rolls": ["siding-takeoff", "vapor-barrier-rolls", "roof-underlayment-rolls"],
   "concrete-vibrator-spacing": ["concrete-pour-rate", "formwork-pressure", "concrete"],
   "formwork-tie-load": ["formwork-pressure", "shore-post-load", "concrete-pour-rate"],
   "mass-concrete-temp-rise": ["concrete-maturity", "fresh-concrete-temp", "concrete-evaporation-rate"],

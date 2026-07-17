@@ -9726,3 +9726,49 @@ const _v893renderRoofInsulationFasteners = _simpleRenderer({
   compute: computeRoofInsulationFasteners,
 });
 CONSTRUCTION_RENDERERS["roof-insulation-fasteners"] = _v893renderRoofInsulationFasteners;
+
+// --- housewrap-rolls: Housewrap (WRB) Rolls, Cap Fasteners, and Seam Tape ---
+//
+// Wall rolls (with lap + waste), cap fasteners at an area density, and the seam tape.
+//   rolls = ceil(area x (1 + overlap_waste/100) / roll_coverage); cap = ceil(area x fasteners_per_sf); tape = area / roll_width
+// dims: in { wall_area_sf: L^2, roll_coverage_sf: L^2, overlap_waste_pct: dimensionless, fasteners_per_sf: L^-2, roll_width_ft: L } out: { rolls: dimensionless, cap_fasteners: dimensionless, seam_tape_lf: L }
+export function computeHousewrapRolls({ wall_area_sf = 4000, roll_coverage_sf = 1350, overlap_waste_pct = 10, fasteners_per_sf = 0.5, roll_width_ft = 9 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(wall_area_sf > 0)) return { error: "Wall area must be positive (ft^2)." };
+  if (!(roll_coverage_sf > 0)) return { error: "Roll coverage must be positive (ft^2)." };
+  if (!(fasteners_per_sf > 0)) return { error: "Fasteners per ft^2 must be positive." };
+  if (!(roll_width_ft > 0)) return { error: "Roll width must be positive (ft)." };
+  if (overlap_waste_pct < 0) return { error: "Overlap / waste cannot be negative (percent)." };
+  const rolls = Math.ceil(wall_area_sf * (1 + overlap_waste_pct / 100) / roll_coverage_sf);
+  const cap_fasteners = Math.ceil(wall_area_sf * fasteners_per_sf);
+  const seam_tape_lf = wall_area_sf / roll_width_ft;
+  if (![rolls, cap_fasteners, seam_tape_lf].every(Number.isFinite)) return { error: "Housewrap math is not a finite value." };
+  return {
+    rolls,
+    cap_fasteners,
+    seam_tape_lf,
+    note: "The WRB is the drainage plane behind the cladding per the manufacturer and code. The cap-nail or cap-staple spacing follows the manufacturer (about a 12 to 18 in grid, tighter in high wind). Seam and penetration tape follow the manufacturer's flashing details. Distinct from the under-slab vapor-barrier-rolls.",
+  };
+}
+
+export const housewrapRollsExample = { inputs: { wall_area_sf: 4000, roll_coverage_sf: 1350, overlap_waste_pct: 10, fasteners_per_sf: 0.5, roll_width_ft: 9 } };
+
+const _v895renderHousewrapRolls = _simpleRenderer({
+  citation: "Citation: takeoff identity by name. rolls = ceil(area x (1 + overlap + waste) / roll coverage); cap fasteners = ceil(area x fasteners per sf); seam tape = area / roll width. The WRB is the drainage plane behind the cladding.",
+  example: housewrapRollsExample.inputs,
+  fields: [
+    { key: "wall_area_sf", label: "Wall area (ft^2)", kind: "number", default: 4000 },
+    { key: "roll_coverage_sf", label: "Coverage per roll (ft^2)", kind: "number", default: 1350 },
+    { key: "overlap_waste_pct", label: "Overlap + waste (%)", kind: "number", default: 10 },
+    { key: "fasteners_per_sf", label: "Cap fasteners per ft^2", kind: "number", default: 0.5 },
+    { key: "roll_width_ft", label: "Roll width / height (ft)", kind: "number", default: 9 },
+  ],
+  outputs: [
+    { key: "rolls", id: "hwr-out-rolls", label: "Housewrap rolls", value: (r) => _fmtC(r.rolls, 0) + " rolls" },
+    { key: "cap", id: "hwr-out-cap", label: "Cap fasteners", value: (r) => _fmtC(r.cap_fasteners, 0) + " fasteners" },
+    { key: "tape", id: "hwr-out-tape", label: "Seam tape", value: (r) => _fmtC(r.seam_tape_lf, 0) + " LF" },
+    { key: "note", id: "hwr-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHousewrapRolls,
+});
+CONSTRUCTION_RENDERERS["housewrap-rolls"] = _v895renderHousewrapRolls;

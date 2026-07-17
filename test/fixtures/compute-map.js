@@ -819,6 +819,7 @@ export const COMPUTE_MAP = {
   "rigid-foam-board-count": { module: "../../calc-construction.js", fn: "computeRigidFoamBoardCount" },
   "roof-insulation-fasteners": { module: "../../calc-construction.js", fn: "computeRoofInsulationFasteners" },
   "pipe-purge-volume": { module: "../../calc-plumbing.js", fn: "computePipePurgeVolume" },
+  "housewrap-rolls": { module: "../../calc-construction.js", fn: "computeHousewrapRolls" },
   "concrete-vibrator-spacing": { module: "../../calc-construction.js", fn: "computeConcreteVibratorSpacing" },
   "formwork-tie-load": { module: "../../calc-construction.js", fn: "computeFormworkTieLoad" },
   "mass-concrete-temp-rise": { module: "../../calc-construction.js", fn: "computeMassConcreteTempRise" },
