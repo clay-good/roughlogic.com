@@ -1017,6 +1017,7 @@ const RELATED = {
   "unit-cost-earthwork": ["equipment-hourly-rate", "dozer-production", "haul-cycle-production"],
   "soil-stabilization-quantity": ["relative-compaction", "water-for-compaction", "aggregate"],
   "flexible-pipe-deflection": ["pipe-flotation", "pipe-bedding-backfill", "relative-compaction"],
+  "cable-reel-capacity": ["pulling-tension", "conduit-fill", "cable-tray-fill"],
   "asphalt-spread-rate": ["asphalt-tonnage", "asphalt-paving-speed", "asphalt-tack-coat-quantity"],
   "pavement-milling-production": ["asphalt-paving-speed", "asphalt-spread-rate", "haul-cycle-production"],
   "striping-paint-quantity": ["paint-coverage", "asphalt-tonnage", "coating-coverage-dft"],

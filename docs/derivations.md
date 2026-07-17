@@ -1878,6 +1878,7 @@ cross-check.
 | calc-electrical.js | `computeBoxFill` | `{ box_volume_in3, conductors_by_size, devices = 0, internal_clamps = false, l...` | _ | _ | _ |
 | calc-electrical.js | `computeBreakerSize` | `{ load_A, continuous, load_W = 0, voltage_V = 0, power_factor = 1, phase = "s...` | _ | _ | _ |
 | calc-electrical.js | `computeBuckBoostSizing` | `{ supply_v = 0, desired_v = 0, load_a = 0 } = {}` | _ | _ | _ |
+| calc-electrical.js | `computeCableReelCapacity` | `{ flange_dia_in = 30, drum_dia_in = 12, traverse_width_in = 18, cable_od_in =...` | _ | _ | _ |
 | calc-electrical.js | `computeCapacitorDischargeTime` | `{ capacitance_uf = 0, initial_voltage = 0, safe_voltage = 50, time_limit_s = ...` | _ | _ | _ |
 | calc-electrical.js | `computeConductorResistance` | `{ material, awg, length_ft, temperature_C }` | _ | _ | _ |
 | calc-electrical.js | `computeConductorShortCircuitWithstand` | `{ area_cmil = 0, fault_current_a = 0, clearing_time_s = 0, material = "copper...` | _ | _ | _ |
@@ -2958,7 +2959,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1544.
+Row count: 1545.
 
 <!-- END function-corpus-v14 -->
 
@@ -3039,7 +3040,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (161 tiles)
+### Group A Electrical (162 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3060,6 +3061,7 @@ per spec-v14 §13.1 second paragraph.
 | `buck-boost-sizing` | Buck-Boost Transformer Sizing (Single-Phase) | NEC 2023 (NFPA 70) Article 450; manuf...; 208 V to 230 V at 50 A -> boost 22 V; xfmr = 22 x 50 / 10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `burial-depth-300-5` | Underground Burial Cover-Depth Lookup (NEC Table 300.5) | NEC 2023 (NFPA 70); nonmetallic raceway (PVC), general earth -> 18 in cover | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cable-bend-radius` | Cable Bend Radius Minimum | Southwire; Single-conductor THHN: 8x multiple; 0.5 in OD -> 4 in min... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `cable-reel-capacity` | Cable Reel Capacity / Length on Reel | Reel-capacity identity (first-princip...; length = 0.9*PI*(900-144)*18/(48*1) = 801 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cable-tray-fill` | Cable Tray Fill | NEC Article 392.22(A) (by name); six 1.5 in 4/0 cables in a 12 in ladder tray -> 9 in of 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `camera-lens-fov` | Camera Lens FOV and Pixel Density (DORI) | IEC 62676-4 DORI; spec-v456 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `camera-max-distance-for-ppf` | Camera Max Distance for a Pixel Density (DORI) | IEC 62676-4 DORI (solved for the dist...; spec-v741 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4441,6 +4443,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1297. Fixture-covered or reference-cadence: 1297 / 1297.
+Tile count: 1298. Fixture-covered or reference-cadence: 1298 / 1298.
 
 <!-- END tile-index-v14 -->

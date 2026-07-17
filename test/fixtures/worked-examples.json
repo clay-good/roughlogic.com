@@ -50245,6 +50245,54 @@
    }
   },
   {
+   "tile_id": "cable-reel-capacity",
+   "source_publisher": "Reel-capacity identity (first-principles)",
+   "source_title": "30 in flange, 12 in drum, 18 in traverse, 1 in cable, 0.9 fill",
+   "source_edition_or_year": "spec-v849 worked example",
+   "source_section_or_page": "length = 0.9*PI*(900-144)*18/(48*1) = 801 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "flange_dia_in": 30,
+    "drum_dia_in": 12,
+    "traverse_width_in": 18,
+    "cable_od_in": 1,
+    "fill_factor": 0.9
+   },
+   "outputs": {
+    "length_ft": {
+     "value": 801.6,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cable-reel-capacity",
+   "source_publisher": "Reel-capacity identity (first-principles)",
+   "source_title": "cross-check: a fatter 1.5 in cable cuts the reel to less than half",
+   "source_edition_or_year": "spec-v849 worked example",
+   "source_section_or_page": "length = 0.9*PI*756*18/(48*2.25) = 356 ft (cable OD enters squared)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-17",
+   "inputs": {
+    "flange_dia_in": 30,
+    "drum_dia_in": 12,
+    "traverse_width_in": 18,
+    "cable_od_in": 1.5,
+    "fill_factor": 0.9
+   },
+   "outputs": {
+    "length_ft": {
+     "value": 356.3,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

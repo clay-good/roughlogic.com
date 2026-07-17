@@ -17277,6 +17277,31 @@
       "kind": "industry"
     },
     {
+      "term": "cable reel capacity",
+      "target": "cable-reel-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "length on a reel",
+      "target": "cable-reel-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "wire reel footage",
+      "target": "cable-reel-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "reel cable length",
+      "target": "cable-reel-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "cable spool capacity",
+      "target": "cable-reel-capacity",
+      "kind": "industry"
+    },
+    {
       "term": "water for compaction",
       "target": "water-for-compaction",
       "kind": "industry"

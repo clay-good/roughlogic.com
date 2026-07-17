@@ -770,6 +770,7 @@ export const COMPUTE_MAP = {
   "unit-cost-earthwork": { module: "../../calc-earthwork.js", fn: "computeUnitCostEarthwork" },
   "soil-stabilization-quantity": { module: "../../calc-earthwork.js", fn: "computeSoilStabilizationQuantity" },
   "flexible-pipe-deflection": { module: "../../calc-earthwork.js", fn: "computeFlexiblePipeDeflection" },
+  "cable-reel-capacity": { module: "../../calc-electrical.js", fn: "computeCableReelCapacity" },
   "asphalt-spread-rate": { module: "../../calc-construction.js", fn: "computeAsphaltSpreadRate" },
   "pavement-milling-production": { module: "../../calc-construction.js", fn: "computePavementMillingProduction" },
   "striping-paint-quantity": { module: "../../calc-construction.js", fn: "computeStripingPaintQuantity" },

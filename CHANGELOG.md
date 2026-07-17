@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): cable-reel-capacity -- cable reel capacity / length on reel (spec-v849); 2026-07-17
+
+- New Group A tile `cable-reel-capacity` (calc-electrical.js), opening the electrical install-ops vein beside
+  `pulling-tension` and `conduit-fill`. How many feet of a given cable fit on a reel (or how much is left on a partial
+  reel from the buildup): length = fill x pi x (flange^2 - drum^2) x traverse / (48 x cable_OD^2), lengths in inches.
+  A 30 in flange, 12 in drum, 18 in wide reel holds ~801 ft of 1 in cable; a fatter 1.5 in cable drops that to 356 ft
+  -- the cable OD enters squared, so a half-inch fatter cable cuts the reel to less than half. Tells the crew whether
+  the pull is on one reel or two. Home count 1,297 -> 1,298.
+
 ### feat(earthwork): flexible-pipe-deflection -- buried flexible pipe deflection, Modified Iowa (spec-v848); 2026-07-17
 
 - New Group E tile `flexible-pipe-deflection` (calc-earthwork.js), closing the buried-pipe check set (`pipe-flotation`,

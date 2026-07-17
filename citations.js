@@ -8255,6 +8255,17 @@ export const CITATIONS = {
       { name: "Pipe stiffness PS", value: "the pipe's stiffness from the manufacturer; DL ~1.5, K ~0.1 typical", source: "pipe manufacturer" },
     ],
   },
+  "cable-reel-capacity": {
+    formula: "length_ft = fill_factor x PI x (flange_dia_in^2 - drum_dia_in^2) x traverse_width_in / (48 x cable_od_in^2).",
+    edition: "Reel-capacity identity by name (annular winding volume / cable cross-section, with a fill factor); first-principles geometry.",
+    freeAccess: "The reel-capacity geometry is public first-principles; the reel dimensions come from the reel and the cable OD from the cable.",
+    governance: GOVERNANCE.general,
+    editionNote: "The fill factor accounts for imperfect winding (about 0.85-0.9). The same relation works backward to read the length left on a partial reel from the measured buildup. The reel dimensions come from the reel and the cable OD from the cable.",
+    assumptions: [
+      { name: "Fill factor", value: "~0.85-0.9 for imperfect winding; the winding pattern governs", source: "winding practice" },
+      { name: "Cable OD", value: "the cable outside diameter; it enters squared, so a fatter cable cuts the reel sharply", source: "cable manufacturer" },
+    ],
+  },
   "haul-cycle-production": {
     formula: "cycle = load + haul + dump + return + spot; loads_per_hour = working_min / cycle; production = truck_cap x loads_per_hour; trucks = ceil(cycle / load); fleet = production x trucks.",
     edition: "Caterpillar Performance Handbook cycle-time production-estimating method by name; first-principles cycle arithmetic.",

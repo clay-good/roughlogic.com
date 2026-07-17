@@ -17119,6 +17119,7 @@ import { computeDumpTruckLoads as _v845dtl } from "../../calc-earthwork.js";
 import { computeUnitCostEarthwork as _v846uce } from "../../calc-earthwork.js";
 import { computeSoilStabilizationQuantity as _v847ssq } from "../../calc-earthwork.js";
 import { computeFlexiblePipeDeflection as _v848fpd } from "../../calc-earthwork.js";
+import { computeCableReelCapacity as _v849crc } from "../../calc-electrical.js";
 
 test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
   const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
@@ -17624,6 +17625,22 @@ test("bounds: spec-v848 computeFlexiblePipeDeflection pins the soil load, deflec
   assert.ok("error" in _v848fpd({ cover_ft: 12, soil_density_pcf: 120, deflection_lag: 1.5, bedding_constant: 0.1, pipe_stiffness_psi: 0, soil_modulus_psi: 1000, allowable_pct: 5 }));
   assert.ok("error" in _v848fpd({ cover_ft: 12, soil_density_pcf: 120, deflection_lag: 1.5, bedding_constant: 0.1, pipe_stiffness_psi: 46, soil_modulus_psi: 0, allowable_pct: 5 }));
   assert.ok("error" in _v848fpd({ cover_ft: 12, soil_density_pcf: 120, deflection_lag: 1.5, bedding_constant: 0.1, pipe_stiffness_psi: 46, soil_modulus_psi: 1000, allowable_pct: 0 }));
+});
+
+test("bounds: spec-v849 computeCableReelCapacity pins the reel length and error seams", () => {
+  // 30 in flange, 12 in drum, 18 in traverse, 1 in cable, 0.9 fill -> ~801 ft.
+  const r = _v849crc({ flange_dia_in: 30, drum_dia_in: 12, traverse_width_in: 18, cable_od_in: 1, fill_factor: 0.9 });
+  assert.ok(Math.abs(r.length_ft - 801.6) < 1);
+  // A fatter 1.5 in cable cuts it to less than half (OD enters squared).
+  assert.ok(Math.abs(_v849crc({ flange_dia_in: 30, drum_dia_in: 12, traverse_width_in: 18, cable_od_in: 1.5, fill_factor: 0.9 }).length_ft - 356.3) < 1);
+  // Error seams.
+  assert.ok("error" in _v849crc({ flange_dia_in: 0, drum_dia_in: 12, traverse_width_in: 18, cable_od_in: 1, fill_factor: 0.9 }));
+  assert.ok("error" in _v849crc({ flange_dia_in: 30, drum_dia_in: 12, traverse_width_in: 0, cable_od_in: 1, fill_factor: 0.9 }));
+  assert.ok("error" in _v849crc({ flange_dia_in: 30, drum_dia_in: 12, traverse_width_in: 18, cable_od_in: 0, fill_factor: 0.9 }));
+  assert.ok("error" in _v849crc({ flange_dia_in: 30, drum_dia_in: 12, traverse_width_in: 18, cable_od_in: 1, fill_factor: 0 }));
+  // Drum at or above the flange (no winding annulus).
+  assert.ok("error" in _v849crc({ flange_dia_in: 12, drum_dia_in: 12, traverse_width_in: 18, cable_od_in: 1, fill_factor: 0.9 }));
+  assert.ok("error" in _v849crc({ flange_dia_in: 12, drum_dia_in: 30, traverse_width_in: 18, cable_od_in: 1, fill_factor: 0.9 }));
 });
 
 test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {

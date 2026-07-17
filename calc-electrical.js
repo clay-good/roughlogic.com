@@ -5491,3 +5491,50 @@ function _v806renderTransformerTurnsRatio(inputRegion, outputRegion, citationEl)
   for (const f of [vp, vs, is, zs]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["transformer-turns-ratio"] = _v806renderTransformerTurnsRatio;
+
+// ===================== spec-v849: cable reel capacity / length on reel =====================
+// dims: in { flange_dia_in: L, drum_dia_in: L, traverse_width_in: L, cable_od_in: L, fill_factor: dimensionless } out: { length_ft: L }
+export function computeCableReelCapacity({ flange_dia_in = 30, drum_dia_in = 12, traverse_width_in = 18, cable_od_in = 1, fill_factor = 0.9 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(flange_dia_in > 0)) return { error: "Flange diameter must be positive (in)." };
+  if (!(traverse_width_in > 0)) return { error: "Traverse width must be positive (in)." };
+  if (!(cable_od_in > 0)) return { error: "Cable OD must be positive (in)." };
+  if (!(fill_factor > 0)) return { error: "Fill factor must be positive." };
+  if (!(flange_dia_in > drum_dia_in)) return { error: "Flange diameter must exceed the drum diameter (no winding annulus)." };
+  const length_ft = (fill_factor * Math.PI * (flange_dia_in * flange_dia_in - drum_dia_in * drum_dia_in) * traverse_width_in) / (48 * cable_od_in * cable_od_in);
+  if (!Number.isFinite(length_ft)) return { error: "Reel-capacity math is not a finite value." };
+  return {
+    length_ft,
+    note: "The fill factor accounts for imperfect winding (about 0.85-0.9). The same relation works backward: read the length left on a partial reel from the measured buildup by entering the buildup diameter as the flange. The reel dimensions come from the reel and the cable OD from the cable.",
+  };
+}
+
+export const cableReelCapacityExample = { inputs: { flange_dia_in: 30, drum_dia_in: 12, traverse_width_in: 18, cable_od_in: 1, fill_factor: 0.9 } };
+
+function _v849renderCableReelCapacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: reel-capacity identity by name. length (ft) = fill x pi x (flange^2 - drum^2) x traverse / (48 x cable_OD^2), lengths in inches. The fill factor (~0.85-0.9) accounts for imperfect winding.";
+  const fl = makeNumber("Reel flange diameter (in)", "crc-fl", { step: "any", min: "0", value: "30" });
+  fl.input.value = "30";
+  const dr = makeNumber("Drum / hub diameter (in)", "crc-dr", { step: "any", min: "0", value: "12" });
+  dr.input.value = "12";
+  const tw = makeNumber("Inside width between flanges (in)", "crc-tw", { step: "any", min: "0", value: "18" });
+  tw.input.value = "18";
+  const od = makeNumber("Cable outside diameter (in)", "crc-od", { step: "any", min: "0", value: "1" });
+  od.input.value = "1";
+  const ff = makeNumber("Winding fill factor", "crc-ff", { step: "any", min: "0", value: "0.9" });
+  ff.input.value = "0.9";
+  for (const f of [fl, dr, tw, od, ff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fl.input.value = "30"; dr.input.value = "12"; tw.input.value = "18"; od.input.value = "1"; ff.input.value = "0.9"; update(); });
+  const oLen = makeOutputLine(outputRegion, "Cable that fits on the reel", "crc-out-len");
+  const update = debounce(() => {
+    const r = computeCableReelCapacity({
+      flange_dia_in: fl.input.value === "" ? 30 : Number(fl.input.value), drum_dia_in: dr.input.value === "" ? 0 : Number(dr.input.value),
+      traverse_width_in: tw.input.value === "" ? 18 : Number(tw.input.value), cable_od_in: od.input.value === "" ? 1 : Number(od.input.value),
+      fill_factor: ff.input.value === "" ? 0.9 : Number(ff.input.value),
+    });
+    if (r.error) { oLen.textContent = r.error; return; }
+    oLen.textContent = fmt(r.length_ft, 0) + " ft";
+  }, DEBOUNCE_MS);
+  for (const f of [fl, dr, tw, od, ff]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["cable-reel-capacity"] = _v849renderCableReelCapacity;

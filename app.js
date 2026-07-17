@@ -23,7 +23,7 @@ const TOOL_MODULES = (() => {
     "service-load", "generator-sizing",
     "voltage-imbalance", "gfci-afci-reference", "lighting-density",
     // v3
-    "pulling-tension", "cable-bend-radius", "pf-correction", "phase-balance",
+    "pulling-tension", "cable-reel-capacity", "cable-bend-radius", "pf-correction", "phase-balance",
     "multi-load-vd", "lv-dc-drop", "poe-budget",
     // v7
     "transformer-kva-sizing", "short-circuit-pp", "generator-motor-starting",
