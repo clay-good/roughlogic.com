@@ -261,6 +261,11 @@
     {"term":"substrate concentration from a target fraction of vmax","target":"substrate-for-velocity","kind":"question"},
     {"term":"how many times km to saturate an enzyme","target":"substrate-for-velocity","kind":"question"},
     {"term":"invert michaelis menten for substrate","target":"substrate-for-velocity","kind":"question"},
-    {"term":"substrate needed for a target reaction velocity","target":"substrate-for-velocity","kind":"question"}
+    {"term":"substrate needed for a target reaction velocity","target":"substrate-for-velocity","kind":"question"},
+    {"term":"how many cells after a doubling time","target":"growth-projected-count","kind":"question"},
+    {"term":"project a cell count over time","target":"growth-projected-count","kind":"question"},
+    {"term":"population from doubling time","target":"growth-projected-count","kind":"question"},
+    {"term":"cells after hours of growth","target":"growth-projected-count","kind":"question"},
+    {"term":"projected count from doubling","target":"growth-projected-count","kind":"question"}
   ]
 }

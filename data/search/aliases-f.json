@@ -571,6 +571,16 @@
     {"term":"maximum useful tankers in a shuttle","target":"tanker-fleet-size","kind":"question"},
     {"term":"when does adding a tanker stop helping","target":"tanker-fleet-size","kind":"question"},
     {"term":"fill site limited shuttle flow","target":"tanker-fleet-size","kind":"question"},
-    {"term":"tanker fleet for a target fire flow","target":"tanker-fleet-size","kind":"question"}
+    {"term":"tanker fleet for a target fire flow","target":"tanker-fleet-size","kind":"question"},
+    {"term":"how many smoke detectors for a ceiling","target":"smoke-detector-spacing-count","kind":"question"},
+    {"term":"spot detector count for a room","target":"smoke-detector-spacing-count","kind":"question"},
+    {"term":"smoke detector layout on a smooth ceiling","target":"smoke-detector-spacing-count","kind":"question"},
+    {"term":"heat detector spacing count","target":"smoke-detector-spacing-count","kind":"question"},
+    {"term":"how many detectors nfpa 72","target":"smoke-detector-spacing-count","kind":"question"},
+    {"term":"what smooth bore tip for a flow","target":"smooth-bore-diameter-for-flow","kind":"question"},
+    {"term":"nozzle tip size for gpm","target":"smooth-bore-diameter-for-flow","kind":"question"},
+    {"term":"bore diameter for a target flow","target":"smooth-bore-diameter-for-flow","kind":"question"},
+    {"term":"tip size to flow gpm","target":"smooth-bore-diameter-for-flow","kind":"question"},
+    {"term":"smooth bore tip for gallons per minute","target":"smooth-bore-diameter-for-flow","kind":"question"}
   ]
 }

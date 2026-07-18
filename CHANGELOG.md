@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(search): question-phrase aliases for the 34 scattered uncovered tiles (spec-v590 follow-on); 2026-07-17
+
+- Second follow-on batch: the 34 tiles outside group E that still lacked `kind: "question"` rows (groups C, G, M, N,
+  L, Z, F, T, J -- inverse/max-capacity tiles and the pool/water-treatment takeoffs) got 152 reviewed phrasings
+  (18 drafted phrasings were already present as vocabulary aliases and skipped). Every tile lands at least one
+  question row; all 152 rank their target top-3 through the v589 ranker with the batch folded in. Only group E
+  (97 construction-ops tiles) now remains uncovered.
+
 ### feat(search): question-phrase aliases for 46 uncovered tiles (spec-v590 follow-on, groups A/B/K); 2026-07-17
 
 - The spec-v590 question corpus was completed when the catalog had 1,041 tiles; 177 tiles landed since then carry

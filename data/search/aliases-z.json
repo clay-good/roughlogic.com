@@ -376,6 +376,21 @@
     {"term":"bridle leg force on a beam clamp","target":"beam-clamp-side-pull","kind":"question"},
     {"term":"vertical and horizontal components of a rigging leg","target":"beam-clamp-side-pull","kind":"question"},
     {"term":"check a beam clamp against its wll","target":"beam-clamp-side-pull","kind":"question"},
-    {"term":"side pull on an unrated clamp re rig","target":"beam-clamp-side-pull","kind":"question"}
+    {"term":"side pull on an unrated clamp re rig","target":"beam-clamp-side-pull","kind":"question"},
+    {"term":"minimum headroom for a spreader beam","target":"spreader-beam-min-height","kind":"question"},
+    {"term":"how much height for a spreader bar","target":"spreader-beam-min-height","kind":"question"},
+    {"term":"top point height for a spreader","target":"spreader-beam-min-height","kind":"question"},
+    {"term":"spreader beam minimum height","target":"spreader-beam-min-height","kind":"question"},
+    {"term":"headroom needed above a spreader","target":"spreader-beam-min-height","kind":"question"},
+    {"term":"how far can i turn a line through a block","target":"block-redirect-max-angle","kind":"question"},
+    {"term":"max redirect angle for a block wll","target":"block-redirect-max-angle","kind":"question"},
+    {"term":"biggest direction change on a block","target":"block-redirect-max-angle","kind":"question"},
+    {"term":"angle a block can turn a line","target":"block-redirect-max-angle","kind":"question"},
+    {"term":"max turn without overloading a block","target":"block-redirect-max-angle","kind":"question"},
+    {"term":"minimum sag for a tension limit","target":"spanline-sag-for-tension","kind":"question"},
+    {"term":"how much sag to stay under wll","target":"spanline-sag-for-tension","kind":"question"},
+    {"term":"least sag before the anchor overloads","target":"spanline-sag-for-tension","kind":"question"},
+    {"term":"sag for a rope tension limit","target":"spanline-sag-for-tension","kind":"question"},
+    {"term":"how tight can i pull a span line","target":"spanline-sag-for-tension","kind":"question"}
   ]
 }

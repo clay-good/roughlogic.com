@@ -90995,6 +90995,766 @@
       "term": "repower hp for more speed",
       "target": "crouch-hp-for-speed",
       "kind": "question"
+    },
+    {
+      "term": "extra charge for line set length",
+      "target": "refrigerant-lineset-charge-adjust",
+      "kind": "question"
+    },
+    {
+      "term": "refrigerant to add per foot of lineset",
+      "target": "refrigerant-lineset-charge-adjust",
+      "kind": "question"
+    },
+    {
+      "term": "line set longer than factory charge",
+      "target": "refrigerant-lineset-charge-adjust",
+      "kind": "question"
+    },
+    {
+      "term": "how many ounces for extra line set",
+      "target": "refrigerant-lineset-charge-adjust",
+      "kind": "question"
+    },
+    {
+      "term": "how much baseboard to heat a room",
+      "target": "baseboard-length-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "feet of baseboard for a heat load",
+      "target": "baseboard-length-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "length of fin tube for btu",
+      "target": "baseboard-length-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "how many feet of baseboard do i need",
+      "target": "baseboard-length-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "size baseboard heat for a room",
+      "target": "baseboard-length-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "how thick insulation to limit heat loss",
+      "target": "insulation-thickness-for-heat-loss",
+      "kind": "question"
+    },
+    {
+      "term": "insulation thickness for a heat loss target",
+      "target": "insulation-thickness-for-heat-loss",
+      "kind": "question"
+    },
+    {
+      "term": "pipe insulation thickness for btu per foot",
+      "target": "insulation-thickness-for-heat-loss",
+      "kind": "question"
+    },
+    {
+      "term": "how much insulation to cap heat loss",
+      "target": "insulation-thickness-for-heat-loss",
+      "kind": "question"
+    },
+    {
+      "term": "thickness to hold heat loss down",
+      "target": "insulation-thickness-for-heat-loss",
+      "kind": "question"
+    },
+    {
+      "term": "how much cfm can a fan motor move",
+      "target": "fan-motor-max-airflow",
+      "kind": "question"
+    },
+    {
+      "term": "max airflow from motor horsepower",
+      "target": "fan-motor-max-airflow",
+      "kind": "question"
+    },
+    {
+      "term": "cfm a motor can push at static",
+      "target": "fan-motor-max-airflow",
+      "kind": "question"
+    },
+    {
+      "term": "airflow limit for a fan motor",
+      "target": "fan-motor-max-airflow",
+      "kind": "question"
+    },
+    {
+      "term": "most cfm at a static pressure",
+      "target": "fan-motor-max-airflow",
+      "kind": "question"
+    },
+    {
+      "term": "how tall a chimney for draft",
+      "target": "chimney-height-for-draft",
+      "kind": "question"
+    },
+    {
+      "term": "stack height to make draft",
+      "target": "chimney-height-for-draft",
+      "kind": "question"
+    },
+    {
+      "term": "how high a flue do i need",
+      "target": "chimney-height-for-draft",
+      "kind": "question"
+    },
+    {
+      "term": "chimney height for a target draft",
+      "target": "chimney-height-for-draft",
+      "kind": "question"
+    },
+    {
+      "term": "roof area for a rain harvest target",
+      "target": "rainwater-catchment-area",
+      "kind": "question"
+    },
+    {
+      "term": "catchment size for a cistern",
+      "target": "rainwater-catchment-area",
+      "kind": "question"
+    },
+    {
+      "term": "roof footprint to fill a tank",
+      "target": "rainwater-catchment-area",
+      "kind": "question"
+    },
+    {
+      "term": "how big a roof for rainwater",
+      "target": "rainwater-catchment-area",
+      "kind": "question"
+    },
+    {
+      "term": "how much power can a belt transmit",
+      "target": "belt-hp-transmitted",
+      "kind": "question"
+    },
+    {
+      "term": "belt horsepower from tension and speed",
+      "target": "belt-hp-transmitted",
+      "kind": "question"
+    },
+    {
+      "term": "power a v belt carries",
+      "target": "belt-hp-transmitted",
+      "kind": "question"
+    },
+    {
+      "term": "hp from belt tension",
+      "target": "belt-hp-transmitted",
+      "kind": "question"
+    },
+    {
+      "term": "how many cells after a doubling time",
+      "target": "growth-projected-count",
+      "kind": "question"
+    },
+    {
+      "term": "project a cell count over time",
+      "target": "growth-projected-count",
+      "kind": "question"
+    },
+    {
+      "term": "population from doubling time",
+      "target": "growth-projected-count",
+      "kind": "question"
+    },
+    {
+      "term": "cells after hours of growth",
+      "target": "growth-projected-count",
+      "kind": "question"
+    },
+    {
+      "term": "projected count from doubling",
+      "target": "growth-projected-count",
+      "kind": "question"
+    },
+    {
+      "term": "what wind speed gives this wind chill",
+      "target": "wind-chill-wind-speed",
+      "kind": "question"
+    },
+    {
+      "term": "wind from a wind chill reading",
+      "target": "wind-chill-wind-speed",
+      "kind": "question"
+    },
+    {
+      "term": "how much wind for a felt temperature",
+      "target": "wind-chill-wind-speed",
+      "kind": "question"
+    },
+    {
+      "term": "wind speed behind a wind chill",
+      "target": "wind-chill-wind-speed",
+      "kind": "question"
+    },
+    {
+      "term": "back out wind from wind chill",
+      "target": "wind-chill-wind-speed",
+      "kind": "question"
+    },
+    {
+      "term": "how far to hang a light for a beam pool",
+      "target": "lighting-throw-for-pool",
+      "kind": "question"
+    },
+    {
+      "term": "throw distance for a pool of light",
+      "target": "lighting-throw-for-pool",
+      "kind": "question"
+    },
+    {
+      "term": "mounting distance for a beam diameter",
+      "target": "lighting-throw-for-pool",
+      "kind": "question"
+    },
+    {
+      "term": "how far back for a light pool",
+      "target": "lighting-throw-for-pool",
+      "kind": "question"
+    },
+    {
+      "term": "distance to cast a beam pool",
+      "target": "lighting-throw-for-pool",
+      "kind": "question"
+    },
+    {
+      "term": "biggest hole my press can punch",
+      "target": "punch-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "thickest steel a punch handles",
+      "target": "punch-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "max hole for a press tonnage",
+      "target": "punch-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "punch capacity for tons",
+      "target": "punch-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "interference for a press fit holding force",
+      "target": "press-fit-interference-for-force",
+      "kind": "question"
+    },
+    {
+      "term": "how much interference for a target force",
+      "target": "press-fit-interference-for-force",
+      "kind": "question"
+    },
+    {
+      "term": "press fit interference for holding",
+      "target": "press-fit-interference-for-force",
+      "kind": "question"
+    },
+    {
+      "term": "diametral interference for force",
+      "target": "press-fit-interference-for-force",
+      "kind": "question"
+    },
+    {
+      "term": "interference to hold a press fit",
+      "target": "press-fit-interference-for-force",
+      "kind": "question"
+    },
+    {
+      "term": "arc rise from radius and chord",
+      "target": "circular-arc-rise-from-radius",
+      "kind": "question"
+    },
+    {
+      "term": "sagitta from a radius",
+      "target": "circular-arc-rise-from-radius",
+      "kind": "question"
+    },
+    {
+      "term": "rise at midspan of an arc",
+      "target": "circular-arc-rise-from-radius",
+      "kind": "question"
+    },
+    {
+      "term": "middle ordinate from radius",
+      "target": "circular-arc-rise-from-radius",
+      "kind": "question"
+    },
+    {
+      "term": "minimum headroom for a spreader beam",
+      "target": "spreader-beam-min-height",
+      "kind": "question"
+    },
+    {
+      "term": "how much height for a spreader bar",
+      "target": "spreader-beam-min-height",
+      "kind": "question"
+    },
+    {
+      "term": "top point height for a spreader",
+      "target": "spreader-beam-min-height",
+      "kind": "question"
+    },
+    {
+      "term": "spreader beam minimum height",
+      "target": "spreader-beam-min-height",
+      "kind": "question"
+    },
+    {
+      "term": "headroom needed above a spreader",
+      "target": "spreader-beam-min-height",
+      "kind": "question"
+    },
+    {
+      "term": "how far can i turn a line through a block",
+      "target": "block-redirect-max-angle",
+      "kind": "question"
+    },
+    {
+      "term": "max redirect angle for a block wll",
+      "target": "block-redirect-max-angle",
+      "kind": "question"
+    },
+    {
+      "term": "biggest direction change on a block",
+      "target": "block-redirect-max-angle",
+      "kind": "question"
+    },
+    {
+      "term": "angle a block can turn a line",
+      "target": "block-redirect-max-angle",
+      "kind": "question"
+    },
+    {
+      "term": "max turn without overloading a block",
+      "target": "block-redirect-max-angle",
+      "kind": "question"
+    },
+    {
+      "term": "how much waterline tile for a pool",
+      "target": "pool-tile-coping-perimeter",
+      "kind": "question"
+    },
+    {
+      "term": "pool coping around the perimeter",
+      "target": "pool-tile-coping-perimeter",
+      "kind": "question"
+    },
+    {
+      "term": "tile count for a pool waterline",
+      "target": "pool-tile-coping-perimeter",
+      "kind": "question"
+    },
+    {
+      "term": "coping length for a pool",
+      "target": "pool-tile-coping-perimeter",
+      "kind": "question"
+    },
+    {
+      "term": "pool perimeter tile takeoff",
+      "target": "pool-tile-coping-perimeter",
+      "kind": "question"
+    },
+    {
+      "term": "how much gunite for a pool shell",
+      "target": "pool-interior-finish-volume",
+      "kind": "question"
+    },
+    {
+      "term": "plaster volume for a pool",
+      "target": "pool-interior-finish-volume",
+      "kind": "question"
+    },
+    {
+      "term": "shotcrete for a pool interior",
+      "target": "pool-interior-finish-volume",
+      "kind": "question"
+    },
+    {
+      "term": "pool shell concrete yards",
+      "target": "pool-interior-finish-volume",
+      "kind": "question"
+    },
+    {
+      "term": "gunite and plaster for a pool",
+      "target": "pool-interior-finish-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how many smoke detectors for a ceiling",
+      "target": "smoke-detector-spacing-count",
+      "kind": "question"
+    },
+    {
+      "term": "spot detector count for a room",
+      "target": "smoke-detector-spacing-count",
+      "kind": "question"
+    },
+    {
+      "term": "smoke detector layout on a smooth ceiling",
+      "target": "smoke-detector-spacing-count",
+      "kind": "question"
+    },
+    {
+      "term": "heat detector spacing count",
+      "target": "smoke-detector-spacing-count",
+      "kind": "question"
+    },
+    {
+      "term": "how many detectors nfpa 72",
+      "target": "smoke-detector-spacing-count",
+      "kind": "question"
+    },
+    {
+      "term": "pull from pto power and speed",
+      "target": "drawbar-pull",
+      "kind": "question"
+    },
+    {
+      "term": "tractor pulling force for an implement",
+      "target": "drawbar-pull",
+      "kind": "question"
+    },
+    {
+      "term": "eave height to store bushels",
+      "target": "grain-bin-height-for-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "bin height for a bushel target",
+      "target": "grain-bin-height-for-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "how thick sound wood a tree needs",
+      "target": "trunk-min-shell-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "minimum shell for a strength loss",
+      "target": "trunk-min-shell-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "sound wood thickness for a hollow tree",
+      "target": "trunk-min-shell-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "minimum wall thickness for tree strength",
+      "target": "trunk-min-shell-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "shell needed to limit strength loss",
+      "target": "trunk-min-shell-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "biggest screen for a projector",
+      "target": "projector-max-screen-size",
+      "kind": "question"
+    },
+    {
+      "term": "max screen size for lumens",
+      "target": "projector-max-screen-size",
+      "kind": "question"
+    },
+    {
+      "term": "how big a screen can my projector light",
+      "target": "projector-max-screen-size",
+      "kind": "question"
+    },
+    {
+      "term": "screen size a projector fills",
+      "target": "projector-max-screen-size",
+      "kind": "question"
+    },
+    {
+      "term": "largest screen for a projector brightness",
+      "target": "projector-max-screen-size",
+      "kind": "question"
+    },
+    {
+      "term": "how much absorption for a target rt60",
+      "target": "room-absorption-target",
+      "kind": "question"
+    },
+    {
+      "term": "sabins needed for a reverb time",
+      "target": "room-absorption-target",
+      "kind": "question"
+    },
+    {
+      "term": "acoustic treatment to hit rt60",
+      "target": "room-absorption-target",
+      "kind": "question"
+    },
+    {
+      "term": "absorption to reach a target reverb",
+      "target": "room-absorption-target",
+      "kind": "question"
+    },
+    {
+      "term": "how much treatment for the room",
+      "target": "room-absorption-target",
+      "kind": "question"
+    },
+    {
+      "term": "how far for a target sound level",
+      "target": "spl-distance-for-level",
+      "kind": "question"
+    },
+    {
+      "term": "distance to a safe db level",
+      "target": "spl-distance-for-level",
+      "kind": "question"
+    },
+    {
+      "term": "how far to drop to 85 db",
+      "target": "spl-distance-for-level",
+      "kind": "question"
+    },
+    {
+      "term": "distance where noise falls to a level",
+      "target": "spl-distance-for-level",
+      "kind": "question"
+    },
+    {
+      "term": "hearing safe distance from a speaker",
+      "target": "spl-distance-for-level",
+      "kind": "question"
+    },
+    {
+      "term": "max led strip run before it dims",
+      "target": "led-tape-max-run",
+      "kind": "question"
+    },
+    {
+      "term": "longest led tape run",
+      "target": "led-tape-max-run",
+      "kind": "question"
+    },
+    {
+      "term": "when does led tape voltage drop too far",
+      "target": "led-tape-max-run",
+      "kind": "question"
+    },
+    {
+      "term": "what size pool heater to warm up in time",
+      "target": "pool-heater-size",
+      "kind": "question"
+    },
+    {
+      "term": "btu per hour to heat a pool",
+      "target": "pool-heater-size",
+      "kind": "question"
+    },
+    {
+      "term": "pool heater output for a heat up time",
+      "target": "pool-heater-size",
+      "kind": "question"
+    },
+    {
+      "term": "heater size to warm a pool",
+      "target": "pool-heater-size",
+      "kind": "question"
+    },
+    {
+      "term": "how big a pool heater for a rise",
+      "target": "pool-heater-size",
+      "kind": "question"
+    },
+    {
+      "term": "efficiency from condenser duty",
+      "target": "condenser-cop-for-heat-rejection",
+      "kind": "question"
+    },
+    {
+      "term": "implied cop from heat rejection",
+      "target": "condenser-cop-for-heat-rejection",
+      "kind": "question"
+    },
+    {
+      "term": "cop from evaporator and rejection",
+      "target": "condenser-cop-for-heat-rejection",
+      "kind": "question"
+    },
+    {
+      "term": "back out cop from heat rejected",
+      "target": "condenser-cop-for-heat-rejection",
+      "kind": "question"
+    },
+    {
+      "term": "what smooth bore tip for a flow",
+      "target": "smooth-bore-diameter-for-flow",
+      "kind": "question"
+    },
+    {
+      "term": "nozzle tip size for gpm",
+      "target": "smooth-bore-diameter-for-flow",
+      "kind": "question"
+    },
+    {
+      "term": "bore diameter for a target flow",
+      "target": "smooth-bore-diameter-for-flow",
+      "kind": "question"
+    },
+    {
+      "term": "tip size to flow gpm",
+      "target": "smooth-bore-diameter-for-flow",
+      "kind": "question"
+    },
+    {
+      "term": "smooth bore tip for gallons per minute",
+      "target": "smooth-bore-diameter-for-flow",
+      "kind": "question"
+    },
+    {
+      "term": "max design speed from sight distance",
+      "target": "ssd-design-speed",
+      "kind": "question"
+    },
+    {
+      "term": "safe speed for available sight line",
+      "target": "ssd-design-speed",
+      "kind": "question"
+    },
+    {
+      "term": "design speed a sight distance allows",
+      "target": "ssd-design-speed",
+      "kind": "question"
+    },
+    {
+      "term": "sustainable yield from specific capacity",
+      "target": "well-max-yield",
+      "kind": "question"
+    },
+    {
+      "term": "max gpm from well drawdown",
+      "target": "well-max-yield",
+      "kind": "question"
+    },
+    {
+      "term": "safe pumping rate for a well",
+      "target": "well-max-yield",
+      "kind": "question"
+    },
+    {
+      "term": "well yield from allowable drawdown",
+      "target": "well-max-yield",
+      "kind": "question"
+    },
+    {
+      "term": "how big a filter for a loading rate",
+      "target": "filter-area-for-loading",
+      "kind": "question"
+    },
+    {
+      "term": "filter area for a flow",
+      "target": "filter-area-for-loading",
+      "kind": "question"
+    },
+    {
+      "term": "size a sand filter area",
+      "target": "filter-area-for-loading",
+      "kind": "question"
+    },
+    {
+      "term": "media area for a loading rate",
+      "target": "filter-area-for-loading",
+      "kind": "question"
+    },
+    {
+      "term": "filter surface for gpm",
+      "target": "filter-area-for-loading",
+      "kind": "question"
+    },
+    {
+      "term": "how big a clarifier for a flow",
+      "target": "clarifier-area-for-loading",
+      "kind": "question"
+    },
+    {
+      "term": "clarifier area for a surface overflow rate",
+      "target": "clarifier-area-for-loading",
+      "kind": "question"
+    },
+    {
+      "term": "clarifier size for sor",
+      "target": "clarifier-area-for-loading",
+      "kind": "question"
+    },
+    {
+      "term": "clarifier diameter for a flow",
+      "target": "clarifier-area-for-loading",
+      "kind": "question"
+    },
+    {
+      "term": "surface area for clarifier loading",
+      "target": "clarifier-area-for-loading",
+      "kind": "question"
+    },
+    {
+      "term": "minimum sag for a tension limit",
+      "target": "spanline-sag-for-tension",
+      "kind": "question"
+    },
+    {
+      "term": "how much sag to stay under wll",
+      "target": "spanline-sag-for-tension",
+      "kind": "question"
+    },
+    {
+      "term": "least sag before the anchor overloads",
+      "target": "spanline-sag-for-tension",
+      "kind": "question"
+    },
+    {
+      "term": "sag for a rope tension limit",
+      "target": "spanline-sag-for-tension",
+      "kind": "question"
+    },
+    {
+      "term": "how tight can i pull a span line",
+      "target": "spanline-sag-for-tension",
+      "kind": "question"
+    },
+    {
+      "term": "zone flow for a precip rate",
+      "target": "sprinkler-gpm-for-precip",
+      "kind": "question"
+    },
+    {
+      "term": "sprinkler gpm for a precipitation rate",
+      "target": "sprinkler-gpm-for-precip",
+      "kind": "question"
+    },
+    {
+      "term": "flow to hit a precip rate",
+      "target": "sprinkler-gpm-for-precip",
+      "kind": "question"
+    },
+    {
+      "term": "how much gpm for a precip target",
+      "target": "sprinkler-gpm-for-precip",
+      "kind": "question"
+    },
+    {
+      "term": "sprinkler zone flow for inches per hour",
+      "target": "sprinkler-gpm-for-precip",
+      "kind": "question"
     }
   ]
 }

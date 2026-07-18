@@ -854,6 +854,20 @@
     {"term":"residual tpa at a target sdi","target":"thinning-target-tpa","kind":"question"},
     {"term":"thin a stand to 35 percent of max sdi","target":"thinning-target-tpa","kind":"question"},
     {"term":"how many trees to mark for cutting","target":"thinning-target-tpa","kind":"question"},
-    {"term":"stocking chart residual density","target":"thinning-target-tpa","kind":"question"}
+    {"term":"stocking chart residual density","target":"thinning-target-tpa","kind":"question"},
+    {"term":"pull from pto power and speed","target":"drawbar-pull","kind":"question"},
+    {"term":"tractor pulling force for an implement","target":"drawbar-pull","kind":"question"},
+    {"term":"eave height to store bushels","target":"grain-bin-height-for-capacity","kind":"question"},
+    {"term":"bin height for a bushel target","target":"grain-bin-height-for-capacity","kind":"question"},
+    {"term":"how thick sound wood a tree needs","target":"trunk-min-shell-thickness","kind":"question"},
+    {"term":"minimum shell for a strength loss","target":"trunk-min-shell-thickness","kind":"question"},
+    {"term":"sound wood thickness for a hollow tree","target":"trunk-min-shell-thickness","kind":"question"},
+    {"term":"minimum wall thickness for tree strength","target":"trunk-min-shell-thickness","kind":"question"},
+    {"term":"shell needed to limit strength loss","target":"trunk-min-shell-thickness","kind":"question"},
+    {"term":"zone flow for a precip rate","target":"sprinkler-gpm-for-precip","kind":"question"},
+    {"term":"sprinkler gpm for a precipitation rate","target":"sprinkler-gpm-for-precip","kind":"question"},
+    {"term":"flow to hit a precip rate","target":"sprinkler-gpm-for-precip","kind":"question"},
+    {"term":"how much gpm for a precip target","target":"sprinkler-gpm-for-precip","kind":"question"},
+    {"term":"sprinkler zone flow for inches per hour","target":"sprinkler-gpm-for-precip","kind":"question"}
   ]
 }

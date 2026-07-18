@@ -357,6 +357,9 @@
     {"term":"scale ticket vs tire ratings","target":"tire-load-check","kind":"question"},
     {"term":"how much weight can four tires carry","target":"tire-load-check","kind":"question"},
     {"term":"drives at 34000 lb tire rating ok","target":"tire-load-check","kind":"question"},
-    {"term":"single vs dual tire rating on an axle","target":"tire-load-check","kind":"question"}
+    {"term":"single vs dual tire rating on an axle","target":"tire-load-check","kind":"question"},
+    {"term":"max design speed from sight distance","target":"ssd-design-speed","kind":"question"},
+    {"term":"safe speed for available sight line","target":"ssd-design-speed","kind":"question"},
+    {"term":"design speed a sight distance allows","target":"ssd-design-speed","kind":"question"}
   ]
 }
