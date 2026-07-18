@@ -12103,3 +12103,17 @@ test("consistency: sewage force-main velocity matches the plumbing pipe-velocity
   const pv = p.computePipeVelocity({ mode: "velocity-from-flow", flow_gpm: 200, diameter_in: 4 });
   assert.ok(Math.abs(fm({}).velocity_fps - pv.velocity_fps) < 1e-9, "force-main and plumbing pipe-velocity must agree for identical flow and diameter");
 });
+
+test("monotonicity: breakeven units and straight-line depreciation track their inputs (accounting)", async () => {
+  const a = await import("../../calc-accounting.js");
+  const be = (o) => a.computeBreakeven({ fixed_costs: 10000, sale_price_per_unit: 50, variable_cost_per_unit: 30, ...o });
+  const sl = (o) => a.computeStraightLine({ cost: 10000, salvage: 1000, life_years: 5, ...o });
+  assert.ok(be({ fixed_costs: 20000 }).breakeven_units > be({}).breakeven_units, "breakeven units must rise with fixed costs");
+  assert.ok(be({ sale_price_per_unit: 60 }).breakeven_units < be({}).breakeven_units, "breakeven units must fall as price (contribution margin) rises");
+  assert.ok(be({ variable_cost_per_unit: 40 }).breakeven_units > be({}).breakeven_units, "breakeven units must rise as variable cost rises (margin shrinks)");
+  assert.ok(Math.abs(be({}).breakeven_units - 10000 / (50 - 30)) < 1e-9, "breakeven units = fixed / (price - variable)");
+  assert.ok(sl({ cost: 20000 }).annual_depreciation > sl({}).annual_depreciation, "annual depreciation must rise with cost basis");
+  assert.ok(sl({ salvage: 5000 }).annual_depreciation < sl({}).annual_depreciation, "annual depreciation must fall as salvage rises");
+  assert.ok(sl({ life_years: 10 }).annual_depreciation < sl({}).annual_depreciation, "annual depreciation must fall as the service life lengthens");
+  assert.ok(Math.abs(sl({}).annual_depreciation - (10000 - 1000) / 5) < 1e-9, "straight-line = (cost - salvage) / life");
+});

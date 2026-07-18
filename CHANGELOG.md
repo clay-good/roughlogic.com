@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(accounting): guard breakeven and straight-line depreciation with monotonicity; 2026-07-17
+
+- Whole-response guards: breakeven units = fixed / (price - variable) rise with fixed costs and variable cost, fall as
+  price (contribution margin) rises; straight-line annual = (cost - salvage) / life rises with cost, falls with salvage
+  and service life. Test-only.
+
 ### test(drainage): cross-check force-main velocity against plumbing pipe-velocity; 2026-07-17
 
 - Sibling-tell guard: the sewage force-main and plumbing pipe-velocity tiles share the 0.4085 continuity coefficient
