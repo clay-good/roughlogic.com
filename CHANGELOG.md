@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(powerquality): guard three-phase neutral current physics; 2026-07-17
+
+- Physical guards: In = sqrt(a^2+b^2+c^2-ab-bc-ca) is zero for a balanced load, equals the phase current for a
+  single-phase load, rises with imbalance; the triplen-harmonic neutral = 3 x avg-phase x triplen-fraction rises with
+  triplen content. Test-only.
+
 ### test(motor): guard synchronous speed/slip and shaft torque with monotonicity; 2026-07-17
 
 - Whole-response guards: synchronous speed = 120 f / poles rises as poles drop and falls at lower frequency; slip pct =

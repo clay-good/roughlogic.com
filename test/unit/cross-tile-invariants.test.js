@@ -12232,3 +12232,14 @@ test("monotonicity: motor synchronous speed/slip and shaft torque track their in
   assert.ok(st({ rpm: 3500 }).torque_lbft < st({}).torque_lbft, "shaft torque must fall as speed rises for fixed HP");
   assert.ok(Math.abs(st({}).torque_lbft - 5252 * 10 / 1750) < 1e-6, "T = 5252 * HP / RPM");
 });
+
+test("physical: three-phase neutral current is zero when balanced, equals the phase current when single-phase, and rises with imbalance and triplen content (powerquality)", async () => {
+  const p = await import("../../calc-powerquality.js");
+  const nc = (o) => p.computeNeutralCurrent3ph({ ia_A: 100, ib_A: 100, ic_A: 100, ...o });
+  assert.ok(Math.abs(nc({}).neutral_A - 0) < 1e-9, "a balanced linear load must carry zero fundamental neutral current");
+  assert.ok(Math.abs(nc({ ib_A: 0, ic_A: 0 }).neutral_A - 100) < 1e-9, "a single-phase load must return all of its current on the neutral");
+  assert.ok(Math.abs(nc({ ic_A: 0 }).neutral_A - 100) < 1e-9, "two equal phases and an open third give In = the phase current");
+  assert.ok(nc({ ic_A: 50 }).neutral_A > nc({}).neutral_A, "neutral current must rise as the load unbalances");
+  assert.ok(nc({ triplen_pct: 40 }).harmonic_neutral_A > nc({ triplen_pct: 20 }).harmonic_neutral_A, "harmonic neutral must rise with triplen content");
+  assert.ok(Math.abs(nc({ triplen_pct: 30 }).harmonic_neutral_A - 3 * 100 * 30 / 100) < 1e-9, "triplen neutral = 3 * avg phase * triplen fraction");
+});
