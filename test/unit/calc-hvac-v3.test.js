@@ -360,3 +360,28 @@ test("NPSHa: at sea level, 60 F H_atm ~ 33.95 ft", () => {
   const r = computeNPSHa({ elevation_ft: 0, water_temp_F: 60, source_elevation_relative_ft: 0, friction_loss_ft: 0, npsh_required_ft: null });
   assert.ok(close(r.H_atm_ft, 29.92 * 1.133, 0.1));
 });
+
+// Ordering invariant over the hydronic baseboard output table that backs
+// baseboard-length-for-load: for each product, heat output (btu/ft) rises with
+// water temperature, and the high-capacity product outputs at least as much as
+// the slant-fin baseline at every temperature. A transcription error would
+// missize the baseboard run; the per-value fixtures do not cover the whole curve.
+test("baseboard output table: btu/ft rises with water temperature and high-capacity >= baseline", async () => {
+  const m = await import("../../calc-hvac.js");
+  const B = m.BASEBOARD_OUTPUT;
+  for (const [prod, d] of Object.entries(B)) {
+    const p = d.points;
+    assert.ok(Array.isArray(p) && p.length >= 3, `${prod} points too short`);
+    for (let i = 1; i < p.length; i++) {
+      assert.ok(p[i].water_F > p[i - 1].water_F, `${prod} water_F not increasing at ${i}`);
+      assert.ok(p[i].btu_per_ft > p[i - 1].btu_per_ft, `${prod} btu/ft not increasing at ${p[i].water_F} F`);
+    }
+  }
+  const base = B.slant_fin_baseline.points, hi = B.high_capacity.points;
+  assert.equal(base.length, hi.length, "baseboard product curves have different length");
+  for (let i = 0; i < base.length; i++) {
+    assert.equal(hi[i].water_F, base[i].water_F, `baseboard temperature mismatch at ${i}`);
+    assert.ok(hi[i].btu_per_ft >= base[i].btu_per_ft,
+      `high-capacity baseboard outputs less than baseline at ${base[i].water_F} F: ${hi[i].btu_per_ft} < ${base[i].btu_per_ft}`);
+  }
+});

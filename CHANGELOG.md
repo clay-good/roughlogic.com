@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(hvac): guard the hydronic baseboard output table (temperature monotonicity + product ordering); 2026-07-17
+
+- Added an ordering invariant over BASEBOARD_OUTPUT (backs baseboard-length-for-load): heat output rises with water
+  temperature for each product, and the high-capacity product outputs at least as much as the slant-fin baseline at every
+  temperature. A transcription error would missize the baseboard run, a class the per-value fixtures do not cover. Test-only.
+
 ### test(plumbing): guard the Hunter's-curve and PDI water-hammer-arrestor demand tables; 2026-07-17
 
 - Added ordering invariants over HUNTERS_CURVE (WSFU -> gpm probable demand, both columns strictly increasing -- it drives
