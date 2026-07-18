@@ -220,6 +220,7 @@ export const COMPUTE_MAP = {
   "ev-charger-load": { module: "../../calc-solar.js", fn: "computeEvChargerLoad" },
   "ev-charge-time": { module: "../../calc-solar.js", fn: "computeEvChargeTime" },
   "ev-range-per-hour": { module: "../../calc-solar.js", fn: "computeEvRangePerHour" },
+  "battery-series-parallel": { module: "../../calc-solar.js", fn: "computeBatterySeriesParallel" },
   "ev-charge-cost": { module: "../../calc-solar.js", fn: "computeEvChargeCost" },
   "ev-dcfc-time": { module: "../../calc-solar.js", fn: "computeEvDcfcTime" },
   "solar-egc-690-45": { module: "../../calc-solar.js", fn: "computeSolarEgc69045" },

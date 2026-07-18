@@ -3788,6 +3788,78 @@
    }
   },
   {
+   "tile_id": "battery-series-parallel",
+   "source_publisher": "Battery bank series/parallel configuration",
+   "source_title": "48 V bus, 12.8 V / 100 Ah LFP, 2 parallel, 80% DoD -> 4S2P, 51.2 V, 200 Ah, 8.19 kWh",
+   "source_edition_or_year": "spec-v972 worked example (machine-verified)",
+   "source_section_or_page": "series = round(48/12.8) = 4; bus = 4*12.8 = 51.2; Ah = 2*100 = 200; usable = 4*2*12.8*100*0.8/1000 = 8.192",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "target_bus_v": 48,
+    "module_v": 12.8,
+    "module_ah": 100,
+    "parallel_strings": 2,
+    "depth_of_discharge": 0.8
+   },
+   "outputs": {
+    "series_count": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "actual_bus_v": {
+     "value": 51.2,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_ah": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "usable_kwh": {
+     "value": 8.192,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "battery-series-parallel",
+   "source_publisher": "Battery bank series/parallel configuration",
+   "source_title": "cross-check: a 24 V bus of 12 V lead-acid modules is 2S, and doubling parallel to 4 doubles capacity",
+   "source_edition_or_year": "spec-v972 worked example (machine-verified)",
+   "source_section_or_page": "series = round(24/12) = 2; bus = 24 V; Ah = 4*100 = 400",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "target_bus_v": 24,
+    "module_v": 12,
+    "module_ah": 100,
+    "parallel_strings": 4,
+    "depth_of_discharge": 0.5
+   },
+   "outputs": {
+    "series_count": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_ah": {
+     "value": 400,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "off-grid-battery",
    "source_publisher": "IEEE",
    "source_title": "IEEE 1013 lead-acid off-grid sizing: 2,400 Wh/day, 3 days autonomy, 50% DoD, 85% round-trip, 12 V",

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(solar): add battery-series-parallel tile (spec-v972); 2026-07-18
+
+- New Group A tile `battery-series-parallel` (Battery Bank Series/Parallel Configuration) in calc-solar.js. Series adds
+  voltage, parallel adds capacity: series = round(target bus V / module V); bus = series x module V; total Ah = parallel
+  x module Ah; usable kWh = series x parallel x V x Ah x DoD / 1000. A 48 V bus of 12.8 V / 100 Ah LFP, 2 parallel at
+  80% DoD = 4S2P, 51.2 V, 200 Ah, 8.19 kWh. Never mix chemistry/age/capacity; NEC 706 and the BMS govern. Home count
+  1,420 -> 1,421.
+
 ### feat(water): add dechlorination-dose tile (spec-v971); 2026-07-18
 
 - New Group M tile `dechlorination-dose` (Dechlorination Chemical Dose) in calc-water.js. reagent dose (mg/L) = stoich

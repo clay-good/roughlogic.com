@@ -28016,3 +28016,27 @@ test("bounds: spec-v971 computeDechlorinationDose pins the reagent dose and feed
   assert.ok("error" in _v971({ chlorine_residual_mg_l: 2, flow_mgd: 5, stoich_ratio: 1.46, purity_pct: 150 }));
   assert.ok("error" in _v971({ chlorine_residual_mg_l: Infinity, flow_mgd: 5, stoich_ratio: 1.46, purity_pct: 100 }));
 });
+
+import { computeBatterySeriesParallel as _v972 } from "../../calc-solar.js";
+
+test("bounds: spec-v972 computeBatterySeriesParallel pins the series/parallel config and error seams", () => {
+  const r = _v972({ target_bus_v: 48, module_v: 12.8, module_ah: 100, parallel_strings: 2, depth_of_discharge: 0.8 });
+  assert.equal(r.series_count, 4); // round(48/12.8)=round(3.75)=4
+  assert.ok(Math.abs(r.actual_bus_v - 51.2) < 1e-9);
+  assert.ok(Math.abs(r.total_ah - 200) < 1e-9);
+  assert.ok(Math.abs(r.usable_kwh - 8.192) < 1e-4); // 4*2*12.8*100*0.8/1000
+  // 24 V bus of 12 V modules is 2S; parallel scales capacity.
+  const pb = _v972({ target_bus_v: 24, module_v: 12, module_ah: 100, parallel_strings: 4, depth_of_discharge: 0.5 });
+  assert.equal(pb.series_count, 2);
+  assert.ok(Math.abs(pb.total_ah - 400) < 1e-9);
+  // Parallel and DoD scale usable energy linearly.
+  assert.ok(Math.abs(_v972({ target_bus_v: 48, module_v: 12.8, module_ah: 100, parallel_strings: 4, depth_of_discharge: 0.8 }).usable_kwh - 2 * r.usable_kwh) < 1e-6);
+  // Series count is at least 1 (never zero).
+  assert.ok(_v972({ target_bus_v: 5, module_v: 12.8, module_ah: 100, parallel_strings: 1, depth_of_discharge: 0.8 }).series_count >= 1);
+  // Error seams: non-positive bus / module V / Ah, parallel < 1, DoD out of (0,1], non-finite.
+  assert.ok("error" in _v972({ target_bus_v: 0, module_v: 12.8, module_ah: 100, parallel_strings: 2, depth_of_discharge: 0.8 }));
+  assert.ok("error" in _v972({ target_bus_v: 48, module_v: 0, module_ah: 100, parallel_strings: 2, depth_of_discharge: 0.8 }));
+  assert.ok("error" in _v972({ target_bus_v: 48, module_v: 12.8, module_ah: 100, parallel_strings: 0, depth_of_discharge: 0.8 }));
+  assert.ok("error" in _v972({ target_bus_v: 48, module_v: 12.8, module_ah: 100, parallel_strings: 2, depth_of_discharge: 1.5 }));
+  assert.ok("error" in _v972({ target_bus_v: Infinity, module_v: 12.8, module_ah: 100, parallel_strings: 2, depth_of_discharge: 0.8 }));
+});

@@ -1744,3 +1744,63 @@ function _v968renderEvRangePerHour(inputRegion, outputRegion, citationEl) {
   for (const f of [pw, ef, ve, tr]) f.input.addEventListener("input", update);
 }
 SOLAR_RENDERERS["ev-range-per-hour"] = _v968renderEvRangePerHour;
+
+// ===================== spec-v972: battery bank series/parallel configuration =====================
+// dims: in { args: dimensionless } out: { series_count: dimensionless, actual_bus_v: dimensionless, total_ah: dimensionless, usable_kwh: dimensionless }
+export function computeBatterySeriesParallel({ target_bus_v = 48, module_v = 12.8, module_ah = 100, parallel_strings = 2, depth_of_discharge = 0.8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(target_bus_v > 0)) return { error: "Target bus voltage must be positive (V)." };
+  if (!(module_v > 0)) return { error: "Module nominal voltage must be positive (V)." };
+  if (!(module_ah > 0)) return { error: "Module capacity must be positive (Ah)." };
+  if (!(parallel_strings >= 1)) return { error: "Parallel strings must be at least 1." };
+  if (!(depth_of_discharge > 0 && depth_of_discharge <= 1)) return { error: "Depth of discharge must be between 0 and 1." };
+  // Series sets the bus voltage; parallel sets the capacity. Round the series count to the nearest whole module.
+  const np = Math.round(parallel_strings);
+  const series_count = Math.max(1, Math.round(target_bus_v / module_v));
+  const actual_bus_v = series_count * module_v;
+  const total_ah = np * module_ah;
+  const usable_kwh = series_count * np * module_v * module_ah * depth_of_discharge / 1000;
+  if (![actual_bus_v, total_ah, usable_kwh].every(Number.isFinite)) return { error: "Battery-configuration math is not a finite value." };
+  return {
+    series_count,
+    parallel_count: np,
+    actual_bus_v,
+    total_ah,
+    usable_kwh,
+    note: "The series/parallel wiring of a battery bank: modules in SERIES add their voltages to make the bus voltage, modules in PARALLEL add their amp-hours to make the capacity. The series count is the target bus voltage divided by the module's nominal voltage, rounded to a whole module: four 12.8 V LFP modules in series make a 51.2 V (nominal 48 V) bus, and putting two such strings in parallel gives 200 Ah. The usable energy is series x parallel x module V x module Ah x depth-of-discharge / 1000: this 4S2P bank of 12.8 V / 100 Ah LFP at 80% DoD is 8.19 kWh usable. Note the actual bus voltage lands on the module's nominal (51.2 V here), not exactly the 48 V system label, and a real design must respect the battery/BMS/inverter voltage window and never mix chemistries, ages, or capacities on the same bus. LFP nominal is ~12.8 V/module at ~80% usable DoD; flooded lead-acid is ~12.0 V at ~50%. A configuration aid; the battery and BMS manufacturer's series/parallel limits, the inverter's voltage range, and NEC 706 govern the actual bank.",
+  };
+}
+
+export const batterySeriesParallelExample = { inputs: { target_bus_v: 48, module_v: 12.8, module_ah: 100, parallel_strings: 2, depth_of_discharge: 0.8 } };
+
+function _v972renderBatterySeriesParallel(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: battery bank series/parallel configuration, by name. series = round(target bus V / module V); bus = series x module V; total Ah = parallel x module Ah; usable kWh = series x parallel x V x Ah x DoD / 1000. LFP ~12.8 V/80% DoD, flooded lead-acid ~12.0 V/50%. The battery/BMS series-parallel limits, the inverter voltage window, and NEC 706 govern.";
+  const tv = makeNumber("Target bus voltage (V)", "bsp-tv", { step: "any", min: "0", value: "48" });
+  tv.input.value = "48";
+  const mv = makeNumber("Module nominal voltage (V)", "bsp-mv", { step: "any", min: "0", value: "12.8" });
+  mv.input.value = "12.8";
+  const ma = makeNumber("Module capacity (Ah)", "bsp-ma", { step: "any", min: "0", value: "100" });
+  ma.input.value = "100";
+  const ps = makeNumber("Parallel strings", "bsp-ps", { step: "1", min: "1", value: "2" });
+  ps.input.value = "2";
+  const dd = makeNumber("Depth of discharge (0-1)", "bsp-dd", { step: "any", min: "0", value: "0.8" });
+  dd.input.value = "0.8";
+  for (const f of [tv, mv, ma, ps, dd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { tv.input.value = "48"; mv.input.value = "12.8"; ma.input.value = "100"; ps.input.value = "2"; dd.input.value = "0.8"; update(); });
+  const oC = makeOutputLine(outputRegion, "Configuration", "bsp-out-c");
+  const oB = makeOutputLine(outputRegion, "Bus voltage / capacity", "bsp-out-b");
+  const oE = makeOutputLine(outputRegion, "Usable energy", "bsp-out-e");
+  const update = debounce(() => {
+    const r = computeBatterySeriesParallel({
+      target_bus_v: tv.input.value === "" ? 48 : Number(tv.input.value), module_v: mv.input.value === "" ? 12.8 : Number(mv.input.value),
+      module_ah: ma.input.value === "" ? 100 : Number(ma.input.value), parallel_strings: ps.input.value === "" ? 2 : Number(ps.input.value),
+      depth_of_discharge: dd.input.value === "" ? 0.8 : Number(dd.input.value),
+    });
+    if (r.error) { oC.textContent = r.error; oB.textContent = "-"; oE.textContent = "-"; return; }
+    oC.textContent = r.series_count + "S" + r.parallel_count + "P";
+    oB.textContent = fmt(r.actual_bus_v, 1) + " V bus, " + fmt(r.total_ah, 0) + " Ah";
+    oE.textContent = fmt(r.usable_kwh, 2) + " kWh usable";
+  }, DEBOUNCE_MS);
+  for (const f of [tv, mv, ma, ps, dd]) f.input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["battery-series-parallel"] = _v972renderBatterySeriesParallel;

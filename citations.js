@@ -2550,6 +2550,17 @@ export const CITATIONS = {
     ],
   },
 
+  "battery-series-parallel": {
+    formula: "series_count = max(1, round(target_bus_v / module_v)); actual_bus_v = series_count x module_v; total_ah = parallel x module_ah; usable_kwh = series_count x parallel x module_v x module_ah x DoD / 1000.",
+    edition: "Battery bank series/parallel configuration (series adds voltage, parallel adds capacity), by name; the battery/BMS series-parallel limits, the inverter voltage window, and NEC 706 govern.",
+    freeAccess: "The series/parallel relations are public electrical first-principles; the module voltage, capacity, target bus, string count, and depth of discharge are the design and product values.",
+    governance: GOVERNANCE.general,
+    editionNote: "Wiring a battery bank trades off voltage against capacity. Cells or modules wired in SERIES add their voltages while sharing the same current, so the series count sets the bus voltage; modules wired in PARALLEL share the voltage while adding their currents, so the parallel count sets the capacity. The number of modules in a string is the target bus voltage divided by the module's nominal voltage, rounded to a whole module: four 12.8 V lithium-iron-phosphate (LFP) modules in series make a 51.2 V bus (the nominal '48 V' system), and putting two of those strings in parallel yields 200 Ah. The usable energy is the whole array multiplied out and derated for depth of discharge: series x parallel x module voltage x module amp-hours x DoD / 1000 kWh, so this 4-series, 2-parallel bank of 12.8 V / 100 Ah LFP at 80% DoD is 8.19 kWh usable. Two practical cautions: the ACTUAL bus voltage lands on a multiple of the module's nominal (51.2 V here, not exactly the 48 V label), which must fall inside the inverter's and charge controller's operating window; and modules on a common bus must be matched -- never mix chemistries, ages, or capacities, since the weakest module limits and can be damaged by the others. Chemistry sets the two key numbers: LFP is about 12.8 V nominal per module with roughly 80% usable depth of discharge, while flooded lead-acid is about 12.0 V at roughly 50% DoD. A configuration aid; the battery and BMS manufacturer's allowed series and parallel counts, the inverter/charger voltage range, and NEC Article 706 (energy storage systems) govern the actual bank.",
+    assumptions: [
+      { name: "Series voltage, parallel capacity", value: "series = round(target bus / module V), bus = series x module V; total Ah = parallel x module Ah; usable kWh = series x parallel x V x Ah x DoD / 1000", source: "battery-bank electrical first-principles" },
+      { name: "Match and limits", value: "actual bus is a module-nominal multiple (must fit the inverter window); never mix chemistry/age/capacity; LFP ~12.8 V/80% DoD, flooded lead-acid ~12.0 V/50%; NEC 706 and the BMS govern", source: "manufacturer / NEC 706" },
+    ],
+  },
   "off-grid-battery": {
     formula: "usable_Wh = daily_Wh * days_autonomy; nameplate_Wh = usable_Wh / (DoD * round_trip_efficiency * temperature_derate); nameplate_Ah = nameplate_Wh / system_V.",
     edition: "IEEE 1013 (Sizing Lead-Acid Batteries for Stand-Alone PV Systems); IEEE 1561 (PV / Hybrid Power Systems).",

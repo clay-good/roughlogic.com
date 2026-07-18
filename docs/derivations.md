@@ -2861,6 +2861,7 @@ cross-check.
 | calc-solar.js | `computeBatteryCRate` | `{ nameplate_kwh = 0, c_rate = 0.5, dod = 0.90, inverter_kw = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computeBatteryPeakShaving` | `{ nameplate_kwh = 0, dod = 0.90, event_duration_h = 0, target_shave_kw = 0, d...` | _ | _ | _ |
 | calc-solar.js | `computeBatteryRuntime` | `{ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1 }` | _ | _ | _ |
+| calc-solar.js | `computeBatterySeriesParallel` | `{ target_bus_v = 48, module_v = 12.8, module_ah = 100, parallel_strings = 2, ...` | _ | _ | _ |
 | calc-solar.js | `computeBatteryTouArbitrage` | `{ nameplate_kwh = 0, dod = 0.90, rte = 0.86, peak_price = 0, offpeak_price = ...` | _ | _ | _ |
 | calc-solar.js | `computeDcShuntSizing` | `{ rated_current_a = 100, rated_millivolt = 50, measured_millivolt = 25 } = {}` | _ | _ | _ |
 | calc-solar.js | `computeEvChargeCost` | `{ battery_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, electrici...` | _ | _ | _ |
@@ -3081,7 +3082,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1667.
+Row count: 1668.
 
 <!-- END function-corpus-v14 -->
 
@@ -3162,7 +3163,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (190 tiles)
+### Group A Electrical (191 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3176,6 +3177,7 @@ per spec-v14 §13.1 second paragraph.
 | `battery-inverter-dc-conductor` | Battery-to-Inverter DC Conductor and OCPD (NEC 690.9 / 706) | battery-inverter DC sizing (NEC 690.8...; I_dc = 4000/(48*0.90) = 92.59; 1.25x = 115.74; next std O... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `battery-peak-shaving` | Battery Peak-Shaving Demand-Charge Savings | Demand-charge peak-shaving method; spec-v237 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `battery-runtime` | Battery Runtime | Project (first-principles); 100 Ah * 0.80 * 12 V = 960 Wh; 960 Wh / 120 W = 8 h | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `battery-series-parallel` | Battery Bank Series/Parallel Configuration | Battery bank series/parallel configur...; series = round(48/12.8) = 4; bus = 4*12.8 = 51.2; Ah = 2*... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `battery-tou-arbitrage` | Battery Time-of-Use Arbitrage Value | NREL battery round-trip / arbitrage v...; spec-v236 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `battery-vent-max-current` | Battery Room Max Charge Current from Available Airflow | IEEE 1635 battery-room hydrogen venti...; spec-v666 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bends-between-pulls` | Conduit Bends Between Pull Points (360-Degree Rule) | NEC 2023 (NFPA 70); 90 + 90 + 45 + 45 = 270 deg; 270/90 = 3.0 quarter bends, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4687,6 +4689,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1420. Fixture-covered or reference-cadence: 1420 / 1420.
+Tile count: 1421. Fixture-covered or reference-cadence: 1421 / 1421.
 
 <!-- END tile-index-v14 -->
