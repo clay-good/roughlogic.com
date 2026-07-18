@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(edu): guard quadratic roots against Vieta and confidence-interval width; 2026-07-17
+
+- Self-consistency guards: each quadratic root satisfies a x^2 + b x + c = 0 with sum = -b/a and product = c/a (Vieta),
+  discriminant = b^2-4ac, vertex x = -b/2a; the confidence interval SE = sd/sqrt(n) shrinks with n (quartering n halves
+  SE), grows with sd and confidence, width = 2 x margin, centered on the mean. Test-only.
+
 ### test(finish): guard flat-glass weight and attic-ventilation NFA with monotonicity; 2026-07-17
 
 - Whole-response guards: glass weight = 13.0 x thickness x area rises with thickness/width/panes and doubles when

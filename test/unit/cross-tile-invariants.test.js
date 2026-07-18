@@ -12329,3 +12329,21 @@ test("monotonicity: flat-glass weight and attic ventilation NFA track their inpu
   assert.ok(Math.abs(at({}).intake_sqin - at({}).exhaust_sqin) < 1e-9, "intake and exhaust must split the net free area evenly");
   assert.ok(Math.abs(at({}).nfa_sqin - 1200 / 150 * 144) < 1e-6, "NFA (sq in) = floor area / 150 * 144");
 });
+
+test("self-consistency: quadratic roots satisfy Vieta and the confidence interval narrows correctly (edu)", async () => {
+  const e = await import("../../calc-edu.js");
+  const q = e.computeQuadratic({ a: 1, b: -5, c: 6 });
+  for (const r of q.roots) assert.ok(Math.abs(1 * r * r - 5 * r + 6) < 1e-9, "each root must satisfy a*x^2 + b*x + c = 0");
+  assert.ok(Math.abs((q.roots[0] + q.roots[1]) - 5) < 1e-9, "sum of roots must equal -b/a (Vieta)");
+  assert.ok(Math.abs((q.roots[0] * q.roots[1]) - 6) < 1e-9, "product of roots must equal c/a (Vieta)");
+  assert.ok(Math.abs(q.discriminant - 1) < 1e-9, "discriminant = b^2 - 4ac");
+  assert.ok(Math.abs(q.vertex_x - 2.5) < 1e-9, "vertex x = -b/(2a)");
+  const ci = (o) => e.computeConfidenceInterval({ mode: "mean", mean: 100, sd: 15, n: 36, confidence_pct: 95, ...o });
+  assert.ok(Math.abs(ci({}).standard_error - 15 / 6) < 1e-9, "standard error = sd / sqrt(n)");
+  assert.ok(ci({ n: 144 }).margin_of_error < ci({}).margin_of_error, "margin must shrink with a larger sample");
+  assert.ok(ci({ sd: 30 }).margin_of_error > ci({}).margin_of_error, "margin must grow with a larger standard deviation");
+  assert.ok(ci({ confidence_pct: 99 }).margin_of_error > ci({}).margin_of_error, "margin must grow with a higher confidence level");
+  assert.ok(Math.abs(ci({}).standard_error / ci({ n: 144 }).standard_error - 2) < 1e-9, "quadrupling n must halve the standard error");
+  assert.ok(Math.abs((ci({}).upper_bound - ci({}).lower_bound) - 2 * ci({}).margin_of_error) < 1e-9, "interval width = 2 * margin");
+  assert.ok(Math.abs(ci({}).point_estimate - 100) < 1e-9, "the interval must be centered on the sample mean");
+});
