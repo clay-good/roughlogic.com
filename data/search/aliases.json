@@ -91755,6 +91755,1196 @@
       "term": "sprinkler zone flow for inches per hour",
       "target": "sprinkler-gpm-for-precip",
       "kind": "question"
+    },
+    {
+      "term": "how much shotcrete to order with rebound",
+      "target": "shotcrete-rebound-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "gunite yards accounting for rebound",
+      "target": "shotcrete-rebound-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "shotcrete order quantity",
+      "target": "shotcrete-rebound-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "how much gunite for a wall",
+      "target": "shotcrete-rebound-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "shotcrete cubic yards with waste",
+      "target": "shotcrete-rebound-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "how fast can a paver go",
+      "target": "asphalt-paving-speed",
+      "kind": "question"
+    },
+    {
+      "term": "asphalt tons per hour a paver lays",
+      "target": "asphalt-paving-speed",
+      "kind": "question"
+    },
+    {
+      "term": "how much asphalt can we lay in a day",
+      "target": "asphalt-paving-speed",
+      "kind": "question"
+    },
+    {
+      "term": "paving speed for a screed width",
+      "target": "asphalt-paving-speed",
+      "kind": "question"
+    },
+    {
+      "term": "how much tack coat to order",
+      "target": "asphalt-tack-coat-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "emulsion gallons for a tack coat",
+      "target": "asphalt-tack-coat-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "prime coat quantity",
+      "target": "asphalt-tack-coat-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "tack coat gallons per square yard",
+      "target": "asphalt-tack-coat-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "how much emulsion for a prime coat",
+      "target": "asphalt-tack-coat-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "how many yards in a stockpile",
+      "target": "stockpile-volume",
+      "kind": "question"
+    },
+    {
+      "term": "conical stockpile volume",
+      "target": "stockpile-volume",
+      "kind": "question"
+    },
+    {
+      "term": "tonnage of a gravel pile",
+      "target": "stockpile-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how much material in a cone pile",
+      "target": "stockpile-volume",
+      "kind": "question"
+    },
+    {
+      "term": "stockpile volume from diameter",
+      "target": "stockpile-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how much strip is left on a coil",
+      "target": "coil-length",
+      "kind": "question"
+    },
+    {
+      "term": "length of stock on a roll",
+      "target": "coil-length",
+      "kind": "question"
+    },
+    {
+      "term": "coil footage without unrolling",
+      "target": "coil-length",
+      "kind": "question"
+    },
+    {
+      "term": "feet of material on a coil",
+      "target": "coil-length",
+      "kind": "question"
+    },
+    {
+      "term": "roll stock length from diameter",
+      "target": "coil-length",
+      "kind": "question"
+    },
+    {
+      "term": "how fast does concrete rise in a form",
+      "target": "concrete-pour-rate",
+      "kind": "question"
+    },
+    {
+      "term": "rate of rise for a pour",
+      "target": "concrete-pour-rate",
+      "kind": "question"
+    },
+    {
+      "term": "placement rate for formwork pressure",
+      "target": "concrete-pour-rate",
+      "kind": "question"
+    },
+    {
+      "term": "how long to pour a wall",
+      "target": "concrete-pour-rate",
+      "kind": "question"
+    },
+    {
+      "term": "how many mesh sheets for a slab",
+      "target": "welded-wire-mesh",
+      "kind": "question"
+    },
+    {
+      "term": "welded wire reinforcement takeoff",
+      "target": "welded-wire-mesh",
+      "kind": "question"
+    },
+    {
+      "term": "wwf sheets with laps",
+      "target": "welded-wire-mesh",
+      "kind": "question"
+    },
+    {
+      "term": "how much mesh for a slab",
+      "target": "welded-wire-mesh",
+      "kind": "question"
+    },
+    {
+      "term": "welded wire mesh sheet count",
+      "target": "welded-wire-mesh",
+      "kind": "question"
+    },
+    {
+      "term": "what torque to reach helical pile capacity",
+      "target": "helical-pile-torque",
+      "kind": "question"
+    },
+    {
+      "term": "installation torque for a target capacity",
+      "target": "helical-pile-torque",
+      "kind": "question"
+    },
+    {
+      "term": "helical pile acceptance torque",
+      "target": "helical-pile-torque",
+      "kind": "question"
+    },
+    {
+      "term": "torque to confirm pile capacity",
+      "target": "helical-pile-torque",
+      "kind": "question"
+    },
+    {
+      "term": "how much torque for a screw pile",
+      "target": "helical-pile-torque",
+      "kind": "question"
+    },
+    {
+      "term": "safe speed for a banked curve",
+      "target": "superelevation-safe-curve-speed",
+      "kind": "question"
+    },
+    {
+      "term": "max speed from radius and superelevation",
+      "target": "superelevation-safe-curve-speed",
+      "kind": "question"
+    },
+    {
+      "term": "how fast around a curve",
+      "target": "superelevation-safe-curve-speed",
+      "kind": "question"
+    },
+    {
+      "term": "curve speed from bank and friction",
+      "target": "superelevation-safe-curve-speed",
+      "kind": "question"
+    },
+    {
+      "term": "safe curve speed from radius",
+      "target": "superelevation-safe-curve-speed",
+      "kind": "question"
+    },
+    {
+      "term": "weld length for an applied load",
+      "target": "groove-weld-length-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "how long a groove weld for a load",
+      "target": "groove-weld-length-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "groove weld length for force",
+      "target": "groove-weld-length-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "length of weld to carry a load",
+      "target": "groove-weld-length-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "weld length from load and throat",
+      "target": "groove-weld-length-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "wire feed speed for a deposition rate",
+      "target": "wire-feed-speed-for-deposition",
+      "kind": "question"
+    },
+    {
+      "term": "wfs for a target deposition",
+      "target": "wire-feed-speed-for-deposition",
+      "kind": "question"
+    },
+    {
+      "term": "feed speed to deposit pounds per hour",
+      "target": "wire-feed-speed-for-deposition",
+      "kind": "question"
+    },
+    {
+      "term": "how fast to feed wire for deposition",
+      "target": "wire-feed-speed-for-deposition",
+      "kind": "question"
+    },
+    {
+      "term": "wire speed for a deposit rate",
+      "target": "wire-feed-speed-for-deposition",
+      "kind": "question"
+    },
+    {
+      "term": "annual soil loss from a site",
+      "target": "rusle-soil-loss",
+      "kind": "question"
+    },
+    {
+      "term": "rusle soil loss tons per acre",
+      "target": "rusle-soil-loss",
+      "kind": "question"
+    },
+    {
+      "term": "how much soil erodes per year",
+      "target": "rusle-soil-loss",
+      "kind": "question"
+    },
+    {
+      "term": "erosion rate from rusle",
+      "target": "rusle-soil-loss",
+      "kind": "question"
+    },
+    {
+      "term": "soil loss for a disturbed site",
+      "target": "rusle-soil-loss",
+      "kind": "question"
+    },
+    {
+      "term": "what stone size to armor a channel",
+      "target": "riprap-d50",
+      "kind": "question"
+    },
+    {
+      "term": "riprap d50 for a velocity",
+      "target": "riprap-d50",
+      "kind": "question"
+    },
+    {
+      "term": "median stone size isbash",
+      "target": "riprap-d50",
+      "kind": "question"
+    },
+    {
+      "term": "riprap size for scour",
+      "target": "riprap-d50",
+      "kind": "question"
+    },
+    {
+      "term": "d50 to resist a velocity",
+      "target": "riprap-d50",
+      "kind": "question"
+    },
+    {
+      "term": "how much riprap to order",
+      "target": "riprap-tonnage",
+      "kind": "question"
+    },
+    {
+      "term": "tons of riprap for a layer",
+      "target": "riprap-tonnage",
+      "kind": "question"
+    },
+    {
+      "term": "riprap volume and tonnage",
+      "target": "riprap-tonnage",
+      "kind": "question"
+    },
+    {
+      "term": "stone tonnage for an outlet",
+      "target": "riprap-tonnage",
+      "kind": "question"
+    },
+    {
+      "term": "how many tons of rock for riprap",
+      "target": "riprap-tonnage",
+      "kind": "question"
+    },
+    {
+      "term": "how long a silt fence for the drainage area",
+      "target": "silt-fence-drainage",
+      "kind": "question"
+    },
+    {
+      "term": "silt fence length for acreage",
+      "target": "silt-fence-drainage",
+      "kind": "question"
+    },
+    {
+      "term": "is my silt fence long enough",
+      "target": "silt-fence-drainage",
+      "kind": "question"
+    },
+    {
+      "term": "silt fence drainage area check",
+      "target": "silt-fence-drainage",
+      "kind": "question"
+    },
+    {
+      "term": "length of silt fence per acre",
+      "target": "silt-fence-drainage",
+      "kind": "question"
+    },
+    {
+      "term": "spacing between check dams",
+      "target": "check-dam-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "rock check dam spacing in a swale",
+      "target": "check-dam-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "how far apart check dams",
+      "target": "check-dam-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "check dam spacing from slope",
+      "target": "check-dam-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "distance between check dams",
+      "target": "check-dam-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "sediment basin storage volume",
+      "target": "sediment-basin-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how big a sediment basin per acre",
+      "target": "sediment-basin-volume",
+      "kind": "question"
+    },
+    {
+      "term": "sediment trap volume required",
+      "target": "sediment-basin-volume",
+      "kind": "question"
+    },
+    {
+      "term": "settling storage for disturbed acres",
+      "target": "sediment-basin-volume",
+      "kind": "question"
+    },
+    {
+      "term": "sediment basin size",
+      "target": "sediment-basin-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how many erosion blanket rolls",
+      "target": "erosion-blanket-coverage",
+      "kind": "question"
+    },
+    {
+      "term": "recp rolls and staples for a slope",
+      "target": "erosion-blanket-coverage",
+      "kind": "question"
+    },
+    {
+      "term": "erosion control blanket takeoff",
+      "target": "erosion-blanket-coverage",
+      "kind": "question"
+    },
+    {
+      "term": "rolls of blanket for a slope",
+      "target": "erosion-blanket-coverage",
+      "kind": "question"
+    },
+    {
+      "term": "staples for erosion blanket",
+      "target": "erosion-blanket-coverage",
+      "kind": "question"
+    },
+    {
+      "term": "how much seed and mulch for hydroseed",
+      "target": "hydroseed-mix",
+      "kind": "question"
+    },
+    {
+      "term": "hydroseed slurry mix quantity",
+      "target": "hydroseed-mix",
+      "kind": "question"
+    },
+    {
+      "term": "tank loads for hydroseed",
+      "target": "hydroseed-mix",
+      "kind": "question"
+    },
+    {
+      "term": "hydroseed material for an area",
+      "target": "hydroseed-mix",
+      "kind": "question"
+    },
+    {
+      "term": "seed mulch tackifier for hydroseeding",
+      "target": "hydroseed-mix",
+      "kind": "question"
+    },
+    {
+      "term": "stone for a construction entrance",
+      "target": "rock-construction-entrance",
+      "kind": "question"
+    },
+    {
+      "term": "how much rock for a stabilized entrance",
+      "target": "rock-construction-entrance",
+      "kind": "question"
+    },
+    {
+      "term": "construction entrance stone tonnage",
+      "target": "rock-construction-entrance",
+      "kind": "question"
+    },
+    {
+      "term": "coarse stone for a site entrance",
+      "target": "rock-construction-entrance",
+      "kind": "question"
+    },
+    {
+      "term": "will a buried pipe float",
+      "target": "pipe-flotation",
+      "kind": "question"
+    },
+    {
+      "term": "pipe flotation check",
+      "target": "pipe-flotation",
+      "kind": "question"
+    },
+    {
+      "term": "anti-flotation backfill for a pipe",
+      "target": "pipe-flotation",
+      "kind": "question"
+    },
+    {
+      "term": "empty pipe uplift in a flooded trench",
+      "target": "pipe-flotation",
+      "kind": "question"
+    },
+    {
+      "term": "does my pipe need anti-flotation",
+      "target": "pipe-flotation",
+      "kind": "question"
+    },
+    {
+      "term": "restrained joint length at a bend",
+      "target": "restrained-pipe-length",
+      "kind": "question"
+    },
+    {
+      "term": "how much restrained pipe at a bend",
+      "target": "restrained-pipe-length",
+      "kind": "question"
+    },
+    {
+      "term": "restrained length instead of a thrust block",
+      "target": "restrained-pipe-length",
+      "kind": "question"
+    },
+    {
+      "term": "length of restrained pipe each side of a bend",
+      "target": "restrained-pipe-length",
+      "kind": "question"
+    },
+    {
+      "term": "restrained pipe for thrust",
+      "target": "restrained-pipe-length",
+      "kind": "question"
+    },
+    {
+      "term": "hdd pullback force estimate",
+      "target": "hdd-pullback",
+      "kind": "question"
+    },
+    {
+      "term": "pullback force for a directional bore",
+      "target": "hdd-pullback",
+      "kind": "question"
+    },
+    {
+      "term": "how much force to pull back hdd",
+      "target": "hdd-pullback",
+      "kind": "question"
+    },
+    {
+      "term": "product pipe pullback force",
+      "target": "hdd-pullback",
+      "kind": "question"
+    },
+    {
+      "term": "directional drill pullback",
+      "target": "hdd-pullback",
+      "kind": "question"
+    },
+    {
+      "term": "how much water for dust control",
+      "target": "dust-control-water",
+      "kind": "question"
+    },
+    {
+      "term": "water truck gallons for a haul road",
+      "target": "dust-control-water",
+      "kind": "question"
+    },
+    {
+      "term": "dust control watering volume",
+      "target": "dust-control-water",
+      "kind": "question"
+    },
+    {
+      "term": "water truck trips for dust",
+      "target": "dust-control-water",
+      "kind": "question"
+    },
+    {
+      "term": "gallons to keep dust down",
+      "target": "dust-control-water",
+      "kind": "question"
+    },
+    {
+      "term": "haul road total resistance",
+      "target": "haul-road-resistance",
+      "kind": "question"
+    },
+    {
+      "term": "rimpull to climb a grade",
+      "target": "haul-road-resistance",
+      "kind": "question"
+    },
+    {
+      "term": "resistance a loaded hauler fights",
+      "target": "haul-road-resistance",
+      "kind": "question"
+    },
+    {
+      "term": "required rimpull for a haul road",
+      "target": "haul-road-resistance",
+      "kind": "question"
+    },
+    {
+      "term": "grade and rolling resistance for a truck",
+      "target": "haul-road-resistance",
+      "kind": "question"
+    },
+    {
+      "term": "how many dump truck loads",
+      "target": "dump-truck-loads",
+      "kind": "question"
+    },
+    {
+      "term": "dump truck payload weight or volume limited",
+      "target": "dump-truck-loads",
+      "kind": "question"
+    },
+    {
+      "term": "truck load count for a job",
+      "target": "dump-truck-loads",
+      "kind": "question"
+    },
+    {
+      "term": "governing payload for a dump truck",
+      "target": "dump-truck-loads",
+      "kind": "question"
+    },
+    {
+      "term": "loads to haul material",
+      "target": "dump-truck-loads",
+      "kind": "question"
+    },
+    {
+      "term": "earthwork unit cost per yard",
+      "target": "unit-cost-earthwork",
+      "kind": "question"
+    },
+    {
+      "term": "dollars per cubic yard earthwork",
+      "target": "unit-cost-earthwork",
+      "kind": "question"
+    },
+    {
+      "term": "unit cost from equipment and production",
+      "target": "unit-cost-earthwork",
+      "kind": "question"
+    },
+    {
+      "term": "cost per cy to move dirt",
+      "target": "unit-cost-earthwork",
+      "kind": "question"
+    },
+    {
+      "term": "earthwork production unit cost",
+      "target": "unit-cost-earthwork",
+      "kind": "question"
+    },
+    {
+      "term": "lime or cement for subgrade stabilization",
+      "target": "soil-stabilization-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "tons of cement for stabilization",
+      "target": "soil-stabilization-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "spread rate for lime stabilization",
+      "target": "soil-stabilization-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "how much cement to stabilize subgrade",
+      "target": "soil-stabilization-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "how much will a buried plastic pipe deflect",
+      "target": "flexible-pipe-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "flexible pipe deflection modified iowa",
+      "target": "flexible-pipe-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "pipe ovaling under soil load",
+      "target": "flexible-pipe-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "deflection of a buried flexible pipe",
+      "target": "flexible-pipe-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "will my pipe oval too much",
+      "target": "flexible-pipe-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "pounds per square yard of asphalt",
+      "target": "asphalt-spread-rate",
+      "kind": "question"
+    },
+    {
+      "term": "yield check for a paving mat",
+      "target": "asphalt-spread-rate",
+      "kind": "question"
+    },
+    {
+      "term": "spread rate for a mat thickness",
+      "target": "asphalt-spread-rate",
+      "kind": "question"
+    },
+    {
+      "term": "square yards per ton of asphalt",
+      "target": "asphalt-spread-rate",
+      "kind": "question"
+    },
+    {
+      "term": "cold planer production rate",
+      "target": "pavement-milling-production",
+      "kind": "question"
+    },
+    {
+      "term": "milling square yards per hour",
+      "target": "pavement-milling-production",
+      "kind": "question"
+    },
+    {
+      "term": "rap tonnage from milling",
+      "target": "pavement-milling-production",
+      "kind": "question"
+    },
+    {
+      "term": "how much can a milling machine cut",
+      "target": "pavement-milling-production",
+      "kind": "question"
+    },
+    {
+      "term": "pavement milling production",
+      "target": "pavement-milling-production",
+      "kind": "question"
+    },
+    {
+      "term": "how much paint for pavement markings",
+      "target": "striping-paint-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "striping paint and glass bead quantity",
+      "target": "striping-paint-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "paint gallons for a stripe run",
+      "target": "striping-paint-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "pavement marking paint quantity",
+      "target": "striping-paint-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "glass beads for striping",
+      "target": "striping-paint-quantity",
+      "kind": "question"
+    },
+    {
+      "term": "how long a merging taper",
+      "target": "traffic-taper-length",
+      "kind": "question"
+    },
+    {
+      "term": "channelizing devices for a taper",
+      "target": "traffic-taper-length",
+      "kind": "question"
+    },
+    {
+      "term": "mutcd taper length for a lane closure",
+      "target": "traffic-taper-length",
+      "kind": "question"
+    },
+    {
+      "term": "taper length for a work zone",
+      "target": "traffic-taper-length",
+      "kind": "question"
+    },
+    {
+      "term": "how much siding for a wall",
+      "target": "siding-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "siding squares takeoff",
+      "target": "siding-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "lap siding linear footage",
+      "target": "siding-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "siding material after openings",
+      "target": "siding-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "squares of siding with waste",
+      "target": "siding-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "how many bags of stucco",
+      "target": "stucco-coverage",
+      "kind": "question"
+    },
+    {
+      "term": "portland cement plaster takeoff",
+      "target": "stucco-coverage",
+      "kind": "question"
+    },
+    {
+      "term": "stucco material for a wall",
+      "target": "stucco-coverage",
+      "kind": "question"
+    },
+    {
+      "term": "bags of stucco for an area",
+      "target": "stucco-coverage",
+      "kind": "question"
+    },
+    {
+      "term": "stucco coverage per bag",
+      "target": "stucco-coverage",
+      "kind": "question"
+    },
+    {
+      "term": "under slab vapor barrier rolls",
+      "target": "vapor-barrier-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "how much poly for a slab",
+      "target": "vapor-barrier-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "vapor barrier and seam tape takeoff",
+      "target": "vapor-barrier-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "rolls of vapor barrier for a slab",
+      "target": "vapor-barrier-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "seam tape for a vapor barrier",
+      "target": "vapor-barrier-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "control joint saw cut footage",
+      "target": "concrete-sawcut-footage",
+      "kind": "question"
+    },
+    {
+      "term": "how many feet of saw cutting for joints",
+      "target": "concrete-sawcut-footage",
+      "kind": "question"
+    },
+    {
+      "term": "concrete control joint layout footage",
+      "target": "concrete-sawcut-footage",
+      "kind": "question"
+    },
+    {
+      "term": "saw cut linear feet for a slab",
+      "target": "concrete-sawcut-footage",
+      "kind": "question"
+    },
+    {
+      "term": "joint footage for a control grid",
+      "target": "concrete-sawcut-footage",
+      "kind": "question"
+    },
+    {
+      "term": "how many joist hangers",
+      "target": "joist-hanger-count",
+      "kind": "question"
+    },
+    {
+      "term": "joist hanger and nail count",
+      "target": "joist-hanger-count",
+      "kind": "question"
+    },
+    {
+      "term": "hangers for a joist run",
+      "target": "joist-hanger-count",
+      "kind": "question"
+    },
+    {
+      "term": "connector nails for hangers",
+      "target": "joist-hanger-count",
+      "kind": "question"
+    },
+    {
+      "term": "joist hanger takeoff",
+      "target": "joist-hanger-count",
+      "kind": "question"
+    },
+    {
+      "term": "how many drywall screws",
+      "target": "drywall-fastener-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "drywall fastener takeoff",
+      "target": "drywall-fastener-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "screws for a drywall job",
+      "target": "drywall-fastener-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "drywall screw count",
+      "target": "drywall-fastener-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "screws per sheet of drywall",
+      "target": "drywall-fastener-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "how many suction cups to lift glass",
+      "target": "glass-vacuum-lift",
+      "kind": "question"
+    },
+    {
+      "term": "glass weight and lifter count",
+      "target": "glass-vacuum-lift",
+      "kind": "question"
+    },
+    {
+      "term": "vacuum cup count for glass",
+      "target": "glass-vacuum-lift",
+      "kind": "question"
+    },
+    {
+      "term": "how heavy is a glass lite",
+      "target": "glass-vacuum-lift",
+      "kind": "question"
+    },
+    {
+      "term": "suction lifters for a glass panel",
+      "target": "glass-vacuum-lift",
+      "kind": "question"
+    },
+    {
+      "term": "how many bags of polymeric sand",
+      "target": "polymeric-sand-bags",
+      "kind": "question"
+    },
+    {
+      "term": "polymeric joint sand bag count",
+      "target": "polymeric-sand-bags",
+      "kind": "question"
+    },
+    {
+      "term": "paver joint sand bags",
+      "target": "polymeric-sand-bags",
+      "kind": "question"
+    },
+    {
+      "term": "bags of poly sand for a patio",
+      "target": "polymeric-sand-bags",
+      "kind": "question"
+    },
+    {
+      "term": "polymeric sand for pavers",
+      "target": "polymeric-sand-bags",
+      "kind": "question"
+    },
+    {
+      "term": "how many rigid foam boards",
+      "target": "rigid-foam-board-count",
+      "kind": "question"
+    },
+    {
+      "term": "continuous insulation board count",
+      "target": "rigid-foam-board-count",
+      "kind": "question"
+    },
+    {
+      "term": "xps board count for a wall",
+      "target": "rigid-foam-board-count",
+      "kind": "question"
+    },
+    {
+      "term": "rigid insulation boards for an area",
+      "target": "rigid-foam-board-count",
+      "kind": "question"
+    },
+    {
+      "term": "foam board takeoff",
+      "target": "rigid-foam-board-count",
+      "kind": "question"
+    },
+    {
+      "term": "roof board fasteners by wind zone",
+      "target": "roof-insulation-fasteners",
+      "kind": "question"
+    },
+    {
+      "term": "fasteners and plates for roof insulation",
+      "target": "roof-insulation-fasteners",
+      "kind": "question"
+    },
+    {
+      "term": "how many fasteners for roof board",
+      "target": "roof-insulation-fasteners",
+      "kind": "question"
+    },
+    {
+      "term": "mechanically attached roof insulation fasteners",
+      "target": "roof-insulation-fasteners",
+      "kind": "question"
+    },
+    {
+      "term": "roof insulation plate count",
+      "target": "roof-insulation-fasteners",
+      "kind": "question"
+    },
+    {
+      "term": "how many rolls of housewrap",
+      "target": "housewrap-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "weather resistive barrier rolls",
+      "target": "housewrap-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "housewrap cap fasteners and tape",
+      "target": "housewrap-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "wrb roll count for a wall",
+      "target": "housewrap-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "housewrap takeoff",
+      "target": "housewrap-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "chain link fence material takeoff",
+      "target": "chain-link-fence-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "posts and fabric for chain link",
+      "target": "chain-link-fence-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "how much chain link fence material",
+      "target": "chain-link-fence-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "tension bands and posts for chain link",
+      "target": "chain-link-fence-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "chain link parts list",
+      "target": "chain-link-fence-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "concrete for curb and gutter",
+      "target": "curb-gutter-volume",
+      "kind": "question"
+    },
+    {
+      "term": "curb and gutter volume per foot",
+      "target": "curb-gutter-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how much concrete for a curb run",
+      "target": "curb-gutter-volume",
+      "kind": "question"
+    },
+    {
+      "term": "cubic yards for curb and gutter",
+      "target": "curb-gutter-volume",
+      "kind": "question"
+    },
+    {
+      "term": "curb gutter concrete takeoff",
+      "target": "curb-gutter-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how many rebar chairs",
+      "target": "rebar-chair-count",
+      "kind": "question"
+    },
+    {
+      "term": "bar support count for a slab",
+      "target": "rebar-chair-count",
+      "kind": "question"
+    },
+    {
+      "term": "rebar chair takeoff",
+      "target": "rebar-chair-count",
+      "kind": "question"
+    },
+    {
+      "term": "chairs to hold rebar at cover",
+      "target": "rebar-chair-count",
+      "kind": "question"
+    },
+    {
+      "term": "bolster count for a slab",
+      "target": "rebar-chair-count",
+      "kind": "question"
+    },
+    {
+      "term": "gutter footage and downspout count",
+      "target": "gutter-downspout-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "gutter and downspout takeoff",
+      "target": "gutter-downspout-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "downspouts for a roof area",
+      "target": "gutter-downspout-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "gutter linear feet and hangers",
+      "target": "gutter-downspout-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "how many soffit and ridge vents",
+      "target": "soffit-ridge-vent-count",
+      "kind": "question"
+    },
+    {
+      "term": "attic vent count from net free area",
+      "target": "soffit-ridge-vent-count",
+      "kind": "question"
+    },
+    {
+      "term": "soffit vents and ridge vent feet",
+      "target": "soffit-ridge-vent-count",
+      "kind": "question"
+    },
+    {
+      "term": "balanced attic ventilation count",
+      "target": "soffit-ridge-vent-count",
+      "kind": "question"
+    },
+    {
+      "term": "ridge vent length for nfa",
+      "target": "soffit-ridge-vent-count",
+      "kind": "question"
     }
   ]
 }

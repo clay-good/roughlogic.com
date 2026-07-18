@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(search): question-phrase aliases for group E construction-ops tiles, part 1 of 2 (spec-v590 follow-on); 2026-07-17
+
+- Group E holds 97 of the last uncovered tiles (the v809-v908 construction-operations campaign). Part 1 covers the
+  first 49 -- shotcrete/asphalt/erosion-BMP production and the concrete/roofing/framing takeoffs -- with 238 reviewed
+  phrasings, each rank-checked top-3 through the v589 ranker with the batch folded in. Part 2 (the remaining 48)
+  follows.
+
 ### feat(search): question-phrase aliases for the 34 scattered uncovered tiles (spec-v590 follow-on); 2026-07-17
 
 - Second follow-on batch: the 34 tiles outside group E that still lacked `kind: "question"` rows (groups C, G, M, N,
