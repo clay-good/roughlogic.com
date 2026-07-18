@@ -333,7 +333,7 @@ const renderCoolingCurve = _r({
   citation: "Notice: This is a planning aid. The thermometer on the food governs. Citation: per FDA Food Code 2022 §3-401.11 and §3-501.14 (135 F to 70 F in ≤ 2 hr; 70 F to 41 F in ≤ 4 hr). Local health code adopts and may modify. Free at fda.gov/food/retail-food-protection/fda-food-code.",
   example: coolingCurveExample.inputs,
   fields: [
-    { key: "start_F",      label: "Starting temp (F)", kind: "number", default: 165 },
+    { key: "start_F",      label: "Starting temp (F; confirms food is hot; cooling time shown is the FDA 135-to-70-to-41 window, not measured from this temp)", kind: "number", default: 165 },
     { key: "ambient_F",    label: "Ambient temp (F)", kind: "number", default: 70 },
     { key: "container",    label: "Container", kind: "select", options: Object.keys(COOLING_BASE_MIN).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
     { key: "product_type", label: "Product type", kind: "select", options: [{ value: "thin_liquid", label: "Thin liquid" }, { value: "thick_liquid", label: "Thick liquid" }, { value: "dense_solid", label: "Dense solid" }] },
@@ -568,7 +568,7 @@ function renderSousVidePasteurization(inputRegion, outputRegion, citationEl) {
   );
   const th = makeNumber("Thickness (in; full slab, not half)", "sv-th", { step: "any", min: "0" });
   const tb = makeNumber("Bath temperature (F)", "sv-tb", { step: "any", min: "100" });
-  const ti = makeNumber("Initial food temperature (F; default 38)", "sv-ti", { step: "any", value: "38" });
+  const ti = makeNumber("Initial food temperature (F; must be below bath; come-up time assumes a refrigerated start)", "sv-ti", { step: "any", value: "38" });
   ti.input.value = "38";
   for (const f of [c, th, tb, ti]) inputRegion.appendChild(f.wrap);
 

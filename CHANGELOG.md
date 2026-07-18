@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs(kitchen): label two temperature fields whose value the (cited) model intentionally does not use; 2026-07-18
+
+- cooling-curve's "Starting temp" and sous-vide-pasteurization's "Initial food temperature" are prominent numeric
+  fields, but each compute intentionally ignores the value per a cited simplification: cooling time is scoped to the
+  FDA 135->70->41 window (start-independent above 135 F), and sous-vide come-up uses a conservative fixed-fraction
+  model calibrated to a refrigerated start. The math is correct and documented, but a user editing the field and
+  seeing no change is misled. Clarified both labels to state the field's real role (validation / assumption) without
+  touching the food-safety computations. Found by a dead-input sweep (calc-accounting / calc-realestate / calc-lab
+  came back clean, ~88 functions).
+
 ### fix(trucking): pallet-loadout collected case dimensions but never used them; 2026-07-18
 
 - computePalletLoadout rendered "Case length / width / height" fields and validated them, but the loadout (pallets
