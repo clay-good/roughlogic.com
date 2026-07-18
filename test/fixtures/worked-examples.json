@@ -10461,6 +10461,66 @@
    }
   },
   {
+   "tile_id": "ujoint-operating-angle",
+   "source_publisher": "Cardan (Hooke) U-joint kinematics + cancellation rule",
+   "source_title": "10 deg both joints -> 3.06% per-joint variation, equal angles -> cancelled",
+   "source_edition_or_year": "spec-v959 worked example (machine-verified)",
+   "source_section_or_page": "variation = 1/cos(10) - cos(10) = 1.01543 - 0.98481 = 0.03062 = 3.062%; |10-10| = 0 <= 1 -> cancelled",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "input_angle_deg": 10,
+    "output_angle_deg": 10
+   },
+   "outputs": {
+    "first_joint_variation_pct": {
+     "value": 3.062,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "second_joint_variation_pct": {
+     "value": 3.062,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "angle_difference_deg": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ujoint-operating-angle",
+   "source_publisher": "Cardan (Hooke) U-joint kinematics + cancellation rule",
+   "source_title": "cross-check: 15 deg front, 10 deg rear -> 6.94% vs 3.06%, 5 deg mismatch UNCANCELLED",
+   "source_edition_or_year": "spec-v959 worked example (machine-verified)",
+   "source_section_or_page": "front = 1/cos(15)-cos(15) = 6.935%; |15-10| = 5 > 1 -> uncancelled",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "input_angle_deg": 15,
+    "output_angle_deg": 10
+   },
+   "outputs": {
+    "first_joint_variation_pct": {
+     "value": 6.935,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "angle_difference_deg": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "driveshaft-crit",
    "source_publisher": "Project (first-principles) over Spicer / Dana driveshaft tables",
    "source_title": "Critical-speed: N_crit = K * sqrt(EI / (m * L^3)); recommended max = 0.65 * N_crit",

@@ -27728,3 +27728,28 @@ test("bounds: spec-v958 computeDpLevelHydrostatic pins P = 0.433 SG H and error 
   assert.ok("error" in _v958({ measured_pressure_psi: 4.33, specific_gravity: 1.0, max_level_ft: 0 }));
   assert.ok("error" in _v958({ measured_pressure_psi: Infinity, specific_gravity: 1.0, max_level_ft: 20 }));
 });
+
+import { computeUjointOperatingAngle as _v959 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v959 computeUjointOperatingAngle pins the Cardan variation, cancellation, and error seams", () => {
+  const r = _v959({ input_angle_deg: 10, output_angle_deg: 10 });
+  assert.ok(Math.abs(r.first_joint_variation_pct - 3.0623) < 1e-2); // 1/cos(10)-cos(10)
+  assert.ok(Math.abs(r.second_joint_variation_pct - 3.0623) < 1e-2);
+  assert.ok(Math.abs(r.angle_difference_deg - 0) < 1e-9);
+  assert.equal(r.cancelled, true); // equal angles within 1 deg
+  // Larger angle -> larger variation; unequal angles -> uncancelled.
+  const mis = _v959({ input_angle_deg: 15, output_angle_deg: 10 });
+  assert.ok(Math.abs(mis.first_joint_variation_pct - 6.9353) < 1e-2);
+  assert.ok(mis.first_joint_variation_pct > r.first_joint_variation_pct);
+  assert.equal(mis.cancelled, false); // 5 deg mismatch
+  // A 1-degree mismatch still counts as cancelled (boundary).
+  assert.equal(_v959({ input_angle_deg: 11, output_angle_deg: 10 }).cancelled, true);
+  assert.equal(_v959({ input_angle_deg: 11.5, output_angle_deg: 10 }).cancelled, false);
+  // Zero angle -> zero variation (straight shaft).
+  assert.ok(Math.abs(_v959({ input_angle_deg: 0, output_angle_deg: 0 }).first_joint_variation_pct) < 1e-12);
+  // Error seams: angle at/above 90 or negative, non-finite.
+  assert.ok("error" in _v959({ input_angle_deg: 90, output_angle_deg: 10 }));
+  assert.ok("error" in _v959({ input_angle_deg: -1, output_angle_deg: 10 }));
+  assert.ok("error" in _v959({ input_angle_deg: 10, output_angle_deg: 95 }));
+  assert.ok("error" in _v959({ input_angle_deg: Infinity, output_angle_deg: 10 }));
+});

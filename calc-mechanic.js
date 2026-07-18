@@ -2591,3 +2591,51 @@ MECHANIC_RENDERERS["dynamic-compression-ratio"] = _simpleRenderer({
   ],
   compute: computeDynamicCompressionRatio,
 });
+
+// ===================== spec-v959: driveline U-joint operating angle and cancellation =====================
+// dims: in { args: dimensionless } out: { first_joint_variation_pct: dimensionless, second_joint_variation_pct: dimensionless, angle_difference_deg: dimensionless }
+export function computeUjointOperatingAngle({ input_angle_deg = 10, output_angle_deg = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(input_angle_deg >= 0 && input_angle_deg < 90)) return { error: "Input (first) U-joint operating angle must be between 0 and 90 degrees." };
+  if (!(output_angle_deg >= 0 && output_angle_deg < 90)) return { error: "Output (second) U-joint operating angle must be between 0 and 90 degrees." };
+  // A single Cardan (Hooke) joint at angle b makes the output speed swing between cos(b) and 1/cos(b) of the input,
+  // twice per revolution; peak-to-peak variation as a fraction of input speed = 1/cos(b) - cos(b) = sin^2(b)/cos(b).
+  const varPct = (deg) => { const b = deg * Math.PI / 180; return 100 * (1 / Math.cos(b) - Math.cos(b)); };
+  const first_joint_variation_pct = varPct(input_angle_deg);
+  const second_joint_variation_pct = varPct(output_angle_deg);
+  const angle_difference_deg = Math.abs(input_angle_deg - output_angle_deg);
+  const cancelled = angle_difference_deg <= 1.0;
+  if (![first_joint_variation_pct, second_joint_variation_pct].every(Number.isFinite)) return { error: "U-joint angle math is not a finite value." };
+  return {
+    first_joint_variation_pct,
+    second_joint_variation_pct,
+    angle_difference_deg,
+    cancelled,
+    verdict: cancelled ? "cancelled -- the two working angles are equal within 1 degree (phase the yokes in the same plane)" : "UNCANCELLED -- equalize the two working angles; the mismatch drives a 2/rev speed fluctuation and vibration",
+    note: "How a Cardan (Hooke) universal joint's operating angle drives a speed fluctuation, and the two-joint rule that cancels it. A single U-joint at a working angle b does NOT pass motion uniformly: the output speed swings between cos(b) and 1/cos(b) of the input speed TWICE per revolution, a peak-to-peak variation of 1/cos(b) - cos(b) = sin^2(b)/cos(b). At a 10 degree angle that is 3.1%, at 3 degrees only 0.3%, but at 15 degrees it climbs to 6.9% -- and the fluctuating acceleration, not just the speed, is what beats the driveline. A standard two-joint driveshaft CANCELS the fluctuation only when BOTH working angles are equal AND the two yokes are phased in the same plane (in-phase): the second joint's fluctuation exactly offsets the first's. So the design targets are (1) keep each working angle small -- a common rule of thumb is under about 3 degrees at highway rpm, less as rpm rises -- and (2) make the two angles equal (within ~1 degree) with the slip yoke phased correctly. This tile gives the per-joint variation and the equal-angle cancellation check; the exact maximum working angle for a given driveshaft rpm comes from the U-joint / driveshaft manufacturer's chart (Spicer/Dana, GMB), and the vehicle service manual and the measured pinion, transmission, and shaft inclinations govern the setup.",
+  };
+}
+
+export const ujointOperatingAngleExample = { inputs: { input_angle_deg: 10, output_angle_deg: 10 } };
+
+function _v959renderUjointOperatingAngle(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Cardan (Hooke) U-joint kinematics and the two-joint cancellation rule, by name. A single joint at angle b swings the output speed between cos(b) and 1/cos(b) of input (peak-to-peak = 1/cos(b) - cos(b)) twice per rev; a two-joint shaft cancels it only when both working angles are equal and the yokes are phased. Keep angles small; the manufacturer's rpm-vs-angle chart and the service manual govern.";
+  const ia = makeNumber("Input (first) U-joint angle (deg)", "uja-ia", { step: "any", min: "0", value: "10" });
+  ia.input.value = "10";
+  const oa = makeNumber("Output (second) U-joint angle (deg)", "uja-oa", { step: "any", min: "0", value: "10" });
+  oa.input.value = "10";
+  for (const f of [ia, oa]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ia.input.value = "10"; oa.input.value = "10"; update(); });
+  const oV = makeOutputLine(outputRegion, "Cancellation verdict", "uja-out-v");
+  const oF = makeOutputLine(outputRegion, "Per-joint speed variation", "uja-out-f");
+  const update = debounce(() => {
+    const r = computeUjointOperatingAngle({
+      input_angle_deg: ia.input.value === "" ? 10 : Number(ia.input.value), output_angle_deg: oa.input.value === "" ? 10 : Number(oa.input.value),
+    });
+    if (r.error) { oV.textContent = r.error; oF.textContent = "-"; return; }
+    oV.textContent = r.verdict + " (delta " + fmt(r.angle_difference_deg, 1) + " deg)";
+    oF.textContent = "first " + fmt(r.first_joint_variation_pct, 2) + "%, second " + fmt(r.second_joint_variation_pct, 2) + "% peak-to-peak";
+  }, DEBOUNCE_MS);
+  for (const f of [ia, oa]) f.input.addEventListener("input", update);
+}
+MECHANIC_RENDERERS["ujoint-operating-angle"] = _v959renderUjointOperatingAngle;

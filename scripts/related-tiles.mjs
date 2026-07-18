@@ -909,6 +909,7 @@ const RELATED = {
   // Group K: Mechanic (fill-in).
   "bolt-stretch": ["bolt-torque", "displacement-cr"],
   "driveshaft-crit": ["driveshaft-max-length", "shaft-torsion", "displacement-cr"],
+  "ujoint-operating-angle": ["driveshaft-crit", "driveshaft-max-length", "tire-gearing"],
   "driveshaft-max-length": ["driveshaft-crit", "shaft-torsion", "displacement-cr"],
   "tire-gearing": ["fuel-range", "displacement-cr"],
   "tire-contact-patch": ["tire-gearing", "tire-load-check", "gear-mph-rpm"],

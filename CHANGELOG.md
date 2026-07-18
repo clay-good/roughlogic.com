@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): add ujoint-operating-angle tile (spec-v959); 2026-07-18
+
+- New Group K tile `ujoint-operating-angle` (Driveline U-Joint Operating Angle and Cancellation) in calc-mechanic.js. A
+  single Cardan joint at angle b swings the output speed between cos(b) and 1/cos(b) of input twice per rev -- peak-to-
+  peak 1/cos(b) - cos(b): 3.1% at 10 deg, 0.3% at 3 deg, 6.9% at 15 deg. A two-joint shaft cancels it only when both
+  working angles are equal (within ~1 deg) and the yokes are phased. Reports per-joint variation + the equal-angle
+  check; keep angles small. The manufacturer's rpm-vs-angle chart and the service manual govern. Home count
+  1,407 -> 1,408.
+
 ### feat(low-voltage): add dp-level-hydrostatic tile (spec-v958); 2026-07-18
 
 - New Group A tile `dp-level-hydrostatic` (Hydrostatic DP Level Transmitter, Head to Level) in calc-lowvoltage.js. The

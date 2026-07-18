@@ -284,7 +284,7 @@ const _TILES = [
   ["incoterm-decoder", "J"], ["stopping-sight-distance", "J"], ["ssd-design-speed", "J"], ["truck-off-tracking", "J"],
 
   ["prop-slip", "K"], ["displacement-cr", "K"], ["dynamic-compression-ratio", "K"], ["chamber-cc-for-cr", "K"],
-  ["bolt-stretch", "K"], ["driveshaft-crit", "K"], ["driveshaft-max-length", "K"], ["fuel-range", "K"],
+  ["bolt-stretch", "K"], ["driveshaft-crit", "K"], ["driveshaft-max-length", "K"], ["fuel-range", "K"], ["ujoint-operating-angle", "K"],
   ["tire-gearing", "K"], ["brake-pad-life", "K"],
   ["valve-flow-coefficient", "K"],
 

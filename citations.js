@@ -4878,6 +4878,17 @@ export const CITATIONS = {
       { name: "Elastic-region behavior", value: "true (stretch < proof-load yield)", source: "Hooke's law assumption" },
     ],
   },
+  "ujoint-operating-angle": {
+    formula: "single Cardan joint: output speed ranges cos(b) to 1/cos(b) of input, twice per rev; peak-to-peak variation = 1/cos(b) - cos(b) = sin^2(b)/cos(b). Two-joint cancellation requires equal working angles (within ~1 deg) and in-plane yoke phasing.",
+    edition: "Cardan (Hooke) universal-joint kinematics and the two-joint cancellation rule, by name; the U-joint / driveshaft manufacturer's angle-vs-rpm chart (Spicer / Dana, GMB) and the vehicle service manual govern.",
+    freeAccess: "The Cardan velocity relation is public kinematics; the working angles come from the measured driveline geometry, and the maximum-angle-vs-rpm limit is on the manufacturer's chart.",
+    governance: GOVERNANCE.general,
+    editionNote: "A single Cardan (Hooke) universal joint does not transmit rotation uniformly when the two shafts meet at an operating angle b: as the joint turns, the driven-shaft speed oscillates between cos(b) and 1/cos(b) times the driving speed, completing two full cycles per revolution. The peak-to-peak speed non-uniformity is therefore 1/cos(b) - cos(b), which equals sin^2(b)/cos(b) -- about 3.1% at a 10 degree angle, only 0.3% at 3 degrees, but 6.9% at 15 degrees; and because it is the fluctuating ANGULAR ACCELERATION (which grows with rpm squared) that actually excites driveline vibration, small angles matter more at higher speed. A conventional two-joint driveshaft is designed to CANCEL this: the second joint introduces an equal and opposite fluctuation, but only when two conditions both hold -- the two joints' working angles are equal (practically, within about a degree) AND the shaft's two yokes are phased in the same plane (in-phase, the usual slip-yoke arrangement). If the angles are unequal or the yokes are clocked wrong, the fluctuations do not cancel and a second-order (2/rev) vibration results. The practical setup targets are thus a small working angle at each joint -- a common rule of thumb keeps each under roughly 3 degrees at highway rpm, with the allowable angle falling as rpm rises -- and equal angles at the two ends. This tile reports the per-joint speed variation and the equal-angle cancellation check; the exact maximum permissible working angle for a given driveshaft rpm comes from the U-joint and driveshaft manufacturer's published chart (Spicer / Dana, GMB, American Axle), and the vehicle service manual and the actual measured transmission-output, driveshaft, and pinion inclinations govern the alignment.",
+    assumptions: [
+      { name: "Cardan velocity variation", value: "output speed cos(b) to 1/cos(b) of input, 2/rev; peak-to-peak = 1/cos(b) - cos(b) = sin^2(b)/cos(b)", source: "Cardan (Hooke) joint kinematics" },
+      { name: "Two-joint cancellation", value: "cancels only with equal working angles (within ~1 deg) and in-plane yoke phasing; keep each angle small (rule of thumb < ~3 deg at highway rpm)", source: "driveline manufacturer chart / service manual" },
+    ],
+  },
   "driveshaft-crit": {
     formula: "Euler-Bernoulli first-mode whirl (simply-supported, eigenvalue (βL)² = π²): N_crit (RPM) = (π² / L²) × sqrt((E × I) / (ρ × A)). Recommended max operating = 0.65 × N_crit (engineering-practice safety margin).",
     edition: "Euler-Bernoulli beam theory by name; AAM (American Axle) and Spicer / Dana driveshaft engineering manuals by name.",

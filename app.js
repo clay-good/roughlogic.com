@@ -871,6 +871,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [
     "prop-slip", "displacement-cr", "dynamic-compression-ratio", "chamber-cc-for-cr", "bolt-stretch",
     "driveshaft-crit", "driveshaft-max-length", "fuel-range", "tire-gearing", "brake-pad-life",
+    "ujoint-operating-angle",
     "tire-contact-patch",
     // v23
     "valve-flow-coefficient", "screw-conveyor", "screw-conveyor-rpm",
