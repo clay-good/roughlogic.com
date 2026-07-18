@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(mechanic): guard driveshaft critical-speed compute (protects the 4.7 -> pi^2 fix); 2026-07-17
+
+- Added a physical guard on computeDriveshaftCritical (the tile whose first-mode eigenvalue was corrected 4.7 -> pi^2
+  earlier today): critical speed rises with tube outer diameter, falls with length, scales as 1/length^2 (Euler-Bernoulli),
+  and recommended max = 0.65 x critical. This locks the corrected constant and the 1/L^2 form against a regression the
+  single pinned example would not catch. Test-only.
+
 ### test(structural): guard wood beam-bending (NDS) and pipe pressure-rating (ASME B31) with physical monotonicity; 2026-07-17
 
 - Added whole-response guards: wood allowable moment rises with reference bending value, width, and depth and falls with

@@ -11862,3 +11862,21 @@ test("monotonicity: wood beam moment and pipe pressure rating respond correctly 
   assert.ok(pp({ allow_stress: 20000 }) > pp({ allow_stress: 17100 }), "pipe pressure must rise with allowable stress");
   assert.ok(pp({ od_in: 6.625 }) < pp({ od_in: 4.5 }), "pipe pressure must fall with outside diameter");
 });
+
+// Physical monotonicity of the driveshaft whirl critical-speed compute (the tile
+// whose first-mode eigenvalue was fixed 4.7 -> pi^2 on 2026-07-17). Critical
+// speed rises with tube outer diameter (stiffer), falls with length, and scales
+// as 1/length^2 (Euler-Bernoulli); recommended max = 0.65 * critical. These guard
+// the corrected constant and the 1/L^2 form against a regression the single
+// pinned example would not catch.
+test("monotonicity: driveshaft critical speed rises with OD, falls as 1/length^2, and recommended = 0.65 * critical", async () => {
+  const m = await import("../../calc-mechanic.js");
+  const base = { od_in: 3.5, wall_in: 0.083, length_in: 50, material: "steel" };
+  const nc = (o) => m.computeDriveshaftCritical({ ...base, ...o }).critical_rpm;
+  assert.ok(nc({ od_in: 4.5 }) > nc({ od_in: 3.5 }), "critical speed must rise with outer diameter");
+  assert.ok(nc({ length_in: 70 }) < nc({ length_in: 50 }), "critical speed must fall with length");
+  // Euler-Bernoulli 1/L^2: doubling the length quarters the critical speed.
+  assert.ok(Math.abs(nc({ length_in: 100 }) - nc({ length_in: 50 }) / 4) < 1, "critical speed must scale as 1/length^2");
+  const r = m.computeDriveshaftCritical(base);
+  assert.ok(Math.abs(r.recommended_max_rpm - 0.65 * r.critical_rpm) < 1e-6, "recommended max must be 0.65 * critical");
+});
