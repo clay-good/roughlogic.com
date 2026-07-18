@@ -9952,3 +9952,44 @@ CONSTRUCTION_RENDERERS["stud-notch-bore-limit"] = _simpleRenderer({
   ],
   compute: computeStudNotchBoreLimit,
 });
+
+// ===================== spec-v930: floor joist notching and boring limits =====================
+// dims: in { joist_depth_in: L } out: { end_notch_max_in: L, notch_depth_max_in: L, notch_length_max_in: L, bore_dia_max_in: L, bore_edge_min_in: L }
+export function computeJoistNotchBoreLimit({ joist_depth_in = 9.25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(joist_depth_in > 0)) return { error: "Joist depth must be positive (in)." };
+  // IRC R502.8.1 (sawn lumber): end notch <= D/4; top/bottom notch depth <= D/6 and length <= D/3, not in the middle
+  // third of the span; bored hole dia <= D/3 with the edge >= 2 in from the top/bottom and from any other hole/notch.
+  const end_notch_max_in = joist_depth_in / 4;
+  const notch_depth_max_in = joist_depth_in / 6;
+  const notch_length_max_in = joist_depth_in / 3;
+  const bore_dia_max_in = joist_depth_in / 3;
+  const bore_edge_min_in = 2;
+  if (![end_notch_max_in, notch_depth_max_in, notch_length_max_in, bore_dia_max_in].every(Number.isFinite)) return { error: "Notch/bore math is not a finite value." };
+  return {
+    end_notch_max_in,
+    notch_depth_max_in,
+    notch_length_max_in,
+    bore_dia_max_in,
+    bore_edge_min_in,
+    note: "IRC R502.8.1 notching and boring limits for SAWN-LUMBER floor joists, on the actual joist depth (2x10 = 9.25 in, 2x12 = 11.25 in): a notch at the bearing ends may not exceed D/4; a top or bottom notch elsewhere is limited to D/6 deep and D/3 long and is NOT allowed in the middle third of the span; a bored hole may not exceed D/3 in diameter, with its edge at least 2 in from the top and bottom edges and from any other hole or notch. A 2x10 allows a 2.31 in end notch and a 3.08 in bore. These are the prescriptive limits for dimension lumber -- ENGINEERED I-joists and trusses follow the manufacturer's hole chart ONLY (never field-notch a flange), and a cantilever or a heavily loaded joist may be tighter. The AHJ-adopted code and any engineering govern.",
+  };
+}
+export const joistNotchBoreLimitExample = { inputs: { joist_depth_in: 9.25 } };
+
+CONSTRUCTION_RENDERERS["joist-notch-bore-limit"] = _simpleRenderer({
+  citation: "Citation: IRC R502.8.1 sawn-lumber floor-joist notch/bore limits by name, on the actual joist depth. End notch <= D/4; top/bottom notch <= D/6 deep and D/3 long (not in the middle third); bore <= D/3 dia, edge >= 2 in. Engineered I-joists follow the manufacturer's chart only. The AHJ-adopted code governs.",
+  example: joistNotchBoreLimitExample.inputs,
+  fields: [
+    { key: "joist_depth_in", label: "Actual joist depth (in, 2x10 = 9.25, 2x12 = 11.25)", kind: "number", default: 9.25 },
+  ],
+  outputs: [
+    { key: "en", id: "jnb-out-en", label: "Max end notch (at bearing)", value: (r) => fmt(r.end_notch_max_in, 3) + " in (D/4)" },
+    { key: "nd", id: "jnb-out-nd", label: "Max notch depth (elsewhere)", value: (r) => fmt(r.notch_depth_max_in, 3) + " in (D/6)" },
+    { key: "nl", id: "jnb-out-nl", label: "Max notch length", value: (r) => fmt(r.notch_length_max_in, 3) + " in (D/3)" },
+    { key: "bd", id: "jnb-out-bd", label: "Max bored-hole diameter", value: (r) => fmt(r.bore_dia_max_in, 3) + " in (D/3)" },
+    { key: "be", id: "jnb-out-be", label: "Min edge to hole", value: (r) => fmt(r.bore_edge_min_in, 3) + " in" },
+    { key: "n", id: "jnb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeJoistNotchBoreLimit,
+});

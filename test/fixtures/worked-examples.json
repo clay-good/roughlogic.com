@@ -34932,6 +34932,58 @@
    }
   },
   {
+   "tile_id": "joist-notch-bore-limit",
+   "source_publisher": "floor joist notch/bore limits (IRC R502.8.1)",
+   "source_title": "2x10 joist (9.25 in) -> end notch 2.31, notch 1.54 deep x 3.08 long, bore 3.08",
+   "source_edition_or_year": "spec-v930 worked example (machine-verified)",
+   "source_section_or_page": "end = 9.25/4 = 2.3125; depth = 9.25/6 = 1.5417; length = 9.25/3 = 3.0833; bore = 9.25/3 = 3.0833",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "joist_depth_in": 9.25
+   },
+   "outputs": {
+    "end_notch_max_in": {
+     "value": 2.3125,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "bore_dia_max_in": {
+     "value": 3.0833,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "joist-notch-bore-limit",
+   "source_publisher": "floor joist notch/bore limits (IRC R502.8.1)",
+   "source_title": "cross-check: 2x12 joist (11.25 in) -> end notch 2.81, bore 3.75",
+   "source_edition_or_year": "spec-v930 worked example (machine-verified)",
+   "source_section_or_page": "end = 11.25/4 = 2.8125; bore = 11.25/3 = 3.75",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "joist_depth_in": 11.25
+   },
+   "outputs": {
+    "end_notch_max_in": {
+     "value": 2.8125,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "bore_dia_max_in": {
+     "value": 3.75,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "stud-notch-bore-limit",
    "source_publisher": "wall stud notch/bore limits (IRC R602.6)",
    "source_title": "2x6 stud (5.5 in) -> notch 1.375 bearing, bore 2.20 single, 3.30 doubled",

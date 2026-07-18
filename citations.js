@@ -4421,6 +4421,17 @@ export const CITATIONS = {
       { name: "Doubled stud / edge", value: "bore up to 60% only on a doubled stud (<=2 successive); hole edge >= 5/8 in; not in the same section as a notch", source: "IRC R602.6" },
     ],
   },
+  "joist-notch-bore-limit": {
+    formula: "end_notch_max = D/4; notch_depth_max = D/6; notch_length_max = D/3; bore_dia_max = D/3; bore_edge_min = 2 in (D = actual joist depth).",
+    edition: "IRC R502.8.1 sawn-lumber floor-joist notching and boring limits, by name; the fractions apply to the actual joist depth. The AHJ-adopted IRC edition governs.",
+    freeAccess: "The fractional limits are prescriptive IRC R502.8.1 values (many jurisdictions post the adopted IRC); the tile applies them to the entered actual joist depth.",
+    governance: GOVERNANCE.general,
+    editionNote: "IRC R502.8.1 limits on notching and boring SAWN-LUMBER floor joists, applied to the ACTUAL joist depth (a 2x10 is 9.25 in, a 2x12 is 11.25 in). A notch at the bearing ends may not exceed one quarter of the depth (D/4). A notch elsewhere on the top or bottom edge is limited to D/6 in depth and D/3 in length, and notches are NOT permitted in the middle third of the span. A bored hole may not exceed D/3 in diameter, and its edge must be at least 2 in from the top and bottom edges of the joist and at least 2 in from any other hole or notch. These prescriptive limits are for dimension lumber ONLY -- engineered I-joists, LVL, and trusses follow the manufacturer's hole chart and web-stiffener rules, and a flange must never be field-notched. A cantilever, a doubled/built-up member, or a heavily loaded joist may be more restrictive, and the AHJ-adopted code and any engineering govern.",
+    assumptions: [
+      { name: "Actual depth", value: "fractions apply to the actual dressed depth (2x10 = 9.25 in, 2x12 = 11.25 in), not the nominal", source: "IRC R502.8.1" },
+      { name: "Sawn lumber only", value: "engineered I-joists / LVL / trusses follow the maker's hole chart; never notch a flange", source: "IRC R502.8.1 / manufacturer" },
+    ],
+  },
   "deck-beam-post": {
     formula: "Tributary width to beam = joist span / 2; beam load w (plf) = (live + dead) psf × tributary. Smallest built-up beam with min(L_bending, L_deflection) ≥ post spacing. Post axial load = w × post spacing; NDS column capacity = F_c × C_P × A with C_P from F_cE = 0.822 E_min / (le/d)². Footing from soil bearing; ledger fastener spacing from IRC Table R507.9.1.3(1).",
     edition: IRC_2021 + " §R507 (decks). " + AWC_NDS + " reference values; IRC Table R507.9.1.3(1) ledger fasteners.",

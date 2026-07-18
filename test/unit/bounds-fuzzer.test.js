@@ -26904,6 +26904,23 @@ test("bounds: spec-v924 computeMicroinverterBranchCount pins the count, 80% limi
   assert.ok("error" in _v924({ branch_ocpd_a: Infinity, unit_max_current_a: 1.21 }));
 });
 
+import { computeJoistNotchBoreLimit as _v930 } from "../../calc-construction.js";
+
+test("bounds: spec-v930 computeJoistNotchBoreLimit pins the D/4, D/6, D/3 limits and error seams", () => {
+  const r = _v930({ joist_depth_in: 9.25 }); // 2x10
+  assert.ok(Math.abs(r.end_notch_max_in - 2.3125) < 1e-9); // D/4
+  assert.ok(Math.abs(r.notch_depth_max_in - 9.25 / 6) < 1e-9); // D/6
+  assert.ok(Math.abs(r.notch_length_max_in - 9.25 / 3) < 1e-9); // D/3
+  assert.ok(Math.abs(r.bore_dia_max_in - 9.25 / 3) < 1e-9); // D/3
+  assert.equal(r.bore_edge_min_in, 2); // fixed 2 in
+  const b = _v930({ joist_depth_in: 11.25 }); // 2x12
+  assert.ok(Math.abs(b.end_notch_max_in - 2.8125) < 1e-9);
+  assert.ok(Math.abs(b.bore_dia_max_in - 3.75) < 1e-9);
+  // Error seams: non-positive depth, non-finite.
+  assert.ok("error" in _v930({ joist_depth_in: 0 }));
+  assert.ok("error" in _v930({ joist_depth_in: Infinity }));
+});
+
 import { computeStudNotchBoreLimit as _v923 } from "../../calc-construction.js";
 
 test("bounds: spec-v923 computeStudNotchBoreLimit pins the notch/bore limits and error seams", () => {

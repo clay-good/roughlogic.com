@@ -2832,6 +2832,31 @@
       "kind": "industry"
     },
     {
+      "term": "joist notching",
+      "target": "joist-notch-bore-limit",
+      "kind": "industry"
+    },
+    {
+      "term": "joist boring",
+      "target": "joist-notch-bore-limit",
+      "kind": "industry"
+    },
+    {
+      "term": "drill through joist",
+      "target": "joist-notch-bore-limit",
+      "kind": "adjacent"
+    },
+    {
+      "term": "notch a floor joist",
+      "target": "joist-notch-bore-limit",
+      "kind": "adjacent"
+    },
+    {
+      "term": "floor joist hole limit",
+      "target": "joist-notch-bore-limit",
+      "kind": "adjacent"
+    },
+    {
       "term": "stud boring",
       "target": "stud-notch-bore-limit",
       "kind": "industry"

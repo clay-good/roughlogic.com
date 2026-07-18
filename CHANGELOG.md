@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): add joist-notch-bore-limit tile (spec-v930); 2026-07-18
+
+- New Group E tile `joist-notch-bore-limit` (Floor Joist Notching and Boring Limits, IRC R502.8.1) in
+  calc-construction.js, beside stud-notch-bore-limit. On the actual sawn-lumber joist depth: end notch <= D/4; top/bottom
+  notch <= D/6 deep and D/3 long (not in the middle third); bore <= D/3 dia, edge >= 2 in. A 2x10 (9.25 in) allows a 2.31
+  in end notch and a 3.08 in bore; a 2x12 a 2.81 in notch and 3.75 in bore. Engineered I-joists follow the maker's chart
+  only. The AHJ-adopted code governs. Home count 1,378 -> 1,379.
+
 ### feat(low-voltage): add access-control-power-supply tile (spec-v929); 2026-07-18
 
 - New Group A tile `access-control-power-supply` (Access-Control Power Supply and Standby Battery) in calc-lowvoltage.js,
