@@ -12205,3 +12205,16 @@ test("consistency: cutting-speed RPM and its diameter inverse round-trip, and fe
   const inv = m.computeCuttingDiameterForRpm({ surface_speed_sfm: 100, target_rpm: cs({}).rpm });
   assert.ok(Math.abs(inv.diameter_in - 0.5) < 1e-9, "cutting-speed and its diameter inverse must round-trip the diameter");
 });
+
+test("consistency: groove-weld capacity and its required-length inverse round-trip, and capacity scales correctly (metalair)", async () => {
+  const m = await import("../../calc-metalair.js");
+  const gw = (o) => m.computeGrooveWeldStrength({ weld_type: "PJP", effective_throat_in: 0.25, base_thickness_in: 0.5, length_in: 6, electrode: "E70", method: "ASD", ...o });
+  assert.ok(gw({ effective_throat_in: 0.5 }).capacity_lb > gw({}).capacity_lb, "capacity must rise with effective throat");
+  assert.ok(gw({ length_in: 12 }).capacity_lb > gw({}).capacity_lb, "capacity must rise with weld length");
+  assert.ok(gw({ electrode: "E80" }).capacity_lb > gw({}).capacity_lb, "capacity must rise with a stronger electrode");
+  assert.ok(Math.abs(gw({}).capacity_lb - 21 * 0.25 * 6 * 1000) < 1e-6, "ASD capacity = 0.30*Fexx * throat * length (E70 -> 21 ksi)");
+  assert.ok(Math.abs(gw({}).strength_per_in_lb - 21 * 0.25 * 1000) < 1e-6, "strength per inch = stress * throat");
+  // Round-trip: the required-length inverse fed the forward capacity must recover the weld length.
+  const inv = m.computeGrooveWeldLengthForLoad({ applied_load_lb: gw({}).capacity_lb, weld_type: "PJP", effective_throat_in: 0.25, base_thickness_in: 0.5, electrode: "E70", method: "ASD" });
+  assert.ok(Math.abs(inv.required_length_in - 6) < 1e-9, "groove-weld strength and its required-length inverse must round-trip the length");
+});

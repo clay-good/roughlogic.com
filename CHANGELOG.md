@@ -4,6 +4,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(metalair): round-trip groove-weld capacity against its required-length inverse; 2026-07-17
+
+- Consistency guard: ASD groove-weld capacity = 0.30 x Fexx x throat x length rises with throat, length, and electrode
+  strength, and the required-length inverse round-trips the weld length; strength-per-inch = stress x throat. Test-only.
+
 ### test(machining): round-trip cutting-speed RPM against its diameter inverse; 2026-07-17
 
 - Consistency guard: RPM = 12 x SFM / (pi x diameter) rises with surface speed, falls with diameter, and the
