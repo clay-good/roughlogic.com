@@ -1175,3 +1175,46 @@ GEOTECH_RENDERERS["slope-failure-depth-for-fs"] = _simpleRenderer({
   ],
   compute: computeSlopeFailureDepthForFs,
 });
+
+// ===================== spec-v965: frost penetration depth (Stefan / modified Berggren) =====================
+// dims: in { args: dimensionless } out: { volumetric_latent_heat_btu_ft3: dimensionless, stefan_depth_ft: dimensionless, berggren_depth_ft: dimensionless }
+export function computeFrostDepthBerggren({ freezing_index_f_days = 2000, frozen_conductivity_btu = 1.0, dry_density_pcf = 100, water_content_pct = 15, berggren_lambda = 0.8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(freezing_index_f_days > 0)) return { error: "Air-freezing index must be positive (F-days)." };
+  if (!(frozen_conductivity_btu > 0)) return { error: "Frozen thermal conductivity must be positive (BTU/hr-ft-F)." };
+  if (!(dry_density_pcf > 0)) return { error: "Dry density must be positive (pcf)." };
+  if (!(water_content_pct > 0)) return { error: "Water content must be positive (percent)." };
+  if (!(berggren_lambda > 0 && berggren_lambda <= 1)) return { error: "Berggren lambda coefficient must be between 0 and 1." };
+  // Stefan: X = sqrt(48 kf FI / L); 48 = 2 x 24 (F-days -> F-hours). L = 144 x gamma_d x w/100 (latent heat of fusion).
+  const volumetric_latent_heat_btu_ft3 = 144 * dry_density_pcf * (water_content_pct / 100);
+  const stefan_depth_ft = Math.sqrt(48 * frozen_conductivity_btu * freezing_index_f_days / volumetric_latent_heat_btu_ft3);
+  const berggren_depth_ft = berggren_lambda * stefan_depth_ft;
+  if (![volumetric_latent_heat_btu_ft3, stefan_depth_ft, berggren_depth_ft].every(Number.isFinite)) return { error: "Frost-depth math is not a finite value." };
+  return {
+    volumetric_latent_heat_btu_ft3,
+    stefan_depth_ft,
+    berggren_depth_ft,
+    note: "How deep frost drives into the ground, by the Stefan and modified-Berggren heat-of-fusion method. The Stefan equation X = sqrt(48 kf FI / L) balances the cold the air delivers against the latent heat of freezing the soil moisture: kf is the frozen soil's thermal conductivity (BTU/hr-ft-F), FI is the air-freezing index (F-days, the seasonal sum of below-freezing average daily temperatures below 32 F), the 48 converts F-days to F-hours, and L = 144 x dry density x water content/100 is the volumetric latent heat (144 BTU/lb is the heat of fusion of water). A soil at kf 1.0, dry density 100 pcf, 15% water in a 2,000 F-day climate has L = 2,160 BTU/ft^3 and a Stefan depth of about 6.7 ft. Stefan ignores the soil's own heat capacity and so OVER-predicts; the modified Berggren correction multiplies by a coefficient lambda (typically 0.6 to 0.9, read from the Berggren nomograph off the thermal-ratio and freezing-index-ratio), giving about 5.3 ft here. CRITICAL: this computes the PHYSICS of frost penetration -- the footing depth that actually governs is the jurisdictional frost line in the locally adopted code (IRC Table R301.2 / the local amendment), which this does not replace. A drier or well-drained soil with less moisture freezes deeper (less latent heat to overcome), and insulation, snow cover, and pavement all shift it. A screen; the adopted frost-depth requirement, the geotechnical report, and the AHJ govern.",
+  };
+}
+
+export const frostDepthBerggrenExample = { inputs: { freezing_index_f_days: 2000, frozen_conductivity_btu: 1.0, dry_density_pcf: 100, water_content_pct: 15, berggren_lambda: 0.8 } };
+
+GEOTECH_RENDERERS["frost-depth-berggren"] = _simpleRenderer({
+  citation: "Citation: Stefan / modified-Berggren frost penetration (US Army Corps / FHWA), by name. Stefan X = sqrt(48 kf FI / L); L = 144 x dry density x water content/100 (latent heat of fusion); modified Berggren X_MB = lambda x X_Stefan, lambda ~0.6-0.9 from the Berggren nomograph. Computes the physics, not the code frost line -- the locally adopted frost depth (IRC Table R301.2 / amendment), the geotech report, and the AHJ govern the footing depth.",
+  example: frostDepthBerggrenExample.inputs,
+  fields: [
+    { key: "freezing_index_f_days", label: "Air-freezing index (F-days)", kind: "number", default: 2000 },
+    { key: "frozen_conductivity_btu", label: "Frozen conductivity kf (BTU/hr-ft-F)", kind: "number", default: 1.0 },
+    { key: "dry_density_pcf", label: "Dry density (pcf)", kind: "number", default: 100 },
+    { key: "water_content_pct", label: "Water content (percent)", kind: "number", default: 15 },
+    { key: "berggren_lambda", label: "Berggren lambda (0-1, ~0.8)", kind: "number", default: 0.8 },
+  ],
+  outputs: [
+    { key: "l", id: "frb-out-l", label: "Volumetric latent heat", value: (r) => fmt(r.volumetric_latent_heat_btu_ft3, 0) + " BTU/ft^3" },
+    { key: "s", id: "frb-out-s", label: "Stefan frost depth (upper bound)", value: (r) => fmt(r.stefan_depth_ft, 2) + " ft" },
+    { key: "b", id: "frb-out-b", label: "Modified Berggren frost depth", value: (r) => fmt(r.berggren_depth_ft, 2) + " ft" },
+    { key: "n", id: "frb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFrostDepthBerggren,
+});

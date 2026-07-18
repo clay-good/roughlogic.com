@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): add frost-depth-berggren tile (spec-v965); 2026-07-18
+
+- New Group E tile `frost-depth-berggren` (Frost Penetration Depth, Stefan / Modified Berggren) in calc-geotech.js.
+  Stefan X = sqrt(48 kf FI / L), L = 144 x dry density x water content/100. kf 1.0, 100 pcf, 15% water, FI 2,000 F-days
+  gives L 2,160, Stefan 6.7 ft; the modified-Berggren lambda (~0.8) cuts it to 5.3 ft. A drier soil freezes deeper.
+  Computes the PHYSICS, not the code frost line -- the jurisdictional frost depth (IRC Table R301.2) governs the footing.
+  Home count 1,413 -> 1,414.
+
 ### feat(agriculture): add mad-irrigation-trigger tile (spec-v964); 2026-07-18
 
 - New Group L tile `mad-irrigation-trigger` (Available Water and MAD Irrigation Trigger) in calc-agriculture.js. From the

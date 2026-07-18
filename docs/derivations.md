@@ -2154,6 +2154,7 @@ cross-check.
 | calc-geotech.js | `computeCoulombEarthPressure` | `{ phi = 0, delta = 0, theta = 0, alpha = 0, gamma = 120, h_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeElasticSettlementAllowablePressure` | `{ settlement_limit_in = 1, b_ft = 0, es_ksf = 0, nu = 0.3, is_f = 0.82 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeFootingEccentricPressure` | `{ p_kip = 0, m_kft = 0, b_ft = 0, l_ft = 0 } = {}` | _ | _ | _ |
+| calc-geotech.js | `computeFrostDepthBerggren` | `{ freezing_index_f_days = 2000, frozen_conductivity_btu = 1.0, dry_density_pc...` | _ | _ | _ |
 | calc-geotech.js | `computeLateralEarthPressure` | `{ phi = 0, gamma = 120, h_ft = 0, q = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeLiquefactionScreening` | `{ amax_g = 0, sigma_v_psf = 0, sigma_vp_psf = 0, depth_ft = 0, crr = 0, msf =...` | _ | _ | _ |
 | calc-geotech.js | `computePileAxialCapacity` | `{ d_ft = 0, l_ft = 0, cu_ksf = 0, alpha = 0.55, fs = 3 } = {}` | _ | _ | _ |
@@ -3074,7 +3075,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1660.
+Row count: 1661.
 
 <!-- END function-corpus-v14 -->
 
@@ -3663,7 +3664,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (360 tiles)
+### Group E Construction (361 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3788,6 +3789,7 @@ per spec-v14 §13.1 second paragraph.
 | `formwork-pressure` | Formwork Pressure | ACI 347 Guide to Formwork for Concrete; Pour 5 ft/hr / 70 F / normal-weight 150 pcf / 12 ft wall ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `formwork-tie-load` | Formwork Tie Load and Spacing | Formwork tie-load identity (first-pri...; tie load = 600*2*2 = 2,400 lb; util = 2400/3000 = 0.80 (p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fresh-concrete-temp` | Fresh Concrete Temperature (ACI 305.1) | ACI 305.1 Hot Weather Concreting (bat...; agg 3000 lb@80F, cement 564 lb@150F, water 240 lb@70F, ag... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `frost-depth-berggren` | Frost Penetration Depth (Stefan / Modified Berggren) | Stefan / modified-Berggren frost pene...; L = 144*100*0.15 = 2160; X = sqrt(48*1.0*2000/2160) = 6.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `glass-vacuum-lift` | Glass Weight and Suction-Cup Lifter Count | Suction-cup lifter identity (first-pr...; weight = 32*0.5*13 = 208; cups = ceil(208*4/150) = ceil(5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `glass-weight` | Flat Glass Lite Weight | NGA Glazing Manual glass-weight table...; 60 x 40 in lite of 1/4 in soda-lime -> 16.67 ft2, 54.2 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `glulam-volume-factor` | Glulam Volume Factor Cv (NDS 5.3.6) | NDS 2018 §5.3.6; spec-v448 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4673,6 +4675,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1413. Fixture-covered or reference-cadence: 1413 / 1413.
+Tile count: 1414. Fixture-covered or reference-cadence: 1414 / 1414.
 
 <!-- END tile-index-v14 -->

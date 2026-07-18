@@ -47904,6 +47904,66 @@
    }
   },
   {
+   "tile_id": "frost-depth-berggren",
+   "source_publisher": "Stefan / modified-Berggren frost penetration (Army Corps / FHWA)",
+   "source_title": "FI 2000 F-days, kf 1.0, 100 pcf, 15% water, lambda 0.8 -> L 2160, Stefan 6.67 ft, Berggren 5.33 ft",
+   "source_edition_or_year": "spec-v965 worked example (machine-verified)",
+   "source_section_or_page": "L = 144*100*0.15 = 2160; X = sqrt(48*1.0*2000/2160) = 6.667; XMB = 0.8*6.667 = 5.333",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "freezing_index_f_days": 2000,
+    "frozen_conductivity_btu": 1.0,
+    "dry_density_pcf": 100,
+    "water_content_pct": 15,
+    "berggren_lambda": 0.8
+   },
+   "outputs": {
+    "volumetric_latent_heat_btu_ft3": {
+     "value": 2160,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "stefan_depth_ft": {
+     "value": 6.667,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "berggren_depth_ft": {
+     "value": 5.333,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "frost-depth-berggren",
+   "source_publisher": "Stefan / modified-Berggren frost penetration (Army Corps / FHWA)",
+   "source_title": "cross-check: a drier soil (8% water) has less latent heat and frost drives deeper, 9.13 ft Stefan",
+   "source_edition_or_year": "spec-v965 worked example (machine-verified)",
+   "source_section_or_page": "L = 144*100*0.08 = 1152; X = sqrt(48*1.0*2000/1152) = 9.129 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "freezing_index_f_days": 2000,
+    "frozen_conductivity_btu": 1.0,
+    "dry_density_pcf": 100,
+    "water_content_pct": 8,
+    "berggren_lambda": 0.8
+   },
+   "outputs": {
+    "stefan_depth_ft": {
+     "value": 9.129,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "slope-failure-depth-for-fs",
    "source_publisher": "Infinite-slope stability (Das / NAVFAC DM-7, solved for depth)",
    "source_title": "25 deg cut, c' 200 psf, phi' 30, gamma 120, target FS 1.5 -> 16.6 ft critical depth",

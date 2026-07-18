@@ -1502,6 +1502,7 @@ const RELATED = {
   "pile-group-spacing-for-efficiency": ["pile-group-efficiency","pile-axial-capacity","soil-bearing-capacity"],
   "slope-stability-infinite": ["retaining-wall-stability","lateral-earth-pressure","trench-slope"],
   "slope-failure-depth-for-fs": ["slope-stability-infinite","slope-stability-seepage","trench-slope"],
+  "frost-depth-berggren": ["soil-phase-relations","soil-bearing-capacity","footing-area"],
   "slope-stability-seepage": ["slope-stability-infinite","submerged-earth-pressure","soil-bearing-capacity"],
   // spec-v290..v292 NDS wood-member depth batch (Group E)
   "wood-bearing-perpendicular": ["wood-beam-shear","wood-beam-bending","deck-beam-post"],

@@ -27864,3 +27864,25 @@ test("bounds: spec-v964 computeMadIrrigationTrigger pins TAW/RAW/interval and er
   assert.ok("error" in _v964({ field_capacity: 0.30, wilting_point: 0.12, root_depth_in: 24, mad_fraction: 0.5, etc_in_day: 0 }));
   assert.ok("error" in _v964({ field_capacity: Infinity, wilting_point: 0.12, root_depth_in: 24, mad_fraction: 0.5, etc_in_day: 0.25 }));
 });
+
+import { computeFrostDepthBerggren as _v965 } from "../../calc-geotech.js";
+
+test("bounds: spec-v965 computeFrostDepthBerggren pins Stefan/Berggren frost depth and error seams", () => {
+  const r = _v965({ freezing_index_f_days: 2000, frozen_conductivity_btu: 1.0, dry_density_pcf: 100, water_content_pct: 15, berggren_lambda: 0.8 });
+  assert.ok(Math.abs(r.volumetric_latent_heat_btu_ft3 - 2160) < 1e-6); // 144*100*0.15
+  assert.ok(Math.abs(r.stefan_depth_ft - 6.66667) < 1e-3); // sqrt(48*2000/2160)
+  assert.ok(Math.abs(r.berggren_depth_ft - 5.33333) < 1e-3); // 0.8*Stefan
+  assert.ok(r.berggren_depth_ft < r.stefan_depth_ft); // Berggren corrects the over-prediction down
+  // A drier soil has less latent heat, so frost drives DEEPER.
+  const dry = _v965({ freezing_index_f_days: 2000, frozen_conductivity_btu: 1.0, dry_density_pcf: 100, water_content_pct: 8, berggren_lambda: 0.8 });
+  assert.ok(Math.abs(dry.stefan_depth_ft - 9.1287) < 1e-3);
+  assert.ok(dry.stefan_depth_ft > r.stefan_depth_ft);
+  // A colder climate (higher freezing index) drives deeper; depth goes as sqrt(FI).
+  assert.ok(Math.abs(_v965({ freezing_index_f_days: 8000, frozen_conductivity_btu: 1.0, dry_density_pcf: 100, water_content_pct: 15, berggren_lambda: 0.8 }).stefan_depth_ft - 2 * r.stefan_depth_ft) < 1e-3);
+  // Error seams: non-positive FI / kf / density / water, lambda out of 0-1, non-finite.
+  assert.ok("error" in _v965({ freezing_index_f_days: 0, frozen_conductivity_btu: 1.0, dry_density_pcf: 100, water_content_pct: 15, berggren_lambda: 0.8 }));
+  assert.ok("error" in _v965({ freezing_index_f_days: 2000, frozen_conductivity_btu: 0, dry_density_pcf: 100, water_content_pct: 15, berggren_lambda: 0.8 }));
+  assert.ok("error" in _v965({ freezing_index_f_days: 2000, frozen_conductivity_btu: 1.0, dry_density_pcf: 100, water_content_pct: 0, berggren_lambda: 0.8 }));
+  assert.ok("error" in _v965({ freezing_index_f_days: 2000, frozen_conductivity_btu: 1.0, dry_density_pcf: 100, water_content_pct: 15, berggren_lambda: 1.5 }));
+  assert.ok("error" in _v965({ freezing_index_f_days: Infinity, frozen_conductivity_btu: 1.0, dry_density_pcf: 100, water_content_pct: 15, berggren_lambda: 0.8 }));
+});

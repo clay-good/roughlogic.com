@@ -644,6 +644,7 @@ const TOOL_MODULES = (() => {
     "soil-bearing-capacity", "lateral-earth-pressure", "at-rest-earth-pressure", "submerged-earth-pressure", "sloped-backfill-earth-pressure", "coulomb-earth-pressure", "retaining-wall-stability",
     // spec-v287..v289 foundation depth batch
     "soil-settlement-elastic", "elastic-settlement-allowable-pressure", "pile-axial-capacity", "pile-length-for-capacity", "slope-stability-infinite", "slope-failure-depth-for-fs", "slope-stability-seepage",
+    "frost-depth-berggren",
     // spec-v308..v310 geotechnical depth-2 batch
     "soil-consolidation-settlement", "settlement-limit-load", "footing-eccentric-pressure", "boussinesq-surcharge-wall",
     // spec-v414..v416 settlement/foundation trio
