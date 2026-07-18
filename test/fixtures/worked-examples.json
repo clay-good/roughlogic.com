@@ -27382,6 +27382,50 @@
    }
   },
   {
+   "tile_id": "room-cavity-ratio",
+   "source_publisher": "IES zonal-cavity room cavity ratio",
+   "source_title": "40 x 30 ft room, 8 ft luminaire-to-workplane cavity -> RCR 2.33",
+   "source_edition_or_year": "spec-v979 worked example (machine-verified)",
+   "source_section_or_page": "RCR = 5*8*(40+30)/(40*30) = 5*8*70/1200 = 2800/1200 = 2.333",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "room_length_ft": 40,
+    "room_width_ft": 30,
+    "cavity_height_ft": 8
+   },
+   "outputs": {
+    "room_cavity_ratio": {
+     "value": 2.333,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "room-cavity-ratio",
+   "source_publisher": "IES zonal-cavity room cavity ratio",
+   "source_title": "cross-check: a tall narrow 12 x 20 room with a 10 ft cavity has a high RCR of 6.67",
+   "source_edition_or_year": "spec-v979 worked example (machine-verified)",
+   "source_section_or_page": "RCR = 5*10*(12+20)/(12*20) = 1600/240 = 6.667 (high -> lower CU)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "room_length_ft": 20,
+    "room_width_ft": 12,
+    "cavity_height_ft": 10
+   },
+   "outputs": {
+    "room_cavity_ratio": {
+     "value": 6.667,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "lumen-method",
    "source_publisher": "IES lumen method (by name).",
    "source_title": "count = ceil(target_fc x area / (lumens x CU x LLF)); achieved_fc = count x lumens x CU x LLF / area.",

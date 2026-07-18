@@ -654,3 +654,36 @@ ELECDESIGN_RENDERERS["rolling-sphere-protection"] = _simpleRenderer({
   ],
   compute: computeRollingSphereProtection,
 });
+
+// ===================== spec-v979: room cavity ratio (RCR) for CU lookup =====================
+// dims: in { args: dimensionless } out: { room_cavity_ratio: dimensionless }
+export function computeRoomCavityRatio({ room_length_ft = 40, room_width_ft = 30, cavity_height_ft = 8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(room_length_ft > 0)) return { error: "Room length must be positive (ft)." };
+  if (!(room_width_ft > 0)) return { error: "Room width must be positive (ft)." };
+  if (!(cavity_height_ft > 0)) return { error: "Cavity height must be positive (ft)." };
+  // IES zonal-cavity: RCR = 5 x cavity height x (L + W) / (L x W).
+  const room_cavity_ratio = 5 * cavity_height_ft * (room_length_ft + room_width_ft) / (room_length_ft * room_width_ft);
+  if (!Number.isFinite(room_cavity_ratio)) return { error: "Room-cavity-ratio math is not a finite value." };
+  return {
+    room_cavity_ratio,
+    note: "The room cavity ratio (RCR), the shape number a lighting designer needs to read the coefficient of utilization (CU) off a luminaire's photometric report before running the lumen method. By the IES zonal-cavity method RCR = 5 x cavity height x (length + width) / (length x width), where the cavity height is the vertical distance from the luminaire plane down to the WORK PLANE (usually ~2.5 ft above the floor for a desk) -- NOT the full floor-to-ceiling height. A 40 x 30 ft room with an 8 ft luminaire-to-workplane cavity has an RCR of 5 x 8 x 70 / 1200 = 2.33. A tall, narrow room (a big cavity height relative to its floor area) has a HIGH RCR, meaning more of the light bounces off the walls and less reaches the work plane, so the CU is lower; a low, wide room has a low RCR and a higher CU. The designer enters this RCR (with the ceiling, wall, and floor reflectances) into the manufacturer's CU table to pick the CU, then that CU goes into the lumen-method fixture count (lumen-method). The same formula gives the ceiling and floor cavity ratios using their cavity heights when the reflectances must be corrected to the work-plane cavity. A design input; the fixture's photometric (IES) file and the actual surface reflectances govern the CU that follows.",
+  };
+}
+
+export const roomCavityRatioExample = { inputs: { room_length_ft: 40, room_width_ft: 30, cavity_height_ft: 8 } };
+
+ELECDESIGN_RENDERERS["room-cavity-ratio"] = _simpleRenderer({
+  citation: "Citation: room cavity ratio, IES zonal-cavity method, by name. RCR = 5 x cavity height x (L + W) / (L x W); cavity height = luminaire plane to the WORK plane (not floor to ceiling). The RCR (with the surface reflectances) reads the CU off the fixture's photometric report, which feeds the lumen method. The IES photometric file and the actual reflectances govern the CU.",
+  example: roomCavityRatioExample.inputs,
+  fields: [
+    { key: "room_length_ft", label: "Room length (ft)", kind: "number", default: 40 },
+    { key: "room_width_ft", label: "Room width (ft)", kind: "number", default: 30 },
+    { key: "cavity_height_ft", label: "Cavity height: luminaire to work plane (ft)", kind: "number", default: 8 },
+  ],
+  outputs: [
+    { key: "r", id: "rcr-out-r", label: "Room cavity ratio (RCR)", value: (r) => fmt(r.room_cavity_ratio, 2) },
+    { key: "n", id: "rcr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRoomCavityRatio,
+});

@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): add room-cavity-ratio tile (spec-v979); 2026-07-18
+
+- New Group A tile `room-cavity-ratio` (RCR for CU Lookup) in calc-elecdesign.js. RCR = 5 x cavity height x (length +
+  width) / (length x width); the cavity height is the luminaire plane to the WORK plane, not floor-to-ceiling. A 40 x 30
+  ft room with an 8 ft cavity = RCR 2.33; a tall narrow room has a high RCR (lower CU). Enter the RCR with the surface
+  reflectances into the fixture's CU table, then feed that CU to the lumen method. Home count 1,427 -> 1,428.
+
 ### feat(refrigeration): add compressor-volumetric-efficiency tile (spec-v978); 2026-07-18
 
 - New Group C tile `compressor-volumetric-efficiency` (Clearance Re-Expansion) in calc-refrigerant.js -- the gap

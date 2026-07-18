@@ -28163,3 +28163,24 @@ test("bounds: spec-v978 computeCompressorVolumetricEfficiency pins clearance VE 
   assert.ok("error" in _v978({ clearance_ratio: 0.045, suction_pressure_psia: 70, discharge_pressure_psia: 300, polytropic_exponent: 0 }));
   assert.ok("error" in _v978({ clearance_ratio: 0.045, suction_pressure_psia: Infinity, discharge_pressure_psia: 300, polytropic_exponent: 1.11 }));
 });
+
+import { computeRoomCavityRatio as _v979 } from "../../calc-elecdesign.js";
+
+test("bounds: spec-v979 computeRoomCavityRatio pins the IES zonal-cavity RCR and error seams", () => {
+  const r = _v979({ room_length_ft: 40, room_width_ft: 30, cavity_height_ft: 8 });
+  assert.ok(Math.abs(r.room_cavity_ratio - 2.33333) < 1e-4); // 5*8*70/1200
+  // A tall, narrow room (big cavity, small floor) has a high RCR.
+  const tall = _v979({ room_length_ft: 20, room_width_ft: 12, cavity_height_ft: 10 });
+  assert.ok(Math.abs(tall.room_cavity_ratio - 6.66667) < 1e-4); // 5*10*32/240
+  assert.ok(tall.room_cavity_ratio > r.room_cavity_ratio);
+  // RCR is linear in cavity height; a bigger room (same shape) lowers RCR.
+  assert.ok(Math.abs(_v979({ room_length_ft: 40, room_width_ft: 30, cavity_height_ft: 16 }).room_cavity_ratio - 2 * r.room_cavity_ratio) < 1e-6);
+  assert.ok(_v979({ room_length_ft: 80, room_width_ft: 60, cavity_height_ft: 8 }).room_cavity_ratio < r.room_cavity_ratio);
+  // A square room: RCR = 5*h*2L/L^2 = 10h/L.
+  assert.ok(Math.abs(_v979({ room_length_ft: 20, room_width_ft: 20, cavity_height_ft: 8 }).room_cavity_ratio - 10 * 8 / 20) < 1e-9);
+  // Error seams: non-positive length / width / cavity, non-finite.
+  assert.ok("error" in _v979({ room_length_ft: 0, room_width_ft: 30, cavity_height_ft: 8 }));
+  assert.ok("error" in _v979({ room_length_ft: 40, room_width_ft: 0, cavity_height_ft: 8 }));
+  assert.ok("error" in _v979({ room_length_ft: 40, room_width_ft: 30, cavity_height_ft: 0 }));
+  assert.ok("error" in _v979({ room_length_ft: Infinity, room_width_ft: 30, cavity_height_ft: 8 }));
+});

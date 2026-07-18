@@ -534,6 +534,7 @@ const TOOL_MODULES = (() => {
   // calc-electrical.js cap watch. Both tiles keep group "A".
   declare("./calc-elecdesign.js", "ELECDESIGN_RENDERERS", [
     "pull-box-sizing", "lumen-method",
+    "room-cavity-ratio",
     // spec-v175 electrician batch
     "point-illuminance", "luminaire-height-for-illuminance", "point-method-required-candela",
     "lighting-light-loss-factor", "lighting-uniformity-ratio", "egress-lighting-check",

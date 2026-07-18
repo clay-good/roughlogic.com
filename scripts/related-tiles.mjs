@@ -1253,6 +1253,7 @@ const RELATED = {
   "cutting-fluid-concentration": ["cutting-speed-rpm","dilution","paint-mix-ratio"],
   "pull-box-sizing": ["box-fill","conduit-fill","cable-tray-fill"],
   "lumen-method": ["lighting-density","lux-to-footcandle","service-load"],
+  "room-cavity-ratio": ["lumen-method","lighting-density","point-illuminance"],
   "condensate-drain": ["cfm-per-ton","manual-j-cooling","duct-sizing"],
   "recovery-cylinder": ["refrigerant-charging","refrigerant-pt","compare-refrigerants"],
   "hvac-equipment-circuit": ["breaker-sizing","wire-ampacity","ev-charger-load"],
