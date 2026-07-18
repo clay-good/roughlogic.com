@@ -26962,6 +26962,24 @@ test("bounds: spec-v934 computeDrypipeAirCompressor pins the volume, free-air CF
   assert.ok("error" in _v934({ dry_volume_gal: Infinity, normal_pressure_psig: 40, restore_minutes: 30 }));
 });
 
+import { computePvAcOutputCircuit as _v942 } from "../../calc-electrical.js";
+
+test("bounds: spec-v942 computePvAcOutputCircuit pins the output current, conductor, OCPD, phase factor, and error seams", () => {
+  const r = _v942({ ac_power_w: 9600, ac_voltage_v: 240, phases: 1 });
+  assert.ok(Math.abs(r.continuous_current_a - 40) < 1e-9); // 9600/240
+  assert.ok(Math.abs(r.min_conductor_ampacity_a - 50) < 1e-9); // 1.25x
+  assert.equal(r.ocpd_a, 50); // next standard >= 50
+  // Three-phase drops the current by sqrt(3).
+  const three = _v942({ ac_power_w: 9600, ac_voltage_v: 208, phases: 3 });
+  assert.ok(Math.abs(three.continuous_current_a - 26.647) < 1e-2); // 9600/(208*sqrt3)
+  assert.equal(three.ocpd_a, 35); // next standard >= 33.3
+  // Error seams: non-positive power / voltage, bad phase, non-finite.
+  assert.ok("error" in _v942({ ac_power_w: 0, ac_voltage_v: 240, phases: 1 }));
+  assert.ok("error" in _v942({ ac_power_w: 9600, ac_voltage_v: 0, phases: 1 }));
+  assert.ok("error" in _v942({ ac_power_w: 9600, ac_voltage_v: 240, phases: 2 }));
+  assert.ok("error" in _v942({ ac_power_w: Infinity, ac_voltage_v: 240, phases: 1 }));
+});
+
 import { computeBatteryInverterDcConductor as _v941 } from "../../calc-electrical.js";
 
 test("bounds: spec-v941 computeBatteryInverterDcConductor pins the DC current, conductor, next-standard OCPD, and error seams", () => {

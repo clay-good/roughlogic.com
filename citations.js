@@ -8838,6 +8838,17 @@ export const CITATIONS = {
       { name: "DC-rated / Class T", value: "a battery's high fault current needs a listed DC-rated fuse (often Class T) and disconnect with adequate interrupting rating", source: "NEC 706 / practice" },
     ],
   },
+  "pv-ac-output-circuit": {
+    formula: "continuous_current_a = ac_power_w / (ac_voltage_v x [1 single-phase, sqrt(3) three-phase]); min_conductor_ampacity_a = 1.25 x continuous_current_a; ocpd_a = next standard size (NEC 240.6) >= 1.25 x continuous_current_a.",
+    edition: "NEC 690.8(B) (continuous current), 705.60 (interconnected-source overcurrent), 240.4 (conductor protection), and 240.6 (standard OCPD sizes), by name; the inverter datasheet and the AHJ govern.",
+    freeAccess: "The output-current relation is power / voltage (public); the 125% continuous factor and the standard OCPD sizes are public NEC, and the inverter power, voltage, and phase come from the datasheet.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverter AC output circuit -- the conductors and overcurrent device from a PV or ESS inverter to its point of connection. The inverter's rated continuous output current is its AC output power divided by the output voltage, times sqrt(3) for a three-phase inverter. Because the inverter is a continuous source, NEC 690.8(B) / 705.60 / 240.4 size both the conductor and the overcurrent device at 125% of that current, and 240.6 rounds the OCPD up to the next standard size. Where the datasheet gives a rated maximum continuous AC output current, use it (it can differ slightly from power / voltage). The point of connection to a busbar or panel is separately limited by the 705.12 busbar rules (the 120% allowance or a supply-side connection), checked with pv-interconnection-busbar. This is distinct from the DC-side conductor sizing (pv-circuit-ampacity, the 690.8(A) 156% rule on Isc). A sizing estimate; the inverter datasheet, the AHJ, and the adopted NEC edition govern the final design.",
+    assumptions: [
+      { name: "125% continuous", value: "conductor and OCPD at 1.25 x the continuous output current; OCPD to the next standard size (240.6)", source: "NEC 690.8(B) / 240.4 / 240.6" },
+      { name: "Busbar limit separate", value: "the 705.12 point-of-connection / busbar limit is checked separately (pv-interconnection-busbar)", source: "NEC 705.12" },
+    ],
+  },
   "lv-cable-pull-footage": {
     formula: "total_ft = drops x (avg_run_ft + slack_ft); boxes = ceil(total_ft / box_ft).",
     edition: "Low-voltage cable footage takeoff identity by name (drops x per-drop length; boxes from total / box); first-principles count arithmetic.",

@@ -35112,6 +35112,68 @@
    }
   },
   {
+   "tile_id": "pv-ac-output-circuit",
+   "source_publisher": "inverter AC output sizing (NEC 690.8(B))",
+   "source_title": "9.6 kW inverter, 240 V single-phase -> 40 A, 50 A conductor, 50 A OCPD",
+   "source_edition_or_year": "spec-v942 worked example (machine-verified)",
+   "source_section_or_page": "I = 9600/240 = 40; 1.25x = 50; next std OCPD >= 50 = 50",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "ac_power_w": 9600,
+    "ac_voltage_v": 240,
+    "phases": 1
+   },
+   "outputs": {
+    "continuous_current_a": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "min_conductor_ampacity_a": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "ocpd_a": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pv-ac-output-circuit",
+   "source_publisher": "inverter AC output sizing (NEC 690.8(B))",
+   "source_title": "cross-check: same 9.6 kW inverter at 208 V three-phase -> 26.6 A, 35 A OCPD",
+   "source_edition_or_year": "spec-v942 worked example (machine-verified)",
+   "source_section_or_page": "I = 9600/(208*sqrt(3)) = 26.65; 1.25x = 33.3; next std OCPD >= 33.3 = 35",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "ac_power_w": 9600,
+    "ac_voltage_v": 208,
+    "phases": 3
+   },
+   "outputs": {
+    "continuous_current_a": {
+     "value": 26.65,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "ocpd_a": {
+     "value": 35,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "battery-inverter-dc-conductor",
    "source_publisher": "battery-inverter DC sizing (NEC 690.8(B) / 706)",
    "source_title": "4 kW inverter, 48 V bank, 90% eff -> 92.6 A DC, 115.7 A conductor, 125 A OCPD",

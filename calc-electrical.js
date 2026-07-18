@@ -5823,3 +5823,55 @@ function _v941renderBatteryInverterDcConductor(inputRegion, outputRegion, citati
   for (const f of [pw, bv, ef]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["battery-inverter-dc-conductor"] = _v941renderBatteryInverterDcConductor;
+
+// ===================== spec-v942: inverter AC output-circuit conductor and OCPD (NEC 690.8(B) / 705.60) =====================
+// dims: in { ac_power_w: M L^2 T^-3, ac_voltage_v: M L^2 T^-3 I^-1, phases: dimensionless } out: { continuous_current_a: I, min_conductor_ampacity_a: I, ocpd_a: I }
+export function computePvAcOutputCircuit({ ac_power_w = 9600, ac_voltage_v = 240, phases = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(ac_power_w > 0)) return { error: "Inverter AC power must be positive (W)." };
+  if (!(ac_voltage_v > 0)) return { error: "AC voltage must be positive (V)." };
+  const ph = Math.round(phases);
+  if (ph !== 1 && ph !== 3) return { error: "Phases must be 1 (single-phase) or 3 (three-phase)." };
+  // I_cont = P / (V x line-to-line factor): 1 for single-phase, sqrt(3) for three-phase.
+  const phase_factor = ph === 3 ? Math.sqrt(3) : 1;
+  const continuous_current_a = ac_power_w / (ac_voltage_v * phase_factor);
+  // NEC 690.8(B) / 705.60 / 240.4: conductor and OCPD at 125% of the continuous inverter output current.
+  const min_conductor_ampacity_a = 1.25 * continuous_current_a;
+  const ocpd_a = _V941_STD_OCPD.find((s) => s >= min_conductor_ampacity_a) || Math.ceil(min_conductor_ampacity_a);
+  if (![continuous_current_a, min_conductor_ampacity_a, ocpd_a].every(Number.isFinite)) return { error: "AC-output math is not a finite value." };
+  return {
+    continuous_current_a,
+    min_conductor_ampacity_a,
+    ocpd_a,
+    note: "The inverter AC output circuit -- the conductors and overcurrent device from the inverter to the point of connection. The inverter's rated continuous output current is its AC power divided by the output voltage (times sqrt(3) for a three-phase inverter). Because it is a continuous source, NEC 690.8(B) / 705.60 / 240.4 size both the conductor and the overcurrent device at 125% of that current, and the OCPD rounds up to the next standard size (240.6). A 9.6 kW inverter at 240 V single-phase puts out 40 A, so the conductor is rated at least 50 A (a #6 Cu at 75 C) on a 50 A breaker; the same inverter at 208 V three-phase is only 26.6 A. Use the inverter's RATED continuous AC output current from its datasheet if given (it can differ slightly from power/voltage), and check the 705.12 busbar / point-of-connection limit separately. A sizing estimate; the inverter datasheet, the AHJ, and the adopted NEC edition govern.",
+  };
+}
+
+export const pvAcOutputCircuitExample = { inputs: { ac_power_w: 9600, ac_voltage_v: 240, phases: 1 } };
+
+function _v942renderPvAcOutputCircuit(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: inverter AC output-circuit conductor and OCPD by name (NEC 690.8(B) / 705.60 / 240.4). I_cont = P / (V x [1 or sqrt(3)]); conductor and OCPD at 125% of I_cont, OCPD to the next standard size (240.6). Check the 705.12 busbar limit separately; the datasheet and NEC govern.";
+  const pw = makeNumber("Inverter AC power (W)", "pao-pw", { step: "any", min: "0", value: "9600" });
+  pw.input.value = "9600";
+  const vv = makeNumber("AC voltage (V, line-to-line)", "pao-vv", { step: "any", min: "0", value: "240" });
+  vv.input.value = "240";
+  const ph = makeNumber("Phases (1 or 3)", "pao-ph", { step: "1", min: "1", value: "1" });
+  ph.input.value = "1";
+  for (const f of [pw, vv, ph]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { pw.input.value = "9600"; vv.input.value = "240"; ph.input.value = "1"; update(); });
+  const oI = makeOutputLine(outputRegion, "Continuous output current", "pao-out-i");
+  const oC = makeOutputLine(outputRegion, "Min conductor ampacity (125%)", "pao-out-c");
+  const oO = makeOutputLine(outputRegion, "Overcurrent device", "pao-out-o");
+  const update = debounce(() => {
+    const r = computePvAcOutputCircuit({
+      ac_power_w: pw.input.value === "" ? 9600 : Number(pw.input.value), ac_voltage_v: vv.input.value === "" ? 240 : Number(vv.input.value),
+      phases: ph.input.value === "" ? 1 : Number(ph.input.value),
+    });
+    if (r.error) { oI.textContent = r.error; oC.textContent = "-"; oO.textContent = "-"; return; }
+    oI.textContent = fmt(r.continuous_current_a, 1) + " A";
+    oC.textContent = fmt(r.min_conductor_ampacity_a, 1) + " A";
+    oO.textContent = fmt(r.ocpd_a, 0) + " A (next standard size)";
+  }, DEBOUNCE_MS);
+  for (const f of [pw, vv, ph]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["pv-ac-output-circuit"] = _v942renderPvAcOutputCircuit;

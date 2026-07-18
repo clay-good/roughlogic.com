@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(solar): add pv-ac-output-circuit tile (spec-v942); 2026-07-18
+
+- New Group A tile `pv-ac-output-circuit` (Inverter AC Output Circuit Conductor and OCPD, NEC 690.8(B)) in
+  calc-electrical.js, beside battery-inverter-dc-conductor. continuous current = AC power / (voltage x [1 or sqrt(3)]);
+  conductor and OCPD at 125% of it, OCPD to the next standard size (240.6). A 9.6 kW inverter at 240 V single-phase =
+  40 A -> 50 A conductor (#6 Cu), 50 A breaker; at 208 V three-phase = 26.6 A, 35 A. Distinct from the DC pv-circuit-
+  ampacity; check the 705.12 busbar limit separately. Home count 1,390 -> 1,391.
+
 ### feat(solar): add battery-inverter-dc-conductor tile (spec-v941); 2026-07-18
 
 - New Group A tile `battery-inverter-dc-conductor` (Battery-to-Inverter DC Conductor and OCPD, NEC 690.9/706) in

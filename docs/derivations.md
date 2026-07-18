@@ -1963,6 +1963,7 @@ cross-check.
 | calc-electrical.js | `computePoEBudget` | `{ poe_class = "at", category = "Cat6", run_length_ft = 100, ambient_C = 25 }` | _ | _ | _ |
 | calc-electrical.js | `computePowerTriangle` | `{ kw = null, kva = null, kvar = null, pf = null, angle_deg = null, sign = "la...` | _ | _ | _ |
 | calc-electrical.js | `computePullingTension` | `{ cable_weight_lb_per_ft = 0, run_length_ft = 0, lubricant = "polymer", strai...` | _ | _ | _ |
+| calc-electrical.js | `computePvAcOutputCircuit` | `{ ac_power_w = 9600, ac_voltage_v = 240, phases = 1 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeRooftopTempAdder` | `{ measured_ambient_f = 0, height_above_roof_in = 0, base_ampacity_a = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeServiceLoad` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuits = 1, fixed_app...` | _ | _ | _ |
 | calc-electrical.js | `computeServiceLoadOptional` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuits = 1, fixed_app...` | _ | _ | _ |
@@ -3051,7 +3052,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1637.
+Row count: 1638.
 
 <!-- END function-corpus-v14 -->
 
@@ -3132,7 +3133,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (175 tiles)
+### Group A Electrical (176 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3254,6 +3255,7 @@ per spec-v14 §13.1 second paragraph.
 | `power-triangle` | Power Triangle Solver (kW / kVA / kVAR / PF) | IEEE; kVA^2 = kW^2 + kVAR^2; PF = kW/kVA; theta = arccos(PF) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pull-box-sizing` | NEC Pull and Junction Box Sizing | NEC (NFPA 70) 314.28(A)(1) and (A)(2)...; spec-v101 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pulling-tension` | Conductor Pulling Tension | NECA / cable-pulling engineering prac...; 1.5 lb/ft cable / 100 ft straight / one 90-deg bend at 2 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pv-ac-output-circuit` | Inverter AC Output Circuit Conductor and OCPD (NEC 690.8(B)) | inverter AC output sizing (NEC 690.8(B)); I = 9600/240 = 40; 1.25x = 50; next std OCPD >= 50 = 50 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pv-array-sizing` | PV Array Size from a Target Annual Energy | NREL PVWatts energy model (inverted f...; spec-v647 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pv-ballast-weight` | PV Flat-Roof Ballast Weight and Roof PSF Screen | PV ballast load-screen identity (firs...; total = 30*(50+40)+150 = 2850; added = 2850/630 = 4.52 <=... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pv-cell-temperature-power` | PV Cell Temperature and Temperature-Derated Power | PV design practice / NREL; spec-v350 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4627,6 +4629,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1390. Fixture-covered or reference-cadence: 1390 / 1390.
+Tile count: 1391. Fixture-covered or reference-cadence: 1391 / 1391.
 
 <!-- END tile-index-v14 -->

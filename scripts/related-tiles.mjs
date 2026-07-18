@@ -1041,6 +1041,7 @@ const RELATED = {
   "welder-arc-circuit-conductor": ["wire-ampacity", "weld-duty-cycle", "motor-branch-protection"],
   "welder-resistance-circuit-conductor": ["welder-arc-circuit-conductor", "wire-ampacity", "weld-duty-cycle"],
   "battery-inverter-dc-conductor": ["pv-circuit-ampacity", "wire-ampacity", "off-grid-battery"],
+  "pv-ac-output-circuit": ["pv-interconnection-busbar", "microinverter-branch-count", "pv-circuit-ampacity"],
   "lv-cable-pull-footage": ["structured-cabling-channel", "cable-tray-fill", "cable-reel-capacity"],
   "solder-joint-quantity": ["pipe-volume", "pipe-expansion-loop", "pipe-fitting-takeout"],
   "pipe-insulation-takeoff": ["insulation-thickness", "pipe-heat-loss-radial", "solder-joint-quantity"],

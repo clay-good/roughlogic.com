@@ -17782,6 +17782,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "inverter ac output circuit",
+      "target": "pv-ac-output-circuit",
+      "kind": "industry"
+    },
+    {
+      "term": "inverter output conductor",
+      "target": "pv-ac-output-circuit",
+      "kind": "industry"
+    },
+    {
+      "term": "pv ac output circuit",
+      "target": "pv-ac-output-circuit",
+      "kind": "industry"
+    },
+    {
+      "term": "inverter breaker size",
+      "target": "pv-ac-output-circuit",
+      "kind": "adjacent"
+    },
+    {
+      "term": "solar inverter wire size",
+      "target": "pv-ac-output-circuit",
+      "kind": "adjacent"
+    },
+    {
       "term": "homerun wire takeoff",
       "target": "branch-circuit-wire-footage",
       "kind": "industry"
