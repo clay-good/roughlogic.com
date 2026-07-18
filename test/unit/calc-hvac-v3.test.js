@@ -385,3 +385,22 @@ test("baseboard output table: btu/ft rises with water temperature and high-capac
       `high-capacity baseboard outputs less than baseline at ${base[i].water_F} F: ${hi[i].btu_per_ft} < ${base[i].btu_per_ft}`);
   }
 });
+
+// Cross-tile physical consistency on the ASHRAE sensible-heat constant: the
+// SHR/latent split tile and the economizer-savings tile both compute the
+// sensible load Q = 1.08 * cfm * dT (the 1.08 is sea-level standard air). At
+// altitude 0 with matching cfm and dT they must return the same sensible Btu/hr.
+// If the 1.08 constant diverges between tiles, this catches it -- a "sibling"
+// class the per-tile fixtures cannot see.
+test("cross-tile: SHR/latent and economizer tiles agree on Q = 1.08 * cfm * dT sensible load", async () => {
+  const m = await import("../../calc-hvac.js");
+  for (const [cfm, dT] of [[1200, 20], [800, 15], [2000, 25]]) {
+    const supply = 55, ret = supply + dT;
+    const shr = m.computeSHRLatent({ total_capacity_btu_hr: 36000, return_db_F: ret, return_wb_F: ret - 12, supply_db_F: supply, cfm, altitude_ft: 0 });
+    const eco = m.computeEconomizerSavingsHours({ cfm, delta_t_f: dT, hours: 1 });
+    assert.ok(!shr.error && !eco.error, `error at ${cfm}/${dT}`);
+    assert.ok(Math.abs(shr.Q_sensible_btu_hr - 1.08 * cfm * dT) < 1e-6, `SHR sensible off closed form at ${cfm}/${dT}`);
+    assert.ok(Math.abs(shr.Q_sensible_btu_hr - eco.q_sens_btuh) < 1e-6,
+      `sensible load diverges between tiles at ${cfm} cfm / ${dT} F: SHR ${shr.Q_sensible_btu_hr} vs economizer ${eco.q_sens_btuh}`);
+  }
+});

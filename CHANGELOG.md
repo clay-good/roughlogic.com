@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(hvac): cross-tile consistency of the ASHRAE sensible-heat load (SHR-latent <-> economizer); 2026-07-17
+
+- Added a cross-tile guard: the SHR/latent split tile (Q_sensible_btu_hr) and the economizer-savings tile (q_sens_btuh)
+  both compute the sensible load Q = 1.08 x cfm x dT (1.08 = sea-level standard air). At altitude 0 with matching cfm and
+  dT they must return the same Btu/hr, and match the closed form. If the 1.08 constant diverges between tiles, this catches
+  it -- invisible to per-tile fixtures. Test-only.
+
 ### test(electrical): cross-tile round-trip of the three-phase power relation (three-phase-power <-> breaker-sizing); 2026-07-17
 
 - Added a cross-tile guard: computeThreePhase (P from V, I, pf) and computeBreakerSize (current from watts, V, pf) encode
