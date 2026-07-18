@@ -12090,3 +12090,16 @@ test("monotonicity: horizontal-curve geometry and average-end-area earthwork tra
   assert.ok(Math.abs(ea({}).total_yd3 - ea({}).total_ft3 / 27) < 1e-9, "cubic yards must equal cubic feet / 27");
   assert.ok(Math.abs(ea({}).total_ft3 - 50 * (100 + 200) / 2) < 1e-9, "V = interval * (A1+A2)/2 (average end area)");
 });
+
+test("consistency: sewage force-main velocity matches the plumbing pipe-velocity continuity formula, and both scale correctly", async () => {
+  const d = await import("../../calc-drainage.js");
+  const p = await import("../../calc-plumbing.js");
+  const fm = (o) => d.computeSewageForceMainVelocity({ gpm: 200, id_in: 4, ...o });
+  assert.ok(fm({ gpm: 400 }).velocity_fps > fm({}).velocity_fps, "force-main velocity must rise with flow");
+  assert.ok(fm({ id_in: 6 }).velocity_fps < fm({}).velocity_fps, "force-main velocity must fall as the pipe widens");
+  assert.ok(Math.abs(fm({}).velocity_fps - 0.4085 * 200 / 16) < 1e-9, "V = 0.4085 Q / d^2");
+  assert.ok(Math.abs(fm({}).d_max_scour_in - Math.sqrt(0.4085 * 200 / 2)) < 1e-9, "scour-limited diameter = sqrt(0.4085 Q / 2)");
+  // Sibling-tell: the drainage force-main and the plumbing pipe-velocity tiles share the 0.4085 continuity coefficient.
+  const pv = p.computePipeVelocity({ mode: "velocity-from-flow", flow_gpm: 200, diameter_in: 4 });
+  assert.ok(Math.abs(fm({}).velocity_fps - pv.velocity_fps) < 1e-9, "force-main and plumbing pipe-velocity must agree for identical flow and diameter");
+});

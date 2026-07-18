@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(drainage): cross-check force-main velocity against plumbing pipe-velocity; 2026-07-17
+
+- Sibling-tell guard: the sewage force-main and plumbing pipe-velocity tiles share the 0.4085 continuity coefficient
+  (V = 0.4085 Q/d^2) and must agree for identical flow and diameter; force-main velocity rises with flow, falls as the
+  pipe widens, and the scour-limited diameter = sqrt(0.4085 Q/2). Test-only.
+
 ### test(civil): guard horizontal-curve and average-end-area earthwork with monotonicity; 2026-07-17
 
 - Whole-response guards: horizontal-curve length L = R x delta(rad) and tangent T = R x tan(delta/2) rise with radius
