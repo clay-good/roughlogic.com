@@ -639,7 +639,7 @@ const TOOL_MODULES = (() => {
   // masonry's first structural (not takeoff) tiles. All three KEEP group "E".
   declare("./calc-masonry.js", "MASONRY_RENDERERS", [
     "cmu-wall-flexure", "cmu-shear-wall", "cmu-wall-axial",
-    "masonry-wall-weight", "brick-veneer-anchor-spacing", "brick-veneer-weep-count", "masonry-lintel-loading",
+    "masonry-wall-weight", "brick-veneer-anchor-spacing", "brick-veneer-weep-count", "masonry-joint-reinforcement", "masonry-lintel-loading",
     "masonry-anchor-bolt", "masonry-anchor-embedment", "masonry-prism-fm",
   ]);
   // spec-v272..v274 SDPWS wood lateral-force-resisting-system trio: a new

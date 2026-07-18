@@ -26797,6 +26797,24 @@ test("bounds: spec-v920 computeCementBoardTakeoff pins the sheets, screws, and e
   assert.ok("error" in _v920({ area_sf: Infinity, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 35 }));
 });
 
+import { computeMasonryJointReinforcement as _v922 } from "../../calc-masonry.js";
+
+test("bounds: spec-v922 computeMasonryJointReinforcement pins the courses, pieces, and error seams", () => {
+  const r = _v922({ wall_length_ft: 40, wall_height_ft: 12, vertical_spacing_in: 16, piece_length_ft: 10 });
+  assert.equal(r.reinforced_courses, 9); // ceil(144/16)
+  assert.equal(r.pieces_per_course, 4); // ceil(40/10)
+  assert.equal(r.total_pieces, 36); // 9 * 4
+  const s = _v922({ wall_length_ft: 30, wall_height_ft: 10, vertical_spacing_in: 16, piece_length_ft: 10 });
+  assert.equal(s.reinforced_courses, 8); // ceil(120/16)
+  assert.equal(s.total_pieces, 24); // 8 * 3
+  // Error seams: non-positive length / height / spacing / piece, non-finite.
+  assert.ok("error" in _v922({ wall_length_ft: 0, wall_height_ft: 12, vertical_spacing_in: 16, piece_length_ft: 10 }));
+  assert.ok("error" in _v922({ wall_length_ft: 40, wall_height_ft: 0, vertical_spacing_in: 16, piece_length_ft: 10 }));
+  assert.ok("error" in _v922({ wall_length_ft: 40, wall_height_ft: 12, vertical_spacing_in: 0, piece_length_ft: 10 }));
+  assert.ok("error" in _v922({ wall_length_ft: 40, wall_height_ft: 12, vertical_spacing_in: 16, piece_length_ft: 0 }));
+  assert.ok("error" in _v922({ wall_length_ft: Infinity, wall_height_ft: 12, vertical_spacing_in: 16, piece_length_ft: 10 }));
+});
+
 import { computeBrickVeneerWeepCount as _v919 } from "../../calc-masonry.js";
 
 test("bounds: spec-v919 computeBrickVeneerWeepCount pins the weep count, flashing lines, and error seams", () => {

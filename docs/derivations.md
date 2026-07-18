@@ -2385,6 +2385,7 @@ cross-check.
 | calc-masonry.js | `computeCmuWallFlexure` | `{ fm_psi = 2000, as_in2 = 0, d_in = 0, b_in = 12, fs_psi = 32000 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryAnchorBolt` | `{ fm_psi = 1500, lbe_in = 0, ab_in2 = 0, fy_psi = 36000 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryAnchorEmbedment` | `{ required_tension_lb = 0, fm_psi = 1500, ab_in2 = 0.442, fy_psi = 36000 } = {}` | _ | _ | _ |
+| calc-masonry.js | `computeMasonryJointReinforcement` | `{ wall_length_ft = 40, wall_height_ft = 12, vertical_spacing_in = 16, piece_l...` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryLintelLoading` | `{ span_ft = 0, wall_psf = 0, wall_h_above = 0 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryPrismFm` | `{ unit_type = "concrete", unit_strength_psi = 2000, mortar_type = "ms" } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryWallWeight` | `{ hollow_psf = 0, grout_adder = 0, cell_spacing = 8, grout_spacing = 0, heigh...` | _ | _ | _ |
@@ -3031,7 +3032,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1617.
+Row count: 1618.
 
 <!-- END function-corpus-v14 -->
 
@@ -3596,7 +3597,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (354 tiles)
+### Group E Construction (355 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3755,6 +3756,7 @@ per spec-v14 §13.1 second paragraph.
 | `masonry-control-joint-layout` | Masonry Control-Joint Layout | Masonry control-joint rule (NCMA empi...; max spacing = min(1.5*16, 25) = 24 ft; panels = ceil(80/2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-count` | Brick and CMU Count | Project (first-principles face-area c...; 100 ft^2 wall / CMU 8x8x16 (15.625x7.625 actual) / 3/8 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `masonry-coursing` | Masonry Coursing and Course-Out Check | BIA Technical Notes / NCMA TEK; spec-v213 section 2.1 pinned example (CMU wall on module) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `masonry-joint-reinforcement` | Masonry Horizontal Joint-Reinforcement Takeoff (IRC R606.12.2) | masonry joint-reinforcement takeoff (...; courses = ceil(144/16) = 9; per course = ceil(40/10) = 4;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-lintel-loading` | Masonry Lintel Arching Load (Triangular Load Over an Opening) | masonry design method; spec-v370 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-prism-fm` | Masonry Compressive Strength f'm, Unit-Strength Method (TMS 602 Table 2) | TMS 602-16 (ACI 530.1 / ASCE 6) Table...; spec-v551 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-wall-weight` | Masonry Wall Dead Load | NCMA TEK; spec-v368 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4587,6 +4589,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1370. Fixture-covered or reference-cadence: 1370 / 1370.
+Tile count: 1371. Fixture-covered or reference-cadence: 1371 / 1371.
 
 <!-- END tile-index-v14 -->

@@ -34602,6 +34602,58 @@
    }
   },
   {
+   "tile_id": "masonry-joint-reinforcement",
+   "source_publisher": "masonry joint-reinforcement takeoff (IRC R606.12.2)",
+   "source_title": "40 x 12 ft CMU wall, 16 in vertical, 10 ft pieces -> 9 courses, 4 per course, 36 total",
+   "source_edition_or_year": "spec-v922 worked example (machine-verified)",
+   "source_section_or_page": "courses = ceil(144/16) = 9; per course = ceil(40/10) = 4; total = 36",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "wall_length_ft": 40,
+    "wall_height_ft": 12,
+    "vertical_spacing_in": 16,
+    "piece_length_ft": 10
+   },
+   "outputs": {
+    "reinforced_courses": {
+     "value": 9,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_pieces": {
+     "value": 36,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-joint-reinforcement",
+   "source_publisher": "masonry joint-reinforcement takeoff (IRC R606.12.2)",
+   "source_title": "cross-check: 30 x 10 ft wall, 16 in vertical, 10 ft pieces -> 8 courses, 24 total",
+   "source_edition_or_year": "spec-v922 worked example (machine-verified)",
+   "source_section_or_page": "courses = ceil(120/16) = 8; per course = ceil(30/10) = 3; total = 24",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "wall_length_ft": 30,
+    "wall_height_ft": 10,
+    "vertical_spacing_in": 16,
+    "piece_length_ft": 10
+   },
+   "outputs": {
+    "total_pieces": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "brick-veneer-weep-count",
    "source_publisher": "brick veneer weep spacing (IRC R703.8.6)",
    "source_title": "30 ft wall, 33 in max spacing, 1 flashing line -> 12 weeps",

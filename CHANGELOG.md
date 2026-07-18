@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(masonry): add masonry-joint-reinforcement tile (spec-v922); 2026-07-18
+
+- New Group E tile `masonry-joint-reinforcement` (Masonry Horizontal Joint-Reinforcement Takeoff, IRC R606.12.2) in
+  calc-masonry.js, beside brick-veneer-weep-count. Ladder/truss wire in the bed joints: reinforced courses = ceil(height
+  in / vertical spacing); pieces per course = ceil(length / piece length); total = courses x pieces. IRC R606.12.2 / TMS
+  402 cap the vertical spacing at 16 in (every other 8 in course). A 40 x 12 ft CMU wall at 16 in and 10 ft pieces = 9
+  courses x 4 = 36; a 30 x 10 ft wall = 24. Laps (>= 6 in) and extra wire at openings not counted. The structural spec
+  and code govern. Home count 1,370 -> 1,371.
+
 ### feat(concrete): add concrete-isolation-joint tile (spec-v921); 2026-07-18
 
 - New Group E tile `concrete-isolation-joint` (Concrete Isolation-Joint Filler Takeoff) in calc-concrete.js, beside

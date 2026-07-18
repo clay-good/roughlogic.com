@@ -1345,6 +1345,7 @@ export const COMPUTE_MAP = {
   "masonry-wall-weight": { module: "../../calc-masonry.js", fn: "computeMasonryWallWeight" },
   "brick-veneer-anchor-spacing": { module: "../../calc-masonry.js", fn: "computeBrickVeneerAnchorSpacing" },
   "brick-veneer-weep-count": { module: "../../calc-masonry.js", fn: "computeBrickVeneerWeepCount" },
+  "masonry-joint-reinforcement": { module: "../../calc-masonry.js", fn: "computeMasonryJointReinforcement" },
   "masonry-lintel-loading": { module: "../../calc-masonry.js", fn: "computeMasonryLintelLoading" },
   // spec-v272..v274 SDPWS wood lateral-force-resisting-system trio (3 tiles, new calc-lateral.js)
   "diaphragm-shear": { module: "../../calc-lateral.js", fn: "computeDiaphragmShear" },

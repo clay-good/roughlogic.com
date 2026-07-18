@@ -1298,6 +1298,7 @@ const RELATED = {
   "annular-grout-volume": ["cmu-grout-volume","pipe-bedding-backfill","concrete"],
   "masonry-coursing": ["masonry-count","cmu-grout-volume","mortar-mix"],
   "brick-veneer-weep-count": ["brick-veneer-anchor-spacing","masonry-coursing","masonry-wall-weight"],
+  "masonry-joint-reinforcement": ["masonry-coursing","masonry-count","cmu-grout-volume"],
   "wallpaper-rolls": ["paint-coverage","square-footage","flooring-takeoff"],
   // spec-v215..v217 roofing material-takeoff batch
   "ice-barrier-coverage": ["roofing-squares","roof-pitch","gutter-downspout"],

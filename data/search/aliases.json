@@ -23882,6 +23882,31 @@
       "kind": "industry"
     },
     {
+      "term": "joint reinforcement",
+      "target": "masonry-joint-reinforcement",
+      "kind": "industry"
+    },
+    {
+      "term": "ladder wire",
+      "target": "masonry-joint-reinforcement",
+      "kind": "industry"
+    },
+    {
+      "term": "truss wire masonry",
+      "target": "masonry-joint-reinforcement",
+      "kind": "industry"
+    },
+    {
+      "term": "bed joint reinforcement",
+      "target": "masonry-joint-reinforcement",
+      "kind": "adjacent"
+    },
+    {
+      "term": "masonry wire count",
+      "target": "masonry-joint-reinforcement",
+      "kind": "adjacent"
+    },
+    {
       "term": "brick weep holes",
       "target": "brick-veneer-weep-count",
       "kind": "industry"

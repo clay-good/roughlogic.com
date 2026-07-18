@@ -14845,6 +14845,17 @@ export const CITATIONS = {
       { name: "Per flashing line", value: "count is per through-wall flashing line; base course plus each shelf-angle/lintel line needs its own weeps", source: "masonry veneer detailing" },
     ],
   },
+  "masonry-joint-reinforcement": {
+    formula: "reinforced_courses = ceil(wall_height_ft x 12 / vertical_spacing_in); pieces_per_course = ceil(wall_length_ft / piece_length_ft); total_pieces = reinforced_courses x pieces_per_course.",
+    edition: "IRC R606.12.2 and TMS 402 masonry horizontal joint-reinforcement provisions, by name; the spacing and lap come from the adopted code and the structural spec.",
+    freeAccess: "The count arithmetic is public first-principles; the 16 in maximum vertical spacing and 6 in minimum lap are in IRC R606.12.2 (many jurisdictions post the adopted IRC).",
+    governance: GOVERNANCE.general,
+    editionNote: "Horizontal joint reinforcement (ladder or truss wire) laid in the mortar bed joints of a masonry wall for crack control and, where designed, flexural capacity. The reinforced courses = ceil(height / vertical spacing); IRC R606.12.2 and TMS 402 set the maximum vertical spacing at 16 in (every other 8 in course), and some specs tighten it to 8 in or add wire at bond beams, lintels, and above and below openings. Pieces per course = ceil(length / piece length), and the wire (typically ~10 ft lengths) laps at least 6 in -- the lap is NOT added into the count here. This is a material count; the required spacing, the lap, the extra wire at openings and corners, and whether the wire is structural come from the structural spec and the adopted code.",
+    assumptions: [
+      { name: "Vertical spacing", value: "IRC R606.12.2 / TMS 402 max 16 in o.c. (every other 8 in course); some specs tighten to 8 in", source: "IRC R606.12.2" },
+      { name: "Lap not counted", value: "wire laps >= 6 in and gets extra runs at openings/corners; not added into this count", source: "masonry practice" },
+    ],
+  },
   "masonry-lintel-loading": {
     formula: "tri_h = span/2; if wall_above >= tri_h: W = 0.5 x span x tri_h x wall_psf (arching); else W = span x wall_above x wall_psf (full rectangle); UDL = W/span.",
     edition: "The masonry arching-action lintel-load method (TMS 402 commentary / masonry design references), by name.",
