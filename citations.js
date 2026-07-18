@@ -8739,6 +8739,17 @@ export const CITATIONS = {
       { name: "Datasheet current", value: "use the unit's max continuous AC output current, not wattage / voltage; the datasheet governs", source: "microinverter datasheet" },
     ],
   },
+  "welder-arc-circuit-conductor": {
+    formula: "duty_multiplier = sqrt(duty_pct / 100) (NEC Table 630.11(A)); effective_current_a = primary_current_a x duty_multiplier; ocpd_max_a = 2.0 x primary_current_a (630.12(A)).",
+    edition: "NEC 630.11 (conductors) and 630.12 (overcurrent protection) for arc-welding equipment, with the Table 630.11(A) duty-cycle multipliers, by name; the welder nameplate and the adopted NEC edition govern.",
+    freeAccess: "The duty-cycle multiplier (square root of the duty) and the 200% OCPD limit are public NEC (many jurisdictions post the adopted NEC); the rated primary current and duty come from the welder nameplate.",
+    governance: GOVERNANCE.general,
+    editionNote: "An arc-welder branch circuit is sized on an EFFECTIVE current rather than the nameplate primary. NEC 630.11(A) and Table 630.11(A) set the conductor at the rated primary current times a duty-cycle multiplier equal to the square root of the duty cycle (a 50%-duty welder draws its rated current only half the time, so its I^2 t heating is halved and the conductor need only carry sqrt(0.5) = 0.71 of the primary). The conductor's ampacity must be at least this effective current. NEC 630.12(A) permits the overcurrent device to be up to 200% of the rated primary current (using the next standard size down if 200% does not land on one). This covers arc welders (transformer / rectifier / motor-generator); resistance (spot / seam) welders use the separate 630.31 / 630.32 method with a 300% OCPD limit. Use the welder's rated primary current and duty cycle; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
+    assumptions: [
+      { name: "Duty multiplier", value: "conductor at I_primary x sqrt(duty) per Table 630.11(A); a low-duty welder heats the wire less", source: "NEC 630.11(A)" },
+      { name: "OCPD 200%", value: "arc-welder overcurrent device up to 200% of the rated primary (630.12(A)); resistance welders use 630.31/32 (300%)", source: "NEC 630.12" },
+    ],
+  },
   "lv-cable-pull-footage": {
     formula: "total_ft = drops x (avg_run_ft + slack_ft); boxes = ceil(total_ft / box_ft).",
     edition: "Low-voltage cable footage takeoff identity by name (drops x per-drop length; boxes from total / box); first-principles count arithmetic.",

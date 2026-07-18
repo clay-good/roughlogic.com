@@ -34884,6 +34884,60 @@
    }
   },
   {
+   "tile_id": "welder-arc-circuit-conductor",
+   "source_publisher": "arc-welder circuit sizing (NEC 630.11 / 630.12)",
+   "source_title": "40 A primary, 50% duty -> 28.28 A effective, 80 A max OCPD",
+   "source_edition_or_year": "spec-v932 worked example (machine-verified)",
+   "source_section_or_page": "mult = sqrt(0.50) = 0.7071; I_eff = 40*0.7071 = 28.28; OCPD = 2.0*40 = 80",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "primary_current_a": 40,
+    "duty_pct": 50
+   },
+   "outputs": {
+    "effective_current_a": {
+     "value": 28.284,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ocpd_max_a": {
+     "value": 80,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "welder-arc-circuit-conductor",
+   "source_publisher": "arc-welder circuit sizing (NEC 630.11 / 630.12)",
+   "source_title": "cross-check: 60 A primary, 100% duty -> full 60 A effective, 120 A OCPD",
+   "source_edition_or_year": "spec-v932 worked example (machine-verified)",
+   "source_section_or_page": "mult = sqrt(1.0) = 1.0; I_eff = 60; OCPD = 2.0*60 = 120",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "primary_current_a": 60,
+    "duty_pct": 100
+   },
+   "outputs": {
+    "effective_current_a": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ocpd_max_a": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "microinverter-branch-count",
    "source_publisher": "max microinverters per AC branch (NEC 705.60)",
    "source_title": "20 A branch, IQ7+ at 1.21 A -> 13 microinverters",

@@ -786,6 +786,7 @@ export const COMPUTE_MAP = {
   "wire-pulling-lubricant": { module: "../../calc-electrical.js", fn: "computeWirePullingLubricant" },
   "branch-circuit-wire-footage": { module: "../../calc-electrical.js", fn: "computeBranchCircuitWireFootage" },
   "microinverter-branch-count": { module: "../../calc-electrical.js", fn: "computeMicroinverterBranchCount" },
+  "welder-arc-circuit-conductor": { module: "../../calc-electrical.js", fn: "computeWelderArcCircuitConductor" },
   "lv-cable-pull-footage": { module: "../../calc-lowvoltage.js", fn: "computeLvCablePullFootage" },
   "solder-joint-quantity": { module: "../../calc-plumbing.js", fn: "computeSolderJointQuantity" },
   "pipe-insulation-takeoff": { module: "../../calc-plumbing.js", fn: "computePipeInsulationTakeoff" },

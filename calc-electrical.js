@@ -5683,3 +5683,47 @@ function _v924renderMicroinverterBranchCount(inputRegion, outputRegion, citation
   for (const f of [oc, iu]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["microinverter-branch-count"] = _v924renderMicroinverterBranchCount;
+
+// ===================== spec-v932: arc-welder branch-circuit conductor and OCPD =====================
+// dims: in { primary_current_a: I, duty_pct: dimensionless } out: { duty_multiplier: dimensionless, effective_current_a: I, ocpd_max_a: I }
+export function computeWelderArcCircuitConductor({ primary_current_a = 40, duty_pct = 50 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(primary_current_a > 0)) return { error: "Nameplate primary current must be positive (A)." };
+  if (!(duty_pct > 0 && duty_pct <= 100)) return { error: "Duty cycle must be between 0 and 100 percent." };
+  // NEC 630.11(A) / Table 630.11(A): the conductor-sizing multiplier is sqrt(duty), so I_eff = I_primary x sqrt(duty).
+  const duty_multiplier = Math.sqrt(duty_pct / 100);
+  const effective_current_a = primary_current_a * duty_multiplier;
+  // NEC 630.12(A): the overcurrent device for an arc welder may not exceed 200% of the rated primary current.
+  const ocpd_max_a = 2.0 * primary_current_a;
+  if (![duty_multiplier, effective_current_a, ocpd_max_a].every(Number.isFinite)) return { error: "Welder-circuit math is not a finite value." };
+  return {
+    duty_multiplier,
+    effective_current_a,
+    ocpd_max_a,
+    note: "Arc-welder (AC/DC transformer or motor-generator) branch circuit per NEC 630.11 and 630.12. The conductor is sized on an EFFECTIVE current, not the nameplate primary: I_eff = I_primary x the Table 630.11(A) duty-cycle multiplier, which is the square root of the duty cycle (a 50% duty welder only draws its rated current half the time, so the conductor heats less). Pick a conductor whose ampacity is at least I_eff. The overcurrent device may run up to 200% of the rated primary current (630.12(A)), using the next standard size down if 200% does not land on one. A 40 A primary, 50%-duty welder needs conductors rated for 28.3 A (a #10 Cu at 60 C) on up to an 80 A breaker. Use the nameplate rated primary current and duty; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
+  };
+}
+
+export const welderArcCircuitConductorExample = { inputs: { primary_current_a: 40, duty_pct: 50 } };
+
+function _v932renderWelderArcCircuitConductor(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: arc-welder branch-circuit conductor and OCPD by name (NEC 630.11 / 630.12). I_eff = I_primary x sqrt(duty) (Table 630.11(A) multiplier); conductor ampacity >= I_eff; OCPD <= 200% of the rated primary. The welder nameplate and the adopted NEC edition govern.";
+  const ip = makeNumber("Nameplate primary current (A)", "wac-ip", { step: "any", min: "0", value: "40" });
+  ip.input.value = "40";
+  const dc = makeNumber("Duty cycle (%)", "wac-dc", { step: "any", min: "0", value: "50" });
+  dc.input.value = "50";
+  for (const f of [ip, dc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ip.input.value = "40"; dc.input.value = "50"; update(); });
+  const oEff = makeOutputLine(outputRegion, "Effective current (size conductor to)", "wac-out-eff");
+  const oOcpd = makeOutputLine(outputRegion, "Max overcurrent device", "wac-out-ocpd");
+  const update = debounce(() => {
+    const r = computeWelderArcCircuitConductor({
+      primary_current_a: ip.input.value === "" ? 40 : Number(ip.input.value), duty_pct: dc.input.value === "" ? 50 : Number(dc.input.value),
+    });
+    if (r.error) { oEff.textContent = r.error; oOcpd.textContent = "-"; return; }
+    oEff.textContent = fmt(r.effective_current_a, 1) + " A (" + fmt(r.duty_multiplier, 2) + "x nameplate)";
+    oOcpd.textContent = fmt(r.ocpd_max_a, 0) + " A (200% of " + fmt(Number(ip.input.value) || 40, 0) + " A)";
+  }, DEBOUNCE_MS);
+  for (const f of [ip, dc]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["welder-arc-circuit-conductor"] = _v932renderWelderArcCircuitConductor;

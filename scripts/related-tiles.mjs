@@ -1036,6 +1036,7 @@ const RELATED = {
   "wire-pulling-lubricant": ["pulling-tension", "cable-reel-capacity", "conduit-fill"],
   "branch-circuit-wire-footage": ["voltage-drop", "wire-pulling-lubricant", "conduit-fill"],
   "microinverter-branch-count": ["pv-interconnection-busbar", "pv-circuit-ampacity", "pv-string-sizing"],
+  "welder-arc-circuit-conductor": ["wire-ampacity", "weld-duty-cycle", "motor-branch-protection"],
   "lv-cable-pull-footage": ["structured-cabling-channel", "cable-tray-fill", "cable-reel-capacity"],
   "solder-joint-quantity": ["pipe-volume", "pipe-expansion-loop", "pipe-fitting-takeout"],
   "pipe-insulation-takeoff": ["insulation-thickness", "pipe-heat-loss-radial", "solder-joint-quantity"],

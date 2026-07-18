@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): add welder-arc-circuit-conductor tile (spec-v932); 2026-07-18
+
+- New Group A tile `welder-arc-circuit-conductor` (Arc-Welder Branch-Circuit Conductor and OCPD, NEC 630.11) in
+  calc-electrical.js, beside microinverter-branch-count. Conductor at an EFFECTIVE current I_eff = primary x sqrt(duty)
+  (NEC Table 630.11(A) multiplier); OCPD <= 200% of the rated primary (630.12(A)). A 40 A primary, 50%-duty welder needs
+  28.3 A conductors (#10 Cu) on up to an 80 A breaker; a 60 A 100%-duty welder needs 60 A conductors, 120 A OCPD.
+  Resistance welders use the separate 630.31/32 (300%). Raised the calc-electrical.js gzip cap 88000 -> 92000. Home
+  count 1,380 -> 1,381.
+
 ### feat(construction): add joist-cantilever-check tile (spec-v931); 2026-07-18
 
 - New Group E tile `joist-cantilever-check` (Joist / Deck Cantilever Ratio Check, IRC R507.6) in calc-construction.js,

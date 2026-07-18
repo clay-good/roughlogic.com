@@ -26888,6 +26888,26 @@ test("bounds: spec-v925 computeRotaryPhaseConverter pins the idler size, governi
   assert.ok("error" in _v925({ largest_motor_hp: Infinity, total_running_hp: 15 }));
 });
 
+import { computeWelderArcCircuitConductor as _v932 } from "../../calc-electrical.js";
+
+test("bounds: spec-v932 computeWelderArcCircuitConductor pins the duty multiplier, effective current, OCPD, and error seams", () => {
+  const r = _v932({ primary_current_a: 40, duty_pct: 50 });
+  assert.ok(Math.abs(r.duty_multiplier - Math.SQRT1_2) < 1e-9); // sqrt(0.5)
+  assert.ok(Math.abs(r.effective_current_a - 28.2843) < 1e-3); // 40 * sqrt(0.5)
+  assert.equal(r.ocpd_max_a, 80); // 2.0 * 40
+  // 100% duty -> full nameplate current.
+  const full = _v932({ primary_current_a: 60, duty_pct: 100 });
+  assert.ok(Math.abs(full.effective_current_a - 60) < 1e-9);
+  assert.equal(full.ocpd_max_a, 120);
+  // A lower duty lowers the effective current (and the conductor).
+  assert.ok(_v932({ primary_current_a: 40, duty_pct: 20 }).effective_current_a < r.effective_current_a);
+  // Error seams: non-positive primary, duty out of range, non-finite.
+  assert.ok("error" in _v932({ primary_current_a: 0, duty_pct: 50 }));
+  assert.ok("error" in _v932({ primary_current_a: 40, duty_pct: 0 }));
+  assert.ok("error" in _v932({ primary_current_a: 40, duty_pct: 120 }));
+  assert.ok("error" in _v932({ primary_current_a: Infinity, duty_pct: 50 }));
+});
+
 import { computeMicroinverterBranchCount as _v924 } from "../../calc-electrical.js";
 
 test("bounds: spec-v924 computeMicroinverterBranchCount pins the count, 80% limit, and error seams", () => {
