@@ -207,6 +207,7 @@ export const COMPUTE_MAP = {
   "filter-loading": { module: "../../calc-water.js", fn: "computeFilterLoading" },
   "ro-recovery-concentration": { module: "../../calc-water.js", fn: "computeRoRecoveryConcentration" },
   "iron-manganese-chlorine-dose": { module: "../../calc-water.js", fn: "computeIronManganeseChlorineDose" },
+  "cistern-storage-days": { module: "../../calc-water.js", fn: "computeCisternStorageDays" },
   "filter-area-for-loading": { module: "../../calc-water.js", fn: "computeFilterAreaForLoading" },
   "arc-flash-screen": { module: "../../calc-electrical.js", fn: "computeArcFlashScreen" },
   "motor-branch-from-nameplate": { module: "../../calc-electrical.js", fn: "computeMotorBranchFromNameplate" },

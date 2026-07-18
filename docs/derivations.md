@@ -2983,6 +2983,7 @@ cross-check.
 | calc-water.js | `computeBackflowTestPSI` | `{ assembly_type = "rp", check1_psid = 0, relief_open_psid = 0, check2_psi = 0...` | _ | _ | _ |
 | calc-water.js | `computeChlorineDecay` | `{ initial_mg_l = 0, decay_k_per_hr = 0.1, time_hr = 0, target_mg_l = 0.2, vel...` | _ | _ | _ |
 | calc-water.js | `computeChlorineDemand` | `{ applied_mg_l = 0, measured_residual_mg_l = 0, target_residual_mg_l = 0 } = {}` | _ | _ | _ |
+| calc-water.js | `computeCisternStorageDays` | `{ usable_storage_gal = 2500, daily_demand_gpd = 150, target_days = 30 } = {}` | _ | _ | _ |
 | calc-water.js | `computeCoagulantDose` | `{ flow_mgd = 0, jar_test_dose_mg_l = 0, product = "alum_liquid", } = {}` | _ | _ | _ |
 | calc-water.js | `computeCoolingWaterMakeup` | `{ recirculation_gpm = 0, delta_T_F = 0, coc = 4, drift_fraction = 0.002, } = {}` | _ | _ | _ |
 | calc-water.js | `computeDetentionBasinVolume` | `{ target_minutes = 0, flow_gpm = 0 } = {}` | _ | _ | _ |
@@ -3044,7 +3045,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1630.
+Row count: 1631.
 
 <!-- END function-corpus-v14 -->
 
@@ -4310,7 +4311,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (54 tiles)
+### Group M Water and wastewater (55 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4323,6 +4324,7 @@ per spec-v14 §13.1 second paragraph.
 | `chlorine-decay` | Chlorine Residual Decay (First-Order) | EPA / AWWA; C(10) = 2*exp(-1) = 0.7358 mg/L; time to 0.2 mg/L = ln(2/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chlorine-decay-constant` | Chlorine Decay Constant from a Bottle Test | EPA / AWWA; k = ln(2.0/0.7358)/10 = ln(2.7182)/10 = 0.100 1/hr; half-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chlorine-demand` | Chlorine Demand and Dose for a Target Residual | Standard Methods 4500-Cl / AWWA M14 (...; spec-v116 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `cistern-storage-days` | Cistern / Storage Reserve Days and Required Volume | storage reserve mass balance (ARCSA /...; days = 2500/150 = 16.67; required = 150*30 = 4500 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `clarifier-area-for-loading` | Clarifier Surface Area for a Target SOR | Ten States Standards / Metcalf & Eddy...; spec-v742 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `clarifier-surface-loading` | Clarifier Surface, Weir, and Solids Loading | Ten States Standards / Metcalf & Eddy; spec-v405 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coagulant-dose` | Coagulant Dose from Jar Test | USEPA / WEF; pure_lb_day = 5 * 20 * 8.34 = 834; product_lb_day = 834 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4613,6 +4615,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1383. Fixture-covered or reference-cadence: 1383 / 1383.
+Tile count: 1384. Fixture-covered or reference-cadence: 1384 / 1384.
 
 <!-- END tile-index-v14 -->

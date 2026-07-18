@@ -5043,6 +5043,17 @@ export const CITATIONS = {
       { name: "Manganese kinetics", value: "Mn(II) is slow below pH ~8; often needs a catalytic (greensand / pyrolusite) filter or permanganate", source: "water-treatment practice" },
     ],
   },
+  "cistern-storage-days": {
+    formula: "reserve_days = usable_storage_gal / daily_demand_gpd; required_gal_for_target = daily_demand_gpd x target_days.",
+    edition: "Rainwater-harvesting / off-grid storage mass balance (ARCSA / TWDB rainwater manuals; water-storage practice), by name; local rainfall or the source yield and the AHJ govern.",
+    freeAccess: "The reserve relations are a public first-principles mass balance (storage over demand; demand times days); the usable storage, demand, and target come from the tank detail and the water budget.",
+    governance: GOVERNANCE.water,
+    editionNote: "A straight storage mass balance. The reserve a tank carries is its usable storage divided by the daily demand, and the tank needed to bank a target dry spell is the daily demand times the target days. USABLE storage is what sits above the pump-intake dead volume and below the overflow, past any reserved fire-suppression or first-flush volume. Use a realistic PEAK daily demand (not the annual average), because the reserve has to survive the worst stretch. For a rain-fed cistern the reserve must bridge the longest dry spell between meaningful rains, sized off the local rainfall record; for a hauled or well-fed tank it sets the refill interval. This is a planning estimate; the local rainfall or the source yield, the storage tank detail, and the AHJ (for a potable system) govern.",
+    assumptions: [
+      { name: "Usable storage", value: "above the pump-intake dead volume and below overflow, past any fire / first-flush reserve", source: "storage-tank detail" },
+      { name: "Peak demand", value: "use a realistic peak daily demand, not the annual average; the reserve must bridge the worst stretch", source: "water-budget practice" },
+    ],
+  },
   "filter-area-for-loading": {
     formula: "Required filter area (ft²) = design_flow / target_loading. Backwash flow = backwash_rate × area. Bands: rapid sand 2-5 gpm/ft², high-rate 5-8 gpm/ft².",
     edition: "Ten States Standards (Recommended Standards for Water Works), Great Lakes - Upper Mississippi River Board of State and Provincial Public Health and Environmental Managers, current edition by name. AWWA B100 / B130 (filter media) by name.",

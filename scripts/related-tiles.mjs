@@ -414,6 +414,7 @@ const RELATED = {
   "filter-loading": ["detention-time", "pump-eff-w2w"],
   "ro-recovery-concentration": ["filter-loading", "detention-time", "pounds-formula"],
   "iron-manganese-chlorine-dose": ["pounds-formula", "disinfection-ct", "filter-loading"],
+  "cistern-storage-days": ["detention-time", "ro-recovery-concentration", "filter-loading"],
   "filter-area-for-loading": ["filter-loading", "detention-basin-volume", "detention-time"],
   // v16 Group M first-principles batch.
   "pool-turnover": ["chlorine-decay", "pounds-formula", "disinfection-ct"],

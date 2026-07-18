@@ -1866,3 +1866,47 @@ function _v927renderIronManganeseChlorineDose(inputRegion, outputRegion, citatio
   for (const f of [fe, mn, dm, rs, fl]) f.input.addEventListener("input", update);
 }
 WATER_RENDERERS["iron-manganese-chlorine-dose"] = _v927renderIronManganeseChlorineDose;
+
+// ===================== spec-v935: cistern / storage reserve days =====================
+// dims: in { usable_storage_gal: L^3, daily_demand_gpd: L^3 T^-1, target_days: T } out: { reserve_days: T, required_gal_for_target: L^3 }
+export function computeCisternStorageDays({ usable_storage_gal = 2500, daily_demand_gpd = 150, target_days = 30 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(usable_storage_gal > 0)) return { error: "Usable storage must be positive (gal)." };
+  if (!(daily_demand_gpd > 0)) return { error: "Daily demand must be positive (gpd)." };
+  if (!(target_days > 0)) return { error: "Target days must be positive." };
+  const reserve_days = usable_storage_gal / daily_demand_gpd;
+  const required_gal_for_target = daily_demand_gpd * target_days;
+  if (![reserve_days, required_gal_for_target].every(Number.isFinite)) return { error: "Storage-reserve math is not a finite value." };
+  return {
+    reserve_days,
+    required_gal_for_target,
+    note: "Cistern / storage reserve, a straight mass balance: days of reserve = usable storage / daily demand, and the tank needed to bank a target dry spell = daily demand x target days. A 2,500-gal usable tank at 150 gpd carries 16.7 days; banking a 30-day dry spell needs 4,500 gal. Use USABLE storage (above the pump intake and below overflow, and above any fire or first-flush reserve), and a realistic peak demand, not the annual average. For a rain-fed cistern the reserve must bridge the longest dry spell between refills, and for a hauled or well-fed tank it sets the refill interval. A planning estimate; local rainfall or the source yield, the storage detail, and the AHJ (for potable use) govern." ,
+  };
+}
+
+export const cisternStorageDaysExample = { inputs: { usable_storage_gal: 2500, daily_demand_gpd: 150, target_days: 30 } };
+
+function _v935renderCisternStorageDays(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: storage-reserve mass balance by name. reserve days = usable storage / daily demand; required volume = daily demand x target days. Use usable storage and a peak (not average) demand; local rainfall or source yield and the AHJ govern.";
+  const st = makeNumber("Usable storage (gal)", "csd-st", { step: "any", min: "0", value: "2500" });
+  st.input.value = "2500";
+  const dd = makeNumber("Daily demand (gpd)", "csd-dd", { step: "any", min: "0", value: "150" });
+  dd.input.value = "150";
+  const td = makeNumber("Target reserve (days, for required volume)", "csd-td", { step: "any", min: "0", value: "30" });
+  td.input.value = "30";
+  for (const f of [st, dd, td]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { st.input.value = "2500"; dd.input.value = "150"; td.input.value = "30"; update(); });
+  const oDays = makeOutputLine(outputRegion, "Reserve on this tank", "csd-out-days");
+  const oReq = makeOutputLine(outputRegion, "Tank needed for the target", "csd-out-req");
+  const update = debounce(() => {
+    const r = computeCisternStorageDays({
+      usable_storage_gal: st.input.value === "" ? 2500 : Number(st.input.value), daily_demand_gpd: dd.input.value === "" ? 150 : Number(dd.input.value),
+      target_days: td.input.value === "" ? 30 : Number(td.input.value),
+    });
+    if (r.error) { oDays.textContent = r.error; oReq.textContent = "-"; return; }
+    oDays.textContent = fmt(r.reserve_days, 1) + " days";
+    oReq.textContent = fmt(r.required_gal_for_target, 0) + " gal (for " + fmt(Number(td.input.value) || 30, 0) + " days)";
+  }, DEBOUNCE_MS);
+  for (const f of [st, dd, td]) f.input.addEventListener("input", update);
+}
+WATER_RENDERERS["cistern-storage-days"] = _v935renderCisternStorageDays;

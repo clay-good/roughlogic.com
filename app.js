@@ -1001,6 +1001,7 @@ const TOOL_MODULES = (() => {
     "pounds-formula", "filter-loading", "filter-area-for-loading", "detention-time", "detention-basin-volume",
     "ro-recovery-concentration",
     "iron-manganese-chlorine-dose",
+    "cistern-storage-days",
     "lab-dilution", "pump-eff-w2w", "srt-fm-ratio",
     // v8
     "coagulant-dose",

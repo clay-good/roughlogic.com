@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(water): add cistern-storage-days tile (spec-v935); 2026-07-18
+
+- New Group M tile `cistern-storage-days` (Cistern / Storage Reserve Days and Required Volume) in calc-water.js, beside
+  iron-manganese-chlorine-dose. reserve days = usable storage / daily demand; required volume = daily demand x target
+  days. A 2,500-gal usable tank at 150 gpd carries 16.7 days; banking 30 days needs 4,500 gal. Use usable storage and a
+  peak (not average) demand. Local rainfall/source yield and the AHJ govern. Raised the calc-water.js gzip cap 30000 ->
+  32000. Home count 1,383 -> 1,384.
+
 ### feat(fire): add drypipe-air-compressor tile (spec-v934); 2026-07-18
 
 - New Group F tile `drypipe-air-compressor` (Dry-Pipe / Preaction Air Compressor CFM) in calc-firesprinkler.js, beside

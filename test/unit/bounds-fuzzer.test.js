@@ -26832,6 +26832,22 @@ test("bounds: spec-v928 computeDynamicCompressionRatio pins the DCR, clearance v
   assert.ok("error" in _v928({ bore_in: Infinity, stroke_in: 3.75, rod_length_in: 6, static_cr: 10.5, ivc_abdc_deg: 60 }));
 });
 
+import { computeCisternStorageDays as _v935 } from "../../calc-water.js";
+
+test("bounds: spec-v935 computeCisternStorageDays pins the reserve days, required volume, and error seams", () => {
+  const r = _v935({ usable_storage_gal: 2500, daily_demand_gpd: 150, target_days: 30 });
+  assert.ok(Math.abs(r.reserve_days - 16.6667) < 1e-3); // 2500/150
+  assert.equal(r.required_gal_for_target, 4500); // 150*30
+  const b = _v935({ usable_storage_gal: 1000, daily_demand_gpd: 50, target_days: 14 });
+  assert.equal(b.reserve_days, 20); // 1000/50
+  assert.equal(b.required_gal_for_target, 700); // 50*14
+  // Error seams: non-positive storage / demand / target, non-finite.
+  assert.ok("error" in _v935({ usable_storage_gal: 0, daily_demand_gpd: 150, target_days: 30 }));
+  assert.ok("error" in _v935({ usable_storage_gal: 2500, daily_demand_gpd: 0, target_days: 30 }));
+  assert.ok("error" in _v935({ usable_storage_gal: 2500, daily_demand_gpd: 150, target_days: 0 }));
+  assert.ok("error" in _v935({ usable_storage_gal: Infinity, daily_demand_gpd: 150, target_days: 30 }));
+});
+
 import { computeIronManganeseChlorineDose as _v927 } from "../../calc-water.js";
 
 test("bounds: spec-v927 computeIronManganeseChlorineDose pins the dose, lb/day, and error seams", () => {
