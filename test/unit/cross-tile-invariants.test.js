@@ -12562,3 +12562,14 @@ test("monotonicity: chiller tonnage follows q = 500 * gpm * dT / 12000 (hvacsyst
   assert.ok(Math.abs(ct({ gpm: 480 }).tons / ct({}).tons - 2) < 1e-9, "doubling the flow must double the tonnage (linear)");
   assert.ok(Math.abs(ct({ ewt_F: 64 }).delta_T_F - 20) < 1e-9, "a 64/44 F pair must give a 20 F delta-T");
 });
+
+test("monotonicity: IICRC air-mover count grows with area and water-class severity (restoration)", async () => {
+  const r = await import("../../calc-restoration.js");
+  const am = (o) => r.computeAirMovers({ affected_area_ft2: 500, water_class: "2", ...o });
+  assert.ok(am({ affected_area_ft2: 1000 }).air_mover_count > am({}).air_mover_count, "air-mover count must rise with affected area");
+  assert.ok(am({ water_class: "1" }).ft2_per_unit > am({}).ft2_per_unit, "a less severe class (1) covers more ft2 per unit");
+  assert.ok(am({ water_class: "3" }).ft2_per_unit < am({}).ft2_per_unit, "a more severe class (3) covers fewer ft2 per unit");
+  assert.ok(am({ water_class: "3" }).air_mover_count > am({ water_class: "1" }).air_mover_count, "a worse water class must call for more air movers over the same area");
+  assert.strictEqual(am({}).air_mover_count, Math.ceil(500 / am({}).ft2_per_unit), "count = ceil(area / ft2-per-unit)");
+  assert.ok(Math.abs(am({}).total_cfm - am({}).air_mover_count * 2500) < 1e-6, "total CFM = count * per-unit CFM");
+});

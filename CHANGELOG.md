@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(restoration): guard IICRC air-mover count with monotonicity; 2026-07-17
+
+- Whole-response guard: air-mover count = ceil(area / ft2-per-unit) rises with affected area, a worse water class (S500
+  Class 1->2->3) shrinks ft2-per-unit (150/100/75) and calls for more units, and total CFM = count x per-unit CFM.
+  Test-only.
+
 ### test(hvacsystems): guard chiller tonnage against q = 500 gpm dT / 12000; 2026-07-17
 
 - Whole-response guard: cooling load = 500 x gpm x dT (water factor 500), tons = q/12000, delta-T = entering - leaving
