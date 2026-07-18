@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(layout): guard sine-bar angle and bolt-circle hole geometry; 2026-07-17
+
+- Geometry guards: sine-bar angle = asin(H/L) (30 deg at H/L=0.5, 90 deg at H=L) rises with stack height and falls with
+  bar length; bolt-circle radius = dia/2, spacing = 360/n, chord = 2R sin(180/n), and every hole lies exactly on the
+  pitch circle. Test-only.
+
 ### test(demo): guard flood-cut demolition quantities with monotonicity; 2026-07-17
 
 - Whole-response guards: drywall area = wall-run x cut-height/12 rises with run and height, a two-sided cut doubles

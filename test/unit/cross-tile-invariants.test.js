@@ -12361,3 +12361,19 @@ test("monotonicity: flood-cut demolition quantities scale correctly, and two-sid
   assert.strictEqual(fc({}).sheets_4x8, Math.ceil(200 / 32), "replacement sheets = ceil(drywall area / 32)");
   assert.ok(fc({ cut_height_in: 48 }).sheets_4x8 > fc({}).sheets_4x8, "sheet count must rise with the cut area");
 });
+
+test("geometry: sine-bar angle = asin(H/L) and bolt-circle holes lie on the pitch circle (layout)", async () => {
+  const l = await import("../../calc-layout.js");
+  const sb = (o) => l.computeSineBar({ solve_for: "angle", bar_length_in: 5, stack_height_in: 2.5, ...o });
+  assert.ok(Math.abs(sb({}).angle_deg - 30) < 1e-6, "H/L = 0.5 must give asin(0.5) = 30 degrees");
+  assert.ok(sb({ stack_height_in: 3.5 }).angle_deg > sb({}).angle_deg, "angle must rise with the gauge-block stack height");
+  assert.ok(sb({ bar_length_in: 10 }).angle_deg < sb({}).angle_deg, "angle must fall as the sine-bar length grows for the same stack");
+  assert.ok(Math.abs(sb({ stack_height_in: 5 }).angle_deg - 90) < 1e-6, "a stack equal to the bar length must give 90 degrees");
+  const bc = (o) => l.computeBoltCircle({ bolt_circle_dia_in: 10, num_holes: 4, start_angle_deg: 0, center_x_in: 0, center_y_in: 0, ...o });
+  const b = bc({});
+  assert.ok(Math.abs(b.radius_in - 5) < 1e-9, "radius = diameter / 2");
+  assert.ok(Math.abs(b.angular_spacing_deg - 90) < 1e-9, "4 holes must space 90 degrees apart");
+  assert.ok(Math.abs(b.chord_in - 2 * 5 * Math.sin(Math.PI / 4)) < 1e-9, "chord between adjacent holes = 2 R sin(180/n)");
+  for (const h of b.holes) assert.ok(Math.abs(Math.hypot(h.x_in, h.y_in) - 5) < 1e-9, "every hole must lie on the pitch circle (distance R from center)");
+  assert.ok(Math.abs(bc({ num_holes: 8 }).angular_spacing_deg - 45) < 1e-9, "doubling the hole count must halve the angular spacing");
+});
