@@ -5727,3 +5727,48 @@ function _v932renderWelderArcCircuitConductor(inputRegion, outputRegion, citatio
   for (const f of [ip, dc]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["welder-arc-circuit-conductor"] = _v932renderWelderArcCircuitConductor;
+
+// ===================== spec-v933: resistance-welder branch-circuit conductor and OCPD =====================
+// dims: in { primary_current_a: I, duty_pct: dimensionless } out: { duty_multiplier: dimensionless, conductor_current_a: I, ocpd_max_a: I }
+export function computeWelderResistanceCircuitConductor({ primary_current_a = 100, duty_pct = 50 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(primary_current_a > 0)) return { error: "Nameplate primary current must be positive (A)." };
+  if (!(duty_pct > 0 && duty_pct <= 100)) return { error: "Duty cycle must be between 0 and 100 percent." };
+  // NEC 630.31(A)(2): a specific nonrepetitive resistance welder sizes its conductor at the primary current times
+  // the square root of the duty cycle (a spot welder fires briefly, so the conductor heats far less than the peak).
+  const duty_multiplier = Math.sqrt(duty_pct / 100);
+  const conductor_current_a = primary_current_a * duty_multiplier;
+  // NEC 630.32(A): the overcurrent device for a resistance welder may not exceed 300% of the rated primary current.
+  const ocpd_max_a = 3.0 * primary_current_a;
+  if (![duty_multiplier, conductor_current_a, ocpd_max_a].every(Number.isFinite)) return { error: "Welder-circuit math is not a finite value." };
+  return {
+    duty_multiplier,
+    conductor_current_a,
+    ocpd_max_a,
+    note: "Resistance (spot / seam / projection) welder branch circuit per NEC 630.31 and 630.32. A resistance welder fires in brief high-current pulses, so the conductor is sized on the primary current times the square root of the duty cycle (NEC 630.31(A)(2) for a specific nonrepetitive welder), the same duty-derating as an arc welder. But the overcurrent device is allowed up to 300% of the rated primary current (630.32(A)) -- higher than the 200% for arc welders -- because the pulses would nuisance-trip a tighter device. A 100 A primary, 50%-duty spot welder needs conductors rated 70.7 A (a #4 Cu at 75 C) on up to a 300 A device. Use the nameplate rated primary current and duty; the AHJ, the welder nameplate, and the adopted NEC edition govern. Arc welders use the separate 630.11/630.12 (200%) method.",
+  };
+}
+
+export const welderResistanceCircuitConductorExample = { inputs: { primary_current_a: 100, duty_pct: 50 } };
+
+function _v933renderWelderResistanceCircuitConductor(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: resistance-welder branch-circuit conductor and OCPD by name (NEC 630.31 / 630.32). conductor = primary x sqrt(duty) (630.31(A)(2)); OCPD <= 300% of the rated primary (630.32(A)). The welder nameplate and the adopted NEC edition govern.";
+  const ip = makeNumber("Nameplate primary current (A)", "wrc-ip", { step: "any", min: "0", value: "100" });
+  ip.input.value = "100";
+  const dc = makeNumber("Duty cycle (%)", "wrc-dc", { step: "any", min: "0", value: "50" });
+  dc.input.value = "50";
+  for (const f of [ip, dc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ip.input.value = "100"; dc.input.value = "50"; update(); });
+  const oCond = makeOutputLine(outputRegion, "Conductor current (size to)", "wrc-out-cond");
+  const oOcpd = makeOutputLine(outputRegion, "Max overcurrent device", "wrc-out-ocpd");
+  const update = debounce(() => {
+    const r = computeWelderResistanceCircuitConductor({
+      primary_current_a: ip.input.value === "" ? 100 : Number(ip.input.value), duty_pct: dc.input.value === "" ? 50 : Number(dc.input.value),
+    });
+    if (r.error) { oCond.textContent = r.error; oOcpd.textContent = "-"; return; }
+    oCond.textContent = fmt(r.conductor_current_a, 1) + " A (" + fmt(r.duty_multiplier, 2) + "x nameplate)";
+    oOcpd.textContent = fmt(r.ocpd_max_a, 0) + " A (300% of " + fmt(Number(ip.input.value) || 100, 0) + " A)";
+  }, DEBOUNCE_MS);
+  for (const f of [ip, dc]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["welder-resistance-circuit-conductor"] = _v933renderWelderResistanceCircuitConductor;

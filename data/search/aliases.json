@@ -17732,6 +17732,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "spot welder circuit",
+      "target": "welder-resistance-circuit-conductor",
+      "kind": "industry"
+    },
+    {
+      "term": "resistance welder circuit",
+      "target": "welder-resistance-circuit-conductor",
+      "kind": "industry"
+    },
+    {
+      "term": "spot welder conductor size",
+      "target": "welder-resistance-circuit-conductor",
+      "kind": "industry"
+    },
+    {
+      "term": "resistance welder breaker",
+      "target": "welder-resistance-circuit-conductor",
+      "kind": "adjacent"
+    },
+    {
+      "term": "seam welder circuit",
+      "target": "welder-resistance-circuit-conductor",
+      "kind": "adjacent"
+    },
+    {
       "term": "homerun wire takeoff",
       "target": "branch-circuit-wire-footage",
       "kind": "industry"

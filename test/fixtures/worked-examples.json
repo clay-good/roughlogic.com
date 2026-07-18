@@ -34884,6 +34884,60 @@
    }
   },
   {
+   "tile_id": "welder-resistance-circuit-conductor",
+   "source_publisher": "resistance-welder circuit sizing (NEC 630.31 / 630.32)",
+   "source_title": "100 A primary, 50% duty -> 70.71 A conductor, 300 A max OCPD",
+   "source_edition_or_year": "spec-v933 worked example (machine-verified)",
+   "source_section_or_page": "mult = sqrt(0.50) = 0.7071; conductor = 100*0.7071 = 70.71; OCPD = 3.0*100 = 300",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "primary_current_a": 100,
+    "duty_pct": 50
+   },
+   "outputs": {
+    "conductor_current_a": {
+     "value": 70.711,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ocpd_max_a": {
+     "value": 300,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "welder-resistance-circuit-conductor",
+   "source_publisher": "resistance-welder circuit sizing (NEC 630.31 / 630.32)",
+   "source_title": "cross-check: 60 A primary, 20% duty -> 26.83 A conductor, 180 A OCPD",
+   "source_edition_or_year": "spec-v933 worked example (machine-verified)",
+   "source_section_or_page": "mult = sqrt(0.20) = 0.4472; conductor = 60*0.4472 = 26.83; OCPD = 3.0*60 = 180",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "primary_current_a": 60,
+    "duty_pct": 20
+   },
+   "outputs": {
+    "conductor_current_a": {
+     "value": 26.833,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ocpd_max_a": {
+     "value": 180,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "welder-arc-circuit-conductor",
    "source_publisher": "arc-welder circuit sizing (NEC 630.11 / 630.12)",
    "source_title": "40 A primary, 50% duty -> 28.28 A effective, 80 A max OCPD",

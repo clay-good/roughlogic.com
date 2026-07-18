@@ -26888,6 +26888,22 @@ test("bounds: spec-v925 computeRotaryPhaseConverter pins the idler size, governi
   assert.ok("error" in _v925({ largest_motor_hp: Infinity, total_running_hp: 15 }));
 });
 
+import { computeWelderResistanceCircuitConductor as _v933 } from "../../calc-electrical.js";
+
+test("bounds: spec-v933 computeWelderResistanceCircuitConductor pins the conductor, 300% OCPD, and error seams", () => {
+  const r = _v933({ primary_current_a: 100, duty_pct: 50 });
+  assert.ok(Math.abs(r.conductor_current_a - 70.7107) < 1e-3); // 100 * sqrt(0.5)
+  assert.equal(r.ocpd_max_a, 300); // 3.0 * 100 (higher than arc's 200%)
+  const low = _v933({ primary_current_a: 60, duty_pct: 20 });
+  assert.ok(Math.abs(low.conductor_current_a - 26.8328) < 1e-3); // 60 * sqrt(0.2)
+  assert.equal(low.ocpd_max_a, 180); // 3.0 * 60
+  // Error seams: non-positive primary, duty out of range, non-finite.
+  assert.ok("error" in _v933({ primary_current_a: 0, duty_pct: 50 }));
+  assert.ok("error" in _v933({ primary_current_a: 100, duty_pct: 0 }));
+  assert.ok("error" in _v933({ primary_current_a: 100, duty_pct: 150 }));
+  assert.ok("error" in _v933({ primary_current_a: Infinity, duty_pct: 50 }));
+});
+
 import { computeWelderArcCircuitConductor as _v932 } from "../../calc-electrical.js";
 
 test("bounds: spec-v932 computeWelderArcCircuitConductor pins the duty multiplier, effective current, OCPD, and error seams", () => {

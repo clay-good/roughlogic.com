@@ -8750,6 +8750,17 @@ export const CITATIONS = {
       { name: "OCPD 200%", value: "arc-welder overcurrent device up to 200% of the rated primary (630.12(A)); resistance welders use 630.31/32 (300%)", source: "NEC 630.12" },
     ],
   },
+  "welder-resistance-circuit-conductor": {
+    formula: "duty_multiplier = sqrt(duty_pct / 100) (NEC 630.31(A)(2)); conductor_current_a = primary_current_a x duty_multiplier; ocpd_max_a = 3.0 x primary_current_a (630.32(A)).",
+    edition: "NEC 630.31 (conductors) and 630.32 (overcurrent protection) for resistance welding equipment, by name; the welder nameplate and the adopted NEC edition govern.",
+    freeAccess: "The duty-cycle conductor derating and the 300% OCPD limit are public NEC (many jurisdictions post the adopted NEC); the rated primary current and duty come from the welder nameplate.",
+    governance: GOVERNANCE.general,
+    editionNote: "A resistance (spot / seam / projection) welder fires in brief, high-current pulses. NEC 630.31(A)(2) sizes the conductor for a specific nonrepetitive welder at the rated primary current times the square root of the duty cycle -- the same duty derating as an arc welder, because the brief pulses heat the conductor far less than the peak current would suggest. NEC 630.32(A) then permits the overcurrent device up to 300% of the rated primary current, HIGHER than the 200% allowed for arc welders (630.12), so the inrush of the weld pulses does not nuisance-trip the device. This is the resistance-welder method; arc welders (transformer / rectifier / motor-generator) use the separate 630.11 / 630.12 (200%) method. Use the welder's rated primary current and duty cycle; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
+    assumptions: [
+      { name: "Duty multiplier", value: "conductor at I_primary x sqrt(duty) per 630.31(A)(2) for a specific nonrepetitive welder", source: "NEC 630.31" },
+      { name: "OCPD 300%", value: "resistance-welder overcurrent device up to 300% of the rated primary (630.32(A)); arc welders are 200%", source: "NEC 630.32" },
+    ],
+  },
   "lv-cable-pull-footage": {
     formula: "total_ft = drops x (avg_run_ft + slack_ft); boxes = ceil(total_ft / box_ft).",
     edition: "Low-voltage cable footage takeoff identity by name (drops x per-drop length; boxes from total / box); first-principles count arithmetic.",

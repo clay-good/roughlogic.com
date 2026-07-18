@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): add welder-resistance-circuit-conductor tile (spec-v933); 2026-07-18
+
+- New Group A tile `welder-resistance-circuit-conductor` (Resistance / Spot-Welder Branch-Circuit Conductor and OCPD,
+  NEC 630.31) in calc-electrical.js, beside welder-arc-circuit-conductor. Conductor = primary x sqrt(duty) (630.31(A)(2));
+  OCPD <= 300% of the rated primary (630.32(A)) -- higher than the 200% for arc welders so the weld pulses do not
+  nuisance-trip. A 100 A primary, 50%-duty spot welder needs 70.7 A conductors on up to a 300 A device; 60 A at 20% duty
+  = 26.8 A, 180 A. Home count 1,381 -> 1,382.
+
 ### feat(electrical): add welder-arc-circuit-conductor tile (spec-v932); 2026-07-18
 
 - New Group A tile `welder-arc-circuit-conductor` (Arc-Welder Branch-Circuit Conductor and OCPD, NEC 630.11) in
