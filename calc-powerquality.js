@@ -553,3 +553,68 @@ function _v524renderTddIeee519(inputRegion, outputRegion, citationEl) {
   for (const f of [isc, il, tdd]) f.input.addEventListener("input", update);
 }
 POWERQUALITY_RENDERERS["tdd-ieee-519"] = _v524renderTddIeee519;
+
+// --- spec-v955: Series RLC reactance, impedance, and resonant frequency (`rlc-reactance-resonance`) ---
+// dims: in { args: dimensionless } out: { inductive_reactance_ohm: dimensionless, capacitive_reactance_ohm: dimensionless, impedance_ohm: dimensionless, resonant_frequency_hz: dimensionless, power_factor: dimensionless }
+export function computeRlcReactanceResonance({ frequency_hz = 60, resistance_ohm = 10, inductance_h = 0.05, capacitance_uf = 50 } = {}) {
+  for (const v of [frequency_hz, resistance_ohm, inductance_h, capacitance_uf]) {
+    if (typeof v === "number" && !Number.isFinite(v)) return { error: "All numeric inputs must be finite numbers." };
+  }
+  if (!(frequency_hz > 0)) return { error: "Frequency must be positive (Hz)." };
+  if (!(resistance_ohm >= 0)) return { error: "Resistance cannot be negative (ohms)." };
+  if (!(inductance_h > 0)) return { error: "Inductance must be positive (H)." };
+  if (!(capacitance_uf > 0)) return { error: "Capacitance must be positive (uF)." };
+  const w = 2 * Math.PI * frequency_hz;
+  const c_farad = capacitance_uf * 1e-6;
+  const inductive_reactance_ohm = w * inductance_h;
+  const capacitive_reactance_ohm = 1 / (w * c_farad);
+  const net_reactance_ohm = inductive_reactance_ohm - capacitive_reactance_ohm;
+  const impedance_ohm = Math.sqrt(resistance_ohm * resistance_ohm + net_reactance_ohm * net_reactance_ohm);
+  const resonant_frequency_hz = 1 / (2 * Math.PI * Math.sqrt(inductance_h * c_farad));
+  const power_factor = impedance_ohm > 0 ? resistance_ohm / impedance_ohm : 1;
+  const character = Math.abs(net_reactance_ohm) < 1e-9 ? "resonant (XL = XC)" : (net_reactance_ohm > 0 ? "inductive (lagging)" : "capacitive (leading)");
+  if (![inductive_reactance_ohm, capacitive_reactance_ohm, impedance_ohm, resonant_frequency_hz, power_factor].every(Number.isFinite)) {
+    return { error: "RLC math is not a finite value." };
+  }
+  return {
+    inductive_reactance_ohm,
+    capacitive_reactance_ohm,
+    net_reactance_ohm,
+    impedance_ohm,
+    resonant_frequency_hz,
+    power_factor,
+    character,
+    note: "The reactances, total impedance, and resonant frequency of a series R-L-C branch, the base AC-circuit relations behind filter, coil, and cable-reactance work: inductive reactance XL = 2 pi f L rises with frequency, capacitive reactance XC = 1/(2 pi f C) falls with it, the series impedance is Z = sqrt(R^2 + (XL - XC)^2), and the power factor is R/Z. At 60 Hz a 10 ohm / 0.05 H / 50 uF branch has XL = 18.85 ohm, XC = 53.05 ohm, so the net reactance is capacitive (leading) and Z = 35.6 ohm at a 0.28 power factor. The branch is at RESONANCE where XL = XC, at the resonant frequency f0 = 1/(2 pi sqrt(L C)) -- 100.7 Hz here -- where the reactances cancel, the impedance collapses to just R, and the current peaks; that is the frequency a passive filter is tuned to and the one a cap bank must be kept away from. Single-frequency, linear, lumped-element series R-L-C at steady state; a real cable or coil has distributed and frequency-dependent parameters, and a harmonic or transient analysis governs a power-system resonance study.",
+  };
+}
+
+export const rlcReactanceResonanceExample = { inputs: { frequency_hz: 60, resistance_ohm: 10, inductance_h: 0.05, capacitance_uf: 50 } };
+
+function _v955renderRlcReactanceResonance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: series R-L-C reactance / impedance / resonance relations, by name. XL = 2 pi f L; XC = 1/(2 pi f C); Z = sqrt(R^2 + (XL - XC)^2); PF = R/Z; resonant f0 = 1/(2 pi sqrt(L C)). Single-frequency lumped-element steady state; a harmonic/transient study governs a power-system resonance.";
+  const fr = makeNumber("Frequency (Hz)", "rlc-fr", { step: "any", min: "0", value: "60" });
+  fr.input.value = "60";
+  const rr = makeNumber("Resistance R (ohms)", "rlc-rr", { step: "any", min: "0", value: "10" });
+  rr.input.value = "10";
+  const ll = makeNumber("Inductance L (H)", "rlc-ll", { step: "any", min: "0", value: "0.05" });
+  ll.input.value = "0.05";
+  const cc = makeNumber("Capacitance C (uF)", "rlc-cc", { step: "any", min: "0", value: "50" });
+  cc.input.value = "50";
+  for (const f of [fr, rr, ll, cc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fr.input.value = "60"; rr.input.value = "10"; ll.input.value = "0.05"; cc.input.value = "50"; update(); });
+  const oX = makeOutputLine(outputRegion, "XL / XC", "rlc-out-x");
+  const oZ = makeOutputLine(outputRegion, "Impedance Z / PF", "rlc-out-z");
+  const oF = makeOutputLine(outputRegion, "Resonant frequency", "rlc-out-f");
+  const update = debounce(() => {
+    const r = computeRlcReactanceResonance({
+      frequency_hz: fr.input.value === "" ? 60 : Number(fr.input.value), resistance_ohm: rr.input.value === "" ? 10 : Number(rr.input.value),
+      inductance_h: ll.input.value === "" ? 0.05 : Number(ll.input.value), capacitance_uf: cc.input.value === "" ? 50 : Number(cc.input.value),
+    });
+    if (r.error) { oX.textContent = r.error; oZ.textContent = "-"; oF.textContent = "-"; return; }
+    oX.textContent = fmt(r.inductive_reactance_ohm, 2) + " / " + fmt(r.capacitive_reactance_ohm, 2) + " ohm (" + r.character + ")";
+    oZ.textContent = fmt(r.impedance_ohm, 2) + " ohm, PF " + fmt(r.power_factor, 3);
+    oF.textContent = fmt(r.resonant_frequency_hz, 2) + " Hz";
+  }, DEBOUNCE_MS);
+  for (const f of [fr, rr, ll, cc]) f.input.addEventListener("input", update);
+}
+POWERQUALITY_RENDERERS["rlc-reactance-resonance"] = _v955renderRlcReactanceResonance;

@@ -2601,6 +2601,7 @@ cross-check.
 | calc-powerquality.js | `computeMotorVdStarting` | `{ source_voltage_V = 0, length_ft = 0, cmils = 0, lrc_A = 0, phase = "three",...` | _ | _ | _ |
 | calc-powerquality.js | `computeNeutralCurrent3ph` | `{ ia_A = 0, ib_A = 0, ic_A = 0, triplen_pct = 0 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeParallelConductorDerate` | `{ i_single_A = 0, n_sets = 1, total_ccc = 0, ambient_factor = 1, i_load_A = 0...` | _ | _ | _ |
+| calc-powerquality.js | `computeRlcReactanceResonance` | `{ frequency_hz = 60, resistance_ohm = 10, inductance_h = 0.05, capacitance_uf...` | _ | _ | _ |
 | calc-powerquality.js | `computeTddIeee519` | `{ isc_a = 0, il_a = 0, measured_tdd_pct = 0 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeTransformerKFactor` | `{ i1 = 1, i3 = 0, i5 = 0, i7 = 0, i9 = 0, i11 = 0, i13 = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `compute1031Timeline` | `{ sale_close_iso }` | _ | _ | _ |
@@ -3064,7 +3065,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1650.
+Row count: 1651.
 
 <!-- END function-corpus-v14 -->
 
@@ -3145,7 +3146,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (184 tiles)
+### Group A Electrical (185 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3290,6 +3291,7 @@ per spec-v14 §13.1 second paragraph.
 | `raceway-expansion-fitting` | PVC Raceway Expansion Fitting | NEC Article 352.44 / Table 352.44 (by...; 100 ft PVC, dT 100 F -> 3.38e-5 * 1200 in * 100 = 4.056 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `range-demand-220-55` | Household Range Demand Load (NEC Table 220.55 Col. C) | NEC 2023 (NFPA 70); 1 range Column C = 8 kW (not 12); demand 8 kW = 33.3 A at... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `reduced-voltage-starter` | Reduced-Voltage Starter Current and Torque | reduced-voltage-starter current and t...; spec-v522 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `rlc-reactance-resonance` | Series R-L-C Reactance, Impedance, and Resonant Frequency | Series R-L-C reactance / impedance / ...; XL=2pi*60*0.05=18.85; XC=1/(2pi*60*50e-6)=53.05; Z=sqrt(1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rolling-sphere-protection` | Lightning Rolling-Sphere Zone of Protection | NFPA 780 (rolling-sphere method); 30 ft mast, 150 ft sphere -> sqrt(9000 - 900) = sqrt(8100... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rooftop-temp-adder` | Rooftop Conduit Sunlight Ambient Adder (NEC 310.15(B)(2)) | NEC 2023 (NFPA 70); 95 F on the roof (<7/8 in) + 60 F adder = 155 F (~68 C) -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rotary-phase-converter-sizing` | Rotary Phase Converter Idler Sizing | rotary phase converter idler sizing (...; start = 2*10 = 20; idler = max(20, 15) = 20 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4653,6 +4655,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1403. Fixture-covered or reference-cadence: 1403 / 1403.
+Tile count: 1404. Fixture-covered or reference-cadence: 1404 / 1404.
 
 <!-- END tile-index-v14 -->

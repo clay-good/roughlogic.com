@@ -27627,3 +27627,32 @@ test("bounds: spec-v954 computeSteamBoilerBlowdown pins the TDS mass balance and
   assert.ok("error" in _v954({ steam_rate_lb_hr: 10000, feedwater_tds_ppm: 100, max_boiler_tds_ppm: 50 }));
   assert.ok("error" in _v954({ steam_rate_lb_hr: Infinity, feedwater_tds_ppm: 100, max_boiler_tds_ppm: 3500 }));
 });
+
+import { computeRlcReactanceResonance as _v955 } from "../../calc-powerquality.js";
+
+test("bounds: spec-v955 computeRlcReactanceResonance pins XL/XC/Z/f0/PF and error seams", () => {
+  const r = _v955({ frequency_hz: 60, resistance_ohm: 10, inductance_h: 0.05, capacitance_uf: 50 });
+  assert.ok(Math.abs(r.inductive_reactance_ohm - 18.8496) < 1e-3); // 2pi*60*0.05
+  assert.ok(Math.abs(r.capacitive_reactance_ohm - 53.0516) < 1e-3); // 1/(2pi*60*50e-6)
+  assert.ok(Math.abs(r.impedance_ohm - 35.6337) < 1e-3);
+  assert.ok(Math.abs(r.resonant_frequency_hz - 100.6584) < 1e-2); // 1/(2pi*sqrt(0.05*50e-6))
+  assert.ok(Math.abs(r.power_factor - 0.28063) < 1e-4);
+  assert.ok(r.character.startsWith("capacitive")); // XC > XL at 60 Hz here
+  // At the resonant frequency XL = XC, so Z collapses to R and PF = 1.
+  const res = _v955({ frequency_hz: r.resonant_frequency_hz, resistance_ohm: 10, inductance_h: 0.05, capacitance_uf: 50 });
+  assert.ok(Math.abs(res.impedance_ohm - 10) < 0.02);
+  assert.ok(Math.abs(res.power_factor - 1) < 1e-3);
+  assert.ok(Math.abs(res.net_reactance_ohm) < 0.05);
+  // XL rises and XC falls with frequency.
+  const hi = _v955({ frequency_hz: 120, resistance_ohm: 10, inductance_h: 0.05, capacitance_uf: 50 });
+  assert.ok(hi.inductive_reactance_ohm > r.inductive_reactance_ohm);
+  assert.ok(hi.capacitive_reactance_ohm < r.capacitive_reactance_ohm);
+  // Resonant frequency is independent of R.
+  assert.ok(Math.abs(_v955({ frequency_hz: 60, resistance_ohm: 999, inductance_h: 0.05, capacitance_uf: 50 }).resonant_frequency_hz - r.resonant_frequency_hz) < 1e-9);
+  // Error seams: non-positive frequency / L / C, negative R, non-finite.
+  assert.ok("error" in _v955({ frequency_hz: 0, resistance_ohm: 10, inductance_h: 0.05, capacitance_uf: 50 }));
+  assert.ok("error" in _v955({ frequency_hz: 60, resistance_ohm: -1, inductance_h: 0.05, capacitance_uf: 50 }));
+  assert.ok("error" in _v955({ frequency_hz: 60, resistance_ohm: 10, inductance_h: 0, capacitance_uf: 50 }));
+  assert.ok("error" in _v955({ frequency_hz: 60, resistance_ohm: 10, inductance_h: 0.05, capacitance_uf: 0 }));
+  assert.ok("error" in _v955({ frequency_hz: Infinity, resistance_ohm: 10, inductance_h: 0.05, capacitance_uf: 50 }));
+});

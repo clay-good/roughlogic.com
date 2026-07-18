@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): add rlc-reactance-resonance tile (spec-v955); 2026-07-18
+
+- New Group A tile `rlc-reactance-resonance` (Series R-L-C Reactance, Impedance, and Resonant Frequency) in
+  calc-powerquality.js. XL = 2 pi f L, XC = 1/(2 pi f C), Z = sqrt(R^2 + (XL - XC)^2), PF = R/Z, resonant f0 = 1/(2 pi
+  sqrt(L C)). At 60 Hz a 10 ohm / 0.05 H / 50 uF branch has XL 18.85, XC 53.05 ohm (capacitive/leading), Z 35.6 ohm,
+  PF 0.28, f0 100.7 Hz; at f0 the reactances cancel and Z collapses to R. Single-frequency lumped-element model; a
+  harmonic/transient study governs a real resonance. Home count 1,403 -> 1,404.
+
 ### feat(pipefitting): add steam-boiler-blowdown tile (spec-v954); 2026-07-18
 
 - New Group B tile `steam-boiler-blowdown` (Steam Boiler Surface Blowdown, Cycles of Concentration) in calc-pipefit.js.

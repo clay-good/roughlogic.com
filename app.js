@@ -134,6 +134,7 @@ const TOOL_MODULES = (() => {
     "harmonic-resonance", "capacitor-bank-for-resonance-order",
     // spec-v524 total demand distortion limit check (IEEE 519)
     "tdd-ieee-519",
+    "rlc-reactance-resonance",
   ]);
   // spec-v26 feeder + transformer-conductor overcurrent bench (group A;
   // relocated from calc-electrical.js at spec-v72 to relieve that module's

@@ -38499,6 +38499,82 @@
    }
   },
   {
+   "tile_id": "rlc-reactance-resonance",
+   "source_publisher": "Series R-L-C reactance / impedance / resonance",
+   "source_title": "60 Hz, 10 ohm, 0.05 H, 50 uF -> XL 18.85, XC 53.05, Z 35.63 ohm, PF 0.281, f0 100.66 Hz",
+   "source_edition_or_year": "spec-v955 worked example (machine-verified)",
+   "source_section_or_page": "XL=2pi*60*0.05=18.85; XC=1/(2pi*60*50e-6)=53.05; Z=sqrt(100+34.2^2)=35.63; f0=1/(2pi*sqrt(0.05*50e-6))=100.66",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "frequency_hz": 60,
+    "resistance_ohm": 10,
+    "inductance_h": 0.05,
+    "capacitance_uf": 50
+   },
+   "outputs": {
+    "inductive_reactance_ohm": {
+     "value": 18.85,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "capacitive_reactance_ohm": {
+     "value": 53.052,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "impedance_ohm": {
+     "value": 35.634,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "resonant_frequency_hz": {
+     "value": 100.658,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "power_factor": {
+     "value": 0.2806,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rlc-reactance-resonance",
+   "source_publisher": "Series R-L-C reactance / impedance / resonance",
+   "source_title": "cross-check: at the resonant frequency (100.66 Hz) XL = XC and Z collapses to R = 10 ohm (PF 1)",
+   "source_edition_or_year": "spec-v955 worked example (machine-verified)",
+   "source_section_or_page": "at f0, XL=XC so net reactance 0 -> Z = R = 10 ohm, PF = 1",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "frequency_hz": 100.658,
+    "resistance_ohm": 10,
+    "inductance_h": 0.05,
+    "capacitance_uf": 50
+   },
+   "outputs": {
+    "impedance_ohm": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "power_factor": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "tdd-ieee-519",
    "source_publisher": "IEEE 519-2022 Table 1 current-distortion limits",
    "source_title": "Isc 10,000 A, IL 400 A (ratio 25), measured TDD 6% -> 8% limit, passes",

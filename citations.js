@@ -7634,6 +7634,17 @@ export const CITATIONS = {
       { name: "Charging current", value: "the HRG resistor current must exceed the system charging current to control overvoltage", source: "IEEE 142" },
     ],
   },
+  "rlc-reactance-resonance": {
+    formula: "XL = 2 pi f L; XC = 1/(2 pi f C); net X = XL - XC; Z = sqrt(R^2 + (XL - XC)^2); power factor = R/Z; resonant frequency f0 = 1/(2 pi sqrt(L C)).",
+    edition: "Series R-L-C reactance, impedance, and resonance relations (classic AC circuit theory), by name; a harmonic or transient study governs a real power-system resonance.",
+    freeAccess: "The reactance, impedance, and resonant-frequency relations are public physics; the frequency, resistance, inductance, and capacitance are the user's circuit values.",
+    governance: GOVERNANCE.general,
+    editionNote: "The fundamental steady-state relations for a series resistor-inductor-capacitor branch at a single frequency. Inductive reactance XL = 2 pi f L increases with frequency (an inductor opposes fast change); capacitive reactance XC = 1/(2 pi f C) decreases with frequency (a capacitor passes fast change). They act in opposition, so the net reactance is XL - XC and the total series impedance is the vector sum Z = sqrt(R^2 + (XL - XC)^2), with the power factor R/Z (lagging when the net reactance is inductive, leading when capacitive). Resonance occurs where XL exactly equals XC, at the resonant frequency f0 = 1/(2 pi sqrt(L C)); there the reactances cancel, the impedance collapses to just the resistance R, the current is at its maximum, and the branch is purely resistive (unity power factor). That resonant frequency is what a passive harmonic filter is tuned to and the frequency a power-factor capacitor bank must be detuned away from, since a lightly damped resonance near a harmonic the loads produce amplifies it into destructive overvoltage and current. This is a single-frequency, linear, lumped-element model at steady state; a real cable or winding has distributed capacitance and inductance and frequency-dependent resistance (skin effect), and a full harmonic or electromagnetic-transient study governs an actual power-system resonance investigation.",
+    assumptions: [
+      { name: "Series R-L-C relations", value: "XL = 2 pi f L, XC = 1/(2 pi f C), Z = sqrt(R^2 + (XL-XC)^2), PF = R/Z, f0 = 1/(2 pi sqrt(LC))", source: "AC circuit theory" },
+      { name: "Single-frequency lumped model", value: "linear, lumped-element, one frequency; distributed parameters and a harmonic/transient study govern a real resonance", source: "power-quality practice" },
+    ],
+  },
   "tdd-ieee-519": {
     formula: "ratio = Isc / IL; limit = ratio < 20 ? 5.0 : ratio < 50 ? 8.0 : ratio < 100 ? 12.0 : ratio <= 1000 ? 15.0 : 20.0 (%); pass = measured_TDD <= limit.",
     edition: "The IEEE 519-2022 Table 1 current-distortion limits (total demand distortion at the point of common coupling), by name; the utility agreement and a measurement study govern.",

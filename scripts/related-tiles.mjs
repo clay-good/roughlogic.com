@@ -264,6 +264,7 @@ const RELATED = {
   "harmonic-resonance": ["pf-correction", "transformer-k-factor", "power-factor-billing-savings"],
   "capacitor-bank-for-resonance-order": ["harmonic-resonance", "pf-correction", "transformer-k-factor", "tdd-ieee-519"],
   "tdd-ieee-519": ["transformer-k-factor", "harmonic-resonance", "voltage-imbalance"],
+  "rlc-reactance-resonance": ["harmonic-resonance", "pf-correction", "voltage-drop-reactance"],
   "neutral-grounding-resistor": ["grounding-electrode", "egc-sizing", "grounding-electrode-conductor"],
   "step-touch-voltage": ["grounding-electrode", "neutral-grounding-resistor", "grounding-electrode-conductor"],
   "ground-potential-rise": ["step-touch-voltage", "neutral-grounding-resistor", "grounding-electrode"],

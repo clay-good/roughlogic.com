@@ -1049,6 +1049,7 @@ export const COMPUTE_MAP = {
   "harmonic-resonance": { module: "../../calc-powerquality.js", fn: "computeHarmonicResonance" },
   "capacitor-bank-for-resonance-order": { module: "../../calc-powerquality.js", fn: "computeCapacitorBankForResonanceOrder" },
   "tdd-ieee-519": { module: "../../calc-powerquality.js", fn: "computeTddIeee519" },
+  "rlc-reactance-resonance": { module: "../../calc-powerquality.js", fn: "computeRlcReactanceResonance" },
   "neutral-grounding-resistor": { module: "../../calc-elecdesign.js", fn: "computeNeutralGroundingResistor" },
   "step-touch-voltage": { module: "../../calc-elecdesign.js", fn: "computeStepTouchVoltage" },
   "ground-potential-rise": { module: "../../calc-elecdesign.js", fn: "computeGroundPotentialRise" },

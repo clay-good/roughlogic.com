@@ -566,7 +566,7 @@ const _TILES = [
   // spec-v523 harmonic parallel-resonance order
   ["harmonic-resonance", "A"], ["capacitor-bank-for-resonance-order", "A"],
   // spec-v524 total demand distortion limit check (IEEE 519)
-  ["tdd-ieee-519", "A"],
+  ["tdd-ieee-519", "A"], ["rlc-reactance-resonance", "A"],
   // spec-v525 neutral grounding resistor sizing (IEEE 142)
   ["neutral-grounding-resistor", "A"],
   ["step-touch-voltage", "A"],
