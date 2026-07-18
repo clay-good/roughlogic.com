@@ -8409,6 +8409,17 @@ export const CITATIONS = {
       { name: "Worst-case load", value: "total appliance current lumped at the end of the line; each device must still see its listed minimum", source: "NAC design practice" },
     ],
   },
+  "loop-signal-scaling": {
+    formula: "percent_of_span = (signal_ma - 4) / 16 x 100; engineering_value = range_low + (percent_of_span / 100) x (range_high - range_low). NAMUR NE43: <=3.6 or >=21 mA = fault; 3.8-20.5 mA valid.",
+    edition: "4-20 mA current-loop (live-zero) analog signal scaling by name (ANSI/ISA-50.00.01 analog signal ranges; NAMUR NE43 fault-signal levels); the transmitter's range and calibration govern.",
+    freeAccess: "The linear live-zero scaling is public instrumentation practice; the 4-20 mA range and the NAMUR NE43 fault thresholds are open industry standards, and the transmitter's engineering-unit range comes from its configuration.",
+    governance: GOVERNANCE.general,
+    editionNote: "A 4-20 mA current loop is the workhorse analog signal in process instrumentation, and it is a LIVE ZERO: 4 mA (not 0) represents the low end of the transmitter's range and 20 mA the high end, so the engineering value is a straight linear interpolation, percent of span = (mA - 4) / 16 x 100 and value = range_low + percent/100 x (range_high - range_low). A transmitter ranged 0-100 psi reads 50 psi at 12 mA and 75 psi at 16 mA; a -40 to 120 F transmitter reads 40 F at 12 mA. The live zero is deliberate: because a healthy zero reading still carries 4 mA, a dead wire or failed sensor (0 mA) is instantly distinguishable from a real bottom-of-range measurement. NAMUR NE43 formalizes this -- 3.8 to 20.5 mA is the valid measuring range, while a transmitter driven to <=3.6 mA (downscale) or >=21 mA (upscale) is signaling a diagnosed fault, and 3.6-3.8 / 20.5-21 mA are the under/overrange bands. This tile does the LINEAR scaling only; a differential-pressure flow transmitter with square-root extraction relates the signal to flow by the square root of the fraction (that is a different calc), and the transmitter's actual configured range, damping, and calibration -- not this screen -- govern the real reading.",
+    assumptions: [
+      { name: "Live-zero linear scaling", value: "4 mA = range_low (0% span), 20 mA = range_high (100%); value linear in (mA - 4)/16", source: "ANSI/ISA-50.00.01" },
+      { name: "NAMUR NE43 fault levels", value: "3.8-20.5 mA valid; <=3.6 mA downscale fault, >=21 mA upscale fault; below 4 / above 20 is under/overrange", source: "NAMUR NE43" },
+    ],
+  },
   "polymeric-sand-bags": {
     formula: "bags = ceil(area_sf x (1 + waste_pct/100) / coverage_per_bag_sf).",
     edition: "Polymeric joint-sand bag-count identity by name (area over the per-bag coverage, plus waste); first-principles arithmetic.",

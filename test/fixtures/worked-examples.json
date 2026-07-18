@@ -34602,6 +34602,56 @@
    }
   },
   {
+   "tile_id": "loop-signal-scaling",
+   "source_publisher": "4-20 mA current-loop live-zero scaling (ANSI/ISA-50.00.01)",
+   "source_title": "12 mA on a 0-100 psi range -> 50% of span, 50 psi",
+   "source_edition_or_year": "spec-v946 worked example (machine-verified)",
+   "source_section_or_page": "percent = (12-4)/16*100 = 50; value = 0 + 0.5*(100-0) = 50",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "signal_ma": 12,
+    "range_low": 0,
+    "range_high": 100
+   },
+   "outputs": {
+    "percent_of_span": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "engineering_value": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "loop-signal-scaling",
+   "source_publisher": "4-20 mA current-loop live-zero scaling (ANSI/ISA-50.00.01)",
+   "source_title": "cross-check: 12 mA on a -40 to 120 F range -> still 50% but 40 F (offset zero)",
+   "source_edition_or_year": "spec-v946 worked example (machine-verified)",
+   "source_section_or_page": "value = -40 + 0.5*(120-(-40)) = -40 + 80 = 40",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "signal_ma": 12,
+    "range_low": -40,
+    "range_high": 120
+   },
+   "outputs": {
+    "engineering_value": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fire-alarm-nac-voltage-drop",
    "source_publisher": "fire-alarm NAC voltage drop (NFPA 72)",
    "source_title": "24 V panel, 0.8 A, 250 ft #14 (2.525 ohm/1000 ft), 16 V device -> 19.39 V EOL, PASS",

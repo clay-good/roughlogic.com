@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(low-voltage): add loop-signal-scaling tile (spec-v946); 2026-07-18
+
+- New Group A tile `loop-signal-scaling` (4-20 mA Current-Loop Signal Scaling) in calc-lowvoltage.js. The live-zero
+  linear scaling an instrumentation tech reads off a loop meter: percent of span = (mA - 4)/16 x 100, value = range_low +
+  percent/100 x (range_high - range_low). 12 mA on 0-100 psi = 50 psi; 16 mA = 75 psi; 12 mA on -40 to 120 F = 40 F.
+  Flags NAMUR NE43 status: 3.8-20.5 mA valid, <=3.6 or >=21 mA sensor/loop fault, under/overrange otherwise. Linear only
+  (DP-flow square-root is separate). Home count 1,394 -> 1,395.
+
 ### feat(electrical): add motor-rms-hp tile (spec-v945); 2026-07-18
 
 - New Group A tile `motor-rms-hp` (Motor RMS Horsepower for a Duty-Cycle Load) in calc-motor.js. The constant HP that

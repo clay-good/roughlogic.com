@@ -1042,3 +1042,58 @@ function _v937renderFireAlarmNacVoltageDrop(inputRegion, outputRegion, citationE
   for (const f of [nv, ic, rl, rr, dm]) f.input.addEventListener("input", update);
 }
 LOWVOLTAGE_RENDERERS["fire-alarm-nac-voltage-drop"] = _v937renderFireAlarmNacVoltageDrop;
+
+// ===================== spec-v946: 4-20 mA current-loop signal scaling =====================
+// dims: in { args: dimensionless } out: { percent_of_span: dimensionless, engineering_value: dimensionless, status: dimensionless }
+export function computeLoopSignalScaling({ signal_ma = 12, range_low = 0, range_high = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (range_high === range_low) return { error: "Range high and low must differ (the span cannot be zero)." };
+  // Linear live-zero scaling: 4 mA = range_low (0% of span), 20 mA = range_high (100% of span).
+  const percent_of_span = (signal_ma - 4) / 16 * 100;
+  const engineering_value = range_low + (percent_of_span / 100) * (range_high - range_low);
+  // NAMUR NE43 valid measuring range is ~3.8 to 20.5 mA; <=3.6 or >=21 mA signals a sensor/loop fault.
+  let status;
+  if (signal_ma <= 3.6) status = "fault-low (<=3.6 mA: sensor/loop fault or open circuit, NAMUR NE43)";
+  else if (signal_ma < 3.8) status = "underrange (3.6-3.8 mA)";
+  else if (signal_ma < 4) status = "underrange (below 4 mA live zero)";
+  else if (signal_ma >= 21) status = "fault-high (>=21 mA: sensor/loop fault, NAMUR NE43)";
+  else if (signal_ma > 20.5) status = "overrange (above 20.5 mA)";
+  else if (signal_ma > 20) status = "overrange (above 20 mA full scale)";
+  else status = "in range (4-20 mA)";
+  if (![percent_of_span, engineering_value].every(Number.isFinite)) return { error: "Loop-scaling math is not a finite value." };
+  return {
+    percent_of_span,
+    engineering_value,
+    status,
+    note: "The engineering value a 4-20 mA current-loop signal represents, the number an instrumentation tech reads off a loop meter: the loop is a linear LIVE ZERO where 4 mA = the low end of the range (0% of span) and 20 mA = the high end (100%), so percent of span = (mA - 4) / 16 x 100 and the value = range_low + percent/100 x (range_high - range_low). A transmitter ranged 0-100 psi reads 50 psi at 12 mA and 75 psi at 16 mA. The live zero (4 mA, not 0) is what lets the loop tell a real zero reading apart from a dead wire: per NAMUR NE43, 3.8-20.5 mA is the valid measuring band, while <=3.6 mA or >=21 mA is driven deliberately to flag a sensor or loop fault (an open circuit reads 0 mA). Below 4 or above 20 mA is under/overrange. This is the linear scaling only; a square-root-extracted flow transmitter (differential-pressure flow) needs the sqrt of the fraction, and the transmitter's actual range, damping, and calibration govern.",
+  };
+}
+
+export const loopSignalScalingExample = { inputs: { signal_ma: 12, range_low: 0, range_high: 100 } };
+
+function _v946renderLoopSignalScaling(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: 4-20 mA current-loop (live-zero) signal scaling, by name; ANSI/ISA-50.00.01 analog signal ranges and NAMUR NE43 fault levels. percent = (mA - 4)/16 x 100; value = range_low + percent/100 x (range_high - range_low). Linear scaling only (a DP-flow transmitter is square-root); the transmitter's range and calibration govern.";
+  const ma = makeNumber("Loop signal (mA)", "lss-ma", { step: "any", value: "12" });
+  ma.input.value = "12";
+  const lo = makeNumber("Range low (value at 4 mA)", "lss-lo", { step: "any", value: "0" });
+  lo.input.value = "0";
+  const hi = makeNumber("Range high (value at 20 mA)", "lss-hi", { step: "any", value: "100" });
+  hi.input.value = "100";
+  for (const f of [ma, lo, hi]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ma.input.value = "12"; lo.input.value = "0"; hi.input.value = "100"; update(); });
+  const oVal = makeOutputLine(outputRegion, "Engineering value", "lss-out-v");
+  const oPct = makeOutputLine(outputRegion, "Percent of span", "lss-out-p");
+  const oStatus = makeOutputLine(outputRegion, "Signal status", "lss-out-s");
+  const update = debounce(() => {
+    const r = computeLoopSignalScaling({
+      signal_ma: ma.input.value === "" ? 12 : Number(ma.input.value),
+      range_low: lo.input.value === "" ? 0 : Number(lo.input.value), range_high: hi.input.value === "" ? 100 : Number(hi.input.value),
+    });
+    if (r.error) { oVal.textContent = r.error; oPct.textContent = "-"; oStatus.textContent = "-"; return; }
+    oVal.textContent = fmt(r.engineering_value, 3);
+    oPct.textContent = fmt(r.percent_of_span, 2) + "%";
+    oStatus.textContent = r.status;
+  }, DEBOUNCE_MS);
+  for (const f of [ma, lo, hi]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["loop-signal-scaling"] = _v946renderLoopSignalScaling;

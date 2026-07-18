@@ -27414,3 +27414,31 @@ test("bounds: spec-v945 computeMotorRmsHp pins the RMS heating equivalent, the c
   assert.ok("error" in _v945({ hp_run: 20, run_time_s: 10, hp_idle: 0, idle_time_s: 20, cooling_factor: 0.5 }));
   assert.ok("error" in _v945({ hp_run: Infinity, run_time_s: 10, hp_idle: 0, idle_time_s: 20, cooling_factor: 3 }));
 });
+
+import { computeLoopSignalScaling as _v946 } from "../../calc-lowvoltage.js";
+
+test("bounds: spec-v946 computeLoopSignalScaling pins the live-zero linear scaling, NAMUR status, and error seams", () => {
+  const r = _v946({ signal_ma: 12, range_low: 0, range_high: 100 });
+  assert.ok(Math.abs(r.percent_of_span - 50) < 1e-9); // (12-4)/16*100
+  assert.ok(Math.abs(r.engineering_value - 50) < 1e-9);
+  assert.ok(r.status.startsWith("in range"));
+  // Endpoints: 4 mA = range_low (0%), 20 mA = range_high (100%).
+  assert.ok(Math.abs(_v946({ signal_ma: 4, range_low: 0, range_high: 100 }).engineering_value - 0) < 1e-9);
+  assert.ok(Math.abs(_v946({ signal_ma: 20, range_low: 0, range_high: 100 }).engineering_value - 100) < 1e-9);
+  // Offset (live) zero: same 50% maps into an offset range.
+  assert.ok(Math.abs(_v946({ signal_ma: 12, range_low: -40, range_high: 120 }).engineering_value - 40) < 1e-9);
+  // 16 mA on 0-100 = 75%.
+  assert.ok(Math.abs(_v946({ signal_ma: 16, range_low: 0, range_high: 100 }).percent_of_span - 75) < 1e-9);
+  // NAMUR NE43 fault / range status flags.
+  assert.ok(_v946({ signal_ma: 3.6, range_low: 0, range_high: 100 }).status.startsWith("fault-low"));
+  assert.ok(_v946({ signal_ma: 21, range_low: 0, range_high: 100 }).status.startsWith("fault-high"));
+  assert.ok(_v946({ signal_ma: 3.9, range_low: 0, range_high: 100 }).status.startsWith("underrange"));
+  assert.ok(_v946({ signal_ma: 20.7, range_low: 0, range_high: 100 }).status.startsWith("overrange"));
+  // Out-of-range signals still scale linearly (can go below 0% / above 100%).
+  assert.ok(_v946({ signal_ma: 2, range_low: 0, range_high: 100 }).percent_of_span < 0);
+  // A reversed range (high < low) is allowed as long as the span is non-zero.
+  assert.ok(Math.abs(_v946({ signal_ma: 12, range_low: 100, range_high: 0 }).engineering_value - 50) < 1e-9);
+  // Error seams: zero span (high == low), non-finite.
+  assert.ok("error" in _v946({ signal_ma: 12, range_low: 50, range_high: 50 }));
+  assert.ok("error" in _v946({ signal_ma: Infinity, range_low: 0, range_high: 100 }));
+});
