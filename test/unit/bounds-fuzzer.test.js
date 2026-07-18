@@ -26797,6 +26797,22 @@ test("bounds: spec-v920 computeCementBoardTakeoff pins the sheets, screws, and e
   assert.ok("error" in _v920({ area_sf: Infinity, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 35 }));
 });
 
+import { computeMicroinverterBranchCount as _v924 } from "../../calc-electrical.js";
+
+test("bounds: spec-v924 computeMicroinverterBranchCount pins the count, 80% limit, and error seams", () => {
+  const r = _v924({ branch_ocpd_a: 20, unit_max_current_a: 1.21 });
+  assert.ok(Math.abs(r.continuous_limit_a - 16) < 1e-9); // 20 * 0.80
+  assert.equal(r.max_microinverters, 13); // floor(16/1.21) = floor(13.22)
+  assert.ok(Math.abs(r.branch_load_a - 13 * 1.21) < 1e-9);
+  // A lower-output unit fits more; higher-output fewer.
+  assert.equal(_v924({ branch_ocpd_a: 20, unit_max_current_a: 1.0 }).max_microinverters, 16); // floor(16/1)
+  assert.equal(_v924({ branch_ocpd_a: 20, unit_max_current_a: 1.6 }).max_microinverters, 10); // floor(16/1.6)
+  // Error seams: non-positive OCPD / current, non-finite.
+  assert.ok("error" in _v924({ branch_ocpd_a: 0, unit_max_current_a: 1.21 }));
+  assert.ok("error" in _v924({ branch_ocpd_a: 20, unit_max_current_a: 0 }));
+  assert.ok("error" in _v924({ branch_ocpd_a: Infinity, unit_max_current_a: 1.21 }));
+});
+
 import { computeStudNotchBoreLimit as _v923 } from "../../calc-construction.js";
 
 test("bounds: spec-v923 computeStudNotchBoreLimit pins the notch/bore limits and error seams", () => {

@@ -17632,6 +17632,31 @@
       "kind": "industry"
     },
     {
+      "term": "microinverters per branch",
+      "target": "microinverter-branch-count",
+      "kind": "industry"
+    },
+    {
+      "term": "max microinverters",
+      "target": "microinverter-branch-count",
+      "kind": "industry"
+    },
+    {
+      "term": "microinverter branch circuit",
+      "target": "microinverter-branch-count",
+      "kind": "industry"
+    },
+    {
+      "term": "iq7 per branch",
+      "target": "microinverter-branch-count",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ac module branch count",
+      "target": "microinverter-branch-count",
+      "kind": "adjacent"
+    },
+    {
       "term": "homerun wire takeoff",
       "target": "branch-circuit-wire-footage",
       "kind": "industry"

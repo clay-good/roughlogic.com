@@ -8662,6 +8662,17 @@ export const CITATIONS = {
       { name: "Conductor count", value: "conductors per circuit for conduit (e.g. hot/neutral/ground = 3), or 1 for cable", source: "wiring method" },
     ],
   },
+  "microinverter-branch-count": {
+    formula: "continuous_limit_a = branch_ocpd_a x 0.80; max_microinverters = floor(continuous_limit_a / unit_max_current_a); branch_load_a = max_microinverters x unit_max_current_a.",
+    edition: "NEC 705.60 (interconnected sources), 690.8(B) (continuous current), and 240.4 (conductor / OCPD protection), by name; the microinverter datasheet and the adopted NEC edition govern.",
+    freeAccess: "The 80% continuous limit is public NEC (many jurisdictions post the adopted NEC); the unit's maximum continuous AC output current comes from its datasheet.",
+    governance: GOVERNANCE.general,
+    editionNote: "The maximum microinverters (or AC modules) on one AC branch circuit. A microinverter's AC output is a continuous load, so NEC 690.8(B) / 705.60 / 240.4 limit the combined continuous output current to 80% of the branch overcurrent device (the inverse of the 125% continuous sizing): N = floor(OCPD x 0.80 / unit max current). Use the unit's MAXIMUM continuous AC output current from its datasheet, not the module wattage divided by the AC voltage. The branch conductors and the point-of-connection to the panel must be sized to the same 125% continuous rule, and the 705.12 busbar / point-of-connection limit is checked separately. The microinverter datasheet, the AHJ, and the adopted NEC edition govern the final layout.",
+    assumptions: [
+      { name: "80% continuous", value: "combined continuous AC output <= 80% of branch OCPD (inverse of the 125% continuous rule)", source: "NEC 690.8(B) / 705.60 / 240.4" },
+      { name: "Datasheet current", value: "use the unit's max continuous AC output current, not wattage / voltage; the datasheet governs", source: "microinverter datasheet" },
+    ],
+  },
   "lv-cable-pull-footage": {
     formula: "total_ft = drops x (avg_run_ft + slack_ft); boxes = ceil(total_ft / box_ft).",
     edition: "Low-voltage cable footage takeoff identity by name (drops x per-drop length; boxes from total / box); first-principles count arithmetic.",

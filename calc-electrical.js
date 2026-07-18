@@ -5640,3 +5640,46 @@ function _v854renderBranchCircuitWireFootage(inputRegion, outputRegion, citation
   for (const f of [c, hr, mu, cp, rf]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["branch-circuit-wire-footage"] = _v854renderBranchCircuitWireFootage;
+
+// ===================== spec-v924: max microinverters per AC branch circuit =====================
+// dims: in { branch_ocpd_a: I, unit_max_current_a: I } out: { max_microinverters: dimensionless, branch_load_a: I, continuous_limit_a: I }
+export function computeMicroinverterBranchCount({ branch_ocpd_a = 20, unit_max_current_a = 1.21 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(branch_ocpd_a > 0)) return { error: "Branch OCPD must be positive (A)." };
+  if (!(unit_max_current_a > 0)) return { error: "Microinverter max current must be positive (A)." };
+  // NEC 705.60 / 690.8(B) / 240.4: continuous inverter output is limited to 80% of the branch OCPD.
+  const continuous_limit_a = branch_ocpd_a * 0.80;
+  const max_microinverters = Math.floor(continuous_limit_a / unit_max_current_a);
+  const branch_load_a = max_microinverters * unit_max_current_a;
+  if (![max_microinverters, branch_load_a, continuous_limit_a].every(Number.isFinite)) return { error: "Branch-count math is not a finite value." };
+  return {
+    max_microinverters,
+    branch_load_a,
+    continuous_limit_a,
+    note: "The most microinverters (or AC modules) on one AC branch circuit: their combined continuous output current, as a continuous load, may not exceed 80% of the branch overcurrent device (NEC 705.60 / 690.8(B) / 240.4), so N = floor(OCPD x 0.80 / unit max current). On a 20 A branch an Enphase IQ7+ at 1.21 A allows 13 units; a higher-output unit allows fewer. Use the unit's MAXIMUM continuous AC output current from its datasheet (not the panel wattage divided by voltage), and keep the branch conductors and the point-of-connection sized to the same 125% continuous rule. The microinverter datasheet, the AHJ, and the adopted NEC edition govern the final layout." ,
+  };
+}
+
+export const microinverterBranchCountExample = { inputs: { branch_ocpd_a: 20, unit_max_current_a: 1.21 } };
+
+function _v924renderMicroinverterBranchCount(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: max microinverters per AC branch by name (NEC 705.60 / 690.8(B) / 240.4). N = floor(branch OCPD x 0.80 / unit max continuous AC current) -- the combined continuous output cannot exceed 80% of the branch OCPD. The datasheet and the adopted NEC edition govern.";
+  const oc = makeNumber("Branch OCPD (A)", "mbc-oc", { step: "any", min: "0", value: "20" });
+  oc.input.value = "20";
+  const iu = makeNumber("Microinverter max AC current (A)", "mbc-iu", { step: "any", min: "0", value: "1.21" });
+  iu.input.value = "1.21";
+  for (const f of [oc, iu]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { oc.input.value = "20"; iu.input.value = "1.21"; update(); });
+  const oN = makeOutputLine(outputRegion, "Max microinverters per branch", "mbc-out-n");
+  const oLoad = makeOutputLine(outputRegion, "Branch continuous load", "mbc-out-l");
+  const update = debounce(() => {
+    const r = computeMicroinverterBranchCount({
+      branch_ocpd_a: oc.input.value === "" ? 20 : Number(oc.input.value), unit_max_current_a: iu.input.value === "" ? 1.21 : Number(iu.input.value),
+    });
+    if (r.error) { oN.textContent = r.error; oLoad.textContent = "-"; return; }
+    oN.textContent = fmt(r.max_microinverters, 0) + " units";
+    oLoad.textContent = fmt(r.branch_load_a, 2) + " A of " + fmt(r.continuous_limit_a, 1) + " A allowed (80% of " + fmt(Number(oc.input.value) || 20, 0) + " A)";
+  }, DEBOUNCE_MS);
+  for (const f of [oc, iu]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["microinverter-branch-count"] = _v924renderMicroinverterBranchCount;

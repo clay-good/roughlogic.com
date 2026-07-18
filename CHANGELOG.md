@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(solar): add microinverter-branch-count tile (spec-v924); 2026-07-18
+
+- New Group A tile `microinverter-branch-count` (Max Microinverters per AC Branch Circuit, NEC 705.60) in
+  calc-electrical.js, beside branch-circuit-wire-footage. N = floor(branch OCPD x 0.80 / unit max continuous AC current)
+  -- the combined continuous output cannot exceed 80% of the branch OCPD (NEC 690.8(B) / 705.60 / 240.4). A 20 A branch
+  with an IQ7+ at 1.21 A allows 13 microinverters; a 1.0 A unit 16. Use the datasheet max current, not wattage/voltage.
+  The datasheet, AHJ, and adopted NEC edition govern. Home count 1,372 -> 1,373.
+
 ### feat(construction): add stud-notch-bore-limit tile (spec-v923); 2026-07-18
 
 - New Group E tile `stud-notch-bore-limit` (Wall Stud Notching and Boring Limits, IRC R602.6) in calc-construction.js,

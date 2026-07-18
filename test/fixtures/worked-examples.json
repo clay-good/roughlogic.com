@@ -34602,6 +34602,54 @@
    }
   },
   {
+   "tile_id": "microinverter-branch-count",
+   "source_publisher": "max microinverters per AC branch (NEC 705.60)",
+   "source_title": "20 A branch, IQ7+ at 1.21 A -> 13 microinverters",
+   "source_edition_or_year": "spec-v924 worked example (machine-verified)",
+   "source_section_or_page": "limit = 20*0.80 = 16 A; N = floor(16/1.21) = floor(13.22) = 13",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "branch_ocpd_a": 20,
+    "unit_max_current_a": 1.21
+   },
+   "outputs": {
+    "max_microinverters": {
+     "value": 13,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "continuous_limit_a": {
+     "value": 16,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "microinverter-branch-count",
+   "source_publisher": "max microinverters per AC branch (NEC 705.60)",
+   "source_title": "cross-check: 20 A branch, 1.0 A unit -> 16 microinverters",
+   "source_edition_or_year": "spec-v924 worked example (machine-verified)",
+   "source_section_or_page": "limit = 16 A; N = floor(16/1.0) = 16",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "branch_ocpd_a": 20,
+    "unit_max_current_a": 1.0
+   },
+   "outputs": {
+    "max_microinverters": {
+     "value": 16,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "stud-notch-bore-limit",
    "source_publisher": "wall stud notch/bore limits (IRC R602.6)",
    "source_title": "2x6 stud (5.5 in) -> notch 1.375 bearing, bore 2.20 single, 3.30 doubled",
