@@ -197,3 +197,24 @@ test("SCH40 pipe ID table: gas, plumbing, and pipefit copies agree and are stric
     assert.equal(F.get(frac), G[k], `SCH40 diverges at nominal ${k} in: pipefit ${F.get(frac)} vs gas/plumbing ${G[k]}`);
   }
 });
+
+// Ordering invariants over two plumbing demand tables. Hunter's curve (WSFU ->
+// gpm probable demand) must rise in both columns -- it drives water-service and
+// branch pipe sizing, and the sizing logic interpolates/steps up a sorted curve.
+// PDI water-hammer arrestor sizes must have strictly increasing WSFU capacity.
+// A transcription error or mis-order would undersize a supply main or arrestor.
+test("plumbing demand tables: Hunter's curve and PDI arrestor sizes are strictly increasing", async () => {
+  const m = await import("../../calc-plumbing.js");
+  const H = m.HUNTERS_CURVE;
+  assert.ok(Array.isArray(H) && H.length >= 5, "HUNTERS_CURVE too short");
+  for (let i = 1; i < H.length; i++) {
+    assert.ok(H[i].wsfu > H[i - 1].wsfu, `Hunter's WSFU not increasing at ${i}: ${H[i].wsfu}`);
+    assert.ok(H[i].gpm > H[i - 1].gpm, `Hunter's gpm not increasing at ${i}: ${H[i].gpm} (WSFU ${H[i].wsfu})`);
+  }
+  const P = m.PDI_WH_ARRESTOR_SIZES;
+  assert.ok(Array.isArray(P) && P.length >= 3, "PDI_WH_ARRESTOR_SIZES too short");
+  for (let i = 1; i < P.length; i++) {
+    assert.ok(P[i].max_wsfu > P[i - 1].max_wsfu,
+      `PDI arrestor WSFU capacity not increasing at ${i}: ${P[i].designation} ${P[i].max_wsfu} <= ${P[i - 1].max_wsfu}`);
+  }
+});

@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(plumbing): guard the Hunter's-curve and PDI water-hammer-arrestor demand tables; 2026-07-17
+
+- Added ordering invariants over HUNTERS_CURVE (WSFU -> gpm probable demand, both columns strictly increasing -- it drives
+  water-service and branch pipe sizing) and PDI_WH_ARRESTOR_SIZES (strictly increasing WSFU capacity by designation). A
+  transcription error or mis-order would undersize a supply main or a water-hammer arrestor, a class the per-tile fixtures
+  miss. Test-only.
+
 ### test(electrical): guard four more NEC ordered tables (EGC, conduit area, service / kVA ladders); 2026-07-17
 
 - Added ordering invariants over EGC_TABLE_AWG (250.122: OCPD strictly increasing, copper/aluminum EGC never shrinks),
