@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(solar): add battery-inverter-dc-conductor tile (spec-v941); 2026-07-18
+
+- New Group A tile `battery-inverter-dc-conductor` (Battery-to-Inverter DC Conductor and OCPD, NEC 690.9/706) in
+  calc-electrical.js, beside welder-resistance-circuit-conductor. I_dc = AC power / (battery voltage x efficiency);
+  conductor and OCPD at 125% of I_dc, OCPD to the next standard size (240.6). A 4 kW inverter on a 48 V bank at 90% eff
+  draws 92.6 A -> 115.7 A conductor (1/0 Cu), 125 A fuse; a 24 V bank -> 185 A, 250 A. Use a listed DC-rated (Class T)
+  fuse. Home count 1,389 -> 1,390.
+
 ### feat(agriculture): add anhydrous-ammonia-rate tile (spec-v940); 2026-07-18
 
 - New Group L tile `anhydrous-ammonia-rate` (Anhydrous Ammonia Rate from Target Nitrogen) in calc-agriculture.js, beside

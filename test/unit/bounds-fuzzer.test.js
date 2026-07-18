@@ -26962,6 +26962,25 @@ test("bounds: spec-v934 computeDrypipeAirCompressor pins the volume, free-air CF
   assert.ok("error" in _v934({ dry_volume_gal: Infinity, normal_pressure_psig: 40, restore_minutes: 30 }));
 });
 
+import { computeBatteryInverterDcConductor as _v941 } from "../../calc-electrical.js";
+
+test("bounds: spec-v941 computeBatteryInverterDcConductor pins the DC current, conductor, next-standard OCPD, and error seams", () => {
+  const r = _v941({ inverter_power_w: 4000, battery_voltage_v: 48, efficiency_pct: 90 });
+  assert.ok(Math.abs(r.dc_current_a - 92.5926) < 1e-3); // 4000/(48*0.9)
+  assert.ok(Math.abs(r.min_conductor_ampacity_a - 115.74) < 0.01); // 1.25x
+  assert.equal(r.ocpd_a, 125); // next standard >= 115.74
+  // Halving the bank voltage doubles the current and jumps the OCPD.
+  const low = _v941({ inverter_power_w: 4000, battery_voltage_v: 24, efficiency_pct: 90 });
+  assert.ok(Math.abs(low.dc_current_a - 185.185) < 1e-3);
+  assert.equal(low.ocpd_a, 250); // next standard >= 231.5
+  // Error seams: non-positive power / voltage, efficiency out of range, non-finite.
+  assert.ok("error" in _v941({ inverter_power_w: 0, battery_voltage_v: 48, efficiency_pct: 90 }));
+  assert.ok("error" in _v941({ inverter_power_w: 4000, battery_voltage_v: 0, efficiency_pct: 90 }));
+  assert.ok("error" in _v941({ inverter_power_w: 4000, battery_voltage_v: 48, efficiency_pct: 0 }));
+  assert.ok("error" in _v941({ inverter_power_w: 4000, battery_voltage_v: 48, efficiency_pct: 150 }));
+  assert.ok("error" in _v941({ inverter_power_w: Infinity, battery_voltage_v: 48, efficiency_pct: 90 }));
+});
+
 import { computeWelderResistanceCircuitConductor as _v933 } from "../../calc-electrical.js";
 
 test("bounds: spec-v933 computeWelderResistanceCircuitConductor pins the conductor, 300% OCPD, and error seams", () => {

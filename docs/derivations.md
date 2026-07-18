@@ -1919,6 +1919,7 @@ cross-check.
 | calc-electrical.js | `computeAsymmetricalFaultXr` | `{ isym_ka = 0, x_over_r = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeAwgWireGeometry` | `{ awg = "12" } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeBatteryHydrogenVent` | `{ cell_count = 0, charge_current_a = 0, room_volume_ft3 = 0 } = {}` | _ | _ | _ |
+| calc-electrical.js | `computeBatteryInverterDcConductor` | `{ inverter_power_w = 4000, battery_voltage_v = 48, efficiency_pct = 90 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeBatteryVentMaxCurrent` | `{ available_cfm = 0, cell_count = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeBendRadius` | `{ cable_type, cable_od_in }` | _ | _ | _ |
 | calc-electrical.js | `computeBendsBetweenPulls` | `{ bend1_deg = 0, bend2_deg = 0, bend3_deg = 0, bend4_deg = 0, bend5_deg = 0, ...` | _ | _ | _ |
@@ -3050,7 +3051,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1636.
+Row count: 1637.
 
 <!-- END function-corpus-v14 -->
 
@@ -3131,7 +3132,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (174 tiles)
+### Group A Electrical (175 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3142,6 +3143,7 @@ per spec-v14 §13.1 second paragraph.
 | `awg-wire-geometry` | AWG Conductor Geometry (Diameter, Circular Mils, mm^2) | AWG geometric definition (ASTM B258); spec-v804 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `battery-c-rate` | Battery C-Rate: Deliverable Power and Discharge Duration | Battery C-rate definition; spec-v238 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `battery-hydrogen-vent` | Battery Room Hydrogen Ventilation (IEEE 1635) | IEEE 1635 battery-room hydrogen venti...; spec-v518 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `battery-inverter-dc-conductor` | Battery-to-Inverter DC Conductor and OCPD (NEC 690.9 / 706) | battery-inverter DC sizing (NEC 690.8...; I_dc = 4000/(48*0.90) = 92.59; 1.25x = 115.74; next std O... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `battery-peak-shaving` | Battery Peak-Shaving Demand-Charge Savings | Demand-charge peak-shaving method; spec-v237 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `battery-runtime` | Battery Runtime | Project (first-principles); 100 Ah * 0.80 * 12 V = 960 Wh; 960 Wh / 120 W = 8 h | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `battery-tou-arbitrage` | Battery Time-of-Use Arbitrage Value | NREL battery round-trip / arbitrage v...; spec-v236 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4625,6 +4627,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1389. Fixture-covered or reference-cadence: 1389 / 1389.
+Tile count: 1390. Fixture-covered or reference-cadence: 1390 / 1390.
 
 <!-- END tile-index-v14 -->

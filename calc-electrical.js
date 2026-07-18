@@ -5772,3 +5772,54 @@ function _v933renderWelderResistanceCircuitConductor(inputRegion, outputRegion, 
   for (const f of [ip, dc]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["welder-resistance-circuit-conductor"] = _v933renderWelderResistanceCircuitConductor;
+
+// ===================== spec-v941: battery-to-inverter DC conductor and OCPD (NEC 690.9 / 706) =====================
+const _V941_STD_OCPD = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200];
+// dims: in { inverter_power_w: M L^2 T^-3, battery_voltage_v: M L^2 T^-3 I^-1, efficiency_pct: dimensionless } out: { dc_current_a: I, min_conductor_ampacity_a: I, ocpd_a: I }
+export function computeBatteryInverterDcConductor({ inverter_power_w = 4000, battery_voltage_v = 48, efficiency_pct = 90 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(inverter_power_w > 0)) return { error: "Inverter power must be positive (W)." };
+  if (!(battery_voltage_v > 0)) return { error: "Battery bank voltage must be positive (V)." };
+  if (!(efficiency_pct > 0 && efficiency_pct <= 100)) return { error: "Efficiency must be between 0 and 100 percent." };
+  // DC input current the inverter pulls at full output: P_ac / (V_dc x efficiency).
+  const dc_current_a = inverter_power_w / (battery_voltage_v * (efficiency_pct / 100));
+  // NEC 690.8(B)/706/240.4: conductor and OCPD at 125% of the continuous current.
+  const min_conductor_ampacity_a = 1.25 * dc_current_a;
+  const ocpd_a = _V941_STD_OCPD.find((s) => s >= min_conductor_ampacity_a) || Math.ceil(min_conductor_ampacity_a);
+  if (![dc_current_a, min_conductor_ampacity_a, ocpd_a].every(Number.isFinite)) return { error: "Battery-conductor math is not a finite value." };
+  return {
+    dc_current_a,
+    min_conductor_ampacity_a,
+    ocpd_a,
+    note: "Battery-to-inverter DC conductor and overcurrent device for an off-grid or ESS system. The inverter's full-output DC input current is its AC power divided by the battery voltage and the inverter efficiency (a lower bank voltage pulls MUCH more current). NEC 690.8(B) / 706 / 240.4 size both the conductor and the OCPD at 125% of that continuous current, and the OCPD rounds UP to the next standard size (240.6). A 4 kW inverter on a 48 V bank at 90% efficiency draws about 92.6 A, so the conductor is rated at least 115.7 A (a 1/0 Cu at 75 C) on a 125 A DC fuse. Use a listed DC-rated (often Class T for a battery's high available fault current) fuse and switch, keep the run short and heavy for voltage drop, and terminate at the battery's rated torque. A sizing estimate; the inverter and battery datasheets, the fault-current rating, the AHJ, and the adopted NEC edition govern.",
+  };
+}
+
+export const batteryInverterDcConductorExample = { inputs: { inverter_power_w: 4000, battery_voltage_v: 48, efficiency_pct: 90 } };
+
+function _v941renderBatteryInverterDcConductor(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: battery-to-inverter DC conductor and OCPD by name (NEC 690.8(B) / 706 / 240.4). I_dc = P_ac / (V_dc x efficiency); conductor ampacity and OCPD at 125% of I_dc, OCPD to the next standard size (240.6). Use a listed DC-rated (Class T) fuse; the datasheets and NEC govern.";
+  const pw = makeNumber("Inverter continuous power (W)", "bid-pw", { step: "any", min: "0", value: "4000" });
+  pw.input.value = "4000";
+  const bv = makeNumber("Battery bank voltage (V)", "bid-bv", { step: "any", min: "0", value: "48" });
+  bv.input.value = "48";
+  const ef = makeNumber("Inverter efficiency (%)", "bid-ef", { step: "any", min: "0", value: "90" });
+  ef.input.value = "90";
+  for (const f of [pw, bv, ef]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { pw.input.value = "4000"; bv.input.value = "48"; ef.input.value = "90"; update(); });
+  const oI = makeOutputLine(outputRegion, "DC input current", "bid-out-i");
+  const oC = makeOutputLine(outputRegion, "Min conductor ampacity (125%)", "bid-out-c");
+  const oO = makeOutputLine(outputRegion, "DC overcurrent device", "bid-out-o");
+  const update = debounce(() => {
+    const r = computeBatteryInverterDcConductor({
+      inverter_power_w: pw.input.value === "" ? 4000 : Number(pw.input.value), battery_voltage_v: bv.input.value === "" ? 48 : Number(bv.input.value),
+      efficiency_pct: ef.input.value === "" ? 90 : Number(ef.input.value),
+    });
+    if (r.error) { oI.textContent = r.error; oC.textContent = "-"; oO.textContent = "-"; return; }
+    oI.textContent = fmt(r.dc_current_a, 1) + " A";
+    oC.textContent = fmt(r.min_conductor_ampacity_a, 1) + " A";
+    oO.textContent = fmt(r.ocpd_a, 0) + " A (next standard size)";
+  }, DEBOUNCE_MS);
+  for (const f of [pw, bv, ef]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["battery-inverter-dc-conductor"] = _v941renderBatteryInverterDcConductor;

@@ -35112,6 +35112,68 @@
    }
   },
   {
+   "tile_id": "battery-inverter-dc-conductor",
+   "source_publisher": "battery-inverter DC sizing (NEC 690.8(B) / 706)",
+   "source_title": "4 kW inverter, 48 V bank, 90% eff -> 92.6 A DC, 115.7 A conductor, 125 A OCPD",
+   "source_edition_or_year": "spec-v941 worked example (machine-verified)",
+   "source_section_or_page": "I_dc = 4000/(48*0.90) = 92.59; 1.25x = 115.74; next std OCPD >= 115.74 = 125",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "inverter_power_w": 4000,
+    "battery_voltage_v": 48,
+    "efficiency_pct": 90
+   },
+   "outputs": {
+    "dc_current_a": {
+     "value": 92.59,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "min_conductor_ampacity_a": {
+     "value": 115.74,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "ocpd_a": {
+     "value": 125,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "battery-inverter-dc-conductor",
+   "source_publisher": "battery-inverter DC sizing (NEC 690.8(B) / 706)",
+   "source_title": "cross-check: same 4 kW inverter on a 24 V bank -> 185.2 A DC, 250 A OCPD",
+   "source_edition_or_year": "spec-v941 worked example (machine-verified)",
+   "source_section_or_page": "I_dc = 4000/(24*0.90) = 185.19; 1.25x = 231.5; next std OCPD >= 231.5 = 250",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "inverter_power_w": 4000,
+    "battery_voltage_v": 24,
+    "efficiency_pct": 90
+   },
+   "outputs": {
+    "dc_current_a": {
+     "value": 185.19,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "ocpd_a": {
+     "value": 250,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "welder-resistance-circuit-conductor",
    "source_publisher": "resistance-welder circuit sizing (NEC 630.31 / 630.32)",
    "source_title": "100 A primary, 50% duty -> 70.71 A conductor, 300 A max OCPD",

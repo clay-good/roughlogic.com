@@ -17757,6 +17757,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "battery inverter conductor",
+      "target": "battery-inverter-dc-conductor",
+      "kind": "industry"
+    },
+    {
+      "term": "battery cable sizing",
+      "target": "battery-inverter-dc-conductor",
+      "kind": "industry"
+    },
+    {
+      "term": "inverter dc conductor",
+      "target": "battery-inverter-dc-conductor",
+      "kind": "industry"
+    },
+    {
+      "term": "off grid battery wire size",
+      "target": "battery-inverter-dc-conductor",
+      "kind": "adjacent"
+    },
+    {
+      "term": "battery fuse sizing",
+      "target": "battery-inverter-dc-conductor",
+      "kind": "adjacent"
+    },
+    {
       "term": "homerun wire takeoff",
       "target": "branch-circuit-wire-footage",
       "kind": "industry"

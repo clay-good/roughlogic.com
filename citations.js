@@ -8827,6 +8827,17 @@ export const CITATIONS = {
       { name: "OCPD 300%", value: "resistance-welder overcurrent device up to 300% of the rated primary (630.32(A)); arc welders are 200%", source: "NEC 630.32" },
     ],
   },
+  "battery-inverter-dc-conductor": {
+    formula: "dc_current_a = inverter_power_w / (battery_voltage_v x efficiency_pct/100); min_conductor_ampacity_a = 1.25 x dc_current_a; ocpd_a = next standard size (NEC 240.6) >= 1.25 x dc_current_a.",
+    edition: "NEC 690.8(B) (continuous current), 706 (energy storage systems), 240.4 (conductor protection), and 240.6 (standard OCPD sizes), by name; the inverter and battery datasheets and the AHJ govern.",
+    freeAccess: "The DC-current relation is Ohm's/power law (public); the 125% continuous factor and the standard OCPD sizes are public NEC, and the inverter power, efficiency, and battery voltage come from the datasheets.",
+    governance: GOVERNANCE.general,
+    editionNote: "The DC conductor and overcurrent device between a battery bank and an off-grid or energy-storage-system inverter. The inverter's full-output DC input current is its AC output power divided by the battery bank voltage and the inverter efficiency -- a lower bank voltage (24 V vs 48 V) pulls proportionally MORE current for the same power. NEC 690.8(B) / 706 / 240.4 size both the conductor and the overcurrent device at 125% of that continuous current, and 240.6 rounds the OCPD up to the next standard size. A battery can deliver an enormous fault current, so the DC overcurrent device is typically a LISTED DC-rated fuse (often Class T) with an adequate interrupting rating, paired with a DC-rated disconnect. The run should be short and heavy for voltage drop and terminated at the battery manufacturer's torque. This is a sizing estimate; the inverter and battery datasheets, the available fault current and interrupting rating, the AHJ, and the adopted NEC edition govern the final design.",
+    assumptions: [
+      { name: "125% continuous", value: "conductor and OCPD at 1.25 x the DC input current; OCPD to the next standard size (240.6)", source: "NEC 690.8(B) / 240.4 / 240.6" },
+      { name: "DC-rated / Class T", value: "a battery's high fault current needs a listed DC-rated fuse (often Class T) and disconnect with adequate interrupting rating", source: "NEC 706 / practice" },
+    ],
+  },
   "lv-cable-pull-footage": {
     formula: "total_ft = drops x (avg_run_ft + slack_ft); boxes = ceil(total_ft / box_ft).",
     edition: "Low-voltage cable footage takeoff identity by name (drops x per-drop length; boxes from total / box); first-principles count arithmetic.",
