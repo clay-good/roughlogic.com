@@ -10099,12 +10099,13 @@ test("monotonicity: computeMasonryCount unit_count is monotone non-decreasing in
       `units at area=${wall_area_ft2} = ${r.unit_count} not >= prev=${prev}`);
     prev = r.unit_count;
   }
-  // Closed-form pin from masonryCountExample: 100 ft^2 cmu_8x8x16 (face 16x8 in).
-  // With 3/8 in mortar joint: face_in2 = (16 + 0.375)(8 + 0.375) = 137.14 in^2.
-  // face_ft2 = 137.14 / 144 = 0.9524. base_raw = 100 / 0.9524 = 105. base = 105.
-  // waste 5% -> count = 105 + ceil(105 * 0.05) = 105 + 6 = 111.
+  // Closed-form pin from masonryCountExample: 100 ft^2 cmu_8x8x16 (actual face
+  // 15.625 x 7.625 in). With 3/8 in mortar joint the laid-up module is
+  // (15.625 + 0.375)(7.625 + 0.375) = 16 x 8 = 128 in^2 -> 1.125 units/ft^2.
+  // face_ft2 = 128 / 144 = 0.8889. base = ceil(100 / 0.8889) = 113.
+  // waste 5% -> count = 113 + ceil(113 * 0.05) = 113 + 6 = 119.
   const ref = computeMasonryCount({ wall_area_ft2: 100, unit_type: "cmu_8x8x16" });
-  const expectedFaceIn2 = (16 + 0.375) * (8 + 0.375);
+  const expectedFaceIn2 = (15.625 + 0.375) * (7.625 + 0.375);
   assert.ok(Math.abs(ref.face_ft2 - expectedFaceIn2 / 144) < 1e-9,
     `face_ft2 = ${ref.face_ft2}, expected ${expectedFaceIn2 / 144}`);
   // Example band pin: 110-130 units.

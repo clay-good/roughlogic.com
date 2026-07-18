@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(test): update 3 straggler pins missed by the masonry + wind-pressure fixes; 2026-07-17
+
+- The masonry-count (#18) and wind-pressure Kz (#20) fixes left three mirror-written pins in OTHER test files still
+  asserting the old values: bounds-fuzzer wind Kz (C 0.85->0.98, D 1.03->1.16), numerical-stability wind bit-pins
+  (qz/windward for C=0.98), and the cross-tile masonry monotonicity closed-form (face 137.14->128 in^2). All updated to
+  the corrected values; full suite back to 0 fail. (My per-commit check grepped "^not ok" which node:test does not emit
+  -- it uses the "# fail" summary; corrected going forward.)
+
 ### fix(lowvoltage): cable-tray-fill mixed-cable reduction uses NEC 1.2 x Sd (was 1.167); 2026-07-17
 
 - computeCableTrayFill mixed case (NEC 392.22(A)(1)(c)) computed the reduced small-cable allowance as

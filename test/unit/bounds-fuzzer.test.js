@@ -8538,13 +8538,14 @@ test("bounds: calc-construction computeMasonryCount pins face_in2 = (w+m)*(h+m) 
 test("bounds: calc-construction computeWindPressure pins q = 0.00256*V^2 and Kz exposure ladder", () => {
   const r = computeWindPressure({ V_mph: 100, exposure: "C" });
   assert.strictEqual(r.q_psf, 0.00256 * 100 * 100);
-  assert.ok(Math.abs(r.qz_at_30ft_psf - r.q_psf * 0.85) < 1e-9);
+  // Kz at 30 ft per ASCE 7-16 Table 26.10-1: C = 0.98.
+  assert.ok(Math.abs(r.qz_at_30ft_psf - r.q_psf * 0.98) < 1e-9);
   assert.strictEqual(r.Cp_windward, 0.8);
   assert.strictEqual(r.Cp_leeward, -0.5);
   assert.ok(Math.abs(r.pressure_windward_psf - r.qz_at_30ft_psf * 0.8) < 1e-9);
-  // Exposure D = 1.03.
+  // Exposure D = 1.16 at 30 ft.
   const d = computeWindPressure({ V_mph: 100, exposure: "D" });
-  assert.ok(Math.abs(d.qz_at_30ft_psf - d.q_psf * 1.03) < 1e-9);
+  assert.ok(Math.abs(d.qz_at_30ft_psf - d.q_psf * 1.16) < 1e-9);
   const b = computeWindPressure({ V_mph: 100, exposure: "B" });
   assert.ok(Math.abs(b.qz_at_30ft_psf - b.q_psf * 0.70) < 1e-9);
   assert.ok("error" in computeWindPressure({ V_mph: 0 }));

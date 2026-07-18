@@ -871,13 +871,13 @@ test("computeThreePhase: bit-stable kW + kVA + kVAR at the spec example (480 V_L
 
 test("computeWindPressure: bit-stable q_psf + windward pressure at the ASCE 7 spec example (100 mph, exposure C)", () => {
   // Group E. q = 0.00256 * V^2 = 25.6 psf at 100 mph (exact in IEEE-754).
-  // qz_at_30ft applies the exposure-C 0.85 Kz factor; pressure_windward
-  // applies Cp_windward = 0.8 against the qz value. Pins the 0.00256
-  // dynamic-pressure coefficient.
+  // qz_at_30ft applies the exposure-C 0.98 Kz factor (ASCE 7-16 Table 26.10-1
+  // at 30 ft); pressure_windward applies Cp_windward = 0.8 against the qz value.
+  // Pins the 0.00256 dynamic-pressure coefficient.
   const r = computeWindPressure(windPressureExample.inputs);
   assert.equal(bits(r.q_psf), "403999999999999a", `q_psf=${r.q_psf}`);
-  assert.equal(bits(r.qz_at_30ft_psf), "4035c28f5c28f5c3", `qz_at_30ft_psf=${r.qz_at_30ft_psf}`);
-  assert.equal(bits(r.pressure_windward_psf), "40316872b020c49c", `pressure_windward=${r.pressure_windward_psf}`);
+  assert.equal(bits(r.qz_at_30ft_psf), "403916872b020c4a", `qz_at_30ft_psf=${r.qz_at_30ft_psf}`);
+  assert.equal(bits(r.pressure_windward_psf), "40341205bc01a36f", `pressure_windward=${r.pressure_windward_psf}`);
 });
 
 test("computePITI: bit-stable PI + escrow + total at the spec example ($320k / 6.5% / 30 yr, $4800 tax, $1800 ins)", () => {
