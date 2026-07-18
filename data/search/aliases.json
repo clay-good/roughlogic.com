@@ -2827,6 +2827,31 @@
       "kind": "industry"
     },
     {
+      "term": "stud notching",
+      "target": "stud-notch-bore-limit",
+      "kind": "industry"
+    },
+    {
+      "term": "stud boring",
+      "target": "stud-notch-bore-limit",
+      "kind": "industry"
+    },
+    {
+      "term": "notch a stud",
+      "target": "stud-notch-bore-limit",
+      "kind": "adjacent"
+    },
+    {
+      "term": "drill through stud",
+      "target": "stud-notch-bore-limit",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bored hole stud limit",
+      "target": "stud-notch-bore-limit",
+      "kind": "adjacent"
+    },
+    {
       "term": "lvl header",
       "target": "header-sizing",
       "kind": "adjacent"

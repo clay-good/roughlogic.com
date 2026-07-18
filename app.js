@@ -432,7 +432,7 @@ const TOOL_MODULES = (() => {
     // v9
     "excavation-bench-plan",
     // v15
-    "header-sizing", "deck-beam-post",
+    "header-sizing", "deck-beam-post", "stud-notch-bore-limit",
     // v23
     "wall-bracing-length", "deck-ledger-fasteners",
   

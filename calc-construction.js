@@ -9911,3 +9911,44 @@ const _v905renderRebarChairCount = _simpleRenderer({
   compute: computeRebarChairCount,
 });
 CONSTRUCTION_RENDERERS["rebar-chair-count"] = _v905renderRebarChairCount;
+
+// ===================== spec-v923: stud notching and boring limits =====================
+// dims: in { stud_width_in: L } out: { notch_max_bearing_in: L, notch_max_nonbearing_in: L, bore_single_max_in: L, bore_doubled_max_in: L, edge_min_in: L }
+export function computeStudNotchBoreLimit({ stud_width_in = 5.5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(stud_width_in > 0)) return { error: "Stud width must be positive (in)." };
+  // IRC R602.6: notch <= 25% (bearing/exterior) or 40% (nonbearing); bore <= 40% (single) or 60% (doubled),
+  // with a >= 5/8 in edge to the hole and no hole in the same section as a cut or notch.
+  const notch_max_bearing_in = 0.25 * stud_width_in;
+  const notch_max_nonbearing_in = 0.40 * stud_width_in;
+  const bore_single_max_in = 0.40 * stud_width_in;
+  const bore_doubled_max_in = 0.60 * stud_width_in;
+  const edge_min_in = 0.625;
+  if (![notch_max_bearing_in, notch_max_nonbearing_in, bore_single_max_in, bore_doubled_max_in].every(Number.isFinite)) return { error: "Notch/bore math is not a finite value." };
+  return {
+    notch_max_bearing_in,
+    notch_max_nonbearing_in,
+    bore_single_max_in,
+    bore_doubled_max_in,
+    edge_min_in,
+    note: "IRC R602.6 wall-stud notching and boring limits, on the ACTUAL stud width (2x4 = 3.5 in, 2x6 = 5.5 in): a notch may not exceed 25% of the width in a bearing or exterior wall, or 40% in a nonbearing wall; a bored hole may not exceed 40% of the width in a single stud, or 60% if the stud is doubled (no more than two successive doubled studs). The hole edge must stay at least 5/8 in from the stud edge, and a hole may not be in the same cross section as a cut or notch. A 2x6 bearing stud allows a 1.375 in notch and a 2.20 in single-stud bore. These are the prescriptive limits; a plumbing or mechanical wall, an engineered stud, or a shear wall may be more restrictive, and the AHJ-adopted code governs.",
+  };
+}
+export const studNotchBoreLimitExample = { inputs: { stud_width_in: 5.5 } };
+
+CONSTRUCTION_RENDERERS["stud-notch-bore-limit"] = _simpleRenderer({
+  citation: "Citation: IRC R602.6 wall-stud notch/bore limits by name, on the actual stud width. Notch <= 25% (bearing) / 40% (nonbearing); bore <= 40% (single) / 60% (doubled); hole edge >= 5/8 in; no hole in the same section as a notch. The AHJ-adopted code governs.",
+  example: studNotchBoreLimitExample.inputs,
+  fields: [
+    { key: "stud_width_in", label: "Actual stud width (in, 2x4 = 3.5, 2x6 = 5.5)", kind: "number", default: 5.5 },
+  ],
+  outputs: [
+    { key: "nb", id: "snb-out-nb", label: "Max notch (bearing / exterior)", value: (r) => fmt(r.notch_max_bearing_in, 3) + " in (25%)" },
+    { key: "nn", id: "snb-out-nn", label: "Max notch (nonbearing)", value: (r) => fmt(r.notch_max_nonbearing_in, 3) + " in (40%)" },
+    { key: "bs", id: "snb-out-bs", label: "Max bore (single stud)", value: (r) => fmt(r.bore_single_max_in, 3) + " in (40%)" },
+    { key: "bd", id: "snb-out-bd", label: "Max bore (doubled stud)", value: (r) => fmt(r.bore_doubled_max_in, 3) + " in (60%)" },
+    { key: "e", id: "snb-out-e", label: "Min edge to hole", value: (r) => fmt(r.edge_min_in, 3) + " in" },
+    { key: "n", id: "snb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeStudNotchBoreLimit,
+});

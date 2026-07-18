@@ -34602,6 +34602,64 @@
    }
   },
   {
+   "tile_id": "stud-notch-bore-limit",
+   "source_publisher": "wall stud notch/bore limits (IRC R602.6)",
+   "source_title": "2x6 stud (5.5 in) -> notch 1.375 bearing, bore 2.20 single, 3.30 doubled",
+   "source_edition_or_year": "spec-v923 worked example (machine-verified)",
+   "source_section_or_page": "notch bearing = 0.25*5.5 = 1.375; bore single = 0.40*5.5 = 2.20; bore doubled = 0.60*5.5 = 3.30",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "stud_width_in": 5.5
+   },
+   "outputs": {
+    "notch_max_bearing_in": {
+     "value": 1.375,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "bore_single_max_in": {
+     "value": 2.2,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "bore_doubled_max_in": {
+     "value": 3.3,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "stud-notch-bore-limit",
+   "source_publisher": "wall stud notch/bore limits (IRC R602.6)",
+   "source_title": "cross-check: 2x4 stud (3.5 in) -> notch 0.875 bearing, 1.40 nonbearing, bore 1.40 single",
+   "source_edition_or_year": "spec-v923 worked example (machine-verified)",
+   "source_section_or_page": "notch bearing = 0.25*3.5 = 0.875; notch nonbearing = 0.40*3.5 = 1.40; bore single = 0.40*3.5 = 1.40",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "stud_width_in": 3.5
+   },
+   "outputs": {
+    "notch_max_bearing_in": {
+     "value": 0.875,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "notch_max_nonbearing_in": {
+     "value": 1.4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "masonry-joint-reinforcement",
    "source_publisher": "masonry joint-reinforcement takeoff (IRC R606.12.2)",
    "source_title": "40 x 12 ft CMU wall, 16 in vertical, 10 ft pieces -> 9 courses, 4 per course, 36 total",

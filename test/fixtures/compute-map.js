@@ -134,6 +134,7 @@ export const COMPUTE_MAP = {
   "voltage-drop": { module: "../../calc-electrical.js", fn: "computeVoltageDrop" },
   "footing-area": { module: "../../calc-construction.js", fn: "computeFootingArea" },
   "header-sizing": { module: "../../calc-construction.js", fn: "computeHeaderSizing" },
+  "stud-notch-bore-limit": { module: "../../calc-construction.js", fn: "computeStudNotchBoreLimit" },
   "deck-beam-post": { module: "../../calc-construction.js", fn: "computeDeckBeamPost" },
   "standpipe-pdp": { module: "../../calc-fire.js", fn: "computeStandpipePDP" },
   "smoke-ejector-cfm": { module: "../../calc-fire.js", fn: "computeSmokeEjector" },

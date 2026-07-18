@@ -26797,6 +26797,23 @@ test("bounds: spec-v920 computeCementBoardTakeoff pins the sheets, screws, and e
   assert.ok("error" in _v920({ area_sf: Infinity, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 35 }));
 });
 
+import { computeStudNotchBoreLimit as _v923 } from "../../calc-construction.js";
+
+test("bounds: spec-v923 computeStudNotchBoreLimit pins the notch/bore limits and error seams", () => {
+  const r = _v923({ stud_width_in: 5.5 }); // 2x6
+  assert.ok(Math.abs(r.notch_max_bearing_in - 1.375) < 1e-9); // 0.25*5.5
+  assert.ok(Math.abs(r.notch_max_nonbearing_in - 2.2) < 1e-9); // 0.40*5.5
+  assert.ok(Math.abs(r.bore_single_max_in - 2.2) < 1e-9); // 0.40*5.5
+  assert.ok(Math.abs(r.bore_doubled_max_in - 3.3) < 1e-9); // 0.60*5.5
+  assert.equal(r.edge_min_in, 0.625); // 5/8 in
+  const s = _v923({ stud_width_in: 3.5 }); // 2x4
+  assert.ok(Math.abs(s.notch_max_bearing_in - 0.875) < 1e-9); // 0.25*3.5
+  assert.ok(Math.abs(s.bore_single_max_in - 1.4) < 1e-9); // 0.40*3.5
+  // Error seams: non-positive width, non-finite.
+  assert.ok("error" in _v923({ stud_width_in: 0 }));
+  assert.ok("error" in _v923({ stud_width_in: Infinity }));
+});
+
 import { computeMasonryJointReinforcement as _v922 } from "../../calc-masonry.js";
 
 test("bounds: spec-v922 computeMasonryJointReinforcement pins the courses, pieces, and error seams", () => {

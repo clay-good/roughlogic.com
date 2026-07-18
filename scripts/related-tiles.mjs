@@ -870,6 +870,7 @@ const RELATED = {
   "vehicle-load": ["bridge-formula", "freight-density", "dim-weight"],
   "noise-dose": ["heat-stress", "niosh-lifting"],
   "header-sizing": ["lumber-spans", "beam-loading", "residential-framing"],
+  "stud-notch-bore-limit": ["header-sizing", "joist-hanger-count", "sill-plate-anchor-count"],
   "deck-beam-post": ["footing-area", "lumber-spans", "joist-deflection"],
   "standpipe-pdp": ["standpipe-friction", "pdp", "fire-friction"],
   "smoke-ejector-cfm": ["confined-space-vent", "confined-space-purge", "air-movers"],

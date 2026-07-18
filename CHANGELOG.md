@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): add stud-notch-bore-limit tile (spec-v923); 2026-07-18
+
+- New Group E tile `stud-notch-bore-limit` (Wall Stud Notching and Boring Limits, IRC R602.6) in calc-construction.js,
+  beside header-sizing. On the actual stud width: notch <= 25% (bearing/exterior) or 40% (nonbearing); bore <= 40%
+  (single) or 60% (doubled), hole edge >= 5/8 in, not in the same section as a notch. A 2x6 (5.5 in) bearing stud allows
+  a 1.375 in notch and a 2.20 in single bore; a 2x4 (3.5 in) nonbearing allows a 1.40 in notch. Prescriptive limits; the
+  AHJ-adopted code governs. Home count 1,371 -> 1,372.
+
 ### feat(masonry): add masonry-joint-reinforcement tile (spec-v922); 2026-07-18
 
 - New Group E tile `masonry-joint-reinforcement` (Masonry Horizontal Joint-Reinforcement Takeoff, IRC R606.12.2) in
