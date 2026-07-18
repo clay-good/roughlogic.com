@@ -559,3 +559,39 @@ FINISH_RENDERERS["cement-board-takeoff"] = _simpleRenderer({
   ],
   compute: computeCementBoardTakeoff,
 });
+
+// ===================== spec-v966: roof step-flashing piece count =====================
+// dims: in { args: dimensionless } out: { step_flashing_pieces: dimensionless, order_pieces: dimensionless }
+export function computeStepFlashingCount({ wall_run_ft = 20, shingle_exposure_in = 5, waste_pct = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(wall_run_ft > 0)) return { error: "Sloped wall/chimney run must be positive (ft)." };
+  if (!(shingle_exposure_in > 0)) return { error: "Shingle exposure must be positive (in)." };
+  if (!(waste_pct >= 0)) return { error: "Waste percent cannot be negative." };
+  // One step-flashing piece per shingle course along a roof-to-wall intersection, plus one to start.
+  const step_flashing_pieces = Math.ceil(wall_run_ft * 12 / shingle_exposure_in) + 1;
+  const order_pieces = Math.ceil(step_flashing_pieces * (1 + waste_pct / 100));
+  if (![step_flashing_pieces, order_pieces].every(Number.isFinite)) return { error: "Step-flashing count math is not a finite value." };
+  return {
+    step_flashing_pieces,
+    order_pieces,
+    note: "The number of step-flashing pieces for a roof-to-wall or chimney sidewall intersection: one piece is woven into EACH shingle course as the roof rises along the wall, plus one to start, so pieces = ceil(sloped wall run x 12 / shingle exposure) + 1. A 20 ft sloped run against a wall with a 5 in exposure (standard 3-tab / architectural) takes ceil(240/5) + 1 = 49 pieces; a longer exposure means fewer, larger courses and fewer pieces. Order a few extra for waste and bad bends (a 5% adder here). Each L-shaped piece laps the one below by the exposure and tucks under the siding/counterflashing above the roof plane -- step flashing is woven course-by-course, NOT run as a single continuous piece (that is a different, leak-prone detail). A takeoff estimate; the shingle exposure, the flashing size, and the roofing manufacturer's and code (IRC R905.2.8.3) flashing details govern the install.",
+  };
+}
+
+export const stepFlashingCountExample = { inputs: { wall_run_ft: 20, shingle_exposure_in: 5, waste_pct: 5 } };
+
+FINISH_RENDERERS["step-flashing-count"] = _simpleRenderer({
+  citation: "Citation: roof step-flashing piece count, by name. One piece per shingle course plus one: pieces = ceil(wall run x 12 / shingle exposure) + 1. Woven course-by-course (not a continuous piece); IRC R905.2.8.3 and the shingle/flashing manufacturer's details govern the install.",
+  example: stepFlashingCountExample.inputs,
+  fields: [
+    { key: "wall_run_ft", label: "Sloped wall / chimney sidewall run (ft)", kind: "number", default: 20 },
+    { key: "shingle_exposure_in", label: "Shingle exposure (in, ~5)", kind: "number", default: 5 },
+    { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 5 },
+  ],
+  outputs: [
+    { key: "p", id: "sfc-out-p", label: "Step-flashing pieces (one per course + 1)", value: (r) => String(r.step_flashing_pieces) + " pieces" },
+    { key: "o", id: "sfc-out-o", label: "Order with waste", value: (r) => String(r.order_pieces) + " pieces" },
+    { key: "n", id: "sfc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeStepFlashingCount,
+});

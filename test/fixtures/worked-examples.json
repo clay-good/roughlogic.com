@@ -34952,6 +34952,56 @@
    }
   },
   {
+   "tile_id": "step-flashing-count",
+   "source_publisher": "Roof step-flashing takeoff (one per shingle course)",
+   "source_title": "20 ft sloped wall run, 5 in shingle exposure, 5% waste -> 49 pieces, order 52",
+   "source_edition_or_year": "spec-v966 worked example (machine-verified)",
+   "source_section_or_page": "pieces = ceil(20*12/5) + 1 = 48 + 1 = 49; order = ceil(49*1.05) = ceil(51.45) = 52",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "wall_run_ft": 20,
+    "shingle_exposure_in": 5,
+    "waste_pct": 5
+   },
+   "outputs": {
+    "step_flashing_pieces": {
+     "value": 49,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "order_pieces": {
+     "value": 52,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "step-flashing-count",
+   "source_publisher": "Roof step-flashing takeoff (one per shingle course)",
+   "source_title": "cross-check: a coarser 7.5 in exposure over a 16 ft run needs fewer pieces, 27",
+   "source_edition_or_year": "spec-v966 worked example (machine-verified)",
+   "source_section_or_page": "pieces = ceil(16*12/7.5) + 1 = ceil(25.6) + 1 = 26 + 1 = 27",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "wall_run_ft": 16,
+    "shingle_exposure_in": 7.5,
+    "waste_pct": 0
+   },
+   "outputs": {
+    "step_flashing_pieces": {
+     "value": 27,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cement-board-takeoff",
    "source_publisher": "cement-board takeoff (ANSI A108 / TCNA)",
    "source_title": "120 sf tub surround, 15 sf sheets, 10% waste, 35 screws/sheet -> 9 sheets, 315 screws",

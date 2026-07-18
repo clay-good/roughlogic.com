@@ -523,6 +523,7 @@ const TOOL_MODULES = (() => {
     // v98 roofing trim-out
     "attic-ventilation", "soffit-ridge-vent-count", "gutter-downspout", "gutter-downspout-takeoff", "deck-board-takeoff", "glass-weight",
     "cement-board-takeoff",
+    "step-flashing-count",
   ]);
   // spec-v101 new electrician design/layout bench; relieves the standing
   // calc-electrical.js cap watch. Both tiles keep group "A".

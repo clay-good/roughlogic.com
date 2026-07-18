@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(roofing): add step-flashing-count tile (spec-v966); 2026-07-18
+
+- New Group E tile `step-flashing-count` (Roof Step-Flashing Piece Count) in calc-finish.js. One piece per shingle
+  course along a roof-to-wall or chimney sidewall: pieces = ceil(wall run x 12 / shingle exposure) + 1. A 20 ft sloped
+  run at a 5 in exposure = 49 pieces (order 52 at 5% waste); a coarser exposure needs fewer. Woven course-by-course, not
+  a continuous strip. IRC R905.2.8.3 and the manufacturer details govern the install. Home count 1,414 -> 1,415.
+
 ### feat(construction): add frost-depth-berggren tile (spec-v965); 2026-07-18
 
 - New Group E tile `frost-depth-berggren` (Frost Penetration Depth, Stefan / Modified Berggren) in calc-geotech.js.

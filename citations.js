@@ -11035,6 +11035,17 @@ export const CITATIONS = {
       { name: "Mortar contact", value: "ANSI A108 ~80% dry / 95% wet or exterior (do not stretch a bag)", source: "ANSI A108" },
     ],
   },
+  "step-flashing-count": {
+    formula: "step_flashing_pieces = ceil(wall_run_ft x 12 / shingle_exposure_in) + 1; order_pieces = ceil(step_flashing_pieces x (1 + waste_pct/100)).",
+    edition: "Roof step-flashing piece-count takeoff (one piece per shingle course) by name; IRC R905.2.8.3 and the shingle / flashing manufacturer's details govern the install.",
+    freeAccess: "The piece count is public first-principles (one flashing per course plus one); the sloped wall run and the shingle exposure are the field measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "Step flashing waterproofs a sloped roof-to-wall or chimney sidewall intersection with a series of small L-shaped metal pieces, one bent over each shingle course as the roof climbs the wall. Because there is exactly one piece per course, the count is the number of courses along the sloped run plus one to start the bottom: pieces = ceil(sloped wall run x 12 inches / shingle exposure) + 1. A 20-foot sloped run against a wall with the common 5-inch shingle exposure (3-tab or architectural) is ceil(240/5) + 1 = 49 pieces; a coarser exposure makes fewer, taller courses and fewer pieces. A few extra should be ordered for waste and mis-bends. Each piece laps the one below it by the shingle exposure and turns up under the wall's siding or counterflashing so water sheds course over course -- step flashing is woven in shingle by shingle and must NOT be replaced by a single continuous bent strip, which traps water and leaks. This is a material-takeoff estimate; the actual shingle exposure, the step-flashing size (commonly a 5x7 or 4x4 piece bent square), and the flashing details of IRC R905.2.8.3 and the shingle and flashing manufacturers govern the installation.",
+    assumptions: [
+      { name: "One piece per course", value: "pieces = ceil(wall run x 12 / shingle exposure) + 1; woven course-by-course, not a continuous strip", source: "roofing practice / IRC R905.2.8.3" },
+      { name: "Exposure and size", value: "standard ~5 in shingle exposure; order extra for waste; the flashing size and manufacturer details govern the install", source: "shingle / flashing manufacturer" },
+    ],
+  },
   "cement-board-takeoff": {
     formula: "sheets = ceil(area_sf x (1 + waste_pct/100) / sheet_area_sf); screws = sheets x round(screws_per_sheet).",
     edition: "ANSI A108 / TCNA Handbook cement-board installation practice, by name; the board manufacturer governs the fastener schedule and wet-area assembly.",

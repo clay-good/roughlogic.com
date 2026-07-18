@@ -961,6 +961,7 @@ export const COMPUTE_MAP = {
   "post-hole-concrete": { module: "../../calc-construction.js", fn: "computePostHoleConcrete" },
   "thinset-coverage": { module: "../../calc-finish.js", fn: "computeThinsetCoverage" },
   "cement-board-takeoff": { module: "../../calc-finish.js", fn: "computeCementBoardTakeoff" },
+  "step-flashing-count": { module: "../../calc-finish.js", fn: "computeStepFlashingCount" },
   "flooring-takeoff": { module: "../../calc-finish.js", fn: "computeFlooringTakeoff" },
   "control-joint-spacing": { module: "../../calc-construction.js", fn: "computeControlJointSpacing" },
   "rebar-lap-splice": { module: "../../calc-construction.js", fn: "computeRebarLapSplice" },

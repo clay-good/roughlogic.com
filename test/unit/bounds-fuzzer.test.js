@@ -27886,3 +27886,23 @@ test("bounds: spec-v965 computeFrostDepthBerggren pins Stefan/Berggren frost dep
   assert.ok("error" in _v965({ freezing_index_f_days: 2000, frozen_conductivity_btu: 1.0, dry_density_pcf: 100, water_content_pct: 15, berggren_lambda: 1.5 }));
   assert.ok("error" in _v965({ freezing_index_f_days: Infinity, frozen_conductivity_btu: 1.0, dry_density_pcf: 100, water_content_pct: 15, berggren_lambda: 0.8 }));
 });
+
+import { computeStepFlashingCount as _v966 } from "../../calc-finish.js";
+
+test("bounds: spec-v966 computeStepFlashingCount pins the one-per-course count and error seams", () => {
+  const r = _v966({ wall_run_ft: 20, shingle_exposure_in: 5, waste_pct: 5 });
+  assert.equal(r.step_flashing_pieces, 49); // ceil(240/5)+1
+  assert.equal(r.order_pieces, 52); // ceil(49*1.05)
+  // A coarser exposure needs fewer pieces.
+  assert.equal(_v966({ wall_run_ft: 16, shingle_exposure_in: 7.5, waste_pct: 0 }).step_flashing_pieces, 27); // ceil(25.6)+1
+  // A longer run needs more; ceil rounds up partial courses.
+  assert.ok(_v966({ wall_run_ft: 40, shingle_exposure_in: 5, waste_pct: 0 }).step_flashing_pieces > r.step_flashing_pieces);
+  assert.equal(_v966({ wall_run_ft: 1, shingle_exposure_in: 5, waste_pct: 0 }).step_flashing_pieces, 4); // ceil(12/5)=3, +1
+  // Zero waste orders exactly the piece count.
+  assert.equal(_v966({ wall_run_ft: 20, shingle_exposure_in: 5, waste_pct: 0 }).order_pieces, 49);
+  // Error seams: non-positive run or exposure, negative waste, non-finite.
+  assert.ok("error" in _v966({ wall_run_ft: 0, shingle_exposure_in: 5, waste_pct: 5 }));
+  assert.ok("error" in _v966({ wall_run_ft: 20, shingle_exposure_in: 0, waste_pct: 5 }));
+  assert.ok("error" in _v966({ wall_run_ft: 20, shingle_exposure_in: 5, waste_pct: -1 }));
+  assert.ok("error" in _v966({ wall_run_ft: Infinity, shingle_exposure_in: 5, waste_pct: 5 }));
+});

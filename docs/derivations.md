@@ -2075,6 +2075,7 @@ cross-check.
 | calc-finish.js | `computePaverPatio` | `{ area_sqft = 0, paver_length_in = 0, paver_width_in = 0, base_depth_in = 6, ...` | _ | _ | _ |
 | calc-finish.js | `computeRetainingWallBlock` | `{ wall_length_ft = 0, exposed_height_ft = 0, block_length_in = 18, block_heig...` | _ | _ | _ |
 | calc-finish.js | `computeSoffitRidgeVentCount` | `{ attic_area_sf = 1500, vent_ratio = 300, soffit_vent_nfa_in2 = 26, ridge_nfa...` | _ | _ | _ |
+| calc-finish.js | `computeStepFlashingCount` | `{ wall_run_ft = 20, shingle_exposure_in = 5, waste_pct = 5 } = {}` | _ | _ | _ |
 | calc-finish.js | `computeThinsetCoverage` | `{ area_sqft = 0, trowel = "quarter_three_eighths", coverage_per_bag = 0, bag_...` | _ | _ | _ |
 | calc-fire.js | `computeAerialLadderReach` | `{ angle_deg, extension_ft }` | _ | _ | _ |
 | calc-fire.js | `computeBrakingDistance` | `{ speed_mph, friction_coefficient, grade_percent = 0, reaction_time_s = 1.5 }` | _ | _ | _ |
@@ -3075,7 +3076,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1661.
+Row count: 1662.
 
 <!-- END function-corpus-v14 -->
 
@@ -3664,7 +3665,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (361 tiles)
+### Group E Construction (362 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3976,6 +3977,7 @@ per spec-v14 §13.1 second paragraph.
 | `steel-panel-zone-shear` | Column Web Panel-Zone Shear (AISC 360 J10.6) | AISC 360-16 Section J10.6 (panel-zone...; W14 Fy50 dc14 tw0.5, 24 in beam, Mf 5500, Vcol 40, basic ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-tension-member` | Steel Tension Member: Yield and Rupture with Shear Lag (AISC 360 D2/D3) | AISC 360-22 Chapter D (D2 / D3, Table...; spec-v283 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-web-local-strength` | Steel Web Local Yielding and Crippling (AISC 360 J10) | AISC 360-22 J10.2 / J10.3; spec-v293 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `step-flashing-count` | Roof Step-Flashing Piece Count | Roof step-flashing takeoff (one per s...; pieces = ceil(20*12/5) + 1 = 48 + 1 = 49; order = ceil(49... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stockpile-volume` | Conical Stockpile Volume and Tonnage | Right-circular-cone identity (first-p...; radius = 30; height = 30*tan(37) = 22.6 ft; volume = (1/3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `striping-paint-quantity` | Pavement Marking Paint and Glass Bead Quantity | Pavement-marking quantity identity (f...; area = 5280*4/12 = 1,760 sf; paint = 1760/320 = 5.5 gal; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stucco-coverage` | Portland-Cement Plaster (Stucco) Material Takeoff | Portland-cement plaster bag-count ide...; bags = ceil(1000*0.875/10.1*1.10) = ceil(95.30) = 96 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4675,6 +4677,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1414. Fixture-covered or reference-cadence: 1414 / 1414.
+Tile count: 1415. Fixture-covered or reference-cadence: 1415 / 1415.
 
 <!-- END tile-index-v14 -->
