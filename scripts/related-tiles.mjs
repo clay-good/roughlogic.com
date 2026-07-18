@@ -1463,6 +1463,7 @@ const RELATED = {
   // spec-v278..v280 NEC conductor-and-overcurrent-sizing batch (Group A)
   "motor-overload-sizing": ["motor-branch-protection","motor-fla","motor-feeder-multiple"],
   "service-conductor-sizing": ["service-load-standard","service-load-optional","ambient-ampacity-adjust"],
+  "insulation-resistance-pi": ["motor-overload-sizing","soil-resistivity-wenner","grounding-electrode"],
   "continuous-load-ocpd": ["service-conductor-sizing","commercial-lighting-load","wire-ampacity"],
   "generator-conductor-445": ["generator-sizing","service-conductor-sizing","wire-ampacity"],
   "existing-load-220-87": ["service-load-optional","service-load-standard","ev-charger-load"],

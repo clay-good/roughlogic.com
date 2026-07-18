@@ -558,7 +558,7 @@ const _TILES = [
   // spec-v275..v277 ventilation-and-recovery batch
   ["erv-sensible-recovery", "C"], ["mua-tempering-load", "C"], ["dcv-co2-ventilation", "C"],
   // spec-v278..v280 NEC conductor-and-overcurrent-sizing batch
-  ["motor-overload-sizing", "A"], ["service-conductor-sizing", "A"], ["continuous-load-ocpd", "A"],
+  ["motor-overload-sizing", "A"], ["service-conductor-sizing", "A"], ["insulation-resistance-pi", "A"], ["continuous-load-ocpd", "A"],
   // spec-v499 motor locked-rotor kVA from code letter (NEC 430.7(B))
   ["motor-locked-rotor-kva", "A"], ["motor-max-hp-for-starting-current", "A"],
   // spec-v521 motor short-circuit contribution (first cycle)

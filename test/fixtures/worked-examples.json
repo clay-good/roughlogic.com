@@ -45876,6 +45876,62 @@
    }
   },
   {
+   "tile_id": "insulation-resistance-pi",
+   "source_publisher": "Insulation resistance PI / DAR (IEEE 43 megger test)",
+   "source_title": "800 / 1,040 / 4,160 Mohm at 30s / 1min / 10min -> DAR 1.30, PI 4.0",
+   "source_edition_or_year": "spec-v957 worked example (machine-verified)",
+   "source_section_or_page": "DAR = 1040/800 = 1.30; PI = 4160/1040 = 4.0",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "ir_30s_mohm": 800,
+    "ir_1min_mohm": 1040,
+    "ir_10min_mohm": 4160
+   },
+   "outputs": {
+    "dar": {
+     "value": 1.3,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "polarization_index": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "insulation-resistance-pi",
+   "source_publisher": "Insulation resistance PI / DAR (IEEE 43 megger test)",
+   "source_title": "cross-check: a flat 1,000 / 1,000 / 1,000 Mohm test (no rise) gives PI 1.0 -- dangerous",
+   "source_edition_or_year": "spec-v957 worked example (machine-verified)",
+   "source_section_or_page": "PI = 1000/1000 = 1.0 (insulation not absorbing -> wet/contaminated flag)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "ir_30s_mohm": 1000,
+    "ir_1min_mohm": 1000,
+    "ir_10min_mohm": 1000
+   },
+   "outputs": {
+    "polarization_index": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "dar": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "service-conductor-sizing",
    "source_publisher": "NEC 2023 310.12 / Table 310.16 (75 degC)",
    "source_title": "200 A copper dwelling service -> 166 A -> 2/0 Cu (Table 310.12)",

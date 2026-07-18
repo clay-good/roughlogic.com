@@ -27680,3 +27680,28 @@ test("bounds: spec-v956 computeHydronicInjectionMixing pins the injection energy
   assert.ok("error" in _v956({ secondary_gpm: 10, secondary_supply_f: 110, secondary_return_f: 90, primary_supply_f: 90 }));
   assert.ok("error" in _v956({ secondary_gpm: Infinity, secondary_supply_f: 110, secondary_return_f: 90, primary_supply_f: 180 }));
 });
+
+import { computeInsulationResistancePi as _v957 } from "../../calc-service.js";
+
+test("bounds: spec-v957 computeInsulationResistancePi pins PI/DAR, IEEE 43 verdicts, and error seams", () => {
+  const r = _v957({ ir_30s_mohm: 800, ir_1min_mohm: 1040, ir_10min_mohm: 4160 });
+  assert.ok(Math.abs(r.dar - 1.3) < 1e-9); // 1040/800
+  assert.ok(Math.abs(r.polarization_index - 4) < 1e-9); // 4160/1040
+  assert.equal(r.pi_verdict, "excellent"); // PI >= 4
+  // Correct DAR band: 1.3 is in [1.25,1.4) -> acceptable.
+  assert.equal(_v957({ ir_30s_mohm: 800, ir_1min_mohm: 1040, ir_10min_mohm: 4160 }).dar_verdict, "acceptable");
+  // Flat readings (no rise) -> PI 1.0, DAR 1.0, both flagged.
+  const flat = _v957({ ir_30s_mohm: 1000, ir_1min_mohm: 1000, ir_10min_mohm: 1000 });
+  assert.ok(Math.abs(flat.polarization_index - 1) < 1e-9);
+  assert.equal(flat.pi_verdict, "questionable"); // PI in [1,2)
+  assert.equal(flat.dar_verdict, "questionable"); // DAR in [1,1.25)
+  // Falling IR -> PI < 1 -> dangerous.
+  assert.equal(_v957({ ir_30s_mohm: 1000, ir_1min_mohm: 1000, ir_10min_mohm: 800 }).pi_verdict, "dangerous (investigate)");
+  // Verdict band edges: PI exactly 2 -> good, exactly 4 -> excellent.
+  assert.equal(_v957({ ir_30s_mohm: 500, ir_1min_mohm: 1000, ir_10min_mohm: 2000 }).pi_verdict, "good");
+  // Error seams: non-positive any reading, non-finite.
+  assert.ok("error" in _v957({ ir_30s_mohm: 0, ir_1min_mohm: 1040, ir_10min_mohm: 4160 }));
+  assert.ok("error" in _v957({ ir_30s_mohm: 800, ir_1min_mohm: 0, ir_10min_mohm: 4160 }));
+  assert.ok("error" in _v957({ ir_30s_mohm: 800, ir_1min_mohm: 1040, ir_10min_mohm: 0 }));
+  assert.ok("error" in _v957({ ir_30s_mohm: Infinity, ir_1min_mohm: 1040, ir_10min_mohm: 4160 }));
+});

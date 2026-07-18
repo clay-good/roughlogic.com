@@ -979,6 +979,7 @@ export const COMPUTE_MAP = {
   // spec-v278..v280 NEC conductor-and-overcurrent-sizing batch (3 tiles)
   "motor-overload-sizing": { module: "../../calc-motor.js", fn: "computeMotorOverloadSizing" },
   "service-conductor-sizing": { module: "../../calc-service.js", fn: "computeServiceConductorSizing" },
+  "insulation-resistance-pi": { module: "../../calc-service.js", fn: "computeInsulationResistancePi" },
   "continuous-load-ocpd": { module: "../../calc-feeder.js", fn: "computeContinuousLoadOcpd" },
   // spec-v281..v283 steel members-and-connections depth batch (3 tiles)
   "steel-beam-ltb": { module: "../../calc-steel.js", fn: "computeSteelBeamLtb" },

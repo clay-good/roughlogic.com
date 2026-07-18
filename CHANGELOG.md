@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): add insulation-resistance-pi tile (spec-v957); 2026-07-18
+
+- New Group A tile `insulation-resistance-pi` (Insulation Resistance PI / DAR, Megger Test) in calc-service.js. From a
+  timed insulation-resistance test: DAR = IR(60s)/IR(30s), PI = IR(10min)/IR(1min). Good insulation keeps absorbing so IR
+  rises; wet/dirty insulation stays flat or falls. IEEE 43 bands: PI < 1 dangerous, 1-2 questionable, 2-4 good, > 4
+  excellent; DAR < 1.25 marginal, 1.4+ good. 800/1,040/4,160 Mohm = DAR 1.30, PI 4.0. A trend/screen -- temperature-
+  correct first; PI loses meaning above ~5,000 Mohm at 1 min. Home count 1,405 -> 1,406.
+
 ### feat(hvac): add hydronic-injection-mixing tile (spec-v956); 2026-07-18
 
 - New Group C tile `hydronic-injection-mixing` (Hydronic Injection-Mixing Loop Flow) in calc-hvacsystems.js. The injection

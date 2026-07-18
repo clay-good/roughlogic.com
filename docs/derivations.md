@@ -2812,6 +2812,7 @@ cross-check.
 | calc-service.js | `computeCommercialLightingLoad` | `{ floor_area_ft2 = 0, unit_load_va_ft2 = 0, receptacle_count = 0, supply_v = ...` | _ | _ | _ |
 | calc-service.js | `computeDryerDemand22054` | `{ num_dryers = 1, nameplate_w = 5000, supply_v = 240 } = {}` | _ | _ | _ |
 | calc-service.js | `computeGasApplianceDemand` | `{ appliances = [], fuel = "natural_gas", heating_value = null } = {}` | _ | _ | _ |
+| calc-service.js | `computeInsulationResistancePi` | `{ ir_30s_mohm = 800, ir_1min_mohm = 1040, ir_10min_mohm = 4160 } = {}` | _ | _ | _ |
 | calc-service.js | `computeLightingRetrofitSavings` | `{ fixtures = 0, watts_existing = 0, watts_new = 0, annual_hours = 0, rate_kwh...` | _ | _ | _ |
 | calc-service.js | `computeNeutralDemand22061` | `{ max_unbalanced_a = 0, nonlinear_excluded = 0 } = {}` | _ | _ | _ |
 | calc-service.js | `computeNoncoincidentLoad` | `{ load_a_va = 0, load_b_va = 0, both_can_run = 0 } = {}` | _ | _ | _ |
@@ -3066,7 +3067,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1652.
+Row count: 1653.
 
 <!-- END function-corpus-v14 -->
 
@@ -3147,7 +3148,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (185 tiles)
+### Group A Electrical (186 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3220,6 +3221,7 @@ per spec-v14 §13.1 second paragraph.
 | `grounding-electrode` | Grounding Electrode Resistance (Dwight / IEEE 142) | IEEE / Dwight; R = (rho / (2*pi*L)) * (ln(8L/d) - 1) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grounding-electrode-conductor` | Grounding Electrode Conductor Sizing | NFPA; spec-v109 section 2.1 pinned example (250 kcmil Cu servic... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `harmonic-resonance` | Harmonic Parallel-Resonance Order | parallel-resonance order of a PF capa...; spec-v523 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `insulation-resistance-pi` | Insulation Resistance PI / DAR (Megger Test) | Insulation resistance PI / DAR (IEEE ...; DAR = 1040/800 = 1.30; PI = 4160/1040 = 4.0 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lighting-density` | Lighting Power Density | ASHRAE / IECC; 1000 ft^2 office @ 1.0 W/ft^2 -> 1000 W target lighting load | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lighting-light-loss-factor` | Lighting Light-Loss Factor (Maintained/Initial) | IES Lighting Handbook; spec-v365 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lighting-retrofit-savings` | LED Lighting Retrofit Savings and Payback | Energy-and-demand lighting-savings me...; spec-v231 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4657,6 +4659,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1405. Fixture-covered or reference-cadence: 1405 / 1405.
+Tile count: 1406. Fixture-covered or reference-cadence: 1406 / 1406.
 
 <!-- END tile-index-v14 -->

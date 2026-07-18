@@ -12626,6 +12626,17 @@ export const CITATIONS = {
       { name: "Scope", value: "a continuous-duty motor over 1 hp with a separate overload device", source: "NEC 430.32(A)" },
     ],
   },
+  "insulation-resistance-pi": {
+    formula: "dar = IR(60 s) / IR(30 s); polarization_index = IR(10 min) / IR(1 min). IEEE 43 bands: PI < 1 dangerous, 1-2 questionable, 2-4 good, > 4 excellent; DAR < 1.25 marginal, 1.4+ good.",
+    edition: "IEEE 43 (Recommended Practice for Testing Insulation Resistance of Electric Machinery) polarization index and dielectric absorption ratio, by name; the machine baseline trend and the OEM acceptance criteria govern.",
+    freeAccess: "The PI and DAR are public ratios of timed insulation-resistance readings; the interpretation bands are the IEEE 43 guidance, and the readings come from the megger test.",
+    governance: GOVERNANCE.general,
+    editionNote: "A timed insulation-resistance (megger) test reveals winding condition through how the measured resistance changes over time, not just its absolute value. When test voltage is applied, clean dry insulation keeps absorbing (polarizing) charge, so its apparent resistance keeps climbing for many minutes; wet, dirty, or cracked insulation stops climbing or falls as leakage current dominates. Two ratios capture that: the dielectric absorption ratio DAR = IR at 60 seconds / IR at 30 seconds (a quick 1-minute test), and the polarization index PI = IR at 10 minutes / IR at 1 minute (note the 1-minute and 60-second readings are one and the same). By IEEE 43, a PI below 1.0 is dangerous and warrants investigation, 1.0-2.0 is questionable, 2.0-4.0 is good, and above 4.0 excellent; a DAR below about 1.25 is marginal and 1.4 or above is good. This is a TREND and SCREEN, not a stand-alone pass/fail: the readings must be temperature-corrected to a common base (insulation resistance roughly halves for each 10 C rise) before they are compared against a machine's own history, and IEEE 43 cautions that on modern high-resistance epoxy-mica windings that already read above about 5,000 Mohm at one minute, the PI loses diagnostic meaning and the absolute IR and its trend govern instead. The machine's baseline trend, the OEM's acceptance criteria, and the test standards (IEEE 43 / 95) govern the verdict.",
+    assumptions: [
+      { name: "PI and DAR ratios", value: "DAR = IR(60s)/IR(30s); PI = IR(10min)/IR(1min); rising IR = good insulation; IEEE 43 interpretation bands", source: "IEEE 43" },
+      { name: "Trend, not pass/fail", value: "temperature-correct to a common base (~halve IR per 10 C); PI loses meaning above ~5000 Mohm at 1 min; the baseline trend and OEM criteria govern", source: "IEEE 43 practice" },
+    ],
+  },
   "service-conductor-sizing": {
     formula: "A_req = 0.83 x service_A; size = smallest Table 310.16 75 degC conductor (ordered smallest first, copper or aluminum) with ampacity >= A_req.",
     edition: "The dwelling service/feeder 83% allowance of NEC 2023 310.12(A)/(B) with the conductor selected from the Table 310.16 75 degC column (reproducing Table 310.12's tabulated 100 A -> #4 Cu, 200 A -> 2/0 Cu / 4/0 Al results), by name. A computational aid; the AHJ-adopted NEC edition governs.",

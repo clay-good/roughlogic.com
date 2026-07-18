@@ -909,3 +909,52 @@ function renderServiceConductorSizing(inputRegion, outputRegion, citationEl) {
   mat.select.addEventListener("change", update);
 }
 SERVICE_RENDERERS["service-conductor-sizing"] = renderServiceConductorSizing;
+
+// ===================== spec-v957: insulation-resistance PI / DAR (megger test) =====================
+// dims: in { args: dimensionless } out: { polarization_index: dimensionless, dar: dimensionless }
+export function computeInsulationResistancePi({ ir_30s_mohm = 800, ir_1min_mohm = 1040, ir_10min_mohm = 4160 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(ir_30s_mohm > 0)) return { error: "30-second insulation resistance must be positive (Mohm)." };
+  if (!(ir_1min_mohm > 0)) return { error: "1-minute insulation resistance must be positive (Mohm)." };
+  if (!(ir_10min_mohm > 0)) return { error: "10-minute insulation resistance must be positive (Mohm)." };
+  // DAR = IR(60s)/IR(30s); PI = IR(10min)/IR(1min). 1 minute = 60 seconds, so ir_1min IS the 60-second reading.
+  const dar = ir_1min_mohm / ir_30s_mohm;
+  const polarization_index = ir_10min_mohm / ir_1min_mohm;
+  const piVerdict = polarization_index < 1 ? "dangerous (investigate)" : polarization_index < 2 ? "questionable" : polarization_index < 4 ? "good" : "excellent";
+  const darVerdict = dar < 1 ? "poor (investigate)" : dar < 1.25 ? "questionable" : dar < 1.4 ? "acceptable" : "good";
+  if (![dar, polarization_index].every(Number.isFinite)) return { error: "PI / DAR math is not a finite value." };
+  return {
+    polarization_index,
+    dar,
+    pi_verdict: piVerdict,
+    dar_verdict: darVerdict,
+    note: "The polarization index (PI) and dielectric absorption ratio (DAR) from a timed insulation-resistance (megger) test -- the ratios that reveal whether a motor, generator, or transformer winding is clean and dry or wet and contaminated. Good insulation keeps absorbing charge, so its measured resistance keeps RISING over the test; wet or dirty insulation stops rising or falls. DAR = IR at 60 s / IR at 30 s (a 1-minute test), and PI = IR at 10 minutes / IR at 1 minute (note the 1-minute and 60-second readings are the same). By IEEE 43, PI below 1 is dangerous and 1-2 questionable, 2-4 good, above 4 excellent; DAR below 1.25 is marginal and 1.4+ is good. An 800 -> 1,040 -> 4,160 Mohm test gives DAR 1.30 and PI 4.0. IMPORTANT: this is a trend/screen, not a pass/fail -- always temperature-correct the readings to a common base (about halving IR per 10 C rise) before comparing to history, and on modern high-resistance epoxy windings (IR above ~5,000 Mohm at 1 minute) PI loses meaning per IEEE 43 and the absolute IR and the trend govern. The machine's baseline trend, the OEM's acceptance criteria, and the test standard (IEEE 43 / 95) govern the verdict.",
+  };
+}
+
+export const insulationResistancePiExample = { inputs: { ir_30s_mohm: 800, ir_1min_mohm: 1040, ir_10min_mohm: 4160 } };
+
+function _v957renderInsulationResistancePi(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: insulation-resistance polarization index (PI) and dielectric absorption ratio (DAR), by name (IEEE 43). DAR = IR(60s)/IR(30s); PI = IR(10min)/IR(1min). PI < 1 dangerous, 1-2 questionable, 2-4 good, > 4 excellent; DAR < 1.25 marginal, 1.4+ good. Temperature-correct to a common base; on very-high-IR epoxy windings PI loses meaning. The baseline trend and OEM criteria govern.";
+  const t30 = makeNumber("IR at 30 seconds (Mohm)", "irp-30", { step: "any", min: "0", value: "800" });
+  t30.input.value = "800";
+  const t60 = makeNumber("IR at 1 minute / 60 s (Mohm)", "irp-60", { step: "any", min: "0", value: "1040" });
+  t60.input.value = "1040";
+  const t600 = makeNumber("IR at 10 minutes (Mohm)", "irp-600", { step: "any", min: "0", value: "4160" });
+  t600.input.value = "4160";
+  for (const f of [t30, t60, t600]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { t30.input.value = "800"; t60.input.value = "1040"; t600.input.value = "4160"; update(); });
+  const oPi = makeOutputLine(outputRegion, "Polarization index (PI)", "irp-out-pi");
+  const oDar = makeOutputLine(outputRegion, "Dielectric absorption ratio (DAR)", "irp-out-dar");
+  const update = debounce(() => {
+    const r = computeInsulationResistancePi({
+      ir_30s_mohm: t30.input.value === "" ? 800 : Number(t30.input.value), ir_1min_mohm: t60.input.value === "" ? 1040 : Number(t60.input.value),
+      ir_10min_mohm: t600.input.value === "" ? 4160 : Number(t600.input.value),
+    });
+    if (r.error) { oPi.textContent = r.error; oDar.textContent = "-"; return; }
+    oPi.textContent = fmt(r.polarization_index, 2) + " -- " + r.pi_verdict;
+    oDar.textContent = fmt(r.dar, 2) + " -- " + r.dar_verdict;
+  }, DEBOUNCE_MS);
+  for (const f of [t30, t60, t600]) f.input.addEventListener("input", update);
+}
+SERVICE_RENDERERS["insulation-resistance-pi"] = _v957renderInsulationResistancePi;

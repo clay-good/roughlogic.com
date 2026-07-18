@@ -262,6 +262,7 @@ const TOOL_MODULES = (() => {
     "vfd-energy-savings", "lighting-retrofit-savings", "power-factor-billing-savings",
     // spec-v279 NEC 310.12 dwelling service conductor
     "service-conductor-sizing",
+    "insulation-resistance-pi",
   ]);
   // spec-v73 cap-relief split: the two spec-v62 storm-drainage tiles relocated
   // out of calc-plumbing.js (which had reached 96.2% of cap -- the tightest
