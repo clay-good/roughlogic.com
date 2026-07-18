@@ -170,9 +170,10 @@ test("Backflow: returns reference array of scenarios", () => {
 // (2) have inside diameters that strictly increase with nominal size. A silent
 // transcription error in either -- or a divergence between the two -- would
 // missize a pipe or a gas line, a class the per-tile fixtures do not cover.
-test("SCH40 pipe ID table: gas and plumbing copies agree and are strictly monotone in nominal size", async () => {
+test("SCH40 pipe ID table: gas, plumbing, and pipefit copies agree and are strictly monotone in nominal size", async () => {
   const gas = await import("../../calc-gas.js");
   const plumb = await import("../../calc-plumbing.js");
+  const pipefit = await import("../../calc-pipefit.js");
   const G = gas.SCH40_ID_IN, P = plumb.SCH40_ID_IN;
   const gKeys = Object.keys(G).sort((a, b) => Number(a) - Number(b));
   const pKeys = Object.keys(P).sort((a, b) => Number(a) - Number(b));
@@ -184,5 +185,15 @@ test("SCH40 pipe ID table: gas and plumbing copies agree and are strictly monoto
   for (let i = 1; i < gKeys.length; i++) {
     assert.ok(G[gKeys[i]] > G[gKeys[i - 1]],
       `SCH40 inside diameter not strictly increasing: nominal ${gKeys[i]} in (${G[gKeys[i]]}) <= ${gKeys[i - 1]} in (${G[gKeys[i - 1]]})`);
+  }
+  // Third copy in calc-pipefit.js (array form, fractional size keys) must agree
+  // on every overlapping size -- it is the same ASME B36.10M data and the most
+  // likely of the three to drift (private, different format, extra sizes).
+  const F = new Map(pipefit._SCH40_ID_IN); // "1/2" -> 0.622, ...
+  const decimalToFraction = { "0.5": "1/2", "0.75": "3/4", "1": "1", "1.25": "1-1/4", "1.5": "1-1/2", "2": "2", "2.5": "2-1/2", "3": "3", "4": "4" };
+  for (const k of gKeys) {
+    const frac = decimalToFraction[k];
+    assert.ok(frac && F.has(frac), `pipefit SCH40 table is missing nominal ${k} in (${frac})`);
+    assert.equal(F.get(frac), G[k], `SCH40 diverges at nominal ${k} in: pipefit ${F.get(frac)} vs gas/plumbing ${G[k]}`);
   }
 });

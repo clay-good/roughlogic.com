@@ -30,7 +30,7 @@ import {
 // the steam-main velocity sizing (v158). Standard mill dimensions (ASME
 // B36.10M); the same 3.068 / 4.026 figures the calc-plumbing / calc-gas
 // sizing tiles already bundle.
-const _SCH40_ID_IN = [
+export const _SCH40_ID_IN = [
   ["1/2", 0.622], ["3/4", 0.824], ["1", 1.049], ["1-1/4", 1.380],
   ["1-1/2", 1.610], ["2", 2.067], ["2-1/2", 2.469], ["3", 3.068],
   ["3-1/2", 3.548], ["4", 4.026], ["5", 5.047], ["6", 6.065],
