@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(hvacservice): round-trip furnace temp-rise against airflow-to-rise; 2026-07-17
+
+- Consistency guard: both tiles share Qs = 1.08 x CFM x delta-T with output = input x efficiency; derived CFM =
+  output/(1.08 dT) rises with firing rate and falls with rise, the airflow inverse lowers rise as CFM climbs, and the
+  derived airflow fed back reproduces the measured rise. Test-only.
+
 ### test(fab): guard conduit-offset bender multiplier against csc geometry; 2026-07-17
 
 - Geometry guards: the offset multiplier is csc(angle) (2 at 30 deg, sqrt(2) at 45 deg), mark spacing = offset x

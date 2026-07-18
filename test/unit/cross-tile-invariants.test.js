@@ -12282,3 +12282,19 @@ test("geometry: conduit-offset bender multiplier is csc(angle), with mark spacin
   assert.ok(co({ angle_deg: 45 }).shrink_in > co({}).shrink_in, "shrink must rise with bend angle");
   assert.ok(Math.abs(co({}).shrink_in - 10 * Math.tan(15 * Math.PI / 180)) < 1e-9, "shrink = offset * tan(angle/2)");
 });
+
+test("consistency: furnace temp-rise and airflow-to-rise round-trip through Qs = 1.08 CFM dT (hvacservice)", async () => {
+  const h = await import("../../calc-hvacservice.js");
+  const tr = (o) => h.computeFurnaceTempRise({ return_air_F: 70, supply_air_F: 120, input_btuh: 80000, efficiency_pct: 80, ...o });
+  const af = (o) => h.computeFurnaceAirflowToRise({ input_btuh: 80000, efficiency_pct: 80, cfm: 1185.185185, return_air_F: 70, ...o });
+  assert.ok(Math.abs(tr({}).delta_T_F - 50) < 1e-9, "temp rise = supply - return");
+  assert.ok(Math.abs(tr({}).output_btuh - 64000) < 1e-6, "output = input * efficiency");
+  assert.ok(Math.abs(tr({}).cfm - 64000 / (1.08 * 50)) < 1e-6, "derived CFM = output / (1.08 * delta-T)");
+  assert.ok(tr({ supply_air_F: 110 }).cfm > tr({}).cfm, "a smaller measured rise implies more airflow");
+  assert.ok(tr({ input_btuh: 100000 }).cfm > tr({}).cfm, "more firing rate at the same rise implies more airflow");
+  assert.ok(af({ cfm: 2000 }).delta_T_F < af({}).delta_T_F, "more airflow must lower the predicted rise");
+  assert.ok(af({ input_btuh: 100000 }).delta_T_F > af({}).delta_T_F, "more firing rate must raise the predicted rise");
+  // Round-trip: the airflow the temp-rise tile derives, fed back in, must reproduce the 50 F rise.
+  const back = h.computeFurnaceAirflowToRise({ input_btuh: 80000, efficiency_pct: 80, cfm: tr({}).cfm, return_air_F: 70 });
+  assert.ok(Math.abs(back.delta_T_F - 50) < 1e-4, "temp-rise and airflow-to-rise must round-trip the rise");
+});
