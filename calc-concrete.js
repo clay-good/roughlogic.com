@@ -1558,3 +1558,47 @@ CONCRETE_RENDERERS["concrete-stair-volume"] = _simpleRenderer({
   ],
   compute: computeConcreteStairVolume,
 });
+
+// ===================== spec-v975: slab load-transfer dowel schedule (ACI 302) =====================
+// dims: in { args: dimensionless } out: { dowels_per_joint: dimensionless, total_dowels: dimensionless, dowel_diameter_in: dimensionless }
+export function computeSlabDowelSchedule({ joint_length_ft = 40, slab_thickness_in = 6, dowel_spacing_in = 12, edge_clearance_in = 6, num_joints = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(joint_length_ft > 0)) return { error: "Joint length must be positive (ft)." };
+  if (!(slab_thickness_in > 0)) return { error: "Slab thickness must be positive (in)." };
+  if (!(dowel_spacing_in > 0)) return { error: "Dowel spacing must be positive (in)." };
+  if (!(edge_clearance_in >= 0)) return { error: "Edge clearance cannot be negative (in)." };
+  if (!(num_joints >= 1)) return { error: "Number of joints must be at least 1." };
+  // One dowel every spacing along the joint, inset from each edge, plus one to start.
+  const usable_in = joint_length_ft * 12 - 2 * edge_clearance_in;
+  const dowels_per_joint = usable_in <= 0 ? 1 : Math.floor(usable_in / dowel_spacing_in) + 1;
+  const total_dowels = dowels_per_joint * Math.round(num_joints);
+  const dowel_diameter_in = slab_thickness_in / 8;
+  if (![dowels_per_joint, total_dowels, dowel_diameter_in].every(Number.isFinite)) return { error: "Dowel-schedule math is not a finite value." };
+  return {
+    dowels_per_joint,
+    total_dowels,
+    dowel_diameter_in,
+    note: "The smooth load-transfer dowels for a jointed concrete slab-on-grade, per ACI 302 detailing practice. Round, GREASED (bond-broken) dowels bridge a construction or contraction joint so the two panels deflect together under wheel loads while still free to shrink and slide -- distinct from the deformed, bonded bars of a structural connection (rc-shear-friction). One dowel is placed every spacing (commonly 12 in on center) along the joint, held back from each slab edge, so dowels per joint = floor((joint length x 12 - 2 x edge clearance) / spacing) + 1: a 40 ft joint at 12 in on center with 6 in edge clearance takes 40 dowels, and five such joints need 200. The dowel diameter is roughly the slab thickness over 8 (about 3/4 in for a 6 in slab) at about 18 in long, ONE end greased or capped so the joint can open -- but ACI 302.1R gives the actual dowel size, length, and spacing by slab thickness in a table, which governs over the t/8 guideline here. The dowels must be aligned parallel to the slab and to each other (a dowel basket or careful placement); misaligned dowels lock the joint and crack the slab. A material-takeoff and detailing aid; the structural drawings, ACI 302 / ACI 360, and the engineer of record govern the size and schedule.",
+  };
+}
+
+export const slabDowelScheduleExample = { inputs: { joint_length_ft: 40, slab_thickness_in: 6, dowel_spacing_in: 12, edge_clearance_in: 6, num_joints: 5 } };
+
+CONCRETE_RENDERERS["slab-dowel-schedule"] = _simpleRenderer({
+  citation: "Citation: slab load-transfer dowel schedule (ACI 302 detailing), by name. dowels per joint = floor((joint length x 12 - 2 x edge clearance) / spacing) + 1; total = per joint x joints; dowel diameter ~ slab thickness/8 (advisory), ~18 in long, one end greased. ACI 302.1R gives the dowel size/length/spacing table (governs); the structural drawings and engineer of record govern.",
+  example: slabDowelScheduleExample.inputs,
+  fields: [
+    { key: "joint_length_ft", label: "Joint length (ft)", kind: "number", default: 40 },
+    { key: "slab_thickness_in", label: "Slab thickness (in)", kind: "number", default: 6 },
+    { key: "dowel_spacing_in", label: "Dowel spacing (in o.c.)", kind: "number", default: 12 },
+    { key: "edge_clearance_in", label: "Edge clearance (in)", kind: "number", default: 6 },
+    { key: "num_joints", label: "Number of dowelled joints", kind: "number", default: 5 },
+  ],
+  outputs: [
+    { key: "d", id: "sds-out-d", label: "Dowels per joint", value: (r) => String(r.dowels_per_joint) + " (one per " + "spacing + 1)" },
+    { key: "t", id: "sds-out-t", label: "Total dowels", value: (r) => String(r.total_dowels) },
+    { key: "s", id: "sds-out-s", label: "Dowel diameter (advisory, ACI 302 table governs)", value: (r) => fmt(r.dowel_diameter_in, 3) + " in (~t/8)" },
+    { key: "n", id: "sds-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSlabDowelSchedule,
+});

@@ -844,6 +844,7 @@ export const COMPUTE_MAP = {
   "curing-compound-coverage": { module: "../../calc-concrete.js", fn: "computeCuringCompoundCoverage" },
   "concrete-isolation-joint": { module: "../../calc-concrete.js", fn: "computeConcreteIsolationJoint" },
   "concrete-stair-volume": { module: "../../calc-concrete.js", fn: "computeConcreteStairVolume" },
+  "slab-dowel-schedule": { module: "../../calc-concrete.js", fn: "computeSlabDowelSchedule" },
   "joist-hanger-count": { module: "../../calc-construction.js", fn: "computeJoistHangerCount" },
   "drywall-fastener-takeoff": { module: "../../calc-construction.js", fn: "computeDrywallFastenerTakeoff" },
   "glass-vacuum-lift": { module: "../../calc-construction.js", fn: "computeGlassVacuumLift" },

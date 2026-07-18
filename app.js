@@ -639,6 +639,7 @@ const TOOL_MODULES = (() => {
     "curing-compound-coverage",
     "concrete-isolation-joint",
     "concrete-stair-volume",
+    "slab-dowel-schedule",
   ]);
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio: a new
   // lazy Group E cluster, where the steel / RC member load path meets the

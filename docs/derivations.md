@@ -1552,6 +1552,7 @@ cross-check.
 | calc-concrete.js | `computeRcSlabMaxSpanForThickness` | `{ available_thickness_in = 0, support = "simply", fy_psi = 60000, wc_pcf = 14...` | _ | _ | _ |
 | calc-concrete.js | `computeRcSlabMinThickness` | `{ l_ft = 0, support = "simply", fy_psi = 60000, wc_pcf = 145 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcSlenderColumnMagnify` | `{ factored_axial_kip = 0, end_moment_m2_kft = 0, end_moment_m1_kft = 0, unbra...` | _ | _ | _ |
+| calc-concrete.js | `computeSlabDowelSchedule` | `{ joint_length_ft = 40, slab_thickness_in = 6, dowel_spacing_in = 12, edge_cl...` | _ | _ | _ |
 | calc-concrete.js | `computeTBeamEffectiveFlangeWidth` | `{ bw_in = 0, hf_in = 0, ln_in = 0, sw_in = 0, beam_type = "interior" } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAbrasiveBlast` | `{ nozzle_bore_in, pressure_psi = 100, area_ft2, lb_per_ft2 = 8 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAdaRampSlope` | `{ rise_in = 0, slope_ratio = 12, landing_in = 60 } = {}` | _ | _ | _ |
@@ -3084,7 +3085,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1670.
+Row count: 1671.
 
 <!-- END function-corpus-v14 -->
 
@@ -3675,7 +3676,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (363 tiles)
+### Group E Construction (364 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3944,6 +3945,7 @@ per spec-v14 §13.1 second paragraph.
 | `siding-takeoff` | Lap / Panel Siding Squares and Linear Footage | Siding-takeoff identity (first-princi...; net = 2000-200 = 1800; squares = 1800*1.12/100 = 20.16; l... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sill-plate-anchor-count` | Sill-Plate Anchor Bolt Count (IRC R403.1.6) | IRC R403.1.6 anchor-count rule; effective = 40 - 2*(9/12) = 38.5 ft; bolts = max(2, ceil(... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `silt-fence-drainage` | Silt Fence Drainage-Area and Length Check | Silt-fence drainage-area guideline (g...; required = 0.5*400 = 200 ft (250 adequate); max area = 25... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `slab-dowel-schedule` | Slab Load-Transfer Dowel Schedule (ACI 302) | Slab load-transfer dowel schedule (AC...; per joint = floor((40*12-2*6)/12)+1 = floor(468/12)+1 = 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sliding-snow-load` | Sliding Snow Load on a Lower Roof (ASCE 7 7.9) | ASCE 7 §7.9; spec-v469 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slope-failure-depth-for-fs` | Infinite Slope Critical Depth for a Target FS | Infinite-slope stability (Das / NAVFA...; spec-v749 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `slope-stability-infinite` | Infinite Slope Stability Factor of Safety | Infinite-slope stability (Das / NAVFA...; spec-v289 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4693,6 +4695,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1423. Fixture-covered or reference-cadence: 1423 / 1423.
+Tile count: 1424. Fixture-covered or reference-cadence: 1424 / 1424.
 
 <!-- END tile-index-v14 -->

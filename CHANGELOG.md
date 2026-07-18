@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): add slab-dowel-schedule tile (spec-v975); 2026-07-18
+
+- New Group E tile `slab-dowel-schedule` (Slab Load-Transfer Dowel Schedule, ACI 302) in calc-concrete.js. Smooth greased
+  load-transfer dowels for a jointed slab-on-grade: dowels per joint = floor((joint length x 12 - 2 x edge clearance) /
+  spacing) + 1; total = per joint x joints. A 40 ft joint at 12 in o.c. with 6 in edge clearance = 40 dowels; 5 joints =
+  200. Dowel dia ~ slab thickness/8 (advisory; ACI 302.1R table governs), ~18 in, one end greased. Align parallel or the
+  joint locks. Home count 1,423 -> 1,424.
+
 ### feat(agriculture): add fertigation-injection-rate tile (spec-v974); 2026-07-18
 
 - New Group L tile `fertigation-injection-rate` (Fertigation / Chemigation Injection Rate) in calc-agriculture.js. total

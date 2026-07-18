@@ -28080,3 +28080,23 @@ test("bounds: spec-v974 computeFertigationInjectionRate pins the injection rate 
   assert.ok("error" in _v974({ product_rate_gal_per_acre: 5, area_acres: 40, set_time_hours: 0 }));
   assert.ok("error" in _v974({ product_rate_gal_per_acre: Infinity, area_acres: 40, set_time_hours: 6 }));
 });
+
+import { computeSlabDowelSchedule as _v975 } from "../../calc-concrete.js";
+
+test("bounds: spec-v975 computeSlabDowelSchedule pins the dowel count and error seams", () => {
+  const r = _v975({ joint_length_ft: 40, slab_thickness_in: 6, dowel_spacing_in: 12, edge_clearance_in: 6, num_joints: 5 });
+  assert.equal(r.dowels_per_joint, 40); // floor(468/12)+1
+  assert.equal(r.total_dowels, 200); // 40*5
+  assert.ok(Math.abs(r.dowel_diameter_in - 0.75) < 1e-9); // 6/8
+  // A tighter spacing raises the count.
+  assert.equal(_v975({ joint_length_ft: 40, slab_thickness_in: 6, dowel_spacing_in: 8, edge_clearance_in: 6, num_joints: 5 }).dowels_per_joint, 59); // floor(58.5)+1
+  // A thicker slab gets a bigger dowel; a longer joint more dowels.
+  assert.ok(_v975({ joint_length_ft: 40, slab_thickness_in: 10, dowel_spacing_in: 12, edge_clearance_in: 6, num_joints: 5 }).dowel_diameter_in > r.dowel_diameter_in);
+  assert.ok(_v975({ joint_length_ft: 80, slab_thickness_in: 6, dowel_spacing_in: 12, edge_clearance_in: 6, num_joints: 5 }).dowels_per_joint > r.dowels_per_joint);
+  // Error seams: non-positive joint / slab / spacing, negative edge, joints < 1, non-finite.
+  assert.ok("error" in _v975({ joint_length_ft: 0, slab_thickness_in: 6, dowel_spacing_in: 12, edge_clearance_in: 6, num_joints: 5 }));
+  assert.ok("error" in _v975({ joint_length_ft: 40, slab_thickness_in: 0, dowel_spacing_in: 12, edge_clearance_in: 6, num_joints: 5 }));
+  assert.ok("error" in _v975({ joint_length_ft: 40, slab_thickness_in: 6, dowel_spacing_in: 0, edge_clearance_in: 6, num_joints: 5 }));
+  assert.ok("error" in _v975({ joint_length_ft: 40, slab_thickness_in: 6, dowel_spacing_in: 12, edge_clearance_in: 6, num_joints: 0 }));
+  assert.ok("error" in _v975({ joint_length_ft: Infinity, slab_thickness_in: 6, dowel_spacing_in: 12, edge_clearance_in: 6, num_joints: 5 }));
+});
