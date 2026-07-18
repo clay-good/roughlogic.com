@@ -12511,3 +12511,16 @@ test("cross-module: the 0.433 psi/ft static-water-head constant agrees across fi
   assert.ok(fe(40) > fe(20), "sprinkler elevation pressure must rise with lift height");
   assert.ok(pe(40) > pe(20), "plumbing elevation loss must rise with fixture height");
 });
+
+test("consistency: soil swell/shrink volume conversions round-trip and order bank between loose and compacted (earthwork)", async () => {
+  const e = await import("../../calc-earthwork.js");
+  const ss = (o) => e.computeSoilSwellShrink({ bank_cy: 1000, swell_pct: 25, shrink_pct: 10, ...o });
+  assert.ok(Math.abs(ss({}).loose_cy - 1000 * 1.25) < 1e-9, "loose = bank * (1 + swell)");
+  assert.ok(Math.abs(ss({}).compacted_cy - 1000 * 0.90) < 1e-9, "compacted = bank * (1 - shrink)");
+  assert.ok(Math.abs(ss({}).load_factor - 1 / 1.25) < 1e-9, "load factor = 1 / (1 + swell)");
+  assert.ok(Math.abs(ss({}).loose_cy * ss({}).load_factor - 1000) < 1e-6, "load factor must convert loose yards back to bank yards");
+  assert.ok(ss({ swell_pct: 40 }).loose_cy > ss({}).loose_cy, "loose volume must rise with swell");
+  assert.ok(ss({ shrink_pct: 20 }).compacted_cy < ss({}).compacted_cy, "compacted volume must fall as shrinkage rises");
+  assert.ok(ss({}).loose_cy > 1000 && ss({}).compacted_cy < 1000, "bank volume must sit between loose (bigger) and compacted (smaller)");
+  assert.ok(Math.abs(ss({}).borrow_per_compacted - 1 / 0.9) < 1e-9, "borrow per compacted yard = 1 / (1 - shrink)");
+});

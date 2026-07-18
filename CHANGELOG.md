@@ -4,6 +4,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(earthwork): guard soil swell/shrink volume conversions; 2026-07-17
+
+- Consistency guard: loose = bank x (1+swell), compacted = bank x (1-shrink), load-factor = 1/(1+swell) converts loose
+  back to bank, bank sits between loose and compacted, and borrow-per-compacted = 1/(1-shrink). Test-only.
+
 ### test: cross-module 0.433 psi/ft static-head consistency (firesprinkler vs plumbing); 2026-07-17
 
 - Shared-constant guard: firesprinkler and plumbing must return the same elevation-head loss for the same lift, both
