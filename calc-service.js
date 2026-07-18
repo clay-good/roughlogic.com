@@ -372,7 +372,8 @@ export function computeRangeDemand22055({ num_ranges = 1, nameplate_kw = 0, supp
   const col_c_kw = n <= maxCount ? _RANGE_COL_C_KW[n] : _RANGE_COL_C_KW[maxCount];
   const over_table = n > maxCount;
   // Note 1: ranges over 12 kW add 5% to Column C per kW (or major fraction) over 12.
-  const increase = kw > 12 ? Math.ceil(kw - 12) * 0.05 : 0;
+  // "Major fraction thereof" counts >= 0.5 kW as a full step; < 0.5 kW is dropped -- round-half-up, not ceil.
+  const increase = kw > 12 ? Math.round(kw - 12) * 0.05 : 0;
   const demand_kw = col_c_kw * (1 + increase);
   const demand_a = demand_kw * 1000 / v;
   return {

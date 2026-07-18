@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(service): range-demand-220.55 Note 1 major-fraction rounding (ceil -> round); 2026-07-17
+
+- range-demand-220-55 used Math.ceil(kw-12) for the NEC Table 220.55 Note 1 5%-per-kW increase, counting ANY fraction
+  over 12 kW as a full step. Note 1 counts a "major fraction thereof" (>= 0.5 kW) -- round-half-up, not ceil. A 12.4 kW
+  range was over-demanded (8.4 vs 8.0 kW); a 13.4 kW range gave 8.8 vs 8.4 kW. Sibling calc-electrical service-load-standard
+  already uses the round form (fixed earlier this session). Fixed ceil -> round; pinned example (12 kW) + 16 kW pin unchanged
+  (whole kW where ceil == round); added fractional-kW fuzzer pins.
+
 ### test(rescue): guard sling tension cos(theta/2) direction; 2026-07-17
 
 - Physical guard on the rescue sling-angle compute (guards the sling sin-vs-cos class fixed elsewhere): bridle leg

@@ -13291,6 +13291,10 @@ test("bounds: spec-v167 range-demand-220-55 pins Column C, the Note 1 increase, 
   assert.ok(Math.abs(ex.col_c_kw - 8) < 1e-9 && Math.abs(ex.demand_kw - 8) < 1e-9 && Math.abs(ex.demand_a - 33.3333) < 1e-2);
   const big = _cv167({ num_ranges: 1, nameplate_kw: 16, supply_v: 240 });
   assert.ok(Math.abs(big.demand_kw - 9.6) < 1e-9 && Math.abs(big.demand_a - 40) < 1e-9);
+  // Note 1 "major fraction thereof": a minor fraction (< 0.5 kW) is dropped, a major fraction (>= 0.5) counts a full step.
+  assert.ok(Math.abs(_cv167({ num_ranges: 1, nameplate_kw: 12.4, supply_v: 240 }).demand_kw - 8.0) < 1e-9);
+  assert.ok(Math.abs(_cv167({ num_ranges: 1, nameplate_kw: 13.4, supply_v: 240 }).demand_kw - 8.4) < 1e-9);
+  assert.ok(Math.abs(_cv167({ num_ranges: 1, nameplate_kw: 12.5, supply_v: 240 }).demand_kw - 8.4) < 1e-9);
   // multi-range reads Column C directly (4 ranges -> 17 kW)
   assert.ok(Math.abs(_cv167({ num_ranges: 4, nameplate_kw: 12, supply_v: 240 }).col_c_kw - 17) < 1e-9);
   assert.ok("error" in _cv167({ num_ranges: 1, nameplate_kw: 0, supply_v: 240 }));
