@@ -31,9 +31,11 @@ test("Containment: scales with sqrt of pressure", () => {
   assert.ok(close(b.required_cfm / a.required_cfm, 2, 0.001));
 });
 
-test("Containment: zero volume errors", () => {
-  const r = computeContainmentAirBalance({ containment_volume_ft3: 0, target_dp_in_wc: 0.02, leakage_area_in2: 5 });
-  assert.ok(r.error);
+test("Containment: required CFM is leakage-driven and independent of containment volume", () => {
+  // The negative-pressure exhaust is orifice flow through the leakage area, so
+  // the volume input was removed; the ACH/volume exhaust is chamber-turnover.
+  const a = computeContainmentAirBalance({ target_dp_in_wc: 0.02, leakage_area_in2: 5 });
+  assert.ok(!a.error && a.required_cfm > 0);
 });
 
 test("Containment: zero pressure errors", () => {

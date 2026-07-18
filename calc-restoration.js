@@ -722,7 +722,7 @@ export function renderThermalDeltaT(inputRegion, outputRegion, citationEl) {
 //  the discharge-coefficient x velocity-pressure constant for standard air).
 // The leakage area is entered in in^2, so it is divided by 144 to ft^2.
 
-// dims: in { containment_volume_ft3: L^3, target_dp_in_wc: M L^-1 T^-2, leakage_area_in2: L^2 }
+// dims: in { target_dp_in_wc: M L^-1 T^-2, leakage_area_in2: L^2 }
 //        out: { required_cfm: L^3 T^-1, recommendations: dimensionless }
 // (Public orifice-flow form Q (cfm) = 2610 * A (ft^2) * sqrt(dP
 //  (in wc)). Pressure in inches-water-column is `M L^-1 T^-2`;
@@ -730,10 +730,12 @@ export function renderThermalDeltaT(inputRegion, outputRegion, citationEl) {
 //  the 2610 constant absorbs the cfm + ft^2 + in-WC unit conversions.
 //  Required CFM surfaces as volume-per-time `L^3 T^-1`.)
 export function computeContainmentAirBalance({
-  containment_volume_ft3 = 0, target_dp_in_wc = 0.02, leakage_area_in2 = 0,
+  target_dp_in_wc = 0.02, leakage_area_in2 = 0,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  if (!(containment_volume_ft3 > 0)) return { error: "Containment volume must be positive." };
+  // The negative-pressure exhaust is leakage-driven (orifice flow), so it does
+  // not depend on the containment volume -- the volume-based minimum air-change
+  // exhaust is the separate chamber-turnover tile.
   if (!(target_dp_in_wc > 0)) return { error: "Target pressure differential must be positive." };
   if (!(leakage_area_in2 >= 0)) return { error: "Leakage area must be non-negative." };
   const required_cfm = 2610 * (leakage_area_in2 / 144) * Math.sqrt(target_dp_in_wc);
@@ -747,7 +749,7 @@ export function computeContainmentAirBalance({
 }
 
 export const containmentAirBalanceExample = {
-  inputs: { containment_volume_ft3: 10000, target_dp_in_wc: 0.02, leakage_area_in2: 12 },
+  inputs: { target_dp_in_wc: 0.02, leakage_area_in2: 12 },
 };
 
 // --- Utility 146: Drying Chamber Air Turnover ---
@@ -787,17 +789,15 @@ import {
 function renderContainmentAirBalance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Public orifice-flow form Q (cfm) = 2610 * A (ft^2) * sqrt(delta_P (in wc)); leakage area entered in in^2 is converted to ft^2 (/144). Engineering practice.";
   _ae3(inputRegion, () => fillExample(containmentAirBalanceExample.inputs));
-  const v = _mn3("Containment volume (ft^3)", "cb-v", { step: "any", min: "0" });
   const dp = _mn3("Target pressure differential (in wc)", "cb-dp", { step: "any", min: "0", value: "0.02" });
   dp.input.value = "0.02";
   const a = _mn3("Estimated leakage area (in^2)", "cb-a", { step: "any", min: "0" });
-  for (const f of [v, dp, a]) inputRegion.appendChild(f.wrap);
+  for (const f of [dp, a]) inputRegion.appendChild(f.wrap);
   const oR = _mo3(outputRegion, "Required net negative CFM", "cb-out-r");
   const oU = _mo3(outputRegion, "Recommended NAMs", "cb-out-u");
-  function fillExample(x) { v.input.value = x.containment_volume_ft3; dp.input.value = x.target_dp_in_wc; a.input.value = x.leakage_area_in2; update(); }
+  function fillExample(x) { dp.input.value = x.target_dp_in_wc; a.input.value = x.leakage_area_in2; update(); }
   const update = _deb3(() => {
     const r = computeContainmentAirBalance({
-      containment_volume_ft3: Number(v.input.value) || 0,
       target_dp_in_wc: Number(dp.input.value) || 0,
       leakage_area_in2: Number(a.input.value) || 0,
     });
@@ -805,7 +805,7 @@ function renderContainmentAirBalance(inputRegion, outputRegion, citationEl) {
     oR.textContent = _fmt3(r.required_cfm, 0) + " cfm";
     oU.textContent = r.recommendations.map((x) => x.units_needed + "x " + x.unit_cfm + " cfm").join(", ");
   }, _D3);
-  for (const el of [v.input, dp.input, a.input]) el.addEventListener("input", update);
+  for (const el of [dp.input, a.input]) el.addEventListener("input", update);
 }
 
 function renderChamberTurnover(inputRegion, outputRegion, citationEl) {

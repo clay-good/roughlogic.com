@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(restoration): containment-air-balance collected a containment-volume input it never used; 2026-07-18
+
+- computeContainmentAirBalance rendered and validated `containment_volume_ft3`, but the required negative-pressure
+  exhaust is orifice flow through the leakage area (`2610 * A * sqrt(dP)`) -- leakage-driven and independent of the
+  containment volume, so the input never affected the result (guard-only dead input on a hazardous-remediation
+  containment tile). Removed it; the volume-based minimum air-change exhaust is already the separate chamber-turnover
+  tile. No output changed. Found by a heuristic dead-input scan over the remaining modules; verified with render-no-nan
+  (hand-written renderer). The trench-slope `surcharge` guard the same scan flagged is a legitimate out-of-scope
+  rejection, not a dead input.
+
 ### docs(kitchen): label two temperature fields whose value the (cited) model intentionally does not use; 2026-07-18
 
 - cooling-curve's "Starting temp" and sous-vide-pasteurization's "Initial food temperature" are prominent numeric

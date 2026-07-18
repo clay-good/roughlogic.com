@@ -2337,12 +2337,12 @@ test("bounds: calc-restoration computeContainmentAirBalance pins required_cfm = 
     }
   }
   // Zero leakage area -> required_cfm = 0, no error.
-  const zero_leak = computeContainmentAirBalance({ containment_volume_ft3: 5000, target_dp_in_wc: 0.02, leakage_area_in2: 0 });
+  const zero_leak = computeContainmentAirBalance({ target_dp_in_wc: 0.02, leakage_area_in2: 0 });
   assert.strictEqual(zero_leak.required_cfm, 0);
-  // Documented rejections.
-  assert.ok("error" in computeContainmentAirBalance({ containment_volume_ft3: 0, target_dp_in_wc: 0.02, leakage_area_in2: 12 }));
-  assert.ok("error" in computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc: 0, leakage_area_in2: 12 }));
-  assert.ok("error" in computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc: 0.02, leakage_area_in2: -1 }));
+  // Documented rejections (containment_volume_ft3 was removed as a dead input;
+  // the required CFM is leakage-driven and volume-independent).
+  assert.ok("error" in computeContainmentAirBalance({ target_dp_in_wc: 0, leakage_area_in2: 12 }));
+  assert.ok("error" in computeContainmentAirBalance({ target_dp_in_wc: 0.02, leakage_area_in2: -1 }));
 });
 
 test("bounds: calc-restoration computeChamberTurnover pins ACH = (am + dehu) * 60 / V and gap = max(0, required - total)", () => {

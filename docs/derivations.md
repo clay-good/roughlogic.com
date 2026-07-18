@@ -2679,7 +2679,7 @@ cross-check.
 | calc-restoration.js | `computeCeilingWaterLoad` | `{ pooled_area_ft2 = 0, avg_depth_in = 0, threshold_psf = 5 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeChamberTurnover` | `{ chamber_volume_ft3 = 0, target_ach = 60, air_mover_total_cfm = 0, dehu_cfm ...` | _ | _ | _ |
 | calc-restoration.js | `computeCharDepthCapacity` | `{ exposure_min = 0, nominal_width_in = 0, nominal_depth_in = 0, faces_across_...` | _ | _ | _ |
-| calc-restoration.js | `computeContainmentAirBalance` | `{ containment_volume_ft3 = 0, target_dp_in_wc = 0.02, leakage_area_in2 = 0, }` | _ | _ | _ |
+| calc-restoration.js | `computeContainmentAirBalance` | `{ target_dp_in_wc = 0.02, leakage_area_in2 = 0, }` | _ | _ | _ |
 | calc-restoration.js | `computeContentsPackoutInventory` | `{ floor_area_ft2 = 0, contents_ft3_per_ft2 = 2, box_volume_ft3 = 3, stacking_...` | _ | _ | _ |
 | calc-restoration.js | `computeDehumidifierDerate` | `{ aham_pints_per_day = 0, derate_factor = 0.5, required_pints_per_day = 0 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeDehumidifierSize` | `{ room_cubic_feet, water_class = "2", expected_pints_per_day = null }` | _ | _ | _ |
@@ -3541,7 +3541,7 @@ per spec-v14 §13.1 second paragraph.
 | `chamber-turnover` | Drying Chamber Air Turnover | IICRC; actual_ACH = 1450 * 60 / 1500 = 58; required_CFM = 60 * 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `char-depth-capacity` | Fire-Exposed Wood Char Depth and Residual Capacity | AWC National Design Specification cha...; 6x10 (5.5x9.5) 30 min, 2 width + 1 depth faces -> 0.53 S-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `class-of-loss-screen` | S500 Class-of-Loss Screen by Wetted-Surface Fraction | ANSI/IICRC S500 Class-of-loss definit...; spec-v139 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `containment-air-balance` | Containment Air Balance | IICRC S520 negative-pressure-containm...; 5400 ft^3 / 0.02 in WC target / 8 in^2 leakage -> 2610 * ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `containment-air-balance` | Containment Air Balance | IICRC S520 negative-pressure-containm...; 0.02 in WC target / 8 in^2 leakage -> 2610 * (8/144) * sq... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `contents-packout-inventory` | Contents Pack-Out Volume, Boxes, and Storage | Restoration estimating practice (ANSI...; 200 ft^2 at 2 ft^3/ft^2 -> 400 ft^3, 134 boxes, 600 ft^3,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dehumidifier` | Dehumidifier Sizing | AHAM DH-1 / IICRC S500 dehumidificati...; 6000 ft^3 / Class 2 -> 240 pints/day AHAM, 372 pints/day ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dehumidifier-derate` | Field-Effective Dehumidifier Capacity at Chamber Grain Depression | ANSI/IICRC S500 AHAM-overstates-field...; spec-v138 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
