@@ -714,7 +714,7 @@ const _TILES = [
   ["blower-door-ach50", "C"], ["ashrae-622-ventilation", "C"], ["infiltration-load", "C"],
   // spec-v111 fuel-gas altitude derate / NG-LP conversion (Group B)
   ["gas-altitude-derate", "B"],
-  ["gas-fuel-conversion", "B"],
+  ["gas-fuel-conversion", "B"], ["wobbe-index", "B"],
   // spec-v112 storage water-heater sizing (Group B)
   ["water-heater-storage-sizing", "B"],
   // spec-v113 guard and handrail code check (Group E)

@@ -287,6 +287,7 @@ const TOOL_MODULES = (() => {
     "gas-pipe-sizing", "gas-leak-rate", "gas-leak-hole-diameter", "gas-pipe-pressure-drop", "gas-pipe-max-flow",
     // spec-v111 high-altitude derate and NG/LP fuel conversion (same module).
     "gas-altitude-derate", "gas-fuel-conversion",
+    "wobbe-index",
     // spec-v206 medical-gas system demand and diversity (NFPA 99).
     "medgas-demand",
   ]);

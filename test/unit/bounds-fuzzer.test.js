@@ -28122,3 +28122,23 @@ test("bounds: spec-v976 computeDrywellInfiltration pins the void-ratio sizing an
   assert.ok("error" in _v976({ runoff_volume_ft3: 200, void_ratio: 0.35, trench_depth_ft: 4, infiltration_rate_in_hr: 0 }));
   assert.ok("error" in _v976({ runoff_volume_ft3: Infinity, void_ratio: 0.35, trench_depth_ft: 4, infiltration_rate_in_hr: 0.5 }));
 });
+
+import { computeWobbeIndex as _v977 } from "../../calc-gas.js";
+
+test("bounds: spec-v977 computeWobbeIndex pins WI = HHV/sqrt(SG) and error seams", () => {
+  const r = _v977({ hhv_btu_ft3: 1000, specific_gravity: 0.60 });
+  assert.ok(Math.abs(r.wobbe_index_btu_ft3 - 1290.994) < 0.1); // 1000/sqrt(0.60)
+  // Propane: far from natural gas (why an appliance must be converted).
+  const propane = _v977({ hhv_btu_ft3: 2516, specific_gravity: 1.52 });
+  assert.ok(Math.abs(propane.wobbe_index_btu_ft3 - 2040.72) < 0.1);
+  assert.ok(propane.wobbe_index_btu_ft3 > r.wobbe_index_btu_ft3);
+  // Wobbe is linear in HHV and falls with sqrt(SG): a denser gas has a lower Wobbe at the same HHV.
+  assert.ok(Math.abs(_v977({ hhv_btu_ft3: 2000, specific_gravity: 0.60 }).wobbe_index_btu_ft3 - 2 * r.wobbe_index_btu_ft3) < 1e-6);
+  assert.ok(_v977({ hhv_btu_ft3: 1000, specific_gravity: 1.0 }).wobbe_index_btu_ft3 < r.wobbe_index_btu_ft3);
+  // SG = 1 gives WI = HHV.
+  assert.ok(Math.abs(_v977({ hhv_btu_ft3: 1000, specific_gravity: 1.0 }).wobbe_index_btu_ft3 - 1000) < 1e-9);
+  // Error seams: non-positive HHV or SG, non-finite.
+  assert.ok("error" in _v977({ hhv_btu_ft3: 0, specific_gravity: 0.60 }));
+  assert.ok("error" in _v977({ hhv_btu_ft3: 1000, specific_gravity: 0 }));
+  assert.ok("error" in _v977({ hhv_btu_ft3: Infinity, specific_gravity: 0.60 }));
+});

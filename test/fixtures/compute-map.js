@@ -1280,6 +1280,7 @@ export const COMPUTE_MAP = {
   "infiltration-load": { module: "../../calc-hvacservice.js", fn: "computeInfiltrationLoad" },
   "gas-altitude-derate": { module: "../../calc-gas.js", fn: "computeGasAltitudeDerate" },
   "gas-fuel-conversion": { module: "../../calc-gas.js", fn: "computeGasFuelConversion" },
+  "wobbe-index": { module: "../../calc-gas.js", fn: "computeWobbeIndex" },
   "water-heater-storage-sizing": { module: "../../calc-plumbing.js", fn: "computeWaterHeaterStorageSizing" },
   "guard-handrail-check": { module: "../../calc-construction.js", fn: "computeGuardHandrailCheck" },
   "stair-code-check": { module: "../../calc-construction.js", fn: "computeStairCodeCheck" },

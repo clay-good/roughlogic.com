@@ -28473,6 +28473,48 @@
    }
   },
   {
+   "tile_id": "wobbe-index",
+   "source_publisher": "Wobbe index (fuel-gas interchangeability)",
+   "source_title": "natural gas: HHV 1,000 BTU/ft^3, SG 0.60 -> Wobbe 1,291",
+   "source_edition_or_year": "spec-v977 worked example (machine-verified)",
+   "source_section_or_page": "WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "hhv_btu_ft3": 1000,
+    "specific_gravity": 0.60
+   },
+   "outputs": {
+    "wobbe_index_btu_ft3": {
+     "value": 1291,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wobbe-index",
+   "source_publisher": "Wobbe index (fuel-gas interchangeability)",
+   "source_title": "cross-check: propane HHV 2,516, SG 1.52 -> Wobbe 2,041, far from NG (must convert)",
+   "source_edition_or_year": "spec-v977 worked example (machine-verified)",
+   "source_section_or_page": "WI = 2516 / sqrt(1.52) = 2516 / 1.23288 = 2040.7",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "hhv_btu_ft3": 2516,
+    "specific_gravity": 1.52
+   },
+   "outputs": {
+    "wobbe_index_btu_ft3": {
+     "value": 2040.7,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gas-fuel-conversion",
    "source_publisher": "First-principles orifice flow Q ~ area x sqrt(pressure / specific gravity)",
    "source_title": "natural gas to propane at the same appliance input",

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(gas): add wobbe-index tile (spec-v977); 2026-07-18
+
+- New Group B tile `wobbe-index` (Wobbe Index, Fuel-Gas Interchangeability) in calc-gas.js. WI = HHV / sqrt(specific
+  gravity), the heat delivered through a fixed orifice at a fixed pressure. Two gases of equal Wobbe deliver the same
+  heat input through the same orifice. NG (1,000 BTU/ft^3, 0.60 SG) = ~1,291; propane (2,516, 1.52) = ~2,040 -- far
+  apart, so an appliance must be converted between them. Captures orifice/heat-input, not flame speed. The supplier
+  analysis and conversion kit govern. Home count 1,425 -> 1,426.
+
 ### feat(plumbing): add drywell-infiltration tile (spec-v976); 2026-07-18
 
 - New Group B tile `drywell-infiltration` (Dry Well / Infiltration Trench Sizing) in calc-drainage.js. Stone stores water

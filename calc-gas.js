@@ -557,3 +557,40 @@ function renderMedgasDemand(inputRegion, outputRegion, citationEl) {
   for (const f of [st.input, q.input, div.input]) f.addEventListener("input", update);
 }
 GAS_RENDERERS["medgas-demand"] = renderMedgasDemand;
+
+// ===================== spec-v977: Wobbe index (fuel-gas interchangeability) =====================
+// dims: in { args: dimensionless } out: { wobbe_index_btu_ft3: dimensionless }
+export function computeWobbeIndex({ hhv_btu_ft3 = 1000, specific_gravity = 0.60 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(hhv_btu_ft3 > 0)) return { error: "Higher heating value must be positive (BTU/ft^3)." };
+  if (!(specific_gravity > 0)) return { error: "Specific gravity must be positive." };
+  // Wobbe index = HHV / sqrt(SG): the heat delivered through a fixed orifice at a fixed pressure.
+  const wobbe_index_btu_ft3 = hhv_btu_ft3 / Math.sqrt(specific_gravity);
+  if (!Number.isFinite(wobbe_index_btu_ft3)) return { error: "Wobbe-index math is not a finite value." };
+  return {
+    wobbe_index_btu_ft3,
+    note: "The Wobbe index, the single number that governs fuel-gas interchangeability: WI = HHV / sqrt(specific gravity), where HHV is the higher heating value (BTU/ft^3) and SG is the gas density relative to air. Because the flow through a fixed orifice at a fixed pressure goes as 1/sqrt(SG) and the heat carried goes as the HHV, TWO GASES OF EQUAL WOBBE DELIVER THE SAME HEAT INPUT through the same orifice at the same manifold pressure -- so an appliance set up for one runs correctly on the other without changing the orifice. Natural gas at 1,000 BTU/ft^3 and 0.60 SG has a Wobbe of about 1,291; propane at 2,516 BTU/ft^3 and 1.52 SG is about 2,040 -- far apart, which is exactly why an appliance MUST be converted (orifice and often manifold pressure changed) between them and cannot simply be switched. Within a fuel, a utility holds the Wobbe in a narrow band (a few percent) so appliances stay in tune as the gas composition shifts (propane-air peak shaving, LNG, or hydrogen blending all move it). Wobbe captures the orifice/heat-input behavior but NOT flame speed or the yellow-tipping/flashback limits, so a full interchangeability check (AGA indices) also considers those. The gas supplier's certified analysis, the appliance listing, and the manufacturer's conversion kit and the AHJ govern the actual conversion.",
+  };
+}
+
+export const wobbeIndexExample = { inputs: { hhv_btu_ft3: 1000, specific_gravity: 0.60 } };
+
+function _v977renderWobbeIndex(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Wobbe index of a fuel gas (AGA / ISO 13686 interchangeability), by name. WI = HHV / sqrt(specific gravity). Two gases of equal Wobbe deliver the same heat input through the same orifice at the same pressure. NG ~1,291, propane ~2,040. Captures orifice/heat-input, not flame speed; the supplier's analysis, the appliance listing, and the conversion kit govern.";
+  const hv = makeNumber("Higher heating value (BTU/ft^3)", "wob-hv", { step: "any", min: "0", value: "1000" });
+  hv.input.value = "1000";
+  const sg = makeNumber("Specific gravity (vs air)", "wob-sg", { step: "any", min: "0", value: "0.60" });
+  sg.input.value = "0.60";
+  for (const f of [hv, sg]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { hv.input.value = "1000"; sg.input.value = "0.60"; update(); });
+  const oW = makeOutputLine(outputRegion, "Wobbe index", "wob-out-w");
+  const update = debounce(() => {
+    const r = computeWobbeIndex({
+      hhv_btu_ft3: hv.input.value === "" ? 1000 : Number(hv.input.value), specific_gravity: sg.input.value === "" ? 0.60 : Number(sg.input.value),
+    });
+    if (r.error) { oW.textContent = r.error; return; }
+    oW.textContent = fmt(r.wobbe_index_btu_ft3, 0) + " BTU/ft^3 (NG ~1,291, propane ~2,040)";
+  }, DEBOUNCE_MS);
+  for (const f of [hv, sg]) f.input.addEventListener("input", update);
+}
+GAS_RENDERERS["wobbe-index"] = _v977renderWobbeIndex;
