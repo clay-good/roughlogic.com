@@ -197,10 +197,14 @@ export function computeCableTrayFill({ tray_type = "ladder", tray_width_in = 0, 
     fill_value = area_sum; pass = area_sum <= allowable;
     fill_percent = (area_sum / allowable) * 100;
   } else {
-    // Mixed (392.22(A)(1)(c)): the large cables take their diameter off the
-    // width, and the smaller cables' areas fit in the reduced column-2 area.
+    // Mixed (392.22(A)(1)(c)): the smaller-cable Column-1 area is reduced by the
+    // 4/0-and-larger cables laid in a single layer. NEC gives (Column-1 area) - 1.2*Sd
+    // for ladder/ventilated (base 1.167*width - so 12 in tray, Sd 5.25 -> 14 - 6.3 = 7.7 in^2).
+    // The 1.2 single-layer allowance is distinct from the 1.167 Column-1 depth; applying the
+    // base factor to Sd (the old code) under-reduced the allowance and over-stated the fill.
     basis = "mixed: 4/0-and-larger diameters reduce the smaller-cable area allowance";
-    const reduced_allowable = _trayColumn2Area(tray_type, Math.max(0, width - diameter_sum));
+    const sdFactor = tray_type === "solid-bottom" ? 0.917 : 1.2;
+    const reduced_allowable = Math.max(0, _trayColumn2Area(tray_type, width) - sdFactor * diameter_sum);
     allowable = reduced_allowable; fill_value = area_sum;
     pass = diameter_sum <= width && area_sum <= reduced_allowable;
     fill_percent = reduced_allowable > 0 ? (area_sum / reduced_allowable) * 100 : Infinity;

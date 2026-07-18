@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(lowvoltage): cable-tray-fill mixed-cable reduction uses NEC 1.2 x Sd (was 1.167); 2026-07-17
+
+- computeCableTrayFill mixed case (NEC 392.22(A)(1)(c)) computed the reduced small-cable allowance as
+  factor x (width - Sd), applying the Column-1 depth factor (ladder 1.167) to the large-cable diameter sum too. NEC
+  reduces the Column-1 area by 1.2 x Sd (the single-layer large-cable allowance, distinct from the 1.167 fill depth):
+  a 12 in ladder tray with Sd=5.25 in is 14 - 1.2(5.25) = 7.7 in^2, not 1.167(12-5.25) = 7.88. The old form over-stated
+  the allowable fill (non-conservative). Fixed ladder/ventilated to base - 1.2 Sd; solid-bottom preserved. Example and
+  pins use pure-large/pure-small branches (unchanged).
+
 ### fix(construction): wind-pressure Exposure C/D fallback Kz used 15-ft values at 30 ft (ASCE 7-16 Table 26.10-1); 2026-07-17
 
 - computeWindPressure exposure-fallback Kz (used when Kz is left blank) mixed heights: B=0.70 was the 30-ft value but
