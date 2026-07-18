@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test: cross-module 0.433 psi/ft static-head consistency (firesprinkler vs plumbing); 2026-07-17
+
+- Shared-constant guard: firesprinkler and plumbing must return the same elevation-head loss for the same lift, both
+  embed 0.433 psi per foot of water, and each rises with height. A drift of the head constant in either is caught.
+  Test-only.
+
 ### test: cross-module 43560 sq-ft-per-acre consistency (agriculture vs survey); 2026-07-17
 
 - Shared-constant guard: recovers 43560 sq ft/acre from agriculture crop-yield (yield x strip-area = 43560 at

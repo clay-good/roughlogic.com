@@ -12499,3 +12499,15 @@ test("cross-module: the 43560 sq-ft-per-acre constant agrees across agriculture 
   assert.ok(Math.abs(kSurvey - 43560) < 1e-6, "survey area must embed 43560 sq ft per acre");
   assert.ok(Math.abs(kAg - kSurvey) < 1e-6, "the two modules must use the identical acre conversion (a drift in either is caught)");
 });
+
+test("cross-module: the 0.433 psi/ft static-water-head constant agrees across firesprinkler and plumbing", async () => {
+  const fs = await import("../../calc-firesprinkler.js");
+  const p = await import("../../calc-plumbing.js");
+  const fe = (ft) => fs.computeSprinklerPressureDemand({ q_head_gpm: 25, k_factor: 5.6, q_total_gpm: 25, pipe_id_in: 1.05, c_factor: 120, equiv_length_ft: 100, elevation_ft: ft }).elevation_psi;
+  const pe = (ft) => p.computeSupplyPressureBudget({ street_pressure: 60, fixture_height: ft, meter_loss: 0, bfp_loss: 0, friction_loss: 0, fixture_min: 8 }).elevation_loss;
+  assert.ok(Math.abs(fe(20) - pe(20)) < 1e-9, "the sprinkler and plumbing elevation-head losses must match for the same lift");
+  assert.ok(Math.abs(fe(20) / 20 - 0.433) < 1e-9, "firesprinkler must embed 0.433 psi per foot of water");
+  assert.ok(Math.abs(pe(20) / 20 - 0.433) < 1e-9, "plumbing must embed 0.433 psi per foot of water");
+  assert.ok(fe(40) > fe(20), "sprinkler elevation pressure must rise with lift height");
+  assert.ok(pe(40) > pe(20), "plumbing elevation loss must rise with fixture height");
+});
