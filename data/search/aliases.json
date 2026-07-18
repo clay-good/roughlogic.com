@@ -92945,6 +92945,1181 @@
       "term": "ridge vent length for nfa",
       "target": "soffit-ridge-vent-count",
       "kind": "question"
+    },
+    {
+      "term": "internal vibrator spacing",
+      "target": "concrete-vibrator-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "how far apart to vibrate concrete",
+      "target": "concrete-vibrator-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "aci 309 vibrator insertion spacing",
+      "target": "concrete-vibrator-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "concrete consolidation vibrator spacing",
+      "target": "concrete-vibrator-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "spacing for vibrator insertions",
+      "target": "concrete-vibrator-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "formwork tie load and spacing",
+      "target": "formwork-tie-load",
+      "kind": "question"
+    },
+    {
+      "term": "how much load on a form tie",
+      "target": "formwork-tie-load",
+      "kind": "question"
+    },
+    {
+      "term": "wall form tie spacing",
+      "target": "formwork-tie-load",
+      "kind": "question"
+    },
+    {
+      "term": "tie load from concrete pressure",
+      "target": "formwork-tie-load",
+      "kind": "question"
+    },
+    {
+      "term": "form tie sizing",
+      "target": "formwork-tie-load",
+      "kind": "question"
+    },
+    {
+      "term": "adiabatic temp rise for concrete",
+      "target": "mass-concrete-temp-rise",
+      "kind": "question"
+    },
+    {
+      "term": "peak temperature of a concrete placement",
+      "target": "mass-concrete-temp-rise",
+      "kind": "question"
+    },
+    {
+      "term": "concrete heat rise screen",
+      "target": "mass-concrete-temp-rise",
+      "kind": "question"
+    },
+    {
+      "term": "how hot will mass concrete get",
+      "target": "mass-concrete-temp-rise",
+      "kind": "question"
+    },
+    {
+      "term": "concrete washout containment volume",
+      "target": "concrete-washout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how big a washout pit",
+      "target": "concrete-washout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "size a concrete washout",
+      "target": "concrete-washout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "washout container volume",
+      "target": "concrete-washout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "concrete washout sizing",
+      "target": "concrete-washout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how many roofing nails",
+      "target": "shingle-nails",
+      "kind": "question"
+    },
+    {
+      "term": "shingle nail count by wind zone",
+      "target": "shingle-nails",
+      "kind": "question"
+    },
+    {
+      "term": "nails for an asphalt shingle roof",
+      "target": "shingle-nails",
+      "kind": "question"
+    },
+    {
+      "term": "roofing nail takeoff",
+      "target": "shingle-nails",
+      "kind": "question"
+    },
+    {
+      "term": "shingle nails per square",
+      "target": "shingle-nails",
+      "kind": "question"
+    },
+    {
+      "term": "how many rolls of roofing underlayment",
+      "target": "roof-underlayment-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "roof underlayment roll count",
+      "target": "roof-underlayment-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "underlayment rolls for a deck",
+      "target": "roof-underlayment-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "felt rolls for a roof",
+      "target": "roof-underlayment-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "roofing underlayment takeoff",
+      "target": "roof-underlayment-rolls",
+      "kind": "question"
+    },
+    {
+      "term": "single ply membrane rolls",
+      "target": "membrane-roof-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "tpo roll and seam takeoff",
+      "target": "membrane-roof-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "membrane roof roll count",
+      "target": "membrane-roof-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "epdm rolls and seam length",
+      "target": "membrane-roof-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "how much membrane for a roof",
+      "target": "membrane-roof-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "tapered roof insulation quantity",
+      "target": "tapered-roof-insulation",
+      "kind": "question"
+    },
+    {
+      "term": "average thickness of a tapered layout",
+      "target": "tapered-roof-insulation",
+      "kind": "question"
+    },
+    {
+      "term": "board feet for tapered insulation",
+      "target": "tapered-roof-insulation",
+      "kind": "question"
+    },
+    {
+      "term": "slope to drain insulation takeoff",
+      "target": "tapered-roof-insulation",
+      "kind": "question"
+    },
+    {
+      "term": "tapered insulation average r",
+      "target": "tapered-roof-insulation",
+      "kind": "question"
+    },
+    {
+      "term": "how many sheets of sheathing",
+      "target": "sheathing-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "wall sheathing panel takeoff",
+      "target": "sheathing-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "sheathing and nails for a wall",
+      "target": "sheathing-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "osb sheets for a roof",
+      "target": "sheathing-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "sheathing panel count",
+      "target": "sheathing-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "how many tubes of construction adhesive",
+      "target": "construction-adhesive-tubes",
+      "kind": "question"
+    },
+    {
+      "term": "adhesive tube count for subfloor",
+      "target": "construction-adhesive-tubes",
+      "kind": "question"
+    },
+    {
+      "term": "construction adhesive takeoff",
+      "target": "construction-adhesive-tubes",
+      "kind": "question"
+    },
+    {
+      "term": "tubes of glue for a panel job",
+      "target": "construction-adhesive-tubes",
+      "kind": "question"
+    },
+    {
+      "term": "adhesive tubes from bead size",
+      "target": "construction-adhesive-tubes",
+      "kind": "question"
+    },
+    {
+      "term": "how many sill plate anchor bolts",
+      "target": "sill-plate-anchor-count",
+      "kind": "question"
+    },
+    {
+      "term": "anchor bolt count for a sill plate",
+      "target": "sill-plate-anchor-count",
+      "kind": "question"
+    },
+    {
+      "term": "sill plate anchor spacing",
+      "target": "sill-plate-anchor-count",
+      "kind": "question"
+    },
+    {
+      "term": "irc anchor bolt count",
+      "target": "sill-plate-anchor-count",
+      "kind": "question"
+    },
+    {
+      "term": "j bolts for a sill plate",
+      "target": "sill-plate-anchor-count",
+      "kind": "question"
+    },
+    {
+      "term": "how many metal studs and track",
+      "target": "metal-stud-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "light gauge steel stud takeoff",
+      "target": "metal-stud-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "steel studs for a partition",
+      "target": "metal-stud-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "metal stud and track count",
+      "target": "metal-stud-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "studs and track for a wall",
+      "target": "metal-stud-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "suspended ceiling grid takeoff",
+      "target": "suspended-ceiling-grid",
+      "kind": "question"
+    },
+    {
+      "term": "how many ceiling tiles and tees",
+      "target": "suspended-ceiling-grid",
+      "kind": "question"
+    },
+    {
+      "term": "acoustical ceiling grid material",
+      "target": "suspended-ceiling-grid",
+      "kind": "question"
+    },
+    {
+      "term": "lay in ceiling grid takeoff",
+      "target": "suspended-ceiling-grid",
+      "kind": "question"
+    },
+    {
+      "term": "main and cross tees for a ceiling",
+      "target": "suspended-ceiling-grid",
+      "kind": "question"
+    },
+    {
+      "term": "masonry control joint spacing",
+      "target": "masonry-control-joint-layout",
+      "kind": "question"
+    },
+    {
+      "term": "how far apart masonry control joints",
+      "target": "masonry-control-joint-layout",
+      "kind": "question"
+    },
+    {
+      "term": "ncma control joint layout",
+      "target": "masonry-control-joint-layout",
+      "kind": "question"
+    },
+    {
+      "term": "control joints for a cmu wall",
+      "target": "masonry-control-joint-layout",
+      "kind": "question"
+    },
+    {
+      "term": "masonry joint spacing",
+      "target": "masonry-control-joint-layout",
+      "kind": "question"
+    },
+    {
+      "term": "how many dumpsters for demo debris",
+      "target": "dumpster-count",
+      "kind": "question"
+    },
+    {
+      "term": "roll off dumpster count",
+      "target": "dumpster-count",
+      "kind": "question"
+    },
+    {
+      "term": "haul count for debris",
+      "target": "dumpster-count",
+      "kind": "question"
+    },
+    {
+      "term": "dumpsters for a demolition",
+      "target": "dumpster-count",
+      "kind": "question"
+    },
+    {
+      "term": "roll off count from debris volume",
+      "target": "dumpster-count",
+      "kind": "question"
+    },
+    {
+      "term": "how many feet per caulk tube",
+      "target": "sealant-joint-yield",
+      "kind": "question"
+    },
+    {
+      "term": "sealant cartridge yield for a joint",
+      "target": "sealant-joint-yield",
+      "kind": "question"
+    },
+    {
+      "term": "caulk tubes for a run",
+      "target": "sealant-joint-yield",
+      "kind": "question"
+    },
+    {
+      "term": "cartridges for a sealant joint",
+      "target": "sealant-joint-yield",
+      "kind": "question"
+    },
+    {
+      "term": "sealant yield from joint size",
+      "target": "sealant-joint-yield",
+      "kind": "question"
+    },
+    {
+      "term": "how many bags of self leveler",
+      "target": "self-leveler-bags",
+      "kind": "question"
+    },
+    {
+      "term": "self leveling underlayment bag count",
+      "target": "self-leveler-bags",
+      "kind": "question"
+    },
+    {
+      "term": "slu bags for a floor",
+      "target": "self-leveler-bags",
+      "kind": "question"
+    },
+    {
+      "term": "self leveler quantity",
+      "target": "self-leveler-bags",
+      "kind": "question"
+    },
+    {
+      "term": "bags of leveler from thickness",
+      "target": "self-leveler-bags",
+      "kind": "question"
+    },
+    {
+      "term": "carpet square yards takeoff",
+      "target": "carpet-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "how much carpet to order",
+      "target": "carpet-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "carpet in square yards with waste",
+      "target": "carpet-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "carpet linear feet off a 12 ft roll",
+      "target": "carpet-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "carpet quantity for a room",
+      "target": "carpet-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "spray fireproofing material takeoff",
+      "target": "sfrm-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "sfrm bags at a thickness",
+      "target": "sfrm-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "how much fireproofing material",
+      "target": "sfrm-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "spray applied fireproofing quantity",
+      "target": "sfrm-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "sfrm volume and weight",
+      "target": "sfrm-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "how many sets of spray foam",
+      "target": "spray-foam-board-feet",
+      "kind": "question"
+    },
+    {
+      "term": "board feet of spray foam",
+      "target": "spray-foam-board-feet",
+      "kind": "question"
+    },
+    {
+      "term": "spray foam sets for an area",
+      "target": "spray-foam-board-feet",
+      "kind": "question"
+    },
+    {
+      "term": "spray foam quantity from thickness",
+      "target": "spray-foam-board-feet",
+      "kind": "question"
+    },
+    {
+      "term": "steel deck sheet takeoff",
+      "target": "metal-deck-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "how many deck sheets for a roof",
+      "target": "metal-deck-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "metal deck panel count",
+      "target": "metal-deck-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "roof deck sheets by cover",
+      "target": "metal-deck-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "steel floor deck takeoff",
+      "target": "metal-deck-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "how much rebar tie wire",
+      "target": "rebar-tie-wire",
+      "kind": "question"
+    },
+    {
+      "term": "tie wire count and weight",
+      "target": "rebar-tie-wire",
+      "kind": "question"
+    },
+    {
+      "term": "intersections to tie in a mat",
+      "target": "rebar-tie-wire",
+      "kind": "question"
+    },
+    {
+      "term": "tie wire for a rebar mat",
+      "target": "rebar-tie-wire",
+      "kind": "question"
+    },
+    {
+      "term": "rebar tie wire takeoff",
+      "target": "rebar-tie-wire",
+      "kind": "question"
+    },
+    {
+      "term": "epoxy volume for adhesive anchors",
+      "target": "anchor-epoxy-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how many epoxy cartridges for anchors",
+      "target": "anchor-epoxy-volume",
+      "kind": "question"
+    },
+    {
+      "term": "adhesive anchor epoxy per hole",
+      "target": "anchor-epoxy-volume",
+      "kind": "question"
+    },
+    {
+      "term": "epoxy cartridges for anchor bolts",
+      "target": "anchor-epoxy-volume",
+      "kind": "question"
+    },
+    {
+      "term": "anchor epoxy quantity",
+      "target": "anchor-epoxy-volume",
+      "kind": "question"
+    },
+    {
+      "term": "non shrink grout under a base plate",
+      "target": "baseplate-grout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "grout volume for a column base plate",
+      "target": "baseplate-grout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how many bags of grout under a baseplate",
+      "target": "baseplate-grout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "baseplate grout takeoff",
+      "target": "baseplate-grout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "grout under a steel column",
+      "target": "baseplate-grout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how many balusters for a guard",
+      "target": "baluster-picket-count",
+      "kind": "question"
+    },
+    {
+      "term": "picket count for a rail",
+      "target": "baluster-picket-count",
+      "kind": "question"
+    },
+    {
+      "term": "balusters to reject a 4 inch sphere",
+      "target": "baluster-picket-count",
+      "kind": "question"
+    },
+    {
+      "term": "guard picket spacing count",
+      "target": "baluster-picket-count",
+      "kind": "question"
+    },
+    {
+      "term": "how many pickets for a fence section",
+      "target": "baluster-picket-count",
+      "kind": "question"
+    },
+    {
+      "term": "galvanized duct sheet metal weight",
+      "target": "duct-metal-weight",
+      "kind": "question"
+    },
+    {
+      "term": "how much does ductwork weigh",
+      "target": "duct-metal-weight",
+      "kind": "question"
+    },
+    {
+      "term": "duct metal weight for a coil order",
+      "target": "duct-metal-weight",
+      "kind": "question"
+    },
+    {
+      "term": "sheet metal weight for duct",
+      "target": "duct-metal-weight",
+      "kind": "question"
+    },
+    {
+      "term": "duct weight from gauge",
+      "target": "duct-metal-weight",
+      "kind": "question"
+    },
+    {
+      "term": "concrete for an electrical duct bank",
+      "target": "duct-bank-concrete",
+      "kind": "question"
+    },
+    {
+      "term": "duct bank encasement volume",
+      "target": "duct-bank-concrete",
+      "kind": "question"
+    },
+    {
+      "term": "how much concrete around conduits",
+      "target": "duct-bank-concrete",
+      "kind": "question"
+    },
+    {
+      "term": "duct bank concrete takeoff",
+      "target": "duct-bank-concrete",
+      "kind": "question"
+    },
+    {
+      "term": "encasement concrete for a duct bank",
+      "target": "duct-bank-concrete",
+      "kind": "question"
+    },
+    {
+      "term": "duct wrap insulation area",
+      "target": "duct-wrap-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "how many rolls of duct wrap",
+      "target": "duct-wrap-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "external duct insulation takeoff",
+      "target": "duct-wrap-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "duct liner material quantity",
+      "target": "duct-wrap-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "duct wrap rolls for a run",
+      "target": "duct-wrap-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "load on a duct hanger",
+      "target": "duct-hanger-load",
+      "kind": "question"
+    },
+    {
+      "term": "how many duct hangers",
+      "target": "duct-hanger-load",
+      "kind": "question"
+    },
+    {
+      "term": "duct hanger load and count",
+      "target": "duct-hanger-load",
+      "kind": "question"
+    },
+    {
+      "term": "hanger spacing for ductwork",
+      "target": "duct-hanger-load",
+      "kind": "question"
+    },
+    {
+      "term": "weight per duct hanger",
+      "target": "duct-hanger-load",
+      "kind": "question"
+    },
+    {
+      "term": "wheel loader production rate",
+      "target": "loader-production",
+      "kind": "question"
+    },
+    {
+      "term": "loose yards per hour a loader digs",
+      "target": "loader-production",
+      "kind": "question"
+    },
+    {
+      "term": "how much can a loader move per hour",
+      "target": "loader-production",
+      "kind": "question"
+    },
+    {
+      "term": "loader cycle production",
+      "target": "loader-production",
+      "kind": "question"
+    },
+    {
+      "term": "yards per hour a dozer pushes",
+      "target": "dozer-production",
+      "kind": "question"
+    },
+    {
+      "term": "dozer blade production",
+      "target": "dozer-production",
+      "kind": "question"
+    },
+    {
+      "term": "how much can a dozer push",
+      "target": "dozer-production",
+      "kind": "question"
+    },
+    {
+      "term": "dozer slot production",
+      "target": "dozer-production",
+      "kind": "question"
+    },
+    {
+      "term": "roller compaction production rate",
+      "target": "compaction-roller-production",
+      "kind": "question"
+    },
+    {
+      "term": "how much can a roller compact per hour",
+      "target": "compaction-roller-production",
+      "kind": "question"
+    },
+    {
+      "term": "compacted yards per hour",
+      "target": "compaction-roller-production",
+      "kind": "question"
+    },
+    {
+      "term": "roller production from width and speed",
+      "target": "compaction-roller-production",
+      "kind": "question"
+    },
+    {
+      "term": "sy per hour a roller covers",
+      "target": "compaction-roller-production",
+      "kind": "question"
+    },
+    {
+      "term": "dozer ripper production rate",
+      "target": "ripper-production",
+      "kind": "question"
+    },
+    {
+      "term": "how much can a ripper loosen per hour",
+      "target": "ripper-production",
+      "kind": "question"
+    },
+    {
+      "term": "bank yards per hour ripping",
+      "target": "ripper-production",
+      "kind": "question"
+    },
+    {
+      "term": "ripper loosening production",
+      "target": "ripper-production",
+      "kind": "question"
+    },
+    {
+      "term": "dozer ripping production",
+      "target": "ripper-production",
+      "kind": "question"
+    },
+    {
+      "term": "longitudinal steel for a column load",
+      "target": "rc-column-steel-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "rebar for a target column axial load",
+      "target": "rc-column-steel-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "rc column steel for a load",
+      "target": "rc-column-steel-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "ast for a tied column",
+      "target": "rc-column-steel-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "column steel area for a load",
+      "target": "rc-column-steel-for-load",
+      "kind": "question"
+    },
+    {
+      "term": "critical failure depth for a target fs",
+      "target": "slope-failure-depth-for-fs",
+      "kind": "question"
+    },
+    {
+      "term": "infinite slope depth at a factor of safety",
+      "target": "slope-failure-depth-for-fs",
+      "kind": "question"
+    },
+    {
+      "term": "failure plane depth for fs",
+      "target": "slope-failure-depth-for-fs",
+      "kind": "question"
+    },
+    {
+      "term": "how deep before the slope fails",
+      "target": "slope-failure-depth-for-fs",
+      "kind": "question"
+    },
+    {
+      "term": "critical depth for a slope fs",
+      "target": "slope-failure-depth-for-fs",
+      "kind": "question"
+    },
+    {
+      "term": "live load reduction for a tributary area",
+      "target": "asce-live-load-reduction",
+      "kind": "question"
+    },
+    {
+      "term": "reduced live load from area",
+      "target": "asce-live-load-reduction",
+      "kind": "question"
+    },
+    {
+      "term": "how much live load reduction",
+      "target": "asce-live-load-reduction",
+      "kind": "question"
+    },
+    {
+      "term": "live load reduction factor",
+      "target": "asce-live-load-reduction",
+      "kind": "question"
+    },
+    {
+      "term": "section depth for a cracking moment",
+      "target": "concrete-depth-for-cracking-moment",
+      "kind": "question"
+    },
+    {
+      "term": "concrete depth for a target cracking moment",
+      "target": "concrete-depth-for-cracking-moment",
+      "kind": "question"
+    },
+    {
+      "term": "how deep a section for cracking moment",
+      "target": "concrete-depth-for-cracking-moment",
+      "kind": "question"
+    },
+    {
+      "term": "depth to reach a cracking moment",
+      "target": "concrete-depth-for-cracking-moment",
+      "kind": "question"
+    },
+    {
+      "term": "section height from mcr",
+      "target": "concrete-depth-for-cracking-moment",
+      "kind": "question"
+    },
+    {
+      "term": "how much water to reach optimum moisture",
+      "target": "water-for-compaction",
+      "kind": "question"
+    },
+    {
+      "term": "water to add before compaction",
+      "target": "water-for-compaction",
+      "kind": "question"
+    },
+    {
+      "term": "gallons of water for a lift",
+      "target": "water-for-compaction",
+      "kind": "question"
+    },
+    {
+      "term": "water for proctor optimum moisture",
+      "target": "water-for-compaction",
+      "kind": "question"
+    },
+    {
+      "term": "water to compact soil",
+      "target": "water-for-compaction",
+      "kind": "question"
+    },
+    {
+      "term": "shaft diameter for a torque",
+      "target": "shaft-diameter-for-torsion",
+      "kind": "question"
+    },
+    {
+      "term": "solid shaft size for torsion",
+      "target": "shaft-diameter-for-torsion",
+      "kind": "question"
+    },
+    {
+      "term": "minimum shaft diameter for an allowable shear",
+      "target": "shaft-diameter-for-torsion",
+      "kind": "question"
+    },
+    {
+      "term": "how big a shaft for torsion",
+      "target": "shaft-diameter-for-torsion",
+      "kind": "question"
+    },
+    {
+      "term": "shaft diameter from torque",
+      "target": "shaft-diameter-for-torsion",
+      "kind": "question"
+    },
+    {
+      "term": "max temperature change before a stress limit",
+      "target": "thermal-stress-max-deltat",
+      "kind": "question"
+    },
+    {
+      "term": "allowable delta t for a restrained member",
+      "target": "thermal-stress-max-deltat",
+      "kind": "question"
+    },
+    {
+      "term": "temperature change for a thermal stress limit",
+      "target": "thermal-stress-max-deltat",
+      "kind": "question"
+    },
+    {
+      "term": "how much temp change before overstress",
+      "target": "thermal-stress-max-deltat",
+      "kind": "question"
+    },
+    {
+      "term": "max delta t for thermal stress",
+      "target": "thermal-stress-max-deltat",
+      "kind": "question"
+    },
+    {
+      "term": "max allowable working pressure of a vessel",
+      "target": "hoop-stress-mawp",
+      "kind": "question"
+    },
+    {
+      "term": "mawp from wall and diameter",
+      "target": "hoop-stress-mawp",
+      "kind": "question"
+    },
+    {
+      "term": "thin wall vessel pressure rating",
+      "target": "hoop-stress-mawp",
+      "kind": "question"
+    },
+    {
+      "term": "how much pressure a cylinder wall holds",
+      "target": "hoop-stress-mawp",
+      "kind": "question"
+    },
+    {
+      "term": "mawp for a thin wall cylinder",
+      "target": "hoop-stress-mawp",
+      "kind": "question"
+    },
+    {
+      "term": "annular grout volume for a cased bore",
+      "target": "annular-grout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "grout in the ring around a carrier pipe",
+      "target": "annular-grout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "pipe in casing grout volume",
+      "target": "annular-grout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how much grout for a cased bore",
+      "target": "annular-grout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "annular space grout quantity",
+      "target": "annular-grout-volume",
+      "kind": "question"
+    },
+    {
+      "term": "scaffold mudsill bearing pressure",
+      "target": "scaffold-mudsill-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "does the scaffold leg clear soil bearing",
+      "target": "scaffold-mudsill-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "mudsill size for a scaffold leg",
+      "target": "scaffold-mudsill-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "soil pressure under a scaffold sill",
+      "target": "scaffold-mudsill-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "scaffold sill length for bearing",
+      "target": "scaffold-mudsill-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "load on a scaffold leg",
+      "target": "scaffold-leg-load",
+      "kind": "question"
+    },
+    {
+      "term": "scaffold per leg load osha 4 to 1",
+      "target": "scaffold-leg-load",
+      "kind": "question"
+    },
+    {
+      "term": "does a scaffold leg pass the 4 to 1 check",
+      "target": "scaffold-leg-load",
+      "kind": "question"
+    },
+    {
+      "term": "scaffold leg safe working load",
+      "target": "scaffold-leg-load",
+      "kind": "question"
+    },
+    {
+      "term": "how much load per scaffold leg",
+      "target": "scaffold-leg-load",
+      "kind": "question"
+    },
+    {
+      "term": "frame scaffold material takeoff",
+      "target": "scaffold-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "how many scaffold frames and braces",
+      "target": "scaffold-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "planks and frames for a scaffold run",
+      "target": "scaffold-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "scaffold parts from bay layout",
+      "target": "scaffold-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "frame scaffold quantity",
+      "target": "scaffold-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "moment of inertia for a deflection limit",
+      "target": "steel-inertia-for-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "required i for a beam deflection",
+      "target": "steel-inertia-for-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "inertia a beam needs to limit deflection",
+      "target": "steel-inertia-for-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "how much i to hold deflection",
+      "target": "steel-inertia-for-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "moment of inertia from a deflection limit",
+      "target": "steel-inertia-for-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "pile spacing for a target efficiency",
+      "target": "pile-group-spacing-for-efficiency",
+      "kind": "question"
+    },
+    {
+      "term": "center to center spacing for pile group efficiency",
+      "target": "pile-group-spacing-for-efficiency",
+      "kind": "question"
+    },
+    {
+      "term": "spacing to reach converse labarre efficiency",
+      "target": "pile-group-spacing-for-efficiency",
+      "kind": "question"
+    },
+    {
+      "term": "how far apart piles for efficiency",
+      "target": "pile-group-spacing-for-efficiency",
+      "kind": "question"
+    },
+    {
+      "term": "pile group spacing from efficiency",
+      "target": "pile-group-spacing-for-efficiency",
+      "kind": "question"
+    },
+    {
+      "term": "masonry compressive strength fm",
+      "target": "masonry-prism-fm",
+      "kind": "question"
+    },
+    {
+      "term": "f m from unit strength method",
+      "target": "masonry-prism-fm",
+      "kind": "question"
+    },
+    {
+      "term": "net area masonry strength",
+      "target": "masonry-prism-fm",
+      "kind": "question"
+    },
+    {
+      "term": "tms 602 fm table",
+      "target": "masonry-prism-fm",
+      "kind": "question"
+    },
+    {
+      "term": "masonry prism strength",
+      "target": "masonry-prism-fm",
+      "kind": "question"
     }
   ]
 }

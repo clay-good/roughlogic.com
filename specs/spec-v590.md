@@ -9,6 +9,9 @@
 > **Follow-on batch 2026-07-17:** question coverage had been complete at the 1,041-tile catalog; of the 177 tiles
 > landed since without question rows, the 46 in groups A/B/K got 230 reviewed phrasings (top-3 rank-checked through
 > the v589 ranker, batch folded in). Remaining: 131 tiles (97 group E + 34 scattered) ride this same spec.
+> **Question corpus COMPLETE 2026-07-17:** four batches (A/B/K, then the 34 scattered, then group E in two parts)
+> covered all 316 tiles landed since the original 1,041-tile close, so every one of the 1,357 tiles now carries
+> `kind: "question"` rows. 18,830 alias rows total.
 > Phase 2 as landed: five group-sized batches same day (A; E; C+B; G/K/D/L; final F/H/J/M/N/O/P/R/T/X/Y/Z) taking the
 > shard to 16,159 rows / 241.0 KB gz with question coverage on ALL 1,041 tiles. The Group A batch surfaced a ranker
 > hardening recorded in spec-v589 territory: digit-led query tokens are score-only (never coverage) and pure-number

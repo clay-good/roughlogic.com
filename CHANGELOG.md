@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(search): question-phrase aliases for group E construction-ops tiles, part 2 of 2 -- corpus now covers every tile (spec-v590 follow-on); 2026-07-17
+
+- Part 2 covers the remaining 48 group E tiles (scaffold/formwork/mass-concrete, the roofing/insulation/finish
+  takeoffs, the equipment-production and structural-inverse tiles) with 235 reviewed phrasings, all rank-checked
+  top-3. This closes the spec-v590 question corpus: **all 1,357 tiles now carry `kind: "question"` rows** (the
+  campaign had stopped at the 1,041-tile catalog; the four 2026-07-17 batches covered the 316 tiles landed since).
+  Live-browser spot check green.
+
 ### feat(search): question-phrase aliases for group E construction-ops tiles, part 1 of 2 (spec-v590 follow-on); 2026-07-17
 
 - Group E holds 97 of the last uncovered tiles (the v809-v908 construction-operations campaign). Part 1 covers the
