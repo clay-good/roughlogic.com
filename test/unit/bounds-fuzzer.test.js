@@ -28297,3 +28297,27 @@ test("bounds: spec-v984 computeFluorideFeedDose pins the AFI pounds formula and 
   assert.ok("error" in _v984({ target_dose_mg_l: 0.5, raw_fluoride_mg_l: 0.5, flow_mgd: 2, afi_fraction: 0.792, purity_fraction: 0.25 }));
   assert.ok("error" in _v984({ target_dose_mg_l: 0.7, raw_fluoride_mg_l: 0.1, flow_mgd: Infinity, afi_fraction: 0.792, purity_fraction: 0.25 }));
 });
+
+import { computeOpenDeltaTransformer as _v985 } from "../../calc-electrical.js";
+
+test("bounds: spec-v985 computeOpenDeltaTransformer pins the sqrt(3) capacity and overload seam", () => {
+  const r = _v985({ transformer_kva_each: 25, required_load_kva: 40 });
+  assert.ok(Math.abs(r.available_3ph_kva - 43.30127) < 1e-3); // sqrt(3)*25
+  assert.ok(Math.abs(r.per_transformer_kva - 23.09401) < 1e-3); // 40/sqrt(3)
+  assert.ok(Math.abs(r.utilization_pct - 92.376) < 1e-2);
+  assert.ok(/^OK/.test(r.verdict)); // 40 <= 43.3
+  // Available is 86.6% of two installed and 57.7% of three-unit closed delta.
+  assert.ok(Math.abs(r.available_3ph_kva / (2 * 25) - 0.86603) < 1e-4);
+  assert.ok(Math.abs(r.available_3ph_kva / (3 * 25) - 0.57735) < 1e-4);
+  // Overload cross-check: 75 kVA on two 25s exceeds the bank.
+  const over = _v985({ transformer_kva_each: 25, required_load_kva: 75 });
+  assert.ok(Math.abs(over.utilization_pct - 173.205) < 1e-2);
+  assert.ok(/OVERLOADED/.test(over.verdict));
+  // Capacity scales linearly with unit size; zero load = OK at 0% utilization.
+  assert.ok(Math.abs(_v985({ transformer_kva_each: 50, required_load_kva: 40 }).available_3ph_kva - 86.60254) < 1e-3);
+  assert.ok(/^OK/.test(_v985({ transformer_kva_each: 25, required_load_kva: 0 }).verdict));
+  // Error seams: non-positive rating, negative load, non-finite.
+  assert.ok("error" in _v985({ transformer_kva_each: 0, required_load_kva: 40 }));
+  assert.ok("error" in _v985({ transformer_kva_each: 25, required_load_kva: -1 }));
+  assert.ok("error" in _v985({ transformer_kva_each: Infinity, required_load_kva: 40 }));
+});

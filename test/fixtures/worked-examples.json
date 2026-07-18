@@ -28302,6 +28302,66 @@
    }
   },
   {
+   "tile_id": "open-delta-transformer",
+   "source_publisher": "Open-delta (V-V) transformer bank capacity",
+   "source_title": "two 25 kVA units, 40 kVA 3-phase load -> 43.3 kVA available, each at 92.4%, OK",
+   "source_edition_or_year": "spec-v985 worked example (machine-verified)",
+   "source_section_or_page": "available = sqrt(3) x 25 = 43.30; per unit = 40/sqrt(3) = 23.09 kVA = 92.4% of 25",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "transformer_kva_each": 25,
+    "required_load_kva": 40
+   },
+   "outputs": {
+    "available_3ph_kva": {
+     "value": 43.301,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "per_transformer_kva": {
+     "value": 23.094,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "utilization_pct": {
+     "value": 92.376,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "open-delta-transformer",
+   "source_publisher": "Open-delta (V-V) transformer bank capacity",
+   "source_title": "cross-check: two 25 kVA units, 75 kVA load -> each at 173%, OVERLOADED",
+   "source_edition_or_year": "spec-v985 worked example (machine-verified)",
+   "source_section_or_page": "per unit = 75/sqrt(3) = 43.30 kVA = 173.2% of 25; 75 > 43.3 available -> overloaded",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "transformer_kva_each": 25,
+    "required_load_kva": 75
+   },
+   "outputs": {
+    "available_3ph_kva": {
+     "value": 43.301,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "utilization_pct": {
+     "value": 173.205,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "max-circuit-length-for-vd",
    "source_publisher": "Max circuit length for a voltage-drop target (I x R, solved for length)",
    "source_title": "#12 Cu (6,530 cmil), 20 A, 120 V, 3%, single-phase -> 3.6 V allowable, 45.56 ft max",

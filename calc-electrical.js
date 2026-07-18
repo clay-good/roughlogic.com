@@ -5973,3 +5973,55 @@ function _v981renderMaxCircuitLengthForVd(inputRegion, outputRegion, citationEl)
   for (const f of [sv, tp, cu, cm, kk, ph]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["max-circuit-length-for-vd"] = _v981renderMaxCircuitLengthForVd;
+
+// ===================== spec-v985: open-delta (V-V) transformer bank capacity =====================
+// dims: in { args: dimensionless } out: { available_3ph_kva: dimensionless, per_transformer_kva: dimensionless, utilization_pct: dimensionless }
+export function computeOpenDeltaTransformer({ transformer_kva_each = 25, required_load_kva = 40 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(transformer_kva_each > 0)) return { error: "Transformer rating must be positive (kVA)." };
+  if (!(required_load_kva >= 0)) return { error: "Required load must be non-negative (kVA)." };
+  const s3 = Math.sqrt(3);
+  // Two identical single-phase units in open delta serve sqrt(3) x one unit of balanced 3-phase load;
+  // each unit then carries load / sqrt(3), so the bank utilization is capped at 86.6% of the two installed.
+  const available_3ph_kva = s3 * transformer_kva_each;
+  const per_transformer_kva = required_load_kva / s3;
+  const utilization_pct = per_transformer_kva / transformer_kva_each * 100;
+  if (![available_3ph_kva, per_transformer_kva, utilization_pct].every(Number.isFinite)) return { error: "Open-delta math is not a finite value." };
+  const ok = required_load_kva <= available_3ph_kva;
+  const verdict = ok
+    ? "OK: the two-transformer open-delta bank carries this balanced three-phase load."
+    : "OVERLOADED: this load exceeds the open-delta bank capacity -- use larger units or close the delta with a third transformer.";
+  return {
+    available_3ph_kva,
+    per_transformer_kva,
+    utilization_pct,
+    verdict,
+    note: "The balanced three-phase capacity of an open-delta (V-V) bank -- two single-phase transformers wired to serve three-phase, common where a third unit failed or a light three-phase load does not justify a full bank. Two identical units do NOT deliver twice one unit: the available three-phase capacity is sqrt(3) x one unit's rating (1.732, not 2), because each transformer carries the load divided by sqrt(3) and the phase angle between the two units caps their combined useful output at 86.6% of the two installed. Two 25 kVA units in open delta serve 1.732 x 25 = 43.3 kVA of three-phase load, each carrying 43.3 / sqrt(3) = 21.65 kVA (86.6% of its 25 kVA rating). Put another way, an open-delta bank delivers only 57.7% of the closed-delta bank of three identical units (43.3 vs 75 kVA), so removing one transformer from a three-unit delta drops it to 57.7%, not 66.7%. For a specific load the tile reports each unit's loading and flags an overload. A sizing screen; the transformer nameplate kVA and impedance, the actual load balance and power factor, and the utility govern the real bank.",
+  };
+}
+
+export const openDeltaTransformerExample = { inputs: { transformer_kva_each: 25, required_load_kva: 40 } };
+
+function _v985renderOpenDeltaTransformer(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: open-delta (V-V) transformer bank capacity, by name. available 3-phase kVA = sqrt(3) x one unit; each unit carries load / sqrt(3); bank utilization capped at 86.6% of the two installed, and 57.7% of the closed-delta three-unit bank. The nameplate kVA and impedance, the load balance and power factor, and the utility govern.";
+  const ke = makeNumber("Transformer rating, each (kVA)", "odt-ke", { step: "any", min: "0", value: "25" });
+  ke.input.value = "25";
+  const rl = makeNumber("Required three-phase load (kVA)", "odt-rl", { step: "any", min: "0", value: "40" });
+  rl.input.value = "40";
+  for (const f of [ke, rl]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ke.input.value = "25"; rl.input.value = "40"; update(); });
+  const oA = makeOutputLine(outputRegion, "Bank capacity (3-phase)", "odt-out-a");
+  const oU = makeOutputLine(outputRegion, "Each unit loaded to", "odt-out-u");
+  const oV = makeOutputLine(outputRegion, "Verdict", "odt-out-v");
+  const update = debounce(() => {
+    const r = computeOpenDeltaTransformer({
+      transformer_kva_each: ke.input.value === "" ? 25 : Number(ke.input.value), required_load_kva: rl.input.value === "" ? 40 : Number(rl.input.value),
+    });
+    if (r.error) { oA.textContent = r.error; oU.textContent = "-"; oV.textContent = "-"; return; }
+    oA.textContent = fmt(r.available_3ph_kva, 1) + " kVA available";
+    oU.textContent = fmt(r.per_transformer_kva, 2) + " kVA (" + fmt(r.utilization_pct, 1) + "% of rating)";
+    oV.textContent = r.verdict;
+  }, DEBOUNCE_MS);
+  for (const f of [ke, rl]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["open-delta-transformer"] = _v985renderOpenDeltaTransformer;

@@ -11863,6 +11863,17 @@ export const CITATIONS = {
       { name: "Limits", value: "DC-resistance only (reactance adds on large conductors, see voltage-drop-reactance); 3%/5% are NEC recommendations; the conductor must still pass the 310.16 ampacity check", source: "NEC 210.19 / 215.2 / 310.16" },
     ],
   },
+  "open-delta-transformer": {
+    formula: "available_3ph_kva = sqrt(3) x transformer_kva_each; per_transformer_kva = required_load_kva / sqrt(3); utilization_pct = 100 x per_transformer_kva / transformer_kva_each. Open delta = 86.6% of the two installed, 57.7% of the closed-delta three-unit bank.",
+    edition: "Open-delta (V-V) transformer connection capacity (standard power-system relation), by name; the transformer nameplate kVA and impedance, the load balance and power factor, and the utility govern the real bank.",
+    freeAccess: "The open-delta sqrt(3) capacity relation is public power-system theory; the transformer rating and the required load are the design values.",
+    governance: GOVERNANCE.general,
+    editionNote: "An open-delta, or V-V, connection makes three-phase power from just two single-phase transformers instead of the usual three. It is used where the third transformer of a delta bank has failed and service must continue, or where a light three-phase load does not justify a full bank. The key fact, often gotten wrong, is that two transformers do not deliver twice the capacity of one: the available balanced three-phase capacity is the square root of three (about 1.732) times a single unit's rating, not two times. This is because the two transformers carry their load with a phase relationship that leaves each one able to contribute only 86.6% of its rating to the combined output, so the bank's usable capacity is 86.6% of the two installed kVA. Two 25 kVA units in open delta therefore serve 1.732 x 25 = 43.3 kVA of three-phase load, with each unit carrying 43.3 divided by the square root of three, or 21.65 kVA -- exactly 86.6% of its 25 kVA nameplate. Compared to a full closed-delta bank of three identical 25 kVA units (75 kVA), the open-delta bank delivers only 43.3 / 75 = 57.7%, which is why dropping one transformer from a three-unit delta cuts capacity to 57.7%, not to two-thirds. For a specified load the calculation also reports how hard each unit is worked and warns when the load exceeds the bank. This is a sizing screen; the transformer nameplate kVA and impedance, the actual load balance and power factor, and the serving utility govern the real installation.",
+    assumptions: [
+      { name: "Open-delta capacity", value: "available 3-phase kVA = sqrt(3) x one unit; each unit carries load / sqrt(3); bank = 86.6% of two installed", source: "power-system V-V connection theory" },
+      { name: "Vs closed delta", value: "open delta = 57.7% of the closed-delta three-unit bank; removing one of three drops capacity to 57.7%, not 66.7%", source: "power-system V-V connection theory" },
+    ],
+  },
   "min-conductor-for-vd": {
     formula: "allowed_drop_V = target% / 100 x source_V; for each standard size smallest-up, drop = (2 for single phase, sqrt(3) for three phase) x K x I x length / cmils with K copper 12.9, aluminum 21.2 ohm-cmil/ft at 75 C; the result is the first size whose drop is at or below the allowed value.",
     edition: "First-principles I x R voltage drop (public); NEC FPN advisory 3% branch / 5% total (informational, not a requirement).",

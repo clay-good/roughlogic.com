@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): add open-delta-transformer tile (spec-v985); 2026-07-18
+
+- New Group A tile `open-delta-transformer` in calc-electrical.js. Balanced three-phase capacity of an open-delta
+  (V-V) bank: available 3-phase kVA = sqrt(3) x one unit's rating (1.732, not 2), each unit carries load / sqrt(3), so
+  the bank is capped at 86.6% of the two installed and 57.7% of the closed-delta three-unit bank. Two 25 kVA units
+  serve 43.3 kVA; a 40 kVA load runs each at 92.4% (OK), a 75 kVA load overloads them (173%). Reports each unit's
+  loading and flags overload. Home count 1,433 -> 1,434.
+
 ### feat(water): add fluoride-feed-dose tile (spec-v984); 2026-07-18
 
 - New Group M tile `fluoride-feed-dose` in calc-water.js. Water-fluoridation feed rate: the pounds formula with the

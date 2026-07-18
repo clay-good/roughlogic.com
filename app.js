@@ -42,6 +42,7 @@ const TOOL_MODULES = (() => {
     // spec-v109 service grounding, bonding, and inverse voltage-drop sizing.
     "grounding-electrode-conductor", "bonding-jumper", "min-conductor-for-vd",
     "max-circuit-length-for-vd",
+    "open-delta-transformer",
     // spec-v121..v128 fault / raceway / grounding / three-phase
     "conductor-short-circuit-withstand", "conduit-thermal-expansion", "conduit-expansion-max-run",
     "egc-upsize-proportional", "delta-wye-line-phase",
