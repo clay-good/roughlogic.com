@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(survey): guard shoelace area-by-coordinates against closed forms; 2026-07-17
+
+- Geometry guards: a 100-ft square reads 10000 ft^2 / 400-ft perimeter, acres = ft^2/43560, m^2 = ft^2 x 0.09290304,
+  doubling the side quadruples the area, reversing the winding preserves the area magnitude, and a 60x80 right triangle
+  reads 2400 ft^2. Test-only.
+
 ### test(kitchen): guard edible-portion yield and food-cost percentage with monotonicity; 2026-07-17
 
 - Whole-response guards: EP weight = (AP - trim) x (1 - cooking loss) falls with trim and cooking loss while EP cost/lb

@@ -12174,3 +12174,20 @@ test("monotonicity: edible-portion yield and food-cost percentage track their in
   assert.ok(Math.abs(fcp({}).cogs - (5000 + 8000 - 4000)) < 1e-9, "COGS = beginning + purchases - ending");
   assert.ok(Math.abs(fcp({}).food_cost_pct - 9000 / 30000 * 100) < 1e-9, "food cost % = COGS / food sales");
 });
+
+test("geometry: shoelace area-by-coordinates matches closed forms and scales correctly (survey)", async () => {
+  const s = await import("../../calc-survey.js");
+  const sq = (k) => s.computeAreaByCoordinates({ points: [{ n: 0, e: 0 }, { n: 0, e: k }, { n: k, e: k }, { n: k, e: 0 }] });
+  const a = sq(100);
+  assert.ok(Math.abs(a.area_ft2 - 10000) < 1e-6, "a 100x100 square must be 10000 ft^2");
+  assert.ok(Math.abs(a.area_acres - 10000 / 43560) < 1e-9, "acres = ft^2 / 43560");
+  assert.ok(Math.abs(a.area_m2 - 10000 * 0.09290304) < 1e-4, "m^2 = ft^2 * 0.09290304");
+  assert.ok(Math.abs(a.perimeter_ft - 400) < 1e-6, "perimeter of the 100-ft square must be 400 ft");
+  assert.ok(Math.abs(sq(200).area_ft2 / a.area_ft2 - 4) < 1e-6, "doubling the side must quadruple the area");
+  // Winding independence: reversing the vertex order gives the same (unsigned) area.
+  const rev = s.computeAreaByCoordinates({ points: [{ n: 100, e: 0 }, { n: 100, e: 100 }, { n: 0, e: 100 }, { n: 0, e: 0 }] });
+  assert.ok(Math.abs(rev.area_ft2 - 10000) < 1e-6, "reversing the winding must not change the area magnitude");
+  // Right triangle: area = 1/2 * base * height.
+  const tri = s.computeAreaByCoordinates({ points: [{ n: 0, e: 0 }, { n: 0, e: 60 }, { n: 80, e: 0 }] });
+  assert.ok(Math.abs(tri.area_ft2 - 0.5 * 60 * 80) < 1e-6, "a 60x80 right triangle must be 2400 ft^2");
+});
