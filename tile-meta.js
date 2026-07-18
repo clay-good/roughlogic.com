@@ -802,7 +802,7 @@ const _TILES = [
   // spec-v269..v271 TMS 402-16 reinforced-masonry member trio (calc-masonry.js)
   ["cmu-wall-flexure", "E"], ["cmu-shear-wall", "E"], ["cmu-wall-axial", "E"],
   ["masonry-prism-fm", "E"],
-  ["masonry-wall-weight", "E"], ["brick-veneer-anchor-spacing", "E"], ["masonry-lintel-loading", "E"],
+  ["masonry-wall-weight", "E"], ["brick-veneer-anchor-spacing", "E"], ["brick-veneer-weep-count", "E"], ["masonry-lintel-loading", "E"],
   // spec-v272..v274 SDPWS wood lateral-force-resisting-system trio (calc-lateral.js)
   ["diaphragm-shear", "E"], ["shearwall-overturning", "E"], ["shearwall-deflection", "E"],
   ["diaphragm-collector-force", "E"],

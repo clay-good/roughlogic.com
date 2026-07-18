@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(masonry): add brick-veneer-weep-count tile (spec-v919); 2026-07-18
+
+- New Group E tile `brick-veneer-weep-count` (Brick Veneer Weep-Hole Count, IRC R703.8.6) in calc-masonry.js, beside
+  brick-veneer-anchor-spacing. Weeps per flashing line = ceil(wall length in / max spacing) + 1 (a weep at each end);
+  IRC R703.8.6 / TMS 402 cap the spacing at 33 in o.c. (24 in a common tighter spec), >= 3/16 in dia, above the flashing.
+  A 30 ft wall at 33 in = 12 weeps per line; a 50 ft wall at 24 in over 2 flashing lines = 52 total. Distinct from the
+  veneer ANCHOR count. The AHJ-adopted code and wall detail govern. Home count 1,367 -> 1,368. Raised the calc-masonry.js
+  gzip cap 11000 -> 12500 (the new tile crossed it; lazy-loaded, not in the home payload).
+
 ### feat(concrete): add curing-compound-coverage tile (spec-v918); 2026-07-18
 
 - New Group E tile `curing-compound-coverage` (Concrete Curing Compound Coverage) in calc-concrete.js. Gallons of

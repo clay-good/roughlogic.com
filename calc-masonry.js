@@ -503,3 +503,39 @@ MASONRY_RENDERERS["masonry-prism-fm"] = _simpleRenderer({
   ],
   compute: computeMasonryPrismFm,
 });
+
+// ===================== spec-v919: brick veneer weep-hole count =====================
+// dims: in { wall_length_ft: L, max_spacing_in: L, flashing_lines: dimensionless } out: { weeps_per_line: dimensionless, total_weeps: dimensionless }
+export function computeBrickVeneerWeepCount({ wall_length_ft = 30, max_spacing_in = 33, flashing_lines = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(wall_length_ft > 0)) return { error: "Wall length must be positive (ft)." };
+  if (!(max_spacing_in > 0)) return { error: "Maximum spacing must be positive (in)." };
+  if (!(flashing_lines > 0)) return { error: "Flashing lines must be positive." };
+  const length_in = wall_length_ft * 12;
+  // Weeps at the ends plus one every max_spacing: count = ceil(length / spacing) + 1.
+  const weeps_per_line = Math.ceil(length_in / max_spacing_in) + 1;
+  const total_weeps = weeps_per_line * Math.round(flashing_lines);
+  if (![weeps_per_line, total_weeps].every(Number.isFinite)) return { error: "Weep-count math is not a finite value." };
+  return {
+    weeps_per_line,
+    total_weeps,
+    note: "Weep holes drain the veneer air space at every through-wall flashing line. IRC R703.8.6 and TMS 402 cap them at 33 in on center (a common tighter spec is 24 in), at least 3/16 in diameter, immediately above the flashing. The count is ceil(length / spacing) + 1 so both ends get a weep, per flashing line -- the base course plus every shelf angle, lintel, and other through-wall flashing above openings each need their own line. A 30 ft wall at 33 in is 12 weeps per line. The weeps must sit directly on the flashing with a clear, un-mortar-clogged air space behind; the AHJ-adopted code and the wall detail govern.",
+  };
+}
+export const brickVeneerWeepCountExample = { inputs: { wall_length_ft: 30, max_spacing_in: 33, flashing_lines: 1 } };
+
+MASONRY_RENDERERS["brick-veneer-weep-count"] = _simpleRenderer({
+  citation: "Citation: brick veneer weep spacing by name (IRC R703.8.6 / TMS 402). weeps per line = ceil(wall length in / max spacing) + 1; weeps <= 33 in o.c., >= 3/16 in dia, directly above each through-wall flashing line. The AHJ-adopted code and the wall detail govern.",
+  example: brickVeneerWeepCountExample.inputs,
+  fields: [
+    { key: "wall_length_ft", label: "Wall / flashing length (ft)", kind: "number", default: 30 },
+    { key: "max_spacing_in", label: "Max weep spacing (in, code cap 33)", kind: "number", default: 33 },
+    { key: "flashing_lines", label: "Flashing lines (base + lintels)", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "wpl", id: "bvw-out-wpl", label: "Weeps per flashing line", value: (r) => fmt(r.weeps_per_line, 0) },
+    { key: "tot", id: "bvw-out-tot", label: "Total weep holes", value: (r) => fmt(r.total_weeps, 0) },
+    { key: "n", id: "bvw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBrickVeneerWeepCount,
+});

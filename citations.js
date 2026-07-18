@@ -14812,6 +14812,17 @@ export const CITATIONS = {
       { name: "Not anchor design", value: "verify the adopted edition and demand; does not design the anchor", source: "scope of this tile" },
     ],
   },
+  "brick-veneer-weep-count": {
+    formula: "weeps_per_line = ceil(wall_length_ft x 12 / max_spacing_in) + 1; total_weeps = weeps_per_line x round(flashing_lines).",
+    edition: "IRC R703.8.6 and TMS 402 masonry-veneer weep-hole provisions, by name; the spacing cap and detail come from the adopted code.",
+    freeAccess: "The count arithmetic is public first-principles; the 33 in spacing cap, 3/16 in minimum diameter, and above-flashing placement are in IRC R703.8.6 (many jurisdictions post the adopted IRC).",
+    governance: GOVERNANCE.general,
+    editionNote: "Weep holes drain the veneer air space at every through-wall flashing line. IRC R703.8.6 and TMS 402 cap them at 33 in on center (a common tighter specification is 24 in), at least 3/16 in in diameter, located immediately above the flashing. The count = ceil(length / spacing) + 1 puts a weep at each end plus one per spacing interval, PER flashing line -- the base course plus every shelf angle, lintel, and other through-wall flashing above openings each need their own line of weeps. The weeps must sit directly on the flashing over a clear air space that is kept free of mortar droppings (mortar-clogged weeps do not drain). This counts weeps; the AHJ-adopted code and the wall flashing detail govern the placement and type.",
+    assumptions: [
+      { name: "Spacing cap", value: "IRC R703.8.6 / TMS 402: <= 33 in o.c. (24 in a common tighter spec), >= 3/16 in diameter, above the flashing", source: "IRC R703.8.6" },
+      { name: "Per flashing line", value: "count is per through-wall flashing line; base course plus each shelf-angle/lintel line needs its own weeps", source: "masonry veneer detailing" },
+    ],
+  },
   "masonry-lintel-loading": {
     formula: "tri_h = span/2; if wall_above >= tri_h: W = 0.5 x span x tri_h x wall_psf (arching); else W = span x wall_above x wall_psf (full rectangle); UDL = W/span.",
     edition: "The masonry arching-action lintel-load method (TMS 402 commentary / masonry design references), by name.",

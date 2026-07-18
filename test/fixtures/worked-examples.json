@@ -34550,6 +34550,62 @@
    }
   },
   {
+   "tile_id": "brick-veneer-weep-count",
+   "source_publisher": "brick veneer weep spacing (IRC R703.8.6)",
+   "source_title": "30 ft wall, 33 in max spacing, 1 flashing line -> 12 weeps",
+   "source_edition_or_year": "spec-v919 worked example (machine-verified)",
+   "source_section_or_page": "weeps = ceil(30*12/33) + 1 = ceil(10.9) + 1 = 11 + 1 = 12",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "wall_length_ft": 30,
+    "max_spacing_in": 33,
+    "flashing_lines": 1
+   },
+   "outputs": {
+    "weeps_per_line": {
+     "value": 12,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_weeps": {
+     "value": 12,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "brick-veneer-weep-count",
+   "source_publisher": "brick veneer weep spacing (IRC R703.8.6)",
+   "source_title": "cross-check: 50 ft wall at a tighter 24 in spacing, 2 flashing lines -> 26 per line, 52 total",
+   "source_edition_or_year": "spec-v919 worked example (machine-verified)",
+   "source_section_or_page": "per line = ceil(50*12/24) + 1 = ceil(25) + 1 = 26; total = 26*2 = 52",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "wall_length_ft": 50,
+    "max_spacing_in": 24,
+    "flashing_lines": 2
+   },
+   "outputs": {
+    "weeps_per_line": {
+     "value": 26,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_weeps": {
+     "value": 52,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "curing-compound-coverage",
    "source_publisher": "liquid membrane cure coverage (ASTM C309)",
    "source_title": "2,500 sf slab, 1 coat, 200 sf/gal -> 13 gal, 3 pails",

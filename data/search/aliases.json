@@ -23827,6 +23827,31 @@
       "kind": "industry"
     },
     {
+      "term": "weep hole count",
+      "target": "brick-veneer-weep-count",
+      "kind": "industry"
+    },
+    {
+      "term": "brick weep holes",
+      "target": "brick-veneer-weep-count",
+      "kind": "industry"
+    },
+    {
+      "term": "veneer weep count",
+      "target": "brick-veneer-weep-count",
+      "kind": "industry"
+    },
+    {
+      "term": "weep spacing",
+      "target": "brick-veneer-weep-count",
+      "kind": "adjacent"
+    },
+    {
+      "term": "weephole count",
+      "target": "brick-veneer-weep-count",
+      "kind": "adjacent"
+    },
+    {
       "term": "tms 402 veneer",
       "target": "brick-veneer-anchor-spacing",
       "kind": "industry"

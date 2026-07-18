@@ -26782,6 +26782,23 @@ test("bounds: spec-v910 computeKnurlBlankDiameter pins the teeth, blank diameter
   assert.ok("error" in _v910({ target_diameter_in: Infinity, knurl_tpi: 21 }));
 });
 
+import { computeBrickVeneerWeepCount as _v919 } from "../../calc-masonry.js";
+
+test("bounds: spec-v919 computeBrickVeneerWeepCount pins the weep count, flashing lines, and error seams", () => {
+  const r = _v919({ wall_length_ft: 30, max_spacing_in: 33, flashing_lines: 1 });
+  assert.equal(r.weeps_per_line, 12); // ceil(360/33) + 1 = 11 + 1
+  assert.equal(r.total_weeps, 12); // one line
+  // Tighter spacing + multiple flashing lines.
+  const t = _v919({ wall_length_ft: 50, max_spacing_in: 24, flashing_lines: 2 });
+  assert.equal(t.weeps_per_line, 26); // ceil(600/24) + 1 = 25 + 1
+  assert.equal(t.total_weeps, 52); // 26 x 2
+  // Error seams: non-positive length / spacing / lines, non-finite.
+  assert.ok("error" in _v919({ wall_length_ft: 0, max_spacing_in: 33, flashing_lines: 1 }));
+  assert.ok("error" in _v919({ wall_length_ft: 30, max_spacing_in: 0, flashing_lines: 1 }));
+  assert.ok("error" in _v919({ wall_length_ft: 30, max_spacing_in: 33, flashing_lines: 0 }));
+  assert.ok("error" in _v919({ wall_length_ft: Infinity, max_spacing_in: 33, flashing_lines: 1 }));
+});
+
 import { computeCuringCompoundCoverage as _v918 } from "../../calc-concrete.js";
 
 test("bounds: spec-v918 computeCuringCompoundCoverage pins the gallons, pails, waste, and error seams", () => {
