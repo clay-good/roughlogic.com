@@ -2444,6 +2444,7 @@ cross-check.
 | calc-mechanic.js | `computeGlidepathDescentRate` | `{ ground_speed_kt = 0, glidepath_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHelicalSpringRate` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, material...` | _ | _ | _ |
 | calc-mechanic.js | `computeHpFromTorque` | `{ solve_for = "hp", torque_lbft = 0, rpm = 0, hp = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeHullDisplacement` | `{ lwl_ft = 30, bwl_ft = 10, draft_ft = 4, block_coefficient = 0.5, water_dens...` | _ | _ | _ |
 | calc-mechanic.js | `computeHullSpeed` | `{ lwl_ft = 0, actual_speed_kn = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHydraulicDriveFlowLimit` | `{ drive_hp = 0, psi = 0, efficiency = 0.85 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHydraulicMotorTorqueSpeed` | `{ psi = 0, disp_in3 = 0, gpm = 0, mech_eff = 0.90, vol_eff = 0.95 } = {}` | _ | _ | _ |
@@ -3076,7 +3077,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1662.
+Row count: 1663.
 
 <!-- END function-corpus-v14 -->
 
@@ -4205,7 +4206,7 @@ per spec-v14 §13.1 second paragraph.
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group K Mechanic (89 tiles)
+### Group K Mechanic (90 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4253,6 +4254,7 @@ per spec-v14 §13.1 second paragraph.
 | `grinding-wheel-rpm` | Grinding Wheel Surface Speed and Max Safe RPM | grinding wheel surface-speed identity...; max_rpm = 6500*12/(pi*7) = 3547; actual_sfpm = pi*7*3450/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `helical-spring-rate` | Helical Compression Spring Rate | Machinery's Handbook / Shigley; k = 11.5e6 x 0.080^4 / (8 x 0.75^3 x 8) = 471.04 / 27.0 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hp-from-torque` | Horsepower from Torque and RPM | Classical mechanical power (Watt) + S...; 400 lb-ft at 5000 RPM -> 380.8 HP | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `hull-displacement` | Hull Displacement and Block Coefficient | Hull displacement (Archimedes + block...; vol = 30*10*4*0.5 = 600; wt = 600*64 = 38400; long tons =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hull-speed` | Displacement Hull Speed and Speed/Length Ratio | displacement hull-speed relation (Fro...; spec-v502 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-drive-flow-limit` | Hydraulic Flow Limit from Drive Power | fluid-power engineering (inverse); 13.73 drive HP, 2000 psi, 0.85 efficiency -> 10 GPM (roun... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-motor-torque-speed` | Hydraulic Motor Torque and Speed | fluid-power engineering; spec-v397 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4677,6 +4679,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1415. Fixture-covered or reference-cadence: 1415 / 1415.
+Tile count: 1416. Fixture-covered or reference-cadence: 1416 / 1416.
 
 <!-- END tile-index-v14 -->

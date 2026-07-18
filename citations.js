@@ -11495,6 +11495,17 @@ export const CITATIONS = {
       { name: "Swing radius", value: "assumes the boat pivots on a set anchor; governs spacing to neighbors", source: "geometry" },
     ],
   },
+  "hull-displacement": {
+    formula: "displacement_ft3 = LWL x BWL x draft x Cb; displacement_lb = displacement_ft3 x water_density_pcf (64.0 seawater, 62.4 fresh); displacement_long_tons = displacement_lb / 2240.",
+    edition: "Hull displacement by Archimedes' principle and the block coefficient (naval-architecture hydrostatics), by name; the lines drawing (Simpson's rule) and the naval architect's hydrostatics govern the exact value.",
+    freeAccess: "The displacement relation is public physics (Archimedes); the waterline dimensions, block coefficient, and water density are the hull's geometry and the water it floats in.",
+    governance: GOVERNANCE.general,
+    editionNote: "By Archimedes' principle a floating boat displaces its own weight in water, so its displacement (weight) is the weight of the water its underwater hull pushes aside. The immersed hull fits inside a box of the waterline length times the waterline beam times the draft, but the real hull shape only partly fills that box; the fraction it fills is the block coefficient Cb, which runs roughly 0.35 to 0.45 for a fine-lined planing or semi-displacement hull and 0.40 to 0.60 for a fuller displacement or work hull. The displaced volume is therefore LWL x BWL x draft x Cb, the weight is that volume times the water density (64.0 lb/ft^3 for seawater, 62.4 for fresh), and dividing by 2,240 gives long tons (the traditional unit of ship displacement). A 30-foot-waterline, 10-foot-beam, 4-foot-draft hull at Cb 0.5 in seawater displaces 600 ft^3, which is 38,400 lb or 17.1 long tons; the same hull in fresh water, being less buoyant per cubic foot, must float slightly deeper to displace the same weight. This is a first-order estimate from block dimensions -- useful for sizing ground tackle, a trailer, a haul-out sling, or a lift -- but the accurate displacement comes from integrating the actual hull sections from the lines drawing (Simpson's rule) or reading the builder's displacement and tons-per-inch-immersion curves, and the loaded trim, appendages, and true hull form all shift it. A screening estimate; the naval architect's hydrostatics govern.",
+    assumptions: [
+      { name: "Archimedes + block coefficient", value: "displacement volume = LWL x BWL x draft x Cb; weight = volume x density (64 sea / 62.4 fresh); long tons = weight/2240", source: "naval-architecture hydrostatics" },
+      { name: "First-order block estimate", value: "Cb ~0.35-0.60 by hull form; the real value comes from the lines drawing (Simpson's rule) / builder's tables; trim and appendages shift it", source: "naval architect" },
+    ],
+  },
   "hull-speed": {
     formula: "hull_speed_kn = 1.34 x sqrt(LWL_ft); SL_ratio = actual_speed / sqrt(LWL_ft); regime = SL <= 1.34 displacement / 1.34-2.5 semi-displacement / > 2.5 planing.",
     edition: "Displacement hull-speed relation (Froude speed-length theory), the 1.34 x sqrt(LWL) ceiling, by name; the actual hull form, displacement, and power govern.",

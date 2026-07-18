@@ -27906,3 +27906,25 @@ test("bounds: spec-v966 computeStepFlashingCount pins the one-per-course count a
   assert.ok("error" in _v966({ wall_run_ft: 20, shingle_exposure_in: 5, waste_pct: -1 }));
   assert.ok("error" in _v966({ wall_run_ft: Infinity, shingle_exposure_in: 5, waste_pct: 5 }));
 });
+
+import { computeHullDisplacement as _v967 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v967 computeHullDisplacement pins Archimedes displacement and error seams", () => {
+  const r = _v967({ lwl_ft: 30, bwl_ft: 10, draft_ft: 4, block_coefficient: 0.5, water_density_pcf: 64 });
+  assert.ok(Math.abs(r.displacement_ft3 - 600) < 1e-9); // 30*10*4*0.5
+  assert.ok(Math.abs(r.displacement_lb - 38400) < 1e-6); // *64
+  assert.ok(Math.abs(r.displacement_long_tons - 17.142857) < 1e-4); // /2240
+  // Fresh water (less dense) gives less weight for the same volume.
+  const fresh = _v967({ lwl_ft: 30, bwl_ft: 10, draft_ft: 4, block_coefficient: 0.5, water_density_pcf: 62.4 });
+  assert.ok(Math.abs(fresh.displacement_lb - 37440) < 1e-6);
+  assert.ok(fresh.displacement_lb < r.displacement_lb);
+  // A fuller hull (higher Cb) displaces more; linear in each dimension.
+  assert.ok(_v967({ lwl_ft: 30, bwl_ft: 10, draft_ft: 4, block_coefficient: 0.6, water_density_pcf: 64 }).displacement_ft3 > r.displacement_ft3);
+  assert.ok(Math.abs(_v967({ lwl_ft: 60, bwl_ft: 10, draft_ft: 4, block_coefficient: 0.5, water_density_pcf: 64 }).displacement_ft3 - 2 * r.displacement_ft3) < 1e-9);
+  // Error seams: non-positive dims/density, Cb out of (0,1], non-finite.
+  assert.ok("error" in _v967({ lwl_ft: 0, bwl_ft: 10, draft_ft: 4, block_coefficient: 0.5, water_density_pcf: 64 }));
+  assert.ok("error" in _v967({ lwl_ft: 30, bwl_ft: 10, draft_ft: 4, block_coefficient: 0, water_density_pcf: 64 }));
+  assert.ok("error" in _v967({ lwl_ft: 30, bwl_ft: 10, draft_ft: 4, block_coefficient: 1.5, water_density_pcf: 64 }));
+  assert.ok("error" in _v967({ lwl_ft: 30, bwl_ft: 10, draft_ft: 4, block_coefficient: 0.5, water_density_pcf: 0 }));
+  assert.ok("error" in _v967({ lwl_ft: Infinity, bwl_ft: 10, draft_ft: 4, block_coefficient: 0.5, water_density_pcf: 64 }));
+});

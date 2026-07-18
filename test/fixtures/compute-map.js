@@ -1011,6 +1011,7 @@ export const COMPUTE_MAP = {
   "density-altitude": { module: "../../calc-mechanic.js", fn: "computeDensityAltitude" },
   "crosswind-component": { module: "../../calc-mechanic.js", fn: "computeCrosswindComponent" },
   "hull-speed": { module: "../../calc-mechanic.js", fn: "computeHullSpeed" },
+  "hull-displacement": { module: "../../calc-mechanic.js", fn: "computeHullDisplacement" },
   "waterline-for-hull-speed": { module: "../../calc-mechanic.js", fn: "computeWaterlineForHullSpeed" },
   "bolt-proof-load": { module: "../../calc-cross.js", fn: "computeBoltProofLoad" },
   "bearing-l10-life": { module: "../../calc-machining.js", fn: "computeBearingL10Life" },

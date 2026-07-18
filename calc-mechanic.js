@@ -2639,3 +2639,46 @@ function _v959renderUjointOperatingAngle(inputRegion, outputRegion, citationEl) 
   for (const f of [ia, oa]) f.input.addEventListener("input", update);
 }
 MECHANIC_RENDERERS["ujoint-operating-angle"] = _v959renderUjointOperatingAngle;
+
+// ===================== spec-v967: hull displacement and block coefficient =====================
+// dims: in { args: dimensionless } out: { displacement_ft3: dimensionless, displacement_lb: dimensionless, displacement_long_tons: dimensionless }
+export function computeHullDisplacement({ lwl_ft = 30, bwl_ft = 10, draft_ft = 4, block_coefficient = 0.5, water_density_pcf = 64 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(lwl_ft > 0)) return { error: "Waterline length must be positive (ft)." };
+  if (!(bwl_ft > 0)) return { error: "Waterline beam must be positive (ft)." };
+  if (!(draft_ft > 0)) return { error: "Draft must be positive (ft)." };
+  if (!(block_coefficient > 0 && block_coefficient <= 1)) return { error: "Block coefficient must be between 0 and 1." };
+  if (!(water_density_pcf > 0)) return { error: "Water density must be positive (pcf)." };
+  // Archimedes: the boat weighs what it displaces. Displaced volume = the L x B x T box x the block coefficient.
+  const displacement_ft3 = lwl_ft * bwl_ft * draft_ft * block_coefficient;
+  const displacement_lb = displacement_ft3 * water_density_pcf;
+  const displacement_long_tons = displacement_lb / 2240;
+  if (![displacement_ft3, displacement_lb, displacement_long_tons].every(Number.isFinite)) return { error: "Hull-displacement math is not a finite value." };
+  return {
+    displacement_ft3,
+    displacement_lb,
+    displacement_long_tons,
+    note: "A boat's displacement -- what it weighs, because by Archimedes it floats on the weight of water it pushes aside. The immersed volume is the waterline length x waterline beam x draft box, filled only partway by the actual underwater shape: that fill fraction is the block coefficient Cb (roughly 0.35-0.45 for a fine planing or semi-displacement hull, 0.40-0.60 for a full displacement/work hull). Displacement volume = LWL x BWL x draft x Cb; weight = volume x water density (64.0 lb/ft^3 seawater, 62.4 fresh); long tons = weight / 2,240. A 30 ft waterline, 10 ft beam, 4 ft draft hull at Cb 0.5 in seawater displaces 600 ft^3 = 38,400 lb = 17.1 long tons. Fresh water is less dense, so the same hull floats a touch deeper to displace the same weight. This is a first-order estimate from block dimensions; the real value comes from a lines drawing integrated by Simpson's rule (or a builder's displacement/immersion table), and the loaded trim, appendages, and the actual hull form shift it. A screening estimate for sizing ground tackle, a trailer, or a lift; the naval architect's hydrostatics govern.",
+  };
+}
+
+export const hullDisplacementExample = { inputs: { lwl_ft: 30, bwl_ft: 10, draft_ft: 4, block_coefficient: 0.5, water_density_pcf: 64 } };
+
+MECHANIC_RENDERERS["hull-displacement"] = _simpleRenderer({
+  citation: "Citation: hull displacement by Archimedes and the block coefficient, by name. Displacement volume = LWL x BWL x draft x Cb; weight = volume x water density (64.0 lb/ft^3 seawater, 62.4 fresh); long tons = weight/2240. Cb ~0.35-0.60 by hull form. A first-order block estimate; the lines drawing (Simpson's rule) and loaded trim govern, and the naval architect's hydrostatics rule.",
+  example: hullDisplacementExample.inputs,
+  fields: [
+    { key: "lwl_ft", label: "Waterline length LWL (ft)", kind: "number", default: 30 },
+    { key: "bwl_ft", label: "Waterline beam BWL (ft)", kind: "number", default: 10 },
+    { key: "draft_ft", label: "Draft (ft)", kind: "number", default: 4 },
+    { key: "block_coefficient", label: "Block coefficient Cb (~0.35-0.60)", kind: "number", default: 0.5 },
+    { key: "water_density_pcf", label: "Water density (pcf: 64 sea, 62.4 fresh)", kind: "number", default: 64 },
+  ],
+  outputs: [
+    { key: "v", id: "hdp-out-v", label: "Displacement volume", value: (r) => fmt(r.displacement_ft3, 1) + " ft^3" },
+    { key: "w", id: "hdp-out-w", label: "Displacement (weight)", value: (r) => fmt(r.displacement_lb, 0) + " lb" },
+    { key: "t", id: "hdp-out-t", label: "Displacement (long tons)", value: (r) => fmt(r.displacement_long_tons, 2) + " long tons" },
+    { key: "n", id: "hdp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHullDisplacement,
+});

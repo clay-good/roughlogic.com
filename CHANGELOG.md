@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(marine): add hull-displacement tile (spec-v967); 2026-07-18
+
+- New Group K tile `hull-displacement` (Hull Displacement and Block Coefficient) in calc-mechanic.js. By Archimedes:
+  displacement volume = LWL x BWL x draft x Cb; weight = volume x water density (64.0 lb/ft^3 sea, 62.4 fresh); long
+  tons = weight/2,240. A 30 ft LWL, 10 ft beam, 4 ft draft hull at Cb 0.5 in seawater displaces 600 ft^3 = 38,400 lb =
+  17.1 long tons; fresh water floats it deeper. A first-order block estimate; the lines drawing and naval architect
+  govern. Home count 1,415 -> 1,416.
+
 ### feat(roofing): add step-flashing-count tile (spec-v966); 2026-07-18
 
 - New Group E tile `step-flashing-count` (Roof Step-Flashing Piece Count) in calc-finish.js. One piece per shingle
