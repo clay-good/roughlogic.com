@@ -34502,6 +34502,66 @@
    }
   },
   {
+   "tile_id": "outdoor-reset-ratio",
+   "source_publisher": "hydronic outdoor reset control (Idronics / tekmar)",
+   "source_title": "180 F design supply at 0 F OA, 80 F min at 65 F no-heat, at 30 F OA -> 1.54 ratio, 133.8 F supply",
+   "source_edition_or_year": "spec-v915 worked example (machine-verified)",
+   "source_section_or_page": "ratio = (180-80)/(65-0) = 1.5385; target = 80 + 1.5385*(65-30) = 133.85",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "supply_design_f": 180,
+    "supply_min_f": 80,
+    "oa_design_f": 0,
+    "oa_noheat_f": 65,
+    "oa_current_f": 30
+   },
+   "outputs": {
+    "reset_ratio": {
+     "value": 1.5385,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "supply_target_f": {
+     "value": 133.85,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "outdoor-reset-ratio",
+   "source_publisher": "hydronic outdoor reset control (Idronics / tekmar)",
+   "source_title": "cross-check: 70 F OA (above the 65 F no-heat point) clamps the target to the 80 F minimum supply",
+   "source_edition_or_year": "spec-v915 worked example (machine-verified)",
+   "source_section_or_page": "raw = 80 + 1.5385*(65-70) = 72.3, clamped up to the 80 F min supply",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "supply_design_f": 180,
+    "supply_min_f": 80,
+    "oa_design_f": 0,
+    "oa_noheat_f": 65,
+    "oa_current_f": 70
+   },
+   "outputs": {
+    "reset_ratio": {
+     "value": 1.5385,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "supply_target_f": {
+     "value": 80,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "tractor-ballast",
    "source_publisher": "tractor ballasting rule (ASABE)",
    "source_title": "180 hp at 125 lb/hp target, 18,000 lb current -> 22,500 lb target, add 4,500 lb",

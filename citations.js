@@ -13027,6 +13027,17 @@ export const CITATIONS = {
       { name: "500 factor", value: "8.33 lb/gal x 60 min/hr for water; adjust for glycol", source: "ASHRAE" },
     ],
   },
+  "outdoor-reset-ratio": {
+    formula: "reset_ratio = (supply_design_f - supply_min_f) / (oa_noheat_f - oa_design_f); supply_target_f = clamp( supply_min_f + reset_ratio x (oa_noheat_f - oa_current_f), supply_min_f, supply_design_f ).",
+    edition: "Hydronic outdoor-reset control practice (Taco / tekmar / Caleffi Idronics), by name; the linear reset curve is standard control math.",
+    freeAccess: "The reset relation is a first-principles linear interpolation; the design and minimum supply temperatures and the outdoor design / no-heat points come from the building heat loss and the control manual.",
+    governance: GOVERNANCE.general,
+    editionNote: "Outdoor reset lowers the boiler supply temperature as the weather warms, cutting standby and flue loss and improving comfort. The reset ratio is the supply rise per degree of outdoor drop over the design span, (design supply - min supply) / (no-heat OA - design OA); the target at any outdoor temperature is min supply + ratio x (no-heat OA - current OA), clamped flat at the design supply below the design OA and at the min supply above the no-heat OA (where the heat is effectively off). A steep ratio suits high-temp fin-tube; a radiant floor runs a shallow ratio off a low design supply. A conventional (non-condensing) boiler must still protect its return above the flue-condensation limit, so the min supply and a return-protection bypass govern the low end. The control manual and the building heat loss govern the final curve.",
+    assumptions: [
+      { name: "Linear curve", value: "a straight reset line between the design point and the no-heat point; clamped to the min/design supply", source: "outdoor-reset control practice" },
+      { name: "Return protection", value: "a non-condensing boiler must keep its return above the flue-condensation limit; the min supply and a bypass govern the low end", source: "boiler protection" },
+    ],
+  },
   "buffer-tank-loop-credit": {
     formula: "gross_buffer_gal = min_on_time_min x (source_min_btu - zone_min_load_btu) / (500 x delta_t_f); loop_volume_gal = 0.0408 x pipe_id_in^2 x loop_length_ft; net_tank_gal = max(0, gross_buffer_gal - loop_volume_gal).",
     edition: "ASHRAE / Idronics (Caleffi) anti-short-cycle buffer-tank practice, by name.",

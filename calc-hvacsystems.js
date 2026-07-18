@@ -1337,3 +1337,56 @@ function _v623renderBufferTankLoopCredit(inputRegion, outputRegion, citationEl) 
   for (const f of [t, qMin, qLoad, dt, d, L]) f.input.addEventListener("input", update);
 }
 HVACSYSTEMS_RENDERERS["buffer-tank-loop-credit"] = _v623renderBufferTankLoopCredit;
+
+// ===================== spec-v915: hydronic outdoor reset ratio and supply target =====================
+// dims: in { args: dimensionless } out: { reset_ratio: dimensionless, supply_target_f: T, clamped: dimensionless }
+export function computeOutdoorResetRatio({ supply_design_f = 180, supply_min_f = 80, oa_design_f = 0, oa_noheat_f = 65, oa_current_f = 30 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(supply_design_f > supply_min_f)) return { error: "Design supply temperature must be above the minimum supply." };
+  if (!(oa_noheat_f > oa_design_f)) return { error: "No-heat outdoor temperature must be above the design outdoor temperature." };
+  // Reset ratio = supply rise per degree of outdoor drop, over the design span.
+  const reset_ratio = (supply_design_f - supply_min_f) / (oa_noheat_f - oa_design_f);
+  const raw_target = supply_min_f + reset_ratio * (oa_noheat_f - oa_current_f);
+  // Clamp the curve to the min/max supply the boiler runs (flat below design OA, off above no-heat OA).
+  const supply_target_f = Math.min(supply_design_f, Math.max(supply_min_f, raw_target));
+  const clamped = supply_target_f !== raw_target;
+  if (![reset_ratio, supply_target_f].every(Number.isFinite)) return { error: "Reset-curve math is not a finite value." };
+  return {
+    reset_ratio,
+    supply_target_f,
+    clamped,
+    note: "Outdoor reset lowers the boiler supply temperature as it warms, saving fuel and improving comfort. The reset ratio is the supply rise per degree of outdoor drop, (design supply - min supply) / (no-heat OA - design OA); the target at any outdoor temperature is min supply + ratio x (no-heat OA - current OA), clamped between the min and design supply (flat below the design OA, heat off above the no-heat OA). A steeper ratio suits high-temp fin-tube; radiant floors run a shallow ratio off a low design supply. The boiler must protect its return above the condensing/flue limit. The control manual and the building's heat loss govern the final curve.",
+  };
+}
+
+export const outdoorResetRatioExample = { inputs: { supply_design_f: 180, supply_min_f: 80, oa_design_f: 0, oa_noheat_f: 65, oa_current_f: 30 } };
+
+function _v915renderOutdoorResetRatio(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: outdoor reset curve by name. reset ratio = (design supply - min supply) / (no-heat OA - design OA); supply target = min supply + ratio x (no-heat OA - current OA), clamped to the min/design supply. The control manual and the building heat loss govern.";
+  const sd = makeNumber("Design supply temp (F, at design OA)", "orr-sd", { step: "any", value: "180" });
+  sd.input.value = "180";
+  const sm = makeNumber("Minimum supply temp (F, at no-heat OA)", "orr-sm", { step: "any", value: "80" });
+  sm.input.value = "80";
+  const od = makeNumber("Design outdoor temp (F)", "orr-od", { step: "any", value: "0" });
+  od.input.value = "0";
+  const on = makeNumber("No-heat outdoor temp (F)", "orr-on", { step: "any", value: "65" });
+  on.input.value = "65";
+  const oc = makeNumber("Current outdoor temp (F)", "orr-oc", { step: "any", value: "30" });
+  oc.input.value = "30";
+  for (const f of [sd, sm, od, on, oc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sd.input.value = "180"; sm.input.value = "80"; od.input.value = "0"; on.input.value = "65"; oc.input.value = "30"; update(); });
+  const oRatio = makeOutputLine(outputRegion, "Reset ratio", "orr-out-r");
+  const oTarget = makeOutputLine(outputRegion, "Supply target at current OA", "orr-out-t");
+  const update = debounce(() => {
+    const r = computeOutdoorResetRatio({
+      supply_design_f: sd.input.value === "" ? 180 : Number(sd.input.value), supply_min_f: sm.input.value === "" ? 80 : Number(sm.input.value),
+      oa_design_f: od.input.value === "" ? 0 : Number(od.input.value), oa_noheat_f: on.input.value === "" ? 65 : Number(on.input.value),
+      oa_current_f: oc.input.value === "" ? 30 : Number(oc.input.value),
+    });
+    if (r.error) { oRatio.textContent = r.error; oTarget.textContent = "-"; return; }
+    oRatio.textContent = fmt(r.reset_ratio, 2) + " F supply per F outdoor";
+    oTarget.textContent = fmt(r.supply_target_f, 1) + " F" + (r.clamped ? " (clamped to the min/design supply)" : "");
+  }, DEBOUNCE_MS);
+  for (const f of [sd, sm, od, on, oc]) f.input.addEventListener("input", update);
+}
+HVACSYSTEMS_RENDERERS["outdoor-reset-ratio"] = _v915renderOutdoorResetRatio;

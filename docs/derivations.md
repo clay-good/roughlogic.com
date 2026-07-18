@@ -2282,6 +2282,7 @@ cross-check.
 | calc-hvacsystems.js | `computeHxLmtdNtu` | `{ config = "counterflow", th_in_F = 0, th_out_F = 0, tc_in_F = 0, tc_out_F = ...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHydronicBufferTank` | `{ min_on_time_min = 0, source_min_btu = 0, zone_min_load_btu = 0, delta_t_f =...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeInternalHeatGains` | `{ occupants = 0, sens_per_person = 245, lat_per_person = 200, lighting_w = 0,...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeOutdoorResetRatio` | `{ supply_design_f = 180, supply_min_f = 80, oa_design_f = 0, oa_noheat_f = 65...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeVavBoxAirflow` | `{ zone_sensible_btuh = 0, supply_dt_f = 0, ventilation_cfm = 0, turndown = 0....` | _ | _ | _ |
 | calc-hvacsystems.js | `computeWindowSolarHeatGain` | `{ area_ft2 = 0, shgc = 0, psf = 0, u_factor = 0, cltd_f = 0 } = {}` | _ | _ | _ |
 | calc-kitchen.js | `computeBakersPercentage` | `{ flour_g = 0, hydration_pct = 0, salt_pct = 0, yeast_pct = 0, other_pct = 0,...` | _ | _ | _ |
@@ -3024,7 +3025,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1610.
+Row count: 1611.
 
 <!-- END function-corpus-v14 -->
 
@@ -3395,7 +3396,7 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (131 tiles)
+### Group C HVAC (132 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3497,6 +3498,7 @@ per spec-v14 §13.1 second paragraph.
 | `npsh-a` | Pump NPSH Available | Hydraulic Institute / centrifugal-pum...; 0 ft elevation / 60 F water / +5 ft flooded source / 2 ft... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `outdoor-air-mix` | Outdoor Air Mix | ASHRAE Handbook (Fundamentals); Return 75 F / 50% RH, outdoor 95 F / 60% RH, OA fraction ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `outdoor-air-ventilation` | ASHRAE 62.1 Outdoor-Air Ventilation | ASHRAE; Vbz = Rp*Pz + Ra*Az; Voz = Vbz / E_z | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `outdoor-reset-ratio` | Hydronic Outdoor Reset Ratio and Supply Target | hydronic outdoor reset control (Idron...; ratio = (180-80)/(65-0) = 1.5385; target = 80 + 1.5385*(6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `outside-air-percent-temps` | Measured Outside-Air Percent from Mixed-Air Temperatures | ASHRAE / AABC-NEBB; spec-v386 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pipe-heat-loss-radial` | Insulated Pipe Heat Loss (Radial) | Fourier cylindrical-shell conduction ...; r1=1 in, r2=2 in, k=0.25, 200 vs 70 F -> ~24.55 BTU/hr-ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pitot-traverse-cfm` | Pitot Traverse Airflow (Velocity Pressure to CFM) | ASHRAE Fundamentals / AABC-NEBB; spec-v385 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4573,6 +4575,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1363. Fixture-covered or reference-cadence: 1363 / 1363.
+Tile count: 1364. Fixture-covered or reference-cadence: 1364 / 1364.
 
 <!-- END tile-index-v14 -->

@@ -349,6 +349,7 @@ const TOOL_MODULES = (() => {
     "coil-face-velocity", "coil-face-area", "vav-box-airflow",
     // spec-v587 anti-short-cycle buffer tank
     "hydronic-buffer-tank",
+    "outdoor-reset-ratio",
     // spec-v623 buffer tank with distribution-loop credit
     "buffer-tank-loop-credit",
   ]);

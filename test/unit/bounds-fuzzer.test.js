@@ -26763,6 +26763,26 @@ test("bounds: spec-v910 computeKnurlBlankDiameter pins the teeth, blank diameter
   assert.ok("error" in _v910({ target_diameter_in: Infinity, knurl_tpi: 21 }));
 });
 
+import { computeOutdoorResetRatio as _v915 } from "../../calc-hvacsystems.js";
+
+test("bounds: spec-v915 computeOutdoorResetRatio pins the reset ratio, supply target, clamp, and error seams", () => {
+  const r = _v915({ supply_design_f: 180, supply_min_f: 80, oa_design_f: 0, oa_noheat_f: 65, oa_current_f: 30 });
+  assert.ok(Math.abs(r.reset_ratio - 1.53846) < 1e-4); // (180-80)/(65-0)
+  assert.ok(Math.abs(r.supply_target_f - 133.846) < 0.01); // 80 + 1.5385*(65-30)
+  assert.equal(r.clamped, false);
+  // Above the no-heat OA the raw target falls below the min supply and clamps up.
+  const warm = _v915({ supply_design_f: 180, supply_min_f: 80, oa_design_f: 0, oa_noheat_f: 65, oa_current_f: 70 });
+  assert.equal(warm.supply_target_f, 80); // clamped to min
+  assert.equal(warm.clamped, true);
+  // At the design OA the target is the design supply (no clamp needed, exact).
+  const cold = _v915({ supply_design_f: 180, supply_min_f: 80, oa_design_f: 0, oa_noheat_f: 65, oa_current_f: 0 });
+  assert.ok(Math.abs(cold.supply_target_f - 180) < 1e-9);
+  // Error seams: min >= design, no-heat <= design OA, non-finite.
+  assert.ok("error" in _v915({ supply_design_f: 80, supply_min_f: 80, oa_design_f: 0, oa_noheat_f: 65, oa_current_f: 30 }));
+  assert.ok("error" in _v915({ supply_design_f: 180, supply_min_f: 80, oa_design_f: 65, oa_noheat_f: 65, oa_current_f: 30 }));
+  assert.ok("error" in _v915({ supply_design_f: Infinity, supply_min_f: 80, oa_design_f: 0, oa_noheat_f: 65, oa_current_f: 30 }));
+});
+
 import { computeTractorBallast as _v914 } from "../../calc-agriculture.js";
 
 test("bounds: spec-v914 computeTractorBallast pins the target weight, signed ballast change, and error seams", () => {

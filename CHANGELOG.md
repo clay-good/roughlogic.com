@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): add outdoor-reset-ratio tile (spec-v915); 2026-07-18
+
+- New Group C tile `outdoor-reset-ratio` (Hydronic Outdoor Reset Ratio and Supply Target) in calc-hvacsystems.js, beside
+  hydronic-buffer-tank. The boiler reset curve: reset ratio = (design supply - min supply) / (no-heat OA - design OA);
+  supply target = min supply + ratio x (no-heat OA - current OA), clamped between the min and design supply. A 180 F
+  design supply at 0 F resetting to an 80 F minimum at 65 F is a 1.54 ratio, so at 30 F outdoors the boiler targets
+  ~134 F; above the no-heat point the target clamps to the 80 F minimum. Fin-tube runs a steep ratio, radiant a shallow
+  one; a non-condensing boiler must still protect its return. The control manual and heat loss govern. Home count
+  1,363 -> 1,364.
+
 ### feat(agriculture): add tractor-ballast tile (spec-v914); 2026-07-18
 
 - New Group L tile `tractor-ballast` (Tractor Ballast for a Target Weight-to-Power Ratio) in calc-agriculture.js, beside

@@ -1537,6 +1537,7 @@ const RELATED = {
   "evaporator-td-dtd": ["approach-delta-t","superheat-subcool","walk-in-cooler-load","product-pull-down-load"],
   "flash-gas-subcool": ["superheat-subcool", "refrigerant-velocity", "refrigerant-charge"],
   "hydronic-buffer-tank": ["expansion-tank", "boiler-pipe-sizing", "compressor-short-cycle"],
+  "outdoor-reset-ratio": ["boiler-pipe-sizing", "radiant-floor-output", "hydronic-gpm-deltat"],
   "buffer-tank-loop-credit": ["hydronic-buffer-tank", "pipe-volume", "expansion-tank"],
   // spec-v323..v325 engine-build performance batch (Group K)
   "injector-size": ["injector-max-hp","volumetric-efficiency","displacement-cr","hp-from-torque"],
