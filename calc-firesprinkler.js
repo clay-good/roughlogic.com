@@ -316,3 +316,40 @@ FIRESPRINKLER_RENDERERS["smoke-detector-spacing-count"] = _simpleRenderer({
   ],
   compute: computeSmokeDetectorSpacingCount,
 });
+
+// ===================== spec-v934: dry-pipe / preaction air compressor CFM =====================
+// dims: in { dry_volume_gal: L^3, normal_pressure_psig: dimensionless, restore_minutes: T } out: { system_ft3: L^3, free_air_cfm: L^3 T^-1 }
+export function computeDrypipeAirCompressor({ dry_volume_gal = 400, normal_pressure_psig = 40, restore_minutes = 30 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(dry_volume_gal > 0)) return { error: "Dry system volume must be positive (gal)." };
+  if (!(normal_pressure_psig > 0)) return { error: "Normal air pressure must be positive (psig)." };
+  if (!(restore_minutes > 0)) return { error: "Restore time must be positive (min)." };
+  const system_ft3 = dry_volume_gal / 7.48;
+  // Free air to pressurize the system volume to the normal gauge pressure = V x (P_gauge / atmospheric);
+  // spread over the NFPA 13 restore time gives the compressor free-air CFM.
+  const free_air_cfm = system_ft3 * (normal_pressure_psig / 14.7) / restore_minutes;
+  if (![system_ft3, free_air_cfm].every(Number.isFinite)) return { error: "Compressor-sizing math is not a finite value." };
+  return {
+    system_ft3,
+    free_air_cfm,
+    note: "Dry-pipe (or double-interlock preaction) air-compressor free-air CFM to restore the system's normal air pressure within the NFPA 13 time limit: 30 minutes for a standard system (60 minutes is allowed for some). Free air = system volume x (normal gauge pressure / 14.7 atmospheric), spread over the restore time. A 400-gal dry system to 40 psi in 30 min needs about 4.85 CFM of free air -- spec the NEXT larger compressor. A dedicated air maintenance device (not a shop compressor) with a listed automatic control is required, and an air/nitrogen source that avoids corrosion is preferred. The system volume (from the pipe schedule), the required pressure (set to keep the clapper closed with margin), and the NFPA 13 / AHJ restore time govern. A sizing estimate; the compressor manufacturer's rating at the pressure governs the pick.",
+  };
+}
+
+export const drypipeAirCompressorExample = { inputs: { dry_volume_gal: 400, normal_pressure_psig: 40, restore_minutes: 30 } };
+
+FIRESPRINKLER_RENDERERS["drypipe-air-compressor"] = _simpleRenderer({
+  citation: "Citation: dry-pipe air compressor free-air CFM by name (NFPA 13 restore-time rule). free air = (system gal / 7.48) x (normal psig / 14.7) / restore minutes; restore within 30 min (60 for some systems). A listed air-maintenance device is required; the compressor rating at pressure and the AHJ govern.",
+  example: drypipeAirCompressorExample.inputs,
+  fields: [
+    { key: "dry_volume_gal", label: "Dry system volume (gal, from pipe schedule)", kind: "number", default: 400 },
+    { key: "normal_pressure_psig", label: "Normal air pressure (psig)", kind: "number", default: 40 },
+    { key: "restore_minutes", label: "Restore time (min, NFPA 13 <= 30)", kind: "number", default: 30 },
+  ],
+  outputs: [
+    { key: "v", id: "dac-out-v", label: "System volume", value: (r) => fmt(r.system_ft3, 1) + " ft3" },
+    { key: "c", id: "dac-out-c", label: "Compressor free-air CFM (spec next size up)", value: (r) => fmt(r.free_air_cfm, 2) + " CFM" },
+    { key: "n", id: "dac-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDrypipeAirCompressor,
+});

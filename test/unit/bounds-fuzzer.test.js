@@ -26888,6 +26888,22 @@ test("bounds: spec-v925 computeRotaryPhaseConverter pins the idler size, governi
   assert.ok("error" in _v925({ largest_motor_hp: Infinity, total_running_hp: 15 }));
 });
 
+import { computeDrypipeAirCompressor as _v934 } from "../../calc-firesprinkler.js";
+
+test("bounds: spec-v934 computeDrypipeAirCompressor pins the volume, free-air CFM, and error seams", () => {
+  const r = _v934({ dry_volume_gal: 400, normal_pressure_psig: 40, restore_minutes: 30 });
+  assert.ok(Math.abs(r.system_ft3 - 53.4759) < 1e-3); // 400/7.48
+  assert.ok(Math.abs(r.free_air_cfm - 4.850425) < 1e-4); // 53.48*(40/14.7)/30
+  assert.ok(Math.abs(_v934({ dry_volume_gal: 750, normal_pressure_psig: 40, restore_minutes: 30 }).free_air_cfm - 9.094547) < 1e-4);
+  // A 60 min restore halves the CFM.
+  assert.ok(Math.abs(_v934({ dry_volume_gal: 400, normal_pressure_psig: 40, restore_minutes: 60 }).free_air_cfm - 4.850425 / 2) < 1e-4);
+  // Error seams: non-positive volume / pressure / time, non-finite.
+  assert.ok("error" in _v934({ dry_volume_gal: 0, normal_pressure_psig: 40, restore_minutes: 30 }));
+  assert.ok("error" in _v934({ dry_volume_gal: 400, normal_pressure_psig: 0, restore_minutes: 30 }));
+  assert.ok("error" in _v934({ dry_volume_gal: 400, normal_pressure_psig: 40, restore_minutes: 0 }));
+  assert.ok("error" in _v934({ dry_volume_gal: Infinity, normal_pressure_psig: 40, restore_minutes: 30 }));
+});
+
 import { computeWelderResistanceCircuitConductor as _v933 } from "../../calc-electrical.js";
 
 test("bounds: spec-v933 computeWelderResistanceCircuitConductor pins the conductor, 300% OCPD, and error seams", () => {

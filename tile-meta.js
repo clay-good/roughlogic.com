@@ -724,7 +724,7 @@ const _TILES = [
   ["smooth-bore-flow", "F"],
   ["smooth-bore-diameter-for-flow", "F"],
   // spec-v248..v250 fire-sprinkler system-design trio (calc-firesprinkler.js)
-  ["fire-pump-curve", "F"], ["sprinkler-system-demand", "F"], ["sprinkler-protection-area-for-supply", "F"], ["sprinkler-head-layout", "F"], ["smoke-detector-spacing-count", "F"],
+  ["fire-pump-curve", "F"], ["sprinkler-system-demand", "F"], ["sprinkler-protection-area-for-supply", "F"], ["sprinkler-head-layout", "F"], ["smoke-detector-spacing-count", "F"], ["drypipe-air-compressor", "F"],
   ["sprinkler-pressure-demand", "F"],
   // spec-v115 trucking weight compliance (Group J)
   ["gcwr-check", "J"],

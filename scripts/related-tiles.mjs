@@ -1099,6 +1099,7 @@ const RELATED = {
   "pex-homerun-takeoff": ["pipe-sizing", "wsfu-demand", "solder-joint-quantity"],
   "soffit-ridge-vent-count": ["attic-ventilation", "powered-attic-ventilator", "roofing-squares"],
   "smoke-detector-spacing-count": ["sprinkler-head-layout", "standby-battery-sizing", "occupant-load"],
+  "drypipe-air-compressor": ["fire-pump-curve", "sprinkler-system-demand", "sprinkler-head-layout"],
   "curb-gutter-volume": ["concrete", "concrete-sawcut-footage", "material-quantity"],
   "rebar-chair-count": ["rebar-tie-wire", "rebar-weight-takeoff", "welded-wire-mesh"],
   "concrete-vibrator-spacing": ["concrete-pour-rate", "formwork-pressure", "concrete"],

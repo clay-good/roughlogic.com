@@ -2121,6 +2121,7 @@ cross-check.
 | calc-fire.js | `renderSprinklerDensity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderSprinklerKFactor` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderStandpipeFriction` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-firesprinkler.js | `computeDrypipeAirCompressor` | `{ dry_volume_gal = 400, normal_pressure_psig = 40, restore_minutes = 30 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeFirePumpCurve` | `{ rated_gpm = 0, rated_psi = 0, churn_psi = 0, overload_psi = 0 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSmokeDetectorSpacingCount` | `{ room_length_ft = 60, room_width_ft = 40, listed_spacing_ft = 30 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerHeadLayout` | `{ room_length = 0, room_width = 0, area_per_head = 130, max_spacing = 15 } = {}` | _ | _ | _ |
@@ -3043,7 +3044,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1629.
+Row count: 1630.
 
 <!-- END function-corpus-v14 -->
 
@@ -3976,7 +3977,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (46 tiles)
+### Group F Fire-ground (47 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3985,6 +3986,7 @@ per spec-v14 §13.1 second paragraph.
 | `confined-space-purge` | Confined Space Air Change Time | 29 CFR 1910.146 + ACGIH ventilation e...; 2000 ft^3 / 1000 cfm / 7 target purges -> 14 min purge | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `confined-space-vent` | Confined-Space Pre-Entry Ventilation (OSHA 1910.146) | OSHA / NIOSH; V=1000 ft^3; minutes_to_purge = 1000 * 7 / 200 = 35 min; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `draft-lift-max` | Drafting Maximum Lift (Altitude-Corrected) | IFSTA / NWCG firefighter math; 3,000 ft, 0.667 factor, no suction loss -> 30.9 ft theore... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `drypipe-air-compressor` | Dry-Pipe / Preaction Air Compressor CFM | dry-pipe air compressor sizing (NFPA 13); ft3 = 400/7.48 = 53.48; CFM = 53.48*(40/14.7)/30 = 4.85 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `elevation-pressure-loss` | Elevation Pressure Loss / Gain | Hydrostatic head 0.434 psi/ft + IFSTA...; 9 floors above pump -> exact ~39.06 psi, rule 45 psi | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fall-arrest-clearance` | Required Fall-Arrest Clearance (ANSI Z359) | ANSI Z359.1 / OSHA 1926 Subpart M; free fall 6 + deceleration 3.5 + worker 5 + margin 3 = 17... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fire-friction` | Fire Hose Friction Loss | National Fire Academy; FL = C * Q^2 * L; 2.5 in C = 2; FL = 2 * (2.5)^2 * 2 = 25... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4611,6 +4613,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1382. Fixture-covered or reference-cadence: 1382 / 1382.
+Tile count: 1383. Fixture-covered or reference-cadence: 1383 / 1383.
 
 <!-- END tile-index-v14 -->

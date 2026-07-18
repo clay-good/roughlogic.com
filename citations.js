@@ -8563,6 +8563,17 @@ export const CITATIONS = {
       { name: "Coverage", value: "0.7 x spacing to the farthest point; first detector within spacing/2 of each wall", source: "NFPA 72" },
     ],
   },
+  "drypipe-air-compressor": {
+    formula: "system_ft3 = dry_volume_gal / 7.48; free_air_cfm = system_ft3 x (normal_pressure_psig / 14.7) / restore_minutes.",
+    edition: "NFPA 13 (Standard for the Installation of Sprinkler Systems) dry-pipe / preaction air-restoration time limit (about 30 minutes), by name; the compressor rating and the AHJ govern.",
+    freeAccess: "The free-air relation is public first-principles (system volume x gauge-to-atmospheric ratio over the restore time); the system volume comes from the pipe schedule and the pressure and restore time from NFPA 13 and the AHJ.",
+    governance: GOVERNANCE.general,
+    editionNote: "The free-air CFM a compressor must deliver to restore a dry-pipe or double-interlock-preaction system's normal air pressure within the NFPA 13 time limit -- 30 minutes for a standard system (some are allowed 60). The free air needed to pressurize the system volume to its normal gauge pressure is the volume times the gauge-to-atmospheric ratio (P / 14.7), and dividing by the restore time gives the compressor's required free-air CFM; the next larger listed unit is selected. A dedicated, LISTED automatic air-maintenance device is required (not a portable shop compressor), and an air source that mitigates internal corrosion, or supervised nitrogen, is preferred. The system volume comes from the pipe schedule, the normal air pressure is set to hold the dry-pipe clapper closed with the required margin over the trip point, and NFPA 13 and the AHJ set the restore time. A sizing estimate; the compressor manufacturer's rating at the operating pressure governs the pick.",
+    assumptions: [
+      { name: "Restore time", value: "NFPA 13: restore normal air pressure within ~30 min (60 min allowed for some systems)", source: "NFPA 13" },
+      { name: "Listed device", value: "a listed automatic air-maintenance device is required, not a shop compressor; nitrogen mitigates corrosion", source: "NFPA 13 / practice" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fire): add drypipe-air-compressor tile (spec-v934); 2026-07-18
+
+- New Group F tile `drypipe-air-compressor` (Dry-Pipe / Preaction Air Compressor CFM) in calc-firesprinkler.js, beside
+  smoke-detector-spacing-count. free air = (system gal / 7.48) x (normal psig / 14.7) / restore minutes, restoring
+  normal pressure within the NFPA 13 time limit (30 min standard). A 400-gal dry system to 40 psi in 30 min needs 4.85
+  CFM; a 750-gal system 9.1 CFM. A listed automatic air-maintenance device is required; the compressor rating at pressure
+  and the AHJ govern. Raised the calc-firesprinkler.js gzip cap 7000 -> 8500. Home count 1,382 -> 1,383.
+
 ### feat(electrical): add welder-resistance-circuit-conductor tile (spec-v933); 2026-07-18
 
 - New Group A tile `welder-resistance-circuit-conductor` (Resistance / Spot-Welder Branch-Circuit Conductor and OCPD,

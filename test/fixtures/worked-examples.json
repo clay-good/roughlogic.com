@@ -34884,6 +34884,56 @@
    }
   },
   {
+   "tile_id": "drypipe-air-compressor",
+   "source_publisher": "dry-pipe air compressor sizing (NFPA 13)",
+   "source_title": "400 gal dry system to 40 psi in 30 min -> 53.5 ft3, 4.85 CFM free air",
+   "source_edition_or_year": "spec-v934 worked example (machine-verified)",
+   "source_section_or_page": "ft3 = 400/7.48 = 53.48; CFM = 53.48*(40/14.7)/30 = 4.85",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "dry_volume_gal": 400,
+    "normal_pressure_psig": 40,
+    "restore_minutes": 30
+   },
+   "outputs": {
+    "system_ft3": {
+     "value": 53.48,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "free_air_cfm": {
+     "value": 4.85,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drypipe-air-compressor",
+   "source_publisher": "dry-pipe air compressor sizing (NFPA 13)",
+   "source_title": "cross-check: 750 gal to 40 psi in 30 min -> 9.09 CFM",
+   "source_edition_or_year": "spec-v934 worked example (machine-verified)",
+   "source_section_or_page": "ft3 = 750/7.48 = 100.27; CFM = 100.27*(40/14.7)/30 = 9.09",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "dry_volume_gal": 750,
+    "normal_pressure_psig": 40,
+    "restore_minutes": 30
+   },
+   "outputs": {
+    "free_air_cfm": {
+     "value": 9.09,
+     "tolerance": {
+      "abs": 0.03
+     }
+    }
+   }
+  },
+  {
    "tile_id": "welder-resistance-circuit-conductor",
    "source_publisher": "resistance-welder circuit sizing (NEC 630.31 / 630.32)",
    "source_title": "100 A primary, 50% duty -> 70.71 A conductor, 300 A max OCPD",
