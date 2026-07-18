@@ -8442,6 +8442,17 @@ export const CITATIONS = {
       { name: "K-factor not exactly constant", value: "drifts with viscosity and below the linear range; match pulses/gal vs /L vs /ft^3 units first", source: "meter calibration certificate" },
     ],
   },
+  "loop-voltage-budget": {
+    formula: "max_loop_resistance = (supply_v - transmitter_min_v) / 0.020; voltage_at_transmitter = supply_v - 0.020 x (load_resistance + wire_resistance); within_spec when voltage_at_transmitter >= transmitter_min_v.",
+    edition: "Loop-powered (2-wire) 4-20 mA transmitter voltage-budget / maximum-load-resistance relation by name (transmitter compliance-voltage practice; Ohm's law at the 20 mA worst case); the transmitter datasheet governs.",
+    freeAccess: "The voltage-budget relation is public Ohm's law; the transmitter's compliance (lift-off) voltage is on its datasheet, and the sense-resistor, wire, and barrier resistances come from the loop design.",
+    governance: GOVERNANCE.general,
+    editionNote: "A 2-wire (loop-powered) 4-20 mA transmitter draws its own operating power from the same two wires that carry the signal, so it needs a minimum voltage across its terminals to function -- the compliance or lift-off voltage, commonly 8 to 12 Vdc on the datasheet. The binding case is at 20 mA (top of range), where the loop supply must drive the full 20 mA through every series resistance in the loop -- the sense/load resistor at the receiver (classically 250 ohm to make a 1-5 V input for a PLC/DCS), the round-trip wire resistance, and any intrinsic-safety barrier or signal isolator burden -- and STILL leave the transmitter its minimum. That sets a ceiling on total loop resistance: max = (supply - transmitter minimum) / 0.020 A. Equivalently, the voltage left at the transmitter is supply - 0.020 x total series resistance, which must exceed the compliance voltage. A 24 Vdc supply with a 250 ohm sense resistor and 50 ohm of wire leaves 18 V (a 675 ohm ceiling, 375 ohm of headroom); a long run or an added barrier can push the total past the ceiling, starving the transmitter so the loop pins or reads wrong. The remedy is a higher supply voltage, a smaller sense resistor, heavier or shorter wire, or removing burden. This is the DC worst case at 20 mA; the transmitter's actual datasheet compliance voltage, the barrier/isolator burden, and the real wire resistance govern.",
+    assumptions: [
+      { name: "20 mA worst case", value: "max loop resistance = (supply - transmitter min)/0.020; voltage at transmitter = supply - 0.020 x series R", source: "2-wire transmitter compliance practice" },
+      { name: "Series burden", value: "sense resistor (often 250 ohm) + round-trip wire + barrier/isolator; the transmitter min (compliance) voltage is on its datasheet", source: "transmitter datasheet / loop design" },
+    ],
+  },
   "polymeric-sand-bags": {
     formula: "bags = ceil(area_sf x (1 + waste_pct/100) / coverage_per_bag_sf).",
     edition: "Polymeric joint-sand bag-count identity by name (area over the per-bag coverage, plus waste); first-principles arithmetic.",

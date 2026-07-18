@@ -1094,6 +1094,7 @@ const RELATED = {
   "loop-signal-scaling": ["access-control-power-supply", "voltage-drop", "structured-cabling-channel"],
   "rtd-resistance-to-temp": ["loop-signal-scaling", "copper-resistance", "structured-cabling-channel"],
   "pulse-flowmeter-k-factor": ["loop-signal-scaling", "valve-flow-coefficient", "weir-flow"],
+  "loop-voltage-budget": ["loop-signal-scaling", "rtd-resistance-to-temp", "voltage-drop"],
   "polymeric-sand-bags": ["paver-patio", "retaining-wall-block", "aggregate"],
   "rigid-foam-board-count": ["insulation-batt-coverage", "spray-foam-board-feet", "assembly-r-value"],
   "roof-insulation-fasteners": ["membrane-roof-takeoff", "tapered-roof-insulation", "metal-roof-panels"],

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(low-voltage): add loop-voltage-budget tile (spec-v949); 2026-07-18
+
+- New Group A tile `loop-voltage-budget` (Loop-Powered 2-Wire 4-20 mA Transmitter Voltage Budget) in calc-lowvoltage.js.
+  At the 20 mA worst case the loop supply must drive all series resistance (sense resistor + wire + barrier) and still
+  leave the transmitter its compliance voltage: max total loop resistance = (supply - transmitter min) / 0.020; voltage
+  at transmitter = supply - 0.020 x series R. 24 Vdc, 10.5 V min, 250 ohm sense + 50 ohm wire = 18 V (675 ohm ceiling,
+  PASS); a 600 ohm run starves it to 7 V (FAIL). Home count 1,397 -> 1,398.
+
 ### feat(low-voltage): add pulse-flowmeter-k-factor tile (spec-v948); 2026-07-18
 
 - New Group A tile `pulse-flowmeter-k-factor` (Pulse Flowmeter K-Factor, Frequency to Flow) in calc-lowvoltage.js. A

@@ -34602,6 +34602,70 @@
    }
   },
   {
+   "tile_id": "loop-voltage-budget",
+   "source_publisher": "Loop-powered 2-wire 4-20 mA transmitter voltage budget",
+   "source_title": "24 Vdc, 10.5 V transmitter min, 250 ohm sense + 50 ohm wire -> 18 V at transmitter, 675 ohm ceiling",
+   "source_edition_or_year": "spec-v949 worked example (machine-verified)",
+   "source_section_or_page": "maxR = (24-10.5)/0.020 = 675; V_at = 24 - 0.020*300 = 18; margin = 18-10.5 = 7.5",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "supply_v": 24,
+    "transmitter_min_v": 10.5,
+    "load_resistance_ohms": 250,
+    "wire_resistance_ohms": 50
+   },
+   "outputs": {
+    "max_loop_resistance_ohms": {
+     "value": 675,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "voltage_at_transmitter_v": {
+     "value": 18,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "margin_v": {
+     "value": 7.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "loop-voltage-budget",
+   "source_publisher": "Loop-powered 2-wire 4-20 mA transmitter voltage budget",
+   "source_title": "cross-check: a 600 ohm run (850 ohm total) starves the transmitter at 7 V (FAIL)",
+   "source_edition_or_year": "spec-v949 worked example (machine-verified)",
+   "source_section_or_page": "V_at = 24 - 0.020*850 = 7.0; margin = 7.0 - 10.5 = -3.5 (below compliance)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "supply_v": 24,
+    "transmitter_min_v": 10.5,
+    "load_resistance_ohms": 250,
+    "wire_resistance_ohms": 600
+   },
+   "outputs": {
+    "voltage_at_transmitter_v": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "margin_v": {
+     "value": -3.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pulse-flowmeter-k-factor",
    "source_publisher": "Pulse flowmeter K-factor (turbine/paddlewheel)",
    "source_title": "200 pulses/gal meter reading 100 Hz -> 30 gpm (1800 gph)",

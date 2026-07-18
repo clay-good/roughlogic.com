@@ -1184,3 +1184,63 @@ function _v948renderPulseFlowmeterRate(inputRegion, outputRegion, citationEl) {
   for (const f of [fr, kf]) f.input.addEventListener("input", update);
 }
 LOWVOLTAGE_RENDERERS["pulse-flowmeter-k-factor"] = _v948renderPulseFlowmeterRate;
+
+// ===================== spec-v949: loop-powered 2-wire 4-20 mA transmitter voltage budget =====================
+// dims: in { args: dimensionless } out: { max_loop_resistance_ohms: dimensionless, voltage_at_transmitter_v: dimensionless, margin_v: dimensionless, within_spec: dimensionless }
+export function computeLoopVoltageBudget({ supply_v = 24, transmitter_min_v = 10.5, load_resistance_ohms = 250, wire_resistance_ohms = 50 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(supply_v > 0)) return { error: "Loop supply voltage must be positive (Vdc)." };
+  if (!(transmitter_min_v >= 0)) return { error: "Transmitter minimum (compliance) voltage cannot be negative." };
+  if (!(transmitter_min_v < supply_v)) return { error: "Supply voltage must exceed the transmitter minimum for the loop to operate." };
+  if (!(load_resistance_ohms >= 0)) return { error: "Load (sense) resistance cannot be negative." };
+  if (!(wire_resistance_ohms >= 0)) return { error: "Wire resistance cannot be negative." };
+  // At the 20 mA worst case the loop supply drives all series resistance; the transmitter needs its minimum left over.
+  const I_MAX = 0.020;
+  const max_loop_resistance_ohms = (supply_v - transmitter_min_v) / I_MAX;
+  const total_series_ohms = load_resistance_ohms + wire_resistance_ohms;
+  const voltage_at_transmitter_v = supply_v - I_MAX * total_series_ohms;
+  const margin_v = voltage_at_transmitter_v - transmitter_min_v;
+  const headroom_ohms = max_loop_resistance_ohms - total_series_ohms;
+  const within_spec = margin_v >= 0;
+  if (![max_loop_resistance_ohms, voltage_at_transmitter_v, margin_v].every(Number.isFinite)) return { error: "Loop-budget math is not a finite value." };
+  return {
+    max_loop_resistance_ohms,
+    voltage_at_transmitter_v,
+    margin_v,
+    headroom_ohms,
+    within_spec,
+    verdict: within_spec ? "OK -- the loop drives 20 mA with margin" : "FAIL -- the transmitter starves at 20 mA",
+    note: "Whether a loop-powered (2-wire) 4-20 mA transmitter has enough voltage to operate. The transmitter needs a minimum terminal (compliance / lift-off) voltage to work -- commonly 8-12 Vdc -- and at the 20 mA top of range the loop supply must push that current through ALL the series resistance (the sense/load resistor at the receiver, the round-trip wire resistance, plus any barriers or isolators) and still leave the transmitter its minimum. So the maximum total loop resistance = (supply - transmitter minimum) / 0.020 A, and the voltage left at the transmitter = supply - 0.020 x total series resistance. A 24 Vdc loop into a 250 ohm sense resistor with 50 ohm of wire (300 ohm total) leaves 18 V at the transmitter -- well above a 10.5 V minimum -- and could carry up to 675 ohm; push the run to 600 ohm of wire (850 ohm total) and the transmitter starves at 7 V, below its minimum, so the loop pins or reads wrong. The 250 ohm sense resistor (for a 1-5 V input) is the usual big consumer. This is the DC worst case at 20 mA; the transmitter datasheet's actual compliance voltage, the barrier/isolator burden, and the real wire resistance govern.",
+  };
+}
+
+export const loopVoltageBudgetExample = { inputs: { supply_v: 24, transmitter_min_v: 10.5, load_resistance_ohms: 250, wire_resistance_ohms: 50 } };
+
+function _v949renderLoopVoltageBudget(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: loop-powered (2-wire) 4-20 mA transmitter voltage budget, by name. Max total loop resistance = (supply - transmitter minimum) / 0.020 A; voltage at the transmitter = supply - 0.020 x (load + wire + barrier resistance), which must exceed the transmitter's compliance (lift-off) voltage at the 20 mA worst case. The transmitter datasheet's compliance voltage and the barrier burden govern.";
+  const sv = makeNumber("Loop supply (Vdc)", "lvb-sv", { step: "any", min: "0", value: "24" });
+  sv.input.value = "24";
+  const tv = makeNumber("Transmitter minimum voltage (V)", "lvb-tv", { step: "any", min: "0", value: "10.5" });
+  tv.input.value = "10.5";
+  const lr = makeNumber("Load / sense resistor (ohms)", "lvb-lr", { step: "any", min: "0", value: "250" });
+  lr.input.value = "250";
+  const wr = makeNumber("Wire + barrier resistance (ohms)", "lvb-wr", { step: "any", min: "0", value: "50" });
+  wr.input.value = "50";
+  for (const f of [sv, tv, lr, wr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sv.input.value = "24"; tv.input.value = "10.5"; lr.input.value = "250"; wr.input.value = "50"; update(); });
+  const oV = makeOutputLine(outputRegion, "Verdict", "lvb-out-v");
+  const oVat = makeOutputLine(outputRegion, "Voltage at transmitter (20 mA)", "lvb-out-vat");
+  const oMax = makeOutputLine(outputRegion, "Max total loop resistance", "lvb-out-max");
+  const update = debounce(() => {
+    const r = computeLoopVoltageBudget({
+      supply_v: sv.input.value === "" ? 24 : Number(sv.input.value), transmitter_min_v: tv.input.value === "" ? 10.5 : Number(tv.input.value),
+      load_resistance_ohms: lr.input.value === "" ? 250 : Number(lr.input.value), wire_resistance_ohms: wr.input.value === "" ? 50 : Number(wr.input.value),
+    });
+    if (r.error) { oV.textContent = r.error; oVat.textContent = "-"; oMax.textContent = "-"; return; }
+    oV.textContent = r.verdict + " (" + (r.margin_v >= 0 ? "+" : "") + fmt(r.margin_v, 2) + " V margin)";
+    oVat.textContent = fmt(r.voltage_at_transmitter_v, 2) + " V (need " + fmt(Number(tv.input.value) || 10.5, 1) + " V)";
+    oMax.textContent = fmt(r.max_loop_resistance_ohms, 0) + " ohm ceiling (" + (r.headroom_ohms >= 0 ? "+" : "") + fmt(r.headroom_ohms, 0) + " ohm headroom)";
+  }, DEBOUNCE_MS);
+  for (const f of [sv, tv, lr, wr]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["loop-voltage-budget"] = _v949renderLoopVoltageBudget;

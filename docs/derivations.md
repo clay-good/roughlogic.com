@@ -2366,6 +2366,7 @@ cross-check.
 | calc-lowvoltage.js | `computeFiberMaxLength` | `{ max_channel_loss_db = 0, attenuation_db_km = 0, connector_count = 0, loss_p...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeFireAlarmNacVoltageDrop` | `{ nominal_voltage_v = 24, total_current_a = 0.8, run_length_ft = 250, resista...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeLoopSignalScaling` | `{ signal_ma = 12, range_low = 0, range_high = 100 } = {}` | _ | _ | _ |
+| calc-lowvoltage.js | `computeLoopVoltageBudget` | `{ supply_v = 24, transmitter_min_v = 10.5, load_resistance_ohms = 250, wire_r...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeLvCablePullFootage` | `{ drops = 48, avg_run_ft = 120, slack_ft = 15, box_ft = 1000 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computePulseFlowmeterRate` | `{ frequency_hz = 100, k_factor_pulses_per_gal = 200 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeRtdResistanceToTemp` | `{ resistance_ohms = 119.397, r0_ohms = 100 } = {}` | _ | _ | _ |
@@ -3058,7 +3059,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1644.
+Row count: 1645.
 
 <!-- END function-corpus-v14 -->
 
@@ -3139,7 +3140,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (181 tiles)
+### Group A Electrical (182 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3217,6 +3218,7 @@ per spec-v14 §13.1 second paragraph.
 | `lighting-retrofit-savings` | LED Lighting Retrofit Savings and Payback | Energy-and-demand lighting-savings me...; spec-v231 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lighting-uniformity-ratio` | Lighting Illuminance Uniformity Ratio | IES recommended practice; spec-v366 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `loop-signal-scaling` | 4-20 mA Current-Loop Signal Scaling | 4-20 mA current-loop live-zero scalin...; percent = (12-4)/16*100 = 50; value = 0 + 0.5*(100-0) = 50 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `loop-voltage-budget` | Loop-Powered (2-Wire) 4-20 mA Transmitter Voltage Budget | Loop-powered 2-wire 4-20 mA transmitt...; maxR = (24-10.5)/0.020 = 675; V_at = 24 - 0.020*300 = 18;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lumen-method` | Lumen-Method Luminaire Count | IES lumen method (by name).; spec-v101 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `luminaire-height-for-illuminance` | Luminaire Mounting Height for a Target Illuminance | IES Lighting Handbook (point method, ...; angle 0: h = sqrt(1000 x cos(0)^3 / 10) = 10.0 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lux-to-footcandle` | Lux / Footcandle Converter and Lumen Method | IES Lighting Handbook (lumen method) ...; convert mode: 100 fc -> 1076.4 lux (100 * 10.764) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4641,6 +4643,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1397. Fixture-covered or reference-cadence: 1397 / 1397.
+Tile count: 1398. Fixture-covered or reference-cadence: 1398 / 1398.
 
 <!-- END tile-index-v14 -->

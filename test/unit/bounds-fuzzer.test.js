@@ -27482,3 +27482,31 @@ test("bounds: spec-v948 computePulseFlowmeterRate pins the K-factor scaling and 
   assert.ok("error" in _v948({ frequency_hz: 100, k_factor_pulses_per_gal: 0 }));
   assert.ok("error" in _v948({ frequency_hz: Infinity, k_factor_pulses_per_gal: 200 }));
 });
+
+import { computeLoopVoltageBudget as _v949 } from "../../calc-lowvoltage.js";
+
+test("bounds: spec-v949 computeLoopVoltageBudget pins the max loop resistance, transmitter voltage, verdict, and error seams", () => {
+  const r = _v949({ supply_v: 24, transmitter_min_v: 10.5, load_resistance_ohms: 250, wire_resistance_ohms: 50 });
+  assert.ok(Math.abs(r.max_loop_resistance_ohms - 675) < 1e-9); // (24-10.5)/0.020
+  assert.ok(Math.abs(r.voltage_at_transmitter_v - 18) < 1e-9); // 24 - 0.020*300
+  assert.ok(Math.abs(r.margin_v - 7.5) < 1e-9);
+  assert.ok(Math.abs(r.headroom_ohms - 375) < 1e-9);
+  assert.equal(r.within_spec, true);
+  // A long run pushes total series resistance past the ceiling: the transmitter starves and it FAILS.
+  const bad = _v949({ supply_v: 24, transmitter_min_v: 10.5, load_resistance_ohms: 250, wire_resistance_ohms: 600 });
+  assert.ok(Math.abs(bad.voltage_at_transmitter_v - 7) < 1e-9);
+  assert.ok(Math.abs(bad.margin_v - -3.5) < 1e-9);
+  assert.equal(bad.within_spec, false);
+  // Right at the ceiling is exactly pass (margin 0).
+  const edge = _v949({ supply_v: 24, transmitter_min_v: 10.5, load_resistance_ohms: 675, wire_resistance_ohms: 0 });
+  assert.ok(Math.abs(edge.margin_v) < 1e-9);
+  assert.equal(edge.within_spec, true);
+  // A higher supply raises the ceiling.
+  assert.ok(_v949({ supply_v: 30, transmitter_min_v: 10.5, load_resistance_ohms: 250, wire_resistance_ohms: 50 }).max_loop_resistance_ohms > 675);
+  // Error seams: non-positive supply, transmitter min >= supply (no loop), negative load/wire, non-finite.
+  assert.ok("error" in _v949({ supply_v: 0, transmitter_min_v: 10.5, load_resistance_ohms: 250, wire_resistance_ohms: 50 }));
+  assert.ok("error" in _v949({ supply_v: 10, transmitter_min_v: 10.5, load_resistance_ohms: 250, wire_resistance_ohms: 50 }));
+  assert.ok("error" in _v949({ supply_v: 24, transmitter_min_v: 10.5, load_resistance_ohms: -1, wire_resistance_ohms: 50 }));
+  assert.ok("error" in _v949({ supply_v: 24, transmitter_min_v: 10.5, load_resistance_ohms: 250, wire_resistance_ohms: -1 }));
+  assert.ok("error" in _v949({ supply_v: Infinity, transmitter_min_v: 10.5, load_resistance_ohms: 250, wire_resistance_ohms: 50 }));
+});
