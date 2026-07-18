@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test: cross-module 8.34 lb/gal water-weight consistency (treatment vs disinfect); 2026-07-17
+
+- Shared-constant guard: recovers the 8.34 lb/gal water weight independently from treatment chemical-feed
+  (lb/day = MGD x dose x 8.34) and disinfect main-chlorine (lb = gal x dose x 8.34/1e6) and asserts both equal 8.34 and
+  agree -- a drift of the constant in either module is caught. Test-only.
+
 ### test(historical): guard percentile-band ordering and translation invariance; 2026-07-17
 
 - Statistics guards: percentiles are non-decreasing (p25 <= p50 <= p75 <= p90), lie within the data range, the median

@@ -12444,3 +12444,17 @@ test("statistics: percentile bands stay ordered, bounded, and translation-invari
   assert.ok(Math.abs(pb2.p50 - (pb.p50 + 100)) < 1e-9, "shifting all data by +100 must shift the median by +100");
   assert.ok(Math.abs(pb2.p25 - (pb.p25 + 100)) < 1e-9, "shifting all data by +100 must shift the 25th percentile by +100");
 });
+
+test("cross-module: the 8.34 lb/gal water constant agrees across treatment chemical-feed and disinfect main-chlorine (shared constant)", async () => {
+  const t = await import("../../calc-treatment.js");
+  const d = await import("../../calc-disinfect.js");
+  // Treatment feeds pounds/day = flow(MGD) * dose(mg/L) * 8.34; recover the embedded constant.
+  const cfp = t.computeChemicalFeedPump({ flow_mgd: 2, dose_mgl: 5, strength_pct: 100, sg: 1 });
+  const kTreatment = cfp.pure_lb_day / (2 * 5);
+  // Disinfect computes available chlorine = volume(gal) * dose(mg/L) * 8.34 / 1e6; recover the same constant.
+  const mc = d.computeMainDisinfectionChlorine({ diameter_in: 8, length_ft: 1000, dose_mg_l: 25, product_pct: 65 });
+  const kDisinfect = mc.available_cl_lb / (mc.volume_gal * 25 / 1e6);
+  assert.ok(Math.abs(kTreatment - 8.34) < 1e-6, "treatment chemical-feed must embed the 8.34 lb/gal water weight");
+  assert.ok(Math.abs(kDisinfect - 8.34) < 1e-6, "disinfect main-chlorine must embed the 8.34 lb/gal water weight");
+  assert.ok(Math.abs(kTreatment - kDisinfect) < 1e-6, "the two modules must use the identical water-weight constant (a drift in either is caught)");
+});
