@@ -11935,3 +11935,22 @@ test("monotonicity: cooling-tower heat rejection = gpm*500*range, rising with fl
   assert.ok(Math.abs(r.heat_rejection_BTU_hr - 600 * 500 * 10) < 1, "Q must equal gpm * 500 * range");
   assert.ok(Math.abs(r.range_F - 10) < 1e-9 && Math.abs(r.approach_F - 7) < 1e-9, "range = Tin - Tout, approach = Tout - Twb");
 });
+
+// Physical monotonicity of two water-treatment computes (public-health dosing /
+// process design). Chemical feed: pure chemical mass lb/day = MGD * mg/L * 8.34
+// rises with flow and dose, and the solution volume falls as product strength
+// rises. Clarifier surface overflow rate = flow / area rises with flow and falls
+// with surface area; solids loading rises with flow and MLSS. A wrong 8.34
+// constant or a term error is caught, invisible to the single pinned example.
+test("monotonicity: chemical-feed and clarifier-loading treatment computes respond correctly to their inputs", async () => {
+  const t = await import("../../calc-treatment.js");
+  const cf = (o) => t.computeChemicalFeedPump({ flow_mgd: 0.5, dose_mgl: 8, strength_pct: 12.5, sg: 1.16, pump_max_gpd: 50, ...o });
+  assert.ok(cf({ dose_mgl: 16 }).pure_lb_day > cf({}).pure_lb_day, "chemical mass must rise with dose");
+  assert.ok(cf({ flow_mgd: 1 }).pure_lb_day > cf({}).pure_lb_day, "chemical mass must rise with flow");
+  assert.ok(cf({ strength_pct: 25 }).solution_gpd < cf({}).solution_gpd, "solution volume must fall as product strength rises");
+  assert.ok(Math.abs(cf({}).pure_lb_day - 0.5 * 8 * 8.34) < 0.01, "pure lb/day must equal MGD * mg/L * 8.34");
+  const cl = (o) => t.computeClarifierSurfaceLoading({ flow_mgd: 1, surface_ft2: 1256.6, weir_len_ft: 125.7, mlss_mgl: 2500, ...o });
+  assert.ok(cl({ flow_mgd: 2 }).sor_gpd_ft2 > cl({}).sor_gpd_ft2, "surface overflow rate must rise with flow");
+  assert.ok(cl({ surface_ft2: 2000 }).sor_gpd_ft2 < cl({}).sor_gpd_ft2, "surface overflow rate must fall with surface area");
+  assert.ok(cl({ mlss_mgl: 4000 }).solids_lb_ft2_day > cl({}).solids_lb_ft2_day, "solids loading must rise with MLSS");
+});

@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(treatment): guard chemical-feed and clarifier-loading with monotonicity; 2026-07-17
+
+- Added whole-response guards on two water-treatment computes: pure chemical mass lb/day = MGD x mg/L x 8.34 rises with
+  flow and dose and the solution volume falls as product strength rises; clarifier surface overflow rate = flow / area
+  rises with flow and falls with surface area, and solids loading rises with MLSS. A wrong 8.34 constant or a term error
+  is caught, invisible to the pinned example. Test-only.
+
 ### test(hvac): guard cooling-tower heat rejection with flow/range monotonicity; 2026-07-17
 
 - Added a guard on computeCoolingTower: heat rejection Q = gpm x 500 x range rises with flow and as the range widens,
