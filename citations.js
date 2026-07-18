@@ -3832,7 +3832,7 @@ export const CITATIONS = {
     edition: "IPC 2021 §608.15.1 (air gaps) and ASME A112.1.2 (Air Gaps in Plumbing Systems) by name.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_DISCLOSURE + " IPC 608.15.1 sets the minimum air gap at twice the effective opening diameter (the diameter of the least cross-sectional area of the supply outlet), but never less than 1 in; within three effective-opening diameters of a wall the minimum is three times the opening (ASME A112.1.2 Table 1). The air gap is the vertical distance between the supply outlet and the flood-level rim of the fixture it discharges into and is the most positive cross-connection protection there is -- unlike a mechanical assembly it cannot fail or be defeated. This returns the minimum air gap for indirect-waste and tank-fill protection and checks a measured gap against it; the AHJ's adopted plumbing code governs.",
+    editionNote: IPC_DISCLOSURE + " IPC 608.15.1 sets the minimum air gap at twice the effective opening diameter (the diameter of the least cross-sectional area of the supply outlet), but never less than 1 in; within three effective-opening diameters of a wall the minimum is three times the opening and never less than 1.5 in for openings up to 1/2 in (ASME A112.1.2 Table 1). The air gap is the vertical distance between the supply outlet and the flood-level rim of the fixture it discharges into and is the most positive cross-connection protection there is -- unlike a mechanical assembly it cannot fail or be defeated. This returns the minimum air gap for indirect-waste and tank-fill protection and checks a measured gap against it; the AHJ's adopted plumbing code governs.",
     assumptions: [
       { name: "2x / 3x rule", value: "minimum = 2x the effective opening (1 in floor), or 3x within three diameters of a wall", source: "IPC 608.15.1 / ASME A112.1.2" },
       { name: "Effective opening", value: "the diameter of the least cross-sectional area of the supply outlet", source: "ASME A112.1.2" },
@@ -7278,7 +7278,7 @@ export const CITATIONS = {
     ],
   },
   "range-demand-220-55": {
-    formula: "demand_kw = ColumnC(num_ranges) x (1 + increase); increase = 0.05 x ceil(nameplate_kw - 12) for ranges over 12 kW, else 0; demand_a = demand_kw x 1000 / supply_v. Column C: 1->8, 2->11, 3->14, 4->17, 5->20 kW.",
+    formula: "demand_kw = ColumnC(num_ranges) x (1 + increase); increase = 0.05 x round(nameplate_kw - 12) for ranges over 12 kW, else 0 (Note 1 counts a kW 'or major fraction thereof' -- round-half-up, not ceil); demand_a = demand_kw x 1000 / supply_v. Column C: 1->8, 2->11, 3->14, 4->17, 5->20 kW.",
     edition: "Household electric ranges, wall ovens, and counter-mounted cooking units, NEC 2023 Table 220.55 Column C and Note 1, by name.",
     freeAccess: "NEC is free to read at nfpa.org/freeaccess. This is the common equal-rating Column C path with the Note 1 over-12 kW increase; Notes 2-4 (Columns A/B and unequal-rating averaging) govern the other cases.",
     governance: GOVERNANCE.electrical,
@@ -10042,7 +10042,7 @@ export const CITATIONS = {
     ],
   },
   "cable-tray-fill": {
-    formula: "NEC 392.22(A): cables 4/0 and larger, sum of diameters <= tray inside width; smaller cables, sum of cross-sectional areas <= the column-2 allowable (~1.167 * width ladder/ventilated, ~0.917 * width solid bottom); mixed loads reduce the smaller-cable allowance by the large-cable diameters.",
+    formula: "NEC 392.22(A): cables 4/0 and larger, sum of diameters <= tray inside width; smaller cables, sum of cross-sectional areas <= the column-2 allowable (~1.167 * width ladder/ventilated, ~0.917 * width solid bottom); mixed loads reduce the smaller-cable column-1 area by 1.2 * the sum of the 4/0-and-larger diameters (392.22(A)(1)(c), ladder/ventilated).",
     edition: "Cable-tray fill per NEC Article 392.22 (the sum-of-diameters rule for cables 4/0 and larger and the cross-sectional-area allowance for smaller cables), by name.",
     freeAccess: "NEC is free to read at nfpa.org/freeaccess. Ampacity derating for tray fill (392.80) is a separate check.",
     governance: GOVERNANCE.electrical,
