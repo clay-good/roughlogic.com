@@ -12269,3 +12269,16 @@ test("monotonicity: continuous-load OCPD sizing applies the 1.25 factor and pick
   assert.ok(cl({ l_cont_A: 200 }).ocpd_A >= cl({}).ocpd_A, "the standard OCPD rating must not shrink as the load grows");
   assert.strictEqual(cl({}).ocpd_A, 125, "80 A continuous + 20 A -> 120 A -> the next 240.6(A) size is 125 A");
 });
+
+test("geometry: conduit-offset bender multiplier is csc(angle), with mark spacing and shrink scaling correctly (fab)", async () => {
+  const f = await import("../../calc-fab.js");
+  const co = (o) => f.computeConduitOffset({ offset_in: 10, angle_deg: 30, ...o });
+  assert.ok(Math.abs(co({}).multiplier - 2) < 1e-9, "the 30-degree multiplier must be csc(30) = 2");
+  assert.ok(Math.abs(co({ angle_deg: 45 }).multiplier - Math.SQRT2) < 1e-9, "the 45-degree multiplier must be csc(45) = sqrt(2)");
+  assert.ok(Math.abs(co({}).mark_spacing_in - 10 * 2) < 1e-9, "mark spacing = offset * multiplier");
+  assert.ok(co({ angle_deg: 22.5 }).multiplier > co({}).multiplier, "a shallower bend must give a larger multiplier");
+  assert.ok(co({ angle_deg: 22.5 }).mark_spacing_in > co({}).mark_spacing_in, "a shallower bend must space the marks farther apart");
+  assert.ok(co({ offset_in: 20 }).mark_spacing_in > co({}).mark_spacing_in, "mark spacing must rise with offset depth");
+  assert.ok(co({ angle_deg: 45 }).shrink_in > co({}).shrink_in, "shrink must rise with bend angle");
+  assert.ok(Math.abs(co({}).shrink_in - 10 * Math.tan(15 * Math.PI / 180)) < 1e-9, "shrink = offset * tan(angle/2)");
+});

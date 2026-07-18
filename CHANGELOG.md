@@ -4,6 +4,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(fab): guard conduit-offset bender multiplier against csc geometry; 2026-07-17
+
+- Geometry guards: the offset multiplier is csc(angle) (2 at 30 deg, sqrt(2) at 45 deg), mark spacing = offset x
+  multiplier rises with offset and as the bend shallows, and shrink = offset x tan(angle/2) rises with angle. Test-only.
+
 ### test(feeder): guard continuous-load OCPD sizing with monotonicity; 2026-07-17
 
 - Whole-response guards: A_min = 1.25 x continuous + noncontinuous (NEC 210.20(A)/215.3) rises with both loads, a
