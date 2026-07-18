@@ -985,6 +985,7 @@ export const COMPUTE_MAP = {
   "roller-chain-length": { module: "../../calc-shop.js", fn: "computeRollerChainLength" },
   "sprocket-pitch-diameter": { module: "../../calc-shop.js", fn: "computeSprocketPitchDiameter" },
   "coil-length": { module: "../../calc-fab.js", fn: "computeCoilLength" },
+  "barstock-cutlist": { module: "../../calc-fab.js", fn: "computeBarstockCutlist" },
   "asce-live-load-reduction": { module: "../../calc-construction.js", fn: "computeAsceLiveLoadReduction" },
   "awg-wire-geometry": { module: "../../calc-electrical.js", fn: "computeAwgWireGeometry" },
   "tailstock-setover": { module: "../../calc-shop.js", fn: "computeTailstockSetover" },

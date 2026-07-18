@@ -1999,6 +1999,7 @@ cross-check.
 | calc-electrical.js | `renderVoltageDropReactance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-electrical.js | `renderVoltageImbalance` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-electrical.js | `renderWireAmpacity` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
+| calc-fab.js | `computeBarstockCutlist` | `{ stock_length_in = 240, piece_length_in = 14.5, kerf_in = 0.125, pieces_need...` | _ | _ | _ |
 | calc-fab.js | `computeCoilLength` | `{ outside_diameter_in = 0, inside_diameter_in = 0, material_thickness_in = 0 ...` | _ | _ | _ |
 | calc-fab.js | `computeConduit90Stub` | `{ mode = "stub-up", height_in = 0, deduct_in = 0, back_to_back_in = 0, radius...` | _ | _ | _ |
 | calc-fab.js | `computeConduitOffset` | `{ offset_in = 0, angle_deg = 0 } = {}` | _ | _ | _ |
@@ -3018,7 +3019,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1604.
+Row count: 1605.
 
 <!-- END function-corpus-v14 -->
 
@@ -3581,7 +3582,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (348 tiles)
+### Group E Construction (349 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3602,6 +3603,7 @@ per spec-v14 §13.1 second paragraph.
 | `atterberg-indices` | Atterberg Plasticity Indices and A-Line Classification | Atterberg limits / USCS A-line; spec-v328 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `attic-ventilation` | Attic Ventilation Net Free Area | IRC R806 attic-ventilation rule; spec-v98 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `baluster-picket-count` | Guard Baluster / Picket Count (4-in Sphere Rule) | Guard baluster spacing (IRC 4 in sphe...; pickets = ceil((96-4)/(1.5+4)) = ceil(16.7) = 17; gaps = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `barstock-cutlist` | Bar / Tube Stock Cut List Yield | linear cut-list yield identity (first...; pieces = floor((240+0.125)/(14.5+0.125)) = 16; drop = 240... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `baseplate-grout-volume` | Non-Shrink Grout Volume Under a Base Plate | Base-plate grout-volume identity (fir...; grout = (324-64)*1.5 = 390 in^3; ft^3 = 390/1728*1.10 = 0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `beam-loading` | Beam Loading | Project (first-principles); 200 plf / 12 ft / E = 1.6e6 psi / 4x10 -> M = 3600 lb-ft,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `beam-reactions` | Simple-Span Beam Reactions and Max Moment | Statics / AISC simple-beam diagrams; L 16 ft, w 200 plf -> R 1600 lb, M_max 6400 ft-lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4561,6 +4563,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1357. Fixture-covered or reference-cadence: 1357 / 1357.
+Tile count: 1358. Fixture-covered or reference-cadence: 1358 / 1358.
 
 <!-- END tile-index-v14 -->

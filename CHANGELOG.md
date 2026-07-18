@@ -4,7 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
-### test(cross-tile): pin forward/inverse round-trip agreement for three unprotected pairs; 2026-07-18
+### feat(fab): add barstock-cutlist tile (spec-v909); 2026-07-18
+
+- New Group E tile `barstock-cutlist` (Bar / Tube Stock Cut List Yield) in calc-fab.js, beside coil-length. Turns a
+  stock length, cut piece length, saw kerf, and quantity into pieces per stick, drop per stick, sticks to buy, and the
+  material yield: pieces_per_stick = floor((stock + kerf)/(piece + kerf)) (N pieces take N-1 internal saw cuts), drop =
+  stock - [pieces x piece + (pieces-1) x kerf], sticks = ceil(needed / per_stick). A 20 ft stick cut into 14.5 in pieces
+  at a 1/8 in kerf yields 16 per stick with a 6.13 in drop, so 100 pieces take 7 sticks at 86.3% yield; a 24 ft stick
+  into 40 in pieces yields 7. Single-length model, no mixed nesting or end trim; the cut list and saw govern. Home tile
+  count 1,357 -> 1,358.
 
 - Two of this session's formula bugs (refrigerant-pt target superheat, voltage-imbalance derate) were two
   computations of the same physical quantity that silently disagreed. The subagent audit confirmed many forward/inverse

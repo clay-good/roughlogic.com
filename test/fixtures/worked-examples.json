@@ -34392,6 +34392,76 @@
    }
   },
   {
+   "tile_id": "barstock-cutlist",
+   "source_publisher": "linear cut-list yield identity (first-principles)",
+   "source_title": "20 ft (240 in) stick, 14.5 in pieces, 1/8 in kerf, 100 pieces -> 16 per stick, 6.13 in drop, 7 sticks",
+   "source_edition_or_year": "spec-v909 worked example (machine-verified)",
+   "source_section_or_page": "pieces = floor((240+0.125)/(14.5+0.125)) = 16; drop = 240 - (16*14.5 + 15*0.125) = 6.125; sticks = ceil(100/16) = 7",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "stock_length_in": 240,
+    "piece_length_in": 14.5,
+    "kerf_in": 0.125,
+    "pieces_needed": 100
+   },
+   "outputs": {
+    "pieces_per_stick": {
+     "value": 16,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "drop_per_stick_in": {
+     "value": 6.125,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "sticks_needed": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "barstock-cutlist",
+   "source_publisher": "linear cut-list yield identity (first-principles)",
+   "source_title": "cross-check: 24 ft (288 in) stick, 40 in pieces, 1/16 in kerf, 50 pieces -> 7 per stick, 7.63 in drop, 8 sticks",
+   "source_edition_or_year": "spec-v909 worked example (machine-verified)",
+   "source_section_or_page": "pieces = floor((288+0.0625)/(40+0.0625)) = 7; drop = 288 - (7*40 + 6*0.0625) = 7.625; sticks = ceil(50/7) = 8",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "stock_length_in": 288,
+    "piece_length_in": 40,
+    "kerf_in": 0.0625,
+    "pieces_needed": 50
+   },
+   "outputs": {
+    "pieces_per_stick": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "drop_per_stick_in": {
+     "value": 7.625,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "sticks_needed": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "asce-live-load-reduction",
    "source_publisher": "ASCE 7 minimum design loads",
    "source_title": "50 psf office live load, interior column (KLL 4), 400 ft2 tributary, one floor -> 31.25 psf (37.5% reduction)",

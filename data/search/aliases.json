@@ -1012,6 +1012,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "bar stock cut list",
+      "target": "barstock-cutlist",
+      "kind": "industry"
+    },
+    {
+      "term": "cut list yield",
+      "target": "barstock-cutlist",
+      "kind": "industry"
+    },
+    {
+      "term": "pieces per stick",
+      "target": "barstock-cutlist",
+      "kind": "industry"
+    },
+    {
+      "term": "saw kerf yield",
+      "target": "barstock-cutlist",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how many sticks to buy",
+      "target": "barstock-cutlist",
+      "kind": "adjacent"
+    },
+    {
       "term": "live load reduction",
       "target": "asce-live-load-reduction",
       "kind": "industry"

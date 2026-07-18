@@ -770,6 +770,8 @@ const TOOL_MODULES = (() => {
     "weld-dilution", "weld-passes-arc-time", "weld-travel-speed",
     // spec-v802 coil / roll stock length (group E)
     "coil-length",
+    // spec-v909 bar / tube stock cut list yield (group E)
+    "barstock-cutlist",
   ]);
   // Group G (cont.): the layout & shop-geometry bench, split out of
   // calc-fab.js into calc-layout.js (spec-v56) once calc-fab hit 96% of its

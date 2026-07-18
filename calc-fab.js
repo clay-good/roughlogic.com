@@ -1399,3 +1399,64 @@ function _v802renderCoilLength(inputRegion, outputRegion, citationEl) {
   for (const f of [od, id, t]) f.input.addEventListener("input", update);
 }
 FAB_RENDERERS["coil-length"] = _v802renderCoilLength;
+
+// ===================== spec-v909: bar / tube stock cut list yield =====================
+// dims: in { stock_length_in: L, piece_length_in: L, kerf_in: L, pieces_needed: dimensionless } out: { pieces_per_stick: dimensionless, drop_per_stick_in: L, sticks_needed: dimensionless, total_stock_in: L, yield_pct: dimensionless }
+export function computeBarstockCutlist({ stock_length_in = 240, piece_length_in = 14.5, kerf_in = 0.125, pieces_needed = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(stock_length_in > 0)) return { error: "Stock length must be positive (in)." };
+  if (!(piece_length_in > 0)) return { error: "Piece length must be positive (in)." };
+  if (kerf_in < 0) return { error: "Kerf cannot be negative (in)." };
+  if (!(pieces_needed > 0)) return { error: "Pieces needed must be positive." };
+  // N pieces from one stick take N-1 internal saw cuts, so N pieces + (N-1) kerfs must fit:
+  // N (piece + kerf) - kerf <= stock, i.e. N <= (stock + kerf) / (piece + kerf).
+  const pieces_per_stick = Math.floor((stock_length_in + kerf_in) / (piece_length_in + kerf_in));
+  if (pieces_per_stick < 1) return { error: "Piece plus kerf is longer than the stock: no piece fits." };
+  const material_per_stick = pieces_per_stick * piece_length_in + (pieces_per_stick - 1) * kerf_in;
+  const drop_per_stick_in = stock_length_in - material_per_stick;
+  const sticks_needed = Math.ceil(pieces_needed / pieces_per_stick);
+  const total_stock_in = sticks_needed * stock_length_in;
+  const yield_pct = (pieces_needed * piece_length_in) / total_stock_in * 100;
+  if (![pieces_per_stick, drop_per_stick_in, sticks_needed, total_stock_in, yield_pct].every(Number.isFinite)) return { error: "Cut-list math is not a finite value." };
+  return {
+    pieces_per_stick,
+    drop_per_stick_in,
+    sticks_needed,
+    total_stock_in,
+    yield_pct,
+    note: "N pieces per stick take N-1 internal saw cuts (one kerf between pieces); the drop is the usable remnant left on each stick. Mixed-length nesting, end trim, and clamping loss are not modeled; the cut list and saw govern. A material-ordering estimate.",
+  };
+}
+
+export const barstockCutlistExample = { inputs: { stock_length_in: 240, piece_length_in: 14.5, kerf_in: 0.125, pieces_needed: 100 } };
+
+function _v909renderBarstockCutlist(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: cut-list yield identity by name. pieces per stick = floor( (stock + kerf) / (piece + kerf) ); drop = stock - [pieces x piece + (pieces - 1) x kerf]; sticks = ceil(pieces needed / pieces per stick). N pieces take N-1 internal saw cuts.";
+  const sl = makeNumber("Stock length (in)", "bcl-sl", { step: "any", min: "0", value: "240" });
+  sl.input.value = "240";
+  const pl = makeNumber("Cut piece length (in)", "bcl-pl", { step: "any", min: "0", value: "14.5" });
+  pl.input.value = "14.5";
+  const kf = makeNumber("Saw kerf (in)", "bcl-kf", { step: "any", min: "0", value: "0.125" });
+  kf.input.value = "0.125";
+  const pn = makeNumber("Pieces needed", "bcl-pn", { step: "1", min: "0", value: "100" });
+  pn.input.value = "100";
+  for (const f of [sl, pl, kf, pn]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sl.input.value = "240"; pl.input.value = "14.5"; kf.input.value = "0.125"; pn.input.value = "100"; update(); });
+  const oPer = makeOutputLine(outputRegion, "Pieces per stick", "bcl-out-per");
+  const oSticks = makeOutputLine(outputRegion, "Sticks to buy", "bcl-out-sticks");
+  const oDrop = makeOutputLine(outputRegion, "Drop per stick", "bcl-out-drop");
+  const oYield = makeOutputLine(outputRegion, "Material yield", "bcl-out-yield");
+  const update = debounce(() => {
+    const r = computeBarstockCutlist({
+      stock_length_in: sl.input.value === "" ? 240 : Number(sl.input.value), piece_length_in: pl.input.value === "" ? 14.5 : Number(pl.input.value),
+      kerf_in: kf.input.value === "" ? 0.125 : Number(kf.input.value), pieces_needed: pn.input.value === "" ? 100 : Number(pn.input.value),
+    });
+    if (r.error) { oPer.textContent = r.error; oSticks.textContent = "-"; oDrop.textContent = "-"; oYield.textContent = "-"; return; }
+    oPer.textContent = fmt(r.pieces_per_stick, 0) + " per stick";
+    oSticks.textContent = fmt(r.sticks_needed, 0) + " sticks";
+    oDrop.textContent = fmt(r.drop_per_stick_in, 2) + " in";
+    oYield.textContent = fmt(r.yield_pct, 1) + "%";
+  }, DEBOUNCE_MS);
+  for (const f of [sl, pl, kf, pn]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["barstock-cutlist"] = _v909renderBarstockCutlist;

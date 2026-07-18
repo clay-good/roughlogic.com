@@ -9797,6 +9797,18 @@ export const CITATIONS = {
       { name: "Usable length", value: "the last wrap and core stub trim the usable length slightly", source: "shop practice" },
     ],
   },
+  "barstock-cutlist": {
+    formula: "pieces_per_stick = floor( (stock_length + kerf) / (piece_length + kerf) ); drop = stock_length - [pieces_per_stick x piece_length + (pieces_per_stick - 1) x kerf]; sticks = ceil(pieces_needed / pieces_per_stick); yield% = pieces_needed x piece_length / (sticks x stock_length) x 100.",
+    edition: "Linear cut-list yield identity, first-principles; the stock length, cut length, saw kerf, and quantity come from the job.",
+    freeAccess: "The cut-list arithmetic is public first-principles (a linear packing count with a saw kerf between pieces); the stock length, piece length, kerf, and quantity come from the cut list and the saw.",
+    governance: GOVERNANCE.general,
+    editionNote: "Bar / tube / angle stock cut-list yield. Fitting N pieces on one stick takes N-1 internal saw cuts, so N pieces and (N-1) kerfs must fit the stock: pieces_per_stick = floor( (stock + kerf) / (piece + kerf) ). The drop is the usable remnant left on each stick, and the sticks to buy are ceil(pieces_needed / pieces_per_stick). This is a single-length (no mixed nesting) model that ignores end trim, facing, and clamping loss; the actual cut list and saw govern. A material-ordering estimate.",
+    assumptions: [
+      { name: "One kerf between pieces", value: "N pieces take N-1 internal saw cuts; each cut removes one kerf width", source: "shop practice" },
+      { name: "Single length", value: "every piece is the same length; mixed-length nesting is not modeled", source: "scope of this tile" },
+      { name: "No end allowance", value: "stock end trim, facing, and clamping loss are not deducted", source: "scope of this tile" },
+    ],
+  },
   "weld-dilution": {
     formula: "dilution = A_base / (A_base + A_filler) x 100; filler_share = 100 - dilution.",
     edition: "The standard welding-metallurgy weld-dilution definition, by name.",

@@ -26722,3 +26722,26 @@ test("bounds: spec-v908 computeSmokeDetectorSpacingCount pins the grid, detector
   assert.ok("error" in _v908({ room_length_ft: 60, room_width_ft: 40, listed_spacing_ft: 0 }));
   assert.ok("error" in _v908({ room_length_ft: Infinity, room_width_ft: 40, listed_spacing_ft: 30 }));
 });
+
+import { computeBarstockCutlist as _v909 } from "../../calc-fab.js";
+
+test("bounds: spec-v909 computeBarstockCutlist pins the yield, drop, stick count, and error seams", () => {
+  const r = _v909({ stock_length_in: 240, piece_length_in: 14.5, kerf_in: 0.125, pieces_needed: 100 });
+  assert.equal(r.pieces_per_stick, 16); // floor((240+0.125)/(14.5+0.125))
+  assert.ok(Math.abs(r.drop_per_stick_in - 6.125) < 1e-9); // 240 - (16*14.5 + 15*0.125)
+  assert.equal(r.sticks_needed, 7); // ceil(100/16)
+  assert.equal(r.total_stock_in, 1680); // 7 * 240
+  assert.ok(Math.abs(r.yield_pct - 86.30952380952381) < 1e-6); // 100*14.5/1680*100
+  // Cross-check: N-1 kerf model, a longer piece on a longer stick.
+  const b = _v909({ stock_length_in: 288, piece_length_in: 40, kerf_in: 0.0625, pieces_needed: 50 });
+  assert.equal(b.pieces_per_stick, 7); // floor((288+0.0625)/40.0625)
+  assert.ok(Math.abs(b.drop_per_stick_in - 7.625) < 1e-9); // 288 - (7*40 + 6*0.0625)
+  assert.equal(b.sticks_needed, 8); // ceil(50/7)
+  // Error seams: non-positive stock / piece / pieces, negative kerf, piece longer than stock, non-finite.
+  assert.ok("error" in _v909({ stock_length_in: 0, piece_length_in: 14.5, kerf_in: 0.125, pieces_needed: 100 }));
+  assert.ok("error" in _v909({ stock_length_in: 240, piece_length_in: 0, kerf_in: 0.125, pieces_needed: 100 }));
+  assert.ok("error" in _v909({ stock_length_in: 240, piece_length_in: 14.5, kerf_in: -0.1, pieces_needed: 100 }));
+  assert.ok("error" in _v909({ stock_length_in: 240, piece_length_in: 14.5, kerf_in: 0.125, pieces_needed: 0 }));
+  assert.ok("error" in _v909({ stock_length_in: 100, piece_length_in: 120, kerf_in: 0.125, pieces_needed: 10 }));
+  assert.ok("error" in _v909({ stock_length_in: Infinity, piece_length_in: 14.5, kerf_in: 0.125, pieces_needed: 100 }));
+});
