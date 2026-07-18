@@ -27549,3 +27549,26 @@ test("bounds: spec-v951 computeSoilResistivityWenner pins rho = 2 pi a R and err
   assert.ok("error" in _v951({ probe_spacing_ft: 10, meter_resistance_ohm: 0 }));
   assert.ok("error" in _v951({ probe_spacing_ft: Infinity, meter_resistance_ohm: 5 }));
 });
+
+import { computeTaylorToolLife as _v952 } from "../../calc-machining.js";
+
+test("bounds: spec-v952 computeTaylorToolLife pins V x T^n = C both directions and error seams", () => {
+  const r = _v952({ taylor_c: 300, taylor_n: 0.2, cutting_speed_sfm: 200, target_life_min: 15 });
+  assert.ok(Math.abs(r.tool_life_min - 7.59375) < 1e-4); // (300/200)^5
+  assert.ok(Math.abs(r.speed_for_target_life_sfm - 174.543) < 0.05); // 300/15^0.2
+  // Cutting at C gives exactly 1-minute life; the round-trip is consistent.
+  assert.ok(Math.abs(_v952({ taylor_c: 300, taylor_n: 0.2, cutting_speed_sfm: 300, target_life_min: 15 }).tool_life_min - 1) < 1e-9);
+  // Faster speed -> shorter life (monotone decreasing).
+  assert.ok(_v952({ taylor_c: 300, taylor_n: 0.2, cutting_speed_sfm: 250, target_life_min: 15 }).tool_life_min <
+            _v952({ taylor_c: 300, taylor_n: 0.2, cutting_speed_sfm: 150, target_life_min: 15 }).tool_life_min);
+  // The speed-for-target-life inverts the life relation: at that speed, life equals the target.
+  const s = r.speed_for_target_life_sfm;
+  const back = _v952({ taylor_c: 300, taylor_n: 0.2, cutting_speed_sfm: s, target_life_min: 15 });
+  assert.ok(Math.abs(back.tool_life_min - 15) < 1e-6);
+  // Error seams: non-positive C / n / speed / target life, non-finite.
+  assert.ok("error" in _v952({ taylor_c: 0, taylor_n: 0.2, cutting_speed_sfm: 200, target_life_min: 15 }));
+  assert.ok("error" in _v952({ taylor_c: 300, taylor_n: 0, cutting_speed_sfm: 200, target_life_min: 15 }));
+  assert.ok("error" in _v952({ taylor_c: 300, taylor_n: 0.2, cutting_speed_sfm: 0, target_life_min: 15 }));
+  assert.ok("error" in _v952({ taylor_c: 300, taylor_n: 0.2, cutting_speed_sfm: 200, target_life_min: 0 }));
+  assert.ok("error" in _v952({ taylor_c: Infinity, taylor_n: 0.2, cutting_speed_sfm: 200, target_life_min: 15 }));
+});

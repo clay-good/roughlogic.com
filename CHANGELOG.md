@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(machining): add taylor-tool-life tile (spec-v952); 2026-07-18
+
+- New Group K tile `taylor-tool-life` (Taylor Tool-Life vs Cutting Speed) in calc-machining.js. The V x T^n = C relation:
+  tool life T = (C/V)^(1/n) minutes, and the speed for a target life V = C / T^n. C = sfm for a 1-min life, n = tool
+  exponent (~0.1-0.15 HSS, 0.2-0.4 carbide). C=300, n=0.2 at 200 sfm = 7.6 min; 174 sfm stretches it to 15 min (a 13%
+  speed cut roughly doubles the life). Base form (no feed/depth term); the insert maker's data governs. Home count
+  1,400 -> 1,401.
+
 ### feat(electrical): add soil-resistivity-wenner tile (spec-v951); 2026-07-18
 
 - New Group A tile `soil-resistivity-wenner` (Wenner 4-Pin Soil Resistivity) in calc-electrical.js. The field test behind

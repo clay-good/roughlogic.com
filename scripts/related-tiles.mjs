@@ -170,6 +170,7 @@ const RELATED = {
   "knurl-blank-diameter": ["cutting-speed-rpm", "tap-drill-size", "decimal-to-fraction"],
   "grinding-wheel-rpm": ["cutting-speed-rpm", "gear-mph-rpm", "hp-from-torque"],
   "reaming-drill-allowance": ["tap-drill-size", "drill-point-depth", "cutting-speed-rpm"],
+  "taylor-tool-life": ["cutting-speed-rpm", "cutting-diameter-for-rpm", "tap-drill-size"],
   "cutting-diameter-for-rpm": ["cutting-speed-rpm", "drill-point-depth", "drill-point-angle-from-length"],
   "drill-point-depth": ["cutting-speed-rpm", "bolt-circle", "decimal-to-fraction"],
   "drill-point-angle-from-length": ["drill-point-depth", "cutting-speed-rpm", "countersink-depth"],

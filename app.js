@@ -926,6 +926,7 @@ const TOOL_MODULES = (() => {
     "grinding-wheel-rpm",
     // spec-v917 reaming prebore (drill) allowance
     "reaming-drill-allowance",
+    "taylor-tool-life",
     // v100 cutting-fluid concentration
     "cutting-fluid-concentration",
     // v135 cutting power and spindle torque from MRR

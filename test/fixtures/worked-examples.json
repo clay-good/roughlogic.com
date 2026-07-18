@@ -34440,6 +34440,58 @@
    }
   },
   {
+   "tile_id": "taylor-tool-life",
+   "source_publisher": "Taylor tool-life equation (F.W. Taylor)",
+   "source_title": "C=300, n=0.2, cutting at 200 sfm -> 7.59 min life; 174.5 sfm for a 15-min life",
+   "source_edition_or_year": "spec-v952 worked example (machine-verified)",
+   "source_section_or_page": "T = (300/200)^(1/0.2) = 1.5^5 = 7.594 min; V = 300/15^0.2 = 300/1.71883 = 174.54 sfm",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "taylor_c": 300,
+    "taylor_n": 0.2,
+    "cutting_speed_sfm": 200,
+    "target_life_min": 15
+   },
+   "outputs": {
+    "tool_life_min": {
+     "value": 7.594,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "speed_for_target_life_sfm": {
+     "value": 174.5,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "taylor-tool-life",
+   "source_publisher": "Taylor tool-life equation (F.W. Taylor)",
+   "source_title": "cross-check: cutting at C (300 sfm) gives exactly the 1-minute reference life",
+   "source_edition_or_year": "spec-v952 worked example (machine-verified)",
+   "source_section_or_page": "T = (300/300)^(1/0.2) = 1^5 = 1.00 min (C is the 1-min-life speed by definition)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "taylor_c": 300,
+    "taylor_n": 0.2,
+    "cutting_speed_sfm": 300,
+    "target_life_min": 15
+   },
+   "outputs": {
+    "tool_life_min": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "grinding-wheel-rpm",
    "source_publisher": "grinding wheel surface-speed identity (ANSI B7.1)",
    "source_title": "7 in wheel rated 6,500 SFPM on a 3,450 RPM grinder -> max 3,547 RPM, actual 6,322 SFPM, within rating",

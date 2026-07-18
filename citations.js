@@ -1009,6 +1009,18 @@ export const CITATIONS = {
     ],
   },
 
+  "taylor-tool-life": {
+    formula: "V x T^n = C, so tool life T = (C/V)^(1/n) minutes and the speed for a target life V = C / T^n. C = cutting speed (sfm) for a 1-minute life; n = tool-material exponent (~0.1-0.15 HSS, 0.2-0.4 carbide).",
+    edition: "Taylor tool-life equation (F.W. Taylor, 1907), by name; the extended form adds feed and depth terms. The insert manufacturer's data and the tool/work/coolant combination govern.",
+    freeAccess: "The Taylor equation is public (a classic machining relation); C and n are the two tool-life constants for the specific tool/work pair, from the insert maker's data or a machining handbook, and the cutting speed is the user's choice.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Taylor tool-life equation V x T^n = C captures how a cutting tool's edge life falls as cutting speed rises. Solved for life, T = (C/V)^(1/n) minutes; solved for the speed that gives a chosen life, V = C / T^n. C is the intercept -- the cutting speed (surface feet per minute) that would wear the edge out in one minute (a large number) -- and n is the slope exponent set by the tool material: roughly 0.1 to 0.15 for high-speed steel, 0.2 to 0.4 for carbide, and higher for ceramics and CBN. Both come from the insert manufacturer's tool-life data or a machining handbook for the specific tool/work-material pair. Because n is small, tool life is extremely sensitive to speed: with C = 300 and n = 0.2, cutting at 200 sfm gives (300/200)^5 = 7.6 minutes of life, while backing off to 174 sfm stretches it to 15 minutes -- a 13% speed reduction roughly doubles the life, which is the calculation a shop uses to balance cycle time against insert cost and tool-change downtime. This base (one-variable) form holds feed and depth of cut fixed; the extended Taylor equation V x T^n x f^a x d^b = C accounts for those, and the insert manufacturer's data, the machine rigidity, and the actual tool/work/coolant combination govern the real edge life.",
+    assumptions: [
+      { name: "Taylor equation", value: "V x T^n = C; T = (C/V)^(1/n), V = C/T^n; life very sensitive to speed because n is small", source: "F.W. Taylor / Machinery's Handbook" },
+      { name: "Constants C, n", value: "C = sfm for 1-min life, n = tool-material exponent (~0.1-0.15 HSS, 0.2-0.4 carbide); base form fixes feed and depth", source: "insert manufacturer data" },
+    ],
+  },
+
   "drill-point-depth": {
     formula: "point length = (diameter / 2) / tan(point angle / 2); tip (drill-to) depth = full-diameter depth + point length; a 118-degree point is about 0.3 * diameter.",
     edition: "Drill-point geometry; the 118 / 135-degree drill-point relation as in Machinery's Handbook (Industrial Press), by name; first-principles trigonometry.",

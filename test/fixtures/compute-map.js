@@ -89,6 +89,7 @@ export const COMPUTE_MAP = {
   "knurl-blank-diameter": { module: "../../calc-machining.js", fn: "computeKnurlBlankDiameter" },
   "grinding-wheel-rpm": { module: "../../calc-machining.js", fn: "computeGrindingWheelRpm" },
   "reaming-drill-allowance": { module: "../../calc-machining.js", fn: "computeReamingDrillAllowance" },
+  "taylor-tool-life": { module: "../../calc-machining.js", fn: "computeTaylorToolLife" },
   "cutting-diameter-for-rpm": { module: "../../calc-machining.js", fn: "computeCuttingDiameterForRpm" },
   "drill-point-depth": { module: "../../calc-machining.js", fn: "computeDrillPointDepth" },
   "drill-point-angle-from-length": { module: "../../calc-machining.js", fn: "computeDrillPointAngleFromLength" },

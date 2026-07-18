@@ -1109,3 +1109,51 @@ function _v917renderReamingDrillAllowance(inputRegion, outputRegion, citationEl)
   for (const f of [rd, ov]) f.input.addEventListener("input", update);
 }
 MACHINING_RENDERERS["reaming-drill-allowance"] = _v917renderReamingDrillAllowance;
+
+// ===================== spec-v952: Taylor tool-life / cutting-speed trade-off =====================
+// dims: in { args: dimensionless } out: { tool_life_min: dimensionless, speed_for_target_life_sfm: dimensionless }
+export function computeTaylorToolLife({ taylor_c = 300, taylor_n = 0.2, cutting_speed_sfm = 200, target_life_min = 15 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(taylor_c > 0)) return { error: "Taylor constant C must be positive (sfm at 1-minute life)." };
+  if (!(taylor_n > 0)) return { error: "Taylor exponent n must be positive." };
+  if (!(cutting_speed_sfm > 0)) return { error: "Cutting speed must be positive (sfm)." };
+  if (!(target_life_min > 0)) return { error: "Target tool life must be positive (min)." };
+  // Taylor tool-life V x T^n = C, so life T = (C/V)^(1/n) and the speed for a target life V = C / T^n.
+  const tool_life_min = Math.pow(taylor_c / cutting_speed_sfm, 1 / taylor_n);
+  const speed_for_target_life_sfm = taylor_c / Math.pow(target_life_min, taylor_n);
+  if (![tool_life_min, speed_for_target_life_sfm].every(Number.isFinite)) return { error: "Taylor tool-life math is not a finite value." };
+  return {
+    tool_life_min,
+    speed_for_target_life_sfm,
+    note: "The Taylor tool-life relation V x T^n = C, the trade-off between cutting speed and how long the tool edge lasts: at a cutting speed V (surface feet per minute) the tool life is T = (C/V)^(1/n) minutes, and the speed that yields a chosen target life is V = C / T^n. C is the cutting speed that gives a 1-minute life (a large number) and n is the tool-material exponent -- about 0.1-0.15 for HSS, 0.2-0.4 for carbide, higher for ceramics -- both from the insert maker's data or a machining handbook for the specific tool/work pair. Because n is small, life is VERY sensitive to speed: with C = 300, n = 0.2, cutting at 200 sfm gives (300/200)^5 = 7.6 min, but easing to 174 sfm stretches it to 15 min -- a 13% speed cut roughly doubles the life. Run the numbers to balance cycle time against insert cost and downtime. The base form ignores feed and depth of cut (the extended Taylor equation adds those); the insert manufacturer's data, the machine, and the actual tool/work/coolant combination govern.",
+  };
+}
+
+export const taylorToolLifeExample = { inputs: { taylor_c: 300, taylor_n: 0.2, cutting_speed_sfm: 200, target_life_min: 15 } };
+
+function _v952renderTaylorToolLife(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Taylor tool-life equation V x T^n = C (F.W. Taylor), by name. Tool life T = (C/V)^(1/n); speed for a target life V = C / T^n. C = cutting speed (sfm) for 1-minute life, n = tool-material exponent (~0.1-0.15 HSS, 0.2-0.4 carbide). Base form (no feed/depth term); the insert maker's data and the tool/work/coolant combination govern.";
+  const cc = makeNumber("Taylor C (sfm at 1-min life)", "ttl-cc", { step: "any", min: "0", value: "300" });
+  cc.input.value = "300";
+  const nn = makeNumber("Taylor exponent n (~0.125 HSS, ~0.25 carbide)", "ttl-nn", { step: "any", min: "0", value: "0.2" });
+  nn.input.value = "0.2";
+  const vv = makeNumber("Cutting speed (sfm)", "ttl-vv", { step: "any", min: "0", value: "200" });
+  vv.input.value = "200";
+  const tl = makeNumber("Target tool life (min)", "ttl-tl", { step: "any", min: "0", value: "15" });
+  tl.input.value = "15";
+  for (const f of [cc, nn, vv, tl]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cc.input.value = "300"; nn.input.value = "0.2"; vv.input.value = "200"; tl.input.value = "15"; update(); });
+  const oLife = makeOutputLine(outputRegion, "Tool life at this speed", "ttl-out-l");
+  const oSpeed = makeOutputLine(outputRegion, "Speed for the target life", "ttl-out-s");
+  const update = debounce(() => {
+    const r = computeTaylorToolLife({
+      taylor_c: cc.input.value === "" ? 300 : Number(cc.input.value), taylor_n: nn.input.value === "" ? 0.2 : Number(nn.input.value),
+      cutting_speed_sfm: vv.input.value === "" ? 200 : Number(vv.input.value), target_life_min: tl.input.value === "" ? 15 : Number(tl.input.value),
+    });
+    if (r.error) { oLife.textContent = r.error; oSpeed.textContent = "-"; return; }
+    oLife.textContent = fmt(r.tool_life_min, 2) + " min at " + fmt(Number(vv.input.value) || 200, 0) + " sfm";
+    oSpeed.textContent = fmt(r.speed_for_target_life_sfm, 1) + " sfm for " + fmt(Number(tl.input.value) || 15, 0) + " min";
+  }, DEBOUNCE_MS);
+  for (const f of [cc, nn, vv, tl]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["taylor-tool-life"] = _v952renderTaylorToolLife;
