@@ -18407,6 +18407,31 @@
       "kind": "industry"
     },
     {
+      "term": "isolation joint filler",
+      "target": "concrete-isolation-joint",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete isolation joint",
+      "target": "concrete-isolation-joint",
+      "kind": "industry"
+    },
+    {
+      "term": "expansion joint filler",
+      "target": "concrete-isolation-joint",
+      "kind": "industry"
+    },
+    {
+      "term": "slab isolation joint",
+      "target": "concrete-isolation-joint",
+      "kind": "adjacent"
+    },
+    {
+      "term": "isolation joint takeoff",
+      "target": "concrete-isolation-joint",
+      "kind": "adjacent"
+    },
+    {
       "term": "control joint cut length",
       "target": "concrete-sawcut-footage",
       "kind": "industry"

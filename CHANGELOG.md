@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): add concrete-isolation-joint tile (spec-v921); 2026-07-18
+
+- New Group E tile `concrete-isolation-joint` (Concrete Isolation-Joint Filler Takeoff) in calc-concrete.js, beside
+  curing-compound-coverage. Pre-molded filler where a slab-on-grade abuts rigid elements: filler = 2 x (L + W) + columns
+  x column-perimeter; strips = ceil(filler / strip length). A 40 x 30 ft slab around six 12 in columns = 164 LF (140
+  perimeter + 24 columns), 17 ten-foot strips; a 50 x 40 ft slab with no columns = 180 LF. Distinct from the sawn control
+  joints (concrete-sawcut-footage). ACI 302 / ACI 360 and the structural detail govern. Home count 1,369 -> 1,370.
+
 ### feat(finish): add cement-board-takeoff tile (spec-v920); 2026-07-18
 
 - New Group E tile `cement-board-takeoff` (Cement Board (Tile Backer) Sheet and Screw Takeoff) in calc-finish.js, beside

@@ -34658,6 +34658,60 @@
    }
   },
   {
+   "tile_id": "concrete-isolation-joint",
+   "source_publisher": "isolation-joint filler takeoff (ACI 302 / 360)",
+   "source_title": "40 x 30 ft slab, six 12 in columns (4 ft perim), 10 ft strips -> 164 LF, 17 strips",
+   "source_edition_or_year": "spec-v921 worked example (machine-verified)",
+   "source_section_or_page": "perimeter = 2*(40+30) = 140; columns = 6*4 = 24; filler = 164; strips = ceil(164/10) = 17",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "slab_length_ft": 40,
+    "slab_width_ft": 30,
+    "num_columns": 6,
+    "column_perimeter_ft": 4,
+    "strip_length_ft": 10
+   },
+   "outputs": {
+    "filler_lf": {
+     "value": 164,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "strips": {
+     "value": 17,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-isolation-joint",
+   "source_publisher": "isolation-joint filler takeoff (ACI 302 / 360)",
+   "source_title": "cross-check: 50 x 40 ft slab, no interior columns -> 180 LF, 18 strips",
+   "source_edition_or_year": "spec-v921 worked example (machine-verified)",
+   "source_section_or_page": "perimeter = 2*(50+40) = 180; columns = 0; filler = 180; strips = ceil(180/10) = 18",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "slab_length_ft": 50,
+    "slab_width_ft": 40,
+    "num_columns": 0,
+    "column_perimeter_ft": 4,
+    "strip_length_ft": 10
+   },
+   "outputs": {
+    "filler_lf": {
+     "value": 180,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "curing-compound-coverage",
    "source_publisher": "liquid membrane cure coverage (ASTM C309)",
    "source_title": "2,500 sf slab, 1 coat, 200 sf/gal -> 13 gal, 3 pails",

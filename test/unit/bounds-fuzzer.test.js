@@ -26814,6 +26814,26 @@ test("bounds: spec-v919 computeBrickVeneerWeepCount pins the weep count, flashin
   assert.ok("error" in _v919({ wall_length_ft: Infinity, max_spacing_in: 33, flashing_lines: 1 }));
 });
 
+import { computeConcreteIsolationJoint as _v921 } from "../../calc-concrete.js";
+
+test("bounds: spec-v921 computeConcreteIsolationJoint pins the filler LF, strips, and error seams", () => {
+  const r = _v921({ slab_length_ft: 40, slab_width_ft: 30, num_columns: 6, column_perimeter_ft: 4, strip_length_ft: 10 });
+  assert.equal(r.slab_perimeter_ft, 140); // 2*(40+30)
+  assert.equal(r.column_isolation_ft, 24); // 6*4
+  assert.equal(r.filler_lf, 164); // 140 + 24
+  assert.equal(r.strips, 17); // ceil(164/10)
+  // No interior columns.
+  const n = _v921({ slab_length_ft: 50, slab_width_ft: 40, num_columns: 0, column_perimeter_ft: 4, strip_length_ft: 10 });
+  assert.equal(n.filler_lf, 180); // 2*(50+40)
+  assert.equal(n.strips, 18);
+  // Error seams: non-positive slab dims / strip length, negative columns / column perimeter, non-finite.
+  assert.ok("error" in _v921({ slab_length_ft: 0, slab_width_ft: 30 }));
+  assert.ok("error" in _v921({ slab_length_ft: 40, slab_width_ft: 0 }));
+  assert.ok("error" in _v921({ slab_length_ft: 40, slab_width_ft: 30, num_columns: -1 }));
+  assert.ok("error" in _v921({ slab_length_ft: 40, slab_width_ft: 30, strip_length_ft: 0 }));
+  assert.ok("error" in _v921({ slab_length_ft: Infinity, slab_width_ft: 30 }));
+});
+
 import { computeCuringCompoundCoverage as _v918 } from "../../calc-concrete.js";
 
 test("bounds: spec-v918 computeCuringCompoundCoverage pins the gallons, pails, waste, and error seams", () => {

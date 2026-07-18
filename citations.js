@@ -8233,6 +8233,17 @@ export const CITATIONS = {
       { name: "Timing and type", value: "apply after the surface sheen leaves; Type 1-D dissipating or Type 2 white-pigmented per the job", source: "ASTM C309" },
     ],
   },
+  "concrete-isolation-joint": {
+    formula: "slab_perimeter_ft = 2 x (slab_length_ft + slab_width_ft); column_isolation_ft = round(num_columns) x column_perimeter_ft; filler_lf = slab_perimeter_ft + column_isolation_ft; strips = ceil(filler_lf / strip_length_ft).",
+    edition: "ACI 302 (Guide for Concrete Floor and Slab Construction) and ACI 360 (Design of Slabs-on-Ground) isolation-joint practice, by name; the structural detail governs the joint locations.",
+    freeAccess: "The takeoff arithmetic is public first-principles (perimeter plus column perimeters over strip length); the joint locations and the 1/2 in filler type come from the ACI 302 / 360 slab-on-grade detail.",
+    governance: GOVERNANCE.general,
+    editionNote: "Pre-molded isolation-joint (expansion-joint) filler, usually a 1/2 in asphalt-impregnated fiber or foam strip, wraps a slab-on-grade wherever it abuts a rigid element so the slab moves independently: the slab perimeter against walls and footings, plus the full perimeter of each column, pier, or equipment pad the slab surrounds. filler = 2 x (L + W) + columns x column-perimeter; strips = ceil(filler / strip length). This is DISTINCT from the sawn control joints (concrete-sawcut-footage), which relieve drying shrinkage within the slab field -- an isolation joint separates dissimilar or restrained elements, a control joint makes a weakened plane for a crack to follow. The structural and slab-on-grade details (ACI 302 / ACI 360) govern where the isolation joints go and the filler type.",
+    assumptions: [
+      { name: "Isolation locations", value: "slab perimeter at walls/footings plus the full perimeter of each column/pier/pad the slab surrounds", source: "ACI 302 / ACI 360" },
+      { name: "Distinct from control joints", value: "isolation separates restrained elements; control (sawn) joints relieve shrinkage within the field", source: "ACI 302" },
+    ],
+  },
   "joist-hanger-count": {
     formula: "joists = ceil(run_width_ft x 12 / spacing_in) + 1; hangers = joists x ends_per_joist; hanger_nails = hangers x nails_per_hanger.",
     edition: "Joist-hanger count identity by name (joists across the run, hangers on the hung ends, filled holes); first-principles count arithmetic.",

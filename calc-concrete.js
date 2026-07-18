@@ -1471,3 +1471,45 @@ CONCRETE_RENDERERS["curing-compound-coverage"] = _simpleRenderer({
   ],
   compute: computeCuringCompoundCoverage,
 });
+
+// ===================== spec-v921: concrete isolation-joint filler takeoff =====================
+// dims: in { slab_length_ft: L, slab_width_ft: L, num_columns: dimensionless, column_perimeter_ft: L, strip_length_ft: L } out: { slab_perimeter_ft: L, column_isolation_ft: L, filler_lf: L, strips: dimensionless }
+export function computeConcreteIsolationJoint({ slab_length_ft = 40, slab_width_ft = 30, num_columns = 6, column_perimeter_ft = 4, strip_length_ft = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(slab_length_ft > 0)) return { error: "Slab length must be positive (ft)." };
+  if (!(slab_width_ft > 0)) return { error: "Slab width must be positive (ft)." };
+  if (num_columns < 0) return { error: "Column count cannot be negative." };
+  if (column_perimeter_ft < 0) return { error: "Column perimeter cannot be negative (ft)." };
+  if (!(strip_length_ft > 0)) return { error: "Strip length must be positive (ft)." };
+  const slab_perimeter_ft = 2 * (slab_length_ft + slab_width_ft);
+  const column_isolation_ft = Math.round(num_columns) * column_perimeter_ft;
+  const filler_lf = slab_perimeter_ft + column_isolation_ft;
+  const strips = Math.ceil(filler_lf / strip_length_ft);
+  if (![slab_perimeter_ft, column_isolation_ft, filler_lf, strips].every(Number.isFinite)) return { error: "Isolation-joint math is not a finite value." };
+  return {
+    slab_perimeter_ft,
+    column_isolation_ft,
+    filler_lf,
+    strips,
+    note: "Pre-molded isolation-joint filler (usually 1/2 in fiber or foam) wraps a slab-on-grade wherever it abuts a rigid element so the slab can move independently: the slab perimeter against walls and footings, plus the full perimeter of each column, pier, or equipment pad it surrounds. filler = 2 x (L + W) + columns x column-perimeter; strips = ceil(filler / strip length). A 40 x 30 ft slab around six 12 in columns is 164 LF, 17 ten-foot strips. This is distinct from the sawn CONTROL joints (concrete-sawcut-footage), which relieve shrinkage within the slab. The structural and slab-on-grade details (ACI 302 / ACI 360) govern the joint locations and the filler.",
+  };
+}
+export const concreteIsolationJointExample = { inputs: { slab_length_ft: 40, slab_width_ft: 30, num_columns: 6, column_perimeter_ft: 4, strip_length_ft: 10 } };
+
+CONCRETE_RENDERERS["concrete-isolation-joint"] = _simpleRenderer({
+  citation: "Citation: isolation-joint filler takeoff by name. filler = 2 x (L + W) + columns x column-perimeter; strips = ceil(filler / strip length). Isolation joints let a slab move independently of rigid elements (walls, footings, columns); distinct from sawn control joints. ACI 302 / ACI 360 and the structural detail govern.",
+  example: concreteIsolationJointExample.inputs,
+  fields: [
+    { key: "slab_length_ft", label: "Slab length (ft)", kind: "number", default: 40 },
+    { key: "slab_width_ft", label: "Slab width (ft)", kind: "number", default: 30 },
+    { key: "num_columns", label: "Columns / piers in the slab", kind: "number", default: 6 },
+    { key: "column_perimeter_ft", label: "Perimeter per column (ft, 12 in sq = 4)", kind: "number", default: 4 },
+    { key: "strip_length_ft", label: "Filler strip length (ft)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "f", id: "cij-out-f", label: "Isolation-joint filler", value: (r) => fmt(r.filler_lf, 0) + " LF (" + fmt(r.slab_perimeter_ft, 0) + " perimeter + " + fmt(r.column_isolation_ft, 0) + " columns)" },
+    { key: "s", id: "cij-out-s", label: "Filler strips", value: (r) => fmt(r.strips, 0) + " strips" },
+    { key: "n", id: "cij-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteIsolationJoint,
+});
