@@ -12429,3 +12429,18 @@ test("self-consistency: field pacing recovers the calibration distance and scale
   const sc = f.computePacing({ calibration_distance_ft: 100, calibration_paces: 40, current_paces: 40, terrain: "flat" });
   assert.ok(Math.abs(sc.distance_ft - 100) < 1e-9, "walking the calibration pace count must recover the calibration distance");
 });
+
+test("statistics: percentile bands stay ordered, bounded, and translation-invariant (historical)", async () => {
+  const h = await import("../../calc-historical.js");
+  const mk = (vals) => vals.map((v, i) => ({ value: v, date: "2026-" + String((i % 12) + 1).padStart(2, "0") }));
+  const base = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+  const pb = h.computePercentileBands({ points: mk(base) });
+  assert.ok(pb.p25 <= pb.p50 && pb.p50 <= pb.p75 && pb.p75 <= pb.p90, "percentiles must be non-decreasing (p25 <= p50 <= p75 <= p90)");
+  assert.ok(pb.p25 >= 10 && pb.p90 <= 100, "every percentile must lie within the data range");
+  assert.ok(Math.abs(pb.p50 - 55) < 1e-9, "the median of the symmetric even set must be the midpoint 55");
+  assert.strictEqual(pb.latest, 100, "the latest value must be the last point");
+  // Translation invariance: shifting all values by a constant shifts every percentile by the same constant.
+  const pb2 = h.computePercentileBands({ points: mk(base.map((v) => v + 100)) });
+  assert.ok(Math.abs(pb2.p50 - (pb.p50 + 100)) < 1e-9, "shifting all data by +100 must shift the median by +100");
+  assert.ok(Math.abs(pb2.p25 - (pb.p25 + 100)) < 1e-9, "shifting all data by +100 must shift the 25th percentile by +100");
+});

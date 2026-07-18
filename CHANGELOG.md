@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(historical): guard percentile-band ordering and translation invariance; 2026-07-17
+
+- Statistics guards: percentiles are non-decreasing (p25 <= p50 <= p75 <= p90), lie within the data range, the median
+  of a symmetric set is its midpoint, and shifting every value by a constant shifts every percentile by that same
+  constant. Test-only.
+
 ### test(field): guard pacing calibration self-consistency; 2026-07-17
 
 - Self-consistency guard: pace length = calibration distance / calibration paces, distance = current paces x pace
