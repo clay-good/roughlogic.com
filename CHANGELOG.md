@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(kitchen): brine-cure equilibrium nitrite ppm is on the green meat weight (9 CFR 424.22); 2026-07-17
+
+- computeBrineCure divided ingoing nitrite by the whole batch weight (meat+water+salt+cure) in BOTH modes. For an
+  equilibrium cure the FSIS ingoing basis is the GREEN WEIGHT OF THE MEAT: 2.5 g Cure #1 per kg meat = 156 ppm. The tile
+  gave 152 ppm at its own example and cleared the 156 ppm nitrite_over_max safety flag when the meat-basis value is at
+  the limit -- a food-safety false-negative. Fixed the equilibrium denominator to meat green weight; the brine mode keeps
+  its pickle-concentration basis (a different, legitimate quantity). Updated the mirror-written example + 3 test pins.
+
 ### fix(construction): masonry-count double-counted the mortar joint (CMU undercount ~7%); 2026-07-17
 
 - MASONRY_UNIT_FACE_IN stored NOMINAL unit dimensions (16x8 CMU) but the code added the 3/8 in joint AGAIN

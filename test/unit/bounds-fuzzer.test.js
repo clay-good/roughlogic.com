@@ -10263,7 +10263,7 @@ test("bounds: calc-stage N + calc-kitchen O + calc-field P v20 tiles pin constan
   assert.ok("error" in _n1({ watts: Infinity, voltage_v: 208, phase: "three", rating_a: 60 }));
   assert.ok("error" in _n1({ watts: 12000, voltage_v: 208, phase: "three", rating_a: 60, pf: 0 }));
   const o1 = _o1({ mode: "equilibrium", salt_g: 25, meat_g: 1000, cure_g: 2.5 });
-  assert.ok(Math.abs(o1.nitrite_ppm - 152.1) < 0.5 && Number.isFinite(o1.concentration_pct));
+  assert.ok(Math.abs(o1.nitrite_ppm - 156.25) < 0.5 && Number.isFinite(o1.concentration_pct));
   assert.ok("error" in _o1({ mode: "brine", salt_g: -1, water_g: 100 }));
   const p1 = _p1({ pod_list: [30, 40, 50], poa_pct: 60 });
   assert.ok(Math.abs(p1.cumulative_pod_pct - 79) < 0.1 && p1.pos_pct <= 60);

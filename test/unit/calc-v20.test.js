@@ -855,20 +855,19 @@ test("power-distro: invalid inputs rejected", () => {
   assert.ok("error" in computePowerDistro({ watts: 12000, voltage_v: 208, phase: "three", rating_a: 60, pf: 1.5 }));
 });
 
-test("brine-cure: equilibrium meat1000 salt25 cure2.5 -> 2.5%, 152 ppm", () => {
+test("brine-cure: equilibrium meat1000 salt25 cure2.5 -> 2.5%, 156 ppm (green-meat basis)", () => {
   const r = computeBrineCure({ mode: "equilibrium", salt_g: 25, meat_g: 1000, cure_g: 2.5 });
   assert.ok(Math.abs(r.concentration_pct - 2.5) < 0.01);
-  assert.ok(Math.abs(r.nitrite_ppm - 152.1) < 0.5);
+  assert.ok(Math.abs(r.nitrite_ppm - 156.25) < 0.5);
 });
 test("brine-cure: example", () => { assert.ok(computeBrineCure(brineCureExample.inputs).nitrite_ppm > 0); });
 test("brine-cure: brine mode = salt/(salt+water)", () => {
   const r = computeBrineCure({ mode: "brine", salt_g: 50, water_g: 950 });
   assert.ok(Math.abs(r.concentration_pct - 5) < 1e-6);
 });
-test("brine-cure: nitrite ppm uses the 6.25% constant", () => {
+test("brine-cure: equilibrium nitrite ppm is on the green meat weight (6.25% cure)", () => {
   const r = computeBrineCure({ mode: "equilibrium", salt_g: 25, meat_g: 1000, cure_g: 2.5 });
-  const total = 1000 + 0 + 25 + 2.5;
-  assert.ok(Math.abs(r.nitrite_ppm - 2.5 * 0.0625 * 1e6 / total) < 1e-6);
+  assert.ok(Math.abs(r.nitrite_ppm - 2.5 * 0.0625 * 1e6 / 1000) < 1e-6);
 });
 test("brine-cure: over-max nitrite flagged", () => {
   const r = computeBrineCure({ mode: "equilibrium", salt_g: 25, meat_g: 1000, cure_g: 4 });

@@ -19280,9 +19280,9 @@
   {
    "tile_id": "brine-cure",
    "source_publisher": "Mass-fraction chemistry + USDA FSIS 9 CFR 424 nitrite limit",
-   "source_title": "nitrite ppm = cure*0.0625*1e6/total",
+   "source_title": "equilibrium ingoing nitrite ppm = cure*0.0625*1e6/meat (green meat weight, 9 CFR 424.22)",
    "source_edition_or_year": "6.25% nitrite constant",
-   "source_section_or_page": "equilibrium: meat 1000 g, salt 25 g, cure 2.5 g -> 2.5% salt, ~152 ppm nitrite",
+   "source_section_or_page": "equilibrium: meat 1000 g, salt 25 g, cure 2.5 g -> 2.5% salt, 156 ppm nitrite (2.5 g Cure #1 / kg meat)",
    "verified_by": "rl",
    "verified_on": "2026-06-06",
    "inputs": {
@@ -19301,7 +19301,7 @@
      }
     },
     "nitrite_ppm": {
-     "value": 152.1,
+     "value": 156.25,
      "tolerance": {
       "abs": 0.5
      }

@@ -642,7 +642,13 @@ export function computeBrineCure({ mode = "brine", water_g = 0, salt_g = 0, meat
     if (!(salt + water > 0)) return { error: "Enter salt and water weight for a brine." };
     concentration = salt / (salt + water) * 100;
   }
-  const nitritePpm = total > 0 && cure > 0 ? cure * NITRITE_FRACTION * 1e6 / total : 0;
+  // Ingoing nitrite ppm. For an equilibrium cure the regulated basis is the GREEN WEIGHT OF THE
+  // MEAT (9 CFR 424.22): all the nitrite ends up in the meat, so 2.5 g Cure #1 / 1 kg meat = 156 ppm.
+  // (Dividing by the whole batch weight -- meat + water + salt + cure -- understated it and could clear
+  // the 156 ppm limit when the meat basis is at/over it.) For a brine, ppm is the nitrite concentration
+  // in the pickle (its own total), which the meat then takes up at an uptake the operator controls.
+  const nitriteBasis = mode === "equilibrium" ? meat : total;
+  const nitritePpm = nitriteBasis > 0 && cure > 0 ? cure * NITRITE_FRACTION * 1e6 / nitriteBasis : 0;
   const saltToAdd = target > 0 ? target * total / 100 - salt : null;
   return {
     concentration_pct: Number.isFinite(concentration) ? concentration : null,
