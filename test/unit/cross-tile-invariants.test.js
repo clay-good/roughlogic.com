@@ -11720,3 +11720,29 @@ test("monotonicity: computeStandardsBasedGrade overall_mastery = sum(level * pri
   assert.ok(computeStandardsBasedGrade({ rows: "" }).error, "expected error for empty input");
   assert.ok(computeStandardsBasedGrade({ rows: "a 9 major" }).error, "expected error for out-of-range level");
 });
+
+// Cross-tile physical consistency: three separate real-estate tiles independently
+// compute the monthly mortgage payment M = P*r/(1-(1+r)^-n) with r = apr/12 and
+// n = years*12 -- PITI (monthly_principal_and_interest), cost-of-waiting
+// (monthly_pi_now), and amortization-schedule (monthly_principal_and_interest).
+// For the same loan they must agree bit-for-bit; a divergence (e.g. one using apr
+// as a monthly rate, or years not x12) is the "sibling" class the formula audit
+// used, which per-tile fixtures -- each testing only itself -- cannot see.
+test("cross-tile: PITI, cost-of-waiting, and amortization-schedule agree on the monthly P&I for the same loan", async () => {
+  const m = await import("../../calc-realestate.js");
+  const loan = { principal: 320000, apr_percent: 6.5, term_years: 30 };
+  const piti = m.computePITI({ ...loan, annual_property_tax: 0, annual_insurance: 0, monthly_hoa: 0, monthly_pmi: 0 });
+  const cow = m.computeCostOfWaiting({ principal: loan.principal, current_rate_percent: loan.apr_percent, future_rate_percent: loan.apr_percent + 1, term_years: loan.term_years });
+  const amort = m.computeAmortizationSchedule(loan);
+  assert.ok(!piti.error && !cow.error && !amort.error, "one of the payment tiles errored");
+  const pPiti = piti.monthly_principal_and_interest;
+  const pCow = cow.monthly_pi_now;
+  const pAmort = amort.monthly_principal_and_interest;
+  assert.ok(pPiti > 0, "PITI P&I not positive");
+  assert.ok(Math.abs(pPiti - pCow) < 1e-9, `PITI P&I ${pPiti} != cost-of-waiting ${pCow}`);
+  assert.ok(Math.abs(pPiti - pAmort) < 1e-9, `PITI P&I ${pPiti} != amortization-schedule ${pAmort}`);
+  // Sanity vs the closed-form standard-amortization formula.
+  const r = 6.5 / 100 / 12, n = 30 * 12;
+  const M = 320000 * r / (1 - Math.pow(1 + r, -n));
+  assert.ok(Math.abs(pPiti - M) < 1e-6, `P&I ${pPiti} != closed-form ${M}`);
+});

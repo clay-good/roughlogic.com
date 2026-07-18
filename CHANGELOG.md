@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(real-estate): cross-tile consistency of the monthly mortgage payment across three tiles; 2026-07-17
+
+- Added a cross-tile guard: PITI, cost-of-waiting, and amortization-schedule independently compute the monthly P&I
+  (M = P r / (1 - (1+r)^-n), r = apr/12, n = years x12). For the same loan all three must agree bit-for-bit, and match
+  the closed-form standard-amortization value. A divergence (e.g. one treating apr as a monthly rate, or years not x12)
+  is the "sibling" class the formula audit used, invisible to per-tile fixtures. Test-only.
+
 ### test(plumbing): cross-tile velocity consistency between pipe-velocity and friction-loss; 2026-07-17
 
 - Added a cross-tile physical-consistency guard: pipe-velocity and friction-loss are separate tiles that both compute
