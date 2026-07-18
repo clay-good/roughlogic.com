@@ -12416,3 +12416,16 @@ test("monotonicity: water-softener sizing scales grain load and regeneration int
   assert.ok(ss({ capacity: 48000 }).days_between > ss({}).days_between, "days between regenerations must rise with resin capacity");
   assert.ok(ss({ hardness_gpg: 40 }).days_between < ss({}).days_between, "days between regenerations must fall as the daily grain load rises");
 });
+
+test("self-consistency: field pacing recovers the calibration distance and scales with pace count (field)", async () => {
+  const f = await import("../../calc-field.js");
+  const pc = (o) => f.computePacing({ calibration_distance_ft: 100, calibration_paces: 40, current_paces: 80, terrain: "flat", ...o });
+  assert.ok(Math.abs(pc({}).pace_length_ft - 100 / 40) < 1e-9, "pace length = calibration distance / calibration paces");
+  assert.ok(Math.abs(pc({}).distance_ft - 80 * 2.5) < 1e-9, "distance = current paces * pace length (flat)");
+  assert.ok(pc({ current_paces: 160 }).distance_ft > pc({}).distance_ft, "distance must rise with the pace count walked");
+  assert.ok(pc({ calibration_paces: 50 }).pace_length_ft < pc({}).pace_length_ft, "more calibration paces over the same distance means a shorter stride");
+  assert.ok(Math.abs(pc({}).distance_m - pc({}).distance_ft * 0.3048) < 1e-6, "meters = feet * 0.3048");
+  // Self-consistency: walking the calibration pace count back must reproduce the calibration distance on flat ground.
+  const sc = f.computePacing({ calibration_distance_ft: 100, calibration_paces: 40, current_paces: 40, terrain: "flat" });
+  assert.ok(Math.abs(sc.distance_ft - 100) < 1e-9, "walking the calibration pace count must recover the calibration distance");
+});

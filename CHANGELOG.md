@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(field): guard pacing calibration self-consistency; 2026-07-17
+
+- Self-consistency guard: pace length = calibration distance / calibration paces, distance = current paces x pace
+  length rises with the count walked, meters = feet x 0.3048, and walking the calibration pace count back recovers the
+  calibration distance on flat ground. Test-only.
+
 ### test(service): guard water-softener sizing with monotonicity; 2026-07-17
 
 - Whole-response guards: daily use = people x per-capita, daily grain load = daily gallons x compensated hardness rises
