@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): add motor-rms-hp tile (spec-v945); 2026-07-18
+
+- New Group A tile `motor-rms-hp` (Motor RMS Horsepower for a Duty-Cycle Load) in calc-motor.js. The constant HP that
+  heats the motor the same as a repeating on/off load: HP_rms = sqrt((HP_run^2 x t_run + HP_idle^2 x t_idle) /
+  (t_run + t_idle / K)), with the idle time divided by a cooling factor K (~3 stopped, ~2 unloaded) for reduced
+  self-cooling. 20 HP for 10 s then a 20 s rest at K=3 = 15.5 HP_rms (so a 15 HP continuous motor is marginal). Worse idle
+  cooling raises the requirement; sizes the thermal duty only -- check the peak against breakdown torque separately. Home
+  count 1,393 -> 1,394.
+
 ### feat(electrical): add motor-acceleration-time tile (spec-v944); 2026-07-18
 
 - New Group A tile `motor-acceleration-time` (Motor Across-the-Line Acceleration Time) in calc-motor.js. The rotational

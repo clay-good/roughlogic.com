@@ -710,3 +710,56 @@ function _v944renderMotorAccelerationTime(inputRegion, outputRegion, citationEl)
   for (const f of [wk, dn, tq]) f.input.addEventListener("input", update);
 }
 MOTOR_RENDERERS["motor-acceleration-time"] = _v944renderMotorAccelerationTime;
+
+// ===================== spec-v945: motor RMS horsepower for a duty-cycle load =====================
+// dims: in { args: dimensionless } out: { rms_hp: M L^2 T^-3, effective_time_s: T }
+export function computeMotorRmsHp({ hp_run = 20, run_time_s = 10, hp_idle = 0, idle_time_s = 20, cooling_factor = 3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(hp_run > 0)) return { error: "Working (run) horsepower must be positive." };
+  if (!(run_time_s > 0)) return { error: "Run time must be positive (s)." };
+  if (!(hp_idle >= 0)) return { error: "Idle horsepower cannot be negative." };
+  if (!(idle_time_s >= 0)) return { error: "Idle time cannot be negative (s)." };
+  if (!(cooling_factor >= 1)) return { error: "Cooling factor must be at least 1 (idle time cools no better than running)." };
+  // RMS horsepower over the duty cycle: the constant HP that heats the motor the same as the varying load.
+  // The idle (stopped/unloaded) time is divided by the cooling factor because a self-cooled motor sheds heat
+  // less well when it is not running at speed.
+  const heat = hp_run * hp_run * run_time_s + hp_idle * hp_idle * idle_time_s;
+  const effective_time_s = run_time_s + idle_time_s / cooling_factor;
+  const rms_hp = Math.sqrt(heat / effective_time_s);
+  if (![rms_hp, effective_time_s].every(Number.isFinite)) return { error: "RMS-horsepower math is not a finite value." };
+  return {
+    rms_hp,
+    effective_time_s,
+    note: "The RMS (root-mean-square) horsepower of a repeating duty cycle: the single constant horsepower that would heat the motor the same as the real varying load, and so the smallest CONTINUOUS-rated motor that will not overheat on that cycle. HP_rms = sqrt( (HP_run^2 x t_run + HP_idle^2 x t_idle) / (t_run + t_idle / K) ), where K is the idle-cooling factor -- the idle or stopped time is divided by K (commonly ~3 for a self-cooled motor at standstill, ~2 running unloaded) because the motor sheds heat less well when it is not turning at speed. A 20 HP load for 10 s then a 20 s rest at K = 3 gives sqrt(20^2 x 10 / (10 + 20/3)) = 15.5 HP_rms, so a 15 HP continuous motor is marginal and a 20 HP is safe. This sizes the THERMAL (heating) duty only -- the PEAK horsepower must still fall within the motor's breakdown-torque capability, a separate check. A screen; the motor's thermal-damage curve, service factor, and the manufacturer's duty rating govern.",
+  };
+}
+
+export const motorRmsHpExample = { inputs: { hp_run: 20, run_time_s: 10, hp_idle: 0, idle_time_s: 20, cooling_factor: 3 } };
+
+function _v945renderMotorRmsHp(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: motor RMS horsepower for a duty-cycle load (NEMA MG-1 duty-cycle / RMS-horsepower sizing method), by name. HP_rms = sqrt( (HP_run^2 x t_run + HP_idle^2 x t_idle) / (t_run + t_idle / K) ); the idle time is divided by the cooling factor K (~3 stopped, ~2 unloaded). Sizes the thermal duty only -- check the peak against breakdown torque separately. The motor's thermal-damage curve, service factor, and the manufacturer's duty rating govern.";
+  const hr = makeNumber("Working (run) load (HP)", "mrh-hr", { step: "any", min: "0", value: "20" });
+  hr.input.value = "20";
+  const tr = makeNumber("Run time (s)", "mrh-tr", { step: "any", min: "0", value: "10" });
+  tr.input.value = "10";
+  const hi = makeNumber("Idle / light load (HP)", "mrh-hi", { step: "any", min: "0", value: "0" });
+  hi.input.value = "0";
+  const ti = makeNumber("Idle / rest time (s)", "mrh-ti", { step: "any", min: "0", value: "20" });
+  ti.input.value = "20";
+  const cf = makeNumber("Idle cooling factor (3 stopped, 2 unloaded)", "mrh-cf", { step: "any", min: "1", value: "3" });
+  cf.input.value = "3";
+  for (const f of [hr, tr, hi, ti, cf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { hr.input.value = "20"; tr.input.value = "10"; hi.input.value = "0"; ti.input.value = "20"; cf.input.value = "3"; update(); });
+  const oRms = makeOutputLine(outputRegion, "RMS horsepower", "mrh-out-r");
+  const update = debounce(() => {
+    const r = computeMotorRmsHp({
+      hp_run: hr.input.value === "" ? 20 : Number(hr.input.value), run_time_s: tr.input.value === "" ? 10 : Number(tr.input.value),
+      hp_idle: hi.input.value === "" ? 0 : Number(hi.input.value), idle_time_s: ti.input.value === "" ? 20 : Number(ti.input.value),
+      cooling_factor: cf.input.value === "" ? 3 : Number(cf.input.value),
+    });
+    if (r.error) { oRms.textContent = r.error; return; }
+    oRms.textContent = fmt(r.rms_hp, 2) + " HP continuous (size the motor at or above this)";
+  }, DEBOUNCE_MS);
+  for (const f of [hr, tr, hi, ti, cf]) f.input.addEventListener("input", update);
+}
+MOTOR_RENDERERS["motor-rms-hp"] = _v945renderMotorRmsHp;

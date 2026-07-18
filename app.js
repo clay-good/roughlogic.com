@@ -89,6 +89,7 @@ const TOOL_MODULES = (() => {
     "vfd-reflected-wave",
     "rotary-phase-converter-sizing",
     "motor-acceleration-time",
+    "motor-rms-hp",
   ]);
   // spec-v88 cap-relief split: the cohesive solar-PV / battery-storage /
   // EV-charging electrification bench moved out of calc-electrical.js (which

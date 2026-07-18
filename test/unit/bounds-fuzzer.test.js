@@ -27389,3 +27389,28 @@ test("bounds: spec-v944 computeMotorAccelerationTime pins t = WK^2 dN / (308 T),
   assert.ok("error" in _v944({ inertia_lbft2: 100, speed_change_rpm: 1750, net_accel_torque_lbft: -5 }));
   assert.ok("error" in _v944({ inertia_lbft2: Infinity, speed_change_rpm: 1750, net_accel_torque_lbft: 50 }));
 });
+
+import { computeMotorRmsHp as _v945 } from "../../calc-motor.js";
+
+test("bounds: spec-v945 computeMotorRmsHp pins the RMS heating equivalent, the cooling-factor effect, and error seams", () => {
+  const r = _v945({ hp_run: 20, run_time_s: 10, hp_idle: 0, idle_time_s: 20, cooling_factor: 3 });
+  assert.ok(Math.abs(r.rms_hp - 15.491933) < 1e-4); // sqrt(4000/(10+20/3))
+  assert.ok(Math.abs(r.effective_time_s - (10 + 20 / 3)) < 1e-9);
+  // Worse idle cooling (smaller K) shortens the effective time and RAISES the required RMS horsepower.
+  const k1 = _v945({ hp_run: 20, run_time_s: 10, hp_idle: 0, idle_time_s: 20, cooling_factor: 1 });
+  assert.ok(Math.abs(k1.rms_hp - 11.547005) < 1e-4); // sqrt(4000/30)
+  assert.ok(k1.rms_hp < r.rms_hp); // K=1 (full cooling) -> smaller motor than K=3
+  // A non-zero idle load adds heat and raises the RMS horsepower.
+  const withIdle = _v945({ hp_run: 20, run_time_s: 10, hp_idle: 10, idle_time_s: 20, cooling_factor: 3 });
+  assert.ok(Math.abs(withIdle.rms_hp - 18.973666) < 1e-4);
+  assert.ok(withIdle.rms_hp > r.rms_hp);
+  // A pure steady load (no idle) returns the run horsepower exactly.
+  assert.ok(Math.abs(_v945({ hp_run: 15, run_time_s: 10, hp_idle: 0, idle_time_s: 0, cooling_factor: 3 }).rms_hp - 15) < 1e-9);
+  // Error seams: non-positive run HP or run time, negative idle HP/time, cooling factor < 1, non-finite.
+  assert.ok("error" in _v945({ hp_run: 0, run_time_s: 10, hp_idle: 0, idle_time_s: 20, cooling_factor: 3 }));
+  assert.ok("error" in _v945({ hp_run: 20, run_time_s: 0, hp_idle: 0, idle_time_s: 20, cooling_factor: 3 }));
+  assert.ok("error" in _v945({ hp_run: 20, run_time_s: 10, hp_idle: -1, idle_time_s: 20, cooling_factor: 3 }));
+  assert.ok("error" in _v945({ hp_run: 20, run_time_s: 10, hp_idle: 0, idle_time_s: -1, cooling_factor: 3 }));
+  assert.ok("error" in _v945({ hp_run: 20, run_time_s: 10, hp_idle: 0, idle_time_s: 20, cooling_factor: 0.5 }));
+  assert.ok("error" in _v945({ hp_run: Infinity, run_time_s: 10, hp_idle: 0, idle_time_s: 20, cooling_factor: 3 }));
+});

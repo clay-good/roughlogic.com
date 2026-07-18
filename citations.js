@@ -12455,6 +12455,17 @@ export const CITATIONS = {
       { name: "Average net torque", value: "T_net = motor torque - load torque averaged over the start; a single average is a screen (the honest method integrates over speed)", source: "speed-torque curves" },
     ],
   },
+  "motor-rms-hp": {
+    formula: "rms_hp = sqrt( (hp_run^2 x run_time_s + hp_idle^2 x idle_time_s) / (run_time_s + idle_time_s / cooling_factor) ). The idle/stopped time is divided by the cooling factor K (~3 stopped, ~2 unloaded).",
+    edition: "Motor duty-cycle RMS-horsepower sizing method (NEMA MG-1 duty-cycle practice; standard motor-application references), by name; the motor's thermal-damage curve and duty rating govern.",
+    freeAccess: "The RMS-horsepower relation is public engineering practice (the root-mean-square heating equivalent); the load horsepowers, the run and idle times, and the cooling factor come from the driven-load duty cycle and the motor's cooling type.",
+    governance: GOVERNANCE.general,
+    editionNote: "The RMS (root-mean-square) horsepower of a repeating duty cycle is the single constant horsepower that heats the motor the same as the real varying load, so it sets the smallest CONTINUOUS-rated motor that will not overheat on that cycle. Because motor heating goes as current squared and current tracks horsepower, the equivalent is a root-mean-square, not a simple average: HP_rms = sqrt( (HP_run^2 x t_run + HP_idle^2 x t_idle) / (t_run + t_idle / K) ). The denominator is an EFFECTIVE time: the idle or stopped time is divided by the cooling factor K because a self-cooled (fan-on-shaft) motor moves less or no cooling air when it is stopped or turning slowly, so that time counts for less cooling -- K is commonly taken as ~3 for a motor stopped at standstill and ~2 for a motor running unloaded, and it is editable. A larger K (worse idle cooling) raises the required RMS horsepower. This method sizes the THERMAL (heating) duty only; the PEAK horsepower on the cycle must separately fall within the motor's breakdown-torque capability, or the motor stalls regardless of its thermal rating. A screen; the motor's thermal-damage curve, service factor, and the manufacturer's duty (S1-S10) rating govern.",
+    assumptions: [
+      { name: "RMS heating equivalent", value: "HP_rms = sqrt(sum(HP^2 t) / effective_time); heating goes as HP^2, so the equivalent is a root-mean-square", source: "motor-application practice" },
+      { name: "Idle cooling factor", value: "idle/stopped time divided by K (~3 stopped, ~2 unloaded) for reduced self-cooling; peak-vs-breakdown-torque is a separate check", source: "NEMA MG-1 duty-cycle practice" },
+    ],
+  },
   "reduced-voltage-starter": {
     formula: "autotransformer: motor = tap x LRA, line = tap^2 x LRA, torque = tap^2 x LRT. wye-delta: 0.333x on current and torque. solid-state/reactor: motor = line = tap x LRA, torque = tap^2 x LRT.",
     edition: "Reduced-voltage-starter current and torque relations (NEMA ICS 2; torque proportional to voltage squared), by name; the motor speed-torque curve and the load govern.",

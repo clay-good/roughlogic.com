@@ -35044,6 +35044,54 @@
    }
   },
   {
+   "tile_id": "motor-rms-hp",
+   "source_publisher": "Motor duty-cycle RMS horsepower (NEMA MG-1 practice)",
+   "source_title": "20 HP run 10 s, 0 HP idle 20 s, cooling factor 3 -> 15.49 HP_rms",
+   "source_edition_or_year": "spec-v945 worked example (machine-verified)",
+   "source_section_or_page": "sqrt((20^2*10 + 0)/(10 + 20/3)) = sqrt(4000/16.667) = 15.49",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "hp_run": 20,
+    "run_time_s": 10,
+    "hp_idle": 0,
+    "idle_time_s": 20,
+    "cooling_factor": 3
+   },
+   "outputs": {
+    "rms_hp": {
+     "value": 15.49,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-rms-hp",
+   "source_publisher": "Motor duty-cycle RMS horsepower (NEMA MG-1 practice)",
+   "source_title": "cross-check: full cooling (K=1) lowers the requirement to 11.55 HP_rms",
+   "source_edition_or_year": "spec-v945 worked example (machine-verified)",
+   "source_section_or_page": "sqrt((20^2*10)/(10 + 20/1)) = sqrt(4000/30) = 11.55 (worse idle cooling -> larger motor)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "hp_run": 20,
+    "run_time_s": 10,
+    "hp_idle": 0,
+    "idle_time_s": 20,
+    "cooling_factor": 1
+   },
+   "outputs": {
+    "rms_hp": {
+     "value": 11.55,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "jockey-pump-sizing",
    "source_publisher": "jockey pump sizing (NFPA 20)",
    "source_title": "750 gpm fire pump, 120 psi churn, 50 psi static -> 7.5 gpm jockey; stop 170 / start 160 / fp-start 155",

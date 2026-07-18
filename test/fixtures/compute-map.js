@@ -1038,6 +1038,7 @@ export const COMPUTE_MAP = {
   "vfd-reflected-wave": { module: "../../calc-motor.js", fn: "computeVfdReflectedWave" },
   "rotary-phase-converter-sizing": { module: "../../calc-motor.js", fn: "computeRotaryPhaseConverter" },
   "motor-acceleration-time": { module: "../../calc-motor.js", fn: "computeMotorAccelerationTime" },
+  "motor-rms-hp": { module: "../../calc-motor.js", fn: "computeMotorRmsHp" },
   "harmonic-resonance": { module: "../../calc-powerquality.js", fn: "computeHarmonicResonance" },
   "capacitor-bank-for-resonance-order": { module: "../../calc-powerquality.js", fn: "computeCapacitorBankForResonanceOrder" },
   "tdd-ieee-519": { module: "../../calc-powerquality.js", fn: "computeTddIeee519" },
