@@ -12393,3 +12393,14 @@ test("consistency: duct velocity-pressure solves V = 4005 sqrt(VP) both ways and
   const vBack = v.computeDuctVelocityPressure({ solve_for: "velocity", vp_inwc: vpMid }).velocity_fpm;
   assert.ok(Math.abs(vBack - 3000) < 1e-6, "the two directions of the velocity-pressure relation must round-trip");
 });
+
+test("monotonicity: AWWA main-disinfection chlorine scales with pipe volume, dose, and product strength (disinfect)", async () => {
+  const d = await import("../../calc-disinfect.js");
+  const mc = (o) => d.computeMainDisinfectionChlorine({ diameter_in: 8, length_ft: 1000, dose_mg_l: 25, product_pct: 65, ...o });
+  assert.ok(mc({ length_ft: 2000 }).volume_gal > mc({}).volume_gal, "pipe volume must rise with length");
+  assert.ok(Math.abs(mc({ diameter_in: 16 }).volume_gal / mc({}).volume_gal - 4) < 1e-6, "doubling the diameter must quadruple the volume");
+  assert.ok(mc({ dose_mg_l: 50 }).available_cl_lb > mc({}).available_cl_lb, "available chlorine must rise with dose");
+  assert.ok(mc({ product_pct: 35 }).product_lb > mc({}).product_lb, "more product is needed when the product is weaker");
+  assert.ok(Math.abs(mc({}).available_cl_lb - mc({}).volume_gal * 25 * 8.34 / 1e6) < 1e-6, "available Cl (lb) = volume(gal) * dose(mg/L) * 8.34 / 1e6");
+  assert.ok(Math.abs(mc({}).product_lb - mc({}).available_cl_lb / 0.65) < 1e-9, "product lb = available chlorine / (product fraction)");
+});

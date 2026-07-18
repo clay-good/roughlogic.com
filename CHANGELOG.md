@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(disinfect): guard AWWA main-disinfection chlorine dosing with monotonicity; 2026-07-17
+
+- Whole-response guards: pipe volume rises with length and quadruples when diameter doubles; available Cl (lb) =
+  volume x dose x 8.34/1e6 rises with dose; product weight rises as the product weakens; product lb = available Cl /
+  product fraction. Test-only.
+
 ### test(velocity): round-trip duct velocity-pressure V = 4005 sqrt(VP); 2026-07-17
 
 - Consistency guard: the velocity and vp modes are exact inverses (VP=1 -> V=4005, and back), velocity rises with VP
