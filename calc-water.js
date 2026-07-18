@@ -1910,3 +1910,51 @@ function _v935renderCisternStorageDays(inputRegion, outputRegion, citationEl) {
   for (const f of [st, dd, td]) f.input.addEventListener("input", update);
 }
 WATER_RENDERERS["cistern-storage-days"] = _v935renderCisternStorageDays;
+
+// ===================== spec-v971: dechlorination chemical dose =====================
+// dims: in { args: dimensionless } out: { reagent_dose_mg_l: dimensionless, feed_lb_day: dimensionless }
+export function computeDechlorinationDose({ chlorine_residual_mg_l = 2, flow_mgd = 5, stoich_ratio = 1.46, purity_pct = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(chlorine_residual_mg_l > 0)) return { error: "Chlorine residual must be positive (mg/L)." };
+  if (!(flow_mgd > 0)) return { error: "Flow must be positive (MGD)." };
+  if (!(stoich_ratio > 0)) return { error: "Stoichiometric ratio must be positive (mg reagent per mg Cl2)." };
+  if (!(purity_pct > 0 && purity_pct <= 100)) return { error: "Reagent purity must be between 0 and 100 percent." };
+  // Dechlorination reagent dose = stoichiometric ratio x the chlorine residual to remove; pounds formula for feed.
+  const reagent_dose_mg_l = stoich_ratio * chlorine_residual_mg_l;
+  const feed_lb_day = reagent_dose_mg_l * flow_mgd * 8.34 / (purity_pct / 100);
+  if (![reagent_dose_mg_l, feed_lb_day].every(Number.isFinite)) return { error: "Dechlorination-dose math is not a finite value." };
+  return {
+    reagent_dose_mg_l,
+    feed_lb_day,
+    note: "The dechlorination chemical to neutralize a chlorine residual before an NPDES discharge (or to protect a fish-bearing receiving stream): the reagent dose in mg/L is the stoichiometric ratio times the chlorine residual to remove, and the feed rate is the pounds formula, dose x flow (MGD) x 8.34 / purity. The stoichiometric RATIO -- mg of reagent per mg of chlorine -- is reagent-specific and is entered here: about 0.9-1.0 for sulfur dioxide (SO2), 1.34 for sodium metabisulfite, 1.46 for sodium bisulfite, 1.77 for sodium sulfite, and about 0.56 for sodium thiosulfate. Removing a 2.0 mg/L residual from 5 MGD with sodium bisulfite (ratio 1.46) is a 2.92 mg/L dose and 121.8 lb/day of 100% product; a less-pure product needs proportionally more. Sulfur-based dechlorination consumes dissolved oxygen and depresses pH, so an over-dose has its own permit consequences -- dose to just neutralize the residual, and confirm a zero (or the permit-required near-zero) residual downstream of mixing. A dosing estimate; the discharge permit limit, the actual reagent and its assay, and the state primacy agency govern.",
+  };
+}
+
+export const dechlorinationDoseExample = { inputs: { chlorine_residual_mg_l: 2, flow_mgd: 5, stoich_ratio: 1.46, purity_pct: 100 } };
+
+function _v971renderDechlorinationDose(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: dechlorination chemical dose (stoichiometry + the pounds formula), by name. reagent dose (mg/L) = ratio x chlorine residual; feed (lb/day) = dose x flow (MGD) x 8.34 / (purity/100). Ratio (mg reagent / mg Cl2): SO2 ~0.9-1.0, metabisulfite 1.34, bisulfite 1.46, sulfite 1.77, thiosulfate ~0.56. The discharge permit, the reagent assay, and the state primacy agency govern.";
+  const cr = makeNumber("Chlorine residual to remove (mg/L)", "dcl-cr", { step: "any", min: "0", value: "2" });
+  cr.input.value = "2";
+  const fl = makeNumber("Flow (MGD)", "dcl-fl", { step: "any", min: "0", value: "5" });
+  fl.input.value = "5";
+  const sr = makeNumber("Stoich ratio (mg reagent / mg Cl2)", "dcl-sr", { step: "any", min: "0", value: "1.46" });
+  sr.input.value = "1.46";
+  const pu = makeNumber("Reagent purity (percent)", "dcl-pu", { step: "any", min: "0", value: "100" });
+  pu.input.value = "100";
+  for (const f of [cr, fl, sr, pu]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cr.input.value = "2"; fl.input.value = "5"; sr.input.value = "1.46"; pu.input.value = "100"; update(); });
+  const oD = makeOutputLine(outputRegion, "Reagent dose", "dcl-out-d");
+  const oF = makeOutputLine(outputRegion, "Feed rate", "dcl-out-f");
+  const update = debounce(() => {
+    const r = computeDechlorinationDose({
+      chlorine_residual_mg_l: cr.input.value === "" ? 2 : Number(cr.input.value), flow_mgd: fl.input.value === "" ? 5 : Number(fl.input.value),
+      stoich_ratio: sr.input.value === "" ? 1.46 : Number(sr.input.value), purity_pct: pu.input.value === "" ? 100 : Number(pu.input.value),
+    });
+    if (r.error) { oD.textContent = r.error; oF.textContent = "-"; return; }
+    oD.textContent = fmt(r.reagent_dose_mg_l, 2) + " mg/L";
+    oF.textContent = fmt(r.feed_lb_day, 1) + " lb/day";
+  }, DEBOUNCE_MS);
+  for (const f of [cr, fl, sr, pu]) f.input.addEventListener("input", update);
+}
+WATER_RENDERERS["dechlorination-dose"] = _v971renderDechlorinationDose;

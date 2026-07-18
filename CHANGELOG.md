@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(water): add dechlorination-dose tile (spec-v971); 2026-07-18
+
+- New Group M tile `dechlorination-dose` (Dechlorination Chemical Dose) in calc-water.js. reagent dose (mg/L) = stoich
+  ratio x chlorine residual; feed (lb/day) = dose x flow (MGD) x 8.34 / purity. Ratio (editable) is reagent-specific:
+  ~0.9-1.0 SO2, 1.34 metabisulfite, 1.46 bisulfite, 1.77 sulfite, ~0.56 thiosulfate. Removing 2.0 mg/L from 5 MGD with
+  sodium bisulfite = 2.92 mg/L, 121.8 lb/day of 100% product. Do not over-dose (consumes DO, lowers pH). The permit and
+  primacy agency govern. Home count 1,419 -> 1,420.
+
 ### feat(construction): add foundation-waterproofing-takeoff tile (spec-v970); 2026-07-18
 
 - New Group E tile `foundation-waterproofing-takeoff` (Foundation Waterproofing / Dampproofing Takeoff) in

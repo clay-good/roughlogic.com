@@ -11943,6 +11943,17 @@ export const CITATIONS = {
       { name: "Not the GAWR", value: "this is a tire-load check, not a substitute for the axle's gross axle weight rating (GAWR)", source: "manufacturer GAWR" },
     ],
   },
+  "dechlorination-dose": {
+    formula: "reagent_dose_mg_l = stoich_ratio x chlorine_residual_mg_l; feed_lb_day = reagent_dose_mg_l x flow_mgd x 8.34 / (purity_pct/100). Ratio (mg reagent/mg Cl2): SO2 ~0.9-1.0, metabisulfite 1.34, bisulfite 1.46, sulfite 1.77, thiosulfate ~0.56.",
+    edition: "Dechlorination stoichiometry with the pounds formula (Standard Methods / wastewater-operations practice), by name; the discharge permit, the reagent assay, and the state primacy agency govern.",
+    freeAccess: "The reagent-to-chlorine stoichiometry and the pounds formula are public (8.34 lb/gal water); the residual, flow, reagent ratio, and purity come from the process, the permit, and the product.",
+    governance: GOVERNANCE.general,
+    editionNote: "Before treated water carrying a chlorine residual is discharged under an NPDES permit -- or released to a fish-bearing receiving stream, where free chlorine is acutely toxic to aquatic life at very low concentrations -- the residual is chemically reduced (dechlorinated), most often with a sulfur reagent (sulfur dioxide gas, or a sodium sulfite / bisulfite / metabisulfite / thiosulfate solution). The reagent dose in mg/L is a stoichiometric multiple of the chlorine residual to be removed, and the feed rate follows the pounds formula: dose x flow in MGD x 8.34 lb/gal, divided by the product's assay. The stoichiometric ratio, in milligrams of reagent per milligram of chlorine, is specific to the reagent and its reaction and is the key entered value: roughly 0.9 to 1.0 for sulfur dioxide, about 1.34 for sodium metabisulfite, 1.46 for sodium bisulfite, 1.77 for sodium sulfite, and about 0.56 for sodium thiosulfate. Removing a 2.0 mg/L residual from a 5 MGD flow with sodium bisulfite (ratio 1.46) is a 2.92 mg/L dose and 121.8 lb/day of 100% product, with a less concentrated product requiring proportionally more. An important operational caution: the sulfite reaction consumes dissolved oxygen and lowers pH, so an OVER-dose can itself violate the discharge permit's DO or pH limits; the practice is to dose to just neutralize the measured residual and then confirm a zero (or the permit's required near-zero) chlorine residual downstream of the mixing point. A dosing estimate; the specific discharge permit limits, the actual reagent and its certified assay, and the state primacy agency govern.",
+    assumptions: [
+      { name: "Stoichiometry + pounds formula", value: "reagent dose = ratio x Cl2 residual; feed = dose x MGD x 8.34 / purity; ratio SO2 ~0.9-1.0 / metabisulfite 1.34 / bisulfite 1.46 / sulfite 1.77 / thiosulfate ~0.56", source: "wastewater-operations practice" },
+      { name: "Do not over-dose", value: "sulfite consumes dissolved oxygen and lowers pH; dose to just neutralize and confirm a near-zero residual downstream; the permit and primacy agency govern", source: "NPDES permit / Standard Methods" },
+    ],
+  },
   "chlorine-demand": {
     formula: "demand = applied - measured_residual; dose_for_target = demand + target_residual. A high demand (flagged above 4 mg/L) suggests ammonia / organics - check the breakpoint curve.",
     edition: "Standard Methods 4500-Cl / AWWA M14 (by name); applied-minus-residual mass balance, no edition cycle.",

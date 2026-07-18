@@ -3021,6 +3021,7 @@ cross-check.
 | calc-water.js | `computeCisternStorageDays` | `{ usable_storage_gal = 2500, daily_demand_gpd = 150, target_days = 30 } = {}` | _ | _ | _ |
 | calc-water.js | `computeCoagulantDose` | `{ flow_mgd = 0, jar_test_dose_mg_l = 0, product = "alum_liquid", } = {}` | _ | _ | _ |
 | calc-water.js | `computeCoolingWaterMakeup` | `{ recirculation_gpm = 0, delta_T_F = 0, coc = 4, drift_fraction = 0.002, } = {}` | _ | _ | _ |
+| calc-water.js | `computeDechlorinationDose` | `{ chlorine_residual_mg_l = 2, flow_mgd = 5, stoich_ratio = 1.46, purity_pct =...` | _ | _ | _ |
 | calc-water.js | `computeDetentionBasinVolume` | `{ target_minutes = 0, flow_gpm = 0 } = {}` | _ | _ | _ |
 | calc-water.js | `computeDetentionTime` | `{ tank_volume_gal = 0, flow_gpm = 0, target_minutes = 0, surface_area_ft2 = 0...` | _ | _ | _ |
 | calc-water.js | `computeDilution` | `{ c1 = 0, v1 = 0, c2 = 0, v2 = 0, mode = "single", steps = 1, dilution_factor...` | _ | _ | _ |
@@ -3080,7 +3081,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1666.
+Row count: 1667.
 
 <!-- END function-corpus-v14 -->
 
@@ -4377,7 +4378,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (57 tiles)
+### Group M Water and wastewater (58 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4396,6 +4397,7 @@ per spec-v14 §13.1 second paragraph.
 | `coagulant-dose` | Coagulant Dose from Jar Test | USEPA / WEF; pure_lb_day = 5 * 20 * 8.34 = 834; product_lb_day = 834 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conductivity-from-tds` | Conductivity from Total Dissolved Solids | Standard Methods 2510 (inverse of tds...; spec-v657 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-water-makeup` | Cooling Water Makeup (Cycles of Concentration) | CTI / ASHRAE; evap = 1000*10/1000 = 10; blowdown = 10/(4-1) = 3.333; dr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `dechlorination-dose` | Dechlorination Chemical Dose | Dechlorination stoichiometry + pounds...; dose = 1.46*2.0 = 2.92; feed = 2.92*5*8.34/1.0 = 121.76 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `detention-basin-volume` | Detention Basin Volume for a Target Time | Ten States Standards / USEPA; 120 min contact at 350 GPM -> 42,000 gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `detention-time` | Detention Time | USEPA; Standard hydraulic retention identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `digester-gas-production` | Digester Gas and Methane Production | Anaerobic digester gas production (WE...; 10,000 lb/day VS fed at 55% reduction, 15 ft3/lb, 65% met... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4685,6 +4687,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1419. Fixture-covered or reference-cadence: 1419 / 1419.
+Tile count: 1420. Fixture-covered or reference-cadence: 1420 / 1420.
 
 <!-- END tile-index-v14 -->

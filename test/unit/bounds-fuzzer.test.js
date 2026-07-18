@@ -27993,3 +27993,26 @@ test("bounds: spec-v970 computeFoundationWaterproofingTakeoff pins the area/gall
   assert.ok("error" in _v970({ perimeter_ft: 150, below_grade_height_ft: 8, coverage_sf_per_gal: 50, waste_pct: -1 }));
   assert.ok("error" in _v970({ perimeter_ft: Infinity, below_grade_height_ft: 8, coverage_sf_per_gal: 50, waste_pct: 10 }));
 });
+
+import { computeDechlorinationDose as _v971 } from "../../calc-water.js";
+
+test("bounds: spec-v971 computeDechlorinationDose pins the reagent dose and feed rate", () => {
+  const r = _v971({ chlorine_residual_mg_l: 2, flow_mgd: 5, stoich_ratio: 1.46, purity_pct: 100 });
+  assert.ok(Math.abs(r.reagent_dose_mg_l - 2.92) < 1e-9); // 1.46*2
+  assert.ok(Math.abs(r.feed_lb_day - 121.764) < 1e-2); // 2.92*5*8.34
+  // A less-pure product needs proportionally more feed.
+  const impure = _v971({ chlorine_residual_mg_l: 2, flow_mgd: 5, stoich_ratio: 1.46, purity_pct: 65 });
+  assert.ok(Math.abs(impure.feed_lb_day - 187.33) < 0.05);
+  assert.ok(impure.feed_lb_day > r.feed_lb_day);
+  // Linear in residual, flow, and ratio.
+  assert.ok(Math.abs(_v971({ chlorine_residual_mg_l: 4, flow_mgd: 5, stoich_ratio: 1.46, purity_pct: 100 }).feed_lb_day - 2 * r.feed_lb_day) < 1e-6);
+  assert.ok(Math.abs(_v971({ chlorine_residual_mg_l: 2, flow_mgd: 10, stoich_ratio: 1.46, purity_pct: 100 }).feed_lb_day - 2 * r.feed_lb_day) < 1e-6);
+  // A different reagent ratio (SO2 ~0.9) gives a lower dose.
+  assert.ok(_v971({ chlorine_residual_mg_l: 2, flow_mgd: 5, stoich_ratio: 0.9, purity_pct: 100 }).reagent_dose_mg_l < r.reagent_dose_mg_l);
+  // Error seams: non-positive residual / flow / ratio, purity out of (0,100], non-finite.
+  assert.ok("error" in _v971({ chlorine_residual_mg_l: 0, flow_mgd: 5, stoich_ratio: 1.46, purity_pct: 100 }));
+  assert.ok("error" in _v971({ chlorine_residual_mg_l: 2, flow_mgd: 0, stoich_ratio: 1.46, purity_pct: 100 }));
+  assert.ok("error" in _v971({ chlorine_residual_mg_l: 2, flow_mgd: 5, stoich_ratio: 0, purity_pct: 100 }));
+  assert.ok("error" in _v971({ chlorine_residual_mg_l: 2, flow_mgd: 5, stoich_ratio: 1.46, purity_pct: 150 }));
+  assert.ok("error" in _v971({ chlorine_residual_mg_l: Infinity, flow_mgd: 5, stoich_ratio: 1.46, purity_pct: 100 }));
+});

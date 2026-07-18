@@ -28862,6 +28862,58 @@
    }
   },
   {
+   "tile_id": "dechlorination-dose",
+   "source_publisher": "Dechlorination stoichiometry + pounds formula",
+   "source_title": "2.0 mg/L residual, 5 MGD, sodium bisulfite (1.46), 100% -> 2.92 mg/L dose, 121.8 lb/day",
+   "source_edition_or_year": "spec-v971 worked example (machine-verified)",
+   "source_section_or_page": "dose = 1.46*2.0 = 2.92; feed = 2.92*5*8.34/1.0 = 121.76",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "chlorine_residual_mg_l": 2,
+    "flow_mgd": 5,
+    "stoich_ratio": 1.46,
+    "purity_pct": 100
+   },
+   "outputs": {
+    "reagent_dose_mg_l": {
+     "value": 2.92,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "feed_lb_day": {
+     "value": 121.76,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dechlorination-dose",
+   "source_publisher": "Dechlorination stoichiometry + pounds formula",
+   "source_title": "cross-check: a 65% product needs proportionally more feed, 187.3 lb/day",
+   "source_edition_or_year": "spec-v971 worked example (machine-verified)",
+   "source_section_or_page": "feed = 2.92*5*8.34/0.65 = 121.76/0.65 = 187.32 lb/day",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "chlorine_residual_mg_l": 2,
+    "flow_mgd": 5,
+    "stoich_ratio": 1.46,
+    "purity_pct": 65
+   },
+   "outputs": {
+    "feed_lb_day": {
+     "value": 187.32,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "chlorine-demand",
    "source_publisher": "Standard Methods 4500-Cl / AWWA M14 (by name)",
    "source_title": "applied 3.0, residual 0.8 -> demand 2.2, dose 3.2 for a 1.0 target",
