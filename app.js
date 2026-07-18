@@ -615,6 +615,8 @@ const TOOL_MODULES = (() => {
     "concrete-corbel-bracket",
     // spec-v793 fresh (batch) concrete temperature (ACI 305.1)
     "fresh-concrete-temp",
+    // spec-v918 curing compound coverage (ASTM C309)
+    "curing-compound-coverage",
   ]);
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio: a new
   // lazy Group E cluster, where the steel / RC member load path meets the

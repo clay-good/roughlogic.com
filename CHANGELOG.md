@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): add curing-compound-coverage tile (spec-v918); 2026-07-18
+
+- New Group E tile `curing-compound-coverage` (Concrete Curing Compound Coverage) in calc-concrete.js. Gallons of
+  liquid membrane-forming curing compound (ASTM C309): gallons = ceil(area x coats / coverage x (1 + waste)), coverage
+  ~200 sf/gal but the label governs. A 2,500 sf slab at 1 coat = 13 gal (3 pails); 3,200 sf at 2 coats with 10% waste =
+  36 gal. Apply after the surface sheen leaves; Type 1-D dissipating or Type 2 white-pigmented per the job. The product
+  data sheet and spec govern. Home count 1,366 -> 1,367.
+
 ### feat(machining): add reaming-drill-allowance tile (spec-v917); 2026-07-18
 
 - New Group K tile `reaming-drill-allowance` (Reaming Prebore (Drill) Allowance) in calc-machining.js, beside

@@ -1433,3 +1433,41 @@ CONCRETE_RENDERERS["fresh-concrete-temp"] = _simpleRenderer({
   ],
   compute: computeFreshConcreteTemp,
 });
+
+// ===================== spec-v918: curing compound coverage =====================
+// dims: in { slab_area_sf: L^2, coats: dimensionless, coverage_sf_per_gal: L^2, waste_pct: dimensionless } out: { gallons_needed: dimensionless, gallons_exact: dimensionless, pails_5gal: dimensionless }
+export function computeCuringCompoundCoverage({ slab_area_sf = 2500, coats = 1, coverage_sf_per_gal = 200, waste_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(slab_area_sf > 0)) return { error: "Slab area must be positive (sf)." };
+  if (!(coats > 0)) return { error: "Coats must be positive." };
+  if (!(coverage_sf_per_gal > 0)) return { error: "Coverage rate must be positive (sf/gal)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  const gallons_exact = slab_area_sf * coats / coverage_sf_per_gal * (100 + waste_pct) / 100;
+  const gallons_needed = Math.ceil(gallons_exact);
+  const pails_5gal = Math.ceil(gallons_needed / 5);
+  if (![gallons_exact, gallons_needed, pails_5gal].every(Number.isFinite)) return { error: "Coverage math is not a finite value." };
+  return {
+    gallons_exact,
+    gallons_needed,
+    pails_5gal,
+    note: "Liquid membrane-forming curing compound (ASTM C309): gallons = area x coats / coverage, rounded up. Coverage runs about 200 sf/gal but the product label governs -- a rougher broom or tined finish, a second coat, and vertical faces all cut it. Apply right after the surface sheen leaves so the membrane seals in the mix water; a dissipating-resin (Type 1-D) or a white-pigmented (Type 2, reflects heat) is chosen per the job. A material-ordering estimate; the product data sheet and the spec govern the rate and the type.",
+  };
+}
+export const curingCompoundCoverageExample = { inputs: { slab_area_sf: 2500, coats: 1, coverage_sf_per_gal: 200, waste_pct: 0 } };
+
+CONCRETE_RENDERERS["curing-compound-coverage"] = _simpleRenderer({
+  citation: "Citation: liquid membrane cure coverage by name (ASTM C309). gallons = ceil(area x coats / coverage x (1 + waste)); coverage ~200 sf/gal but the product label governs. Apply after the surface sheen leaves. A material estimate; the product data sheet and the spec govern.",
+  example: curingCompoundCoverageExample.inputs,
+  fields: [
+    { key: "slab_area_sf", label: "Slab area (sf)", kind: "number", default: 2500 },
+    { key: "coats", label: "Coats", kind: "number", default: 1 },
+    { key: "coverage_sf_per_gal", label: "Coverage (sf/gal, label governs)", kind: "number", default: 200 },
+    { key: "waste_pct", label: "Waste / overspray (%)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "g", id: "ccc-out-g", label: "Curing compound", value: (r) => fmt(r.gallons_needed, 0) + " gal (" + fmt(r.gallons_exact, 1) + " exact)" },
+    { key: "p", id: "ccc-out-p", label: "5-gallon pails", value: (r) => fmt(r.pails_5gal, 0) + " pails" },
+    { key: "n", id: "ccc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCuringCompoundCoverage,
+});

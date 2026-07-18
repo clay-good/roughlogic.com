@@ -817,6 +817,7 @@ export const COMPUTE_MAP = {
   "stucco-coverage": { module: "../../calc-construction.js", fn: "computeStuccoCoverage" },
   "vapor-barrier-rolls": { module: "../../calc-construction.js", fn: "computeVaporBarrierRolls" },
   "concrete-sawcut-footage": { module: "../../calc-construction.js", fn: "computeConcreteSawcutFootage" },
+  "curing-compound-coverage": { module: "../../calc-concrete.js", fn: "computeCuringCompoundCoverage" },
   "joist-hanger-count": { module: "../../calc-construction.js", fn: "computeJoistHangerCount" },
   "drywall-fastener-takeoff": { module: "../../calc-construction.js", fn: "computeDrywallFastenerTakeoff" },
   "glass-vacuum-lift": { module: "../../calc-construction.js", fn: "computeGlassVacuumLift" },

@@ -26782,6 +26782,24 @@ test("bounds: spec-v910 computeKnurlBlankDiameter pins the teeth, blank diameter
   assert.ok("error" in _v910({ target_diameter_in: Infinity, knurl_tpi: 21 }));
 });
 
+import { computeCuringCompoundCoverage as _v918 } from "../../calc-concrete.js";
+
+test("bounds: spec-v918 computeCuringCompoundCoverage pins the gallons, pails, waste, and error seams", () => {
+  const r = _v918({ slab_area_sf: 2500, coats: 1, coverage_sf_per_gal: 200, waste_pct: 0 });
+  assert.ok(Math.abs(r.gallons_exact - 12.5) < 1e-9); // 2500/200
+  assert.equal(r.gallons_needed, 13); // ceil
+  assert.equal(r.pails_5gal, 3); // ceil(13/5)
+  // Two coats + waste.
+  const two = _v918({ slab_area_sf: 3200, coats: 2, coverage_sf_per_gal: 200, waste_pct: 10 });
+  assert.equal(two.gallons_needed, 36); // ceil(3200*2/200*1.10) = ceil(35.2)
+  // Error seams: non-positive area / coats / coverage, negative waste, non-finite.
+  assert.ok("error" in _v918({ slab_area_sf: 0, coats: 1, coverage_sf_per_gal: 200 }));
+  assert.ok("error" in _v918({ slab_area_sf: 2500, coats: 0, coverage_sf_per_gal: 200 }));
+  assert.ok("error" in _v918({ slab_area_sf: 2500, coats: 1, coverage_sf_per_gal: 0 }));
+  assert.ok("error" in _v918({ slab_area_sf: 2500, coats: 1, coverage_sf_per_gal: 200, waste_pct: -5 }));
+  assert.ok("error" in _v918({ slab_area_sf: Infinity, coats: 1, coverage_sf_per_gal: 200 }));
+});
+
 import { computeDuctTransitionLength as _v916 } from "../../calc-metalair.js";
 
 test("bounds: spec-v916 computeDuctTransitionLength pins concentric/eccentric length, ratio, and error seams", () => {

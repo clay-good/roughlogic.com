@@ -34550,6 +34550,58 @@
    }
   },
   {
+   "tile_id": "curing-compound-coverage",
+   "source_publisher": "liquid membrane cure coverage (ASTM C309)",
+   "source_title": "2,500 sf slab, 1 coat, 200 sf/gal -> 13 gal, 3 pails",
+   "source_edition_or_year": "spec-v918 worked example (machine-verified)",
+   "source_section_or_page": "gallons = ceil(2500*1/200) = ceil(12.5) = 13; pails = ceil(13/5) = 3",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "slab_area_sf": 2500,
+    "coats": 1,
+    "coverage_sf_per_gal": 200,
+    "waste_pct": 0
+   },
+   "outputs": {
+    "gallons_needed": {
+     "value": 13,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "pails_5gal": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "curing-compound-coverage",
+   "source_publisher": "liquid membrane cure coverage (ASTM C309)",
+   "source_title": "cross-check: 3,200 sf, 2 coats, 200 sf/gal, 10% waste -> 36 gal",
+   "source_edition_or_year": "spec-v918 worked example (machine-verified)",
+   "source_section_or_page": "gallons = ceil(3200*2/200*1.10) = ceil(35.2) = 36",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "slab_area_sf": 3200,
+    "coats": 2,
+    "coverage_sf_per_gal": 200,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "gallons_needed": {
+     "value": 36,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "duct-transition-length",
    "source_publisher": "duct transition length geometry (SMACNA)",
    "source_title": "20 in to 12 in, 15 deg per side -> concentric 14.93 in, eccentric 29.86 in",

@@ -8222,6 +8222,17 @@ export const CITATIONS = {
       { name: "Joint spacing", value: "~24 to 36 times the slab thickness (from control-joint-spacing)", source: "ACI 302 / PCA guidance" },
     ],
   },
+  "curing-compound-coverage": {
+    formula: "gallons_exact = slab_area_sf x coats / coverage_sf_per_gal x (100 + waste_pct)/100; gallons_needed = ceil(gallons_exact); pails_5gal = ceil(gallons_needed / 5).",
+    edition: "ASTM C309 (Liquid Membrane-Forming Compounds for Curing Concrete) by name; the coverage rate and compound type come from the product data sheet and the spec.",
+    freeAccess: "The coverage arithmetic is public first-principles (area over rate); the coverage rate (~200 sf/gal) and the compound type are on the product label per ASTM C309.",
+    governance: GOVERNANCE.general,
+    editionNote: "Liquid membrane-forming curing compound per ASTM C309: gallons = area x coats / coverage, rounded up. Coverage is about 200 sf/gal but the product label governs -- a rougher broom or tined finish, a second coat, and vertical faces all cut it. The compound is applied right after the surface bleed-water sheen leaves so the film seals the mix water in for hydration. A dissipating-resin compound (Type 1-D) burns off for later coatings; a white-pigmented compound (Type 2) reflects heat on hot-weather slabs. A material-ordering estimate; the product data sheet and the spec govern the rate and the type.",
+    assumptions: [
+      { name: "Coverage rate", value: "~200 sf/gal typical; the product label governs, and a rough/tined finish or vertical face cuts it", source: "ASTM C309 / product data sheet" },
+      { name: "Timing and type", value: "apply after the surface sheen leaves; Type 1-D dissipating or Type 2 white-pigmented per the job", source: "ASTM C309" },
+    ],
+  },
   "joist-hanger-count": {
     formula: "joists = ceil(run_width_ft x 12 / spacing_in) + 1; hangers = joists x ends_per_joist; hanger_nails = hangers x nails_per_hanger.",
     edition: "Joist-hanger count identity by name (joists across the run, hangers on the hung ends, filled holes); first-principles count arithmetic.",

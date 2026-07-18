@@ -18397,6 +18397,31 @@
       "kind": "industry"
     },
     {
+      "term": "curing compound coverage",
+      "target": "curing-compound-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete curing compound",
+      "target": "curing-compound-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "cure and seal coverage",
+      "target": "curing-compound-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "curing compound gallons",
+      "target": "curing-compound-coverage",
+      "kind": "adjacent"
+    },
+    {
+      "term": "membrane cure gallons",
+      "target": "curing-compound-coverage",
+      "kind": "adjacent"
+    },
+    {
       "term": "control joint footage",
       "target": "concrete-sawcut-footage",
       "kind": "industry"
