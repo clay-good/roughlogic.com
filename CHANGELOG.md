@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(lowvoltage): round-trip fiber loss budget against its max-length inverse; 2026-07-17
+
+- Consistency guard: fiber link loss = length x attenuation + connectors x loss + splices x loss rises with each term,
+  and feeding the computed total back as the channel budget into the max-length inverse recovers the link length.
+  Test-only.
+
 ### test(powerquality): guard three-phase neutral current physics; 2026-07-17
 
 - Physical guards: In = sqrt(a^2+b^2+c^2-ab-bc-ca) is zero for a balanced load, equals the phase current for a

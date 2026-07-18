@@ -12243,3 +12243,16 @@ test("physical: three-phase neutral current is zero when balanced, equals the ph
   assert.ok(nc({ triplen_pct: 40 }).harmonic_neutral_A > nc({ triplen_pct: 20 }).harmonic_neutral_A, "harmonic neutral must rise with triplen content");
   assert.ok(Math.abs(nc({ triplen_pct: 30 }).harmonic_neutral_A - 3 * 100 * 30 / 100) < 1e-9, "triplen neutral = 3 * avg phase * triplen fraction");
 });
+
+test("consistency: fiber loss budget and its max-length inverse round-trip, and loss scales correctly (lowvoltage)", async () => {
+  const l = await import("../../calc-lowvoltage.js");
+  const fl = (o) => l.computeFiberLossBudget({ length_m: 1000, attenuation_db_km: 0.35, connector_count: 4, loss_per_connector_db: 0.75, splice_count: 2, loss_per_splice_db: 0.3, ...o });
+  assert.ok(fl({ length_m: 2000 }).total_loss_db > fl({}).total_loss_db, "link loss must rise with length");
+  assert.ok(fl({ connector_count: 6 }).total_loss_db > fl({}).total_loss_db, "link loss must rise with connector count");
+  assert.ok(fl({ splice_count: 4 }).total_loss_db > fl({}).total_loss_db, "link loss must rise with splice count");
+  assert.ok(fl({ attenuation_db_km: 0.5 }).total_loss_db > fl({}).total_loss_db, "link loss must rise with fiber attenuation");
+  assert.ok(Math.abs(fl({}).total_loss_db - (0.35 + 3 + 0.6)) < 1e-9, "total loss = length*atten + connectors*loss + splices*loss");
+  // Round-trip: feeding the computed total loss as the channel budget into the max-length inverse recovers the length.
+  const ml = l.computeFiberMaxLength({ max_channel_loss_db: fl({}).total_loss_db, attenuation_db_km: 0.35, connector_count: 4, loss_per_connector_db: 0.75, splice_count: 2, loss_per_splice_db: 0.3 });
+  assert.ok(Math.abs(ml.max_length_m - 1000) < 1e-6, "fiber loss budget and its max-length inverse must round-trip the link length");
+});
