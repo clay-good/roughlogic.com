@@ -1262,6 +1262,7 @@ export const COMPUTE_MAP = {
   "grounding-electrode-conductor": { module: "../../calc-electrical.js", fn: "computeGroundingElectrodeConductor" },
   "bonding-jumper": { module: "../../calc-electrical.js", fn: "computeBondingJumper" },
   "min-conductor-for-vd": { module: "../../calc-electrical.js", fn: "computeMinConductorForVd" },
+  "max-circuit-length-for-vd": { module: "../../calc-electrical.js", fn: "computeMaxCircuitLengthForVd" },
   "motor-synchronous-speed-slip": { module: "../../calc-motor.js", fn: "computeMotorSyncSlip" },
   "motor-pole-identification": { module: "../../calc-motor.js", fn: "computeMotorPoleIdentification" },
   "motor-shaft-torque": { module: "../../calc-motor.js", fn: "computeMotorShaftTorque" },

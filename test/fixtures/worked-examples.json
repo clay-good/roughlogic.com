@@ -28200,6 +28200,62 @@
    }
   },
   {
+   "tile_id": "max-circuit-length-for-vd",
+   "source_publisher": "Max circuit length for a voltage-drop target (I x R, solved for length)",
+   "source_title": "#12 Cu (6,530 cmil), 20 A, 120 V, 3%, single-phase -> 3.6 V allowable, 45.56 ft max",
+   "source_edition_or_year": "spec-v981 worked example (machine-verified)",
+   "source_section_or_page": "VD = 0.03*120 = 3.6; L = 3.6*6530/(2*12.9*20) = 23508/516 = 45.56 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "source_voltage_v": 120,
+    "target_vd_pct": 3,
+    "current_a": 20,
+    "conductor_cmil": 6530,
+    "k_constant": 12.9,
+    "phases": 1
+   },
+   "outputs": {
+    "vd_target_volts": {
+     "value": 3.6,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "max_length_ft": {
+     "value": 45.56,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "max-circuit-length-for-vd",
+   "source_publisher": "Max circuit length for a voltage-drop target (I x R, solved for length)",
+   "source_title": "cross-check: the same wire on 208 V three-phase reaches farther, 91.18 ft",
+   "source_edition_or_year": "spec-v981 worked example (machine-verified)",
+   "source_section_or_page": "L = (0.03*208)*6530/(sqrt(3)*12.9*20) = 6.24*6530/446.87 = 91.18 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "source_voltage_v": 208,
+    "target_vd_pct": 3,
+    "current_a": 20,
+    "conductor_cmil": 6530,
+    "k_constant": 12.9,
+    "phases": 3
+   },
+   "outputs": {
+    "max_length_ft": {
+     "value": 91.18,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "min-conductor-for-vd",
    "source_publisher": "First-principles I x R voltage drop (K = copper 12.9 ohm-cmil/ft at 75 C)",
    "source_title": "smallest standard conductor at or below the target drop percent",

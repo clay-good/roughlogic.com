@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): add max-circuit-length-for-vd tile (spec-v981); 2026-07-18
+
+- New Group A tile `max-circuit-length-for-vd` in calc-electrical.js. Solves the I x R voltage-drop relation for LENGTH:
+  max one-way run = allowable-drop-volts x conductor cmil / (factor x K x current), factor 2 single-phase / sqrt(3)
+  three-phase, K 12.9 Cu / 21.2 Al. #12 Cu (6,530 cmil), 20 A, 120 V, 3% single-phase = 45.56 ft; the same wire on
+  208 V three-phase reaches 91.18 ft. The inverse of min-conductor-for-vd -- given the wire, how far can it run. Home
+  count 1,429 -> 1,430.
+
 ### feat(hvac): add valve-authority tile (spec-v980); 2026-07-18
 
 - New Group C tile `valve-authority` (Control Valve Authority, Beta) in calc-hvacsystems.js. beta = valve open pressure

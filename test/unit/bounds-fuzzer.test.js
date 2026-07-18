@@ -28207,3 +28207,26 @@ test("bounds: spec-v980 computeValveAuthority pins beta and the verdict bands, a
   assert.ok("error" in _v980({ valve_pressure_drop_psi: 5, controlled_circuit_drop_psi: -1 }));
   assert.ok("error" in _v980({ valve_pressure_drop_psi: Infinity, controlled_circuit_drop_psi: 3 }));
 });
+
+import { computeMaxCircuitLengthForVd as _v981 } from "../../calc-electrical.js";
+
+test("bounds: spec-v981 computeMaxCircuitLengthForVd pins the length-for-VD and error seams", () => {
+  const r = _v981({ source_voltage_v: 120, target_vd_pct: 3, current_a: 20, conductor_cmil: 6530, k_constant: 12.9, phases: 1 });
+  assert.ok(Math.abs(r.vd_target_volts - 3.6) < 1e-9); // 0.03*120
+  assert.ok(Math.abs(r.max_length_ft - 45.5581) < 1e-2); // 3.6*6530/(2*12.9*20)
+  // Three-phase (208 V, sqrt(3) factor) reaches farther on the same wire.
+  const threeph = _v981({ source_voltage_v: 208, target_vd_pct: 3, current_a: 20, conductor_cmil: 6530, k_constant: 12.9, phases: 3 });
+  assert.ok(Math.abs(threeph.max_length_ft - 91.181) < 0.05);
+  assert.ok(threeph.max_length_ft > r.max_length_ft);
+  // Doubling the current halves the length; a bigger wire lengthens it.
+  assert.ok(Math.abs(_v981({ source_voltage_v: 120, target_vd_pct: 3, current_a: 40, conductor_cmil: 6530, k_constant: 12.9, phases: 1 }).max_length_ft - r.max_length_ft / 2) < 1e-6);
+  assert.ok(_v981({ source_voltage_v: 120, target_vd_pct: 3, current_a: 20, conductor_cmil: 13060, k_constant: 12.9, phases: 1 }).max_length_ft > r.max_length_ft);
+  // Aluminum (higher K) reaches less far than copper.
+  assert.ok(_v981({ source_voltage_v: 120, target_vd_pct: 3, current_a: 20, conductor_cmil: 6530, k_constant: 21.2, phases: 1 }).max_length_ft < r.max_length_ft);
+  // Error seams: non-positive voltage / target / current / cmil / K, bad phase, non-finite.
+  assert.ok("error" in _v981({ source_voltage_v: 0, target_vd_pct: 3, current_a: 20, conductor_cmil: 6530, k_constant: 12.9, phases: 1 }));
+  assert.ok("error" in _v981({ source_voltage_v: 120, target_vd_pct: 0, current_a: 20, conductor_cmil: 6530, k_constant: 12.9, phases: 1 }));
+  assert.ok("error" in _v981({ source_voltage_v: 120, target_vd_pct: 3, current_a: 0, conductor_cmil: 6530, k_constant: 12.9, phases: 1 }));
+  assert.ok("error" in _v981({ source_voltage_v: 120, target_vd_pct: 3, current_a: 20, conductor_cmil: 6530, k_constant: 12.9, phases: 2 }));
+  assert.ok("error" in _v981({ source_voltage_v: Infinity, target_vd_pct: 3, current_a: 20, conductor_cmil: 6530, k_constant: 12.9, phases: 1 }));
+});

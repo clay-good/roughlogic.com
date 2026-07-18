@@ -5917,3 +5917,59 @@ function _v951renderSoilResistivityWenner(inputRegion, outputRegion, citationEl)
   for (const f of [sp, rr]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["soil-resistivity-wenner"] = _v951renderSoilResistivityWenner;
+
+// ===================== spec-v981: maximum one-way circuit length for a voltage-drop target =====================
+// dims: in { args: dimensionless } out: { vd_target_volts: dimensionless, max_length_ft: dimensionless }
+export function computeMaxCircuitLengthForVd({ source_voltage_v = 120, target_vd_pct = 3, current_a = 20, conductor_cmil = 6530, k_constant = 12.9, phases = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(source_voltage_v > 0)) return { error: "Source voltage must be positive (V)." };
+  if (!(target_vd_pct > 0)) return { error: "Target voltage drop must be positive (percent)." };
+  if (!(current_a > 0)) return { error: "Load current must be positive (A)." };
+  if (!(conductor_cmil > 0)) return { error: "Conductor size must be positive (circular mils)." };
+  if (!(k_constant > 0)) return { error: "Resistivity constant K must be positive (12.9 Cu, 21.2 Al)." };
+  if (phases !== 1 && phases !== 3) return { error: "Phases must be 1 (single-phase) or 3 (three-phase)." };
+  // VD = (2 or sqrt3) x K x I x L / cmil, solved for the one-way length L at the target drop.
+  const vd_target_volts = (target_vd_pct / 100) * source_voltage_v;
+  const factor = phases === 3 ? Math.sqrt(3) : 2;
+  const max_length_ft = vd_target_volts * conductor_cmil / (factor * k_constant * current_a);
+  if (![vd_target_volts, max_length_ft].every(Number.isFinite)) return { error: "Max-length math is not a finite value." };
+  return {
+    vd_target_volts,
+    max_length_ft,
+    note: "The longest one-way circuit run that still meets a voltage-drop target, the inverse of the voltage-drop tile (which gives the drop for a known length) and the min-conductor tile (which gives the wire for a known length). The drop is VD = (2 for single-phase, sqrt(3) for three-phase) x K x I x L / circular mils, so the maximum length is L = VD_target x cmil / (factor x K x I), where VD_target = target percent x source voltage, K is the conductor resistivity constant (12.9 ohm-cmil/ft for copper, 21.2 for aluminum), I the load current, and cmil the conductor's circular-mil area (see awg-wire-geometry). A #12 copper (6,530 cmil) at 20 A on a 120 V single-phase branch reaches about 45 ft before it drops 3%; the same wire on a 208 V three-phase circuit reaches about 91 ft, because three-phase uses the sqrt(3) factor (smaller than 2) and the higher voltage raises the allowable volts. Doubling the current halves the length; going up a wire size (more cmil) or to a higher voltage lengthens it. This is the DC-resistance drop only (a lagging power factor and AC reactance add to it on larger conductors -- see voltage-drop-reactance), and the 3% branch / 5% total figures are informational NEC 210.19/215.2 recommendations, not hard limits. The conductor must still pass the NEC 310.16 ampacity and termination-temperature checks independently. A design aid; the AHJ and the adopted NEC edition govern.",
+  };
+}
+
+export const maxCircuitLengthForVdExample = { inputs: { source_voltage_v: 120, target_vd_pct: 3, current_a: 20, conductor_cmil: 6530, k_constant: 12.9, phases: 1 } };
+
+function _v981renderMaxCircuitLengthForVd(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: maximum one-way circuit length for a voltage-drop target, by name. L = VD_target x cmil / (factor x K x I); factor = 2 single-phase / sqrt(3) three-phase; K = 12.9 Cu / 21.2 Al ohm-cmil/ft; VD_target = target% x source V. DC-resistance drop only (reactance adds on larger conductors); the 3%/5% figures are NEC recommendations. The conductor must still pass the 310.16 ampacity check; the AHJ governs.";
+  const sv = makeNumber("Source voltage (V)", "mcl-sv", { step: "any", min: "0", value: "120" });
+  sv.input.value = "120";
+  const tp = makeNumber("Target voltage drop (%)", "mcl-tp", { step: "any", min: "0", value: "3" });
+  tp.input.value = "3";
+  const cu = makeNumber("Load current (A)", "mcl-cu", { step: "any", min: "0", value: "20" });
+  cu.input.value = "20";
+  const cm = makeNumber("Conductor size (circular mils)", "mcl-cm", { step: "any", min: "0", value: "6530" });
+  cm.input.value = "6530";
+  const kk = makeNumber("K (12.9 Cu, 21.2 Al)", "mcl-kk", { step: "any", min: "0", value: "12.9" });
+  kk.input.value = "12.9";
+  const ph = makeNumber("Phases (1 or 3)", "mcl-ph", { step: "1", min: "1", value: "1" });
+  ph.input.value = "1";
+  for (const f of [sv, tp, cu, cm, kk, ph]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sv.input.value = "120"; tp.input.value = "3"; cu.input.value = "20"; cm.input.value = "6530"; kk.input.value = "12.9"; ph.input.value = "1"; update(); });
+  const oV = makeOutputLine(outputRegion, "Allowable drop", "mcl-out-v");
+  const oL = makeOutputLine(outputRegion, "Max one-way length", "mcl-out-l");
+  const update = debounce(() => {
+    const r = computeMaxCircuitLengthForVd({
+      source_voltage_v: sv.input.value === "" ? 120 : Number(sv.input.value), target_vd_pct: tp.input.value === "" ? 3 : Number(tp.input.value),
+      current_a: cu.input.value === "" ? 20 : Number(cu.input.value), conductor_cmil: cm.input.value === "" ? 6530 : Number(cm.input.value),
+      k_constant: kk.input.value === "" ? 12.9 : Number(kk.input.value), phases: ph.input.value === "" ? 1 : Number(ph.input.value),
+    });
+    if (r.error) { oV.textContent = r.error; oL.textContent = "-"; return; }
+    oV.textContent = fmt(r.vd_target_volts, 2) + " V (" + fmt(Number(tp.input.value) || 3, 1) + "%)";
+    oL.textContent = fmt(r.max_length_ft, 1) + " ft one-way";
+  }, DEBOUNCE_MS);
+  for (const f of [sv, tp, cu, cm, kk, ph]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["max-circuit-length-for-vd"] = _v981renderMaxCircuitLengthForVd;

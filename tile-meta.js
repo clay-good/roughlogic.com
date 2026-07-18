@@ -702,7 +702,7 @@ const _TILES = [
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   ["grounding-electrode-conductor", "A"],
   ["bonding-jumper", "A"],
-  ["min-conductor-for-vd", "A"],
+  ["min-conductor-for-vd", "A"], ["max-circuit-length-for-vd", "A"],
   // spec-v121..v128 motors / feeders / fault / raceway / grounding / three-phase
   ["motor-synchronous-speed-slip", "A"], ["motor-pole-identification", "A"], ["motor-shaft-torque", "A"], ["motor-operating-cost", "A"], ["motor-run-hours-for-budget", "A"],
   ["multi-motor-feeder", "A"], ["conductor-short-circuit-withstand", "A"], ["conduit-thermal-expansion", "A"], ["conduit-expansion-max-run", "A"],

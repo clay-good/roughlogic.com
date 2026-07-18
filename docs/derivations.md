@@ -1955,6 +1955,7 @@ cross-check.
 | calc-electrical.js | `computeLVDCDrop` | `{ system_V = 12, awg = "10", run_length_ft = 0, current_A = 0, application = ...` | _ | _ | _ |
 | calc-electrical.js | `computeLightingDensity` | `{ area_ft2, occupancy_class }` | _ | _ | _ |
 | calc-electrical.js | `computeLuxFootcandle` | `{ mode = "convert", lux = 0, footcandles = 0, lumens = 0, area_ft2 = 0, cu = ...` | _ | _ | _ |
+| calc-electrical.js | `computeMaxCircuitLengthForVd` | `{ source_voltage_v = 120, target_vd_pct = 3, current_a = 20, conductor_cmil =...` | _ | _ | _ |
 | calc-electrical.js | `computeMicroinverterBranchCount` | `{ branch_ocpd_a = 20, unit_max_current_a = 1.21 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeMinConductorForVd` | `{ phase = "single", material = "copper", current_A = 0, length_ft = 0, source...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorBranchFromNameplate` | `{ hp = 0, voltage_V = 0, phase = 1, eta = 0.90, power_factor = 0.85, nameplat...` | _ | _ | _ |
@@ -3090,7 +3091,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1676.
+Row count: 1677.
 
 <!-- END function-corpus-v14 -->
 
@@ -3171,7 +3172,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (192 tiles)
+### Group A Electrical (193 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3260,6 +3261,7 @@ per spec-v14 §13.1 second paragraph.
 | `lux-to-footcandle` | Lux / Footcandle Converter and Lumen Method | IES Lighting Handbook (lumen method) ...; convert mode: 100 fc -> 1076.4 lux (100 * 10.764) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lv-cable-pull-footage` | Low-Voltage Cable Footage and Box Count | Low-voltage footage takeoff identity ...; total = 48*(120+15) = 6,480 ft; boxes = ceil(6480/1000) = 7 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lv-dc-drop` | Low-Voltage DC Drop | Project (first-principles); 12 V / 10 AWG Cu / 20 ft / 10 A LED lighting -> ~0.407 V ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `max-circuit-length-for-vd` | Maximum Circuit Length for a Voltage-Drop Target | Max circuit length for a voltage-drop...; VD = 0.03*120 = 3.6; L = 3.6*6530/(2*12.9*20) = 23508/516... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `max-grid-resistance-for-touch` | Max Grounding-Grid Resistance for the GPR Screen (IEEE 80) | IEEE Std 80 (ground potential rise); 200-V tolerable touch, 200-A grid current -> 1.0 ohm max ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `microinverter-branch-count` | Max Microinverters per AC Branch Circuit (NEC 705.60) | max microinverters per AC branch (NEC...; limit = 20*0.80 = 16 A; N = floor(16/1.21) = floor(13.22)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `min-conductor-for-vd` | Minimum Conductor Size for a Voltage-Drop Target | First-principles I x R voltage drop (...; spec-v109 section 2.3 (20 A, 150 ft one-way, 120 V, 3 per... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4705,6 +4707,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1429. Fixture-covered or reference-cadence: 1429 / 1429.
+Tile count: 1430. Fixture-covered or reference-cadence: 1430 / 1430.
 
 <!-- END tile-index-v14 -->
