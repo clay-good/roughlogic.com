@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(hvac): strengthen the SMACNA leakage-class guard to assert value === class number; 2026-07-17
+
+- Extended the existing SMACNA_LEAKAGE_CLASSES test (which only checked the 5 classes exist) to assert each class's
+  `cfm_per_100ft2_at_1inwc` equals its class number (the SMACNA definition: class 6 = 6 cfm/100 ft^2) and that the
+  allowances strictly increase. This table drives `duct-leakage`'s effective-class lookup and pass/fail; a transcription
+  typo (e.g. 60 for 6) would silently corrupt every verdict, which the existence check could not catch. Test-only.
+
 ### test(pipe): guard the triplicated Schedule-40 pipe-ID table (consistency + monotonicity); 2026-07-17
 
 - The Schedule-40 inside-diameter lookup that feeds pipe sizing / volume / friction / gas capacity is bundled in THREE

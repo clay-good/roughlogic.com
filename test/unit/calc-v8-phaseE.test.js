@@ -49,8 +49,22 @@ test("255 zero leak case yields effective class 3 (tightest)", () => {
   assert.equal(r.pass, true);
 });
 
-test("255 SMACNA_LEAKAGE_CLASSES has 5 expected classes", () => {
-  for (const k of [3, 6, 12, 24, 48]) assert.ok(SMACNA_LEAKAGE_CLASSES[k]);
+test("255 SMACNA_LEAKAGE_CLASSES has 5 expected classes with value === class number (SMACNA definition)", () => {
+  const keys = [3, 6, 12, 24, 48];
+  for (const k of keys) {
+    assert.ok(SMACNA_LEAKAGE_CLASSES[k], "missing SMACNA class " + k);
+    // The leakage class NUMBER is by definition the allowable cfm per 100 ft^2 at
+    // 1 in w.c. (class 6 = 6 cfm/100 ft^2). This drives duct-leakage's pass/fail
+    // and effective-class lookup; a transcription typo (e.g. 60 for 6) would
+    // silently corrupt every verdict, and the existence check would not catch it.
+    assert.equal(SMACNA_LEAKAGE_CLASSES[k].cfm_per_100ft2_at_1inwc, k,
+      "SMACNA class " + k + " cfm value must equal the class number");
+  }
+  // Strictly increasing allowance (looser class = more leakage).
+  for (let i = 1; i < keys.length; i++) {
+    assert.ok(SMACNA_LEAKAGE_CLASSES[keys[i]].cfm_per_100ft2_at_1inwc > SMACNA_LEAKAGE_CLASSES[keys[i - 1]].cfm_per_100ft2_at_1inwc,
+      "SMACNA classes not strictly increasing at " + keys[i]);
+  }
 });
 
 test("255 errors on zero design CFM / negative measured / unknown class", () => {
