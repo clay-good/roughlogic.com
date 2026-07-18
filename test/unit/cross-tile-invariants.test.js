@@ -12404,3 +12404,15 @@ test("monotonicity: AWWA main-disinfection chlorine scales with pipe volume, dos
   assert.ok(Math.abs(mc({}).available_cl_lb - mc({}).volume_gal * 25 * 8.34 / 1e6) < 1e-6, "available Cl (lb) = volume(gal) * dose(mg/L) * 8.34 / 1e6");
   assert.ok(Math.abs(mc({}).product_lb - mc({}).available_cl_lb / 0.65) < 1e-9, "product lb = available chlorine / (product fraction)");
 });
+
+test("monotonicity: water-softener sizing scales grain load and regeneration interval correctly (service)", async () => {
+  const s = await import("../../calc-service.js");
+  const ss = (o) => s.computeSoftenerSizing({ people: 4, use_per_cap: 75, hardness_gpg: 20, iron_ppm: 0, capacity: 32000, ...o });
+  assert.ok(Math.abs(ss({}).daily_gal - 4 * 75) < 1e-9, "daily use = people * per-capita use");
+  assert.ok(Math.abs(ss({}).grain_load - 300 * 20 * 1) < 1e-9, "daily grain load = daily gallons * compensated hardness");
+  assert.ok(ss({ people: 6 }).grain_load > ss({}).grain_load, "grain load must rise with household size");
+  assert.ok(ss({ hardness_gpg: 30 }).grain_load > ss({}).grain_load, "grain load must rise with water hardness");
+  assert.ok(ss({ iron_ppm: 3 }).comp_hardness > ss({}).comp_hardness, "compensated hardness must rise with dissolved iron");
+  assert.ok(ss({ capacity: 48000 }).days_between > ss({}).days_between, "days between regenerations must rise with resin capacity");
+  assert.ok(ss({ hardness_gpg: 40 }).days_between < ss({}).days_between, "days between regenerations must fall as the daily grain load rises");
+});

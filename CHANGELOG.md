@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(service): guard water-softener sizing with monotonicity; 2026-07-17
+
+- Whole-response guards: daily use = people x per-capita, daily grain load = daily gallons x compensated hardness rises
+  with household size and hardness, compensated hardness rises with dissolved iron, and days between regenerations
+  rises with resin capacity and falls as the grain load climbs. Test-only.
+
 ### test(disinfect): guard AWWA main-disinfection chlorine dosing with monotonicity; 2026-07-17
 
 - Whole-response guards: pipe volume rises with length and quadruples when diameter doubles; available Cl (lb) =
