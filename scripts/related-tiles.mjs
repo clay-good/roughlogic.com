@@ -1093,6 +1093,7 @@ const RELATED = {
   "fire-alarm-nac-voltage-drop": ["standby-battery-sizing", "voltage-drop", "lv-cable-pull-footage"],
   "loop-signal-scaling": ["access-control-power-supply", "voltage-drop", "structured-cabling-channel"],
   "rtd-resistance-to-temp": ["loop-signal-scaling", "copper-resistance", "structured-cabling-channel"],
+  "pulse-flowmeter-k-factor": ["loop-signal-scaling", "valve-flow-coefficient", "weir-flow"],
   "polymeric-sand-bags": ["paver-patio", "retaining-wall-block", "aggregate"],
   "rigid-foam-board-count": ["insulation-batt-coverage", "spray-foam-board-feet", "assembly-r-value"],
   "roof-insulation-fasteners": ["membrane-roof-takeoff", "tapered-roof-insulation", "metal-roof-panels"],

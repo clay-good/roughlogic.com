@@ -27464,3 +27464,21 @@ test("bounds: spec-v947 computeRtdResistanceToTemp pins the Callendar-Van Dusen 
   assert.ok("error" in _v947({ resistance_ohms: 900, r0_ohms: 100 })); // discriminant < 0
   assert.ok("error" in _v947({ resistance_ohms: Infinity, r0_ohms: 100 }));
 });
+
+import { computePulseFlowmeterRate as _v948 } from "../../calc-lowvoltage.js";
+
+test("bounds: spec-v948 computePulseFlowmeterRate pins the K-factor scaling and error seams", () => {
+  const r = _v948({ frequency_hz: 100, k_factor_pulses_per_gal: 200 });
+  assert.ok(Math.abs(r.flow_gpm - 30) < 1e-9); // 100*60/200
+  assert.ok(Math.abs(r.flow_gph - 1800) < 1e-6);
+  // Lower K-factor (coarser meter) = more volume per pulse = higher rate at the same frequency.
+  assert.ok(Math.abs(_v948({ frequency_hz: 100, k_factor_pulses_per_gal: 100 }).flow_gpm - 60) < 1e-9);
+  // Linear in frequency: double the Hz, double the rate.
+  assert.ok(Math.abs(_v948({ frequency_hz: 200, k_factor_pulses_per_gal: 200 }).flow_gpm - 60) < 1e-9);
+  // Zero flow reads zero (not an error).
+  assert.ok(Math.abs(_v948({ frequency_hz: 0, k_factor_pulses_per_gal: 200 }).flow_gpm - 0) < 1e-12);
+  // Error seams: negative frequency, non-positive K-factor, non-finite.
+  assert.ok("error" in _v948({ frequency_hz: -1, k_factor_pulses_per_gal: 200 }));
+  assert.ok("error" in _v948({ frequency_hz: 100, k_factor_pulses_per_gal: 0 }));
+  assert.ok("error" in _v948({ frequency_hz: Infinity, k_factor_pulses_per_gal: 200 }));
+});

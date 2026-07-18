@@ -1143,3 +1143,44 @@ function _v947renderRtdResistanceToTemp(inputRegion, outputRegion, citationEl) {
   for (const f of [rm, r0]) f.input.addEventListener("input", update);
 }
 LOWVOLTAGE_RENDERERS["rtd-resistance-to-temp"] = _v947renderRtdResistanceToTemp;
+
+// ===================== spec-v948: pulse (turbine/paddlewheel) flowmeter K-factor scaling =====================
+// dims: in { args: dimensionless } out: { flow_gpm: dimensionless, flow_gph: dimensionless }
+export function computePulseFlowmeterRate({ frequency_hz = 100, k_factor_pulses_per_gal = 200 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(frequency_hz >= 0)) return { error: "Pulse frequency cannot be negative (Hz)." };
+  if (!(k_factor_pulses_per_gal > 0)) return { error: "K-factor must be positive (pulses per gallon)." };
+  // A turbine/paddlewheel/PD meter emits K pulses per gallon; rate = pulses/sec x 60 sec/min / (pulses/gal).
+  const flow_gpm = frequency_hz * 60 / k_factor_pulses_per_gal;
+  const flow_gph = flow_gpm * 60;
+  if (![flow_gpm, flow_gph].every(Number.isFinite)) return { error: "Flowmeter rate math is not a finite value." };
+  return {
+    flow_gpm,
+    flow_gph,
+    note: "The flow rate a pulse-output flowmeter (turbine, paddlewheel, or positive-displacement) reports from its output frequency: the meter emits a fixed number of pulses per gallon -- its K-factor, stamped on the meter or its calibration certificate -- so rate = frequency (Hz = pulses/sec) x 60 / K-factor, and the totalized volume is simply the pulse count divided by the K-factor. A 200 pulse/gal meter reading 100 Hz is 30 gpm; a coarser 100 pulse/gal meter at the same 100 Hz is 60 gpm, because each pulse is worth twice the volume. The K-factor is not truly constant: it drifts with fluid viscosity and shifts at the low end of the meter's range (below its linear turndown), so a viscous fluid or a near-zero flow reads off. Some meters are rated in pulses per liter or per cubic foot -- convert first. This is the linear frequency-to-rate scaling; the meter's calibration certificate, its linear flow range, and the fluid govern the field accuracy.",
+  };
+}
+
+export const pulseFlowmeterRateExample = { inputs: { frequency_hz: 100, k_factor_pulses_per_gal: 200 } };
+
+function _v948renderPulseFlowmeterRate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: pulse-output flowmeter (turbine/paddlewheel/PD) K-factor scaling, by name. rate = frequency_Hz x 60 / K-factor (pulses per gallon); totalized volume = pulse count / K-factor. The K-factor is stamped on the meter or its calibration certificate; it drifts with viscosity and at low flow. The calibration cert, linear range, and fluid govern.";
+  const fr = makeNumber("Output frequency (Hz = pulses/sec)", "pfm-fr", { step: "any", min: "0", value: "100" });
+  fr.input.value = "100";
+  const kf = makeNumber("K-factor (pulses per gallon)", "pfm-kf", { step: "any", min: "0", value: "200" });
+  kf.input.value = "200";
+  for (const f of [fr, kf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fr.input.value = "100"; kf.input.value = "200"; update(); });
+  const oGpm = makeOutputLine(outputRegion, "Flow rate", "pfm-out-gpm");
+  const oGph = makeOutputLine(outputRegion, "Flow rate (gph)", "pfm-out-gph");
+  const update = debounce(() => {
+    const r = computePulseFlowmeterRate({
+      frequency_hz: fr.input.value === "" ? 100 : Number(fr.input.value), k_factor_pulses_per_gal: kf.input.value === "" ? 200 : Number(kf.input.value),
+    });
+    if (r.error) { oGpm.textContent = r.error; oGph.textContent = "-"; return; }
+    oGpm.textContent = fmt(r.flow_gpm, 2) + " gpm";
+    oGph.textContent = fmt(r.flow_gph, 1) + " gph";
+  }, DEBOUNCE_MS);
+  for (const f of [fr, kf]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["pulse-flowmeter-k-factor"] = _v948renderPulseFlowmeterRate;

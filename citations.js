@@ -8431,6 +8431,17 @@ export const CITATIONS = {
       { name: "Sub-zero + lead resistance", value: "below 0 C drops the C(T-100)T^3 term (< ~0.02 C to -40 C); assumes a lead-compensated 3/4-wire reading", source: "IEC 60751 / RTD wiring practice" },
     ],
   },
+  "pulse-flowmeter-k-factor": {
+    formula: "flow_gpm = frequency_hz x 60 / k_factor_pulses_per_gal; totalized volume (gal) = pulse_count / k_factor. flow_gph = flow_gpm x 60.",
+    edition: "Pulse-output flowmeter (turbine / paddlewheel / positive-displacement) K-factor frequency-to-rate scaling, by name; the meter's calibration certificate and linear flow range govern.",
+    freeAccess: "The frequency-to-rate relation is public first-principles (pulses per second over pulses per gallon); the K-factor is on the meter or its calibration certificate, and the frequency is the field reading.",
+    governance: GOVERNANCE.general,
+    editionNote: "A pulse-output flowmeter -- a turbine, paddlewheel, or positive-displacement meter -- emits a fixed number of pulses per unit volume, its K-factor. Since frequency in Hz is pulses per second, the volumetric rate is frequency x 60 / K-factor when K is in pulses per gallon, and the totalized volume is simply the accumulated pulse count divided by the K-factor. A meter stamped 200 pulses/gal reading 100 Hz is flowing 30 gpm; a coarser 100 pulses/gal meter at that same 100 Hz is 60 gpm, because each pulse now represents twice the volume. The K-factor is treated as constant here but is not exactly: it drifts with fluid viscosity (a turbine meter calibrated on water reads off on oil) and departs from linear at the low end of the meter's rated range, below its usable turndown, so a viscous fluid or a near-zero flow gives an unreliable rate. Meters are also rated variously in pulses per gallon, per liter, or per cubic foot -- the units must match before scaling. This is the linear frequency-to-rate conversion; the meter's calibration certificate, its stated linear flow range, and the actual fluid govern the field accuracy.",
+    assumptions: [
+      { name: "K-factor scaling", value: "rate = frequency_Hz x 60 / K (pulses per gallon); totalized volume = pulse count / K", source: "flowmeter practice" },
+      { name: "K-factor not exactly constant", value: "drifts with viscosity and below the linear range; match pulses/gal vs /L vs /ft^3 units first", source: "meter calibration certificate" },
+    ],
+  },
   "polymeric-sand-bags": {
     formula: "bags = ceil(area_sf x (1 + waste_pct/100) / coverage_per_bag_sf).",
     edition: "Polymeric joint-sand bag-count identity by name (area over the per-bag coverage, plus waste); first-principles arithmetic.",

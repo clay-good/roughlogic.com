@@ -161,6 +161,7 @@ const TOOL_MODULES = (() => {
     "camera-lens-fov", "camera-max-distance-for-ppf", "ceiling-speaker-coverage", "ceiling-speaker-coverage-angle", "structured-cabling-channel", "lv-cable-pull-footage", "cable-support-jhook", "access-control-power-supply", "fire-alarm-nac-voltage-drop",
     "loop-signal-scaling",
     "rtd-resistance-to-temp",
+    "pulse-flowmeter-k-factor",
   ]);
   // spec-v29 pipe / raceway field-layout bench (deepens Groups B, A, G per
   // the spec-v28 §7 roadmap; lives in its own module because calc-electrical

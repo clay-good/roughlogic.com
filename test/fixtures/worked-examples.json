@@ -34602,6 +34602,54 @@
    }
   },
   {
+   "tile_id": "pulse-flowmeter-k-factor",
+   "source_publisher": "Pulse flowmeter K-factor (turbine/paddlewheel)",
+   "source_title": "200 pulses/gal meter reading 100 Hz -> 30 gpm (1800 gph)",
+   "source_edition_or_year": "spec-v948 worked example (machine-verified)",
+   "source_section_or_page": "rate = 100 Hz x 60 / 200 pulses/gal = 30 gpm; x60 = 1800 gph",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "frequency_hz": 100,
+    "k_factor_pulses_per_gal": 200
+   },
+   "outputs": {
+    "flow_gpm": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "flow_gph": {
+     "value": 1800,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pulse-flowmeter-k-factor",
+   "source_publisher": "Pulse flowmeter K-factor (turbine/paddlewheel)",
+   "source_title": "cross-check: a coarser 100 pulses/gal meter at the same 100 Hz is 60 gpm",
+   "source_edition_or_year": "spec-v948 worked example (machine-verified)",
+   "source_section_or_page": "rate = 100 x 60 / 100 = 60 gpm (each pulse worth twice the volume)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "frequency_hz": 100,
+    "k_factor_pulses_per_gal": 100
+   },
+   "outputs": {
+    "flow_gpm": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rtd-resistance-to-temp",
    "source_publisher": "IEC 60751 platinum RTD (Callendar-Van Dusen)",
    "source_title": "Pt100 reading 119.397 ohms -> 50 C (122 F)",

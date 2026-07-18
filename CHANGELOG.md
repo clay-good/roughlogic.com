@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(low-voltage): add pulse-flowmeter-k-factor tile (spec-v948); 2026-07-18
+
+- New Group A tile `pulse-flowmeter-k-factor` (Pulse Flowmeter K-Factor, Frequency to Flow) in calc-lowvoltage.js. A
+  turbine/paddlewheel/PD meter emits a fixed K-factor of pulses per gallon, so rate = frequency (Hz) x 60 / K-factor and
+  totalized volume = pulse count / K-factor. 200 pulses/gal at 100 Hz = 30 gpm; a coarser 100 pulses/gal at the same
+  100 Hz = 60 gpm. K-factor drifts with viscosity and below the linear range; match pulses/gal vs /L vs /ft^3 first. Home
+  count 1,396 -> 1,397.
+
 ### feat(low-voltage): add rtd-resistance-to-temp tile (spec-v947); 2026-07-18
 
 - New Group A tile `rtd-resistance-to-temp` (RTD Pt100/Pt1000 Resistance to Temperature) in calc-lowvoltage.js. The
