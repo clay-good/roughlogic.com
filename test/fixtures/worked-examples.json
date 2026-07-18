@@ -5335,7 +5335,7 @@
    "source_publisher": "ASCE",
    "source_title": "Wind velocity pressure: q = 0.00256 * V^2; Kz adjusts for exposure; Cp for windward/leeward walls",
    "source_edition_or_year": "ASCE 7 (current edition); public formula",
-   "source_section_or_page": "100 mph basic wind, Exposure C (Kz=0.85), gable roof -> q=25.6 psf / qz=21.76 psf / windward 17.408 psf / leeward -10.88 psf",
+   "source_section_or_page": "100 mph basic wind, Exposure C (Kz=0.98 at 30 ft per ASCE 7-16 Table 26.10-1), gable roof -> q=25.6 psf / qz=25.088 psf / windward 20.0704 psf / leeward -12.544 psf",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -5350,19 +5350,19 @@
      }
     },
     "qz_at_30ft_psf": {
-     "value": 21.76,
+     "value": 25.088,
      "tolerance": {
       "pct": 0.5
      }
     },
     "pressure_windward_psf": {
-     "value": 17.408,
+     "value": 20.0704,
      "tolerance": {
       "pct": 0.5
      }
     },
     "pressure_leeward_psf": {
-     "value": -10.88,
+     "value": -12.544,
      "tolerance": {
       "pct": 0.5
      }

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(construction): wind-pressure Exposure C/D fallback Kz used 15-ft values at 30 ft (ASCE 7-16 Table 26.10-1); 2026-07-17
+
+- computeWindPressure exposure-fallback Kz (used when Kz is left blank) mixed heights: B=0.70 was the 30-ft value but
+  C=0.85 and D=1.03 are the 15-FT values, all labeled "Kz at 30 ft". ASCE 7-16 Table 26.10-1 gives C=0.98 and D=1.16 at
+  30 ft, so C/D wind pressure was under-stated ~13% (non-conservative) in the fallback/informational qz_at_30ft outputs.
+  Fixed C 0.85->0.98, D 1.03->1.16 (B already correct). Primary q_design uses user-supplied Kz and is unchanged; updated
+  the mirror-written worked example (qz 21.76->25.088). Web-verified against ASCE 7-16.
+
 ### fix(kitchen): brine-cure equilibrium nitrite ppm is on the green meat weight (9 CFR 424.22); 2026-07-17
 
 - computeBrineCure divided ingoing nitrite by the whole batch weight (meat+water+salt+cure) in BOTH modes. For an

@@ -975,8 +975,9 @@ export function computeWindPressure({ V_mph, exposure = "C", Kz = 0, Kzt = 1.0, 
   const V = Number(V_mph) || 0;
   if (V <= 0) return { error: "Wind speed must be positive." };
   const q_psf = 0.00256 * V * V;
-  // Exposure multipliers (Kz at 30 ft for typical exposures); orientation only.
-  const kz = exposure === "B" ? 0.70 : exposure === "D" ? 1.03 : 0.85;
+  // Exposure multipliers: Kz at 30 ft per ASCE 7-16 Table 26.10-1 (B 0.70, C 0.98, D 1.16);
+  // orientation only, and only a fallback -- enter Kz for the actual mean roof height.
+  const kz = exposure === "B" ? 0.70 : exposure === "D" ? 1.16 : 0.98;
   const qz = q_psf * kz;
   // v23 EN.8: full ASCE 7 Ch.26-27 design velocity pressure with the
   // exposure/height (Kz), topographic (Kzt), directionality (Kd), and gust
