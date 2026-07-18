@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs(gas): gas-pipe-sizing citation showed a Spitzglass formula missing the diameter-correction term; 2026-07-18
+
+- The gas-pipe-sizing tile computes with the full low-pressure Spitzglass formula including the
+  `(1 + 3.6/d + 0.03*d)` diameter correction (shared `spitzglassFlow` helper, same as the pressure-drop and
+  max-flow siblings), but its displayed citation wrote the bare `Q = 3550 * sqrt(d^5 * dP / (SG * L))`, omitting
+  that denominator term -- so a user cross-checking the shown formula against a handbook would get a different
+  (higher) capacity than the tile reports. Added the correction term to the renderer citation, the
+  docs/citation-discipline.md source-of-truth stamp, and the regenerated citation-strings.generated.json (kept
+  aligned per the citation-runtime audit). Compute unchanged. Found by a first-principles formula audit.
+
 ### fix(refrigerant): refrigerant-pt target superheat used a band that pinned to 30 F for every real condition; 2026-07-18
 
 - computeRefrigerantPT's optional target-superheat band was `clamp(70 + 0.6*IWB - 0.5*ODB, 5, 30)`. For every
