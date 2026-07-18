@@ -27059,6 +27059,22 @@ test("bounds: spec-v919 computeBrickVeneerWeepCount pins the weep count, flashin
   assert.ok("error" in _v919({ wall_length_ft: Infinity, max_spacing_in: 33, flashing_lines: 1 }));
 });
 
+import { computeConcreteStairVolume as _v936 } from "../../calc-concrete.js";
+
+test("bounds: spec-v936 computeConcreteStairVolume pins the stair volume and error seams", () => {
+  const r = _v936({ num_risers: 4, riser_in: 7, tread_in: 11, width_in: 48, throat_in: 4 });
+  assert.ok(Math.abs(r.volume_in3 - 17405.0) < 1); // (154 + 208.6)*48
+  assert.ok(Math.abs(r.volume_ft3 - 10.072) < 0.01);
+  assert.ok(Math.abs(r.volume_cy - 0.3731) < 0.001);
+  const b = _v936({ num_risers: 6, riser_in: 7.5, tread_in: 10, width_in: 36, throat_in: 5 });
+  assert.ok(Math.abs(b.volume_ft3 - 12.5) < 0.01); // (225 + 375)*36 / 1728
+  // Error seams: risers < 1, non-positive rise/tread/width/throat, non-finite.
+  assert.ok("error" in _v936({ num_risers: 0, riser_in: 7, tread_in: 11, width_in: 48, throat_in: 4 }));
+  assert.ok("error" in _v936({ num_risers: 4, riser_in: 0, tread_in: 11, width_in: 48, throat_in: 4 }));
+  assert.ok("error" in _v936({ num_risers: 4, riser_in: 7, tread_in: 11, width_in: 48, throat_in: 0 }));
+  assert.ok("error" in _v936({ num_risers: Infinity, riser_in: 7, tread_in: 11, width_in: 48, throat_in: 4 }));
+});
+
 import { computeConcreteIsolationJoint as _v921 } from "../../calc-concrete.js";
 
 test("bounds: spec-v921 computeConcreteIsolationJoint pins the filler LF, strips, and error seams", () => {

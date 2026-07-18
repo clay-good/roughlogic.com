@@ -18582,6 +18582,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "concrete stair volume",
+      "target": "concrete-stair-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "stoop concrete volume",
+      "target": "concrete-stair-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete steps volume",
+      "target": "concrete-stair-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "poured stair concrete",
+      "target": "concrete-stair-volume",
+      "kind": "adjacent"
+    },
+    {
+      "term": "stair ready mix",
+      "target": "concrete-stair-volume",
+      "kind": "adjacent"
+    },
+    {
       "term": "control joint cut length",
       "target": "concrete-sawcut-footage",
       "kind": "industry"

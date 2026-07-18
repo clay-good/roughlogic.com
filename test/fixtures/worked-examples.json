@@ -35418,6 +35418,60 @@
    }
   },
   {
+   "tile_id": "concrete-stair-volume",
+   "source_publisher": "concrete stair volume geometry (first-principles)",
+   "source_title": "4 risers, 7 in rise, 11 in tread, 48 in wide, 4 in throat -> 10.07 ft3, 0.373 cy",
+   "source_edition_or_year": "spec-v936 worked example (machine-verified)",
+   "source_section_or_page": "steps = 4*0.5*7*11 = 154; rake = sqrt(28^2+44^2) = 52.15; slab = 4*52.15 = 208.6; vol = (154+208.6)*48 = 17405 in3",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "num_risers": 4,
+    "riser_in": 7,
+    "tread_in": 11,
+    "width_in": 48,
+    "throat_in": 4
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 10.07,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "volume_cy": {
+     "value": 0.373,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-stair-volume",
+   "source_publisher": "concrete stair volume geometry (first-principles)",
+   "source_title": "cross-check: 6 risers, 7.5 in rise, 10 in tread, 36 in wide, 5 in throat -> 12.5 ft3",
+   "source_edition_or_year": "spec-v936 worked example (machine-verified)",
+   "source_section_or_page": "steps = 6*0.5*7.5*10 = 225; rake = sqrt(45^2+60^2) = 75; slab = 5*75 = 375; vol = (225+375)*36 = 21600 in3 = 12.5 ft3",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "num_risers": 6,
+    "riser_in": 7.5,
+    "tread_in": 10,
+    "width_in": 36,
+    "throat_in": 5
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 12.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-isolation-joint",
    "source_publisher": "isolation-joint filler takeoff (ACI 302 / 360)",
    "source_title": "40 x 30 ft slab, six 12 in columns (4 ft perim), 10 ft strips -> 164 LF, 17 strips",

@@ -1513,3 +1513,48 @@ CONCRETE_RENDERERS["concrete-isolation-joint"] = _simpleRenderer({
   ],
   compute: computeConcreteIsolationJoint,
 });
+
+// ===================== spec-v936: concrete stair / stoop volume takeoff =====================
+// dims: in { num_risers: dimensionless, riser_in: L, tread_in: L, width_in: L, throat_in: L } out: { volume_in3: L^3, volume_ft3: L^3, volume_cy: L^3 }
+export function computeConcreteStairVolume({ num_risers = 4, riser_in = 7, tread_in = 11, width_in = 48, throat_in = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(num_risers >= 1)) return { error: "Number of risers must be at least 1." };
+  if (!(riser_in > 0)) return { error: "Riser height must be positive (in)." };
+  if (!(tread_in > 0)) return { error: "Tread depth must be positive (in)." };
+  if (!(width_in > 0)) return { error: "Width must be positive (in)." };
+  if (!(throat_in > 0)) return { error: "Throat (waist) thickness must be positive (in)." };
+  const n = Math.round(num_risers);
+  // Cross-section = the sawtooth steps (n triangles of 1/2 R T) plus the raking waist slab (throat x rake length).
+  const steps_area = n * 0.5 * riser_in * tread_in;
+  const rake_length = Math.sqrt((n * riser_in) ** 2 + (n * tread_in) ** 2);
+  const slab_area = throat_in * rake_length;
+  const volume_in3 = (steps_area + slab_area) * width_in;
+  const volume_ft3 = volume_in3 / 1728;
+  const volume_cy = volume_in3 / 46656;
+  if (![volume_in3, volume_ft3, volume_cy].every(Number.isFinite)) return { error: "Stair-volume math is not a finite value." };
+  return {
+    volume_in3,
+    volume_ft3,
+    volume_cy,
+    note: "Concrete volume of a poured stair or stoop = the stepped wedge plus the raking waist slab: cross-section = n triangular steps (each 1/2 x riser x tread) + the throat slab (throat thickness x the rake length sqrt((n x riser)^2 + (n x tread)^2)), times the width. A 4-riser stoop at 7 in rise, 11 in tread, 48 in wide on a 4 in throat is about 10.1 ft3 (0.37 cy). Order a bit over -- this is the neat geometry, and it ignores the nosing overhang, a top landing or bottom footing, the reinforcing displacement, and the fact that the run is taken as risers x tread. A ready-mix ordering estimate; the structural stair detail and the finisher's forms govern the actual pour." ,
+  };
+}
+
+export const concreteStairVolumeExample = { inputs: { num_risers: 4, riser_in: 7, tread_in: 11, width_in: 48, throat_in: 4 } };
+
+CONCRETE_RENDERERS["concrete-stair-volume"] = _simpleRenderer({
+  citation: "Citation: concrete stair volume geometry by name. cross-section = n x (1/2 x riser x tread) steps + throat x rake-length slab; volume = cross-section x width; cy = in3 / 46656. A ready-mix estimate; the stair detail and forms govern.",
+  example: concreteStairVolumeExample.inputs,
+  fields: [
+    { key: "num_risers", label: "Number of risers", kind: "number", default: 4 },
+    { key: "riser_in", label: "Riser height (in)", kind: "number", default: 7 },
+    { key: "tread_in", label: "Tread depth (in)", kind: "number", default: 11 },
+    { key: "width_in", label: "Stair width (in)", kind: "number", default: 48 },
+    { key: "throat_in", label: "Throat / waist thickness (in)", kind: "number", default: 4 },
+  ],
+  outputs: [
+    { key: "cy", id: "csv-out-cy", label: "Concrete volume", value: (r) => fmt(r.volume_cy, 2) + " cy (" + fmt(r.volume_ft3, 1) + " ft3)" },
+    { key: "n", id: "csv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteStairVolume,
+});

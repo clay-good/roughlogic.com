@@ -8321,6 +8321,17 @@ export const CITATIONS = {
       { name: "Distinct from control joints", value: "isolation separates restrained elements; control (sawn) joints relieve shrinkage within the field", source: "ACI 302" },
     ],
   },
+  "concrete-stair-volume": {
+    formula: "steps_area = n x 0.5 x riser_in x tread_in; rake_length = sqrt((n x riser_in)^2 + (n x tread_in)^2); slab_area = throat_in x rake_length; volume_in3 = (steps_area + slab_area) x width_in; volume_cy = volume_in3 / 46656.",
+    edition: "Concrete stair / stoop volume geometry, first-principles (the waist-slab-plus-steps takeoff method); the structural stair detail and the forms govern the actual pour.",
+    freeAccess: "The stair-volume relation is public first-principles geometry (stepped wedge plus raking slab); the risers, rise, tread, width, and throat come from the stair detail.",
+    governance: GOVERNANCE.general,
+    editionNote: "The concrete volume of a poured (cast-in-place) stair or stoop, taken off as the stepped wedge plus the raking waist slab. The side-view cross-section is the n triangular steps -- each a 1/2 x riser x tread right triangle -- sitting on top of the sloped waist (throat) slab, whose area is the throat thickness times the rake length sqrt((n x riser)^2 + (n x tread)^2). Multiplying by the width and dividing by 46,656 gives cubic yards. This is the NEAT geometry: it takes the run as risers x tread and ignores the nosing overhang, a top landing or bottom footing poured monolithically, the volume the reinforcing displaces, and any batter on the sides. Order a little over the computed volume. A ready-mix ordering estimate; the structural stair detail (throat thickness, reinforcing, landings) and the finisher's forms govern the actual pour.",
+    assumptions: [
+      { name: "Waist + steps", value: "cross-section = n step triangles (1/2 R T) + throat slab (t x rake length); run taken as risers x tread", source: "stair-takeoff geometry" },
+      { name: "Neat geometry", value: "ignores nosing overhang, landings/footings, and rebar displacement; order a bit over", source: "ready-mix practice" },
+    ],
+  },
   "joist-hanger-count": {
     formula: "joists = ceil(run_width_ft x 12 / spacing_in) + 1; hangers = joists x ends_per_joist; hanger_nails = hangers x nails_per_hanger.",
     edition: "Joist-hanger count identity by name (joists across the run, hangers on the hung ends, filled holes); first-principles count arithmetic.",

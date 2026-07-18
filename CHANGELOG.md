@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): add concrete-stair-volume tile (spec-v936); 2026-07-18
+
+- New Group E tile `concrete-stair-volume` (Concrete Stair / Stoop Volume Takeoff) in calc-concrete.js, beside
+  concrete-isolation-joint. Volume = the stepped wedge (n triangles of 1/2 x riser x tread) plus the raking waist slab
+  (throat x rake length sqrt((n R)^2 + (n T)^2)), times width; cy = in^3 / 46656. A 4-riser stoop (7/11 in, 48 in wide,
+  4 in throat) = 10.1 ft^3 (0.37 cy); a 6-riser flight = 12.5 ft^3. Neat geometry; the stair detail and forms govern.
+  Raised the calc-concrete.js gzip cap 28000 -> 30000. Home count 1,384 -> 1,385.
+
 ### feat(water): add cistern-storage-days tile (spec-v935); 2026-07-18
 
 - New Group M tile `cistern-storage-days` (Cistern / Storage Reserve Days and Required Volume) in calc-water.js, beside

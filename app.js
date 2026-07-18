@@ -620,6 +620,7 @@ const TOOL_MODULES = (() => {
     // spec-v918 curing compound coverage (ASTM C309)
     "curing-compound-coverage",
     "concrete-isolation-joint",
+    "concrete-stair-volume",
   ]);
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio: a new
   // lazy Group E cluster, where the steel / RC member load path meets the
