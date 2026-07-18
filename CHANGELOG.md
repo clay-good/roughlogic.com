@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(velocity): round-trip duct velocity-pressure V = 4005 sqrt(VP); 2026-07-17
+
+- Consistency guard: the velocity and vp modes are exact inverses (VP=1 -> V=4005, and back), velocity rises with VP
+  and VP with velocity, quadrupling VP doubles V (sqrt law) while doubling V quadruples VP (square law), and
+  V -> VP -> V round-trips. Test-only.
+
 ### test(layout): guard sine-bar angle and bolt-circle hole geometry; 2026-07-17
 
 - Geometry guards: sine-bar angle = asin(H/L) (30 deg at H/L=0.5, 90 deg at H=L) rises with stack height and falls with

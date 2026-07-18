@@ -12377,3 +12377,19 @@ test("geometry: sine-bar angle = asin(H/L) and bolt-circle holes lie on the pitc
   for (const h of b.holes) assert.ok(Math.abs(Math.hypot(h.x_in, h.y_in) - 5) < 1e-9, "every hole must lie on the pitch circle (distance R from center)");
   assert.ok(Math.abs(bc({ num_holes: 8 }).angular_spacing_deg - 45) < 1e-9, "doubling the hole count must halve the angular spacing");
 });
+
+test("consistency: duct velocity-pressure solves V = 4005 sqrt(VP) both ways and round-trips (velocity)", async () => {
+  const v = await import("../../calc-velocity.js");
+  const fv = (o) => v.computeDuctVelocityPressure({ solve_for: "velocity", vp_inwc: 1.0, ...o });
+  const fp = (o) => v.computeDuctVelocityPressure({ solve_for: "vp", velocity_fpm: 4005, ...o });
+  assert.ok(Math.abs(fv({}).velocity_fpm - 4005) < 1e-6, "VP = 1 in wc must give V = 4005 fpm (standard air)");
+  assert.ok(Math.abs(fp({}).vp_inwc - 1) < 1e-9, "V = 4005 fpm must give VP = 1 in wc");
+  assert.ok(fv({ vp_inwc: 2 }).velocity_fpm > fv({}).velocity_fpm, "velocity must rise with velocity pressure");
+  assert.ok(fp({ velocity_fpm: 6000 }).vp_inwc > fp({}).vp_inwc, "velocity pressure must rise with velocity");
+  assert.ok(Math.abs(fv({ vp_inwc: 4 }).velocity_fpm / fv({}).velocity_fpm - 2) < 1e-9, "quadrupling VP must double the velocity (square-root law)");
+  assert.ok(Math.abs(fp({ velocity_fpm: 8010 }).vp_inwc / fp({}).vp_inwc - 4) < 1e-9, "doubling the velocity must quadruple VP (square law)");
+  // Round-trip: V -> VP -> V must recover the velocity.
+  const vpMid = v.computeDuctVelocityPressure({ solve_for: "vp", velocity_fpm: 3000 }).vp_inwc;
+  const vBack = v.computeDuctVelocityPressure({ solve_for: "velocity", vp_inwc: vpMid }).velocity_fpm;
+  assert.ok(Math.abs(vBack - 3000) < 1e-6, "the two directions of the velocity-pressure relation must round-trip");
+});
