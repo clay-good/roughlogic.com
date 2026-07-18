@@ -29377,6 +29377,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "iron manganese chlorine dose",
+      "target": "iron-manganese-chlorine-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "manganese oxidation dose",
+      "target": "iron-manganese-chlorine-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "iron oxidation chlorine",
+      "target": "iron-manganese-chlorine-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "chlorine to oxidize iron",
+      "target": "iron-manganese-chlorine-dose",
+      "kind": "adjacent"
+    },
+    {
+      "term": "greensand chlorine dose",
+      "target": "iron-manganese-chlorine-dose",
+      "kind": "adjacent"
+    },
+    {
       "term": "filter area for loading",
       "target": "filter-area-for-loading",
       "kind": "industry"

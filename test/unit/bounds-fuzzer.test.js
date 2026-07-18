@@ -26797,6 +26797,22 @@ test("bounds: spec-v920 computeCementBoardTakeoff pins the sheets, screws, and e
   assert.ok("error" in _v920({ area_sf: Infinity, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 35 }));
 });
 
+import { computeIronManganeseChlorineDose as _v927 } from "../../calc-water.js";
+
+test("bounds: spec-v927 computeIronManganeseChlorineDose pins the dose, lb/day, and error seams", () => {
+  const r = _v927({ fe_mgl: 3.0, mn_mgl: 0.5, extra_demand_mgl: 0.5, target_residual_mgl: 0.3, flow_mgd: 0.05 });
+  assert.ok(Math.abs(r.dose_mgl - 3.31) < 1e-9); // 0.62*3 + 1.30*0.5 + 0.5 + 0.3
+  assert.ok(Math.abs(r.dose_lb_day - 3.31 * 0.05 * 8.34) < 1e-9);
+  // Manganese term weighs more than iron per mg.
+  const mn = _v927({ fe_mgl: 0, mn_mgl: 1, extra_demand_mgl: 0, target_residual_mgl: 0, flow_mgd: 1 });
+  assert.ok(Math.abs(mn.dose_mgl - 1.30) < 1e-9);
+  // Error seams: negative Fe/Mn/demand/residual, non-positive flow, non-finite.
+  assert.ok("error" in _v927({ fe_mgl: -1, mn_mgl: 0.5, flow_mgd: 0.05 }));
+  assert.ok("error" in _v927({ fe_mgl: 3, mn_mgl: -0.1, flow_mgd: 0.05 }));
+  assert.ok("error" in _v927({ fe_mgl: 3, mn_mgl: 0.5, flow_mgd: 0 }));
+  assert.ok("error" in _v927({ fe_mgl: Infinity, mn_mgl: 0.5, flow_mgd: 0.05 }));
+});
+
 import { computeRoRecoveryConcentration as _v926 } from "../../calc-water.js";
 
 test("bounds: spec-v926 computeRoRecoveryConcentration pins recovery, CF, reject TDS, and error seams", () => {

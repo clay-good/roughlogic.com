@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(water): add iron-manganese-chlorine-dose tile (spec-v927); 2026-07-18
+
+- New Group M tile `iron-manganese-chlorine-dose` (Chlorine Dose to Oxidize Iron and Manganese) in calc-water.js, beside
+  ro-recovery-concentration. dose = 0.62 x Fe + 1.30 x Mn + demand + residual (mg/L); lb/day = dose x flow(MGD) x 8.34.
+  Fe 3.0, Mn 0.5, 0.5 demand, 0.3 residual = 3.31 mg/L, 1.38 lb/day at 0.05 MGD. Manganese is slow below pH ~8 and often
+  needs greensand/pyrolusite; jar tests and the state primacy agency govern. Home count 1,375 -> 1,376.
+
 ### feat(water): add ro-recovery-concentration tile (spec-v926); 2026-07-18
 
 - New Group M tile `ro-recovery-concentration` (RO Recovery, Concentrate Flow, and Concentration Factor) in

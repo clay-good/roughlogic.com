@@ -34602,6 +34602,60 @@
    }
   },
   {
+   "tile_id": "iron-manganese-chlorine-dose",
+   "source_publisher": "iron/manganese chlorine oxidation (AWWA / Ten States)",
+   "source_title": "Fe 3.0, Mn 0.5, 0.5 demand, 0.3 residual, 0.05 MGD -> 3.31 mg/L, 1.38 lb/day",
+   "source_edition_or_year": "spec-v927 worked example (machine-verified)",
+   "source_section_or_page": "dose = 0.62*3.0 + 1.30*0.5 + 0.5 + 0.3 = 3.31; lb/day = 3.31*0.05*8.34 = 1.38",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "fe_mgl": 3.0,
+    "mn_mgl": 0.5,
+    "extra_demand_mgl": 0.5,
+    "target_residual_mgl": 0.3,
+    "flow_mgd": 0.05
+   },
+   "outputs": {
+    "dose_mgl": {
+     "value": 3.31,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "dose_lb_day": {
+     "value": 1.38,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "iron-manganese-chlorine-dose",
+   "source_publisher": "iron/manganese chlorine oxidation (AWWA / Ten States)",
+   "source_title": "cross-check: Fe 1.0, Mn 0.2, 0.3 demand, 0.5 residual -> 1.68 mg/L",
+   "source_edition_or_year": "spec-v927 worked example (machine-verified)",
+   "source_section_or_page": "dose = 0.62*1.0 + 1.30*0.2 + 0.3 + 0.5 = 1.68",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "fe_mgl": 1.0,
+    "mn_mgl": 0.2,
+    "extra_demand_mgl": 0.3,
+    "target_residual_mgl": 0.5,
+    "flow_mgd": 0.1
+   },
+   "outputs": {
+    "dose_mgl": {
+     "value": 1.68,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ro-recovery-concentration",
    "source_publisher": "RO mass balance (AMTA / AWWA)",
    "source_title": "10 gpm feed, 7.5 gpm permeate, 500 mg/L feed -> 75% recovery, 2.5 gpm reject, CF 4, 2000 mg/L",

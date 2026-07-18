@@ -4999,6 +4999,17 @@ export const CITATIONS = {
       { name: "Scaling ceiling", value: "high recovery raises CF past the least-soluble salt's saturation; antiscalant and the LSI govern", source: "membrane scaling control" },
     ],
   },
+  "iron-manganese-chlorine-dose": {
+    formula: "dose_mgl = 0.62 x fe_mgl + 1.30 x mn_mgl + extra_demand_mgl + target_residual_mgl; dose_lb_day = dose_mgl x flow_mgd x 8.34.",
+    edition: "AWWA / Ten States Standards iron-and-manganese oxidation stoichiometry (0.62 mg Cl2/mg Fe, 1.30 mg Cl2/mg Mn), by name; jar tests and the state primacy agency govern.",
+    freeAccess: "The oxidation stoichiometry (0.62 and 1.30) and the 8.34 pounds formula are public water-treatment relations; the raw Fe/Mn, the demand, the residual, and the flow come from the water quality and the plant.",
+    governance: GOVERNANCE.water,
+    editionNote: "The free-chlorine dose to oxidize dissolved (ferrous / manganous) iron and manganese ahead of a filter. The stoichiometry is 0.62 mg of chlorine per mg of ferrous iron and 1.30 mg of chlorine per mg of manganese; add any other chlorine demand and the free-chlorine residual to be carried, then dose (mg/L) x flow (MGD) x 8.34 gives the pounds per day of chlorine. Iron(II) oxidizes within minutes, but manganese(II) oxidizes slowly at low pH and often needs a pH near 8, a longer contact time, or a catalytic filter medium (manganese greensand or pyrolusite) to finish -- potassium permanganate or aeration are alternative oxidants. This is a dosing estimate; jar tests, the operating pH, the contact time, and the state primacy agency govern the actual feed and the compliance sampling.",
+    assumptions: [
+      { name: "Oxidation stoichiometry", value: "0.62 mg Cl2 per mg Fe(II); 1.30 mg Cl2 per mg Mn(II); plus demand and residual", source: "AWWA / Ten States" },
+      { name: "Manganese kinetics", value: "Mn(II) is slow below pH ~8; often needs a catalytic (greensand / pyrolusite) filter or permanganate", source: "water-treatment practice" },
+    ],
+  },
   "filter-area-for-loading": {
     formula: "Required filter area (ft²) = design_flow / target_loading. Backwash flow = backwash_rate × area. Bands: rapid sand 2-5 gpm/ft², high-rate 5-8 gpm/ft².",
     edition: "Ten States Standards (Recommended Standards for Water Works), Great Lakes - Upper Mississippi River Board of State and Provincial Public Health and Environmental Managers, current edition by name. AWWA B100 / B130 (filter media) by name.",

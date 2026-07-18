@@ -1814,3 +1814,55 @@ function _v926renderRoRecoveryConcentration(inputRegion, outputRegion, citationE
   for (const f of [fd, pm, td]) f.input.addEventListener("input", update);
 }
 WATER_RENDERERS["ro-recovery-concentration"] = _v926renderRoRecoveryConcentration;
+
+// ===================== spec-v927: chlorine dose to oxidize iron and manganese =====================
+// dims: in { fe_mgl: M L^-3, mn_mgl: M L^-3, extra_demand_mgl: M L^-3, target_residual_mgl: M L^-3, flow_mgd: L^3 T^-1 } out: { dose_mgl: M L^-3, dose_lb_day: M T^-1 }
+export function computeIronManganeseChlorineDose({ fe_mgl = 3.0, mn_mgl = 0.5, extra_demand_mgl = 0.5, target_residual_mgl = 0.3, flow_mgd = 0.05 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (fe_mgl < 0) return { error: "Iron cannot be negative (mg/L)." };
+  if (mn_mgl < 0) return { error: "Manganese cannot be negative (mg/L)." };
+  if (extra_demand_mgl < 0) return { error: "Extra demand cannot be negative (mg/L)." };
+  if (target_residual_mgl < 0) return { error: "Target residual cannot be negative (mg/L)." };
+  if (!(flow_mgd > 0)) return { error: "Flow must be positive (MGD)." };
+  // Stoichiometry: 0.62 mg Cl2 per mg Fe(II), 1.30 mg Cl2 per mg Mn(II); plus the other demand and the target residual.
+  const dose_mgl = 0.62 * fe_mgl + 1.30 * mn_mgl + extra_demand_mgl + target_residual_mgl;
+  const dose_lb_day = dose_mgl * flow_mgd * 8.34;
+  if (![dose_mgl, dose_lb_day].every(Number.isFinite)) return { error: "Chlorine-dose math is not a finite value." };
+  return {
+    dose_mgl,
+    dose_lb_day,
+    note: "Free-chlorine dose to oxidize dissolved iron and manganese ahead of a filter: 0.62 mg Cl2 per mg of ferrous iron, 1.30 mg Cl2 per mg of manganese, plus any other chlorine demand and the free-chlorine residual to carry. Dose (mg/L) x flow (MGD) x 8.34 = lb/day of chlorine. Fe(II) oxidizes in minutes, but Mn(II) is slow at low pH and often needs a pH near 8 or a catalytic (greensand / pyrolusite) filter to finish; permanganate or air are alternatives to chlorine. A dosing estimate; jar tests, the pH, the contact time, and the state primacy agency govern the actual feed. A wrong dose is a re-set, breakthrough, or a dirty filter, not a compliance sign-off.",
+  };
+}
+
+export const ironManganeseChlorineDoseExample = { inputs: { fe_mgl: 3.0, mn_mgl: 0.5, extra_demand_mgl: 0.5, target_residual_mgl: 0.3, flow_mgd: 0.05 } };
+
+function _v927renderIronManganeseChlorineDose(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: iron/manganese chlorine-oxidation stoichiometry by name (AWWA / Ten States). 0.62 mg Cl2 per mg Fe, 1.30 mg Cl2 per mg Mn, plus other demand and the target residual; lb/day = dose x flow(MGD) x 8.34. Jar tests, pH, and the state primacy agency govern.";
+  const fe = makeNumber("Iron Fe (mg/L)", "imc-fe", { step: "any", min: "0", value: "3.0" });
+  fe.input.value = "3.0";
+  const mn = makeNumber("Manganese Mn (mg/L)", "imc-mn", { step: "any", min: "0", value: "0.5" });
+  mn.input.value = "0.5";
+  const dm = makeNumber("Other chlorine demand (mg/L)", "imc-dm", { step: "any", min: "0", value: "0.5" });
+  dm.input.value = "0.5";
+  const rs = makeNumber("Target free residual (mg/L)", "imc-rs", { step: "any", min: "0", value: "0.3" });
+  rs.input.value = "0.3";
+  const fl = makeNumber("Flow (MGD)", "imc-fl", { step: "any", min: "0", value: "0.05" });
+  fl.input.value = "0.05";
+  for (const f of [fe, mn, dm, rs, fl]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fe.input.value = "3.0"; mn.input.value = "0.5"; dm.input.value = "0.5"; rs.input.value = "0.3"; fl.input.value = "0.05"; update(); });
+  const oDose = makeOutputLine(outputRegion, "Chlorine dose", "imc-out-d");
+  const oLb = makeOutputLine(outputRegion, "Chlorine feed", "imc-out-lb");
+  const update = debounce(() => {
+    const r = computeIronManganeseChlorineDose({
+      fe_mgl: fe.input.value === "" ? 3.0 : Number(fe.input.value), mn_mgl: mn.input.value === "" ? 0.5 : Number(mn.input.value),
+      extra_demand_mgl: dm.input.value === "" ? 0.5 : Number(dm.input.value), target_residual_mgl: rs.input.value === "" ? 0.3 : Number(rs.input.value),
+      flow_mgd: fl.input.value === "" ? 0.05 : Number(fl.input.value),
+    });
+    if (r.error) { oDose.textContent = r.error; oLb.textContent = "-"; return; }
+    oDose.textContent = fmt(r.dose_mgl, 2) + " mg/L";
+    oLb.textContent = fmt(r.dose_lb_day, 2) + " lb/day";
+  }, DEBOUNCE_MS);
+  for (const f of [fe, mn, dm, rs, fl]) f.input.addEventListener("input", update);
+}
+WATER_RENDERERS["iron-manganese-chlorine-dose"] = _v927renderIronManganeseChlorineDose;
