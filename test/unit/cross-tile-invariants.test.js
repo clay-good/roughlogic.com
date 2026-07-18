@@ -12032,3 +12032,19 @@ test("monotonicity: off-grid battery bank sizing responds correctly to load, aut
   assert.ok(ob({ dod_limit: 0.8 }).nameplate_wh < ob({}).nameplate_wh, "bank energy must fall as a deeper discharge is allowed");
   assert.ok(ob({ system_voltage_v: 48 }).nameplate_ah < ob({}).nameplate_ah, "amp-hours must fall as system voltage rises (Ah = Wh / V)");
 });
+
+// Monotonicity of the water-heater recovery compute: recovery gph = input BTU/hr
+// * efficiency / (8.33 * delta_T) rises with input and efficiency and falls as
+// the temperature rise grows (higher setpoint / colder incoming); first-hour
+// delivery rises with tank size. A wrong 8.33 constant or delta-T term passes
+// the single pinned example but breaks these.
+test("monotonicity: water-heater recovery responds correctly to input, efficiency, temperature rise, and tank size", async () => {
+  const p = await import("../../calc-plumbing.js");
+  const wh = (o) => p.computeWaterHeaterRecovery({ heater_type: "gas_atmospheric", input_btu_hr: 40000, efficiency: 0.8, incoming_F: 50, setpoint_F: 120, tank_gal: 40, ...o });
+  assert.ok(wh({ input_btu_hr: 60000 }).recovery_gph > wh({}).recovery_gph, "recovery must rise with burner input");
+  assert.ok(wh({ efficiency: 0.95 }).recovery_gph > wh({}).recovery_gph, "recovery must rise with efficiency");
+  assert.ok(wh({ setpoint_F: 140 }).recovery_gph < wh({}).recovery_gph, "recovery must fall as the setpoint (temperature rise) climbs");
+  assert.ok(wh({ incoming_F: 70 }).recovery_gph > wh({}).recovery_gph, "recovery must rise as incoming water warms (smaller rise)");
+  assert.ok(wh({ tank_gal: 80 }).first_hour_gph > wh({}).first_hour_gph, "first-hour delivery must rise with tank size");
+  assert.ok(Math.abs(wh({}).recovery_gph - 40000 * 0.8 / (8.33 * 70)) < 0.1, "recovery must equal input*eff/(8.33*deltaT)");
+});

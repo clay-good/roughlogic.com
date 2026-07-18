@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(plumbing): guard water-heater recovery with monotonicity; 2026-07-17
+
+- Added a guard on computeWaterHeaterRecovery: recovery gph = input BTU/hr x efficiency / (8.33 x delta_T) rises with
+  input and efficiency and falls as the temperature rise grows (higher setpoint / colder incoming); first-hour delivery
+  rises with tank size. A wrong 8.33 constant or delta-T term passes the pinned example but breaks these. Test-only.
+
 ### test(solar): guard off-grid battery bank sizing with monotonicity; 2026-07-17
 
 - Added a guard on computeOffGridBattery: required capacity = daily load x days autonomy / (DoD x efficiency x derate).
