@@ -12313,3 +12313,19 @@ test("consistency: point-illuminance obeys the inverse-square cosine law and rou
   const inv = e.computeLuminaireHeightForIlluminance({ intensity_cd: 1000, target_fc: pi({}).e_fc, angle_deg: 0 });
   assert.ok(Math.abs(inv.mount_height_ft - 10) < 1e-6, "point-illuminance and its height inverse must round-trip the mounting height");
 });
+
+test("monotonicity: flat-glass weight and attic ventilation NFA track their inputs (finish)", async () => {
+  const f = await import("../../calc-finish.js");
+  const gw = (o) => f.computeGlassWeight({ width_in: 24, height_in: 36, thickness_in: 0.25, panes: 1, ...o });
+  const at = (o) => f.computeAtticVentilation({ attic_floor_area_sqft: 1200, ratio: "150", ...o });
+  assert.ok(gw({ thickness_in: 0.5 }).weight_lb > gw({}).weight_lb, "glass weight must rise with thickness");
+  assert.ok(gw({ width_in: 48 }).weight_lb > gw({}).weight_lb, "glass weight must rise with pane width");
+  assert.ok(gw({ panes: 2 }).weight_lb > gw({}).weight_lb, "glass weight must rise with pane count");
+  assert.ok(Math.abs(gw({}).area_ft2 - 24 * 36 / 144) < 1e-9, "area = width * height / 144");
+  assert.ok(Math.abs(gw({ thickness_in: 0.5 }).weight_lb / gw({}).weight_lb - 2) < 1e-9, "doubling the thickness must double the weight");
+  assert.ok(Math.abs(gw({ panes: 2 }).weight_lb - 2 * gw({}).per_pane_lb) < 1e-9, "total weight = per-pane weight * panes");
+  assert.ok(at({ attic_floor_area_sqft: 2400 }).nfa_sqin > at({}).nfa_sqin, "required net free area must rise with attic floor area");
+  assert.ok(Math.abs(at({ ratio: "300" }).nfa_sqin - at({}).nfa_sqin / 2) < 1e-6, "the 1/300 ratio must require half the net free area of 1/150");
+  assert.ok(Math.abs(at({}).intake_sqin - at({}).exhaust_sqin) < 1e-9, "intake and exhaust must split the net free area evenly");
+  assert.ok(Math.abs(at({}).nfa_sqin - 1200 / 150 * 144) < 1e-6, "NFA (sq in) = floor area / 150 * 144");
+});

@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(finish): guard flat-glass weight and attic-ventilation NFA with monotonicity; 2026-07-17
+
+- Whole-response guards: glass weight = 13.0 x thickness x area rises with thickness/width/panes and doubles when
+  thickness doubles; attic net-free-area = floor/150 x 144 rises with area, halves at the 1/300 ratio, and splits
+  intake/exhaust evenly. Test-only.
+
 ### test(elecdesign): guard point-illuminance inverse-square law and its height round-trip; 2026-07-17
 
 - Consistency guard: IES point method E = I x cos^3(angle) / h^2 rises with intensity, falls with mount height and
