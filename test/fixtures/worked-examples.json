@@ -35804,6 +35804,58 @@
    }
   },
   {
+   "tile_id": "wire-rope-clips",
+   "source_publisher": "wire-rope clip requirements (OSHA Table H-2)",
+   "source_title": "3/4 in wire rope -> 4 clips, 4.5 in spacing (6 x diameter)",
+   "source_edition_or_year": "spec-v938 worked example (OSHA-table-verified)",
+   "source_section_or_page": "OSHA Table H-2: 3/4 in -> 4 clips; spacing = 6 x 0.75 = 4.5 in",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "rope_diameter_in": 0.75
+   },
+   "outputs": {
+    "clip_count": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "spacing_in": {
+     "value": 4.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wire-rope-clips",
+   "source_publisher": "wire-rope clip requirements (OSHA Table H-2)",
+   "source_title": "cross-check: 1/2 in -> 3 clips (3.0 in spacing); 1 in -> 5 clips (6.0 in)",
+   "source_edition_or_year": "spec-v938 worked example (OSHA-table-verified)",
+   "source_section_or_page": "OSHA Table H-2: 1/2 in -> 3 clips, spacing 6 x 0.5 = 3.0",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "rope_diameter_in": 0.5
+   },
+   "outputs": {
+    "clip_count": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "spacing_in": {
+     "value": 3.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "static-rollover-threshold",
    "source_publisher": "static stability factor (NHTSA)",
    "source_title": "72 in track, 80 in loaded CG, 200 ft curve -> 0.45 g, ~37 mph rollover speed",

@@ -744,7 +744,7 @@ const _TILES = [
   ["spanline-sag-tension", "Z"], ["spanline-sag-for-tension", "Z"],
   ["bridle-leg-tension", "Z"],
   ["three-point-bridle", "Z"],
-  ["beam-clamp-side-pull", "Z"],
+  ["beam-clamp-side-pull", "Z"], ["wire-rope-clips", "Z"],
   ["winch-drum-line-pull", "Z"],
   ["crane-outrigger-reaction", "Z"],
   ["lifting-lug-design", "Z"],

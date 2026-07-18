@@ -1532,3 +1532,45 @@ function renderBeamClampSidePull(inputRegion, outputRegion, citationEl) {
   for (const f of [t, a, vc, hc]) f.input.addEventListener("input", update);
 }
 RIGGING_RENDERERS["beam-clamp-side-pull"] = renderBeamClampSidePull;
+
+// ===================== spec-v938: wire-rope clip count and spacing (OSHA Table H-2/H-20) =====================
+// dims: in { rope_diameter_in: L } out: { clip_count: dimensionless, spacing_in: L, minimum_tail_in: L }
+export function computeWireRopeClips({ rope_diameter_in = 0.75 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(rope_diameter_in > 0)) return { error: "Rope diameter must be positive (in)." };
+  // OSHA 1926.251 Table H-2 (formerly H-20) minimum U-bolt clip count by rope diameter.
+  const d = rope_diameter_in;
+  const clip_count = d < 0.5 ? 2 : d <= 0.625 ? 3 : d <= 0.875 ? 4 : d <= 1.0 ? 5 : d <= 1.25 ? 6 : d <= 1.5 ? 7 : 8;
+  // Spacing between clips = 6 x the rope diameter (per the table); the tail past the last clip carries the same spacing.
+  const spacing_in = 6 * rope_diameter_in;
+  const minimum_tail_in = (clip_count - 1) * spacing_in + spacing_in;
+  if (![clip_count, spacing_in, minimum_tail_in].every(Number.isFinite)) return { error: "Wire-rope-clip math is not a finite value." };
+  return {
+    clip_count,
+    spacing_in,
+    minimum_tail_in,
+    note: "The minimum number of U-bolt wire-rope clips and their spacing to form a load-bearing eye, per OSHA 29 CFR 1926.251 Table H-2 (the old H-20): a 3/4 in rope takes 4 clips at 6 x the diameter (4.5 in) on center. The clips MUST be installed with the U-bolt (saddle) on the DEAD (short) end and the saddle (base) on the LIVE (load) end -- 'never saddle a dead horse' -- torqued to the maker's value in sequence, retorqued after the first load. Below 1/2 in the OSHA table does not list a count; 2 clips is the common manufacturer minimum. Use only the wire-rope thimble and clips rated for the rope, and re-check the torque; the clip and rope manufacturer and OSHA govern the termination, and a properly formed clip eye develops only about 80% of the rope's strength." ,
+  };
+}
+
+export const wireRopeClipsExample = { inputs: { rope_diameter_in: 0.75 } };
+
+function _v938renderWireRopeClips(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: wire-rope clip count and spacing by name (OSHA 29 CFR 1926.251 Table H-2 / H-20). clips by rope diameter (1/2->3, 3/4->4, 1->5, ...); spacing = 6 x diameter. U-bolt on the dead end ('never saddle a dead horse'); torque per the maker. The manufacturer and OSHA govern the termination.";
+  const dia = makeNumber("Wire rope diameter (in)", "wrc-dia", { step: "any", min: "0", value: "0.75" });
+  dia.input.value = "0.75";
+  inputRegion.appendChild(dia.wrap);
+  attachExampleButton(inputRegion, () => { dia.input.value = "0.75"; update(); });
+  const oClips = makeOutputLine(outputRegion, "Minimum clips", "wrc-out-clips");
+  const oSpace = makeOutputLine(outputRegion, "Clip spacing (6 x diameter)", "wrc-out-space");
+  const oTail = makeOutputLine(outputRegion, "Minimum turnback / tail", "wrc-out-tail");
+  const update = debounce(() => {
+    const r = computeWireRopeClips({ rope_diameter_in: dia.input.value === "" ? 0.75 : Number(dia.input.value) });
+    if (r.error) { oClips.textContent = r.error; oSpace.textContent = "-"; oTail.textContent = "-"; return; }
+    oClips.textContent = fmt(r.clip_count, 0) + " clips";
+    oSpace.textContent = fmt(r.spacing_in, 2) + " in on center";
+    oTail.textContent = "about " + fmt(r.minimum_tail_in, 1) + " in of tail past the thimble";
+  }, DEBOUNCE_MS);
+  dia.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["wire-rope-clips"] = _v938renderWireRopeClips;

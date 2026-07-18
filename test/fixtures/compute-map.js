@@ -1269,6 +1269,7 @@ export const COMPUTE_MAP = {
   "bridle-leg-tension": { module: "../../calc-rigging.js", fn: "computeBridleLegTension" },
   "three-point-bridle": { module: "../../calc-rigging.js", fn: "computeThreePointBridle" },
   "beam-clamp-side-pull": { module: "../../calc-rigging.js", fn: "computeBeamClampSidePull" },
+  "wire-rope-clips": { module: "../../calc-rigging.js", fn: "computeWireRopeClips" },
   "winch-drum-line-pull": { module: "../../calc-rigging.js", fn: "computeWinchDrumLinePull" },
   "crane-outrigger-reaction": { module: "../../calc-rigging.js", fn: "computeCraneOutriggerReaction" },
   "lifting-lug-design": { module: "../../calc-rigging.js", fn: "computeLiftingLugDesign" },

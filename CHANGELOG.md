@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(rigging): add wire-rope-clips tile (spec-v938); 2026-07-18
+
+- New Group Z tile `wire-rope-clips` (Wire-Rope Clip Count and Spacing, OSHA Table H-2) in calc-rigging.js, beside
+  beam-clamp-side-pull. Minimum U-bolt clips by rope diameter per OSHA 29 CFR 1926.251 Table H-2 (1/2 & 5/8 -> 3, 3/4 &
+  7/8 -> 4, 1 -> 5, up to 7 for 1-3/8 & 1-1/2 in; below 1/2 -> 2 per maker); spacing = 6 x diameter. A 3/4 in rope takes
+  4 clips at 4.5 in o.c. U-bolt on the dead end ("never saddle a dead horse"), torque per the maker, retorque after first
+  load; a clip eye develops ~80% of rope strength. The manufacturer and OSHA govern. Home count 1,386 -> 1,387.
+
 ### feat(fire): add fire-alarm-nac-voltage-drop tile (spec-v937); 2026-07-18
 
 - New Group A tile `fire-alarm-nac-voltage-drop` (Fire-Alarm NAC Circuit Voltage Drop, End-of-Line) in

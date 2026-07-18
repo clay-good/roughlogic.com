@@ -27188,6 +27188,26 @@ test("bounds: spec-v914 computeTractorBallast pins the target weight, signed bal
   assert.ok("error" in _v914({ power_hp: Infinity, weight_to_power_ratio: 125, current_weight_lb: 18000 }));
 });
 
+import { computeWireRopeClips as _v938 } from "../../calc-rigging.js";
+
+test("bounds: spec-v938 computeWireRopeClips pins the OSHA Table H-2 count, spacing, and error seams", () => {
+  const r = _v938({ rope_diameter_in: 0.75 });
+  assert.equal(r.clip_count, 4); // OSHA Table H-2: 3/4 in
+  assert.ok(Math.abs(r.spacing_in - 4.5) < 1e-9); // 6 * 0.75
+  // Spot-check the table steps.
+  assert.equal(_v938({ rope_diameter_in: 0.5 }).clip_count, 3); // 1/2 in
+  assert.equal(_v938({ rope_diameter_in: 0.625 }).clip_count, 3); // 5/8 in
+  assert.equal(_v938({ rope_diameter_in: 0.875 }).clip_count, 4); // 7/8 in
+  assert.equal(_v938({ rope_diameter_in: 1.0 }).clip_count, 5); // 1 in
+  assert.equal(_v938({ rope_diameter_in: 1.25 }).clip_count, 6); // 1-1/4 in
+  assert.equal(_v938({ rope_diameter_in: 1.5 }).clip_count, 7); // 1-1/2 in
+  assert.equal(_v938({ rope_diameter_in: 0.375 }).clip_count, 2); // below the table
+  assert.ok(Math.abs(_v938({ rope_diameter_in: 1.0 }).spacing_in - 6.0) < 1e-9); // 6 * 1
+  // Error seams: non-positive diameter, non-finite.
+  assert.ok("error" in _v938({ rope_diameter_in: 0 }));
+  assert.ok("error" in _v938({ rope_diameter_in: Infinity }));
+});
+
 import { computeStaticRolloverThreshold as _v913 } from "../../calc-trucking.js";
 
 test("bounds: spec-v913 computeStaticRolloverThreshold pins the SRT, rollover speed, and error seams", () => {

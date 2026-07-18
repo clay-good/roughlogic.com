@@ -89452,6 +89452,31 @@
       "kind": "industry"
     },
     {
+      "term": "wire rope clips",
+      "target": "wire-rope-clips",
+      "kind": "industry"
+    },
+    {
+      "term": "how many wire rope clips",
+      "target": "wire-rope-clips",
+      "kind": "industry"
+    },
+    {
+      "term": "u-bolt clips",
+      "target": "wire-rope-clips",
+      "kind": "industry"
+    },
+    {
+      "term": "cable clip spacing",
+      "target": "wire-rope-clips",
+      "kind": "adjacent"
+    },
+    {
+      "term": "never saddle a dead horse",
+      "target": "wire-rope-clips",
+      "kind": "adjacent"
+    },
+    {
       "term": "side pull",
       "target": "beam-clamp-side-pull",
       "kind": "industry"

@@ -1296,6 +1296,7 @@ const RELATED = {
   "bridle-leg-tension": ["multi-leg-sling","sling-angle","counterweight-arbor-load"],
   "three-point-bridle": ["bridle-leg-tension","multi-leg-sling","sling-angle"],
   "beam-clamp-side-pull": ["bridle-leg-tension","three-point-bridle","shackle-eyebolt-wll"],
+  "wire-rope-clips": ["shackle-eyebolt-wll","sling-angle","bridle-leg-tension"],
   "winch-drum-line-pull": ["wire-rope-strength","chain-lever-hoist","pulley-ma-gen"],
   "crane-outrigger-reaction": ["crane-ground-bearing","crane-net-capacity","crane-lift-quick"],
   "lifting-lug-design": ["shackle-eyebolt-wll","spreader-beam","rigging-check"],

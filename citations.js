@@ -11853,6 +11853,17 @@ export const CITATIONS = {
       { name: "Estimate only", value: "the hardware working load limits and a qualified rigger govern the actual pick", source: "ASME B30.20" },
     ],
   },
+  "wire-rope-clips": {
+    formula: "clip_count from OSHA Table H-2 by rope diameter (1/2 & 5/8 -> 3, 3/4 & 7/8 -> 4, 1 -> 5, 1-1/8 & 1-1/4 -> 6, 1-3/8 & 1-1/2 -> 7; below 1/2 -> 2 per manufacturer); spacing_in = 6 x rope_diameter_in.",
+    edition: "OSHA 29 CFR 1926.251 Table H-2 (formerly Table H-20) wire-rope U-bolt clip requirements, by name; the clip and rope manufacturer and OSHA govern the termination.",
+    freeAccess: "The clip count and spacing are in OSHA 29 CFR 1926.251 Table H-2 (public federal regulation); the U-bolt orientation and torque come from the clip manufacturer.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The minimum number and spacing of U-bolt wire-rope clips to form a load-bearing eye, from OSHA 29 CFR 1926.251 Table H-2 (the old H-20). The clip count steps with the rope diameter (1/2 and 5/8 in take 3 clips, 3/4 and 7/8 in take 4, 1 in takes 5, up to 7 for 1-3/8 and 1-1/2 in), and the clips are spaced 6 times the rope diameter on center. The U-bolt (the threaded saddle) MUST bear on the DEAD (short) end of the rope and the clip base on the LIVE (load-bearing) end -- 'never saddle a dead horse' -- and the nuts are torqued to the manufacturer's value in sequence and RE-torqued after the rope has been loaded once. OSHA does not tabulate below 1/2 in; 2 clips is the common manufacturer minimum there. A correctly installed U-bolt clip eye develops only about 80% of the rope's breaking strength (a swaged or poured socket is stronger). This counts and spaces the clips; the clip and rope manufacturer's instructions, the required torque, and OSHA govern the actual termination, and a qualified person inspects it.",
+    assumptions: [
+      { name: "Clip count and spacing", value: "OSHA Table H-2 count by diameter; spacing = 6 x rope diameter on center", source: "OSHA 29 CFR 1926.251 Table H-2" },
+      { name: "Saddle on the live end", value: "U-bolt on the dead end, base on the live end; torque per the maker and retorque after first load", source: "clip manufacturer / OSHA" },
+    ],
+  },
   "winch-drum-line-pull": {
     formula: "Dn = drum_dia + (2n - 1) x rope_dia; Pn = rated_pull x drum_dia / Dn; Vn = drum_speed x Dn / drum_dia; wraps_per_layer = floor(barrel_width / rope_dia).",
     edition: "Wire-rope drum mechanics / SAE winch rating convention, by name.",

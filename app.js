@@ -1238,6 +1238,7 @@ const TOOL_MODULES = (() => {
     "three-point-bridle",
     // spec-v616
     "beam-clamp-side-pull",
+    "wire-rope-clips",
   ]);
   return map;
 })();
