@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(refrigerant): cross-tile consistency of saturation temperature between refrigerant-pt and superheat-subcool; 2026-07-17
+
+- Added a cross-tile guard on the safety-critical charging data: refrigerant-pt and superheat-subcool both derive the
+  saturation temperature from pressure via the same bundled REFRIGERANTS.pt_pairs table, so for the same refrigerant and
+  pressure refrigerant-pt's saturated_temperature_F must equal (line_T - superheat) from superheat-subcool. A divergent
+  interpolation or table read in either tile is caught here, invisible to per-tile fixtures. Test-only.
+
 ### test(real-estate): cross-tile consistency of the monthly mortgage payment across three tiles; 2026-07-17
 
 - Added a cross-tile guard: PITI, cost-of-waiting, and amortization-schedule independently compute the monthly P&I

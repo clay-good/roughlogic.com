@@ -296,3 +296,23 @@ test("HVAC_RENDERERS exposes the 3 v7 ids that stayed in calc-hvac.js", () => {
 test("REFRIGERANT_RENDERERS exposes the relocated refrigerant-charging renderer", () => {
   assert.equal(typeof REFRIGERANT_RENDERERS["refrigerant-charging"], "function");
 });
+
+// Cross-tile physical consistency on the safety-critical refrigerant charging
+// data: refrigerant-pt and superheat-subcool both derive the saturation
+// temperature from pressure using the same bundled REFRIGERANTS.pt_pairs table.
+// For the same refrigerant and pressure they must agree -- refrigerant-pt's
+// saturated_temperature_F must equal (line_T - superheat) from superheat-subcool.
+// A divergent interpolation or a different table read in either tile is caught
+// here, a "sibling" class the per-tile fixtures cannot see.
+test("cross-tile: refrigerant-pt and superheat-subcool agree on saturation temperature", async () => {
+  const m = await import("../../calc-refrigerant.js");
+  const LINE = 200; // any line temp above saturation; superheat = LINE - satT
+  for (const [ref, psig] of [["R-410A", 118], ["R-410A", 200], ["R-134a", 50], ["R-22", 100], ["R-404A", 80], ["R-32", 150], ["R-407C", 100]]) {
+    const pt = m.computeRefrigerantPT({ refrigerant: ref, pressure_psig: psig });
+    const ss = m.computeSuperheatSubcool({ refrigerant: ref, system_pressure_psig: psig, line_temperature_F: LINE, mode: "superheat" });
+    assert.ok(!pt.error && !ss.error, `error for ${ref} ${psig} psig`);
+    const impliedSat = LINE - ss.superheat_F;
+    assert.ok(Math.abs(pt.saturated_temperature_F - impliedSat) < 1e-9,
+      `${ref} ${psig} psig: refrigerant-pt satT ${pt.saturated_temperature_F} != superheat-subcool implied ${impliedSat}`);
+  }
+});
