@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(mixed): guard short-circuit fault current and engine HP with physical monotonicity; 2026-07-17
+
+- Added guards: Bussmann point-to-point available fault current (arc-flash / equipment-rating safety) rises with source
+  kVA and parallel conductor sets and falls with source impedance and cable length; engine HP = T x rpm / 5252 rises with
+  torque and speed. An understated fault current is unsafe; a sign/term error would pass the pinned example but not these. Test-only.
+
 ### test(mechanic): guard driveshaft critical-speed compute (protects the 4.7 -> pi^2 fix); 2026-07-17
 
 - Added a physical guard on computeDriveshaftCritical (the tile whose first-mode eigenvalue was corrected 4.7 -> pi^2

@@ -11880,3 +11880,23 @@ test("monotonicity: driveshaft critical speed rises with OD, falls as 1/length^2
   const r = m.computeDriveshaftCritical(base);
   assert.ok(Math.abs(r.recommended_max_rpm - 0.65 * r.critical_rpm) < 1e-6, "recommended max must be 0.65 * critical");
 });
+
+// Physical monotonicity of two more computes. Bussmann point-to-point fault
+// current (electrical arc-flash / equipment-rating safety): available fault
+// current rises with source kVA and parallel conductor sets, falls with source
+// impedance and cable length. Engine HP = T * rpm / 5252 rises with torque and
+// speed. A sign/term error is non-conservative (understated fault current is
+// unsafe) and would pass the single pinned example.
+test("monotonicity: short-circuit fault current and engine HP respond correctly to their inputs", async () => {
+  const el = await import("../../calc-electrical.js");
+  const me = await import("../../calc-mechanic.js");
+  const sc = (o) => el.computeShortCircuitPP({ utility_kVA: 1500, utility_Z_pct: 5.75, secondary_V: 480, phase: "three", C_value: 22185, length_ft: 100, parallel_sets: 1, ...o });
+  assert.ok(sc({ utility_kVA: 3000 }).I_sca_secondary_A > sc({}).I_sca_secondary_A, "fault current must rise with source kVA");
+  assert.ok(sc({ utility_Z_pct: 10 }).I_sca_secondary_A < sc({}).I_sca_secondary_A, "fault current must fall with source impedance");
+  assert.ok(sc({ length_ft: 300 }).I_sca_panel_A < sc({}).I_sca_panel_A, "downstream fault current must fall with cable length");
+  assert.ok(sc({ parallel_sets: 2 }).I_sca_panel_A > sc({}).I_sca_panel_A, "downstream fault current must rise with parallel conductor sets");
+  const hp = (o) => me.computeHpFromTorque({ solve_for: "hp", torque_lbft: 400, rpm: 5000, hp: 0, ...o }).hp;
+  assert.ok(hp({ torque_lbft: 600 }) > hp({ torque_lbft: 400 }), "HP must rise with torque");
+  assert.ok(hp({ rpm: 6000 }) > hp({ rpm: 5000 }), "HP must rise with rpm");
+  assert.ok(Math.abs(hp({}) - 400 * 5000 / 5252) < 0.01, "HP must equal T * rpm / 5252");
+});
