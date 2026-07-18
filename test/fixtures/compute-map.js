@@ -1394,6 +1394,7 @@ export const COMPUTE_MAP = {
   "steam-pipe-velocity": { module: "../../calc-pipefit.js", fn: "computeSteamPipeVelocity" },
   "steam-pipe-capacity": { module: "../../calc-pipefit.js", fn: "computeSteamPipeCapacity" },
   "steam-trap-sizing": { module: "../../calc-pipefit.js", fn: "computeSteamTrapSizing" },
+  "steam-boiler-blowdown": { module: "../../calc-pipefit.js", fn: "computeSteamBoilerBlowdown" },
   "boiler-horsepower": { module: "../../calc-pipefit.js", fn: "computeBoilerHorsepower" },
   "steam-prv-napier": { module: "../../calc-pipefit.js", fn: "computeSteamPrvNapier" },
   "steam-prv-area-for-capacity": { module: "../../calc-pipefit.js", fn: "computeSteamPrvAreaForCapacity" },

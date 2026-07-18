@@ -2499,6 +2499,7 @@ cross-check.
 | calc-pipefit.js | `computePipeSpacingRack` | `{ pipe_od_in = 0, insulation_thickness_in = 0, clearance_in = 1, pipe_count =...` | _ | _ | _ |
 | calc-pipefit.js | `computeRacewayExpansion` | `{ run_length_ft = 0, temp_range_f = 0, alpha_per_f = 0.0000338, fitting_trave...` | _ | _ | _ |
 | calc-pipefit.js | `computeReducerOffset` | `{ large_od_in = 0, small_od_in = 0, lay_length_in = 0, type = "concentric" } ...` | _ | _ | _ |
+| calc-pipefit.js | `computeSteamBoilerBlowdown` | `{ steam_rate_lb_hr = 10000, feedwater_tds_ppm = 100, max_boiler_tds_ppm = 350...` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamPipeCapacity` | `{ nps = "2", spec_vol_ft3lb = 0, vel_ceiling_fpm = 0 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamPipeVelocity` | `{ steam_flow_lbhr = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 0 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamPrvAreaForCapacity` | `{ required_capacity_lb_hr = 0, upstream_p_psia = 0, discharge_coeff = 0.9 } = {}` | _ | _ | _ |
@@ -3063,7 +3064,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1649.
+Row count: 1650.
 
 <!-- END function-corpus-v14 -->
 
@@ -3333,7 +3334,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (112 tiles)
+### Group B Plumbing (113 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3418,6 +3419,7 @@ per spec-v14 §13.1 second paragraph.
 | `solder-joint-quantity` | Solder and Flux per Sweat-Joint Takeoff | Solder-weight identity (first-princip...; w/in = (PI/4)*0.125^2*0.30 = 0.003682; solder = 200*0.75*... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `specific-energy` | Open-Channel Specific Energy and Alternate Depth | Specific energy E = y + q^2/(2 g y^2)...; spec-v637 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `static-pressure-piping` | Static Pressure Loss in Piping | Project (first-principles); 30 ft column of water -> 30 * 62.4 / 144 = 13.00 psi elev... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `steam-boiler-blowdown` | Steam Boiler Surface Blowdown (Cycles of Concentration) | Steam boiler surface blowdown (TDS ma...; CoC = 3500/100 = 35; blowdown = 10000*100/(3500-100) = 29... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steam-pipe-capacity` | Steam Main Capacity from Size and Velocity | Continuity; ASHRAE Fundamentals / Sys...; spec-v643 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steam-pipe-velocity` | Steam Main Size from Flow and Velocity | Continuity; ASHRAE Fundamentals / Sys...; spec-v158 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steam-prv-area-for-capacity` | Steam PRV Orifice Area for a Required Capacity (Napier) | Napier's formula / ASME/API 520 (solv...; spec-v759 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4651,6 +4653,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1402. Fixture-covered or reference-cadence: 1402 / 1402.
+Tile count: 1403. Fixture-covered or reference-cadence: 1403 / 1403.
 
 <!-- END tile-index-v14 -->

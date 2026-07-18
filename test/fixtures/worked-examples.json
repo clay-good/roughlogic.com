@@ -32409,6 +32409,62 @@
    }
   },
   {
+   "tile_id": "steam-boiler-blowdown",
+   "source_publisher": "Steam boiler surface blowdown (TDS mass balance)",
+   "source_title": "10,000 lb/hr, 100 ppm feedwater, 3,500 ppm limit -> 35 cycles, 294 lb/hr, 2.86% of feedwater",
+   "source_edition_or_year": "spec-v954 worked example (machine-verified)",
+   "source_section_or_page": "CoC = 3500/100 = 35; blowdown = 10000*100/(3500-100) = 294.1; %FW = 100*100/3500 = 2.857",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "steam_rate_lb_hr": 10000,
+    "feedwater_tds_ppm": 100,
+    "max_boiler_tds_ppm": 3500
+   },
+   "outputs": {
+    "cycles_of_concentration": {
+     "value": 35,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "blowdown_rate_lb_hr": {
+     "value": 294.12,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "blowdown_pct_of_feedwater": {
+     "value": 2.857,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steam-boiler-blowdown",
+   "source_publisher": "Steam boiler surface blowdown (TDS mass balance)",
+   "source_title": "cross-check: cleaner 50 ppm feedwater doubles the cycles to 70 and halves the blowdown to 145 lb/hr",
+   "source_edition_or_year": "spec-v954 worked example (machine-verified)",
+   "source_section_or_page": "CoC = 3500/50 = 70; blowdown = 10000*50/(3500-50) = 144.9 lb/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "steam_rate_lb_hr": 10000,
+    "feedwater_tds_ppm": 50,
+    "max_boiler_tds_ppm": 3500
+   },
+   "outputs": {
+    "blowdown_rate_lb_hr": {
+     "value": 144.93,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "boiler-horsepower",
    "source_publisher": "ABMA / ASME boiler-horsepower definition",
    "source_title": "500,000 Btu/hr gross output -> 14.94 BHP, 515 lb/hr, 2,076 sq ft EDR",

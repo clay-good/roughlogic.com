@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(pipefitting): add steam-boiler-blowdown tile (spec-v954); 2026-07-18
+
+- New Group B tile `steam-boiler-blowdown` (Steam Boiler Surface Blowdown, Cycles of Concentration) in calc-pipefit.js.
+  A TDS mass balance: steam leaves solids-free, so feedwater solids exit in the blowdown at the boiler-water limit. CoC =
+  BW limit / FW TDS; blowdown rate = steam x FW/(limit - FW); blowdown % of feedwater = 1/CoC. A 10,000 lb/hr boiler on
+  100 ppm feedwater held to 3,500 ppm runs 35 cycles, blows down ~294 lb/hr (2.9%); cleaner makeup raises cycles and
+  cuts blowdown. Surface blowdown only; ASME/manufacturer limits and a licensed operator govern. Distinct from
+  cooling-tower cooling-water-makeup. Home count 1,402 -> 1,403.
+
 ### feat(rigging): add crane-load-radius-boom tile (spec-v953); 2026-07-18
 
 - New Group Z tile `crane-load-radius-boom` (Crane Load Radius and Boom-Tip Height from Boom Geometry) in calc-rigging.js.

@@ -839,7 +839,7 @@ const _TILES = [
   // spec-v157..v162 steamfitting / pressure-piping / pipe-support bench (Group B)
   ["flash-steam-pct", "B"],
   ["steam-pipe-velocity", "B"], ["steam-pipe-capacity", "B"],
-  ["steam-trap-sizing", "B"],
+  ["steam-trap-sizing", "B"], ["steam-boiler-blowdown", "B"],
   ["boiler-horsepower", "B"],
   ["steam-prv-napier", "B"], ["steam-prv-area-for-capacity", "B"],
   ["pipe-pressure-rating", "B"],

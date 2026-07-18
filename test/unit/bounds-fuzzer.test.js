@@ -27602,3 +27602,28 @@ test("bounds: spec-v953 computeCraneLoadRadiusBoom pins the boom geometry, inver
   assert.ok("error" in _v953({ boom_length_ft: 30, boom_angle_deg: 60, boom_foot_offset_ft: 4, boom_foot_height_ft: 6, target_radius_ft: 0 }));
   assert.ok("error" in _v953({ boom_length_ft: Infinity, boom_angle_deg: 60, boom_foot_offset_ft: 4, boom_foot_height_ft: 6, target_radius_ft: 25 }));
 });
+
+import { computeSteamBoilerBlowdown as _v954 } from "../../calc-pipefit.js";
+
+test("bounds: spec-v954 computeSteamBoilerBlowdown pins the TDS mass balance and error seams", () => {
+  const r = _v954({ steam_rate_lb_hr: 10000, feedwater_tds_ppm: 100, max_boiler_tds_ppm: 3500 });
+  assert.ok(Math.abs(r.cycles_of_concentration - 35) < 1e-9); // 3500/100
+  assert.ok(Math.abs(r.blowdown_rate_lb_hr - 294.1176) < 1e-3); // 10000*100/3400
+  assert.ok(Math.abs(r.blowdown_pct_of_feedwater - 2.857143) < 1e-4); // 100/35
+  // Cleaner feedwater raises cycles and cuts blowdown.
+  const clean = _v954({ steam_rate_lb_hr: 10000, feedwater_tds_ppm: 50, max_boiler_tds_ppm: 3500 });
+  assert.ok(Math.abs(clean.cycles_of_concentration - 70) < 1e-9);
+  assert.ok(Math.abs(clean.blowdown_rate_lb_hr - 144.9275) < 1e-3);
+  assert.ok(clean.blowdown_rate_lb_hr < r.blowdown_rate_lb_hr);
+  // Blowdown is linear in steam rate.
+  assert.ok(Math.abs(_v954({ steam_rate_lb_hr: 20000, feedwater_tds_ppm: 100, max_boiler_tds_ppm: 3500 }).blowdown_rate_lb_hr - 2 * r.blowdown_rate_lb_hr) < 1e-6);
+  // Consistency: blowdown/(steam+blowdown) equals blowdown_pct_of_feedwater/100.
+  const bd = r.blowdown_rate_lb_hr;
+  assert.ok(Math.abs(bd / (10000 + bd) - r.blowdown_pct_of_feedwater / 100) < 1e-9);
+  // Error seams: non-positive steam / feedwater TDS, boiler limit <= feedwater TDS, non-finite.
+  assert.ok("error" in _v954({ steam_rate_lb_hr: 0, feedwater_tds_ppm: 100, max_boiler_tds_ppm: 3500 }));
+  assert.ok("error" in _v954({ steam_rate_lb_hr: 10000, feedwater_tds_ppm: 0, max_boiler_tds_ppm: 3500 }));
+  assert.ok("error" in _v954({ steam_rate_lb_hr: 10000, feedwater_tds_ppm: 3500, max_boiler_tds_ppm: 3500 }));
+  assert.ok("error" in _v954({ steam_rate_lb_hr: 10000, feedwater_tds_ppm: 100, max_boiler_tds_ppm: 50 }));
+  assert.ok("error" in _v954({ steam_rate_lb_hr: Infinity, feedwater_tds_ppm: 100, max_boiler_tds_ppm: 3500 }));
+});

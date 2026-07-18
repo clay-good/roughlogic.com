@@ -15825,6 +15825,17 @@ export const CITATIONS = {
       { name: "Selection", value: "the trap is sized from the manufacturer's capacity chart at the actual differential pressure", source: "manufacturer capacity chart" },
     ],
   },
+  "steam-boiler-blowdown": {
+    formula: "cycles_of_concentration = max_boiler_tds / feedwater_tds; blowdown_rate_lb_hr = steam_rate x feedwater_tds / (max_boiler_tds - feedwater_tds); blowdown_pct_of_feedwater = 100 x feedwater_tds / max_boiler_tds = 100 / CoC.",
+    edition: "Steam-boiler surface-blowdown TDS mass balance (cycles of concentration), by name; the ASME / manufacturer boiler-water limits and the treatment program govern the actual schedule.",
+    freeAccess: "The TDS mass balance is public first-principles (steam leaves solids behind, blowdown removes them); the feedwater TDS, the boiler-water TDS limit, and the steam rate come from the water analysis and the boiler rating.",
+    governance: GOVERNANCE.general,
+    editionNote: "A steam boiler concentrates dissolved solids because the steam leaves essentially solids-free while the makeup keeps bringing them in; surface (continuous) blowdown bleeds off concentrated boiler water to hold the total dissolved solids below the ASME / manufacturer limit. By a steady-state TDS mass balance, all the solids the feedwater carries in must leave in the blowdown at the maximum boiler-water concentration, so the cycles of concentration CoC = boiler-water TDS limit / feedwater TDS, the blowdown rate = steam rate x feedwater TDS / (limit - feedwater TDS), and the blowdown as a fraction of feedwater is 1/CoC. A 10,000 lb/hr boiler on 100 ppm feedwater held to a 3,500 ppm limit runs at 35 cycles and blows down about 294 lb/hr (2.9% of feedwater). Cleaner makeup (softening, RO, better condensate return) lowers the feedwater TDS, raising the cycles and cutting the blowdown and the fuel, chemical, and treated-water it carries away -- a flash-recovery vessel and a blowdown heat exchanger recover part of that energy. This estimates the steady-state SURFACE blowdown only; intermittent bottom (mud) blowdown to remove sludge, the specific boiler-water treatment program (alkalinity, silica, and conductivity limits, not just TDS), and a licensed boiler operator govern the actual blowdown schedule. Distinct from the cooling-tower blowdown (evaporation and drift) of cooling-water-makeup.",
+    assumptions: [
+      { name: "TDS mass balance", value: "steam leaves TDS-free; CoC = BW_limit/FW_TDS; blowdown = steam x FW/(BW-FW); % of feedwater = 1/CoC", source: "boiler water-treatment practice" },
+      { name: "Surface blowdown only", value: "steady-state continuous (surface) blowdown; bottom/mud blowdown, alkalinity/silica limits, and a licensed operator govern the schedule", source: "ASME / manufacturer boiler-water limits" },
+    ],
+  },
   "boiler-horsepower": {
     formula: "boiler_hp = output_btuhr / 33,475; steam_lbhr = boiler_hp x 34.5; edr_sqft = boiler_hp x 139. From the ABMA / ASME definition: 1 boiler horsepower = 33,475 Btu/hr gross output = 34.5 lb/hr of steam evaporated 'from and at' 212 F = 139 sq ft of equivalent direct radiation.",
     edition: "ABMA / ASME boiler-horsepower definition (33,475 Btu/hr; 34.5 lb/hr from and at 212 F). Not edition-bound.",

@@ -1058,3 +1058,53 @@ function _renderSteamPrvAreaForCapacity(inputRegion, outputRegion, citationEl) {
   for (const f of [W.input, P1.input, Cd.input]) f.addEventListener("input", update);
 }
 PIPEFIT_RENDERERS["steam-prv-area-for-capacity"] = _renderSteamPrvAreaForCapacity;
+
+// ===================== spec-v954: steam boiler surface blowdown (cycles of concentration) =====================
+// dims: in { args: dimensionless } out: { cycles_of_concentration: dimensionless, blowdown_rate_lb_hr: dimensionless, blowdown_pct_of_feedwater: dimensionless }
+export function computeSteamBoilerBlowdown({ steam_rate_lb_hr = 10000, feedwater_tds_ppm = 100, max_boiler_tds_ppm = 3500 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(steam_rate_lb_hr > 0)) return { error: "Steam rate must be positive (lb/hr)." };
+  if (!(feedwater_tds_ppm > 0)) return { error: "Feedwater TDS must be positive (ppm)." };
+  if (!(max_boiler_tds_ppm > feedwater_tds_ppm)) return { error: "Max boiler-water TDS must exceed the feedwater TDS (blowdown concentrates the dissolved solids)." };
+  // TDS mass balance: steam leaves TDS-free, so feedwater TDS in = blowdown TDS out.
+  // Blowdown as a fraction of STEAM = FW_TDS / (BW_TDS - FW_TDS); of FEEDWATER = FW_TDS / BW_TDS = 1/CoC.
+  const cycles_of_concentration = max_boiler_tds_ppm / feedwater_tds_ppm;
+  const blowdown_rate_lb_hr = steam_rate_lb_hr * feedwater_tds_ppm / (max_boiler_tds_ppm - feedwater_tds_ppm);
+  const blowdown_pct_of_feedwater = 100 * feedwater_tds_ppm / max_boiler_tds_ppm;
+  if (![cycles_of_concentration, blowdown_rate_lb_hr, blowdown_pct_of_feedwater].every(Number.isFinite)) return { error: "Blowdown math is not a finite value." };
+  return {
+    cycles_of_concentration,
+    blowdown_rate_lb_hr,
+    blowdown_pct_of_feedwater,
+    note: "The continuous surface blowdown a steam boiler needs to hold its dissolved solids below the limit, by a TDS mass balance: the steam leaves essentially TDS-free, so all the dissolved solids the feedwater carries in must leave in the blowdown at the maximum allowed boiler-water concentration. The cycles of concentration is CoC = boiler-water TDS limit / feedwater TDS -- how many times the solids are concentrated before blowdown. The blowdown rate is steam rate x feedwater TDS / (boiler-water limit - feedwater TDS), and expressed as a share of feedwater it is simply 1/CoC. A 10,000 lb/hr boiler on 100 ppm feedwater held to a 3,500 ppm limit runs at 35 cycles and blows down about 294 lb/hr (2.9% of feedwater); cleaner makeup (fewer ppm) raises the cycles and cuts the blowdown and its heat loss. Blowdown carries away hot, treated water, so every pound blown down is a fuel and chemical cost -- a flash-recovery vessel and a blowdown heat exchanger claw some of it back. This is a steady-state SURFACE (continuous TDS) blowdown estimate; intermittent bottom (mud) blowdown, the boiler-water treatment program, the ASME / manufacturer TDS and alkalinity limits, and a licensed boiler operator govern the actual schedule.",
+  };
+}
+
+export const steamBoilerBlowdownExample = { inputs: { steam_rate_lb_hr: 10000, feedwater_tds_ppm: 100, max_boiler_tds_ppm: 3500 } };
+
+function _v954renderSteamBoilerBlowdown(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: steam boiler surface blowdown by TDS mass balance (cycles of concentration), by name. CoC = boiler-water TDS limit / feedwater TDS; blowdown rate = steam rate x FW_TDS / (BW_limit - FW_TDS); blowdown % of feedwater = 1/CoC. Steam assumed TDS-free. The ASME / manufacturer TDS limits and the water-treatment program and a licensed operator govern.";
+  const sr = makeNumber("Steam rate (lb/hr)", "sbb-sr", { step: "any", min: "0", value: "10000" });
+  sr.input.value = "10000";
+  const fw = makeNumber("Feedwater TDS (ppm)", "sbb-fw", { step: "any", min: "0", value: "100" });
+  fw.input.value = "100";
+  const bw = makeNumber("Max boiler-water TDS (ppm)", "sbb-bw", { step: "any", min: "0", value: "3500" });
+  bw.input.value = "3500";
+  for (const f of [sr, fw, bw]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sr.input.value = "10000"; fw.input.value = "100"; bw.input.value = "3500"; update(); });
+  const oC = makeOutputLine(outputRegion, "Cycles of concentration", "sbb-out-c");
+  const oR = makeOutputLine(outputRegion, "Blowdown rate", "sbb-out-r");
+  const oP = makeOutputLine(outputRegion, "Blowdown (% of feedwater)", "sbb-out-p");
+  const update = debounce(() => {
+    const r = computeSteamBoilerBlowdown({
+      steam_rate_lb_hr: sr.input.value === "" ? 10000 : Number(sr.input.value), feedwater_tds_ppm: fw.input.value === "" ? 100 : Number(fw.input.value),
+      max_boiler_tds_ppm: bw.input.value === "" ? 3500 : Number(bw.input.value),
+    });
+    if (r.error) { oC.textContent = r.error; oR.textContent = "-"; oP.textContent = "-"; return; }
+    oC.textContent = fmt(r.cycles_of_concentration, 1) + " cycles";
+    oR.textContent = fmt(r.blowdown_rate_lb_hr, 0) + " lb/hr";
+    oP.textContent = fmt(r.blowdown_pct_of_feedwater, 2) + "%";
+  }, DEBOUNCE_MS);
+  for (const f of [sr, fw, bw]) f.input.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["steam-boiler-blowdown"] = _v954renderSteamBoilerBlowdown;
