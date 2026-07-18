@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(construction): word the baluster-picket gap verdict as the IRC cross-check it is; 2026-07-17
+
+- baluster-picket-count's actual-gap line said "(under 4 in)" / "(OVER - add a picket)" against a hardcoded 4 in
+  regardless of the user's own maximum-gap input. The ceil in the count already guarantees the actual gap never
+  exceeds the entered maximum, so the comparison's only real meaning is the IRC 4 in sphere cross-check -- and "add
+  a picket" was wrong advice for a legitimate larger-gap entry (a 6 in fence spec is fine per its own input). Both
+  branches now name the rule: "(meets the IRC 4 in sphere rule)" / "(over the IRC 4 in guard limit - fine only where
+  the guard rule does not apply)". Display wording only; the counts and gap values are unchanged (flagged non-blocking
+  by the 2026-07-17 v809-v908 batch audit).
+
 ### feat(search): split the alias corpus into per-group runtime shards (spec-v590 remediation); 2026-07-17
 
 - data/search/aliases.json crossed the ~250 KB-gzipped split threshold spec-v590 designated (261.9 KB gz at 17,975

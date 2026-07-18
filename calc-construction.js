@@ -9262,7 +9262,7 @@ const _v881renderBalusterPicketCount = _simpleRenderer({
   ],
   outputs: [
     { key: "p", id: "bpc-out-p", label: "Balusters / pickets", value: (r) => _fmtC(r.pickets, 0) + " pickets (" + _fmtC(r.gaps, 0) + " gaps)" },
-    { key: "g", id: "bpc-out-g", label: "Actual clear gap", value: (r) => _fmtC(r.actual_gap_in, 2) + " in" + (r.actual_gap_in <= 4 ? " (under 4 in)" : " (OVER - add a picket)") },
+    { key: "g", id: "bpc-out-g", label: "Actual clear gap", value: (r) => _fmtC(r.actual_gap_in, 2) + " in" + (r.actual_gap_in <= 4 ? " (meets the IRC 4 in sphere rule)" : " (over the IRC 4 in guard limit - fine only where the guard rule does not apply)") },
     { key: "note", id: "bpc-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeBalusterPicketCount,
