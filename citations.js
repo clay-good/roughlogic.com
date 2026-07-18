@@ -4432,6 +4432,17 @@ export const CITATIONS = {
       { name: "Sawn lumber only", value: "engineered I-joists / LVL / trusses follow the maker's hole chart; never notch a flange", source: "IRC R502.8.1 / manufacturer" },
     ],
   },
+  "joist-cantilever-check": {
+    formula: "cantilever_max_ft = backspan_ft / 4; within_limit when overhang_ft <= cantilever_max_ft; margin_ft = cantilever_max_ft - overhang_ft.",
+    edition: "IRC R507.6 (decks) and R502.3.3 (floors) joist-cantilever provisions, by name; the 1:4 backspan ratio. The AHJ-adopted IRC edition governs.",
+    freeAccess: "The 1:4 cantilever ratio is a prescriptive IRC value (many jurisdictions post the adopted IRC); the tile applies it to the entered backspan and overhang.",
+    governance: GOVERNANCE.general,
+    editionNote: "The prescriptive joist-cantilever ratio: a joist may overhang its support by no more than one quarter of its backspan (the span from that support back to the next support), per IRC R507.6 for decks and R502.3.3 for floors. So the maximum cantilever = backspan / 4, and the overhang must not exceed it. Beyond this ratio the prescriptive tables also set an absolute overhang cap and require the cantilever to be checked for uplift at the backspan support and for the load it carries. A joist cantilever that supports a beam, a wall, or a roof at its tip is NOT a prescriptive case -- it is an engineered condition. This is the ratio screen; the prescriptive span tables, the tip load, the connection at the backspan support (uplift), and the AHJ-adopted code govern.",
+    assumptions: [
+      { name: "1:4 ratio", value: "max cantilever = backspan / 4; the prescriptive tables also cap the absolute overhang", source: "IRC R507.6 / R502.3.3" },
+      { name: "Tip load is engineered", value: "a beam / wall / roof bearing on the cantilever tip is an engineered condition, not prescriptive", source: "IRC / engineering" },
+    ],
+  },
   "deck-beam-post": {
     formula: "Tributary width to beam = joist span / 2; beam load w (plf) = (live + dead) psf × tributary. Smallest built-up beam with min(L_bending, L_deflection) ≥ post spacing. Post axial load = w × post spacing; NDS column capacity = F_c × C_P × A with C_P from F_cE = 0.822 E_min / (le/d)². Footing from soil bearing; ledger fastener spacing from IRC Table R507.9.1.3(1).",
     edition: IRC_2021 + " §R507 (decks). " + AWC_NDS + " reference values; IRC Table R507.9.1.3(1) ledger fasteners.",

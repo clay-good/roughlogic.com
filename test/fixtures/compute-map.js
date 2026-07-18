@@ -136,6 +136,7 @@ export const COMPUTE_MAP = {
   "header-sizing": { module: "../../calc-construction.js", fn: "computeHeaderSizing" },
   "stud-notch-bore-limit": { module: "../../calc-construction.js", fn: "computeStudNotchBoreLimit" },
   "joist-notch-bore-limit": { module: "../../calc-construction.js", fn: "computeJoistNotchBoreLimit" },
+  "joist-cantilever-check": { module: "../../calc-construction.js", fn: "computeJoistCantileverCheck" },
   "deck-beam-post": { module: "../../calc-construction.js", fn: "computeDeckBeamPost" },
   "standpipe-pdp": { module: "../../calc-fire.js", fn: "computeStandpipePDP" },
   "smoke-ejector-cfm": { module: "../../calc-fire.js", fn: "computeSmokeEjector" },

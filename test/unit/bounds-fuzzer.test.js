@@ -26904,6 +26904,24 @@ test("bounds: spec-v924 computeMicroinverterBranchCount pins the count, 80% limi
   assert.ok("error" in _v924({ branch_ocpd_a: Infinity, unit_max_current_a: 1.21 }));
 });
 
+import { computeJoistCantileverCheck as _v931 } from "../../calc-construction.js";
+
+test("bounds: spec-v931 computeJoistCantileverCheck pins the 1:4 max, verdict, and error seams", () => {
+  const r = _v931({ backspan_ft: 10, overhang_ft: 3 });
+  assert.ok(Math.abs(r.cantilever_max_ft - 2.5) < 1e-9); // 10/4
+  assert.equal(r.within_limit, false); // 3 > 2.5
+  assert.equal(r.verdict, "EXCEEDS");
+  assert.ok(Math.abs(r.margin_ft - (-0.5)) < 1e-9);
+  const ok = _v931({ backspan_ft: 12, overhang_ft: 2 });
+  assert.ok(Math.abs(ok.cantilever_max_ft - 3.0) < 1e-9);
+  assert.equal(ok.within_limit, true); // 2 <= 3
+  assert.equal(ok.verdict, "WITHIN LIMIT");
+  // Error seams: non-positive backspan, negative overhang, non-finite.
+  assert.ok("error" in _v931({ backspan_ft: 0, overhang_ft: 2 }));
+  assert.ok("error" in _v931({ backspan_ft: 10, overhang_ft: -1 }));
+  assert.ok("error" in _v931({ backspan_ft: Infinity, overhang_ft: 2 }));
+});
+
 import { computeJoistNotchBoreLimit as _v930 } from "../../calc-construction.js";
 
 test("bounds: spec-v930 computeJoistNotchBoreLimit pins the D/4, D/6, D/3 limits and error seams", () => {

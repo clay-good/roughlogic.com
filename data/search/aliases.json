@@ -2837,6 +2837,31 @@
       "kind": "industry"
     },
     {
+      "term": "cantilever ratio",
+      "target": "joist-cantilever-check",
+      "kind": "industry"
+    },
+    {
+      "term": "joist cantilever",
+      "target": "joist-cantilever-check",
+      "kind": "industry"
+    },
+    {
+      "term": "deck cantilever",
+      "target": "joist-cantilever-check",
+      "kind": "industry"
+    },
+    {
+      "term": "how far can a joist overhang",
+      "target": "joist-cantilever-check",
+      "kind": "adjacent"
+    },
+    {
+      "term": "backspan cantilever rule",
+      "target": "joist-cantilever-check",
+      "kind": "adjacent"
+    },
+    {
       "term": "joist boring",
       "target": "joist-notch-bore-limit",
       "kind": "industry"

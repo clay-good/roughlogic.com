@@ -34932,6 +34932,60 @@
    }
   },
   {
+   "tile_id": "joist-cantilever-check",
+   "source_publisher": "joist cantilever ratio (IRC R507.6)",
+   "source_title": "10 ft backspan, 3 ft overhang -> max 2.5 ft, EXCEEDS",
+   "source_edition_or_year": "spec-v931 worked example (machine-verified)",
+   "source_section_or_page": "max = 10/4 = 2.5; overhang 3 > 2.5 -> EXCEEDS (margin -0.5 ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "backspan_ft": 10,
+    "overhang_ft": 3
+   },
+   "outputs": {
+    "cantilever_max_ft": {
+     "value": 2.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "margin_ft": {
+     "value": -0.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "joist-cantilever-check",
+   "source_publisher": "joist cantilever ratio (IRC R507.6)",
+   "source_title": "cross-check: 12 ft backspan, 2 ft overhang -> max 3.0 ft, WITHIN LIMIT",
+   "source_edition_or_year": "spec-v931 worked example (machine-verified)",
+   "source_section_or_page": "max = 12/4 = 3.0; overhang 2 <= 3.0 -> WITHIN (margin +1.0 ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "backspan_ft": 12,
+    "overhang_ft": 2
+   },
+   "outputs": {
+    "cantilever_max_ft": {
+     "value": 3.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "margin_ft": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "joist-notch-bore-limit",
    "source_publisher": "floor joist notch/bore limits (IRC R502.8.1)",
    "source_title": "2x10 joist (9.25 in) -> end notch 2.31, notch 1.54 deep x 3.08 long, bore 3.08",

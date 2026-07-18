@@ -9993,3 +9993,39 @@ CONSTRUCTION_RENDERERS["joist-notch-bore-limit"] = _simpleRenderer({
   ],
   compute: computeJoistNotchBoreLimit,
 });
+
+// ===================== spec-v931: joist / deck cantilever ratio check =====================
+// dims: in { backspan_ft: L, overhang_ft: L } out: { cantilever_max_ft: L, margin_ft: L, within_limit: dimensionless }
+export function computeJoistCantileverCheck({ backspan_ft = 10, overhang_ft = 2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(backspan_ft > 0)) return { error: "Backspan must be positive (ft)." };
+  if (overhang_ft < 0) return { error: "Overhang cannot be negative (ft)." };
+  // IRC R507.6 (decks) / R502.3.3: a joist cantilever may not exceed one quarter of its actual backspan.
+  const cantilever_max_ft = backspan_ft / 4;
+  const margin_ft = cantilever_max_ft - overhang_ft;
+  const within_limit = overhang_ft <= cantilever_max_ft;
+  if (![cantilever_max_ft, margin_ft].every(Number.isFinite)) return { error: "Cantilever math is not a finite value." };
+  return {
+    cantilever_max_ft,
+    margin_ft,
+    within_limit,
+    verdict: within_limit ? "WITHIN LIMIT" : "EXCEEDS",
+    note: "The 1:4 joist-cantilever ratio rule: a joist may overhang its support by no more than one quarter of its backspan (the span from that support back to the next), per IRC R507.6 for decks and R502.3.3 for floors. A 10 ft backspan allows a 2.5 ft cantilever; a 3 ft overhang on that backspan EXCEEDS the limit and needs a longer backspan (>= 12 ft). The prescriptive tables also cap the absolute overhang and require the cantilever be checked for uplift and for the load it carries (a roof or a wall bearing on the tip is a separate engineered case). This is the RATIO screen; the prescriptive span tables, the connection at the support, and the AHJ-adopted code govern -- and a beam or roof landing on the cantilever tip is an engineered condition.",
+  };
+}
+export const joistCantileverCheckExample = { inputs: { backspan_ft: 10, overhang_ft: 2 } };
+
+CONSTRUCTION_RENDERERS["joist-cantilever-check"] = _simpleRenderer({
+  citation: "Citation: IRC R507.6 / R502.3.3 joist cantilever ratio by name. cantilever_max = backspan / 4; within limit when overhang <= max. The prescriptive span tables, the tip load, and the AHJ-adopted code govern; a beam/roof on the tip is an engineered case.",
+  example: joistCantileverCheckExample.inputs,
+  fields: [
+    { key: "backspan_ft", label: "Backspan (ft, support to next support)", kind: "number", default: 10 },
+    { key: "overhang_ft", label: "Cantilever / overhang (ft)", kind: "number", default: 2 },
+  ],
+  outputs: [
+    { key: "v", id: "jcc-out-v", label: "Verdict", value: (r) => r.verdict + " (" + (r.margin_ft >= 0 ? "+" : "") + fmt(r.margin_ft, 2) + " ft margin)" },
+    { key: "m", id: "jcc-out-m", label: "Max cantilever (backspan / 4)", value: (r) => fmt(r.cantilever_max_ft, 2) + " ft (" + fmt(r.cantilever_max_ft * 12, 1) + " in)" },
+    { key: "n", id: "jcc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeJoistCantileverCheck,
+});

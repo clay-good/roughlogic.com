@@ -876,6 +876,7 @@ const RELATED = {
   "header-sizing": ["lumber-spans", "beam-loading", "residential-framing"],
   "stud-notch-bore-limit": ["header-sizing", "joist-hanger-count", "sill-plate-anchor-count"],
   "joist-notch-bore-limit": ["stud-notch-bore-limit", "joist-hanger-count", "header-sizing"],
+  "joist-cantilever-check": ["deck-beam-post", "cantilever-beam", "joist-hanger-count"],
   "deck-beam-post": ["footing-area", "lumber-spans", "joist-deflection"],
   "standpipe-pdp": ["standpipe-friction", "pdp", "fire-friction"],
   "smoke-ejector-cfm": ["confined-space-vent", "confined-space-purge", "air-movers"],

@@ -245,7 +245,7 @@ const _TILES = [
   ["hip-valley-rafter", "E"], ["rebar-schedule", "E"], ["welded-wire-mesh", "E"], ["plywood-span", "E"],
   ["helical-pile", "E"], ["helical-pile-torque", "E"], ["crane-lift-quick", "E"],
   ["excavation-bench-plan", "E"],
-  ["header-sizing", "E"], ["stud-notch-bore-limit", "E"], ["joist-notch-bore-limit", "E"], ["deck-beam-post", "E"],
+  ["header-sizing", "E"], ["stud-notch-bore-limit", "E"], ["joist-notch-bore-limit", "E"], ["joist-cantilever-check", "E"], ["deck-beam-post", "E"],
 
   ["fire-friction", "F"], ["pdp", "F"], ["hydrant-flow", "F"],
   ["required-fire-flow", "F"], ["master-stream", "F"], ["aerial-ladder", "F"],

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): add joist-cantilever-check tile (spec-v931); 2026-07-18
+
+- New Group E tile `joist-cantilever-check` (Joist / Deck Cantilever Ratio Check, IRC R507.6) in calc-construction.js,
+  beside joist-notch-bore-limit. The 1:4 rule: max cantilever = backspan / 4; within limit when overhang <= max. A 10 ft
+  backspan allows 2.5 ft (a 3 ft overhang EXCEEDS); a 12 ft backspan allows 3.0 ft. The span tables, tip load, and uplift
+  check govern; a beam/roof on the tip is engineered. Distinct from the engineering cantilever-beam tile. Home count
+  1,379 -> 1,380.
+
 ### feat(construction): add joist-notch-bore-limit tile (spec-v930); 2026-07-18
 
 - New Group E tile `joist-notch-bore-limit` (Floor Joist Notching and Boring Limits, IRC R502.8.1) in
