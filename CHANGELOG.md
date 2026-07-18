@@ -4,6 +4,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(lint): add check-guard-only-inputs gate; fix the 3 dead inputs it caught; 2026-07-18
+
+- The existing check-dead-inputs gate catches a parameter that is never referenced, but misses the subtler "guard-only"
+  flavor -- a parameter referenced only in a validation guard (`if (!(x > 0)) return { error }`) and/or a `Number()`
+  coercion, never flowing into a returned value. Six such dead inputs were found and fixed by hand this session; this
+  new gate (scripts/check-guard-only-inputs.mjs, wired into `npm run lint`) closes the blind spot permanently with an
+  alias-aware trace and a reviewed allowlist (scripts/guard-only-inputs-allowlist.json) for legitimate scope/validation
+  selectors. It swept 5,660 compute parameters and immediately caught three guard-only dead inputs the manual audits
+  had missed:
+  - **branch-reinforcement `run_od_in`** (calc-pipefit.js): validated but unused in the B31.3 area balance. Made it
+    live with an additive branch-to-run OD-ratio applicability screen (flags a near-full-size branch that needs a
+    listed tee), so run OD now affects the verdict.
+  - **trap-seal-loss `drain_diameter_in`** (calc-plumbing.js): the permitted maximum trap-to-vent distance is entered
+    directly, so the drain diameter was redundant and unused. Removed it.
+  - **hood-exhaust `width_ft`** (calc-hvac.js) and **masonry-prism-fm `unit_type`** (calc-masonry.js): reviewed and
+    allowlisted -- the Type II hood rate is flat per linear foot (width has no numeric role), and unit_type is a
+    scope selector that correctly rejects the not-yet-implemented clay branch.
+
 ### fix(restoration): containment-air-balance collected a containment-volume input it never used; 2026-07-18
 
 - computeContainmentAirBalance rendered and validated `containment_volume_ft3`, but the required negative-pressure

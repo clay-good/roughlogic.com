@@ -1,0 +1,35 @@
+{
+  "_comment": "Reviewed exceptions for check-guard-only-inputs.mjs. Each entry is a compute parameter that legitimately appears only in a validation guard, because the parameter's presence or value MEANS the requested case is out of the tile's scope -- so returning an error (or the tile scoping the computation to a fixed regulatory window) IS the correct behavior, not a dead input. Add an entry only after confirming by hand (a two-call test) that the parameter genuinely has no numeric role the label/note implies. Reviewed like a citation.",
+  "entries": [
+    {
+      "module": "calc-cross.js",
+      "fn": "computeTrenchSlope",
+      "param": "surcharge",
+      "justification": "A boolean flag: when true the simple OSHA slope table does not apply, so the tile correctly rejects the case with an error. Its only meaningful behavior IS the guard; it is not a value that should flow into a slope number."
+    },
+    {
+      "module": "calc-kitchen.js",
+      "fn": "computeCoolingCurve",
+      "param": "start_F",
+      "justification": "Validates the food is above 70 F (has something to cool). The FDA cooling clock the tile computes is scoped to the fixed 135->70->41 window, which is start-temperature-independent above 135 F, so start_F correctly does not drive the time. Label clarified 2026-07-18 to state this."
+    },
+    {
+      "module": "calc-kitchen.js",
+      "fn": "computeSousVidePasteurization",
+      "param": "initial_temperature_F",
+      "justification": "Validates the start is below the bath temperature (a real physical constraint). Come-up time uses the cited Fo~0.4 fixed-fractional-approach model calibrated to a refrigerated start, so the value does not drive come-up; label clarified 2026-07-18 to state the refrigerated-start assumption. Changing the food-safety model requires authoritative validation, not a code tweak."
+    },
+    {
+      "module": "calc-masonry.js",
+      "fn": "computeMasonryPrismFm",
+      "param": "unit_type",
+      "justification": "A scope selector: the tile covers concrete (CMU) units by the TMS 602 Table 2 unit-strength method; unit_type='clay' is correctly rejected as a not-yet-implemented branch, and any other value errors. Its role is validation/scoping, not a numeric driver of f'm."
+    },
+    {
+      "module": "calc-hvac.js",
+      "fn": "computeHoodExhaust",
+      "param": "width_ft",
+      "justification": "Type II vapor hood exhaust is a flat cfm-per-linear-foot rate (IMC 507.20 / the bundled TYPE_II_HOOD_CFM_PER_FT), so the width does not change the airflow; it is a required dimensional field for the hood spec (label reads 'Type II only') and the requirement is covered by tests. A capture-velocity model would use width, but the per-foot method does not."
+    }
+  ]
+}

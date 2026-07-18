@@ -244,15 +244,17 @@ test("screw-conveyor: shaft >= screw rejected; loading out of (0,1] rejected; no
 
 // B.1 trap-seal-loss
 test("trap-seal-loss: 6 ft used of 8 ft permitted -> 75%, within limit, no siphonage", () => {
-  const r = computeTrapSealLoss({ drain_diameter_in: 2, developed_distance_ft: 6, table_max_ft: 8, trap_seal_in: 2 });
+  const r = computeTrapSealLoss({ developed_distance_ft: 6, table_max_ft: 8, trap_seal_in: 2 });
   assert.strictEqual(r.percent_used, 75);
   assert.strictEqual(r.within_limit, true);
   assert.strictEqual(r.siphonage_risk, false);
 });
 test("trap-seal-loss: over-limit or shallow seal flags siphonage; non-positive rejected", () => {
-  assert.strictEqual(computeTrapSealLoss({ drain_diameter_in: 2, developed_distance_ft: 10, table_max_ft: 8 }).siphonage_risk, true);
-  assert.strictEqual(computeTrapSealLoss({ drain_diameter_in: 2, developed_distance_ft: 6, table_max_ft: 8, trap_seal_in: 0.5 }).siphonage_risk, true);
-  assert.ok("error" in computeTrapSealLoss({ drain_diameter_in: 0, developed_distance_ft: 6, table_max_ft: 8 }));
+  assert.strictEqual(computeTrapSealLoss({ developed_distance_ft: 10, table_max_ft: 8 }).siphonage_risk, true);
+  assert.strictEqual(computeTrapSealLoss({ developed_distance_ft: 6, table_max_ft: 8, trap_seal_in: 0.5 }).siphonage_risk, true);
+  // drain_diameter_in was removed as a dead input; the permitted maximum is entered directly.
+  assert.ok("error" in computeTrapSealLoss({ developed_distance_ft: 0, table_max_ft: 8 }));
+  assert.ok("error" in computeTrapSealLoss({ developed_distance_ft: 6, table_max_ft: 0 }));
 });
 
 // B.2 water-meter-sizing

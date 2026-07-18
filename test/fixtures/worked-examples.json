@@ -15708,7 +15708,6 @@
    "verified_by": "rl",
    "verified_on": "2026-06-06",
    "inputs": {
-    "drain_diameter_in": 2,
     "developed_distance_ft": 6,
     "table_max_ft": 8,
     "trap_seal_in": 2

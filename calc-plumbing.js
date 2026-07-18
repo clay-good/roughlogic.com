@@ -3020,13 +3020,14 @@ function _v23SimpleRenderer(spec) {
 // =====================================================================
 // v23 B.1: Trap-seal protection check (IPC/UPC §1002 trap-to-vent)
 // =====================================================================
-// dims: in { drain_diameter_in: L, developed_distance_ft: L, table_max_ft: L, trap_seal_in: L } out: { percent_used: dimensionless, within_limit: dimensionless, siphonage_risk: dimensionless, trap_seal_in: L }
-export function computeTrapSealLoss({ drain_diameter_in = 0, developed_distance_ft = 0, table_max_ft = 0, trap_seal_in = 2 } = {}) {
-  const dia = Number(drain_diameter_in) || 0;
+// dims: in { developed_distance_ft: L, table_max_ft: L, trap_seal_in: L } out: { percent_used: dimensionless, within_limit: dimensionless, siphonage_risk: dimensionless, trap_seal_in: L }
+export function computeTrapSealLoss({ developed_distance_ft = 0, table_max_ft = 0, trap_seal_in = 2 } = {}) {
+  // The permitted maximum trap-to-vent distance is entered directly (looked up
+  // by the user from the adopted code table for the fixture-drain size), so the
+  // drain diameter itself is not part of this check.
   const dist = Number(developed_distance_ft) || 0;
   const max = Number(table_max_ft) || 0;
   let seal = Number(trap_seal_in); if (!Number.isFinite(seal) || seal < 0) seal = 0;
-  if (!(dia > 0 && Number.isFinite(dia))) return { error: "Fixture-drain diameter must be positive (in)." };
   if (!(dist > 0 && Number.isFinite(dist))) return { error: "Developed vent distance must be positive (ft)." };
   if (!(max > 0 && Number.isFinite(max))) return { error: "Permitted trap-to-vent distance must be positive (ft)." };
   const percent_used = (dist / max) * 100;
@@ -3034,12 +3035,11 @@ export function computeTrapSealLoss({ drain_diameter_in = 0, developed_distance_
   const siphonage_risk = !within_limit || seal < 1;
   return { percent_used, within_limit, siphonage_risk, trap_seal_in: seal };
 }
-export const trapSealLossExample = { inputs: { drain_diameter_in: 2, developed_distance_ft: 6, table_max_ft: 8, trap_seal_in: 2 } };
+export const trapSealLossExample = { inputs: { developed_distance_ft: 6, table_max_ft: 8, trap_seal_in: 2 } };
 const renderTrapSealLoss = _v23SimpleRenderer({
   citation: "Citation: Per the adopted plumbing code's trap-seal-protection and trap-to-vent distance provisions (IPC §1002 / UPC §1002). The permitted maximum distance is user-supplied from the adopted table; no proprietary table is reproduced. S-traps are out of scope. The AHJ-adopted edition governs. Free read-only at codes.iccsafe.org.",
   example: trapSealLossExample.inputs,
   fields: [
-    { key: "drain_diameter_in", label: "Fixture-drain diameter (in)", kind: "number" },
     { key: "developed_distance_ft", label: "Developed trap-to-vent distance (ft)", kind: "number" },
     { key: "table_max_ft", label: "Permitted maximum (ft, from adopted table)", kind: "number" },
     { key: "trap_seal_in", label: "Trap-seal depth (in)", kind: "number", default: 2 },

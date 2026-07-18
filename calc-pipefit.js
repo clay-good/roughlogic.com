@@ -851,7 +851,7 @@ PIPEFIT_RENDERERS["flange-rating"] = _renderFlangeRating;
 // Required walls come from the pressure design (pipe-pressure-rating); the
 // engineer of record and the AHJ govern - this is the area balance, not a
 // stamped branch-connection design.
-// dims: in { run_od_in: L, run_wall_in: L, run_treq_in: L, branch_od_in: L, branch_wall_in: L, branch_treq_in: L, beta_deg: dimensionless } out: { d1_in: L, a_required_in2: L^2, a_run_in2: L^2, a_branch_in2: L^2, a_available_in2: L^2, pad_area_in2: L^2 }
+// dims: in { run_od_in: L, run_wall_in: L, run_treq_in: L, branch_od_in: L, branch_wall_in: L, branch_treq_in: L, beta_deg: dimensionless } out: { d1_in: L, a_required_in2: L^2, a_run_in2: L^2, a_branch_in2: L^2, a_available_in2: L^2, pad_area_in2: L^2, branch_run_od_ratio: dimensionless, large_branch: dimensionless }
 export function computeBranchReinforcement({ run_od_in = 0, run_wall_in = 0, run_treq_in = 0, branch_od_in = 0, branch_wall_in = 0, branch_treq_in = 0, beta_deg = 90 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rod = Number(run_od_in), bod = Number(branch_od_in);
@@ -875,7 +875,17 @@ export function computeBranchReinforcement({ run_od_in = 0, run_wall_in = 0, run
   const a_available = a1 + a2;
   const adequate = a_available >= a_required;
   const pad_area = Math.max(0, a_required - a_available);
-  return { d1_in: d1, a_required_in2: a_required, a_run_in2: a1, a_branch_in2: a2, a_available_in2: a_available, adequate, pad_area_in2: pad_area };
+  // Applicability screen: the simple area-replacement rules are intended for a
+  // branch that is not a near-full-size outlet on the run. When the branch OD
+  // approaches the run OD (ratio over ~0.5) a listed tee or a more rigorous
+  // analysis is the norm, so flag it rather than report a bare area balance.
+  const branch_run_od_ratio = bod / rod;
+  const large_branch = branch_run_od_ratio > 0.5;
+  return {
+    d1_in: d1, a_required_in2: a_required, a_run_in2: a1, a_branch_in2: a2,
+    a_available_in2: a_available, adequate, pad_area_in2: pad_area,
+    branch_run_od_ratio, large_branch,
+  };
 }
 export const branchReinforcementExample = { inputs: { run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034, beta_deg: 90 } };
 
@@ -906,7 +916,7 @@ function _renderBranchReinforcement(inputRegion, outputRegion, citationEl) {
     if (r.error) { oReq.textContent = r.error; oAvail.textContent = "-"; oVerdict.textContent = "-"; return; }
     oReq.textContent = fmt(r.a_required_in2, 3) + " in^2 (opening d1 " + fmt(r.d1_in, 3) + " in)";
     oAvail.textContent = fmt(r.a_available_in2, 3) + " in^2 (run " + fmt(r.a_run_in2, 3) + " + branch " + fmt(r.a_branch_in2, 3) + ")";
-    oVerdict.textContent = r.adequate ? "Adequate - excess wall covers it, no pad" : "Pad required - add " + fmt(r.pad_area_in2, 3) + " in^2 of reinforcement";
+    oVerdict.textContent = (r.large_branch ? "Large branch (OD ratio " + fmt(r.branch_run_od_ratio, 2) + " > 0.5; verify a listed tee or a rigorous check applies). " : "") + (r.adequate ? "Adequate - excess wall covers it, no pad" : "Pad required - add " + fmt(r.pad_area_in2, 3) + " in^2 of reinforcement");
   }, DEBOUNCE_MS);
   for (const f of [rod.input, rwall.input, rtreq.input, bod.input, bwall.input, btreq.input, beta.input]) f.addEventListener("input", update);
 }
