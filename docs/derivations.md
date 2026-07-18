@@ -1970,6 +1970,7 @@ cross-check.
 | calc-electrical.js | `computeServiceLoadStandard` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuit = 1, fixed_appl...` | _ | _ | _ |
 | calc-electrical.js | `computeShockApproachBoundary` | `{ nominal_v_ac = "151-750 V" } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeShortCircuitPP` | `{ utility_kVA = 0, utility_Z_pct = 0, secondary_V = 0, phase = "three", C_val...` | _ | _ | _ |
+| calc-electrical.js | `computeSoilResistivityWenner` | `{ probe_spacing_ft = 10, meter_resistance_ohm = 5 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeTerminationTempAmpacity` | `{ amp_90c = 0, amp_75c = 0, amp_60c = 0, termination_rating = 75, over_100a =...` | _ | _ | _ |
 | calc-electrical.js | `computeThreePhase` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | calc-electrical.js | `computeTransformerInrushPoint` | `{ kva = 0, primary_voltage_v = 0, phase = 3, inrush_multiple = 12, duration_s...` | _ | _ | _ |
@@ -3060,7 +3061,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1646.
+Row count: 1647.
 
 <!-- END function-corpus-v14 -->
 
@@ -3141,7 +3142,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (183 tiles)
+### Group A Electrical (184 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3298,6 +3299,7 @@ per spec-v14 §13.1 second paragraph.
 | `shadow-length` | Sun Shadow Length | Sun shadow-length geometry (first-pri...; 10 ft object under a 30 deg sun -> 10 / tan(30) = 17.32 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shock-approach-boundary` | Shock Approach Boundaries (NFPA 70E Table 130.4) | NFPA 70E-2024; 151-750 V: limited fixed 3 ft 6 in, limited movable 10 ft... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `short-circuit-pp` | Short-Circuit Current at Panel (Point-to-Point) | NEMA / Bussmann (Cooper); 1500 kVA / 5.75 %Z / 480 V three-phase utility -> 31,379 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `soil-resistivity-wenner` | Wenner 4-Pin Soil Resistivity | Wenner 4-pin soil resistivity (IEEE 8...; rho = 2*pi*(10*0.3048)*5 = 2*pi*3.048*5 = 95.76 ohm-m; x1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `solar-egc-690-45` | PV Equipment Grounding Conductor (NEC 690.45) | NFPA; 20 A OCPD -> 12 AWG copper EGC (above the 14 AWG floor) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `speaker-70v-line` | 70-Volt Distributed Speaker Line | constant-voltage distributed audio pr...; sixteen 8 W taps (128 W) on a 200 W amp at 20% headroom -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standby-battery-runtime` | Standby Battery Runtime from Capacity | NFPA 72 §10.6 (by name), inverse; 14.6 Ah, 0.5 A standby, 2 A / 5 min alarm, derate 1.2 -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4645,6 +4647,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1399. Fixture-covered or reference-cadence: 1399 / 1399.
+Tile count: 1400. Fixture-covered or reference-cadence: 1400 / 1400.
 
 <!-- END tile-index-v14 -->

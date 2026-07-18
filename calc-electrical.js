@@ -5875,3 +5875,45 @@ function _v942renderPvAcOutputCircuit(inputRegion, outputRegion, citationEl) {
   for (const f of [pw, vv, ph]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["pv-ac-output-circuit"] = _v942renderPvAcOutputCircuit;
+
+// ===================== spec-v951: Wenner 4-pin soil resistivity =====================
+// dims: in { args: dimensionless } out: { resistivity_ohm_m: dimensionless, resistivity_ohm_cm: dimensionless }
+export function computeSoilResistivityWenner({ probe_spacing_ft = 10, meter_resistance_ohm = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(probe_spacing_ft > 0)) return { error: "Probe spacing must be positive (ft)." };
+  if (!(meter_resistance_ohm > 0)) return { error: "Meter resistance reading must be positive (ohms)." };
+  // Wenner equal-spacing 4-pin array: rho = 2*pi*a*R with a in the same length unit; report ohm-m and ohm-cm.
+  const a_m = probe_spacing_ft * 0.3048;
+  const resistivity_ohm_m = 2 * Math.PI * a_m * meter_resistance_ohm;
+  const resistivity_ohm_cm = resistivity_ohm_m * 100;
+  if (![resistivity_ohm_m, resistivity_ohm_cm].every(Number.isFinite)) return { error: "Soil-resistivity math is not a finite value." };
+  return {
+    resistivity_ohm_m,
+    resistivity_ohm_cm,
+    note: "Apparent soil resistivity from a Wenner 4-pin (four-electrode, equal-spacing) test, the field measurement behind every ground-grid and driven-rod design: rho = 2 x pi x a x R, where a is the equal probe spacing and R is the earth-tester reading. With a in meters the result is ohm-meters (x100 for ohm-cm, the unit the grounding-electrode / Dwight tile wants). A 10 ft (3.048 m) spacing reading 5 ohms is 2 x pi x 3.048 x 5 = 95.8 ohm-m (9,575 ohm-cm); a wider 20 ft spacing probes deeper soil. The spacing a is the effective depth explored, so a set of readings at increasing spacings maps resistivity versus depth (a sounding) and reveals layering. This assumes the electrode depth is small compared with the spacing (the standard Wenner assumption) and that the 4 pins are equally spaced in a straight line. Soil resistivity swings widely with moisture, temperature, and season; the wettest-to-driest range and the AWWA/IEEE 81 test method and the engineer of record govern the design value.",
+  };
+}
+
+export const soilResistivityWennerExample = { inputs: { probe_spacing_ft: 10, meter_resistance_ohm: 5 } };
+
+function _v951renderSoilResistivityWenner(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Wenner 4-pin (four-electrode, equal-spacing) soil resistivity test, by name (IEEE 81 / ASTM G57). rho = 2 x pi x a x R with a the equal probe spacing (converted to meters) and R the earth-tester reading; result in ohm-m and ohm-cm. Assumes electrode depth small vs spacing. Resistivity varies with moisture/temperature/season; the IEEE 81 method and the engineer govern.";
+  const sp = makeNumber("Probe spacing a (ft)", "srw-sp", { step: "any", min: "0", value: "10" });
+  sp.input.value = "10";
+  const rr = makeNumber("Earth-tester reading R (ohms)", "srw-rr", { step: "any", min: "0", value: "5" });
+  rr.input.value = "5";
+  for (const f of [sp, rr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sp.input.value = "10"; rr.input.value = "5"; update(); });
+  const oM = makeOutputLine(outputRegion, "Soil resistivity", "srw-out-m");
+  const oCm = makeOutputLine(outputRegion, "Soil resistivity (ohm-cm)", "srw-out-cm");
+  const update = debounce(() => {
+    const r = computeSoilResistivityWenner({
+      probe_spacing_ft: sp.input.value === "" ? 10 : Number(sp.input.value), meter_resistance_ohm: rr.input.value === "" ? 5 : Number(rr.input.value),
+    });
+    if (r.error) { oM.textContent = r.error; oCm.textContent = "-"; return; }
+    oM.textContent = fmt(r.resistivity_ohm_m, 1) + " ohm-m";
+    oCm.textContent = fmt(r.resistivity_ohm_cm, 0) + " ohm-cm (feeds grounding-electrode)";
+  }, DEBOUNCE_MS);
+  for (const f of [sp, rr]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["soil-resistivity-wenner"] = _v951renderSoilResistivityWenner;

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): add soil-resistivity-wenner tile (spec-v951); 2026-07-18
+
+- New Group A tile `soil-resistivity-wenner` (Wenner 4-Pin Soil Resistivity) in calc-electrical.js. The field test behind
+  every ground-grid/rod design: rho = 2 x pi x a x R (a = equal probe spacing in meters, R = earth-tester reading). A
+  10 ft (3.048 m) spacing reading 5 ohms is 95.8 ohm-m (9,575 ohm-cm, the unit the grounding-electrode/Dwight tile
+  wants); a wider spacing probes deeper. Assumes electrode depth small vs spacing. IEEE 81 / ASTM G57; resistivity varies
+  with moisture/season. Home count 1,399 -> 1,400.
+
 ### feat(low-voltage): add thermistor-beta-temp tile (spec-v950); 2026-07-18
 
 - New Group A tile `thermistor-beta-temp` (NTC Thermistor Resistance to Temperature, Beta Equation) in calc-lowvoltage.js.

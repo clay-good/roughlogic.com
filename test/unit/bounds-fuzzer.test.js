@@ -27533,3 +27533,19 @@ test("bounds: spec-v950 computeThermistorBetaTemp pins the NTC beta equation and
   assert.ok("error" in _v950({ resistance_ohms: 20000, r0_ohms: 10000, beta_k: 3950, ref_temp_c: -300 }));
   assert.ok("error" in _v950({ resistance_ohms: Infinity, r0_ohms: 10000, beta_k: 3950, ref_temp_c: 25 }));
 });
+
+import { computeSoilResistivityWenner as _v951 } from "../../calc-electrical.js";
+
+test("bounds: spec-v951 computeSoilResistivityWenner pins rho = 2 pi a R and error seams", () => {
+  const r = _v951({ probe_spacing_ft: 10, meter_resistance_ohm: 5 });
+  assert.ok(Math.abs(r.resistivity_ohm_m - 95.756) < 0.02); // 2*pi*(10*0.3048)*5
+  assert.ok(Math.abs(r.resistivity_ohm_cm - 9575.6) < 2); // x100
+  // Linear in both spacing and reading.
+  assert.ok(Math.abs(_v951({ probe_spacing_ft: 20, meter_resistance_ohm: 2 }).resistivity_ohm_m - 76.605) < 0.02);
+  assert.ok(Math.abs(_v951({ probe_spacing_ft: 20, meter_resistance_ohm: 5 }).resistivity_ohm_m - 2 * r.resistivity_ohm_m) < 1e-6);
+  assert.ok(Math.abs(_v951({ probe_spacing_ft: 10, meter_resistance_ohm: 10 }).resistivity_ohm_m - 2 * r.resistivity_ohm_m) < 1e-6);
+  // Error seams: non-positive spacing or reading, non-finite.
+  assert.ok("error" in _v951({ probe_spacing_ft: 0, meter_resistance_ohm: 5 }));
+  assert.ok("error" in _v951({ probe_spacing_ft: 10, meter_resistance_ohm: 0 }));
+  assert.ok("error" in _v951({ probe_spacing_ft: Infinity, meter_resistance_ohm: 5 }));
+});

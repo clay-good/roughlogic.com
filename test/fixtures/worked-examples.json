@@ -35466,6 +35466,54 @@
    }
   },
   {
+   "tile_id": "soil-resistivity-wenner",
+   "source_publisher": "Wenner 4-pin soil resistivity (IEEE 81 / ASTM G57)",
+   "source_title": "10 ft probe spacing, 5 ohm earth-tester reading -> 95.8 ohm-m (9575 ohm-cm)",
+   "source_edition_or_year": "spec-v951 worked example (machine-verified)",
+   "source_section_or_page": "rho = 2*pi*(10*0.3048)*5 = 2*pi*3.048*5 = 95.76 ohm-m; x100 = 9575 ohm-cm",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "probe_spacing_ft": 10,
+    "meter_resistance_ohm": 5
+   },
+   "outputs": {
+    "resistivity_ohm_m": {
+     "value": 95.76,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "resistivity_ohm_cm": {
+     "value": 9575.6,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soil-resistivity-wenner",
+   "source_publisher": "Wenner 4-pin soil resistivity (IEEE 81 / ASTM G57)",
+   "source_title": "cross-check: a wider 20 ft spacing at 2 ohms -> 76.6 ohm-m",
+   "source_edition_or_year": "spec-v951 worked example (machine-verified)",
+   "source_section_or_page": "rho = 2*pi*(20*0.3048)*2 = 2*pi*6.096*2 = 76.60 ohm-m",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "probe_spacing_ft": 20,
+    "meter_resistance_ohm": 2
+   },
+   "outputs": {
+    "resistivity_ohm_m": {
+     "value": 76.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pv-ac-output-circuit",
    "source_publisher": "inverter AC output sizing (NEC 690.8(B))",
    "source_title": "9.6 kW inverter, 240 V single-phase -> 40 A, 50 A conductor, 50 A OCPD",

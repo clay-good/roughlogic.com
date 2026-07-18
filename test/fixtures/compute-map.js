@@ -792,6 +792,7 @@ export const COMPUTE_MAP = {
   "welder-resistance-circuit-conductor": { module: "../../calc-electrical.js", fn: "computeWelderResistanceCircuitConductor" },
   "battery-inverter-dc-conductor": { module: "../../calc-electrical.js", fn: "computeBatteryInverterDcConductor" },
   "pv-ac-output-circuit": { module: "../../calc-electrical.js", fn: "computePvAcOutputCircuit" },
+  "soil-resistivity-wenner": { module: "../../calc-electrical.js", fn: "computeSoilResistivityWenner" },
   "lv-cable-pull-footage": { module: "../../calc-lowvoltage.js", fn: "computeLvCablePullFootage" },
   "solder-joint-quantity": { module: "../../calc-plumbing.js", fn: "computeSolderJointQuantity" },
   "pipe-insulation-takeoff": { module: "../../calc-plumbing.js", fn: "computePipeInsulationTakeoff" },

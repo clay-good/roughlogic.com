@@ -8915,6 +8915,17 @@ export const CITATIONS = {
       { name: "Busbar limit separate", value: "the 705.12 point-of-connection / busbar limit is checked separately (pv-interconnection-busbar)", source: "NEC 705.12" },
     ],
   },
+  "soil-resistivity-wenner": {
+    formula: "rho = 2 x pi x a x R, with the probe spacing a converted to meters (a_m = a_ft x 0.3048) and R the earth-tester reading (ohms); resistivity in ohm-m, and x100 for ohm-cm.",
+    edition: "Wenner four-electrode (equal-spacing) soil-resistivity test method by name (IEEE 81 / ASTM G57); the field measurement and the engineer of record govern the design value.",
+    freeAccess: "The Wenner relation rho = 2 pi a R is public (the equal-spacing four-electrode formula); the probe spacing and the earth-tester reading are the field measurements, and the method is IEEE 81 / ASTM G57.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Wenner 4-pin (four-electrode, equal-spacing) test is the standard way to measure apparent soil resistivity for grounding design. Four electrodes are driven in a straight line at equal spacing a; the outer two inject a test current and the inner two read the voltage, and the earth tester reports the ratio R. The apparent resistivity is rho = 2 x pi x a x R when the electrode depth is small compared with the spacing -- a in meters gives ohm-meters, and multiplying by 100 gives ohm-cm, the unit the Dwight / IEEE 142 grounding-electrode tile takes. A 10 ft (3.048 m) spacing reading 5 ohms is 2 pi x 3.048 x 5 = 95.8 ohm-m (9,575 ohm-cm). The spacing a sets the effective depth explored, so repeating the test at increasing spacings produces a resistivity-versus-depth sounding that reveals soil layering (a two-layer model is common for grid design). Soil resistivity varies strongly with moisture content, temperature, and season, so the design uses the worst (driest / coldest) credible value, not a single fair-weather reading. The IEEE 81 / ASTM G57 test method and the engineer of record govern.",
+    assumptions: [
+      { name: "Wenner equal-spacing", value: "rho = 2 pi a R, electrode depth small vs spacing a; a in meters -> ohm-m (x100 -> ohm-cm)", source: "IEEE 81 / ASTM G57" },
+      { name: "Depth sounding + seasonal", value: "spacing a ~ effective depth; repeat at increasing a for layering; use the worst seasonal (dry/cold) value for design", source: "grounding-design practice" },
+    ],
+  },
   "lv-cable-pull-footage": {
     formula: "total_ft = drops x (avg_run_ft + slack_ft); boxes = ceil(total_ft / box_ft).",
     edition: "Low-voltage cable footage takeoff identity by name (drops x per-drop length; boxes from total / box); first-principles count arithmetic.",
