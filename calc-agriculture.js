@@ -3192,3 +3192,59 @@ function _v940renderAnhydrousAmmoniaRate(inputRegion, outputRegion, citationEl) 
   for (const f of [nt, tk]) f.input.addEventListener("input", update);
 }
 AGRICULTURE_RENDERERS["anhydrous-ammonia-rate"] = _v940renderAnhydrousAmmoniaRate;
+
+// ===================== spec-v964: available-water / MAD irrigation trigger =====================
+// dims: in { args: dimensionless } out: { taw_in: dimensionless, raw_in: dimensionless, irrigation_interval_days: dimensionless }
+export function computeMadIrrigationTrigger({ field_capacity = 0.30, wilting_point = 0.12, root_depth_in = 24, mad_fraction = 0.5, etc_in_day = 0.25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(field_capacity > 0 && field_capacity < 1)) return { error: "Field capacity must be a fraction between 0 and 1 (in/in)." };
+  if (!(wilting_point >= 0 && wilting_point < field_capacity)) return { error: "Wilting point must be below field capacity (in/in)." };
+  if (!(root_depth_in > 0)) return { error: "Root depth must be positive (in)." };
+  if (!(mad_fraction > 0 && mad_fraction <= 1)) return { error: "Management-allowed-depletion fraction must be between 0 and 1." };
+  if (!(etc_in_day > 0)) return { error: "Crop water use ETc must be positive (in/day)." };
+  // TAW = plant-available water in the root zone; RAW = the fraction (MAD) you let deplete before irrigating.
+  const taw_in = (field_capacity - wilting_point) * root_depth_in;
+  const raw_in = mad_fraction * taw_in;
+  const irrigation_interval_days = raw_in / etc_in_day;
+  if (![taw_in, raw_in, irrigation_interval_days].every(Number.isFinite)) return { error: "Irrigation-trigger math is not a finite value." };
+  return {
+    taw_in,
+    raw_in,
+    irrigation_interval_days,
+    note: "When to irrigate and how much, from the soil water reservoir (FAO-56 / NRCS Irrigation Guide). The total available water the root zone can hold is TAW = (field capacity - permanent wilting point) x root depth, both water contents as a fraction (in of water per in of soil). You do not let the crop use all of it: the readily available water RAW = MAD x TAW is the fraction you allow to deplete before the crop stresses, where MAD (management-allowed depletion) is commonly 0.5 (0.3 for shallow-rooted or sensitive crops, up to 0.6 for deep-rooted grains). A silt loam at field capacity 0.30, wilting point 0.12, and a 24 in root zone holds 4.32 in of available water, so at MAD 0.5 you irrigate after 2.16 in is used; at a crop use of 0.25 in/day that is an 8.6-day interval, and the net refill depth is that same 2.16 in (gross depth adds the application efficiency -- see irrigation-requirement). Hotter weather (higher ETc) shortens the interval, a deeper root zone or a finer soil lengthens it. A scheduling aid; the field-measured soil moisture, the actual crop root depth and ETc, and the agronomist govern.",
+  };
+}
+
+export const madIrrigationTriggerExample = { inputs: { field_capacity: 0.30, wilting_point: 0.12, root_depth_in: 24, mad_fraction: 0.5, etc_in_day: 0.25 } };
+
+function _v964renderMadIrrigationTrigger(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: available-water / management-allowed-depletion irrigation scheduling (FAO-56 / NRCS Irrigation Guide), by name. TAW = (field capacity - wilting point) x root depth; RAW = MAD x TAW; interval = RAW / ETc. MAD ~0.5 (0.3-0.6 by crop). The field-measured soil moisture, the actual root depth and ETc, and the agronomist govern.";
+  const fc = makeNumber("Field capacity (in/in, e.g. 0.30)", "mad-fc", { step: "any", min: "0", value: "0.30" });
+  fc.input.value = "0.30";
+  const wp = makeNumber("Wilting point (in/in, e.g. 0.12)", "mad-wp", { step: "any", min: "0", value: "0.12" });
+  wp.input.value = "0.12";
+  const rd = makeNumber("Root depth (in)", "mad-rd", { step: "any", min: "0", value: "24" });
+  rd.input.value = "24";
+  const md = makeNumber("MAD fraction (0-1, ~0.5)", "mad-md", { step: "any", min: "0", value: "0.5" });
+  md.input.value = "0.5";
+  const et = makeNumber("Crop use ETc (in/day)", "mad-et", { step: "any", min: "0", value: "0.25" });
+  et.input.value = "0.25";
+  for (const f of [fc, wp, rd, md, et]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fc.input.value = "0.30"; wp.input.value = "0.12"; rd.input.value = "24"; md.input.value = "0.5"; et.input.value = "0.25"; update(); });
+  const oT = makeOutputLine(outputRegion, "Total available water (TAW)", "mad-out-t");
+  const oR = makeOutputLine(outputRegion, "Readily available / net refill (RAW)", "mad-out-r");
+  const oI = makeOutputLine(outputRegion, "Irrigation interval", "mad-out-i");
+  const update = debounce(() => {
+    const r = computeMadIrrigationTrigger({
+      field_capacity: fc.input.value === "" ? 0.30 : Number(fc.input.value), wilting_point: wp.input.value === "" ? 0.12 : Number(wp.input.value),
+      root_depth_in: rd.input.value === "" ? 24 : Number(rd.input.value), mad_fraction: md.input.value === "" ? 0.5 : Number(md.input.value),
+      etc_in_day: et.input.value === "" ? 0.25 : Number(et.input.value),
+    });
+    if (r.error) { oT.textContent = r.error; oR.textContent = "-"; oI.textContent = "-"; return; }
+    oT.textContent = fmt(r.taw_in, 2) + " in in the root zone";
+    oR.textContent = fmt(r.raw_in, 2) + " in";
+    oI.textContent = fmt(r.irrigation_interval_days, 1) + " days";
+  }, DEBOUNCE_MS);
+  for (const f of [fc, wp, rd, md, et]) f.input.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["mad-irrigation-trigger"] = _v964renderMadIrrigationTrigger;

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(agriculture): add mad-irrigation-trigger tile (spec-v964); 2026-07-18
+
+- New Group L tile `mad-irrigation-trigger` (Available Water and MAD Irrigation Trigger) in calc-agriculture.js. From the
+  soil water reservoir (FAO-56/NRCS): TAW = (field capacity - wilting point) x root depth; RAW = MAD x TAW; interval =
+  RAW / ETc. A silt loam at FC 0.30, PWP 0.12, 24 in root, MAD 0.5 holds 4.32 in, triggers at 2.16 in depletion, an
+  8.6-day interval at ETc 0.25 in/day. Hotter weather shortens it; a deeper/finer soil lengthens it. A scheduling aid;
+  field soil moisture and the agronomist govern. Home count 1,412 -> 1,413.
+
 ### feat(solar): add dc-shunt-sizing tile (spec-v963); 2026-07-18
 
 - New Group A tile `dc-shunt-sizing` (DC Ammeter Shunt Sizing) in calc-solar.js. A shunt rated as a millivolt drop at a

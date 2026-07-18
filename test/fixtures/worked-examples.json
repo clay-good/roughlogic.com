@@ -14961,6 +14961,66 @@
    }
   },
   {
+   "tile_id": "mad-irrigation-trigger",
+   "source_publisher": "FAO-56 / NRCS soil-water reservoir (MAD)",
+   "source_title": "silt loam FC 0.30, PWP 0.12, 24 in root, MAD 0.5, ETc 0.25 -> TAW 4.32, RAW 2.16, 8.64-day interval",
+   "source_edition_or_year": "spec-v964 worked example (machine-verified)",
+   "source_section_or_page": "TAW = (0.30-0.12)*24 = 4.32; RAW = 0.5*4.32 = 2.16; interval = 2.16/0.25 = 8.64",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "field_capacity": 0.30,
+    "wilting_point": 0.12,
+    "root_depth_in": 24,
+    "mad_fraction": 0.5,
+    "etc_in_day": 0.25
+   },
+   "outputs": {
+    "taw_in": {
+     "value": 4.32,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "raw_in": {
+     "value": 2.16,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "irrigation_interval_days": {
+     "value": 8.64,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "mad-irrigation-trigger",
+   "source_publisher": "FAO-56 / NRCS soil-water reservoir (MAD)",
+   "source_title": "cross-check: hotter weather (ETc 0.35) shortens the interval to 6.17 days",
+   "source_edition_or_year": "spec-v964 worked example (machine-verified)",
+   "source_section_or_page": "interval = 2.16/0.35 = 6.171 days (same RAW, higher crop use)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "field_capacity": 0.30,
+    "wilting_point": 0.12,
+    "root_depth_in": 24,
+    "mad_fraction": 0.5,
+    "etc_in_day": 0.35
+   },
+   "outputs": {
+    "irrigation_interval_days": {
+     "value": 6.171,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "irrigation-requirement",
    "source_publisher": "FAO / USDA NRCS",
    "source_title": "Irrigation requirement: corn (Kc 1.20), 0.25 in/day ET0 over 30 days, 80 acres, 90% drip, 1 in rain",

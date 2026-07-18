@@ -959,7 +959,7 @@ const TOOL_MODULES = (() => {
     // v9
     "thi-livestock", "sprayer-calibration",
     // v17
-    "irrigation-requirement", "cattle-stocking-rate", "grain-bin-capacity", "grain-bin-height-for-capacity", "bunker-silo-capacity", "feed-conversion-ratio",
+    "irrigation-requirement", "mad-irrigation-trigger", "cattle-stocking-rate", "grain-bin-capacity", "grain-bin-height-for-capacity", "bunker-silo-capacity", "feed-conversion-ratio",
     "grain-shrink-moisture", "livestock-dry-matter-intake", "manure-application-rate",
     "npk-blend", "tank-mix",
     // v23

@@ -2229,6 +2229,17 @@ export const CITATIONS = {
     ],
   },
 
+  "mad-irrigation-trigger": {
+    formula: "TAW = (field_capacity - wilting_point) x root_depth_in (in); RAW = mad_fraction x TAW (in); irrigation_interval_days = RAW / etc_in_day. Water contents in in/in; MAD ~0.5 (0.3-0.6 by crop).",
+    edition: "Soil-water-reservoir irrigation scheduling (FAO Irrigation and Drainage Paper 56, Allen et al. 1998; USDA NRCS Irrigation Guide), by name; the field-measured soil moisture, root depth, and ETc govern.",
+    freeAccess: "The available-water and depletion relations are public (FAO-56 / NRCS); the field capacity, wilting point, root depth, MAD, and ETc are soil, crop, and weather values the user supplies.",
+    governance: GOVERNANCE.general,
+    editionNote: "Irrigation scheduling from the soil water reservoir. The total available water a root zone can hold for the crop is TAW = (field capacity - permanent wilting point) x root depth, with the two water contents expressed as a fraction (inches of water per inch of soil, i.e. volumetric): between field capacity (the water left after gravity drainage) and the wilting point (where the crop can no longer extract water) lies the plant-available fraction. The crop is not allowed to use all of it before irrigating -- the readily available water RAW = MAD x TAW is the portion allowed to deplete without stressing the crop, where MAD, the management-allowed depletion, is commonly 0.5, dropping to about 0.3 for shallow-rooted or drought-sensitive crops and rising to 0.6 for deep-rooted grains. RAW is therefore both the trigger (irrigate when depletion reaches it) and the net refill depth. Dividing by the crop water use ETc (in/day) gives the irrigation interval. A silt loam at field capacity 0.30, wilting point 0.12, and a 24-inch root zone holds 4.32 inches of available water; at MAD 0.5 the trigger is 2.16 inches of depletion, an 8.6-day interval at ETc 0.25 in/day. Hotter, windier weather raises ETc and shortens the interval; a deeper root zone or a finer-textured soil raises TAW and lengthens it. The gross applied depth adds the application-efficiency losses (that conversion, and the ETc from Kc x ET0, are in irrigation-requirement). A scheduling aid; the field-measured soil moisture, the actual crop rooting depth and ETc, and the agronomist govern.",
+    assumptions: [
+      { name: "Soil water reservoir", value: "TAW = (FC - PWP) x root depth; RAW = MAD x TAW (net refill and trigger); interval = RAW / ETc", source: "FAO-56 / NRCS Irrigation Guide" },
+      { name: "MAD by crop", value: "MAD ~0.5 (0.3 shallow/sensitive to 0.6 deep-rooted grains); gross depth adds application efficiency (irrigation-requirement)", source: "FAO-56" },
+    ],
+  },
   "irrigation-requirement": {
     formula: "ET_crop = Kc x ET0 x days. Net depth = max(0, ET_crop - effective rainfall). Gross depth = net / application efficiency. Total = gross_in x acres / 12 (acre-feet); gallons = acre-ft x 325,851.",
     edition: "FAO Irrigation and Drainage Paper 56 (Crop Evapotranspiration, Allen et al. 1998) by name; USDA NRCS Irrigation Guide by name. Kc values from FAO 56 Table 12.",

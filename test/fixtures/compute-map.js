@@ -544,6 +544,7 @@ export const COMPUTE_MAP = {
   "cross-connection-air-gap": { module: "../../calc-cross.js", fn: "computeCrossConnectionAirGap" },
   "hydronic-fill-pressure": { module: "../../calc-plumbing.js", fn: "computeHydronicFillPressure" },
   "irrigation-requirement": { module: "../../calc-agriculture.js", fn: "computeIrrigationRequirement" },
+  "mad-irrigation-trigger": { module: "../../calc-agriculture.js", fn: "computeMadIrrigationTrigger" },
   "cattle-stocking-rate": { module: "../../calc-agriculture.js", fn: "computeStockingRate" },
   "grain-bin-capacity": { module: "../../calc-agriculture.js", fn: "computeGrainBin" },
   "grain-bin-height-for-capacity": { module: "../../calc-agriculture.js", fn: "computeGrainBinHeightForCapacity" },

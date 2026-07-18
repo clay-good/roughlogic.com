@@ -1462,6 +1462,7 @@ cross-check.
 | calc-agriculture.js | `computeIrrigationZoneRuntime` | `{ target_in = 0, precip_in_hr = 0, du = 1.0, max_cycle_min = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeLivestockDryMatterIntake` | `{ BW_lb = 0, intake = 0, feed_DM = 0, head = 1 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeLivestockWaterRequirement` | `{ method = "table", head = 1, temp_f = 0, t_low_f = 0, gal_low = 0, t_high_f ...` | _ | _ | _ |
+| calc-agriculture.js | `computeMadIrrigationTrigger` | `{ field_capacity = 0.30, wilting_point = 0.12, root_depth_in = 24, mad_fracti...` | _ | _ | _ |
 | calc-agriculture.js | `computeManureApplicationRate` | `{ crop_need = 0, total_nutr = 0, availability = 0, form = "solid" } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeManureCoverSavings` | `{ daily_manure_ft3 = 0, wastewater_ft3 = 0, bedding_ft3 = 0, storage_days = 0...` | _ | _ | _ |
 | calc-agriculture.js | `computeManureNutrientApplication` | `{ crop_n_need_lb_acre = 0, total_n_lb_ton = 0, availability_pct = 0, p2o5_lb_...` | _ | _ | _ |
@@ -3073,7 +3074,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1659.
+Row count: 1660.
 
 <!-- END function-corpus-v14 -->
 
@@ -4294,7 +4295,7 @@ per spec-v14 §13.1 second paragraph.
 | `waterline-for-hull-speed` | Waterline Length for a Target Hull Speed | displacement hull-speed relation (Fro...; 8 kn target displacement hull -> 35.6 ft waterline | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (65 tiles)
+### Group L Agriculture (66 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4327,6 +4328,7 @@ per spec-v14 §13.1 second paragraph.
 | `livestock-dry-matter-intake` | Livestock Dry-Matter Intake and As-Fed Ration | NRC Nutrient Requirements; spec-v339 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `livestock-water-requirement` | Livestock Water Requirement | NRC / USDA NRCS water-intake guidance...; 50 head, 80 F between (40 F,8 gal) and (90 F,20 gal) -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `log-limb-weight` | Green Log and Limb Weight | USDA FPL Wood Handbook green density; 16 in butt / 16 in top, 8 ft red oak (density 64) -> 11.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `mad-irrigation-trigger` | Available Water and MAD Irrigation Trigger | FAO-56 / NRCS soil-water reservoir (MAD); TAW = (0.30-0.12)*24 = 4.32; RAW = 0.5*4.32 = 2.16; inter... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manure-application-rate` | Nutrient-Based Manure Application Rate | USDA NRCS Code 590; spec-v340 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manure-cover-savings` | Manure Storage Roof Savings (Covered vs Open) | USDA-NRCS Conservation Practice 313 (...; 8,000 ft2 pit, 6-in net precip + 4-in storm -> 6,667 ft3 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manure-nutrient-application` | Manure Nutrient Application Rate | USDA NRCS Code 590; spec-v419 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4671,6 +4673,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1412. Fixture-covered or reference-cadence: 1412 / 1412.
+Tile count: 1413. Fixture-covered or reference-cadence: 1413 / 1413.
 
 <!-- END tile-index-v14 -->

@@ -27843,3 +27843,24 @@ test("bounds: spec-v963 computeDcShuntSizing pins the shunt Ohm's law and error 
   assert.ok("error" in _v963({ rated_current_a: 100, rated_millivolt: 50, measured_millivolt: -1 }));
   assert.ok("error" in _v963({ rated_current_a: Infinity, rated_millivolt: 50, measured_millivolt: 25 }));
 });
+
+import { computeMadIrrigationTrigger as _v964 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v964 computeMadIrrigationTrigger pins TAW/RAW/interval and error seams", () => {
+  const r = _v964({ field_capacity: 0.30, wilting_point: 0.12, root_depth_in: 24, mad_fraction: 0.5, etc_in_day: 0.25 });
+  assert.ok(Math.abs(r.taw_in - 4.32) < 1e-9); // (0.30-0.12)*24
+  assert.ok(Math.abs(r.raw_in - 2.16) < 1e-9); // 0.5*4.32
+  assert.ok(Math.abs(r.irrigation_interval_days - 8.64) < 1e-6); // 2.16/0.25
+  // Higher ETc shortens the interval; deeper root zone raises TAW.
+  assert.ok(Math.abs(_v964({ field_capacity: 0.30, wilting_point: 0.12, root_depth_in: 24, mad_fraction: 0.5, etc_in_day: 0.35 }).irrigation_interval_days - 6.171429) < 1e-4);
+  assert.ok(_v964({ field_capacity: 0.30, wilting_point: 0.12, root_depth_in: 36, mad_fraction: 0.5, etc_in_day: 0.25 }).taw_in > r.taw_in);
+  // RAW is linear in MAD.
+  assert.ok(Math.abs(_v964({ field_capacity: 0.30, wilting_point: 0.12, root_depth_in: 24, mad_fraction: 0.25, etc_in_day: 0.25 }).raw_in - r.raw_in / 2) < 1e-9);
+  // Error seams: FC out of range, PWP >= FC, non-positive root/ETc, MAD out of range, non-finite.
+  assert.ok("error" in _v964({ field_capacity: 1.5, wilting_point: 0.12, root_depth_in: 24, mad_fraction: 0.5, etc_in_day: 0.25 }));
+  assert.ok("error" in _v964({ field_capacity: 0.30, wilting_point: 0.30, root_depth_in: 24, mad_fraction: 0.5, etc_in_day: 0.25 }));
+  assert.ok("error" in _v964({ field_capacity: 0.30, wilting_point: 0.12, root_depth_in: 0, mad_fraction: 0.5, etc_in_day: 0.25 }));
+  assert.ok("error" in _v964({ field_capacity: 0.30, wilting_point: 0.12, root_depth_in: 24, mad_fraction: 1.5, etc_in_day: 0.25 }));
+  assert.ok("error" in _v964({ field_capacity: 0.30, wilting_point: 0.12, root_depth_in: 24, mad_fraction: 0.5, etc_in_day: 0 }));
+  assert.ok("error" in _v964({ field_capacity: Infinity, wilting_point: 0.12, root_depth_in: 24, mad_fraction: 0.5, etc_in_day: 0.25 }));
+});
