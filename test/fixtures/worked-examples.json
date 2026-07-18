@@ -6098,7 +6098,7 @@
    "source_publisher": "Project (first-principles face-area count)",
    "source_title": "Units per ft^2 = 144 / ((w + joint)*(h + joint)); add ceil(base * waste_factor)",
    "source_edition_or_year": "n/a; standard CMU/brick coursing identity",
-   "source_section_or_page": "100 ft^2 wall / CMU 8x8x16 / 3/8 in joints / 5% waste -> face 0.952 ft^2 / base 106 / 112 units with waste",
+   "source_section_or_page": "100 ft^2 wall / CMU 8x8x16 (15.625x7.625 actual) / 3/8 in joints -> 16x8 module = 128 in^2 = 0.889 ft^2 (1.125/ft^2) / base 113 / 119 units with 5% waste",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -6109,19 +6109,19 @@
    },
    "outputs": {
     "unit_count": {
-     "value": 112,
+     "value": 119,
      "tolerance": {
       "abs": 0
      }
     },
     "base_count": {
-     "value": 106,
+     "value": 113,
      "tolerance": {
       "abs": 0
      }
     },
     "face_ft2": {
-     "value": 0.9524,
+     "value": 0.8889,
      "tolerance": {
       "pct": 0.5
      }

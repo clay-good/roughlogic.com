@@ -927,11 +927,15 @@ export const excavationExample = {
 
 // --- Utility 96: Brick / CMU Count ---
 
+// ACTUAL unit face dimensions (in); the mortar joint is added below to build the
+// laid-up module. A nominal 8x8x16 CMU is 15.625 x 7.625 actual, so with a 3/8 in
+// joint the module is 16 x 8 = 128 in^2 -> the standard 1.125 CMU/ft^2. (Storing the
+// nominal 16 x 8 here and adding the joint again double-counted it, undercounting ~7%.)
 export const MASONRY_UNIT_FACE_IN = {
-  modular_brick: { w: 8, h: 2.25 },
-  standard_brick: { w: 8, h: 2.67 },
-  cmu_8x8x16: { w: 16, h: 8 },
-  cmu_8x16x16: { w: 16, h: 8 },
+  modular_brick: { w: 7.625, h: 2.25 },
+  standard_brick: { w: 8, h: 2.25 },
+  cmu_8x8x16: { w: 15.625, h: 7.625 },
+  cmu_8x16x16: { w: 15.625, h: 7.625 },
 };
 
 // dims: in { wall_area_ft2: L^2, unit_type: dimensionless, mortar_joint_in: L, waste_factor: dimensionless } out: { units: dimensionless, mortar_ft3: L^3 }

@@ -8524,8 +8524,10 @@ test("bounds: calc-construction computeExcavationVolume pins prism volume at 90Â
 
 test("bounds: calc-construction computeMasonryCount pins face_in2 = (w+m)*(h+m) and waste-bumped unit_count", () => {
   const r = computeMasonryCount({ wall_area_ft2: 100, unit_type: "cmu_8x8x16" });
-  const face_in2 = (16 + 0.375) * (8 + 0.375);
+  // Actual CMU face 15.625 x 7.625 + 3/8 in joint = 16 x 8 = 128 in^2 module -> 1.125 units/ft^2.
+  const face_in2 = (15.625 + 0.375) * (7.625 + 0.375);
   assert.ok(Math.abs(r.face_ft2 - face_in2 / 144) < 1e-12);
+  assert.ok(Math.abs(144 / face_in2 - 1.125) < 1e-9);
   const base = Math.ceil(100 / (face_in2 / 144));
   assert.strictEqual(r.base_count, base);
   assert.strictEqual(r.unit_count, base + Math.ceil(base * 0.05));

@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(construction): masonry-count double-counted the mortar joint (CMU undercount ~7%); 2026-07-17
+
+- MASONRY_UNIT_FACE_IN stored NOMINAL unit dimensions (16x8 CMU) but the code added the 3/8 in joint AGAIN
+  ((16+0.375)(8+0.375)=137 in^2), so a nominal 8x8x16 CMU came out at 1.05 units/ft^2 instead of the universal 1.125
+  (=144/128). Wall material was undercounted ~7%. Fixed the table to true ACTUAL face dims (CMU 15.625x7.625, standard
+  brick 8x2.25, modular brick 7.625x2.25) so the existing +joint builds the correct 16x8=128 in^2 module; CMU now reads
+  1.125/ft^2 and standard brick 6.55/ft^2 (both the published takeoff figures). Updated the mirror-written worked example
+  (112->119 units) and fuzzer pin, regenerated the tile index.
+
 ### fix(service): range-demand-220.55 Note 1 major-fraction rounding (ceil -> round); 2026-07-17
 
 - range-demand-220-55 used Math.ceil(kw-12) for the NEC Table 220.55 Note 1 5%-per-kW increase, counting ANY fraction
