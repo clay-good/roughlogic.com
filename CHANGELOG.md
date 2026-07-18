@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(motor): guard synchronous speed/slip and shaft torque with monotonicity; 2026-07-17
+
+- Whole-response guards: synchronous speed = 120 f / poles rises as poles drop and falls at lower frequency; slip pct =
+  (Ns - rated)/Ns falls as rated speed nears synchronous; shaft torque = 5252 HP/RPM rises with HP and falls with speed.
+  Test-only.
+
 ### test(metalair): round-trip groove-weld capacity against its required-length inverse; 2026-07-17
 
 - Consistency guard: ASD groove-weld capacity = 0.30 x Fexx x throat x length rises with throat, length, and electrode
