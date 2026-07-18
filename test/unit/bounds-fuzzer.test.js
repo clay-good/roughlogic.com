@@ -26763,6 +26763,25 @@ test("bounds: spec-v910 computeKnurlBlankDiameter pins the teeth, blank diameter
   assert.ok("error" in _v910({ target_diameter_in: Infinity, knurl_tpi: 21 }));
 });
 
+import { computeStaticRolloverThreshold as _v913 } from "../../calc-trucking.js";
+
+test("bounds: spec-v913 computeStaticRolloverThreshold pins the SRT, rollover speed, and error seams", () => {
+  const r = _v913({ track_width_in: 72, cg_height_in: 80, curve_radius_ft: 200 });
+  assert.ok(Math.abs(r.srt_g - 0.45) < 1e-9); // (72/2)/80
+  assert.ok(Math.abs(r.rollover_speed_mph - 36.69) < 0.1); // sqrt(0.45*32.174*200)*0.6818
+  // No curve radius -> null rollover speed, SRT still computed.
+  const n = _v913({ track_width_in: 96, cg_height_in: 60, curve_radius_ft: 0 });
+  assert.ok(Math.abs(n.srt_g - 0.8) < 1e-9); // (96/2)/60, a stable low flatbed
+  assert.equal(n.rollover_speed_mph, null);
+  // A higher CG lowers the threshold (less stable).
+  assert.ok(_v913({ track_width_in: 72, cg_height_in: 90 }).srt_g < r.srt_g);
+  // Error seams: non-positive track / CG, negative radius, non-finite.
+  assert.ok("error" in _v913({ track_width_in: 0, cg_height_in: 80 }));
+  assert.ok("error" in _v913({ track_width_in: 72, cg_height_in: 0 }));
+  assert.ok("error" in _v913({ track_width_in: 72, cg_height_in: 80, curve_radius_ft: -5 }));
+  assert.ok("error" in _v913({ track_width_in: Infinity, cg_height_in: 80 }));
+});
+
 import { computeVesselHeadVolume as _v912 } from "../../calc-fab.js";
 
 test("bounds: spec-v912 computeVesselHeadVolume pins the head volumes by type, straight flange, and error seams", () => {

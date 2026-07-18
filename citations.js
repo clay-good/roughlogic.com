@@ -10847,6 +10847,17 @@ export const CITATIONS = {
       { name: "Freeze point", value: "DEF freezes at about 12 F; the SCR system thaws it in service", source: "ISO 22241" },
     ],
   },
+  "static-rollover-threshold": {
+    formula: "srt_g = (track_width_in / 2) / cg_height_in; rollover_speed_mph = sqrt(srt_g x 32.174 x curve_radius_ft) x 0.6818 (g = 32.174 ft/s^2, ft/s -> mph).",
+    edition: "Static stability factor (static rollover threshold), first-principles rigid-body statics; the track width and loaded CG height come from the truck and its load. NHTSA static-stability metric.",
+    freeAccess: "The static stability factor is a first-principles statics identity (half-track over CG height); the track width, loaded CG height, and curve radius are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "The static rollover threshold (static stability factor, SSF) is the steady lateral acceleration, in g, that lifts the inside wheels of a rigid vehicle: SRT = (track width / 2) / CG height. On a steady curve, rollover impends when the lateral acceleration v^2/R reaches SRT x g, giving a rollover speed sqrt(SRT x g x R). This is a STATIC, rigid-body screen: suspension roll, tire lateral slip, load shift, and the transient of a fast steer or a decreasing-radius ramp all lower the real threshold below the static value, so a driver must slow well below this on ramps and curves. A loaded van runs about 0.35 to 0.45 g, a low flatbed higher, a tanker or high-cube lower. The loaded CG height and the truck govern; the number is a screen, not a substitute for driving to conditions.",
+    assumptions: [
+      { name: "Rigid body", value: "no suspension roll or tire slip; these lower the real threshold below the static value", source: "static stability factor" },
+      { name: "Steady curve", value: "the rollover speed assumes a constant-radius steady turn; a fast steer or ramp is worse", source: "vehicle dynamics" },
+    ],
+  },
   "abyc-dc-wire": {
     formula: "V_drop = drop_pct/100 x system_voltage; CM = 10.75 x current x (2 x length) / V_drop; AWG = smallest standard size with circular-mil area >= CM.",
     edition: "The ABYC E-11 (AC & DC Electrical Systems on Boats) DC conductor sizing by voltage drop, on the round-trip length, by name; the standard, the wire's temperature rating, and the installation govern.",

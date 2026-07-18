@@ -1733,3 +1733,39 @@ TRUCKING_RENDERERS["def-consumption"] = _simpleRenderer({
   ],
   compute: computeDefConsumption,
 });
+
+// ===================== spec-v913: static rollover threshold =====================
+// dims: in { track_width_in: L, cg_height_in: L, curve_radius_ft: L } out: { srt_g: dimensionless, rollover_speed_mph: L*T^-1 }
+export function computeStaticRolloverThreshold({ track_width_in = 72, cg_height_in = 80, curve_radius_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(track_width_in > 0)) return { error: "Track width must be positive (in)." };
+  if (!(cg_height_in > 0)) return { error: "Center-of-gravity height must be positive (in)." };
+  if (curve_radius_ft < 0) return { error: "Curve radius cannot be negative (ft)." };
+  // Static Stability Factor: the lateral acceleration (in g) that lifts the inside wheels,
+  // SRT = (track width / 2) / CG height. Rollover on a steady curve when v^2/R = SRT x g.
+  const srt_g = (track_width_in / 2) / cg_height_in;
+  const rollover_speed_mph = curve_radius_ft > 0 ? Math.sqrt(srt_g * 32.174 * curve_radius_ft) * 0.6818182 : null;
+  if (!Number.isFinite(srt_g)) return { error: "Rollover-threshold math is not a finite value." };
+  return {
+    srt_g,
+    rollover_speed_mph,
+    note: "The static rollover threshold (static stability factor) is the steady lateral acceleration, in g, that lifts the inside wheels: SRT = half-track / CG-height. A loaded van runs about 0.35 to 0.45 g; a low flatbed is higher, a tanker or high-cube lower. On a steady curve, rollover impends when v^2/R reaches SRT x g, so a tighter radius or a higher CG drops the safe speed fast. This is a STATIC screen -- suspension roll, tire slip, load shift, and the dynamics of a fast steer or a ramp lower the real threshold, so slow well below this on ramps and curves. The loaded CG height and the truck govern; a wrong number is a re-check, not a substitute for driving to conditions.",
+  };
+}
+export const staticRolloverThresholdExample = { inputs: { track_width_in: 72, cg_height_in: 80, curve_radius_ft: 200 } };
+
+TRUCKING_RENDERERS["static-rollover-threshold"] = _simpleRenderer({
+  citation: "Citation: static stability factor by name. SRT = (track width / 2) / CG height (the lateral g that lifts the inside wheels); steady-curve rollover speed = sqrt(SRT x g x R), g = 32.174 ft/s^2. A static screen; suspension roll, tire slip, and load shift lower the real threshold. The loaded CG and the truck govern.",
+  example: staticRolloverThresholdExample.inputs,
+  fields: [
+    { key: "track_width_in", label: "Track width (in, wheel centerline to centerline)", kind: "number", default: 72 },
+    { key: "cg_height_in", label: "Loaded CG height (in above ground)", kind: "number", default: 80 },
+    { key: "curve_radius_ft", label: "Curve radius (ft, 0 = skip rollover speed)", kind: "number", default: 200 },
+  ],
+  outputs: [
+    { key: "srt", id: "srt-out-g", label: "Static rollover threshold", value: (r) => fmt(r.srt_g, 2) + " g" },
+    { key: "spd", id: "srt-out-spd", label: "Steady-curve rollover speed", value: (r) => r.rollover_speed_mph === null ? "- (enter curve radius)" : fmt(r.rollover_speed_mph, 0) + " mph" },
+    { key: "n", id: "srt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeStaticRolloverThreshold,
+});

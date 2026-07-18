@@ -34502,6 +34502,56 @@
    }
   },
   {
+   "tile_id": "static-rollover-threshold",
+   "source_publisher": "static stability factor (NHTSA)",
+   "source_title": "72 in track, 80 in loaded CG, 200 ft curve -> 0.45 g, ~37 mph rollover speed",
+   "source_edition_or_year": "spec-v913 worked example (machine-verified)",
+   "source_section_or_page": "srt = (72/2)/80 = 0.45; speed = sqrt(0.45*32.174*200)*0.6818 = 36.7 mph",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "track_width_in": 72,
+    "cg_height_in": 80,
+    "curve_radius_ft": 200
+   },
+   "outputs": {
+    "srt_g": {
+     "value": 0.45,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "rollover_speed_mph": {
+     "value": 36.7,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "static-rollover-threshold",
+   "source_publisher": "static stability factor (NHTSA)",
+   "source_title": "cross-check: low flatbed 96 in track, 60 in CG -> 0.80 g (far more stable)",
+   "source_edition_or_year": "spec-v913 worked example (machine-verified)",
+   "source_section_or_page": "srt = (96/2)/60 = 0.80",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "track_width_in": 96,
+    "cg_height_in": 60,
+    "curve_radius_ft": 0
+   },
+   "outputs": {
+    "srt_g": {
+     "value": 0.8,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "vessel-head-volume",
    "source_publisher": "dished-head volume geometry (first-principles)",
    "source_title": "48 in ID 2:1 semi-elliptical head -> 14,477 in3 = 62.67 gal",

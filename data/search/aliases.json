@@ -2062,6 +2062,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "static rollover threshold",
+      "target": "static-rollover-threshold",
+      "kind": "industry"
+    },
+    {
+      "term": "static stability factor",
+      "target": "static-rollover-threshold",
+      "kind": "industry"
+    },
+    {
+      "term": "truck rollover speed",
+      "target": "static-rollover-threshold",
+      "kind": "industry"
+    },
+    {
+      "term": "rollover g",
+      "target": "static-rollover-threshold",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tanker rollover",
+      "target": "static-rollover-threshold",
+      "kind": "adjacent"
+    },
+    {
       "term": "elevation pressure",
       "target": "elevation-pressure-loss",
       "kind": "industry"

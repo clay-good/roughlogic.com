@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(trucking): add static-rollover-threshold tile (spec-v913); 2026-07-18
+
+- New Group J tile `static-rollover-threshold` (Static Rollover Threshold) in calc-trucking.js. The static stability
+  factor: the steady lateral g that lifts a truck's inside wheels, SRT = (track width / 2) / CG height, plus the
+  steady-curve rollover speed sqrt(SRT x g x R). A 72 in track over an 80 in loaded CG is 0.45 g (~37 mph on a 200 ft
+  ramp); a low 96 in-track flatbed with a 60 in CG is 0.80 g. A static screen -- suspension roll, tire slip, and load
+  shift lower the real threshold, so slow well below this on ramps and curves. Home tile count 1,361 -> 1,362.
+
 ### feat(fab): add vessel-head-volume tile (spec-v912); 2026-07-18
 
 - New Group E tile `vessel-head-volume` (Dished Tank / Vessel Head Volume) in calc-fab.js, beside barstock-cutlist. The

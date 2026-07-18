@@ -220,6 +220,7 @@ const RELATED = {
   "cost-per-mile": ["fuel-range", "reefer-burn", "hos-math"],
   "deadhead-percent": ["cost-per-mile", "fuel-range", "freight-density"],
   "axle-load-distribution": ["bridge-formula", "cargo-securement-wll", "pallet-loadout"],
+  "static-rollover-threshold": ["axle-load-distribution", "truck-off-tracking", "tire-load-check"],
   "detention-demurrage-billing": ["load-profitability", "cost-per-mile", "driver-pay-cpm-vs-percentage", "fuel-surcharge"],
   "driver-pay-cpm-vs-percentage": ["cost-per-mile", "load-profitability", "detention-demurrage-billing", "deadhead-percent"],
   "invoice-factoring-cost": ["load-profitability", "cost-per-mile", "driver-pay-cpm-vs-percentage", "detention-demurrage-billing"],
