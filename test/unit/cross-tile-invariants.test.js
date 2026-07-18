@@ -11791,3 +11791,19 @@ test("monotonicity: steel flexure/column and RC flexure capacities respond corre
   assert.ok(rc({ d: 26 }) > rc({ d: 21.5 }), "RC Mn must rise with effective depth");
   assert.ok(rc({ fy: 75000 }) > rc({ fy: 60000 }), "RC Mn must rise with reinforcement yield");
 });
+
+// Physical monotonicity of the multi-leg sling tension calc (a rigging / lift
+// safety compute): per-leg tension = (load / effective legs) / sin(angle),
+// so it rises linearly with the load and rises as the sling angle flattens
+// toward horizontal (the 1/sin(theta) penalty). A sin/cos swap or an inverted
+// angle term -- the exact class fixed in the 2026-07-15 sling-angle audit --
+// would break these and understate the tension a rigger relies on.
+test("monotonicity: multi-leg sling per-leg tension rises with load and as the sling angle flattens", async () => {
+  const m = await import("../../calc-rigging.js");
+  const base = { total_load_lb: 8000, num_legs: 4, horizontal_angle_deg: 60 };
+  const t = (o) => m.computeMultiLegSling({ ...base, ...o }).tension_per_leg_lb;
+  assert.ok(t({ total_load_lb: 16000 }) > t({ total_load_lb: 8000 }), "tension must rise with load");
+  assert.ok(Math.abs(t({ total_load_lb: 16000 }) - 2 * t({ total_load_lb: 8000 })) < 1e-6, "tension must be linear in load");
+  assert.ok(t({ horizontal_angle_deg: 30 }) > t({ horizontal_angle_deg: 60 }), "tension must rise as the sling flattens (60 -> 30 deg)");
+  assert.ok(t({ horizontal_angle_deg: 15 }) > t({ horizontal_angle_deg: 30 }), "tension must keep rising toward horizontal (30 -> 15 deg)");
+});

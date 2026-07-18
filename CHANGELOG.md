@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(rigging): guard multi-leg sling tension with load/angle monotonicity; 2026-07-17
+
+- Added a physical guard on computeMultiLegSling (lift safety): per-leg tension rises linearly with the load and rises as
+  the sling angle flattens toward horizontal (the 1/sin(theta) penalty). A sin/cos swap or inverted angle term -- the exact
+  class fixed in the 2026-07-15 sling-angle audit -- would understate the tension a rigger relies on and pass the pinned
+  example. Test-only.
+
 ### test(structural): guard steel and RC capacity computes with physical monotonicity; 2026-07-17
 
 - Added whole-response monotonicity guards on three life-safety capacity computes: steel-beam flexure (Mn rises with
