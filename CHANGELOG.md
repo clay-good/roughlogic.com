@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(masonry): guard CMU wall axial and flexural capacity with physical monotonicity (TMS 402); 2026-07-17
+
+- Added whole-response monotonicity guards on the two masonry wall capacity computes: allowable axial load rises with
+  prism strength and net area and falls with slenderness (height, up with radius of gyration); allowable moment rises with
+  reinforcement area and effective depth. A non-conservative sign/term error would pass the single pinned example. Test-only.
+
 ### test(rigging): guard multi-leg sling tension with load/angle monotonicity; 2026-07-17
 
 - Added a physical guard on computeMultiLegSling (lift safety): per-leg tension rises linearly with the load and rises as

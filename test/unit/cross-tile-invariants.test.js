@@ -11807,3 +11807,20 @@ test("monotonicity: multi-leg sling per-leg tension rises with load and as the s
   assert.ok(t({ horizontal_angle_deg: 30 }) > t({ horizontal_angle_deg: 60 }), "tension must rise as the sling flattens (60 -> 30 deg)");
   assert.ok(t({ horizontal_angle_deg: 15 }) > t({ horizontal_angle_deg: 30 }), "tension must keep rising toward horizontal (30 -> 15 deg)");
 });
+
+// Physical monotonicity of the two masonry wall capacity computes (TMS 402
+// life-safety design calcs): allowable axial load rises with prism strength and
+// net area and falls with slenderness (height, up with radius of gyration);
+// allowable moment rises with reinforcement area and effective depth. A sign or
+// wrong-term error that is non-conservative would pass the single pinned example.
+test("monotonicity: CMU wall axial and flexural capacities respond correctly to their inputs (TMS 402)", async () => {
+  const m = await import("../../calc-masonry.js");
+  const ax = (o) => m.computeCmuWallAxial({ fm_psi: 2000, an_in2: 91.5, ast_in2: 0.155, h_in: 144, r_in: 2.201, fs_psi: 32000, ...o }).pa_kip;
+  assert.ok(ax({ fm_psi: 3000 }) > ax({ fm_psi: 2000 }), "axial capacity must rise with prism strength f'm");
+  assert.ok(ax({ an_in2: 120 }) > ax({ an_in2: 91.5 }), "axial capacity must rise with net area");
+  assert.ok(ax({ h_in: 200 }) < ax({ h_in: 144 }), "axial capacity must fall with wall height (slenderness)");
+  assert.ok(ax({ r_in: 3 }) > ax({ r_in: 2.201 }), "axial capacity must rise with radius of gyration");
+  const fl = (o) => m.computeCmuWallFlexure({ fm_psi: 2000, as_in2: 0.155, d_in: 3.81, b_in: 12, fs_psi: 32000, ...o }).ma_ftlb;
+  assert.ok(fl({ as_in2: 0.31 }) > fl({ as_in2: 0.155 }), "flexural capacity must rise with reinforcement area");
+  assert.ok(fl({ d_in: 5.81 }) > fl({ d_in: 3.81 }), "flexural capacity must rise with effective depth");
+});
