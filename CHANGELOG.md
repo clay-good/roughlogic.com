@@ -4,6 +4,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(gas): guard high-altitude derate threshold and step behavior; 2026-07-17
+
+- Whole-response guard: no derate at or below the threshold (factor 1), factor = 1 - steps x derate-per-1000 above it,
+  derated input = nameplate x factor falls with elevation, steps = floor((elev-threshold)/1000). Test-only.
+
 ### test(earthwork): guard soil swell/shrink volume conversions; 2026-07-17
 
 - Consistency guard: loose = bank x (1+swell), compacted = bank x (1-shrink), load-factor = 1/(1+swell) converts loose

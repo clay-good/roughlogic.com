@@ -12524,3 +12524,16 @@ test("consistency: soil swell/shrink volume conversions round-trip and order ban
   assert.ok(ss({}).loose_cy > 1000 && ss({}).compacted_cy < 1000, "bank volume must sit between loose (bigger) and compacted (smaller)");
   assert.ok(Math.abs(ss({}).borrow_per_compacted - 1 / 0.9) < 1e-9, "borrow per compacted yard = 1 / (1 - shrink)");
 });
+
+test("monotonicity: gas high-altitude derate applies only above the threshold and falls with elevation (gas)", async () => {
+  const g = await import("../../calc-gas.js");
+  const ad = (o) => g.computeGasAltitudeDerate({ nameplate_input_btuh: 100000, elevation_ft: 5000, derate_pct_per_1000: 4, threshold_ft: 2000, ...o });
+  assert.strictEqual(ad({ elevation_ft: 1500 }).factor, 1, "at or below the threshold there must be no derate (factor 1)");
+  assert.strictEqual(ad({ elevation_ft: 1500 }).derated_input_btuh, 100000, "below threshold the derated input equals the nameplate");
+  assert.ok(ad({}).factor < 1, "above the threshold the derate factor must drop below 1");
+  assert.ok(ad({}).derated_input_btuh < 100000, "above the threshold the derated input must fall below the nameplate");
+  assert.ok(ad({ elevation_ft: 8000 }).derated_input_btuh < ad({}).derated_input_btuh, "derated input must fall as elevation rises");
+  assert.strictEqual(ad({}).steps_1000, 3, "5000 ft with a 2000 ft threshold gives 3 full 1000-ft steps");
+  assert.ok(Math.abs(ad({}).factor - (1 - 3 * 0.04)) < 1e-9, "factor = 1 - steps * derate-per-1000");
+  assert.ok(Math.abs(ad({}).derated_input_btuh - 100000 * ad({}).factor) < 1e-6, "derated input = nameplate * factor");
+});
