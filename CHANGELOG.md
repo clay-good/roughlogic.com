@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(electrical): guard four more NEC ordered tables (EGC, conduit area, service / kVA ladders); 2026-07-17
+
+- Added ordering invariants over EGC_TABLE_AWG (250.122: OCPD strictly increasing, copper/aluminum EGC never shrinks),
+  CONDUIT_AREAS_IN2 (area increases with trade size), and the STANDARD_SERVICE_AMPACITIES / TRANSFORMER_KVA_STEPS ladders.
+  The two ladders are consumed by "smallest step >= required" sizing that assumes a sorted list; a mis-ordering or
+  transcription error would pick the wrong grounding conductor, conduit, service, or transformer. Test-only.
+
 ### test(electrical): guard the NEC conduit-area and box-fill tables with conductor-size monotonicity; 2026-07-17
 
 - Added a structural invariant over CONDUCTOR_AREAS_IN2 (NEC Ch. 9 Table 5) and BOX_FILL_PER_CONDUCTOR_IN3 (NEC 314.16):

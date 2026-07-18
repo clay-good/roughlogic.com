@@ -8,6 +8,10 @@ import {
   computeVoltageDrop,
   computeConduitFill,
   CONDUCTOR_AREAS_IN2,
+  CONDUIT_AREAS_IN2,
+  EGC_TABLE_AWG,
+  STANDARD_SERVICE_AMPACITIES,
+  TRANSFORMER_KVA_STEPS,
   computeBoxFill,
   BOX_FILL_PER_CONDUCTOR_IN3,
   computeBreakerSize,
@@ -311,5 +315,48 @@ test("NEC conduit-area and box-fill tables are strictly increasing with conducto
     assert.ok(BOX_FILL_PER_CONDUCTOR_IN3[s] > prevBf,
       `BOX_FILL_PER_CONDUCTOR_IN3 not increasing at ${s}: ${BOX_FILL_PER_CONDUCTOR_IN3[s]} <= ${prevBf}`);
     prevBf = BOX_FILL_PER_CONDUCTOR_IN3[s];
+  }
+});
+
+// Ordering invariants over four more NEC electrical lookup tables. The two
+// standard-size ladders are consumed by "smallest step >= required" sizing logic
+// that ASSUMES a sorted ladder; the EGC and conduit tables must grow with OCPD
+// and trade size respectively. A mis-ordering or transcription error would pick
+// the wrong grounding conductor, conduit, service, or transformer -- a safety /
+// code defect the per-value fixtures do not catch.
+test("NEC electrical ordered tables: EGC by OCPD, conduit area by trade size, and the service / kVA ladders are monotone", () => {
+  const cond = ["14", "12", "10", "8", "6", "4", "3", "2", "1", "1/0", "2/0", "3/0", "4/0", "250", "300", "350", "400", "500", "600"];
+  const cRank = Object.fromEntries(cond.map((s, i) => [s, i]));
+  const trade = ["1/2", "3/4", "1", "1-1/4", "1-1/2", "2", "2-1/2", "3", "3-1/2", "4", "5", "6"];
+  const tRank = Object.fromEntries(trade.map((s, i) => [s, i]));
+
+  // EGC (NEC 250.122): OCPD strictly increasing; copper/aluminum EGC never shrinks.
+  let prevO = -Infinity, prevCu = -Infinity, prevAl = -Infinity;
+  for (const row of EGC_TABLE_AWG) {
+    assert.ok(row.ocpd_max_A > prevO, `EGC OCPD not increasing: ${row.ocpd_max_A}`);
+    prevO = row.ocpd_max_A;
+    assert.ok(cRank[row.copper] >= prevCu, `EGC copper shrinks at OCPD ${row.ocpd_max_A}: ${row.copper}`);
+    prevCu = cRank[row.copper];
+    assert.ok(cRank[row.aluminum] >= prevAl, `EGC aluminum shrinks at OCPD ${row.ocpd_max_A}: ${row.aluminum}`);
+    prevAl = cRank[row.aluminum];
+  }
+
+  // Conduit internal area strictly increases with trade size, per conduit type.
+  for (const [ct, tbl] of Object.entries(CONDUIT_AREAS_IN2)) {
+    const sizes = Object.keys(tbl).sort((a, b) => tRank[a] - tRank[b]);
+    let prev = -Infinity;
+    for (const s of sizes) {
+      assert.ok(tRank[s] !== undefined, `unranked trade size ${s} in CONDUIT_AREAS_IN2.${ct}`);
+      assert.ok(tbl[s] > prev, `CONDUIT_AREAS_IN2.${ct} not increasing at ${s}: ${tbl[s]} <= ${prev}`);
+      prev = tbl[s];
+    }
+  }
+
+  // Standard-size ladders must be strictly increasing (the sizing logic assumes it).
+  for (const [name, ladder] of [["STANDARD_SERVICE_AMPACITIES", STANDARD_SERVICE_AMPACITIES], ["TRANSFORMER_KVA_STEPS", TRANSFORMER_KVA_STEPS]]) {
+    assert.ok(ladder.length >= 5, `${name} unexpectedly short`);
+    for (let i = 1; i < ladder.length; i++) {
+      assert.ok(ladder[i] > ladder[i - 1], `${name} not strictly increasing at index ${i}: ${ladder[i]} <= ${ladder[i - 1]}`);
+    }
   }
 });
