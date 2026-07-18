@@ -27382,6 +27382,50 @@
    }
   },
   {
+   "tile_id": "luminaire-spacing-mh-ratio",
+   "source_publisher": "IES luminaire spacing criterion (spacing-to-mounting-height ratio)",
+   "source_title": "SMH 1.3, 8 ft above the work plane -> 10.4 ft max spacing; a 9 ft layout is OK",
+   "source_edition_or_year": "spec-v982 worked example (machine-verified)",
+   "source_section_or_page": "max spacing = 1.3 x 8 = 10.4 ft; proposed 9 ft <= 10.4 -> uniform OK",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "smh_ratio": 1.3,
+    "mounting_height_ft": 8,
+    "actual_spacing_ft": 9
+   },
+   "outputs": {
+    "max_spacing_ft": {
+     "value": 10.4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "luminaire-spacing-mh-ratio",
+   "source_publisher": "IES luminaire spacing criterion (spacing-to-mounting-height ratio)",
+   "source_title": "cross-check: narrow-beam SMH 1.0, 12 ft above the work plane -> 12.0 ft max; a 15 ft layout is too wide",
+   "source_edition_or_year": "spec-v982 worked example (machine-verified)",
+   "source_section_or_page": "max spacing = 1.0 x 12 = 12.0 ft; proposed 15 ft > 12.0 -> scalloping, tighten",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "smh_ratio": 1.0,
+    "mounting_height_ft": 12,
+    "actual_spacing_ft": 15
+   },
+   "outputs": {
+    "max_spacing_ft": {
+     "value": 12.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "room-cavity-ratio",
    "source_publisher": "IES zonal-cavity room cavity ratio",
    "source_title": "40 x 30 ft room, 8 ft luminaire-to-workplane cavity -> RCR 2.33",

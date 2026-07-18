@@ -690,7 +690,7 @@ const _TILES = [
   ["abyc-dc-wire", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
-  ["lumen-method", "A"], ["room-cavity-ratio", "A"],
+  ["lumen-method", "A"], ["room-cavity-ratio", "A"], ["luminaire-spacing-mh-ratio", "A"],
   ["condensate-drain", "C"],
   ["recovery-cylinder", "C"],
   ["hvac-equipment-circuit", "C"],

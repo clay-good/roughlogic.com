@@ -1251,6 +1251,7 @@ export const COMPUTE_MAP = {
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },
   "lumen-method": { module: "../../calc-elecdesign.js", fn: "computeLumenMethod" },
   "room-cavity-ratio": { module: "../../calc-elecdesign.js", fn: "computeRoomCavityRatio" },
+  "luminaire-spacing-mh-ratio": { module: "../../calc-elecdesign.js", fn: "computeLuminaireSpacingMh" },
   "condensate-drain": { module: "../../calc-hvacservice.js", fn: "computeCondensateDrain" },
   "recovery-cylinder": { module: "../../calc-hvacservice.js", fn: "computeRecoveryCylinder" },
   "hvac-equipment-circuit": { module: "../../calc-hvacservice.js", fn: "computeHvacEquipmentCircuit" },

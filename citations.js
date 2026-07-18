@@ -11698,6 +11698,17 @@ export const CITATIONS = {
       { name: "Feeds the CU / lumen method", value: "high RCR (tall/narrow) -> lower CU; enter RCR with the surface reflectances into the fixture CU table; that CU feeds lumen-method", source: "manufacturer photometric report" },
     ],
   },
+  "luminaire-spacing-mh-ratio": {
+    formula: "max_spacing_ft = smh_ratio x mounting_height_ft, where the mounting height is measured from the luminaire plane down to the WORK plane. Uniform if the proposed center-to-center spacing <= max_spacing_ft.",
+    edition: "IES luminaire spacing criterion (SC), historically the spacing-to-mounting-height ratio (S/MH), by name; the fixture's photometric distribution and the target uniformity govern the final layout.",
+    freeAccess: "The spacing-criterion relation is public IES lighting practice; the SMH ratio itself is published on the fixture's photometric report.",
+    governance: GOVERNANCE.general,
+    editionNote: "Once a lighting layout has the right number of fixtures (from the lumen method), the designer still has to place them so the light is reasonably even and does not scallop into bright pools and dark gaps between fixtures. The tool for that is the spacing criterion (SC), which older references call the spacing-to-mounting-height ratio (S/MH or SMH). Every luminaire's photometric report publishes this ratio -- a dimensionless number that captures how wide the fixture throws light -- and the rule is simple: the maximum center-to-center spacing between fixtures equals the SMH ratio times the mounting height measured ABOVE THE WORK PLANE, not floor-to-ceiling. A troffer with an SMH of 1.3 hung 8 feet above the work plane may be spaced up to 1.3 x 8 = 10.4 feet apart; a proposed 9-foot layout is comfortably within that, but a 12-foot layout would exceed it and leave visible dark scallops midway between fixtures. Narrow-distribution optics -- spotlights, high-bay reflectors -- have low SMH ratios (roughly 0.5 to 1.0) and must be packed closer; wide-distribution troffers and lensed fixtures run higher (about 1.2 to 1.5). By convention the perimeter row of fixtures is set at roughly half this spacing away from the walls. This is a layout screen; the fixture's actual photometric distribution, the room's surface reflectances, and the uniformity ratio the designer is targeting govern the final spacing.",
+    assumptions: [
+      { name: "IES spacing criterion", value: "max spacing = SMH x mounting height above the work plane; uniform if actual spacing <= max", source: "IES Lighting Handbook (spacing criterion / S-MH ratio)" },
+      { name: "SMH by optic", value: "narrow-beam/high-bay ~0.5-1.0 (tighter); wide troffers ~1.2-1.5; perimeter row ~half spacing off the wall", source: "manufacturer photometric report" },
+    ],
+  },
   "lumen-method": {
     formula: "count = ceil(target_fc x area / (lumens_per_lum x CU x LLF)); achieved_fc = count x lumens_per_lum x CU x LLF / area. 1 fc = 1 lumen per square foot.",
     edition: "IES lumen method (zonal-cavity number-of-luminaires relation, by name).",

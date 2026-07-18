@@ -687,3 +687,42 @@ ELECDESIGN_RENDERERS["room-cavity-ratio"] = _simpleRenderer({
   ],
   compute: computeRoomCavityRatio,
 });
+
+// ===================== spec-v982: luminaire spacing-to-mounting-height ratio =====================
+// dims: in { args: dimensionless } out: { max_spacing_ft: dimensionless }
+export function computeLuminaireSpacingMh({ smh_ratio = 1.3, mounting_height_ft = 8, actual_spacing_ft = 9 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(smh_ratio > 0)) return { error: "Spacing-to-mounting-height ratio must be positive." };
+  if (!(mounting_height_ft > 0)) return { error: "Mounting height above the work plane must be positive (ft)." };
+  if (!(actual_spacing_ft > 0)) return { error: "Actual spacing must be positive (ft)." };
+  // IES spacing criterion: max center-to-center spacing = SMH x mounting height above the work plane.
+  const max_spacing_ft = smh_ratio * mounting_height_ft;
+  if (!Number.isFinite(max_spacing_ft)) return { error: "Spacing math is not a finite value." };
+  const ok = actual_spacing_ft <= max_spacing_ft;
+  const verdict = ok
+    ? "OK: the proposed spacing is at or below the maximum, so the illuminance stays reasonably uniform."
+    : "TOO WIDE: the proposed spacing exceeds the maximum -- expect scalloping / dark spots between fixtures. Tighten the layout or add a row.";
+  return {
+    max_spacing_ft,
+    verdict,
+    note: "The maximum center-to-center spacing between luminaires for reasonably uniform light, from the fixture's spacing criterion (SC), historically the spacing-to-mounting-height ratio (S/MH or SMH). Every photometric report publishes this ratio; the maximum spacing is simply SMH x the mounting height MEASURED ABOVE THE WORK PLANE (luminaire plane down to the ~2.5 ft desk height, not floor-to-ceiling). A fixture with an SMH of 1.3 mounted 8 ft above the work plane may be spaced up to 1.3 x 8 = 10.4 ft apart; a proposed 9 ft layout is fine, but a 12 ft layout would leave dark scallops between fixtures. Narrow-beam or high-bay optics have a lower SMH (nearer 0.5-1.0) and must be spaced tighter; wide-distribution troffers run higher (1.2-1.5). The perimeter row is usually set at about half this spacing off the wall. A layout screen; the fixture's actual photometric distribution, the room's reflectances, and the uniformity ratio the designer targets govern the final spacing.",
+  };
+}
+
+export const luminaireSpacingMhExample = { inputs: { smh_ratio: 1.3, mounting_height_ft: 8, actual_spacing_ft: 9 } };
+
+ELECDESIGN_RENDERERS["luminaire-spacing-mh-ratio"] = _simpleRenderer({
+  citation: "Citation: luminaire spacing criterion (SC), historically the spacing-to-mounting-height ratio (S/MH), IES, by name. Max center-to-center spacing = SMH x mounting height above the WORK plane. The fixture's photometric distribution, the room reflectances, and the target uniformity govern the final layout.",
+  example: luminaireSpacingMhExample.inputs,
+  fields: [
+    { key: "smh_ratio", label: "Spacing-to-mounting-height ratio (from the photometric report)", kind: "number", default: 1.3 },
+    { key: "mounting_height_ft", label: "Mounting height above the work plane (ft)", kind: "number", default: 8 },
+    { key: "actual_spacing_ft", label: "Proposed center-to-center spacing (ft)", kind: "number", default: 9 },
+  ],
+  outputs: [
+    { key: "s", id: "smh-out-s", label: "Max spacing (ft)", value: (r) => fmt(r.max_spacing_ft, 2) },
+    { key: "v", id: "smh-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "n", id: "smh-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLuminaireSpacingMh,
+});

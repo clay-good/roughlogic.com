@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): add luminaire-spacing-mh-ratio tile (spec-v982); 2026-07-18
+
+- New Group A tile `luminaire-spacing-mh-ratio` in calc-elecdesign.js. Max center-to-center spacing between luminaires
+  for uniform light, from the IES spacing criterion (S/MH ratio): max spacing = SMH x mounting height above the WORK
+  plane. SMH 1.3 at 8 ft = 10.4 ft (a 9 ft layout is OK); narrow-beam SMH 1.0 at 12 ft = 12.0 ft (a 15 ft layout
+  scallops). Pairs with room-cavity-ratio and lumen-method in the lighting-design sweep. Home count 1,430 -> 1,431.
+
 ### feat(electrical): add max-circuit-length-for-vd tile (spec-v981); 2026-07-18
 
 - New Group A tile `max-circuit-length-for-vd` in calc-electrical.js. Solves the I x R voltage-drop relation for LENGTH:

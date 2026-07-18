@@ -537,6 +537,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-elecdesign.js", "ELECDESIGN_RENDERERS", [
     "pull-box-sizing", "lumen-method",
     "room-cavity-ratio",
+    "luminaire-spacing-mh-ratio",
     // spec-v175 electrician batch
     "point-illuminance", "luminaire-height-for-illuminance", "point-method-required-candela",
     "lighting-light-loss-factor", "lighting-uniformity-ratio", "egress-lighting-check",

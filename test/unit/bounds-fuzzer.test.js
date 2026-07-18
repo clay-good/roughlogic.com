@@ -28230,3 +28230,26 @@ test("bounds: spec-v981 computeMaxCircuitLengthForVd pins the length-for-VD and 
   assert.ok("error" in _v981({ source_voltage_v: 120, target_vd_pct: 3, current_a: 20, conductor_cmil: 6530, k_constant: 12.9, phases: 2 }));
   assert.ok("error" in _v981({ source_voltage_v: Infinity, target_vd_pct: 3, current_a: 20, conductor_cmil: 6530, k_constant: 12.9, phases: 1 }));
 });
+
+import { computeLuminaireSpacingMh as _v982 } from "../../calc-elecdesign.js";
+
+test("bounds: spec-v982 computeLuminaireSpacingMh pins the spacing criterion and verdict seams", () => {
+  const r = _v982({ smh_ratio: 1.3, mounting_height_ft: 8, actual_spacing_ft: 9 });
+  assert.ok(Math.abs(r.max_spacing_ft - 10.4) < 1e-9); // 1.3*8
+  assert.ok(/^OK/.test(r.verdict)); // 9 <= 10.4
+  // Narrow-beam cross-check: 1.0*12 = 12.0, and a 15 ft layout exceeds it.
+  const nb = _v982({ smh_ratio: 1.0, mounting_height_ft: 12, actual_spacing_ft: 15 });
+  assert.ok(Math.abs(nb.max_spacing_ft - 12.0) < 1e-9);
+  assert.ok(/TOO WIDE/.test(nb.verdict));
+  // Max spacing scales linearly with both SMH and mounting height.
+  assert.ok(Math.abs(_v982({ smh_ratio: 2.6, mounting_height_ft: 8, actual_spacing_ft: 9 }).max_spacing_ft - 20.8) < 1e-9);
+  assert.ok(Math.abs(_v982({ smh_ratio: 1.3, mounting_height_ft: 16, actual_spacing_ft: 9 }).max_spacing_ft - 20.8) < 1e-9);
+  // Verdict edge: exactly at the max is still OK.
+  assert.ok(/^OK/.test(_v982({ smh_ratio: 1.3, mounting_height_ft: 8, actual_spacing_ft: 10.4 }).verdict));
+  assert.ok(/TOO WIDE/.test(_v982({ smh_ratio: 1.3, mounting_height_ft: 8, actual_spacing_ft: 10.41 }).verdict));
+  // Error seams: non-positive ratio / height / spacing, and non-finite.
+  assert.ok("error" in _v982({ smh_ratio: 0, mounting_height_ft: 8, actual_spacing_ft: 9 }));
+  assert.ok("error" in _v982({ smh_ratio: 1.3, mounting_height_ft: 0, actual_spacing_ft: 9 }));
+  assert.ok("error" in _v982({ smh_ratio: 1.3, mounting_height_ft: 8, actual_spacing_ft: 0 }));
+  assert.ok("error" in _v982({ smh_ratio: Infinity, mounting_height_ft: 8, actual_spacing_ft: 9 }));
+});

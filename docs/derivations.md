@@ -1911,6 +1911,7 @@ cross-check.
 | calc-elecdesign.js | `computeLightingUniformityRatio` | `{ readings = [], target_avgmin = 0, target_maxmin = 0 } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computeLumenMethod` | `{ target_fc = 0, area_sqft = 0, lumens_per_lum = 0, cu = 0.7, llf = 0.8 } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computeLuminaireHeightForIlluminance` | `{ intensity_cd = 0, target_fc = 0, angle_deg = 0 } = {}` | _ | _ | _ |
+| calc-elecdesign.js | `computeLuminaireSpacingMh` | `{ smh_ratio = 1.3, mounting_height_ft = 8, actual_spacing_ft = 9 } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computeMaxGridResistanceForTouch` | `{ tolerable_touch_v = 0, grid_current_a = 0 } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computeNeutralGroundingResistor` | `{ system_voltage_ll_v = 0, target_fault_a = 0, duty = "hrg" } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computePointIlluminance` | `{ intensity_cd = 0, mount_height_ft = 0, angle_deg = 0 } = {}` | _ | _ | _ |
@@ -3091,7 +3092,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1677.
+Row count: 1678.
 
 <!-- END function-corpus-v14 -->
 
@@ -3172,7 +3173,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (193 tiles)
+### Group A Electrical (194 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3258,6 +3259,7 @@ per spec-v14 §13.1 second paragraph.
 | `loop-voltage-budget` | Loop-Powered (2-Wire) 4-20 mA Transmitter Voltage Budget | Loop-powered 2-wire 4-20 mA transmitt...; maxR = (24-10.5)/0.020 = 675; V_at = 24 - 0.020*300 = 18;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lumen-method` | Lumen-Method Luminaire Count | IES lumen method (by name).; spec-v101 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `luminaire-height-for-illuminance` | Luminaire Mounting Height for a Target Illuminance | IES Lighting Handbook (point method, ...; angle 0: h = sqrt(1000 x cos(0)^3 / 10) = 10.0 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `luminaire-spacing-mh-ratio` | Luminaire Spacing-to-Mounting-Height Ratio | IES luminaire spacing criterion (spac...; max spacing = 1.3 x 8 = 10.4 ft; proposed 9 ft <= 10.4 ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lux-to-footcandle` | Lux / Footcandle Converter and Lumen Method | IES Lighting Handbook (lumen method) ...; convert mode: 100 fc -> 1076.4 lux (100 * 10.764) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lv-cable-pull-footage` | Low-Voltage Cable Footage and Box Count | Low-voltage footage takeoff identity ...; total = 48*(120+15) = 6,480 ft; boxes = ceil(6480/1000) = 7 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lv-dc-drop` | Low-Voltage DC Drop | Project (first-principles); 12 V / 10 AWG Cu / 20 ft / 10 A LED lighting -> ~0.407 V ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4707,6 +4709,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1430. Fixture-covered or reference-cadence: 1430 / 1430.
+Tile count: 1431. Fixture-covered or reference-cadence: 1431 / 1431.
 
 <!-- END tile-index-v14 -->
