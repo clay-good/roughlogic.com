@@ -11954,3 +11954,20 @@ test("monotonicity: chemical-feed and clarifier-loading treatment computes respo
   assert.ok(cl({ surface_ft2: 2000 }).sor_gpd_ft2 < cl({}).sor_gpd_ft2, "surface overflow rate must fall with surface area");
   assert.ok(cl({ mlss_mgl: 4000 }).solids_lb_ft2_day > cl({}).solids_lb_ft2_day, "solids loading must rise with MLSS");
 });
+
+// Monotonicity of two trucking computes. Stopping sight distance (a highway
+// design safety calc) SSD = 1.47*v*t + v^2/(30(f+-g)) rises with speed and
+// reaction time and falls with pavement friction. Cost per mile rises with fuel
+// price, falls with fuel economy, and falls with monthly miles (fixed-cost
+// spread). A sign/term error passes the pinned example but not these.
+test("monotonicity: stopping sight distance and cost-per-mile respond correctly to their inputs", async () => {
+  const t = await import("../../calc-trucking.js");
+  const ssd = (o) => t.computeStoppingSightDistance({ speed_mph: 55, reaction_time_s: 2.5, friction: 0.35, grade: 0, ...o }).total_ssd_ft;
+  assert.ok(ssd({ speed_mph: 70 }) > ssd({}), "SSD must rise with speed");
+  assert.ok(ssd({ reaction_time_s: 3.5 }) > ssd({}), "SSD must rise with reaction time");
+  assert.ok(ssd({ friction: 0.5 }) < ssd({}), "SSD must fall with pavement friction");
+  const cpm = (o) => t.computeCostPerMile({ fixed_monthly: 6000, miles_month: 10000, fuel_price: 4, mpg: 6.5, maint_cpm: 0.15, driver_cpm: 0.6, ...o }).total_cpm;
+  assert.ok(cpm({ fuel_price: 5 }) > cpm({}), "cost/mile must rise with fuel price");
+  assert.ok(cpm({ mpg: 8 }) < cpm({}), "cost/mile must fall with fuel economy");
+  assert.ok(cpm({ miles_month: 20000 }) < cpm({}), "cost/mile must fall with monthly miles (fixed-cost spread)");
+});

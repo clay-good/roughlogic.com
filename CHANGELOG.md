@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(trucking): guard stopping-sight-distance and cost-per-mile with monotonicity; 2026-07-17
+
+- Added guards: stopping sight distance (highway-design safety) rises with speed and reaction time and falls with pavement
+  friction; cost per mile rises with fuel price, falls with fuel economy, and falls with monthly miles (fixed-cost spread).
+  A sign/term error passes the pinned example but breaks these. Test-only.
+
 ### test(treatment): guard chemical-feed and clarifier-loading with monotonicity; 2026-07-17
 
 - Added whole-response guards on two water-treatment computes: pure chemical mass lb/day = MGD x mg/L x 8.34 rises with
