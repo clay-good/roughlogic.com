@@ -34502,6 +34502,62 @@
    }
   },
   {
+   "tile_id": "tractor-ballast",
+   "source_publisher": "tractor ballasting rule (ASABE)",
+   "source_title": "180 hp at 125 lb/hp target, 18,000 lb current -> 22,500 lb target, add 4,500 lb",
+   "source_edition_or_year": "spec-v914 worked example (machine-verified)",
+   "source_section_or_page": "target = 125*180 = 22500; change = 22500 - 18000 = 4500",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "power_hp": 180,
+    "weight_to_power_ratio": 125,
+    "current_weight_lb": 18000
+   },
+   "outputs": {
+    "target_weight_lb": {
+     "value": 22500,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "ballast_change_lb": {
+     "value": 4500,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tractor-ballast",
+   "source_publisher": "tractor ballasting rule (ASABE)",
+   "source_title": "cross-check: 120 hp at 130 lb/hp, 16,000 lb current -> 15,600 lb target, remove 400 lb",
+   "source_edition_or_year": "spec-v914 worked example (machine-verified)",
+   "source_section_or_page": "target = 130*120 = 15600; change = 15600 - 16000 = -400 (remove)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "power_hp": 120,
+    "weight_to_power_ratio": 130,
+    "current_weight_lb": 16000
+   },
+   "outputs": {
+    "target_weight_lb": {
+     "value": 15600,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "ballast_change_lb": {
+     "value": -400,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "static-rollover-threshold",
    "source_publisher": "static stability factor (NHTSA)",
    "source_title": "72 in track, 80 in loaded CG, 200 ft curve -> 0.45 g, ~37 mph rollover speed",

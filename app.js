@@ -959,6 +959,8 @@ const TOOL_MODULES = (() => {
     // spec-v207..v211 landscape irrigation and planting install cluster.
     "sprinkler-precip-rate", "sprinkler-gpm-for-precip", "irrigation-zone-runtime", "drip-zone-flow",
     "plant-spacing-count", "sod-takeoff",
+    // spec-v914 tractor ballast for a target weight-to-power ratio
+    "tractor-ballast",
   ]);
   // v87 cap-relief split: the v68 tree-care / arborist-rigging bench moved out
   // of calc-agriculture.js (95.1% of cap) into calc-arborist.js. All five KEEP

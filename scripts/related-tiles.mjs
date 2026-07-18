@@ -906,6 +906,7 @@ const RELATED = {
   "timber-cruise": ["crop-yield", "board-footage"],
   "drawbar-power": ["drawbar-pull", "sprayer-calibration", "gpa-rate"],
   "drawbar-pull": ["drawbar-power", "sprayer-calibration", "gpa-rate"],
+  "tractor-ballast": ["drawbar-pull", "drawbar-power", "tire-contact-patch"],
   "bulk-density": ["seed-rate", "crop-yield"],
   "crop-yield": ["seed-rate", "bulk-density", "timber-cruise"],
   "thi-livestock": ["heat-stress"],

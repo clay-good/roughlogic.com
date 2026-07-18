@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(agriculture): add tractor-ballast tile (spec-v914); 2026-07-18
+
+- New Group L tile `tractor-ballast` (Tractor Ballast for a Target Weight-to-Power Ratio) in calc-agriculture.js, beside
+  drawbar-pull. Ballast to add or remove to hit a target weight-to-power ratio: target = ratio x power (hp); change =
+  target - current (positive = add, negative = remove). A 180 hp tractor at 125 lb/hp targets 22,500 lb, so an 18,000 lb
+  machine adds 4,500 lb; a 120 hp tractor at 130 lb/hp targets 15,600 lb, so a 16,000 lb machine removes 400 lb. Field
+  draft wants ~120-145 lb/hp, transport ~90-110 (target 8-15% wheel slip). The operator's manual and implement govern.
+  Home tile count 1,362 -> 1,363.
+
 ### feat(trucking): add static-rollover-threshold tile (spec-v913); 2026-07-18
 
 - New Group J tile `static-rollover-threshold` (Static Rollover Threshold) in calc-trucking.js. The static stability

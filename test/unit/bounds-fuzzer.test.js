@@ -26763,6 +26763,23 @@ test("bounds: spec-v910 computeKnurlBlankDiameter pins the teeth, blank diameter
   assert.ok("error" in _v910({ target_diameter_in: Infinity, knurl_tpi: 21 }));
 });
 
+import { computeTractorBallast as _v914 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v914 computeTractorBallast pins the target weight, signed ballast change, and error seams", () => {
+  const r = _v914({ power_hp: 180, weight_to_power_ratio: 125, current_weight_lb: 18000 });
+  assert.equal(r.target_weight_lb, 22500); // 125*180
+  assert.equal(r.ballast_change_lb, 4500); // 22500-18000, add
+  // Overweight tractor -> negative change (remove ballast).
+  const rem = _v914({ power_hp: 120, weight_to_power_ratio: 130, current_weight_lb: 16000 });
+  assert.equal(rem.target_weight_lb, 15600); // 130*120
+  assert.equal(rem.ballast_change_lb, -400); // remove
+  // Error seams: non-positive power / ratio, negative current, non-finite.
+  assert.ok("error" in _v914({ power_hp: 0, weight_to_power_ratio: 125, current_weight_lb: 18000 }));
+  assert.ok("error" in _v914({ power_hp: 180, weight_to_power_ratio: 0, current_weight_lb: 18000 }));
+  assert.ok("error" in _v914({ power_hp: 180, weight_to_power_ratio: 125, current_weight_lb: -1 }));
+  assert.ok("error" in _v914({ power_hp: Infinity, weight_to_power_ratio: 125, current_weight_lb: 18000 }));
+});
+
 import { computeStaticRolloverThreshold as _v913 } from "../../calc-trucking.js";
 
 test("bounds: spec-v913 computeStaticRolloverThreshold pins the SRT, rollover speed, and error seams", () => {

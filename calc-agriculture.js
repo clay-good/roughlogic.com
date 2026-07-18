@@ -3104,3 +3104,48 @@ function _v606renderManureCoverSavings(inputRegion, outputRegion, citationEl) {
   for (const f of [manure, ww, bed, days, area, precip, storm, fb]) f.input.addEventListener("input", update);
 }
 AGRICULTURE_RENDERERS["manure-cover-savings"] = _v606renderManureCoverSavings;
+
+// ===================== spec-v914: tractor ballast for a target weight-to-power ratio =====================
+// dims: in { power_hp: M L^2 T^-3, weight_to_power_ratio: T L^-1, current_weight_lb: M L T^-2 } out: { target_weight_lb: M L T^-2, ballast_change_lb: M L T^-2 }
+export function computeTractorBallast({ power_hp = 180, weight_to_power_ratio = 125, current_weight_lb = 18000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(power_hp > 0)) return { error: "Engine / PTO power must be positive (hp)." };
+  if (!(weight_to_power_ratio > 0)) return { error: "Weight-to-power ratio must be positive (lb/hp)." };
+  if (current_weight_lb < 0) return { error: "Current weight cannot be negative (lb)." };
+  // Ballast to a target total weight = ratio x power; add (or, if negative, remove) to reach it.
+  const target_weight_lb = weight_to_power_ratio * power_hp;
+  const ballast_change_lb = target_weight_lb - current_weight_lb;
+  if (![target_weight_lb, ballast_change_lb].every(Number.isFinite)) return { error: "Ballast math is not a finite value." };
+  return {
+    target_weight_lb,
+    ballast_change_lb,
+    note: "Ballast a tractor to a target total weight = weight-to-power ratio x power. Rules of thumb (ASABE / operator's manual): about 120 to 145 lb/hp for tillage and drawbar work at field speeds, dropping toward 90 to 110 lb/hp for higher-speed transport and lighter draft -- too much ballast wastes fuel to rolling resistance, too little spins the tires (target 8 to 15% wheel slip). A positive result is ballast to ADD, a negative result is ballast to REMOVE. The ratio, the split between front and rear, and the tire and inflation ratings come from the operator's manual and the implement; a wrong number is a re-ballast, not a failure.",
+  };
+}
+
+export const tractorBallastExample = { inputs: { power_hp: 180, weight_to_power_ratio: 125, current_weight_lb: 18000 } };
+
+function _v914renderTractorBallast(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: tractor ballasting rule by name. target weight = weight-to-power ratio x power (hp); ballast change = target - current. ASABE / operator's-manual guidance (~120-145 lb/hp for field draft, ~90-110 for transport; target 8-15% wheel slip). The operator's manual and implement govern.";
+  const hp = makeNumber("Engine or PTO power (hp)", "tbal-hp", { step: "any", min: "0", value: "180" });
+  hp.input.value = "180";
+  const rt = makeNumber("Weight-to-power ratio (lb/hp)", "tbal-rt", { step: "any", min: "0", value: "125" });
+  rt.input.value = "125";
+  const cw = makeNumber("Current tractor weight (lb)", "tbal-cw", { step: "any", min: "0", value: "18000" });
+  cw.input.value = "18000";
+  for (const f of [hp, rt, cw]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { hp.input.value = "180"; rt.input.value = "125"; cw.input.value = "18000"; update(); });
+  const oTarget = makeOutputLine(outputRegion, "Target total weight", "tbal-out-t");
+  const oChange = makeOutputLine(outputRegion, "Ballast to add / remove", "tbal-out-c");
+  const update = debounce(() => {
+    const r = computeTractorBallast({
+      power_hp: hp.input.value === "" ? 180 : Number(hp.input.value), weight_to_power_ratio: rt.input.value === "" ? 125 : Number(rt.input.value),
+      current_weight_lb: cw.input.value === "" ? 18000 : Number(cw.input.value),
+    });
+    if (r.error) { oTarget.textContent = r.error; oChange.textContent = "-"; return; }
+    oTarget.textContent = fmt(r.target_weight_lb, 0) + " lb";
+    oChange.textContent = (r.ballast_change_lb >= 0 ? "add " : "remove ") + fmt(Math.abs(r.ballast_change_lb), 0) + " lb";
+  }, DEBOUNCE_MS);
+  for (const f of [hp, rt, cw]) f.input.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["tractor-ballast"] = _v914renderTractorBallast;

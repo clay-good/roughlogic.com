@@ -269,6 +269,7 @@ export const COMPUTE_MAP = {
   "affinity-laws": { module: "../../calc-hvac.js", fn: "computeAffinityLaws" },
   "drawbar-power": { module: "../../calc-agriculture.js", fn: "computeDrawbarPower" },
   "drawbar-pull": { module: "../../calc-agriculture.js", fn: "computeDrawbarPull" },
+  "tractor-ballast": { module: "../../calc-agriculture.js", fn: "computeTractorBallast" },
   "chamber-turnover": { module: "../../calc-restoration.js", fn: "computeChamberTurnover" },
   "concrete-mix-design": { module: "../../calc-construction.js", fn: "computeConcreteMixDesign" },
   "drying-goal": { module: "../../calc-restoration.js", fn: "computeDryingGoal" },

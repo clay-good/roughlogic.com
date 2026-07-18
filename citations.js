@@ -5961,6 +5961,17 @@ export const CITATIONS = {
       { name: "Traction may limit", value: "the power-based pull can exceed the traction limit (weight x soil coefficient); ballast and tires govern the usable pull", source: "traction mechanics" },
     ],
   },
+  "tractor-ballast": {
+    formula: "target_weight_lb = weight_to_power_ratio x power_hp; ballast_change_lb = target_weight_lb - current_weight_lb (positive = add, negative = remove).",
+    edition: "ASABE tractor-ballasting guidance (Agricultural Machinery Management) and the operator's manual, by name; the ratio, front/rear split, and tire ratings come from the manual.",
+    freeAccess: "The ballast identity is a first-principles product (ratio x power); the weight-to-power ratio target and the current weight are user-supplied from ASABE guidance and the scale.",
+    governance: GOVERNANCE.general,
+    editionNote: "Ballast a tractor to a target total weight = weight-to-power ratio x power. ASABE and operator-manual rules of thumb: about 120 to 145 lb/hp for tillage and drawbar work at field speeds, dropping toward 90 to 110 lb/hp for higher-speed transport and lighter draft. The target is 8 to 15% wheel slip -- too much ballast wastes fuel to rolling resistance, too little spins the tires and wastes power. A positive result is ballast to ADD; a negative result is ballast to REMOVE. The ratio, the front-to-rear split, the tire load and inflation ratings, and MFWD vs 2WD all come from the operator's manual and the implement; a wrong number is a re-ballast, not a failure.",
+    assumptions: [
+      { name: "Ratio by task", value: "~120-145 lb/hp field draft; ~90-110 lb/hp higher-speed transport; user-supplied", source: "ASABE machinery management" },
+      { name: "Slip target", value: "aim for 8-15% wheel slip; too much ballast wastes fuel, too little spins the tires", source: "tractor ballasting practice" },
+    ],
+  },
   "irrigation-uniformity": {
     formula: "Christiansen CU = 100 × (1 − Σ|x_i − mean| / (n × mean)). Distribution Uniformity DU = 100 × mean_lowest_quarter / mean_all. Pass / fail at CU 85 / DU 75.",
     edition: "Christiansen 1942 paper by name; USDA NRCS National Engineering Handbook (NEH) Part 623 (Irrigation) by name.",
