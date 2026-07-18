@@ -12062,3 +12062,16 @@ test("regression: joist-hanger, timber-cruise, and cargo-securement respond mono
   assert.ok(tc({ small_end_dib_in: 18 }) > tc({}), "board feet must rise with small-end diameter (guards the /4 log-rule fix)");
   assert.ok(cs({ cargo_length_ft: 25 }) > cs({}), "minimum tiedowns must rise with cargo length (guards the 10-ft-plus rule fix)");
 });
+
+test("monotonicity: PV energy yield and shadow length track their physical inputs (solar)", async () => {
+  const s = await import("../../calc-solar.js");
+  const ey = (o) => s.computePvEnergyYield({ dc_kw: 10, psh: 5, perf_ratio: 0.77, ...o }).annual_kwh;
+  const sh = (o) => s.computeShadowLength({ object_height_ft: 10, sun_altitude_deg: 30, ...o }).shadow_length_ft;
+  assert.ok(ey({ dc_kw: 20 }) > ey({}), "annual energy must rise with DC nameplate");
+  assert.ok(ey({ psh: 6 }) > ey({}), "annual energy must rise with peak-sun-hours");
+  assert.ok(ey({ perf_ratio: 0.9 }) > ey({}), "annual energy must rise with performance ratio");
+  assert.ok(Math.abs(ey({}) - 10 * 5 * 365 * 0.77) < 1e-6, "annual energy must equal dc_kw*psh*365*perf_ratio (PVWatts)");
+  assert.ok(sh({ object_height_ft: 20 }) > sh({}), "shadow length must rise with object height");
+  assert.ok(sh({ sun_altitude_deg: 60 }) < sh({}), "shadow length must fall as the sun climbs");
+  assert.ok(Math.abs(s.computeShadowLength({ object_height_ft: 10, sun_altitude_deg: 45 }).shadow_length_ft - 10) < 1e-6, "a 45-degree sun must throw a shadow equal to the height (cot 45 = 1)");
+});

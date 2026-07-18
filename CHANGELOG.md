@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(solar): guard PV energy yield and shadow length with monotonicity; 2026-07-17
+
+- Whole-response guards: PVWatts annual energy = dc_kw x psh x 365 x perf_ratio rises with each of nameplate,
+  peak-sun-hours, and performance ratio; ground shadow = height / tan(altitude) rises with height, falls as the sun
+  climbs, and equals the height at a 45-degree sun (cot 45 = 1). Test-only.
+
 ### test: regression-guard the audited joist-hanger, timber-cruise, and cargo-securement fixes; 2026-07-17
 
 - Whole-response monotonicity guards protecting three earlier formula fixes: joist count ceils on a partial bay
