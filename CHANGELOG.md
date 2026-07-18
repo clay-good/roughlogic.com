@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(solar): add bifacial-pv-gain tile (spec-v983); 2026-07-18
+
+- New Group A tile `bifacial-pv-gain` in calc-solar.js. Extra output from light on a bifacial module's back side:
+  gain = bifaciality x (rear irradiance / front irradiance); effective power = front x (1 + gain). phi 0.75 with
+  150 W/m^2 rear vs 1000 W/m^2 front = 11.25% (a 400 W rating -> ~445 W); a white roof lifting rear to 250 W/m^2 =
+  18.75% (~475 W). A yield estimate; the datasheet bifaciality, site albedo, and a bifacial ray-trace govern. Home
+  count 1,431 -> 1,432.
+
 ### feat(electrical): add luminaire-spacing-mh-ratio tile (spec-v982); 2026-07-18
 
 - New Group A tile `luminaire-spacing-mh-ratio` in calc-elecdesign.js. Max center-to-center spacing between luminaires

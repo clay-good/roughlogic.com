@@ -658,6 +658,7 @@ const RELATED = {
   "ev-charge-time": ["ev-charger-load", "battery-runtime", "battery-c-rate"],
   "ev-range-per-hour": ["ev-charge-time", "ev-charger-load", "ev-charge-cost"],
   "battery-series-parallel": ["off-grid-battery", "battery-runtime", "dc-shunt-sizing"],
+  "bifacial-pv-gain": ["pv-energy-yield", "pv-cell-temperature-power", "pv-array-sizing"],
   "ev-charge-cost": ["ev-charge-time", "ev-charger-load", "battery-tou-arbitrage"],
   "ev-dcfc-time": ["ev-charge-time", "ev-charge-cost", "battery-c-rate"],
   "solar-egc-690-45": ["egc-sizing", "pv-circuit-ampacity", "pv-string-fusing"],

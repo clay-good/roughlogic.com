@@ -2872,6 +2872,7 @@ cross-check.
 | calc-solar.js | `computeBatteryRuntime` | `{ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1 }` | _ | _ | _ |
 | calc-solar.js | `computeBatterySeriesParallel` | `{ target_bus_v = 48, module_v = 12.8, module_ah = 100, parallel_strings = 2, ...` | _ | _ | _ |
 | calc-solar.js | `computeBatteryTouArbitrage` | `{ nameplate_kwh = 0, dod = 0.90, rte = 0.86, peak_price = 0, offpeak_price = ...` | _ | _ | _ |
+| calc-solar.js | `computeBifacialPvGain` | `{ front_poa_wm2 = 1000, rear_poa_wm2 = 150, bifaciality = 0.75, front_power_w...` | _ | _ | _ |
 | calc-solar.js | `computeDcShuntSizing` | `{ rated_current_a = 100, rated_millivolt = 50, measured_millivolt = 25 } = {}` | _ | _ | _ |
 | calc-solar.js | `computeEvChargeCost` | `{ battery_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, electrici...` | _ | _ | _ |
 | calc-solar.js | `computeEvChargeTime` | `{ battery_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, evse_powe...` | _ | _ | _ |
@@ -3092,7 +3093,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1678.
+Row count: 1679.
 
 <!-- END function-corpus-v14 -->
 
@@ -3173,7 +3174,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (194 tiles)
+### Group A Electrical (195 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3191,6 +3192,7 @@ per spec-v14 §13.1 second paragraph.
 | `battery-tou-arbitrage` | Battery Time-of-Use Arbitrage Value | NREL battery round-trip / arbitrage v...; spec-v236 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `battery-vent-max-current` | Battery Room Max Charge Current from Available Airflow | IEEE 1635 battery-room hydrogen venti...; spec-v666 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bends-between-pulls` | Conduit Bends Between Pull Points (360-Degree Rule) | NEC 2023 (NFPA 70); 90 + 90 + 45 + 45 = 270 deg; 270/90 = 3.0 quarter bends, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `bifacial-pv-gain` | Bifacial PV Rear-Side Gain | Bifacial PV rear-side gain (bifaciali...; gain = 0.75 x 150/1000 = 0.1125; effective = 400 x 1.1125... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bonding-jumper` | Bonding Jumper Sizing (Supply-Side and Equipment) | NFPA; spec-v109 section 2.2 pinned example (350 kcmil Cu servic... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `box-fill` | Box Fill | NFPA; 12 AWG = 2.25 in^3 each; 6 conductors = 13.5; clamps +2.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `branch-circuit-wire-footage` | Branch-Circuit Conductor Footage Takeoff | Branch-circuit footage takeoff identi...; total = 20*(45+15)*3 = 3,600 ft; rolls = ceil(3600/1000) = 4 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4709,6 +4711,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1431. Fixture-covered or reference-cadence: 1431 / 1431.
+Tile count: 1432. Fixture-covered or reference-cadence: 1432 / 1432.
 
 <!-- END tile-index-v14 -->

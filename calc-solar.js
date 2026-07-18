@@ -1804,3 +1804,52 @@ function _v972renderBatterySeriesParallel(inputRegion, outputRegion, citationEl)
   for (const f of [tv, mv, ma, ps, dd]) f.input.addEventListener("input", update);
 }
 SOLAR_RENDERERS["battery-series-parallel"] = _v972renderBatterySeriesParallel;
+
+// ===================== spec-v983: bifacial PV rear-side gain =====================
+// dims: in { args: dimensionless } out: { bifacial_gain_pct: dimensionless, effective_power_w: dimensionless }
+export function computeBifacialPvGain({ front_poa_wm2 = 1000, rear_poa_wm2 = 150, bifaciality = 0.75, front_power_w = 400 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(front_poa_wm2 > 0)) return { error: "Front plane-of-array irradiance must be positive (W/m^2)." };
+  if (!(rear_poa_wm2 >= 0)) return { error: "Rear plane-of-array irradiance must be zero or positive (W/m^2)." };
+  if (!(bifaciality > 0 && bifaciality <= 1)) return { error: "Bifaciality coefficient must be between 0 and 1." };
+  if (!(front_power_w > 0)) return { error: "Front-side nameplate power must be positive (W)." };
+  // Bifacial gain = bifaciality x (rear irradiance / front irradiance); effective = front x (1 + gain).
+  const gain_ratio = bifaciality * (rear_poa_wm2 / front_poa_wm2);
+  const bifacial_gain_pct = gain_ratio * 100;
+  const effective_power_w = front_power_w * (1 + gain_ratio);
+  if (!Number.isFinite(bifacial_gain_pct) || !Number.isFinite(effective_power_w)) return { error: "Bifacial-gain math is not a finite value." };
+  return {
+    bifacial_gain_pct,
+    effective_power_w,
+    note: "The extra output a bifacial PV module makes from light hitting its BACK side. The rear cells see a fraction of the front's efficiency -- the bifaciality coefficient (phi), a datasheet number typically 0.65 to 0.90 for modern modules -- and they collect the plane-of-array irradiance reflected onto the back from the ground or roof. The gain over a front-only module is bifaciality x (rear irradiance / front irradiance): a module with phi 0.75 whose back sees 150 W/m^2 while the front sees 1000 W/m^2 makes 0.75 x 0.15 = 11.25% more power, so a 400 W front rating becomes ~445 W effective. The rear irradiance is what the site drives -- it climbs with a higher ground albedo (white membrane or light gravel ~0.5-0.7 vs dark asphalt ~0.1), a taller mounting height, wider row spacing, and less rack shading. Over a white roof the same module might see 250 W/m^2 rear (18.75% gain, ~475 W). A yield estimate; the module datasheet's bifaciality, the actual site albedo and rear-shading, and a bifacial ray-trace (PVsyst / NREL) govern the real number, and the inverter and array must still be sized for the boosted output.",
+  };
+}
+
+export const bifacialPvGainExample = { inputs: { front_poa_wm2: 1000, rear_poa_wm2: 150, bifaciality: 0.75, front_power_w: 400 } };
+
+function _v983renderBifacialPvGain(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: bifacial PV rear-side gain, by name. gain = bifaciality x (rear irradiance / front irradiance); effective power = front x (1 + gain). Bifaciality (phi) ~0.65-0.90 from the datasheet; rear irradiance climbs with ground albedo, mounting height, and row spacing. The datasheet bifaciality, the site albedo, and a bifacial ray-trace govern the real yield.";
+  const fp = makeNumber("Front plane-of-array irradiance (W/m^2)", "bpg-fp", { step: "any", min: "0", value: "1000" });
+  fp.input.value = "1000";
+  const rp = makeNumber("Rear plane-of-array irradiance (W/m^2)", "bpg-rp", { step: "any", min: "0", value: "150" });
+  rp.input.value = "150";
+  const bf = makeNumber("Bifaciality coefficient (0-1, from datasheet)", "bpg-bf", { step: "any", min: "0", max: "1", value: "0.75" });
+  bf.input.value = "0.75";
+  const pw = makeNumber("Front-side nameplate power (W)", "bpg-pw", { step: "any", min: "0", value: "400" });
+  pw.input.value = "400";
+  for (const f of [fp, rp, bf, pw]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fp.input.value = "1000"; rp.input.value = "150"; bf.input.value = "0.75"; pw.input.value = "400"; update(); });
+  const oG = makeOutputLine(outputRegion, "Bifacial gain", "bpg-out-g");
+  const oP = makeOutputLine(outputRegion, "Effective power", "bpg-out-p");
+  const update = debounce(() => {
+    const r = computeBifacialPvGain({
+      front_poa_wm2: fp.input.value === "" ? 1000 : Number(fp.input.value), rear_poa_wm2: rp.input.value === "" ? 150 : Number(rp.input.value),
+      bifaciality: bf.input.value === "" ? 0.75 : Number(bf.input.value), front_power_w: pw.input.value === "" ? 400 : Number(pw.input.value),
+    });
+    if (r.error) { oG.textContent = r.error; oP.textContent = "-"; return; }
+    oG.textContent = fmt(r.bifacial_gain_pct, 2) + " %";
+    oP.textContent = fmt(r.effective_power_w, 1) + " W";
+  }, DEBOUNCE_MS);
+  for (const f of [fp, rp, bf, pw]) f.input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["bifacial-pv-gain"] = _v983renderBifacialPvGain;

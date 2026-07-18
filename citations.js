@@ -2561,6 +2561,17 @@ export const CITATIONS = {
     ],
   },
 
+  "bifacial-pv-gain": {
+    formula: "bifacial_gain = bifaciality x (rear_poa_wm2 / front_poa_wm2); bifacial_gain_pct = 100 x bifacial_gain; effective_power_w = front_power_w x (1 + bifacial_gain).",
+    edition: "Bifacial PV rear-side gain (bifaciality-coefficient effective-irradiance model), by name; the module datasheet bifaciality, the site albedo and rear-shading, and a bifacial ray-trace (PVsyst / NREL) govern the yield.",
+    freeAccess: "The bifacial effective-irradiance relation is public PV engineering practice; the bifaciality coefficient is on the module datasheet and the rear irradiance comes from a site model.",
+    governance: GOVERNANCE.general,
+    editionNote: "A bifacial photovoltaic module collects light on both faces: the front makes power the ordinary way, and the back cells make additional power from light reflected up onto them from the ground or roof. The back is less efficient than the front, and the datasheet captures that with the bifaciality coefficient (phi), the ratio of rear to front efficiency -- typically 0.65 to 0.90 for modern cells. The extra output relative to a front-only module is simply phi times the ratio of rear-side to front-side plane-of-array irradiance. A module with phi = 0.75 whose back sees 150 W/m^2 while its front sees 1000 W/m^2 gains 0.75 x 0.15 = 0.1125, or 11.25%, so a 400 W front nameplate becomes about 445 W effective. What drives the rear irradiance is the site, not the module: it rises with a higher ground albedo (a white membrane or light gravel reflects roughly 0.5 to 0.7 of incident light versus about 0.1 for dark asphalt), a taller mounting height that lets more reflected light reach the back, wider row spacing, and less shading from the rack and structure behind the module. Over a bright white roof the same module might see 250 W/m^2 on the back, a gain of 18.75% and about 475 W. This is a first-order yield estimate; the module datasheet's bifaciality, the actual measured or modeled site albedo and rear-side shading, and a proper bifacial ray-trace (as in PVsyst or NREL's bifacial model) govern the real energy, and the inverter and conductors must still be sized for the boosted output.",
+    assumptions: [
+      { name: "Bifacial effective irradiance", value: "gain = bifaciality x (rear POA / front POA); effective power = front x (1 + gain)", source: "bifacial PV engineering practice" },
+      { name: "Bifaciality and albedo", value: "phi ~0.65-0.90 from the datasheet; rear POA rises with ground albedo (white membrane ~0.5-0.7 vs asphalt ~0.1), mount height, and row spacing", source: "module datasheet / site albedo model" },
+    ],
+  },
   "battery-series-parallel": {
     formula: "series_count = max(1, round(target_bus_v / module_v)); actual_bus_v = series_count x module_v; total_ah = parallel x module_ah; usable_kwh = series_count x parallel x module_v x module_ah x DoD / 1000.",
     edition: "Battery bank series/parallel configuration (series adds voltage, parallel adds capacity), by name; the battery/BMS series-parallel limits, the inverter voltage window, and NEC 706 govern.",

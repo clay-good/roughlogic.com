@@ -28253,3 +28253,26 @@ test("bounds: spec-v982 computeLuminaireSpacingMh pins the spacing criterion and
   assert.ok("error" in _v982({ smh_ratio: 1.3, mounting_height_ft: 8, actual_spacing_ft: 0 }));
   assert.ok("error" in _v982({ smh_ratio: Infinity, mounting_height_ft: 8, actual_spacing_ft: 9 }));
 });
+
+import { computeBifacialPvGain as _v983 } from "../../calc-solar.js";
+
+test("bounds: spec-v983 computeBifacialPvGain pins the rear-side gain and error seams", () => {
+  const r = _v983({ front_poa_wm2: 1000, rear_poa_wm2: 150, bifaciality: 0.75, front_power_w: 400 });
+  assert.ok(Math.abs(r.bifacial_gain_pct - 11.25) < 1e-6); // 0.75*0.15*100
+  assert.ok(Math.abs(r.effective_power_w - 445) < 1e-6); // 400*1.1125
+  // White-roof cross-check: rear 250 -> 18.75%, 475 W.
+  const wr = _v983({ front_poa_wm2: 1000, rear_poa_wm2: 250, bifaciality: 0.75, front_power_w: 400 });
+  assert.ok(Math.abs(wr.bifacial_gain_pct - 18.75) < 1e-6);
+  assert.ok(Math.abs(wr.effective_power_w - 475) < 1e-6);
+  // Monotonic: more rear irradiance and higher bifaciality both raise the gain; zero rear = no gain.
+  assert.ok(wr.bifacial_gain_pct > r.bifacial_gain_pct);
+  assert.ok(_v983({ front_poa_wm2: 1000, rear_poa_wm2: 150, bifaciality: 0.9, front_power_w: 400 }).bifacial_gain_pct > r.bifacial_gain_pct);
+  assert.ok(Math.abs(_v983({ front_poa_wm2: 1000, rear_poa_wm2: 0, bifaciality: 0.75, front_power_w: 400 }).bifacial_gain_pct) < 1e-12);
+  // Error seams: non-positive front POA / power, bifaciality out of (0,1], negative rear, non-finite.
+  assert.ok("error" in _v983({ front_poa_wm2: 0, rear_poa_wm2: 150, bifaciality: 0.75, front_power_w: 400 }));
+  assert.ok("error" in _v983({ front_poa_wm2: 1000, rear_poa_wm2: 150, bifaciality: 1.5, front_power_w: 400 }));
+  assert.ok("error" in _v983({ front_poa_wm2: 1000, rear_poa_wm2: 150, bifaciality: 0, front_power_w: 400 }));
+  assert.ok("error" in _v983({ front_poa_wm2: 1000, rear_poa_wm2: -1, bifaciality: 0.75, front_power_w: 400 }));
+  assert.ok("error" in _v983({ front_poa_wm2: 1000, rear_poa_wm2: 150, bifaciality: 0.75, front_power_w: 0 }));
+  assert.ok("error" in _v983({ front_poa_wm2: Infinity, rear_poa_wm2: 150, bifaciality: 0.75, front_power_w: 400 }));
+});

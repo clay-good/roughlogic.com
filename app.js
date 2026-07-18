@@ -115,6 +115,7 @@ const TOOL_MODULES = (() => {
     "ev-charge-time",
     "ev-range-per-hour",
     "battery-series-parallel",
+    "bifacial-pv-gain",
     // spec-v489 EV charge cost at the meter
     "ev-charge-cost",
     // spec-v492 EV DC fast-charge time with CC-CV taper
