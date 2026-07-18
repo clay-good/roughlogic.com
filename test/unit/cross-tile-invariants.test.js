@@ -12347,3 +12347,17 @@ test("self-consistency: quadratic roots satisfy Vieta and the confidence interva
   assert.ok(Math.abs((ci({}).upper_bound - ci({}).lower_bound) - 2 * ci({}).margin_of_error) < 1e-9, "interval width = 2 * margin");
   assert.ok(Math.abs(ci({}).point_estimate - 100) < 1e-9, "the interval must be centered on the sample mean");
 });
+
+test("monotonicity: flood-cut demolition quantities scale correctly, and two-sided doubles drywall but not baseboard (demo)", async () => {
+  const d = await import("../../calc-demo.js");
+  const fc = (o) => d.computeFloodCutQuantity({ wall_run_lf: 100, cut_height_in: 24, two_sided: false, insulated: false, ...o });
+  assert.ok(Math.abs(fc({}).drywall_ft2 - 100 * 24 / 12) < 1e-9, "drywall area = wall run * cut height / 12");
+  assert.ok(fc({ wall_run_lf: 200 }).drywall_ft2 > fc({}).drywall_ft2, "drywall area must rise with wall run");
+  assert.ok(fc({ cut_height_in: 48 }).drywall_ft2 > fc({}).drywall_ft2, "drywall area must rise with cut height");
+  assert.ok(Math.abs(fc({ two_sided: true }).drywall_ft2 - 2 * fc({}).drywall_ft2) < 1e-9, "a two-sided cut must double the drywall area (both faces)");
+  assert.strictEqual(fc({ two_sided: true }).baseboard_lf, fc({}).baseboard_lf, "baseboard runs the floor line once, so two-sided must not change it");
+  assert.ok(fc({ insulated: true }).insulation_ft2 > 0, "an insulated wall must add insulation removal area");
+  assert.strictEqual(fc({}).insulation_ft2, 0, "a non-insulated wall must report zero insulation");
+  assert.strictEqual(fc({}).sheets_4x8, Math.ceil(200 / 32), "replacement sheets = ceil(drywall area / 32)");
+  assert.ok(fc({ cut_height_in: 48 }).sheets_4x8 > fc({}).sheets_4x8, "sheet count must rise with the cut area");
+});

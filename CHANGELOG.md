@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(demo): guard flood-cut demolition quantities with monotonicity; 2026-07-17
+
+- Whole-response guards: drywall area = wall-run x cut-height/12 rises with run and height, a two-sided cut doubles
+  drywall (both faces) but leaves baseboard unchanged (one floor line), insulation area is nonzero only when insulated,
+  and replacement sheets = ceil(area/32). Test-only.
+
 ### test(edu): guard quadratic roots against Vieta and confidence-interval width; 2026-07-17
 
 - Self-consistency guards: each quadratic root satisfies a x^2 + b x + c = 0 with sum = -b/a and product = c/a (Vieta),
