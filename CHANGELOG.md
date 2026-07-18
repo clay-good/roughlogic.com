@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(electrical): guard the NEC 430.248/250 motor FLA table with hp/voltage monotonicity; 2026-07-17
+
+- Added physical/NEC invariants over MOTOR_FLA_TABLE (drives motor branch-circuit and OCPD sizing -- an undersized value
+  is a fire risk): full-load amps rise with horsepower down each voltage column and fall with voltage across each hp row
+  (higher voltage draws less current for the same power). The table was previously exported and used but had no structural
+  guard; a transcription error would break one of these relations and the per-value fixtures would not catch it. Test-only.
+
 ### test(hvac): strengthen the SMACNA leakage-class guard to assert value === class number; 2026-07-17
 
 - Extended the existing SMACNA_LEAKAGE_CLASSES test (which only checked the 5 classes exist) to assert each class's

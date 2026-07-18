@@ -10,6 +10,7 @@ import {
   computeBoxFill,
   computeBreakerSize,
   computeMotorFLA,
+  MOTOR_FLA_TABLE,
   computeTransformerSize,
   computeThreePhase,
   computeConductorResistance,
@@ -184,6 +185,37 @@ test("Motor FLA example: 5 hp three-phase 230 V -> 15.2 A", () => {
 test("Motor FLA: missing combination returns error", () => {
   const r = computeMotorFLA({ hp: 100, voltage: 480, phase: "three" });
   assert.ok(r.error);
+});
+
+// Physical/NEC invariants over the NEC 430.248/250 FLA lookup (drives motor
+// branch-circuit and OCPD sizing -- an undersized value is a fire risk). Full-load
+// amps must rise with horsepower down each voltage column, and fall with voltage
+// across each hp row (higher voltage draws less current for the same power). A
+// transcription error would break one of these; the per-value fixtures do not cover it.
+test("Motor FLA table: monotone increasing in hp per voltage, decreasing in voltage per hp (NEC 430.248/250)", () => {
+  const hps = Object.keys(MOTOR_FLA_TABLE).map(Number).sort((a, b) => a - b);
+  const cols = ["single_115V", "single_230V", "three_208V", "three_230V", "three_460V"];
+  for (const c of cols) {
+    let prev = -Infinity;
+    for (const hp of hps) {
+      const v = MOTOR_FLA_TABLE[hp][c];
+      if (v == null) continue;
+      assert.ok(v > prev, `${c} FLA not increasing with hp at ${hp} hp: ${v} <= ${prev}`);
+      prev = v;
+    }
+  }
+  for (const hp of hps) {
+    const r = MOTOR_FLA_TABLE[hp];
+    if (r.single_115V != null && r.single_230V != null) {
+      assert.ok(r.single_115V > r.single_230V, `${hp} hp: 115 V FLA must exceed 230 V`);
+    }
+    if (r.three_208V != null && r.three_230V != null) {
+      assert.ok(r.three_208V > r.three_230V, `${hp} hp: 208 V FLA must exceed 230 V (3ph)`);
+    }
+    if (r.three_230V != null && r.three_460V != null) {
+      assert.ok(r.three_230V > r.three_460V, `${hp} hp: 230 V FLA must exceed 460 V (3ph)`);
+    }
+  }
 });
 
 // --- Utility 8: Transformer Sizing ---
