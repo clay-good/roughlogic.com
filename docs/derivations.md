@@ -2408,6 +2408,7 @@ cross-check.
 | calc-mechanic.js | `computeDisplacementCR` | `{ bore_in = 0, stroke_in = 0, cylinders = 0, chamber_cc = 0, gasket_bore_in =...` | _ | _ | _ |
 | calc-mechanic.js | `computeDriveshaftCritical` | `{ od_in = 0, wall_in = 0, length_in = 0, material = "steel" }` | _ | _ | _ |
 | calc-mechanic.js | `computeDriveshaftMaxLength` | `{ target_rpm = 0, od_in = 0, wall_in = 0, material = "steel" } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeDynamicCompressionRatio` | `{ bore_in = 4.030, stroke_in = 3.75, rod_length_in = 6.0, static_cr = 10.5, i...` | _ | _ | _ |
 | calc-mechanic.js | `computeDynoCorrectionSae` | `{ observed_hp = 0, baro_mbar = 0, air_temp_c = 25, humidity_pct = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeEngineBmep` | `{ torque_lb_ft = 0, displacement_cid = 0, cycle_type = "four_stroke" } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeEngineFuelBurnGph` | `{ horsepower = 0, bsfc_lb_hp_hr = 0, density_lb_gal = 0, tank_gal = 0 } = {}` | _ | _ | _ |
@@ -3037,7 +3038,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1623.
+Row count: 1624.
 
 <!-- END function-corpus-v14 -->
 
@@ -4136,7 +4137,7 @@ per spec-v14 §13.1 second paragraph.
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group K Mechanic (86 tiles)
+### Group K Mechanic (87 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4170,6 +4171,7 @@ per spec-v14 §13.1 second paragraph.
 | `drill-point-depth` | Drill Point Depth | First-principles drill-point geometry...; 0.5-in drill, 118-deg point, 1.0-in full depth -> 0.1502-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `driveshaft-crit` | Driveshaft Critical Speed | Project (first-principles) over Spice...; 3.5 in OD / 0.083 in wall / 48 in long / steel -> 9823 rp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `driveshaft-max-length` | Driveshaft Max Length for an Operating Speed | Project (first-principles, inverse) o...; 3.5 in OD / 0.083 in wall / steel, running at the 6,385.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `dynamic-compression-ratio` | Dynamic Compression Ratio | dynamic compression ratio (slider-cra...; Vc = 47.833/(10.5-1) = 5.035; piston@IVC = 3.036; Veff = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dyno-correction-sae` | SAE J1349 Dyno Correction Factor | SAE J1349 dyno correction factor; spec-v515 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `engine-bmep` | Engine BMEP (Brake Mean Effective Pressure) | Brake mean effective pressure (SAE; H...; 350 CID at 400 lb-ft (4-stroke) -> 150.8 x 400 / 350 = 17... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `engine-fuel-burn-gph` | Engine Fuel Burn from Horsepower (BSFC) | BSFC engine-performance practice; spec-v463 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4599,6 +4601,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1376. Fixture-covered or reference-cadence: 1376 / 1376.
+Tile count: 1377. Fixture-covered or reference-cadence: 1377 / 1377.
 
 <!-- END tile-index-v14 -->

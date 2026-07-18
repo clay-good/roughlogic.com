@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): add dynamic-compression-ratio tile (spec-v928); 2026-07-18
+
+- New Group K tile `dynamic-compression-ratio` (Dynamic Compression Ratio) in calc-mechanic.js, beside displacement-cr.
+  Effective CR measured from intake-valve-closing (slider-crank geometry): clearance from the static CR, piston position
+  at IVC from the rod/stroke, DCR = (swept-from-IVC + clearance) / clearance. A 4.030 bore / 3.75 stroke / 6.0 rod / 10.5
+  static with a 60-deg ABDC intake close = 8.69 DCR; a bigger cam (75 deg) drops it to 7.69. ~7.5-8.5 suits pump gas at
+  sea level. The cam seat timing, octane, and tune govern. Raised the calc-mechanic.js gzip cap 52000 -> 54000. Home
+  count 1,376 -> 1,377.
+
 ### feat(water): add iron-manganese-chlorine-dose tile (spec-v927); 2026-07-18
 
 - New Group M tile `iron-manganese-chlorine-dose` (Chlorine Dose to Oxidize Iron and Manganese) in calc-water.js, beside

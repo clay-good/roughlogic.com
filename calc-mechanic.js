@@ -2544,3 +2544,50 @@ MECHANIC_RENDERERS["tire-contact-patch"] = _simpleRenderer({
   ],
   compute: computeTireContactPatch,
 });
+
+// ===================== spec-v928: dynamic compression ratio =====================
+// dims: in { bore_in: L, stroke_in: L, rod_length_in: L, static_cr: dimensionless, ivc_abdc_deg: dimensionless } out: { dynamic_cr: dimensionless, clearance_volume_in3: L^3, effective_volume_in3: L^3 }
+export function computeDynamicCompressionRatio({ bore_in = 4.030, stroke_in = 3.75, rod_length_in = 6.0, static_cr = 10.5, ivc_abdc_deg = 60 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(bore_in > 0)) return { error: "Bore must be positive (in)." };
+  if (!(stroke_in > 0)) return { error: "Stroke must be positive (in)." };
+  if (!(rod_length_in > stroke_in / 2)) return { error: "Rod length must exceed the crank radius (stroke / 2)." };
+  if (!(static_cr > 1)) return { error: "Static compression ratio must be greater than 1." };
+  if (!(ivc_abdc_deg > 0 && ivc_abdc_deg < 180)) return { error: "Intake valve closing must be between 0 and 180 degrees after BDC." };
+  const r = stroke_in / 2;
+  const bore_area = Math.PI / 4 * bore_in * bore_in;
+  const full_displacement = bore_area * stroke_in;
+  const clearance_volume_in3 = full_displacement / (static_cr - 1);
+  // Piston position below TDC at the intake-valve-closing crank angle (measured from TDC).
+  const theta = (180 - ivc_abdc_deg) * Math.PI / 180;
+  const piston_from_tdc = r + rod_length_in - (r * Math.cos(theta) + Math.sqrt(rod_length_in * rod_length_in - r * r * Math.sin(theta) * Math.sin(theta)));
+  const effective_volume_in3 = bore_area * piston_from_tdc;
+  const dynamic_cr = (effective_volume_in3 + clearance_volume_in3) / clearance_volume_in3;
+  if (![dynamic_cr, clearance_volume_in3, effective_volume_in3].every(Number.isFinite)) return { error: "Dynamic-CR math is not a finite value." };
+  return {
+    dynamic_cr,
+    clearance_volume_in3,
+    effective_volume_in3,
+    note: "Dynamic (effective) compression ratio measures compression only from where the intake valve actually CLOSES, not from BDC, so it reflects what the cam does to cylinder pressure. From the clearance volume (set by the static CR) and the piston position at intake-valve-closing (slider-crank geometry off the rod length and stroke), DCR = (swept-from-IVC + clearance) / clearance. A big cam closes the intake late (a high ABDC number), bleeding off cylinder charge and dropping the DCR -- which is why a high-static-CR engine with a large cam can still run on pump gas, and a mild cam on the same short block can detonate. Roughly 7.5 to 8.5 DCR suits 91-93 octane pump gas at sea level; altitude and iron vs aluminum heads shift it. An estimate off the geometry; the cam's actual seat-timing at the checking lash, the octane, and the tune govern.",
+  };
+}
+
+export const dynamicCompressionRatioExample = { inputs: { bore_in: 4.030, stroke_in: 3.75, rod_length_in: 6.0, static_cr: 10.5, ivc_abdc_deg: 60 } };
+
+MECHANIC_RENDERERS["dynamic-compression-ratio"] = _simpleRenderer({
+  citation: "Citation: dynamic compression ratio by name (slider-crank geometry from intake-valve-closing). clearance volume from the static CR; piston position at IVC from the rod/stroke; DCR = (swept-from-IVC + clearance) / clearance. ~7.5-8.5 suits pump gas at sea level; the cam seat-timing, octane, and tune govern.",
+  example: dynamicCompressionRatioExample.inputs,
+  fields: [
+    { key: "bore_in", label: "Bore (in)", kind: "number", default: 4.030 },
+    { key: "stroke_in", label: "Stroke (in)", kind: "number", default: 3.75 },
+    { key: "rod_length_in", label: "Rod length (in, center-to-center)", kind: "number", default: 6.0 },
+    { key: "static_cr", label: "Static compression ratio", kind: "number", default: 10.5 },
+    { key: "ivc_abdc_deg", label: "Intake valve closing (deg ABDC, at checking lash)", kind: "number", default: 60 },
+  ],
+  outputs: [
+    { key: "d", id: "dcr-out-d", label: "Dynamic compression ratio", value: (r) => fmt(r.dynamic_cr, 2) + " : 1" },
+    { key: "c", id: "dcr-out-c", label: "Clearance / effective volume", value: (r) => fmt(r.clearance_volume_in3, 3) + " in3 / " + fmt(r.effective_volume_in3, 2) + " in3" },
+    { key: "n", id: "dcr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDynamicCompressionRatio,
+});

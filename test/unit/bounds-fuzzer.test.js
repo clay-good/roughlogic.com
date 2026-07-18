@@ -26797,6 +26797,24 @@ test("bounds: spec-v920 computeCementBoardTakeoff pins the sheets, screws, and e
   assert.ok("error" in _v920({ area_sf: Infinity, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 35 }));
 });
 
+import { computeDynamicCompressionRatio as _v928 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v928 computeDynamicCompressionRatio pins the DCR, clearance volume, and error seams", () => {
+  const r = _v928({ bore_in: 4.030, stroke_in: 3.75, rod_length_in: 6.0, static_cr: 10.5, ivc_abdc_deg: 60 });
+  assert.ok(Math.abs(r.dynamic_cr - 8.692) < 0.01); // slider-crank at 60 ABDC
+  assert.ok(Math.abs(r.clearance_volume_in3 - 5.035) < 0.01); // Vd/(scr-1)
+  // A later intake close (bigger cam) lowers the DCR.
+  const big = _v928({ bore_in: 4.030, stroke_in: 3.75, rod_length_in: 6.0, static_cr: 10.5, ivc_abdc_deg: 75 });
+  assert.ok(Math.abs(big.dynamic_cr - 7.688) < 0.01);
+  assert.ok(big.dynamic_cr < r.dynamic_cr);
+  // Error seams: non-positive bore/stroke, rod <= crank radius, static_cr <= 1, IVC out of range, non-finite.
+  assert.ok("error" in _v928({ bore_in: 0, stroke_in: 3.75, rod_length_in: 6, static_cr: 10.5, ivc_abdc_deg: 60 }));
+  assert.ok("error" in _v928({ bore_in: 4.03, stroke_in: 3.75, rod_length_in: 1, static_cr: 10.5, ivc_abdc_deg: 60 })); // rod < r
+  assert.ok("error" in _v928({ bore_in: 4.03, stroke_in: 3.75, rod_length_in: 6, static_cr: 1, ivc_abdc_deg: 60 }));
+  assert.ok("error" in _v928({ bore_in: 4.03, stroke_in: 3.75, rod_length_in: 6, static_cr: 10.5, ivc_abdc_deg: 200 }));
+  assert.ok("error" in _v928({ bore_in: Infinity, stroke_in: 3.75, rod_length_in: 6, static_cr: 10.5, ivc_abdc_deg: 60 }));
+});
+
 import { computeIronManganeseChlorineDose as _v927 } from "../../calc-water.js";
 
 test("bounds: spec-v927 computeIronManganeseChlorineDose pins the dose, lb/day, and error seams", () => {

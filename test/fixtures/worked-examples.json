@@ -34602,6 +34602,60 @@
    }
   },
   {
+   "tile_id": "dynamic-compression-ratio",
+   "source_publisher": "dynamic compression ratio (slider-crank geometry)",
+   "source_title": "4.030 bore, 3.75 stroke, 6.0 rod, 10.5 static, 60 deg ABDC IVC -> 8.69 DCR",
+   "source_edition_or_year": "spec-v928 worked example (machine-verified)",
+   "source_section_or_page": "Vc = 47.833/(10.5-1) = 5.035; piston@IVC = 3.036; Veff = 38.73; DCR = (38.73+5.035)/5.035 = 8.69",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "bore_in": 4.030,
+    "stroke_in": 3.75,
+    "rod_length_in": 6.0,
+    "static_cr": 10.5,
+    "ivc_abdc_deg": 60
+   },
+   "outputs": {
+    "dynamic_cr": {
+     "value": 8.69,
+     "tolerance": {
+      "abs": 0.03
+     }
+    },
+    "clearance_volume_in3": {
+     "value": 5.035,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dynamic-compression-ratio",
+   "source_publisher": "dynamic compression ratio (slider-crank geometry)",
+   "source_title": "cross-check: a bigger cam (75 deg ABDC IVC) on the same engine lowers the DCR to ~7.69",
+   "source_edition_or_year": "spec-v928 worked example (machine-verified)",
+   "source_section_or_page": "later intake close (75 vs 60 ABDC) bleeds more charge, dropping DCR from 8.69 to 7.69",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "bore_in": 4.030,
+    "stroke_in": 3.75,
+    "rod_length_in": 6.0,
+    "static_cr": 10.5,
+    "ivc_abdc_deg": 75
+   },
+   "outputs": {
+    "dynamic_cr": {
+     "value": 7.688,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "iron-manganese-chlorine-dose",
    "source_publisher": "iron/manganese chlorine oxidation (AWWA / Ten States)",
    "source_title": "Fe 3.0, Mn 0.5, 0.5 demand, 0.3 residual, 0.05 MGD -> 3.31 mg/L, 1.38 lb/day",

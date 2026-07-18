@@ -388,6 +388,7 @@ const RELATED = {
   // aviation; displacement-cr + driveshaft-crit + fuel-range for auto.
   "prop-slip": ["displacement-cr"],
   "displacement-cr": ["chamber-cc-for-cr", "bolt-stretch", "driveshaft-crit"],
+  "dynamic-compression-ratio": ["displacement-cr", "chamber-cc-for-cr", "volumetric-efficiency"],
   "chamber-cc-for-cr": ["displacement-cr", "volumetric-efficiency", "hp-from-torque"],
   "fuel-range": ["mileage-cost"],
 

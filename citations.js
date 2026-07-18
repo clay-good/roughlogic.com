@@ -4812,6 +4812,17 @@ export const CITATIONS = {
       { name: "Bore / stroke / chamber inputs", value: "user-supplied", source: "OEM service manual or measurement" },
     ],
   },
+  "dynamic-compression-ratio": {
+    formula: "r = stroke/2; V_clear = (pi/4 x bore^2 x stroke) / (static_cr - 1); theta = (180 - IVC_ABDC) deg from TDC; piston_from_TDC = r + rod - (r cos theta + sqrt(rod^2 - r^2 sin^2 theta)); V_eff = pi/4 x bore^2 x piston_from_TDC; DCR = (V_eff + V_clear) / V_clear.",
+    edition: "Classical slider-crank engine geometry (Machinery's Handbook / engine-design texts), by name; the dynamic-compression concept measures compression from the intake-valve-closing point.",
+    freeAccess: "The slider-crank piston-position relation is public first-principles geometry; the bore, stroke, rod, static CR, and intake-valve-closing angle come from the build and the cam card.",
+    governance: GOVERNANCE.general,
+    editionNote: "Dynamic (effective) compression ratio measures compression only from the crank angle where the intake valve actually CLOSES, not from bottom dead center, so it captures what the camshaft does to trapped charge. The clearance volume is set by the static compression ratio; the piston position at intake-valve-closing comes from the slider-crank geometry of the rod length and stroke; and DCR = (volume swept from IVC + clearance) / clearance. A larger cam closes the intake later (a higher degrees-ABDC number), bleeds charge back into the intake, and lowers the DCR -- the reason a high-static-CR engine with a big cam can run on pump gas while a mild cam on the same short block detonates. Roughly 7.5 to 8.5 DCR suits 91-93 octane pump gas at sea level; altitude, iron vs aluminum heads, and boost shift the safe window. An estimate off the geometry; the cam's actual seat timing at the checking lash, the fuel octane, and the tune govern.",
+    assumptions: [
+      { name: "IVC point", value: "compression is measured from intake-valve-closing (deg ABDC) at the checking lash, not from BDC", source: "dynamic-compression method" },
+      { name: "Slider-crank", value: "piston position from rod length and stroke; the static CR sets the clearance volume", source: "engine geometry" },
+    ],
+  },
   "chamber-cc-for-cr": {
     formula: "TDC_volume = cylinder_cc / (target_CR − 1); chamber_cc = TDC_volume − gasket − deck + dome. The inverse of CR = (cylinder_cc + TDC_volume) / TDC_volume. 1 in³ = 16.387 cc.",
     edition: "Classical engine-design geometry; SAE J604 displacement by name.",

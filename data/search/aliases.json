@@ -29087,6 +29087,31 @@
       "kind": "question"
     },
     {
+      "term": "dynamic compression ratio",
+      "target": "dynamic-compression-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "effective compression ratio",
+      "target": "dynamic-compression-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "dcr calculator",
+      "target": "dynamic-compression-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "cam and compression pump gas",
+      "target": "dynamic-compression-ratio",
+      "kind": "adjacent"
+    },
+    {
+      "term": "intake valve closing compression",
+      "target": "dynamic-compression-ratio",
+      "kind": "adjacent"
+    },
+    {
       "term": "how to figure engine compression ratio",
       "target": "displacement-cr",
       "kind": "question"
