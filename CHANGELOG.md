@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): add hydronic-injection-mixing tile (spec-v956); 2026-07-18
+
+- New Group C tile `hydronic-injection-mixing` (Hydronic Injection-Mixing Loop Flow) in calc-hvacsystems.js. The injection
+  flow feeding a lower-temp secondary loop from a hotter primary, by energy balance: injection gpm = secondary gpm x
+  (secondary supply - secondary return) / (primary supply - secondary return). A 10 gpm secondary at 110/90 F off a
+  180 F primary needs 2.2 gpm injection (22%); a cooler 140 F primary needs 4.0 gpm. Flags when the primary is too cool
+  to reach the target. Sizes the flow; a variable-speed injection pump/valve and boiler protection govern. Home count
+  1,404 -> 1,405.
+
 ### feat(electrical): add rlc-reactance-resonance tile (spec-v955); 2026-07-18
 
 - New Group A tile `rlc-reactance-resonance` (Series R-L-C Reactance, Impedance, and Resonant Frequency) in

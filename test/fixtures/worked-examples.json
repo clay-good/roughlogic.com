@@ -36444,6 +36444,58 @@
    }
   },
   {
+   "tile_id": "hydronic-injection-mixing",
+   "source_publisher": "hydronic injection-mixing loop (primary/secondary energy balance)",
+   "source_title": "10 gpm secondary at 110/90 F off a 180 F primary -> 2.22 gpm injection (22.2%)",
+   "source_edition_or_year": "spec-v956 worked example (machine-verified)",
+   "source_section_or_page": "inj = 10*(110-90)/(180-90) = 10*20/90 = 2.222 gpm; %sec = 22.22",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "secondary_gpm": 10,
+    "secondary_supply_f": 110,
+    "secondary_return_f": 90,
+    "primary_supply_f": 180
+   },
+   "outputs": {
+    "injection_gpm": {
+     "value": 2.222,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "injection_pct_of_secondary": {
+     "value": 22.22,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydronic-injection-mixing",
+   "source_publisher": "hydronic injection-mixing loop (primary/secondary energy balance)",
+   "source_title": "cross-check: a cooler 140 F primary needs more injection, 4.0 gpm",
+   "source_edition_or_year": "spec-v956 worked example (machine-verified)",
+   "source_section_or_page": "inj = 10*(110-90)/(140-90) = 10*20/50 = 4.0 gpm",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "secondary_gpm": 10,
+    "secondary_supply_f": 110,
+    "secondary_return_f": 90,
+    "primary_supply_f": 140
+   },
+   "outputs": {
+    "injection_gpm": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "outdoor-reset-ratio",
    "source_publisher": "hydronic outdoor reset control (Idronics / tekmar)",
    "source_title": "180 F design supply at 0 F OA, 80 F min at 65 F no-heat, at 30 F OA -> 1.54 ratio, 133.8 F supply",

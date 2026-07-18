@@ -27656,3 +27656,27 @@ test("bounds: spec-v955 computeRlcReactanceResonance pins XL/XC/Z/f0/PF and erro
   assert.ok("error" in _v955({ frequency_hz: 60, resistance_ohm: 10, inductance_h: 0.05, capacitance_uf: 0 }));
   assert.ok("error" in _v955({ frequency_hz: Infinity, resistance_ohm: 10, inductance_h: 0.05, capacitance_uf: 50 }));
 });
+
+import { computeHydronicInjectionMixing as _v956 } from "../../calc-hvacsystems.js";
+
+test("bounds: spec-v956 computeHydronicInjectionMixing pins the injection energy balance and error seams", () => {
+  const r = _v956({ secondary_gpm: 10, secondary_supply_f: 110, secondary_return_f: 90, primary_supply_f: 180 });
+  assert.ok(Math.abs(r.injection_gpm - 2.22222) < 1e-4); // 10*20/90
+  assert.ok(Math.abs(r.injection_pct_of_secondary - 22.2222) < 1e-3);
+  assert.equal(r.reachable, true);
+  // A cooler primary needs more injection.
+  const cool = _v956({ secondary_gpm: 10, secondary_supply_f: 110, secondary_return_f: 90, primary_supply_f: 140 });
+  assert.ok(Math.abs(cool.injection_gpm - 4) < 1e-9);
+  assert.ok(cool.injection_gpm > r.injection_gpm);
+  // Injection is linear in secondary flow and in the secondary delta-T.
+  assert.ok(Math.abs(_v956({ secondary_gpm: 20, secondary_supply_f: 110, secondary_return_f: 90, primary_supply_f: 180 }).injection_gpm - 2 * r.injection_gpm) < 1e-9);
+  // A primary cooler than the required secondary supply is flagged unreachable (but still computes a flow).
+  const unreach = _v956({ secondary_gpm: 10, secondary_supply_f: 110, secondary_return_f: 90, primary_supply_f: 100 });
+  assert.equal(unreach.reachable, false);
+  assert.ok(Number.isFinite(unreach.injection_gpm));
+  // Error seams: non-positive secondary flow, supply <= return, primary <= secondary return, non-finite.
+  assert.ok("error" in _v956({ secondary_gpm: 0, secondary_supply_f: 110, secondary_return_f: 90, primary_supply_f: 180 }));
+  assert.ok("error" in _v956({ secondary_gpm: 10, secondary_supply_f: 90, secondary_return_f: 90, primary_supply_f: 180 }));
+  assert.ok("error" in _v956({ secondary_gpm: 10, secondary_supply_f: 110, secondary_return_f: 90, primary_supply_f: 90 }));
+  assert.ok("error" in _v956({ secondary_gpm: Infinity, secondary_supply_f: 110, secondary_return_f: 90, primary_supply_f: 180 }));
+});

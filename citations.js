@@ -13435,6 +13435,17 @@ export const CITATIONS = {
       { name: "500 factor", value: "8.33 lb/gal x 60 min/hr for water; adjust for glycol", source: "ASHRAE" },
     ],
   },
+  "hydronic-injection-mixing": {
+    formula: "injection_gpm = secondary_gpm x (secondary_supply_f - secondary_return_f) / (primary_supply_f - secondary_return_f); injection_pct = 100 x injection_gpm / secondary_gpm; reachable when primary_supply_f >= secondary_supply_f.",
+    edition: "Hydronic injection-mixing loop flow (primary/secondary energy balance; Siegenthaler, Modern Hydronic Heating), by name; a variable-speed injection pump or modulating valve and the control strategy govern the design.",
+    freeAccess: "The injection-flow energy balance is public first-principles (the injection water carries the secondary loop's load); the flows and temperatures come from the loop design and the heat loss.",
+    governance: GOVERNANCE.general,
+    editionNote: "Injection mixing feeds a lower-temperature secondary loop (a radiant floor or an outdoor-reset zone) from a hotter primary loop by injecting a small hot flow into the secondary, which otherwise recirculates its own water. By an energy/mass balance, the injected hot water must carry the secondary loop's entire load, so injection gpm = secondary gpm x (secondary supply - secondary return) / (primary supply - secondary return): the numerator is the secondary loop's temperature rise (its delta-T, proportional to its load) and the denominator is the temperature the injection water gives up between the primary supply and the secondary return. A 10 gpm secondary loop running 110/90 F off a 180 F primary needs only 2.2 gpm of injection -- 22% of the secondary flow -- with the other 7.8 gpm being recirculated secondary water. The colder the primary, the more injection flow is needed to deliver the same heat, so a 140 F primary raises the injection to 4.0 gpm; and if the primary supply is not at least as warm as the required secondary supply, no injection rate can reach the target (flagged). This sizes the injection FLOW; the injection pump's or valve's Cv follows from that flow and the primary-loop differential pressure, and the actual control is a variable-speed injection pump or a modulating two-way valve on a pressure-decoupled primary. The boiler return-temperature protection (condensing/flue limit), the room-by-room heat loss, and the control strategy govern the design.",
+    assumptions: [
+      { name: "Injection energy balance", value: "injection gpm = secondary gpm x (Tss - Tsr)/(Tps - Tsr); the injected hot water carries the secondary load", source: "Siegenthaler / hydronic practice" },
+      { name: "Flow sizing only", value: "sizes the injection flow; the pump/valve Cv, boiler protection, and the control strategy govern the design; unreachable if primary is not warmer than the required secondary supply", source: "control design practice" },
+    ],
+  },
   "outdoor-reset-ratio": {
     formula: "reset_ratio = (supply_design_f - supply_min_f) / (oa_noheat_f - oa_design_f); supply_target_f = clamp( supply_min_f + reset_ratio x (oa_noheat_f - oa_current_f), supply_min_f, supply_design_f ).",
     edition: "Hydronic outdoor-reset control practice (Taco / tekmar / Caleffi Idronics), by name; the linear reset curve is standard control math.",

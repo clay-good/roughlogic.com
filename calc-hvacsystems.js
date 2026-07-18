@@ -1390,3 +1390,52 @@ function _v915renderOutdoorResetRatio(inputRegion, outputRegion, citationEl) {
   for (const f of [sd, sm, od, on, oc]) f.input.addEventListener("input", update);
 }
 HVACSYSTEMS_RENDERERS["outdoor-reset-ratio"] = _v915renderOutdoorResetRatio;
+
+// ===================== spec-v956: hydronic injection-mixing loop flow =====================
+// dims: in { args: dimensionless } out: { injection_gpm: dimensionless, injection_pct_of_secondary: dimensionless }
+export function computeHydronicInjectionMixing({ secondary_gpm = 10, secondary_supply_f = 110, secondary_return_f = 90, primary_supply_f = 180 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(secondary_gpm > 0)) return { error: "Secondary loop flow must be positive (gpm)." };
+  if (!(secondary_supply_f > secondary_return_f)) return { error: "Secondary supply must be warmer than the secondary return (positive loop delta-T for heating)." };
+  if (!(primary_supply_f > secondary_return_f)) return { error: "Primary supply must be warmer than the secondary return for injection to add heat." };
+  // Energy balance: hot injection water carries the secondary loop's load. inj = sec x (Tss - Tsr)/(Tps - Tsr).
+  const injection_gpm = secondary_gpm * (secondary_supply_f - secondary_return_f) / (primary_supply_f - secondary_return_f);
+  const injection_pct_of_secondary = 100 * injection_gpm / secondary_gpm;
+  const reachable = primary_supply_f >= secondary_supply_f;
+  if (![injection_gpm, injection_pct_of_secondary].every(Number.isFinite)) return { error: "Injection-mixing math is not a finite value." };
+  return {
+    injection_gpm,
+    injection_pct_of_secondary,
+    reachable,
+    note: "The injection flow that feeds a lower-temperature secondary (radiant or reset) loop from a hotter primary, by an energy/mass balance: the hot injection water must carry the secondary loop's load, so injection gpm = secondary gpm x (secondary supply - secondary return) / (primary supply - secondary return). A 10 gpm secondary at 110/90 F off a 180 F primary needs only 2.2 gpm of injection (22% of the secondary flow); the balance is the secondary loop's own recirculated water. A cooler primary needs MORE injection to deliver the same heat -- drop the primary to 140 F and the injection climbs to 4.0 gpm. If the primary supply is not warmer than the required secondary supply, the target is unreachable at any injection rate (flagged). This sizes the injection FLOW (and the injection pump/valve Cv follows from it and the primary loop head); the actual control is a variable-speed injection pump or a modulating two-way valve on a differential-pressure-decoupled primary, and the boiler protection, the room-by-room heat loss, and the control strategy govern the design.",
+  };
+}
+
+export const hydronicInjectionMixingExample = { inputs: { secondary_gpm: 10, secondary_supply_f: 110, secondary_return_f: 90, primary_supply_f: 180 } };
+
+function _v956renderHydronicInjectionMixing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: hydronic injection-mixing loop flow (primary/secondary energy balance), by name. injection gpm = secondary gpm x (secondary supply - secondary return) / (primary supply - secondary return). Sizes the injection flow; a variable-speed injection pump or modulating valve, boiler protection, and the heat loss govern the design.";
+  const sg = makeNumber("Secondary loop flow (gpm)", "him-sg", { step: "any", min: "0", value: "10" });
+  sg.input.value = "10";
+  const ss = makeNumber("Secondary supply temp (F)", "him-ss", { step: "any", value: "110" });
+  ss.input.value = "110";
+  const sr = makeNumber("Secondary return temp (F)", "him-sr", { step: "any", value: "90" });
+  sr.input.value = "90";
+  const ps = makeNumber("Primary supply temp (F)", "him-ps", { step: "any", value: "180" });
+  ps.input.value = "180";
+  for (const f of [sg, ss, sr, ps]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sg.input.value = "10"; ss.input.value = "110"; sr.input.value = "90"; ps.input.value = "180"; update(); });
+  const oI = makeOutputLine(outputRegion, "Injection flow", "him-out-i");
+  const oP = makeOutputLine(outputRegion, "Injection (% of secondary)", "him-out-p");
+  const update = debounce(() => {
+    const r = computeHydronicInjectionMixing({
+      secondary_gpm: sg.input.value === "" ? 10 : Number(sg.input.value), secondary_supply_f: ss.input.value === "" ? 110 : Number(ss.input.value),
+      secondary_return_f: sr.input.value === "" ? 90 : Number(sr.input.value), primary_supply_f: ps.input.value === "" ? 180 : Number(ps.input.value),
+    });
+    if (r.error) { oI.textContent = r.error; oP.textContent = "-"; return; }
+    oI.textContent = fmt(r.injection_gpm, 2) + " gpm" + (r.reachable ? "" : " (target unreachable: primary cooler than the required supply)");
+    oP.textContent = fmt(r.injection_pct_of_secondary, 1) + "% of secondary flow";
+  }, DEBOUNCE_MS);
+  for (const f of [sg, ss, sr, ps]) f.input.addEventListener("input", update);
+}
+HVACSYSTEMS_RENDERERS["hydronic-injection-mixing"] = _v956renderHydronicInjectionMixing;
