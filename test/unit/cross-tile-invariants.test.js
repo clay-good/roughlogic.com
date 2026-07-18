@@ -12004,3 +12004,16 @@ test("monotonicity: sprinkler K-factor flow and sprinkler system demand respond 
   const sd = (o) => f.computeSprinklerDensity({ area_of_operation_ft2: 1500, hazard_category: "ordinary_2", ...o }).total_gpm;
   assert.ok(sd({ area_of_operation_ft2: 3000 }) > sd({}), "system demand must rise with area of operation");
 });
+
+// Monotonicity of the amplifier SPL compute (a stage/audio calc): SPL =
+// sensitivity + 10*log10(power) - 20*log10(distance) rises with driver
+// sensitivity and power (exactly +10 dB per 10x power) and falls with distance.
+// A log-base or term error passes the single pinned example but breaks these.
+test("monotonicity: amplifier SPL rises with sensitivity/power (10 dB per 10x) and falls with distance", async () => {
+  const s = await import("../../calc-stage.js");
+  const sp = (o) => s.computeAmpPowerSpl({ sensitivity_db: 90, power_w: 100, distance_m: 1, crest_db: 12, target_spl_db: 100, ...o }).spl_db;
+  assert.ok(sp({ sensitivity_db: 96 }) > sp({}), "SPL must rise with driver sensitivity");
+  assert.ok(sp({ power_w: 200 }) > sp({}), "SPL must rise with amplifier power");
+  assert.ok(sp({ distance_m: 4 }) < sp({}), "SPL must fall with distance");
+  assert.ok(Math.abs((sp({ power_w: 1000 }) - sp({ power_w: 100 })) - 10) < 0.01, "SPL must rise 10 dB per 10x power (10*log10)");
+});

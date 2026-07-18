@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(stage): guard amplifier SPL with sensitivity/power/distance monotonicity; 2026-07-17
+
+- Added a guard on computeAmpPowerSpl: SPL = sensitivity + 10*log10(power) - 20*log10(distance) rises with driver
+  sensitivity and power (exactly +10 dB per 10x power) and falls with distance. A log-base or term error passes the pinned
+  example but breaks these. Test-only.
+
 ### test(fire): guard sprinkler K-factor flow and system demand with monotonicity; 2026-07-17
 
 - Added a fire-protection guard (life-safety): sprinkler discharge Q = K x sqrt(P) rises with the K-factor and pressure
