@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(refrigerant): guard the psig P-T table against the non-monotonic regression class; 2026-07-17
+
+- Added a monotonicity invariant over the primary `REFRIGERANTS.pt_pairs` (psig) table read by refrigerant-pt /
+  superheat-subcool / refrigerant-compare: for every bundled refrigerant, saturation temperature must strictly increase
+  with pressure. The original P-T defect (fixed 2026-07-16) was exactly a NON-monotonic table (R-410A 75 psig -> 31 F
+  sitting above 100 psig -> 30 F, physically impossible) -- a class a single pinned point cannot catch. The parallel
+  psia table (`REFRIGERANT_PT_TABLES_v7`) already had this guard; the psig table did not. Test-only; no source change.
+
 ### fix(solar): battery-runtime citation stated a Peukert form that contradicts the compute (and was wrong at k=1); 2026-07-17
 
 - The `battery-runtime` renderer citation read "Peukert form t = C * (C / I)^(k - 1)", but the compute uses `t = C / I^k`

@@ -13,6 +13,7 @@ import {
 // spec-v89: refrigerant-circuit bench relocated to calc-refrigerant.js.
 import {
   computeRefrigerantCharging, refrigerantChargingExample, REFRIGERANT_PT_TABLES_v7,
+  REFRIGERANTS,
   REFRIGERANT_RENDERERS,
 } from "../../calc-refrigerant.js";
 
@@ -148,6 +149,29 @@ test("243 P-T table has 5 refrigerants with monotone-increasing T", () => {
     assert.ok(t && t.length >= 5);
     for (let i = 1; i < t.length; i++) {
       assert.ok(t[i].T_F > t[i - 1].T_F, k + " not monotone at " + i);
+    }
+  }
+});
+
+// The primary psig REFRIGERANTS.pt_pairs table (read by refrigerant-pt /
+// superheat-subcool / refrigerant-compare) MUST be strictly monotone: saturation
+// temperature rises with pressure for every refrigerant. The original P-T bug
+// (fixed 2026-07-16) was exactly a NON-monotonic table (R-410A 75 psig -> 31 F
+// sitting above 100 psig -> 30 F, physically impossible), which a single pinned
+// point cannot catch. This invariant guards that whole class against reintroduction.
+test("refrigerant P-T (psig pt_pairs): every refrigerant is strictly monotone in both pressure and temperature", () => {
+  const names = Object.keys(REFRIGERANTS);
+  assert.ok(names.length >= 6, "expected >= 6 bundled refrigerants, got " + names.length);
+  for (const name of names) {
+    const pairs = REFRIGERANTS[name].pt_pairs;
+    assert.ok(Array.isArray(pairs) && pairs.length >= 5, name + " pt_pairs too short");
+    for (let i = 1; i < pairs.length; i++) {
+      assert.ok(pairs[i].pressure_psig > pairs[i - 1].pressure_psig,
+        name + " pressure not strictly increasing at index " + i + " (" + pairs[i].pressure_psig + " psig)");
+      assert.ok(pairs[i].temperature_F > pairs[i - 1].temperature_F,
+        name + " saturation temperature not strictly increasing at index " + i +
+        " (" + pairs[i].temperature_F + " F at " + pairs[i].pressure_psig + " psig <= " +
+        pairs[i - 1].temperature_F + " F at " + pairs[i - 1].pressure_psig + " psig) -- physically impossible");
     }
   }
 });
