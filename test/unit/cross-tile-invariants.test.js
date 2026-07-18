@@ -11824,3 +11824,21 @@ test("monotonicity: CMU wall axial and flexural capacities respond correctly to 
   assert.ok(fl({ as_in2: 0.31 }) > fl({ as_in2: 0.155 }), "flexural capacity must rise with reinforcement area");
   assert.ok(fl({ d_in: 5.81 }) > fl({ d_in: 3.81 }), "flexural capacity must rise with effective depth");
 });
+
+// Physical monotonicity of the RC beam-shear and column-axial capacity computes
+// (ACI 318 life-safety design calcs): concrete shear Vc = 2*lambda*sqrt(f'c)*bw*d
+// rises with concrete strength, web width, and effective depth; column squash
+// load Po = 0.85 f'c (Ag - Ast) + fy*Ast rises with cross-section, concrete
+// strength, and longitudinal steel. A non-conservative sign/term error passes
+// the single pinned example but breaks these whole-response checks.
+test("monotonicity: RC beam shear Vc and column axial capacity respond correctly to their inputs (ACI 318)", async () => {
+  const c = await import("../../calc-concrete.js");
+  const vc = (o) => c.computeRcBeamShear({ fc: 4000, fyt: 60000, bw: 12, d: 21.5, av_in2: 0.22, vu: 40, lambda: 1, ...o }).vc_kip;
+  assert.ok(vc({ fc: 6000 }) > vc({ fc: 4000 }), "Vc must rise with concrete strength");
+  assert.ok(vc({ bw: 16 }) > vc({ bw: 12 }), "Vc must rise with web width");
+  assert.ok(vc({ d: 26 }) > vc({ d: 21.5 }), "Vc must rise with effective depth");
+  const pn = (o) => c.computeRcColumnAxial({ b_in: 16, h_in: 16, fc_psi: 4000, fy_psi: 60000, ast_in2: 6.32, ...o }).phi_pn_kip;
+  assert.ok(pn({ b_in: 20 }) > pn({ b_in: 16 }), "column capacity must rise with cross-section");
+  assert.ok(pn({ fc_psi: 5000 }) > pn({ fc_psi: 4000 }), "column capacity must rise with concrete strength");
+  assert.ok(pn({ ast_in2: 9 }) > pn({ ast_in2: 6.32 }), "column capacity must rise with longitudinal steel area");
+});

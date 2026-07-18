@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(concrete): guard RC beam-shear and column-axial capacity with physical monotonicity (ACI 318); 2026-07-17
+
+- Added whole-response monotonicity guards on two RC capacity computes: concrete shear Vc rises with concrete strength,
+  web width, and effective depth; column squash load Po rises with cross-section, concrete strength, and longitudinal
+  steel. A non-conservative sign/term error passes the single pinned example but breaks these checks. Test-only.
+
 ### test(masonry): guard CMU wall axial and flexural capacity with physical monotonicity (TMS 402); 2026-07-17
 
 - Added whole-response monotonicity guards on the two masonry wall capacity computes: allowable axial load rises with
