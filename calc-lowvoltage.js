@@ -1347,3 +1347,57 @@ function _v958renderDpLevelHydrostatic(inputRegion, outputRegion, citationEl) {
   for (const f of [pp, sg, ml]) f.input.addEventListener("input", update);
 }
 LOWVOLTAGE_RENDERERS["dp-level-hydrostatic"] = _v958renderDpLevelHydrostatic;
+
+// ===================== spec-v961: Ziegler-Nichols closed-loop PID tuning =====================
+// dims: in { args: dimensionless } out: { pid_kp: dimensionless, pid_ti_sec: dimensionless, pid_td_sec: dimensionless, proportional_band_pct: dimensionless }
+export function computePidTuningZieglerNichols({ ultimate_gain_ku = 4, ultimate_period_tu_sec = 2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(ultimate_gain_ku > 0)) return { error: "Ultimate gain Ku must be positive." };
+  if (!(ultimate_period_tu_sec > 0)) return { error: "Ultimate period Tu must be positive (s)." };
+  // Ziegler-Nichols closed-loop (ultimate-sensitivity) PID: Kp = 0.6 Ku, Ti = 0.5 Tu, Td = 0.125 Tu.
+  const pid_kp = 0.6 * ultimate_gain_ku;
+  const pid_ti_sec = 0.5 * ultimate_period_tu_sec;
+  const pid_td_sec = 0.125 * ultimate_period_tu_sec;
+  const proportional_band_pct = 100 / pid_kp;
+  // The P-only and PI variants (for legacy or noise-sensitive loops).
+  const p_kp = 0.5 * ultimate_gain_ku;
+  const pi_kp = 0.45 * ultimate_gain_ku;
+  const pi_ti_sec = ultimate_period_tu_sec / 1.2;
+  if (![pid_kp, pid_ti_sec, pid_td_sec, proportional_band_pct].every(Number.isFinite)) return { error: "PID-tuning math is not a finite value." };
+  return {
+    pid_kp,
+    pid_ti_sec,
+    pid_td_sec,
+    proportional_band_pct,
+    p_kp,
+    pi_kp,
+    pi_ti_sec,
+    note: "Starting PID gains from the Ziegler-Nichols closed-loop (ultimate-sensitivity) method: with integral and derivative off, raise the proportional gain until the loop just oscillates steadily -- that gain is the ultimate gain Ku and the oscillation period is the ultimate period Tu. Then a PID controller starts at Kp = 0.6 Ku, integral time Ti = 0.5 Tu, derivative time Td = 0.125 Tu; a PI controller (for a noisy or fast loop where derivative amplifies noise) at Kp = 0.45 Ku, Ti = Tu/1.2; and a P-only at Kp = 0.5 Ku. With Ku = 4 and Tu = 2 s, a PID starts at Kp 2.4, Ti 1.0 s, Td 0.25 s (a 42% proportional band). Note that a legacy controller may want the equivalent proportional band PB = 100/Kp and reset in repeats per minute (1/Ti) rather than gain and seconds, and that some controllers use a non-interacting (parallel) form whose Ki and Kd differ. Ziegler-Nichols is deliberately aggressive -- tuned for a fast quarter-amplitude-decay response, which overshoots; back the gain off for a gentler loop, and re-tune on the running process. A starting point, not a final tune; the process dynamics, the controller's algorithm form, and the commissioning technician govern.",
+  };
+}
+
+export const pidTuningZieglerNicholsExample = { inputs: { ultimate_gain_ku: 4, ultimate_period_tu_sec: 2 } };
+
+function _v961renderPidTuningZieglerNichols(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Ziegler-Nichols closed-loop (ultimate-sensitivity) PID tuning, by name. PID: Kp = 0.6 Ku, Ti = 0.5 Tu, Td = 0.125 Tu; PI: Kp = 0.45 Ku, Ti = Tu/1.2; P: Kp = 0.5 Ku. Ku/Tu are the gain and period at the stability limit. Aggressive (quarter-amplitude decay); a starting point, not a final tune. The process, the controller algorithm form, and the technician govern.";
+  const ku = makeNumber("Ultimate gain Ku (gain at steady oscillation)", "pid-ku", { step: "any", min: "0", value: "4" });
+  ku.input.value = "4";
+  const tu = makeNumber("Ultimate period Tu (s, oscillation period)", "pid-tu", { step: "any", min: "0", value: "2" });
+  tu.input.value = "2";
+  for (const f of [ku, tu]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ku.input.value = "4"; tu.input.value = "2"; update(); });
+  const oPid = makeOutputLine(outputRegion, "PID: Kp / Ti / Td", "pid-out-pid");
+  const oPb = makeOutputLine(outputRegion, "Proportional band", "pid-out-pb");
+  const oPi = makeOutputLine(outputRegion, "PI / P variants", "pid-out-pi");
+  const update = debounce(() => {
+    const r = computePidTuningZieglerNichols({
+      ultimate_gain_ku: ku.input.value === "" ? 4 : Number(ku.input.value), ultimate_period_tu_sec: tu.input.value === "" ? 2 : Number(tu.input.value),
+    });
+    if (r.error) { oPid.textContent = r.error; oPb.textContent = "-"; oPi.textContent = "-"; return; }
+    oPid.textContent = fmt(r.pid_kp, 3) + " / " + fmt(r.pid_ti_sec, 3) + " s / " + fmt(r.pid_td_sec, 3) + " s";
+    oPb.textContent = fmt(r.proportional_band_pct, 1) + "% (PB = 100/Kp)";
+    oPi.textContent = "PI Kp " + fmt(r.pi_kp, 3) + ", Ti " + fmt(r.pi_ti_sec, 3) + " s; P Kp " + fmt(r.p_kp, 3);
+  }, DEBOUNCE_MS);
+  for (const f of [ku, tu]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["pid-tuning-ziegler-nichols"] = _v961renderPidTuningZieglerNichols;

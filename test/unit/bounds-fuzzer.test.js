@@ -27777,3 +27777,25 @@ test("bounds: spec-v960 computeDuctStaticRegain pins VP = (V/4005)^2, the regain
   assert.ok("error" in _v960({ upstream_velocity_fpm: 2000, downstream_velocity_fpm: 1500, recovery_factor: 1.5 }));
   assert.ok("error" in _v960({ upstream_velocity_fpm: Infinity, downstream_velocity_fpm: 1500, recovery_factor: 0.75 }));
 });
+
+import { computePidTuningZieglerNichols as _v961 } from "../../calc-lowvoltage.js";
+
+test("bounds: spec-v961 computePidTuningZieglerNichols pins the ZN closed-loop rules and error seams", () => {
+  const r = _v961({ ultimate_gain_ku: 4, ultimate_period_tu_sec: 2 });
+  assert.ok(Math.abs(r.pid_kp - 2.4) < 1e-9); // 0.6*Ku
+  assert.ok(Math.abs(r.pid_ti_sec - 1) < 1e-9); // 0.5*Tu
+  assert.ok(Math.abs(r.pid_td_sec - 0.25) < 1e-9); // 0.125*Tu
+  assert.ok(Math.abs(r.proportional_band_pct - 41.6667) < 1e-3); // 100/Kp
+  assert.ok(Math.abs(r.pi_kp - 1.8) < 1e-9); // 0.45*Ku
+  assert.ok(Math.abs(r.pi_ti_sec - 1.66667) < 1e-4); // Tu/1.2
+  assert.ok(Math.abs(r.p_kp - 2) < 1e-9); // 0.5*Ku
+  // Linear in Ku (gains) and Tu (times).
+  assert.ok(Math.abs(_v961({ ultimate_gain_ku: 8, ultimate_period_tu_sec: 2 }).pid_kp - 2 * r.pid_kp) < 1e-9);
+  assert.ok(Math.abs(_v961({ ultimate_gain_ku: 4, ultimate_period_tu_sec: 4 }).pid_ti_sec - 2 * r.pid_ti_sec) < 1e-9);
+  // Proportional band is inverse to Ku.
+  assert.ok(_v961({ ultimate_gain_ku: 8, ultimate_period_tu_sec: 2 }).proportional_band_pct < r.proportional_band_pct);
+  // Error seams: non-positive Ku or Tu, non-finite.
+  assert.ok("error" in _v961({ ultimate_gain_ku: 0, ultimate_period_tu_sec: 2 }));
+  assert.ok("error" in _v961({ ultimate_gain_ku: 4, ultimate_period_tu_sec: 0 }));
+  assert.ok("error" in _v961({ ultimate_gain_ku: Infinity, ultimate_period_tu_sec: 2 }));
+});

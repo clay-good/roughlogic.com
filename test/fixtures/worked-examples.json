@@ -34830,6 +34830,78 @@
    }
   },
   {
+   "tile_id": "pid-tuning-ziegler-nichols",
+   "source_publisher": "Ziegler-Nichols closed-loop PID tuning (1942)",
+   "source_title": "Ku 4, Tu 2 s -> PID Kp 2.4, Ti 1.0 s, Td 0.25 s, PB 41.67%",
+   "source_edition_or_year": "spec-v961 worked example (machine-verified)",
+   "source_section_or_page": "Kp = 0.6*4 = 2.4; Ti = 0.5*2 = 1.0; Td = 0.125*2 = 0.25; PB = 100/2.4 = 41.67",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "ultimate_gain_ku": 4,
+    "ultimate_period_tu_sec": 2
+   },
+   "outputs": {
+    "pid_kp": {
+     "value": 2.4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pid_ti_sec": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pid_td_sec": {
+     "value": 0.25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "proportional_band_pct": {
+     "value": 41.67,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pid-tuning-ziegler-nichols",
+   "source_publisher": "Ziegler-Nichols closed-loop PID tuning (1942)",
+   "source_title": "cross-check: the PI variant is Kp 1.8, Ti 1.667 s (no derivative)",
+   "source_edition_or_year": "spec-v961 worked example (machine-verified)",
+   "source_section_or_page": "PI Kp = 0.45*4 = 1.8; Ti = 2/1.2 = 1.6667 s; P Kp = 0.5*4 = 2.0",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "ultimate_gain_ku": 4,
+    "ultimate_period_tu_sec": 2
+   },
+   "outputs": {
+    "pi_kp": {
+     "value": 1.8,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pi_ti_sec": {
+     "value": 1.667,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "p_kp": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dp-level-hydrostatic",
    "source_publisher": "Hydrostatic DP level transmitter (P = 0.433 x SG x H)",
    "source_title": "4.33 psi in water (SG 1.0), 20 ft tank -> 10 ft level, 50% of span, 8.66 psi URV",

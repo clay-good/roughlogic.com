@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(low-voltage): add pid-tuning-ziegler-nichols tile (spec-v961); 2026-07-18
+
+- New Group A tile `pid-tuning-ziegler-nichols` (PID Loop Tuning, Ziegler-Nichols Closed-Loop) in calc-lowvoltage.js.
+  From the ultimate gain Ku and period Tu (measured at the stability limit): PID Kp = 0.6 Ku, Ti = 0.5 Tu, Td = 0.125 Tu;
+  PI Kp = 0.45 Ku, Ti = Tu/1.2; P Kp = 0.5 Ku; proportional band = 100/Kp. Ku 4, Tu 2 s = PID Kp 2.4, Ti 1.0 s, Td
+  0.25 s (42% PB). Aggressive (quarter-amplitude decay); a starting point, not a final tune. Home count 1,409 -> 1,410.
+
 ### feat(hvac): add duct-static-regain tile (spec-v960); 2026-07-18
 
 - New Group C tile `duct-static-regain` (Duct Static Regain at a Velocity Decrease) in calc-metalair.js. VP = (V/4005)^2

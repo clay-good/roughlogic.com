@@ -8498,6 +8498,17 @@ export const CITATIONS = {
       { name: "Two-point fit accuracy", value: "~+/-0.2-1 C near T0; a wide span or tight accuracy uses the 3-constant Steinhart-Hart equation", source: "thermistor datasheet" },
     ],
   },
+  "pid-tuning-ziegler-nichols": {
+    formula: "PID: Kp = 0.6 Ku, Ti = 0.5 Tu, Td = 0.125 Tu; PI: Kp = 0.45 Ku, Ti = Tu/1.2; P: Kp = 0.5 Ku. Proportional band = 100/Kp. Ku, Tu = the gain and period at the stability limit (steady oscillation).",
+    edition: "Ziegler-Nichols closed-loop (ultimate-sensitivity) tuning rules (Ziegler & Nichols, 1942), by name; the process dynamics, the controller's algorithm form, and the commissioning technician govern the final tune.",
+    freeAccess: "The Ziegler-Nichols closed-loop tuning rules are public (a classic control-engineering result); Ku and Tu are measured on the actual loop at the stability limit.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Ziegler-Nichols closed-loop (ultimate-sensitivity) method gives starting PID controller gains from a simple test on the running loop: with the integral and derivative action turned off, the proportional gain is raised until the process just sustains a steady oscillation; that gain is the ultimate gain Ku and the period of the oscillation is the ultimate period Tu. The recommended settings follow directly -- a full PID controller starts at Kp = 0.6 Ku, integral (reset) time Ti = 0.5 Tu, and derivative (rate) time Td = 0.125 Tu; a PI controller, preferred where derivative action would amplify measurement noise or on a fast loop, at Kp = 0.45 Ku and Ti = Tu/1.2; and a proportional-only controller at Kp = 0.5 Ku. For example Ku = 4 and Tu = 2 s give a PID of Kp 2.4, Ti 1.0 s, Td 0.25 s, equivalently a proportional band of 100/2.4 = 42%. Two cautions on translation: a legacy controller may be configured in proportional band (PB = 100/Kp, in percent) and reset in repeats per minute (1/Ti) rather than gain and time, and a controller using the non-interacting (parallel) algorithm has integral and derivative coefficients (Ki, Kd) that differ from these interacting-form values. Finally, Ziegler-Nichols is deliberately AGGRESSIVE -- it targets a quarter-amplitude-decay response that overshoots substantially -- so for a gentler, more robust loop the gain is backed off from these numbers. These are a starting point, not a final tune; the actual process dynamics, the controller's algorithm form and units, and the commissioning technician's trim on the running process govern the result.",
+    assumptions: [
+      { name: "Ziegler-Nichols closed-loop", value: "PID: Kp=0.6Ku, Ti=0.5Tu, Td=0.125Tu; PI: Kp=0.45Ku, Ti=Tu/1.2; P: Kp=0.5Ku; from the ultimate gain/period at the stability limit", source: "Ziegler & Nichols 1942" },
+      { name: "Starting point, aggressive", value: "quarter-amplitude-decay tuning (overshoots); watch PB=100/Kp / reset units and interacting-vs-parallel form; the technician trims on the process", source: "control-tuning practice" },
+    ],
+  },
   "dp-level-hydrostatic": {
     formula: "level_ft = measured_pressure_psi / (0.433 x specific_gravity); span_psi (URV) = 0.433 x specific_gravity x max_level_ft; level_pct = 100 x level_ft / max_level_ft. 0.433 psi/ft is water at ~60 F.",
     edition: "Hydrostatic (differential-pressure) level measurement (P = 0.433 x SG x H), by name; the transmitter's configured range/calibration and the tank geometry govern.",

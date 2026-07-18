@@ -849,6 +849,7 @@ export const COMPUTE_MAP = {
   "loop-voltage-budget": { module: "../../calc-lowvoltage.js", fn: "computeLoopVoltageBudget" },
   "thermistor-beta-temp": { module: "../../calc-lowvoltage.js", fn: "computeThermistorBetaTemp" },
   "dp-level-hydrostatic": { module: "../../calc-lowvoltage.js", fn: "computeDpLevelHydrostatic" },
+  "pid-tuning-ziegler-nichols": { module: "../../calc-lowvoltage.js", fn: "computePidTuningZieglerNichols" },
   "polymeric-sand-bags": { module: "../../calc-construction.js", fn: "computePolymericSandBags" },
   "rigid-foam-board-count": { module: "../../calc-construction.js", fn: "computeRigidFoamBoardCount" },
   "roof-insulation-fasteners": { module: "../../calc-construction.js", fn: "computeRoofInsulationFasteners" },

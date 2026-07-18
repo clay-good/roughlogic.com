@@ -2371,6 +2371,7 @@ cross-check.
 | calc-lowvoltage.js | `computeLoopSignalScaling` | `{ signal_ma = 12, range_low = 0, range_high = 100 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeLoopVoltageBudget` | `{ supply_v = 24, transmitter_min_v = 10.5, load_resistance_ohms = 250, wire_r...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeLvCablePullFootage` | `{ drops = 48, avg_run_ft = 120, slack_ft = 15, box_ft = 1000 } = {}` | _ | _ | _ |
+| calc-lowvoltage.js | `computePidTuningZieglerNichols` | `{ ultimate_gain_ku = 4, ultimate_period_tu_sec = 2 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computePulseFlowmeterRate` | `{ frequency_hz = 100, k_factor_pulses_per_gal = 200 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeRtdResistanceToTemp` | `{ resistance_ohms = 119.397, r0_ohms = 100 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeSpeaker70vLine` | `{ amp_rated_w = 0, headroom_percent = 20, tap_watts = 0, tap_count = 0, line_...` | _ | _ | _ |
@@ -3070,7 +3071,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1656.
+Row count: 1657.
 
 <!-- END function-corpus-v14 -->
 
@@ -3151,7 +3152,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (187 tiles)
+### Group A Electrical (188 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3271,6 +3272,7 @@ per spec-v14 §13.1 second paragraph.
 | `parallel-conductor-derate` | Parallel Conductor Ampacity | NEC (NFPA 70) Article 310 parallel-co...; 3/0 Cu at 200 A, N=3, no derate -> 600 A total | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pf-correction` | Power Factor Correction Capacitor | Project (first-principles); 100 kW / pf 0.75 -> 0.95 / 480 V three-phase -> 55.32 kVA... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `phase-balance` | Phase Balance Across Panels | Project (first-principles); Four circuits {A:1500, A:800, B:600, C:700} -> 141.67% in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pid-tuning-ziegler-nichols` | PID Loop Tuning (Ziegler-Nichols Closed-Loop) | Ziegler-Nichols closed-loop PID tunin...; Kp = 0.6*4 = 2.4; Ti = 0.5*2 = 1.0; Td = 0.125*2 = 0.25; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `poe-budget` | PoE Budget and Run Distance | IEEE; Type 2 PSE = 30 W, PD min 25.5 W; 200 ft Cat6 @ 25 C -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `point-illuminance` | Point-Method Illuminance (Inverse-Square + Cosine) | IES Lighting Handbook (point method); angle 0: E = 1000 x cos(0) / 10^2 = 10.0 fc (107.6 lux) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `point-method-required-candela` | Point-Method Required Candela for a Target | IES Lighting Handbook (point method),...; 10 fc target, 10 ft up, nadir -> 1,000 cd (round-trips po... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4665,6 +4667,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1409. Fixture-covered or reference-cadence: 1409 / 1409.
+Tile count: 1410. Fixture-covered or reference-cadence: 1410 / 1410.
 
 <!-- END tile-index-v14 -->
