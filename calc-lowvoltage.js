@@ -922,3 +922,61 @@ function _v890renderCableSupportJhook(inputRegion, outputRegion, citationEl) {
   for (const f of [rn, sp, nc, cw, hw]) f.input.addEventListener("input", update);
 }
 LOWVOLTAGE_RENDERERS["cable-support-jhook"] = _v890renderCableSupportJhook;
+
+// ===================== spec-v929: access-control power supply and standby battery =====================
+// dims: in { lock_count: dimensionless, lock_current_a: I, reader_count: dimensionless, reader_current_a: I, other_load_a: I, standby_hours: T } out: { total_load_a: I, psu_min_a: I, battery_ah: I*T }
+export function computeAccessControlPowerSupply({ lock_count = 4, lock_current_a = 0.5, reader_count = 2, reader_current_a = 0.15, other_load_a = 0.225, standby_hours = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (lock_count < 0 || reader_count < 0) return { error: "Device counts cannot be negative." };
+  if (lock_current_a < 0 || reader_current_a < 0 || other_load_a < 0) return { error: "Device currents cannot be negative (A)." };
+  if (standby_hours < 0) return { error: "Standby hours cannot be negative." };
+  const total_load_a = Math.round(lock_count) * lock_current_a + Math.round(reader_count) * reader_current_a + other_load_a;
+  if (!(total_load_a > 0)) return { error: "Total load must be positive: enter at least one device or load." };
+  // NFPA 72 / UL 294: size the supply with 25% headroom, and the standby battery to the load for the required
+  // standby time with a 25% aging derate.
+  const psu_min_a = 1.25 * total_load_a;
+  const battery_ah = total_load_a * standby_hours * 1.25;
+  if (![total_load_a, psu_min_a, battery_ah].every(Number.isFinite)) return { error: "Access-control power math is not a finite value." };
+  return {
+    total_load_a,
+    psu_min_a,
+    battery_ah,
+    note: "Access-control power supply and standby battery: total load = locks x hold current + readers + request-to-exit + controller; the supply is sized about 25% over the load (NFPA 72 / UL 294 continuous-load headroom); the standby battery = load x standby hours x 1.25 for aging. FAIL-SAFE maglocks draw continuously (and drop on power loss -- egress), while FAIL-SECURE strikes draw only on unlock and hold on power loss, so a fail-secure system draws far less standby. NFPA 72 sets the standby time (often 4 to 24 hr) for a system tied to the fire alarm or required for egress. A sizing estimate; the listed panel, the door hardware datasheets, the AHJ, and the fire/life-safety interface govern.",
+  };
+}
+
+export const accessControlPowerSupplyExample = { inputs: { lock_count: 4, lock_current_a: 0.5, reader_count: 2, reader_current_a: 0.15, other_load_a: 0.225, standby_hours: 4 } };
+
+function _v929renderAccessControlPowerSupply(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: access-control power / standby-battery sizing by name (NFPA 72 / UL 294). total load = locks x hold + readers + REX + controller; supply >= 1.25 x load; battery Ah = load x standby hours x 1.25 (aging). Fail-safe maglocks draw continuously; the listed panel, the AHJ, and the door hardware govern.";
+  const lc = makeNumber("Maglock count", "acp-lc", { step: "1", min: "0", value: "4" });
+  lc.input.value = "4";
+  const li = makeNumber("Per-lock hold current (A)", "acp-li", { step: "any", min: "0", value: "0.5" });
+  li.input.value = "0.5";
+  const rc = makeNumber("Reader count", "acp-rc", { step: "1", min: "0", value: "2" });
+  rc.input.value = "2";
+  const ri = makeNumber("Per-reader current (A)", "acp-ri", { step: "any", min: "0", value: "0.15" });
+  ri.input.value = "0.15";
+  const ol = makeNumber("Other load: REX + controller (A)", "acp-ol", { step: "any", min: "0", value: "0.225" });
+  ol.input.value = "0.225";
+  const sh = makeNumber("Standby time (hr)", "acp-sh", { step: "any", min: "0", value: "4" });
+  sh.input.value = "4";
+  for (const f of [lc, li, rc, ri, ol, sh]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { lc.input.value = "4"; li.input.value = "0.5"; rc.input.value = "2"; ri.input.value = "0.15"; ol.input.value = "0.225"; sh.input.value = "4"; update(); });
+  const oLoad = makeOutputLine(outputRegion, "Total load", "acp-out-load");
+  const oPsu = makeOutputLine(outputRegion, "Minimum power supply", "acp-out-psu");
+  const oBat = makeOutputLine(outputRegion, "Standby battery", "acp-out-bat");
+  const update = debounce(() => {
+    const r = computeAccessControlPowerSupply({
+      lock_count: lc.input.value === "" ? 4 : Number(lc.input.value), lock_current_a: li.input.value === "" ? 0.5 : Number(li.input.value),
+      reader_count: rc.input.value === "" ? 2 : Number(rc.input.value), reader_current_a: ri.input.value === "" ? 0.15 : Number(ri.input.value),
+      other_load_a: ol.input.value === "" ? 0.225 : Number(ol.input.value), standby_hours: sh.input.value === "" ? 4 : Number(sh.input.value),
+    });
+    if (r.error) { oLoad.textContent = r.error; oPsu.textContent = "-"; oBat.textContent = "-"; return; }
+    oLoad.textContent = fmt(r.total_load_a, 2) + " A";
+    oPsu.textContent = fmt(r.psu_min_a, 2) + " A (1.25x load)";
+    oBat.textContent = fmt(r.battery_ah, 1) + " Ah for " + fmt(Number(sh.input.value) || 4, 0) + " hr standby";
+  }, DEBOUNCE_MS);
+  for (const f of [lc, li, rc, ri, ol, sh]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["access-control-power-supply"] = _v929renderAccessControlPowerSupply;

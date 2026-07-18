@@ -1078,6 +1078,7 @@ const RELATED = {
   "drywall-fastener-takeoff": ["drywall", "metal-stud-takeoff", "sheathing-takeoff"],
   "glass-vacuum-lift": ["glass-weight", "rigging-check", "sling-angle"],
   "cable-support-jhook": ["lv-cable-pull-footage", "cable-tray-fill", "structured-cabling-channel"],
+  "access-control-power-supply": ["standby-battery-sizing", "lv-cable-pull-footage", "cctv-storage"],
   "polymeric-sand-bags": ["paver-patio", "retaining-wall-block", "aggregate"],
   "rigid-foam-board-count": ["insulation-batt-coverage", "spray-foam-board-feet", "assembly-r-value"],
   "roof-insulation-fasteners": ["membrane-roof-takeoff", "tapered-roof-insulation", "metal-roof-panels"],

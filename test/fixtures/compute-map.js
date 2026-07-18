@@ -828,6 +828,7 @@ export const COMPUTE_MAP = {
   "drywall-fastener-takeoff": { module: "../../calc-construction.js", fn: "computeDrywallFastenerTakeoff" },
   "glass-vacuum-lift": { module: "../../calc-construction.js", fn: "computeGlassVacuumLift" },
   "cable-support-jhook": { module: "../../calc-lowvoltage.js", fn: "computeCableSupportJhook" },
+  "access-control-power-supply": { module: "../../calc-lowvoltage.js", fn: "computeAccessControlPowerSupply" },
   "polymeric-sand-bags": { module: "../../calc-construction.js", fn: "computePolymericSandBags" },
   "rigid-foam-board-count": { module: "../../calc-construction.js", fn: "computeRigidFoamBoardCount" },
   "roof-insulation-fasteners": { module: "../../calc-construction.js", fn: "computeRoofInsulationFasteners" },

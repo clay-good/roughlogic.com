@@ -26797,6 +26797,23 @@ test("bounds: spec-v920 computeCementBoardTakeoff pins the sheets, screws, and e
   assert.ok("error" in _v920({ area_sf: Infinity, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 35 }));
 });
 
+import { computeAccessControlPowerSupply as _v929 } from "../../calc-lowvoltage.js";
+
+test("bounds: spec-v929 computeAccessControlPowerSupply pins the load, supply, battery, and error seams", () => {
+  const r = _v929({ lock_count: 4, lock_current_a: 0.5, reader_count: 2, reader_current_a: 0.15, other_load_a: 0.225, standby_hours: 4 });
+  assert.ok(Math.abs(r.total_load_a - 2.525) < 1e-9); // 4*0.5 + 2*0.15 + 0.225
+  assert.ok(Math.abs(r.psu_min_a - 3.15625) < 1e-9); // 1.25 * load
+  assert.ok(Math.abs(r.battery_ah - 12.625) < 1e-9); // load * 4 * 1.25
+  // Longer standby scales the battery.
+  assert.ok(Math.abs(_v929({ lock_count: 4, lock_current_a: 0.5, reader_count: 2, reader_current_a: 0.15, other_load_a: 0.225, standby_hours: 24 }).battery_ah - 75.75) < 1e-9);
+  // Error seams: negative counts / currents / hours, zero total load, non-finite.
+  assert.ok("error" in _v929({ lock_count: -1, lock_current_a: 0.5, reader_count: 2 }));
+  assert.ok("error" in _v929({ lock_count: 4, lock_current_a: -0.5, reader_count: 2 }));
+  assert.ok("error" in _v929({ lock_count: 0, lock_current_a: 0.5, reader_count: 0, reader_current_a: 0.15, other_load_a: 0 })); // zero load
+  assert.ok("error" in _v929({ lock_count: 4, lock_current_a: 0.5, standby_hours: -1 }));
+  assert.ok("error" in _v929({ lock_count: Infinity, lock_current_a: 0.5 }));
+});
+
 import { computeDynamicCompressionRatio as _v928 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v928 computeDynamicCompressionRatio pins the DCR, clearance volume, and error seams", () => {

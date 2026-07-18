@@ -34602,6 +34602,68 @@
    }
   },
   {
+   "tile_id": "access-control-power-supply",
+   "source_publisher": "access-control power / standby sizing (NFPA 72 / UL 294)",
+   "source_title": "4 maglocks @0.5A, 2 readers @0.15A, 0.225A other, 4 hr -> 2.53 A load, 3.16 A supply, 12.6 Ah",
+   "source_edition_or_year": "spec-v929 worked example (machine-verified)",
+   "source_section_or_page": "load = 4*0.5 + 2*0.15 + 0.225 = 2.525; psu = 1.25*2.525 = 3.156; Ah = 2.525*4*1.25 = 12.625",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "lock_count": 4,
+    "lock_current_a": 0.5,
+    "reader_count": 2,
+    "reader_current_a": 0.15,
+    "other_load_a": 0.225,
+    "standby_hours": 4
+   },
+   "outputs": {
+    "total_load_a": {
+     "value": 2.525,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "psu_min_a": {
+     "value": 3.156,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "battery_ah": {
+     "value": 12.625,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "access-control-power-supply",
+   "source_publisher": "access-control power / standby sizing (NFPA 72 / UL 294)",
+   "source_title": "cross-check: a 24 hr standby time quadruples the battery to 75.75 Ah",
+   "source_edition_or_year": "spec-v929 worked example (machine-verified)",
+   "source_section_or_page": "Ah = 2.525*24*1.25 = 75.75",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "lock_count": 4,
+    "lock_current_a": 0.5,
+    "reader_count": 2,
+    "reader_current_a": 0.15,
+    "other_load_a": 0.225,
+    "standby_hours": 24
+   },
+   "outputs": {
+    "battery_ah": {
+     "value": 75.75,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dynamic-compression-ratio",
    "source_publisher": "dynamic compression ratio (slider-crank geometry)",
    "source_title": "4.030 bore, 3.75 stroke, 6.0 rod, 10.5 static, 60 deg ABDC IVC -> 8.69 DCR",

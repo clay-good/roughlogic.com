@@ -2342,6 +2342,7 @@ cross-check.
 | calc-layout.js | `computePolygonMiter` | `{ sides = 0, size_mode = "side", size_in = 0 } = {}` | _ | _ | _ |
 | calc-layout.js | `computeSineBar` | `{ solve_for = "angle", bar_length_in = 5, stack_height_in = 0, target_angle_d...` | _ | _ | _ |
 | calc-layout.js | `computeThreadPitch` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, starts = 1 } = {}` | _ | _ | _ |
+| calc-lowvoltage.js | `computeAccessControlPowerSupply` | `{ lock_count = 4, lock_current_a = 0.5, reader_count = 2, reader_current_a = ...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCableSupportJhook` | `{ run_ft = 400, spacing_ft = 4, num_cables = 50, cable_lb_per_ft = 0.035, hoo...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCableTrayFill` | `{ tray_type = "ladder", tray_width_in = 0, cables = [] } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCameraLensFov` | `{ sensor_width_mm = 0, focal_length_mm = 0, distance_ft = 0, h_pixels = 0 } = {}` | _ | _ | _ |
@@ -3038,7 +3039,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1624.
+Row count: 1625.
 
 <!-- END function-corpus-v14 -->
 
@@ -3119,10 +3120,11 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (170 tiles)
+### Group A Electrical (171 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
+| `access-control-power-supply` | Access-Control Power Supply and Standby Battery | access-control power / standby sizing...; load = 4*0.5 + 2*0.15 + 0.225 = 2.525; psu = 1.25*2.525 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ambient-ampacity-adjust` | Conductor Ambient and Fill Ampacity Adjustment | NFPA; adjusted = base * ambient_factor * fill_factor = 75 * 0.8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `arc-flash-screen` | Arc-Flash Incident-Energy Screen (Lee 1982) | Lee 1982 / NFPA; Closed-form Lee equation; NFPA 70E-2024 §130.5 governs th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `asymmetrical-fault-xr` | Asymmetrical and Peak Fault Current from X/R | first-cycle fault asymmetry model (DC...; spec-v496 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4601,6 +4603,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1377. Fixture-covered or reference-cadence: 1377 / 1377.
+Tile count: 1378. Fixture-covered or reference-cadence: 1378 / 1378.
 
 <!-- END tile-index-v14 -->

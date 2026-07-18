@@ -8332,6 +8332,17 @@ export const CITATIONS = {
       { name: "Cable weight", value: "~0.035 lb/ft per Cat 6 cable (default); the cable datasheet governs", source: "cable manufacturer" },
     ],
   },
+  "access-control-power-supply": {
+    formula: "total_load_a = lock_count x lock_current_a + reader_count x reader_current_a + other_load_a; psu_min_a = 1.25 x total_load_a; battery_ah = total_load_a x standby_hours x 1.25.",
+    edition: "NFPA 72 (National Fire Alarm and Signaling Code) secondary-power provisions and UL 294 (access-control system units) device loads, by name; the listed panel and the AHJ govern.",
+    freeAccess: "The load rollup and the 1.25 headroom / aging factors are public first-principles; the device currents come from the door-hardware and reader datasheets, and the standby time from NFPA 72 and the AHJ.",
+    governance: GOVERNANCE.general,
+    editionNote: "Sizes the DC power supply and standby battery for an access-control door system. The total load rolls up the maglock hold currents, the reader currents, the request-to-exit devices, and the controller; the supply is sized about 25% over the continuous load; and the standby battery is the load times the required standby hours with a 25% aging derate. FAIL-SAFE maglocks draw continuously and release on loss of power (egress on a fire alarm), so they dominate the standby draw; FAIL-SECURE electric strikes draw only during an unlock and stay locked on power loss, cutting the standby battery sharply. NFPA 72 sets the standby time (commonly 4 to 24 hours) for a system tied to the fire alarm or required for egress. A sizing estimate; the listed access-control panel, the door-hardware datasheets, the AHJ, and the fire / life-safety interface govern the final design.",
+    assumptions: [
+      { name: "Headroom and aging", value: "supply >= 1.25 x continuous load; battery = load x standby hr x 1.25 aging", source: "NFPA 72 / UL 294 practice" },
+      { name: "Fail-safe vs fail-secure", value: "fail-safe maglocks draw continuously (dominate standby); fail-secure strikes draw only on unlock", source: "door-hardware behavior" },
+    ],
+  },
   "polymeric-sand-bags": {
     formula: "bags = ceil(area_sf x (1 + waste_pct/100) / coverage_per_bag_sf).",
     edition: "Polymeric joint-sand bag-count identity by name (area over the per-bag coverage, plus waste); first-principles arithmetic.",

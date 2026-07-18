@@ -18607,6 +18607,31 @@
       "kind": "industry"
     },
     {
+      "term": "access control power supply",
+      "target": "access-control-power-supply",
+      "kind": "industry"
+    },
+    {
+      "term": "maglock power supply",
+      "target": "access-control-power-supply",
+      "kind": "industry"
+    },
+    {
+      "term": "door power supply sizing",
+      "target": "access-control-power-supply",
+      "kind": "industry"
+    },
+    {
+      "term": "access control standby battery",
+      "target": "access-control-power-supply",
+      "kind": "adjacent"
+    },
+    {
+      "term": "maglock battery backup",
+      "target": "access-control-power-supply",
+      "kind": "adjacent"
+    },
+    {
       "term": "cable j hooks",
       "target": "cable-support-jhook",
       "kind": "industry"

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(low-voltage): add access-control-power-supply tile (spec-v929); 2026-07-18
+
+- New Group A tile `access-control-power-supply` (Access-Control Power Supply and Standby Battery) in calc-lowvoltage.js,
+  beside cable-support-jhook. total load = locks x hold + readers + REX + controller; supply >= 1.25 x load; battery Ah =
+  load x standby hours x 1.25 (aging). 4 maglocks @0.5A + 2 readers @0.15A + 0.225A = 2.53 A -> 3.16 A supply, 12.6 Ah
+  at 4 hr (75.75 Ah at 24 hr). Fail-safe maglocks dominate standby; NFPA 72 sets the time. The listed panel, door
+  hardware, and AHJ govern. Raised the calc-lowvoltage.js gzip cap 17500 -> 19000. Home count 1,377 -> 1,378.
+
 ### feat(mechanic): add dynamic-compression-ratio tile (spec-v928); 2026-07-18
 
 - New Group K tile `dynamic-compression-ratio` (Dynamic Compression Ratio) in calc-mechanic.js, beside displacement-cr.
