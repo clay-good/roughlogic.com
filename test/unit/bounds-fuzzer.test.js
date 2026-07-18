@@ -11621,7 +11621,7 @@ test("bounds: spec-v40 thread-measure-wire pins best wire/M + rejects bad inputs
 });
 
 import { computeThreadPitchDiaFromWires as _v721 } from "../../calc-shop.js";
-test("bounds: spec-v721 computeThreadPitchDiaFromWires pins E = M - 3W + 1.51553 P, round-trips through computeThreadMeasureWire, and error seams", () => {
+test("bounds: spec-v721 computeThreadPitchDiaFromWires pins E = M - 3W + (sqrt(3)/2) P, round-trips through computeThreadMeasureWire, and error seams", () => {
   const r = _v721({ thread_standard: "inch", tpi: 13, measurement_over_wires_in: 0.49, wire_dia_in: 0 });
   assert.ok(!r.error, JSON.stringify(r));
   const P = 1 / 13, W = 0.5773502691896258 * P;

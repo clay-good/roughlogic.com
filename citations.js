@@ -5923,7 +5923,7 @@ export const CITATIONS = {
     ],
   },
   "timber-cruise": {
-    formula: "Doyle: BF = ((D − 4)² × L) / 16. Scribner Decimal C: from public tabulated values keyed to D (in) and L (ft). International 1/4 inch: BF = 0.22 × D² − 0.71 × D (16-ft log basis).",
+    formula: "Doyle: BF = ((D − 4)² × L) / 16. Scribner Decimal C: from public tabulated values keyed to D (in) and L (ft). International 1/4 inch: BF = (0.22 × D² − 0.71 × D) per 4-ft section, scaled by (L / 4).",
     edition: "Public log-volume tables (Doyle 1825, Scribner Decimal C, International 1/4-inch USDA Forest Service publications); USDA Forest Service Manual 2400 by name.",
     freeAccess: "Free at fs.usda.gov.",
     governance: GOVERNANCE.general,
