@@ -12158,3 +12158,19 @@ test("monotonicity: log/limb frustum weight tracks its inputs and stays under a 
   // Taper invariant (the note's safe-side claim): a tapered frustum weighs less than a cylinder of the butt diameter.
   assert.ok(lw({}).weight_lb < cyl.weight_lb, "a tapered log must weigh less than a full cylinder of its butt diameter");
 });
+
+test("monotonicity: edible-portion yield and food-cost percentage track their inputs (kitchen)", async () => {
+  const k = await import("../../calc-kitchen.js");
+  const yep = (o) => k.computeYieldEP({ ap_weight: 10, trim_weight: 2, cooking_loss_pct: 10, ap_cost_per_lb: 5, ...o });
+  const fcp = (o) => k.computeFoodCostPercentage({ beginning_inventory: 5000, purchases: 8000, ending_inventory: 4000, food_sales: 30000, ...o });
+  assert.ok(yep({ trim_weight: 4 }).ep_weight < yep({}).ep_weight, "edible-portion weight must fall as trim rises");
+  assert.ok(yep({ cooking_loss_pct: 20 }).ep_weight < yep({}).ep_weight, "edible-portion weight must fall as cooking loss rises");
+  assert.ok(yep({ trim_weight: 4 }).ep_cost_per_lb > yep({}).ep_cost_per_lb, "EP cost per lb must rise as yield drops (more trim)");
+  assert.ok(Math.abs(yep({}).ep_weight - (10 - 2) * (1 - 0.10)) < 1e-9, "EP weight = (AP - trim) * (1 - cooking loss)");
+  assert.ok(Math.abs(yep({}).ep_cost_per_lb - 5 * 10 / 7.2) < 1e-9, "EP cost/lb = AP cost * AP weight / EP weight");
+  assert.ok(fcp({ purchases: 10000 }).food_cost_pct > fcp({}).food_cost_pct, "food cost % must rise with purchases");
+  assert.ok(fcp({ ending_inventory: 6000 }).food_cost_pct < fcp({}).food_cost_pct, "food cost % must fall as ending inventory rises (less consumed)");
+  assert.ok(fcp({ food_sales: 40000 }).food_cost_pct < fcp({}).food_cost_pct, "food cost % must fall as sales rise");
+  assert.ok(Math.abs(fcp({}).cogs - (5000 + 8000 - 4000)) < 1e-9, "COGS = beginning + purchases - ending");
+  assert.ok(Math.abs(fcp({}).food_cost_pct - 9000 / 30000 * 100) < 1e-9, "food cost % = COGS / food sales");
+});

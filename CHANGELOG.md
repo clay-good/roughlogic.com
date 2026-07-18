@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(kitchen): guard edible-portion yield and food-cost percentage with monotonicity; 2026-07-17
+
+- Whole-response guards: EP weight = (AP - trim) x (1 - cooking loss) falls with trim and cooking loss while EP cost/lb
+  rises as yield drops; food cost pct = COGS / food sales where COGS = beginning + purchases - ending, rising with
+  purchases and falling with ending inventory and sales. Test-only.
+
 ### test(arborist): guard log/limb frustum weight with monotonicity and a taper bound; 2026-07-17
 
 - Whole-response guards: frustum weight = (pi/3) L (r1^2+r1 r2+r2^2) x density rises with butt/top diameter, length,
