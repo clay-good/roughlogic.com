@@ -2229,6 +2229,17 @@ export const CITATIONS = {
     ],
   },
 
+  "fertigation-injection-rate": {
+    formula: "total_product_gal = product_rate_gal_per_acre x area_acres; injection_rate_gph = total_product_gal / set_time_hours; injection_rate_gpm = injection_rate_gph / 60.",
+    edition: "Fertigation / chemigation injection-rate practice (EPA chemigation rules; the product label under FIFRA), by name; the label, the state chemigation regulations, and a drawdown calibration govern.",
+    freeAccess: "The injection-rate arithmetic is public first-principles (total product over the set time); the per-acre rate, acres, and set time come from the recommendation and the irrigation schedule.",
+    governance: GOVERNANCE.general,
+    editionNote: "Fertigation (injecting fertilizer) and chemigation (injecting a pesticide or other chemical) apply a product to a field through the irrigation water rather than a sprayer. The total product needed is the recommended per-acre rate times the field acres, and to apply it uniformly it is metered in at a constant rate over the irrigation SET, so the injection-pump rate is simply the total product divided by the set duration. Applying 5 gallons per acre over 40 acres during a 6-hour set is 200 gallons total, injected at 33.3 gallons per hour (about 0.56 gpm). Operationally the injection is started only after the irrigation system has come up to pressure and the most distant emitter or sprinkler is flowing (so the whole field receives product), and the lines are flushed with clear water at the end of the set to clear the chemical. When the product is a stock or concentrate solution, its resulting concentration in the irrigation water is the injection flow divided by the system flow multiplied by the stock strength, which sets the dilution needed to hit a target ppm, and a tank-mixed formulation is checked for compatibility before it is injected. A critical regulatory point: whenever a chemical is injected, an EPA-required, functioning backflow-prevention package -- an anti-siphon device, a check valve, a low-pressure drain, and an interlock that shuts the injection pump off if the irrigation pump stops -- must protect the water source, and the actual injection rate is calibrated against a drawdown (or weight) check on the day of application. A rate estimate; the product label (which is enforceable law under FIFRA), the state chemigation regulations, and the applicator's calibration govern.",
+    assumptions: [
+      { name: "Injection rate", value: "total product = rate (gal/acre) x acres; injection rate = total / set time; stock ppm = (injection flow/system flow) x stock strength", source: "fertigation/chemigation practice" },
+      { name: "Backflow protection + calibration", value: "an EPA-required anti-siphon/check-valve/interlock package must protect the water source; calibrate against a drawdown check; the FIFRA label and state chemigation rules govern", source: "EPA chemigation rules / FIFRA" },
+    ],
+  },
   "mad-irrigation-trigger": {
     formula: "TAW = (field_capacity - wilting_point) x root_depth_in (in); RAW = mad_fraction x TAW (in); irrigation_interval_days = RAW / etc_in_day. Water contents in in/in; MAD ~0.5 (0.3-0.6 by crop).",
     edition: "Soil-water-reservoir irrigation scheduling (FAO Irrigation and Drainage Paper 56, Allen et al. 1998; USDA NRCS Irrigation Guide), by name; the field-measured soil moisture, root depth, and ETc govern.",

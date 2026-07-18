@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(agriculture): add fertigation-injection-rate tile (spec-v974); 2026-07-18
+
+- New Group L tile `fertigation-injection-rate` (Fertigation / Chemigation Injection Rate) in calc-agriculture.js. total
+  product = rate (gal/acre) x acres; injection rate = total / set hours. 5 gal/acre over 40 acres in a 6-hour set = 200
+  gal at 33.3 gph (0.56 gpm); a longer set feeds slower. Start after the system is pressurized, flush at the end. An
+  EPA-required anti-siphon/check-valve/interlock package must protect the water source. The FIFRA label and state
+  chemigation rules govern. Home count 1,422 -> 1,423.
+
 ### feat(water): add float-method-flow tile (spec-v973); 2026-07-18
 
 - New Group M tile `float-method-flow` (Float-Method / Velocity-Area Open-Channel Flow) in calc-water.js. Q = C x surface

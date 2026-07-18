@@ -28061,3 +28061,22 @@ test("bounds: spec-v973 computeFloatMethodFlow pins the velocity-area flow and e
   assert.ok("error" in _v973({ float_distance_ft: 20, travel_time_s: 10, channel_width_ft: 4, mean_depth_ft: 1.5, float_coefficient: 1.5 }));
   assert.ok("error" in _v973({ float_distance_ft: Infinity, travel_time_s: 10, channel_width_ft: 4, mean_depth_ft: 1.5, float_coefficient: 0.85 }));
 });
+
+import { computeFertigationInjectionRate as _v974 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v974 computeFertigationInjectionRate pins the injection rate and error seams", () => {
+  const r = _v974({ product_rate_gal_per_acre: 5, area_acres: 40, set_time_hours: 6 });
+  assert.ok(Math.abs(r.total_product_gal - 200) < 1e-9); // 5*40
+  assert.ok(Math.abs(r.injection_rate_gph - 33.33333) < 1e-4); // 200/6
+  assert.ok(Math.abs(r.injection_rate_gpm - r.injection_rate_gph / 60) < 1e-9);
+  // A longer set halves the rate (same total product).
+  assert.ok(Math.abs(_v974({ product_rate_gal_per_acre: 5, area_acres: 40, set_time_hours: 12 }).injection_rate_gph - 16.66667) < 1e-4);
+  // Total product is linear in rate and acres.
+  assert.ok(Math.abs(_v974({ product_rate_gal_per_acre: 10, area_acres: 40, set_time_hours: 6 }).total_product_gal - 2 * r.total_product_gal) < 1e-6);
+  assert.ok(Math.abs(_v974({ product_rate_gal_per_acre: 5, area_acres: 80, set_time_hours: 6 }).total_product_gal - 2 * r.total_product_gal) < 1e-6);
+  // Error seams: non-positive rate / acres / set time, non-finite.
+  assert.ok("error" in _v974({ product_rate_gal_per_acre: 0, area_acres: 40, set_time_hours: 6 }));
+  assert.ok("error" in _v974({ product_rate_gal_per_acre: 5, area_acres: 0, set_time_hours: 6 }));
+  assert.ok("error" in _v974({ product_rate_gal_per_acre: 5, area_acres: 40, set_time_hours: 0 }));
+  assert.ok("error" in _v974({ product_rate_gal_per_acre: Infinity, area_acres: 40, set_time_hours: 6 }));
+});

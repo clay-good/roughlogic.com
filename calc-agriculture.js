@@ -3248,3 +3248,50 @@ function _v964renderMadIrrigationTrigger(inputRegion, outputRegion, citationEl) 
   for (const f of [fc, wp, rd, md, et]) f.input.addEventListener("input", update);
 }
 AGRICULTURE_RENDERERS["mad-irrigation-trigger"] = _v964renderMadIrrigationTrigger;
+
+// ===================== spec-v974: fertigation / chemigation injection rate =====================
+// dims: in { args: dimensionless } out: { total_product_gal: dimensionless, injection_rate_gph: dimensionless, injection_rate_gpm: dimensionless }
+export function computeFertigationInjectionRate({ product_rate_gal_per_acre = 5, area_acres = 40, set_time_hours = 6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(product_rate_gal_per_acre > 0)) return { error: "Product rate must be positive (gal/acre)." };
+  if (!(area_acres > 0)) return { error: "Area must be positive (acres)." };
+  if (!(set_time_hours > 0)) return { error: "Set (irrigation) time must be positive (hours)." };
+  // Total product for the field, injected evenly over the irrigation set: injection rate = total / set time.
+  const total_product_gal = product_rate_gal_per_acre * area_acres;
+  const injection_rate_gph = total_product_gal / set_time_hours;
+  const injection_rate_gpm = injection_rate_gph / 60;
+  if (![total_product_gal, injection_rate_gph, injection_rate_gpm].every(Number.isFinite)) return { error: "Fertigation math is not a finite value." };
+  return {
+    total_product_gal,
+    injection_rate_gph,
+    injection_rate_gpm,
+    note: "The injection-pump rate to apply a liquid fertilizer or chemical through an irrigation system (fertigation / chemigation): the total product for the field is the per-acre rate times the acres, and injecting it evenly over the irrigation SET means the pump runs at total product / set time. Applying 5 gal/acre over 40 acres in a 6-hour set is 200 gallons total at a 33.3 gph (0.56 gpm) injection rate -- set the metering pump to that and start it after the system reaches pressure and the last emitter is flowing, then flush the lines with clear water at the end of the set. For a stock (concentrate) solution, the resulting concentration in the irrigation water is the injection flow divided by the system flow times the stock strength (target ppm sets the dilution), and a mixed formulation is checked for compatibility before injecting. CRITICAL: an EPA-required, functioning anti-siphon / check-valve and interlock package must protect the water source from backflow whenever a chemical is injected (chemigation regulations), and the actual injection is calibrated against a drawdown/weight check on the day. A rate estimate; the product label (FIFRA), the state chemigation rules, and the agronomist govern.",
+  };
+}
+
+export const fertigationInjectionRateExample = { inputs: { product_rate_gal_per_acre: 5, area_acres: 40, set_time_hours: 6 } };
+
+function _v974renderFertigationInjectionRate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: fertigation / chemigation injection rate, by name. total product = rate (gal/acre) x acres; injection rate = total / set hours. Start after the system is pressurized, flush at the end; an EPA-required anti-siphon/check-valve/interlock package must protect the water source (chemigation rules). The product label (FIFRA), the state chemigation rules, and a drawdown calibration govern.";
+  const pr = makeNumber("Product rate (gal/acre)", "fir-pr", { step: "any", min: "0", value: "5" });
+  pr.input.value = "5";
+  const ac = makeNumber("Area (acres)", "fir-ac", { step: "any", min: "0", value: "40" });
+  ac.input.value = "40";
+  const st = makeNumber("Irrigation set time (hours)", "fir-st", { step: "any", min: "0", value: "6" });
+  st.input.value = "6";
+  for (const f of [pr, ac, st]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { pr.input.value = "5"; ac.input.value = "40"; st.input.value = "6"; update(); });
+  const oT = makeOutputLine(outputRegion, "Total product", "fir-out-t");
+  const oI = makeOutputLine(outputRegion, "Injection rate", "fir-out-i");
+  const update = debounce(() => {
+    const r = computeFertigationInjectionRate({
+      product_rate_gal_per_acre: pr.input.value === "" ? 5 : Number(pr.input.value), area_acres: ac.input.value === "" ? 40 : Number(ac.input.value),
+      set_time_hours: st.input.value === "" ? 6 : Number(st.input.value),
+    });
+    if (r.error) { oT.textContent = r.error; oI.textContent = "-"; return; }
+    oT.textContent = fmt(r.total_product_gal, 1) + " gal for the field";
+    oI.textContent = fmt(r.injection_rate_gph, 2) + " gph (" + fmt(r.injection_rate_gpm, 3) + " gpm)";
+  }, DEBOUNCE_MS);
+  for (const f of [pr, ac, st]) f.input.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["fertigation-injection-rate"] = _v974renderFertigationInjectionRate;
