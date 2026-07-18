@@ -4,6 +4,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(finish,masonry): two takeoff tiles ignored an input the compute is documented to use; 2026-07-18
+
+- **thinset-coverage** (calc-finish.js): `bag_weight_lb` was destructured, validated, and rendered as a field, but
+  never entered the math -- coverage was hardcoded per 50-lb bag, so a user with 25-lb bags got the same bag count
+  (dead-input class; check-dead-inputs missed it because the validation line references the parameter). Coverage now
+  scales by `bag_weight_lb/50` (a 25-lb bag covers half -> ~double the bags: 200 sq ft goes from 4 to 7 bags). A
+  user-entered coverage override is still taken as-is.
+- **brick-veneer-anchor-spacing** (calc-masonry.js): the count was `ceil(area/area_per)`, ignoring the max horizontal
+  x vertical spacing grid -- yet the note and citation say "if the max grid is smaller than the area limit, the
+  spacing caps govern the count." The caps never actually governed. Now `ceil(area / min(area_per, max_grid))`: a
+  12 x 12 in grid (1.0 ft^2/anchor) on a 200 ft^2 wall correctly gives 200 anchors, not 75. Default 32 x 24 in grid
+  (5.33 ft^2) is looser than the 2.67 ft^2 area limit, so all pinned examples are unchanged. Both found by a targeted
+  count-correctness audit; regression tests added for the non-default cases.
+
 ### fix(construction): deck-ledger-fasteners undercounted by one on a non-even ledger (floor -> ceil); 2026-07-18
 
 - computeDeckLedgerFasteners counted `floor(length*12/spacing) + 1`, the same floor-vs-ceil member-count bug the

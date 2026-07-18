@@ -12115,6 +12115,10 @@ import { computeThinsetCoverage as _v95a, computeFlooringTakeoff as _v95b, compu
 test("bounds: spec-v95 finish + v97 hardscape + v98 roofing trim-out", () => {
   assert.ok(_v95a({ area_sqft: 200, trowel: "quarter_three_eighths", waste_pct: 10 }).bags === 4);
   assert.ok(_v95a({ area_sqft: 200, trowel: "half", waste_pct: 10 }).bags === 5);
+  // bag_weight_lb scales the per-50-lb coverage (was a dead input): a 25-lb
+  // bag covers half the area, so it takes about double the bags (7 vs 4).
+  assert.ok(_v95a({ area_sqft: 200, trowel: "quarter_three_eighths", bag_weight_lb: 25, waste_pct: 10 }).cov_per_bag === 31.5);
+  assert.ok(_v95a({ area_sqft: 200, trowel: "quarter_three_eighths", bag_weight_lb: 25, waste_pct: 10 }).bags === 7);
   assert.ok("error" in _v95a({ area_sqft: 0 }));
   const b = _v95b({ room_length_ft: 15, room_width_ft: 12, box_coverage_sqft: 20, pattern: "straight", plank_width_in: 7.5 });
   assert.ok(b.boxes === 10 && b.full_rows === 19 && b.rip_needed === true && Math.abs(b.start_width - 4.5) < 1e-9);
@@ -19238,6 +19242,11 @@ test("bounds: spec-v369 computeBrickVeneerAnchorSpacing pins the ceil count and 
   // A tighter demand limit adds anchors.
   const hw = _v369({ area_ft2: 200, area_per: 2.0 });
   assert.strictEqual(hw.anchors, 100);
+  // Tighter max spacing grid governs the count (was ignored): a 12 x 12 in
+  // grid = 1.0 ft^2/anchor < the 2.67 ft^2 area limit -> ceil(200/1.0) = 200.
+  const tight = _v369({ area_ft2: 200, area_per: 2.67, max_horiz_in: 12, max_vert_in: 12 });
+  assert.strictEqual(tight.anchors, 200);
+  assert.strictEqual(tight.spacing_governs, true);
   // Error seams.
   assert.ok("error" in _v369({ area_ft2: 0, area_per: 2.67 }));
   assert.ok("error" in _v369({ area_ft2: 200, area_per: 0 }));

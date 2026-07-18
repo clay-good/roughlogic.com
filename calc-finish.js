@@ -86,7 +86,13 @@ export function computeThinsetCoverage({ area_sqft = 0, trowel = "quarter_three_
   if (waste_pct < 0) return { error: "Waste must be non-negative." };
   if (!(area_sqft > 0)) return { error: "Area must be positive." };
   if (!(bag_weight_lb > 0)) return { error: "Bag weight must be positive." };
-  const cov_per_bag = coverage_per_bag > 0 ? coverage_per_bag : _THINSET_COVERAGE[trowel];
+  // The trowel-notch coverage table is per 50-lb bag; a different bag weight
+  // carries proportionally more/less mortar, so scale the table value by
+  // bag_weight/50. A user-entered coverage override is taken as the coverage
+  // for their actual bag and is not re-scaled.
+  const cov_per_bag = coverage_per_bag > 0
+    ? coverage_per_bag
+    : _THINSET_COVERAGE[trowel] * (bag_weight_lb / 50);
   if (!(cov_per_bag > 0)) return { error: "Choose a trowel size or enter a per-bag coverage." };
   const order_area = area_sqft * (1 + waste_pct / 100);
   return {

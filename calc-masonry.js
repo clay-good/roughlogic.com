@@ -277,9 +277,14 @@ export function computeBrickVeneerAnchorSpacing({ area_ft2 = 0, area_per = 2.67,
   const mv = Number(max_vert_in) > 0 ? Number(max_vert_in) : 24;
   if (!(area > 0)) return { error: "Veneer wall area must be positive (ft^2)." };
   if (!(per > 0)) return { error: "Maximum area per anchor must be positive (ft^2)." };
-  const anchors = Math.ceil(area / per);
-  const grid_ft2 = area / anchors;
+  // Each anchor must satisfy BOTH the area-per-anchor limit AND the maximum
+  // horizontal x vertical spacing grid, so the effective coverage is the
+  // tighter (smaller) of the two -- otherwise the spacing caps the note and
+  // citation say govern would never actually reduce the count.
   const max_grid_ft2 = (mh * mv) / 144;
+  const eff_per = Math.min(per, max_grid_ft2);
+  const anchors = Math.ceil(area / eff_per);
+  const grid_ft2 = area / anchors;
   const spacing_governs = max_grid_ft2 < per;
   return {
     anchors, grid_ft2, max_horiz_in: mh, max_vert_in: mv, max_grid_ft2, spacing_governs,
