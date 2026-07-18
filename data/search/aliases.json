@@ -29352,6 +29352,31 @@
       "kind": "question"
     },
     {
+      "term": "ro recovery",
+      "target": "ro-recovery-concentration",
+      "kind": "industry"
+    },
+    {
+      "term": "reverse osmosis recovery",
+      "target": "ro-recovery-concentration",
+      "kind": "industry"
+    },
+    {
+      "term": "concentration factor",
+      "target": "ro-recovery-concentration",
+      "kind": "industry"
+    },
+    {
+      "term": "ro concentrate flow",
+      "target": "ro-recovery-concentration",
+      "kind": "adjacent"
+    },
+    {
+      "term": "membrane recovery rate",
+      "target": "ro-recovery-concentration",
+      "kind": "adjacent"
+    },
+    {
       "term": "filter area for loading",
       "target": "filter-area-for-loading",
       "kind": "industry"

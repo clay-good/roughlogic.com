@@ -411,6 +411,7 @@ const RELATED = {
   "disinfection-ct": ["detention-time", "pounds-formula", "coagulant-dose"],
   "coagulant-dose": ["pounds-formula", "disinfection-ct"],
   "filter-loading": ["detention-time", "pump-eff-w2w"],
+  "ro-recovery-concentration": ["filter-loading", "detention-time", "pounds-formula"],
   "filter-area-for-loading": ["filter-loading", "detention-basin-volume", "detention-time"],
   // v16 Group M first-principles batch.
   "pool-turnover": ["chlorine-decay", "pounds-formula", "disinfection-ct"],

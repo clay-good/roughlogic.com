@@ -1762,3 +1762,55 @@ const renderAerationOxygenDemand = _v23SimpleRenderer({
   compute: computeAerationOxygenDemand,
 });
 WATER_RENDERERS["aeration-oxygen-demand"] = renderAerationOxygenDemand;
+
+// ===================== spec-v926: RO recovery, concentrate flow, and concentration factor =====================
+// dims: in { feed_gpm: L^3 T^-1, permeate_gpm: L^3 T^-1, feed_tds_mgl: M L^-3 } out: { recovery_pct: dimensionless, concentrate_gpm: L^3 T^-1, concentration_factor: dimensionless, concentrate_tds_mgl: M L^-3 }
+export function computeRoRecoveryConcentration({ feed_gpm = 10, permeate_gpm = 7.5, feed_tds_mgl = 500 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(feed_gpm > 0)) return { error: "Feed flow must be positive (gpm)." };
+  if (!(permeate_gpm > 0)) return { error: "Permeate flow must be positive (gpm)." };
+  if (feed_tds_mgl < 0) return { error: "Feed TDS cannot be negative (mg/L)." };
+  if (!(permeate_gpm < feed_gpm)) return { error: "Permeate flow must be less than the feed flow (recovery below 100%)." };
+  const recovery = permeate_gpm / feed_gpm;
+  const recovery_pct = recovery * 100;
+  const concentrate_gpm = feed_gpm - permeate_gpm;
+  const concentration_factor = 1 / (1 - recovery);
+  const concentrate_tds_mgl = concentration_factor * feed_tds_mgl;
+  if (![recovery_pct, concentrate_gpm, concentration_factor, concentrate_tds_mgl].every(Number.isFinite)) return { error: "RO recovery math is not a finite value." };
+  return {
+    recovery_pct,
+    concentrate_gpm,
+    concentration_factor,
+    concentrate_tds_mgl,
+    note: "Reverse-osmosis mass balance: recovery R = permeate / feed, concentrate (reject) flow = feed - permeate, and the concentration factor CF = 1 / (1 - R) is how much the rejected salts are concentrated in the reject stream. At 75% recovery CF = 4, so a 500 mg/L feed leaves about a 2,000 mg/L concentrate (assuming near-complete rejection). Pushing recovery higher shrinks the reject flow but raises CF sharply -- past the scaling limit of the least-soluble salt (calcium carbonate, sulfate, silica) the membrane fouls, which antiscalant dosing and the LSI govern. The membrane manufacturer's projection software and the state primacy agency (for a public system) govern the actual design.",
+  };
+}
+
+export const roRecoveryConcentrationExample = { inputs: { feed_gpm: 10, permeate_gpm: 7.5, feed_tds_mgl: 500 } };
+
+function _v926renderRoRecoveryConcentration(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: RO mass balance by name (AMTA / AWWA membrane practice). recovery = permeate/feed; concentrate flow = feed - permeate; concentration factor CF = 1/(1-recovery); concentrate TDS ~ CF x feed TDS at high rejection. The membrane maker's projection and the state primacy agency govern.";
+  const fd = makeNumber("Feed flow (gpm)", "ror-fd", { step: "any", min: "0", value: "10" });
+  fd.input.value = "10";
+  const pm = makeNumber("Permeate flow (gpm)", "ror-pm", { step: "any", min: "0", value: "7.5" });
+  pm.input.value = "7.5";
+  const td = makeNumber("Feed TDS (mg/L)", "ror-td", { step: "any", min: "0", value: "500" });
+  td.input.value = "500";
+  for (const f of [fd, pm, td]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fd.input.value = "10"; pm.input.value = "7.5"; td.input.value = "500"; update(); });
+  const oR = makeOutputLine(outputRegion, "Recovery", "ror-out-r");
+  const oC = makeOutputLine(outputRegion, "Concentrate (reject) flow", "ror-out-c");
+  const oCF = makeOutputLine(outputRegion, "Concentration factor / reject TDS", "ror-out-cf");
+  const update = debounce(() => {
+    const r = computeRoRecoveryConcentration({
+      feed_gpm: fd.input.value === "" ? 10 : Number(fd.input.value), permeate_gpm: pm.input.value === "" ? 7.5 : Number(pm.input.value),
+      feed_tds_mgl: td.input.value === "" ? 500 : Number(td.input.value),
+    });
+    if (r.error) { oR.textContent = r.error; oC.textContent = "-"; oCF.textContent = "-"; return; }
+    oR.textContent = fmt(r.recovery_pct, 1) + "%";
+    oC.textContent = fmt(r.concentrate_gpm, 2) + " gpm";
+    oCF.textContent = fmt(r.concentration_factor, 2) + "x -> " + fmt(r.concentrate_tds_mgl, 0) + " mg/L reject";
+  }, DEBOUNCE_MS);
+  for (const f of [fd, pm, td]) f.input.addEventListener("input", update);
+}
+WATER_RENDERERS["ro-recovery-concentration"] = _v926renderRoRecoveryConcentration;

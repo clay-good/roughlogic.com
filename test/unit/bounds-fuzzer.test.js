@@ -26797,6 +26797,25 @@ test("bounds: spec-v920 computeCementBoardTakeoff pins the sheets, screws, and e
   assert.ok("error" in _v920({ area_sf: Infinity, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 35 }));
 });
 
+import { computeRoRecoveryConcentration as _v926 } from "../../calc-water.js";
+
+test("bounds: spec-v926 computeRoRecoveryConcentration pins recovery, CF, reject TDS, and error seams", () => {
+  const r = _v926({ feed_gpm: 10, permeate_gpm: 7.5, feed_tds_mgl: 500 });
+  assert.ok(Math.abs(r.recovery_pct - 75) < 1e-9); // 7.5/10
+  assert.ok(Math.abs(r.concentrate_gpm - 2.5) < 1e-9);
+  assert.ok(Math.abs(r.concentration_factor - 4) < 1e-9); // 1/(1-0.75)
+  assert.ok(Math.abs(r.concentrate_tds_mgl - 2000) < 1e-9); // 4*500
+  // 50% recovery -> CF 2.
+  const h = _v926({ feed_gpm: 100, permeate_gpm: 50, feed_tds_mgl: 500 });
+  assert.ok(Math.abs(h.concentration_factor - 2) < 1e-9);
+  // Error seams: non-positive feed / permeate, negative TDS, permeate >= feed, non-finite.
+  assert.ok("error" in _v926({ feed_gpm: 0, permeate_gpm: 7.5 }));
+  assert.ok("error" in _v926({ feed_gpm: 10, permeate_gpm: 0 }));
+  assert.ok("error" in _v926({ feed_gpm: 10, permeate_gpm: 7.5, feed_tds_mgl: -1 }));
+  assert.ok("error" in _v926({ feed_gpm: 10, permeate_gpm: 10 })); // recovery 100%
+  assert.ok("error" in _v926({ feed_gpm: Infinity, permeate_gpm: 7.5 }));
+});
+
 import { computeRotaryPhaseConverter as _v925 } from "../../calc-motor.js";
 
 test("bounds: spec-v925 computeRotaryPhaseConverter pins the idler size, governing term, and error seams", () => {

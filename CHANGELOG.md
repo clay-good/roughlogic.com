@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(water): add ro-recovery-concentration tile (spec-v926); 2026-07-18
+
+- New Group M tile `ro-recovery-concentration` (RO Recovery, Concentrate Flow, and Concentration Factor) in
+  calc-water.js, beside filter-loading. recovery = permeate/feed; concentrate flow = feed - permeate; concentration
+  factor CF = 1/(1-recovery); reject TDS ~ CF x feed TDS at high rejection. 10 gpm feed / 7.5 gpm permeate = 75%
+  recovery, 2.5 gpm reject, CF 4, 500 -> 2,000 mg/L; 50% recovery = CF 2. High recovery raises CF past the scaling limit
+  (antiscalant/LSI govern). The membrane maker's projection and state primacy agency govern. Home count 1,374 -> 1,375.
+
 ### feat(electrical): add rotary-phase-converter-sizing tile (spec-v925); 2026-07-18
 
 - New Group A tile `rotary-phase-converter-sizing` (Rotary Phase Converter Idler Sizing) in calc-motor.js, beside

@@ -34602,6 +34602,68 @@
    }
   },
   {
+   "tile_id": "ro-recovery-concentration",
+   "source_publisher": "RO mass balance (AMTA / AWWA)",
+   "source_title": "10 gpm feed, 7.5 gpm permeate, 500 mg/L feed -> 75% recovery, 2.5 gpm reject, CF 4, 2000 mg/L",
+   "source_edition_or_year": "spec-v926 worked example (machine-verified)",
+   "source_section_or_page": "R = 7.5/10 = 0.75; reject = 2.5; CF = 1/(1-0.75) = 4; reject TDS = 4*500 = 2000",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "feed_gpm": 10,
+    "permeate_gpm": 7.5,
+    "feed_tds_mgl": 500
+   },
+   "outputs": {
+    "recovery_pct": {
+     "value": 75,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "concentration_factor": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "concentrate_tds_mgl": {
+     "value": 2000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ro-recovery-concentration",
+   "source_publisher": "RO mass balance (AMTA / AWWA)",
+   "source_title": "cross-check: 100 gpm feed, 50 gpm permeate -> 50% recovery, CF 2",
+   "source_edition_or_year": "spec-v926 worked example (machine-verified)",
+   "source_section_or_page": "R = 50/100 = 0.50; CF = 1/(1-0.50) = 2",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "feed_gpm": 100,
+    "permeate_gpm": 50,
+    "feed_tds_mgl": 500
+   },
+   "outputs": {
+    "recovery_pct": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "concentration_factor": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rotary-phase-converter-sizing",
    "source_publisher": "rotary phase converter idler sizing (industry rule)",
    "source_title": "10 HP largest, 15 HP total running, 2x start -> 20 HP idler (starting governs)",

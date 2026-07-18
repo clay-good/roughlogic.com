@@ -4988,6 +4988,17 @@ export const CITATIONS = {
       { name: "Default backwash rate", value: "15 gpm/ft² unless user supplies", source: "Ten States Standards typical" },
     ],
   },
+  "ro-recovery-concentration": {
+    formula: "recovery = permeate_gpm / feed_gpm; concentrate_gpm = feed_gpm - permeate_gpm; concentration_factor = 1 / (1 - recovery); concentrate_tds_mgl = concentration_factor x feed_tds_mgl (near-complete rejection).",
+    edition: "AMTA (American Membrane Technology Association) and AWWA membrane-treatment practice, by name; the membrane manufacturer's projection software and the state primacy agency govern the design.",
+    freeAccess: "The recovery / concentration-factor relations are public first-principles mass balance; the feed and permeate flows and the feed TDS come from the operating data.",
+    governance: GOVERNANCE.water,
+    editionNote: "The reverse-osmosis (or nanofiltration) mass balance. Recovery R = permeate / feed is the fraction of feed turned into product; the concentrate (reject) flow = feed - permeate carries the rejected salts; and the concentration factor CF = 1 / (1 - R) is how many times those salts are concentrated in the reject (exact for a fully-rejected solute). So the reject TDS is about CF x feed TDS at high rejection. Raising recovery shrinks the reject flow to waste but raises CF sharply, and past the scaling saturation of the least-soluble salt (calcium carbonate by the LSI, calcium sulfate, barium sulfate, silica) the membrane scales -- antiscalant dosing, acid, and the projected saturation govern that recovery ceiling. This is the operating mass balance; the membrane manufacturer's projection software and, for a public water system, the state primacy agency govern the actual design and permit.",
+    assumptions: [
+      { name: "Mass balance", value: "recovery = permeate/feed; CF = 1/(1-recovery); reject TDS ~ CF x feed TDS at high rejection", source: "AMTA / AWWA membrane practice" },
+      { name: "Scaling ceiling", value: "high recovery raises CF past the least-soluble salt's saturation; antiscalant and the LSI govern", source: "membrane scaling control" },
+    ],
+  },
   "filter-area-for-loading": {
     formula: "Required filter area (ft²) = design_flow / target_loading. Backwash flow = backwash_rate × area. Bands: rapid sand 2-5 gpm/ft², high-rate 5-8 gpm/ft².",
     edition: "Ten States Standards (Recommended Standards for Water Works), Great Lakes - Upper Mississippi River Board of State and Provincial Public Health and Environmental Managers, current edition by name. AWWA B100 / B130 (filter media) by name.",
