@@ -360,3 +360,22 @@ test("NEC electrical ordered tables: EGC by OCPD, conduit area by trade size, an
     }
   }
 });
+
+// Cross-tile physical consistency: computeThreePhase (P from V, I, pf) and
+// computeBreakerSize (current derived from watts, V, pf) encode the same
+// three-phase relation P = sqrt(3) * V_LL * I_L * pf from opposite directions,
+// so feeding one's output into the other must recover the original current. A
+// wrong sqrt(3) factor or power formula in either tile breaks the round-trip --
+// the "sibling" divergence class the formula audit used, invisible to the
+// per-tile fixtures that test each tile alone.
+test("cross-tile: three-phase power and breaker sizing round-trip the sqrt(3) V I pf relation", () => {
+  for (const [V, I, pf] of [[480, 100, 0.9], [208, 50, 0.85], [240, 30, 1.0], [600, 75, 0.8]]) {
+    const tp = computeThreePhase({ V_LL: V, I_L: I, pf });
+    // P = sqrt(3) V I pf, cross-checked against the closed form.
+    assert.ok(Math.abs(tp.P_W - Math.sqrt(3) * V * I * pf) < 1e-6, `threePhase P_W wrong at ${V}/${I}/${pf}`);
+    const bs = computeBreakerSize({ load_W: tp.P_W, voltage_V: V, power_factor: pf, phase: "three", continuous: false });
+    assert.ok(!bs.error, `breakerSize errored at ${V}/${I}/${pf}`);
+    assert.ok(Math.abs(bs.derived_load_A - I) < 1e-6,
+      `breaker-derived current ${bs.derived_load_A} != original ${I} at ${V} V / pf ${pf} -- three-phase relation diverges between tiles`);
+  }
+});

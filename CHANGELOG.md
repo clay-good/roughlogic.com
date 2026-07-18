@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(electrical): cross-tile round-trip of the three-phase power relation (three-phase-power <-> breaker-sizing); 2026-07-17
+
+- Added a cross-tile guard: computeThreePhase (P from V, I, pf) and computeBreakerSize (current from watts, V, pf) encode
+  the same P = sqrt(3) x V_LL x I_L x pf relation from opposite directions, so feeding one's output into the other must
+  recover the original current. A wrong sqrt(3) factor or power formula in either tile breaks the round-trip -- the
+  "sibling" class the formula audit used, invisible to per-tile fixtures. Test-only.
+
 ### test(refrigerant): cross-tile consistency of saturation temperature between refrigerant-pt and superheat-subcool; 2026-07-17
 
 - Added a cross-tile guard on the safety-critical charging data: refrigerant-pt and superheat-subcool both derive the
