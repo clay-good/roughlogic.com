@@ -34550,6 +34550,58 @@
    }
   },
   {
+   "tile_id": "cement-board-takeoff",
+   "source_publisher": "cement-board takeoff (ANSI A108 / TCNA)",
+   "source_title": "120 sf tub surround, 15 sf sheets, 10% waste, 35 screws/sheet -> 9 sheets, 315 screws",
+   "source_edition_or_year": "spec-v920 worked example (machine-verified)",
+   "source_section_or_page": "sheets = ceil(120*1.10/15) = ceil(8.8) = 9; screws = 9*35 = 315",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "area_sf": 120,
+    "sheet_area_sf": 15,
+    "waste_pct": 10,
+    "screws_per_sheet": 35
+   },
+   "outputs": {
+    "sheets": {
+     "value": 9,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "screws": {
+     "value": 315,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cement-board-takeoff",
+   "source_publisher": "cement-board takeoff (ANSI A108 / TCNA)",
+   "source_title": "cross-check: 200 sf floor, 15 sf sheets, 10% waste -> 15 sheets",
+   "source_edition_or_year": "spec-v920 worked example (machine-verified)",
+   "source_section_or_page": "sheets = ceil(200*1.10/15) = ceil(14.67) = 15",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "area_sf": 200,
+    "sheet_area_sf": 15,
+    "waste_pct": 10,
+    "screws_per_sheet": 35
+   },
+   "outputs": {
+    "sheets": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "brick-veneer-weep-count",
    "source_publisher": "brick veneer weep spacing (IRC R703.8.6)",
    "source_title": "30 ft wall, 33 in max spacing, 1 flashing line -> 12 weeps",

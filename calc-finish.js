@@ -523,3 +523,39 @@ FINISH_RENDERERS["soffit-ridge-vent-count"] = _simpleRenderer({
   ],
   compute: computeSoffitRidgeVentCount,
 });
+
+// ===================== spec-v920: cement board (tile backer) takeoff =====================
+// dims: in { area_sf: L^2, sheet_area_sf: L^2, waste_pct: dimensionless, screws_per_sheet: dimensionless } out: { sheets: dimensionless, screws: dimensionless }
+export function computeCementBoardTakeoff({ area_sf = 120, sheet_area_sf = 15, waste_pct = 10, screws_per_sheet = 35 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_sf > 0)) return { error: "Area must be positive (sf)." };
+  if (!(sheet_area_sf > 0)) return { error: "Sheet area must be positive (sf)." };
+  if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  if (!(screws_per_sheet > 0)) return { error: "Screws per sheet must be positive." };
+  const sheets = Math.ceil(area_sf * (100 + waste_pct) / 100 / sheet_area_sf);
+  const screws = sheets * Math.round(screws_per_sheet);
+  if (![sheets, screws].every(Number.isFinite)) return { error: "Takeoff math is not a finite value." };
+  return {
+    sheets,
+    screws,
+    note: "Cement-board (tile backer) sheet and screw takeoff for a tub surround, wall, or floor: sheets = ceil(area x (1 + waste) / sheet area); a 3x5 ft board is 15 sf, a 3x4 is 12 sf. Fasteners run about every 8 in on the field and edges -- roughly 30 to 40 corrosion-resistant backer screws (or roofing nails) per 3x5 sheet. Add alkali-resistant mesh tape and thin-set at the joints (not counted here), and set the board over a moisture barrier per the wet-area detail. A material-ordering estimate; ANSI A108 / the TCNA Handbook and the board manufacturer govern the fastener schedule and the wet-area assembly.",
+  };
+}
+export const cementBoardTakeoffExample = { inputs: { area_sf: 120, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 35 } };
+
+FINISH_RENDERERS["cement-board-takeoff"] = _simpleRenderer({
+  citation: "Citation: cement-board takeoff by name. sheets = ceil(area x (1 + waste) / sheet area); screws = sheets x per-sheet (~30-40 at 8 in o.c.). Plus mesh tape and thin-set at joints (not counted). ANSI A108 / TCNA Handbook and the board maker govern the fastener schedule and wet-area assembly.",
+  example: cementBoardTakeoffExample.inputs,
+  fields: [
+    { key: "area_sf", label: "Backer area (sf)", kind: "number", default: 120 },
+    { key: "sheet_area_sf", label: "Sheet area (sf, 3x5 = 15)", kind: "number", default: 15 },
+    { key: "waste_pct", label: "Waste / cuts (%)", kind: "number", default: 10 },
+    { key: "screws_per_sheet", label: "Screws per sheet (~30-40)", kind: "number", default: 35 },
+  ],
+  outputs: [
+    { key: "s", id: "cbt-out-s", label: "Cement board sheets", value: (r) => fmt(r.sheets, 0) + " sheets" },
+    { key: "sc", id: "cbt-out-sc", label: "Backer screws", value: (r) => fmt(r.screws, 0) + " screws" },
+    { key: "n", id: "cbt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCementBoardTakeoff,
+});

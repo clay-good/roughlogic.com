@@ -1162,6 +1162,7 @@ const RELATED = {
   "fence-estimate": ["post-hole-concrete","equal-spacing","material-quantity"],
   "post-hole-concrete": ["fence-estimate","concrete","deck-beam-post"],
   "thinset-coverage": ["tile-count","flooring-takeoff","mortar-mix"],
+  "cement-board-takeoff": ["thinset-coverage","tile-count","drywall-fastener-takeoff"],
   "flooring-takeoff": ["tile-count","thinset-coverage","square-footage"],
   "control-joint-spacing": ["concrete","rebar","square-footage"],
   "rebar-lap-splice": ["rebar","rebar-schedule","concrete"],

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(finish): add cement-board-takeoff tile (spec-v920); 2026-07-18
+
+- New Group E tile `cement-board-takeoff` (Cement Board (Tile Backer) Sheet and Screw Takeoff) in calc-finish.js, beside
+  thinset-coverage. sheets = ceil(area x (1 + waste) / sheet area) (3x5 board = 15 sf); screws = sheets x per-sheet
+  (~30-40 at 8 in o.c.). A 120 sf tub surround at 10% waste = 9 sheets, ~315 screws; a 200 sf floor = 15 sheets. Mesh
+  tape and thin-set at joints not counted; distinct from the gypsum drywall takeoff. ANSI A108 / TCNA Handbook and the
+  board maker govern the fastener schedule and wet-area assembly. Home count 1,368 -> 1,369.
+
 ### feat(masonry): add brick-veneer-weep-count tile (spec-v919); 2026-07-18
 
 - New Group E tile `brick-veneer-weep-count` (Brick Veneer Weep-Hole Count, IRC R703.8.6) in calc-masonry.js, beside

@@ -10649,6 +10649,17 @@ export const CITATIONS = {
       { name: "Mortar contact", value: "ANSI A108 ~80% dry / 95% wet or exterior (do not stretch a bag)", source: "ANSI A108" },
     ],
   },
+  "cement-board-takeoff": {
+    formula: "sheets = ceil(area_sf x (1 + waste_pct/100) / sheet_area_sf); screws = sheets x round(screws_per_sheet).",
+    edition: "ANSI A108 / TCNA Handbook cement-board installation practice, by name; the board manufacturer governs the fastener schedule and wet-area assembly.",
+    freeAccess: "The takeoff arithmetic is public first-principles (area over sheet size); the ~30-40 screws per 3x5 sheet at 8 in o.c. and the wet-area detail come from the board manufacturer and ANSI A108 / TCNA.",
+    governance: GOVERNANCE.general,
+    editionNote: "Cement-board (tile backer) sheet and screw takeoff: sheets = ceil(area x (1 + waste) / sheet area). A 3x5 ft board is 15 sf, a 3x4 is 12 sf. Corrosion-resistant backer screws (or roofing nails) run about every 8 in on the field and edges, roughly 30 to 40 per 3x5 sheet. Alkali-resistant mesh tape and thin-set fill the joints (not counted here), and the board is set over a moisture barrier or with a waterproofing membrane per the wet-area detail. This is distinct from the gypsum drywall takeoff. A material-ordering estimate; ANSI A108, the TCNA Handbook, and the board manufacturer govern the fastener schedule and the wet-area assembly.",
+    assumptions: [
+      { name: "Sheet size", value: "3x5 ft = 15 sf, 3x4 ft = 12 sf; sheets = ceil(area x (1+waste) / sheet area)", source: "cement-board products" },
+      { name: "Fastener schedule", value: "~30-40 backer screws per 3x5 sheet at ~8 in o.c.; the board maker governs", source: "ANSI A108 / TCNA Handbook" },
+    ],
+  },
   "flooring-takeoff": {
     formula: "Boxes = ceil(area x (1 + pattern waste) / box coverage); last row from full_rows = floor(width / plank), rip if the remainder is under a third of a plank.",
     edition: "Published flooring waste rules of thumb and the standard last-row balancing rule.",

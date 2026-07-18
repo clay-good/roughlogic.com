@@ -26782,6 +26782,21 @@ test("bounds: spec-v910 computeKnurlBlankDiameter pins the teeth, blank diameter
   assert.ok("error" in _v910({ target_diameter_in: Infinity, knurl_tpi: 21 }));
 });
 
+import { computeCementBoardTakeoff as _v920 } from "../../calc-finish.js";
+
+test("bounds: spec-v920 computeCementBoardTakeoff pins the sheets, screws, and error seams", () => {
+  const r = _v920({ area_sf: 120, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 35 });
+  assert.equal(r.sheets, 9); // ceil(120*1.10/15) = ceil(8.8)
+  assert.equal(r.screws, 315); // 9 * 35
+  assert.equal(_v920({ area_sf: 200, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 35 }).sheets, 15); // ceil(14.67)
+  // Error seams: non-positive area / sheet / screws, negative waste, non-finite.
+  assert.ok("error" in _v920({ area_sf: 0, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 35 }));
+  assert.ok("error" in _v920({ area_sf: 120, sheet_area_sf: 0, waste_pct: 10, screws_per_sheet: 35 }));
+  assert.ok("error" in _v920({ area_sf: 120, sheet_area_sf: 15, waste_pct: -5, screws_per_sheet: 35 }));
+  assert.ok("error" in _v920({ area_sf: 120, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 0 }));
+  assert.ok("error" in _v920({ area_sf: Infinity, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 35 }));
+});
+
 import { computeBrickVeneerWeepCount as _v919 } from "../../calc-masonry.js";
 
 test("bounds: spec-v919 computeBrickVeneerWeepCount pins the weep count, flashing lines, and error seams", () => {

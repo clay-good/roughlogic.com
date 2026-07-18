@@ -6817,6 +6817,31 @@
       "kind": "redirect"
     },
     {
+      "term": "cement board takeoff",
+      "target": "cement-board-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "backer board takeoff",
+      "target": "cement-board-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "tile backer sheets",
+      "target": "cement-board-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "cement board sheets",
+      "target": "cement-board-takeoff",
+      "kind": "adjacent"
+    },
+    {
+      "term": "durock takeoff",
+      "target": "cement-board-takeoff",
+      "kind": "adjacent"
+    },
+    {
       "term": "tile mortar coverage",
       "target": "thinset-coverage",
       "kind": "adjacent"
