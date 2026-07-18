@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(lab): guard centrifuge RCF and Beer-Lambert concentration with monotonicity; 2026-07-17
+
+- Whole-response guards: RCF = 1.118 x r(mm) x (rpm/1000)^2 rises with radius and speed and quadruples when rpm
+  doubles (rpm-squared law); Beer-Lambert c = A / (epsilon x path) rises with absorbance and falls with molar
+  absorptivity and path length. Test-only.
+
 ### test(accounting): guard breakeven and straight-line depreciation with monotonicity; 2026-07-17
 
 - Whole-response guards: breakeven units = fixed / (price - variable) rise with fixed costs and variable cost, fall as

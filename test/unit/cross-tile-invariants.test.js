@@ -12117,3 +12117,17 @@ test("monotonicity: breakeven units and straight-line depreciation track their i
   assert.ok(sl({ life_years: 10 }).annual_depreciation < sl({}).annual_depreciation, "annual depreciation must fall as the service life lengthens");
   assert.ok(Math.abs(sl({}).annual_depreciation - (10000 - 1000) / 5) < 1e-9, "straight-line = (cost - salvage) / life");
 });
+
+test("monotonicity: centrifuge RCF and Beer-Lambert concentration track their inputs (lab)", async () => {
+  const l = await import("../../calc-lab.js");
+  const rcf = (o) => l.computeRcf({ rotor_radius_mm: 100, rpm: 5000, ...o });
+  const bl = (o) => l.computeBeerLambert({ absorbance: 0.5, epsilon: 6220, path_length_cm: 1, ...o });
+  assert.ok(rcf({ rpm: 10000 }).rcf > rcf({}).rcf, "RCF must rise with rotor speed");
+  assert.ok(rcf({ rotor_radius_mm: 200 }).rcf > rcf({}).rcf, "RCF must rise with rotor radius");
+  assert.ok(Math.abs(rcf({ rpm: 10000 }).rcf / rcf({}).rcf - 4) < 1e-6, "RCF must quadruple when rpm doubles (rpm-squared law)");
+  assert.ok(Math.abs(rcf({}).rcf - 1.118 * 100 * Math.pow(5000 / 1000, 2)) < 1e-3, "RCF = 1.118 * r(mm) * (rpm/1000)^2");
+  assert.ok(bl({ absorbance: 1.0 }).concentration > bl({}).concentration, "concentration must rise with absorbance (Beer-Lambert)");
+  assert.ok(bl({ epsilon: 12440 }).concentration < bl({}).concentration, "concentration must fall as molar absorptivity rises");
+  assert.ok(bl({ path_length_cm: 2 }).concentration < bl({}).concentration, "concentration must fall as path length grows");
+  assert.ok(Math.abs(bl({}).concentration - 0.5 / (6220 * 1)) < 1e-12, "c = A / (epsilon * path length)");
+});
