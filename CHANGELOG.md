@@ -10,7 +10,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
   beside header-sizing. On the actual stud width: notch <= 25% (bearing/exterior) or 40% (nonbearing); bore <= 40%
   (single) or 60% (doubled), hole edge >= 5/8 in, not in the same section as a notch. A 2x6 (5.5 in) bearing stud allows
   a 1.375 in notch and a 2.20 in single bore; a 2x4 (3.5 in) nonbearing allows a 1.40 in notch. Prescriptive limits; the
-  AHJ-adopted code governs. Home count 1,371 -> 1,372.
+  AHJ-adopted code governs. Home count 1,371 -> 1,372. Raised the check-shells group-shell gzip cap 74 -> 80 KB (the
+  Group E construction shell crossed it; CI-only gate).
 
 ### feat(masonry): add masonry-joint-reinforcement tile (spec-v922); 2026-07-18
 
