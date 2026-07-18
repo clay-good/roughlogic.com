@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(geotech): guard Terzaghi/Vesic bearing capacity with physical monotonicity; 2026-07-17
+
+- Added a physical-invariant guard on computeSoilBearingCapacity (a foundation-design safety calc): ultimate bearing qu
+  must strictly increase with friction angle, cohesion, footing width, embedment (surcharge), and unit weight, and the
+  allowable q_all = qu / FS must fall with the factor of safety. A sign error or wrong-term bug breaks one of these; the
+  bounds-fuzzer pins the Vesic factors but not the whole-formula response. Test-only.
+
 ### test(hvac): cross-tile consistency of the ASHRAE sensible-heat load (SHR-latent <-> economizer); 2026-07-17
 
 - Added a cross-tile guard: the SHR/latent split tile (Q_sensible_btu_hr) and the economizer-savings tile (q_sens_btuh)

@@ -11746,3 +11746,25 @@ test("cross-tile: PITI, cost-of-waiting, and amortization-schedule agree on the 
   const M = 320000 * r / (1 - Math.pow(1 + r, -n));
   assert.ok(Math.abs(pPiti - M) < 1e-6, `P&I ${pPiti} != closed-form ${M}`);
 });
+
+// Physical monotonicity of the Terzaghi/Vesic bearing-capacity compute (a
+// foundation-design safety calc): ultimate bearing qu = c*Nc*sc + q*Nq*sq +
+// 0.5*gamma*B*Ngamma*sgamma must strictly increase with friction angle,
+// cohesion, footing width, embedment (surcharge), and unit weight, and the
+// allowable q_all = qu / FS must decrease with the factor of safety. A sign
+// error or wrong-term bug breaks one of these; the fuzzer pins the factors but
+// not the whole-formula response.
+test("monotonicity: computeSoilBearingCapacity qu rises with phi/c/B/Df/gamma and q_all = qu/FS falls with FS", async () => {
+  const m = await import("../../calc-geotech.js");
+  const base = { c: 500, phi: 30, gamma: 120, b_ft: 5, df_ft: 3, shape: "strip", fs: 3 };
+  const qu = (o) => m.computeSoilBearingCapacity({ ...base, ...o }).qu;
+  assert.ok(qu({ phi: 35 }) > qu({ phi: 30 }), "qu must rise with friction angle");
+  assert.ok(qu({ c: 1000 }) > qu({ c: 500 }), "qu must rise with cohesion");
+  assert.ok(qu({ b_ft: 8 }) > qu({ b_ft: 5 }), "qu must rise with footing width");
+  assert.ok(qu({ df_ft: 6 }) > qu({ df_ft: 3 }), "qu must rise with embedment depth (surcharge)");
+  assert.ok(qu({ gamma: 140 }) > qu({ gamma: 120 }), "qu must rise with unit weight");
+  const fs2 = m.computeSoilBearingCapacity({ ...base, fs: 2 });
+  const fs4 = m.computeSoilBearingCapacity({ ...base, fs: 4 });
+  assert.ok(fs2.q_all > fs4.q_all, "allowable must fall as FS rises");
+  assert.ok(Math.abs(fs2.q_all - fs2.qu / 2) < 1e-6, "q_all must equal qu / FS");
+});
