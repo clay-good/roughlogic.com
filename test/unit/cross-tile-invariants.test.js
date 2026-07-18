@@ -12256,3 +12256,16 @@ test("consistency: fiber loss budget and its max-length inverse round-trip, and 
   const ml = l.computeFiberMaxLength({ max_channel_loss_db: fl({}).total_loss_db, attenuation_db_km: 0.35, connector_count: 4, loss_per_connector_db: 0.75, splice_count: 2, loss_per_splice_db: 0.3 });
   assert.ok(Math.abs(ml.max_length_m - 1000) < 1e-6, "fiber loss budget and its max-length inverse must round-trip the link length");
 });
+
+test("monotonicity: continuous-load OCPD sizing applies the 1.25 factor and picks the next standard rating (feeder)", async () => {
+  const f = await import("../../calc-feeder.js");
+  const cl = (o) => f.computeContinuousLoadOcpd({ l_cont_A: 80, l_noncont_A: 20, rated_100: false, ...o });
+  assert.ok(Math.abs(cl({}).A_min - (1.25 * 80 + 20)) < 1e-9, "A_min = 1.25*continuous + noncontinuous (NEC 210.20(A)/215.3)");
+  assert.ok(cl({ l_cont_A: 120 }).A_min > cl({}).A_min, "A_min must rise with continuous load");
+  assert.ok(cl({ l_noncont_A: 50 }).A_min > cl({}).A_min, "A_min must rise with noncontinuous load");
+  assert.ok(cl({ rated_100: true }).A_min < cl({}).A_min, "a 100%-rated assembly drops the 1.25 factor and lowers A_min");
+  assert.ok(Math.abs(cl({ rated_100: true }).A_min - (80 + 20)) < 1e-9, "100%-rated A_min = continuous + noncontinuous");
+  assert.ok(cl({}).ocpd_A >= cl({}).A_min, "the chosen OCPD must be at or above the minimum rating");
+  assert.ok(cl({ l_cont_A: 200 }).ocpd_A >= cl({}).ocpd_A, "the standard OCPD rating must not shrink as the load grows");
+  assert.strictEqual(cl({}).ocpd_A, 125, "80 A continuous + 20 A -> 120 A -> the next 240.6(A) size is 125 A");
+});

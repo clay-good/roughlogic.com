@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(feeder): guard continuous-load OCPD sizing with monotonicity; 2026-07-17
+
+- Whole-response guards: A_min = 1.25 x continuous + noncontinuous (NEC 210.20(A)/215.3) rises with both loads, a
+  100%-rated assembly drops the 1.25 factor, the chosen 240.6(A) device is at or above A_min and never shrinks as load
+  grows (80 A continuous + 20 A -> 125 A). Test-only.
+
 ### test(lowvoltage): round-trip fiber loss budget against its max-length inverse; 2026-07-17
 
 - Consistency guard: fiber link loss = length x attenuation + connectors x loss + splices x loss rises with each term,
