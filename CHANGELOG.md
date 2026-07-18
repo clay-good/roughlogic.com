@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs(kitchen): sync brine-cure citation + derivation text to the green-meat nitrite fix; 2026-07-17
+
+- The #19 brine-cure fix corrected the compute but left the CITATION formula (citations.js, user-facing) and two
+  derivation strings still describing the old "nitrite ppm = cure*0.0625*1e6/total ... 152 ppm". Updated the citation
+  formula, the calc-kitchen dims comment, and the hand-authored spec-v20 derivation row (docs/derivations.md, ungated -
+  build-tile-index only regenerates the auto index) to the equilibrium green-meat basis (cure*0.0625*1e6/meat -> 156 ppm).
+
 ### fix(test): update 3 straggler pins missed by the masonry + wind-pressure fixes; 2026-07-17
 
 - The masonry-count (#18) and wind-pressure Kz (#20) fixes left three mirror-written pins in OTHER test files still

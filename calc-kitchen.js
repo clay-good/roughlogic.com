@@ -621,7 +621,8 @@ export const KITCHEN_RENDERERS = {
 
 // --- v20 O.1: Brine / cure concentration (`brine-cure`) ---
 // brine% = salt/(salt+water)*100; equilibrium salt% = salt/(meat+water)*100;
-// nitrite ppm = cure*0.0625*1e6/total; salt-to-add = target%*total/100 - salt.
+// equilibrium ingoing nitrite ppm = cure*0.0625*1e6/meat (green meat weight, 9 CFR 424.22);
+// brine nitrite ppm = cure*0.0625*1e6/(salt+water+cure); salt-to-add = target%*total/100 - salt.
 // dims: in { mode: dimensionless, water_g: M, salt_g: M, meat_g: M, cure_g: M, target_pct: dimensionless } out: { concentration_pct: dimensionless, nitrite_ppm: dimensionless }
 export function computeBrineCure({ mode = "brine", water_g = 0, salt_g = 0, meat_g = 0, cure_g = 0, target_pct = 0 } = {}) {
   const water = Number(water_g) || 0;

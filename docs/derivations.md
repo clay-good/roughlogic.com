@@ -3052,7 +3052,7 @@ Row count: 1604.
 | `langelier-index` | Langelier Saturation Index | Langelier LSI = pH - pHs; pH 7.5/25 C/Ca 200/alk 150/TDS 320 -> +0.04 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chemical-feed-pump` | Chemical Metering-Pump Setting | Pounds formula; 0.5 MGD*8*8.34/0.125/(8.34*1.16) = 27.6 GPD -> 55% of 50 GPD pump | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `power-distro` | Power Distro Per-Leg Loading | AC power 3-phase I = W/(sqrt(3)*V*PF); 12kW/208 V -> 33.3 A/leg, pass (80% of 60) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `brine-cure` | Brine / Cure Concentration | Mass fraction; nitrite ppm = cure*0.0625*1e6/total; 2.5 g cure / 1027.5 g -> 152 ppm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `brine-cure` | Brine / Cure Concentration | Mass fraction; equilibrium ingoing nitrite ppm = cure*0.0625*1e6/meat (green meat weight, 9 CFR 424.22); 2.5 g cure / 1000 g meat -> 156 ppm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `search-probability` | Search Probability of Detection | Koopman; cumPOD = 1-(0.7*0.6*0.5) = 79%; POS = 0.6*0.79 = 47.4% | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `declining-balance-depreciation` | Declining-Balance Depreciation (Book) | ASC 360 DDB; rate = 2/5 = 0.4; Yr1 = 50000*0.4 = $20,000; book $30,000 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `markup-vs-margin` | Markup vs. Margin Converter | CVP; price = 60*1.5 = $90; margin = 30/90 = 33.3% | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |

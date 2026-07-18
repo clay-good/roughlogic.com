@@ -585,7 +585,7 @@ export const CITATIONS = {
   },
 
   "brine-cure": {
-    formula: "brine% = salt/(salt+water)*100; equilibrium salt% = salt/(meat+water)*100; finished nitrite ppm = cure*0.0625*1e6/total; salt-to-add = target%*total/100 - salt.",
+    formula: "brine% = salt/(salt+water)*100; equilibrium salt% = salt/(meat+water)*100; equilibrium ingoing nitrite ppm = cure*0.0625*1e6/meat (green meat weight, 9 CFR 424.22); brine nitrite ppm = cure*0.0625*1e6/(salt+water+cure); salt-to-add = target%*total/100 - salt.",
     edition: "First-principles mass-fraction chemistry. Prague Powder #1 is 6.25% sodium nitrite; finished-product ingoing nitrite is limited per USDA FSIS regulation (9 CFR 424.21/424.22, by name).",
     freeAccess: "Free at fsis.usda.gov and ecfr.gov; the user confirms the current FSIS ingoing limit.",
     governance: GOVERNANCE.general,
