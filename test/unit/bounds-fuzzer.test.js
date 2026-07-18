@@ -27369,3 +27369,23 @@ test("bounds: spec-v943 computeOilWaterSeparatorSizing pins the Stokes rise, are
   assert.ok("error" in _v943({ flow_gpm: 50, oil_sg: 0.85, droplet_micron: 150, water_viscosity_cp: 0 }));
   assert.ok("error" in _v943({ flow_gpm: Infinity, oil_sg: 0.85, droplet_micron: 150, water_viscosity_cp: 1.1 }));
 });
+
+import { computeMotorAccelerationTime as _v944 } from "../../calc-motor.js";
+
+test("bounds: spec-v944 computeMotorAccelerationTime pins t = WK^2 dN / (308 T), the scalings, and error seams", () => {
+  const r = _v944({ inertia_lbft2: 100, speed_change_rpm: 1750, net_accel_torque_lbft: 50 });
+  assert.ok(Math.abs(r.accel_time_s - 11.363636) < 1e-4); // 100*1750/(308*50)
+  // Linear in inertia and speed change; inverse in net torque.
+  const dbl = _v944({ inertia_lbft2: 200, speed_change_rpm: 1750, net_accel_torque_lbft: 50 });
+  assert.ok(Math.abs(dbl.accel_time_s - 2 * r.accel_time_s) < 1e-6);
+  const halfT = _v944({ inertia_lbft2: 100, speed_change_rpm: 1750, net_accel_torque_lbft: 100 });
+  assert.ok(Math.abs(halfT.accel_time_s - r.accel_time_s / 2) < 1e-6);
+  const halfN = _v944({ inertia_lbft2: 100, speed_change_rpm: 875, net_accel_torque_lbft: 50 });
+  assert.ok(Math.abs(halfN.accel_time_s - r.accel_time_s / 2) < 1e-6);
+  // Error seams: non-positive inertia, speed change, or net torque (load out-torques the motor -> no start), non-finite.
+  assert.ok("error" in _v944({ inertia_lbft2: 0, speed_change_rpm: 1750, net_accel_torque_lbft: 50 }));
+  assert.ok("error" in _v944({ inertia_lbft2: 100, speed_change_rpm: 0, net_accel_torque_lbft: 50 }));
+  assert.ok("error" in _v944({ inertia_lbft2: 100, speed_change_rpm: 1750, net_accel_torque_lbft: 0 }));
+  assert.ok("error" in _v944({ inertia_lbft2: 100, speed_change_rpm: 1750, net_accel_torque_lbft: -5 }));
+  assert.ok("error" in _v944({ inertia_lbft2: Infinity, speed_change_rpm: 1750, net_accel_torque_lbft: 50 }));
+});

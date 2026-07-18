@@ -35000,6 +35000,50 @@
    }
   },
   {
+   "tile_id": "motor-acceleration-time",
+   "source_publisher": "Motor across-the-line acceleration time (rotational F = m a)",
+   "source_title": "100 lb-ft^2 inertia, 1750 rpm, 50 lb-ft net torque -> 11.36 s",
+   "source_edition_or_year": "spec-v944 worked example (machine-verified)",
+   "source_section_or_page": "t = WK^2*dN/(308*T_net) = 100*1750/(308*50) = 11.36 s",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "inertia_lbft2": 100,
+    "speed_change_rpm": 1750,
+    "net_accel_torque_lbft": 50
+   },
+   "outputs": {
+    "accel_time_s": {
+     "value": 11.36,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-acceleration-time",
+   "source_publisher": "Motor across-the-line acceleration time (rotational F = m a)",
+   "source_title": "cross-check: doubling the inertia to 200 lb-ft^2 doubles the start to 22.73 s",
+   "source_edition_or_year": "spec-v944 worked example (machine-verified)",
+   "source_section_or_page": "t = 200*1750/(308*50) = 22.73 s (linear in inertia)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "inertia_lbft2": 200,
+    "speed_change_rpm": 1750,
+    "net_accel_torque_lbft": 50
+   },
+   "outputs": {
+    "accel_time_s": {
+     "value": 22.73,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "jockey-pump-sizing",
    "source_publisher": "jockey pump sizing (NFPA 20)",
    "source_title": "750 gpm fire pump, 120 psi churn, 50 psi static -> 7.5 gpm jockey; stop 170 / start 160 / fp-start 155",

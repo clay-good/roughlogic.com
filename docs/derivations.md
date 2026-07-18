@@ -2463,6 +2463,7 @@ cross-check.
 | calc-metalair.js | `computeDuctTransitionLength` | `{ large_dim_in = 20, small_dim_in = 12, slope_deg = 15 } = {}` | _ | _ | _ |
 | calc-metalair.js | `computeGrooveWeldLengthForLoad` | `{ applied_load_lb = 0, weld_type = "PJP", effective_throat_in = 0, base_thick...` | _ | _ | _ |
 | calc-metalair.js | `computeGrooveWeldStrength` | `{ weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, length_i...` | _ | _ | _ |
+| calc-motor.js | `computeMotorAccelerationTime` | `{ inertia_lbft2 = 100, speed_change_rpm = 1750, net_accel_torque_lbft = 50 } ...` | _ | _ | _ |
 | calc-motor.js | `computeMotorFaultContribution` | `{ motor_fla_a = 0, x_subtransient_pu = 0.167, utility_fault_a = 0 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorLockedRotorKva` | `{ horsepower = 0, code_letter = "G", voltage_v = 0, phase = 3 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorMaxHpForStartingCurrent` | `{ max_starting_current_a = 0, code_letter = "G", voltage_v = 0, phase = 3 } = {}` | _ | _ | _ |
@@ -3053,7 +3054,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1639.
+Row count: 1640.
 
 <!-- END function-corpus-v14 -->
 
@@ -3134,7 +3135,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (176 tiles)
+### Group A Electrical (177 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3219,6 +3220,7 @@ per spec-v14 §13.1 second paragraph.
 | `max-grid-resistance-for-touch` | Max Grounding-Grid Resistance for the GPR Screen (IEEE 80) | IEEE Std 80 (ground potential rise); 200-V tolerable touch, 200-A grid current -> 1.0 ohm max ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `microinverter-branch-count` | Max Microinverters per AC Branch Circuit (NEC 705.60) | max microinverters per AC branch (NEC...; limit = 20*0.80 = 16 A; N = floor(16/1.21) = floor(13.22)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `min-conductor-for-vd` | Minimum Conductor Size for a Voltage-Drop Target | First-principles I x R voltage drop (...; spec-v109 section 2.3 (20 A, 150 ft one-way, 120 V, 3 per... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `motor-acceleration-time` | Motor Across-the-Line Acceleration Time | Motor across-the-line acceleration ti...; t = WK^2*dN/(308*T_net) = 100*1750/(308*50) = 11.36 s | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-branch-from-nameplate` | Motor Branch-Circuit from Nameplate | NFPA; §430.6(A)(1) reference-FLA tables; §430.22 125% rule; §43... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-branch-protection` | Motor Branch-Circuit Protection and Disconnect (NEC 430.52 / 430.110) | NEC 2023 (NFPA 70); 10 HP 230 V 3ph FLC 28 A x 250% = 70 A (standard); discon... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-capacitor-max` | Max Capacitor kVAR at Motor Terminals (Self-Excitation Limit) | NEMA MG-1 / IEEE 18; 480 V, 8 A no-load: sqrt(3) x 480 x 8 / 1000 = 6.65 kVAR;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4631,6 +4633,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1392. Fixture-covered or reference-cadence: 1392 / 1392.
+Tile count: 1393. Fixture-covered or reference-cadence: 1393 / 1393.
 
 <!-- END tile-index-v14 -->

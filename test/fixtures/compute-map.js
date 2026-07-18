@@ -1037,6 +1037,7 @@ export const COMPUTE_MAP = {
   "reduced-voltage-starter": { module: "../../calc-motor.js", fn: "computeReducedVoltageStarter" },
   "vfd-reflected-wave": { module: "../../calc-motor.js", fn: "computeVfdReflectedWave" },
   "rotary-phase-converter-sizing": { module: "../../calc-motor.js", fn: "computeRotaryPhaseConverter" },
+  "motor-acceleration-time": { module: "../../calc-motor.js", fn: "computeMotorAccelerationTime" },
   "harmonic-resonance": { module: "../../calc-powerquality.js", fn: "computeHarmonicResonance" },
   "capacitor-bank-for-resonance-order": { module: "../../calc-powerquality.js", fn: "computeCapacitorBankForResonanceOrder" },
   "tdd-ieee-519": { module: "../../calc-powerquality.js", fn: "computeTddIeee519" },

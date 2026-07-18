@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): add motor-acceleration-time tile (spec-v944); 2026-07-18
+
+- New Group A tile `motor-acceleration-time` (Motor Across-the-Line Acceleration Time) in calc-motor.js. The rotational
+  form of F = m x a: t = WK^2 x dN / (308 x T_net), where WK^2 is the total reflected inertia (lb-ft^2), dN the speed
+  change (rpm), and T_net the average net accelerating torque (motor minus load, lb-ft). 100 lb-ft^2 to 1,750 rpm on
+  50 lb-ft net = 11.4 s; double the inertia or halve the net torque and it doubles. A long start heats the rotor -- check
+  the motor's thermal-limit (stall-time) curve. A screen; the speed-torque and thermal-damage curves govern. Home count
+  1,392 -> 1,393.
+
 ### feat(water): add oil-water-separator-sizing tile (spec-v943); 2026-07-18
 
 - New Group M tile `oil-water-separator-sizing` (Gravity Oil/Water Separator Surface Area, API 421) in calc-treatment.js.

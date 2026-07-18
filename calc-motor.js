@@ -669,3 +669,44 @@ function _v925renderRotaryPhaseConverter(inputRegion, outputRegion, citationEl) 
   for (const f of [lg, tot, sf]) f.input.addEventListener("input", update);
 }
 MOTOR_RENDERERS["rotary-phase-converter-sizing"] = _v925renderRotaryPhaseConverter;
+
+// ===================== spec-v944: motor across-the-line acceleration time =====================
+// dims: in { inertia_lbft2: dimensionless, speed_change_rpm: T^-1, net_accel_torque_lbft: M L^2 T^-2 } out: { accel_time_s: T }
+export function computeMotorAccelerationTime({ inertia_lbft2 = 100, speed_change_rpm = 1750, net_accel_torque_lbft = 50 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(inertia_lbft2 > 0)) return { error: "Inertia WK^2 must be positive (lb-ft^2)." };
+  if (!(speed_change_rpm > 0)) return { error: "Speed change must be positive (rpm)." };
+  if (!(net_accel_torque_lbft > 0)) return { error: "Net accelerating torque must be positive (lb-ft) -- the motor must out-torque the load to start." };
+  // Rotational form of F = ma: t = WK^2 x dN / (308 x T_net). The 308 folds 2*pi/60 and g (32.174 ft/s^2).
+  const accel_time_s = inertia_lbft2 * speed_change_rpm / (308 * net_accel_torque_lbft);
+  if (!Number.isFinite(accel_time_s)) return { error: "Acceleration-time math is not a finite value." };
+  return {
+    accel_time_s,
+    note: "The time to bring a motor and its driven load up to speed across the line: t = WK^2 x dN / (308 x T_net), the rotational form of F = m x a, where WK^2 is the total inertia (lb-ft^2) reflected to the motor shaft, dN is the speed change (rpm), and T_net is the AVERAGE net accelerating torque (motor torque minus load torque, lb-ft). The 308 constant folds the rad/s and gravitational conversions. A 100 lb-ft^2 inertia reaching 1,750 rpm on 50 lb-ft of net torque takes 100 x 1750 / (308 x 50) = 11.4 s. Double the inertia or halve the net torque and the time doubles. A long acceleration heats the rotor and can trip the overload or exceed the motor's safe locked-rotor / stall time -- check the motor's thermal-limit (t-vs-speed) curve. A screen: the motor's speed-torque and thermal-damage curves, the actual reflected load inertia, and the drive govern.",
+  };
+}
+
+export const motorAccelerationTimeExample = { inputs: { inertia_lbft2: 100, speed_change_rpm: 1750, net_accel_torque_lbft: 50 } };
+
+function _v944renderMotorAccelerationTime(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: motor across-the-line acceleration time by name. t = WK^2 x dN / (308 x T_net), the rotational F = m x a, with WK^2 the reflected inertia (lb-ft^2), dN the speed change (rpm), and T_net the average net accelerating torque (lb-ft). The motor's speed-torque and thermal-limit curves and the reflected load inertia govern.";
+  const wk = makeNumber("Total inertia WK^2 (lb-ft^2)", "mat-wk", { step: "any", min: "0", value: "100" });
+  wk.input.value = "100";
+  const dn = makeNumber("Speed change (rpm)", "mat-dn", { step: "any", min: "0", value: "1750" });
+  dn.input.value = "1750";
+  const tq = makeNumber("Avg net accelerating torque (lb-ft)", "mat-tq", { step: "any", min: "0", value: "50" });
+  tq.input.value = "50";
+  for (const f of [wk, dn, tq]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { wk.input.value = "100"; dn.input.value = "1750"; tq.input.value = "50"; update(); });
+  const oTime = makeOutputLine(outputRegion, "Acceleration time", "mat-out-t");
+  const update = debounce(() => {
+    const r = computeMotorAccelerationTime({
+      inertia_lbft2: wk.input.value === "" ? 100 : Number(wk.input.value), speed_change_rpm: dn.input.value === "" ? 1750 : Number(dn.input.value),
+      net_accel_torque_lbft: tq.input.value === "" ? 50 : Number(tq.input.value),
+    });
+    if (r.error) { oTime.textContent = r.error; return; }
+    oTime.textContent = fmt(r.accel_time_s, 2) + " s to reach speed";
+  }, DEBOUNCE_MS);
+  for (const f of [wk, dn, tq]) f.input.addEventListener("input", update);
+}
+MOTOR_RENDERERS["motor-acceleration-time"] = _v944renderMotorAccelerationTime;

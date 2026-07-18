@@ -12444,6 +12444,17 @@ export const CITATIONS = {
       { name: "Start factor", value: "~2x normal, ~3x high-inertia/hard-start; a soft-start/VFD on the big motor lowers it", source: "converter-manufacturer guidance" },
     ],
   },
+  "motor-acceleration-time": {
+    formula: "accel_time_s = WK^2 x dN / (308 x T_net), where WK^2 is the reflected inertia (lb-ft^2), dN the speed change (rpm), and T_net the average net accelerating torque (lb-ft = motor torque - load torque). The 308 folds 2*pi/60 and g.",
+    edition: "Motor across-the-line acceleration-time formula (the rotational form of F = m x a; standard motor-engineering references), by name; the motor's speed-torque and thermal-limit curves govern.",
+    freeAccess: "The acceleration-time relation is public physics (Newton's second law in rotational form); the reflected inertia, the speed change, and the average net accelerating torque are user-supplied from the motor and load data.",
+    governance: GOVERNANCE.general,
+    editionNote: "The time to bring a motor and its driven load up to speed when started directly across the line is the rotational form of F = m x a: t = WK^2 x dN / (308 x T_net). WK^2 is the total moment of inertia (lb-ft^2) of the motor rotor plus the driven load, reflected to the motor shaft through any gear or belt ratio (inertia reflects as the square of the ratio); dN is the speed change (rpm, usually zero to rated); and T_net is the AVERAGE net accelerating torque over that speed range -- the motor's developed torque minus the load's opposing torque, taken from the two speed-torque curves. The 308 constant folds the rad/s (2*pi/60) and gravitational (g = 32.174 ft/s^2) conversions. Because the average net torque varies with speed, the honest method integrates over speed steps; a single average is a screen. A long acceleration heats the rotor, so the result must be checked against the motor's thermal-damage (permissible-locked-rotor / stall-time) curve -- if the start takes longer than the safe stall time, the overload trips or the rotor is damaged. The motor's speed-torque and thermal-limit curves, the actual reflected load inertia, and the drive govern.",
+    assumptions: [
+      { name: "Newton's second law (rotational)", value: "t = WK^2 x dN / (308 x T_net); 308 folds 2*pi/60 and g = 32.174 ft/s^2", source: "first principles / motor-engineering references" },
+      { name: "Average net torque", value: "T_net = motor torque - load torque averaged over the start; a single average is a screen (the honest method integrates over speed)", source: "speed-torque curves" },
+    ],
+  },
   "reduced-voltage-starter": {
     formula: "autotransformer: motor = tap x LRA, line = tap^2 x LRA, torque = tap^2 x LRT. wye-delta: 0.333x on current and torque. solid-state/reactor: motor = line = tap x LRA, torque = tap^2 x LRT.",
     edition: "Reduced-voltage-starter current and torque relations (NEMA ICS 2; torque proportional to voltage squared), by name; the motor speed-torque curve and the load govern.",

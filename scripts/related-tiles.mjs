@@ -258,6 +258,7 @@ const RELATED = {
   "reduced-voltage-starter": ["motor-locked-rotor-kva", "motor-vd-starting", "generator-motor-starting"],
   "vfd-reflected-wave": ["vfd-energy-savings", "cable-bend-radius", "reduced-voltage-starter"],
   "rotary-phase-converter-sizing": ["reduced-voltage-starter", "motor-synchronous-speed-slip", "three-phase"],
+  "motor-acceleration-time": ["reduced-voltage-starter", "motor-shaft-torque", "motor-locked-rotor-kva"],
   "harmonic-resonance": ["pf-correction", "transformer-k-factor", "power-factor-billing-savings"],
   "capacitor-bank-for-resonance-order": ["harmonic-resonance", "pf-correction", "transformer-k-factor", "tdd-ieee-519"],
   "tdd-ieee-519": ["transformer-k-factor", "harmonic-resonance", "voltage-imbalance"],
