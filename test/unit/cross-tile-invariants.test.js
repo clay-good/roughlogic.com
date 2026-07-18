@@ -12537,3 +12537,15 @@ test("monotonicity: gas high-altitude derate applies only above the threshold an
   assert.ok(Math.abs(ad({}).factor - (1 - 3 * 0.04)) < 1e-9, "factor = 1 - steps * derate-per-1000");
   assert.ok(Math.abs(ad({}).derated_input_btuh - 100000 * ad({}).factor) < 1e-6, "derated input = nameplate * factor");
 });
+
+test("statics: simple-span beam reactions satisfy equilibrium and moment balance (construction)", async () => {
+  const c = await import("../../calc-construction.js");
+  const br = (o) => c.computeBeamReactions({ span_ft: 20, w_plf: 100, point_lb: 1000, a_ft: 5, ...o });
+  const b = br({});
+  assert.ok(Math.abs(b.r_left_lb + b.r_right_lb - (100 * 20 + 1000)) < 1e-6, "sum of reactions must equal total load (vertical equilibrium)");
+  assert.ok(Math.abs(b.r_left_lb - (1000 + 750)) < 1e-6, "R_left = w*L/2 + P*(L-a)/L (moment about the right support)");
+  assert.ok(Math.abs(b.r_right_lb - (1000 + 250)) < 1e-6, "R_right = w*L/2 + P*a/L");
+  assert.ok(Math.abs(br({ a_ft: 10 }).r_left_lb - br({ a_ft: 10 }).r_right_lb) < 1e-6, "a centered point load must split the reactions evenly");
+  assert.ok(br({ point_lb: 2000 }).r_left_lb > b.r_left_lb, "reactions must rise with applied load");
+  assert.ok(br({ a_ft: 5 }).r_left_lb > br({ a_ft: 5 }).r_right_lb, "a load left of center must throw more reaction to the near support");
+});

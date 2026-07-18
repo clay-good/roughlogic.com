@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(construction): guard simple-span beam reactions against statics; 2026-07-17
+
+- Statics guard: sum of reactions equals total load (vertical equilibrium), R_left = w L/2 + P(L-a)/L and R_right =
+  w L/2 + P a/L (moment balance), a centered point load splits reactions evenly, reactions rise with load, and a load
+  left of center throws more to the near support. Test-only.
+
 ### test(gas): guard high-altitude derate threshold and step behavior; 2026-07-17
 
 - Whole-response guard: no derate at or below the threshold (factor 1), factor = 1 - steps x derate-per-1000 above it,
