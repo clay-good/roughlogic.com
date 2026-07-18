@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(hvac): guard cooling-tower heat rejection with flow/range monotonicity; 2026-07-17
+
+- Added a guard on computeCoolingTower: heat rejection Q = gpm x 500 x range rises with flow and as the range widens,
+  and range = T_in - T_out, approach = T_out - T_wb. A 500-constant or range/approach mixup is caught, invisible to the
+  single pinned example. Test-only.
+
 ### test(mixed): guard irrigation requirement and EOQ with monotonicity; 2026-07-17
 
 - Added whole-response guards: irrigation water requirement (gallons) rises with area, reference ET, and period and falls

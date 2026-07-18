@@ -11920,3 +11920,18 @@ test("monotonicity: irrigation requirement and EOQ respond correctly to their in
   assert.ok(eq({ holding_cost: 6 }) < eq({}), "EOQ must fall with holding cost");
   assert.ok(Math.abs(eq({}) - Math.sqrt(2 * 12000 * 50 / 3)) < 0.01, "EOQ must equal sqrt(2 D S / H)");
 });
+
+// Physical consistency of the cooling-tower compute: heat rejection Q = gpm *
+// 500 * range (range = T_in - T_out) rises with flow and with a wider range;
+// range = T_in - T_out and approach = T_out - T_wb. A 500-constant or
+// range/approach mixup is caught, invisible to the single pinned example.
+test("monotonicity: cooling-tower heat rejection = gpm*500*range, rising with flow and range", async () => {
+  const h = await import("../../calc-hvac.js");
+  const ct = (o) => h.computeCoolingTower({ T_in_F: 95, T_out_F: 85, T_wb_F: 78, gpm: 600, fan_kW: 7.5, ...o });
+  assert.ok(ct({ gpm: 1200 }).heat_rejection_BTU_hr > ct({}).heat_rejection_BTU_hr, "heat rejection must rise with flow");
+  assert.ok(ct({ T_in_F: 105 }).heat_rejection_BTU_hr > ct({}).heat_rejection_BTU_hr, "heat rejection must rise as range widens (hotter inlet)");
+  assert.ok(ct({ T_out_F: 90 }).heat_rejection_BTU_hr < ct({}).heat_rejection_BTU_hr, "heat rejection must fall as range narrows (warmer outlet)");
+  const r = ct({});
+  assert.ok(Math.abs(r.heat_rejection_BTU_hr - 600 * 500 * 10) < 1, "Q must equal gpm * 500 * range");
+  assert.ok(Math.abs(r.range_F - 10) < 1e-9 && Math.abs(r.approach_F - 7) < 1e-9, "range = Tin - Tout, approach = Tout - Twb");
+});
