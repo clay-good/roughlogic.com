@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(gas): gas-pipe-sizing Spitzglass helper dropped the diameter-correction factor (~2.1x overestimate, undersized pipe); 2026-07-17
+
+- `spitzglassFlow` (calc-gas.js), the low-pressure Spitzglass capacity helper behind `gas-pipe-sizing`, computed
+  `Q = 3550 * sqrt(d^5 * dP / (SG * L))` -- omitting the Spitzglass diameter-correction term `(1 + 3.6/d + 0.03*d)`. The
+  two sibling tiles in the same file (`gas-pipe-pressure-drop` and `gas-pipe-max-flow`) both carry that factor, so the
+  sizing helper was the outlier. It overestimated capacity ~2.1x (a 1 in bore at 100 ft / 0.5 in w.c. read 365 CFH vs the
+  correct 173), which UNDERSIZES the gas line -- a safety-relevant defect. The tile's own example (100,000 BTU natural
+  gas, 50 ft) recommended a 1/2 in pipe (buggy capacity 139.8 CFH >= 97.1 required) where the correct Spitzglass capacity
+  of 1/2 in is only ~53 CFH; the true answer is 3/4 in, matching IFGC 2021 Table 402.4(1). Added the missing factor
+  (matching the siblings) and updated the worked-example fixture and the bounds-fuzzer pin, both of which mirrored the
+  buggy formula. Caught by a first-principles re-derivation of calc-gas.js.
+
 ### fix(real-estate): seller-net-sheet cost-of-sale percentage wrongly folded in the mortgage payoff; 2026-07-17
 
 - `seller-net-sheet` (calc-realestate.js) computed `cost_of_sale_pct = (price - net) / price * 100`. Because

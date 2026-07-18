@@ -7632,9 +7632,10 @@ test("bounds: calc-plumbing computeStaticPressureLossPiping pins elev_psi = h*rh
   assert.ok(Math.abs(c.elevation_loss_psi - (10 * 70) / 144) < 1e-9);
 });
 
-test("bounds: calc-plumbing spitzglassFlow pins Q = 3550*sqrt(d^5*dP/(SG*L)) and L<=0 guard", () => {
+test("bounds: calc-plumbing spitzglassFlow pins Q = 3550*sqrt(d^5*dP/(SG*L*(1+3.6/d+0.03d))) and L<=0 guard", () => {
   const Q = spitzglassFlow({ d_in: 1.049, dP_in_wc: 0.5, specific_gravity: 0.6, L_ft: 50 });
-  const expected = 3550 * Math.sqrt((Math.pow(1.049, 5) * 0.5) / (0.6 * 50));
+  const spitz = 1 + 3.6 / 1.049 + 0.03 * 1.049; // Spitzglass diameter-correction factor
+  const expected = 3550 * Math.sqrt((Math.pow(1.049, 5) * 0.5) / (0.6 * 50 * spitz));
   assert.ok(Math.abs(Q - expected) < 1e-9);
   // Guards return 0, not error.
   assert.strictEqual(spitzglassFlow({ d_in: 1, dP_in_wc: 0.5, specific_gravity: 0.6, L_ft: 0 }), 0);

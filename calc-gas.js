@@ -51,13 +51,16 @@ export const GAS_PROPERTIES = {
 };
 
 // Spitzglass low-pressure gas-flow formula:
-//   Q = 3550 * sqrt( d^5 * dP / (SG * L) )
+//   Q = 3550 * sqrt( d^5 * dP / (SG * L * (1 + 3.6/d + 0.03*d)) )
 // where d is internal diameter in inches, dP is pressure drop in inches w.c.,
-// SG is specific gravity, and L is length in feet.
+// SG is specific gravity, and L is length in feet. The (1 + 3.6/d + 0.03*d)
+// diameter-correction term is part of the low-pressure Spitzglass equation
+// (the sibling pressure-drop and max-flow tiles carry it too).
 // dims: in { d_in: L, dP_in_wc: M L^-1 T^-2, specific_gravity: dimensionless, L_ft: L } out: { flow_cfh: L^3 T^-1 }
 export function spitzglassFlow({ d_in, dP_in_wc, specific_gravity, L_ft }) {
   if (L_ft <= 0 || d_in <= 0) return 0;
-  return 3550 * Math.sqrt((Math.pow(d_in, 5) * dP_in_wc) / (specific_gravity * L_ft));
+  const spitz = 1 + 3.6 / d_in + 0.03 * d_in;
+  return 3550 * Math.sqrt((Math.pow(d_in, 5) * dP_in_wc) / (specific_gravity * L_ft * spitz));
 }
 
 export const GAS_RENDERERS = {};

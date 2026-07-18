@@ -6301,9 +6301,9 @@
   {
    "tile_id": "gas-pipe-sizing",
    "source_publisher": "NFPA",
-   "source_title": "Spitzglass low-pressure gas flow: Q = 3550 * sqrt(d^5 * dP / (SG * L))",
+   "source_title": "Spitzglass low-pressure gas flow: Q = 3550 * sqrt(d^5 * dP / (SG * L * (1 + 3.6/d + 0.03*d)))",
    "source_edition_or_year": "NFPA 54 (National Fuel Gas Code) low-pressure derivation; natural gas heating value 1030 BTU/ft^3, SG 0.60",
-   "source_section_or_page": "100,000 BTU natural gas at 50 ft / 0.5 in w.c. drop -> 97.09 cfh required; 1/2 in SCH40 passes (139.84 cfh capacity)",
+   "source_section_or_page": "100,000 BTU natural gas at 50 ft / 0.5 in w.c. drop -> 97.09 cfh required; 1/2 in fails, 3/4 in SCH40 passes (~121.6 cfh capacity), matching IFGC Table 402.4(1)",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -6319,7 +6319,7 @@
      }
     },
     "recommended_size": {
-     "value": "0.5",
+     "value": "0.75",
      "tolerance": {
       "abs": 0
      }
