@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(construction): residential-framing had a dead "Rafter span" input duplicating "Building run"; 2026-07-18
+
+- computeResidentialFraming rendered a "Rafter span (ft)" field and validated `rafter_span_ft`, but the rafter
+  takeoff derives rafter length and count from `building_run_ft` and `pitch` -- the two fields are the same physical
+  quantity (the rafter's horizontal run), and the "Rafter span" one never affected any output (guard-only dead input;
+  editing it changed nothing). Removed the redundant field and parameter, and clarified the surviving field as
+  "Building run (ft; rafter horizontal run)". No output changed. Found by a targeted dead-input audit; verified with
+  render-no-nan (hand-written renderer, two reference sites).
+
 ### fix(finish,masonry): two takeoff tiles ignored an input the compute is documented to use; 2026-07-18
 
 - **thinset-coverage** (calc-finish.js): `bag_weight_lb` was destructured, validated, and rendered as a field, but

@@ -2676,7 +2676,7 @@ export function computeResidentialFraming({
   footprint_ft2 = 0, perimeter_ft = 0, wall_height_ft = 8,
   stud_oc_in = 16,
   joist_span_ft = 14, joist_oc_in = 16,
-  rafter_span_ft = 14, rafter_oc_in = 24,
+  rafter_oc_in = 24,
   building_run_ft = 14, pitch = 6,
   stud_size = "2x4", joist_size = "2x10", rafter_size = "2x8",
 } = {}) {
@@ -2686,7 +2686,7 @@ export function computeResidentialFraming({
   if (!(wall_height_ft > 0)) return { error: "Wall height must be positive." };
   if (!(stud_oc_in > 0)) return { error: "Stud OC must be positive." };
   if (!(joist_span_ft > 0 && joist_oc_in > 0)) return { error: "Joist span and OC must be positive." };
-  if (!(rafter_span_ft > 0 && rafter_oc_in > 0)) return { error: "Rafter span and OC must be positive." };
+  if (!(rafter_oc_in > 0)) return { error: "Rafter OC must be positive." };
   if (!(building_run_ft > 0)) return { error: "Building run must be positive." };
   // Stud count: every wall stud plus per-corner / per-T extras (engineering practice ~ 1 stud per linear ft for 16 OC).
   const stud_oc_ft = stud_oc_in / 12;
@@ -2731,7 +2731,7 @@ export const residentialFramingExample = {
   inputs: {
     footprint_ft2: 1500, perimeter_ft: 160, wall_height_ft: 9,
     stud_oc_in: 16, joist_span_ft: 14, joist_oc_in: 16,
-    rafter_span_ft: 16, rafter_oc_in: 24, building_run_ft: 16, pitch: 6,
+    rafter_oc_in: 24, building_run_ft: 16, pitch: 6,
     stud_size: "2x4", joist_size: "2x10", rafter_size: "2x8",
   },
 };
@@ -2748,13 +2748,12 @@ function _v8c_renderResidentialFraming(inputRegion, outputRegion, citationEl) {
   const js = _v7c_makeNumber("Joist span (ft)", "rf-js", { step: "any", min: "0" });
   const jo = _v7c_makeNumber("Joist OC (in)", "rf-jo", { step: "any", min: "0" });
   jo.input.value = "16";
-  const rs = _v7c_makeNumber("Rafter span (ft)", "rf-rs", { step: "any", min: "0" });
   const ro = _v7c_makeNumber("Rafter OC (in)", "rf-ro", { step: "any", min: "0" });
   ro.input.value = "24";
-  const br = _v7c_makeNumber("Building run (ft)", "rf-br", { step: "any", min: "0" });
+  const br = _v7c_makeNumber("Building run (ft; rafter horizontal run)", "rf-br", { step: "any", min: "0" });
   const p = _v7c_makeNumber("Pitch (rise per 12)", "rf-p", { step: "any", min: "0" });
   p.input.value = "6";
-  for (const f of [fp, per, wh, oc, js, jo, rs, ro, br, p]) inputRegion.appendChild(f.wrap);
+  for (const f of [fp, per, wh, oc, js, jo, ro, br, p]) inputRegion.appendChild(f.wrap);
   const oS = _v7c_makeOut(outputRegion, "Studs (count + bf)", "rf-out-s");
   const oPl = _v7c_makeOut(outputRegion, "Plates (linear ft + bf)", "rf-out-pl");
   const oJ = _v7c_makeOut(outputRegion, "Joists (count + bf)", "rf-out-j");
@@ -2764,7 +2763,7 @@ function _v8c_renderResidentialFraming(inputRegion, outputRegion, citationEl) {
     fp.input.value = x.footprint_ft2; per.input.value = x.perimeter_ft;
     wh.input.value = x.wall_height_ft; oc.input.value = x.stud_oc_in;
     js.input.value = x.joist_span_ft; jo.input.value = x.joist_oc_in;
-    rs.input.value = x.rafter_span_ft; ro.input.value = x.rafter_oc_in;
+    ro.input.value = x.rafter_oc_in;
     br.input.value = x.building_run_ft; p.input.value = x.pitch;
     update();
   }
@@ -2773,7 +2772,7 @@ function _v8c_renderResidentialFraming(inputRegion, outputRegion, citationEl) {
       footprint_ft2: Number(fp.input.value) || 0, perimeter_ft: Number(per.input.value) || 0,
       wall_height_ft: Number(wh.input.value) || 0, stud_oc_in: Number(oc.input.value) || 0,
       joist_span_ft: Number(js.input.value) || 0, joist_oc_in: Number(jo.input.value) || 0,
-      rafter_span_ft: Number(rs.input.value) || 0, rafter_oc_in: Number(ro.input.value) || 0,
+      rafter_oc_in: Number(ro.input.value) || 0,
       building_run_ft: Number(br.input.value) || 0, pitch: Number(p.input.value) || 0,
     });
     if (r.error) { oS.textContent = r.error; for (const o of [oPl, oJ, oR, oT]) o.textContent = "-"; return; }
@@ -2783,7 +2782,7 @@ function _v8c_renderResidentialFraming(inputRegion, outputRegion, citationEl) {
     oR.textContent = r.rafter_count + " rafters (" + _v7c_fmt(r.rafter_bf, 0) + " bf, " + _v7c_fmt(r.rafter_length_ft, 2) + " ft each)";
     oT.textContent = _v7c_fmt(r.total_bf, 0) + " bf total";
   }, _V7C_DEB);
-  for (const f of [fp.input, per.input, wh.input, oc.input, js.input, jo.input, rs.input, ro.input, br.input, p.input]) f.addEventListener("input", update);
+  for (const f of [fp.input, per.input, wh.input, oc.input, js.input, jo.input, ro.input, br.input, p.input]) f.addEventListener("input", update);
 }
 
 CONSTRUCTION_RENDERERS["residential-framing"] = _v8c_renderResidentialFraming;
