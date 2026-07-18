@@ -1037,6 +1037,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "knurl blank diameter",
+      "target": "knurl-blank-diameter",
+      "kind": "industry"
+    },
+    {
+      "term": "knurl tracking",
+      "target": "knurl-blank-diameter",
+      "kind": "industry"
+    },
+    {
+      "term": "knurl blank size",
+      "target": "knurl-blank-diameter",
+      "kind": "industry"
+    },
+    {
+      "term": "blank for knurling",
+      "target": "knurl-blank-diameter",
+      "kind": "adjacent"
+    },
+    {
+      "term": "knurl pitch diameter",
+      "target": "knurl-blank-diameter",
+      "kind": "adjacent"
+    },
+    {
       "term": "live load reduction",
       "target": "asce-live-load-reduction",
       "kind": "industry"

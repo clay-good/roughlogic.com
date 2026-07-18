@@ -964,3 +964,50 @@ function renderKeyseatKeySize(inputRegion, outputRegion, citationEl) {
   for (const f of [d, t, len]) f.input.addEventListener("input", update);
 }
 MACHINING_RENDERERS["keyseat-key-size"] = renderKeyseatKeySize;
+
+// ===================== spec-v910: knurling blank diameter for clean tracking =====================
+// dims: in { target_diameter_in: L, knurl_tpi: L^-1 } out: { teeth: dimensionless, blank_diameter_in: L, adjustment_in: L }
+export function computeKnurlBlankDiameter({ target_diameter_in = 0.75, knurl_tpi = 21 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(target_diameter_in > 0)) return { error: "Target diameter must be positive (in)." };
+  if (!(knurl_tpi > 0)) return { error: "Knurl TPI must be positive." };
+  // A circular-pitch (TPI) knurl tracks cleanly only when the blank circumference is a whole
+  // number of teeth, so round pi x D x TPI to an integer and back-solve the blank diameter.
+  const teeth = Math.round(Math.PI * target_diameter_in * knurl_tpi);
+  if (teeth < 1) return { error: "Diameter is too small for even one knurl tooth at this pitch." };
+  const blank_diameter_in = teeth / (Math.PI * knurl_tpi);
+  const adjustment_in = blank_diameter_in - target_diameter_in;
+  if (![teeth, blank_diameter_in, adjustment_in].every(Number.isFinite)) return { error: "Knurl blank math is not a finite value." };
+  return {
+    teeth,
+    blank_diameter_in,
+    adjustment_in,
+    note: "For a circular-pitch (TPI) knurl to track cleanly, the blank circumference must be a whole number of teeth: teeth = round(pi x D x TPI), then turn the blank to teeth / (pi x TPI). The adjustment is signed -- turn slightly over or under the nominal. Diamond and straight knurls in TPI (teeth per inch) form; diametral-pitch knurls and the knurl maker's tracking chart govern the finished pattern.",
+  };
+}
+
+export const knurlBlankDiameterExample = { inputs: { target_diameter_in: 0.75, knurl_tpi: 21 } };
+
+function _v910renderKnurlBlankDiameter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: knurl tracking rule by name. A circular-pitch (TPI) knurl tracks cleanly when the blank circumference is a whole number of teeth: teeth = round(pi x D x TPI); blank diameter = teeth / (pi x TPI).";
+  const td = makeNumber("Target diameter (in)", "kbd-td", { step: "any", min: "0", value: "0.75" });
+  td.input.value = "0.75";
+  const tp = makeNumber("Knurl pitch (TPI)", "kbd-tp", { step: "any", min: "0", value: "21" });
+  tp.input.value = "21";
+  for (const f of [td, tp]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { td.input.value = "0.75"; tp.input.value = "21"; update(); });
+  const oTeeth = makeOutputLine(outputRegion, "Teeth around blank", "kbd-out-teeth");
+  const oBlank = makeOutputLine(outputRegion, "Turn blank to", "kbd-out-blank");
+  const oAdj = makeOutputLine(outputRegion, "Adjustment from target", "kbd-out-adj");
+  const update = debounce(() => {
+    const r = computeKnurlBlankDiameter({
+      target_diameter_in: td.input.value === "" ? 0.75 : Number(td.input.value), knurl_tpi: tp.input.value === "" ? 21 : Number(tp.input.value),
+    });
+    if (r.error) { oTeeth.textContent = r.error; oBlank.textContent = "-"; oAdj.textContent = "-"; return; }
+    oTeeth.textContent = fmt(r.teeth, 0) + " teeth";
+    oBlank.textContent = fmt(r.blank_diameter_in, 4) + " in";
+    oAdj.textContent = (r.adjustment_in >= 0 ? "+" : "") + fmt(r.adjustment_in, 4) + " in";
+  }, DEBOUNCE_MS);
+  for (const f of [td, tp]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["knurl-blank-diameter"] = _v910renderKnurlBlankDiameter;

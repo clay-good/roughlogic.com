@@ -901,6 +901,8 @@ const TOOL_MODULES = (() => {
   declare("./calc-machining.js", "MACHINING_RENDERERS", [
     // v31, v34
     "cutting-speed-rpm", "cutting-diameter-for-rpm", "drill-point-depth", "drill-point-angle-from-length",
+    // spec-v910 knurling blank diameter for clean tracking
+    "knurl-blank-diameter",
     // v100 cutting-fluid concentration
     "cutting-fluid-concentration",
     // v135 cutting power and spindle torque from MRR

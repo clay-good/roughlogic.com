@@ -26723,6 +26723,25 @@ test("bounds: spec-v908 computeSmokeDetectorSpacingCount pins the grid, detector
   assert.ok("error" in _v908({ room_length_ft: Infinity, room_width_ft: 40, listed_spacing_ft: 30 }));
 });
 
+import { computeKnurlBlankDiameter as _v910 } from "../../calc-machining.js";
+
+test("bounds: spec-v910 computeKnurlBlankDiameter pins the teeth, blank diameter, signed adjustment, and error seams", () => {
+  const r = _v910({ target_diameter_in: 0.75, knurl_tpi: 21 });
+  assert.equal(r.teeth, 49); // round(pi*0.75*21) = round(49.48)
+  assert.ok(Math.abs(r.blank_diameter_in - 0.7427231) < 1e-6); // 49/(pi*21)
+  assert.ok(r.adjustment_in < 0); // 0.7427 < 0.75, turn under
+  const b = _v910({ target_diameter_in: 1.0, knurl_tpi: 33 });
+  assert.equal(b.teeth, 104); // round(pi*1*33) = round(103.67)
+  assert.ok(Math.abs(b.blank_diameter_in - 1.0031584) < 1e-6); // 104/(pi*33)
+  assert.ok(b.adjustment_in > 0); // 1.0032 > 1.0, turn over
+  // Adjustment is always within half a tooth pitch (1/TPI) of the target.
+  assert.ok(Math.abs(r.adjustment_in) <= 0.5 / 21 + 1e-9);
+  // Error seams: non-positive diameter / TPI, non-finite.
+  assert.ok("error" in _v910({ target_diameter_in: 0, knurl_tpi: 21 }));
+  assert.ok("error" in _v910({ target_diameter_in: 0.75, knurl_tpi: 0 }));
+  assert.ok("error" in _v910({ target_diameter_in: Infinity, knurl_tpi: 21 }));
+});
+
 import { computeBarstockCutlist as _v909 } from "../../calc-fab.js";
 
 test("bounds: spec-v909 computeBarstockCutlist pins the yield, drop, stick count, and error seams", () => {

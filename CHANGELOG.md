@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(machining): add knurl-blank-diameter tile (spec-v910); 2026-07-18
+
+- New Group K tile `knurl-blank-diameter` (Knurling Blank Diameter for Clean Tracking) in calc-machining.js, beside
+  keyseat-key-size. A circular-pitch (TPI) knurl tracks cleanly only when the blank circumference is a whole number of
+  teeth, so teeth = round(pi x D x TPI) and the blank is turned to teeth / (pi x TPI); the adjustment from target is
+  signed and always within half a tooth. 0.750 in at 21 TPI -> 49 teeth, blank 0.7427 in (0.0073 under); 1.000 in at
+  33 TPI -> 104 teeth, blank 1.0032 in (0.0032 over). TPI knurls only; diametral-pitch knurls and the maker's tracking
+  chart govern. Home tile count 1,358 -> 1,359.
+
 ### feat(fab): add barstock-cutlist tile (spec-v909); 2026-07-18
 
 - New Group E tile `barstock-cutlist` (Bar / Tube Stock Cut List Yield) in calc-fab.js, beside coil-length. Turns a

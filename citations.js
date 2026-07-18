@@ -9868,6 +9868,17 @@ export const CITATIONS = {
       { name: "Thread form and target", value: "60-degree included angle; 65-75% thread is the usual target, user-supplied (default 75%)", source: "tap-drill geometry" },
     ],
   },
+  "knurl-blank-diameter": {
+    formula: "teeth = round(pi x target_diameter_in x knurl_tpi); blank_diameter_in = teeth / (pi x knurl_tpi); adjustment_in = blank_diameter_in - target_diameter_in.",
+    edition: "Knurl tracking rule, first-principles; a circular-pitch (TPI) knurl tracks cleanly only when the blank circumference is a whole number of teeth.",
+    freeAccess: "The tracking relation is public first-principles geometry (circumference = whole number of teeth); the target diameter and knurl TPI are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "A circular-pitch knurl impresses one tooth per 1/TPI of circumference. It tracks cleanly (no double-tracking) only when the blank circumference pi x D is a whole number of tooth pitches, so teeth = round(pi x D x TPI) and the blank is turned to teeth / (pi x TPI). The adjustment is signed and always within half a tooth pitch of the target. This is the TPI (teeth-per-inch) knurl form; diametral-pitch knurls and the knurl maker's tracking chart govern the finished pattern.",
+    assumptions: [
+      { name: "Whole-tooth circumference", value: "clean tracking needs pi x D x TPI to round to a whole number of teeth", source: "knurl tracking geometry" },
+      { name: "TPI form", value: "circular-pitch (teeth-per-inch) knurl; diametral-pitch knurls differ", source: "scope of this tile" },
+    ],
+  },
   "rolled-blank": {
     formula: "Developed flat length L = pi x neutral-axis diameter; with the neutral axis k x T from the inside, D_neutral = OD - 2T(1-k) = ID + 2kT. Default k = 0.5 (mid-thickness) gives L = pi x (OD - T).",
     edition: "Developed blank length to roll plate into a cylinder - first-principles arc-length geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",

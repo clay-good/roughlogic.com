@@ -34392,6 +34392,60 @@
    }
   },
   {
+   "tile_id": "knurl-blank-diameter",
+   "source_publisher": "knurl tracking rule (first-principles)",
+   "source_title": "0.750 in target at 21 TPI -> 49 teeth, turn blank to 0.7427 in (0.0073 in under)",
+   "source_edition_or_year": "spec-v910 worked example (machine-verified)",
+   "source_section_or_page": "teeth = round(pi*0.75*21) = round(49.48) = 49; blank = 49/(pi*21) = 0.74270",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "target_diameter_in": 0.75,
+    "knurl_tpi": 21
+   },
+   "outputs": {
+    "teeth": {
+     "value": 49,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "blank_diameter_in": {
+     "value": 0.7427,
+     "tolerance": {
+      "abs": 0.0002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "knurl-blank-diameter",
+   "source_publisher": "knurl tracking rule (first-principles)",
+   "source_title": "cross-check: 1.000 in target at 33 TPI -> 104 teeth, blank 1.0032 in (0.0032 in over)",
+   "source_edition_or_year": "spec-v910 worked example (machine-verified)",
+   "source_section_or_page": "teeth = round(pi*1.0*33) = round(103.67) = 104; blank = 104/(pi*33) = 1.00320",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "target_diameter_in": 1.0,
+    "knurl_tpi": 33
+   },
+   "outputs": {
+    "teeth": {
+     "value": 104,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "blank_diameter_in": {
+     "value": 1.0032,
+     "tolerance": {
+      "abs": 0.0002
+     }
+    }
+   }
+  },
+  {
    "tile_id": "barstock-cutlist",
    "source_publisher": "linear cut-list yield identity (first-principles)",
    "source_title": "20 ft (240 in) stick, 14.5 in pieces, 1/8 in kerf, 100 pieces -> 16 per stick, 6.13 in drop, 7 sticks",

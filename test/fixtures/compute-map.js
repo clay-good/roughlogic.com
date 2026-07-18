@@ -86,6 +86,7 @@ export const COMPUTE_MAP = {
   "volumetric-efficiency": { module: "../../calc-mechanic.js", fn: "computeVolumetricEfficiency" },
   "gear-mph-rpm": { module: "../../calc-mechanic.js", fn: "computeGearMphRpm" },
   "cutting-speed-rpm": { module: "../../calc-machining.js", fn: "computeCuttingSpeed" },
+  "knurl-blank-diameter": { module: "../../calc-machining.js", fn: "computeKnurlBlankDiameter" },
   "cutting-diameter-for-rpm": { module: "../../calc-machining.js", fn: "computeCuttingDiameterForRpm" },
   "drill-point-depth": { module: "../../calc-machining.js", fn: "computeDrillPointDepth" },
   "drill-point-angle-from-length": { module: "../../calc-machining.js", fn: "computeDrillPointAngleFromLength" },

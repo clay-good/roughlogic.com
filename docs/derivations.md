@@ -2365,6 +2365,7 @@ cross-check.
 | calc-machining.js | `computeGearChordalThickness` | `{ diametral_pitch = 0, teeth = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeGearIdentification` | `{ teeth = 0, outside_dia_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeKeyseatKeySize` | `{ shaft_diameter_in = 0, torque_in_lb = 0, key_length_in = 0 } = {}` | _ | _ | _ |
+| calc-machining.js | `computeKnurlBlankDiameter` | `{ target_diameter_in = 0.75, knurl_tpi = 21 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeRadialChipThinning` | `{ ae_in = 0, d_in = 0, fz_target = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeSpindleMaxMrr` | `{ available_motor_hp = 0, unit_power_hp = 1.0, efficiency_pct = 80 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeSpindlePowerTorque` | `{ mrr_in3_min = 0, unit_power_hp = 1.0, efficiency_pct = 80, rpm = 0 } = {}` | _ | _ | _ |
@@ -3019,7 +3020,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1605.
+Row count: 1606.
 
 <!-- END function-corpus-v14 -->
 
@@ -4106,7 +4107,7 @@ per spec-v14 §13.1 second paragraph.
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group K Mechanic (83 tiles)
+### Group K Mechanic (84 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4160,6 +4161,7 @@ per spec-v14 §13.1 second paragraph.
 | `injector-max-hp` | Injector Max Horsepower Capacity | Fuel injector power capacity (inverse...; spec-v661 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `injector-size` | Fuel Injector Size from Horsepower, BSFC, and Duty Cycle | Fuel injector sizing (HP x BSFC / (n ...; spec-v323 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `keyseat-key-size` | Shaft Key and Keyseat Size (ANSI B17.1) | ANSI B17.1 Keys and Keyseats; spec-v513 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `knurl-blank-diameter` | Knurling Blank Diameter for Clean Tracking | knurl tracking rule (first-principles); teeth = round(pi*0.75*21) = round(49.48) = 49; blank = 49... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `machining-time` | Cut Time per Pass | First-principles cutting time + Machi...; 6 in at 500 RPM x 0.010 IPR -> 5 IPM, 1.2 min/pass, 4 pas... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `material-removal-rate` | Material Removal Rate | First-principles swept-volume geometr...; 0.5 x 0.1 x 10 IPM -> 0.5 in3/min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `max-rpm-from-piston-speed` | Max RPM from a Piston-Speed Limit | Mean piston speed (engine building), ...; spec-v660 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4563,6 +4565,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1358. Fixture-covered or reference-cadence: 1358 / 1358.
+Tile count: 1359. Fixture-covered or reference-cadence: 1359 / 1359.
 
 <!-- END tile-index-v14 -->

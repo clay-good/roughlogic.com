@@ -440,7 +440,7 @@ const _TILES = [
   ["countersink-depth", "K"],
   ["countersink-diameter-from-depth", "K"],
   // spec-v513 shaft key and keyseat size (ANSI B17.1)
-  ["keyseat-key-size", "K"],
+  ["keyseat-key-size", "K"], ["knurl-blank-diameter", "K"],
 
   // v43 cross-trade tank gauging (calc-cross.js)
   ["tank-volume", "G"], ["linear-interpolation", "G"],
