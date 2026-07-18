@@ -12191,3 +12191,17 @@ test("geometry: shoelace area-by-coordinates matches closed forms and scales cor
   const tri = s.computeAreaByCoordinates({ points: [{ n: 0, e: 0 }, { n: 0, e: 60 }, { n: 80, e: 0 }] });
   assert.ok(Math.abs(tri.area_ft2 - 0.5 * 60 * 80) < 1e-6, "a 60x80 right triangle must be 2400 ft^2");
 });
+
+test("consistency: cutting-speed RPM and its diameter inverse round-trip, and feeds/speeds scale correctly (machining)", async () => {
+  const m = await import("../../calc-machining.js");
+  const cs = (o) => m.computeCuttingSpeed({ surface_speed_sfm: 100, diameter_in: 0.5, num_flutes: 2, chip_load_in: 0.002, ...o });
+  assert.ok(cs({ surface_speed_sfm: 200 }).rpm > cs({}).rpm, "RPM must rise with surface speed");
+  assert.ok(cs({ diameter_in: 1.0 }).rpm < cs({}).rpm, "RPM must fall as the cutter diameter grows");
+  assert.ok(cs({ num_flutes: 4 }).feed_ipm > cs({}).feed_ipm, "feed must rise with flute count");
+  assert.ok(cs({ chip_load_in: 0.004 }).feed_ipm > cs({}).feed_ipm, "feed must rise with chip load per tooth");
+  assert.ok(Math.abs(cs({}).rpm - 12 * 100 / (Math.PI * 0.5)) < 1e-6, "RPM = 12 * SFM / (pi * diameter)");
+  assert.ok(Math.abs(cs({}).feed_ipm - cs({}).rpm * 2 * 0.002) < 1e-9, "feed = RPM * flutes * chip load");
+  // Round-trip: the diameter inverse fed the forward RPM must recover the cutter diameter.
+  const inv = m.computeCuttingDiameterForRpm({ surface_speed_sfm: 100, target_rpm: cs({}).rpm });
+  assert.ok(Math.abs(inv.diameter_in - 0.5) < 1e-9, "cutting-speed and its diameter inverse must round-trip the diameter");
+});

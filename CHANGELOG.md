@@ -4,6 +4,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(machining): round-trip cutting-speed RPM against its diameter inverse; 2026-07-17
+
+- Consistency guard: RPM = 12 x SFM / (pi x diameter) rises with surface speed, falls with diameter, and the
+  diameter inverse round-trips it; feed = RPM x flutes x chip-load rises with flute count and chip load. Test-only.
+
 ### test(survey): guard shoelace area-by-coordinates against closed forms; 2026-07-17
 
 - Geometry guards: a 100-ft square reads 10000 ft^2 / 400-ft perimeter, acres = ft^2/43560, m^2 = ft^2 x 0.09290304,
