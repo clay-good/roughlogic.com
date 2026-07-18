@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(pipe): guard the duplicated Schedule-40 pipe-ID table (consistency + monotonicity); 2026-07-17
+
+- The Schedule-40 inside-diameter lookup (`SCH40_ID_IN`) that feeds pipe sizing / volume / friction / gas capacity is
+  duplicated in calc-gas.js and calc-plumbing.js. Added an invariant test asserting the two copies agree cell-for-cell
+  and that inside diameter strictly increases with nominal size. A silent transcription error in either table -- or a
+  divergence between the two (the "sibling" class the formula audit repeatedly relied on) -- would missize a pipe or gas
+  line, which the per-tile fixtures do not cover. Test-only; no source change.
+
 ### test(water): guard the SWTR disinfection CT table with a two-axis monotonicity invariant; 2026-07-17
 
 - Added a physical invariant over the whole SWTR Table A-1 (3-log Giardia, free chlorine) read by `disinfection-ct`:

@@ -163,3 +163,26 @@ test("Backflow: returns reference array of scenarios", () => {
   assert.ok(Array.isArray(r.reference));
   assert.ok(r.reference.length >= 5);
 });
+
+// Data-table invariants for the Schedule-40 pipe inside-diameter lookup, which
+// feeds pipe sizing / volume / friction / gas capacity. The table is duplicated
+// in calc-gas.js and calc-plumbing.js; both must (1) agree with each other and
+// (2) have inside diameters that strictly increase with nominal size. A silent
+// transcription error in either -- or a divergence between the two -- would
+// missize a pipe or a gas line, a class the per-tile fixtures do not cover.
+test("SCH40 pipe ID table: gas and plumbing copies agree and are strictly monotone in nominal size", async () => {
+  const gas = await import("../../calc-gas.js");
+  const plumb = await import("../../calc-plumbing.js");
+  const G = gas.SCH40_ID_IN, P = plumb.SCH40_ID_IN;
+  const gKeys = Object.keys(G).sort((a, b) => Number(a) - Number(b));
+  const pKeys = Object.keys(P).sort((a, b) => Number(a) - Number(b));
+  assert.deepEqual(gKeys, pKeys, "gas and plumbing SCH40_ID_IN cover different nominal sizes");
+  for (const k of gKeys) {
+    assert.equal(G[k], P[k], `SCH40_ID_IN diverges at nominal ${k} in: gas ${G[k]} vs plumbing ${P[k]}`);
+    assert.ok(G[k] > 0 && G[k] < Number(k) + 1, `SCH40 ID at nominal ${k} in is out of range: ${G[k]}`);
+  }
+  for (let i = 1; i < gKeys.length; i++) {
+    assert.ok(G[gKeys[i]] > G[gKeys[i - 1]],
+      `SCH40 inside diameter not strictly increasing: nominal ${gKeys[i]} in (${G[gKeys[i]]}) <= ${gKeys[i - 1]} in (${G[gKeys[i - 1]]})`);
+  }
+});
