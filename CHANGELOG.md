@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(arborist): guard log/limb frustum weight with monotonicity and a taper bound; 2026-07-17
+
+- Whole-response guards: frustum weight = (pi/3) L (r1^2+r1 r2+r2^2) x density rises with butt/top diameter, length,
+  and density; equal ends collapse to the cylinder volume pi r^2 L; and a tapered log weighs less than a full cylinder
+  of its butt diameter (the note safe-side claim). Test-only.
+
 ### test(septic): round-trip drainfield sizing against its capacity inverse; 2026-07-17
 
 - Consistency guard: septic-drainfield (area = flow / application-rate; trench = area / width) and its

@@ -12144,3 +12144,17 @@ test("consistency: septic drainfield sizing and its capacity inverse round-trip,
   const back = s.computeSepticDrainfieldCapacity({ available_trench_ft: tf, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 });
   assert.ok(Math.abs(back.design_flow_gpd - 600) < 1e-6, "drainfield and its capacity inverse must round-trip the design flow");
 });
+
+test("monotonicity: log/limb frustum weight tracks its inputs and stays under a cylinder of the butt (arborist)", async () => {
+  const a = await import("../../calc-arborist.js");
+  const lw = (o) => a.computeLogLimbWeight({ butt_dia_in: 16, top_dia_in: 10, length_ft: 12, density: 50, ...o });
+  assert.ok(lw({ butt_dia_in: 20 }).weight_lb > lw({}).weight_lb, "weight must rise with butt diameter");
+  assert.ok(lw({ top_dia_in: 14 }).weight_lb > lw({}).weight_lb, "weight must rise with top diameter");
+  assert.ok(lw({ length_ft: 16 }).weight_lb > lw({}).weight_lb, "weight must rise with length");
+  assert.ok(lw({ density: 60 }).weight_lb > lw({}).weight_lb, "weight must rise with green density");
+  // Degenerate case: equal ends make the frustum a cylinder, V = pi * (d/24 ft)^2 * L.
+  const cyl = lw({ top_dia_in: 16 });
+  assert.ok(Math.abs(cyl.volume_ft3 - Math.PI * Math.pow(16 / 24, 2) * 12) < 1e-9, "equal ends must give the cylinder volume pi*r^2*L");
+  // Taper invariant (the note's safe-side claim): a tapered frustum weighs less than a cylinder of the butt diameter.
+  assert.ok(lw({}).weight_lb < cyl.weight_lb, "a tapered log must weigh less than a full cylinder of its butt diameter");
+});
