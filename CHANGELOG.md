@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): add solar-thermal-collector tile (spec-v987); 2026-07-18
+
+- New Group B tile `solar-thermal-collector` in calc-plumbing.js. Useful heat from a flat-plate solar thermal
+  collector by the ASHRAE 93 / Hottel-Whillier-Bliss efficiency line: efficiency = optical efficiency (y-intercept)
+  minus loss coefficient (slope) x (inlet - ambient) / irradiance; useful heat = irradiance x efficiency x area.
+  0.70 optical, 0.85 loss, 120 F inlet, 70 F ambient, 300 Btu/hr-ft^2, 40 sq ft = 55.8%, 6,700 Btu/hr; a colder,
+  dimmer day drops to 36.0%, 3,600 Btu/hr. Clamps to zero past stagnation. Home count 1,435 -> 1,436.
+
 ### feat(roofing): add roof-ballast-weight tile (spec-v986); 2026-07-18
 
 - New Group E tile `roof-ballast-weight` in calc-construction.js. Weight and order quantity of loose ballast on a

@@ -28343,3 +28343,30 @@ test("bounds: spec-v986 computeRoofBallastWeight pins the ballast weight and ord
   assert.ok("error" in _v986({ roof_area_sqft: 5000, ballast_psf: 12, stone_density_pcf: 0 }));
   assert.ok("error" in _v986({ roof_area_sqft: Infinity, ballast_psf: 12, stone_density_pcf: 100 }));
 });
+
+import { computeSolarThermalCollector as _v987 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v987 computeSolarThermalCollector pins the ASHRAE 93 efficiency line", () => {
+  const r = _v987({ optical_efficiency: 0.70, loss_coeff: 0.85, inlet_temp_f: 120, ambient_temp_f: 70, irradiance_btu: 300, area_sqft: 40 });
+  assert.ok(Math.abs(r.efficiency - 0.558333) < 1e-4); // 0.70 - 0.85*50/300
+  assert.ok(Math.abs(r.useful_btu_per_sqft - 167.5) < 1e-2); // 300*eta
+  assert.ok(Math.abs(r.useful_btu_hr - 6700) < 1e-1); // *40
+  // Colder, dimmer cross-check.
+  const cold = _v987({ optical_efficiency: 0.70, loss_coeff: 0.85, inlet_temp_f: 140, ambient_temp_f: 40, irradiance_btu: 250, area_sqft: 40 });
+  assert.ok(Math.abs(cold.efficiency - 0.36) < 1e-4);
+  assert.ok(Math.abs(cold.useful_btu_hr - 3600) < 1e-1);
+  // Monotonic: a hotter inlet lowers efficiency; more sun raises it; area scales the total.
+  assert.ok(_v987({ optical_efficiency: 0.70, loss_coeff: 0.85, inlet_temp_f: 160, ambient_temp_f: 70, irradiance_btu: 300, area_sqft: 40 }).efficiency < r.efficiency);
+  assert.ok(_v987({ optical_efficiency: 0.70, loss_coeff: 0.85, inlet_temp_f: 120, ambient_temp_f: 70, irradiance_btu: 350, area_sqft: 40 }).efficiency > r.efficiency);
+  // Past stagnation the useful heat clamps to zero (raw efficiency goes negative).
+  const stag = _v987({ optical_efficiency: 0.70, loss_coeff: 0.85, inlet_temp_f: 300, ambient_temp_f: 70, irradiance_btu: 100, area_sqft: 40 });
+  assert.ok(stag.efficiency < 0);
+  assert.ok(stag.useful_btu_hr === 0);
+  assert.ok(/STAGNATION/.test(stag.verdict));
+  // Error seams: optical out of (0,1], non-positive irradiance / area, negative loss, non-finite.
+  assert.ok("error" in _v987({ optical_efficiency: 1.5, loss_coeff: 0.85, inlet_temp_f: 120, ambient_temp_f: 70, irradiance_btu: 300, area_sqft: 40 }));
+  assert.ok("error" in _v987({ optical_efficiency: 0.70, loss_coeff: 0.85, inlet_temp_f: 120, ambient_temp_f: 70, irradiance_btu: 0, area_sqft: 40 }));
+  assert.ok("error" in _v987({ optical_efficiency: 0.70, loss_coeff: 0.85, inlet_temp_f: 120, ambient_temp_f: 70, irradiance_btu: 300, area_sqft: 0 }));
+  assert.ok("error" in _v987({ optical_efficiency: 0.70, loss_coeff: -1, inlet_temp_f: 120, ambient_temp_f: 70, irradiance_btu: 300, area_sqft: 40 }));
+  assert.ok("error" in _v987({ optical_efficiency: 0.70, loss_coeff: 0.85, inlet_temp_f: Infinity, ambient_temp_f: 70, irradiance_btu: 300, area_sqft: 40 }));
+});

@@ -218,7 +218,7 @@ const TOOL_MODULES = (() => {
     // v9
     "recirc-loop-sizing",
     // v16
-    "water-heater-recovery", "water-heater-input", "wh-expansion-tank", "sanitary-dfu", "trap-primer",
+    "water-heater-recovery", "water-heater-input", "solar-thermal-collector", "wh-expansion-tank", "sanitary-dfu", "trap-primer",
     "backflow-sizing",
     // v23
     "trap-seal-loss", "water-meter-sizing",

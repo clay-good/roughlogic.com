@@ -4833,3 +4833,63 @@ function _v906renderPexHomerunTakeoff(inputRegion, outputRegion, citationEl) {
   for (const f of [fx, hf, ar, ws]) f.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["pex-homerun-takeoff"] = _v906renderPexHomerunTakeoff;
+
+// ===================== spec-v987: solar thermal flat-plate collector output =====================
+// dims: in { args: dimensionless } out: { efficiency: dimensionless, useful_btu_per_sqft: dimensionless, useful_btu_hr: dimensionless }
+export function computeSolarThermalCollector({ optical_efficiency = 0.70, loss_coeff = 0.85, inlet_temp_f = 120, ambient_temp_f = 70, irradiance_btu = 300, area_sqft = 40 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(optical_efficiency > 0 && optical_efficiency <= 1)) return { error: "Optical efficiency (y-intercept) must be between 0 and 1." };
+  if (!(loss_coeff >= 0)) return { error: "Loss coefficient must be non-negative (Btu/hr-ft^2-F)." };
+  if (!(irradiance_btu > 0)) return { error: "Solar irradiance must be positive (Btu/hr-ft^2)." };
+  if (!(area_sqft > 0)) return { error: "Collector area must be positive (sq ft)." };
+  // ASHRAE 93 / Hottel-Whillier-Bliss: eta = FR(ta) - FR*UL*(Ti - Ta)/G, useful heat = G*eta*area (clamped at 0).
+  const efficiency = optical_efficiency - loss_coeff * (inlet_temp_f - ambient_temp_f) / irradiance_btu;
+  const eff_clamped = Math.max(0, efficiency);
+  const useful_btu_per_sqft = irradiance_btu * eff_clamped;
+  const useful_btu_hr = useful_btu_per_sqft * area_sqft;
+  if (![efficiency, useful_btu_per_sqft, useful_btu_hr].every(Number.isFinite)) return { error: "Collector math is not a finite value." };
+  const verdict = efficiency > 0
+    ? "The collector delivers useful heat at this operating point."
+    : "AT OR BELOW STAGNATION: the collector loses as much as it captures -- no useful heat until the irradiance rises or the inlet temperature drops.";
+  return {
+    efficiency,
+    useful_btu_per_sqft,
+    useful_btu_hr,
+    verdict,
+    note: "The useful heat a flat-plate solar thermal collector delivers at a given operating point, by the ASHRAE 93 / Hottel-Whillier-Bliss efficiency line the SRCC prints on every collector rating: efficiency = optical efficiency (the y-intercept, FR times tau-alpha) minus the loss coefficient (FR times UL, the slope) times (inlet temp minus ambient) divided by the solar irradiance. The optical efficiency (~0.68-0.75 for a good glazed flat plate) is the ceiling when the fluid runs at ambient; the loss term eats into it as the collector runs hotter than the air. With an optical efficiency of 0.70, a loss coefficient of 0.85 Btu/hr-ft^2-F, a 120 F inlet, 70 F ambient, and 300 Btu/hr-ft^2 of sun, efficiency = 0.70 - 0.85 x 50/300 = 0.56, so the collector makes 300 x 0.56 = 168 Btu/hr per sq ft, or 6,700 Btu/hr over 40 sq ft. On a colder, dimmer day (140 F inlet, 40 F ambient, 250 Btu/hr-ft^2) efficiency falls to 0.36 and output to 3,600 Btu/hr -- the collector is least efficient exactly when the heat is needed most. Past the stagnation point (efficiency <= 0) it delivers nothing. An unglazed pool collector has a near-1.0 optical efficiency but a very high loss slope, which is why it works only near ambient. A performance estimate; the actual SRCC-rated intercept and slope, the incidence angle, the flow rate, and the glazing condition govern the real output.",
+  };
+}
+
+export const solarThermalCollectorExample = { inputs: { optical_efficiency: 0.70, loss_coeff: 0.85, inlet_temp_f: 120, ambient_temp_f: 70, irradiance_btu: 300, area_sqft: 40 } };
+
+function _v987renderSolarThermalCollector(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: solar thermal flat-plate collector output (ASHRAE 93 / Hottel-Whillier-Bliss efficiency line), by name. eta = optical efficiency - loss coeff x (inlet - ambient)/irradiance; useful heat = irradiance x eta x area. The SRCC-rated intercept and slope, the incidence angle, flow rate, and glazing govern.";
+  const oe = makeNumber("Optical efficiency (y-intercept, ~0.70)", "stc-oe", { step: "any", min: "0", max: "1", value: "0.70" });
+  oe.input.value = "0.70";
+  const lc = makeNumber("Loss coefficient (Btu/hr-ft^2-F, slope)", "stc-lc", { step: "any", min: "0", value: "0.85" });
+  lc.input.value = "0.85";
+  const it = makeNumber("Fluid inlet temp (F)", "stc-it", { step: "any", value: "120" });
+  it.input.value = "120";
+  const at = makeNumber("Ambient air temp (F)", "stc-at", { step: "any", value: "70" });
+  at.input.value = "70";
+  const ir = makeNumber("Solar irradiance (Btu/hr-ft^2)", "stc-ir", { step: "any", min: "0", value: "300" });
+  ir.input.value = "300";
+  const ar = makeNumber("Collector area (sq ft)", "stc-ar", { step: "any", min: "0", value: "40" });
+  ar.input.value = "40";
+  for (const f of [oe, lc, it, at, ir, ar]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { oe.input.value = "0.70"; lc.input.value = "0.85"; it.input.value = "120"; at.input.value = "70"; ir.input.value = "300"; ar.input.value = "40"; update(); });
+  const oE = makeOutputLine(outputRegion, "Collector efficiency", "stc-out-e");
+  const oQ = makeOutputLine(outputRegion, "Useful heat output", "stc-out-q");
+  const update = debounce(() => {
+    const r = computeSolarThermalCollector({
+      optical_efficiency: oe.input.value === "" ? 0.70 : Number(oe.input.value), loss_coeff: lc.input.value === "" ? 0.85 : Number(lc.input.value),
+      inlet_temp_f: it.input.value === "" ? 120 : Number(it.input.value), ambient_temp_f: at.input.value === "" ? 70 : Number(at.input.value),
+      irradiance_btu: ir.input.value === "" ? 300 : Number(ir.input.value), area_sqft: ar.input.value === "" ? 40 : Number(ar.input.value),
+    });
+    if (r.error) { oE.textContent = r.error; oQ.textContent = "-"; return; }
+    oE.textContent = fmt(r.efficiency * 100, 1) + "%";
+    oQ.textContent = fmt(r.useful_btu_hr, 0) + " Btu/hr (" + fmt(r.useful_btu_per_sqft, 1) + " per sq ft)";
+  }, DEBOUNCE_MS);
+  for (const f of [oe, lc, it, at, ir, ar]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["solar-thermal-collector"] = _v987renderSolarThermalCollector;

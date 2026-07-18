@@ -14616,6 +14616,74 @@
    }
   },
   {
+   "tile_id": "solar-thermal-collector",
+   "source_publisher": "Solar thermal collector (ASHRAE 93 / Hottel-Whillier-Bliss efficiency line)",
+   "source_title": "0.70 optical, 0.85 loss, 120 F inlet, 70 F ambient, 300 Btu/hr-ft^2, 40 sq ft -> 55.8%, 6,700 Btu/hr",
+   "source_edition_or_year": "spec-v987 worked example (machine-verified)",
+   "source_section_or_page": "eta = 0.70 - 0.85 x 50/300 = 0.5583; per sf = 300 x 0.5583 = 167.5; total = x 40 = 6,700 Btu/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "optical_efficiency": 0.70,
+    "loss_coeff": 0.85,
+    "inlet_temp_f": 120,
+    "ambient_temp_f": 70,
+    "irradiance_btu": 300,
+    "area_sqft": 40
+   },
+   "outputs": {
+    "efficiency": {
+     "value": 0.55833,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "useful_btu_per_sqft": {
+     "value": 167.5,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "useful_btu_hr": {
+     "value": 6700,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "solar-thermal-collector",
+   "source_publisher": "Solar thermal collector (ASHRAE 93 / Hottel-Whillier-Bliss efficiency line)",
+   "source_title": "cross-check: colder, dimmer day (140 F inlet, 40 F ambient, 250 Btu/hr-ft^2) -> 36.0%, 3,600 Btu/hr",
+   "source_edition_or_year": "spec-v987 worked example (machine-verified)",
+   "source_section_or_page": "eta = 0.70 - 0.85 x 100/250 = 0.36; per sf = 250 x 0.36 = 90; total = x 40 = 3,600 Btu/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "optical_efficiency": 0.70,
+    "loss_coeff": 0.85,
+    "inlet_temp_f": 140,
+    "ambient_temp_f": 40,
+    "irradiance_btu": 250,
+    "area_sqft": 40
+   },
+   "outputs": {
+    "efficiency": {
+     "value": 0.36,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "useful_btu_hr": {
+     "value": 3600,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "water-heater-recovery",
    "source_publisher": "DOE / AHRI",
    "source_title": "Water heater recovery: 40,000 BTU/hr atmospheric gas, 0.80 efficiency, 50->120 F, 40 gal tank",

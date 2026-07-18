@@ -187,7 +187,7 @@ const _TILES = [
   ["hydrostatic-test", "B"], ["grease-trap", "B"], ["grease-interceptor-flow-capacity", "B"], ["glycol-mix", "B"], ["hydronic-system-volume", "B"],
   ["expansion-tank", "B"], ["backflow-loss", "B"], ["water-hammer-surge", "B"],
   ["pump-operating-point", "B"], ["septic-drainfield", "B"], ["septic-drainfield-capacity", "B"], ["pipe-expansion-loop", "B"],
-  ["water-heater-recovery", "B"], ["water-heater-input", "B"], ["wh-expansion-tank", "B"],
+  ["water-heater-recovery", "B"], ["water-heater-input", "B"], ["solar-thermal-collector", "B"], ["wh-expansion-tank", "B"],
   ["sanitary-dfu", "B"], ["trap-primer", "B"], ["backflow-sizing", "B"],
   ["cross-connection-air-gap", "B"], ["hydronic-fill-pressure", "B"], ["solder-joint-quantity", "B"], ["pipe-insulation-takeoff", "B"], ["heat-trace-sizing", "B"], ["pipe-purge-volume", "B"],
   ["septic-dose-tank", "B"], ["septic-pumpout-interval", "B"], ["septic-tank-for-interval", "B"], ["septic-lpp-orifice", "B"], ["septic-lpp-squirt-head", "B"], ["leach-field-aggregate", "B"],

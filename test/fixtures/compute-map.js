@@ -159,6 +159,7 @@ export const COMPUTE_MAP = {
   "depreciation-recapture": { module: "../../calc-realestate.js", fn: "computeDepreciationRecapture" },
   "rent-roll-vacancy": { module: "../../calc-realestate.js", fn: "computeRentRollVacancy" },
   "water-heater-recovery": { module: "../../calc-plumbing.js", fn: "computeWaterHeaterRecovery" },
+  "solar-thermal-collector": { module: "../../calc-plumbing.js", fn: "computeSolarThermalCollector" },
   "water-heater-input": { module: "../../calc-plumbing.js", fn: "computeWaterHeaterInput" },
   "wh-expansion-tank": { module: "../../calc-plumbing.js", fn: "computeWhExpansionTank" },
   "sanitary-dfu": { module: "../../calc-plumbing.js", fn: "computeSanitaryDfu" },

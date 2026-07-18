@@ -702,6 +702,7 @@ const RELATED = {
   "septic-drainfield-capacity": ["septic-drainfield", "septic-tank", "septic-pumpout-interval"],
   "pipe-expansion-loop": ["pipe-expansion", "expansion-tank"],
   "water-heater-recovery": ["water-heater-input", "wh-expansion-tank", "tankless-gpm", "recirc-loop-sizing"],
+  "solar-thermal-collector": ["water-heater-recovery", "water-heater-storage-sizing", "pool-heater-btu"],
   "water-heater-input": ["water-heater-recovery", "water-heater-storage-sizing", "tankless-gpm", "gas-appliance-demand"],
   "wh-expansion-tank": ["water-heater-recovery", "expansion-tank", "pressure-conversion"],
   "sanitary-dfu": ["trap-arm", "slope", "septic-tank"],

@@ -2565,6 +2565,7 @@ cross-check.
 | calc-plumbing.js | `computeRecircPumpHead` | `{ pipe_length_ft, fittings_count = 0, target_flow_gpm, internal_diameter_in, ...` | _ | _ | _ |
 | calc-plumbing.js | `computeSanitaryDfu` | `{ fixtures = {}, config = "horizontal_branch", slope_in_per_ft = 0.25, propos...` | _ | _ | _ |
 | calc-plumbing.js | `computeSlope` | `{ rise, run, units = "in_per_ft" }` | _ | _ | _ |
+| calc-plumbing.js | `computeSolarThermalCollector` | `{ optical_efficiency = 0.70, loss_coeff = 0.85, inlet_temp_f = 120, ambient_t...` | _ | _ | _ |
 | calc-plumbing.js | `computeSolderJointQuantity` | `{ joints = 200, wire_in_per_joint = 0.75, wire_dia_in = 0.125, solder_density...` | _ | _ | _ |
 | calc-plumbing.js | `computeSpecificEnergy` | `{ b_ft = 0, q_cfs = 0, y_ft = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeStaticPressureLossPiping` | `{ elevation_change_ft, friction_loss_psi = 0, fluid_density_lb_ft3 = 62.4 }` | _ | _ | _ |
@@ -3096,7 +3097,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1682.
+Row count: 1683.
 
 <!-- END function-corpus-v14 -->
 
@@ -3378,7 +3379,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (115 tiles)
+### Group B Plumbing (116 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3461,6 +3462,7 @@ per spec-v14 §13.1 second paragraph.
 | `sewage-force-main-velocity` | Sewage Force-Main Scour Velocity | Ten States Standards; spec-v427 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slope` | Drainage Slope | IPC; Rise 1, run 4 (same units) -> 3 in/ft / 25% / 14.04 deg /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `softener-sizing` | Water Softener Sizing | NSF/ANSI 44 / Water Quality Association; 4 people at 75 gal/day, 20 gpg, 2 ppm iron, 32,000-grain ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `solar-thermal-collector` | Solar Thermal Collector Output | Solar thermal collector (ASHRAE 93 / ...; eta = 0.70 - 0.85 x 50/300 = 0.5583; per sf = 300 x 0.558... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `solder-joint-quantity` | Solder and Flux per Sweat-Joint Takeoff | Solder-weight identity (first-princip...; w/in = (PI/4)*0.125^2*0.30 = 0.003682; solder = 200*0.75*... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `specific-energy` | Open-Channel Specific Energy and Alternate Depth | Specific energy E = y + q^2/(2 g y^2)...; spec-v637 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `static-pressure-piping` | Static Pressure Loss in Piping | Project (first-principles); 30 ft column of water -> 30 * 62.4 / 144 = 13.00 psi elev... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4717,6 +4719,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1435. Fixture-covered or reference-cadence: 1435 / 1435.
+Tile count: 1436. Fixture-covered or reference-cadence: 1436 / 1436.
 
 <!-- END tile-index-v14 -->
