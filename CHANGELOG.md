@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(machining): add reaming-drill-allowance tile (spec-v917); 2026-07-18
+
+- New Group K tile `reaming-drill-allowance` (Reaming Prebore (Drill) Allowance) in calc-machining.js, beside
+  grinding-wheel-rpm. The prebore drill that leaves the right stock for a machine reamer: drill = reamer diameter -
+  allowance, with Machinery's Handbook diameter-band allowances (~0.010 under 1/4 in, 0.015 to 1/2, 0.020 to 1, 0.025
+  to 1-1/2, 0.030 to 2 in), overridable. A 1/2 in reamer wants a 0.485 in prebore; a 3/4 in reamer 0.730 in. Too little
+  stock burnishes the reamer, too much tears an oversize hole. The reamer maker and material govern. Home count
+  1,365 -> 1,366.
+
 ### feat(hvac): add duct-transition-length tile (spec-v916); 2026-07-18
 
 - New Group C tile `duct-transition-length` (Duct Transition (Reducer) Length from Slope) in calc-metalair.js, beside

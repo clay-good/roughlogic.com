@@ -88,6 +88,7 @@ export const COMPUTE_MAP = {
   "cutting-speed-rpm": { module: "../../calc-machining.js", fn: "computeCuttingSpeed" },
   "knurl-blank-diameter": { module: "../../calc-machining.js", fn: "computeKnurlBlankDiameter" },
   "grinding-wheel-rpm": { module: "../../calc-machining.js", fn: "computeGrindingWheelRpm" },
+  "reaming-drill-allowance": { module: "../../calc-machining.js", fn: "computeReamingDrillAllowance" },
   "cutting-diameter-for-rpm": { module: "../../calc-machining.js", fn: "computeCuttingDiameterForRpm" },
   "drill-point-depth": { module: "../../calc-machining.js", fn: "computeDrillPointDepth" },
   "drill-point-angle-from-length": { module: "../../calc-machining.js", fn: "computeDrillPointAngleFromLength" },

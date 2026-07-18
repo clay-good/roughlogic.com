@@ -1112,6 +1112,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "reaming allowance",
+      "target": "reaming-drill-allowance",
+      "kind": "industry"
+    },
+    {
+      "term": "reamer drill size",
+      "target": "reaming-drill-allowance",
+      "kind": "industry"
+    },
+    {
+      "term": "prebore for reamer",
+      "target": "reaming-drill-allowance",
+      "kind": "industry"
+    },
+    {
+      "term": "reaming stock",
+      "target": "reaming-drill-allowance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "drill before reaming",
+      "target": "reaming-drill-allowance",
+      "kind": "adjacent"
+    },
+    {
       "term": "live load reduction",
       "target": "asce-live-load-reduction",
       "kind": "industry"

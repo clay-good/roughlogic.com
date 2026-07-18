@@ -9912,6 +9912,17 @@ export const CITATIONS = {
       { name: "Fresh wheel", value: "the full (unworn) wheel diameter is the governing case; a worn wheel turns slower in SFPM", source: "abrasive-wheel practice" },
     ],
   },
+  "reaming-drill-allowance": {
+    formula: "allowance = banded from the finished diameter (0.010 under 1/4 in, 0.015 to 1/2, 0.020 to 1, 0.025 to 1-1/2, 0.030 to 2 in) unless overridden; drill_diameter_in = reamer_diameter_in - allowance (on the diameter).",
+    edition: "Machinery's Handbook (Industrial Press) machine-reaming stock allowances, by name; public-domain shop guidance. The reamer maker and the material govern.",
+    freeAccess: "The prebore relation is a first-principles subtraction; the diameter-band stock allowances are public Machinery's Handbook guidance, and the reamer diameter is user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "The drill (prebore) diameter that leaves the correct stock for a machine reamer to clean up: drill = reamer diameter - allowance, the allowance taken on the diameter. Machinery's Handbook machine-reaming allowances run about 0.010 in under 1/4 in, 0.015 in from 1/4 to 1/2, 0.020 in from 1/2 to 1, 0.025 in from 1 to 1-1/2, and 0.030 in from 1-1/2 to 2 in. Too little stock burnishes and dulls the reamer without cutting; too much overloads the flutes and leaves an oversize, torn, or bell-mouthed hole. Select the nearest available drill at or just below the computed size. Hand reamers, thin-wall parts, and interrupted holes take less stock; the reamer manufacturer's guidance and the material govern.",
+    assumptions: [
+      { name: "Diameter-band allowance", value: "machine reaming: ~0.010/0.015/0.020/0.025/0.030 in by finished-diameter band, on the diameter; overridable", source: "Machinery's Handbook" },
+      { name: "Machine reaming", value: "hand reamers and thin-wall or interrupted holes take less; the reamer maker and material govern", source: "shop practice" },
+    ],
+  },
   "rolled-blank": {
     formula: "Developed flat length L = pi x neutral-axis diameter; with the neutral axis k x T from the inside, D_neutral = OD - 2T(1-k) = ID + 2kT. Default k = 0.5 (mid-thickness) gives L = pi x (OD - T).",
     edition: "Developed blank length to roll plate into a cylinder - first-principles arc-length geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",

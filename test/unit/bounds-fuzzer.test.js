@@ -26723,6 +26723,25 @@ test("bounds: spec-v908 computeSmokeDetectorSpacingCount pins the grid, detector
   assert.ok("error" in _v908({ room_length_ft: Infinity, room_width_ft: 40, listed_spacing_ft: 30 }));
 });
 
+import { computeReamingDrillAllowance as _v917 } from "../../calc-machining.js";
+
+test("bounds: spec-v917 computeReamingDrillAllowance pins the banded allowance, prebore, override, and error seams", () => {
+  const r = _v917({ reamer_diameter_in: 0.5, allowance_override_in: 0 });
+  assert.ok(Math.abs(r.allowance_used_in - 0.015) < 1e-9); // 1/4-1/2 band
+  assert.ok(Math.abs(r.drill_diameter_in - 0.485) < 1e-9); // 0.500 - 0.015
+  assert.ok(Math.abs(_v917({ reamer_diameter_in: 0.75 }).drill_diameter_in - 0.730) < 1e-9); // 1/2-1 band 0.020
+  assert.ok(Math.abs(_v917({ reamer_diameter_in: 0.2 }).allowance_used_in - 0.010) < 1e-9); // under 1/4
+  assert.ok(Math.abs(_v917({ reamer_diameter_in: 1.25 }).allowance_used_in - 0.025) < 1e-9); // 1-1.5 band
+  // Override wins over the band.
+  const ov = _v917({ reamer_diameter_in: 0.5, allowance_override_in: 0.008 });
+  assert.ok(Math.abs(ov.drill_diameter_in - 0.492) < 1e-9);
+  // Error seams: non-positive reamer, negative override, allowance exceeding diameter, non-finite.
+  assert.ok("error" in _v917({ reamer_diameter_in: 0 }));
+  assert.ok("error" in _v917({ reamer_diameter_in: 0.5, allowance_override_in: -0.01 }));
+  assert.ok("error" in _v917({ reamer_diameter_in: 0.008, allowance_override_in: 0.02 }));
+  assert.ok("error" in _v917({ reamer_diameter_in: Infinity }));
+});
+
 import { computeGrindingWheelRpm as _v911 } from "../../calc-machining.js";
 
 test("bounds: spec-v911 computeGrindingWheelRpm pins the max RPM, surface speed, verdict, and error seams", () => {

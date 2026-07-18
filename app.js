@@ -911,6 +911,8 @@ const TOOL_MODULES = (() => {
     "knurl-blank-diameter",
     // spec-v911 grinding wheel surface speed and max safe RPM
     "grinding-wheel-rpm",
+    // spec-v917 reaming prebore (drill) allowance
+    "reaming-drill-allowance",
     // v100 cutting-fluid concentration
     "cutting-fluid-concentration",
     // v135 cutting power and spindle torque from MRR

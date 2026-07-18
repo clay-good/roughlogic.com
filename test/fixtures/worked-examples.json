@@ -34392,6 +34392,54 @@
    }
   },
   {
+   "tile_id": "reaming-drill-allowance",
+   "source_publisher": "machine-reaming stock allowance (Machinery's Handbook)",
+   "source_title": "0.500 in reamer -> 0.015 in allowance, 0.485 in prebore drill",
+   "source_edition_or_year": "spec-v917 worked example (machine-verified)",
+   "source_section_or_page": "0.5 in is in the 1/4-1/2 band (0.015); drill = 0.500 - 0.015 = 0.485",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "reamer_diameter_in": 0.5,
+    "allowance_override_in": 0
+   },
+   "outputs": {
+    "allowance_used_in": {
+     "value": 0.015,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "drill_diameter_in": {
+     "value": 0.485,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "reaming-drill-allowance",
+   "source_publisher": "machine-reaming stock allowance (Machinery's Handbook)",
+   "source_title": "cross-check: 0.750 in reamer -> 0.020 in allowance, 0.730 in prebore",
+   "source_edition_or_year": "spec-v917 worked example (machine-verified)",
+   "source_section_or_page": "0.75 in is in the 1/2-1 band (0.020); drill = 0.750 - 0.020 = 0.730",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "reamer_diameter_in": 0.75,
+    "allowance_override_in": 0
+   },
+   "outputs": {
+    "drill_diameter_in": {
+     "value": 0.73,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "grinding-wheel-rpm",
    "source_publisher": "grinding wheel surface-speed identity (ANSI B7.1)",
    "source_title": "7 in wheel rated 6,500 SFPM on a 3,450 RPM grinder -> max 3,547 RPM, actual 6,322 SFPM, within rating",

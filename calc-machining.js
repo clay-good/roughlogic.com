@@ -1063,3 +1063,49 @@ function _v911renderGrindingWheelRpm(inputRegion, outputRegion, citationEl) {
   for (const f of [wd, rs, gr]) f.input.addEventListener("input", update);
 }
 MACHINING_RENDERERS["grinding-wheel-rpm"] = _v911renderGrindingWheelRpm;
+
+// ===================== spec-v917: reaming prebore (drill) allowance =====================
+// dims: in { reamer_diameter_in: L, allowance_override_in: L } out: { allowance_used_in: L, drill_diameter_in: L }
+export function computeReamingDrillAllowance({ reamer_diameter_in = 0.5, allowance_override_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(reamer_diameter_in > 0)) return { error: "Reamer diameter must be positive (in)." };
+  if (allowance_override_in < 0) return { error: "Allowance override cannot be negative (in)." };
+  // Machinery's Handbook machine-reaming stock allowances by finished diameter band (on the diameter).
+  const banded = reamer_diameter_in < 0.25 ? 0.010
+    : reamer_diameter_in <= 0.5 ? 0.015
+    : reamer_diameter_in <= 1.0 ? 0.020
+    : reamer_diameter_in <= 1.5 ? 0.025
+    : 0.030;
+  const allowance_used_in = allowance_override_in > 0 ? allowance_override_in : banded;
+  const drill_diameter_in = reamer_diameter_in - allowance_used_in;
+  if (!(drill_diameter_in > 0)) return { error: "Allowance exceeds the reamer diameter: the prebore would be non-positive." };
+  return {
+    allowance_used_in,
+    drill_diameter_in,
+    note: "The prebore (drill) diameter to leave the right stock for a machine reamer to clean up: drill = reamer diameter - allowance. Machinery's Handbook stock allowances on the diameter run about 0.010 in under 1/4 in, 0.015 in from 1/4 to 1/2, 0.020 in from 1/2 to 1, 0.025 in from 1 to 1-1/2, and 0.030 in from 1-1/2 to 2; too little stock burnishes and dulls the reamer, too much leaves an oversize, torn, or bell-mouthed hole. Select the nearest available drill at or just below this size. Hand reamers, thin-wall parts, and interrupted holes take less; the reamer maker's guidance and the material govern.",
+  };
+}
+
+export const reamingDrillAllowanceExample = { inputs: { reamer_diameter_in: 0.5, allowance_override_in: 0 } };
+
+function _v917renderReamingDrillAllowance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: machine-reaming stock allowance by name. drill = reamer diameter - allowance; Machinery's Handbook diameter-band allowances (~0.010 under 1/4, 0.015 to 1/2, 0.020 to 1, 0.025 to 1-1/2, 0.030 to 2 in). The reamer maker's guidance and the material govern.";
+  const rd = makeNumber("Finished reamer diameter (in)", "rda-rd", { step: "any", min: "0", value: "0.5" });
+  rd.input.value = "0.5";
+  const ov = makeNumber("Allowance override (in, 0 = auto band)", "rda-ov", { step: "any", min: "0", value: "0" });
+  ov.input.value = "0";
+  for (const f of [rd, ov]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { rd.input.value = "0.5"; ov.input.value = "0"; update(); });
+  const oDrill = makeOutputLine(outputRegion, "Prebore drill diameter", "rda-out-d");
+  const oAllow = makeOutputLine(outputRegion, "Allowance used", "rda-out-a");
+  const update = debounce(() => {
+    const r = computeReamingDrillAllowance({
+      reamer_diameter_in: rd.input.value === "" ? 0.5 : Number(rd.input.value), allowance_override_in: ov.input.value === "" ? 0 : Number(ov.input.value),
+    });
+    if (r.error) { oDrill.textContent = r.error; oAllow.textContent = "-"; return; }
+    oDrill.textContent = fmt(r.drill_diameter_in, 4) + " in";
+    oAllow.textContent = fmt(r.allowance_used_in, 4) + " in on the diameter";
+  }, DEBOUNCE_MS);
+  for (const f of [rd, ov]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["reaming-drill-allowance"] = _v917renderReamingDrillAllowance;
