@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(structural): guard wood beam-bending (NDS) and pipe pressure-rating (ASME B31) with physical monotonicity; 2026-07-17
+
+- Added whole-response guards: wood allowable moment rises with reference bending value, width, and depth and falls with
+  unbraced length (beam-stability penalty); pipe allowable pressure rises with wall thickness and allowable stress and
+  falls with outside diameter. A non-conservative sign/term error passes the pinned example but breaks these. Test-only.
+
 ### test(concrete): guard RC beam-shear and column-axial capacity with physical monotonicity (ACI 318); 2026-07-17
 
 - Added whole-response monotonicity guards on two RC capacity computes: concrete shear Vc rises with concrete strength,

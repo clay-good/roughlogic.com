@@ -11842,3 +11842,23 @@ test("monotonicity: RC beam shear Vc and column axial capacity respond correctly
   assert.ok(pn({ fc_psi: 5000 }) > pn({ fc_psi: 4000 }), "column capacity must rise with concrete strength");
   assert.ok(pn({ ast_in2: 9 }) > pn({ ast_in2: 6.32 }), "column capacity must rise with longitudinal steel area");
 });
+
+// Physical monotonicity of the wood beam-bending (NDS) and pipe pressure-rating
+// (ASME B31) capacity computes. Wood allowable moment M' = Fb' * S rises with
+// reference bending value, width, and depth, and falls with unbraced length
+// (the CL beam-stability penalty). Pipe allowable pressure P = 2*S*E*t/D rises
+// with wall thickness and allowable stress and falls with outside diameter. A
+// non-conservative sign/term error passes the single pinned example but not these.
+test("monotonicity: wood beam moment and pipe pressure rating respond correctly to their inputs (NDS / ASME B31)", async () => {
+  const con = await import("../../calc-construction.js");
+  const pf = await import("../../calc-pipefit.js");
+  const wb = (o) => con.computeWoodBeamBending({ fb_star_psi: 1350, emin_psi: 620000, b_in: 3.5, d_in: 11.25, le_in: 144, ...o }).m_prime_ftlb;
+  assert.ok(wb({ fb_star_psi: 1600 }) > wb({ fb_star_psi: 1350 }), "wood M' must rise with reference bending value");
+  assert.ok(wb({ b_in: 5.5 }) > wb({ b_in: 3.5 }), "wood M' must rise with width");
+  assert.ok(wb({ d_in: 13.5 }) > wb({ d_in: 11.25 }), "wood M' must rise with depth");
+  assert.ok(wb({ le_in: 240 }) < wb({ le_in: 144 }), "wood M' must fall with unbraced length (beam stability)");
+  const pp = (o) => pf.computePipePressureRating({ od_in: 4.5, wall_in: 0.237, allow_stress: 17100, joint_factor: 1, y_coeff: 0.4, mill_tol_frac: 0.125, allowance_in: 0, mode: "allowable_pressure", ...o }).p_allow;
+  assert.ok(pp({ wall_in: 0.337 }) > pp({ wall_in: 0.237 }), "pipe pressure must rise with wall thickness");
+  assert.ok(pp({ allow_stress: 20000 }) > pp({ allow_stress: 17100 }), "pipe pressure must rise with allowable stress");
+  assert.ok(pp({ od_in: 6.625 }) < pp({ od_in: 4.5 }), "pipe pressure must fall with outside diameter");
+});
