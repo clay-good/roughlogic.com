@@ -136,13 +136,14 @@ export function computeRefrigerantPT({ refrigerant, pressure_psig = null, temper
   if (pressure_psig === null && temperature_F === null) return { error: "Provide pressure or temperature." };
   const value = interpolateRefrigerant({ pairs: r.pt_pairs, pressure_psig, temperature_F });
   // v8 §C.3: target-superheat lookup for outdoor temp + indoor wet-bulb.
-  // Carrier / Trane published TXV / fixed-orifice charging charts collapse
-  // to a roughly-linear band: superheat decreases as outdoor temp rises and
-  // increases as indoor wet-bulb rises. The bundled engineering-practice
-  // approximation: target_superheat_F = clamp(70 + 0.6 × WB - 0.5 × OAT, 5, 30).
+  // The published fixed-orifice charging-chart approximation is
+  // target_SH = (3 × IWB − 80 − ODB) / 2 (superheat falls as outdoor temp
+  // rises and rises with indoor wet-bulb) -- the same identity the sibling
+  // superheat-subcool tile uses; the two must agree on this quantity. Clamped
+  // to a sane [5, 30] °F band only at the extremes of the chart's domain.
   let target_superheat_F = null;
   if (outdoor_F !== null && indoor_wb_F !== null) {
-    const t = 70 + 0.6 * Number(indoor_wb_F) - 0.5 * Number(outdoor_F);
+    const t = (3 * Number(indoor_wb_F) - 80 - Number(outdoor_F)) / 2;
     target_superheat_F = Math.max(5, Math.min(30, t));
   }
   const out = pressure_psig !== null

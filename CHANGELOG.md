@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(refrigerant): refrigerant-pt target superheat used a band that pinned to 30 F for every real condition; 2026-07-18
+
+- computeRefrigerantPT's optional target-superheat band was `clamp(70 + 0.6*IWB - 0.5*ODB, 5, 30)`. For every
+  physically realistic A/C condition the raw value exceeds 30 (to drop below it you'd need an outdoor temp over
+  150 F), so the tile always displayed "target superheat 30.0 F" -- which reads as severe undercharge and would
+  mislead a tech charging a correctly-charged system. Replaced with the published fixed-orifice charging-chart
+  identity `(3*IWB - 80 - ODB)/2`, the same formula the sibling superheat-subcool tile already uses, so the two
+  tiles now agree. IWB 67 / ODB 95 now gives 13 F (was 30); IWB 63 / ODB 95 gives 7 F. The pinned P-T worked
+  example never supplied the optional wet-bulb/outdoor inputs, so the bug hid behind the fixture; the bounds-fuzzer
+  assertion had mirrored the broken formula and now pins 13 F plus a cross-tile consistency check against the
+  sibling. Found by a first-principles formula audit.
+
 ### feat(search): question-phrase aliases for group E construction-ops tiles, part 2 of 2 -- corpus now covers every tile (spec-v590 follow-on); 2026-07-17
 
 - Part 2 covers the remaining 48 group E tiles (scaffold/formwork/mass-concrete, the roofing/insulation/finish

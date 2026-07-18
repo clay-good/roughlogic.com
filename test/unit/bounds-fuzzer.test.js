@@ -7014,10 +7014,19 @@ test("bounds: calc-hvac computeRefrigerantPT pins R-410A psig=118 -> sat T=40 F 
   const r = computeRefrigerantPT({ refrigerant: "R-410A", pressure_psig: 118 });
   assert.strictEqual(r.saturated_temperature_F, 40);
   assert.ok(typeof r.manufacturer === "string");
-  // target_superheat_F = clamp(70 + 0.6 * WB - 0.5 * OAT, 5, 30).
+  // target_superheat_F = clamp((3 * IWB - 80 - ODB) / 2, 5, 30) -- the
+  // published fixed-orifice charging-chart identity, shared with the
+  // superheat-subcool tile. IWB 67 / ODB 95 -> (201 - 80 - 95)/2 = 13 F
+  // (interior of the band, so the clamp does NOT dominate -- the pre-fix
+  // 70 + 0.6*WB - 0.5*OAT band pinned to 30 F for every realistic input).
   const sh = computeRefrigerantPT({ refrigerant: "R-410A", pressure_psig: 118, outdoor_F: 95, indoor_wb_F: 67 });
-  const expected = Math.max(5, Math.min(30, 70 + 0.6 * 67 - 0.5 * 95));
+  const expected = Math.max(5, Math.min(30, (3 * 67 - 80 - 95) / 2));
   assert.ok(Math.abs(sh.target_superheat_F - expected) < 1e-9);
+  assert.ok(sh.target_superheat_F === 13, "IWB 67 / ODB 95 target superheat should be 13 F, not the clamped 30");
+  // Cross-tile consistency: the P-T tile and the superheat-subcool tile must
+  // agree on the target-superheat identity for the same conditions.
+  const sib = computeSuperheatSubcool({ refrigerant: "R-410A", system_pressure_psig: 118, line_temperature_F: 55, mode: "superheat", indoor_wet_bulb_F: 67, outdoor_dry_bulb_F: 95 });
+  assert.ok(Math.abs(sib.target_superheat_F - 13) < 1e-9, "superheat-subcool sibling should also give 13 F");
   // Rejections.
   assert.ok("error" in computeRefrigerantPT({ refrigerant: "unknown", pressure_psig: 100 }));
   assert.ok("error" in computeRefrigerantPT({ refrigerant: "R-410A" }));
