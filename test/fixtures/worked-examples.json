@@ -17221,9 +17221,9 @@
   {
    "tile_id": "thread-measure-wire",
    "source_publisher": "First-principles three-wire geometry + Machinery's Handbook",
-   "source_title": "W = 0.57735 P; M = E + 3W - 1.51553 P",
+   "source_title": "W = 0.57735 P; M = E + 3W - 0.86603 P",
    "source_edition_or_year": "geometric",
-   "source_section_or_page": "1/2-13 UNC, E 0.45 in -> best wire 0.044412 in, M 0.466655 in",
+   "source_section_or_page": "1/2-13 UNC, E 0.45 in -> best wire 0.044412 in, M 0.516617 in",
    "verified_by": "rl",
    "verified_on": "2026-06-11",
    "inputs": {
@@ -17241,7 +17241,7 @@
      }
     },
     "measurement_over_wires_in": {
-     "value": 0.46665545,
+     "value": 0.51661734,
      "tolerance": {
       "abs": 1e-07
      }
@@ -17251,9 +17251,9 @@
   {
    "tile_id": "thread-pitch-dia-from-wires",
    "source_publisher": "First-principles three-wire geometry + Machinery's Handbook",
-   "source_title": "E = M - 3W + 1.51553 P; inverse of the three-wire measurement",
+   "source_title": "E = M - 3W + 0.86603 P; inverse of the three-wire measurement",
    "source_edition_or_year": "geometric",
-   "source_section_or_page": "1/2-13 UNC, M 0.49 in over best wires -> E 0.473345 in",
+   "source_section_or_page": "1/2-13 UNC, M 0.49 in over best wires -> E 0.423383 in",
    "verified_by": "rl",
    "verified_on": "2026-07-14",
    "inputs": {
@@ -17271,7 +17271,7 @@
      }
     },
     "pitch_diameter_in": {
-     "value": 0.47334455,
+     "value": 0.42338266,
      "tolerance": {
       "abs": 1e-07
      }

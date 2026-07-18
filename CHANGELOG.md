@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(shop): three-wire thread measurement constant 1.51553 -> 0.86603 (sqrt(3)/2) for thread-measure-wire and its inverse; 2026-07-17
+
+- `thread-measure-wire` and `thread-pitch-dia-from-wires` (calc-shop.js) used a measurement-over-wires constant
+  `_V40_MOW_K = 1.51553` in `M = E + 3W - K*P`. For a 60-degree V-thread the correct constant is
+  `(1/2)cot(30 deg) = sqrt(3)/2 = 0.8660254` (the wire center sits H/2 = 0.43301*P below the pitch line; sharp-V height
+  H = 0.86603*P); 1.51553 has no valid geometric origin (it is exactly 1.75x the correct value). For the tiles' own
+  1/2-13 example the measurement over wires came out 0.4667 in -- below the 0.500 in major diameter, physically impossible
+  since the wires must protrude past the crest -- instead of the correct 0.5166 in; the inverse tile carried the same
+  ~0.05 in error into pitch-diameter readings (enormous for thread gaging). The constant was mirrored in the fixtures,
+  bounds-fuzzer pins, tools-data descriptions, and citations, so the gates green-lit it. Fixed to `Math.cos(Math.PI/6)`
+  (= sqrt(3)/2) and updated every mirrored value. Caught by a first-principles re-derivation of calc-shop.js.
+
 ### fix(trucking): cargo-securement-wll undercounted tiedowns for articles over 10 ft (49 CFR 393.110); 2026-07-17
 
 - `cargo-securement-wll` (calc-trucking.js) computed the minimum tiedown count as `max(2, ceil(len/10))`. 49 CFR 393.110(b)

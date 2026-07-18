@@ -494,11 +494,11 @@ SHOP_RENDERERS["dividing-head"] = _v40renderDividingHead;
 // =====================================================================
 // spec-v40 2.6 - thread-measure-wire (Three-Wire Thread Measurement) - Group G
 // 60-degree form. Best wire W = P / (2 cos30) = 0.57735 P; measurement
-// over three wires M = E + 3W - 1.51553 P. First-principles geometry.
+// over three wires M = E + 3W - 0.86603 P. First-principles geometry.
 // =====================================================================
 
 const _V40_BESTWIRE = 1 / (2 * Math.cos(Math.PI / 6)); // 0.5773502691896258
-const _V40_MOW_K = 1.51553; // 60-degree measurement-over-wires constant
+const _V40_MOW_K = Math.cos(Math.PI / 6); // 0.8660254 = (1/2)cot(30deg) = sqrt(3)/2, the 60-degree measurement-over-wires constant (M = E + 3W - K*P)
 
 // dims: in { thread_standard: dimensionless, tpi: T^-1, pitch_mm: L, pitch_diameter_in: L, wire_dia_in: L } out: { best_wire_in: L, measurement_over_wires_in: L }
 export function computeThreadMeasureWire({ thread_standard = "inch", tpi = 0, pitch_mm = 0, pitch_diameter_in = 0, wire_dia_in = 0 } = {}) {
@@ -524,7 +524,7 @@ export function computeThreadMeasureWire({ thread_standard = "inch", tpi = 0, pi
   const wire_out_of_range = W < wire_min_in || W > wire_max_in;
   const M = E + 3 * W - _V40_MOW_K * P_in;
   const notes = [];
-  notes.push("For a 60-degree thread, best wire W = P / (2 cos30) = 0.57735 x P (acceptable range 0.560P to 0.650P); the measurement over three wires M = E + 3W - 1.51553 x P. First-principles thread geometry; the pitch diameter E is user-supplied (no thread-class table here).");
+  notes.push("For a 60-degree thread, best wire W = P / (2 cos30) = 0.57735 x P (acceptable range 0.560P to 0.650P); the measurement over three wires M = E + 3W - 0.86603 x P. First-principles thread geometry; the pitch diameter E is user-supplied (no thread-class table here).");
   if (used_best) notes.push("Using the best-wire size " + fmt(best_wire_in, 6) + " in.");
   if (wire_out_of_range) notes.push("The entered wire " + fmt(W, 6) + " in is outside the acceptable range " + fmt(wire_min_in, 6) + " to " + fmt(wire_max_in, 6) + " in - the contact point moves off the pitch line and M is less reliable.");
   return {
@@ -536,7 +536,7 @@ export function computeThreadMeasureWire({ thread_standard = "inch", tpi = 0, pi
 export const threadMeasureWireExample = { inputs: { thread_standard: "inch", tpi: 13, pitch_mm: 0, pitch_diameter_in: 0.45, wire_dia_in: 0 } };
 
 function _v40renderThreadMeasureWire(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: The three-wire measurement-over-wires method for 60-degree threads - best wire W = 0.57735 x P, M = E + 3W - 1.51553 x P - first-principles geometry as in Machinery's Handbook (Industrial Press), by name; public domain. The pitch diameter E is user-supplied (no thread-class table lookup).";
+  citationEl.textContent = "Citation: The three-wire measurement-over-wires method for 60-degree threads - best wire W = 0.57735 x P, M = E + 3W - 0.86603 x P - first-principles geometry as in Machinery's Handbook (Industrial Press), by name; public domain. The pitch diameter E is user-supplied (no thread-class table lookup).";
   const std = makeSelect("Thread standard", "tmw-std", [
     { value: "inch", label: "Inch (enter TPI)" },
     { value: "metric", label: "Metric (enter pitch in mm)" },
@@ -564,7 +564,7 @@ SHOP_RENDERERS["thread-measure-wire"] = _v40renderThreadMeasureWire;
 
 // thread-pitch-dia-from-wires: inverse of thread-measure-wire. The forward tile
 // gives the measurement over wires M from a pitch diameter E; the machinist
-// actually measures M on the mic and wants E, so E = M - 3W + 1.51553 P is the
+// actually measures M on the mic and wants E, so E = M - 3W + 0.86603 P is the
 // working direction. Same 60-degree geometry, best-wire default, and range check.
 // dims: in { thread_standard: dimensionless, tpi: T^-1, pitch_mm: L, measurement_over_wires_in: L, wire_dia_in: L } out: { pitch_diameter_in: L, best_wire_in: L, pitch_in: L }
 export function computeThreadPitchDiaFromWires({ thread_standard = "inch", tpi = 0, pitch_mm = 0, measurement_over_wires_in = 0, wire_dia_in = 0 } = {}) {
@@ -591,7 +591,7 @@ export function computeThreadPitchDiaFromWires({ thread_standard = "inch", tpi =
   const E = M - 3 * W + _V40_MOW_K * P_in;
   if (!(E > 0)) return { error: "Computed pitch diameter is not positive; check the measurement, the wire size, and the thread pitch." };
   const notes = [];
-  notes.push("For a 60-degree thread, best wire W = 0.57735 x P (acceptable range 0.560P to 0.650P); the pitch diameter from a measurement over three wires is E = M - 3W + 1.51553 x P. First-principles thread geometry; compare E to the thread-class pitch-diameter limits for the fit.");
+  notes.push("For a 60-degree thread, best wire W = 0.57735 x P (acceptable range 0.560P to 0.650P); the pitch diameter from a measurement over three wires is E = M - 3W + 0.86603 x P. First-principles thread geometry; compare E to the thread-class pitch-diameter limits for the fit.");
   if (used_best) notes.push("Using the best-wire size " + fmt(best_wire_in, 6) + " in.");
   if (wire_out_of_range) notes.push("The entered wire " + fmt(W, 6) + " in is outside the acceptable range " + fmt(wire_min_in, 6) + " to " + fmt(wire_max_in, 6) + " in - the contact point moves off the pitch line and E is less reliable.");
   return {
@@ -602,7 +602,7 @@ export function computeThreadPitchDiaFromWires({ thread_standard = "inch", tpi =
 }
 export const threadPitchDiaFromWiresExample = { inputs: { thread_standard: "inch", tpi: 13, pitch_mm: 0, measurement_over_wires_in: 0.49, wire_dia_in: 0 } };
 function _v721renderThreadPitchDiaFromWires(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: The three-wire method for 60-degree threads solved for the pitch diameter - E = M - 3W + 1.51553 x P, best wire W = 0.57735 x P - first-principles geometry as in Machinery's Handbook (Industrial Press), by name; public domain. Compare E to the thread-class limits.";
+  citationEl.textContent = "Citation: The three-wire method for 60-degree threads solved for the pitch diameter - E = M - 3W + 0.86603 x P, best wire W = 0.57735 x P - first-principles geometry as in Machinery's Handbook (Industrial Press), by name; public domain. Compare E to the thread-class limits.";
   const std = makeSelect("Thread standard", "tpd-std", [
     { value: "inch", label: "Inch (enter TPI)" },
     { value: "metric", label: "Metric (enter pitch in mm)" },

@@ -11604,7 +11604,7 @@ test("bounds: spec-v40 thread-measure-wire pins best wire/M + rejects bad inputs
   const a = _cv40f({ thread_standard: "inch", tpi: 13, pitch_diameter_in: 0.45 });
   const P = 1 / 13;
   assert.ok(Math.abs(a.best_wire_in - 0.5773502691896258 * P) < 1e-12);
-  assert.ok(Math.abs(a.measurement_over_wires_in - (0.45 + 3 * a.best_wire_in - 1.51553 * P)) < 1e-12);
+  assert.ok(Math.abs(a.measurement_over_wires_in - (0.45 + 3 * a.best_wire_in - Math.cos(Math.PI / 6) * P)) < 1e-12); // K = (1/2)cot(30deg) = sqrt(3)/2
   // metric path.
   const b = _cv40f({ thread_standard: "metric", pitch_mm: 1.5, pitch_diameter_in: 0.4 });
   assert.ok(Math.abs(b.pitch_in - 1.5 / 25.4) < 1e-12);
@@ -11621,8 +11621,8 @@ test("bounds: spec-v721 computeThreadPitchDiaFromWires pins E = M - 3W + 1.51553
   const r = _v721({ thread_standard: "inch", tpi: 13, measurement_over_wires_in: 0.49, wire_dia_in: 0 });
   assert.ok(!r.error, JSON.stringify(r));
   const P = 1 / 13, W = 0.5773502691896258 * P;
-  assert.ok(Math.abs(r.pitch_diameter_in - (0.49 - 3 * W + 1.51553 * P)) < 1e-9, `E identity: ${r.pitch_diameter_in}`);
-  assert.ok(Math.abs(r.pitch_diameter_in - 0.47334455) < 1e-6, `pinned 0.4733 in: ${r.pitch_diameter_in}`);
+  assert.ok(Math.abs(r.pitch_diameter_in - (0.49 - 3 * W + Math.cos(Math.PI / 6) * P)) < 1e-9, `E identity: ${r.pitch_diameter_in}`); // K = sqrt(3)/2
+  assert.ok(Math.abs(r.pitch_diameter_in - 0.42338266) < 1e-6, `pinned 0.4234 in: ${r.pitch_diameter_in}`);
   // Round-trip: the pitch diameter, fed back through the forward tile with the same wire, reproduces the measurement.
   for (const tpi of [8, 13, 20]) {
     for (const measurement_over_wires_in of [0.3, 0.49, 1.2]) {

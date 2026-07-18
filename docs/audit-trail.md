@@ -684,7 +684,7 @@ review.
 - **v40 correctness re-audit**: independently re-derived all 10 calc-shop tiles'
   formulas + empirical constants from first principles (machining-time, turning
   MRR 12xSFMxDOCxIPR=4.32, surface finish Rt=f^2/8r, taper atan((D-d)/2L)=2.38594,
-  three-wire 0.57735/1.51553, punch perimeterxTxshear=19634.95, press-brake
+  three-wire 0.57735/0.86603, punch perimeterxTxshear=19634.95, press-brake
   575x(UTS/60)xT^2/V=8.984, weld duty 60x(250/300)^2=41.67%, IIW CE=0.38333).
   ALL MATCH -- recent additions confirmed correct, not merely self-consistent. No
   fix needed. (Also surveyed Group T Lab = comprehensive; no clean gap there.)
