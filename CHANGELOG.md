@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(elecdesign): guard point-illuminance inverse-square law and its height round-trip; 2026-07-17
+
+- Consistency guard: IES point method E = I x cos^3(angle) / h^2 rises with intensity, falls with mount height and
+  aiming angle, quarters when the height doubles, lux = fc x 10.764, and the height inverse round-trips the mounting
+  height. Test-only.
+
 ### test(hvacservice): round-trip furnace temp-rise against airflow-to-rise; 2026-07-17
 
 - Consistency guard: both tiles share Qs = 1.08 x CFM x delta-T with output = input x efficiency; derived CFM =

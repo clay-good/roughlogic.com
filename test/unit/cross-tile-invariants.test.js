@@ -12298,3 +12298,18 @@ test("consistency: furnace temp-rise and airflow-to-rise round-trip through Qs =
   const back = h.computeFurnaceAirflowToRise({ input_btuh: 80000, efficiency_pct: 80, cfm: tr({}).cfm, return_air_F: 70 });
   assert.ok(Math.abs(back.delta_T_F - 50) < 1e-4, "temp-rise and airflow-to-rise must round-trip the rise");
 });
+
+test("consistency: point-illuminance obeys the inverse-square cosine law and round-trips its height inverse (elecdesign)", async () => {
+  const e = await import("../../calc-elecdesign.js");
+  const pi = (o) => e.computePointIlluminance({ intensity_cd: 1000, mount_height_ft: 10, angle_deg: 0, ...o });
+  assert.ok(Math.abs(pi({}).e_fc - 10) < 1e-9, "E at nadir = I / h^2 (1000 cd, 10 ft -> 10 fc)");
+  assert.ok(Math.abs(pi({ angle_deg: 30 }).e_fc - 1000 * Math.pow(Math.cos(30 * Math.PI / 180), 3) / 100) < 1e-6, "E = I * cos^3(angle) / h^2");
+  assert.ok(pi({ intensity_cd: 2000 }).e_fc > pi({}).e_fc, "illuminance must rise with luminous intensity");
+  assert.ok(pi({ mount_height_ft: 20 }).e_fc < pi({}).e_fc, "illuminance must fall as the mounting height rises");
+  assert.ok(pi({ angle_deg: 45 }).e_fc < pi({}).e_fc, "illuminance must fall as the aiming angle opens off nadir");
+  assert.ok(Math.abs(pi({}).e_fc / pi({ mount_height_ft: 20 }).e_fc - 4) < 1e-6, "doubling the height must quarter the illuminance (inverse square)");
+  assert.ok(Math.abs(pi({}).e_lux - pi({}).e_fc * 10.764) < 1e-3, "lux = footcandles * 10.764");
+  // Round-trip: the computed footcandles fed the height inverse must recover the mounting height.
+  const inv = e.computeLuminaireHeightForIlluminance({ intensity_cd: 1000, target_fc: pi({}).e_fc, angle_deg: 0 });
+  assert.ok(Math.abs(inv.mount_height_ft - 10) < 1e-6, "point-illuminance and its height inverse must round-trip the mounting height");
+});
