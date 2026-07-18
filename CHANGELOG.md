@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test: regression-guard the audited joist-hanger, timber-cruise, and cargo-securement fixes; 2026-07-17
+
+- Whole-response monotonicity guards protecting three earlier formula fixes: joist count ceils on a partial bay
+  (floor->ceil fix), timber-cruise board feet rise with small-end diameter (/4 log-rule fix), and minimum tiedowns
+  rise past 10 ft (cargo-securement rule fix). Complements the pinned worked examples. Test-only.
+
 ### test(plumbing): guard water-heater recovery with monotonicity; 2026-07-17
 
 - Added a guard on computeWaterHeaterRecovery: recovery gph = input BTU/hr x efficiency / (8.33 x delta_T) rises with

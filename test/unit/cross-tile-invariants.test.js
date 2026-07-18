@@ -12048,3 +12048,17 @@ test("monotonicity: water-heater recovery responds correctly to input, efficienc
   assert.ok(wh({ tank_gal: 80 }).first_hour_gph > wh({}).first_hour_gph, "first-hour delivery must rise with tank size");
   assert.ok(Math.abs(wh({}).recovery_gph - 40000 * 0.8 / (8.33 * 70)) < 0.1, "recovery must equal input*eff/(8.33*deltaT)");
 });
+
+test("regression: joist-hanger, timber-cruise, and cargo-securement respond monotonically (guards the audited fixes)", async () => {
+  const con = await import("../../calc-construction.js");
+  const ag = await import("../../calc-agriculture.js");
+  const tr = await import("../../calc-trucking.js");
+  const jh = (o) => con.computeJoistHangerCount({ run_width_ft: 16, spacing_in: 16, ends_per_joist: 2, nails_per_hanger: 10, ...o });
+  const tc = (o) => ag.computeTimberCruise({ small_end_dib_in: 14, log_length_ft: 16, rule: "international", ...o }).board_feet;
+  const cs = (o) => tr.computeCargoSecurementWLL({ cargo_weight_lb: 8000, tiedown_count: 9, wll_each_lb: 5000, cargo_length_ft: 16, ...o }).min_tiedowns;
+  assert.ok(jh({ run_width_ft: 24 }).joists > jh({}).joists, "joist count must rise with run width");
+  assert.ok(jh({ run_width_ft: 16.5 }).joists > jh({ run_width_ft: 16 }).joists, "a partial bay must ceil to one more joist (guards the floor->ceil fix)");
+  assert.ok(tc({ log_length_ft: 32 }) > tc({}), "board feet must rise with log length");
+  assert.ok(tc({ small_end_dib_in: 18 }) > tc({}), "board feet must rise with small-end diameter (guards the /4 log-rule fix)");
+  assert.ok(cs({ cargo_length_ft: 25 }) > cs({}), "minimum tiedowns must rise with cargo length (guards the 10-ft-plus rule fix)");
+});
