@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(civil): guard horizontal-curve and average-end-area earthwork with monotonicity; 2026-07-17
+
+- Whole-response guards: horizontal-curve length L = R x delta(rad) and tangent T = R x tan(delta/2) rise with radius
+  and deflection; average-end-area earthwork V = interval x (A1+A2)/2 rises with end area and station interval, with
+  cubic yards = cubic feet / 27. Test-only.
+
 ### test(solar): guard PV energy yield and shadow length with monotonicity; 2026-07-17
 
 - Whole-response guards: PVWatts annual energy = dc_kw x psh x 365 x perf_ratio rises with each of nameplate,

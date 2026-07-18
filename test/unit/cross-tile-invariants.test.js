@@ -12075,3 +12075,18 @@ test("monotonicity: PV energy yield and shadow length track their physical input
   assert.ok(sh({ sun_altitude_deg: 60 }) < sh({}), "shadow length must fall as the sun climbs");
   assert.ok(Math.abs(s.computeShadowLength({ object_height_ft: 10, sun_altitude_deg: 45 }).shadow_length_ft - 10) < 1e-6, "a 45-degree sun must throw a shadow equal to the height (cot 45 = 1)");
 });
+
+test("monotonicity: horizontal-curve geometry and average-end-area earthwork track their inputs (civil)", async () => {
+  const c = await import("../../calc-civil.js");
+  const hc = (o) => c.computeHorizontalCurve({ mode: "radius", radius_ft: 1000, delta_deg: 30, pi_station_ft: 5000, ...o });
+  const ea = (o) => c.computeEarthworkEndArea({ areas: [100, 200], interval_ft: 50, ...o });
+  assert.ok(hc({ radius_ft: 2000 }).curve_length_ft > hc({}).curve_length_ft, "curve length must rise with radius");
+  assert.ok(hc({ delta_deg: 60 }).curve_length_ft > hc({}).curve_length_ft, "curve length must rise with deflection angle");
+  assert.ok(hc({ radius_ft: 2000 }).tangent_ft > hc({}).tangent_ft, "tangent must rise with radius");
+  assert.ok(Math.abs(hc({}).curve_length_ft - 1000 * 30 * Math.PI / 180) < 1e-6, "L = R * delta(rad)");
+  assert.ok(Math.abs(hc({}).tangent_ft - 1000 * Math.tan(15 * Math.PI / 180)) < 1e-6, "T = R * tan(delta/2)");
+  assert.ok(ea({ areas: [100, 400] }).total_ft3 > ea({}).total_ft3, "earthwork volume must rise with end area");
+  assert.ok(ea({ interval_ft: 100 }).total_ft3 > ea({}).total_ft3, "earthwork volume must rise with station interval");
+  assert.ok(Math.abs(ea({}).total_yd3 - ea({}).total_ft3 / 27) < 1e-9, "cubic yards must equal cubic feet / 27");
+  assert.ok(Math.abs(ea({}).total_ft3 - 50 * (100 + 200) / 2) < 1e-9, "V = interval * (A1+A2)/2 (average end area)");
+});
