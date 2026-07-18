@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(rigging): tagline-force note stated the angle/tension relationship backwards; 2026-07-18
+
+- computeTaglineForce computes `T = force / cos(angle above horizontal)` (correct statics), but its note said "a tag
+  line at a shallow angle to horizontal pulls far harder than the lateral force" -- backwards. A shallow (near-
+  horizontal) tagline pulls close to the lateral force (100 lb at 10 deg -> 101 lb); a STEEP one pulls far harder
+  (100 lb at 80 deg -> 576 lb). A rigger reading the old note might steepen the line to reduce force, the wrong move.
+  Rewrote the note to state the relationship correctly. Compute unchanged. Found by a first-principles formula audit.
+
 ### fix(fire): scba-cylinder-time treated a L/min breathing rate as scfm, making a 60-min bottle read ~2 min; 2026-07-18
 
 - computeScbaCylinderTime divided the cylinder's scf volume by the consumption rate directly, but the input guidance,

@@ -406,7 +406,7 @@ export function computeTaglineForce({ lateral_force_lb, tagline_angle_deg, per_p
     handlers,
     mechanical_help: tagTension > perPerson * 2,
     verdict: tagTension > perPerson * 2 ? "rig a mechanical tag (snatch block / winch)" : "hand control acceptable",
-    note: "A tag line at a shallow angle to horizontal pulls far harder than the lateral force it resists. Tag lines control rotation and position; they do not arrest a falling or runaway load. Handlers stand clear of the swing path and pinch points, and 50 lb sustained per person is a planning default, not a maximum a tired crew can hold in gusts.",
+    note: "A tag line kept shallow (near horizontal) pulls close to the lateral force it resists; as it steepens toward vertical the tension climbs steeply (T = force / cos of the angle above horizontal), so keep handlers back and the line low. Tag lines control rotation and position; they do not arrest a falling or runaway load. Handlers stand clear of the swing path and pinch points, and 50 lb sustained per person is a planning default, not a maximum a tired crew can hold in gusts.",
   };
 }
 
