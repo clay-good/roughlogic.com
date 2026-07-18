@@ -34602,6 +34602,58 @@
    }
   },
   {
+   "tile_id": "thermistor-beta-temp",
+   "source_publisher": "NTC thermistor beta (B-parameter) equation",
+   "source_title": "20 kohm reading on a 10 kohm/3950 K sensor -> 10.18 C (NTC: higher R = colder)",
+   "source_edition_or_year": "spec-v950 worked example (machine-verified)",
+   "source_section_or_page": "1/T = 1/298.15 + (1/3950) ln(20000/10000) -> T = 283.33 K = 10.18 C",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "resistance_ohms": 20000,
+    "r0_ohms": 10000,
+    "beta_k": 3950,
+    "ref_temp_c": 25
+   },
+   "outputs": {
+    "temperature_c": {
+     "value": 10.18,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "temperature_f": {
+     "value": 50.32,
+     "tolerance": {
+      "abs": 0.03
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thermistor-beta-temp",
+   "source_publisher": "NTC thermistor beta (B-parameter) equation",
+   "source_title": "cross-check: exactly R0 (10 kohm) returns the reference temperature 25 C",
+   "source_edition_or_year": "spec-v950 worked example (machine-verified)",
+   "source_section_or_page": "ln(10000/10000) = 0 -> 1/T = 1/298.15 -> T = 25.00 C",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "resistance_ohms": 10000,
+    "r0_ohms": 10000,
+    "beta_k": 3950,
+    "ref_temp_c": 25
+   },
+   "outputs": {
+    "temperature_c": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "loop-voltage-budget",
    "source_publisher": "Loop-powered 2-wire 4-20 mA transmitter voltage budget",
    "source_title": "24 Vdc, 10.5 V transmitter min, 250 ohm sense + 50 ohm wire -> 18 V at transmitter, 675 ohm ceiling",

@@ -2374,6 +2374,7 @@ cross-check.
 | calc-lowvoltage.js | `computeStandbyBatteryRuntime` | `{ battery_ah = 0, standby_current_a = 0, alarm_current_a = 0, alarm_minutes =...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeStandbyBatterySizing` | `{ standby_current_a = 0, standby_hours = 0, alarm_current_a = 0, alarm_minute...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeStructuredCablingChannel` | `{ permanent_link_m = 0, cords_m = 0, temp_c = 20, derate_per_c = 0.004 } = {}` | _ | _ | _ |
+| calc-lowvoltage.js | `computeThermistorBetaTemp` | `{ resistance_ohms = 10000, r0_ohms = 10000, beta_k = 3950, ref_temp_c = 25 } ...` | _ | _ | _ |
 | calc-machining.js | `computeBallnoseScallopHeight` | `{ r_in = 0, mode = "scallop-from-stepover", s_in = 0, h_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeBearingL10Life` | `{ dynamic_rating_lbf = 0, equivalent_load_lbf = 0, speed_rpm = 0, bearing_typ...` | _ | _ | _ |
 | calc-machining.js | `computeBearingMaxLoad` | `{ dynamic_rating_lbf = 0, target_life_hr = 0, speed_rpm = 0, bearing_type = "...` | _ | _ | _ |
@@ -3059,7 +3060,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1645.
+Row count: 1646.
 
 <!-- END function-corpus-v14 -->
 
@@ -3140,7 +3141,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (182 tiles)
+### Group A Electrical (183 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3306,6 +3307,7 @@ per spec-v14 §13.1 second paragraph.
 | `support-spacing` | Raceway / Cable Support-Spacing Lookup (NEC Chapter 3) | NEC 2023 (NFPA 70); EMT secure within 36 in of each box; support every 10 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tdd-ieee-519` | Total Demand Distortion Limit Check (IEEE 519-2022) | IEEE 519-2022 Table 1 current-distort...; spec-v524 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `termination-temp-ampacity` | Termination Temperature Ampacity Limit (NEC 110.14(C)) | NEC 2023 110.14(C) with Table 310.16; 4/0 THHN: 90C 260, 75C 230, 60C 195; 75C term, over 100 A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `thermistor-beta-temp` | NTC Thermistor Resistance to Temperature (Beta Equation) | NTC thermistor beta (B-parameter) equ...; 1/T = 1/298.15 + (1/3950) ln(20000/10000) -> T = 283.33 K... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `three-phase` | Three-Phase Power | Project (first-principles); V_LL=480 V / I_L=100 A / pf=0.9 -> kVA=83.14 / kW=74.82 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-conductor-protection` | Transformer Conductor and Overcurrent Protection | NEC Table 450.3(B) and 240.21(C) (by ...; 45 kVA 3-phase 480->208 V -> primary FLA 54.13 A, seconda... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-inrush-point` | Transformer Inrush Coordination Point | transformer energization-inrush coord...; spec-v520 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4643,6 +4645,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1398. Fixture-covered or reference-cadence: 1398 / 1398.
+Tile count: 1399. Fixture-covered or reference-cadence: 1399 / 1399.
 
 <!-- END tile-index-v14 -->

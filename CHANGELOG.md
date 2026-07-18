@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(low-voltage): add thermistor-beta-temp tile (spec-v950); 2026-07-18
+
+- New Group A tile `thermistor-beta-temp` (NTC Thermistor Resistance to Temperature, Beta Equation) in calc-lowvoltage.js.
+  The beta (B-parameter) equation 1/T = 1/T0 + (1/B) ln(R/R0) in kelvin. R0 and B (e.g. 10 kohm at 25 C, B ~ 3950 K)
+  come from the datasheet. Being NTC, resistance falls as temperature rises: a 10k/3950 sensor reads 25 C at 10 kohm,
+  41.5 C at 5 kohm, 10.2 C at 20 kohm. Two-point fit (~+/-0.2-1 C near T0); a wider span uses Steinhart-Hart. Distinct
+  from the positive-coefficient platinum RTD. Home count 1,398 -> 1,399.
+
 ### feat(low-voltage): add loop-voltage-budget tile (spec-v949); 2026-07-18
 
 - New Group A tile `loop-voltage-budget` (Loop-Powered 2-Wire 4-20 mA Transmitter Voltage Budget) in calc-lowvoltage.js.

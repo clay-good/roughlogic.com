@@ -8453,6 +8453,17 @@ export const CITATIONS = {
       { name: "Series burden", value: "sense resistor (often 250 ohm) + round-trip wire + barrier/isolator; the transmitter min (compliance) voltage is on its datasheet", source: "transmitter datasheet / loop design" },
     ],
   },
+  "thermistor-beta-temp": {
+    formula: "1/T = 1/T0 + (1/B) ln(R/R0), T and T0 in kelvin (T0 = ref_temp_c + 273.15); T = 1 / (1/T0 + (1/B) ln(R/R0)); output in C and F. R0 and B come from the sensor datasheet.",
+    edition: "NTC thermistor beta (B-parameter) resistance-temperature equation, by name; the sensor datasheet R-T curve and tolerance govern. A wider span uses the 3-constant Steinhart-Hart equation.",
+    freeAccess: "The beta equation is public (a two-point Arrhenius fit); R0 (e.g. 10 kohm at 25 C) and B (e.g. 3950 K) are the two datasheet numbers for the specific thermistor, and R is the field reading.",
+    governance: GOVERNANCE.general,
+    editionNote: "A negative-temperature-coefficient (NTC) thermistor's resistance falls as its temperature rises, following the beta or B-parameter equation 1/T = 1/T0 + (1/B) ln(R/R0) with all temperatures in kelvin. R0 is the nominal resistance at a reference temperature T0 -- overwhelmingly 10 kohm at 25 C for the HVAC and appliance standard sensor -- and B (typically 3435 to 3950 K) is the thermistor's material constant; both are printed on the sensor datasheet. Inverting for temperature from a measured resistance is what a controls or appliance tech does at the sensor: a 10 kohm/3950 K thermistor reads 25 C at 10 kohm, about 41.5 C at 5 kohm, and about 10.2 C at 20 kohm -- resistance and temperature move in OPPOSITE directions, the opposite of a platinum RTD. The beta form is a two-point curve fit and is accurate to roughly +/-0.2 to 1 C over a moderate span around T0; over a wide temperature range, or where tighter accuracy is needed, the 3-constant Steinhart-Hart equation (A + B ln R + C (ln R)^3) is used with the manufacturer's coefficients instead. This is distinct from a platinum RTD (positive coefficient, Callendar-Van Dusen). A lead-compensated reading is assumed; the sensor's datasheet R-T table, its tolerance grade, and self-heating from the excitation set the real field accuracy.",
+    assumptions: [
+      { name: "Beta (B-parameter) equation", value: "1/T = 1/T0 + (1/B) ln(R/R0), kelvin; NTC, so R falls as T rises; R0 and B from the datasheet", source: "NTC thermistor practice" },
+      { name: "Two-point fit accuracy", value: "~+/-0.2-1 C near T0; a wide span or tight accuracy uses the 3-constant Steinhart-Hart equation", source: "thermistor datasheet" },
+    ],
+  },
   "polymeric-sand-bags": {
     formula: "bags = ceil(area_sf x (1 + waste_pct/100) / coverage_per_bag_sf).",
     edition: "Polymeric joint-sand bag-count identity by name (area over the per-bag coverage, plus waste); first-principles arithmetic.",

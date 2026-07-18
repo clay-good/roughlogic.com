@@ -27510,3 +27510,26 @@ test("bounds: spec-v949 computeLoopVoltageBudget pins the max loop resistance, t
   assert.ok("error" in _v949({ supply_v: 24, transmitter_min_v: 10.5, load_resistance_ohms: 250, wire_resistance_ohms: -1 }));
   assert.ok("error" in _v949({ supply_v: Infinity, transmitter_min_v: 10.5, load_resistance_ohms: 250, wire_resistance_ohms: 50 }));
 });
+
+import { computeThermistorBetaTemp as _v950 } from "../../calc-lowvoltage.js";
+
+test("bounds: spec-v950 computeThermistorBetaTemp pins the NTC beta equation and error seams", () => {
+  const r = _v950({ resistance_ohms: 20000, r0_ohms: 10000, beta_k: 3950, ref_temp_c: 25 });
+  assert.ok(Math.abs(r.temperature_c - 10.177) < 0.02); // 1/T = 1/298.15 + (1/3950)ln(2)
+  assert.ok(Math.abs(r.temperature_f - 50.318) < 0.03);
+  // At exactly R0 the temperature is the reference temperature.
+  assert.ok(Math.abs(_v950({ resistance_ohms: 10000, r0_ohms: 10000, beta_k: 3950, ref_temp_c: 25 }).temperature_c - 25) < 1e-6);
+  // NTC: lower resistance means HIGHER temperature.
+  const hot = _v950({ resistance_ohms: 5000, r0_ohms: 10000, beta_k: 3950, ref_temp_c: 25 });
+  assert.ok(Math.abs(hot.temperature_c - 41.46) < 0.02);
+  assert.ok(hot.temperature_c > r.temperature_c); // 5k hotter than 20k
+  // Monotonic decreasing in resistance.
+  assert.ok(_v950({ resistance_ohms: 8000, r0_ohms: 10000, beta_k: 3950, ref_temp_c: 25 }).temperature_c >
+            _v950({ resistance_ohms: 12000, r0_ohms: 10000, beta_k: 3950, ref_temp_c: 25 }).temperature_c);
+  // Error seams: non-positive resistance / R0 / beta, reference at/below absolute zero, non-finite.
+  assert.ok("error" in _v950({ resistance_ohms: 0, r0_ohms: 10000, beta_k: 3950, ref_temp_c: 25 }));
+  assert.ok("error" in _v950({ resistance_ohms: 20000, r0_ohms: 0, beta_k: 3950, ref_temp_c: 25 }));
+  assert.ok("error" in _v950({ resistance_ohms: 20000, r0_ohms: 10000, beta_k: 0, ref_temp_c: 25 }));
+  assert.ok("error" in _v950({ resistance_ohms: 20000, r0_ohms: 10000, beta_k: 3950, ref_temp_c: -300 }));
+  assert.ok("error" in _v950({ resistance_ohms: Infinity, r0_ohms: 10000, beta_k: 3950, ref_temp_c: 25 }));
+});

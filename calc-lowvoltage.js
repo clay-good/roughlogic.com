@@ -1244,3 +1244,55 @@ function _v949renderLoopVoltageBudget(inputRegion, outputRegion, citationEl) {
   for (const f of [sv, tv, lr, wr]) f.input.addEventListener("input", update);
 }
 LOWVOLTAGE_RENDERERS["loop-voltage-budget"] = _v949renderLoopVoltageBudget;
+
+// ===================== spec-v950: NTC thermistor resistance to temperature (beta equation) =====================
+// dims: in { args: dimensionless } out: { temperature_c: dimensionless, temperature_f: dimensionless }
+export function computeThermistorBetaTemp({ resistance_ohms = 10000, r0_ohms = 10000, beta_k = 3950, ref_temp_c = 25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(resistance_ohms > 0)) return { error: "Measured resistance must be positive (ohms)." };
+  if (!(r0_ohms > 0)) return { error: "R0 (nominal resistance at the reference temperature) must be positive." };
+  if (!(beta_k > 0)) return { error: "Beta coefficient must be positive (K)." };
+  if (!(ref_temp_c > -273.15)) return { error: "Reference temperature must be above absolute zero (C)." };
+  // NTC thermistor beta (B-parameter) equation: 1/T = 1/T0 + (1/B) ln(R/R0), temperatures in kelvin.
+  const t0_k = ref_temp_c + 273.15;
+  const inv_t = 1 / t0_k + (1 / beta_k) * Math.log(resistance_ohms / r0_ohms);
+  if (!(inv_t > 0)) return { error: "Resistance is outside the thermistor's valid range (no positive temperature solution)." };
+  const t_k = 1 / inv_t;
+  const temperature_c = t_k - 273.15;
+  const temperature_f = temperature_c * 9 / 5 + 32;
+  if (![temperature_c, temperature_f].every(Number.isFinite)) return { error: "Thermistor temperature math is not a finite value." };
+  return {
+    temperature_c,
+    temperature_f,
+    note: "The temperature an NTC (negative-temperature-coefficient) thermistor's measured resistance corresponds to, by the beta (B-parameter) equation 1/T = 1/T0 + (1/B) ln(R/R0) with temperatures in kelvin. R0 is the nominal resistance at the reference temperature T0 (almost always 10 kohm at 25 C for the HVAC-standard sensor), and B (commonly 3435-3950 K) is the thermistor's material constant -- both come from the sensor datasheet. Because it is NEGATIVE-coefficient, resistance FALLS as temperature RISES: a 10 kohm/3950 K sensor reads 25 C at 10 kohm, 41.5 C at 5 kohm, and 10.2 C at 20 kohm. The beta equation is a two-point fit and is accurate to about +/-0.2 to 1 C over a moderate span around T0; a wider or tighter job uses the 3-constant Steinhart-Hart equation instead. This is distinct from a platinum RTD, which is POSITIVE-coefficient and follows the Callendar-Van Dusen curve. Assumes a lead-compensated reading; the sensor's datasheet R-T curve, tolerance, and self-heating govern the field accuracy.",
+  };
+}
+
+export const thermistorBetaTempExample = { inputs: { resistance_ohms: 20000, r0_ohms: 10000, beta_k: 3950, ref_temp_c: 25 } };
+
+function _v950renderThermistorBetaTemp(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NTC thermistor beta (B-parameter) equation, by name. 1/T = 1/T0 + (1/B) ln(R/R0), temperatures in kelvin; R0 and B (e.g. 10 kohm at 25 C, B ~ 3950 K) come from the sensor datasheet. A two-point fit (accurate ~+/-0.2-1 C near T0); a wider span uses Steinhart-Hart. Distinct from a positive-coefficient platinum RTD. The datasheet R-T curve and tolerance govern.";
+  const rm = makeNumber("Measured resistance (ohms)", "th-rm", { step: "any", min: "0", value: "20000" });
+  rm.input.value = "20000";
+  const r0 = makeNumber("R0 at reference temp (ohms, e.g. 10000)", "th-r0", { step: "any", min: "0", value: "10000" });
+  r0.input.value = "10000";
+  const bk = makeNumber("Beta B (K, e.g. 3950)", "th-bk", { step: "any", min: "0", value: "3950" });
+  bk.input.value = "3950";
+  const rt = makeNumber("Reference temp T0 in C (usually 25)", "th-rt", { step: "any", value: "25" });
+  rt.input.value = "25";
+  for (const f of [rm, r0, bk, rt]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { rm.input.value = "20000"; r0.input.value = "10000"; bk.input.value = "3950"; rt.input.value = "25"; update(); });
+  const oC = makeOutputLine(outputRegion, "Temperature (C)", "th-out-c");
+  const oF = makeOutputLine(outputRegion, "Temperature (F)", "th-out-f");
+  const update = debounce(() => {
+    const r = computeThermistorBetaTemp({
+      resistance_ohms: rm.input.value === "" ? 20000 : Number(rm.input.value), r0_ohms: r0.input.value === "" ? 10000 : Number(r0.input.value),
+      beta_k: bk.input.value === "" ? 3950 : Number(bk.input.value), ref_temp_c: rt.input.value === "" ? 25 : Number(rt.input.value),
+    });
+    if (r.error) { oC.textContent = r.error; oF.textContent = "-"; return; }
+    oC.textContent = fmt(r.temperature_c, 2) + " C";
+    oF.textContent = fmt(r.temperature_f, 2) + " F";
+  }, DEBOUNCE_MS);
+  for (const f of [rm, r0, bk, rt]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["thermistor-beta-temp"] = _v950renderThermistorBetaTemp;
