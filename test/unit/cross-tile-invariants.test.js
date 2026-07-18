@@ -12017,3 +12017,18 @@ test("monotonicity: amplifier SPL rises with sensitivity/power (10 dB per 10x) a
   assert.ok(sp({ distance_m: 4 }) < sp({}), "SPL must fall with distance");
   assert.ok(Math.abs((sp({ power_w: 1000 }) - sp({ power_w: 100 })) - 10) < 0.01, "SPL must rise 10 dB per 10x power (10*log10)");
 });
+
+// Monotonicity of the off-grid battery bank sizing compute: required capacity =
+// daily load * days of autonomy / (depth-of-discharge * efficiency * derate).
+// Nameplate energy rises with daily load and days of autonomy and falls as a
+// deeper discharge is allowed; nameplate amp-hours fall as system voltage rises
+// (Ah = Wh / V). An undersized bank is a reliability failure; a term error
+// passes the single pinned example but breaks these.
+test("monotonicity: off-grid battery bank sizing responds correctly to load, autonomy, DoD, and voltage", async () => {
+  const s = await import("../../calc-solar.js");
+  const ob = (o) => s.computeOffGridBattery({ daily_load_wh: 2400, days_autonomy: 3, dod_limit: 0.5, system_voltage_v: 12, round_trip_eff: 0.9, derate: 0.9, ...o });
+  assert.ok(ob({ daily_load_wh: 4800 }).nameplate_wh > ob({}).nameplate_wh, "bank energy must rise with daily load");
+  assert.ok(ob({ days_autonomy: 5 }).nameplate_wh > ob({}).nameplate_wh, "bank energy must rise with days of autonomy");
+  assert.ok(ob({ dod_limit: 0.8 }).nameplate_wh < ob({}).nameplate_wh, "bank energy must fall as a deeper discharge is allowed");
+  assert.ok(ob({ system_voltage_v: 48 }).nameplate_ah < ob({}).nameplate_ah, "amp-hours must fall as system voltage rises (Ah = Wh / V)");
+});

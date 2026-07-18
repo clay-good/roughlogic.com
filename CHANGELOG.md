@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(solar): guard off-grid battery bank sizing with monotonicity; 2026-07-17
+
+- Added a guard on computeOffGridBattery: required capacity = daily load x days autonomy / (DoD x efficiency x derate).
+  Nameplate energy rises with daily load and days of autonomy and falls as a deeper discharge is allowed; nameplate Ah
+  falls as system voltage rises (Ah = Wh/V). An undersized bank is a reliability failure; a term error passes the pinned
+  example but breaks these. Test-only.
+
 ### test(stage): guard amplifier SPL with sensitivity/power/distance monotonicity; 2026-07-17
 
 - Added a guard on computeAmpPowerSpl: SPL = sensitivity + 10*log10(power) - 20*log10(distance) rises with driver
