@@ -12573,3 +12573,15 @@ test("monotonicity: IICRC air-mover count grows with area and water-class severi
   assert.strictEqual(am({}).air_mover_count, Math.ceil(500 / am({}).ft2_per_unit), "count = ceil(area / ft2-per-unit)");
   assert.ok(Math.abs(am({}).total_cfm - am({}).air_mover_count * 2500) < 1e-6, "total CFM = count * per-unit CFM");
 });
+
+test("physical: rescue sling tension uses cos(theta/2) and rises as legs open (guards the sling sin-vs-cos class)", async () => {
+  const r = await import("../../calc-rescue.js");
+  const sa = (o) => r.computeSlingAngle({ load_lb: 1000, sling_config: "bridle", included_angle_deg: 60, n_legs: 2, ...o });
+  const v = r.computeSlingAngle({ load_lb: 1000, sling_config: "vertical", n_legs: 2 });
+  assert.ok(Math.abs(v.tension_per_leg_lb - 500) < 1e-6, "vertical legs share the load evenly (W/n)");
+  assert.ok(Math.abs(sa({}).tension_per_leg_lb - 1000 / (2 * Math.cos(30 * Math.PI / 180))) < 1e-6, "bridle leg tension = W / (n * cos(theta/2))");
+  assert.ok(sa({ included_angle_deg: 120 }).tension_per_leg_lb > sa({ included_angle_deg: 60 }).tension_per_leg_lb, "tension must RISE as the included angle opens (legs flatten) -- the cos direction, not sin");
+  assert.ok(sa({ included_angle_deg: 1 }).tension_per_leg_lb < sa({ included_angle_deg: 90 }).tension_per_leg_lb, "near-vertical legs must carry the least tension");
+  assert.ok(sa({ load_lb: 2000 }).tension_per_leg_lb > sa({}).tension_per_leg_lb, "tension must rise with load");
+  assert.ok(sa({ n_legs: 4 }).tension_per_leg_lb < sa({}).tension_per_leg_lb, "more legs share the load, lowering per-leg tension");
+});

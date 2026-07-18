@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(rescue): guard sling tension cos(theta/2) direction; 2026-07-17
+
+- Physical guard on the rescue sling-angle compute (guards the sling sin-vs-cos class fixed elsewhere): bridle leg
+  tension = W/(n cos(theta/2)) RISES as the included angle opens, near-vertical legs carry the least, tension rises with
+  load and falls with more legs. Test-only.
+
 ### test(restoration): guard IICRC air-mover count with monotonicity; 2026-07-17
 
 - Whole-response guard: air-mover count = ceil(area / ft2-per-unit) rises with affected area, a worse water class (S500
