@@ -12458,3 +12458,15 @@ test("cross-module: the 8.34 lb/gal water constant agrees across treatment chemi
   assert.ok(Math.abs(kDisinfect - 8.34) < 1e-6, "disinfect main-chlorine must embed the 8.34 lb/gal water weight");
   assert.ok(Math.abs(kTreatment - kDisinfect) < 1e-6, "the two modules must use the identical water-weight constant (a drift in either is caught)");
 });
+
+test("cross-module: the 5252 hp-torque constant agrees across mechanic and motor, with torque = HP at 5252 rpm", async () => {
+  const me = await import("../../calc-mechanic.js");
+  const mo = await import("../../calc-motor.js");
+  const mech = (hp, rpm) => me.computeHpFromTorque({ solve_for: "torque", hp, rpm }).torque_lbft;
+  const mot = (hp, rpm) => mo.computeMotorShaftTorque({ hp, rpm }).torque_lbft;
+  assert.ok(Math.abs(mech(10, 1750) - mot(10, 1750)) < 1e-9, "mechanic and motor must compute the same shaft torque for identical HP and RPM");
+  assert.ok(Math.abs(mech(10, 1750) * 1750 / 10 - 5252) < 1e-6, "mechanic must embed T = 5252 * HP / RPM");
+  assert.ok(Math.abs(mot(10, 1750) * 1750 / 10 - 5252) < 1e-6, "motor must embed T = 5252 * HP / RPM");
+  assert.ok(Math.abs(mot(25, 5252) - 25) < 1e-6, "torque must equal HP at 5252 rpm (the defining identity)");
+  assert.ok(Math.abs(mech(25, 5252) - 25) < 1e-6, "mechanic must also give torque = HP at 5252 rpm");
+});

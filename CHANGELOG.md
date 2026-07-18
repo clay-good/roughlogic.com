@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test: cross-module 5252 hp-torque consistency (mechanic vs motor); 2026-07-17
+
+- Shared-constant guard: mechanic and motor must compute the same shaft torque for identical HP/RPM, both embed
+  T = 5252 x HP / RPM, and torque equals HP at 5252 rpm (the defining identity). A drift of 5252 in either module is
+  caught. Test-only.
+
 ### test: cross-module 8.34 lb/gal water-weight consistency (treatment vs disinfect); 2026-07-17
 
 - Shared-constant guard: recovers the 8.34 lb/gal water weight independently from treatment chemical-feed
