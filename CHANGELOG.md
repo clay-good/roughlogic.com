@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs(citations): sync 3 tile citations to their formula fixes (range-demand, air-gap, cable-tray); 2026-07-17
+
+- Swept citations.js for descriptions still documenting the OLD behavior of this session's fixes: range-demand-220-55
+  formula said "0.05 x ceil(kw-12)" (now round, the Note 1 major-fraction rule, #17); cross-connection-air-gap editionNote
+  omitted the 1.5 in near-wall floor for small openings (#16); cable-tray-fill formula described the mixed reduction
+  vaguely -- now "1.2 x the sum of the 4/0-and-larger diameters" (#21). All are user-facing.
+
 ### docs(kitchen): sync brine-cure citation + derivation text to the green-meat nitrite fix; 2026-07-17
 
 - The #19 brine-cure fix corrected the compute but left the CITATION formula (citations.js, user-facing) and two
