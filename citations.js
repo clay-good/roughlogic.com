@@ -1640,6 +1640,17 @@ export const CITATIONS = {
       { name: "Inverter-input window", value: "user-supplied from listing", source: "UL 1741 listing" },
     ],
   },
+  "dc-shunt-sizing": {
+    formula: "shunt_resistance_ohm = (rated_millivolt / 1000) / rated_current_a; measured_current_a = rated_current_a x (measured_millivolt / rated_millivolt); power_dissipation_w = rated_current_a x (rated_millivolt / 1000).",
+    edition: "DC current-shunt sizing by Ohm's law, by name; the shunt's accuracy class and temperature coefficient and the meter's input range and calibration govern the measurement.",
+    freeAccess: "The shunt relations are public Ohm's law; the rated current and millivolt output are the shunt's markings and the measured millivolt is the meter reading.",
+    governance: GOVERNANCE.general,
+    editionNote: "A DC current shunt is a precision, very-low-value resistor placed in series with a DC load so that a millivoltmeter reading the drop across it reads current. Shunts are rated by the millivolt output they produce at a rated current -- the ubiquitous '50 mV at 100 A' -- so the resistance is simply Ohm's law, R = (rated millivolt / 1000) / rated current, which for the 50 mV / 100 A shunt is 0.5 milliohm. The meter then reads current linearly from the drop: current = rated current x (measured millivolt / rated millivolt), so 25 mV on that shunt is 50 A. At full rated current the shunt dissipates rated current x rated voltage = 100 x 0.05 = 5 W of heat, which is why manufacturers derate shunts to about two-thirds of their rated current for continuous service and why they are mounted in open air for cooling. Wiring matters: the shunt goes in series in the ungrounded/return leg carrying the full load current through its heavy current lugs, while the millivolt sense leads tap the separate small potential (voltage) terminals -- taking the drop there, not at the current lugs, keeps the resistance of the load cabling and the lug joints out of the measurement, and running the sense pair twisted and away from noise sources keeps the low-millivolt signal clean. A design and reading aid; the shunt's accuracy class and temperature coefficient, and the meter's input range and calibration, govern the actual measurement accuracy.",
+    assumptions: [
+      { name: "Ohm's law shunt", value: "R = rated_mV/1000 / rated_A; current = rated_A x (measured_mV / rated_mV); dissipation at rating = rated_A x rated_mV/1000", source: "Ohm's law" },
+      { name: "Derate and sense", value: "derate to ~2/3 rated for continuous use; sense at the potential terminals with a twisted pair so lead resistance does not add", source: "shunt / DC-metering practice" },
+    ],
+  },
   "battery-runtime": {
     formula: "Runtime = (battery_Wh × inverter_efficiency × depth_of_discharge) / load_W. Coulombic adjustments via Peukert exponent for lead-acid only.",
     edition: "Battery-chemistry physical facts; manufacturer datasheets by name.",

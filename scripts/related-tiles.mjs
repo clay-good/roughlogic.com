@@ -618,6 +618,7 @@ const RELATED = {
   "generator-sizing": ["generator-motor-starting", "service-load", "transformer-kva-sizing"],
   "pv-string-sizing": ["battery-runtime", "voltage-drop", "wire-ampacity"],
   "battery-runtime": ["pv-string-sizing", "poe-budget", "lv-dc-drop"],
+  "dc-shunt-sizing": ["battery-runtime", "loop-signal-scaling", "voltage-drop"],
   "voltage-imbalance": ["phase-balance", "motor-fla", "three-phase"],
   "gfci-afci-reference": ["breaker-sizing", "service-load"],
   "lighting-density": ["service-load", "wire-ampacity"],

@@ -153,7 +153,7 @@ const _TILES = [
   ["conduit-fill", "A"], ["box-fill", "A"], ["breaker-sizing", "A"],
   ["motor-fla", "A"], ["transformer-sizing", "A"], ["three-phase", "A"],
   ["copper-resistance", "A"], ["egc-sizing", "A"], ["service-load", "A"],
-  ["generator-sizing", "A"], ["pv-string-sizing", "A"], ["battery-runtime", "A"],
+  ["generator-sizing", "A"], ["pv-string-sizing", "A"], ["battery-runtime", "A"], ["dc-shunt-sizing", "A"],
   ["voltage-imbalance", "A"], ["gfci-afci-reference", "A"], ["lighting-density", "A"],
   ["pulling-tension", "A"], ["cable-reel-capacity", "A"], ["wire-pulling-lubricant", "A"], ["branch-circuit-wire-footage", "A"], ["microinverter-branch-count", "A"], ["welder-arc-circuit-conductor", "A"], ["welder-resistance-circuit-conductor", "A"], ["battery-inverter-dc-conductor", "A"], ["pv-ac-output-circuit", "A"], ["soil-resistivity-wenner", "A"], ["cable-bend-radius", "A"], ["pf-correction", "A"],
   ["phase-balance", "A"], ["multi-load-vd", "A"], ["lv-dc-drop", "A"],

@@ -100,6 +100,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-solar.js", "SOLAR_RENDERERS", [
     // v2
     "pv-string-sizing", "battery-runtime",
+    "dc-shunt-sizing",
     // v15
     "pv-interconnection-busbar", "off-grid-battery", "ev-charger-load",
     // spec-v182 electrician second-pass batch

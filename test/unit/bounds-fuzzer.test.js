@@ -27822,3 +27822,24 @@ test("bounds: spec-v962 computeBendSpringback pins the Machinery's Handbook spri
   assert.ok("error" in _v962({ tool_radius_in: 100, thickness_in: 0.1, yield_strength_psi: 50000, modulus_psi: 29000000 })); // x huge -> Ks <= 0
   assert.ok("error" in _v962({ tool_radius_in: Infinity, thickness_in: 0.1, yield_strength_psi: 50000, modulus_psi: 29000000 }));
 });
+
+import { computeDcShuntSizing as _v963 } from "../../calc-solar.js";
+
+test("bounds: spec-v963 computeDcShuntSizing pins the shunt Ohm's law and error seams", () => {
+  const r = _v963({ rated_current_a: 100, rated_millivolt: 50, measured_millivolt: 25 });
+  assert.ok(Math.abs(r.shunt_resistance_ohm - 0.0005) < 1e-9); // 0.05/100
+  assert.ok(Math.abs(r.measured_current_a - 50) < 1e-9); // 100*25/50
+  assert.ok(Math.abs(r.power_dissipation_w - 5) < 1e-9); // 100*0.05
+  // Full-scale reading gives full current; zero mV gives zero current.
+  assert.ok(Math.abs(_v963({ rated_current_a: 200, rated_millivolt: 75, measured_millivolt: 75 }).measured_current_a - 200) < 1e-9);
+  assert.ok(Math.abs(_v963({ rated_current_a: 100, rated_millivolt: 50, measured_millivolt: 0 }).measured_current_a) < 1e-12);
+  // Shunt resistance is rated_mV/rated_A; a higher-current shunt at the same mV is lower resistance.
+  assert.ok(_v963({ rated_current_a: 200, rated_millivolt: 50, measured_millivolt: 25 }).shunt_resistance_ohm < r.shunt_resistance_ohm);
+  // Current reading is linear in measured mV.
+  assert.ok(Math.abs(_v963({ rated_current_a: 100, rated_millivolt: 50, measured_millivolt: 50 }).measured_current_a - 2 * r.measured_current_a) < 1e-9);
+  // Error seams: non-positive rated current or mV, negative measured mV, non-finite.
+  assert.ok("error" in _v963({ rated_current_a: 0, rated_millivolt: 50, measured_millivolt: 25 }));
+  assert.ok("error" in _v963({ rated_current_a: 100, rated_millivolt: 0, measured_millivolt: 25 }));
+  assert.ok("error" in _v963({ rated_current_a: 100, rated_millivolt: 50, measured_millivolt: -1 }));
+  assert.ok("error" in _v963({ rated_current_a: Infinity, rated_millivolt: 50, measured_millivolt: 25 }));
+});

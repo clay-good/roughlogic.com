@@ -1647,3 +1647,52 @@ function _v897renderPvBallastWeight(inputRegion, outputRegion, citationEl) {
   for (const f of [mo, mw, bl, rk, ar, al]) f.input.addEventListener("input", update);
 }
 SOLAR_RENDERERS["pv-ballast-weight"] = _v897renderPvBallastWeight;
+
+// ===================== spec-v963: DC ammeter shunt sizing =====================
+// dims: in { args: dimensionless } out: { shunt_resistance_ohm: dimensionless, measured_current_a: dimensionless, power_dissipation_w: dimensionless }
+export function computeDcShuntSizing({ rated_current_a = 100, rated_millivolt = 50, measured_millivolt = 25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(rated_current_a > 0)) return { error: "Rated current must be positive (A)." };
+  if (!(rated_millivolt > 0)) return { error: "Rated millivolt output must be positive (mV)." };
+  if (!(measured_millivolt >= 0)) return { error: "Measured millivolt cannot be negative (mV)." };
+  // A DC shunt is a precision resistor: R = rated_voltage / rated_current. Meter reads the mV drop across it.
+  const shunt_resistance_ohm = (rated_millivolt / 1000) / rated_current_a;
+  const measured_current_a = rated_current_a * measured_millivolt / rated_millivolt;
+  const power_dissipation_w = rated_current_a * (rated_millivolt / 1000);
+  if (![shunt_resistance_ohm, measured_current_a, power_dissipation_w].every(Number.isFinite)) return { error: "Shunt math is not a finite value." };
+  return {
+    shunt_resistance_ohm,
+    measured_current_a,
+    power_dissipation_w,
+    note: "Sizing and reading a DC current-measuring shunt -- the precision low-value resistor a DC panel meter, battery monitor, or PV/DC combiner uses to measure current. The shunt is rated as a millivolt drop at a rated current (a '50 mV, 100 A' shunt), so its resistance is simply R = rated millivolt / 1000 / rated current = 0.5 milliohm here, and the meter reads current by measuring the millivolt drop: current = rated current x (measured mV / rated mV), so 25 mV on a 50 mV / 100 A shunt is 50 A. At full rated current the shunt dissipates rated current x rated volts = 100 x 0.05 = 5 W as heat, which is why shunts are derated to about two-thirds of rating for continuous use and mounted for cooling. The shunt goes in the ungrounded/return leg in series with the load; keep the sense leads a twisted pair and take the drop at the shunt's voltage (potential) terminals, not the current lugs, so lead resistance does not add to the reading. A design aid; the shunt's accuracy class, temperature coefficient, and the meter's input range and calibration govern the measurement.",
+  };
+}
+
+export const dcShuntSizingExample = { inputs: { rated_current_a: 100, rated_millivolt: 50, measured_millivolt: 25 } };
+
+function _v963renderDcShuntSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: DC current-shunt sizing (Ohm's law), by name. R = rated_mV/1000 / rated_A; current = rated_A x (measured_mV / rated_mV); dissipation at rating = rated_A x rated_mV/1000. Derate to ~2/3 for continuous use; sense at the potential terminals. The shunt accuracy class and the meter range/calibration govern.";
+  const ir = makeNumber("Rated current (A)", "shu-ir", { step: "any", min: "0", value: "100" });
+  ir.input.value = "100";
+  const mr = makeNumber("Rated output (mV at rated current)", "shu-mr", { step: "any", min: "0", value: "50" });
+  mr.input.value = "50";
+  const mm = makeNumber("Measured output (mV)", "shu-mm", { step: "any", min: "0", value: "25" });
+  mm.input.value = "25";
+  for (const f of [ir, mr, mm]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ir.input.value = "100"; mr.input.value = "50"; mm.input.value = "25"; update(); });
+  const oR = makeOutputLine(outputRegion, "Shunt resistance", "shu-out-r");
+  const oI = makeOutputLine(outputRegion, "Measured current", "shu-out-i");
+  const oP = makeOutputLine(outputRegion, "Dissipation at rated current", "shu-out-p");
+  const update = debounce(() => {
+    const r = computeDcShuntSizing({
+      rated_current_a: ir.input.value === "" ? 100 : Number(ir.input.value), rated_millivolt: mr.input.value === "" ? 50 : Number(mr.input.value),
+      measured_millivolt: mm.input.value === "" ? 25 : Number(mm.input.value),
+    });
+    if (r.error) { oR.textContent = r.error; oI.textContent = "-"; oP.textContent = "-"; return; }
+    oR.textContent = fmt(r.shunt_resistance_ohm * 1000, 4) + " milliohm";
+    oI.textContent = fmt(r.measured_current_a, 2) + " A";
+    oP.textContent = fmt(r.power_dissipation_w, 2) + " W (derate to ~2/3 continuous)";
+  }, DEBOUNCE_MS);
+  for (const f of [ir, mr, mm]) f.input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["dc-shunt-sizing"] = _v963renderDcShuntSizing;

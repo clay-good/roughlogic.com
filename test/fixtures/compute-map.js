@@ -290,6 +290,7 @@ export const COMPUTE_MAP = {
   "evaporative-cooler-effectiveness": { module: "../../calc-hvac.js", fn: "computeEvaporativeCoolerEffectiveness" },
   "conduit-fill": { module: "../../calc-electrical.js", fn: "computeConduitFill" },
   "battery-runtime": { module: "../../calc-solar.js", fn: "computeBatteryRuntime" },
+  "dc-shunt-sizing": { module: "../../calc-solar.js", fn: "computeDcShuntSizing" },
   "loan-amortization": { module: "../../calc-accounting.js", fn: "computeAmortization" },
   "belt-pulley": { module: "../../calc-hvac.js", fn: "computeBeltAndPulley" },
   "cable-bend-radius": { module: "../../calc-electrical.js", fn: "computeBendRadius" },

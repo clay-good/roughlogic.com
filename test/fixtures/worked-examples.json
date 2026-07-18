@@ -4486,6 +4486,68 @@
    }
   },
   {
+   "tile_id": "dc-shunt-sizing",
+   "source_publisher": "DC current-shunt sizing (Ohm's law)",
+   "source_title": "100 A / 50 mV shunt reading 25 mV -> 0.5 milliohm, 50 A, 5 W at rated",
+   "source_edition_or_year": "spec-v963 worked example (machine-verified)",
+   "source_section_or_page": "R = 0.05/100 = 0.0005 ohm; I = 100*25/50 = 50 A; P = 100*0.05 = 5 W",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "rated_current_a": 100,
+    "rated_millivolt": 50,
+    "measured_millivolt": 25
+   },
+   "outputs": {
+    "shunt_resistance_ohm": {
+     "value": 0.0005,
+     "tolerance": {
+      "abs": 0.000001
+     }
+    },
+    "measured_current_a": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "power_dissipation_w": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dc-shunt-sizing",
+   "source_publisher": "DC current-shunt sizing (Ohm's law)",
+   "source_title": "cross-check: a 200 A / 75 mV shunt is 0.375 milliohm; 75 mV reads full 200 A",
+   "source_edition_or_year": "spec-v963 worked example (machine-verified)",
+   "source_section_or_page": "R = 0.075/200 = 0.000375 ohm; I = 200*75/75 = 200 A",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "rated_current_a": 200,
+    "rated_millivolt": 75,
+    "measured_millivolt": 75
+   },
+   "outputs": {
+    "shunt_resistance_ohm": {
+     "value": 0.000375,
+     "tolerance": {
+      "abs": 0.000001
+     }
+    },
+    "measured_current_a": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "battery-runtime",
    "source_publisher": "Project (first-principles)",
    "source_title": "t = (C_Ah * DoD * V) / P_load (k=1; simple form)",

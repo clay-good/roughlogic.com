@@ -2857,6 +2857,7 @@ cross-check.
 | calc-solar.js | `computeBatteryPeakShaving` | `{ nameplate_kwh = 0, dod = 0.90, event_duration_h = 0, target_shave_kw = 0, d...` | _ | _ | _ |
 | calc-solar.js | `computeBatteryRuntime` | `{ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1 }` | _ | _ | _ |
 | calc-solar.js | `computeBatteryTouArbitrage` | `{ nameplate_kwh = 0, dod = 0.90, rte = 0.86, peak_price = 0, offpeak_price = ...` | _ | _ | _ |
+| calc-solar.js | `computeDcShuntSizing` | `{ rated_current_a = 100, rated_millivolt = 50, measured_millivolt = 25 } = {}` | _ | _ | _ |
 | calc-solar.js | `computeEvChargeCost` | `{ battery_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, electrici...` | _ | _ | _ |
 | calc-solar.js | `computeEvChargeTime` | `{ battery_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, evse_powe...` | _ | _ | _ |
 | calc-solar.js | `computeEvChargerLoad` | `{ charger_amps = 0, main_breaker_a = 0, existing_load_a = 0, busbar_rating_a ...` | _ | _ | _ |
@@ -3072,7 +3073,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1658.
+Row count: 1659.
 
 <!-- END function-corpus-v14 -->
 
@@ -3153,7 +3154,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (188 tiles)
+### Group A Electrical (189 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3200,6 +3201,7 @@ per spec-v14 §13.1 second paragraph.
 | `conduit-thermal-expansion` | PVC Conduit Thermal Expansion (NEC 352.44) | NFPA; spec-v126 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `continuous-load-ocpd` | Continuous-Load OCPD and Conductor at 125% (NEC 210.20 / 215.3) | NEC 2023 210.20(A) / 215.3 / 240.6(A); spec-v280 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `copper-resistance` | Conductor Resistance at Temperature | NFPA; NEC Table 8 gives 1.93 ohm/1000 ft at 75 C uncoated coppe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `dc-shunt-sizing` | DC Ammeter Shunt Sizing | DC current-shunt sizing (Ohm's law); R = 0.05/100 = 0.0005 ohm; I = 100*25/50 = 50 A; P = 100*... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `delta-wye-line-phase` | Wye / Delta Line-to-Phase Voltage and Current | First-principles three-phase theory; spec-v128 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dp-level-hydrostatic` | Hydrostatic DP Level Transmitter (Head to Level) | Hydrostatic DP level transmitter (P =...; level = 4.33/(0.433*1.0) = 10 ft; span = 0.433*1.0*20 = 8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dryer-demand-220-54` | Household Clothes Dryer Demand Load (NEC 220.54) | NEC 2023 (NFPA 70); each at 5000 W floor; 4 x 5000 = 20000 W at 100% = 83.3 A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4669,6 +4671,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1411. Fixture-covered or reference-cadence: 1411 / 1411.
+Tile count: 1412. Fixture-covered or reference-cadence: 1412 / 1412.
 
 <!-- END tile-index-v14 -->

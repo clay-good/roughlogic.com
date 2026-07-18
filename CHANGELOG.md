@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(solar): add dc-shunt-sizing tile (spec-v963); 2026-07-18
+
+- New Group A tile `dc-shunt-sizing` (DC Ammeter Shunt Sizing) in calc-solar.js. A shunt rated as a millivolt drop at a
+  rated current: R = rated mV/1000 / rated current; current = rated current x (measured mV / rated mV); dissipation at
+  rating = rated current x rated volts. A 50 mV / 100 A shunt is 0.5 milliohm, reads 50 A at 25 mV, and dissipates 5 W
+  at rating (derate to ~2/3 continuous). Sense at the potential terminals. Home count 1,411 -> 1,412.
+
 ### feat(fabrication): add bend-springback tile (spec-v962); 2026-07-18
 
 - New Group E tile `bend-springback` (Sheet-Metal Bend Springback) in calc-fab.js. The Machinery's Handbook relation
