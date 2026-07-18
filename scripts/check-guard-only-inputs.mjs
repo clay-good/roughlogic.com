@@ -114,6 +114,8 @@ function extractFunctions(src) {
 
 const errors = [];
 let checked = 0;
+let fnsChecked = 0;
+let fnsTotal = 0;
 
 const files = (await readdir(ROOT))
   .filter((f) => f.startsWith("calc-") && f.endsWith(".js"))
@@ -121,7 +123,14 @@ const files = (await readdir(ROOT))
 
 for (const file of files) {
   const src = await readFile(resolve(ROOT, file), "utf8");
+  // Every exported compute function, so the skip count is visible: this gate
+  // only parses the object-destructure signature form `computeX({ ... })`.
+  // Param-less reference functions and single-arg `computeX(input)` forms are
+  // skipped (the latter shared with check-dead-inputs); a rising skip count on
+  // a new function is the signal to widen the parser.
+  fnsTotal += (src.match(/^export function compute\w+\(/gm) || []).length;
   for (const { fn, params, body } of extractFunctions(src)) {
+    fnsChecked++;
     const lines = body.split("\n");
     const guardIdx = guardLineIndexes(lines);
     for (const param of params) {
@@ -160,6 +169,7 @@ if (errors.length > 0) {
   process.exit(1);
 }
 console.log(
-  "check-guard-only-inputs OK: " + checked + " compute parameters swept; no unallowlisted guard-only dead inputs (" +
-  allowlist.entries.length + " reviewed allowlist entries).",
+  "check-guard-only-inputs OK: " + checked + " parameters across " + fnsChecked + " / " + fnsTotal +
+  " compute functions (" + (fnsTotal - fnsChecked) + " skipped: param-less reference or non-destructured signature); " +
+  "no unallowlisted guard-only dead inputs (" + allowlist.entries.length + " reviewed allowlist entries).",
 );

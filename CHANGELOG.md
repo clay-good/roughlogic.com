@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(lint): report coverage in check-guard-only-inputs so skipped functions are auditable; 2026-07-18
+
+- The new guard-only dead-input gate only parses the object-destructure signature form `computeX({ ... })`. It now
+  reports how many compute functions it checked vs. skipped (1329 / 1355; 26 skipped are param-less reference cards
+  or the single-arg `computeX(input)` form that check-dead-inputs also skips), matching that gate's convention. A
+  rising skip count on a newly-added non-destructured function is now the visible signal to widen the parser, so
+  coverage cannot silently erode. No behavior change to the check itself.
+
 ### test(realestate): pin closing-costs worked-example outputs (was inputs-only, unverified); 2026-07-18
 
 - The closing-costs worked-example fixture had `outputs: {}`, so the runner only checked the tile did not crash --
