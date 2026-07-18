@@ -11900,3 +11900,23 @@ test("monotonicity: short-circuit fault current and engine HP respond correctly 
   assert.ok(hp({ rpm: 6000 }) > hp({ rpm: 5000 }), "HP must rise with rpm");
   assert.ok(Math.abs(hp({}) - 400 * 5000 / 5252) < 0.01, "HP must equal T * rpm / 5252");
 });
+
+// Physical/economic monotonicity of two more computes (lower-consequence but
+// real bug-catchers). Irrigation water requirement (gallons) rises with area,
+// reference ET, and period, and falls with system efficiency and rainfall.
+// EOQ = sqrt(2*D*S/H) rises with annual demand and order cost and falls with
+// holding cost. A sign/term error passes the single pinned example but not these.
+test("monotonicity: irrigation requirement and EOQ respond correctly to their inputs", async () => {
+  const ag = await import("../../calc-agriculture.js");
+  const ac = await import("../../calc-accounting.js");
+  const ir = (o) => ag.computeIrrigationRequirement({ crop: "corn", et_ref_in_per_day: 0.25, period_days: 30, area_acres: 80, efficiency_pct: 90, rainfall_in: 1, ...o });
+  assert.ok(ir({ area_acres: 160 }).gallons > ir({}).gallons, "irrigation gallons must rise with area");
+  assert.ok(ir({ et_ref_in_per_day: 0.35 }).gallons > ir({}).gallons, "irrigation gallons must rise with reference ET");
+  assert.ok(ir({ efficiency_pct: 70 }).gallons > ir({ efficiency_pct: 90 }).gallons, "irrigation gallons must fall as system efficiency rises");
+  assert.ok(ir({ rainfall_in: 3 }).net_in < ir({ rainfall_in: 1 }).net_in, "net irrigation must fall as rainfall rises");
+  const eq = (o) => ac.computeEoqOrderQuantity({ annual_demand: 12000, order_cost: 50, holding_cost: 3, ...o }).eoq;
+  assert.ok(eq({ annual_demand: 24000 }) > eq({}), "EOQ must rise with annual demand");
+  assert.ok(eq({ order_cost: 100 }) > eq({}), "EOQ must rise with order cost");
+  assert.ok(eq({ holding_cost: 6 }) < eq({}), "EOQ must fall with holding cost");
+  assert.ok(Math.abs(eq({}) - Math.sqrt(2 * 12000 * 50 / 3)) < 0.01, "EOQ must equal sqrt(2 D S / H)");
+});

@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(mixed): guard irrigation requirement and EOQ with monotonicity; 2026-07-17
+
+- Added whole-response guards: irrigation water requirement (gallons) rises with area, reference ET, and period and falls
+  with system efficiency and rainfall; EOQ = sqrt(2 D S / H) rises with annual demand and order cost and falls with holding
+  cost. A sign/term error passes the single pinned example but breaks these. Test-only.
+
 ### test(mixed): guard short-circuit fault current and engine HP with physical monotonicity; 2026-07-17
 
 - Added guards: Bussmann point-to-point available fault current (arc-flash / equipment-rating safety) rises with source
