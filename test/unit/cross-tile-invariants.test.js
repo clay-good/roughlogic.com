@@ -11768,3 +11768,26 @@ test("monotonicity: computeSoilBearingCapacity qu rises with phi/c/B/Df/gamma an
   assert.ok(fs2.q_all > fs4.q_all, "allowable must fall as FS rises");
   assert.ok(Math.abs(fs2.q_all - fs2.qu / 2) < 1e-6, "q_all must equal qu / FS");
 });
+
+// Physical monotonicity of three structural capacity computes (each a
+// life-safety design calc). A sign error or wrong-term bug that raises capacity
+// when a strengthening input drops (or vice-versa) is non-conservative and would
+// pass the single pinned worked example; these whole-response checks catch it.
+test("monotonicity: steel flexure/column and RC flexure capacities respond correctly to their strengthening inputs", async () => {
+  const s = await import("../../calc-steel.js");
+  const c = await import("../../calc-concrete.js");
+  // Steel beam flexure Mn = Fy*Zx: design moment rises with plastic modulus and yield.
+  const bf = (o) => s.computeSteelBeamFlexure({ fy: 50, zx: 101, mu: 200, ...o }).phi_mn;
+  assert.ok(bf({ zx: 150 }) > bf({ zx: 101 }), "steel Mn must rise with plastic modulus Zx");
+  assert.ok(bf({ fy: 65 }) > bf({ fy: 50 }), "steel Mn must rise with yield strength Fy");
+  // Steel column: capacity rises with area and radius of gyration, falls with unbraced length.
+  const cc = (o) => s.computeSteelColumnCapacity({ fy: 50, e_mod: 29000, k: 1, l_ft: 14, r_in: 2.01, ag: 13.3, pu: 0, ...o }).phi_pn;
+  assert.ok(cc({ ag: 20 }) > cc({ ag: 13.3 }), "column capacity must rise with gross area");
+  assert.ok(cc({ r_in: 3 }) > cc({ r_in: 2.01 }), "column capacity must rise with radius of gyration");
+  assert.ok(cc({ l_ft: 25 }) < cc({ l_ft: 14 }), "column capacity must fall with unbraced length (slenderness)");
+  // RC beam flexure Mn = As*fy*(d-a/2): rises with steel area, effective depth, yield.
+  const rc = (o) => c.computeRcBeamFlexure({ fc: 4000, fy: 60000, as_in2: 3, b: 12, d: 21.5, mu: 200, ...o }).phi_mn;
+  assert.ok(rc({ as_in2: 4 }) > rc({ as_in2: 3 }), "RC Mn must rise with reinforcement area");
+  assert.ok(rc({ d: 26 }) > rc({ d: 21.5 }), "RC Mn must rise with effective depth");
+  assert.ok(rc({ fy: 75000 }) > rc({ fy: 60000 }), "RC Mn must rise with reinforcement yield");
+});

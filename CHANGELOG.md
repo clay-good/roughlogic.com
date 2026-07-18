@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(structural): guard steel and RC capacity computes with physical monotonicity; 2026-07-17
+
+- Added whole-response monotonicity guards on three life-safety capacity computes: steel-beam flexure (Mn rises with
+  plastic modulus Zx and yield Fy), steel-column capacity (rises with gross area and radius of gyration, falls with
+  unbraced length/slenderness), and RC-beam flexure (Mn rises with steel area, effective depth, and yield). A sign or
+  wrong-term error that raises capacity when a strengthening input falls is non-conservative and would pass the single
+  pinned worked example; these checks catch it. Test-only.
+
 ### test(geotech): guard Terzaghi/Vesic bearing capacity with physical monotonicity; 2026-07-17
 
 - Added a physical-invariant guard on computeSoilBearingCapacity (a foundation-design safety calc): ultimate bearing qu
