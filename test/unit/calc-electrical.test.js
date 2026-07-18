@@ -7,7 +7,9 @@ import {
   computeWireAmpacity,
   computeVoltageDrop,
   computeConduitFill,
+  CONDUCTOR_AREAS_IN2,
   computeBoxFill,
+  BOX_FILL_PER_CONDUCTOR_IN3,
   computeBreakerSize,
   computeMotorFLA,
   MOTOR_FLA_TABLE,
@@ -283,4 +285,31 @@ test("EGC: 200 A aluminum -> 4 AWG", () => {
 test("EGC: rating beyond table returns error", () => {
   const r = computeEGCSize({ ocpd_A: 5000, material: "copper" });
   assert.ok(r.error);
+});
+
+// Structural invariants over the two NEC Chapter 9 / 314.16 lookup tables that
+// drive conduit fill and box fill (over-fill is a heat / code-violation hazard):
+// both the conductor cross-sectional area and the per-conductor box allowance
+// must strictly increase with conductor size. A transcription error in either
+// table would silently skew every fill verdict; the per-value fixtures miss it.
+test("NEC conduit-area and box-fill tables are strictly increasing with conductor size", () => {
+  // Cross-section rank, smallest to largest (AWG then kcmil).
+  const order = ["18", "16", "14", "12", "10", "8", "6", "4", "2", "1", "1/0", "2/0", "3/0", "4/0"];
+  const rank = Object.fromEntries(order.map((s, i) => [s, i]));
+  for (const [ins, tbl] of Object.entries(CONDUCTOR_AREAS_IN2)) {
+    const sizes = Object.keys(tbl).sort((a, b) => rank[a] - rank[b]);
+    let prev = -Infinity;
+    for (const s of sizes) {
+      assert.ok(rank[s] !== undefined, `unranked conductor size ${s} in CONDUCTOR_AREAS_IN2.${ins}`);
+      assert.ok(tbl[s] > 0 && tbl[s] > prev, `CONDUCTOR_AREAS_IN2.${ins} not increasing at ${s}: ${tbl[s]} <= ${prev}`);
+      prev = tbl[s];
+    }
+  }
+  const bfSizes = Object.keys(BOX_FILL_PER_CONDUCTOR_IN3).sort((a, b) => rank[a] - rank[b]);
+  let prevBf = -Infinity;
+  for (const s of bfSizes) {
+    assert.ok(BOX_FILL_PER_CONDUCTOR_IN3[s] > prevBf,
+      `BOX_FILL_PER_CONDUCTOR_IN3 not increasing at ${s}: ${BOX_FILL_PER_CONDUCTOR_IN3[s]} <= ${prevBf}`);
+    prevBf = BOX_FILL_PER_CONDUCTOR_IN3[s];
+  }
 });

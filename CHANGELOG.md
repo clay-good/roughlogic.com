@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(electrical): guard the NEC conduit-area and box-fill tables with conductor-size monotonicity; 2026-07-17
+
+- Added a structural invariant over CONDUCTOR_AREAS_IN2 (NEC Ch. 9 Table 5) and BOX_FILL_PER_CONDUCTOR_IN3 (NEC 314.16):
+  both the conductor cross-sectional area and the per-conductor box allowance must strictly increase with conductor size.
+  These drive conduit-fill and box-fill pass/fail (over-fill is a heat / code-violation hazard); a transcription error
+  would silently skew every verdict, a class the per-value fixtures miss. Test-only.
+
 ### test(fab): guard the flange-bolt tensile-area lookup (UNC + 8UN) with a diameter-monotonicity invariant; 2026-07-17
 
 - Added a safety invariant over the ASME B1.1 bolt tensile-stress-area tables that back flange-bolt preload/torque:
