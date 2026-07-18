@@ -219,6 +219,12 @@
       "justification": "Air-sampling pumps are calibrated in L/min."
     },
     {
+      "module": "calc-fire.js",
+      "match": "Consumption rate (L/min",
+      "family": "fire service SCBA air management",
+      "justification": "SCBA breathing/consumption rate is expressed in L/min: NIOSH rates open-circuit SCBA duration at 40 L/min and NFPA 1981 heavy-work testing at ~103 L/min, and US fireground air-management training teaches ~40 L/min light / ~100 L/min heavy. There is no US-customary breathing-rate unit a firefighter reads off the rating."
+    },
+    {
       "module": "calc-restoration.js",
       "match": "per cassette (L)",
       "family": "lab and IH practice",

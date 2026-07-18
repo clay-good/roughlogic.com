@@ -5088,40 +5088,43 @@ test("bounds: calc-fire computeIsoNeededFireFlow rejects non-positive area / sto
 });
 
 test("bounds: calc-fire computeScbaCylinderTime pins available_scf = (P_start - P_alarm)/P_rated * V_rated and time = scf/consumption across the operational sweep", () => {
-  // Standard 60-min 4500-psi cylinder (88 scf rated) at full fill,
-  // 33% low-air alarm (1485 psi), 40 scfm light work -> available_scf = (4500-1485)/4500*88 ~= 58.96 scf,
-  // time_to_alarm = 58.96 / 40 ~= 1.474 min.
-  const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 40 });
+  // Standard 60-min 4500-psi cylinder (88 scf rated) at full fill, 33% low-air
+  // alarm (1485 psi), 40 L/min light-work breathing rate. Consumption is
+  // entered in L/min and converted to scf/min by 28.3168 L/ft^3:
+  // available_scf = (4500-1485)/4500*88 ~= 58.96 scf; 40 L/min = 1.4126 scfm,
+  // so time_to_alarm = 58.96 / 1.4126 ~= 41.74 min.
+  const L_PER_FT3 = 28.3168;
+  const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_lpm: 40 });
   assert.ok(!r.error, JSON.stringify(r));
   const expected_to_alarm = ((4500 - 1485) / 4500) * 88;
   assert.ok(Math.abs(r.available_scf_to_alarm - expected_to_alarm) < 1e-9, `available_scf identity`);
   assert.ok(Math.abs(r.available_scf_to_empty - (4500 / 4500) * 88) < 1e-9, `available_scf_to_empty == V_rated when P_start == P_rated`);
-  assert.ok(Math.abs(r.time_to_alarm_min - expected_to_alarm / 40) < 1e-9, `time_to_alarm identity`);
+  assert.ok(Math.abs(r.time_to_alarm_min - expected_to_alarm / (40 / L_PER_FT3)) < 1e-9, `time_to_alarm identity (L/min -> scf/min)`);
   assert.ok(Array.isArray(r.warnings) && r.warnings.length >= 1, "exit-at-alarm warning present");
   assert.ok(r.warnings[0].toLowerCase().includes("alarm"), "first warning mentions alarm");
   // Sweep across the documented work-rate window: time scales as 1/consumption at fixed pressures.
   for (const V_rated_scf of [45, 66, 88]) {
-    for (const consumption_scfm of [25, 40, 60, 100]) {
-      const s = computeScbaCylinderTime({ V_rated_scf, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm });
-      assertFinitePositive(s.time_to_alarm_min, `V=${V_rated_scf} C=${consumption_scfm}`);
-      assertFinitePositive(s.time_to_empty_min, `V=${V_rated_scf} C=${consumption_scfm} empty`);
+    for (const consumption_lpm of [25, 40, 60, 100]) {
+      const s = computeScbaCylinderTime({ V_rated_scf, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_lpm });
+      assertFinitePositive(s.time_to_alarm_min, `V=${V_rated_scf} C=${consumption_lpm}`);
+      assertFinitePositive(s.time_to_empty_min, `V=${V_rated_scf} C=${consumption_lpm} empty`);
       assert.ok(s.time_to_empty_min > s.time_to_alarm_min, "empty > alarm");
     }
   }
 });
 
 test("bounds: calc-fire computeScbaCylinderTime rejects every documented out-of-domain input (documented)", () => {
-  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 0, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 40 }));
-  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 0, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 40 }));
-  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 0, P_alarm_psi: 1485, consumption_scfm: 40 }));
+  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 0, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_lpm: 40 }));
+  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 0, P_start_psi: 4500, P_alarm_psi: 1485, consumption_lpm: 40 }));
+  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 0, P_alarm_psi: 1485, consumption_lpm: 40 }));
   // P_start > P_rated.
-  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 5000, P_alarm_psi: 1485, consumption_scfm: 40 }));
+  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 5000, P_alarm_psi: 1485, consumption_lpm: 40 }));
   // P_alarm negative.
-  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: -1, consumption_scfm: 40 }));
+  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: -1, consumption_lpm: 40 }));
   // P_alarm >= P_start.
-  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 4500, consumption_scfm: 40 }));
+  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 4500, consumption_lpm: 40 }));
   // Non-positive consumption.
-  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 0 }));
+  assert.ok("error" in computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_lpm: 0 }));
 });
 
 test("bounds: calc-fire computeNFPA1142WaterSupply pins WS = (V*CCN)/OHC with 1.5x exposure and 0.5x sprinkler multipliers across the occupancy x construction sweep", () => {

@@ -943,44 +943,50 @@ FIRE_RENDERERS["iso-nff"] = _v7f_renderIsoNFF;
 // duration at 4500 psi rated pressure -> 45 / 66 / 88 scf typical).
 //
 //   available_scf_to_alarm = (P_start - P_alarm) / P_rated * V_rated
-//   time_to_alarm_min      = available_scf_to_alarm / consumption_scfm
-//   time_to_empty_min      = (P_start / P_rated * V_rated) / consumption_scfm
+//   time_to_alarm_min      = available_scf_to_alarm / (consumption_lpm / 28.3168)
+//   time_to_empty_min      = (P_start / P_rated * V_rated) / (consumption_lpm / 28.3168)
 //
 // "Time to empty" is a math-aid only, not a planning number. NFPA 1500
 // and incident-command practice train members to exit at the low-air
 // alarm, not at empty. The output surfaces this caveat on every result.
 
-// dims: in { V_rated_scf: L^3, P_rated_psi: M L^-1 T^-2, P_start_psi: M L^-1 T^-2, P_alarm_psi: M L^-1 T^-2, consumption_scfm: L^3 T^-1 }
+// dims: in { V_rated_scf: L^3, P_rated_psi: M L^-1 T^-2, P_start_psi: M L^-1 T^-2, P_alarm_psi: M L^-1 T^-2, consumption_lpm: L^3 T^-1 }
 //        out: { available_scf_to_alarm: L^3, available_scf_to_empty: L^3, time_to_alarm_min: T, time_to_empty_min: T, warnings: dimensionless }
+// Consumption is entered as a human breathing rate in LITERS per minute
+// (NIOSH rates SCBA at 40 L/min; heavy fireground work is ~100 L/min), and
+// converted to scf/min against the scf cylinder volume by the 28.3168 L/ft^3
+// bridge. A 60-min 88-scf bottle at 40 L/min (1.41 scfm) lasts ~62 min.
 export function computeScbaCylinderTime({
   V_rated_scf = 0,
   P_rated_psi = 0,
   P_start_psi = 0,
   P_alarm_psi = 0,
-  consumption_scfm = 0,
+  consumption_lpm = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L_PER_FT3 = 28.3168;
   const Vr = Number(V_rated_scf) || 0;
   const Pr = Number(P_rated_psi) || 0;
   const Ps = Number(P_start_psi) || 0;
   const Pa = Number(P_alarm_psi) || 0;
-  const C = Number(consumption_scfm) || 0;
+  const C_lpm = Number(consumption_lpm) || 0;
   if (!(Vr > 0)) return { error: "Cylinder rated volume must be positive (scf)." };
   if (!(Pr > 0)) return { error: "Rated pressure must be positive (psi)." };
   if (!(Ps > 0)) return { error: "Starting pressure must be positive (psi)." };
   if (Ps > Pr) return { error: "Starting pressure cannot exceed rated pressure." };
   if (!(Pa >= 0)) return { error: "Low-air alarm pressure must be non-negative." };
   if (Pa >= Ps) return { error: "Low-air alarm pressure must be below starting pressure." };
-  if (!(C > 0)) return { error: "Consumption rate must be positive (scfm)." };
+  if (!(C_lpm > 0)) return { error: "Consumption rate must be positive (L/min)." };
 
+  const C = C_lpm / L_PER_FT3; // breathing rate L/min -> scf/min to match the scf cylinder volume
   const available_scf_to_alarm = ((Ps - Pa) / Pr) * Vr;
   const available_scf_to_empty = (Ps / Pr) * Vr;
   const time_to_alarm_min = available_scf_to_alarm / C;
   const time_to_empty_min = available_scf_to_empty / C;
 
   const warnings = ["Time-to-empty is a math aid only. NFPA 1500 / incident-command practice trains members to exit at the low-air alarm; do not plan to empty."];
-  if (C < 20) warnings.push("Consumption below 20 scfm is below the NFPA 1981 light-work range; verify against manufacturer field data.");
-  if (C > 200) warnings.push("Consumption above 200 scfm is above the typical heavy-work range; verify the input.");
+  if (C_lpm < 20) warnings.push("Consumption below 20 L/min is below the NFPA 1981 light-work range (~40 L/min); verify against manufacturer field data.");
+  if (C_lpm > 200) warnings.push("Consumption above 200 L/min is above the typical heavy-work range (~100 L/min); verify the input.");
 
   return {
     available_scf_to_alarm,
@@ -993,8 +999,9 @@ export function computeScbaCylinderTime({
 
 export const scbaCylinderExample = {
   // Standard 60-min 4500-psi cylinder (88 scf rated) at full fill,
-  // 33% low-air alarm (1485 psi), 40 scfm light work.
-  inputs: { V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 40 },
+  // 33% low-air alarm (1485 psi), 40 L/min light-work breathing rate
+  // (= 1.41 scfm): ~42 min to the alarm, ~62 min to empty.
+  inputs: { V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_lpm: 40 },
 };
 
 // dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
@@ -1008,7 +1015,7 @@ export function renderScbaCylinder(inputRegion, outputRegion, citationEl) {
   pr.input.value = "4500";
   const ps = makeNumber("Starting pressure (psi)", "scba-ps", { step: "any", min: "0" });
   const pa = makeNumber("Low-air alarm pressure (psi; typically ~33% of rated)", "scba-pa", { step: "any", min: "0" });
-  const cs = makeNumber("Consumption rate (scfm; ~40 light, ~100 heavy)", "scba-cs", { step: "any", min: "0", value: "40" });
+  const cs = makeNumber("Consumption rate (L/min; ~40 light, ~100 heavy)", "scba-cs", { step: "any", min: "0", value: "40" });
   cs.input.value = "40";
   for (const f of [vr, pr, ps, pa, cs]) inputRegion.appendChild(f.wrap);
 
@@ -1039,7 +1046,7 @@ export function renderScbaCylinder(inputRegion, outputRegion, citationEl) {
       P_rated_psi: readNum(pr.input),
       P_start_psi: readNum(ps.input),
       P_alarm_psi: readNum(pa.input),
-      consumption_scfm: readNum(cs.input),
+      consumption_lpm: readNum(cs.input),
     });
     if (r.error) {
       oA.textContent = r.error; oE.textContent = ""; oSa.textContent = ""; oW.textContent = "";

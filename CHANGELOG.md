@@ -4,6 +4,19 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(fire): scba-cylinder-time treated a L/min breathing rate as scfm, making a 60-min bottle read ~2 min; 2026-07-18
+
+- computeScbaCylinderTime divided the cylinder's scf volume by the consumption rate directly, but the input guidance,
+  example, and warning thresholds are all human breathing rates in **L/min** ("~40 light, ~100 heavy" is the NIOSH
+  40 L/min / heavy-work rate, and the `<20` / `>200` warning bounds only make sense as L/min). Consumed as scfm, a
+  standard 60-minute 88-scf 4500-psi bottle computed as lasting **2.2 minutes to empty / 1.5 minutes to the low-air
+  alarm** -- a ~28x error on a firefighter air-management tool. The field now reads L/min and converts to scf/min by
+  28.3168 L/ft^3: the same bottle at 40 L/min gives **62.3 min to empty / 41.7 min to alarm**, and 100 L/min heavy
+  work gives ~25 min. The worked example had pinned the impossible 2.2 min (fixture mirrored the bug) and the
+  bounds-fuzzer/monotonicity/unit tests re-derived the same broken identity; all re-pinned to the corrected values.
+  Added a us-defaults allowlist entry for the L/min label (SCBA breathing rate has no US-customary unit; NIOSH/NFPA
+  1981 rate SCBA in L/min). Found by a first-principles formula audit.
+
 ### docs(gas): gas-pipe-sizing citation showed a Spitzglass formula missing the diameter-correction term; 2026-07-18
 
 - The gas-pipe-sizing tile computes with the full low-pressure Spitzglass formula including the

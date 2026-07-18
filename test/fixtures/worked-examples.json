@@ -3647,9 +3647,9 @@
   {
    "tile_id": "scba-cylinder-time",
    "source_publisher": "NFPA / NIOSH",
-   "source_title": "SCBA cylinder gas-law: scf to alarm and to empty (60-min 4500 psi rating at heavy work)",
+   "source_title": "SCBA cylinder gas-law: scf to alarm and to empty (60-min 4500 psi rating at 40 L/min light-work breathing rate)",
    "source_edition_or_year": "NFPA 1981-2019; NIOSH 42 CFR 84",
-   "source_section_or_page": "Manufacturer rated scf / pressure; 33% low-air alarm",
+   "source_section_or_page": "Manufacturer rated scf / pressure; 33% low-air alarm; 40 L/min NIOSH breathing rate",
    "verified_by": "rl",
    "verified_on": "2026-05-10",
    "inputs": {
@@ -3657,7 +3657,7 @@
     "P_rated_psi": 4500,
     "P_start_psi": 4500,
     "P_alarm_psi": 1485,
-    "consumption_scfm": 40
+    "consumption_lpm": 40
    },
    "outputs": {
     "available_scf_to_alarm": {
@@ -3667,13 +3667,13 @@
      }
     },
     "time_to_alarm_min": {
-     "value": 1.474,
+     "value": 41.74,
      "tolerance": {
       "pct": 0.5
      }
     },
     "time_to_empty_min": {
-     "value": 2.2,
+     "value": 62.3,
      "tolerance": {
       "pct": 0.5
      }

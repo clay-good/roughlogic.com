@@ -16,56 +16,45 @@ import {
 const close = (a, b, tol) => Math.abs(a - b) <= tol;
 const closePct = (a, b, pct) => Math.abs(a - b) <= Math.max(Math.abs(b) * (pct / 100), 1e-6);
 
-test("scba-cylinder-time: 60-min 4500 psi 88 scf, full fill, 33% alarm, 40 scfm -> ~1.475 min/psi", () => {
+test("scba-cylinder-time: 60-min 4500 psi 88 scf, full fill, 33% alarm, 40 L/min light work -> ~42 min to alarm, ~62 to empty", () => {
   const r = computeScbaCylinderTime(scbaCylinderExample.inputs);
   assert.ok(!r.error);
-  // available_scf_to_alarm = (4500 - 1485) / 4500 * 88 = 0.67 * 88 = 58.96
-  // time_to_alarm = 58.96 / 40 = 1.474 min ... wait that's < 30 min
-  // Hmm let me recompute:
-  //   (4500-1485)/4500 = 3015/4500 = 0.67
-  //   * 88 = 58.96 scf
-  //   / 40 scfm = 1.474 min -- that's way too short for a 60-min rated bottle
-  // Wait — for a "60-min rated" bottle the rating IS at the manufacturer-
-  // assumed consumption rate, usually 40 scfm. So at 40 scfm AND from full
-  // to empty, we should get exactly 60 min. Let me check:
-  //   time_to_empty = 4500/4500 * 88 / 40 = 88 / 40 = 2.2 min??
-  // That doesn't match either. The "60-min rating" means 88 scf is for
-  // 60 minutes at ~1.5 scfm metered consumption (not 40 scfm). The 40
-  // scfm assumption gives much shorter actual times in heavy-work
-  // conditions. Sanity check: 88 scf @ 40 scfm = 2.2 min total.
-  // That IS in fact correct — at 40 scfm consumption (heavy work), a
-  // 88 scf cylinder lasts ~2.2 min. The "60-minute rating" is at the
-  // light-work consumption of ~1.5 scfm where 88 scf / 1.5 ~ 58 min.
-  // So the test below uses 1.5 scfm to land near 60 min.
-  assert.ok(close(r.time_to_alarm_min, (3015 / 4500) * 88 / 40, 0.001));
+  // Consumption is entered in L/min (NIOSH rates SCBA at 40 L/min light
+  // work) and converted to scf/min by 28.3168 L/ft^3: 40 L/min = 1.4126 scfm.
+  //   available_scf_to_alarm = (4500 - 1485)/4500 * 88 = 0.67 * 88 = 58.96 scf
+  //   time_to_alarm = 58.96 / 1.4126 = 41.74 min
+  //   time_to_empty = 88 / 1.4126 = 62.30 min  (matches the 60-min rating)
+  assert.ok(closePct(r.available_scf_to_alarm, 58.96, 0.5));
+  assert.ok(closePct(r.time_to_alarm_min, 41.74, 0.5));
+  assert.ok(closePct(r.time_to_empty_min, 62.30, 0.5));
 });
 
-test("scba-cylinder-time: 60-min rated bottle at 1.5 scfm metered consumption ~ 58 min to empty", () => {
-  const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 1.5 });
-  // time_to_empty = 88 / 1.5 = 58.67 min ~= 60 min rating.
-  assert.ok(closePct(r.time_to_empty_min, 58.67, 1));
+test("scba-cylinder-time: heavy fireground work (100 L/min) drains a 60-min bottle in ~25 min", () => {
+  const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_lpm: 100 });
+  // 100 L/min = 3.531 scfm; time_to_empty = 88 / 3.531 = 24.92 min.
+  assert.ok(closePct(r.time_to_empty_min, 24.92, 1));
 });
 
 test("scba-cylinder-time: rejects start pressure > rated pressure", () => {
-  const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4600, P_alarm_psi: 1485, consumption_scfm: 40 });
+  const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4600, P_alarm_psi: 1485, consumption_lpm: 40 });
   assert.ok(r.error);
 });
 
 test("scba-cylinder-time: rejects alarm pressure >= start pressure", () => {
-  const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 1500, P_alarm_psi: 1500, consumption_scfm: 40 });
+  const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 1500, P_alarm_psi: 1500, consumption_lpm: 40 });
   assert.ok(r.error);
 });
 
 test("scba-cylinder-time: rejects zero / negative consumption", () => {
-  const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 0 });
+  const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_lpm: 0 });
   assert.ok(r.error);
 });
 
-test("scba-cylinder-time: warns when consumption is below 20 or above 200 scfm", () => {
-  const r1 = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 10 });
-  const r2 = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 250 });
-  assert.ok(r1.warnings.some((w) => /below 20 scfm/.test(w)));
-  assert.ok(r2.warnings.some((w) => /above 200 scfm/.test(w)));
+test("scba-cylinder-time: warns when consumption is below 20 or above 200 L/min", () => {
+  const r1 = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_lpm: 10 });
+  const r2 = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_lpm: 250 });
+  assert.ok(r1.warnings.some((w) => /below 20 L\/min/.test(w)));
+  assert.ok(r2.warnings.some((w) => /above 200 L\/min/.test(w)));
 });
 
 test("scba-cylinder-time: every result includes the 'do not plan to empty' warning", () => {
@@ -74,8 +63,8 @@ test("scba-cylinder-time: every result includes the 'do not plan to empty' warni
 });
 
 test("scba-cylinder-time: partial bottle at 3000 psi delivers proportional scf", () => {
-  const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 3000, P_alarm_psi: 1485, consumption_scfm: 40 });
-  // available = (3000-1485)/4500 * 88 = 0.337 * 88 = 29.6
+  const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 3000, P_alarm_psi: 1485, consumption_lpm: 40 });
+  // available = (3000-1485)/4500 * 88 = 0.337 * 88 = 29.6 (independent of consumption)
   assert.ok(closePct(r.available_scf_to_alarm, 29.6, 1));
 });
 

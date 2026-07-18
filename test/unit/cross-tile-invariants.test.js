@@ -3700,39 +3700,41 @@ test("monotonicity: computeShortCircuitPP I_sca_panel_A is strictly decreasing i
     `I_sca_secondary = ${zero.I_sca_secondary_A}, expected ${expectedI}`);
 });
 
-test("monotonicity: computeScbaCylinderTime time_to_alarm_min is strictly decreasing in consumption_scfm; strictly increasing in P_start_psi (NFPA 1981 linear pin)", () => {
-  // Group F. available_scf_to_alarm = ((Ps - Pa) / Pr) * Vr; time =
-  // available / C. Inversely linear in C, linear in (Ps - Pa).
+test("monotonicity: computeScbaCylinderTime time_to_alarm_min is strictly decreasing in consumption_lpm; strictly increasing in P_start_psi (NFPA 1981 linear pin)", () => {
+  // Group F. available_scf_to_alarm = ((Ps - Pa) / Pr) * Vr; consumption is
+  // entered in L/min and converted to scf/min by 28.3168 L/ft^3, so time =
+  // available * 28.3168 / C_lpm. Inversely linear in C, linear in (Ps - Pa).
+  const L_PER_FT3 = 28.3168;
   const baseline = { V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485 };
   let prev = Infinity;
-  for (const consumption_scfm of [20, 30, 40, 60, 80, 120, 200]) {
-    const r = computeScbaCylinderTime({ ...baseline, consumption_scfm });
+  for (const consumption_lpm of [20, 30, 40, 60, 80, 120, 200]) {
+    const r = computeScbaCylinderTime({ ...baseline, consumption_lpm });
     assert.ok(Number.isFinite(r.time_to_alarm_min) && r.time_to_alarm_min > 0,
-      `time at C=${consumption_scfm}: ${JSON.stringify(r)}`);
+      `time at C=${consumption_lpm}: ${JSON.stringify(r)}`);
     assert.ok(r.time_to_alarm_min < prev,
-      `time at C=${consumption_scfm} = ${r.time_to_alarm_min} not less than prev=${prev}`);
+      `time at C=${consumption_lpm} = ${r.time_to_alarm_min} not less than prev=${prev}`);
     prev = r.time_to_alarm_min;
   }
   // Strict monotonicity in P_start_psi at fixed C / Pa / Pr / Vr.
   let prevT = -Infinity;
   for (const P_start_psi of [2000, 2500, 3000, 3500, 4000, 4500]) {
-    const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi, P_alarm_psi: 1485, consumption_scfm: 40 });
+    const r = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi, P_alarm_psi: 1485, consumption_lpm: 40 });
     assert.ok(r.time_to_alarm_min > prevT,
       `time at Ps=${P_start_psi} = ${r.time_to_alarm_min} not greater than prev=${prevT}`);
     prevT = r.time_to_alarm_min;
   }
-  // Closed-form pin from scbaCylinderExample: full 88 scf cylinder /
-  // 33% alarm / 40 scfm. available_to_alarm = ((4500 - 1485) / 4500) * 88
-  // = (3015 / 4500) * 88 = 0.67 * 88 = 58.96 scf; time = 58.96 / 40 = 1.474 min.
-  const ref = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_scfm: 40 });
+  // Closed-form pin from scbaCylinderExample: full 88 scf cylinder / 33% alarm
+  // / 40 L/min (= 1.4126 scfm). available_to_alarm = ((4500 - 1485) / 4500) * 88
+  // = 58.96 scf; time = 58.96 / (40/28.3168) = 41.74 min.
+  const ref = computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: 1485, consumption_lpm: 40 });
   const expectedAvail = ((4500 - 1485) / 4500) * 88;
   assert.ok(Math.abs(ref.available_scf_to_alarm - expectedAvail) < 1e-9,
     `available = ${ref.available_scf_to_alarm}, expected ${expectedAvail}`);
-  assert.ok(Math.abs(ref.time_to_alarm_min - expectedAvail / 40) < 1e-9,
-    `time = ${ref.time_to_alarm_min}, expected ${expectedAvail / 40}`);
-  // time_to_empty = Ps / Pr * Vr / C closed-form pin.
-  assert.ok(Math.abs(ref.time_to_empty_min - (88 / 40)) < 1e-9,
-    `time_to_empty = ${ref.time_to_empty_min}, expected 2.2`);
+  assert.ok(Math.abs(ref.time_to_alarm_min - expectedAvail / (40 / L_PER_FT3)) < 1e-9,
+    `time = ${ref.time_to_alarm_min}, expected ${expectedAvail / (40 / L_PER_FT3)}`);
+  // time_to_empty = Ps / Pr * Vr / (C_lpm / 28.3168) closed-form pin (~62.3 min).
+  assert.ok(Math.abs(ref.time_to_empty_min - (88 / (40 / L_PER_FT3))) < 1e-9,
+    `time_to_empty = ${ref.time_to_empty_min}, expected ${88 / (40 / L_PER_FT3)}`);
 });
 
 test("monotonicity: computeTireGearing rev_per_mi_new is strictly decreasing in new tire OD; cruise_mph strictly increasing in new tire OD at fixed gear / RPM (63360 / (pi*OD) circumference pin)", () => {
