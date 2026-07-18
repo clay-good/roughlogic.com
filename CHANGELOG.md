@@ -4,7 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
-### fix(construction): word the baluster-picket gap verdict as the IRC cross-check it is; 2026-07-17
+### feat(search): question-phrase aliases for 46 uncovered tiles (spec-v590 follow-on, groups A/B/K); 2026-07-17
+
+- The spec-v590 question corpus was completed when the catalog had 1,041 tiles; 177 tiles landed since then carry
+  vocabulary aliases but no `kind: "question"` rows. This batch covers the 46 in groups A, B, and K (electrical /
+  low-voltage, plumbing-gas, mechanic-machinist) with 230 reviewed phrasings, each passed through the standing
+  mechanical checks (global dedup, normalizeQuery survival) plus the v589 top-3 rank check with the batch folded in
+  (all 230 rank their target top-3). Shards regenerated; live-browser spot check green. 131 tiles remain (97 in
+  group E, 34 scattered) for follow-on batches.
 
 - baluster-picket-count's actual-gap line said "(under 4 in)" / "(OVER - add a picket)" against a hardcoded 4 in
   regardless of the user's own maximum-gap input. The ceil in the count already guarantees the actual gap never
