@@ -8508,6 +8508,17 @@ export const CITATIONS = {
       { name: "Shell / plaster", value: "~8 in gunite shell and ~3/8 in plaster (defaults); the spec governs", source: "pool structural spec" },
     ],
   },
+  "oil-water-separator-sizing": {
+    formula: "rise_velocity Vt = g x (rho_w - rho_o) x d^2 / (18 mu) (Stokes, computed in SI, converted to ft/min); horizontal_area_ft2 = F x Q / Vt, with F ~ 1.2 (turbulence factor) and Q in ft3/min.",
+    edition: "API Publication 421 (Design and Operation of Oil-Water Separators) gravity-separator method with Stokes' law, by name; the manufacturer and the engineer / AHJ govern.",
+    freeAccess: "Stokes' law is public physics; the API 421 turbulence factor (~1.2), the 150 micron design droplet, and the horizontal-velocity limits are the API 421 method, and the flow, oil SG, and viscosity come from the waste stream.",
+    governance: GOVERNANCE.water,
+    editionNote: "The minimum horizontal (plan) surface area of a rectangular gravity oil/water separator per API Publication 421. The design oil droplet (commonly 150 micron) rises through the water at the Stokes terminal velocity Vt = g (rho_w - rho_o) d^2 / (18 mu); the separator must give that droplet enough surface residence to reach the top before the flow carries it out, so the required horizontal area is the flow divided by the rise velocity, multiplied by a turbulence / short-circuit factor F of about 1.2. The horizontal velocity is also held below about 15 times Vt and under about 3 ft/min. Colder water raises the viscosity and slows the rise, and a smaller design droplet demands much more area (the velocity goes as the diameter squared). Critically, only FREE oil separates by gravity: an emulsified or dissolved oil fraction will pass a gravity separator and needs coalescing media, dissolved-air flotation, or downstream treatment. This is a screening estimate, not a design; API 421, the separator manufacturer, and the engineer of record / AHJ govern the unit and the discharge permit.",
+    assumptions: [
+      { name: "Stokes rise", value: "Vt = g(rho_w - rho_o)d^2/(18 mu) for a 150 micron droplet; area = F x Q / Vt with F ~ 1.2", source: "API 421" },
+      { name: "Free oil only", value: "emulsified / dissolved oil does not gravity-separate; needs coalescing / DAF / downstream treatment", source: "API 421 / practice" },
+    ],
+  },
   "gutter-downspout-takeoff": {
     formula: "gutter_lf = eave_length_ft; downspouts = ceil(roof_area_sf / max_area_per_downspout_sf); downspout_pipe_lf = downspouts x wall_height_ft; hangers = ceil(eave_length_ft / hanger_spacing_ft).",
     edition: "Gutter takeoff identity by name (gutter runs the eave; downspouts from the roof area over the per-downspout area; pipe and hangers from height and spacing); first-principles arithmetic.",

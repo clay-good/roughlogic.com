@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(water): add oil-water-separator-sizing tile (spec-v943); 2026-07-18
+
+- New Group M tile `oil-water-separator-sizing` (Gravity Oil/Water Separator Surface Area, API 421) in calc-treatment.js.
+  A design oil droplet rises at the Stokes velocity Vt = g(rho_w - rho_o)d^2/(18 mu); the minimum horizontal (plan) area
+  is F x Q / Vt with a turbulence factor F ~ 1.2. A 150 micron droplet of 0.85-SG oil in 60 F water rises ~0.33 ft/min,
+  so 50 gpm needs ~24 ft^2 and 100 gpm ~49 ft^2. Colder water and smaller droplets slow the rise and demand more area;
+  emulsified/dissolved oil does NOT gravity-separate (needs coalescing/DAF). A screen, not a design; API 421, the
+  manufacturer, and the engineer/AHJ govern. Home count 1,391 -> 1,392.
+
 ### feat(solar): add pv-ac-output-circuit tile (spec-v942); 2026-07-18
 
 - New Group A tile `pv-ac-output-circuit` (Inverter AC Output Circuit Conductor and OCPD, NEC 690.8(B)) in

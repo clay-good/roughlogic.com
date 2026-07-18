@@ -55196,6 +55196,58 @@
    }
   },
   {
+   "tile_id": "oil-water-separator-sizing",
+   "source_publisher": "API Publication 421 (gravity oil/water separator, Stokes' law)",
+   "source_title": "50 gpm, 0.85 SG oil, 150 micron droplet, 1.1 cP water -> 0.328 ft/min rise, 24.4 ft^2 surface",
+   "source_edition_or_year": "spec-v943 worked example",
+   "source_section_or_page": "Vt=9.81*(rho_w-rho_o)*d^2/(18*mu) SI -> 0.3285 ft/min; area=1.2*(50*0.133681)/0.3285=24.42 ft^2",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "flow_gpm": 50,
+    "oil_sg": 0.85,
+    "droplet_micron": 150,
+    "water_viscosity_cp": 1.1
+   },
+   "outputs": {
+    "rise_velocity_ftmin": {
+     "value": 0.3285,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "horizontal_area_ft2": {
+     "value": 24.42,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "oil-water-separator-sizing",
+   "source_publisher": "API Publication 421 (gravity oil/water separator, Stokes' law)",
+   "source_title": "cross-check: doubling the flow to 100 gpm doubles the required surface to 48.8 ft^2",
+   "source_edition_or_year": "spec-v943 worked example",
+   "source_section_or_page": "area=1.2*(100*0.133681)/0.3285=48.83 ft^2 (rise velocity unchanged by flow)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "flow_gpm": 100,
+    "oil_sg": 0.85,
+    "droplet_micron": 150,
+    "water_viscosity_cp": 1.1
+   },
+   "outputs": {
+    "horizontal_area_ft2": {
+     "value": 48.83,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gutter-downspout-takeoff",
    "source_publisher": "Gutter takeoff identity (first-principles)",
    "source_title": "140 ft eave, 2,400 sf roof, 800 sf/downspout, 10 ft wall, 2 ft hangers -> 3 downspouts, 30 LF pipe, 70 hangers",

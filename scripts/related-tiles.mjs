@@ -1098,6 +1098,7 @@ const RELATED = {
   "pv-ballast-weight": ["pv-rail-clamp-takeoff", "pv-row-spacing", "snow-load"],
   "pool-tile-coping-perimeter": ["pool-volume", "tile-count", "thinset-coverage"],
   "pool-interior-finish-volume": ["pool-volume", "pool-tile-coping-perimeter", "shotcrete-rebound-quantity"],
+  "oil-water-separator-sizing": ["detention-time", "grease-interceptor-flow-capacity", "filter-loading"],
   "gutter-downspout-takeoff": ["gutter-downspout", "roofing-squares", "rain-load-ponding"],
   "chain-link-fence-takeoff": ["fence-estimate", "post-hole-concrete", "siding-takeoff"],
   "leach-field-aggregate": ["septic-drainfield", "pipe-bedding-backfill", "aggregate"],

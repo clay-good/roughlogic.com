@@ -1355,3 +1355,59 @@ function _v899renderPoolInteriorFinishVolume(inputRegion, outputRegion, citation
   for (const f of [ln, wd, dp, sh, pl, ws]) f.input.addEventListener("input", update);
 }
 TREATMENT_RENDERERS["pool-interior-finish-volume"] = _v899renderPoolInteriorFinishVolume;
+
+// ===================== spec-v943: gravity oil/water separator surface area (API 421) =====================
+// dims: in { args: dimensionless } out: { rise_velocity_ftmin: dimensionless, horizontal_area_ft2: dimensionless }
+export function computeOilWaterSeparatorSizing({ flow_gpm = 50, oil_sg = 0.85, droplet_micron = 150, water_viscosity_cp = 1.1 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  if (!(flow_gpm > 0)) return { error: "Flow must be positive (gpm)." };
+  if (!(oil_sg > 0 && oil_sg < 1)) return { error: "Oil specific gravity must be between 0 and 1 (oil floats)." };
+  if (!(droplet_micron > 0)) return { error: "Droplet diameter must be positive (micron)." };
+  if (!(water_viscosity_cp > 0)) return { error: "Water viscosity must be positive (cP)." };
+  // Stokes rise velocity of the design oil droplet (API 421), computed in SI then converted to ft/min.
+  const RHO_W_LB_FT3 = 62.3; // water at ~60 F
+  const F = 1.2;             // API 421 turbulence / short-circuit factor
+  const d_m = droplet_micron * 1e-6;
+  const rho_w = RHO_W_LB_FT3 * 16.0185;
+  const rho_o = oil_sg * rho_w;
+  const mu = water_viscosity_cp * 1e-3;
+  const vt_ms = 9.81 * (rho_w - rho_o) * d_m * d_m / (18 * mu);
+  const rise_velocity_ftmin = vt_ms * 3.28084 * 60;
+  const q_ft3min = flow_gpm * 0.133681;
+  const horizontal_area_ft2 = F * q_ft3min / rise_velocity_ftmin;
+  if (![rise_velocity_ftmin, horizontal_area_ft2].every(Number.isFinite)) return { error: "Separator-sizing math is not a finite value." };
+  return {
+    rise_velocity_ftmin,
+    horizontal_area_ft2,
+    note: "The minimum horizontal (plan) surface area of a gravity oil/water separator per API 421: an oil droplet rises at the Stokes velocity Vt = g (rho_w - rho_o) d^2 / (18 mu), and the separator must give the design droplet time to reach the surface before the flow carries it out, so the horizontal area = F x Q / Vt with a turbulence/short-circuit factor F of about 1.2 and the horizontal velocity held under about 15 x Vt (and under 3 ft/min). A 150 micron droplet of 0.85-SG oil in 60 F water rises about 0.33 ft/min, so 50 gpm needs about 24 ft^2 of surface. Colder water (higher viscosity) and smaller droplets slow the rise and demand more area; an emulsified or dissolved fraction will NOT separate by gravity and needs coalescing, DAF, or downstream treatment. A SCREEN, not a design: API 421, the manufacturer, and the engineer / AHJ govern the separator and the discharge permit." ,
+  };
+}
+
+export const oilWaterSeparatorSizingExample = { inputs: { flow_gpm: 50, oil_sg: 0.85, droplet_micron: 150, water_viscosity_cp: 1.1 } };
+
+function _v943renderOilWaterSeparatorSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: gravity oil/water separator surface area by name (API 421). rise velocity Vt = g(rho_w - rho_o)d^2/(18 mu) (Stokes); horizontal area = 1.2 x Q / Vt. A screen; API 421, the manufacturer, and the engineer / AHJ govern the separator and discharge.";
+  const q = makeNumber("Design flow (gpm)", "ows-q", { step: "any", min: "0", value: "50" });
+  q.input.value = "50";
+  const sg = makeNumber("Oil specific gravity", "ows-sg", { step: "any", min: "0", value: "0.85" });
+  sg.input.value = "0.85";
+  const dm = makeNumber("Design droplet (micron)", "ows-dm", { step: "any", min: "0", value: "150" });
+  dm.input.value = "150";
+  const mu = makeNumber("Water viscosity (cP)", "ows-mu", { step: "any", min: "0", value: "1.1" });
+  mu.input.value = "1.1";
+  for (const f of [q, sg, dm, mu]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { q.input.value = "50"; sg.input.value = "0.85"; dm.input.value = "150"; mu.input.value = "1.1"; update(); });
+  const oVt = makeOutputLine(outputRegion, "Droplet rise velocity", "ows-out-vt");
+  const oA = makeOutputLine(outputRegion, "Minimum horizontal area", "ows-out-a");
+  const update = debounce(() => {
+    const r = computeOilWaterSeparatorSizing({
+      flow_gpm: q.input.value === "" ? 50 : Number(q.input.value), oil_sg: sg.input.value === "" ? 0.85 : Number(sg.input.value),
+      droplet_micron: dm.input.value === "" ? 150 : Number(dm.input.value), water_viscosity_cp: mu.input.value === "" ? 1.1 : Number(mu.input.value),
+    });
+    if (r.error) { oVt.textContent = r.error; oA.textContent = "-"; return; }
+    oVt.textContent = fmt(r.rise_velocity_ftmin, 3) + " ft/min";
+    oA.textContent = fmt(r.horizontal_area_ft2, 1) + " ft2";
+  }, DEBOUNCE_MS);
+  for (const f of [q, sg, dm, mu]) f.input.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["oil-water-separator-sizing"] = _v943renderOilWaterSeparatorSizing;

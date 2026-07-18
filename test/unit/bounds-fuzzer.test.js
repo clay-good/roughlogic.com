@@ -27346,3 +27346,26 @@ test("bounds: spec-v909 computeBarstockCutlist pins the yield, drop, stick count
   assert.ok("error" in _v909({ stock_length_in: 100, piece_length_in: 120, kerf_in: 0.125, pieces_needed: 10 }));
   assert.ok("error" in _v909({ stock_length_in: Infinity, piece_length_in: 14.5, kerf_in: 0.125, pieces_needed: 100 }));
 });
+
+import { computeOilWaterSeparatorSizing as _v943 } from "../../calc-treatment.js";
+
+test("bounds: spec-v943 computeOilWaterSeparatorSizing pins the Stokes rise, area, and error seams", () => {
+  const r = _v943({ flow_gpm: 50, oil_sg: 0.85, droplet_micron: 150, water_viscosity_cp: 1.1 });
+  assert.ok(Math.abs(r.rise_velocity_ftmin - 0.328491) < 1e-4); // Vt = g(rho_w-rho_o)d^2/(18mu), SI -> ft/min
+  assert.ok(Math.abs(r.horizontal_area_ft2 - 24.4173) < 5e-3); // 1.2*(50*0.133681)/Vt
+  // Area is linear in flow: doubling the flow doubles the area; rise velocity is unchanged.
+  const b = _v943({ flow_gpm: 100, oil_sg: 0.85, droplet_micron: 150, water_viscosity_cp: 1.1 });
+  assert.ok(Math.abs(b.horizontal_area_ft2 - 48.8345) < 5e-3);
+  assert.ok(Math.abs(b.rise_velocity_ftmin - r.rise_velocity_ftmin) < 1e-9);
+  // A smaller droplet slows the rise as d^2, demanding more area; a lighter (lower-SG) oil rises faster.
+  const small = _v943({ flow_gpm: 50, oil_sg: 0.85, droplet_micron: 75, water_viscosity_cp: 1.1 });
+  assert.ok(small.horizontal_area_ft2 > r.horizontal_area_ft2 * 3.9); // ~4x (d halved)
+  const light = _v943({ flow_gpm: 50, oil_sg: 0.75, droplet_micron: 150, water_viscosity_cp: 1.1 });
+  assert.ok(light.rise_velocity_ftmin > r.rise_velocity_ftmin);
+  // Error seams: non-positive flow, SG out of (0,1), non-positive droplet / viscosity, non-finite.
+  assert.ok("error" in _v943({ flow_gpm: 0, oil_sg: 0.85, droplet_micron: 150, water_viscosity_cp: 1.1 }));
+  assert.ok("error" in _v943({ flow_gpm: 50, oil_sg: 1.0, droplet_micron: 150, water_viscosity_cp: 1.1 }));
+  assert.ok("error" in _v943({ flow_gpm: 50, oil_sg: 0.85, droplet_micron: 0, water_viscosity_cp: 1.1 }));
+  assert.ok("error" in _v943({ flow_gpm: 50, oil_sg: 0.85, droplet_micron: 150, water_viscosity_cp: 0 }));
+  assert.ok("error" in _v943({ flow_gpm: Infinity, oil_sg: 0.85, droplet_micron: 150, water_viscosity_cp: 1.1 }));
+});

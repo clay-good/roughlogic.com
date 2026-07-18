@@ -534,7 +534,7 @@ const _TILES = [
   ["room-acoustics", "N"], ["room-absorption-target", "N"],
   ["counterweight-arbor-load", "N"],
   ["led-tape-run", "N"], ["led-tape-max-run", "N"],
-  ["pool-volume", "M"], ["pool-tile-coping-perimeter", "M"], ["pool-interior-finish-volume", "M"],
+  ["pool-volume", "M"], ["pool-tile-coping-perimeter", "M"], ["pool-interior-finish-volume", "M"], ["oil-water-separator-sizing", "M"],
   ["pool-alkalinity-adjust", "M"],
   ["pool-cya-dose", "M"],
   ["pool-salt-dose", "M"],
