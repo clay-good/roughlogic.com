@@ -26321,6 +26321,50 @@
    }
   },
   {
+   "tile_id": "pool-calcium-hardness-dose",
+   "source_publisher": "Pool calcium hardness increase (calcium chloride)",
+   "source_title": "20,000 gal, +20 ppm, 77% flake -> 4.80 lb calcium chloride",
+   "source_edition_or_year": "spec-v969 worked example (machine-verified)",
+   "source_section_or_page": "lb = 20*20000*8.34e-6*(110.98/100.09)/0.77 = 3.336*1.1088/0.77 = 4.804",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "gallons": 20000,
+    "ppm_increase": 20,
+    "product_purity_pct": 77
+   },
+   "outputs": {
+    "calcium_chloride_lb": {
+     "value": 4.804,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pool-calcium-hardness-dose",
+   "source_publisher": "Pool calcium hardness increase (calcium chloride)",
+   "source_title": "cross-check: higher-purity anhydrous (94%) needs less product, 3.94 lb",
+   "source_edition_or_year": "spec-v969 worked example (machine-verified)",
+   "source_section_or_page": "lb = 20*20000*8.34e-6*(110.98/100.09)/0.94 = 3.935 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "gallons": 20000,
+    "ppm_increase": 20,
+    "product_purity_pct": 94
+   },
+   "outputs": {
+    "calcium_chloride_lb": {
+     "value": 3.935,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pool-salt-dose",
    "source_publisher": "Mass-balance identity (NSPF CPO / ANSI-APSP-ICC, by name); 8.34 lb/gal water.",
    "source_title": "Add: salt lb = gallons x 8.34 lb/gal x ppm rise / 1,000,000, bags = ceil(lb / 40); lower: drained fraction = 1 - target/current.",

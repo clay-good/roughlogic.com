@@ -1073,6 +1073,7 @@ const TOOL_MODULES = (() => {
     "pool-volume", "pool-tile-coping-perimeter", "pool-interior-finish-volume",
     "oil-water-separator-sizing",
     "pool-alkalinity-adjust", "pool-cya-dose", "pool-salt-dose",
+    "pool-calcium-hardness-dose",
     "pool-chlorine-dose", "pool-heater-btu", "pool-heater-size", "breakpoint-chlorination",
   ]);
   // v4 Group N: Stage and Live Production.

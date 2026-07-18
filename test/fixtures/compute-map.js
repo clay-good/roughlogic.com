@@ -954,6 +954,7 @@ export const COMPUTE_MAP = {
   "pool-alkalinity-adjust": { module: "../../calc-treatment.js", fn: "computePoolAlkalinityAdjust" },
   "pool-cya-dose": { module: "../../calc-treatment.js", fn: "computePoolCyaDose" },
   "pool-salt-dose": { module: "../../calc-treatment.js", fn: "computePoolSaltDose" },
+  "pool-calcium-hardness-dose": { module: "../../calc-treatment.js", fn: "computePoolCalciumHardnessDose" },
   "pool-chlorine-dose": { module: "../../calc-treatment.js", fn: "computePoolChlorineDose" },
   "pool-heater-btu": { module: "../../calc-treatment.js", fn: "computePoolHeaterBtu" },
   "pool-heater-size": { module: "../../calc-treatment.js", fn: "computePoolHeaterSize" },

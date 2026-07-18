@@ -11006,6 +11006,17 @@ export const CITATIONS = {
       { name: "Confirm by testing", value: "10:1 is a rule of thumb; confirm the breakpoint by testing; no baseline demand added", source: "scope of this tile" },
     ],
   },
+  "pool-calcium-hardness-dose": {
+    formula: "calcium_chloride_lb = ppm_increase x gallons x 8.34e-6 x (110.98/100.09) / (product_purity_pct/100); oz = lb x 16. The 110.98/100.09 converts CaCO3-equivalent hardness to lb of calcium chloride.",
+    edition: "Pool calcium-hardness dosing with calcium chloride (mass balance with the CaCl2/CaCO3 molecular-weight conversion), by name; the test kit, the target hardness, the product label, and NSPF CPO practice govern.",
+    freeAccess: "The dose is a public mass balance (8.34 lb/gal water) with the standard CaCl2/CaCO3 molecular weights; the ppm rise, pool volume, and product purity are the user's water test and product.",
+    governance: GOVERNANCE.general,
+    editionNote: "Calcium hardness is one leg of a pool's water balance: too low (soft water) and the water is aggressive, etching plaster and corroding metal to satisfy its calcium demand; too high and it scales. It is raised with calcium chloride. Because hardness is reported as CaCO3 (molecular weight 100.09) but the additive is calcium chloride (110.98), the dose first computes the CaCO3-equivalent mass to add -- ppm rise x pool gallons x 8.34 lb/gal / 1,000,000 -- then multiplies by the molecular-weight ratio 110.98/100.09 to get pounds of pure calcium chloride, then divides by the product's calcium-chloride content (about 77% for the common dihydrate flake, up to about 94-100% for anhydrous). Raising 20,000 gallons by 20 ppm with 77% flake takes about 4.8 lb; expressed as the pool-shop rule of thumb that is roughly 1.2 lb of 77% flake per 10,000 gallons per 10 ppm rise, and a higher-purity anhydrous product needs proportionally less. A critical safety and handling note: calcium chloride is strongly exothermic when it dissolves, so it must be added slowly to a bucket of water (never water poured onto the chemical, which can boil and spatter) and then poured into the pool with the circulation pump running, and the water retested and adjusted in steps. Calcium hardness cannot be lowered chemically -- only by draining and refilling with softer water. A starting dose; the pool test kit, the target hardness (commonly 200-400 ppm), the product label, and NSPF CPO / health-code practice govern.",
+    assumptions: [
+      { name: "CaCO3-to-CaCl2 conversion", value: "lb CaCl2 = ppm x gal x 8.34e-6 x (110.98/100.09) / (purity/100); ~1.2 lb of 77% flake per 10,000 gal per 10 ppm", source: "pool water chemistry / NSPF CPO" },
+      { name: "Handling and limits", value: "exothermic -- add to water, pump running, retest; hardness only dilutes down (drain/refill); target ~200-400 ppm; the label and CPO govern", source: "product label / CPO practice" },
+    ],
+  },
   "pool-salt-dose": {
     formula: "Add: salt lb = gallons x 8.34 lb/gal x ppm rise / 1,000,000, bags = ceil(lb / 40); lower: drained fraction = 1 - target/current.",
     edition: "Mass-balance identity (NSPF CPO / ANSI-APSP-ICC, by name); 8.34 lb/gal water.",

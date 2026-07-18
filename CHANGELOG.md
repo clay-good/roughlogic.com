@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(pool): add pool-calcium-hardness-dose tile (spec-v969); 2026-07-18
+
+- New Group M tile `pool-calcium-hardness-dose` (Pool Calcium Hardness Increase, Calcium Chloride) in calc-treatment.js.
+  lb = ppm x gal x 8.34e-6 x (110.98/100.09) / (purity/100) -- CaCO3-equivalent converted to calcium chloride by
+  molecular weight and product purity. Raising 20,000 gal by 20 ppm with 77% flake takes ~4.8 lb (~1.2 lb per 10,000 gal
+  per 10 ppm, the shop rule of thumb); anhydrous needs less. Exothermic -- add to water, pump running, retest. The test
+  kit and CPO practice govern. Home count 1,417 -> 1,418.
+
 ### feat(solar): add ev-range-per-hour tile (spec-v968); 2026-07-18
 
 - New Group A tile `ev-range-per-hour` (EV Range Added per Hour of Charging) in calc-solar.js. range/hr = EVSE power (kW)

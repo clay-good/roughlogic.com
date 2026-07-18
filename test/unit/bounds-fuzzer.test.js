@@ -27950,3 +27950,26 @@ test("bounds: spec-v968 computeEvRangePerHour pins the range-per-hour identity a
   assert.ok("error" in _v968({ evse_power_kw: 7.7, charge_efficiency: 0.88, vehicle_efficiency_mi_per_kwh: 3.5, target_range_mi: 0 }));
   assert.ok("error" in _v968({ evse_power_kw: Infinity, charge_efficiency: 0.88, vehicle_efficiency_mi_per_kwh: 3.5, target_range_mi: 100 }));
 });
+
+import { computePoolCalciumHardnessDose as _v969 } from "../../calc-treatment.js";
+
+test("bounds: spec-v969 computePoolCalciumHardnessDose pins the calcium chloride dose and error seams", () => {
+  const r = _v969({ gallons: 20000, ppm_increase: 20, product_purity_pct: 77 });
+  assert.ok(Math.abs(r.calcium_chloride_lb - 4.8036) < 1e-2); // 20*20000*8.34e-6*(110.98/100.09)/0.77
+  assert.ok(Math.abs(r.calcium_chloride_oz - r.calcium_chloride_lb * 16) < 1e-9);
+  // Higher purity needs less product.
+  const anhydrous = _v969({ gallons: 20000, ppm_increase: 20, product_purity_pct: 94 });
+  assert.ok(Math.abs(anhydrous.calcium_chloride_lb - 3.9346) < 1e-2);
+  assert.ok(anhydrous.calcium_chloride_lb < r.calcium_chloride_lb);
+  // Linear in ppm and gallons.
+  assert.ok(Math.abs(_v969({ gallons: 20000, ppm_increase: 40, product_purity_pct: 77 }).calcium_chloride_lb - 2 * r.calcium_chloride_lb) < 1e-6);
+  assert.ok(Math.abs(_v969({ gallons: 40000, ppm_increase: 20, product_purity_pct: 77 }).calcium_chloride_lb - 2 * r.calcium_chloride_lb) < 1e-6);
+  // Rule of thumb: ~1.2 lb of 77% flake per 10,000 gal per 10 ppm.
+  assert.ok(Math.abs(_v969({ gallons: 10000, ppm_increase: 10, product_purity_pct: 77 }).calcium_chloride_lb - 1.201) < 0.02);
+  // Error seams: non-positive gallons / ppm, purity out of (0,100], non-finite.
+  assert.ok("error" in _v969({ gallons: 0, ppm_increase: 20, product_purity_pct: 77 }));
+  assert.ok("error" in _v969({ gallons: 20000, ppm_increase: 0, product_purity_pct: 77 }));
+  assert.ok("error" in _v969({ gallons: 20000, ppm_increase: 20, product_purity_pct: 0 }));
+  assert.ok("error" in _v969({ gallons: 20000, ppm_increase: 20, product_purity_pct: 150 }));
+  assert.ok("error" in _v969({ gallons: Infinity, ppm_increase: 20, product_purity_pct: 77 }));
+});

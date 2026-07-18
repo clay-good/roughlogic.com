@@ -1411,3 +1411,40 @@ function _v943renderOilWaterSeparatorSizing(inputRegion, outputRegion, citationE
   for (const f of [q, sg, dm, mu]) f.input.addEventListener("input", update);
 }
 TREATMENT_RENDERERS["oil-water-separator-sizing"] = _v943renderOilWaterSeparatorSizing;
+
+// ===================== spec-v969: pool calcium hardness increase (calcium chloride dose) =====================
+// dims: in { gallons: dimensionless, ppm_increase: dimensionless, product_purity_pct: dimensionless } out: { calcium_chloride_lb: dimensionless, calcium_chloride_oz: dimensionless }
+export function computePoolCalciumHardnessDose({ gallons = 20000, ppm_increase = 20, product_purity_pct = 77 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  if (!(gallons > 0)) return { error: "Pool volume must be positive (gal)." };
+  if (!(ppm_increase > 0)) return { error: "Calcium hardness increase must be positive (ppm)." };
+  if (!(product_purity_pct > 0 && product_purity_pct <= 100)) return { error: "Product purity must be between 0 and 100 percent (calcium chloride content)." };
+  // Raise calcium hardness (as CaCO3) with calcium chloride: CaCO3-equivalent lb x (MW CaCl2 / MW CaCO3), then / purity.
+  const MW_RATIO = 110.98 / 100.09; // CaCl2 (110.98) per CaCO3 (100.09)
+  const calcium_chloride_lb = ppm_increase * gallons * 8.34e-6 * MW_RATIO / (product_purity_pct / 100);
+  const calcium_chloride_oz = calcium_chloride_lb * 16;
+  if (![calcium_chloride_lb, calcium_chloride_oz].every(Number.isFinite)) return { error: "Calcium-dose math is not a finite value." };
+  return {
+    calcium_chloride_lb,
+    calcium_chloride_oz,
+    note: "Calcium chloride to raise a pool's calcium hardness -- the level that, with pH and alkalinity, sets the water's LSI balance (soft water is corrosive to plaster and metal, hard water scales). Hardness is expressed as CaCO3, so the dose converts the CaCO3-equivalent (ppm x gallons x 8.34e-6 lb) to pounds of calcium chloride by the molecular-weight ratio 110.98/100.09, then divides by the product's calcium-chloride content: raising 20,000 gal by 20 ppm with 77% flake takes about 4.8 lb, or about 1.2 lb per 10,000 gal per 10 ppm -- the pool-shop rule of thumb. Anhydrous calcium chloride (~94%) needs less product for the same rise. CAUTION: calcium chloride releases a lot of heat as it dissolves, so it is added slowly to a bucket of water (never water onto the chemical) and poured into the pool with the pump running, then retested. Calcium hardness can only be diluted DOWN (partial drain and refill), not chemically lowered. A starting dose; the test kit, the target hardness (typically 200-400 ppm), the product label, and CPO/health-code practice govern.",
+  };
+}
+
+export const poolCalciumHardnessDoseExample = { inputs: { gallons: 20000, ppm_increase: 20, product_purity_pct: 77 } };
+
+TREATMENT_RENDERERS["pool-calcium-hardness-dose"] = _rPool({
+  citation: "Citation: pool calcium hardness increase with calcium chloride, by name. lb = ppm x gallons x 8.34e-6 x (110.98/100.09) / (purity/100), the CaCO3-equivalent converted to calcium chloride by molecular weight and product purity. ~1.2 lb of 77% flake per 10,000 gal per 10 ppm. Add to water (heat!), pump running, retest; the test kit and the product label govern.",
+  example: poolCalciumHardnessDoseExample.inputs,
+  fields: [
+    { key: "gallons", label: "Pool volume (gal)", default: 20000 },
+    { key: "ppm_increase", label: "Calcium hardness increase (ppm)", default: 20 },
+    { key: "product_purity_pct", label: "Calcium chloride content (percent: ~77 flake, ~94 anhydrous)", default: 77 },
+  ],
+  outputs: [
+    { key: "lb", label: "Calcium chloride", value: (r) => fmt(r.calcium_chloride_lb, 2) + " lb" },
+    { key: "oz", label: "Calcium chloride (oz)", value: (r) => fmt(r.calcium_chloride_oz, 1) + " oz" },
+    { key: "n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePoolCalciumHardnessDose,
+});

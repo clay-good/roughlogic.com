@@ -537,7 +537,7 @@ const _TILES = [
   ["pool-volume", "M"], ["pool-tile-coping-perimeter", "M"], ["pool-interior-finish-volume", "M"], ["oil-water-separator-sizing", "M"],
   ["pool-alkalinity-adjust", "M"],
   ["pool-cya-dose", "M"],
-  ["pool-salt-dose", "M"],
+  ["pool-salt-dose", "M"], ["pool-calcium-hardness-dose", "M"],
   ["pool-chlorine-dose", "M"], ["pool-heater-btu", "M"], ["pool-heater-size", "M"], ["breakpoint-chlorination", "M"],
   ["fence-estimate", "E"],
   ["post-hole-concrete", "E"],

@@ -1199,6 +1199,7 @@ const RELATED = {
   "pool-alkalinity-adjust": ["pool-turnover","langelier-index","pool-cya-dose"],
   "pool-cya-dose": ["pool-turnover","pool-alkalinity-adjust","pool-salt-dose"],
   "pool-salt-dose": ["pool-turnover","pool-cya-dose","langelier-index"],
+  "pool-calcium-hardness-dose": ["pool-alkalinity-adjust","langelier-index","pool-chlorine-dose"],
   "fence-estimate": ["post-hole-concrete","equal-spacing","material-quantity"],
   "post-hole-concrete": ["fence-estimate","concrete","deck-beam-post"],
   "thinset-coverage": ["tile-count","flooring-takeoff","mortar-mix"],
