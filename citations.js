@@ -8421,6 +8421,17 @@ export const CITATIONS = {
       { name: "Dampproofing vs waterproofing", value: "coverage varies widely: thin dampproofing ~40-60 sf/gal (IRC R406.1) vs a fluid membrane at a wet-mil thickness (IRC R406.2); read the data sheet; sheet membrane is by the roll", source: "IRC R406 / product data sheet" },
     ],
   },
+  "roof-ballast-weight": {
+    formula: "total_ballast_lb = roof_area_sqft x ballast_psf; total_tons = total_ballast_lb / 2000; stone_depth_in = ballast_psf / stone_density_pcf x 12; volume_cy = total_ballast_lb / stone_density_pcf / 27.",
+    edition: "Ballasted single-ply roof ballast weight and order quantity (ANSI/SPRI RP-4 ballast rates), by name; RP-4 and the structural engineer set the ballast rate and zone layout, and the deck capacity governs.",
+    freeAccess: "The takeoff is public first-principles (weight = area x rate, volume = weight / bulk density); the ballast rate comes from ANSI/SPRI RP-4 and the stone bulk density from the supplier.",
+    governance: GOVERNANCE.general,
+    editionNote: "A ballasted single-ply roof holds a loose EPDM or TPO membrane down with a layer of stone (or concrete pavers) rather than adhesive or fasteners, and two numbers matter: how much the ballast weighs, for the structural dead-load check, and how much to order, since stone is bought by the cubic yard. The weight is simply the roof area times the ballast rate in pounds per square foot: 5,000 square feet at 12 psf is 60,000 pounds, or 30 tons. The order volume is that weight divided by the stone's loose bulk density -- about 90 to 105 pounds per cubic foot for washed round river gravel -- and then by 27 to convert cubic feet to cubic yards, giving about 22 cubic yards spread roughly 1.4 inches deep. The ballast rate is the governing variable and it is not a free choice: ANSI/SPRI RP-4, the wind-design standard for ballasted roofs, sets the required rate as a function of the building height, the roof-edge and parapet condition, and the basic wind speed for the site. A frequent minimum is 10 psf, a nominal 1,000 pounds per roofing square, of smooth ASTM #4 river gravel over the field, increasing to about 13 to 15 psf or switching to heavier concrete pavers at the corners and along the perimeter and on taller or higher-wind buildings, because wind uplift is worst at those zones. This calculation is a material-ordering and dead-load screen, not a wind-uplift design: RP-4 and the structural engineer of record set the actual ballast rate and the corner/perimeter zone layout, and the roof deck's combined live and dead load capacity governs whether it can carry the stone at all.",
+    assumptions: [
+      { name: "Weight and order volume", value: "total lb = area x rate; tons = lb/2000; order cy = lb / bulk density / 27; stone depth = rate / density x 12", source: "material-takeoff practice" },
+      { name: "Ballast rate per RP-4", value: "ANSI/SPRI RP-4 sets the rate by building height, edge condition, and wind zone (~10 psf field minimum, higher/pavers at corners and perimeter); a dead-load screen, not an uplift design", source: "ANSI/SPRI RP-4" },
+    ],
+  },
   "concrete-sawcut-footage": {
     formula: "panels_l = ceil(length_ft / spacing_ft); panels_w = ceil(width_ft / spacing_ft); joint_lf = (panels_l - 1) x width_ft + (panels_w - 1) x length_ft.",
     edition: "Control-joint saw-cut-footage identity by name (panel grid by ceiling, interior joint length); first-principles grid arithmetic.",

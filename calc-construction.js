@@ -10068,3 +10068,43 @@ CONSTRUCTION_RENDERERS["foundation-waterproofing-takeoff"] = _simpleRenderer({
   ],
   compute: computeFoundationWaterproofingTakeoff,
 });
+
+// ===================== spec-v986: ballasted single-ply roof ballast weight and order =====================
+// dims: in { args: dimensionless } out: { total_ballast_lb: dimensionless, total_tons: dimensionless, stone_depth_in: dimensionless, volume_cy: dimensionless }
+export function computeRoofBallastWeight({ roof_area_sqft = 5000, ballast_psf = 12, stone_density_pcf = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(roof_area_sqft > 0)) return { error: "Roof area must be positive (sq ft)." };
+  if (!(ballast_psf > 0)) return { error: "Ballast rate must be positive (psf)." };
+  if (!(stone_density_pcf > 0)) return { error: "Stone bulk density must be positive (pcf)." };
+  // Loose-laid ballast: total weight = area x rate; stone depth and order volume from the bulk density.
+  const total_ballast_lb = roof_area_sqft * ballast_psf;
+  const total_tons = total_ballast_lb / 2000;
+  const stone_depth_in = ballast_psf / stone_density_pcf * 12;
+  const volume_cy = total_ballast_lb / stone_density_pcf / 27;
+  if (![total_ballast_lb, total_tons, stone_depth_in, volume_cy].every(Number.isFinite)) return { error: "Ballast takeoff math is not a finite value." };
+  return {
+    total_ballast_lb,
+    total_tons,
+    stone_depth_in,
+    volume_cy,
+    note: "The weight and order quantity of loose ballast on a ballasted single-ply (EPDM / TPO) low-slope roof, the two numbers a roofer and the structural check both need. The total dead load the roof deck must carry is simply the roof area times the ballast rate: 5,000 sf at 12 psf is 60,000 lb, or 30 tons. The stone is ordered by the cubic yard, so the volume is the weight divided by the stone's loose bulk density (about 90-105 pcf for washed round river gravel) divided by 27 -- here 22.2 cubic yards, spread about 1.4 in deep. The BALLAST RATE is the lever and it is set by ANSI/SPRI RP-4 as a function of the building height, the roof-edge/parapet condition, and the wind zone: a common minimum is 10 psf (nominal 1,000 lb per square) of smooth #4 river gravel, rising to ~13-15 psf or shifting to concrete pavers at the corners and perimeter and on taller or higher-wind buildings, where uplift is worst. This is a material-ordering and dead-load screen, NOT a wind-uplift design: RP-4 and the structural engineer set the actual ballast rate and zone layout, and the deck's live+dead load capacity governs whether it can carry the stone at all.",
+  };
+}
+
+export const roofBallastWeightExample = { inputs: { roof_area_sqft: 5000, ballast_psf: 12, stone_density_pcf: 100 } };
+
+CONSTRUCTION_RENDERERS["roof-ballast-weight"] = _simpleRenderer({
+  citation: "Citation: ballasted single-ply roof ballast weight and order (ANSI/SPRI RP-4), by name. total lb = area x ballast rate; tons = lb / 2000; order cy = lb / bulk density / 27; stone depth = rate / density x 12. RP-4 sets the rate by building height, edge condition, and wind zone (~10 psf minimum, higher at corners/perimeter). A dead-load and ordering screen; RP-4 and the structural engineer govern.",
+  example: roofBallastWeightExample.inputs,
+  fields: [
+    { key: "roof_area_sqft", label: "Roof area (sq ft)", kind: "number", default: 5000 },
+    { key: "ballast_psf", label: "Ballast rate (psf, per RP-4 zone)", kind: "number", default: 12 },
+    { key: "stone_density_pcf", label: "Stone bulk density (pcf, ~90-105)", kind: "number", default: 100 },
+  ],
+  outputs: [
+    { key: "w", id: "rbw-out-w", label: "Total ballast weight", value: (r) => fmt(r.total_ballast_lb, 0) + " lb (" + fmt(r.total_tons, 1) + " tons)" },
+    { key: "v", id: "rbw-out-v", label: "Order quantity", value: (r) => fmt(r.volume_cy, 1) + " cu yd (~" + fmt(r.stone_depth_in, 1) + " in deep)" },
+    { key: "n", id: "rbw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRoofBallastWeight,
+});

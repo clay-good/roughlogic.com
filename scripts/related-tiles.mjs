@@ -1097,6 +1097,7 @@ const RELATED = {
   "vapor-barrier-rolls": ["roof-underlayment-rolls", "concrete", "welded-wire-mesh"],
   "concrete-sawcut-footage": ["control-joint-spacing", "concrete", "concrete-pour-rate"],
   "foundation-waterproofing-takeoff": ["housewrap-rolls", "coating-coverage-dft", "concrete"],
+  "roof-ballast-weight": ["membrane-roof-takeoff", "roof-insulation-fasteners", "roofing-squares"],
   "curing-compound-coverage": ["concrete-evaporation-rate", "concrete-strength-gain", "concrete"],
   "concrete-isolation-joint": ["concrete-sawcut-footage", "control-joint-spacing", "sealant-joint-yield"],
   "concrete-stair-volume": ["concrete", "stairs", "rebar-weight-takeoff"],

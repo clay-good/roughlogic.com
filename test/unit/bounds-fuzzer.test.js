@@ -28321,3 +28321,25 @@ test("bounds: spec-v985 computeOpenDeltaTransformer pins the sqrt(3) capacity an
   assert.ok("error" in _v985({ transformer_kva_each: 25, required_load_kva: -1 }));
   assert.ok("error" in _v985({ transformer_kva_each: Infinity, required_load_kva: 40 }));
 });
+
+import { computeRoofBallastWeight as _v986 } from "../../calc-construction.js";
+
+test("bounds: spec-v986 computeRoofBallastWeight pins the ballast weight and order volume", () => {
+  const r = _v986({ roof_area_sqft: 5000, ballast_psf: 12, stone_density_pcf: 100 });
+  assert.ok(Math.abs(r.total_ballast_lb - 60000) < 1e-6); // 5000*12
+  assert.ok(Math.abs(r.total_tons - 30) < 1e-9); // /2000
+  assert.ok(Math.abs(r.volume_cy - 22.2222) < 1e-3); // 60000/100/27
+  assert.ok(Math.abs(r.stone_depth_in - 1.44) < 1e-9); // 12/100*12
+  // High-wind-zone cross-check.
+  const hw = _v986({ roof_area_sqft: 10000, ballast_psf: 15, stone_density_pcf: 95 });
+  assert.ok(Math.abs(hw.total_ballast_lb - 150000) < 1e-6);
+  assert.ok(Math.abs(hw.volume_cy - 58.4795) < 1e-3);
+  // Monotonic: weight scales with area and rate; denser stone means less order volume for the same weight.
+  assert.ok(_v986({ roof_area_sqft: 10000, ballast_psf: 12, stone_density_pcf: 100 }).total_ballast_lb > r.total_ballast_lb);
+  assert.ok(_v986({ roof_area_sqft: 5000, ballast_psf: 12, stone_density_pcf: 120 }).volume_cy < r.volume_cy);
+  // Error seams: non-positive area / rate / density, non-finite.
+  assert.ok("error" in _v986({ roof_area_sqft: 0, ballast_psf: 12, stone_density_pcf: 100 }));
+  assert.ok("error" in _v986({ roof_area_sqft: 5000, ballast_psf: 0, stone_density_pcf: 100 }));
+  assert.ok("error" in _v986({ roof_area_sqft: 5000, ballast_psf: 12, stone_density_pcf: 0 }));
+  assert.ok("error" in _v986({ roof_area_sqft: Infinity, ballast_psf: 12, stone_density_pcf: 100 }));
+});

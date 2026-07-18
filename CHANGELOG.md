@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(roofing): add roof-ballast-weight tile (spec-v986); 2026-07-18
+
+- New Group E tile `roof-ballast-weight` in calc-construction.js. Weight and order quantity of loose ballast on a
+  ballasted single-ply (EPDM/TPO) roof: total lb = area x ballast rate; order cy = weight / bulk density / 27. 5,000 sf
+  at 12 psf = 60,000 lb (30 tons), 22.2 cu yd, ~1.44 in deep; 10,000 sf at a 15 psf high-wind rate = 150,000 lb
+  (75 tons), 58.5 cu yd. Ballast rate per ANSI/SPRI RP-4 (height/edge/wind zone). A dead-load and ordering screen, not
+  a wind-uplift design. Home count 1,434 -> 1,435.
+
 ### feat(electrical): add open-delta-transformer tile (spec-v985); 2026-07-18
 
 - New Group A tile `open-delta-transformer` in calc-electrical.js. Balanced three-phase capacity of an open-delta
