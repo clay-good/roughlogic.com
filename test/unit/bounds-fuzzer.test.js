@@ -28040,3 +28040,24 @@ test("bounds: spec-v972 computeBatterySeriesParallel pins the series/parallel co
   assert.ok("error" in _v972({ target_bus_v: 48, module_v: 12.8, module_ah: 100, parallel_strings: 2, depth_of_discharge: 1.5 }));
   assert.ok("error" in _v972({ target_bus_v: Infinity, module_v: 12.8, module_ah: 100, parallel_strings: 2, depth_of_discharge: 0.8 }));
 });
+
+import { computeFloatMethodFlow as _v973 } from "../../calc-water.js";
+
+test("bounds: spec-v973 computeFloatMethodFlow pins the velocity-area flow and error seams", () => {
+  const r = _v973({ float_distance_ft: 20, travel_time_s: 10, channel_width_ft: 4, mean_depth_ft: 1.5, float_coefficient: 0.85 });
+  assert.ok(Math.abs(r.surface_velocity_fps - 2) < 1e-9); // 20/10
+  assert.ok(Math.abs(r.cross_area_ft2 - 6) < 1e-9); // 4*1.5
+  assert.ok(Math.abs(r.flow_cfs - 10.2) < 1e-9); // 0.85*2*6
+  assert.ok(Math.abs(r.flow_gpm - 4578.0762) < 0.5); // *448.831
+  // A rougher channel (lower C) cuts the flow.
+  assert.ok(Math.abs(_v973({ float_distance_ft: 20, travel_time_s: 10, channel_width_ft: 4, mean_depth_ft: 1.5, float_coefficient: 0.80 }).flow_cfs - 9.6) < 1e-9);
+  // A slower float (longer time) means less flow; a bigger area means more.
+  assert.ok(_v973({ float_distance_ft: 20, travel_time_s: 20, channel_width_ft: 4, mean_depth_ft: 1.5, float_coefficient: 0.85 }).flow_cfs < r.flow_cfs);
+  assert.ok(_v973({ float_distance_ft: 20, travel_time_s: 10, channel_width_ft: 8, mean_depth_ft: 1.5, float_coefficient: 0.85 }).flow_cfs > r.flow_cfs);
+  // Error seams: non-positive distance / time / width / depth, C out of (0,1], non-finite.
+  assert.ok("error" in _v973({ float_distance_ft: 0, travel_time_s: 10, channel_width_ft: 4, mean_depth_ft: 1.5, float_coefficient: 0.85 }));
+  assert.ok("error" in _v973({ float_distance_ft: 20, travel_time_s: 0, channel_width_ft: 4, mean_depth_ft: 1.5, float_coefficient: 0.85 }));
+  assert.ok("error" in _v973({ float_distance_ft: 20, travel_time_s: 10, channel_width_ft: 0, mean_depth_ft: 1.5, float_coefficient: 0.85 }));
+  assert.ok("error" in _v973({ float_distance_ft: 20, travel_time_s: 10, channel_width_ft: 4, mean_depth_ft: 1.5, float_coefficient: 1.5 }));
+  assert.ok("error" in _v973({ float_distance_ft: Infinity, travel_time_s: 10, channel_width_ft: 4, mean_depth_ft: 1.5, float_coefficient: 0.85 }));
+});

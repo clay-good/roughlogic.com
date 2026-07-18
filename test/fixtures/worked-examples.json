@@ -28934,6 +28934,66 @@
    }
   },
   {
+   "tile_id": "float-method-flow",
+   "source_publisher": "Float (velocity-area) open-channel flow method",
+   "source_title": "20 ft in 10 s, 4 ft wide, 1.5 ft deep, C 0.85 -> 2.0 ft/s, 10.2 cfs, 4,578 gpm",
+   "source_edition_or_year": "spec-v973 worked example (machine-verified)",
+   "source_section_or_page": "V = 20/10 = 2.0; A = 4*1.5 = 6; Q = 0.85*2.0*6 = 10.2 cfs; gpm = 10.2*448.831 = 4578.1",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "float_distance_ft": 20,
+    "travel_time_s": 10,
+    "channel_width_ft": 4,
+    "mean_depth_ft": 1.5,
+    "float_coefficient": 0.85
+   },
+   "outputs": {
+    "surface_velocity_fps": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "flow_cfs": {
+     "value": 10.2,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "flow_gpm": {
+     "value": 4578.1,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "float-method-flow",
+   "source_publisher": "Float (velocity-area) open-channel flow method",
+   "source_title": "cross-check: a rougher channel (C 0.80) cuts the flow to 9.6 cfs",
+   "source_edition_or_year": "spec-v973 worked example (machine-verified)",
+   "source_section_or_page": "Q = 0.80*2.0*6 = 9.6 cfs",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "float_distance_ft": 20,
+    "travel_time_s": 10,
+    "channel_width_ft": 4,
+    "mean_depth_ft": 1.5,
+    "float_coefficient": 0.80
+   },
+   "outputs": {
+    "flow_cfs": {
+     "value": 9.6,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dechlorination-dose",
    "source_publisher": "Dechlorination stoichiometry + pounds formula",
    "source_title": "2.0 mg/L residual, 5 MGD, sodium bisulfite (1.46), 100% -> 2.92 mg/L dose, 121.8 lb/day",

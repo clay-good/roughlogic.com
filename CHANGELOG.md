@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(water): add float-method-flow tile (spec-v973); 2026-07-18
+
+- New Group M tile `float-method-flow` (Float-Method / Velocity-Area Open-Channel Flow) in calc-water.js. Q = C x surface
+  velocity x area; surface velocity = float distance / time, area = width x mean depth, C ~0.85 converts surface to mean
+  velocity. A float running 20 ft in 10 s (2.0 ft/s) in a 4 ft x 1.5 ft channel = 10.2 cfs (~4,580 gpm); a rougher
+  channel (C 0.80) cuts it. A rough field estimate; a compliance flow needs a calibrated meter. Home count 1,421 -> 1,422.
+
 ### feat(solar): add battery-series-parallel tile (spec-v972); 2026-07-18
 
 - New Group A tile `battery-series-parallel` (Battery Bank Series/Parallel Configuration) in calc-solar.js. Series adds

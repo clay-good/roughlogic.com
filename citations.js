@@ -11954,6 +11954,17 @@ export const CITATIONS = {
       { name: "Not the GAWR", value: "this is a tire-load check, not a substitute for the axle's gross axle weight rating (GAWR)", source: "manufacturer GAWR" },
     ],
   },
+  "float-method-flow": {
+    formula: "surface_velocity_fps = float_distance_ft / travel_time_s; cross_area_ft2 = channel_width_ft x mean_depth_ft; flow_cfs = float_coefficient x surface_velocity_fps x cross_area_ft2; flow_gpm = flow_cfs x 448.831.",
+    edition: "Float (velocity-area) open-channel flow-gauging method (USGS / Standard Methods field practice), by name; a calibrated meter and the permit govern a compliance measurement.",
+    freeAccess: "The velocity-area relation is public (flow = mean velocity x area); the float distance, time, channel dimensions, and coefficient are the field measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "The float method is the simplest field way to estimate the flow in an open channel -- a drainage ditch, a canal, or a plant outfall -- using only a float, a measuring tape, and a stopwatch. A float (an orange, a partly filled bottle) is timed as it drifts down a measured straight reach, giving the SURFACE velocity, distance divided by time. Because the water moves fastest at the surface and slows toward the bed and banks by friction, the average velocity of the whole cross section is lower than the surface velocity, so a float (or surface) coefficient C is applied to convert one to the other -- roughly 0.85 for a typical channel, dropping toward 0.8 for a rough or shallow channel and rising toward 0.9 for a smooth, deep one. Multiplying the mean velocity by the cross-sectional area (channel width times mean depth) gives the discharge: Q = C x surface velocity x area. A float that runs 20 feet in 10 seconds (a 2.0 ft/s surface velocity) in a channel 4 feet wide and averaging 1.5 feet deep carries about 0.85 x 2.0 x 6 = 10.2 cubic feet per second, or roughly 4,580 gallons per minute. Accuracy is improved by averaging several float runs launched in the fastest central thread of flow, by surveying the true cross-sectional area rather than assuming a single mean depth, and by choosing a straight, uniform, obstruction-free reach. This is a rough field gauging estimate and is considerably less accurate than a current-meter traverse or a calibrated flume/weir; a flow reported for permit compliance must come from a calibrated device, and the applicable metering standard and the discharge permit govern.",
+    assumptions: [
+      { name: "Velocity-area (float)", value: "Q = C x surface velocity x area; surface velocity = distance/time, area = width x mean depth; C ~0.85 (0.8 rough to 0.9 smooth)", source: "USGS / Standard Methods field practice" },
+      { name: "Rough estimate", value: "average several runs in the fast thread, survey the real cross-section, straight uniform reach; a compliance flow needs a calibrated meter and the permit governs", source: "stream-gauging practice" },
+    ],
+  },
   "dechlorination-dose": {
     formula: "reagent_dose_mg_l = stoich_ratio x chlorine_residual_mg_l; feed_lb_day = reagent_dose_mg_l x flow_mgd x 8.34 / (purity_pct/100). Ratio (mg reagent/mg Cl2): SO2 ~0.9-1.0, metabisulfite 1.34, bisulfite 1.46, sulfite 1.77, thiosulfate ~0.56.",
     edition: "Dechlorination stoichiometry with the pounds formula (Standard Methods / wastewater-operations practice), by name; the discharge permit, the reagent assay, and the state primacy agency govern.",

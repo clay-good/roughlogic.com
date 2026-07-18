@@ -1037,7 +1037,7 @@ const TOOL_MODULES = (() => {
     // v23
     "backflow-test-psi",
     // spec-v116 disinfection: chlorine demand/breakpoint + UV dose.
-    "chlorine-demand", "dechlorination-dose", "uv-dose", "uv-required-exposure",
+    "chlorine-demand", "dechlorination-dose", "float-method-flow", "uv-dose", "uv-required-exposure",
     // spec-v570
     "population-equivalent",
     // spec-v571

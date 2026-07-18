@@ -730,7 +730,7 @@ const _TILES = [
   ["gcwr-check", "J"],
   ["tire-load-check", "J"],
   // spec-v116 water disinfection (Group M)
-  ["chlorine-demand", "M"], ["dechlorination-dose", "M"],
+  ["chlorine-demand", "M"], ["dechlorination-dose", "M"], ["float-method-flow", "M"],
   ["uv-dose", "M"], ["uv-required-exposure", "M"],
   ["population-equivalent", "M"],
   ["ras-flow-rate", "M"],

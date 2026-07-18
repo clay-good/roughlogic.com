@@ -3029,6 +3029,7 @@ cross-check.
 | calc-water.js | `computeDisinfectionCT` | `{ chlorine_mg_l = 0, t10_minutes = 0, temperature_C = 5, pH = 7.0, log_target...` | _ | _ | _ |
 | calc-water.js | `computeFilterAreaForLoading` | `{ flow_gpm = 0, target_loading_gpm_ft2 = 0, backwash_rate_gpm_ft2 = 15 }` | _ | _ | _ |
 | calc-water.js | `computeFilterLoading` | `{ filter_area_ft2 = 0, flow_gpm = 0, backwash_rate_gpm_ft2 = 15 }` | _ | _ | _ |
+| calc-water.js | `computeFloatMethodFlow` | `{ float_distance_ft = 20, travel_time_s = 10, channel_width_ft = 4, mean_dept...` | _ | _ | _ |
 | calc-water.js | `computeIronManganeseChlorineDose` | `{ fe_mgl = 3.0, mn_mgl = 0.5, extra_demand_mgl = 0.5, target_residual_mgl = 0...` | _ | _ | _ |
 | calc-water.js | `computePoolTurnover` | `{ pool_volume_gal = 0, turnover_hr = 6, chlorine_ppm = 2, chlorine_type = "ca...` | _ | _ | _ |
 | calc-water.js | `computePopulationEquivalent` | `{ flow_mgd = 0, bod_mg_l = 0, ss_mg_l = 0 } = {}` | _ | _ | _ |
@@ -3082,7 +3083,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1668.
+Row count: 1669.
 
 <!-- END function-corpus-v14 -->
 
@@ -4380,7 +4381,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (58 tiles)
+### Group M Water and wastewater (59 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4407,6 +4408,7 @@ per spec-v14 §13.1 second paragraph.
 | `disinfection-ct` | Disinfection CT (USEPA SWTR) | USEPA; Table A-1 (<=0.4 mg/L band): CT_required = 139 mg-min/L a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `filter-area-for-loading` | Filter Area for a Target Loading Rate | USEPA / AWWA general practice; Rapid-sand band 2-5 gpm/ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `filter-loading` | Filter Loading Rate and Backwash | USEPA; Rapid-sand band 2-5 gpm/ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `float-method-flow` | Float-Method (Velocity-Area) Open-Channel Flow | Float (velocity-area) open-channel fl...; V = 20/10 = 2.0; A = 4*1.5 = 6; Q = 0.85*2.0*6 = 10.2 cfs... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flocculation-g-value` | Mixing Velocity Gradient (G / Gt) | Camp & Stein / Ten States Standards; 300 W, 100 m^3, 10 C, 1200 s -> G 48/s, Gt 57492 (floccul... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flocculator-paddle-power` | Paddle Flocculator Power from Geometry | Camp paddle flocculator power (water-...; 6-ft wheel, 3 rpm, 40 ft2, Cd 1.8, slip 0.25 -> v_tip 1.8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `iron-manganese-chlorine-dose` | Chlorine Dose to Oxidize Iron and Manganese | iron/manganese chlorine oxidation (AW...; dose = 0.62*3.0 + 1.30*0.5 + 0.5 + 0.3 = 3.31; lb/day = 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4689,6 +4691,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1421. Fixture-covered or reference-cadence: 1421 / 1421.
+Tile count: 1422. Fixture-covered or reference-cadence: 1422 / 1422.
 
 <!-- END tile-index-v14 -->

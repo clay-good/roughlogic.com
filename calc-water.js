@@ -1958,3 +1958,59 @@ function _v971renderDechlorinationDose(inputRegion, outputRegion, citationEl) {
   for (const f of [cr, fl, sr, pu]) f.input.addEventListener("input", update);
 }
 WATER_RENDERERS["dechlorination-dose"] = _v971renderDechlorinationDose;
+
+// ===================== spec-v973: float-method (velocity-area) open-channel flow =====================
+// dims: in { args: dimensionless } out: { surface_velocity_fps: dimensionless, cross_area_ft2: dimensionless, flow_cfs: dimensionless, flow_gpm: dimensionless }
+export function computeFloatMethodFlow({ float_distance_ft = 20, travel_time_s = 10, channel_width_ft = 4, mean_depth_ft = 1.5, float_coefficient = 0.85 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(float_distance_ft > 0)) return { error: "Float travel distance must be positive (ft)." };
+  if (!(travel_time_s > 0)) return { error: "Travel time must be positive (s)." };
+  if (!(channel_width_ft > 0)) return { error: "Channel width must be positive (ft)." };
+  if (!(mean_depth_ft > 0)) return { error: "Mean depth must be positive (ft)." };
+  if (!(float_coefficient > 0 && float_coefficient <= 1)) return { error: "Float coefficient must be between 0 and 1." };
+  // Velocity-area (float) method: Q = C x surface velocity x cross-sectional area.
+  const surface_velocity_fps = float_distance_ft / travel_time_s;
+  const cross_area_ft2 = channel_width_ft * mean_depth_ft;
+  const flow_cfs = float_coefficient * surface_velocity_fps * cross_area_ft2;
+  const flow_gpm = flow_cfs * 448.831;
+  if (![surface_velocity_fps, cross_area_ft2, flow_cfs, flow_gpm].every(Number.isFinite)) return { error: "Float-method math is not a finite value." };
+  return {
+    surface_velocity_fps,
+    cross_area_ft2,
+    flow_cfs,
+    flow_gpm,
+    note: "A field estimate of open-channel flow (a ditch, canal, or outfall) with only a float, a tape, and a stopwatch -- the velocity-area method. Time a float over a measured straight reach to get the SURFACE velocity (distance / time), multiply by the cross-sectional area (width x mean depth), and apply a float coefficient C to convert surface velocity to the lower MEAN velocity of the whole cross section, since flow is slower along the bed and banks: Q = C x surface velocity x area. C is about 0.85 for a typical channel (0.8 rough / shallow, up to ~0.9 smooth / deep). A float running 20 ft in 10 s (2.0 ft/s surface) in a 4 ft wide, 1.5 ft deep channel gives Q = 0.85 x 2.0 x 6 = 10.2 cfs (about 4,580 gpm). Accuracy improves by averaging several float runs in the fastest thread of flow, surveying the real cross-section (not a single mean depth), and using a straight, uniform, debris-free reach. This is a rough field gauging estimate, well below a metered or current-meter measurement in accuracy; a permit-compliance flow needs a calibrated device, and the metering standard and the permit govern.",
+  };
+}
+
+export const floatMethodFlowExample = { inputs: { float_distance_ft: 20, travel_time_s: 10, channel_width_ft: 4, mean_depth_ft: 1.5, float_coefficient: 0.85 } };
+
+function _v973renderFloatMethodFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: float (velocity-area) open-channel flow method, by name. Q = C x surface velocity x cross-sectional area; surface velocity = distance / time, area = width x mean depth. C ~0.85 converts surface to mean velocity (0.8 rough to ~0.9 smooth). A rough field estimate; a permit-compliance flow needs a calibrated meter, and the metering standard governs.";
+  const fd = makeNumber("Float travel distance (ft)", "fmf-fd", { step: "any", min: "0", value: "20" });
+  fd.input.value = "20";
+  const tt = makeNumber("Travel time (s)", "fmf-tt", { step: "any", min: "0", value: "10" });
+  tt.input.value = "10";
+  const cw = makeNumber("Channel width (ft)", "fmf-cw", { step: "any", min: "0", value: "4" });
+  cw.input.value = "4";
+  const md = makeNumber("Mean depth (ft)", "fmf-md", { step: "any", min: "0", value: "1.5" });
+  md.input.value = "1.5";
+  const fc = makeNumber("Float coefficient (0-1, ~0.85)", "fmf-fc", { step: "any", min: "0", value: "0.85" });
+  fc.input.value = "0.85";
+  for (const f of [fd, tt, cw, md, fc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fd.input.value = "20"; tt.input.value = "10"; cw.input.value = "4"; md.input.value = "1.5"; fc.input.value = "0.85"; update(); });
+  const oV = makeOutputLine(outputRegion, "Surface velocity", "fmf-out-v");
+  const oQ = makeOutputLine(outputRegion, "Flow", "fmf-out-q");
+  const update = debounce(() => {
+    const r = computeFloatMethodFlow({
+      float_distance_ft: fd.input.value === "" ? 20 : Number(fd.input.value), travel_time_s: tt.input.value === "" ? 10 : Number(tt.input.value),
+      channel_width_ft: cw.input.value === "" ? 4 : Number(cw.input.value), mean_depth_ft: md.input.value === "" ? 1.5 : Number(md.input.value),
+      float_coefficient: fc.input.value === "" ? 0.85 : Number(fc.input.value),
+    });
+    if (r.error) { oV.textContent = r.error; oQ.textContent = "-"; return; }
+    oV.textContent = fmt(r.surface_velocity_fps, 2) + " ft/s (area " + fmt(r.cross_area_ft2, 1) + " ft^2)";
+    oQ.textContent = fmt(r.flow_cfs, 2) + " cfs (" + fmt(r.flow_gpm, 0) + " gpm)";
+  }, DEBOUNCE_MS);
+  for (const f of [fd, tt, cw, md, fc]) f.input.addEventListener("input", update);
+}
+WATER_RENDERERS["float-method-flow"] = _v973renderFloatMethodFlow;
