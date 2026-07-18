@@ -12131,3 +12131,16 @@ test("monotonicity: centrifuge RCF and Beer-Lambert concentration track their in
   assert.ok(bl({ path_length_cm: 2 }).concentration < bl({}).concentration, "concentration must fall as path length grows");
   assert.ok(Math.abs(bl({}).concentration - 0.5 / (6220 * 1)) < 1e-12, "c = A / (epsilon * path length)");
 });
+
+test("consistency: septic drainfield sizing and its capacity inverse round-trip, and area scales correctly (septic)", async () => {
+  const s = await import("../../calc-septic.js");
+  const df = (o) => s.computeSepticDrainfield({ design_flow_gpd: 600, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3, ...o });
+  assert.ok(df({ design_flow_gpd: 1200 }).required_area_ft2 > df({}).required_area_ft2, "absorption area must rise with design flow");
+  assert.ok(df({ application_rate_gpd_per_ft2: 1.2 }).required_area_ft2 < df({}).required_area_ft2, "absorption area must fall as the soil application rate rises (faster soil)");
+  assert.ok(df({ trench_width_ft: 5 }).trench_feet < df({}).trench_feet, "trench length must fall as trench width grows for the same area");
+  assert.ok(Math.abs(df({}).required_area_ft2 - 600 / 0.6) < 1e-9, "required area = design flow / application rate");
+  // Round-trip: the forward tile's trench length fed back through the capacity inverse must recover the design flow.
+  const tf = df({}).trench_feet;
+  const back = s.computeSepticDrainfieldCapacity({ available_trench_ft: tf, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 });
+  assert.ok(Math.abs(back.design_flow_gpd - 600) < 1e-6, "drainfield and its capacity inverse must round-trip the design flow");
+});

@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(septic): round-trip drainfield sizing against its capacity inverse; 2026-07-17
+
+- Consistency guard: septic-drainfield (area = flow / application-rate; trench = area / width) and its
+  septic-drainfield-capacity inverse must round-trip the design flow; area rises with flow, falls as the soil
+  application rate rises, and trench length falls as width grows. Test-only.
+
 ### test(lab): guard centrifuge RCF and Beer-Lambert concentration with monotonicity; 2026-07-17
 
 - Whole-response guards: RCF = 1.118 x r(mm) x (rpm/1000)^2 rises with radius and speed and quadruples when rpm
