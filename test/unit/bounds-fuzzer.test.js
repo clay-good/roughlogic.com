@@ -28276,3 +28276,24 @@ test("bounds: spec-v983 computeBifacialPvGain pins the rear-side gain and error 
   assert.ok("error" in _v983({ front_poa_wm2: 1000, rear_poa_wm2: 150, bifaciality: 0.75, front_power_w: 0 }));
   assert.ok("error" in _v983({ front_poa_wm2: Infinity, rear_poa_wm2: 150, bifaciality: 0.75, front_power_w: 400 }));
 });
+
+import { computeFluorideFeedDose as _v984 } from "../../calc-water.js";
+
+test("bounds: spec-v984 computeFluorideFeedDose pins the AFI pounds formula and error seams", () => {
+  const r = _v984({ target_dose_mg_l: 0.7, raw_fluoride_mg_l: 0.1, flow_mgd: 2, afi_fraction: 0.792, purity_fraction: 0.25 });
+  assert.ok(Math.abs(r.pure_fluoride_lb_day - 10.008) < 1e-6); // 0.6*2*8.34
+  assert.ok(Math.abs(r.feed_lb_day - 50.5454545) < 1e-3); // /(0.792*0.25)
+  // Dry NaF cross-check: (0.7-0.1)*1*8.34/(0.452*0.98) = 11.2967.
+  const naf = _v984({ target_dose_mg_l: 0.7, raw_fluoride_mg_l: 0.1, flow_mgd: 1, afi_fraction: 0.452, purity_fraction: 0.98 });
+  assert.ok(Math.abs(naf.feed_lb_day - 11.29673) < 1e-3);
+  // Monotonic: lower AFI or lower purity means MORE product to feed; higher raw means less.
+  assert.ok(_v984({ target_dose_mg_l: 0.7, raw_fluoride_mg_l: 0.1, flow_mgd: 2, afi_fraction: 0.5, purity_fraction: 0.25 }).feed_lb_day > r.feed_lb_day);
+  assert.ok(_v984({ target_dose_mg_l: 0.7, raw_fluoride_mg_l: 0.1, flow_mgd: 2, afi_fraction: 0.792, purity_fraction: 0.20 }).feed_lb_day > r.feed_lb_day);
+  assert.ok(_v984({ target_dose_mg_l: 0.7, raw_fluoride_mg_l: 0.3, flow_mgd: 2, afi_fraction: 0.792, purity_fraction: 0.25 }).feed_lb_day < r.feed_lb_day);
+  // Error seams: non-positive flow, AFI/purity out of (0,1], target at or below raw (no feed), non-finite.
+  assert.ok("error" in _v984({ target_dose_mg_l: 0.7, raw_fluoride_mg_l: 0.1, flow_mgd: 0, afi_fraction: 0.792, purity_fraction: 0.25 }));
+  assert.ok("error" in _v984({ target_dose_mg_l: 0.7, raw_fluoride_mg_l: 0.1, flow_mgd: 2, afi_fraction: 1.5, purity_fraction: 0.25 }));
+  assert.ok("error" in _v984({ target_dose_mg_l: 0.7, raw_fluoride_mg_l: 0.1, flow_mgd: 2, afi_fraction: 0.792, purity_fraction: 0 }));
+  assert.ok("error" in _v984({ target_dose_mg_l: 0.5, raw_fluoride_mg_l: 0.5, flow_mgd: 2, afi_fraction: 0.792, purity_fraction: 0.25 }));
+  assert.ok("error" in _v984({ target_dose_mg_l: 0.7, raw_fluoride_mg_l: 0.1, flow_mgd: Infinity, afi_fraction: 0.792, purity_fraction: 0.25 }));
+});

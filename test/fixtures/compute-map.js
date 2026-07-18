@@ -1297,6 +1297,7 @@ export const COMPUTE_MAP = {
   "chlorine-demand": { module: "../../calc-water.js", fn: "computeChlorineDemand" },
   "dechlorination-dose": { module: "../../calc-water.js", fn: "computeDechlorinationDose" },
   "float-method-flow": { module: "../../calc-water.js", fn: "computeFloatMethodFlow" },
+  "fluoride-feed-dose": { module: "../../calc-water.js", fn: "computeFluorideFeedDose" },
   "uv-dose": { module: "../../calc-water.js", fn: "computeUvDose" },
   "uv-required-exposure": { module: "../../calc-water.js", fn: "computeUvRequiredExposure" },
   "population-equivalent": { module: "../../calc-water.js", fn: "computePopulationEquivalent" },

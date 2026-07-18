@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(water): add fluoride-feed-dose tile (spec-v984); 2026-07-18
+
+- New Group M tile `fluoride-feed-dose` in calc-water.js. Water-fluoridation feed rate: the pounds formula with the
+  two corrections the generic chemical-feed tile omits -- divide by the available fluoride ion (AFI) fraction and the
+  commercial strength, and subtract the raw background fluoride. AFI: fluorosilicic acid 0.792, sodium fluoride 0.452,
+  sodium fluorosilicate 0.607. Net 0.6 mg/L into 2 MGD with 25% fluorosilicic acid = 50.55 lb/day (10.0 lb/day
+  fluoride ion); dry NaF at 98% = 11.30 lb/day. US PHS target 0.7 mg/L. Home count 1,432 -> 1,433.
+
 ### feat(solar): add bifacial-pv-gain tile (spec-v983); 2026-07-18
 
 - New Group A tile `bifacial-pv-gain` in calc-solar.js. Extra output from light on a bifacial module's back side:

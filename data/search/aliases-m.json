@@ -3,6 +3,11 @@
   "_updated": "2026-07-17",
   "aliases": [
     {"term":"float method flow","target":"float-method-flow","kind":"industry"},
+    {"term":"fluoride feed","target":"fluoride-feed-dose","kind":"industry"},
+    {"term":"fluoridation dose","target":"fluoride-feed-dose","kind":"industry"},
+    {"term":"fluoride dosage","target":"fluoride-feed-dose","kind":"industry"},
+    {"term":"water fluoridation","target":"fluoride-feed-dose","kind":"industry"},
+    {"term":"fluorosilicic acid feed","target":"fluoride-feed-dose","kind":"industry"},
     {"term":"velocity area method","target":"float-method-flow","kind":"industry"},
     {"term":"open channel flow measurement","target":"float-method-flow","kind":"industry"},
     {"term":"ditch flow","target":"float-method-flow","kind":"industry"},

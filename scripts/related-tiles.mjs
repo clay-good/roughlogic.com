@@ -1319,6 +1319,7 @@ const RELATED = {
   "chlorine-demand": ["pounds-formula","chlorine-decay","disinfection-ct"],
   "dechlorination-dose": ["chlorine-demand","pounds-formula","breakpoint-chlorination"],
   "float-method-flow": ["weir-flow","manning-pipe-capacity","detention-time"],
+  "fluoride-feed-dose": ["pounds-formula","coagulant-dose","chlorine-demand"],
   "uv-dose": ["uv-required-exposure","disinfection-ct","chlorine-demand"],
   "uv-required-exposure": ["uv-dose","disinfection-ct","chlorine-demand"],
   "population-equivalent": ["bod-tss-loading-removal","pounds-formula","chlorine-demand"],

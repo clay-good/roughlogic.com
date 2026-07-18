@@ -2014,3 +2014,58 @@ function _v973renderFloatMethodFlow(inputRegion, outputRegion, citationEl) {
   for (const f of [fd, tt, cw, md, fc]) f.input.addEventListener("input", update);
 }
 WATER_RENDERERS["float-method-flow"] = _v973renderFloatMethodFlow;
+
+// ===================== spec-v984: fluoride feed dose (available-fluoride-ion) =====================
+// Unlike the generic pounds formula, fluoride dosing must divide by the AVAILABLE FLUORIDE ION (AFI)
+// fraction of the compound and subtract the raw background fluoride already in the source water.
+// dims: in { args: dimensionless } out: { feed_lb_day: dimensionless, pure_fluoride_lb_day: dimensionless }
+export function computeFluorideFeedDose({ target_dose_mg_l = 0.7, raw_fluoride_mg_l = 0.1, flow_mgd = 2, afi_fraction = 0.792, purity_fraction = 0.25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(flow_mgd > 0)) return { error: "Flow must be positive (MGD)." };
+  if (!(afi_fraction > 0 && afi_fraction <= 1)) return { error: "Available-fluoride-ion fraction must be between 0 and 1." };
+  if (!(purity_fraction > 0 && purity_fraction <= 1)) return { error: "Purity / solution strength must be between 0 and 1." };
+  if (!(target_dose_mg_l >= 0) || !(raw_fluoride_mg_l >= 0)) return { error: "Doses must be non-negative (mg/L)." };
+  const net_dose = target_dose_mg_l - raw_fluoride_mg_l;
+  if (!(net_dose > 0)) return { error: "Target dose must exceed the raw background fluoride; no feed is needed." };
+  // Pounds formula with the AFI and commercial-strength factors: feed = net dose x flow x 8.34 / (AFI x purity).
+  const pure_fluoride_lb_day = net_dose * flow_mgd * 8.34;
+  const feed_lb_day = pure_fluoride_lb_day / (afi_fraction * purity_fraction);
+  if (!Number.isFinite(feed_lb_day)) return { error: "Fluoride-feed math is not a finite value." };
+  return {
+    feed_lb_day,
+    pure_fluoride_lb_day,
+    note: "The pounds-per-day of a fluoridation chemical to hit a target fluoride level, the calculation a water operator runs to set the feed pump or dry feeder. It is the pounds formula (net dose x flow in MGD x 8.34) with two corrections the generic chemical-feed tile leaves out: divide by the AVAILABLE FLUORIDE ION (AFI) fraction -- the share of the compound that is actually fluoride ion -- and by the commercial strength, and first SUBTRACT the raw background fluoride the source water already carries. The AFI is a fixed property of the chemical: fluorosilicic acid (H2SiF6) is 0.792, sodium fluoride (NaF) is 0.452, and sodium fluorosilicate (Na2SiF6) is 0.607. Feeding a net 0.6 mg/L (0.7 target minus 0.1 raw) into 2 MGD with 25% fluorosilicic acid is 0.6 x 2 x 8.34 / (0.792 x 0.25) = 50.55 lb/day of acid solution, which carries 10.0 lb/day of actual fluoride ion. The current US Public Health Service recommendation is 0.7 mg/L. A feed-setpoint aid; the operator's daily lab checks, the SDWA maximum, the exact product assay and specific gravity, and the state fluoridation program govern the real feed.",
+  };
+}
+
+export const fluorideFeedDoseExample = { inputs: { target_dose_mg_l: 0.7, raw_fluoride_mg_l: 0.1, flow_mgd: 2, afi_fraction: 0.792, purity_fraction: 0.25 } };
+
+function _v984renderFluorideFeedDose(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: fluoride feed dose (available-fluoride-ion pounds formula), by name. feed lb/day = (target - raw) x flow MGD x 8.34 / (AFI x purity). AFI: fluorosilicic acid 0.792, sodium fluoride 0.452, sodium fluorosilicate 0.607. US PHS target 0.7 mg/L. The daily lab checks, the SDWA maximum, the product assay, and the state fluoridation program govern.";
+  const td = makeNumber("Target fluoride (mg/L)", "flf-td", { step: "any", min: "0", value: "0.7" });
+  td.input.value = "0.7";
+  const rf = makeNumber("Raw background fluoride (mg/L)", "flf-rf", { step: "any", min: "0", value: "0.1" });
+  rf.input.value = "0.1";
+  const fl = makeNumber("Flow (MGD)", "flf-fl", { step: "any", min: "0", value: "2" });
+  fl.input.value = "2";
+  const af = makeNumber("Available fluoride ion (0-1): FSA 0.792, NaF 0.452, Na2SiF6 0.607", "flf-af", { step: "any", min: "0", max: "1", value: "0.792" });
+  af.input.value = "0.792";
+  const pu = makeNumber("Purity / solution strength (0-1)", "flf-pu", { step: "any", min: "0", max: "1", value: "0.25" });
+  pu.input.value = "0.25";
+  for (const f of [td, rf, fl, af, pu]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { td.input.value = "0.7"; rf.input.value = "0.1"; fl.input.value = "2"; af.input.value = "0.792"; pu.input.value = "0.25"; update(); });
+  const oF = makeOutputLine(outputRegion, "Chemical feed", "flf-out-f");
+  const oP = makeOutputLine(outputRegion, "Pure fluoride ion fed", "flf-out-p");
+  const update = debounce(() => {
+    const r = computeFluorideFeedDose({
+      target_dose_mg_l: td.input.value === "" ? 0.7 : Number(td.input.value), raw_fluoride_mg_l: rf.input.value === "" ? 0.1 : Number(rf.input.value),
+      flow_mgd: fl.input.value === "" ? 2 : Number(fl.input.value), afi_fraction: af.input.value === "" ? 0.792 : Number(af.input.value),
+      purity_fraction: pu.input.value === "" ? 0.25 : Number(pu.input.value),
+    });
+    if (r.error) { oF.textContent = r.error; oP.textContent = "-"; return; }
+    oF.textContent = fmt(r.feed_lb_day, 2) + " lb/day of product";
+    oP.textContent = fmt(r.pure_fluoride_lb_day, 2) + " lb/day fluoride ion";
+  }, DEBOUNCE_MS);
+  for (const f of [td, rf, fl, af, pu]) f.input.addEventListener("input", update);
+}
+WATER_RENDERERS["fluoride-feed-dose"] = _v984renderFluorideFeedDose;
