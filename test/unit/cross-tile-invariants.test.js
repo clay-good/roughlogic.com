@@ -12470,3 +12470,17 @@ test("cross-module: the 5252 hp-torque constant agrees across mechanic and motor
   assert.ok(Math.abs(mot(25, 5252) - 25) < 1e-6, "torque must equal HP at 5252 rpm (the defining identity)");
   assert.ok(Math.abs(mech(25, 5252) - 25) < 1e-6, "mechanic must also give torque = HP at 5252 rpm");
 });
+
+test("cross-module: the 1.08 sensible-heat coefficient agrees across hvac SHR-latent and hvacservice furnace", async () => {
+  const h = await import("../../calc-hvac.js");
+  const hs = await import("../../calc-hvacservice.js");
+  // hvac SHR-latent: Q_sensible = 1.08 * CFM * (return - supply); recover the coefficient.
+  const shr = h.computeSHRLatent({ total_capacity_btu_hr: 36000, cfm: 1200, return_db_F: 75, supply_db_F: 55, return_wb_F: 63, altitude_ft: 0 });
+  const kHvac = shr.Q_sensible_btu_hr / (1200 * (75 - 55));
+  // hvacservice furnace airflow-to-rise: rise = output / (1.08 * CFM); recover the same coefficient.
+  const af = hs.computeFurnaceAirflowToRise({ input_btuh: 80000, efficiency_pct: 80, cfm: 1185.185185, return_air_F: 70 });
+  const kSvc = af.output_btuh / (1185.185185 * af.delta_T_F);
+  assert.ok(Math.abs(kHvac - 1.08) < 1e-9, "hvac SHR-latent must embed the 1.08 standard-air sensible-heat coefficient");
+  assert.ok(Math.abs(kSvc - 1.08) < 1e-6, "hvacservice furnace must embed the 1.08 standard-air sensible-heat coefficient");
+  assert.ok(Math.abs(kHvac - kSvc) < 1e-6, "the two modules must use the identical 1.08 coefficient (a drift in either is caught)");
+});

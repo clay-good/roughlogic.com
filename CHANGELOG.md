@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test: cross-module 1.08 sensible-heat consistency (hvac vs hvacservice); 2026-07-17
+
+- Shared-constant guard: recovers the 1.08 standard-air sensible-heat coefficient independently from hvac SHR-latent
+  (Q_sens = 1.08 x CFM x dT) and hvacservice furnace airflow-to-rise (rise = output/(1.08 CFM)) and asserts both equal
+  1.08 and agree. Test-only.
+
 ### test: cross-module 5252 hp-torque consistency (mechanic vs motor); 2026-07-17
 
 - Shared-constant guard: mechanic and motor must compute the same shaft torque for identical HP/RPM, both embed
