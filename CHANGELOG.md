@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(water): guard the SWTR disinfection CT table with a two-axis monotonicity invariant; 2026-07-17
+
+- Added a physical invariant over the whole SWTR Table A-1 (3-log Giardia, free chlorine) read by `disinfection-ct`:
+  required CT strictly rises with pH (harder to disinfect) and strictly falls with temperature (warmer disinfects faster),
+  at every grid point. The bug fixed earlier today was a pH-column mislabel; the independent point pins (139/198/279)
+  catch the shift at the pinned cells, and this two-axis guard protects the rest of the grid against a row/column
+  transcription error a few points would miss. Public-health critical; test-only, no source change.
+
 ### test(refrigerant): guard the psig P-T table against the non-monotonic regression class; 2026-07-17
 
 - Added a monotonicity invariant over the primary `REFRIGERANTS.pt_pairs` (psig) table read by refrigerant-pt /

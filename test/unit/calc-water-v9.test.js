@@ -149,6 +149,33 @@ test("disinfection-ct: cold-water / high-pH worst corner inflates CT requirement
   assert.ok(close(r.CT_required_3log_Giardia, 390, 1e-9));
 });
 
+// Physical invariant over the whole SWTR Table A-1 (3-log Giardia, free chlorine):
+// required CT rises with pH (higher pH is harder to disinfect) and falls with
+// temperature (warmer water disinfects faster), across every grid point. The bug
+// fixed 2026-07-17 was a pH-column MISLABEL; independent point pins catch the shift
+// at the pinned cells, and this two-axis monotonicity guards the rest of the table
+// against a row/column transcription error a few points would miss. Public-health critical.
+test("disinfection-ct: CT_required is monotone in pH (increasing) and temperature (decreasing) across the whole SWTR grid", () => {
+  const CT = (temperature_C, pH) =>
+    computeDisinfectionCT({ chlorine_mg_l: 1, t10_minutes: 1, temperature_C, pH }).CT_required_3log_Giardia;
+  const temps = [0.5, 5, 10, 15, 20, 25];
+  const phs = [6, 7, 8, 9];
+  // Strictly increasing in pH at every temperature.
+  for (const T of temps) {
+    for (let i = 1; i < phs.length; i++) {
+      assert.ok(CT(T, phs[i]) > CT(T, phs[i - 1]),
+        `CT must rise with pH at ${T} C: pH ${phs[i]} (${CT(T, phs[i])}) <= pH ${phs[i - 1]} (${CT(T, phs[i - 1])})`);
+    }
+  }
+  // Strictly decreasing in temperature at every pH.
+  for (const p of phs) {
+    for (let i = 1; i < temps.length; i++) {
+      assert.ok(CT(temps[i], p) < CT(temps[i - 1], p),
+        `CT must fall with temperature at pH ${p}: ${temps[i]} C (${CT(temps[i], p)}) >= ${temps[i - 1]} C (${CT(temps[i - 1], p)})`);
+    }
+  }
+});
+
 test("disinfection-ct: WATER_RENDERERS exposes disinfection-ct", () => {
   assert.equal(typeof WATER_RENDERERS["disinfection-ct"], "function");
 });
