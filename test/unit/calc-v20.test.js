@@ -1117,6 +1117,11 @@ test("seller-net-sheet: tax proration reduces net", () => {
 test("seller-net-sheet: cost of sale percent", () => {
   const r = computeSellerNetSheet({ price: 400000, payoff: 0, commission_pct: 5.5, transfer_tax_pct: 0.5, fees: 2500 });
   assert.ok(r.cost_of_sale_pct > 0 && r.cost_of_sale_pct < 100);
+  // Cost of sale must EXCLUDE the mortgage payoff: with a $250k payoff the cost of
+  // sale is still just commission $22k + transfer $2k + fees $2.5k = $26.5k / $400k = 6.625%,
+  // not 69.125% (which would fold the loan payoff into "cost of sale").
+  const withPayoff = computeSellerNetSheet({ price: 400000, payoff: 250000, commission_pct: 5.5, transfer_tax_pct: 0.5, fees: 2500 });
+  assert.ok(Math.abs(withPayoff.cost_of_sale_pct - 6.625) < 1e-9, `cost_of_sale_pct=${withPayoff.cost_of_sale_pct}`);
 });
 test("seller-net-sheet: zero price rejected", () => {
   assert.ok("error" in computeSellerNetSheet({ price: 0, payoff: 0, commission_pct: 5.5 }));

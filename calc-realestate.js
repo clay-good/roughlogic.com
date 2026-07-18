@@ -2443,7 +2443,10 @@ export function computeSellerNetSheet({ price = 0, payoff = 0, commission_pct = 
   const transferTax = P * ttPct / 100;
   const taxProration = annualTax * days / 365; // seller owes this share (debit)
   const net = P - payoffN - commission - transferTax - feesN - conc - taxProration - otherN;
-  const costOfSale = (P - net) / P * 100;
+  // Cost of sale excludes the mortgage payoff (that is repayment of the seller's
+  // own debt, not a transaction cost): commission + transfer tax + fees +
+  // concessions + proration + other, over the price.
+  const costOfSale = (P - net - payoffN) / P * 100;
   return {
     gross_price: P,
     commission: Number.isFinite(commission) ? commission : null,

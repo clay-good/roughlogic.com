@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(real-estate): seller-net-sheet cost-of-sale percentage wrongly folded in the mortgage payoff; 2026-07-17
+
+- `seller-net-sheet` (calc-realestate.js) computed `cost_of_sale_pct = (price - net) / price * 100`. Because
+  `net = price - payoff - commission - transfer_tax - fees - concessions - proration`, `(price - net)` includes the
+  mortgage payoff, which is repayment of the seller's own debt -- not a cost of selling the property. For the tile's own
+  example ($400k sale, $250k payoff, 5.5% commission, 0.5% transfer tax, $2,500 fees) it displayed a 69.1% "cost of sale"
+  where the true transaction cost is commission $22k + transfer $2k + fees $2.5k = $26.5k / $400k = 6.625%. Net proceeds
+  ($123,500) was already correct; only the percentage was wrong. Fixed to `(price - net - payoff) / price * 100` and added
+  a nonzero-payoff regression assertion (the existing cost-of-sale test used a $0 payoff, so it never exercised the bug).
+  Caught by a first-principles re-derivation of calc-realestate.js.
+
 ### fix(shop): three-wire thread measurement constant 1.51553 -> 0.86603 (sqrt(3)/2) for thread-measure-wire and its inverse; 2026-07-17
 
 - `thread-measure-wire` and `thread-pitch-dia-from-wires` (calc-shop.js) used a measurement-over-wires constant
