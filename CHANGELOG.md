@@ -4,6 +4,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(hvacsystems): guard chiller tonnage against q = 500 gpm dT / 12000; 2026-07-17
+
+- Whole-response guard: cooling load = 500 x gpm x dT (water factor 500), tons = q/12000, delta-T = entering - leaving
+  water temp, tonnage rises linearly with flow and with the water delta-T. Test-only.
+
 ### fix(cross): correct the near-wall minimum air gap floor for small openings (IPC 608.15.1); 2026-07-17
 
 - cross-connection-air-gap floored BOTH the away-from-wall and near-wall required gaps at 1 in. IPC Table 608.15.1

@@ -12549,3 +12549,16 @@ test("statics: simple-span beam reactions satisfy equilibrium and moment balance
   assert.ok(br({ point_lb: 2000 }).r_left_lb > b.r_left_lb, "reactions must rise with applied load");
   assert.ok(br({ a_ft: 5 }).r_left_lb > br({ a_ft: 5 }).r_right_lb, "a load left of center must throw more reaction to the near support");
 });
+
+test("monotonicity: chiller tonnage follows q = 500 * gpm * dT / 12000 (hvacsystems)", async () => {
+  const h = await import("../../calc-hvacsystems.js");
+  const ct = (o) => h.computeChillerTons({ gpm: 240, ewt_F: 54, lwt_F: 44, fluid: "water", ...o });
+  assert.ok(Math.abs(ct({}).q_btu_hr - 500 * 240 * 10) < 1e-6, "cooling load = 500 * gpm * dT (water factor 500)");
+  assert.ok(Math.abs(ct({}).tons - 100) < 1e-9, "tons = q / 12000 (12000 BTU/hr per ton)");
+  assert.strictEqual(ct({}).factor, 500, "the chilled-water factor must be the standard 500");
+  assert.ok(Math.abs(ct({}).delta_T_F - 10) < 1e-9, "delta-T = entering - leaving water temperature");
+  assert.ok(ct({ gpm: 480 }).tons > ct({}).tons, "tonnage must rise with chilled-water flow");
+  assert.ok(ct({ ewt_F: 64 }).tons > ct({}).tons, "tonnage must rise as the water delta-T widens");
+  assert.ok(Math.abs(ct({ gpm: 480 }).tons / ct({}).tons - 2) < 1e-9, "doubling the flow must double the tonnage (linear)");
+  assert.ok(Math.abs(ct({ ewt_F: 64 }).delta_T_F - 20) < 1e-9, "a 64/44 F pair must give a 20 F delta-T");
+});
