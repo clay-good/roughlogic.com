@@ -19953,9 +19953,12 @@ test("bounds: spec-v450 computeCrossConnectionAirGap pins the 2x/3x gap, the 1 i
   // Near a wall the requirement is 3x.
   const wall = _v450({ opening_in: 1, near_wall: true, measured_in: 0 });
   assert.ok(Math.abs(wall.required_in - 3) < 1e-9 && wall.passes === null);
-  // A small opening hits the 1 in absolute floor.
+  // A small opening hits the 1 in away-from-wall absolute floor.
   const small = _v450({ opening_in: 0.5, near_wall: false });
   assert.ok(Math.abs(small.air_gap_in - 1) < 1e-9 && Math.abs(small.required_in - 1) < 1e-9);
+  // A sub-1/2-in opening near a wall hits the 1.5 in near-wall floor (IPC Table 608.15.1, openings <= 1/2 in).
+  const smallWall = _v450({ opening_in: 0.3, near_wall: true, measured_in: 0 });
+  assert.ok(Math.abs(smallWall.air_gap_wall_in - 1.5) < 1e-9 && Math.abs(smallWall.required_in - 1.5) < 1e-9);
   // A measured gap below the requirement fails.
   assert.ok(_v450({ opening_in: 2, near_wall: false, measured_in: 3 }).passes === false);
   // Error seams: non-positive opening, non-finite.

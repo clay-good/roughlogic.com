@@ -2809,17 +2809,17 @@ export function computeCrossConnectionAirGap({ opening_in = 0, near_wall = false
   const measured = Number(measured_in) || 0;
   if (!(opening > 0)) return { error: "Effective opening diameter must be positive (in)." };
   const air_gap_in = Math.max(2 * opening, 1);
-  const air_gap_wall_in = Math.max(3 * opening, 1);
+  const air_gap_wall_in = Math.max(3 * opening, 1.5);
   const required_in = near_wall ? air_gap_wall_in : air_gap_in;
   const passes = measured > 0 ? measured >= required_in : null;
   return {
     air_gap_in, air_gap_wall_in, required_in, near_wall: !!near_wall, passes,
-    note: "IPC 608.15.1 cross-connection air gap: the minimum vertical distance between a supply outlet and the flood-level rim of the fixture it discharges into is twice the effective opening diameter, but never less than 1 in; within three effective-opening diameters of a wall the minimum is three times the opening. The effective opening is the least cross-sectional area of the supply outlet (a round pipe's diameter, or the equivalent diameter of a non-round outlet). An air gap is the most positive cross-connection protection -- nothing mechanical can defeat it. A design aid, not a substitute for the plumbing code adopted by your AHJ.",
+    note: "IPC 608.15.1 cross-connection air gap: the minimum vertical distance between a supply outlet and the flood-level rim of the fixture it discharges into is twice the effective opening diameter, but never less than 1 in; within three effective-opening diameters of a wall the minimum is three times the opening and never less than 1.5 in. The effective opening is the least cross-sectional area of the supply outlet (a round pipe's diameter, or the equivalent diameter of a non-round outlet). An air gap is the most positive cross-connection protection -- nothing mechanical can defeat it. A design aid, not a substitute for the plumbing code adopted by your AHJ.",
   };
 }
 export const crossConnectionAirGapExample = { inputs: { opening_in: 1, near_wall: false, measured_in: 2 } };
 function renderCrossConnectionAirGap(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 608.15.1 / ASME A112.1.2 cross-connection air gap: minimum = 2x the effective opening diameter (never less than 1 in), or 3x within three diameters of a wall. The most positive backflow protection. A design aid, not a substitute for the plumbing code adopted by your AHJ.";
+  citationEl.textContent = "Citation: IPC 608.15.1 / ASME A112.1.2 cross-connection air gap: minimum = 2x the effective opening diameter (never less than 1 in), or 3x within three diameters of a wall (never less than 1.5 in). The most positive backflow protection. A design aid, not a substitute for the plumbing code adopted by your AHJ.";
   const op = makeNumber("Effective opening diameter (in)", "ccag-op", { step: "any", min: "0" }); op.input.value = "1";
   const nw = makeCheckbox("Outlet within 3 diameters of a wall", "ccag-nw", false);
   const me = makeNumber("Measured installed air gap to check (in, optional)", "ccag-me", { step: "any", min: "0" });

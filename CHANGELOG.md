@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(cross): correct the near-wall minimum air gap floor for small openings (IPC 608.15.1); 2026-07-17
+
+- cross-connection-air-gap floored BOTH the away-from-wall and near-wall required gaps at 1 in. IPC Table 608.15.1
+  (and ASME A112.1.2) set the near-wall minimum for openings <= 1/2 in at 1.5 in, not 1 in. For a sub-1/2-in opening
+  near a wall the tile under-reported the required air gap (1.0 in where the code requires 1.5 in) -- non-conservative
+  on a backflow-protection value. Fixed the near-wall floor 1 -> 1.5; away floor stays 1 (table: openings <= 1/2 in ->
+  1 in away). No worked example or fuzzer pin used a sub-1/2-in near-wall opening, so none changed; added a fuzzer pin
+  for the 1.5 in near-wall floor. Verified against the up.codes/Illinois-Plumbing-Code air-gap table.
+
 ### test(construction): guard simple-span beam reactions against statics; 2026-07-17
 
 - Statics guard: sum of reactions equals total load (vertical equilibrium), R_left = w L/2 + P(L-a)/L and R_right =
