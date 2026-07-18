@@ -1706,10 +1706,11 @@ function renderToolView(id, params) {
 //
 // One search bar. Type free text to filter the catalog, or focus the empty
 // field to browse every tool. Matches render in a results dropdown that
-// routes to the tile on click / Enter / arrow-select. Industry-term aliases
-// (data/search/aliases.json) lazy-load on first focus so a free-text term
-// resolves to its target tile; the SW pre-caches the file so the fetch is
-// local after first install.
+// routes to the tile on click / Enter / arrow-select. Industry-term and
+// question aliases (the per-group data/search/aliases-<letter>.json shards,
+// spec-v590 split) lazy-load on first focus so a free-text term resolves to
+// its target tile; the SW pre-caches the shards so the fetch is local after
+// first install.
 
 function bindSearch() {
   const input = document.getElementById("search-input");
