@@ -1100,6 +1100,7 @@ const RELATED = {
   "pulse-flowmeter-k-factor": ["loop-signal-scaling", "valve-flow-coefficient", "weir-flow"],
   "loop-voltage-budget": ["loop-signal-scaling", "rtd-resistance-to-temp", "voltage-drop"],
   "thermistor-beta-temp": ["rtd-resistance-to-temp", "loop-signal-scaling", "copper-resistance"],
+  "dp-level-hydrostatic": ["loop-signal-scaling", "pulse-flowmeter-k-factor", "tank-volume"],
   "polymeric-sand-bags": ["paver-patio", "retaining-wall-block", "aggregate"],
   "rigid-foam-board-count": ["insulation-batt-coverage", "spray-foam-board-feet", "assembly-r-value"],
   "roof-insulation-fasteners": ["membrane-roof-takeoff", "tapered-roof-insulation", "metal-roof-panels"],

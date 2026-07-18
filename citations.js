@@ -8487,6 +8487,17 @@ export const CITATIONS = {
       { name: "Two-point fit accuracy", value: "~+/-0.2-1 C near T0; a wide span or tight accuracy uses the 3-constant Steinhart-Hart equation", source: "thermistor datasheet" },
     ],
   },
+  "dp-level-hydrostatic": {
+    formula: "level_ft = measured_pressure_psi / (0.433 x specific_gravity); span_psi (URV) = 0.433 x specific_gravity x max_level_ft; level_pct = 100 x level_ft / max_level_ft. 0.433 psi/ft is water at ~60 F.",
+    edition: "Hydrostatic (differential-pressure) level measurement (P = 0.433 x SG x H), by name; the transmitter's configured range/calibration and the tank geometry govern.",
+    freeAccess: "The hydrostatic head relation is public physics; the 0.433 psi/ft is water's density (62.3 lb/ft^3 / 144), the specific gravity and levels come from the fluid and tank, and the pressure is the transmitter reading.",
+    governance: GOVERNANCE.general,
+    editionNote: "A hydrostatic level transmitter infers liquid level from the pressure (head) the column of liquid exerts at a bottom tap: P = 0.433 x SG x H, where 0.433 psi per foot is the head of water at about 60 F (its 62.3 lb/ft^3 density divided by 144 in^2/ft^2) and the specific gravity scales it for a denser or lighter fluid. Solving for level, H = P / (0.433 x SG): a tap reading 4.33 psi in water (SG 1.0) is 10 ft of level, and the full-span (upper-range-value) pressure for a 20-ft tank is 0.433 x 1.0 x 20 = 8.66 psi, so 4.33 psi corresponds to 50% of span. Because a denser fluid produces more pressure per foot, the same 4.33 psi in a 1.2-SG fluid is only 8.3 ft. This assumes an OPEN (vented) tank with the transmitter tap at the zero-level reference (the tank bottom) and no zero elevation or suppression. Two common installations need a calibration offset: an elevated dry-leg tap (the transmitter mounted above the zero-level tap) requires zero SUPPRESSION, and a wet-leg on a sealed or pressurized tank (a reference leg filled with liquid on the low side) requires zero ELEVATION -- both are set when the transmitter is ranged. The specific gravity must be taken at the operating temperature, since it changes with temperature. The transmitter's configured range and calibration and the actual tank geometry govern the reading.",
+    assumptions: [
+      { name: "Hydrostatic head", value: "level = P / (0.433 x SG); 0.433 psi/ft = water at ~60 F; span = 0.433 x SG x max level", source: "hydrostatics" },
+      { name: "Open tank, tap at zero", value: "assumes a vented tank, tap at zero level, no elevation/suppression; a dry-leg needs zero suppression, a wet leg zero elevation; SG at operating temperature", source: "level-transmitter calibration practice" },
+    ],
+  },
   "polymeric-sand-bags": {
     formula: "bags = ceil(area_sf x (1 + waste_pct/100) / coverage_per_bag_sf).",
     edition: "Polymeric joint-sand bag-count identity by name (area over the per-bag coverage, plus waste); first-principles arithmetic.",

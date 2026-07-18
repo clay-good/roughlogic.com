@@ -165,6 +165,7 @@ const TOOL_MODULES = (() => {
     "pulse-flowmeter-k-factor",
     "loop-voltage-budget",
     "thermistor-beta-temp",
+    "dp-level-hydrostatic",
   ]);
   // spec-v29 pipe / raceway field-layout bench (deepens Groups B, A, G per
   // the spec-v28 §7 roadmap; lives in its own module because calc-electrical

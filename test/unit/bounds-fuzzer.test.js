@@ -27705,3 +27705,26 @@ test("bounds: spec-v957 computeInsulationResistancePi pins PI/DAR, IEEE 43 verdi
   assert.ok("error" in _v957({ ir_30s_mohm: 800, ir_1min_mohm: 1040, ir_10min_mohm: 0 }));
   assert.ok("error" in _v957({ ir_30s_mohm: Infinity, ir_1min_mohm: 1040, ir_10min_mohm: 4160 }));
 });
+
+import { computeDpLevelHydrostatic as _v958 } from "../../calc-lowvoltage.js";
+
+test("bounds: spec-v958 computeDpLevelHydrostatic pins P = 0.433 SG H and error seams", () => {
+  const r = _v958({ measured_pressure_psi: 4.33, specific_gravity: 1.0, max_level_ft: 20 });
+  assert.ok(Math.abs(r.level_ft - 10) < 1e-9); // 4.33/(0.433*1.0)
+  assert.ok(Math.abs(r.level_in - 120) < 1e-6);
+  assert.ok(Math.abs(r.level_pct - 50) < 1e-9);
+  assert.ok(Math.abs(r.span_psi - 8.66) < 1e-9); // 0.433*1.0*20
+  // A denser fluid gives less level for the same pressure.
+  const dense = _v958({ measured_pressure_psi: 4.33, specific_gravity: 1.2, max_level_ft: 20 });
+  assert.ok(Math.abs(dense.level_ft - 8.3333) < 1e-3);
+  assert.ok(dense.level_ft < r.level_ft);
+  // Zero pressure is a valid empty tank (0 level).
+  assert.ok(Math.abs(_v958({ measured_pressure_psi: 0, specific_gravity: 1.0, max_level_ft: 20 }).level_ft) < 1e-12);
+  // Level is linear in pressure and inverse in SG.
+  assert.ok(Math.abs(_v958({ measured_pressure_psi: 8.66, specific_gravity: 1.0, max_level_ft: 20 }).level_ft - 2 * r.level_ft) < 1e-9);
+  // Error seams: negative pressure, non-positive SG or max level, non-finite.
+  assert.ok("error" in _v958({ measured_pressure_psi: -1, specific_gravity: 1.0, max_level_ft: 20 }));
+  assert.ok("error" in _v958({ measured_pressure_psi: 4.33, specific_gravity: 0, max_level_ft: 20 }));
+  assert.ok("error" in _v958({ measured_pressure_psi: 4.33, specific_gravity: 1.0, max_level_ft: 0 }));
+  assert.ok("error" in _v958({ measured_pressure_psi: Infinity, specific_gravity: 1.0, max_level_ft: 20 }));
+});

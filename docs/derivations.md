@@ -2364,6 +2364,7 @@ cross-check.
 | calc-lowvoltage.js | `computeCeilingSpeakerCoverage` | `{ ceiling_ft = 0, ear_ft = 0, coverage_deg = 90, room_area_ft2 = 0, layout = ...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCeilingSpeakerCoverageAngle` | `{ ceiling_ft = 0, ear_ft = 0, target_diameter_ft = 0 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCoaxRgLoss` | `{ mode = "loss", loss_per_100ft_db = 0, length_ft = 0, source_level = null, t...` | _ | _ | _ |
+| calc-lowvoltage.js | `computeDpLevelHydrostatic` | `{ measured_pressure_psi = 4.33, specific_gravity = 1.0, max_level_ft = 20 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeFiberLossBudget` | `{ length_m = 0, attenuation_db_km = 0, connector_count = 0, loss_per_connecto...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeFiberMaxLength` | `{ max_channel_loss_db = 0, attenuation_db_km = 0, connector_count = 0, loss_p...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeFireAlarmNacVoltageDrop` | `{ nominal_voltage_v = 24, total_current_a = 0.8, run_length_ft = 250, resista...` | _ | _ | _ |
@@ -3067,7 +3068,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1653.
+Row count: 1654.
 
 <!-- END function-corpus-v14 -->
 
@@ -3148,7 +3149,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (186 tiles)
+### Group A Electrical (187 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3196,6 +3197,7 @@ per spec-v14 §13.1 second paragraph.
 | `continuous-load-ocpd` | Continuous-Load OCPD and Conductor at 125% (NEC 210.20 / 215.3) | NEC 2023 210.20(A) / 215.3 / 240.6(A); spec-v280 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `copper-resistance` | Conductor Resistance at Temperature | NFPA; NEC Table 8 gives 1.93 ohm/1000 ft at 75 C uncoated coppe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `delta-wye-line-phase` | Wye / Delta Line-to-Phase Voltage and Current | First-principles three-phase theory; spec-v128 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `dp-level-hydrostatic` | Hydrostatic DP Level Transmitter (Head to Level) | Hydrostatic DP level transmitter (P =...; level = 4.33/(0.433*1.0) = 10 ft; span = 0.433*1.0*20 = 8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dryer-demand-220-54` | Household Clothes Dryer Demand Load (NEC 220.54) | NEC 2023 (NFPA 70); each at 5000 W floor; 4 x 5000 = 20000 W at 100% = 83.3 A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `economic-conductor-sizing` | Economic Conductor Sizing (I2R Payback) | economic conductor sizing (I2R); spec-v473 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `egc-sizing` | Equipment Grounding Conductor Sizing | NFPA; Table 250.122 (60 A OCPD -> 10 AWG copper EGC) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4659,6 +4661,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1406. Fixture-covered or reference-cadence: 1406 / 1406.
+Tile count: 1407. Fixture-covered or reference-cadence: 1407 / 1407.
 
 <!-- END tile-index-v14 -->

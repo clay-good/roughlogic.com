@@ -846,6 +846,7 @@ export const COMPUTE_MAP = {
   "pulse-flowmeter-k-factor": { module: "../../calc-lowvoltage.js", fn: "computePulseFlowmeterRate" },
   "loop-voltage-budget": { module: "../../calc-lowvoltage.js", fn: "computeLoopVoltageBudget" },
   "thermistor-beta-temp": { module: "../../calc-lowvoltage.js", fn: "computeThermistorBetaTemp" },
+  "dp-level-hydrostatic": { module: "../../calc-lowvoltage.js", fn: "computeDpLevelHydrostatic" },
   "polymeric-sand-bags": { module: "../../calc-construction.js", fn: "computePolymericSandBags" },
   "rigid-foam-board-count": { module: "../../calc-construction.js", fn: "computeRigidFoamBoardCount" },
   "roof-insulation-fasteners": { module: "../../calc-construction.js", fn: "computeRoofInsulationFasteners" },

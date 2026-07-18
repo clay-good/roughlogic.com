@@ -1296,3 +1296,54 @@ function _v950renderThermistorBetaTemp(inputRegion, outputRegion, citationEl) {
   for (const f of [rm, r0, bk, rt]) f.input.addEventListener("input", update);
 }
 LOWVOLTAGE_RENDERERS["thermistor-beta-temp"] = _v950renderThermistorBetaTemp;
+
+// ===================== spec-v958: hydrostatic DP level transmitter (head to level) =====================
+// dims: in { args: dimensionless } out: { level_ft: dimensionless, level_pct: dimensionless, span_psi: dimensionless }
+export function computeDpLevelHydrostatic({ measured_pressure_psi = 4.33, specific_gravity = 1.0, max_level_ft = 20 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(measured_pressure_psi >= 0)) return { error: "Measured pressure cannot be negative (psi)." };
+  if (!(specific_gravity > 0)) return { error: "Specific gravity must be positive." };
+  if (!(max_level_ft > 0)) return { error: "Maximum (full-span) level must be positive (ft)." };
+  // Hydrostatic head: P (psi) = 0.433 x SG x H (ft). 0.433 psi/ft is water at ~60 F (62.3 lb/ft^3 / 144).
+  const PSI_PER_FT_WATER = 0.433;
+  const level_ft = measured_pressure_psi / (PSI_PER_FT_WATER * specific_gravity);
+  const span_psi = PSI_PER_FT_WATER * specific_gravity * max_level_ft;
+  const level_pct = 100 * level_ft / max_level_ft;
+  if (![level_ft, span_psi, level_pct].every(Number.isFinite)) return { error: "DP-level math is not a finite value." };
+  return {
+    level_ft,
+    level_in: level_ft * 12,
+    level_pct,
+    span_psi,
+    note: "The liquid level a hydrostatic (differential-pressure) level transmitter reports from the head it measures: pressure P = 0.433 x SG x H, so level H = P / (0.433 x SG), where 0.433 psi per foot is water at about 60 F and SG scales it for a denser or lighter fluid. A tap reading 4.33 psi in water (SG 1.0) is 10 ft of level; the full-span (URV) pressure for a 20-ft tank is 0.433 x 1.0 x 20 = 8.66 psi, so 4.33 psi is 50% of span. A denser fluid (higher SG) produces more pressure per foot, so the same 4.33 psi in a 1.2-SG fluid is only 8.3 ft. This assumes an OPEN (vented) tank with the transmitter tap at the zero-level (tank bottom), no zero elevation or suppression: an elevated dry-leg tap needs zero SUPPRESSION and a wet-leg (sealed/pressurized tank) needs zero ELEVATION, both set at calibration, and the SG must be taken at the operating temperature (it changes with temperature). The transmitter's configured range and calibration and the tank geometry govern the reading.",
+  };
+}
+
+export const dpLevelHydrostaticExample = { inputs: { measured_pressure_psi: 4.33, specific_gravity: 1.0, max_level_ft: 20 } };
+
+function _v958renderDpLevelHydrostatic(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: hydrostatic DP level transmitter (head to level), by name. P = 0.433 x SG x H (psi), so level H = P / (0.433 x SG); 0.433 psi/ft is water at ~60 F. Full-span (URV) = 0.433 x SG x max level. Assumes an open (vented) tank, tap at zero level, no elevation/suppression; a wet leg or elevated tap needs zero suppression/elevation set at calibration. The transmitter range and calibration govern.";
+  const pp = makeNumber("Measured pressure (psi)", "dpl-pp", { step: "any", min: "0", value: "4.33" });
+  pp.input.value = "4.33";
+  const sg = makeNumber("Fluid specific gravity", "dpl-sg", { step: "any", min: "0", value: "1.0" });
+  sg.input.value = "1.0";
+  const ml = makeNumber("Full-span (max) level (ft)", "dpl-ml", { step: "any", min: "0", value: "20" });
+  ml.input.value = "20";
+  for (const f of [pp, sg, ml]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { pp.input.value = "4.33"; sg.input.value = "1.0"; ml.input.value = "20"; update(); });
+  const oL = makeOutputLine(outputRegion, "Level", "dpl-out-l");
+  const oP = makeOutputLine(outputRegion, "Percent of span", "dpl-out-p");
+  const oS = makeOutputLine(outputRegion, "Full-span pressure (URV)", "dpl-out-s");
+  const update = debounce(() => {
+    const r = computeDpLevelHydrostatic({
+      measured_pressure_psi: pp.input.value === "" ? 4.33 : Number(pp.input.value), specific_gravity: sg.input.value === "" ? 1.0 : Number(sg.input.value),
+      max_level_ft: ml.input.value === "" ? 20 : Number(ml.input.value),
+    });
+    if (r.error) { oL.textContent = r.error; oP.textContent = "-"; oS.textContent = "-"; return; }
+    oL.textContent = fmt(r.level_ft, 2) + " ft (" + fmt(r.level_in, 1) + " in)";
+    oP.textContent = fmt(r.level_pct, 1) + "% of span";
+    oS.textContent = fmt(r.span_psi, 2) + " psi at full level";
+  }, DEBOUNCE_MS);
+  for (const f of [pp, sg, ml]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["dp-level-hydrostatic"] = _v958renderDpLevelHydrostatic;

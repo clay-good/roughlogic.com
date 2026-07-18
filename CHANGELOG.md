@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(low-voltage): add dp-level-hydrostatic tile (spec-v958); 2026-07-18
+
+- New Group A tile `dp-level-hydrostatic` (Hydrostatic DP Level Transmitter, Head to Level) in calc-lowvoltage.js. The
+  level a DP transmitter reports from the head it measures: P = 0.433 x SG x H (0.433 psi/ft is water at ~60 F), so
+  level = P / (0.433 x SG). 4.33 psi in water (SG 1.0) = 10 ft; a 20-ft tank's full-span (URV) pressure is 8.66 psi, so
+  4.33 psi is 50% of span; the same pressure in a 1.2-SG fluid is only 8.3 ft. Assumes an open tank, tap at zero level;
+  a dry-leg needs zero suppression, a wet leg zero elevation. Home count 1,406 -> 1,407.
+
 ### feat(electrical): add insulation-resistance-pi tile (spec-v957); 2026-07-18
 
 - New Group A tile `insulation-resistance-pi` (Insulation Resistance PI / DAR, Megger Test) in calc-service.js. From a

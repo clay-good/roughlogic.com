@@ -34770,6 +34770,62 @@
    }
   },
   {
+   "tile_id": "dp-level-hydrostatic",
+   "source_publisher": "Hydrostatic DP level transmitter (P = 0.433 x SG x H)",
+   "source_title": "4.33 psi in water (SG 1.0), 20 ft tank -> 10 ft level, 50% of span, 8.66 psi URV",
+   "source_edition_or_year": "spec-v958 worked example (machine-verified)",
+   "source_section_or_page": "level = 4.33/(0.433*1.0) = 10 ft; span = 0.433*1.0*20 = 8.66 psi; pct = 10/20 = 50",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "measured_pressure_psi": 4.33,
+    "specific_gravity": 1.0,
+    "max_level_ft": 20
+   },
+   "outputs": {
+    "level_ft": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "level_pct": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "span_psi": {
+     "value": 8.66,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dp-level-hydrostatic",
+   "source_publisher": "Hydrostatic DP level transmitter (P = 0.433 x SG x H)",
+   "source_title": "cross-check: the same 4.33 psi in a denser 1.2-SG fluid is only 8.33 ft",
+   "source_edition_or_year": "spec-v958 worked example (machine-verified)",
+   "source_section_or_page": "level = 4.33/(0.433*1.2) = 4.33/0.5196 = 8.333 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "measured_pressure_psi": 4.33,
+    "specific_gravity": 1.2,
+    "max_level_ft": 20
+   },
+   "outputs": {
+    "level_ft": {
+     "value": 8.333,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "thermistor-beta-temp",
    "source_publisher": "NTC thermistor beta (B-parameter) equation",
    "source_title": "20 kohm reading on a 10 kohm/3950 K sensor -> 10.18 C (NTC: higher R = colder)",
