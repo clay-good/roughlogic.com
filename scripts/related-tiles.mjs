@@ -1313,6 +1313,7 @@ const RELATED = {
   "wire-rope-clips": ["shackle-eyebolt-wll","sling-angle","bridle-leg-tension"],
   "winch-drum-line-pull": ["wire-rope-strength","chain-lever-hoist","pulley-ma-gen"],
   "crane-outrigger-reaction": ["crane-ground-bearing","crane-net-capacity","crane-lift-quick"],
+  "crane-load-radius-boom": ["crane-net-capacity","crane-lift-quick","crane-outrigger-reaction"],
   "lifting-lug-design": ["shackle-eyebolt-wll","spreader-beam","rigging-check"],
   // spec-v118 hay dry-matter (Group L)
   "hay-dry-matter": ["pearson-square-ration","grain-bin-capacity","livestock-water-requirement"],

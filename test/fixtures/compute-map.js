@@ -1286,6 +1286,7 @@ export const COMPUTE_MAP = {
   "wire-rope-clips": { module: "../../calc-rigging.js", fn: "computeWireRopeClips" },
   "winch-drum-line-pull": { module: "../../calc-rigging.js", fn: "computeWinchDrumLinePull" },
   "crane-outrigger-reaction": { module: "../../calc-rigging.js", fn: "computeCraneOutriggerReaction" },
+  "crane-load-radius-boom": { module: "../../calc-rigging.js", fn: "computeCraneLoadRadiusBoom" },
   "lifting-lug-design": { module: "../../calc-rigging.js", fn: "computeLiftingLugDesign" },
   "hay-dry-matter": { module: "../../calc-agriculture.js", fn: "computeHayDryMatter" },
   "sprinkler-precip-rate": { module: "../../calc-agriculture.js", fn: "computeSprinklerPrecipRate" },

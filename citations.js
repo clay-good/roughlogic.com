@@ -12019,6 +12019,17 @@ export const CITATIONS = {
       { name: "Chart governs", value: "the crane manufacturer's load-moment chart and published outrigger reaction data are authoritative", source: "SAE J1063" },
     ],
   },
+  "crane-load-radius-boom": {
+    formula: "load_radius = boom_foot_offset + boom_length x cos(boom_angle); boom_tip_height = boom_foot_height + boom_length x sin(boom_angle); angle_for_target_radius = acos((target_radius - boom_foot_offset)/boom_length).",
+    edition: "Crane boom geometry (load radius and tip height from boom length and angle), by name; the manufacturer's load chart and the load-moment indicator govern the rated capacity.",
+    freeAccess: "The radius/height relations are public plane trigonometry; the boom length, angle (off the boom-angle indicator), and geometry offsets are the operator's measured values.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The load radius -- the horizontal distance from the crane's center of rotation to the hook -- is what the load chart is indexed by, but the operator reads a boom ANGLE off the boom-angle indicator. This converts between them: load radius = the boom-foot horizontal offset from the center pin + boom length x cos(boom angle), and the boom-tip height = the boom-foot height + boom length x sin(boom angle). The inverse gives the boom angle that lands the hook at a target radius, acos((target radius - offset)/boom length), and flags a target beyond the boom's reach. A 30 ft boom at 60 degrees off a foot 4 ft out and 6 ft up gives a 19 ft radius and 32 ft tip height; lowering to 45 degrees swings out to 25 ft. CRITICAL LIMITATION: this is rigid-boom geometry. It does NOT account for boom deflection under load (the boom bends and the real radius grows), wire-rope stretch, tire or outrigger settling, or an out-of-level machine -- all of which INCREASE the actual operating radius beyond the geometric value, reducing capacity. The crane's load chart, the load-moment indicator, the manufacturer's deflection data, and a qualified operator and lift director govern the rated capacity at radius.",
+    assumptions: [
+      { name: "Rigid-boom geometry", value: "radius = offset + L cos(angle); tip height = foot height + L sin(angle); inverse angle = acos((target - offset)/L)", source: "plane trigonometry" },
+      { name: "Deflection excluded", value: "boom deflection, rope stretch, and out-of-level all INCREASE the real radius; the load chart and load-moment indicator govern", source: "crane manufacturer load chart" },
+    ],
+  },
   "lifting-lug-design": {
     formula: "bearing = 1.25 Fy Dp t / Nd; net tension = Fu (w - Dh) t / Nd; shear tear-out = 0.70 Fu (2 t (a + Dp/2 - Dh/2)) / Nd; governing = min; DCR = load / governing.",
     edition: "The ASME BTH-1 Section 3-3.3 pin-connected-plate (lifting lug / padeye) strength checks, by name.",

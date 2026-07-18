@@ -1574,3 +1574,66 @@ function _v938renderWireRopeClips(inputRegion, outputRegion, citationEl) {
   dia.input.addEventListener("input", update);
 }
 RIGGING_RENDERERS["wire-rope-clips"] = _v938renderWireRopeClips;
+
+// ===================== spec-v953: crane load radius and boom-tip height from boom geometry =====================
+// dims: in { args: dimensionless } out: { load_radius_ft: dimensionless, boom_tip_height_ft: dimensionless, angle_for_target_radius_deg: dimensionless }
+export function computeCraneLoadRadiusBoom({ boom_length_ft = 30, boom_angle_deg = 60, boom_foot_offset_ft = 4, boom_foot_height_ft = 6, target_radius_ft = 25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(boom_length_ft > 0)) return { error: "Boom length must be positive (ft)." };
+  if (!(boom_angle_deg >= 0 && boom_angle_deg <= 90)) return { error: "Boom angle must be between 0 and 90 degrees from horizontal." };
+  if (!(boom_foot_offset_ft >= 0)) return { error: "Boom-foot offset cannot be negative (ft)." };
+  if (!(boom_foot_height_ft >= 0)) return { error: "Boom-foot height cannot be negative (ft)." };
+  if (!(target_radius_ft > 0)) return { error: "Target radius must be positive (ft)." };
+  // Load radius = the horizontal distance from the center of rotation to the hook; tip height above ground.
+  const theta = boom_angle_deg * Math.PI / 180;
+  const load_radius_ft = boom_foot_offset_ft + boom_length_ft * Math.cos(theta);
+  const boom_tip_height_ft = boom_foot_height_ft + boom_length_ft * Math.sin(theta);
+  // Inverse: the boom angle that puts the hook at a target load radius (if the boom can reach it).
+  const ratio = (target_radius_ft - boom_foot_offset_ft) / boom_length_ft;
+  let angle_for_target_radius_deg = null;
+  let target_reachable = true;
+  if (ratio >= -1 && ratio <= 1) angle_for_target_radius_deg = Math.acos(ratio) * 180 / Math.PI;
+  else target_reachable = false;
+  if (![load_radius_ft, boom_tip_height_ft].every(Number.isFinite)) return { error: "Crane-geometry math is not a finite value." };
+  return {
+    load_radius_ft,
+    boom_tip_height_ft,
+    angle_for_target_radius_deg,
+    target_reachable,
+    note: "The load radius and boom-tip height from the boom length and angle -- the geometry that turns the crane's boom-angle-indicator reading into the RADIUS the load chart is actually indexed by. Load radius = the boom-foot horizontal offset from the center of rotation + boom length x cos(angle); tip height = the boom-foot height + boom length x sin(angle). A 30 ft boom at 60 degrees off a foot 4 ft out and 6 ft up puts the hook at a 19 ft radius and a 32 ft tip height; lowering the boom to 45 degrees swings the hook out to a 25 ft radius. The inverse -- the angle that lands the hook at a target radius -- is acos((target - offset)/boom length), so a 25 ft radius needs about 46 degrees; if the target exceeds the boom's reach it is flagged unreachable. This is boom geometry only: it does NOT include boom deflection under load, the load-radius increase as the boom bends out, wire-rope stretch, or out-of-level effects, all of which INCREASE the actual radius. The crane's load chart, the load-moment indicator, and a qualified operator/lift director govern the rated capacity at the radius.",
+  };
+}
+
+export const craneLoadRadiusBoomExample = { inputs: { boom_length_ft: 30, boom_angle_deg: 60, boom_foot_offset_ft: 4, boom_foot_height_ft: 6, target_radius_ft: 25 } };
+
+function _v953renderCraneLoadRadiusBoom(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: crane load radius and boom-tip height from boom geometry, by name. radius = boom-foot offset + boom length x cos(angle); tip height = boom-foot height + boom length x sin(angle); angle for a target radius = acos((target - offset)/length). Boom geometry only (no deflection/stretch/out-of-level, which increase the real radius). The load chart, load-moment indicator, and qualified operator govern.";
+  const bl = makeNumber("Boom length (ft)", "clr-bl", { step: "any", min: "0", value: "30" });
+  bl.input.value = "30";
+  const ba = makeNumber("Boom angle from horizontal (deg)", "clr-ba", { step: "any", min: "0", value: "60" });
+  ba.input.value = "60";
+  const bo = makeNumber("Boom-foot offset from center pin (ft)", "clr-bo", { step: "any", min: "0", value: "4" });
+  bo.input.value = "4";
+  const bh = makeNumber("Boom-foot height (ft)", "clr-bh", { step: "any", min: "0", value: "6" });
+  bh.input.value = "6";
+  const tr = makeNumber("Target load radius (ft)", "clr-tr", { step: "any", min: "0", value: "25" });
+  tr.input.value = "25";
+  for (const f of [bl, ba, bo, bh, tr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { bl.input.value = "30"; ba.input.value = "60"; bo.input.value = "4"; bh.input.value = "6"; tr.input.value = "25"; update(); });
+  const oR = makeOutputLine(outputRegion, "Load radius", "clr-out-r");
+  const oH = makeOutputLine(outputRegion, "Boom-tip height", "clr-out-h");
+  const oA = makeOutputLine(outputRegion, "Angle for target radius", "clr-out-a");
+  const update = debounce(() => {
+    const r = computeCraneLoadRadiusBoom({
+      boom_length_ft: bl.input.value === "" ? 30 : Number(bl.input.value), boom_angle_deg: ba.input.value === "" ? 60 : Number(ba.input.value),
+      boom_foot_offset_ft: bo.input.value === "" ? 4 : Number(bo.input.value), boom_foot_height_ft: bh.input.value === "" ? 6 : Number(bh.input.value),
+      target_radius_ft: tr.input.value === "" ? 25 : Number(tr.input.value),
+    });
+    if (r.error) { oR.textContent = r.error; oH.textContent = "-"; oA.textContent = "-"; return; }
+    oR.textContent = fmt(r.load_radius_ft, 2) + " ft";
+    oH.textContent = fmt(r.boom_tip_height_ft, 2) + " ft";
+    oA.textContent = r.target_reachable ? fmt(r.angle_for_target_radius_deg, 1) + " deg for " + fmt(Number(tr.input.value) || 25, 0) + " ft radius" : "target radius beyond boom reach";
+  }, DEBOUNCE_MS);
+  for (const f of [bl, ba, bo, bh, tr]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["crane-load-radius-boom"] = _v953renderCraneLoadRadiusBoom;

@@ -27572,3 +27572,33 @@ test("bounds: spec-v952 computeTaylorToolLife pins V x T^n = C both directions a
   assert.ok("error" in _v952({ taylor_c: 300, taylor_n: 0.2, cutting_speed_sfm: 200, target_life_min: 0 }));
   assert.ok("error" in _v952({ taylor_c: Infinity, taylor_n: 0.2, cutting_speed_sfm: 200, target_life_min: 15 }));
 });
+
+import { computeCraneLoadRadiusBoom as _v953 } from "../../calc-rigging.js";
+
+test("bounds: spec-v953 computeCraneLoadRadiusBoom pins the boom geometry, inverse angle, and error seams", () => {
+  const r = _v953({ boom_length_ft: 30, boom_angle_deg: 60, boom_foot_offset_ft: 4, boom_foot_height_ft: 6, target_radius_ft: 25 });
+  assert.ok(Math.abs(r.load_radius_ft - 19) < 1e-9); // 4 + 30*cos(60)
+  assert.ok(Math.abs(r.boom_tip_height_ft - 31.9808) < 1e-3); // 6 + 30*sin(60)
+  assert.ok(Math.abs(r.angle_for_target_radius_deg - 45.573) < 0.02); // acos((25-4)/30)
+  assert.equal(r.target_reachable, true);
+  // Lowering the boom increases the radius and decreases the tip height.
+  const low = _v953({ boom_length_ft: 30, boom_angle_deg: 45, boom_foot_offset_ft: 4, boom_foot_height_ft: 6, target_radius_ft: 25 });
+  assert.ok(Math.abs(low.load_radius_ft - 25.2132) < 1e-3);
+  assert.ok(low.load_radius_ft > r.load_radius_ft);
+  assert.ok(low.boom_tip_height_ft < r.boom_tip_height_ft);
+  // A target radius beyond the boom's reach is flagged, not an error.
+  const far = _v953({ boom_length_ft: 30, boom_angle_deg: 60, boom_foot_offset_ft: 4, boom_foot_height_ft: 6, target_radius_ft: 100 });
+  assert.equal(far.target_reachable, false);
+  assert.equal(far.angle_for_target_radius_deg, null);
+  assert.ok(Number.isFinite(far.load_radius_ft)); // forward outputs still valid
+  // At 0 degrees the boom is horizontal: radius = offset + length, tip height = foot height.
+  const flat = _v953({ boom_length_ft: 30, boom_angle_deg: 0, boom_foot_offset_ft: 4, boom_foot_height_ft: 6, target_radius_ft: 25 });
+  assert.ok(Math.abs(flat.load_radius_ft - 34) < 1e-9);
+  assert.ok(Math.abs(flat.boom_tip_height_ft - 6) < 1e-9);
+  // Error seams: non-positive boom length, angle out of 0-90, negative offset/height, non-positive target, non-finite.
+  assert.ok("error" in _v953({ boom_length_ft: 0, boom_angle_deg: 60, boom_foot_offset_ft: 4, boom_foot_height_ft: 6, target_radius_ft: 25 }));
+  assert.ok("error" in _v953({ boom_length_ft: 30, boom_angle_deg: 95, boom_foot_offset_ft: 4, boom_foot_height_ft: 6, target_radius_ft: 25 }));
+  assert.ok("error" in _v953({ boom_length_ft: 30, boom_angle_deg: 60, boom_foot_offset_ft: -1, boom_foot_height_ft: 6, target_radius_ft: 25 }));
+  assert.ok("error" in _v953({ boom_length_ft: 30, boom_angle_deg: 60, boom_foot_offset_ft: 4, boom_foot_height_ft: 6, target_radius_ft: 0 }));
+  assert.ok("error" in _v953({ boom_length_ft: Infinity, boom_angle_deg: 60, boom_foot_offset_ft: 4, boom_foot_height_ft: 6, target_radius_ft: 25 }));
+});

@@ -29534,6 +29534,66 @@
    }
   },
   {
+   "tile_id": "crane-load-radius-boom",
+   "source_publisher": "Crane boom geometry (load radius / tip height)",
+   "source_title": "30 ft boom at 60 deg, foot 4 ft out and 6 ft up -> 19 ft radius, 31.98 ft tip; 45.57 deg for a 25 ft radius",
+   "source_edition_or_year": "spec-v953 worked example (machine-verified)",
+   "source_section_or_page": "R = 4 + 30*cos(60) = 19; H = 6 + 30*sin(60) = 31.98; angle = acos((25-4)/30) = acos(0.7) = 45.573",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "boom_length_ft": 30,
+    "boom_angle_deg": 60,
+    "boom_foot_offset_ft": 4,
+    "boom_foot_height_ft": 6,
+    "target_radius_ft": 25
+   },
+   "outputs": {
+    "load_radius_ft": {
+     "value": 19,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "boom_tip_height_ft": {
+     "value": 31.981,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "angle_for_target_radius_deg": {
+     "value": 45.573,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "crane-load-radius-boom",
+   "source_publisher": "Crane boom geometry (load radius / tip height)",
+   "source_title": "cross-check: lowering the same boom to 45 deg swings the hook out to 25.21 ft radius",
+   "source_edition_or_year": "spec-v953 worked example (machine-verified)",
+   "source_section_or_page": "R = 4 + 30*cos(45) = 4 + 21.213 = 25.213 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "boom_length_ft": 30,
+    "boom_angle_deg": 45,
+    "boom_foot_offset_ft": 4,
+    "boom_foot_height_ft": 6,
+    "target_radius_ft": 25
+   },
+   "outputs": {
+    "load_radius_ft": {
+     "value": 25.213,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "crane-outrigger-reaction",
    "source_publisher": "Crane load-moment method / SAE J1063 stability",
    "source_title": "R_max = (W+Wc)/4 + M/(sqrt(2) x spread); M = W R - Wc Rc",

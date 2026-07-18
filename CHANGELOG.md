@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(rigging): add crane-load-radius-boom tile (spec-v953); 2026-07-18
+
+- New Group Z tile `crane-load-radius-boom` (Crane Load Radius and Boom-Tip Height from Boom Geometry) in calc-rigging.js.
+  Turns the boom-angle-indicator reading into the load radius the chart is indexed by: radius = boom-foot offset +
+  boom length x cos(angle); tip height = foot height + boom length x sin(angle); inverse angle = acos((target -
+  offset)/length). A 30 ft boom at 60 deg (foot 4 ft out, 6 ft up) = 19 ft radius, 32 ft tip; 45.6 deg for a 25 ft
+  radius. Rigid-boom geometry only -- deflection/stretch/out-of-level increase the real radius. The load chart and
+  load-moment indicator govern. Home count 1,401 -> 1,402.
+
 ### feat(machining): add taylor-tool-life tile (spec-v952); 2026-07-18
 
 - New Group K tile `taylor-tool-life` (Taylor Tool-Life vs Cutting Speed) in calc-machining.js. The V x T^n = C relation:

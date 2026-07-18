@@ -1242,6 +1242,7 @@ const TOOL_MODULES = (() => {
     "winch-drum-line-pull",
     // spec-v550
     "crane-outrigger-reaction",
+    "crane-load-radius-boom",
     // spec-v554
     "lifting-lug-design",
     // spec-v615

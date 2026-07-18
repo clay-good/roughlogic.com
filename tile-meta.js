@@ -746,7 +746,7 @@ const _TILES = [
   ["three-point-bridle", "Z"],
   ["beam-clamp-side-pull", "Z"], ["wire-rope-clips", "Z"],
   ["winch-drum-line-pull", "Z"],
-  ["crane-outrigger-reaction", "Z"],
+  ["crane-outrigger-reaction", "Z"], ["crane-load-radius-boom", "Z"],
   ["lifting-lug-design", "Z"],
   // spec-v118 hay dry-matter (Group L)
   ["hay-dry-matter", "L"],
