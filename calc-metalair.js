@@ -286,3 +286,55 @@ function _renderCompressionRatio(inputRegion, outputRegion, citationEl) {
   for (const f of [suc.input, dis.input, atm.input]) f.addEventListener("input", update);
 }
 METALAIR_RENDERERS["compression-ratio-refrig"] = _renderCompressionRatio;
+
+// ===================== spec-v916: duct transition (reducer) length from slope =====================
+// dims: in { large_dim_in: L, small_dim_in: L, slope_deg: dimensionless } out: { length_concentric_in: L, length_eccentric_in: L, slope_ratio: dimensionless }
+export function computeDuctTransitionLength({ large_dim_in = 20, small_dim_in = 12, slope_deg = 15 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(large_dim_in > 0)) return { error: "Large dimension must be positive (in)." };
+  if (!(small_dim_in > 0)) return { error: "Small dimension must be positive (in)." };
+  if (!(large_dim_in > small_dim_in)) return { error: "Large dimension must exceed the small dimension." };
+  if (!(slope_deg > 0 && slope_deg < 90)) return { error: "Slope must be between 0 and 90 degrees (per side)." };
+  const tan = Math.tan(slope_deg * Math.PI / 180);
+  // Concentric splits the size change to both sides (offset per side = (large - small)/2);
+  // eccentric (one flat side) takes the full change on one side, so twice the length for the same slope.
+  const length_concentric_in = ((large_dim_in - small_dim_in) / 2) / tan;
+  const length_eccentric_in = (large_dim_in - small_dim_in) / tan;
+  const slope_ratio = 1 / tan;
+  if (![length_concentric_in, length_eccentric_in, slope_ratio].every(Number.isFinite)) return { error: "Transition-length math is not a finite value." };
+  return {
+    length_concentric_in,
+    length_eccentric_in,
+    slope_ratio,
+    note: "The length a duct size change needs to hold a target transition slope. SMACNA keeps the slope shallow -- about 15 degrees per side (roughly a 4:1 run-to-offset ratio) -- to limit turbulence and pressure loss; a steeper transition is shorter but noisier and higher-drop. A concentric transition splits the change to both sides (offset per side = (large - small)/2); an eccentric (one flat side) takes the full change on one side and needs twice the length for the same slope. On a rectangular duct the larger of the width and height changes sets the piece length. The SMACNA duct-construction standards and the system pressure loss govern.",
+  };
+}
+
+export const ductTransitionLengthExample = { inputs: { large_dim_in: 20, small_dim_in: 12, slope_deg: 15 } };
+
+function _renderDuctTransitionLength(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: duct transition length by name. concentric length = ((large - small)/2) / tan(slope); eccentric length = (large - small) / tan(slope). SMACNA keeps the slope near 15 degrees per side (~4:1) to limit turbulence; the SMACNA standards and the pressure loss govern.";
+  const lg = makeNumber("Large end dimension (in)", "dtl-lg", { step: "any", min: "0", value: "20" });
+  lg.input.value = "20";
+  const sm = makeNumber("Small end dimension (in)", "dtl-sm", { step: "any", min: "0", value: "12" });
+  sm.input.value = "12";
+  const sl = makeNumber("Transition slope (deg per side)", "dtl-sl", { step: "any", min: "0", value: "15" });
+  sl.input.value = "15";
+  for (const f of [lg, sm, sl]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { lg.input.value = "20"; sm.input.value = "12"; sl.input.value = "15"; update(); });
+  const oConc = makeOutputLine(outputRegion, "Concentric length", "dtl-out-c");
+  const oEcc = makeOutputLine(outputRegion, "Eccentric (one flat side) length", "dtl-out-e");
+  const oRatio = makeOutputLine(outputRegion, "Run-to-offset ratio", "dtl-out-r");
+  const update = debounce(() => {
+    const r = computeDuctTransitionLength({
+      large_dim_in: lg.input.value === "" ? 20 : Number(lg.input.value), small_dim_in: sm.input.value === "" ? 12 : Number(sm.input.value),
+      slope_deg: sl.input.value === "" ? 15 : Number(sl.input.value),
+    });
+    if (r.error) { oConc.textContent = r.error; oEcc.textContent = "-"; oRatio.textContent = "-"; return; }
+    oConc.textContent = fmt(r.length_concentric_in, 2) + " in";
+    oEcc.textContent = fmt(r.length_eccentric_in, 2) + " in";
+    oRatio.textContent = fmt(r.slope_ratio, 2) + " : 1 (run : offset per side)";
+  }, DEBOUNCE_MS);
+  for (const f of [lg, sm, sl]) f.input.addEventListener("input", update);
+}
+METALAIR_RENDERERS["duct-transition-length"] = _renderDuctTransitionLength;

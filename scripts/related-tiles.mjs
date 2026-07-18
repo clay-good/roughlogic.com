@@ -979,6 +979,7 @@ const RELATED = {
   "groove-weld-strength": ["fillet-weld-strength", "weld-heat-input", "metal-weight"],
   "groove-weld-length-for-load": ["groove-weld-strength", "fillet-weld-strength", "weld-heat-input"],
   "duct-static-pressure-total": ["duct-sizing", "round-to-rect-duct", "cfm-per-ton"],
+  "duct-transition-length": ["duct-static-pressure-total", "round-to-rect-duct", "duct-sizing"],
   "compression-ratio-refrig": ["superheat-subcool", "refrigerant-pt", "duct-static-pressure-total"],
 
   // spec-v65 Group Z (Rigging and Heavy Lift)

@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): add duct-transition-length tile (spec-v916); 2026-07-18
+
+- New Group C tile `duct-transition-length` (Duct Transition (Reducer) Length from Slope) in calc-metalair.js, beside
+  duct-static-pressure-total. The length a duct size change needs to hold a target slope: concentric = ((large -
+  small)/2)/tan(slope); eccentric (one flat side) = (large - small)/tan(slope) = twice the concentric. A 20 in to 12 in
+  concentric transition at 15 deg/side is 14.93 in; eccentric 29.86 in. SMACNA keeps the slope near 15 deg/side (~4:1)
+  to limit turbulence and pressure loss. The SMACNA standards and the system pressure loss govern. Home count
+  1,364 -> 1,365. Raised the citations.js gzip cap 470000 -> 490000 (the per-tile citation blocks crossed it at this
+  sweep's 8th tile; lazy-loaded, prerendered into shells at build, not in the home payload).
+
 ### feat(hvac): add outdoor-reset-ratio tile (spec-v915); 2026-07-18
 
 - New Group C tile `outdoor-reset-ratio` (Hydronic Outdoor Reset Ratio and Supply Target) in calc-hvacsystems.js, beside

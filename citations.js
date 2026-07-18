@@ -10289,6 +10289,17 @@ export const CITATIONS = {
       { name: "Component drops", value: "each external resistance in in. w.c. from the manufacturer tables or a manometer reading; user-supplied", source: "ACCA Manual D / equipment fan tables" },
     ],
   },
+  "duct-transition-length": {
+    formula: "concentric length = ((large_dim_in - small_dim_in) / 2) / tan(slope_deg); eccentric (one flat side) length = (large_dim_in - small_dim_in) / tan(slope_deg); run-to-offset ratio = 1 / tan(slope_deg).",
+    edition: "Duct transition (reducer) length geometry, first-principles; SMACNA HVAC Duct Construction Standards keep the slope shallow to limit turbulence.",
+    freeAccess: "The transition length is a first-principles trigonometric identity (offset / tan slope); the end dimensions and the target slope come from the layout and the SMACNA standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "The length a duct size change needs to hold a target transition slope. SMACNA keeps the slope near 15 degrees per side (about a 4:1 run-to-offset ratio) to limit turbulence and pressure loss; a steeper transition is shorter but noisier and higher-drop. A concentric transition splits the size change to both sides (offset per side = (large - small)/2); an eccentric transition (one flat side) takes the full change on one side and needs twice the length for the same slope. On a rectangular duct the larger of the width and height changes sets the piece length. The SMACNA duct-construction standards and the system pressure loss govern the acceptable slope.",
+    assumptions: [
+      { name: "Slope per side", value: "SMACNA ~15 degrees per side (about 4:1); steeper is shorter but higher pressure loss", source: "SMACNA HVAC Duct Construction Standards" },
+      { name: "Concentric vs eccentric", value: "concentric splits the change both sides; eccentric takes it on one side and needs twice the length", source: "sheet-metal layout" },
+    ],
+  },
   "compression-ratio-refrig": {
     formula: "Compression ratio = absolute discharge / absolute suction = (discharge_psig + atmospheric) / (suction_psig + atmospheric); high-ratio flag above about 10:1.",
     edition: "Refrigeration compression ratio = absolute discharge pressure / absolute suction pressure - per the ASHRAE Handbook Refrigeration compressor-performance fundamentals, by name; first-principles.",

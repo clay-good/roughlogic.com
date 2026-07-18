@@ -179,6 +179,7 @@ const TOOL_MODULES = (() => {
   // at their size caps).
   declare("./calc-metalair.js", "METALAIR_RENDERERS", [
     "groove-weld-strength", "groove-weld-length-for-load", "duct-static-pressure-total", "compression-ratio-refrig",
+    "duct-transition-length",
   ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
     "pipe-sizing", "pex-homerun-takeoff", "friction-loss", "pipe-volume", "pump-sizing",

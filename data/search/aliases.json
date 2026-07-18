@@ -4947,6 +4947,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "duct transition length",
+      "target": "duct-transition-length",
+      "kind": "industry"
+    },
+    {
+      "term": "duct reducer length",
+      "target": "duct-transition-length",
+      "kind": "industry"
+    },
+    {
+      "term": "duct taper length",
+      "target": "duct-transition-length",
+      "kind": "industry"
+    },
+    {
+      "term": "transition slope",
+      "target": "duct-transition-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "concentric reducer duct",
+      "target": "duct-transition-length",
+      "kind": "adjacent"
+    },
+    {
       "term": "compression ratio hvac",
       "target": "compression-ratio-refrig",
       "kind": "industry"

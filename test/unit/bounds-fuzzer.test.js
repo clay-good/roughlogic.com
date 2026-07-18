@@ -26763,6 +26763,22 @@ test("bounds: spec-v910 computeKnurlBlankDiameter pins the teeth, blank diameter
   assert.ok("error" in _v910({ target_diameter_in: Infinity, knurl_tpi: 21 }));
 });
 
+import { computeDuctTransitionLength as _v916 } from "../../calc-metalair.js";
+
+test("bounds: spec-v916 computeDuctTransitionLength pins concentric/eccentric length, ratio, and error seams", () => {
+  const r = _v916({ large_dim_in: 20, small_dim_in: 12, slope_deg: 15 });
+  assert.ok(Math.abs(r.length_concentric_in - 14.9282) < 0.01); // ((20-12)/2)/tan15
+  assert.ok(Math.abs(r.length_eccentric_in - 29.8564) < 0.01); // (20-12)/tan15, exactly 2x
+  assert.ok(Math.abs(r.length_eccentric_in - 2 * r.length_concentric_in) < 1e-9);
+  assert.ok(Math.abs(r.slope_ratio - 3.7321) < 0.001); // 1/tan15
+  // Error seams: non-positive dims, large <= small, slope out of range, non-finite.
+  assert.ok("error" in _v916({ large_dim_in: 0, small_dim_in: 12, slope_deg: 15 }));
+  assert.ok("error" in _v916({ large_dim_in: 12, small_dim_in: 20, slope_deg: 15 }));
+  assert.ok("error" in _v916({ large_dim_in: 20, small_dim_in: 12, slope_deg: 0 }));
+  assert.ok("error" in _v916({ large_dim_in: 20, small_dim_in: 12, slope_deg: 90 }));
+  assert.ok("error" in _v916({ large_dim_in: Infinity, small_dim_in: 12, slope_deg: 15 }));
+});
+
 import { computeOutdoorResetRatio as _v915 } from "../../calc-hvacsystems.js";
 
 test("bounds: spec-v915 computeOutdoorResetRatio pins the reset ratio, supply target, clamp, and error seams", () => {

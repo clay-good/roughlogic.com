@@ -467,7 +467,7 @@ const _TILES = [
   ["pipe-cold-spring", "B"], ["raceway-expansion-fitting", "A"], ["pipe-spacing-rack", "G"],
 
   // v30 metal / air / refrigerant bench (deepens Groups E, C)
-  ["groove-weld-strength", "E"], ["groove-weld-length-for-load", "E"], ["duct-static-pressure-total", "C"], ["compression-ratio-refrig", "C"],
+  ["groove-weld-strength", "E"], ["groove-weld-length-for-load", "E"], ["duct-static-pressure-total", "C"], ["compression-ratio-refrig", "C"], ["duct-transition-length", "C"],
 
   // v65 Group Z (Rigging and Heavy Lift)
   ["cg-load-share", "Z"], ["crane-net-capacity", "Z"], ["crane-ground-bearing", "Z"],

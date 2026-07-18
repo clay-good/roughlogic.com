@@ -34502,6 +34502,56 @@
    }
   },
   {
+   "tile_id": "duct-transition-length",
+   "source_publisher": "duct transition length geometry (SMACNA)",
+   "source_title": "20 in to 12 in, 15 deg per side -> concentric 14.93 in, eccentric 29.86 in",
+   "source_edition_or_year": "spec-v916 worked example (machine-verified)",
+   "source_section_or_page": "concentric = ((20-12)/2)/tan(15) = 4/0.26795 = 14.93; eccentric = 8/0.26795 = 29.86",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "large_dim_in": 20,
+    "small_dim_in": 12,
+    "slope_deg": 15
+   },
+   "outputs": {
+    "length_concentric_in": {
+     "value": 14.93,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "length_eccentric_in": {
+     "value": 29.86,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-transition-length",
+   "source_publisher": "duct transition length geometry (SMACNA)",
+   "source_title": "cross-check: 30 in to 18 in, 15 deg per side -> concentric 22.39 in",
+   "source_edition_or_year": "spec-v916 worked example (machine-verified)",
+   "source_section_or_page": "concentric = ((30-18)/2)/tan(15) = 6/0.26795 = 22.39",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "large_dim_in": 30,
+    "small_dim_in": 18,
+    "slope_deg": 15
+   },
+   "outputs": {
+    "length_concentric_in": {
+     "value": 22.39,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "outdoor-reset-ratio",
    "source_publisher": "hydronic outdoor reset control (Idronics / tekmar)",
    "source_title": "180 F design supply at 0 F OA, 80 F min at 65 F no-heat, at 30 F OA -> 1.54 ratio, 133.8 F supply",
