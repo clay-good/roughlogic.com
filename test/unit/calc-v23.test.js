@@ -190,6 +190,12 @@ test("deck-ledger-fasteners: 16 ft ledger at 16 in OC -> 13 fasteners, within ta
   assert.strictEqual(r.fastener_count, 13);
   assert.strictEqual(r.pass, true);
 });
+test("deck-ledger-fasteners: NON-even 15 ft ledger at 16 in OC -> 13 (ceil), not 12 (floor undercount)", () => {
+  // 180 in / 16 in = 11.25 bays -> ceil 12 bays -> 13 fasteners (gaps 15 in <= 16).
+  // The prior floor formula gave 12 fasteners = 11 bays -> 16.4 in gap, over the IRC max.
+  const r = computeDeckLedgerFasteners({ joist_span_ft: 12, spacing_in: 16, ledger_length_ft: 15 });
+  assert.strictEqual(r.fastener_count, 13);
+});
 test("deck-ledger-fasteners: span over 18 ft flags out-of-table; non-positive inputs rejected", () => {
   assert.strictEqual(computeDeckLedgerFasteners({ joist_span_ft: 20, spacing_in: 16, ledger_length_ft: 16 }).pass, false);
   assert.ok("error" in computeDeckLedgerFasteners({ joist_span_ft: 12, spacing_in: 0, ledger_length_ft: 16 }));

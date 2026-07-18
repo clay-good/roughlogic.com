@@ -3447,8 +3447,13 @@ export function computeDeckLedgerFasteners({ joist_span_ft = 0, spacing_in = 0, 
   if (!(spacing > 0 && Number.isFinite(spacing))) return { error: "On-center spacing must be positive (in)." };
   if (!(len > 0 && Number.isFinite(len))) return { error: "Ledger length must be positive (ft)." };
   const within_table = span <= 18;
-  // One fastener every `spacing` inches plus the closing fastener at the end.
-  const fastener_count = Math.floor((len * 12) / spacing) + 1;
+  // Fasteners at both ends with no gap exceeding the on-center spacing:
+  // bays = ceil(length / spacing), fasteners = bays + 1 (the fence-post count,
+  // matching the sibling joist-hanger / metal-stud / sill-plate tiles). `floor`
+  // here undercounts by one on a non-even ledger (a 15 ft ledger at 16 in would
+  // give 12, implying a 16.4 in gap that exceeds the IRC max) -- it only matched
+  // when the length was an even multiple of the spacing.
+  const fastener_count = Math.ceil((len * 12) / spacing) + 1;
   return { spacing_in: spacing, fastener_count, joist_span_ft: span, within_table, pass: within_table, fastener: String(fastener || "") };
 }
 

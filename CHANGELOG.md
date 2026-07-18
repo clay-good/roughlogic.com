@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(construction): deck-ledger-fasteners undercounted by one on a non-even ledger (floor -> ceil); 2026-07-18
+
+- computeDeckLedgerFasteners counted `floor(length*12/spacing) + 1`, the same floor-vs-ceil member-count bug the
+  joist-hanger fix corrected. A fastener sits near each end with no gap over the on-center spacing, so the count is
+  the fence-post `ceil(length/spacing) + 1` (matching the sibling joist-hanger / metal-stud / sill-plate tiles). A
+  15 ft ledger at 16 in o.c. gave 12 fasteners = 11 bays -> a 16.4 in gap that exceeds the IRC R507.9 max; the correct
+  count is 13 (12 bays, 15 in gaps). It hid because the pinned example (16 ft / 16 in = exactly 12 bays) is an even
+  divisor where floor == ceil. Added a non-even 15 ft regression test. Found by a targeted count-correctness audit.
+
 ### fix(electrical): voltage-imbalance motor derate factor was ~100x under-scaled and non-conservative; 2026-07-18
 
 - computeVoltageImbalance computed `derate_factor = 1 - 2*(imbalance_percent/100)^2`, dividing the percentage by 100
