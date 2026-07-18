@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(realestate): pin closing-costs worked-example outputs (was inputs-only, unverified); 2026-07-18
+
+- The closing-costs worked-example fixture had `outputs: {}`, so the runner only checked the tile did not crash --
+  the computed answer was unverified (the same weak-fixture pattern behind this session's bug findings). A scan of all
+  2,069 worked-example rows found this was the last inputs-only fixture on a numeric compute (the other 17 are
+  argument-less reference cards with no scalar to pin). Re-derived and pinned total_low $6,158.90, total_mid
+  $11,124.79, total_high $19,759.66, and mid-percent 2.78%; verified the line items (transfer tax = 0.4% x $400k =
+  $1,600, 13 items) are correct. No code change -- the compute was already right; this closes the verification gap.
+
 ### feat(lint): add check-guard-only-inputs gate; fix the 3 dead inputs it caught; 2026-07-18
 
 - The existing check-dead-inputs gate catches a parameter that is never referenced, but misses the subtler "guard-only"

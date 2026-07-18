@@ -13245,7 +13245,7 @@
    "source_publisher": "CFPB Closing Disclosure (12 CFR Part 1026 Subpart C)",
    "source_title": "Estimator over the standard CFPB Loan Estimate / Closing Disclosure line items",
    "source_edition_or_year": "Current 12 CFR Part 1026 Appendix H (Forms H-24 / H-25)",
-   "source_section_or_page": "Worked example: $400k purchase / $320k loan / 0.4% transfer tax / 6.5% note -> 13 line items; mid total ~ $11,000",
+   "source_section_or_page": "Worked example: $400k purchase / $320k loan / 0.4% transfer tax / 6.5% note -> 13 line items; low $6,159 / mid $11,125 / high $19,760 (mid 2.78% of price); transfer tax = 0.4% x 400k = $1,600",
    "verified_by": "rl",
    "verified_on": "2026-05-15",
    "inputs": {
@@ -13254,7 +13254,12 @@
     "transfer_tax_rate_pct": 0.4,
     "note_rate_pct": 6.5
    },
-   "outputs": {}
+   "outputs": {
+    "total_low": { "value": 6158.9, "tolerance": { "abs": 1 } },
+    "total_mid": { "value": 11124.79, "tolerance": { "abs": 1 } },
+    "total_high": { "value": 19759.66, "tolerance": { "abs": 1 } },
+    "total_pct_of_price_mid": { "value": 2.781, "tolerance": { "abs": 0.01 } }
+   }
   },
   {
    "tile_id": "rental-worksheet",
