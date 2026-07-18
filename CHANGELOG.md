@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(fire): guard sprinkler K-factor flow and system demand with monotonicity; 2026-07-17
+
+- Added a fire-protection guard (life-safety): sprinkler discharge Q = K x sqrt(P) rises with the K-factor and pressure
+  (and matches the closed form), and sprinkler system demand (area x density) rises with the area of operation. A K-factor
+  or sqrt/term error understates the water demand and passes the single pinned example. Test-only.
+
 ### test(restoration): guard grains-removed and containment-air-balance with monotonicity; 2026-07-17
 
 - Added guards: water extraction (grains-removed) rises with airflow, grain depression, and run hours; containment

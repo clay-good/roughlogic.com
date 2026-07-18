@@ -11989,3 +11989,18 @@ test("monotonicity: grains-removed and containment-air-balance restoration compu
   assert.ok(cb({ leakage_area_in2: 24 }) > cb({}), "required CFM must rise with leakage area");
   assert.ok(cb({ target_dp_in_wc: 0.04 }) > cb({}), "required CFM must rise with target pressure differential");
 });
+
+// Monotonicity of fire-protection computes (life-safety). Sprinkler discharge
+// Q = K * sqrt(P) rises with the K-factor and with pressure; sprinkler system
+// demand (area * density) rises with the area of operation. A K-factor or
+// sqrt/term error understates the water demand -- unsafe -- and passes the
+// single pinned worked example.
+test("monotonicity: sprinkler K-factor flow and sprinkler system demand respond correctly to their inputs", async () => {
+  const f = await import("../../calc-fire.js");
+  const kf = (o) => f.computeSprinklerKFactor({ solve_for: "flow", k_factor: 5.6, pressure_psi: 7, flow_gpm: 0, ...o }).flow_gpm;
+  assert.ok(kf({ k_factor: 8.0 }) > kf({}), "sprinkler flow must rise with K-factor");
+  assert.ok(kf({ pressure_psi: 14 }) > kf({}), "sprinkler flow must rise with pressure");
+  assert.ok(Math.abs(kf({}) - 5.6 * Math.sqrt(7)) < 0.01, "flow must equal K * sqrt(P)");
+  const sd = (o) => f.computeSprinklerDensity({ area_of_operation_ft2: 1500, hazard_category: "ordinary_2", ...o }).total_gpm;
+  assert.ok(sd({ area_of_operation_ft2: 3000 }) > sd({}), "system demand must rise with area of operation");
+});
