@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fab): add vessel-head-volume tile (spec-v912); 2026-07-18
+
+- New Group E tile `vessel-head-volume` (Dished Tank / Vessel Head Volume) in calc-fab.js, beside barstock-cutlist. The
+  liquid volume of one dished tank head plus any straight-flange skirt: 2:1 semi-elliptical = pi D^3/24; hemispherical =
+  pi D^3/12; ASME flanged-and-dished (torispherical) ~ 0.0847 D^3; straight flange = pi/4 D^2 x length; gallons =
+  in^3/231. A 48 in ID 2:1 elliptical head holds 62.67 gal, a hemispherical head 125.34 gal, an F&D head ~40.5 gal. The
+  F&D figure is a standard-geometry approximation; the head maker's stamped crown/knuckle radii govern the exact volume.
+  Complements the flat-end tank-gauging tile. Home tile count 1,360 -> 1,361. Raised the tile-meta.js gzip cap
+  17500 -> 19000 (the _TILES registry crossed the cap at this sweep's 4th tile; one row per tile, lazy-loaded).
+
 ### feat(machining): add grinding-wheel-rpm tile (spec-v911); 2026-07-18
 
 - New Group K tile `grinding-wheel-rpm` (Grinding Wheel Surface Speed and Max Safe RPM) in calc-machining.js, beside

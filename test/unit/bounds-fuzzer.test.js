@@ -26763,6 +26763,29 @@ test("bounds: spec-v910 computeKnurlBlankDiameter pins the teeth, blank diameter
   assert.ok("error" in _v910({ target_diameter_in: Infinity, knurl_tpi: 21 }));
 });
 
+import { computeVesselHeadVolume as _v912 } from "../../calc-fab.js";
+
+test("bounds: spec-v912 computeVesselHeadVolume pins the head volumes by type, straight flange, and error seams", () => {
+  const e = _v912({ inside_diameter_in: 48, head_type: "elliptical", straight_flange_in: 0 });
+  assert.ok(Math.abs(e.head_volume_in3 - 14476.46) < 1); // pi*48^3/24
+  assert.ok(Math.abs(e.head_volume_gal - 62.67) < 0.02);
+  assert.ok(Math.abs(e.head_depth_in - 12) < 1e-9); // D/4 for 2:1 elliptical
+  const h = _v912({ inside_diameter_in: 48, head_type: "hemispherical", straight_flange_in: 0 });
+  assert.ok(Math.abs(h.head_volume_gal - 125.34) < 0.02); // pi*48^3/12 / 231
+  assert.ok(Math.abs(h.head_depth_in - 24) < 1e-9); // D/2
+  const f = _v912({ inside_diameter_in: 48, head_type: "fd", straight_flange_in: 0 });
+  assert.ok(Math.abs(f.head_volume_gal - 40.55) < 0.05); // 0.0847*48^3 / 231
+  // Straight flange adds a cylindrical skirt: pi/4*48^2*2 = 3619.1 in3 = 15.67 gal.
+  const sf = _v912({ inside_diameter_in: 48, head_type: "elliptical", straight_flange_in: 2 });
+  assert.ok(Math.abs(sf.total_volume_gal - (62.67 + 15.67)) < 0.05);
+  // Unknown head type falls back to elliptical (fuzzer-safe).
+  assert.ok(Math.abs(_v912({ inside_diameter_in: 48, head_type: "bogus" }).head_volume_gal - 62.67) < 0.02);
+  // Error seams: non-positive diameter, negative flange, non-finite.
+  assert.ok("error" in _v912({ inside_diameter_in: 0, head_type: "elliptical" }));
+  assert.ok("error" in _v912({ inside_diameter_in: 48, head_type: "elliptical", straight_flange_in: -1 }));
+  assert.ok("error" in _v912({ inside_diameter_in: Infinity, head_type: "elliptical" }));
+});
+
 import { computeBarstockCutlist as _v909 } from "../../calc-fab.js";
 
 test("bounds: spec-v909 computeBarstockCutlist pins the yield, drop, stick count, and error seams", () => {

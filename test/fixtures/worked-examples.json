@@ -34502,6 +34502,56 @@
    }
   },
   {
+   "tile_id": "vessel-head-volume",
+   "source_publisher": "dished-head volume geometry (first-principles)",
+   "source_title": "48 in ID 2:1 semi-elliptical head -> 14,477 in3 = 62.67 gal",
+   "source_edition_or_year": "spec-v912 worked example (machine-verified)",
+   "source_section_or_page": "V = pi*48^3/24 = 14476.5 in3; gal = 14476.5/231 = 62.67",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "inside_diameter_in": 48,
+    "head_type": "elliptical",
+    "straight_flange_in": 0
+   },
+   "outputs": {
+    "head_volume_in3": {
+     "value": 14476.5,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "head_volume_gal": {
+     "value": 62.67,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vessel-head-volume",
+   "source_publisher": "dished-head volume geometry (first-principles)",
+   "source_title": "cross-check: 48 in ID hemispherical head -> 125.34 gal; F&D ~ 40.5 gal",
+   "source_edition_or_year": "spec-v912 worked example (machine-verified)",
+   "source_section_or_page": "hemi V = pi*48^3/12 = 28952.9 in3 = 125.34 gal",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "inside_diameter_in": 48,
+    "head_type": "hemispherical",
+    "straight_flange_in": 0
+   },
+   "outputs": {
+    "head_volume_gal": {
+     "value": 125.34,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "barstock-cutlist",
    "source_publisher": "linear cut-list yield identity (first-principles)",
    "source_title": "20 ft (240 in) stick, 14.5 in pieces, 1/8 in kerf, 100 pieces -> 16 per stick, 6.13 in drop, 7 sticks",

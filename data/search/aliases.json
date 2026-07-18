@@ -1037,6 +1037,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "vessel head volume",
+      "target": "vessel-head-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "dished head volume",
+      "target": "vessel-head-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "tank head volume",
+      "target": "vessel-head-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "elliptical head volume",
+      "target": "vessel-head-volume",
+      "kind": "adjacent"
+    },
+    {
+      "term": "hemispherical head volume",
+      "target": "vessel-head-volume",
+      "kind": "adjacent"
+    },
+    {
       "term": "knurl blank diameter",
       "target": "knurl-blank-diameter",
       "kind": "industry"

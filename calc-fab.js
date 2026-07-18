@@ -1460,3 +1460,63 @@ function _v909renderBarstockCutlist(inputRegion, outputRegion, citationEl) {
   for (const f of [sl, pl, kf, pn]) f.input.addEventListener("input", update);
 }
 FAB_RENDERERS["barstock-cutlist"] = _v909renderBarstockCutlist;
+
+// ===================== spec-v912: dished tank / vessel head volume =====================
+const _VESSEL_HEAD_COEF = { elliptical: Math.PI / 24, fd: 0.0847, hemispherical: Math.PI / 12 };
+// dims: in { inside_diameter_in: L, head_type: dimensionless, straight_flange_in: L } out: { head_volume_in3: L^3, head_volume_gal: L^3, total_volume_gal: L^3, head_depth_in: L }
+export function computeVesselHeadVolume({ inside_diameter_in = 48, head_type = "elliptical", straight_flange_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(inside_diameter_in > 0)) return { error: "Inside diameter must be positive (in)." };
+  if (straight_flange_in < 0) return { error: "Straight flange cannot be negative (in)." };
+  const coef = _VESSEL_HEAD_COEF[head_type] || _VESSEL_HEAD_COEF.elliptical;
+  const D = inside_diameter_in;
+  // Head bulge volume: 2:1 elliptical = pi D^3/24; hemispherical = pi D^3/12; ASME F&D ~ 0.0847 D^3 (standard).
+  const head_volume_in3 = coef * D * D * D;
+  const straight_flange_in3 = Math.PI / 4 * D * D * straight_flange_in;
+  const total_in3 = head_volume_in3 + straight_flange_in3;
+  const head_volume_gal = head_volume_in3 / 231;
+  const total_volume_gal = total_in3 / 231;
+  // Inside head depth (dish depth): D/4 for 2:1 elliptical, D/2 for hemispherical, ~0.169 D for standard F&D.
+  const head_depth_in = head_type === "hemispherical" ? D / 2 : head_type === "fd" ? 0.169 * D : D / 4;
+  if (![head_volume_in3, head_volume_gal, total_volume_gal, head_depth_in].every(Number.isFinite)) return { error: "Head-volume math is not a finite value." };
+  return {
+    head_volume_in3,
+    head_volume_gal,
+    total_volume_gal,
+    head_depth_in,
+    note: "Volume of one dished head (the bulge past the tangent line), plus any straight-flange (cylindrical skirt) section. 2:1 semi-elliptical = pi D^3/24; hemispherical = pi D^3/12; ASME flanged-and-dished (torispherical) ~ 0.0847 D^3 for the standard crown = D, knuckle = 0.06 D geometry -- the F&D figure is an approximation, the exact volume needs the actual crown and knuckle radii. Two heads make a tank's end allowance; add the straight-shell volume separately. The head manufacturer's stamped dimensions govern.",
+  };
+}
+
+export const vesselHeadVolumeExample = { inputs: { inside_diameter_in: 48, head_type: "elliptical", straight_flange_in: 0 } };
+
+function _v912renderVesselHeadVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: dished-head volume geometry by name. 2:1 semi-elliptical head = pi D^3/24; hemispherical = pi D^3/12; ASME flanged-and-dished (torispherical) ~ 0.0847 D^3 (standard crown/knuckle, approximate); straight flange = pi/4 D^2 x length. US gallons = in^3 / 231.";
+  const dia = makeNumber("Inside diameter (in)", "vhv-dia", { step: "any", min: "0", value: "48" });
+  dia.input.value = "48";
+  const ht = makeSelect("Head type", "vhv-ht", [
+    { value: "elliptical", label: "2:1 semi-elliptical", selected: true },
+    { value: "fd", label: "ASME flanged & dished (approx)" },
+    { value: "hemispherical", label: "Hemispherical" },
+  ]);
+  const sf = makeNumber("Straight flange (in)", "vhv-sf", { step: "any", min: "0", value: "0" });
+  sf.input.value = "0";
+  for (const f of [dia, ht, sf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dia.input.value = "48"; ht.input.value = "elliptical"; sf.input.value = "0"; update(); });
+  const oHead = makeOutputLine(outputRegion, "One head volume", "vhv-out-head");
+  const oTotal = makeOutputLine(outputRegion, "Head + straight flange", "vhv-out-total");
+  const oDepth = makeOutputLine(outputRegion, "Inside dish depth", "vhv-out-depth");
+  const update = debounce(() => {
+    const r = computeVesselHeadVolume({
+      inside_diameter_in: dia.input.value === "" ? 48 : Number(dia.input.value), head_type: ht.input.value,
+      straight_flange_in: sf.input.value === "" ? 0 : Number(sf.input.value),
+    });
+    if (r.error) { oHead.textContent = r.error; oTotal.textContent = "-"; oDepth.textContent = "-"; return; }
+    oHead.textContent = fmt(r.head_volume_gal, 2) + " gal (" + fmt(r.head_volume_in3, 0) + " in3)";
+    oTotal.textContent = fmt(r.total_volume_gal, 2) + " gal";
+    oDepth.textContent = fmt(r.head_depth_in, 2) + " in";
+  }, DEBOUNCE_MS);
+  for (const f of [dia, sf]) f.input.addEventListener("input", update);
+  ht.input.addEventListener("change", update);
+}
+FAB_RENDERERS["vessel-head-volume"] = _v912renderVesselHeadVolume;

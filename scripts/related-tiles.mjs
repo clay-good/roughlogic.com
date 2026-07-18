@@ -793,6 +793,7 @@ const RELATED = {
   "multi-bend-flat-pattern": ["bend-allowance", "rolled-blank", "min-bend-radius", "cone-flat-pattern"],
   "coil-length": ["metal-weight", "multi-bend-flat-pattern", "rolled-blank"],
   "barstock-cutlist": ["coil-length", "metal-weight", "weld-cost-per-foot"],
+  "vessel-head-volume": ["rolled-blank", "metal-weight", "coil-length"],
   "speeds-feeds": ["bend-allowance", "weld-usage"],
   "weld-usage": ["bend-allowance", "speeds-feeds"],
   "shielding-gas-runtime": ["weld-usage", "weld-cost-per-foot", "weld-duty-cycle"],

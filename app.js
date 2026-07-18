@@ -772,6 +772,8 @@ const TOOL_MODULES = (() => {
     "coil-length",
     // spec-v909 bar / tube stock cut list yield (group E)
     "barstock-cutlist",
+    // spec-v912 dished tank / vessel head volume (group E)
+    "vessel-head-volume",
   ]);
   // Group G (cont.): the layout & shop-geometry bench, split out of
   // calc-fab.js into calc-layout.js (spec-v56) once calc-fab hit 96% of its

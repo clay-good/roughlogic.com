@@ -9809,6 +9809,17 @@ export const CITATIONS = {
       { name: "No end allowance", value: "stock end trim, facing, and clamping loss are not deducted", source: "scope of this tile" },
     ],
   },
+  "vessel-head-volume": {
+    formula: "2:1 semi-elliptical head V = pi D^3 / 24; hemispherical V = pi D^3 / 12; ASME flanged-and-dished (torispherical) V ~ 0.0847 D^3; straight flange V = pi/4 D^2 x length; gallons = in^3 / 231.",
+    edition: "Dished-head volume geometry, first-principles; the inside diameter, head type, and straight-flange length come from the head. The ASME F&D figure is a standard-geometry approximation.",
+    freeAccess: "The elliptical and hemispherical head volumes are exact first-principles solids of revolution; the F&D approximation and the head dimensions come from the head maker's stamp.",
+    governance: GOVERNANCE.general,
+    editionNote: "The bulge volume of one dished tank head past its tangent line. A 2:1 semi-elliptical head (depth D/4) is a half-ellipsoid, V = pi D^3 / 24; a hemispherical head (depth D/2) is a half-sphere, V = pi D^3 / 12; a standard ASME flanged-and-dished (torispherical) head is close to 0.0847 D^3 for the common crown = D, knuckle = 0.06 D geometry -- this is an approximation and the exact volume needs the actual crown and knuckle radii. Add the straight-flange (cylindrical skirt) section pi/4 D^2 x length. Two heads give a tank's end allowance on top of the straight-shell volume; the head manufacturer's stamped dimensions govern.",
+    assumptions: [
+      { name: "Head geometry", value: "elliptical = half-ellipsoid (pi D^3/24), hemispherical = half-sphere (pi D^3/12), both exact", source: "solid of revolution" },
+      { name: "F&D approximation", value: "standard flanged-and-dished ~ 0.0847 D^3; the actual crown and knuckle radii shift it", source: "ASME BPVC VIII head geometry" },
+    ],
+  },
   "weld-dilution": {
     formula: "dilution = A_base / (A_base + A_filler) x 100; filler_share = 100 - dilution.",
     edition: "The standard welding-metallurgy weld-dilution definition, by name.",
