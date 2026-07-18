@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(refrigeration): add compressor-volumetric-efficiency tile (spec-v978); 2026-07-18
+
+- New Group C tile `compressor-volumetric-efficiency` (Clearance Re-Expansion) in calc-refrigerant.js -- the gap
+  compressor-displacement names. VE = 1 + C - C x (Pd/Ps)^(1/n), C = clearance ratio (~0.03-0.06), n = polytropic
+  exponent (~1.11 R-22, 1.16 R-410A). A 0.045-clearance machine at a 300/70 = 4.3 ratio (R-22) is ~88%; a 400 psia head
+  drops it to ~83%. Clearance VE only -- superheat, leakage, and valve drop lower the actual VE further. The rated
+  capacity governs. Home count 1,426 -> 1,427.
+
 ### feat(gas): add wobbe-index tile (spec-v977); 2026-07-18
 
 - New Group B tile `wobbe-index` (Wobbe Index, Fuel-Gas Interchangeability) in calc-gas.js. WI = HHV / sqrt(specific

@@ -514,7 +514,7 @@ const _TILES = [
   ["deck-board-takeoff", "E"],
   ["shadow-length", "A"],
   ["engine-bmep", "K"],
-  ["compressor-displacement", "C"],
+  ["compressor-displacement", "C"], ["compressor-volumetric-efficiency", "C"],
   ["fresh-concrete-temp", "E"],
   ["glidepath-descent-rate", "K"],
   ["turn-radius-bank", "K"],

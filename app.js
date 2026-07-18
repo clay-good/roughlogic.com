@@ -353,6 +353,7 @@ const TOOL_MODULES = (() => {
     "walk-in-cooler-load", "product-pull-down-load", "product-pull-down-time", "evaporator-td-dtd",
     // spec-v586 liquid-line subcooling / flash gas
     "flash-gas-subcool", "compressor-displacement",
+    "compressor-volumetric-efficiency",
   ]);
   // spec-v81 cap-relief split: the cohesive spec-v16 "Group C expansion" batch
   // (seven first-principles HVAC engineering tiles) relocated out of calc-hvac.js

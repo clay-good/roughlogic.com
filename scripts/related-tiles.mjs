@@ -1188,6 +1188,7 @@ const RELATED = {
   "concrete-yield": ["ready-mix-concrete-order","fresh-concrete-temp","rebar-weight-takeoff"],
   "water-cement-ratio": ["concrete-yield","fresh-concrete-temp","fineness-modulus"],
   "compressor-displacement": ["refrigerant-mass-flow","recovery-cylinder","evaporator-td-dtd"],
+  "compressor-volumetric-efficiency": ["compressor-displacement","refrigerant-mass-flow","refrigeration-cop"],
   "fresh-concrete-temp": ["concrete-evaporation-rate","concrete-strength-gain","concrete-maturity"],
   "load-profitability": ["cost-per-mile","deadhead-percent","fuel-surcharge"],
   "fuel-surcharge": ["load-profitability","cost-per-mile","fuel-tax-ifta"],

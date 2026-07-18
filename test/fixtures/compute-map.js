@@ -936,6 +936,7 @@ export const COMPUTE_MAP = {
   "shadow-length": { module: "../../calc-solar.js", fn: "computeShadowLength" },
   "engine-bmep": { module: "../../calc-mechanic.js", fn: "computeEngineBmep" },
   "compressor-displacement": { module: "../../calc-refrigerant.js", fn: "computeCompressorDisplacement" },
+  "compressor-volumetric-efficiency": { module: "../../calc-refrigerant.js", fn: "computeCompressorVolumetricEfficiency" },
   "fresh-concrete-temp": { module: "../../calc-concrete.js", fn: "computeFreshConcreteTemp" },
   "glidepath-descent-rate": { module: "../../calc-mechanic.js", fn: "computeGlidepathDescentRate" },
   "turn-radius-bank": { module: "../../calc-mechanic.js", fn: "computeTurnRadiusBank" },

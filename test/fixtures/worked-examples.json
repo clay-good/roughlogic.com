@@ -25511,6 +25511,58 @@
    }
   },
   {
+   "tile_id": "compressor-volumetric-efficiency",
+   "source_publisher": "Reciprocating compressor clearance volumetric efficiency",
+   "source_title": "C 0.045, 70/300 psia (R-22 n 1.11) -> 4.29 compression ratio, 87.8% clearance VE",
+   "source_edition_or_year": "spec-v978 worked example (machine-verified)",
+   "source_section_or_page": "ratio = 300/70 = 4.286; VE = 100*(1+0.045-0.045*4.286^(1/1.11)) = 87.8%",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "clearance_ratio": 0.045,
+    "suction_pressure_psia": 70,
+    "discharge_pressure_psia": 300,
+    "polytropic_exponent": 1.11
+   },
+   "outputs": {
+    "compression_ratio": {
+     "value": 4.286,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "volumetric_efficiency_pct": {
+     "value": 87.8,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "compressor-volumetric-efficiency",
+   "source_publisher": "Reciprocating compressor clearance volumetric efficiency",
+   "source_title": "cross-check: a higher head (400 psia) raises the ratio to 5.71 and drops VE to 82.9%",
+   "source_edition_or_year": "spec-v978 worked example (machine-verified)",
+   "source_section_or_page": "ratio = 400/70 = 5.714; VE = 100*(1+0.045-0.045*5.714^(1/1.11)) = 82.86%",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "clearance_ratio": 0.045,
+    "suction_pressure_psia": 70,
+    "discharge_pressure_psia": 400,
+    "polytropic_exponent": 1.11
+   },
+   "outputs": {
+    "volumetric_efficiency_pct": {
+     "value": 82.86,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "compressor-displacement",
    "source_publisher": "Reciprocating compressor theoretical displacement (ASHRAE Refrigeration)",
    "source_title": "displacement = (pi/4) x bore^2 x stroke x cylinders x rpm / 1728",

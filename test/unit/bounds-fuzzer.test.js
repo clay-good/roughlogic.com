@@ -28142,3 +28142,24 @@ test("bounds: spec-v977 computeWobbeIndex pins WI = HHV/sqrt(SG) and error seams
   assert.ok("error" in _v977({ hhv_btu_ft3: 1000, specific_gravity: 0 }));
   assert.ok("error" in _v977({ hhv_btu_ft3: Infinity, specific_gravity: 0.60 }));
 });
+
+import { computeCompressorVolumetricEfficiency as _v978 } from "../../calc-refrigerant.js";
+
+test("bounds: spec-v978 computeCompressorVolumetricEfficiency pins clearance VE and error seams", () => {
+  const r = _v978({ clearance_ratio: 0.045, suction_pressure_psia: 70, discharge_pressure_psia: 300, polytropic_exponent: 1.11 });
+  assert.ok(Math.abs(r.compression_ratio - 4.28571) < 1e-4); // 300/70
+  assert.ok(Math.abs(r.volumetric_efficiency_pct - 87.80) < 0.1); // 100*(1+C-C*ratio^(1/n))
+  // A higher head pressure raises the ratio and lowers VE.
+  const highhead = _v978({ clearance_ratio: 0.045, suction_pressure_psia: 70, discharge_pressure_psia: 400, polytropic_exponent: 1.11 });
+  assert.ok(Math.abs(highhead.volumetric_efficiency_pct - 82.86) < 0.2);
+  assert.ok(highhead.volumetric_efficiency_pct < r.volumetric_efficiency_pct);
+  // A larger clearance ratio lowers VE; zero clearance gives 100%.
+  assert.ok(_v978({ clearance_ratio: 0.06, suction_pressure_psia: 70, discharge_pressure_psia: 300, polytropic_exponent: 1.11 }).volumetric_efficiency_pct < r.volumetric_efficiency_pct);
+  assert.ok(Math.abs(_v978({ clearance_ratio: 0, suction_pressure_psia: 70, discharge_pressure_psia: 300, polytropic_exponent: 1.11 }).volumetric_efficiency_pct - 100) < 1e-9);
+  // Error seams: negative clearance, non-positive suction, discharge <= suction, non-positive n, non-finite.
+  assert.ok("error" in _v978({ clearance_ratio: -0.01, suction_pressure_psia: 70, discharge_pressure_psia: 300, polytropic_exponent: 1.11 }));
+  assert.ok("error" in _v978({ clearance_ratio: 0.045, suction_pressure_psia: 0, discharge_pressure_psia: 300, polytropic_exponent: 1.11 }));
+  assert.ok("error" in _v978({ clearance_ratio: 0.045, suction_pressure_psia: 300, discharge_pressure_psia: 300, polytropic_exponent: 1.11 }));
+  assert.ok("error" in _v978({ clearance_ratio: 0.045, suction_pressure_psia: 70, discharge_pressure_psia: 300, polytropic_exponent: 0 }));
+  assert.ok("error" in _v978({ clearance_ratio: 0.045, suction_pressure_psia: Infinity, discharge_pressure_psia: 300, polytropic_exponent: 1.11 }));
+});

@@ -1097,3 +1097,51 @@ function _v861renderRefrigerantLinesetChargeAdjust(inputRegion, outputRegion, ci
   for (const f of [ll, fl, rt]) f.input.addEventListener("input", update);
 }
 REFRIGERANT_RENDERERS["refrigerant-lineset-charge-adjust"] = _v861renderRefrigerantLinesetChargeAdjust;
+
+// ===================== spec-v978: reciprocating compressor volumetric efficiency (clearance re-expansion) =====================
+// dims: in { args: dimensionless } out: { compression_ratio: dimensionless, volumetric_efficiency_pct: dimensionless }
+export function computeCompressorVolumetricEfficiency({ clearance_ratio = 0.045, suction_pressure_psia = 70, discharge_pressure_psia = 300, polytropic_exponent = 1.11 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(clearance_ratio >= 0)) return { error: "Clearance ratio cannot be negative." };
+  if (!(suction_pressure_psia > 0)) return { error: "Suction pressure must be positive (psia)." };
+  if (!(discharge_pressure_psia > suction_pressure_psia)) return { error: "Discharge pressure must exceed suction pressure (compression ratio > 1)." };
+  if (!(polytropic_exponent > 0)) return { error: "Polytropic exponent must be positive." };
+  // Clearance-volume re-expansion: the clearance gas re-expands on the suction stroke, cutting the intake.
+  const compression_ratio = discharge_pressure_psia / suction_pressure_psia;
+  const volumetric_efficiency_pct = 100 * (1 + clearance_ratio - clearance_ratio * Math.pow(compression_ratio, 1 / polytropic_exponent));
+  if (![compression_ratio, volumetric_efficiency_pct].every(Number.isFinite)) return { error: "Volumetric-efficiency math is not a finite value." };
+  return {
+    compression_ratio,
+    volumetric_efficiency_pct,
+    note: "The clearance (theoretical) volumetric efficiency of a reciprocating compressor -- the fraction of its swept volume it actually draws in as fresh suction vapor, the number the compressor-displacement tile names as a gap. At the top of the stroke a small CLEARANCE volume of high-pressure gas is trapped; on the down-stroke it re-expands and fills part of the cylinder before the suction valve can open, so less fresh vapor is admitted. VE = 1 + C - C x (Pd/Ps)^(1/n), where C is the clearance ratio (clearance volume / swept volume, typically 0.03-0.06), Pd/Ps is the absolute compression ratio, and n is the polytropic re-expansion exponent (about 1.11 for R-22, 1.16 for R-410A). A 0.045-clearance machine at a 300/70 = 4.3 compression ratio (R-22) has a clearance VE of about 88%; push the head pressure up (a dirty condenser, a hot day) and the compression ratio and the re-expansion loss BOTH rise, so VE and capacity fall -- the reason a compressor pumps far less on a high-ratio day. This is the CLEARANCE VE only; the real (actual) VE is lower still because suction-gas superheating, valve and ring leakage, and pressure drop across the valves each subtract a few more points, so field capacity runs below this. Multiply the swept displacement by VE for the actual pumped suction volume. A reciprocating-compressor model; the manufacturer's rated capacity at the operating condition governs.",
+  };
+}
+
+export const compressorVolumetricEfficiencyExample = { inputs: { clearance_ratio: 0.045, suction_pressure_psia: 70, discharge_pressure_psia: 300, polytropic_exponent: 1.11 } };
+
+function _v978renderCompressorVolumetricEfficiency(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: reciprocating compressor clearance volumetric efficiency (ASHRAE Refrigeration / Dossat clearance re-expansion), by name. VE = 1 + C - C x (Pd/Ps)^(1/n); C = clearance ratio (~0.03-0.06), n = polytropic exponent (~1.11 R-22, 1.16 R-410A). Clearance VE only -- superheat, leakage, and valve drop lower the actual VE further. The rated capacity at the operating condition governs.";
+  const cl = makeNumber("Clearance ratio (~0.03-0.06)", "cve-cl", { step: "any", min: "0", value: "0.045" });
+  cl.input.value = "0.045";
+  const sp = makeNumber("Suction pressure (psia)", "cve-sp", { step: "any", min: "0", value: "70" });
+  sp.input.value = "70";
+  const dp = makeNumber("Discharge pressure (psia)", "cve-dp", { step: "any", min: "0", value: "300" });
+  dp.input.value = "300";
+  const nn = makeNumber("Polytropic exponent n (~1.11 R-22)", "cve-nn", { step: "any", min: "0", value: "1.11" });
+  nn.input.value = "1.11";
+  for (const f of [cl, sp, dp, nn]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cl.input.value = "0.045"; sp.input.value = "70"; dp.input.value = "300"; nn.input.value = "1.11"; update(); });
+  const oC = makeOutputLine(outputRegion, "Compression ratio", "cve-out-c");
+  const oV = makeOutputLine(outputRegion, "Clearance volumetric efficiency", "cve-out-v");
+  const update = debounce(() => {
+    const r = computeCompressorVolumetricEfficiency({
+      clearance_ratio: cl.input.value === "" ? 0.045 : Number(cl.input.value), suction_pressure_psia: sp.input.value === "" ? 70 : Number(sp.input.value),
+      discharge_pressure_psia: dp.input.value === "" ? 300 : Number(dp.input.value), polytropic_exponent: nn.input.value === "" ? 1.11 : Number(nn.input.value),
+    });
+    if (r.error) { oC.textContent = r.error; oV.textContent = "-"; return; }
+    oC.textContent = fmt(r.compression_ratio, 2) + ":1";
+    oV.textContent = fmt(r.volumetric_efficiency_pct, 1) + "% (clearance only; actual is lower)";
+  }, DEBOUNCE_MS);
+  for (const f of [cl, sp, dp, nn]) f.input.addEventListener("input", update);
+}
+REFRIGERANT_RENDERERS["compressor-volumetric-efficiency"] = _v978renderCompressorVolumetricEfficiency;
