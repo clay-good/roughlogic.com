@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fire): add jockey-pump-sizing tile (spec-v939); 2026-07-18
+
+- New Group F tile `jockey-pump-sizing` (Jockey (Pressure-Maintenance) Pump Sizing, NFPA 20) in calc-firesprinkler.js,
+  beside drypipe-air-compressor. jockey flow = max(1% of fire pump, 1 gpm); staggered settings: jockey stop = churn +
+  min static; jockey start = stop - 10; fire-pump start = jockey start - 5. A 750 gpm fire pump at 120 psi churn / 50
+  psi static = 7.5 gpm jockey, 170/160/155 psi. A too-large jockey masks real flow. NFPA 20 and the AHJ govern. Raised
+  the calc-firesprinkler.js gzip cap 8500 -> 10000. Home count 1,387 -> 1,388.
+
 ### feat(rigging): add wire-rope-clips tile (spec-v938); 2026-07-18
 
 - New Group Z tile `wire-rope-clips` (Wire-Rope Clip Count and Spacing, OSHA Table H-2) in calc-rigging.js, beside

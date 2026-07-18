@@ -853,6 +853,7 @@ export const COMPUTE_MAP = {
   "soffit-ridge-vent-count": { module: "../../calc-finish.js", fn: "computeSoffitRidgeVentCount" },
   "smoke-detector-spacing-count": { module: "../../calc-firesprinkler.js", fn: "computeSmokeDetectorSpacingCount" },
   "drypipe-air-compressor": { module: "../../calc-firesprinkler.js", fn: "computeDrypipeAirCompressor" },
+  "jockey-pump-sizing": { module: "../../calc-firesprinkler.js", fn: "computeJockeyPumpSizing" },
   "curb-gutter-volume": { module: "../../calc-construction.js", fn: "computeCurbGutterVolume" },
   "rebar-chair-count": { module: "../../calc-construction.js", fn: "computeRebarChairCount" },
   "concrete-vibrator-spacing": { module: "../../calc-construction.js", fn: "computeConcreteVibratorSpacing" },

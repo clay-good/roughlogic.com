@@ -720,7 +720,7 @@ const TOOL_MODULES = (() => {
   // fire module sits near its size cap). All three KEEP group "F" (module
   // independent of group letter, per the v28/v30/v36/v39/v70..v82 precedent).
   declare("./calc-firesprinkler.js", "FIRESPRINKLER_RENDERERS", [
-    "fire-pump-curve", "sprinkler-system-demand", "sprinkler-protection-area-for-supply", "sprinkler-head-layout", "smoke-detector-spacing-count", "drypipe-air-compressor",
+    "fire-pump-curve", "sprinkler-system-demand", "sprinkler-protection-area-for-supply", "sprinkler-head-layout", "smoke-detector-spacing-count", "drypipe-air-compressor", "jockey-pump-sizing",
     "sprinkler-pressure-demand",
   ]);
   declare("./calc-references.js", "REFERENCE_RENDERERS", [

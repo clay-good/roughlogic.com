@@ -353,3 +353,44 @@ FIRESPRINKLER_RENDERERS["drypipe-air-compressor"] = _simpleRenderer({
   ],
   compute: computeDrypipeAirCompressor,
 });
+
+// ===================== spec-v939: jockey (pressure-maintenance) pump sizing =====================
+// dims: in { fire_pump_gpm: L^3 T^-1, churn_psi: dimensionless, min_static_psi: dimensionless } out: { jockey_gpm: L^3 T^-1, jockey_stop_psi: dimensionless, jockey_start_psi: dimensionless, fire_pump_start_psi: dimensionless }
+export function computeJockeyPumpSizing({ fire_pump_gpm = 750, churn_psi = 120, min_static_psi = 50 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fire_pump_gpm > 0)) return { error: "Fire pump rated flow must be positive (gpm)." };
+  if (!(churn_psi > 0)) return { error: "Churn (shutoff) pressure must be positive (psi)." };
+  if (min_static_psi < 0) return { error: "Minimum static pressure cannot be negative (psi)." };
+  // Jockey flow makes up allowable leakage; NFPA 20 practice sizes it near 1% of the fire pump, minimum 1 gpm.
+  const jockey_gpm = Math.max(0.01 * fire_pump_gpm, 1);
+  // Pressure settings so the jockey holds the system max and the fire pump starts only if the jockey cannot keep up.
+  const jockey_stop_psi = churn_psi + min_static_psi;
+  const jockey_start_psi = jockey_stop_psi - 10;
+  const fire_pump_start_psi = jockey_start_psi - 5;
+  if (![jockey_gpm, jockey_stop_psi, jockey_start_psi, fire_pump_start_psi].every(Number.isFinite)) return { error: "Jockey-pump math is not a finite value." };
+  return {
+    jockey_gpm,
+    jockey_stop_psi,
+    jockey_start_psi,
+    fire_pump_start_psi,
+    note: "Jockey (pressure-maintenance) pump sizing per NFPA 20 practice. The jockey makes up small allowable leakage so the fire pump does not start on every minor drop, so its flow is small -- about 1% of the fire pump's rated flow, at least 1 gpm; a 750 gpm fire pump takes about a 7.5 gpm jockey. Its head must exceed the system's maximum pressure. The pressure switches are STAGGERED so the jockey acts first: jockey stop = fire-pump churn (shutoff) pressure + the minimum static supply pressure (the highest the system sees); jockey start = jockey stop - about 10 psi; fire-pump start = jockey start - about 5 psi, so the fire pump only starts if the jockey cannot restore pressure. A too-large jockey masks a real flow and fails to start the fire pump on a fire. A settings guide; the NFPA 20 requirements, the pressure-switch settings, and the AHJ / stamped fire-pump design govern." ,
+  };
+}
+
+export const jockeyPumpSizingExample = { inputs: { fire_pump_gpm: 750, churn_psi: 120, min_static_psi: 50 } };
+
+FIRESPRINKLER_RENDERERS["jockey-pump-sizing"] = _simpleRenderer({
+  citation: "Citation: jockey (pressure-maintenance) pump sizing by name (NFPA 20). jockey flow ~1% of the fire pump (>= 1 gpm); jockey stop = churn + min static; jockey start = stop - 10; fire-pump start = jockey start - 5 (staggered). A settings guide; NFPA 20 and the AHJ govern.",
+  example: jockeyPumpSizingExample.inputs,
+  fields: [
+    { key: "fire_pump_gpm", label: "Fire pump rated flow (gpm)", kind: "number", default: 750 },
+    { key: "churn_psi", label: "Fire pump churn / shutoff pressure (psi)", kind: "number", default: 120 },
+    { key: "min_static_psi", label: "Minimum static supply pressure (psi)", kind: "number", default: 50 },
+  ],
+  outputs: [
+    { key: "q", id: "jps-out-q", label: "Jockey pump flow", value: (r) => fmt(r.jockey_gpm, 1) + " gpm" },
+    { key: "s", id: "jps-out-s", label: "Pressure settings (stop / start / fire-pump start)", value: (r) => fmt(r.jockey_stop_psi, 0) + " / " + fmt(r.jockey_start_psi, 0) + " / " + fmt(r.fire_pump_start_psi, 0) + " psi" },
+    { key: "n", id: "jps-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeJockeyPumpSizing,
+});

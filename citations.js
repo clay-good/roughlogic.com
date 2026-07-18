@@ -8607,6 +8607,17 @@ export const CITATIONS = {
       { name: "Listed device", value: "a listed automatic air-maintenance device is required, not a shop compressor; nitrogen mitigates corrosion", source: "NFPA 13 / practice" },
     ],
   },
+  "jockey-pump-sizing": {
+    formula: "jockey_gpm = max(0.01 x fire_pump_gpm, 1); jockey_stop_psi = churn_psi + min_static_psi; jockey_start_psi = jockey_stop_psi - 10; fire_pump_start_psi = jockey_start_psi - 5.",
+    edition: "NFPA 20 (Standard for the Installation of Stationary Pumps for Fire Protection) pressure-maintenance (jockey) pump practice, by name; the pressure-switch settings and the AHJ govern.",
+    freeAccess: "The jockey-flow rule of thumb and the staggered pressure-switch offsets are public NFPA 20 practice; the fire-pump rating, churn pressure, and static supply come from the pump data and the water supply.",
+    governance: GOVERNANCE.general,
+    editionNote: "A jockey (pressure-maintenance) pump keeps the fire-protection system topped off so the fire pump does not start on minor leakage. Its flow is intentionally small -- NFPA 20 practice sizes it near 1% of the fire pump's rated flow, at least 1 gpm -- and its head must exceed the system's maximum pressure. The pressure switches are STAGGERED so the jockey always acts first: the jockey stops at the fire-pump churn (shutoff) pressure plus the minimum static supply pressure (the highest pressure the system sees); the jockey starts about 10 psi below that; and the fire pump starts about another 5 psi below the jockey start, so the fire pump only runs if the jockey cannot restore pressure -- which means real flow. Sizing the jockey too large is a hazard: it can mask a genuine flow and keep the fire pump from starting on a fire. This is a settings guide; the NFPA 20 requirements, the actual pressure-switch settings and differentials, and the AHJ / the stamped fire-pump design govern.",
+    assumptions: [
+      { name: "Jockey flow", value: "~1% of the fire pump's rated flow, minimum 1 gpm; head above the system max pressure", source: "NFPA 20 practice" },
+      { name: "Staggered settings", value: "jockey stop = churn + min static; jockey start = stop - ~10; fire-pump start = jockey start - ~5", source: "NFPA 20 practice" },
+    ],
+  },
   "concrete-vibrator-spacing": {
     formula: "max_spacing_in = 1.5 x radius_of_action_in; edge_max_in = 0.75 x radius_of_action_in; insertions = ceil(lift_length_ft x 12 / max_spacing_in).",
     edition: "ACI 309 internal-vibration spacing rule by name (spacing = 1.5 R; edge <= 0.75 R); first-principles count arithmetic.",

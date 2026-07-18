@@ -19237,6 +19237,31 @@
       "kind": "industry"
     },
     {
+      "term": "jockey pump",
+      "target": "jockey-pump-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "pressure maintenance pump",
+      "target": "jockey-pump-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "jockey pump sizing",
+      "target": "jockey-pump-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "fire pump start pressure",
+      "target": "jockey-pump-sizing",
+      "kind": "adjacent"
+    },
+    {
+      "term": "jockey pump settings",
+      "target": "jockey-pump-sizing",
+      "kind": "adjacent"
+    },
+    {
       "term": "sprinkler air compressor",
       "target": "drypipe-air-compressor",
       "kind": "industry"

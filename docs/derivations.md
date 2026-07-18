@@ -2124,6 +2124,7 @@ cross-check.
 | calc-fire.js | `renderStandpipeFriction` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-firesprinkler.js | `computeDrypipeAirCompressor` | `{ dry_volume_gal = 400, normal_pressure_psig = 40, restore_minutes = 30 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeFirePumpCurve` | `{ rated_gpm = 0, rated_psi = 0, churn_psi = 0, overload_psi = 0 } = {}` | _ | _ | _ |
+| calc-firesprinkler.js | `computeJockeyPumpSizing` | `{ fire_pump_gpm = 750, churn_psi = 120, min_static_psi = 50 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSmokeDetectorSpacingCount` | `{ room_length_ft = 60, room_width_ft = 40, listed_spacing_ft = 30 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerHeadLayout` | `{ room_length = 0, room_width = 0, area_per_head = 130, max_spacing = 15 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerPressureDemand` | `{ q_head_gpm = 0, k_factor = 5.6, q_total_gpm = 0, pipe_id_in = 0, c_factor =...` | _ | _ | _ |
@@ -3048,7 +3049,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1634.
+Row count: 1635.
 
 <!-- END function-corpus-v14 -->
 
@@ -3983,7 +3984,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (47 tiles)
+### Group F Fire-ground (48 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4005,6 +4006,7 @@ per spec-v14 §13.1 second paragraph.
 | `hydrant-flow` | Hydrant Flow | NFPA; Q = 29.83 * c * d^2 * sqrt(P) = 29.83 * 0.9 * 6.25 * sqrt... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `iowa-rate-of-flow` | Iowa Rate-of-Flow (Volume Method) | Iowa rate-of-flow formula (Royer-Nels...; 20 x 30 x 10 ft room = 6,000 ft3 -> 30 gal to control, 60... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `iso-nff` | ISO Needed Fire Flow | ISO Public Protection Classification ...; 5000 ft^2 / 2 stories / Class 2 / occupancy 1.0 / 50 ft e... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `jockey-pump-sizing` | Jockey (Pressure-Maintenance) Pump Sizing (NFPA 20) | jockey pump sizing (NFPA 20); jockey = max(0.01*750, 1) = 7.5; stop = 120+50 = 170; sta... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ladder-pipe-reach` | Ladder Pipe Reach | IFSTA Pumping Apparatus / ladder-pipe...; 70 deg / 100 ft extension / smooth_bore_1_75 / 80 psi -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `master-stream` | Master Stream Reach | IFSTA / fire-stream engineering practice; smooth_bore_1_75 / 80 psi -> 90 ft typical reach; pure ta... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `nfa-fireground-flow` | National Fire Academy Quick Fire-Flow | National Fire Academy / IFSTA; 40 x 60 ft, 50% involved, 1 floor, 2 exposures -> base 40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4621,6 +4623,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1387. Fixture-covered or reference-cadence: 1387 / 1387.
+Tile count: 1388. Fixture-covered or reference-cadence: 1388 / 1388.
 
 <!-- END tile-index-v14 -->

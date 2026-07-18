@@ -35000,6 +35000,68 @@
    }
   },
   {
+   "tile_id": "jockey-pump-sizing",
+   "source_publisher": "jockey pump sizing (NFPA 20)",
+   "source_title": "750 gpm fire pump, 120 psi churn, 50 psi static -> 7.5 gpm jockey; stop 170 / start 160 / fp-start 155",
+   "source_edition_or_year": "spec-v939 worked example (machine-verified)",
+   "source_section_or_page": "jockey = max(0.01*750, 1) = 7.5; stop = 120+50 = 170; start = 160; fp start = 155",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "fire_pump_gpm": 750,
+    "churn_psi": 120,
+    "min_static_psi": 50
+   },
+   "outputs": {
+    "jockey_gpm": {
+     "value": 7.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "jockey_stop_psi": {
+     "value": 170,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "fire_pump_start_psi": {
+     "value": 155,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "jockey-pump-sizing",
+   "source_publisher": "jockey pump sizing (NFPA 20)",
+   "source_title": "cross-check: 500 gpm fire pump -> 5 gpm jockey; churn 100 + static 40 -> stop 140 / start 130 / fp 125",
+   "source_edition_or_year": "spec-v939 worked example (machine-verified)",
+   "source_section_or_page": "jockey = 0.01*500 = 5; stop = 100+40 = 140; start = 130; fp start = 125",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "fire_pump_gpm": 500,
+    "churn_psi": 100,
+    "min_static_psi": 40
+   },
+   "outputs": {
+    "jockey_gpm": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "jockey_start_psi": {
+     "value": 130,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "drypipe-air-compressor",
    "source_publisher": "dry-pipe air compressor sizing (NFPA 13)",
    "source_title": "400 gal dry system to 40 psi in 30 min -> 53.5 ft3, 4.85 CFM free air",

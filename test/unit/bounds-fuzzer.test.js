@@ -26926,6 +26926,26 @@ test("bounds: spec-v925 computeRotaryPhaseConverter pins the idler size, governi
   assert.ok("error" in _v925({ largest_motor_hp: Infinity, total_running_hp: 15 }));
 });
 
+import { computeJockeyPumpSizing as _v939 } from "../../calc-firesprinkler.js";
+
+test("bounds: spec-v939 computeJockeyPumpSizing pins the jockey flow, staggered settings, and error seams", () => {
+  const r = _v939({ fire_pump_gpm: 750, churn_psi: 120, min_static_psi: 50 });
+  assert.equal(r.jockey_gpm, 7.5); // max(0.01*750, 1)
+  assert.equal(r.jockey_stop_psi, 170); // 120 + 50
+  assert.equal(r.jockey_start_psi, 160); // stop - 10
+  assert.equal(r.fire_pump_start_psi, 155); // start - 5
+  // A small pump floors the jockey at 1 gpm.
+  assert.equal(_v939({ fire_pump_gpm: 50, churn_psi: 100, min_static_psi: 40 }).jockey_gpm, 1); // max(0.5, 1)
+  const b = _v939({ fire_pump_gpm: 500, churn_psi: 100, min_static_psi: 40 });
+  assert.equal(b.jockey_gpm, 5);
+  assert.equal(b.jockey_start_psi, 130);
+  // Error seams: non-positive flow / churn, negative static, non-finite.
+  assert.ok("error" in _v939({ fire_pump_gpm: 0, churn_psi: 120, min_static_psi: 50 }));
+  assert.ok("error" in _v939({ fire_pump_gpm: 750, churn_psi: 0, min_static_psi: 50 }));
+  assert.ok("error" in _v939({ fire_pump_gpm: 750, churn_psi: 120, min_static_psi: -1 }));
+  assert.ok("error" in _v939({ fire_pump_gpm: Infinity, churn_psi: 120, min_static_psi: 50 }));
+});
+
 import { computeDrypipeAirCompressor as _v934 } from "../../calc-firesprinkler.js";
 
 test("bounds: spec-v934 computeDrypipeAirCompressor pins the volume, free-air CFM, and error seams", () => {
