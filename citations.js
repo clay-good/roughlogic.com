@@ -10138,6 +10138,17 @@ export const CITATIONS = {
       { name: "Method", value: "elastic (vector) method, conservative vs instantaneous-center", source: "AISC Manual Part 8" },
     ],
   },
+  "bend-springback": {
+    formula: "x = tool_radius x yield_strength / (modulus x thickness); springback factor Ks = Ri/Rf = 4 x^3 - 3 x + 1; released (final) radius Rf = tool_radius / Ks. E ~ 29-30e6 psi steel, ~10e6 aluminum.",
+    edition: "Sheet-metal bend-springback relation (Machinery's Handbook / ASM Metals Handbook forming), by name; the material certificate, the tooling method, and a test bend govern the actual overbend.",
+    freeAccess: "The springback cubic is a published forming relation; the tool radius, thickness, yield strength, and modulus come from the setup and the material certificate.",
+    governance: GOVERNANCE.general,
+    editionNote: "When a bent sheet is released from the die, the elastic part of the strain recovers and the bend springs OPEN -- the radius increases and the included angle grows. The Machinery's Handbook (and ASM Metals Handbook) springback relation expresses this as a springback factor Ks = Ri/Rf = 4 x^3 - 3 x + 1, where x = Ri x yield strength / (E x thickness) is a dimensionless measure of how much elastic strain the bend stores: Ri is the inside (tool) radius, E the elastic modulus (about 29-30 million psi for steel, 10 million for aluminum), and the yield strength and thickness from the material. Because Ks is slightly less than 1, the released radius Rf = Ri / Ks is larger than the radius held in the tooling, so the operator must OVERBEND -- form to a tighter radius and a smaller angle than the target so the part relaxes onto it. A 1-inch tool radius in 0.1-inch, 50-ksi steel gives Ks = 0.948, so the radius springs from 1.00 to 1.05 inches, about 5%; a higher-yield or aluminum part (a larger yield/E ratio) springs back more, and a thicker part less. This radius relation captures the elastic recovery, but the exact overbend a shop dials in also depends strongly on the tooling method -- air bending springs back the most, bottoming less, and coining (which plastically sets the radius under high tonnage) nearly eliminates springback -- as well as the grain direction and the press, so the first article is always checked with a protractor and radius gauge and the setup trimmed. A screen; the material certificate, the tooling method, and a test bend govern the actual overbend.",
+    assumptions: [
+      { name: "Springback cubic", value: "Ks = Ri/Rf = 4 x^3 - 3 x + 1, x = Ri x yield / (E x thickness); released radius Rf = Ri/Ks > Ri (overbend needed)", source: "Machinery's Handbook / ASM Metals Handbook" },
+      { name: "Tooling-dependent", value: "air bend springs most, bottoming less, coining nearly none; grain direction and press also matter; a test bend sets the final overbend", source: "press-brake practice" },
+    ],
+  },
   "min-bend-radius": {
     formula: "Radius-to-thickness multiple R/T = 50 / %elongation - 1; minimum inside radius R_min = thickness x R/T.",
     edition: "Minimum inside bend radius from ductility - the published forming-limit relation R_min = T x (50 / %elongation - 1), by name; public domain.",

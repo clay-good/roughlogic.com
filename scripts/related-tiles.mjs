@@ -818,6 +818,7 @@ const RELATED = {
   "weld-transverse-shrinkage": ["weld-metal-volume", "weld-heat-input", "metal-weight"],
   "weld-group-eccentric": ["fillet-weld-strength", "groove-weld-strength", "flange-bolt-torque"],
   "min-bend-radius": ["bend-allowance", "rolled-blank", "press-brake-tonnage"],
+  "bend-springback": ["min-bend-radius", "bend-allowance", "press-brake-tonnage"],
   "shrink-fit": ["metal-weight", "flange-bolt-torque", "conduit-thermal-expansion"],
   "spindle-power-torque": ["material-removal-rate", "cutting-speed-rpm", "machining-time"],
   "spindle-max-mrr": ["spindle-power-torque", "material-removal-rate", "machining-time", "cutting-speed-rpm"],

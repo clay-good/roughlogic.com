@@ -27799,3 +27799,26 @@ test("bounds: spec-v961 computePidTuningZieglerNichols pins the ZN closed-loop r
   assert.ok("error" in _v961({ ultimate_gain_ku: 4, ultimate_period_tu_sec: 0 }));
   assert.ok("error" in _v961({ ultimate_gain_ku: Infinity, ultimate_period_tu_sec: 2 }));
 });
+
+import { computeBendSpringback as _v962 } from "../../calc-fab.js";
+
+test("bounds: spec-v962 computeBendSpringback pins the Machinery's Handbook springback and error seams", () => {
+  const r = _v962({ tool_radius_in: 1.0, thickness_in: 0.1, yield_strength_psi: 50000, modulus_psi: 29000000 });
+  assert.ok(Math.abs(r.springback_factor_ks - 0.948313) < 1e-4); // 4x^3-3x+1, x=0.017241
+  assert.ok(Math.abs(r.final_radius_in - 1.05450) < 1e-3); // 1/Ks
+  assert.ok(r.final_radius_in > 1.0); // springback opens the radius
+  // Aluminum (lower E, so larger x) springs back more (smaller Ks, larger final radius).
+  const al = _v962({ tool_radius_in: 1.0, thickness_in: 0.1, yield_strength_psi: 40000, modulus_psi: 10000000 });
+  assert.ok(Math.abs(al.springback_factor_ks - 0.880256) < 1e-4);
+  assert.ok(al.springback_factor_ks < r.springback_factor_ks);
+  assert.ok(al.final_radius_in > r.final_radius_in);
+  // A thicker part springs back less (Ks closer to 1).
+  assert.ok(_v962({ tool_radius_in: 1.0, thickness_in: 0.25, yield_strength_psi: 50000, modulus_psi: 29000000 }).springback_factor_ks > r.springback_factor_ks);
+  // Error seams: non-positive any input, out-of-range (Ks <= 0), non-finite.
+  assert.ok("error" in _v962({ tool_radius_in: 0, thickness_in: 0.1, yield_strength_psi: 50000, modulus_psi: 29000000 }));
+  assert.ok("error" in _v962({ tool_radius_in: 1.0, thickness_in: 0, yield_strength_psi: 50000, modulus_psi: 29000000 }));
+  assert.ok("error" in _v962({ tool_radius_in: 1.0, thickness_in: 0.1, yield_strength_psi: 0, modulus_psi: 29000000 }));
+  assert.ok("error" in _v962({ tool_radius_in: 1.0, thickness_in: 0.1, yield_strength_psi: 50000, modulus_psi: 0 }));
+  assert.ok("error" in _v962({ tool_radius_in: 100, thickness_in: 0.1, yield_strength_psi: 50000, modulus_psi: 29000000 })); // x huge -> Ks <= 0
+  assert.ok("error" in _v962({ tool_radius_in: Infinity, thickness_in: 0.1, yield_strength_psi: 50000, modulus_psi: 29000000 }));
+});

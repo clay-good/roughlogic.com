@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fabrication): add bend-springback tile (spec-v962); 2026-07-18
+
+- New Group E tile `bend-springback` (Sheet-Metal Bend Springback) in calc-fab.js. The Machinery's Handbook relation
+  Ks = Ri/Rf = 4 x^3 - 3 x + 1, x = Ri x yield / (E x thickness). The released radius Rf = Ri/Ks is larger than the die
+  radius, so the operator overbends. 1 in tool radius in 0.1 in, 50 ksi steel = Ks 0.948, radius springs 1.0 -> 1.05 in
+  (~5%); aluminum springs much more. Valid for x < 0.5; coining nearly eliminates springback. A test bend governs the
+  overbend. Home count 1,410 -> 1,411.
+
 ### feat(low-voltage): add pid-tuning-ziegler-nichols tile (spec-v961); 2026-07-18
 
 - New Group A tile `pid-tuning-ziegler-nichols` (PID Loop Tuning, Ziegler-Nichols Closed-Loop) in calc-lowvoltage.js.

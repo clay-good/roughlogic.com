@@ -2014,6 +2014,7 @@ cross-check.
 | calc-electrical.js | `renderVoltageImbalance` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-electrical.js | `renderWireAmpacity` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-fab.js | `computeBarstockCutlist` | `{ stock_length_in = 240, piece_length_in = 14.5, kerf_in = 0.125, pieces_need...` | _ | _ | _ |
+| calc-fab.js | `computeBendSpringback` | `{ tool_radius_in = 1.0, thickness_in = 0.1, yield_strength_psi = 50000, modul...` | _ | _ | _ |
 | calc-fab.js | `computeCoilLength` | `{ outside_diameter_in = 0, inside_diameter_in = 0, material_thickness_in = 0 ...` | _ | _ | _ |
 | calc-fab.js | `computeConduit90Stub` | `{ mode = "stub-up", height_in = 0, deduct_in = 0, back_to_back_in = 0, radius...` | _ | _ | _ |
 | calc-fab.js | `computeConduitOffset` | `{ offset_in = 0, angle_deg = 0 } = {}` | _ | _ | _ |
@@ -3071,7 +3072,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1657.
+Row count: 1658.
 
 <!-- END function-corpus-v14 -->
 
@@ -3659,7 +3660,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (359 tiles)
+### Group E Construction (360 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3685,6 +3686,7 @@ per spec-v14 §13.1 second paragraph.
 | `beam-loading` | Beam Loading | Project (first-principles); 200 plf / 12 ft / E = 1.6e6 psi / 4x10 -> M = 3600 lb-ft,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `beam-reactions` | Simple-Span Beam Reactions and Max Moment | Statics / AISC simple-beam diagrams; L 16 ft, w 200 plf -> R 1600 lb, M_max 6400 ft-lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bend-allowance` | Sheet Metal Bend Allowance | Project (first-principles); BA = (pi/180) * 90 * (0.125 + 0.44 * 0.06) = 0.2378; setb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `bend-springback` | Sheet-Metal Bend Springback | Machinery's Handbook sheet-metal spri...; x = 1*50000/(29e6*0.1) = 0.017241; Ks = 4x^3-3x+1 = 0.948... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `board-footage` | Lumber Board Footage | Project (first-principles); Standard lumber-yard board-foot identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bolt-group-eccentric` | Eccentric Bolt Group in Shear (Elastic Vector Method) | AISC Manual Part 7 (elastic vector me...; spec-v266 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bolt-shear-bearing` | Bolt Shear + Bearing / Tearout Strength (AISC 360 J3) | AISC 360-22 J3.6 / J3.10; spec-v267 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4667,6 +4669,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1410. Fixture-covered or reference-cadence: 1410 / 1410.
+Tile count: 1411. Fixture-covered or reference-cadence: 1411 / 1411.
 
 <!-- END tile-index-v14 -->

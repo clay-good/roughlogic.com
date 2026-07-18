@@ -789,6 +789,7 @@ const TOOL_MODULES = (() => {
     // v129..v134 metal-trades batch: weld estimating + plate forming (group E), shrink fit (group G)
     "weld-metal-volume", "wire-feed-deposition", "wire-feed-speed-for-deposition", "weld-transverse-shrinkage",
     "weld-group-eccentric", "min-bend-radius", "shrink-fit",
+    "bend-springback",
     "weld-dilution", "weld-passes-arc-time", "weld-travel-speed",
     // spec-v802 coil / roll stock length (group E)
     "coil-length",

@@ -414,7 +414,7 @@ const _TILES = [
 
   // v129..v134 metal-trades batch (calc-fab.js): weld estimating + plate forming (E) + shrink fit (G)
   ["weld-metal-volume", "E"], ["wire-feed-deposition", "E"], ["wire-feed-speed-for-deposition", "E"], ["weld-transverse-shrinkage", "E"],
-  ["weld-group-eccentric", "E"], ["min-bend-radius", "E"], ["shrink-fit", "G"],
+  ["weld-group-eccentric", "E"], ["min-bend-radius", "E"], ["bend-springback", "E"], ["shrink-fit", "G"],
   ["weld-dilution", "E"], ["weld-passes-arc-time", "E"], ["weld-travel-speed", "E"],
   // spec-v802 coil / roll stock length (calc-fab.js, group E)
   ["coil-length", "E"], ["barstock-cutlist", "E"], ["vessel-head-volume", "E"],

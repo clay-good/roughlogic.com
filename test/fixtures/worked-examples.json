@@ -34187,6 +34187,58 @@
    }
   },
   {
+   "tile_id": "bend-springback",
+   "source_publisher": "Machinery's Handbook sheet-metal springback",
+   "source_title": "1 in tool radius, 0.1 in, 50 ksi steel (E 29e6) -> Ks 0.9483, released radius 1.0545 in",
+   "source_edition_or_year": "spec-v962 worked example (machine-verified)",
+   "source_section_or_page": "x = 1*50000/(29e6*0.1) = 0.017241; Ks = 4x^3-3x+1 = 0.94831; Rf = 1/0.94831 = 1.0545",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "tool_radius_in": 1.0,
+    "thickness_in": 0.1,
+    "yield_strength_psi": 50000,
+    "modulus_psi": 29000000
+   },
+   "outputs": {
+    "springback_factor_ks": {
+     "value": 0.9483,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "final_radius_in": {
+     "value": 1.0545,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bend-springback",
+   "source_publisher": "Machinery's Handbook sheet-metal springback",
+   "source_title": "cross-check: aluminum (E 10e6, 40 ksi) springs back much more, Ks 0.858",
+   "source_edition_or_year": "spec-v962 worked example (machine-verified)",
+   "source_section_or_page": "x = 1*40000/(10e6*0.1) = 0.04; Ks = 4*0.04^3 - 3*0.04 + 1 = 0.880256",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "tool_radius_in": 1.0,
+    "thickness_in": 0.1,
+    "yield_strength_psi": 40000,
+    "modulus_psi": 10000000
+   },
+   "outputs": {
+    "springback_factor_ks": {
+     "value": 0.8803,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "min-bend-radius",
    "source_publisher": "published forming-limit relation",
    "source_title": "R/T = 50 / %elongation - 1; R_min = thickness x R/T",

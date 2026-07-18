@@ -482,6 +482,7 @@ export const COMPUTE_MAP = {
   "weld-transverse-shrinkage": { module: "../../calc-fab.js", fn: "computeWeldTransverseShrinkage" },
   "weld-group-eccentric": { module: "../../calc-fab.js", fn: "computeWeldGroupEccentric" },
   "min-bend-radius": { module: "../../calc-fab.js", fn: "computeMinBendRadius" },
+  "bend-springback": { module: "../../calc-fab.js", fn: "computeBendSpringback" },
   "shrink-fit": { module: "../../calc-fab.js", fn: "computeShrinkFit" },
   "weld-dilution": { module: "../../calc-fab.js", fn: "computeWeldDilution" },
   "weld-passes-arc-time": { module: "../../calc-fab.js", fn: "computeWeldPassesArcTime" },

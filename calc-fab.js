@@ -1520,3 +1520,58 @@ function _v912renderVesselHeadVolume(inputRegion, outputRegion, citationEl) {
   ht.input.addEventListener("change", update);
 }
 FAB_RENDERERS["vessel-head-volume"] = _v912renderVesselHeadVolume;
+
+// ===================== spec-v962: sheet-metal bend springback =====================
+// dims: in { args: dimensionless } out: { springback_factor_ks: dimensionless, final_radius_in: dimensionless }
+export function computeBendSpringback({ tool_radius_in = 1.0, thickness_in = 0.1, yield_strength_psi = 50000, modulus_psi = 29000000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tool_radius_in > 0)) return { error: "Tool (inside) bend radius must be positive (in)." };
+  if (!(thickness_in > 0)) return { error: "Material thickness must be positive (in)." };
+  if (!(yield_strength_psi > 0)) return { error: "Yield strength must be positive (psi)." };
+  if (!(modulus_psi > 0)) return { error: "Elastic modulus must be positive (psi)." };
+  // Machinery's Handbook springback: Ks = Ri/Rf = 4 x^3 - 3 x + 1, with x = Ri x yield / (E x thickness).
+  const x = tool_radius_in * yield_strength_psi / (modulus_psi * thickness_in);
+  // 4x^3-3x+1 = (2x-1)^2 (x+1), so it is only monotone (and physical) for x < 0.5; beyond that the springback
+  // formula is out of its valid small-elastic-strain range.
+  if (!(x < 0.5)) return { error: "Springback relation is out of range (x = Ri x yield / (E x thickness) must be < 0.5; the radius is too large or the material too springy for this thickness)." };
+  const springback_factor_ks = 4 * Math.pow(x, 3) - 3 * x + 1;
+  if (!(springback_factor_ks > 0)) return { error: "Springback relation is out of range (no positive springback factor)." };
+  const final_radius_in = tool_radius_in / springback_factor_ks;
+  const radius_growth_pct = 100 * (final_radius_in - tool_radius_in) / tool_radius_in;
+  if (![springback_factor_ks, final_radius_in].every(Number.isFinite)) return { error: "Springback math is not a finite value." };
+  return {
+    springback_factor_ks,
+    final_radius_in,
+    radius_growth_pct,
+    note: "How much a sheet-metal bend springs OPEN when the tooling is released, by the Machinery's Handbook springback relation Ks = Ri/Rf = 4 x^3 - 3 x + 1, where x = Ri x yield strength / (E x thickness), Ri is the tool (inside) radius, and E is the elastic modulus (~29-30e6 psi steel, ~10e6 aluminum). Elastic recovery makes the released radius Rf = Ri / Ks LARGER than the radius held in the die, and the included angle opens the same way, so the brake operator must OVERBEND -- form to a tighter radius and a smaller angle than the target so the part relaxes onto it. A 1 in tool radius in 0.1 in, 50 ksi steel gives Ks 0.948, so the radius springs from 1.0 to 1.05 in (about 5%); a high-yield or aluminum part (higher yield/E) springs back more, a thicker part less. The exact overbend also depends on the tooling (air bend vs bottoming vs coining -- coining sets the radius and nearly eliminates springback), the grain direction, and the press, so the first article is confirmed against a protractor and radius gauge and the setup trimmed. A screen; the material certificate, the tooling method, and a test bend govern the actual overbend.",
+  };
+}
+
+export const bendSpringbackExample = { inputs: { tool_radius_in: 1.0, thickness_in: 0.1, yield_strength_psi: 50000, modulus_psi: 29000000 } };
+
+function _v962renderBendSpringback(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: sheet-metal bend springback (Machinery's Handbook), by name. Ks = Ri/Rf = 4 x^3 - 3 x + 1, x = Ri x yield / (E x thickness); released radius Rf = Ri/Ks (larger than the tool radius). E ~ 29-30e6 psi steel, ~10e6 aluminum. Air-bend basis; coining nearly eliminates springback. The material cert, tooling method, and a test bend govern the overbend.";
+  const rr = makeNumber("Tool (inside) bend radius (in)", "bsb-rr", { step: "any", min: "0", value: "1.0" });
+  rr.input.value = "1.0";
+  const tt = makeNumber("Material thickness (in)", "bsb-tt", { step: "any", min: "0", value: "0.1" });
+  tt.input.value = "0.1";
+  const yy = makeNumber("Yield strength (psi)", "bsb-yy", { step: "any", min: "0", value: "50000" });
+  yy.input.value = "50000";
+  const ee = makeNumber("Elastic modulus (psi, ~29e6 steel)", "bsb-ee", { step: "any", min: "0", value: "29000000" });
+  ee.input.value = "29000000";
+  for (const f of [rr, tt, yy, ee]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { rr.input.value = "1.0"; tt.input.value = "0.1"; yy.input.value = "50000"; ee.input.value = "29000000"; update(); });
+  const oK = makeOutputLine(outputRegion, "Springback factor Ks", "bsb-out-k");
+  const oR = makeOutputLine(outputRegion, "Released (final) radius", "bsb-out-r");
+  const update = debounce(() => {
+    const r = computeBendSpringback({
+      tool_radius_in: rr.input.value === "" ? 1.0 : Number(rr.input.value), thickness_in: tt.input.value === "" ? 0.1 : Number(tt.input.value),
+      yield_strength_psi: yy.input.value === "" ? 50000 : Number(yy.input.value), modulus_psi: ee.input.value === "" ? 29000000 : Number(ee.input.value),
+    });
+    if (r.error) { oK.textContent = r.error; oR.textContent = "-"; return; }
+    oK.textContent = fmt(r.springback_factor_ks, 4) + " (Ri/Rf)";
+    oR.textContent = fmt(r.final_radius_in, 4) + " in (from " + fmt(Number(rr.input.value) || 1, 3) + " in tool, +" + fmt(r.radius_growth_pct, 1) + "%)";
+  }, DEBOUNCE_MS);
+  for (const f of [rr, tt, yy, ee]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["bend-springback"] = _v962renderBendSpringback;
