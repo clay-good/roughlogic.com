@@ -518,6 +518,14 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - Shard layout: `{ aliases: [{ term, target, kind }] }` where `kind` is `industry`, `redirect`, `adjacent`, or (since spec-v590) `question`.
 - Privacy: No runtime fetch. Per spec-v10 §13.3 the data is bounded to fit lazy-loaded after first keystroke. No personalization, no telemetry.
 
+### data/search/aliases-*.json (spec-v590 per-group split)
+
+- Source: Generated runtime shards, one per tile group, derived from `data/search/aliases.json` (the authoring master above) by `scripts/build-alias-shards.mjs`. Same rows, keyed by the target tile's group; no independent content.
+- License: MIT-licensed creative work, identical to the master.
+- Cadence: Regenerated whenever the master or the group roster changes; `node scripts/build-alias-shards.mjs --check` fails CI on any drift.
+- Shard layout: `{ _updated, aliases: [{ term, target, kind }] }`, row shape identical to the master.
+- Privacy: Lazy parallel fetch on first search interaction (the master is never fetched at runtime). No personalization, no telemetry.
+
 ### data/search/slots.json (spec-v591)
 
 - Source: Original project-authored quantity-slot tables mapping unit spellings typed in a search query to a tile's own input ids, so a picked result arrives with the typed numbers prefilled.

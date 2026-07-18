@@ -13,11 +13,14 @@ import { fileURLToPath } from "node:url";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const readApp = () => readFile(resolve(ROOT, "app.js"), "utf8");
 
-test("bindSearch lazy-loads aliases.json via ensureAliases", async () => {
+test("bindSearch lazy-loads the per-group alias shards via ensureAliases", async () => {
   const t = await readApp();
   assert.match(t, /async function ensureAliases\(\)/);
-  // Lazy fetch with privacy-preserving credentials posture per spec §6.3.
-  assert.match(t, /fetch\("data\/search\/aliases\.json",\s*\{\s*credentials:\s*"omit"\s*\}\)/);
+  // Per-group shards (spec-v590 split remediation): every group's shard
+  // fetches in parallel, with the privacy-preserving credentials posture
+  // per spec §6.3, and folds in as it arrives.
+  assert.match(t, /fetch\("data\/search\/aliases-" \+ String\(g\)\.toLowerCase\(\) \+ "\.json",\s*\{\s*credentials:\s*"omit"\s*\}\)/);
+  assert.match(t, /const groups = \[\.\.\.new Set\(TOOLS\.map\(\(t\) => t\.group\)\)\];/);
   // ensureAliases is triggered on first focus (not at load) so the
   // home-view first paint is not delayed by an alias fetch. Since
   // spec-v17 §H.2 the focus handler is loadAndRender, which first

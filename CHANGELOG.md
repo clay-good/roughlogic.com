@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(search): split the alias corpus into per-group runtime shards (spec-v590 remediation); 2026-07-17
+
+- data/search/aliases.json crossed the ~250 KB-gzipped split threshold spec-v590 designated (261.9 KB gz at 17,975
+  rows). New scripts/build-alias-shards.mjs derives one runtime shard per tile group (data/search/aliases-a.json ...
+  aliases-z.json, 21 files, 256.5 KB gz total) keyed by each alias row's target-tile group; aliases.json stays the
+  authoring master for gates, tests, and the MCP server, and is no longer fetched or precached at runtime.
+- app.js ensureAliases now fetches every group shard in parallel on first search interaction and folds each in as it
+  arrives, so alias search becomes usable progressively; per-shard failure stays a no-op. sw.js precaches the shards
+  instead of the master (install payload unchanged within ~2%).
+- `node scripts/build-alias-shards.mjs --check` joins `npm run lint` and fails on any master/shard/manifest drift or a
+  wrong sw.js precache list; docs/data-sources.md documents the generated shard family.
+
 ### docs(citations): sync 3 tile citations to their formula fixes (range-demand, air-gap, cable-tray); 2026-07-17
 
 - Swept citations.js for descriptions still documenting the OLD behavior of this session's fixes: range-demand-220-55

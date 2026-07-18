@@ -78,7 +78,14 @@ test("the shell pre-cache list is in sync with the v10 shipped helper modules", 
 
 test("the shell pre-cache list includes the data/search/ shards", async () => {
   const t = await readSw();
-  for (const f of ["aliases.json", "manifest.json"]) {
+  // Per-group alias shards (spec-v590 split remediation). The letter set
+  // is gated against tools-data.js by build-alias-shards.mjs --check;
+  // here we pin the precache wiring for every current group.
+  const letters = ["a", "b", "c", "d", "e", "f", "g", "h", "j", "k", "l", "m", "n", "o", "p", "q", "r", "t", "x", "y", "z"];
+  for (const f of ["manifest.json", ...letters.map((l) => "aliases-" + l + ".json")]) {
     assert.match(t, new RegExp("\\./data/search/" + f.replace(".", "\\.")));
   }
+  // The authoring master must NOT be precached: the runtime never fetches
+  // it, and precaching it would double the alias install payload.
+  assert.doesNotMatch(t, /"\.\/data\/search\/aliases\.json"/);
 });

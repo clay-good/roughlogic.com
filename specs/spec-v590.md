@@ -1,6 +1,11 @@
 # roughlogic.com Specification v590 -- Question-Phrase Alias Corpus Expansion (data/search/aliases.json, 0 New Tiles)
 
 > **Status: LANDED IN FULL (2026-07-10; Phase 1 at 0.177.0, Phase 2 complete at 0.182.0). Platform spec, second of the "ask it a question" search series (v589-v592). Data-only.**
+> **Split remediation LANDED 2026-07-17:** the shard crossed the ~250 KB-gz threshold below (261.9 KB at 17,975 rows),
+> so the designated per-group split shipped: scripts/build-alias-shards.mjs generates data/search/aliases-<letter>.json
+> (21 group shards, 256.5 KB gz total) from the master; app.js fetches them in parallel on first search interaction
+> (progressive fold-in), sw.js precaches the shards instead of the master, and a --check drift gate joined `npm run
+> lint`. aliases.json remains the authoring source of truth for gates, tests, and MCP.
 > Phase 2 as landed: five group-sized batches same day (A; E; C+B; G/K/D/L; final F/H/J/M/N/O/P/R/T/X/Y/Z) taking the
 > shard to 16,159 rows / 241.0 KB gz with question coverage on ALL 1,041 tiles. The Group A batch surfaced a ranker
 > hardening recorded in spec-v589 territory: digit-led query tokens are score-only (never coverage) and pure-number

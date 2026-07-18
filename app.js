@@ -1734,27 +1734,36 @@ function bindSearch() {
   // Alias terms map a free-text phrase to a tile id; loaded lazily.
   // Row shape matches the shard ({ term, target }) so the rows feed
   // rankTools directly. Reassigned (not mutated) on load so the ranker's
-  // per-array caches never go stale.
+  // per-array caches never go stale. The corpus is split per tile group
+  // (data/search/aliases-<letter>.json, spec-v590 remediation, generated
+  // by scripts/build-alias-shards.mjs); all group shards fetch in
+  // parallel and each folds in as it arrives, so alias search becomes
+  // usable progressively instead of waiting on one monolithic shard.
   let aliasRows = [];
   let aliasLoaded = false;
   async function ensureAliases() {
     if (aliasLoaded) return;
     aliasLoaded = true;
-    try {
-      const r = await fetch("data/search/aliases.json", { credentials: "omit" });
-      if (!r.ok) return;
-      const json = await r.json();
-      if (!json || !Array.isArray(json.aliases)) return;
-      const rows = [];
-      for (const row of json.aliases) {
-        if (!row || typeof row.term !== "string" || typeof row.target !== "string") continue;
-        if (!nameToId.has(row.target) && !TOOLS.some((t) => t.id === row.target)) continue;
-        rows.push({ term: row.term.toLowerCase(), target: row.target });
-      }
-      aliasRows = rows;
-      // Refresh the open dropdown so just-loaded aliases become searchable.
-      if (document.activeElement === input) render(input.value);
-    } catch { /* alias autocomplete is opt-in; failure is a no-op */ }
+    const merged = [];
+    const groups = [...new Set(TOOLS.map((t) => t.group))];
+    await Promise.all(groups.map(async (g) => {
+      try {
+        const r = await fetch("data/search/aliases-" + String(g).toLowerCase() + ".json", { credentials: "omit" });
+        if (!r.ok) return;
+        const json = await r.json();
+        if (!json || !Array.isArray(json.aliases)) return;
+        const rows = [];
+        for (const row of json.aliases) {
+          if (!row || typeof row.term !== "string" || typeof row.target !== "string") continue;
+          if (!nameToId.has(row.target) && !TOOLS.some((t) => t.id === row.target)) continue;
+          rows.push({ term: row.term.toLowerCase(), target: row.target });
+        }
+        merged.push(...rows);
+        aliasRows = merged.slice();
+        // Refresh the open dropdown so just-loaded aliases become searchable.
+        if (document.activeElement === input) render(input.value);
+      } catch { /* alias autocomplete is opt-in; failure is a no-op */ }
+    }));
   }
 
   // The spec-v589 pure ranking layer (normalizeQuery / rankTools) loads
