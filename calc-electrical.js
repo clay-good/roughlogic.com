@@ -1035,7 +1035,6 @@ export function computeVoltageImbalance({ V_a, V_b, V_c }) {
   const avg = (v[0] + v[1] + v[2]) / 3;
   const max_dev = Math.max(...v.map((x) => Math.abs(x - avg)));
   const imbalance_percent = (max_dev / avg) * 100;
-  const derate_factor = 1 - 2 * Math.pow(imbalance_percent / 100, 2);
   // v8 §C.1: surface NEMA derate-row by interpolating the published table.
   const ip = imbalance_percent;
   let nema_hp_derate_pct;
@@ -1054,6 +1053,14 @@ export function computeVoltageImbalance({ V_a, V_b, V_c }) {
       prev = row;
     }
   }
+  // The motor derate factor is the fraction of rated HP the machine can
+  // still carry, taken straight from the authoritative NEMA MG-1 §14.36
+  // derating table above (derate_factor = 1 - HP-derate/100). An earlier
+  // closed-form `1 - 2*(imbalance/100)^2` divided the percent by 100 before
+  // squaring, so it was ~100x too small (0.995 at a 5% imbalance where NEMA
+  // says derate 25% / do NOT operate) and contradicted this same tile's
+  // nema_hp_derate_pct output; the two now agree by construction.
+  const derate_factor = 1 - nema_hp_derate_pct / 100;
   return {
     average_V: avg, max_deviation_V: max_dev, imbalance_percent,
     derate_factor, nema_hp_derate_pct,
@@ -1222,7 +1229,7 @@ export function renderGeneratorSize(inputRegion, outputRegion, citationEl, param
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderVoltageImbalance(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Percent imbalance = max(|V_i - V_avg|) / V_avg * 100. Motor derate factor = 1 - 2 * (imbalance / 100)^2 (NEMA derating).";
+  citationEl.textContent = "Citation: Percent imbalance = max(|V_i - V_avg|) / V_avg * 100 (NEMA MG-1 §14.36). Motor derate factor = 1 - (NEMA HP-derate %)/100 from the MG-1 derating table (~2% derate at 1% imbalance, 25% / do NOT operate at 5%).";
   attachExampleButton(inputRegion, () => fillExample(voltageImbalanceExample.inputs));
 
   const a = makeNumber("Line A voltage (V)", "vi-a", { step: "any", min: "0" });

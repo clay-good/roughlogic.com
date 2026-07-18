@@ -7553,7 +7553,7 @@ test("monotonicity: computeStormwaterRational peak_flow_cfs is strictly increasi
 import { computeVoltageImbalance } from "../../calc-electrical.js";
 import { computeUTM } from "../../calc-field.js";
 
-test("monotonicity: computeVoltageImbalance imbalance_percent = max(|V - avg|) / avg * 100 closed-form pin; strictly increasing as one phase voltage drifts further from the average; derate_factor = 1 - 2*(imbalance/100)^2 (NEMA MG-1 pin); nema_hp_derate_pct monotone non-decreasing in imbalance_pct", () => {
+test("monotonicity: computeVoltageImbalance imbalance_percent = max(|V - avg|) / avg * 100 closed-form pin; strictly increasing as one phase voltage drifts further from the average; derate_factor = 1 - nema_hp_derate_pct/100 (NEMA MG-1 table pin); nema_hp_derate_pct monotone non-decreasing in imbalance_pct", () => {
   // Group A. imbalance = max-deviation / avg * 100. Strictly increasing as
   // one phase pulls away from the average.
   let prev = -Infinity;
@@ -7580,11 +7580,11 @@ test("monotonicity: computeVoltageImbalance imbalance_percent = max(|V - avg|) /
     `imb = ${ref.imbalance_percent}, expected ${expectedImb}`);
   assert.ok(ref.imbalance_percent >= 0.5 && ref.imbalance_percent <= 1.5,
     `imb = ${ref.imbalance_percent}, expected example band 0.5-1.5`);
-  // NEMA MG-1 derate_factor = 1 - 2*(imbalance/100)^2 closed-form pin.
-  const expectedDerate = 1 - 2 * Math.pow(expectedImb / 100, 2);
-  assert.ok(Math.abs(ref.derate_factor - expectedDerate) < 1e-12,
-    `derate = ${ref.derate_factor}, expected ${expectedDerate}`);
-  // derate_factor strictly decreasing as imbalance grows (quadratic loss).
+  // derate_factor = 1 - nema_hp_derate_pct/100, straight from the NEMA MG-1
+  // HP-derate table (not the old mis-scaled 1 - 2*(imbalance/100)^2).
+  assert.ok(Math.abs(ref.derate_factor - (1 - ref.nema_hp_derate_pct / 100)) < 1e-12,
+    `derate = ${ref.derate_factor}, expected ${1 - ref.nema_hp_derate_pct / 100}`);
+  // derate_factor non-increasing as imbalance grows (HP derate climbs).
   let prevDerate = Infinity;
   for (const drift of [1, 5, 10, 15, 20, 30]) {
     const r = computeVoltageImbalance({ V_a: 480 + drift, V_b: 480, V_c: 480 });

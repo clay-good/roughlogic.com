@@ -304,13 +304,13 @@ test("Voltage imbalance: average correct", () => {
   assert.ok(close(r.average_V, 470));
 });
 
-test("Voltage imbalance: derate at 2% imbalance approx 0.9992", () => {
-  // 1 - 2*(0.02)^2 = 1 - 0.0008 = 0.9992
+test("Voltage imbalance: derate at 2% imbalance = 0.96 (NEMA MG-1 table, 4% HP derate)", () => {
+  // derate_factor = 1 - NEMA-HP-derate/100; the 2% table row is 4% -> 0.96.
   const v_avg = 470;
   // Want max deviation = 0.02 * 470 = 9.4 -> set V_a = v_avg + 9.4
   const r = computeVoltageImbalance({ V_a: 479.4, V_b: 470, V_c: 460.6 });
   assert.ok(Math.abs(r.imbalance_percent - 2.0) < 0.05);
-  assert.ok(Math.abs(r.derate_factor - 0.9992) < 0.001);
+  assert.ok(Math.abs(r.derate_factor - 0.96) < 0.002);
 });
 
 test("Voltage imbalance: zero voltage returns error", () => {
@@ -341,11 +341,11 @@ test("Voltage imbalance: missing input returns error", () => {
   assert.ok(r.error);
 });
 
-test("Voltage imbalance: 5% imbalance gives derate ~0.995", () => {
-  // 1 - 2 * 0.05^2 = 0.995
+test("Voltage imbalance: 5% imbalance gives derate 0.75 (NEMA MG-1: 25% derate / do NOT operate)", () => {
+  // derate_factor = 1 - 25/100 = 0.75 at the >=5% cap.
   const r = computeVoltageImbalance({ V_a: 504, V_b: 480, V_c: 456 });
   assert.ok(close(r.imbalance_percent, 5, 0.1));
-  assert.ok(close(r.derate_factor, 0.995, 0.001));
+  assert.ok(close(r.derate_factor, 0.75, 0.001));
 });
 
 // --- Utility 70: GFCI/AFCI Reference ---

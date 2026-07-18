@@ -9316,8 +9316,10 @@ test("bounds: calc-electrical computeVoltageImbalance pins NEMA |max-dev|/avg fo
   assert.strictEqual(r.average_V, 475);
   assert.strictEqual(r.max_deviation_V, 5);
   assert.ok(Math.abs(r.imbalance_percent - (5 / 475) * 100) < 1e-9);
-  // derate = 1 - 2 * (1.0526/100)^2 ~ 0.9998
-  assert.ok(r.derate_factor > 0.999 && r.derate_factor < 1.0);
+  // derate_factor = 1 - NEMA-HP-derate/100; 1.0526% interpolates to 2.105%
+  // HP derate -> 0.9789 (the old 1 - 2*(imb/100)^2 gave a wrong ~0.9998).
+  assert.ok(Math.abs(r.derate_factor - (1 - r.nema_hp_derate_pct / 100)) < 1e-9);
+  assert.ok(r.derate_factor > 0.97 && r.derate_factor < 0.99);
   assert.ok("error" in computeVoltageImbalance({ V_a: 0, V_b: 1, V_c: 1 }));
 });
 

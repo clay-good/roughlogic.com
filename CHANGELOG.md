@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(electrical): voltage-imbalance motor derate factor was ~100x under-scaled and non-conservative; 2026-07-18
+
+- computeVoltageImbalance computed `derate_factor = 1 - 2*(imbalance_percent/100)^2`, dividing the percentage by 100
+  before squaring -- so the loss term was ~100x too small and the factor stayed pinned near 1.0 across the whole
+  realistic range (0.995 at a 5% imbalance, where NEMA MG-1 says derate 25% / do NOT operate). It also directly
+  contradicted the same tile's own `nema_hp_derate_pct` table output. Replaced with `derate_factor = 1 -
+  nema_hp_derate_pct/100`, taken straight from the authoritative NEMA MG-1 §14.36 HP-derate table the tile already
+  ships, so the two outputs now agree by construction: 5% imbalance -> 0.75, 2% -> 0.96, the 1.05% example -> 0.9789
+  (was 0.9998). The worked example and the cross-tile / bounds-fuzzer / electrical-v2 pins had all mirrored the wrong
+  formula; re-pinned to the NEMA-table values. Found by a first-principles formula audit; the arc-flash 10^9 fix was
+  re-verified intact in the same pass.
+
 ### fix(rigging): tagline-force note stated the angle/tension relationship backwards; 2026-07-18
 
 - computeTaglineForce computes `T = force / cos(angle above horizontal)` (correct statics), but its note said "a tag

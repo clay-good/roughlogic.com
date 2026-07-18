@@ -5594,9 +5594,9 @@
   {
    "tile_id": "voltage-imbalance",
    "source_publisher": "NEMA",
-   "source_title": "Voltage imbalance percent = (max deviation from average) / average * 100; HP derate per NEMA MG-1 table; derate factor = 1 - 2*(imb/100)^2",
+   "source_title": "Voltage imbalance percent = (max deviation from average) / average * 100; HP derate per NEMA MG-1 table; derate factor = 1 - (HP derate %)/100",
    "source_edition_or_year": "NEMA MG-1 (current edition); standard imbalance identity",
-   "source_section_or_page": "V_a=480 / V_b=475 / V_c=470 -> avg 475 / max deviation 5 / imbalance 1.053% / derate 0.9998 / NEMA HP derate ~2.11% (interpolated 1% / 2% rows)",
+   "source_section_or_page": "V_a=480 / V_b=475 / V_c=470 -> avg 475 / max deviation 5 / imbalance 1.053% / NEMA HP derate ~2.11% (interpolated 1% / 2% rows) / derate factor 1 - 2.11/100 = 0.9789",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -5624,7 +5624,7 @@
      }
     },
     "derate_factor": {
-     "value": 0.99978,
+     "value": 0.9789,
      "tolerance": {
       "pct": 0.5
      }
