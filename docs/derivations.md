@@ -2461,6 +2461,7 @@ cross-check.
 | calc-motor.js | `computeMotorSyncSlip` | `{ line_freq_hz = 60, poles = 4, rated_rpm = 0 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMultiMotorFeeder` | `{ largest_flc_a = 0, sum_other_flc_a = 0, largest_branch_ocpd_a = 0 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeReducedVoltageStarter` | `{ across_line_lra_a = 0, across_line_lrt_pct = 100, starter_type = "autotrans...` | _ | _ | _ |
+| calc-motor.js | `computeRotaryPhaseConverter` | `{ largest_motor_hp = 10, total_running_hp = 15, start_factor = 2 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeVfdReflectedWave` | `{ rise_time_us = 0, velocity_pct = 50, system_voltage_v = 0, run_length_ft = ...` | _ | _ | _ |
 | calc-pipefit.js | `computeBoilerHorsepower` | `{ output_btuhr = 0 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeBranchReinforcement` | `{ run_od_in = 0, run_wall_in = 0, run_treq_in = 0, branch_od_in = 0, branch_w...` | _ | _ | _ |
@@ -3034,7 +3035,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1620.
+Row count: 1621.
 
 <!-- END function-corpus-v14 -->
 
@@ -3115,7 +3116,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (169 tiles)
+### Group A Electrical (170 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3253,6 +3254,7 @@ per spec-v14 §13.1 second paragraph.
 | `reduced-voltage-starter` | Reduced-Voltage Starter Current and Torque | reduced-voltage-starter current and t...; spec-v522 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rolling-sphere-protection` | Lightning Rolling-Sphere Zone of Protection | NFPA 780 (rolling-sphere method); 30 ft mast, 150 ft sphere -> sqrt(9000 - 900) = sqrt(8100... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rooftop-temp-adder` | Rooftop Conduit Sunlight Ambient Adder (NEC 310.15(B)(2)) | NEC 2023 (NFPA 70); 95 F on the roof (<7/8 in) + 60 F adder = 155 F (~68 C) -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `rotary-phase-converter-sizing` | Rotary Phase Converter Idler Sizing | rotary phase converter idler sizing (...; start = 2*10 = 20; idler = max(20, 15) = 20 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sccr-combination` | Industrial Control Panel SCCR (UL 508A) | UL 508A Supplement SB / NEC 409.110; 65/5/5/10 kA components, 22 kA fault -> panel SCCR 5 kA (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `service-conductor-sizing` | Dwelling Service/Feeder Conductor at 83% (NEC 310.12) | NEC 2023 310.12 / Table 310.16 (75 degC); spec-v279 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `service-load` | Service Load Calculation (Residential) | NFPA; 2000 ft^2 dwelling with 2 small-appliance + 1 laundry + 6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4593,6 +4595,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1373. Fixture-covered or reference-cadence: 1373 / 1373.
+Tile count: 1374. Fixture-covered or reference-cadence: 1374 / 1374.
 
 <!-- END tile-index-v14 -->

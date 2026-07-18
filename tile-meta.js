@@ -574,7 +574,7 @@ const _TILES = [
   ["sccr-combination", "A"],
   // spec-v522 reduced-voltage starter current and torque
   ["reduced-voltage-starter", "A"],
-  ["vfd-reflected-wave", "A"],
+  ["vfd-reflected-wave", "A"], ["rotary-phase-converter-sizing", "A"],
   // spec-v493 NEC 445.13 generator output conductor at 115%
   ["generator-conductor-445", "A"],
   // spec-v519 NEC 220.87 existing-facility load by peak demand

@@ -12235,6 +12235,17 @@ export const CITATIONS = {
       { name: "Inverter-duty withstand", value: "NEMA MG-1 Part 31 ~3.1 x V_LL; general-purpose motors far lower (~1000 V)", source: "NEMA MG-1 Part 31" },
     ],
   },
+  "rotary-phase-converter-sizing": {
+    formula: "start_demand_hp = start_factor x largest_motor_hp; idler_hp_min = max(start_demand_hp, total_running_hp); start_factor ~2 (normal) or ~3 (high-inertia).",
+    edition: "Rotary phase converter idler-sizing rule of thumb (industry / converter-manufacturer guidance), by name; NEMA MG-1 across-the-line inrush behavior. The converter manufacturer governs.",
+    freeAccess: "The sizing rule is a public rule of thumb (the greater of the largest-motor start demand and the aggregate running load); the motors' HP and start character are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "A rotary phase converter (idler plus start capacitors) makes three-phase from single-phase. Its idler must do two jobs: START the largest motor across the line, whose inrush is several times its running current, AND RUN the whole load that operates at once. It is sized on the GREATER of the two: idler HP = max(start factor x largest motor HP, total running HP). A ~2x start factor covers a normal-starting load; a high-inertia or hard-starting load (a big reciprocating compressor, a loaded blade) wants ~3x, and a soft-start or VFD on the large motor lowers it. Undersized, the converter stalls or will not bring the big motor up to speed; oversized, it wastes idle power. A rule-of-thumb screen; the converter manufacturer's sizing data and the motors' actual locked-rotor current govern.",
+    assumptions: [
+      { name: "Two duties", value: "idler = max(start factor x largest motor, total running load); the greater governs", source: "phase-converter practice" },
+      { name: "Start factor", value: "~2x normal, ~3x high-inertia/hard-start; a soft-start/VFD on the big motor lowers it", source: "converter-manufacturer guidance" },
+    ],
+  },
   "reduced-voltage-starter": {
     formula: "autotransformer: motor = tap x LRA, line = tap^2 x LRA, torque = tap^2 x LRT. wye-delta: 0.333x on current and torque. solid-state/reactor: motor = line = tap x LRA, torque = tap^2 x LRT.",
     edition: "Reduced-voltage-starter current and torque relations (NEMA ICS 2; torque proportional to voltage squared), by name; the motor speed-torque curve and the load govern.",

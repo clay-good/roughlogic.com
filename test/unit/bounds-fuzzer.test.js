@@ -26797,6 +26797,27 @@ test("bounds: spec-v920 computeCementBoardTakeoff pins the sheets, screws, and e
   assert.ok("error" in _v920({ area_sf: Infinity, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 35 }));
 });
 
+import { computeRotaryPhaseConverter as _v925 } from "../../calc-motor.js";
+
+test("bounds: spec-v925 computeRotaryPhaseConverter pins the idler size, governing term, and error seams", () => {
+  const r = _v925({ largest_motor_hp: 10, total_running_hp: 15, start_factor: 2 });
+  assert.equal(r.start_demand_hp, 20); // 2 * 10
+  assert.equal(r.idler_hp_min, 20); // max(20, 15)
+  assert.match(r.governed_by, /starting/);
+  // Total running load governs when the largest motor is small.
+  const t = _v925({ largest_motor_hp: 5, total_running_hp: 30, start_factor: 2 });
+  assert.equal(t.idler_hp_min, 30); // max(10, 30)
+  assert.match(t.governed_by, /total running/);
+  // High-inertia 3x factor.
+  assert.equal(_v925({ largest_motor_hp: 20, total_running_hp: 25, start_factor: 3 }).idler_hp_min, 60); // max(60, 25)
+  // Error seams: non-positive HP, start factor < 1, total < largest, non-finite.
+  assert.ok("error" in _v925({ largest_motor_hp: 0, total_running_hp: 15 }));
+  assert.ok("error" in _v925({ largest_motor_hp: 10, total_running_hp: 0 }));
+  assert.ok("error" in _v925({ largest_motor_hp: 10, total_running_hp: 15, start_factor: 0.5 }));
+  assert.ok("error" in _v925({ largest_motor_hp: 20, total_running_hp: 10 })); // total < largest
+  assert.ok("error" in _v925({ largest_motor_hp: Infinity, total_running_hp: 15 }));
+});
+
 import { computeMicroinverterBranchCount as _v924 } from "../../calc-electrical.js";
 
 test("bounds: spec-v924 computeMicroinverterBranchCount pins the count, 80% limit, and error seams", () => {

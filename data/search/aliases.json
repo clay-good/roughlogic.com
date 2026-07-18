@@ -27472,6 +27472,31 @@
       "kind": "industry"
     },
     {
+      "term": "rotary phase converter",
+      "target": "rotary-phase-converter-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "phase converter sizing",
+      "target": "rotary-phase-converter-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "idler sizing",
+      "target": "rotary-phase-converter-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "phase converter hp",
+      "target": "rotary-phase-converter-sizing",
+      "kind": "adjacent"
+    },
+    {
+      "term": "single to three phase converter",
+      "target": "rotary-phase-converter-sizing",
+      "kind": "adjacent"
+    },
+    {
       "term": "vfd cable length",
       "target": "vfd-reflected-wave",
       "kind": "industry"

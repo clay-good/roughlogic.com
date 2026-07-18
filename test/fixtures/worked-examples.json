@@ -34602,6 +34602,56 @@
    }
   },
   {
+   "tile_id": "rotary-phase-converter-sizing",
+   "source_publisher": "rotary phase converter idler sizing (industry rule)",
+   "source_title": "10 HP largest, 15 HP total running, 2x start -> 20 HP idler (starting governs)",
+   "source_edition_or_year": "spec-v925 worked example (machine-verified)",
+   "source_section_or_page": "start = 2*10 = 20; idler = max(20, 15) = 20",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "largest_motor_hp": 10,
+    "total_running_hp": 15,
+    "start_factor": 2
+   },
+   "outputs": {
+    "idler_hp_min": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "start_demand_hp": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rotary-phase-converter-sizing",
+   "source_publisher": "rotary phase converter idler sizing (industry rule)",
+   "source_title": "cross-check: 5 HP largest but 30 HP total running -> 30 HP idler (running load governs)",
+   "source_edition_or_year": "spec-v925 worked example (machine-verified)",
+   "source_section_or_page": "start = 2*5 = 10; idler = max(10, 30) = 30",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "largest_motor_hp": 5,
+    "total_running_hp": 30,
+    "start_factor": 2
+   },
+   "outputs": {
+    "idler_hp_min": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "microinverter-branch-count",
    "source_publisher": "max microinverters per AC branch (NEC 705.60)",
    "source_title": "20 A branch, IQ7+ at 1.21 A -> 13 microinverters",

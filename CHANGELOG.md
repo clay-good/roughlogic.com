@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): add rotary-phase-converter-sizing tile (spec-v925); 2026-07-18
+
+- New Group A tile `rotary-phase-converter-sizing` (Rotary Phase Converter Idler Sizing) in calc-motor.js, beside
+  vfd-reflected-wave. idler HP = max(start factor x largest single motor, total HP running at once); ~2x start factor
+  normal, ~3x high-inertia. A 10 HP lathe + 5 HP mill running = max(2x10, 15) = 20 HP; a 5 HP largest with 30 HP total
+  = 30 HP (running load governs). A rule-of-thumb screen; the converter maker and motor locked-rotor current govern.
+  Home count 1,373 -> 1,374.
+
 ### feat(solar): add microinverter-branch-count tile (spec-v924); 2026-07-18
 
 - New Group A tile `microinverter-branch-count` (Max Microinverters per AC Branch Circuit, NEC 705.60) in

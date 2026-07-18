@@ -621,3 +621,51 @@ function renderVfdReflectedWave(inputRegion, outputRegion, citationEl) {
   for (const f of [rt, vp, Vll, run]) f.input.addEventListener("input", update);
 }
 MOTOR_RENDERERS["vfd-reflected-wave"] = renderVfdReflectedWave;
+
+// ===================== spec-v925: rotary phase converter idler sizing =====================
+// dims: in { largest_motor_hp: M L^2 T^-3, total_running_hp: M L^2 T^-3, start_factor: dimensionless } out: { idler_hp_min: M L^2 T^-3, start_demand_hp: M L^2 T^-3 }
+export function computeRotaryPhaseConverter({ largest_motor_hp = 10, total_running_hp = 15, start_factor = 2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(largest_motor_hp > 0)) return { error: "Largest motor HP must be positive." };
+  if (!(total_running_hp > 0)) return { error: "Total running HP must be positive." };
+  if (!(start_factor >= 1)) return { error: "Start factor must be at least 1." };
+  if (total_running_hp < largest_motor_hp) return { error: "Total running HP cannot be less than the largest single motor." };
+  // The idler must both START the largest motor across the line and RUN the whole aggregate load.
+  const start_demand_hp = start_factor * largest_motor_hp;
+  const idler_hp_min = Math.max(start_demand_hp, total_running_hp);
+  const governed_by = start_demand_hp >= total_running_hp ? "starting the largest motor" : "the total running load";
+  if (![idler_hp_min, start_demand_hp].every(Number.isFinite)) return { error: "Phase-converter math is not a finite value." };
+  return {
+    idler_hp_min,
+    start_demand_hp,
+    governed_by,
+    note: "A rotary phase converter's idler is sized on the GREATER of the load needed to start the largest motor across the line and the total load running at once: idler HP = max(start factor x largest motor, total running HP). Use a 2x start factor for a normal load and 3x for a high-inertia or hard-starting load (a big compressor, a loaded saw); a soft-start or VFD on the big motor lowers the factor. A 10 HP lathe (largest) with a 5 HP mill also running is max(2x10, 15) = 20 HP. Undersized, the converter stalls or will not start the load; oversized, it wastes idle power. A rule-of-thumb sizing screen; the converter manufacturer's data and the actual motor locked-rotor current govern.",
+  };
+}
+
+export const rotaryPhaseConverterExample = { inputs: { largest_motor_hp: 10, total_running_hp: 15, start_factor: 2 } };
+
+function _v925renderRotaryPhaseConverter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: rotary phase converter idler sizing by name. idler HP = max(start factor x largest motor HP, total running HP); ~2x start factor for normal loads, 3x for high-inertia. The converter manufacturer's data and the motor locked-rotor current govern.";
+  const lg = makeNumber("Largest single motor (HP)", "rpc-lg", { step: "any", min: "0", value: "10" });
+  lg.input.value = "10";
+  const tot = makeNumber("Total HP running at once", "rpc-tot", { step: "any", min: "0", value: "15" });
+  tot.input.value = "15";
+  const sf = makeNumber("Start factor (2 normal, 3 high-inertia)", "rpc-sf", { step: "any", min: "1", value: "2" });
+  sf.input.value = "2";
+  for (const f of [lg, tot, sf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { lg.input.value = "10"; tot.input.value = "15"; sf.input.value = "2"; update(); });
+  const oIdler = makeOutputLine(outputRegion, "Minimum idler size", "rpc-out-i");
+  const oGov = makeOutputLine(outputRegion, "Governed by", "rpc-out-g");
+  const update = debounce(() => {
+    const r = computeRotaryPhaseConverter({
+      largest_motor_hp: lg.input.value === "" ? 10 : Number(lg.input.value), total_running_hp: tot.input.value === "" ? 15 : Number(tot.input.value),
+      start_factor: sf.input.value === "" ? 2 : Number(sf.input.value),
+    });
+    if (r.error) { oIdler.textContent = r.error; oGov.textContent = "-"; return; }
+    oIdler.textContent = fmt(r.idler_hp_min, 1) + " HP idler";
+    oGov.textContent = r.governed_by + " (start " + fmt(r.start_demand_hp, 1) + " HP vs run " + fmt(Number(tot.input.value) || 15, 1) + " HP)";
+  }, DEBOUNCE_MS);
+  for (const f of [lg, tot, sf]) f.input.addEventListener("input", update);
+}
+MOTOR_RENDERERS["rotary-phase-converter-sizing"] = _v925renderRotaryPhaseConverter;

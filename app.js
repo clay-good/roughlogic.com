@@ -87,6 +87,7 @@ const TOOL_MODULES = (() => {
     "reduced-voltage-starter",
     // spec-v557
     "vfd-reflected-wave",
+    "rotary-phase-converter-sizing",
   ]);
   // spec-v88 cap-relief split: the cohesive solar-PV / battery-storage /
   // EV-charging electrification bench moved out of calc-electrical.js (which
