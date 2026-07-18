@@ -27928,3 +27928,25 @@ test("bounds: spec-v967 computeHullDisplacement pins Archimedes displacement and
   assert.ok("error" in _v967({ lwl_ft: 30, bwl_ft: 10, draft_ft: 4, block_coefficient: 0.5, water_density_pcf: 0 }));
   assert.ok("error" in _v967({ lwl_ft: Infinity, bwl_ft: 10, draft_ft: 4, block_coefficient: 0.5, water_density_pcf: 64 }));
 });
+
+import { computeEvRangePerHour as _v968 } from "../../calc-solar.js";
+
+test("bounds: spec-v968 computeEvRangePerHour pins the range-per-hour identity and error seams", () => {
+  const r = _v968({ evse_power_kw: 7.7, charge_efficiency: 0.88, vehicle_efficiency_mi_per_kwh: 3.5, target_range_mi: 100 });
+  assert.ok(Math.abs(r.range_added_mi_per_hr - 23.716) < 1e-3); // 7.7*0.88*3.5
+  assert.ok(Math.abs(r.hours_to_add_target - 4.21656) < 1e-3); // 100/23.716
+  // A less efficient vehicle adds fewer miles per hour.
+  const truck = _v968({ evse_power_kw: 7.7, charge_efficiency: 0.88, vehicle_efficiency_mi_per_kwh: 2.0, target_range_mi: 100 });
+  assert.ok(Math.abs(truck.range_added_mi_per_hr - 13.552) < 1e-3);
+  assert.ok(truck.range_added_mi_per_hr < r.range_added_mi_per_hr);
+  // Linear in power; a bigger circuit adds range proportionally faster.
+  assert.ok(Math.abs(_v968({ evse_power_kw: 15.4, charge_efficiency: 0.88, vehicle_efficiency_mi_per_kwh: 3.5, target_range_mi: 100 }).range_added_mi_per_hr - 2 * r.range_added_mi_per_hr) < 1e-6);
+  // Hours is inverse to range-per-hour.
+  assert.ok(_v968({ evse_power_kw: 7.7, charge_efficiency: 0.88, vehicle_efficiency_mi_per_kwh: 2.0, target_range_mi: 100 }).hours_to_add_target > r.hours_to_add_target);
+  // Error seams: non-positive power / vehicle eff / target, efficiency out of (0,1], non-finite.
+  assert.ok("error" in _v968({ evse_power_kw: 0, charge_efficiency: 0.88, vehicle_efficiency_mi_per_kwh: 3.5, target_range_mi: 100 }));
+  assert.ok("error" in _v968({ evse_power_kw: 7.7, charge_efficiency: 1.5, vehicle_efficiency_mi_per_kwh: 3.5, target_range_mi: 100 }));
+  assert.ok("error" in _v968({ evse_power_kw: 7.7, charge_efficiency: 0.88, vehicle_efficiency_mi_per_kwh: 0, target_range_mi: 100 }));
+  assert.ok("error" in _v968({ evse_power_kw: 7.7, charge_efficiency: 0.88, vehicle_efficiency_mi_per_kwh: 3.5, target_range_mi: 0 }));
+  assert.ok("error" in _v968({ evse_power_kw: Infinity, charge_efficiency: 0.88, vehicle_efficiency_mi_per_kwh: 3.5, target_range_mi: 100 }));
+});

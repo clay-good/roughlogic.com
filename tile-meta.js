@@ -164,7 +164,7 @@ const _TILES = [
   ["pv-interconnection-busbar", "A"], ["off-grid-battery", "A"],
   ["voltage-drop-reactance", "A"], ["power-triangle", "A"], ["ev-charger-load", "A"],
   // spec-v488 EV charge time, AC Level 2 (Group A, calc-solar.js)
-  ["ev-charge-time", "A"],
+  ["ev-charge-time", "A"], ["ev-range-per-hour", "A"],
   // spec-v489 EV charge cost at the meter (Group A, calc-solar.js)
   ["ev-charge-cost", "A"],
   // spec-v492 EV DC fast-charge time with CC-CV taper (Group A, calc-solar.js)

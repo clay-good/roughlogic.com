@@ -2866,6 +2866,7 @@ cross-check.
 | calc-solar.js | `computeEvChargeTime` | `{ battery_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, evse_powe...` | _ | _ | _ |
 | calc-solar.js | `computeEvChargerLoad` | `{ charger_amps = 0, main_breaker_a = 0, existing_load_a = 0, busbar_rating_a ...` | _ | _ | _ |
 | calc-solar.js | `computeEvDcfcTime` | `{ usable_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, charger_po...` | _ | _ | _ |
+| calc-solar.js | `computeEvRangePerHour` | `{ evse_power_kw = 7.7, charge_efficiency = 0.88, vehicle_efficiency_mi_per_kw...` | _ | _ | _ |
 | calc-solar.js | `computeOffGridBattery` | `{ daily_load_wh = 0, days_autonomy = 3, dod_limit = 0.5, system_voltage_v = 4...` | _ | _ | _ |
 | calc-solar.js | `computePVStringSizing` | `{ module_voc_V, module_vmp_V, voc_temp_coeff_pct_per_C, record_low_C, record_...` | _ | _ | _ |
 | calc-solar.js | `computePvArraySizing` | `{ target_annual_kwh = 0, psh = 5.0, perf_ratio = 0.77 } = {}` | _ | _ | _ |
@@ -3077,7 +3078,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1663.
+Row count: 1664.
 
 <!-- END function-corpus-v14 -->
 
@@ -3158,7 +3159,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (189 tiles)
+### Group A Electrical (190 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3219,6 +3220,7 @@ per spec-v14 §13.1 second paragraph.
 | `ev-charger-throttle` | EV Charger Throttled-Current Schedule (NEC 625.42) | NEC 2023 Article 625 (625.42(A) EVEMS); 100-A EVEMS budget, four 40-A chargers, all active -> 25 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ev-dcfc-time` | EV DC Fast-Charge Time (CC-CV Taper) | DC fast-charge CC-CV taper model (thr...; spec-v492 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ev-load-management-ems` | EV Load-Management (EVEMS) Diversified Load (NEC 625.42) | NEC 2023 625.42(A) / 2026 625.48; Four 40 A chargers, 80 A EVEMS -> 200 A un-managed, 100 A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `ev-range-per-hour` | EV Range Added per Hour of Charging | EV range added per hour of AC charging; range/hr = 7.7*0.88*3.5 = 23.716; hours = 100/23.716 = 4.217 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `existing-load-220-87` | Existing-Facility Load by Peak Demand (NEC 220.87) | NEC 2023 220.87; spec-v519 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `feeder-tap-rule` | Feeder Tap Conductor 10-ft / 25-ft Rule (NEC 240.21(B)) | NEC 2023 (NFPA 70); 400 A feeder, 22 ft tap -> 25-ft rule, min = 400/3 = 133.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fiber-loss-budget` | Fiber Optic Loss Budget | TIA-568 / TIA-526 / IEEE 802.3 (by name); 300 m OM4 @ 850 nm (3.0 dB/km, 2 connectors @ 0.75 dB) ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4679,6 +4681,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1416. Fixture-covered or reference-cadence: 1416 / 1416.
+Tile count: 1417. Fixture-covered or reference-cadence: 1417 / 1417.
 
 <!-- END tile-index-v14 -->

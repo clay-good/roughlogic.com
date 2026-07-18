@@ -3945,6 +3945,58 @@
    }
   },
   {
+   "tile_id": "ev-range-per-hour",
+   "source_publisher": "EV range added per hour of AC charging",
+   "source_title": "7.7 kW EVSE, 88% efficiency, 3.5 mi/kWh, 100 mi target -> 23.72 mi/hr, 4.22 hr",
+   "source_edition_or_year": "spec-v968 worked example (machine-verified)",
+   "source_section_or_page": "range/hr = 7.7*0.88*3.5 = 23.716; hours = 100/23.716 = 4.217",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "evse_power_kw": 7.7,
+    "charge_efficiency": 0.88,
+    "vehicle_efficiency_mi_per_kwh": 3.5,
+    "target_range_mi": 100
+   },
+   "outputs": {
+    "range_added_mi_per_hr": {
+     "value": 23.716,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "hours_to_add_target": {
+     "value": 4.217,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ev-range-per-hour",
+   "source_publisher": "EV range added per hour of AC charging",
+   "source_title": "cross-check: a less efficient truck (2.0 mi/kWh) adds only 13.55 mi/hr",
+   "source_edition_or_year": "spec-v968 worked example (machine-verified)",
+   "source_section_or_page": "range/hr = 7.7*0.88*2.0 = 13.552 mi/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "evse_power_kw": 7.7,
+    "charge_efficiency": 0.88,
+    "vehicle_efficiency_mi_per_kwh": 2.0,
+    "target_range_mi": 100
+   },
+   "outputs": {
+    "range_added_mi_per_hr": {
+     "value": 13.552,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ev-charge-time",
    "source_publisher": "AC Level 2 EV charge-time model (SAE J1772 onboard limit)",
    "source_title": "75 kWh, 20-80% (45 kWh), 11.5 kW EVSE, 7.7 kW onboard, 88% -> 7.7 kW governs, 6.6 hr",

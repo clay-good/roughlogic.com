@@ -2752,6 +2752,17 @@ export const CITATIONS = {
     ],
   },
 
+  "ev-range-per-hour": {
+    formula: "range_added_mi_per_hr = evse_power_kw x charge_efficiency x vehicle_efficiency_mi_per_kwh; hours_to_add_target = target_range_mi / range_added_mi_per_hr.",
+    edition: "EV range-added-per-hour of AC Level 2 charging (energy identity; SAE J1772 onboard-charger limit), by name; the vehicle's onboard charger and actual efficiency govern.",
+    freeAccess: "The range-per-hour relation is a public energy identity; the EVSE power, charge efficiency, and the vehicle's mi/kWh are the charger and vehicle values the user supplies.",
+    governance: GOVERNANCE.general,
+    editionNote: "The practical question an EVSE installer or fleet manager asks is not how long a full charge takes but how many miles of range an hour of charging returns, because that is what has to cover a daily commute overnight. It is a simple energy identity: an EVSE delivering some kilowatts, after the roughly 10-15% AC charging losses (rectification, thermal, battery), puts a certain number of usable kWh into the pack each hour, and each kWh carries the car a distance set by its efficiency in miles per kWh. So range added per hour = EVSE power x charge efficiency x vehicle efficiency, and dividing a target range by that gives the hours needed. A 7.7 kW (240 V, 32 A) Level 2 charger at 88% efficiency on a vehicle that averages 3.5 mi/kWh adds about 23.7 miles per hour, replenishing a 100-mile daily commute in roughly 4.2 hours -- easily overnight on a standard circuit. Going to a 40 A / 9.6 kW circuit adds range proportionally faster, but only up to the vehicle's ONBOARD charger limit: a wall unit larger than the car's onboard AC charger delivers no more power (the same bottleneck the ev-charge-time tile flags), so the effective EVSE power is the lesser of the two. A less efficient vehicle -- a heavy truck, a cold battery, highway speeds -- has fewer miles per kWh and adds fewer miles per hour. This is a steady AC Level 2 estimate; DC fast charging follows a different, tapering profile, and the vehicle's onboard-charger cap, its real-world efficiency, and the utility rate govern.",
+    assumptions: [
+      { name: "Range-per-hour identity", value: "range/hr = EVSE kW x charge efficiency x mi/kWh; hours = target range / (range/hr)", source: "energy identity" },
+      { name: "Onboard-charger cap", value: "AC rate is capped by the vehicle's onboard charger (a bigger EVSE does not charge faster, see ev-charge-time); DC fast charging tapers separately", source: "SAE J1772 / vehicle spec" },
+    ],
+  },
   "ev-charge-time": {
     formula: "energy = capacity x (target - start)/100; charge_power = onboard > 0 ? min(evse, onboard) : evse; time_hr = energy / (charge_power x efficiency/100).",
     edition: "AC Level 2 EV charge-time model (SAE J1772 onboard-charger limit; charging losses), first-principles; the vehicle's charging curve governs the actual profile.",

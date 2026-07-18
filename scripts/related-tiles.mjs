@@ -655,6 +655,7 @@ const RELATED = {
   "power-triangle": ["pf-correction", "three-phase", "transformer-kva-sizing"],
   "ev-charger-load": ["service-load-optional", "breaker-sizing", "wire-ampacity"],
   "ev-charge-time": ["ev-charger-load", "battery-runtime", "battery-c-rate"],
+  "ev-range-per-hour": ["ev-charge-time", "ev-charger-load", "ev-charge-cost"],
   "ev-charge-cost": ["ev-charge-time", "ev-charger-load", "battery-tou-arbitrage"],
   "ev-dcfc-time": ["ev-charge-time", "ev-charge-cost", "battery-c-rate"],
   "solar-egc-690-45": ["egc-sizing", "pv-circuit-ampacity", "pv-string-fusing"],

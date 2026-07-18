@@ -112,6 +112,7 @@ const TOOL_MODULES = (() => {
     "battery-tou-arbitrage", "battery-peak-shaving", "battery-c-rate",
     // spec-v488 EV charge time (AC Level 2)
     "ev-charge-time",
+    "ev-range-per-hour",
     // spec-v489 EV charge cost at the meter
     "ev-charge-cost",
     // spec-v492 EV DC fast-charge time with CC-CV taper

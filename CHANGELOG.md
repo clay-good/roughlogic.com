@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(solar): add ev-range-per-hour tile (spec-v968); 2026-07-18
+
+- New Group A tile `ev-range-per-hour` (EV Range Added per Hour of Charging) in calc-solar.js. range/hr = EVSE power (kW)
+  x charge efficiency x vehicle efficiency (mi/kWh); hours = target range / (range/hr). A 7.7 kW Level 2 charger at 88%
+  on a 3.5 mi/kWh car adds ~23.7 mi/hr, so 100 mi replenishes in ~4.2 hr; a less efficient truck adds fewer. The onboard
+  charger caps the AC rate (see ev-charge-time). Home count 1,416 -> 1,417.
+
 ### feat(marine): add hull-displacement tile (spec-v967); 2026-07-18
 
 - New Group K tile `hull-displacement` (Hull Displacement and Block Coefficient) in calc-mechanic.js. By Archimedes:

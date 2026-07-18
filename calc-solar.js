@@ -1696,3 +1696,51 @@ function _v963renderDcShuntSizing(inputRegion, outputRegion, citationEl) {
   for (const f of [ir, mr, mm]) f.input.addEventListener("input", update);
 }
 SOLAR_RENDERERS["dc-shunt-sizing"] = _v963renderDcShuntSizing;
+
+// ===================== spec-v968: EV range added per hour of charging =====================
+// dims: in { args: dimensionless } out: { range_added_mi_per_hr: dimensionless, hours_to_add_target: dimensionless }
+export function computeEvRangePerHour({ evse_power_kw = 7.7, charge_efficiency = 0.88, vehicle_efficiency_mi_per_kwh = 3.5, target_range_mi = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(evse_power_kw > 0)) return { error: "EVSE power must be positive (kW)." };
+  if (!(charge_efficiency > 0 && charge_efficiency <= 1)) return { error: "Charge efficiency must be between 0 and 1." };
+  if (!(vehicle_efficiency_mi_per_kwh > 0)) return { error: "Vehicle efficiency must be positive (mi/kWh)." };
+  if (!(target_range_mi > 0)) return { error: "Target range must be positive (mi)." };
+  // Miles of range per hour of charging = charge power (after losses) x how far the car goes per kWh.
+  const range_added_mi_per_hr = evse_power_kw * charge_efficiency * vehicle_efficiency_mi_per_kwh;
+  const hours_to_add_target = target_range_mi / range_added_mi_per_hr;
+  if (![range_added_mi_per_hr, hours_to_add_target].every(Number.isFinite)) return { error: "EV range-per-hour math is not a finite value." };
+  return {
+    range_added_mi_per_hr,
+    hours_to_add_target,
+    note: "How many miles of driving range an hour of charging adds -- the number that sizes an EVSE to a commute or a fleet's daily miles. Range per hour = EVSE power (kW) x charge efficiency x the vehicle's efficiency (mi/kWh): the kilowatts delivered, after the ~10-15% AC charging losses, times how far the car goes on each kWh. A 7.7 kW (240 V, 32 A) Level 2 charger at 88% efficiency on a car that gets 3.5 mi/kWh adds about 23.7 miles of range per hour, so a 100-mile daily commute is replenished in about 4.2 hours -- comfortably overnight. Doubling to a 40 A / 9.6 kW circuit adds range proportionally faster, but the vehicle's ONBOARD charger caps the AC rate (a bigger wall unit charges no faster than the car accepts -- see ev-charge-time), and a less efficient vehicle (fewer mi/kWh, a truck or cold weather) adds fewer miles per hour. This is a steady AC Level 2 estimate; DC fast charging is a different, tapering process, and the vehicle's onboard-charger limit, the actual efficiency, and utility rates govern.",
+  };
+}
+
+export const evRangePerHourExample = { inputs: { evse_power_kw: 7.7, charge_efficiency: 0.88, vehicle_efficiency_mi_per_kwh: 3.5, target_range_mi: 100 } };
+
+function _v968renderEvRangePerHour(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: EV range added per hour of AC charging, by name. range/hr = EVSE power (kW) x charge efficiency x vehicle efficiency (mi/kWh); hours = target range / range per hr. Steady AC Level 2; the vehicle's onboard-charger limit caps the AC rate (see ev-charge-time), DC fast charging tapers, and the actual efficiency governs.";
+  const pw = makeNumber("EVSE power (kW, e.g. 7.7)", "evr-pw", { step: "any", min: "0", value: "7.7" });
+  pw.input.value = "7.7";
+  const ef = makeNumber("Charge efficiency (0-1, ~0.88)", "evr-ef", { step: "any", min: "0", value: "0.88" });
+  ef.input.value = "0.88";
+  const ve = makeNumber("Vehicle efficiency (mi/kWh)", "evr-ve", { step: "any", min: "0", value: "3.5" });
+  ve.input.value = "3.5";
+  const tr = makeNumber("Target range to add (mi)", "evr-tr", { step: "any", min: "0", value: "100" });
+  tr.input.value = "100";
+  for (const f of [pw, ef, ve, tr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { pw.input.value = "7.7"; ef.input.value = "0.88"; ve.input.value = "3.5"; tr.input.value = "100"; update(); });
+  const oR = makeOutputLine(outputRegion, "Range added", "evr-out-r");
+  const oH = makeOutputLine(outputRegion, "Hours to add the target", "evr-out-h");
+  const update = debounce(() => {
+    const r = computeEvRangePerHour({
+      evse_power_kw: pw.input.value === "" ? 7.7 : Number(pw.input.value), charge_efficiency: ef.input.value === "" ? 0.88 : Number(ef.input.value),
+      vehicle_efficiency_mi_per_kwh: ve.input.value === "" ? 3.5 : Number(ve.input.value), target_range_mi: tr.input.value === "" ? 100 : Number(tr.input.value),
+    });
+    if (r.error) { oR.textContent = r.error; oH.textContent = "-"; return; }
+    oR.textContent = fmt(r.range_added_mi_per_hr, 1) + " mi per hour of charging";
+    oH.textContent = fmt(r.hours_to_add_target, 2) + " hr for " + fmt(Number(tr.input.value) || 100, 0) + " mi";
+  }, DEBOUNCE_MS);
+  for (const f of [pw, ef, ve, tr]) f.input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["ev-range-per-hour"] = _v968renderEvRangePerHour;
