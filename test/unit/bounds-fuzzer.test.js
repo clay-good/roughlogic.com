@@ -28100,3 +28100,25 @@ test("bounds: spec-v975 computeSlabDowelSchedule pins the dowel count and error 
   assert.ok("error" in _v975({ joint_length_ft: 40, slab_thickness_in: 6, dowel_spacing_in: 12, edge_clearance_in: 6, num_joints: 0 }));
   assert.ok("error" in _v975({ joint_length_ft: Infinity, slab_thickness_in: 6, dowel_spacing_in: 12, edge_clearance_in: 6, num_joints: 5 }));
 });
+
+import { computeDrywellInfiltration as _v976 } from "../../calc-drainage.js";
+
+test("bounds: spec-v976 computeDrywellInfiltration pins the void-ratio sizing and error seams", () => {
+  const r = _v976({ runoff_volume_ft3: 200, void_ratio: 0.35, trench_depth_ft: 4, infiltration_rate_in_hr: 0.5 });
+  assert.ok(Math.abs(r.excavation_volume_ft3 - 571.4286) < 1e-2); // 200/0.35
+  assert.ok(Math.abs(r.footprint_sf - 142.857) < 1e-2); // /4
+  assert.ok(Math.abs(r.draindown_time_hr - 33.6) < 1e-6); // 12*4*0.35/0.5
+  // A slow (clay) soil drains far more slowly.
+  assert.ok(Math.abs(_v976({ runoff_volume_ft3: 200, void_ratio: 0.35, trench_depth_ft: 4, infiltration_rate_in_hr: 0.1 }).draindown_time_hr - 168) < 1e-6);
+  // A higher void ratio (chamber) shrinks the excavation.
+  assert.ok(_v976({ runoff_volume_ft3: 200, void_ratio: 0.9, trench_depth_ft: 4, infiltration_rate_in_hr: 0.5 }).excavation_volume_ft3 < r.excavation_volume_ft3);
+  // Excavation is linear in runoff.
+  assert.ok(Math.abs(_v976({ runoff_volume_ft3: 400, void_ratio: 0.35, trench_depth_ft: 4, infiltration_rate_in_hr: 0.5 }).excavation_volume_ft3 - 2 * r.excavation_volume_ft3) < 1e-6);
+  // Error seams: non-positive runoff / depth / infiltration, void out of (0,1], non-finite.
+  assert.ok("error" in _v976({ runoff_volume_ft3: 0, void_ratio: 0.35, trench_depth_ft: 4, infiltration_rate_in_hr: 0.5 }));
+  assert.ok("error" in _v976({ runoff_volume_ft3: 200, void_ratio: 0, trench_depth_ft: 4, infiltration_rate_in_hr: 0.5 }));
+  assert.ok("error" in _v976({ runoff_volume_ft3: 200, void_ratio: 1.5, trench_depth_ft: 4, infiltration_rate_in_hr: 0.5 }));
+  assert.ok("error" in _v976({ runoff_volume_ft3: 200, void_ratio: 0.35, trench_depth_ft: 0, infiltration_rate_in_hr: 0.5 }));
+  assert.ok("error" in _v976({ runoff_volume_ft3: 200, void_ratio: 0.35, trench_depth_ft: 4, infiltration_rate_in_hr: 0 }));
+  assert.ok("error" in _v976({ runoff_volume_ft3: Infinity, void_ratio: 0.35, trench_depth_ft: 4, infiltration_rate_in_hr: 0.5 }));
+});

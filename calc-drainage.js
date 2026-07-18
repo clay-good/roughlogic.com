@@ -324,3 +324,56 @@ function renderSewageForceMainVelocity(inputRegion, outputRegion, citationEl) {
   for (const f of [q.input, id.input]) f.addEventListener("input", update);
 }
 DRAINAGE_RENDERERS["sewage-force-main-velocity"] = renderSewageForceMainVelocity;
+
+// ===================== spec-v976: dry well / infiltration trench sizing =====================
+// dims: in { args: dimensionless } out: { excavation_volume_ft3: dimensionless, footprint_sf: dimensionless, draindown_time_hr: dimensionless }
+export function computeDrywellInfiltration({ runoff_volume_ft3 = 200, void_ratio = 0.35, trench_depth_ft = 4, infiltration_rate_in_hr = 0.5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(runoff_volume_ft3 > 0)) return { error: "Runoff (storage) volume must be positive (ft^3)." };
+  if (!(void_ratio > 0 && void_ratio <= 1)) return { error: "Void ratio must be between 0 and 1 (clean stone ~0.30-0.40)." };
+  if (!(trench_depth_ft > 0)) return { error: "Trench/pit depth must be positive (ft)." };
+  if (!(infiltration_rate_in_hr > 0)) return { error: "Soil infiltration rate must be positive (in/hr)." };
+  // Aggregate stores water only in its voids, so the excavation is larger than the runoff by 1/void_ratio.
+  const excavation_volume_ft3 = runoff_volume_ft3 / void_ratio;
+  const footprint_sf = excavation_volume_ft3 / trench_depth_ft;
+  // Draindown: the void-water column (depth x void) infiltrates through the bottom at the soil rate.
+  const draindown_time_hr = 12 * trench_depth_ft * void_ratio / infiltration_rate_in_hr;
+  if (![excavation_volume_ft3, footprint_sf, draindown_time_hr].every(Number.isFinite)) return { error: "Dry-well math is not a finite value." };
+  return {
+    excavation_volume_ft3,
+    footprint_sf,
+    draindown_time_hr,
+    note: "The size of a stone-filled dry well or infiltration trench (soakaway) that stores a runoff volume and lets it soak into the ground. Because clean crushed stone holds water only in its VOIDS (about 30-40% of the aggregate volume), the excavation must be larger than the water it stores by 1 / void ratio: storing 200 ft^3 of runoff in 0.35-void stone needs a 571 ft^3 pit, which at a 4 ft depth is a 143 sf footprint. The pit then empties by infiltration through the bottom (and sides) into the soil; a rough draindown estimate is the void-water column (depth x void ratio) divided by the soil infiltration rate, so a 4 ft deep, 0.35-void pit over a 0.5 in/hr soil drains in about 34 hours -- a well-designed system fully empties between storms (commonly within 24-72 hr) so it is ready for the next. The runoff volume itself comes from the design storm and the contributing area (a rational-method or detention calc), the void ratio from the actual aggregate (open-graded stone ~0.35, a chambered/modular unit is higher), and the infiltration rate from a field PERCOLATION or infiltration test -- NOT a default. An overflow/bypass path is required for storms that exceed the design. A sizing screen; the field perc test, the local stormwater code, and the AHJ / geotech govern the design.",
+  };
+}
+
+export const drywellInfiltrationExample = { inputs: { runoff_volume_ft3: 200, void_ratio: 0.35, trench_depth_ft: 4, infiltration_rate_in_hr: 0.5 } };
+
+function _v976renderDrywellInfiltration(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: dry well / infiltration trench (soakaway) sizing, by name. excavation = runoff / void ratio; footprint = excavation / depth; draindown ~ 12 x depth x void / infiltration rate. Void from the aggregate (~0.35 open stone), infiltration from a field perc test (not a default), runoff from the design storm. An overflow path is required; the perc test, the stormwater code, and the AHJ / geotech govern.";
+  const rv = makeNumber("Runoff (storage) volume (ft^3)", "dwi-rv", { step: "any", min: "0", value: "200" });
+  rv.input.value = "200";
+  const vr = makeNumber("Aggregate void ratio (~0.35)", "dwi-vr", { step: "any", min: "0", value: "0.35" });
+  vr.input.value = "0.35";
+  const td = makeNumber("Trench/pit depth (ft)", "dwi-td", { step: "any", min: "0", value: "4" });
+  td.input.value = "4";
+  const ir = makeNumber("Soil infiltration rate (in/hr, perc test)", "dwi-ir", { step: "any", min: "0", value: "0.5" });
+  ir.input.value = "0.5";
+  for (const f of [rv, vr, td, ir]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { rv.input.value = "200"; vr.input.value = "0.35"; td.input.value = "4"; ir.input.value = "0.5"; update(); });
+  const oE = makeOutputLine(outputRegion, "Excavation volume", "dwi-out-e");
+  const oF = makeOutputLine(outputRegion, "Footprint (at this depth)", "dwi-out-f");
+  const oD = makeOutputLine(outputRegion, "Draindown time", "dwi-out-d");
+  const update = debounce(() => {
+    const r = computeDrywellInfiltration({
+      runoff_volume_ft3: rv.input.value === "" ? 200 : Number(rv.input.value), void_ratio: vr.input.value === "" ? 0.35 : Number(vr.input.value),
+      trench_depth_ft: td.input.value === "" ? 4 : Number(td.input.value), infiltration_rate_in_hr: ir.input.value === "" ? 0.5 : Number(ir.input.value),
+    });
+    if (r.error) { oE.textContent = r.error; oF.textContent = "-"; oD.textContent = "-"; return; }
+    oE.textContent = fmt(r.excavation_volume_ft3, 0) + " ft^3 of stone-filled pit";
+    oF.textContent = fmt(r.footprint_sf, 0) + " sf";
+    oD.textContent = fmt(r.draindown_time_hr, 1) + " hr (want < ~24-72 hr)";
+  }, DEBOUNCE_MS);
+  for (const f of [rv, vr, td, ir]) f.input.addEventListener("input", update);
+}
+DRAINAGE_RENDERERS["drywell-infiltration"] = _v976renderDrywellInfiltration;

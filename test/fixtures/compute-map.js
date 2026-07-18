@@ -674,6 +674,7 @@ export const COMPUTE_MAP = {
   "overflow-scupper-sizing": { module: "../../calc-drainage.js", fn: "computeOverflowScupperSizing" },
   "scupper-width-for-flow": { module: "../../calc-drainage.js", fn: "computeScupperWidthForFlow" },
   "sewage-force-main-velocity": { module: "../../calc-drainage.js", fn: "computeSewageForceMainVelocity" },
+  "drywell-infiltration": { module: "../../calc-drainage.js", fn: "computeDrywellInfiltration" },
   "stormwater-detention-volume": { module: "../../calc-plumbing.js", fn: "computeStormwaterDetentionVolume" },
   "sump-basin-sizing": { module: "../../calc-drainage.js", fn: "computeSumpBasinSizing" },
   "gas-appliance-demand": { module: "../../calc-service.js", fn: "computeGasApplianceDemand" },

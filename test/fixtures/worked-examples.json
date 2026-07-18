@@ -63044,6 +63044,64 @@
    }
   },
   {
+   "tile_id": "drywell-infiltration",
+   "source_publisher": "Dry well / infiltration trench (void-ratio storage)",
+   "source_title": "200 ft^3 runoff, 0.35 void, 4 ft deep, 0.5 in/hr -> 571 ft^3 pit, 143 sf, 33.6 hr draindown",
+   "source_edition_or_year": "spec-v976 worked example (machine-verified)",
+   "source_section_or_page": "excavation = 200/0.35 = 571.4; footprint = 571.4/4 = 142.86; draindown = 12*4*0.35/0.5 = 33.6",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "runoff_volume_ft3": 200,
+    "void_ratio": 0.35,
+    "trench_depth_ft": 4,
+    "infiltration_rate_in_hr": 0.5
+   },
+   "outputs": {
+    "excavation_volume_ft3": {
+     "value": 571.4,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "footprint_sf": {
+     "value": 142.86,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "draindown_time_hr": {
+     "value": 33.6,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drywell-infiltration",
+   "source_publisher": "Dry well / infiltration trench (void-ratio storage)",
+   "source_title": "cross-check: a slow 0.1 in/hr clay soil drains far too slowly, 168 hr (7 days)",
+   "source_edition_or_year": "spec-v976 worked example (machine-verified)",
+   "source_section_or_page": "draindown = 12*4*0.35/0.1 = 168 hr (fails the ~72 hr target -- clay is unsuitable)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "runoff_volume_ft3": 200,
+    "void_ratio": 0.35,
+    "trench_depth_ft": 4,
+    "infiltration_rate_in_hr": 0.1
+   },
+   "outputs": {
+    "draindown_time_hr": {
+     "value": 168,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "stormwater-detention-volume",
    "source_publisher": "Modified Rational method",
    "source_title": "C 0.85, i 3 in/hr, 2 ac, Q_allow 1.0 cfs, 30 min -> 5.10 cfs, 7,380 ft^3 (0.169 acre-ft)",

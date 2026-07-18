@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): add drywell-infiltration tile (spec-v976); 2026-07-18
+
+- New Group B tile `drywell-infiltration` (Dry Well / Infiltration Trench Sizing) in calc-drainage.js. Stone stores water
+  only in its voids, so excavation = runoff / void ratio; footprint = excavation / depth; draindown ~ 12 x depth x void /
+  infiltration rate. Storing 200 ft^3 in 0.35-void stone = a 571 ft^3 pit (143 sf at 4 ft), draining in ~34 hr; a clay
+  soil (0.1 in/hr) fails the ~72 hr target. The infiltration rate must come from a field perc test; an overflow is
+  required. The perc test and stormwater code govern. Home count 1,424 -> 1,425.
+
 ### feat(concrete): add slab-dowel-schedule tile (spec-v975); 2026-07-18
 
 - New Group E tile `slab-dowel-schedule` (Slab Load-Transfer Dowel Schedule, ACI 302) in calc-concrete.js. Smooth greased

@@ -308,6 +308,7 @@ const RELATED = {
   "scupper-width-for-flow": ["overflow-scupper-sizing", "roof-drain-sizing", "rain-load-ponding", "weir-flow"],
   "sewage-force-main-velocity": ["sump-basin-sizing", "roof-drain-sizing", "friction-loss", "overflow-scupper-sizing"],
   "stormwater-detention-volume": ["stormwater-rational", "time-of-concentration", "overflow-scupper-sizing", "roof-drain-sizing"],
+  "drywell-infiltration": ["stormwater-detention-volume", "stormwater-rational", "septic-drainfield"],
   "sump-basin-sizing": ["pump-sizing", "pump-tdh", "sanitary-dfu"],
   "gas-appliance-demand": ["gas-pipe-sizing", "gas-pipe-pressure-drop", "tankless-gpm"],
   "tpr-discharge": ["wh-expansion-tank", "water-heater-recovery", "thermal-expansion-volume"],
