@@ -633,7 +633,7 @@ const _TILES = [
   ["refrigerant-mass-flow", "C"], ["refrigeration-cop", "C"], ["condenser-heat-rejection", "C"], ["condenser-cop-for-heat-rejection", "C"],
   ["walk-in-cooler-load", "C"], ["product-pull-down-load", "C"], ["product-pull-down-time", "C"], ["evaporator-td-dtd", "C"],
   ["flash-gas-subcool", "C"],
-  ["hydronic-buffer-tank", "C"], ["outdoor-reset-ratio", "C"], ["hydronic-injection-mixing", "C"],
+  ["hydronic-buffer-tank", "C"], ["outdoor-reset-ratio", "C"], ["hydronic-injection-mixing", "C"], ["valve-authority", "C"],
   ["buffer-tank-loop-credit", "C"],
   // spec-v323..v325 engine-build performance batch (calc-mechanic.js Group K)
   ["injector-size", "K"], ["injector-max-hp", "K"], ["mean-piston-speed", "K"], ["max-rpm-from-piston-speed", "K"], ["trap-speed-horsepower", "K"], ["et-horsepower", "K"],

@@ -1602,6 +1602,7 @@ const RELATED = {
   "hydronic-buffer-tank": ["expansion-tank", "boiler-pipe-sizing", "compressor-short-cycle"],
   "outdoor-reset-ratio": ["boiler-pipe-sizing", "radiant-floor-output", "hydronic-gpm-deltat"],
   "hydronic-injection-mixing": ["outdoor-reset-ratio", "hydronic-gpm-deltat", "radiant-loop-sizing"],
+  "valve-authority": ["valve-flow-coefficient", "hydronic-gpm-deltat", "outdoor-reset-ratio"],
   "buffer-tank-loop-credit": ["hydronic-buffer-tank", "pipe-volume", "expansion-tank"],
   // spec-v323..v325 engine-build performance batch (Group K)
   "injector-size": ["injector-max-hp","volumetric-efficiency","displacement-cr","hp-from-torque"],

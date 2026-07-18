@@ -372,6 +372,7 @@ const TOOL_MODULES = (() => {
     "hydronic-buffer-tank",
     "outdoor-reset-ratio",
     "hydronic-injection-mixing",
+    "valve-authority",
     // spec-v623 buffer tank with distribution-loop credit
     "buffer-tank-loop-credit",
   ]);

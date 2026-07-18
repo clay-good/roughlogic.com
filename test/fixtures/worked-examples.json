@@ -37446,6 +37446,48 @@
    }
   },
   {
+   "tile_id": "valve-authority",
+   "source_publisher": "Control valve authority (beta)",
+   "source_title": "5 psi valve open, 3 psi coil -> beta 0.625 (good, >= 0.5)",
+   "source_edition_or_year": "spec-v980 worked example (machine-verified)",
+   "source_section_or_page": "beta = 5/(5+3) = 5/8 = 0.625",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "valve_pressure_drop_psi": 5,
+    "controlled_circuit_drop_psi": 3
+   },
+   "outputs": {
+    "valve_authority": {
+     "value": 0.625,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "valve-authority",
+   "source_publisher": "Control valve authority (beta)",
+   "source_title": "cross-check: an oversized valve (1 psi) on a 9 psi coil has poor authority 0.10",
+   "source_edition_or_year": "spec-v980 worked example (machine-verified)",
+   "source_section_or_page": "beta = 1/(1+9) = 0.10 (< 0.25 poor -- distorted, hunting; use a smaller valve)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "valve_pressure_drop_psi": 1,
+    "controlled_circuit_drop_psi": 9
+   },
+   "outputs": {
+    "valve_authority": {
+     "value": 0.1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hydronic-injection-mixing",
    "source_publisher": "hydronic injection-mixing loop (primary/secondary energy balance)",
    "source_title": "10 gpm secondary at 110/90 F off a 180 F primary -> 2.22 gpm injection (22.2%)",

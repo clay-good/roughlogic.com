@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): add valve-authority tile (spec-v980); 2026-07-18
+
+- New Group C tile `valve-authority` (Control Valve Authority, Beta) in calc-hvacsystems.js. beta = valve open pressure
+  drop / (valve open drop + controlled-circuit drop). A 5 psi valve on a 3 psi coil = 0.625 (good); an oversized valve
+  (1 psi on a 9 psi coil) = 0.10 (poor, hunting). Target beta >= 0.5 for a near-linear installed characteristic; the fix
+  for low authority is a smaller (lower-Cv) valve. Separate from Cv flow sizing. Home count 1,428 -> 1,429.
+
 ### feat(electrical): add room-cavity-ratio tile (spec-v979); 2026-07-18
 
 - New Group A tile `room-cavity-ratio` (RCR for CU Lookup) in calc-elecdesign.js. RCR = 5 x cavity height x (length +

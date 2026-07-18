@@ -1177,6 +1177,7 @@ export const COMPUTE_MAP = {
   "hydronic-buffer-tank": { module: "../../calc-hvacsystems.js", fn: "computeHydronicBufferTank" },
   "outdoor-reset-ratio": { module: "../../calc-hvacsystems.js", fn: "computeOutdoorResetRatio" },
   "hydronic-injection-mixing": { module: "../../calc-hvacsystems.js", fn: "computeHydronicInjectionMixing" },
+  "valve-authority": { module: "../../calc-hvacsystems.js", fn: "computeValveAuthority" },
   "buffer-tank-loop-credit": { module: "../../calc-hvacsystems.js", fn: "computeBufferTankLoopCredit" },
   // spec-v323..v325 engine-build performance batch (3 tiles)
   "injector-size": { module: "../../calc-mechanic.js", fn: "computeInjectorSize" },

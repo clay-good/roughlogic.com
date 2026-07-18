@@ -2310,6 +2310,7 @@ cross-check.
 | calc-hvacsystems.js | `computeHydronicInjectionMixing` | `{ secondary_gpm = 10, secondary_supply_f = 110, secondary_return_f = 90, prim...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeInternalHeatGains` | `{ occupants = 0, sens_per_person = 245, lat_per_person = 200, lighting_w = 0,...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeOutdoorResetRatio` | `{ supply_design_f = 180, supply_min_f = 80, oa_design_f = 0, oa_noheat_f = 65...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeValveAuthority` | `{ valve_pressure_drop_psi = 5, controlled_circuit_drop_psi = 3 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeVavBoxAirflow` | `{ zone_sensible_btuh = 0, supply_dt_f = 0, ventilation_cfm = 0, turndown = 0....` | _ | _ | _ |
 | calc-hvacsystems.js | `computeWindowSolarHeatGain` | `{ area_ft2 = 0, shgc = 0, psf = 0, u_factor = 0, cltd_f = 0 } = {}` | _ | _ | _ |
 | calc-kitchen.js | `computeBakersPercentage` | `{ flour_g = 0, hydration_pct = 0, salt_pct = 0, yeast_pct = 0, other_pct = 0,...` | _ | _ | _ |
@@ -3089,7 +3090,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1675.
+Row count: 1676.
 
 <!-- END function-corpus-v14 -->
 
@@ -3487,7 +3488,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (136 tiles)
+### Group C HVAC (137 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3621,6 +3622,7 @@ per spec-v14 §13.1 second paragraph.
 | `static-pressure-hvac` | Static Pressure | ACCA Manual D / ASHRAE Fundamentals; filter 0.25 + coil 0.30 + duct 0.20 -> 0.75 in WC TESP | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `superheat-subcool` | Superheat and Subcool | AHRI / manufacturer P-T charts; R-410A at 118 psig saturates at ~40 F; suction line at 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vacuum-decay-test` | Vacuum Decay (Blank-Off) Test | First-principles standing-decay (blan...; spec-v105 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `valve-authority` | Control Valve Authority (Beta) | Control valve authority (beta); beta = 5/(5+3) = 5/8 = 0.625 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `vav-box-airflow` | VAV Box Minimum and Maximum Airflow | VAV design / ASHRAE 62.1; spec-v410 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `vibration-isolation` | Vibration Isolation Efficiency (ASHRAE) | ASHRAE Handbook -- Fundamentals, Soun...; spec-v483 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `walk-in-cooler-load` | Walk-In Cooler Heat Load | ASHRAE Refrigeration; spec-v432 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4703,6 +4705,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1428. Fixture-covered or reference-cadence: 1428 / 1428.
+Tile count: 1429. Fixture-covered or reference-cadence: 1429 / 1429.
 
 <!-- END tile-index-v14 -->

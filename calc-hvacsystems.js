@@ -1439,3 +1439,42 @@ function _v956renderHydronicInjectionMixing(inputRegion, outputRegion, citationE
   for (const f of [sg, ss, sr, ps]) f.input.addEventListener("input", update);
 }
 HVACSYSTEMS_RENDERERS["hydronic-injection-mixing"] = _v956renderHydronicInjectionMixing;
+
+// ===================== spec-v980: control valve authority =====================
+// dims: in { args: dimensionless } out: { valve_authority: dimensionless }
+export function computeValveAuthority({ valve_pressure_drop_psi = 5, controlled_circuit_drop_psi = 3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(valve_pressure_drop_psi > 0)) return { error: "Valve pressure drop (fully open) must be positive (psi)." };
+  if (!(controlled_circuit_drop_psi >= 0)) return { error: "Controlled-circuit pressure drop cannot be negative (psi)." };
+  // Authority = valve open drop / total drop across the variable (controlled) branch (valve + coil/piping it modulates).
+  const valve_authority = valve_pressure_drop_psi / (valve_pressure_drop_psi + controlled_circuit_drop_psi);
+  const verdict = valve_authority >= 0.5 ? "good (>= 0.5): near-linear installed characteristic" : valve_authority >= 0.25 ? "tolerable (0.25-0.5): some distortion" : "poor (< 0.25): distorted control, hunting -- resize the valve";
+  if (!Number.isFinite(valve_authority)) return { error: "Valve-authority math is not a finite value." };
+  return {
+    valve_authority,
+    verdict,
+    note: "The authority (beta) of a modulating control valve -- how much control it actually has over the flow in its branch. Authority = the valve's pressure drop when fully OPEN divided by the total pressure drop across the VARIABLE (controlled) branch it modulates (the valve plus the coil and variable piping in series with it). A 5 psi valve drop in series with a 3 psi coil is beta = 5/(5+3) = 0.625. Why it matters: a valve's inherent flow characteristic (equal-percentage, linear) is only realized if the valve keeps most of the branch pressure drop. When the valve has LOW authority -- it is oversized so it drops little pressure while a fixed coil or long piping drops most -- opening the valve barely changes the flow near the open end and changes it too fast near the closed end, distorting the installed characteristic into an on/off-like curve that hunts and overshoots. The design target is beta >= 0.5 (an equal-percentage trim then gives a near-linear installed response), 0.25 to 0.5 is tolerable, and below 0.25 the control is poor -- the fix is a SMALLER (lower-Cv) valve so it takes more of the drop, which is why control valves are deliberately undersized relative to line size (sized on Cv and pressure drop, not pipe size). Authority is about controllability, separate from the Cv flow-capacity sizing (valve-flow-coefficient). A design/commissioning check; the design pressures, the valve trim, and the engineer / balancer govern.",
+  };
+}
+
+export const valveAuthorityExample = { inputs: { valve_pressure_drop_psi: 5, controlled_circuit_drop_psi: 3 } };
+
+function _v980renderValveAuthority(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: control valve authority (beta), by name. authority = valve open pressure drop / total drop across the variable branch (valve + coil/variable piping). Target beta >= 0.5 for a near-linear installed characteristic; below 0.25 is poor (resize the valve smaller). Separate from Cv flow sizing (valve-flow-coefficient). The design pressures, valve trim, and engineer/balancer govern.";
+  const vd = makeNumber("Valve pressure drop, fully open (psi)", "va-vd", { step: "any", min: "0", value: "5" });
+  vd.input.value = "5";
+  const cd = makeNumber("Coil + variable piping drop (psi)", "va-cd", { step: "any", min: "0", value: "3" });
+  cd.input.value = "3";
+  for (const f of [vd, cd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { vd.input.value = "5"; cd.input.value = "3"; update(); });
+  const oA = makeOutputLine(outputRegion, "Valve authority (beta)", "va-out-a");
+  const update = debounce(() => {
+    const r = computeValveAuthority({
+      valve_pressure_drop_psi: vd.input.value === "" ? 5 : Number(vd.input.value), controlled_circuit_drop_psi: cd.input.value === "" ? 3 : Number(cd.input.value),
+    });
+    if (r.error) { oA.textContent = r.error; return; }
+    oA.textContent = fmt(r.valve_authority, 3) + " -- " + r.verdict;
+  }, DEBOUNCE_MS);
+  for (const f of [vd, cd]) f.input.addEventListener("input", update);
+}
+HVACSYSTEMS_RENDERERS["valve-authority"] = _v980renderValveAuthority;

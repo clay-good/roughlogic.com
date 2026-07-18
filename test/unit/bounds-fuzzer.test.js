@@ -28184,3 +28184,26 @@ test("bounds: spec-v979 computeRoomCavityRatio pins the IES zonal-cavity RCR and
   assert.ok("error" in _v979({ room_length_ft: 40, room_width_ft: 30, cavity_height_ft: 0 }));
   assert.ok("error" in _v979({ room_length_ft: Infinity, room_width_ft: 30, cavity_height_ft: 8 }));
 });
+
+import { computeValveAuthority as _v980 } from "../../calc-hvacsystems.js";
+
+test("bounds: spec-v980 computeValveAuthority pins beta and the verdict bands, and error seams", () => {
+  const r = _v980({ valve_pressure_drop_psi: 5, controlled_circuit_drop_psi: 3 });
+  assert.ok(Math.abs(r.valve_authority - 0.625) < 1e-9); // 5/(5+3)
+  assert.ok(r.verdict.startsWith("good")); // >= 0.5
+  // An oversized valve (small drop vs a big fixed coil) has poor authority.
+  const poor = _v980({ valve_pressure_drop_psi: 1, controlled_circuit_drop_psi: 9 });
+  assert.ok(Math.abs(poor.valve_authority - 0.1) < 1e-9);
+  assert.ok(poor.verdict.startsWith("poor")); // < 0.25
+  // Band edges: exactly 0.5 is good, exactly 0.25 is tolerable.
+  assert.ok(_v980({ valve_pressure_drop_psi: 5, controlled_circuit_drop_psi: 5 }).verdict.startsWith("good")); // 0.5
+  assert.ok(_v980({ valve_pressure_drop_psi: 1, controlled_circuit_drop_psi: 3 }).verdict.startsWith("tolerable")); // 0.25
+  // A larger valve drop (or smaller coil) raises authority toward 1.
+  assert.ok(_v980({ valve_pressure_drop_psi: 9, controlled_circuit_drop_psi: 1 }).valve_authority > r.valve_authority);
+  // Zero controlled-circuit drop gives authority 1 (all drop across the valve).
+  assert.ok(Math.abs(_v980({ valve_pressure_drop_psi: 5, controlled_circuit_drop_psi: 0 }).valve_authority - 1) < 1e-9);
+  // Error seams: non-positive valve drop, negative circuit drop, non-finite.
+  assert.ok("error" in _v980({ valve_pressure_drop_psi: 0, controlled_circuit_drop_psi: 3 }));
+  assert.ok("error" in _v980({ valve_pressure_drop_psi: 5, controlled_circuit_drop_psi: -1 }));
+  assert.ok("error" in _v980({ valve_pressure_drop_psi: Infinity, controlled_circuit_drop_psi: 3 }));
+});
