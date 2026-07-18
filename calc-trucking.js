@@ -135,7 +135,7 @@ export const TRAILER_DIMENSIONS_IN = {
 };
 
 // dims: in { case_length_in: L, case_width_in: L, case_height_in: L, case_weight_lb: M, cases_per_pallet: dimensionless, pallet_length_in: L, pallet_width_in: L, pallet_height_in: L, trailer: dimensionless, pinwheel: dimensionless }
-//        out: { pallets_by_floor: dimensionless, pallets_by_weight: dimensionless, pallets_total: dimensionless, cube_fill_percent: dimensionless, total_weight_lb: M, flag: dimensionless, binding_margin_pallets: dimensionless, slack_utilization_pct: dimensionless, trailer_cube_ft3: L^3, pallet_cube_ft3: L^3 }
+//        out: { pallets_by_floor: dimensionless, pallets_by_weight: dimensionless, pallets_total: dimensionless, cube_fill_percent: dimensionless, total_weight_lb: M, flag: dimensionless, binding_margin_pallets: dimensionless, slack_utilization_pct: dimensionless, trailer_cube_ft3: L^3, pallet_cube_ft3: L^3, case_cube_ft3: L^3, cases_cube_ft3: L^3, cases_fit_pallet_cube: dimensionless, pallet_cube_utilization_pct: dimensionless }
 // (Case and pallet dimensions are lengths `L`; case weight is mass
 //  `M`. Trailer / pinwheel toggles and case-count are dimensionless.
 //  Floor- and weight-bound pallet counts are integer counts
@@ -183,6 +183,15 @@ export function computePalletLoadout({
   const trailer_cube_ft3 = (tr.L * tr.W * tr.H) / 1728;
   const cube_fill_percent = (pallets_total * pallet_cube_ft3 / trailer_cube_ft3) * 100;
 
+  // Physical cube feasibility of the stacked cases on one pallet: the total
+  // case volume must fit within the pallet cube. This is a necessary (volume)
+  // condition, independent of case orientation -- if the cases don't fit by
+  // volume the entered cases_per_pallet is impossible regardless of layout.
+  const case_cube_ft3 = (case_length_in * case_width_in * case_height_in) / 1728;
+  const cases_cube_ft3 = case_cube_ft3 * cases_per_pallet;
+  const cases_fit_pallet_cube = cases_cube_ft3 <= pallet_cube_ft3;
+  const pallet_cube_utilization_pct = pallet_cube_ft3 > 0 ? (cases_cube_ft3 / pallet_cube_ft3) * 100 : null;
+
   const total_weight_lb = pallets_total * total_pallet_weight_lb;
   const flag = pallets_by_weight < pallets_by_floor ? "weigh-out" : (pallets_total > 0 ? "cube-out" : "empty");
   // v8 §C.5: how much the binding limit beats the slack limit by.
@@ -199,6 +208,7 @@ export function computePalletLoadout({
     cube_fill_percent, total_weight_lb, flag,
     binding_margin_pallets, slack_utilization_pct,
     trailer_cube_ft3, pallet_cube_ft3,
+    case_cube_ft3, cases_cube_ft3, cases_fit_pallet_cube, pallet_cube_utilization_pct,
   };
 }
 
@@ -596,6 +606,8 @@ const renderPalletLoadout = _simpleRenderer({
     { key: "g", id: "pl-out-g", label: "Status",             value: (r) => r.flag },
     { key: "bm", id: "pl-out-bm", label: "Binding margin",   value: (r) => r.binding_margin_pallets === null ? "-" : String(r.binding_margin_pallets) + " pallet(s) headroom over the slack limit" },
     { key: "su", id: "pl-out-su", label: "Slack utilization", value: (r) => r.slack_utilization_pct === null ? "-" : fmt(r.slack_utilization_pct, 1) + " % of slack limit used" },
+    { key: "cc", id: "pl-out-cc", label: "Case cube on pallet", value: (r) => fmt(r.cases_cube_ft3, 1) + " ft^3 (" + fmt(r.pallet_cube_utilization_pct, 0) + " % of pallet cube)" },
+    { key: "cf", id: "pl-out-cf", label: "Cases fit pallet cube", value: (r) => r.cases_fit_pallet_cube ? "yes" : "NO - cases_per_pallet exceeds the pallet cube; reduce the count or the case size" },
   ],
   compute: computePalletLoadout,
 });

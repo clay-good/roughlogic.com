@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(trucking): pallet-loadout collected case dimensions but never used them; 2026-07-18
+
+- computePalletLoadout rendered "Case length / width / height" fields and validated them, but the loadout (pallets
+  by floor area and by weight) never used the case dimensions -- changing them left every output byte-identical
+  (guard-only dead input). Rather than drop three fields a user reasonably expects to matter on a trailer-loading
+  tool, made them live with a physical cube-feasibility check: the stacked case volume (cases_per_pallet x case cube)
+  must fit within the pallet cube. New outputs `case_cube_ft3`, `cases_cube_ft3`, `cases_fit_pallet_cube`, and
+  `pallet_cube_utilization_pct` flag an impossible entry (e.g. 40 in cubes at 36/pallet can't fit a 48x40x48 pallet).
+  Existing outputs and pins are unchanged. Found by a targeted dead-input sweep (calc-hvac.js ~68 fns and calc-demo.js
+  came back clean in the same sweep).
+
 ### fix(construction): residential-framing had a dead "Rafter span" input duplicating "Building run"; 2026-07-18
 
 - computeResidentialFraming rendered a "Rafter span (ft)" field and validated `rafter_span_ft`, but the rafter
