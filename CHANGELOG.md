@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(cross-tile): pin forward/inverse round-trip agreement for three unprotected pairs; 2026-07-18
+
+- Two of this session's formula bugs (refrigerant-pt target superheat, voltage-imbalance derate) were two
+  computations of the same physical quantity that silently disagreed. The subagent audit confirmed many forward/inverse
+  pairs round-trip, but three lacked a persistent test: pv-energy-yield <-> pv-array-sizing, pv-cell-temperature-power
+  <-> pv-max-ambient-for-power, and chiller tons -> required_gpm. Added round-trip asserts (over several input values
+  each) to cross-tile-invariants so a future edit that breaks the agreement fails here instead of shipping. Test-only;
+  all three round-trip exactly today.
+
 ### chore(lint): report coverage in check-guard-only-inputs so skipped functions are auditable; 2026-07-18
 
 - The new guard-only dead-input gate only parses the object-destructure signature form `computeX({ ... })`. It now

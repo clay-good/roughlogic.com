@@ -12588,3 +12588,35 @@ test("physical: rescue sling tension uses cos(theta/2) and rises as legs open (g
   assert.ok(sa({ load_lb: 2000 }).tension_per_leg_lb > sa({}).tension_per_leg_lb, "tension must rise with load");
   assert.ok(sa({ n_legs: 4 }).tension_per_leg_lb < sa({}).tension_per_leg_lb, "more legs share the load, lowering per-leg tension");
 });
+
+// Forward/inverse AGREEMENT round-trips. Two of this session's formula bugs
+// (refrigerant-pt target superheat, voltage-imbalance derate) were two
+// computations of the SAME physical quantity that silently disagreed. These
+// pin that a forward tile and its inverse round-trip exactly, so a future edit
+// to one that breaks the agreement fails here instead of shipping.
+test("round-trip: pv-energy-yield <-> pv-array-sizing recover the DC nameplate", async () => {
+  const s = await import("../../calc-solar.js");
+  for (const dc_kw of [4, 8, 12.5, 25]) {
+    const y = s.computePvEnergyYield({ dc_kw, psh: 4.5, perf_ratio: 0.78 });
+    const back = s.computePvArraySizing({ target_annual_kwh: y.annual_kwh, psh: 4.5, perf_ratio: 0.78 });
+    assert.ok(Math.abs(back.dc_kw - dc_kw) < 1e-9, `yield->sizing round-trip for ${dc_kw} kW: got ${back.dc_kw}`);
+  }
+});
+
+test("round-trip: pv-cell-temperature-power <-> pv-max-ambient-for-power recover the ambient", async () => {
+  const s = await import("../../calc-solar.js");
+  for (const T_amb_C of [10, 25, 30, 40]) {
+    const ct = s.computePvCellTemperaturePower({ T_amb_C, G_wm2: 1000, NOCT_C: 45, P_stc_W: 400, gamma: -0.35 });
+    const back = s.computePvMaxAmbientForPower({ target_power_W: ct.P_W, P_stc_W: 400, G_wm2: 1000, NOCT_C: 45, gamma: -0.35 });
+    assert.ok(Math.abs(back.max_ambient_C - T_amb_C) < 1e-6, `cell-temp->max-ambient round-trip for ${T_amb_C} C: got ${back.max_ambient_C}`);
+  }
+});
+
+test("round-trip: chiller tons -> required_gpm recovers the design flow", async () => {
+  const h = await import("../../calc-hvacsystems.js");
+  for (const gpm of [120, 240, 480, 1000]) {
+    const fwd = h.computeChillerTons({ gpm, ewt_F: 54, lwt_F: 44, fluid: "water" });
+    const inv = h.computeChillerTons({ gpm, ewt_F: 54, lwt_F: 44, fluid: "water", nameplate_tons: fwd.tons });
+    assert.ok(Math.abs(inv.required_gpm - gpm) < 1e-6, `tons->required_gpm round-trip for ${gpm} GPM: got ${inv.required_gpm}`);
+  }
+});
