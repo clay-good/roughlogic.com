@@ -218,3 +218,23 @@ test("plumbing demand tables: Hunter's curve and PDI arrestor sizes are strictly
       `PDI arrestor WSFU capacity not increasing at ${i}: ${P[i].designation} ${P[i].max_wsfu} <= ${P[i - 1].max_wsfu}`);
   }
 });
+
+// Cross-tile physical consistency: pipe-velocity and friction-loss are two
+// separate tiles that both compute flow velocity V = 0.4085 * gpm / ID^2. For
+// the same Schedule-40 pipe and flow they must return the same velocity. If the
+// 0.4085 constant, the velocity formula, or the SCH40 ID diverges in either
+// tile, this catches it -- the exact "sibling" divergence the formula audit used
+// to expose bugs, which per-tile fixtures (each testing only itself) cannot see.
+test("cross-tile: pipe-velocity and friction-loss agree on flow velocity for the same SCH40 pipe", async () => {
+  const m = await import("../../calc-plumbing.js");
+  const ID = m.SCH40_ID_IN;
+  for (const nominal of ["0.5", "0.75", "1", "1.25", "2"]) {
+    for (const gpm of [5, 10, 20]) {
+      const fl = m.computeFrictionLoss({ method: "hazen-williams", material: "PVC", nominal_size: nominal, length_ft: 100, flow_gpm: gpm });
+      const pv = m.computePipeVelocity({ mode: "velocity-from-flow", flow_gpm: gpm, diameter_in: ID[nominal], material: "copper", service: "hot" });
+      assert.ok(!fl.error && !pv.error, `error at ${nominal} in / ${gpm} gpm`);
+      assert.ok(Math.abs(fl.velocity_ft_s - pv.velocity_fps) < 1e-9,
+        `velocity mismatch at ${nominal} in / ${gpm} gpm: friction-loss ${fl.velocity_ft_s} vs pipe-velocity ${pv.velocity_fps}`);
+    }
+  }
+});

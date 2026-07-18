@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(plumbing): cross-tile velocity consistency between pipe-velocity and friction-loss; 2026-07-17
+
+- Added a cross-tile physical-consistency guard: pipe-velocity and friction-loss are separate tiles that both compute
+  flow velocity V = 0.4085 x gpm / ID^2, so for the same Schedule-40 pipe and flow they must return the same velocity.
+  If the 0.4085 constant, the velocity formula, or the SCH40 ID diverges in either tile, this catches it -- the "sibling"
+  divergence the formula audit relied on, which per-tile fixtures (each testing only itself) cannot see. Test-only.
+
 ### test(hvac): guard the hydronic baseboard output table (temperature monotonicity + product ordering); 2026-07-17
 
 - Added an ordering invariant over BASEBOARD_OUTPUT (backs baseboard-length-for-load): heat output rises with water
