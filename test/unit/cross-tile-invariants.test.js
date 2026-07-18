@@ -12484,3 +12484,18 @@ test("cross-module: the 1.08 sensible-heat coefficient agrees across hvac SHR-la
   assert.ok(Math.abs(kSvc - 1.08) < 1e-6, "hvacservice furnace must embed the 1.08 standard-air sensible-heat coefficient");
   assert.ok(Math.abs(kHvac - kSvc) < 1e-6, "the two modules must use the identical 1.08 coefficient (a drift in either is caught)");
 });
+
+test("cross-module: the 43560 sq-ft-per-acre constant agrees across agriculture crop-yield and survey area", async () => {
+  const a = await import("../../calc-agriculture.js");
+  const s = await import("../../calc-survey.js");
+  // Agriculture crop-yield: with weight = test-weight and moisture = std, yield(bu/acre) * strip area(ft^2) = 43560.
+  const cy = a.computeCropYield({ crop: "corn", rows_per_pass: 8, row_spacing_in: 30, measured_length_ft: 100, weight_in_strip_lb: 56, current_moisture_pct: 15.5 });
+  const stripArea = 8 * (30 / 12) * 100;
+  const kAg = cy.yield_bu_per_acre * stripArea;
+  // Survey area-by-coordinates: acres = ft^2 / 43560; recover the constant.
+  const sq = s.computeAreaByCoordinates({ points: [{ n: 0, e: 0 }, { n: 0, e: 100 }, { n: 100, e: 100 }, { n: 100, e: 0 }] });
+  const kSurvey = sq.area_ft2 / sq.area_acres;
+  assert.ok(Math.abs(kAg - 43560) < 1e-6, "agriculture crop-yield must embed 43560 sq ft per acre");
+  assert.ok(Math.abs(kSurvey - 43560) < 1e-6, "survey area must embed 43560 sq ft per acre");
+  assert.ok(Math.abs(kAg - kSurvey) < 1e-6, "the two modules must use the identical acre conversion (a drift in either is caught)");
+});

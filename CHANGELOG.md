@@ -4,6 +4,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test: cross-module 43560 sq-ft-per-acre consistency (agriculture vs survey); 2026-07-17
+
+- Shared-constant guard: recovers 43560 sq ft/acre from agriculture crop-yield (yield x strip-area = 43560 at
+  test-weight/std-moisture) and survey area (acres = ft^2/43560) and asserts both equal 43560 and agree. Test-only.
+
 ### test: cross-module 1.08 sensible-heat consistency (hvac vs hvacservice); 2026-07-17
 
 - Shared-constant guard: recovers the 1.08 standard-air sensible-heat coefficient independently from hvac SHR-latent
