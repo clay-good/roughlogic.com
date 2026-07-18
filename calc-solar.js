@@ -154,7 +154,7 @@ export function renderPVStringSizing(inputRegion, outputRegion, citationEl, para
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderBatteryRuntime(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Runtime = (Ah * V * DoD) / load_W. Peukert form t = C * (C / I)^(k - 1) when k > 1 (battery technical bulletins).";
+  citationEl.textContent = "Citation: Runtime = (Ah * V * DoD) / load_W. Peukert form t = C / I^k (C in Ah, I in A), reducing to C / I when k = 1 (battery technical bulletins).";
   attachExampleButton(inputRegion, () => fillExample(batteryRuntimeExample.inputs));
 
   const ah = makeNumber("Battery capacity (Ah)", "br-ah", { step: "any", min: "0" });

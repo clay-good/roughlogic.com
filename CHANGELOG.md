@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(solar): battery-runtime citation stated a Peukert form that contradicts the compute (and was wrong at k=1); 2026-07-17
+
+- The `battery-runtime` renderer citation read "Peukert form t = C * (C / I)^(k - 1)", but the compute uses `t = C / I^k`
+  (reducing to C / I at k = 1). The citation's form is not only inconsistent with the code, it is dimensionally wrong at
+  the default k = 1, where `C * (C / I)^0 = C` yields amp-hours instead of a runtime in hours. The compute is correct
+  (a 100 Ah battery at 80% DoD and 10 A draw runs 8.0 h at k = 1); only the displayed citation string was wrong. Fixed the
+  citation text to match the compute (`t = C / I^k, reducing to C / I when k = 1`). Display-only; no computed value changes.
+
 ### fix(gas): gas-pipe-sizing Spitzglass helper dropped the diameter-correction factor (~2.1x overestimate, undersized pipe); 2026-07-17
 
 - `spitzglassFlow` (calc-gas.js), the low-pressure Spitzglass capacity helper behind `gas-pipe-sizing`, computed
