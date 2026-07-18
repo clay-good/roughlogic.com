@@ -11971,3 +11971,21 @@ test("monotonicity: stopping sight distance and cost-per-mile respond correctly 
   assert.ok(cpm({ mpg: 8 }) < cpm({}), "cost/mile must fall with fuel economy");
   assert.ok(cpm({ miles_month: 20000 }) < cpm({}), "cost/mile must fall with monthly miles (fixed-cost spread)");
 });
+
+// Monotonicity of two restoration computes. Grains-removed water extraction
+// rises with airflow, grain depression (inlet minus outlet GPP), and run hours.
+// Containment air balance required_cfm = 2610 * (leak_in2/144) * sqrt(dP) rises
+// with leakage area and with the target pressure differential -- this is the
+// tile whose orifice constant was fixed (144x) in the prior audit, so the guard
+// protects that fix against regression. A term error is invisible to the pin.
+test("monotonicity: grains-removed and containment-air-balance restoration computes respond correctly", async () => {
+  const r = await import("../../calc-restoration.js");
+  const gr = (o) => r.computeGrainsRemoved({ cfm: 250, inlet_gpp: 90, outlet_gpp: 50, hours: 24, ...o });
+  assert.ok(gr({ cfm: 500 }).water_lb_hr > gr({}).water_lb_hr, "water removal must rise with airflow");
+  assert.ok(gr({ inlet_gpp: 110 }).water_lb_hr > gr({}).water_lb_hr, "water removal must rise with inlet grain load");
+  assert.ok(gr({ outlet_gpp: 40 }).water_lb_hr > gr({}).water_lb_hr, "water removal must rise as outlet GPP drops (bigger depression)");
+  assert.ok(gr({ hours: 48 }).water_gal > gr({}).water_gal, "total water must rise with run hours");
+  const cb = (o) => r.computeContainmentAirBalance({ containment_volume_ft3: 10000, target_dp_in_wc: 0.02, leakage_area_in2: 12, ...o }).required_cfm;
+  assert.ok(cb({ leakage_area_in2: 24 }) > cb({}), "required CFM must rise with leakage area");
+  assert.ok(cb({ target_dp_in_wc: 0.04 }) > cb({}), "required CFM must rise with target pressure differential");
+});

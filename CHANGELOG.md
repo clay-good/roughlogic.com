@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(restoration): guard grains-removed and containment-air-balance with monotonicity; 2026-07-17
+
+- Added guards: water extraction (grains-removed) rises with airflow, grain depression, and run hours; containment
+  required_cfm = 2610 x (leak_in2/144) x sqrt(dP) rises with leakage area and target pressure differential -- this is the
+  tile whose orifice constant was fixed (144x) in the prior audit, so the guard locks that fix. Test-only.
+
 ### test(trucking): guard stopping-sight-distance and cost-per-mile with monotonicity; 2026-07-17
 
 - Added guards: stopping sight distance (highway-design safety) rises with speed and reaction time and falls with pavement
