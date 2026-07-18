@@ -2367,6 +2367,7 @@ cross-check.
 | calc-lowvoltage.js | `computeFireAlarmNacVoltageDrop` | `{ nominal_voltage_v = 24, total_current_a = 0.8, run_length_ft = 250, resista...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeLoopSignalScaling` | `{ signal_ma = 12, range_low = 0, range_high = 100 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeLvCablePullFootage` | `{ drops = 48, avg_run_ft = 120, slack_ft = 15, box_ft = 1000 } = {}` | _ | _ | _ |
+| calc-lowvoltage.js | `computeRtdResistanceToTemp` | `{ resistance_ohms = 119.397, r0_ohms = 100 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeSpeaker70vLine` | `{ amp_rated_w = 0, headroom_percent = 20, tap_watts = 0, tap_count = 0, line_...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeStandbyBatteryRuntime` | `{ battery_ah = 0, standby_current_a = 0, alarm_current_a = 0, alarm_minutes =...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeStandbyBatterySizing` | `{ standby_current_a = 0, standby_hours = 0, alarm_current_a = 0, alarm_minute...` | _ | _ | _ |
@@ -3056,7 +3057,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1642.
+Row count: 1643.
 
 <!-- END function-corpus-v14 -->
 
@@ -3137,7 +3138,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (179 tiles)
+### Group A Electrical (180 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3283,6 +3284,7 @@ per spec-v14 §13.1 second paragraph.
 | `rolling-sphere-protection` | Lightning Rolling-Sphere Zone of Protection | NFPA 780 (rolling-sphere method); 30 ft mast, 150 ft sphere -> sqrt(9000 - 900) = sqrt(8100... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rooftop-temp-adder` | Rooftop Conduit Sunlight Ambient Adder (NEC 310.15(B)(2)) | NEC 2023 (NFPA 70); 95 F on the roof (<7/8 in) + 60 F adder = 155 F (~68 C) -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rotary-phase-converter-sizing` | Rotary Phase Converter Idler Sizing | rotary phase converter idler sizing (...; start = 2*10 = 20; idler = max(20, 15) = 20 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `rtd-resistance-to-temp` | RTD (Pt100 / Pt1000) Resistance to Temperature | IEC 60751 platinum RTD (Callendar-Van...; T = (-A + sqrt(A^2 - 4B(1 - 119.397/100)))/(2B), A=3.9083... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sccr-combination` | Industrial Control Panel SCCR (UL 508A) | UL 508A Supplement SB / NEC 409.110; 65/5/5/10 kA components, 22 kA fault -> panel SCCR 5 kA (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `service-conductor-sizing` | Dwelling Service/Feeder Conductor at 83% (NEC 310.12) | NEC 2023 310.12 / Table 310.16 (75 degC); spec-v279 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `service-load` | Service Load Calculation (Residential) | NFPA; 2000 ft^2 dwelling with 2 small-appliance + 1 laundry + 6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4637,6 +4639,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1395. Fixture-covered or reference-cadence: 1395 / 1395.
+Tile count: 1396. Fixture-covered or reference-cadence: 1396 / 1396.
 
 <!-- END tile-index-v14 -->

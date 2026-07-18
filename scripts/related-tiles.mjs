@@ -1092,6 +1092,7 @@ const RELATED = {
   "access-control-power-supply": ["standby-battery-sizing", "lv-cable-pull-footage", "cctv-storage"],
   "fire-alarm-nac-voltage-drop": ["standby-battery-sizing", "voltage-drop", "lv-cable-pull-footage"],
   "loop-signal-scaling": ["access-control-power-supply", "voltage-drop", "structured-cabling-channel"],
+  "rtd-resistance-to-temp": ["loop-signal-scaling", "copper-resistance", "structured-cabling-channel"],
   "polymeric-sand-bags": ["paver-patio", "retaining-wall-block", "aggregate"],
   "rigid-foam-board-count": ["insulation-batt-coverage", "spray-foam-board-feet", "assembly-r-value"],
   "roof-insulation-fasteners": ["membrane-roof-takeoff", "tapered-roof-insulation", "metal-roof-panels"],

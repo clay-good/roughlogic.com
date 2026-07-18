@@ -3,6 +3,11 @@
   "_updated": "2026-07-17",
   "_schema": "Each alias row: { term: string, target: tile-id, kind: 'industry' | 'redirect' | 'adjacent' }. Multiple aliases may map to the same target.",
   "aliases": [
+    { "term": "rtd resistance to temperature", "target": "rtd-resistance-to-temp", "kind": "industry" },
+    { "term": "pt100 temperature", "target": "rtd-resistance-to-temp", "kind": "industry" },
+    { "term": "pt1000 resistance", "target": "rtd-resistance-to-temp", "kind": "industry" },
+    { "term": "rtd ohms to celsius", "target": "rtd-resistance-to-temp", "kind": "industry" },
+    { "term": "platinum rtd", "target": "rtd-resistance-to-temp", "kind": "industry" },
     { "term": "4-20ma scaling", "target": "loop-signal-scaling", "kind": "industry" },
     { "term": "loop signal scaling", "target": "loop-signal-scaling", "kind": "industry" },
     { "term": "milliamp to engineering units", "target": "loop-signal-scaling", "kind": "industry" },

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(low-voltage): add rtd-resistance-to-temp tile (spec-v947); 2026-07-18
+
+- New Group A tile `rtd-resistance-to-temp` (RTD Pt100/Pt1000 Resistance to Temperature) in calc-lowvoltage.js. The
+  IEC 60751 Callendar-Van Dusen relation R = R0(1 + A T + B T^2) (A = 3.9083e-3, B = -5.775e-7) solved for T. A Pt100
+  reading 119.40 ohms is 50 C, 138.51 ohms is 100 C, 100.00 ohms is 0 C; a Pt1000 uses the same curve at R0 = 1000.
+  Exact at/above 0 C; below 0 C drops the C-term (< ~0.02 C to -40 C). Assumes a lead-compensated 3/4-wire reading. Home
+  count 1,395 -> 1,396.
+
 ### feat(low-voltage): add loop-signal-scaling tile (spec-v946); 2026-07-18
 
 - New Group A tile `loop-signal-scaling` (4-20 mA Current-Loop Signal Scaling) in calc-lowvoltage.js. The live-zero

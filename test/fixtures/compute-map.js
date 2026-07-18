@@ -840,6 +840,7 @@ export const COMPUTE_MAP = {
   "access-control-power-supply": { module: "../../calc-lowvoltage.js", fn: "computeAccessControlPowerSupply" },
   "fire-alarm-nac-voltage-drop": { module: "../../calc-lowvoltage.js", fn: "computeFireAlarmNacVoltageDrop" },
   "loop-signal-scaling": { module: "../../calc-lowvoltage.js", fn: "computeLoopSignalScaling" },
+  "rtd-resistance-to-temp": { module: "../../calc-lowvoltage.js", fn: "computeRtdResistanceToTemp" },
   "polymeric-sand-bags": { module: "../../calc-construction.js", fn: "computePolymericSandBags" },
   "rigid-foam-board-count": { module: "../../calc-construction.js", fn: "computeRigidFoamBoardCount" },
   "roof-insulation-fasteners": { module: "../../calc-construction.js", fn: "computeRoofInsulationFasteners" },

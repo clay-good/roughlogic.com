@@ -1097,3 +1097,49 @@ function _v946renderLoopSignalScaling(inputRegion, outputRegion, citationEl) {
   for (const f of [ma, lo, hi]) f.input.addEventListener("input", update);
 }
 LOWVOLTAGE_RENDERERS["loop-signal-scaling"] = _v946renderLoopSignalScaling;
+
+// ===================== spec-v947: RTD (Pt100 / Pt1000) resistance to temperature =====================
+// dims: in { args: dimensionless } out: { temperature_c: dimensionless, temperature_f: dimensionless }
+export function computeRtdResistanceToTemp({ resistance_ohms = 119.397, r0_ohms = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(resistance_ohms > 0)) return { error: "Measured resistance must be positive (ohms)." };
+  if (!(r0_ohms > 0)) return { error: "R0 (ice-point resistance) must be positive (100 for Pt100, 1000 for Pt1000)." };
+  // Callendar-Van Dusen inverse (IEC 60751 standard coefficients). Exact for T >= 0 C (R >= R0) via the quadratic
+  // R = R0(1 + A T + B T^2); below 0 C the C(T-100)T^3 term is dropped, a close approximation (< ~0.02 C to -40 C).
+  const A = 3.9083e-3, B = -5.775e-7;
+  const ratio = resistance_ohms / r0_ohms;
+  const disc = A * A - 4 * B * (1 - ratio);
+  if (!(disc >= 0)) return { error: "Resistance is outside the platinum RTD range (no real temperature solution)." };
+  const temperature_c = (-A + Math.sqrt(disc)) / (2 * B);
+  const temperature_f = temperature_c * 9 / 5 + 32;
+  if (![temperature_c, temperature_f].every(Number.isFinite)) return { error: "RTD temperature math is not a finite value." };
+  return {
+    temperature_c,
+    temperature_f,
+    note: "The temperature a platinum RTD's measured resistance corresponds to, by the IEC 60751 Callendar-Van Dusen relation R = R0 (1 + A T + B T^2) with the standard coefficients A = 3.9083e-3 and B = -5.775e-7 per C, solved for T. R0 is the ice-point (0 C) resistance -- 100 ohms for a Pt100, 1000 ohms for a Pt1000. A Pt100 reading 119.40 ohms is at 50 C, 138.51 ohms is 100 C, and exactly 100.00 ohms is 0 C; a Pt1000 uses the same curve scaled x10. The inverse is exact for T at or above 0 C (R >= R0); below 0 C the standard adds a C (T - 100) T^3 term that this screen drops, which stays within about 0.02 C down to -40 C and grows slowly colder than that. This assumes a 3- or 4-wire measurement (or a lead-resistance-compensated 2-wire) so the reading is the RTD element alone -- uncompensated 2-wire lead resistance ADDS to R and reads high (hotter). The sensor's calibration, tolerance class (A/B), and self-heating govern the field accuracy.",
+  };
+}
+
+export const rtdResistanceToTempExample = { inputs: { resistance_ohms: 119.397, r0_ohms: 100 } };
+
+function _v947renderRtdResistanceToTemp(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IEC 60751 platinum RTD (Callendar-Van Dusen) resistance-temperature relation, by name; standard coefficients A = 3.9083e-3, B = -5.775e-7 per C. R = R0(1 + A T + B T^2), solved for T (exact T >= 0 C; below 0 C drops the C-term, a close approximation). Assumes a lead-compensated (3/4-wire) reading; the sensor calibration and class govern.";
+  const rm = makeNumber("Measured resistance (ohms)", "rtd-rm", { step: "any", min: "0", value: "119.397" });
+  rm.input.value = "119.397";
+  const r0 = makeNumber("R0 at 0 C (100 = Pt100, 1000 = Pt1000)", "rtd-r0", { step: "any", min: "0", value: "100" });
+  r0.input.value = "100";
+  for (const f of [rm, r0]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { rm.input.value = "119.397"; r0.input.value = "100"; update(); });
+  const oC = makeOutputLine(outputRegion, "Temperature (C)", "rtd-out-c");
+  const oF = makeOutputLine(outputRegion, "Temperature (F)", "rtd-out-f");
+  const update = debounce(() => {
+    const r = computeRtdResistanceToTemp({
+      resistance_ohms: rm.input.value === "" ? 119.397 : Number(rm.input.value), r0_ohms: r0.input.value === "" ? 100 : Number(r0.input.value),
+    });
+    if (r.error) { oC.textContent = r.error; oF.textContent = "-"; return; }
+    oC.textContent = fmt(r.temperature_c, 2) + " C";
+    oF.textContent = fmt(r.temperature_f, 2) + " F";
+  }, DEBOUNCE_MS);
+  for (const f of [rm, r0]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["rtd-resistance-to-temp"] = _v947renderRtdResistanceToTemp;

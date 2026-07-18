@@ -27442,3 +27442,25 @@ test("bounds: spec-v946 computeLoopSignalScaling pins the live-zero linear scali
   assert.ok("error" in _v946({ signal_ma: 12, range_low: 50, range_high: 50 }));
   assert.ok("error" in _v946({ signal_ma: Infinity, range_low: 0, range_high: 100 }));
 });
+
+import { computeRtdResistanceToTemp as _v947 } from "../../calc-lowvoltage.js";
+
+test("bounds: spec-v947 computeRtdResistanceToTemp pins the Callendar-Van Dusen inverse and error seams", () => {
+  const r = _v947({ resistance_ohms: 119.397, r0_ohms: 100 });
+  assert.ok(Math.abs(r.temperature_c - 50) < 0.01); // Pt100 at 119.397 ohms
+  assert.ok(Math.abs(r.temperature_f - 122) < 0.02);
+  // Ice point and 100 C anchors.
+  assert.ok(Math.abs(_v947({ resistance_ohms: 100, r0_ohms: 100 }).temperature_c - 0) < 1e-6);
+  assert.ok(Math.abs(_v947({ resistance_ohms: 138.5055, r0_ohms: 100 }).temperature_c - 100) < 0.01);
+  // Pt1000 is the same curve scaled x10: 1385.055 ohms at R0=1000 is also 100 C.
+  assert.ok(Math.abs(_v947({ resistance_ohms: 1385.055, r0_ohms: 1000 }).temperature_c - 100) < 0.01);
+  // Sub-zero: R below R0 gives a negative temperature (close approximation).
+  assert.ok(Math.abs(_v947({ resistance_ohms: 84.2707, r0_ohms: 100 }).temperature_c - -40) < 0.05);
+  // Monotonic: higher resistance -> higher temperature.
+  assert.ok(_v947({ resistance_ohms: 150, r0_ohms: 100 }).temperature_c > _v947({ resistance_ohms: 120, r0_ohms: 100 }).temperature_c);
+  // Error seams: non-positive resistance or R0, out-of-range (no real solution), non-finite.
+  assert.ok("error" in _v947({ resistance_ohms: 0, r0_ohms: 100 }));
+  assert.ok("error" in _v947({ resistance_ohms: 119, r0_ohms: 0 }));
+  assert.ok("error" in _v947({ resistance_ohms: 900, r0_ohms: 100 })); // discriminant < 0
+  assert.ok("error" in _v947({ resistance_ohms: Infinity, r0_ohms: 100 }));
+});

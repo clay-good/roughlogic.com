@@ -34602,6 +34602,54 @@
    }
   },
   {
+   "tile_id": "rtd-resistance-to-temp",
+   "source_publisher": "IEC 60751 platinum RTD (Callendar-Van Dusen)",
+   "source_title": "Pt100 reading 119.397 ohms -> 50 C (122 F)",
+   "source_edition_or_year": "spec-v947 worked example (machine-verified)",
+   "source_section_or_page": "T = (-A + sqrt(A^2 - 4B(1 - 119.397/100)))/(2B), A=3.9083e-3 B=-5.775e-7 -> 50.00 C",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "resistance_ohms": 119.397,
+    "r0_ohms": 100
+   },
+   "outputs": {
+    "temperature_c": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "temperature_f": {
+     "value": 122,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rtd-resistance-to-temp",
+   "source_publisher": "IEC 60751 platinum RTD (Callendar-Van Dusen)",
+   "source_title": "cross-check: 138.5055 ohms -> 100 C; a Pt1000 at 1385.055 ohms is the same 100 C",
+   "source_edition_or_year": "spec-v947 worked example (machine-verified)",
+   "source_section_or_page": "138.5055/100 = 1.385055 -> 100.00 C; Pt1000 uses the same ratio at R0=1000",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "resistance_ohms": 1385.055,
+    "r0_ohms": 1000
+   },
+   "outputs": {
+    "temperature_c": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "loop-signal-scaling",
    "source_publisher": "4-20 mA current-loop live-zero scaling (ANSI/ISA-50.00.01)",
    "source_title": "12 mA on a 0-100 psi range -> 50% of span, 50 psi",
