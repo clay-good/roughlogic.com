@@ -903,6 +903,8 @@ const TOOL_MODULES = (() => {
     "cutting-speed-rpm", "cutting-diameter-for-rpm", "drill-point-depth", "drill-point-angle-from-length",
     // spec-v910 knurling blank diameter for clean tracking
     "knurl-blank-diameter",
+    // spec-v911 grinding wheel surface speed and max safe RPM
+    "grinding-wheel-rpm",
     // v100 cutting-fluid concentration
     "cutting-fluid-concentration",
     // v135 cutting power and spindle torque from MRR

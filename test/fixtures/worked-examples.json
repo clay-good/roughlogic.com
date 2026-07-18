@@ -34392,6 +34392,62 @@
    }
   },
   {
+   "tile_id": "grinding-wheel-rpm",
+   "source_publisher": "grinding wheel surface-speed identity (ANSI B7.1)",
+   "source_title": "7 in wheel rated 6,500 SFPM on a 3,450 RPM grinder -> max 3,547 RPM, actual 6,322 SFPM, within rating",
+   "source_edition_or_year": "spec-v911 worked example (machine-verified)",
+   "source_section_or_page": "max_rpm = 6500*12/(pi*7) = 3547; actual_sfpm = pi*7*3450/12 = 6322",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "wheel_diameter_in": 7,
+    "rated_max_sfpm": 6500,
+    "grinder_rpm": 3450
+   },
+   "outputs": {
+    "max_rpm": {
+     "value": 3547,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "actual_sfpm": {
+     "value": 6322,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "grinding-wheel-rpm",
+   "source_publisher": "grinding wheel surface-speed identity (ANSI B7.1)",
+   "source_title": "cross-check: 10 in wheel rated 9,000 SFPM on a 3,600 RPM machine -> 9,425 SFPM, OVER rated",
+   "source_edition_or_year": "spec-v911 worked example (machine-verified)",
+   "source_section_or_page": "actual_sfpm = pi*10*3600/12 = 9425 > 9000 rating; max_rpm = 9000*12/(pi*10) = 3438",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "wheel_diameter_in": 10,
+    "rated_max_sfpm": 9000,
+    "grinder_rpm": 3600
+   },
+   "outputs": {
+    "max_rpm": {
+     "value": 3438,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "actual_sfpm": {
+     "value": 9425,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "knurl-blank-diameter",
    "source_publisher": "knurl tracking rule (first-principles)",
    "source_title": "0.750 in target at 21 TPI -> 49 teeth, turn blank to 0.7427 in (0.0073 in under)",

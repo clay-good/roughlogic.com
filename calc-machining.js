@@ -1011,3 +1011,55 @@ function _v910renderKnurlBlankDiameter(inputRegion, outputRegion, citationEl) {
   for (const f of [td, tp]) f.input.addEventListener("input", update);
 }
 MACHINING_RENDERERS["knurl-blank-diameter"] = _v910renderKnurlBlankDiameter;
+
+// ===================== spec-v911: grinding wheel surface speed and max safe RPM =====================
+// dims: in { wheel_diameter_in: L, rated_max_sfpm: L*T^-1, grinder_rpm: T^-1 } out: { max_rpm: T^-1, actual_sfpm: L*T^-1, margin_rpm: T^-1, within_rating: dimensionless }
+export function computeGrindingWheelRpm({ wheel_diameter_in = 7, rated_max_sfpm = 6500, grinder_rpm = 3450 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(wheel_diameter_in > 0)) return { error: "Wheel diameter must be positive (in)." };
+  if (!(rated_max_sfpm > 0)) return { error: "Rated max surface speed must be positive (SFPM)." };
+  if (!(grinder_rpm > 0)) return { error: "Grinder speed must be positive (RPM)." };
+  // Surface speed SFPM = pi x D_in x RPM / 12 (in -> ft). Solve for the RPM that hits the rating.
+  const max_rpm = rated_max_sfpm * 12 / (Math.PI * wheel_diameter_in);
+  const actual_sfpm = Math.PI * wheel_diameter_in * grinder_rpm / 12;
+  const margin_rpm = max_rpm - grinder_rpm;
+  const within_rating = grinder_rpm <= max_rpm;
+  if (![max_rpm, actual_sfpm, margin_rpm].every(Number.isFinite)) return { error: "Grinding-wheel speed math is not a finite value." };
+  return {
+    max_rpm,
+    actual_sfpm,
+    margin_rpm,
+    within_rating,
+    verdict: within_rating ? "WITHIN RATING" : "OVER RATED SPEED",
+    note: "The wheel's rated maximum operating speed (in SFPM, printed on the wheel blotter) and the grinder nameplate govern -- NEVER mount a wheel on a machine whose spindle speed exceeds the wheel's rating; an over-speed wheel can burst. This converts the blotter SFPM rating to a maximum RPM for the wheel diameter and checks the grinder RPM against it. As the wheel wears down its safe RPM rises, but the machine speed is fixed. Per ANSI B7.1; the blotter and machine nameplate are the authority.",
+  };
+}
+
+export const grindingWheelRpmExample = { inputs: { wheel_diameter_in: 7, rated_max_sfpm: 6500, grinder_rpm: 3450 } };
+
+function _v911renderGrindingWheelRpm(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: surface speed identity by name. SFPM = pi x wheel diameter (in) x RPM / 12; max RPM = rated SFPM x 12 / (pi x diameter). Per ANSI B7.1; the wheel blotter rating and the machine nameplate govern -- never exceed the wheel's rated speed.";
+  const wd = makeNumber("Wheel diameter (in)", "gwr-wd", { step: "any", min: "0", value: "7" });
+  wd.input.value = "7";
+  const rs = makeNumber("Wheel rated max speed (SFPM)", "gwr-rs", { step: "any", min: "0", value: "6500" });
+  rs.input.value = "6500";
+  const gr = makeNumber("Grinder speed (RPM)", "gwr-gr", { step: "any", min: "0", value: "3450" });
+  gr.input.value = "3450";
+  for (const f of [wd, rs, gr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { wd.input.value = "7"; rs.input.value = "6500"; gr.input.value = "3450"; update(); });
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "gwr-out-v");
+  const oMax = makeOutputLine(outputRegion, "Max RPM for this wheel", "gwr-out-max");
+  const oAct = makeOutputLine(outputRegion, "Surface speed at grinder RPM", "gwr-out-act");
+  const update = debounce(() => {
+    const r = computeGrindingWheelRpm({
+      wheel_diameter_in: wd.input.value === "" ? 7 : Number(wd.input.value), rated_max_sfpm: rs.input.value === "" ? 6500 : Number(rs.input.value),
+      grinder_rpm: gr.input.value === "" ? 3450 : Number(gr.input.value),
+    });
+    if (r.error) { oVerdict.textContent = r.error; oMax.textContent = "-"; oAct.textContent = "-"; return; }
+    oVerdict.textContent = r.verdict + " (" + (r.margin_rpm >= 0 ? "+" : "") + fmt(r.margin_rpm, 0) + " RPM margin)";
+    oMax.textContent = fmt(r.max_rpm, 0) + " RPM";
+    oAct.textContent = fmt(r.actual_sfpm, 0) + " SFPM (rated " + fmt(Number(rs.input.value) || 6500, 0) + ")";
+  }, DEBOUNCE_MS);
+  for (const f of [wd, rs, gr]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["grinding-wheel-rpm"] = _v911renderGrindingWheelRpm;

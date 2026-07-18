@@ -26723,6 +26723,27 @@ test("bounds: spec-v908 computeSmokeDetectorSpacingCount pins the grid, detector
   assert.ok("error" in _v908({ room_length_ft: Infinity, room_width_ft: 40, listed_spacing_ft: 30 }));
 });
 
+import { computeGrindingWheelRpm as _v911 } from "../../calc-machining.js";
+
+test("bounds: spec-v911 computeGrindingWheelRpm pins the max RPM, surface speed, verdict, and error seams", () => {
+  const r = _v911({ wheel_diameter_in: 7, rated_max_sfpm: 6500, grinder_rpm: 3450 });
+  assert.ok(Math.abs(r.max_rpm - 3547.09) < 0.5); // 6500*12/(pi*7)
+  assert.ok(Math.abs(r.actual_sfpm - 6322.3) < 0.5); // pi*7*3450/12
+  assert.equal(r.within_rating, true); // 6322 <= 6500
+  assert.equal(r.verdict, "WITHIN RATING");
+  // Over-speed case: a bigger wheel at a lower rated speed on a faster machine.
+  const o = _v911({ wheel_diameter_in: 10, rated_max_sfpm: 9000, grinder_rpm: 3600 });
+  assert.ok(Math.abs(o.actual_sfpm - 9424.8) < 0.5); // pi*10*3600/12
+  assert.equal(o.within_rating, false); // 9425 > 9000
+  assert.equal(o.verdict, "OVER RATED SPEED");
+  assert.ok(o.margin_rpm < 0); // grinder exceeds max_rpm
+  // Error seams: non-positive diameter / rating / rpm, non-finite.
+  assert.ok("error" in _v911({ wheel_diameter_in: 0, rated_max_sfpm: 6500, grinder_rpm: 3450 }));
+  assert.ok("error" in _v911({ wheel_diameter_in: 7, rated_max_sfpm: 0, grinder_rpm: 3450 }));
+  assert.ok("error" in _v911({ wheel_diameter_in: 7, rated_max_sfpm: 6500, grinder_rpm: 0 }));
+  assert.ok("error" in _v911({ wheel_diameter_in: Infinity, rated_max_sfpm: 6500, grinder_rpm: 3450 }));
+});
+
 import { computeKnurlBlankDiameter as _v910 } from "../../calc-machining.js";
 
 test("bounds: spec-v910 computeKnurlBlankDiameter pins the teeth, blank diameter, signed adjustment, and error seams", () => {

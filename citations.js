@@ -9879,6 +9879,17 @@ export const CITATIONS = {
       { name: "TPI form", value: "circular-pitch (teeth-per-inch) knurl; diametral-pitch knurls differ", source: "scope of this tile" },
     ],
   },
+  "grinding-wheel-rpm": {
+    formula: "SFPM = pi x wheel_diameter_in x RPM / 12; max_rpm = rated_max_sfpm x 12 / (pi x wheel_diameter_in); actual_sfpm = pi x wheel_diameter_in x grinder_rpm / 12; within rating when grinder_rpm <= max_rpm.",
+    edition: "Surface-speed identity, first-principles; the wheel's rated maximum operating speed (SFPM) comes from the wheel blotter and the machine speed from the nameplate. Per ANSI B7.1.",
+    freeAccess: "The surface-speed relation is a first-principles geometric identity (circumference x rev/min); the wheel's rated SFPM and the grinder RPM are read from the wheel blotter and the machine nameplate.",
+    governance: GOVERNANCE.general,
+    editionNote: "A grinding wheel is rated for a maximum operating SPEED in surface feet per minute (SFPM), printed on its paper blotter. Surface speed is SFPM = pi x D(in) x RPM / 12, so a given wheel diameter has a maximum RPM = rated SFPM x 12 / (pi x D). NEVER mount a wheel on a machine whose spindle speed exceeds the wheel's rating -- an over-speed wheel can burst. As the wheel wears smaller its safe RPM rises, but the machine speed is fixed, so a fresh (larger) wheel is the governing case. Per ANSI B7.1 (safety requirements for the use, care, and protection of abrasive wheels); the wheel blotter and the machine nameplate are the authority.",
+    assumptions: [
+      { name: "Rated speed governs", value: "the wheel blotter's rated maximum SFPM and the machine nameplate RPM are the authority", source: "ANSI B7.1" },
+      { name: "Fresh wheel", value: "the full (unworn) wheel diameter is the governing case; a worn wheel turns slower in SFPM", source: "abrasive-wheel practice" },
+    ],
+  },
   "rolled-blank": {
     formula: "Developed flat length L = pi x neutral-axis diameter; with the neutral axis k x T from the inside, D_neutral = OD - 2T(1-k) = ID + 2kT. Default k = 0.5 (mid-thickness) gives L = pi x (OD - T).",
     edition: "Developed blank length to roll plate into a cylinder - first-principles arc-length geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",

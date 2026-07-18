@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(machining): add grinding-wheel-rpm tile (spec-v911); 2026-07-18
+
+- New Group K tile `grinding-wheel-rpm` (Grinding Wheel Surface Speed and Max Safe RPM) in calc-machining.js, beside
+  knurl-blank-diameter. Converts a wheel's rated maximum surface speed (SFPM, printed on the blotter) to a max RPM for
+  its diameter and checks a grinder's fixed speed against it: SFPM = pi x D(in) x RPM / 12; max_rpm = rated SFPM x 12 /
+  (pi x D). A 7 in wheel rated 6,500 SFPM tops out at 3,547 RPM, so a 3,450 RPM grinder runs it at 6,322 SFPM (within
+  rating); a 10 in wheel rated 9,000 SFPM on a 3,600 RPM machine hits 9,425 SFPM (OVER). Per ANSI B7.1; the wheel blotter
+  and machine nameplate are the authority, never mount a wheel on a faster machine. Home tile count 1,359 -> 1,360.
+
 ### feat(machining): add knurl-blank-diameter tile (spec-v910); 2026-07-18
 
 - New Group K tile `knurl-blank-diameter` (Knurling Blank Diameter for Clean Tracking) in calc-machining.js, beside
