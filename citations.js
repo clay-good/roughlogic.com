@@ -8387,6 +8387,17 @@ export const CITATIONS = {
       { name: "Fail-safe vs fail-secure", value: "fail-safe maglocks draw continuously (dominate standby); fail-secure strikes draw only on unlock", source: "door-hardware behavior" },
     ],
   },
+  "fire-alarm-nac-voltage-drop": {
+    formula: "available_voltage_v = 0.85 x nominal_voltage_v (CUSTV); loop_R = 2 x run_length_ft x (resistance_per_1000ft / 1000); voltage_drop_v = total_current_a x loop_R; eol_voltage_v = available_voltage_v - voltage_drop_v; within_spec when eol >= device_min_v.",
+    edition: "NFPA 72 (National Fire Alarm and Signaling Code) notification-appliance-circuit power / voltage provisions with the NEC Chapter 9 Table 8 conductor resistance, by name; the listed panel and appliances and the AHJ govern.",
+    freeAccess: "The Ohm's-law voltage-drop relation is public physics; the 0.85 regulated-minimum (CUSTV) factor is NFPA 72, and the conductor ohms/1000 ft come from NEC Chapter 9 Table 8 (the appliance draws and listed minimums are on the datasheets).",
+    governance: GOVERNANCE.general,
+    editionNote: "A fire-alarm notification-appliance circuit (NAC) must deliver at least each horn/strobe's listed minimum voltage at the end of the line. The panel's usable output is not its nominal voltage but its regulated minimum output, the CUSTV, which NFPA 72 takes as about 85% of nominal (20.4 V on a 24 V system). On a Class B (out-and-back) circuit the loop resistance is 2 x the one-way length x the conductor resistance per 1000 ft from NEC Chapter 9 Table 8. Lumping ALL the appliance current at the end of the line is the conservative worst case, giving V_EOL = CUSTV - I x loop_R, which must exceed the device's listed minimum (about 16 V for a 24 V appliance) with margin. When it fails the remedy is heavier conductors, a shorter run, splitting the circuit, or a NAC power extender / booster near the load. This is a design screen; the panel's actual regulated voltage, the appliance current draws and listed minimums, the wire table, and a stamped fire-alarm design and the AHJ govern the final circuit.",
+    assumptions: [
+      { name: "CUSTV and Class B", value: "usable voltage = 0.85 x nominal (NFPA 72 regulated minimum); Class B loop = 2 x length x ohms/1000 ft", source: "NFPA 72 / NEC Ch 9 Table 8" },
+      { name: "Worst-case load", value: "total appliance current lumped at the end of the line; each device must still see its listed minimum", source: "NAC design practice" },
+    ],
+  },
   "polymeric-sand-bags": {
     formula: "bags = ceil(area_sf x (1 + waste_pct/100) / coverage_per_bag_sf).",
     edition: "Polymeric joint-sand bag-count identity by name (area over the per-bag coverage, plus waste); first-principles arithmetic.",

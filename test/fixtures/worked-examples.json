@@ -34602,6 +34602,66 @@
    }
   },
   {
+   "tile_id": "fire-alarm-nac-voltage-drop",
+   "source_publisher": "fire-alarm NAC voltage drop (NFPA 72)",
+   "source_title": "24 V panel, 0.8 A, 250 ft #14 (2.525 ohm/1000 ft), 16 V device -> 19.39 V EOL, PASS",
+   "source_edition_or_year": "spec-v937 worked example (machine-verified)",
+   "source_section_or_page": "CUSTV = 0.85*24 = 20.4; loop R = 2*250*(2.525/1000) = 1.2625; drop = 0.8*1.2625 = 1.01; EOL = 19.39 >= 16",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "nominal_voltage_v": 24,
+    "total_current_a": 0.8,
+    "run_length_ft": 250,
+    "resistance_per_1000ft": 2.525,
+    "device_min_v": 16
+   },
+   "outputs": {
+    "available_voltage_v": {
+     "value": 20.4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "voltage_drop_v": {
+     "value": 1.01,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "eol_voltage_v": {
+     "value": 19.39,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fire-alarm-nac-voltage-drop",
+   "source_publisher": "fire-alarm NAC voltage drop (NFPA 72)",
+   "source_title": "cross-check: a long 500 ft run at the same load drops to 18.38 V (still passes 16 V)",
+   "source_edition_or_year": "spec-v937 worked example (machine-verified)",
+   "source_section_or_page": "loop R = 2*500*(2.525/1000) = 2.525; drop = 0.8*2.525 = 2.02; EOL = 20.4 - 2.02 = 18.38",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "nominal_voltage_v": 24,
+    "total_current_a": 0.8,
+    "run_length_ft": 500,
+    "resistance_per_1000ft": 2.525,
+    "device_min_v": 16
+   },
+   "outputs": {
+    "eol_voltage_v": {
+     "value": 18.38,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "access-control-power-supply",
    "source_publisher": "access-control power / standby sizing (NFPA 72 / UL 294)",
    "source_title": "4 maglocks @0.5A, 2 readers @0.15A, 0.225A other, 4 hr -> 2.53 A load, 3.16 A supply, 12.6 Ah",

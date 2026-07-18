@@ -26797,6 +26797,28 @@ test("bounds: spec-v920 computeCementBoardTakeoff pins the sheets, screws, and e
   assert.ok("error" in _v920({ area_sf: Infinity, sheet_area_sf: 15, waste_pct: 10, screws_per_sheet: 35 }));
 });
 
+import { computeFireAlarmNacVoltageDrop as _v937 } from "../../calc-lowvoltage.js";
+
+test("bounds: spec-v937 computeFireAlarmNacVoltageDrop pins CUSTV, drop, EOL, verdict, and error seams", () => {
+  const r = _v937({ nominal_voltage_v: 24, total_current_a: 0.8, run_length_ft: 250, resistance_per_1000ft: 2.525, device_min_v: 16 });
+  assert.ok(Math.abs(r.available_voltage_v - 20.4) < 1e-9); // 0.85 * 24
+  assert.ok(Math.abs(r.voltage_drop_v - 1.01) < 1e-9); // 0.8 * 2*250*2.525/1000
+  assert.ok(Math.abs(r.eol_voltage_v - 19.39) < 1e-9);
+  assert.equal(r.within_spec, true); // 19.39 >= 16
+  assert.equal(r.verdict, "PASS");
+  // A longer run drops more but still passes.
+  const long = _v937({ nominal_voltage_v: 24, total_current_a: 0.8, run_length_ft: 500, resistance_per_1000ft: 2.525, device_min_v: 16 });
+  assert.ok(Math.abs(long.eol_voltage_v - 18.38) < 1e-9);
+  assert.equal(long.within_spec, true);
+  // Push it to fail.
+  assert.equal(_v937({ nominal_voltage_v: 24, total_current_a: 2.0, run_length_ft: 1000, resistance_per_1000ft: 2.525, device_min_v: 16 }).verdict, "FAIL");
+  // Error seams: non-positive inputs, non-finite.
+  assert.ok("error" in _v937({ nominal_voltage_v: 0, total_current_a: 0.8, run_length_ft: 250, resistance_per_1000ft: 2.525, device_min_v: 16 }));
+  assert.ok("error" in _v937({ nominal_voltage_v: 24, total_current_a: 0, run_length_ft: 250, resistance_per_1000ft: 2.525, device_min_v: 16 }));
+  assert.ok("error" in _v937({ nominal_voltage_v: 24, total_current_a: 0.8, run_length_ft: 250, resistance_per_1000ft: 2.525, device_min_v: 0 }));
+  assert.ok("error" in _v937({ nominal_voltage_v: Infinity, total_current_a: 0.8, run_length_ft: 250, resistance_per_1000ft: 2.525, device_min_v: 16 }));
+});
+
 import { computeAccessControlPowerSupply as _v929 } from "../../calc-lowvoltage.js";
 
 test("bounds: spec-v929 computeAccessControlPowerSupply pins the load, supply, battery, and error seams", () => {

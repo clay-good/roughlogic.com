@@ -18757,6 +18757,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "nac voltage drop",
+      "target": "fire-alarm-nac-voltage-drop",
+      "kind": "industry"
+    },
+    {
+      "term": "notification appliance circuit voltage",
+      "target": "fire-alarm-nac-voltage-drop",
+      "kind": "industry"
+    },
+    {
+      "term": "fire alarm voltage drop",
+      "target": "fire-alarm-nac-voltage-drop",
+      "kind": "industry"
+    },
+    {
+      "term": "strobe voltage drop",
+      "target": "fire-alarm-nac-voltage-drop",
+      "kind": "adjacent"
+    },
+    {
+      "term": "end of line voltage fire alarm",
+      "target": "fire-alarm-nac-voltage-drop",
+      "kind": "adjacent"
+    },
+    {
       "term": "cable j hooks",
       "target": "cable-support-jhook",
       "kind": "industry"

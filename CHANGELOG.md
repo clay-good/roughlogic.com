@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fire): add fire-alarm-nac-voltage-drop tile (spec-v937); 2026-07-18
+
+- New Group A tile `fire-alarm-nac-voltage-drop` (Fire-Alarm NAC Circuit Voltage Drop, End-of-Line) in
+  calc-lowvoltage.js, beside access-control-power-supply. CUSTV = 0.85 x nominal (NFPA 72 regulated min); loop R = 2 x
+  length x (ohm/1000 ft)/1000 (Class B); V_EOL = CUSTV - I x loop R, must be >= the device minimum. A 0.8 A load on 250
+  ft of #14 drops 1.01 V to 19.4 V (PASS vs 16 V); 500 ft -> 18.4 V. The panel voltage, appliance draws, wire table, and
+  a stamped design govern. Raised the calc-lowvoltage.js gzip cap 19000 -> 21000. Home count 1,385 -> 1,386.
+
 ### feat(concrete): add concrete-stair-volume tile (spec-v936); 2026-07-18
 
 - New Group E tile `concrete-stair-volume` (Concrete Stair / Stoop Volume Takeoff) in calc-concrete.js, beside
