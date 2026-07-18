@@ -10642,6 +10642,17 @@ export const CITATIONS = {
       { name: "Component drops", value: "each external resistance in in. w.c. from the manufacturer tables or a manometer reading; user-supplied", source: "ACCA Manual D / equipment fan tables" },
     ],
   },
+  "duct-static-regain": {
+    formula: "vp = (V/4005)^2 in w.c. (standard air); static_regain = recovery_factor x (vp_upstream - vp_downstream). Recovery factor ~ 0.75 (0.5-0.9 by fitting). A negative result is a static loss (velocity increased).",
+    edition: "Duct static-regain method and the standard-air velocity-pressure constant (SMACNA HVAC Duct Design / ASHRAE Fundamentals), by name; the fitting quality sets the recovery factor and the engineer of record governs the design.",
+    freeAccess: "The velocity-pressure relation VP = (V/4005)^2 and the static-regain balance are public (SMACNA / ASHRAE); the velocities are the design values and the recovery factor is the fitting property.",
+    governance: GOVERNANCE.general,
+    editionNote: "When air in a duct slows down at a size increase, some of its velocity pressure is recovered as static pressure -- the physical basis of the static-regain method of duct design. The velocity pressure of standard air is VP = (V/4005)^2 in inches of water, where 4005 is the sea-level velocity-pressure constant for 0.075 lb/ft^3 air. At a transition to a larger downstream duct, the drop in velocity pressure partly converts back to static pressure: static regain = R x (VP_upstream - VP_downstream), where the recovery factor R accounts for the imperfect, turbulent conversion in a real fitting -- commonly taken as 0.75, ranging from about 0.5 for an abrupt expansion to 0.9 for a long gradual one. A trunk dropping from 2,000 to 1,500 fpm (VP 0.249 down to 0.140 in) at R = 0.75 recovers about 0.082 in w.c., which is static pressure the downstream run gets for free and the fan does not have to produce. The static-regain design method exploits this by sizing each successive downstream section so that its regain just offsets its friction loss, keeping the static pressure -- and therefore the airflow split to each branch -- nearly constant along the trunk without dampering. If instead the velocity INCREASES (a smaller downstream duct), the formula returns a negative value, which is a static LOSS, not a regain. The 4005 constant is for standard air, so at altitude or at a non-standard temperature the air density and the constant change; the recovery factor depends on the actual transition geometry, and the SMACNA HVAC duct-design standards, ASHRAE Fundamentals, and the engineer of record govern the design.",
+    assumptions: [
+      { name: "Velocity pressure + regain", value: "VP = (V/4005)^2 in w.c. (standard air); static regain = R x (VP_up - VP_down)", source: "SMACNA / ASHRAE Fundamentals" },
+      { name: "Recovery factor", value: "R ~ 0.75 (0.5 abrupt to 0.9 gradual); a velocity increase gives a negative result (static loss); 4005 assumes standard air", source: "duct-design practice" },
+    ],
+  },
   "duct-transition-length": {
     formula: "concentric length = ((large_dim_in - small_dim_in) / 2) / tan(slope_deg); eccentric (one flat side) length = (large_dim_in - small_dim_in) / tan(slope_deg); run-to-offset ratio = 1 / tan(slope_deg).",
     edition: "Duct transition (reducer) length geometry, first-principles; SMACNA HVAC Duct Construction Standards keep the slope shallow to limit turbulence.",

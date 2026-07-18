@@ -27753,3 +27753,27 @@ test("bounds: spec-v959 computeUjointOperatingAngle pins the Cardan variation, c
   assert.ok("error" in _v959({ input_angle_deg: 10, output_angle_deg: 95 }));
   assert.ok("error" in _v959({ input_angle_deg: Infinity, output_angle_deg: 10 }));
 });
+
+import { computeDuctStaticRegain as _v960 } from "../../calc-metalair.js";
+
+test("bounds: spec-v960 computeDuctStaticRegain pins VP = (V/4005)^2, the regain, and error seams", () => {
+  const r = _v960({ upstream_velocity_fpm: 2000, downstream_velocity_fpm: 1500, recovery_factor: 0.75 });
+  assert.ok(Math.abs(r.vp_upstream_inwc - 0.249416) < 1e-4); // (2000/4005)^2
+  assert.ok(Math.abs(r.vp_downstream_inwc - 0.140297) < 1e-4);
+  assert.ok(Math.abs(r.static_regain_inwc - 0.081840) < 1e-4); // 0.75*(diff)
+  assert.equal(r.is_loss, false);
+  // A velocity INCREASE gives a negative regain (static loss), flagged.
+  const loss = _v960({ upstream_velocity_fpm: 1500, downstream_velocity_fpm: 2000, recovery_factor: 0.75 });
+  assert.ok(Math.abs(loss.static_regain_inwc - -0.081840) < 1e-4);
+  assert.equal(loss.is_loss, true);
+  // Regain is linear in the recovery factor; R = 0 recovers nothing.
+  assert.ok(Math.abs(_v960({ upstream_velocity_fpm: 2000, downstream_velocity_fpm: 1500, recovery_factor: 1 }).static_regain_inwc - r.static_regain_inwc / 0.75) < 1e-6);
+  assert.ok(Math.abs(_v960({ upstream_velocity_fpm: 2000, downstream_velocity_fpm: 1500, recovery_factor: 0 }).static_regain_inwc) < 1e-12);
+  // Equal velocities -> no regain.
+  assert.ok(Math.abs(_v960({ upstream_velocity_fpm: 1500, downstream_velocity_fpm: 1500, recovery_factor: 0.75 }).static_regain_inwc) < 1e-12);
+  // Error seams: non-positive velocity, recovery factor out of 0-1, non-finite.
+  assert.ok("error" in _v960({ upstream_velocity_fpm: 0, downstream_velocity_fpm: 1500, recovery_factor: 0.75 }));
+  assert.ok("error" in _v960({ upstream_velocity_fpm: 2000, downstream_velocity_fpm: 0, recovery_factor: 0.75 }));
+  assert.ok("error" in _v960({ upstream_velocity_fpm: 2000, downstream_velocity_fpm: 1500, recovery_factor: 1.5 }));
+  assert.ok("error" in _v960({ upstream_velocity_fpm: Infinity, downstream_velocity_fpm: 1500, recovery_factor: 0.75 }));
+});

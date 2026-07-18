@@ -745,6 +745,7 @@ export const COMPUTE_MAP = {
   "groove-weld-length-for-load": { module: "../../calc-metalair.js", fn: "computeGrooveWeldLengthForLoad" },
   "duct-static-pressure-total": { module: "../../calc-metalair.js", fn: "computeDuctStaticTotal" },
   "duct-transition-length": { module: "../../calc-metalair.js", fn: "computeDuctTransitionLength" },
+  "duct-static-regain": { module: "../../calc-metalair.js", fn: "computeDuctStaticRegain" },
   "compression-ratio-refrig": { module: "../../calc-metalair.js", fn: "computeCompressionRatio" },
   // spec-v65 Group Z (Rigging and Heavy Lift).
   "cg-load-share": { module: "../../calc-rigging.js", fn: "computeCgLoadShare" },

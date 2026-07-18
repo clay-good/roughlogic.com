@@ -2469,6 +2469,7 @@ cross-check.
 | calc-mechanic.js | `computeWheelOffsetBackspacing` | `{ rim_width_in = 0, offset_mm = 0, backspacing_in = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `parseTireSize` | `str` | _ | _ | _ |
 | calc-metalair.js | `computeCompressionRatio` | `{ suction_psig = 0, discharge_psig = 0, atmospheric_psia = 14.696 } = {}` | _ | _ | _ |
+| calc-metalair.js | `computeDuctStaticRegain` | `{ upstream_velocity_fpm = 2000, downstream_velocity_fpm = 1500, recovery_fact...` | _ | _ | _ |
 | calc-metalair.js | `computeDuctStaticTotal` | `{ components = [], rated_esp_in_wc = 0 } = {}` | _ | _ | _ |
 | calc-metalair.js | `computeDuctTransitionLength` | `{ large_dim_in = 20, small_dim_in = 12, slope_deg = 15 } = {}` | _ | _ | _ |
 | calc-metalair.js | `computeGrooveWeldLengthForLoad` | `{ applied_load_lb = 0, weld_type = "PJP", effective_throat_in = 0, base_thick...` | _ | _ | _ |
@@ -3069,7 +3070,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1655.
+Row count: 1656.
 
 <!-- END function-corpus-v14 -->
 
@@ -3460,7 +3461,7 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (134 tiles)
+### Group C HVAC (135 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3516,6 +3517,7 @@ per spec-v14 §13.1 second paragraph.
 | `duct-leakage-cfm25` | Residential Duct Leakage CFM25 (IECC R403.3.5) | IECC R403.3.5; spec-v461 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `duct-sizing` | Duct Sizing | ACCA Manual D / ASHRAE Fundamentals; 400 cfm @ 0.08 in WC / 100 ft -> 10.14 in round (9.28 in ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-static-pressure-total` | Total External Static Pressure | ACCA Manual D / SMACNA (by name); filter 0.10 + registers 0.03 + grille 0.03 + coil 0.30 + ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `duct-static-regain` | Duct Static Regain at a Velocity Decrease | Duct static-regain method (SMACNA / A...; VP_up = (2000/4005)^2 = 0.2494; VP_dn = (1500/4005)^2 = 0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `duct-transition-length` | Duct Transition (Reducer) Length from Slope | duct transition length geometry (SMACNA); concentric = ((20-12)/2)/tan(15) = 4/0.26795 = 14.93; ecc... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `duct-velocity-pressure` | Duct Velocity Pressure | ACCA Manual D / ASHRAE Fundamentals (...; VP 0.25 in. w.c. -> V = 4005 * 0.5 = 2002.5 fpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `economizer-enthalpy-changeover` | Economizer Enthalpy Changeover | ASHRAE 90.1; spec-v443 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4663,6 +4665,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1408. Fixture-covered or reference-cadence: 1408 / 1408.
+Tile count: 1409. Fixture-covered or reference-cadence: 1409 / 1409.
 
 <!-- END tile-index-v14 -->

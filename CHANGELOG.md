@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): add duct-static-regain tile (spec-v960); 2026-07-18
+
+- New Group C tile `duct-static-regain` (Duct Static Regain at a Velocity Decrease) in calc-metalair.js. VP = (V/4005)^2
+  in w.c. (standard air); static regain = R x (VP_up - VP_down), recovery factor R ~ 0.75. Dropping 2,000 to 1,500 fpm at
+  R 0.75 regains ~0.082 in w.c. -- pressure the fan need not supply. A velocity increase gives a negative result (static
+  loss, flagged). The 4005 assumes standard air; the fitting sets R, and SMACNA/ASHRAE govern. Home count 1,408 -> 1,409.
+
 ### feat(mechanic): add ujoint-operating-angle tile (spec-v959); 2026-07-18
 
 - New Group K tile `ujoint-operating-angle` (Driveline U-Joint Operating Angle and Cancellation) in calc-mechanic.js. A

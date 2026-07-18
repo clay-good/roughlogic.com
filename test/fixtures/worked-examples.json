@@ -36560,6 +36560,62 @@
    }
   },
   {
+   "tile_id": "duct-static-regain",
+   "source_publisher": "Duct static-regain method (SMACNA / ASHRAE)",
+   "source_title": "2,000 -> 1,500 fpm at R 0.75 -> 0.0818 in w.c. regained (VP 0.2494 / 0.1403)",
+   "source_edition_or_year": "spec-v960 worked example (machine-verified)",
+   "source_section_or_page": "VP_up = (2000/4005)^2 = 0.2494; VP_dn = (1500/4005)^2 = 0.1403; regain = 0.75*(0.2494-0.1403) = 0.0818",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "upstream_velocity_fpm": 2000,
+    "downstream_velocity_fpm": 1500,
+    "recovery_factor": 0.75
+   },
+   "outputs": {
+    "vp_upstream_inwc": {
+     "value": 0.2494,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "vp_downstream_inwc": {
+     "value": 0.1403,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "static_regain_inwc": {
+     "value": 0.0818,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-static-regain",
+   "source_publisher": "Duct static-regain method (SMACNA / ASHRAE)",
+   "source_title": "cross-check: a velocity INCREASE (1500 -> 2000 fpm) gives a negative result -- a static loss",
+   "source_edition_or_year": "spec-v960 worked example (machine-verified)",
+   "source_section_or_page": "regain = 0.75*(0.1403-0.2494) = -0.0818 in w.c. (static loss, not regain)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "upstream_velocity_fpm": 1500,
+    "downstream_velocity_fpm": 2000,
+    "recovery_factor": 0.75
+   },
+   "outputs": {
+    "static_regain_inwc": {
+     "value": -0.0818,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hydronic-injection-mixing",
    "source_publisher": "hydronic injection-mixing loop (primary/secondary energy balance)",
    "source_title": "10 gpm secondary at 110/90 F off a 180 F primary -> 2.22 gpm injection (22.2%)",

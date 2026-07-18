@@ -338,3 +338,51 @@ function _renderDuctTransitionLength(inputRegion, outputRegion, citationEl) {
   for (const f of [lg, sm, sl]) f.input.addEventListener("input", update);
 }
 METALAIR_RENDERERS["duct-transition-length"] = _renderDuctTransitionLength;
+
+// ===================== spec-v960: duct static regain at a velocity decrease =====================
+// dims: in { args: dimensionless } out: { vp_upstream_inwc: dimensionless, vp_downstream_inwc: dimensionless, static_regain_inwc: dimensionless }
+export function computeDuctStaticRegain({ upstream_velocity_fpm = 2000, downstream_velocity_fpm = 1500, recovery_factor = 0.75 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(upstream_velocity_fpm > 0)) return { error: "Upstream velocity must be positive (fpm)." };
+  if (!(downstream_velocity_fpm > 0)) return { error: "Downstream velocity must be positive (fpm)." };
+  if (!(recovery_factor >= 0 && recovery_factor <= 1)) return { error: "Recovery factor must be between 0 and 1." };
+  // Velocity pressure VP = (V/4005)^2 (standard air); static regain = R x (VP_upstream - VP_downstream).
+  const vp_upstream_inwc = Math.pow(upstream_velocity_fpm / 4005, 2);
+  const vp_downstream_inwc = Math.pow(downstream_velocity_fpm / 4005, 2);
+  const static_regain_inwc = recovery_factor * (vp_upstream_inwc - vp_downstream_inwc);
+  if (![vp_upstream_inwc, vp_downstream_inwc, static_regain_inwc].every(Number.isFinite)) return { error: "Static-regain math is not a finite value." };
+  return {
+    vp_upstream_inwc,
+    vp_downstream_inwc,
+    static_regain_inwc,
+    is_loss: static_regain_inwc < 0,
+    note: "The static pressure a duct RECOVERS when the air slows down at a size increase -- the basis of the static-regain duct-design method. Velocity pressure is VP = (V/4005)^2 in inches of water for standard air (the 4005 is the sea-level, 0.075 lb/ft^3 velocity-pressure constant), and when a larger downstream duct drops the velocity, part of that lost velocity pressure converts back to STATIC pressure: static regain = R x (VP_upstream - VP_downstream), with a recovery factor R commonly 0.75 (about 0.5 to 0.9 depending on the fitting quality and the transition angle). Dropping from 2,000 to 1,500 fpm (VP 0.249 to 0.140 in) at R = 0.75 regains about 0.082 in w.c. -- pressure the next run does not need the fan to provide. The static-regain method sizes each downstream section so its regain offsets its friction loss, holding static pressure nearly constant along the trunk. If the velocity INCREASES (a smaller downstream duct), the result is negative -- a static LOSS, not a regain (flagged). The 4005 constant assumes standard air, so altitude and temperature shift it; the recovery factor depends on the actual fitting, and SMACNA / ASHRAE and the engineer of record govern the design.",
+  };
+}
+
+export const ductStaticRegainExample = { inputs: { upstream_velocity_fpm: 2000, downstream_velocity_fpm: 1500, recovery_factor: 0.75 } };
+
+function _v960renderDuctStaticRegain(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: duct static-regain method, by name (SMACNA / ASHRAE Fundamentals). VP = (V/4005)^2 in w.c. (standard air); static regain = R x (VP_upstream - VP_downstream), recovery factor R ~ 0.75 (0.5-0.9). The 4005 constant assumes standard air (altitude/temperature shift it); the fitting quality sets R, and SMACNA/ASHRAE and the engineer govern.";
+  const uv = makeNumber("Upstream velocity (fpm)", "dsr-uv", { step: "any", min: "0", value: "2000" });
+  uv.input.value = "2000";
+  const dv = makeNumber("Downstream velocity (fpm)", "dsr-dv", { step: "any", min: "0", value: "1500" });
+  dv.input.value = "1500";
+  const rf = makeNumber("Recovery factor (0-1, ~0.75)", "dsr-rf", { step: "any", min: "0", value: "0.75" });
+  rf.input.value = "0.75";
+  for (const f of [uv, dv, rf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { uv.input.value = "2000"; dv.input.value = "1500"; rf.input.value = "0.75"; update(); });
+  const oR = makeOutputLine(outputRegion, "Static regain", "dsr-out-r");
+  const oV = makeOutputLine(outputRegion, "Velocity pressure up / down", "dsr-out-v");
+  const update = debounce(() => {
+    const r = computeDuctStaticRegain({
+      upstream_velocity_fpm: uv.input.value === "" ? 2000 : Number(uv.input.value), downstream_velocity_fpm: dv.input.value === "" ? 1500 : Number(dv.input.value),
+      recovery_factor: rf.input.value === "" ? 0.75 : Number(rf.input.value),
+    });
+    if (r.error) { oR.textContent = r.error; oV.textContent = "-"; return; }
+    oR.textContent = fmt(r.static_regain_inwc, 4) + " in w.c." + (r.is_loss ? " (a static LOSS -- velocity increased)" : " recovered");
+    oV.textContent = fmt(r.vp_upstream_inwc, 4) + " / " + fmt(r.vp_downstream_inwc, 4) + " in w.c.";
+  }, DEBOUNCE_MS);
+  for (const f of [uv, dv, rf]) f.input.addEventListener("input", update);
+}
+METALAIR_RENDERERS["duct-static-regain"] = _v960renderDuctStaticRegain;
