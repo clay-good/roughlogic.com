@@ -55691,6 +55691,58 @@
    }
   },
   {
+   "tile_id": "foundation-waterproofing-takeoff",
+   "source_publisher": "Foundation waterproofing/dampproofing takeoff",
+   "source_title": "150 ft perimeter, 8 ft below grade, 50 sf/gal, 10% waste -> 1,200 sf, 27 gal (6 pails)",
+   "source_edition_or_year": "spec-v970 worked example (machine-verified)",
+   "source_section_or_page": "area = 150*8 = 1200; gal = ceil(1200*1.10/50) = ceil(26.4) = 27; pails = ceil(27/5) = 6",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "perimeter_ft": 150,
+    "below_grade_height_ft": 8,
+    "coverage_sf_per_gal": 50,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "wall_area_sf": {
+     "value": 1200,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "gallons": {
+     "value": 27,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "foundation-waterproofing-takeoff",
+   "source_publisher": "Foundation waterproofing/dampproofing takeoff",
+   "source_title": "cross-check: a thick fluid membrane at 25 sf/gal doubles the product to 53 gal",
+   "source_edition_or_year": "spec-v970 worked example (machine-verified)",
+   "source_section_or_page": "gal = ceil(1200*1.10/25) = ceil(52.8) = 53",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "perimeter_ft": 150,
+    "below_grade_height_ft": 8,
+    "coverage_sf_per_gal": 25,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "gallons": {
+     "value": 53,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-sawcut-footage",
    "source_publisher": "Control-joint saw-cut-footage identity (first-principles)",
    "source_title": "60 x 40 ft slab, 12 ft spacing -> 5 x 4 = 20 panels, 340 LF of saw cut",

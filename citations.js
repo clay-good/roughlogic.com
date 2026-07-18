@@ -8366,6 +8366,17 @@ export const CITATIONS = {
       { name: "Seam tape", value: "one taped seam per roll width; penetrations and perimeter seal separate", source: "installation practice" },
     ],
   },
+  "foundation-waterproofing-takeoff": {
+    formula: "wall_area_sf = perimeter_ft x below_grade_height_ft; gallons = ceil(wall_area_sf x (1 + waste_pct/100) / coverage_sf_per_gal); pails_5gal = ceil(gallons / 5).",
+    edition: "Foundation waterproofing / dampproofing material takeoff (area x coverage), by name; IRC R406 (dampproofing vs waterproofing) and the product data sheet and AHJ govern.",
+    freeAccess: "The takeoff is public first-principles (wall area over the product coverage rate); the coverage rate comes from the product data sheet and the dimensions from the foundation.",
+    governance: GOVERNANCE.general,
+    editionNote: "A material takeoff for coating a below-grade foundation wall against moisture. The area is the foundation perimeter times the average below-grade wall height, and the fluid-applied product quantity is that area, plus waste, divided by the product's published coverage rate: a 150-foot perimeter, 8-foot-below-grade wall is 1,200 sf, so at a 50 sf/gal spray-applied rate with 10% waste it takes 27 gallons, or six five-gallon pails. The coverage rate is the dominant variable and it spans a wide range depending on which of two code-distinct treatments the job calls for. DAMPPROOFING (IRC R406.1) -- required on the exterior of below-grade walls enclosing habitable space where a high water table or hydrostatic pressure is NOT present -- is typically a thin sprayed or brushed bituminous coating at roughly 40-60 sf/gal, a vapor/moisture retarder only. WATERPROOFING (IRC R406.2) -- required where a high water table or other hydrostatic head exists -- is a more robust fluid-applied membrane built to a specified wet-mil thickness (so it covers far fewer square feet per gallon, often in two coats with reinforcing fabric bridged over cracks and cold joints) or a sheet membrane. Because of that range, the coverage rate must be read off the actual product data sheet, not assumed. Sheet (peel-and-stick) membrane is ordered by the roll from its own roll coverage rather than by the gallon. This is a material-ordering estimate; the product data sheet, the full assembly detail (with the protection/drainage board and the footing drain), and IRC R406 and the AHJ govern the specification.",
+    assumptions: [
+      { name: "Area over coverage", value: "area = perimeter x below-grade height; gallons = ceil(area x (1 + waste) / coverage rate); pails = ceil(gallons/5)", source: "material-takeoff practice" },
+      { name: "Dampproofing vs waterproofing", value: "coverage varies widely: thin dampproofing ~40-60 sf/gal (IRC R406.1) vs a fluid membrane at a wet-mil thickness (IRC R406.2); read the data sheet; sheet membrane is by the roll", source: "IRC R406 / product data sheet" },
+    ],
+  },
   "concrete-sawcut-footage": {
     formula: "panels_l = ceil(length_ft / spacing_ft); panels_w = ceil(width_ft / spacing_ft); joint_lf = (panels_l - 1) x width_ft + (panels_w - 1) x length_ft.",
     edition: "Control-joint saw-cut-footage identity by name (panel grid by ceiling, interior joint length); first-principles grid arithmetic.",

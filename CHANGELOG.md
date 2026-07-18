@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): add foundation-waterproofing-takeoff tile (spec-v970); 2026-07-18
+
+- New Group E tile `foundation-waterproofing-takeoff` (Foundation Waterproofing / Dampproofing Takeoff) in
+  calc-construction.js. area = perimeter x below-grade height; gallons = ceil(area x (1 + waste) / coverage rate). A
+  150 ft perimeter, 8 ft below grade = 1,200 sf, so at 50 sf/gal with 10% waste, 27 gal (6 pails). Coverage varies
+  widely (thin dampproofing ~40-60 sf/gal, IRC R406.1, vs a fluid membrane at a wet-mil thickness, IRC R406.2) -- read
+  the data sheet. IRC R406 and the AHJ govern. Home count 1,418 -> 1,419.
+
 ### feat(pool): add pool-calcium-hardness-dose tile (spec-v969); 2026-07-18
 
 - New Group M tile `pool-calcium-hardness-dose` (Pool Calcium Hardness Increase, Calcium Chloride) in calc-treatment.js.

@@ -27973,3 +27973,23 @@ test("bounds: spec-v969 computePoolCalciumHardnessDose pins the calcium chloride
   assert.ok("error" in _v969({ gallons: 20000, ppm_increase: 20, product_purity_pct: 150 }));
   assert.ok("error" in _v969({ gallons: Infinity, ppm_increase: 20, product_purity_pct: 77 }));
 });
+
+import { computeFoundationWaterproofingTakeoff as _v970 } from "../../calc-construction.js";
+
+test("bounds: spec-v970 computeFoundationWaterproofingTakeoff pins the area/gallons takeoff and error seams", () => {
+  const r = _v970({ perimeter_ft: 150, below_grade_height_ft: 8, coverage_sf_per_gal: 50, waste_pct: 10 });
+  assert.ok(Math.abs(r.wall_area_sf - 1200) < 1e-9); // 150*8
+  assert.equal(r.gallons, 27); // ceil(1200*1.10/50)
+  assert.equal(r.pails_5gal, 6); // ceil(27/5)
+  // A thicker (lower-coverage) membrane needs more product.
+  assert.equal(_v970({ perimeter_ft: 150, below_grade_height_ft: 8, coverage_sf_per_gal: 25, waste_pct: 10 }).gallons, 53);
+  // More waste rounds up more gallons; a bigger wall needs more.
+  assert.ok(_v970({ perimeter_ft: 200, below_grade_height_ft: 8, coverage_sf_per_gal: 50, waste_pct: 10 }).gallons > r.gallons);
+  assert.equal(_v970({ perimeter_ft: 150, below_grade_height_ft: 8, coverage_sf_per_gal: 50, waste_pct: 0 }).gallons, 24); // ceil(1200/50)
+  // Error seams: non-positive perimeter / height / coverage, negative waste, non-finite.
+  assert.ok("error" in _v970({ perimeter_ft: 0, below_grade_height_ft: 8, coverage_sf_per_gal: 50, waste_pct: 10 }));
+  assert.ok("error" in _v970({ perimeter_ft: 150, below_grade_height_ft: 0, coverage_sf_per_gal: 50, waste_pct: 10 }));
+  assert.ok("error" in _v970({ perimeter_ft: 150, below_grade_height_ft: 8, coverage_sf_per_gal: 0, waste_pct: 10 }));
+  assert.ok("error" in _v970({ perimeter_ft: 150, below_grade_height_ft: 8, coverage_sf_per_gal: 50, waste_pct: -1 }));
+  assert.ok("error" in _v970({ perimeter_ft: Infinity, below_grade_height_ft: 8, coverage_sf_per_gal: 50, waste_pct: 10 }));
+});

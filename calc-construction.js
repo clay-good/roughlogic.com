@@ -10029,3 +10029,42 @@ CONSTRUCTION_RENDERERS["joist-cantilever-check"] = _simpleRenderer({
   ],
   compute: computeJoistCantileverCheck,
 });
+
+// ===================== spec-v970: foundation waterproofing / dampproofing takeoff =====================
+// dims: in { args: dimensionless } out: { wall_area_sf: dimensionless, gallons: dimensionless }
+export function computeFoundationWaterproofingTakeoff({ perimeter_ft = 150, below_grade_height_ft = 8, coverage_sf_per_gal = 50, waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(perimeter_ft > 0)) return { error: "Foundation perimeter must be positive (ft)." };
+  if (!(below_grade_height_ft > 0)) return { error: "Below-grade wall height must be positive (ft)." };
+  if (!(coverage_sf_per_gal > 0)) return { error: "Coverage rate must be positive (sf/gal)." };
+  if (!(waste_pct >= 0)) return { error: "Waste percent cannot be negative." };
+  // Below-grade wall area to coat; fluid-applied gallons from the product's coverage rate.
+  const wall_area_sf = perimeter_ft * below_grade_height_ft;
+  const gallons = Math.ceil(wall_area_sf * (1 + waste_pct / 100) / coverage_sf_per_gal);
+  if (![wall_area_sf, gallons].every(Number.isFinite)) return { error: "Waterproofing takeoff math is not a finite value." };
+  return {
+    wall_area_sf,
+    gallons,
+    pails_5gal: Math.ceil(gallons / 5),
+    note: "The fluid-applied waterproofing or dampproofing to coat a below-grade foundation wall: area = perimeter x the average below-grade height, and gallons = ceil(area x (1 + waste) / the product's coverage rate). A 150 ft perimeter, 8 ft below grade is 1,200 sf, so at a 50 sf/gal spray-applied rate with 10% waste it takes 27 gallons (6 five-gallon pails). The coverage rate is the LEVER and it varies widely: a thin sprayed-asphalt DAMPPROOFing runs ~40-60 sf/gal (a moisture barrier, IRC R406.1), while a true fluid-applied WATERPROOFing membrane built to a wet-mil thickness (a below-grade-with-hydrostatic-pressure requirement, IRC R406.2) covers far fewer sf/gal per coat and often needs two coats and reinforcing fabric at cracks and cold joints -- read the coverage off the product data sheet, not a default. Foundation dampproofing vs waterproofing is a code distinction (waterproofing where a high water table or hydrostatic head exists). Sheet (peel-and-stick) membrane is ordered by the roll instead (see the roll coverage). A material-ordering estimate; the product data sheet, the assembly detail (with the drainage board and footing drain), and the AHJ / IRC R406 govern.",
+  };
+}
+
+export const foundationWaterproofingTakeoffExample = { inputs: { perimeter_ft: 150, below_grade_height_ft: 8, coverage_sf_per_gal: 50, waste_pct: 10 } };
+
+CONSTRUCTION_RENDERERS["foundation-waterproofing-takeoff"] = _simpleRenderer({
+  citation: "Citation: foundation waterproofing / dampproofing takeoff, by name. area = perimeter x below-grade height; gallons = ceil(area x (1 + waste) / coverage rate). Coverage varies widely (thin dampproofing ~40-60 sf/gal vs a fluid membrane at a wet-mil thickness) -- read it off the product data sheet. IRC R406 (dampproofing vs waterproofing) and the AHJ govern.",
+  example: foundationWaterproofingTakeoffExample.inputs,
+  fields: [
+    { key: "perimeter_ft", label: "Foundation perimeter (ft)", kind: "number", default: 150 },
+    { key: "below_grade_height_ft", label: "Average below-grade height (ft)", kind: "number", default: 8 },
+    { key: "coverage_sf_per_gal", label: "Coverage (sf/gal, from the data sheet)", kind: "number", default: 50 },
+    { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "a", id: "fwt-out-a", label: "Below-grade wall area", value: (r) => fmt(r.wall_area_sf, 0) + " sf" },
+    { key: "g", id: "fwt-out-g", label: "Fluid-applied product", value: (r) => String(r.gallons) + " gal (" + String(r.pails_5gal) + " five-gallon pails)" },
+    { key: "n", id: "fwt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFoundationWaterproofingTakeoff,
+});
