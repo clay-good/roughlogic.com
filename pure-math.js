@@ -159,8 +159,9 @@ export function singlePhasePower({ V, I, pf }) {
 }
 
 // Hazen-Williams friction loss (US customary).
-//   h_f (ft) = (4.52 * Q^1.852) / (C^1.852 * d^4.87) * L
+//   h_f (ft) = (10.44 * Q^1.852) / (C^1.852 * d^4.87) * L
 // Q in gpm, d in inches (internal), L in feet, h_f in feet of head.
+// (10.44 is the feet-of-head coefficient; the NFPA-13 4.52 gives psi = feet / 2.307.)
 // Citation: Hazen and Williams, 1905. Public domain.
 // dims: in { flow_gpm: L^3 T^-1, internal_diameter_in: L, length_ft: L, C: dimensionless }
 //        out: headLoss_ft: L
