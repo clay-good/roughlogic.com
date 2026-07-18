@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(fab): guard the flange-bolt tensile-area lookup (UNC + 8UN) with a diameter-monotonicity invariant; 2026-07-17
+
+- Added a safety invariant over the ASME B1.1 bolt tensile-stress-area tables that back flange-bolt preload/torque:
+  the tensile area must strictly increase with bolt diameter (and stay below the gross bolt area). An undersized area
+  understates capacity and can over-torque a joint; a transcription error is now caught structurally rather than only at
+  the pinned example. Tested through the public computeFlangeBoltTorque, so the private UNC/8UN tables need no export. Test-only.
+
 ### test(electrical): guard the NEC 430.248/250 motor FLA table with hp/voltage monotonicity; 2026-07-17
 
 - Added physical/NEC invariants over MOTOR_FLA_TABLE (drives motor branch-circuit and OCPD sizing -- an undersized value

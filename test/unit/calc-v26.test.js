@@ -142,3 +142,29 @@ test("flange-bolt-torque: preload, torque, cross sequence, over-yield flag", () 
   assert.ok(computeFlangeBoltTorque({ bolt_diameter_in: 0.75, bolt_count: 8, target_percent_yield: 120, yield_ksi: 105, nut_factor_k: 0.18 }).notes.some((n) => n.includes("over-tension")));
   assert.ok("error" in computeFlangeBoltTorque({ bolt_diameter_in: 0, bolt_count: 8 }));
 });
+
+// Safety invariant over the ASME B1.1 bolt tensile-area lookup (UNC + 8UN) that
+// backs flange-bolt preload/torque: tensile stress area must strictly increase
+// with bolt diameter. An undersized area understates preload capacity and can
+// over-torque a joint; a transcription error is caught here, not by point pins.
+// Tested through the public compute so the private tables need no export.
+test("flange-bolt: tensile stress area is strictly increasing in bolt diameter (UNC and 8UN, ASME B1.1)", () => {
+  const areaFor = (d, series) => {
+    const r = computeFlangeBoltTorque({ bolt_diameter_in: d, thread_series: series, bolt_count: 8, yield_ksi: 105 });
+    return r.error ? null : r.tensile_area_in2;
+  };
+  const diameters = [0.25, 0.3125, 0.375, 0.4375, 0.5, 0.625, 0.75, 0.875, 1, 1.125, 1.25, 1.375, 1.5, 1.75, 2];
+  for (const series of ["UNC", "8UN"]) {
+    let prev = -Infinity, seen = 0;
+    for (const d of diameters) {
+      const a = areaFor(d, series);
+      if (a == null) continue;
+      seen++;
+      assert.ok(a > 0, `${series} ${d} in tensile area must be positive`);
+      assert.ok(a < d * d, `${series} ${d} in tensile area ${a} exceeds the gross bolt area (impossible)`);
+      assert.ok(a > prev, `${series} tensile area not increasing at ${d} in: ${a} <= ${prev}`);
+      prev = a;
+    }
+    assert.ok(seen >= 5, `expected >= 5 ${series} sizes, saw ${seen}`);
+  }
+});
