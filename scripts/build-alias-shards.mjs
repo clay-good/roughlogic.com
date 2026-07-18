@@ -48,6 +48,17 @@ function gzipSize(text) {
   return gzipSync(Buffer.from(text, "utf8"), { level: 9 }).length;
 }
 
+// Deterministic view of the manifest for the --check comparison: every field
+// except the per-shard gzip_size_bytes (which varies a few bytes across zlib
+// builds and is informational only). Catches added / removed / renamed / mis-
+// ordered shards and hash-key drift without gating on a non-portable number.
+function manifestShape(m) {
+  return JSON.stringify({
+    ...m,
+    shards: (m.shards || []).map((s) => ({ file: s.file, name: s.name })),
+  });
+}
+
 // Serialize a shard with one alias row per line so diffs stay per-row,
 // matching the review ergonomics of the master file.
 function serializeShard(letter, updated, rows) {
@@ -160,8 +171,14 @@ async function main() {
       if (current !== content) errors.push("data/search/" + file + " is stale or missing.");
     }
     for (const n of stale) errors.push("data/search/" + n + " is stale (its group no longer exists).");
-    const manifestCurrent = await readFile(MANIFEST, "utf8");
-    if (manifestCurrent !== manifestOut) errors.push("data/search/manifest.json alias entries are stale.");
+    // Compare manifest STRUCTURE, not bytes: gzip_size_bytes is informational
+    // and not reproducible across zlib builds (macOS vs CI Linux differ by a
+    // few bytes), so gating on it would fail CI on an otherwise-correct commit.
+    // The shard file list, names, order, and hash keys ARE deterministic.
+    const manifestCurrent = JSON.parse(await readFile(MANIFEST, "utf8"));
+    if (manifestShape(manifestCurrent) !== manifestShape(manifest)) {
+      errors.push("data/search/manifest.json alias shard list / hashes are stale (run the generator).");
+    }
     if (errors.length > 0) {
       for (const e of errors) console.error("ERROR: " + e);
       console.error(
