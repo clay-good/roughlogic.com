@@ -3149,3 +3149,46 @@ function _v914renderTractorBallast(inputRegion, outputRegion, citationEl) {
   for (const f of [hp, rt, cw]) f.input.addEventListener("input", update);
 }
 AGRICULTURE_RENDERERS["tractor-ballast"] = _v914renderTractorBallast;
+
+// ===================== spec-v940: anhydrous ammonia product rate from target nitrogen =====================
+// dims: in { n_target_lb_per_ac: dimensionless, tank_gal: dimensionless } out: { product_lb_per_ac: dimensionless, product_gal_per_ac: dimensionless, acres_per_tank: dimensionless }
+export function computeAnhydrousAmmoniaRate({ n_target_lb_per_ac = 180, tank_gal = 1000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(n_target_lb_per_ac > 0)) return { error: "Target nitrogen must be positive (lb N/acre)." };
+  if (tank_gal < 0) return { error: "Tank size cannot be negative (gal)." };
+  // Anhydrous ammonia is 82-0-0 (82% N by weight); liquid density ~5.15 lb/gal.
+  const product_lb_per_ac = n_target_lb_per_ac / 0.82;
+  const product_gal_per_ac = product_lb_per_ac / 5.15;
+  const acres_per_tank = tank_gal > 0 ? tank_gal / product_gal_per_ac : null;
+  if (![product_lb_per_ac, product_gal_per_ac].every(Number.isFinite)) return { error: "Anhydrous-rate math is not a finite value." };
+  return {
+    product_lb_per_ac,
+    product_gal_per_ac,
+    acres_per_tank,
+    note: "Anhydrous ammonia is 82-0-0 (82% nitrogen by weight), so the product rate = target N / 0.82; at a liquid density of about 5.15 lb/gal that is the gallons per acre, and a nurse-tank's gallons divided by that is the acres it covers. A 180 lb N/acre target is about 219.5 lb (42.6 gal) of anhydrous per acre, so a 1,000-gal tank covers about 23.5 acres. Anhydrous is a pressurized, hazardous liquid -- set the applicator with a flow monitor and calibrate against a weigh or flow check, allow for temperature and vapor, and follow the label and safety (PPE, water, closed-transfer) requirements. A rate estimate; the applicator calibration, the soil-test N recommendation, and the co-op / label govern.",
+  };
+}
+
+export const anhydrousAmmoniaRateExample = { inputs: { n_target_lb_per_ac: 180, tank_gal: 1000 } };
+
+function _v940renderAnhydrousAmmoniaRate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: anhydrous ammonia rate by name. product = target N / 0.82 (82-0-0 grade); gal/acre = lb/acre / 5.15 (liquid density); acres/tank = tank gal / (gal/acre). Anhydrous is hazardous and pressurized -- calibrate the applicator; the label and co-op govern.";
+  const nt = makeNumber("Target nitrogen (lb N/acre)", "anh-nt", { step: "any", min: "0", value: "180" });
+  nt.input.value = "180";
+  const tk = makeNumber("Nurse tank size (gal, 0 to skip)", "anh-tk", { step: "any", min: "0", value: "1000" });
+  tk.input.value = "1000";
+  for (const f of [nt, tk]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { nt.input.value = "180"; tk.input.value = "1000"; update(); });
+  const oRate = makeOutputLine(outputRegion, "Anhydrous rate", "anh-out-rate");
+  const oAcres = makeOutputLine(outputRegion, "Acres per tank", "anh-out-acres");
+  const update = debounce(() => {
+    const r = computeAnhydrousAmmoniaRate({
+      n_target_lb_per_ac: nt.input.value === "" ? 180 : Number(nt.input.value), tank_gal: tk.input.value === "" ? 1000 : Number(tk.input.value),
+    });
+    if (r.error) { oRate.textContent = r.error; oAcres.textContent = "-"; return; }
+    oRate.textContent = fmt(r.product_lb_per_ac, 1) + " lb/acre (" + fmt(r.product_gal_per_ac, 1) + " gal/acre)";
+    oAcres.textContent = r.acres_per_tank === null ? "- (enter tank size)" : fmt(r.acres_per_tank, 1) + " acres/tank";
+  }, DEBOUNCE_MS);
+  for (const f of [nt, tk]) f.input.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["anhydrous-ammonia-rate"] = _v940renderAnhydrousAmmoniaRate;

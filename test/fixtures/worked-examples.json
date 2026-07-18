@@ -35810,6 +35810,66 @@
    }
   },
   {
+   "tile_id": "anhydrous-ammonia-rate",
+   "source_publisher": "anhydrous ammonia rate (82-0-0)",
+   "source_title": "180 lb N/acre, 1,000 gal tank -> 219.5 lb/acre (42.6 gal/acre), 23.5 acres/tank",
+   "source_edition_or_year": "spec-v940 worked example (machine-verified)",
+   "source_section_or_page": "product = 180/0.82 = 219.5 lb; gal/ac = 219.5/5.15 = 42.62; acres = 1000/42.62 = 23.46",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "n_target_lb_per_ac": 180,
+    "tank_gal": 1000
+   },
+   "outputs": {
+    "product_lb_per_ac": {
+     "value": 219.51,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "product_gal_per_ac": {
+     "value": 42.62,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "acres_per_tank": {
+     "value": 23.46,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "anhydrous-ammonia-rate",
+   "source_publisher": "anhydrous ammonia rate (82-0-0)",
+   "source_title": "cross-check: 120 lb N/acre -> 146.3 lb/acre (28.4 gal/acre)",
+   "source_edition_or_year": "spec-v940 worked example (machine-verified)",
+   "source_section_or_page": "product = 120/0.82 = 146.3 lb; gal/ac = 146.3/5.15 = 28.41",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "n_target_lb_per_ac": 120,
+    "tank_gal": 0
+   },
+   "outputs": {
+    "product_lb_per_ac": {
+     "value": 146.34,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "product_gal_per_ac": {
+     "value": 28.41,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "tractor-ballast",
    "source_publisher": "tractor ballasting rule (ASABE)",
    "source_title": "180 hp at 125 lb/hp target, 18,000 lb current -> 22,500 lb target, add 4,500 lb",

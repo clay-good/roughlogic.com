@@ -68112,6 +68112,31 @@
       "kind": "industry"
     },
     {
+      "term": "anhydrous ammonia rate",
+      "target": "anhydrous-ammonia-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "nh3 rate",
+      "target": "anhydrous-ammonia-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "anhydrous per acre",
+      "target": "anhydrous-ammonia-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "82-0-0 nitrogen rate",
+      "target": "anhydrous-ammonia-rate",
+      "kind": "adjacent"
+    },
+    {
+      "term": "anhydrous acres per tank",
+      "target": "anhydrous-ammonia-rate",
+      "kind": "adjacent"
+    },
+    {
       "term": "weight to power ratio",
       "target": "tractor-ballast",
       "kind": "industry"

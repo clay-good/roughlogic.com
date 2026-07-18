@@ -1441,6 +1441,7 @@ cross-check.
 | calc-accounting.js | `computeUnitsOfProductionDepr` | `{ cost_basis = 0, salvage_value = 0, total_units = 0, period_units = 0, accum...` | _ | _ | _ |
 | calc-accounting.js | `computeWipPercentComplete` | `{ contract_usd = 0, cost_to_date_usd = 0, est_total_cost_usd = 0, billed_to_d...` | _ | _ | _ |
 | calc-accounting.js | `computeWorkersCompEmrPremium` | `{ payroll_usd = 0, class_rate = 0, emr = 1.0 } = {}` | _ | _ | _ |
+| calc-agriculture.js | `computeAnhydrousAmmoniaRate` | `{ n_target_lb_per_ac = 180, tank_gal = 1000 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeBulkDensity` | `{ dry_mass_g = 0, core_volume_cc = 0, particle_density_pcc = 2.65, texture = ...` | _ | _ | _ |
 | calc-agriculture.js | `computeBunkerSiloCapacity` | `{ bottom_width_ft = 0, top_width_ft = 0, average_depth_ft = 0, length_ft = 0,...` | _ | _ | _ |
 | calc-agriculture.js | `computeCenterPivotRuntime` | `{ system_flow_gpm = 0, area_acres = 0, target_depth_in = 0, efficiency_pct = ...` | _ | _ | _ |
@@ -3049,7 +3050,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1635.
+Row count: 1636.
 
 <!-- END function-corpus-v14 -->
 
@@ -4249,10 +4250,11 @@ per spec-v14 §13.1 second paragraph.
 | `waterline-for-hull-speed` | Waterline Length for a Target Hull Speed | displacement hull-speed relation (Fro...; 8 kn target displacement hull -> 35.6 ft waterline | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (64 tiles)
+### Group L Agriculture (65 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
+| `anhydrous-ammonia-rate` | Anhydrous Ammonia Rate from Target Nitrogen | anhydrous ammonia rate (82-0-0); product = 180/0.82 = 219.5 lb; gal/ac = 219.5/5.15 = 42.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `basal-area-prism` | Basal Area per Acre (Prism Cruise) | USDA Forest Service mensuration / Bit...; BAF-10, 8 trees in, 14 in DBH -> 80 ft^2/ac, 1.069 ft^2/t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bulk-density` | Soil Bulk Density and Compaction | USDA-NRCS; bulk_density = 200/150 = 1.333 g/cc; porosity = 1 - 1.333... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bunker-silo-capacity` | Bunker (Horizontal) Silo Forage Capacity | NRCS / MWPS forage storage sizing; A = (30+30)/2 x 8 = 240 ft^2; V = 240 x 100 = 24000 ft^3;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4623,6 +4625,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1388. Fixture-covered or reference-cadence: 1388 / 1388.
+Tile count: 1389. Fixture-covered or reference-cadence: 1389 / 1389.
 
 <!-- END tile-index-v14 -->

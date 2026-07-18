@@ -6049,6 +6049,17 @@ export const CITATIONS = {
       { name: "Slip target", value: "aim for 8-15% wheel slip; too much ballast wastes fuel, too little spins the tires", source: "tractor ballasting practice" },
     ],
   },
+  "anhydrous-ammonia-rate": {
+    formula: "product_lb_per_ac = n_target_lb_per_ac / 0.82; product_gal_per_ac = product_lb_per_ac / 5.15; acres_per_tank = tank_gal / product_gal_per_ac.",
+    edition: "Anhydrous ammonia fertilizer grade (82-0-0) and liquid density (~5.15 lb/gal), by name; extension-service and co-op practice. The soil-test N recommendation and the label govern.",
+    freeAccess: "The grade (82% N) and the liquid density are public product facts; the target N comes from the soil-test recommendation and the tank size from the equipment.",
+    governance: GOVERNANCE.general,
+    editionNote: "Anhydrous ammonia (NH3) is the highest-analysis nitrogen fertilizer, graded 82-0-0 -- 82% nitrogen by weight. So the product needed to deliver a target N rate is the target divided by 0.82, and at a liquid density of about 5.15 lb/gal that converts to gallons per acre; a nurse tank's usable gallons divided by the per-acre gallons is the acres it covers before a refill. Anhydrous is a compressed, refrigerated-when-released, and acutely hazardous liquid: it must be applied with a properly calibrated, flow-monitored applicator (temperature and flashing vapor affect the metered rate), and handled with the required PPE, a water source, and closed-transfer / anti-drift precautions per the label and the applicator's certification. This is a rate estimate; the applicator calibration, the certified soil-test nitrogen recommendation, and the co-op / product label govern the actual application. This is distinct from a multi-nutrient NPK blend, which solves a soil test into urea, DAP, and potash.",
+    assumptions: [
+      { name: "Grade and density", value: "82-0-0 (82% N); ~5.15 lb/gal liquid; product = N/0.82, gal/ac = lb/ac / 5.15", source: "anhydrous ammonia product data" },
+      { name: "Calibration and safety", value: "flow-monitored, calibrated applicator; PPE, water, closed transfer per the label; the certification governs", source: "extension / label" },
+    ],
+  },
   "irrigation-uniformity": {
     formula: "Christiansen CU = 100 × (1 − Σ|x_i − mean| / (n × mean)). Distribution Uniformity DU = 100 × mean_lowest_quarter / mean_all. Pass / fail at CU 85 / DU 75.",
     edition: "Christiansen 1942 paper by name; USDA NRCS National Engineering Handbook (NEH) Part 623 (Irrigation) by name.",

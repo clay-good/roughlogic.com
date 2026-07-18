@@ -277,6 +277,7 @@ export const COMPUTE_MAP = {
   "drawbar-power": { module: "../../calc-agriculture.js", fn: "computeDrawbarPower" },
   "drawbar-pull": { module: "../../calc-agriculture.js", fn: "computeDrawbarPull" },
   "tractor-ballast": { module: "../../calc-agriculture.js", fn: "computeTractorBallast" },
+  "anhydrous-ammonia-rate": { module: "../../calc-agriculture.js", fn: "computeAnhydrousAmmoniaRate" },
   "chamber-turnover": { module: "../../calc-restoration.js", fn: "computeChamberTurnover" },
   "concrete-mix-design": { module: "../../calc-construction.js", fn: "computeConcreteMixDesign" },
   "drying-goal": { module: "../../calc-restoration.js", fn: "computeDryingGoal" },

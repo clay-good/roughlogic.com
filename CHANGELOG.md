@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(agriculture): add anhydrous-ammonia-rate tile (spec-v940); 2026-07-18
+
+- New Group L tile `anhydrous-ammonia-rate` (Anhydrous Ammonia Rate from Target Nitrogen) in calc-agriculture.js, beside
+  tractor-ballast. Anhydrous is 82-0-0, so product = target N / 0.82; gal/acre = lb/acre / 5.15 (liquid density);
+  acres/tank = tank gal / (gal/acre). A 180 lb N/acre target = 219.5 lb (42.6 gal)/acre, so a 1,000-gal tank covers
+  23.5 acres. Distinct from npk-blend (urea/DAP/potash). Calibrate the applicator; the label and co-op govern. Home count
+  1,388 -> 1,389.
+
 ### feat(fire): add jockey-pump-sizing tile (spec-v939); 2026-07-18
 
 - New Group F tile `jockey-pump-sizing` (Jockey (Pressure-Maintenance) Pump Sizing, NFPA 20) in calc-firesprinkler.js,

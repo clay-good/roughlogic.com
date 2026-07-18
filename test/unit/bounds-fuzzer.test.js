@@ -27191,6 +27191,23 @@ test("bounds: spec-v915 computeOutdoorResetRatio pins the reset ratio, supply ta
   assert.ok("error" in _v915({ supply_design_f: Infinity, supply_min_f: 80, oa_design_f: 0, oa_noheat_f: 65, oa_current_f: 30 }));
 });
 
+import { computeAnhydrousAmmoniaRate as _v940 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v940 computeAnhydrousAmmoniaRate pins the product rate, acres/tank, and error seams", () => {
+  const r = _v940({ n_target_lb_per_ac: 180, tank_gal: 1000 });
+  assert.ok(Math.abs(r.product_lb_per_ac - 219.512) < 0.01); // 180/0.82
+  assert.ok(Math.abs(r.product_gal_per_ac - 42.624) < 0.01); // /5.15
+  assert.ok(Math.abs(r.acres_per_tank - 23.463) < 0.01); // 1000/42.624
+  // No tank -> null acres.
+  const n = _v940({ n_target_lb_per_ac: 120, tank_gal: 0 });
+  assert.ok(Math.abs(n.product_lb_per_ac - 146.341) < 0.01); // 120/0.82
+  assert.equal(n.acres_per_tank, null);
+  // Error seams: non-positive N, negative tank, non-finite.
+  assert.ok("error" in _v940({ n_target_lb_per_ac: 0, tank_gal: 1000 }));
+  assert.ok("error" in _v940({ n_target_lb_per_ac: 180, tank_gal: -1 }));
+  assert.ok("error" in _v940({ n_target_lb_per_ac: Infinity, tank_gal: 1000 }));
+});
+
 import { computeTractorBallast as _v914 } from "../../calc-agriculture.js";
 
 test("bounds: spec-v914 computeTractorBallast pins the target weight, signed ballast change, and error seams", () => {
