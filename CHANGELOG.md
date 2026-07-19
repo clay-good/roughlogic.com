@@ -8,8 +8,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 - Added `scripts/check-render-output-keys.mjs` to `npm run lint`, closing the surface that produced the
   trailer-tongue-weight fix below. A `_simpleRenderer` output reads `r.KEY` off its compute's return object; if the
-  compute never returns `KEY`, a number surfaces as `NaN` (caught by the render-no-nan Playwright gate) but a string
-  renders the literal text "undefined" -- a visibly broken output no gate could see. The gate resolves each compute's
+  compute never returns `KEY`, the output renders `NaN` (numbers) or the literal text `undefined` (strings). The
+  30-minute render-no-nan Playwright gate scans for both, but empirically shipped the trailer leak, so this fast
+  deterministic static check is the reliable catch. The gate resolves each compute's
   `return { ... }` literal keys and fails when an output reads a key the compute never returns; computes whose return
   is unresolvable (an object spread `{ ...t }` or a returned variable `return out`) are skipped, so a clean run is
   never a false alarm. Swept all 56 modules: 1,860 output references, zero missing after the fix; verified it fails
@@ -19,8 +20,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 - `computeTrailerTongueWeight` built the `verdict` string (TOO LIGHT / TOO HEAVY / in-band) but left it out of the
   return object, while the renderer's Verdict line reads `r.verdict`. So the tile's headline output rendered
-  "OK: undefined" (or "undefined -- ALSO over the hitch tongue-weight rating"). The render-no-nan gate missed it
-  because an undefined STRING is not a NaN. Added `verdict` to the return; the Verdict line now shows the real
+  "OK: undefined" (or "undefined -- ALSO over the hitch tongue-weight rating"). The render-no-nan Playwright gate
+  scans output text for `undefined` too, but empirically shipped this leak (integration was green with the bug
+  present), so a deterministic static check is the reliable catch. Added `verdict` to the return; the Verdict line
+  now shows the real
   message. Added a regression assertion pinning the verdict for the in-band / too-light / too-heavy cases. Found by a
   precise `_simpleRenderer` output-key scan (every `r.KEY` a renderer reads must be a key its compute returns), which
   otherwise came back clean across 1,873 output references.
