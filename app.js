@@ -1717,10 +1717,15 @@ function renderToolView(id, params) {
       copyBtn.className = "view-copy-reference";
       copyBtn.textContent = "Copy answer with full reference block";
       copyBtn.addEventListener("click", async () => {
-        const answerSummary = (outputRegion.textContent || "").trim().replace(/\s+/g, " ");
-        const text = cit.buildAnswerWithReference(tool.name, answerSummary, id);
         try {
           const cb = await import("./clipboard.js");
+          // Build the answer from the structured (label, value) rows -- the
+          // same extraction the "Copy all" button uses -- NOT
+          // outputRegion.textContent, which fuses each value with its per-line
+          // "Copy" button label ("Needed final score: 88CopyMax / min ...").
+          const answerSummary = cb.collectOutputs(outputRegion)
+            .map((r) => r.label + ": " + r.value).join("\n");
+          const text = cit.buildAnswerWithReference(tool.name, answerSummary, id);
           cb.copyText(text, copyBtn);
         } catch {
           // Fallback: leave the text on the page in a focusable element.

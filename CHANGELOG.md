@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(app): copy-answer-with-reference copied the output's "Copy" button labels; 2026-07-19
+
+- The "Copy answer with full reference block" button built its answer summary from `outputRegion.textContent`, which
+  concatenates each value with its adjacent per-line "Copy" button label and the trailing "Copy all" button, so the
+  copied answer came out garbled: `Concrete shear stress vc: 253 psiCopyDesign capacity phi Vc: 118.4 kipCopyCopy all`.
+  Switched it to `collectOutputs()` -- the same structured `(label, value)` extraction the "Copy all" button already
+  uses, which reads the `.out-value` spans and ignores the buttons -- so the clipboard now gets clean `label: value`
+  lines. Affected every tile (all have a structured citation block). Verified via a real clipboard read in Chromium.
+
 ### test(render-no-nan): reliably catch example-state "undefined" leaks; 2026-07-19
 
 - The spec-v18 render gate's example-fill check had two flaws that let real leaks ship green (trailer-tongue-weight's
