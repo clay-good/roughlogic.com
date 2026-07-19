@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): add flue-gas-dew-point tile (spec-v1004); 2026-07-18
+
+- New Group C tile `flue-gas-dew-point` in calc-hvacservice.js. Water dew point of natural-gas combustion products,
+  from methane stoichiometry (water fraction = 2/(1 + 9.52 x lambda)) and the Antoine water-saturation relation. 15%
+  excess air -> 16.7% water vapor, ~134 F dew point; stoichiometric -> 19.0%, ~139 F (the maximum). Non-condensing
+  appliances must keep flue gas above it to the vent terminus or the vent corrodes; condensing units drop below to
+  harvest latent heat. NFPA 54 vent tables and the AHJ govern. Home count 1,452 -> 1,453.
+
 ### feat(stage): add acoustic-gain-pag-nag tile (spec-v1003); 2026-07-18
 
 - New Group N tile `acoustic-gain-pag-nag` in calc-stage.js. Feedback-stability check for a sound system: PAG =

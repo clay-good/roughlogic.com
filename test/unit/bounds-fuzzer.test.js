@@ -28718,3 +28718,22 @@ test("bounds: spec-v1003 computeAcousticGainPagNag pins PAG/NAG feedback stabili
   assert.ok("error" in _v1003({ ds_ft: 2, d0_ft: 30, d1_ft: 8, d2_ft: 12, open_mics: 1, ead_ft: 0 }));
   assert.ok("error" in _v1003({ ds_ft: Infinity, d0_ft: 30, d1_ft: 8, d2_ft: 12, open_mics: 1, ead_ft: 6 }));
 });
+
+import { computeFlueGasDewPoint as _v1004fg } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v1004 computeFlueGasDewPoint pins the natural-gas water dew point", () => {
+  const r = _v1004fg({ excess_air_pct: 15 });
+  assert.ok(Math.abs(r.water_vapor_pct - 16.74) < 0.05); // 2/(1+9.52*1.15)*100
+  assert.ok(Math.abs(r.dew_point_f - 133.9) < 0.5); // Antoine
+  // Stoichiometric is the maximum water fraction and dew point.
+  const stoich = _v1004fg({ excess_air_pct: 0 });
+  assert.ok(Math.abs(stoich.water_vapor_pct - 19.01) < 0.05); // 2/10.52
+  assert.ok(Math.abs(stoich.dew_point_f - 138.8) < 0.5);
+  assert.ok(stoich.dew_point_f > r.dew_point_f);
+  // More excess air dilutes the water and lowers the dew point.
+  assert.ok(_v1004fg({ excess_air_pct: 50 }).dew_point_f < r.dew_point_f);
+  assert.ok(_v1004fg({ excess_air_pct: 100 }).water_vapor_pct < r.water_vapor_pct);
+  // Error seams.
+  assert.ok("error" in _v1004fg({ excess_air_pct: -5 }));
+  assert.ok("error" in _v1004fg({ excess_air_pct: Infinity }));
+});

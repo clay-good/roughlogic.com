@@ -623,6 +623,7 @@ export const COMPUTE_MAP = {
   "excess-air-o2": { module: "../../calc-hvacservice.js", fn: "computeExcessAirO2" },
   "combustion-lambda": { module: "../../calc-hvacservice.js", fn: "computeCombustionLambda" },
   "oil-burner-firing-rate": { module: "../../calc-hvacservice.js", fn: "computeOilBurnerFiringRate" },
+  "flue-gas-dew-point": { module: "../../calc-hvacservice.js", fn: "computeFlueGasDewPoint" },
   "co-air-free": { module: "../../calc-hvacservice.js", fn: "computeCoAirFree" },
   "draft-hood-dilution": { module: "../../calc-hvacservice.js", fn: "computeDraftHoodDilution" },
   "chimney-draft": { module: "../../calc-hvacservice.js", fn: "computeChimneyDraft" },

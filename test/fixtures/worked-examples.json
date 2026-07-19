@@ -69229,6 +69229,52 @@
    }
   },
   {
+   "tile_id": "flue-gas-dew-point",
+   "source_publisher": "Natural-gas flue-gas water dew point (stoichiometry + Antoine)",
+   "source_title": "15% excess air -> 16.7% water vapor, ~134 F water dew point",
+   "source_edition_or_year": "spec-v1004 worked example (machine-verified)",
+   "source_section_or_page": "frac = 2/(1 + 9.52 x 1.15) = 0.1674; p = 127.2 mmHg; Antoine -> 56.6 C = 133.9 F",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "excess_air_pct": 15
+   },
+   "outputs": {
+    "water_vapor_pct": {
+     "value": 16.74,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "dew_point_f": {
+     "value": 133.9,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flue-gas-dew-point",
+   "source_publisher": "Natural-gas flue-gas water dew point (stoichiometry + Antoine)",
+   "source_title": "cross-check: stoichiometric (0% excess air) -> 19.0% water, ~139 F (the maximum dew point)",
+   "source_edition_or_year": "spec-v1004 worked example (machine-verified)",
+   "source_section_or_page": "frac = 2/(1 + 9.52) = 0.1901; p = 144.5 mmHg; Antoine -> 59.3 C = 138.8 F",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "excess_air_pct": 0
+   },
+   "outputs": {
+    "dew_point_f": {
+     "value": 138.8,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "oil-burner-firing-rate",
    "source_publisher": "Oil burner nozzle firing rate (NORA / oil-heat practice)",
    "source_title": "88,000 BTU/hr output, 85% eff, 138,500 BTU/gal -> 103,529 BTU/hr input, 0.75 GPH nozzle",

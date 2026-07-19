@@ -1080,3 +1080,38 @@ HVACSERVICE_RENDERERS["oil-burner-firing-rate"] = _simpleRenderer({
   ],
   compute: computeOilBurnerFiringRate,
 });
+
+// ===================== spec-v1004: natural-gas flue-gas water dew point =====================
+// dims: in { args: dimensionless } out: { water_vapor_pct: dimensionless, dew_point_f: dimensionless }
+export function computeFlueGasDewPoint({ excess_air_pct = 15 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(excess_air_pct >= 0)) return { error: "Excess air cannot be negative (percent)." };
+  // Methane combustion: CH4 + 2(O2+3.76 N2) -> CO2 + 2 H2O + 7.52 N2. Wet moles = 1 + 9.52*lambda; H2O = 2.
+  const lambda = 1 + excess_air_pct / 100;
+  const water_fraction = 2 / (1 + 9.52 * lambda);
+  const p_h2o_mmhg = water_fraction * 760; // partial pressure at 1 atm
+  // Antoine (water, NIST, 1-100 C): log10(P_mmHg) = 8.07131 - 1730.63/(233.426 + T_C).
+  const dew_point_c = 1730.63 / (8.07131 - Math.log10(p_h2o_mmhg)) - 233.426;
+  const dew_point_f = dew_point_c * 9 / 5 + 32;
+  if (![water_fraction, dew_point_f].every(Number.isFinite)) return { error: "Dew-point math is not a finite value." };
+  return {
+    water_vapor_pct: water_fraction * 100,
+    dew_point_f,
+    note: "The WATER dew point of natural-gas (methane) combustion products -- the flue temperature at which water vapor starts to condense in a vent, chimney, or heat exchanger. Burning methane makes two molecules of water for each of fuel (CH4 + 2 O2 -> CO2 + 2 H2O), so the wet flue gas is about 19% water vapor at stoichiometric, falling as excess air dilutes it: with 15% excess air the water fraction is 2 / (1 + 9.52 x 1.15) = 16.7%. That fraction sets the water's partial pressure (16.7% of atmospheric, ~127 mmHg), and the Antoine saturation relation gives the dew point -- about 134 F at 15% excess air, 139 F near stoichiometric, and lower with more excess air. This is why a standard (non-condensing) furnace or water heater must keep its flue gas ABOVE ~135 F all the way out: let a masonry chimney or a single-wall vent run colder and the flue gas condenses into a mildly acidic water that corrodes steel and spalls masonry, the classic reason for a chimney liner or a Category-I vent-sizing table. A condensing appliance deliberately drops below this to harvest the latent heat and drains the condensate. This is the natural-gas water dew point (a SULFURIC-acid dew point is far higher and applies to oil/high-sulfur fuel); the real value shifts with fuel composition, humidity in the combustion air, and altitude. A screen; the appliance listing, the vent-sizing tables (NFPA 54 / the manufacturer), and the AHJ govern.",
+  };
+}
+
+export const flueGasDewPointExample = { inputs: { excess_air_pct: 15 } };
+
+HVACSERVICE_RENDERERS["flue-gas-dew-point"] = _simpleRenderer({
+  citation: "Citation: natural-gas flue-gas water dew point, by name. Methane stoichiometry (CH4 -> 2 H2O; wet moles 1 + 9.52*lambda) gives the water fraction; its partial pressure into the Antoine saturation relation (water, NIST) gives the dew point (~134 F at 15% excess air). Non-condensing appliances must keep flue gas above it or the vent corrodes. The appliance listing, the vent-sizing tables (NFPA 54), and the AHJ govern.",
+  example: flueGasDewPointExample.inputs,
+  fields: [
+    { key: "excess_air_pct", label: "Excess air (%)", kind: "number", default: 15 },
+  ],
+  outputs: [
+    { key: "w", id: "fgd-out-w", label: "Flue-gas water vapor", value: (r) => fmt(r.water_vapor_pct, 1) + " %" },
+    { key: "d", id: "fgd-out-d", label: "Water dew point", value: (r) => fmt(r.dew_point_f, 0) + " F" },
+  ],
+  compute: computeFlueGasDewPoint,
+});
