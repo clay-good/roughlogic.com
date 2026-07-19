@@ -4,6 +4,19 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(concrete): rc-punching-shear was missing the ACI 318-19 size-effect factor lambda_s; 2026-07-19
+
+- `computeRcPunchingShear` (calc-concrete.js) computed the two-way shear stress as the least of the three Table
+  22.6.5.2 terms times `lambda*sqrt(f'c)`, but omitted the size-effect factor `lambda_s = sqrt(2/(1 + d/10)) <= 1.0`
+  that ACI 318-19 (the cited standard) added to all three terms in 22.5.5.1.3. `lambda_s` is 1.0 up to d = 10 in
+  (so thin flat plates were unaffected) but drops below 1.0 for deeper members, so the tile OVER-predicted the
+  punching capacity of thick slabs, mats, and footings, e.g. by ~23% at d = 24 in (`lambda_s = 0.767`) -- an
+  unconservative error. Added `lambda_s`, applied it to `vc`, exposed it as an output, and updated the note and
+  citation. The existing worked example and all pins use d = 6 in (`lambda_s` capped at 1.0), so every previously
+  pinned value is unchanged; 5,840 unit tests stay green. Found by a first-principles ACI 318-19 re-derivation audit
+  of the most formula-intricate structural tiles (anchor breakout/pullout/blowout, bolt-group, base plate, panel
+  zone), which were otherwise all correct.
+
 ### build(lint): add check-note-arithmetic gate for wrong worked examples in note strings; 2026-07-19
 
 - Added `scripts/check-note-arithmetic.mjs` to `npm run lint`, closing the surface that produced the two note fixes

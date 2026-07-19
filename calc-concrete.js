@@ -305,7 +305,7 @@ CONCRETE_RENDERERS["rc-column-axial"] = _simpleRenderer({
   compute: computeRcColumnAxial,
 });
 
-// dims: in { c1_in: L, c2_in: L, d_in: L, fc_psi: M L^-1 T^-2, position: dimensionless, lambda: dimensionless } out: { bo_in: L, beta: dimensionless, vc_psi: M L^-1 T^-2, phi_vc_kip: M L T^-2 }
+// dims: in { c1_in: L, c2_in: L, d_in: L, fc_psi: M L^-1 T^-2, position: dimensionless, lambda: dimensionless } out: { bo_in: L, beta: dimensionless, lambda_s: dimensionless, vc_psi: M L^-1 T^-2, phi_vc_kip: M L T^-2 }
 export function computeRcPunchingShear({ c1_in = 0, c2_in = 0, d_in = 0, fc_psi = 4000, position = "interior", lambda = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(c1_in > 0) || !(c2_in > 0)) return { error: "Column plan dimensions must be positive (in)." };
@@ -320,17 +320,18 @@ export function computeRcPunchingShear({ c1_in = 0, c2_in = 0, d_in = 0, fc_psi 
   const t3 = 2 + (alpha_s * d_in) / bo_in;
   const least = Math.min(t1, t2, t3);
   const governs = least === t1 ? "the 4 sqrt(f'c) base term" : (least === t2 ? "the aspect-ratio (2 + 4/beta) term" : "the (2 + alpha_s d/bo) large-column term");
-  const vc_psi = least * lambda * Math.sqrt(fc_psi);
+  const lambda_s = Math.min(Math.sqrt(2 / (1 + d_in / 10)), 1.0);
+  const vc_psi = least * lambda_s * lambda * Math.sqrt(fc_psi);
   const phi_vc_kip = (0.75 * vc_psi * bo_in * d_in) / 1000;
   return {
-    bo_in, beta, alpha_s, t2, t3, least, governs, vc_psi, phi_vc_kip,
-    note: "ACI 318-19 Table 22.6.5.2 two-way (punching) shear on the d/2 critical perimeter: vc is the least of 4 lambda sqrt(f'c), (2 + 4/beta) lambda sqrt(f'c), and (2 + alpha_s d/bo) lambda sqrt(f'c), with alpha_s = 40/30/20 for an interior/edge/corner column and phi = 0.75; phi Vc = phi vc bo d. Shear without unbalanced-moment transfer (no gamma_v amplification), no shear reinforcement or drop panel, rectangular column with the full d/2 perimeter available. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    bo_in, beta, alpha_s, t2, t3, least, governs, lambda_s, vc_psi, phi_vc_kip,
+    note: "ACI 318-19 Table 22.6.5.2 two-way (punching) shear on the d/2 critical perimeter: vc is the least of 4 lambda sqrt(f'c), (2 + 4/beta) lambda sqrt(f'c), and (2 + alpha_s d/bo) lambda sqrt(f'c), with alpha_s = 40/30/20 for an interior/edge/corner column and phi = 0.75; phi Vc = phi vc bo d. All three terms also carry the 22.5.5.1.3 size-effect factor lambda_s = sqrt(2 / (1 + d/10)) capped at 1.0 (new in the 2019 edition), so lambda_s is 1.0 up to d = 10 in and drops below it for deeper slabs and footings, cutting the punching capacity of thick members. Shear without unbalanced-moment transfer (no gamma_v amplification), no shear reinforcement or drop panel, rectangular column with the full d/2 perimeter available. A design aid, not a substitute for the structural engineer of record's stamped design.",
   };
 }
 export const rcPunchingShearExample = { inputs: { c1_in: 20, c2_in: 20, d_in: 6, fc_psi: 4000, position: "interior", lambda: 1.0 } };
 
 CONCRETE_RENDERERS["rc-punching-shear"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Table 22.6.5.2 two-way shear (least of 4, 2 + 4/beta, 2 + alpha_s d/bo, each x lambda sqrt(f'c)) on the 22.6.4.1 d/2 critical perimeter, alpha_s = 40/30/20 interior/edge/corner, phi = 0.75, by name. No unbalanced-moment transfer or shear reinforcement. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: ACI 318-19 Table 22.6.5.2 two-way shear (least of 4, 2 + 4/beta, 2 + alpha_s d/bo, each x the 22.5.5.1.3 size-effect factor lambda_s and lambda sqrt(f'c)) on the 22.6.4.1 d/2 critical perimeter, alpha_s = 40/30/20 interior/edge/corner, phi = 0.75, by name. No unbalanced-moment transfer or shear reinforcement. A design aid, not a substitute for the engineer of record.",
   example: rcPunchingShearExample.inputs,
   fields: [
     { key: "c1_in", label: "Column dimension c1 (in)", kind: "number" },
@@ -347,6 +348,7 @@ CONCRETE_RENDERERS["rc-punching-shear"] = _simpleRenderer({
   outputs: [
     { key: "bo", id: "rps-out-bo", label: "Critical perimeter bo (at d/2)", value: (r) => fmt(r.bo_in, 0) + " in" },
     { key: "gov", id: "rps-out-gov", label: "Governing term", value: (r) => r.governs },
+    { key: "ls", id: "rps-out-ls", label: "Size-effect factor lambda_s", value: (r) => fmt(r.lambda_s, 3) },
     { key: "vc", id: "rps-out-vc", label: "Concrete shear stress vc", value: (r) => fmt(r.vc_psi, 0) + " psi" },
     { key: "pvc", id: "rps-out-pvc", label: "Design capacity phi Vc", value: (r) => fmt(r.phi_vc_kip, 1) + " kip" },
     { key: "n", id: "rps-out-n", label: "Note", value: (r) => r.note },
