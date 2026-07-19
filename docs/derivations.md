@@ -2919,6 +2919,7 @@ cross-check.
 | calc-solar.js | `renderPVStringSizing` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-solar.js | `renderPvInterconnectionBusbar` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-stage.js | `_v9_atmosphericAbsorption` | `{ f_Hz, T_K, h_r, p_a_kPa }` | _ | _ | _ |
+| calc-stage.js | `computeAcousticGainPagNag` | `{ ds_ft = 2, d0_ft = 30, d1_ft = 8, d2_ft = 12, open_mics = 1, ead_ft = 6 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeAmpPowerSpl` | `{ sensitivity_db, power_w, distance_m, crest_db, target_spl_db, max_spl_db }` | _ | _ | _ |
 | calc-stage.js | `computeCounterweightArborLoad` | `{ batten_weight_lb = 0, attached_load_lb = 0, purchase_type = "single", brick...` | _ | _ | _ |
 | calc-stage.js | `computeDMX` | `{ fixtures = [] }` | _ | _ | _ |
@@ -3112,7 +3113,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1698.
+Row count: 1699.
 
 <!-- END function-corpus-v14 -->
 
@@ -4498,10 +4499,11 @@ per spec-v14 §13.1 second paragraph.
 | `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `well-max-yield` | Well Sustainable Yield from Specific Capacity | AWWA / USGS (inverse); 1.0 GPM/ft, 30 ft allowable drawdown -> 30 GPM (round-tri... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group N Stage (23 tiles)
+### Group N Stage (24 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
+| `acoustic-gain-pag-nag` | Potential / Needed Acoustic Gain (Feedback Stability) | Potential / needed acoustic gain (PAG...; PAG = 20log8 + 20log30 - 20log2 - 20log12 - 10log1 - 6 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `amp-power-spl` | Amplifier Power to SPL | first-principles loudspeaker SPL (ANS...; 90 dB sensitivity, 100 W, 1 m -> 110 dB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `counterweight-arbor-load` | Counterweight Fly System Balance | Theatrical counterweight rigging (sin...; 100 lb batten + 400 lb load, single, 30 lb bricks, 200 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `decibel-converter` | Decibel Converter | ANSI S1.1 (by name); P2/P1 = 2 -> 3.0103 dB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4749,6 +4751,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1451. Fixture-covered or reference-cadence: 1451 / 1451.
+Tile count: 1452. Fixture-covered or reference-cadence: 1452 / 1452.
 
 <!-- END tile-index-v14 -->

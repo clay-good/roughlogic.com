@@ -1426,6 +1426,74 @@
    }
   },
   {
+   "tile_id": "acoustic-gain-pag-nag",
+   "source_publisher": "Potential / needed acoustic gain (PAG/NAG; Davis & Patronis)",
+   "source_title": "Ds 2, D0 30, D1 8, D2 12 ft, 1 mic, EAD 6 -> PAG 14.0 = NAG 14.0 (balanced)",
+   "source_edition_or_year": "spec-v1003 worked example (machine-verified)",
+   "source_section_or_page": "PAG = 20log8 + 20log30 - 20log2 - 20log12 - 10log1 - 6 = 14.0; NAG = 20log(30/6) = 14.0",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "ds_ft": 2,
+    "d0_ft": 30,
+    "d1_ft": 8,
+    "d2_ft": 12,
+    "open_mics": 1,
+    "ead_ft": 6
+   },
+   "outputs": {
+    "pag_db": {
+     "value": 14.0,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "nag_db": {
+     "value": 14.0,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "margin_db": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "acoustic-gain-pag-nag",
+   "source_publisher": "Potential / needed acoustic gain (PAG/NAG; Davis & Patronis)",
+   "source_title": "cross-check: mic moved to 1 ft from talker (Ds 1) -> PAG 20.0, NAG 14.0, +6 dB headroom",
+   "source_edition_or_year": "spec-v1003 worked example (machine-verified)",
+   "source_section_or_page": "PAG = 20log8 + 20log30 - 20log1 - 20log12 - 10log1 - 6 = 20.02; NAG = 14.0; margin +6.0",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "ds_ft": 1,
+    "d0_ft": 30,
+    "d1_ft": 8,
+    "d2_ft": 12,
+    "open_mics": 1,
+    "ead_ft": 6
+   },
+   "outputs": {
+    "pag_db": {
+     "value": 20.02,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "margin_db": {
+     "value": 6.02,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spl-distance",
    "source_publisher": "Project (first-principles)",
    "source_title": "Inverse-square law: L2 = L1 - 20 * log10(d2/d1)",

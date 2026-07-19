@@ -303,7 +303,7 @@ const _TILES = [
   ["cooling-water-makeup", "M"], ["chlorine-decay", "M"], ["chlorine-decay-constant", "M"],
 
   ["truss-capacity", "N"], ["time-alignment", "N"], ["dmx-planner", "N"],
-  ["neutral-imbalance", "N"], ["spl-distance", "N"], ["spl-distance-for-level", "N"], ["rigging-check", "N"],
+  ["neutral-imbalance", "N"], ["spl-distance", "N"], ["acoustic-gain-pag-nag", "N"], ["spl-distance-for-level", "N"], ["rigging-check", "N"],
   ["spl-atmospheric", "N"],
 
   ["recipe-scale", "O"], ["yield-ep", "O"], ["as-purchased-quantity", "O"], ["cooling-curve", "O"],

@@ -1604,3 +1604,67 @@ function renderWinchFleetAngle(inputRegion, outputRegion, citationEl) {
   for (const el of [offset.input, lead.input]) el.addEventListener("input", update);
 }
 STAGE_RENDERERS["winch-fleet-angle"] = renderWinchFleetAngle;
+
+// ===================== spec-v1003: potential / needed acoustic gain (feedback stability) =====================
+// dims: in { args: dimensionless } out: { pag_db: dimensionless, nag_db: dimensionless, margin_db: dimensionless }
+export function computeAcousticGainPagNag({ ds_ft = 2, d0_ft = 30, d1_ft = 8, d2_ft = 12, open_mics = 1, ead_ft = 6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(ds_ft > 0)) return { error: "Talker-to-mic distance Ds must be positive (ft)." };
+  if (!(d0_ft > 0)) return { error: "Talker-to-farthest-listener distance D0 must be positive (ft)." };
+  if (!(d1_ft > 0)) return { error: "Loudspeaker-to-farthest-listener distance D1 must be positive (ft)." };
+  if (!(d2_ft > 0)) return { error: "Loudspeaker-to-mic distance D2 must be positive (ft)." };
+  if (!(open_mics >= 1)) return { error: "Number of open mics must be at least 1." };
+  if (!(ead_ft > 0)) return { error: "Equivalent acoustic distance EAD must be positive (ft)." };
+  const l = Math.log10;
+  // PAG (with the 6 dB feedback-stability margin) and NAG; the system is workable when PAG >= NAG.
+  const pag_db = 20 * l(d1_ft) + 20 * l(d0_ft) - 20 * l(ds_ft) - 20 * l(d2_ft) - 10 * l(open_mics) - 6;
+  const nag_db = 20 * l(d0_ft / ead_ft);
+  const margin_db = pag_db - nag_db;
+  if (![pag_db, nag_db, margin_db].every(Number.isFinite)) return { error: "Acoustic-gain math is not a finite value." };
+  const verdict = margin_db >= 0
+    ? "OK: the potential gain meets or exceeds the needed gain -- the system can be loud enough before feedback."
+    : "SHORT: the needed gain exceeds the potential gain -- move the mic closer to the talker, the speaker closer to the listeners, or reduce open mics, or it will feed back before it is loud enough.";
+  return {
+    pag_db,
+    nag_db,
+    margin_db,
+    verdict,
+    note: "The feedback-stability check for a sound-reinforcement system: whether it can be turned up loud enough (the needed acoustic gain, NAG) before it starts to ring (past the potential acoustic gain, PAG). PAG comes from the four critical distances by the inverse-square (20 log) law: 20 log D1 + 20 log D0 - 20 log Ds - 20 log D2 - 10 log(NOM) - 6, where Ds is talker-to-mic, D0 talker-to-farthest-listener, D1 loudspeaker-to-farthest-listener, D2 loudspeaker-to-mic, NOM the number of open mics (each doubling of open mics costs 3 dB), and the 6 dB is the feedback-stability margin below the ring point. NAG is how much gain the back row needs over hearing the talker unaided: 20 log (D0 / EAD), where EAD is the equivalent acoustic distance, the closest a listener would be for a comfortable unaided level. The system works when PAG is at least NAG. With Ds 2, D0 30, D1 8, D2 12 ft, one open mic, and a 6 ft EAD, PAG = 14.0 dB and NAG = 14.0 dB -- exactly balanced, the textbook marginal case. Moving the mic in to 1 ft from the talker raises PAG to 20 dB, a comfortable 6 dB of headroom. The levers are clear: get the MIC close to the talker (the biggest one), get the LOUDSPEAKER close to the listeners and away from the mic, and keep open mics to a minimum. A design screen; the real room acoustics, the mic and speaker directivity, and the system tuning govern actual stability.",
+  };
+}
+
+export const acousticGainPagNagExample = { inputs: { ds_ft: 2, d0_ft: 30, d1_ft: 8, d2_ft: 12, open_mics: 1, ead_ft: 6 } };
+
+function _v1003renderAcousticGainPagNag(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: potential / needed acoustic gain (PAG/NAG feedback stability; Davis & Patronis, Sound System Engineering; Yamaha Sound Reinforcement Handbook), by name. PAG = 20log(D1) + 20log(D0) - 20log(Ds) - 20log(D2) - 10log(NOM) - 6; NAG = 20log(D0/EAD); stable when PAG >= NAG. The room acoustics, mic/speaker directivity, and system tuning govern actual stability.";
+  const ds = makeNumber("Ds: talker to mic (ft)", "agp-ds", { step: "any", min: "0", value: "2" });
+  ds.input.value = "2";
+  const d0 = makeNumber("D0: talker to farthest listener (ft)", "agp-d0", { step: "any", min: "0", value: "30" });
+  d0.input.value = "30";
+  const d1 = makeNumber("D1: speaker to farthest listener (ft)", "agp-d1", { step: "any", min: "0", value: "8" });
+  d1.input.value = "8";
+  const d2 = makeNumber("D2: speaker to mic (ft)", "agp-d2", { step: "any", min: "0", value: "12" });
+  d2.input.value = "12";
+  const nm = makeNumber("Number of open mics (NOM)", "agp-nm", { step: "1", min: "1", value: "1" });
+  nm.input.value = "1";
+  const ea = makeNumber("EAD: equivalent acoustic distance (ft)", "agp-ea", { step: "any", min: "0", value: "6" });
+  ea.input.value = "6";
+  for (const f of [ds, d0, d1, d2, nm, ea]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ds.input.value = "2"; d0.input.value = "30"; d1.input.value = "8"; d2.input.value = "12"; nm.input.value = "1"; ea.input.value = "6"; update(); });
+  const oP = makeOutputLine(outputRegion, "PAG / NAG", "agp-out-p");
+  const oM = makeOutputLine(outputRegion, "Margin", "agp-out-m");
+  const oV = makeOutputLine(outputRegion, "Verdict", "agp-out-v");
+  const update = debounce(() => {
+    const r = computeAcousticGainPagNag({
+      ds_ft: ds.input.value === "" ? 2 : Number(ds.input.value), d0_ft: d0.input.value === "" ? 30 : Number(d0.input.value),
+      d1_ft: d1.input.value === "" ? 8 : Number(d1.input.value), d2_ft: d2.input.value === "" ? 12 : Number(d2.input.value),
+      open_mics: nm.input.value === "" ? 1 : Number(nm.input.value), ead_ft: ea.input.value === "" ? 6 : Number(ea.input.value),
+    });
+    if (r.error) { oP.textContent = r.error; oM.textContent = "-"; oV.textContent = "-"; return; }
+    oP.textContent = fmt(r.pag_db, 1) + " dB PAG / " + fmt(r.nag_db, 1) + " dB NAG";
+    oM.textContent = fmt(r.margin_db, 1) + " dB";
+    oV.textContent = r.verdict;
+  }, DEBOUNCE_MS);
+  for (const f of [ds, d0, d1, d2, nm, ea]) f.input.addEventListener("input", update);
+}
+STAGE_RENDERERS["acoustic-gain-pag-nag"] = _v1003renderAcousticGainPagNag;

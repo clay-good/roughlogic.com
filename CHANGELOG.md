@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(stage): add acoustic-gain-pag-nag tile (spec-v1003); 2026-07-18
+
+- New Group N tile `acoustic-gain-pag-nag` in calc-stage.js. Feedback-stability check for a sound system: PAG =
+  20log(D1) + 20log(D0) - 20log(Ds) - 20log(D2) - 10log(NOM) - 6; NAG = 20log(D0/EAD); workable when PAG >= NAG.
+  Ds 2, D0 30, D1 8, D2 12 ft, 1 mic, 6 ft EAD -> PAG 14.0 = NAG 14.0 (balance); moving the mic to 1 ft raises PAG to
+  20 dB (+6 dB headroom). Mic close to the talker, speaker close to listeners and away from the mic, minimize open mics.
+  Home count 1,451 -> 1,452.
+
 ### feat(kitchen): add abv-from-gravity tile (spec-v1002); 2026-07-18
 
 - New Group O tile `abv-from-gravity` in calc-kitchen.js. Alcohol by volume of a fermented beer/wine/cider/mead from

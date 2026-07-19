@@ -28694,3 +28694,27 @@ test("bounds: spec-v1002 computeAbvFromGravity pins ABV and apparent attenuation
   assert.ok("error" in _v1002({ original_gravity: 1.055, final_gravity: 0 }));
   assert.ok("error" in _v1002({ original_gravity: Infinity, final_gravity: 1.012 }));
 });
+
+import { computeAcousticGainPagNag as _v1003 } from "../../calc-stage.js";
+
+test("bounds: spec-v1003 computeAcousticGainPagNag pins PAG/NAG feedback stability", () => {
+  const r = _v1003({ ds_ft: 2, d0_ft: 30, d1_ft: 8, d2_ft: 12, open_mics: 1, ead_ft: 6 });
+  assert.ok(Math.abs(r.pag_db - 14.001) < 5e-2); // 20log8+20log30-20log2-20log12-6
+  assert.ok(Math.abs(r.nag_db - 13.979) < 5e-2); // 20log(30/6)
+  assert.ok(Math.abs(r.margin_db - (r.pag_db - r.nag_db)) < 1e-9);
+  // Mic closer to the talker raises PAG (the biggest lever).
+  const close = _v1003({ ds_ft: 1, d0_ft: 30, d1_ft: 8, d2_ft: 12, open_mics: 1, ead_ft: 6 });
+  assert.ok(Math.abs(close.pag_db - 20.022) < 5e-2);
+  assert.ok(close.pag_db > r.pag_db);
+  assert.ok(/^OK/.test(close.verdict));
+  // Each doubling of open mics costs 3 dB of PAG.
+  assert.ok(Math.abs(_v1003({ ds_ft: 2, d0_ft: 30, d1_ft: 8, d2_ft: 12, open_mics: 2, ead_ft: 6 }).pag_db - (r.pag_db - 3.0103)) < 1e-2);
+  // A farther back row (bigger EAD ratio) raises NAG; if it outruns PAG the system is SHORT.
+  const short = _v1003({ ds_ft: 2, d0_ft: 30, d1_ft: 8, d2_ft: 12, open_mics: 1, ead_ft: 3 });
+  assert.ok(/SHORT/.test(short.verdict));
+  // Error seams.
+  assert.ok("error" in _v1003({ ds_ft: 0, d0_ft: 30, d1_ft: 8, d2_ft: 12, open_mics: 1, ead_ft: 6 }));
+  assert.ok("error" in _v1003({ ds_ft: 2, d0_ft: 30, d1_ft: 8, d2_ft: 12, open_mics: 0, ead_ft: 6 }));
+  assert.ok("error" in _v1003({ ds_ft: 2, d0_ft: 30, d1_ft: 8, d2_ft: 12, open_mics: 1, ead_ft: 0 }));
+  assert.ok("error" in _v1003({ ds_ft: Infinity, d0_ft: 30, d1_ft: 8, d2_ft: 12, open_mics: 1, ead_ft: 6 }));
+});

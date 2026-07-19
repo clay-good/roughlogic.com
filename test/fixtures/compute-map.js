@@ -202,6 +202,7 @@ export const COMPUTE_MAP = {
   "detention-time": { module: "../../calc-water.js", fn: "computeDetentionTime" },
   "detention-basin-volume": { module: "../../calc-water.js", fn: "computeDetentionBasinVolume" },
   "spl-distance": { module: "../../calc-stage.js", fn: "computeSPL" },
+  "acoustic-gain-pag-nag": { module: "../../calc-stage.js", fn: "computeAcousticGainPagNag" },
   "spl-distance-for-level": { module: "../../calc-stage.js", fn: "computeSPLDistanceForLevel" },
   "gpa-rate": { module: "../../calc-agriculture.js", fn: "computeGPA" },
   "motor-fla": { module: "../../calc-electrical.js", fn: "computeMotorFLA" },
