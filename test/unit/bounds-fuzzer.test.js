@@ -28755,3 +28755,24 @@ test("bounds: spec-v1005 computeCondensingFlueCondensate pins the condensate rat
   assert.ok("error" in _v1005({ input_btu_hr: 100000, water_lb_per_therm: 9.4, condensing_fraction: 1.5 }));
   assert.ok("error" in _v1005({ input_btu_hr: Infinity, water_lb_per_therm: 9.4, condensing_fraction: 0.85 }));
 });
+
+import { computeThreadSingleDepth as _v1006 } from "../../calc-machining.js";
+
+test("bounds: spec-v1006 computeThreadSingleDepth pins the UN external thread depth", () => {
+  const r = _v1006({ tpi: 13 });
+  assert.ok(Math.abs(r.pitch_in - 0.076923) < 1e-5); // 1/13
+  assert.ok(Math.abs(r.single_depth_in - 0.047185) < 1e-5); // 0.6134/13
+  assert.ok(Math.abs(r.compound_infeed_in - 0.054217) < 1e-5); // /cos(29.5)
+  // The compound infeed always exceeds the radial depth (it feeds at an angle).
+  assert.ok(r.compound_infeed_in > r.single_depth_in);
+  // Coarser thread (lower TPI) is deeper.
+  const coarse = _v1006({ tpi: 10 });
+  assert.ok(Math.abs(coarse.single_depth_in - 0.06134) < 1e-5);
+  assert.ok(coarse.single_depth_in > r.single_depth_in);
+  // Depth scales as 1/TPI: doubling TPI halves the depth.
+  assert.ok(Math.abs(_v1006({ tpi: 26 }).single_depth_in - r.single_depth_in / 2) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v1006({ tpi: 0 }));
+  assert.ok("error" in _v1006({ tpi: -13 }));
+  assert.ok("error" in _v1006({ tpi: Infinity }));
+});

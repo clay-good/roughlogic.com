@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(machinist): add thread-single-depth tile (spec-v1006); 2026-07-18
+
+- New Group K tile `thread-single-depth` in calc-machining.js. Cut depth for single-point threading a 60-degree UN
+  external thread: pitch = 1/TPI; radial depth = 0.6134 x pitch; compound infeed (at 29.5 deg) = depth / cos(29.5).
+  1/2-13 -> 0.0472 in depth, 0.0542 in compound infeed; 3/4-10 -> 0.0613 in. Feed over several passes and verify with a
+  gauge or the three-wire method. Home count 1,454 -> 1,455.
+
 ### feat(hvac): add condensing-flue-condensate tile (spec-v1005); 2026-07-18
 
 - New Group C tile `condensing-flue-condensate` in calc-hvacservice.js. Condensate drained by a condensing furnace/

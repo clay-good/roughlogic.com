@@ -1009,6 +1009,17 @@ export const CITATIONS = {
       { name: "Chart inputs", value: "recommended SFM is user-supplied from the tool/material chart", source: "tool manufacturer data" },
     ],
   },
+  "thread-single-depth": {
+    formula: "pitch_in = 1 / tpi; single_depth_in = 0.6134 x pitch_in (60-degree UN external thread height); compound_infeed_in = single_depth_in / cos(29.5 degrees).",
+    edition: "Single-point 60-degree (Unified/UN) external thread cutting depth and 29.5-degree compound infeed (Machinery's Handbook threading practice), by name; the thread standard, the tool geometry, and a thread gauge govern the finished part.",
+    freeAccess: "The thread-depth geometry (0.6134 x pitch for a UN external thread, and the 29.5-degree compound-infeed trig) is public machining practice; the threads-per-inch is the thread's spec.",
+    governance: GOVERNANCE.general,
+    editionNote: "When a machinist cuts a screw thread on a lathe with a single-point 60-degree form tool, the tool must be fed in to a specific depth. The pitch of the thread is one divided by the threads per inch. For a Unified (UN) external thread, the height of the thread from crest to root is 0.6134 times the pitch; this comes from the geometry of the 60-degree fundamental triangle, whose sharp-V height is 0.86603 times the pitch, reduced by the standard truncation of the crest and root that the UN form specifies for the external thread. So a 1/2-13 thread has a pitch of 0.0769 inch and a radial thread depth of 0.6134 times 0.0769, or 0.0472 inch, and a coarser 3/4-10 is 0.0613 inch deep. In practice the tool is not fed straight in on the cross slide; instead the compound rest is set to 29.5 degrees, just under the 30-degree half-angle of the thread, so that as the compound advances the tool cuts almost entirely on the leading flank of the groove and merely skims the trailing flank, which produces a cleaner cut and longer tool life than plunging straight in. Because the compound feeds at that angle, it must travel farther than the straight radial depth: the compound infeed equals the radial depth divided by the cosine of 29.5 degrees, so the 1/2-13 thread needs 0.0472 divided by the cosine of 29.5, or 0.0542 inch, of compound travel. The depth is reached over several passes, with progressively lighter cuts near finish size, and the finished thread should be checked against a ring or thread gauge or by the three-wire measuring method rather than relying on the dialed depth alone, because tool wear, workpiece deflection, and the exact crest and root form all shift the actual fit. This is a lathe setup aid; the specific thread standard (UN, UNJ, or metric, which use slightly different truncations), the threading tool's geometry, and a thread gauge govern the finished part.",
+    assumptions: [
+      { name: "UN external thread depth", value: "pitch = 1/TPI; external thread height = 0.6134 x pitch (60-degree UN truncation, from the 0.866 P sharp-V)", source: "Machinery's Handbook (Unified thread form)" },
+      { name: "Compound infeed", value: "compound set to 29.5 degrees; infeed = radial depth / cos(29.5) so the tool cuts on the leading flank; verify with a gauge / three-wire method", source: "single-point threading practice" },
+    ],
+  },
   "cutting-speed-rpm": {
     formula: "RPM = 12 * SFM / (pi * dia(in)); feed IPM = RPM * flutes * chip_load(in/tooth); 12/pi = 3.8197.",
     edition: "First-principles cutting geometry; the speeds-and-feeds method as in Machinery's Handbook (Industrial Press), by name.",

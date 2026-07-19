@@ -1157,3 +1157,41 @@ function _v952renderTaylorToolLife(inputRegion, outputRegion, citationEl) {
   for (const f of [cc, nn, vv, tl]) f.input.addEventListener("input", update);
 }
 MACHINING_RENDERERS["taylor-tool-life"] = _v952renderTaylorToolLife;
+
+// ===================== spec-v1006: single-point thread cutting depth (60-degree UN external) =====================
+// dims: in { args: dimensionless } out: { pitch_in: dimensionless, single_depth_in: dimensionless, compound_infeed_in: dimensionless }
+export function computeThreadSingleDepth({ tpi = 13 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tpi > 0)) return { error: "Threads per inch must be positive." };
+  // 60-degree UN external thread: pitch = 1/TPI; external thread height = 0.6134 P; compound infeed at 29.5 deg = depth / cos(29.5).
+  const pitch_in = 1 / tpi;
+  const single_depth_in = 0.6134 * pitch_in;
+  const compound_infeed_in = single_depth_in / Math.cos(29.5 * Math.PI / 180);
+  if (![pitch_in, single_depth_in, compound_infeed_in].every(Number.isFinite)) return { error: "Thread-depth math is not a finite value." };
+  return {
+    pitch_in,
+    single_depth_in,
+    compound_infeed_in,
+    note: "The cut depth for single-point threading a 60-degree external (Unified / UN) thread on a lathe, the number a machinist dials in when cutting a thread with a form tool. The pitch is one over the threads per inch, and the full-form external thread height -- crest to root -- is 0.6134 times the pitch (the standard UN external thread truncation, five-eighths of the sharp-V height of 0.866 P less the root truncation). For a 1/2-13 thread the pitch is 0.0769 in and the single (radial) depth is 0.6134 x 0.0769 = 0.0472 in; a 3/4-10 is 0.0613 in deep. Because most machinists feed the tool with the COMPOUND rest set to 29.5 degrees (just under the 30-degree half-angle, so the tool cuts mainly on the leading flank and clears the trailing one), the compound travels farther than the radial depth: the compound infeed is the radial depth divided by the cosine of 29.5 degrees, so the 1/2-13 needs 0.0472 / cos(29.5) = 0.0542 in of compound travel. Feed in over several passes, taking lighter cuts near the end, and check the finished thread with a gauge or the three-wire method rather than trusting the depth alone -- tool wear, deflection, and the exact root/crest form shift the fit. A setup aid; the thread standard (UN vs UNJ vs metric), the tool geometry, and a thread gauge govern the finished part.",
+  };
+}
+
+export const threadSingleDepthExample = { inputs: { tpi: 13 } };
+
+function _v1006renderThreadSingleDepth(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: single-point thread cutting depth (60-degree UN external), by name. pitch = 1/TPI; external thread height = 0.6134 x pitch; compound infeed at 29.5 deg = depth / cos(29.5). Feed over several passes and verify with a gauge or the three-wire method. The thread standard, the tool geometry, and a thread gauge govern the finished part.";
+  const tp = makeNumber("Threads per inch (TPI)", "tsd-tp", { step: "any", min: "0", value: "13" });
+  tp.input.value = "13";
+  inputRegion.appendChild(tp.wrap);
+  attachExampleButton(inputRegion, () => { tp.input.value = "13"; update(); });
+  const oD = makeOutputLine(outputRegion, "Radial (single) depth", "tsd-out-d");
+  const oC = makeOutputLine(outputRegion, "Compound infeed (29.5 deg)", "tsd-out-c");
+  const update = debounce(() => {
+    const r = computeThreadSingleDepth({ tpi: tp.input.value === "" ? 13 : Number(tp.input.value) });
+    if (r.error) { oD.textContent = r.error; oC.textContent = "-"; return; }
+    oD.textContent = fmt(r.single_depth_in, 4) + " in (pitch " + fmt(r.pitch_in, 4) + " in)";
+    oC.textContent = fmt(r.compound_infeed_in, 4) + " in";
+  }, DEBOUNCE_MS);
+  tp.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["thread-single-depth"] = _v1006renderThreadSingleDepth;

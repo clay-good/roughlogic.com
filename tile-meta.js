@@ -122,7 +122,7 @@ const _TILES = [
   ["hp-from-torque", "K"],
   ["volumetric-efficiency", "K"],
   ["gear-mph-rpm", "K"],
-  ["cutting-speed-rpm", "K"],
+  ["cutting-speed-rpm", "K"], ["thread-single-depth", "K"],
   ["cutting-diameter-for-rpm", "K"],
   ["drill-point-depth", "K"],
   ["drill-point-angle-from-length", "K"],

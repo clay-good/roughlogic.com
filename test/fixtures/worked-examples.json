@@ -17345,6 +17345,52 @@
    }
   },
   {
+   "tile_id": "thread-single-depth",
+   "source_publisher": "Single-point thread cutting depth (60-degree UN external; Machinery's Handbook)",
+   "source_title": "1/2-13 thread -> 0.0472 in radial depth, 0.0542 in compound infeed at 29.5 deg",
+   "source_edition_or_year": "spec-v1006 worked example (machine-verified)",
+   "source_section_or_page": "pitch = 1/13 = 0.0769; depth = 0.6134 x 0.0769 = 0.0472; infeed = 0.0472 / cos(29.5) = 0.0542",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "tpi": 13
+   },
+   "outputs": {
+    "single_depth_in": {
+     "value": 0.04719,
+     "tolerance": {
+      "abs": 0.0002
+     }
+    },
+    "compound_infeed_in": {
+     "value": 0.05422,
+     "tolerance": {
+      "abs": 0.0002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thread-single-depth",
+   "source_publisher": "Single-point thread cutting depth (60-degree UN external; Machinery's Handbook)",
+   "source_title": "cross-check: coarser 3/4-10 thread -> 0.0613 in radial depth",
+   "source_edition_or_year": "spec-v1006 worked example (machine-verified)",
+   "source_section_or_page": "pitch = 1/10 = 0.100; depth = 0.6134 x 0.100 = 0.06134 in",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "tpi": 10
+   },
+   "outputs": {
+    "single_depth_in": {
+     "value": 0.06134,
+     "tolerance": {
+      "abs": 0.0002
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cutting-speed-rpm",
    "source_publisher": "First-principles cutting geometry + Machinery's Handbook method",
    "source_title": "RPM = 12 * SFM / (pi * dia); feed IPM = RPM * flutes * chip load",
