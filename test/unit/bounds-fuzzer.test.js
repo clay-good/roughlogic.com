@@ -28370,3 +28370,27 @@ test("bounds: spec-v987 computeSolarThermalCollector pins the ASHRAE 93 efficien
   assert.ok("error" in _v987({ optical_efficiency: 0.70, loss_coeff: -1, inlet_temp_f: 120, ambient_temp_f: 70, irradiance_btu: 300, area_sqft: 40 }));
   assert.ok("error" in _v987({ optical_efficiency: 0.70, loss_coeff: 0.85, inlet_temp_f: Infinity, ambient_temp_f: 70, irradiance_btu: 300, area_sqft: 40 }));
 });
+
+import { computeDrainageBoardTakeoff as _v988 } from "../../calc-construction.js";
+
+test("bounds: spec-v988 computeDrainageBoardTakeoff pins the roll count and ceil seam", () => {
+  const r = _v988({ perimeter_ft: 150, below_grade_height_ft: 8, roll_width_ft: 4, roll_length_ft: 50, waste_pct: 10 });
+  assert.ok(Math.abs(r.wall_area_sf - 1200) < 1e-9); // 150*8
+  assert.strictEqual(r.rolls, 7); // ceil(1200*1.1/200) = ceil(6.6)
+  assert.ok(Math.abs(r.termination_lf - 150) < 1e-9);
+  // Cross-check.
+  const x = _v988({ perimeter_ft: 200, below_grade_height_ft: 9, roll_width_ft: 4, roll_length_ft: 50, waste_pct: 10 });
+  assert.ok(Math.abs(x.wall_area_sf - 1800) < 1e-9);
+  assert.strictEqual(x.rolls, 10); // ceil(9.9)
+  // Ceil boundary: exactly one roll of coverage at 0 waste = 1 roll; one square foot over = 2 rolls.
+  assert.strictEqual(_v988({ perimeter_ft: 20, below_grade_height_ft: 10, roll_width_ft: 4, roll_length_ft: 50, waste_pct: 0 }).rolls, 1); // 200 sf exactly
+  assert.strictEqual(_v988({ perimeter_ft: 20.1, below_grade_height_ft: 10, roll_width_ft: 4, roll_length_ft: 50, waste_pct: 0 }).rolls, 2); // 201 sf
+  // A bigger roll needs fewer rolls; more waste can only add rolls.
+  assert.ok(_v988({ perimeter_ft: 150, below_grade_height_ft: 8, roll_width_ft: 4, roll_length_ft: 100, waste_pct: 10 }).rolls < r.rolls);
+  assert.ok(_v988({ perimeter_ft: 150, below_grade_height_ft: 8, roll_width_ft: 4, roll_length_ft: 50, waste_pct: 30 }).rolls >= r.rolls);
+  // Error seams.
+  assert.ok("error" in _v988({ perimeter_ft: 0, below_grade_height_ft: 8, roll_width_ft: 4, roll_length_ft: 50, waste_pct: 10 }));
+  assert.ok("error" in _v988({ perimeter_ft: 150, below_grade_height_ft: 8, roll_width_ft: 0, roll_length_ft: 50, waste_pct: 10 }));
+  assert.ok("error" in _v988({ perimeter_ft: 150, below_grade_height_ft: 8, roll_width_ft: 4, roll_length_ft: 50, waste_pct: -5 }));
+  assert.ok("error" in _v988({ perimeter_ft: Infinity, below_grade_height_ft: 8, roll_width_ft: 4, roll_length_ft: 50, waste_pct: 10 }));
+});

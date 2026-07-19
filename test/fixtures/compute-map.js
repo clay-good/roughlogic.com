@@ -844,6 +844,7 @@ export const COMPUTE_MAP = {
   "vapor-barrier-rolls": { module: "../../calc-construction.js", fn: "computeVaporBarrierRolls" },
   "concrete-sawcut-footage": { module: "../../calc-construction.js", fn: "computeConcreteSawcutFootage" },
   "foundation-waterproofing-takeoff": { module: "../../calc-construction.js", fn: "computeFoundationWaterproofingTakeoff" },
+  "drainage-board-takeoff": { module: "../../calc-construction.js", fn: "computeDrainageBoardTakeoff" },
   "roof-ballast-weight": { module: "../../calc-construction.js", fn: "computeRoofBallastWeight" },
   "curing-compound-coverage": { module: "../../calc-concrete.js", fn: "computeCuringCompoundCoverage" },
   "concrete-isolation-joint": { module: "../../calc-concrete.js", fn: "computeConcreteIsolationJoint" },

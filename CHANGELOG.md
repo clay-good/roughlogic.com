@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(waterproofing): add drainage-board-takeoff tile (spec-v988); 2026-07-18
+
+- New Group E tile `drainage-board-takeoff` in calc-construction.js. Dimpled foundation drainage board (dimple mat)
+  ordered by the roll: area = perimeter x below-grade height; rolls = ceil(area x (1 + waste) / roll coverage); plus a
+  top-edge termination bar per perimeter. 150 ft perimeter, 8 ft below grade, 4x50 ft rolls, 10% waste = 1,200 sf, 7
+  rolls, 150 lf bar. Dimples face the wall over the membrane, relieving hydrostatic pressure to the footing drain
+  (IRC R405). Home count 1,436 -> 1,437.
+
 ### feat(plumbing): add solar-thermal-collector tile (spec-v987); 2026-07-18
 
 - New Group B tile `solar-thermal-collector` in calc-plumbing.js. Useful heat from a flat-plate solar thermal

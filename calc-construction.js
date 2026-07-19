@@ -10108,3 +10108,46 @@ CONSTRUCTION_RENDERERS["roof-ballast-weight"] = _simpleRenderer({
   ],
   compute: computeRoofBallastWeight,
 });
+
+// ===================== spec-v988: foundation drainage board (dimple mat) takeoff =====================
+// dims: in { args: dimensionless } out: { wall_area_sf: dimensionless, rolls: dimensionless, termination_lf: dimensionless }
+export function computeDrainageBoardTakeoff({ perimeter_ft = 150, below_grade_height_ft = 8, roll_width_ft = 4, roll_length_ft = 50, waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(perimeter_ft > 0)) return { error: "Foundation perimeter must be positive (ft)." };
+  if (!(below_grade_height_ft > 0)) return { error: "Below-grade wall height must be positive (ft)." };
+  if (!(roll_width_ft > 0)) return { error: "Roll width must be positive (ft)." };
+  if (!(roll_length_ft > 0)) return { error: "Roll length must be positive (ft)." };
+  if (!(waste_pct >= 0)) return { error: "Waste percent cannot be negative." };
+  // Below-grade wall area; rolls from the roll's coverage with waste; top-edge termination bar per perimeter.
+  const wall_area_sf = perimeter_ft * below_grade_height_ft;
+  const roll_coverage_sf = roll_width_ft * roll_length_ft;
+  const rolls = Math.ceil(wall_area_sf * (1 + waste_pct / 100) / roll_coverage_sf);
+  const termination_lf = perimeter_ft;
+  if (![wall_area_sf, roll_coverage_sf, rolls].every(Number.isFinite)) return { error: "Drainage-board takeoff math is not a finite value." };
+  return {
+    wall_area_sf,
+    rolls,
+    termination_lf,
+    note: "The dimpled drainage board (a dimple mat or composite drainage sheet) to cover a below-grade foundation wall over the waterproofing, ordered by the roll. It relieves hydrostatic pressure by giving water an air-gapped path down to the footing drain and protects the membrane from backfill during compaction. Area = perimeter x the average below-grade height, and rolls = ceil(area x (1 + waste) / the roll's coverage). A 150 ft perimeter, 8 ft below grade is 1,200 sf, so at a 4 ft x 50 ft roll (200 sf) with 10% waste it takes 7 rolls, plus about 150 lf of top-edge termination molding (the bar that seals the top of the board so backfill and surface water do not get behind it). The dimples face the WALL (the flat filter-fabric face, if any, goes toward the soil) so the air gap sits against the membrane. Order the termination bar and any inside/outside-corner and butyl-tape accessories separately, and lap the sheets per the maker's detail (usually one dimple course). A material-ordering estimate; the product's roll size and lap, the assembly detail (with the membrane below and the footing drain at the base per IRC R405), and the AHJ govern.",
+  };
+}
+
+export const drainageBoardTakeoffExample = { inputs: { perimeter_ft: 150, below_grade_height_ft: 8, roll_width_ft: 4, roll_length_ft: 50, waste_pct: 10 } };
+
+CONSTRUCTION_RENDERERS["drainage-board-takeoff"] = _simpleRenderer({
+  citation: "Citation: foundation drainage board (dimple mat) takeoff, by name. area = perimeter x below-grade height; rolls = ceil(area x (1 + waste) / roll coverage); termination bar per perimeter. The dimples face the wall over the membrane; it relieves hydrostatic pressure to the footing drain (IRC R405). The product roll size and lap, the assembly detail, and the AHJ govern.",
+  example: drainageBoardTakeoffExample.inputs,
+  fields: [
+    { key: "perimeter_ft", label: "Foundation perimeter (ft)", kind: "number", default: 150 },
+    { key: "below_grade_height_ft", label: "Average below-grade height (ft)", kind: "number", default: 8 },
+    { key: "roll_width_ft", label: "Roll width (ft)", kind: "number", default: 4 },
+    { key: "roll_length_ft", label: "Roll length (ft)", kind: "number", default: 50 },
+    { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "a", id: "dbt-out-a", label: "Below-grade wall area", value: (r) => fmt(r.wall_area_sf, 0) + " sf" },
+    { key: "r", id: "dbt-out-r", label: "Drainage board", value: (r) => String(r.rolls) + " rolls (+" + fmt(r.termination_lf, 0) + " lf termination bar)" },
+    { key: "n", id: "dbt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDrainageBoardTakeoff,
+});

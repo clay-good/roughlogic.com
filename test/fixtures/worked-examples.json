@@ -56511,6 +56511,72 @@
    }
   },
   {
+   "tile_id": "drainage-board-takeoff",
+   "source_publisher": "Foundation drainage board (dimple mat) takeoff",
+   "source_title": "150 ft perimeter, 8 ft below grade, 4 x 50 ft rolls, 10% waste -> 1,200 sf, 7 rolls, 150 lf bar",
+   "source_edition_or_year": "spec-v988 worked example (machine-verified)",
+   "source_section_or_page": "area = 150 x 8 = 1,200 sf; rolls = ceil(1200 x 1.1 / 200) = ceil(6.6) = 7; termination = 150 lf",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "perimeter_ft": 150,
+    "below_grade_height_ft": 8,
+    "roll_width_ft": 4,
+    "roll_length_ft": 50,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "wall_area_sf": {
+     "value": 1200,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "rolls": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "termination_lf": {
+     "value": 150,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drainage-board-takeoff",
+   "source_publisher": "Foundation drainage board (dimple mat) takeoff",
+   "source_title": "cross-check: 200 ft perimeter, 9 ft below grade, 4 x 50 ft rolls, 10% waste -> 1,800 sf, 10 rolls",
+   "source_edition_or_year": "spec-v988 worked example (machine-verified)",
+   "source_section_or_page": "area = 200 x 9 = 1,800 sf; rolls = ceil(1800 x 1.1 / 200) = ceil(9.9) = 10; termination = 200 lf",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "perimeter_ft": 200,
+    "below_grade_height_ft": 9,
+    "roll_width_ft": 4,
+    "roll_length_ft": 50,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "wall_area_sf": {
+     "value": 1800,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "rolls": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "roof-ballast-weight",
    "source_publisher": "Ballasted single-ply roof ballast weight and order (ANSI/SPRI RP-4)",
    "source_title": "5,000 sf at 12 psf, 100 pcf gravel -> 60,000 lb (30 tons), 22.2 cu yd, ~1.44 in deep",
