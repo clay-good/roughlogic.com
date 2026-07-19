@@ -777,6 +777,7 @@ export const COMPUTE_MAP = {
   "chain-lever-hoist": { module: "../../calc-rigging.js", fn: "computeChainLeverHoist" },
   "block-redirect-load": { module: "../../calc-rigging.js", fn: "computeBlockRedirectLoad" },
   "reeving-parts-of-line": { module: "../../calc-rigging.js", fn: "computeReevingPartsOfLine" },
+  "guy-wire-tension": { module: "../../calc-rigging.js", fn: "computeGuyWireTension" },
   "block-redirect-max-angle": { module: "../../calc-rigging.js", fn: "computeBlockRedirectMaxAngle" },
   // spec-v67 Group E earthwork and excavation deepening.
   "soil-swell-shrink": { module: "../../calc-earthwork.js", fn: "computeSoilSwellShrink" },

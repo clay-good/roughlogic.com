@@ -1686,3 +1686,53 @@ function _v991renderReevingPartsOfLine(inputRegion, outputRegion, citationEl) {
   for (const f of [ld, np, ke]) f.input.addEventListener("input", update);
 }
 RIGGING_RENDERERS["reeving-parts-of-line"] = _v991renderReevingPartsOfLine;
+
+// ===================== spec-v996: guy-wire / down-guy tension and mast download =====================
+// dims: in { args: dimensionless } out: { guy_angle_deg: dimensionless, guy_tension_lb: dimensionless, mast_download_lb: dimensionless, anchor_uplift_lb: dimensionless }
+export function computeGuyWireTension({ horizontal_load_lb = 500, attachment_height_ft = 20, anchor_lead_ft = 20 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(horizontal_load_lb > 0)) return { error: "Horizontal load must be positive (lb)." };
+  if (!(attachment_height_ft > 0)) return { error: "Attachment height must be positive (ft)." };
+  if (!(anchor_lead_ft > 0)) return { error: "Anchor lead distance must be positive (ft)." };
+  // Statics: a guy at angle theta above horizontal resists a horizontal top load H.
+  const theta = Math.atan(attachment_height_ft / anchor_lead_ft);
+  const guy_angle_deg = theta * 180 / Math.PI;
+  const guy_tension_lb = horizontal_load_lb / Math.cos(theta);
+  const mast_download_lb = horizontal_load_lb * Math.tan(theta);
+  const anchor_uplift_lb = mast_download_lb; // the guy's vertical pull on the anchor equals the mast download
+  if (![guy_angle_deg, guy_tension_lb, mast_download_lb].every(Number.isFinite)) return { error: "Guy-wire math is not a finite value." };
+  return {
+    guy_angle_deg,
+    guy_tension_lb,
+    mast_download_lb,
+    anchor_uplift_lb,
+    note: "The tension in a guy wire holding a mast, pole, or tower against a horizontal load, and the vertical compression that guy stacks onto the mast. A single down-guy attached at a height H_a up the mast and anchored a horizontal lead distance L away makes an angle theta above horizontal of arctan(H_a / L). To resist a horizontal load H at the top -- wind on an antenna, the pull of a conductor or a highline, a sign's wind area -- the guy must carry a tension of H / cos(theta), which is always MORE than the load itself and climbs steeply as the guy gets steeper. At the same time the guy pulls DOWN on the mast, adding a vertical compression (mast download) of H x tan(theta) that the pole and its footing must carry on top of everything else, and it pulls UP on the anchor by the same amount. A 500 lb horizontal load on a guy attached 20 ft up and anchored 20 ft out sits at 45 degrees, so the guy tension is 500 / cos45 = 707 lb and the mast download is 500 x tan45 = 500 lb. Steepen the guy -- a short anchor lead -- and both the tension and the download shoot up (a guy at 63 degrees more than triples the download), which is exactly why crews want long anchor leads and shallow guy angles. This is single-guy statics only (a real installation balances guys in multiple directions, adds the mast's own wind and weight, and pretensions the guys); the pole class, the anchor holding capacity, the guy grade, and the engineer of record or the NESC / RUS standard govern the actual design.",
+  };
+}
+
+export const guyWireTensionExample = { inputs: { horizontal_load_lb: 500, attachment_height_ft: 20, anchor_lead_ft: 20 } };
+
+function _v996renderGuyWireTension(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: guy-wire / down-guy tension and mast download, by name. theta = atan(height/lead); guy tension = H / cos(theta); mast download (and anchor uplift) = H x tan(theta). Single-guy statics only (real rigs balance multiple guys, mast wind/weight, pretension). The pole class, anchor capacity, guy grade, and the engineer / NESC / RUS govern.";
+  const hl = makeNumber("Horizontal load at top (lb)", "gwt-hl", { step: "any", min: "0", value: "500" });
+  hl.input.value = "500";
+  const ah = makeNumber("Guy attachment height (ft)", "gwt-ah", { step: "any", min: "0", value: "20" });
+  ah.input.value = "20";
+  const al = makeNumber("Anchor lead distance (ft)", "gwt-al", { step: "any", min: "0", value: "20" });
+  al.input.value = "20";
+  for (const f of [hl, ah, al]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { hl.input.value = "500"; ah.input.value = "20"; al.input.value = "20"; update(); });
+  const oT = makeOutputLine(outputRegion, "Guy tension", "gwt-out-t");
+  const oD = makeOutputLine(outputRegion, "Mast download / anchor uplift", "gwt-out-d");
+  const update = debounce(() => {
+    const r = computeGuyWireTension({
+      horizontal_load_lb: hl.input.value === "" ? 500 : Number(hl.input.value), attachment_height_ft: ah.input.value === "" ? 20 : Number(ah.input.value),
+      anchor_lead_ft: al.input.value === "" ? 20 : Number(al.input.value),
+    });
+    if (r.error) { oT.textContent = r.error; oD.textContent = "-"; return; }
+    oT.textContent = fmt(r.guy_tension_lb, 0) + " lb (guy at " + fmt(r.guy_angle_deg, 1) + " deg)";
+    oD.textContent = fmt(r.mast_download_lb, 0) + " lb";
+  }, DEBOUNCE_MS);
+  for (const f of [hl, ah, al]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["guy-wire-tension"] = _v996renderGuyWireTension;

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(rigging): add guy-wire-tension tile (spec-v996); 2026-07-18
+
+- New Group Z tile `guy-wire-tension` in calc-rigging.js. Down-guy tension and mast download from a horizontal top
+  load: theta = atan(height/lead); guy tension = H / cos(theta) (always > H); mast download = anchor uplift = H x
+  tan(theta). A 500 lb load 20 ft up, 20 ft out sits at 45 deg -> 707 lb tension, 500 lb download; a steep guy (63 deg)
+  more than triples the download. Single-guy statics; the pole class, anchor capacity, guy grade, and the engineer /
+  NESC / RUS govern. Home count 1,444 -> 1,445.
+
 ### feat(agriculture): add dressing-percentage tile (spec-v995); 2026-07-18
 
 - New Group L tile `dressing-percentage` in calc-agriculture.js. Carcass dressing % and freezer meat yield: dressing %

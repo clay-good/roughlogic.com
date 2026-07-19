@@ -28548,3 +28548,26 @@ test("bounds: spec-v995 computeDressingPercentage pins the dressing % and freeze
   assert.ok("error" in _v995({ live_weight_lb: 1200, hot_carcass_weight_lb: 744, cutting_yield_pct: 120 }));
   assert.ok("error" in _v995({ live_weight_lb: Infinity, hot_carcass_weight_lb: 744, cutting_yield_pct: 67 }));
 });
+
+import { computeGuyWireTension as _v996 } from "../../calc-rigging.js";
+
+test("bounds: spec-v996 computeGuyWireTension pins the guy statics and mast download", () => {
+  const r = _v996({ horizontal_load_lb: 500, attachment_height_ft: 20, anchor_lead_ft: 20 });
+  assert.ok(Math.abs(r.guy_angle_deg - 45) < 1e-6); // atan(1)
+  assert.ok(Math.abs(r.guy_tension_lb - 707.107) < 1e-2); // 500/cos45
+  assert.ok(Math.abs(r.mast_download_lb - 500) < 1e-6); // 500*tan45
+  assert.ok(Math.abs(r.anchor_uplift_lb - r.mast_download_lb) < 1e-12);
+  assert.ok(r.guy_tension_lb > 500); // tension always exceeds the load
+  // Steep-guy cross-check.
+  const steep = _v996({ horizontal_load_lb: 800, attachment_height_ft: 30, anchor_lead_ft: 15 });
+  assert.ok(Math.abs(steep.guy_angle_deg - 63.4349) < 1e-3);
+  assert.ok(Math.abs(steep.guy_tension_lb - 1788.85) < 1e-1);
+  assert.ok(Math.abs(steep.mast_download_lb - 1600) < 1e-2);
+  // Steeper guy (shorter lead) raises both tension and download.
+  assert.ok(_v996({ horizontal_load_lb: 500, attachment_height_ft: 20, anchor_lead_ft: 10 }).mast_download_lb > r.mast_download_lb);
+  // Error seams.
+  assert.ok("error" in _v996({ horizontal_load_lb: 0, attachment_height_ft: 20, anchor_lead_ft: 20 }));
+  assert.ok("error" in _v996({ horizontal_load_lb: 500, attachment_height_ft: 0, anchor_lead_ft: 20 }));
+  assert.ok("error" in _v996({ horizontal_load_lb: 500, attachment_height_ft: 20, anchor_lead_ft: 0 }));
+  assert.ok("error" in _v996({ horizontal_load_lb: Infinity, attachment_height_ft: 20, anchor_lead_ft: 20 }));
+});

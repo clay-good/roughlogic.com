@@ -23158,6 +23158,68 @@
    }
   },
   {
+   "tile_id": "guy-wire-tension",
+   "source_publisher": "Guy-wire / down-guy tension and mast download (statics; NESC / RUS)",
+   "source_title": "500 lb load, 20 ft up, 20 ft lead -> 45 deg, 707 lb guy tension, 500 lb mast download",
+   "source_edition_or_year": "spec-v996 worked example (machine-verified)",
+   "source_section_or_page": "theta = atan(20/20) = 45 deg; tension = 500/cos45 = 707.1; download = 500 x tan45 = 500",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "horizontal_load_lb": 500,
+    "attachment_height_ft": 20,
+    "anchor_lead_ft": 20
+   },
+   "outputs": {
+    "guy_angle_deg": {
+     "value": 45,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "guy_tension_lb": {
+     "value": 707.1,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "mast_download_lb": {
+     "value": 500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "guy-wire-tension",
+   "source_publisher": "Guy-wire / down-guy tension and mast download (statics; NESC / RUS)",
+   "source_title": "cross-check: steep guy 800 lb, 30 ft up, 15 ft lead -> 63.4 deg, 1,789 lb tension, 1,600 lb download",
+   "source_edition_or_year": "spec-v996 worked example (machine-verified)",
+   "source_section_or_page": "theta = atan(30/15) = 63.43 deg; tension = 800/cos63.43 = 1789; download = 800 x tan63.43 = 1600",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "horizontal_load_lb": 800,
+    "attachment_height_ft": 30,
+    "anchor_lead_ft": 15
+   },
+   "outputs": {
+    "guy_tension_lb": {
+     "value": 1788.9,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "mast_download_lb": {
+     "value": 1600,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "reeving-parts-of-line",
    "source_publisher": "Block-and-tackle reeving line pull (Wire Rope Users Manual / Crosby)",
    "source_title": "20,000 lb, 4 parts, k 0.98 -> 5,152 lb hauling pull, 97.0% reeving efficiency",
