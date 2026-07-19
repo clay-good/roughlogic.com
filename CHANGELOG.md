@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### build(lint): add check-select-options gate for makeSelect primitive-array options; 2026-07-19
+
+- Added `scripts/check-select-options.mjs` to `npm run lint`, a sibling of `check-field-accessors` for the quieter
+  half of the makeSelect footgun. `makeSelect(label, id, options)` reads `o.value`/`o.label` off every option, so
+  passing a bare array of primitives (`makeSelect("Size", "id", ["1/2","3/4"])`, e.g. forgetting the
+  `.map((s) => ({ value: s, label: s }))` wrapper) silently renders every choice as value/text `undefined`. Nothing
+  throws and no NaN reaches an output, so neither the crash-safe boundary nor the ~30-minute `render-no-nan` gate
+  fires: the tile ships visibly broken with zero signal. The gate fails in milliseconds on the two unambiguous
+  mistake shapes (a primitive array literal, or a bare `Object.keys(...)`/`Object.values(...)` with no `.map`) and
+  stays conservative on indirection. Swept all 447 makeSelect calls across 56 modules with zero pre-existing
+  violations.
+
 ### fix(fab): vessel-head-volume renderer + new field-accessor lint gate; 2026-07-19
 
 - `vessel-head-volume` (calc-fab.js) bound its head-type field with `makeSelect` (which returns `{ wrap, select }`)
