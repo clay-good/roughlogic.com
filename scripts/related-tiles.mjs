@@ -1273,6 +1273,7 @@ const RELATED = {
   "min-conductor-for-vd": ["voltage-drop","wire-ampacity","copper-resistance"],
   "max-circuit-length-for-vd": ["voltage-drop","min-conductor-for-vd","awg-wire-geometry"],
   "open-delta-transformer": ["transformer-kva-sizing","transformer-loading-efficiency","transformer-turns-ratio"],
+  "conduit-nipple-60-fill": ["conduit-fill","box-fill","conduit-jam-ratio"],
   // spec-v121..v128 motors / feeders / fault / raceway / grounding / three-phase
   "motor-synchronous-speed-slip": ["motor-pole-identification", "motor-fla", "motor-vd-starting", "motor-branch-from-nameplate"],
   "motor-pole-identification": ["motor-synchronous-speed-slip", "motor-shaft-torque", "motor-fla", "motor-operating-cost"],

@@ -1944,6 +1944,7 @@ cross-check.
 | calc-electrical.js | `computeConduitExpansionMaxRun` | `{ temp_change_f = 0, coeff_in_per_in_f = 0.0000338, trigger_in = 0.25 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeConduitFill` | `{ conduit, trade_size, conductors }` | _ | _ | _ |
 | calc-electrical.js | `computeConduitJamRatio` | `{ conduit_id_in = 0, conductor_od_in = 0, n_conductors = 3 } = {}` | _ | _ | _ |
+| calc-electrical.js | `computeConduitNipple60Fill` | `{ conduit_area_sqin = 0.864, conductor_area_sqin = 0.0211, conductor_count = ...` | _ | _ | _ |
 | calc-electrical.js | `computeConduitThermalExpansion` | `{ run_length_ft = 0, temp_change_f = 0, coeff_in_per_in_f = 0.0000338, trigge...` | _ | _ | _ |
 | calc-electrical.js | `computeDeltaWyeLinePhase` | `{ configuration = "wye", line_voltage_v = 0, line_current_a = 0, power_factor...` | _ | _ | _ |
 | calc-electrical.js | `computeEGCSize` | `{ ocpd_A, material }` | _ | _ | _ |
@@ -3098,7 +3099,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1684.
+Row count: 1685.
 
 <!-- END function-corpus-v14 -->
 
@@ -3179,7 +3180,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (196 tiles)
+### Group A Electrical (197 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3223,6 +3224,7 @@ per spec-v14 §13.1 second paragraph.
 | `conduit-expansion-max-run` | PVC Conduit Max Run Before an Expansion Fitting | NFPA; spec-v665 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `conduit-fill` | Conduit Fill | NFPA; Chapter 9 Tables 1, 4, 5; 4 conductors -> 40% fill thresh... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-jam-ratio` | Conduit Jam Ratio for Three Same-Size Conductors (NEC Ch. 9) | NEC (NFPA 70) Chapter 9; spec-v374 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `conduit-nipple-60-fill` | Conduit Nipple 60% Fill (NEC Ch. 9 Note 4) | Conduit nipple 60% fill (NEC Chapter ...; fill = 20 x 0.0211 / 0.864 = 48.8%; nipple max floor(0.6 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `conduit-offset` | Conduit Offset Bend | Ugly's Electrical References / NECA b...; 6 in offset at 30 deg -> 12 in mark spacing, multiplier 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-saddle` | Conduit Saddle Bend | Ugly's Electrical References (by name); 3 in obstruction, 45/22.5 preset -> 7.5 in outer-mark spa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-thermal-expansion` | PVC Conduit Thermal Expansion (NEC 352.44) | NFPA; spec-v126 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4721,6 +4723,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1437. Fixture-covered or reference-cadence: 1437 / 1437.
+Tile count: 1438. Fixture-covered or reference-cadence: 1438 / 1438.
 
 <!-- END tile-index-v14 -->

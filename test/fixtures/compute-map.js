@@ -1269,6 +1269,7 @@ export const COMPUTE_MAP = {
   "min-conductor-for-vd": { module: "../../calc-electrical.js", fn: "computeMinConductorForVd" },
   "max-circuit-length-for-vd": { module: "../../calc-electrical.js", fn: "computeMaxCircuitLengthForVd" },
   "open-delta-transformer": { module: "../../calc-electrical.js", fn: "computeOpenDeltaTransformer" },
+  "conduit-nipple-60-fill": { module: "../../calc-electrical.js", fn: "computeConduitNipple60Fill" },
   "motor-synchronous-speed-slip": { module: "../../calc-motor.js", fn: "computeMotorSyncSlip" },
   "motor-pole-identification": { module: "../../calc-motor.js", fn: "computeMotorPoleIdentification" },
   "motor-shaft-torque": { module: "../../calc-motor.js", fn: "computeMotorShaftTorque" },

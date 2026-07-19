@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): add conduit-nipple-60-fill tile (spec-v989); 2026-07-18
+
+- New Group A tile `conduit-nipple-60-fill` in calc-electrical.js. NEC Chapter 9 Note 4: a nipple (raceway <= 24 in
+  between enclosures) may fill to 60% (vs the normal 40%/31%/53%) and is exempt from the 310.15(C)(1) ampacity
+  adjustment. fill% = count x conductor area / conduit total area (Table 4 / Table 5). 20 #10 THHN in a 1 in EMT nipple
+  = 48.8%: legal in a nipple (allows 24) but over the normal 40% (allows 16). Reports both maxima and which limits
+  pass. Home count 1,437 -> 1,438.
+
 ### feat(waterproofing): add drainage-board-takeoff tile (spec-v988); 2026-07-18
 
 - New Group E tile `drainage-board-takeoff` in calc-construction.js. Dimpled foundation drainage board (dimple mat)

@@ -6025,3 +6025,62 @@ function _v985renderOpenDeltaTransformer(inputRegion, outputRegion, citationEl) 
   for (const f of [ke, rl]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["open-delta-transformer"] = _v985renderOpenDeltaTransformer;
+
+// ===================== spec-v989: conduit nipple 60% fill (NEC Chapter 9 Note 4) =====================
+// dims: in { args: dimensionless } out: { fill_area_sqin: dimensionless, fill_pct: dimensionless, nipple_max_conductors: dimensionless, normal_max_conductors: dimensionless }
+export function computeConduitNipple60Fill({ conduit_area_sqin = 0.864, conductor_area_sqin = 0.0211, conductor_count = 20 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(conduit_area_sqin > 0)) return { error: "Conduit total area must be positive (sq in, NEC Ch. 9 Table 4)." };
+  if (!(conductor_area_sqin > 0)) return { error: "Conductor area must be positive (sq in, NEC Ch. 9 Table 5)." };
+  if (!(conductor_count > 0)) return { error: "Conductor count must be positive." };
+  // NEC Ch. 9 Note 4: a nipple <= 24 in between enclosures may fill to 60% (vs the normal 40% for 3+ conductors).
+  const fill_area_sqin = conductor_count * conductor_area_sqin;
+  const fill_pct = fill_area_sqin / conduit_area_sqin * 100;
+  const nipple_max_conductors = Math.floor(0.60 * conduit_area_sqin / conductor_area_sqin);
+  const normal_max_conductors = Math.floor(0.40 * conduit_area_sqin / conductor_area_sqin);
+  if (![fill_area_sqin, fill_pct, nipple_max_conductors, normal_max_conductors].every(Number.isFinite)) return { error: "Nipple-fill math is not a finite value." };
+  const nipple_ok = fill_pct <= 60;
+  const passes_normal = fill_pct <= 40;
+  const verdict = !nipple_ok
+    ? "OVER 60%: too full even for a nipple -- go up a conduit size."
+    : passes_normal
+      ? "OK: under 40%, so this fill is legal in a nipple AND in any normal raceway."
+      : "OK for a NIPPLE only (<= 24 in): the 60% allowance passes, but this fill exceeds the normal 40% -- a longer run would need a bigger conduit.";
+  return {
+    fill_area_sqin,
+    fill_pct,
+    nipple_max_conductors,
+    normal_max_conductors,
+    verdict,
+    note: "The conductor fill allowed in a conduit or tubing NIPPLE -- a raceway no longer than 24 in between boxes, cabinets, wireways, or similar enclosures. NEC Chapter 9, Note 4 lets a nipple be filled to 60% of its total cross-sectional area, well above the 40% (three or more conductors), 31% (two), or 53% (one) limits of a normal run, because a short nipple pulls and dissipates heat easily. Fill percent = conductor count x each conductor's area / the conduit's total area (both read from NEC Chapter 9 -- Table 4 for the conduit's total area by type and trade size, Table 5 for the insulated-conductor area). Twenty #10 THHN (0.0211 in^2 each) in a 1 in EMT nipple (0.864 in^2) fill 20 x 0.0211 / 0.864 = 48.8%: legal in a nipple (the 60% cap allows 24 of them) but OVER the normal 40% (which allows only 16), so those 20 conductors could not run in a full-length raceway of the same size. Note 4 ALSO exempts nipples from the 310.15(C)(1) ampacity adjustment (derating) factors, so the conductors keep their full table ampacity through the nipple. A fill check; the exact Table 4/5 areas, the box and pull-can sizing, and the AHJ and adopted NEC edition govern.",
+  };
+}
+
+export const conduitNipple60FillExample = { inputs: { conduit_area_sqin: 0.864, conductor_area_sqin: 0.0211, conductor_count: 20 } };
+
+function _v989renderConduitNipple60Fill(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: conduit nipple 60% fill, NEC Chapter 9 Note 4, by name. A nipple <= 24 in between enclosures may fill to 60% (vs 40%/31%/53% normal). fill% = count x conductor area / conduit total area (Table 4 conduit area, Table 5 conductor area). Note 4 also exempts nipples from the 310.15(C)(1) ampacity adjustment. The exact table areas and the AHJ govern.";
+  const ca = makeNumber("Conduit total area (sq in, Table 4)", "cn6-ca", { step: "any", min: "0", value: "0.864" });
+  ca.input.value = "0.864";
+  const wa = makeNumber("Each conductor area (sq in, Table 5)", "cn6-wa", { step: "any", min: "0", value: "0.0211" });
+  wa.input.value = "0.0211";
+  const nc = makeNumber("Conductor count", "cn6-nc", { step: "1", min: "1", value: "20" });
+  nc.input.value = "20";
+  for (const f of [ca, wa, nc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ca.input.value = "0.864"; wa.input.value = "0.0211"; nc.input.value = "20"; update(); });
+  const oF = makeOutputLine(outputRegion, "Fill", "cn6-out-f");
+  const oM = makeOutputLine(outputRegion, "Max conductors", "cn6-out-m");
+  const oV = makeOutputLine(outputRegion, "Verdict", "cn6-out-v");
+  const update = debounce(() => {
+    const r = computeConduitNipple60Fill({
+      conduit_area_sqin: ca.input.value === "" ? 0.864 : Number(ca.input.value), conductor_area_sqin: wa.input.value === "" ? 0.0211 : Number(wa.input.value),
+      conductor_count: nc.input.value === "" ? 20 : Number(nc.input.value),
+    });
+    if (r.error) { oF.textContent = r.error; oM.textContent = "-"; oV.textContent = "-"; return; }
+    oF.textContent = fmt(r.fill_area_sqin, 4) + " sq in (" + fmt(r.fill_pct, 1) + "%)";
+    oM.textContent = r.nipple_max_conductors + " in a nipple (60%), " + r.normal_max_conductors + " normal (40%)";
+    oV.textContent = r.verdict;
+  }, DEBOUNCE_MS);
+  for (const f of [ca, wa, nc]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["conduit-nipple-60-fill"] = _v989renderConduitNipple60Fill;

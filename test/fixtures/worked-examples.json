@@ -28370,6 +28370,68 @@
    }
   },
   {
+   "tile_id": "conduit-nipple-60-fill",
+   "source_publisher": "Conduit nipple 60% fill (NEC Chapter 9 Note 4)",
+   "source_title": "20 #10 THHN (0.0211) in a 1 in EMT nipple (0.864) -> 48.8%, nipple-only (over normal 40%)",
+   "source_edition_or_year": "spec-v989 worked example (machine-verified)",
+   "source_section_or_page": "fill = 20 x 0.0211 / 0.864 = 48.8%; nipple max floor(0.6 x 0.864/0.0211) = 24; normal floor(0.4 x .864/.0211) = 16",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "conduit_area_sqin": 0.864,
+    "conductor_area_sqin": 0.0211,
+    "conductor_count": 20
+   },
+   "outputs": {
+    "fill_pct": {
+     "value": 48.84,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "nipple_max_conductors": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "normal_max_conductors": {
+     "value": 16,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conduit-nipple-60-fill",
+   "source_publisher": "Conduit nipple 60% fill (NEC Chapter 9 Note 4)",
+   "source_title": "cross-check: 30 #12 THHN (0.0133) in the same nipple -> 46.2%, nipple allows 38, normal 25",
+   "source_edition_or_year": "spec-v989 worked example (machine-verified)",
+   "source_section_or_page": "fill = 30 x 0.0133 / 0.864 = 46.2%; nipple max floor(0.6 x 0.864/0.0133) = 38; normal 25",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "conduit_area_sqin": 0.864,
+    "conductor_area_sqin": 0.0133,
+    "conductor_count": 30
+   },
+   "outputs": {
+    "fill_pct": {
+     "value": 46.18,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "nipple_max_conductors": {
+     "value": 38,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "open-delta-transformer",
    "source_publisher": "Open-delta (V-V) transformer bank capacity",
    "source_title": "two 25 kVA units, 40 kVA 3-phase load -> 43.3 kVA available, each at 92.4%, OK",

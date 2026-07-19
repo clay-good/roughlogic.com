@@ -28394,3 +28394,27 @@ test("bounds: spec-v988 computeDrainageBoardTakeoff pins the roll count and ceil
   assert.ok("error" in _v988({ perimeter_ft: 150, below_grade_height_ft: 8, roll_width_ft: 4, roll_length_ft: 50, waste_pct: -5 }));
   assert.ok("error" in _v988({ perimeter_ft: Infinity, below_grade_height_ft: 8, roll_width_ft: 4, roll_length_ft: 50, waste_pct: 10 }));
 });
+
+import { computeConduitNipple60Fill as _v989 } from "../../calc-electrical.js";
+
+test("bounds: spec-v989 computeConduitNipple60Fill pins the 60% nipple allowance vs the normal 40%", () => {
+  const r = _v989({ conduit_area_sqin: 0.864, conductor_area_sqin: 0.0211, conductor_count: 20 });
+  assert.ok(Math.abs(r.fill_pct - 48.842) < 1e-2); // 20*0.0211/0.864
+  assert.strictEqual(r.nipple_max_conductors, 24); // floor(0.6*0.864/0.0211)
+  assert.strictEqual(r.normal_max_conductors, 16); // floor(0.4*0.864/0.0211)
+  assert.ok(/NIPPLE only/.test(r.verdict)); // 40 < 48.8 <= 60
+  // Cross-check with #12 THHN.
+  const c12 = _v989({ conduit_area_sqin: 0.864, conductor_area_sqin: 0.0133, conductor_count: 30 });
+  assert.ok(Math.abs(c12.fill_pct - 46.18) < 1e-2);
+  assert.strictEqual(c12.nipple_max_conductors, 38);
+  // Verdict bands: <= 40% passes both; > 60% fails even a nipple.
+  assert.ok(/AND in any normal/.test(_v989({ conduit_area_sqin: 0.864, conductor_area_sqin: 0.0211, conductor_count: 15 }).verdict)); // 36.6%
+  assert.ok(/OVER 60%/.test(_v989({ conduit_area_sqin: 0.864, conductor_area_sqin: 0.0211, conductor_count: 26 }).verdict)); // 63.5%
+  // The nipple always allows more (or equal) conductors than a normal run.
+  assert.ok(r.nipple_max_conductors > r.normal_max_conductors);
+  // Error seams.
+  assert.ok("error" in _v989({ conduit_area_sqin: 0, conductor_area_sqin: 0.0211, conductor_count: 20 }));
+  assert.ok("error" in _v989({ conduit_area_sqin: 0.864, conductor_area_sqin: 0, conductor_count: 20 }));
+  assert.ok("error" in _v989({ conduit_area_sqin: 0.864, conductor_area_sqin: 0.0211, conductor_count: 0 }));
+  assert.ok("error" in _v989({ conduit_area_sqin: Infinity, conductor_area_sqin: 0.0211, conductor_count: 20 }));
+});
