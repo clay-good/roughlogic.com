@@ -76,11 +76,35 @@ for (const id of TOOL_IDS) {
     // ceiling, not a wait: zero cost for the fast majority.
     test.slow();
     // Collect renderer crashes: a thrown renderer surfaces as a pageerror
-    // (uncaught) or as the crash-safe boundary's console.error log. Attach
-    // before navigation so boot-time failures are caught too.
-    const errors = [];
-    page.on("pageerror", (e) => errors.push("pageerror: " + e.message));
-    page.on("console", (m) => { if (m.type() === "error") errors.push("console.error: " + m.text()); });
+    // (uncaught) or as the crash-safe boundary's console.error log. Collect
+    // IN-PAGE into window.__renderErrors__ (installed before any app script,
+    // so boot-time failures are caught too) and read it once, deterministically,
+    // at assertion time.
+    //
+    // Why not page.on("console"/"pageerror"): those deliver via async CDP
+    // events that RACE the final assertion. Under 2-worker CI load a
+    // synchronous renderer crash's console.error could arrive AFTER the test
+    // resolved, so a real deterministic crash flakily PASSED -- vessel-head-
+    // volume's makeSelect-read-as-.input crash passed 3 of 4 CI runs that way.
+    // An in-page array read via page.evaluate reflects the true accumulated
+    // state (every waitForTimeout below has elapsed past the debounce, so any
+    // deferred throw is already recorded) with no delivery race. Same event
+    // set (all console.error + every uncaught error), reliable delivery.
+    await page.addInitScript(() => {
+      window.__renderErrors__ = [];
+      const ser = (a) => {
+        if (a instanceof Error) return a.stack || a.message;
+        if (a && typeof a === "object") {
+          try { return JSON.stringify(a, (_k, v) => (v instanceof Error ? v.stack || v.message : v)); }
+          catch { return String(a); }
+        }
+        return String(a);
+      };
+      const orig = console.error.bind(console);
+      console.error = (...args) => { window.__renderErrors__.push("console.error: " + args.map(ser).join(" ")); orig(...args); };
+      window.addEventListener("error", (e) => window.__renderErrors__.push("pageerror: " + (e.message || (e.error && e.error.message) || String(e))));
+      window.addEventListener("unhandledrejection", (e) => window.__renderErrors__.push("pageerror: " + ((e.reason && e.reason.message) || String(e.reason))));
+    });
 
     await page.goto("/index.html#" + id);
     const out = page.locator("#view-region .output-region");
@@ -193,7 +217,9 @@ for (const id of TOOL_IDS) {
       }
     }
 
-    // Renderer-health: no crash during load or example-populate.
+    // Renderer-health: no crash during load or example-populate. Read the
+    // in-page collector deterministically (no CDP event-delivery race).
+    const errors = await page.evaluate(() => window.__renderErrors__ || []);
     expect(errors, `${id} renderer crashed:\n${errors.join("\n")}`).toEqual([]);
   });
 }

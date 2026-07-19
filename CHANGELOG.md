@@ -15,6 +15,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
   renderer reads a `makeSelect` var as `.input` (or an input-factory var as `.select`), replacing a ~30-minute
   Playwright feedback loop. Swept 3,787 factory-bound field vars across 1,024 renderers with zero pre-existing
   violations.
+- De-flaked the `render-no-nan` gate: it collected renderer crashes via async `page.on("console"/"pageerror")`
+  events that raced the final assertion, so under CI load a deterministic crash could arrive late and pass (the
+  vessel-head-volume crash passed 3 of 4 runs this way). Now it collects into an in-page `window.__renderErrors__`
+  array read once via `page.evaluate` -- same event set, deterministic delivery, and fuller diagnostics (serialized
+  stack traces). Full 1,456-tile single-worker sweep stays green.
 
 ### feat(mechanic): add flywheel-energy tile (spec-v1007); 2026-07-18
 
