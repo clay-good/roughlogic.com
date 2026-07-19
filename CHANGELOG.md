@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### build(lint): add check-render-output-keys gate for missing _simpleRenderer outputs; 2026-07-19
+
+- Added `scripts/check-render-output-keys.mjs` to `npm run lint`, closing the surface that produced the
+  trailer-tongue-weight fix below. A `_simpleRenderer` output reads `r.KEY` off its compute's return object; if the
+  compute never returns `KEY`, a number surfaces as `NaN` (caught by the render-no-nan Playwright gate) but a string
+  renders the literal text "undefined" -- a visibly broken output no gate could see. The gate resolves each compute's
+  `return { ... }` literal keys and fails when an output reads a key the compute never returns; computes whose return
+  is unresolvable (an object spread `{ ...t }` or a returned variable `return out`) are skipped, so a clean run is
+  never a false alarm. Swept all 56 modules: 1,860 output references, zero missing after the fix; verified it fails
+  deterministically on a reintroduced missing return key.
+
 ### fix(trucking): trailer-tongue-weight rendered "undefined" for its Verdict; 2026-07-19
 
 - `computeTrailerTongueWeight` built the `verdict` string (TOO LIGHT / TOO HEAVY / in-band) but left it out of the
