@@ -1502,13 +1502,13 @@ function _v912renderVesselHeadVolume(inputRegion, outputRegion, citationEl) {
   const sf = makeNumber("Straight flange (in)", "vhv-sf", { step: "any", min: "0", value: "0" });
   sf.input.value = "0";
   for (const f of [dia, ht, sf]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { dia.input.value = "48"; ht.input.value = "elliptical"; sf.input.value = "0"; update(); });
+  attachExampleButton(inputRegion, () => { dia.input.value = "48"; ht.select.value = "elliptical"; sf.input.value = "0"; update(); });
   const oHead = makeOutputLine(outputRegion, "One head volume", "vhv-out-head");
   const oTotal = makeOutputLine(outputRegion, "Head + straight flange", "vhv-out-total");
   const oDepth = makeOutputLine(outputRegion, "Inside dish depth", "vhv-out-depth");
   const update = debounce(() => {
     const r = computeVesselHeadVolume({
-      inside_diameter_in: dia.input.value === "" ? 48 : Number(dia.input.value), head_type: ht.input.value,
+      inside_diameter_in: dia.input.value === "" ? 48 : Number(dia.input.value), head_type: ht.select.value,
       straight_flange_in: sf.input.value === "" ? 0 : Number(sf.input.value),
     });
     if (r.error) { oHead.textContent = r.error; oTotal.textContent = "-"; oDepth.textContent = "-"; return; }
@@ -1517,7 +1517,7 @@ function _v912renderVesselHeadVolume(inputRegion, outputRegion, citationEl) {
     oDepth.textContent = fmt(r.head_depth_in, 2) + " in";
   }, DEBOUNCE_MS);
   for (const f of [dia, sf]) f.input.addEventListener("input", update);
-  ht.input.addEventListener("change", update);
+  ht.select.addEventListener("change", update);
 }
 FAB_RENDERERS["vessel-head-volume"] = _v912renderVesselHeadVolume;
 
