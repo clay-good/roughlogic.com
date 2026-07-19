@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): add condensing-flue-condensate tile (spec-v1005); 2026-07-18
+
+- New Group C tile `condensing-flue-condensate` in calc-hvacservice.js. Condensate drained by a condensing furnace/
+  boiler/water heater, for sizing the drain, pump, and neutralizer. Natural gas makes ~9.4 lb water per therm;
+  condensate = (input/100,000) x water-per-therm x condensing fraction / 8.34. 100,000 BTU/hr at 0.85 = 0.96 gph;
+  150,000 BTU/hr at 0.90 = 1.52 gph. The condensate is acidic (pH ~3-5) -- code may require a neutralizer. Home count
+  1,453 -> 1,454.
+
 ### feat(hvac): add flue-gas-dew-point tile (spec-v1004); 2026-07-18
 
 - New Group C tile `flue-gas-dew-point` in calc-hvacservice.js. Water dew point of natural-gas combustion products,

@@ -28737,3 +28737,21 @@ test("bounds: spec-v1004 computeFlueGasDewPoint pins the natural-gas water dew p
   assert.ok("error" in _v1004fg({ excess_air_pct: -5 }));
   assert.ok("error" in _v1004fg({ excess_air_pct: Infinity }));
 });
+
+import { computeCondensingFlueCondensate as _v1005 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v1005 computeCondensingFlueCondensate pins the condensate rate", () => {
+  const r = _v1005({ input_btu_hr: 100000, water_lb_per_therm: 9.4, condensing_fraction: 0.85 });
+  assert.ok(Math.abs(r.water_produced_lb_hr - 9.4) < 1e-9); // 1 therm/hr * 9.4
+  assert.ok(Math.abs(r.condensate_gph - 0.95803) < 1e-3); // 9.4*0.85/8.34
+  const c = _v1005({ input_btu_hr: 150000, water_lb_per_therm: 9.4, condensing_fraction: 0.90 });
+  assert.ok(Math.abs(c.condensate_gph - 1.52194) < 1e-3);
+  // Condensate scales with input and condensing fraction.
+  assert.ok(Math.abs(_v1005({ input_btu_hr: 200000, water_lb_per_therm: 9.4, condensing_fraction: 0.85 }).condensate_gph - 2 * r.condensate_gph) < 1e-6);
+  assert.ok(_v1005({ input_btu_hr: 100000, water_lb_per_therm: 9.4, condensing_fraction: 0.70 }).condensate_gph < r.condensate_gph);
+  // Error seams.
+  assert.ok("error" in _v1005({ input_btu_hr: 0, water_lb_per_therm: 9.4, condensing_fraction: 0.85 }));
+  assert.ok("error" in _v1005({ input_btu_hr: 100000, water_lb_per_therm: 0, condensing_fraction: 0.85 }));
+  assert.ok("error" in _v1005({ input_btu_hr: 100000, water_lb_per_therm: 9.4, condensing_fraction: 1.5 }));
+  assert.ok("error" in _v1005({ input_btu_hr: Infinity, water_lb_per_therm: 9.4, condensing_fraction: 0.85 }));
+});

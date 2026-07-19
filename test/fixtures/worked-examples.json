@@ -69229,6 +69229,56 @@
    }
   },
   {
+   "tile_id": "condensing-flue-condensate",
+   "source_publisher": "Condensing appliance flue condensate rate (water of combustion)",
+   "source_title": "100,000 BTU/hr, 9.4 lb/therm, 0.85 condensing -> 9.4 lb/hr water, 0.96 gph condensate",
+   "source_edition_or_year": "spec-v1005 worked example (machine-verified)",
+   "source_section_or_page": "water = 1 therm/hr x 9.4 = 9.4 lb/hr; condensate = 9.4 x 0.85 / 8.34 = 0.958 gph",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "input_btu_hr": 100000,
+    "water_lb_per_therm": 9.4,
+    "condensing_fraction": 0.85
+   },
+   "outputs": {
+    "water_produced_lb_hr": {
+     "value": 9.4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "condensate_gph": {
+     "value": 0.958,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "condensing-flue-condensate",
+   "source_publisher": "Condensing appliance flue condensate rate (water of combustion)",
+   "source_title": "cross-check: 150,000 BTU/hr, 0.90 condensing -> 14.1 lb/hr water, 1.52 gph",
+   "source_edition_or_year": "spec-v1005 worked example (machine-verified)",
+   "source_section_or_page": "water = 1.5 x 9.4 = 14.1 lb/hr; condensate = 14.1 x 0.90 / 8.34 = 1.522 gph",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "input_btu_hr": 150000,
+    "water_lb_per_therm": 9.4,
+    "condensing_fraction": 0.90
+   },
+   "outputs": {
+    "condensate_gph": {
+     "value": 1.522,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "flue-gas-dew-point",
    "source_publisher": "Natural-gas flue-gas water dew point (stoichiometry + Antoine)",
    "source_title": "15% excess air -> 16.7% water vapor, ~134 F water dew point",

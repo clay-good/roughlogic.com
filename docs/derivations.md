@@ -2290,6 +2290,7 @@ cross-check.
 | calc-hvacservice.js | `computeCoAirFree` | `{ measured_co_ppm = 0, measured_o2_pct = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeCombustionLambda` | `{ fuel = "natural_gas", flue_o2_pct = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeCondensateDrain` | `{ tons = 0, pints_per_ton_hr = 3, run_ft = 0, slope_in_per_ft = 0.125 } = {}` | _ | _ | _ |
+| calc-hvacservice.js | `computeCondensingFlueCondensate` | `{ input_btu_hr = 100000, water_lb_per_therm = 9.4, condensing_fraction = 0.85...` | _ | _ | _ |
 | calc-hvacservice.js | `computeDraftHoodDilution` | `{ appliance_o2_pct = 0, diluted_o2_pct = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeDuctLeakageCfm25` | `{ leakage_cfm25 = 0, cfa_ft2 = 0, limit = 4 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeExcessAirO2` | `{ measured_o2_pct = 0, measured_co2_pct = 0, co2max_pct = 11.7 } = {}` | _ | _ | _ |
@@ -3114,7 +3115,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1700.
+Row count: 1701.
 
 <!-- END function-corpus-v14 -->
 
@@ -3519,7 +3520,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (139 tiles)
+### Group C HVAC (140 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3563,6 +3564,7 @@ per spec-v14 §13.1 second paragraph.
 | `condensate-drain` | Condensate Rate and Drain Size | IMC 307.2.2 (drain size by capacity) ...; spec-v102 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `condenser-cop-for-heat-rejection` | COP Implied by the Heat of Rejection | THR = Q_evap (1 + 1/COP), solved for COP; spec-v761 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `condenser-heat-rejection` | Condenser Total Heat of Rejection | Total heat of rejection THR = Q_evap ...; spec-v322 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `condensing-flue-condensate` | Condensing Appliance Flue Condensate Rate | Condensing appliance flue condensate ...; water = 1 therm/hr x 9.4 = 9.4 lb/hr; condensate = 9.4 x ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-coil-total-load` | Cooling Coil Total Load from Enthalpy Difference | ASHRAE Fundamentals; spec-v376 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-tower` | Cooling Tower Approach and Range | CTI ATC-105 cooling-tower test code; 95 F in / 85 F out / 75 F wet-bulb / 300 gpm / 15 kW fan ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dcv-co2-ventilation` | Demand-Controlled Ventilation Rate from a CO2 Setpoint | Steady-state single-zone CO2 mass bal...; spec-v277 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4753,6 +4755,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1453. Fixture-covered or reference-cadence: 1453 / 1453.
+Tile count: 1454. Fixture-covered or reference-cadence: 1454 / 1454.
 
 <!-- END tile-index-v14 -->

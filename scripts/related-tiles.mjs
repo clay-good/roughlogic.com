@@ -752,6 +752,7 @@ const RELATED = {
   "combustion-lambda": ["excess-air-o2", "co-air-free", "flue-gas-combustion-eff"],
   "oil-burner-firing-rate": ["combustion-lambda", "gas-appliance-demand", "manual-j-heating"],
   "flue-gas-dew-point": ["combustion-lambda", "chimney-draft", "flue-gas-combustion-eff"],
+  "condensing-flue-condensate": ["flue-gas-dew-point", "condensate-drain", "gas-appliance-demand"],
   "duct-friction-static": ["duct-sizing", "static-pressure-hvac", "equivalent-length"],
   "refrigerant-charging": ["refrigerant-pt", "superheat-subcool", "refrigerant-charge"],
   "cooling-tower": ["approach-delta-t", "wet-bulb-psychrometer", "chiller-tons"],

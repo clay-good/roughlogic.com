@@ -207,7 +207,7 @@ const _TILES = [
   ["draft-hood-dilution", "C"],
   ["chimney-draft", "C"], ["chimney-height-for-draft", "C"],
   ["flue-gas-combustion-eff", "C"],
-  ["combustion-lambda", "C"], ["oil-burner-firing-rate", "C"], ["flue-gas-dew-point", "C"],
+  ["combustion-lambda", "C"], ["oil-burner-firing-rate", "C"], ["flue-gas-dew-point", "C"], ["condensing-flue-condensate", "C"],
   ["refrigerant-charging", "C"], ["cooling-tower", "C"], ["insulation-heat-loss", "C"],
   ["chiller-tons", "C"], ["hx-lmtd-ntu", "C"], ["air-changes-hour", "C"],
   ["boiler-pipe-sizing", "C"], ["compressor-short-cycle", "C"],

@@ -1115,3 +1115,40 @@ HVACSERVICE_RENDERERS["flue-gas-dew-point"] = _simpleRenderer({
   ],
   compute: computeFlueGasDewPoint,
 });
+
+// ===================== spec-v1005: condensing appliance flue condensate rate =====================
+// dims: in { args: dimensionless } out: { water_produced_lb_hr: dimensionless, condensate_gph: dimensionless }
+export function computeCondensingFlueCondensate({ input_btu_hr = 100000, water_lb_per_therm = 9.4, condensing_fraction = 0.85 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(input_btu_hr > 0)) return { error: "Fuel input must be positive (BTU/hr)." };
+  if (!(water_lb_per_therm > 0)) return { error: "Water produced per therm must be positive (lb)." };
+  if (!(condensing_fraction > 0 && condensing_fraction <= 1)) return { error: "Condensing fraction must be between 0 and 1." };
+  // Water made by combustion (per therm x therms/hr), times the fraction actually condensed, into gallons.
+  const therms_per_hr = input_btu_hr / 100000;
+  const water_produced_lb_hr = therms_per_hr * water_lb_per_therm;
+  const condensate_lb_hr = water_produced_lb_hr * condensing_fraction;
+  const condensate_gph = condensate_lb_hr / 8.34;
+  if (![water_produced_lb_hr, condensate_gph].every(Number.isFinite)) return { error: "Condensate math is not a finite value." };
+  return {
+    water_produced_lb_hr,
+    condensate_gph,
+    note: "The condensate a high-efficiency condensing furnace, boiler, or water heater drains -- the number that sizes the drain, the condensate pump, and the neutralizer. Burning natural gas MAKES water (CH4 + 2 O2 -> CO2 + 2 H2O), about 9.4 lb of water per therm (100,000 BTU) of gas: a 100,000 BTU/hr appliance produces roughly 9.4 lb of water vapor an hour. A condensing appliance cools the flue gas below its dew point (see flue-gas-dew-point) to recover the water's latent heat, condensing a large fraction of that vapor -- typically about 0.8-0.9 at design return-water temperatures. So the drained condensate is the water produced times the condensing fraction, converted to gallons at 8.34 lb/gal: 9.4 x 0.85 / 8.34 is about 0.96 gph, so a 100,000 BTU/hr unit drains roughly a gallon an hour, and a 150,000 BTU/hr boiler about 1.5 gph. The condensate is mildly acidic (carbonic acid, pH ~3-5), so codes increasingly require a limestone/marble neutralizer before it enters cast-iron or copper drains or a septic system, and the drain must be trapped, pitched, and freeze-protected. The 9.4 lb/therm depends on the actual gas composition, and the condensing fraction on the return-water temperature (lower return = more condensate). A sizing aid; the appliance's rated condensate output, the local plumbing code (drain, trap, neutralizer), and the manufacturer's instructions govern.",
+  };
+}
+
+export const condensingFlueCondensateExample = { inputs: { input_btu_hr: 100000, water_lb_per_therm: 9.4, condensing_fraction: 0.85 } };
+
+HVACSERVICE_RENDERERS["condensing-flue-condensate"] = _simpleRenderer({
+  citation: "Citation: condensing appliance flue condensate rate, by name. Natural gas makes ~9.4 lb water per therm; condensate = (input/100,000) x water/therm x condensing fraction / 8.34 lb/gal. ~0.96 gph per 100,000 BTU/hr at an 0.85 fraction. The condensate is mildly acidic (pH ~3-5) -- codes may require a neutralizer. The rated condensate output, the plumbing code (drain/trap/neutralizer), and the manufacturer govern.",
+  example: condensingFlueCondensateExample.inputs,
+  fields: [
+    { key: "input_btu_hr", label: "Fuel input (BTU/hr)", kind: "number", default: 100000 },
+    { key: "water_lb_per_therm", label: "Water produced per therm (lb, ~9.4 nat gas)", kind: "number", default: 9.4 },
+    { key: "condensing_fraction", label: "Condensing fraction (0-1, ~0.85)", kind: "number", default: 0.85 },
+  ],
+  outputs: [
+    { key: "w", id: "cfc-out-w", label: "Water produced", value: (r) => fmt(r.water_produced_lb_hr, 1) + " lb/hr" },
+    { key: "c", id: "cfc-out-c", label: "Condensate drained", value: (r) => fmt(r.condensate_gph, 2) + " gph" },
+  ],
+  compute: computeCondensingFlueCondensate,
+});
