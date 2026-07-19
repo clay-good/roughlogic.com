@@ -853,6 +853,7 @@ export const COMPUTE_MAP = {
   "drainage-board-takeoff": { module: "../../calc-construction.js", fn: "computeDrainageBoardTakeoff" },
   "roof-ballast-weight": { module: "../../calc-construction.js", fn: "computeRoofBallastWeight" },
   "curing-compound-coverage": { module: "../../calc-concrete.js", fn: "computeCuringCompoundCoverage" },
+  "concrete-premix-bags": { module: "../../calc-concrete.js", fn: "computeConcretePremixBags" },
   "concrete-isolation-joint": { module: "../../calc-concrete.js", fn: "computeConcreteIsolationJoint" },
   "concrete-stair-volume": { module: "../../calc-concrete.js", fn: "computeConcreteStairVolume" },
   "slab-dowel-schedule": { module: "../../calc-concrete.js", fn: "computeSlabDowelSchedule" },

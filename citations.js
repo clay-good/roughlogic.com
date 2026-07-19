@@ -11202,6 +11202,17 @@ export const CITATIONS = {
       { name: "End-post rule", value: "straight run posts = sections + 1; corners/ends/gates added by eye", source: "fence-layout practice" },
     ],
   },
+  "concrete-premix-bags": {
+    formula: "volume_ft3 = length_ft x width_ft x (thickness_in / 12); bags = ceil(volume_ft3 x (1 + waste_pct/100) / bag_yield_ft3). Bag yield ~0.0075 ft^3/lb: 80 lb ~0.60, 60 lb ~0.45, 50 lb ~0.375, 40 lb ~0.30.",
+    edition: "Bagged concrete count for a small pour (manufacturer bag yield; Quikrete / Sakrete published yields), by name; the printed bag yield, the real formwork dimensions, and the mix design govern.",
+    freeAccess: "The takeoff is public first-principles (pour volume over the per-bag yield); the per-bag yield is printed on every bag of concrete.",
+    governance: GOVERNANCE.general,
+    editionNote: "For a small concrete pour -- a pad, a footing, a curb, or an equipment base -- it is cheaper and simpler to mix bags on site than to order a ready-mix truck, so the question is how many bags to buy. The pour volume is length times width times thickness, with all three in feet, so a thickness given in inches is divided by 12. The number of bags is that volume, plus a waste allowance, divided by the volume one bag yields. Bagged concrete yields a volume that scales with the dry weight at roughly 0.0075 cubic feet per pound, so an 80-pound bag makes about 0.60 cubic feet, a 60-pound bag about 0.45, a 50-pound bag about 0.375, and a 40-pound bag about 0.30. A 4-foot by 4-foot pad poured 4 inches thick is 4 times 4 times four-twelfths, or 5.33 cubic feet, so with a 10% waste allowance it takes the ceiling of 5.33 times 1.10 divided by 0.60, which is 10 of the 80-pound bags, or 14 of the 60-pound bags. The count is always rounded up, because a partial bag still means opening a whole one, and it is prudent to add extra for uneven or over-excavated subgrade, spillage, and mixing loss. This complements the other concrete tiles: post-hole-concrete handles the cylindrical hole-minus-post case, and the main concrete tile gives cubic yards for a ready-mix order; past roughly one cubic yard, about 45 of the 80-pound bags, ready-mix is usually cheaper and far less labor. This is a material-ordering estimate; the exact yield printed on the specific product, the true formwork dimensions, and the concrete mix design govern.",
+    assumptions: [
+      { name: "Volume over bag yield", value: "volume = L x W x (thickness_in/12); bags = ceil(volume x (1 + waste) / bag yield); round up", source: "material-takeoff practice" },
+      { name: "Bag yields", value: "~0.0075 ft^3/lb: 80 lb ~0.60, 60 lb ~0.45, 50 lb ~0.375, 40 lb ~0.30; past ~1 cu yd (~45 of the 80 lb bags) use ready-mix", source: "manufacturer bag yield (Quikrete / Sakrete)" },
+    ],
+  },
   "post-hole-concrete": {
     formula: "Per hole = pi x (dia/2)^2 x depth / 1728 - post_side^2 x depth / 1728; total = per hole x posts; bags = ceil(total cu ft / bag yield).",
     edition: "Cylinder-volume geometry less post displacement; bagged-concrete yields ~0.45 cu ft (60-lb) / 0.60 cu ft (80-lb).",

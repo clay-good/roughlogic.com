@@ -28613,3 +28613,23 @@ test("bounds: spec-v998 computeSailboatPerformanceRatios pins SA/D and DLR", () 
   assert.ok("error" in _v998({ sail_area_sqft: 500, displacement_lb: 10000, lwl_ft: 0 }));
   assert.ok("error" in _v998({ sail_area_sqft: Infinity, displacement_lb: 10000, lwl_ft: 30 }));
 });
+
+import { computeConcretePremixBags as _v999 } from "../../calc-concrete.js";
+
+test("bounds: spec-v999 computeConcretePremixBags pins the pour volume and bag count", () => {
+  const r = _v999({ length_ft: 4, width_ft: 4, thickness_in: 4, bag_yield_ft3: 0.60, waste_pct: 10 });
+  assert.ok(Math.abs(r.volume_ft3 - 5.3333) < 1e-3); // 4*4*4/12
+  assert.strictEqual(r.bags, 10); // ceil(5.333*1.1/0.60) = ceil(9.78)
+  // 60 lb bags yield less, so more bags for the same pour.
+  assert.strictEqual(_v999({ length_ft: 4, width_ft: 4, thickness_in: 4, bag_yield_ft3: 0.45, waste_pct: 10 }).bags, 14); // ceil(13.04)
+  // Ceil boundary: exactly one bag's worth at 0 waste = 1 bag; a hair over = 2.
+  assert.strictEqual(_v999({ length_ft: 1, width_ft: 0.6, thickness_in: 12, bag_yield_ft3: 0.60, waste_pct: 0 }).bags, 1); // 0.6 ft^3 exactly
+  assert.strictEqual(_v999({ length_ft: 1, width_ft: 0.61, thickness_in: 12, bag_yield_ft3: 0.60, waste_pct: 0 }).bags, 2); // 0.61 ft^3
+  // More waste or a thicker pour can only add bags.
+  assert.ok(_v999({ length_ft: 4, width_ft: 4, thickness_in: 6, bag_yield_ft3: 0.60, waste_pct: 10 }).bags > r.bags);
+  // Error seams.
+  assert.ok("error" in _v999({ length_ft: 0, width_ft: 4, thickness_in: 4, bag_yield_ft3: 0.60, waste_pct: 10 }));
+  assert.ok("error" in _v999({ length_ft: 4, width_ft: 4, thickness_in: 4, bag_yield_ft3: 0, waste_pct: 10 }));
+  assert.ok("error" in _v999({ length_ft: 4, width_ft: 4, thickness_in: 4, bag_yield_ft3: 0.60, waste_pct: -5 }));
+  assert.ok("error" in _v999({ length_ft: Infinity, width_ft: 4, thickness_in: 4, bag_yield_ft3: 0.60, waste_pct: 10 }));
+});

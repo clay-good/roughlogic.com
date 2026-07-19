@@ -27015,6 +27015,60 @@
    }
   },
   {
+   "tile_id": "concrete-premix-bags",
+   "source_publisher": "Bagged (premix) concrete count for a small pour",
+   "source_title": "4 x 4 ft pad, 4 in thick, 80 lb bags (0.60 ft^3), 10% waste -> 5.33 ft^3, 10 bags",
+   "source_edition_or_year": "spec-v999 worked example (machine-verified)",
+   "source_section_or_page": "volume = 4 x 4 x 4/12 = 5.333; bags = ceil(5.333 x 1.10 / 0.60) = ceil(9.78) = 10",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "length_ft": 4,
+    "width_ft": 4,
+    "thickness_in": 4,
+    "bag_yield_ft3": 0.60,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 5.333,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "bags": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-premix-bags",
+   "source_publisher": "Bagged (premix) concrete count for a small pour",
+   "source_title": "cross-check: same 5.33 ft^3 pad with 60 lb bags (0.45 ft^3), 10% waste -> 14 bags",
+   "source_edition_or_year": "spec-v999 worked example (machine-verified)",
+   "source_section_or_page": "bags = ceil(5.333 x 1.10 / 0.45) = ceil(13.04) = 14 (60 lb bags yield less, so more bags)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "length_ft": 4,
+    "width_ft": 4,
+    "thickness_in": 4,
+    "bag_yield_ft3": 0.45,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "bags": {
+     "value": 14,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "post-hole-concrete",
    "source_publisher": "Cylinder-volume geometry less post displacement; bagged-concrete yields ~0.45 cu ft (60-lb) / 0.60 cu ft (80-lb).",
    "source_title": "Per hole = pi x (dia/2)^2 x depth / 1728 - post_side^2 x depth / 1728; total = per hole x posts; bags = ceil(total cu ft / bag yield).",

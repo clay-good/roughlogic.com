@@ -1602,3 +1602,43 @@ CONCRETE_RENDERERS["slab-dowel-schedule"] = _simpleRenderer({
   ],
   compute: computeSlabDowelSchedule,
 });
+
+// ===================== spec-v999: bagged (premix) concrete count for a small pour =====================
+// dims: in { args: dimensionless } out: { volume_ft3: dimensionless, bags: dimensionless }
+export function computeConcretePremixBags({ length_ft = 4, width_ft = 4, thickness_in = 4, bag_yield_ft3 = 0.60, waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(length_ft > 0)) return { error: "Length must be positive (ft)." };
+  if (!(width_ft > 0)) return { error: "Width must be positive (ft)." };
+  if (!(thickness_in > 0)) return { error: "Thickness must be positive (in)." };
+  if (!(bag_yield_ft3 > 0)) return { error: "Bag yield must be positive (ft^3 per bag)." };
+  if (!(waste_pct >= 0)) return { error: "Waste percent cannot be negative." };
+  // Slab/pad volume, then bags at the mix's per-bag yield with a waste allowance.
+  const volume_ft3 = length_ft * width_ft * (thickness_in / 12);
+  const bags = Math.ceil(volume_ft3 * (1 + waste_pct / 100) / bag_yield_ft3);
+  if (![volume_ft3, bags].every(Number.isFinite)) return { error: "Bag-count math is not a finite value." };
+  return {
+    volume_ft3,
+    bags,
+    note: "The number of bags of pre-mixed concrete for a small pour -- a pad, footing, curb, or equipment base -- where ordering ready-mix by the yard makes no sense. The volume is length x width x thickness (all in feet, so a thickness in inches is divided by 12), and the bag count is that volume, plus a waste allowance, divided by the mix's yield per bag. Bagged concrete yields a published volume per bag that scales with the dry weight at about 0.0075 cubic feet per pound: an 80 lb bag makes about 0.60 cubic feet, 60 lb about 0.45, 50 lb about 0.375, and 40 lb about 0.30. A 4 ft x 4 ft pad 4 in thick is 4 x 4 x (4/12) = 5.33 cubic feet, so with 10% waste it takes ceil(5.33 x 1.10 / 0.60) = 10 of the 80 lb bags, or 14 of the 60 lb bags. Round UP -- a partial bag still means opening a whole one -- and add extra for uneven subgrade, spillage, and over-excavation; past roughly 1 cubic yard (about 45 of the 80 lb bags) ready-mix is usually cheaper and faster. A material-ordering estimate; the exact bag yield printed on the product, the real formwork dimensions, and the mix design govern." ,
+  };
+}
+
+export const concretePremixBagsExample = { inputs: { length_ft: 4, width_ft: 4, thickness_in: 4, bag_yield_ft3: 0.60, waste_pct: 10 } };
+
+CONCRETE_RENDERERS["concrete-premix-bags"] = _simpleRenderer({
+  citation: "Citation: bagged (premix) concrete count for a small pour, by name. volume = L x W x (thickness_in/12); bags = ceil(volume x (1 + waste) / bag yield). Bag yield ~0.0075 ft^3/lb: 80 lb ~0.60 ft^3, 60 lb ~0.45, 50 lb ~0.375, 40 lb ~0.30. Round up; past ~1 cu yd (~45 of the 80 lb bags) ready-mix is cheaper. The printed bag yield, the real formwork, and the mix design govern.",
+  example: concretePremixBagsExample.inputs,
+  fields: [
+    { key: "length_ft", label: "Length (ft)", kind: "number", default: 4 },
+    { key: "width_ft", label: "Width (ft)", kind: "number", default: 4 },
+    { key: "thickness_in", label: "Thickness (in)", kind: "number", default: 4 },
+    { key: "bag_yield_ft3", label: "Bag yield (ft^3): 80lb 0.60, 60lb 0.45, 50lb 0.375, 40lb 0.30", kind: "number", default: 0.60 },
+    { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "v", id: "cpb-out-v", label: "Pour volume", value: (r) => fmt(r.volume_ft3, 2) + " ft^3" },
+    { key: "b", id: "cpb-out-b", label: "Bags needed", value: (r) => String(r.bags) + " bags" },
+    { key: "n", id: "cpb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcretePremixBags,
+});

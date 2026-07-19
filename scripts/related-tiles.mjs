@@ -1219,6 +1219,7 @@ const RELATED = {
   "pool-calcium-hardness-dose": ["pool-alkalinity-adjust","langelier-index","pool-chlorine-dose"],
   "fence-estimate": ["post-hole-concrete","equal-spacing","material-quantity"],
   "post-hole-concrete": ["fence-estimate","concrete","deck-beam-post"],
+  "concrete-premix-bags": ["concrete","post-hole-concrete","self-leveler-bags"],
   "thinset-coverage": ["tile-count","flooring-takeoff","mortar-mix"],
   "cement-board-takeoff": ["thinset-coverage","tile-count","drywall-fastener-takeoff"],
   "step-flashing-count": ["roofing-squares","shingle-nails","gutter-downspout-takeoff"],

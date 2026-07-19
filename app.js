@@ -472,7 +472,7 @@ const TOOL_MODULES = (() => {
     // v69 surface prep and coatings
     "coating-coverage-dft", "abrasive-blast",
     // v94 fencing + v96 concrete joints / rebar lap splices
-    "fence-estimate", "post-hole-concrete",
+    "fence-estimate", "post-hole-concrete", "concrete-premix-bags",
     "control-joint-spacing", "rebar-lap-splice",
     // spec-v113 guard and handrail code check (IRC R312 / R311.7.8).
     "guard-handrail-check",

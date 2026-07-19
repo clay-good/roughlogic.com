@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): add concrete-premix-bags tile (spec-v999); 2026-07-18
+
+- New Group E tile `concrete-premix-bags` in calc-concrete.js. Bags of pre-mixed concrete for a small rectangular pour
+  (the complement of post-hole-concrete's cylinder case and the concrete tile's ready-mix cubic yards): volume = L x W
+  x (thickness_in/12); bags = ceil(volume x (1 + waste) / bag yield). Bag yield ~0.0075 ft^3/lb (80 lb ~0.60, 60 lb
+  ~0.45, 50 lb ~0.375, 40 lb ~0.30). A 4 x 4 ft pad, 4 in thick = 5.33 ft^3 -> 10 of the 80 lb bags or 14 of the 60 lb.
+  Past ~1 cu yd, ready-mix is cheaper. Home count 1,447 -> 1,448.
+
 ### feat(marine): add sailboat-performance-ratios tile (spec-v998); 2026-07-18
 
 - New Group K tile `sailboat-performance-ratios` in calc-mechanic.js. Two dimensionless sailing ratios: sail

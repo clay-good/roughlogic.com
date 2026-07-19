@@ -540,7 +540,7 @@ const _TILES = [
   ["pool-salt-dose", "M"], ["pool-calcium-hardness-dose", "M"],
   ["pool-chlorine-dose", "M"], ["pool-heater-btu", "M"], ["pool-heater-size", "M"], ["breakpoint-chlorination", "M"],
   ["fence-estimate", "E"],
-  ["post-hole-concrete", "E"],
+  ["post-hole-concrete", "E"], ["concrete-premix-bags", "E"],
   ["thinset-coverage", "E"], ["cement-board-takeoff", "E"], ["step-flashing-count", "E"],
   ["flooring-takeoff", "E"],
   ["control-joint-spacing", "E"],
