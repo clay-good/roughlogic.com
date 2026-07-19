@@ -553,6 +553,7 @@ export const COMPUTE_MAP = {
   "cattle-stocking-rate": { module: "../../calc-agriculture.js", fn: "computeStockingRate" },
   "cattle-heart-girth-weight": { module: "../../calc-agriculture.js", fn: "computeCattleHeartGirthWeight" },
   "corn-yield-estimate": { module: "../../calc-agriculture.js", fn: "computeCornYieldEstimate" },
+  "dressing-percentage": { module: "../../calc-agriculture.js", fn: "computeDressingPercentage" },
   "grain-bin-capacity": { module: "../../calc-agriculture.js", fn: "computeGrainBin" },
   "grain-bin-height-for-capacity": { module: "../../calc-agriculture.js", fn: "computeGrainBinHeightForCapacity" },
   "bunker-silo-capacity": { module: "../../calc-agriculture.js", fn: "computeBunkerSiloCapacity" },

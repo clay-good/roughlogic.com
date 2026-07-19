@@ -2263,6 +2263,17 @@ export const CITATIONS = {
       { name: "Acre-foot conversion", value: "1 acre-foot = 325,851 US gallons", source: "physical fact" },
     ],
   },
+  "dressing-percentage": {
+    formula: "dressing_pct = 100 x hot_carcass_weight_lb / live_weight_lb; boneless_yield_lb = hot_carcass_weight_lb x cutting_yield_pct / 100.",
+    edition: "Carcass dressing percentage and cutting yield (standard meat-science figures: beef ~60-64%, pork ~72-75%, lamb ~50%; beef cutting yield ~65-70% of the carcass), by name; the processor's certified scale and the cut sheet govern the actual freezer yield.",
+    freeAccess: "The dressing-percentage ratio and cutting-yield fractions are public meat-science practice; the live weight, carcass weight, and cutting yield are the animal's and processor's values.",
+    governance: GOVERNANCE.general,
+    editionNote: "Dressing percentage measures how much of a live slaughter animal ends up as carcass, and it is the starting point for pricing freezer beef, pork, or lamb. It is the hot carcass weight -- the weight of the chilled hanging carcass immediately after slaughter, with the head, hide, feet, and internal organs removed -- divided by the animal's live weight. A 1,200-pound steer that yields a 744-pound carcass dresses at 744 divided by 1,200, or 62.0%, which is typical for beef at roughly 60 to 64%. Pork dresses higher, around 72 to 75%, because the skin and feet remain on the carcass: a 260-pound market hog with a 190-pound carcass dresses at 73.1%. Lamb dresses lower, near 50%. What actually fills the freezer, though, is much less than the carcass weight, because the carcass still contains bone, trim fat, and unavoidable cutting loss. A boneless cutting yield of about 65 to 70% of the carcass is common for beef, so the 744-pound carcass produces roughly 744 times 0.67, or about 498 pounds, of cut-and-wrapped boneless meat. Dressing percentage rises with fatter, more heavily muscled, and lighter-gutted animals, and falls with gut fill from a full rumen and with a heavy or muddy hide. This is a pricing and planning aid; the actual live and carcass weights come from the processor's certified scale, and the specific cut sheet chosen, the dry-aging shrink, and the packer or custom locker govern the final freezer yield.",
+    assumptions: [
+      { name: "Dressing and cutting yield", value: "dressing % = hot carcass / live x 100; boneless = carcass x cutting yield; beef 60-64%, pork 72-75%, lamb ~50% dressing; beef cutting yield ~65-70%", source: "standard meat-science figures" },
+      { name: "Freezer yield", value: "boneless take-home is well below the carcass (bone, trim, cutting loss); the processor's scale, cut sheet, and aging shrink govern", source: "custom-processing practice" },
+    ],
+  },
   "corn-yield-estimate": {
     formula: "kernels_per_ear = kernel_rows_around x kernels_per_row; bushels_per_acre = ears_per_thousandth_acre x kernels_per_ear / kernel_factor. Ears counted in 1/1000 acre (17.5 ft of 30-in row); kernel_factor = thousands of kernels per 56-lb bushel (~90).",
     edition: "Pre-harvest corn yield, the yield component (ear-count) method (Purdue / Iowa State University Extension), by name; the harvested and moisture-corrected yield is the real number, and the combine and scale govern.",

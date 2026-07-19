@@ -28527,3 +28527,24 @@ test("bounds: spec-v994 computeCornYieldEstimate pins the yield component method
   assert.ok("error" in _v994({ ears_per_thousandth_acre: 32, kernel_rows_around: 16, kernels_per_row: 35, kernel_factor: 0 }));
   assert.ok("error" in _v994({ ears_per_thousandth_acre: Infinity, kernel_rows_around: 16, kernels_per_row: 35, kernel_factor: 90 }));
 });
+
+import { computeDressingPercentage as _v995 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v995 computeDressingPercentage pins the dressing % and freezer yield", () => {
+  const r = _v995({ live_weight_lb: 1200, hot_carcass_weight_lb: 744, cutting_yield_pct: 67 });
+  assert.ok(Math.abs(r.dressing_pct - 62.0) < 1e-9); // 744/1200*100
+  assert.ok(Math.abs(r.boneless_yield_lb - 498.48) < 1e-2); // 744*0.67
+  // Pork cross-check runs higher.
+  const hog = _v995({ live_weight_lb: 260, hot_carcass_weight_lb: 190, cutting_yield_pct: 70 });
+  assert.ok(Math.abs(hog.dressing_pct - 73.077) < 1e-2);
+  assert.ok(hog.dressing_pct > r.dressing_pct);
+  // Boneless yield is always below the carcass weight.
+  assert.ok(r.boneless_yield_lb < 744);
+  // Error seams: non-positive weights, carcass > live, cutting yield out of (0,100], non-finite.
+  assert.ok("error" in _v995({ live_weight_lb: 0, hot_carcass_weight_lb: 744, cutting_yield_pct: 67 }));
+  assert.ok("error" in _v995({ live_weight_lb: 1200, hot_carcass_weight_lb: 0, cutting_yield_pct: 67 }));
+  assert.ok("error" in _v995({ live_weight_lb: 700, hot_carcass_weight_lb: 744, cutting_yield_pct: 67 }));
+  assert.ok("error" in _v995({ live_weight_lb: 1200, hot_carcass_weight_lb: 744, cutting_yield_pct: 0 }));
+  assert.ok("error" in _v995({ live_weight_lb: 1200, hot_carcass_weight_lb: 744, cutting_yield_pct: 120 }));
+  assert.ok("error" in _v995({ live_weight_lb: Infinity, hot_carcass_weight_lb: 744, cutting_yield_pct: 67 }));
+});

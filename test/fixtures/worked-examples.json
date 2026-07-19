@@ -15370,6 +15370,56 @@
    }
   },
   {
+   "tile_id": "dressing-percentage",
+   "source_publisher": "Carcass dressing percentage and freezer yield",
+   "source_title": "1,200 lb steer, 744 lb carcass, 67% cutting yield -> 62.0% dressing, 498 lb boneless",
+   "source_edition_or_year": "spec-v995 worked example (machine-verified)",
+   "source_section_or_page": "dressing = 744/1200 x 100 = 62.0%; boneless = 744 x 0.67 = 498.5 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "live_weight_lb": 1200,
+    "hot_carcass_weight_lb": 744,
+    "cutting_yield_pct": 67
+   },
+   "outputs": {
+    "dressing_pct": {
+     "value": 62.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "boneless_yield_lb": {
+     "value": 498.5,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dressing-percentage",
+   "source_publisher": "Carcass dressing percentage and freezer yield",
+   "source_title": "cross-check: 260 lb hog, 190 lb carcass (skin-on) -> 73.1% dressing (pork runs higher)",
+   "source_edition_or_year": "spec-v995 worked example (machine-verified)",
+   "source_section_or_page": "dressing = 190/260 x 100 = 73.08%",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "live_weight_lb": 260,
+    "hot_carcass_weight_lb": 190,
+    "cutting_yield_pct": 70
+   },
+   "outputs": {
+    "dressing_pct": {
+     "value": 73.08,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "corn-yield-estimate",
    "source_publisher": "Pre-harvest corn yield (yield component / ear-count method)",
    "source_title": "32 ears/1000th acre, 16 rows x 35 kernels, factor 90 -> 560 kernels/ear, 199 bu/acre",

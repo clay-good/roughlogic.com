@@ -3364,3 +3364,40 @@ AGRICULTURE_RENDERERS["corn-yield-estimate"] = _r({
   ],
   compute: computeCornYieldEstimate,
 });
+
+// ===================== spec-v995: carcass dressing percentage =====================
+// dims: in { args: dimensionless } out: { dressing_pct: dimensionless, boneless_yield_lb: dimensionless }
+export function computeDressingPercentage({ live_weight_lb = 1200, hot_carcass_weight_lb = 744, cutting_yield_pct = 67 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(live_weight_lb > 0)) return { error: "Live weight must be positive (lb)." };
+  if (!(hot_carcass_weight_lb > 0)) return { error: "Hot carcass weight must be positive (lb)." };
+  if (!(hot_carcass_weight_lb <= live_weight_lb)) return { error: "Carcass weight cannot exceed the live weight." };
+  if (!(cutting_yield_pct > 0 && cutting_yield_pct <= 100)) return { error: "Cutting yield must be between 0 and 100 percent." };
+  // Dressing % = hot carcass weight / live weight; take-home boneless = carcass x cutting yield.
+  const dressing_pct = hot_carcass_weight_lb / live_weight_lb * 100;
+  const boneless_yield_lb = hot_carcass_weight_lb * cutting_yield_pct / 100;
+  if (![dressing_pct, boneless_yield_lb].every(Number.isFinite)) return { error: "Dressing-percentage math is not a finite value." };
+  return {
+    dressing_pct,
+    boneless_yield_lb,
+    note: "The dressing percentage and take-home meat yield of a slaughter animal, the numbers a producer and a locker use to price freezer beef, pork, or lamb. Dressing percentage is the hot carcass weight (the chilled-hanging carcass right after slaughter, head, hide, feet, and offal removed) divided by the live weight: a 1,200 lb steer yielding a 744 lb carcass dresses at 744 / 1,200 = 62.0%, typical for beef (about 60-64%). Pork runs higher because the skin and feet stay on -- a 260 lb hog with a 190 lb carcass dresses at 73.1% (about 72-75%) -- and lamb runs lower, near 50%. The actual boneless meat that goes in the freezer is far less than the carcass, because the carcass weight still includes bone, trim fat, and cutting loss: a beef cutting yield of about 65-70% of the carcass is common, so the 744 lb carcass gives roughly 744 x 0.67 = 498 lb of cut-and-wrapped boneless meat. Dressing percentage rises with fatter, more muscular, lighter-gutted animals and falls with fill (a full rumen) and heavy hide or mud. A pricing and planning aid; the actual weights come from the processor's certified scale, and the exact cut sheet, aging shrink, and the packer or locker govern the freezer yield.",
+  };
+}
+
+export const dressingPercentageExample = { inputs: { live_weight_lb: 1200, hot_carcass_weight_lb: 744, cutting_yield_pct: 67 } };
+
+AGRICULTURE_RENDERERS["dressing-percentage"] = _r({
+  citation: "Citation: carcass dressing percentage and freezer yield, by name. dressing % = hot carcass weight / live weight x 100; boneless take-home = carcass x cutting yield. Typical dressing: beef 60-64%, pork 72-75%, lamb ~50%; beef cutting yield ~65-70% of the carcass. The processor's certified scale and the cut sheet govern the actual freezer yield.",
+  example: dressingPercentageExample.inputs,
+  fields: [
+    { key: "live_weight_lb", label: "Live weight (lb)", kind: "number", default: 1200 },
+    { key: "hot_carcass_weight_lb", label: "Hot carcass weight (lb)", kind: "number", default: 744 },
+    { key: "cutting_yield_pct", label: "Cutting yield (% of carcass, boneless)", kind: "number", default: 67 },
+  ],
+  outputs: [
+    { key: "d", id: "drp-out-d", label: "Dressing percentage", value: (r) => fmt(r.dressing_pct, 1) + " %" },
+    { key: "b", id: "drp-out-b", label: "Boneless freezer yield", value: (r) => fmt(r.boneless_yield_lb, 0) + " lb" },
+    { key: "n", id: "drp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDressingPercentage,
+});

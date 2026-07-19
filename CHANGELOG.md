@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(agriculture): add dressing-percentage tile (spec-v995); 2026-07-18
+
+- New Group L tile `dressing-percentage` in calc-agriculture.js. Carcass dressing % and freezer meat yield: dressing %
+  = hot carcass weight / live weight; boneless take-home = carcass x cutting yield. A 1,200 lb steer with a 744 lb
+  carcass dresses at 62.0% (498 lb boneless at 67% cutting yield); a 260 lb hog at 190 lb carcass = 73.1% (pork runs
+  higher, skin-on). The processor's scale and cut sheet govern the freezer yield. Home count 1,443 -> 1,444.
+
 ### feat(agriculture): add corn-yield-estimate tile (spec-v994); 2026-07-18
 
 - New Group L tile `corn-yield-estimate` in calc-agriculture.js. Pre-harvest corn yield by the yield component

@@ -937,6 +937,7 @@ const RELATED = {
   "fertigation-injection-rate": ["tank-mix", "sprayer-calibration", "irrigation-requirement"],
   "cattle-heart-girth-weight": ["cattle-stocking-rate", "livestock-dry-matter-intake", "thi-livestock"],
   "corn-yield-estimate": ["crop-yield", "grain-bin-capacity", "grain-shrink-moisture"],
+  "dressing-percentage": ["cattle-heart-girth-weight", "cattle-stocking-rate", "livestock-dry-matter-intake"],
   "cattle-stocking-rate": ["crop-yield", "thi-livestock", "seed-rate"],
   "grain-bin-capacity": ["grain-bin-height-for-capacity", "crop-yield", "seed-rate", "grain-shrink-moisture"],
   "grain-bin-height-for-capacity": ["grain-bin-capacity", "grain-aeration-airflow", "crop-yield"],
