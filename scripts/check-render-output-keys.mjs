@@ -14,11 +14,14 @@
 // output rendered "undefined". This gate makes that a millisecond lint failure.
 //
 // The rule: for every _simpleRenderer whose `compute` returns a resolvable
-// object literal, each `r.KEY` the block reads must be a key that compute
-// returns. Computes whose return can't be resolved statically -- an object
-// spread (`return { ...t }`) or a returned variable (`return out`) -- are
-// skipped, so a clean run is never a false alarm. Standalone Node script,
-// built-ins only. Wired into npm run lint.
+// object shape, each `r.KEY` the block reads must be a key that compute returns.
+// The return shape is resolved from `return { ... }` literals and from a
+// returned local object carrier (`out = { ... }; out.k = ...; return out`); an
+// error passthrough (`const x = computeY(...); if (x.error) return x;`) is
+// ignored since the main literal return carries the output keys. Only a return
+// that stays opaque -- an object spread (`return { ...t }`) or a returned value
+// we cannot resolve -- is skipped, so a clean run is never a false alarm.
+// Standalone Node script, built-ins only. Wired into npm run lint.
 
 import { readFile, readdir } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -40,21 +43,11 @@ function returnInfo(src, fnName) {
   const region = src.slice(p, end < 0 ? src.length : end);
   const keys = new Set();
   let spread = false;
-  let returnsVariable = false;
-  for (const m of region.matchAll(/return\s+([A-Za-z_]\w*)\s*;/g)) {
-    if (m[1] !== "_g") returnsVariable = true; // return out;  (not the guard)
-  }
-  let idx = 0;
-  while ((idx = region.indexOf("return {", idx)) !== -1) {
-    let j = region.indexOf("{", idx);
-    let d = 0;
-    const start = j;
-    for (; j < region.length; j++) {
-      const c = region[j];
-      if (c === "{") d++;
-      else if (c === "}") { d--; if (d === 0) break; }
-    }
-    const body = region.slice(start + 1, j);
+  let unresolvable = false;
+
+  // Add the top-level keys of a `{ ... }` object body to `keys`; sets `spread`
+  // if the body contains an object spread.
+  const addLiteralKeys = (body) => {
     if (/\.\.\./.test(body)) spread = true;
     let depth = 0;
     let tok = "";
@@ -84,10 +77,52 @@ function returnInfo(src, fnName) {
       tok += c;
     }
     flush();
-    idx = start + 1;
+  };
+
+  // Return the body of the first `<open>...<close>` balanced brace group at/after `from`.
+  const braceBody = (from) => {
+    let j = region.indexOf("{", from);
+    if (j < 0) return null;
+    const start = j;
+    let d = 0;
+    for (; j < region.length; j++) {
+      const c = region[j];
+      if (c === "{") d++;
+      else if (c === "}") { d--; if (d === 0) break; }
+    }
+    return region.slice(start + 1, j);
+  };
+
+  // `return { ... }` object literals.
+  let idx = 0;
+  while ((idx = region.indexOf("return {", idx)) !== -1) {
+    addLiteralKeys(braceBody(idx) || "");
+    idx = region.indexOf("{", idx) + 1;
   }
+
+  // `return <var>;` (not the _finiteGuard `return _g;`) -- resolve <var> from its
+  // `<var> = { ... }` object-literal declaration plus any `<var>.KEY = ...`
+  // property assignments. If <var> has no resolvable literal, the return is
+  // opaque, so mark the whole compute unresolvable (skipped by the caller).
+  for (const m of region.matchAll(/return\s+([A-Za-z_]\w*)\s*;/g)) {
+    const v = m[1];
+    if (v === "_g") continue;
+    // `return <var>;` where <var> = someCompute(...) is an error passthrough
+    // (`if (x.error) return x;`) -- it forwards another compute's error object,
+    // not this tile's output shape, so ignore it (the main literal return
+    // carries the real keys). Only an opaque local carrier disqualifies.
+    if (new RegExp("\\b(?:const|let|var)\\s+" + v + "\\s*=\\s*\\w*compute\\w*\\s*\\(").test(region)) continue;
+    const decl = region.match(new RegExp("\\b(?:const|let|var)\\s+" + v + "\\s*=\\s*\\{"));
+    if (decl) {
+      addLiteralKeys(braceBody(region.indexOf(decl[0])) || "");
+      for (const a of region.matchAll(new RegExp("\\b" + v + "\\.(\\w+)\\s*=(?!=)", "g"))) keys.add(a[1]);
+    } else {
+      unresolvable = true;
+    }
+  }
+
   keys.add("error");
-  return { keys, spread, returnsVariable };
+  return { keys, spread, unresolvable };
 }
 
 async function main() {
@@ -115,7 +150,7 @@ async function main() {
       const cm = block.match(/compute:\s*(compute\w+)/);
       if (!cm) continue;
       const info = returnInfo(src, cm[1]);
-      if (!info || info.spread || info.returnsVariable) { skipped++; continue; }
+      if (!info || info.spread || info.unresolvable) { skipped++; continue; }
       for (const m of block.matchAll(/\br\.(\w+)\b/g)) {
         checked++;
         if (!info.keys.has(m[1])) {
@@ -137,7 +172,7 @@ async function main() {
   console.log(
     "check-render-output-keys OK: " + checked + " _simpleRenderer output reference(s) across " +
     modules.length + " calc-* modules resolve to a key their compute returns (" + skipped +
-    " compute(s) skipped: spread or returned-variable returns).",
+    " compute(s) skipped: spread or opaque returns).",
   );
 }
 
