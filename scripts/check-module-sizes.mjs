@@ -66,7 +66,7 @@ const CAPS = {
   // Bumped 7500 -> 10000 when v9 §H.6 sous-vide-pasteurization added
   // the FDA Annex 6 Table A break points + diffusivity table. Per
   // spec-v10 §H.1 the per-tile split is the preferred long-term path.
-  "calc-kitchen.js": 21000, // spec-v782/v787 (19000->21000): +overrun-percent + draft-beer-line-balance; built ~19.8 KB gz, current + ~6% headroom // spec-v537..v539 Group O batch (menu-engineering, kitchen-sanitizer-ppm, drink-abv-dilution) (16000) // v90 2026-06-18 (13000->16000): +3 food-service cost-control tiles (food-cost-percentage, prime-cost, pour-cost); built ~14.5 KB gz; current + ~10% headroom // v20 2026-06-06 (10000)
+  "calc-kitchen.js": 25000, // spec-v1000..v1002 culinary discovery batch 2026-07-18 (21000->25000): +3 Group O tiles (dough-water-temperature, as-purchased-quantity, abv-from-gravity); +headroom // spec-v782/v787 (19000->21000): +overrun-percent + draft-beer-line-balance; built ~19.8 KB gz, current + ~6% headroom // spec-v537..v539 Group O batch (menu-engineering, kitchen-sanitizer-ppm, drink-abv-dilution) (16000) // v90 2026-06-18 (13000->16000): +3 food-service cost-control tiles (food-cost-percentage, prime-cost, pour-cost); built ~14.5 KB gz; current + ~10% headroom // v20 2026-06-06 (10000)
   // Bumped 7500 -> 9000 (v9 §H.4 thi-livestock species tables) and
   // 9000 -> 11000 (v9 §H.3 sprayer-calibration). Per spec-v10 §H.1
   // the per-tile split is the preferred long-term path once the bundle

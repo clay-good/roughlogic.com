@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(kitchen): add dough-water-temperature tile (spec-v1000); 2026-07-18
+
+- New Group O tile `dough-water-temperature` in calc-kitchen.js. Mixing-water temp for a target dough temperature
+  (DDT): water = DDT x N - (other factors + friction); N = 3 (flour, room, friction) or 4 (adds a preferment). Friction
+  factor is the mixer's rise (~0-5 F hand, ~24-30 F spiral). 75 F DDT / 68 flour / 72 room / 24 friction = 61 F water;
+  the 4-factor case (78 DDT, 74 preferment, 26 friction) = 77 F. Flags a below-freezing result (add weighed ice). Home
+  count 1,448 -> 1,449.
+
 ### feat(concrete): add concrete-premix-bags tile (spec-v999); 2026-07-18
 
 - New Group E tile `concrete-premix-bags` in calc-concrete.js. Bags of pre-mixed concrete for a small rectangular pour

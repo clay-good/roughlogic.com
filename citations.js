@@ -595,6 +595,17 @@ export const CITATIONS = {
     ],
   },
 
+  "dough-water-temperature": {
+    formula: "factor_count = preferment_temp_f > 0 ? 4 : 3; water_temp_f = desired_dough_temp_f x factor_count - (flour_temp_f + room_temp_f + friction_factor_f + (preferment used ? preferment_temp_f : 0)).",
+    edition: "Desired dough temperature (DDT) mixing-water calculation (Hamelman, Bread; Bread Bakers Guild of America / San Francisco Baking Institute), by name; the measured friction factor for the specific mixer and batch and the baker's finished-dough temperature reading govern.",
+    freeAccess: "The DDT method is public baking practice; the desired dough temperature, flour and room temperatures, and the mixer's friction factor are the bakery's measured values.",
+    governance: GOVERNANCE.general,
+    editionNote: "Because the speed of fermentation depends strongly on dough temperature, a baker aims for a specific desired dough temperature, or DDT, and hits it by adjusting the one input under real-time control: the mixing water. The method treats the finished dough temperature as the average of a set of temperature 'factors,' so the total of all factors is the DDT times how many there are. Solving for the water gives the DDT times the number of factors, minus every other factor's temperature. A straight dough has three factors -- the flour, the room (which stands in for the ambient and the ingredients equilibrated to it), and the friction of mixing -- so the water temperature is the DDT times three, less the flour, room, and friction temperatures. When a preferment such as a poolish, biga, or levain is added, it becomes a fourth factor and the multiplier becomes four, subtracting the preferment temperature as well. The friction factor is the temperature rise the mechanical action of mixing adds to the dough; it is a property of the specific mixer and batch size, determined once by comparing a measured finished dough temperature against the prediction, and it runs roughly 0 to 5 degrees Fahrenheit for hand mixing and about 24 to 30 for a spiral mixer at speed. To reach a 75-degree DDT with 68-degree flour, a 72-degree room, and a 24-degree friction factor, the water must be 75 times 3 minus the sum 164, or 61 degrees; with a 74-degree preferment and a 78-degree DDT at a 26-degree friction factor, the water is 78 times 4 minus 235, or 77 degrees. If the required water comes out below freezing, part of the water is weighed out and added as ice; if it comes out implausibly hot, the friction factor is almost certainly mis-estimated. This is a working setpoint; the actual measured friction factor for the specific mixer and batch, and the baker's own finished-dough temperature reading, govern.",
+    assumptions: [
+      { name: "DDT water calculation", value: "water = DDT x N - (other factors + friction); N = 3 (flour, room, friction) or 4 (adds a preferment)", source: "Hamelman / Bread Bakers Guild" },
+      { name: "Friction factor", value: "the mixer's temperature rise, measured per mixer/batch: ~0-5 F hand, ~24-30 F spiral; below freezing, add weighed ice", source: "baking practice" },
+    ],
+  },
   "bakers-percentage": {
     formula: "Flour = 100%. Ingredient weight = flour x percent / 100; hydration water = flour x hydration% / 100; total dough = sum of all ingredient weights; total formula % = 100 + sum of the other percentages; per-piece = total / pieces.",
     edition: "Baker's percentage (baker's math) - the standard bakery / pizzeria dough formulation method; first-principles arithmetic, public domain.",

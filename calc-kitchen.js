@@ -1122,3 +1122,43 @@ const renderDraftBeerLineBalance = _r({
   compute: computeDraftBeerLineBalance,
 });
 KITCHEN_RENDERERS["draft-beer-line-balance"] = renderDraftBeerLineBalance;
+
+// ===================== spec-v1000: desired dough temperature (mixing water temp) =====================
+// dims: in { args: dimensionless } out: { water_temp_f: dimensionless, factor_count: dimensionless }
+export function computeDoughWaterTemperature({ desired_dough_temp_f = 75, flour_temp_f = 68, room_temp_f = 72, friction_factor_f = 24, preferment_temp_f = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(desired_dough_temp_f > 0)) return { error: "Desired dough temperature must be positive (F)." };
+  if (!(friction_factor_f >= 0)) return { error: "Friction factor cannot be negative (F)." };
+  const usePreferment = preferment_temp_f > 0;
+  const factor_count = usePreferment ? 4 : 3;
+  // Water temp = DDT x N minus the sum of the other N-1 temperature factors and the friction factor.
+  const known = flour_temp_f + room_temp_f + friction_factor_f + (usePreferment ? preferment_temp_f : 0);
+  const water_temp_f = desired_dough_temp_f * factor_count - known;
+  if (!Number.isFinite(water_temp_f)) return { error: "Water-temperature math is not a finite value." };
+  const practicality = water_temp_f < 33 ? "Below freezing -- use ice water (weigh ice as part of the water) or cool the flour/room." : water_temp_f > 100 ? "Very warm -- verify the friction factor; hot tap water may not reach it." : "";
+  return {
+    water_temp_f,
+    factor_count,
+    practicality,
+    note: "The temperature of the mixing water to hit a target finished dough temperature (DDT), the calculation a baker runs before every mix because fermentation speed depends on dough temperature. The DDT is the sum of the temperature 'factors' that go into the dough, so the water -- the one factor the baker controls -- is the DDT multiplied by the number of factors, minus all the other known temperatures. In a straight dough there are three factors (flour, room, and the friction of mixing), so water = DDT x 3 - (flour + room + friction). Add a preferment (a poolish, biga, or levain) and there are four factors: water = DDT x 4 - (flour + room + preferment + friction). The FRICTION FACTOR is the temperature rise the mixer imparts, measured once for a given mixer and batch: roughly 0-5 F for hand mixing, and about 24-30 F for a spiral mixer at speed. To reach a 75 F DDT with 68 F flour, a 72 F room, and a 24 F friction factor, the water must be 75 x 3 - (68 + 72 + 24) = 61 F. With a 74 F preferment and a 78 F DDT at a 26 F friction factor, water = 78 x 4 - (65 + 70 + 74 + 26) = 77 F. If the answer comes out below freezing, part of the water is added as weighed ICE; if it comes out very hot, the friction factor is probably wrong. A working setpoint; the actual measured friction factor for the specific mixer and batch, and the baker's finished-dough temperature reading, govern.",
+  };
+}
+
+export const doughWaterTemperatureExample = { inputs: { desired_dough_temp_f: 75, flour_temp_f: 68, room_temp_f: 72, friction_factor_f: 24, preferment_temp_f: 0 } };
+
+KITCHEN_RENDERERS["dough-water-temperature"] = _r({
+  citation: "Citation: desired dough temperature (DDT) mixing-water calculation (Hamelman / Bread Bakers Guild), by name. water = DDT x N - (sum of the other factors + friction); N = 3 (flour, room, friction) or 4 (adds a preferment). Friction factor ~0-5 F hand, ~24-30 F spiral mixer, measured per mixer. If below freezing, add weighed ice. The measured friction factor and the finished-dough reading govern.",
+  example: doughWaterTemperatureExample.inputs,
+  fields: [
+    { key: "desired_dough_temp_f", label: "Desired dough temp DDT (F)", kind: "number", default: 75 },
+    { key: "flour_temp_f", label: "Flour temp (F)", kind: "number", default: 68 },
+    { key: "room_temp_f", label: "Room temp (F)", kind: "number", default: 72 },
+    { key: "friction_factor_f", label: "Friction factor (F, ~24-30 spiral, 0-5 hand)", kind: "number", default: 24 },
+    { key: "preferment_temp_f", label: "Preferment temp (F, 0 if none)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "w", id: "dwt-out-w", label: "Mixing water temperature", value: (r) => fmt(r.water_temp_f, 0) + " F (" + r.factor_count + "-factor)" },
+    { key: "n", id: "dwt-out-n", label: "Note", value: (r) => (r.practicality ? r.practicality + " " : "") + r.note },
+  ],
+  compute: computeDoughWaterTemperature,
+});

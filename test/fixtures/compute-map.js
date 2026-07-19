@@ -51,6 +51,7 @@ export const COMPUTE_MAP = {
   "search-probability": { module: "../../calc-field.js", fn: "computeSearchProbability" },
   "brine-cure": { module: "../../calc-kitchen.js", fn: "computeBrineCure" },
   "bakers-percentage": { module: "../../calc-kitchen.js", fn: "computeBakersPercentage" },
+  "dough-water-temperature": { module: "../../calc-kitchen.js", fn: "computeDoughWaterTemperature" },
   "power-distro": { module: "../../calc-stage.js", fn: "computePowerDistro" },
   "weir-flow": { module: "../../calc-treatment.js", fn: "computeWeirFlow" },
   "weir-head-from-flow": { module: "../../calc-treatment.js", fn: "computeWeirHeadFromFlow" },

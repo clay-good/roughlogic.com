@@ -1119,7 +1119,7 @@ const TOOL_MODULES = (() => {
     "sous-vide-pasteurization",
   
     // v20
-    "brine-cure", "bakers-percentage",
+    "brine-cure", "bakers-percentage", "dough-water-temperature",
     // v90 food-service cost control
     "food-cost-percentage", "prime-cost", "pour-cost",
     // spec-v537

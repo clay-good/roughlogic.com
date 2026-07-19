@@ -132,6 +132,7 @@ const RELATED = {
   "search-probability": ["backcountry-needs", "bearing-conversion", "pacing-distance"],
   "brine-cure": ["recipe-scale", "sous-vide-pasteurization", "yield-ep"],
   "bakers-percentage": ["recipe-scale", "plate-cost", "yield-ep"],
+  "dough-water-temperature": ["bakers-percentage", "recipe-scale", "sous-vide-pasteurization"],
   "power-distro": ["neutral-imbalance", "dmx-planner", "rigging-check"],
   "weir-flow": ["weir-head-from-flow", "detention-time", "pump-eff-w2w", "manning-slope"],
   "weir-head-from-flow": ["weir-flow", "detention-time", "manning-slope", "channel-normal-depth"],

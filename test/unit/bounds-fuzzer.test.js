@@ -28633,3 +28633,25 @@ test("bounds: spec-v999 computeConcretePremixBags pins the pour volume and bag c
   assert.ok("error" in _v999({ length_ft: 4, width_ft: 4, thickness_in: 4, bag_yield_ft3: 0.60, waste_pct: -5 }));
   assert.ok("error" in _v999({ length_ft: Infinity, width_ft: 4, thickness_in: 4, bag_yield_ft3: 0.60, waste_pct: 10 }));
 });
+
+import { computeDoughWaterTemperature as _v1000 } from "../../calc-kitchen.js";
+
+test("bounds: spec-v1000 computeDoughWaterTemperature pins the DDT water calc", () => {
+  const r = _v1000({ desired_dough_temp_f: 75, flour_temp_f: 68, room_temp_f: 72, friction_factor_f: 24, preferment_temp_f: 0 });
+  assert.strictEqual(r.factor_count, 3);
+  assert.ok(Math.abs(r.water_temp_f - 61) < 1e-9); // 75*3 - 164
+  // 4-factor with a preferment.
+  const p = _v1000({ desired_dough_temp_f: 78, flour_temp_f: 65, room_temp_f: 70, friction_factor_f: 26, preferment_temp_f: 74 });
+  assert.strictEqual(p.factor_count, 4);
+  assert.ok(Math.abs(p.water_temp_f - 77) < 1e-9); // 78*4 - 235
+  // A higher friction factor lowers the required water temp; a warmer room lowers it too.
+  assert.ok(_v1000({ desired_dough_temp_f: 75, flour_temp_f: 68, room_temp_f: 72, friction_factor_f: 30, preferment_temp_f: 0 }).water_temp_f < r.water_temp_f);
+  // Below-freezing result flags ice.
+  const cold = _v1000({ desired_dough_temp_f: 70, flour_temp_f: 85, room_temp_f: 90, friction_factor_f: 30, preferment_temp_f: 0 });
+  assert.ok(cold.water_temp_f < 33);
+  assert.ok(/ice/.test(cold.practicality));
+  // Error seams.
+  assert.ok("error" in _v1000({ desired_dough_temp_f: 0, flour_temp_f: 68, room_temp_f: 72, friction_factor_f: 24, preferment_temp_f: 0 }));
+  assert.ok("error" in _v1000({ desired_dough_temp_f: 75, flour_temp_f: 68, room_temp_f: 72, friction_factor_f: -1, preferment_temp_f: 0 }));
+  assert.ok("error" in _v1000({ desired_dough_temp_f: Infinity, flour_temp_f: 68, room_temp_f: 72, friction_factor_f: 24, preferment_temp_f: 0 }));
+});

@@ -19943,6 +19943,66 @@
    }
   },
   {
+   "tile_id": "dough-water-temperature",
+   "source_publisher": "Desired dough temperature (DDT) mixing water (Hamelman / BBGA)",
+   "source_title": "3-factor: DDT 75, flour 68, room 72, friction 24 -> 61 F mixing water",
+   "source_edition_or_year": "spec-v1000 worked example (machine-verified)",
+   "source_section_or_page": "water = 75 x 3 - (68 + 72 + 24) = 225 - 164 = 61 F",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "desired_dough_temp_f": 75,
+    "flour_temp_f": 68,
+    "room_temp_f": 72,
+    "friction_factor_f": 24,
+    "preferment_temp_f": 0
+   },
+   "outputs": {
+    "water_temp_f": {
+     "value": 61,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "factor_count": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dough-water-temperature",
+   "source_publisher": "Desired dough temperature (DDT) mixing water (Hamelman / BBGA)",
+   "source_title": "4-factor (with preferment): DDT 78, flour 65, room 70, preferment 74, friction 26 -> 77 F",
+   "source_edition_or_year": "spec-v1000 worked example (machine-verified)",
+   "source_section_or_page": "water = 78 x 4 - (65 + 70 + 74 + 26) = 312 - 235 = 77 F",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "desired_dough_temp_f": 78,
+    "flour_temp_f": 65,
+    "room_temp_f": 70,
+    "friction_factor_f": 26,
+    "preferment_temp_f": 74
+   },
+   "outputs": {
+    "water_temp_f": {
+     "value": 77,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "factor_count": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "bakers-percentage",
    "source_publisher": "Baker's percentage (baker's math)",
    "source_title": "ingredient = flour x percent / 100; total dough = sum; per-piece = total / pieces",

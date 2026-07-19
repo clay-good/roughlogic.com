@@ -272,7 +272,7 @@ test("Group O audit coverage: every kitchen tile id has a CITATIONS entry", asyn
   const re = /\{ id: "([a-z0-9-]+)"/g;
   let m;
   while ((m = re.exec(groupOBlock)) !== null) ids.push(m[1]);
-  assert.ok(ids.length === 8, "expected 8 Group O tile ids, got " + ids.length);
+  assert.ok(ids.length === 9, "expected 9 Group O tile ids, got " + ids.length);
   for (const id of ids) {
     assert.ok(CITATIONS[id], "Group O tile '" + id + "' missing CITATIONS entry");
   }

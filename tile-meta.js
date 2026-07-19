@@ -95,7 +95,7 @@ const _TILES = [
   // spec-v531 units-of-production depreciation
   ["units-of-production-depr", "R"],
   ["search-probability", "P"],
-  ["brine-cure", "O"], ["bakers-percentage", "O"],
+  ["brine-cure", "O"], ["bakers-percentage", "O"], ["dough-water-temperature", "O"],
   ["power-distro", "N"],
   ["weir-flow", "M"], ["weir-head-from-flow", "M"],
   ["langelier-index", "M"],
