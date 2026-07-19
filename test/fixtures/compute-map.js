@@ -406,6 +406,7 @@ export const COMPUTE_MAP = {
   "master-stream": { module: "../../calc-fire.js", fn: "computeMasterStreamReach" },
   "required-fire-flow": { module: "../../calc-fire.js", fn: "computeRequiredFireFlow" },
   "yield-ep": { module: "../../calc-kitchen.js", fn: "computeYieldEP" },
+  "as-purchased-quantity": { module: "../../calc-kitchen.js", fn: "computeAsPurchasedQuantity" },
   "cooling-curve": { module: "../../calc-kitchen.js", fn: "computeCoolingCurve" },
   "time-alignment": { module: "../../calc-stage.js", fn: "computeTimeAlignment" },
   "slope-avalanche": { module: "../../calc-field.js", fn: "computeSlopeAvalanche" },

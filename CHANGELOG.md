@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(kitchen): add as-purchased-quantity tile (spec-v1001); 2026-07-18
+
+- New Group O tile `as-purchased-quantity` in calc-kitchen.js. The purchasing inverse of yield-ep: how much to buy for
+  a needed edible portion. AP = EP needed / yield (always divide, so the buy exceeds what you serve). 20 lb EP
+  tenderloin at 75% = 26.67 lb; 10 lb EP onion at 88% = 11.36 lb; a 50% yield doubles the buy. Optional unit weight
+  gives units to order. A yield test on the real product governs. Home count 1,449 -> 1,450.
+
 ### feat(kitchen): add dough-water-temperature tile (spec-v1000); 2026-07-18
 
 - New Group O tile `dough-water-temperature` in calc-kitchen.js. Mixing-water temp for a target dough temperature

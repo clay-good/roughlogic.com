@@ -1113,7 +1113,7 @@ const TOOL_MODULES = (() => {
   ]);
   // v4 Group O: Kitchen and Food Service.
   declare("./calc-kitchen.js", "KITCHEN_RENDERERS", [
-    "recipe-scale", "yield-ep", "cooling-curve",
+    "recipe-scale", "yield-ep", "as-purchased-quantity", "cooling-curve",
     "plate-cost", "pan-conversion",
     // v9
     "sous-vide-pasteurization",

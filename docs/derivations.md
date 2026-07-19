@@ -2324,6 +2324,7 @@ cross-check.
 | calc-hvacsystems.js | `computeValveAuthority` | `{ valve_pressure_drop_psi = 5, controlled_circuit_drop_psi = 3 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeVavBoxAirflow` | `{ zone_sensible_btuh = 0, supply_dt_f = 0, ventilation_cfm = 0, turndown = 0....` | _ | _ | _ |
 | calc-hvacsystems.js | `computeWindowSolarHeatGain` | `{ area_ft2 = 0, shgc = 0, psf = 0, u_factor = 0, cltd_f = 0 } = {}` | _ | _ | _ |
+| calc-kitchen.js | `computeAsPurchasedQuantity` | `{ ep_quantity_needed = 20, yield_pct = 75, unit_weight = 0 } = {}` | _ | _ | _ |
 | calc-kitchen.js | `computeBakersPercentage` | `{ flour_g = 0, hydration_pct = 0, salt_pct = 0, yeast_pct = 0, other_pct = 0,...` | _ | _ | _ |
 | calc-kitchen.js | `computeBrineCure` | `{ mode = "brine", water_g = 0, salt_g = 0, meat_g = 0, cure_g = 0, target_pct...` | _ | _ | _ |
 | calc-kitchen.js | `computeCoolingCurve` | `{ start_F = 135, ambient_F = 70, container = "full_pan_4in", product_type = "...` | _ | _ | _ |
@@ -3110,7 +3111,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1696.
+Row count: 1697.
 
 <!-- END function-corpus-v14 -->
 
@@ -4524,10 +4525,11 @@ per spec-v14 §13.1 second paragraph.
 | `truss-capacity` | Truss Point Load and Span Capacity | Tomcat 16 in box truss published tech...; 16 in box / 40 ft span / 200 + 400 + 200 lb point loads -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `winch-fleet-angle` | Winch Drum Fleet Angle | Winch drum fleet angle (Wire Rope Use...; 6 in offset over a 240 in lead -> atan(0.025) = 1.43 deg,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group O Kitchen (17 tiles)
+### Group O Kitchen (18 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
+| `as-purchased-quantity` | As-Purchased Quantity from Edible Portion | As-purchased quantity from edible por...; AP = EP / yield = 20 / 0.75 = 26.67 lb (always divide; th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bakers-percentage` | Baker's Percentage | Baker's percentage (baker's math); flour 1000 g, 65% hydration, 2% salt, 1% yeast, 4 pieces ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `brine-cure` | Brine / Cure Concentration | Mass-fraction chemistry + USDA FSIS 9...; equilibrium: meat 1000 g, salt 25 g, cure 2.5 g -> 2.5% s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-curve` | Food Safety Cooling Curve | FDA Food Code 2022 (project bundled t...; Full 4 in pan / thick liquid / start 135 F / ambient 70 F... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4745,6 +4747,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1449. Fixture-covered or reference-cadence: 1449 / 1449.
+Tile count: 1450. Fixture-covered or reference-cadence: 1450 / 1450.
 
 <!-- END tile-index-v14 -->

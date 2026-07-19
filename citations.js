@@ -5106,6 +5106,17 @@ export const CITATIONS = {
       { name: "Egg weight", value: "50 g per large egg (USDA)", source: "USDA grading standards for shell eggs" },
     ],
   },
+  "as-purchased-quantity": {
+    formula: "ap_quantity = ep_quantity_needed / (yield_pct / 100); ap_units = unit_weight > 0 ? ap_quantity / unit_weight : n/a.",
+    edition: "As-purchased quantity from edible-portion needed (standard culinary math; CIA The Professional Chef; Labensky, On Cooking; ServSafe), by name; the actual yield varies with grade, season, and trimming, so a yield test on the real product governs.",
+    freeAccess: "The as-purchased-quantity relation is public culinary math (the inverse of yield); the edible-portion amount needed, the yield percentage, and the purchase-unit weight are the kitchen's values.",
+    governance: GOVERNANCE.general,
+    editionNote: "Kitchens buy ingredients as-purchased -- whole, untrimmed, bone-in -- but serve them as edible portions, and the two weights differ because trimming, peeling, boning, and cooking loss all remove weight. The yield percentage is the fraction of the as-purchased weight that survives to the plate. This calculation answers the purchasing question, which is the inverse of the more familiar yield calculation that starts from a known as-purchased weight: to find how much to buy for a needed edible-portion amount, you divide the edible-portion quantity by the yield expressed as a fraction. Because the yield is always less than one, dividing by it always produces a purchase quantity larger than what will be served, and the lower the yield the larger the gap -- a 50% yield doubles the amount that must be bought. To plate 20 pounds of trimmed beef tenderloin at a 75% yield, the kitchen must purchase 20 divided by 0.75, or 26.67 pounds; to end up with 10 pounds of diced onion at an 88% yield takes 10 divided by 0.88, or 11.36 pounds as purchased. When the ingredient is bought in a fixed unit -- a case, a bag, or an each of known weight -- dividing the as-purchased quantity by that unit weight gives the number of units to order, which in practice is rounded up. This is a purchasing estimate; the true yield of any given product varies with its grade, the season, and how aggressively the cook trims, so a yield test performed on the actual product governs the order.",
+    assumptions: [
+      { name: "AP from EP", value: "AP = EP needed / yield (always divide, so the buy exceeds what is served); AP units = AP / unit weight, rounded up", source: "CIA / On Cooking / ServSafe culinary math" },
+      { name: "Yield varies", value: "the real yield changes with grade, season, and trimming; a yield test on the actual product governs the order", source: "kitchen purchasing practice" },
+    ],
+  },
   "yield-ep": {
     formula: "Yield % = EP weight / AP weight × 100. EP cost per lb = AP cost / yield. Cooking-loss adjustment applied as a second-stage yield where cooking changes the salable weight.",
     edition: "USDA FoodData Central yield factors by name; CIA Pro Chef textbook by name (engineering-practice yield benchmarks).",

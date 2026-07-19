@@ -8412,6 +8412,50 @@
    }
   },
   {
+   "tile_id": "as-purchased-quantity",
+   "source_publisher": "As-purchased quantity from edible portion (CIA / On Cooking culinary math)",
+   "source_title": "need 20 lb EP tenderloin at 75% yield -> buy 26.67 lb as-purchased",
+   "source_edition_or_year": "spec-v1001 worked example (machine-verified)",
+   "source_section_or_page": "AP = EP / yield = 20 / 0.75 = 26.67 lb (always divide; the buy exceeds what you serve)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "ep_quantity_needed": 20,
+    "yield_pct": 75,
+    "unit_weight": 0
+   },
+   "outputs": {
+    "ap_quantity": {
+     "value": 26.667,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "as-purchased-quantity",
+   "source_publisher": "As-purchased quantity from edible portion (CIA / On Cooking culinary math)",
+   "source_title": "cross-check: need 10 lb EP diced onion at 88% yield -> buy 11.36 lb",
+   "source_edition_or_year": "spec-v1001 worked example (machine-verified)",
+   "source_section_or_page": "AP = 10 / 0.88 = 11.36 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "ep_quantity_needed": 10,
+    "yield_pct": 88,
+    "unit_weight": 0
+   },
+   "outputs": {
+    "ap_quantity": {
+     "value": 11.364,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "yield-ep",
    "source_publisher": "Project (first-principles) over Culinary Institute / National Restaurant Association EP yield identity",
    "source_title": "Edible portion yield: yield% = (1 - trim/AP) * (1 - cook_loss%); EP cost = AP cost / yield%",

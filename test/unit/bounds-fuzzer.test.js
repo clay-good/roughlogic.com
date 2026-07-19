@@ -28655,3 +28655,23 @@ test("bounds: spec-v1000 computeDoughWaterTemperature pins the DDT water calc", 
   assert.ok("error" in _v1000({ desired_dough_temp_f: 75, flour_temp_f: 68, room_temp_f: 72, friction_factor_f: -1, preferment_temp_f: 0 }));
   assert.ok("error" in _v1000({ desired_dough_temp_f: Infinity, flour_temp_f: 68, room_temp_f: 72, friction_factor_f: 24, preferment_temp_f: 0 }));
 });
+
+import { computeAsPurchasedQuantity as _v1001 } from "../../calc-kitchen.js";
+
+test("bounds: spec-v1001 computeAsPurchasedQuantity pins AP = EP / yield", () => {
+  const r = _v1001({ ep_quantity_needed: 20, yield_pct: 75, unit_weight: 0 });
+  assert.ok(Math.abs(r.ap_quantity - 26.6667) < 1e-3); // 20/0.75
+  assert.strictEqual(r.ap_units, null);
+  assert.ok(Math.abs(_v1001({ ep_quantity_needed: 10, yield_pct: 88, unit_weight: 0 }).ap_quantity - 11.3636) < 1e-3);
+  // The AP always exceeds the EP; a lower yield buys more; a 50% yield doubles it.
+  assert.ok(r.ap_quantity > 20);
+  assert.ok(_v1001({ ep_quantity_needed: 20, yield_pct: 50, unit_weight: 0 }).ap_quantity > r.ap_quantity);
+  assert.ok(Math.abs(_v1001({ ep_quantity_needed: 20, yield_pct: 50, unit_weight: 0 }).ap_quantity - 40) < 1e-9);
+  // Unit weight gives units to order.
+  assert.ok(Math.abs(_v1001({ ep_quantity_needed: 20, yield_pct: 75, unit_weight: 5 }).ap_units - 5.3333) < 1e-3); // 26.67/5
+  // Error seams.
+  assert.ok("error" in _v1001({ ep_quantity_needed: 0, yield_pct: 75, unit_weight: 0 }));
+  assert.ok("error" in _v1001({ ep_quantity_needed: 20, yield_pct: 0, unit_weight: 0 }));
+  assert.ok("error" in _v1001({ ep_quantity_needed: 20, yield_pct: 120, unit_weight: 0 }));
+  assert.ok("error" in _v1001({ ep_quantity_needed: Infinity, yield_pct: 75, unit_weight: 0 }));
+});

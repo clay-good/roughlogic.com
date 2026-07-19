@@ -474,6 +474,7 @@ const RELATED = {
   // pasteurization are the food-safety pair.
   "recipe-scale": ["yield-ep", "plate-cost", "pan-conversion"],
   "yield-ep": ["recipe-scale", "plate-cost"],
+  "as-purchased-quantity": ["yield-ep", "recipe-scale", "plate-cost"],
   "plate-cost": ["recipe-scale", "yield-ep", "markup"],
   "pan-conversion": ["recipe-scale", "yield-ep"],
   "cooling-curve": ["sous-vide-pasteurization"],

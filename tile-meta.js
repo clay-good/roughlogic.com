@@ -306,7 +306,7 @@ const _TILES = [
   ["neutral-imbalance", "N"], ["spl-distance", "N"], ["spl-distance-for-level", "N"], ["rigging-check", "N"],
   ["spl-atmospheric", "N"],
 
-  ["recipe-scale", "O"], ["yield-ep", "O"], ["cooling-curve", "O"],
+  ["recipe-scale", "O"], ["yield-ep", "O"], ["as-purchased-quantity", "O"], ["cooling-curve", "O"],
   ["plate-cost", "O"], ["pan-conversion", "O"], ["sous-vide-pasteurization", "O"],
 
   ["pacing-distance", "P"], ["bearing-conversion", "P"], ["slope-avalanche", "P"],
