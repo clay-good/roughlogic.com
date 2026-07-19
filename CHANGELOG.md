@@ -4,6 +4,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(docs): correct two worked-example figures in tile note strings; 2026-07-19
+
+- `open-delta-transformer` (calc-electrical.js) note said each of two 25 kVA units at the bank's 43.3 kVA max load
+  carries `43.3 / sqrt(3) = 21.65 kVA (86.6% of its 25 kVA rating)`. That arithmetic is wrong (`43.3 / sqrt(3) = 25.0`,
+  and 21.65 is `43.3 / 2`) and it understated per-unit loading: at the √3 x 25 = 43.3 kVA maximum each transformer is
+  at 100% of rating, not 86.6%. The 86.6% figure is the bank's utilization of installed capacity (43.3 / 50), which the
+  same note already states correctly one sentence earlier. Compute code was and is correct; only the hardcoded example
+  in the note was wrong.
+- `guy-wire-tension` (calc-rigging.js) note said a guy at 63 degrees "more than triples the download." Download is
+  `H x tan(theta)`, so relative to the 45-degree example a 63-degree guy (a 2:1 rise-to-lead, `tan 63.4 = 2.0`) roughly
+  doubles it; tripling needs ~72 degrees. Corrected to "roughly doubles." Compute unaffected.
+- Both surfaced by a first-principles re-derivation audit of the 99 most recently landed tiles (spec-v909..v1007);
+  every compute formula and constant in that batch verified correct.
+
 ### build(lint): add check-select-options gate for makeSelect primitive-array options; 2026-07-19
 
 - Added `scripts/check-select-options.mjs` to `npm run lint`, a sibling of `check-field-accessors` for the quieter
