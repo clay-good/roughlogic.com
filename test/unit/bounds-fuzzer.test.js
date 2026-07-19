@@ -28508,3 +28508,22 @@ test("bounds: spec-v993 computeCattleHeartGirthWeight pins Schaeffer's formula",
   assert.ok("error" in _v993c({ heart_girth_in: 70, body_length_in: 0 }));
   assert.ok("error" in _v993c({ heart_girth_in: Infinity, body_length_in: 55 }));
 });
+
+import { computeCornYieldEstimate as _v994 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v994 computeCornYieldEstimate pins the yield component method", () => {
+  const r = _v994({ ears_per_thousandth_acre: 32, kernel_rows_around: 16, kernels_per_row: 35, kernel_factor: 90 });
+  assert.strictEqual(r.kernels_per_ear, 560); // 16*35
+  assert.ok(Math.abs(r.bushels_per_acre - 199.111) < 1e-2); // 32*560/90
+  const c = _v994({ ears_per_thousandth_acre: 28, kernel_rows_around: 16, kernels_per_row: 30, kernel_factor: 90 });
+  assert.strictEqual(c.kernels_per_ear, 480);
+  assert.ok(Math.abs(c.bushels_per_acre - 149.333) < 1e-2);
+  // A smaller kernel factor (bigger kernels) raises the estimate; more ears raises it.
+  assert.ok(_v994({ ears_per_thousandth_acre: 32, kernel_rows_around: 16, kernels_per_row: 35, kernel_factor: 80 }).bushels_per_acre > r.bushels_per_acre);
+  assert.ok(_v994({ ears_per_thousandth_acre: 40, kernel_rows_around: 16, kernels_per_row: 35, kernel_factor: 90 }).bushels_per_acre > r.bushels_per_acre);
+  // Error seams.
+  assert.ok("error" in _v994({ ears_per_thousandth_acre: 0, kernel_rows_around: 16, kernels_per_row: 35, kernel_factor: 90 }));
+  assert.ok("error" in _v994({ ears_per_thousandth_acre: 32, kernel_rows_around: 0, kernels_per_row: 35, kernel_factor: 90 }));
+  assert.ok("error" in _v994({ ears_per_thousandth_acre: 32, kernel_rows_around: 16, kernels_per_row: 35, kernel_factor: 0 }));
+  assert.ok("error" in _v994({ ears_per_thousandth_acre: Infinity, kernel_rows_around: 16, kernels_per_row: 35, kernel_factor: 90 }));
+});

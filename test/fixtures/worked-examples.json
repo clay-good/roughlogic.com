@@ -15370,6 +15370,58 @@
    }
   },
   {
+   "tile_id": "corn-yield-estimate",
+   "source_publisher": "Pre-harvest corn yield (yield component / ear-count method)",
+   "source_title": "32 ears/1000th acre, 16 rows x 35 kernels, factor 90 -> 560 kernels/ear, 199 bu/acre",
+   "source_edition_or_year": "spec-v994 worked example (machine-verified)",
+   "source_section_or_page": "kernels/ear = 16 x 35 = 560; bu/ac = 32 x 560 / 90 = 17,920 / 90 = 199.1",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "ears_per_thousandth_acre": 32,
+    "kernel_rows_around": 16,
+    "kernels_per_row": 35,
+    "kernel_factor": 90
+   },
+   "outputs": {
+    "kernels_per_ear": {
+     "value": 560,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "bushels_per_acre": {
+     "value": 199.1,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "corn-yield-estimate",
+   "source_publisher": "Pre-harvest corn yield (yield component / ear-count method)",
+   "source_title": "cross-check: thinner 28 ears, 16 rows x 30 kernels, factor 90 -> 480 kernels/ear, 149 bu/acre",
+   "source_edition_or_year": "spec-v994 worked example (machine-verified)",
+   "source_section_or_page": "kernels/ear = 16 x 30 = 480; bu/ac = 28 x 480 / 90 = 13,440 / 90 = 149.3",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "ears_per_thousandth_acre": 28,
+    "kernel_rows_around": 16,
+    "kernels_per_row": 30,
+    "kernel_factor": 90
+   },
+   "outputs": {
+    "bushels_per_acre": {
+     "value": 149.3,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cattle-heart-girth-weight",
    "source_publisher": "Cattle live weight from heart girth (Schaeffer's formula)",
    "source_title": "70 in heart girth, 55 in body length -> 898 lb estimated live weight",

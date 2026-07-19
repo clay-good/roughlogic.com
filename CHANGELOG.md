@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(agriculture): add corn-yield-estimate tile (spec-v994); 2026-07-18
+
+- New Group L tile `corn-yield-estimate` in calc-agriculture.js. Pre-harvest corn yield by the yield component
+  (ear-count) method: bu/ac = ears (per 1/1000 acre) x (kernel rows around x kernels per row) / kernel factor, factor =
+  thousands of kernels per bushel (~90 average, 75-80 big kernels, 95-100 small). 32 ears x 16 x 35 / 90 = 199 bu/ac; a
+  thinner 28-ear, 480-kernel stand ~149. A pre-harvest estimate; the harvested, moisture-corrected yield governs. Home
+  count 1,442 -> 1,443.
+
 ### feat(agriculture): add cattle-heart-girth-weight tile (spec-v993); 2026-07-18
 
 - New Group L tile `cattle-heart-girth-weight` in calc-agriculture.js. Beef live weight from a weigh tape (Schaeffer's

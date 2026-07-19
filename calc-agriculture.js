@@ -3326,3 +3326,41 @@ AGRICULTURE_RENDERERS["cattle-heart-girth-weight"] = _r({
   ],
   compute: computeCattleHeartGirthWeight,
 });
+
+// ===================== spec-v994: pre-harvest corn yield (yield component method) =====================
+// dims: in { args: dimensionless } out: { kernels_per_ear: dimensionless, bushels_per_acre: dimensionless }
+export function computeCornYieldEstimate({ ears_per_thousandth_acre = 32, kernel_rows_around = 16, kernels_per_row = 35, kernel_factor = 90 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(ears_per_thousandth_acre > 0)) return { error: "Ear count must be positive (ears in 1/1000 acre)." };
+  if (!(kernel_rows_around > 0)) return { error: "Kernel rows around the ear must be positive." };
+  if (!(kernels_per_row > 0)) return { error: "Kernels per row must be positive." };
+  if (!(kernel_factor > 0)) return { error: "Kernel factor (thousands of kernels per bushel) must be positive." };
+  // Yield component method: bu/ac = ears (per 1/1000 acre) x kernels/ear / factor (factor = 1000s of kernels/bushel).
+  const kernels_per_ear = kernel_rows_around * kernels_per_row;
+  const bushels_per_acre = ears_per_thousandth_acre * kernels_per_ear / kernel_factor;
+  if (![kernels_per_ear, bushels_per_acre].every(Number.isFinite)) return { error: "Corn-yield math is not a finite value." };
+  return {
+    kernels_per_ear,
+    bushels_per_acre,
+    note: "An in-season estimate of corn grain yield from three field counts, the yield component (ear-count) method extension agronomists use weeks before harvest. Count the ears in 1/1000 of an acre -- 17 ft 5 in of a single row at 30 in row spacing -- then on a representative ear count the kernel ROWS around the cob and the kernels per row; their product is the kernels per ear. Estimated bushels per acre is the ears times the kernels per ear, divided by a kernel factor: ears x (rows around x kernels per row) / factor. The factor is the thousands of kernels in a 56-lb bushel, about 90 for average-size kernels, adjusted DOWN to about 75-80 in a good year with big, heavy kernels (which RAISES the estimate) and UP to about 95-100 in a stressed year with small kernels. Thirty-two ears with 16 rows of 35 kernels at a factor of 90 gives 32 x 560 / 90 = 199 bushels per acre; a thinner, smaller-eared stand at 28 ears and 480 kernels per ear gives about 149. Accuracy improves by averaging several 1/1000-acre counts across the field and picking truly representative ears, and the estimate is roughest before the kernels finish filling (the R5-R6 dent-to-black-layer stage). A pre-harvest estimate; the actual harvested and moisture-corrected yield (crop-yield) is the real number, and the combine and the scale govern.",
+  };
+}
+
+export const cornYieldEstimateExample = { inputs: { ears_per_thousandth_acre: 32, kernel_rows_around: 16, kernels_per_row: 35, kernel_factor: 90 } };
+
+AGRICULTURE_RENDERERS["corn-yield-estimate"] = _r({
+  citation: "Citation: pre-harvest corn yield, yield component (ear-count) method (Purdue / Iowa State Extension), by name. bu/ac = ears (per 1/1000 acre) x (rows around x kernels per row) / factor; factor = thousands of kernels per bushel (~90, 75-80 big kernels, 95-100 small). Count ears in 17.5 ft of 30-in row. A pre-harvest estimate; the harvested, moisture-corrected yield governs.",
+  example: cornYieldEstimateExample.inputs,
+  fields: [
+    { key: "ears_per_thousandth_acre", label: "Ears in 1/1000 acre (17.5 ft of 30-in row)", kind: "number", default: 32 },
+    { key: "kernel_rows_around", label: "Kernel rows around the ear", kind: "number", default: 16 },
+    { key: "kernels_per_row", label: "Kernels per row", kind: "number", default: 35 },
+    { key: "kernel_factor", label: "Kernel factor (1000s kernels/bu, ~90)", kind: "number", default: 90 },
+  ],
+  outputs: [
+    { key: "k", id: "cye-out-k", label: "Kernels per ear", value: (r) => fmt(r.kernels_per_ear, 0) },
+    { key: "y", id: "cye-out-y", label: "Estimated yield", value: (r) => fmt(r.bushels_per_acre, 0) + " bu/acre" },
+    { key: "n", id: "cye-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCornYieldEstimate,
+});

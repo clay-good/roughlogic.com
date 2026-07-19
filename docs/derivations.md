@@ -1446,6 +1446,7 @@ cross-check.
 | calc-agriculture.js | `computeBunkerSiloCapacity` | `{ bottom_width_ft = 0, top_width_ft = 0, average_depth_ft = 0, length_ft = 0,...` | _ | _ | _ |
 | calc-agriculture.js | `computeCattleHeartGirthWeight` | `{ heart_girth_in = 70, body_length_in = 55 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeCenterPivotRuntime` | `{ system_flow_gpm = 0, area_acres = 0, target_depth_in = 0, efficiency_pct = ...` | _ | _ | _ |
+| calc-agriculture.js | `computeCornYieldEstimate` | `{ ears_per_thousandth_acre = 32, kernel_rows_around = 16, kernels_per_row = 3...` | _ | _ | _ |
 | calc-agriculture.js | `computeCropYield` | `{ crop = "corn", rows_per_pass = 1, row_spacing_in = 30, measured_length_ft =...` | _ | _ | _ |
 | calc-agriculture.js | `computeDrawbarPower` | `{ pull_lb = 0, speed_mph = 0, surface = "firm_soil" }` | _ | _ | _ |
 | calc-agriculture.js | `computeDrawbarPull` | `{ power_hp = 0, power_basis = "drawbar", speed_mph = 0, surface = "firm_soil"...` | _ | _ | _ |
@@ -3103,7 +3104,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1689.
+Row count: 1690.
 
 <!-- END function-corpus-v14 -->
 
@@ -4345,7 +4346,7 @@ per spec-v14 §13.1 second paragraph.
 | `waterline-for-hull-speed` | Waterline Length for a Target Hull Speed | displacement hull-speed relation (Fro...; 8 kn target displacement hull -> 35.6 ft waterline | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (68 tiles)
+### Group L Agriculture (69 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4357,6 +4358,7 @@ per spec-v14 §13.1 second paragraph.
 | `cattle-stocking-rate` | Cattle Stocking Rate (AUM) | USDA NRCS; available = 1500*160*0.40 = 96,000 lb; AUMs = 96,000/780 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `center-pivot-runtime` | Center-Pivot Application Depth and Runtime | USDA-NRCS center-pivot design / unive...; 800 gpm, 125 ac, 1 in gross, 85% -> 70.7 hr, 6.4 gpm/ac, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chipper-debris` | Brush Chip Volume and Haul Loads | First-principles green-weight to chip...; 4,400 lb of green wood, 550 lb/lcy, 15 cy box -> 8.0 loos... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `corn-yield-estimate` | Pre-Harvest Corn Yield (Yield Component Method) | Pre-harvest corn yield (yield compone...; kernels/ear = 16 x 35 = 560; bu/ac = 32 x 560 / 90 = 17,9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `crop-yield` | Crop Yield and Harvest Loss | USDA NASS yield-strip identity (proje...; Corn / 2 rows @ 30 in / 50 ft strip / 8 lb / 18% moisture... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crown-pruning-dose` | Live Crown Removal Limit (Pruning Dose) | ANSI A300 Part 1 / ISA BMP - Pruning; 15 of 100 live foliage, mature -> 15% removal, cap 25% (w... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drawbar-power` | Tractor Drawbar Power | ASABE; DBHP = pull * mph / 375 = 4500 * 4.5 / 375 = 54; PTO ~= 5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4731,6 +4733,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1442. Fixture-covered or reference-cadence: 1442 / 1442.
+Tile count: 1443. Fixture-covered or reference-cadence: 1443 / 1443.
 
 <!-- END tile-index-v14 -->
