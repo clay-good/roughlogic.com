@@ -28,6 +28,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
   Non-evaluable claims (a variable, a spelled-out constant, a units word) and nominal-lumber tokens (`2x4`) are
   skipped, so a clean run is never a false alarm. Swept all 56 modules: 41 evaluable examples, zero disagreements;
   verified it fails deterministically on a reintroduced `43.3 / sqrt(3) = 21.65` and on a wrong percentage.
+- Tightened the tolerance for integer results: when both the computed value and the stated result are integers, a
+  valid worked example is exact (you never round an integer to a different integer), so an exact integer typo like
+  `10 / 2 = 6` is now caught -- the loose last-place tolerance (>= 1 for an integer result) previously swallowed it.
+  Non-integer results still tolerate ceil/floor rounding (e.g. `1200 x 1.1 / 50 -> 27` pails), so the sweep stays at
+  zero false positives on the catalog.
 
 ### fix(docs): correct two worked-example figures in tile note strings; 2026-07-19
 

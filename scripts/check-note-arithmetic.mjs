@@ -127,8 +127,17 @@ async function main() {
         checked++;
         const decimals = rhsRaw.includes("/") ? 3 : (rhsRaw.split(".")[1] || "").length;
         const tol = Math.max(Math.pow(10, -decimals), Math.abs(rhs) * 0.02);
-        const direct = Math.abs(lhs - rhs) <= tol;
-        const asPct = Math.abs(lhs * 100 - rhs) <= Math.max(tol, Math.abs(rhs) * 0.02);
+        // A computed value `a` agrees with the stated `b` within rounding. When
+        // BOTH are integers a valid worked example is exact (you never round an
+        // integer to a different integer), so require exact agreement there --
+        // this catches an exact integer typo like "10 / 2 = 6" that the loose
+        // last-place tolerance (>= 1 for an integer RESULT) would otherwise
+        // swallow, while still tolerating ceil/floor rounding of a NON-integer
+        // result (e.g. 1200 * 1.1 / 50 -> 27 pails).
+        const isInt = (x) => Math.abs(x - Math.round(x)) < 1e-6;
+        const agrees = (a, b) => (isInt(a) && isInt(b) ? Math.abs(a - b) < 0.5 : Math.abs(a - b) <= tol);
+        const direct = agrees(lhs, rhs);
+        const asPct = agrees(lhs * 100, rhs);
         // A percent RESULT means the note states EXPR as a percentage; a plain
         // RESULT should match EXPR directly (but tolerate the fraction/percent
         // convention either way to stay false-positive-free).
