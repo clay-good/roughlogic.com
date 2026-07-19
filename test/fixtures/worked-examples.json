@@ -25780,6 +25780,60 @@
    }
   },
   {
+   "tile_id": "abv-from-gravity",
+   "source_publisher": "Alcohol by volume from gravity (standard homebrew formula)",
+   "source_title": "OG 1.055, FG 1.012 -> 5.64% ABV, 78.2% apparent attenuation",
+   "source_edition_or_year": "spec-v1002 worked example (machine-verified)",
+   "source_section_or_page": "ABV = (1.055 - 1.012) x 131.25 = 0.043 x 131.25 = 5.64%; atten = 0.043/0.055 = 78.2%",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "original_gravity": 1.055,
+    "final_gravity": 1.012
+   },
+   "outputs": {
+    "abv_pct": {
+     "value": 5.64,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "apparent_attenuation_pct": {
+     "value": 78.2,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "abv-from-gravity",
+   "source_publisher": "Alcohol by volume from gravity (standard homebrew formula)",
+   "source_title": "cross-check: OG 1.065, FG 1.010 -> 7.22% ABV, 84.6% attenuation (stronger wort)",
+   "source_edition_or_year": "spec-v1002 worked example (machine-verified)",
+   "source_section_or_page": "ABV = (1.065 - 1.010) x 131.25 = 0.055 x 131.25 = 7.22%; atten = 0.055/0.065 = 84.6%",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "original_gravity": 1.065,
+    "final_gravity": 1.010
+   },
+   "outputs": {
+    "abv_pct": {
+     "value": 7.22,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "apparent_attenuation_pct": {
+     "value": 84.6,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "drink-abv-dilution",
    "source_publisher": "Cocktail dilution model (Dave Arnold, Liquid Intelligence)",
    "source_title": "final_abv = pure_alcohol / (total_volume + dilution_water) x 100",

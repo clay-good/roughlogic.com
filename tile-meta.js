@@ -503,7 +503,7 @@ const _TILES = [
   ["pour-cost", "O"],
   ["menu-engineering", "O"],
   ["kitchen-sanitizer-ppm", "O"],
-  ["drink-abv-dilution", "O"],
+  ["drink-abv-dilution", "O"], ["abv-from-gravity", "O"],
   ["overrun-percent", "O"],
   ["reserve-capacity-amp-hours", "K"],
   ["floor-area-ratio", "X"],

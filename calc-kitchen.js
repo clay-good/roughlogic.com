@@ -1198,3 +1198,38 @@ KITCHEN_RENDERERS["as-purchased-quantity"] = _r({
   ],
   compute: computeAsPurchasedQuantity,
 });
+
+// ===================== spec-v1002: alcohol by volume from gravity =====================
+// dims: in { args: dimensionless } out: { abv_pct: dimensionless, apparent_attenuation_pct: dimensionless }
+export function computeAbvFromGravity({ original_gravity = 1.055, final_gravity = 1.012 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(original_gravity > 1)) return { error: "Original gravity must be greater than 1.000." };
+  if (!(final_gravity > 0)) return { error: "Final gravity must be positive." };
+  if (!(original_gravity > final_gravity)) return { error: "Original gravity must exceed the final gravity (fermentation lowers gravity)." };
+  // Standard homebrew screen: ABV% = (OG - FG) x 131.25; apparent attenuation = (OG - FG)/(OG - 1).
+  const abv_pct = (original_gravity - final_gravity) * 131.25;
+  const apparent_attenuation_pct = (original_gravity - final_gravity) / (original_gravity - 1) * 100;
+  if (![abv_pct, apparent_attenuation_pct].every(Number.isFinite)) return { error: "ABV math is not a finite value." };
+  return {
+    abv_pct,
+    apparent_attenuation_pct,
+    note: "The alcohol by volume of a fermented beer, wine, cider, or mead from its gravity readings, the number a brewer or vintner computes at the end of fermentation. Specific gravity is the density relative to water (1.000); the sugars in the unfermented wort or must push it above 1.000 (the ORIGINAL gravity), and as yeast converts sugar to alcohol and CO2 the gravity falls to the FINAL gravity. The common screen multiplies the gravity drop by 131.25: ABV% = (OG - FG) x 131.25. A beer that starts at 1.055 and finishes at 1.012 drops 0.043, so it is about 0.043 x 131.25 = 5.6% ABV. The apparent attenuation -- how much of the original extract the yeast consumed -- is the gravity drop divided by the original excess over water: (OG - FG)/(OG - 1), here 0.043/0.055 = 78%, a normal ale. A stronger wort at 1.065 finishing at 1.010 is about 7.2% ABV and 85% attenuated. The 131.25 factor is a widely used approximation; it drifts high on strong brews, where a more elaborate formula (76.08 x (OG - FG)/(1.775 - OG) x FG/0.794) tracks better, and 'apparent' attenuation reads high because dissolved alcohol is lighter than water. A working estimate; a calibrated hydrometer or refractometer (temperature-corrected) and, for anything sold, the TTB/lab method govern the label value.",
+  };
+}
+
+export const abvFromGravityExample = { inputs: { original_gravity: 1.055, final_gravity: 1.012 } };
+
+KITCHEN_RENDERERS["abv-from-gravity"] = _r({
+  citation: "Citation: alcohol by volume from gravity (standard homebrew/brewing formula; Papazian, The Complete Joy of Homebrewing), by name. ABV% = (OG - FG) x 131.25; apparent attenuation = (OG - FG)/(OG - 1). The 131.25 factor is an approximation (drifts high on strong brews). A temperature-corrected hydrometer/refractometer and, for a sold product, the TTB/lab method govern the label.",
+  example: abvFromGravityExample.inputs,
+  fields: [
+    { key: "original_gravity", label: "Original gravity (OG)", kind: "number", default: 1.055 },
+    { key: "final_gravity", label: "Final gravity (FG)", kind: "number", default: 1.012 },
+  ],
+  outputs: [
+    { key: "a", id: "abv-out-a", label: "Alcohol by volume", value: (r) => fmt(r.abv_pct, 2) + " % ABV" },
+    { key: "t", id: "abv-out-t", label: "Apparent attenuation", value: (r) => fmt(r.apparent_attenuation_pct, 1) + " %" },
+    { key: "n", id: "abv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAbvFromGravity,
+});

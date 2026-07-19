@@ -28675,3 +28675,22 @@ test("bounds: spec-v1001 computeAsPurchasedQuantity pins AP = EP / yield", () =>
   assert.ok("error" in _v1001({ ep_quantity_needed: 20, yield_pct: 120, unit_weight: 0 }));
   assert.ok("error" in _v1001({ ep_quantity_needed: Infinity, yield_pct: 75, unit_weight: 0 }));
 });
+
+import { computeAbvFromGravity as _v1002 } from "../../calc-kitchen.js";
+
+test("bounds: spec-v1002 computeAbvFromGravity pins ABV and apparent attenuation", () => {
+  const r = _v1002({ original_gravity: 1.055, final_gravity: 1.012 });
+  assert.ok(Math.abs(r.abv_pct - 5.64375) < 1e-4); // (1.055-1.012)*131.25
+  assert.ok(Math.abs(r.apparent_attenuation_pct - 78.18) < 1e-1); // 0.043/0.055
+  const s = _v1002({ original_gravity: 1.065, final_gravity: 1.010 });
+  assert.ok(Math.abs(s.abv_pct - 7.21875) < 1e-4);
+  assert.ok(Math.abs(s.apparent_attenuation_pct - 84.615) < 1e-1);
+  // A bigger gravity drop means more alcohol; a lower FG raises attenuation.
+  assert.ok(s.abv_pct > r.abv_pct);
+  assert.ok(_v1002({ original_gravity: 1.055, final_gravity: 1.008 }).apparent_attenuation_pct > r.apparent_attenuation_pct);
+  // Error seams: OG must exceed 1 and exceed FG, FG positive, non-finite.
+  assert.ok("error" in _v1002({ original_gravity: 1.000, final_gravity: 1.012 }));
+  assert.ok("error" in _v1002({ original_gravity: 1.010, final_gravity: 1.020 })); // FG > OG
+  assert.ok("error" in _v1002({ original_gravity: 1.055, final_gravity: 0 }));
+  assert.ok("error" in _v1002({ original_gravity: Infinity, final_gravity: 1.012 }));
+});

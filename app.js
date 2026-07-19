@@ -1128,6 +1128,7 @@ const TOOL_MODULES = (() => {
     "kitchen-sanitizer-ppm",
     // spec-v539
     "drink-abv-dilution",
+    "abv-from-gravity",
     "overrun-percent",
     "draft-beer-line-balance",
   ]);

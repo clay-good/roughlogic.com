@@ -1190,6 +1190,7 @@ const RELATED = {
   "menu-engineering": ["plate-cost","food-cost-percentage","prime-cost"],
   "kitchen-sanitizer-ppm": ["antimicrobial-dilution","pool-chlorine-dose","food-cost-percentage"],
   "drink-abv-dilution": ["pour-cost","bakers-percentage","recipe-scale"],
+  "abv-from-gravity": ["drink-abv-dilution", "draft-beer-line-balance", "brine-cure"],
   "overrun-percent": ["bakers-percentage","yield-ep","recipe-scale"],
   "draft-beer-line-balance": ["pour-cost","drink-abv-dilution","kitchen-sanitizer-ppm"],
   "reserve-capacity-amp-hours": ["standby-battery-sizing","fuel-range","abyc-dc-wire"],

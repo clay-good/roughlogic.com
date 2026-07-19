@@ -938,6 +938,7 @@ export const COMPUTE_MAP = {
   "menu-engineering": { module: "../../calc-kitchen.js", fn: "computeMenuEngineering" },
   "kitchen-sanitizer-ppm": { module: "../../calc-kitchen.js", fn: "computeKitchenSanitizerPpm" },
   "drink-abv-dilution": { module: "../../calc-kitchen.js", fn: "computeDrinkAbvDilution" },
+  "abv-from-gravity": { module: "../../calc-kitchen.js", fn: "computeAbvFromGravity" },
   "overrun-percent": { module: "../../calc-kitchen.js", fn: "computeOverrunPercent" },
   "reserve-capacity-amp-hours": { module: "../../calc-mechanic.js", fn: "computeReserveCapacityAmpHours" },
   "floor-area-ratio": { module: "../../calc-realestate.js", fn: "computeFloorAreaRatio" },

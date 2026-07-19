@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(kitchen): add abv-from-gravity tile (spec-v1002); 2026-07-18
+
+- New Group O tile `abv-from-gravity` in calc-kitchen.js. Alcohol by volume of a fermented beer/wine/cider/mead from
+  gravity readings (distinct from the cocktail-dilution ABV tile): ABV% = (OG - FG) x 131.25; apparent attenuation =
+  (OG - FG)/(OG - 1). A 1.055 -> 1.012 beer = 5.64% ABV, 78.2% attenuation; a 1.065 -> 1.010 wort = 7.22%, 84.6%. The
+  131.25 factor drifts high on strong brews; a temp-corrected hydrometer and the TTB/lab method govern a sold label.
+  Home count 1,450 -> 1,451.
+
 ### feat(kitchen): add as-purchased-quantity tile (spec-v1001); 2026-07-18
 
 - New Group O tile `as-purchased-quantity` in calc-kitchen.js. The purchasing inverse of yield-ep: how much to buy for

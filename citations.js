@@ -10968,6 +10968,17 @@ export const CITATIONS = {
       { name: "Sanitizer bands", value: "chlorine 50-100 ppm, quat ~150-400 (label, often 200), iodine 12.5-25 ppm", source: "FDA Food Code 4-501.114" },
     ],
   },
+  "abv-from-gravity": {
+    formula: "abv_pct = (original_gravity - final_gravity) x 131.25; apparent_attenuation_pct = 100 x (original_gravity - final_gravity) / (original_gravity - 1).",
+    edition: "Alcohol by volume from gravity (standard homebrew/brewing formula; Papazian, The Complete Joy of Homebrewing; ASBC context), by name; a temperature-corrected hydrometer or refractometer and, for a sold product, the TTB / laboratory method govern the label value.",
+    freeAccess: "The gravity-to-ABV relation is public brewing practice; the original and final specific gravities are the brewer's hydrometer readings.",
+    governance: GOVERNANCE.general,
+    editionNote: "After fermentation, a brewer or vintner finds the alcohol content of a beer, wine, cider, or mead from two density readings. Specific gravity is the liquid's density relative to water, which is 1.000; the dissolved sugars in the unfermented wort or must raise it above 1.000, giving the original gravity, and as the yeast converts sugar into alcohol and carbon dioxide the density falls to the final gravity. The widely used homebrew approximation multiplies the drop in gravity by 131.25 to get the alcohol by volume as a percentage: a beer that begins at 1.055 and finishes at 1.012 has fallen 0.043, so its ABV is about 0.043 times 131.25, or 5.6%. The apparent attenuation, which describes how much of the original dissolved extract the yeast fermented, is the gravity drop divided by the original excess of gravity over water, (original minus final) over (original minus 1); here 0.043 over 0.055, or about 78%, typical for an ale. A stronger wort starting at 1.065 and finishing at 1.010 comes out near 7.2% ABV and about 85% attenuation. Two caveats: the 131.25 factor is an approximation that reads increasingly high on strong, high-gravity brews, where a more elaborate correlation -- 76.08 times (original minus final) over (1.775 minus original), times final over 0.794 -- tracks the true value better; and the attenuation is called apparent because the hydrometer is fooled by the dissolved alcohol, which is lighter than water, so it reads a lower final gravity than the sugar alone would give. This is a working estimate; a properly calibrated and temperature-corrected hydrometer or refractometer, and for any product offered for sale the TTB or laboratory method, govern the stated alcohol content.",
+    assumptions: [
+      { name: "Gravity-to-ABV", value: "ABV% = (OG - FG) x 131.25; apparent attenuation = (OG - FG)/(OG - 1); OG/FG are density vs water (1.000)", source: "standard homebrew formula (Papazian)" },
+      { name: "Approximation limits", value: "131.25 drifts high on strong brews (76.08 x (OG-FG)/(1.775-OG) x FG/0.794 tracks better); a temp-corrected hydrometer and the TTB/lab method govern a sold label", source: "brewing practice / TTB" },
+    ],
+  },
   "drink-abv-dilution": {
     formula: "pure_alcohol = total_volume x weighted_abv / 100; dilution_water = total_volume x method_pct / 100; final_abv = pure_alcohol / (total_volume + dilution_water) x 100; standard_drinks = pure_alcohol / 0.6.",
     edition: "Cocktail dilution model (Dave Arnold, Liquid Intelligence), by name.",
