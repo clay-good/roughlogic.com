@@ -63,9 +63,17 @@ function readToolIds(src) {
 
 const TOOL_IDS = readToolIds(TOOLS_JS);
 // Case-sensitive on NaN/Infinity (the JS string forms), so prose like
-// "infinite" or "not a number" never false-positives. `undefined` and the
-// `$NaN` currency-format artifact are matched as whole tokens.
-const BAD = /\bNaN\b|\bInfinity\b|\$NaN|\bundefined\b/;
+// "infinite" or "not a number" never false-positives. `$NaN` is the currency-
+// format artifact. `undefined` intentionally has NO trailing `\b`: a leaked
+// value renders fused with the adjacent "Copy" button label as "undefinedCopy",
+// and `\bundefined\b` (needing a word boundary after the `d`) silently MISSED
+// it -- how the trailer-tongue-weight and vessel-head-volume "undefined" leaks
+// shipped green. `undefined` is never a legitimate rendered value (verified: a
+// full-catalog scan of every tile's example and all-blank output found zero),
+// so dropping the trailing boundary is false-positive-free. NaN/Infinity KEEP
+// their `\b` (a tile can legitimately display "Infinity", so a fused-token
+// relaxation there would false-positive).
+const BAD = /\bNaN\b|\bInfinity\b|\$NaN|\bundefined/;
 
 for (const id of TOOL_IDS) {
   test("render-no-nan: " + id, async ({ page }) => {
@@ -119,8 +127,18 @@ for (const id of TOOL_IDS) {
     const exampleBtn = page.locator(".input-region button", { hasText: /example/i }).first();
     if (await exampleBtn.count()) {
       await exampleBtn.click();
-      await page.waitForTimeout(70); // clear the 50ms input debounce
-      const filled = (await out.textContent()) || "";
+      // Read the FULLY-painted frame, not a fixed 70ms snapshot. makeOutputLine
+      // paints its label first and the compute VALUES land a frame later (~110ms
+      // for a multi-field example), so a fixed 70ms read caught a label-only
+      // frame -- non-empty (passing the paint check below) yet valueless, so a
+      // leaked value in the result was not yet visible. Poll until the text is
+      // stable across two reads so the scan sees the final values.
+      let filled = "";
+      for (let prev = null, s = 0, k = 0; s < 2 && k < 20; k++) {
+        await page.waitForTimeout(50);
+        filled = (await out.textContent()) || "";
+        if (filled === prev) s++; else { s = 0; prev = filled; }
+      }
       expect(filled, `${id} leaked after example: "${filled.trim()}"`).not.toMatch(BAD);
       // The "Test with example" button is the catalog's primary worked-case
       // CTA, so its output region must actually be painted. An empty result is

@@ -4,6 +4,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### test(render-no-nan): reliably catch example-state "undefined" leaks; 2026-07-19
+
+- The spec-v18 render gate's example-fill check had two flaws that let real leaks ship green (trailer-tongue-weight's
+  "Verdict: OK: undefined" and, historically, vessel-head-volume): (1) its `BAD` regex needed a word boundary AFTER
+  `undefined`, but a leaked value renders fused with the adjacent "Copy" button label as `undefinedCopy`, defeating
+  `\bundefined\b`; and (2) a fixed 70 ms read caught a label-only paint frame (makeOutputLine paints the label first
+  and the compute values ~110 ms later), so the leaked value was not yet on screen. Fixed both: dropped the trailing
+  boundary on `undefined` only (it is never a legitimate rendered value -- a full-catalog scan of every tile's example
+  AND all-blank output found zero, so this is false-positive-free; NaN/Infinity keep their `\b` because a tile can
+  legitimately display "Infinity"), and the example read now polls until the output text is stable before scanning.
+  Verified on Chromium (the browser CI runs render-no-nan on): reintroducing the trailer bug now fails deterministically,
+  the fix passes, and a diverse tile sample stays green. Complements the millisecond `check-render-output-keys` static
+  gate, which catches the `_simpleRenderer` subset of this class in `npm run lint`.
+
 ### build(lint): add check-render-output-keys gate for missing _simpleRenderer outputs; 2026-07-19
 
 - Added `scripts/check-render-output-keys.mjs` to `npm run lint`, closing the surface that produced the
