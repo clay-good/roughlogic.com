@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### build(lint): add check-note-arithmetic gate for wrong worked examples in note strings; 2026-07-19
+
+- Added `scripts/check-note-arithmetic.mjs` to `npm run lint`, closing the surface that produced the two note fixes
+  below. Every tile note carries a worked example ("1.732 x 25 = 43.3 kVA", "744 / 1,200 = 62.0%"); the compute code
+  and fixtures are gated but the arithmetic embedded in the prose was not re-derived by anything, so a wrong result
+  shipped silently (the calculator still returns the right number, only the explainer text lied). The gate evaluates
+  every "EXPR = RESULT" claim whose EXPR is fully computable (decimal literals, `+ - x * / ^`, `sqrt(N)`, `pi`) and
+  RESULT is a number, a fraction (`7/8`), or a percent (`62.0%`), and fails when they disagree beyond rounding.
+  Non-evaluable claims (a variable, a spelled-out constant, a units word) and nominal-lumber tokens (`2x4`) are
+  skipped, so a clean run is never a false alarm. Swept all 56 modules: 41 evaluable examples, zero disagreements;
+  verified it fails deterministically on a reintroduced `43.3 / sqrt(3) = 21.65` and on a wrong percentage.
+
 ### fix(docs): correct two worked-example figures in tile note strings; 2026-07-19
 
 - `open-delta-transformer` (calc-electrical.js) note said each of two 25 kVA units at the bank's 43.3 kVA max load
