@@ -3295,3 +3295,34 @@ function _v974renderFertigationInjectionRate(inputRegion, outputRegion, citation
   for (const f of [pr, ac, st]) f.input.addEventListener("input", update);
 }
 AGRICULTURE_RENDERERS["fertigation-injection-rate"] = _v974renderFertigationInjectionRate;
+
+// ===================== spec-v993: cattle live weight from heart girth =====================
+// dims: in { args: dimensionless } out: { live_weight_lb: dimensionless }
+export function computeCattleHeartGirthWeight({ heart_girth_in = 70, body_length_in = 55 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(heart_girth_in > 0)) return { error: "Heart girth must be positive (in)." };
+  if (!(body_length_in > 0)) return { error: "Body length must be positive (in)." };
+  // Schaeffer's formula: live weight (lb) = girth^2 x length / 300, girth and length in inches.
+  const live_weight_lb = heart_girth_in * heart_girth_in * body_length_in / 300;
+  if (!Number.isFinite(live_weight_lb)) return { error: "Weight math is not a finite value." };
+  return {
+    live_weight_lb,
+    note: "An estimate of a beef animal's live weight from two tape measurements, the weigh-tape method a producer uses when no scale is at hand. Schaeffer's formula multiplies the square of the HEART GIRTH -- the circumference of the body just behind the front legs, around the barrel at the heart -- by the BODY LENGTH from the point of the shoulder to the pin bone (the point of the rump), then divides by 300, with both measurements in inches: weight = girth^2 x length / 300. A steer measuring 70 in around the heart girth and 55 in long estimates 70 x 70 x 55 / 300 = 898 lb. The heart girth dominates because it captures the barrel's cross-section, which is why a snug tape pulled at the smallest point behind the shoulder, with the animal standing square, gives the most repeatable number. The formula is calibrated for mature beef-type cattle and runs a bit off for very young, very fat, dairy-type, or heavily pregnant animals, and commercial weigh tapes printed with just the girth make the same estimate with the length folded into their scale. An on-farm estimate; a certified scale governs a sale weight, and a vet or the tape maker's chart governs a dose or a market decision.",
+  };
+}
+
+export const cattleHeartGirthWeightExample = { inputs: { heart_girth_in: 70, body_length_in: 55 } };
+
+AGRICULTURE_RENDERERS["cattle-heart-girth-weight"] = _r({
+  citation: "Citation: cattle live weight from heart girth (Schaeffer's formula), by name. weight (lb) = heart girth^2 x body length / 300, both in inches; girth behind the front legs, length shoulder-point to pin bone. Calibrated for mature beef cattle; off for young/dairy/pregnant animals. A certified scale governs a sale weight.",
+  example: cattleHeartGirthWeightExample.inputs,
+  fields: [
+    { key: "heart_girth_in", label: "Heart girth (in, behind front legs)", kind: "number", default: 70 },
+    { key: "body_length_in", label: "Body length (in, shoulder to pin bone)", kind: "number", default: 55 },
+  ],
+  outputs: [
+    { key: "w", id: "chg-out-w", label: "Estimated live weight", value: (r) => fmt(r.live_weight_lb, 0) + " lb" },
+    { key: "n", id: "chg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCattleHeartGirthWeight,
+});

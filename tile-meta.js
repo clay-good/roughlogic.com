@@ -291,7 +291,7 @@ const _TILES = [
   ["gpa-rate", "L"], ["timber-cruise", "L"], ["seed-rate", "L"],
   ["drawbar-power", "L"], ["drawbar-pull", "L"], ["tractor-ballast", "L"], ["anhydrous-ammonia-rate", "L"], ["irrigation-uniformity", "L"], ["bulk-density", "L"],
   ["crop-yield", "L"], ["thi-livestock", "L"], ["sprayer-calibration", "L"],
-  ["irrigation-requirement", "L"], ["mad-irrigation-trigger", "L"], ["fertigation-injection-rate", "L"], ["cattle-stocking-rate", "L"],
+  ["irrigation-requirement", "L"], ["mad-irrigation-trigger", "L"], ["fertigation-injection-rate", "L"], ["cattle-heart-girth-weight", "L"], ["cattle-stocking-rate", "L"],
   ["grain-bin-capacity", "L"], ["grain-bin-height-for-capacity", "L"], ["bunker-silo-capacity", "L"], ["feed-conversion-ratio", "L"], ["npk-blend", "L"], ["tank-mix", "L"],
   ["grain-shrink-moisture", "L"], ["livestock-dry-matter-intake", "L"], ["manure-application-rate", "L"],
 

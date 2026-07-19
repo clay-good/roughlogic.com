@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(agriculture): add cattle-heart-girth-weight tile (spec-v993); 2026-07-18
+
+- New Group L tile `cattle-heart-girth-weight` in calc-agriculture.js. Beef live weight from a weigh tape (Schaeffer's
+  formula): weight (lb) = heart girth^2 x body length / 300, both in inches. A 70 x 55 in steer estimates 898 lb; a
+  60 x 48 in heifer 576 lb. Calibrated for mature beef-type cattle; a certified scale governs a sale weight. Home count
+  1,441 -> 1,442.
+
 ### feat(water): add two-source-blend tile (spec-v992); 2026-07-18
 
 - New Group M tile `two-source-blend` in calc-water.js. Flow-weighted blend of two water sources and the split to meet

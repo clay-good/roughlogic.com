@@ -2263,6 +2263,17 @@ export const CITATIONS = {
       { name: "Acre-foot conversion", value: "1 acre-foot = 325,851 US gallons", source: "physical fact" },
     ],
   },
+  "cattle-heart-girth-weight": {
+    formula: "live_weight_lb = heart_girth_in^2 x body_length_in / 300 (Schaeffer's formula). Heart girth = circumference behind the front legs; body length = point of shoulder to pin bone; both in inches.",
+    edition: "Cattle live-weight estimation from heart girth (Schaeffer's formula; Penn State / University of Missouri Extension 'Estimating Cattle Weight'), by name; a certified scale governs a sale weight and a vet or the weigh-tape maker's chart governs a dose.",
+    freeAccess: "The heart-girth weight relation is public extension-service practice; the girth and length are the animal's tape measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "When a producer needs a beef animal's weight and no scale is available, a cloth tape and Schaeffer's formula give a usable estimate. Two measurements are taken in inches: the heart girth, the circumference of the body just behind the front legs where the tape crosses the barrel at the level of the heart, and the body length, the straight-line distance from the point of the shoulder back to the pin bone at the point of the rump. The estimated live weight in pounds is the heart girth squared, times the body length, divided by 300. A steer measuring 70 inches around the heart girth and 55 inches long estimates 70 times 70 times 55 divided by 300, or about 898 pounds; a smaller animal at 60 by 48 inches estimates 576 pounds. The heart girth is squared because it stands in for the cross-sectional area of the barrel, which is the biggest driver of body mass, so a repeatable reading depends on pulling the tape snug at the smallest point right behind the shoulder with the animal standing squarely on level ground. The formula is calibrated for mature beef-type cattle and is least accurate for very young calves, very fat or very thin animals, dairy-type conformation, and heavily pregnant cows; commercial weigh tapes printed for cattle fold the length term into a girth-only scale and make the same kind of estimate. This is an on-farm working estimate; a certified livestock scale governs an actual sale weight, and a veterinarian or the tape manufacturer's chart governs a medication dose or a marketing decision.",
+    assumptions: [
+      { name: "Schaeffer's formula", value: "weight (lb) = heart girth^2 x body length / 300, both in inches; girth behind front legs, length shoulder-point to pin bone", source: "Penn State / Univ. of Missouri Extension" },
+      { name: "Calibration range", value: "for mature beef-type cattle; off for very young/fat/thin, dairy-type, or heavily pregnant animals; a certified scale governs a sale weight", source: "extension-service weigh-tape guidance" },
+    ],
+  },
   "cattle-stocking-rate": {
     formula: "Available forage = production (lb/acre) x area (acres) x utilization. AUMs = available forage / 780 lb (one animal-unit-month). Head supported for 30 days = AUMs / AU-equivalent. Grazing days for a herd = available forage / (herd x AU-equivalent x 26 lb/day).",
     edition: "USDA NRCS National Range and Pasture Handbook Chapter 6 (stocking rate) by name.",

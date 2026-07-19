@@ -15370,6 +15370,48 @@
    }
   },
   {
+   "tile_id": "cattle-heart-girth-weight",
+   "source_publisher": "Cattle live weight from heart girth (Schaeffer's formula)",
+   "source_title": "70 in heart girth, 55 in body length -> 898 lb estimated live weight",
+   "source_edition_or_year": "spec-v993 worked example (machine-verified)",
+   "source_section_or_page": "weight = 70^2 x 55 / 300 = 4900 x 55 / 300 = 269,500 / 300 = 898.3 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "heart_girth_in": 70,
+    "body_length_in": 55
+   },
+   "outputs": {
+    "live_weight_lb": {
+     "value": 898.3,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cattle-heart-girth-weight",
+   "source_publisher": "Cattle live weight from heart girth (Schaeffer's formula)",
+   "source_title": "cross-check: 60 in girth, 48 in length (heifer) -> 576 lb",
+   "source_edition_or_year": "spec-v993 worked example (machine-verified)",
+   "source_section_or_page": "weight = 60^2 x 48 / 300 = 3600 x 48 / 300 = 172,800 / 300 = 576 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "heart_girth_in": 60,
+    "body_length_in": 48
+   },
+   "outputs": {
+    "live_weight_lb": {
+     "value": 576,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cattle-stocking-rate",
    "source_publisher": "USDA NRCS",
    "source_title": "Cattle stocking rate: 160 acres, 1,500 lb/acre forage, 40% utilization, cow-calf pairs, 30 head",

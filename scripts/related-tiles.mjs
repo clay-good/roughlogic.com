@@ -935,6 +935,7 @@ const RELATED = {
   "irrigation-requirement": ["irrigation-uniformity", "gpa-rate", "crop-yield"],
   "mad-irrigation-trigger": ["irrigation-requirement", "sprinkler-precip-rate", "soil-phase-relations"],
   "fertigation-injection-rate": ["tank-mix", "sprayer-calibration", "irrigation-requirement"],
+  "cattle-heart-girth-weight": ["cattle-stocking-rate", "livestock-dry-matter-intake", "thi-livestock"],
   "cattle-stocking-rate": ["crop-yield", "thi-livestock", "seed-rate"],
   "grain-bin-capacity": ["grain-bin-height-for-capacity", "crop-yield", "seed-rate", "grain-shrink-moisture"],
   "grain-bin-height-for-capacity": ["grain-bin-capacity", "grain-aeration-airflow", "crop-yield"],

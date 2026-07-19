@@ -28492,3 +28492,19 @@ test("bounds: spec-v992 computeTwoSourceBlend pins the flow-weighted blend and t
   assert.ok("error" in _v992({ flow1_gpm: 500, conc1: -1, flow2_gpm: 300, conc2: 12, target_conc: 8 }));
   assert.ok("error" in _v992({ flow1_gpm: Infinity, conc1: 4, flow2_gpm: 300, conc2: 12, target_conc: 8 }));
 });
+
+import { computeCattleHeartGirthWeight as _v993c } from "../../calc-agriculture.js";
+
+test("bounds: spec-v993 computeCattleHeartGirthWeight pins Schaeffer's formula", () => {
+  const r = _v993c({ heart_girth_in: 70, body_length_in: 55 });
+  assert.ok(Math.abs(r.live_weight_lb - 898.333) < 1e-2); // 70^2*55/300
+  const h = _v993c({ heart_girth_in: 60, body_length_in: 48 });
+  assert.ok(Math.abs(h.live_weight_lb - 576) < 1e-9); // 60^2*48/300
+  // Weight scales with girth SQUARED and length linearly.
+  assert.ok(Math.abs(_v993c({ heart_girth_in: 140, body_length_in: 55 }).live_weight_lb - 4 * 898.333) < 1e-1); // double girth -> 4x
+  assert.ok(Math.abs(_v993c({ heart_girth_in: 70, body_length_in: 110 }).live_weight_lb - 2 * 898.333) < 1e-1); // double length -> 2x
+  // Error seams.
+  assert.ok("error" in _v993c({ heart_girth_in: 0, body_length_in: 55 }));
+  assert.ok("error" in _v993c({ heart_girth_in: 70, body_length_in: 0 }));
+  assert.ok("error" in _v993c({ heart_girth_in: Infinity, body_length_in: 55 }));
+});
