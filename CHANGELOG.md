@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(fab): vessel-head-volume renderer + new field-accessor lint gate; 2026-07-19
+
+- `vessel-head-volume` (calc-fab.js) bound its head-type field with `makeSelect` (which returns `{ wrap, select }`)
+  but read it as `ht.input.value` / `ht.input.addEventListener`. `.input` was undefined, so the renderer threw a
+  TypeError at render time; the crash-safe boundary swallowed it and the tile shipped visibly broken since spec-v912.
+  Switched the three references to `ht.select`. The render-no-nan integration gate (the only thing that caught it) is
+  green again.
+- Added `scripts/check-field-accessors.mjs` to `npm run lint`: a static gate that fails in milliseconds when a
+  renderer reads a `makeSelect` var as `.input` (or an input-factory var as `.select`), replacing a ~30-minute
+  Playwright feedback loop. Swept 3,787 factory-bound field vars across 1,024 renderers with zero pre-existing
+  violations.
+
 ### feat(mechanic): add flywheel-energy tile (spec-v1007); 2026-07-18
 
 - New Group K tile `flywheel-energy` in calc-mechanic.js. Rotational kinetic energy stored in a flywheel and its speed
