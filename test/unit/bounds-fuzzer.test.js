@@ -15867,6 +15867,16 @@ test("bounds: spec-v285 computeRcPunchingShear pins the three-term least, the al
   // alpha_s position map.
   assert.strictEqual(_v285({ c1_in: 20, c2_in: 20, d_in: 6, position: "edge" }).alpha_s, 30);
   assert.strictEqual(_v285({ c1_in: 20, c2_in: 20, d_in: 6, position: "corner" }).alpha_s, 20);
+  // ACI 318-19 22.5.5.1.3 size-effect factor lambda_s = sqrt(2/(1 + d/10)) <= 1.0,
+  // applied to all three Table 22.6.5.2 terms. It is 1.0 up to d = 10 in (so every
+  // case above is unchanged) and drops below 1.0 for deeper members, cutting vc.
+  assert.strictEqual(r.lambda_s, 1); // d = 6 in
+  assert.strictEqual(_v285({ c1_in: 20, c2_in: 20, d_in: 10 }).lambda_s, 1); // exactly 1 at d = 10
+  const rDeep = _v285({ c1_in: 20, c2_in: 20, d_in: 24, fc_psi: 4000, position: "interior", lambda: 1.0 });
+  assert.ok(Math.abs(rDeep.lambda_s - Math.sqrt(2 / (1 + 24 / 10))) < 1e-12); // ~0.7670
+  assert.ok(rDeep.lambda_s < 1);
+  // vc carries lambda_s (regression guard: removing it would over-predict deep-member capacity).
+  assert.ok(Math.abs(rDeep.vc_psi - rDeep.least * rDeep.lambda_s * Math.sqrt(4000)) < 1e-9);
   // Error seams.
   assert.ok("error" in _v285({ c1_in: 0, c2_in: 20, d_in: 6 }));
   assert.ok("error" in _v285({ c1_in: 20, c2_in: 20, d_in: 0 }));
