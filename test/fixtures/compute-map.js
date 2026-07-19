@@ -1030,6 +1030,7 @@ export const COMPUTE_MAP = {
   "crosswind-component": { module: "../../calc-mechanic.js", fn: "computeCrosswindComponent" },
   "hull-speed": { module: "../../calc-mechanic.js", fn: "computeHullSpeed" },
   "hull-displacement": { module: "../../calc-mechanic.js", fn: "computeHullDisplacement" },
+  "sailboat-performance-ratios": { module: "../../calc-mechanic.js", fn: "computeSailboatPerformanceRatios" },
   "waterline-for-hull-speed": { module: "../../calc-mechanic.js", fn: "computeWaterlineForHullSpeed" },
   "bolt-proof-load": { module: "../../calc-cross.js", fn: "computeBoltProofLoad" },
   "bearing-l10-life": { module: "../../calc-machining.js", fn: "computeBearingL10Life" },

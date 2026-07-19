@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(marine): add sailboat-performance-ratios tile (spec-v998); 2026-07-18
+
+- New Group K tile `sailboat-performance-ratios` in calc-mechanic.js. Two dimensionless sailing ratios: sail
+  area-to-displacement SA/D = sail area / (displacement/64)^(2/3) (under 16 heavy, 16-20 moderate, over 20 performance)
+  and displacement-to-length DLR = (displacement/2240) / (0.01 x LWL)^3 (under 100 ultralight ... over 300 heavy). A
+  500 sq ft, 10,000 lb, 30 ft-LWL boat = SA/D 17.2 (moderate), DLR 165 (light). Comparative screens; a VPP analysis
+  governs real performance. Home count 1,446 -> 1,447.
+
 ### feat(hvac): add oil-burner-firing-rate tile (spec-v997); 2026-07-18
 
 - New Group C tile `oil-burner-firing-rate` in calc-hvacservice.js. Oil burner nozzle GPH to hit a target output:

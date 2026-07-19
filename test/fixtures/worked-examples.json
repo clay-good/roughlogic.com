@@ -66379,6 +66379,62 @@
    }
   },
   {
+   "tile_id": "sailboat-performance-ratios",
+   "source_publisher": "Sailboat performance ratios (SA/D and DLR; Skene's / Gerr)",
+   "source_title": "500 sq ft sail, 10,000 lb, 30 ft LWL -> SA/D 17.2 (moderate), DLR 165 (light)",
+   "source_edition_or_year": "spec-v998 worked example (machine-verified)",
+   "source_section_or_page": "SA/D = 500 / (10000/64)^(2/3) = 500/29.0 = 17.24; DLR = (10000/2240)/(0.30)^3 = 4.464/0.027 = 165.3",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "sail_area_sqft": 500,
+    "displacement_lb": 10000,
+    "lwl_ft": 30
+   },
+   "outputs": {
+    "sa_d_ratio": {
+     "value": 17.24,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "dl_ratio": {
+     "value": 165.3,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sailboat-performance-ratios",
+   "source_publisher": "Sailboat performance ratios (SA/D and DLR; Skene's / Gerr)",
+   "source_title": "cross-check: 700 sq ft, 12,000 lb, 34 ft LWL -> SA/D 21.4 (performance), DLR 136 (light)",
+   "source_edition_or_year": "spec-v998 worked example (machine-verified)",
+   "source_section_or_page": "SA/D = 700 / (12000/64)^(2/3) = 700/32.76 = 21.37; DLR = (12000/2240)/(0.34)^3 = 5.357/0.039304 = 136.3",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "sail_area_sqft": 700,
+    "displacement_lb": 12000,
+    "lwl_ft": 34
+   },
+   "outputs": {
+    "sa_d_ratio": {
+     "value": 21.37,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "dl_ratio": {
+     "value": 136.3,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hull-displacement",
    "source_publisher": "Hull displacement (Archimedes + block coefficient)",
    "source_title": "30 ft LWL, 10 ft beam, 4 ft draft, Cb 0.5, seawater -> 600 ft^3, 38,400 lb, 17.14 long tons",

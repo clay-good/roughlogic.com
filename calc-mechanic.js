@@ -2682,3 +2682,44 @@ MECHANIC_RENDERERS["hull-displacement"] = _simpleRenderer({
   ],
   compute: computeHullDisplacement,
 });
+
+// ===================== spec-v998: sailboat performance ratios (SA/D and DLR) =====================
+// dims: in { args: dimensionless } out: { sa_d_ratio: dimensionless, dl_ratio: dimensionless }
+export function computeSailboatPerformanceRatios({ sail_area_sqft = 500, displacement_lb = 10000, lwl_ft = 30 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(sail_area_sqft > 0)) return { error: "Sail area must be positive (sq ft)." };
+  if (!(displacement_lb > 0)) return { error: "Displacement must be positive (lb)." };
+  if (!(lwl_ft > 0)) return { error: "Waterline length must be positive (ft)." };
+  // SA/D uses the displaced volume (disp/64 ft^3 seawater); DLR uses displacement in long tons and LWL.
+  const displaced_volume_ft3 = displacement_lb / 64;
+  const sa_d_ratio = sail_area_sqft / Math.pow(displaced_volume_ft3, 2 / 3);
+  const dl_ratio = (displacement_lb / 2240) / Math.pow(0.01 * lwl_ft, 3);
+  if (![sa_d_ratio, dl_ratio].every(Number.isFinite)) return { error: "Sailboat-ratio math is not a finite value." };
+  const sa_d_class = sa_d_ratio < 16 ? "heavy cruiser (under-canvassed)" : sa_d_ratio <= 20 ? "moderate cruiser" : "performance / racer";
+  const dl_class = dl_ratio < 100 ? "ultralight" : dl_ratio <= 200 ? "light" : dl_ratio <= 300 ? "moderate" : "heavy displacement";
+  return {
+    sa_d_ratio,
+    dl_ratio,
+    sa_d_class,
+    dl_class,
+    note: "Two dimensionless ratios that characterize a sailboat's power and heft, the numbers a surveyor, designer, or shopper reads off the specs. The SAIL AREA-TO-DISPLACEMENT ratio (SA/D) is the sail area divided by the displaced volume to the two-thirds power, where the volume is the displacement in pounds divided by 64 (the weight of a cubic foot of seawater): it measures how much sail the boat carries for its size, its 'horsepower to weight.' Under about 16 is a heavy, under-canvassed cruiser, 16 to 20 is a moderate cruiser, and over 20 is a performance boat or racer. The DISPLACEMENT-TO-LENGTH ratio (DLR) is the displacement in long tons (2,240 lb) divided by one one-hundredth of the waterline length, cubed: it measures how heavy the boat is for its length. Under 100 is ultralight, 100 to 200 light, 200 to 300 moderate, and over 300 a heavy full-keel cruiser. A 500 sq ft, 10,000 lb, 30 ft-waterline boat has an SA/D of 500 / (10,000/64)^(2/3) = 17.2 (moderate cruiser) and a DLR of (10,000/2,240) / 0.30^3 = 165 (light). A bigger rig or lighter hull raises SA/D; a heavier boat on a shorter waterline raises DLR. Comparative screens, not a performance prediction; the actual displacement (loaded vs design), the measured sail area and waterline, and a naval architect's velocity-prediction analysis govern real performance.",
+  };
+}
+
+export const sailboatPerformanceRatiosExample = { inputs: { sail_area_sqft: 500, displacement_lb: 10000, lwl_ft: 30 } };
+
+MECHANIC_RENDERERS["sailboat-performance-ratios"] = _simpleRenderer({
+  citation: "Citation: sailboat performance ratios (sail area-to-displacement and displacement-to-length), by name. SA/D = sail area / (displacement/64)^(2/3); DLR = (displacement/2240) / (0.01 x LWL)^3. SA/D: <16 heavy, 16-20 moderate, >20 performance; DLR: <100 ultralight, 100-200 light, 200-300 moderate, >300 heavy. Comparative screens; the loaded displacement, measured sail/waterline, and a VPP analysis govern real performance.",
+  example: sailboatPerformanceRatiosExample.inputs,
+  fields: [
+    { key: "sail_area_sqft", label: "Sail area (sq ft)", kind: "number", default: 500 },
+    { key: "displacement_lb", label: "Displacement (lb)", kind: "number", default: 10000 },
+    { key: "lwl_ft", label: "Waterline length LWL (ft)", kind: "number", default: 30 },
+  ],
+  outputs: [
+    { key: "s", id: "spr-out-s", label: "Sail area / displacement", value: (r) => fmt(r.sa_d_ratio, 1) + " (" + r.sa_d_class + ")" },
+    { key: "d", id: "spr-out-d", label: "Displacement / length", value: (r) => fmt(r.dl_ratio, 0) + " (" + r.dl_class + ")" },
+    { key: "n", id: "spr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSailboatPerformanceRatios,
+});

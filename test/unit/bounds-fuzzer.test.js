@@ -28590,3 +28590,26 @@ test("bounds: spec-v997 computeOilBurnerFiringRate pins the input and nozzle GPH
   assert.ok("error" in _v997({ output_btu_hr: 88000, steady_state_efficiency_pct: 85, heating_value_btu_gal: 0 }));
   assert.ok("error" in _v997({ output_btu_hr: Infinity, steady_state_efficiency_pct: 85, heating_value_btu_gal: 138500 }));
 });
+
+import { computeSailboatPerformanceRatios as _v998 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v998 computeSailboatPerformanceRatios pins SA/D and DLR", () => {
+  const r = _v998({ sail_area_sqft: 500, displacement_lb: 10000, lwl_ft: 30 });
+  assert.ok(Math.abs(r.sa_d_ratio - 17.244) < 1e-2); // 500/(10000/64)^(2/3)
+  assert.ok(Math.abs(r.dl_ratio - 165.34) < 1e-1); // (10000/2240)/0.3^3
+  assert.ok(/moderate/.test(r.sa_d_class));
+  assert.ok(/light/.test(r.dl_class));
+  // Performance cross-check.
+  const p = _v998({ sail_area_sqft: 700, displacement_lb: 12000, lwl_ft: 34 });
+  assert.ok(Math.abs(p.sa_d_ratio - 21.37) < 1e-1);
+  assert.ok(Math.abs(p.dl_ratio - 136.3) < 1e-1);
+  assert.ok(/performance/.test(p.sa_d_class));
+  // More sail raises SA/D; a shorter waterline raises DLR.
+  assert.ok(_v998({ sail_area_sqft: 700, displacement_lb: 10000, lwl_ft: 30 }).sa_d_ratio > r.sa_d_ratio);
+  assert.ok(_v998({ sail_area_sqft: 500, displacement_lb: 10000, lwl_ft: 25 }).dl_ratio > r.dl_ratio);
+  // Error seams.
+  assert.ok("error" in _v998({ sail_area_sqft: 0, displacement_lb: 10000, lwl_ft: 30 }));
+  assert.ok("error" in _v998({ sail_area_sqft: 500, displacement_lb: 0, lwl_ft: 30 }));
+  assert.ok("error" in _v998({ sail_area_sqft: 500, displacement_lb: 10000, lwl_ft: 0 }));
+  assert.ok("error" in _v998({ sail_area_sqft: Infinity, displacement_lb: 10000, lwl_ft: 30 }));
+});
