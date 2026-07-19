@@ -921,6 +921,7 @@ const TOOL_MODULES = (() => {
     "hull-speed", "waterline-for-hull-speed",
     "hull-displacement",
     "sailboat-performance-ratios",
+    "flywheel-energy",
     // spec-v505 anchor rode scope and swing radius
     "anchor-rode-scope",
     // spec-v506 turbocharger pressure ratio and charge-air temp

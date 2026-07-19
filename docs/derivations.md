@@ -2463,6 +2463,7 @@ cross-check.
 | calc-mechanic.js | `computeEngineBmep` | `{ torque_lb_ft = 0, displacement_cid = 0, cycle_type = "four_stroke" } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeEngineFuelBurnGph` | `{ horsepower = 0, bsfc_lb_hp_hr = 0, density_lb_gal = 0, tank_gal = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeEtHorsepower` | `{ weight_lb = 0, et_s = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeFlywheelEnergy` | `{ weight_lb = 100, radius_of_gyration_ft = 1, rpm = 1000, energy_fluctuation_...` | _ | _ | _ |
 | calc-mechanic.js | `computeFuelRange` | `{ fuel = "gasoline_E10", tank_gal = 0, mpg = 0, mpg_basis = "gasoline_E10", l...` | _ | _ | _ |
 | calc-mechanic.js | `computeGearMphRpm` | `{ solve_for = "mph", rpm = 0, trans_ratio = 1, axle_ratio = 0, tire_dia_in = ...` | _ | _ | _ |
 | calc-mechanic.js | `computeGlidepathDescentRate` | `{ ground_speed_kt = 0, glidepath_angle_deg = 0 } = {}` | _ | _ | _ |
@@ -3116,7 +3117,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1702.
+Row count: 1703.
 
 <!-- END function-corpus-v14 -->
 
@@ -4267,7 +4268,7 @@ per spec-v14 §13.1 second paragraph.
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group K Mechanic (92 tiles)
+### Group K Mechanic (93 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4307,6 +4308,7 @@ per spec-v14 §13.1 second paragraph.
 | `engine-fuel-burn-gph` | Engine Fuel Burn from Horsepower (BSFC) | BSFC engine-performance practice; spec-v463 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `et-horsepower` | Horsepower from Quarter-Mile ET | Hale quarter-mile ET relation (invers...; spec-v662 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `feed-for-surface-finish` | Feed for a Target Turned Finish | First-principles scallop geometry (in...; 25 uin Ra target, 1/32 in nose radius -> 0.005 IPR (round... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `flywheel-energy` | Flywheel Kinetic Energy and Speed Fluctuation | Flywheel kinetic energy and speed flu...; I = 100/32.174 x 1 = 3.108; omega = 1000 x pi/30 = 104.72... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fuel-range` | Fuel Energy and Range | Project (first-principles); range = 18 * 28 * 1.0 = 504 mi; total_btu = 18 * 112000 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gear-chordal-thickness` | Gear-Tooth Chordal Thickness (Caliper) | Machinery's Handbook / AGMA (gear-too...; half-angle 2.25 deg; tc = 4 sin(2.25) = 0.15704; ac = 0.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gear-identification` | Gear Identification (Pitch from Teeth and OD) | Machinery's Handbook / AGMA (inverse ...; spec-v649 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4757,6 +4759,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1455. Fixture-covered or reference-cadence: 1455 / 1455.
+Tile count: 1456. Fixture-covered or reference-cadence: 1456 / 1456.
 
 <!-- END tile-index-v14 -->

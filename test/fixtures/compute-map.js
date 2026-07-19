@@ -1039,6 +1039,7 @@ export const COMPUTE_MAP = {
   "hull-speed": { module: "../../calc-mechanic.js", fn: "computeHullSpeed" },
   "hull-displacement": { module: "../../calc-mechanic.js", fn: "computeHullDisplacement" },
   "sailboat-performance-ratios": { module: "../../calc-mechanic.js", fn: "computeSailboatPerformanceRatios" },
+  "flywheel-energy": { module: "../../calc-mechanic.js", fn: "computeFlywheelEnergy" },
   "waterline-for-hull-speed": { module: "../../calc-mechanic.js", fn: "computeWaterlineForHullSpeed" },
   "bolt-proof-load": { module: "../../calc-cross.js", fn: "computeBoltProofLoad" },
   "bearing-l10-life": { module: "../../calc-machining.js", fn: "computeBearingL10Life" },

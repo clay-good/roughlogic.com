@@ -2723,3 +2723,43 @@ MECHANIC_RENDERERS["sailboat-performance-ratios"] = _simpleRenderer({
   ],
   compute: computeSailboatPerformanceRatios,
 });
+
+// ===================== spec-v1007: flywheel stored kinetic energy and speed fluctuation =====================
+// dims: in { args: dimensionless } out: { kinetic_energy_ftlb: dimensionless, speed_fluctuation_pct: dimensionless }
+export function computeFlywheelEnergy({ weight_lb = 100, radius_of_gyration_ft = 1, rpm = 1000, energy_fluctuation_ftlb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(weight_lb > 0)) return { error: "Flywheel weight must be positive (lb)." };
+  if (!(radius_of_gyration_ft > 0)) return { error: "Radius of gyration must be positive (ft)." };
+  if (!(rpm > 0)) return { error: "Speed must be positive (rpm)." };
+  if (!(energy_fluctuation_ftlb >= 0)) return { error: "Energy fluctuation cannot be negative (ft-lb)." };
+  // I = (W/g) k^2 (slug-ft^2); omega = rpm * pi/30; KE = 1/2 I omega^2. Coefficient of fluctuation Cs = dE/(I omega^2).
+  const I = (weight_lb / 32.174) * radius_of_gyration_ft * radius_of_gyration_ft;
+  const omega = rpm * Math.PI / 30;
+  const kinetic_energy_ftlb = 0.5 * I * omega * omega;
+  const speed_fluctuation_pct = energy_fluctuation_ftlb > 0 ? energy_fluctuation_ftlb / (I * omega * omega) * 100 : null;
+  if (!Number.isFinite(kinetic_energy_ftlb)) return { error: "Flywheel-energy math is not a finite value." };
+  return {
+    kinetic_energy_ftlb,
+    speed_fluctuation_pct,
+    note: "The rotational kinetic energy stored in a spinning flywheel, and how much its speed swings when a machine pulls energy out of it -- the number a millwright or machine builder uses to size a flywheel for a punch press, shear, engine, or any machine with a pulsing load. The stored energy is one-half times the mass moment of inertia times the angular velocity squared. In US units the moment of inertia I is the weight divided by gravity (32.174 ft/s^2) times the radius of gyration squared, where the radius of gyration k captures the mass distribution: for a solid disk k = radius / sqrt(2), for a thin rim k is nearly the rim radius (rim flywheels store far more energy for their weight, which is why real flywheels put the mass at the outside). The angular velocity is the rpm times pi over 30. A 100 lb flywheel with a 1 ft radius of gyration at 1,000 rpm stores 0.5 x (100/32.174) x (1,000 x pi/30)^2 = about 17,000 ft-lb of energy. When the machine draws an energy pulse out during a stroke, the flywheel slows: the coefficient of fluctuation -- the fractional speed swing -- is that energy fluctuation divided by (I times omega squared), or the pulse divided by twice the stored energy, so a 2,000 ft-lb draw on this flywheel swings the speed about 5.9%. Machines are designed to a target coefficient of fluctuation (roughly 0.002 for AC generators up to 0.2 for punches and shears), and the flywheel is sized up until the swing is small enough. A sizing aid; the actual inertia from the flywheel's geometry, the load's real energy profile, and the drive and prime mover govern the design.",
+  };
+}
+
+export const flywheelEnergyExample = { inputs: { weight_lb: 100, radius_of_gyration_ft: 1, rpm: 1000, energy_fluctuation_ftlb: 2000 } };
+
+MECHANIC_RENDERERS["flywheel-energy"] = _simpleRenderer({
+  citation: "Citation: flywheel stored kinetic energy and speed fluctuation, by name. I = (W/g) k^2; omega = rpm x pi/30; KE = 1/2 I omega^2; coefficient of fluctuation Cs = energy pulse / (I omega^2) = pulse / (2 KE). Radius of gyration k: disk = radius/sqrt(2), rim ~ radius. Target Cs ~0.002 (generators) to 0.2 (punches/shears). The actual inertia, the load's energy profile, and the drive govern.",
+  example: flywheelEnergyExample.inputs,
+  fields: [
+    { key: "weight_lb", label: "Flywheel weight (lb)", kind: "number", default: 100 },
+    { key: "radius_of_gyration_ft", label: "Radius of gyration k (ft): disk r/1.414, rim ~r", kind: "number", default: 1 },
+    { key: "rpm", label: "Speed (rpm)", kind: "number", default: 1000 },
+    { key: "energy_fluctuation_ftlb", label: "Energy pulse per cycle (ft-lb, 0 to skip)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "e", id: "fly-out-e", label: "Stored kinetic energy", value: (r) => fmt(r.kinetic_energy_ftlb, 0) + " ft-lb" },
+    { key: "s", id: "fly-out-s", label: "Speed fluctuation", value: (r) => r.speed_fluctuation_pct === null ? "-" : fmt(r.speed_fluctuation_pct, 2) + " % swing" },
+    { key: "n", id: "fly-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFlywheelEnergy,
+});

@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): add flywheel-energy tile (spec-v1007); 2026-07-18
+
+- New Group K tile `flywheel-energy` in calc-mechanic.js. Rotational kinetic energy stored in a flywheel and its speed
+  swing under a pulsing load, for sizing a flywheel (punch press, shear, engine). KE = 1/2 I omega^2, I = (weight/g)
+  x k^2, omega = rpm x pi/30; coefficient of fluctuation = pulse / (2 KE). 100 lb, k 1 ft, 1,000 rpm = 17,042 ft-lb;
+  a 2,000 ft-lb pulse swings it 5.87%. Target Cs ~0.002 (generators) to ~0.2 (punches/shears). Home count 1,455 ->
+  1,456.
+
 ### feat(machinist): add thread-single-depth tile (spec-v1006); 2026-07-18
 
 - New Group K tile `thread-single-depth` in calc-machining.js. Cut depth for single-point threading a 60-degree UN

@@ -1259,6 +1259,7 @@ const RELATED = {
   "hull-speed": ["prop-slip","prop-pitch-selection","fuel-range"],
   "hull-displacement": ["hull-speed","anchor-rode-scope","sacrificial-anode-life"],
   "sailboat-performance-ratios": ["hull-speed","hull-displacement","prop-slip"],
+  "flywheel-energy": ["hp-from-torque", "mean-piston-speed", "driveshaft-crit"],
   "waterline-for-hull-speed": ["hull-speed","crouch-planing-speed","prop-pitch-selection","fuel-range"],
   "anchor-rode-scope": ["hull-speed","prop-slip","wire-rope-strength"],
   "turbo-pressure-ratio": ["volumetric-efficiency","density-altitude","air-density-correction"],

@@ -28776,3 +28776,26 @@ test("bounds: spec-v1006 computeThreadSingleDepth pins the UN external thread de
   assert.ok("error" in _v1006({ tpi: -13 }));
   assert.ok("error" in _v1006({ tpi: Infinity }));
 });
+
+import { computeFlywheelEnergy as _v1007 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v1007 computeFlywheelEnergy pins the rotational KE and speed fluctuation", () => {
+  const r = _v1007({ weight_lb: 100, radius_of_gyration_ft: 1, rpm: 1000, energy_fluctuation_ftlb: 2000 });
+  assert.ok(Math.abs(r.kinetic_energy_ftlb - 17042) < 5); // 0.5*(100/32.174)*(1000*pi/30)^2
+  assert.ok(Math.abs(r.speed_fluctuation_pct - 5.867) < 0.05); // 2000/(2*KE)*100
+  // No pulse -> null fluctuation.
+  const np = _v1007({ weight_lb: 200, radius_of_gyration_ft: 1.5, rpm: 600, energy_fluctuation_ftlb: 0 });
+  assert.strictEqual(np.speed_fluctuation_pct, null);
+  assert.ok(Math.abs(np.kinetic_energy_ftlb - 27608) < 10);
+  // KE scales with the square of both speed and radius of gyration.
+  assert.ok(Math.abs(_v1007({ weight_lb: 100, radius_of_gyration_ft: 1, rpm: 2000, energy_fluctuation_ftlb: 0 }).kinetic_energy_ftlb - 4 * r.kinetic_energy_ftlb) < 1); // 2x rpm -> 4x KE
+  assert.ok(Math.abs(_v1007({ weight_lb: 100, radius_of_gyration_ft: 2, rpm: 1000, energy_fluctuation_ftlb: 0 }).kinetic_energy_ftlb - 4 * r.kinetic_energy_ftlb) < 1); // 2x k -> 4x KE
+  // A bigger flywheel (more KE) swings less for the same pulse.
+  assert.ok(_v1007({ weight_lb: 200, radius_of_gyration_ft: 1, rpm: 1000, energy_fluctuation_ftlb: 2000 }).speed_fluctuation_pct < r.speed_fluctuation_pct);
+  // Error seams.
+  assert.ok("error" in _v1007({ weight_lb: 0, radius_of_gyration_ft: 1, rpm: 1000, energy_fluctuation_ftlb: 0 }));
+  assert.ok("error" in _v1007({ weight_lb: 100, radius_of_gyration_ft: 0, rpm: 1000, energy_fluctuation_ftlb: 0 }));
+  assert.ok("error" in _v1007({ weight_lb: 100, radius_of_gyration_ft: 1, rpm: 0, energy_fluctuation_ftlb: 0 }));
+  assert.ok("error" in _v1007({ weight_lb: 100, radius_of_gyration_ft: 1, rpm: 1000, energy_fluctuation_ftlb: -1 }));
+  assert.ok("error" in _v1007({ weight_lb: Infinity, radius_of_gyration_ft: 1, rpm: 1000, energy_fluctuation_ftlb: 0 }));
+});
