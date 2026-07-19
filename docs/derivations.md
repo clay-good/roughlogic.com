@@ -2521,6 +2521,7 @@ cross-check.
 | calc-pipefit.js | `computePipePressureRating` | `{ od_in = 0, wall_in = 0, allow_stress = 0, joint_factor = 1, y_coeff = 0.4, ...` | _ | _ | _ |
 | calc-pipefit.js | `computePipeSpacingRack` | `{ pipe_od_in = 0, insulation_thickness_in = 0, clearance_in = 1, pipe_count =...` | _ | _ | _ |
 | calc-pipefit.js | `computeRacewayExpansion` | `{ run_length_ft = 0, temp_range_f = 0, alpha_per_f = 0.0000338, fitting_trave...` | _ | _ | _ |
+| calc-pipefit.js | `computeRadiatorEdrOutput` | `{ edr_sqft = 320, system_k = 240, pickup_factor = 0.33 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeReducerOffset` | `{ large_od_in = 0, small_od_in = 0, lay_length_in = 0, type = "concentric" } ...` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamBoilerBlowdown` | `{ steam_rate_lb_hr = 10000, feedwater_tds_ppm = 100, max_boiler_tds_ppm = 350...` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamPipeCapacity` | `{ nps = "2", spec_vol_ft3lb = 0, vel_ceiling_fpm = 0 } = {}` | _ | _ | _ |
@@ -3099,7 +3100,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1685.
+Row count: 1686.
 
 <!-- END function-corpus-v14 -->
 
@@ -3382,7 +3383,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (116 tiles)
+### Group B Plumbing (117 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3448,6 +3449,7 @@ per spec-v14 §13.1 second paragraph.
 | `pump-operating-point` | Pump Operating Point | Project (engineering composite); Static head 30 ft / friction k = 0.003 / small centrifuga... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-sizing` | Pump Sizing | Project (first-principles); Standard centrifugal-pump identity (US customary, gpm and... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `radiant-loop-sizing` | Hydronic Radiant Floor Loop Sizing | First-principles; ASHRAE HVAC Systems...; spec-v199 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `radiator-edr-output` | Radiator EDR to Heat Output | Radiator EDR to heat output (Hydronic...; Q = 320 x 240 = 76,800; gross = 76,800 x 1.33 = 102,144 B... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `recirc-loop-sizing` | Hot Water Recirc Loop Sizing (ASPE) | ASPE; U=0.17 Btu/hr/ft/F at 3/4-in / 1-in insulation; dT_pipe =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `recirc-pump-head` | Hot Water Recirc Pump Head | Project (first-principles); 100 ft of 0.75 in copper / 8 fittings (eq. ~16 ft) / 4 gp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reducer-offset` | Reducer Centerline Offset and Invert Continuity | Geometry; ASME B16.9 lay lengths (by ...; spec-v202 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4723,6 +4725,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1438. Fixture-covered or reference-cadence: 1438 / 1438.
+Tile count: 1439. Fixture-covered or reference-cadence: 1439 / 1439.
 
 <!-- END tile-index-v14 -->

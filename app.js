@@ -184,6 +184,7 @@ const TOOL_MODULES = (() => {
     "flash-steam-pct", "steam-pipe-velocity", "steam-pipe-capacity", "steam-trap-sizing",
     "steam-boiler-blowdown",
     "boiler-horsepower",
+    "radiator-edr-output",
     "pipe-pressure-rating", "pipe-filled-support-load", "hanger-rod-sizing",
     // spec-v200..v203 condensate return + fabrication/process layout tiles.
     "condensate-return-sizing", "branch-saddle-cutback", "reducer-offset",

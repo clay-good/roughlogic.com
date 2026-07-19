@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(pipefitting): add radiator-edr-output tile (spec-v990); 2026-07-18
+
+- New Group B tile `radiator-edr-output` in calc-pipefit.js. Heat output from a radiator's EDR rating and the gross
+  boiler to feed it -- the counting-radiators-to-size-a-boiler direction (complement of boiler-horsepower). Q = EDR x k,
+  k = 240 BTU/hr per sq ft (steam) or 150 (hot water); gross boiler = net x (1 + pickup), I=B=R pickup ~0.33 steam /
+  ~0.15 hot water. 320 sq ft EDR steam = 76,800 BTU/hr, 102,144 gross; 360 sq ft hot water = 54,000, 62,100 gross.
+  Home count 1,438 -> 1,439.
+
 ### feat(electrical): add conduit-nipple-60-fill tile (spec-v989); 2026-07-18
 
 - New Group A tile `conduit-nipple-60-fill` in calc-electrical.js. NEC Chapter 9 Note 4: a nipple (raceway <= 24 in

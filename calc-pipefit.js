@@ -1108,3 +1108,48 @@ function _v954renderSteamBoilerBlowdown(inputRegion, outputRegion, citationEl) {
   for (const f of [sr, fw, bw]) f.input.addEventListener("input", update);
 }
 PIPEFIT_RENDERERS["steam-boiler-blowdown"] = _v954renderSteamBoilerBlowdown;
+
+// ===================== spec-v990: radiator EDR to heat output =====================
+// dims: in { args: dimensionless } out: { heat_output_btu_hr: dimensionless, gross_boiler_btu_hr: dimensionless }
+export function computeRadiatorEdrOutput({ edr_sqft = 320, system_k = 240, pickup_factor = 0.33 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(edr_sqft > 0)) return { error: "EDR must be positive (sq ft)." };
+  if (!(system_k > 0)) return { error: "EDR heat constant must be positive (240 steam, 150 hot water)." };
+  if (!(pickup_factor >= 0)) return { error: "Pickup factor cannot be negative." };
+  // Q = EDR x k; k = 240 (steam, 215 F in a 70 F room) or 150 (hot water, 170 F avg). Boiler gross = net x (1 + pickup).
+  const heat_output_btu_hr = edr_sqft * system_k;
+  const gross_boiler_btu_hr = heat_output_btu_hr * (1 + pickup_factor);
+  if (![heat_output_btu_hr, gross_boiler_btu_hr].every(Number.isFinite)) return { error: "EDR math is not a finite value." };
+  return {
+    heat_output_btu_hr,
+    gross_boiler_btu_hr,
+    note: "The heat a cast-iron radiator or convector delivers from its EDR rating, and the gross boiler size that feeds it. EDR -- Equivalent Direct Radiation, in square feet -- is the standard way old steam and hot-water heating is rated, and the conversion to BTU per hour is a fixed constant per system: 1 sq ft EDR = 240 BTU/hr on STEAM (the Hydronics Institute / I=B=R basis, one square foot emitting 240 BTU/hr with 215 F steam in a 70 F room) and 150 BTU/hr on HOT WATER (170 F average water in a 70 F room). Six radiators totaling 320 sq ft EDR on steam put out 320 x 240 = 76,800 BTU/hr; the same 320 sq ft on a hot-water system would put out 320 x 150 = 48,000. Sizing the boiler adds a PICKUP allowance -- extra capacity to warm the cold piping and iron on a morning start -- so the gross boiler output is the connected load times (1 + pickup): the I=B=R pickup is about 0.33 (33%) for steam and about 0.15 for hot water, so the 76,800 steam load wants a boiler with a gross output near 102,000 BTU/hr, selected by its NET steam rating (>= 320 sq ft / 76,800 BTU/hr). A sizing aid; the actual radiator EDR from the maker or a measurement, the real piping and pickup, and the boiler's I=B=R net rating govern.",
+  };
+}
+
+export const radiatorEdrOutputExample = { inputs: { edr_sqft: 320, system_k: 240, pickup_factor: 0.33 } };
+
+function _v990renderRadiatorEdrOutput(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: radiator EDR to heat output, Hydronics Institute / I=B=R basis, by name. Q = EDR x k; k = 240 BTU/hr per sq ft (steam, 215 F / 70 F room), 150 (hot water, 170 F avg). Gross boiler = net x (1 + pickup); I=B=R pickup ~0.33 steam, ~0.15 hot water; select by NET rating. The radiator EDR, the real piping/pickup, and the boiler's I=B=R rating govern.";
+  const ed = makeNumber("Connected EDR (sq ft)", "red-ed", { step: "any", min: "0", value: "320" });
+  ed.input.value = "320";
+  const sk = makeNumber("EDR constant (240 steam, 150 hot water)", "red-sk", { step: "any", min: "0", value: "240" });
+  sk.input.value = "240";
+  const pf = makeNumber("Boiler pickup factor (0.33 steam, 0.15 HW)", "red-pf", { step: "any", min: "0", value: "0.33" });
+  pf.input.value = "0.33";
+  for (const f of [ed, sk, pf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ed.input.value = "320"; sk.input.value = "240"; pf.input.value = "0.33"; update(); });
+  const oH = makeOutputLine(outputRegion, "Radiator heat output", "red-out-h");
+  const oG = makeOutputLine(outputRegion, "Gross boiler size", "red-out-g");
+  const update = debounce(() => {
+    const r = computeRadiatorEdrOutput({
+      edr_sqft: ed.input.value === "" ? 320 : Number(ed.input.value), system_k: sk.input.value === "" ? 240 : Number(sk.input.value),
+      pickup_factor: pf.input.value === "" ? 0.33 : Number(pf.input.value),
+    });
+    if (r.error) { oH.textContent = r.error; oG.textContent = "-"; return; }
+    oH.textContent = fmt(r.heat_output_btu_hr, 0) + " BTU/hr";
+    oG.textContent = fmt(r.gross_boiler_btu_hr, 0) + " BTU/hr (with pickup)";
+  }, DEBOUNCE_MS);
+  for (const f of [ed, sk, pf]) f.input.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["radiator-edr-output"] = _v990renderRadiatorEdrOutput;

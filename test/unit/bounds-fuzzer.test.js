@@ -28418,3 +28418,25 @@ test("bounds: spec-v989 computeConduitNipple60Fill pins the 60% nipple allowance
   assert.ok("error" in _v989({ conduit_area_sqin: 0.864, conductor_area_sqin: 0.0211, conductor_count: 0 }));
   assert.ok("error" in _v989({ conduit_area_sqin: Infinity, conductor_area_sqin: 0.0211, conductor_count: 20 }));
 });
+
+import { computeRadiatorEdrOutput as _v990 } from "../../calc-pipefit.js";
+
+test("bounds: spec-v990 computeRadiatorEdrOutput pins the EDR heat output and boiler gross-up", () => {
+  const r = _v990({ edr_sqft: 320, system_k: 240, pickup_factor: 0.33 });
+  assert.ok(Math.abs(r.heat_output_btu_hr - 76800) < 1e-6); // 320*240
+  assert.ok(Math.abs(r.gross_boiler_btu_hr - 102144) < 1e-6); // *1.33
+  // Hot-water cross-check.
+  const hw = _v990({ edr_sqft: 360, system_k: 150, pickup_factor: 0.15 });
+  assert.ok(Math.abs(hw.heat_output_btu_hr - 54000) < 1e-6);
+  assert.ok(Math.abs(hw.gross_boiler_btu_hr - 62100) < 1e-6);
+  // Steam (240) always outputs more than hot water (150) for the same EDR; zero pickup = net equals gross.
+  assert.ok(_v990({ edr_sqft: 320, system_k: 240, pickup_factor: 0 }).heat_output_btu_hr > _v990({ edr_sqft: 320, system_k: 150, pickup_factor: 0 }).heat_output_btu_hr);
+  assert.ok(Math.abs(_v990({ edr_sqft: 320, system_k: 240, pickup_factor: 0 }).gross_boiler_btu_hr - 76800) < 1e-6);
+  // Output scales linearly with EDR.
+  assert.ok(Math.abs(_v990({ edr_sqft: 640, system_k: 240, pickup_factor: 0.33 }).heat_output_btu_hr - 2 * 76800) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v990({ edr_sqft: 0, system_k: 240, pickup_factor: 0.33 }));
+  assert.ok("error" in _v990({ edr_sqft: 320, system_k: 0, pickup_factor: 0.33 }));
+  assert.ok("error" in _v990({ edr_sqft: 320, system_k: 240, pickup_factor: -0.1 }));
+  assert.ok("error" in _v990({ edr_sqft: Infinity, system_k: 240, pickup_factor: 0.33 }));
+});

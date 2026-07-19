@@ -1431,6 +1431,7 @@ export const COMPUTE_MAP = {
   "steam-trap-sizing": { module: "../../calc-pipefit.js", fn: "computeSteamTrapSizing" },
   "steam-boiler-blowdown": { module: "../../calc-pipefit.js", fn: "computeSteamBoilerBlowdown" },
   "boiler-horsepower": { module: "../../calc-pipefit.js", fn: "computeBoilerHorsepower" },
+  "radiator-edr-output": { module: "../../calc-pipefit.js", fn: "computeRadiatorEdrOutput" },
   "steam-prv-napier": { module: "../../calc-pipefit.js", fn: "computeSteamPrvNapier" },
   "steam-prv-area-for-capacity": { module: "../../calc-pipefit.js", fn: "computeSteamPrvAreaForCapacity" },
   "pipe-pressure-rating": { module: "../../calc-pipefit.js", fn: "computePipePressureRating" },

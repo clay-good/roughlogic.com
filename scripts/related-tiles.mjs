@@ -985,6 +985,7 @@ const RELATED = {
   "steam-trap-sizing": ["flash-steam-pct", "steam-pipe-velocity", "boiler-pipe-sizing"],
   "steam-boiler-blowdown": ["boiler-horsepower", "cooling-water-makeup", "steam-trap-sizing"],
   "boiler-horsepower": ["boiler-pipe-sizing", "steam-pipe-velocity", "steam-trap-sizing"],
+  "radiator-edr-output": ["boiler-horsepower", "manual-j-heating", "steam-boiler-blowdown"],
   "steam-prv-napier": ["valve-flow-coefficient", "flash-steam-pct", "steam-trap-sizing"],
   "steam-prv-area-for-capacity": ["steam-prv-napier", "flash-steam-pct", "steam-trap-sizing"],
   // spec-v199 radiant; spec-v200..v203 condensate return + fabrication/process layout
