@@ -1953,6 +1953,17 @@ export const CITATIONS = {
       { name: "Sample points", value: "appliance O2 before the draft hood, diluted O2 after it; dilution can only raise the O2", source: "combustion-analysis practice" },
     ],
   },
+  "oil-burner-firing-rate": {
+    formula: "input_btu_hr = output_btu_hr / (steady_state_efficiency_pct / 100); firing_rate_gph = input_btu_hr / heating_value_btu_gal. No. 2 fuel oil heating value ~138,500 BTU/gal (editable).",
+    edition: "Oil burner nozzle firing rate (NORA / oil-heat industry practice; EIA No. 2 distillate heating value ~138,000-139,000 BTU/gal), by name; the appliance rating plate and firing range, the nozzle chart, the pump pressure, and a combustion analysis with the manufacturer's instructions govern.",
+    freeAccess: "The input-and-firing-rate conversion is a public physics identity (output over efficiency over heating value); the output, efficiency, and heating value are the appliance's and fuel's values.",
+    governance: GOVERNANCE.general,
+    editionNote: "When a service tech sizes or re-nozzles an oil burner, the firing rate in gallons per hour follows directly from the target heat output, the burner's efficiency, and the energy in the fuel. The heat OUTPUT the building needs is less than the fuel INPUT by the steady-state combustion efficiency, so the required input in BTU per hour is the output divided by that efficiency as a fraction. Dividing the input by the fuel's heating value in BTU per gallon gives the firing rate in gallons per hour. No. 2 fuel oil, the common heating oil, carries about 138,500 BTU per gallon, though the figure ranges roughly 138,000 to 140,000 depending on the blend, so it is left editable. To produce 88,000 BTU per hour of output at an 85% steady-state efficiency, the input is 88,000 divided by 0.85, or 103,529 BTU per hour, and the firing rate is 103,529 divided by 138,500, or 0.75 gallons per hour, pointing to a 0.75 GPH nozzle. Read the other direction, a 1.00 GPH nozzle fires 138,500 BTU per hour of input and, at 84% efficiency, delivers about 116,300 BTU per hour of output. Oil nozzles are manufactured in fixed GPH increments along with specific spray angles and patterns, so the calculated rate is rounded to the nearest available nozzle, and the actual delivered flow depends on the fuel-pump pressure: a nozzle is rated at 100 psi, and raising the pump pressure increases the flow in proportion to the square root of the pressure ratio. This is a sizing aid; the appliance's rating plate and its listed firing-rate range, the nozzle manufacturer's chart, the set pump pressure, and a proper combustion analysis performed per the manufacturer's instructions govern the final setup.",
+    assumptions: [
+      { name: "Firing-rate conversion", value: "input = output / steady-state efficiency; GPH = input / heating value; No. 2 oil ~138,500 BTU/gal (editable)", source: "NORA / oil-heat practice; EIA distillate HHV" },
+      { name: "Nozzle and pressure", value: "round to a stocked GPH nozzle and spray pattern; a nozzle is rated at 100 psi and flow scales with sqrt of the pressure ratio; a combustion analysis governs", source: "burner-nozzle service practice" },
+    ],
+  },
   "combustion-lambda": {
     formula: "lambda = 20.9 / (20.9 - flue_o2_pct); excess_air_pct = (lambda - 1) x 100; afr_actual = lambda x afr_stoich(fuel).",
     edition: "Combustion-analysis practice lambda and air-fuel ratio, by name.",

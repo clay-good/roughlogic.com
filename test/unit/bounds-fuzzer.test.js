@@ -28571,3 +28571,22 @@ test("bounds: spec-v996 computeGuyWireTension pins the guy statics and mast down
   assert.ok("error" in _v996({ horizontal_load_lb: 500, attachment_height_ft: 20, anchor_lead_ft: 0 }));
   assert.ok("error" in _v996({ horizontal_load_lb: Infinity, attachment_height_ft: 20, anchor_lead_ft: 20 }));
 });
+
+import { computeOilBurnerFiringRate as _v997 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v997 computeOilBurnerFiringRate pins the input and nozzle GPH", () => {
+  const r = _v997({ output_btu_hr: 88000, steady_state_efficiency_pct: 85, heating_value_btu_gal: 138500 });
+  assert.ok(Math.abs(r.input_btu_hr - 103529.4) < 1); // 88000/0.85
+  assert.ok(Math.abs(r.firing_rate_gph - 0.74750) < 1e-3); // /138500
+  const c = _v997({ output_btu_hr: 120000, steady_state_efficiency_pct: 82, heating_value_btu_gal: 138500 });
+  assert.ok(Math.abs(c.firing_rate_gph - 1.0566) < 1e-3);
+  // Lower efficiency raises the required firing rate; a higher heating value lowers it.
+  assert.ok(_v997({ output_btu_hr: 88000, steady_state_efficiency_pct: 75, heating_value_btu_gal: 138500 }).firing_rate_gph > r.firing_rate_gph);
+  assert.ok(_v997({ output_btu_hr: 88000, steady_state_efficiency_pct: 85, heating_value_btu_gal: 140000 }).firing_rate_gph < r.firing_rate_gph);
+  // Error seams.
+  assert.ok("error" in _v997({ output_btu_hr: 0, steady_state_efficiency_pct: 85, heating_value_btu_gal: 138500 }));
+  assert.ok("error" in _v997({ output_btu_hr: 88000, steady_state_efficiency_pct: 0, heating_value_btu_gal: 138500 }));
+  assert.ok("error" in _v997({ output_btu_hr: 88000, steady_state_efficiency_pct: 120, heating_value_btu_gal: 138500 }));
+  assert.ok("error" in _v997({ output_btu_hr: 88000, steady_state_efficiency_pct: 85, heating_value_btu_gal: 0 }));
+  assert.ok("error" in _v997({ output_btu_hr: Infinity, steady_state_efficiency_pct: 85, heating_value_btu_gal: 138500 }));
+});

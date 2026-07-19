@@ -747,6 +747,7 @@ const RELATED = {
   "chimney-height-for-draft": ["chimney-draft", "combustion-air", "excess-air-o2", "flue-gas-combustion-eff"],
   "flue-gas-combustion-eff": ["excess-air-o2", "co-air-free", "chimney-draft"],
   "combustion-lambda": ["excess-air-o2", "co-air-free", "flue-gas-combustion-eff"],
+  "oil-burner-firing-rate": ["combustion-lambda", "gas-appliance-demand", "manual-j-heating"],
   "duct-friction-static": ["duct-sizing", "static-pressure-hvac", "equivalent-length"],
   "refrigerant-charging": ["refrigerant-pt", "superheat-subcool", "refrigerant-charge"],
   "cooling-tower": ["approach-delta-t", "wet-bulb-psychrometer", "chiller-tons"],

@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): add oil-burner-firing-rate tile (spec-v997); 2026-07-18
+
+- New Group C tile `oil-burner-firing-rate` in calc-hvacservice.js. Oil burner nozzle GPH to hit a target output:
+  input = output / steady-state efficiency; firing rate = input / heating value. No. 2 fuel oil ~138,500 BTU/gal
+  (editable). 88,000 BTU/hr output at 85% = 103,529 BTU/hr input, 0.75 GPH; 120,000 at 82% = 1.06 GPH. Nozzles come in
+  fixed GPH steps; actual flow shifts with pump pressure. Home count 1,445 -> 1,446.
+
 ### feat(rigging): add guy-wire-tension tile (spec-v996); 2026-07-18
 
 - New Group Z tile `guy-wire-tension` in calc-rigging.js. Down-guy tension and mast download from a horizontal top

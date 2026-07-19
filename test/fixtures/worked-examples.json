@@ -68893,6 +68893,56 @@
    }
   },
   {
+   "tile_id": "oil-burner-firing-rate",
+   "source_publisher": "Oil burner nozzle firing rate (NORA / oil-heat practice)",
+   "source_title": "88,000 BTU/hr output, 85% eff, 138,500 BTU/gal -> 103,529 BTU/hr input, 0.75 GPH nozzle",
+   "source_edition_or_year": "spec-v997 worked example (machine-verified)",
+   "source_section_or_page": "input = 88,000 / 0.85 = 103,529; GPH = 103,529 / 138,500 = 0.7475 -> 0.75 nozzle",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "output_btu_hr": 88000,
+    "steady_state_efficiency_pct": 85,
+    "heating_value_btu_gal": 138500
+   },
+   "outputs": {
+    "input_btu_hr": {
+     "value": 103529,
+     "tolerance": {
+      "abs": 5
+     }
+    },
+    "firing_rate_gph": {
+     "value": 0.7475,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "oil-burner-firing-rate",
+   "source_publisher": "Oil burner nozzle firing rate (NORA / oil-heat practice)",
+   "source_title": "cross-check: 120,000 BTU/hr output, 82% eff -> 146,341 BTU/hr input, 1.06 GPH",
+   "source_edition_or_year": "spec-v997 worked example (machine-verified)",
+   "source_section_or_page": "input = 120,000 / 0.82 = 146,341; GPH = 146,341 / 138,500 = 1.057",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "output_btu_hr": 120000,
+    "steady_state_efficiency_pct": 82,
+    "heating_value_btu_gal": 138500
+   },
+   "outputs": {
+    "firing_rate_gph": {
+     "value": 1.057,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "combustion-lambda",
    "source_publisher": "Combustion-analysis practice (lambda / air-fuel ratio)",
    "source_title": "lambda = 20.9 / (20.9 - O2); AFR_actual = lambda x AFR_stoich (spec-v583's named follow-on)",

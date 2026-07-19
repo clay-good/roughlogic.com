@@ -619,6 +619,7 @@ export const COMPUTE_MAP = {
   "duct-leakage-cfm25": { module: "../../calc-hvacservice.js", fn: "computeDuctLeakageCfm25" },
   "excess-air-o2": { module: "../../calc-hvacservice.js", fn: "computeExcessAirO2" },
   "combustion-lambda": { module: "../../calc-hvacservice.js", fn: "computeCombustionLambda" },
+  "oil-burner-firing-rate": { module: "../../calc-hvacservice.js", fn: "computeOilBurnerFiringRate" },
   "co-air-free": { module: "../../calc-hvacservice.js", fn: "computeCoAirFree" },
   "draft-hood-dilution": { module: "../../calc-hvacservice.js", fn: "computeDraftHoodDilution" },
   "chimney-draft": { module: "../../calc-hvacservice.js", fn: "computeChimneyDraft" },

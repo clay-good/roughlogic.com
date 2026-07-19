@@ -1045,3 +1045,38 @@ function _v609renderCombustionLambda(inputRegion, outputRegion, citationEl) {
   o2.input.addEventListener("input", update);
 }
 HVACSERVICE_RENDERERS["combustion-lambda"] = _v609renderCombustionLambda;
+
+// ===================== spec-v997: oil burner nozzle firing rate (GPH) =====================
+// dims: in { args: dimensionless } out: { input_btu_hr: dimensionless, firing_rate_gph: dimensionless }
+export function computeOilBurnerFiringRate({ output_btu_hr = 88000, steady_state_efficiency_pct = 85, heating_value_btu_gal = 138500 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(output_btu_hr > 0)) return { error: "Design output must be positive (BTU/hr)." };
+  if (!(steady_state_efficiency_pct > 0 && steady_state_efficiency_pct <= 100)) return { error: "Steady-state efficiency must be between 0 and 100 percent." };
+  if (!(heating_value_btu_gal > 0)) return { error: "Heating value must be positive (BTU/gal)." };
+  // Fuel input from the output and efficiency, then gallons/hr from the oil's heating value.
+  const input_btu_hr = output_btu_hr / (steady_state_efficiency_pct / 100);
+  const firing_rate_gph = input_btu_hr / heating_value_btu_gal;
+  if (![input_btu_hr, firing_rate_gph].every(Number.isFinite)) return { error: "Firing-rate math is not a finite value." };
+  return {
+    input_btu_hr,
+    firing_rate_gph,
+    note: "The oil burner nozzle firing rate in gallons per hour to hit a target heat OUTPUT, the number a tech sets when swapping a nozzle or matching a boiler/furnace to a heat loss. The fuel INPUT is the output divided by the steady-state (combustion) efficiency, and the firing rate is that input divided by the oil's heating value. No. 2 fuel oil carries about 138,500 BTU per gallon (the figure varies ~138,000-140,000, so it is an editable input). To make 88,000 BTU/hr of output at 85% steady-state efficiency, the input is 88,000 / 0.85 = 103,529 BTU/hr, and the firing rate is 103,529 / 138,500 = 0.75 GPH -- so a 0.75 GPH nozzle. Going the other way, a 1.00 GPH nozzle fires 138,500 BTU/hr of input and, at 84% efficiency, makes about 116,300 BTU/hr of output. Nozzles come in fixed GPH steps and spray angles/patterns, so round to the nearest available size, and the ACTUAL delivered rate shifts with the pump pressure (a nozzle is rated at 100 psi; raising the pressure raises the flow roughly with the square root of the pressure ratio). A sizing aid; the appliance's rating plate and firing-rate range, the nozzle chart, the pump pressure, and a combustion analysis with the manufacturer's instructions govern the final setup.",
+  };
+}
+
+export const oilBurnerFiringRateExample = { inputs: { output_btu_hr: 88000, steady_state_efficiency_pct: 85, heating_value_btu_gal: 138500 } };
+
+HVACSERVICE_RENDERERS["oil-burner-firing-rate"] = _simpleRenderer({
+  citation: "Citation: oil burner nozzle firing rate (GPH), by name. input = output / (steady-state efficiency); GPH = input / heating value. No. 2 fuel oil ~138,500 BTU/gal (editable). Nozzles come in fixed GPH steps; actual flow shifts with pump pressure (rated at 100 psi, flow ~ sqrt of pressure ratio). The rating plate, nozzle chart, pump pressure, and a combustion analysis govern.",
+  example: oilBurnerFiringRateExample.inputs,
+  fields: [
+    { key: "output_btu_hr", label: "Design heat output (BTU/hr)", kind: "number", default: 88000 },
+    { key: "steady_state_efficiency_pct", label: "Steady-state efficiency (%)", kind: "number", default: 85 },
+    { key: "heating_value_btu_gal", label: "Oil heating value (BTU/gal, #2 ~138,500)", kind: "number", default: 138500 },
+  ],
+  outputs: [
+    { key: "i", id: "obf-out-i", label: "Fuel input", value: (r) => fmt(r.input_btu_hr, 0) + " BTU/hr" },
+    { key: "g", id: "obf-out-g", label: "Nozzle firing rate", value: (r) => fmt(r.firing_rate_gph, 2) + " GPH" },
+  ],
+  compute: computeOilBurnerFiringRate,
+});
