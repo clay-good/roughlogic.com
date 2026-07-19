@@ -3058,6 +3058,7 @@ cross-check.
 | calc-water.js | `computeRoRecoveryConcentration` | `{ feed_gpm = 10, permeate_gpm = 7.5, feed_tds_mgl = 500 } = {}` | _ | _ | _ |
 | calc-water.js | `computeSRTandFM` | `{ aeration_volume_gal = 0, mlss_mg_l = 0, mlvss_mg_l = 0, was_flow_mgd = 0, w...` | _ | _ | _ |
 | calc-water.js | `computeSVI` | `{ sv30_ml_per_l = 0, mlss_mg_per_l = 0, } = {}` | _ | _ | _ |
+| calc-water.js | `computeTwoSourceBlend` | `{ flow1_gpm = 500, conc1 = 4, flow2_gpm = 300, conc2 = 12, target_conc = 8 } ...` | _ | _ | _ |
 | calc-water.js | `computeUvDose` | `{ intensity_mw_cm2 = 0, exposure_time_s = 0, target_dose_mj_cm2 = 40 } = {}` | _ | _ | _ |
 | calc-water.js | `computeUvRequiredExposure` | `{ target_dose_mj_cm2 = 40, intensity_mw_cm2 = 0, exposure_time_s = 0 } = {}` | _ | _ | _ |
 | calc-water.js | `computeWasSrtControl` | `{ aeration_volume_mg = 0, mlss_mg_l = 0, target_srt_days = 0, was_conc_mg_l =...` | _ | _ | _ |
@@ -3101,7 +3102,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1687.
+Row count: 1688.
 
 <!-- END function-corpus-v14 -->
 
@@ -4415,7 +4416,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (60 tiles)
+### Group M Water and wastewater (61 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4471,6 +4472,7 @@ per spec-v14 §13.1 second paragraph.
 | `svi-sludge-index` | Sludge Volume Index (SVI) | USEPA / WEF; SVI = SV30 * 1000 / MLSS | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tapered-flocculation-g` | Tapered Flocculation G Schedule | Camp & Stein 1943 / Ten States Standards; G 50/30/20 per s, three 100 m3 stages, 15 C (mu 1.138e-3)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tds-from-conductivity` | Total Dissolved Solids from Conductivity | Standard Methods 2510; spec-v407 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `two-source-blend` | Flow-Weighted Two-Source Water Blend | Flow-weighted two-source water blend; blend = (500x4 + 300x12)/800 = 5600/800 = 7.0; low-source... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `uv-dose` | UV Dose and Target Check | USEPA UV Disinfection Guidance Manual...; spec-v116 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `uv-required-exposure` | UV Required Intensity or Contact Time | USEPA UV Disinfection Guidance Manual...; spec-v659 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `va-alkalinity-ratio` | Digester Volatile-Acid to Alkalinity Ratio | WEF Manual of Practice / EPA operator...; VA 180 mg/L, alkalinity 2,400 mg/L -> ratio 0.075 (stable... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4727,6 +4729,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1440. Fixture-covered or reference-cadence: 1440 / 1440.
+Tile count: 1441. Fixture-covered or reference-cadence: 1441 / 1441.
 
 <!-- END tile-index-v14 -->

@@ -2069,3 +2069,66 @@ function _v984renderFluorideFeedDose(inputRegion, outputRegion, citationEl) {
   for (const f of [td, rf, fl, af, pu]) f.input.addEventListener("input", update);
 }
 WATER_RENDERERS["fluoride-feed-dose"] = _v984renderFluorideFeedDose;
+
+// ===================== spec-v992: flow-weighted two-source water blend =====================
+// dims: in { args: dimensionless } out: { blended_conc: dimensionless, required_low_source_pct: dimensionless }
+export function computeTwoSourceBlend({ flow1_gpm = 500, conc1 = 4, flow2_gpm = 300, conc2 = 12, target_conc = 8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(flow1_gpm > 0)) return { error: "Source 1 flow must be positive (gpm)." };
+  if (!(flow2_gpm > 0)) return { error: "Source 2 flow must be positive (gpm)." };
+  if (!(conc1 >= 0) || !(conc2 >= 0)) return { error: "Concentrations must be non-negative." };
+  if (!(target_conc >= 0)) return { error: "Target concentration must be non-negative." };
+  // Flow-weighted mass balance for the blend; the low-source fraction to hit a target is (C2 - Ct)/(C2 - C1).
+  const blended_conc = (flow1_gpm * conc1 + flow2_gpm * conc2) / (flow1_gpm + flow2_gpm);
+  const lo = Math.min(conc1, conc2), hi = Math.max(conc1, conc2);
+  let required_low_source_pct = null;
+  let target_note = "";
+  if (conc1 === conc2) {
+    target_note = "Both sources are the same concentration -- blending cannot change it.";
+  } else if (target_conc >= lo && target_conc <= hi) {
+    // Fraction of the LOWER-concentration source needed to reach the target.
+    required_low_source_pct = (hi - target_conc) / (hi - lo) * 100;
+    target_note = "To hit the target, run about " + required_low_source_pct.toFixed(1) + "% of the total flow from the lower-concentration source.";
+  } else {
+    target_note = "The target is outside the two source concentrations -- no blend of these two can reach it; treatment or a third source is needed.";
+  }
+  if (!Number.isFinite(blended_conc)) return { error: "Blend math is not a finite value." };
+  return {
+    blended_conc,
+    required_low_source_pct,
+    target_note,
+    note: "The concentration of two water sources blended together, and the split needed to meet a target -- the everyday calculation when an operator combines wells or surface intakes to hold a contaminant (nitrate, fluoride, hardness, TDS, chloride) under its limit. The blend is the flow-weighted average: (flow1 x conc1 + flow2 x conc2) / (flow1 + flow2), the same mass balance behind the pounds formula. Blending 500 gpm of a 4 mg/L well with 300 gpm of a 12 mg/L well gives (2,000 + 3,600) / 800 = 7.0 mg/L, comfortably under a 10 mg/L MCL. To design toward a target that lies between the two source concentrations, the fraction of the LOWER-concentration source is (high conc - target) / (high conc - low conc): to reach 8 mg/L from the 4 and 12 mg/L wells needs (12 - 8) / (12 - 4) = 50% of the total flow from the clean well, i.e. equal flows. A target outside the two source concentrations cannot be reached by blending them at all -- it takes treatment or a different source. A blending screen; the actual source concentrations vary over time, the SDWA maximum contaminant level is a running or single-sample limit depending on the contaminant, and the state primacy agency and the operator's monitoring govern compliance.",
+  };
+}
+
+export const twoSourceBlendExample = { inputs: { flow1_gpm: 500, conc1: 4, flow2_gpm: 300, conc2: 12, target_conc: 8 } };
+
+function _v992renderTwoSourceBlend(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: flow-weighted two-source water blend, by name. blended = (Q1 C1 + Q2 C2)/(Q1 + Q2); low-source fraction for a target = (Chigh - target)/(Chigh - Clow). A blending mass balance; the source concentrations vary, the SDWA MCL applies, and the state primacy agency and the operator's monitoring govern compliance.";
+  const f1 = makeNumber("Source 1 flow (gpm)", "tsb-f1", { step: "any", min: "0", value: "500" });
+  f1.input.value = "500";
+  const c1 = makeNumber("Source 1 concentration (mg/L)", "tsb-c1", { step: "any", min: "0", value: "4" });
+  c1.input.value = "4";
+  const f2 = makeNumber("Source 2 flow (gpm)", "tsb-f2", { step: "any", min: "0", value: "300" });
+  f2.input.value = "300";
+  const c2 = makeNumber("Source 2 concentration (mg/L)", "tsb-c2", { step: "any", min: "0", value: "12" });
+  c2.input.value = "12";
+  const tc = makeNumber("Target concentration (mg/L)", "tsb-tc", { step: "any", min: "0", value: "8" });
+  tc.input.value = "8";
+  for (const f of [f1, c1, f2, c2, tc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { f1.input.value = "500"; c1.input.value = "4"; f2.input.value = "300"; c2.input.value = "12"; tc.input.value = "8"; update(); });
+  const oB = makeOutputLine(outputRegion, "Blended concentration", "tsb-out-b");
+  const oT = makeOutputLine(outputRegion, "To hit the target", "tsb-out-t");
+  const update = debounce(() => {
+    const r = computeTwoSourceBlend({
+      flow1_gpm: f1.input.value === "" ? 500 : Number(f1.input.value), conc1: c1.input.value === "" ? 4 : Number(c1.input.value),
+      flow2_gpm: f2.input.value === "" ? 300 : Number(f2.input.value), conc2: c2.input.value === "" ? 12 : Number(c2.input.value),
+      target_conc: tc.input.value === "" ? 8 : Number(tc.input.value),
+    });
+    if (r.error) { oB.textContent = r.error; oT.textContent = "-"; return; }
+    oB.textContent = fmt(r.blended_conc, 2) + " mg/L";
+    oT.textContent = r.target_note;
+  }, DEBOUNCE_MS);
+  for (const f of [f1, c1, f2, c2, tc]) f.input.addEventListener("input", update);
+}
+WATER_RENDERERS["two-source-blend"] = _v992renderTwoSourceBlend;

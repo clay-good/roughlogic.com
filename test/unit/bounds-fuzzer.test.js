@@ -28468,3 +28468,27 @@ test("bounds: spec-v991 computeReevingPartsOfLine pins the reeving pull and effi
   assert.ok("error" in _v991({ load_lb: 20000, parts_of_line: 4, sheave_efficiency: 0 }));
   assert.ok("error" in _v991({ load_lb: Infinity, parts_of_line: 4, sheave_efficiency: 0.98 }));
 });
+
+import { computeTwoSourceBlend as _v992 } from "../../calc-water.js";
+
+test("bounds: spec-v992 computeTwoSourceBlend pins the flow-weighted blend and target split", () => {
+  const r = _v992({ flow1_gpm: 500, conc1: 4, flow2_gpm: 300, conc2: 12, target_conc: 8 });
+  assert.ok(Math.abs(r.blended_conc - 7.0) < 1e-9); // (500*4+300*12)/800
+  assert.ok(Math.abs(r.required_low_source_pct - 50) < 1e-9); // (12-8)/(12-4)*100
+  // Equal-flow cross-check: 50/50 of 4 and 12 = 8.
+  assert.ok(Math.abs(_v992({ flow1_gpm: 400, conc1: 4, flow2_gpm: 400, conc2: 12, target_conc: 8 }).blended_conc - 8.0) < 1e-9);
+  // The blend always lands between the two source concentrations.
+  assert.ok(r.blended_conc >= 4 && r.blended_conc <= 12);
+  // A target outside the two sources is unreachable (fraction null, note flags it).
+  const out = _v992({ flow1_gpm: 500, conc1: 4, flow2_gpm: 300, conc2: 12, target_conc: 2 });
+  assert.strictEqual(out.required_low_source_pct, null);
+  assert.ok(/outside/.test(out.target_note));
+  // Equal source concentrations: blending can't change it.
+  const same = _v992({ flow1_gpm: 500, conc1: 6, flow2_gpm: 300, conc2: 6, target_conc: 6 });
+  assert.ok(Math.abs(same.blended_conc - 6) < 1e-9);
+  assert.ok(/same concentration/.test(same.target_note));
+  // Error seams.
+  assert.ok("error" in _v992({ flow1_gpm: 0, conc1: 4, flow2_gpm: 300, conc2: 12, target_conc: 8 }));
+  assert.ok("error" in _v992({ flow1_gpm: 500, conc1: -1, flow2_gpm: 300, conc2: 12, target_conc: 8 }));
+  assert.ok("error" in _v992({ flow1_gpm: Infinity, conc1: 4, flow2_gpm: 300, conc2: 12, target_conc: 8 }));
+});

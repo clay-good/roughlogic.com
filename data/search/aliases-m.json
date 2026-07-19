@@ -3,6 +3,11 @@
   "_updated": "2026-07-17",
   "aliases": [
     {"term":"float method flow","target":"float-method-flow","kind":"industry"},
+    {"term":"two source blend","target":"two-source-blend","kind":"industry"},
+    {"term":"water blend","target":"two-source-blend","kind":"industry"},
+    {"term":"blend wells","target":"two-source-blend","kind":"industry"},
+    {"term":"blending calculation","target":"two-source-blend","kind":"industry"},
+    {"term":"source blending","target":"two-source-blend","kind":"industry"},
     {"term":"fluoride feed","target":"fluoride-feed-dose","kind":"industry"},
     {"term":"fluoridation dose","target":"fluoride-feed-dose","kind":"industry"},
     {"term":"fluoride dosage","target":"fluoride-feed-dose","kind":"industry"},

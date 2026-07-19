@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(water): add two-source-blend tile (spec-v992); 2026-07-18
+
+- New Group M tile `two-source-blend` in calc-water.js. Flow-weighted blend of two water sources and the split to meet
+  a target: blend = (Q1 C1 + Q2 C2)/(Q1 + Q2); lower-source fraction for a target = (Chigh - target)/(Chigh - Clow).
+  500 gpm at 4 mg/L + 300 gpm at 12 = 7.0 mg/L; reaching 8 mg/L needs 50% clean flow (equal flows). Flags a target
+  outside both source concentrations as unreachable by blending. Home count 1,440 -> 1,441.
+
 ### feat(rigging): add reeving-parts-of-line tile (spec-v991); 2026-07-18
 
 - New Group Z tile `reeving-parts-of-line` in calc-rigging.js. Hauling-line pull on a block-and-tackle/hoist reeved

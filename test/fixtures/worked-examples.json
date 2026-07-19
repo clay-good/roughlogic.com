@@ -29538,6 +29538,60 @@
    }
   },
   {
+   "tile_id": "two-source-blend",
+   "source_publisher": "Flow-weighted two-source water blend",
+   "source_title": "500 gpm @ 4 mg/L + 300 gpm @ 12 mg/L -> 7.0 mg/L; 50% clean flow to hit 8 mg/L",
+   "source_edition_or_year": "spec-v992 worked example (machine-verified)",
+   "source_section_or_page": "blend = (500x4 + 300x12)/800 = 5600/800 = 7.0; low-source frac for 8 = (12-8)/(12-4) = 50%",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "flow1_gpm": 500,
+    "conc1": 4,
+    "flow2_gpm": 300,
+    "conc2": 12,
+    "target_conc": 8
+   },
+   "outputs": {
+    "blended_conc": {
+     "value": 7.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "required_low_source_pct": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "two-source-blend",
+   "source_publisher": "Flow-weighted two-source water blend",
+   "source_title": "cross-check: equal 400 gpm each of 4 and 12 mg/L -> 8.0 mg/L (the 50% split confirmed)",
+   "source_edition_or_year": "spec-v992 worked example (machine-verified)",
+   "source_section_or_page": "blend = (400x4 + 400x12)/800 = 6400/800 = 8.0 mg/L",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "flow1_gpm": 400,
+    "conc1": 4,
+    "flow2_gpm": 400,
+    "conc2": 12,
+    "target_conc": 8
+   },
+   "outputs": {
+    "blended_conc": {
+     "value": 8.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fluoride-feed-dose",
    "source_publisher": "Water-fluoridation feed (available-fluoride-ion pounds formula)",
    "source_title": "net 0.6 mg/L (0.7 target - 0.1 raw), 2 MGD, 25% fluorosilicic acid (AFI 0.792) -> 50.55 lb/day",
