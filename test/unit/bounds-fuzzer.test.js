@@ -21420,6 +21420,12 @@ test("bounds: spec-v486 computeTrailerTongueWeight pins the percent, the convent
   assert.ok(Math.abs(r.tongue_pct - 10) < 1e-9);
   assert.ok(Math.abs(r.target_low_lb - 700) < 1e-9 && Math.abs(r.target_high_lb - 1050) < 1e-9);
   assert.strictEqual(r.in_band, true); // 10% is at the inclusive floor
+  // The verdict string must be RETURNED (the renderer reads r.verdict; when it
+  // was computed-but-not-returned the Verdict line rendered "undefined").
+  assert.strictEqual(typeof r.verdict, "string");
+  assert.ok(r.verdict.includes("in band"));
+  assert.ok(_v486({ trailer_gross_weight_lb: 7000, tongue_weight_lb: 490 }).verdict.includes("TOO LIGHT"));
+  assert.ok(_v486({ trailer_gross_weight_lb: 7000, tongue_weight_lb: 1400 }).verdict.includes("TOO HEAVY"));
   // The sway trap: shifting load back to 7% drops below the 10% floor.
   const r2 = _v486({ trailer_gross_weight_lb: 7000, tongue_weight_lb: 490, hitch_type: "conventional" });
   assert.ok(Math.abs(r2.tongue_pct - 7) < 1e-9);

@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(trucking): trailer-tongue-weight rendered "undefined" for its Verdict; 2026-07-19
+
+- `computeTrailerTongueWeight` built the `verdict` string (TOO LIGHT / TOO HEAVY / in-band) but left it out of the
+  return object, while the renderer's Verdict line reads `r.verdict`. So the tile's headline output rendered
+  "OK: undefined" (or "undefined -- ALSO over the hitch tongue-weight rating"). The render-no-nan gate missed it
+  because an undefined STRING is not a NaN. Added `verdict` to the return; the Verdict line now shows the real
+  message. Added a regression assertion pinning the verdict for the in-band / too-light / too-heavy cases. Found by a
+  precise `_simpleRenderer` output-key scan (every `r.KEY` a renderer reads must be a key its compute returns), which
+  otherwise came back clean across 1,873 output references.
+
 ### fix(dims): annotate gpm outputs as flow (L^3 T^-1), not volume (L^3); 2026-07-19
 
 - Ten `*_gpm` dimensional annotations in the `// dims:` comments (calc-agriculture, calc-fire, calc-treatment,

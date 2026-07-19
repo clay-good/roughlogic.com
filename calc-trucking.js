@@ -1658,7 +1658,7 @@ export function computeTrailerTongueWeight({ trailer_gross_weight_lb = 0, tongue
       ? "TOO HEAVY (" + fmt(tongue_pct, 1) + "% > " + band.high + "%) - overloads the hitch and the tow vehicle's rear axle and unloads the steer axle; move cargo rearward"
       : "in band (" + band.low + "-" + band.high + "% for a " + band.label + " hitch)";
   return {
-    tongue_pct, target_low_lb, target_high_lb, in_band, over_rating, band_label: band.label,
+    tongue_pct, target_low_lb, target_high_lb, in_band, over_rating, band_label: band.label, verdict,
     note: "Tongue weight is the down-force the loaded trailer puts on the hitch ball, and its share of the trailer's gross weight is what keeps the rig tracking straight: the industry bands are 10-15% for a conventional (bumper-pull) hitch and 15-25% for a gooseneck or fifth wheel. Below the band the load sits too far behind the axle and the trailer sways (fishtails), the classic single-vehicle trailer wreck; above it the hitch and the tow vehicle's rear axle are overloaded while the steer axle lightens, robbing steering and braking. Adjust by moving cargo forward (more tongue) or rearward (less). The bands are rules of thumb; the specific vehicle, hitch, and trailer manufacturer ratings and the tow vehicle's payload and rear-axle GAWR govern. Weigh the tongue with the trailer level and loaded as it will tow; a scale reading, not a guess.",
   };
 }
