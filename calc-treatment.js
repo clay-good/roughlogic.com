@@ -25,7 +25,7 @@ export const TREATMENT_RENDERERS = {};
 // --- v20 M.1: Weir / flume open-channel flow (`weir-flow`) ---
 // 90deg V-notch Q = 2.49*H^2.48; rectangular Francis Q = 3.33*(L-0.2H)*H^1.5
 // (contracted) or 3.33*L*H^1.5 (suppressed). 1 cfs = 448.831 GPM.
-// dims: in { weir_type: dimensionless, head_ft: L, crest_length_ft: L, coeff: dimensionless } out: { flow_cfs: L^3*T^-1, flow_gpm: L^3*T^-1 }
+// dims: in { weir_type: dimensionless, head_ft: L, crest_length_ft: L, coeff: dimensionless } out: { flow_cfs: L^3*T^-1, flow_gpm: L^3 T^-1*T^-1 }
 export function computeWeirFlow({ weir_type = "vnotch90", head_ft = 0, crest_length_ft = 0, coeff = 0 } = {}) {
   const H = Number(head_ft) || 0;
   const L = Number(crest_length_ft) || 0;
@@ -84,7 +84,7 @@ TREATMENT_RENDERERS["weir-flow"] = renderWeirFlow;
 // --- spec-v658 M: weir head from a target flow (inverse of weir-flow) ---
 // V-notch H = (Q/C)^(1/2.48); rect suppressed H = (Q/(C L))^(2/3); rect
 // contracted solves L-0.2H by a few fixed-point passes seeded from suppressed.
-// dims: in { weir_type: dimensionless, target_flow_cfs: L^3*T^-1, crest_length_ft: L, coeff: dimensionless } out: { head_ft: L, flow_gpm: L^3*T^-1, flow_mgd: L^3*T^-1 }
+// dims: in { weir_type: dimensionless, target_flow_cfs: L^3*T^-1, crest_length_ft: L, coeff: dimensionless } out: { head_ft: L, flow_gpm: L^3 T^-1*T^-1, flow_mgd: L^3*T^-1 }
 export function computeWeirHeadFromFlow({ weir_type = "vnotch90", target_flow_cfs = 0, crest_length_ft = 0, coeff = 0 } = {}) {
   const Q = Number(target_flow_cfs) || 0;
   const L = Number(crest_length_ft) || 0;

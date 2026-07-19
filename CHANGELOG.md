@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(dims): annotate gpm outputs as flow (L^3 T^-1), not volume (L^3); 2026-07-19
+
+- Ten `*_gpm` dimensional annotations in the `// dims:` comments (calc-agriculture, calc-fire, calc-treatment,
+  calc-septic) declared gpm as `L^3` (volume) when gallons-per-minute is a flow rate `L^3 T^-1` -- the other 114 gpm
+  annotations in the catalog already had it right. Corrected the ten outliers (both the producing output and the
+  linked consumer input, so cross-tile matching stays consistent). Metadata only: no computed value, renderer label,
+  or test changes; `check-dimensions` and the full lint stay green. Found by a new unit-label-vs-declared-dimension
+  consistency scan, which otherwise confirmed every rendered output's unit string matches its computed dimension.
+
 ### fix(concrete): rc-punching-shear was missing the ACI 318-19 size-effect factor lambda_s; 2026-07-19
 
 - `computeRcPunchingShear` (calc-concrete.js) computed the two-way shear stress as the least of the three Table

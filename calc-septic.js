@@ -196,7 +196,7 @@ export function computeSepticTankForInterval({ target_years = 0, people = 0, acc
 }
 export const septicTankForIntervalExample = { inputs: { target_years: 5, people: 4, accum_gal_pp_yr: 30, fill_fraction: 0.33 } };
 
-// dims: in { orifice_dia_in: L, squirt_ft: L, cd: dimensionless, orifices_per_lateral: dimensionless, num_laterals: dimensionless } out: { per_orifice_gpm: L^3, total_orifices: dimensionless, system_gpm: L^3, squirt_psi: M L^-1 T^-2 }
+// dims: in { orifice_dia_in: L, squirt_ft: L, cd: dimensionless, orifices_per_lateral: dimensionless, num_laterals: dimensionless } out: { per_orifice_gpm: L^3 T^-1, total_orifices: dimensionless, system_gpm: L^3 T^-1, squirt_psi: M L^-1 T^-2 }
 export function computeSepticLppOrifice({ orifice_dia_in, squirt_ft, cd = 0.6, orifices_per_lateral, num_laterals } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const dia = Number(orifice_dia_in);
@@ -426,7 +426,7 @@ function renderSepticLppOrifice(inputRegion, outputRegion, citationEl) {
 // head; the inverse recovers the squirt head (residual pressure) that produces a target per-orifice discharge for a given
 // orifice size, so a designer checks that the head lands in the LPP 2.5-5 ft range. From
 // Q = 19.63 Cd d^2 sqrt(h), h = ( Q / (19.63 Cd d^2) )^2. Squirt pressure = h x 0.433 psi/ft.
-// dims: in { per_orifice_gpm: L^3, orifice_dia_in: L, cd: dimensionless } out: { squirt_ft: L, squirt_psi: M L^-1 T^-2 }
+// dims: in { per_orifice_gpm: L^3 T^-1, orifice_dia_in: L, cd: dimensionless } out: { squirt_ft: L, squirt_psi: M L^-1 T^-2 }
 export function computeSepticLppSquirtHead({ per_orifice_gpm, orifice_dia_in, cd = 0.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const q = Number(per_orifice_gpm);

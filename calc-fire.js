@@ -1760,7 +1760,7 @@ FIRE_RENDERERS["elevation-pressure-loss"] = renderElevationPressureLoss;
 
 // --- v20 F.2: Water-supply duration (`water-supply-duration`) ---
 // t = V / GPM; with resupply R: if R >= GPM, sustained; else t = V/(GPM-R).
-// dims: in { volume_gal: L^3, flow_gpm: L^3*T^-1, resupply_gpm: L^3*T^-1 } out: { duration_min: T, net_drain_gpm: L^3*T^-1 }
+// dims: in { volume_gal: L^3, flow_gpm: L^3 T^-1*T^-1, resupply_gpm: L^3 T^-1*T^-1 } out: { duration_min: T, net_drain_gpm: L^3 T^-1*T^-1 }
 export function computeWaterSupplyDuration({ volume_gal = 0, flow_gpm = 0, resupply_gpm = 0 } = {}) {
   const V = Number(volume_gal) || 0;
   const Q = Number(flow_gpm) || 0;

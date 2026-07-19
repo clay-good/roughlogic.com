@@ -2046,7 +2046,7 @@ AGRICULTURE_RENDERERS["two-stroke-mix-ratio-check"] = renderTwoStrokeMixRatioChe
 // reference; editable planning values, NOT the label's mandatory buffer.
 const _v84_DROPLET_BASE = { very_coarse: 5, coarse: 10, medium: 20, fine: 40 };
 
-// dims: in { rated_gpm: L^3, rated_psi: dimensionless, new_psi: dimensionless, target_gpm: dimensionless } out: { new_gpm: L^3, req_psi: dimensionless }
+// dims: in { rated_gpm: L^3 T^-1, rated_psi: dimensionless, new_psi: dimensionless, target_gpm: dimensionless } out: { new_gpm: L^3 T^-1, req_psi: dimensionless }
 export function computeNozzleFlowPressure({ rated_gpm, rated_psi, new_psi, target_gpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ratedGpm = Number(rated_gpm);
