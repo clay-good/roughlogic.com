@@ -1027,6 +1027,7 @@ const RELATED = {
   "roller-jack-force": ["block-redirect-load", "chain-lever-hoist", "ramp-slope"],
   "chain-lever-hoist": ["pulley-ma-gen", "rope-ma", "block-redirect-load"],
   "block-redirect-load": ["roller-jack-force", "chain-lever-hoist", "tagline-force"],
+  "reeving-parts-of-line": ["chain-lever-hoist", "pulley-ma-gen", "rope-ma"],
   "block-redirect-max-angle": ["block-redirect-load", "tagline-force", "chain-lever-hoist"],
 
   // spec-v67 Group E earthwork and excavation deepening

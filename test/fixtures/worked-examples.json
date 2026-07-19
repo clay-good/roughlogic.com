@@ -23014,6 +23014,68 @@
    }
   },
   {
+   "tile_id": "reeving-parts-of-line",
+   "source_publisher": "Block-and-tackle reeving line pull (Wire Rope Users Manual / Crosby)",
+   "source_title": "20,000 lb, 4 parts, k 0.98 -> 5,152 lb hauling pull, 97.0% reeving efficiency",
+   "source_edition_or_year": "spec-v991 worked example (machine-verified)",
+   "source_section_or_page": "pull = 20000 x 0.02 / (1 - 0.98^4) = 20000 x 0.02/0.077632 = 5152.5; eff = 20000/(4 x 5152.5) = 0.9704",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "load_lb": 20000,
+    "parts_of_line": 4,
+    "sheave_efficiency": 0.98
+   },
+   "outputs": {
+    "hauling_line_pull_lb": {
+     "value": 5152.5,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "frictionless_pull_lb": {
+     "value": 5000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "reeving_efficiency": {
+     "value": 0.9704,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "reeving-parts-of-line",
+   "source_publisher": "Block-and-tackle reeving line pull (Wire Rope Users Manual / Crosby)",
+   "source_title": "cross-check: 10,000 lb, 2 parts, k 0.98 -> 5,050 lb, 99.0% (one sheave loses little)",
+   "source_edition_or_year": "spec-v991 worked example (machine-verified)",
+   "source_section_or_page": "pull = 10000 x 0.02 / (1 - 0.98^2) = 10000 x 0.02/0.0396 = 5050.5; eff = 10000/(2 x 5050.5) = 0.9901",
+   "verified_by": "rl",
+   "verified_on": "2026-07-18",
+   "inputs": {
+    "load_lb": 10000,
+    "parts_of_line": 2,
+    "sheave_efficiency": 0.98
+   },
+   "outputs": {
+    "hauling_line_pull_lb": {
+     "value": 5050.5,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "reeving_efficiency": {
+     "value": 0.9901,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "block-redirect-load",
    "source_publisher": "ASME B30.26 / rigging statics",
    "source_title": "resultant = 2 x line_tension x sin(direction_change / 2)",

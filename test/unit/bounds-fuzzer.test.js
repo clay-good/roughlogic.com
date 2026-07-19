@@ -28440,3 +28440,31 @@ test("bounds: spec-v990 computeRadiatorEdrOutput pins the EDR heat output and bo
   assert.ok("error" in _v990({ edr_sqft: 320, system_k: 240, pickup_factor: -0.1 }));
   assert.ok("error" in _v990({ edr_sqft: Infinity, system_k: 240, pickup_factor: 0.33 }));
 });
+
+import { computeReevingPartsOfLine as _v991 } from "../../calc-rigging.js";
+
+test("bounds: spec-v991 computeReevingPartsOfLine pins the reeving pull and efficiency", () => {
+  const r = _v991({ load_lb: 20000, parts_of_line: 4, sheave_efficiency: 0.98 });
+  assert.ok(Math.abs(r.hauling_line_pull_lb - 5152.46) < 0.1); // 20000*0.02/(1-0.98^4)
+  assert.ok(Math.abs(r.frictionless_pull_lb - 5000) < 1e-9); // 20000/4
+  assert.ok(Math.abs(r.reeving_efficiency - 0.97041) < 1e-4);
+  assert.ok(r.hauling_line_pull_lb > r.frictionless_pull_lb); // friction always raises the pull
+  // Two-part cross-check: one sheave loses little.
+  const c2 = _v991({ load_lb: 10000, parts_of_line: 2, sheave_efficiency: 0.98 });
+  assert.ok(Math.abs(c2.hauling_line_pull_lb - 5050.51) < 0.1);
+  assert.ok(Math.abs(c2.reeving_efficiency - 0.99010) < 1e-4);
+  // Frictionless limit (k=1): pull is exactly load/N, efficiency 1.
+  const fl = _v991({ load_lb: 20000, parts_of_line: 4, sheave_efficiency: 1 });
+  assert.ok(Math.abs(fl.hauling_line_pull_lb - 5000) < 1e-9);
+  assert.ok(Math.abs(fl.reeving_efficiency - 1) < 1e-12);
+  // Lower per-sheave efficiency (plain sheaves) raises the pull; more parts lowers the frictionless share.
+  assert.ok(_v991({ load_lb: 20000, parts_of_line: 4, sheave_efficiency: 0.96 }).hauling_line_pull_lb > r.hauling_line_pull_lb);
+  assert.ok(_v991({ load_lb: 20000, parts_of_line: 6, sheave_efficiency: 0.98 }).frictionless_pull_lb < r.frictionless_pull_lb);
+  // Error seams: non-positive load, non-integer / <1 parts, efficiency out of (0,1], non-finite.
+  assert.ok("error" in _v991({ load_lb: 0, parts_of_line: 4, sheave_efficiency: 0.98 }));
+  assert.ok("error" in _v991({ load_lb: 20000, parts_of_line: 2.5, sheave_efficiency: 0.98 }));
+  assert.ok("error" in _v991({ load_lb: 20000, parts_of_line: 0, sheave_efficiency: 0.98 }));
+  assert.ok("error" in _v991({ load_lb: 20000, parts_of_line: 4, sheave_efficiency: 1.2 }));
+  assert.ok("error" in _v991({ load_lb: 20000, parts_of_line: 4, sheave_efficiency: 0 }));
+  assert.ok("error" in _v991({ load_lb: Infinity, parts_of_line: 4, sheave_efficiency: 0.98 }));
+});

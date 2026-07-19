@@ -474,7 +474,7 @@ const _TILES = [
   ["sling-d-d-efficiency", "Z"], ["wind-on-load", "Z"], ["max-wind-speed-for-lift", "Z"], ["tagline-force", "Z"], ["tandem-lift-share", "Z"],
   // v66 Group Z hardware and below-the-hook
   ["shackle-eyebolt-wll", "Z"], ["spreader-beam", "Z"], ["spreader-beam-min-height", "Z"], ["forklift-capacity-derate", "Z"],
-  ["roller-jack-force", "Z"], ["chain-lever-hoist", "Z"], ["block-redirect-load", "Z"], ["block-redirect-max-angle", "Z"],
+  ["roller-jack-force", "Z"], ["chain-lever-hoist", "Z"], ["block-redirect-load", "Z"], ["block-redirect-max-angle", "Z"], ["reeving-parts-of-line", "Z"],
   // v67 Group E earthwork and excavation deepening
   ["soil-swell-shrink", "E"], ["haul-cycle-production", "E"], ["loader-production", "E"], ["dozer-production", "E"], ["compaction-roller-production", "E"], ["ripper-production", "E"], ["rusle-soil-loss", "E"], ["riprap-d50", "E"], ["riprap-tonnage", "E"], ["silt-fence-drainage", "E"], ["check-dam-spacing", "E"], ["sediment-basin-volume", "E"], ["erosion-blanket-coverage", "E"], ["hydroseed-mix", "E"], ["rock-construction-entrance", "E"], ["dewatering-rate", "E"],
   ["spoil-setback", "E"], ["pipe-bedding-backfill", "E"], ["pipe-flotation", "E"], ["restrained-pipe-length", "E"], ["hdd-pullback", "E"], ["dust-control-water", "E"], ["haul-road-resistance", "E"], ["dump-truck-loads", "E"], ["unit-cost-earthwork", "E"], ["soil-stabilization-quantity", "E"], ["flexible-pipe-deflection", "E"],

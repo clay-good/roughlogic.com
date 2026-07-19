@@ -8158,6 +8158,17 @@ export const CITATIONS = {
       { name: "Max angle", value: "2 x asin( WLL / (2 x line tension) ), capped at 180 degrees when WLL >= 2 x line tension", source: "first-principles statics" },
     ],
   },
+  "reeving-parts-of-line": {
+    formula: "frictionless_pull_lb = load_lb / parts_of_line; hauling_line_pull_lb = load_lb x (1 - k) / (1 - k^N) with k = sheave_efficiency, N = parts_of_line (= load/N when k = 1); reeving_efficiency = load_lb / (parts_of_line x hauling_line_pull_lb).",
+    edition: "Block-and-tackle / hoist reeving efficiency (Wire Rope Users Manual / Crosby reeving practice; ASME B30 hoisting), by name; the block and rope ratings, the actual sheave friction, and a qualified rigger and the lift plan govern.",
+    freeAccess: "The reeving-efficiency relation is public rigging mechanics; the per-sheave efficiency (~0.98 roller, 0.96 plain) is a standard published figure and the load and parts are the rig's values.",
+    governance: GOVERNANCE.general,
+    editionNote: "When a load is lifted through a block and tackle -- a fixed block and a moving block reeved with several parts of line -- the mechanical advantage divides the load among the parts, but sheave friction makes the hauling line work harder than the ideal. In a frictionless system each of the N parts carries an equal share, load divided by N, and that share is what the hauling line must pull. Real sheaves each lose a few percent of the tension passing over them to bearing friction and the work of bending the rope, and crucially that loss stacks from part to part: the tension is highest in the part closest to the hauling end and falls by the per-sheave efficiency factor k across each successive sheave. Setting the sum of all the parts' tensions equal to the load and solving gives the hauling-line pull as the load times (1 minus k) divided by (1 minus k raised to the N). For a 20,000-pound load reeved on four parts with roller-bearing sheaves at k = 0.98, the pull is 20,000 times 0.02 divided by (1 minus 0.98 to the fourth), or 5,152 pounds, noticeably above the frictionless 5,000 pounds; the reeving efficiency, defined as the load divided by N times the pull, is 97.0%. Plain bronze-bushed sheaves run closer to k = 0.96 and cost more efficiency. Adding parts of line multiplies the load advantage but also stacks more friction, so doubling the number of parts never quite halves the required pull. Two cautions: this is the steady pull to hold or slowly haul the load, not the larger force needed to overcome inertia and start it moving, and it is the tension in the lead (hauling) line only. This is a rigging screen; the rated capacities of the blocks and rope, the true sheave friction for the specific hardware, the reeving pattern, and a qualified rigger working to the lift plan govern the actual rig.",
+    assumptions: [
+      { name: "Reeving pull", value: "pull = load x (1 - k) / (1 - k^N); frictionless share = load/N; efficiency = load/(N x pull)", source: "block-and-tackle reeving mechanics" },
+      { name: "Per-sheave efficiency", value: "k ~0.98 roller-bearing, ~0.96 plain-bronze sheaves; loss stacks part to part; steady pull on the lead line only (not inertia to start)", source: "Wire Rope Users Manual / Crosby / ASME B30" },
+    ],
+  },
   "block-redirect-load": {
     formula: "resultant = 2 x line_tension x sin(direction_change / 2). A 180-degree turn doubles the line tension on the anchor.",
     edition: "ASME B30.26 and standard rigging statics by name; first-principles vector resultant.",

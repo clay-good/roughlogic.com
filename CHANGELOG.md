@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(rigging): add reeving-parts-of-line tile (spec-v991); 2026-07-18
+
+- New Group Z tile `reeving-parts-of-line` in calc-rigging.js. Hauling-line pull on a block-and-tackle/hoist reeved
+  with N parts: pull = load x (1 - k) / (1 - k^N), k the per-sheave efficiency (~0.98 roller, 0.96 plain); reeving
+  efficiency = load / (N x pull). Friction stacks, so a 20,000 lb load on 4 parts at k 0.98 needs 5,152 lb (vs the
+  frictionless 5,000), 97.0% efficient; 10,000 lb on 2 parts = 5,050 lb, 99.0%. Steady lead-line pull only, not the
+  inertia to start the load. Home count 1,439 -> 1,440.
+
 ### feat(pipefitting): add radiator-edr-output tile (spec-v990); 2026-07-18
 
 - New Group B tile `radiator-edr-output` in calc-pipefit.js. Heat output from a radiator's EDR rating and the gross
