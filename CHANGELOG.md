@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(hvac): fall back to the main thread when the Manual J worker fails to load; 2026-07-19
+
+- `runInWorker` (calc-hvac.js, used by the Manual J cooling/heating and duct-sizing tiles) resolved its promise only
+  on a matching worker reply -- with no `error` listener and no timeout. A module worker that fails to load
+  (unsupported engine, CSP-blocked, network hiccup) or crashes never posts a reply, so the promise, and the tile's
+  output, would hang forever with no result and no error. Added an `error` listener that resolves via the existing
+  `fallbackFn` main-thread compute -- the same graceful path already taken when `Worker` is unavailable -- guarded so
+  the message and error paths settle exactly once. The normal worker path is unchanged (verified the tiles still
+  populate).
+
 ### fix(app): copy-answer-with-reference copied the output's "Copy" button labels; 2026-07-19
 
 - The "Copy answer with full reference block" button built its answer summary from `outputRegion.textContent`, which

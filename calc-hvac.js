@@ -862,13 +862,22 @@ function runInWorker(payload, fallbackFn) {
     const w = ensureWorker();
     if (!w) { resolve(fallbackFn(payload.inputs)); return; }
     const id = Math.random().toString(36).slice(2);
-    const onMessage = (e) => {
-      if (e.data && e.data.id === id) {
-        w.removeEventListener("message", onMessage);
-        resolve(e.data.result);
-      }
+    let settled = false;
+    const done = (value) => {
+      if (settled) return;
+      settled = true;
+      w.removeEventListener("message", onMessage);
+      w.removeEventListener("error", onError);
+      resolve(value);
     };
+    const onMessage = (e) => { if (e.data && e.data.id === id) done(e.data.result); };
+    // A module worker that fails to load (unsupported, CSP-blocked, network) or
+    // crashes never posts a reply, so without this the promise -- and the tile's
+    // output -- would hang forever. Fall back to the main-thread compute, the
+    // same path taken when Worker is unavailable.
+    const onError = () => done(fallbackFn(payload.inputs));
     w.addEventListener("message", onMessage);
+    w.addEventListener("error", onError);
     w.postMessage({ id, ...payload });
   });
 }
