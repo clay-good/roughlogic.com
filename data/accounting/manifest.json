@@ -1,9 +1,9 @@
 {
   "name": "accounting",
-  "version": "2026-07-13",
-  "fetched": "2026-07-13",
-  "edition": "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS / SBA published medians (inventory). Per-year entries with verified-on date; verified 2026-07-13.",
-  "asOf": "2026-07-13",
+  "version": "2026-07-20",
+  "fetched": "2026-07-20",
+  "edition": "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS / SBA published medians (inventory). Per-year entries with verified-on date; verified 2026-07-20.",
+  "asOf": "2026-07-20",
   "refresh_cadence": "annual",
   "shards": [
     {
@@ -19,7 +19,7 @@
     {
       "file": "se-tax-parameters.json",
       "name": "Social Security wage base + Additional Medicare threshold, per-year",
-      "gzip_size_bytes": 363
+      "gzip_size_bytes": 362
     },
     {
       "file": "estimated-tax-due-dates.json",
@@ -29,12 +29,12 @@
     {
       "file": "standard-mileage-rates.json",
       "name": "IRS standard mileage rate, per-year",
-      "gzip_size_bytes": 270
+      "gzip_size_bytes": 269
     },
     {
       "file": "inventory-benchmarks.json",
       "name": "Industry-median inventory turnover (Census ARTS / SBA)",
-      "gzip_size_bytes": 371
+      "gzip_size_bytes": 372
     },
     {
       "file": "pub-15-t-tables.json",
@@ -43,12 +43,12 @@
     }
   ],
   "hashes": {
-    "macrs-tables.json": "a6fe2977bb6d518d7b6f1bd6f8b32aa5504f19d7f5b21f89c72bb44f382dd94e",
-    "section-179-limits.json": "b0a45ba9ab43b21e4def8f4e36e0f3d60815ff64d9917ed0bb827ae4c9deeae8",
-    "se-tax-parameters.json": "34e800e6bcbb808cc2611d738f3753a571476b2b2ba35571486cc06f5c41020a",
-    "estimated-tax-due-dates.json": "f99a076ee82ee11251b114e83b5c0ac89eaf1843e4640b805ca3b511c9a31b62",
-    "standard-mileage-rates.json": "56f373fce5e288d07ed83b6befeaf3088692988d74226f46b27b94ce7524fd8b",
-    "inventory-benchmarks.json": "b0c4827394fa2c1aa5cc3002ddd990be96a491742b22968e8d6ea9f1c370607e",
-    "pub-15-t-tables.json": "04619970856ae09f4c78c3410210240e46d3fa3d97c4bb50359360a7ce39eb6e"
+    "macrs-tables.json": "65c58169cb93e0969543d60c38c43ee41c6e86af0a37fbc2932725d6b8bfb622",
+    "section-179-limits.json": "e9f8408960860325c3af4e42230883358084b13136309006ee45ad84c5e843f9",
+    "se-tax-parameters.json": "5c1afd32f761ada011588e0291ee2e294d018cf9975e1e714264bd45ef75362b",
+    "estimated-tax-due-dates.json": "aec148eb0898cfe5d5bbac071ed4ec95477170291a1c55ee1e964fd8ea7d3166",
+    "standard-mileage-rates.json": "8d619a07ec69985b4f26402258850c0daee9fb8b9c951201ecb28f861c701cd7",
+    "inventory-benchmarks.json": "b02602dfc7d4f821b7530426a3b09a24afaf90c9947172216af59127e095f7db",
+    "pub-15-t-tables.json": "91b0420e610fe3759b80e4d3ceccd21b1de98df9799bee03d3ae6d5d92940a45"
   }
 }

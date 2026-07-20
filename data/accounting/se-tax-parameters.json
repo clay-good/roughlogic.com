@@ -1,8 +1,8 @@
 {
   "source": "Social Security Administration annual wage-base announcement; IRC 3101(b)(2) for the Additional Medicare 0.9% threshold per filing status.",
   "edition": "per-year",
-  "fetched": "2026-07-13",
-  "verified_on": "2026-07-13",
+  "fetched": "2026-07-20",
+  "verified_on": "2026-07-20",
   "free_access": "ssa.gov/oact/cola/cbb.html for the wage base; irs.gov for the Additional Medicare guidance.",
   "by_year": {
     "2023": {

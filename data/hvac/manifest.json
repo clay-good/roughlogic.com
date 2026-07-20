@@ -1,15 +1,15 @@
 {
   "name": "hvac",
-  "version": "2026-07-13",
-  "fetched": "2026-07-13",
-  "edition": "ASHRAE 62.1-2022; ASHRAE Handbook Fundamentals chapter 21 (duct design) and chapter 25 (insulation); ACCA Manual J 8th ed.; CTI cooling-tower engineering practice; manufacturer P-T tables (DuPont / Honeywell / Chemours / Arkema) and insulation k-values as of 2026-07-13.",
-  "asOf": "2026-07-13",
+  "version": "2026-07-20",
+  "fetched": "2026-07-20",
+  "edition": "ASHRAE 62.1-2022; ASHRAE Handbook Fundamentals chapter 21 (duct design) and chapter 25 (insulation); ACCA Manual J 8th ed.; CTI cooling-tower engineering practice; manufacturer P-T tables (DuPont / Honeywell / Chemours / Arkema) and insulation k-values as of 2026-07-20.",
+  "asOf": "2026-07-20",
   "refresh_cadence": "annual",
   "shards": [
     {
       "file": "refrigerants.json",
       "name": "Refrigerant P-T tables",
-      "gzip_size_bytes": 493
+      "gzip_size_bytes": 497
     },
     {
       "file": "duct-friction.json",
@@ -64,7 +64,7 @@
     {
       "file": "refrigerant-pt-tables.json",
       "name": "Manufacturer-attributed refrigerant P-T tables",
-      "gzip_size_bytes": 566
+      "gzip_size_bytes": 564
     },
     {
       "file": "insulation-k-values.json",

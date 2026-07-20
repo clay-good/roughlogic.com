@@ -1,10 +1,10 @@
 {
   "source": "Per-state department of revenue published nexus guidance (post-South Dakota v. Wayfair, Inc., 138 S. Ct. 2080 (2018)).",
   "edition": "current",
-  "fetched": "2026-07-13",
+  "fetched": "2026-07-20",
   "free_access": "Each state's DOR site publishes its current threshold.",
   "by_state": {
-    "verifiedOn": "2026-07-13",
+    "verifiedOn": "2026-07-20",
     "AL": {
       "sales_threshold_usd": 250000,
       "transactions_threshold": null,

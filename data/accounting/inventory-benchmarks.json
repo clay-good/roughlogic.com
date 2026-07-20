@@ -1,8 +1,8 @@
 {
   "source": "U.S. Census Annual Retail Trade Survey (ARTS), Annual Survey of Manufactures (ASM), and SBA / industry-association published medians.",
   "edition": "2023",
-  "fetched": "2026-07-13",
-  "verified_on": "2026-07-13",
+  "fetched": "2026-07-20",
+  "verified_on": "2026-07-20",
   "free_access": "census.gov/retail/arts; census.gov/programs-surveys/asm; sba.gov/data.",
   "benchmarks": {
     "retail_general": {
