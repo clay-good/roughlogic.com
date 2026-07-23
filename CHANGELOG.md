@@ -4,6 +4,25 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(construction): two NDS input labels that invited wrong values; 2026-07-23
+
+Closes the last two actionable items from the NDS wood audit. Both are label/documentation defects -- no math changes
+-- but each invites a user to enter the wrong quantity.
+
+- **Wood-screw withdrawal asked for "Penetration", but NDS 12.2.2 W is per inch of THREAD penetration.** On a
+  partially threaded screw the smooth shank contributes nothing to withdrawal, so entering total embedment overstates
+  the capacity. The lag sibling (12.2.1) already said "Thread penetration" -- the screw tile now matches, with the
+  error text and note spelling out the distinction. **The NAIL tile was deliberately left alone: NDS 12.2.3 really is
+  per inch of TOTAL penetration, because a nail has no thread.** A blind find-and-replace would have corrupted it;
+  the two tiles share the identical old label string.
+- **The wood-column tile labelled its length input "Unbraced length le", then computed `le = Ke x lu`.** Since `le`
+  conventionally means the *effective* length, a user entering an already-Ke-adjusted value would have it counted
+  twice. Relabelled to "Unbraced length lu (in) - Ke is applied below", with the note stating `le = Ke x lu` and
+  warning not to pre-multiply.
+- Guarded by tests that pin both withdrawal formulas (2,850 G^2 D for screws, 1,380 G^2.5 D for nails), assert the
+  screw text mentions thread penetration while the nail text does NOT, and confirm Ke scales slenderness exactly
+  once (linearly) with the NDS 3.7.1.4 le/d = 50 guard still firing.
+
 ### fix(concrete): corbel was missing the ACI 16.5.5 steel minimum and the closed stirrups; 2026-07-23
 
 - `computeConcreteCorbelBracket` took the primary steel as `max(flexure+tension, shear-friction+tension)` but omitted

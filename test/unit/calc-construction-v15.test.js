@@ -16,6 +16,7 @@ import {
   computeDeckBeamPost, deckBeamPostExample,
   SYP_NO2_FB_BY_WIDTH, LUMBER_SPECIES_GRADES, LUMBER_EMIN_PSI, computeLumberSpan,
   LUMBER_FC_PSI, LUMBER_TIMBERS_FC_PSI, LUMBER_TIMBERS_EMIN_PSI,
+  computeWoodScrewWithdrawal, computeWoodNailWithdrawal, computeColumnBucklingWood,
 } from "../../calc-construction.js";
 
 // ---------------------------------------------------------------------------
@@ -276,4 +277,35 @@ test("deck post: a 6x6 is a TIMBER (NDS Table 4D), not dimension lumber", () => 
   const short = computeDeckBeamPost({ joist_span_ft: 12, beam_span_ft: 10, post_height_ft: 8, live_load_psf: 40, dead_load_psf: 10, species_grade: "SYP_No2", soil_class: "clay", ledger: "free" });
   assert.strictEqual(short.post_size, "4x4");
   assert.ok(Math.abs(short.post_allowable_load_lb - 6169) < 5);
+});
+
+test("wood withdrawal: screw is per THREAD penetration (NDS 12.2.2), nail is per total penetration (12.2.3)", () => {
+  // NDS tabulates screw/lag withdrawal per inch of THREAD penetration, but nail
+  // withdrawal per inch of total penetration -- a nail has no thread. The screw
+  // tile's field said only "Penetration", inviting a partially threaded screw's
+  // full embedment and overstating capacity; the lag sibling already said
+  // "Thread penetration". Labels only -- the math is unchanged.
+  const scr = computeWoodScrewWithdrawal({ g: 0.50, d_in: 0.190, p_in: 1.0, cd: 1.0 });
+  assert.ok(Math.abs(scr.w_lbin - 2850 * 0.5 * 0.5 * 0.190) < 1e-9); // 2850 G^2 D
+  assert.match(computeWoodScrewWithdrawal({ g: 0.5, d_in: 0.19, p_in: 0 }).error, /THREAD penetration/i);
+  assert.match(scr.note, /THREAD penetration/i);
+  // The NAIL tile must NOT be relabelled -- 12.2.3 really is total penetration.
+  const nail = computeWoodNailWithdrawal({ g: 0.50, d_in: 0.131, p_in: 1.5, cd: 1.0 });
+  assert.ok(Math.abs(nail.w_lbin - 1380 * Math.pow(0.5, 2.5) * 0.131) < 1e-9); // 1380 G^2.5 D
+  assert.ok(!/THREAD penetration/i.test(computeWoodNailWithdrawal({ g: 0.5, d_in: 0.131, p_in: 0 }).error));
+});
+
+test("wood column: the length input is UNBRACED lu, and Ke is applied exactly once", () => {
+  // The field said "Unbraced length le", but le conventionally means the
+  // EFFECTIVE length; the code computes le = Ke x lu. A user entering an
+  // already-Ke-adjusted value would double-count it.
+  const P = { b_in: 3.5, d_in: 3.5, le_in: 96, fc_star_psi: 1150, emin_psi: 580000 };
+  const k1 = computeColumnBucklingWood({ ...P, ke: 1 });
+  assert.ok(Math.abs(k1.slenderness_ratio - 96 / 3.5) < 1e-9);
+  // Ke scales the slenderness linearly -- applied once, not squared or ignored.
+  const k15 = computeColumnBucklingWood({ ...P, ke: 1.5 });
+  assert.ok(Math.abs(k15.slenderness_ratio - 1.5 * (96 / 3.5)) < 1e-9);
+  // Past the NDS 3.7.1.4 le/d = 50 limit it errors rather than returning a value.
+  assert.match(computeColumnBucklingWood({ ...P, ke: 2 }).error, /50/);
+  assert.match(k1.note, /le = Ke x lu|do not pre-multiply/i);
 });

@@ -3630,7 +3630,7 @@ export function computeColumnBucklingWood({ b_in = 0, d_in = 0, le_in = 0, fc_st
     cp: Number.isFinite(cp) ? cp : null,
     fc_prime_psi: Number.isFinite(fcPrime) ? fcPrime : null,
     capacity_lb: Number.isFinite(capacity) ? capacity : null,
-    note: "Solid rectangular sawn lumber (c = 0.8); the larger le/d (smaller dimension) governs. Built-up / round columns are out of scope. Reference design values user-supplied.",
+    note: "Solid rectangular sawn lumber (c = 0.8); the larger le/d (smaller dimension) governs. Enter the UNBRACED length lu - the effective length is computed here as le = Ke x lu, so do not pre-multiply by Ke or it is counted twice. Built-up / round columns are out of scope. Reference design values user-supplied.",
   };
 }
 export const columnBucklingWoodExample = { inputs: { b_in: 3.5, d_in: 3.5, le_in: 96, fc_star_psi: 1150, emin_psi: 580000, ke: 1 } };
@@ -3641,7 +3641,7 @@ function renderColumnBucklingWood(inputRegion, outputRegion, citationEl) {
   b.input.value = "3.5";
   const d = makeNumber("Column depth d (in)", "cbw-d", { step: "any", min: "0", value: "3.5" });
   d.input.value = "3.5";
-  const le = makeNumber("Unbraced length le (in)", "cbw-le", { step: "any", min: "0", value: "96" });
+  const le = makeNumber("Unbraced length lu (in) - Ke is applied below", "cbw-le", { step: "any", min: "0", value: "96" });
   le.input.value = "96";
   const fc = makeNumber("Fc* (psi)", "cbw-fc", { step: "any", min: "0", value: "1150" });
   fc.input.value = "1150";
@@ -6664,24 +6664,24 @@ export function computeWoodScrewWithdrawal({ g = 0, d_in = 0, p_in = 0, cd = 1.0
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(g > 0)) return { error: "Specific gravity must be positive (0.50 DF-L, 0.42 SPF)." };
   if (!(d_in > 0)) return { error: "Screw diameter must be positive (in)." };
-  if (!(p_in > 0)) return { error: "Penetration must be positive (in)." };
+  if (!(p_in > 0)) return { error: "Thread penetration must be positive (in). NDS 12.2.2 W is per inch of THREAD penetration, not total embedment - on a partially threaded screw these differ." };
   if (!(cd > 0)) return { error: "The load-duration factor CD must be positive." };
   const w_lbin = 2850 * g * g * d_in;
   const z_w = w_lbin * p_in * cd;
   return {
     w_lbin, z_w,
-    note: "NDS 12.2.2 wood-screw reference withdrawal design value W = 2,850 G^2 D (lb/in), with G the holding member's specific gravity and D the screw diameter, and the capacity W x p times the load-duration CD. Withdrawal scales with the SQUARE of the specific gravity, so a screw that holds in Douglas Fir-Larch (G 0.50) can strip in a softer spruce (G 0.42) - about a 30% drop. This is the withdrawal (axial) value only, not the lateral connection or the head pull-through. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    note: "NDS 12.2.2 wood-screw reference withdrawal design value W = 2,850 G^2 D (lb per inch of THREAD penetration into side grain), with G the holding member's specific gravity and D the screw diameter, and the capacity W x p_thread times the load-duration CD. Enter the THREADED length embedded in the holding member, not the total penetration - the smooth shank of a partially threaded screw contributes nothing to withdrawal, so using total penetration overstates the capacity. (The nail tile alongside is per inch of total penetration, NDS 12.2.3, because a nail has no thread.) Withdrawal scales with the SQUARE of the specific gravity, so a screw that holds in Douglas Fir-Larch (G 0.50) can strip in a softer spruce (G 0.42) - about a 30% drop. This is the withdrawal (axial) value only, not the lateral connection or the head pull-through. A design aid, not a substitute for the structural engineer of record's stamped design.",
   };
 }
 export const woodScrewWithdrawalExample = { inputs: { g: 0.50, d_in: 0.190, p_in: 1.0, cd: 1.0 } };
 
 const _renderWoodScrewWithdrawal = _simpleRenderer({
-  citation: "Citation: NDS 2018 12.2.2 wood-screw withdrawal W = 2,850 G^2 D (lb/in), capacity W x p x CD, by name. Axial withdrawal only. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: NDS 2018 12.2.2 wood-screw withdrawal W = 2,850 G^2 D (lb per inch of THREAD penetration into side grain), capacity W x p_thread x CD, by name. Axial withdrawal only. A design aid, not a substitute for the engineer of record.",
   example: woodScrewWithdrawalExample.inputs,
   fields: [
     { key: "g", label: "Specific gravity G (0.50 DF-L, 0.42 SPF)", kind: "number" },
     { key: "d_in", label: "Screw diameter D (in; #10 ~ 0.190)", kind: "number" },
-    { key: "p_in", label: "Penetration into holding member (in)", kind: "number" },
+    { key: "p_in", label: "THREAD penetration into holding member (in)", kind: "number" },
     { key: "cd", label: "Load-duration factor CD", kind: "number", default: 1.0 },
   ],
   outputs: [
