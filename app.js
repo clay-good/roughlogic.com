@@ -210,7 +210,10 @@ const TOOL_MODULES = (() => {
     "water-hammer-arrestor", "recirc-pump-head", "trap-arm",
     "pipe-expansion", "tankless-gpm",
     // v3
-    "stormwater-rational", "stormwater-max-drainage-area", "manning-slope", "manning-pipe-capacity", "hydrostatic-test", "grease-trap", "grease-interceptor-flow-capacity",
+    "stormwater-rational", "stormwater-max-drainage-area", "manning-slope", "manning-pipe-capacity",
+    // spec-v1011 partial-flow depth of a circular gravity pipe
+    "pipe-partial-flow-depth",
+    "hydrostatic-test", "grease-trap", "grease-interceptor-flow-capacity",
     "stormwater-detention-volume",
     "glycol-mix", "expansion-tank", "backflow-loss", "hydronic-system-volume",
     "hydronic-fill-pressure", "solder-joint-quantity", "pipe-insulation-takeoff", "heat-trace-sizing", "pipe-purge-volume",

@@ -4,6 +4,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): circular pipe partial-flow depth and velocity (spec-v1011); 2026-07-23
+
+- New tile `pipe-partial-flow-depth` (Group B, calc-plumbing.js): how deep a gravity pipe actually runs at a given
+  flow. The catalog declared this gap in four places, one of them user-facing -- `manning-pipe-capacity`'s note ("it
+  does not compute the partial-flow depth, and a circular pipe actually carries a few percent more than full-bore at
+  about 0.94 depth"), its citation, the `tools-data.js` description, and `channel-normal-depth`'s note. Manning is
+  applied to the circular segment and solved for depth by bisection, reporting d/D, velocity, the 2 ft/s
+  self-cleansing check, and the boundary shear `tau = 62.4 R S`. An 8 in concrete pipe at 1% carrying 200 gpm runs
+  3.36 in deep (d/D 0.420) at 3.20 ft/s. Home tile count 1,459 -> 1,460.
+- **The correctness trap, handled:** discharge is NOT monotonic with depth. It peaks 7.571% above full-bore at
+  d/D = 0.93818 and falls back at the crown; velocity peaks at d/D = 0.81280. Both turning points are DERIVED here
+  (`3θ - 5θ cos θ + 2 sin θ = 0` and `tan θ = θ`), not read off a chart. Because two depths satisfy most flows, the
+  solver bisects only the rising branch and returns the smaller, physical root; the fuzzer pins this by feeding the
+  full-bore flow back in and asserting d/D lands near 0.82 rather than 1.0. The sibling `channel-normal-depth`
+  bisects the full range, which is correct for a rectangle but would be wrong for a circle.
+- Cross-checks: the tile's full-bore capacity (542 gpm) reproduces the value `manning-pipe-capacity` already pins for
+  the same pipe, and substituting the solved θ back into Manning returns the 200.000 gpm input exactly.
+
 ### feat(mechanic): spring wire stress (Wahl), solid height, and buckling (spec-v1010); 2026-07-23
 
 - New tile `spring-wire-stress` (Group K, calc-mechanic.js): the checks `helical-spring-rate` names as its own

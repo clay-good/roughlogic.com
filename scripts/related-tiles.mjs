@@ -693,6 +693,7 @@ const RELATED = {
   "stormwater-max-drainage-area": ["stormwater-rational", "time-of-concentration", "stormwater-detention-volume", "roof-drain-sizing"],
   "manning-slope": ["manning-pipe-capacity", "slope", "stormwater-rational", "trap-arm"],
   "manning-pipe-capacity": ["manning-slope", "channel-froude-number", "stormwater-rational", "weir-flow"],
+  "pipe-partial-flow-depth": ["manning-pipe-capacity","manning-slope","channel-normal-depth","channel-froude-number"],
   "drainage-invert": ["slope", "manning-slope", "trench-slope"],
   "hydrostatic-test": ["gas-leak-rate", "pressure-conversion"],
   "grease-trap": ["septic-tank", "septic-drainfield"],

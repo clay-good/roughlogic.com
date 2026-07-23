@@ -55872,6 +55872,56 @@
       "kind": "industry"
     },
     {
+      "term": "partial flow depth",
+      "target": "pipe-partial-flow-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "partially full pipe",
+      "target": "pipe-partial-flow-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "depth of flow in a sewer",
+      "target": "pipe-partial-flow-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "d over D ratio",
+      "target": "pipe-partial-flow-depth",
+      "kind": "adjacent"
+    },
+    {
+      "term": "self cleansing velocity",
+      "target": "pipe-partial-flow-depth",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tractive shear sewer",
+      "target": "pipe-partial-flow-depth",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how deep does the sewer run at this flow",
+      "target": "pipe-partial-flow-depth",
+      "kind": "question"
+    },
+    {
+      "term": "will solids settle in my gravity line",
+      "target": "pipe-partial-flow-depth",
+      "kind": "question"
+    },
+    {
+      "term": "why does a pipe carry more than full at 94 percent depth",
+      "target": "pipe-partial-flow-depth",
+      "kind": "question"
+    },
+    {
+      "term": "velocity in a partly full pipe",
+      "target": "pipe-partial-flow-depth",
+      "kind": "question"
+    },
+    {
       "term": "full flow pipe capacity",
       "target": "manning-pipe-capacity",
       "kind": "industry"

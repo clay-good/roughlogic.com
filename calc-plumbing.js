@@ -4113,6 +4113,108 @@ function _v641renderChannelNormalDepth(inputRegion, outputRegion, citationEl) {
 }
 PLUMBING_RENDERERS["channel-normal-depth"] = _v641renderChannelNormalDepth;
 
+// spec-v1011: circular-pipe partial-flow depth. The two turning points below are
+// DERIVED, not tabulated. With A = (D^2/8)(th - sin th) and P = D th/2:
+//   max discharge (maximize A R^(2/3) = A^(5/3) P^(-2/3)): 5 A' P = 2 A P'
+//     -> 3 th - 5 th cos th + 2 sin th = 0  -> th = 5.27811, d/D = 0.9382
+//   max velocity (maximize R = A/P):        A' P = A P'  -> tan th = th
+//     -> th = 4.49341, d/D = 0.8128
+// Discharge is NOT monotonic in depth, so the solver must bisect only on the
+// rising branch (0, THETA_MAX_Q]; the smaller root is the physical normal depth.
+function _v1011root(f, a, b) {
+  for (let i = 0; i < 200; i++) { const m = (a + b) / 2; if (f(a) * f(m) <= 0) b = m; else a = m; }
+  return (a + b) / 2;
+}
+const THETA_MAX_Q = _v1011root((t) => 3 * t - 5 * t * Math.cos(t) + 2 * Math.sin(t), 4.0, 6.0);
+const THETA_MAX_V = _v1011root((t) => Math.tan(t) - t, Math.PI + 1e-9, 3 * Math.PI / 2 - 1e-9);
+
+// dims: in { d_in: L, slope: dimensionless, flow_gpm: L^3 T^-1, material: dimensionless } out: { depth_in: L, d_over_d: dimensionless, v_fps: L T^-1, a_ft2: L^2, r_ft: L, q_full_gpm: L^3 T^-1, q_max_gpm: L^3 T^-1, shear_psf: M L^-1 T^-2 }
+export function computePipePartialFlowDepth({ d_in = 0, slope = 0, flow_gpm = 0, material = "pvc" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(d_in > 0)) return { error: "Pipe diameter must be positive (in)." };
+  if (!(slope > 0)) return { error: "Pipe slope must be positive (ft/ft)." };
+  if (!(flow_gpm > 0)) return { error: "Flow must be positive (gpm)." };
+  const n = MANNING_ROUGHNESS[material];
+  if (!Number.isFinite(n)) return { error: "Unknown pipe material." };
+  const d_ft = d_in / 12;
+  const q_cfs = flow_gpm / 448.831;
+  const areaOf = (th) => (d_ft * d_ft / 8) * (th - Math.sin(th));
+  const perimOf = (th) => (d_ft * th) / 2;
+  const qOf = (th) => {
+    const A = areaOf(th), P = perimOf(th);
+    return (1.486 / n) * A * Math.pow(A / P, 2 / 3) * Math.sqrt(slope);
+  };
+  const q_full_cfs = qOf(2 * Math.PI);
+  const q_max_cfs = qOf(THETA_MAX_Q);
+  if (q_cfs > q_max_cfs) {
+    return { error: "Flow exceeds the pipe's maximum gravity capacity of " + (q_max_cfs * 448.831).toFixed(0) + " gpm (reached at d/D = 0.94). Use a larger pipe or a steeper slope." };
+  }
+  // Bisect on the rising branch only: qOf is monotonic on (0, THETA_MAX_Q].
+  let lo = 1e-9, hi = THETA_MAX_Q;
+  for (let i = 0; i < 200; i++) { const mid = (lo + hi) / 2; if (qOf(mid) < q_cfs) lo = mid; else hi = mid; }
+  const theta = (lo + hi) / 2;
+  const a_ft2 = areaOf(theta);
+  const r_ft = a_ft2 / perimOf(theta);
+  const depth_ft = (d_ft / 2) * (1 - Math.cos(theta / 2));
+  const depth_in = depth_ft * 12;
+  const d_over_d = depth_ft / d_ft;
+  const v_fps = q_cfs / a_ft2;
+  const self_cleansing = v_fps >= 2;
+  // Tractive (boundary) shear stress: tau = gamma R S, gamma = 62.4 lb/ft^3.
+  const shear_psf = 62.4 * r_ft * slope;
+  return {
+    n, d_ft, theta, depth_in, d_over_d, a_ft2, r_ft, v_fps, self_cleansing, shear_psf,
+    q_full_gpm: q_full_cfs * 448.831,
+    q_max_gpm: q_max_cfs * 448.831,
+    d_over_d_at_max_q: (1 - Math.cos(THETA_MAX_Q / 2)) / 2,
+    d_over_d_at_max_v: (1 - Math.cos(THETA_MAX_V / 2)) / 2,
+    pct_full: (q_cfs / q_full_cfs) * 100,
+    note: "The partial-flow (normal) depth a circular gravity pipe runs at, which the full-bore capacity tile leaves out. Manning Q = (1.486/n) A R^(2/3) sqrt(S) is applied to the circular segment A = (D^2/8)(theta - sin theta), P = D theta/2, y = (D/2)(1 - cos(theta/2)), and solved for theta by bisection. The key subtlety: discharge is NOT monotonic with depth. It peaks about 7.6% ABOVE full-bore at d/D = 0.938 and falls back to the full value at the crown, and velocity peaks at d/D = 0.813 - both derived from the geometry here, not read off a chart. So a pipe has two depths for most flows, and the SMALLER (the physical normal depth) is the one reported. Hydraulic radius is D/4 at both half-full and full, which is why a half-full pipe runs the same velocity as a full one at the same slope. The 2 ft/s self-cleansing check and the boundary shear tau = 62.4 R S (roughly 0.02 to 0.03 lb/ft^2 is the usual grit-moving target) tell you whether solids stay suspended at this depth. Steady uniform flow, constant n with depth; Camp's variable-n curves raise n at shallow depths, so a low d/D result here is slightly optimistic. A design aid; the engineer of record and the local sewer code govern.",
+  };
+}
+export const pipePartialFlowDepthExample = { inputs: { d_in: 8, slope: 0.01, flow_gpm: 200, material: "concrete" } };
+
+function _v1011renderPipePartialFlowDepth(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Manning's equation applied to the circular-segment geometry (A = (D^2/8)(theta - sin theta), P = D theta/2, y = (D/2)(1 - cos(theta/2))) and solved for the partial-flow normal depth by bisection, the standard gravity-sewer partial-flow relation as compiled in ASCE/WEF MOP FD-5 and Chow, by name. The maximum-discharge depth d/D = 0.938 and maximum-velocity depth d/D = 0.813 are derived from these equations, not tabulated. Roughness n from the standard tables; self-cleansing taken as 2 ft/s. Constant n with depth (Camp's variable-n curves are separate). A design aid; the engineer of record and the local sewer code govern.";
+  attachExampleButton(inputRegion, () => { d.input.value = "8"; s.input.value = "0.01"; q.input.value = "200"; m.select.value = "concrete"; update(); });
+  const d = makeNumber("Pipe diameter (in)", "ppfd-d", { step: "any", min: "0" });
+  const s = makeNumber("Pipe slope S (ft/ft)", "ppfd-s", { step: "any", min: "0" });
+  const q = makeNumber("Flow Q (gpm)", "ppfd-q", { step: "any", min: "0" });
+  const m = makeSelect("Pipe material", "ppfd-m", Object.keys(MANNING_ROUGHNESS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
+  for (const f of [d, s, q]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(m.wrap);
+  const oY = makeOutputLine(outputRegion, "Flow depth", "ppfd-out-y");
+  const oDD = makeOutputLine(outputRegion, "Depth ratio d/D", "ppfd-out-dd");
+  const oV = makeOutputLine(outputRegion, "Velocity at that depth", "ppfd-out-v");
+  const oSC = makeOutputLine(outputRegion, "Self-cleansing (2 ft/s)", "ppfd-out-sc");
+  const oSH = makeOutputLine(outputRegion, "Boundary shear", "ppfd-out-sh");
+  const oCap = makeOutputLine(outputRegion, "Capacity full / maximum", "ppfd-out-cap");
+  const oNote = makeOutputLine(outputRegion, "Note", "ppfd-out-n");
+  const update = debounce(() => {
+    const r = computePipePartialFlowDepth({
+      d_in: Number(d.input.value) || 0,
+      slope: Number(s.input.value) || 0,
+      flow_gpm: Number(q.input.value) || 0,
+      material: m.select.value,
+    });
+    if (r.error) {
+      oY.textContent = r.error;
+      for (const o of [oDD, oV, oSC, oSH, oCap, oNote]) o.textContent = "-";
+      return;
+    }
+    oY.textContent = fmt(r.depth_in, 2) + " in of " + fmt(r.d_ft * 12, 2) + " in";
+    oDD.textContent = fmt(r.d_over_d, 3) + " (" + fmt(r.pct_full, 0) + "% of full-bore flow)";
+    oV.textContent = fmt(r.v_fps, 2) + " ft/s";
+    oSC.textContent = r.self_cleansing ? "YES (at or above 2 ft/s)" : "NO - below 2 ft/s, solids may settle";
+    oSH.textContent = fmt(r.shear_psf, 4) + " lb/ft^2";
+    oCap.textContent = fmt(r.q_full_gpm, 0) + " gpm full, " + fmt(r.q_max_gpm, 0) + " gpm max at d/D " + fmt(r.d_over_d_at_max_q, 3);
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [d, s, q]) f.input.addEventListener("input", update);
+  m.select.addEventListener("change", update);
+}
+PLUMBING_RENDERERS["pipe-partial-flow-depth"] = _v1011renderPipePartialFlowDepth;
+
 // dims: in { b_ft: L, q_cfs: L^3 T^-1, y1_ft: L } out: { v1_fps: L T^-1, fr1: dimensionless, y2_ft: L, fr2: dimensionless, de_ft: L, efficiency: dimensionless }
 export function computeHydraulicJump({ b_ft = 0, q_cfs = 0, y1_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

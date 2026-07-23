@@ -28947,3 +28947,51 @@ test("bounds: spec-v1010 computeSpringWireStress pins the Wahl factor, the corre
   assert.ok("error" in _v1010({ ...base, end_type: "not-an-end" }));
   assert.ok("error" in _v1010({ ...base, force_lb: Infinity }));
 });
+
+import { computePipePartialFlowDepth as _v1011 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v1011 computePipePartialFlowDepth pins the circular partial-flow depth, the derived turning points, the non-monotonic branch, and error seams", () => {
+  const base = { d_in: 8, slope: 0.01, flow_gpm: 200, material: "concrete" };
+  const r = _v1011(base);
+  assert.ok(Math.abs(r.depth_in - 3.3626) < 1e-3);
+  assert.ok(Math.abs(r.d_over_d - 0.42033) < 1e-4);
+  assert.ok(Math.abs(r.v_fps - 3.1995) < 1e-3);
+  // Full-bore capacity must agree with the manning-pipe-capacity sibling (542 gpm).
+  assert.ok(Math.abs(r.q_full_gpm - 542.4) < 1);
+  // Independent re-check: substituting the solved theta back into Manning must
+  // return the input flow. This is the solver's own proof.
+  const D = 8 / 12, n = 0.013, S = 0.01, th = r.theta;
+  const A = (D * D / 8) * (th - Math.sin(th)), P = D * th / 2;
+  const qBack = (1.486 / n) * A * Math.pow(A / P, 2 / 3) * Math.sqrt(S) * 448.831;
+  assert.ok(Math.abs(qBack - 200) < 1e-6);
+  // The turning points are DERIVED, not tabulated: max Q at d/D 0.9382, max V at 0.8128.
+  assert.ok(Math.abs(r.d_over_d_at_max_q - 0.93818) < 1e-4);
+  assert.ok(Math.abs(r.d_over_d_at_max_v - 0.81280) < 1e-4);
+  // A circular pipe carries ~7.6% MORE than full-bore at its best depth.
+  assert.ok(Math.abs(r.q_max_gpm / r.q_full_gpm - 1.07571) < 1e-4);
+  assert.ok(r.q_max_gpm > r.q_full_gpm);
+  // NON-MONOTONIC GUARD: at exactly the full-bore flow the solver must return the
+  // SMALLER root (d/D ~ 0.82), never 1.0 -- a naive full-range bisection fails here.
+  const atFull = _v1011({ ...base, flow_gpm: r.q_full_gpm });
+  assert.ok(atFull.d_over_d > 0.80 && atFull.d_over_d < 0.84);
+  assert.ok(atFull.d_over_d < r.d_over_d_at_max_q);
+  // Depth rises with flow; velocity and depth both rise with slope-driven capacity.
+  assert.ok(_v1011({ ...base, flow_gpm: 400 }).depth_in > r.depth_in);
+  assert.ok(_v1011({ ...base, slope: 0.02 }).depth_in < r.depth_in); // steeper runs shallower
+  // Hydraulic radius is D/4 at BOTH half-full and full -- the classic result.
+  const half = _v1011({ ...base, flow_gpm: r.q_full_gpm / 2 });
+  assert.ok(Math.abs(half.d_over_d - 0.5) < 0.02); // half the flow is near half depth
+  // Self-cleansing and boundary shear.
+  assert.strictEqual(r.self_cleansing, true); // 3.20 ft/s >= 2
+  assert.ok(Math.abs(r.shear_psf - 62.4 * r.r_ft * 0.01) < 1e-9);
+  assert.strictEqual(_v1011({ ...base, slope: 0.0008, flow_gpm: 30 }).self_cleansing, false);
+  // Over-capacity is a clear error naming the ceiling, not a bogus depth.
+  const over = _v1011({ ...base, flow_gpm: 99999 });
+  assert.ok("error" in over && /maximum gravity capacity/.test(over.error));
+  // Error seams.
+  assert.ok("error" in _v1011({ ...base, d_in: 0 }));
+  assert.ok("error" in _v1011({ ...base, slope: 0 }));
+  assert.ok("error" in _v1011({ ...base, flow_gpm: 0 }));
+  assert.ok("error" in _v1011({ ...base, material: "unobtainium" }));
+  assert.ok("error" in _v1011({ ...base, slope: Infinity }));
+});

@@ -183,6 +183,8 @@ const _TILES = [
   ["recirc-loop-sizing", "B"],
   ["trap-arm", "B"], ["pipe-expansion", "B"], ["tankless-gpm", "B"],
   ["gas-leak-rate", "B"], ["gas-leak-hole-diameter", "B"], ["stormwater-rational", "B"], ["stormwater-max-drainage-area", "B"], ["manning-slope", "B"], ["manning-pipe-capacity", "B"],
+  // spec-v1011 circular-pipe partial-flow depth
+  ["pipe-partial-flow-depth", "B"],
   ["drainage-invert", "B"],
   ["hydrostatic-test", "B"], ["grease-trap", "B"], ["grease-interceptor-flow-capacity", "B"], ["glycol-mix", "B"], ["hydronic-system-volume", "B"],
   ["expansion-tank", "B"], ["backflow-loss", "B"], ["water-hammer-surge", "B"],

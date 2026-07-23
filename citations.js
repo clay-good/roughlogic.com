@@ -3919,6 +3919,19 @@ export const CITATIONS = {
       { name: "Self-cleansing velocity", value: "2 ft/s for sanitary sewers", source: "public engineering practice" },
     ],
   },
+  "pipe-partial-flow-depth": {
+    formula: "A = (D^2/8)(theta - sin theta); P = D theta/2; R = A/P; y = (D/2)(1 - cos(theta/2)); solve (1.486/n) A R^(2/3) sqrt(S) = Q for theta by bisection on the rising branch (0, 5.27811]; V = Q/A; tau = 62.4 R S. Max discharge at theta = 5.27811 (d/D = 0.9382), max velocity at tan theta = theta, theta = 4.49341 (d/D = 0.8128).",
+    edition: "Manning's equation applied to circular-segment geometry for partial (part-full) gravity flow, the standard sewer-design relation as compiled in ASCE/WEF MOP FD-5 (Gravity Sanitary Sewer Design and Construction) and Chow's Open-Channel Hydraulics, by name; the 2 ft/s self-cleansing velocity is standard sewer practice.",
+    freeAccess: "Manning's equation and the circular-segment geometry are public results; the partial-flow relations here are derived from them rather than read from a proprietary chart.",
+    governance: GOVERNANCE.general,
+    editionNote: "The partial-flow normal depth of a circular gravity pipe: Manning Q = (1.486/n) A R^(2/3) sqrt(S) applied to the circular segment A = (D^2/8)(theta - sin theta), P = D theta/2, y = (D/2)(1 - cos(theta/2)), solved for the central angle theta by bisection. Discharge is NOT monotonic with depth - it reaches a maximum about 7.6% above the full-bore value at d/D = 0.938 and falls back to the full value at the crown, while velocity peaks at d/D = 0.813. Both turning points are DERIVED from the geometry (5 A' P = 2 A P' for discharge, A' P = A P' i.e. tan theta = theta for velocity), not taken from a tabulated chart. Because two depths satisfy most flows, the solver is restricted to the rising branch and returns the SMALLER root, which is the physical normal depth. The hydraulic radius is D/4 at both half-full and full, so a half-full pipe runs the same velocity as a full one on the same slope. Reports the 2 ft/s self-cleansing check and the boundary (tractive) shear tau = 62.4 R S. Assumes steady uniform flow and a roughness n held CONSTANT with depth; Camp's variable-n curves raise n at shallow depths, so a low d/D result is slightly optimistic. It does not cover surcharged or pressurized flow, gradually varied (backwater) profiles, or non-circular conduits. A design aid, not a substitute for the engineer of record's design or the local sewer code.",
+    assumptions: [
+      { name: "Circular-segment geometry", value: "A = (D^2/8)(theta - sin theta), P = D theta/2, y = (D/2)(1 - cos(theta/2))", source: "first-principles geometry" },
+      { name: "Non-monotonic discharge", value: "Q peaks ~7.6% above full-bore at d/D = 0.938; the smaller (physical) root is reported", source: "derived from Manning + circular segment" },
+      { name: "Self-cleansing", value: "2 ft/s minimum velocity; boundary shear tau = 62.4 R S reported alongside", source: "ASCE/WEF MOP FD-5 sewer practice" },
+      { name: "Constant roughness", value: "n held constant with depth; Camp's variable-n curves are not applied", source: "standard simplification" },
+    ],
+  },
   "manning-pipe-capacity": {
     formula: "English Manning V = (1.486 / n) R^(2/3) S^(1/2); full-bore circular pipe R = D/4, A = (pi/4) D^2, Q = V A; Q_gpm = 448.831 Q_cfs.",
     edition: "Manning equation; n-values from USGS WSP-2339 (public domain).",

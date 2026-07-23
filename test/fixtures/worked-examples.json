@@ -6818,6 +6818,82 @@
    }
   },
   {
+   "tile_id": "pipe-partial-flow-depth",
+   "source_publisher": "Manning applied to circular-segment geometry (ASCE/WEF MOP FD-5, Chow)",
+   "source_title": "8 in concrete (n 0.013) at 1% carrying 200 gpm -> 3.36 in deep, d/D 0.420, 3.20 ft/s, self-cleansing",
+   "source_edition_or_year": "spec-v1011 worked example (machine-verified)",
+   "source_section_or_page": "spec-v1011 section 2.1; re-checked by substituting the solved theta back into Manning, which returns 200.000 gpm",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "d_in": 8,
+    "slope": 0.01,
+    "flow_gpm": 200,
+    "material": "concrete"
+   },
+   "outputs": {
+    "depth_in": {
+     "value": 3.3626,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "d_over_d": {
+     "value": 0.42033,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "v_fps": {
+     "value": 3.1995,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "q_full_gpm": {
+     "value": 542.4,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "q_max_gpm": {
+     "value": 583.4,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pipe-partial-flow-depth",
+   "source_publisher": "Derived turning points of the circular partial-flow curve",
+   "source_title": "cross-check: max discharge at d/D 0.93818 (7.57% above full-bore), max velocity at d/D 0.81280",
+   "source_edition_or_year": "spec-v1011 worked example (machine-verified)",
+   "source_section_or_page": "spec-v1011 section 2.1 cross-check; 3 theta - 5 theta cos theta + 2 sin theta = 0 and tan theta = theta",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "d_in": 12,
+    "slope": 0.005,
+    "flow_gpm": 500,
+    "material": "pvc"
+   },
+   "outputs": {
+    "d_over_d_at_max_q": {
+     "value": 0.93818,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "d_over_d_at_max_v": {
+     "value": 0.81280,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "manning-pipe-capacity",
    "source_publisher": "Manning full-bore capacity V = (1.486/n) R^(2/3) S^(1/2), Q = V (pi/4) D^2",
    "source_title": "8 in concrete pipe (n 0.013) flowing full at 1% slope -> 1.21 cfs (542 gpm) at 3.46 ft/s",
