@@ -15877,6 +15877,17 @@ test("bounds: spec-v285 computeRcPunchingShear pins the three-term least, the al
   assert.ok(rDeep.lambda_s < 1);
   // vc carries lambda_s (regression guard: removing it would over-predict deep-member capacity).
   assert.ok(Math.abs(rDeep.vc_psi - rDeep.least * rDeep.lambda_s * Math.sqrt(4000)) < 1e-9);
+  // 22.5.3.1 caps sqrt(f'c) at 100 psi for two-way shear (this no-shear-
+  // reinforcement case cannot invoke the 22.5.3.2 exception). The cap only
+  // bites above f'c = 10,000 psi, so ordinary strengths are untouched but a
+  // high-strength slab is not over-predicted.
+  assert.ok(Math.abs(r.vc_psi - r.least * r.lambda_s * Math.sqrt(4000)) < 1e-9); // f'c = 4,000: uncapped
+  const rHi = _v285({ c1_in: 20, c2_in: 20, d_in: 6, fc_psi: 12000, position: "interior", lambda: 1.0 });
+  assert.ok(Math.abs(rHi.vc_psi - rHi.least * rHi.lambda_s * 100) < 1e-9); // capped at sqrt(f'c) = 100
+  assert.ok(rHi.vc_psi < rHi.least * rHi.lambda_s * Math.sqrt(12000)); // strictly below the uncapped value
+  // Continuity at the f'c = 10,000 boundary (sqrt = 100 exactly).
+  assert.ok(Math.abs(_v285({ c1_in: 20, c2_in: 20, d_in: 6, fc_psi: 10000, position: "interior", lambda: 1.0 }).vc_psi
+    - _v285({ c1_in: 20, c2_in: 20, d_in: 6, fc_psi: 12000, position: "interior", lambda: 1.0 }).vc_psi) < 1e-9);
   // Error seams.
   assert.ok("error" in _v285({ c1_in: 0, c2_in: 20, d_in: 6 }));
   assert.ok("error" in _v285({ c1_in: 20, c2_in: 20, d_in: 0 }));

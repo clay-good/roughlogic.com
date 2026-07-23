@@ -321,17 +321,22 @@ export function computeRcPunchingShear({ c1_in = 0, c2_in = 0, d_in = 0, fc_psi 
   const least = Math.min(t1, t2, t3);
   const governs = least === t1 ? "the 4 sqrt(f'c) base term" : (least === t2 ? "the aspect-ratio (2 + 4/beta) term" : "the (2 + alpha_s d/bo) large-column term");
   const lambda_s = Math.min(Math.sqrt(2 / (1 + d_in / 10)), 1.0);
-  const vc_psi = least * lambda_s * lambda * Math.sqrt(fc_psi);
+  // 22.5.3.1 caps sqrt(f'c) at 100 psi for two-way shear Vc; the 22.5.3.2
+  // exception that lifts the cap requires minimum shear reinforcement, which
+  // this no-shear-reinforcement punching case does not have. So the cap holds,
+  // and it only bites above f'c = 10,000 psi.
+  const sqrt_fc = Math.min(Math.sqrt(fc_psi), 100);
+  const vc_psi = least * lambda_s * lambda * sqrt_fc;
   const phi_vc_kip = (0.75 * vc_psi * bo_in * d_in) / 1000;
   return {
     bo_in, beta, alpha_s, t2, t3, least, governs, lambda_s, vc_psi, phi_vc_kip,
-    note: "ACI 318-19 Table 22.6.5.2 two-way (punching) shear on the d/2 critical perimeter: vc is the least of 4 lambda sqrt(f'c), (2 + 4/beta) lambda sqrt(f'c), and (2 + alpha_s d/bo) lambda sqrt(f'c), with alpha_s = 40/30/20 for an interior/edge/corner column and phi = 0.75; phi Vc = phi vc bo d. All three terms also carry the 22.5.5.1.3 size-effect factor lambda_s = sqrt(2 / (1 + d/10)) capped at 1.0 (new in the 2019 edition), so lambda_s is 1.0 up to d = 10 in and drops below it for deeper slabs and footings, cutting the punching capacity of thick members. Shear without unbalanced-moment transfer (no gamma_v amplification), no shear reinforcement or drop panel, rectangular column with the full d/2 perimeter available. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    note: "ACI 318-19 Table 22.6.5.2 two-way (punching) shear on the d/2 critical perimeter: vc is the least of 4 lambda sqrt(f'c), (2 + 4/beta) lambda sqrt(f'c), and (2 + alpha_s d/bo) lambda sqrt(f'c), with alpha_s = 40/30/20 for an interior/edge/corner column and phi = 0.75; phi Vc = phi vc bo d. All three terms also carry the 22.5.5.1.3 size-effect factor lambda_s = sqrt(2 / (1 + d/10)) capped at 1.0 (new in the 2019 edition), so lambda_s is 1.0 up to d = 10 in and drops below it for deeper slabs and footings, cutting the punching capacity of thick members. sqrt(f'c) is capped at 100 psi per 22.5.3.1 (the 22.5.3.2 exception needs minimum shear reinforcement, which this case lacks), so it only affects f'c above 10,000 psi. Shear without unbalanced-moment transfer (no gamma_v amplification), no shear reinforcement or drop panel, rectangular column with the full d/2 perimeter available. A design aid, not a substitute for the structural engineer of record's stamped design.",
   };
 }
 export const rcPunchingShearExample = { inputs: { c1_in: 20, c2_in: 20, d_in: 6, fc_psi: 4000, position: "interior", lambda: 1.0 } };
 
 CONCRETE_RENDERERS["rc-punching-shear"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Table 22.6.5.2 two-way shear (least of 4, 2 + 4/beta, 2 + alpha_s d/bo, each x the 22.5.5.1.3 size-effect factor lambda_s and lambda sqrt(f'c)) on the 22.6.4.1 d/2 critical perimeter, alpha_s = 40/30/20 interior/edge/corner, phi = 0.75, by name. No unbalanced-moment transfer or shear reinforcement. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: ACI 318-19 Table 22.6.5.2 two-way shear (least of 4, 2 + 4/beta, 2 + alpha_s d/bo, each x the 22.5.5.1.3 size-effect factor lambda_s and lambda sqrt(f'c)) on the 22.6.4.1 d/2 critical perimeter, alpha_s = 40/30/20 interior/edge/corner, the 22.5.3.1 sqrt(f'c) <= 100 psi cap, and phi = 0.75, by name. No unbalanced-moment transfer or shear reinforcement. A design aid, not a substitute for the engineer of record.",
   example: rcPunchingShearExample.inputs,
   fields: [
     { key: "c1_in", label: "Column dimension c1 (in)", kind: "number" },

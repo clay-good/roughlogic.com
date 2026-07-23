@@ -49686,6 +49686,37 @@
    }
   },
   {
+   "tile_id": "rc-punching-shear",
+   "source_publisher": "ACI 318-19 22.5.3.1 (sqrt(f'c) <= 100 psi cap)",
+   "source_title": "high-strength: same interior column on 12,000 psi concrete -> vc capped at 400 psi (not 438), phi Vc 187.2 kip",
+   "source_edition_or_year": "spec-v285 worked example (2026-07-23 cap regression)",
+   "source_section_or_page": "22.5.3.1 caps sqrt(12000)=109.5 at 100; vc = 4 x 1.0 x 1.0 x 100 = 400 psi; phi Vc = 0.75 x 400 x 104 x 6 / 1000",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "c1_in": 20,
+    "c2_in": 20,
+    "d_in": 6,
+    "fc_psi": 12000,
+    "position": "interior",
+    "lambda": 1.0
+   },
+   "outputs": {
+    "vc_psi": {
+     "value": 400.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "phi_vc_kip": {
+     "value": 187.2,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-one-way-shear",
    "source_publisher": "ACI 318-19 Table 22.5.5.1(b)",
    "source_title": "12 in strip, d = 16 in, 4,000 psi, As = 1.0 in^2 -> lambda_s 0.877, vc 77 psi, phi Vc 11.1 kip",

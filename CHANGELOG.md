@@ -4,6 +4,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(concrete): cap sqrt(f'c) at 100 psi in two-way punching shear (ACI 318-19 22.5.3.1); 2026-07-23
+
+- `computeRcPunchingShear` (rc-punching-shear) computed the two-way shear stress with an UNCAPPED `sqrt(f'c)`, omitting
+  the ACI 318-19 22.5.3.1 limit that `sqrt(f'c)` used to calculate Vc shall not exceed 100 psi. The 22.5.3.2 exception
+  that lifts the cap requires minimum shear reinforcement, which a punching-shear-without-reinforcement slab or footing
+  does not have, so the cap applies. The old value was NON-CONSERVATIVE above f'c = 10,000 psi: an interior column on
+  12,000 psi concrete reported vc = 438 psi where the code allows only 400 psi (a ~9.5% over-prediction of punching
+  capacity). Found by an adversarial audit of the spec-v1008..v1014 batch, then confirmed against ACI 22.5.3.1/22.6.3.1.
+- Fixed by capping `sqrt(f'c)` at 100 psi, matching the new `rc-one-way-shear` and `rc-min-shear-reinforcement` tiles.
+  The cap only engages above f'c = 10,000 psi, so both pinned worked examples (f'c = 4,000) are byte-identical
+  (vc 252.98 and 216.84 psi, phi Vc 118.4 and 163.9 kip) -- no ordinary-strength result changes. Added a high-strength
+  worked example (12,000 psi -> vc 400 psi, phi Vc 187.2 kip) and a fuzzer regression guard pinning the cap and its
+  continuity at the f'c = 10,000 boundary.
+- Scope note: the sibling `rc-beam-shear` (one-way, WITH stirrups) is deliberately LEFT uncapped and is correct -- its
+  simplified 2 sqrt(f'c) formula is valid only for a member with at least Av,min, which is exactly the 22.5.3.2
+  condition that permits sqrt(f'c) > 100. The audit's initial framing that rc-beam-shear was the less faithful tile was
+  wrong; only the no-reinforcement two-way case needed the cap.
+
 ### feat(earthwork): relative density (density index) of a cohesionless soil (spec-v1014); 2026-07-23
 
 - New tile `soil-relative-density` (Group E, calc-earthwork.js): the Dr that TWO tiles independently declared missing
