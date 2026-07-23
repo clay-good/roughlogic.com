@@ -17362,6 +17362,31 @@
       "kind": "industry"
     },
     {
+      "term": "relative density soil",
+      "target": "soil-relative-density",
+      "kind": "industry"
+    },
+    {
+      "term": "density index",
+      "target": "soil-relative-density",
+      "kind": "industry"
+    },
+    {
+      "term": "index density sand",
+      "target": "soil-relative-density",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how dense is this sand",
+      "target": "soil-relative-density",
+      "kind": "question"
+    },
+    {
+      "term": "compaction spec for clean sand",
+      "target": "soil-relative-density",
+      "kind": "question"
+    },
+    {
       "term": "rusle soil loss",
       "target": "rusle-soil-loss",
       "kind": "industry"

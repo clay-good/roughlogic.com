@@ -53826,6 +53826,64 @@
    }
   },
   {
+   "tile_id": "soil-relative-density",
+   "source_publisher": "Relative density (density index), dry-density form",
+   "source_title": "117.6 pcf wet at 12% -> 105.0 pcf dry; index densities 90 / 115 pcf -> Dr 65.7%",
+   "source_edition_or_year": "spec-v1014 worked example (machine-verified)",
+   "source_section_or_page": "spec-v1014 section 2.1; cross-checked against the void-ratio definition, which returns 65.714% for Gs 2.65 AND 2.80, confirming Gs cancels",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "field_wet_pcf": 117.6,
+    "w_pct": 12,
+    "gamma_dmin_pcf": 90,
+    "gamma_dmax_pcf": 115
+   },
+   "outputs": {
+    "gd_field_pcf": {
+     "value": 105.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "dr_pct": {
+     "value": 65.71429,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soil-relative-density",
+   "source_publisher": "Relative density (density index), dry-density form",
+   "source_title": "cross-check: a field dry density equal to the maximum index density is exactly Dr = 100%",
+   "source_edition_or_year": "spec-v1014 worked example (machine-verified)",
+   "source_section_or_page": "spec-v1014 section 2.1 cross-check; the endpoints Dr(gamma_d,min) = 0 and Dr(gamma_d,max) = 100 are exact",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "field_wet_pcf": 115,
+    "w_pct": 0,
+    "gamma_dmin_pcf": 90,
+    "gamma_dmax_pcf": 115
+   },
+   "outputs": {
+    "gd_field_pcf": {
+     "value": 115.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "dr_pct": {
+     "value": 100.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "relative-compaction",
    "source_publisher": "Relative compaction (earthwork QC)",
    "source_title": "128 pcf wet at 12%, Proctor 120 pcf, 95% spec -> 114.3 pcf dry, 95.2% pass",

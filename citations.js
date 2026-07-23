@@ -13756,6 +13756,19 @@ export const CITATIONS = {
       { name: "Cohesionless halving", value: "c' = 0 gives FS = ((gamma_sat - gamma_w)/gamma_sat) tan(phi')/tan(beta), about half the dry value for common soils", source: "infinite-slope seepage model" },
     ],
   },
+  "soil-relative-density": {
+    formula: "gamma_d = gamma_wet/(1 + w/100); Dr = 100 x gamma_d,max (gamma_d - gamma_d,min) / (gamma_d (gamma_d,max - gamma_d,min)), the dry-density reduction of Dr = (e_max - e)/(e_max - e_min).",
+    edition: "Relative density (density index) as defined on void ratios and reduced to its dry-density form, standard soil-mechanics practice as compiled in Das, Principles of Geotechnical Engineering, and NAVFAC DM-7.01; the minimum and maximum index dry densities come from the laboratory index-density tests for that soil and are entered by the user.",
+    freeAccess: "The definition and its dry-density reduction are public first-principles soil mechanics; the reduction is shown in the note so it can be checked by hand.",
+    governance: GOVERNANCE.general,
+    editionNote: "Relative density (density index) Dr, the compaction measure appropriate to a clean cohesionless sand or gravel, for which a Proctor curve is poorly defined and relative compaction is the wrong specification. Defined on void ratios as Dr = (e_max - e)/(e_max - e_min); substituting the phase relation e = Gs gamma_w/gamma_d - 1 cancels the specific gravity Gs and the unit weight of water gamma_w COMPLETELY, leaving the dry-density form Dr = gamma_d,max (gamma_d - gamma_d,min)/(gamma_d (gamma_d,max - gamma_d,min)). That cancellation is why the tile asks for no specific gravity, and it can be verified by hand from the two expressions. The field dry density is backed out of the measured wet density and moisture, gamma_d = gamma_wet/(1 + w), the same conversion the relative-compaction tile uses. Dr is referenced to the LOOSEST and DENSEST index densities of that same soil, not to a Proctor maximum, so relative density and relative compaction are different scales and are not interchangeable. A computed value outside the 0% to 100% range means the field density lies outside the index-test range and indicates a testing or data problem rather than a reportable result. The descriptive bands (very loose, loose, medium dense, dense, very dense) are terms in common professional use and are NOT a code requirement. A QC aid, not a substitute for the project geotechnical specification, the laboratory index-density results, or the testing agency.",
+    assumptions: [
+      { name: "Definition", value: "Dr = (e_max - e)/(e_max - e_min), reduced to the dry-density form; Gs and gamma_w cancel", source: "soil-mechanics first principles" },
+      { name: "Index densities entered", value: "the minimum and maximum index dry densities are laboratory results for that soil, entered by the user", source: "laboratory index-density tests" },
+      { name: "Not relative compaction", value: "referenced to loosest/densest index densities, not a Proctor maximum; the scales are not interchangeable", source: "Das / NAVFAC DM-7.01" },
+      { name: "Descriptive bands", value: "very loose / loose / medium dense / dense / very dense are conventional terms, not a code requirement", source: "common professional usage" },
+    ],
+  },
   "relative-compaction": {
     formula: "gd_field = wet / (1 + w/100); RC = gd_field / max x 100; pass when RC >= spec.",
     edition: "The relative-compaction relation RC = (gamma_d,field / gamma_d,max) x 100 with the moisture-back-out of field dry density and the ASTM D698/D1557 Proctor basis, a standard earthwork-QC result, by name.",

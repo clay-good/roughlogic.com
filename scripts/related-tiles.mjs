@@ -1645,6 +1645,7 @@ const RELATED = {
   "trap-speed-horsepower": ["et-horsepower","hp-from-torque","injector-size","mean-piston-speed"],
   "et-horsepower": ["trap-speed-horsepower","hp-from-torque","dyno-correction-sae","injector-size"],
   // spec-v326..v328 soil characterization / QC batch (Group E)
+  "soil-relative-density": ["relative-compaction","soil-phase-relations","liquefaction-screening","soil-bearing-capacity"],
   "relative-compaction": ["soil-swell-shrink","soil-phase-relations","soil-bearing-capacity"],
   "water-for-compaction": ["relative-compaction","soil-phase-relations","compaction-roller-production"],
   "soil-phase-relations": ["relative-compaction","soil-consolidation-settlement","atterberg-indices"],

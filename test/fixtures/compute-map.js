@@ -1213,6 +1213,7 @@ export const COMPUTE_MAP = {
   "et-horsepower": { module: "../../calc-mechanic.js", fn: "computeEtHorsepower" },
   // spec-v326..v328 soil characterization / QC batch (3 tiles)
   "relative-compaction": { module: "../../calc-earthwork.js", fn: "computeRelativeCompaction" },
+  "soil-relative-density": { module: "../../calc-earthwork.js", fn: "computeSoilRelativeDensity" },
   "water-for-compaction": { module: "../../calc-earthwork.js", fn: "computeWaterForCompaction" },
   "soil-phase-relations": { module: "../../calc-earthwork.js", fn: "computeSoilPhaseRelations" },
   "atterberg-indices": { module: "../../calc-earthwork.js", fn: "computeAtterbergIndices" },

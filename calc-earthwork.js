@@ -1680,6 +1680,68 @@ function _v326renderRelativeCompaction(inputRegion, outputRegion, citationEl) {
 }
 EARTHWORK_RENDERERS["relative-compaction"] = _v326renderRelativeCompaction;
 
+// dims: in { field_wet_pcf: M L^-2 T^-2, w_pct: dimensionless, gamma_dmin_pcf: M L^-2 T^-2, gamma_dmax_pcf: M L^-2 T^-2 } out: { gd_field_pcf: M L^-2 T^-2, dr_pct: dimensionless }
+export function computeSoilRelativeDensity({ field_wet_pcf = 0, w_pct = 0, gamma_dmin_pcf = 0, gamma_dmax_pcf = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(field_wet_pcf > 0)) return { error: "Field density must be positive (pcf)." };
+  if (w_pct < 0) return { error: "Moisture content cannot be negative (%)." };
+  if (!(gamma_dmin_pcf > 0)) return { error: "Minimum index dry density must be positive (pcf)." };
+  if (!(gamma_dmax_pcf > gamma_dmin_pcf)) return { error: "Maximum index dry density must exceed the minimum (pcf)." };
+  // Same conversion the relative-compaction sibling uses: back the dry density
+  // out of the measured wet density and moisture (w = 0 means it is already dry).
+  const gd_field_pcf = field_wet_pcf / (1 + w_pct / 100);
+  // Dr = (e_max - e)/(e_max - e_min). Substituting e = Gs gamma_w/gamma_d - 1
+  // cancels Gs and gamma_w entirely, leaving the dry-density form below, so this
+  // needs no specific gravity and no unit weight of water.
+  const dr_pct = 100 * gamma_dmax_pcf * (gd_field_pcf - gamma_dmin_pcf) / (gd_field_pcf * (gamma_dmax_pcf - gamma_dmin_pcf));
+  const below_min = gd_field_pcf < gamma_dmin_pcf;
+  const above_max = gd_field_pcf > gamma_dmax_pcf;
+  const out_of_range = below_min || above_max;
+  // Descriptive terms in common use for cohesionless soils. These are
+  // conventional labels, NOT a code requirement; the project spec governs.
+  const state = dr_pct < 15 ? "very loose" : dr_pct < 35 ? "loose" : dr_pct < 65 ? "medium dense" : dr_pct < 85 ? "dense" : "very dense";
+  return {
+    gd_field_pcf, dr_pct, state, out_of_range, below_min, above_max,
+    note: "Relative density (density index) Dr, the correct compaction measure for a CLEAN SAND or gravel, where a Proctor curve is poorly defined and relative compaction is the wrong spec. Defined on void ratios as Dr = (e_max - e)/(e_max - e_min); substituting the phase relation e = Gs gamma_w/gamma_d - 1 cancels the specific gravity and the unit weight of water completely, leaving the dry-density form used here, Dr = gamma_d,max (gamma_d - gamma_d,min) / (gamma_d (gamma_d,max - gamma_d,min)). That cancellation is why no Gs is asked for. The field dry density is backed out of the measured wet density and moisture, gamma_d = gamma_wet/(1 + w); enter a moisture of 0 if the density is already dry. Dr is measured against the LOOSEST and DENSEST index densities of that same soil, not against a Proctor maximum, so the two scales are not interchangeable and a sand at 95% relative compaction can still be loose. A result below 0% or above 100% means the field density falls outside the index-test range: re-check the index tests or the field measurement rather than reporting it. The descriptive bands (very loose / loose / medium dense / dense / very dense) are terms in common use, not a code requirement. A QC aid; the project geotechnical specification, the index-density test results, and the testing agency govern.",
+  };
+}
+export const soilRelativeDensityExample = { inputs: { field_wet_pcf: 117.6, w_pct: 12, gamma_dmin_pcf: 90, gamma_dmax_pcf: 115 } };
+
+function _v1014renderSoilRelativeDensity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: relative density (density index) Dr = (e_max - e)/(e_max - e_min), reduced to its dry-density form Dr = gamma_d,max (gamma_d - gamma_d,min)/(gamma_d (gamma_d,max - gamma_d,min)) by substituting e = Gs gamma_w/gamma_d - 1, which cancels the specific gravity and the unit weight of water; the field dry density from gamma_d = gamma_wet/(1 + w). The minimum and maximum index dry densities come from the laboratory index-density tests for that soil and are entered, not bundled. The descriptive bands are terms in common use, not a code requirement. A QC aid; the project geotechnical specification and the testing agency govern.";
+  attachExampleButton(inputRegion, () => { wet.input.value = "117.6"; w.input.value = "12"; dmin.input.value = "90"; dmax.input.value = "115"; update(); });
+  const wet = makeNumber("Field density (pcf)", "srd-wet", { step: "any", min: "0" });
+  const w = makeNumber("Moisture content w (%, 0 = already dry)", "srd-w", { step: "any", min: "0" });
+  const dmin = makeNumber("Minimum index dry density, loosest (pcf)", "srd-dmin", { step: "any", min: "0" });
+  const dmax = makeNumber("Maximum index dry density, densest (pcf)", "srd-dmax", { step: "any", min: "0" });
+  for (const f of [wet, w, dmin, dmax]) inputRegion.appendChild(f.wrap);
+  const oGd = makeOutputLine(outputRegion, "Field dry density", "srd-out-gd");
+  const oDr = makeOutputLine(outputRegion, "Relative density Dr", "srd-out-dr");
+  const oSt = makeOutputLine(outputRegion, "Descriptive state", "srd-out-st");
+  const oNote = makeOutputLine(outputRegion, "Note", "srd-out-n");
+  const update = debounce(() => {
+    const r = computeSoilRelativeDensity({
+      field_wet_pcf: Number(wet.input.value) || 0,
+      w_pct: Number(w.input.value) || 0,
+      gamma_dmin_pcf: Number(dmin.input.value) || 0,
+      gamma_dmax_pcf: Number(dmax.input.value) || 0,
+    });
+    if (r.error) {
+      oGd.textContent = r.error;
+      for (const o of [oDr, oSt, oNote]) o.textContent = "-";
+      return;
+    }
+    oGd.textContent = fmt(r.gd_field_pcf, 1) + " pcf";
+    oDr.textContent = fmt(r.dr_pct, 1) + "%"
+      + (r.below_min ? " - BELOW the loosest index density; re-check the tests" : "")
+      + (r.above_max ? " - ABOVE the densest index density; re-check the tests" : "");
+    oSt.textContent = r.out_of_range ? "- (outside the index-test range)" : r.state + " (terms in common use, not a code requirement)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [wet, w, dmin, dmax]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["soil-relative-density"] = _v1014renderSoilRelativeDensity;
+
 // dims: in { gamma_pcf: M L^-2 T^-2, w_pct: dimensionless, gs: dimensionless } out: { gamma_d_pcf: M L^-2 T^-2, e_ratio: dimensionless, n_porosity: dimensionless, s_pct: dimensionless }
 export function computeSoilPhaseRelations({ gamma_pcf = 0, w_pct = 0, gs = 2.70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

@@ -29096,3 +29096,50 @@ test("bounds: spec-v1013 computeSoilVerticalEffectiveStress pins the Terzaghi pr
   assert.ok("error" in _v1013({ ...base, surcharge_psf: -1 }));
   assert.ok("error" in _v1013({ ...base, depth_ft: Infinity }));
 });
+
+import { computeSoilRelativeDensity as _v1014 } from "../../calc-earthwork.js";
+
+test("bounds: spec-v1014 computeSoilRelativeDensity pins the dry-density form, its equivalence to the void-ratio definition, the exact endpoints, and error seams", () => {
+  const base = { field_wet_pcf: 117.6, w_pct: 12, gamma_dmin_pcf: 90, gamma_dmax_pcf: 115 };
+  const r = _v1014(base);
+  assert.ok(Math.abs(r.gd_field_pcf - 105) < 1e-9); // 117.6 / 1.12
+  assert.ok(Math.abs(r.dr_pct - 65.714286) < 1e-4);
+  assert.strictEqual(r.out_of_range, false);
+  // EQUIVALENCE PROOF: the void-ratio definition Dr = (e_max - e)/(e_max - e_min)
+  // with e = Gs gamma_w/gamma_d - 1 must return the same number for ANY Gs,
+  // because Gs and gamma_w cancel out of the dry-density form.
+  const voidDr = (gd, gmin, gmax, Gs, gw) => {
+    const e = (x) => Gs * gw / x - 1;
+    return 100 * (e(gmin) - e(gd)) / (e(gmin) - e(gmax));
+  };
+  for (const Gs of [2.60, 2.65, 2.72, 2.80]) {
+    assert.ok(Math.abs(voidDr(105, 90, 115, Gs, 62.4) - r.dr_pct) < 1e-6);
+  }
+  // Endpoints are exact: the loosest index density is 0%, the densest is 100%.
+  assert.ok(Math.abs(_v1014({ ...base, field_wet_pcf: 90, w_pct: 0 }).dr_pct) < 1e-9);
+  assert.ok(Math.abs(_v1014({ ...base, field_wet_pcf: 115, w_pct: 0 }).dr_pct - 100) < 1e-9);
+  // Denser field density gives a higher Dr; more moisture at the same wet
+  // density means less soil, so a lower dry density and a lower Dr.
+  assert.ok(_v1014({ ...base, field_wet_pcf: 125 }).dr_pct > r.dr_pct);
+  assert.ok(_v1014({ ...base, w_pct: 20 }).dr_pct < r.dr_pct);
+  // Out-of-range is flagged, not silently clamped -- it signals a test problem.
+  const lo = _v1014({ ...base, field_wet_pcf: 85, w_pct: 0 });
+  const hi = _v1014({ ...base, field_wet_pcf: 120, w_pct: 0 });
+  assert.strictEqual(lo.below_min, true);
+  assert.ok(lo.dr_pct < 0);
+  assert.strictEqual(hi.above_max, true);
+  assert.ok(hi.dr_pct > 100);
+  // Descriptive bands land in the right order across the range.
+  const state = (gd) => _v1014({ ...base, field_wet_pcf: gd, w_pct: 0 }).state;
+  assert.strictEqual(state(92), "very loose");
+  assert.strictEqual(state(97), "loose");
+  assert.strictEqual(state(101), "medium dense");
+  assert.strictEqual(state(112), "very dense");
+  // Error seams.
+  assert.ok("error" in _v1014({ ...base, field_wet_pcf: 0 }));
+  assert.ok("error" in _v1014({ ...base, w_pct: -1 }));
+  assert.ok("error" in _v1014({ ...base, gamma_dmin_pcf: 0 }));
+  assert.ok("error" in _v1014({ ...base, gamma_dmax_pcf: 90 })); // max must exceed min
+  assert.ok("error" in _v1014({ ...base, gamma_dmax_pcf: 80 }));
+  assert.ok("error" in _v1014({ ...base, w_pct: Infinity }));
+});

@@ -4,6 +4,25 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): relative density (density index) of a cohesionless soil (spec-v1014); 2026-07-23
+
+- New tile `soil-relative-density` (Group E, calc-earthwork.js): the Dr that TWO tiles independently declared missing
+  (`relative-compaction`: "it does not compute ... the cohesionless relative density Dr"; `soil-phase-relations`: "it
+  does not compute ... the compaction relative density"). The distinction those notes draw is real trade content:
+  relative *compaction* (percent of Proctor) is the wrong spec for a clean sand; relative *density* against the
+  loosest and densest index densities is. 117.6 pcf wet at 12% is 105.0 pcf dry, which against index densities of 90
+  and 115 pcf is Dr = 65.7%. Home tile count 1,462 -> 1,463.
+- **No specific gravity is asked for, and that is a derived result, not an omission.** Dr is defined on void ratios as
+  `(e_max - e)/(e_max - e_min)`; substituting `e = Gs*gamma_w/gamma_d - 1` cancels Gs and gamma_w completely, leaving
+  the dry-density form `Dr = gamma_dmax(gamma_d - gamma_dmin)/(gamma_d(gamma_dmax - gamma_dmin))`. The fuzzer proves
+  the cancellation empirically by evaluating the void-ratio definition at Gs = 2.60, 2.65, 2.72 and 2.80 and asserting
+  all four match to within 1e-6, and pins both exact endpoints (0% at the loosest, 100% at the densest).
+- A Dr outside 0-100% is flagged, not clamped: it means the field density falls outside the index-test range, which is
+  a testing or data problem rather than a reportable result.
+- The descriptive bands (very loose / loose / medium dense / dense / very dense) are labelled in both the note and the
+  citation as terms in common professional use, **not** a code requirement. No ASTM designation is claimed for them;
+  the citation covers only the Dr definition and its reduction, both shown so they can be checked by hand.
+
 ### feat(geotech): soil vertical total and effective stress (spec-v1013); 2026-07-23
 
 - New tile `soil-vertical-effective-stress` (Group E, calc-geotech.js): Terzaghi's `sigma' = sigma - u` profile.
