@@ -1,9 +1,9 @@
 {
   "name": "plumbing",
-  "version": "2026-07-13",
-  "fetched": "2026-07-13",
-  "edition": "IPC 2021; IFGC 2021; Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of 2026-07-13.",
-  "asOf": "2026-07-13",
+  "version": "2026-07-20",
+  "fetched": "2026-07-20",
+  "edition": "IPC 2021; IFGC 2021; Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of 2026-07-20.",
+  "asOf": "2026-07-20",
   "refresh_cadence": "annual",
   "shards": [
     {

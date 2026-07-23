@@ -1,8 +1,8 @@
 {
   "source": "IRS Form 1040-ES (Estimated Tax for Individuals), per-year published schedule.",
   "edition": "per-year",
-  "fetched": "2026-07-13",
-  "verified_on": "2026-07-13",
+  "fetched": "2026-07-20",
+  "verified_on": "2026-07-20",
   "free_access": "irs.gov/forms-pubs/about-form-1040-es.",
   "by_year": {
     "2024": [

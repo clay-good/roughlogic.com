@@ -1,9 +1,9 @@
 {
   "name": "construction",
-  "version": "2026-07-13",
-  "fetched": "2026-07-13",
-  "edition": "IRC 2021 / IBC 2021 cited by section number; ASCE 7 formulas applied (no licensed text reproduced); ACI 211 / ACI 318 / ACI 347 cited by name; ASTM A615 + CRSI rebar values; APA span-rating tables (technical-bulletin reuse); ICC-ES AC358 helical-pile Kt; ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC for crane-lift; ASTM/SAE bolt grades; AWS deposition; lumber properties from public engineering references; verified 2026-07-13.",
-  "asOf": "2026-07-13",
+  "version": "2026-07-20",
+  "fetched": "2026-07-20",
+  "edition": "IRC 2021 / IBC 2021 cited by section number; ASCE 7 formulas applied (no licensed text reproduced); ACI 211 / ACI 318 / ACI 347 cited by name; ASTM A615 + CRSI rebar values; APA span-rating tables (technical-bulletin reuse); ICC-ES AC358 helical-pile Kt; ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC for crane-lift; ASTM/SAE bolt grades; AWS deposition; lumber properties from public engineering references; verified 2026-07-20.",
+  "asOf": "2026-07-20",
   "refresh_cadence": "annual",
   "shards": [
     {
@@ -70,7 +70,7 @@
   "hashes": {
     "lumber-properties.json": "907d333733626defbf54e57c71f3b2e27f72f495cc26de21eaf63908fff39a00",
     "concrete-mixes.json": "4c302a4012faa2b2e034dc826accbcab49860ed23dc204f68071d70372f5a45f",
-    "span-derivations.json": "98eb4884a314a839e361c3a28530044d6ca60799eae5616e76e8e08876b34cf0",
+    "span-derivations.json": "32fd28607a252bba65e38c8afa4fa4eb175da4d08083058d42ec9bce79fdca2f",
     "soil-bearing.json": "c479e27f0a867104f45ee9d0ae2ad52ae17c249a4c3165b7450358754c055ef9",
     "wind-snow-zones.json": "4b7d5d2b3094f721fb8f59625ae96ab4f8d948768800a5b9cdd29715cd99ee9e",
     "aci-211-curves.json": "ca22e2509e45132b4bd3d7e1893a0a57c90441ae8ad12179cde5eda980776c13",
