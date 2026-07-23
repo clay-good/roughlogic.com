@@ -15308,6 +15308,12 @@ test("bounds: spec-v259 computeRcDevelopmentLength pins ld, the 1.7 and 2.5 caps
   // The 12 in floor: a #3 (0.375 in) well-confined bottom bar computes under 12 in and floors.
   const rf = _v259({ fc: 4000, fy: 60000, db: 0.375, psi_s: 0.8 });
   assert.ok(rf.ld_in === 12);
+  // 25.4.1.4 caps sqrt(f'c) at 100 psi, so ld stops shortening above f'c =
+  // 10,000 psi (in the denominator, uncapped would UNDER-develop the bar).
+  const rHi1 = _v259({ fc: 12000, fy: 60000, db: 1.0, psi_t: 1.0, psi_e: 1.0, psi_s: 1.0, psi_g: 1.0, lambda: 1.0, conf: 1.5 });
+  const rHi2 = _v259({ fc: 10000, fy: 60000, db: 1.0, psi_t: 1.0, psi_e: 1.0, psi_s: 1.0, psi_g: 1.0, lambda: 1.0, conf: 1.5 });
+  assert.ok(Math.abs(rHi1.ld_in - rHi2.ld_in) < 1e-9); // frozen at the f'c = 10,000 cap
+  assert.ok(rHi1.ld_in > (3 / 40) * 60000 / (Math.sqrt(12000) * 1.5) * 1.0); // longer than uncapped
   // Error seams.
   assert.ok("error" in _v259({ fc: 0, fy: 60000, db: 1 }));
   assert.ok("error" in _v259({ fc: 4000, fy: 0, db: 1 }));
@@ -15909,6 +15915,12 @@ test("bounds: spec-v286 computeRcHookDevelopment pins the db^1.5 scaling, the ps
   const r3 = _v286({ db_in: 0.375 });
   assert.strictEqual(r3.ldh_in, 6);
   assert.strictEqual(r3.floor_governs, true);
+  // 25.4.1.4 caps sqrt(f'c) at 100 psi, so ldh stops shortening above f'c =
+  // 10,000 psi (a big bar so the 8db/6in floor does not mask the cap).
+  const h12 = _v286({ db_in: 2.0, fy_psi: 60000, fc_psi: 12000, psi_e: 1.0, psi_r: 1.0, psi_o: 1.0, lambda: 1.0 });
+  const h10 = _v286({ db_in: 2.0, fy_psi: 60000, fc_psi: 10000, psi_e: 1.0, psi_r: 1.0, psi_o: 1.0, lambda: 1.0 });
+  assert.ok(Math.abs(h12.ldh_in - h10.ldh_in) < 1e-9); // frozen at the cap
+  assert.ok(h12.ldh_in > (60000 / (55 * Math.sqrt(12000))) * Math.pow(2.0, 1.5)); // longer than uncapped
   // Error seams.
   assert.ok("error" in _v286({ db_in: 0 }));
   assert.ok("error" in _v286({ db_in: 1.0, fc_psi: 0 }));
@@ -21582,6 +21594,13 @@ test("bounds: spec-v491 computeRcCompressionDevLength pins the two governing ter
   assert.ok(Math.abs(ties.ldc_in - 14.23) < 0.01 && ties.ldc_in < r.ldc_in);
   // The 8 in absolute minimum: a tiny bar never develops in less than 8 in.
   assert.ok(_v491({ bar_diameter_in: 0.375, fy_psi: 60000, fc_psi: 4000, lambda: 1.0, psi_r: 1.0 }).ldc_in >= 8.0);
+  // 25.4.1.4 caps sqrt(f'c) at 100 psi, so term1 stops shrinking above f'c =
+  // 10,000 psi. (The 0.0003 fy db floor governs the OUTPUT at any f'c > ~4,444,
+  // so the cap does not change ldc here, but term1 itself must freeze at the cap.)
+  const t12 = _v491({ bar_diameter_in: 1.0, fy_psi: 60000, fc_psi: 12000, lambda: 1.0, psi_r: 1.0 });
+  const t10 = _v491({ bar_diameter_in: 1.0, fy_psi: 60000, fc_psi: 10000, lambda: 1.0, psi_r: 1.0 });
+  assert.ok(Math.abs(t12.term1_in - t10.term1_in) < 1e-9); // frozen at the cap
+  assert.ok(t12.term1_in > (60000 / (50 * Math.sqrt(12000))) * 1.0); // capped value exceeds the uncapped
   // Error seams: non-finite, non-positive db/fy/f'c, lambda out of range, psi_r out of range.
   assert.ok("error" in _v491({ bar_diameter_in: Infinity, fy_psi: 60000, fc_psi: 4000 }));
   assert.ok("error" in _v491({ bar_diameter_in: 0, fy_psi: 60000, fc_psi: 4000 }));

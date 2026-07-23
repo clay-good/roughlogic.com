@@ -4,6 +4,25 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(concrete): cap sqrt(f'c) at 100 psi in the three development-length tiles (ACI 318-19 25.4.1.4); 2026-07-23
+
+- After the rc-punching-shear cap fix, a systematic sweep of every `Math.sqrt(f'c)` in calc-concrete.js found the
+  same missing-cap bug class in the development-length family: `computeRcDevelopmentLength` (tension, 25.4.2),
+  `computeRcHookDevelopment` (hooks, 25.4.3), and `computeRcCompressionDevLength` (compression, 25.4.9) all divided by
+  an UNCAPPED sqrt(f'c). ACI 318-19 25.4.1.4 caps the value of sqrt(f'c) used to calculate development length at
+  100 psi (no exception, unlike shear's 22.5.3.2). Because sqrt(f'c) is in the DENOMINATOR, the uncapped code returned
+  a SHORTER development length above f'c = 10,000 psi -- non-conservative, an under-developed bar. A #9 tension bar at
+  12,000 psi returned 27.4 in where the code requires 30.0 in.
+- Fixed all three by capping sqrt(f'c) at 100 psi. The cap only engages above f'c = 10,000 psi, so every pinned worked
+  example (all f'c <= 10,000) is unchanged. Verified with fuzzer guards that ld/ldh freeze at the f'c = 10,000 value
+  and exceed the uncapped result. The compression tile's 0.0003 fy db floor already governs the OUTPUT above
+  f'c ~ 4,444 psi, so its cap changes term1 but not ldc; it is applied anyway for correctness and family consistency,
+  and pinned on term1 in the fuzzer.
+- The non-shear caps confirmed against ACI 25.4.1.4 (development), not recall. Modulus of elasticity (57000 sqrt(f'c))
+  and modulus of rupture (7.5 sqrt(f'c)) are material properties with NO such cap and were correctly left alone; the
+  torsion threshold and the Chapter 17 anchor tiles use sqrt(f'c) under different provisions and are tracked
+  separately (not swept into this fix).
+
 ### fix(concrete): cap sqrt(f'c) at 100 psi in two-way punching shear (ACI 318-19 22.5.3.1); 2026-07-23
 
 - `computeRcPunchingShear` (rc-punching-shear) computed the two-way shear stress with an UNCAPPED `sqrt(f'c)`, omitting

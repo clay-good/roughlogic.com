@@ -179,7 +179,11 @@ export function computeRcDevelopmentLength({ fc = 4000, fy = 60000, db = 0, psi_
   if (!(lambda > 0)) return { error: "Lightweight factor lambda must be positive." };
   const te = Math.min(psi_t * psi_e, 1.7);
   const conf_eff = Math.min(conf, 2.5);
-  const ld_calc = (3 / 40) * fy * te * psi_s * psi_g / (lambda * Math.sqrt(fc) * conf_eff) * db;
+  // 25.4.1.4 caps sqrt(f'c) at 100 psi in development-length calculations
+  // (no exception, unlike shear's 22.5.3.2). sqrt(f'c) is in the denominator,
+  // so the cap lengthens ld above f'c = 10,000 psi - the conservative direction.
+  const sqrt_fc = Math.min(Math.sqrt(fc), 100);
+  const ld_calc = (3 / 40) * fy * te * psi_s * psi_g / (lambda * sqrt_fc * conf_eff) * db;
   const ld_in = Math.max(ld_calc, 12);
   const ld_db = ld_in / db;
   return { te, conf_eff, ld_in, ld_db };
@@ -188,7 +192,7 @@ export function computeRcDevelopmentLength({ fc = 4000, fy = 60000, db = 0, psi_
 export const rcDevelopmentLengthExample = { inputs: { fc: 4000, fy: 60000, db: 1.00, psi_t: 1.0, psi_e: 1.0, psi_s: 1.0, psi_g: 1.0, lambda: 1.0, conf: 2.5 } };
 
 CONCRETE_RENDERERS["rc-development-length"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 §25.4.2.3 (the general tension development-length equation ld = (3/40) x (fy x psi_t x psi_e x psi_s x psi_g) / (lambda x sqrt(f'c) x ((cb + Ktr)/db)) x db), §25.4.2.4 (the (cb + Ktr)/db confinement term, capped at 2.5), §25.4.2.5 / Table 25.4.2.5 (psi_t casting position 1.3 top bar / 1.0 other, psi_e coating 1.5 or 1.2 epoxy / 1.0 uncoated, psi_s size 0.8 for #6 and smaller / 1.0 for #7 and larger, psi_g grade 1.0 Gr 60 / 1.15 Gr 80 / 1.3 Gr 100, with psi_t x psi_e capped at 1.7), and §25.4.2.1 (the 12 in minimum). The psi factors are user-selected inputs, not derived here -- the tool does not read cover, spacing, or transverse reinforcement to compute cb or Ktr. Straight-bar tension development only: not a standard hook (§25.4.3), a compression bar (§25.4.9), or a lap splice (§25.5, see the rebar lap splice tile). Lambda is 1.0 normalweight, 0.75 lightweight. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's detailing governs.",
+  citation: "Citation: ACI 318-19 §25.4.2.3 (the general tension development-length equation ld = (3/40) x (fy x psi_t x psi_e x psi_s x psi_g) / (lambda x sqrt(f'c) x ((cb + Ktr)/db)) x db), §25.4.2.4 (the (cb + Ktr)/db confinement term, capped at 2.5), §25.4.2.5 / Table 25.4.2.5 (psi_t casting position 1.3 top bar / 1.0 other, psi_e coating 1.5 or 1.2 epoxy / 1.0 uncoated, psi_s size 0.8 for #6 and smaller / 1.0 for #7 and larger, psi_g grade 1.0 Gr 60 / 1.15 Gr 80 / 1.3 Gr 100, with psi_t x psi_e capped at 1.7), §25.4.2.1 (the 12 in minimum), and §25.4.1.4 (the value of sqrt(f'c) shall not exceed 100 psi, so f'c above 10,000 psi does not further shorten ld). The psi factors are user-selected inputs, not derived here -- the tool does not read cover, spacing, or transverse reinforcement to compute cb or Ktr. Straight-bar tension development only: not a standard hook (§25.4.3), a compression bar (§25.4.9), or a lap splice (§25.5, see the rebar lap splice tile). Lambda is 1.0 normalweight, 0.75 lightweight. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's detailing governs.",
   example: rcDevelopmentLengthExample.inputs,
   fields: [
     { key: "fc", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
@@ -487,7 +491,10 @@ export function computeRcHookDevelopment({ db_in = 0, fy_psi = 60000, fc_psi = 4
   if (!(psi_e > 0) || !(psi_r > 0) || !(psi_o > 0)) return { error: "Modification factors must be positive (1.0 is the base)." };
   if (!(lambda > 0 && lambda <= 1)) return { error: "The lightweight factor lambda is over 0 and up to 1.0." };
   const psi_c = fc_psi < 6000 ? fc_psi / 15000 + 0.6 : 1.0;
-  const ldh_eq_in = (fy_psi * psi_e * psi_r * psi_o * psi_c / (55 * lambda * Math.sqrt(fc_psi))) * Math.pow(db_in, 1.5);
+  // 25.4.1.4 caps sqrt(f'c) at 100 psi in development-length calculations; in
+  // the denominator, the cap lengthens ldh above f'c = 10,000 psi (conservative).
+  const sqrt_fc = Math.min(Math.sqrt(fc_psi), 100);
+  const ldh_eq_in = (fy_psi * psi_e * psi_r * psi_o * psi_c / (55 * lambda * sqrt_fc)) * Math.pow(db_in, 1.5);
   const floor_in = Math.max(8 * db_in, 6);
   const ldh_in = Math.max(ldh_eq_in, floor_in);
   const floor_governs = floor_in >= ldh_eq_in;
@@ -499,7 +506,7 @@ export function computeRcHookDevelopment({ db_in = 0, fy_psi = 60000, fc_psi = 4
 export const rcHookDevelopmentExample = { inputs: { db_in: 1.0, fy_psi: 60000, fc_psi: 4000, psi_e: 1.0, psi_r: 1.0, psi_o: 1.0, lambda: 1.0 } };
 
 CONCRETE_RENDERERS["rc-hook-development"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Eq. 25.4.3.1a hooked-bar development ldh = (fy psi_e psi_r psi_o psi_c / (55 lambda sqrt(f'c))) db^1.5 with the 25.4.3.2 modification factors (psi_c = f'c/15,000 + 0.6 under 6,000 psi) and the max(8 db, 6 in) floor, by name. Standard 90/180 hooks; headed bars are separate. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: ACI 318-19 Eq. 25.4.3.1a hooked-bar development ldh = (fy psi_e psi_r psi_o psi_c / (55 lambda sqrt(f'c))) db^1.5 with the 25.4.3.2 modification factors (psi_c = f'c/15,000 + 0.6 under 6,000 psi), the 25.4.1.4 sqrt(f'c) <= 100 psi cap (f'c above 10,000 psi does not further shorten ldh), and the max(8 db, 6 in) floor, by name. Standard 90/180 hooks; headed bars are separate. A design aid, not a substitute for the engineer of record.",
   example: rcHookDevelopmentExample.inputs,
   fields: [
     { key: "db_in", label: "Bar diameter db (in; #8 = 1.0)", kind: "number" },
@@ -1185,7 +1192,10 @@ export function computeRcCompressionDevLength({ bar_diameter_in = 0, fy_psi = 60
   if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
   if (!(lam > 0 && lam <= 1)) return { error: "Lightweight factor lambda must be in (0, 1] (1.0 normalweight, 0.75 lightweight)." };
   if (!(pr >= 0.75 && pr <= 1.0)) return { error: "Confinement factor psi_r must be 0.75 to 1.0 (0.75 with ties/spiral per 25.4.9.3, else 1.0)." };
-  const term1_in = (fy * pr) / (50 * lam * Math.sqrt(fc)) * db;
+  // 25.4.1.4 caps sqrt(f'c) at 100 psi in development-length calculations; in
+  // the denominator, the cap lengthens term1 above f'c = 10,000 psi (conservative).
+  const sqrt_fc = Math.min(Math.sqrt(fc), 100);
+  const term1_in = (fy * pr) / (50 * lam * sqrt_fc) * db;
   const term2_in = 0.0003 * fy * pr * db;
   const ldc_in = Math.max(term1_in, term2_in, 8.0);
   const governing = ldc_in <= 8.0 ? "8 in minimum" : (term1_in >= term2_in ? "term1: fy / (50 lambda sqrt(f'c))" : "term2: 0.0003 fy floor");
@@ -1196,7 +1206,7 @@ export function computeRcCompressionDevLength({ bar_diameter_in = 0, fy_psi = 60
 export const rcCompressionDevLengthExample = { inputs: { bar_diameter_in: 1.0, fy_psi: 60000, fc_psi: 4000, lambda: 1.0, psi_r: 1.0 } };
 
 CONCRETE_RENDERERS["rc-compression-dev-length"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 §25.4.9.2 compression development length ldc = max((fy x psi_r) / (50 x lambda x sqrt(f'c)) x db, 0.0003 x fy x psi_r x db, 8 in). Compression development is shorter than tension because the bar end bears on the concrete (no flexural-cracking penalty). The 0.0003 fy db term governs at high f'c, where the sqrt(f'c) term keeps shrinking. psi_r = 0.75 applies only where §25.4.9.3 confining reinforcement (ties or a spiral of the stated size and spacing) wraps the developed bar; lambda = 0.75 for lightweight concrete. Lap-splice (§25.5) and minimum-length provisions still apply. A design aid, not a substitute for the engineer of record's detailing.",
+  citation: "Citation: ACI 318-19 §25.4.9.2 compression development length ldc = max((fy x psi_r) / (50 x lambda x sqrt(f'c)) x db, 0.0003 x fy x psi_r x db, 8 in). Compression development is shorter than tension because the bar end bears on the concrete (no flexural-cracking penalty). The 0.0003 fy db term governs at high f'c, where the sqrt(f'c) term keeps shrinking, and the 25.4.1.4 cap (sqrt(f'c) <= 100 psi) freezes the sqrt(f'c) term at f'c = 10,000 psi so it cannot shrink further. psi_r = 0.75 applies only where §25.4.9.3 confining reinforcement (ties or a spiral of the stated size and spacing) wraps the developed bar; lambda = 0.75 for lightweight concrete. Lap-splice (§25.5) and minimum-length provisions still apply. A design aid, not a substitute for the engineer of record's detailing.",
   example: rcCompressionDevLengthExample.inputs,
   fields: [
     { key: "bar_diameter_in", label: "Bar diameter db (in, #8 = 1.00)", kind: "number" },
