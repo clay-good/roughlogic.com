@@ -967,6 +967,51 @@
       "kind": "industry"
     },
     {
+      "term": "wahl factor",
+      "target": "spring-wire-stress",
+      "kind": "industry"
+    },
+    {
+      "term": "spring wire stress",
+      "target": "spring-wire-stress",
+      "kind": "industry"
+    },
+    {
+      "term": "spring solid height",
+      "target": "spring-wire-stress",
+      "kind": "industry"
+    },
+    {
+      "term": "spring buckling",
+      "target": "spring-wire-stress",
+      "kind": "adjacent"
+    },
+    {
+      "term": "spring stress correction",
+      "target": "spring-wire-stress",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much stress is in my spring wire",
+      "target": "spring-wire-stress",
+      "kind": "question"
+    },
+    {
+      "term": "how far can a spring compress before it stacks solid",
+      "target": "spring-wire-stress",
+      "kind": "question"
+    },
+    {
+      "term": "will my compression spring buckle",
+      "target": "spring-wire-stress",
+      "kind": "question"
+    },
+    {
+      "term": "shear stress in a coil spring",
+      "target": "spring-wire-stress",
+      "kind": "question"
+    },
+    {
       "term": "hp torque rpm",
       "target": "hp-from-torque",
       "kind": "redirect"

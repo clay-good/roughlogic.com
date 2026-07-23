@@ -904,6 +904,8 @@ const TOOL_MODULES = (() => {
     // v23
     "valve-flow-coefficient", "screw-conveyor", "screw-conveyor-rpm",
     "helical-spring-rate",
+    // spec-v1010 Wahl wire stress + solid height + buckling
+    "spring-wire-stress",
 
     // v20
     "hp-from-torque", "volumetric-efficiency", "gear-mph-rpm",

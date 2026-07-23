@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): spring wire stress (Wahl), solid height, and buckling (spec-v1010); 2026-07-23
+
+- New tile `spring-wire-stress` (Group K, calc-mechanic.js): the checks `helical-spring-rate` names as its own
+  omissions ("Rate only (not stress, solid height, or buckling)" and "add wire-stress and buckling checks for a full
+  design"). The rate tile even computed `spring_index` and never used it. Computes the corrected wire shear stress
+  `tau = Kw x 8 F D / (pi d^3)` with the Wahl factor `Kw = (4C - 1)/(4C - 4) + 0.615/C`, solid height (`Nt d` ground,
+  `(Nt + 1) d` unground), the travel left before the spring stacks solid, and a slenderness screen against the 5.26
+  absolute-stability limit for squared-and-ground ends. A 0.080 in wire on a 0.75 in coil at 5 lb runs 18,651 psi
+  uncorrected but 21,545 psi corrected; a tight index bites hard, Kw being 1.40 at C = 4 against 1.12 at C = 12.
+  The Wahl factor is pinned in the fuzzer against the published tabulated values at C = 4, 6, 8, and 12. Home tile
+  count 1,458 -> 1,459.
+
 ### feat(concrete): minimum stirrups and the section-size limit (spec-v1009); 2026-07-23
 
 - New tile `rc-min-shear-reinforcement` (Group E, calc-concrete.js): the ACI 318-19 detailing checks that bound a beam

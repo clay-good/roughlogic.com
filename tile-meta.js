@@ -379,6 +379,8 @@ const _TILES = [
   ["cargo-securement-wll", "J"], ["fuel-tax-ifta", "J"],
   ["screw-conveyor", "K"], ["screw-conveyor-rpm", "K"],
   ["helical-spring-rate", "K"],
+  // spec-v1010 spring wire stress (Wahl), solid height, buckling screen
+  ["spring-wire-stress", "K"],
   ["pesticide-rei-phi", "L"],
   ["backflow-test-psi", "M"],
   ["gel-percent-agarose", "T"],

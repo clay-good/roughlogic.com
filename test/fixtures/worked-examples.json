@@ -16449,6 +16449,98 @@
    }
   },
   {
+   "tile_id": "spring-wire-stress",
+   "source_publisher": "Machinery's Handbook / Shigley (Wahl correction)",
+   "source_title": "0.080 in wire, 0.75 in mean coil, 5 lb, Nt 10, L0 2.0 in, squared-and-ground -> Kw 1.155, tau 21,545 psi",
+   "source_edition_or_year": "tau = Kw x 8 F D / (pi d^3); Kw = (4C-1)/(4C-4) + 0.615/C",
+   "source_section_or_page": "C = 0.75/0.080 = 9.375; Kw = 36.5/33.5 + 0.0656 = 1.15515; tau_unc = 8 x 5 x 0.75/(pi x 0.080^3) = 18,651 psi; tau = 21,545 psi; Ls = 10 x 0.080 = 0.80 in",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "wire_diameter_in": 0.080,
+    "mean_coil_diameter_in": 0.75,
+    "force_lb": 5,
+    "total_coils": 10,
+    "free_length_in": 2.0,
+    "end_type": "squared-ground"
+   },
+   "outputs": {
+    "spring_index": {
+     "value": 9.375,
+     "tolerance": {
+      "abs": 0.000001
+     }
+    },
+    "wahl_factor": {
+     "value": 1.15515,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "tau_uncorrected_psi": {
+     "value": 18651.0,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "tau_psi": {
+     "value": 21544.7,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "solid_height_in": {
+     "value": 0.80,
+     "tolerance": {
+      "abs": 0.000001
+     }
+    },
+    "max_deflection_in": {
+     "value": 1.20,
+     "tolerance": {
+      "abs": 0.000001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spring-wire-stress",
+   "source_publisher": "Shigley end-condition table / spring-buckling criterion",
+   "source_title": "cross-check: unground ends add a coil to solid height, and L0 = 5 in trips the 5.26 slenderness limit",
+   "source_edition_or_year": "Ls = (Nt + 1) d unground; slenderness = L0/D",
+   "source_section_or_page": "Ls = 11 x 0.080 = 0.88 in; travel = 5.0 - 0.88 = 4.12 in; L0/D = 5.0/0.75 = 6.667 > 5.26",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "wire_diameter_in": 0.080,
+    "mean_coil_diameter_in": 0.75,
+    "force_lb": 5,
+    "total_coils": 10,
+    "free_length_in": 5.0,
+    "end_type": "squared"
+   },
+   "outputs": {
+    "solid_height_in": {
+     "value": 0.88,
+     "tolerance": {
+      "abs": 0.000001
+     }
+    },
+    "max_deflection_in": {
+     "value": 4.12,
+     "tolerance": {
+      "abs": 0.000001
+     }
+    },
+    "slenderness": {
+     "value": 6.6667,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "trap-seal-loss",
    "source_publisher": "IPC/UPC §1002 (trap-to-vent)",
    "source_title": "Pass if developed distance <= permitted maximum; percent used",

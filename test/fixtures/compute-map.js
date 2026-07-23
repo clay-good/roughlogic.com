@@ -152,6 +152,7 @@ export const COMPUTE_MAP = {
   "screw-conveyor": { module: "../../calc-mechanic.js", fn: "computeScrewConveyor" },
   "screw-conveyor-rpm": { module: "../../calc-mechanic.js", fn: "computeScrewConveyorRpm" },
   "helical-spring-rate": { module: "../../calc-mechanic.js", fn: "computeHelicalSpringRate" },
+  "spring-wire-stress": { module: "../../calc-mechanic.js", fn: "computeSpringWireStress" },
   "trap-seal-loss": { module: "../../calc-plumbing.js", fn: "computeTrapSealLoss" },
   "water-meter-sizing": { module: "../../calc-plumbing.js", fn: "computeWaterMeterSizing" },
   "drying-chamber-co2": { module: "../../calc-restoration.js", fn: "computeDryingChamberCO2" },

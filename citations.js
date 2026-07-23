@@ -3211,6 +3211,20 @@ export const CITATIONS = {
     ],
   },
 
+  "spring-wire-stress": {
+    formula: "C = D/d; Kw = (4C - 1)/(4C - 4) + 0.615/C; tau_uncorrected = 8 F D / (pi d^3); tau = Kw x tau_uncorrected; Ls = Nt d (ground ends) or (Nt + 1) d (unground); travel = L0 - Ls; slenderness = L0/D, stable under 5.26 for squared-and-ground ends on parallel flat plates.",
+    edition: "The standard round-wire helical-compression-spring wire shear stress with the Wahl correction factor, the Shigley end-condition solid-height table, and the absolute-stability slenderness limit, per Machinery's Handbook and Shigley's Mechanical Engineering Design, by name.",
+    freeAccess: "The Wahl factor, the torsional-stress relation, and the solid-height and stability criteria are public machine-design results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The wire-stress, solid-height, and buckling checks that accompany a helical-spring rate calculation. Torsion in the wire is T = F D/2 and the round-wire polar section modulus is pi d^3/16, giving an uncorrected torsional stress of 8 F D / (pi d^3); the Wahl factor Kw = (4C - 1)/(4C - 4) + 0.615/C, with the spring index C = D/d, corrects it for wire curvature (the inner fiber is the critical one) plus direct transverse shear. Kw is 1.40 at C = 4 and 1.12 at C = 12, which is why an index of 4-12 is the practical range. Solid height is Nt d for ground ends and (Nt + 1) d for unground per the Shigley end-condition table, and free length minus solid height bounds the travel. The buckling screen is the squared-and-ground-on-parallel-plates case (absolute stability while L0/D < 5.26); a pivoted or free end lowers the limit to roughly 3.7 or 2.63. This returns stress and geometry only - the ALLOWABLE stress depends on the wire material, diameter, and static-versus-cyclic duty (the maker's percent-of-tensile tables), and fatigue life, set removal, and surging are not covered. The spring maker's design governs.",
+    assumptions: [
+      { name: "Wahl correction", value: "Kw = (4C - 1)/(4C - 4) + 0.615/C applied to 8 F D / (pi d^3); round wire, axial load", source: "Machinery's Handbook / Shigley" },
+      { name: "Solid height", value: "Nt d for ground ends, (Nt + 1) d for unground", source: "Shigley end-condition table" },
+      { name: "Stability", value: "absolute stability while L0/D < 5.26 for squared-and-ground ends on parallel flat plates", source: "Shigley spring-buckling criterion" },
+      { name: "Allowable not included", value: "the permissible stress by material, wire size, and duty is the spring maker's; fatigue and set removal are separate", source: "spring-design practice" },
+    ],
+  },
+
   "pesticide-rei-phi": {
     formula: "REI remaining = max(0, REI_hours - hours since application); PHI remaining = max(0, PHI_days - days since application); early-entry / early-harvest violation when not yet clear.",
     edition: "EPA Worker Protection Standard 40 CFR 170 (REI) and the product label's PHI, by name.",

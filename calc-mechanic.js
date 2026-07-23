@@ -888,6 +888,79 @@ MECHANIC_RENDERERS["helical-spring-rate"] = _simpleRenderer({
   compute: computeHelicalSpringRate,
 });
 
+// dims: in { wire_diameter_in: L, mean_coil_diameter_in: L, force_lb: M L T^-2, total_coils: dimensionless, free_length_in: L, end_type: dimensionless } out: { spring_index: dimensionless, wahl_factor: dimensionless, tau_uncorrected_psi: M L^-1 T^-2, tau_psi: M L^-1 T^-2, solid_height_in: L, max_deflection_in: L, slenderness: dimensionless }
+export function computeSpringWireStress({ wire_diameter_in = 0, mean_coil_diameter_in = 0, force_lb = 0, total_coils = 0, free_length_in = 0, end_type = "squared-ground" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const d = Number(wire_diameter_in) || 0;
+  const D = Number(mean_coil_diameter_in) || 0;
+  const F = Number(force_lb) || 0;
+  const Nt = Number(total_coils) || 0;
+  const L0 = Number(free_length_in) || 0;
+  if (!(d > 0)) return { error: "Wire diameter must be positive (in)." };
+  if (!(D > d)) return { error: "Mean coil diameter must be greater than the wire diameter (in)." };
+  if (!(F > 0)) return { error: "Spring force must be positive (lb)." };
+  if (!(Nt > 0)) return { error: "Total coils must be positive." };
+  if (!(L0 > 0)) return { error: "Free length must be positive (in)." };
+  const GROUND = { "squared-ground": true, "plain-ground": true, "squared": false, "plain": false };
+  if (!(end_type in GROUND)) return { error: "End type must be squared-ground, squared, plain-ground, or plain." };
+  const spring_index = D / d;
+  // Wahl correction: curvature plus direct (transverse) shear on the inner fiber.
+  const wahl_factor = (4 * spring_index - 1) / (4 * spring_index - 4) + 0.615 / spring_index;
+  // Torsion in the wire is T = F D/2; for round wire J/c = pi d^3/16, so the
+  // uncorrected torsional stress is 8 F D / (pi d^3).
+  const tau_uncorrected_psi = (8 * F * D) / (Math.PI * Math.pow(d, 3));
+  const tau_psi = wahl_factor * tau_uncorrected_psi;
+  // Ground ends close flat: Ls = Nt d. Unground ends leave a gap: Ls = (Nt + 1) d.
+  const solid_height_in = GROUND[end_type] ? Nt * d : (Nt + 1) * d;
+  const max_deflection_in = L0 - solid_height_in;
+  const bottoms_out = max_deflection_in <= 0;
+  const slenderness = L0 / D;
+  // Absolute stability for squared-and-ground ends on parallel flat plates
+  // requires L0 < 2.63 D / alpha with alpha = 0.5, i.e. slenderness < 5.26.
+  const buckling_limit = 5.26;
+  const buckling_risk = slenderness > buckling_limit;
+  const index_flag = spring_index < 4
+    ? "Spring index D/d < 4: hard to coil and a high stress concentration (Wahl factor climbs fast)."
+    : spring_index > 12
+      ? "Spring index D/d > 12: the spring tangles and buckles easily."
+      : null;
+  return {
+    spring_index, wahl_factor, tau_uncorrected_psi, tau_psi, solid_height_in,
+    max_deflection_in, bottoms_out, slenderness, buckling_limit, buckling_risk, index_flag,
+    note: "The wire-stress, solid-height, and buckling checks the spring-rate tile leaves out. Torsion in the wire is T = F D/2, so the uncorrected torsional stress is 8 F D / (pi d^3); the Wahl factor Kw = (4C - 1)/(4C - 4) + 0.615/C with C = D/d corrects it for the wire curvature (the inner fiber runs hotter) plus direct transverse shear, and the corrected value is the one to compare against the allowable. A tight spring index runs the correction up fast: Kw is 1.40 at C = 4 but only 1.12 at C = 12, which is why 4-12 is the practical range. Solid height is Nt d for GROUND ends and (Nt + 1) d for unground, and free length minus solid height is the most the spring can ever travel. The buckling screen is the squared-and-ground-on-parallel-plates case, stable while the slenderness L0/D stays under 5.26; a pivoted or free end drops that limit sharply (to about 3.7 with one end pivoted, 2.63 with both), so a guided rod or bore may be needed. Allowable stress depends on the wire material, diameter, and whether the load is static or cyclic (use the maker's percent-of-tensile tables). Machinery's Handbook / Shigley; the spring maker governs.",
+  };
+}
+export const springWireStressExample = { inputs: { wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, force_lb: 5, total_coils: 10, free_length_in: 2.0, end_type: "squared-ground" } };
+
+MECHANIC_RENDERERS["spring-wire-stress"] = _simpleRenderer({
+  citation: "Citation: helical compression spring wire shear stress tau = Kw x 8 F D / (pi d^3) with the Wahl correction factor Kw = (4C - 1)/(4C - 4) + 0.615/C, C = D/d, the standard Machinery's Handbook / Shigley formulation; solid height Nt d (ground ends) or (Nt + 1) d (unground) per the Shigley end-condition table; and the absolute-stability slenderness limit L0/D < 5.26 for squared-and-ground ends on parallel flat plates. Stress, travel, and buckling only - the allowable stress by material and duty, fatigue life, and set-removal are the spring maker's. The companion rate calculation is helical-spring-rate.",
+  example: springWireStressExample.inputs,
+  fields: [
+    { key: "wire_diameter_in", label: "Wire diameter d (in)", kind: "number" },
+    { key: "mean_coil_diameter_in", label: "Mean coil diameter D = OD - d (in)", kind: "number" },
+    { key: "force_lb", label: "Spring force F (lb)", kind: "number" },
+    { key: "total_coils", label: "Total coils Nt", kind: "number" },
+    { key: "free_length_in", label: "Free length L0 (in)", kind: "number" },
+    { key: "end_type", label: "End condition", kind: "select", options: [
+      { value: "squared-ground", label: "Squared and ground (Ls = Nt d)" },
+      { value: "squared", label: "Squared, not ground (Ls = (Nt+1) d)" },
+      { value: "plain-ground", label: "Plain and ground (Ls = Nt d)" },
+      { value: "plain", label: "Plain (Ls = (Nt+1) d)" },
+    ], default: "squared-ground" },
+  ],
+  outputs: [
+    { key: "c", id: "sws-out-c", label: "Spring index D/d", value: (r) => fmt(r.spring_index, 2) + (r.index_flag ? " - " + r.index_flag : " (good, 4-12)") },
+    { key: "kw", id: "sws-out-kw", label: "Wahl correction factor Kw", value: (r) => fmt(r.wahl_factor, 3) },
+    { key: "tu", id: "sws-out-tu", label: "Uncorrected torsional stress", value: (r) => fmt(r.tau_uncorrected_psi, 0) + " psi" },
+    { key: "t", id: "sws-out-t", label: "Corrected wire shear stress", value: (r) => fmt(r.tau_psi, 0) + " psi" },
+    { key: "sh", id: "sws-out-sh", label: "Solid height Ls", value: (r) => fmt(r.solid_height_in, 3) + " in" },
+    { key: "md", id: "sws-out-md", label: "Max travel to solid", value: (r) => r.bottoms_out ? "NONE - free length is at or below solid height" : fmt(r.max_deflection_in, 3) + " in" },
+    { key: "sl", id: "sws-out-sl", label: "Slenderness L0/D", value: (r) => fmt(r.slenderness, 2) + (r.buckling_risk ? " - OVER the 5.26 limit, check buckling (guide the spring)" : " (under the 5.26 squared-and-ground limit)") },
+    { key: "n", id: "sws-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSpringWireStress,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================

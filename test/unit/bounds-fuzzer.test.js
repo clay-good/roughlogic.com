@@ -28899,3 +28899,51 @@ test("bounds: spec-v1009 computeRcMinShearReinforcement pins Av,min, the 9.6.3.1
   assert.ok("error" in _v1009({ ...base, lambda: 1.5 }));
   assert.ok("error" in _v1009({ ...base, bw_in: Infinity }));
 });
+
+import { computeSpringWireStress as _v1010 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v1010 computeSpringWireStress pins the Wahl factor, the corrected stress, solid height by end condition, and error seams", () => {
+  const base = { wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, force_lb: 5, total_coils: 10, free_length_in: 2.0, end_type: "squared-ground" };
+  const r = _v1010(base);
+  assert.ok(Math.abs(r.spring_index - 9.375) < 1e-9); // 0.75/0.080
+  assert.ok(Math.abs(r.wahl_factor - 1.15515) < 1e-4); // 36.5/33.5 + 0.615/9.375
+  assert.ok(Math.abs(r.tau_uncorrected_psi - 18651.0) < 1); // 8*5*0.75/(pi*0.080^3)
+  assert.ok(Math.abs(r.tau_psi - 21544.7) < 1); // Kw * uncorrected
+  assert.ok(r.tau_psi > r.tau_uncorrected_psi); // the correction only ever adds
+  assert.ok(Math.abs(r.solid_height_in - 0.80) < 1e-9); // ground: Nt*d
+  assert.ok(Math.abs(r.max_deflection_in - 1.20) < 1e-9);
+  assert.strictEqual(r.bottoms_out, false);
+  assert.strictEqual(r.buckling_risk, false); // L0/D = 2.667 < 5.26
+  // The Wahl factor is pinned against the standard tabulated values and must
+  // fall monotonically as the spring index opens up.
+  const kw = (C) => _v1010({ ...base, mean_coil_diameter_in: C * 0.080 }).wahl_factor;
+  assert.ok(Math.abs(kw(4) - 1.4038) < 5e-4);
+  assert.ok(Math.abs(kw(6) - 1.2525) < 5e-4);
+  assert.ok(Math.abs(kw(8) - 1.1840) < 5e-4);
+  assert.ok(Math.abs(kw(12) - 1.1194) < 5e-4);
+  assert.ok(kw(4) > kw(6) && kw(6) > kw(8) && kw(8) > kw(12));
+  // End condition drives solid height: unground ends add one wire diameter.
+  assert.ok(Math.abs(_v1010({ ...base, end_type: "squared" }).solid_height_in - 0.88) < 1e-9);
+  assert.ok(Math.abs(_v1010({ ...base, end_type: "plain" }).solid_height_in - 0.88) < 1e-9);
+  assert.ok(Math.abs(_v1010({ ...base, end_type: "plain-ground" }).solid_height_in - 0.80) < 1e-9);
+  // Slenderness trips the 5.26 absolute-stability limit.
+  const tall = _v1010({ ...base, free_length_in: 5.0 });
+  assert.ok(Math.abs(tall.slenderness - 6.6667) < 1e-3);
+  assert.strictEqual(tall.buckling_risk, true);
+  // A free length at or under solid height leaves no travel.
+  assert.strictEqual(_v1010({ ...base, free_length_in: 0.5 }).bottoms_out, true);
+  // Stress scales linearly with force and with the cube of 1/d.
+  assert.ok(Math.abs(_v1010({ ...base, force_lb: 10 }).tau_psi - 2 * r.tau_psi) < 1e-6);
+  // Index flags at the practical bounds.
+  assert.ok(_v1010({ ...base, mean_coil_diameter_in: 0.28 }).index_flag !== null); // C = 3.5
+  assert.ok(_v1010({ ...base, mean_coil_diameter_in: 1.20 }).index_flag !== null); // C = 15
+  assert.strictEqual(r.index_flag, null); // C = 9.375 is in the good band
+  // Error seams.
+  assert.ok("error" in _v1010({ ...base, wire_diameter_in: 0 }));
+  assert.ok("error" in _v1010({ ...base, mean_coil_diameter_in: 0.05 })); // D must exceed d
+  assert.ok("error" in _v1010({ ...base, force_lb: 0 }));
+  assert.ok("error" in _v1010({ ...base, total_coils: 0 }));
+  assert.ok("error" in _v1010({ ...base, free_length_in: 0 }));
+  assert.ok("error" in _v1010({ ...base, end_type: "not-an-end" }));
+  assert.ok("error" in _v1010({ ...base, force_lb: Infinity }));
+});
