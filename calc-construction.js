@@ -3013,6 +3013,19 @@ export const LUMBER_EMIN_PSI = {
   "DF-L": 580000, "SPF": 510000, "SYP": 510000, "Hem-Fir": 470000,
 };
 
+// NDS Supplement Table 4D, "Reference Design Values for Visually Graded TIMBERS
+// (5x5 and larger)", No.2 Posts and Timbers. A nominal 6x6 is a TIMBER, not
+// dimension lumber, and the two grading categories are graded and tabulated
+// separately -- the timber values are far lower. Using the dimension-lumber
+// numbers above for a 6x6 overstated F_c by 93% (DF-L) to 176% (SYP).
+// Southern Pine cross-checks exactly against SPIB Appendix A Table 8.
+export const LUMBER_TIMBERS_FC_PSI = {
+  "DF-L": 700, "SPF": 500, "SYP": 525, "Hem-Fir": 575,
+};
+export const LUMBER_TIMBERS_EMIN_PSI = {
+  "DF-L": 470000, "SPF": 370000, "SYP": 440000, "Hem-Fir": 400000,
+};
+
 function _v15cSpeciesPrefix(species_grade) {
   return String(species_grade || "").split("_")[0];
 }
@@ -3299,10 +3312,17 @@ export function computeDeckBeamPost({
   const prefix = _v15cSpeciesPrefix(species_grade);
   const F_c = LUMBER_FC_PSI[prefix] || 1150;
   const E_min = LUMBER_EMIN_PSI[prefix] || 510000;
+  // A nominal 4x4 is DIMENSION lumber; a nominal 6x6 is a TIMBER (NDS "5x5 and
+  // larger"), a separately graded category with much lower reference values.
+  // Pick the property set per candidate rather than using dimension values for
+  // both, which overstated the 6x6 capacity roughly 2x.
+  const F_c_timbers = LUMBER_TIMBERS_FC_PSI[prefix] || 500;
+  const E_min_timbers = LUMBER_TIMBERS_EMIN_PSI[prefix] || 370000;
+  const _postProps = (timbers) => (timbers ? { F_c: F_c_timbers, E_min: E_min_timbers } : { F_c, E_min });
   let post_size = null;
   let post_capacity = null;
-  for (const cand of [{ label: "4x4", d_in: 3.5 }, { label: "6x6", d_in: 5.5 }]) {
-    const cap = _v15cPostColumnCapacity({ d_in: cand.d_in, height_ft: postH, F_c, E_min });
+  for (const cand of [{ label: "4x4", d_in: 3.5, timbers: false }, { label: "6x6", d_in: 5.5, timbers: true }]) {
+    const cap = _v15cPostColumnCapacity({ d_in: cand.d_in, height_ft: postH, ..._postProps(cand.timbers) });
     // Skip a candidate past the NDS 3.7.1.4 le/d = 50 limit even if the column
     // equation still returns a capacity - that member is not permitted.
     if (cap.slenderness_exceeded) continue;
@@ -3311,7 +3331,7 @@ export function computeDeckBeamPost({
   let post_warning = null;
   if (!post_size) {
     post_size = "6x6";
-    post_capacity = _v15cPostColumnCapacity({ d_in: 5.5, height_ft: postH, F_c, E_min });
+    post_capacity = _v15cPostColumnCapacity({ d_in: 5.5, height_ft: postH, ..._postProps(true) });
     post_warning = post_capacity.slenderness_exceeded
       ? "This post height exceeds the NDS 3.7.1.4 slenderness limit (le/d = " + post_capacity.le_d.toFixed(1) + " > 50) even at 6x6, so no sawn post of this size is permitted. Shorten the post, brace it, or use an engineered column."
       : "A 6x6 is overloaded at this height and load; shorten the post, reduce the beam span, or use an engineered column.";

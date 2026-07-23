@@ -15,6 +15,7 @@ import {
   computeHeaderSizing, headerSizingExample,
   computeDeckBeamPost, deckBeamPostExample,
   SYP_NO2_FB_BY_WIDTH, LUMBER_SPECIES_GRADES, LUMBER_EMIN_PSI, computeLumberSpan,
+  LUMBER_FC_PSI, LUMBER_TIMBERS_FC_PSI, LUMBER_TIMBERS_EMIN_PSI,
 } from "../../calc-construction.js";
 
 // ---------------------------------------------------------------------------
@@ -251,4 +252,28 @@ test("Southern Pine No.2 reference bending values are tabulated PER WIDTH (SPIB 
   const narrow = computeLumberSpan({ species_grade: "SYP_No2", nominal_size: "2x4", total_load_psf: 40, tributary_width_in: 16 });
   assert.ok(wide.allowable_span_ft > narrow.allowable_span_ft); // deeper still spans further
   assert.ok(!("error" in wide) && !("error" in narrow));
+});
+
+test("deck post: a 6x6 is a TIMBER (NDS Table 4D), not dimension lumber", () => {
+  // NDS grades "5x5 and larger" as Timbers, a separate category with much lower
+  // reference values. Using the dimension-lumber F_c for a nominal 6x6
+  // overstated its capacity ~2x (SYP: F_c 1450 vs the true 525).
+  assert.deepStrictEqual(LUMBER_TIMBERS_FC_PSI, { "DF-L": 700, "SPF": 500, "SYP": 525, "Hem-Fir": 575 });
+  assert.deepStrictEqual(LUMBER_TIMBERS_EMIN_PSI, { "DF-L": 470000, "SPF": 370000, "SYP": 440000, "Hem-Fir": 400000 });
+  // Timber values must be strictly below the dimension-lumber values for every
+  // species -- that is the whole point of the separate grading category.
+  for (const sp of ["DF-L", "SPF", "SYP", "Hem-Fir"]) {
+    assert.ok(LUMBER_TIMBERS_FC_PSI[sp] < LUMBER_FC_PSI[sp], `${sp} F_c`);
+    assert.ok(LUMBER_TIMBERS_EMIN_PSI[sp] < LUMBER_EMIN_PSI[sp], `${sp} E_min`);
+  }
+  // The 6x6 branch must actually USE them. At 12 ft the engine picks a 6x6;
+  // hand-check: le/d = 26.18, FcE = 0.822 x 440,000 / 26.18^2 = 527.6,
+  // CP = 0.6927, F_c' = 363.7, capacity = 363.7 x 30.25 = 11,001 lb.
+  const tall = computeDeckBeamPost({ joist_span_ft: 12, beam_span_ft: 10, post_height_ft: 12, live_load_psf: 40, dead_load_psf: 10, species_grade: "SYP_No2", soil_class: "clay", ledger: "free" });
+  assert.strictEqual(tall.post_size, "6x6");
+  assert.ok(Math.abs(tall.post_allowable_load_lb - 11001) < 5);
+  // The 4x4 branch is dimension lumber and must be unaffected.
+  const short = computeDeckBeamPost({ joist_span_ft: 12, beam_span_ft: 10, post_height_ft: 8, live_load_psf: 40, dead_load_psf: 10, species_grade: "SYP_No2", soil_class: "clay", ledger: "free" });
+  assert.strictEqual(short.post_size, "4x4");
+  assert.ok(Math.abs(short.post_allowable_load_lb - 6169) < 5);
 });

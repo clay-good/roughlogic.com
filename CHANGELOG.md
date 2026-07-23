@@ -4,6 +4,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(construction): a 6x6 deck post is a TIMBER, not dimension lumber (NDS Table 4D); 2026-07-23
+
+Closes the last open finding of the NDS wood audit, again by going and getting the primary source rather than
+deferring: **NDS Supplement Table 4D, "Reference Design Values for Visually Graded Timbers (5x5 and larger)"**, No.2
+Posts and Timbers.
+
+- `computeDeckBeamPost` checked BOTH post candidates with the dimension-lumber `F_c` / `E_min`. A nominal 4x4 is
+  dimension lumber and was correct; a nominal 6x6 is a **TIMBER**, a separately graded category with far lower
+  reference values. The overstatement was large: `F_c` 1,350 -> **700** (DF-L), 1,150 -> **500** (SPF),
+  1,450 -> **525** (SYP, 176% high), 1,300 -> **575** (Hem-Fir), with `E_min` correspondingly lower.
+- Effect on a SYP 6x6 at 8 ft: capacity **29,502 -> 14,069 lb**, a 2.1x reduction. Hand-verified end to end
+  (le/d = 17.45, FcE = 1,187.2, CP = 0.8859, F_c' = 465.1, x 30.25 in^2). The 4x4 branch is untouched, so the pinned
+  worked example (which selects a 4x4) does not move and no fixture needed changing.
+- Southern Pine cross-validates against a second independent primary source: SPIB Appendix A Table 8 gives the same
+  No.2 timber row (Fb 850, Ft 550, Fv 165, Fc-perp 375, Fc 525, E 1.2e6).
+- Guarded by a regression test pinning both timber tables, asserting every species' timber values are strictly below
+  its dimension values, and hand-checking the 6x6 capacity (11,001 lb at 12 ft) alongside the unchanged 4x4.
+
 ### fix(construction): Southern Pine bending values are tabulated PER WIDTH, and its E was the Dense row; 2026-07-23
 
 Closes the highest-severity finding of the NDS wood audit, using the SPIB Standard Grading Rules design-value tables
