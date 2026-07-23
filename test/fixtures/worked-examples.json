@@ -50626,12 +50626,12 @@
   },
   {
    "tile_id": "steel-web-local-strength",
-   "source_publisher": "AISC 360-22 J10.2 / J10.3",
-   "source_title": "cross-check: same bearing at the member end -> yielding drops to 126.5 kip and governs ASD at 84.3",
-   "source_edition_or_year": "spec-v293 worked example (machine-verified; corrects the spec prose's 126.0 rounding)",
-   "source_section_or_page": "spec-v293 section 2.1 cross-check",
+   "source_publisher": "AISC 360-22 J10.2 / J10.3 (Eq. J10-5b)",
+   "source_title": "cross-check: same bearing at the member end -> yielding 126.5 kip, crippling HALVED to 103.0 kip by the 0.40 end coefficient, so crippling governs ASD at 51.5",
+   "source_edition_or_year": "spec-v293 worked example (machine-verified; end web crippling corrected to Eq. J10-5 on 2026-07-23)",
+   "source_section_or_page": "spec-v293 section 2.1 cross-check; end lb/d = 4/18 = 0.222 > 0.2 so Eq. J10-5b: Rn = 0.40 tw^2 [1 + (4 lb/d - 0.2)(tw/tf)^1.5] sqrt(E Fy tf/tw)",
    "verified_by": "rl",
-   "verified_on": "2026-07-03",
+   "verified_on": "2026-07-23",
    "inputs": {
     "fy": 50,
     "tw": 0.355,
@@ -50648,8 +50648,14 @@
       "pct": 0.1
      }
     },
+    "wc_rn": {
+     "value": 102.96,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
     "asd_kip": {
-     "value": 84.31,
+     "value": 51.48,
      "tolerance": {
       "pct": 0.1
      }

@@ -4,6 +4,22 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(steel): reduce web crippling at an end location per AISC J10-5 (was using the interior coefficient); 2026-07-23
+
+- A refute-first audit of calc-steel.js (AISC 360) found ONE non-conservative bug among its 25 tiles (the other 24
+  verified correct). `computeSteelWebLocalStrength` offers an interior/end `location` selector and correctly reduced
+  web local YIELDING for the end case (5k -> 2.5k), but web CRIPPLING always used the interior 0.80 lead coefficient
+  (Eq. J10-4) regardless of location. AISC 360 J10.3 halves that to 0.40 for a force within d/2 of the member end
+  (Eq. J10-5), and switches the bracket to [1 + (4 lb/d - 0.2)(tw/tf)^1.5] when lb/d > 0.2 (Eq. J10-5b).
+- Impact: this is the everyday beam-reaction-at-a-support case. For the W18x50 example at the end, crippling was
+  reported at 204.2 kip (the interior value) so yielding wrongly governed at 84.3 kip ASD; corrected, crippling drops
+  to 103.0 kip and GOVERNS at 51.5 kip ASD -- the tile was overstating the end bearing capacity ~1.6x. The interior
+  case (the pinned example) is unchanged.
+- Fixed to apply the 0.40 end coefficient and the J10-5a/J10-5b bracket split. Verified against AISC J10-5 (Qf = 1.0
+  for I-shapes). Updated the end worked example (now pins the corrected 103.0 / 51.5 kip and adds wc_rn), corrected the
+  note and citation (which had mislabeled the end reduction as "separate" when the whole 0.40 coefficient was
+  unapplied), and added fuzzer guards pinning the end crippling reduction and both J10-5a/J10-5b brackets.
+
 ### fix(concrete): apply two missing ACI 318-19 strength limits found by the refute-audit; 2026-07-23
 
 A refute-first adversarial audit of the calc-concrete.js tiles NOT touched by the sqrt(f'c) sweep found two more

@@ -16154,11 +16154,20 @@ test("bounds: spec-v293 computeSteelWebLocalStrength pins both limit states, the
   assert.ok(Math.abs(r.asd_kip - r.wc_rn / 2) < 1e-12); // crippling governs ASD (differing Omegas)
   assert.ok(r.asd_governs.startsWith("web crippling"));
   assert.ok(Math.abs(r.lrfd_kip - 0.75 * r.wc_rn) < 1e-12);
-  // At the end the yielding coefficient halves the k term and yielding governs.
+  // At the end BOTH limit states reduce: yielding uses 2.5k (not 5k), and AISC
+  // J10-5 crippling uses a 0.40 lead coefficient (HALF the interior 0.80) with
+  // the (4 lb/d - 0.2) bracket for lb/d > 0.2. Regression guard: the old code
+  // left crippling at 0.80 for the end, so yielding wrongly governed at 84.3 kip.
   const r2 = _v293({ ...P, location: "end" });
-  assert.ok(Math.abs(r2.wly_rn - 50 * 0.355 * 7.125) < 1e-9);
-  assert.ok(r2.asd_governs.startsWith("web local yielding"));
-  assert.ok(Math.abs(r2.asd_kip - r2.wly_rn / 1.5) < 1e-12);
+  assert.ok(Math.abs(r2.wly_rn - 50 * 0.355 * 7.125) < 1e-9); // 2.5k + lb, unchanged
+  assert.ok(r2.wc_rn < r.wc_rn); // end crippling is below interior
+  assert.ok(Math.abs(r2.wc_rn - 102.96) < 0.1); // Eq. J10-5b (lb/d = 0.222 > 0.2)
+  assert.ok(r2.asd_governs.startsWith("web crippling")); // crippling now GOVERNS the end
+  assert.ok(Math.abs(r2.asd_kip - r2.wc_rn / 2) < 1e-9); // Omega = 2.00 for crippling
+  // Short end bearing (lb/d <= 0.2) uses Eq. J10-5a with the 3(lb/d) bracket, still 0.40.
+  const r3 = _v293({ ...P, lb_in: 2, location: "end" });
+  const expJ10_5a = 0.40 * 0.355 * 0.355 * (1 + 3 * (2 / 18) * Math.pow(0.355 / 0.570, 1.5)) * Math.sqrt(29000 * 50 * 0.570 / 0.355);
+  assert.ok(Math.abs(r3.wc_rn - expJ10_5a) < 1e-6);
   // Error seams.
   assert.ok("error" in _v293({ ...P, tw: 0, location: "interior" }));
   assert.ok("error" in _v293({ ...P, lb_in: 0, location: "interior" }));

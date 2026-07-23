@@ -593,7 +593,17 @@ export function computeSteelWebLocalStrength({ fy = 50, tw = 0, tf = 0, k_in = 0
   }
   const interior = location !== "end";
   const wly_rn = interior ? fy * tw * (5 * k_in + lb_in) : fy * tw * (2.5 * k_in + lb_in);
-  const wc_rn = 0.80 * tw * tw * (1 + 3 * (lb_in / d_in) * Math.pow(tw / tf, 1.5)) * Math.sqrt((_E_STEEL * fy * tf) / tw);
+  // AISC 360 J10.3 web crippling: interior (Eq. J10-4) uses the 0.80 lead
+  // coefficient; an end force less than d/2 from the member end (Eq. J10-5)
+  // uses 0.40 - HALF - and, when lb/d > 0.2, the (4 lb/d - 0.2) bracket of
+  // J10-5b instead of the 3(lb/d) bracket. Applying 0.80 at an end (the common
+  // beam-reaction-at-a-support case) overstates the crippling capacity ~2x.
+  const lb_d = lb_in / d_in;
+  const wc_coeff = interior ? 0.80 : 0.40;
+  const wc_bracket = (!interior && lb_d > 0.2)
+    ? (1 + (4 * lb_d - 0.2) * Math.pow(tw / tf, 1.5))
+    : (1 + 3 * lb_d * Math.pow(tw / tf, 1.5));
+  const wc_rn = wc_coeff * tw * tw * wc_bracket * Math.sqrt((_E_STEEL * fy * tf) / tw);
   const wly_asd = wly_rn / 1.50, wly_lrfd = 1.00 * wly_rn;
   const wc_asd = wc_rn / 2.00, wc_lrfd = 0.75 * wc_rn;
   const asd_kip = Math.min(wly_asd, wc_asd);
@@ -601,13 +611,13 @@ export function computeSteelWebLocalStrength({ fy = 50, tw = 0, tf = 0, k_in = 0
   const asd_governs = wc_asd < wly_asd ? "web crippling governs (ASD)" : "web local yielding governs (ASD)";
   return {
     wly_rn, wc_rn, wly_asd, wc_asd, asd_kip, lrfd_kip, asd_governs,
-    note: "AISC 360-22 J10 concentrated-force web checks: J10.2 web local yielding Rn = Fy tw (5k + lb) at an interior location, (2.5k + lb) at an end (phi = 1.00 / Omega = 1.50), and J10.3 web crippling Rn = 0.80 tw^2 [1 + 3(lb/d)(tw/tf)^1.5] sqrt(E Fy tf/tw) (phi = 0.75 / Omega = 2.00, E = 29,000 ksi, k = kdes). Because the safety factors differ, the governing limit state can flip between ASD and LRFD. The near-end crippling reduction for lb/d > 0.2, web sidesway/compression buckling (J10.4/J10.5), and the bearing-stiffener design are separate. A design aid, not a substitute for the engineer of record.",
+    note: "AISC 360-22 J10 concentrated-force web checks: J10.2 web local yielding Rn = Fy tw (5k + lb) at an interior location, (2.5k + lb) at an end (phi = 1.00 / Omega = 1.50), and J10.3 web crippling Rn = 0.80 tw^2 [1 + 3(lb/d)(tw/tf)^1.5] sqrt(E Fy tf/tw) at an interior location (Eq. J10-4), HALVED to a 0.40 lead coefficient at an end force within d/2 of the member end (Eq. J10-5), with the bracket becoming [1 + (4 lb/d - 0.2)(tw/tf)^1.5] when lb/d > 0.2 (Eq. J10-5b); phi = 0.75 / Omega = 2.00, E = 29,000 ksi, k = kdes. Because the safety factors differ, the governing limit state can flip between ASD and LRFD. The Qf factor for HSS (1.0 for I-shapes), web sidesway/compression buckling (J10.4/J10.5), and the bearing-stiffener design are separate. A design aid, not a substitute for the engineer of record.",
   };
 }
 export const steelWebLocalStrengthExample = { inputs: { fy: 50, tw: 0.355, tf: 0.570, k_in: 1.25, d_in: 18.0, lb_in: 4, location: "interior" } };
 
 STEEL_RENDERERS["steel-web-local-strength"] = _simpleRenderer({
-  citation: "Citation: AISC 360-22 J10.2 web local yielding Rn = Fy tw (5k + lb) interior / (2.5k + lb) end (phi 1.00 / Omega 1.50) and J10.3 web crippling Rn = 0.80 tw^2 [1 + 3(lb/d)(tw/tf)^1.5] sqrt(E Fy tf/tw) (phi 0.75 / Omega 2.00), E = 29,000 ksi, by name. Stiffener design and sidesway buckling are separate. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: AISC 360-22 J10.2 web local yielding Rn = Fy tw (5k + lb) interior / (2.5k + lb) end (phi 1.00 / Omega 1.50) and J10.3 web crippling Rn = 0.80 tw^2 [...] sqrt(E Fy tf/tw) interior (Eq. J10-4), 0.40 lead coefficient at an end (Eq. J10-5a/b, the bracket becoming (4 lb/d - 0.2) when lb/d > 0.2), phi 0.75 / Omega 2.00, E = 29,000 ksi, by name. Stiffener design and sidesway buckling are separate. A design aid, not a substitute for the engineer of record.",
   example: steelWebLocalStrengthExample.inputs,
   fields: [
     { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", default: 50 },
