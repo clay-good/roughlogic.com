@@ -19904,6 +19904,15 @@ test("bounds: spec-v447 computeConcreteTorsionThreshold pins Tth, neglect, crack
   assert.ok(Math.abs(big.tth_inlb / 12000 - 11.7) < 0.1);
   // Lightweight lambda reduces the threshold.
   assert.ok(_v447({ fc_psi: 4000, b_in: 12, h_in: 20, lambda: 0.75 }).tth_inlb < r.tth_inlb);
+  // 22.7 caps sqrt(f'c) at 100 psi for Tth (and Tcr), so the threshold stops
+  // rising above f'c = 10,000 psi -- uncapped would raise it and let torsion be
+  // wrongly neglected. Tcr and the neglect line scale from the capped Tth.
+  const th12 = _v447({ fc_psi: 12000, b_in: 12, h_in: 20, lambda: 1.0 });
+  const th10 = _v447({ fc_psi: 10000, b_in: 12, h_in: 20, lambda: 1.0 });
+  assert.ok(Math.abs(th12.tth_inlb - th10.tth_inlb) < 1e-9); // frozen at the cap
+  assert.ok(Math.abs(th12.tth_inlb - 100 * (240 * 240 / 64)) < 1e-6); // = 100 x Acp^2/pcp
+  assert.ok(th12.tth_inlb < Math.sqrt(12000) * (240 * 240 / 64)); // below the uncapped value
+  assert.ok(Math.abs(th12.tcr_inlb - 4 * th12.tth_inlb) < 1e-9);
   // Error seams: non-positive f'c, dimension, lambda, non-finite.
   assert.ok("error" in _v447({ fc_psi: 0, b_in: 12, h_in: 20, lambda: 1.0 }));
   assert.ok("error" in _v447({ fc_psi: 4000, b_in: 0, h_in: 20, lambda: 1.0 }));

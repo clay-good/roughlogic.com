@@ -4,6 +4,22 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(concrete): cap sqrt(f'c) at 100 psi in the torsion threshold (ACI 318-19 22.7); 2026-07-23
+
+- Completing the calc-concrete.js sqrt(f'c)-cap sweep: `computeConcreteTorsionThreshold` computed the threshold
+  torsion Tth = lambda sqrt(f'c) (Acp^2/pcp) with an UNCAPPED sqrt(f'c). ACI 318-19 22.7 caps the value of sqrt(f'c)
+  used for both Tth (22.7.4.1) and Tcr (22.7.5.1) at 100 psi. Uncapped, a 12 x 20 in section on 12,000 psi concrete
+  reported a threshold of 98,590 in-lb where the code allows only 90,000 -- and because torsion may be NEGLECTED below
+  phi x Tth, an over-stated threshold is non-conservative (it can let a beam skip torsion design it needs). Only bites
+  above f'c = 10,000 psi.
+- Fixed by capping sqrt(f'c) at 100 psi; Tcr and the neglect line both scale from the capped Tth. The pinned worked
+  example (f'c = 4,000) is unchanged. Fuzzer guard pins the freeze at f'c = 10,000 and the exact capped value.
+- This clears calc-concrete.js: every sqrt(f'c) in a shear (22.5.3.1), two-way (22.6.3.1), torsion (22.7), or
+  development-length (25.4.1.4) strength term is now capped, and the material-property uses (Ec = 57000 sqrt(f'c),
+  fr = 7.5 sqrt(f'c)) are correctly left uncapped. The rc-beam-shear one-way case stays uncapped by design (its
+  Av >= Av,min premise invokes the 22.5.3.2 exception). Chapter 17 anchor tiles use sqrt(f'c) under different
+  provisions and remain a separate, documented lead.
+
 ### fix(concrete): cap sqrt(f'c) at 100 psi in the three development-length tiles (ACI 318-19 25.4.1.4); 2026-07-23
 
 - After the rc-punching-shear cap fix, a systematic sweep of every `Math.sqrt(f'c)` in calc-concrete.js found the

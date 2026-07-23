@@ -1108,17 +1108,21 @@ export function computeConcreteTorsionThreshold({ fc_psi = 4000, b_in = 0, h_in 
   if (!(lam > 0)) return { error: "Lightweight factor lambda must be positive." };
   const acp_in2 = b * h;
   const pcp_in = 2 * (b + h);
-  const tth_inlb = lam * Math.sqrt(fc) * (acp_in2 * acp_in2 / pcp_in);
+  // 22.7 caps sqrt(f'c) at 100 psi for Tth and Tcr; uncapped, a higher
+  // threshold would let torsion be neglected when it should not be (the
+  // non-conservative direction). Only bites above f'c = 10,000 psi.
+  const sqrt_fc = Math.min(Math.sqrt(fc), 100);
+  const tth_inlb = lam * sqrt_fc * (acp_in2 * acp_in2 / pcp_in);
   const neglect_inlb = 0.75 * tth_inlb;
   const tcr_inlb = 4 * tth_inlb;
   return {
     acp_in2, pcp_in, tth_inlb, neglect_inlb, tcr_inlb,
-    note: "ACI 318-19 §22.7 torsion thresholds for a solid non-prestressed section: the threshold torsion Tth = lambda x sqrt(f'c) x (Acp^2 / pcp), where Acp = b x h is the area enclosed by the outside perimeter and pcp = 2(b + h) is that perimeter. Torsion may be neglected when the factored torque Tu is below phi x Tth (phi = 0.75); the section cracks in torsion at Tcr = 4 x Tth. Above phi x Tth the beam must be designed for torsion with closed stirrups (At/s) and longitudinal steel (Al) per §9.5.4. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+    note: "ACI 318-19 §22.7 torsion thresholds for a solid non-prestressed section: the threshold torsion Tth = lambda x sqrt(f'c) x (Acp^2 / pcp), where Acp = b x h is the area enclosed by the outside perimeter and pcp = 2(b + h) is that perimeter. Torsion may be neglected when the factored torque Tu is below phi x Tth (phi = 0.75); the section cracks in torsion at Tcr = 4 x Tth. sqrt(f'c) is capped at 100 psi per §22.7 (so f'c above 10,000 psi does not raise the threshold further). Above phi x Tth the beam must be designed for torsion with closed stirrups (At/s) and longitudinal steel (Al) per §9.5.4. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   };
 }
 export const concreteTorsionThresholdExample = { inputs: { fc_psi: 4000, b_in: 12, h_in: 20, lambda: 1.0 } };
 CONCRETE_RENDERERS["concrete-torsion-threshold"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 §22.7.4.1: threshold torsion Tth = lambda x sqrt(f'c) x (Acp^2/pcp), neglect torsion when Tu < phi x Tth (phi = 0.75), cracking torsion Tcr = 4 x Tth, with Acp and pcp the area and perimeter of the outside section. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: ACI 318-19 §22.7.4.1: threshold torsion Tth = lambda x sqrt(f'c) x (Acp^2/pcp), neglect torsion when Tu < phi x Tth (phi = 0.75), cracking torsion Tcr = 4 x Tth, with Acp and pcp the area and perimeter of the outside section, and the §22.7 sqrt(f'c) <= 100 psi cap. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: concreteTorsionThresholdExample.inputs,
   fields: [
     { key: "fc_psi", label: "Specified strength f'c (psi)", kind: "number", default: 4000 },
