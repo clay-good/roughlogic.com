@@ -4,6 +4,30 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(construction): IRC roof live-load floor and the NDS le/d slenderness limit (wood refute-audit); 2026-07-23
+
+A refute-first audit of the NDS wood-design tiles (the 4th standard swept, after ACI/AISC/TMS) found two fixable
+non-conservative bugs. The six pure-NDS equation tiles were all CORRECT -- the classic traps all passed (Emin never E
+in stability, 0.822 Emin/(le/d)^2, 1.20 Emin/RB^2, c = 0.8 sawn, 1.5V/bd, Cb = (lb+0.375)/lb, Cr = 1.15 never
+misapplied, CD never applied to E or Fc-perp). The bugs were in the *sizing* tiles that bundle load assumptions.
+
+- **`computeHeaderSizing` had no minimum roof live load.** It used `roof_psf = snow + 15`, taking ground snow as the
+  entire roof live load. IRC R301.6 designs the roof for the Table R301.6 roof LIVE load **or** the ground snow load,
+  *whichever is greater* -- they are alternatives, not additive. At ground snow = 0 (Florida, Phoenix, coastal
+  California, all valid inputs since the field accepts 0) the header was sized for 15 psf instead of 35, understating
+  the load 2.33x: an 8 ft / 14 ft-tributary header returned "(2) 2x8, bending OK" when that member sees 1,790 psi
+  against its own reported 1,208 psi allowable -- **1.48x overstressed while reported as passing**. Fixed to
+  `max(snow, 20) + 15`; it now returns (2) 2x10. Snow-governed cases (pg > 20) are unchanged, so the pinned worked
+  example (pg = 30) does not move.
+- **`_v15cPostColumnCapacity` did not enforce the NDS 3.7.1.4 `le/d <= 50` limit.** The standalone
+  `computeColumnBucklingWood` tile errors correctly past 50, but the deck-post helper silently returned a capacity for
+  an NDS-prohibited member -- a 26 ft post gave `le/d = 56.7` and a bare "6x6, 4,384 lb" with no flag. Now
+  over-slender candidates are skipped and the tile warns naming the limit and the actual le/d. The 14 ft / le/d = 48.0
+  case stays legal and unflagged.
+
+Both verified against the primary source (IRC R301.6 "whichever is greater"; NDS 3.7.1.4) and pinned with regression
+guards. The gates missed the first one because the existing tests only exercised ground snow 30 and 40, never 0.
+
 ### fix(steel): reduce web crippling at an end location per AISC J10-5 (was using the interior coefficient); 2026-07-23
 
 - A refute-first audit of calc-steel.js (AISC 360) found ONE non-conservative bug among its 25 tiles (the other 24

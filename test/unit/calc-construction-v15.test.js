@@ -182,3 +182,43 @@ test("deck: invalid inputs are rejected", () => {
   assert.ok("error" in computeDeckBeamPost({ joist_span_ft: 12, beam_span_ft: 8, post_height_ft: 0 }));
   assert.ok("error" in computeDeckBeamPost({ joist_span_ft: 12, beam_span_ft: 8, species_grade: "Unobtanium_No2" }));
 });
+
+// --- 2026-07-23 regression guards (NDS/IRC refute-audit) ---
+
+test("header sizing: IRC R301.6 roof live load floor (20 psf) governs in a zero-snow region", () => {
+  // IRC R301.6 designs the roof for the Table R301.6 roof LIVE load OR the
+  // ground snow load, whichever is greater. Taking snow alone left pg = 0
+  // (Florida, Phoenix, coastal CA) at 15 psf instead of 35 -- a 2.33x load
+  // understatement that recommended a member ~1.48x overstressed as "OK".
+  const zero = computeHeaderSizing({ header_span_ft: 8, tributary_width_ft: 14, floors_above: 0, ground_snow_psf: 0, species_grade: "SPF_No2" });
+  assert.strictEqual(zero.total_load_psf, 35); // max(0, 20) + 15 dead
+  assert.strictEqual(zero.w_plf, 490);
+  // Below the 20 psf floor every ground snow gives the same governing load.
+  for (const pg of [0, 5, 10, 19, 20]) {
+    const r = computeHeaderSizing({ header_span_ft: 8, tributary_width_ft: 14, floors_above: 0, ground_snow_psf: pg, species_grade: "SPF_No2" });
+    assert.strictEqual(r.total_load_psf, 35);
+  }
+  // Above it, snow governs and the result is unchanged from the pre-fix behavior.
+  const snowy = computeHeaderSizing({ header_span_ft: 8, tributary_width_ft: 14, floors_above: 0, ground_snow_psf: 40, species_grade: "SPF_No2" });
+  assert.strictEqual(snowy.total_load_psf, 55); // 40 + 15
+  // The zero-snow member must be heavier than the (2) 2x8 the old code returned.
+  assert.ok(zero.bending_ok);
+  assert.ok(zero.f_b_psi <= zero.F_b_psi); // actually satisfies its own allowable
+});
+
+test("deck beam/post: NDS 3.7.1.4 le/d <= 50 is enforced, not silently exceeded", () => {
+  const P = { joist_span_ft: 12, beam_span_ft: 8, live_load_psf: 40, dead_load_psf: 10, species_grade: "SYP_No2" };
+  // Normal heights are unaffected and carry no warning.
+  const ok = computeDeckBeamPost({ ...P, post_height_ft: 8 });
+  assert.ok(ok.post_slenderness_le_d < 50);
+  assert.strictEqual(ok.warnings.length, 0);
+  // 14 ft on a 4x4 is le/d = 48.0 -- legal, must NOT be flagged.
+  const edge = computeDeckBeamPost({ ...P, post_height_ft: 14 });
+  assert.ok(edge.post_slenderness_le_d <= 50);
+  // Past the limit the tile must warn rather than return a bare capacity.
+  for (const h of [26, 30]) {
+    const bad = computeDeckBeamPost({ ...P, post_height_ft: h });
+    assert.ok(bad.post_slenderness_le_d > 50);
+    assert.ok(bad.warnings.some((w) => /3\.7\.1\.4|slenderness/i.test(w)));
+  }
+});

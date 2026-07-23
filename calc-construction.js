@@ -3064,7 +3064,14 @@ export function computeHeaderSizing({
   if (floors > 2) return { error: "This tile covers 0, 1, or 2 floors above per the IRC R602.7 table range." };
 
   // Area loads (psf) on the tributary width.
-  const roof_psf = snow + 15; // snow live + roof/ceiling dead
+  // IRC R301.6: the roof is designed for the Table R301.6 roof LIVE load or the
+  // ground snow load, WHICHEVER IS GREATER - they are alternatives, not additive.
+  // Taking snow alone left a zero-snow region (Florida, Phoenix, coastal CA)
+  // sized for 15 psf instead of 35, understating the load 2.33x. The 20 psf is
+  // the unreduced Table R301.6 value (tributary <= 200 ft^2, slope <= 4:12);
+  // using it unreduced is the conservative choice for a residential header.
+  const roof_live_psf = Math.max(snow, 20);
+  const roof_psf = roof_live_psf + 15; // governing roof live + roof/ceiling dead
   const floor_psf = 50 * floors; // 40 live + 10 dead per floor
   const total_psf = roof_psf + floor_psf;
   const w_plf = total_psf * trib;
@@ -3220,7 +3227,12 @@ function _v15cPostColumnCapacity({ d_in, height_ft, F_c, E_min }) {
   const ratio = F_cE / F_c;
   const C_P = (1 + ratio) / (2 * c) - Math.sqrt(Math.pow((1 + ratio) / (2 * c), 2) - ratio / c);
   const F_c_prime = F_c * C_P;
-  return { A_in2, le_d, C_P, allowable_load_lb: F_c_prime * A_in2 };
+  // NDS 3.7.1.4 caps le/d at 50 for a permanent column (70 is allowed only
+  // during construction). The standalone computeColumnBucklingWood tile already
+  // errors past 50; this helper silently returned a capacity for an
+  // NDS-prohibited member, so flag it rather than report a bare number.
+  const slenderness_exceeded = le_d > 50;
+  return { A_in2, le_d, C_P, allowable_load_lb: F_c_prime * A_in2, slenderness_exceeded };
 }
 
 // dims: in { joist_span_ft: L, beam_span_ft: L, post_height_ft: L, live_load_psf: M L^-1 T^-2, dead_load_psf: M L^-1 T^-2, species_grade: dimensionless } out: { beam_label: dimensionless, post_size: dimensionless, footing_side_in: L }
@@ -3269,13 +3281,18 @@ export function computeDeckBeamPost({
   let post_capacity = null;
   for (const cand of [{ label: "4x4", d_in: 3.5 }, { label: "6x6", d_in: 5.5 }]) {
     const cap = _v15cPostColumnCapacity({ d_in: cand.d_in, height_ft: postH, F_c, E_min });
+    // Skip a candidate past the NDS 3.7.1.4 le/d = 50 limit even if the column
+    // equation still returns a capacity - that member is not permitted.
+    if (cap.slenderness_exceeded) continue;
     if (cap.allowable_load_lb >= post_load_lb) { post_size = cand.label; post_capacity = cap; break; }
   }
   let post_warning = null;
   if (!post_size) {
     post_size = "6x6";
     post_capacity = _v15cPostColumnCapacity({ d_in: 5.5, height_ft: postH, F_c, E_min });
-    post_warning = "A 6x6 is overloaded at this height and load; shorten the post, reduce the beam span, or use an engineered column.";
+    post_warning = post_capacity.slenderness_exceeded
+      ? "This post height exceeds the NDS 3.7.1.4 slenderness limit (le/d = " + post_capacity.le_d.toFixed(1) + " > 50) even at 6x6, so no sawn post of this size is permitted. Shorten the post, brace it, or use an engineered column."
+      : "A 6x6 is overloaded at this height and load; shorten the post, reduce the beam span, or use an engineered column.";
   }
 
   // Footing from the E.1 soil-bearing engine.
