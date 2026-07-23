@@ -231,9 +231,31 @@ export const LUMBER_SPECIES_GRADES = {
   "DF-L_No2":   { F_b_psi: 900,  E_psi: 1600000 },
   "DF-L_No1":   { F_b_psi: 1000, E_psi: 1700000 },
   "SPF_No2":    { F_b_psi: 875,  E_psi: 1400000 },
-  "SYP_No2":    { F_b_psi: 1100, E_psi: 1600000 },
+  // Southern Pine No.2: F_b_psi here is the 2x4 (2"-4" wide) value; SP is
+  // tabulated PER WIDTH, so use SYP_NO2_FB_BY_WIDTH below for anything deeper.
+  // E = 1.4e6 is the No.2 row (1.6e6 is No.2 DENSE, a different grade).
+  "SYP_No2":    { F_b_psi: 1100, E_psi: 1400000 },
   "Hem-Fir_No2":{ F_b_psi: 850,  E_psi: 1300000 },
 };
+
+// Southern Pine reference bending design values by nominal width, No.2 visually
+// graded, 2"-4" thick, from the SPIB Standard Grading Rules design-value tables
+// (Appendix A Tables 2-6; the post-2013 in-grade revision). SP values are
+// tabulated per width -- which is exactly WHY the size factor C_F is 1.0 for SP
+// -- so a single value applied at every depth overstates F_b badly: 1,100 psi at
+// 2x12 against a tabulated 750 psi is 47% high. Other species carry the depth
+// effect through _V15C_CF_BENDING instead; SP must not use both.
+export const SYP_NO2_FB_BY_WIDTH = { "2x4": 1100, "2x6": 1000, "2x8": 925, "2x10": 800, "2x12": 750 };
+
+// Base (unadjusted) reference bending stress for a species/grade at a nominal
+// size: the per-width SP table when it applies, else the single species value.
+function _lumberBaseFb(species_grade, nominal_size, props) {
+  if (String(species_grade || "").split("_")[0] === "SYP") {
+    const byWidth = SYP_NO2_FB_BY_WIDTH[nominal_size];
+    if (byWidth) return byWidth;
+  }
+  return props.F_b_psi;
+}
 
 export const LUMBER_NOMINAL_TO_ACTUAL = {
   "2x4":  { b_in: 1.5, d_in: 3.5 },
@@ -257,7 +279,7 @@ export function computeLumberSpan({ species_grade, nominal_size, total_load_psf,
   if (!(tributary_width_in > 0)) return { error: "Tributary width must be positive." };
   if (!(deflection_limit > 0)) return { error: "Deflection limit must be positive." };
   const w_lb_ft = total_load_psf * (tributary_width_in / 12);
-  const L_b = allowableSpanByBending({ w_lb_ft, Fb_psi: props.F_b_psi, b_in: dim.b_in, d_in: dim.d_in });
+  const L_b = allowableSpanByBending({ w_lb_ft, Fb_psi: _lumberBaseFb(species_grade, nominal_size, props), b_in: dim.b_in, d_in: dim.d_in });
   const L_d = allowableSpanByDeflection({ w_lb_ft, E_psi: props.E_psi, b_in: dim.b_in, d_in: dim.d_in, deflectionLimit: deflection_limit });
   const L_max = Math.min(L_b, L_d);
   const governs = L_b < L_d ? "bending" : "deflection";
@@ -2988,7 +3010,7 @@ export const LUMBER_FC_PSI = {
   "DF-L": 1350, "SPF": 1150, "SYP": 1450, "Hem-Fir": 1300,
 };
 export const LUMBER_EMIN_PSI = {
-  "DF-L": 580000, "SPF": 510000, "SYP": 580000, "Hem-Fir": 470000,
+  "DF-L": 580000, "SPF": 510000, "SYP": 510000, "Hem-Fir": 470000,
 };
 
 function _v15cSpeciesPrefix(species_grade) {
@@ -3020,7 +3042,7 @@ function _v15cSmallestMember({ sizes, plyOptions, props, species_grade, w_plf, s
     for (const size of sizes) {
       const dim = LUMBER_NOMINAL_TO_ACTUAL[size];
       if (!dim) continue;
-      const Fb_adj = props.F_b_psi * c_d * _v15cSizeFactor(size, species_grade);
+      const Fb_adj = _lumberBaseFb(species_grade, size, props) * c_d * _v15cSizeFactor(size, species_grade);
       const b_in = 1.5 * plies;
       const Lb = allowableSpanByBending({ w_lb_ft: w_plf, Fb_psi: Fb_adj, b_in, d_in: dim.d_in });
       const Ld = allowableSpanByDeflection({ w_lb_ft: w_plf, E_psi: props.E_psi, b_in, d_in: dim.d_in, deflectionLimit: deflection_limit });

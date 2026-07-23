@@ -14,6 +14,7 @@ import assert from "node:assert/strict";
 import {
   computeHeaderSizing, headerSizingExample,
   computeDeckBeamPost, deckBeamPostExample,
+  SYP_NO2_FB_BY_WIDTH, LUMBER_SPECIES_GRADES, LUMBER_EMIN_PSI, computeLumberSpan,
 } from "../../calc-construction.js";
 
 // ---------------------------------------------------------------------------
@@ -101,9 +102,15 @@ test("header: invalid inputs are rejected", () => {
 // E.8 Deck post and beam sizing
 // ---------------------------------------------------------------------------
 
-test("deck: worked example (12 ft joist span, 8 ft post spacing, SYP #2) -> (2) 2x8, 4x4, ledger 15 in", () => {
+test("deck: worked example (12 ft joist span, 8 ft post spacing, SYP #2) -> (2) 2x10, 4x4, ledger 15 in", () => {
+  // 2026-07-23: was pinned at (2) 2x8, which the SPIB per-width correction
+  // showed to be OVERSTRESSED. M = 28,800 lb-in; a (2) 2x8 has S = 26.28 in^3
+  // so f_b = 1,096 psi against the tabulated SP No.2 2x8 F_b of 925 psi (18%
+  // over). It only "passed" because the code applied the 2x4 value (1,100 psi)
+  // at every depth. The correct member is (2) 2x10: S = 42.78, f_b = 673 psi
+  // against F_b = 800.
   const r = computeDeckBeamPost(deckBeamPostExample.inputs);
-  assert.strictEqual(r.beam_size, "2x8");
+  assert.strictEqual(r.beam_size, "2x10");
   assert.strictEqual(r.beam_plies, 2);
   assert.strictEqual(r.post_size, "4x4");
   assert.strictEqual(r.ledger_spacing_in, 15);
@@ -221,4 +228,27 @@ test("deck beam/post: NDS 3.7.1.4 le/d <= 50 is enforced, not silently exceeded"
     assert.ok(bad.post_slenderness_le_d > 50);
     assert.ok(bad.warnings.some((w) => /3\.7\.1\.4|slenderness/i.test(w)));
   }
+});
+
+test("Southern Pine No.2 reference bending values are tabulated PER WIDTH (SPIB Appendix A Tables 2-6)", () => {
+  // SP is tabulated per width, which is exactly why C_F = 1.0 for SP. Applying
+  // one value at every depth (the old 1,100 psi 2x4 entry) overstated F_b by up
+  // to 47% at 2x12. Other species carry the depth effect through C_F instead;
+  // SP must not use both.
+  assert.deepStrictEqual(SYP_NO2_FB_BY_WIDTH, { "2x4": 1100, "2x6": 1000, "2x8": 925, "2x10": 800, "2x12": 750 });
+  // Monotonically non-increasing with depth -- the whole point of the size effect.
+  const vals = ["2x4", "2x6", "2x8", "2x10", "2x12"].map((s) => SYP_NO2_FB_BY_WIDTH[s]);
+  for (let i = 1; i < vals.length; i++) assert.ok(vals[i] < vals[i - 1]);
+  // SP E is the No.2 row (1.4e6), NOT the No.2 DENSE row (1.6e6), and E pairs
+  // with Emin exactly as the file's other species do (1.4e6 <-> 510,000).
+  assert.strictEqual(LUMBER_SPECIES_GRADES["SYP_No2"].E_psi, 1400000);
+  assert.strictEqual(LUMBER_EMIN_PSI["SYP"], 510000);
+  assert.strictEqual(LUMBER_SPECIES_GRADES["SPF_No2"].E_psi, 1400000);
+  assert.strictEqual(LUMBER_EMIN_PSI["SPF"], 510000); // same pairing, unchanged
+  // The per-width values actually reach the member selection: an SP 2x12 must
+  // not be evaluated at the 2x4 stress.
+  const wide = computeLumberSpan({ species_grade: "SYP_No2", nominal_size: "2x12", total_load_psf: 40, tributary_width_in: 16 });
+  const narrow = computeLumberSpan({ species_grade: "SYP_No2", nominal_size: "2x4", total_load_psf: 40, tributary_width_in: 16 });
+  assert.ok(wide.allowable_span_ft > narrow.allowable_span_ft); // deeper still spans further
+  assert.ok(!("error" in wide) && !("error" in narrow));
 });

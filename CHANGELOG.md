@@ -4,6 +4,29 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(construction): Southern Pine bending values are tabulated PER WIDTH, and its E was the Dense row; 2026-07-23
+
+Closes the highest-severity finding of the NDS wood audit, using the SPIB Standard Grading Rules design-value tables
+(Appendix A Tables 2-6) as the primary source rather than recall.
+
+- **`SYP_No2` used F_b = 1,100 psi at every depth.** Southern Pine reference bending values are tabulated PER WIDTH --
+  which is precisely why the size factor C_F is 1.0 for SP -- so a single value applied at all depths silently
+  overstated the allowable. Correct SP No.2 (2"-4" thick) values are **1,100 / 1,000 / 925 / 800 / 750 psi** at
+  2x4 / 2x6 / 2x8 / 2x10 / 2x12; the old code was **47% high at 2x12**. Other species carry the depth effect through
+  `_V15C_CF_BENDING`; SP now carries it through the tabulated values, and must not use both.
+- **`SYP_No2` E was 1.6e6 -- the No.2 DENSE row.** SP No.2 is 1.4e6. `LUMBER_EMIN_PSI.SYP` was correspondingly 580,000
+  (the Dense pairing) and is now 510,000. The file's own other species confirm the pairing: DF-L 1.6e6/580,000,
+  SPF 1.4e6/510,000, Hem-Fir 1.3e6/470,000 -- SYP was the lone outlier. This overstated both deflection resistance and
+  column-buckling capacity.
+- **What it changes in practice:** the deck worked example moves from (2) 2x8 to (2) 2x10. The old answer was
+  genuinely overstressed -- M = 28,800 lb-in on a (2) 2x8 (S = 26.28 in^3) is f_b = 1,096 psi against a tabulated
+  925 psi, **18% over**, and it only "passed" because the 2x4 value was being applied. The corrected (2) 2x10 runs
+  673 psi against 800. A 9 ft header on 12 ft tributary likewise moves from (3) 2x10 to (3) 2x12 and now agrees with
+  DF-L for identical inputs -- the two species disagreeing by a full size was the audit's visible symptom.
+- Guarded by a regression test pinning the whole per-width table, its monotonic decrease with depth, and the
+  E/E_min pairing. The pinned worked example and the v15 unit test were both updated **because they had been pinning
+  the bug**; each carries a comment with the hand-calculation showing why the old value was wrong.
+
 ### fix(construction): IRC roof live-load floor and the NDS le/d slenderness limit (wood refute-audit); 2026-07-23
 
 A refute-first audit of the NDS wood-design tiles (the 4th standard swept, after ACI/AISC/TMS) found two fixable
