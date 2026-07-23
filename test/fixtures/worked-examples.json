@@ -33276,6 +33276,90 @@
    }
   },
   {
+   "tile_id": "window-overhang-shade",
+   "source_publisher": "ASHRAE Handbook-Fundamentals (Fenestration) profile-angle method",
+   "source_title": "24 in overhang, 6 in gap, 48 in glass, 70 deg summer sun straight on -> shade line 65.94 in, fully shaded",
+   "source_edition_or_year": "spec-v1012 worked example (machine-verified)",
+   "source_section_or_page": "spec-v1012 section 2.1 pinned example; tan(profile) = tan(70)/cos(0) so profile = 70 deg, shade line = 24 tan 70 = 65.94 in > 6 + 48",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "projection_in": 24,
+    "gap_in": 6,
+    "glass_height_in": 48,
+    "solar_altitude_deg": 70,
+    "surface_solar_azimuth_deg": 0
+   },
+   "outputs": {
+    "profile_angle_deg": {
+     "value": 70.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "shade_line_in": {
+     "value": 65.9395,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "shaded_height_in": {
+     "value": 48.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "sunlit_fraction": {
+     "value": 0.0,
+     "tolerance": {
+      "abs": 0.000001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "window-overhang-shade",
+   "source_publisher": "ASHRAE Handbook-Fundamentals (Fenestration) profile-angle method",
+   "source_title": "cross-check: the same overhang at a 30 deg winter sun leaves 84% of the glass sunlit",
+   "source_edition_or_year": "spec-v1012 worked example (machine-verified)",
+   "source_section_or_page": "spec-v1012 section 2.1 cross-check; shade line = 24 tan 30 = 13.86 in, shaded = 13.86 - 6 = 7.86 in of 48 in",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "projection_in": 24,
+    "gap_in": 6,
+    "glass_height_in": 48,
+    "solar_altitude_deg": 30,
+    "surface_solar_azimuth_deg": 0
+   },
+   "outputs": {
+    "profile_angle_deg": {
+     "value": 30.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "shade_line_in": {
+     "value": 13.8564,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "shaded_height_in": {
+     "value": 7.8564,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "sunlit_fraction": {
+     "value": 0.83632,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "window-solar-heat-gain",
    "source_publisher": "ASHRAE / ACCA Manual J fenestration",
    "source_title": "40 ft2 west window, SHGC 0.30, PSF 200 -> 2,400 solar, 2,568 total",

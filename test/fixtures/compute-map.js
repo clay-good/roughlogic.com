@@ -536,6 +536,7 @@ export const COMPUTE_MAP = {
   "filter-pressure-drop": { module: "../../calc-hvacsystems.js", fn: "computeFilterPressureDrop" },
   // spec-v227..v229 cooling-load-components batch (3 tiles)
   "window-solar-heat-gain": { module: "../../calc-hvacsystems.js", fn: "computeWindowSolarHeatGain" },
+  "window-overhang-shade": { module: "../../calc-hvacsystems.js", fn: "computeWindowOverhangShade" },
   "internal-heat-gains": { module: "../../calc-hvacsystems.js", fn: "computeInternalHeatGains" },
   "envelope-conduction-load": { module: "../../calc-hvacsystems.js", fn: "computeEnvelopeConductionLoad" },
   "manual-d-friction-rate": { module: "../../calc-hvac.js", fn: "computeManualDFrictionRate" },

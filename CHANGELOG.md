@@ -4,6 +4,26 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): window overhang shading, profile angle and shade line (spec-v1012); 2026-07-23
+
+- New tile `window-overhang-shade` (Group C, calc-hvacsystems.js): the shade factor `window-solar-heat-gain` defers to
+  in both its note and citation ("Interior shades and overhangs reduce the solar term by a separate shade factor").
+  Computes the profile angle `tan(profile) = tan(altitude)/cos(surface-solar azimuth)`, the shade line
+  `projection x tan(profile)`, and the resulting sunlit fraction of the glass. A 24 in overhang set 6 in above a 48 in
+  window FULLY shades it at a 70 deg summer sun but leaves 84% sunlit at a 30 deg winter sun -- the seasonal swing
+  that makes a fixed overhang work with no moving parts. Home tile count 1,460 -> 1,461.
+- Derived, not looked up: ASHRAE tabulates shade-line factors by latitude and orientation, but computing the profile
+  angle from the entered sun position sidesteps that table, so no remembered tabulated constant enters the tile. The
+  fuzzer pins the identity that the profile angle equals the solar altitude at normal incidence, across four
+  altitudes.
+- Scope stated in the output itself: this is the **direct-beam** sunlit fraction. Shaded glazing still receives
+  diffuse sky and ground-reflected radiation, so applying this fraction to a TOTAL solar gain overstates the
+  reduction. A sun below the horizon or behind the wall plane is treated as a valid physical result (zero fraction,
+  null angles), not an error.
+- Build: `calc-hvacsystems.js` gzip cap raised 26,000 -> 28,000 B (this tile took it to 26,420 B, 101.6%), and
+  `citations.js` raised 548,000 -> 556,000 B (the five spec-v1008..v1012 citation bodies took it to 548,084 B, exactly
+  100.0% of the old cap). Both are lazy-loaded and outside the home-view payload.
+
 ### feat(plumbing): circular pipe partial-flow depth and velocity (spec-v1011); 2026-07-23
 
 - New tile `pipe-partial-flow-depth` (Group B, calc-plumbing.js): how deep a gravity pipe actually runs at a given

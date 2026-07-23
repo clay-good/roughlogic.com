@@ -1038,6 +1038,82 @@ function _v16h_renderWindowSolarHeatGain(inputRegion, outputRegion, citationEl) 
 }
 HVACSYSTEMS_RENDERERS["window-solar-heat-gain"] = _v16h_renderWindowSolarHeatGain;
 
+// dims: in { projection_in: L, gap_in: L, glass_height_in: L, solar_altitude_deg: dimensionless, surface_solar_azimuth_deg: dimensionless } out: { profile_angle_deg: dimensionless, shade_line_in: L, shaded_height_in: L, sunlit_height_in: L, sunlit_fraction: dimensionless }
+export function computeWindowOverhangShade({ projection_in = 0, gap_in = 0, glass_height_in = 0, solar_altitude_deg = 0, surface_solar_azimuth_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(projection_in >= 0)) return { error: "Overhang projection cannot be negative (in)." };
+  if (!(gap_in >= 0)) return { error: "Gap from the overhang to the glass top cannot be negative (in)." };
+  if (!(glass_height_in > 0)) return { error: "Glass height must be positive (in)." };
+  if (!(solar_altitude_deg >= -90 && solar_altitude_deg <= 90)) return { error: "Solar altitude must be -90 to 90 degrees." };
+  if (!(surface_solar_azimuth_deg >= -180 && surface_solar_azimuth_deg <= 180)) return { error: "Surface-solar azimuth must be -180 to 180 degrees." };
+  const DEG = Math.PI / 180;
+  // No direct beam when the sun is below the horizon or behind the wall plane.
+  const direct_sun = solar_altitude_deg > 0 && Math.abs(surface_solar_azimuth_deg) < 90;
+  if (!direct_sun) {
+    return {
+      direct_sun: false, profile_angle_deg: null, shade_line_in: null,
+      shaded_height_in: glass_height_in, sunlit_height_in: 0, sunlit_fraction: 0,
+      note: "No direct beam reaches this glazing: the sun is below the horizon or behind the wall plane (surface-solar azimuth at or past 90 degrees). The direct-beam sunlit fraction is 0. Diffuse sky and ground-reflected radiation still strike the glass, so the total solar gain is NOT zero -- see the scope note on the sunlit-fraction output.",
+    };
+  }
+  // Profile (vertical shadow) angle: with the wall normal as x, the sun vector is
+  // (cos a cos g, cos a sin g, sin a); projecting onto the vertical plane normal
+  // to the wall gives tan(profile) = tan(altitude) / cos(surface-solar azimuth).
+  const profile_rad = Math.atan(Math.tan(solar_altitude_deg * DEG) / Math.cos(surface_solar_azimuth_deg * DEG));
+  const profile_angle_deg = profile_rad / DEG;
+  // The overhang casts its shade line this far down the wall from its underside.
+  const shade_line_in = projection_in * Math.tan(profile_rad);
+  const shaded_height_in = Math.min(Math.max(shade_line_in - gap_in, 0), glass_height_in);
+  const sunlit_height_in = glass_height_in - shaded_height_in;
+  const sunlit_fraction = sunlit_height_in / glass_height_in;
+  const fully_shaded = shaded_height_in >= glass_height_in;
+  const fully_sunlit = shaded_height_in <= 0;
+  return {
+    direct_sun: true, profile_angle_deg, shade_line_in, shaded_height_in,
+    sunlit_height_in, sunlit_fraction, fully_shaded, fully_sunlit,
+    note: "Overhang shading of vertical glazing by the profile-angle (shade-line) method. The profile angle is the sun's altitude projected into the vertical plane perpendicular to the wall, tan(profile) = tan(altitude) / cos(surface-solar azimuth), where the surface-solar azimuth is the horizontal angle between the sun and the wall's outward normal (0 means the sun is straight on). The overhang throws its shade line projection x tan(profile) down the wall, and whatever of that falls past the gap onto the glass is shaded. This is the geometry that makes a fixed overhang work seasonally: a 24 in overhang 6 in above a 48 in window fully shades it at a 70 degree summer altitude but leaves 84% of it sunlit at a 30 degree winter altitude, with no moving parts. At normal incidence the profile angle equals the solar altitude. SCOPE: this is the DIRECT-BEAM sunlit fraction. Shaded glazing still receives diffuse sky and ground-reflected radiation, so multiplying a total solar gain by this fraction OVERSTATES the reduction -- apply it to the beam component and keep the diffuse term. Also assumes an overhang wide enough that side (end) effects do not matter, no side fins, and an unobstructed sun; get the altitude and azimuth from the solar-times tile or an ASHRAE table for the date, hour, and latitude.",
+  };
+}
+export const windowOverhangShadeExample = { inputs: { projection_in: 24, gap_in: 6, glass_height_in: 48, solar_altitude_deg: 70, surface_solar_azimuth_deg: 0 } };
+
+function _v1012renderWindowOverhangShade(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASHRAE Handbook-Fundamentals (Fenestration) / ACCA Manual J overhang shading by the profile-angle (shade-line) method: tan(profile angle) = tan(solar altitude) / cos(surface-solar azimuth), shade line = projection x tan(profile angle), by name. The profile-angle geometry is computed from the entered sun position rather than read from a tabulated shade-line-factor chart. Reports the DIRECT-BEAM sunlit fraction; diffuse sky and ground-reflected radiation still reach shaded glass. Overhang assumed wide enough to ignore end effects; no side fins. A design aid, not a Manual J.";
+  attachExampleButton(inputRegion, () => { p.input.value = "24"; g.input.value = "6"; h.input.value = "48"; a.input.value = "70"; z.input.value = "0"; update(); });
+  const p = makeNumber("Overhang projection (in)", "wos-p", { step: "any", min: "0" });
+  const g = makeNumber("Gap, overhang to glass top (in)", "wos-g", { step: "any", min: "0" });
+  const h = makeNumber("Glass height (in)", "wos-h", { step: "any", min: "0" });
+  const a = makeNumber("Solar altitude (deg)", "wos-a", { step: "any" });
+  const z = makeNumber("Surface-solar azimuth (deg, 0 = sun straight on)", "wos-z", { step: "any" });
+  for (const f of [p, g, h, a, z]) inputRegion.appendChild(f.wrap);
+  const oPa = makeOutputLine(outputRegion, "Profile angle", "wos-out-pa");
+  const oSl = makeOutputLine(outputRegion, "Shade line below overhang", "wos-out-sl");
+  const oSh = makeOutputLine(outputRegion, "Glass shaded", "wos-out-sh");
+  const oFr = makeOutputLine(outputRegion, "Direct-beam sunlit fraction", "wos-out-fr");
+  const oNote = makeOutputLine(outputRegion, "Note", "wos-out-n");
+  const update = debounce(() => {
+    const r = computeWindowOverhangShade({
+      projection_in: Number(p.input.value) || 0,
+      gap_in: Number(g.input.value) || 0,
+      glass_height_in: Number(h.input.value) || 0,
+      solar_altitude_deg: Number(a.input.value) || 0,
+      surface_solar_azimuth_deg: Number(z.input.value) || 0,
+    });
+    if (r.error) {
+      oPa.textContent = r.error;
+      for (const o of [oSl, oSh, oFr, oNote]) o.textContent = "-";
+      return;
+    }
+    oPa.textContent = r.direct_sun ? fmt(r.profile_angle_deg, 2) + " deg" : "- (no direct sun on this wall)";
+    oSl.textContent = r.direct_sun ? fmt(r.shade_line_in, 2) + " in" : "-";
+    oSh.textContent = fmt(r.shaded_height_in, 2) + " in of " + fmt(r.shaded_height_in + r.sunlit_height_in, 2) + " in"
+      + (r.fully_shaded ? " (fully shaded)" : (r.fully_sunlit ? " (fully sunlit)" : ""));
+    oFr.textContent = fmt(r.sunlit_fraction * 100, 1) + "% sunlit (beam only; diffuse still reaches the glass)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [p, g, h, a, z]) f.input.addEventListener("input", update);
+}
+HVACSYSTEMS_RENDERERS["window-overhang-shade"] = _v1012renderWindowOverhangShade;
+
 // ===================== spec-v228: internal heat gains (people, lighting, equipment) =====================
 
 // dims: in { occupants: dimensionless, sens_per_person: M L^2 T^-3, lat_per_person: M L^2 T^-3, lighting_w: M L^2 T^-3, equipment_w: M L^2 T^-3, use_factor: dimensionless } out: { q_sensible: M L^2 T^-3, q_latent: M L^2 T^-3, q_total: M L^2 T^-3 }

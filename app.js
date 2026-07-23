@@ -373,7 +373,10 @@ const TOOL_MODULES = (() => {
     "boiler-pipe-sizing", "compressor-short-cycle", "humidifier-capacity",
     "filter-pressure-drop",
     // spec-v227..v229 cooling-load-components batch
-    "window-solar-heat-gain", "internal-heat-gains", "envelope-conduction-load",
+    "window-solar-heat-gain",
+    // spec-v1012 overhang shade line / direct-beam sunlit fraction
+    "window-overhang-shade",
+    "internal-heat-gains", "envelope-conduction-load",
     // spec-v409..v410 HVAC duct-design
     "coil-face-velocity", "coil-face-area", "vav-box-airflow",
     // spec-v587 anti-short-cycle buffer tank

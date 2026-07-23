@@ -28995,3 +28995,53 @@ test("bounds: spec-v1011 computePipePartialFlowDepth pins the circular partial-f
   assert.ok("error" in _v1011({ ...base, material: "unobtainium" }));
   assert.ok("error" in _v1011({ ...base, slope: Infinity }));
 });
+
+import { computeWindowOverhangShade as _v1012 } from "../../calc-hvacsystems.js";
+
+test("bounds: spec-v1012 computeWindowOverhangShade pins the profile angle, the seasonal shade line, the no-direct-sun branch, and error seams", () => {
+  const base = { projection_in: 24, gap_in: 6, glass_height_in: 48, solar_altitude_deg: 70, surface_solar_azimuth_deg: 0 };
+  const summer = _v1012(base);
+  // Summer: a 24 in overhang fully shades a 48 in window at a 70 deg sun.
+  assert.ok(Math.abs(summer.profile_angle_deg - 70) < 1e-9);
+  assert.ok(Math.abs(summer.shade_line_in - 65.9395) < 1e-3); // 24 tan 70
+  assert.ok(Math.abs(summer.shaded_height_in - 48) < 1e-9);
+  assert.strictEqual(summer.sunlit_fraction, 0);
+  assert.strictEqual(summer.fully_shaded, true);
+  // Winter: the SAME overhang leaves 84% of the glass sunlit. This seasonal
+  // swing with no moving parts is the whole point of a fixed overhang.
+  const winter = _v1012({ ...base, solar_altitude_deg: 30 });
+  assert.ok(Math.abs(winter.shade_line_in - 13.8564) < 1e-3); // 24 tan 30
+  assert.ok(Math.abs(winter.shaded_height_in - 7.8564) < 1e-3);
+  assert.ok(Math.abs(winter.sunlit_fraction - 0.83632) < 1e-4);
+  assert.ok(winter.sunlit_fraction > summer.sunlit_fraction);
+  // At normal incidence the profile angle equals the solar altitude exactly.
+  for (const alt of [15, 35, 55, 80]) {
+    assert.ok(Math.abs(_v1012({ ...base, solar_altitude_deg: alt }).profile_angle_deg - alt) < 1e-9);
+  }
+  // Off-normal sun raises the profile angle above the altitude (tan/cos > tan).
+  const oblique = _v1012({ ...base, solar_altitude_deg: 45, surface_solar_azimuth_deg: 45 });
+  assert.ok(Math.abs(oblique.profile_angle_deg - 54.7356) < 1e-3);
+  assert.ok(oblique.profile_angle_deg > 45);
+  // Deeper overhang shades more; a shallower sun shades less.
+  assert.ok(_v1012({ ...base, projection_in: 36, solar_altitude_deg: 30 }).shaded_height_in > winter.shaded_height_in);
+  // No overhang leaves the glass fully sunlit.
+  const none = _v1012({ ...base, projection_in: 0 });
+  assert.strictEqual(none.sunlit_fraction, 1);
+  assert.strictEqual(none.fully_sunlit, true);
+  // No direct beam when the sun is behind the wall plane or below the horizon:
+  // the branch returns a fully-shaded, zero-fraction result with null angles.
+  for (const bad of [{ surface_solar_azimuth_deg: 90 }, { surface_solar_azimuth_deg: -120 }, { solar_altitude_deg: 0 }, { solar_altitude_deg: -10 }]) {
+    const r = _v1012({ ...base, ...bad });
+    assert.strictEqual(r.direct_sun, false);
+    assert.strictEqual(r.sunlit_fraction, 0);
+    assert.strictEqual(r.profile_angle_deg, null);
+    assert.ok(Math.abs(r.shaded_height_in - 48) < 1e-9);
+  }
+  // Error seams.
+  assert.ok("error" in _v1012({ ...base, glass_height_in: 0 }));
+  assert.ok("error" in _v1012({ ...base, projection_in: -1 }));
+  assert.ok("error" in _v1012({ ...base, gap_in: -1 }));
+  assert.ok("error" in _v1012({ ...base, solar_altitude_deg: 999 }));
+  assert.ok("error" in _v1012({ ...base, surface_solar_azimuth_deg: 999 }));
+  assert.ok("error" in _v1012({ ...base, gap_in: Infinity }));
+});

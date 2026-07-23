@@ -215,7 +215,9 @@ const _TILES = [
   ["boiler-pipe-sizing", "C"], ["compressor-short-cycle", "C"],
   ["humidifier-capacity", "C"], ["filter-pressure-drop", "C"],
   // spec-v227..v229 cooling-load-components batch
-  ["window-solar-heat-gain", "C"], ["internal-heat-gains", "C"], ["envelope-conduction-load", "C"],
+  ["window-solar-heat-gain", "C"],
+  // spec-v1012 overhang shading by the profile-angle method
+  ["window-overhang-shade", "C"], ["internal-heat-gains", "C"], ["envelope-conduction-load", "C"],
   ["manual-d-friction-rate", "C"], ["coil-face-velocity", "C"], ["coil-face-area", "C"], ["vav-box-airflow", "C"],
   ["erv-total-enthalpy-recovery", "C"], ["radiant-floor-output", "C"], ["economizer-enthalpy-changeover", "C"],
   // spec-v478 hydronic snowmelt sizing

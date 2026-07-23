@@ -3932,6 +3932,19 @@ export const CITATIONS = {
       { name: "Constant roughness", value: "n held constant with depth; Camp's variable-n curves are not applied", source: "standard simplification" },
     ],
   },
+  "window-overhang-shade": {
+    formula: "tan(profile) = tan(altitude) / cos(surface-solar azimuth); shade_line = projection x tan(profile); shaded = clamp(shade_line - gap, 0, glass_height); sunlit_fraction = 1 - shaded/glass_height. No direct beam when altitude <= 0 or |surface-solar azimuth| >= 90.",
+    edition: "The ASHRAE Handbook-Fundamentals (Fenestration) and ACCA Manual J profile-angle / shade-line method for overhang shading of vertical glazing, by name.",
+    freeAccess: "The profile-angle relation is first-principles solar geometry; it is computed here from the entered sun position rather than read from a proprietary shade-line-factor table.",
+    governance: GOVERNANCE.general,
+    editionNote: "Overhang shading of vertical glazing by the profile-angle (shade-line) method. With the wall outward normal as x, the sun direction is (cos a cos g, cos a sin g, sin a) for altitude a and surface-solar azimuth g; projecting that onto the vertical plane normal to the wall gives the profile angle, tan(profile) = tan(a)/cos(g). The overhang casts its shade line projection x tan(profile) below its underside, and the part of that falling past the gap onto the glass is shaded. At normal incidence (g = 0) the profile angle equals the solar altitude. The shade-line factors ASHRAE tabulates by latitude and orientation are NOT used - the angle is computed directly from the entered sun position, which sidesteps the table. SCOPE: this returns the DIRECT-BEAM sunlit fraction. Shaded glazing still receives diffuse sky and ground-reflected radiation, so multiplying a TOTAL solar gain by this fraction overstates the reduction; apply it to the beam component and retain the diffuse term. Assumes an overhang wide enough that end effects are negligible, no side fins, no adjacent obstructions, and flat vertical glazing. A design aid, not a Manual J or a full fenestration analysis.",
+    assumptions: [
+      { name: "Profile angle", value: "tan(profile) = tan(altitude)/cos(surface-solar azimuth); equals the altitude at normal incidence", source: "solar geometry / ASHRAE Fundamentals Fenestration" },
+      { name: "Shade line", value: "projection x tan(profile) below the overhang; the portion past the gap shades the glass", source: "ASHRAE / ACCA Manual J shade-line method" },
+      { name: "Beam only", value: "the reported fraction is direct-beam; diffuse sky and ground-reflected radiation still reach shaded glass", source: "fenestration practice" },
+      { name: "Geometry limits", value: "overhang wide enough to ignore end effects; no side fins or adjacent obstructions", source: "method scope" },
+    ],
+  },
   "manning-pipe-capacity": {
     formula: "English Manning V = (1.486 / n) R^(2/3) S^(1/2); full-bore circular pipe R = D/4, A = (pi/4) D^2, Q = V A; Q_gpm = 448.831 Q_cfs.",
     edition: "Manning equation; n-values from USGS WSP-2339 (public domain).",

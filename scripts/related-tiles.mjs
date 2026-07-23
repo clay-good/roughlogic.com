@@ -1480,6 +1480,7 @@ const RELATED = {
   "seismic-overturning-moment": ["seismic-vertical-distribution","seismic-base-shear","shearwall-overturning"],
   // spec-v227..v229 cooling-load-components batch (Group C)
   "window-solar-heat-gain": ["manual-j-cooling","internal-heat-gains","envelope-conduction-load"],
+  "window-overhang-shade": ["window-solar-heat-gain","solar-times","manual-j-cooling","envelope-conduction-load"],
   "internal-heat-gains": ["manual-j-cooling","window-solar-heat-gain","shr"],
   "envelope-conduction-load": ["assembly-r-value","window-solar-heat-gain","manual-j-cooling"],
   "manual-d-friction-rate": ["duct-sizing","duct-friction-static","duct-static-pressure-total","equivalent-length"],
