@@ -631,24 +631,30 @@ export function computeRcDoublyReinforced({ b_in = 0, d_in = 0, dp_in = 0, as_in
   const beta1 = _RC_BETA1(fc_psi);
   const a_in = ((as_in2 - asp_in2) * fy_psi) / (0.85 * fc_psi * b_in);
   const c_in = a_in / beta1;
-  const eps_y = fy_psi / 29e6;
+  const eps_y = fy_psi / 29e6; // eps_ty = fy/Es, the yield (compression-controlled) strain
   const eps_sp = 0.003 * (c_in - dp_in) / c_in;
   const eps_t = 0.003 * (d_in - c_in) / c_in;
   const comp_yields = eps_sp >= eps_y;
-  const tension_controlled = eps_t >= 0.005;
-  const phi = tension_controlled ? 0.90 : (eps_t <= eps_y ? 0.65 : 0.65 + 0.25 * (eps_t - eps_y) / (0.005 - eps_y));
+  // ACI 318-19 21.2.2 / Table 21.2.2: the tension-controlled limit is eps_ty +
+  // 0.003 and the transition denominator is 0.003 - NOT the fixed 0.005 of
+  // 318-14. They coincide only near Grade 60 (eps_ty ~ 0.00207); for Grade 80
+  // and 100 the old 0.005 wrongly classifies transition sections as
+  // tension-controlled and overstates phi.
+  const tc_limit = eps_y + 0.003;
+  const tension_controlled = eps_t >= tc_limit;
+  const phi = tension_controlled ? 0.90 : (eps_t <= eps_y ? 0.65 : 0.65 + 0.25 * (eps_t - eps_y) / 0.003);
   const mn_lbin = (as_in2 - asp_in2) * fy_psi * (d_in - a_in / 2) + asp_in2 * fy_psi * (d_in - dp_in);
   const mn_kipft = mn_lbin / 12000;
   const phi_mn_kipft = phi * mn_kipft;
   return {
-    a_in, c_in, beta1, eps_sp, eps_t, eps_y, comp_yields, tension_controlled, phi, mn_kipft, phi_mn_kipft,
-    note: "ACI 318-19 doubly-reinforced rectangular-beam flexure: a = (As - A's) fy / (0.85 f'c b), c = a/beta1, and Mn = (As - A's) fy (d - a/2) + A's fy (d - d') - the singly-reinforced couple plus the steel-to-steel couple. This ASSUMES both steel layers yield (the compression-steel yield check epsilon's = 0.003 (c - d')/c >= fy/Es is flagged when it fails, where a rigorous solution would iterate with f's = Es epsilon's <= fy), confirms the tension-controlled phi = 0.90 at epsilon_t >= 0.005, and covers a rectangular section (no T-beam flange). Minimum steel, bar spacing, and development are not checked. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    a_in, c_in, beta1, eps_sp, eps_t, eps_y, tc_limit, comp_yields, tension_controlled, phi, mn_kipft, phi_mn_kipft,
+    note: "ACI 318-19 doubly-reinforced rectangular-beam flexure: a = (As - A's) fy / (0.85 f'c b), c = a/beta1, and Mn = (As - A's) fy (d - a/2) + A's fy (d - d') - the singly-reinforced couple plus the steel-to-steel couple. This ASSUMES both steel layers yield (the compression-steel yield check epsilon's = 0.003 (c - d')/c >= fy/Es is flagged when it fails, where a rigorous solution would iterate with f's = Es epsilon's <= fy). The strength-reduction factor phi follows ACI 318-19 21.2.2: tension-controlled (phi = 0.90) at epsilon_t >= epsilon_ty + 0.003, compression-controlled (phi = 0.65) at epsilon_t <= epsilon_ty = fy/Es, and phi = 0.65 + 0.25 (epsilon_t - epsilon_ty)/0.003 between - the 2019 edition replaced the fixed 0.005 tension-controlled limit with epsilon_ty + 0.003, which matters for Grade 80 and 100 steel. Rectangular section (no T-beam flange); minimum steel, bar spacing, and development are not checked. A design aid, not a substitute for the structural engineer of record's stamped design.",
   };
 }
 export const rcDoublyReinforcedExample = { inputs: { b_in: 14, d_in: 22, dp_in: 2.0, as_in2: 8.0, asp_in2: 3.0, fc_psi: 4000, fy_psi: 60000 } };
 
 CONCRETE_RENDERERS["rc-doubly-reinforced"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 doubly-reinforced flexure a = (As - A's) fy / (0.85 f'c b), Mn = (As - A's) fy (d - a/2) + A's fy (d - d'), the compression-steel yield check epsilon's >= fy/Es, and the tension-controlled phi = 0.90, by name. Both layers assumed to yield; rectangular section. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: ACI 318-19 doubly-reinforced flexure a = (As - A's) fy / (0.85 f'c b), Mn = (As - A's) fy (d - a/2) + A's fy (d - d'), the compression-steel yield check epsilon's >= fy/Es, and the 21.2.2 strength-reduction factor (tension-controlled phi = 0.90 at epsilon_t >= epsilon_ty + 0.003, the 2019 replacement for the fixed 0.005 limit), by name. Both layers assumed to yield; rectangular section. A design aid, not a substitute for the engineer of record.",
   example: rcDoublyReinforcedExample.inputs,
   fields: [
     { key: "b_in", label: "Beam width b (in)", kind: "number" },
@@ -683,20 +689,27 @@ export function computeRcShearFriction({ avf_in2 = 0, fy_psi = 60000, ac_in2 = 0
   if (!base_mu) return { error: "The interface must be monolithic, roughened, unroughened, or steel." };
   const mu_f = base_mu * lambda;
   const vn0_kip = (mu_f * avf_in2 * fy_psi) / 1000;
-  const cap_governs_mono = iface === "monolithic" || iface === "roughened";
-  const cap_kip = (Math.min(0.2 * fc_psi, 480 + 0.08 * fc_psi, 1600) * ac_in2) / 1000;
-  const vn_kip = cap_governs_mono ? Math.min(vn0_kip, cap_kip) : vn0_kip;
-  const capped = cap_governs_mono && cap_kip < vn0_kip;
+  // ACI 318-19 Table 22.9.4.4 caps Vn for EVERY interface, not just the
+  // monolithic/roughened case: (a) monolithic or roughened to 1/4 in is the
+  // least of 0.2 f'c, 480 + 0.08 f'c, and 1600 (x Ac); (b) all other cases
+  // (unroughened concrete, or against as-rolled steel) is the least of 0.2 f'c
+  // and 800 (x Ac). Omitting the (b) cap overstates Vn for those interfaces.
+  const case_a = iface === "monolithic" || iface === "roughened";
+  const cap_kip = case_a
+    ? (Math.min(0.2 * fc_psi, 480 + 0.08 * fc_psi, 1600) * ac_in2) / 1000
+    : (Math.min(0.2 * fc_psi, 800) * ac_in2) / 1000;
+  const vn_kip = Math.min(vn0_kip, cap_kip);
+  const capped = cap_kip < vn0_kip;
   const phi_vn_kip = 0.75 * vn_kip;
   return {
     mu_f, vn0_kip, cap_kip, vn_kip, capped, phi_vn_kip,
-    note: "ACI 318-19 22.9 shear-friction strength Vn = mu Avf fy, with mu = 1.4 lambda (monolithic), 1.0 lambda (against roughened hardened concrete), 0.6 lambda (unroughened), 0.7 lambda (against as-rolled steel), capped by min(0.2 f'c, 480 + 0.08 f'c, 1600) Ac for a NORMALWEIGHT monolithic or roughened interface, and phi = 0.75. This returns the shear transferred across a single well-defined plane by friction in the perpendicular (no permanent net tension) case; a net tension across the plane needs added reinforcement Avf = Vu/(phi fy mu) + An. The reduced caps for lightweight or other interface conditions, the anchorage/development of the crossing bars, and the concrete bracket/corbel bearing are separate. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    note: "ACI 318-19 22.9 shear-friction strength Vn = mu Avf fy, with mu = 1.4 lambda (monolithic), 1.0 lambda (against roughened hardened concrete), 0.6 lambda (unroughened), 0.7 lambda (against as-rolled steel), and phi = 0.75. Table 22.9.4.4 caps Vn: a monolithic or 1/4-in-roughened interface (case a) by the least of 0.2 f'c, 480 + 0.08 f'c, and 1600 (x Ac); every OTHER interface - unroughened concrete or as-rolled steel (case b) - by the least of 0.2 f'c and 800 (x Ac), which is the lower ceiling and governs sooner. This returns the shear transferred across a single well-defined plane by friction in the perpendicular (no permanent net tension) case; a net tension across the plane needs added reinforcement Avf = Vu/(phi fy mu) + An. The reduced caps for lightweight concrete, the anchorage/development of the crossing bars, and the concrete bracket/corbel bearing are separate. A design aid, not a substitute for the structural engineer of record's stamped design.",
   };
 }
 export const rcShearFrictionExample = { inputs: { avf_in2: 2.0, fy_psi: 60000, ac_in2: 192, fc_psi: 4000, iface: "roughened", lambda: 1.0 } };
 
 CONCRETE_RENDERERS["rc-shear-friction"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 22.9 shear friction Vn = mu Avf fy (mu 1.4/1.0/0.6/0.7 x lambda by interface), capped by min(0.2 f'c, 480 + 0.08 f'c, 1600) Ac for normalweight monolithic/roughened, phi = 0.75, by name. Perpendicular (no net tension) case, single plane. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: ACI 318-19 22.9 shear friction Vn = mu Avf fy (mu 1.4/1.0/0.6/0.7 x lambda by interface), with the Table 22.9.4.4 cap - min(0.2 f'c, 480 + 0.08 f'c, 1600) Ac for a monolithic/roughened interface (case a) and min(0.2 f'c, 800) Ac for every other interface (case b) - and phi = 0.75, by name. Perpendicular (no net tension) case, single plane. A design aid, not a substitute for the engineer of record.",
   example: rcShearFrictionExample.inputs,
   fields: [
     { key: "avf_in2", label: "Reinforcement crossing the plane Avf (in^2)", kind: "number" },

@@ -16352,6 +16352,18 @@ test("bounds: spec-v300 computeRcDoublyReinforced pins the two couples, the yiel
   // The compression-steel-yield flag fires when d' is deep relative to c.
   const r3 = _v300({ b_in: 14, d_in: 22, dp_in: 6.5, as_in2: 8.0, asp_in2: 3.0, fc_psi: 4000, fy_psi: 60000 });
   assert.strictEqual(r3.comp_yields, false);
+  // ACI 318-19 21.2.2: the tension-controlled limit is eps_ty + 0.003, NOT the
+  // fixed 0.005 of 318-14. For Grade 100 a transition section (eps_t = 0.00517)
+  // must NOT be classified tension-controlled and must get phi < 0.90.
+  const g100 = _v300({ b_in: 14, d_in: 22, dp_in: 2, as_in2: 8, asp_in2: 3, fc_psi: 8000, fy_psi: 100000 });
+  assert.ok(Math.abs(g100.tc_limit - (100000 / 29e6 + 0.003)) < 1e-12);
+  assert.ok(g100.eps_t > 0.005 && g100.eps_t < g100.tc_limit); // above the old limit, below the real one
+  assert.strictEqual(g100.tension_controlled, false);
+  assert.ok(Math.abs(g100.phi - (0.65 + 0.25 * (g100.eps_t - 100000 / 29e6) / 0.003)) < 1e-9);
+  assert.ok(g100.phi > 0.65 && g100.phi < 0.90); // transition, not the overstated 0.90
+  // The Grade 60 base case is deep in the tension-controlled zone either way, so
+  // the fix leaves it (and the pinned worked example) unchanged at phi = 0.90.
+  assert.strictEqual(r.tension_controlled, true);
   // Error seams.
   assert.ok("error" in _v300({ b_in: 0, d_in: 22, dp_in: 2, as_in2: 8, asp_in2: 3 }));
   assert.ok("error" in _v300({ b_in: 14, d_in: 22, dp_in: 22, as_in2: 8, asp_in2: 3 })); // d' >= d
@@ -16377,6 +16389,20 @@ test("bounds: spec-v301 computeRcShearFriction pins the mu map, the interface ca
   assert.strictEqual(_v301({ avf_in2: 2, fy_psi: 60000, ac_in2: 192, fc_psi: 4000, iface: "steel" }).mu_f, 0.7);
   // Lightweight lambda scales mu.
   assert.ok(Math.abs(_v301({ avf_in2: 2, fy_psi: 60000, ac_in2: 192, fc_psi: 4000, iface: "roughened", lambda: 0.75 }).mu_f - 0.75) < 1e-9);
+  // ACI 318-19 Table 22.9.4.4 case (b): unroughened concrete and as-rolled steel
+  // are capped at min(0.2 f'c, 800) Ac -- omitting it overstated Vn. At f'c =
+  // 6,000 the (a) and (b) caps differ (960 vs 800 psi), so the case split shows.
+  const unr = _v301({ avf_in2: 5, fy_psi: 60000, ac_in2: 100, fc_psi: 6000, iface: "unroughened" });
+  assert.ok(Math.abs(unr.cap_kip - Math.min(0.2 * 6000, 800) * 100 / 1000) < 1e-9); // 80 kip, the (b) cap
+  assert.ok(Math.abs(unr.vn_kip - 80) < 1e-9); // capped below the 180 kip friction value
+  assert.strictEqual(unr.capped, true);
+  assert.ok(Math.abs(unr.phi_vn_kip - 60) < 1e-9);
+  const stl = _v301({ avf_in2: 5, fy_psi: 60000, ac_in2: 100, fc_psi: 6000, iface: "steel" });
+  assert.ok(Math.abs(stl.cap_kip - 80) < 1e-9 && Math.abs(stl.vn_kip - 80) < 1e-9); // same (b) cap
+  // Sanity: a roughened interface at the same f'c uses the higher (a) cap (960).
+  const rgh = _v301({ avf_in2: 5, fy_psi: 60000, ac_in2: 100, fc_psi: 6000, iface: "roughened" });
+  assert.ok(Math.abs(rgh.cap_kip - Math.min(0.2 * 6000, 480 + 0.08 * 6000, 1600) * 100 / 1000) < 1e-9); // 96 kip
+  assert.ok(rgh.cap_kip > unr.cap_kip); // case (a) ceiling is higher than case (b)
   // Error seams.
   assert.ok("error" in _v301({ avf_in2: 0, fy_psi: 60000, ac_in2: 192, fc_psi: 4000 }));
   assert.ok("error" in _v301({ avf_in2: 2, fy_psi: 60000, ac_in2: 0, fc_psi: 4000 }));

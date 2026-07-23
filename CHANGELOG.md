@@ -4,6 +4,31 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(concrete): apply two missing ACI 318-19 strength limits found by the refute-audit; 2026-07-23
+
+A refute-first adversarial audit of the calc-concrete.js tiles NOT touched by the sqrt(f'c) sweep found two more
+non-conservative bugs of the same class (a code-mandated limit not applied). Both confirmed against the primary
+standard, not the audit's word.
+
+- **rc-doubly-reinforced (phi classification, ACI 318-19 21.2.2):** `computeRcDoublyReinforced` classified a section
+  as tension-controlled (phi = 0.90) at the fixed strain limit 0.005 -- the ACI 318-14 value. The 2019 edition
+  redefined the limit as eps_ty + 0.003 (eps_ty = fy/Es) and the transition denominator as 0.003. For Grade 60 the two
+  coincide (eps_ty ~ 0.00207, so eps_ty + 0.003 ~ 0.005), but for Grade 80 and 100 the old limit wrongly classified
+  transition sections as tension-controlled and OVERSTATED phi. A Grade 100 section at eps_t = 0.00517 returned
+  phi = 0.90 where the code requires the transition value 0.793 -- a 13.4% overstatement of the phi-Mn the tile
+  reports directly. Fixed to eps_ty + 0.003; the Grade 60 pinned worked example is unchanged (it is deep in the
+  tension-controlled zone either way).
+- **rc-shear-friction (Vn cap, ACI 318-19 Table 22.9.4.4):** `computeRcShearFriction` applied the case-(a) cap
+  (least of 0.2 f'c, 480 + 0.08 f'c, 1600, x Ac) only to monolithic and roughened interfaces and left the unroughened
+  and as-rolled-steel interfaces UNCAPPED. Table 22.9.4.4 case (b) caps those at the least of 0.2 f'c and 800 (x Ac).
+  An unroughened interface with 5 in^2 of dowels on 100 in^2 at 6,000 psi returned Vn = 180 kip (phi-Vn 135) where the
+  code allows 80 kip (phi-Vn 60) -- overstated 2.25x, and the displayed "interface cap" showed the wrong (a)-case
+  ceiling without applying it. Fixed to apply the case-(b) cap to those interfaces; the roughened pinned example
+  (case a) is unchanged.
+
+Both are unconservative in direction (an overstated strength). Fuzzer guards pin the Grade-100 transition phi and the
+case-(b) cap; both provisions were web-verified (21.2.2 and 22.9.4.4), not recalled. No pinned worked example changes.
+
 ### fix(concrete): cap sqrt(f'c) at 100 psi in the torsion threshold (ACI 318-19 22.7); 2026-07-23
 
 - Completing the calc-concrete.js sqrt(f'c)-cap sweep: `computeConcreteTorsionThreshold` computed the threshold
