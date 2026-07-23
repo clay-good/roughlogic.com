@@ -116,9 +116,19 @@ export function ampacityFromPhysics({
   const I2 = (h_eff * P * dT) / r_per_m;
   let I = Math.sqrt(I2);
 
-  // Bundling derate per IEEE 835 (typical published factors).
-  const bundleFactors = { 1: 1, 2: 1, 3: 1, 4: 0.8, 5: 0.8, 6: 0.8, 7: 0.7, 8: 0.7, 9: 0.7 };
-  const k = bundle_count >= 10 ? 0.5 : (bundleFactors[bundle_count] ?? 0.7);
+  // NEC 310.15(C)(1) adjustment factors for more than three current-carrying
+  // conductors. The previous table floored at 0.50 for EVERY count >= 10, which
+  // is right only through 20 conductors: 21-30 is 0.45, 31-40 is 0.40, and 41+
+  // is 0.35. Flooring at 0.50 was NON-CONSERVATIVE above 20 conductors (43%
+  // high at 41+) and contradicted _fillFactor() in calc-electrical.js, which
+  // already carried the correct steps. Counts of 1-20 are unchanged.
+  const k = bundle_count <= 3 ? 1.0
+    : bundle_count <= 6 ? 0.80
+      : bundle_count <= 9 ? 0.70
+        : bundle_count <= 20 ? 0.50
+          : bundle_count <= 30 ? 0.45
+            : bundle_count <= 40 ? 0.40
+              : 0.35;
   I *= k;
 
   return I;

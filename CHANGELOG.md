@@ -4,6 +4,29 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(electrical): NEC conductor-count derate past 20, and sizing tiles that silently clamped; 2026-07-23
+
+A refute-first audit of calc-electrical.js (77 computes, the highest-consequence module in the catalog) produced two
+findings that are fully verifiable **without** reproducing any copyrighted NEC table. Both are fixed here; the
+remaining findings depend on table values I could not source and are recorded, not guessed.
+
+- **`ampacityFromPhysics` floored the conductor-count adjustment at 0.50 for EVERY count of 10 or more.** NEC
+  310.15(C)(1) continues stepping down: 21-30 -> 0.45, 31-40 -> 0.40, 41+ -> 0.35. The tile was therefore
+  **43% non-conservative at 41+ conductors** and 11% at 21-30. The repo already contained the correct ladder in
+  `_fillFactor()` in calc-electrical.js, so two calculators in the same module returned different derates for the same
+  physical condition -- and the ampacity one was the unsafe side. Counts of 1-20 are unchanged.
+- **Four sizing tiles silently returned the largest table entry as a "recommendation" when the requirement exceeded
+  it.** A 7,467 kW generator demand came back as "recommended 1,000 kW" -- a 7.5x undersize with no warning; the
+  service and transformer tiles behaved the same way. They now still show the ceiling but set `exceeds_standard` and
+  say so in the output ("EXCEEDS the largest standard size; this is the ceiling, NOT a sufficient size"), matching the
+  `at_cap` pattern `computeTransformerSize` already used. The optional-method tile also appends a full warning.
+- Guarded by tests pinning every NEC 310.15(C)(1) step, asserting ampacity is monotonically non-increasing in
+  conductor count from 1 to 60, and checking the sizing tiles flag an over-table case while NOT flagging normal ones.
+
+**Audit-template correction worth recording:** my brief to the auditor stated wireway fill (376.22) as 40%. It is
+**20%**, the code was already right, and "fixing" it would have doubled allowable fill. The auditor caught the error
+in the brief.
+
 ### fix(construction): two NDS input labels that invited wrong values; 2026-07-23
 
 Closes the last two actionable items from the NDS wood audit. Both are label/documentation defects -- no math changes

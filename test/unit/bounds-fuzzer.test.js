@@ -29242,3 +29242,48 @@ test("bounds: spec-v1014 computeSoilRelativeDensity pins the dry-density form, i
   assert.ok("error" in _v1014({ ...base, gamma_dmax_pcf: 80 }));
   assert.ok("error" in _v1014({ ...base, w_pct: Infinity }));
 });
+
+import { ampacityFromPhysics as _necAmp } from "../../pure-math.js";
+import { computeGeneratorMotorStarting as _necGen, computeTransformerKvaSizing as _necXfmr,
+  computeServiceLoadStandard as _necSvc } from "../../calc-electrical.js";
+
+test("bounds: NEC 310.15(C)(1) conductor-count adjustment steps past 20 conductors", () => {
+  // The old table floored at 0.50 for EVERY count >= 10. NEC 310.15(C)(1) steps
+  // down further: 21-30 -> 0.45, 31-40 -> 0.40, 41+ -> 0.35. Flooring at 0.50
+  // was NON-CONSERVATIVE above 20 (43% high at 41+) and contradicted
+  // _fillFactor() in calc-electrical.js, which already had the right steps.
+  const base = { awg: "12", material: "copper", insulation_rating_C: 90, ambient_C: 30 };
+  const a1 = _necAmp({ ...base, bundle_count: 1 });
+  const expect = { 1: 1, 3: 1, 4: 0.80, 6: 0.80, 7: 0.70, 9: 0.70, 10: 0.50, 20: 0.50, 21: 0.45, 30: 0.45, 31: 0.40, 40: 0.40, 41: 0.35, 60: 0.35 };
+  for (const [n, f] of Object.entries(expect)) {
+    assert.ok(Math.abs(_necAmp({ ...base, bundle_count: Number(n) }) / a1 - f) < 1e-9, `n=${n}`);
+  }
+  // Monotonically non-increasing -- more conductors can never raise ampacity.
+  let prev = Infinity;
+  for (let n = 1; n <= 60; n++) {
+    const a = _necAmp({ ...base, bundle_count: n });
+    assert.ok(a <= prev + 1e-9, `n=${n} rose`);
+    prev = a;
+  }
+});
+
+test("bounds: sizing tiles FLAG when the requirement exceeds the largest standard size", () => {
+  // The `?? TABLE[last]` fallback silently returned the biggest step as a
+  // "recommendation" -- a 7,467 kW generator demand came back as 1,000 kW with
+  // no warning, a 7.5x undersize.
+  const over = _necGen({ motors: [{ hp: 500, code_letter: "G" }], dip_factor: 0.30 });
+  assert.ok(over.required_kW > 1000);
+  assert.strictEqual(over.recommended_kW, 1000); // still shows the ceiling
+  assert.strictEqual(over.exceeds_standard, true); // ...but says so
+  // A normal case must NOT be flagged.
+  const ok = _necGen({ motors: [{ hp: 20, code_letter: "G" }], dip_factor: 0.30 });
+  assert.strictEqual(ok.exceeds_standard, false);
+  assert.ok(ok.recommended_kW >= ok.required_kW); // genuinely sufficient
+  // Same contract on the other sizing tiles.
+  const svc = _necSvc({ area_ft2: 2400, fixed_appliance_count: 3, service_voltage: 240 });
+  assert.strictEqual(svc.exceeds_standard, false);
+  assert.ok(svc.recommended_A >= svc.required_A);
+  const xf = _necXfmr({ loads: [{ kVA: 25 }, { kVA: 18 }], growth_reserve_pct: 25, phase: "three" });
+  assert.strictEqual(xf.exceeds_standard, false);
+  assert.ok(xf.recommended_kVA >= xf.required_kVA);
+});

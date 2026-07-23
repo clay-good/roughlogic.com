@@ -2025,10 +2025,17 @@ export function computeTransformerKvaSizing({
   }
   const reserve = Math.max(0, Number(growth_reserve_pct) || 0) / 100;
   const required_kVA = connected_kVA * (1 + reserve);
-  const recommended_kVA = TRANSFORMER_KVA_STEPS.find((s) => s >= required_kVA) ?? TRANSFORMER_KVA_STEPS[TRANSFORMER_KVA_STEPS.length - 1];
+  // The `?? TABLE[last]` fallback silently returned the LARGEST standard size when the
+  // requirement exceeded the table -- e.g. a 7,467 kW generator demand was reported as a
+  // "recommended 1,000 kW", a 7.5x undersize presented as a recommendation. Keep returning
+  // the largest step (so the tile still shows the ceiling) but FLAG it, the way
+  // computeTransformerSize already does with at_cap.
+  const _tk_max = TRANSFORMER_KVA_STEPS[TRANSFORMER_KVA_STEPS.length - 1];
+  const exceeds_standard = required_kVA > _tk_max;
+  const recommended_kVA = TRANSFORMER_KVA_STEPS.find((s) => s >= required_kVA) ?? _tk_max;
   const fla_primary_A = (recommended_kVA * 1000) / (primary_V * sqrt_phases);
   const fla_secondary_A = (recommended_kVA * 1000) / (secondary_V * sqrt_phases);
-  return { connected_kVA, required_kVA, recommended_kVA, fla_primary_A, fla_secondary_A };
+  return { connected_kVA, required_kVA, recommended_kVA, fla_primary_A, fla_secondary_A, exceeds_standard };
 }
 
 export const transformerKvaSizingExample = {
@@ -2137,10 +2144,17 @@ export function computeGeneratorMotorStarting({
   // Generator must be larger of running-kW basis and starting-kVA basis
   // (assume pf ~ 1 for the running-kW comparison; engineering-practice).
   const required_kW = Math.max(running_kW, required_starting_kVA * 0.8);
-  const recommended_kW = GENERATOR_KW_STEPS.find((s) => s >= required_kW) ?? GENERATOR_KW_STEPS[GENERATOR_KW_STEPS.length - 1];
+  // The `?? TABLE[last]` fallback silently returned the LARGEST standard size when the
+  // requirement exceeded the table -- e.g. a 7,467 kW generator demand was reported as a
+  // "recommended 1,000 kW", a 7.5x undersize presented as a recommendation. Keep returning
+  // the largest step (so the tile still shows the ceiling) but FLAG it, the way
+  // computeTransformerSize already does with at_cap.
+  const _gk_max = GENERATOR_KW_STEPS[GENERATOR_KW_STEPS.length - 1];
+  const exceeds_standard = required_kW > _gk_max;
+  const recommended_kW = GENERATOR_KW_STEPS.find((s) => s >= required_kW) ?? _gk_max;
   return {
     running_kW, worst_starting_kVA, required_starting_kVA,
-    required_kW, recommended_kW, starts_factor: sf,
+    required_kW, recommended_kW, starts_factor: sf, exceeds_standard,
   };
 }
 
@@ -2207,9 +2221,16 @@ export function computeServiceLoadStandard({
 
   const total_VA = general_demand + range_demand + dryer_demand + fixed_demand + motor_demand + hvac_demand;
   const required_A = total_VA / (Number(service_voltage) || 240);
-  const recommended_A = STD_SERVICE_AMPACITIES.find((s) => s >= required_A) ?? STD_SERVICE_AMPACITIES[STD_SERVICE_AMPACITIES.length - 1];
+  // The `?? TABLE[last]` fallback silently returned the LARGEST standard size when the
+  // requirement exceeded the table -- e.g. a 7,467 kW generator demand was reported as a
+  // "recommended 1,000 kW", a 7.5x undersize presented as a recommendation. Keep returning
+  // the largest step (so the tile still shows the ceiling) but FLAG it, the way
+  // computeTransformerSize already does with at_cap.
+  const _sa_max = STD_SERVICE_AMPACITIES[STD_SERVICE_AMPACITIES.length - 1];
+  const exceeds_standard = required_A > _sa_max;
+  const recommended_A = STD_SERVICE_AMPACITIES.find((s) => s >= required_A) ?? _sa_max;
   return {
-    total_VA, required_A, recommended_A,
+    total_VA, required_A, recommended_A, exceeds_standard,
     breakdown: {
       lighting_general_VA: general, lighting_general_demand_VA: general_demand,
       range_demand_VA: range_demand, dryer_demand_VA: dryer_demand,
@@ -2270,7 +2291,7 @@ function _v7renderTransformerKvaSizing(inputRegion, outputRegion, citationEl) {
     if (r.error) { oC.textContent = r.error; oR.textContent = "-"; oRec.textContent = "-"; oP.textContent = "-"; oS.textContent = "-"; return; }
     oC.textContent = _v7fmt(r.connected_kVA, 2) + " kVA";
     oR.textContent = _v7fmt(r.required_kVA, 2) + " kVA";
-    oRec.textContent = r.recommended_kVA + " kVA (ANSI/IEEE step series)";
+    oRec.textContent = r.recommended_kVA + " kVA (ANSI/IEEE step series)" + (r.exceeds_standard ? " -- EXCEEDS the largest standard size; this is the ceiling, NOT a sufficient size. Engineered design required." : "");
     oP.textContent = _v7fmt(r.fla_primary_A, 1) + " A";
     oS.textContent = _v7fmt(r.fla_secondary_A, 1) + " A";
   }, _V7_DEB);
@@ -2346,7 +2367,7 @@ function _v7renderGeneratorMotorStarting(inputRegion, outputRegion, citationEl) 
     oR.textContent = _v7fmt(r.running_kW, 1) + " kW";
     oS.textContent = _v7fmt(r.worst_starting_kVA, 1) + " kVA";
     oReq.textContent = _v7fmt(r.required_kW, 1) + " kW";
-    oRec.textContent = r.recommended_kW + " kW (typical step series)";
+    oRec.textContent = r.recommended_kW + " kW (typical step series)" + (r.exceeds_standard ? " -- EXCEEDS the largest standard size; this is the ceiling, NOT a sufficient size. Engineered design required." : "");
   }, _V7_DEB);
   for (const f of [hp.input, code.select, nonMotor.input, dip.input, starts.select]) f.addEventListener("input", update);
 }
@@ -2400,7 +2421,7 @@ function _v7renderServiceLoadStandard(inputRegion, outputRegion, citationEl) {
     if (r.error) { oT.textContent = r.error; oA.textContent = "-"; oRec.textContent = "-"; oG.textContent = "-"; oR.textContent = "-"; return; }
     oT.textContent = _v7fmt(r.total_VA, 0) + " VA";
     oA.textContent = _v7fmt(r.required_A, 1) + " A";
-    oRec.textContent = r.recommended_A + " A (NEC service ladder)";
+    oRec.textContent = r.recommended_A + " A (NEC service ladder)" + (r.exceeds_standard ? " -- EXCEEDS the largest standard size; this is the ceiling, NOT a sufficient size. Engineered design required." : "");
     oG.textContent = _v7fmt(r.breakdown.lighting_general_demand_VA, 0) + " VA";
     oR.textContent = _v7fmt(r.breakdown.range_demand_VA, 0) + " VA";
   }, _V7_DEB);
@@ -3629,7 +3650,14 @@ export function computeServiceLoadOptional({
   const standard_demand_a = std.error ? null : std.required_A;
 
   const governing_a = Math.max(optional_demand_a, standard_demand_a ?? 0);
-  const recommended_a = STD_SERVICE_AMPACITIES.find((s) => s >= governing_a) ?? STD_SERVICE_AMPACITIES[STD_SERVICE_AMPACITIES.length - 1];
+  // The `?? TABLE[last]` fallback silently returned the LARGEST standard size when the
+  // requirement exceeded the table -- e.g. a 7,467 kW generator demand was reported as a
+  // "recommended 1,000 kW", a 7.5x undersize presented as a recommendation. Keep returning
+  // the largest step (so the tile still shows the ceiling) but FLAG it, the way
+  // computeTransformerSize already does with at_cap.
+  const _so_max = STD_SERVICE_AMPACITIES[STD_SERVICE_AMPACITIES.length - 1];
+  const exceeds_standard = governing_a > _so_max;
+  const recommended_a = STD_SERVICE_AMPACITIES.find((s) => s >= governing_a) ?? _so_max;
 
   return {
     general_va,
@@ -3640,8 +3668,11 @@ export function computeServiceLoadOptional({
     standard_total_va,
     standard_demand_a,
     recommended_a,
+    exceeds_standard,
     governing_method: optional_demand_a >= (standard_demand_a ?? 0) ? "optional (220.82)" : "standard (220.42)",
-    warnings,
+    warnings: exceeds_standard
+      ? warnings.concat("Calculated demand of " + governing_a.toFixed(1) + " A exceeds the largest bundled standard service (" + _so_max + " A). The figure shown is that ceiling, NOT a sufficient service - size the service to the calculated demand.")
+      : warnings,
   };
 }
 
@@ -3736,7 +3767,7 @@ export function renderServiceLoadOptional(inputRegion, outputRegion, citationEl)
     oTot.textContent = fmt(r.optional_total_va, 0) + " VA";
     oA.textContent = fmt(r.optional_demand_a, 1) + " A";
     oStd.textContent = r.standard_demand_a === null ? "n/a" : fmt(r.standard_demand_a, 1) + " A";
-    oRec.textContent = r.recommended_a + " A (governed by " + r.governing_method + ")";
+    oRec.textContent = r.recommended_a + " A (governed by " + r.governing_method + ")" + (r.exceeds_standard ? " -- EXCEEDS the largest standard size; this is the ceiling, NOT a sufficient size. Engineered design required." : "");
     oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Size the service to the larger of the two methods; the AHJ-adopted edition governs.";
   }, DEBOUNCE_MS);
   for (const f of [area.input, sa.input, laundry.input, fixed.input, range.input, dryer.input, wh.input, heat.input, cool.input, ev.input, volts.select]) f.addEventListener("input", update);
