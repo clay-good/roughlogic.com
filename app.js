@@ -678,6 +678,8 @@ const TOOL_MODULES = (() => {
     "soil-consolidation-settlement", "settlement-limit-load", "footing-eccentric-pressure", "boussinesq-surcharge-wall",
     // spec-v414..v416 settlement/foundation trio
     "consolidation-time-rate", "consolidation-degree", "spt-bearing-capacity", "spt-required-n60", "liquefaction-screening",
+    // spec-v1013 Terzaghi total/effective vertical stress profile
+    "soil-vertical-effective-stress",
     // spec-v498 pile group efficiency (Converse-Labarre)
     "pile-group-efficiency", "pile-group-spacing-for-efficiency",
   ]);

@@ -46930,6 +46930,84 @@
    }
   },
   {
+   "tile_id": "soil-vertical-effective-stress",
+   "source_publisher": "Terzaghi effective-stress principle (Das / NAVFAC DM-7.01)",
+   "source_title": "120/125 pcf profile, water table 10 ft, depth 20 ft -> 2,450 psf total, 624 psf pore, 1,826 psf effective",
+   "source_edition_or_year": "spec-v1013 worked example (machine-verified)",
+   "source_section_or_page": "spec-v1013 section 2.1; buoyant cross-check 120x10 + (125-62.4)x10 = 1,826 psf reproduces sigma' exactly",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "gamma_moist_pcf": 120,
+    "gamma_sat_pcf": 125,
+    "depth_ft": 20,
+    "water_table_depth_ft": 10,
+    "surcharge_psf": 0
+   },
+   "outputs": {
+    "total_stress_psf": {
+     "value": 2450,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pore_pressure_psf": {
+     "value": 624,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "effective_stress_psf": {
+     "value": 1826,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "gamma_buoy_pcf": {
+     "value": 62.6,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soil-vertical-effective-stress",
+   "source_publisher": "Terzaghi effective-stress principle (Das / NAVFAC DM-7.01)",
+   "source_title": "cross-check: water table at the surface -> effective stress is the buoyant weight alone, 62.6 x 20 = 1,252 psf",
+   "source_edition_or_year": "spec-v1013 worked example (machine-verified)",
+   "source_section_or_page": "spec-v1013 section 2.1 cross-check; sigma_v = 125x20 = 2,500, u = 62.4x20 = 1,248, sigma' = 1,252 psf",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "gamma_moist_pcf": 120,
+    "gamma_sat_pcf": 125,
+    "depth_ft": 20,
+    "water_table_depth_ft": 0,
+    "surcharge_psf": 0
+   },
+   "outputs": {
+    "total_stress_psf": {
+     "value": 2500,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pore_pressure_psf": {
+     "value": 1248,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "effective_stress_psf": {
+     "value": 1252,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "liquefaction-screening",
    "source_publisher": "Seed-Idriss",
    "source_title": "amax 0.30g, sv 2000, s'v 1200 psf, z 5 m, CRR 0.20 -> CSR 0.313, FS 0.64, liquefiable",

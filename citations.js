@@ -15729,6 +15729,19 @@ export const CITATIONS = {
       { name: "Settlement-controlled", value: "1 in settlement check; N60 energy-corrected; round up for design", source: "scope of this tile" },
     ],
   },
+  "soil-vertical-effective-stress": {
+    formula: "z_dry = min(z, z_wt); z_sub = max(0, z - z_wt); sigma_v = q + gamma_moist x z_dry + gamma_sat x z_sub; u = gamma_w x z_sub (gamma_w = 62.4 pcf); sigma'_v = sigma_v - u. Below the table this equals q + gamma_moist x z_wt + (gamma_sat - gamma_w) x z_sub.",
+    edition: "Terzaghi's effective-stress principle and the hydrostatic vertical stress profile, as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.01 (Soil Mechanics), by name.",
+    freeAccess: "The effective-stress principle is a public first-principles result; gamma_w = 62.4 pcf is a physical constant already used across this module.",
+    governance: GOVERNANCE.general,
+    editionNote: "Terzaghi's vertical stress profile. The total vertical stress at a depth is the accumulated weight above it -- any surface surcharge, plus the moist unit weight down to the water table, plus the saturated unit weight below it. Pore water pressure below the table is hydrostatic, u = gamma_w x (depth below the table) with gamma_w = 62.4 pcf. The effective stress carried by the soil skeleton is sigma' = sigma - u. Below the table this is algebraically identical to accumulating the BUOYANT unit weight (gamma_sat - gamma_w), so submerged soil contributes roughly half its dry effect; that is why a change in water-table elevation alters settlement and bearing capacity with no change in applied load. A surface surcharge raises the total and the effective stress by the same amount because it adds no pore pressure. This tile exists because several tiles in this module (liquefaction-screening, soil-consolidation-settlement, and the settlement-limit load) take the effective stress as a hand-entered input and none produced it. Assumes hydrostatic conditions with no seepage gradient or artesian head, level ground, uniform layers above and below the table, full saturation below it, and no capillary rise above it. A design aid, not a substitute for the geotechnical engineer of record's report.",
+    assumptions: [
+      { name: "Effective-stress principle", value: "sigma' = sigma - u; the skeleton carries what the water does not", source: "Terzaghi 1925" },
+      { name: "Hydrostatic pore pressure", value: "u = 62.4 x depth below the water table; no seepage gradient or artesian head", source: "Das / NAVFAC DM-7.01" },
+      { name: "Buoyant equivalence", value: "below the table, sigma' accumulates at (gamma_sat - gamma_w)", source: "first-principles algebra" },
+      { name: "Surcharge", value: "a surface surcharge raises total and effective stress equally, adding no pore pressure", source: "first principles" },
+    ],
+  },
   "liquefaction-screening": {
     formula: "rd = 1 - 0.00233172 z (z <= 30.02 ft) else 1.174 - 0.00813816 z; CSR = 0.65 amax (sigma_v/sigma'_v) rd; FS = (CRR/CSR) MSF; liquefiable if FS < 1.",
     edition: "The Seed-Idriss simplified liquefaction-triggering procedure (NCEER/NSF workshop consensus), by name.",

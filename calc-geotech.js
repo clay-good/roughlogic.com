@@ -983,6 +983,52 @@ GEOTECH_RENDERERS["spt-required-n60"] = _simpleRenderer({
   compute: computeSptRequiredN60,
 });
 
+// dims: in { gamma_moist_pcf: M L^-2 T^-2, gamma_sat_pcf: M L^-2 T^-2, depth_ft: L, water_table_depth_ft: L, surcharge_psf: M L^-1 T^-2 } out: { total_stress_psf: M L^-1 T^-2, pore_pressure_psf: M L^-1 T^-2, effective_stress_psf: M L^-1 T^-2, gamma_buoy_pcf: M L^-2 T^-2, depth_below_wt_ft: L }
+export function computeSoilVerticalEffectiveStress({ gamma_moist_pcf = 120, gamma_sat_pcf = 125, depth_ft = 0, water_table_depth_ft = 0, surcharge_psf = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(gamma_moist_pcf > 0)) return { error: "Moist unit weight must be positive (pcf)." };
+  if (!(gamma_sat_pcf > _GAMMA_W)) return { error: "Saturated unit weight must exceed the water unit weight (62.4 pcf)." };
+  if (!(depth_ft > 0)) return { error: "Depth must be positive (ft)." };
+  if (!(water_table_depth_ft >= 0)) return { error: "Water-table depth cannot be negative (ft); use a depth at or below the point of interest for a dry profile." };
+  if (!(surcharge_psf >= 0)) return { error: "Surcharge cannot be negative (psf)." };
+  const z_dry = Math.min(depth_ft, water_table_depth_ft);
+  const depth_below_wt_ft = Math.max(0, depth_ft - water_table_depth_ft);
+  const below_water_table = depth_below_wt_ft > 0;
+  // Terzaghi: total = overburden + surcharge, u is hydrostatic below the table,
+  // and the effective stress is what is left carried by the soil skeleton.
+  const total_stress_psf = surcharge_psf + gamma_moist_pcf * z_dry + gamma_sat_pcf * depth_below_wt_ft;
+  const pore_pressure_psf = _GAMMA_W * depth_below_wt_ft;
+  const effective_stress_psf = total_stress_psf - pore_pressure_psf;
+  const gamma_buoy_pcf = gamma_sat_pcf - _GAMMA_W;
+  const sat_below_moist = gamma_sat_pcf < gamma_moist_pcf;
+  return {
+    total_stress_psf, pore_pressure_psf, effective_stress_psf, gamma_buoy_pcf,
+    depth_below_wt_ft, below_water_table, sat_below_moist,
+    note: "Terzaghi's vertical stress profile, the effective stress that several tiles here ask you to supply by hand. Total stress is the weight of everything above the point (surcharge plus moist soil down to the water table plus saturated soil below it); pore water pressure below the table is hydrostatic, u = 62.4 x (depth below the table); and the effective stress carried by the soil skeleton is sigma' = sigma - u. Below the table this is the same as stacking the BUOYANT unit weight (gamma_sat - 62.4), which is why a soil roughly halves its effective weight once submerged, and why dropping or raising a water table changes settlement and bearing capacity so much without any load changing. A surcharge at the surface raises the total and the effective stress equally, since it adds no pore pressure. Feed the total and effective values into liquefaction-screening, and the effective value into soil-consolidation-settlement, instead of computing them by hand. Hydrostatic (no seepage or artesian head), level ground, uniform layers above and below the table, and a fully saturated zone below it with no capillary rise above. A design aid; the geotechnical engineer of record and the site-specific profile govern.",
+  };
+}
+export const soilVerticalEffectiveStressExample = { inputs: { gamma_moist_pcf: 120, gamma_sat_pcf: 125, depth_ft: 20, water_table_depth_ft: 10, surcharge_psf: 0 } };
+
+GEOTECH_RENDERERS["soil-vertical-effective-stress"] = _simpleRenderer({
+  citation: "Citation: Terzaghi's effective-stress principle sigma' = sigma - u with a hydrostatic pore pressure u = gamma_w x (depth below the water table), gamma_w = 62.4 pcf, and the total vertical stress accumulated from the moist unit weight above the table and the saturated unit weight below it, plus any surface surcharge -- as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.01, by name. Equivalent to stacking the buoyant unit weight (gamma_sat - gamma_w) below the table. Hydrostatic conditions, level ground, uniform layers, no capillary rise. A design aid, not a substitute for the geotechnical engineer of record's report.",
+  example: soilVerticalEffectiveStressExample.inputs,
+  fields: [
+    { key: "gamma_moist_pcf", label: "Moist unit weight above water table (pcf)", kind: "number", default: 120 },
+    { key: "gamma_sat_pcf", label: "Saturated unit weight below water table (pcf)", kind: "number", default: 125 },
+    { key: "depth_ft", label: "Depth of interest (ft)", kind: "number" },
+    { key: "water_table_depth_ft", label: "Depth to water table (ft, >= depth = dry)", kind: "number" },
+    { key: "surcharge_psf", label: "Surface surcharge (psf, 0 = none)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "sv", id: "svs-out-sv", label: "Total vertical stress sigma_v", value: (r) => fmt(r.total_stress_psf, 0) + " psf" },
+    { key: "u", id: "svs-out-u", label: "Pore water pressure u", value: (r) => fmt(r.pore_pressure_psf, 0) + " psf" + (r.below_water_table ? " (" + fmt(r.depth_below_wt_ft, 1) + " ft below the table)" : " (above the water table)") },
+    { key: "sp", id: "svs-out-sp", label: "Effective vertical stress sigma'_v", value: (r) => fmt(r.effective_stress_psf, 0) + " psf" },
+    { key: "gb", id: "svs-out-gb", label: "Buoyant unit weight below the table", value: (r) => fmt(r.gamma_buoy_pcf, 1) + " pcf" + (r.sat_below_moist ? " - check inputs: saturated weight is below the moist weight" : "") },
+    { key: "n", id: "svs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSoilVerticalEffectiveStress,
+});
+
 // dims: in { amax_g: dimensionless, sigma_v_psf: M L^-1 T^-2, sigma_vp_psf: M L^-1 T^-2, depth_ft: L, crr: dimensionless, msf: dimensionless } out: { rd: dimensionless, csr: dimensionless, fs: dimensionless }
 export function computeLiquefactionScreening({ amax_g = 0, sigma_v_psf = 0, sigma_vp_psf = 0, depth_ft = 0, crr = 0, msf = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

@@ -29045,3 +29045,54 @@ test("bounds: spec-v1012 computeWindowOverhangShade pins the profile angle, the 
   assert.ok("error" in _v1012({ ...base, surface_solar_azimuth_deg: 999 }));
   assert.ok("error" in _v1012({ ...base, gap_in: Infinity }));
 });
+
+import { computeSoilVerticalEffectiveStress as _v1013 } from "../../calc-geotech.js";
+
+test("bounds: spec-v1013 computeSoilVerticalEffectiveStress pins the Terzaghi profile, the buoyant equivalence, the sigma' <= sigma_v invariant, and error seams", () => {
+  const base = { gamma_moist_pcf: 120, gamma_sat_pcf: 125, depth_ft: 20, water_table_depth_ft: 10, surcharge_psf: 0 };
+  const r = _v1013(base);
+  assert.ok(Math.abs(r.total_stress_psf - 2450) < 1e-9); // 120*10 + 125*10
+  assert.ok(Math.abs(r.pore_pressure_psf - 624) < 1e-9); // 62.4 * 10
+  assert.ok(Math.abs(r.effective_stress_psf - 1826) < 1e-9);
+  assert.ok(Math.abs(r.gamma_buoy_pcf - 62.6) < 1e-9); // 125 - 62.4
+  // BUOYANT EQUIVALENCE: below the table, sigma' must equal the moist column
+  // plus the buoyant weight -- the same number by a different route.
+  assert.ok(Math.abs(r.effective_stress_psf - (120 * 10 + 62.6 * 10)) < 1e-9);
+  // Above the table there is no pore pressure, so sigma' == sigma_v.
+  const dry = _v1013({ ...base, depth_ft: 8 });
+  assert.strictEqual(dry.pore_pressure_psf, 0);
+  assert.strictEqual(dry.below_water_table, false);
+  assert.ok(Math.abs(dry.effective_stress_psf - dry.total_stress_psf) < 1e-9);
+  assert.ok(Math.abs(dry.total_stress_psf - 960) < 1e-9);
+  // A surcharge adds NO pore pressure, so it raises total and effective equally.
+  const q = _v1013({ ...base, surcharge_psf: 500 });
+  assert.ok(Math.abs(q.pore_pressure_psf - r.pore_pressure_psf) < 1e-9);
+  assert.ok(Math.abs(q.total_stress_psf - r.total_stress_psf - 500) < 1e-9);
+  assert.ok(Math.abs(q.effective_stress_psf - r.effective_stress_psf - 500) < 1e-9);
+  // Water at the surface: sigma' is the buoyant weight alone.
+  const wet = _v1013({ ...base, water_table_depth_ft: 0 });
+  assert.ok(Math.abs(wet.effective_stress_psf - 62.6 * 20) < 1e-9);
+  assert.ok(Math.abs(wet.pore_pressure_psf - 1248) < 1e-9);
+  // INVARIANT the consuming tile relies on: liquefaction-screening rejects
+  // sigma' > sigma_v, so this tile must never produce that, at any water table.
+  for (const wt of [0, 3, 10, 19.9, 20, 50]) {
+    const s = _v1013({ ...base, water_table_depth_ft: wt });
+    assert.ok(s.effective_stress_psf <= s.total_stress_psf);
+    assert.ok(s.effective_stress_psf > 0);
+    assert.ok(s.pore_pressure_psf >= 0);
+  }
+  // A water table at or below the point of interest is a dry profile.
+  assert.strictEqual(_v1013({ ...base, water_table_depth_ft: 20 }).pore_pressure_psf, 0);
+  assert.strictEqual(_v1013({ ...base, water_table_depth_ft: 50 }).pore_pressure_psf, 0);
+  // Raising the water table (smaller depth to it) lowers the effective stress.
+  assert.ok(_v1013({ ...base, water_table_depth_ft: 5 }).effective_stress_psf < r.effective_stress_psf);
+  // Physically impossible saturated weight is rejected, not silently negative.
+  assert.ok("error" in _v1013({ ...base, gamma_sat_pcf: 62.4 }));
+  assert.ok("error" in _v1013({ ...base, gamma_sat_pcf: 50 }));
+  // Error seams.
+  assert.ok("error" in _v1013({ ...base, gamma_moist_pcf: 0 }));
+  assert.ok("error" in _v1013({ ...base, depth_ft: 0 }));
+  assert.ok("error" in _v1013({ ...base, water_table_depth_ft: -1 }));
+  assert.ok("error" in _v1013({ ...base, surcharge_psf: -1 }));
+  assert.ok("error" in _v1013({ ...base, depth_ft: Infinity }));
+});

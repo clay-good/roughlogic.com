@@ -4,6 +4,27 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(geotech): soil vertical total and effective stress (spec-v1013); 2026-07-23
+
+- New tile `soil-vertical-effective-stress` (Group E, calc-geotech.js): Terzaghi's `sigma' = sigma - u` profile.
+  `computeSoilPhaseRelations` declared the gap ("it does not compute ... the effective stress"), but the stronger
+  evidence was structural: **three tiles consumed effective stress as a hand-entered input and nothing produced it.**
+  `liquefaction-screening` takes both total and effective vertical stress as fields and even guards
+  `sigma'_v <= sigma_v` -- it knew the relationship and still made the user do the arithmetic;
+  `soil-consolidation-settlement` and the settlement-limit load take the same input. At 20 ft in a 120/125 pcf profile
+  with the table at 10 ft: 2,450 psf total, 624 psf pore, 1,826 psf effective. Home tile count 1,461 -> 1,462.
+- Zero recalled constants: the only one is `gamma_w = 62.4 pcf`, already defined as `_GAMMA_W` in this module. The
+  result is cross-checked by a second independent route -- the buoyant form `120x10 + (125-62.4)x10` reproduces the
+  1,826 psf exactly -- and with the table at the surface `sigma'` collapses to the buoyant weight alone (62.6 x 20 =
+  1,252 psf).
+- The fuzzer pins the invariant its consumer depends on: `liquefaction-screening` rejects `sigma'_v > sigma_v`, so the
+  water table is swept across six positions asserting `sigma'_v <= sigma_v`, `sigma'_v > 0`, and `u >= 0` at each. It
+  also asserts a surcharge raises total and effective stress equally while leaving `u` untouched, since a surface load
+  adds no pore pressure. A saturated unit weight at or below `gamma_w` is rejected as physically impossible rather
+  than allowed to yield a negative buoyant weight.
+- Build: `calc-geotech.js` gzip cap raised 23,000 -> 26,000 B (this tile took it to 23,861 B, 103.7%). Lazy-loaded,
+  outside the home-view payload.
+
 ### feat(hvac): window overhang shading, profile angle and shade line (spec-v1012); 2026-07-23
 
 - New tile `window-overhang-shade` (Group C, calc-hvacsystems.js): the shade factor `window-solar-heat-gain` defers to

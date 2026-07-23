@@ -23352,6 +23352,46 @@
       "kind": "industry"
     },
     {
+      "term": "effective stress",
+      "target": "soil-vertical-effective-stress",
+      "kind": "industry"
+    },
+    {
+      "term": "overburden pressure",
+      "target": "soil-vertical-effective-stress",
+      "kind": "industry"
+    },
+    {
+      "term": "pore water pressure",
+      "target": "soil-vertical-effective-stress",
+      "kind": "industry"
+    },
+    {
+      "term": "total vertical stress",
+      "target": "soil-vertical-effective-stress",
+      "kind": "adjacent"
+    },
+    {
+      "term": "buoyant unit weight",
+      "target": "soil-vertical-effective-stress",
+      "kind": "adjacent"
+    },
+    {
+      "term": "effective stress at depth with a water table",
+      "target": "soil-vertical-effective-stress",
+      "kind": "question"
+    },
+    {
+      "term": "how does the water table change soil pressure",
+      "target": "soil-vertical-effective-stress",
+      "kind": "question"
+    },
+    {
+      "term": "overburden stress at 20 feet",
+      "target": "soil-vertical-effective-stress",
+      "kind": "question"
+    },
+    {
       "term": "cyclic stress ratio",
       "target": "liquefaction-screening",
       "kind": "industry"

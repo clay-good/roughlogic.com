@@ -2189,6 +2189,7 @@ cross-check.
 | calc-geotech.js | `computeSoilBearingCapacity` | `{ c = 0, phi = 0, gamma = 120, b_ft = 0, df_ft = 0, shape = "strip", fs = 3 }...` | _ | _ | _ |
 | calc-geotech.js | `computeSoilConsolidationSettlement` | `{ cc = 0, h_ft = 0, e0 = 0, sig0_psf = 0, dsig_psf = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSoilSettlementElastic` | `{ q_ksf = 0, b_ft = 0, es_ksf = 0, nu = 0.3, is_f = 0.82 } = {}` | _ | _ | _ |
+| calc-geotech.js | `computeSoilVerticalEffectiveStress` | `{ gamma_moist_pcf = 120, gamma_sat_pcf = 125, depth_ft = 0, water_table_depth...` | _ | _ | _ |
 | calc-geotech.js | `computeSptBearingCapacity` | `{ n60 = 0, b_ft = 0, d_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSptRequiredN60` | `{ qa_target_ksf = 0, b_ft = 0, d_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSubmergedEarthPressure` | `{ phi = 0, gamma_sat = 125, h_ft = 0, q = 0 } = {}` | _ | _ | _ |
@@ -3122,7 +3123,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1708.
+Row count: 1709.
 
 <!-- END function-corpus-v14 -->
 
@@ -3730,7 +3731,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (369 tiles)
+### Group E Construction (370 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4021,6 +4022,7 @@ per spec-v14 §13.1 second paragraph.
 | `soil-settlement-elastic` | Shallow Foundation Elastic (Immediate) Settlement | Theory-of-elasticity immediate settle...; spec-v287 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-stabilization-quantity` | Soil Stabilization (Lime / Cement) Quantity | Stabilizer-quantity identity (first-p...; spread = 0.06*110*(8/12)*9 = 39.6 lb/sy; tons = 39.6*1000... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-swell-shrink` | Soil Swell / Shrinkage Volume Conversion | Caterpillar Performance Handbook soil...; 100 bank cy common earth, swell 25%, shrink 15% -> 125 lo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `soil-vertical-effective-stress` | Soil Vertical Total and Effective Stress (Terzaghi) | Terzaghi effective-stress principle (...; spec-v1013 section 2.1; buoyant cross-check 120x10 + (125... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `speeds-feeds` | Shop Speeds and Feeds | Machining Data Handbook / project bun...; drill / steel / 0.5 in / 2 flutes -> SFM 80, chipload 0.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spoil-setback` | Trench Spoil Pile Setback and Surcharge | OSHA 29 CFR 1926.651(j) / Subpart P; 10 ft trench, 4 ft pile at 34 deg, 2 ft minimum -> 5.93 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spray-foam-board-feet` | Spray Foam Board-Feet and Set Count | Spray-foam board-feet identity (first...; board-feet = 2000*3 = 6,000; sets = ceil(6000*1.10/4800) = 2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4769,6 +4771,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1461. Fixture-covered or reference-cadence: 1461 / 1461.
+Tile count: 1462. Fixture-covered or reference-cadence: 1462 / 1462.
 
 <!-- END tile-index-v14 -->
