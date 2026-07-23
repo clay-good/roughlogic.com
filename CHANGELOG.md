@@ -4,6 +4,21 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): one-way shear without stirrups, the ACI 318-19 detailed method (spec-v1008); 2026-07-23
+
+- New tile `rc-one-way-shear` (Group E, calc-concrete.js): `Vc = 8 lambda_s lambda (rho_w)^(1/3) sqrt(f'c) bw d`, the
+  ACI 318-19 Table 22.5.5.1(b) one-way shear for a member **without** at least minimum shear reinforcement, with the
+  22.5.5.1.3 size-effect factor `lambda_s = sqrt(2/(1 + d/10)) <= 1.0` and the 22.5.3.1 `sqrt(f'c) <= 100 psi` cap.
+  This closes the last gap in the ACI shear family: the catalog already had two-way punching (`rc-punching-shear`,
+  which carries `lambda_s`) and the stirrup-designed simplified case (`rc-beam-shear`, whose citation states it omits
+  the reinforcement-ratio and size-effect terms), but nothing covered the no-stirrup case that actually governs
+  footings and one-way slabs. The tile reports the old `2 sqrt(f'c) bw d` beside the result so the 2019 penalty is
+  visible: a 12 in strip at d = 16 in with As = 1.0 in^2 carries 11.1 kip design shear, not the 18.2 kip the simplified
+  rule implied. Home tile count 1,456 -> 1,457.
+- Audit note: this landed from re-deriving `rc-beam-shear` against ACI 318-19 rather than from a discovery sweep.
+  `rc-beam-shear` itself was **verified correct** -- it designs a stirrup-reinforced beam (Table 22.5.5.1 case (a)),
+  where the simplified `2 lambda sqrt(f'c)` is the permitted expression and `lambda_s` does not apply.
+
 ### fix(hvac): fall back to the main thread when the Manual J worker fails to load; 2026-07-19
 
 - `runInWorker` (calc-hvac.js, used by the Manual J cooling/heating and duct-sizing tiles) resolved its promise only

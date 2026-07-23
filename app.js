@@ -628,6 +628,8 @@ const TOOL_MODULES = (() => {
     "concrete-torsion-threshold",
     // spec-v284..v286 member depth batch
     "rc-column-axial", "rc-column-steel-for-load", "rc-punching-shear", "rc-hook-development",
+    // spec-v1008 one-way shear without stirrups (ACI 318-19 22.5.5.1 detailed method)
+    "rc-one-way-shear",
     // spec-v299..v301 depth-2 batch
     "rc-slab-min-thickness", "rc-slab-max-span-for-thickness", "rc-doubly-reinforced", "rc-shear-friction",
     "concrete-elastic-modulus", "concrete-strength-from-modulus", "concrete-modulus-of-rupture", "concrete-strength-from-rupture", "concrete-cracking-moment", "concrete-depth-for-cracking-moment", "concrete-shrinkage-temperature-steel",

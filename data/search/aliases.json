@@ -15012,6 +15012,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "one-way shear",
+      "target": "rc-one-way-shear",
+      "kind": "industry"
+    },
+    {
+      "term": "beam shear without stirrups",
+      "target": "rc-one-way-shear",
+      "kind": "industry"
+    },
+    {
+      "term": "shear without shear reinforcement",
+      "target": "rc-one-way-shear",
+      "kind": "adjacent"
+    },
+    {
+      "term": "size effect shear factor",
+      "target": "rc-one-way-shear",
+      "kind": "industry"
+    },
+    {
+      "term": "lambda_s size effect",
+      "target": "rc-one-way-shear",
+      "kind": "adjacent"
+    },
+    {
+      "term": "one-way slab shear",
+      "target": "rc-one-way-shear",
+      "kind": "adjacent"
+    },
+    {
+      "term": "footing one-way shear",
+      "target": "rc-one-way-shear",
+      "kind": "adjacent"
+    },
+    {
+      "term": "aci 22.5.5.1",
+      "target": "rc-one-way-shear",
+      "kind": "industry"
+    },
+    {
       "term": "hook development length",
       "target": "rc-hook-development",
       "kind": "industry"
@@ -48194,6 +48234,36 @@
     {
       "term": "drop panel needed for slab shear",
       "target": "rc-punching-shear",
+      "kind": "question"
+    },
+    {
+      "term": "one way shear on a footing without stirrups",
+      "target": "rc-one-way-shear",
+      "kind": "question"
+    },
+    {
+      "term": "does a concrete slab need stirrups for shear",
+      "target": "rc-one-way-shear",
+      "kind": "question"
+    },
+    {
+      "term": "concrete beam shear capacity with no stirrups",
+      "target": "rc-one-way-shear",
+      "kind": "question"
+    },
+    {
+      "term": "size effect on concrete shear strength",
+      "target": "rc-one-way-shear",
+      "kind": "question"
+    },
+    {
+      "term": "shear strength of a footing without shear reinforcement",
+      "target": "rc-one-way-shear",
+      "kind": "question"
+    },
+    {
+      "term": "does a deep lightly reinforced slab carry less shear",
+      "target": "rc-one-way-shear",
       "kind": "question"
     },
     {

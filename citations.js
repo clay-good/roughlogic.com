@@ -14909,6 +14909,18 @@ export const CITATIONS = {
       { name: "Position constant", value: "alpha_s = 40 interior, 30 edge, 20 corner", source: "ACI 318-19 22.6.5.3" },
     ],
   },
+  "rc-one-way-shear": {
+    formula: "rho_w = As/(bw d); lambda_s = min(sqrt(2/(1 + d/10)), 1.0); vc = 8 lambda_s lambda (rho_w)^(1/3) sqrt(f'c) (sqrt(f'c) <= 100 psi); Vc = vc bw d; phi Vc = 0.75 Vc.",
+    edition: "The ACI 318-19 Table 22.5.5.1(b) one-way (beam-action) shear Vc for a member without at least minimum shear reinforcement, the 22.5.5.1.3 size-effect factor lambda_s, and phi = 0.75, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; Table 22.5.5.1 and the 22.5.5.1.3 size-effect factor are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 Table 22.5.5.1(b) detailed one-way shear Vc = 8 lambda_s lambda (rho_w)^(1/3) sqrt(f'c) bw d for a member without at least Av,min shear reinforcement and no axial load, with rho_w = As/(bw d) the longitudinal tension-steel ratio, the 22.5.5.1.3 size-effect factor lambda_s = sqrt(2/(1 + d/10)) capped at 1.0 (new in the 2019 edition), the 22.5.3.1 cap sqrt(f'c) <= 100 psi, and phi = 0.75. This returns the concrete beam-action shear capacity of a footing, one-way slab, or shallow beam with no stirrups - it assumes no axial load, that the member genuinely lacks at least minimum shear reinforcement (if it has stirrups, lambda_s = 1.0 and the simplified 2 lambda sqrt(f'c) or the (a) expressions govern, see rc-beam-shear), and that the tension steel is developed at the section. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "No-stirrup case", value: "Table 22.5.5.1(b) applies only when Av < Av,min; a member with at least minimum stirrups uses lambda_s = 1.0 and the (a) expressions", source: "ACI 318-19 Table 22.5.5.1" },
+      { name: "Size-effect factor", value: "lambda_s = sqrt(2/(1 + d/10)) <= 1.0; 1.0 up to d = 10 in, smaller for deeper sections", source: "ACI 318-19 22.5.5.1.3" },
+      { name: "Strength cap", value: "sqrt(f'c) taken as at most 100 psi", source: "ACI 318-19 22.5.3.1" },
+    ],
+  },
   "rc-hook-development": {
     formula: "psi_c = f'c/15,000 + 0.6 (f'c < 6,000 psi, else 1.0); ldh = (fy psi_e psi_r psi_o psi_c / (55 lambda sqrt(f'c))) db^1.5; ldh = max(ldh, 8 db, 6 in).",
     edition: "The ACI 318-19 Eq. 25.4.3.1a hooked-bar tension development length with the 25.4.3.2 modification factors and the max(8 db, 6 in) minimum, by name.",

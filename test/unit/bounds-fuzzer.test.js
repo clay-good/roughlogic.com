@@ -28815,3 +28815,39 @@ test("bounds: spec-v1007 computeFlywheelEnergy pins the rotational KE and speed 
   assert.ok("error" in _v1007({ weight_lb: 100, radius_of_gyration_ft: 1, rpm: 1000, energy_fluctuation_ftlb: -1 }));
   assert.ok("error" in _v1007({ weight_lb: Infinity, radius_of_gyration_ft: 1, rpm: 1000, energy_fluctuation_ftlb: 0 }));
 });
+
+import { computeRcOneWayShear as _v1008 } from "../../calc-concrete.js";
+
+test("bounds: spec-v1008 computeRcOneWayShear pins the ACI 318-19 22.5.5.1(b) Vc, the size-effect factor, the sqrt(f'c) cap, and error seams", () => {
+  const base = { fc_psi: 4000, bw_in: 12, d_in: 16, as_in2: 1.0, vu_kip: 0, lambda: 1.0 };
+  const r = _v1008(base);
+  assert.ok(Math.abs(r.rho_w - 1.0 / (12 * 16)) < 1e-9); // 0.0052083
+  assert.ok(Math.abs(r.lambda_s - Math.sqrt(2 / 2.6)) < 1e-9); // 0.877058
+  assert.ok(Math.abs(r.vc_psi - 76.9215) < 1e-3); // 8*0.877058*cbrt(0.0052083)*sqrt(4000)
+  assert.ok(Math.abs(r.phi_vc_kip - 11.0767) < 1e-3); // 0.75 * 76.9215 * 12 * 16 / 1000
+  assert.ok(Math.abs(r.vc_simplified_kip - 24.2863) < 1e-3); // 2*sqrt(4000)*12*16/1000
+  // The whole point of the 2019 detailed method: a deep, lightly reinforced
+  // section carries LESS than the old 2 sqrt(f'c) rule of thumb.
+  assert.ok(r.vc_kip < r.vc_simplified_kip);
+  // 22.5.5.1.3 size-effect factor: exactly 1.0 at and below d = 10 in, under it above.
+  assert.strictEqual(_v1008({ ...base, d_in: 10 }).lambda_s, 1);
+  assert.strictEqual(_v1008({ ...base, d_in: 8 }).lambda_s, 1);
+  assert.ok(_v1008({ ...base, d_in: 11 }).lambda_s < 1);
+  assert.ok(Math.abs(_v1008({ ...base, d_in: 10 }).phi_vc_kip - 9.232) < 1e-2); // lambda_s = 1.0 cross-check
+  // More tension steel raises rho_w and so Vc; lightweight lowers it by lambda.
+  assert.ok(_v1008({ ...base, as_in2: 2.0 }).vc_kip > r.vc_kip);
+  assert.ok(Math.abs(_v1008({ ...base, lambda: 0.75 }).vc_kip - 0.75 * r.vc_kip) < 1e-9);
+  // 22.5.3.1 caps sqrt(f'c) at 100 psi, so 15,000 psi computes the same as 10,000.
+  assert.ok(Math.abs(_v1008({ ...base, fc_psi: 15000 }).vc_psi - _v1008({ ...base, fc_psi: 10000 }).vc_psi) < 1e-9);
+  // Adequacy verdict: null until a Vu is entered, then a real comparison.
+  assert.strictEqual(r.adequate, null);
+  assert.strictEqual(_v1008({ ...base, vu_kip: 5 }).adequate, true);
+  assert.strictEqual(_v1008({ ...base, vu_kip: 50 }).adequate, false);
+  // Error seams.
+  assert.ok("error" in _v1008({ ...base, fc_psi: 0 }));
+  assert.ok("error" in _v1008({ ...base, bw_in: 0 }));
+  assert.ok("error" in _v1008({ ...base, d_in: 0 }));
+  assert.ok("error" in _v1008({ ...base, as_in2: 0 }));
+  assert.ok("error" in _v1008({ ...base, lambda: 1.5 }));
+  assert.ok("error" in _v1008({ ...base, d_in: Infinity }));
+});

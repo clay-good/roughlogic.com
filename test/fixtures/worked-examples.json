@@ -49356,6 +49356,80 @@
    }
   },
   {
+   "tile_id": "rc-one-way-shear",
+   "source_publisher": "ACI 318-19 Table 22.5.5.1(b)",
+   "source_title": "12 in strip, d = 16 in, 4,000 psi, As = 1.0 in^2 -> lambda_s 0.877, vc 77 psi, phi Vc 11.1 kip",
+   "source_edition_or_year": "spec-v1008 worked example (machine-verified)",
+   "source_section_or_page": "spec-v1008 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "fc_psi": 4000,
+    "bw_in": 12,
+    "d_in": 16,
+    "as_in2": 1.0,
+    "vu_kip": 0,
+    "lambda": 1.0
+   },
+   "outputs": {
+    "lambda_s": {
+     "value": 0.8771,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "vc_psi": {
+     "value": 76.92,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "phi_vc_kip": {
+     "value": 11.08,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-one-way-shear",
+   "source_publisher": "ACI 318-19 Table 22.5.5.1(b)",
+   "source_title": "cross-check: d = 10 in -> lambda_s = 1.0 (size effect off), phi Vc 9.2 kip",
+   "source_edition_or_year": "spec-v1008 worked example (machine-verified)",
+   "source_section_or_page": "spec-v1008 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "fc_psi": 4000,
+    "bw_in": 12,
+    "d_in": 10,
+    "as_in2": 1.0,
+    "vu_kip": 0,
+    "lambda": 1.0
+   },
+   "outputs": {
+    "lambda_s": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "vc_psi": {
+     "value": 102.58,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "phi_vc_kip": {
+     "value": 9.232,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-hook-development",
    "source_publisher": "ACI 318-19 Eq. 25.4.3.1a",
    "source_title": "#8 Grade 60 in 4,000 psi, base factors -> psi_c 0.867, ldh 14.9 in",
