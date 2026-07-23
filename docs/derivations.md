@@ -1551,6 +1551,7 @@ cross-check.
 | calc-concrete.js | `computeRcDevelopmentLength` | `{ fc = 4000, fy = 60000, db = 0, psi_t = 1.0, psi_e = 1.0, psi_s = 1.0, psi_g...` | _ | _ | _ |
 | calc-concrete.js | `computeRcDoublyReinforced` | `{ b_in = 0, d_in = 0, dp_in = 0, as_in2 = 0, asp_in2 = 0, fc_psi = 4000, fy_p...` | _ | _ | _ |
 | calc-concrete.js | `computeRcHookDevelopment` | `{ db_in = 0, fy_psi = 60000, fc_psi = 4000, psi_e = 1.0, psi_r = 1.0, psi_o =...` | _ | _ | _ |
+| calc-concrete.js | `computeRcMinShearReinforcement` | `{ fc_psi = 4000, fyt_psi = 60000, bw_in = 0, d_in = 0, av_in2 = 0, vu_kip = 0...` | _ | _ | _ |
 | calc-concrete.js | `computeRcOneWayShear` | `{ fc_psi = 4000, bw_in = 0, d_in = 0, as_in2 = 0, vu_kip = 0, lambda = 1.0 } ...` | _ | _ | _ |
 | calc-concrete.js | `computeRcPunchingShear` | `{ c1_in = 0, c2_in = 0, d_in = 0, fc_psi = 4000, position = "interior", lambd...` | _ | _ | _ |
 | calc-concrete.js | `computeRcShearFriction` | `{ avf_in2 = 0, fy_psi = 60000, ac_in2 = 0, fc_psi = 4000, iface = "roughened"...` | _ | _ | _ |
@@ -3118,7 +3119,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1704.
+Row count: 1705.
 
 <!-- END function-corpus-v14 -->
 
@@ -3724,7 +3725,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (368 tiles)
+### Group E Construction (369 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3936,6 +3937,7 @@ per spec-v14 §13.1 second paragraph.
 | `rc-development-length` | Rebar Tension Development Length (ACI 318-19) | ACI 318-19 (Building Code Requirement...; spec-v259 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-doubly-reinforced` | Doubly-Reinforced Concrete Beam Flexural Capacity (ACI 318-19) | ACI 318-19 doubly-reinforced flexure; spec-v300 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-hook-development` | Standard Hook Development Length (ACI 318-19 25.4.3) | ACI 318-19 Eq. 25.4.3.1a; spec-v286 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `rc-min-shear-reinforcement` | Minimum Stirrups and the Section-Size Limit (ACI 318-19 9.6.3) | ACI 318-19 9.6.3.4 / 9.6.3.1 / 22.5.1...; spec-v1009 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-one-way-shear` | One-Way Concrete Shear Without Stirrups (ACI 318-19 22.5.5.1) | ACI 318-19 Table 22.5.5.1(b); spec-v1008 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-punching-shear` | Two-Way Slab Punching Shear at a Column (ACI 318-19 22.6) | ACI 318-19 Table 22.6.5.2; spec-v285 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-shear-friction` | Shear Friction Across an Interface (ACI 318-19 22.9) | ACI 318-19 22.9; spec-v301 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4761,6 +4763,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1457. Fixture-covered or reference-cadence: 1457 / 1457.
+Tile count: 1458. Fixture-covered or reference-cadence: 1458 / 1458.
 
 <!-- END tile-index-v14 -->

@@ -402,6 +402,78 @@ CONCRETE_RENDERERS["rc-one-way-shear"] = _simpleRenderer({
   compute: computeRcOneWayShear,
 });
 
+// dims: in { fc_psi: M L^-1 T^-2, fyt_psi: M L^-1 T^-2, bw_in: L, d_in: L, av_in2: L^2, vu_kip: M L T^-2, lambda: dimensionless } out: { av_min_per_s: L, s_max_av_min_in: L, trigger_kip: M L T^-2, vc_kip: M L T^-2, vs_req_kip: M L T^-2, vs_max_kip: M L T^-2, phi_vn_max_kip: M L T^-2, s_max_code_in: L, s_max_in: L }
+export function computeRcMinShearReinforcement({ fc_psi = 4000, fyt_psi = 60000, bw_in = 0, d_in = 0, av_in2 = 0, vu_kip = 0, lambda = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fc_psi > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (!(fyt_psi > 0)) return { error: "Stirrup yield fyt must be positive (psi)." };
+  if (!(bw_in > 0)) return { error: "Web width bw must be positive (in)." };
+  if (!(d_in > 0)) return { error: "Effective depth d must be positive (in)." };
+  if (!(av_in2 > 0)) return { error: "Stirrup area Av must be positive (in^2)." };
+  if (!(lambda > 0 && lambda <= 1)) return { error: "The lightweight factor lambda is over 0 and up to 1.0." };
+  const PHI = 0.75;
+  // 22.5.3.1 caps sqrt(f'c) at 100 psi for the shear-STRENGTH terms (Vc, the
+  // 9.6.3.1 trigger, and the Vs limits). The 9.6.3.4 Av,min detailing minimum
+  // sits in Chapter 9 and carries no such cap, so it uses the true sqrt(f'c).
+  // The two differ only above f'c = 10,000 psi.
+  const sqrt_fc_raw = Math.sqrt(fc_psi);
+  const sqrt_fc = Math.min(sqrt_fc_raw, 100);
+  // 9.6.3.4: Av,min/s = greater of 0.75 sqrt(f'c) bw/fyt and 50 bw/fyt.
+  const av_min_a = 0.75 * sqrt_fc_raw * bw_in / fyt_psi;
+  const av_min_b = 50 * bw_in / fyt_psi;
+  const av_min_per_s = Math.max(av_min_a, av_min_b);
+  const av_min_governs = av_min_a >= av_min_b ? "the 0.75 sqrt(f'c) bw/fyt term (f'c above ~4,444 psi)" : "the 50 bw/fyt floor (f'c below ~4,444 psi)";
+  const s_max_av_min_in = av_in2 / av_min_per_s;
+  // 9.6.3.1: Av,min is required where Vu > phi lambda sqrt(f'c) bw d (ACI
+  // 318-19 replaced the 318-14 "Vu > 0.5 phi Vc" trigger with this one).
+  const trigger_kip = PHI * lambda * sqrt_fc * bw_in * d_in / 1000;
+  const av_min_required = vu_kip > 0 ? vu_kip > trigger_kip : null;
+  // Simplified Vc for a member with at least Av,min (Table 22.5.5.1(a)).
+  const vc_kip = 2 * lambda * sqrt_fc * bw_in * d_in / 1000;
+  const vs_req_kip = vu_kip > 0 ? Math.max(0, vu_kip / PHI - vc_kip) : 0;
+  // 22.5.1.2 section-size ceiling and the 9.7.6.2.2 spacing tightening.
+  const vs_max_kip = 8 * sqrt_fc * bw_in * d_in / 1000;
+  const vs_half_kip = 4 * sqrt_fc * bw_in * d_in / 1000;
+  const phi_vn_max_kip = PHI * (vc_kip + vs_max_kip);
+  const tightened = vs_req_kip > vs_half_kip;
+  const s_max_code_in = tightened ? Math.min(d_in / 4, 12) : Math.min(d_in / 2, 24);
+  const s_max_in = Math.min(s_max_code_in, s_max_av_min_in);
+  const section_adequate = vu_kip > 0 ? vu_kip <= phi_vn_max_kip : null;
+  return {
+    av_min_per_s, av_min_governs, s_max_av_min_in, trigger_kip, av_min_required,
+    vc_kip, vs_req_kip, vs_max_kip, phi_vn_max_kip, tightened, s_max_code_in, s_max_in, section_adequate,
+    note: "The detailing and section-size checks that sit BESIDE the rc-beam-shear strength calculation, all ACI 318-19. (1) 9.6.3.4 minimum shear reinforcement Av,min/s = greater of 0.75 sqrt(f'c) bw/fyt and 50 bw/fyt; the 50 bw/fyt floor governs below about 4,444 psi and the sqrt(f'c) term above it. Dividing the stirrup area by Av,min/s gives the widest spacing that still satisfies the minimum. (2) 9.6.3.1 requires Av,min wherever Vu exceeds phi lambda sqrt(f'c) bw d -- the 2019 edition REPLACED the old 318-14 'Vu > 0.5 phi Vc' trigger with this one, and Table 9.6.3.1 exempts shallow beams (h <= 10 in), joists, and certain slab-integral members, which are not modeled here. (3) 22.5.1.2 caps the stirrup contribution at Vs <= 8 sqrt(f'c) bw d, so the section itself can never carry more than phi (Vc + 8 sqrt(f'c) bw d) no matter how much steel is added -- past that the beam must get deeper or wider. (4) 9.7.6.2.2 caps stirrup spacing at the lesser of d/2 and 24 in, halved to d/4 and 12 in once Vs exceeds 4 sqrt(f'c) bw d. Vc uses the simplified Table 22.5.5.1(a) expression appropriate to a member with at least Av,min. A design aid, not a substitute for the structural engineer of record's stamped design.",
+  };
+}
+export const rcMinShearReinforcementExample = { inputs: { fc_psi: 4000, fyt_psi: 60000, bw_in: 12, d_in: 21.5, av_in2: 0.22, vu_kip: 40, lambda: 1.0 } };
+
+CONCRETE_RENDERERS["rc-min-shear-reinforcement"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 9.6.3.4 (Av,min/s = greater of 0.75 sqrt(f'c) bw/fyt and 50 bw/fyt), 9.6.3.1 (Av,min required where Vu > phi lambda sqrt(f'c) bw d, the 2019 replacement for the 318-14 0.5 phi Vc trigger), 22.5.1.2 (Vs <= 8 sqrt(f'c) bw d section-size ceiling), and 9.7.6.2.2 (spacing at the lesser of d/2 and 24 in, halved past Vs = 4 sqrt(f'c) bw d), with phi = 0.75, by name. The Table 9.6.3.1 exemptions are not modeled. A design aid, not a substitute for the engineer of record.",
+  example: rcMinShearReinforcementExample.inputs,
+  fields: [
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "fyt_psi", label: "Stirrup yield fyt (psi)", kind: "number", default: 60000 },
+    { key: "bw_in", label: "Web width bw (in)", kind: "number" },
+    { key: "d_in", label: "Effective depth d (in)", kind: "number" },
+    { key: "av_in2", label: "Stirrup area Av, both legs (in^2)", kind: "number" },
+    { key: "vu_kip", label: "Factored shear Vu (kip, 0 = detailing only)", kind: "number", default: 0 },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight)", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "am", id: "rmsr-out-am", label: "Minimum Av/s required", value: (r) => fmt(r.av_min_per_s, 4) + " in^2/in" },
+    { key: "ag", id: "rmsr-out-ag", label: "Which minimum governs", value: (r) => r.av_min_governs },
+    { key: "sa", id: "rmsr-out-sa", label: "Widest spacing meeting Av,min", value: (r) => fmt(r.s_max_av_min_in, 1) + " in" },
+    { key: "tr", id: "rmsr-out-tr", label: "Av,min triggered above Vu of", value: (r) => fmt(r.trigger_kip, 1) + " kip" },
+    { key: "rq", id: "rmsr-out-rq", label: "Av,min required here", value: (r) => r.av_min_required === null ? "- (enter Vu to check)" : (r.av_min_required ? "YES (Vu > phi lambda sqrt(f'c) bw d)" : "no (below the trigger)") },
+    { key: "sc", id: "rmsr-out-sc", label: "Code max spacing", value: (r) => fmt(r.s_max_code_in, 2) + " in" + (r.tightened ? " (halved: Vs > 4 sqrt(f'c) bw d)" : "") },
+    { key: "sg", id: "rmsr-out-sg", label: "Governing max spacing", value: (r) => fmt(r.s_max_in, 2) + " in" },
+    { key: "vm", id: "rmsr-out-vm", label: "Section ceiling phi (Vc + Vs,max)", value: (r) => fmt(r.phi_vn_max_kip, 1) + " kip" },
+    { key: "ok", id: "rmsr-out-ok", label: "Section big enough for Vu", value: (r) => r.section_adequate === null ? "- (enter Vu to check)" : (r.section_adequate ? "YES" : "NO (deepen or widen; more stirrups cannot help)") },
+    { key: "n", id: "rmsr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRcMinShearReinforcement,
+});
+
 // dims: in { db_in: L, fy_psi: M L^-1 T^-2, fc_psi: M L^-1 T^-2, psi_e: dimensionless, psi_r: dimensionless, psi_o: dimensionless, lambda: dimensionless } out: { psi_c: dimensionless, ldh_eq_in: L, ldh_in: L }
 export function computeRcHookDevelopment({ db_in = 0, fy_psi = 60000, fc_psi = 4000, psi_e = 1.0, psi_r = 1.0, psi_o = 1.0, lambda = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

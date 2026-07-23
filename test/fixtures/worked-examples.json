@@ -49430,6 +49430,94 @@
    }
   },
   {
+   "tile_id": "rc-min-shear-reinforcement",
+   "source_publisher": "ACI 318-19 9.6.3.4 / 9.6.3.1 / 22.5.1.2 / 9.7.6.2.2",
+   "source_title": "12 x 21.5 in beam, #3 stirrups, 4,000 psi -> Av,min/s 0.0100, d/2 governs at 10.75 in, ceiling 122.4 kip",
+   "source_edition_or_year": "spec-v1009 worked example (machine-verified)",
+   "source_section_or_page": "spec-v1009 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "fc_psi": 4000,
+    "fyt_psi": 60000,
+    "bw_in": 12,
+    "d_in": 21.5,
+    "av_in2": 0.22,
+    "vu_kip": 40,
+    "lambda": 1.0
+   },
+   "outputs": {
+    "av_min_per_s": {
+     "value": 0.01,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "s_max_av_min_in": {
+     "value": 22.0,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "trigger_kip": {
+     "value": 12.238,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "s_max_in": {
+     "value": 10.75,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "phi_vn_max_kip": {
+     "value": 122.38,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-min-shear-reinforcement",
+   "source_publisher": "ACI 318-19 22.5.1.2 / 9.7.6.2.2",
+   "source_title": "cross-check: Vu = 150 kip on the same section exceeds the 122.4 kip ceiling and halves the spacing to d/4",
+   "source_edition_or_year": "spec-v1009 worked example (machine-verified)",
+   "source_section_or_page": "spec-v1009 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-23",
+   "inputs": {
+    "fc_psi": 4000,
+    "fyt_psi": 60000,
+    "bw_in": 12,
+    "d_in": 21.5,
+    "av_in2": 0.22,
+    "vu_kip": 150,
+    "lambda": 1.0
+   },
+   "outputs": {
+    "s_max_code_in": {
+     "value": 5.375,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "vs_max_kip": {
+     "value": 130.539,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "phi_vn_max_kip": {
+     "value": 122.38,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-hook-development",
    "source_publisher": "ACI 318-19 Eq. 25.4.3.1a",
    "source_title": "#8 Grade 60 in 4,000 psi, base factors -> psi_c 0.867, ldh 14.9 in",

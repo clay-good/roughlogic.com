@@ -15052,6 +15052,41 @@
       "kind": "industry"
     },
     {
+      "term": "minimum shear reinforcement",
+      "target": "rc-min-shear-reinforcement",
+      "kind": "industry"
+    },
+    {
+      "term": "av min stirrups",
+      "target": "rc-min-shear-reinforcement",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum stirrup area",
+      "target": "rc-min-shear-reinforcement",
+      "kind": "adjacent"
+    },
+    {
+      "term": "maximum stirrup spacing",
+      "target": "rc-min-shear-reinforcement",
+      "kind": "industry"
+    },
+    {
+      "term": "section size limit shear",
+      "target": "rc-min-shear-reinforcement",
+      "kind": "adjacent"
+    },
+    {
+      "term": "vs limit 8 sqrt fc",
+      "target": "rc-min-shear-reinforcement",
+      "kind": "adjacent"
+    },
+    {
+      "term": "aci 9.6.3",
+      "target": "rc-min-shear-reinforcement",
+      "kind": "industry"
+    },
+    {
       "term": "hook development length",
       "target": "rc-hook-development",
       "kind": "industry"
@@ -48264,6 +48299,31 @@
     {
       "term": "does a deep lightly reinforced slab carry less shear",
       "target": "rc-one-way-shear",
+      "kind": "question"
+    },
+    {
+      "term": "minimum stirrups required in a concrete beam",
+      "target": "rc-min-shear-reinforcement",
+      "kind": "question"
+    },
+    {
+      "term": "how far apart can stirrups be spaced",
+      "target": "rc-min-shear-reinforcement",
+      "kind": "question"
+    },
+    {
+      "term": "beam too small for shear no matter how many stirrups",
+      "target": "rc-min-shear-reinforcement",
+      "kind": "question"
+    },
+    {
+      "term": "when are stirrups required by code",
+      "target": "rc-min-shear-reinforcement",
+      "kind": "question"
+    },
+    {
+      "term": "do i need to halve the stirrup spacing",
+      "target": "rc-min-shear-reinforcement",
       "kind": "question"
     },
     {

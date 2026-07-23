@@ -14921,6 +14921,19 @@ export const CITATIONS = {
       { name: "Strength cap", value: "sqrt(f'c) taken as at most 100 psi", source: "ACI 318-19 22.5.3.1" },
     ],
   },
+  "rc-min-shear-reinforcement": {
+    formula: "Av,min/s = max(0.75 sqrt(f'c) bw/fyt, 50 bw/fyt); s(Av,min) = Av / (Av,min/s); trigger = phi lambda sqrt(f'c) bw d; Vs,max = 8 sqrt(f'c) bw d; phi Vn,max = phi (2 lambda sqrt(f'c) bw d + Vs,max); s <= min(d/2, 24 in), or min(d/4, 12 in) when Vs > 4 sqrt(f'c) bw d. (phi = 0.75)",
+    edition: "The ACI 318-19 9.6.3.4 minimum shear reinforcement, the 9.6.3.1 Av,min trigger, the 22.5.1.2 Vs section-size ceiling, and the 9.7.6.2.2 stirrup-spacing maxima, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; 9.6.3, 9.7.6.2.2, and 22.5.1.2 are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 detailing and section-size checks that accompany a beam-shear strength calculation: 9.6.3.4 Av,min/s as the greater of 0.75 sqrt(f'c) bw/fyt and 50 bw/fyt (the 50 bw/fyt floor governs below about f'c = 4,444 psi); 9.6.3.1, which requires Av,min wherever Vu exceeds phi lambda sqrt(f'c) bw d -- the 2019 edition replaced the 318-14 'Vu > 0.5 phi Vc' trigger with this expression; 22.5.1.2, which caps the stirrup contribution at Vs = 8 sqrt(f'c) bw d so the section has an absolute ceiling of phi (Vc + 8 sqrt(f'c) bw d) regardless of reinforcement; and 9.7.6.2.2, which caps spacing at the lesser of d/2 and 24 in, halved to d/4 and 12 in once Vs exceeds 4 sqrt(f'c) bw d. Vc uses the simplified Table 22.5.5.1(a) expression appropriate to a member carrying at least Av,min. The Table 9.6.3.1 exemptions (shallow beams with h <= 10 in, one-way joist systems, certain slab-integral members) are NOT modeled, nor are torsion, deep-beam action, or prestressed members. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Minimum area", value: "Av,min/s is the greater of 0.75 sqrt(f'c) bw/fyt and 50 bw/fyt; the constant floor governs at ordinary strengths", source: "ACI 318-19 9.6.3.4" },
+      { name: "2019 trigger", value: "Av,min required where Vu > phi lambda sqrt(f'c) bw d, replacing the 318-14 0.5 phi Vc rule; Table 9.6.3.1 exemptions not modeled", source: "ACI 318-19 9.6.3.1" },
+      { name: "Section ceiling", value: "Vs may not exceed 8 sqrt(f'c) bw d, so beyond phi (Vc + Vs,max) the section must grow", source: "ACI 318-19 22.5.1.2" },
+      { name: "Spacing maxima", value: "lesser of d/2 and 24 in, halved to d/4 and 12 in once Vs exceeds 4 sqrt(f'c) bw d", source: "ACI 318-19 9.7.6.2.2" },
+    ],
+  },
   "rc-hook-development": {
     formula: "psi_c = f'c/15,000 + 0.6 (f'c < 6,000 psi, else 1.0); ldh = (fy psi_e psi_r psi_o psi_c / (55 lambda sqrt(f'c))) db^1.5; ldh = max(ldh, 8 db, 6 in).",
     edition: "The ACI 318-19 Eq. 25.4.3.1a hooked-bar tension development length with the 25.4.3.2 modification factors and the max(8 db, 6 in) minimum, by name.",

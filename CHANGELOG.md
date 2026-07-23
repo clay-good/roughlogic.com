@@ -4,6 +4,26 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): minimum stirrups and the section-size limit (spec-v1009); 2026-07-23
+
+- New tile `rc-min-shear-reinforcement` (Group E, calc-concrete.js): the ACI 318-19 detailing checks that bound a beam
+  shear design but were computed nowhere in the catalog. `rc-beam-shear`'s citation named them as gaps ("does not check
+  the §22.5.1.2 upper limit ... the §9.6.3 minimum shear reinforcement") and its output said only "minimums still
+  apply". This is the case where a beam **passes the strength math and is still under-detailed** -- or is simply too
+  small, in a way no amount of stirrup steel can fix. Computes 9.6.3.4 `Av,min/s = max(0.75 sqrt(f'c) bw/fyt,
+  50 bw/fyt)`, the 9.6.3.1 trigger, the 22.5.1.2 ceiling `Vs <= 8 sqrt(f'c) bw d`, and the 9.7.6.2.2 spacing maxima
+  (d/2 and 24 in, halved to d/4 and 12 in past `Vs = 4 sqrt(f'c) bw d`). A 12 x 21.5 in beam with #3 stirrups needs
+  Av/s = 0.0100 in^2/in, so 22 in meets the minimum but the d/2 = 10.75 in cap governs, and the section tops out at
+  122.4 kip. Home tile count 1,457 -> 1,458.
+- **Correction carried by this tile:** ACI 318-19 §9.6.3.1 requires Av,min where `Vu > phi lambda sqrt(f'c) bw d`. The
+  2019 edition **replaced** the ACI 318-14 `Vu > 0.5 phi Vc` trigger, which is still widely quoted (and was the value
+  initially proposed for this tile before it was checked against the standard). The 2019 expression is what shipped.
+- The §22.5.3.1 `sqrt(f'c) <= 100 psi` cap is applied to the shear-strength terms but deliberately **not** to the
+  Chapter 9 Av,min detailing minimum, which carries no such cap. The two differ only above f'c = 10,000 psi; the
+  distinction is commented in the source so a future audit does not "correct" it.
+- Build: `calc-concrete.js` gzip cap raised 32,000 -> 36,000 B. The two new tiles took the module to 32,792 B (102.5%
+  of the old cap); both carry long standards notes. The module is lazy-loaded and not in the home-view payload.
+
 ### feat(concrete): one-way shear without stirrups, the ACI 318-19 detailed method (spec-v1008); 2026-07-23
 
 - New tile `rc-one-way-shear` (Group E, calc-concrete.js): `Vc = 8 lambda_s lambda (rho_w)^(1/3) sqrt(f'c) bw d`, the

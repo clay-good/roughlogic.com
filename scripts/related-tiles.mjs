@@ -1534,6 +1534,7 @@ const RELATED = {
   "concrete-corbel-bracket": ["rc-shear-friction","rc-beam-shear","concrete-bearing-strength"],
   "rc-punching-shear": ["rc-beam-shear","rc-column-axial","footing-area"],
   "rc-one-way-shear": ["rc-beam-shear","rc-punching-shear","footing-area"],
+  "rc-min-shear-reinforcement": ["rc-beam-shear","rc-one-way-shear","concrete-torsion-threshold"],
   "rc-hook-development": ["rc-development-length","rebar-lap-splice","rebar"],
   // spec-v287..v289 geotechnical foundation depth batch (Group E)
   "soil-settlement-elastic": ["soil-bearing-capacity","footing-area","pile-axial-capacity"],

@@ -587,6 +587,8 @@ const _TILES = [
   ["rc-column-axial", "E"], ["rc-column-steel-for-load", "E"], ["rc-punching-shear", "E"], ["rc-hook-development", "E"],
   // spec-v1008 ACI 318-19 one-way shear without stirrups (detailed size-effect method)
   ["rc-one-way-shear", "E"],
+  // spec-v1009 ACI 318-19 minimum shear reinforcement + section-size limit
+  ["rc-min-shear-reinforcement", "E"],
   // spec-v287..v289 geotechnical foundation depth batch
   ["soil-settlement-elastic", "E"], ["elastic-settlement-allowable-pressure", "E"], ["pile-axial-capacity", "E"], ["pile-length-for-capacity", "E"], ["slope-stability-infinite", "E"], ["slope-failure-depth-for-fs", "E"], ["frost-depth-berggren", "E"],
   // spec-v290..v292 NDS wood-member depth batch

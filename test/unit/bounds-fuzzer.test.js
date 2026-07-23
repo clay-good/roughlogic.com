@@ -28851,3 +28851,51 @@ test("bounds: spec-v1008 computeRcOneWayShear pins the ACI 318-19 22.5.5.1(b) Vc
   assert.ok("error" in _v1008({ ...base, lambda: 1.5 }));
   assert.ok("error" in _v1008({ ...base, d_in: Infinity }));
 });
+
+import { computeRcMinShearReinforcement as _v1009 } from "../../calc-concrete.js";
+
+test("bounds: spec-v1009 computeRcMinShearReinforcement pins Av,min, the 9.6.3.1 trigger, the 22.5.1.2 ceiling, the spacing maxima, and error seams", () => {
+  const base = { fc_psi: 4000, fyt_psi: 60000, bw_in: 12, d_in: 21.5, av_in2: 0.22, vu_kip: 40, lambda: 1.0 };
+  const r = _v1009(base);
+  // 9.6.3.4: at 4,000 psi the 50 bw/fyt floor governs -> 50*12/60000 = 0.0100.
+  assert.ok(Math.abs(r.av_min_per_s - 0.01) < 1e-9);
+  assert.match(r.av_min_governs, /50 bw\/fyt/);
+  assert.ok(Math.abs(r.s_max_av_min_in - 22) < 1e-6); // 0.22 / 0.0100
+  // 9.6.3.1 trigger = phi lambda sqrt(f'c) bw d (the 2019 replacement for 0.5 phi Vc).
+  assert.ok(Math.abs(r.trigger_kip - 12.238) < 1e-2);
+  assert.strictEqual(r.av_min_required, true); // 40 kip > 12.24 kip
+  assert.strictEqual(_v1009({ ...base, vu_kip: 5 }).av_min_required, false);
+  // The crossover: at f'c = 4,444 psi the two minimums are equal; above it the
+  // 0.75 sqrt(f'c) term takes over and demands MORE steel.
+  assert.ok(Math.abs(_v1009({ ...base, fc_psi: 4444 }).av_min_per_s - 0.01) < 1e-5);
+  const hi = _v1009({ ...base, fc_psi: 6000 });
+  assert.ok(hi.av_min_per_s > r.av_min_per_s);
+  assert.match(hi.av_min_governs, /0\.75 sqrt/);
+  // 9.7.6.2.2: d/2 = 10.75 in governs over the 22 in that Av,min alone allows.
+  assert.ok(Math.abs(r.s_max_code_in - 10.75) < 1e-9);
+  assert.ok(Math.abs(r.s_max_in - 10.75) < 1e-9);
+  assert.strictEqual(r.tightened, false);
+  // 22.5.1.2: a demand past the ceiling halves the spacing AND fails the section.
+  const big = _v1009({ ...base, vu_kip: 150 });
+  assert.strictEqual(big.tightened, true);
+  assert.ok(Math.abs(big.s_max_code_in - 5.375) < 1e-9); // d/4
+  assert.ok(Math.abs(big.vs_max_kip - 130.539) < 1e-2); // 8 sqrt(f'c) bw d
+  assert.ok(Math.abs(big.phi_vn_max_kip - 122.38) < 1e-2); // 0.75 (Vc + Vs,max)
+  assert.strictEqual(big.section_adequate, false); // 150 > 122.38, more steel cannot help
+  assert.strictEqual(r.section_adequate, true);
+  // The ceiling is a property of the section, so adding stirrup area cannot raise it.
+  assert.ok(Math.abs(_v1009({ ...base, av_in2: 1.0 }).phi_vn_max_kip - r.phi_vn_max_kip) < 1e-9);
+  // Vu = 0 is the detailing-only mode: no verdicts, but the minimums still compute.
+  const q = _v1009({ ...base, vu_kip: 0 });
+  assert.strictEqual(q.av_min_required, null);
+  assert.strictEqual(q.section_adequate, null);
+  assert.ok(q.av_min_per_s > 0);
+  // Error seams.
+  assert.ok("error" in _v1009({ ...base, fc_psi: 0 }));
+  assert.ok("error" in _v1009({ ...base, fyt_psi: 0 }));
+  assert.ok("error" in _v1009({ ...base, bw_in: 0 }));
+  assert.ok("error" in _v1009({ ...base, d_in: 0 }));
+  assert.ok("error" in _v1009({ ...base, av_in2: 0 }));
+  assert.ok("error" in _v1009({ ...base, lambda: 1.5 }));
+  assert.ok("error" in _v1009({ ...base, bw_in: Infinity }));
+});

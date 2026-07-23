@@ -1102,6 +1102,7 @@ export const COMPUTE_MAP = {
   "units-of-production-depr": { module: "../../calc-accounting.js", fn: "computeUnitsOfProductionDepr" },
   "rc-punching-shear": { module: "../../calc-concrete.js", fn: "computeRcPunchingShear" },
   "rc-one-way-shear": { module: "../../calc-concrete.js", fn: "computeRcOneWayShear" },
+  "rc-min-shear-reinforcement": { module: "../../calc-concrete.js", fn: "computeRcMinShearReinforcement" },
   "rc-hook-development": { module: "../../calc-concrete.js", fn: "computeRcHookDevelopment" },
   // spec-v287..v289 geotechnical foundation depth batch (3 tiles)
   "soil-settlement-elastic": { module: "../../calc-geotech.js", fn: "computeSoilSettlementElastic" },
