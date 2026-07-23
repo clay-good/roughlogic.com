@@ -23913,6 +23913,31 @@ test("bounds: spec-v556 computeConcreteCorbelBracket pins the 0.2Vu tension clam
   assert.ok(Math.abs(_v556({ ...cb, horiz_tension_lb: 1000 }).nuc_lb - 8000) < 1);
   // A larger applied tension is used as-is.
   assert.ok(Math.abs(_v556({ ...cb, horiz_tension_lb: 12000 }).nuc_lb - 12000) < 1);
+  // ACI 318-19 16.5.5.1 floor Asc,min = 0.04 (f'c/fy) b d, and 16.5.5.2 closed
+  // stirrups Ah = 0.5 (Asc - An) within 2d/3. Both were missing. Validated
+  // against a published ACI 318-19 corbel example (f'c 5 ksi, fy 60 ksi,
+  // Vu 80 kip, Nu 40 kip, b 15, d 20, h 22, a 4): An 0.889, Avf 1.270,
+  // (2/3)Avf+An 1.735, Asc,min 1.000, Asc 1.735, Ah 0.423.
+  const pub = _v556({ factored_shear_lb: 80000, horiz_tension_lb: 40000, shear_span_av_in: 4, eff_depth_d_in: 20, height_h_in: 22, width_b_in: 15, fc_psi: 5000, fy_psi: 60000, friction_mu: 1.4 });
+  assert.ok(Math.abs(pub.an_in2 - 0.889) < 1e-3);
+  assert.ok(Math.abs(pub.avf_in2 - 1.270) < 1e-3);
+  assert.ok(Math.abs(pub.sf_path - 1.735) < 1e-3);
+  assert.ok(Math.abs(pub.asc_min_in2 - 1.000) < 1e-3); // 0.04 x (5000/60000) x 15 x 20
+  assert.ok(Math.abs(pub.asc_in2 - 1.735) < 1e-3);
+  assert.ok(Math.abs(pub.ah_in2 - 0.5 * (pub.asc_in2 - pub.an_in2)) < 1e-9);
+  assert.ok(Math.abs(pub.ah_in2 - 0.423) < 1e-3);
+  assert.ok(Math.abs(pub.ah_zone_in - (2 / 3) * 20) < 1e-9);
+  // Asc can never fall below the code minimum: a lightly loaded corbel must be
+  // driven by the floor, and the governing label must say so.
+  const light = _v556({ ...cb, factored_shear_lb: 2000, horiz_tension_lb: 0 });
+  assert.ok(Math.abs(light.asc_in2 - light.asc_min_in2) < 1e-9);
+  assert.ok(/minimum/i.test(light.governing_path));
+  // The floor never REDUCES the answer -- Asc is always >= both design paths.
+  for (const Vu of [2000, 10000, 30000, 60000]) {
+    const r2 = _v556({ ...cb, factored_shear_lb: Vu });
+    assert.ok(r2.asc_in2 >= r2.flex_path - 1e-9 && r2.asc_in2 >= r2.sf_path - 1e-9);
+    assert.ok(r2.asc_in2 >= r2.asc_min_in2 - 1e-9);
+  }
   // Error seams: non-finite, non-positive shear / depth / width / f'c / fy, av > d.
   assert.ok("error" in _v556({ ...cb, factored_shear_lb: Infinity }));
   assert.ok("error" in _v556({ ...cb, factored_shear_lb: 0 }));

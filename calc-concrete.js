@@ -1393,19 +1393,30 @@ export function computeConcreteCorbelBracket({ factored_shear_lb = 0, horiz_tens
   const an_in2 = nuc_lb / (0.75 * fy);
   const flex_path = af_in2 + an_in2;
   const sf_path = (2 / 3) * avf_in2 + an_in2;
-  const asc_in2 = Math.max(flex_path, sf_path);
-  const governing_path = flex_path >= sf_path ? "flexure + tension" : "shear-friction + tension";
+  // ACI 318-19 16.5.5.1 also imposes a FLOOR on the primary steel:
+  // Asc,min = 0.04 (f'c/fy) b d. Without it a lightly loaded corbel reports
+  // less steel than the code permits.
+  const asc_min_in2 = 0.04 * (fc / fy) * b * d;
+  const asc_in2 = Math.max(flex_path, sf_path, asc_min_in2);
+  const governing_path = asc_min_in2 >= Math.max(flex_path, sf_path)
+    ? "the 0.04 (f'c/fy) b d minimum"
+    : (flex_path >= sf_path ? "flexure + tension" : "shear-friction + tension");
+  // ACI 318-19 16.5.5.2 closed-stirrup (horizontal) reinforcement, distributed
+  // within 2d/3 adjacent to Asc. A corbel is not detailed without it.
+  const ah_in2 = 0.5 * (asc_in2 - an_in2);
+  const ah_zone_in = (2 / 3) * d;
   const phi_vn_lb = 0.75 * Math.min(0.2 * fc, 480 + 0.08 * fc, 1600) * b * d;
   return {
-    nuc_lb, avf_in2, af_in2, an_in2, flex_path, sf_path, asc_in2, governing_path, phi_vn_lb, shear_ok: Vu <= phi_vn_lb,
-    note: "The horizontal tension Nuc of at least 0.2 Vu is mandatory (restrained shrinkage and creep drag on the bearing) and drives the top steel. The primary steel is the greater of the flexure-plus-tension and shear-friction-plus-tension paths (which governs flips with the shear span). The shear is capped by the min-of-three limit, not the sqrt(f'c) shear, so a deep short corbel is cap-governed. ACI 318 and the engineer of record govern.",
+    nuc_lb, avf_in2, af_in2, an_in2, flex_path, sf_path, asc_min_in2, asc_in2, governing_path,
+    ah_in2, ah_zone_in, phi_vn_lb, shear_ok: Vu <= phi_vn_lb,
+    note: "The horizontal tension Nuc of at least 0.2 Vu is mandatory (restrained shrinkage and creep drag on the bearing) and drives the top steel. The primary steel is the greatest of the flexure-plus-tension path, the shear-friction-plus-tension path (which governs flips with the shear span), and the 16.5.5.1 floor Asc,min = 0.04 (f'c/fy) b d. Closed stirrups Ah = 0.5 (Asc - An) per 16.5.5.2 must be distributed within 2d/3 below the primary steel - a corbel is not detailed without them. The shear is capped by the min-of-three limit, not the sqrt(f'c) shear, so a deep short corbel is cap-governed. ACI 318 and the engineer of record govern.",
   };
 }
 
 export const concreteCorbelBracketExample = { inputs: { factored_shear_lb: 40000, horiz_tension_lb: 0, shear_span_av_in: 4, eff_depth_d_in: 12, height_h_in: 14, width_b_in: 14, fc_psi: 4000, fy_psi: 60000, friction_mu: 1.4 } };
 
 CONCRETE_RENDERERS["concrete-corbel-bracket"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Section 16.5 brackets and corbels: Nuc = max(input, 0.2 Vu); Avf = Vu/(phi mu fy); Mu = Vu av + Nuc(h - d); Af = Mu/(phi fy 0.85 d); An = Nuc/(phi fy); Asc = max(Af + An, (2/3)Avf + An); phiVn = phi min(0.2 f'c, 480 + 0.08 f'c, 1600) b d (phi = 0.75). The 0.2 Vu horizontal tension is mandatory and drives the top steel; the primary steel is the greater of two paths; the shear is capped by the min-of-three limit. ACI 318 and the engineer of record govern.",
+  citation: "Citation: ACI 318-19 Section 16.5 brackets and corbels: Nuc = max(input, 0.2 Vu); Avf = Vu/(phi mu fy); Mu = Vu av + Nuc(h - d); Af = Mu/(phi fy 0.85 d); An = Nuc/(phi fy); Asc = max(Af + An, (2/3)Avf + An, 0.04 (f'c/fy) b d per 16.5.5.1); Ah = 0.5 (Asc - An) closed stirrups within 2d/3 per 16.5.5.2; phiVn = phi min(0.2 f'c, 480 + 0.08 f'c, 1600) b d (phi = 0.75). The 0.2 Vu horizontal tension is mandatory and drives the top steel; the primary steel is the greatest of the two paths and the 0.04 (f'c/fy) b d minimum; the closed stirrups Ah are required within 2d/3; the shear is capped by the min-of-three limit. ACI 318 and the engineer of record govern.",
   example: concreteCorbelBracketExample.inputs,
   fields: [
     { key: "factored_shear_lb", label: "Factored shear Vu (lb)", kind: "number" },
@@ -1422,6 +1433,8 @@ CONCRETE_RENDERERS["concrete-corbel-bracket"] = _simpleRenderer({
     { key: "n", id: "ccb-out-n", label: "Mandatory tension Nuc", value: (r) => fmt(r.nuc_lb, 0) + " lb" },
     { key: "asc", id: "ccb-out-asc", label: "Primary steel Asc (governing)", value: (r) => fmt(r.asc_in2, 3) + " in^2 (" + r.governing_path + ")" },
     { key: "paths", id: "ccb-out-paths", label: "Flexure vs shear-friction path", value: (r) => fmt(r.flex_path, 3) + " / " + fmt(r.sf_path, 3) + " in^2" },
+    { key: "ascmin", id: "ccb-out-ascmin", label: "Code minimum 0.04 (f'c/fy) b d", value: (r) => fmt(r.asc_min_in2, 3) + " in^2" },
+    { key: "ah", id: "ccb-out-ah", label: "Closed stirrups Ah (within 2d/3)", value: (r) => fmt(r.ah_in2, 3) + " in^2 spread over the top " + fmt(r.ah_zone_in, 1) + " in" },
     { key: "v", id: "ccb-out-v", label: "Shear cap phiVn", value: (r) => fmt(r.phi_vn_lb / 1000, 1) + " kip - " + (r.shear_ok ? "OK" : "OVER, deepen the corbel") },
   ],
   compute: computeConcreteCorbelBracket,

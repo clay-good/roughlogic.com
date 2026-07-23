@@ -4,6 +4,22 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(concrete): corbel was missing the ACI 16.5.5 steel minimum and the closed stirrups; 2026-07-23
+
+- `computeConcreteCorbelBracket` took the primary steel as `max(flexure+tension, shear-friction+tension)` but omitted
+  the **ACI 318-19 16.5.5.1 floor `Asc,min = 0.04 (f'c/fy) b d`**, so a lightly loaded corbel reported less steel than
+  the code permits. It also never computed the **16.5.5.2 closed stirrups `Ah = 0.5 (Asc - An)`**, distributed within
+  `2d/3` below the primary steel -- a corbel is not detailed without them. Both omissions under-report reinforcement.
+- Validated against a published ACI 318-19 corbel worked example (f'c 5 ksi, fy 60 ksi, Vu 80 kip, Nu 40 kip,
+  b 15 in, d 20 in, h 22 in, a 4 in). The tile now reproduces it: An **0.889**, Avf **1.270**, (2/3)Avf+An **1.735**,
+  Asc,min **1.000**, Asc **1.735**, Ah **0.423** -- all exact.
+- The one intentional difference from that example is the flexure path: this tile uses the simplified `0.85d`
+  lever-arm (`Af = Mu/(phi fy 0.85 d)`, already disclosed in its note) rather than the exact stress-block quadratic,
+  which yields 1.412 vs 1.262 in^2 -- i.e. MORE steel, the conservative side, and it does not govern here anyway.
+- Two new outputs surface the additions (the code minimum, and Ah with its 2d/3 zone). Guarded by a fuzzer block that
+  pins the published example, asserts a lightly loaded corbel is driven by the floor and labelled as such, and checks
+  the floor can only ever RAISE Asc, never reduce it.
+
 ### fix(construction): a 6x6 deck post is a TIMBER, not dimension lumber (NDS Table 4D); 2026-07-23
 
 Closes the last open finding of the NDS wood audit, again by going and getting the primary source rather than
