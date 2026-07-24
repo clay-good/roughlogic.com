@@ -4,6 +4,21 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(electrical): 110.14(C) discarded a declared 60 C termination above 100 A; 2026-07-23
+
+- `computeTerminationTempAmpacity` used the 75 C column whenever `over_100a` was set, **silently discarding an
+  explicit 60 C selection** -- 230 A reported where 195 A governs, **18% non-conservative on the one calculation whose
+  entire purpose is protecting a termination**.
+- Four signals said the code was wrong and one said it was right. Against it: the input field is literally
+  *"Lowest termination rating"*; the tile's note says the ampacity is *"capped at the lowest-rated termination"*; the
+  citation says the same; and NEC 110.14(C) opens by requiring the rating be coordinated *"so as not to exceed the
+  lowest temperature rating of any connected termination"* -- the >100 A provision **permits** the 75 C column, it does
+  not override 60 C-marked equipment. For it: a fuzzer comment asserting *"over 100 A always uses the 75 C column
+  regardless of the termination-rating select"*. That comment was pinning the bug and has been corrected.
+- The declared rating now governs at any circuit size. `over_100a` still does real work (verified by
+  `check-dead-inputs`): it reports which 110.14(C) default column applies and flags the uncommon-but-real case of
+  60 C-marked equipment above 100 A, which the renderer surfaces. The pinned worked example (75 C) is unchanged.
+
 ### fix(electrical): the ampacity tile claimed to be NEC Table 310.16 while running its own physics model; 2026-07-23
 
 - `wire-ampacity` told the user *"Citation: per NEC 2023 Table 310.16 (75 C column)"*, but it calls

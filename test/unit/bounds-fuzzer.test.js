@@ -24088,8 +24088,15 @@ test("bounds: spec-v562 computeTerminationTempAmpacity pins the termination-colu
   assert.equal(noDer.governed_by, "termination");
   // At or below 100 A with a 60 C termination, the 60 C column governs.
   assert.equal(_v562({ amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 60, over_100a: false, derate_factor: 1.0 }).termination_ampacity_a, 195);
-  // Over 100 A always uses the 75 C column regardless of the termination-rating select.
-  assert.equal(_v562({ amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 60, over_100a: true, derate_factor: 1.0 }).termination_ampacity_a, 230);
+  // 2026-07-23: this previously asserted "over 100 A always uses the 75 C column
+  // regardless of the termination-rating select", pinning a non-conservative
+  // bug. NEC 110.14(C) opens by requiring the rating to be coordinated so as
+  // not to exceed the LOWEST rating of any connected termination; the >100 A
+  // provision PERMITS the 75 C column, it does not override 60 C-marked
+  // equipment. The field is literally "Lowest termination rating", and the
+  // tile's own note and citation both say the ampacity is capped at it. A
+  // declared 60 C must therefore govern at any circuit size (195 A, not 230).
+  assert.equal(_v562({ amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 60, over_100a: true, derate_factor: 1.0 }).termination_ampacity_a, 195);
   // Error seams: non-finite, non-positive ampacities, derate out of range, bad termination.
   assert.ok("error" in _v562({ amp_90c: Infinity, amp_75c: 230, amp_60c: 195, termination_rating: 75, over_100a: true, derate_factor: 0.8 }));
   assert.ok("error" in _v562({ amp_90c: 0, amp_75c: 230, amp_60c: 195, termination_rating: 75, over_100a: true, derate_factor: 0.8 }));
@@ -29304,4 +29311,37 @@ test("bounds: the wire-ampacity tile does not claim to be NEC Table 310.16", () 
   // ...and must say plainly what it is.
   assert.ok(/NOT NEC 2023 Table 310\.16/.test(block), "citation must disclaim the table");
   assert.ok(/estimate/i.test(block), "must be labelled an estimate");
+});
+
+import { computeTerminationTempAmpacity as _necTerm } from "../../calc-electrical.js";
+
+test("bounds: NEC 110.14(C) honors the DECLARED lowest termination rating above 100 A", () => {
+  // The field is "Lowest termination rating" and both the note and citation say
+  // the ampacity is capped at it -- but the code used the 75 C column whenever
+  // over_100a was set, discarding an explicit 60 C selection. That is 18%
+  // non-conservative on the one calculation meant to protect a termination.
+  const P = { amp_90c: 260, amp_75c: 230, amp_60c: 195, derate_factor: 1.0 };
+  // 60 C declared must govern in BOTH circuit-size cases.
+  for (const over of [true, false]) {
+    const r = _necTerm({ ...P, termination_rating: 60, over_100a: over });
+    assert.strictEqual(r.termination_ampacity_a, 195);
+    assert.strictEqual(r.governing_a, 195);
+  }
+  // 75 C declared uses the 75 C column in both cases.
+  for (const over of [true, false]) {
+    assert.strictEqual(_necTerm({ ...P, termination_rating: 75, over_100a: over }).termination_ampacity_a, 230);
+  }
+  // over_100a is still meaningful: it reports the 110.14(C) default column and
+  // flags the uncommon 60 C-marked termination above 100 A.
+  assert.strictEqual(_necTerm({ ...P, termination_rating: 60, over_100a: true }).nec_default_column_c, 75);
+  assert.strictEqual(_necTerm({ ...P, termination_rating: 60, over_100a: true }).below_nec_default, true);
+  assert.strictEqual(_necTerm({ ...P, termination_rating: 60, over_100a: false }).below_nec_default, false);
+  assert.strictEqual(_necTerm({ ...P, termination_rating: 75, over_100a: true }).below_nec_default, false);
+  // The declared rating can never be exceeded by the reported termination value.
+  for (const tr of [60, 75]) {
+    for (const over of [true, false]) {
+      const r = _necTerm({ ...P, termination_rating: tr, over_100a: over });
+      assert.ok(r.termination_ampacity_a <= (tr === 60 ? 195 : 230));
+    }
+  }
 });

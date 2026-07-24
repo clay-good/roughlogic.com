@@ -5401,13 +5401,25 @@ export function computeTerminationTempAmpacity({ amp_90c = 0, amp_75c = 0, amp_6
   if (!(a60 > 0)) return { error: "60 C ampacity must be positive (A)." };
   if (tr !== 60 && tr !== 75) return { error: "Termination rating must be 60 or 75 (C)." };
   if (!(d > 0 && d <= 1)) return { error: "Derating factor must be over 0 and at most 1." };
-  const termination_ampacity_a = over ? a75 : (tr === 75 ? a75 : a60);
+  // NEC 110.14(C) coordinates to the LOWEST-rated termination in the circuit.
+  // The input field is literally "Lowest termination rating", and both the note
+  // and the citation say the ampacity is capped at it -- but this used the 75 C
+  // column whenever over_100a was set, silently DISCARDING a user's explicit
+  // 60 C selection (18% non-conservative: 230 A vs 195 A on the example
+  // section, on the one calculation whose whole purpose is protecting a
+  // termination). Honor the declared rating; over_100a now reports which
+  // 110.14(C) default column applies and flags the uncommon but real case of
+  // 60 C-marked equipment on a circuit above 100 A.
+  const termination_ampacity_a = tr === 75 ? a75 : a60;
+  const nec_default_column_c = over ? 75 : 60;
+  const below_nec_default = tr < nec_default_column_c;
   const derated_90c_a = a90 * d;
   const governing_a = Math.min(termination_ampacity_a, derated_90c_a);
   const governed_by = governing_a === termination_ampacity_a && termination_ampacity_a <= derated_90c_a ? "termination" : "derating";
   return {
     termination_ampacity_a, derated_90c_a, governing_a, governed_by,
-    note: "The 90 C column may be used only for the ambient and fill derating math, not for the final termination current. The usable ampacity is capped at the lowest-rated termination (60 or 75 C). Circuits at or below 100 A default to the 60 C column unless all terminations and conductors are listed for 75 C; circuits above 100 A use the 75 C column. NEC 110.14(C) and the equipment listing govern.",
+    nec_default_column_c, below_nec_default,
+    note: "The 90 C column may be used only for the ambient and fill derating math, not for the final termination current. The usable ampacity is capped at the lowest-rated termination you declare (60 or 75 C) - a 60 C-marked termination governs even above 100 A, where the 75 C column would otherwise be the default. Circuits at or below 100 A default to the 60 C column unless all terminations and conductors are listed for 75 C; circuits above 100 A use the 75 C column. NEC 110.14(C) and the equipment listing govern.",
   };
 }
 export const terminationTempAmpacityExample = { inputs: { amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 75, over_100a: true, derate_factor: 0.8 } };
@@ -5436,7 +5448,7 @@ function _v562renderTerminationTempAmpacity(inputRegion, outputRegion, citationE
   const update = debounce(() => {
     const r = computeTerminationTempAmpacity({ amp_90c: readNum(a90.input), amp_75c: readNum(a75.input), amp_60c: readNum(a60.input), termination_rating: Number(tr.select.value), over_100a: over.select.value === "yes", derate_factor: d.input.value === "" ? 1.0 : readNum(d.input) });
     if (r.error) { oTerm.textContent = r.error; oDer.textContent = "-"; oGov.textContent = "-"; oNote.textContent = ""; return; }
-    oTerm.textContent = fmt(r.termination_ampacity_a, 0) + " A";
+    oTerm.textContent = fmt(r.termination_ampacity_a, 0) + " A" + (r.below_nec_default ? " (60 C-marked termination governs even above 100 A, where 75 C would otherwise be the default)" : "");
     oDer.textContent = fmt(r.derated_90c_a, 0) + " A";
     oGov.textContent = fmt(r.governing_a, 0) + " A (" + r.governed_by + " governs)";
     oNote.textContent = r.note;
