@@ -8183,7 +8183,7 @@ export const CITATIONS = {
     ],
   },
   "sling-d-d-efficiency": {
-    formula: "ratio = bend_dia / sling_dia; efficiency interpolated from the WRTB 6x19 / 6x37 D/d curve (1->0.50 ... 25+ ->1.00); reduced_wll = rated_wll x efficiency.",
+    formula: "ratio = bend_dia / sling_dia; efficiency interpolated from the WRTB 6x19 / 6x37 D/d curve (1->0.50 ... 25+ ->0.95, plateauing below full strength); reduced_wll = rated_wll x efficiency.",
     edition: "Wire Rope Technical Board Wire Rope Users Manual (D/d bend efficiency) and ASME B30.9 by name; the curve ships as editable breakpoints.",
     freeAccess: "The WRTB D/d efficiency curve is published guidance; ASME B30.9 is a consensus standard.",
     governance: GOVERNANCE.rigging,
@@ -8220,7 +8220,7 @@ export const CITATIONS = {
     edition: "OSHA 1926 Subpart CC and standard rigging practice by name; first-principles statics on the tag-line geometry.",
     freeAccess: "OSHA 1926 Subpart CC is free at osha.gov. The geometry is public.",
     governance: GOVERNANCE.rigging,
-    editionNote: "A tag line at a shallow angle to horizontal pulls far harder than the lateral force it resists. Tag lines control rotation and position; they do not arrest a falling load. Handlers stand clear of the swing path, and 50 lb sustained per person is a planning default.",
+    editionNote: "A tag line kept shallow (near horizontal) pulls close to the lateral force it resists; as it steepens toward vertical the tension climbs steeply (T = force / cos of the angle above horizontal), so keep the line low. Tag lines control rotation and position; they do not arrest a falling load. Handlers stand clear of the swing path, and 50 lb sustained per person is a planning default.",
     assumptions: [
       { name: "Per-person pull", value: "50 lb safe sustained pull per handler (planning default)", source: "rigging planning practice" },
     ],

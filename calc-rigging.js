@@ -215,7 +215,12 @@ RIGGING_RENDERERS["crane-ground-bearing"] = renderCraneGroundBearing;
 //
 // ratio = D/d; efficiency interpolated from the WRTB 6x19 / 6x37 curve;
 // reduced_wll = rated_wll * efficiency.
-const DD_CURVE = [[1, 0.50], [2, 0.65], [3, 0.70], [4, 0.75], [6, 0.83], [8, 0.87], [10, 0.90], [15, 0.92], [20, 0.94], [25, 1.00]];
+// D/d bend efficiency (6x19 / 6x37 wire rope). The top of the practical range
+// PLATEAUS at ~95%, not 100%: per the WRTB manual and rigging references a rope
+// still loses about 5% even at D/d = 40, so a bend never restores full straight-
+// pull strength. The previous 25 -> 1.00 endpoint over-credited retained WLL by
+// ~5% in the gentle-bend regime (the non-conservative direction).
+const DD_CURVE = [[1, 0.50], [2, 0.65], [3, 0.70], [4, 0.75], [6, 0.83], [8, 0.87], [10, 0.90], [15, 0.92], [20, 0.94], [25, 0.95]];
 const _ddEfficiency = (ratio) => {
   if (ratio <= DD_CURVE[0][0]) return DD_CURVE[0][1];
   if (ratio >= DD_CURVE[DD_CURVE.length - 1][0]) return DD_CURVE[DD_CURVE.length - 1][1];
@@ -225,7 +230,7 @@ const _ddEfficiency = (ratio) => {
       return y1 + (ratio - x1) * (y2 - y1) / (x2 - x1);
     }
   }
-  return 1.0;
+  return 0.95;
 };
 // dims: in { rated_wll_lb: M L T^-2, bend_dia_in: L, sling_dia_in: L } out: { ratio: dimensionless, efficiency: dimensionless, reduced_wll_lb: M L T^-2 }
 // (Rated WLL is a force M L T^-2; the two diameters are lengths L whose
@@ -246,7 +251,7 @@ export function computeSlingDdEfficiency({ rated_wll_lb, bend_dia_in, sling_dia_
     ratio,
     efficiency,
     reduced_wll_lb: reducedWll,
-    note: "The bundled curve is for 6x19 / 6x37 wire-rope slings (synthetic round and web slings follow their own bend factors). The rated WLL is the catalog straight-pull value; the sling-angle factor and any choker-hitch reduction apply on top of this bend efficiency. A damaged or kinked sling is removed from service regardless of the math.",
+    note: "The bundled curve is for 6x19 / 6x37 wire-rope slings (synthetic round and web slings follow their own bend factors). Efficiency plateaus at about 95% - a bend never restores full straight-pull strength (even a very gentle D/d = 40 bend still loses roughly 5%). The rated WLL is the catalog straight-pull value; the sling-angle factor and any choker-hitch reduction apply on top of this bend efficiency. A damaged or kinked sling is removed from service regardless of the math.",
   };
 }
 

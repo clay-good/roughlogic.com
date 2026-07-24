@@ -4,6 +4,27 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(rigging): D/d bend efficiency capped at 95% (never 100%); backwards tag-line citation sentence; 2026-07-24
+
+A refute-first audit of calc-rigging.js (31 computes) found the LIFE-SAFETY core -- every sling-tension, leg-count, and
+angle calculation -- CORRECT: the 1/sin(angle-from-horizontal) load-angle factor lands exactly at the canonical
+2.0/1.414/1.155/1.0, radians are converted everywhere, the ASME B30.9 2-leg credit for 3/4-leg slings is applied, and
+the spreader/bridle/outrigger/reeving statics all re-derive correctly. No load-dropping bug. Two low-severity items,
+both fixed:
+
+- **The D/d wire-rope bend-efficiency curve reached 100% at D/d = 25.** A bend never restores full straight-pull
+  strength -- per the WRTB manual and rigging references, even a very gentle D/d = 40 bend still loses ~5% (~95%
+  efficiency). The old `[25, 1.00]` endpoint over-credited retained WLL by ~5% in the gentle-bend regime (the
+  non-conservative direction: a higher reduced WLL). Web-verified the ~95% ceiling and capped the curve and its
+  fallback at 0.95; D/d <= 20 is unchanged, so the pinned worked example (D/d = 3 -> 0.70) does not move. Guarded that
+  efficiency is < 1.0 at every D/d and plateaus at 0.95.
+- **The tag-line-force citation in citations.js was backwards.** It read "a tag line at a shallow angle to horizontal
+  pulls far harder than the lateral force it resists" -- the opposite of the physics. With T = force / cos(angle above
+  horizontal), a SHALLOW line pulls ~= the lateral force (least tension) and a STEEP line pulls far harder. The compute
+  and the in-tile note were both already correct; only this one citations.js prose line contradicted them, and in the
+  dangerous direction (a rigger could steepen the line thinking it reduces the handler load, which raises it).
+  Corrected to match the compute.
+
 ### fix(solar): battery-runtime cited an inverter-efficiency term the compute never applied; 2026-07-24
 
 A refute-first audit of calc-solar.js (29 computes) found the fire-risk PV DC-circuit math all CORRECT: the NEC

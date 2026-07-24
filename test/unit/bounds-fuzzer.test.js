@@ -10889,6 +10889,15 @@ test("bounds: calc-rigging v65 Group Z lift-planning core pins every worked exam
   assert.strictEqual(dd.reduced_wll_lb, 7000);
   assert.strictEqual(_v65d({ rated_wll_lb: 10000, bend_dia_in: 10, sling_dia_in: 1 }).reduced_wll_lb, 9000); // D/d 10
   assert.strictEqual(_v65d({ rated_wll_lb: 10000, bend_dia_in: 1, sling_dia_in: 1 }).reduced_wll_lb, 5000); // D/d 1
+  // 2026-07-24: the D/d curve PLATEAUS at 0.95, not 1.00. A bend never restores
+  // full straight-pull strength -- even D/d = 40 loses ~5% (WRTB / rigging
+  // references). The old 25 -> 1.00 endpoint over-credited retained WLL ~5%.
+  assert.ok(Math.abs(_v65d({ rated_wll_lb: 10000, bend_dia_in: 25, sling_dia_in: 1 }).efficiency - 0.95) < 1e-9);
+  assert.ok(Math.abs(_v65d({ rated_wll_lb: 10000, bend_dia_in: 400, sling_dia_in: 1 }).efficiency - 0.95) < 1e-9); // huge D/d still capped
+  // Efficiency never reaches or exceeds 1.0 at any D/d (a bend always costs strength).
+  for (const bd of [1, 3, 10, 20, 25, 50, 200]) {
+    assert.ok(_v65d({ rated_wll_lb: 10000, bend_dia_in: bd, sling_dia_in: 1 }).efficiency < 1.0);
+  }
   assert.ok("error" in _v65d({ rated_wll_lb: 0, bend_dia_in: 3, sling_dia_in: 1 }));
   assert.ok("error" in _v65d({ rated_wll_lb: 10000, bend_dia_in: 0, sling_dia_in: 1 }));
   // wind-on-load: 200 ft^2, 20 mph, 1.6, 4000 lb -> 1.024 psf, 327.68 lb, 4.685 deg
