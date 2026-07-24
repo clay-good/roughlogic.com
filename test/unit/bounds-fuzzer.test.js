@@ -29345,3 +29345,56 @@ test("bounds: NEC 110.14(C) honors the DECLARED lowest termination rating above 
     }
   }
 });
+
+import { computeMotorBranchProtection as _necMotOcpd } from "../../calc-electrical.js";
+
+test("bounds: motor OCPD rounding uses the 240.6(A) FUSE-only ratings for fuses", () => {
+  // NEC 240.6(A): "Additional standard ampere ratings for fuses shall be 1, 3,
+  // 6, 10, and 601." The tile used the breaker ladder (starts at 15) for every
+  // device type, so a fractional-HP motor whose 430.52 ceiling is 3.5 A was told
+  // its max standard fuse is 15 A -- 4x its own computed maximum.
+  const de = _necMotOcpd({ flc_a: 2, device_type: "dual-element/time-delay fuse" });
+  assert.ok(Math.abs(de.max_ocpd_a - 3.5) < 1e-9); // 175% of 2 A
+  assert.strictEqual(de.max_ocpd_std_a, 6); // next fuse rating >= 3.5, NOT 15
+  const nt = _necMotOcpd({ flc_a: 2, device_type: "nontime-delay fuse" });
+  assert.strictEqual(nt.max_ocpd_std_a, 6); // 300% = 6 A lands exactly
+  // A breaker has NO sub-15 A standard rating, so it correctly still gets 15 A.
+  const br = _necMotOcpd({ flc_a: 2, device_type: "inverse-time breaker" });
+  assert.strictEqual(br.max_ocpd_std_a, 15);
+  // The rounded fuse size never exceeds the 430.52 ceiling unless rounding up is
+  // needed, and never drops below it (Exception 1 rounds UP).
+  for (const flc of [0.5, 1, 1.5, 2, 3]) {
+    const r = _necMotOcpd({ flc_a: flc, device_type: "dual-element/time-delay fuse" });
+    assert.ok(r.max_ocpd_std_a >= r.max_ocpd_a - 1e-9);
+  }
+  // The pinned 28 A breaker example is unchanged.
+  const ex = _necMotOcpd({ flc_a: 28, device_type: "inverse-time breaker" });
+  assert.strictEqual(ex.max_ocpd_std_a, 70);
+  assert.strictEqual(ex.rounded_up, false);
+});
+
+import { computeWelderArcCircuitConductor as _necWeld } from "../../calc-electrical.js";
+
+test("bounds: welder tile scopes to the transformer/rectifier column and rounds the OCPD down to a standard size", () => {
+  // sqrt(duty) is the Table 630.11(A) TRANSFORMER/DC-RECTIFIER column, verified
+  // against its published values (0.71 at 50%, 0.55 at 30%, 0.45 at 20%). The
+  // note previously also claimed motor-generator coverage (a different, higher
+  // column) and an OCPD rounding the code never performed.
+  for (const [duty, mult] of [[50, 0.7071], [30, 0.5477], [20, 0.4472], [100, 1.0]]) {
+    assert.ok(Math.abs(_necWeld({ primary_current_a: 40, duty_pct: duty }).duty_multiplier - mult) < 1e-4);
+  }
+  const r = _necWeld({ primary_current_a: 40, duty_pct: 50 });
+  assert.ok(Math.abs(r.effective_current_a - 28.284) < 1e-3);
+  // 630.12(A) hard 200% ceiling; the reported standard OCPD is the largest
+  // 240.6 size at or below it -- rounding DOWN, not up (no welder round-up).
+  assert.strictEqual(r.ocpd_max_a, 80);
+  assert.strictEqual(r.ocpd_std_a, 80); // lands exactly
+  const odd = _necWeld({ primary_current_a: 37, duty_pct: 60 });
+  assert.ok(Math.abs(odd.ocpd_max_a - 74) < 1e-9);
+  assert.strictEqual(odd.ocpd_std_a, 70); // 74 rounds DOWN to 70
+  assert.ok(odd.ocpd_std_a <= odd.ocpd_max_a); // never exceeds the 200% ceiling
+  // The note must no longer claim motor-generator coverage, and must name the
+  // transformer/rectifier scope.
+  assert.match(r.note, /transformer/i);
+  assert.match(r.note, /motor-generator[^.]*not modeled|different, higher column/i);
+});

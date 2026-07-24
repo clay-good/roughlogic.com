@@ -4664,6 +4664,14 @@ const _STD_OCPD_240_6 = [
   225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200, 1600, 2000,
   2500, 3000, 4000, 5000, 6000,
 ];
+
+// NEC 240.6(A): "Additional standard ampere ratings for FUSES shall be 1, 3, 6,
+// 10, and 601." Using the breaker ladder (which starts at 15) for a fuse meant a
+// fractional-horsepower motor whose 430.52 ceiling is 3.5 A was told its "max
+// standard size" is 15 A -- more than 4x its OWN computed maximum, and 750% of a
+// 2 A FLC where Table 430.52 allows 175%. These extra ratings exist precisely
+// for fractional-HP motor and control-circuit protection.
+const _STD_FUSE_240_6 = [1, 3, 6, 10, 601].concat(_STD_OCPD_240_6).sort((a, b) => a - b);
 // NEC Table 430.52 max % of FLC by device type (squirrel-cage / synchronous,
 // other than Design B energy-efficient).
 const _MOTOR_OCPD_MULT = {
@@ -4683,8 +4691,10 @@ export function computeMotorBranchProtection({ flc_a = 0, device_type = "inverse
   const max_ocpd_a = flc * multiplier;
   // 430.52(C)(1) Exception 1: where the calculated value does not correspond
   // to a standard rating, the next higher standard size (240.6) is permitted.
-  const next_std = _STD_OCPD_240_6.find((s) => s >= max_ocpd_a);
-  const is_standard = _STD_OCPD_240_6.some((s) => Math.abs(s - max_ocpd_a) < 1e-9);
+  // Fuses carry the extra 240.6(A) ratings; breakers do not.
+  const ladder = /fuse/i.test(device_type) ? _STD_FUSE_240_6 : _STD_OCPD_240_6;
+  const next_std = ladder.find((s) => s >= max_ocpd_a);
+  const is_standard = ladder.some((s) => Math.abs(s - max_ocpd_a) < 1e-9);
   const max_ocpd_std_a = next_std ?? max_ocpd_a;
   const min_disconnect_a = 1.15 * flc;
   return {
@@ -5740,19 +5750,24 @@ export function computeWelderArcCircuitConductor({ primary_current_a = 40, duty_
   const effective_current_a = primary_current_a * duty_multiplier;
   // NEC 630.12(A): the overcurrent device for an arc welder may not exceed 200% of the rated primary current.
   const ocpd_max_a = 2.0 * primary_current_a;
+  // 630.12(A) is a hard 200% ceiling (no round-up exception, unlike motors), so
+  // the actual device is the largest standard rating AT OR BELOW it. The note
+  // previously claimed this rounding but the code never performed it.
+  const ocpd_std_a = _STD_OCPD_240_6.filter((sz) => sz <= ocpd_max_a).pop() ?? null;
   if (![duty_multiplier, effective_current_a, ocpd_max_a].every(Number.isFinite)) return { error: "Welder-circuit math is not a finite value." };
   return {
     duty_multiplier,
     effective_current_a,
     ocpd_max_a,
-    note: "Arc-welder (AC/DC transformer or motor-generator) branch circuit per NEC 630.11 and 630.12. The conductor is sized on an EFFECTIVE current, not the nameplate primary: I_eff = I_primary x the Table 630.11(A) duty-cycle multiplier, which is the square root of the duty cycle (a 50% duty welder only draws its rated current half the time, so the conductor heats less). Pick a conductor whose ampacity is at least I_eff. The overcurrent device may run up to 200% of the rated primary current (630.12(A)), using the next standard size down if 200% does not land on one. A 40 A primary, 50%-duty welder needs conductors rated for 28.3 A (a #10 Cu at 60 C) on up to an 80 A breaker. Use the nameplate rated primary current and duty; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
+    ocpd_std_a,
+    note: "Arc-welder branch circuit per NEC 630.11 and 630.12, for an AC/DC TRANSFORMER or DC-RECTIFIER welder. The conductor is sized on an EFFECTIVE current, not the nameplate primary: I_eff = I_primary x the Table 630.11(A) duty-cycle multiplier. This tile uses the transformer/rectifier column, which is the square root of the duty cycle (verified against the table's published values: 0.71 at 50%, 0.55 at 30%, 0.45 at 20%). A MOTOR-GENERATOR welder uses a DIFFERENT, HIGHER column of Table 630.11(A) that is not modeled here -- size those from the table, or the conductor will be undersized. Pick a conductor whose ampacity is at least I_eff. The overcurrent device may not exceed 200% of the rated primary current (630.12(A)); the largest standard 240.6 size at or below that ceiling is reported. A 40 A primary, 50%-duty transformer welder needs conductors rated for 28.3 A (a #10 Cu at 60 C) and an OCPD no larger than 80 A. Use the nameplate rated primary current and duty; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
   };
 }
 
 export const welderArcCircuitConductorExample = { inputs: { primary_current_a: 40, duty_pct: 50 } };
 
 function _v932renderWelderArcCircuitConductor(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: arc-welder branch-circuit conductor and OCPD by name (NEC 630.11 / 630.12). I_eff = I_primary x sqrt(duty) (Table 630.11(A) multiplier); conductor ampacity >= I_eff; OCPD <= 200% of the rated primary. The welder nameplate and the adopted NEC edition govern.";
+  citationEl.textContent = "Citation: arc-welder branch-circuit conductor and OCPD by name (NEC 630.11 / 630.12) for a TRANSFORMER or DC-RECTIFIER welder. I_eff = I_primary x sqrt(duty), the transformer/rectifier column of Table 630.11(A); a MOTOR-GENERATOR welder uses a different, higher column not modeled here. Conductor ampacity >= I_eff; OCPD <= 200% of the rated primary. The welder nameplate and the adopted NEC edition govern.";
   const ip = makeNumber("Nameplate primary current (A)", "wac-ip", { step: "any", min: "0", value: "40" });
   ip.input.value = "40";
   const dc = makeNumber("Duty cycle (%)", "wac-dc", { step: "any", min: "0", value: "50" });
@@ -5767,7 +5782,7 @@ function _v932renderWelderArcCircuitConductor(inputRegion, outputRegion, citatio
     });
     if (r.error) { oEff.textContent = r.error; oOcpd.textContent = "-"; return; }
     oEff.textContent = fmt(r.effective_current_a, 1) + " A (" + fmt(r.duty_multiplier, 2) + "x nameplate)";
-    oOcpd.textContent = fmt(r.ocpd_max_a, 0) + " A (200% of " + fmt(Number(ip.input.value) || 40, 0) + " A)";
+    oOcpd.textContent = fmt(r.ocpd_max_a, 0) + " A max (200% of " + fmt(Number(ip.input.value) || 40, 0) + " A)" + (r.ocpd_std_a ? "; largest standard size <= that: " + fmt(r.ocpd_std_a, 0) + " A" : "");
   }, DEBOUNCE_MS);
   for (const f of [ip, dc]) f.input.addEventListener("input", update);
 }

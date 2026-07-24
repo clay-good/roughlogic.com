@@ -4,6 +4,26 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(electrical): motor OCPD fuse ratings (240.6(A)) and welder scope/OCPD rounding (630.11/630.12); 2026-07-23
+
+Two more NEC findings, both closable after web-verifying one provision and resolving the rest from internal
+contradictions -- I had wrongly filed both as fully "blocked".
+
+- **`computeMotorBranchProtection` rounded every device type on the breaker ladder (which starts at 15 A).** NEC
+  240.6(A) adds standard FUSE ratings of 1, 3, 6, 10, and 601 A -- present specifically for fractional-horsepower
+  motor protection. A 2 A motor with a dual-element fuse has a 430.52 ceiling of 3.5 A but was told its "max standard
+  size" is **15 A**, over 4x its own computed maximum and 750% of FLC. Fuses now round on the extended ladder (3.5 A
+  -> 6 A); breakers correctly still get 15 A (no standard breaker below it). Web-verified against 240.6(A).
+- **The welder tile claimed motor-generator coverage it does not implement, and claimed an OCPD rounding it does not
+  perform.** The `sqrt(duty)` multiplier is the Table 630.11(A) TRANSFORMER/DC-rectifier column (verified: it
+  reproduces the table's published values, 0.71/0.55/0.45 at 50/30/20% duty). A motor-generator welder uses a
+  different, HIGHER column -- so claiming MG coverage was non-conservative. The note and citation now scope to
+  transformer/rectifier and say MG is not modeled. Separately, the note said the OCPD used "the next standard size
+  down" but the code returned a raw 200%; it now computes the largest 240.6 size at or below the 200% ceiling
+  (74 A -> 70 A) and surfaces it, resolving a pure internal note-vs-code contradiction.
+- Both guarded: the fuse ladder (3.5 A -> 6 A, breaker still 15 A, pinned 28 A example unchanged) and the welder
+  (the sqrt column against the published table values, the round-DOWN OCPD, and the note no longer claiming MG).
+
 ### fix(electrical): 110.14(C) discarded a declared 60 C termination above 100 A; 2026-07-23
 
 - `computeTerminationTempAmpacity` used the 75 C column whenever `over_100a` was set, **silently discarding an
