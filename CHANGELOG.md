@@ -4,6 +4,27 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(solar): battery-runtime cited an inverter-efficiency term the compute never applied; 2026-07-24
+
+A refute-first audit of calc-solar.js (29 computes) found the fire-risk PV DC-circuit math all CORRECT: the NEC
+690.8(A)/(B) stacked 156% conductor sizing (both 1.25 factors present, right base), the 690.7 cold-Voc max-voltage
+inflation (correct direction and floor/ceil rounding), 690.9 source-circuit fusing, 705.12 120% busbar, and 690.45
+EGC all verified at boundary inputs. One internal contradiction:
+
+- **`computeBatteryRuntime`'s citations.js entry documented "Runtime = Wh x inverter_efficiency x DoD / load" and a
+  "90% inverter efficiency" assumption, but the compute had NO inverter term.** For an AC backup load -- which draws
+  through the inverter -- omitting the ~10% conversion loss overstates the runtime by ~11%, the unsafe direction for a
+  backup-sizing estimate. (The in-file render citation agreed with the code, so the two citation surfaces disagreed;
+  per the pattern this session, the agreeing one is weak evidence.)
+- Fixed constructively rather than by stripping the doc: added an `inverter_efficiency` input defaulting to **100%**
+  (the DC / ideal case), so every existing result and fixture is unchanged, while an AC-backup user can enter ~90% and
+  get the conservative runtime (a 120 W / 100 Ah / 12 V case drops from 10 h to 9 h). The term now genuinely exists,
+  so citations.js is true; its DoD assumption was also corrected to match the actual user-supplied default (100%, not
+  the claimed 80/50). The inverter loss carries through the Peukert branch too.
+- Left as-is (verified, not bugs): the pv-string-sizing citation naming current/OCP sizing done in sibling tiles
+  (documentation bleed, no wrong number), and the warm-Vmp depression reusing the single Voc coefficient input (a
+  standard one-coefficient simplification; the true Vmp coefficient is a datasheet value, NEEDS-PRIMARY-SOURCE).
+
 ### fix(hvac): two derivation comments that mis-cite the latent-heat constant; combustion-air minimum-dimension note; 2026-07-24
 
 A refute-first audit of calc-hvac.js (70 computes) found the computational core CLEAN -- psychrometrics (Magnus,

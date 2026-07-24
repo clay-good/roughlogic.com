@@ -1680,8 +1680,8 @@ export const CITATIONS = {
     governance: GOVERNANCE.electrical,
     editionNote: "Single-edition (chemistry / manufacturer data).",
     assumptions: [
-      { name: "Inverter efficiency", value: "90% unless user supplies", source: "engineering practice" },
-      { name: "DoD limit", value: "80% LFP / 50% lead-acid unless user supplies", source: "manufacturer typical" },
+      { name: "Inverter efficiency", value: "100% (DC / ideal) unless user supplies; enter ~90% for an AC load through an inverter", source: "engineering practice" },
+      { name: "DoD limit", value: "user-supplied depth of discharge (default 100%); typical practice is 80% LFP / 50% lead-acid", source: "manufacturer typical" },
     ],
   },
   "voltage-imbalance": {

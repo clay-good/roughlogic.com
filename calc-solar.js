@@ -75,27 +75,32 @@ export const pvStringSizingExample = {
 // --- Utility 68: Battery Runtime ---
 
 // dims: in { amp_hours: I T, system_V: M L^2 T^-3 I^-1, dod_percent: dimensionless, load_W: M L^2 T^-3, peukert_k: dimensionless } out: { usable_wh: M L^2 T^-3 T, hours: T }
-export function computeBatteryRuntime({ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1 }) {
+export function computeBatteryRuntime({ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1, inverter_efficiency_pct = 100 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Ah = Number(amp_hours) || 0;
   const V = Number(system_V) || 0;
   const dod = (Number(dod_percent) || 0) / 100;
   const load = Number(load_W) || 0;
+  const eff = (Number(inverter_efficiency_pct) || 0) / 100;
   if (Ah <= 0 || V <= 0 || load <= 0) return { error: "Provide positive Ah, system V, and load W." };
+  if (!(eff > 0 && eff <= 1)) return { error: "Inverter efficiency must be over 0 and at most 100 percent (use 100 for a DC load)." };
   const usable_Ah = Ah * dod;
   const usable_Wh = usable_Ah * V;
   const k = Number(peukert_k) || 1;
+  // An AC load draws through the inverter, so the battery must supply load/eff.
+  // The default 100% is the DC / ideal case and leaves the simple form unchanged.
+  const battery_load_W = load / eff;
   let hours;
   if (k > 1) {
     // Peukert form per spec-v2 section 2: t = C / I^k, C in Ah, I in A.
     // Reduces to C / I (the simple form) when k = 1.
-    const I = load / V;
+    const I = battery_load_W / V;
     if (I <= 0) return { error: "Computed current is non-positive." };
     hours = usable_Ah / Math.pow(I, k);
   } else {
-    hours = usable_Wh / load;
+    hours = usable_Wh / battery_load_W;
   }
-  return { hours, minutes: hours * 60, usable_Wh };
+  return { hours, minutes: hours * 60, usable_Wh, inverter_efficiency_pct: eff * 100 };
 }
 
 export const batteryRuntimeExample = {
@@ -154,7 +159,7 @@ export function renderPVStringSizing(inputRegion, outputRegion, citationEl, para
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderBatteryRuntime(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: Runtime = (Ah * V * DoD) / load_W. Peukert form t = C / I^k (C in Ah, I in A), reducing to C / I when k = 1 (battery technical bulletins).";
+  citationEl.textContent = "Citation: Runtime = (Ah * V * DoD * inverter_efficiency) / load_W. The inverter efficiency (default 100%, i.e. a DC load) accounts for the conversion loss when the load runs on AC through an inverter -- enter about 90% for that case. Peukert form t = C / I^k (C in Ah, I in A), reducing to C / I when k = 1 (battery technical bulletins).";
   attachExampleButton(inputRegion, () => fillExample(batteryRuntimeExample.inputs));
 
   const ah = makeNumber("Battery capacity (Ah)", "br-ah", { step: "any", min: "0" });
@@ -163,8 +168,9 @@ export function renderBatteryRuntime(inputRegion, outputRegion, citationEl, para
   dod.input.value = "100";
   const load = makeNumber("Load (W)", "br-load", { step: "any", min: "0" });
   const k = makeNumber("Peukert exponent k (1 if unknown)", "br-k", { step: "any", min: "1", value: "1" });
+  const eff = makeNumber("Inverter efficiency (%, 100 for a DC load)", "br-eff", { step: "any", min: "0", max: "100", value: "100" });
   k.input.value = "1";
-  for (const f of [ah, v, dod, load, k]) inputRegion.appendChild(f.wrap);
+  for (const f of [ah, v, dod, load, k, eff]) inputRegion.appendChild(f.wrap);
 
   const oH = makeOutputLine(outputRegion, "Runtime (hours)", "br-out-h");
   const oM = makeOutputLine(outputRegion, "Runtime (minutes)", "br-out-m");
@@ -180,6 +186,7 @@ export function renderBatteryRuntime(inputRegion, outputRegion, citationEl, para
       amp_hours: Number(ah.input.value) || 0,
       system_V: Number(v.input.value) || 0,
       dod_percent: Number(dod.input.value) || 0,
+      inverter_efficiency_pct: Number(eff.input.value) || 100,
       load_W: Number(load.input.value) || 0,
       peukert_k: Number(k.input.value) || 1,
     });

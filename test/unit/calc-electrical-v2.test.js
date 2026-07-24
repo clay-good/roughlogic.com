@@ -465,3 +465,22 @@ test("Lighting density: result preserves inputs", () => {
 test("Lighting density: 8 occupancy classes available", () => {
   assert.equal(Object.keys(LIGHTING_DENSITY_W_PER_FT2).length, 8);
 });
+
+test("Battery runtime: inverter efficiency (default 100 = DC/ideal, preserves the simple form)", () => {
+  // citations.js documented "Runtime = Wh x inverter_efficiency x DoD / load" and a
+  // "90% inverter efficiency" assumption, but the compute had NO inverter term --
+  // overstating an AC-backup runtime by ~11%. Added the input; default 100% keeps
+  // the DC/ideal behavior (and every prior fixture) unchanged.
+  const dc = computeBatteryRuntime({ amp_hours: 100, system_V: 12, dod_percent: 100, load_W: 120 });
+  assert.ok(close(dc.hours, 10)); // 100*12*1.0/120, unchanged default
+  const ac = computeBatteryRuntime({ amp_hours: 100, system_V: 12, dod_percent: 100, load_W: 120, inverter_efficiency_pct: 90 });
+  assert.ok(close(ac.hours, 9)); // an AC load draws through the inverter: 10 * 0.90
+  assert.ok(ac.hours < dc.hours); // efficiency loss shortens runtime (conservative direction)
+  // The Peukert branch also carries the inverter loss.
+  const acK = computeBatteryRuntime({ amp_hours: 100, system_V: 12, dod_percent: 100, load_W: 600, peukert_k: 1.2, inverter_efficiency_pct: 90 });
+  const dcK = computeBatteryRuntime({ amp_hours: 100, system_V: 12, dod_percent: 100, load_W: 600, peukert_k: 1.2 });
+  assert.ok(acK.hours < dcK.hours);
+  // Out-of-range efficiency is rejected, not silently treated as a fraction.
+  assert.ok("error" in computeBatteryRuntime({ amp_hours: 100, system_V: 12, load_W: 120, inverter_efficiency_pct: 150 }));
+  assert.ok("error" in computeBatteryRuntime({ amp_hours: 100, system_V: 12, load_W: 120, inverter_efficiency_pct: 0 }));
+});
