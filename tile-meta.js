@@ -385,6 +385,7 @@ const _TILES = [
   ["helical-spring-rate", "K"],
   // spec-v1010 spring wire stress (Wahl), solid height, buckling screen
   ["spring-wire-stress", "K"],
+  ["gear-tooth-bending-stress", "K"],
   ["pesticide-rei-phi", "L"],
   ["backflow-test-psi", "M"],
   ["gel-percent-agarose", "T"],

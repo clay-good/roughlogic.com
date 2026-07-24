@@ -29064,6 +29064,40 @@ test("bounds: spec-v1010 computeSpringWireStress pins the Wahl factor, the corre
   assert.ok("error" in _v1010({ ...base, force_lb: Infinity }));
 });
 
+import { computeGearToothBendingStress as _v1015 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v1015 computeGearToothBendingStress pins the Lewis stress, the closed-form factor by tooth system, the two-form agreement, and error seams", () => {
+  const base = { transmitted_load_lb: 500, diametral_pitch_1_in: 8, face_width_in: 1.5, number_of_teeth: 20, tooth_system: "20-full-depth" };
+  const r = _v1015(base);
+  assert.ok(Math.abs(r.lewis_form_factor_y - 0.1084) < 1e-9); // 0.154 - 0.912/20
+  assert.ok(Math.abs(r.circular_pitch_in - Math.PI / 8) < 1e-9); // pc = pi/Pd
+  assert.ok(Math.abs(r.bending_stress_psi - 7830.5) < 1); // Wt/(F pc y)
+  assert.ok(Math.abs(r.lewis_Y_diametral - Math.PI * 0.1084) < 1e-9); // Y = pi y
+  // The two Lewis forms must agree: sigma = Wt/(F pc y) == Wt Pd/(F Y). This is
+  // the tile's own internal proof that Y = pi y is applied consistently.
+  const sigma_diametral = (base.transmitted_load_lb * base.diametral_pitch_1_in) / (base.face_width_in * r.lewis_Y_diametral);
+  assert.ok(Math.abs(r.bending_stress_psi - sigma_diametral) < 1e-6);
+  // Closed-form factor by tooth system at T = 20.
+  assert.ok(Math.abs(_v1015({ ...base, tooth_system: "14.5-full-depth" }).lewis_form_factor_y - 0.0898) < 1e-9); // 0.124 - 0.684/20
+  assert.ok(Math.abs(_v1015({ ...base, tooth_system: "20-stub" }).lewis_form_factor_y - 0.13295) < 1e-9); // 0.175 - 0.841/20
+  // Stress scales linearly with load and inversely with face width.
+  assert.ok(Math.abs(_v1015({ ...base, transmitted_load_lb: 1000 }).bending_stress_psi - 2 * r.bending_stress_psi) < 1e-6);
+  assert.ok(Math.abs(_v1015({ ...base, face_width_in: 3.0 }).bending_stress_psi - r.bending_stress_psi / 2) < 1e-6);
+  // The form factor rises (stronger tooth) as the tooth count climbs.
+  assert.ok(_v1015({ ...base, number_of_teeth: 100 }).lewis_form_factor_y > _v1015({ ...base, number_of_teeth: 20 }).lewis_form_factor_y);
+  // Undercut flag trips below the system threshold and clears above it.
+  assert.ok(_v1015({ ...base, number_of_teeth: 14 }).undercut_flag !== null); // < 17 for 20 deg
+  assert.strictEqual(_v1015({ ...base, number_of_teeth: 24 }).undercut_flag, null);
+  assert.ok(_v1015({ ...base, tooth_system: "14.5-full-depth", number_of_teeth: 24 }).undercut_flag !== null); // < 32 for 14.5 deg
+  // Error seams.
+  assert.ok("error" in _v1015({ ...base, tooth_system: "not-a-system" }));
+  assert.ok("error" in _v1015({ ...base, transmitted_load_lb: 0 }));
+  assert.ok("error" in _v1015({ ...base, diametral_pitch_1_in: 0 }));
+  assert.ok("error" in _v1015({ ...base, face_width_in: 0 }));
+  assert.ok("error" in _v1015({ ...base, number_of_teeth: 5 })); // below the Lewis floor
+  assert.ok("error" in _v1015({ ...base, transmitted_load_lb: Infinity }));
+});
+
 import { computePipePartialFlowDepth as _v1011 } from "../../calc-plumbing.js";
 
 test("bounds: spec-v1011 computePipePartialFlowDepth pins the circular partial-flow depth, the derived turning points, the non-monotonic branch, and error seams", () => {

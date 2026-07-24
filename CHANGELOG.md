@@ -4,6 +4,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): gear-tooth-bending-stress (Lewis), the tooth-strength check spur-gear-geometry omits; 2026-07-24
+
+`spur-gear-geometry` states its own gap: its citation says it "returns the geometry only; it does not check tooth
+strength, backlash, or undercutting." Alias, compute-map, and nearest-sibling-output checks confirmed nothing in the
+catalog computed the bending stress in a gear tooth (the only gear tiles are geometry, identification, chordal
+thickness, cascade, and mph-rpm). Adds one tile to `calc-mechanic.js` (Group K), no new module or dependency.
+
+`gear-tooth-bending-stress` applies the public-domain Lewis beam-strength equation (Wilfred Lewis, 1892): the tooth is
+a cantilever loaded by the tangential load Wt at the pitch line, so sigma = Wt / (F pc y), with face width F, circular
+pitch pc = pi/Pd, and the Lewis form factor y = a - b/T, a closed form of the tooth count for each standard system
+(20 deg full depth a,b = 0.154, 0.912; 14.5 deg full depth 0.124, 0.684; 20 deg stub 0.175, 0.841). The diametral-pitch
+form factor Y = pi y is reported alongside, and the tile pins the two forms to agree. Static Lewis stress only: the
+Barth velocity factor and the AGMA 2001 geometry (J) and load-distribution factors are stated out of scope, not modeled.
+
 ### fix(gas): two citations.js entries described formulas/methods the code does not implement; 2026-07-24
 
 A refute-first audit of calc-gas.js (the highest life-safety consequence in the catalog: undersizing -> CO or

@@ -2471,6 +2471,7 @@ cross-check.
 | calc-mechanic.js | `computeFlywheelEnergy` | `{ weight_lb = 100, radius_of_gyration_ft = 1, rpm = 1000, energy_fluctuation_...` | _ | _ | _ |
 | calc-mechanic.js | `computeFuelRange` | `{ fuel = "gasoline_E10", tank_gal = 0, mpg = 0, mpg_basis = "gasoline_E10", l...` | _ | _ | _ |
 | calc-mechanic.js | `computeGearMphRpm` | `{ solve_for = "mph", rpm = 0, trans_ratio = 1, axle_ratio = 0, tire_dia_in = ...` | _ | _ | _ |
+| calc-mechanic.js | `computeGearToothBendingStress` | `{ transmitted_load_lb = 0, diametral_pitch_1_in = 0, face_width_in = 0, numbe...` | _ | _ | _ |
 | calc-mechanic.js | `computeGlidepathDescentRate` | `{ ground_speed_kt = 0, glidepath_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHelicalSpringRate` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, material...` | _ | _ | _ |
 | calc-mechanic.js | `computeHpFromTorque` | `{ solve_for = "hp", torque_lbft = 0, rpm = 0, hp = 0 } = {}` | _ | _ | _ |
@@ -3124,7 +3125,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1710.
+Row count: 1711.
 
 <!-- END function-corpus-v14 -->
 
@@ -4281,7 +4282,7 @@ per spec-v14 §13.1 second paragraph.
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group K Mechanic (94 tiles)
+### Group K Mechanic (95 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4326,6 +4327,7 @@ per spec-v14 §13.1 second paragraph.
 | `gear-chordal-thickness` | Gear-Tooth Chordal Thickness (Caliper) | Machinery's Handbook / AGMA (gear-too...; half-angle 2.25 deg; tc = 4 sin(2.25) = 0.15704; ac = 0.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gear-identification` | Gear Identification (Pitch from Teeth and OD) | Machinery's Handbook / AGMA (inverse ...; spec-v649 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gear-mph-rpm` | Gear-Ratio MPH from RPM | Drivetrain kinematics + SAE J267 tire...; 2500 RPM, 1:1, 3.55 axle, 28.5-in tire -> 59.71 MPH | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `gear-tooth-bending-stress` | Gear Tooth Bending Stress (Lewis) | Lewis beam-strength equation (Wilfred...; y = 0.154 - 0.912/20 = 0.1084; pc = pi/8 = 0.392699 in; s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `glidepath-descent-rate` | Glidepath Rate of Descent | FAA Instrument Flying Handbook; TERPS...; 120 kt on a 3.0 deg glidepath -> 637 ft/min, 318 ft/nm (T... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grinding-wheel-rpm` | Grinding Wheel Surface Speed and Max Safe RPM | grinding wheel surface-speed identity...; max_rpm = 6500*12/(pi*7) = 3547; actual_sfpm = pi*7*3450/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `helical-spring-rate` | Helical Compression Spring Rate | Machinery's Handbook / Shigley; k = 11.5e6 x 0.080^4 / (8 x 0.75^3 x 8) = 471.04 / 27.0 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4773,6 +4775,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1463. Fixture-covered or reference-cadence: 1463 / 1463.
+Tile count: 1464. Fixture-covered or reference-cadence: 1464 / 1464.
 
 <!-- END tile-index-v14 -->

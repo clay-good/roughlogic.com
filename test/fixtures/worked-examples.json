@@ -16639,6 +16639,48 @@
    }
   },
   {
+   "tile_id": "gear-tooth-bending-stress",
+   "source_publisher": "Lewis beam-strength equation (Wilfred Lewis, 1892) / Shigley",
+   "source_title": "500 lb tangential load, 8 diametral pitch, 1.5 in face, 20 teeth, 20 deg full depth -> y 0.1084, sigma 7,830 psi",
+   "source_edition_or_year": "sigma = Wt / (F pc y); pc = pi/Pd; y = 0.154 - 0.912/T (20 deg full depth)",
+   "source_section_or_page": "y = 0.154 - 0.912/20 = 0.1084; pc = pi/8 = 0.392699 in; sigma = 500/(1.5 x 0.392699 x 0.1084) = 7,830.5 psi; cross-check Y = pi y = 0.340549, Wt Pd/(F Y) = 4000/0.510824 = 7,830.5 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-07-24",
+   "inputs": {
+    "transmitted_load_lb": 500,
+    "diametral_pitch_1_in": 8,
+    "face_width_in": 1.5,
+    "number_of_teeth": 20,
+    "tooth_system": "20-full-depth"
+   },
+   "outputs": {
+    "bending_stress_psi": {
+     "value": 7830.5,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "lewis_form_factor_y": {
+     "value": 0.1084,
+     "tolerance": {
+      "abs": 0.000001
+     }
+    },
+    "circular_pitch_in": {
+     "value": 0.392699,
+     "tolerance": {
+      "abs": 0.00001
+     }
+    },
+    "lewis_Y_diametral": {
+     "value": 0.340549,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "water-meter-sizing",
    "source_publisher": "AWWA M22 / C700-series",
    "source_title": "Adequate if peak <= normal rating; percent of rating used",

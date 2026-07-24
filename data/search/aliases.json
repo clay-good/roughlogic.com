@@ -1012,6 +1012,36 @@
       "kind": "question"
     },
     {
+      "term": "lewis form factor",
+      "target": "gear-tooth-bending-stress",
+      "kind": "industry"
+    },
+    {
+      "term": "gear tooth bending stress",
+      "target": "gear-tooth-bending-stress",
+      "kind": "industry"
+    },
+    {
+      "term": "gear tooth strength",
+      "target": "gear-tooth-bending-stress",
+      "kind": "industry"
+    },
+    {
+      "term": "lewis equation gear",
+      "target": "gear-tooth-bending-stress",
+      "kind": "adjacent"
+    },
+    {
+      "term": "is my gear tooth strong enough",
+      "target": "gear-tooth-bending-stress",
+      "kind": "question"
+    },
+    {
+      "term": "how much stress on a spur gear tooth",
+      "target": "gear-tooth-bending-stress",
+      "kind": "question"
+    },
+    {
       "term": "hp torque rpm",
       "target": "hp-from-torque",
       "kind": "redirect"

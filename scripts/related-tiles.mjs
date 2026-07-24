@@ -980,6 +980,7 @@ const RELATED = {
   "screw-conveyor-rpm": ["screw-conveyor", "affinity-laws", "belt-pulley"],
   "helical-spring-rate": ["bolt-stretch", "driveshaft-crit", "hp-from-torque"],
   "spring-wire-stress": ["helical-spring-rate", "bolt-stretch", "driveshaft-crit"],
+  "gear-tooth-bending-stress": ["spur-gear-geometry", "gear-mph-rpm", "belt-hp-transmitted"],
   "pesticide-rei-phi": ["tank-mix", "sprayer-calibration", "gpa-rate"],
   "backflow-test-psi": ["backflow", "backflow-sizing", "backflow-loss"],
   "gel-percent-agarose": ["pcr-master-mix", "molarity-dilution", "serial-dilution"],

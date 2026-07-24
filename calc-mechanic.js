@@ -961,6 +961,76 @@ MECHANIC_RENDERERS["spring-wire-stress"] = _simpleRenderer({
   compute: computeSpringWireStress,
 });
 
+// --- spec-v1015 K: gear tooth bending stress, Lewis (`gear-tooth-bending-stress`) ---
+// Lewis beam strength treats a spur-gear tooth as a cantilever loaded by the
+// tangential (transmitted) load Wt at the pitch line. The bending stress at the
+// weakest root section is sigma = Wt / (F pc y), where F is the face width,
+// pc = pi/Pd is the circular pitch, and y is the Lewis form factor. For the
+// standard involute systems y is a closed form of the tooth count T (Wilfred
+// Lewis, 1892): 20 deg full depth y = 0.154 - 0.912/T; 14.5 deg full depth
+// y = 0.124 - 0.684/T; 20 deg stub y = 0.175 - 0.841/T. The diametral-pitch
+// form factor Y = pi y (Shigley) gives the identical stress as Wt Pd/(F Y).
+// This is the STATIC Lewis stress; the Barth velocity factor and the AGMA
+// geometry (J) and load factors are not modeled. The spur-gear-geometry tile
+// names this omission: "the geometry only; does not check tooth strength".
+export const GEAR_TOOTH_SYSTEMS = {
+  "20-full-depth": { a: 0.154, b: 0.912, label: "20 deg full depth" },
+  "14.5-full-depth": { a: 0.124, b: 0.684, label: "14.5 deg full depth" },
+  "20-stub": { a: 0.175, b: 0.841, label: "20 deg stub" },
+};
+// dims: in { transmitted_load_lb: M L T^-2, diametral_pitch_1_in: L^-1, face_width_in: L, number_of_teeth: dimensionless, tooth_system: dimensionless } out: { bending_stress_psi: M L^-1 T^-2, circular_pitch_in: L, lewis_form_factor_y: dimensionless, lewis_Y_diametral: dimensionless }
+export function computeGearToothBendingStress({ transmitted_load_lb = 0, diametral_pitch_1_in = 0, face_width_in = 0, number_of_teeth = 0, tooth_system = "20-full-depth" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Wt = Number(transmitted_load_lb) || 0;
+  const Pd = Number(diametral_pitch_1_in) || 0;
+  const F = Number(face_width_in) || 0;
+  const T = Number(number_of_teeth) || 0;
+  const sys = GEAR_TOOTH_SYSTEMS[tooth_system];
+  if (!sys) return { error: "Tooth system must be 20-full-depth, 14.5-full-depth, or 20-stub." };
+  if (!(Wt > 0)) return { error: "Transmitted (tangential) load must be positive (lb)." };
+  if (!(Pd > 0)) return { error: "Diametral pitch must be positive (teeth per inch)." };
+  if (!(F > 0)) return { error: "Face width must be positive (in)." };
+  if (!(T >= 6)) return { error: "Number of teeth must be at least 6 for the Lewis form factor." };
+  const y = sys.a - sys.b / T;
+  if (!(y > 0)) return { error: "Too few teeth for this tooth system: the Lewis form factor is non-physical." };
+  const pc = Math.PI / Pd;
+  const bending_stress_psi = Wt / (F * pc * y);
+  const lewis_Y_diametral = Math.PI * y;
+  const undercut_teeth = tooth_system === "14.5-full-depth" ? 32 : 17;
+  const undercut_flag = T < undercut_teeth
+    ? "Fewer than " + undercut_teeth + " teeth may undercut at the root; the Lewis factor assumes a full tooth."
+    : null;
+  return {
+    bending_stress_psi, circular_pitch_in: pc, lewis_form_factor_y: y, lewis_Y_diametral, undercut_flag,
+    note: "Lewis beam strength treats the tooth as a cantilever loaded by the tangential load Wt at the pitch line: sigma = Wt / (F pc y), with face width F, circular pitch pc = pi/Pd, and the Lewis form factor y = a - b/T for the tooth system (20 full-depth a,b = 0.154, 0.912; 14.5 full-depth 0.124, 0.684; 20 stub 0.175, 0.841). The diametral-pitch form Y = pi y gives the same stress as sigma = Wt Pd / (F Y). This is the STATIC Lewis stress: it does not apply the velocity (Barth) dynamic factor or the AGMA geometry (J) and load-distribution factors, so it runs optimistic at speed. Compare against the material endurance limit with the maker's factors; AGMA 2001 and the gear maker govern.",
+  };
+}
+export const gearToothBendingStressExample = { inputs: { transmitted_load_lb: 500, diametral_pitch_1_in: 8, face_width_in: 1.5, number_of_teeth: 20, tooth_system: "20-full-depth" } };
+
+MECHANIC_RENDERERS["gear-tooth-bending-stress"] = _simpleRenderer({
+  citation: "Citation: Lewis beam-strength equation (Wilfred Lewis, 1892; public domain): sigma = Wt / (F pc y) with face width F, circular pitch pc = pi/Pd, and the Lewis form factor y = a - b/T (20 deg full depth a,b = 0.154, 0.912; 14.5 deg full depth 0.124, 0.684; 20 deg stub 0.175, 0.841). The diametral-pitch form is sigma = Wt Pd / (F Y) with Y = pi y. Static Lewis stress only - the Barth velocity factor and the AGMA 2001 geometry (J) and load factors are not modeled. The gear maker and AGMA govern.",
+  example: gearToothBendingStressExample.inputs,
+  fields: [
+    { key: "transmitted_load_lb", label: "Transmitted (tangential) load Wt (lb)", kind: "number" },
+    { key: "diametral_pitch_1_in", label: "Diametral pitch Pd (teeth per in)", kind: "number" },
+    { key: "face_width_in", label: "Face width F (in)", kind: "number" },
+    { key: "number_of_teeth", label: "Number of teeth T", kind: "number" },
+    { key: "tooth_system", label: "Tooth system", kind: "select", options: [
+      { value: "20-full-depth", label: "20 deg full depth" },
+      { value: "14.5-full-depth", label: "14.5 deg full depth" },
+      { value: "20-stub", label: "20 deg stub" },
+    ], default: "20-full-depth" },
+  ],
+  outputs: [
+    { key: "s", id: "gtb-out-s", label: "Tooth bending stress", value: (r) => fmt(r.bending_stress_psi, 0) + " psi" },
+    { key: "y", id: "gtb-out-y", label: "Lewis form factor", value: (r) => "y = " + fmt(r.lewis_form_factor_y, 4) + " (circular pitch); Y = pi y = " + fmt(r.lewis_Y_diametral, 3) + " (diametral pitch)" },
+    { key: "pc", id: "gtb-out-pc", label: "Circular pitch pc", value: (r) => fmt(r.circular_pitch_in, 4) + " in" },
+    { key: "u", id: "gtb-out-u", label: "Undercut check", value: (r) => r.undercut_flag ? r.undercut_flag : "OK (enough teeth to avoid root undercut)" },
+    { key: "n", id: "gtb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGearToothBendingStress,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================
