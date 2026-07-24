@@ -828,7 +828,7 @@ export const disinfectionCTExample = {
 };
 
 function renderDisinfectionCT(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per USEPA Surface Water Treatment Rule Guidance Manual EPA 815-R-99-014 Table A-1 (free chlorine 3-log Giardia inactivation, ≤0.4 mg/L band, 6 temperature x 4 pH grid). 4-log virus credit per SWTR Table E-1 simplified contact-time formula. State primacy agency governs CT compliance; this tile is a planning check, not a compliance report. Free at epa.gov/dwreginfo/surface-water-treatment-rules.";
+  citationEl.textContent = "Citation: Per USEPA Surface Water Treatment Rule Guidance Manual EPA 815-R-99-014 Table A-1 (free chlorine 3-log Giardia inactivation, ≤0.4 mg/L band, 6 temperature x 4 pH grid). 4-log virus pass inferred from the Giardia result (free-chlorine 3-log Giardia is more stringent than 4-log virus; no separate Table E-1 lookup). State primacy agency governs CT compliance; this tile is a planning check, not a compliance report. Free at epa.gov/dwreginfo/surface-water-treatment-rules.";
 
   const c = makeNumber("Free chlorine residual (mg/L)", "ct-c", { step: "any", min: "0" });
   const t10 = makeNumber("Contact time t10 (min; basin 10-percentile)", "ct-t10", { step: "any", min: "0" });

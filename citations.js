@@ -2173,7 +2173,7 @@ export const CITATIONS = {
   },
 
   "disinfection-ct": {
-    formula: "CT_achieved (mg-min/L) = chlorine_mg_l * t10_minutes. CT_required from bilinear interpolation of SWTR Table A-1 (free chlorine, 3-log Giardia, <=0.4 mg/L band) over the 6 temperature x 4 pH grid. 4-log virus credit from the SWTR Table E-1 simplified contact-time relation.",
+    formula: "CT_achieved (mg-min/L) = chlorine_mg_l * t10_minutes. CT_required from bilinear interpolation of SWTR Table A-1 (free chlorine, 3-log Giardia, <=0.4 mg/L band) over the 6 temperature x 4 pH grid. 4-log virus pass is inferred from the Giardia result (free-chlorine 3-log Giardia is more stringent than 4-log virus), not from a separate Table E-1 lookup.",
     edition: "USEPA Surface Water Treatment Rule Guidance Manual EPA 815-R-99-014, Tables A-1 and E-1 (public domain).",
     freeAccess: "epa.gov/dwreginfo/surface-water-treatment-rules.",
     governance: GOVERNANCE.water,
@@ -3572,7 +3572,7 @@ export const CITATIONS = {
     ],
   },
   "friction-loss": {
-    formula: "Hazen-Williams head loss (feet of head): hL = 10.44 × Q^1.852 / (C^1.852 × D^4.87) per 100 ft (water; English units; the NFPA-13 4.52 coefficient gives psi, feet = psi × 2.307). Darcy-Weisbach for gas and other fluids.",
+    formula: "Hazen-Williams head loss (feet of head): hL = 10.44 × Q^1.852 / (C^1.852 × D^4.87) per 100 ft (water; English units; the NFPA-13 4.52 coefficient gives psi, feet = psi × 2.307). Darcy-Weisbach with Colebrook-White friction factor uses water properties at 60 °F.",
     edition: "Hazen-Williams (AWWA M11, 5th ed., by name). Darcy-Weisbach: classical fluid mechanics.",
     freeAccess: "AWWA M11 licensed; principles free at engineering OCW. NIST fluid-property tables free at nist.gov.",
     governance: GOVERNANCE.plumbing,
@@ -3593,7 +3593,7 @@ export const CITATIONS = {
     ],
   },
   "pump-sizing": {
-    formula: "Total dynamic head TDH = static lift + friction loss + velocity head + pressure required at outlet. Brake HP = (GPM × TDH) / (3960 × pump_efficiency).",
+    formula: "Hydraulic HP = (GPM × TDH × specific_gravity) / 3960; shaft (brake) HP = hydraulic HP / pump_efficiency. Total dynamic head (TDH) is supplied by the user.",
     edition: "Hydraulic Institute by name; Hazen-Williams (AWWA M11 5th ed.) for friction term.",
     freeAccess: "Hydraulic Institute standards licensed; principles free in published engineering texts and university OCW.",
     governance: GOVERNANCE.plumbing,
@@ -4558,8 +4558,8 @@ export const CITATIONS = {
     ],
   },
   "fastener-pullout": {
-    formula: "Withdrawal capacity W = G^2 × D × p × L_threaded for nails (NDS Eq. 11.2-3 form); lag-screw withdrawal per NDS Table 12.2A. G is wood specific gravity.",
-    edition: AWC_NDS + " Tables 11.2A / 12.2A.",
+    formula: "Withdrawal capacity W = G^2.5 × D × 1380 (lb per inch of thread penetration); G is wood specific gravity, D is fastener shank diameter (NDS nail-withdrawal form). Wood screws apply an approximate 1.85× factor over common nails; lag screws are not modeled.",
+    edition: AWC_NDS + " Chapter 12 (dowel-type fastener withdrawal).",
     freeAccess: "Free at awc.org/codes-standards.",
     governance: GOVERNANCE.structural,
     editionNote: "Editions available: AWC NDS-2018 is the current published edition.",
