@@ -43,7 +43,7 @@
     },
     "combustion-air": {
       "group": "calc-hvac.js (Group C)",
-      "stamp": "Citation: per IMC 2021 §304 (combustion air). 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. AHJ governs. Free at codes.iccsafe.org."
+      "stamp": "Citation: per IMC 2021 §304 (combustion air). 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. This is the FREE AREA; each opening's smallest dimension must also be at least 3 in (IFGC 304.6 -- a long narrow opening is blocked by leaves and lint), which a free-area figure cannot enforce. AHJ governs. Free at codes.iccsafe.org."
     },
     "conduit-fill": {
       "group": "calc-electrical.js (Group A)",

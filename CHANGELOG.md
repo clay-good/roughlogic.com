@@ -4,6 +4,28 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(hvac): two derivation comments that mis-cite the latent-heat constant; combustion-air minimum-dimension note; 2026-07-24
+
+A refute-first audit of calc-hvac.js (70 computes) found the computational core CLEAN -- psychrometrics (Magnus,
+humidity ratio, enthalpy forward/inverse), the duct Darcy-Weisbach/Colebrook solver (independently re-implemented and
+matched to 4 digits), the 1.08/0.68/4.5/500 constants, combustion-air rules, SHR/latent, cooling tower, and the
+Manual J worker/main-thread paths (same object shape) all verified. Three items, all low-severity; no computational
+bug.
+
+- **Two derivation comments cross-cite the wrong latent heat of vaporization.** The code is correct in both places;
+  only the annotations are wrong -- a landmine, since a future editor could "fix" correct code to match a wrong
+  comment. `computeSHRLatent`'s per-lb constant 4840 = 60 x 0.075 x 1076, but the comment said 1060 (which gives
+  4770). The demand-ventilation header's per-grain 0.68 = 60 x 0.075 x 1061 / 7000, but the comment said 1076 (which
+  gives 0.69). Corrected each comment to the hfg the code actually uses.
+- **`combustion-air` citation now states the 3 in minimum-dimension rule.** The tile computes free AREA correctly, but
+  IFGC 304.6 also requires each opening's smallest dimension to be at least 3 in (a long narrow opening is blocked by
+  leaves and lint) -- a real CO-safety detail a free-area figure cannot enforce. Added to the citation, the
+  `docs/citation-discipline.md` stamp, and the regenerated citation-strings.
+- Deliberately NOT changed: the audit suggested a "100 in^2 per opening" floor, but the primary source (IFGC 304.6)
+  confirms only the 3 in minimum DIMENSION, not a 100 in^2 area minimum -- so that was left out rather than guessed.
+  And `computeDuctSize` running ~1 nominal size larger than a slide-rule ductulator is a physically-consistent
+  Darcy-Weisbach result erring on the safe (larger) side, not a bug.
+
 ### fix(plumbing): pipe-sizing cited the wrong IPC table, and pump cycles/hr was 2x the worst case; 2026-07-24
 
 A refute-first audit of calc-plumbing.js (67 computes) found the hydraulics engine correct throughout -- Hazen-Williams,

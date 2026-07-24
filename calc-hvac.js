@@ -1192,7 +1192,7 @@ export function renderCfmPerTon(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IMC 2021 §304 (combustion air). 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IMC 2021 §304 (combustion air). 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. This is the FREE AREA; each opening's smallest dimension must also be at least 3 in (IFGC 304.6 -- a long narrow opening is blocked by leaves and lint), which a free-area figure cannot enforce. AHJ governs. Free at codes.iccsafe.org.";
   const btu = makeNumber("Appliance BTU input", "ca-b", { step: "any", min: "0" });
   const vol = makeNumber("Room volume (ft^3)", "ca-v", { step: "any", min: "0" });
   for (const f of [btu, vol]) inputRegion.appendChild(f.wrap);
@@ -2532,7 +2532,7 @@ export function computeSHRLatent({
 
   // Return-air humidity ratio from T_db_ra / T_wb_ra at altitude P.
   const W_ra = _v9_humidityRatio({ T_db_F: T_ra, T_wb_F: T_wb_ra, P_kPa });
-  // Latent removed in lb/lb = Q_l / (1060 Btu/lb water * CFM * rho_air_sea * 60 min/hr * rho_ratio).
+  // Latent removed in lb/lb = Q_l / (1076 Btu/lb water * CFM * rho_air_sea * 60 min/hr * rho_ratio).
   // Equivalent shorthand: Q_l = 4840 * CFM * dW * rho_ratio  =>  dW = Q_l / (4840 * CFM * rho_ratio).
   const dW_lb_lb = Q_l / (4840 * CFM * rho_ratio);
   const W_sa_lb_lb = Math.max(0, W_ra - dW_lb_lb);
@@ -3368,7 +3368,7 @@ HVAC_RENDERERS["air-pressure-setpoint-savings"] = _rEnv({
 // air off the leaving exhaust), temper (the makeup-air unit heats the
 // outdoor air an exhaust hood pulls in), modulate (the CO2-setpoint
 // demand-controlled ventilation rate). Sea-level psychrometric constants:
-// 1.08 = 60 x 0.075 x 0.24 (sensible), 0.68 = 60 x 0.075 x (1076/1.0)/7000
+// 1.08 = 60 x 0.075 x 0.24 (sensible), 0.68 = 60 x 0.075 x (1061/1.0)/7000
 // (latent, humidity ratio in gr/lb).
 // =====================================================================
 

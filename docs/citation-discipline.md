@@ -89,7 +89,7 @@ The structured §3 reference block in `citations.js` is the deeper source - this
 | manual-j-heating | "Citation: Simplified screening estimate from envelope conductance and infiltration. Code-compliant load calc requires ACCA Manual J (8th ed.). Licensed HVAC designer and AHJ govern. Free at codes.iccsafe.org for IMC references." |
 | duct-sizing | "Citation: per IMC 2021 §603 and Darcy-Weisbach with Colebrook-White friction factor on standard galvanized-steel duct. Equivalent rectangular diameter per Huebscher. AHJ governs. Free at codes.iccsafe.org." |
 | refrigerant-pt | "Citation: Manufacturer P-T table by attribution. ASHRAE 15-2022 governs refrigerant safety; manufacturer technical bulletin governs charge." |
-| combustion-air | "Citation: per IMC 2021 §304 (combustion air). 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. AHJ governs. Free at codes.iccsafe.org." |
+| combustion-air | "Citation: per IMC 2021 §304 (combustion air). 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. This is the FREE AREA; each opening's smallest dimension must also be at least 3 in (IFGC 304.6 -- a long narrow opening is blocked by leaves and lint), which a free-area figure cannot enforce. AHJ governs. Free at codes.iccsafe.org." |
 
 ### calc-fire.js (Group F)
 
