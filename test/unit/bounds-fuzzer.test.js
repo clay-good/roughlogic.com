@@ -22,6 +22,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   awgDiameterInches,
   awgToNumber,
@@ -29286,4 +29287,21 @@ test("bounds: sizing tiles FLAG when the requirement exceeds the largest standar
   const xf = _necXfmr({ loads: [{ kVA: 25 }, { kVA: 18 }], growth_reserve_pct: 25, phase: "three" });
   assert.strictEqual(xf.exceeds_standard, false);
   assert.ok(xf.recommended_kVA >= xf.required_kVA);
+});
+
+test("bounds: the wire-ampacity tile does not claim to be NEC Table 310.16", () => {
+  // The tile ran an ORIGINAL free-air physics model (pure-math.js says so in its
+  // own comment: "This implementation is original work from physics") while its
+  // citation told the user it was "per NEC 2023 Table 310.16". The model scales
+  // as area^0.75 from a single #12 calibration, so it reads HIGH on large
+  // conductors -- and reading high on ampacity means undersizing the wire.
+  const src = readFileSync(new URL("../../calc-electrical.js", import.meta.url), "utf8");
+  const i = src.indexOf("export function renderWireAmpacity");
+  assert.ok(i > 0, "renderWireAmpacity not found");
+  const block = src.slice(i, i + 4000);
+  // It must NOT assert the table as its source...
+  assert.ok(!/Citation: per NEC 2023 Table 310\.16/.test(block), "citation still claims to BE Table 310.16");
+  // ...and must say plainly what it is.
+  assert.ok(/NOT NEC 2023 Table 310\.16/.test(block), "citation must disclaim the table");
+  assert.ok(/estimate/i.test(block), "must be labelled an estimate");
 });

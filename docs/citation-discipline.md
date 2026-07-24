@@ -39,7 +39,7 @@ The structured §3 reference block in `citations.js` is the deeper source - this
 
 | Tile | Source-stamp |
 | --- | --- |
-| wire-ampacity | "Citation: per NEC 2023 Table 310.16 (75 C column) with §310.15(B) ambient/conduit-fill adjustments. AHJ-adopted edition governs. Free at nfpa.org/freeaccess." |
+| wire-ampacity | "Citation: a physics-based ESTIMATE, not a table lookup. This tile solves a steady-state thermal balance (I^2 R heating against convective and radiative loss from the conductor surface) with the effective coefficient calibrated to a 75 C THWN #12 in 30 C ambient, then applies the NEC 310.15(C)(1) conductor-count adjustment. It is NOT NEC 2023 Table 310.16: the free-air model scales roughly as area^0.75, so it reads progressively HIGH against the table as the conductor gets larger, and reading high on ampacity means undersizing the wire. Size conductors from NEC 2023 Table 310.16 in the AHJ-adopted edition; for table-based work use the ambient/fill adjustment tile, which takes the Table 310.16 ampacity as an input. Free at nfpa.org/freeaccess." |
 | conduit-fill | "Citation: per NEC 2023 Chapter 9, Table 4 (conduit areas) and Chapter 9, Table 5 (conductor areas). Fill thresholds 53% (1 conductor), 31% (2 conductors), 40% (>= 3 conductors). AHJ governs. Free at nfpa.org/freeaccess." |
 | box-fill | "Citation: per NEC 2023 §314.16 (volume allowances by conductor size; devices count twice the largest conductor; internal clamps count once). AHJ governs. Free at nfpa.org/freeaccess." |
 | service-load | "Citation: per NEC 2023 §220.12 (general lighting 3 VA/ft^2), §220.42 (dwelling demand 3000 / 35% / 25% schedule), §220.82 (optional method). AHJ governs final service sizing. Free at nfpa.org/freeaccess." |

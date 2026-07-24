@@ -283,7 +283,7 @@
     },
     "wire-ampacity": {
       "group": "calc-electrical.js (Group A)",
-      "stamp": "Citation: per NEC 2023 Table 310.16 (75 C column) with §310.15(B) ambient/conduit-fill adjustments. AHJ-adopted edition governs. Free at nfpa.org/freeaccess."
+      "stamp": "Citation: a physics-based ESTIMATE, not a table lookup. This tile solves a steady-state thermal balance (I^2 R heating against convective and radiative loss from the conductor surface) with the effective coefficient calibrated to a 75 C THWN #12 in 30 C ambient, then applies the NEC 310.15(C)(1) conductor-count adjustment. It is NOT NEC 2023 Table 310.16: the free-air model scales roughly as area^0.75, so it reads progressively HIGH against the table as the conductor gets larger, and reading high on ampacity means undersizing the wire. Size conductors from NEC 2023 Table 310.16 in the AHJ-adopted edition; for table-based work use the ambient/fill adjustment tile, which takes the Table 310.16 ampacity as an input. Free at nfpa.org/freeaccess."
     }
   }
 }

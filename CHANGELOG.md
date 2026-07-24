@@ -4,6 +4,25 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(electrical): the ampacity tile claimed to be NEC Table 310.16 while running its own physics model; 2026-07-23
+
+- `wire-ampacity` told the user *"Citation: per NEC 2023 Table 310.16 (75 C column)"*, but it calls
+  `ampacityFromPhysics`, whose own source comment says **"This implementation is original work from physics"** and
+  describes a free-air approximation calibrated to a single #12 data point. The model scales roughly as `area^0.75`,
+  so it drifts progressively HIGH against the table as conductors get larger -- and reading high on ampacity means
+  **undersizing the wire**. No NEC table was needed to establish this: the code contradicts its own citation.
+- Fixed the citation to state plainly what the tile is (a thermal-balance estimate), why it diverges, and that
+  Table 310.16 in the adopted edition governs -- and added a **"Basis"** line to the rendered output, because the
+  citation is a separate UI element a user may never read. The answer itself now says
+  *"Thermal-balance estimate, NOT NEC Table 310.16 - it reads high on larger conductors."*
+- The repo's existing citation-discipline gate caught the edit and forced it to be done properly: the stamp is the
+  same verbatim string in the tile, in `docs/citation-discipline.md` (the spec-v10 §3.3 source of truth), and in the
+  regenerated `citation-strings.generated.json`. A pre-existing test (`B.1`) had been *enforcing* the misleading
+  claim; its intent (cite the governing authority + free-access URL) is preserved -- the tile still points at
+  Table 310.16 as what governs, it just no longer claims to BE it.
+- Guarded by a test asserting the citation never re-acquires the "per NEC 2023 Table 310.16" form and always carries
+  the disclaimer.
+
 ### fix(electrical): NEC conductor-count derate past 20, and sizing tiles that silently clamped; 2026-07-23
 
 A refute-first audit of calc-electrical.js (77 computes, the highest-consequence module in the catalog) produced two

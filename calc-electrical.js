@@ -480,7 +480,7 @@ function awgOptions() {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderWireAmpacity(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: per NEC 2023 Table 310.16 (75 C column) with §310.15(B) ambient/conduit-fill adjustments. AHJ-adopted edition governs. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: a physics-based ESTIMATE, not a table lookup. This tile solves a steady-state thermal balance (I^2 R heating against convective and radiative loss from the conductor surface) with the effective coefficient calibrated to a 75 C THWN #12 in 30 C ambient, then applies the NEC 310.15(C)(1) conductor-count adjustment. It is NOT NEC 2023 Table 310.16: the free-air model scales roughly as area^0.75, so it reads progressively HIGH against the table as the conductor gets larger, and reading high on ampacity means undersizing the wire. Size conductors from NEC 2023 Table 310.16 in the AHJ-adopted edition; for table-based work use the ambient/fill adjustment tile, which takes the Table 310.16 ampacity as an input. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ awg: "12", material: "copper", insulation: "75", ambient: 30, bundle: 1 }));
 
   const awg = makeSelect("AWG", "wa-awg", awgOptions());
@@ -515,7 +515,8 @@ export function renderWireAmpacity(inputRegion, outputRegion, citationEl, params
   inputRegion.appendChild(chipRow);
   inputRegion.appendChild(bun.wrap);
 
-  const out = makeOutputLine(outputRegion, "Ampacity", "wa-out");
+  const out = makeOutputLine(outputRegion, "Ampacity (physics estimate)", "wa-out");
+  const outBasis = makeOutputLine(outputRegion, "Basis", "wa-out-basis");
 
   function fillExample(v) {
     awg.select.value = v.awg; mat.select.value = v.material; ins.select.value = v.insulation;
@@ -530,6 +531,7 @@ export function renderWireAmpacity(inputRegion, outputRegion, citationEl, params
       bundle_count: Number(bun.input.value) || 1,
     });
     out.textContent = fmt(r.ampacity_A, 1) + " A";
+    outBasis.textContent = "Thermal-balance estimate, NOT NEC Table 310.16 - it reads high on larger conductors. Size from the table in the adopted NEC edition.";
   }, DEBOUNCE_MS);
 
   for (const el of [awg.select, mat.select, ins.select, amb.input, bun.input]) el.addEventListener("input", update);
