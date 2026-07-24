@@ -4,6 +4,27 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(gas): two citations.js entries described formulas/methods the code does not implement; 2026-07-24
+
+A refute-first audit of calc-gas.js (the highest life-safety consequence in the catalog: undersizing -> CO or
+explosion) found the SIZING MATH CORRECT and self-consistent -- the Spitzglass kernel and its exact inverses, the
+Btu->cfh direction with realistic heating values, the specific gravities (0.60 NG / 1.52 propane, not swapped), and the
+Wobbe/fuel-conversion physics all verified. No undersizing bug. Two citations.js-vs-code contradictions (the pattern
+this session found across six modules), both documentation-only:
+
+- **`gas-leak-rate`'s citations.js formula read `Q = Cd x A x sqrt(2 x dP / rho)`** (a Bernoulli/density form), but the
+  compute and the in-tile citation both use `Q = 3550 x c x A x sqrt(dP / SG)` (the Spitzglass-coefficient form). Aligned
+  the citations.js formula to the code.
+- **`gas-pipe-sizing`'s citations.js formula claimed "Spitzglass / Weymouth ... longest-length method per IFGC Tables
+  402.4(1)-(36)".** The code implements ONLY the Spitzglass formula on a single entered length -- no Weymouth, no table
+  lookup, no multi-branch network. Corrected it to describe the single-run Spitzglass estimate accurately and state
+  plainly that it is NOT the full Table 402.4 longest-length network method (which the AHJ and tables govern) -- so a
+  user cannot mistake the output for table-equivalent.
+- Left as-is (correctly): the altitude-derate convention (counting 4%/1000 ft from the 2000 ft threshold vs from sea
+  level) genuinely appears both ways in the literature, the code + note + citation are internally consistent, and the
+  percent/threshold are user-editable -- NEEDS-PRIMARY-SOURCE, not asserted wrong. And the copyrighted Table 402.4
+  capacities were not touched.
+
 ### fix(rigging): D/d bend efficiency capped at 95% (never 100%); backwards tag-line citation sentence; 2026-07-24
 
 A refute-first audit of calc-rigging.js (31 computes) found the LIFE-SAFETY core -- every sling-tension, leg-count, and

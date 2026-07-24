@@ -3614,7 +3614,7 @@ export const CITATIONS = {
     ],
   },
   "gas-pipe-sizing": {
-    formula: "Spitzglass / Weymouth public formulas with bundled gas properties; longest-length method per IFGC 2021 Section 402.4 and Tables 402.4(1)–(36).",
+    formula: "Spitzglass low-pressure formula Q = 3550 * sqrt(d^5 * dP / (SG * L * (1 + 3.6/d + 0.03 d))) sizing a SINGLE run of the entered length -- it picks the smallest listed diameter whose Spitzglass capacity meets the load. This is a single-segment estimate, NOT the full IFGC 2021 Section 402.4 / Tables 402.4(1)-(36) longest-length network method, and does not implement the Weymouth equation; a multi-branch system is sized on the single longest run to the most remote appliance, which the AHJ and the tables govern.",
     edition: IFGC_2021 + " Section 402.4 and capacity tables.",
     freeAccess: ICC_FREE + " NFPA 54: " + NFPA54_FREE,
     governance: GOVERNANCE.plumbing,
@@ -3876,7 +3876,7 @@ export const CITATIONS = {
     ],
   },
   "gas-leak-rate": {
-    formula: "Orifice flow estimate Q = Cd × A × √(2 × ΔP / ρ); converted to scf/h with bundled natural-gas / propane density at standard conditions.",
+    formula: "Orifice-flow leak estimate Q = 3550 * c * A * sqrt(dP / SG) (scf/h), the Spitzglass-coefficient form using specific gravity, matching the compute. Estimation only, not an authoritative leak-rate calculation.",
     edition: "Classical fluid mechanics; orifice coefficient typical from public engineering references.",
     freeAccess: "NIST fluid-property tables free at nist.gov.",
     governance: GOVERNANCE.plumbing,
