@@ -385,7 +385,7 @@ import {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPipeSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IPC 2021 Table 422.1 (fixture units); Hunter's Curve (1940; NBS BMS65) public-domain methodology. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: WSFU per IPC 2021 Table 604.3 and DFU per Table 709.1; Hunter's Curve (1940; NBS BMS65) public-domain methodology converts water-supply fixture units to gpm. AHJ governs. Free at codes.iccsafe.org.";
   const fixtures = Object.keys(FIXTURE_UNITS);
   const rows = [];
   for (const f of fixtures) {
@@ -3362,7 +3362,7 @@ export function computePressureTankDrawdown({ mode = "find-drawdown", tank_volum
     const tank = target / factor;
     let runtime = null, cycles = null;
     const gpm = Number(pump_gpm);
-    if (gpm > 0) { runtime = target / gpm; cycles = 30 / runtime; if (runtime < 1) notes.push("Runtime per cycle " + fmt(runtime, 2) + " min is below the 1-minute anti-short-cycle minimum."); }
+    if (gpm > 0) { runtime = target / gpm; cycles = 15 / runtime; /* 15/runtime = Q/(4*drawdown)/hr: worst-case cycling is at demand = Q/2, period = 4*drawdown/Q */ if (runtime < 1) notes.push("Runtime per cycle " + fmt(runtime, 2) + " min is below the 1-minute anti-short-cycle minimum."); }
     else notes.push("Pump gpm not entered: runtime and cycles suppressed.");
     return { mode, tank_volume_gal: tank, drawdown_gal: target, precharge_psi: Ppre, runtime_min: runtime, cycles_per_hour: cycles, notes };
   }
@@ -3373,7 +3373,7 @@ export function computePressureTankDrawdown({ mode = "find-drawdown", tank_volum
   const drawdown = V * Math.max(factor, 0);
   let runtime = null, cycles = null;
   const gpm = Number(pump_gpm);
-  if (gpm > 0) { runtime = drawdown / gpm; cycles = runtime > 0 ? 30 / runtime : null; if (runtime > 0 && runtime < 1) notes.push("Runtime per cycle " + fmt(runtime, 2) + " min is below the 1-minute anti-short-cycle minimum."); }
+  if (gpm > 0) { runtime = drawdown / gpm; cycles = runtime > 0 ? 15 / runtime : null; /* Q/(4*drawdown)/hr, worst-case cycling at demand = Q/2 */ if (runtime > 0 && runtime < 1) notes.push("Runtime per cycle " + fmt(runtime, 2) + " min is below the 1-minute anti-short-cycle minimum."); }
   else notes.push("Pump gpm not entered: runtime and cycles suppressed.");
   return { mode, tank_volume_gal: V, drawdown_gal: drawdown, precharge_psi: Ppre, runtime_min: runtime, cycles_per_hour: cycles, notes };
 }
@@ -3382,7 +3382,7 @@ export const pressureTankDrawdownExample = { inputs: { mode: "find-drawdown", ta
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v26renderPressureTankDrawdown(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Pressure-tank drawdown from Boyle's law on the diaphragm air charge (drawdown = V * (Ppre_abs/Pin_abs - Ppre_abs/Pout_abs)) and the anti-short-cycle minimum-runtime rule (about 1 min per cycle), per the published pump/tank engineering practice (Amtrol/WellMate and the WQA references), by name; first-principles gas law. The pump manufacturer's minimum runtime and the installed precharge govern.";
+  citationEl.textContent = "Citation: Pressure-tank drawdown from Boyle's law on the diaphragm air charge (drawdown = V * (Ppre_abs/Pin_abs - Ppre_abs/Pout_abs)) the worst-case cycle rate (maximum cycling occurs when demand is half the pump output, giving a minimum period of 4 x drawdown / pump_gpm, i.e. 15 x pump_gpm / drawdown cycles per hour), and the anti-short-cycle minimum-runtime rule (about 1 min per run), per the published pump/tank engineering practice (Amtrol/WellMate and the WQA references), by name; first-principles gas law. The pump manufacturer's minimum runtime and the installed precharge govern.";
   const mode = makeSelect("Mode", "ptd-mode", [
     { value: "find-drawdown", label: "Find drawdown from a tank", selected: true },
     { value: "size-the-tank", label: "Size the tank for a drawdown" },

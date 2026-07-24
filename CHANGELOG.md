@@ -4,6 +4,25 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(plumbing): pipe-sizing cited the wrong IPC table, and pump cycles/hr was 2x the worst case; 2026-07-24
+
+A refute-first audit of calc-plumbing.js (67 computes) found the hydraulics engine correct throughout -- Hazen-Williams,
+Manning, the circular partial-flow solver, the open-channel set, water hammer, thermal expansion all re-derived and
+verified. Two internal-contradiction defects, both fixable with no copyrighted table:
+
+- **`pipe-sizing` cited "IPC 2021 Table 422.1 (fixture units)".** The tile sums WSFU and DFU from `FIXTURE_UNITS`, and
+  those values live in Table 604.3 (WSFU) and Table 709.1 (DFU) -- as the repo's OWN `citations.js` states for this
+  same tile, and as the sibling `sanitary-dfu` tile cites. Table 422.1 is occupancy fixture-COUNT material, a
+  different calculation. Corrected the citation to 604.3 / 709.1 across the tile, the `docs/citation-discipline.md`
+  source of truth, the regenerated citation-strings, and a B.2 test that had been *enforcing* the wrong table. String
+  fix only; no compute change.
+- **`pressure-tank-drawdown` reported "Worst-case cycles/hr" at 2x the actual worst case.** Pump cycling is fastest
+  when demand is half the pump output: minimum period = 4 x drawdown / Q, so max cycles/hr = 15 x Q / drawdown =
+  15 / runtime. The code used 30 / runtime. For the 44 gal / 40-60 psi / 10 gpm example it reported 26.4 cycles/hr
+  where the textbook worst case is 13.2. The drawdown (Boyle's law) and the minimum-runtime anti-short-cycle check are
+  unchanged and were already correct; only the cycle-rate coefficient was wrong. Fixed in both tile modes with the
+  derivation named in the citation.
+
 ### fix(electrical): motor OCPD fuse ratings (240.6(A)) and welder scope/OCPD rounding (630.11/630.12); 2026-07-23
 
 Two more NEC findings, both closable after web-verifying one provision and resolving the rest from internal

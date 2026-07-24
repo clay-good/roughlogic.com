@@ -74,7 +74,7 @@ The structured §3 reference block in `citations.js` is the deeper source - this
 
 | Tile | Source-stamp |
 | --- | --- |
-| pipe-sizing | "Citation: per IPC 2021 Table 422.1 (fixture units); Hunter's Curve (1940; NBS BMS65) public-domain methodology. AHJ governs. Free at codes.iccsafe.org." |
+| pipe-sizing | "Citation: WSFU per IPC 2021 Table 604.3 and DFU per Table 709.1; Hunter's Curve (1940; NBS BMS65) public-domain methodology converts water-supply fixture units to gpm. AHJ governs. Free at codes.iccsafe.org." |
 | gas-pipe-sizing | "Citation: per IFGC 2021 Table 402.4 (NFPA 54). Spitzglass low-pressure gas formula Q = 3550 * sqrt(d^5 * dP / (SG * L * (1 + 3.6/d + 0.03*d))), the diameter-correction term included as the tile computes it. AHJ governs. Free at codes.iccsafe.org." |
 | friction-loss | "Citation: Hazen-Williams (1905, public domain). IPC 2021 referenced for application." |
 | septic-tank | "Citation: EPA Onsite Wastewater Treatment Manual (EPA/625/R-00/008). 150 gpd per bedroom rule of thumb; tank floor 1000 gal; tank gallons >= 2 * daily flow. State primacy agency governs final design. Free at epa.gov/septic." |

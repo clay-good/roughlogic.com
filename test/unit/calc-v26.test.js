@@ -71,6 +71,13 @@ test("pressure-tank-drawdown: Boyle's-law drawdown and size round-trip", () => {
   assert.ok(near(r.drawdown_gal, 11.3497, 1e-2));
   assert.strictEqual(r.precharge_psi, 38); // default cut-in - 2
   assert.ok(near(r.runtime_min, 1.135, 1e-2));
+  // Worst-case pump cycling is at demand = half the pump output: minimum period
+  // = 4 x drawdown / Q, so max cycles/hr = 15 x Q / drawdown = 15 / runtime. The
+  // code previously used 30 / runtime -- exactly 2x the textbook worst case,
+  // while its output is labelled "Worst-case cycles/hr". (2026-07-24 fix.)
+  assert.ok(near(r.cycles_per_hour, 15 / r.runtime_min, 1e-9));
+  assert.ok(near(r.cycles_per_hour, 15 * 10 / r.drawdown_gal, 1e-6));
+  assert.ok(near(r.cycles_per_hour, 13.22, 0.05));
   // size mode round-trips the drawdown (C-4)
   const sized = computePressureTankDrawdown({ mode: "size-the-tank", target_drawdown_gal: r.drawdown_gal, cut_in_psi: 40, cut_out_psi: 60 });
   assert.ok(near(sized.tank_volume_gal, 44, 1e-3));

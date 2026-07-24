@@ -187,7 +187,7 @@
     },
     "pipe-sizing": {
       "group": "calc-plumbing.js (Group B)",
-      "stamp": "Citation: per IPC 2021 Table 422.1 (fixture units); Hunter's Curve (1940; NBS BMS65) public-domain methodology. AHJ governs. Free at codes.iccsafe.org."
+      "stamp": "Citation: WSFU per IPC 2021 Table 604.3 and DFU per Table 709.1; Hunter's Curve (1940; NBS BMS65) public-domain methodology converts water-supply fixture units to gpm. AHJ governs. Free at codes.iccsafe.org."
     },
     "piti": {
       "group": "calc-realestate.js (Group X, v12 §8)",

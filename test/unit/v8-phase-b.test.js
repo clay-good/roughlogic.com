@@ -70,9 +70,9 @@ test("B.1 gfci-afci-reference cites NEC 2023 §210.8 / §210.12 / §406.4", asyn
 
 // --- Plumbing (spec §B.2) ---
 
-test("B.2 pipe-sizing cites IPC 2021 Table 422.1 + Hunter (1940)", async () => {
+test("B.2 pipe-sizing cites IPC 2021 Tables 604.3 (WSFU) / 709.1 (DFU) + Hunter (1940)", async () => {
   const t = await readCalc("calc-plumbing.js");
-  assertCitationContains(t, ["IPC 2021 Table 422.1", "Hunter", "codes.iccsafe.org"], "pipe-sizing");
+  assertCitationContains(t, ["IPC 2021 Table 604.3", "Table 709.1", "Hunter", "codes.iccsafe.org"], "pipe-sizing");
 });
 test("B.2 gas-pipe-sizing cites IFGC 2021 Table 402.4 (NFPA 54)", async () => {
   const t = await readCalc("calc-gas.js"); // relocated from calc-plumbing.js (spec-v42 split)
