@@ -4,6 +4,32 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): injector-flow-at-pressure, the rail pressure injector-size says it skips; 2026-07-27
+
+A self-declared gap, quoted from `injector-size`'s own note: it "does not cover a return-versus-returnless
+fuel system, the rail pressure that sets the injector's static flow, or direct injection." That tile has no
+pressure term anywhere. Adds one tile to `calc-mechanic.js` (Group K); no new constants -- the square-root
+orifice law is physics and the 10.5 cc/min-to-lb/h factor is the sibling's own, already documented there.
+
+Two things the tile is built around. Pressure is a **weak lever**: flow follows the square root, so it
+takes four times the differential to double the flow and no amount of fuel pressure rescues an injector
+that is simply too small. And the fuel system decides the differential -- a return system's
+manifold-referenced regulator holds it constant so boost changes nothing, while a returnless system holds
+the RAIL constant, so boost eats the differential and the engine **loses fuel exactly when it wants more**.
+Pinned: a 550 cc/min injector on a returnless 43.5 psi rail at 15 psi boost delivers 445 cc/min, 19.1%
+under its rating; the cross-check runs identical inputs on a return system and it holds all 550.
+
+Fuzzer pins the boost loss, return-system invariance across four manifold pressures including vacuum, the
+square-root law both generally and as the specific 4x-differential-doubles-flow property, that vacuum
+raises flow, that raising the rail recovers the loss, and the boost-consumes-the-rail error. Catalog
+1,490 -> 1,491. Spec: spec-v1107.
+
+**One candidate deferred in the same session.** `rc-headed-bar-development` (ACI 318-19 §25.4.4) was scoped
+and dropped: the equation's structure appears in secondary sources but the Table 25.4.4.3 modification
+factors could not be verified against the standard, and the one apparent confirmation turned out to be a
+search engine echoing the query's own phrasing back. A structural development length does not ship on
+recalled coefficients.
+
 ### feat(finish): cabinet-linear-feet, and the corner that makes wall-to-wall over-count; 2026-07-27
 
 No cabinet tile existed -- the only "cabinet" aliases point at under-cabinet LED tape, and there is no

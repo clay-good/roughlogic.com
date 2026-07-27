@@ -30656,3 +30656,56 @@ test("bounds: spec-v1106 computeCabinetLinearFeet pins the corner-loss rule, the
   assert.ok("error" in _v1106({ ...base, appliance_openings_ft: 18 }));
   assert.ok("error" in _v1106({ ...base, base_wall_ft: Infinity }));
 });
+
+import { computeInjectorFlowAtPressure as _v1107 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v1107 computeInjectorFlowAtPressure pins the returnless boost loss, the return-system invariance, the square-root law and its 4x-for-double property, the cc/min-to-lb/h factor, and error seams", () => {
+  const base = { rated_flow_ccmin: 550, rated_pressure_psi: 43.5, rail_pressure_psi: 43.5, manifold_pressure_psig: 15, system_type: "returnless" };
+  // Returnless under boost: the differential is eaten and flow drops 19%.
+  const r = _v1107(base);
+  assert.ok(Math.abs(r.effective_dp_psi - 28.5) < 1e-12);
+  assert.ok(Math.abs(r.flow_ccmin - 445.18497) < 1e-4);
+  assert.ok(Math.abs(r.pct_change + 19.05728) < 1e-4);
+  assert.ok(r.loses_flow_under_boost === true);
+  // Return system, identical inputs: the regulator holds the differential, so nothing changes.
+  const ret = _v1107({ ...base, system_type: "return" });
+  assert.ok(ret.effective_dp_psi === 43.5 && Math.abs(ret.flow_ccmin - 550) < 1e-12);
+  assert.ok(Math.abs(ret.pct_change) < 1e-12 && ret.loses_flow_under_boost === false);
+  // A return system ignores manifold pressure entirely - boost or vacuum.
+  for (const map of [-10, 0, 15, 30]) {
+    const t = _v1107({ ...base, system_type: "return", manifold_pressure_psig: map });
+    assert.ok(Math.abs(t.flow_ccmin - 550) < 1e-12);
+  }
+  // The square-root law: 4x the differential exactly doubles the flow.
+  {
+    const at1 = _v1107({ ...base, rail_pressure_psi: 43.5, manifold_pressure_psig: 0 });
+    const at4 = _v1107({ ...base, rail_pressure_psi: 174, manifold_pressure_psig: 0 });
+    assert.ok(Math.abs(at1.flow_ccmin - 550) < 1e-12);
+    assert.ok(Math.abs(at4.flow_ccmin - 1100) < 1e-9);
+  }
+  // General sqrt identity across a differential sweep.
+  for (const rail of [20, 43.5, 58, 90]) {
+    const t = _v1107({ ...base, rail_pressure_psi: rail, manifold_pressure_psig: 0 });
+    assert.ok(Math.abs(t.flow_ccmin - 550 * Math.sqrt(rail / 43.5)) < 1e-9);
+    assert.ok(Math.abs(t.flow_lbh - t.flow_ccmin / 10.5) < 1e-12);
+  }
+  // Vacuum on a returnless system RAISES the differential and the flow.
+  const vac = _v1107({ ...base, manifold_pressure_psig: -8 });
+  assert.ok(vac.effective_dp_psi > 43.5 && vac.flow_ccmin > 550 && vac.pct_change > 0);
+  // Raising the rail recovers the boost loss: 58 psi rail at 15 psi boost is nearly the rating.
+  const raised = _v1107({ ...base, rail_pressure_psi: 58 });
+  assert.ok(Math.abs(raised.effective_dp_psi - 43) < 1e-12);
+  assert.ok(Math.abs(raised.flow_ccmin - 546.82994) < 1e-4);
+  assert.ok(raised.flow_ccmin > r.flow_ccmin);
+  // At the rating point the factor is exactly 1.
+  const atRating = _v1107({ ...base, manifold_pressure_psig: 0 });
+  assert.ok(Math.abs(atRating.flow_factor - 1) < 1e-12 && Math.abs(atRating.pct_change) < 1e-12);
+  // Error seams, including boost consuming the whole rail.
+  assert.ok("error" in _v1107({ ...base, rail_pressure_psi: 15, manifold_pressure_psig: 15 }));
+  assert.ok("error" in _v1107({ ...base, rail_pressure_psi: 10, manifold_pressure_psig: 20 }));
+  assert.ok("error" in _v1107({ ...base, rated_flow_ccmin: 0 }));
+  assert.ok("error" in _v1107({ ...base, rated_pressure_psi: 0 }));
+  assert.ok("error" in _v1107({ ...base, rail_pressure_psi: 0 }));
+  assert.ok("error" in _v1107({ ...base, system_type: "direct" }));
+  assert.ok("error" in _v1107({ ...base, manifold_pressure_psig: Infinity }));
+});

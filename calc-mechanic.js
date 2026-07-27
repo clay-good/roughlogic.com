@@ -2969,3 +2969,63 @@ MECHANIC_RENDERERS["hydraulic-line-velocity"] = _simpleRenderer({
   ],
   compute: computeHydraulicLineVelocity,
 });
+
+// --- spec-v1107 K: Injector static flow at a different rail pressure ---
+// injector-size's own note says it "does not cover a return-versus-returnless fuel system, the rail
+// pressure that sets the injector's static flow". An injector is an ORIFICE, so flow scales with
+// sqrt of the pressure DIFFERENTIAL across it - no table, no fitted constant. The differential is
+// where the two fuel systems part: a return system's regulator references manifold pressure and
+// holds the differential constant, while a returnless system holds the RAIL constant, so boost eats
+// the differential and the injector flows LESS exactly when the engine wants more.
+// dims: in { rated_flow_ccmin: L^3 T^-1, rated_pressure_psi: M L^-1 T^-2, rail_pressure_psi: M L^-1 T^-2, manifold_pressure_psig: M L^-1 T^-2, system_type: dimensionless } out: { effective_dp_psi: M L^-1 T^-2, flow_ccmin: L^3 T^-1, flow_lbh: M T^-1 }
+export function computeInjectorFlowAtPressure({ rated_flow_ccmin = 0, rated_pressure_psi = 43.5, rail_pressure_psi = 43.5, manifold_pressure_psig = 0, system_type = "returnless" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const rated = Number(rated_flow_ccmin) || 0;
+  const ratedP = Number(rated_pressure_psi) || 0;
+  const rail = Number(rail_pressure_psi) || 0;
+  const map = Number(manifold_pressure_psig);
+  if (system_type !== "returnless" && system_type !== "return") return { error: "System type must be returnless or return." };
+  if (!(rated > 0)) return { error: "Rated injector flow must be positive (cc/min)." };
+  if (!(ratedP > 0)) return { error: "Rated test pressure must be positive (psi; 43.5 psi / 3 bar is the common rating point)." };
+  if (!(rail > 0)) return { error: "Rail pressure must be positive (psi)." };
+  if (!Number.isFinite(map)) return { error: "Manifold pressure must be a number (psig; positive is boost, negative is vacuum)." };
+  const returnless = system_type === "returnless";
+  const effective_dp_psi = returnless ? rail - map : rail;
+  if (!(effective_dp_psi > 0)) return { error: "Boost has consumed the entire rail pressure - the differential across the injector is zero or negative and no fuel flows. Raise the rail pressure or use a manifold-referenced regulator." };
+  const pressure_ratio = effective_dp_psi / ratedP;
+  const flow_factor = Math.sqrt(pressure_ratio);
+  const flow_ccmin = rated * flow_factor;
+  const flow_lbh = flow_ccmin / 10.5;
+  const rated_lbh = rated / 10.5;
+  const pct_change = (flow_factor - 1) * 100;
+  const loses_flow_under_boost = returnless && map > 0;
+  if (![effective_dp_psi, flow_ccmin, flow_lbh].every(Number.isFinite)) return { error: "Injector-flow math did not produce a finite value." };
+  return {
+    effective_dp_psi, pressure_ratio, flow_factor, flow_ccmin, flow_lbh, rated_lbh, pct_change,
+    loses_flow_under_boost, returnless,
+    note: "An injector is an orifice, so flow follows the SQUARE ROOT of the pressure differential across it - which means pressure is a weak lever: it takes 4x the differential to double the flow, and no amount of fuel pressure rescues an injector that is simply too small. "
+      + (returnless
+        ? "RETURNLESS system: the rail is held at a fixed pressure, so the differential is rail minus manifold. " + (map > 0 ? "Under " + map + " psi of boost the differential drops to " + effective_dp_psi.toFixed(1) + " psi and this injector flows " + Math.abs(pct_change).toFixed(1) + "% LESS than its rating - the engine loses fuel exactly when it wants more, and it is the classic returnless-plus-boost failure. Raise the rail or fit a manifold-referenced regulator. " : "At " + map + " psig manifold the differential is " + effective_dp_psi.toFixed(1) + " psi. ")
+        : "RETURN system with a manifold-referenced regulator: the regulator tracks manifold pressure and holds the differential CONSTANT, so boost does not change the static flow - which is the whole reason that plumbing exists. ")
+      + "Static flow only: this is the injector's full-open capacity, not what it delivers at a given pulse width, and it says nothing about the dead time (latency) that shifts with voltage and pressure and that a tune must correct. Raising rail pressure also slows the injector's opening and can push a small injector out of its linear range at short pulse widths. Gasoline at about 0.72 specific gravity for the cc/min to lb/h conversion; ethanol blends are denser per unit energy and change the whole fuel budget. A tuning aid; the injector's own flow data and the tuner's measured fueling govern.",
+  };
+}
+export const injectorFlowAtPressureExample = { inputs: { rated_flow_ccmin: 550, rated_pressure_psi: 43.5, rail_pressure_psi: 43.5, manifold_pressure_psig: 15, system_type: "returnless" } };
+MECHANIC_RENDERERS["injector-flow-at-pressure"] = _simpleRenderer({
+  citation: "Citation: orifice flow scales with the square root of the pressure differential, flow_new = flow_rated x sqrt(dP_new / dP_rated) - no table and no fitted constant. The differential depends on the fuel system: a RETURN system's manifold-referenced regulator holds the differential constant regardless of boost, while a RETURNLESS system holds the rail pressure constant so the differential is rail minus manifold pressure and boost reduces it. Static (full-open) flow only - not delivered flow at a pulse width, and not injector dead time, which shifts with voltage and pressure. Gasoline at about 0.72 specific gravity for the cc/min to lb/h conversion, matching the injector-size tile. A tuning aid; the injector's flow data and measured fueling govern.",
+  example: injectorFlowAtPressureExample.inputs,
+  fields: [
+    { key: "rated_flow_ccmin", label: "Rated injector flow (cc/min)", kind: "number" },
+    { key: "rated_pressure_psi", label: "Rated at pressure (psi; 43.5 = 3 bar)", kind: "number", default: 43.5 },
+    { key: "rail_pressure_psi", label: "Actual rail pressure (psi)", kind: "number", default: 43.5 },
+    { key: "manifold_pressure_psig", label: "Manifold pressure (psig; + boost, - vacuum)", kind: "number", default: 0 },
+    { key: "system_type", label: "Fuel system", kind: "select", options: [{ value: "returnless", label: "Returnless (fixed rail pressure)", selected: true }, { value: "return", label: "Return (manifold-referenced regulator)" }] },
+  ],
+  outputs: [
+    { key: "dp", id: "ifp-out-dp", label: "Differential across the injector", value: (r) => fmt(r.effective_dp_psi, 1) + " psi" },
+    { key: "f", id: "ifp-out-f", label: "Static flow at this pressure", value: (r) => fmt(r.flow_ccmin, 1) + " cc/min (" + fmt(r.flow_lbh, 1) + " lb/h)" },
+    { key: "c", id: "ifp-out-c", label: "Change from the rating", value: (r) => (r.pct_change >= 0 ? "+" : "") + fmt(r.pct_change, 1) + "% (factor " + fmt(r.flow_factor, 4) + ")" + (r.loses_flow_under_boost ? " - losing flow under boost" : "") },
+    { key: "n", id: "ifp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeInjectorFlowAtPressure,
+});

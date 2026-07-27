@@ -15240,6 +15240,18 @@ export const CITATIONS = {
       { name: "Countertop differs", value: "the top runs the full corner, so corner length is added back for it", source: "cabinet layout geometry" },
     ],
   },
+  "injector-flow-at-pressure": {
+    formula: "flow_new = flow_rated x sqrt(dP_new / dP_rated); returnless dP = rail - manifold pressure, return (manifold-referenced) dP = the regulator's base setting; lb/h = cc/min / 10.5.",
+    edition: "Orifice flow scaling with the square root of the pressure differential - public physics, no table and no fitted constant. The cc/min to lb/h factor matches the landed injector-size tile (gasoline about 0.72 specific gravity).",
+    freeAccess: "The square-root orifice relation is elementary fluid mechanics; injector flow ratings and their test pressure are published on every injector's data sheet.",
+    governance: GOVERNANCE.general,
+    editionNote: "Pressure is a WEAK lever because flow follows the square root: it takes four times the differential to double the flow, and no amount of fuel pressure rescues an injector that is simply too small. The differential is where the two fuel systems part, and it is the point of the tile: a RETURN system's manifold-referenced regulator tracks manifold pressure and holds the differential constant, so boost does not change static flow, while a RETURNLESS system holds the RAIL constant, so the differential is rail minus manifold and boost reduces it - a 550 cc/min injector on a 43.5 psi rail flows 19% LESS at 15 psi of boost, losing fuel exactly when the engine wants more. STATIC flow only: this is full-open capacity, not delivered flow at a pulse width, and it says nothing about injector dead time (latency), which shifts with voltage and pressure and must be corrected in the tune. Raising rail pressure also slows opening and can push a small injector out of its linear range at short pulse widths. Ethanol blends change the whole fuel budget. A tuning aid; the injector's flow data and measured fueling govern.",
+    assumptions: [
+      { name: "Square-root orifice law", value: "flow scales with sqrt of the differential; derived, not fitted", source: "orifice flow physics" },
+      { name: "System type sets the differential", value: "returnless = rail - manifold; return = constant regulator setting", source: "fuel-system plumbing" },
+      { name: "Static flow only", value: "full-open capacity; dead time and pulse-width delivery are not modeled", source: "stated scope limit" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

@@ -1665,7 +1665,8 @@ const RELATED = {
   "valve-authority": ["valve-flow-coefficient", "hydronic-gpm-deltat", "outdoor-reset-ratio"],
   "buffer-tank-loop-credit": ["hydronic-buffer-tank", "pipe-volume", "expansion-tank"],
   // spec-v323..v325 engine-build performance batch (Group K)
-  "injector-size": ["injector-max-hp","volumetric-efficiency","displacement-cr","hp-from-torque"],
+  "injector-flow-at-pressure": ["injector-size","injector-max-hp","volumetric-efficiency"],
+  "injector-size": ["injector-flow-at-pressure","injector-max-hp","volumetric-efficiency","displacement-cr","hp-from-torque"],
   "injector-max-hp": ["injector-size","volumetric-efficiency","hp-from-torque","displacement-cr"],
   "mean-piston-speed": ["max-rpm-from-piston-speed","displacement-cr","hp-from-torque","injector-size"],
   "max-rpm-from-piston-speed": ["mean-piston-speed","displacement-cr","hp-from-torque","injector-size"],
