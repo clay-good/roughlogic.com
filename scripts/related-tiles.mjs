@@ -1443,6 +1443,7 @@ const RELATED = {
   "sloped-backfill-earth-pressure": ["lateral-earth-pressure","at-rest-earth-pressure","retaining-wall-stability"],
   "coulomb-earth-pressure": ["lateral-earth-pressure","sloped-backfill-earth-pressure","retaining-wall-stability"],
   "seismic-earth-pressure": ["coulomb-earth-pressure","retaining-wall-stability","seismic-base-shear"],
+  "cohesive-earth-pressure": ["lateral-earth-pressure","retaining-wall-stability","trench-slope"],
   "retaining-wall-stability": ["lateral-earth-pressure","soil-bearing-capacity","retaining-wall-block"],
   "consolidation-time-rate": ["consolidation-degree","soil-consolidation-settlement","soil-settlement-elastic","spt-bearing-capacity"],
   "consolidation-degree": ["consolidation-time-rate","soil-consolidation-settlement","soil-settlement-elastic","spt-bearing-capacity"],

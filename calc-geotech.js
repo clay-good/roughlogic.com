@@ -1337,3 +1337,79 @@ GEOTECH_RENDERERS["seismic-earth-pressure"] = _simpleRenderer({
   ],
   compute: computeSeismicEarthPressure,
 });
+
+// ===================== spec-v1017: Rankine active earth pressure on a cohesive backfill =====================
+// The reduction lateral-earth-pressure names as its own gap ("a cohesionless
+// soil -- the 2c sqrt(Ka) tension-crack reduction of a cohesive backfill is
+// not applied"). Cohesion subtracts a constant 2c sqrt(Ka) from the active
+// pressure at every depth, so the top of a clay backfill goes into tension,
+// cracks open to depth zc, and the thrust acts on the cracked wall only --
+// but that same crack fills with water, which puts the load back and then
+// some. Nothing in the catalog computed zc, the cracked thrust, the
+// water-filled-crack case, or the critical unsupported height Hc = 2 zc.
+
+// dims: in { phi: dimensionless, c_psf: M L^-1 T^-2, gamma: M L^-2 T^-2, h_ft: L, q: M L^-1 T^-2 } out: { ka: dimensionless, kp: dimensionless, sigma_top: M L^-1 T^-2, sigma_base: M L^-1 T^-2, z_c_ft: L, pa_cracked: M T^-2, y_bar_ft: L, pa_uncracked: M T^-2, pw_crack: M T^-2, pa_plus_water: M T^-2, pp: M T^-2, h_crit_ft: L }
+export function computeCohesiveEarthPressure({ phi = 0, c_psf = 0, gamma = 120, h_ft = 0, q = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(gamma > 0)) return { error: "Soil unit weight must be positive (pcf)." };
+  if (!(h_ft > 0)) return { error: "Retained height must be positive (ft)." };
+  // phi = 0 is the legitimate undrained (total-stress) clay case here, unlike
+  // the cohesionless siblings that require phi > 0.
+  if (phi < 0 || phi >= 50) return { error: "Friction angle must be at least 0 and less than 50 degrees (0 is the undrained clay case)." };
+  if (c_psf < 0) return { error: "Cohesion cannot be negative (psf)." };
+  if (q < 0) return { error: "Surcharge cannot be negative (psf)." };
+  if (!(c_psf > 0)) return { error: "Cohesion must be positive (psf); a cohesionless backfill is the lateral-earth-pressure tile." };
+  const P = phi * Math.PI / 180;
+  const ka = (1 - Math.sin(P)) / (1 + Math.sin(P));
+  const kp = 1 / ka;
+  const rka = Math.sqrt(ka);
+  // Rankine active pressure with cohesion, sigma_a(z) = Ka (gamma z + q) - 2 c sqrt(Ka).
+  const sigma_top = ka * q - 2 * c_psf * rka;
+  const sigma_base = ka * (gamma * h_ft + q) - 2 * c_psf * rka;
+  // Tension-crack depth: where sigma_a crosses zero. Clamped to [0, H] -- a
+  // heavy surcharge can suppress the crack entirely, and a very soft, deep
+  // backfill can put the crossing below the base (no positive pressure at all).
+  const z_raw = (2 * c_psf * rka - ka * q) / (ka * gamma);
+  const z_c_ft = Math.min(Math.max(z_raw, 0), h_ft);
+  // Cracked-wall thrust: the triangle below the crack only, no tension credited.
+  const pa_cracked = Math.max(sigma_base, 0) * (h_ft - z_c_ft) / 2;
+  const y_bar_ft = pa_cracked > 0 ? (h_ft - z_c_ft) / 3 : 0;
+  // Uncracked (theoretical) thrust: the full trapezoid including the negative
+  // top, the value most texts print before the crack is admitted.
+  const pa_uncracked = 0.5 * ka * gamma * h_ft * h_ft + ka * q * h_ft - 2 * c_psf * rka * h_ft;
+  // A water-filled tension crack: full hydrostatic over the crack depth,
+  // acting at zc/3 above the crack bottom, i.e. (H - zc) + zc/3 above the base.
+  const pw_crack = 0.5 * _GAMMA_W * z_c_ft * z_c_ft;
+  const pa_plus_water = pa_cracked + pw_crack;
+  // Rankine passive on the same soil: cohesion ADDS here, +2c sqrt(Kp).
+  const pp = 0.5 * kp * gamma * h_ft * h_ft + 2 * c_psf * Math.sqrt(kp) * h_ft;
+  // Critical unsupported height of a vertical cut, Hc = 4c / (gamma sqrt(Ka))
+  // = 2 zc at zero surcharge: the depth at which the uncracked thrust is zero
+  // and an unbraced face is theoretically self-supporting.
+  const h_crit_ft = 4 * c_psf / (gamma * rka);
+  return { ka, kp, sigma_top, sigma_base, z_c_ft, pa_cracked, y_bar_ft, pa_uncracked, pw_crack, pa_plus_water, pp, h_crit_ft };
+}
+
+export const cohesiveEarthPressureExample = { inputs: { phi: 20, c_psf: 300, gamma: 115, h_ft: 20, q: 0 } };
+
+GEOTECH_RENDERERS["cohesive-earth-pressure"] = _simpleRenderer({
+  citation: "Citation: Rankine active earth pressure on a c-phi (cohesive) backfill -- sigma_a(z) = Ka (gamma z + q) - 2 c sqrt(Ka) with Ka = (1 - sin phi)/(1 + sin phi), the tension-crack depth zc where sigma_a crosses zero, the cracked-wall thrust Pa = 0.5 sigma_a(H) (H - zc) at (H - zc)/3 above the base, the passive sigma_p(z) = Kp gamma z + 2 c sqrt(Kp), and the critical unsupported height Hc = 4c / (gamma sqrt(Ka)) = 2 zc -- as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures). Cohesion cuts a constant 2 c sqrt(Ka) off the active pressure at every depth, so the top of a clay backfill goes into tension and cracks; the tension is not credited (soil does not pull), which is why the cracked thrust is used for design. The crack then fills with water, and the tile reports that full-hydrostatic case beside the dry one -- it is normally the governing load and is the reason clay backfills are drained, not relied on. phi = 0 is the undrained (total-stress) clay case and is allowed. Vertical wall face, level backfill, no wall friction, no water table below the crack, and the fully-mobilized active state (the wall must move enough to reach it); the long-term drained condition can lose most of the cohesion the short-term case shows, so a design that depends on c should be checked both ways. Take c, phi, and gamma from the geotechnical report. A design aid, not a substitute for a geotechnical engineer's report -- the geotechnical engineer of record's recommendation governs, and Hc is a theoretical value, never an excavation-safety allowance (OSHA 29 CFR 1926 Subpart P governs an unbraced face).",
+  example: cohesiveEarthPressureExample.inputs,
+  fields: [
+    { key: "phi", label: "Friction angle phi (deg, 0 for undrained clay)", kind: "number" },
+    { key: "c_psf", label: "Cohesion c (psf)", kind: "number" },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
+    { key: "q", label: "Uniform surcharge q (psf)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "k", id: "cohep-out-k", label: "Coefficients Ka / Kp", value: (r) => fmt(r.ka, 3) + " / " + fmt(r.kp, 2) },
+    { key: "s", id: "cohep-out-s", label: "Active pressure at top / base", value: (r) => fmt(r.sigma_top, 0) + " / " + fmt(r.sigma_base, 0) + " psf" },
+    { key: "z", id: "cohep-out-z", label: "Tension-crack depth zc", value: (r) => fmt(r.z_c_ft, 2) + " ft" },
+    { key: "p", id: "cohep-out-p", label: "Cracked-wall active thrust (design)", value: (r) => fmt(r.pa_cracked, 0) + " lb/ft at " + fmt(r.y_bar_ft, 2) + " ft above the base (uncracked theory " + fmt(r.pa_uncracked, 0) + ")" },
+    { key: "w", id: "cohep-out-w", label: "Water-filled crack case", value: (r) => fmt(r.pa_plus_water, 0) + " lb/ft (adds " + fmt(r.pw_crack, 0) + "; usually governs -- drain the backfill)" },
+    { key: "pp", id: "cohep-out-pp", label: "Passive thrust Pp (cohesion adds)", value: (r) => fmt(r.pp, 0) + " lb/ft" },
+    { key: "hc", id: "cohep-out-hc", label: "Critical unsupported height Hc (theory only)", value: (r) => fmt(r.h_crit_ft, 2) + " ft (OSHA Subpart P governs any unbraced face)" },
+  ],
+  compute: computeCohesiveEarthPressure,
+});

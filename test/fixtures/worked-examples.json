@@ -16639,6 +16639,72 @@
    }
   },
   {
+   "tile_id": "cohesive-earth-pressure",
+   "source_publisher": "Rankine c-phi active earth pressure / Das, Principles of Foundation Engineering / NAVFAC DM-7.02",
+   "source_title": "phi 20 deg, c 300 psf, gamma 115 pcf, H 20 ft, no surcharge -> zc 7.451 ft, cracked thrust 4,439 lb/ft",
+   "source_edition_or_year": "sigma_a(z) = Ka (gamma z + q) - 2 c sqrt(Ka); zc = 2 c / (gamma sqrt(Ka)); Pa = 0.5 sigma_a(H) (H - zc); Hc = 4 c / (gamma sqrt(Ka))",
+   "source_section_or_page": "Ka = (1 - sin 20)/(1 + sin 20) = 0.490291, sqrt(Ka) = 0.700208; sigma_a(0) = -2 x 300 x 0.700208 = -420.1 psf; sigma_a(20) = 0.490291 x 115 x 20 - 420.1 = 1,127.7 - 420.1 = 707.5 psf; zc = 600 / (115 x 0.700208) = 7.451 ft; Pa = 0.5 x 707.5 x (20 - 7.451) = 4,439.4 lb/ft at (20 - 7.451)/3 = 4.183 ft; uncracked trapezoid = 0.5 x 0.490291 x 115 x 400 - 2 x 300 x 0.700208 x 20 = 11,276.7 - 8,402.5 = 2,874.2 lb/ft; water-filled crack adds 0.5 x 62.4 x 7.451^2 = 1,732.2 lb/ft; Hc = 2 zc = 14.902 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-27",
+   "inputs": {
+    "phi": 20,
+    "c_psf": 300,
+    "gamma": 115,
+    "h_ft": 20,
+    "q": 0
+   },
+   "outputs": {
+    "ka": {
+     "value": 0.490291,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "sigma_top": {
+     "value": -420.1,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "sigma_base": {
+     "value": 707.5,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "z_c_ft": {
+     "value": 7.451,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "pa_cracked": {
+     "value": 4439.4,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "pa_uncracked": {
+     "value": 2874.2,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "pw_crack": {
+     "value": 1732.2,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "h_crit_ft": {
+     "value": 14.902,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "seismic-earth-pressure",
    "source_publisher": "Mononobe-Okabe (Okabe 1926; Mononobe and Matsuo 1929) / Kramer, Geotechnical Earthquake Engineering / NAVFAC DM-7.02",
    "source_title": "phi 35 deg, delta 17.5 deg (2/3 phi), vertical wall, level backfill, gamma 120 pcf, H 12 ft, kh 0.15, kv 0 -> Kae 0.3405, Pae 2,942 lb/ft",

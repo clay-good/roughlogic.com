@@ -4,6 +4,35 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(geotech): cohesive-earth-pressure, the clay-backfill case the whole earth-pressure family excluded; 2026-07-27
+
+`lateral-earth-pressure` names its own omission in the first clause of its scope note: "a cohesionless soil (the
+2c sqrt(Ka) tension-crack reduction of a cohesive backfill is not applied)." A repo-wide search for "tension crack"
+returned zero hits, and every tile in the earth-pressure family requires phi > 0, so none of them can even represent
+the undrained clay case. Adds one tile to `calc-geotech.js` (Group E), no new module or dependency.
+
+`cohesive-earth-pressure` applies Rankine to a c-phi soil: cohesion subtracts a constant 2 c sqrt(Ka) from the active
+pressure at every depth, so sigma_a(z) = Ka (gamma z + q) - 2 c sqrt(Ka). The upper zone computes as tension, soil does
+not pull, the backfill cracks to zc = 2c / (gamma sqrt(Ka)), and the design thrust is the triangle below the crack.
+
+Two results this settles that the sand formulas hide. First, the ordering: most texts print the uncracked trapezoid,
+and it is LOWER than the cracked value, because crediting the tension subtracts load the soil cannot carry. In the
+worked example the uncracked figure is 2,874 lb/ft and the real design thrust is 4,439 lb/ft, a 54% understatement --
+the fuzzer pins `Pa_cracked > Pa_uncracked` so the ordering cannot silently invert. Second, the crack fills: full
+hydrostatic over the crack depth adds 1,732 lb/ft, taking the total to 6,172 lb/ft, more than the crack ever relieved.
+That is reported as its own output line rather than buried in prose.
+
+Also returns the passive case (cohesion ADDS there, +2 c sqrt(Kp)) and the critical unsupported height
+Hc = 4c / (gamma sqrt(Ka)) = 2 zc, labeled theory-only in the output line itself with OSHA 29 CFR 1926 Subpart P named
+as what actually governs an unbraced face. phi = 0 (undrained clay) is legal here and c = 0 is not -- the error for a
+cohesionless backfill points at the sibling tile. As c approaches zero both thrusts converge on the value
+`lateral-earth-pressure` returns for the same soil, which the fuzzer pins against that sibling's own output.
+
+Two cap-ledger bumps came with the pair, both by the documented raise-with-a-note path: `calc-geotech.js`
+26000 -> 30000 B gz (the two tiles' long standards notes took it to 27,873 B, 107.2% of the old cap) and the
+group-shell `GROUP_GZIP_CAP` 80 -> 84 KB (construction/index.html reached ~80.3 KB). A per-tile split of
+`calc-geotech.js` remains the eventual preferred fix and is noted in its ledger entry.
+
 ### feat(geotech): seismic-earth-pressure (Mononobe-Okabe), the last unbuilt item on spec-v262's own list; 2026-07-27
 
 `retaining-wall-stability` states its own gap: its citation says it "does not apply seismic (Mononobe-Okabe) pressure or

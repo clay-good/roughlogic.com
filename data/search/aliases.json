@@ -1012,6 +1012,41 @@
       "kind": "question"
     },
     {
+      "term": "cohesive earth pressure",
+      "target": "cohesive-earth-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "clay backfill pressure",
+      "target": "cohesive-earth-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "tension crack depth",
+      "target": "cohesive-earth-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "critical unsupported height",
+      "target": "cohesive-earth-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "undrained clay wall pressure",
+      "target": "cohesive-earth-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how deep does a clay backfill crack",
+      "target": "cohesive-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "how much pressure does clay put on a retaining wall",
+      "target": "cohesive-earth-pressure",
+      "kind": "question"
+    },
+    {
       "term": "mononobe okabe",
       "target": "seismic-earth-pressure",
       "kind": "industry"

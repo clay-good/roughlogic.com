@@ -29490,3 +29490,66 @@ test("bounds: spec-v1016 computeSeismicEarthPressure pins the Mononobe-Okabe coe
   assert.ok("error" in _v1016({ ...base, phi: 20, delta: 0, alpha: 15, kh: 0.4 }));
   assert.ok("error" in _v1016({ ...base, kh: Infinity }));
 });
+
+import { computeCohesiveEarthPressure as _v1017 } from "../../calc-geotech.js";
+import { computeLateralEarthPressure as _v1017l } from "../../calc-geotech.js";
+
+test("bounds: spec-v1017 computeCohesiveEarthPressure pins the c-phi active pressure, the tension crack, the cracked-vs-uncracked ordering, the water-filled case, Hc = 2 zc, and error seams", () => {
+  const base = { phi: 20, c_psf: 300, gamma: 115, h_ft: 20, q: 0 };
+  const r = _v1017(base);
+  const rka = Math.sqrt(r.ka);
+  assert.ok(Math.abs(r.ka - 0.490291) < 1e-5);
+  assert.ok(Math.abs(r.kp - 1 / r.ka) < 1e-12);
+  assert.ok(Math.abs(r.sigma_top - -2 * 300 * rka) < 1e-6); // -420.1 psf
+  assert.ok(Math.abs(r.sigma_base - 707.5) < 0.1);
+  assert.ok(Math.abs(r.z_c_ft - 600 / (115 * rka)) < 1e-9); // 7.451 ft
+  assert.ok(Math.abs(r.pa_cracked - 0.5 * r.sigma_base * (20 - r.z_c_ft)) < 1e-9);
+  assert.ok(Math.abs(r.y_bar_ft - (20 - r.z_c_ft) / 3) < 1e-9);
+  assert.ok(Math.abs(r.pa_uncracked - 2874.2) < 0.1);
+  assert.ok(Math.abs(r.pw_crack - 0.5 * 62.4 * r.z_c_ft ** 2) < 1e-9);
+  assert.ok(Math.abs(r.pa_plus_water - (r.pa_cracked + r.pw_crack)) < 1e-9);
+  // Hc = 2 zc exactly at zero surcharge; both are 4c/(gamma sqrt(Ka)) / 2.
+  assert.ok(Math.abs(r.h_crit_ft - 2 * r.z_c_ft) < 1e-9);
+  // The trap this tile closes: discarding the tension RAISES the design thrust
+  // above the textbook uncracked trapezoid. Getting this backwards understates
+  // the wall load, so it is pinned.
+  assert.ok(r.pa_cracked > r.pa_uncracked);
+  // A water-filled crack costs more than the crack saved.
+  assert.ok(r.pa_plus_water > r.pa_uncracked);
+  // Cohesion only reduces the active side: at c -> 0 the cracked thrust must
+  // approach the cohesionless Rankine value the sibling tile returns.
+  const tiny = _v1017({ ...base, c_psf: 1e-9 });
+  const cohesionless = _v1017l({ phi: 20, gamma: 115, h_ft: 20, q: 0 });
+  assert.ok(Math.abs(tiny.ka - cohesionless.ka) < 1e-12);
+  assert.ok(Math.abs(tiny.pa_cracked - cohesionless.pa_soil) < 1e-3);
+  assert.ok(Math.abs(tiny.pa_uncracked - cohesionless.pa_soil) < 1e-3);
+  // More cohesion -> deeper crack, smaller thrust, taller unsupported cut.
+  const stiff = _v1017({ ...base, c_psf: 600 });
+  assert.ok(stiff.z_c_ft > r.z_c_ft);
+  assert.ok(stiff.pa_cracked < r.pa_cracked);
+  assert.ok(stiff.h_crit_ft > r.h_crit_ft);
+  // Surcharge suppresses the crack; a large enough q closes it entirely.
+  assert.ok(_v1017({ ...base, q: 200 }).z_c_ft < r.z_c_ft);
+  assert.strictEqual(_v1017({ ...base, q: 5000 }).z_c_ft, 0);
+  // Crack deeper than the wall clamps to H, leaving zero thrust, not a negative one.
+  const soft = _v1017({ ...base, c_psf: 900, h_ft: 5 });
+  assert.strictEqual(soft.z_c_ft, 5);
+  assert.strictEqual(soft.pa_cracked, 0);
+  // phi = 0 undrained clay: Ka = 1, zc = 2c/gamma, Hc = 4c/gamma.
+  const undrained = _v1017({ phi: 0, c_psf: 500, gamma: 120, h_ft: 30, q: 0 });
+  assert.ok(Math.abs(undrained.ka - 1) < 1e-12);
+  assert.ok(Math.abs(undrained.z_c_ft - 2 * 500 / 120) < 1e-9);
+  assert.ok(Math.abs(undrained.h_crit_ft - 4 * 500 / 120) < 1e-9);
+  // Passive: cohesion ADDS, so Pp exceeds the cohesionless 0.5 Kp gamma H^2.
+  assert.ok(r.pp > 0.5 * r.kp * 115 * 400);
+  assert.ok(Math.abs(r.pp - (0.5 * r.kp * 115 * 400 + 2 * 300 * Math.sqrt(r.kp) * 20)) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v1017({ ...base, c_psf: 0 })); // cohesionless -> sibling tile
+  assert.ok("error" in _v1017({ ...base, c_psf: -1 }));
+  assert.ok("error" in _v1017({ ...base, gamma: 0 }));
+  assert.ok("error" in _v1017({ ...base, h_ft: 0 }));
+  assert.ok("error" in _v1017({ ...base, phi: -1 }));
+  assert.ok("error" in _v1017({ ...base, phi: 50 }));
+  assert.ok("error" in _v1017({ ...base, q: -1 }));
+  assert.ok("error" in _v1017({ ...base, gamma: Infinity }));
+});

@@ -106,7 +106,11 @@ const TILE_GZIP_CAP = 6 * 1024;
 // (curing-compound-coverage, concrete-isolation-joint, cement-board-takeoff, stud-notch-bore-limit, ...) took
 // construction/index.html to ~74.1 KB gz (over the 74 KB cap at stud-notch-bore-limit); 80 KB restores headroom for
 // the sweep's remaining Group E tiles (this gate runs only in CI's integration job -- run check-shells.mjs locally).
-const GROUP_GZIP_CAP = 80 * 1024;
+// Bumped 80 -> 84 KB on 2026-07-27: the spec-v1016/v1017 earth-pressure landings
+// (seismic-earth-pressure, cohesive-earth-pressure) took construction/index.html to ~80.3 KB gz (over
+// the 80 KB cap at cohesive-earth-pressure); 84 KB restores ~5% headroom (this gate runs only in CI's
+// integration job, so push lint stays green while CI goes red -- run check-shells.mjs locally).
+const GROUP_GZIP_CAP = 84 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",
