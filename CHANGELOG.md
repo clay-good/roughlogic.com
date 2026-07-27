@@ -4,6 +4,28 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): concrete-anchor-shear-breakout, the deferred fourth member of the anchor family, verified against the primary standard; 2026-07-27
+
+The tension tile's citation says outright that "anchor shear and combined shear-tension (pryout) are separate
+checks," every one of the 30+ `breakout` aliases targeted the TENSION tile, and nothing in the catalog returned a
+shear capacity -- `computeConcreteAnchorBreakout` is hef^1.5-driven with no ca1^1.5 term. The tile was deliberately
+deferred on 2026-07-23 because eight ACI 318-19 Section 17.7.2 coefficients would otherwise have come from recall;
+all eight were verified 2026-07-27 against independent corroborating sources (manufacturer design reference with
+318-19 numbering, ICC-ES ESR-3068, K-State/PCA worked examples), including the known trap that one secondary source
+renders the 9-cap equation with a spurious sqrt(da). Adds one tile to `calc-concrete.js` (Group E), no new module.
+
+`concrete-anchor-shear-breakout` computes Vb as the lesser of the 7 (le/da)^0.2 sqrt(da) stiffness form and the
+9-cap (le = min(hef, 8 da)), truncates the AVco = 4.5 ca1^2 half-pyramid for a corner and a thin member, applies
+psi_edV / psi_cV / psi_hV, and reports phiVcb = 0.70 Vcb (Condition B). The headline fact the tile exists to teach:
+shear-breakout capacity scales with the EDGE DISTANCE to the 1.5 power, not the embedment -- the pinned example's
+3/4-in anchor 6 in from an edge checks 5.9 kip design, and a 4-in second edge in a corner cuts it to 2.9 kip.
+
+The fuzzer pins the 9-cap vs 7-form crossover, both boundary continuities (ca2 = 1.5 ca1 and ha = 1.5 ca1 exactly
+reproduce the far-edge case), cracked Vcb <= Vb across the truncation grid (the thin-member area loss and psi_hV
+trade exactly as sqrt), the published-example ceiling (the le cap only ever lowers Vb below the App-D worked
+example it otherwise reproduces), exact 2^1.5 scaling on the 9-cap branch, and ca1 monotonicity. Catalog
+1,467 -> 1,468. Spec: spec-v1019.
+
 ### fix(fire): pdp's three citation sites claimed 0.434 psi/ft while the tile deliberately applies the 0.5 NFA shortcut; 2026-07-27
 
 `computePDP` computes its elevation term as `elevation_ft * 0.5`. All three places that document the tile said

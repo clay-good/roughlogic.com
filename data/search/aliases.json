@@ -90487,6 +90487,41 @@
       "kind": "question"
     },
     {
+      "term": "anchor shear breakout",
+      "target": "concrete-anchor-shear-breakout",
+      "kind": "industry"
+    },
+    {
+      "term": "shear breakout at an edge",
+      "target": "concrete-anchor-shear-breakout",
+      "kind": "industry"
+    },
+    {
+      "term": "anchor bolt shear near edge",
+      "target": "concrete-anchor-shear-breakout",
+      "kind": "redirect"
+    },
+    {
+      "term": "aci 17.7.2",
+      "target": "concrete-anchor-shear-breakout",
+      "kind": "redirect"
+    },
+    {
+      "term": "vb basic breakout strength in shear",
+      "target": "concrete-anchor-shear-breakout",
+      "kind": "question"
+    },
+    {
+      "term": "shear capacity of an anchor near a slab edge",
+      "target": "concrete-anchor-shear-breakout",
+      "kind": "question"
+    },
+    {
+      "term": "ledger anchor shear toward edge",
+      "target": "concrete-anchor-shear-breakout",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

@@ -29617,3 +29617,69 @@ test("bounds: spec-v1018 computeSoilGradationCoefficients pins Cu/Cc, the both-c
   assert.ok("error" in _v1018({ ...base, pct_coarse_passing_no4: -1 }));
   assert.ok("error" in _v1018({ ...base, d10_mm: Infinity }));
 });
+
+import { computeConcreteAnchorShearBreakout as _v1019 } from "../../calc-concrete.js";
+
+test("bounds: spec-v1019 computeConcreteAnchorShearBreakout pins the Vb pair and 9-cap crossover, the corner/thin-member truncation, both boundary continuities, the published-example ceiling, monotonicity, and error seams", () => {
+  // Pinned worked example: 3/4-in cast-in, hef 6, f'c 4000, ca1 6, far second edge, thick, cracked.
+  const base = { anchor_dia_in: 0.75, embedment_in: 6, fc_psi: 4000, edge_distance_in: 6, perp_edge_in: 0, member_thickness_in: 0, cracking: "cracked", lambda: 1 };
+  const r = _v1019(base);
+  assert.ok(Math.abs(r.vb_lb - 8365.64) < 0.5);
+  assert.ok(r.governing_form.startsWith("9-cap"));
+  assert.ok(Math.abs(r.le_in - 6) < 1e-12); // le = min(hef, 8 da) = min(6, 6)
+  assert.ok(r.area_ratio === 1 && r.psi_edV === 1 && r.psi_hV === 1);
+  assert.ok(Math.abs(r.vcb_lb - r.vb_lb) < 1e-9);
+  assert.ok(Math.abs(r.phi_vcb_lb - 0.70 * r.vcb_lb) < 1e-9);
+  // Cross-check: corner (ca2 4) + thin member (ha 6).
+  const c = _v1019({ ...base, perp_edge_in: 4, member_thickness_in: 6 });
+  assert.ok(Math.abs(c.psi_edV - (0.7 + 0.3 * 4 / 9)) < 1e-12);
+  assert.ok(Math.abs(c.psi_hV - Math.sqrt(9 / 6)) < 1e-12);
+  assert.ok(Math.abs(c.AVc - 78) < 1e-9 && Math.abs(c.AVco - 162) < 1e-9);
+  assert.ok(Math.abs(c.vcb_lb - 4110.96) < 0.5);
+  assert.ok(Math.abs(c.phi_vcb_lb - 2877.67) < 0.5);
+  // 7-form governs for a slender anchor: da 0.5, hef 4 -> coefficient 7.502 < 9.
+  const s = _v1019({ ...base, anchor_dia_in: 0.5, embedment_in: 4, edge_distance_in: 4 });
+  assert.ok(s.governing_form.startsWith("7-form"));
+  assert.ok(Math.abs(s.vb_lb - 3795.95) < 0.5);
+  // Published-example ceiling: the mechguru App-D example (da 0.75, hef 10, ca1 11, no le cap)
+  // reports Vb = 23,482.6 lb; with the 17.7.2.2.2 le <= 8 da cap this implementation must be
+  // at or below it (it lands on the 9-cap at 20,766 lb). The cap only ever lowers Vb.
+  const m = _v1019({ ...base, embedment_in: 10, edge_distance_in: 11 });
+  assert.ok(m.vb_lb <= 23482.7);
+  assert.ok(Math.abs(m.vb_lb - 20766.42) < 0.5);
+  assert.ok(Math.abs(m.le_in - 6) < 1e-12);
+  // Boundary continuity: ca2 = 1.5 ca1 exactly equals the far-edge case; same for ha = 1.5 ca1.
+  const edgeAt = _v1019({ ...base, perp_edge_in: 9 });
+  assert.ok(Math.abs(edgeAt.vcb_lb - r.vcb_lb) < 1e-9);
+  const thickAt = _v1019({ ...base, member_thickness_in: 9 });
+  assert.ok(Math.abs(thickAt.vcb_lb - r.vcb_lb) < 1e-9);
+  // Cracked Vcb never exceeds Vb (area ratio and psi_hV trade exactly; psi_edV <= 1).
+  for (const [ca2, ha] of [[0, 0], [2, 0], [0, 3], [4, 6], [8, 5], [9, 9]]) {
+    const t = _v1019({ ...base, perp_edge_in: ca2, member_thickness_in: ha });
+    assert.ok(t.vcb_lb <= t.vb_lb + 1e-9);
+    assert.ok(t.psi_edV <= 1 + 1e-12 && t.psi_hV >= 1 - 1e-12 && t.area_ratio <= 1 + 1e-12);
+  }
+  // Uncracked multiplies by exactly 1.4.
+  const u = _v1019({ ...base, cracking: "uncracked" });
+  assert.ok(Math.abs(u.vcb_lb - 1.4 * r.vcb_lb) < 1e-9);
+  // Monotonic in ca1 (far second edge, thick member): capacity ~ ca1^1.5.
+  let prev = 0;
+  for (const ca1 of [2, 4, 6, 9, 14]) {
+    const t = _v1019({ ...base, edge_distance_in: ca1 });
+    assert.ok(t.vcb_lb > prev);
+    prev = t.vcb_lb;
+  }
+  // Exact ca1^1.5 scaling on the 9-cap branch: doubling ca1 multiplies Vb by 2^1.5.
+  const dbl = _v1019({ ...base, edge_distance_in: 12 });
+  assert.ok(Math.abs(dbl.vb_lb - Math.pow(2, 1.5) * r.vb_lb) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v1019({ ...base, anchor_dia_in: 0 }));
+  assert.ok("error" in _v1019({ ...base, embedment_in: 0 }));
+  assert.ok("error" in _v1019({ ...base, fc_psi: 0 }));
+  assert.ok("error" in _v1019({ ...base, edge_distance_in: 0 }));
+  assert.ok("error" in _v1019({ ...base, perp_edge_in: -1 }));
+  assert.ok("error" in _v1019({ ...base, member_thickness_in: -1 }));
+  assert.ok("error" in _v1019({ ...base, lambda: 1.2 }));
+  assert.ok("error" in _v1019({ ...base, cracking: "maybe" }));
+  assert.ok("error" in _v1019({ ...base, edge_distance_in: Infinity }));
+});

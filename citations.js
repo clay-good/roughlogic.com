@@ -14964,6 +14964,19 @@ export const CITATIONS = {
       { name: "psi_c cracked factor", value: "taken as 1.0 (cracked); an uncracked section with supplementary reinforcement raises it", source: "ACI 318-19 17.6.2.6" },
     ],
   },
+  "concrete-anchor-shear-breakout": {
+    formula: "Vb = lesser of 7 (le/da)^0.2 sqrt(da) lambda_a sqrt(f'c) c_a1^1.5 and 9 lambda_a sqrt(f'c) c_a1^1.5; le = min(hef, 8 da); AVco = 4.5 c_a1^2; Vcb = (AVc/AVco) psi_edV psi_cV psi_hV Vb; phiVcb = 0.70 Vcb (Condition B).",
+    edition: "The ACI 318-19 Section 17.7.2 concrete breakout strength in shear (17.7.2.2.1 basic strength, 17.7.2.4.1 edge factor, 17.7.2.5.1 cracking factor, 17.7.2.6.1 thin-member factor, Table 17.5.3 phi), by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Chapter 17 anchoring provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "Shear breakout scales with the EDGE DISTANCE to the 1.5 power, not the embedment (that is the tension mode) - moving the anchor away from the edge is the strongest knob. Shear toward the edge, single cast-in anchor, one loaded edge: shear parallel to an edge is checked with twice this strength per 17.7.2.1(c), anchor groups, eccentricity (psi_ecV), the supplementary-reinforcement psi_cV credits (1.2/1.4), and the seismic 0.75 factor are not modeled. Steel shear and pryout are separate checks. phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+    assumptions: [
+      { name: "Basic-strength pair", value: "the lesser of the 7 (le/da)^0.2 sqrt(da) stiffness form and the 9-cap governs; the 9-form carries no sqrt(da); le = min(hef, 8 da)", source: "ACI 318-19 17.7.2.2.1" },
+      { name: "Projected area", value: "AVco = 4.5 c_a1^2 (a full half-pyramid needs 1.5 c_a1 each way along the edge and 1.5 c_a1 of depth); a corner or thin member truncates AVc", source: "ACI 318-19 17.7.2.1.3" },
+      { name: "psi_cV cracking factor", value: "1.0 cracked without supplementary reinforcement, 1.4 uncracked; the 1.2/1.4 edge-reinforcement credits are not offered", source: "ACI 318-19 17.7.2.5.1" },
+      { name: "Scope", value: "single anchor, shear toward one edge; steel shear (0.6 Ase futa) and pryout (kcp Ncp) are separate checks", source: "ACI 318-19 17.7.1, 17.7.3" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

@@ -1032,6 +1032,7 @@ export const COMPUTE_MAP = {
   "concrete-longterm-defl": { module: "../../calc-concrete.js", fn: "computeConcreteLongtermDefl" },
   "concrete-anchor-breakout": { module: "../../calc-concrete.js", fn: "computeConcreteAnchorBreakout" },
   "concrete-anchor-pullout": { module: "../../calc-concrete.js", fn: "computeConcreteAnchorPullout" },
+  "concrete-anchor-shear-breakout": { module: "../../calc-concrete.js", fn: "computeConcreteAnchorShearBreakout" },
   "concrete-anchor-blowout": { module: "../../calc-concrete.js", fn: "computeConcreteAnchorBlowout" },
   "rc-slender-column-magnify": { module: "../../calc-concrete.js", fn: "computeRcSlenderColumnMagnify" },
   "concrete-corbel-bracket": { module: "../../calc-concrete.js", fn: "computeConcreteCorbelBracket" },

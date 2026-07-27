@@ -1549,6 +1549,76 @@ CONCRETE_RENDERERS["concrete-anchor-blowout"] = _simpleRenderer({
   compute: computeConcreteAnchorBlowout,
 });
 
+// --- spec-v1019 E: Cast-in anchor SHEAR concrete breakout (ACI 318-19 17.7.2) ---
+// Vb = min(7 (le/da)^0.2 sqrt(da), 9) lambda_a sqrt(f'c) ca1^1.5 (17.7.2.2.1a/b, lesser governs;
+// the 9-form carries NO sqrt(da)); le = min(hef, 8 da). AVco = 4.5 ca1^2; single anchor, one loaded
+// edge: AVc = min(1.5 ca1, ha) x (1.5 ca1 + min(1.5 ca1, ca2)). psi_edV = 0.7 + 0.3 ca2/(1.5 ca1)
+// when ca2 < 1.5 ca1; psi_cV 1.0 cracked / 1.4 uncracked; psi_hV = sqrt(1.5 ca1/ha) >= 1.0 when
+// ha < 1.5 ca1. phi = 0.70 Condition B.
+// dims: in { anchor_dia_in: L, embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, perp_edge_in: L, member_thickness_in: L, cracking: dimensionless, lambda: dimensionless } out: { vb_lb: M L T^-2, vcb_lb: M L T^-2, phi_vcb_lb: M L T^-2 }
+export function computeConcreteAnchorShearBreakout({ anchor_dia_in = 0, embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, perp_edge_in = 0, member_thickness_in = 0, cracking = "cracked", lambda = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const da = Number(anchor_dia_in) || 0;
+  const hef = Number(embedment_in) || 0;
+  const fc = Number(fc_psi) || 0;
+  const ca1 = Number(edge_distance_in) || 0;
+  const ca2 = Number(perp_edge_in) || 0;
+  const ha = Number(member_thickness_in) || 0;
+  const lam = Number(lambda) || 0;
+  if (!(da > 0)) return { error: "Anchor diameter must be positive (in)." };
+  if (!(hef > 0)) return { error: "Effective embedment must be positive (in)." };
+  if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (!(ca1 > 0)) return { error: "Edge distance c_a1 (toward the shear) must be positive (in) - far from an edge, shear breakout does not apply; steel or pryout governs." };
+  if (ca2 < 0) return { error: "Perpendicular edge distance must be zero (none) or positive (in)." };
+  if (ha < 0) return { error: "Member thickness must be zero (thick) or positive (in)." };
+  if (!(lam > 0 && lam <= 1)) return { error: "Lambda must be in (0, 1] (1.0 normal weight)." };
+  const uncracked = cracking === "uncracked";
+  if (cracking !== "cracked" && cracking !== "uncracked") return { error: "Cracking must be cracked or uncracked." };
+  const le_in = Math.min(hef, 8 * da);
+  const coef7 = 7 * Math.pow(le_in / da, 0.2) * Math.sqrt(da);
+  const governing_form = coef7 <= 9 ? "7-form (stiffness)" : "9-cap (stiff anchor)";
+  const vb_lb = Math.min(coef7, 9) * lam * Math.sqrt(fc) * Math.pow(ca1, 1.5);
+  const AVco = 4.5 * ca1 * ca1;
+  const depth_in = ha > 0 ? Math.min(1.5 * ca1, ha) : 1.5 * ca1;
+  const width_in = 1.5 * ca1 + (ca2 > 0 ? Math.min(1.5 * ca1, ca2) : 1.5 * ca1);
+  const AVc = depth_in * width_in;
+  const area_ratio = Math.min(AVc / AVco, 1.0);
+  const psi_edV = ca2 > 0 && ca2 < 1.5 * ca1 ? 0.7 + 0.3 * ca2 / (1.5 * ca1) : 1.0;
+  const psi_cV = uncracked ? 1.4 : 1.0;
+  const psi_hV = ha > 0 && ha < 1.5 * ca1 ? Math.sqrt(1.5 * ca1 / ha) : 1.0;
+  const vcb_lb = area_ratio * psi_edV * psi_cV * psi_hV * vb_lb;
+  const phi_vcb_lb = 0.70 * vcb_lb;
+  if (![vb_lb, vcb_lb, phi_vcb_lb].every(Number.isFinite)) return { error: "Shear-breakout math did not produce a finite value." };
+  return {
+    vb_lb, governing_form, le_in, AVco, AVc, area_ratio, psi_edV, psi_cV, psi_hV, vcb_lb, phi_vcb_lb,
+    note: "The strength scales with the EDGE DISTANCE to the 1.5 power (not the embedment - that is the tension mode): moving the anchor away from the edge is the strongest knob. A second edge closer than 1.5 c_a1 (corner) and a member thinner than 1.5 c_a1 both truncate the breakout half-pyramid; psi_hV partially compensates for the thin-member area loss. Shear toward the edge only - shear parallel to an edge is checked with twice this strength per 17.7.2.1(c) (not modeled). Single anchor; groups, eccentricity, and the seismic 0.75 factor are separate. Steel shear and pryout are separate checks. phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+  };
+}
+export const concreteAnchorShearBreakoutExample = { inputs: { anchor_dia_in: 0.75, embedment_in: 6, fc_psi: 4000, edge_distance_in: 6, perp_edge_in: 0, member_thickness_in: 0, cracking: "cracked", lambda: 1.0 } };
+CONCRETE_RENDERERS["concrete-anchor-shear-breakout"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 Section 17.7.2 concrete breakout in shear: Vb = lesser of 7 (le/da)^0.2 sqrt(da) lambda_a sqrt(f'c) c_a1^1.5 and 9 lambda_a sqrt(f'c) c_a1^1.5 (17.7.2.2.1), le = min(hef, 8 da); AVco = 4.5 c_a1^2; Vcb = (AVc/AVco) psi_edV psi_cV psi_hV Vb with psi_edV = 0.7 + 0.3 c_a2/(1.5 c_a1) when c_a2 < 1.5 c_a1 (17.7.2.4.1), psi_cV = 1.0 cracked / 1.4 uncracked (17.7.2.5.1), psi_hV = sqrt(1.5 c_a1/ha) when ha < 1.5 c_a1 (17.7.2.6.1); phiVcb = 0.70 Vcb (Condition B, Table 17.5.3). The capacity scales with the edge distance to the 1.5 power, not the embedment. Shear toward the edge, single cast-in anchor. ACI 318 Chapter 17 and the engineer of record govern.",
+  example: concreteAnchorShearBreakoutExample.inputs,
+  fields: [
+    { key: "anchor_dia_in", label: "Anchor diameter da (in)", kind: "number" },
+    { key: "embedment_in", label: "Effective embedment hef (in)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "edge_distance_in", label: "Edge distance c_a1, toward the shear (in)", kind: "number" },
+    { key: "perp_edge_in", label: "Perpendicular edge c_a2 (in, 0 = none)", kind: "number", default: 0 },
+    { key: "member_thickness_in", label: "Member thickness ha (in, 0 = thick)", kind: "number", default: 0 },
+    { key: "cracking", label: "Concrete condition at service", kind: "select", options: [{ value: "cracked", label: "Cracked (psi_cV = 1.0)", selected: true }, { value: "uncracked", label: "Uncracked (psi_cV = 1.4)" }] },
+    { key: "lambda", label: "Lightweight factor lambda_a (1.0 normal weight)", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "vb", id: "casb-out-vb", label: "Basic breakout Vb", value: (r) => fmt(r.vb_lb, 0) + " lb (" + r.governing_form + ", le " + fmt(r.le_in, 2) + " in)" },
+    { key: "geom", id: "casb-out-geom", label: "Projected area AVc / AVco", value: (r) => fmt(r.AVc, 1) + " / " + fmt(r.AVco, 1) + " in^2 (ratio " + fmt(r.area_ratio, 3) + ")" },
+    { key: "psi", id: "casb-out-psi", label: "Factors psi_edV / psi_cV / psi_hV", value: (r) => fmt(r.psi_edV, 3) + " / " + fmt(r.psi_cV, 1) + " / " + fmt(r.psi_hV, 3) },
+    { key: "vcb", id: "casb-out-vcb", label: "Nominal breakout Vcb", value: (r) => fmt(r.vcb_lb, 0) + " lb (" + fmt(r.vcb_lb / 1000, 1) + " kip)" },
+    { key: "phi", id: "casb-out-phi", label: "Design capacity phiVcb", value: (r) => fmt(r.phi_vcb_lb, 0) + " lb (" + fmt(r.phi_vcb_lb / 1000, 1) + " kip)" },
+    { key: "n", id: "casb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteAnchorShearBreakout,
+});
+
 // ===================== spec-v793: fresh (batch) concrete temperature (ACI 305.1) =====================
 // Mass-weighted thermal-energy balance: mixture T = sum(c_i m_i T_i) / sum(c_i m_i), with the specific
 // heat of solids (cement + aggregate) ~0.22 Btu/lb-F and water = 1.0. Free surface moisture on the
