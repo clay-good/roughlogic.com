@@ -578,3 +578,67 @@ MASONRY_RENDERERS["masonry-joint-reinforcement"] = _simpleRenderer({
   ],
   compute: computeMasonryJointReinforcement,
 });
+
+// ===================== spec-v1032: masonry lintel bearing length (TMS 402) =====================
+// The companion masonry-lintel-loading returns the LOAD only; this takes the reaction to the
+// support. Effective span = clear span + depth, capped at the distance between support centers
+// (TMS/MSJC 2.3.3.4.1); end bearing not less than 4 in (2.3.3.4.3). The allowable bearing stress
+// is an INPUT, not a recalled coefficient - published secondary sources disagree on it (one-fourth
+// vs one-third of f'm), so the tile takes the designer's value from the governing code edition and
+// says so, rather than shipping a number it cannot verify.
+// dims: in { clear_span_ft: L, lintel_depth_in: L, support_center_ft: L, udl_plf: M T^-2, bearing_width_in: L, allowable_bearing_psi: M L^-1 T^-2 } out: { eff_span_ft: L, reaction_lb: M L T^-2, required_bearing_in: L, governing_bearing_in: L }
+export function computeMasonryLintelBearing({ clear_span_ft = 0, lintel_depth_in = 8, support_center_ft = 0, udl_plf = 0, bearing_width_in = 7.625, allowable_bearing_psi = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const clear = Number(clear_span_ft) || 0;
+  const depth = Number(lintel_depth_in) || 0;
+  const centers = Number(support_center_ft) || 0;
+  const w = Number(udl_plf) || 0;
+  const bw = Number(bearing_width_in) || 0;
+  const Fbr = Number(allowable_bearing_psi) || 0;
+  if (!(clear > 0)) return { error: "Clear span must be positive (ft)." };
+  if (!(depth > 0)) return { error: "Lintel depth must be positive (in)." };
+  if (centers < 0) return { error: "Support-center distance cannot be negative (ft); enter 0 to use clear span + depth." };
+  if (centers > 0 && centers < clear) return { error: "Support centers cannot be closer than the clear span." };
+  if (!(w > 0)) return { error: "Uniform load must be positive (lb/ft) - chain it from masonry-lintel-loading." };
+  if (!(bw > 0)) return { error: "Bearing width must be positive (in) - the wall thickness carrying the lintel end." };
+  if (!(Fbr > 0)) return { error: "Allowable bearing stress must be positive (psi) - from your f'm and the governing code edition." };
+  const span_by_depth_ft = clear + depth / 12;
+  const eff_span_ft = centers > 0 ? Math.min(span_by_depth_ft, centers) : span_by_depth_ft;
+  const span_capped = centers > 0 && centers < span_by_depth_ft;
+  const reaction_lb = w * eff_span_ft / 2;
+  const required_area_in2 = reaction_lb / Fbr;
+  const required_bearing_in = required_area_in2 / bw;
+  const CODE_MIN_BEARING_IN = 4;
+  const governing_bearing_in = Math.max(required_bearing_in, CODE_MIN_BEARING_IN);
+  const code_min_governs = required_bearing_in <= CODE_MIN_BEARING_IN;
+  if (![eff_span_ft, reaction_lb, required_bearing_in, governing_bearing_in].every(Number.isFinite)) return { error: "Lintel-bearing math did not produce a finite value." };
+  return {
+    span_by_depth_ft, eff_span_ft, span_capped, reaction_lb, required_area_in2,
+    required_bearing_in, code_min_in: CODE_MIN_BEARING_IN, governing_bearing_in, code_min_governs,
+    note: (code_min_governs
+      ? "The 4-in CODE MINIMUM governs here, not the stress check - which is the usual outcome for ordinary lintels and the reason a stress calculation alone can mislead: it would have permitted " + required_bearing_in.toFixed(2) + " in. "
+      : "The stress check governs here: " + required_bearing_in.toFixed(2) + " in exceeds the 4-in code minimum, so bearing is a real constraint on this lintel - lengthen the bearing, widen it, or raise f'm. ")
+      + "Effective span is the clear span plus the lintel depth, capped at the distance between support centers. The allowable bearing stress is YOUR input from the governing code edition and f'm - published secondary sources disagree on the coefficient (one-fourth versus one-third of f'm), so this tile does not pick one. Uniform load only; chain it from masonry-lintel-loading for the arching dead load and add the floor, roof, and superimposed loads. Bearing is one check: lintel flexure, shear, and deflection are separate, and so is the bearing capacity of the masonry BELOW the lintel end. TMS 402 and the engineer of record govern.",
+  };
+}
+const masonryLintelBearingExample = { inputs: { clear_span_ft: 6, lintel_depth_in: 8, support_center_ft: 0, udl_plf: 500, bearing_width_in: 7.625, allowable_bearing_psi: 500 } };
+MASONRY_RENDERERS["masonry-lintel-bearing"] = _simpleRenderer({
+  citation: "Citation: TMS 402 (MSJC) lintel bearing - effective span is the clear span plus the member depth but not more than the distance between support centers (2.3.3.4.1), and the end bearing shall not be less than 4 in (2.3.3.4.3). Required bearing length = end reaction / (allowable bearing stress x bearing width), and the governing length is the greater of that and the 4-in minimum. The allowable bearing stress is entered by the user from the governing code edition and f'm - this tile deliberately ships no coefficient, because published secondary sources disagree (one-fourth versus one-third of f'm). Bearing only: lintel flexure, shear, deflection, and the capacity of the masonry below the bearing are separate checks. TMS 402 and the engineer of record govern.",
+  example: masonryLintelBearingExample.inputs,
+  fields: [
+    { key: "clear_span_ft", label: "Clear span of opening (ft)", kind: "number" },
+    { key: "lintel_depth_in", label: "Lintel depth (in)", kind: "number", default: 8 },
+    { key: "support_center_ft", label: "Distance between support centers (ft, 0 = use span + depth)", kind: "number", default: 0 },
+    { key: "udl_plf", label: "Uniform load on lintel (lb/ft)", kind: "number" },
+    { key: "bearing_width_in", label: "Bearing width (in, wall thickness at the end)", kind: "number", default: 7.625 },
+    { key: "allowable_bearing_psi", label: "Allowable bearing stress (psi, from your code edition)", kind: "number" },
+  ],
+  outputs: [
+    { key: "sp", id: "mlb-out-sp", label: "Effective span", value: (r) => fmt(r.eff_span_ft, 3) + " ft" + (r.span_capped ? " (capped at the support centers)" : " (clear span + depth)") },
+    { key: "rx", id: "mlb-out-rx", label: "End reaction", value: (r) => fmt(r.reaction_lb, 0) + " lb" },
+    { key: "req", id: "mlb-out-req", label: "Bearing length by stress", value: (r) => fmt(r.required_bearing_in, 2) + " in (area " + fmt(r.required_area_in2, 2) + " in^2)" },
+    { key: "gov", id: "mlb-out-gov", label: "Governing bearing length", value: (r) => fmt(r.governing_bearing_in, 2) + " in - " + (r.code_min_governs ? "the 4 in code minimum governs" : "the stress check governs") },
+    { key: "n", id: "mlb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMasonryLintelBearing,
+});

@@ -4,6 +4,28 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(masonry): masonry-lintel-bearing, and a coefficient deliberately left as an input; 2026-07-27
+
+`masonry-lintel-loading` returns the load and stops there; all eight lintel aliases point at it, and nothing
+computed what that load does at the support. Adds one tile to `calc-masonry.js` (Group E), with backlinks
+both ways so the pair chains.
+
+`masonry-lintel-bearing` takes the effective span (clear span + depth, capped at the distance between
+support centers, TMS 402 2.3.3.4.1), the end reaction from the UDL, and the bearing length that reaction
+needs -- then compares it against the 4-in code minimum (2.3.3.4.3) and reports which governs. The point of
+the tile is that for ordinary lintels the code minimum wins: the pinned 6-ft example needs 0.44 in by
+stress, so a calculator reporting only the stress answer would tell a mason half an inch is fine. The
+cross-check fixture pins the other regime -- a 16-ft lintel at 4,000 plf on weak masonry needs 30.3 in.
+
+**The allowable bearing stress is a user input and no coefficient is shipped.** Two provisions were verified
+in free authoritative sources (the CMHA/NCMA lintel design manual, which reproduces the MSJC citations): the
+effective-span rule and the 4-in minimum. The allowable bearing STRESS was not -- secondary sources give
+one-fourth and one-third of f'm, and the same manual's `Fb = 1/3 f'm` is flexural compression, a different
+quantity that is easy to conflate. Rather than pick one, the tile takes the designer's value and both the
+note and the citation say why.
+
+Catalog 1,479 -> 1,480. Spec: spec-v1032. Cap ledger: calc-masonry.js 12500 -> 15000 (was at 93.8%).
+
 ### feat(plumbing): trapezoidal-channel-flow, the section every real swale actually is; 2026-07-27
 
 A self-declared gap: `channel-normal-depth`'s own citation says "trapezoidal sections and backwater

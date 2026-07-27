@@ -30123,3 +30123,57 @@ test("bounds: spec-v1031 computeTrapezoidalChannelFlow pins the worked example, 
   assert.ok("error" in _v1031({ ...base, s_slope: 0 }));
   assert.ok("error" in _v1031({ ...base, depth_ft: Infinity }));
 });
+
+import { computeMasonryLintelBearing as _v1032 } from "../../calc-masonry.js";
+import { computeMasonryLintelLoading as _v1032sib } from "../../calc-masonry.js";
+
+test("bounds: spec-v1032 computeMasonryLintelBearing pins both governing branches, the span cap and its coincidence seam, chaining from the loading sibling, linearity, and error seams", () => {
+  const base = { clear_span_ft: 6, lintel_depth_in: 8, support_center_ft: 0, udl_plf: 500, bearing_width_in: 7.625, allowable_bearing_psi: 500 };
+  // Pinned example: the 4-in code minimum governs.
+  const r = _v1032(base);
+  assert.ok(Math.abs(r.eff_span_ft - (6 + 8 / 12)) < 1e-12);
+  assert.ok(Math.abs(r.reaction_lb - 500 * (6 + 8 / 12) / 2) < 1e-9);
+  assert.ok(Math.abs(r.required_bearing_in - 0.437158) < 1e-5);
+  assert.ok(r.governing_bearing_in === 4 && r.code_min_governs === true);
+  // Stress-governs branch: a long, heavily loaded lintel on weak masonry.
+  const hard = _v1032({ clear_span_ft: 16, lintel_depth_in: 16, udl_plf: 4000, bearing_width_in: 7.625, allowable_bearing_psi: 150, support_center_ft: 0 });
+  assert.ok(hard.code_min_governs === false);
+  assert.ok(Math.abs(hard.required_bearing_in - 30.309654) < 1e-5);
+  assert.ok(Math.abs(hard.governing_bearing_in - hard.required_bearing_in) < 1e-12);
+  // The governing length is never below the 4-in minimum, across a sweep.
+  for (const w of [10, 100, 500, 5000, 50000]) {
+    const t = _v1032({ ...base, udl_plf: w });
+    assert.ok(t.governing_bearing_in >= 4 - 1e-12);
+    assert.ok(t.governing_bearing_in === Math.max(t.required_bearing_in, 4));
+  }
+  // Span cap: support centers closer than clear span + depth truncate the effective span.
+  const capped = _v1032({ ...base, support_center_ft: 6.25 });
+  assert.ok(capped.span_capped === true && Math.abs(capped.eff_span_ft - 6.25) < 1e-12);
+  // Coincidence seam: centers exactly equal to clear span + depth is NOT reported as capped.
+  const seam = _v1032({ ...base, support_center_ft: 6 + 8 / 12 });
+  assert.ok(seam.span_capped === false && Math.abs(seam.eff_span_ft - (6 + 8 / 12)) < 1e-12);
+  // Centers wider than span + depth leave the depth rule governing.
+  const wide = _v1032({ ...base, support_center_ft: 10 });
+  assert.ok(wide.span_capped === false && Math.abs(wide.eff_span_ft - (6 + 8 / 12)) < 1e-12);
+  // Chains from the loading sibling: its w_udl_plf feeds straight in.
+  {
+    const load = _v1032sib({ span_ft: 6, wall_psf: 60, wall_h_above: 5 });
+    const chained = _v1032({ ...base, udl_plf: load.w_udl_plf });
+    assert.ok(Math.abs(chained.reaction_lb - load.w_udl_plf * chained.eff_span_ft / 2) < 1e-9);
+    assert.ok(chained.governing_bearing_in >= 4);
+  }
+  // Reaction is linear in load; required length is exactly inverse in allowable stress.
+  const dbl = _v1032({ ...base, udl_plf: 1000 });
+  assert.ok(Math.abs(dbl.reaction_lb / r.reaction_lb - 2) < 1e-12);
+  const soft = _v1032({ ...base, allowable_bearing_psi: 250 });
+  assert.ok(Math.abs(soft.required_bearing_in / r.required_bearing_in - 2) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v1032({ ...base, clear_span_ft: 0 }));
+  assert.ok("error" in _v1032({ ...base, lintel_depth_in: 0 }));
+  assert.ok("error" in _v1032({ ...base, udl_plf: 0 }));
+  assert.ok("error" in _v1032({ ...base, bearing_width_in: 0 }));
+  assert.ok("error" in _v1032({ ...base, allowable_bearing_psi: 0 }));
+  assert.ok("error" in _v1032({ ...base, support_center_ft: -1 }));
+  assert.ok("error" in _v1032({ ...base, support_center_ft: 5 })); // centers inside the clear span
+  assert.ok("error" in _v1032({ ...base, clear_span_ft: Infinity }));
+});

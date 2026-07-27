@@ -90857,6 +90857,36 @@
       "kind": "question"
     },
     {
+      "term": "lintel bearing length",
+      "target": "masonry-lintel-bearing",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum lintel bearing",
+      "target": "masonry-lintel-bearing",
+      "kind": "industry"
+    },
+    {
+      "term": "how much bearing does a lintel need",
+      "target": "masonry-lintel-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "4 inch end bearing masonry",
+      "target": "masonry-lintel-bearing",
+      "kind": "redirect"
+    },
+    {
+      "term": "lintel effective span clear span plus depth",
+      "target": "masonry-lintel-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "lintel end reaction on the jamb",
+      "target": "masonry-lintel-bearing",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

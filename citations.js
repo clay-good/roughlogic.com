@@ -15108,6 +15108,18 @@ export const CITATIONS = {
       { name: "Roughness entered", value: "n is a user input (about 0.013 concrete, 0.030 grassed earth, 0.035 natural); no table shipped", source: "user input" },
     ],
   },
+  "masonry-lintel-bearing": {
+    formula: "Effective span = min(clear span + depth, distance between support centers); reaction = udl x eff span / 2; required bearing length = reaction / (allowable bearing stress x bearing width); governing = max(required, 4 in).",
+    edition: "TMS 402 (MSJC) lintel provisions by section number: 2.3.3.4.1 effective span (clear span plus depth, not more than the distance between support centers) and 2.3.3.4.3 end bearing not less than 4 in.",
+    freeAccess: "The two provisions used here are reproduced with their MSJC citations in the freely published CMHA/NCMA concrete-masonry lintel design manual; TMS 402 itself is available through The Masonry Society.",
+    governance: GOVERNANCE.general,
+    editionNote: "For ordinary lintels the 4-in CODE MINIMUM governs, not the stress check - the pinned example needs 0.44 in by stress - which is exactly why a stress calculation reported alone would mislead; the tile reports both and names the governing one. THE ALLOWABLE BEARING STRESS IS A USER INPUT AND NO COEFFICIENT IS SHIPPED: published secondary sources disagree (one-fourth versus one-third of f'm), and the lintel manual's Fb = 1/3 f'm is FLEXURAL compression, a different quantity that is easy to conflate. Enter the value from your governing code edition and f'm. Bearing only and uniform load only: lintel flexure, shear, and deflection are separate checks, and so is the capacity of the masonry BELOW the bearing - a length that satisfies the lintel can still overstress a narrow pier. Chain the arching dead load from masonry-lintel-loading. TMS 402 and the engineer of record govern.",
+    assumptions: [
+      { name: "Effective span", value: "clear span plus member depth, capped at the distance between support centers", source: "TMS 402 (MSJC) 2.3.3.4.1" },
+      { name: "Minimum bearing", value: "not less than 4 in, and it usually governs over the stress check", source: "TMS 402 (MSJC) 2.3.3.4.3" },
+      { name: "Allowable stress entered", value: "no coefficient shipped - secondary sources disagree, so the designer supplies the value", source: "user input from the governing code edition" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",
