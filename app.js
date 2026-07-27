@@ -203,7 +203,7 @@ const TOOL_MODULES = (() => {
     "duct-static-regain",
   ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
-    "pipe-sizing", "pex-homerun-takeoff", "friction-loss", "pipe-volume", "pump-sizing",
+    "pipe-sizing", "friction-loss", "pipe-volume", "pump-sizing",
     "static-pressure-piping", "slope",
     "pressure-conversion", "backflow",
     // v2
@@ -215,15 +215,13 @@ const TOOL_MODULES = (() => {
     "pipe-partial-flow-depth",
     "hydrostatic-test", "grease-trap", "grease-interceptor-flow-capacity",
     "stormwater-detention-volume",
-    "glycol-mix", "expansion-tank", "backflow-loss", "hydronic-system-volume",
-    "hydronic-fill-pressure", "solder-joint-quantity", "pipe-insulation-takeoff", "heat-trace-sizing", "pipe-purge-volume",
-    // v7
+    "glycol-mix", "expansion-tank", "backflow-loss", "hydronic-fill-pressure", // v7
     "water-hammer-surge", "pump-operating-point",
     "pipe-expansion-loop",
     // v9
     "recirc-loop-sizing",
     // v16
-    "water-heater-recovery", "water-heater-input", "solar-thermal-collector", "wh-expansion-tank", "sanitary-dfu", "trap-primer",
+    "water-heater-recovery", "water-heater-input", "wh-expansion-tank", "sanitary-dfu", "trap-primer",
     "backflow-sizing",
     // v23
     "trap-seal-loss", "water-meter-sizing",
@@ -245,6 +243,13 @@ const TOOL_MODULES = (() => {
     "velocity-head", "flow-continuity", "bernoulli-head",
     "thrust-block-sizing", "thrust-block-max-pressure",
   ]);
+  declare("./calc-plumbingtakeoff.js", "PLUMBINGTAKEOFF_RENDERERS", [
+    // spec-v1028 cap-relief split out of calc-plumbing.js: the takeoff /
+    // materials bench (what you buy and install).
+    "solder-joint-quantity", "pipe-insulation-takeoff", "heat-trace-sizing", "pipe-purge-volume",
+    "hydronic-system-volume", "pex-homerun-takeoff", "solar-thermal-collector",
+  ]);
+  
   // spec-v86 cap-relief split: the cohesive onsite-wastewater / septic bench
   // (the v2 septic-tank, the v7 septic-drainfield, and the v83 pressure-
   // distribution trio) relocated out of calc-plumbing.js (which had reached

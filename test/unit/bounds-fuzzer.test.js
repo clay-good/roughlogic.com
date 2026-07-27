@@ -17249,9 +17249,9 @@ import { computeWirePullingLubricant as _v852wpl } from "../../calc-electrical.j
 import { computeDuctBankConcrete as _v853dbc } from "../../calc-construction.js";
 import { computeBranchCircuitWireFootage as _v854bcw } from "../../calc-electrical.js";
 import { computeLvCablePullFootage as _v855lvf } from "../../calc-lowvoltage.js";
-import { computeSolderJointQuantity as _v856sjq } from "../../calc-plumbing.js";
-import { computePipeInsulationTakeoff as _v857pit } from "../../calc-plumbing.js";
-import { computeHeatTraceSizing as _v858hts } from "../../calc-plumbing.js";
+import { computeSolderJointQuantity as _v856sjq } from "../../calc-plumbingtakeoff.js";
+import { computePipeInsulationTakeoff as _v857pit } from "../../calc-plumbingtakeoff.js";
+import { computeHeatTraceSizing as _v858hts } from "../../calc-plumbingtakeoff.js";
 import { computeDuctWrapTakeoff as _v859dwt } from "../../calc-construction.js";
 import { computeDuctHangerLoad as _v860dhl } from "../../calc-construction.js";
 import { computeRefrigerantLinesetChargeAdjust as _v861rlc } from "../../calc-refrigerant.js";
@@ -26539,7 +26539,7 @@ test("bounds: spec-v893 computeRoofInsulationFasteners pins the fastener/plate t
   assert.ok("error" in _v893({ field_boards: Infinity, field_per_board: 8, perimeter_boards: 20, perimeter_per_board: 12, corner_boards: 5, corner_per_board: 16 }));
 });
 
-import { computePipePurgeVolume as _v894 } from "../../calc-plumbing.js";
+import { computePipePurgeVolume as _v894 } from "../../calc-plumbingtakeoff.js";
 
 test("bounds: spec-v894 computePipePurgeVolume pins the pipe/purge volumes, time, and error seams", () => {
   const r = _v894({ pipe_id_in: 2.067, length_ft: 100, air_changes: 5, flow_scfh: 60 });
@@ -26736,7 +26736,7 @@ test("bounds: spec-v902 computeLeachFieldAggregate pins the stone volume, tonnag
   assert.ok("error" in _v902({ num_trenches: Infinity, trench_length_ft: 60, trench_width_in: 24, stone_depth_in: 12, waste_pct: 10 }));
 });
 
-import { computeHydronicSystemVolume as _v903 } from "../../calc-plumbing.js";
+import { computeHydronicSystemVolume as _v903 } from "../../calc-plumbingtakeoff.js";
 
 test("bounds: spec-v903 computeHydronicSystemVolume pins the pipe, system, glycol, water gallons, and error seams", () => {
   const r = _v903({ pipe_length_ft: 500, gal_per_ft: 0.023, terminal_gal: 8, boiler_tank_gal: 5, glycol_fraction: 0.30 });
@@ -26791,7 +26791,7 @@ test("bounds: spec-v905 computeRebarChairCount pins the chair count, squared-spa
   assert.ok("error" in _v905({ slab_area_sf: Infinity, support_spacing_ft: 4, waste_pct: 5 }));
 });
 
-import { computePexHomerunTakeoff as _v906 } from "../../calc-plumbing.js";
+import { computePexHomerunTakeoff as _v906 } from "../../calc-plumbingtakeoff.js";
 
 test("bounds: spec-v906 computePexHomerunTakeoff pins the ports, tubing footage, and error seams", () => {
   const r = _v906({ fixtures: 8, hot_fixtures: 6, avg_run_ft: 35, waste_pct: 10 });
@@ -28476,7 +28476,7 @@ test("bounds: spec-v986 computeRoofBallastWeight pins the ballast weight and ord
   assert.ok("error" in _v986({ roof_area_sqft: Infinity, ballast_psf: 12, stone_density_pcf: 100 }));
 });
 
-import { computeSolarThermalCollector as _v987 } from "../../calc-plumbing.js";
+import { computeSolarThermalCollector as _v987 } from "../../calc-plumbingtakeoff.js";
 
 test("bounds: spec-v987 computeSolarThermalCollector pins the ASHRAE 93 efficiency line", () => {
   const r = _v987({ optical_efficiency: 0.70, loss_coeff: 0.85, inlet_temp_f: 120, ambient_temp_f: 70, irradiance_btu: 300, area_sqft: 40 });

@@ -66,7 +66,7 @@ roughlogic is a **100% client-side static site**. There is no server, no databas
 flowchart TD
     subgraph browser["Browser (everything runs here)"]
         shell["index.html + styles.css + app.js<br/>router · search · theme · URL-hash state"]
-        modules["56 per-group calculator modules<br/>(calc-*.js, dynamic-imported on first open)"]
+        modules["57 per-group calculator modules<br/>(calc-*.js, dynamic-imported on first open)"]
         worker["Web Worker<br/>Manual J load + duct sizing"]
         sw["Service Worker (sw.js)<br/>caches shell + data shards, keyed to build hash"]
         data[("data/ - sharded JSON<br/>largest shard &lt; 1 MB gzipped")]

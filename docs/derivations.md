@@ -2576,22 +2576,17 @@ cross-check.
 | calc-plumbing.js | `computeGlycolMix` | `{ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene", prot...` | _ | _ | _ |
 | calc-plumbing.js | `computeGreaseInterceptorFlowCapacity` | `{ interceptor_volume_gal = 0, retention_minutes = 30, loading_factor = 1.25 }...` | _ | _ | _ |
 | calc-plumbing.js | `computeGreaseTrap` | `{ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25 }` | _ | _ | _ |
-| calc-plumbing.js | `computeHeatTraceSizing` | `{ pipe_ft = 150, allowance_pct = 10, num_valves = 1, valve_allow_ft = 3, rate...` | _ | _ | _ |
 | calc-plumbing.js | `computeHydraulicJump` | `{ b_ft = 0, q_cfs = 0, y1_ft = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeHydronicFillPressure` | `{ height_ft = 0, margin_psi = 4 } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computeHydronicSystemVolume` | `{ pipe_length_ft = 500, gal_per_ft = 0.023, terminal_gal = 0, boiler_tank_gal...` | _ | _ | _ |
 | calc-plumbing.js | `computeHydrostaticTest` | `{ working_pressure_psi = 0, system_volume_gal = 0, material = "water", multip...` | _ | _ | _ |
 | calc-plumbing.js | `computeManningPipeCapacity` | `{ d_in = 0, slope = 0, material = "pvc" } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeManningSlope` | `{ pipe_diameter_in = 0, target_flow_gpm = 0, material = "pvc" }` | _ | _ | _ |
 | calc-plumbing.js | `computeMixedWaterTemp` | `{ mode = "find-blend", hot_temp_F = 0, cold_temp_F = 0, hot_gpm = 0, cold_gpm...` | _ | _ | _ |
 | calc-plumbing.js | `computeOrificeDiameterForFlow` | `{ q_cfs = 0, h_ft = 0, cd = 0.60 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeOrificeFlow` | `{ d_in = 0, h_ft = 0, cd = 0.60 } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computePexHomerunTakeoff` | `{ fixtures = 8, hot_fixtures = 6, avg_run_ft = 35, waste_pct = 10 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computePipeExpansion` | `{ material, length_ft, delta_T_F }` | _ | _ | _ |
 | calc-plumbing.js | `computePipeExpansionLoop` | `{ material = "copper", length_ft = 0, delta_T_F = 0, pipe_OD_in = 1.315, } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computePipeInsulationTakeoff` | `{ pipe_ft = 250, waste_pct = 5, num_fittings = 12, fitting_allow_ft = 1, sect...` | _ | _ | _ |
 | calc-plumbing.js | `computePipePartialFlowDepth` | `{ d_in = 0, slope = 0, flow_gpm = 0, material = "pvc" } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computePipePurgeVolume` | `{ pipe_id_in = 2.067, length_ft = 100, air_changes = 5, flow_scfh = 60 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computePipeSizing` | `{ fixtures, slope_in_per_ft = 0.25 }` | _ | _ | _ |
 | calc-plumbing.js | `computePipeVelocity` | `{ mode = "velocity-from-flow", flow_gpm = 0, diameter_in = 0, material = "cop...` | _ | _ | _ |
 | calc-plumbing.js | `computePipeVolume` | `{ internal_diameter_in, length_ft, nominal_size }` | _ | _ | _ |
@@ -2603,8 +2598,6 @@ cross-check.
 | calc-plumbing.js | `computeRecircPumpHead` | `{ pipe_length_ft, fittings_count = 0, target_flow_gpm, internal_diameter_in, ...` | _ | _ | _ |
 | calc-plumbing.js | `computeSanitaryDfu` | `{ fixtures = {}, config = "horizontal_branch", slope_in_per_ft = 0.25, propos...` | _ | _ | _ |
 | calc-plumbing.js | `computeSlope` | `{ rise, run, units = "in_per_ft" }` | _ | _ | _ |
-| calc-plumbing.js | `computeSolarThermalCollector` | `{ optical_efficiency = 0.70, loss_coeff = 0.85, inlet_temp_f = 120, ambient_t...` | _ | _ | _ |
-| calc-plumbing.js | `computeSolderJointQuantity` | `{ joints = 200, wire_in_per_joint = 0.75, wire_dia_in = 0.125, solder_density...` | _ | _ | _ |
 | calc-plumbing.js | `computeSpecificEnergy` | `{ b_ft = 0, q_cfs = 0, y_ft = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeStaticPressureLossPiping` | `{ elevation_change_ft, friction_loss_psi = 0, fluid_density_lb_ft3 = 62.4 }` | _ | _ | _ |
 | calc-plumbing.js | `computeStormwaterDetentionVolume` | `{ runoff_c = 0, intensity_in_hr = 0, area_ac = 0, q_allow_cfs = 0, duration_m...` | _ | _ | _ |
@@ -2654,6 +2647,13 @@ cross-check.
 | calc-plumbing.js | `renderTanklessGPM` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderTrapArm` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderWaterHammerArrestor` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-plumbingtakeoff.js | `computeHeatTraceSizing` | `{ pipe_ft = 150, allowance_pct = 10, num_valves = 1, valve_allow_ft = 3, rate...` | _ | _ | _ |
+| calc-plumbingtakeoff.js | `computeHydronicSystemVolume` | `{ pipe_length_ft = 500, gal_per_ft = 0.023, terminal_gal = 0, boiler_tank_gal...` | _ | _ | _ |
+| calc-plumbingtakeoff.js | `computePexHomerunTakeoff` | `{ fixtures = 8, hot_fixtures = 6, avg_run_ft = 35, waste_pct = 10 } = {}` | _ | _ | _ |
+| calc-plumbingtakeoff.js | `computePipeInsulationTakeoff` | `{ pipe_ft = 250, waste_pct = 5, num_fittings = 12, fitting_allow_ft = 1, sect...` | _ | _ | _ |
+| calc-plumbingtakeoff.js | `computePipePurgeVolume` | `{ pipe_id_in = 2.067, length_ft = 100, air_changes = 5, flow_scfh = 60 } = {}` | _ | _ | _ |
+| calc-plumbingtakeoff.js | `computeSolarThermalCollector` | `{ optical_efficiency = 0.70, loss_coeff = 0.85, inlet_temp_f = 120, ambient_t...` | _ | _ | _ |
+| calc-plumbingtakeoff.js | `computeSolderJointQuantity` | `{ joints = 200, wire_in_per_joint = 0.75, wire_dia_in = 0.125, solder_density...` | _ | _ | _ |
 | calc-powerquality.js | `computeCapacitorBankForResonanceOrder` | `{ short_circuit_mva = 0, target_resonant_order = 4.7 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeHarmonicResonance` | `{ short_circuit_mva = 0, cap_bank_mvar = 0 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeMotorCapacitorMax` | `{ v_ll = 0, i_noload_a = 0, safety_factor = 0.90 } = {}` | _ | _ | _ |

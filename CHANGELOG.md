@@ -42,6 +42,35 @@ because the splice must land AT a support, never mid-span.
 Fuzzer pins the per-run support formula, the double-hang two-tier identity, the linen one-run-per-shelf
 rule, the splice seam exactly at stock length, additivity, and the error seams. Catalog 1,476 -> 1,477.
 Spec: spec-v1028.
+### refactor(plumbing): split the takeoff bench into calc-plumbingtakeoff.js instead of raising the cap an eleventh time; 2026-07-27
+
+`calc-plumbing.js` had reached 75,543 B gz of its 76,000 B cap (99.4%), so the next plumbing tile would have failed
+`check-module-sizes`. That gate's own failure message says "Either split the module per-tile (preferred) or raise the
+cap," and three separate entries in this module's cap ledger already say a split is "the eventual preferred fix." This
+does the split.
+
+Seven tiles move to a new lazy module `calc-plumbingtakeoff.js` (the 57th calc-* module) -- the materials half of the
+bench, what you buy and install rather than what the hydraulics require: `solder-joint-quantity`,
+`pipe-insulation-takeoff`, `heat-trace-sizing`, `pipe-purge-volume`, `hydronic-system-volume`, `pex-homerun-takeoff`,
+`solar-thermal-collector`. They were picked for mechanical safety as much as theme: all seven are the newer
+co-located style, they form one contiguous block at the tail of the file, and they read nothing from the rest of the
+module beyond the standard scaffolding, so the move leaves no cross-module import. No tile id, input, output,
+citation, or worked example changed, and every tile keeps `group: "B"`.
+
+`calc-plumbing.js` 99.4% -> 90.8%; the new module sits at 76.0% of its own 11,000 B cap.
+
+A larger site-water-hydraulics split (~15 tiles, more relief) was scoped first and rejected: `MANNING_ROUGHNESS` is
+read by three tiles that straddle the boundary, the older tiles use the split `// --- Utility N ---` layout where a
+compute sits hundreds of lines from its renderer (so a contiguous-slice extraction would silently drag or drop code),
+and `renderManningSlope` is an exported renderer with extra annotation requirements. spec-v1030 §2 records those
+findings so the next attempt does not rediscover them; that split is still worth doing as its own deliberate change.
+
+Behavior-preserving, so the evidence is that nothing changed: full lint, 5,873 unit tests passing (same count as
+before -- every moved tile's fuzzer row and worked example still runs, now against the new path), build, and
+check-dist / shells / module-sizes / shell-mobile / csp / data:verify / readme-counts. All seven moved tiles were
+additionally render-verified in a real browser via the targeted Playwright a11y run, which is the failure mode a
+module move actually risks: a tile that resolves in Node but never mounts because its renderer is unreachable from
+the new registry.
 
 ### feat(construction): siding-course-layout, the story-pole half siding-takeoff defers; 2026-07-27
 
