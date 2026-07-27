@@ -30177,3 +30177,58 @@ test("bounds: spec-v1032 computeMasonryLintelBearing pins both governing branche
   assert.ok("error" in _v1032({ ...base, support_center_ft: 5 })); // centers inside the clear span
   assert.ok("error" in _v1032({ ...base, clear_span_ft: Infinity }));
 });
+
+import { computeCompressedAirPressureDrop as _v1033 } from "../../calc-hvac.js";
+import { colebrookFrictionFactor as _v1033cb } from "../../pure-math.js";
+
+test("bounds: spec-v1033 computeCompressedAirPressureDrop pins the worked example, the published-table cross-check, the gas-law identities, the scfm-vs-actual trap, exact length linearity, and error seams", () => {
+  const base = { scfm: 100, pipe_id_in: 1.049, length_ft: 100, line_pressure_psig: 100, air_temp_f: 68, roughness_ft: 0.00015 };
+  const r = _v1033(base);
+  assert.ok(Math.abs(r.density_lb_ft3 - 0.586718) < 1e-5);
+  assert.ok(Math.abs(r.actual_cfm - 12.816042) < 1e-5);
+  assert.ok(Math.abs(r.velocity_fps - 35.589698) < 1e-4);
+  assert.ok(Math.abs(r.reynolds - 150078.737) < 0.5);
+  assert.ok(Math.abs(r.pressure_drop_psi - 2.181637) < 1e-4);
+  assert.ok(Math.abs(r.pct_of_line - 2.181637) < 1e-4); // 100 psig -> percent equals psi numerically
+  assert.ok(r.over_10pct === false);
+  // Published-practice cross-check: 2-in main lands near 0.25 psi per 100 ft.
+  const main = _v1033({ ...base, scfm: 200, pipe_id_in: 2.067, length_ft: 500 });
+  assert.ok(Math.abs(main.pressure_drop_psi - 1.292335) < 1e-4);
+  assert.ok(main.drop_per_100ft_psi > 0.2 && main.drop_per_100ft_psi < 0.3);
+  // THE TRAP: actual cfm is far below scfm at line pressure - the exact gas-law ratio.
+  assert.ok(Math.abs(r.actual_cfm - 100 * (14.7 / 114.7)) < 1e-9);
+  assert.ok(r.actual_cfm < 13 && r.actual_cfm > 12);
+  // Density and actual volume are exact inverses through the absolute-pressure ratio.
+  const hi = _v1033({ ...base, line_pressure_psig: 229.4 }); // P_abs exactly doubles: 114.7 -> 244.1? check ratio form
+  assert.ok(Math.abs(hi.density_lb_ft3 * hi.actual_cfm - r.density_lb_ft3 * r.actual_cfm) < 1e-9); // mass flow is pressure-independent
+  // Friction factor agrees with the shared Colebrook solver called directly.
+  {
+    const D = 1.049 / 12;
+    const f = _v1033cb({ Re: r.reynolds, relativeRoughness: 0.00015 / D });
+    assert.ok(Math.abs(r.friction_factor - f) < 1e-12);
+  }
+  // Exact linearity in length at fixed everything else.
+  const long = _v1033({ ...base, length_ft: 300 });
+  assert.ok(Math.abs(long.pressure_drop_psi / r.pressure_drop_psi - 3) < 1e-9);
+  assert.ok(Math.abs(long.drop_per_100ft_psi - r.drop_per_100ft_psi) < 1e-9);
+  // Monotonic in flow, and a bigger pipe always drops less.
+  let prev = 0;
+  for (const q of [10, 50, 100, 200, 400]) {
+    const t = _v1033({ ...base, scfm: q });
+    assert.ok(t.pressure_drop_psi > prev);
+    prev = t.pressure_drop_psi;
+  }
+  assert.ok(_v1033({ ...base, pipe_id_in: 2.067 }).pressure_drop_psi < r.pressure_drop_psi);
+  // Higher line pressure moves less actual volume, so the same scfm drops less.
+  assert.ok(_v1033({ ...base, line_pressure_psig: 175 }).pressure_drop_psi < r.pressure_drop_psi);
+  // The 10% flag trips on an undersized line.
+  assert.ok(_v1033({ ...base, pipe_id_in: 0.5, scfm: 150 }).over_10pct === true);
+  // Error seams.
+  assert.ok("error" in _v1033({ ...base, scfm: 0 }));
+  assert.ok("error" in _v1033({ ...base, pipe_id_in: 0 }));
+  assert.ok("error" in _v1033({ ...base, length_ft: 0 }));
+  assert.ok("error" in _v1033({ ...base, line_pressure_psig: 0 }));
+  assert.ok("error" in _v1033({ ...base, roughness_ft: 0 }));
+  assert.ok("error" in _v1033({ ...base, air_temp_f: -460 }));
+  assert.ok("error" in _v1033({ ...base, scfm: Infinity }));
+});

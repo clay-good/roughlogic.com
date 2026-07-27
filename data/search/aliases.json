@@ -90887,6 +90887,36 @@
       "kind": "question"
     },
     {
+      "term": "compressed air pressure drop",
+      "target": "compressed-air-pressure-drop",
+      "kind": "industry"
+    },
+    {
+      "term": "shop air line sizing",
+      "target": "compressed-air-pressure-drop",
+      "kind": "industry"
+    },
+    {
+      "term": "what size air line for my shop",
+      "target": "compressed-air-pressure-drop",
+      "kind": "question"
+    },
+    {
+      "term": "scfm vs acfm at line pressure",
+      "target": "compressed-air-pressure-drop",
+      "kind": "question"
+    },
+    {
+      "term": "psi loss per 100 ft of air pipe",
+      "target": "compressed-air-pressure-drop",
+      "kind": "redirect"
+    },
+    {
+      "term": "air main losing pressure at the far end",
+      "target": "compressed-air-pressure-drop",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

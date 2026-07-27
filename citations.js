@@ -15120,6 +15120,18 @@ export const CITATIONS = {
       { name: "Allowable stress entered", value: "no coefficient shipped - secondary sources disagree, so the designer supplies the value", source: "user input from the governing code edition" },
     ],
   },
+  "compressed-air-pressure-drop": {
+    formula: "rho = P_abs x 144 / (R_air x T_R) with R_air = 53.35 ft-lbf/lb-R; Q_actual = scfm x (14.7/P_abs) x (T_R/527.67); Re = rho V D / mu; f from Colebrook-White; dP = f (L/D) rho V^2 / (2 gc) / 144.",
+    edition: "Darcy-Weisbach with the Colebrook-White friction factor and the ideal gas law, by name; NO empirical compressed-air constant or sizing table is used.",
+    freeAccess: "All relations are public engineering formulas; the Colebrook solver is the same one this catalog already uses for duct and pipe friction.",
+    governance: GOVERNANCE.general,
+    editionNote: "Standard cubic feet are a MASS measure: at 100 psig, 100 scfm is only about 12.8 ACTUAL cfm, so sizing a line off the scfm figure directly overstates the velocity nearly eightfold - the tile reports actual cfm and line density alongside the velocity for that reason. Enter the pipe's true INSIDE diameter and add fitting equivalent lengths to the run, which often dominate a shop drop. Air dynamic viscosity is written as the standard 1.81e-5 Pa-s at 68 F times the exact Pa-s to lb/(ft-s) conversion rather than a recalled imperial value. Isothermal single-phase flow using the INLET density throughout, which is conservative because density rises as pressure falls along the run. The rule of thumb is to hold the loss under about 10% of line pressure. Receiver sizing, leak cost, and compression power are separate tiles.",
+    assumptions: [
+      { name: "No empirical constant", value: "friction from the repo's verified Colebrook solver, density and volume from the ideal gas law", source: "Darcy-Weisbach / Colebrook-White" },
+      { name: "Viscosity derivation", value: "1.81e-5 Pa-s at 68 F converted with the exact 0.67197 lb/(ft-s) per Pa-s factor", source: "standard air property" },
+      { name: "Inlet density", value: "used for the whole run; conservative, since density rises as pressure drops", source: "stated simplification" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

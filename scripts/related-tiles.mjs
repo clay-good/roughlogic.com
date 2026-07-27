@@ -1518,7 +1518,8 @@ const RELATED = {
   "battery-c-rate": ["battery-peak-shaving","battery-runtime","battery-tou-arbitrage"],
   // spec-v239..v241 compressed-air energy batch (Group C)
   "air-leak-cost": ["air-receiver","compressed-air-power","air-pressure-setpoint-savings"],
-  "compressed-air-power": ["air-leak-cost","air-pressure-setpoint-savings","air-receiver"],
+  "compressed-air-power": ["compressed-air-pressure-drop","air-leak-cost","air-pressure-setpoint-savings","air-receiver"],
+  "compressed-air-pressure-drop": ["compressed-air-power","air-receiver","air-pressure-setpoint-savings"],
   "air-pressure-setpoint-savings": ["compressed-air-power","air-leak-cost","air-receiver"],
   // spec-v275..v277 ventilation-and-recovery batch (Group C)
   "erv-sensible-recovery": ["outdoor-air-ventilation","ashrae-622-ventilation","mua-tempering-load"],

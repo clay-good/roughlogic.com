@@ -1015,6 +1015,7 @@ export const COMPUTE_MAP = {
   // spec-v239..v241 compressed-air energy batch (3 tiles)
   "air-leak-cost": { module: "../../calc-hvac.js", fn: "computeAirLeakCost" },
   "compressed-air-power": { module: "../../calc-hvac.js", fn: "computeCompressedAirPower" },
+  "compressed-air-pressure-drop": { module: "../../calc-hvac.js", fn: "computeCompressedAirPressureDrop" },
   "air-pressure-setpoint-savings": { module: "../../calc-hvac.js", fn: "computeAirPressureSetpointSavings" },
   // spec-v275..v277 ventilation-and-recovery batch (3 tiles)
   "erv-sensible-recovery": { module: "../../calc-hvac.js", fn: "computeErvSensibleRecovery" },

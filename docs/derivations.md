@@ -2231,6 +2231,7 @@ cross-check.
 | calc-hvac.js | `computeCombustionAir` | `{ btu_input, room_volume_ft3 }` | _ | _ | _ |
 | calc-hvac.js | `computeCombustionAirMaxInput` | `{ room_volume_ft3 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCompressedAirPower` | `{ free_air_cfm = 0, inlet_psia = 14.7, discharge_psig = 0, overall_eff = 0.75...` | _ | _ | _ |
+| calc-hvac.js | `computeCompressedAirPressureDrop` | `{ scfm = 0, pipe_id_in = 0, length_ft = 0, line_pressure_psig = 100, air_temp...` | _ | _ | _ |
 | calc-hvac.js | `computeCoolingCoilTotalLoad` | `{ cfm = 0, h_ent_btu = 0, h_lvg_btu = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCoolingTower` | `{ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm = 0, fan_kW = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDcvCo2Ventilation` | `{ n = 0, co2_set_ppm = 0, co2_oa_ppm = 400, gen_cfm = 0.0106 } = {}` | _ | _ | _ |
@@ -3141,7 +3142,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1727.
+Row count: 1728.
 
 <!-- END function-corpus-v14 -->
 
@@ -3548,7 +3549,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (142 tiles)
+### Group C HVAC (143 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3585,6 +3586,7 @@ per spec-v14 §13.1 second paragraph.
 | `combustion-lambda` | Combustion Lambda and Air-Fuel Ratio | Combustion-analysis practice (lambda ...; Natural gas at 3% O2 -> lambda 1.168, 16.8% excess air, 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `compare-refrigerants` | Compare Two Refrigerants | Chemours / Honeywell / Daikin publish...; R-410A vs R-32 at 118 psig -> 40 F vs 43.2 F sat-temp; pr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compressed-air-power` | Compressed-Air Compression Power (Isentropic) and Energy Cost | Single-stage adiabatic (isentropic) c...; spec-v240 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `compressed-air-pressure-drop` | Compressed-Air Pipe Pressure Drop | Darcy-Weisbach / Colebrook-White + id...; 100 scfm, 1.049-in ID, 100 ft, 100 psig, 68 F, steel -> r... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `compression-ratio-refrig` | Refrigeration Compression Ratio | ASHRAE Handbook Refrigeration (by name); suction 70 psig, discharge 260 psig, atm 14.696 -> 274.69... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compressor-displacement` | Compressor Theoretical Displacement | Reciprocating compressor theoretical ...; 2.0 in bore, 1.5 in stroke, 4 cyl, 1750 rpm -> 18.85 in^3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compressor-short-cycle` | Compressor Short-Cycle Protection | Copeland / ASHRAE; N = 6*4*0.5*0.5 = 6 cph; on = 0.5*60/6 = 5 min < 10 min o... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4807,6 +4809,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1480. Fixture-covered or reference-cadence: 1480 / 1480.
+Tile count: 1481. Fixture-covered or reference-cadence: 1481 / 1481.
 
 <!-- END tile-index-v14 -->

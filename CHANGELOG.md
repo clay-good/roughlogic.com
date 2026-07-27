@@ -4,6 +4,30 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): compressed-air-pressure-drop, derived rather than tabulated; 2026-07-27
+
+The compressed-air bench was energy and volume only -- power, leak cost, receiver, setpoint savings,
+density correction -- with nothing for distribution pressure drop. The fuel-gas tiles are a different
+regime and `pipe-velocity` is liquid. Adds one tile to `calc-hvac.js` (Group C).
+
+`compressed-air-pressure-drop` is built entirely from things the catalog already owns or can derive: air
+density and the standard-to-actual volume conversion from the ideal gas law, and the friction factor from
+`colebrookFrictionFactor` in pure-math.js -- the same solver the duct tiles use, already landed and already
+fuzzed -- so no empirical compressed-air constant enters. The one physical property is written as
+`1.81e-5 * 0.67197`, the web-verified SI viscosity at 68 F times the exact unit conversion, so every digit's
+source is visible in the code rather than recalled in imperial units.
+
+The trap it exists to show: standard cubic feet are a MASS measure. At 100 psig, 100 scfm is only **12.8
+actual cfm**, so sizing a line off the scfm figure overstates velocity nearly eightfold; the renderer puts
+actual cfm and line density next to the velocity for exactly that reason. Pinned: 100 scfm through 1-in
+schedule 40 over 100 ft drops 2.18 psi. The cross-check fixture validates against published practice --
+200 scfm through a 2-in main lands at 0.26 psi per 100 ft, matching the ~0.25 that compressed-air sizing
+tables give.
+
+The fuzzer pins the mass-flow invariant (density x actual cfm is pressure-independent to 1e-9), exact
+agreement with the shared Colebrook solver called directly, exact length linearity, and the 10%-of-line
+flag. Catalog 1,480 -> 1,481. Spec: spec-v1033.
+
 ### feat(masonry): masonry-lintel-bearing, and a coefficient deliberately left as an input; 2026-07-27
 
 `masonry-lintel-loading` returns the load and stops there; all eight lintel aliases point at it, and nothing

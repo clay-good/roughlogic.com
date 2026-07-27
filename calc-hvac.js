@@ -11,6 +11,7 @@ import {
   psychrometric,
   saturationVaporPressure_hPa,
   dewPointFromVaporPressure_C,
+  colebrookFrictionFactor,
   F_to_C,
   C_to_F,
 } from "./pure-math.js";
@@ -4606,3 +4607,87 @@ function renderPipeInsulationForCondensation(inputRegion, outputRegion, citation
   sync();
 }
 HVAC_RENDERERS["pipe-insulation-for-condensation"] = renderPipeInsulationForCondensation;
+
+// --- spec-v1033 C: Compressed-air pipe pressure drop ---
+// Built from first principles on the repo's own verified Colebrook solver rather than an empirical
+// compressed-air constant. Air density at LINE conditions from the ideal gas law
+// (rho = P_abs x 144 / (R_air x T_rankine), R_air = 53.35 ft-lbf/lb-R); the standard-to-actual volume
+// conversion is the same gas law (Q_actual = scfm x (14.7/P_abs) x (T/T_std)); then Darcy-Weisbach
+// dP = f (L/D) rho V^2 / (2 gc). Air dynamic viscosity is DERIVED from the SI value 1.81e-5 Pa-s at
+// 68 F times the exact 0.67197 lb/(ft-s) per Pa-s conversion, not recalled in imperial units.
+const AIR_GAS_CONSTANT_FT_LBF_PER_LB_R = 53.35;
+const AIR_VISCOSITY_LB_FT_S = 1.81e-5 * 0.67197; // 1.81e-5 Pa-s at 68 F -> lb/(ft-s)
+const STD_PRESSURE_PSIA = 14.7;
+const STD_TEMP_RANKINE = 527.67; // 68 F
+// dims: in { scfm: L^3 T^-1, pipe_id_in: L, length_ft: L, line_pressure_psig: M L^-1 T^-2, air_temp_f: T, roughness_ft: L } out: { velocity_fps: L T^-1, reynolds: dimensionless, pressure_drop_psi: M L^-1 T^-2, density_lb_ft3: M L^-3 }
+export function computeCompressedAirPressureDrop({ scfm = 0, pipe_id_in = 0, length_ft = 0, line_pressure_psig = 100, air_temp_f = 68, roughness_ft = 0.00015 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q = Number(scfm) || 0;
+  const d = Number(pipe_id_in) || 0;
+  const L = Number(length_ft) || 0;
+  const pg = Number(line_pressure_psig);
+  const tF = Number(air_temp_f);
+  const eps = Number(roughness_ft) || 0;
+  if (!(q > 0)) return { error: "Airflow must be positive (scfm)." };
+  if (!(d > 0)) return { error: "Pipe inside diameter must be positive (in) - use the actual ID, not the nominal size." };
+  if (!(L > 0)) return { error: "Run length must be positive (ft) - include fitting equivalent lengths." };
+  if (!Number.isFinite(pg) || pg <= 0) return { error: "Line pressure must be positive (psig)." };
+  if (!Number.isFinite(tF) || tF <= -459.67) return { error: "Air temperature must be above absolute zero (F)." };
+  if (!(eps > 0)) return { error: "Pipe roughness must be positive (ft; about 0.00015 commercial steel, 0.000005 drawn copper or plastic)." };
+  const p_abs_psia = pg + STD_PRESSURE_PSIA;
+  const t_rankine = tF + 459.67;
+  const density_lb_ft3 = p_abs_psia * 144 / (AIR_GAS_CONSTANT_FT_LBF_PER_LB_R * t_rankine);
+  const actual_cfm = q * (STD_PRESSURE_PSIA / p_abs_psia) * (t_rankine / STD_TEMP_RANKINE);
+  const d_ft = d / 12;
+  const area_ft2 = Math.PI / 4 * d_ft * d_ft;
+  const velocity_fps = actual_cfm / 60 / area_ft2;
+  const reynolds = density_lb_ft3 * velocity_fps * d_ft / AIR_VISCOSITY_LB_FT_S;
+  const friction_factor = colebrookFrictionFactor({ Re: reynolds, relativeRoughness: eps / d_ft });
+  const pressure_drop_psi = friction_factor * (L / d_ft) * density_lb_ft3 * velocity_fps * velocity_fps / (2 * 32.174) / 144;
+  const drop_per_100ft_psi = pressure_drop_psi * 100 / L;
+  const pct_of_line = pressure_drop_psi / pg * 100;
+  const over_10pct = pct_of_line > 10;
+  if (![density_lb_ft3, velocity_fps, reynolds, pressure_drop_psi].every(Number.isFinite)) return { error: "Compressed-air pressure-drop math did not produce a finite value." };
+  return {
+    p_abs_psia, density_lb_ft3, actual_cfm, velocity_fps, reynolds, friction_factor,
+    pressure_drop_psi, drop_per_100ft_psi, pct_of_line, over_10pct,
+    note: "Standard cubic feet are a MASS measure; the air actually moving down the pipe occupies far less volume at line pressure, which is why " + q + " scfm at " + pg + " psig flows as only " + actual_cfm.toFixed(1) + " actual cfm and why sizing off scfm directly badly overstates the velocity. Enter the pipe's true INSIDE diameter, and add fitting equivalent lengths to the run - elbows and tees often dominate a shop drop. The common rule of thumb is to hold the loss under about 10% of line pressure (this run is " + pct_of_line.toFixed(1) + "%), and every psi of drop costs roughly half a percent of compressor energy, so an oversize main usually pays back. Isothermal single-phase flow at the entered temperature; a large drop changes the density along the run and this uses the inlet value, which is conservative. Receiver sizing, leak cost, and compression power are separate tiles.",
+  };
+}
+export const compressedAirPressureDropExample = { inputs: { scfm: 100, pipe_id_in: 1.049, length_ft: 100, line_pressure_psig: 100, air_temp_f: 68, roughness_ft: 0.00015 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderCompressedAirPressureDrop(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Darcy-Weisbach pressure drop dP = f (L/D) rho V^2 / (2 gc) with the friction factor from the Colebrook-White relation, air density at line conditions from the ideal gas law rho = P_abs x 144 / (R_air T) with R_air = 53.35 ft-lbf/lb-R, and the standard-to-actual volume conversion Q_actual = scfm x (14.7/P_abs) x (T/528 R) from the same gas law. Air dynamic viscosity is taken as the standard 1.81e-5 Pa-s at 68 F converted to imperial units. No empirical compressed-air constant is used. Isothermal single-phase flow; the inlet density is used throughout, which is conservative. Fitting equivalent lengths must be added to the run length by the user.";
+  const q = makeNumber("Airflow (scfm)", "capd-q", { step: "any", value: "100" });
+  q.input.value = "100";
+  const d = makeNumber("Pipe inside diameter (in, actual ID)", "capd-d", { step: "any", value: "1.049" });
+  d.input.value = "1.049";
+  const L = makeNumber("Run length incl. fitting equiv. (ft)", "capd-l", { step: "any", value: "100" });
+  L.input.value = "100";
+  const p = makeNumber("Line pressure (psig)", "capd-p", { step: "any", value: "100" });
+  p.input.value = "100";
+  const t = makeNumber("Air temperature (F)", "capd-t", { step: "any", value: "68" });
+  t.input.value = "68";
+  const e = makeNumber("Pipe roughness (ft)", "capd-e", { step: "any", value: "0.00015" });
+  e.input.value = "0.00015";
+  for (const f of [q, d, L, p, t, e]) inputRegion.appendChild(f.wrap);
+  const oDp = makeOutputLine(outputRegion, "Pressure drop", "capd-out-dp");
+  const oV = makeOutputLine(outputRegion, "Actual flow / velocity", "capd-out-v");
+  const oRe = makeOutputLine(outputRegion, "Reynolds / friction factor", "capd-out-re");
+  const oN = makeOutputLine(outputRegion, "Note", "capd-out-n");
+  const sync = () => {
+    const r = computeCompressedAirPressureDrop({
+      scfm: Number(q.input.value), pipe_id_in: Number(d.input.value), length_ft: Number(L.input.value),
+      line_pressure_psig: Number(p.input.value), air_temp_f: Number(t.input.value), roughness_ft: Number(e.input.value),
+    });
+    if (r.error) { oDp.textContent = r.error; oV.textContent = ""; oRe.textContent = ""; oN.textContent = ""; return; }
+    oDp.textContent = r.pressure_drop_psi.toFixed(2) + " psi (" + r.drop_per_100ft_psi.toFixed(2) + " psi per 100 ft, " + r.pct_of_line.toFixed(1) + "% of line" + (r.over_10pct ? " - OVER the 10% rule of thumb" : "") + ")";
+    oV.textContent = r.actual_cfm.toFixed(1) + " actual cfm at " + r.density_lb_ft3.toFixed(4) + " lb/ft^3 - " + r.velocity_fps.toFixed(1) + " ft/s";
+    oRe.textContent = "Re " + r.reynolds.toFixed(0) + " / f " + r.friction_factor.toFixed(5);
+    oN.textContent = r.note;
+  };
+  for (const f of [q, d, L, p, t, e]) f.input.addEventListener("input", sync);
+  sync();
+}
+HVAC_RENDERERS["compressed-air-pressure-drop"] = renderCompressedAirPressureDrop;

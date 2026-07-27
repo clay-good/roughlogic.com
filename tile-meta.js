@@ -564,7 +564,7 @@ const _TILES = [
   // spec-v233..v235 heat-pump heating-mode batch
   ["heat-pump-seasonal-energy", "C"], ["dual-fuel-balance-point", "C"], ["heat-pump-cold-capacity", "C"],
   // spec-v239..v241 compressed-air energy batch
-  ["air-leak-cost", "C"], ["compressed-air-power", "C"], ["air-pressure-setpoint-savings", "C"],
+  ["air-leak-cost", "C"], ["compressed-air-power", "C"], ["compressed-air-pressure-drop", "C"], ["air-pressure-setpoint-savings", "C"],
   // spec-v275..v277 ventilation-and-recovery batch
   ["erv-sensible-recovery", "C"], ["mua-tempering-load", "C"], ["dcv-co2-ventilation", "C"],
   // spec-v278..v280 NEC conductor-and-overcurrent-sizing batch
