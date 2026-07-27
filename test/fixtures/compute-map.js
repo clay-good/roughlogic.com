@@ -1034,6 +1034,7 @@ export const COMPUTE_MAP = {
   "concrete-anchor-pullout": { module: "../../calc-concrete.js", fn: "computeConcreteAnchorPullout" },
   "concrete-anchor-shear-breakout": { module: "../../calc-concrete.js", fn: "computeConcreteAnchorShearBreakout" },
   "concrete-anchor-pryout": { module: "../../calc-concrete.js", fn: "computeConcreteAnchorPryout" },
+  "concrete-anchor-steel-strength": { module: "../../calc-concrete.js", fn: "computeConcreteAnchorSteelStrength" },
   "concrete-anchor-blowout": { module: "../../calc-concrete.js", fn: "computeConcreteAnchorBlowout" },
   "rc-slender-column-magnify": { module: "../../calc-concrete.js", fn: "computeRcSlenderColumnMagnify" },
   "concrete-corbel-bracket": { module: "../../calc-concrete.js", fn: "computeConcreteCorbelBracket" },

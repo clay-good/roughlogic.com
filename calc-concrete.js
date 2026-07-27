@@ -1659,6 +1659,56 @@ CONCRETE_RENDERERS["concrete-anchor-pryout"] = _simpleRenderer({
   compute: computeConcreteAnchorPryout,
 });
 
+// --- spec-v1021 E: Concrete anchor steel strength (ACI 318-19 17.6.1 / 17.7.1) ---
+// Ase = (pi/4)(da - 0.9743/n)^2 (R17.6.1.2 commentary formula); futa capped at min(1.9 fya, 125 ksi);
+// Nsa = Ase futa (17.6.1.2), phi 0.75 ductile tension; Vsa = 0.6 Ase futa (17.7.1.2b, cast-in
+// headed/hooked BOLT - a welded stud uses the full Ase futa and is not modeled), phi 0.65 ductile shear.
+// dims: in { anchor_dia_in: L, threads_per_in: L^-1, fya_psi: M L^-1 T^-2, futa_psi: M L^-1 T^-2 } out: { ase_in2: L^2, nsa_lb: M L T^-2, phi_nsa_lb: M L T^-2, vsa_lb: M L T^-2, phi_vsa_lb: M L T^-2 }
+export function computeConcreteAnchorSteelStrength({ anchor_dia_in = 0, threads_per_in = 0, fya_psi = 36000, futa_psi = 58000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const da = Number(anchor_dia_in) || 0;
+  const n = Number(threads_per_in) || 0;
+  const fya = Number(fya_psi) || 0;
+  const futa = Number(futa_psi) || 0;
+  if (!(da > 0)) return { error: "Anchor diameter must be positive (in)." };
+  if (!(n > 0)) return { error: "Threads per inch must be positive (from the bolt callout, e.g. 5/8-11 has 11)." };
+  if (!(fya > 0)) return { error: "Yield strength fya must be positive (psi)." };
+  if (!(futa > 0)) return { error: "Tensile strength futa must be positive (psi)." };
+  const root = da - 0.9743 / n;
+  if (!(root > 0)) return { error: "Thread pitch is larger than the diameter allows - check the threads-per-inch callout." };
+  const ase_in2 = Math.PI / 4 * root * root;
+  const futa_used_psi = Math.min(futa, 1.9 * fya, 125000);
+  const capped = futa_used_psi < futa;
+  const nsa_lb = ase_in2 * futa_used_psi;
+  const phi_nsa_lb = 0.75 * nsa_lb;
+  const vsa_lb = 0.6 * ase_in2 * futa_used_psi;
+  const phi_vsa_lb = 0.65 * vsa_lb;
+  if (![ase_in2, nsa_lb, phi_nsa_lb, vsa_lb, phi_vsa_lb].every(Number.isFinite)) return { error: "Steel-strength math did not produce a finite value." };
+  return {
+    ase_in2, futa_used_psi, capped, nsa_lb, phi_nsa_lb, vsa_lb, phi_vsa_lb,
+    note: "The steel number every anchor-family tile's 'takes the least of steel and ...' note refers to. Ase is the effective (threaded) area, smaller than the nominal shank; futa is capped at the lesser of 1.9 fya and 125,000 psi so a high-strength rod cannot claim more than the code allows. The 0.6 shear factor is for cast-in headed and hooked BOLTS - a stud welded to a plate develops the full Ase futa per 17.7.1.2(a) and is not modeled; ductile steel phi (0.75 tension / 0.65 shear) is used, and a brittle element takes lower phi. The anchor design takes the LEAST of this and the concrete modes (breakout, pullout, blowout, shear breakout, pryout). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+  };
+}
+export const concreteAnchorSteelStrengthExample = { inputs: { anchor_dia_in: 0.625, threads_per_in: 11, fya_psi: 36000, futa_psi: 58000 } };
+CONCRETE_RENDERERS["concrete-anchor-steel-strength"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 Sections 17.6.1 and 17.7.1 anchor steel strength: Ase = (pi/4)(da - 0.9743/n)^2 (the R17.6.1.2 commentary formula, also AISC Manual Table 7-18); futa taken as no more than the lesser of 1.9 fya and 125,000 psi; Nsa = Ase futa (17.6.1.2) with phi = 0.75 (ductile steel, tension); Vsa = 0.6 Ase futa for cast-in headed and hooked bolts (17.7.1.2b) with phi = 0.65 (ductile steel, shear) per Table 17.5.3. A welded headed stud develops the full Ase futa (17.7.1.2a, not modeled). The anchor design takes the least of the steel and every concrete mode. ACI 318 Chapter 17 and the engineer of record govern.",
+  example: concreteAnchorSteelStrengthExample.inputs,
+  fields: [
+    { key: "anchor_dia_in", label: "Anchor diameter da (in)", kind: "number" },
+    { key: "threads_per_in", label: "Threads per inch n (5/8-11 -> 11)", kind: "number" },
+    { key: "fya_psi", label: "Steel yield fya (psi)", kind: "number", default: 36000 },
+    { key: "futa_psi", label: "Steel tensile futa (psi)", kind: "number", default: 58000 },
+  ],
+  outputs: [
+    { key: "ase", id: "cass-out-ase", label: "Effective thread area Ase", value: (r) => fmt(r.ase_in2, 4) + " in^2" },
+    { key: "futa", id: "cass-out-futa", label: "futa used (after the 1.9 fya / 125 ksi cap)", value: (r) => fmt(r.futa_used_psi, 0) + " psi" + (r.capped ? " - CAPPED below the entered value" : "") },
+    { key: "nsa", id: "cass-out-nsa", label: "Steel tension Nsa / phiNsa", value: (r) => fmt(r.nsa_lb, 0) + " / " + fmt(r.phi_nsa_lb, 0) + " lb (phi 0.75)" },
+    { key: "vsa", id: "cass-out-vsa", label: "Steel shear Vsa / phiVsa", value: (r) => fmt(r.vsa_lb, 0) + " / " + fmt(r.phi_vsa_lb, 0) + " lb (phi 0.65)" },
+    { key: "n", id: "cass-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteAnchorSteelStrength,
+});
+
 // ===================== spec-v793: fresh (batch) concrete temperature (ACI 305.1) =====================
 // Mass-weighted thermal-energy balance: mixture T = sum(c_i m_i T_i) / sum(c_i m_i), with the specific
 // heat of solids (cement + aggregate) ~0.22 Btu/lb-F and water = 1.0. Free surface moisture on the

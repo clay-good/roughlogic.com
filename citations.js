@@ -14989,6 +14989,19 @@ export const CITATIONS = {
       { name: "Scope", value: "single anchor away from an edge; steel shear and the 17.7.2 edge breakout are separate checks", source: "ACI 318-19 17.7.1, 17.7.2" },
     ],
   },
+  "concrete-anchor-steel-strength": {
+    formula: "Ase = (pi/4)(da - 0.9743/n)^2; futa <= min(1.9 fya, 125,000 psi); Nsa = Ase futa, phiNsa = 0.75 Nsa (ductile, tension); Vsa = 0.6 Ase futa, phiVsa = 0.65 Vsa (ductile, shear, cast-in headed/hooked bolts).",
+    edition: "The ACI 318-19 Sections 17.6.1 (steel strength in tension) and 17.7.1 (steel strength in shear, Eq. 17.7.1.2b) with Table 17.5.3 phi factors, by name; the Ase expression is the R17.6.1.2 commentary formula (also AISC Manual Table 7-18).",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Chapter 17 anchoring provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The steel check the concrete-mode tiles keep pointing at: the anchor design takes the LEAST of this and the concrete modes (breakout, pullout, blowout, shear breakout, pryout). Ase is the effective threaded area, smaller than the shank; the futa cap keeps a high-strength rod from claiming more than the code allows. Scope: cast-in headed and hooked BOLTS with ductile steel (A307/F1554 class) - a stud welded to a plate develops the full Ase futa per 17.7.1.2(a) and a brittle element takes lower phi (neither modeled). The AISC J3 bolt tiles (bolt-shear-bearing, steel-bolt-tension-shear) are the structural steel-to-steel connection path with different stresses - do not mix the two. ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+    assumptions: [
+      { name: "Effective area", value: "Ase = (pi/4)(da - 0.9743/n)^2 from the thread callout (5/8-11 -> n = 11)", source: "ACI 318-19 R17.6.1.2" },
+      { name: "futa cap", value: "no more than the lesser of 1.9 fya and 125,000 psi", source: "ACI 318-19 17.6.1.2" },
+      { name: "Shear factor", value: "0.6 Ase futa for cast-in headed and hooked bolts; a welded stud develops the full Ase futa (not modeled)", source: "ACI 318-19 17.7.1.2" },
+      { name: "phi (ductile)", value: "0.75 tension / 0.65 shear; brittle elements take lower values (not offered)", source: "ACI 318-19 Table 17.5.3" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

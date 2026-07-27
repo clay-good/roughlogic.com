@@ -29725,3 +29725,46 @@ test("bounds: spec-v1020 computeConcreteAnchorPryout pins Vcp = kcp Ncb, the cro
   assert.ok("error" in _v1020({ ...base, anchor_type: "adhesive" }));
   assert.ok("error" in _v1020({ ...base, embedment_in: Infinity }));
 });
+
+import { computeConcreteAnchorSteelStrength as _v1021 } from "../../calc-concrete.js";
+
+test("bounds: spec-v1021 computeConcreteAnchorSteelStrength pins both K-State published examples, the futa cap seams, the exact 0.6 shear identity, monotonicity, and error seams", () => {
+  const base = { anchor_dia_in: 0.625, threads_per_in: 11, fya_psi: 36000, futa_psi: 58000 };
+  // Pinned published example: 5/8-11 A307 -> Ase 0.226, Nsa 13.11 kip, phiNsa 9.83, Vsa 7.86, phiVsa 5.11.
+  const r = _v1021(base);
+  assert.ok(Math.abs(r.ase_in2 - Math.PI / 4 * Math.pow(0.625 - 0.9743 / 11, 2)) < 1e-12);
+  assert.ok(Math.abs(r.ase_in2 - 0.226) < 0.0005);
+  assert.ok(Math.abs(r.nsa_lb - 13108.1) < 0.5);
+  assert.ok(Math.abs(r.phi_nsa_lb - 9831.1) < 0.5);
+  assert.ok(Math.abs(r.vsa_lb - 7864.9) < 0.5);
+  assert.ok(Math.abs(r.phi_vsa_lb - 5112.2) < 0.5);
+  assert.ok(r.capped === false);
+  // Exact identities: Vsa = 0.6 Nsa, phi factors 0.75 / 0.65.
+  assert.ok(Math.abs(r.vsa_lb - 0.6 * r.nsa_lb) < 1e-9);
+  assert.ok(Math.abs(r.phi_nsa_lb - 0.75 * r.nsa_lb) < 1e-9);
+  assert.ok(Math.abs(r.phi_vsa_lb - 0.65 * r.vsa_lb) < 1e-9);
+  // Second published example: 3/4-10.
+  const t = _v1021({ ...base, anchor_dia_in: 0.75, threads_per_in: 10 });
+  assert.ok(Math.abs(t.ase_in2 - 0.33446) < 0.000005);
+  assert.ok(Math.abs(t.nsa_lb - 19398.7) < 0.5);
+  // futa cap seams: 1.9 fya governs a soft rod; 125 ksi floors a high-strength one.
+  const soft = _v1021({ ...base, fya_psi: 20000, futa_psi: 58000 });
+  assert.ok(soft.capped === true && Math.abs(soft.futa_used_psi - 38000) < 1e-9);
+  const hs = _v1021({ ...base, fya_psi: 105000, futa_psi: 210000 });
+  assert.ok(hs.capped === true && Math.abs(hs.futa_used_psi - 125000) < 1e-9);
+  assert.ok(Math.abs(hs.nsa_lb - hs.ase_in2 * 125000) < 1e-6);
+  // Monotonic in da at fixed n.
+  let prev = 0;
+  for (const da of [0.375, 0.5, 0.625, 0.75, 1.0]) {
+    const s = _v1021({ ...base, anchor_dia_in: da, threads_per_in: 10 });
+    assert.ok(s.nsa_lb > prev);
+    prev = s.nsa_lb;
+  }
+  // Error seams, incl. the thread pitch eating the whole diameter.
+  assert.ok("error" in _v1021({ ...base, anchor_dia_in: 0 }));
+  assert.ok("error" in _v1021({ ...base, threads_per_in: 0 }));
+  assert.ok("error" in _v1021({ ...base, anchor_dia_in: 0.1, threads_per_in: 8 }));
+  assert.ok("error" in _v1021({ ...base, fya_psi: 0 }));
+  assert.ok("error" in _v1021({ ...base, futa_psi: 0 }));
+  assert.ok("error" in _v1021({ ...base, anchor_dia_in: NaN }));
+});

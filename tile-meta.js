@@ -621,6 +621,7 @@ const _TILES = [
   ["concrete-anchor-pullout", "E"],
   ["concrete-anchor-shear-breakout", "E"],
   ["concrete-anchor-pryout", "E"],
+  ["concrete-anchor-steel-strength", "E"],
   ["concrete-anchor-blowout", "E"],
   ["rc-slender-column-magnify", "E"],
   ["concrete-corbel-bracket", "E"],

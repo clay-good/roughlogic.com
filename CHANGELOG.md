@@ -4,6 +4,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): concrete-anchor-steel-strength, the steel number every anchor tile's note points at; 2026-07-27
+
+The anchor family now checks every concrete mode (tension breakout / pullout / blowout / shear breakout /
+pryout) and each tile's note says the design "takes the least of steel and ..." -- yet nothing produced the steel
+number. The existing bolt tiles are AISC 360 J3 structural-connection checks with different stresses; the ACI
+Chapter 17 path uses Ase from the thread callout and futa with the 1.9 fya / 125 ksi cap. Adds one tile to
+`calc-concrete.js` (Group E), no new module.
+
+`concrete-anchor-steel-strength` computes Ase = (pi/4)(da - 0.9743/n)^2 (the R17.6.1.2 commentary formula),
+caps futa at min(1.9 fya, 125,000 psi), and reports Nsa = Ase futa with phi = 0.75 and Vsa = 0.6 Ase futa with
+phi = 0.65 (ductile cast-in headed/hooked bolts; welded studs and brittle elements are named, not modeled).
+Every constant reproduces the K-State/PCA-notes published worked example exactly: 5/8-11 A307 -> Ase 0.226 in^2,
+Nsa 13.11 kip, phiNsa 9.83, Vsa 7.86, phiVsa 5.11.
+
+Fuzzer pins both published examples, both futa-cap seams (1.9 fya governing a soft rod; the 125-ksi floor on a
+high-strength one), the exact Vsa = 0.6 Nsa identity, da monotonicity, and the thread-pitch-exceeds-diameter
+error seam. Catalog 1,469 -> 1,470. Spec: spec-v1021.
+
 ### feat(concrete): concrete-anchor-pryout, the shear mode that governs exactly where the edge-breakout check exits; 2026-07-27
 
 The tension tile's Scope line names pryout as a separate check, `aliases.json` had zero hits for `pryout`, and
