@@ -701,3 +701,71 @@ FINISH_RENDERERS["closet-shelf-takeoff"] = _simpleRenderer({
   ],
   compute: computeClosetShelfTakeoff,
 });
+
+// --- spec-v1029 E: Stone countertop overhang support check ---
+// Unsupported cantilever limit is the LESSER of the thickness rule (2 cm -> 6 in, 3 cm -> 10 in,
+// the figures the stone-industry guidance publishes) and the one-third-of-total-depth rule that
+// every source states alongside it. Past the limit the overhang needs corbels or steel: brackets
+// at the entered spacing (24 in default), each extending about 2/3 of the overhang under the stone.
+// Slab weight comes from an ENTERED density (170 pcf granite default), never a recalled table.
+// dims: in { overhang_in: L, total_depth_in: L, thickness_cm: L, run_length_ft: L, bracket_spacing_in: L, density_pcf: M L^-3, unsupported_limit_override_in: L } out: { governing_limit_in: L, overhang_weight_plf: M T^-2, brackets: dimensionless, bracket_depth_in: L }
+export function computeCountertopOverhangSupport({ overhang_in = 0, total_depth_in = 25.5, thickness_cm = 3, run_length_ft = 0, bracket_spacing_in = 24, density_pcf = 170, unsupported_limit_override_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const oh = Number(overhang_in) || 0;
+  const depth = Number(total_depth_in) || 0;
+  const th = Number(thickness_cm) || 0;
+  const run = Number(run_length_ft) || 0;
+  const spacing = Number(bracket_spacing_in) || 0;
+  const dens = Number(density_pcf) || 0;
+  const override = Number(unsupported_limit_override_in) || 0;
+  if (!(oh > 0)) return { error: "Overhang must be positive (in)." };
+  if (!(depth > 0)) return { error: "Total countertop depth must be positive (in)." };
+  if (!(depth > oh)) return { error: "The overhang cannot equal or exceed the total depth - the top would have no bearing." };
+  if (th !== 2 && th !== 3) return { error: "Thickness must be 2 or 3 (cm); enter an override limit for other materials." };
+  if (!(run > 0)) return { error: "Overhang run length must be positive (ft)." };
+  if (!(spacing > 0)) return { error: "Bracket spacing must be positive (in)." };
+  if (!(dens > 0)) return { error: "Stone density must be positive (pcf)." };
+  if (override < 0) return { error: "Limit override cannot be negative (in); use 0 to take the thickness rule." };
+  const thickness_limit_in = override > 0 ? override : (th === 3 ? 10 : 6);
+  const one_third_limit_in = depth / 3;
+  const governing_limit_in = Math.min(thickness_limit_in, one_third_limit_in);
+  const governing_rule = one_third_limit_in < thickness_limit_in ? "the one-third-of-depth rule" : "the thickness rule";
+  const supported = oh <= governing_limit_in;
+  const thickness_in = th * 0.393701;
+  const psf = dens * thickness_in / 12;
+  const overhang_weight_plf = psf * oh / 12;
+  const overhang_weight_lb = overhang_weight_plf * run;
+  const brackets = supported ? 0 : Math.ceil((run * 12) / spacing) + 1;
+  const bracket_depth_in = supported ? 0 : (2 / 3) * oh;
+  if (![governing_limit_in, overhang_weight_plf, overhang_weight_lb, brackets].every(Number.isFinite)) return { error: "Overhang-support math did not produce a finite value." };
+  return {
+    thickness_limit_in, one_third_limit_in, governing_limit_in, governing_rule, supported,
+    psf, overhang_weight_plf, overhang_weight_lb, brackets, bracket_depth_in,
+    note: (supported
+      ? "This overhang is within the unsupported limit (" + governing_limit_in.toFixed(1) + " in, set by " + governing_rule + ") - no corbels required by the cantilever rule alone. "
+      : "SUPPORT REQUIRED: the overhang exceeds the " + governing_limit_in.toFixed(1) + "-in unsupported limit set by " + governing_rule + ". Corbels or flush steel plates, fastened to studs or a load-bearing frame - not to cabinet boxes alone - and each running about " + bracket_depth_in.toFixed(1) + " in (two-thirds of the overhang) under the stone so the bracket carries the load rather than pivoting on its tip. ")
+      + "The two rules are checked TOGETHER: the thickness limit and the one-third-of-depth limit, whichever is smaller. Weight comes from the density you enter (170 pcf is a common granite figure; quartz and marble differ, and dense stones run heavier), not a lookup. A seated person on a bar overhang is a point load this cantilever check does not cover, and a seam inside the overhang changes the problem entirely. The fabricator's own written support guideline and the slab manufacturer govern - published figures vary between them.",
+  };
+}
+export const countertopOverhangSupportExample = { inputs: { overhang_in: 12, total_depth_in: 36, thickness_cm: 3, run_length_ft: 8, bracket_spacing_in: 24, density_pcf: 170, unsupported_limit_override_in: 0 } };
+FINISH_RENDERERS["countertop-overhang-support"] = _simpleRenderer({
+  citation: "Citation: stone-industry countertop support guidance - the unsupported cantilever is limited to the LESSER of the thickness rule (about 6 in for 2 cm, 10 in for 3 cm) and one-third of the total countertop depth; past that the overhang takes corbels or flush steel supports fastened to studs or a load-bearing frame, spaced at the entered interval (24 in default; published fabricator guidelines range roughly 18-36 in) and extending about two-thirds of the overhang under the stone. Slab weight is computed from the density you enter, not a recalled table. Published limits VARY between fabricators and stone types - the fabricator's own written guideline and the slab manufacturer govern.",
+  example: countertopOverhangSupportExample.inputs,
+  fields: [
+    { key: "overhang_in", label: "Overhang beyond the cabinet (in)", kind: "number" },
+    { key: "total_depth_in", label: "Total countertop depth (in)", kind: "number", default: 25.5 },
+    { key: "thickness_cm", label: "Slab thickness", kind: "select", options: [{ value: "3", label: "3 cm (limit 10 in)", selected: true }, { value: "2", label: "2 cm (limit 6 in)" }] },
+    { key: "run_length_ft", label: "Length of the overhang run (ft)", kind: "number" },
+    { key: "bracket_spacing_in", label: "Bracket spacing (in)", kind: "number", default: 24 },
+    { key: "density_pcf", label: "Stone density (pcf)", kind: "number", default: 170 },
+    { key: "unsupported_limit_override_in", label: "Limit override (in, 0 = thickness rule)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "lim", id: "cos-out-lim", label: "Unsupported limit (governing)", value: (r) => fmt(r.governing_limit_in, 1) + " in by " + r.governing_rule + " (thickness " + fmt(r.thickness_limit_in, 1) + ", depth/3 " + fmt(r.one_third_limit_in, 1) + ")" },
+    { key: "res", id: "cos-out-res", label: "Result", value: (r) => (r.supported ? "OK unsupported" : "SUPPORT REQUIRED") },
+    { key: "wt", id: "cos-out-wt", label: "Cantilevered weight", value: (r) => fmt(r.overhang_weight_plf, 1) + " lb per ft of run (" + fmt(r.overhang_weight_lb, 0) + " lb total; slab " + fmt(r.psf, 1) + " psf)" },
+    { key: "brk", id: "cos-out-brk", label: "Brackets", value: (r) => (r.supported ? "none required by the cantilever rule" : fmt(r.brackets, 0) + " at " + fmt(r.bracket_depth_in, 1) + " in deep under the stone") },
+    { key: "n", id: "cos-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCountertopOverhangSupport,
+});

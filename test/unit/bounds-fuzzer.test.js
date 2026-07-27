@@ -30013,3 +30013,50 @@ test("bounds: spec-v1028 computeClosetShelfTakeoff pins the worked example, the 
   assert.ok("error" in _v1028({ linen_wall_ft: 3, linen_shelf_count: 2.5, single_hang_ft: 0, double_hang_ft: 0 }));
   assert.ok("error" in _v1028({ single_hang_ft: Infinity }));
 });
+
+import { computeCountertopOverhangSupport as _v1029 } from "../../calc-finish.js";
+
+test("bounds: spec-v1029 computeCountertopOverhangSupport pins both governing regimes and the crossover, the 2 cm limit, the override, the pass/fail seam, weight linearity, and error seams", () => {
+  const base = { overhang_in: 12, total_depth_in: 36, thickness_cm: 3, run_length_ft: 8, bracket_spacing_in: 24, density_pcf: 170, unsupported_limit_override_in: 0 };
+  // Pinned example: thickness rule governs (10 < 12).
+  const r = _v1029(base);
+  assert.ok(r.thickness_limit_in === 10 && Math.abs(r.one_third_limit_in - 12) < 1e-12);
+  assert.ok(r.governing_limit_in === 10 && r.governing_rule.includes("thickness"));
+  assert.ok(r.supported === false && r.brackets === 5);
+  assert.ok(Math.abs(r.bracket_depth_in - 8) < 1e-12);
+  assert.ok(Math.abs(r.psf - 170 * (3 * 0.393701) / 12) < 1e-9);
+  assert.ok(Math.abs(r.overhang_weight_lb - r.overhang_weight_plf * 8) < 1e-9);
+  // Depth/3 regime: a shallow top makes one-third govern, and an 8-in overhang then passes.
+  const shallow = _v1029({ ...base, overhang_in: 8, total_depth_in: 25.5, run_length_ft: 6 });
+  assert.ok(Math.abs(shallow.one_third_limit_in - 8.5) < 1e-12);
+  assert.ok(shallow.governing_limit_in === shallow.one_third_limit_in && shallow.governing_rule.includes("one-third"));
+  assert.ok(shallow.supported === true && shallow.brackets === 0 && shallow.bracket_depth_in === 0);
+  // Exact crossover: depth 30 makes depth/3 = 10 = the thickness limit; the min is 10 either way.
+  const cross = _v1029({ ...base, total_depth_in: 30 });
+  assert.ok(Math.abs(cross.governing_limit_in - 10) < 1e-12);
+  // 2 cm limit is 6 in.
+  const thin = _v1029({ ...base, thickness_cm: 2 });
+  assert.ok(thin.thickness_limit_in === 6 && thin.governing_limit_in === 6);
+  // A 2 cm slab weighs exactly two-thirds of the 3 cm slab per square foot.
+  assert.ok(Math.abs(thin.psf / r.psf - 2 / 3) < 1e-12);
+  // Override path takes precedence over the thickness rule.
+  const ov = _v1029({ ...base, unsupported_limit_override_in: 8, total_depth_in: 36 });
+  assert.ok(ov.thickness_limit_in === 8 && ov.governing_limit_in === 8);
+  // Pass/fail seam: exactly at the limit passes, a hair over fails.
+  assert.ok(_v1029({ ...base, overhang_in: 10 }).supported === true);
+  assert.ok(_v1029({ ...base, overhang_in: 10.01 }).supported === false);
+  // Weight linearity in density and in overhang.
+  const dense = _v1029({ ...base, density_pcf: 340 });
+  assert.ok(Math.abs(dense.psf / r.psf - 2) < 1e-12);
+  const wide = _v1029({ ...base, overhang_in: 24, total_depth_in: 48 });
+  assert.ok(Math.abs(wide.overhang_weight_plf / r.overhang_weight_plf - 2) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v1029({ ...base, overhang_in: 0 }));
+  assert.ok("error" in _v1029({ ...base, overhang_in: 36 })); // overhang == depth: no bearing
+  assert.ok("error" in _v1029({ ...base, thickness_cm: 4 }));
+  assert.ok("error" in _v1029({ ...base, run_length_ft: 0 }));
+  assert.ok("error" in _v1029({ ...base, bracket_spacing_in: 0 }));
+  assert.ok("error" in _v1029({ ...base, density_pcf: 0 }));
+  assert.ok("error" in _v1029({ ...base, unsupported_limit_override_in: -1 }));
+  assert.ok("error" in _v1029({ ...base, overhang_in: Infinity }));
+});

@@ -1246,6 +1246,7 @@ const RELATED = {
   "rough-opening-size": ["header-sizing","metal-stud-takeoff","glass-weight"],
   "corner-bead-takeoff": ["drywall","drywall-fastener-takeoff","trim-linear-footage"],
   "closet-shelf-takeoff": ["trim-linear-footage","equal-spacing","rough-opening-size"],
+  "countertop-overhang-support": ["glass-weight","material-quantity","trim-linear-footage"],
   "fineness-modulus": ["relative-compaction","atterberg-indices","soil-phase-relations","soil-gradation-coefficients"],
   "soil-gradation-coefficients": ["atterberg-indices","fineness-modulus","relative-compaction","soil-phase-relations"],
   "shadow-length": ["pv-row-spacing","pv-row-shade-angle","pv-array-sizing"],

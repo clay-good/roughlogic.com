@@ -4,6 +4,29 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(finish): countertop-overhang-support, the two-rule cantilever check with the source conflict handled honestly; 2026-07-27
+
+Zero countertop hits in tools-data.js, aliases.json, or compute-map.js -- discovery called it the strongest
+gap in its batch. Adds one tile to `calc-finish.js` (Group E).
+
+`countertop-overhang-support` checks the two rules the stone-industry guidance always states TOGETHER and
+takes the smaller: the thickness limit (about 10 in at 3 cm, 6 in at 2 cm) and one-third of the total depth.
+Which one governs flips with the top -- a 12-in overhang on a 36-in island is inside one-third but outside
+the 3 cm thickness limit, while on a 25.5-in top the depth rule takes over at 8.5 in -- so a tile
+implementing only one rule would pass jobs the guidance fails. Past the limit it sizes brackets: count at
+the entered spacing, each 2/3 of the overhang deep so the bracket carries the load instead of pivoting on
+its tip. Weight comes from an entered density (170 pcf default), never a recalled table.
+
+The published figures are NOT uniform -- the corroborated thickness pair here versus at least one
+fabricator guideline capping every overhang at a flat 8 in -- so the limit is an override input, bracket
+spacing is an input with the 18-36 in published range named, and both the note and citation say the
+fabricator's own written guideline governs. Scope limits are stated too: a seated person is a point load
+this does not cover, and a seam inside the overhang changes the problem.
+
+Fuzzer pins both regimes, the exact crossover at a 30-in depth, the 2 cm limit and its exact 2/3 weight
+ratio, the override, the pass/fail seam, and weight linearity. Catalog 1,477 -> 1,478. Spec: spec-v1029.
+Cap ledger: calc-finish.js 15000 -> 18000.
+
 ### feat(finish): closet-shelf-takeoff, the closet build nothing counted; 2026-07-27
 
 No closet tile existed; the only closet-adjacent alias points at `equal-spacing`, which returns spacing,

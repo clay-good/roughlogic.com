@@ -15084,6 +15084,18 @@ export const CITATIONS = {
       { name: "One run per category", value: "each hang category is treated as one continuous run for the end count; enter walls separately for multi-wall closets", source: "stated simplification" },
     ],
   },
+  "countertop-overhang-support": {
+    formula: "unsupported limit = MIN(thickness rule: 10 in at 3 cm / 6 in at 2 cm, one-third of total depth); slab psf = density x (thickness_cm x 0.393701)/12; cantilevered weight = psf x overhang/12 per lineal ft; if over the limit, brackets = ceil(run/spacing) + 1 at 2/3 x overhang deep.",
+    edition: "Stone-industry countertop support guidance, named as GUIDANCE and not a code section; published limits vary between fabricators and stone types.",
+    freeAccess: "Fabricator and stone-industry support guidelines are published freely; several independent references state the thickness pair and the one-third rule together.",
+    governance: GOVERNANCE.general,
+    editionNote: "Both rules are checked TOGETHER and the smaller governs - which one that is flips with the top, so a tile implementing only one would pass jobs the guidance fails. The published unsupported figures are NOT uniform (the corroborated thickness pair here is roughly 6 in at 2 cm and 10 in at 3 cm; at least one fabricator guideline instead caps every overhang at a flat 8 in), so the limit is exposed as an override and bracket spacing is an input - 24 in default, published guidance ranging roughly 18-36 in. Brackets must fasten to studs or a load-bearing frame, never cabinet boxes alone, and run about two-thirds of the overhang under the stone so they carry the load instead of pivoting on the tip. Weight comes from the density entered (170 pcf is a common granite figure), never a recalled table. The cantilever rule only: a seated person is a point load this does not cover, and a seam inside the overhang changes the problem. The fabricator's own written support guideline and the slab manufacturer govern.",
+    assumptions: [
+      { name: "Two rules, min governs", value: "thickness limit and one-third-of-depth limit are both checked; the smaller controls", source: "stone-industry support guidance (stated together across references)" },
+      { name: "Limits vary", value: "the thickness pair is overridable and bracket spacing is an input because published figures differ by fabricator", source: "conflicting published fabricator guidelines" },
+      { name: "Density entered", value: "no stone-density table is shipped; 170 pcf granite is a default, not a claim about a specific slab", source: "user input" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

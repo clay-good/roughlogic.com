@@ -529,6 +529,7 @@ const _TILES = [
   ["concrete-yield", "E"],
   ["rough-opening-size", "E"],
   ["closet-shelf-takeoff", "E"],
+  ["countertop-overhang-support", "E"],
   ["glass-weight", "E"],
   ["fineness-modulus", "E"], ["soil-gradation-coefficients", "E"],
   ["water-cement-ratio", "E"],
