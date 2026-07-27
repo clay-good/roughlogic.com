@@ -10268,3 +10268,59 @@ CONSTRUCTION_RENDERERS["corner-bead-takeoff"] = _simpleRenderer({
   ],
   compute: computeCornerBeadTakeoff,
 });
+
+// --- spec-v1027 E: Siding course layout (story pole) ---
+// courses = ceil(height/exposure) at the target reveal, then the ADJUSTED exposure = height/courses
+// so the top course lands full, not a sliver - the story-pole move every siding crew makes. The
+// adjustment is flagged against the manufacturer's minimum-overlap limit: for lap siding of a given
+// board height, exposure <= board - min_overlap (1 in headlap default), and shrinking exposure only
+// ever INCREASES overlap, so the adjusted layout is checked against the target only for a sliver
+// the other way (an added course pushing exposure far below target reads as intended).
+// dims: in { wall_height_ft: L, wall_length_ft: L, target_exposure_in: L, board_height_in: L, min_overlap_in: L } out: { courses: dimensionless, adjusted_exposure_in: L, starter_lf: L, total_course_lf: L }
+export function computeSidingCourseLayout({ wall_height_ft = 0, wall_length_ft = 0, target_exposure_in = 7, board_height_in = 8, min_overlap_in = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const hft = Number(wall_height_ft) || 0;
+  const lft = Number(wall_length_ft) || 0;
+  const target = Number(target_exposure_in) || 0;
+  const board = Number(board_height_in) || 0;
+  const minlap = Number(min_overlap_in);
+  if (!(hft > 0)) return { error: "Wall height must be positive (ft)." };
+  if (!(lft > 0)) return { error: "Wall length must be positive (ft)." };
+  if (!(target > 0)) return { error: "Target exposure must be positive (in)." };
+  if (!(board > 0)) return { error: "Board height must be positive (in)." };
+  if (!(minlap >= 0)) return { error: "Minimum overlap cannot be negative (in)." };
+  const max_exposure_in = board - minlap;
+  if (!(max_exposure_in > 0)) return { error: "Minimum overlap leaves no exposure - it must be less than the board height." };
+  if (target > max_exposure_in) return { error: "Target exposure exceeds the board height minus the minimum overlap - lower the exposure or use a taller board." };
+  const h_in = hft * 12;
+  const courses = Math.ceil(h_in / target);
+  const adjusted_exposure_in = h_in / courses;
+  const sliver_in = h_in - Math.floor(h_in / target) * target;
+  const starter_lf = lft;
+  const total_course_lf = courses * lft;
+  if (![courses, adjusted_exposure_in, starter_lf, total_course_lf].every(Number.isFinite)) return { error: "Course-layout math did not produce a finite value." };
+  return {
+    courses, adjusted_exposure_in, max_exposure_in, starter_lf, total_course_lf, sliver_in,
+    note: "The story-pole move: divide the wall into WHOLE courses and shrink the exposure evenly (" + adjusted_exposure_in.toFixed(2) + " in here) so the top course lands full instead of a " + sliver_in.toFixed(1) + "-in sliver. Shrinking exposure only ever increases the headlap, so the adjusted layout always still clears the manufacturer's minimum overlap. Mark the pole at the adjusted spacing and transfer to the corners; align courses to hit window heads and sills where the elevation allows. Squares and material LF are the separate siding-takeoff tile; starter strip runs the wall length once. The manufacturer's exposure limits and the installation instructions govern.",
+  };
+}
+export const sidingCourseLayoutExample = { inputs: { wall_height_ft: 9, wall_length_ft: 40, target_exposure_in: 7, board_height_in: 8, min_overlap_in: 1 } };
+CONSTRUCTION_RENDERERS["siding-course-layout"] = _simpleRenderer({
+  citation: "Citation: the siding story pole - courses = ceil(wall height / target exposure), then adjusted exposure = height / courses so the top course lands full rather than a sliver; the exposure ceiling is the board height minus the manufacturer's minimum headlap (entered, 1-in default), and shrinking exposure only ever increases the lap, so an adjusted layout never violates it. Starter strip runs the wall length; total course LF = courses x length. Layout arithmetic the trade does on a story pole; the manufacturer's exposure limits and installation instructions govern.",
+  example: sidingCourseLayoutExample.inputs,
+  fields: [
+    { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
+    { key: "wall_length_ft", label: "Wall length (ft)", kind: "number" },
+    { key: "target_exposure_in", label: "Target exposure / reveal (in)", kind: "number", default: 7 },
+    { key: "board_height_in", label: "Board height (in)", kind: "number", default: 8 },
+    { key: "min_overlap_in", label: "Manufacturer minimum overlap (in)", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "c", id: "scl-out-c", label: "Courses", value: (r) => fmt(r.courses, 0) },
+    { key: "ae", id: "scl-out-ae", label: "Adjusted exposure (story-pole mark)", value: (r) => fmt(r.adjusted_exposure_in, 2) + " in (max allowed " + fmt(r.max_exposure_in, 2) + ")" },
+    { key: "sl", id: "scl-out-sl", label: "Sliver avoided", value: (r) => fmt(r.sliver_in, 1) + " in top course at the raw target" },
+    { key: "st", id: "scl-out-st", label: "Starter strip / course LF", value: (r) => fmt(r.starter_lf, 0) + " ft starter; " + fmt(r.total_course_lf, 0) + " ft of courses" },
+    { key: "n", id: "scl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSidingCourseLayout,
+});

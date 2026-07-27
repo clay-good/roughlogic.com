@@ -15062,6 +15062,17 @@ export const CITATIONS = {
       { name: "Wrap geometry", value: "a cased opening wrapped in bead takes two legs plus a head", source: "takeoff arithmetic" },
     ],
   },
+  "siding-course-layout": {
+    formula: "courses = ceil(height/target exposure); adjusted exposure = height/courses (the story-pole mark); exposure ceiling = board height - manufacturer minimum overlap; starter = wall length; course LF = courses x length.",
+    edition: "Siding story-pole layout arithmetic - no standard claimed; the exposure ceiling is the manufacturer's stated minimum headlap, entered by the user (1-in default).",
+    freeAccess: "Layout arithmetic; every siding manufacturer's installation instructions publish the exposure and overlap limits free.",
+    governance: GOVERNANCE.general,
+    editionNote: "The judgment the tile encodes: divide the wall into WHOLE courses and shrink the exposure evenly so the top course lands full instead of a sliver. The adjustment is always safe against the overlap minimum because shrinking exposure only ever increases the lap - the ceiling check happens once, on the target. Mark the story pole at the adjusted spacing and transfer to the corners; aligning courses to window heads and sills is named as crew judgment, not automated. Squares and material are the separate siding-takeoff tile. The manufacturer's exposure limits and installation instructions govern.",
+    assumptions: [
+      { name: "Whole-course adjustment", value: "courses x adjusted exposure equals the wall height exactly; the top course is always full", source: "story-pole practice" },
+      { name: "Overlap safety", value: "shrinking exposure increases headlap, so an adjusted layout never violates a minimum the target cleared", source: "geometry of lap siding" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

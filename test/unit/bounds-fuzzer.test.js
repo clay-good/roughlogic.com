@@ -29948,3 +29948,35 @@ test("bounds: spec-v1026 computeCornerBeadTakeoff pins both governing regimes of
   assert.ok("error" in _v1026({ outside_corners: 4, corner_height_ft: 8, waste_pct: 60 }));
   assert.ok("error" in _v1026({ outside_corners: 4, corner_height_ft: Infinity }));
 });
+
+import { computeSidingCourseLayout as _v1027 } from "../../calc-construction.js";
+
+test("bounds: spec-v1027 computeSidingCourseLayout pins the story-pole adjustment, the whole-course identity, the ceiling seam, adjusted <= target, and error seams", () => {
+  const base = { wall_height_ft: 9, wall_length_ft: 40, target_exposure_in: 7, board_height_in: 8, min_overlap_in: 1 };
+  const r = _v1027(base);
+  assert.ok(r.courses === 16);
+  assert.ok(Math.abs(r.adjusted_exposure_in - 6.75) < 1e-12);
+  assert.ok(Math.abs(r.sliver_in - 3) < 1e-9);
+  assert.ok(r.starter_lf === 40 && r.total_course_lf === 640);
+  // Whole-course identity: courses x adjusted == height exactly, and adjusted never exceeds the target.
+  for (const h of [8, 8.75, 9, 10.5, 12]) {
+    const t = _v1027({ ...base, wall_height_ft: h });
+    assert.ok(Math.abs(t.courses * t.adjusted_exposure_in - h * 12) < 1e-9);
+    assert.ok(t.adjusted_exposure_in <= 7 + 1e-12);
+  }
+  // Even division keeps the target exactly (105 in / 7 = 15 courses).
+  const even = _v1027({ ...base, wall_height_ft: 8.75 });
+  assert.ok(even.courses === 15 && Math.abs(even.adjusted_exposure_in - 7) < 1e-12);
+  // Ceiling seam: target exactly at board - overlap passes; a hair over errors.
+  assert.ok(!("error" in _v1027({ ...base, target_exposure_in: 7, board_height_in: 8, min_overlap_in: 1 })));
+  assert.ok("error" in _v1027({ ...base, target_exposure_in: 7.01, board_height_in: 8, min_overlap_in: 1 }));
+  // Overlap eating the board errors.
+  assert.ok("error" in _v1027({ ...base, min_overlap_in: 8 }));
+  // Error seams.
+  assert.ok("error" in _v1027({ ...base, wall_height_ft: 0 }));
+  assert.ok("error" in _v1027({ ...base, wall_length_ft: 0 }));
+  assert.ok("error" in _v1027({ ...base, target_exposure_in: 0 }));
+  assert.ok("error" in _v1027({ ...base, board_height_in: 0 }));
+  assert.ok("error" in _v1027({ ...base, min_overlap_in: -1 }));
+  assert.ok("error" in _v1027({ ...base, wall_height_ft: Infinity }));
+});

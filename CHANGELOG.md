@@ -4,6 +4,23 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): siding-course-layout, the story-pole half siding-takeoff defers; 2026-07-27
+
+`siding-takeoff` returns squares and lap LF and defers layout -- courses and trim "taken off separately."
+Nothing computed the course count or the part with actual judgment in it: the ADJUSTED exposure that makes
+the top course land full. Adds one tile to `calc-construction.js` (Group E).
+
+`siding-course-layout` divides the wall into whole courses (ceil at the target reveal) and shrinks the
+exposure evenly -- the story-pole move -- so a 9-ft wall at a 7-in target runs 16 courses at 6.75 in instead
+of ending in a 3-in sliver at the frieze. The exposure ceiling is the board height minus the manufacturer's
+minimum headlap (entered), and the note states the invariant that makes the adjustment safe: shrinking
+exposure only ever INCREASES the lap, so an adjusted layout can never violate a minimum the target cleared.
+Starter and per-course LF included.
+
+Fuzzer pins the whole-course identity (courses x adjusted == height exactly), adjusted <= target across a
+height sweep, the even-division case keeping the target exactly, and the ceiling seam on both sides.
+Catalog 1,475 -> 1,476. Spec: spec-v1027.
+
 ### feat(construction): corner-bead-takeoff, the drywall accessory the sheet/mud/screw tiles skip; 2026-07-27
 
 The drywall bench counts sheets, mud, tape, and screws, and the wood-trim tile counts casing -- but nothing
