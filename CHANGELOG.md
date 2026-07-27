@@ -4,6 +4,20 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(discoverability): backlink four parent tiles to the companions that fill the gaps they name; 2026-07-27
+
+The related-tiles graph is curated per tile and is not automatically symmetric, so a newly landed companion links to
+its parent but the parent keeps pointing only at its original neighbors. That leaves the reader in exactly the wrong
+place: `retaining-wall-stability` tells you it "does not apply seismic (Mononobe-Okabe) pressure," and the tile that
+does now exists, but nothing on the page gets you there. Four one-line additions, all within the spec-v13 six-entry
+cap:
+
+- `retaining-wall-stability` -> `seismic-earth-pressure`, `cohesive-earth-pressure`
+- `lateral-earth-pressure` -> `cohesive-earth-pressure` (its scope note names the cohesionless limitation)
+- `coulomb-earth-pressure` -> `seismic-earth-pressure` (Mononobe-Okabe is this tile's wedge, rotated)
+- `spur-gear-geometry` -> `gear-tooth-bending-stress` (a pre-existing miss from the spec-v1015 landing, whose own
+  changelog entry calls the new tile a "companion to spur-gear-geometry" while the parent never linked back)
+
 ### feat(geotech): cohesive-earth-pressure, the clay-backfill case the whole earth-pressure family excluded; 2026-07-27
 
 `lateral-earth-pressure` names its own omission in the first clause of its scope note: "a cohesionless soil (the
