@@ -30367,3 +30367,50 @@ test("bounds: spec-v1037 computeHydraulicLineVelocity pins the worked example, t
   assert.ok("error" in _v1037({ ...base, max_velocity_override_fps: -1 }));
   assert.ok("error" in _v1037({ ...base, flow_gpm: Infinity }));
 });
+
+import { computeExtensionLadderOverlap as _v1101 } from "../../calc-cross.js";
+
+test("bounds: spec-v1101 computeExtensionLadderOverlap pins both worked examples, the 4:1 hypotenuse relation, the 36-ft tier boundary, the override, the two-joint penalty, and error seams", () => {
+  // 24-ft two-section: the case the source states outright (21 ft working length).
+  const r = _v1101({ nominal_length_ft: 24, sections: 2, overlap_override_ft: 0 });
+  assert.ok(r.overlap_ft === 3 && r.working_length_ft === 21 && r.joints === 1);
+  assert.ok(Math.abs(r.top_support_ft - 20.372989) < 1e-5);
+  assert.ok(Math.abs(r.base_offset_ft - 5.093247) < 1e-5);
+  assert.ok(Math.abs(r.max_landing_ft - (r.top_support_ft - 3)) < 1e-12);
+  // The 4:1 hypotenuse relation, checked against an independent sqrt(17)/4 form.
+  for (const t of [r, _v1101({ nominal_length_ft: 40, sections: 2 }), _v1101({ nominal_length_ft: 60, sections: 3 })]) {
+    assert.ok(Math.abs(t.top_support_ft - t.working_length_ft / (Math.sqrt(17) / 4)) < 1e-9);
+    assert.ok(Math.abs(t.base_offset_ft * 4 - t.top_support_ft) < 1e-12);
+    // Pythagoras closes: height^2 + base^2 == working^2.
+    assert.ok(Math.abs(Math.hypot(t.top_support_ft, t.base_offset_ft) - t.working_length_ft) < 1e-9);
+  }
+  // Three sections lose overlap at TWO joints.
+  const three = _v1101({ nominal_length_ft: 60, sections: 3 });
+  assert.ok(three.joints === 2 && three.overlap_ft === 4 && three.lost_ft === 8 && three.working_length_ft === 52);
+  // Same nominal length, more sections => less working length.
+  const twoAt60 = _v1101({ nominal_length_ft: 60, sections: 2 });
+  assert.ok(twoAt60.working_length_ft > three.working_length_ft);
+  // Overlap tier boundary: 36 ft takes 3 ft, just over takes 4 ft.
+  assert.ok(_v1101({ nominal_length_ft: 36, sections: 2 }).rule_overlap_ft === 3);
+  assert.ok(_v1101({ nominal_length_ft: 36.5, sections: 2 }).rule_overlap_ft === 4);
+  assert.ok(_v1101({ nominal_length_ft: 40, sections: 2 }).rule_overlap_ft === 4);
+  // Override wins over the rule.
+  const ov = _v1101({ nominal_length_ft: 60, sections: 2, overlap_override_ft: 5 });
+  assert.ok(ov.overlap_ft === 5 && ov.rule_overlap_ft === 4 && ov.working_length_ft === 55);
+  // Working length is exactly linear in nominal length at fixed overlap and sections.
+  const a = _v1101({ nominal_length_ft: 20, sections: 2 });
+  const b = _v1101({ nominal_length_ft: 30, sections: 2 });
+  assert.ok(Math.abs((b.working_length_ft - a.working_length_ft) - 10) < 1e-12);
+  // A short ladder cannot serve a landing at all.
+  const shorty = _v1101({ nominal_length_ft: 6, sections: 2 });
+  assert.ok(shorty.max_landing_ft < 0 && shorty.can_reach_landing === false);
+  assert.ok(r.can_reach_landing === true);
+  // Error seams, including geometry that cannot exist.
+  assert.ok("error" in _v1101({ nominal_length_ft: 0, sections: 2 }));
+  assert.ok("error" in _v1101({ nominal_length_ft: 24, sections: 1 }));
+  assert.ok("error" in _v1101({ nominal_length_ft: 24, sections: 2.5 }));
+  assert.ok("error" in _v1101({ nominal_length_ft: 24, sections: 2, overlap_override_ft: -1 }));
+  assert.ok("error" in _v1101({ nominal_length_ft: 5, sections: 2, overlap_override_ft: 10 })); // overlap > ladder
+  assert.ok("error" in _v1101({ nominal_length_ft: 24, sections: 2, overlap_override_ft: 20 })); // overlap > a section
+  assert.ok("error" in _v1101({ nominal_length_ft: Infinity, sections: 2 }));
+});

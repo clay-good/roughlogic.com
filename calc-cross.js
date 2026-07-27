@@ -2901,3 +2901,60 @@ function renderBoltProofLoad(inputRegion, outputRegion, citationEl) {
   grade.select.addEventListener("change", update);
 }
 CROSS_RENDERERS["bolt-proof-load"] = renderBoltProofLoad;
+
+// --- spec-v1101 G: Extension ladder overlap and true working height ---
+// Sections must overlap, so an extension ladder NEVER reaches its nominal length: a 24-ft ladder
+// tops out at 21 ft of working length. Overlap per joint is 3 ft up to 36 ft nominal and 4 ft at
+// 40 ft and longer (the federal wording leaves 36-40 unstated, so this takes the conservative 4 ft
+// above 36 and says so; some standards add a 5-ft tier past 48 ft, hence the override input).
+// With the 4:1 setup the working length is the HYPOTENUSE: L^2 = H^2 + (H/4)^2, so H = L/sqrt(17/16).
+// dims: in { nominal_length_ft: L, sections: dimensionless, overlap_override_ft: L } out: { overlap_ft: L, working_length_ft: L, top_support_ft: L, base_offset_ft: L, max_landing_ft: L }
+export function computeExtensionLadderOverlap({ nominal_length_ft = 0, sections = 2, overlap_override_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const nom = Number(nominal_length_ft) || 0;
+  const secs = Number(sections) || 0;
+  const override = Number(overlap_override_ft) || 0;
+  if (!(nom > 0)) return { error: "Nominal ladder length must be positive (ft)." };
+  if (!(secs >= 2) || !Number.isInteger(secs)) return { error: "Sections must be a whole number of at least 2 (a single section is a straight ladder, not an extension ladder)." };
+  if (override < 0) return { error: "Overlap override cannot be negative (ft); use 0 to take the length-based rule." };
+  const rule_overlap_ft = nom <= 36 ? 3 : 4;
+  const overlap_ft = override > 0 ? override : rule_overlap_ft;
+  const joints = secs - 1;
+  const section_length_ft = nom / secs;
+  const working_length_ft = nom - overlap_ft * joints;
+  if (!(working_length_ft > 0)) return { error: "The required overlap exceeds the ladder length - check the section count and the nominal length." };
+  if (overlap_ft > section_length_ft) return { error: "The required overlap is longer than one section - check the section count and the nominal length." };
+  const FOUR_TO_ONE = Math.sqrt(1 + 1 / 16); // hypotenuse per unit of height at a 4:1 setup
+  const top_support_ft = working_length_ft / FOUR_TO_ONE;
+  const base_offset_ft = top_support_ft / 4;
+  const max_landing_ft = top_support_ft - 3;
+  const lost_ft = nom - working_length_ft;
+  if (![overlap_ft, working_length_ft, top_support_ft, base_offset_ft].every(Number.isFinite)) return { error: "Ladder-geometry math did not produce a finite value." };
+  return {
+    rule_overlap_ft, overlap_ft, joints, section_length_ft, working_length_ft, lost_ft,
+    top_support_ft, base_offset_ft, max_landing_ft, can_reach_landing: max_landing_ft > 0,
+    note: "An extension ladder never reaches its nominal length: the sections have to overlap, so a 24-ft ladder gives 21 ft of working length and this one loses " + lost_ft.toFixed(1) + " ft. That working length is the HYPOTENUSE at the 4:1 setup, not the height - the top support lands " + top_support_ft.toFixed(1) + " ft up with the base " + base_offset_ft.toFixed(1) + " ft out. And the ladder must extend at least 3 ft above a landing you step off onto, so the highest floor this ladder can serve is " + max_landing_ft.toFixed(1) + " ft"
+      + (max_landing_ft > 0 ? "" : " - which is to say it cannot serve a landing at all")
+      + ". Overlap is 3 ft up to 36 ft nominal and 4 ft at 40 ft and longer; the federal wording does not state the 36-40 ft range, so this tile takes the conservative 4 ft above 36 ft, and some standards add a 5-ft tier past 48 ft - use the override to match the standard you work to. Three-section ladders lose overlap at TWO joints, which is why they give up so much more. Secure the top, tie off the base, and remember the duty rating is a separate limit from the geometry. OSHA/ANSI and your employer's program govern.",
+  };
+}
+export const extensionLadderOverlapExample = { inputs: { nominal_length_ft: 24, sections: 2, overlap_override_ft: 0 } };
+const renderExtensionLadderOverlap = _simpleRendererG({
+  citation: "Citation: extension-ladder section overlap and working length - each section of a multi-section ladder must overlap the adjacent section by at least 3 ft for ladders up to 36 ft and 4 ft for 40 ft or longer (US Office of Congressional Workplace Rights extension-ladder fast facts, restating the OSHA/ANSI requirement), so the working length is the nominal length minus the overlap at each joint; a 24-ft ladder gives 21 ft. The non-self-supporting ladder is set at 4:1, which makes the working length the hypotenuse: top support height = L / sqrt(1 + 1/16), base offset = height / 4. A ladder used to reach a landing must extend at least 3 ft above it. The 36-40 ft range is not stated in the federal wording, so this tile takes the conservative 4 ft above 36 ft and the overlap is overridable. Geometry only - the duty rating is a separate limit. OSHA/ANSI and your employer's program govern.",
+  example: extensionLadderOverlapExample.inputs,
+  fields: [
+    { key: "nominal_length_ft", label: "Nominal ladder length (ft, as labeled)", kind: "number" },
+    { key: "sections", label: "Sections", kind: "number", default: 2 },
+    { key: "overlap_override_ft", label: "Overlap override (ft, 0 = rule)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "w", id: "elo-out-w", label: "Working length", value: (r) => fmt(r.working_length_ft, 1) + " ft (loses " + fmt(r.lost_ft, 1) + " ft to " + fmt(r.overlap_ft, 0) + " ft of overlap at " + fmt(r.joints, 0) + " joint" + (r.joints === 1 ? "" : "s") + ")" },
+    { key: "h", id: "elo-out-h", label: "Top support height at 4:1", value: (r) => fmt(r.top_support_ft, 1) + " ft, base " + fmt(r.base_offset_ft, 1) + " ft out" },
+    { key: "l", id: "elo-out-l", label: "Highest landing served (3 ft extension)", value: (r) => (r.can_reach_landing ? fmt(r.max_landing_ft, 1) + " ft" : "none - too short to serve a landing") },
+    { key: "n", id: "elo-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeExtensionLadderOverlap,
+});
+// Registered after the definition: CROSS_RENDERERS is built above this point, so a const
+// declared here cannot be referenced inside that object literal (temporal dead zone).
+CROSS_RENDERERS["extension-ladder-overlap"] = renderExtensionLadderOverlap;

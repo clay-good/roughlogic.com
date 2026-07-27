@@ -4,6 +4,28 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(cross): extension-ladder-overlap, the three ways a ladder loses the height on its label; 2026-07-27
+
+`ladder-angle` returns only the 4:1 setup; "overlap", "fly section", and "extension ladder" had no hits
+anywhere. Adds one tile to `calc-cross.js` (Group G), cross-linked with the angle sibling.
+
+An extension ladder never reaches its label, and the height is lost three times over: the sections must
+overlap, so a 24-ft ladder gives **21 ft** of working length; that working length is the HYPOTENUSE once
+the ladder is set at 4:1, so the top support is **20.4 ft**, not 21; and a ladder used to reach a landing
+must extend 3 ft above it, so the highest floor a 24-ft ladder serves is **17.4 ft**. Only the first is
+widely known. Three-section ladders lose overlap at two joints -- a 60-footer gives up 8 ft.
+
+The overlap rule is quoted from the OCWR extension-ladder fast facts (US-government public domain,
+restating the OSHA/ANSI requirement), which states the 24-ft/21-ft case outright. That wording leaves the
+36-to-40-ft range unstated, so the tile takes the conservative 4 ft above 36 and says so, with the overlap
+overridable for standards that add a 5-ft tier past 48 ft.
+
+Fuzzer pins both worked examples, the hypotenuse relation against an independent sqrt(17)/4 form plus a
+Pythagoras closure check, the 36-ft tier boundary on both sides, the two-joint penalty, and the
+negative-landing flag on a ladder too short to serve one. Catalog 1,484 -> 1,485. Spec: spec-v1101 --
+**this campaign's specs move to the v1101+ band** after colliding twice with a concurrent session that also
+takes the next free number.
+
 ### feat(mechanic): hydraulic-line-velocity, with the band disagreement made editable; 2026-07-27
 
 The hydraulics bench is power, flow, torque, and force -- five tiles, none returning a velocity.

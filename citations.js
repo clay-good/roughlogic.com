@@ -15168,6 +15168,18 @@ export const CITATIONS = {
       { name: "Velocity only", value: "pressure drop, heat rejection, and hose pressure rating are separate checks", source: "stated scope limit" },
     ],
   },
+  "extension-ladder-overlap": {
+    formula: "overlap = 3 ft up to 36 ft nominal, 4 ft at 40 ft and longer; working length = nominal - overlap x (sections - 1); at a 4:1 setup the working length is the hypotenuse, so top support = L / sqrt(1 + 1/16) and base offset = height / 4; highest landing served = top support - 3 ft.",
+    edition: "Extension-ladder section overlap and the 3-ft-above-a-landing rule as stated in the US Office of Congressional Workplace Rights extension-ladder fast facts, restating the OSHA/ANSI requirement, by name.",
+    freeAccess: "The OCWR fast-facts sheet is US-government public domain; OSHA 1910.23 and 1926.1053 are free at osha.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "An extension ladder never reaches its label, and the height is lost three times over: the sections must overlap (a 24-ft ladder gives 21 ft of working length), that working length is the HYPOTENUSE once the ladder is set at 4:1 (top support 20.4 ft, not 21), and a ladder used to reach a landing must extend 3 ft above it (highest floor served 17.4 ft). Only the first is widely known. THE FEDERAL WORDING LEAVES 36 TO 40 FT UNSTATED - it gives 3 ft up to 36 and 4 ft at 40 or longer - so this tile takes the conservative 4 ft above 36 ft, and because some standards add a 5-ft tier past 48 ft the overlap is an override input. Three-section ladders lose overlap at TWO joints. Geometry only: the duty rating is a separate limit, and securing the top and base is not optional. OSHA/ANSI and the employer's ladder program govern.",
+    assumptions: [
+      { name: "Overlap tiers", value: "3 ft up to 36 ft nominal, 4 ft at 40 ft and longer; the 36-40 ft gap is taken conservatively as 4 ft", source: "OCWR extension-ladder fast facts (OSHA/ANSI requirement)" },
+      { name: "4:1 hypotenuse", value: "the working length is the ladder along the slope, so the height is L / sqrt(1 + 1/16)", source: "geometry of the 4:1 setup" },
+      { name: "Landing extension", value: "at least 3 ft above the landing surface", source: "OCWR extension-ladder fast facts" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

@@ -380,7 +380,8 @@ const RELATED = {
   "niosh-lifting": ["heat-stress", "fall-protection-clearance", "noise-dose"],
   "heat-stress": ["niosh-lifting", "wind-chill", "noise-dose"],
   "haversine": ["geometry", "unit-converter", "trench-slope"],
-  "ladder-angle": ["fall-protection-clearance", "sling-angle"],
+  "ladder-angle": ["extension-ladder-overlap", "fall-protection-clearance", "sling-angle"],
+  "extension-ladder-overlap": ["ladder-angle", "fall-protection-clearance", "roofing-squares"],
   "pulley-ma-gen": ["rope-ma", "sling-angle"],
 
   // Group J: Trucking. dim-weight, freight-density, pallet-loadout are

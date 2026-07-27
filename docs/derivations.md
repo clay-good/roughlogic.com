@@ -1779,6 +1779,7 @@ cross-check.
 | calc-cross.js | `computeBoltProofLoad` | `{ nominal_diameter_in = 0, threads_per_inch = 0, grade = "5" } = {}` | _ | _ | _ |
 | calc-cross.js | `computeCrossConnectionAirGap` | `{ opening_in = 0, near_wall = false, measured_in = 0 } = {}` | _ | _ | _ |
 | calc-cross.js | `computeDilution` | `{ concentrate_percent, target_percent, final_volume }` | _ | _ | _ |
+| calc-cross.js | `computeExtensionLadderOverlap` | `{ nominal_length_ft = 0, sections = 2, overlap_override_ft = 0 } = {}` | _ | _ | _ |
 | calc-cross.js | `computeFallProtectionClearance` | `{ connector = "shock-absorbing-lanyard-6ft", free_fall_ft_override = null, de...` | _ | _ | _ |
 | calc-cross.js | `computeGearCascade` | `{ stages = [], input_rpm = 0, input_torque = 0, efficiency = 0.97, } = {}` | _ | _ | _ |
 | calc-cross.js | `computeGeometry` | `{ shape, ...args }` | _ | _ | _ |
@@ -3145,7 +3146,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1731.
+Row count: 1732.
 
 <!-- END function-corpus-v14 -->
 
@@ -4201,7 +4202,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (63 tiles)
+### Group G Cross-trade (64 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4216,6 +4217,7 @@ per spec-v14 §13.1 second paragraph.
 | `decimal-to-fraction` | Decimal to Fraction | First-principles tape-measure arithmetic; 2.375 in to nearest 1/16 -> 2-3/8 in (whole 2, 3/8), error 0 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dilution` | Dilution / Mixing Ratio | Project (first-principles); C1*V1 = C2*V2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `equal-spacing` | Equal Spacing Layout | First-principles equal-spacing layout...; 60 in run, 1.5 in balusters, 4 in max gap -> 11 balusters... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `extension-ladder-overlap` | Extension Ladder Overlap and True Working Height | OCWR extension-ladder fast facts (OSH...; 24 ft, 2 sections -> 3 ft overlap, 21.0 ft working length... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fall-protection-clearance` | Fall Protection Clearance | 29 CFR 1926.502 (fall-protection syst...; 6 ft shock-absorbing lanyard / 5 ft worker height / 1 ft ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flange-bolt-torque` | Flange Bolt-Up Torque | ASME PCC-1 / B16.5 (by name); 3/4 in B7 bolt (A_t 0.334 in^2) at 50% of 105 ksi yield, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gear-cascade` | Gear Ratio and RPM Cascade | First-principles / AGMA; overall = product of stage ratios; RPM_out = RPM_in/overa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4815,6 +4817,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1484. Fixture-covered or reference-cadence: 1484 / 1484.
+Tile count: 1485. Fixture-covered or reference-cadence: 1485 / 1485.
 
 <!-- END tile-index-v14 -->

@@ -172,6 +172,7 @@ export const COMPUTE_MAP = {
   "mileage-cost": { module: "../../calc-cross.js", fn: "computeMileageCost" },
   "heat-stress": { module: "../../calc-cross.js", fn: "computeHeatStress" },
   "ladder-angle": { module: "../../calc-cross.js", fn: "computeLadderAngle" },
+  "extension-ladder-overlap": { module: "../../calc-cross.js", fn: "computeExtensionLadderOverlap" },
   "beer-lambert": { module: "../../calc-lab.js", fn: "computeBeerLambert" },
   "board-footage": { module: "../../calc-construction.js", fn: "computeBoardFootage" },
   "stairs": { module: "../../calc-construction.js", fn: "computeStairs" },
