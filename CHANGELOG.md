@@ -30,6 +30,35 @@ converter was scoped and dropped -- the widely cited `1.2/sqrt(T)` relation and 
 department's regulatory table disagree by roughly a factor of two at the same perc rate. There is no
 defensible universal conversion, and an undersized drainfield surfaces sewage, so the tile was abandoned
 rather than shipped with a guessed relation.
+### chore(caps): raise nine size caps that were one or two tiles from blocking every landing; 2026-07-27
+
+A cap sweep after the spec-v1030 / v1036 split work. Three of these are not module caps at all but the **shared
+registries every tile landing appends to**, and they were the urgent ones -- when `tile-meta.js` overflows, it is not
+one module that fails, it is the entire catalog-landing pipeline, mid-landing, for whoever happens to be pushing:
+
+| file | was | now | headroom before |
+|---|---|---|---|
+| `tile-meta.js` | 19,000 | 23,000 | 99.4% -- about 108 B, roughly two more tile rows |
+| `citations.js` | 572,000 | 610,000 | 99.2% |
+| `tools-data.js` | 262,000 | 280,000 | 98.8% |
+| `calc-rescue.js` | 9,500 | 11,500 | 99.4% |
+| `calc-geotech.js` | 30,000 | 34,000 | 99.2% |
+| `calc-feeder.js` | 11,000 | 12,500 | 98.8% |
+| `calc-metalair.js` | 8,000 | 9,500 | 98.7% |
+| `calc-velocity.js` | 4,000 | 5,000 | 98.4% |
+| `calc-gas.js` | 10,500 | 12,000 | 98.2% |
+
+Every one of these is a case where **raising is the correct remedy, not splitting**. The registries are append-only
+and cannot be split per-tile. The six calc modules are all small (4-30 KB); per the spec-v1030 / v1036 precedent a
+split is the remedy for the large modules, and `calc-plumbing.js` at 76 KB was the one that actually warranted it.
+The single arguable case is `calc-geotech.js` at ~30 KB, where a split of the now-complete 8-tile earth-pressure
+bench would work; its ledger entry says so and records the raise as the stopgap because the module was one tile from
+failing.
+
+This is deliberately the opposite call from the split work earlier today, and the ledger notes say which rule applied
+and why, so the distinction does not read as inconsistency later.
+
+Cap changes only -- no source touched. Full lint, 5,884 unit tests passing, build and check-module-sizes green.
 
 ### feat(construction): formwork-member-spacing, the check that says shear governs; 2026-07-27
 
