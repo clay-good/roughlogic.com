@@ -10324,3 +10324,67 @@ CONSTRUCTION_RENDERERS["siding-course-layout"] = _simpleRenderer({
   ],
   compute: computeSidingCourseLayout,
 });
+
+// --- spec-v1035 E: Snow guard (snow retention) row layout ---
+// Manufacturer design method: the vertical snow load is resolved onto the slope, so the
+// VECTOR force is snow_psf x sin(theta); the force a row must hold is that times the rafter
+// (slope) length above it. Guards per foot of eave = required force x safety factor / the
+// guard's TESTED holding capacity, which is a manufacturer input - no capacity is shipped.
+// The rafter length is the SLOPE length, matching the manufacturer method; that is conservative
+// relative to the horizontal projection the snow load is defined on, by 1/cos(theta).
+// dims: in { roof_snow_psf: M L^-1 T^-2, pitch_rise_per_12: dimensionless, rafter_length_ft: L, eave_length_ft: L, guard_capacity_lb: M L T^-2, safety_factor: dimensionless, rows: dimensionless } out: { slope_deg: dimensionless, vector_psf: M L^-1 T^-2, force_plf: M T^-2, spacing_in: L, guards_total: dimensionless }
+export function computeSnowGuardLayout({ roof_snow_psf = 0, pitch_rise_per_12 = 0, rafter_length_ft = 0, eave_length_ft = 0, guard_capacity_lb = 0, safety_factor = 2, rows = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ps = Number(roof_snow_psf) || 0;
+  const rise = Number(pitch_rise_per_12) || 0;
+  const rl = Number(rafter_length_ft) || 0;
+  const el = Number(eave_length_ft) || 0;
+  const cap = Number(guard_capacity_lb) || 0;
+  const sf = Number(safety_factor) || 0;
+  const n = Number(rows) || 0;
+  if (!(ps > 0)) return { error: "Roof snow load must be positive (psf) - the design sloped-roof value, not the ground load." };
+  if (!(rise > 0)) return { error: "Roof pitch must be positive (rise per 12) - a flat roof does not slide." };
+  if (!(rl > 0)) return { error: "Rafter (slope) length must be positive (ft)." };
+  if (!(el > 0)) return { error: "Eave length must be positive (ft)." };
+  if (!(cap > 0)) return { error: "Guard holding capacity must be positive (lb) - use the manufacturer's TESTED value for your panel and seam, not a generic number." };
+  if (!(sf >= 1)) return { error: "Safety factor must be at least 1.0 (2.0 is common practice)." };
+  if (!(n >= 1) || !Number.isInteger(n)) return { error: "Rows must be a whole number of at least 1." };
+  const slope_rad = Math.atan(rise / 12);
+  const slope_deg = slope_rad * 180 / Math.PI;
+  const vector_psf = ps * Math.sin(slope_rad);
+  const force_plf = vector_psf * rl;
+  const per_row_plf = force_plf / n;
+  const required_plf = per_row_plf * sf;
+  const guards_per_ft = required_plf / cap;
+  const spacing_in = 12 / guards_per_ft;
+  const guards_per_row = Math.ceil(el * guards_per_ft);
+  const guards_total = guards_per_row * n;
+  if (![vector_psf, force_plf, guards_per_ft, spacing_in, guards_total].every(Number.isFinite)) return { error: "Snow-guard layout math did not produce a finite value." };
+  return {
+    slope_deg, vector_psf, force_plf, per_row_plf, required_plf,
+    guards_per_ft, spacing_in, guards_per_row, guards_total,
+    note: "The vertical snow load is resolved onto the slope: only the sin(theta) component tries to slide, which is why a steep roof needs far more retention than a shallow one at the same snow load. The holding capacity MUST be the manufacturer's tested value for your exact panel profile, seam, and attachment - a clamp on a standing seam and a screw into a through-fastened panel are different numbers, and the panel or its fastening often fails before the guard does. Rows share the load in this calculation, which assumes they are spaced so each takes a comparable tributary; concentrating rows near the eave is common practice and changes the distribution. The rafter length here is the SLOPE length, matching the manufacturer method and running conservative against the horizontal projection the snow load is defined on. Snow retention keeps snow ON the roof, so the roof structure must be able to hold it - releasing it was the previous load path. Ice-dam and drift behavior are separate, and above roughly a 12:12 pitch the standard method needs the manufacturer's steep-slope guidance. A layout aid; the manufacturer's tested data and the engineer of record govern.",
+  };
+}
+export const snowGuardLayoutExample = { inputs: { roof_snow_psf: 40, pitch_rise_per_12: 4, rafter_length_ft: 30, eave_length_ft: 40, guard_capacity_lb: 500, safety_factor: 2, rows: 1 } };
+CONSTRUCTION_RENDERERS["snow-guard-layout"] = _simpleRenderer({
+  citation: "Citation: manufacturer snow-retention design method - the vector (down-slope) force is the roof snow load x sin(roof angle), and the force a row resists is that vector force times the rafter (slope) length above it; guards per foot of eave = force x safety factor / the guard's TESTED holding capacity. No holding capacity is shipped: it must come from the manufacturer's test data for the exact panel profile, seam, and attachment. The rafter length is the slope length, matching the manufacturer method and running conservative against the horizontal projection the snow load is defined on. Above roughly a 12:12 pitch the standard method needs the manufacturer's steep-slope guidance. Retention keeps the snow ON the roof, so the structure must be able to carry it. The manufacturer's tested data and the engineer of record govern.",
+  example: snowGuardLayoutExample.inputs,
+  fields: [
+    { key: "roof_snow_psf", label: "Design roof snow load (psf)", kind: "number" },
+    { key: "pitch_rise_per_12", label: "Roof pitch (rise per 12)", kind: "number" },
+    { key: "rafter_length_ft", label: "Rafter / slope length, eave to ridge (ft)", kind: "number" },
+    { key: "eave_length_ft", label: "Eave length to protect (ft)", kind: "number" },
+    { key: "guard_capacity_lb", label: "Guard tested holding capacity (lb each)", kind: "number" },
+    { key: "safety_factor", label: "Safety factor", kind: "number", default: 2 },
+    { key: "rows", label: "Rows of guards", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "v", id: "sgl-out-v", label: "Vector (down-slope) force", value: (r) => fmt(r.vector_psf, 2) + " psf at " + fmt(r.slope_deg, 1) + " deg" },
+    { key: "f", id: "sgl-out-f", label: "Force per ft of eave", value: (r) => fmt(r.force_plf, 0) + " lb/ft total, " + fmt(r.per_row_plf, 0) + " per row, " + fmt(r.required_plf, 0) + " with the safety factor" },
+    { key: "s", id: "sgl-out-s", label: "Guard spacing", value: (r) => fmt(r.spacing_in, 1) + " in on center (" + fmt(r.guards_per_ft, 2) + " per ft)" },
+    { key: "c", id: "sgl-out-c", label: "Guard count", value: (r) => fmt(r.guards_per_row, 0) + " per row x " + fmt(r.guards_total / r.guards_per_row, 0) + " rows = " + fmt(r.guards_total, 0) },
+    { key: "n", id: "sgl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSnowGuardLayout,
+});

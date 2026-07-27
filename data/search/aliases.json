@@ -90947,6 +90947,36 @@
       "kind": "question"
     },
     {
+      "term": "snow guards",
+      "target": "snow-guard-layout",
+      "kind": "industry"
+    },
+    {
+      "term": "snow retention",
+      "target": "snow-guard-layout",
+      "kind": "industry"
+    },
+    {
+      "term": "how many snow guards do i need",
+      "target": "snow-guard-layout",
+      "kind": "question"
+    },
+    {
+      "term": "snow bar spacing metal roof",
+      "target": "snow-guard-layout",
+      "kind": "question"
+    },
+    {
+      "term": "stop snow sliding off a metal roof",
+      "target": "snow-guard-layout",
+      "kind": "redirect"
+    },
+    {
+      "term": "down slope snow force on a roof",
+      "target": "snow-guard-layout",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

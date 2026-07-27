@@ -1141,6 +1141,7 @@ export const COMPUTE_MAP = {
   "snow-drift-load": { module: "../../calc-construction.js", fn: "computeSnowDriftLoad" },
   "rain-on-snow-surcharge": { module: "../../calc-construction.js", fn: "computeRainOnSnowSurcharge" },
   "sliding-snow-load": { module: "../../calc-construction.js", fn: "computeSlidingSnowLoad" },
+  "snow-guard-layout": { module: "../../calc-construction.js", fn: "computeSnowGuardLayout" },
   "minimum-roof-snow": { module: "../../calc-construction.js", fn: "computeMinimumRoofSnow" },
   "wind-mwfrs-pressure": { module: "../../calc-construction.js", fn: "computeWindMwfrsPressure" },
   "wind-solid-sign": { module: "../../calc-construction.js", fn: "computeWindSolidSign" },

@@ -4,6 +4,31 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): snow-guard-layout, the retention side of the sliding-snow problem; 2026-07-27
+
+Zero hits for snow guard, snow retention, or snow bar anywhere. The catalog has seven snow-LOAD tiles
+including `sliding-snow-load`, but that one catches snow on a lower roof -- the opposite design decision
+from keeping it on the upper roof. Adds one tile to `calc-construction.js` (Group E), backlinked from the
+sliding sibling.
+
+`snow-guard-layout` resolves the vertical load onto the slope (vector force = snow load x sin theta, the
+web-verified manufacturer method), multiplies by the rafter length above the row, applies a safety factor,
+and divides by the guard's TESTED holding capacity to get guards per foot, spacing, and count. 40 psf on a
+4:12 with a 30-ft rafter pushes 379 lb per foot of eave: 61 guards at 7.9 in on center over a 40-ft eave.
+
+Two things the tile is careful about. **No holding capacity is shipped** -- a clamp on a standing seam and
+a screw into a through-fastened panel are different numbers, and the panel or its fastening often fails
+before the guard does. And the manufacturer method multiplies by the RAFTER (slope) length while ASCE snow
+loads are defined on the horizontal projection, so the result runs conservative by 1/cos theta (5% at 4:12,
+12% at 8:12) -- stated in the note and citation rather than hidden, so anyone reconciling against a
+code-based calculation knows why the numbers differ. The note also carries the consequence a layout
+calculation hides: retention keeps the snow ON the roof, so the structure has to carry what it used to shed.
+
+Fuzzer pins the sin identity across six pitches (including 12:12 where the angle is exactly 45 degrees),
+exact inverse scaling in capacity, exact linearity in safety factor, that row count divides the per-row
+force without changing the total, and that spacing x guards-per-ft is exactly 12. Catalog 1,482 -> 1,483.
+Spec: spec-v1035. Cap ledger: calc-construction.js 172000 -> 182000 (was at 97.4%).
+
 ### feat(hvac): condensate-trap-depth, and a field rule the manufacturer geometry contradicts; 2026-07-27
 
 `condensate-drain` returns the rate and drain size and only MENTIONS the trap in prose. "Trap depth" had

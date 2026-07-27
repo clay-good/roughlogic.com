@@ -609,7 +609,7 @@ const _TILES = [
   ["wind-cc-pressure", "E"], ["snow-drift-load", "E"], ["wind-mwfrs-pressure", "E"],
   ["wind-solid-sign", "E"],
   ["snow-unbalanced-gable", "E"],
-  ["rain-on-snow-surcharge", "E"], ["sliding-snow-load", "E"], ["minimum-roof-snow", "E"],
+  ["rain-on-snow-surcharge", "E"], ["sliding-snow-load", "E"], ["snow-guard-layout", "E"], ["minimum-roof-snow", "E"],
   // spec-v299..v301 reinforced-concrete depth-2 batch
   ["rc-slab-min-thickness", "E"], ["rc-slab-max-span-for-thickness", "E"], ["rc-doubly-reinforced", "E"], ["rc-shear-friction", "E"],
   ["concrete-elastic-modulus", "E"], ["concrete-strength-from-modulus", "E"], ["concrete-modulus-of-rupture", "E"], ["concrete-strength-from-rupture", "E"], ["concrete-cracking-moment", "E"], ["concrete-depth-for-cracking-moment", "E"], ["concrete-shrinkage-temperature-steel", "E"],

@@ -521,7 +521,7 @@ const TOOL_MODULES = (() => {
     // spec-v296..v298 ASCE 7 wind-and-snow load depth batch.
     "wind-cc-pressure", "snow-drift-load", "wind-mwfrs-pressure",
     // spec-v468..v470 ASCE 7 snow provisions batch.
-    "rain-on-snow-surcharge", "sliding-snow-load", "minimum-roof-snow",
+    "rain-on-snow-surcharge", "sliding-snow-load", "snow-guard-layout", "minimum-roof-snow",
     // spec-v474 ADA ramp layout
     "ada-ramp-slope",
     // spec-v332..v334 wood-fastener withdrawal batch.

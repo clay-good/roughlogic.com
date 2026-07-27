@@ -30268,3 +30268,51 @@ test("bounds: spec-v1034 computeCondensateTrapDepth pins both configurations, th
   assert.ok("error" in _v1034({ configuration: "draw-through", static_pressure_in_wc: 1, insulation_in: -1 }));
   assert.ok("error" in _v1034({ configuration: "draw-through", static_pressure_in_wc: Infinity }));
 });
+
+import { computeSnowGuardLayout as _v1035 } from "../../calc-construction.js";
+
+test("bounds: spec-v1035 computeSnowGuardLayout pins the worked example, the sin(theta) vector identity across pitches, exact capacity/safety-factor scaling, the rows division, the spacing identity, and error seams", () => {
+  const base = { roof_snow_psf: 40, pitch_rise_per_12: 4, rafter_length_ft: 30, eave_length_ft: 40, guard_capacity_lb: 500, safety_factor: 2, rows: 1 };
+  const r = _v1035(base);
+  assert.ok(Math.abs(r.slope_deg - 18.434949) < 1e-5);
+  assert.ok(Math.abs(r.vector_psf - 12.649111) < 1e-5);
+  assert.ok(Math.abs(r.force_plf - 379.473319) < 1e-4);
+  assert.ok(Math.abs(r.guards_per_ft - 1.517893) < 1e-5);
+  assert.ok(Math.abs(r.spacing_in - 7.905694) < 1e-5);
+  assert.ok(r.guards_per_row === 61 && r.guards_total === 61);
+  // Vector identity across pitches; at 12:12 the angle is exactly 45 deg so sin == cos.
+  for (const rise of [1, 3, 4, 6, 9, 12]) {
+    const t = _v1035({ ...base, pitch_rise_per_12: rise });
+    const theta = Math.atan(rise / 12);
+    assert.ok(Math.abs(t.vector_psf - 40 * Math.sin(theta)) < 1e-12);
+    assert.ok(Math.abs(t.force_plf - t.vector_psf * 30) < 1e-9);
+  }
+  const steep = _v1035({ ...base, pitch_rise_per_12: 12 });
+  assert.ok(Math.abs(steep.slope_deg - 45) < 1e-12);
+  assert.ok(Math.abs(steep.vector_psf - 40 * Math.SQRT1_2) < 1e-12);
+  // A steep roof needs far more retention than a shallow one - the point of the tile.
+  assert.ok(steep.force_plf / r.force_plf > 2.2);
+  // Rows divide the per-row force exactly.
+  const two = _v1035({ ...base, pitch_rise_per_12: 12, rows: 2 });
+  assert.ok(Math.abs(two.per_row_plf - steep.force_plf / 2) < 1e-9);
+  assert.ok(Math.abs(two.force_plf - steep.force_plf) < 1e-9); // total is unchanged by row count
+  // Exact inverse in capacity, exact linear in safety factor.
+  const strong = _v1035({ ...base, guard_capacity_lb: 1000 });
+  assert.ok(Math.abs(strong.guards_per_ft * 2 - r.guards_per_ft) < 1e-12);
+  const sf3 = _v1035({ ...base, safety_factor: 3 });
+  assert.ok(Math.abs(sf3.guards_per_ft / r.guards_per_ft - 1.5) < 1e-12);
+  // Spacing and guards-per-foot are exact reciprocals through 12.
+  for (const t of [r, steep, two, strong, sf3]) {
+    assert.ok(Math.abs(t.spacing_in * t.guards_per_ft - 12) < 1e-9);
+  }
+  // Error seams.
+  assert.ok("error" in _v1035({ ...base, roof_snow_psf: 0 }));
+  assert.ok("error" in _v1035({ ...base, pitch_rise_per_12: 0 }));
+  assert.ok("error" in _v1035({ ...base, rafter_length_ft: 0 }));
+  assert.ok("error" in _v1035({ ...base, eave_length_ft: 0 }));
+  assert.ok("error" in _v1035({ ...base, guard_capacity_lb: 0 }));
+  assert.ok("error" in _v1035({ ...base, safety_factor: 0.9 }));
+  assert.ok("error" in _v1035({ ...base, rows: 0 }));
+  assert.ok("error" in _v1035({ ...base, rows: 1.5 }));
+  assert.ok("error" in _v1035({ ...base, roof_snow_psf: Infinity }));
+});

@@ -15144,6 +15144,18 @@ export const CITATIONS = {
       { name: "Worst-case static", value: "size on the dirty-filter condition, not the clean-filter number", source: "same bulletin" },
     ],
   },
+  "snow-guard-layout": {
+    formula: "vector force (psf) = roof snow load x sin(roof angle); force per ft of eave = vector force x rafter (slope) length; guards per ft = force x safety factor / tested guard capacity; spacing = 12 / guards per ft.",
+    edition: "Manufacturer snow-retention design method (roof snow x sine of the roof angle, times rafter length and tributary width), by name - not a code section.",
+    freeAccess: "The method is published across independent snow-retention design references and manufacturer design guides.",
+    governance: GOVERNANCE.general,
+    editionNote: "Only the sin(theta) component tries to slide, which is why a steep roof needs far more retention than a shallow one at the same snow load. THE HOLDING CAPACITY IS A MANUFACTURER TESTED VALUE AND IS NOT SHIPPED HERE: a clamp on a standing seam and a screw into a through-fastened panel are different numbers, and the panel or its fastening often fails before the guard does. The rafter length used is the SLOPE length, matching the manufacturer method; ASCE roof snow loads are defined on the horizontal projection, so this runs conservative by 1/cos(theta) - about 5% at 4:12 and 12% at 8:12 - and that is stated so a user reconciling against a code-based calculation knows why the numbers differ. Rows are assumed to share the load, which holds when they are spaced for comparable tributaries; concentrating rows near the eave changes the distribution. Above roughly 12:12 the standard method needs the manufacturer's steep-slope guidance. Retention keeps snow ON the roof, so the structure must be able to carry it - shedding was the previous load path. The manufacturer's tested data and the engineer of record govern.",
+    assumptions: [
+      { name: "Vector force", value: "snow load x sin(roof angle); the cosine component is carried by the roof, not the guards", source: "manufacturer snow-retention method" },
+      { name: "Capacity is an input", value: "no holding capacity shipped; use tested data for the exact panel, seam, and attachment", source: "manufacturer test data" },
+      { name: "Slope length, stated", value: "rafter length used per the manufacturer method, conservative vs the horizontal projection by 1/cos(theta)", source: "stated conservatism" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",
