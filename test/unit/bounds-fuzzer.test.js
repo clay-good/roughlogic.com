@@ -552,7 +552,6 @@ import {
   computeGreaseTrap,
   computeGreaseInterceptorFlowCapacity,
   computeHydrostaticTest,
-  computeManningSlope,
   computePipeExpansion,
   computePipeExpansionLoop,
   computePipeSizing,
@@ -584,7 +583,6 @@ import {
   renderGlycolMix,
   renderGreaseTrap,
   renderHydrostaticTest,
-  renderManningSlope,
   renderPipeExpansion,
   renderPipeSizing,
   renderPipeVolume,
@@ -597,6 +595,8 @@ import {
   renderTrapArm,
   renderWaterHammerArrestor,
 } from "../../calc-plumbing.js";
+// spec-v1036: the Manning family moved to calc-drainage.js.
+import { computeManningSlope, renderManningSlope } from "../../calc-drainage.js";
 // spec-v86 cap-relief split: septic bench moved to calc-septic.js
 import {
   computeSepticDrainfield,
@@ -26060,7 +26060,7 @@ test("bounds: spec-v641 computeChannelNormalDepth solves the Manning normal dept
   assert.ok("error" in _v641({ b_ft: 10, q_cfs: Infinity, n: 0.015, s_slope: 0.001 }));
 });
 
-import { computeManningPipeCapacity as _v640 } from "../../calc-plumbing.js";
+import { computeManningPipeCapacity as _v640 } from "../../calc-drainage.js";
 
 test("bounds: spec-v640 computeManningPipeCapacity pins the full-bore Manning capacity, the sqrt(S) slope law, and error seams", () => {
   const r = _v640({ d_in: 8, slope: 0.01, material: "concrete" });
@@ -29098,7 +29098,7 @@ test("bounds: spec-v1015 computeGearToothBendingStress pins the Lewis stress, th
   assert.ok("error" in _v1015({ ...base, transmitted_load_lb: Infinity }));
 });
 
-import { computePipePartialFlowDepth as _v1011 } from "../../calc-plumbing.js";
+import { computePipePartialFlowDepth as _v1011 } from "../../calc-drainage.js";
 
 test("bounds: spec-v1011 computePipePartialFlowDepth pins the circular partial-flow depth, the derived turning points, the non-monotonic branch, and error seams", () => {
   const base = { d_in: 8, slope: 0.01, flow_gpm: 200, material: "concrete" };
@@ -30271,7 +30271,7 @@ test("bounds: spec-v1034 computeCondensateTrapDepth pins both configurations, th
 
 import { computeSnowGuardLayout as _v1035 } from "../../calc-construction.js";
 
-test("bounds: spec-v1035 computeSnowGuardLayout pins the worked example, the sin(theta) vector identity across pitches, exact capacity/safety-factor scaling, the rows division, the spacing identity, and error seams", () => {
+test("bounds: spec-v1036 computeSnowGuardLayout pins the worked example, the sin(theta) vector identity across pitches, exact capacity/safety-factor scaling, the rows division, the spacing identity, and error seams", () => {
   const base = { roof_snow_psf: 40, pitch_rise_per_12: 4, rafter_length_ft: 30, eave_length_ft: 40, guard_capacity_lb: 500, safety_factor: 2, rows: 1 };
   const r = _v1035(base);
   assert.ok(Math.abs(r.slope_deg - 18.434949) < 1e-5);

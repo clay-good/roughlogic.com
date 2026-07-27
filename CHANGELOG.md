@@ -27,7 +27,7 @@ calculation hides: retention keeps the snow ON the roof, so the structure has to
 Fuzzer pins the sin identity across six pitches (including 12:12 where the angle is exactly 45 degrees),
 exact inverse scaling in capacity, exact linearity in safety factor, that row count divides the per-row
 force without changing the total, and that spacing x guards-per-ft is exactly 12. Catalog 1,482 -> 1,483.
-Spec: spec-v1035. Cap ledger: calc-construction.js 172000 -> 182000 (was at 97.4%).
+Spec: spec-v1036. Cap ledger: calc-construction.js 172000 -> 182000 (was at 97.4%).
 
 ### feat(hvac): condensate-trap-depth, and a field rule the manufacturer geometry contradicts; 2026-07-27
 
@@ -124,6 +124,34 @@ Catalog 1,478 -> 1,479. Spec: spec-v1031. **No cap bump needed:** this tile was 
 `calc-plumbing.js` at 99.4% and originally carried a raise to 82,000, but the spec-v1030 split landed first
 and returned the module to 90.8%, so the raise was dropped -- the split doing exactly the job its own spec
 argued for.
+### refactor(drainage): rehome the Manning gravity-flow family from calc-plumbing.js; 2026-07-27
+
+spec-v1030 §2 recorded that `MANNING_ROUGHNESS` straddles the boundary of any wider site-water split -- it is read by
+exactly three tiles and no others -- and that this was the specific thing blocking that split. This moves those three
+together, removing the blocker: `manning-slope`, `manning-pipe-capacity`, and the spec-v1011
+`pipe-partial-flow-depth` solver, plus the shared roughness table and the partial-flow turning-point constants.
+
+They land in the existing `calc-drainage.js` rather than a new module because Manning's equation IS gravity drainage:
+`roof-drain-sizing` and `sewage-force-main-velocity` already live there, and `calc-drainage.js` was itself created by
+this same cap-relief pattern out of `calc-plumbing.js` back in spec-v73. All three keep group "B"; ids, inputs,
+outputs, citations, worked examples, and dimensional annotations are unchanged.
+
+This family needed more care than the spec-v1030 tail block because it uses the older split `// --- Utility N ---`
+layout -- the code sits in three non-contiguous regions, with `computeManningSlope` around line 1016 and its renderer
+around line 1346. Extraction used explicit named boundaries and was verified by conservation: `calc-plumbing.js` went
+61 -> 58 renderers and `calc-drainage.js` 6 -> 9, so nothing was dropped or duplicated. Three couplings a naive move
+would have missed were each caught by a gate rather than by reading: four other test files imported the moved symbols
+(including `MANNING_ROUGHNESS` and `manningSlopeExample`, not just the computes); `renderManningSlope` is an exported
+renderer pulled into the fuzzer's DOM-sentinel test; and its `// dims:` annotation sat one line above the function,
+outside the boundary, so losing it failed `check-dimensions` exactly as the Phase C ratchet is designed to.
+
+`calc-plumbing.js` 90.8% -> 86.1%; `calc-drainage.js` cap raised 9,000 -> 15,000 B gz (now 80.3%). Raising is the
+right call for a module that size -- a split is the remedy for the large ones. Across spec-v1030 and this change,
+`calc-plumbing.js` has gone 99.4% -> 86.1%.
+
+Behavior-preserving: renderer-count conservation, full lint, 5,875 unit tests passing (same count as before), build,
+and check-dist / shells / module-sizes / shell-mobile / csp / readme-counts / data:verify. All three moved tiles were
+render-verified in a real browser via the targeted Playwright a11y run.
 
 ### feat(finish): countertop-overhang-support, the two-rule cantilever check with the source conflict handled honestly; 2026-07-27
 

@@ -3530,7 +3530,8 @@ test("monotonicity: computeTimeAlignment c_m_s is strictly increasing in ambient
 // --- spec-v14 §10.3 Phase F twenty-eighth monotonicity batch -----------
 // Five new sweeps across five distinct catalog groups (B / C / T / V / X).
 
-import { computeManningSlope } from "../../calc-plumbing.js";
+// spec-v1036: the Manning family moved to calc-drainage.js.
+import { computeManningSlope } from "../../calc-drainage.js";
 import { computeAffinityLaws } from "../../calc-hvac.js";
 import { computeSerialDilution } from "../../calc-lab.js";
 import { computeDTI } from "../../calc-realestate.js";

@@ -1836,11 +1836,15 @@ cross-check.
 | calc-disinfect.js | `computeMainDisinfectionChlorine` | `{ diameter_in = 0, length_ft = 0, dose_mg_l = 25, product_pct = 65 } = {}` | _ | _ | _ |
 | calc-disinfect.js | `computeWellShockChlorination` | `{ casing_diameter_in = 0, water_column_ft = 0, target_ppm = 100, bleach_pct =...` | _ | _ | _ |
 | calc-drainage.js | `computeDrywellInfiltration` | `{ runoff_volume_ft3 = 200, void_ratio = 0.35, trench_depth_ft = 4, infiltrati...` | _ | _ | _ |
+| calc-drainage.js | `computeManningPipeCapacity` | `{ d_in = 0, slope = 0, material = "pvc" } = {}` | _ | _ | _ |
+| calc-drainage.js | `computeManningSlope` | `{ pipe_diameter_in = 0, target_flow_gpm = 0, material = "pvc" }` | _ | _ | _ |
 | calc-drainage.js | `computeOverflowScupperSizing` | `{ length_in = 0, head_in = 0 } = {}` | _ | _ | _ |
+| calc-drainage.js | `computePipePartialFlowDepth` | `{ d_in = 0, slope = 0, flow_gpm = 0, material = "pvc" } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeRoofDrainSizing` | `{ roof_area, rainfall_rate, drain_slope = "1/4", leader_table = null, horiz_t...` | _ | _ | _ |
 | calc-drainage.js | `computeScupperWidthForFlow` | `{ required_gpm = 0, head_in = 0 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeSewageForceMainVelocity` | `{ gpm = 0, id_in = 0 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeSumpBasinSizing` | `{ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60 } = {}` | _ | _ | _ |
+| calc-drainage.js | `renderManningSlope` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-earthwork.js | `computeAtterbergIndices` | `{ ll = 0, pl = 0, w_pct = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeCheckDamSpacing` | `{ dam_height_ft = 0, channel_slope_pct = 0, reach_length_ft = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeCompactionRollerProduction` | `{ drum_width_ft, speed_mph, lift_in, passes, efficiency = 0.75 } = {}` | _ | _ | _ |
@@ -2583,14 +2587,11 @@ cross-check.
 | calc-plumbing.js | `computeHydraulicJump` | `{ b_ft = 0, q_cfs = 0, y1_ft = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeHydronicFillPressure` | `{ height_ft = 0, margin_psi = 4 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeHydrostaticTest` | `{ working_pressure_psi = 0, system_volume_gal = 0, material = "water", multip...` | _ | _ | _ |
-| calc-plumbing.js | `computeManningPipeCapacity` | `{ d_in = 0, slope = 0, material = "pvc" } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computeManningSlope` | `{ pipe_diameter_in = 0, target_flow_gpm = 0, material = "pvc" }` | _ | _ | _ |
 | calc-plumbing.js | `computeMixedWaterTemp` | `{ mode = "find-blend", hot_temp_F = 0, cold_temp_F = 0, hot_gpm = 0, cold_gpm...` | _ | _ | _ |
 | calc-plumbing.js | `computeOrificeDiameterForFlow` | `{ q_cfs = 0, h_ft = 0, cd = 0.60 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeOrificeFlow` | `{ d_in = 0, h_ft = 0, cd = 0.60 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computePipeExpansion` | `{ material, length_ft, delta_T_F }` | _ | _ | _ |
 | calc-plumbing.js | `computePipeExpansionLoop` | `{ material = "copper", length_ft = 0, delta_T_F = 0, pipe_OD_in = 1.315, } = {}` | _ | _ | _ |
-| calc-plumbing.js | `computePipePartialFlowDepth` | `{ d_in = 0, slope = 0, flow_gpm = 0, material = "pvc" } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computePipeSizing` | `{ fixtures, slope_in_per_ft = 0.25 }` | _ | _ | _ |
 | calc-plumbing.js | `computePipeVelocity` | `{ mode = "velocity-from-flow", flow_gpm = 0, diameter_in = 0, material = "cop...` | _ | _ | _ |
 | calc-plumbing.js | `computePipeVolume` | `{ internal_diameter_in, length_ft, nominal_size }` | _ | _ | _ |
@@ -2639,7 +2640,6 @@ cross-check.
 | calc-plumbing.js | `renderGlycolMix` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderGreaseTrap` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderHydrostaticTest` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-plumbing.js | `renderManningSlope` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderPipeExpansion` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderPipeSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderPipeVolume` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |

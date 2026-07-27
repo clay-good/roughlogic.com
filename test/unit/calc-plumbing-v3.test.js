@@ -4,24 +4,23 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   computeStormwaterRational,
-  computeManningSlope,
   computeHydrostaticTest,
   computeGreaseTrap,
   computeGlycolMix,
   computeExpansionTank,
   computeBackflowLoss,
   RUNOFF_COEFFICIENTS,
-  MANNING_ROUGHNESS,
   GLYCOL_FREEZE_CURVES,
   BACKFLOW_CURVES,
   stormwaterRationalExample,
-  manningSlopeExample,
   hydrostaticTestExample,
   greaseTrapExample,
   glycolMixExample,
   expansionTankExample,
   backflowLossExample,
 } from "../../calc-plumbing.js";
+// spec-v1036: the Manning family moved to calc-drainage.js.
+import { computeManningSlope, MANNING_ROUGHNESS, manningSlopeExample } from "../../calc-drainage.js";
 
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 

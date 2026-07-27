@@ -1013,55 +1013,12 @@ export const stormwaterMaxDrainageAreaExample = {
   inputs: { allowable_flow_cfs: 2, surface: "asphalt", rainfall_in_per_hr: 2 },
 };
 
-// --- Utility 133: Manning's Equation Drainage Slope ---
-//
-// Manning: V = (1.486 / n) * R^(2/3) * S^(1/2) (English units, ft, ft/s).
-// For circular pipes flowing half-full, hydraulic radius R = D/4 (D in ft).
-// Solve for slope: S = ( V * n / (1.486 * R^(2/3)) )^2.
 
-export const MANNING_ROUGHNESS = {
-  pvc: 0.009,
-  copper: 0.011,
-  cast_iron: 0.013,
-  concrete: 0.013,
-  galvanized_steel: 0.016,
-  corrugated_metal: 0.024,
-};
-
-// dims: in { pipe_diameter_in: L, target_flow_gpm: L^3 T^-1, material: dimensionless } out: { slope_in_per_ft: dimensionless, slope_percent: dimensionless }
-export function computeManningSlope({ pipe_diameter_in = 0, target_flow_gpm = 0, material = "pvc" }) {
-  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  if (!(pipe_diameter_in > 0)) return { error: "Pipe diameter must be positive." };
-  if (!(target_flow_gpm >= 0)) return { error: "Target flow must be non-negative." };
-  const n = MANNING_ROUGHNESS[material];
-  if (!Number.isFinite(n)) return { error: "Unknown pipe material." };
-  const D_ft = pipe_diameter_in / 12;
-  // Half-full hydraulic radius and area:
-  const R_ft = D_ft / 4;
-  const A_half_ft2 = Math.PI * D_ft * D_ft / 8;
-  // Self-cleansing velocity 2 ft/s; slope to achieve V_target:
-  const slopeForVelocity = (V) => Math.pow((V * n) / (1.486 * Math.pow(R_ft, 2 / 3)), 2);
-  const slope_self_cleansing = slopeForVelocity(2);
-  // Slope to carry the target flow at half-full:
-  // Q (cfs) = V * A_half. 1 gpm = 0.002228 cfs.
-  const Q_cfs = target_flow_gpm * 0.002228;
-  let slope_for_flow = null;
-  if (Q_cfs > 0) {
-    const V_required = Q_cfs / A_half_ft2;
-    slope_for_flow = slopeForVelocity(V_required);
-  }
-  return {
-    slope_self_cleansing,
-    slope_self_cleansing_in_per_ft: slope_self_cleansing * 12,
-    slope_for_flow,
-    slope_for_flow_in_per_ft: slope_for_flow !== null ? slope_for_flow * 12 : null,
-    n, D_ft, R_ft, A_half_ft2,
-  };
-}
-
-export const manningSlopeExample = {
-  inputs: { pipe_diameter_in: 4, target_flow_gpm: 50, material: "pvc" },
-};
+// spec-v1036 cap-relief move: the Manning gravity-flow family (manning-slope,
+// manning-pipe-capacity, and the spec-v1011 pipe-partial-flow-depth solver) and
+// the MANNING_ROUGHNESS table they share relocated to calc-drainage.js, beside
+// the roof-drain and force-main tiles. The table was read only by those three,
+// so the move leaves no cross-module import.
 
 // --- Utility 134: Hydrostatic Test Pressure and Hold Time ---
 
@@ -1340,67 +1297,6 @@ function renderStormwaterMaxDrainageArea(inputRegion, outputRegion, citationEl) 
     oN.textContent = x.note;
   }, DEBOUNCE_MS);
   for (const el of [q.input, s.select, r.input]) el.addEventListener("input", update);
-}
-
-// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
-export function renderManningSlope(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Manning's equation V = (1.486/n) * R^(2/3) * S^(1/2). Public engineering. Pipe roughness values from public engineering tables.";
-  attachExampleButton(inputRegion, () => fillExample(manningSlopeExample.inputs));
-  const d = makeNumber("Pipe diameter (in)", "mn-d", { step: "any", min: "0" });
-  const f = makeNumber("Target flow (gpm)", "mn-f", { step: "any", min: "0" });
-  const m = makeSelect("Pipe material", "mn-m", Object.keys(MANNING_ROUGHNESS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
-  for (const x of [d, f, m]) inputRegion.appendChild(x.wrap);
-  const oSC = makeOutputLine(outputRegion, "Self-cleansing slope", "mn-out-sc");
-  const oFL = makeOutputLine(outputRegion, "Slope for flow (half-full)", "mn-out-fl");
-  function fillExample(v) { d.input.value = v.pipe_diameter_in; f.input.value = v.target_flow_gpm; m.select.value = v.material; update(); }
-  const update = debounce(() => {
-    const r = computeManningSlope({ pipe_diameter_in: Number(d.input.value) || 0, target_flow_gpm: Number(f.input.value) || 0, material: m.select.value });
-    if (r.error) { oSC.textContent = r.error; oFL.textContent = "-"; return; }
-    oSC.textContent = fmt(r.slope_self_cleansing_in_per_ft, 4) + " in/ft";
-    oFL.textContent = r.slope_for_flow_in_per_ft !== null ? fmt(r.slope_for_flow_in_per_ft, 4) + " in/ft" : "-";
-  }, DEBOUNCE_MS);
-  for (const el of [d.input, f.input, m.select]) el.addEventListener("input", update);
-}
-
-// dims: in { d_in: L, slope: dimensionless, material: dimensionless } out: { v_fps: L T^-1, q_cfs: L^3 T^-1, q_gpm: L^3 T^-1 }
-export function computeManningPipeCapacity({ d_in = 0, slope = 0, material = "pvc" } = {}) {
-  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  if (!(d_in > 0)) return { error: "Pipe diameter must be positive (in)." };
-  if (!(slope > 0)) return { error: "Pipe slope must be positive (ft/ft)." };
-  const n = MANNING_ROUGHNESS[material];
-  if (!Number.isFinite(n)) return { error: "Unknown pipe material." };
-  const D_ft = d_in / 12;
-  const r_ft = D_ft / 4;
-  const a_ft2 = Math.PI * D_ft * D_ft / 4;
-  const v_fps = (1.486 / n) * Math.pow(r_ft, 2 / 3) * Math.sqrt(slope);
-  const q_cfs = v_fps * a_ft2;
-  const q_gpm = q_cfs * 448.831;
-  return {
-    n, a_ft2, r_ft, v_fps, q_cfs, q_gpm,
-    note: "Manning full-bore gravity-flow capacity: V = (1.486/n) R^(2/3) sqrt(S) with the hydraulic radius R = D/4 for a circular pipe flowing full and Q = V (pi/4) D^2 - the discharge side of the same Manning equation the manning-slope tile inverts. The roughness n is taken from the standard tables (PVC 0.009, cast iron / concrete 0.013, corrugated metal 0.024). Because Q scales with sqrt(S), doubling the slope raises the capacity only about 1.41x. A steady, uniform (normal-depth) full flow in a circular pipe; it does not compute the partial-flow depth, and a circular pipe actually carries a few percent more than full-bore at about 0.94 depth (the partial-flow curves are separate). A design aid; the engineer of record and the local plumbing/sewer code govern.",
-  };
-}
-export const manningPipeCapacityExample = { inputs: { d_in: 8, slope: 0.01, material: "concrete" } };
-
-function renderManningPipeCapacity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Manning full-bore capacity V = (1.486/n) R^(2/3) S^(1/2), R = D/4, Q = V (pi/4) D^2, by name. Circular pipe flowing full; the roughness n is from the standard tables. The partial-flow depth is separate. A design aid; the engineer of record governs.";
-  attachExampleButton(inputRegion, () => fillExample(manningPipeCapacityExample.inputs));
-  const d = makeNumber("Pipe diameter (in)", "mpc-d", { step: "any", min: "0" });
-  const s = makeNumber("Pipe slope S (ft/ft)", "mpc-s", { step: "any", min: "0" });
-  const m = makeSelect("Pipe material", "mpc-m", Object.keys(MANNING_ROUGHNESS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
-  for (const x of [d, s, m]) inputRegion.appendChild(x.wrap);
-  const oQ = makeOutputLine(outputRegion, "Full-flow capacity", "mpc-out-q");
-  const oV = makeOutputLine(outputRegion, "Full-flow velocity", "mpc-out-v");
-  const oNote = makeOutputLine(outputRegion, "Note", "mpc-out-n");
-  function fillExample(v) { d.input.value = v.d_in; s.input.value = v.slope; m.select.value = v.material; update(); }
-  const update = debounce(() => {
-    const r = computeManningPipeCapacity({ d_in: Number(d.input.value) || 0, slope: Number(s.input.value) || 0, material: m.select.value });
-    if (r.error) { oQ.textContent = r.error; oV.textContent = "-"; oNote.textContent = "-"; return; }
-    oQ.textContent = fmt(r.q_cfs, 2) + " cfs (" + fmt(r.q_gpm, 0) + " gpm)";
-    oV.textContent = fmt(r.v_fps, 2) + " ft/s";
-    oNote.textContent = r.note;
-  }, DEBOUNCE_MS);
-  for (const el of [d.input, s.input, m.select]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -1958,8 +1854,6 @@ export const PLUMBING_RENDERERS = {
   "tankless-gpm": renderTanklessGPM,
   // v3
   "stormwater-rational": renderStormwaterRational,
-  "manning-slope": renderManningSlope,
-  "manning-pipe-capacity": renderManningPipeCapacity,
   "hydrostatic-test": renderHydrostaticTest,
   "grease-trap": renderGreaseTrap,
   "grease-interceptor-flow-capacity": renderGreaseInterceptorFlowCapacity,
@@ -4112,108 +4006,6 @@ function _v641renderChannelNormalDepth(inputRegion, outputRegion, citationEl) {
   for (const f of [b, q, nn, s]) f.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["channel-normal-depth"] = _v641renderChannelNormalDepth;
-
-// spec-v1011: circular-pipe partial-flow depth. The two turning points below are
-// DERIVED, not tabulated. With A = (D^2/8)(th - sin th) and P = D th/2:
-//   max discharge (maximize A R^(2/3) = A^(5/3) P^(-2/3)): 5 A' P = 2 A P'
-//     -> 3 th - 5 th cos th + 2 sin th = 0  -> th = 5.27811, d/D = 0.9382
-//   max velocity (maximize R = A/P):        A' P = A P'  -> tan th = th
-//     -> th = 4.49341, d/D = 0.8128
-// Discharge is NOT monotonic in depth, so the solver must bisect only on the
-// rising branch (0, THETA_MAX_Q]; the smaller root is the physical normal depth.
-function _v1011root(f, a, b) {
-  for (let i = 0; i < 200; i++) { const m = (a + b) / 2; if (f(a) * f(m) <= 0) b = m; else a = m; }
-  return (a + b) / 2;
-}
-const THETA_MAX_Q = _v1011root((t) => 3 * t - 5 * t * Math.cos(t) + 2 * Math.sin(t), 4.0, 6.0);
-const THETA_MAX_V = _v1011root((t) => Math.tan(t) - t, Math.PI + 1e-9, 3 * Math.PI / 2 - 1e-9);
-
-// dims: in { d_in: L, slope: dimensionless, flow_gpm: L^3 T^-1, material: dimensionless } out: { depth_in: L, d_over_d: dimensionless, v_fps: L T^-1, a_ft2: L^2, r_ft: L, q_full_gpm: L^3 T^-1, q_max_gpm: L^3 T^-1, shear_psf: M L^-1 T^-2 }
-export function computePipePartialFlowDepth({ d_in = 0, slope = 0, flow_gpm = 0, material = "pvc" } = {}) {
-  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  if (!(d_in > 0)) return { error: "Pipe diameter must be positive (in)." };
-  if (!(slope > 0)) return { error: "Pipe slope must be positive (ft/ft)." };
-  if (!(flow_gpm > 0)) return { error: "Flow must be positive (gpm)." };
-  const n = MANNING_ROUGHNESS[material];
-  if (!Number.isFinite(n)) return { error: "Unknown pipe material." };
-  const d_ft = d_in / 12;
-  const q_cfs = flow_gpm / 448.831;
-  const areaOf = (th) => (d_ft * d_ft / 8) * (th - Math.sin(th));
-  const perimOf = (th) => (d_ft * th) / 2;
-  const qOf = (th) => {
-    const A = areaOf(th), P = perimOf(th);
-    return (1.486 / n) * A * Math.pow(A / P, 2 / 3) * Math.sqrt(slope);
-  };
-  const q_full_cfs = qOf(2 * Math.PI);
-  const q_max_cfs = qOf(THETA_MAX_Q);
-  if (q_cfs > q_max_cfs) {
-    return { error: "Flow exceeds the pipe's maximum gravity capacity of " + (q_max_cfs * 448.831).toFixed(0) + " gpm (reached at d/D = 0.94). Use a larger pipe or a steeper slope." };
-  }
-  // Bisect on the rising branch only: qOf is monotonic on (0, THETA_MAX_Q].
-  let lo = 1e-9, hi = THETA_MAX_Q;
-  for (let i = 0; i < 200; i++) { const mid = (lo + hi) / 2; if (qOf(mid) < q_cfs) lo = mid; else hi = mid; }
-  const theta = (lo + hi) / 2;
-  const a_ft2 = areaOf(theta);
-  const r_ft = a_ft2 / perimOf(theta);
-  const depth_ft = (d_ft / 2) * (1 - Math.cos(theta / 2));
-  const depth_in = depth_ft * 12;
-  const d_over_d = depth_ft / d_ft;
-  const v_fps = q_cfs / a_ft2;
-  const self_cleansing = v_fps >= 2;
-  // Tractive (boundary) shear stress: tau = gamma R S, gamma = 62.4 lb/ft^3.
-  const shear_psf = 62.4 * r_ft * slope;
-  return {
-    n, d_ft, theta, depth_in, d_over_d, a_ft2, r_ft, v_fps, self_cleansing, shear_psf,
-    q_full_gpm: q_full_cfs * 448.831,
-    q_max_gpm: q_max_cfs * 448.831,
-    d_over_d_at_max_q: (1 - Math.cos(THETA_MAX_Q / 2)) / 2,
-    d_over_d_at_max_v: (1 - Math.cos(THETA_MAX_V / 2)) / 2,
-    pct_full: (q_cfs / q_full_cfs) * 100,
-    note: "The partial-flow (normal) depth a circular gravity pipe runs at, which the full-bore capacity tile leaves out. Manning Q = (1.486/n) A R^(2/3) sqrt(S) is applied to the circular segment A = (D^2/8)(theta - sin theta), P = D theta/2, y = (D/2)(1 - cos(theta/2)), and solved for theta by bisection. The key subtlety: discharge is NOT monotonic with depth. It peaks about 7.6% ABOVE full-bore at d/D = 0.938 and falls back to the full value at the crown, and velocity peaks at d/D = 0.813 - both derived from the geometry here, not read off a chart. So a pipe has two depths for most flows, and the SMALLER (the physical normal depth) is the one reported. Hydraulic radius is D/4 at both half-full and full, which is why a half-full pipe runs the same velocity as a full one at the same slope. The 2 ft/s self-cleansing check and the boundary shear tau = 62.4 R S (roughly 0.02 to 0.03 lb/ft^2 is the usual grit-moving target) tell you whether solids stay suspended at this depth. Steady uniform flow, constant n with depth; Camp's variable-n curves raise n at shallow depths, so a low d/D result here is slightly optimistic. A design aid; the engineer of record and the local sewer code govern.",
-  };
-}
-export const pipePartialFlowDepthExample = { inputs: { d_in: 8, slope: 0.01, flow_gpm: 200, material: "concrete" } };
-
-function _v1011renderPipePartialFlowDepth(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Manning's equation applied to the circular-segment geometry (A = (D^2/8)(theta - sin theta), P = D theta/2, y = (D/2)(1 - cos(theta/2))) and solved for the partial-flow normal depth by bisection, the standard gravity-sewer partial-flow relation as compiled in ASCE/WEF MOP FD-5 and Chow, by name. The maximum-discharge depth d/D = 0.938 and maximum-velocity depth d/D = 0.813 are derived from these equations, not tabulated. Roughness n from the standard tables; self-cleansing taken as 2 ft/s. Constant n with depth (Camp's variable-n curves are separate). A design aid; the engineer of record and the local sewer code govern.";
-  attachExampleButton(inputRegion, () => { d.input.value = "8"; s.input.value = "0.01"; q.input.value = "200"; m.select.value = "concrete"; update(); });
-  const d = makeNumber("Pipe diameter (in)", "ppfd-d", { step: "any", min: "0" });
-  const s = makeNumber("Pipe slope S (ft/ft)", "ppfd-s", { step: "any", min: "0" });
-  const q = makeNumber("Flow Q (gpm)", "ppfd-q", { step: "any", min: "0" });
-  const m = makeSelect("Pipe material", "ppfd-m", Object.keys(MANNING_ROUGHNESS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
-  for (const f of [d, s, q]) inputRegion.appendChild(f.wrap);
-  inputRegion.appendChild(m.wrap);
-  const oY = makeOutputLine(outputRegion, "Flow depth", "ppfd-out-y");
-  const oDD = makeOutputLine(outputRegion, "Depth ratio d/D", "ppfd-out-dd");
-  const oV = makeOutputLine(outputRegion, "Velocity at that depth", "ppfd-out-v");
-  const oSC = makeOutputLine(outputRegion, "Self-cleansing (2 ft/s)", "ppfd-out-sc");
-  const oSH = makeOutputLine(outputRegion, "Boundary shear", "ppfd-out-sh");
-  const oCap = makeOutputLine(outputRegion, "Capacity full / maximum", "ppfd-out-cap");
-  const oNote = makeOutputLine(outputRegion, "Note", "ppfd-out-n");
-  const update = debounce(() => {
-    const r = computePipePartialFlowDepth({
-      d_in: Number(d.input.value) || 0,
-      slope: Number(s.input.value) || 0,
-      flow_gpm: Number(q.input.value) || 0,
-      material: m.select.value,
-    });
-    if (r.error) {
-      oY.textContent = r.error;
-      for (const o of [oDD, oV, oSC, oSH, oCap, oNote]) o.textContent = "-";
-      return;
-    }
-    oY.textContent = fmt(r.depth_in, 2) + " in of " + fmt(r.d_ft * 12, 2) + " in";
-    oDD.textContent = fmt(r.d_over_d, 3) + " (" + fmt(r.pct_full, 0) + "% of full-bore flow)";
-    oV.textContent = fmt(r.v_fps, 2) + " ft/s";
-    oSC.textContent = r.self_cleansing ? "YES (at or above 2 ft/s)" : "NO - below 2 ft/s, solids may settle";
-    oSH.textContent = fmt(r.shear_psf, 4) + " lb/ft^2";
-    oCap.textContent = fmt(r.q_full_gpm, 0) + " gpm full, " + fmt(r.q_max_gpm, 0) + " gpm max at d/D " + fmt(r.d_over_d_at_max_q, 3);
-    oNote.textContent = r.note;
-  }, DEBOUNCE_MS);
-  for (const f of [d, s, q]) f.input.addEventListener("input", update);
-  m.select.addEventListener("change", update);
-}
-PLUMBING_RENDERERS["pipe-partial-flow-depth"] = _v1011renderPipePartialFlowDepth;
 
 // dims: in { b_ft: L, q_cfs: L^3 T^-1, y1_ft: L } out: { v1_fps: L T^-1, fr1: dimensionless, y2_ft: L, fr2: dimensionless, de_ft: L, efficiency: dimensionless }
 export function computeHydraulicJump({ b_ft = 0, q_cfs = 0, y1_ft = 0 } = {}) {

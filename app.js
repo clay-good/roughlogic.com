@@ -210,9 +210,7 @@ const TOOL_MODULES = (() => {
     "water-hammer-arrestor", "recirc-pump-head", "trap-arm",
     "pipe-expansion", "tankless-gpm",
     // v3
-    "stormwater-rational", "stormwater-max-drainage-area", "manning-slope", "manning-pipe-capacity",
-    // spec-v1011 partial-flow depth of a circular gravity pipe
-    "pipe-partial-flow-depth",
+    "stormwater-rational", "stormwater-max-drainage-area", // spec-v1011 partial-flow depth of a circular gravity pipe
     "hydrostatic-test", "grease-trap", "grease-interceptor-flow-capacity",
     "stormwater-detention-volume",
     "glycol-mix", "expansion-tank", "backflow-loss", "hydronic-fill-pressure", // v7
@@ -292,6 +290,8 @@ const TOOL_MODULES = (() => {
     // spec-v426..v427 drainage
     "overflow-scupper-sizing", "scupper-width-for-flow", "sewage-force-main-velocity",
     "drywell-infiltration",
+      // spec-v1036 cap-relief move from calc-plumbing.js (shared MANNING_ROUGHNESS)
+    "manning-slope", "manning-pipe-capacity", "pipe-partial-flow-depth",
   ]);
   // spec-v42 cap-relief split: the three fuel-gas tiles relocated out of
   // calc-plumbing.js (which had reached 98.9% of cap) into calc-gas.js. They
