@@ -4,6 +4,25 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): concrete-anchor-pryout, the shear mode that governs exactly where the edge-breakout check exits; 2026-07-27
+
+The tension tile's Scope line names pryout as a separate check, `aliases.json` had zero hits for `pryout`, and
+nothing in the catalog computed one. Pryout governs SHORT, STIFF anchors AWAY from an edge loaded in shear -- the
+anchor rotates and pries a breakout body out of the surface behind it -- which is precisely the geometry where
+spec-v1019's edge shear-breakout does not apply, so the shear story had a hole exactly where that check exits.
+Adds one tile to `calc-concrete.js` (Group E), no new module.
+
+`concrete-anchor-pryout` computes Vcp = kcp x Ncb per ACI 318-19 17.7.3.1(a), with kcp = 1.0 below hef = 2.5 in
+and 2.0 at or above it, and phiVcp = 0.70 Vcp (Condition B). Ncb is obtained by CALLING the landed
+`computeConcreteAnchorBreakout` directly, so the two tiles can never drift apart -- and the fuzzer's primary pin
+is that cross-implementation identity at a near-edge geometry where psi_ed and the area truncation are both
+active. All three constants were verified during the spec-v1019 primary-source pass (Williams Form 318-19
+reference, ICC-ES ESR-3068's kcp = 1.0 for its 1.23-in anchor, K-State worked example at kcp = 2.0, Panache
+Ch.17 guide stating the 2.5-in threshold).
+
+The seam case is a round number: hef = 2.5 in at f'c = 4,000 gives Ncb = 6,000.0 lb exactly, Vcp = 12,000 lb,
+phiVcp = 8,400 lb -- pinned on both sides of the threshold. Catalog 1,468 -> 1,469. Spec: spec-v1020.
+
 ### feat(concrete): concrete-anchor-shear-breakout, the deferred fourth member of the anchor family, verified against the primary standard; 2026-07-27
 
 The tension tile's citation says outright that "anchor shear and combined shear-tension (pryout) are separate

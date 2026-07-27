@@ -653,6 +653,7 @@ const TOOL_MODULES = (() => {
     "concrete-anchor-pullout",
     // spec-v617
     "concrete-anchor-shear-breakout",
+    "concrete-anchor-pryout",
     "concrete-anchor-blowout",
     // spec-v552
     "rc-slender-column-magnify",

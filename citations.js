@@ -14977,6 +14977,18 @@ export const CITATIONS = {
       { name: "Scope", value: "single anchor, shear toward one edge; steel shear (0.6 Ase futa) and pryout (kcp Ncp) are separate checks", source: "ACI 318-19 17.7.1, 17.7.3" },
     ],
   },
+  "concrete-anchor-pryout": {
+    formula: "Vcp = kcp x Ncp with Ncp = Ncb (the 17.6.2 tension-breakout strength); kcp = 1.0 for hef < 2.5 in, 2.0 for hef >= 2.5 in; phiVcp = 0.70 Vcp (Condition B).",
+    edition: "The ACI 318-19 Section 17.7.3 concrete pryout strength of an anchor in shear (17.7.3.1a), by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Chapter 17 anchoring provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "Pryout governs SHORT, STIFF anchors AWAY from an edge loaded in shear - the anchor rotates and pries a breakout body out of the surface behind it, so the capacity is proportional to the tension-breakout strength and does not involve an edge distance in the shear direction. Near an edge, the 17.7.2 shear breakout applies instead; a shear design takes the LEAST of steel, edge breakout, and pryout. Ncb here is computed by the same routine as concrete-anchor-breakout, inheriting its documented simplifications (psi_c = 1.0, single edge, Condition B). Single anchor; the group form Vcpg = kcp Ncbg is not modeled. phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+    assumptions: [
+      { name: "Pryout base", value: "Ncp = Ncb, the tension concrete-breakout strength; the tile calls the landed breakout routine so the two can never drift", source: "ACI 318-19 17.7.3.1" },
+      { name: "kcp threshold", value: "1.0 below hef = 2.5 in, 2.0 at or above it", source: "ACI 318-19 17.7.3.1" },
+      { name: "Scope", value: "single anchor away from an edge; steel shear and the 17.7.2 edge breakout are separate checks", source: "ACI 318-19 17.7.1, 17.7.2" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

@@ -1524,6 +1524,7 @@ cross-check.
 | calc-civil.js | `computeVerticalCurveSightDistance` | `{ A_pct, S_ft, C } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteAnchorBlowout` | `{ edge_distance_in = 0, head_bearing_area_in2 = 0, fc_psi = 0, embedment_in =...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteAnchorBreakout` | `{ embedment_in = 0, fc_psi = 0, edge_distance_in = 0, anchor_type = "cast-in"...` | _ | _ | _ |
+| calc-concrete.js | `computeConcreteAnchorPryout` | `{ embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, anchor_type = "cast-...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteAnchorPullout` | `{ head_bearing_area_in2 = 0, fc_psi = 0, cracking = "cracked" } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteAnchorShearBreakout` | `{ anchor_dia_in = 0, embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, p...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteBeamMinFlexuralSteel` | `{ fc_psi = 4000, fy_psi = 60000, bw_in = 0, d_in = 0 } = {}` | _ | _ | _ |
@@ -3129,7 +3130,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1715.
+Row count: 1716.
 
 <!-- END function-corpus-v14 -->
 
@@ -3737,7 +3738,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (375 tiles)
+### Group E Construction (376 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3793,6 +3794,7 @@ per spec-v14 §13.1 second paragraph.
 | `concrete` | Concrete Volume | Project (first-principles); Volume identity; 20x10 footing 4 in deep | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-anchor-blowout` | Concrete Anchor Side-Face Blowout (ACI 318-19 17.6.4) | ACI 318-19; 3/4-in heavy-hex (Abrg 0.654 in^2), f'c 4000, ca1 3 in, h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-anchor-breakout` | Cast-In Anchor Tension Concrete Breakout (ACI 318-19 Ch. 17) | ACI 318-19 Section 17.6.2 (concrete b...; 6 in cast-in, 4000 psi, away from edges -> Nb 22308 lb, N... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `concrete-anchor-pryout` | Concrete Anchor Pryout in Shear (ACI 318-19 17.7.3) | ACI 318-19; hef 6, f'c 4000, ca1 large -> Ncb = 24 sqrt(4000) 6^1.5 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-anchor-pullout` | Concrete Headed-Anchor Pullout (ACI 318-19 17.6.3) | ACI 318-19 Section 17.6.3 (headed-anc...; 3/4-in bolt, 0.654-in2 head, 4,000-psi cracked -> Np 20,9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-anchor-shear-breakout` | Cast-In Anchor Shear Concrete Breakout (ACI 318-19 17.7.2) | ACI 318-19; 3/4-in anchor, hef 6, f'c 4000, ca1 6 -> le 6, 7-form coe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-beam-min-flexural-steel` | Minimum Flexural Reinforcement As,min (ACI 318-19 9.6.1.2) | ACI 318-19 9.6.1.2; spec-v394 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4783,6 +4785,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1468. Fixture-covered or reference-cadence: 1468 / 1468.
+Tile count: 1469. Fixture-covered or reference-cadence: 1469 / 1469.
 
 <!-- END tile-index-v14 -->

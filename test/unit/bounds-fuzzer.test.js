@@ -29683,3 +29683,45 @@ test("bounds: spec-v1019 computeConcreteAnchorShearBreakout pins the Vb pair and
   assert.ok("error" in _v1019({ ...base, cracking: "maybe" }));
   assert.ok("error" in _v1019({ ...base, edge_distance_in: Infinity }));
 });
+
+import { computeConcreteAnchorPryout as _v1020 } from "../../calc-concrete.js";
+import { computeConcreteAnchorBreakout as _v1020base } from "../../calc-concrete.js";
+
+test("bounds: spec-v1020 computeConcreteAnchorPryout pins Vcp = kcp Ncb, the cross-implementation identity with the tension sibling, both sides of the 2.5-in kcp seam, and error seams", () => {
+  const base = { embedment_in: 6, fc_psi: 4000, edge_distance_in: 100, anchor_type: "cast-in", lambda: 1 };
+  // Pinned worked example: hef 6, away from edges -> kcp 2, Vcp = 2 Ncb.
+  const r = _v1020(base);
+  assert.ok(Math.abs(r.ncb_lb - 22308.38) < 0.5);
+  assert.ok(r.kcp === 2);
+  assert.ok(Math.abs(r.vcp_lb - 44616.77) < 0.5);
+  assert.ok(Math.abs(r.phi_vcp_lb - 31231.74) < 0.5);
+  assert.ok(Math.abs(r.phi_vcp_lb - 0.70 * r.vcp_lb) < 1e-9);
+  // Cross-implementation identity: Ncb must equal the tension sibling's EXACTLY, including at a
+  // non-trivial near-edge geometry where psi_ed and the area truncation are both active.
+  const nearEdge = { embedment_in: 6, fc_psi: 4000, edge_distance_in: 4, anchor_type: "cast-in", lambda: 1 };
+  assert.ok(_v1020(nearEdge).ncb_lb === _v1020base(nearEdge).ncb_lb);
+  assert.ok(Math.abs(_v1020(nearEdge).vcp_lb - 2 * _v1020base(nearEdge).ncb_lb) < 1e-9);
+  // The kcp seam: hef 2.5 exactly is the round-number case (Ncb 6,000, Vcp 12,000); hef 2 drops to kcp 1.
+  const seam = _v1020({ ...base, embedment_in: 2.5 });
+  assert.ok(Math.abs(seam.ncb_lb - 6000) < 0.01);
+  assert.ok(seam.kcp === 2 && Math.abs(seam.vcp_lb - 12000) < 0.01 && Math.abs(seam.phi_vcp_lb - 8400) < 0.01);
+  const shallow = _v1020({ ...base, embedment_in: 2 });
+  assert.ok(shallow.kcp === 1);
+  assert.ok(Math.abs(shallow.vcp_lb - shallow.ncb_lb) < 1e-9);
+  // Post-installed uses the sibling's kc 17: ratio of Vcp values is exactly 17/24.
+  const pi = _v1020({ ...base, anchor_type: "post-installed" });
+  assert.ok(Math.abs(pi.vcp_lb / r.vcp_lb - 17 / 24) < 1e-12);
+  // Monotonic in hef away from edges (Ncb ~ hef^1.5 and kcp only ever steps up).
+  let prev = 0;
+  for (const hef of [1, 2, 2.5, 4, 8]) {
+    const t = _v1020({ ...base, embedment_in: hef });
+    assert.ok(t.vcp_lb > prev);
+    prev = t.vcp_lb;
+  }
+  // Error seams delegate to the sibling's guards.
+  assert.ok("error" in _v1020({ ...base, embedment_in: 0 }));
+  assert.ok("error" in _v1020({ ...base, fc_psi: 0 }));
+  assert.ok("error" in _v1020({ ...base, lambda: 0 }));
+  assert.ok("error" in _v1020({ ...base, anchor_type: "adhesive" }));
+  assert.ok("error" in _v1020({ ...base, embedment_in: Infinity }));
+});

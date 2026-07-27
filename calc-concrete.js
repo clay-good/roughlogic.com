@@ -1619,6 +1619,46 @@ CONCRETE_RENDERERS["concrete-anchor-shear-breakout"] = _simpleRenderer({
   compute: computeConcreteAnchorShearBreakout,
 });
 
+// --- spec-v1020 E: Concrete anchor pryout in shear (ACI 318-19 17.7.3) ---
+// Vcp = kcp x Ncp, Ncp = Ncb (the tension-breakout strength, computed by CALLING the landed
+// computeConcreteAnchorBreakout so the two tiles can never drift); kcp = 1.0 for hef < 2.5 in,
+// 2.0 for hef >= 2.5 in; phi = 0.70 Condition B. Governs short stiff anchors AWAY from an edge.
+// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless } out: { ncb_lb: M L T^-2, vcp_lb: M L T^-2, phi_vcp_lb: M L T^-2 }
+export function computeConcreteAnchorPryout({ embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, anchor_type = "cast-in", lambda = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const base = computeConcreteAnchorBreakout({ embedment_in, fc_psi, edge_distance_in, anchor_type, lambda });
+  if (base.error) return { error: base.error };
+  const hef = Number(embedment_in) || 0;
+  const kcp = hef < 2.5 ? 1.0 : 2.0;
+  const vcp_lb = kcp * base.ncb_lb;
+  const phi_vcp_lb = 0.70 * vcp_lb;
+  if (![vcp_lb, phi_vcp_lb].every(Number.isFinite)) return { error: "Pryout math did not produce a finite value." };
+  return {
+    ncb_lb: base.ncb_lb, kcp, vcp_lb, phi_vcp_lb,
+    note: "Pryout is the shear mode that governs SHORT, STIFF anchors AWAY from an edge - the anchor rotates and pries a breakout body out of the surface BEHIND it, so the capacity is proportional to the tension-breakout strength (Vcp = kcp Ncb), not to any edge distance in the shear direction. Near an edge, concrete-anchor-shear-breakout applies instead, and a shear design takes the LEAST of steel, edge breakout, and pryout. kcp jumps from 1.0 to 2.0 at hef = 2.5 in. Single anchor; the group form and psi_c credits are not modeled. phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+  };
+}
+export const concreteAnchorPryoutExample = { inputs: { embedment_in: 6, fc_psi: 4000, edge_distance_in: 100, anchor_type: "cast-in", lambda: 1.0 } };
+CONCRETE_RENDERERS["concrete-anchor-pryout"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 Section 17.7.3 concrete pryout: Vcp = kcp x Ncp with Ncp = Ncb, the Section 17.6.2 tension-breakout strength (17.7.3.1a); kcp = 1.0 for hef < 2.5 in and 2.0 for hef >= 2.5 in; phiVcp = 0.70 Vcp (Condition B, Table 17.5.3). Pryout governs short stiff anchors away from an edge loaded in shear - the anchor pries a breakout body out of the surface behind it, so the capacity tracks the tension breakout, not an edge distance. Near an edge the 17.7.2 shear breakout applies instead; a shear design takes the least of steel, edge breakout, and pryout. ACI 318 Chapter 17 and the engineer of record govern.",
+  example: concreteAnchorPryoutExample.inputs,
+  fields: [
+    { key: "embedment_in", label: "Effective embedment hef (in)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "edge_distance_in", label: "Nearest edge distance ca1 (in, large = away)", kind: "number" },
+    { key: "anchor_type", label: "Anchor type", kind: "select", options: [{ value: "cast-in", label: "Cast-in (kc = 24)" }, { value: "post-installed", label: "Post-installed (kc = 17)" }] },
+    { key: "lambda", label: "Lightweight factor lambda_a (1.0 normal weight)", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "ncb", id: "capy-out-ncb", label: "Tension breakout Ncb (the base)", value: (r) => fmt(r.ncb_lb, 0) + " lb (" + fmt(r.ncb_lb / 1000, 1) + " kip)" },
+    { key: "kcp", id: "capy-out-kcp", label: "Pryout coefficient kcp", value: (r) => fmt(r.kcp, 1) + (r.kcp === 1 ? " (hef < 2.5 in)" : " (hef >= 2.5 in)") },
+    { key: "vcp", id: "capy-out-vcp", label: "Nominal pryout Vcp", value: (r) => fmt(r.vcp_lb, 0) + " lb (" + fmt(r.vcp_lb / 1000, 1) + " kip)" },
+    { key: "phi", id: "capy-out-phi", label: "Design pryout phiVcp", value: (r) => fmt(r.phi_vcp_lb, 0) + " lb (" + fmt(r.phi_vcp_lb / 1000, 1) + " kip)" },
+    { key: "n", id: "capy-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteAnchorPryout,
+});
+
 // ===================== spec-v793: fresh (batch) concrete temperature (ACI 305.1) =====================
 // Mass-weighted thermal-energy balance: mixture T = sum(c_i m_i T_i) / sum(c_i m_i), with the specific
 // heat of solids (cement + aggregate) ~0.22 Btu/lb-F and water = 1.0. Free surface moisture on the
