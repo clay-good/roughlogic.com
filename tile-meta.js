@@ -528,7 +528,7 @@ const _TILES = [
   ["climb-gradient-roc", "K"],
   ["concrete-yield", "E"],
   ["glass-weight", "E"],
-  ["fineness-modulus", "E"],
+  ["fineness-modulus", "E"], ["soil-gradation-coefficients", "E"],
   ["water-cement-ratio", "E"],
   // spec-v803 ASCE 7 live load reduction
   ["asce-live-load-reduction", "E"],

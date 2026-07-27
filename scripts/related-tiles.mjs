@@ -1241,7 +1241,8 @@ const RELATED = {
   "attic-ventilation": ["roofing-squares","gutter-downspout","blown-insulation-coverage"],
   "deck-board-takeoff": ["residential-framing","joist-deflection","fence-estimate"],
   "glass-weight": ["metal-weight","deck-board-takeoff","gutter-downspout"],
-  "fineness-modulus": ["relative-compaction","atterberg-indices","soil-phase-relations"],
+  "fineness-modulus": ["relative-compaction","atterberg-indices","soil-phase-relations","soil-gradation-coefficients"],
+  "soil-gradation-coefficients": ["atterberg-indices","fineness-modulus","relative-compaction","soil-phase-relations"],
   "shadow-length": ["pv-row-spacing","pv-row-shade-angle","pv-array-sizing"],
   "powered-attic-ventilator": ["attic-ventilation","ridge-cap-fasteners","blown-insulation-coverage","insulation-heat-loss"],
   "gutter-downspout": ["roofing-squares","attic-ventilation","roof-drain-sizing"],
@@ -1652,7 +1653,7 @@ const RELATED = {
   "relative-compaction": ["soil-swell-shrink","soil-phase-relations","soil-bearing-capacity"],
   "water-for-compaction": ["relative-compaction","soil-phase-relations","compaction-roller-production"],
   "soil-phase-relations": ["relative-compaction","soil-consolidation-settlement","atterberg-indices"],
-  "atterberg-indices": ["soil-phase-relations","relative-compaction","soil-swell-shrink"],
+  "atterberg-indices": ["soil-phase-relations","relative-compaction","soil-swell-shrink","soil-gradation-coefficients"],
   // spec-v329..v331 building-energy batch (Group C)
   "building-ua": ["assembly-r-value","degree-day-energy","infiltration-load"],
   "degree-day-energy": ["building-ua","manual-j-heating","heat-pump-seasonal-energy"],

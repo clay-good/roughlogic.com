@@ -4,6 +4,37 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): soil-gradation-coefficients, the coarse-fraction half of USCS two tiles say they omit; 2026-07-27
+
+Two tiles in two different modules name this gap independently. `atterberg-indices` says "the full USCS also needs
+the fines content and gradation for a coarse or dual classification" and "it does not compute ... the coarse-fraction
+sieve classification." `fineness-modulus` says its single number "does not check whether each sieve meets its C33
+grading band, and two very different gradations can share an FM." So the catalog had the fine-grained half of USCS
+and a one-number gradation summary, and nothing describing the SHAPE of a grain-size curve. Adds one tile to
+`calc-earthwork.js` (Group E), no new module or dependency.
+
+`soil-gradation-coefficients` reads two coefficients off three points of the curve: the uniformity coefficient
+Cu = D60/D10 (how wide a range of sizes is present) and the coefficient of curvature Cc = D30^2 / (D10 x D60)
+(whether the curve is smooth or gapped). ASTM D2487 requires BOTH to call a clean coarse soil well graded -- Cu >= 4
+for a gravel or >= 6 for a sand, and Cc between 1 and 3.
+
+Three results worth stating. Cu alone is not enough: a gap-graded soil posts an enormous Cu and still packs no better
+than a uniform sand, which is exactly what Cc catches -- the fuzzer pins D10 0.15 / D30 0.16 / D60 20, giving Cu > 100
+(passes) and Cc < 1 (fails), correctly POORLY graded. The same curve gets two answers: with Cu = 5 and Cc in range it
+is a well-graded gravel and a poorly-graded sand depending only on which side of the #4 sieve the coarse fraction
+sits, and both readings are pinned. And the fines decide whether any of it controls -- under 5% the gradation symbol
+governs, 5-12% takes a dual symbol, over 12% the fines govern outright, so above that threshold the tile stops
+claiming a gradation symbol and points at `atterberg-indices`.
+
+The Hazen k = D10^2 cm/s permeability estimate is always computed and always flagged in or out of its validity range
+(Cu < 5, D10 0.1-3 mm, under 5% fines). The pinned worked example is deliberately OUT of range (Cu 8.0) so the flag is
+exercised by the primary case rather than only by a fuzzer edge. ASTM D2487 / D6913 are cited by name only; the
+well-graded thresholds are three published numbers, not reproduced table text.
+
+Cap-ledger bump by the documented raise-with-a-note path: `calc-earthwork.js` 34000 -> 38000 B gz (the tile took it to
+34,943 B, 102.8%; it was already at 96.4% beforehand). A per-tile split of that module is the eventual preferred fix
+and is noted in its ledger entry -- lint now warns that 46 modules sit within 10% of their caps.
+
 ### fix(discoverability): backlink four parent tiles to the companions that fill the gaps they name; 2026-07-27
 
 The related-tiles graph is curated per tile and is not automatically symmetric, so a newly landed companion links to

@@ -29553,3 +29553,67 @@ test("bounds: spec-v1017 computeCohesiveEarthPressure pins the c-phi active pres
   assert.ok("error" in _v1017({ ...base, q: -1 }));
   assert.ok("error" in _v1017({ ...base, gamma: Infinity }));
 });
+
+import { computeSoilGradationCoefficients as _v1018 } from "../../calc-earthwork.js";
+
+test("bounds: spec-v1018 computeSoilGradationCoefficients pins Cu/Cc, the both-criteria-required rule, the gravel-vs-sand threshold, the fines ladder, the Hazen validity flag, and error seams", () => {
+  const base = { d10_mm: 0.15, d30_mm: 0.55, d60_mm: 1.2, pct_coarse_passing_no4: 60, pct_fines: 3 };
+  const r = _v1018(base);
+  assert.ok(Math.abs(r.cu - 8) < 1e-12); // 1.2 / 0.15
+  assert.ok(Math.abs(r.cc - 0.55 ** 2 / (0.15 * 1.2)) < 1e-12); // 1.68056
+  assert.strictEqual(r.coarse_type, "sand");
+  assert.strictEqual(r.cu_threshold, 6);
+  assert.strictEqual(r.well_graded, true);
+  assert.strictEqual(r.uscs_symbol, "SW");
+  // Both criteria are required. A soil can be very widely graded (huge Cu) and
+  // still be POORLY graded because a gap in the middle drives Cc out of 1-3.
+  // That is the whole reason Cc exists, so it is pinned.
+  const gapped = _v1018({ ...base, d30_mm: 0.16, d60_mm: 20 });
+  assert.ok(gapped.cu > 100);
+  assert.ok(gapped.cc < 1);
+  assert.strictEqual(gapped.cu_ok, true);
+  assert.strictEqual(gapped.cc_ok, false);
+  assert.strictEqual(gapped.well_graded, false);
+  // The gravel threshold is 4, the sand threshold 6: the SAME curve can be a
+  // well-graded gravel and a poorly-graded sand. Cu = 5 sits between them.
+  // Cc is held inside 1-3 so the Cu threshold is the ONLY thing that differs.
+  const cu5 = { d10_mm: 0.2, d30_mm: 0.55, d60_mm: 1.0, pct_fines: 0 };
+  const asGravel = _v1018({ ...cu5, pct_coarse_passing_no4: 40 });
+  const asSand = _v1018({ ...cu5, pct_coarse_passing_no4: 60 });
+  assert.ok(Math.abs(asGravel.cu - 5) < 1e-12);
+  assert.ok(Math.abs(asGravel.cc - 1.5125) < 1e-12); // 0.55^2 / (0.2 x 1.0), inside 1-3
+  assert.strictEqual(asGravel.coarse_type, "gravel");
+  assert.strictEqual(asGravel.cu_threshold, 4);
+  assert.strictEqual(asGravel.well_graded, true); // Cu 5 >= 4
+  assert.strictEqual(asSand.coarse_type, "sand");
+  assert.strictEqual(asSand.cu_threshold, 6);
+  assert.strictEqual(asSand.well_graded, false); // same curve, Cu 5 < 6
+  // #4 boundary: exactly 50% passing is still a gravel (more than half retained).
+  assert.strictEqual(_v1018({ ...base, pct_coarse_passing_no4: 50 }).coarse_type, "gravel");
+  assert.strictEqual(_v1018({ ...base, pct_coarse_passing_no4: 50.1 }).coarse_type, "sand");
+  // Fines ladder: < 5 clean symbol, 5-12 dual, > 12 the fines govern.
+  assert.strictEqual(_v1018({ ...base, pct_fines: 4.9 }).uscs_symbol, "SW");
+  assert.ok(_v1018({ ...base, pct_fines: 8 }).uscs_symbol.includes("-"));
+  assert.ok(_v1018({ ...base, pct_fines: 20 }).uscs_symbol.includes("atterberg"));
+  assert.ok(!_v1018({ ...base, pct_fines: 20 }).uscs_symbol.startsWith("SW"));
+  // Hazen: flagged out of range here (Cu 8 >= 5), valid for a uniform clean sand.
+  assert.ok(Math.abs(r.hazen_k_cm_s - 0.0225) < 1e-12);
+  assert.strictEqual(r.hazen_valid, false);
+  const uniform = _v1018({ d10_mm: 0.2, d30_mm: 0.3, d60_mm: 0.55, pct_coarse_passing_no4: 80, pct_fines: 2 });
+  assert.ok(Math.abs(uniform.cu - 2.75) < 1e-12);
+  assert.strictEqual(uniform.hazen_valid, true);
+  assert.strictEqual(uniform.uscs_symbol, "SP"); // Cu 2.75 < 6
+  // Out of Hazen's range on each edge, independently.
+  assert.strictEqual(_v1018({ d10_mm: 0.05, d30_mm: 0.06, d60_mm: 0.1, pct_fines: 0 }).hazen_valid, false); // D10 too small
+  assert.strictEqual(_v1018({ d10_mm: 4, d30_mm: 5, d60_mm: 8, pct_fines: 0 }).hazen_valid, false); // D10 too large
+  assert.strictEqual(_v1018({ d10_mm: 0.2, d30_mm: 0.3, d60_mm: 0.55, pct_fines: 10 }).hazen_valid, false); // not clean
+  // Error seams.
+  assert.ok("error" in _v1018({ ...base, d10_mm: 0 }));
+  assert.ok("error" in _v1018({ ...base, d30_mm: 0 }));
+  assert.ok("error" in _v1018({ ...base, d60_mm: 0 }));
+  assert.ok("error" in _v1018({ ...base, d30_mm: 0.1 })); // D30 < D10
+  assert.ok("error" in _v1018({ ...base, d60_mm: 0.4 })); // D60 < D30
+  assert.ok("error" in _v1018({ ...base, pct_fines: 101 }));
+  assert.ok("error" in _v1018({ ...base, pct_coarse_passing_no4: -1 }));
+  assert.ok("error" in _v1018({ ...base, d10_mm: Infinity }));
+});

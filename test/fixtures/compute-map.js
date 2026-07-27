@@ -966,6 +966,7 @@ export const COMPUTE_MAP = {
   "concrete-yield": { module: "../../calc-construction.js", fn: "computeConcreteYield" },
   "glass-weight": { module: "../../calc-finish.js", fn: "computeGlassWeight" },
   "fineness-modulus": { module: "../../calc-earthwork.js", fn: "computeFinenessModulus" },
+  "soil-gradation-coefficients": { module: "../../calc-earthwork.js", fn: "computeSoilGradationCoefficients" },
   "water-cement-ratio": { module: "../../calc-construction.js", fn: "computeWaterCementRatio" },
   "load-profitability": { module: "../../calc-trucking.js", fn: "computeLoadProfitability" },
   "fuel-surcharge": { module: "../../calc-trucking.js", fn: "computeFuelSurcharge" },

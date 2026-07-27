@@ -1012,6 +1012,41 @@
       "kind": "question"
     },
     {
+      "term": "uniformity coefficient",
+      "target": "soil-gradation-coefficients",
+      "kind": "industry"
+    },
+    {
+      "term": "coefficient of curvature",
+      "target": "soil-gradation-coefficients",
+      "kind": "industry"
+    },
+    {
+      "term": "well graded vs poorly graded",
+      "target": "soil-gradation-coefficients",
+      "kind": "industry"
+    },
+    {
+      "term": "uscs soil classification",
+      "target": "soil-gradation-coefficients",
+      "kind": "adjacent"
+    },
+    {
+      "term": "hazen permeability",
+      "target": "soil-gradation-coefficients",
+      "kind": "adjacent"
+    },
+    {
+      "term": "is my sand well graded",
+      "target": "soil-gradation-coefficients",
+      "kind": "question"
+    },
+    {
+      "term": "what does cu and cc mean for soil",
+      "target": "soil-gradation-coefficients",
+      "kind": "question"
+    },
+    {
       "term": "cohesive earth pressure",
       "target": "cohesive-earth-pressure",
       "kind": "industry"

@@ -117,6 +117,24 @@
       "justification": "TIA-568 temperature derating tables are published in deg C."
     },
     {
+      "module": "calc-earthwork.js",
+      "match": "D10, effective size (mm)",
+      "family": "product/spec conventions",
+      "justification": "Grain-size and sieve-opening diameters are stated in mm by ASTM D2487 / D6913 and printed in mm on every US geotechnical gradation report; there is no US-customary equivalent in use."
+    },
+    {
+      "module": "calc-earthwork.js",
+      "match": "D30 (mm)",
+      "family": "product/spec conventions",
+      "justification": "Grain-size and sieve-opening diameters are stated in mm by ASTM D2487 / D6913 and printed in mm on every US geotechnical gradation report; there is no US-customary equivalent in use."
+    },
+    {
+      "module": "calc-earthwork.js",
+      "match": "D60 (mm)",
+      "family": "product/spec conventions",
+      "justification": "Grain-size and sieve-opening diameters are stated in mm by ASTM D2487 / D6913 and printed in mm on every US geotechnical gradation report; there is no US-customary equivalent in use."
+    },
+    {
       "module": "calc-lowvoltage.js",
       "match": "Sensor width (mm",
       "family": "product/spec conventions",

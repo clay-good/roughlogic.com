@@ -13827,6 +13827,19 @@ export const CITATIONS = {
       { name: "Saturation", value: "S = w Gs/e; gamma_w = 62.4 pcf fresh water, Gs ~ 2.65-2.72", source: "soil mechanics" },
     ],
   },
+  "soil-gradation-coefficients": {
+    formula: "Cu = D60 / D10; Cc = D30^2 / (D10 x D60); well graded requires Cu >= 4 (gravel) or Cu >= 6 (sand) AND 1 <= Cc <= 3; Hazen k (cm/s) = D10^2 (D10 in mm).",
+    edition: "ASTM D2487 (Unified Soil Classification System) gradation criteria and ASTM D6913 (sieve analysis) by name, with the Hazen (1892) permeability estimate; no ASTM table text reproduced.",
+    freeAccess: "The Cu / Cc definitions, the USCS well-graded thresholds, and the Hazen relation are public and printed in every soil-mechanics text; ASTM D2487 itself is a purchased standard and is cited by name only.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two coefficients read off three points of the grain-size curve. Cu = D60/D10 is the SPREAD of sizes present; Cc = D30^2/(D10 x D60) is the SMOOTHNESS of the curve, which catches a gap-graded soil that Cu alone calls wide. ASTM D2487 requires BOTH to call a clean coarse soil well graded: Cu >= 4 for a gravel or >= 6 for a sand, and Cc between 1 and 3 inclusive. Failing either is poorly graded (GP/SP). This matters because a well-graded material reaches a higher density at lower compactive effort - the fines fill the voids between the coarse grains - while a uniform sand drains freely but will not densify. The fines content governs whether the gradation criteria apply at all: below 5% passing the #200 the gradation symbol controls; 5-12% requires a dual symbol and the Atterberg limits on the fines decide the M (silt) or C (clay) half; above 12% the fines control and the soil is GM/GC/SM/SC regardless of Cu and Cc, so the tile stops claiming a gradation symbol and points at atterberg-indices. The coarse fraction is a gravel when more than half of it is retained on the #4 sieve, a sand otherwise, which changes only the Cu threshold. The Hazen k = D10^2 cm/s estimate is reported with an explicit validity flag rather than silently: it holds for a fairly uniform clean sand (Cu < 5, D10 between 0.1 and 3 mm, under 5% fines) and is an order-of-magnitude figure even inside that range. Three points off the curve, not the full sieve analysis; the laboratory gradation report and the geotechnical engineer of record govern.",
+    assumptions: [
+      { name: "Both criteria required", value: "well graded needs Cu >= 4 (gravel) or >= 6 (sand) AND 1 <= Cc <= 3; a wide range with a gap in the middle fails on Cc and packs no better than a uniform sand", source: "ASTM D2487" },
+      { name: "Fines decide whether gradation controls", value: "< 5% fines the gradation symbol governs; 5-12% takes a dual symbol; > 12% the fines govern and the Atterberg limits decide M vs C", source: "ASTM D2487" },
+      { name: "Hazen is flagged, not silent", value: "k = D10^2 cm/s is reported with an in-range / out-of-range flag (Cu < 5, D10 0.1-3 mm, clean) and is order-of-magnitude even when valid", source: "Hazen 1892" },
+      { name: "Sizes must increase", value: "D10 <= D30 <= D60 comes off one grain-size curve; a decreasing set is a data-entry error and returns an error", source: "scope of this tile" },
+    ],
+  },
   "fineness-modulus": {
     formula: "FM = (cumulative % retained on #4 + #8 + #16 + #30 + #50 + #100) / 100.",
     edition: "Aggregate fineness modulus (ASTM C136 sieve analysis; ASTM C125 definition; ASTM C33 concrete-sand limits), by name; the sieve analysis and the mix design govern.",

@@ -16639,6 +16639,42 @@
    }
   },
   {
+   "tile_id": "soil-gradation-coefficients",
+   "source_publisher": "ASTM D2487 (Unified Soil Classification System) gradation criteria / ASTM D6913 sieve analysis / Hazen 1892",
+   "source_title": "D10 0.15 mm, D30 0.55 mm, D60 1.2 mm, 60% of the coarse fraction passing #4, 3% fines -> Cu 8.0, Cc 1.681, SW",
+   "source_edition_or_year": "Cu = D60/D10; Cc = D30^2/(D10 x D60); sand well graded requires Cu >= 6 and 1 <= Cc <= 3",
+   "source_section_or_page": "Cu = 1.2/0.15 = 8.0 (>= 6 for a sand, OK); Cc = 0.55^2/(0.15 x 1.2) = 0.3025/0.18 = 1.68056 (between 1 and 3, OK); both hold and fines are under 5%, so the symbol is SW (well-graded sand). Hazen k = D10^2 = 0.0225 cm/s but Cu 8.0 exceeds the Cu < 5 uniformity limit, so the estimate is flagged OUT of range",
+   "verified_by": "rl",
+   "verified_on": "2026-07-27",
+   "inputs": {
+    "d10_mm": 0.15,
+    "d30_mm": 0.55,
+    "d60_mm": 1.2,
+    "pct_coarse_passing_no4": 60,
+    "pct_fines": 3
+   },
+   "outputs": {
+    "cu": {
+     "value": 8,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "cc": {
+     "value": 1.68056,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "hazen_k_cm_s": {
+     "value": 0.0225,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cohesive-earth-pressure",
    "source_publisher": "Rankine c-phi active earth pressure / Das, Principles of Foundation Engineering / NAVFAC DM-7.02",
    "source_title": "phi 20 deg, c 300 psf, gamma 115 pcf, H 20 ft, no surcharge -> zc 7.451 ft, cracked thrust 4,439 lb/ft",

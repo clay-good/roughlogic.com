@@ -1869,3 +1869,95 @@ function _v799renderFinenessModulus(inputRegion, outputRegion, citationEl) {
   for (const [key] of defs) fields[key].input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["fineness-modulus"] = _v799renderFinenessModulus;
+
+// ===================== spec-v1018: soil gradation coefficients Cu / Cc (ASTM D2487) =====================
+// The coarse-fraction half of USCS that atterberg-indices names as its own gap
+// ("the full USCS also needs the fines content and gradation for a coarse or
+// dual classification ... it does not compute the coarse-fraction sieve
+// classification"), and the gradation SHAPE that fineness-modulus says its
+// single number cannot see ("two very different gradations can share an FM").
+// Cu is the spread of the curve, Cc its smoothness; together they separate a
+// well-graded soil (packs and compacts) from a uniform one (does not).
+
+// dims: in { d10_mm: L, d30_mm: L, d60_mm: L, pct_coarse_passing_no4: dimensionless, pct_fines: dimensionless } out: { cu: dimensionless, cc: dimensionless, hazen_k_cm_s: L T^-1 }
+export function computeSoilGradationCoefficients({ d10_mm = 0, d30_mm = 0, d60_mm = 0, pct_coarse_passing_no4 = 60, pct_fines = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(d10_mm > 0)) return { error: "D10 (effective size) must be positive (mm)." };
+  if (!(d30_mm > 0)) return { error: "D30 must be positive (mm)." };
+  if (!(d60_mm > 0)) return { error: "D60 must be positive (mm)." };
+  if (!(d30_mm >= d10_mm)) return { error: "D30 must be at least D10 (the sizes come off one grain-size curve and must increase)." };
+  if (!(d60_mm >= d30_mm)) return { error: "D60 must be at least D30 (the sizes come off one grain-size curve and must increase)." };
+  if (pct_coarse_passing_no4 < 0 || pct_coarse_passing_no4 > 100) return { error: "Percent of the coarse fraction passing the #4 sieve must be between 0 and 100." };
+  if (pct_fines < 0 || pct_fines > 100) return { error: "Percent fines (passing #200) must be between 0 and 100." };
+  const cu = d60_mm / d10_mm;
+  const cc = (d30_mm * d30_mm) / (d10_mm * d60_mm);
+  // USCS coarse fraction: more than half of it retained on the #4 is a gravel.
+  const is_gravel = pct_coarse_passing_no4 <= 50;
+  const coarse_type = is_gravel ? "gravel" : "sand";
+  // ASTM D2487 well-graded criteria: Cu >= 4 (gravel) or >= 6 (sand), AND Cc
+  // between 1 and 3 inclusive. Both must hold; failing either is poorly graded.
+  const cu_threshold = is_gravel ? 4 : 6;
+  const cu_ok = cu >= cu_threshold;
+  const cc_ok = cc >= 1 && cc <= 3;
+  const well_graded = cu_ok && cc_ok;
+  // The fines content decides whether the gradation criteria control at all.
+  let fines_class, uscs_symbol;
+  if (pct_fines < 5) {
+    fines_class = "clean (< 5% fines): the gradation criteria control";
+    uscs_symbol = (is_gravel ? "G" : "S") + (well_graded ? "W" : "P");
+  } else if (pct_fines <= 12) {
+    fines_class = "borderline (5-12% fines): a DUAL symbol is required";
+    uscs_symbol = (is_gravel ? "G" : "S") + (well_graded ? "W" : "P") + "-" + (is_gravel ? "G" : "S") + "M or " + (is_gravel ? "G" : "S") + "C (the Atterberg limits on the fines decide M vs C)";
+  } else {
+    fines_class = "> 12% fines: the FINES govern, not the gradation";
+    uscs_symbol = (is_gravel ? "G" : "S") + "M or " + (is_gravel ? "G" : "S") + "C (run atterberg-indices on the fines)";
+  }
+  // Hazen (1892) permeability estimate, k (cm/s) = C x D10^2 with D10 in mm and
+  // C ~ 1.0. Valid only for a fairly uniform clean sand: Cu < 5 and D10 between
+  // 0.1 and 3 mm. Reported with the range check, never silently.
+  const hazen_k_cm_s = d10_mm * d10_mm;
+  const hazen_valid = cu < 5 && d10_mm >= 0.1 && d10_mm <= 3 && pct_fines < 5;
+  return {
+    cu, cc, coarse_type, cu_threshold, cu_ok, cc_ok, well_graded, fines_class, uscs_symbol,
+    hazen_k_cm_s, hazen_valid,
+    note: "Gradation coefficients from three points on the grain-size curve (ASTM D2487 / D6913): the uniformity coefficient Cu = D60/D10 measures how wide a range of sizes is present, and the coefficient of curvature Cc = D30^2 / (D10 x D60) measures whether the curve is smooth or has a gap in the middle. A well-graded soil needs BOTH -- Cu >= 4 for a gravel or >= 6 for a sand, and Cc between 1 and 3 -- because a wide range with a gap in it packs no better than a uniform sand. Well-graded material compacts to a higher density at lower effort and makes better fill, base, and concrete aggregate; a uniform (poorly-graded) sand drains well but will not densify. The fines content decides whether any of this controls: under 5% the gradation symbol governs, 5-12% takes a dual symbol, and over 12% the fines govern instead and the Atterberg limits (atterberg-indices) decide M versus C. The Hazen k = D10^2 cm/s permeability estimate is shown only with its validity flag -- it holds for a fairly uniform clean sand (Cu < 5, D10 0.1-3 mm, under 5% fines) and is an order-of-magnitude figure even then. Three curve points, not the full sieve analysis; the laboratory gradation report and the geotechnical engineer govern.",
+  };
+}
+
+export const soilGradationCoefficientsExample = { inputs: { d10_mm: 0.15, d30_mm: 0.55, d60_mm: 1.2, pct_coarse_passing_no4: 60, pct_fines: 3 } };
+
+function _v1018renderSoilGradationCoefficients(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASTM D2487 (Unified Soil Classification System) gradation criteria and ASTM D6913 sieve analysis, by name: Cu = D60/D10, Cc = D30^2/(D10 x D60); well graded requires Cu >= 4 (gravel) or >= 6 (sand) AND 1 <= Cc <= 3. Fines under 5% let the gradation symbol govern, 5-12% takes a dual symbol, over 12% the fines govern (see atterberg-indices). The Hazen (1892) k = D10^2 cm/s estimate is shown with its validity range (Cu < 5, D10 0.1-3 mm, clean). Three curve points, not the full sieve analysis; the laboratory gradation report and the geotechnical engineer govern.";
+  const d10 = makeNumber("D10, effective size (mm)", "sgc-d10", { step: "any", min: "0" });
+  const d30 = makeNumber("D30 (mm)", "sgc-d30", { step: "any", min: "0" });
+  const d60 = makeNumber("D60 (mm)", "sgc-d60", { step: "any", min: "0" });
+  const p4 = makeNumber("Coarse fraction passing the #4 sieve (%, <= 50 = gravel)", "sgc-p4", { step: "any", min: "0", max: "100", value: "60" });
+  const pf = makeNumber("Fines passing the #200 sieve (%)", "sgc-pf", { step: "any", min: "0", max: "100", value: "0" });
+  p4.input.value = "60"; pf.input.value = "0";
+  for (const f of [d10, d30, d60, p4, pf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { d10.input.value = "0.15"; d30.input.value = "0.55"; d60.input.value = "1.2"; p4.input.value = "60"; pf.input.value = "3"; update(); });
+  const oCu = makeOutputLine(outputRegion, "Uniformity coefficient Cu = D60/D10", "sgc-out-cu");
+  const oCc = makeOutputLine(outputRegion, "Coefficient of curvature Cc", "sgc-out-cc");
+  const oGrade = makeOutputLine(outputRegion, "Gradation", "sgc-out-grade");
+  const oSym = makeOutputLine(outputRegion, "USCS symbol", "sgc-out-sym");
+  const oK = makeOutputLine(outputRegion, "Hazen permeability estimate", "sgc-out-k");
+  const oNote = makeOutputLine(outputRegion, "Note", "sgc-out-note");
+  const update = debounce(() => {
+    const r = computeSoilGradationCoefficients({
+      d10_mm: Number(d10.input.value) || 0,
+      d30_mm: Number(d30.input.value) || 0,
+      d60_mm: Number(d60.input.value) || 0,
+      pct_coarse_passing_no4: Number(p4.input.value) || 0,
+      pct_fines: Number(pf.input.value) || 0,
+    });
+    if (r.error) { for (const o of [oCu, oCc, oGrade, oSym, oK, oNote]) o.textContent = "-"; oCu.textContent = r.error; return; }
+    oCu.textContent = fmt(r.cu, 2) + " (well-graded " + r.coarse_type + " needs >= " + r.cu_threshold + ")" + (r.cu_ok ? " OK" : " FAILS");
+    oCc.textContent = fmt(r.cc, 2) + " (needs 1 to 3)" + (r.cc_ok ? " OK" : " FAILS");
+    oGrade.textContent = (r.well_graded ? "WELL graded " : "POORLY graded ") + r.coarse_type + " -- " + r.fines_class;
+    oSym.textContent = r.uscs_symbol;
+    oK.textContent = r.hazen_valid ? fmt(r.hazen_k_cm_s, 4) + " cm/s (Hazen, within its validity range)" : fmt(r.hazen_k_cm_s, 4) + " cm/s (OUT of Hazen's range -- needs Cu < 5, D10 0.1-3 mm, under 5% fines; do not use)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [d10, d30, d60, p4, pf]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["soil-gradation-coefficients"] = _v1018renderSoilGradationCoefficients;
