@@ -1627,6 +1627,7 @@ cross-check.
 | calc-construction.js | `computeFenceEstimate` | `{ length_ft = 0, post_spacing_ft = 8, rails_per_section = 2, picket_width_in ...` | _ | _ | _ |
 | calc-construction.js | `computeFilletWeldStrength` | `{ mode = "capacity-from-size", leg_in = 0, length_in = 0, electrode = "E70", ...` | _ | _ | _ |
 | calc-construction.js | `computeFootingArea` | `{ column_load_lb, soil_class, applied_moment_lbft = 0 }` | _ | _ | _ |
+| calc-construction.js | `computeFormworkMemberSpacing` | `{ pressure_psf = 0, tributary_in = 12, width_b_in = 1.5, depth_d_in = 3.5, fb...` | _ | _ | _ |
 | calc-construction.js | `computeFormworkPressure` | `{ pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", un...` | _ | _ | _ |
 | calc-construction.js | `computeFormworkTieLoad` | `{ lateral_pressure_psf = 600, h_spacing_ft = 2, v_spacing_ft = 2, tie_swl_lb ...` | _ | _ | _ |
 | calc-construction.js | `computeFoundationWaterproofingTakeoff` | `{ perimeter_ft = 150, below_grade_height_ft = 8, coverage_sf_per_gal = 50, wa...` | _ | _ | _ |
@@ -3147,7 +3148,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1733.
+Row count: 1734.
 
 <!-- END function-corpus-v14 -->
 
@@ -3759,7 +3760,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (387 tiles)
+### Group E Construction (388 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3892,6 +3893,7 @@ per spec-v14 §13.1 second paragraph.
 | `flooring-takeoff` | Resilient / LVP Flooring Takeoff | Published flooring waste rules of thu...; spec-v95 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `footing-area` | Footing Area for Soil Bearing | Project (first-principles); ASCE 7 / IRC R401 conceptual basis; bundled allowable bea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `footing-eccentric-pressure` | Eccentric Footing Bearing Pressure and Kern Check | Eccentric footing bearing pressure (k...; spec-v309 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `formwork-member-spacing` | Formwork Stud / Wale Maximum Spacing | ACI 347 formwork practice; 600 psf x 12-in tributary = 50 lb/in; S 3.0625 in^3, I 5.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `formwork-pressure` | Formwork Pressure | ACI 347 Guide to Formwork for Concrete; Pour 5 ft/hr / 70 F / normal-weight 150 pcf / 12 ft wall ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `formwork-tie-load` | Formwork Tie Load and Spacing | Formwork tie-load identity (first-pri...; tie load = 600*2*2 = 2,400 lb; util = 2400/3000 = 0.80 (p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `foundation-waterproofing-takeoff` | Foundation Waterproofing / Dampproofing Takeoff | Foundation waterproofing/dampproofing...; area = 150*8 = 1200; gal = ceil(1200*1.10/50) = ceil(26.4... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4819,6 +4821,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1486. Fixture-covered or reference-cadence: 1486 / 1486.
+Tile count: 1487. Fixture-covered or reference-cadence: 1487 / 1487.
 
 <!-- END tile-index-v14 -->

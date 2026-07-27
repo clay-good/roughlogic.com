@@ -4,6 +4,28 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): formwork-member-spacing, the check that says shear governs; 2026-07-27
+
+A self-declared gap: `formwork-tie-load`'s own note says "Wales and studs are sized separately," and a grep
+for `wale` returns nothing else in the repo. `formwork-pressure` gives the load and `shore-post-load`
+handles the vertical side; the member between the sheathing and the ties had no check. Adds one tile to
+`calc-construction.js` (Group E), cross-linked with the tie sibling.
+
+`formwork-member-spacing` treats the member as a continuous beam over three or more equal spans and inverts
+all three limits for the span, taking the smallest. **The coefficients look like formwork folklore and are
+not**: on three or more equal spans the interior-support moment is exactly wL^2/10, the reaction there is
+exactly 0.6wL, and the end-span deflection is 0.0069 wL^4/EI, whose reciprocal is the familiar 145. The
+spec records the derivation so anyone can check them against a continuous-beam table.
+
+The pinned example is chosen to make the point: a 2x4 under 600 psf allows 24.7 in by bending and 41.0 by
+deflection but only **21.0 by shear**. Sizing by bending alone over-spans the form by 18%. The cross-check
+fixture pins that going to a 2x10 does not escape it either -- still shear at 55.5 in.
+
+Fuzzer inverts each span through its own governing equation independently (the bending span reproduces
+Fb x S exactly, the shear span reproduces the capacity, the deflection span lands exactly on L/360), covers
+all three governing modes, and pins that pressure and tributary width enter only as their product. Catalog
+1,486 -> 1,487. Spec: spec-v1103.
+
 ### feat(construction): advance-warning-sign-spacing, and a table the charter actually permits reproducing; 2026-07-27
 
 `traffic-taper-length` computes the taper and nothing placed the signs warning drivers it is coming. Zero

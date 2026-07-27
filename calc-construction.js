@@ -10452,3 +10452,71 @@ CONSTRUCTION_RENDERERS["advance-warning-sign-spacing"] = _simpleRenderer({
   ],
   compute: computeAdvanceWarningSignSpacing,
 });
+
+// --- spec-v1103 E: Formwork stud / wale maximum spacing ---
+// formwork-tie-load's own note says "wales and studs are sized separately." This is that check.
+// A form member is a continuous beam over three or more supports, and the three governing
+// coefficients are EXACT results for that case, not formwork-specific constants:
+//   bending    M = w L^2 / 10        (interior-support moment, 3 equal spans)
+//   shear      V = 0.6 w L           (reaction at the first interior support)
+//   deflection D = w L^4 / (145 EI)  (end-span max, 0.0069 wL^4/EI -> 1/0.0069 = 144.9)
+// Each is inverted for the span, and the smallest governs.
+// dims: in { pressure_psf: M L^-1 T^-2, tributary_in: L, width_b_in: L, depth_d_in: L, fb_psi: M L^-1 T^-2, fv_psi: M L^-1 T^-2, e_psi: M L^-1 T^-2, deflection_denominator: dimensionless } out: { span_bending_in: L, span_shear_in: L, span_deflection_in: L, max_spacing_in: L }
+export function computeFormworkMemberSpacing({ pressure_psf = 0, tributary_in = 12, width_b_in = 1.5, depth_d_in = 3.5, fb_psi = 1000, fv_psi = 180, e_psi = 1600000, deflection_denominator = 360 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const p = Number(pressure_psf) || 0;
+  const trib = Number(tributary_in) || 0;
+  const b = Number(width_b_in) || 0;
+  const d = Number(depth_d_in) || 0;
+  const Fb = Number(fb_psi) || 0;
+  const Fv = Number(fv_psi) || 0;
+  const E = Number(e_psi) || 0;
+  const k = Number(deflection_denominator) || 0;
+  if (!(p > 0)) return { error: "Form pressure must be positive (psf) - chain it from formwork-pressure." };
+  if (!(trib > 0)) return { error: "Tributary width must be positive (in) - the spacing of the members this one supports." };
+  if (!(b > 0)) return { error: "Member width b must be positive (in) - the dressed dimension, not nominal." };
+  if (!(d > 0)) return { error: "Member depth d must be positive (in) - the dressed dimension, not nominal." };
+  if (!(Fb > 0)) return { error: "Allowable bending stress Fb must be positive (psi), adjusted for the short-load-duration factor." };
+  if (!(Fv > 0)) return { error: "Allowable shear stress Fv must be positive (psi)." };
+  if (!(E > 0)) return { error: "Modulus of elasticity E must be positive (psi)." };
+  if (!(k > 0)) return { error: "Deflection denominator must be positive (360 means L/360)." };
+  const w_lb_per_in = p * trib / 144;
+  const section_modulus_in3 = b * d * d / 6;
+  const moment_inertia_in4 = b * Math.pow(d, 3) / 12;
+  const area_in2 = b * d;
+  const span_bending_in = Math.sqrt(10 * Fb * section_modulus_in3 / w_lb_per_in);
+  const shear_capacity_lb = (2 / 3) * Fv * area_in2;
+  const span_shear_in = shear_capacity_lb / (0.6 * w_lb_per_in);
+  const span_deflection_in = Math.cbrt(145 * E * moment_inertia_in4 / (w_lb_per_in * k));
+  const max_spacing_in = Math.min(span_bending_in, span_shear_in, span_deflection_in);
+  const governing = max_spacing_in === span_shear_in ? "shear" : max_spacing_in === span_bending_in ? "bending" : "deflection";
+  if (![span_bending_in, span_shear_in, span_deflection_in, max_spacing_in].every(Number.isFinite)) return { error: "Formwork-spacing math did not produce a finite value." };
+  return {
+    w_lb_per_in, w_plf: w_lb_per_in * 12, section_modulus_in3, moment_inertia_in4, area_in2,
+    shear_capacity_lb, span_bending_in, span_shear_in, span_deflection_in, max_spacing_in, governing,
+    note: "The support spacing this member can carry, governed here by " + governing + " at " + max_spacing_in.toFixed(1) + " in. All three coefficients are exact continuous-beam results for three or more equal spans, not formwork fudge factors: the interior-support moment is wL^2/10, the reaction there is 0.6wL, and the end-span deflection is 0.0069 wL^4/EI, whose reciprocal is the familiar 145. SHEAR usually governs short, deep formwork members, which surprises people who size everything by bending. Use DRESSED dimensions (a 2x4 is 1.5 x 3.5) and allowable stresses already adjusted for the short load duration formwork enjoys - unadjusted table values will under-report the spacing. The load here is the form pressure times the tributary width, so for studs that is the sheathing span and for wales it is the stud spacing; chain the pressure from formwork-pressure and check the ties with formwork-tie-load. Two or fewer spans are NOT this case and carry higher moments. ACI 347 and the engineer of record govern - formwork failure is a collapse, not a redo.",
+  };
+}
+export const formworkMemberSpacingExample = { inputs: { pressure_psf: 600, tributary_in: 12, width_b_in: 1.5, depth_d_in: 3.5, fb_psi: 1000, fv_psi: 180, e_psi: 1600000, deflection_denominator: 360 } };
+CONSTRUCTION_RENDERERS["formwork-member-spacing"] = _simpleRenderer({
+  citation: "Citation: formwork members analyzed as continuous beams over three or more equal spans, the standard ACI 347 formwork-design approach. The three coefficients are exact results for that case: maximum moment wL^2/10 at an interior support, maximum shear 0.6wL at the first interior reaction, and maximum end-span deflection wL^4/(145 EI) (0.0069 wL^4/EI). Each is inverted for the span - L = sqrt(10 Fb S / w), L = (2/3 Fv b d)/(0.6 w), L = cbrt(145 E I/(w x denominator)) - and the smallest governs. Use dressed dimensions and allowable stresses adjusted for short load duration. Two or fewer spans are a different case with higher moments. ACI 347 and the engineer of record govern.",
+  example: formworkMemberSpacingExample.inputs,
+  fields: [
+    { key: "pressure_psf", label: "Form pressure (psf)", kind: "number" },
+    { key: "tributary_in", label: "Tributary width (in, spacing of what it supports)", kind: "number", default: 12 },
+    { key: "width_b_in", label: "Member width b (in, dressed)", kind: "number", default: 1.5 },
+    { key: "depth_d_in", label: "Member depth d (in, dressed)", kind: "number", default: 3.5 },
+    { key: "fb_psi", label: "Allowable bending Fb (psi, duration-adjusted)", kind: "number", default: 1000 },
+    { key: "fv_psi", label: "Allowable shear Fv (psi)", kind: "number", default: 180 },
+    { key: "e_psi", label: "Modulus E (psi)", kind: "number", default: 1600000 },
+    { key: "deflection_denominator", label: "Deflection limit denominator (360 = L/360)", kind: "number", default: 360 },
+  ],
+  outputs: [
+    { key: "w", id: "fms-out-w", label: "Line load on the member", value: (r) => fmt(r.w_plf, 0) + " lb/ft (" + fmt(r.w_lb_per_in, 2) + " lb/in)" },
+    { key: "sp", id: "fms-out-sp", label: "Max spacing (governing)", value: (r) => fmt(r.max_spacing_in, 1) + " in by " + r.governing },
+    { key: "three", id: "fms-out-three", label: "By bending / shear / deflection", value: (r) => fmt(r.span_bending_in, 1) + " / " + fmt(r.span_shear_in, 1) + " / " + fmt(r.span_deflection_in, 1) + " in" },
+    { key: "sec", id: "fms-out-sec", label: "Section S / I", value: (r) => fmt(r.section_modulus_in3, 3) + " in^3 / " + fmt(r.moment_inertia_in4, 3) + " in^4" },
+    { key: "n", id: "fms-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFormworkMemberSpacing,
+});

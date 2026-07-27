@@ -30464,3 +30464,51 @@ test("bounds: spec-v1102 computeAdvanceWarningSignSpacing pins all four MUTCD Ta
   assert.ok("error" in _v1102({ road_type: "rural", sign_count: 3, speed_mph: -1 }));
   assert.ok("error" in _v1102({ road_type: "rural", sign_count: Infinity }));
 });
+
+import { computeFormworkMemberSpacing as _v1103 } from "../../calc-construction.js";
+
+test("bounds: spec-v1103 computeFormworkMemberSpacing pins the worked example, inverts all three span formulas independently, covers every governing mode, and error seams", () => {
+  const base = { pressure_psf: 600, tributary_in: 12, width_b_in: 1.5, depth_d_in: 3.5, fb_psi: 1000, fv_psi: 180, e_psi: 1600000, deflection_denominator: 360 };
+  const r = _v1103(base);
+  assert.ok(Math.abs(r.w_lb_per_in - 50) < 1e-9);
+  assert.ok(Math.abs(r.section_modulus_in3 - 1.5 * 3.5 * 3.5 / 6) < 1e-12);
+  assert.ok(Math.abs(r.moment_inertia_in4 - 1.5 * Math.pow(3.5, 3) / 12) < 1e-12);
+  assert.ok(Math.abs(r.span_bending_in - 24.748737) < 1e-5);
+  assert.ok(Math.abs(r.span_shear_in - 21) < 1e-9);
+  assert.ok(Math.abs(r.span_deflection_in - 41.030755) < 1e-4);
+  assert.ok(r.max_spacing_in === r.span_shear_in && r.governing === "shear");
+  // INVERSION PINS: feed each returned span back through its own governing equation.
+  {
+    const w = r.w_lb_per_in;
+    // Bending: M = w L^2 / 10 must equal Fb x S at the bending span.
+    assert.ok(Math.abs(w * Math.pow(r.span_bending_in, 2) / 10 - 1000 * r.section_modulus_in3) < 1e-6);
+    // Shear: V = 0.6 w L must equal the (2/3) Fv A capacity at the shear span.
+    assert.ok(Math.abs(0.6 * w * r.span_shear_in - r.shear_capacity_lb) < 1e-9);
+    // Deflection: w L^4 / (145 E I) must equal L/360 at the deflection span.
+    const L = r.span_deflection_in;
+    assert.ok(Math.abs(w * Math.pow(L, 4) / (145 * 1600000 * r.moment_inertia_in4) - L / 360) < 1e-9);
+  }
+  // A deeper member does NOT escape shear control - the tile's point.
+  const deep = _v1103({ ...base, depth_d_in: 9.25 });
+  assert.ok(deep.governing === "shear" && Math.abs(deep.span_shear_in - 55.5) < 1e-9);
+  assert.ok(deep.span_bending_in > deep.span_shear_in && deep.span_deflection_in > deep.span_shear_in);
+  // But a tight deflection limit does take control.
+  const tight = _v1103({ ...base, deflection_denominator: 3000 });
+  assert.ok(tight.governing === "deflection" && tight.span_deflection_in < tight.span_shear_in);
+  // And a weak-in-bending member is bending-governed.
+  const weak = _v1103({ ...base, fb_psi: 300 });
+  assert.ok(weak.governing === "bending" && weak.span_bending_in < weak.span_shear_in);
+  // Scaling: the bending span goes as 1/sqrt(w); the shear span as 1/w exactly.
+  const heavy = _v1103({ ...base, pressure_psf: 2400 });
+  assert.ok(Math.abs(heavy.w_lb_per_in - 4 * r.w_lb_per_in) < 1e-9);
+  assert.ok(Math.abs(heavy.span_bending_in * 2 - r.span_bending_in) < 1e-6);
+  assert.ok(Math.abs(heavy.span_shear_in * 4 - r.span_shear_in) < 1e-9);
+  // Tributary width and pressure enter only as their product.
+  const swapped = _v1103({ ...base, pressure_psf: 300, tributary_in: 24 });
+  assert.ok(Math.abs(swapped.max_spacing_in - r.max_spacing_in) < 1e-9);
+  // Error seams.
+  for (const k of ["pressure_psf", "tributary_in", "width_b_in", "depth_d_in", "fb_psi", "fv_psi", "e_psi", "deflection_denominator"]) {
+    assert.ok("error" in _v1103({ ...base, [k]: 0 }), "expected error for zero " + k);
+  }
+  assert.ok("error" in _v1103({ ...base, pressure_psf: Infinity }));
+});

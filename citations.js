@@ -15192,6 +15192,18 @@ export const CITATIONS = {
       { name: "Rural placement guidance", value: "first warning sign 8 to 12 times the speed limit in mph; area 1,500 ft or more on open highway", source: "MUTCD 6C.04" },
     ],
   },
+  "formwork-member-spacing": {
+    formula: "w = pressure x tributary / 144; bending L = sqrt(10 Fb S / w); shear L = (2/3 Fv b d)/(0.6 w); deflection L = cbrt(145 E I/(w x denominator)); the smallest governs.",
+    edition: "Formwork members analyzed as continuous beams over three or more equal spans, the standard ACI 347 formwork-design approach, by name.",
+    freeAccess: "The continuous-beam results are public structural mechanics; ACI 347 is available through ACI and its approach is reproduced in free formwork design guides.",
+    governance: GOVERNANCE.general,
+    editionNote: "The three coefficients are EXACT continuous-beam results for three or more equal spans, not formwork fudge factors: the interior-support moment is w L^2/10, the reaction there is 0.6 w L, and the end-span deflection is 0.0069 w L^4/EI, whose reciprocal is the familiar 145. SHEAR usually governs short, deep formwork members - the pinned 2x4 allows 24.7 in by bending and 41.0 by deflection but only 21.0 by shear - so sizing by bending alone over-spans the form. Use DRESSED dimensions (a 2x4 is 1.5 x 3.5) and allowable stresses already adjusted for the short load duration formwork enjoys; unadjusted table values under-report the spacing. The load is the form pressure times the tributary width: for studs that is the sheathing span, for wales the stud spacing. Two or fewer spans are a different case with higher moments. Bearing at supports, lateral bracing, and the ties are separate checks. ACI 347 and the engineer of record govern - a formwork failure is a collapse, not a redo.",
+    assumptions: [
+      { name: "Three or more spans", value: "continuous-beam coefficients wL^2/10, 0.6wL, and wL^4/145EI apply to that case only", source: "continuous-beam analysis / ACI 347 practice" },
+      { name: "Dressed and adjusted", value: "dimensions dressed, Fb and Fv already adjusted for short load duration", source: "user input, stated in the field labels" },
+      { name: "Shear governs short members", value: "the check most often skipped and most often controlling", source: "worked example in the tile" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

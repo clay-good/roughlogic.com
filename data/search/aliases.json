@@ -91067,6 +91067,36 @@
       "kind": "question"
     },
     {
+      "term": "formwork stud spacing",
+      "target": "formwork-member-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "wale spacing",
+      "target": "formwork-member-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "how far apart can form studs be",
+      "target": "formwork-member-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "form member span bending shear deflection",
+      "target": "formwork-member-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "wl2 over 10 formwork",
+      "target": "formwork-member-spacing",
+      "kind": "redirect"
+    },
+    {
+      "term": "sizing walers for a concrete wall form",
+      "target": "formwork-member-spacing",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"
