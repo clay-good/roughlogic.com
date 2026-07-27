@@ -30609,3 +30609,50 @@ test("bounds: spec-v1105 computeFanSheaveForTargetCfm pins the motor-overload ex
   assert.ok("error" in _v1105({ ...base, current_bhp: -1 }));
   assert.ok("error" in _v1105({ ...base, current_cfm: Infinity }));
 });
+
+import { computeCabinetLinearFeet as _v1106 } from "../../calc-finish.js";
+
+test("bounds: spec-v1106 computeCabinetLinearFeet pins the corner-loss rule, the countertop difference, the no-corner identity, count rounding, additivity, and error seams", () => {
+  const base = { base_wall_ft: 22, wall_cab_ft: 16, tall_ft: 3, appliance_openings_ft: 5, corners: 2, cabinet_depth_in: 24, filler_per_corner_in: 3, standard_width_in: 24, toe_kick_height_in: 4 };
+  const r = _v1106(base);
+  assert.ok(r.base_lf === 13 && r.corner_loss_ft === 4);
+  assert.ok(Math.abs(r.filler_ft - 0.5) < 1e-12);
+  assert.ok(r.total_lf === 32 && r.base_cabinets === 7 && r.wall_cabinets === 8);
+  assert.ok(r.countertop_lf === 17 && Math.abs(r.toe_kick_sf - 16 * 4 / 12) < 1e-9);
+  // THE CORNER RULE: one cabinet DEPTH per corner, off one leg only.
+  for (const [n, depth] of [[0, 24], [1, 24], [2, 24], [3, 21], [2, 12]]) {
+    const t = _v1106({ ...base, corners: n, cabinet_depth_in: depth });
+    assert.ok(Math.abs(t.corner_loss_ft - n * depth / 12) < 1e-12);
+    assert.ok(Math.abs(t.base_lf - (22 - 5 - n * depth / 12)) < 1e-12);
+  }
+  // The countertop runs the full corner, so it always exceeds the cabinet LF by exactly the corner loss.
+  for (const n of [0, 1, 2, 3]) {
+    const t = _v1106({ ...base, corners: n });
+    assert.ok(Math.abs(t.countertop_lf - (t.base_lf + t.corner_loss_ft)) < 1e-12);
+  }
+  // No corners: nothing is lost and the top equals the run.
+  const galley = _v1106({ base_wall_ft: 12, wall_cab_ft: 0, tall_ft: 0, appliance_openings_ft: 0, corners: 0 });
+  assert.ok(galley.base_lf === 12 && galley.corner_loss_ft === 0 && galley.filler_ft === 0);
+  assert.ok(galley.countertop_lf === 12 && galley.base_cabinets === 6);
+  // Counts round UP - a 13 ft run at 24 in is 6.5 boxes, so 7.
+  assert.ok(r.base_cabinets === Math.ceil(13 * 12 / 24));
+  assert.ok(_v1106({ ...base, standard_width_in: 36 }).base_cabinets === Math.ceil(13 * 12 / 36));
+  // Total is exactly the sum of the three runs.
+  assert.ok(Math.abs(r.total_lf - (r.base_lf + r.wall_lf + r.tall_lf)) < 1e-12);
+  // Wall and tall runs pass through untouched by corners and appliances.
+  const moreCorners = _v1106({ ...base, corners: 3 });
+  assert.ok(moreCorners.wall_lf === r.wall_lf && moreCorners.tall_lf === r.tall_lf);
+  // Toe kick covers base and tall but not wall cabinets.
+  assert.ok(Math.abs(r.toe_kick_lf - (r.base_lf + r.tall_lf)) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v1106({ base_wall_ft: 0, wall_cab_ft: 0, tall_ft: 0 }));
+  assert.ok("error" in _v1106({ ...base, base_wall_ft: -1 }));
+  assert.ok("error" in _v1106({ ...base, corners: 1.5 }));
+  assert.ok("error" in _v1106({ ...base, corners: -1 }));
+  assert.ok("error" in _v1106({ ...base, cabinet_depth_in: 0 }));
+  assert.ok("error" in _v1106({ ...base, standard_width_in: 0 }));
+  assert.ok("error" in _v1106({ ...base, filler_per_corner_in: -1 }));
+  // Openings plus corners consuming the whole base run is caught, not silently zeroed.
+  assert.ok("error" in _v1106({ ...base, appliance_openings_ft: 18 }));
+  assert.ok("error" in _v1106({ ...base, base_wall_ft: Infinity }));
+});

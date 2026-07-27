@@ -769,3 +769,73 @@ FINISH_RENDERERS["countertop-overhang-support"] = _simpleRenderer({
   ],
   compute: computeCountertopOverhangSupport,
 });
+
+// --- spec-v1106 E: Kitchen cabinet linear-foot takeoff ---
+// Cabinets are quoted by LINEAR FOOT of run, but the run a shop bills is not the wall length:
+// corners consume depth from one leg, appliance openings come OUT, and fillers go IN. Base, wall,
+// and tall runs are priced separately because their per-foot cost differs. Counts are reported in
+// both linear feet and standard-width cabinet equivalents.
+// dims: in { base_wall_ft: L, wall_cab_ft: L, tall_ft: L, appliance_openings_ft: L, corners: dimensionless, cabinet_depth_in: L, filler_per_corner_in: L, standard_width_in: L, toe_kick_height_in: L } out: { base_lf: L, wall_lf: L, tall_lf: L, total_lf: L, base_cabinets: dimensionless }
+export function computeCabinetLinearFeet({ base_wall_ft = 0, wall_cab_ft = 0, tall_ft = 0, appliance_openings_ft = 0, corners = 0, cabinet_depth_in = 24, filler_per_corner_in = 3, standard_width_in = 24, toe_kick_height_in = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const baseRun = Number(base_wall_ft) || 0;
+  const wallRun = Number(wall_cab_ft) || 0;
+  const tallRun = Number(tall_ft) || 0;
+  const appl = Number(appliance_openings_ft) || 0;
+  const nCorner = Number(corners) || 0;
+  const depth = Number(cabinet_depth_in) || 0;
+  const filler = Number(filler_per_corner_in);
+  const stdW = Number(standard_width_in) || 0;
+  const toe = Number(toe_kick_height_in);
+  if (baseRun < 0 || wallRun < 0 || tallRun < 0 || appl < 0) return { error: "Run lengths cannot be negative (ft)." };
+  if (baseRun === 0 && wallRun === 0 && tallRun === 0) return { error: "Enter at least one run length (base, wall, or tall)." };
+  if (!Number.isInteger(nCorner) || nCorner < 0) return { error: "Corner count must be a whole number (0 or more)." };
+  if (!(depth > 0)) return { error: "Cabinet depth must be positive (in)." };
+  if (!Number.isFinite(filler) || filler < 0) return { error: "Filler per corner cannot be negative (in)." };
+  if (!(stdW > 0)) return { error: "Standard cabinet width must be positive (in)." };
+  if (!Number.isFinite(toe) || toe < 0) return { error: "Toe-kick height cannot be negative (in)." };
+  const corner_loss_ft = nCorner * depth / 12;
+  const filler_ft = nCorner * filler / 12;
+  const base_lf = Math.max(0, baseRun - appl - corner_loss_ft);
+  if (base_lf === 0 && baseRun > 0) return { error: "Appliance openings and corner returns consume the entire base run - check the inputs." };
+  const wall_lf = wallRun;
+  const tall_lf = tallRun;
+  const total_lf = base_lf + wall_lf + tall_lf;
+  const base_cabinets = Math.ceil(base_lf * 12 / stdW);
+  const wall_cabinets = Math.ceil(wall_lf * 12 / stdW);
+  const tall_cabinets = Math.ceil(tall_lf * 12 / stdW);
+  const countertop_lf = base_lf + corner_loss_ft;
+  const toe_kick_lf = base_lf + tall_lf;
+  const toe_kick_sf = toe_kick_lf * toe / 12;
+  if (![base_lf, total_lf, base_cabinets, countertop_lf].every(Number.isFinite)) return { error: "Cabinet-takeoff math did not produce a finite value." };
+  return {
+    base_lf, wall_lf, tall_lf, total_lf, corner_loss_ft, filler_ft,
+    base_cabinets, wall_cabinets, tall_cabinets, countertop_lf, toe_kick_lf, toe_kick_sf,
+    note: "Cabinets are quoted by the linear foot of RUN, and the run a shop bills is not the wall length. Each inside corner eats one cabinet DEPTH off one of its two legs - " + corner_loss_ft.toFixed(2) + " ft here - because the two runs cannot both occupy the corner; that is why an L-kitchen measured wall-to-wall always over-counts. Appliance openings come OUT of the base run and fillers go IN, and fillers are the piece that saves a job: " + filler_ft.toFixed(2) + " ft of filler absorbs out-of-square walls and gives door and drawer clearance at corners and end walls, so order it even when the arithmetic closes. Base, wall, and tall are kept separate because they price differently per foot. Cabinet counts assume every box is the standard width entered; a real elevation mixes widths, so treat the count as a check on the linear feet, not as an order. Countertop runs the full corner (unlike the cabinets), so it is reported with the corner length added back. The shop drawing and the manufacturer's nominal sizes govern.",
+  };
+}
+export const cabinetLinearFeetExample = { inputs: { base_wall_ft: 22, wall_cab_ft: 16, tall_ft: 3, appliance_openings_ft: 5, corners: 2, cabinet_depth_in: 24, filler_per_corner_in: 3, standard_width_in: 24, toe_kick_height_in: 4 } };
+FINISH_RENDERERS["cabinet-linear-feet"] = _simpleRenderer({
+  citation: "Citation: cabinet takeoff arithmetic. Cabinets are quoted per linear foot of run: base LF = wall run minus appliance openings minus one cabinet DEPTH per inside corner (the two legs cannot both occupy the corner), with filler added at corners and end walls. Wall and tall runs are kept separate because they price differently per foot. Cabinet counts divide by the standard width entered and are a check on the linear feet, not an order - a real elevation mixes widths. Countertop runs the full corner and is reported with the corner length added back. No manufacturer's size table is reproduced. The shop drawing and the manufacturer's nominal sizes govern.",
+  example: cabinetLinearFeetExample.inputs,
+  fields: [
+    { key: "base_wall_ft", label: "Base cabinet wall run (ft)", kind: "number" },
+    { key: "wall_cab_ft", label: "Upper / wall cabinet run (ft)", kind: "number", default: 0 },
+    { key: "tall_ft", label: "Tall / pantry run (ft)", kind: "number", default: 0 },
+    { key: "appliance_openings_ft", label: "Appliance openings in the base run (ft)", kind: "number", default: 0 },
+    { key: "corners", label: "Inside corners (count)", kind: "number", default: 0 },
+    { key: "cabinet_depth_in", label: "Base cabinet depth (in)", kind: "number", default: 24 },
+    { key: "filler_per_corner_in", label: "Filler per corner (in)", kind: "number", default: 3 },
+    { key: "standard_width_in", label: "Standard cabinet width (in)", kind: "number", default: 24 },
+    { key: "toe_kick_height_in", label: "Toe-kick height (in)", kind: "number", default: 4 },
+  ],
+  outputs: [
+    { key: "b", id: "clf-out-b", label: "Base LF (after openings and corners)", value: (r) => fmt(r.base_lf, 2) + " ft -- " + fmt(r.base_cabinets, 0) + " standard boxes" },
+    { key: "w", id: "clf-out-w", label: "Wall / tall LF", value: (r) => fmt(r.wall_lf, 2) + " ft (" + fmt(r.wall_cabinets, 0) + ") / " + fmt(r.tall_lf, 2) + " ft (" + fmt(r.tall_cabinets, 0) + ")" },
+    { key: "t", id: "clf-out-t", label: "Total quoted LF", value: (r) => fmt(r.total_lf, 2) + " ft" },
+    { key: "c", id: "clf-out-c", label: "Corner loss / filler needed", value: (r) => fmt(r.corner_loss_ft, 2) + " ft lost to corners; " + fmt(r.filler_ft, 2) + " ft of filler" },
+    { key: "x", id: "clf-out-x", label: "Countertop / toe kick", value: (r) => fmt(r.countertop_lf, 2) + " ft of top; " + fmt(r.toe_kick_lf, 2) + " ft of kick (" + fmt(r.toe_kick_sf, 1) + " sf)" },
+    { key: "n", id: "clf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCabinetLinearFeet,
+});

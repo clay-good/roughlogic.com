@@ -91157,6 +91157,36 @@
       "kind": "question"
     },
     {
+      "term": "cabinet linear feet",
+      "target": "cabinet-linear-feet",
+      "kind": "industry"
+    },
+    {
+      "term": "kitchen cabinet takeoff",
+      "target": "cabinet-linear-feet",
+      "kind": "industry"
+    },
+    {
+      "term": "how many linear feet of cabinets",
+      "target": "cabinet-linear-feet",
+      "kind": "question"
+    },
+    {
+      "term": "corner cabinet loses depth",
+      "target": "cabinet-linear-feet",
+      "kind": "question"
+    },
+    {
+      "term": "filler strip for cabinets",
+      "target": "cabinet-linear-feet",
+      "kind": "redirect"
+    },
+    {
+      "term": "toe kick length for a kitchen",
+      "target": "cabinet-linear-feet",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

@@ -4,6 +4,29 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(finish): cabinet-linear-feet, and the corner that makes wall-to-wall over-count; 2026-07-27
+
+No cabinet tile existed -- the only "cabinet" aliases point at under-cabinet LED tape, and there is no
+"toe kick" or "filler strip" alias. Confirmed CLEAR by two independent discovery passes, despite the
+catalog having a `kitchen` trade (that module is food-service operations, not casework). Adds one tile to
+`calc-finish.js` (Group E).
+
+The one piece of real geometry: each inside corner eats one cabinet DEPTH off one of its two legs, because
+the two runs cannot both occupy the corner. That is why an L-kitchen measured wall-to-wall always
+over-counts -- the pinned 22-ft base run with 5 ft of appliance openings and two corners bills **13 LF, not
+22**. And the corollary that catches people the other way: the COUNTERTOP does run the full corner, so it
+is reported with the corner length added back (17 LF against the cabinets' 13). Ordering top by the
+cabinet figure comes up short.
+
+Base, wall, and tall are kept separate because they price differently per foot; filler, toe-kick LF and
+square footage come along. Cabinet counts are explicitly a check on the linear feet rather than an order,
+since a real elevation mixes widths. A base run entirely consumed by openings and corners is an error, not
+a silent zero.
+
+Fuzzer pins the corner rule across five corner/depth combinations, the countertop-exceeds-cabinets identity
+for every corner count, ceiling behavior at two standard widths, and that wall and tall runs are untouched
+by corners and appliances. Catalog 1,489 -> 1,490. Spec: spec-v1106.
+
 ### feat(hvac): fan-sheave-for-target-cfm, and the cube law landing on the motor; 2026-07-27
 
 `fan-affinity-laws` requires BOTH speeds -- it cannot solve for the speed an airflow needs, let alone the

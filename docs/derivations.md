@@ -2100,6 +2100,7 @@ cross-check.
 | calc-field.js | `timerRemainingSeconds` | `t, now_s` | _ | _ | _ |
 | calc-field.js | `utmToLatLon` | `zone, hemisphere, easting, northing` | _ | _ | _ |
 | calc-finish.js | `computeAtticVentilation` | `{ attic_floor_area_sqft = 0, ratio = "150", intake_vent_nfa_sqin = 9, ridge_n...` | _ | _ | _ |
+| calc-finish.js | `computeCabinetLinearFeet` | `{ base_wall_ft = 0, wall_cab_ft = 0, tall_ft = 0, appliance_openings_ft = 0, ...` | _ | _ | _ |
 | calc-finish.js | `computeCementBoardTakeoff` | `{ area_sf = 120, sheet_area_sf = 15, waste_pct = 10, screws_per_sheet = 35 } ...` | _ | _ | _ |
 | calc-finish.js | `computeClosetShelfTakeoff` | `{ single_hang_ft = 0, double_hang_ft = 0, linen_wall_ft = 0, linen_shelf_coun...` | _ | _ | _ |
 | calc-finish.js | `computeCountertopOverhangSupport` | `{ overhang_in = 0, total_depth_in = 25.5, thickness_cm = 3, run_length_ft = 0...` | _ | _ | _ |
@@ -3150,7 +3151,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1736.
+Row count: 1737.
 
 <!-- END function-corpus-v14 -->
 
@@ -3763,7 +3764,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (388 tiles)
+### Group E Construction (389 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3798,6 +3799,7 @@ per spec-v14 §13.1 second paragraph.
 | `boussinesq-surcharge-wall` | Surcharge Lateral Pressure on a Wall from a Line Load (Boussinesq) | NAVFAC DM-7.2 modified Boussinesq; spec-v310 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `brick-veneer-anchor-spacing` | Brick Veneer Anchor Spacing and Count (TMS 402 / IBC 1405) | TMS 402 / IBC 1405; spec-v369 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `brick-veneer-weep-count` | Brick Veneer Weep-Hole Count (IRC R703.8.6) | brick veneer weep spacing (IRC R703.8.6); weeps = ceil(30*12/33) + 1 = ceil(10.9) + 1 = 11 + 1 = 12 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `cabinet-linear-feet` | Kitchen Cabinet Linear-Foot Takeoff | cabinet takeoff arithmetic; 22-ft base run, 5 ft of appliance openings, 2 inside corn... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cantilever-beam` | Cantilever Beam Moment, Shear, and Deflection | Roark / AISC beam diagrams; spec-v341 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `carbon-equivalent` | Carbon Equivalent and Preheat Screen | IIW / AWS D1.1 carbon-equivalent formula; A36-type C 0.25, Mn 0.80 -> CE 0.38333 (0.35-0.55 band) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `carpet-takeoff` | Carpet Square-Yard and Linear-Foot Takeoff | Carpet takeoff identity (first-princi...; gross = 900*1.10 = 990 sf; SY = 990/9 = 110; linear = 990... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4825,6 +4827,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1489. Fixture-covered or reference-cadence: 1489 / 1489.
+Tile count: 1490. Fixture-covered or reference-cadence: 1490 / 1490.
 
 <!-- END tile-index-v14 -->

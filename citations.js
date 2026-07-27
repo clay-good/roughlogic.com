@@ -15228,6 +15228,18 @@ export const CITATIONS = {
       { name: "Motor check", value: "new BHP compared against the nameplate horsepower; the cube law is what fails it", source: "computed in the tile" },
     ],
   },
+  "cabinet-linear-feet": {
+    formula: "base LF = wall run - appliance openings - (corners x cabinet depth); filler = corners x filler width; wall and tall LF taken as entered; cabinet count = ceil(LF x 12 / standard width); countertop LF = base LF + corner length; toe kick = base + tall LF.",
+    edition: "Cabinet takeoff arithmetic - no standard claimed and no manufacturer size table reproduced.",
+    freeAccess: "Counting arithmetic; nominal cabinet sizes are published free in every manufacturer's catalog.",
+    governance: GOVERNANCE.general,
+    editionNote: "Each inside corner eats one cabinet DEPTH off one of its two legs, because the two runs cannot both occupy the corner - that is why an L-kitchen measured wall-to-wall always over-counts, and it is the arithmetic this tile exists to get right. Appliance openings come OUT of the base run and fillers go IN; order the filler even when the arithmetic closes, because it absorbs out-of-square walls and gives door and drawer clearance at corners and end walls. Base, wall, and tall runs are kept separate because they price differently per foot. Cabinet counts assume every box is the standard width entered - a real elevation mixes widths, so treat the count as a check on the linear feet, not as an order. Countertop runs the FULL corner unlike the cabinets, so it is reported with the corner length added back. The shop drawing and the manufacturer's nominal sizes govern.",
+    assumptions: [
+      { name: "Corner rule", value: "one cabinet depth is lost per inside corner, from one leg only", source: "cabinet layout geometry" },
+      { name: "Counts are a check", value: "boxes assume the single standard width entered; real elevations mix widths", source: "stated simplification" },
+      { name: "Countertop differs", value: "the top runs the full corner, so corner length is added back for it", source: "cabinet layout geometry" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",
