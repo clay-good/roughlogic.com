@@ -4,6 +4,29 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(fire): pdp's three citation sites claimed 0.434 psi/ft while the tile deliberately applies the 0.5 NFA shortcut; 2026-07-27
+
+`computePDP` computes its elevation term as `elevation_ft * 0.5`. All three places that document the tile said
+0.434 psi/ft instead -- the in-file `citationEl`, the `citations.js` `formula`, and a `citations.js` assumption row
+that went further and labeled 0.434 a "physical fact (1 ft H2O = 0.434 psi at 60 °F)."
+
+The 0.5 is not a bug. `test/unit/numerical-stability.test.js` pins it with an invariant whose own comment says "a
+refactor that swaps 0.5 for 0.434 (the more precise water-column value) fails here" -- it is the NFA / IFSTA
+fire-ground shortcut, chosen so a pump operator's elevation term errs about 15% high on pressure rather than low.
+The documentation was the thing that was wrong, and it was wrong in the direction that matters: a user hand-checking
+the tile against the 0.434 it advertised would compute 133.7 psi for the pinned example, see the tile return 135,
+and conclude the tile was broken.
+
+Documentation-only; `calc-fire.js`'s compute is untouched and the pinning invariant still passes. The three sites now
+state the 0.5 psi/ft shortcut, name it as deliberate and roughly 15% above the exact water column, work the pinned
+example both ways so the divergence is concrete, and point at `elevation-pressure-loss` for the exact hydrostatic
+head. `pdp` is a gate-pinned citation, so this took the byte-identical trio edit (in-file string +
+`docs/citation-discipline.md` row + regenerated `docs/citation-strings.generated.json`).
+
+Checked the rest of the module while here: `standpipe-friction`, `standpipe-pdp`, `relay-pump-distance`, and
+`foam-eductor-limit` all use 0.434 in both code and citation, and `elevation-pressure-loss` reports the exact value
+and the 5-psi-per-floor rule side by side. `pdp` was the only site where the two disagreed.
+
 ### feat(earthwork): soil-gradation-coefficients, the coarse-fraction half of USCS two tiles say they omit; 2026-07-27
 
 Two tiles in two different modules name this gap independently. `atterberg-indices` says "the full USCS also needs

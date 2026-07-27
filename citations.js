@@ -5606,13 +5606,14 @@ export const CITATIONS = {
     ],
   },
   "pdp": {
-    formula: "PDP = NP + FL + EL + AFL where NP is nozzle pressure, FL is hose friction, EL is elevation pressure (0.434 psi/ft), AFL is appliance friction.",
+    formula: "PDP = NP + FL + EL + AFL where NP is nozzle pressure, FL is hose friction, EL is elevation pressure (0.5 psi/ft, the NFA fire-ground shortcut), AFL is appliance friction.",
     edition: "NFA training materials by name; IFSTA Pumping Apparatus Driver/Operator Handbook by name.",
     freeAccess: "NFA materials free at usfa.fema.gov; IFSTA licensed.",
     governance: GOVERNANCE.fire,
-    editionNote: "Single-edition (NFA + IFSTA engineering-practice values).",
+    editionNote: "Single-edition (NFA + IFSTA engineering-practice values). The elevation term is the NFA fire-ground shortcut of 0.5 psi per foot, not the exact 0.434 psi/ft water column, so this tile's elevation component runs about 15% high on purpose -- a pump operator working from it arrives at a discharge pressure with margin rather than a shortfall. Hand-checking the tile against 0.434 will therefore NOT reproduce its output: 100 psi nozzle + 25 psi friction + 20 ft up returns 135 psi here, where the exact water column gives 133.7. Use elevation-pressure-loss when the exact hydrostatic head is what is wanted; the standpipe-friction, standpipe-pdp, relay-pump-distance, and foam-eductor-limit tiles in this module all use 0.434.",
     assumptions: [
-      { name: "Elevation factor", value: "0.434 psi per ft of head", source: "physical fact (1 ft H2O = 0.434 psi at 60 °F)" },
+      { name: "Elevation factor", value: "0.5 psi per ft of head -- the NFA / IFSTA fire-ground shortcut this tile applies, deliberately about 15% above the exact 0.434 psi/ft water column so a pump operator's mental math errs high on pressure rather than low", source: "NFA / IFSTA Pumping Apparatus Driver/Operator training materials" },
+      { name: "Not the exact hydrostatic value", value: "1 ft of water is 0.434 psi at 60 °F; the elevation-pressure-loss tile reports the exact figure alongside the 5-psi-per-floor rule, and the standpipe / relay / eductor tiles in this module use 0.434 rather than the shortcut", source: "physical fact (1 ft H2O = 0.434 psi at 60 °F)" },
     ],
   },
   "hydrant-flow": {

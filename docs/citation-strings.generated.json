@@ -179,7 +179,7 @@
     },
     "pdp": {
       "group": "calc-fire.js (Group F)",
-      "stamp": "Citation: per NFPA 13-2022 §8.3 (pressure calculations). PDP = nozzle pressure + friction loss + elevation (0.434 psi/ft of water) + appliance loss. AHJ governs. Free at nfpa.org/freeaccess."
+      "stamp": "Citation: per NFPA 13-2022 §8.3 (pressure calculations). PDP = nozzle pressure + friction loss + elevation + appliance loss. Elevation applies the NFA / IFSTA fire-ground shortcut of 0.5 psi/ft, NOT the exact 0.434 psi/ft water column -- it runs about 15% high by design; the elevation-pressure-loss tile shows both side by side. AHJ governs. Free at nfpa.org/freeaccess."
     },
     "periodic-element": {
       "group": "calc-edu.js (Group Y, v12 §9)",
