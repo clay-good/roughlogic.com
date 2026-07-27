@@ -1413,3 +1413,70 @@ GEOTECH_RENDERERS["cohesive-earth-pressure"] = _simpleRenderer({
   ],
   compute: computeCohesiveEarthPressure,
 });
+
+// --- spec-v1023 E: Embedded post / pole depth for lateral load (IBC 1807.3) ---
+// Nonconstrained Eq. 18-1: d = 0.5 A (1 + sqrt(1 + 4.36 h/A)), A = 2.34 P/(S1 b), with S1 the
+// allowable lateral bearing at ONE-THIRD the embedment (S1 = rate x mult x d/3), so d appears on
+// both sides -- solved by bisection, verified by back-substitution. Constrained Eq. 18-2:
+// d^2 = 4.25 P h/(S3 b) with S3 = rate x mult x d -> closed form d = cbrt(4.25 P h/(rate mult b)).
+// mult = 2.0 for isolated poles per 1806.3.4 (1/2-in motion acceptable). Formula capped at 12 ft.
+// dims: in { lateral_force_lb: M L T^-2, force_height_ft: L, post_width_ft: L, lateral_bearing_psf_per_ft: M L^-2 T^-2, constraint: dimensionless, isolated: dimensionless } out: { embedment_ft: L, embedment_in: L, s_pressure_psf: M L^-1 T^-2 }
+export function computePoleEmbedmentDepth({ lateral_force_lb = 0, force_height_ft = 0, post_width_ft = 0, lateral_bearing_psf_per_ft = 150, constraint = "nonconstrained", isolated = "no" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const P = Number(lateral_force_lb) || 0;
+  const h = Number(force_height_ft) || 0;
+  const b = Number(post_width_ft) || 0;
+  const rate = Number(lateral_bearing_psf_per_ft) || 0;
+  if (!(P > 0)) return { error: "Applied lateral force P must be positive (lb)." };
+  if (!(h > 0)) return { error: "Height of the force above grade must be positive (ft)." };
+  if (!(b > 0)) return { error: "Post/footing width b must be positive (ft) - the diameter of a round post or the diagonal of a square one." };
+  if (!(rate > 0)) return { error: "Lateral bearing must be positive (psf per ft of depth, from the local code table or geotech report)." };
+  if (constraint !== "nonconstrained" && constraint !== "constrained") return { error: "Constraint must be nonconstrained or constrained." };
+  if (isolated !== "no" && isolated !== "yes") return { error: "Isolated-pole increase must be yes or no." };
+  const mult = isolated === "yes" ? 2.0 : 1.0;
+  let embedment_ft, s_pressure_psf;
+  if (constraint === "constrained") {
+    embedment_ft = Math.cbrt(4.25 * P * h / (rate * mult * b));
+    s_pressure_psf = rate * mult * embedment_ft;
+  } else {
+    const req = (d) => {
+      const S1 = rate * mult * d / 3;
+      const A = 2.34 * P / (S1 * b);
+      return 0.5 * A * (1 + Math.sqrt(1 + 4.36 * h / A));
+    };
+    let lo = 0.01, hi = 60;
+    for (let i = 0; i < 200; i++) {
+      const mid = (lo + hi) / 2;
+      if (req(mid) > mid) lo = mid; else hi = mid;
+    }
+    embedment_ft = (lo + hi) / 2;
+    s_pressure_psf = rate * mult * embedment_ft / 3;
+  }
+  const embedment_in = embedment_ft * 12;
+  const over_12ft = embedment_ft > 12;
+  if (![embedment_ft, embedment_in, s_pressure_psf].every(Number.isFinite)) return { error: "Embedment math did not produce a finite value." };
+  return {
+    embedment_ft, embedment_in, s_pressure_psf, over_12ft, mult,
+    note: (over_12ft ? "OVER THE 12-FT LIMIT: the code formula's embedment definition stops at 12 ft - this pole needs an engineered foundation, not the 1807.3 formula. " : "")
+      + "Nonconstrained is a post in soil alone; constrained means grade-level restraint by a rigid slab or pavement, which cuts the required depth by roughly a third. The isolated-pole increase (2x lateral bearing, IBC 1806.3.4) applies only where 1/2 in of movement at grade is acceptable - flagpoles, signs, fences - never where the pole supports a building that cracks. The lateral-bearing rate comes from the LOCAL code table or the geotech report, per foot of depth; poles carrying masonry or concrete need bracing per 1807.3.1, and wood posts need AWPA U1 UC4B treatment. Lateral load only - vertical capacity and concrete volume are separate tiles. The adopted code edition and the AHJ govern - a design aid, not the engineer of record.",
+  };
+}
+export const poleEmbedmentDepthExample = { inputs: { lateral_force_lb: 200, force_height_ft: 4, post_width_ft: 0.5, lateral_bearing_psf_per_ft: 150, constraint: "nonconstrained", isolated: "yes" } };
+GEOTECH_RENDERERS["pole-embedment-depth"] = _simpleRenderer({
+  citation: "Citation: IBC Section 1807.3 embedded posts and poles: nonconstrained Eq. 18-1, d = 0.5 A (1 + sqrt(1 + 4.36 h/A)) with A = 2.34 P/(S1 b) and S1 the allowable lateral soil-bearing pressure at ONE-THIRD the embedment depth (so the equation is implicit in d and is solved iteratively); constrained (rigid floor or pavement at grade) Eq. 18-2, d^2 = 4.25 P h/(S3 b) with S3 at the full embedment; embedment defined up to 12 ft. IBC 1806.3.4 permits twice the tabulated lateral bearing for isolated poles (flagpoles, signs) where 1/2 in of motion at grade is acceptable. The lateral-bearing rate is entered from the local code or geotech report - no code table is reproduced. The adopted edition and the AHJ govern.",
+  example: poleEmbedmentDepthExample.inputs,
+  fields: [
+    { key: "lateral_force_lb", label: "Applied lateral force P (lb)", kind: "number" },
+    { key: "force_height_ft", label: "Height of force above grade h (ft)", kind: "number" },
+    { key: "post_width_ft", label: "Post/footing width b (ft; round dia or square diagonal)", kind: "number" },
+    { key: "lateral_bearing_psf_per_ft", label: "Lateral bearing (psf per ft depth, local code)", kind: "number", default: 150 },
+    { key: "constraint", label: "Restraint at grade", kind: "select", options: [{ value: "nonconstrained", label: "Nonconstrained (soil only)", selected: true }, { value: "constrained", label: "Constrained (rigid slab/pavement at grade)" }] },
+    { key: "isolated", label: "Isolated pole (1/2-in movement OK, 2x bearing)", kind: "select", options: [{ value: "yes", label: "Yes (flagpole/sign/fence, 1806.3.4)", selected: true }, { value: "no", label: "No (movement-sensitive)" }] },
+  ],
+  outputs: [
+    { key: "d", id: "ped-out-d", label: "Required embedment d", value: (r) => fmt(r.embedment_ft, 2) + " ft (" + fmt(r.embedment_in, 0) + " in)" + (r.over_12ft ? " - OVER the 12-ft formula limit" : "") },
+    { key: "s", id: "ped-out-s", label: "Lateral bearing used", value: (r) => fmt(r.s_pressure_psf, 0) + " psf (x" + fmt(r.mult, 0) + " isolated factor)" },
+    { key: "n", id: "ped-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePoleEmbedmentDepth,
+});

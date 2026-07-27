@@ -29806,3 +29806,50 @@ test("bounds: spec-v1022 computeConcreteAnchorInteraction pins all three triline
   assert.ok("error" in _v1022({ nua_lb: 100, vua_lb: 100, phi_nn_lb: 9831, phi_vn_lb: 0 }));
   assert.ok("error" in _v1022({ nua_lb: Infinity, vua_lb: 100, ...caps }));
 });
+
+import { computePoleEmbedmentDepth as _v1023 } from "../../calc-geotech.js";
+
+test("bounds: spec-v1023 computePoleEmbedmentDepth pins the worked example, back-substitutes the bisection root into Eq. 18-1, the constrained closed form, constrained <= nonconstrained, the isolated halving path, monotonicity, the 12-ft flag, and error seams", () => {
+  const base = { lateral_force_lb: 200, force_height_ft: 4, post_width_ft: 0.5, lateral_bearing_psf_per_ft: 150, constraint: "nonconstrained", isolated: "yes" };
+  // Pinned worked example.
+  const r = _v1023(base);
+  assert.ok(Math.abs(r.embedment_ft - 4.33332) < 0.0005);
+  assert.ok(Math.abs(r.embedment_in - 52) < 0.01);
+  // Back-substitution: the root satisfies d = 0.5 A (1 + sqrt(1 + 4.36 h/A)) with S1 at d/3.
+  {
+    const d = r.embedment_ft;
+    const S1 = 150 * 2 * d / 3;
+    const A = 2.34 * 200 / (S1 * 0.5);
+    const rhs = 0.5 * A * (1 + Math.sqrt(1 + 4.36 * 4 / A));
+    assert.ok(Math.abs(rhs - d) < 1e-6);
+    assert.ok(Math.abs(r.s_pressure_psf - S1) < 1e-6);
+  }
+  // Constrained closed form: d = cbrt(4.25 P h / (rate mult b)), and restraint always needs less depth.
+  const c = _v1023({ ...base, constraint: "constrained" });
+  assert.ok(Math.abs(c.embedment_ft - Math.cbrt(4.25 * 200 * 4 / (150 * 2 * 0.5))) < 1e-9);
+  assert.ok(c.embedment_ft < r.embedment_ft);
+  // Non-isolated needs more depth than isolated (the 2x bearing halves the demand path).
+  const ni = _v1023({ ...base, isolated: "no" });
+  assert.ok(Math.abs(ni.embedment_ft - 5.7394) < 0.001);
+  assert.ok(ni.embedment_ft > r.embedment_ft && ni.mult === 1 && r.mult === 2);
+  // Constrained scaling identity: doubling rate x mult divides d^3 by 2 exactly.
+  const c2 = _v1023({ ...base, constraint: "constrained", lateral_bearing_psf_per_ft: 300 });
+  assert.ok(Math.abs(Math.pow(c.embedment_ft, 3) / Math.pow(c2.embedment_ft, 3) - 2) < 1e-9);
+  // Monotonicity: d grows with P and h, shrinks with b and rate.
+  assert.ok(_v1023({ ...base, lateral_force_lb: 400 }).embedment_ft > r.embedment_ft);
+  assert.ok(_v1023({ ...base, force_height_ft: 8 }).embedment_ft > r.embedment_ft);
+  assert.ok(_v1023({ ...base, post_width_ft: 1.0 }).embedment_ft < r.embedment_ft);
+  assert.ok(_v1023({ ...base, lateral_bearing_psf_per_ft: 300 }).embedment_ft < r.embedment_ft);
+  // The 12-ft formula limit flags (a big sign in weak soil).
+  const big = _v1023({ ...base, lateral_force_lb: 5000, force_height_ft: 20, lateral_bearing_psf_per_ft: 100, isolated: "no" });
+  assert.ok(big.over_12ft === true);
+  assert.ok(r.over_12ft === false);
+  // Error seams.
+  assert.ok("error" in _v1023({ ...base, lateral_force_lb: 0 }));
+  assert.ok("error" in _v1023({ ...base, force_height_ft: 0 }));
+  assert.ok("error" in _v1023({ ...base, post_width_ft: 0 }));
+  assert.ok("error" in _v1023({ ...base, lateral_bearing_psf_per_ft: 0 }));
+  assert.ok("error" in _v1023({ ...base, constraint: "braced" }));
+  assert.ok("error" in _v1023({ ...base, isolated: "maybe" }));
+  assert.ok("error" in _v1023({ ...base, lateral_force_lb: Infinity }));
+});

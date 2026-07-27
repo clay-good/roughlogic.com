@@ -4,6 +4,27 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(geotech): pole-embedment-depth, the question every post install starts with and no tile answered; 2026-07-27
+
+Zero hits anywhere for "1807.3", "pole embedment", or "post embedment": `post-hole-concrete` is bag-count
+volume, `anchor-embedment` is concrete anchor bond, `pile-length-for-capacity` is axial. Nothing answered how
+DEEP a fence, sign, deck-rail, or flagpole post goes for a lateral load, even though the code gives a closed
+formula pair for exactly that. Adds one tile to `calc-geotech.js` (Group E); first new tile for the 3-tile
+`fencing` trade in this campaign.
+
+`pole-embedment-depth` implements IBC 1807.3: the nonconstrained Eq. 18-1
+d = 0.5 A (1 + sqrt(1 + 4.36 h/A)), A = 2.34 P/(S1 b) -- where S1 is evaluated at ONE-THIRD the embedment, so
+d appears on both sides and the tile solves it by bisection -- and the constrained (slab at grade) Eq. 18-2
+closed form, with the IBC 1806.3.4 isolated-pole 2x bearing increase as a toggle and the 12-ft formula limit
+flagged rather than extrapolated. No Table 1806.2 values are shipped: the lateral-bearing rate is a user input
+from the local code or geotech report. Formulas verified verbatim against public code hosting (UpCodes 1807.3;
+1806.3.4 confirmed across the 2018-2024 editions).
+
+The pinned example: a 6-ft fence post with 200 lb of wind at 4 ft sets 52 in deep (isolated, nonconstrained);
+a slab at grade cuts it to 34 in. The fuzzer back-substitutes the bisection root into Eq. 18-1 exactly, pins
+the constrained cube-root scaling identity, constrained <= nonconstrained, the isolated toggle, monotonicity
+in all four inputs, and the 12-ft flag seam. Catalog 1,471 -> 1,472. Spec: spec-v1023.
+
 ### feat(concrete): concrete-anchor-interaction closes the anchor family with the ACI 17.8 combined check; 2026-07-27
 
 The tension tile's citation has named "combined shear-tension" as a separate check from the very start, and

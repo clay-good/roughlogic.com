@@ -1445,6 +1445,7 @@ const RELATED = {
   "coulomb-earth-pressure": ["lateral-earth-pressure","sloped-backfill-earth-pressure","retaining-wall-stability","seismic-earth-pressure"],
   "seismic-earth-pressure": ["coulomb-earth-pressure","retaining-wall-stability","seismic-base-shear"],
   "cohesive-earth-pressure": ["lateral-earth-pressure","retaining-wall-stability","trench-slope"],
+  "pole-embedment-depth": ["post-hole-concrete","fence-estimate","soil-bearing-capacity"],
   "retaining-wall-stability": ["lateral-earth-pressure","soil-bearing-capacity","retaining-wall-block","seismic-earth-pressure","cohesive-earth-pressure"],
   "consolidation-time-rate": ["consolidation-degree","soil-consolidation-settlement","soil-settlement-elastic","spt-bearing-capacity"],
   "consolidation-degree": ["consolidation-time-rate","soil-consolidation-settlement","soil-settlement-elastic","spt-bearing-capacity"],

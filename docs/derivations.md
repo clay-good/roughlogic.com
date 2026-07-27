@@ -2187,6 +2187,7 @@ cross-check.
 | calc-geotech.js | `computePileGroupEfficiency` | `{ rows_n = 0, cols_m = 0, diameter_in = 0, spacing_in = 0, single_allow_kip =...` | _ | _ | _ |
 | calc-geotech.js | `computePileGroupSpacingForEfficiency` | `{ rows_n = 0, cols_m = 0, diameter_in = 0, target_eg = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computePileLengthForCapacity` | `{ qall_target_kip = 0, d_ft = 0, cu_ksf = 0, alpha = 0.55, fs = 3 } = {}` | _ | _ | _ |
+| calc-geotech.js | `computePoleEmbedmentDepth` | `{ lateral_force_lb = 0, force_height_ft = 0, post_width_ft = 0, lateral_beari...` | _ | _ | _ |
 | calc-geotech.js | `computeRetainingWallStability` | `{ h_ft = 0, b_ft = 0, t_base = 0, t_stem = 0, toe_ft = 0, gamma_s = 110, gamm...` | _ | _ | _ |
 | calc-geotech.js | `computeSeismicEarthPressure` | `{ phi = 0, delta = 0, theta = 0, alpha = 0, gamma = 120, h_ft = 0, kh = 0, kv...` | _ | _ | _ |
 | calc-geotech.js | `computeSettlementLimitLoad` | `{ sc_allow_in = 0, cc = 0, h_ft = 0, e0 = 0, sig0_psf = 0 } = {}` | _ | _ | _ |
@@ -3132,7 +3133,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1718.
+Row count: 1719.
 
 <!-- END function-corpus-v14 -->
 
@@ -3740,7 +3741,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (378 tiles)
+### Group E Construction (379 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3941,6 +3942,7 @@ per spec-v14 §13.1 second paragraph.
 | `plumbing-fixture-count` | Minimum Plumbing Fixtures by Occupancy (IBC Table 2902.1) | IBC 2021 Table 2902.1 (mirrored in IP...; spec-v244 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `plywood-span` | Plywood and OSB Sheathing Span Rating | APA Engineered Wood Span Ratings (pro...; 24/16 / 0.5 in / roof / 24 in support / 30 psf live + 8 p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `point-load-bearing` | Bearing Length on a Wood Plate | NDS compression perpendicular to grai...; 4000 lb, 3.0-in width, Fc-perp 625 psi -> ~2.133 in bearing | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pole-embedment-depth` | Embedded Post / Pole Depth for Lateral Load (IBC 1807.3) | IBC; P 200 lb at h 4 ft, b 0.5 ft, 150 psf/ft, isolated (x2), ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `polymeric-sand-bags` | Polymeric Paver Joint Sand Bag Count | Polymeric joint-sand bag-count identi...; bags = ceil(400*1.05/75) = ceil(5.6) = 6 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `post-hole-concrete` | Concrete per Post Hole | Cylinder-volume geometry less post di...; spec-v94 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `powered-attic-ventilator` | Powered Attic Ventilator Sizing | attic-fan sizing practice; spec-v467 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4789,6 +4791,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1471. Fixture-covered or reference-cadence: 1471 / 1471.
+Tile count: 1472. Fixture-covered or reference-cadence: 1472 / 1472.
 
 <!-- END tile-index-v14 -->

@@ -90612,6 +90612,41 @@
       "kind": "question"
     },
     {
+      "term": "pole embedment",
+      "target": "pole-embedment-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "post embedment depth",
+      "target": "pole-embedment-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "how deep to set a fence post",
+      "target": "pole-embedment-depth",
+      "kind": "question"
+    },
+    {
+      "term": "flagpole footing depth",
+      "target": "pole-embedment-depth",
+      "kind": "question"
+    },
+    {
+      "term": "ibc 1807.3",
+      "target": "pole-embedment-depth",
+      "kind": "redirect"
+    },
+    {
+      "term": "nonconstrained pole formula",
+      "target": "pole-embedment-depth",
+      "kind": "redirect"
+    },
+    {
+      "term": "sign post embedment for wind",
+      "target": "pole-embedment-depth",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

@@ -15014,6 +15014,19 @@ export const CITATIONS = {
       { name: "Inputs", value: "the two governing design capacities come from the anchor-mode tiles; this tile does not recompute them", source: "ACI 318-19 17.5" },
     ],
   },
+  "pole-embedment-depth": {
+    formula: "Nonconstrained (Eq. 18-1): d = 0.5 A (1 + sqrt(1 + 4.36 h/A)), A = 2.34 P/(S1 b), S1 at one-third the embedment (implicit in d, solved iteratively). Constrained (Eq. 18-2): d^2 = 4.25 P h/(S3 b), S3 at the full embedment. Isolated poles: 2x lateral bearing per 1806.3.4.",
+    edition: "The IBC Section 1807.3 embedded posts and poles design equations and the 1806.3.4 isolated-pole increase, by name; the formula pair dates to the legacy UBC and is unchanged across the 2018-2024 IBC editions.",
+    freeAccess: "The IBC is viewable free through the ICC public-access portal (codes.iccsafe.org) and public code-hosting mirrors; 1807.3 is in every adopted edition.",
+    governance: GOVERNANCE.general,
+    editionNote: "The embedment definition stops at 12 ft - a deeper pole is outside the formula and flagged, not extrapolated. S1/S3 come from the LOCAL code's lateral-bearing table or the geotech report, entered per foot of depth - no Table 1806.2 values are reproduced. The 2x isolated-pole increase applies only where 1/2 in of motion at grade is acceptable (flagpoles, signs, fences), never where the pole supports a building. Poles carrying masonry or concrete need bracing per 1807.3.1; wood posts need AWPA U1 UC4B treatment. Lateral load only - vertical capacity and hole volume are separate tiles. The adopted edition and the AHJ govern - a design aid, not the engineer of record.",
+    assumptions: [
+      { name: "Implicit S1", value: "the nonconstrained equation evaluates the lateral bearing at one-third the (unknown) embedment, so the tile solves it by bisection and the fuzzer verifies the root by back-substitution", source: "IBC 1807.3.2.1" },
+      { name: "Constrained restraint", value: "the closed-form case assumes a rigid floor or pavement restrains the pole at grade", source: "IBC 1807.3.2.2" },
+      { name: "Isolated-pole increase", value: "2x tabulated lateral bearing where 1/2 in of grade-level motion is acceptable", source: "IBC 1806.3.4" },
+      { name: "No code table", value: "the psf-per-ft lateral-bearing rate is a user input from the adopted code or geotech report", source: "IBC Table 1806.2 (not reproduced)" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",
