@@ -1,9 +1,9 @@
 {
   "name": "cross",
-  "version": "2026-07-20",
-  "fetched": "2026-07-20",
+  "version": "2026-07-27",
+  "fetched": "2026-07-27",
   "edition": "Original plain-English glossary entries authored by the project (v5 Step 62, utility 271). MIT licensed.",
-  "asOf": "2026-07-20",
+  "asOf": "2026-07-27",
   "refresh_cadence": "annual",
   "shards": [
     {
@@ -13,6 +13,6 @@
     }
   ],
   "hashes": {
-    "glossary.json": "d6ec4dac037477f551e4b504898974e64170b77eef074a5bf05e80b5ac7568b9"
+    "glossary.json": "0093df7295f7248442f1688c71db17870a66c3478e50400a98ce638a9e78405d"
   }
 }
