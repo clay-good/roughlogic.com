@@ -567,7 +567,7 @@ const TOOL_MODULES = (() => {
   // spec-v102 new HVAC field-service bench; relieves the standing
   // calc-hvac.js cap watch. Both tiles keep group "C".
   declare("./calc-hvacservice.js", "HVACSERVICE_RENDERERS", [
-    "condensate-drain", "recovery-cylinder", "outside-air-percent-temps",
+    "condensate-drain", "condensate-trap-depth", "recovery-cylinder", "outside-air-percent-temps",
     // spec-v104 electrical-side field-service diagnostics (same module).
     "hvac-equipment-circuit", "run-capacitor-microfarad",
     // spec-v105 evacuation/leak-check field diagnostics (same module).

@@ -30232,3 +30232,39 @@ test("bounds: spec-v1033 computeCompressedAirPressureDrop pins the worked exampl
   assert.ok("error" in _v1033({ ...base, air_temp_f: -460 }));
   assert.ok("error" in _v1033({ ...base, scfm: Infinity }));
 });
+
+import { computeCondensateTrapDepth as _v1034 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v1034 computeCondensateTrapDepth pins both configurations, the J = H/2 and L identities, the +1 vs +0.5 offsets, the null contract for inapplicable dimensions, monotonicity, and error seams", () => {
+  // Draw-through pinned example.
+  const d = _v1034({ configuration: "draw-through", static_pressure_in_wc: 2.0, pipe_diameter_in: 1.0, insulation_in: 0.5 });
+  assert.ok(d.h_in === 3 && d.j_in === 1.5 && d.l_in === 6);
+  assert.ok(d.draw === true && d.k_in === null);
+  // Blow-through cross-check: the 1/2-in offset, K fixed, J and L not dimensioned.
+  const b = _v1034({ configuration: "blow-through", static_pressure_in_wc: 1.5, pipe_diameter_in: 1.0, insulation_in: 0 });
+  assert.ok(b.h_in === 2 && b.k_in === 0.5);
+  assert.ok(b.draw === false && b.j_in === null && b.l_in === null);
+  // Identities hold across a static sweep.
+  for (const sp of [0.25, 0.5, 1, 2.5, 4, 8]) {
+    const t = _v1034({ configuration: "draw-through", static_pressure_in_wc: sp, pipe_diameter_in: 1.25, insulation_in: 1 });
+    assert.ok(Math.abs(t.h_in - (sp + 1)) < 1e-12);
+    assert.ok(Math.abs(t.j_in - t.h_in / 2) < 1e-12);
+    assert.ok(Math.abs(t.l_in - (t.h_in + t.j_in + 1.25 + 1)) < 1e-12);
+    const p = _v1034({ configuration: "blow-through", static_pressure_in_wc: sp });
+    assert.ok(Math.abs(p.h_in - (sp + 0.5)) < 1e-12);
+    assert.ok(p.k_in === 0.5);
+    // The draw-through trap is always deeper than the blow-through one at the same static.
+    assert.ok(t.h_in > p.h_in);
+  }
+  // Monotonic in static; L grows with pipe and insulation but H does not.
+  assert.ok(_v1034({ configuration: "draw-through", static_pressure_in_wc: 3 }).h_in > d.h_in);
+  const fat = _v1034({ configuration: "draw-through", static_pressure_in_wc: 2.0, pipe_diameter_in: 2.0, insulation_in: 0.5 });
+  assert.ok(fat.l_in === d.l_in + 1 && fat.h_in === d.h_in);
+  // Error seams.
+  assert.ok("error" in _v1034({ configuration: "side-draw", static_pressure_in_wc: 1 }));
+  assert.ok("error" in _v1034({ configuration: "draw-through", static_pressure_in_wc: 0 }));
+  assert.ok("error" in _v1034({ configuration: "draw-through", static_pressure_in_wc: -1 }));
+  assert.ok("error" in _v1034({ configuration: "draw-through", static_pressure_in_wc: 1, pipe_diameter_in: 0 }));
+  assert.ok("error" in _v1034({ configuration: "draw-through", static_pressure_in_wc: 1, insulation_in: -1 }));
+  assert.ok("error" in _v1034({ configuration: "draw-through", static_pressure_in_wc: Infinity }));
+});

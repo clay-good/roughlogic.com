@@ -1152,3 +1152,53 @@ HVACSERVICE_RENDERERS["condensing-flue-condensate"] = _simpleRenderer({
   ],
   compute: computeCondensingFlueCondensate,
 });
+
+// --- spec-v1034 C: Condensate drain trap geometry from fan static ---
+// Manufacturer engineering geometry (Trane condensate-trapping bulletin), named dimensions:
+//   DRAW-THROUGH (negative pressure at the pan): H = (1 in per 1 in of maximum negative static) + 1 in;
+//     J = half of H; L = H + J + pipe diameter + insulation.
+//   BLOW-THROUGH (positive pressure): H = 0.5 in plus the maximum total static; K = 0.5 in minimum.
+// Worst-case static (dirty filter) is what H must be sized on, not the clean-filter number.
+// dims: in { configuration: dimensionless, static_pressure_in_wc: M L^-1 T^-2, pipe_diameter_in: L, insulation_in: L } out: { h_in: L, j_in: L, l_in: L, k_in: L }
+export function computeCondensateTrapDepth({ configuration = "draw-through", static_pressure_in_wc = 0, pipe_diameter_in = 1.0, insulation_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const sp = Number(static_pressure_in_wc) || 0;
+  const dia = Number(pipe_diameter_in) || 0;
+  const ins = Number(insulation_in);
+  if (configuration !== "draw-through" && configuration !== "blow-through") return { error: "Configuration must be draw-through or blow-through." };
+  if (!(sp > 0)) return { error: "Static pressure must be positive (in w.c.) - enter the magnitude, and use the WORST case (dirty filter), not the clean-filter number." };
+  if (!(dia > 0)) return { error: "Drain pipe diameter must be positive (in)." };
+  if (!Number.isFinite(ins) || ins < 0) return { error: "Insulation thickness cannot be negative (in)." };
+  const draw = configuration === "draw-through";
+  const h_in = draw ? sp + 1 : sp + 0.5;
+  const j_in = draw ? h_in / 2 : null;
+  const k_in = draw ? null : 0.5;
+  const l_in = draw ? h_in + j_in + dia + ins : null;
+  const vals = draw ? [h_in, j_in, l_in] : [h_in];
+  if (!vals.every(Number.isFinite)) return { error: "Trap-geometry math did not produce a finite value." };
+  return {
+    configuration, h_in, j_in, k_in, l_in, draw,
+    note: (draw
+      ? "DRAW-THROUGH (fan pulls through the coil, so the pan sits at NEGATIVE pressure): H = 1 in of trap for every 1 in of maximum negative static, plus 1 in; the outlet leg J is half of H; and the total height L from the pan connection down must clear H + J + the pipe diameter + insulation, or the trap will not fit under the unit and the installer will improvise. Both errors have consequences: a trap too SHORT loses its seal at start-up and the unit pulls air, spray, and drain-line odors back through the pan, while a trap too TALL will not drain against the negative pressure and backs water up into the unit. "
+      : "BLOW-THROUGH (fan pushes through the coil, so the pan sits at POSITIVE pressure): H is the maximum total static plus 1/2 in, and the outlet dimension K is 1/2 in minimum. A positive-pressure trap failure blows air out the drain line rather than pulling contaminated air in, so the consequences are milder than the draw-through case - but the water still will not stay in a trap that is too shallow. ")
+      + "Size H on the WORST-CASE static (a dirty filter), not the clean-filter number. Trap each drain pan SEPARATELY: pans ganged onto one trap let the unit at the greater negative pressure pull air through the other unit's drain line, bypassing both seals. Keep the line pitched, support it so it cannot sag into an air lock, and do not leave the clean-out open. Fill the trap at start-up - an empty trap is no trap. The equipment manufacturer's trapping instructions govern.",
+  };
+}
+export const condensateTrapDepthExample = { inputs: { configuration: "draw-through", static_pressure_in_wc: 2.0, pipe_diameter_in: 1.0, insulation_in: 0.5 } };
+HVACSERVICE_RENDERERS["condensate-trap-depth"] = _simpleRenderer({
+  citation: "Citation: manufacturer condensate-trapping engineering guidance (Trane condensate-trapping bulletin), by name. Draw-through (negative pressure at the pan): H = (1 in for each 1 in of maximum negative static pressure) + 1 in, J = half of H, L = H + J + pipe diameter + insulation. Blow-through (positive pressure): H = 1/2 in plus the maximum total static pressure, K = 1/2 in minimum. Size on the worst-case static (dirty filter). Each drain pan must be trapped separately. The equipment manufacturer's trapping instructions govern - this is a field sizing aid, not a substitute for them.",
+  example: condensateTrapDepthExample.inputs,
+  fields: [
+    { key: "configuration", label: "Unit configuration", kind: "select", options: [{ value: "draw-through", label: "Draw-through (negative at pan)", selected: true }, { value: "blow-through", label: "Blow-through (positive at pan)" }] },
+    { key: "static_pressure_in_wc", label: "Max static pressure, worst case (in w.c.)", kind: "number" },
+    { key: "pipe_diameter_in", label: "Drain pipe diameter (in)", kind: "number", default: 1.0 },
+    { key: "insulation_in", label: "Insulation thickness (in)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "h", id: "ctd-out-h", label: "H (trap depth)", value: (r) => fmt(r.h_in, 2) + " in" },
+    { key: "j", id: "ctd-out-j", label: "J (outlet leg) / K (outlet min)", value: (r) => (r.draw ? fmt(r.j_in, 2) + " in (half of H)" : fmt(r.k_in, 2) + " in minimum (K)") },
+    { key: "l", id: "ctd-out-l", label: "L (clearance needed under the pan)", value: (r) => (r.draw ? fmt(r.l_in, 2) + " in = H + J + pipe + insulation" : "not dimensioned for blow-through") },
+    { key: "n", id: "ctd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCondensateTrapDepth,
+});

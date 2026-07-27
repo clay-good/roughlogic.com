@@ -90917,6 +90917,36 @@
       "kind": "question"
     },
     {
+      "term": "condensate trap depth",
+      "target": "condensate-trap-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "p trap depth for an air handler",
+      "target": "condensate-trap-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "how deep should the condensate trap be",
+      "target": "condensate-trap-depth",
+      "kind": "question"
+    },
+    {
+      "term": "draw through vs blow through trap",
+      "target": "condensate-trap-depth",
+      "kind": "question"
+    },
+    {
+      "term": "ahu drain pulling air",
+      "target": "condensate-trap-depth",
+      "kind": "redirect"
+    },
+    {
+      "term": "condensate not draining negative pressure",
+      "target": "condensate-trap-depth",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

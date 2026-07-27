@@ -709,7 +709,7 @@ const _TILES = [
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
   ["lumen-method", "A"], ["room-cavity-ratio", "A"], ["luminaire-spacing-mh-ratio", "A"],
-  ["condensate-drain", "C"],
+  ["condensate-drain", "C"], ["condensate-trap-depth", "C"],
   ["recovery-cylinder", "C"],
   ["hvac-equipment-circuit", "C"],
   ["run-capacitor-microfarad", "C"],

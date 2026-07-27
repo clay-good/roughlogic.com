@@ -15132,6 +15132,18 @@ export const CITATIONS = {
       { name: "Inlet density", value: "used for the whole run; conservative, since density rises as pressure drops", source: "stated simplification" },
     ],
   },
+  "condensate-trap-depth": {
+    formula: "Draw-through: H = (1 in per 1 in of maximum negative static) + 1 in; J = H/2; L = H + J + pipe diameter + insulation. Blow-through: H = 0.5 in + maximum total static; K = 0.5 in minimum.",
+    edition: "Manufacturer condensate-trapping engineering guidance (Trane condensate-trapping bulletin), by name - the named dimensions H, J, K, and L are taken from its figures.",
+    freeAccess: "The bulletin is publicly available; equipment installation instructions carry the same dimensions per model.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two rules circulate in the field and disagree - one widely repeated article says the trap depth is DOUBLE the static, the manufacturer geometry says static PLUS one inch with the outlet leg at half of H. This tile ships the manufacturer geometry. Size H on the WORST-CASE static (dirty filter), not the clean-filter number. Both errors have consequences: a trap too SHORT loses its seal at start-up and the unit pulls air, condensate spray, and drain-line odors back through the pan, while a trap too TALL will not drain against the negative pressure and backs water into the unit. L is the clearance that decides whether the trap physically fits under the unit. Trap each drain pan SEPARATELY - ganged pans let the unit at greater negative pressure pull air through the other's drain line, bypassing both seals. Condensate rate and drain size are the separate condensate-drain tile. The equipment manufacturer's trapping instructions govern.",
+    assumptions: [
+      { name: "Draw-through geometry", value: "H = static + 1 in, J = half of H, L = H + J + pipe + insulation", source: "Trane condensate-trapping bulletin, negative-pressure figure" },
+      { name: "Blow-through geometry", value: "H = static + 0.5 in, K = 0.5 in minimum", source: "Trane condensate-trapping bulletin, positive-pressure figure" },
+      { name: "Worst-case static", value: "size on the dirty-filter condition, not the clean-filter number", source: "same bulletin" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

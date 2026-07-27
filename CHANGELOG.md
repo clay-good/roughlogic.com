@@ -4,6 +4,31 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): condensate-trap-depth, and a field rule the manufacturer geometry contradicts; 2026-07-27
+
+`condensate-drain` returns the rate and drain size and only MENTIONS the trap in prose. "Trap depth" had
+zero alias hits, and `trap-seal-loss` is a plumbing DWV tile about siphonage. Adds one tile to
+`calc-hvacservice.js` (Group C), backlinked from the sibling.
+
+Two rules circulate in the field and they disagree: a widely repeated article says the trap depth is DOUBLE
+the static, another says static plus an inch. Rather than pick, the manufacturer engineering bulletin was
+retrieved and read, and it dimensions the trap with named letters -- draw-through H = (1 in per 1 in of
+maximum negative static) + 1 in, J = half of H, L = H + J + pipe diameter + insulation; blow-through
+H = static + 1/2 in, K = 1/2 in minimum. **The doubled-static rule is not the manufacturer geometry and the
+tile does not ship it.**
+
+L is the dimension nobody publishes and the one that decides whether the trap physically fits under the
+unit -- when it does not, the installer improvises, and both improvisations fail in opposite directions:
+too SHORT loses the seal at start-up and the unit pulls air, condensate spray, and drain-line odors back
+through the pan; too TALL will not drain against the negative pressure and backs water into the unit. The
+note also carries the separate-trap-per-pan rule, since ganged pans let the unit at greater negative
+pressure bypass both seals.
+
+Pinned: 2.0 in w.c. draw-through with a 1-in insulated drain -> H 3.0, J 1.5, L 6.0 in. Fuzzer pins both
+configurations, the identities across a static sweep, the null contract for dimensions that do not apply to
+a configuration, and that the draw-through trap is always deeper at equal static. Catalog 1,481 -> 1,482.
+Spec: spec-v1034.
+
 ### feat(hvac): compressed-air-pressure-drop, derived rather than tabulated; 2026-07-27
 
 The compressed-air bench was energy and volume only -- power, leak cost, receiver, setpoint savings,
