@@ -30512,3 +30512,45 @@ test("bounds: spec-v1103 computeFormworkMemberSpacing pins the worked example, i
   }
   assert.ok("error" in _v1103({ ...base, pressure_psf: Infinity }));
 });
+
+import { computeSwingFallGeometry as _v1104 } from "../../calc-cross.js";
+
+test("bounds: spec-v1104 computeSwingFallGeometry pins the exact 30-degree case, the two equivalent drop forms, energy consistency, the nonlinearity in offset, the additive clearance, and error seams", () => {
+  // 10 ft offset with a 20 ft anchor height is EXACTLY 30 degrees (asin 0.5).
+  const r = _v1104({ horizontal_offset_ft: 10, anchor_height_ft: 20, base_required_clearance_ft: 18.5 });
+  assert.ok(Math.abs(r.swing_angle_deg - 30) < 1e-9);
+  assert.ok(Math.abs(r.swing_drop_ft - (20 - Math.sqrt(300))) < 1e-12);
+  assert.ok(Math.abs(r.arc_length_ft - 20 * Math.PI / 6) < 1e-9);
+  assert.ok(r.over_30_deg === false); // exactly 30 is not OVER 30
+  // The two algebraic forms of the drop agree: L - sqrt(L^2 - X^2) == L(1 - cos theta).
+  for (const [x, L] of [[10, 20], [5, 20], [15, 20], [2, 20], [3, 7], [1, 100]]) {
+    const t = _v1104({ horizontal_offset_ft: x, anchor_height_ft: L });
+    const theta = Math.asin(x / L);
+    assert.ok(Math.abs(t.swing_drop_ft - L * (1 - Math.cos(theta))) < 1e-9);
+    assert.ok(Math.abs(t.swing_drop_ft - (L - Math.sqrt(L * L - x * x))) < 1e-12);
+    // Energy: the speed at the bottom is sqrt(2 g h) for exactly that drop.
+    assert.ok(Math.abs(t.impact_speed_fps - Math.sqrt(2 * 32.174 * t.swing_drop_ft)) < 1e-12);
+    // The arc is always longer than the straight offset, and the angle stays under 90.
+    assert.ok(t.arc_length_ft > x - 1e-9 && t.swing_angle_deg < 90);
+  }
+  // The clearance term is purely additive on top of the base.
+  const noBase = _v1104({ horizontal_offset_ft: 10, anchor_height_ft: 20, base_required_clearance_ft: 0 });
+  assert.ok(Math.abs(r.total_required_clearance_ft - (18.5 + noBase.swing_drop_ft)) < 1e-12);
+  assert.ok(Math.abs(noBase.total_required_clearance_ft - noBase.swing_drop_ft) < 1e-12);
+  // Strongly nonlinear in offset: 5x the offset gives far more than 5x the drop.
+  const small = _v1104({ horizontal_offset_ft: 2, anchor_height_ft: 20 });
+  assert.ok(Math.abs(small.swing_angle_deg - 5.739170) < 1e-5);
+  assert.ok(noBase.swing_drop_ft / small.swing_drop_ft > 20);
+  // A higher anchor at the same offset swings less - the practical fix.
+  const higher = _v1104({ horizontal_offset_ft: 10, anchor_height_ft: 40 });
+  assert.ok(higher.swing_drop_ft < noBase.swing_drop_ft && higher.swing_angle_deg < noBase.swing_angle_deg);
+  // The 30-degree flag fires past 30.
+  assert.ok(_v1104({ horizontal_offset_ft: 15, anchor_height_ft: 20 }).over_30_deg === true);
+  // Error seams, including the geometrically impossible reach.
+  assert.ok("error" in _v1104({ horizontal_offset_ft: 0, anchor_height_ft: 20 }));
+  assert.ok("error" in _v1104({ horizontal_offset_ft: 10, anchor_height_ft: 0 }));
+  assert.ok("error" in _v1104({ horizontal_offset_ft: 20, anchor_height_ft: 20 }));
+  assert.ok("error" in _v1104({ horizontal_offset_ft: 25, anchor_height_ft: 20 }));
+  assert.ok("error" in _v1104({ horizontal_offset_ft: 10, anchor_height_ft: 20, base_required_clearance_ft: -1 }));
+  assert.ok("error" in _v1104({ horizontal_offset_ft: Infinity, anchor_height_ft: 20 }));
+});

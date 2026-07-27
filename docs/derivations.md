@@ -1806,6 +1806,7 @@ cross-check.
 | calc-cross.js | `computeRollingOffset` | `{ rise_in, roll_in, angle_deg }` | _ | _ | _ |
 | calc-cross.js | `computeSalesTax` | `{ state, subtotal, custom_rate_percent = null }` | _ | _ | _ |
 | calc-cross.js | `computeSlopeFromLevel` | `{ value, from }` | _ | _ | _ |
+| calc-cross.js | `computeSwingFallGeometry` | `{ horizontal_offset_ft = 0, anchor_height_ft = 0, base_required_clearance_ft ...` | _ | _ | _ |
 | calc-cross.js | `computeTankVolume` | `{ orientation = "horizontal", linear_unit = "in", diameter = 0, length = 0, d...` | _ | _ | _ |
 | calc-cross.js | `computeTimeAndMaterials` | `{ hours, labor_rate_per_hour, material_cost, overhead_percent = 0, profit_per...` | _ | _ | _ |
 | calc-cross.js | `computeTimesheet` | `{ jobs = [], regular_rate = 0, weekly_overtime_threshold_hr = 40, irs_rate_pe...` | _ | _ | _ |
@@ -3148,7 +3149,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1734.
+Row count: 1735.
 
 <!-- END function-corpus-v14 -->
 
@@ -4206,7 +4207,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (64 tiles)
+### Group G Cross-trade (65 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4259,6 +4260,7 @@ per spec-v14 §13.1 second paragraph.
 | `shrink-fit` | Interference Shrink-Fit Temperature | first-principles thermal-expansion re...; 4 in fit, 0.004 in interference, 0.002 in clearance, stee... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sine-bar` | Sine Bar Angle Setup | First-principles sine-bar trigonometr...; 5-in sine bar on a 2.5-in stack -> arcsin(0.5) = 30.000 deg | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `slope-from-level` | Slope from Digital Level | Project (first-principles); Trig conversion arctan / tan | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `swing-fall-geometry` | Swing Fall Geometry (Pendulum Drop and Arc) | pendulum geometry; asin(10/20) = exactly 30 deg; drop 20 - sqrt(400-100) = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tank-volume` | Tank Volume (Dipstick) | First-principles circular-segment geo...; 24 in dia x 48 in horizontal, depth 12 in (half) -> 47.00... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thread-measure-wire` | Three-Wire Thread Measurement | First-principles three-wire geometry ...; 1/2-13 UNC, E 0.45 in -> best wire 0.044412 in, M 0.51661... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thread-pitch` | Thread Pitch and Lead | First-principles 60-degree thread geo...; 1/4-20 UNC: 20 TPI -> 0.050 in pitch, 0.043301 in sharp-V... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4821,6 +4823,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1487. Fixture-covered or reference-cadence: 1487 / 1487.
+Tile count: 1488. Fixture-covered or reference-cadence: 1488 / 1488.
 
 <!-- END tile-index-v14 -->

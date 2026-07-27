@@ -4,6 +4,33 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(cross): swing-fall-geometry, the free fall the vertical clearance calculation never counted; 2026-07-27
+
+`fall-protection-clearance` and `fall-arrest-clearance` both sum VERTICAL terms only -- neither has a
+horizontal input. No tile id contained "swing" or "lifeline". Adds one tile to `calc-cross.js` (Group G),
+cross-linked with both clearance tiles. No new constants; only g, already used across the catalog.
+
+Working off to the side of an anchor turns a fall into a pendulum. The tile says two things. The swing drop
+-- `L - sqrt(L^2 - X^2)` -- is *additional free fall* the vertical calculation never counted, so it is
+reported as an addition to whatever `fall-protection-clearance` produced. And the worker arrives at the
+bottom of the arc moving **sideways** at sqrt(2gh); the arrest system does nothing about a wall, a column,
+or a leading edge in the path. That second one is what injures people, so it is reported in ft/s and mph.
+
+The pinned example is chosen for an exact value: 10 ft offset with a 20 ft anchor height is asin(0.5) =
+exactly 30 degrees, giving 2.68 ft of extra drop and 13.1 ft/s (9.0 mph) sideways. The cross-check makes
+the nonlinearity concrete -- a 2 ft offset adds only 0.100 ft, so **5x the offset moves the drop 27x**,
+which is why the guidance is stated as an angle rather than a distance.
+
+Fuzzer pins the equivalence of the two algebraic drop forms across six geometries, energy consistency,
+arc > offset, the additive clearance, that a higher anchor reduces the swing, the flag boundary at exactly
+30 degrees, and the unreachable-offset error. Catalog 1,487 -> 1,488. Spec: spec-v1104.
+
+**Also this session: one candidate deliberately NOT built.** A septic perc-rate to application-rate
+converter was scoped and dropped -- the widely cited `1.2/sqrt(T)` relation and an actual county health
+department's regulatory table disagree by roughly a factor of two at the same perc rate. There is no
+defensible universal conversion, and an undersized drainfield surfaces sewage, so the tile was abandoned
+rather than shipped with a guessed relation.
+
 ### feat(construction): formwork-member-spacing, the check that says shear governs; 2026-07-27
 
 A self-declared gap: `formwork-tie-load`'s own note says "Wales and studs are sized separately," and a grep

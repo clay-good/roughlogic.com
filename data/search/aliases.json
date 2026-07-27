@@ -91097,6 +91097,36 @@
       "kind": "question"
     },
     {
+      "term": "swing fall",
+      "target": "swing-fall-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "pendulum fall anchor offset",
+      "target": "swing-fall-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "how far off to the side can my anchor be",
+      "target": "swing-fall-geometry",
+      "kind": "question"
+    },
+    {
+      "term": "30 degree rule fall protection anchor",
+      "target": "swing-fall-geometry",
+      "kind": "question"
+    },
+    {
+      "term": "extra clearance for a swing fall",
+      "target": "swing-fall-geometry",
+      "kind": "redirect"
+    },
+    {
+      "term": "worker swinging into a wall after a fall",
+      "target": "swing-fall-geometry",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

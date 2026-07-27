@@ -2958,3 +2958,58 @@ const renderExtensionLadderOverlap = _simpleRendererG({
 // Registered after the definition: CROSS_RENDERERS is built above this point, so a const
 // declared here cannot be referenced inside that object literal (temporal dead zone).
 CROSS_RENDERERS["extension-ladder-overlap"] = renderExtensionLadderOverlap;
+
+// --- spec-v1104 G: Swing fall geometry (pendulum drop and arc) ---
+// Pure geometry, no new constants. With the anchor offset horizontally by X and the anchor a
+// distance L above the attachment point, a fall swings through theta = asin(X/L) and DROPS
+// L - sqrt(L^2 - X^2) = L(1 - cos theta) before the line goes vertical. That drop is free fall the
+// vertical clearance calculation never counted, and the speed at the bottom of the arc is
+// sqrt(2 g h) - the same energy that puts a worker into a wall or a column.
+// dims: in { horizontal_offset_ft: L, anchor_height_ft: L, base_required_clearance_ft: L } out: { swing_angle_deg: dimensionless, swing_drop_ft: L, impact_speed_fps: L T^-1, total_required_clearance_ft: L }
+export function computeSwingFallGeometry({ horizontal_offset_ft = 0, anchor_height_ft = 0, base_required_clearance_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const x = Number(horizontal_offset_ft) || 0;
+  const L = Number(anchor_height_ft) || 0;
+  const base = Number(base_required_clearance_ft) || 0;
+  if (!(x > 0)) return { error: "Horizontal offset must be positive (ft) - a worker directly under the anchor has no swing fall." };
+  if (!(L > 0)) return { error: "Anchor height above the attachment point must be positive (ft)." };
+  if (x >= L) return { error: "The horizontal offset equals or exceeds the anchor height - the lanyard cannot reach that position, and at anything near it the system is not a fall-arrest system." };
+  if (base < 0) return { error: "Base required clearance cannot be negative (ft); enter 0 to see the swing terms alone." };
+  const swing_angle_rad = Math.asin(x / L);
+  const swing_angle_deg = swing_angle_rad * 180 / Math.PI;
+  const swing_drop_ft = L - Math.sqrt(L * L - x * x);
+  const impact_speed_fps = Math.sqrt(2 * 32.174 * swing_drop_ft);
+  const impact_speed_mph = impact_speed_fps * 0.681818;
+  const arc_length_ft = L * swing_angle_rad;
+  const total_required_clearance_ft = base + swing_drop_ft;
+  // Epsilon-guarded: asin(0.5) in degrees lands a hair above 30 in floating point, and an
+  // anchor exactly at the guidance limit is AT it, not past it.
+  const over_30_deg = swing_angle_deg > 30 + 1e-9;
+  if (![swing_angle_deg, swing_drop_ft, impact_speed_fps, total_required_clearance_ft].every(Number.isFinite)) return { error: "Swing-fall math did not produce a finite value." };
+  return {
+    swing_angle_deg, swing_drop_ft, impact_speed_fps, impact_speed_mph, arc_length_ft,
+    total_required_clearance_ft, over_30_deg,
+    note: "Working off to the side of an anchor turns a fall into a pendulum. The worker drops " + swing_drop_ft.toFixed(2) + " ft just getting under the anchor - free fall the vertical clearance calculation never counted, so add it to whatever fall-protection-clearance told you - and arrives at the bottom of the arc doing " + impact_speed_fps.toFixed(1) + " ft/s (" + impact_speed_mph.toFixed(1) + " mph) MOVING SIDEWAYS. That last part is what hurts people: the arrest system stops the fall, and the swing puts them into a wall, a column, or the leading edge on the way. "
+      + (over_30_deg ? "This layout is " + swing_angle_deg.toFixed(0) + " degrees off vertical, past the 30 degrees commonly given as the limit for keeping an anchor overhead - move the anchor or add a horizontal lifeline. " : "At " + swing_angle_deg.toFixed(0) + " degrees this is inside the 30 degrees commonly given as the limit, but the swing terms still apply. ")
+      + "Geometry only, and it assumes a taut line pivoting about a fixed anchor: it does not model lanyard stretch, a self-retracting lifeline's locking behavior, the strike itself, or edge contact where a line drags over a corner. The vertical terms - free fall, deceleration, harness stretch, worker height, margin - are the fall-protection-clearance tile. A competent person and the employer's fall-protection plan govern.",
+  };
+}
+export const swingFallGeometryExample = { inputs: { horizontal_offset_ft: 10, anchor_height_ft: 20, base_required_clearance_ft: 18.5 } };
+const renderSwingFallGeometry = _simpleRendererG({
+  citation: "Citation: swing-fall pendulum geometry - with the anchor offset horizontally by X and located a distance L above the attachment point, the swing angle is asin(X/L), the drop before the line goes vertical is L - sqrt(L^2 - X^2) = L(1 - cos theta), the speed at the bottom of the arc is sqrt(2 g h), and the horizontal arc travelled is L x theta. That drop is additional free fall the vertical clearance calculation does not include. The 30-degree limit for keeping an anchor overhead is commonly given guidance, not a computed value. Taut line about a fixed anchor: lanyard stretch, self-retracting-lifeline locking, the strike itself, and edge contact are not modeled. The vertical clearance terms are the separate fall-protection-clearance tile. A competent person and the employer's fall-protection plan govern.",
+  example: swingFallGeometryExample.inputs,
+  fields: [
+    { key: "horizontal_offset_ft", label: "Horizontal offset from under the anchor (ft)", kind: "number" },
+    { key: "anchor_height_ft", label: "Anchor height above the attachment point (ft)", kind: "number" },
+    { key: "base_required_clearance_ft", label: "Vertical clearance already required (ft, from fall-protection-clearance)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "a", id: "sfg-out-a", label: "Swing angle off vertical", value: (r) => fmt(r.swing_angle_deg, 1) + " deg" + (r.over_30_deg ? " - past the 30 deg guidance" : "") },
+    { key: "d", id: "sfg-out-d", label: "Added free fall from the swing", value: (r) => fmt(r.swing_drop_ft, 2) + " ft" },
+    { key: "v", id: "sfg-out-v", label: "Sideways speed at the bottom of the arc", value: (r) => fmt(r.impact_speed_fps, 1) + " ft/s (" + fmt(r.impact_speed_mph, 1) + " mph) across " + fmt(r.arc_length_ft, 1) + " ft of arc" },
+    { key: "t", id: "sfg-out-t", label: "Total clearance with the swing added", value: (r) => fmt(r.total_required_clearance_ft, 2) + " ft" },
+    { key: "n", id: "sfg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSwingFallGeometry,
+});
+CROSS_RENDERERS["swing-fall-geometry"] = renderSwingFallGeometry;

@@ -15204,6 +15204,18 @@ export const CITATIONS = {
       { name: "Shear governs short members", value: "the check most often skipped and most often controlling", source: "worked example in the tile" },
     ],
   },
+  "swing-fall-geometry": {
+    formula: "swing angle = asin(X/L); swing drop = L - sqrt(L^2 - X^2) = L(1 - cos theta); speed at the bottom of the arc = sqrt(2 g h); arc travelled = L x theta; total clearance = base + swing drop.",
+    edition: "Pendulum geometry - no standard claimed and no new constants. The 30-degree limit for keeping an anchor overhead is commonly given fall-protection guidance, reported as such rather than as a computed threshold.",
+    freeAccess: "The geometry is elementary trigonometry; the 30-degree guidance is published widely in fall-protection training material.",
+    governance: GOVERNANCE.general,
+    editionNote: "The swing drop is free fall the VERTICAL clearance calculation never counted, so it must be added to whatever fall-protection-clearance required - that is the whole reason this tile exists. The second output is the one that injures people: the worker arrives at the bottom of the arc moving SIDEWAYS at sqrt(2 g h), and the arrest system does nothing about a wall, a column, or a leading edge in the way. Geometry only, assuming a taut line pivoting about a fixed anchor: lanyard stretch, self-retracting-lifeline locking behavior, the strike itself, and edge contact where a line drags over a corner are NOT modeled. The vertical terms are the separate fall-protection-clearance tile. A competent person and the employer's fall-protection plan govern.",
+    assumptions: [
+      { name: "Taut line, fixed anchor", value: "rigid pendulum about the anchor; no lanyard stretch or SRL payout modeled", source: "stated simplification" },
+      { name: "Swing drop is additive", value: "added to the vertical required clearance, not substituted for it", source: "geometry" },
+      { name: "30-degree guidance", value: "commonly published limit for keeping an anchor overhead; reported, not derived", source: "fall-protection training guidance" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",
