@@ -645,3 +645,59 @@ FINISH_RENDERERS["rough-opening-size"] = _simpleRenderer({
   ],
   compute: computeRoughOpeningSize,
 });
+
+// --- spec-v1028 E: Closet rod and shelf takeoff ---
+// Rod LF: single-hang walls take one rod, double-hang walls take two. Shelf LF: one shelf over
+// every hang run plus linen stacks. Supports land at each end and every bracket_spacing_in between:
+// count per run = ceil(run/spacing) + 1; double-hang runs carry two tiers, linen stacks one per
+// shelf. Sticks/boards divide total LF by stock, with any single run longer than stock flagged
+// (a rod or shelf spanning past stock needs a splice AT a support, which changes the buy).
+// dims: in { single_hang_ft: L, double_hang_ft: L, linen_wall_ft: L, linen_shelf_count: dimensionless, bracket_spacing_in: L, stock_length_ft: L } out: { rod_lf: L, shelf_lf: L, rod_sticks: dimensionless, shelf_boards: dimensionless, brackets: dimensionless }
+export function computeClosetShelfTakeoff({ single_hang_ft = 0, double_hang_ft = 0, linen_wall_ft = 0, linen_shelf_count = 4, bracket_spacing_in = 32, stock_length_ft = 8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const s = Number(single_hang_ft) || 0;
+  const d = Number(double_hang_ft) || 0;
+  const lw = Number(linen_wall_ft) || 0;
+  const lc = Number(linen_shelf_count) || 0;
+  const spacing = Number(bracket_spacing_in) || 0;
+  const stock = Number(stock_length_ft) || 0;
+  if (s < 0 || d < 0 || lw < 0) return { error: "Wall lengths cannot be negative (ft)." };
+  if (s === 0 && d === 0 && lw === 0) return { error: "Enter at least one hang or linen wall length." };
+  if (lw > 0 && !(lc >= 1 && Number.isInteger(lc))) return { error: "Linen shelf count must be a whole number of at least 1." };
+  if (!(spacing > 0)) return { error: "Bracket spacing must be positive (in)." };
+  if (!(stock > 0)) return { error: "Stock length must be positive (ft)." };
+  const rod_lf = s + 2 * d;
+  const shelf_lf = s + d + lw * (lw > 0 ? lc : 0);
+  const perRun = (ft) => (ft > 0 ? Math.ceil((ft * 12) / spacing) + 1 : 0);
+  const brackets = perRun(s) + 2 * perRun(d) + (lw > 0 ? lc * perRun(lw) : 0);
+  const rod_sticks = Math.ceil(rod_lf / stock);
+  const shelf_boards = Math.ceil(shelf_lf / stock);
+  const longest_run_ft = Math.max(s, d, lw);
+  const splice_needed = longest_run_ft > stock;
+  if (![rod_lf, shelf_lf, rod_sticks, shelf_boards, brackets].every(Number.isFinite)) return { error: "Closet-takeoff math did not produce a finite value." };
+  return {
+    rod_lf, shelf_lf, rod_sticks, shelf_boards, brackets, splice_needed,
+    note: (splice_needed ? "A run is LONGER than the stock length - the splice must land AT a support (never mid-span), which can add a stick beyond the straight division below. " : "")
+      + "Single-hang walls take one rod and one shelf; double-hang walls take two rods (two bracket tiers) and one shelf; a linen wall takes its shelf count with supports under every shelf. Supports land at each end and every " + spacing + " in between - the middle bracket is what keeps a loaded 6-ft rod from smiling. Standard hang heights (66-in single; 40/80-in double; linen starting near 76 in and stacking down) are practice, not code. Wire shelving counts by the same wall lengths but its own bracket system; the manufacturer's span and support instructions govern.",
+  };
+}
+export const closetShelfTakeoffExample = { inputs: { single_hang_ft: 6, double_hang_ft: 4, linen_wall_ft: 3, linen_shelf_count: 4, bracket_spacing_in: 32, stock_length_ft: 8 } };
+FINISH_RENDERERS["closet-shelf-takeoff"] = _simpleRenderer({
+  citation: "Citation: closet takeoff arithmetic - rod LF = single-hang + 2 x double-hang; shelf LF = one shelf per hang run + linen shelves; supports at each end and every entered spacing between (count per run = ceil(run/spacing) + 1), with double-hang runs carrying two tiers and linen stacks one per shelf; sticks and boards divide the totals by stock length, and a run longer than stock is flagged because the splice must land at a support. A counting aid; the shelving manufacturer's span and support instructions govern.",
+  example: closetShelfTakeoffExample.inputs,
+  fields: [
+    { key: "single_hang_ft", label: "Single-hang wall length (ft)", kind: "number" },
+    { key: "double_hang_ft", label: "Double-hang wall length (ft)", kind: "number", default: 0 },
+    { key: "linen_wall_ft", label: "Linen wall length (ft)", kind: "number", default: 0 },
+    { key: "linen_shelf_count", label: "Linen shelves (count)", kind: "number", default: 4 },
+    { key: "bracket_spacing_in", label: "Support spacing (in)", kind: "number", default: 32 },
+    { key: "stock_length_ft", label: "Stock length (ft)", kind: "number", default: 8 },
+  ],
+  outputs: [
+    { key: "rod", id: "cst-out-rod", label: "Rod", value: (r) => fmt(r.rod_lf, 0) + " ft (" + fmt(r.rod_sticks, 0) + " sticks)" + (r.splice_needed ? " - splice at a support" : "") },
+    { key: "shf", id: "cst-out-shf", label: "Shelf", value: (r) => fmt(r.shelf_lf, 0) + " ft (" + fmt(r.shelf_boards, 0) + " boards)" },
+    { key: "brk", id: "cst-out-brk", label: "Supports / brackets", value: (r) => fmt(r.brackets, 0) },
+    { key: "n", id: "cst-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeClosetShelfTakeoff,
+});

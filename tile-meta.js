@@ -528,6 +528,7 @@ const _TILES = [
   ["climb-gradient-roc", "K"],
   ["concrete-yield", "E"],
   ["rough-opening-size", "E"],
+  ["closet-shelf-takeoff", "E"],
   ["glass-weight", "E"],
   ["fineness-modulus", "E"], ["soil-gradation-coefficients", "E"],
   ["water-cement-ratio", "E"],

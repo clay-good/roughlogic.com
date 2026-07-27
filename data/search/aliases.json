@@ -90767,6 +90767,36 @@
       "kind": "adjacent"
     },
     {
+      "term": "closet rod and shelf",
+      "target": "closet-shelf-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "closet takeoff",
+      "target": "closet-shelf-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "how many closet brackets",
+      "target": "closet-shelf-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "double hang closet rod length",
+      "target": "closet-shelf-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "linen closet shelving material",
+      "target": "closet-shelf-takeoff",
+      "kind": "redirect"
+    },
+    {
+      "term": "shelf and rod supports spacing",
+      "target": "closet-shelf-takeoff",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

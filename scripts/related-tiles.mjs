@@ -1245,6 +1245,7 @@ const RELATED = {
   "glass-weight": ["metal-weight","deck-board-takeoff","gutter-downspout"],
   "rough-opening-size": ["header-sizing","metal-stud-takeoff","glass-weight"],
   "corner-bead-takeoff": ["drywall","drywall-fastener-takeoff","trim-linear-footage"],
+  "closet-shelf-takeoff": ["trim-linear-footage","equal-spacing","rough-opening-size"],
   "fineness-modulus": ["relative-compaction","atterberg-indices","soil-phase-relations","soil-gradation-coefficients"],
   "soil-gradation-coefficients": ["atterberg-indices","fineness-modulus","relative-compaction","soil-phase-relations"],
   "shadow-length": ["pv-row-spacing","pv-row-shade-angle","pv-array-sizing"],

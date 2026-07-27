@@ -29980,3 +29980,36 @@ test("bounds: spec-v1027 computeSidingCourseLayout pins the story-pole adjustmen
   assert.ok("error" in _v1027({ ...base, min_overlap_in: -1 }));
   assert.ok("error" in _v1027({ ...base, wall_height_ft: Infinity }));
 });
+
+import { computeClosetShelfTakeoff as _v1028 } from "../../calc-finish.js";
+
+test("bounds: spec-v1028 computeClosetShelfTakeoff pins the worked example, the per-run support formula, the double-hang two-tier identity, the splice seam, additivity, and error seams", () => {
+  const base = { single_hang_ft: 6, double_hang_ft: 4, linen_wall_ft: 3, linen_shelf_count: 4, bracket_spacing_in: 32, stock_length_ft: 8 };
+  const r = _v1028(base);
+  assert.ok(r.rod_lf === 14 && r.shelf_lf === 22);
+  assert.ok(r.rod_sticks === 2 && r.shelf_boards === 3);
+  assert.ok(r.brackets === 22 && r.splice_needed === false);
+  // Per-run support formula: 6 ft at 32 in -> ceil(72/32)+1 = 4.
+  const sOnly = _v1028({ single_hang_ft: 6, double_hang_ft: 0, linen_wall_ft: 0, bracket_spacing_in: 32, stock_length_ft: 8 });
+  assert.ok(sOnly.brackets === 4);
+  // Double-hang two-tier identity: same wall as double doubles the rod and the bracket tiers.
+  const dOnly = _v1028({ single_hang_ft: 0, double_hang_ft: 6, linen_wall_ft: 0, bracket_spacing_in: 32, stock_length_ft: 8 });
+  assert.ok(dOnly.rod_lf === 12 && dOnly.brackets === 8 && dOnly.shelf_lf === 6);
+  // Linen stack: one support run per shelf.
+  const lOnly = _v1028({ single_hang_ft: 0, double_hang_ft: 0, linen_wall_ft: 3, linen_shelf_count: 5, bracket_spacing_in: 32, stock_length_ft: 8 });
+  assert.ok(lOnly.shelf_lf === 15 && lOnly.brackets === 5 * 3);
+  // Splice seam: run exactly at stock passes; past it flags.
+  assert.ok(_v1028({ single_hang_ft: 8, double_hang_ft: 0, linen_wall_ft: 0, stock_length_ft: 8 }).splice_needed === false);
+  const long = _v1028({ single_hang_ft: 10, double_hang_ft: 0, linen_wall_ft: 0, stock_length_ft: 8 });
+  assert.ok(long.splice_needed === true && long.rod_sticks === 2 && long.brackets === 5);
+  // Additivity of rod LF in double-hang.
+  const d2 = _v1028({ single_hang_ft: 0, double_hang_ft: 8, linen_wall_ft: 0, stock_length_ft: 8 });
+  assert.ok(Math.abs(d2.rod_lf - 16) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v1028({ single_hang_ft: 0, double_hang_ft: 0, linen_wall_ft: 0 }));
+  assert.ok("error" in _v1028({ single_hang_ft: -1 }));
+  assert.ok("error" in _v1028({ single_hang_ft: 6, bracket_spacing_in: 0 }));
+  assert.ok("error" in _v1028({ single_hang_ft: 6, stock_length_ft: 0 }));
+  assert.ok("error" in _v1028({ linen_wall_ft: 3, linen_shelf_count: 2.5, single_hang_ft: 0, double_hang_ft: 0 }));
+  assert.ok("error" in _v1028({ single_hang_ft: Infinity }));
+});

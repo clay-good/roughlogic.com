@@ -968,6 +968,7 @@ export const COMPUTE_MAP = {
   "rough-opening-size": { module: "../../calc-finish.js", fn: "computeRoughOpeningSize" },
   "corner-bead-takeoff": { module: "../../calc-construction.js", fn: "computeCornerBeadTakeoff" },
   "siding-course-layout": { module: "../../calc-construction.js", fn: "computeSidingCourseLayout" },
+  "closet-shelf-takeoff": { module: "../../calc-finish.js", fn: "computeClosetShelfTakeoff" },
   "fineness-modulus": { module: "../../calc-earthwork.js", fn: "computeFinenessModulus" },
   "soil-gradation-coefficients": { module: "../../calc-earthwork.js", fn: "computeSoilGradationCoefficients" },
   "water-cement-ratio": { module: "../../calc-construction.js", fn: "computeWaterCementRatio" },

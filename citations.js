@@ -15073,6 +15073,17 @@ export const CITATIONS = {
       { name: "Overlap safety", value: "shrinking exposure increases headlap, so an adjusted layout never violates a minimum the target cleared", source: "geometry of lap siding" },
     ],
   },
+  "closet-shelf-takeoff": {
+    formula: "rod = single + 2 x double; shelf = single + double + linen x count; supports per run = ceil(run/spacing) + 1 (two tiers on double-hang, one per linen shelf); sticks/boards = ceil(LF/stock); a run longer than stock flags a splice-at-support.",
+    edition: "Closet takeoff arithmetic - no standard claimed; hang heights are named as common practice, not code.",
+    freeAccess: "Counting arithmetic; shelving manufacturers publish span and support instructions free.",
+    governance: GOVERNANCE.general,
+    editionNote: "The support count is the number a straight LF calculator never produces: brackets land at each end and every entered spacing between, double-hang runs carry two tiers, and a linen stack takes one under every shelf - the middle bracket is what keeps a loaded 6-ft rod from smiling. Runs longer than stock are flagged because the splice must land AT a support, never mid-span. Wood rod and shelf; wire shelving counts by the same wall lengths but its own bracket system, and the manufacturer's span and support instructions govern.",
+    assumptions: [
+      { name: "Support rule", value: "an end support plus one every entered spacing (ceil(run/spacing) + 1 per run)", source: "common shelving practice; manufacturer instructions govern" },
+      { name: "One run per category", value: "each hang category is treated as one continuous run for the end count; enter walls separately for multi-wall closets", source: "stated simplification" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

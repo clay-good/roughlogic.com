@@ -4,6 +4,22 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(finish): closet-shelf-takeoff, the closet build nothing counted; 2026-07-27
+
+No closet tile existed; the only closet-adjacent alias points at `equal-spacing`, which returns spacing,
+not footage or support counts. Adds one tile to `calc-finish.js` (Group E).
+
+`closet-shelf-takeoff` counts rod LF (double-hang walls take two rods), shelf LF (one per hang run plus
+the linen stack), sticks and boards from stock length, and the number a straight LF calculator never
+produces: the support count -- brackets at each end and every entered spacing between, two tiers on
+double-hang, one under every linen shelf. The pinned closet (6-ft single + 4-ft double + 3-ft linen with
+4 shelves) takes 14 ft of rod, 22 ft of shelf, and 22 supports. Runs longer than stock are flagged
+because the splice must land AT a support, never mid-span.
+
+Fuzzer pins the per-run support formula, the double-hang two-tier identity, the linen one-run-per-shelf
+rule, the splice seam exactly at stock length, additivity, and the error seams. Catalog 1,476 -> 1,477.
+Spec: spec-v1028.
+
 ### feat(construction): siding-course-layout, the story-pole half siding-takeoff defers; 2026-07-27
 
 `siding-takeoff` returns squares and lap LF and defers layout -- courses and trim "taken off separately."
