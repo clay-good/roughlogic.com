@@ -90977,6 +90977,36 @@
       "kind": "question"
     },
     {
+      "term": "hydraulic hose velocity",
+      "target": "hydraulic-line-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "hydraulic line sizing by velocity",
+      "target": "hydraulic-line-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "what size hydraulic hose for gpm",
+      "target": "hydraulic-line-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "hydraulic pump cavitating suction line too small",
+      "target": "hydraulic-line-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "hydraulic fluid velocity ft per second",
+      "target": "hydraulic-line-velocity",
+      "kind": "redirect"
+    },
+    {
+      "term": "minimum hose id for a hydraulic circuit",
+      "target": "hydraulic-line-velocity",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

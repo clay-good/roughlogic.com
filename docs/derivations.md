@@ -2500,6 +2500,7 @@ cross-check.
 | calc-mechanic.js | `computeHullDisplacement` | `{ lwl_ft = 30, bwl_ft = 10, draft_ft = 4, block_coefficient = 0.5, water_dens...` | _ | _ | _ |
 | calc-mechanic.js | `computeHullSpeed` | `{ lwl_ft = 0, actual_speed_kn = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHydraulicDriveFlowLimit` | `{ drive_hp = 0, psi = 0, efficiency = 0.85 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeHydraulicLineVelocity` | `{ flow_gpm = 0, inside_dia_in = 0, line_type = "pressure", max_velocity_overr...` | _ | _ | _ |
 | calc-mechanic.js | `computeHydraulicMotorTorqueSpeed` | `{ psi = 0, disp_in3 = 0, gpm = 0, mech_eff = 0.90, vol_eff = 0.95 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHydraulicPumpFlow` | `{ disp_in3 = 0, rpm = 0, vol_eff = 0.95 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHydraulicPumpHorsepower` | `{ gpm = 0, psi = 0, efficiency = 0.85 } = {}` | _ | _ | _ |
@@ -3144,7 +3145,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1730.
+Row count: 1731.
 
 <!-- END function-corpus-v14 -->
 
@@ -4320,7 +4321,7 @@ per spec-v14 §13.1 second paragraph.
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group K Mechanic (95 tiles)
+### Group K Mechanic (96 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4373,6 +4374,7 @@ per spec-v14 §13.1 second paragraph.
 | `hull-displacement` | Hull Displacement and Block Coefficient | Hull displacement (Archimedes + block...; vol = 30*10*4*0.5 = 600; wt = 600*64 = 38400; long tons =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hull-speed` | Displacement Hull Speed and Speed/Length Ratio | displacement hull-speed relation (Fro...; spec-v502 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-drive-flow-limit` | Hydraulic Flow Limit from Drive Power | fluid-power engineering (inverse); 13.73 drive HP, 2000 psi, 0.85 efficiency -> 10 GPM (roun... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `hydraulic-line-velocity` | Hydraulic Line Fluid Velocity and Minimum ID | hydraulic design practice; 20 gpm through 0.625-in ID pressure line -> A 0.30680 in^... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-motor-torque-speed` | Hydraulic Motor Torque and Speed | fluid-power engineering; spec-v397 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-pump-flow` | Hydraulic Pump Output Flow | fluid-power engineering; spec-v642 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-pump-horsepower` | Hydraulic Pump Drive Horsepower | fluid-power engineering; spec-v396 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4813,6 +4815,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1483. Fixture-covered or reference-cadence: 1483 / 1483.
+Tile count: 1484. Fixture-covered or reference-cadence: 1484 / 1484.
 
 <!-- END tile-index-v14 -->

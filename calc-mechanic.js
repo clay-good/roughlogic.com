@@ -2906,3 +2906,66 @@ MECHANIC_RENDERERS["flywheel-energy"] = _simpleRenderer({
   ],
   compute: computeFlywheelEnergy,
 });
+
+// --- spec-v1037 K: Hydraulic line fluid velocity ---
+// V (ft/s) = 231 in^3/gal / (60 s/min x 12 in/ft) x Q / A = 0.3208333 Q / A, with A = pi/4 d^2.
+// The constant is DERIVED from the gallon and the unit conversions, not recalled. The recommended
+// velocity bands are conventions and PUBLISHED SETS DISAGREE, so the ceiling is an editable input
+// seeded by line type; both published sets are named in the citation.
+const HYD_GPM_TO_FPS = 231 / (60 * 12); // 0.3208333... in^3/gal -> ft/s per gpm per in^2
+const HYD_LINE_BANDS = {
+  suction: { label: "Suction / inlet", min: 2, max: 4 },
+  return: { label: "Return", min: 4, max: 13 },
+  pressure: { label: "Pressure / discharge", min: 7, max: 18 },
+};
+// dims: in { flow_gpm: L^3 T^-1, inside_dia_in: L, line_type: dimensionless, max_velocity_override_fps: L T^-1 } out: { area_in2: L^2, velocity_fps: L T^-1, min_dia_in: L }
+export function computeHydraulicLineVelocity({ flow_gpm = 0, inside_dia_in = 0, line_type = "pressure", max_velocity_override_fps = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q = Number(flow_gpm) || 0;
+  const d = Number(inside_dia_in) || 0;
+  const override = Number(max_velocity_override_fps) || 0;
+  const band = HYD_LINE_BANDS[line_type];
+  if (!band) return { error: "Line type must be suction, return, or pressure." };
+  if (!(q > 0)) return { error: "Flow must be positive (gpm)." };
+  if (!(d > 0)) return { error: "Line inside diameter must be positive (in) - the hose ID, not the dash size or the OD." };
+  if (override < 0) return { error: "Velocity ceiling override cannot be negative (ft/s); use 0 to take the line-type default." };
+  const max_fps = override > 0 ? override : band.max;
+  const area_in2 = Math.PI / 4 * d * d;
+  const velocity_fps = HYD_GPM_TO_FPS * q / area_in2;
+  const over = velocity_fps > max_fps;
+  const under = velocity_fps < band.min;
+  const min_area_in2 = HYD_GPM_TO_FPS * q / max_fps;
+  const min_dia_in = Math.sqrt(4 * min_area_in2 / Math.PI);
+  const max_flow_gpm = max_fps * area_in2 / HYD_GPM_TO_FPS;
+  if (![area_in2, velocity_fps, min_dia_in, max_flow_gpm].every(Number.isFinite)) return { error: "Hydraulic-velocity math did not produce a finite value." };
+  return {
+    band_label: band.label, band_min_fps: band.min, band_max_fps: max_fps,
+    area_in2, velocity_fps, over, under, min_dia_in, max_flow_gpm,
+    note: (over
+      ? "OVER the ceiling for a " + band.label.toLowerCase() + " line: " + velocity_fps.toFixed(1) + " ft/s against " + max_fps + ". Step up to at least " + min_dia_in.toFixed(3) + " in ID. "
+      : "Within the " + band.label.toLowerCase() + " range at " + velocity_fps.toFixed(1) + " ft/s. ")
+      + (line_type === "suction"
+        ? "A suction line is the one that punishes you: too fast and the pump cavitates, which sounds like gravel and destroys the pump, so the ceiling is far lower than on any pressure line and the run should be short, straight, and generously sized. "
+        : "Excess velocity turns pressure into heat and noise rather than work, and every fitting multiplies the effect. ")
+      + "PUBLISHED BANDS DISAGREE - one common set gives return 4-13 and pressure 7-18 ft/s while another gives return 10-15, medium pressure 15-20, and high pressure 20-25 - so the ceiling here is editable and the defaults are the more conservative set. Higher system pressures tolerate higher velocity; continuous-duty circuits should sit at the low end of whichever band you use. Enter the true hose ID, not the dash size or the OD. Velocity is one criterion: pressure drop, heat rejection, and hose pressure rating are separate, and the hose manufacturer's data governs.",
+  };
+}
+export const hydraulicLineVelocityExample = { inputs: { flow_gpm: 20, inside_dia_in: 0.625, line_type: "pressure", max_velocity_override_fps: 0 } };
+MECHANIC_RENDERERS["hydraulic-line-velocity"] = _simpleRenderer({
+  citation: "Citation: fluid velocity V (ft/s) = 0.3208 x Q (gpm) / A (in^2), where the constant is 231 in^3 per gallon divided by 60 s/min and 12 in/ft - derived, not tabulated - with A = pi/4 x ID^2. The recommended velocity bands are industry conventions and published sets DISAGREE: one gives suction 2-4, return 4-13, pressure 7-18 ft/s; another gives suction 2-4, return 10-15, medium pressure 15-20, high pressure 20-25. The defaults here are the more conservative set and the ceiling is an editable input. Higher system pressures tolerate higher velocity; continuous duty belongs at the low end. Velocity is one criterion - pressure drop, heat rejection, and the hose pressure rating are separate, and the hose manufacturer's data governs.",
+  example: hydraulicLineVelocityExample.inputs,
+  fields: [
+    { key: "flow_gpm", label: "Flow (gpm)", kind: "number" },
+    { key: "inside_dia_in", label: "Line inside diameter (in, true ID)", kind: "number" },
+    { key: "line_type", label: "Line type", kind: "select", options: [{ value: "pressure", label: "Pressure / discharge (7-18 ft/s)", selected: true }, { value: "return", label: "Return (4-13 ft/s)" }, { value: "suction", label: "Suction / inlet (2-4 ft/s)" }] },
+    { key: "max_velocity_override_fps", label: "Velocity ceiling override (ft/s, 0 = default)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "v", id: "hlv-out-v", label: "Velocity", value: (r) => fmt(r.velocity_fps, 2) + " ft/s (" + r.band_label + " band " + fmt(r.band_min_fps, 0) + "-" + fmt(r.band_max_fps, 0) + ")" },
+    { key: "s", id: "hlv-out-s", label: "Verdict", value: (r) => (r.over ? "OVER the ceiling" : r.under ? "below the band - oversized, but not harmful" : "within the band") },
+    { key: "d", id: "hlv-out-d", label: "Minimum ID at the ceiling", value: (r) => fmt(r.min_dia_in, 3) + " in" },
+    { key: "q", id: "hlv-out-q", label: "Max flow through this line", value: (r) => fmt(r.max_flow_gpm, 1) + " gpm at the ceiling" },
+    { key: "n", id: "hlv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHydraulicLineVelocity,
+});

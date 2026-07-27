@@ -15156,6 +15156,18 @@ export const CITATIONS = {
       { name: "Slope length, stated", value: "rafter length used per the manufacturer method, conservative vs the horizontal projection by 1/cos(theta)", source: "stated conservatism" },
     ],
   },
+  "hydraulic-line-velocity": {
+    formula: "V (ft/s) = [231 / (60 x 12)] x Q (gpm) / A (in^2) = 0.3208333 Q / A, A = pi/4 ID^2; minimum ID at a ceiling = sqrt(4 (K Q / Vmax) / pi); maximum flow = Vmax A / K.",
+    edition: "Continuity with derived unit conversion (231 cubic inches per gallon, 60 s/min, 12 in/ft) plus industry recommended-velocity bands, named as conventions rather than a standard.",
+    freeAccess: "The conversion is arithmetic; the recommended bands are published across hydraulic design references and component catalogs.",
+    governance: GOVERNANCE.general,
+    editionNote: "PUBLISHED BANDS DISAGREE and the tile says so instead of picking silently: one common set gives suction 2-4, return 4-13, and pressure 7-18 ft/s, while another gives suction 2-4, return 10-15, medium pressure 15-20, and high pressure 20-25. The defaults here are the more conservative set, the ceiling is an editable override, and only the suction band (2-4) is common to both - which is fitting, because suction is the strict one: too fast and the pump cavitates, which sounds like gravel and destroys the pump. Higher system pressures tolerate higher velocity, and continuous-duty circuits belong at the low end of whichever band you use. Enter the true hose ID, not the dash size or the OD. Velocity is one criterion: pressure drop, heat rejection, and the hose pressure rating are separate, and the hose manufacturer's data governs.",
+    assumptions: [
+      { name: "Derived constant", value: "0.3208333 is written in source as 231/(60 x 12) so it can be checked, not recalled", source: "unit arithmetic" },
+      { name: "Bands are conventions", value: "editable ceiling seeded by line type; both published sets named", source: "industry hydraulic design references" },
+      { name: "Velocity only", value: "pressure drop, heat rejection, and hose pressure rating are separate checks", source: "stated scope limit" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

@@ -30316,3 +30316,54 @@ test("bounds: spec-v1036 computeSnowGuardLayout pins the worked example, the sin
   assert.ok("error" in _v1035({ ...base, rows: 1.5 }));
   assert.ok("error" in _v1035({ ...base, roof_snow_psf: Infinity }));
 });
+
+import { computeHydraulicLineVelocity as _v1037 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v1037 computeHydraulicLineVelocity pins the worked example, the derived constant, the round trips through min-ID and max-flow, all three band defaults, the override, inverse-square scaling, and error seams", () => {
+  const base = { flow_gpm: 20, inside_dia_in: 0.625, line_type: "pressure", max_velocity_override_fps: 0 };
+  const r = _v1037(base);
+  assert.ok(Math.abs(r.area_in2 - Math.PI / 4 * 0.625 * 0.625) < 1e-12);
+  assert.ok(Math.abs(r.velocity_fps - 20.915082) < 1e-5);
+  assert.ok(r.over === true && r.band_max_fps === 18);
+  assert.ok(Math.abs(r.min_dia_in - 0.673708) < 1e-5);
+  assert.ok(Math.abs(r.max_flow_gpm - 17.2125) < 1e-4);
+  // The constant is exactly 231/(60*12), computed independently here.
+  assert.ok(Math.abs(r.velocity_fps - (231 / 720) * 20 / r.area_in2) < 1e-12);
+  // ROUND TRIP 1: the reported minimum ID lands exactly on the ceiling.
+  {
+    const t = _v1037({ ...base, inside_dia_in: r.min_dia_in });
+    assert.ok(Math.abs(t.velocity_fps - 18) < 1e-9);
+    assert.ok(t.over === false);
+  }
+  // ROUND TRIP 2: the reported max flow through the ORIGINAL line lands exactly on the ceiling.
+  {
+    const t = _v1037({ ...base, flow_gpm: r.max_flow_gpm });
+    assert.ok(Math.abs(t.velocity_fps - 18) < 1e-9);
+  }
+  // All three band defaults, and suction is the strict one both published sets agree on.
+  const suc = _v1037({ ...base, line_type: "suction" });
+  const ret = _v1037({ ...base, line_type: "return" });
+  assert.ok(suc.band_min_fps === 2 && suc.band_max_fps === 4);
+  assert.ok(ret.band_min_fps === 4 && ret.band_max_fps === 13);
+  assert.ok(suc.band_max_fps < ret.band_max_fps && ret.band_max_fps < r.band_max_fps);
+  // Velocity does not depend on line type; only the verdict and the minimum ID do.
+  assert.ok(Math.abs(suc.velocity_fps - r.velocity_fps) < 1e-12);
+  assert.ok(suc.min_dia_in > r.min_dia_in);
+  assert.ok(Math.abs(suc.min_dia_in - 1.429157) < 1e-5);
+  // Override takes precedence over the line-type default.
+  const ov = _v1037({ ...base, max_velocity_override_fps: 25 });
+  assert.ok(ov.band_max_fps === 25 && ov.over === false);
+  // Exact inverse-square in diameter, exact linear in flow.
+  const big = _v1037({ ...base, inside_dia_in: 1.25 });
+  assert.ok(Math.abs(big.velocity_fps * 4 - r.velocity_fps) < 1e-9);
+  const half = _v1037({ ...base, flow_gpm: 10 });
+  assert.ok(Math.abs(half.velocity_fps * 2 - r.velocity_fps) < 1e-9);
+  // The "under the band" flag fires on an oversized line.
+  assert.ok(_v1037({ ...base, inside_dia_in: 3, line_type: "pressure" }).under === true);
+  // Error seams.
+  assert.ok("error" in _v1037({ ...base, line_type: "drain" }));
+  assert.ok("error" in _v1037({ ...base, flow_gpm: 0 }));
+  assert.ok("error" in _v1037({ ...base, inside_dia_in: 0 }));
+  assert.ok("error" in _v1037({ ...base, max_velocity_override_fps: -1 }));
+  assert.ok("error" in _v1037({ ...base, flow_gpm: Infinity }));
+});

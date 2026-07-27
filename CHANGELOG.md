@@ -4,6 +4,29 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): hydraulic-line-velocity, with the band disagreement made editable; 2026-07-27
+
+The hydraulics bench is power, flow, torque, and force -- five tiles, none returning a velocity.
+`pipe-velocity` is the closest analogue but its ceiling table is potable copper/steel erosion-corrosion, a
+different criterion with different numbers. Adds one tile to `calc-mechanic.js` (Group K).
+
+`hydraulic-line-velocity` computes V = 0.3208 Q / A, with the constant written in source as
+`231 / (60 * 12)` -- cubic inches per gallon over seconds and inches -- so a reader can check it instead of
+trusting a remembered decimal. It also returns the minimum ID that meets the ceiling and the maximum flow
+the installed line can carry.
+
+Published velocity bands disagree, and the tile says so rather than picking silently: one set gives suction
+2-4, return 4-13, pressure 7-18 ft/s; another gives return 10-15, medium pressure 15-20, high pressure
+20-25. The conservative set is seeded by line type, the ceiling is an editable override, and both sets are
+named in the citation. Only the suction band is common to both -- fitting, since that is the strict one:
+too fast and the pump cavitates. Pinned: 20 gpm through a 5/8-in ID runs 20.9 ft/s, over the pressure
+ceiling and five times the suction limit.
+
+Fuzzer pins two round trips -- feeding the reported minimum ID back in lands exactly on the ceiling, and so
+does feeding back the reported max flow -- plus the derived constant against an independent 231/720
+computation, all three band defaults, exact inverse-square scaling in diameter, and that velocity is
+independent of line type while the verdict is not. Catalog 1,483 -> 1,484. Spec: spec-v1037.
+
 ### feat(construction): snow-guard-layout, the retention side of the sliding-snow problem; 2026-07-27
 
 Zero hits for snow guard, snow retention, or snow bar anywhere. The catalog has seven snow-LOAD tiles
