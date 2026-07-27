@@ -4691,3 +4691,90 @@ function renderCompressedAirPressureDrop(inputRegion, outputRegion, citationEl) 
   sync();
 }
 HVAC_RENDERERS["compressed-air-pressure-drop"] = renderCompressedAirPressureDrop;
+
+// --- spec-v1105 C: Fan sheave change for a target CFM ---
+// The inverse fan-affinity-laws cannot do: it needs BOTH speeds. Here the target airflow sets the
+// ratio, and on a belt drive fan rpm = motor rpm x (drive sheave / driven sheave), so with the
+// driven (fan) sheave fixed the required DRIVE sheave scales with the same ratio. The point of the
+// tile is the cube law landing on the motor: +20% air is +73% brake horsepower.
+// dims: in { current_cfm: L^3 T^-1, target_cfm: L^3 T^-1, current_fan_rpm: T^-1, motor_rpm: T^-1, drive_sheave_in: L, current_bhp: M L^2 T^-3, motor_hp: M L^2 T^-3, current_sp_inwg: M L^-1 T^-2 } out: { ratio: dimensionless, required_fan_rpm: T^-1, new_drive_sheave_in: L, new_bhp: M L^2 T^-3 }
+export function computeFanSheaveForTargetCfm({ current_cfm = 0, target_cfm = 0, current_fan_rpm = 0, motor_rpm = 1750, drive_sheave_in = 0, current_bhp = 0, motor_hp = 0, current_sp_inwg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q1 = Number(current_cfm) || 0;
+  const q2 = Number(target_cfm) || 0;
+  const n1 = Number(current_fan_rpm) || 0;
+  const nm = Number(motor_rpm) || 0;
+  const dDrive = Number(drive_sheave_in) || 0;
+  const bhp1 = Number(current_bhp) || 0;
+  const mhp = Number(motor_hp) || 0;
+  const sp1 = Number(current_sp_inwg) || 0;
+  if (!(q1 > 0)) return { error: "Current airflow must be positive (cfm) - measure it, do not use the nameplate." };
+  if (!(q2 > 0)) return { error: "Target airflow must be positive (cfm)." };
+  if (!(n1 > 0)) return { error: "Current fan speed must be positive (rpm)." };
+  if (!(nm > 0)) return { error: "Motor speed must be positive (rpm)." };
+  if (!(dDrive > 0)) return { error: "Current drive (motor) sheave pitch diameter must be positive (in)." };
+  if (bhp1 < 0 || mhp < 0 || sp1 < 0) return { error: "Brake horsepower, motor horsepower, and static pressure cannot be negative." };
+  const ratio = q2 / q1;
+  const required_fan_rpm = n1 * ratio;
+  const new_drive_sheave_in = dDrive * ratio;
+  const driven_sheave_in = nm * dDrive / n1;
+  const check_fan_rpm = nm * new_drive_sheave_in / driven_sheave_in;
+  const new_bhp = bhp1 > 0 ? bhp1 * Math.pow(ratio, 3) : 0;
+  const new_sp_inwg = sp1 > 0 ? sp1 * ratio * ratio : 0;
+  const bhp_increase_pct = (Math.pow(ratio, 3) - 1) * 100;
+  const motor_overloaded = mhp > 0 && new_bhp > mhp;
+  const over_motor_rpm = required_fan_rpm > nm;
+  if (![ratio, required_fan_rpm, new_drive_sheave_in, driven_sheave_in].every(Number.isFinite)) return { error: "Sheave-change math did not produce a finite value." };
+  return {
+    ratio, required_fan_rpm, new_drive_sheave_in, driven_sheave_in, check_fan_rpm,
+    new_bhp, new_sp_inwg, bhp_increase_pct, motor_overloaded, over_motor_rpm,
+    note: "Airflow follows speed one-for-one, but brake horsepower follows the CUBE: this change is "
+      + ((ratio - 1) * 100).toFixed(1) + "% on airflow and " + bhp_increase_pct.toFixed(1) + "% on horsepower. "
+      + (motor_overloaded ? "THE MOTOR IS OVERLOADED at " + new_bhp.toFixed(2) + " bhp against a " + mhp + " hp motor - this sheave change trips the overloads or cooks the motor, and it is the single most common way a well-meant airflow fix fails. " : "")
+      + (over_motor_rpm ? "The required fan speed also EXCEEDS the motor speed, which a simple sheave swap cannot deliver. " : "")
+      + "Sheaves come in fixed increments and adjustable sheaves have a limited range, so take the next available size and re-measure rather than trusting the computed diameter to the hundredth. Pitch diameter is not outside diameter. A faster fan also raises static pressure with the square, so duct noise and leakage rise faster than the airflow does, and the belt and bearings see more load. This assumes the same fan on the same system curve - if the system changed, the fan curve, not this ratio, governs. Verify airflow after the change; the fan curve and equipment ratings govern.",
+  };
+}
+export const fanSheaveForTargetCfmExample = { inputs: { current_cfm: 8000, target_cfm: 9600, current_fan_rpm: 700, motor_rpm: 1750, drive_sheave_in: 4.0, current_bhp: 3.0, motor_hp: 5, current_sp_inwg: 1.5 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderFanSheaveForTargetCfm(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: fan affinity laws (AMCA / ASHRAE Handbook - Fundamentals) solved for the DRIVE sheave rather than for a known speed: Q scales with rpm, so the required fan speed is the current speed times the airflow ratio; on a belt drive fan rpm = motor rpm x (drive sheave / driven sheave), so with the fan sheave fixed the required drive sheave scales with the same ratio. Static pressure follows the square and brake horsepower the CUBE, so the motor check is the point: a 20% airflow increase is a 73% horsepower increase. Pitch diameter, not outside diameter; sheaves come in fixed increments. Same fan on the same system curve. Verify airflow after the change; the fan curve and equipment ratings govern.";
+  const q1 = makeNumber("Current airflow (cfm, measured)", "fsc-q1", { step: "any", value: "8000" });
+  q1.input.value = "8000";
+  const q2 = makeNumber("Target airflow (cfm)", "fsc-q2", { step: "any", value: "9600" });
+  q2.input.value = "9600";
+  const n1 = makeNumber("Current fan speed (rpm)", "fsc-n1", { step: "any", value: "700" });
+  n1.input.value = "700";
+  const nm = makeNumber("Motor speed (rpm)", "fsc-nm", { step: "any", value: "1750" });
+  nm.input.value = "1750";
+  const ds = makeNumber("Current drive (motor) sheave pitch dia (in)", "fsc-ds", { step: "any", value: "4" });
+  ds.input.value = "4";
+  const bh = makeNumber("Current brake horsepower (0 = skip)", "fsc-bh", { step: "any", value: "3" });
+  bh.input.value = "3";
+  const mh = makeNumber("Motor nameplate hp (0 = skip)", "fsc-mh", { step: "any", value: "5" });
+  mh.input.value = "5";
+  const sp = makeNumber("Current static pressure (in w.c., 0 = skip)", "fsc-sp", { step: "any", value: "1.5" });
+  sp.input.value = "1.5";
+  for (const f of [q1, q2, n1, nm, ds, bh, mh, sp]) inputRegion.appendChild(f.wrap);
+  const oR = makeOutputLine(outputRegion, "Speed ratio / required fan rpm", "fsc-out-r");
+  const oS = makeOutputLine(outputRegion, "New drive sheave (pitch dia)", "fsc-out-s");
+  const oP = makeOutputLine(outputRegion, "Power and static pressure", "fsc-out-p");
+  const oN = makeOutputLine(outputRegion, "Note", "fsc-out-n");
+  const sync = () => {
+    const r = computeFanSheaveForTargetCfm({
+      current_cfm: Number(q1.input.value), target_cfm: Number(q2.input.value), current_fan_rpm: Number(n1.input.value),
+      motor_rpm: Number(nm.input.value), drive_sheave_in: Number(ds.input.value), current_bhp: Number(bh.input.value),
+      motor_hp: Number(mh.input.value), current_sp_inwg: Number(sp.input.value),
+    });
+    if (r.error) { oR.textContent = r.error; oS.textContent = ""; oP.textContent = ""; oN.textContent = ""; return; }
+    oR.textContent = r.ratio.toFixed(4) + " -- " + r.required_fan_rpm.toFixed(0) + " rpm" + (r.over_motor_rpm ? " (EXCEEDS motor speed)" : "");
+    oS.textContent = r.new_drive_sheave_in.toFixed(2) + " in (from " + Number(ds.input.value).toFixed(2) + "; fan sheave stays " + r.driven_sheave_in.toFixed(2) + " in)";
+    oP.textContent = (r.new_bhp > 0 ? r.new_bhp.toFixed(2) + " bhp, +" + r.bhp_increase_pct.toFixed(0) + "%" + (r.motor_overloaded ? " -- OVER the motor" : " -- within the motor") : "power not checked")
+      + (r.new_sp_inwg > 0 ? "; static " + r.new_sp_inwg.toFixed(2) + " in w.c." : "");
+    oN.textContent = r.note;
+  };
+  for (const f of [q1, q2, n1, nm, ds, bh, mh, sp]) f.input.addEventListener("input", sync);
+  sync();
+}
+HVAC_RENDERERS["fan-sheave-for-target-cfm"] = renderFanSheaveForTargetCfm;

@@ -15216,6 +15216,18 @@ export const CITATIONS = {
       { name: "30-degree guidance", value: "commonly published limit for keeping an anchor overhead; reported, not derived", source: "fall-protection training guidance" },
     ],
   },
+  "fan-sheave-for-target-cfm": {
+    formula: "ratio = target CFM / current CFM; required fan rpm = current rpm x ratio; on a belt drive fan rpm = motor rpm x (drive sheave / driven sheave), so with the fan sheave fixed the new drive sheave = current drive sheave x ratio; SP scales with ratio^2 and BHP with ratio^3.",
+    edition: "Fan affinity laws (AMCA / ASHRAE Handbook - Fundamentals) solved for the drive sheave rather than for a known speed, combined with the belt-drive speed ratio.",
+    freeAccess: "The affinity laws and the belt-drive ratio are public engineering relations published in every fan and drive catalog.",
+    governance: GOVERNANCE.general,
+    editionNote: "THE CUBE LAW LANDING ON THE MOTOR IS THE POINT: airflow follows speed one-for-one but brake horsepower follows the cube, so a 20% airflow increase is a 73% horsepower increase and routinely overloads the existing motor - the most common way a well-meant airflow fix cooks a motor or trips the overloads. The tile checks it explicitly. Sheaves come in fixed increments and adjustable sheaves have a limited range, so take the next available size and re-measure rather than trusting a computed diameter to the hundredth; enter PITCH diameter, not outside diameter. A faster fan raises static pressure with the square, so duct noise and leakage rise faster than the airflow, and the belt and bearings see more load. Same fan on the same system curve - if the system changed, the fan curve governs rather than this ratio. Measure the current airflow rather than trusting the nameplate, and verify airflow after the change. The fan curve and equipment ratings govern.",
+    assumptions: [
+      { name: "Affinity laws", value: "Q ~ N, SP ~ N^2, BHP ~ N^3 for the same fan on the same system curve", source: "AMCA / ASHRAE Handbook - Fundamentals" },
+      { name: "Belt-drive ratio", value: "fan rpm = motor rpm x drive sheave / driven sheave; the fan sheave is held fixed", source: "belt-drive geometry" },
+      { name: "Motor check", value: "new BHP compared against the nameplate horsepower; the cube law is what fails it", source: "computed in the tile" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

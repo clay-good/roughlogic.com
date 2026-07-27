@@ -30554,3 +30554,58 @@ test("bounds: spec-v1104 computeSwingFallGeometry pins the exact 30-degree case,
   assert.ok("error" in _v1104({ horizontal_offset_ft: 10, anchor_height_ft: 20, base_required_clearance_ft: -1 }));
   assert.ok("error" in _v1104({ horizontal_offset_ft: Infinity, anchor_height_ft: 20 }));
 });
+
+import { computeFanSheaveForTargetCfm as _v1105 } from "../../calc-hvac.js";
+import { computeFanAffinityLaws as _v1105sib } from "../../calc-hvac.js";
+
+test("bounds: spec-v1105 computeFanSheaveForTargetCfm pins the motor-overload example, the belt-drive round trip, exact agreement with the affinity-laws sibling, the cube law both directions, and error seams", () => {
+  const base = { current_cfm: 8000, target_cfm: 9600, current_fan_rpm: 700, motor_rpm: 1750, drive_sheave_in: 4.0, current_bhp: 3.0, motor_hp: 5, current_sp_inwg: 1.5 };
+  const r = _v1105(base);
+  assert.ok(Math.abs(r.ratio - 1.2) < 1e-12);
+  assert.ok(Math.abs(r.required_fan_rpm - 840) < 1e-9);
+  assert.ok(Math.abs(r.new_drive_sheave_in - 4.8) < 1e-12);
+  assert.ok(Math.abs(r.driven_sheave_in - 10) < 1e-12);
+  assert.ok(Math.abs(r.new_bhp - 5.184) < 1e-9);
+  assert.ok(Math.abs(r.bhp_increase_pct - 72.8) < 1e-9);
+  assert.ok(r.motor_overloaded === true && r.over_motor_rpm === false);
+  // BELT-DRIVE ROUND TRIP: the returned sheave, run back through the drive ratio, reproduces the speed.
+  assert.ok(Math.abs(r.check_fan_rpm - r.required_fan_rpm) < 1e-9);
+  // CROSS-IMPLEMENTATION: the affinity-laws sibling, given the speed this tile computed, must agree.
+  {
+    const sib = _v1105sib({ q1_cfm: 8000, sp1_inwg: 1.5, bhp1_hp: 3.0, n1: 700, n2: r.required_fan_rpm });
+    assert.ok(Math.abs(sib.q2_cfm - 9600) < 1e-9);
+    assert.ok(Math.abs(sib.bhp2_hp - r.new_bhp) < 1e-9);
+    assert.ok(Math.abs(sib.sp2_inwg - r.new_sp_inwg) < 1e-9);
+  }
+  // The cube law, both directions: a 25% cut takes 57.8% of the power off.
+  const slow = _v1105({ ...base, target_cfm: 6000 });
+  assert.ok(Math.abs(slow.ratio - 0.75) < 1e-12);
+  assert.ok(Math.abs(slow.new_drive_sheave_in - 3) < 1e-12);
+  assert.ok(Math.abs(slow.new_bhp - 1.265625) < 1e-12);
+  assert.ok(Math.abs(slow.bhp_increase_pct + 57.8125) < 1e-9);
+  assert.ok(slow.motor_overloaded === false);
+  // Exact power-law exponents across a ratio sweep.
+  for (const q of [4000, 8000, 10000, 12000]) {
+    const t = _v1105({ ...base, target_cfm: q });
+    const k = q / 8000;
+    assert.ok(Math.abs(t.new_bhp - 3.0 * k * k * k) < 1e-9);
+    assert.ok(Math.abs(t.new_sp_inwg - 1.5 * k * k) < 1e-9);
+    assert.ok(Math.abs(t.new_drive_sheave_in - 4.0 * k) < 1e-12);
+  }
+  // A no-change target is the identity.
+  const same = _v1105({ ...base, target_cfm: 8000 });
+  assert.ok(same.ratio === 1 && same.new_drive_sheave_in === 4 && Math.abs(same.new_bhp - 3) < 1e-12);
+  // Optional inputs left at 0 skip their checks rather than erroring.
+  const noPower = _v1105({ ...base, current_bhp: 0, motor_hp: 0, current_sp_inwg: 0 });
+  assert.ok(noPower.new_bhp === 0 && noPower.new_sp_inwg === 0 && noPower.motor_overloaded === false);
+  // The over-motor-rpm flag fires when a sheave swap cannot get there.
+  assert.ok(_v1105({ ...base, target_cfm: 30000 }).over_motor_rpm === true);
+  // Error seams.
+  assert.ok("error" in _v1105({ ...base, current_cfm: 0 }));
+  assert.ok("error" in _v1105({ ...base, target_cfm: 0 }));
+  assert.ok("error" in _v1105({ ...base, current_fan_rpm: 0 }));
+  assert.ok("error" in _v1105({ ...base, motor_rpm: 0 }));
+  assert.ok("error" in _v1105({ ...base, drive_sheave_in: 0 }));
+  assert.ok("error" in _v1105({ ...base, current_bhp: -1 }));
+  assert.ok("error" in _v1105({ ...base, current_cfm: Infinity }));
+});

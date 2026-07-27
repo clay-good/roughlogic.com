@@ -4,6 +4,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): fan-sheave-for-target-cfm, and the cube law landing on the motor; 2026-07-27
+
+`fan-affinity-laws` requires BOTH speeds -- it cannot solve for the speed an airflow needs, let alone the
+sheave that delivers it. `belt-pulley` goes the other way from known diameters. No tile returned a required
+sheave diameter for an airflow target. Adds one tile to `calc-hvac.js` (Group C), cross-linked with the
+affinity sibling.
+
+The tile exists for the motor check. Airflow follows speed one-for-one but brake horsepower follows the
+CUBE, so the pinned example is deliberately the failure case: 8,000 to 9,600 cfm -- only 20% more air --
+swaps a 4.0-in drive sheave for a 4.8-in and takes 3.0 bhp to **5.18, overloading the 5 hp motor**. A
+sheave calculation that stopped at the diameter would walk the user straight into it. The cross-check pins
+the same law paying off the other way: cutting to 6,000 cfm drops power 57.8%.
+
+Two structural pins in the fuzzer: a belt-drive round trip (the returned sheave, run back through the drive
+ratio, reproduces the required speed) and a cross-implementation check (feeding this tile's computed speed
+into the landed `computeFanAffinityLaws` reproduces the target CFM, the new BHP, and the new static
+pressure exactly). Catalog 1,488 -> 1,489. Spec: spec-v1105.
+
 ### feat(cross): swing-fall-geometry, the free fall the vertical clearance calculation never counted; 2026-07-27
 
 `fall-protection-clearance` and `fall-arrest-clearance` both sum VERTICAL terms only -- neither has a

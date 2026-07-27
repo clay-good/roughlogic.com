@@ -1250,6 +1250,7 @@ export const COMPUTE_MAP = {
   "cooling-coil-total-load": { module: "../../calc-hvac.js", fn: "computeCoolingCoilTotalLoad" },
   "coil-bypass-factor": { module: "../../calc-hvac.js", fn: "computeCoilBypassFactor" },
   "fan-affinity-laws": { module: "../../calc-hvac.js", fn: "computeFanAffinityLaws" },
+  "fan-sheave-for-target-cfm": { module: "../../calc-hvac.js", fn: "computeFanSheaveForTargetCfm" },
   "pitot-traverse-cfm": { module: "../../calc-velocity.js", fn: "computePitotTraverseCfm" },
   "outside-air-percent-temps": { module: "../../calc-hvacservice.js", fn: "computeOutsideAirPercentTemps" },
   "colebrook-friction-factor": { module: "../../calc-hvac.js", fn: "computeColebrookFrictionFactor" },

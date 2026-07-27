@@ -341,7 +341,7 @@ const TOOL_MODULES = (() => {
     "duct-heat-gain", "grille-face-velocity", "air-density-correction",
     "adpi-diffuser-selection", "vibration-isolation", "isolator-deflection",
     "moist-air-enthalpy", "drybulb-from-enthalpy", "cooling-coil-total-load", "coil-bypass-factor",
-    "fan-affinity-laws", "colebrook-friction-factor", "manual-d-friction-rate",
+    "fan-affinity-laws", "fan-sheave-for-target-cfm", "colebrook-friction-factor", "manual-d-friction-rate",
     // spec-v441..v443 energy-recovery / hydronic / economizer
     "erv-total-enthalpy-recovery", "radiant-floor-output", "economizer-enthalpy-changeover",
     // spec-v478 hydronic snowmelt sizing (the v199 radiant follow-on).
