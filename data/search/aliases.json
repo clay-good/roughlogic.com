@@ -90827,6 +90827,36 @@
       "kind": "question"
     },
     {
+      "term": "trapezoidal channel capacity",
+      "target": "trapezoidal-channel-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "swale capacity",
+      "target": "trapezoidal-channel-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "roadside ditch flow",
+      "target": "trapezoidal-channel-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "how much water will this ditch carry",
+      "target": "trapezoidal-channel-flow",
+      "kind": "question"
+    },
+    {
+      "term": "v ditch manning flow",
+      "target": "trapezoidal-channel-flow",
+      "kind": "redirect"
+    },
+    {
+      "term": "manning equation with side slopes",
+      "target": "trapezoidal-channel-flow",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

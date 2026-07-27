@@ -4,6 +4,31 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): trapezoidal-channel-flow, the section every real swale actually is; 2026-07-27
+
+A self-declared gap: `channel-normal-depth`'s own citation says "trapezoidal sections and backwater
+profiles are separate," and all three open-channel tiles take a bare `b_ft` with no side slope while the
+pipe tiles are circular. So the catalog could size every section except the one that gets built. Adds one
+tile to `calc-plumbing.js` (Group B).
+
+`trapezoidal-channel-flow` runs Manning forward (depth to flow) on A = (b + z y) y with
+P = b + 2y sqrt(1 + z^2). Two details make it more than a transcription. The Froude number is taken on the
+HYDRAULIC depth A/T, not the flow depth -- for a rectangle those coincide, which is why the rectangular
+sibling gets away with y, but here they differ (2.18 vs 3.00 ft in the worked example) and using y would
+misreport the regime. And a zero bottom width is legal: that is the V-ditch case, with only the genuinely
+degenerate section (no bottom, vertical sides) erroring.
+
+The fuzzer's strongest pin is cross-implementation: at z = 0 the trapezoid must reproduce the RECTANGULAR
+formula exactly -- same A, P, R, V, Q, and the hydraulic depth collapsing back to the flow depth -- tying
+the new tile to the landed sibling's math rather than only to itself. Plus the worked example (121.33 cfs),
+the near-critical V-ditch (Fr 0.974, which is why the instability warning earns its place), geometry
+identities across a sweep, and exact sqrt(S) and 1/n scaling.
+
+Catalog 1,478 -> 1,479. Spec: spec-v1031. **No cap bump needed:** this tile was written against a
+`calc-plumbing.js` at 99.4% and originally carried a raise to 82,000, but the spec-v1030 split landed first
+and returned the module to 90.8%, so the raise was dropped -- the split doing exactly the job its own spec
+argued for.
+
 ### feat(finish): countertop-overhang-support, the two-rule cantilever check with the source conflict handled honestly; 2026-07-27
 
 Zero countertop hits in tools-data.js, aliases.json, or compute-map.js -- discovery called it the strongest

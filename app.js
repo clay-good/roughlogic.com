@@ -239,7 +239,7 @@ const TOOL_MODULES = (() => {
     "radiant-loop-sizing",
     // spec-v302..v304 site-hydraulics depth batch.
     "time-of-concentration", "orifice-flow", "orifice-diameter-for-flow", "tank-drain-time", "channel-froude-number",
-    "channel-normal-depth", "hydraulic-jump", "specific-energy",
+    "channel-normal-depth", "trapezoidal-channel-flow", "hydraulic-jump", "specific-energy",
     "velocity-head", "flow-continuity", "bernoulli-head",
     "thrust-block-sizing", "thrust-block-max-pressure",
   ]);

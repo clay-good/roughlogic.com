@@ -30060,3 +30060,66 @@ test("bounds: spec-v1029 computeCountertopOverhangSupport pins both governing re
   assert.ok("error" in _v1029({ ...base, unsupported_limit_override_in: -1 }));
   assert.ok("error" in _v1029({ ...base, overhang_in: Infinity }));
 });
+
+import { computeTrapezoidalChannelFlow as _v1031 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v1031 computeTrapezoidalChannelFlow pins the worked example, the V-ditch case, EXACT agreement with the rectangular formula at z = 0, the geometry identities, monotonicity, sqrt(S) scaling, and error seams", () => {
+  const base = { bottom_width_ft: 10, side_slope_z: 2, depth_ft: 3, n: 0.03, s_slope: 0.001 };
+  const r = _v1031(base);
+  assert.ok(r.area_sf === 48);
+  assert.ok(Math.abs(r.wetted_perim_ft - (10 + 2 * 3 * Math.sqrt(5))) < 1e-12);
+  assert.ok(Math.abs(r.velocity_fps - 2.527619) < 1e-5);
+  assert.ok(Math.abs(r.flow_cfs - 121.3257) < 0.001);
+  assert.ok(Math.abs(r.top_width_ft - 22) < 1e-12);
+  assert.ok(Math.abs(r.hyd_depth_ft - 48 / 22) < 1e-12);
+  assert.ok(Math.abs(r.froude - 0.301682) < 1e-5);
+  assert.ok(r.regime.startsWith("subcritical"));
+  // The hydraulic depth is NOT the flow depth for a trapezoid - the reason Fr uses A/T.
+  assert.ok(Math.abs(r.hyd_depth_ft - 3) > 0.5);
+  // CROSS-IMPLEMENTATION PIN: at z = 0 the trapezoid must reproduce the rectangular formula exactly.
+  {
+    const b = 8, y = 2, n = 0.013, S = 0.005;
+    const t = _v1031({ bottom_width_ft: b, side_slope_z: 0, depth_ft: y, n, s_slope: S });
+    const A = b * y, P = b + 2 * y, R = A / P;
+    const V = (1.486 / n) * Math.pow(R, 2 / 3) * Math.sqrt(S);
+    assert.ok(Math.abs(t.area_sf - A) < 1e-12);
+    assert.ok(Math.abs(t.wetted_perim_ft - P) < 1e-12);
+    assert.ok(Math.abs(t.hyd_radius_ft - R) < 1e-12);
+    assert.ok(Math.abs(t.velocity_fps - V) < 1e-9);
+    assert.ok(Math.abs(t.flow_cfs - A * V) < 1e-9);
+    // For a rectangle the hydraulic depth collapses to the flow depth.
+    assert.ok(Math.abs(t.hyd_depth_ft - y) < 1e-12);
+  }
+  // V-ditch: zero bottom width is legal.
+  const v = _v1031({ bottom_width_ft: 0, side_slope_z: 3, depth_ft: 1.5, n: 0.035, s_slope: 0.02 });
+  assert.ok(Math.abs(v.area_sf - 6.75) < 1e-12);
+  assert.ok(Math.abs(v.flow_cfs - 32.3016) < 0.001);
+  assert.ok(Math.abs(v.froude - 0.974176) < 1e-5);
+  // Geometry identities across a sweep.
+  for (const [b, z, y] of [[4, 1, 1], [0, 2, 2], [12, 4, 0.5], [6, 1.5, 3]]) {
+    const t = _v1031({ bottom_width_ft: b, side_slope_z: z, depth_ft: y, n: 0.03, s_slope: 0.01 });
+    assert.ok(Math.abs(t.area_sf - (b + z * y) * y) < 1e-12);
+    assert.ok(Math.abs(t.top_width_ft - (b + 2 * z * y)) < 1e-12);
+    assert.ok(Math.abs(t.hyd_radius_ft - t.area_sf / t.wetted_perim_ft) < 1e-12);
+    assert.ok(Math.abs(t.flow_cfs - t.area_sf * t.velocity_fps) < 1e-9);
+  }
+  // Monotonic in depth; exact sqrt(S) and 1/n scaling at fixed geometry.
+  let prev = 0;
+  for (const y of [0.5, 1, 2, 3, 5]) {
+    const t = _v1031({ ...base, depth_ft: y });
+    assert.ok(t.flow_cfs > prev);
+    prev = t.flow_cfs;
+  }
+  const s4 = _v1031({ ...base, s_slope: 0.004 });
+  assert.ok(Math.abs(s4.velocity_fps / r.velocity_fps - 2) < 1e-9);
+  const rough = _v1031({ ...base, n: 0.06 });
+  assert.ok(Math.abs(rough.velocity_fps * 2 - r.velocity_fps) < 1e-9);
+  // Error seams, including the degenerate no-section case.
+  assert.ok("error" in _v1031({ ...base, bottom_width_ft: 0, side_slope_z: 0 }));
+  assert.ok("error" in _v1031({ ...base, bottom_width_ft: -1 }));
+  assert.ok("error" in _v1031({ ...base, side_slope_z: -1 }));
+  assert.ok("error" in _v1031({ ...base, depth_ft: 0 }));
+  assert.ok("error" in _v1031({ ...base, n: 0 }));
+  assert.ok("error" in _v1031({ ...base, s_slope: 0 }));
+  assert.ok("error" in _v1031({ ...base, depth_ft: Infinity }));
+});

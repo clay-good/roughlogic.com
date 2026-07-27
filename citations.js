@@ -15096,6 +15096,18 @@ export const CITATIONS = {
       { name: "Density entered", value: "no stone-density table is shipped; 170 pcf granite is a default, not a claim about a specific slab", source: "user input" },
     ],
   },
+  "trapezoidal-channel-flow": {
+    formula: "A = (b + z y) y; P = b + 2 y sqrt(1 + z^2); R = A/P; V = (1.486/n) R^(2/3) S^(1/2); Q = A V; T = b + 2 z y; D = A/T; Fr = V/sqrt(g D).",
+    edition: "Manning uniform flow in a prismatic trapezoidal section, as compiled in Chow's Open-Channel Hydraulics, by name; no roughness table reproduced - n is entered.",
+    freeAccess: "The Manning relation and trapezoidal section geometry are public engineering formulas; typical n values are published in every state drainage manual.",
+    governance: GOVERNANCE.general,
+    editionNote: "The section the rectangular tile says is separate, and the one every real swale and roadside ditch actually is. Side slope z is HORIZONTAL run per 1 vertical (a 3:1 bank is z = 3); a zero bottom width is a V-ditch and is allowed. The Froude number is taken on the hydraulic depth A/T, not the flow depth - for a rectangle those coincide, but for a trapezoid they differ and using the flow depth would misreport the regime. Near-critical flow (Fr near 1) is unstable and designers stay clear of it. This is the flow AT the entered depth with NO freeboard, not the depth of a channel sized for a given flow; backwater profiles, irregular natural sections, and composite roughness are separate. Erosion depends on velocity and lining (riprap-d50 sizes rock for a velocity). The engineer of record and the local drainage manual govern.",
+    assumptions: [
+      { name: "Uniform flow", value: "prismatic channel at normal depth; no backwater, no freeboard allowance", source: "Manning uniform-flow assumption" },
+      { name: "Froude length scale", value: "hydraulic depth D = A/T, the correct scale for a non-rectangular section", source: "open-channel hydraulics (Chow)" },
+      { name: "Roughness entered", value: "n is a user input (about 0.013 concrete, 0.030 grassed earth, 0.035 natural); no table shipped", source: "user input" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

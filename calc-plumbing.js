@@ -4612,3 +4612,70 @@ PLUMBING_RENDERERS["hydronic-fill-pressure"] = _v452renderHydronicFillPressure;
 // read from this file -- so the move leaves no cross-module import. The Manning
 // roughness table and the partial-flow theta constants stay here with the
 // hydraulics tiles that use them.
+
+// spec-v1031: trapezoidal open-channel capacity. The rectangular sibling
+// (computeChannelNormalDepth) states in its own citation that "trapezoidal sections
+// ... are separate"; this is that section, in the forward direction (depth -> flow).
+// A = (b + z y) y, P = b + 2 y sqrt(1 + z^2), R = A/P, V = (1.486/n) R^(2/3) sqrt(S),
+// Q = A V. Top width T = b + 2 z y, hydraulic depth D = A/T, Fr = V/sqrt(g D). A bottom
+// width of 0 is the V-ditch case and is legal; z = 0 degenerates to the rectangle and
+// the fuzzer pins that it matches the rectangular formula exactly.
+// dims: in { bottom_width_ft: L, side_slope_z: dimensionless, depth_ft: L, n: dimensionless, s_slope: dimensionless } out: { area_sf: L^2, velocity_fps: L T^-1, flow_cfs: L^3 T^-1, hyd_radius_ft: L, froude: dimensionless }
+export function computeTrapezoidalChannelFlow({ bottom_width_ft = 0, side_slope_z = 2, depth_ft = 0, n = 0.03, s_slope = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const b = Number(bottom_width_ft);
+  const z = Number(side_slope_z);
+  const y = Number(depth_ft) || 0;
+  const nn = Number(n) || 0;
+  const S = Number(s_slope) || 0;
+  if (!Number.isFinite(b) || b < 0) return { error: "Bottom width cannot be negative (ft); enter 0 for a V-ditch." };
+  if (!Number.isFinite(z) || z < 0) return { error: "Side slope z cannot be negative (z horizontal to 1 vertical; 0 is a vertical wall)." };
+  if (!(y > 0)) return { error: "Flow depth must be positive (ft)." };
+  if (!(b > 0 || z > 0)) return { error: "A channel with no bottom width and vertical sides has no cross-section - enter a bottom width or a side slope." };
+  if (!(nn > 0)) return { error: "Manning roughness n must be positive (~0.013 concrete, ~0.030 grassed earth, ~0.035 natural)." };
+  if (!(S > 0)) return { error: "Channel slope must be positive (ft/ft)." };
+  const area_sf = (b + z * y) * y;
+  const wetted_perim_ft = b + 2 * y * Math.sqrt(1 + z * z);
+  const hyd_radius_ft = area_sf / wetted_perim_ft;
+  const velocity_fps = (1.486 / nn) * Math.pow(hyd_radius_ft, 2 / 3) * Math.sqrt(S);
+  const flow_cfs = area_sf * velocity_fps;
+  const top_width_ft = b + 2 * z * y;
+  const hyd_depth_ft = area_sf / top_width_ft;
+  const froude = velocity_fps / Math.sqrt(32.174 * hyd_depth_ft);
+  const regime = froude > 1.01 ? "supercritical (shooting)" : froude < 0.99 ? "subcritical (tranquil)" : "near critical";
+  const flow_gpm = flow_cfs * 448.831;
+  if (![area_sf, hyd_radius_ft, velocity_fps, flow_cfs, froude].every(Number.isFinite)) return { error: "Channel math did not produce a finite value." };
+  return {
+    area_sf, wetted_perim_ft, hyd_radius_ft, velocity_fps, flow_cfs, flow_gpm,
+    top_width_ft, hyd_depth_ft, froude, regime,
+    note: "Uniform (normal) flow in a prismatic trapezoidal channel at the depth you enter - the swale, ditch, and lined-channel section the rectangular tile leaves out. Side slope z is HORIZONTAL run per 1 vertical, so a 3:1 bank is z = 3; a bottom width of 0 is a V-ditch and is allowed. Froude is taken on the hydraulic depth A/T, which is the correct length scale for a non-rectangular section, and near-critical flow (Fr close to 1) is unstable - surface waves stand up and the depth hunts, so designers stay clear of it. Freeboard is NOT included: this is the flow AT the depth entered, not the depth of a channel that carries it. Erosion depends on velocity and lining (riprap-d50 sizes rock for a velocity); a channel that must carry a given flow is the inverse problem. The engineer of record and the local drainage manual govern.",
+  };
+}
+export const trapezoidalChannelFlowExample = { inputs: { bottom_width_ft: 10, side_slope_z: 2, depth_ft: 3, n: 0.03, s_slope: 0.001 } };
+
+function _v1031renderTrapezoidalChannelFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Manning uniform flow in a trapezoidal section - A = (b + z y) y, P = b + 2 y sqrt(1 + z^2), R = A/P, V = (1.486/n) R^(2/3) S^(1/2), Q = A V, with top width T = b + 2 z y, hydraulic depth D = A/T, and Fr = V / sqrt(g D) - as compiled in Chow, by name. Side slope z is horizontal per 1 vertical; a zero bottom width is a V-ditch. Prismatic channel, uniform flow, no freeboard allowance; backwater profiles and the inverse depth-for-a-flow problem are separate. A design aid; the engineer of record and the local drainage manual govern.";
+  attachExampleButton(inputRegion, () => { b.input.value = "10"; z.input.value = "2"; y.input.value = "3"; nn.input.value = "0.03"; s.input.value = "0.001"; update(); });
+  const b = makeNumber("Bottom width b (ft, 0 = V-ditch)", "tcf-b", { step: "any", min: "0" });
+  const z = makeNumber("Side slope z (z horizontal : 1 vertical)", "tcf-z", { step: "any", min: "0" });
+  const y = makeNumber("Flow depth y (ft)", "tcf-y", { step: "any", min: "0" });
+  const nn = makeNumber("Manning roughness n", "tcf-n", { step: "any", min: "0" });
+  const s = makeNumber("Channel slope S (ft/ft)", "tcf-s", { step: "any", min: "0" });
+  for (const f of [b, z, y, nn, s]) inputRegion.appendChild(f.wrap);
+  const oQ = makeOutputLine(outputRegion, "Discharge Q", "tcf-out-q");
+  const oV = makeOutputLine(outputRegion, "Velocity / Froude regime", "tcf-out-v");
+  const oA = makeOutputLine(outputRegion, "Area / wetted perimeter / R", "tcf-out-a");
+  const oT = makeOutputLine(outputRegion, "Top width / hydraulic depth", "tcf-out-t");
+  const oNote = makeOutputLine(outputRegion, "Note", "tcf-out-n");
+  const update = debounce(() => {
+    const r = computeTrapezoidalChannelFlow({ bottom_width_ft: Number(b.input.value) || 0, side_slope_z: Number(z.input.value) || 0, depth_ft: Number(y.input.value) || 0, n: Number(nn.input.value) || 0, s_slope: Number(s.input.value) || 0 });
+    if (r.error) { oQ.textContent = r.error; oV.textContent = "-"; oA.textContent = "-"; oT.textContent = "-"; oNote.textContent = "-"; return; }
+    oQ.textContent = fmt(r.flow_cfs, 2) + " cfs (" + fmt(r.flow_gpm, 0) + " gpm)";
+    oV.textContent = fmt(r.velocity_fps, 2) + " ft/s - Fr " + fmt(r.froude, 2) + " " + r.regime;
+    oA.textContent = fmt(r.area_sf, 2) + " sf / " + fmt(r.wetted_perim_ft, 2) + " ft / R " + fmt(r.hyd_radius_ft, 3) + " ft";
+    oT.textContent = fmt(r.top_width_ft, 2) + " ft top / D " + fmt(r.hyd_depth_ft, 3) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [b, z, y, nn, s]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["trapezoidal-channel-flow"] = _v1031renderTrapezoidalChannelFlow;
