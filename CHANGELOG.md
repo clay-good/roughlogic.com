@@ -4,6 +4,28 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): advance-warning-sign-spacing, and a table the charter actually permits reproducing; 2026-07-27
+
+`traffic-taper-length` computes the taper and nothing placed the signs warning drivers it is coming. Zero
+hits for "advance warning", "sign spacing", or "ttc" anywhere. Adds one tile to `calc-construction.js`
+(Group E), cross-linked with the taper sibling.
+
+The charter bars reproducing copyrighted tables, but **MUTCD Table 6C-1 is FHWA -- a US-government work, so
+it is public domain** and ships verbatim: urban low 100/100/100, urban high 350/350/350, rural 500/500/500,
+expressway 1,000/1,500/2,640 ft. The table was extracted from the FHWA PDF itself, not a secondary summary.
+
+The reversal the tile exists to fix: the letters read backward from how a crew sets signs. A is the
+distance from the transition to the sign CLOSEST to the work, and the standard says outright that "the
+third sign is the first one in a three-sign series encountered by a driver." Reporting A/B/C alone invites
+someone to place the first sign 500 ft out and stop, so the tile reports cumulative distances measured
+upstream -- a rural series opens 1,500 ft ahead of the taper, an expressway series 5,140 ft. It also checks
+the 6C.04 guidance that the first rural sign sits 8 to 12 times the speed limit in mph, and that the area
+extends 1,500 ft or more on open highway.
+
+Fuzzer pins all four rows verbatim, the cumulative arithmetic, truncation at one and two signs, the
+expressway row being the only one with unequal A/B/C, and the speed check firing in both directions.
+Catalog 1,485 -> 1,486. Spec: spec-v1102.
+
 ### feat(cross): extension-ladder-overlap, the three ways a ladder loses the height on its label; 2026-07-27
 
 `ladder-angle` returns only the 4:1 setup; "overlap", "fly section", and "extension ladder" had no hits

@@ -10388,3 +10388,67 @@ CONSTRUCTION_RENDERERS["snow-guard-layout"] = _simpleRenderer({
   ],
   compute: computeSnowGuardLayout,
 });
+
+// --- spec-v1102 E: MUTCD advance warning sign spacing (Table 6C-1) ---
+// Verbatim from the FHWA MUTCD, a US-government public-domain work, so the table may be
+// reproduced. A = transition/point of restriction to the FIRST sign; B = first to second;
+// C = second to third. The third sign is the FIRST one a driver encounters, which is the part
+// that reverses people's intuition, so this tile reports distances measured from the taper.
+const MUTCD_SIGN_SPACING_FT = {
+  "urban-low": { label: "Urban (low speed)", a: 100, b: 100, c: 100 },
+  "urban-high": { label: "Urban (high speed)", a: 350, b: 350, c: 350 },
+  rural: { label: "Rural", a: 500, b: 500, c: 500 },
+  expressway: { label: "Expressway / Freeway", a: 1000, b: 1500, c: 2640 },
+};
+// dims: in { road_type: dimensionless, sign_count: dimensionless, speed_mph: L T^-1 } out: { a_ft: L, b_ft: L, c_ft: L, first_sign_ft: L, total_ft: L }
+export function computeAdvanceWarningSignSpacing({ road_type = "rural", sign_count = 3, speed_mph = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const row = MUTCD_SIGN_SPACING_FT[road_type];
+  const n = Number(sign_count) || 0;
+  const v = Number(speed_mph) || 0;
+  if (!row) return { error: "Road type must be urban-low, urban-high, rural, or expressway." };
+  if (!(n >= 1 && n <= 3) || !Number.isInteger(n)) return { error: "Sign count must be 1, 2, or 3 (Table 6C-1 dimensions cover a three-sign series)." };
+  if (v < 0) return { error: "Speed cannot be negative (mph); enter 0 to skip the rural placement cross-check." };
+  const a_ft = row.a, b_ft = row.b, c_ft = row.c;
+  const positions_ft = [a_ft];
+  if (n >= 2) positions_ft.push(a_ft + b_ft);
+  if (n >= 3) positions_ft.push(a_ft + b_ft + c_ft);
+  const first_sign_ft = positions_ft[positions_ft.length - 1];
+  const total_ft = first_sign_ft;
+  const open_highway_ok = total_ft >= 1500;
+  let speed_rule_min_ft = null, speed_rule_max_ft = null, speed_rule_ok = null;
+  if (v > 0) {
+    speed_rule_min_ft = 8 * v;
+    speed_rule_max_ft = 12 * v;
+    speed_rule_ok = first_sign_ft >= speed_rule_min_ft;
+  }
+  if (![a_ft, b_ft, c_ft, first_sign_ft, total_ft].every(Number.isFinite)) return { error: "Sign-spacing math did not produce a finite value." };
+  return {
+    road_label: row.label, a_ft, b_ft, c_ft, positions_ft, sign_count: n,
+    first_sign_ft, total_ft, open_highway_ok,
+    speed_rule_min_ft, speed_rule_max_ft, speed_rule_ok,
+    note: "Read the series BACKWARD from how it is signed: the A dimension runs from the transition or point of restriction to the sign CLOSEST to the work, and the third sign - the farthest upstream - is the FIRST one a driver actually sees. The distances here are measured upstream from the transition, so the last number is where the advance warning area begins: " + total_ft + " ft ahead of the taper. Rural placement carries a separate guidance: the first warning sign should sit 8 to 12 times the speed limit in mph"
+      + (speed_rule_min_ft !== null ? " (" + speed_rule_min_ft + " to " + speed_rule_max_ft + " ft at the speed entered, and this layout puts it at " + first_sign_ft + " ft)" : "")
+      + ", and for open highway conditions the advance warning area should extend 1,500 ft or more"
+      + (open_highway_ok ? "" : " - which this layout does NOT reach, so it suits a lower-speed setting")
+      + ". These are SUGGESTED distances: the urban speed category is set by the highway agency, and site distance, sight lines, and intersections routinely force adjustment. The taper itself is the separate traffic-taper-length tile. The MUTCD as adopted by your state and the agency's traffic control plan govern.",
+  };
+}
+export const advanceWarningSignSpacingExample = { inputs: { road_type: "rural", sign_count: 3, speed_mph: 55 } };
+CONSTRUCTION_RENDERERS["advance-warning-sign-spacing"] = _simpleRenderer({
+  citation: "Citation: MUTCD Table 6C-1, Suggested Advance Warning Sign Spacing, reproduced from the FHWA Manual on Uniform Traffic Control Devices - a US-government public-domain work. Urban (low speed) 100/100/100 ft; Urban (high speed) 350/350/350 ft; Rural 500/500/500 ft; Expressway/Freeway 1,000/1,500/2,640 ft. The A dimension is the distance from the transition or point of restriction to the first sign, B is between the first and second signs, and C is between the second and third, where the third sign is the first one encountered by a driver approaching the zone. MUTCD 6C.04 adds that on rural highways the first warning sign should be placed 8 to 12 times the speed limit in mph, and that the advance warning area should extend 1,500 ft or more for open highway conditions. The urban speed category is determined by the highway agency. Suggested distances; the MUTCD as adopted by your state and the agency's traffic control plan govern.",
+  example: advanceWarningSignSpacingExample.inputs,
+  fields: [
+    { key: "road_type", label: "Road type", kind: "select", options: [{ value: "rural", label: "Rural (500/500/500)", selected: true }, { value: "urban-low", label: "Urban low speed (100/100/100)" }, { value: "urban-high", label: "Urban high speed (350/350/350)" }, { value: "expressway", label: "Expressway / Freeway (1000/1500/2640)" }] },
+    { key: "sign_count", label: "Signs in the series (1-3)", kind: "number", default: 3 },
+    { key: "speed_mph", label: "Speed limit (mph, 0 = skip the 8-12x check)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "abc", id: "aws-out-abc", label: "Table 6C-1 sign spacings", value: (r) => r.road_label + " -- A " + fmt(r.a_ft, 0) + " ft, B " + fmt(r.b_ft, 0) + " ft, then " + fmt(r.c_ft, 0) + " ft" },
+    { key: "pos", id: "aws-out-pos", label: "Sign positions upstream of the transition", value: (r) => r.positions_ft.map((p) => fmt(p, 0) + " ft").join(", ") },
+    { key: "tot", id: "aws-out-tot", label: "Advance warning area begins", value: (r) => fmt(r.total_ft, 0) + " ft ahead of the taper" + (r.open_highway_ok ? " (meets the 1,500 ft open-highway guidance)" : "") },
+    { key: "sp", id: "aws-out-sp", label: "Rural 8-12x speed check", value: (r) => (r.speed_rule_min_ft === null ? "not checked (enter a speed)" : fmt(r.speed_rule_min_ft, 0) + "-" + fmt(r.speed_rule_max_ft, 0) + " ft suggested - " + (r.speed_rule_ok ? "layout meets it" : "layout is SHORTER than the guidance")) },
+    { key: "n", id: "aws-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAdvanceWarningSignSpacing,
+});

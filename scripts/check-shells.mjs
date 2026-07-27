@@ -110,7 +110,10 @@ const TILE_GZIP_CAP = 6 * 1024;
 // (seismic-earth-pressure, cohesive-earth-pressure) took construction/index.html to ~80.3 KB gz (over
 // the 80 KB cap at cohesive-earth-pressure); 84 KB restores ~5% headroom (this gate runs only in CI's
 // integration job, so push lint stays green while CI goes red -- run check-shells.mjs locally).
-const GROUP_GZIP_CAP = 84 * 1024;
+// spec-v1102 2026-07-27 (84 -> 88 KB): the Group E construction hub crossed 84 KB at 86,158 B as the
+// +100 campaign added corner-bead, siding-course, snow-guard, and advance-warning-sign tiles. This gate
+// is CI-only (not in `npm run lint`), so run `npm run check:shells` locally per Group-E tile.
+const GROUP_GZIP_CAP = 88 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

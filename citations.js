@@ -15180,6 +15180,18 @@ export const CITATIONS = {
       { name: "Landing extension", value: "at least 3 ft above the landing surface", source: "OCWR extension-ladder fast facts" },
     ],
   },
+  "advance-warning-sign-spacing": {
+    formula: "Table 6C-1 A/B/C spacings by road type: urban low 100/100/100, urban high 350/350/350, rural 500/500/500, expressway 1,000/1,500/2,640 ft; sign positions upstream of the transition = A, A+B, A+B+C.",
+    edition: "MUTCD Table 6C-1, Suggested Advance Warning Sign Spacing, from the FHWA Manual on Uniform Traffic Control Devices - a US-government public-domain work, extracted from the FHWA PDF rather than a secondary summary.",
+    freeAccess: "The MUTCD is published free at mutcd.fhwa.dot.gov and is in the public domain.",
+    governance: GOVERNANCE.general,
+    editionNote: "The letters read BACKWARD from the way a crew sets signs: A is the distance from the transition or point of restriction to the sign CLOSEST to the work, B is between the first and second signs, C is between the second and third, and the standard states that the third sign is the first one a driver encounters. Reporting A/B/C alone invites someone to place the first sign 500 ft out and stop, so this tile reports cumulative distances measured upstream from the transition - the last number is where the advance warning area begins. MUTCD 6C.04 adds that on rural highways the first warning sign should sit 8 to 12 times the speed limit in mph, and that the advance warning area should extend 1,500 ft or more for open highway conditions; both are checked. These are SUGGESTED distances and the urban speed category is determined by the highway agency per the table's own footnote; site distance, sight lines, and intersections routinely force adjustment. The taper is the separate traffic-taper-length tile; buffer space, channelizing-device spacing, and flagger stations are not modeled. The MUTCD as adopted by your state and the agency's traffic control plan govern.",
+    assumptions: [
+      { name: "Public-domain table", value: "MUTCD Table 6C-1 reproduced verbatim; it is a US-government work, not a copyrighted table", source: "FHWA MUTCD Table 6C-1" },
+      { name: "A/B/C direction", value: "A is transition-to-nearest-sign; the third sign is the first a driver sees", source: "MUTCD Table 6C-1 footnote" },
+      { name: "Rural placement guidance", value: "first warning sign 8 to 12 times the speed limit in mph; area 1,500 ft or more on open highway", source: "MUTCD 6C.04" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

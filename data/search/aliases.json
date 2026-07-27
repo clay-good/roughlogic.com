@@ -91037,6 +91037,36 @@
       "kind": "question"
     },
     {
+      "term": "advance warning sign spacing",
+      "target": "advance-warning-sign-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "work zone sign placement",
+      "target": "advance-warning-sign-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "mutcd table 6c-1",
+      "target": "advance-warning-sign-spacing",
+      "kind": "redirect"
+    },
+    {
+      "term": "how far ahead of the taper do signs go",
+      "target": "advance-warning-sign-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "road work ahead sign distance",
+      "target": "advance-warning-sign-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "three sign series ttc zone",
+      "target": "advance-warning-sign-spacing",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

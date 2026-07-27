@@ -1566,6 +1566,7 @@ cross-check.
 | calc-concrete.js | `computeTBeamEffectiveFlangeWidth` | `{ bw_in = 0, hf_in = 0, ln_in = 0, sw_in = 0, beam_type = "interior" } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAbrasiveBlast` | `{ nozzle_bore_in, pressure_psi = 100, area_ft2, lb_per_ft2 = 8 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAdaRampSlope` | `{ rise_in = 0, slope_ratio = 12, landing_in = 60 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeAdvanceWarningSignSpacing` | `{ road_type = "rural", sign_count = 3, speed_mph = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAggregate` | `{ area_ft2 = 0, depth_in = 0, material = "crushed_stone" }` | _ | _ | _ |
 | calc-construction.js | `computeAllowableArea` | `{ tabular_area = 0, ns_area = 0, frontage_ft = 0, perimeter_ft = 0, open_widt...` | _ | _ | _ |
 | calc-construction.js | `computeAnchorEmbedment` | `{ uplift_lb, bolt_diameter_in, fc_psi, cracked = false, edge_distance_in = 0 }` | _ | _ | _ |
@@ -3146,7 +3147,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1732.
+Row count: 1733.
 
 <!-- END function-corpus-v14 -->
 
@@ -3758,12 +3759,13 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (386 tiles)
+### Group E Construction (387 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `abrasive-blast` | Abrasive Blast Air and Abrasive Consumption | SSPC / AMPP SP specs / nozzle manufac...; 3/8 in nozzle at 100 psi, 3,000 ft^2 at 8 lb/ft^2 -> 283 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ada-ramp-slope` | ADA Ramp Slope, Runs, and Landings (IBC 1012 / ADA) | IBC 1012 / ADA; spec-v474 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `advance-warning-sign-spacing` | Work Zone Advance Warning Sign Spacing (MUTCD 6C-1) | FHWA MUTCD; rural 500/500/500 -> signs at 500, 1,000, and 1,500 ft up... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `aggregate` | Aggregate / Gravel Cubic Yards | Project (first-principles); volume = 1000 * 4/12 = 333.33 ft^3; cubic_yards = 333.33/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `allowable-area` | Allowable Building Area per Story (IBC Chapter 5) | IBC 2021 §506.2 / §506.3 and Table 506.2; spec-v251 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `anchor-embedment` | Anchor Bolt Embedment | Project (public bond-strength formula); 5000 lb uplift / 5/8 in bolt / 3000 psi concrete -> 66.42... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4817,6 +4819,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1485. Fixture-covered or reference-cadence: 1485 / 1485.
+Tile count: 1486. Fixture-covered or reference-cadence: 1486 / 1486.
 
 <!-- END tile-index-v14 -->

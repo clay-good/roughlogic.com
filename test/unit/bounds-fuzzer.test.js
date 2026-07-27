@@ -30414,3 +30414,53 @@ test("bounds: spec-v1101 computeExtensionLadderOverlap pins both worked examples
   assert.ok("error" in _v1101({ nominal_length_ft: 24, sections: 2, overlap_override_ft: 20 })); // overlap > a section
   assert.ok("error" in _v1101({ nominal_length_ft: Infinity, sections: 2 }));
 });
+
+import { computeAdvanceWarningSignSpacing as _v1102 } from "../../calc-construction.js";
+
+test("bounds: spec-v1102 computeAdvanceWarningSignSpacing pins all four MUTCD Table 6C-1 rows verbatim, the cumulative positions, truncation, the 8-12x check, the open-highway flag, and error seams", () => {
+  // All four table rows, verbatim from MUTCD Table 6C-1.
+  const rows = {
+    "urban-low": [100, 100, 100],
+    "urban-high": [350, 350, 350],
+    rural: [500, 500, 500],
+    expressway: [1000, 1500, 2640],
+  };
+  for (const [type, [a, b, c]] of Object.entries(rows)) {
+    const t = _v1102({ road_type: type, sign_count: 3, speed_mph: 0 });
+    assert.ok(t.a_ft === a && t.b_ft === b && t.c_ft === c);
+    // Positions are cumulative upstream of the transition.
+    assert.deepStrictEqual(t.positions_ft, [a, a + b, a + b + c]);
+    assert.ok(t.first_sign_ft === a + b + c && t.total_ft === t.first_sign_ft);
+  }
+  // The expressway row is the only one with unequal A/B/C - and reaches 5,140 ft.
+  const ex = _v1102({ road_type: "expressway", sign_count: 3 });
+  assert.ok(ex.total_ft === 5140);
+  assert.ok(ex.a_ft !== ex.b_ft && ex.b_ft !== ex.c_ft);
+  for (const type of ["urban-low", "urban-high", "rural"]) {
+    const t = _v1102({ road_type: type, sign_count: 3 });
+    assert.ok(t.a_ft === t.b_ft && t.b_ft === t.c_ft);
+  }
+  // Pinned rural example with the speed cross-check.
+  const r = _v1102({ road_type: "rural", sign_count: 3, speed_mph: 55 });
+  assert.ok(r.total_ft === 1500 && r.open_highway_ok === true);
+  assert.ok(r.speed_rule_min_ft === 440 && r.speed_rule_max_ft === 660 && r.speed_rule_ok === true);
+  // Truncation: fewer signs means a shorter series, and the last position is always the first sign seen.
+  const one = _v1102({ road_type: "rural", sign_count: 1 });
+  const two = _v1102({ road_type: "rural", sign_count: 2 });
+  assert.deepStrictEqual(one.positions_ft, [500]);
+  assert.deepStrictEqual(two.positions_ft, [500, 1000]);
+  assert.ok(one.total_ft === 500 && two.total_ft === 1000);
+  assert.ok(one.open_highway_ok === false && two.open_highway_ok === false);
+  // Speed check omitted when no speed is entered.
+  assert.ok(r.speed_rule_ok === true && _v1102({ road_type: "rural", sign_count: 3 }).speed_rule_ok === null);
+  // A short urban series fails the 8-12x rule at highway speed - the flag has to be able to fire.
+  const mismatch = _v1102({ road_type: "urban-low", sign_count: 3, speed_mph: 65 });
+  assert.ok(mismatch.total_ft === 300 && mismatch.speed_rule_ok === false);
+  // Error seams.
+  assert.ok("error" in _v1102({ road_type: "gravel", sign_count: 3 }));
+  assert.ok("error" in _v1102({ road_type: "rural", sign_count: 0 }));
+  assert.ok("error" in _v1102({ road_type: "rural", sign_count: 4 }));
+  assert.ok("error" in _v1102({ road_type: "rural", sign_count: 2.5 }));
+  assert.ok("error" in _v1102({ road_type: "rural", sign_count: 3, speed_mph: -1 }));
+  assert.ok("error" in _v1102({ road_type: "rural", sign_count: Infinity }));
+});
