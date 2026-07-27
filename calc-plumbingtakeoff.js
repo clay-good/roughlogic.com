@@ -1,5 +1,5 @@
 // Group B (cont.): the plumbing TAKEOFF and materials bench, split out of
-// calc-plumbing.js for cap relief (spec-v1029). calc-plumbing.js had reached
+// calc-plumbing.js for cap relief (spec-v1030). calc-plumbing.js had reached
 // 99.4% of its 76,000 B gzip cap, so the next plumbing tile would have failed
 // check-module-sizes; the repo's stated preference is a per-tile split over
 // another cap raise.
