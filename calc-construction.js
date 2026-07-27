@@ -10210,3 +10210,61 @@ CONSTRUCTION_RENDERERS["drainage-board-takeoff"] = _simpleRenderer({
   ],
   compute: computeDrainageBoardTakeoff,
 });
+
+// --- spec-v1026 E: Corner bead / drywall trim takeoff ---
+// Vertical outside corners take one bead each, full height; a wrapped cased opening takes two legs
+// plus a head. Pieces from stock length after waste; beads are not spliced mid-corner in practice,
+// so pieces are ALSO floored at one full stick per corner when the height exceeds nothing - the
+// count reports both the LF math and the per-corner stick reality and takes the larger.
+// dims: in { outside_corners: dimensionless, corner_height_ft: L, wrapped_openings: dimensionless, opening_width_ft: L, opening_height_ft: L, stock_length_ft: L, waste_pct: dimensionless } out: { corner_lf: L, wrap_lf: L, total_lf: L, pieces: dimensionless }
+export function computeCornerBeadTakeoff({ outside_corners = 0, corner_height_ft = 8, wrapped_openings = 0, opening_width_ft = 3, opening_height_ft = 7, stock_length_ft = 8, waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const corners = Number(outside_corners) || 0;
+  const ch = Number(corner_height_ft) || 0;
+  const wraps = Number(wrapped_openings) || 0;
+  const ow = Number(opening_width_ft) || 0;
+  const oh = Number(opening_height_ft) || 0;
+  const stock = Number(stock_length_ft) || 0;
+  const waste = Number(waste_pct);
+  if (corners < 0 || !Number.isInteger(corners)) return { error: "Outside-corner count must be a whole number (0 or more)." };
+  if (wraps < 0 || !Number.isInteger(wraps)) return { error: "Wrapped-opening count must be a whole number (0 or more)." };
+  if (corners === 0 && wraps === 0) return { error: "Enter at least one outside corner or wrapped opening." };
+  if (corners > 0 && !(ch > 0)) return { error: "Corner height must be positive (ft)." };
+  if (wraps > 0 && !(ow > 0 && oh > 0)) return { error: "Opening width and height must be positive (ft) when openings are wrapped." };
+  if (!(stock > 0)) return { error: "Stock length must be positive (ft)." };
+  if (!(waste >= 0 && waste <= 50)) return { error: "Waste must be 0-50 percent." };
+  const corner_lf = corners * ch;
+  const wrap_lf = wraps * (2 * oh + ow);
+  const total_lf = (corner_lf + wrap_lf) * (1 + waste / 100);
+  const pieces_by_lf = Math.ceil(total_lf / stock);
+  // Sticks are not spliced mid-run: each corner leg is one piece minimum, and a wrap is 3.
+  const pieces_by_runs = corners * Math.ceil(ch / stock) + wraps * (2 * Math.ceil(oh / stock) + Math.ceil(ow / stock));
+  const pieces = Math.max(pieces_by_lf, pieces_by_runs);
+  if (![corner_lf, wrap_lf, total_lf, pieces].every(Number.isFinite)) return { error: "Bead-takeoff math did not produce a finite value." };
+  return {
+    corner_lf, wrap_lf, total_lf, pieces, pieces_by_lf, pieces_by_runs,
+    note: "Bead runs are NOT spliced mid-corner - a splice telegraphs through the mud - so the piece count takes the larger of the linear-feet math and one-stick-per-run reality: 9 corners of 8 ft on 10-ft stock is 9 sticks, not the 8 the LF math suggests. A wrapped cased opening takes two legs plus a head. Metal, vinyl, and paper-faced bead all count the same way; archway and bullnose profiles count per manufacturer. Mud and tape are the separate drywall tile; wood casing is trim-linear-footage.",
+  };
+}
+export const cornerBeadTakeoffExample = { inputs: { outside_corners: 9, corner_height_ft: 8, wrapped_openings: 2, opening_width_ft: 3, opening_height_ft: 7, stock_length_ft: 10, waste_pct: 10 } };
+CONSTRUCTION_RENDERERS["corner-bead-takeoff"] = _simpleRenderer({
+  citation: "Citation: straight takeoff arithmetic - one full-height bead per outside corner, two legs plus a head per wrapped cased opening, a waste allowance, and a piece count that takes the LARGER of the linear-feet division and the one-stick-per-run count, because bead is not spliced mid-run (a splice telegraphs through the mud). A counting aid; the finish schedule and the crew's stock preference govern.",
+  example: cornerBeadTakeoffExample.inputs,
+  fields: [
+    { key: "outside_corners", label: "Outside corners (count)", kind: "number" },
+    { key: "corner_height_ft", label: "Corner height (ft)", kind: "number", default: 8 },
+    { key: "wrapped_openings", label: "Cased openings wrapped in bead (count)", kind: "number", default: 0 },
+    { key: "opening_width_ft", label: "Opening width (ft)", kind: "number", default: 3 },
+    { key: "opening_height_ft", label: "Opening height (ft)", kind: "number", default: 7 },
+    { key: "stock_length_ft", label: "Bead stock length (ft)", kind: "number", default: 8 },
+    { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "clf", id: "cbt-out-clf", label: "Corner bead LF", value: (r) => fmt(r.corner_lf, 0) + " ft" },
+    { key: "wlf", id: "cbt-out-wlf", label: "Opening-wrap LF", value: (r) => fmt(r.wrap_lf, 0) + " ft" },
+    { key: "tot", id: "cbt-out-tot", label: "Total LF (with waste)", value: (r) => fmt(r.total_lf, 1) + " ft" },
+    { key: "pc", id: "cbt-out-pc", label: "Sticks to buy", value: (r) => fmt(r.pieces, 0) + " (LF math " + fmt(r.pieces_by_lf, 0) + ", per-run floor " + fmt(r.pieces_by_runs, 0) + ")" },
+    { key: "n", id: "cbt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCornerBeadTakeoff,
+});

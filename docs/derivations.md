@@ -1604,6 +1604,7 @@ cross-check.
 | calc-construction.js | `computeConcreteYield` | `{ total_batch_mass_lb = 0, measured_unit_weight_lb_ft3 = 0, design_volume_yd3...` | _ | _ | _ |
 | calc-construction.js | `computeConstructionAdhesiveTubes` | `{ total_lf = 1200, tube_volume_in3 = 50.6, bead_dia_in = 0.375 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeControlJointSpacing` | `{ slab_thickness_in = 0, spacing_factor = 2.5, max_spacing_ft = 18, slab_leng...` | _ | _ | _ |
+| calc-construction.js | `computeCornerBeadTakeoff` | `{ outside_corners = 0, corner_height_ft = 8, wrapped_openings = 0, opening_wi...` | _ | _ | _ |
 | calc-construction.js | `computeCraneLiftCheck` | `{ load_lb = 0, rigging_lb = 0, block_lb = 0, jib_deduct_lb = 0, sling_legs = ...` | _ | _ | _ |
 | calc-construction.js | `computeCurbGutterVolume` | `{ cross_section_ft2 = 2.0, length_ft = 300, waste_pct = 8 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeDeckBeamPost` | `{ joist_span_ft = 0, beam_span_ft = 0, post_height_ft = 8, live_load_psf = 40...` | _ | _ | _ |
@@ -3135,7 +3136,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1721.
+Row count: 1722.
 
 <!-- END function-corpus-v14 -->
 
@@ -3744,7 +3745,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (380 tiles)
+### Group E Construction (381 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3834,6 +3835,7 @@ per spec-v14 §13.1 second paragraph.
 | `consolidation-time-rate` | Consolidation Time Rate (Terzaghi) | Terzaghi consolidation theory; spec-v414 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `construction-adhesive-tubes` | Construction Adhesive Tube Count | Adhesive bead-yield identity (first-p...; bead area = (PI/4)*0.375^2 = 0.1105 in^2; lf/tube = 50.6/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `control-joint-spacing` | Concrete Control Joint Spacing | ACI 302.1R / 360R slab-on-ground guid...; spec-v96 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `corner-bead-takeoff` | Corner Bead / Drywall Trim Takeoff | takeoff arithmetic; 9 corners x 8 ft + 2 wrapped 3 x 7 openings, 10-ft stock,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coulomb-earth-pressure` | Coulomb Active Earth Pressure (Wall Friction and Batter) | Coulomb (1776) as compiled in Das / N...; spec-v628 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `crane-lift-quick` | Crane Lift Plan Quick-Math | ASME B30.5 / manufacturer load-chart ...; 8000 lb load + 200 lb rigging / 2-leg sling at 60 deg fro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `curb-gutter-volume` | Curb-and-Gutter Concrete Volume | Linear-pour identity (first-principles); volume = 2.0*300/27*1.08 = 24.0; cy/100LF = 2.0*100/27 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4795,6 +4797,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1474. Fixture-covered or reference-cadence: 1474 / 1474.
+Tile count: 1475. Fixture-covered or reference-cadence: 1475 / 1475.
 
 <!-- END tile-index-v14 -->

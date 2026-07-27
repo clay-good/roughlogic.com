@@ -29918,3 +29918,33 @@ test("bounds: spec-v1025 computeRoughOpeningSize pins both conventions, the over
   assert.ok("error" in _v1025({ opening_type: "sliding", unit_width_in: 36, unit_height_in: 80 }));
   assert.ok("error" in _v1025({ opening_type: "window", unit_width_in: NaN, unit_height_in: 48 }));
 });
+
+import { computeCornerBeadTakeoff as _v1026 } from "../../calc-construction.js";
+
+test("bounds: spec-v1026 computeCornerBeadTakeoff pins both governing regimes of the stick count, the wrap formula, additivity, and error seams", () => {
+  // Pinned worked example: per-run no-splice floor governs (15 > 12).
+  const r = _v1026({ outside_corners: 9, corner_height_ft: 8, wrapped_openings: 2, opening_width_ft: 3, opening_height_ft: 7, stock_length_ft: 10, waste_pct: 10 });
+  assert.ok(r.corner_lf === 72 && r.wrap_lf === 34);
+  assert.ok(Math.abs(r.total_lf - 116.6) < 0.01);
+  assert.ok(r.pieces_by_lf === 12 && r.pieces_by_runs === 15 && r.pieces === 15);
+  // LF regime: tall corners on short stock make the per-run count larger per corner (2 sticks each).
+  const t = _v1026({ outside_corners: 3, corner_height_ft: 9, wrapped_openings: 0, stock_length_ft: 8, waste_pct: 0 });
+  assert.ok(t.pieces === 6 && t.pieces_by_runs === 6);
+  // Wrap formula exact: one opening = 2 legs + head.
+  const w = _v1026({ outside_corners: 0, corner_height_ft: 8, wrapped_openings: 1, opening_width_ft: 4, opening_height_ft: 7, stock_length_ft: 10, waste_pct: 0 });
+  assert.ok(Math.abs(w.wrap_lf - (2 * 7 + 4)) < 1e-12 && w.pieces_by_runs === 3);
+  // Additivity in corners at 0% waste.
+  const a1 = _v1026({ outside_corners: 4, corner_height_ft: 8, stock_length_ft: 10, waste_pct: 0 });
+  const a2 = _v1026({ outside_corners: 8, corner_height_ft: 8, stock_length_ft: 10, waste_pct: 0 });
+  assert.ok(Math.abs(a2.corner_lf - 2 * a1.corner_lf) < 1e-12);
+  // Pieces never fall below the per-run floor.
+  assert.ok(a1.pieces >= a1.pieces_by_runs && a2.pieces >= a2.pieces_by_runs);
+  // Error seams.
+  assert.ok("error" in _v1026({ outside_corners: 0, wrapped_openings: 0 }));
+  assert.ok("error" in _v1026({ outside_corners: 2.5, corner_height_ft: 8 }));
+  assert.ok("error" in _v1026({ outside_corners: -1, corner_height_ft: 8 }));
+  assert.ok("error" in _v1026({ outside_corners: 4, corner_height_ft: 0 }));
+  assert.ok("error" in _v1026({ outside_corners: 4, corner_height_ft: 8, stock_length_ft: 0 }));
+  assert.ok("error" in _v1026({ outside_corners: 4, corner_height_ft: 8, waste_pct: 60 }));
+  assert.ok("error" in _v1026({ outside_corners: 4, corner_height_ft: Infinity }));
+});

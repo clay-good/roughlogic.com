@@ -4,6 +4,21 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): corner-bead-takeoff, the drywall accessory the sheet/mud/screw tiles skip; 2026-07-27
+
+The drywall bench counts sheets, mud, tape, and screws, and the wood-trim tile counts casing -- but nothing
+returned corner-bead footage or stick count. Adds one tile to `calc-construction.js` (Group E); second tile
+this campaign for a thin trade (`drywall` had 3).
+
+`corner-bead-takeoff` counts one full-height bead per outside corner and two-legs-plus-a-head per wrapped
+cased opening, applies waste, and -- the part a pure LF calculator gets wrong -- takes the stick count as the
+LARGER of the linear-feet division and the one-stick-per-run floor, because bead is not spliced mid-run (a
+splice telegraphs through the mud). The pinned example is exactly the trap: 9 corners x 8 ft + 2 wraps on
+10-ft stock divides to 12 sticks but needs 15. The cross-check fixture pins the other regime (9-ft corners
+on 8-ft stock take 2 sticks each).
+
+Catalog 1,474 -> 1,475. Spec: spec-v1026.
+
 ### feat(finish): rough-opening-size, the framing dimension the catalog never produced; 2026-07-27
 
 No "rough opening" string existed anywhere -- not in tools-data.js, the alias index, standard-sizes.js, or

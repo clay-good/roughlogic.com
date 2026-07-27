@@ -15051,6 +15051,17 @@ export const CITATIONS = {
       { name: "Header length", value: "RO width + two 1.5-in jack studs", source: "standard platform-framing practice" },
     ],
   },
+  "corner-bead-takeoff": {
+    formula: "corner_lf = corners x height; wrap_lf = openings x (2 x height + width); total = (corner_lf + wrap_lf) x (1 + waste); sticks = max(ceil(total/stock), one-stick-per-run count).",
+    edition: "Straight takeoff arithmetic with one trade rule encoded - bead is not spliced mid-run - so the stick count takes the larger of the LF division and the per-run floor. No standard claimed.",
+    freeAccess: "Counting arithmetic; the no-splice practice is universal finishing guidance published freely by bead manufacturers.",
+    governance: GOVERNANCE.general,
+    editionNote: "The per-run floor is the part a pure LF calculator gets wrong: 9 corners of 8 ft on 10-ft stock divide to 12 sticks but need 15, because each corner is one unspliced stick and each wrapped opening is three. Metal, vinyl, and paper-faced bead count the same way; archway and bullnose profiles count per the manufacturer. Mud and tape quantities are the separate drywall tile; wood casing is trim-linear-footage. The finish schedule and the crew's stock preference govern.",
+    assumptions: [
+      { name: "No mid-run splices", value: "each corner leg and each wrap leg/head is at least one full stick", source: "universal finishing practice (a splice telegraphs through the mud)" },
+      { name: "Wrap geometry", value: "a cased opening wrapped in bead takes two legs plus a head", source: "takeoff arithmetic" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",
