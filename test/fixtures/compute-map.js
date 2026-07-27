@@ -1421,6 +1421,7 @@ export const COMPUTE_MAP = {
   "submerged-earth-pressure": { module: "../../calc-geotech.js", fn: "computeSubmergedEarthPressure" },
   "sloped-backfill-earth-pressure": { module: "../../calc-geotech.js", fn: "computeSlopedBackfillEarthPressure" },
   "coulomb-earth-pressure": { module: "../../calc-geotech.js", fn: "computeCoulombEarthPressure" },
+  "seismic-earth-pressure": { module: "../../calc-geotech.js", fn: "computeSeismicEarthPressure" },
   "retaining-wall-stability": { module: "../../calc-geotech.js", fn: "computeRetainingWallStability" },
   "consolidation-time-rate": { module: "../../calc-geotech.js", fn: "computeConsolidationTimeRate" },
   "consolidation-degree": { module: "../../calc-geotech.js", fn: "computeConsolidationDegree" },

@@ -29441,3 +29441,52 @@ test("bounds: welder tile scopes to the transformer/rectifier column and rounds 
   assert.match(r.note, /transformer/i);
   assert.match(r.note, /motor-generator[^.]*not modeled|different, higher column/i);
 });
+
+import { computeSeismicEarthPressure as _v1016 } from "../../calc-geotech.js";
+import { computeCoulombEarthPressure as _v1016c } from "../../calc-geotech.js";
+
+test("bounds: spec-v1016 computeSeismicEarthPressure pins the Mononobe-Okabe coefficient, the exact Coulomb reduction at zero acceleration, the increment/line-of-action behavior, and error seams", () => {
+  const base = { phi: 35, delta: 17.5, theta: 0, alpha: 0, gamma: 120, h_ft: 12, kh: 0.15, kv: 0 };
+  const r = _v1016(base);
+  assert.ok(Math.abs(r.psi_deg - (Math.atan(0.15) * 180 / Math.PI)) < 1e-9);
+  assert.ok(Math.abs(r.kae - 0.34053) < 1e-4); // published Kae brackets: 0.246 @ kh 0, 0.306 @ 0.10, 0.380 @ 0.20
+  assert.ok(Math.abs(r.ka_static - 0.24612) < 1e-4);
+  assert.ok(Math.abs(r.pae - 0.5 * r.kae * 120 * 144) < 1e-6);
+  assert.ok(Math.abs(r.sw_increment - 0.375 * 0.15 * 120 * 144) < 1e-6);
+  // The defining identity: Mononobe-Okabe IS Coulomb once the ground stops
+  // moving. At kh = kv = 0 the inertia angle vanishes and Kae must equal the
+  // Coulomb Ka to machine precision, for a non-trivial geometry too.
+  const geom = { phi: 32, delta: 20, theta: 10, alpha: 5, gamma: 115, h_ft: 9 };
+  const still = _v1016({ ...geom, kh: 0, kv: 0 });
+  const coulomb = _v1016c(geom);
+  assert.ok(Math.abs(still.kae - coulomb.ka) < 1e-12);
+  assert.ok(Math.abs(still.kae - still.ka_static) < 1e-12);
+  assert.ok(Math.abs(still.pae - coulomb.pa) < 1e-9);
+  assert.ok(Math.abs(still.d_pae) < 1e-9); // no shaking, no increment
+  assert.ok(Math.abs(still.y_bar_ft - 9 / 3) < 1e-9); // static thrust alone acts at H/3
+  // Shaking harder raises the coefficient, the thrust, and the increment.
+  assert.ok(_v1016({ ...base, kh: 0.25 }).kae > r.kae);
+  assert.ok(_v1016({ ...base, kh: 0.25 }).d_pae > r.d_pae);
+  // The seismic resultant rides higher on the wall than the static H/3.
+  assert.ok(r.y_bar_ft > base.h_ft / 3);
+  assert.ok(r.y_bar_ft < 0.6 * base.h_ft);
+  // Seed-Whitman is the conservative envelope: it exceeds the exact increment.
+  assert.ok(r.sw_increment > r.d_pae);
+  // Upward vertical acceleration (kv > 0) lightens the wedge and cuts the thrust.
+  assert.ok(_v1016({ ...base, kv: 0.1 }).pae < r.pae);
+  // Wall friction still lowers the thrust under shaking, as it does statically.
+  assert.ok(_v1016({ ...base, delta: 0 }).kae > r.kae);
+  // Error seams.
+  assert.ok("error" in _v1016({ ...base, phi: 0 }));
+  assert.ok("error" in _v1016({ ...base, gamma: 0 }));
+  assert.ok("error" in _v1016({ ...base, h_ft: 0 }));
+  assert.ok("error" in _v1016({ ...base, delta: 40 })); // delta > phi
+  assert.ok("error" in _v1016({ ...base, alpha: 35 })); // alpha >= phi
+  assert.ok("error" in _v1016({ ...base, kh: -0.1 }));
+  assert.ok("error" in _v1016({ ...base, kh: 1 }));
+  assert.ok("error" in _v1016({ ...base, kv: 1 }));
+  // phi - psi - alpha < 0: the active wedge does not exist. phi 20, alpha 15,
+  // kh 0.4 -> psi = 21.8 deg, so 20 - 21.8 - 15 is well negative.
+  assert.ok("error" in _v1016({ ...base, phi: 20, delta: 0, alpha: 15, kh: 0.4 }));
+  assert.ok("error" in _v1016({ ...base, kh: Infinity }));
+});

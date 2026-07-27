@@ -1264,3 +1264,76 @@ GEOTECH_RENDERERS["frost-depth-berggren"] = _simpleRenderer({
   ],
   compute: computeFrostDepthBerggren,
 });
+
+// ===================== spec-v1016: Mononobe-Okabe seismic active earth pressure =====================
+// The increment retaining-wall-stability names as its own gap ("does not
+// apply seismic (Mononobe-Okabe) pressure"), and the last unbuilt item on
+// spec-v262's own follow-on list -- the sloped-backfill, submerged, at-rest,
+// and Coulomb siblings all landed. Mononobe-Okabe is Coulomb's wedge with a
+// pseudo-static body force added, so it reduces EXACTLY to the Coulomb Ka
+// when kh = kv = 0; the tile reports both and the fuzzer pins the identity.
+
+// dims: in { phi: dimensionless, delta: dimensionless, theta: dimensionless, alpha: dimensionless, gamma: M L^-2 T^-2, h_ft: L, kh: dimensionless, kv: dimensionless } out: { kae: dimensionless, ka_static: dimensionless, psi_deg: dimensionless, pae: M T^-2, pa_static: M T^-2, d_pae: M T^-2, pae_h: M T^-2, pae_v: M T^-2, sw_increment: M T^-2, y_bar_ft: L }
+export function computeSeismicEarthPressure({ phi = 0, delta = 0, theta = 0, alpha = 0, gamma = 120, h_ft = 0, kh = 0, kv = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(gamma > 0)) return { error: "Soil unit weight must be positive (pcf)." };
+  if (!(h_ft > 0)) return { error: "Retained height must be positive (ft)." };
+  if (phi <= 0 || phi >= 50) return { error: "Friction angle must be between 0 and 50 degrees (exclusive)." };
+  if (delta < 0 || delta > phi) return { error: "Wall friction delta must be between 0 and the soil friction angle (deg)." };
+  if (theta < 0 || theta >= 40) return { error: "Wall batter theta must be between 0 and 40 degrees (deg)." };
+  if (alpha < 0 || alpha >= phi) return { error: "Backfill slope alpha must be at least 0 and less than the friction angle (deg)." };
+  if (kh < 0 || kh >= 1) return { error: "Horizontal seismic coefficient kh must be at least 0 and less than 1." };
+  if (kv <= -1 || kv >= 1) return { error: "Vertical seismic coefficient kv must be between -1 and 1 (exclusive)." };
+  const P = phi * Math.PI / 180, D = delta * Math.PI / 180, T = theta * Math.PI / 180, A = alpha * Math.PI / 180;
+  // Seismic inertia angle: the whole wedge is rotated by psi = atan(kh/(1-kv)).
+  const psi = Math.atan(kh / (1 - kv));
+  // The M-O radical goes negative once the rotated backfill slope exceeds the
+  // friction angle -- physically the wedge can no longer be held in the active
+  // state, and no finite thrust exists. This is the standard M-O breakdown.
+  if (!(P - psi - A >= 0)) return { error: "phi - psi - alpha is negative: the seismic coefficient is too large for this friction angle and backfill slope (the Mononobe-Okabe active wedge does not exist)." };
+  const cdtp = Math.cos(D + T + psi);
+  if (!(cdtp > 0) || !(Math.cos(T - A) > 0)) return { error: "The wall/backfill geometry is degenerate for Mononobe-Okabe theory (check the angles)." };
+  const s = Math.sqrt(Math.sin(P + D) * Math.sin(P - psi - A) / (cdtp * Math.cos(T - A)));
+  const kae = Math.cos(P - T - psi) ** 2 / (Math.cos(psi) * Math.cos(T) ** 2 * cdtp * (1 + s) ** 2);
+  // Static Coulomb (psi = 0) with the identical geometry, for the increment.
+  const s0 = Math.sqrt(Math.sin(P + D) * Math.sin(P - A) / (Math.cos(D + T) * Math.cos(T - A)));
+  const ka_static = Math.cos(P - T) ** 2 / (Math.cos(T) ** 2 * Math.cos(D + T) * (1 + s0) ** 2);
+  const pae = 0.5 * kae * gamma * h_ft * h_ft * (1 - kv);
+  const pa_static = 0.5 * ka_static * gamma * h_ft * h_ft;
+  const d_pae = pae - pa_static;
+  const pae_h = pae * Math.cos(D + T);
+  const pae_v = pae * Math.sin(D + T);
+  // Seed-Whitman (1970) simplified increment, the conservative envelope most
+  // codes allow in place of the full M-O algebra.
+  const sw_increment = 0.375 * kh * gamma * h_ft * h_ft;
+  // Combined line of action: the static thrust at H/3, the dynamic increment
+  // at 0.6H (Seed-Whitman), weighted onto the total.
+  const y_bar_ft = (pa_static * (h_ft / 3) + d_pae * (0.6 * h_ft)) / pae;
+  return { kae, ka_static, psi_deg: psi * 180 / Math.PI, pae, pa_static, d_pae, pae_h, pae_v, sw_increment, y_bar_ft };
+}
+
+export const seismicEarthPressureExample = { inputs: { phi: 35, delta: 17.5, theta: 0, alpha: 0, gamma: 120, h_ft: 12, kh: 0.15, kv: 0 } };
+
+GEOTECH_RENDERERS["seismic-earth-pressure"] = _simpleRenderer({
+  citation: "Citation: the Mononobe-Okabe pseudo-static active earth pressure coefficient (Okabe 1926, Mononobe and Matsuo 1929) -- Coulomb's wedge with the seismic body force folded in as an inertia angle psi = arctan(kh / (1 - kv)), giving Kae = cos^2(phi - theta - psi) / [cos(psi) cos^2(theta) cos(delta + theta + psi) (1 + sqrt(sin(phi + delta) sin(phi - psi - alpha) / (cos(delta + theta + psi) cos(theta - alpha))))^2] and Pae = 0.5 Kae gamma H^2 (1 - kv) -- as compiled in NAVFAC DM-7.02, FHWA earth-retaining-structures guidance, and Kramer, Geotechnical Earthquake Engineering; the simplified dynamic increment 0.375 kh gamma H^2 at 0.6H is Seed and Whitman (1970). Setting kh = kv = 0 reduces Kae exactly to the static Coulomb Ka shown beside it, so the tile is its own check. Cohesionless dry backfill, active limit state (the wall must move enough to mobilize it), planar failure surface, pseudo-static (a single equivalent inertia, not a time history), and no water: a submerged or saturated backfill needs the buoyant unit weight plus a separate hydrodynamic term. Take phi, gamma, and the design kh from the geotechnical report; kh is commonly taken as a fraction of the site peak ground acceleration, not the full PGA. A design aid, not a substitute for a geotechnical engineer's report -- the geotechnical engineer of record's recommendation governs.",
+  example: seismicEarthPressureExample.inputs,
+  fields: [
+    { key: "phi", label: "Soil friction angle phi (deg)", kind: "number" },
+    { key: "delta", label: "Wall friction delta (deg, ~2/3 phi, 0 smooth)", kind: "number", default: 0 },
+    { key: "theta", label: "Wall batter theta (deg from vertical, 0 vertical)", kind: "number", default: 0 },
+    { key: "alpha", label: "Backfill slope alpha (deg, 0 level)", kind: "number", default: 0 },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
+    { key: "kh", label: "Horizontal seismic coefficient kh", kind: "number", default: 0 },
+    { key: "kv", label: "Vertical seismic coefficient kv (+ up)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "k", id: "sep-out-k", label: "Kae (seismic) / Ka (static Coulomb)", value: (r) => fmt(r.kae, 3) + " / " + fmt(r.ka_static, 3) },
+    { key: "ps", id: "sep-out-ps", label: "Seismic inertia angle psi", value: (r) => fmt(r.psi_deg, 2) + " deg" },
+    { key: "p", id: "sep-out-p", label: "Total seismic thrust Pae", value: (r) => fmt(r.pae, 0) + " lb/ft (static " + fmt(r.pa_static, 0) + ")" },
+    { key: "dp", id: "sep-out-dp", label: "Dynamic increment Pae - Pa", value: (r) => fmt(r.d_pae, 0) + " lb/ft (Seed-Whitman 0.375 kh gamma H^2 = " + fmt(r.sw_increment, 0) + ", the conservative envelope)" },
+    { key: "ph", id: "sep-out-ph", label: "Horizontal / vertical components", value: (r) => fmt(r.pae_h, 0) + " / " + fmt(r.pae_v, 0) + " lb/ft" },
+    { key: "y", id: "sep-out-y", label: "Combined line of action above the base", value: (r) => fmt(r.y_bar_ft, 2) + " ft (static at H/3, increment at 0.6H)" },
+  ],
+  compute: computeSeismicEarthPressure,
+});

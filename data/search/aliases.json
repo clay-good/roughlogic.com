@@ -1012,6 +1012,41 @@
       "kind": "question"
     },
     {
+      "term": "mononobe okabe",
+      "target": "seismic-earth-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "seismic earth pressure",
+      "target": "seismic-earth-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "seismic active earth pressure",
+      "target": "seismic-earth-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "pseudo static earth pressure",
+      "target": "seismic-earth-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "seed whitman increment",
+      "target": "seismic-earth-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "earthquake load on a retaining wall",
+      "target": "seismic-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "how much extra soil pressure in an earthquake",
+      "target": "seismic-earth-pressure",
+      "kind": "question"
+    },
+    {
       "term": "lewis form factor",
       "target": "gear-tooth-bending-stress",
       "kind": "industry"

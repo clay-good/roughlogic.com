@@ -16639,6 +16639,69 @@
    }
   },
   {
+   "tile_id": "seismic-earth-pressure",
+   "source_publisher": "Mononobe-Okabe (Okabe 1926; Mononobe and Matsuo 1929) / Kramer, Geotechnical Earthquake Engineering / NAVFAC DM-7.02",
+   "source_title": "phi 35 deg, delta 17.5 deg (2/3 phi), vertical wall, level backfill, gamma 120 pcf, H 12 ft, kh 0.15, kv 0 -> Kae 0.3405, Pae 2,942 lb/ft",
+   "source_edition_or_year": "psi = arctan(kh/(1-kv)); Kae = cos^2(phi - theta - psi) / [cos(psi) cos^2(theta) cos(delta + theta + psi) (1 + sqrt(sin(phi+delta) sin(phi - psi - alpha) / (cos(delta+theta+psi) cos(theta-alpha))))^2]; Pae = 0.5 Kae gamma H^2 (1 - kv)",
+   "source_section_or_page": "psi = arctan(0.15) = 8.5308 deg; Kae = 0.34053 (the published Kae table for phi 35 / delta phi/2 / kv 0 reads 0.246 at kh 0, 0.306 at kh 0.10, 0.380 at kh 0.20, bracketing this value); Pae = 0.5 x 0.34053 x 120 x 144 = 2,942.2 lb/ft; static Coulomb Ka = 0.24612 gives Pa = 2,126.5 lb/ft, so the dynamic increment is 815.7 lb/ft against the Seed-Whitman envelope 0.375 x 0.15 x 120 x 144 = 972 lb/ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-27",
+   "inputs": {
+    "phi": 35,
+    "delta": 17.5,
+    "theta": 0,
+    "alpha": 0,
+    "gamma": 120,
+    "h_ft": 12,
+    "kh": 0.15,
+    "kv": 0
+   },
+   "outputs": {
+    "kae": {
+     "value": 0.34053,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "ka_static": {
+     "value": 0.24612,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "psi_deg": {
+     "value": 8.5308,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pae": {
+     "value": 2942.2,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "pa_static": {
+     "value": 2126.5,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "d_pae": {
+     "value": 815.7,
+     "tolerance": {
+      "pct": 0.2
+     }
+    },
+    "sw_increment": {
+     "value": 972,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gear-tooth-bending-stress",
    "source_publisher": "Lewis beam-strength equation (Wilfred Lewis, 1892) / Shigley",
    "source_title": "500 lb tangential load, 8 diametral pitch, 1.5 in face, 20 teeth, 20 deg full depth -> y 0.1084, sigma 7,830 psi",

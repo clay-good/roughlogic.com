@@ -4,6 +4,31 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(geotech): seismic-earth-pressure (Mononobe-Okabe), the last unbuilt item on spec-v262's own list; 2026-07-27
+
+`retaining-wall-stability` states its own gap: its citation says it "does not apply seismic (Mononobe-Okabe) pressure or
+a sloped or submerged backfill." spec-v262's follow-on list named four items; the sloped-backfill, submerged, at-rest,
+and Coulomb siblings have all since landed, leaving the seismic increment as the last one unbuilt. A repo-wide search
+for "mononobe" returned three hits, every one of them prose saying the tile does not exist. Adds one tile to
+`calc-geotech.js` (Group E), no new module or dependency.
+
+`seismic-earth-pressure` applies Mononobe-Okabe (Okabe 1926; Mononobe and Matsuo 1929): Coulomb's active wedge with the
+earthquake body force folded in as an inertia angle psi = arctan(kh / (1 - kv)) that rotates the whole problem, giving
+Kae = cos^2(phi - theta - psi) / [cos(psi) cos^2(theta) cos(delta + theta + psi) (1 + sqrt(sin(phi + delta)
+sin(phi - psi - alpha) / (cos(delta + theta + psi) cos(theta - alpha))))^2] and Pae = 0.5 Kae gamma H^2 (1 - kv). Because
+M-O is Coulomb rotated rather than a separate theory, setting kh = kv = 0 must reproduce the static Coulomb Ka exactly;
+the tile reports both coefficients side by side and the bounds-fuzzer pins the identity to 1e-12 against the
+independently-implemented `coulomb-earth-pressure`, so the seismic branch proves itself against a sibling.
+
+Coefficients cross-checked against published Kae values before building (phi 35, delta = phi/2, kv 0: 0.246 at kh 0,
+0.306 at kh 0.10, 0.380 at kh 0.20 -- the kh = 0 case reproduces exactly and the worked example falls between the other
+two as it must). The Seed and Whitman (1970) simplified increment 0.375 kh gamma H^2 at 0.6H is reported beside the
+exact value as the conservative envelope, not substituted for it, and the fuzzer pins that it exceeds the exact M-O
+increment. The combined line of action weights the static thrust at H/3 and the increment at 0.6H, so the tile shows the
+seismic resultant riding higher on the wall than the static one -- it overturns harder than its magnitude alone implies.
+When phi - psi - alpha goes negative no active wedge exists and the tile returns an explanatory error rather than a
+number. Dry cohesionless backfill, active limit state, pseudo-static; a submerged backfill is stated out of scope.
+
 ### feat(mechanic): gear-tooth-bending-stress (Lewis), the tooth-strength check spur-gear-geometry omits; 2026-07-24
 
 `spur-gear-geometry` states its own gap: its citation says it "returns the geometry only; it does not check tooth

@@ -805,7 +805,7 @@ const _TILES = [
   ["rc-beam-flexure", "E"], ["rc-beam-shear", "E"], ["rc-development-length", "E"],
   ["concrete-torsion-threshold", "E"], ["glulam-volume-factor", "E"], ["masonry-anchor-bolt", "E"], ["masonry-anchor-embedment", "E"],
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio (calc-geotech.js)
-  ["soil-bearing-capacity", "E"], ["lateral-earth-pressure", "E"], ["at-rest-earth-pressure", "E"], ["submerged-earth-pressure", "E"], ["sloped-backfill-earth-pressure", "E"], ["slope-stability-seepage", "E"], ["coulomb-earth-pressure", "E"], ["retaining-wall-stability", "E"],
+  ["soil-bearing-capacity", "E"], ["lateral-earth-pressure", "E"], ["at-rest-earth-pressure", "E"], ["submerged-earth-pressure", "E"], ["sloped-backfill-earth-pressure", "E"], ["slope-stability-seepage", "E"], ["coulomb-earth-pressure", "E"], ["seismic-earth-pressure", "E"], ["retaining-wall-stability", "E"],
   ["consolidation-time-rate", "E"], ["consolidation-degree", "E"], ["spt-bearing-capacity", "E"], ["spt-required-n60", "E"], ["liquefaction-screening", "E"], ["soil-vertical-effective-stress", "E"],
   // spec-v498 pile group efficiency (Converse-Labarre)
   ["pile-group-efficiency", "E"],
