@@ -4,6 +4,26 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): pipe-insulation-for-condensation, the cold-pipe sizing whose target the catalog could always compute but never did; 2026-07-27
+
+`insulation-thickness` solves the hot-pipe case to a USER-ENTERED surface limit; the condensation tiles
+compare flat walls to the dew point for restoration work. Nothing sized the wall of a COLD line so it does
+not sweat -- the single most common insulation question on chilled-water and suction lines. The seam is that
+the target surface temperature is not a preference, it is the ambient dew point, and the catalog's pinned
+psychrometrics already compute it. Adds one tile to `calc-hvac.js` (Group C); no new physics constants (the
+1.65 still-air film coefficient is the same public value the hot-pipe sibling has always used).
+
+`pipe-insulation-for-condensation` computes the dew point from the design-day RH, then bisects the
+outer-surface energy balance h (2 pi r2/12)(Tamb - Tdp) = 2 pi k (Tdp - Tpipe)/ln(r2/r1) for the minimum
+wall that holds the jacket exactly at the dew point. A 1-in 40 F line at 75 F / 50% RH needs 0.92 in --
+matching the ~1-in walls manufacturer condensation tables give -- and the note carries the table footnotes:
+round UP to stock, design to the worst sustained RH, keep the vapor retarder intact. The no-risk case (pipe
+above dew point) reports zero; near-saturation cases error out rather than extrapolate.
+
+Fuzzer back-substitutes the energy balance at the root exactly, cross-checks the dew point against the
+pure-math functions called directly, and pins RH/coldness monotonicity plus both seams. Catalog
+1,472 -> 1,473. Spec: spec-v1024.
+
 ### feat(geotech): pole-embedment-depth, the question every post install starts with and no tile answered; 2026-07-27
 
 Zero hits anywhere for "1807.3", "pole embedment", or "post embedment": `post-hole-concrete` is bag-count

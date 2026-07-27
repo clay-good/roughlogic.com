@@ -90647,6 +90647,36 @@
       "kind": "question"
     },
     {
+      "term": "insulation to stop pipe sweating",
+      "target": "pipe-insulation-for-condensation",
+      "kind": "industry"
+    },
+    {
+      "term": "condensation control insulation thickness",
+      "target": "pipe-insulation-for-condensation",
+      "kind": "industry"
+    },
+    {
+      "term": "chilled water line sweating",
+      "target": "pipe-insulation-for-condensation",
+      "kind": "redirect"
+    },
+    {
+      "term": "how thick insulation cold pipe dew point",
+      "target": "pipe-insulation-for-condensation",
+      "kind": "question"
+    },
+    {
+      "term": "why is my cold pipe dripping",
+      "target": "pipe-insulation-for-condensation",
+      "kind": "question"
+    },
+    {
+      "term": "suction line insulation wall thickness",
+      "target": "pipe-insulation-for-condensation",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

@@ -10,7 +10,9 @@ import {
   hazenWilliamsFrictionLoss,
   psychrometric,
   saturationVaporPressure_hPa,
+  dewPointFromVaporPressure_C,
   F_to_C,
+  C_to_F,
 } from "./pure-math.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
@@ -4519,3 +4521,88 @@ function _v443renderEconomizerEnthalpyChangeover(inputRegion, outputRegion, cita
   sync();
 }
 HVAC_RENDERERS["economizer-enthalpy-changeover"] = _v443renderEconomizerEnthalpyChangeover;
+
+// --- spec-v1024 C: Pipe insulation thickness for condensation control ---
+// The COLD-pipe mirror of computeInsulationThickness (which solves the hot-pipe surface-limit
+// case to a USER-ENTERED limit): here the limit is COMPUTED - the ambient dew point. At the
+// minimum thickness the outer surface sits exactly at the dew point: heat in through the outside
+// film, h (2 pi r2/12)(Tamb - Td), equals heat through the insulation, 2 pi k (Td - Tpipe)/ln(r2/r1).
+// LHS grows and RHS shrinks with r2, so the root is unique (critical-radius k/h ~ 0.16 in is far
+// below any real pipe). Dew point from the repo's pinned psychrometric functions.
+// dims: in { pipe_od_in: L, pipe_temp_F: T, ambient_F: T, ambient_rh_pct: dimensionless, k_btu_in_per_hr_ft2_F: dimensionless, outside_film_coeff_btu_hr_ft2_F: dimensionless } out: { dew_point_F: T, thickness_in: L, r2_in: L }
+export function computePipeInsulationForCondensation({ pipe_od_in = 0, pipe_temp_F = 40, ambient_F = 75, ambient_rh_pct = 50, k_btu_in_per_hr_ft2_F = 0.27, outside_film_coeff_btu_hr_ft2_F = 1.65 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const od = Number(pipe_od_in) || 0;
+  const Tp = Number(pipe_temp_F);
+  const Tamb = Number(ambient_F);
+  const rh = Number(ambient_rh_pct) || 0;
+  const k = Number(k_btu_in_per_hr_ft2_F) || 0;
+  const h = Number(outside_film_coeff_btu_hr_ft2_F) || 0;
+  if (!(od > 0)) return { error: "Pipe OD must be positive (in)." };
+  if (![Tp, Tamb].every(Number.isFinite)) return { error: "Enter valid temperatures (F)." };
+  if (!(rh > 0 && rh < 100)) return { error: "Ambient RH must be between 0 and 100 percent, exclusive - at saturation no finite thickness keeps the surface dry." };
+  if (!(k > 0)) return { error: "Insulation k must be positive (BTU-in/hr-ft^2-F)." };
+  if (!(h > 0)) return { error: "Outside film coefficient must be positive (BTU/hr-ft^2-F)." };
+  if (!(Tamb > Tp)) return { error: "Ambient must be warmer than the pipe - a pipe at or above ambient does not sweat." };
+  const TambC = F_to_C(Tamb);
+  const e = saturationVaporPressure_hPa(TambC) * rh / 100;
+  const dew_point_F = C_to_F(dewPointFromVaporPressure_C(e));
+  if (dew_point_F <= Tp) {
+    return {
+      dew_point_F, thickness_in: 0, r2_in: od / 2, no_risk: true,
+      note: "NO condensation-control thickness required: the pipe surface (" + Tp + " F) is already at or above the ambient dew point (" + dew_point_F.toFixed(1) + " F), so a bare pipe cannot reach saturation. Insulation may still be wanted for energy - that is the separate heat-loss sizing. Manufacturer condensation tables and the mechanical code govern.",
+    };
+  }
+  const r1 = od / 2;
+  const lhs = (r2) => 2 * Math.PI * k * (dew_point_F - Tp) / Math.log(r2 / r1);
+  const rhs = (r2) => h * (2 * Math.PI * r2 / 12) * (Tamb - dew_point_F);
+  let lo = r1 + 1e-4, hi = r1 + 60;
+  if (lhs(hi) > rhs(hi)) return { error: "No practical thickness keeps the surface at the dew point for these inputs - the humidity is too close to saturation for this pipe temperature; consider a vapor-sealed system review." };
+  for (let i = 0; i < 120; i++) {
+    const mid = (lo + hi) / 2;
+    if (lhs(mid) > rhs(mid)) lo = mid; else hi = mid;
+  }
+  const r2_in = (lo + hi) / 2;
+  const thickness_in = r2_in - r1;
+  if (![dew_point_F, thickness_in, r2_in].every(Number.isFinite)) return { error: "Condensation-control math did not produce a finite value." };
+  return {
+    dew_point_F, thickness_in, r2_in, no_risk: false,
+    note: "The MINIMUM thickness that holds the outer jacket exactly at the ambient dew point - the industry practice is to round UP to the next stock wall and keep a margin, because a surface at the dew point is on the edge of sweating all day. Design-day humidity, not average, is what condensation cares about: raise the RH input to the worst sustained condition the space sees. Assumes still air (film coefficient 1.65 default), a continuous vapor retarder (a torn jacket sweats INSIDE the insulation instead), and a bare-pipe k entered for the actual material (fiberglass ~0.27, elastomeric ~0.25-0.28 BTU-in/hr-ft^2-F, from the data sheet). Energy sizing is the separate insulation-thickness tile. Manufacturer condensation tables and the mechanical code govern.",
+  };
+}
+export const pipeInsulationForCondensationExample = { inputs: { pipe_od_in: 1, pipe_temp_F: 40, ambient_F: 75, ambient_rh_pct: 50, k_btu_in_per_hr_ft2_F: 0.27, outside_film_coeff_btu_hr_ft2_F: 1.65 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderPipeInsulationForCondensation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: minimum condensation-control thickness for a cold pipe: the outer-surface energy balance h (2 pi r2/12)(Tamb - Tdp) = 2 pi k (Tdp - Tpipe)/ln(r2/r1), solved for the radius where the jacket sits exactly at the ambient dew point (dew point from the saturation-vapor-pressure psychrometrics this catalog already pins). The industry practice is to round UP to the next stock wall: a surface at the dew point is on the edge of sweating. Assumes still air and an intact vapor retarder; design-day RH governs, not the average. Manufacturer condensation tables (e.g. the insulation maker's design guide) and the mechanical code govern - a sizing aid, not a substitute for them.";
+  const od = makeNumber("Pipe OD (in)", "pifc-od", { step: "any", value: "1" });
+  od.input.value = "1";
+  const tp = makeNumber("Cold-pipe surface temp (F)", "pifc-tp", { step: "any", value: "40" });
+  tp.input.value = "40";
+  const ta = makeNumber("Ambient dry-bulb (F)", "pifc-ta", { step: "any", value: "75" });
+  ta.input.value = "75";
+  const rh = makeNumber("Ambient RH (%, design-day)", "pifc-rh", { step: "any", min: "1", max: "99", value: "50" });
+  rh.input.value = "50";
+  const k = makeNumber("Insulation k (BTU-in/hr-ft^2-F)", "pifc-k", { step: "any", value: "0.27" });
+  k.input.value = "0.27";
+  const h = makeNumber("Outside film coeff (BTU/hr-ft^2-F)", "pifc-h", { step: "any", value: "1.65" });
+  h.input.value = "1.65";
+  for (const f of [od, tp, ta, rh, k, h]) inputRegion.appendChild(f.wrap);
+  const oD = makeOutputLine(outputRegion, "Ambient dew point", "pifc-out-dew");
+  const oT = makeOutputLine(outputRegion, "Minimum thickness (round UP to stock)", "pifc-out-t");
+  const oN = makeOutputLine(outputRegion, "Note", "pifc-out-n");
+  const sync = () => {
+    const r = computePipeInsulationForCondensation({
+      pipe_od_in: Number(od.input.value), pipe_temp_F: Number(tp.input.value), ambient_F: Number(ta.input.value),
+      ambient_rh_pct: Number(rh.input.value), k_btu_in_per_hr_ft2_F: Number(k.input.value),
+      outside_film_coeff_btu_hr_ft2_F: Number(h.input.value),
+    });
+    if (r.error) { oD.textContent = r.error; oT.textContent = ""; oN.textContent = ""; return; }
+    oD.textContent = r.dew_point_F.toFixed(1) + " F";
+    oT.textContent = r.no_risk ? "0 in (surface already above the dew point)" : r.thickness_in.toFixed(2) + " in (outer radius " + r.r2_in.toFixed(2) + " in)";
+    oN.textContent = r.note;
+  };
+  for (const f of [od, tp, ta, rh, k, h]) f.input.addEventListener("input", sync);
+  sync();
+}
+HVAC_RENDERERS["pipe-insulation-for-condensation"] = renderPipeInsulationForCondensation;

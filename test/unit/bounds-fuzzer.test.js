@@ -29853,3 +29853,43 @@ test("bounds: spec-v1023 computePoleEmbedmentDepth pins the worked example, back
   assert.ok("error" in _v1023({ ...base, isolated: "maybe" }));
   assert.ok("error" in _v1023({ ...base, lateral_force_lb: Infinity }));
 });
+
+import { computePipeInsulationForCondensation as _v1024 } from "../../calc-hvac.js";
+import { saturationVaporPressure_hPa as _v1024es, dewPointFromVaporPressure_C as _v1024dp } from "../../pure-math.js";
+
+test("bounds: spec-v1024 computePipeInsulationForCondensation pins the worked example, back-substitutes the energy balance, cross-checks the dew point against pure-math directly, monotonicity in RH and pipe coldness, the no-risk seam, and error seams", () => {
+  const base = { pipe_od_in: 1, pipe_temp_F: 40, ambient_F: 75, ambient_rh_pct: 50, k_btu_in_per_hr_ft2_F: 0.27, outside_film_coeff_btu_hr_ft2_F: 1.65 };
+  const r = _v1024(base);
+  assert.ok(Math.abs(r.dew_point_F - 55.10621) < 0.0005);
+  assert.ok(Math.abs(r.thickness_in - 0.92434) < 0.0005);
+  // Dew point cross-check: identical to calling the pinned pure-math functions directly.
+  {
+    const TC = (75 - 32) * 5 / 9;
+    const e = _v1024es(TC) * 0.5;
+    const tdF = _v1024dp(e) * 9 / 5 + 32;
+    assert.ok(Math.abs(r.dew_point_F - tdF) < 1e-9);
+  }
+  // Back-substitution: at the root, film heat-in equals insulation conduction exactly.
+  {
+    const r1 = 0.5, r2 = r.r2_in, Td = r.dew_point_F;
+    const lhs = 2 * Math.PI * 0.27 * (Td - 40) / Math.log(r2 / r1);
+    const rhs = 1.65 * (2 * Math.PI * r2 / 12) * (75 - Td);
+    assert.ok(Math.abs(lhs - rhs) < 1e-6);
+  }
+  // More humid or colder pipe always needs a thicker wall.
+  assert.ok(_v1024({ ...base, ambient_rh_pct: 70 }).thickness_in > r.thickness_in);
+  assert.ok(_v1024({ ...base, pipe_temp_F: 20 }).thickness_in > r.thickness_in);
+  // No-risk seam: pipe at or above the dew point needs zero condensation-control thickness.
+  const warm = _v1024({ ...base, pipe_temp_F: 60 });
+  assert.ok(warm.no_risk === true && warm.thickness_in === 0);
+  assert.ok(r.no_risk === false);
+  // Near-saturation error seam: 99.9% RH at a very cold pipe has no practical wall.
+  assert.ok("error" in _v1024({ ...base, pipe_temp_F: -20, ambient_rh_pct: 99.9 }));
+  // Error seams.
+  assert.ok("error" in _v1024({ ...base, pipe_od_in: 0 }));
+  assert.ok("error" in _v1024({ ...base, ambient_rh_pct: 0 }));
+  assert.ok("error" in _v1024({ ...base, ambient_rh_pct: 100 }));
+  assert.ok("error" in _v1024({ ...base, ambient_F: 40 }));
+  assert.ok("error" in _v1024({ ...base, k_btu_in_per_hr_ft2_F: 0 }));
+  assert.ok("error" in _v1024({ ...base, pipe_od_in: NaN }));
+});

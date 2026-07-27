@@ -15027,6 +15027,18 @@ export const CITATIONS = {
       { name: "No code table", value: "the psf-per-ft lateral-bearing rate is a user input from the adopted code or geotech report", source: "IBC Table 1806.2 (not reproduced)" },
     ],
   },
+  "pipe-insulation-for-condensation": {
+    formula: "Tdp from the ambient RH (saturation-vapor-pressure psychrometrics); minimum wall from the outer-surface balance h (2 pi r2/12)(Tamb - Tdp) = 2 pi k (Tdp - Tpipe)/ln(r2/r1), solved for r2; thickness = r2 - r1.",
+    edition: "Standard cylindrical-conduction and surface-film heat balance (the same public engineering relations as the landed insulation-thickness and pipe-heat-loss-radial tiles) with the dew point from the catalog's pinned psychrometric functions; no standard table reproduced.",
+    freeAccess: "The conduction/film balance and Magnus-form psychrometrics are public engineering relations; manufacturer condensation-control design guides publish the equivalent tables free.",
+    governance: GOVERNANCE.general,
+    editionNote: "The MINIMUM wall that holds the jacket exactly at the dew point - industry practice rounds UP to the next stock wall and designs to the WORST sustained (design-day) RH, not the average. Assumes still air (1.65 BTU/hr-ft^2-F outside film, the same public reference value the hot-pipe sibling uses) and an intact vapor retarder: a torn jacket moves the condensation inside the insulation, which no thickness fixes. Near-saturation inputs error out rather than extrapolate (at 100% RH no finite wall keeps a cold surface dry). Energy sizing is the separate insulation-thickness tile. Manufacturer condensation tables and the mechanical code govern.",
+    assumptions: [
+      { name: "Dew point source", value: "computed from the repo's pinned saturation-vapor-pressure / dew-point functions, not a lookup", source: "pure-math.js psychrometrics (Magnus form)" },
+      { name: "Film coefficient", value: "1.65 BTU/hr-ft^2-F still-air default, identical to the insulation-thickness sibling", source: "public engineering reference value" },
+      { name: "Vapor retarder", value: "assumed continuous; failure moves condensation inside the insulation", source: "manufacturer design guides" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",
