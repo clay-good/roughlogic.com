@@ -15002,6 +15002,18 @@ export const CITATIONS = {
       { name: "phi (ductile)", value: "0.75 tension / 0.65 shear; brittle elements take lower values (not offered)", source: "ACI 318-19 Table 17.5.3" },
     ],
   },
+  "concrete-anchor-interaction": {
+    formula: "Vua/phiVn <= 0.2 -> full tension strength permitted; Nua/phiNn <= 0.2 -> full shear strength permitted; otherwise Nua/phiNn + Vua/phiVn <= 1.2. Each demand must also clear its own capacity (17.8.1, 17.8.2).",
+    edition: "The ACI 318-19 Section 17.8 interaction of tensile and shear forces (trilinear rule, 17.8.3), by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Chapter 17 anchoring provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "phiNn is the LEAST of the tension modes (steel, breakout, pullout, blowout) and phiVn the LEAST of the shear modes (steel, shear breakout, pryout), in the same phi basis - this tile checks the combination, it does not recompute the capacities. The rule is continuous at the 20% corners, and the individual checks are never waived: an anchor comfortable in tension and comfortable in shear can still fail combined, which is the case the pinned example sits one hair from. Seismic (17.10) modifications act on the capacities upstream. ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+    assumptions: [
+      { name: "Trilinear rule", value: "full companion strength permitted below a 0.2 demand ratio; 1.2 combined limit above", source: "ACI 318-19 17.8.2, 17.8.3" },
+      { name: "Individual caps", value: "Nua <= phiNn and Vua <= phiVn always hold on their own", source: "ACI 318-19 17.8.1" },
+      { name: "Inputs", value: "the two governing design capacities come from the anchor-mode tiles; this tile does not recompute them", source: "ACI 318-19 17.5" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

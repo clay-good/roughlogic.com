@@ -1709,6 +1709,70 @@ CONCRETE_RENDERERS["concrete-anchor-steel-strength"] = _simpleRenderer({
   compute: computeConcreteAnchorSteelStrength,
 });
 
+// --- spec-v1022 E: Concrete anchor tension-shear interaction (ACI 318-19 17.8) ---
+// Trilinear rule: shear ratio <= 0.2 -> full tension permitted; tension ratio <= 0.2 -> full shear
+// permitted; else Nua/phiNn + Vua/phiVn <= 1.2 (17.8.3). Each individual ratio must be <= 1.0 on its
+// own (17.8.1/17.8.2) - the interaction never waives that. Continuous at the 0.2 corners.
+// dims: in { nua_lb: M L T^-2, vua_lb: M L T^-2, phi_nn_lb: M L T^-2, phi_vn_lb: M L T^-2 } out: { tension_ratio: dimensionless, shear_ratio: dimensionless, sum_ratio: dimensionless }
+export function computeConcreteAnchorInteraction({ nua_lb = 0, vua_lb = 0, phi_nn_lb = 0, phi_vn_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const nua = Number(nua_lb) || 0;
+  const vua = Number(vua_lb) || 0;
+  const pn = Number(phi_nn_lb) || 0;
+  const pv = Number(phi_vn_lb) || 0;
+  if (nua < 0) return { error: "Tension demand cannot be negative (lb); enter 0 for shear-only." };
+  if (vua < 0) return { error: "Shear demand cannot be negative (lb); enter 0 for tension-only." };
+  if (!(pn > 0)) return { error: "Design tension capacity phiNn must be positive (lb) - the least of the tension-mode tiles." };
+  if (!(pv > 0)) return { error: "Design shear capacity phiVn must be positive (lb) - the least of the shear-mode tiles." };
+  const tension_ratio = nua / pn;
+  const shear_ratio = vua / pv;
+  const individual_ok = tension_ratio <= 1.0 && shear_ratio <= 1.0;
+  let branch, sum_ratio, limit, governing_ratio;
+  if (shear_ratio <= 0.2) {
+    branch = "full tension permitted (shear under 20%)";
+    sum_ratio = tension_ratio + shear_ratio;
+    limit = 1.0;
+    governing_ratio = tension_ratio;
+  } else if (tension_ratio <= 0.2) {
+    branch = "full shear permitted (tension under 20%)";
+    sum_ratio = tension_ratio + shear_ratio;
+    limit = 1.0;
+    governing_ratio = shear_ratio;
+  } else {
+    branch = "interaction (both over 20%)";
+    sum_ratio = tension_ratio + shear_ratio;
+    limit = 1.2;
+    governing_ratio = sum_ratio / 1.2;
+  }
+  const pass = individual_ok && governing_ratio <= 1.0 + 1e-12;
+  const utilization_pct = Math.max(tension_ratio, shear_ratio, governing_ratio) * 100;
+  if (![tension_ratio, shear_ratio, sum_ratio, utilization_pct].every(Number.isFinite)) return { error: "Interaction math did not produce a finite value." };
+  return {
+    tension_ratio, shear_ratio, branch, sum_ratio, limit, utilization_pct, pass,
+    note: "Enter the GOVERNING design capacities: phiNn is the least of the tension modes (steel, breakout, pullout, blowout) and phiVn the least of the shear modes (steel, shear breakout, pryout), in the same phi basis. Each demand must clear its own capacity outright - the interaction never waives that - and when both demands exceed 20% of capacity the sum must stay under 1.2, so an anchor comfortable in tension and comfortable in shear can still fail combined. The rule is continuous at the 20% corners. Seismic modifications (17.10) act on the capacities upstream. ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+  };
+}
+export const concreteAnchorInteractionExample = { inputs: { nua_lb: 6000, vua_lb: 3000, phi_nn_lb: 9831, phi_vn_lb: 5112 } };
+CONCRETE_RENDERERS["concrete-anchor-interaction"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 Section 17.8 interaction of tensile and shear forces: where Vua/phiVn <= 0.2 the full tension strength is permitted, where Nua/phiNn <= 0.2 the full shear strength is permitted, and otherwise Nua/phiNn + Vua/phiVn <= 1.2 (17.8.3) - with each demand also required to clear its own capacity (17.8.1, 17.8.2). The trilinear rule is continuous at the 20% corners. phiNn is the least of the tension modes (steel, breakout, pullout, blowout) and phiVn the least of the shear modes (steel, shear breakout, pryout). ACI 318 Chapter 17 and the engineer of record govern.",
+  example: concreteAnchorInteractionExample.inputs,
+  fields: [
+    { key: "nua_lb", label: "Factored tension demand Nua (lb)", kind: "number" },
+    { key: "vua_lb", label: "Factored shear demand Vua (lb)", kind: "number" },
+    { key: "phi_nn_lb", label: "Governing design tension capacity phiNn (lb)", kind: "number" },
+    { key: "phi_vn_lb", label: "Governing design shear capacity phiVn (lb)", kind: "number" },
+  ],
+  outputs: [
+    { key: "tr", id: "cai-out-tr", label: "Tension ratio Nua/phiNn", value: (r) => fmt(r.tension_ratio, 3) },
+    { key: "sr", id: "cai-out-sr", label: "Shear ratio Vua/phiVn", value: (r) => fmt(r.shear_ratio, 3) },
+    { key: "br", id: "cai-out-br", label: "Branch", value: (r) => r.branch + " (limit " + fmt(r.limit, 1) + ")" },
+    { key: "sum", id: "cai-out-sum", label: "Combined sum", value: (r) => fmt(r.sum_ratio, 3) + (r.limit === 1.2 ? " vs 1.2" : " (informational)") },
+    { key: "res", id: "cai-out-res", label: "Result", value: (r) => (r.pass ? "PASSES" : "FAILS") + " at " + fmt(r.utilization_pct, 1) + "% utilization" },
+    { key: "n", id: "cai-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteAnchorInteraction,
+});
+
 // ===================== spec-v793: fresh (batch) concrete temperature (ACI 305.1) =====================
 // Mass-weighted thermal-energy balance: mixture T = sum(c_i m_i T_i) / sum(c_i m_i), with the specific
 // heat of solids (cement + aggregate) ~0.22 Btu/lb-F and water = 1.0. Free surface moisture on the

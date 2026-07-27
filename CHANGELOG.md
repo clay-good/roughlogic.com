@@ -4,6 +4,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): concrete-anchor-interaction closes the anchor family with the ACI 17.8 combined check; 2026-07-27
+
+The tension tile's citation has named "combined shear-tension" as a separate check from the very start, and
+with spec-v1019/v1020/v1021 landed, every input the combined check needs now exists in the catalog. The AISC
+tiles (`steel-bolt-tension-shear` J3.7, `steel-h1-interaction` H1.1) are different code paths; nothing
+implemented the ACI 318-19 Section 17.8 trilinear rule. Adds one tile to `calc-concrete.js` (Group E).
+
+`concrete-anchor-interaction` takes the two GOVERNING design capacities (each the least of its mode tiles) and
+the factored demands, applies the trilinear rule -- full companion strength permitted below a 0.2 demand ratio,
+otherwise Nua/phiNn + Vua/phiVn <= 1.2 -- and never waives the individual 17.8.1/17.8.2 caps. The rule is
+continuous at the 20% corners, and the fuzzer pins that continuity plus the individual-cap enforcement inside
+the exempt branches.
+
+The pinned example is the lesson: chained from the spec-v1021 anchor, tension sits at 61% and shear at 59% --
+comfortable in each direction -- yet combined it clears 1.197 of 1.2 by a hair, and a 100-lb nudge fails it.
+Catalog 1,470 -> 1,471. Spec: spec-v1022. The anchor family is now complete: tension breakout / pullout /
+blowout / shear breakout / pryout / steel / interaction.
+
 ### feat(concrete): concrete-anchor-steel-strength, the steel number every anchor tile's note points at; 2026-07-27
 
 The anchor family now checks every concrete mode (tension breakout / pullout / blowout / shear breakout /

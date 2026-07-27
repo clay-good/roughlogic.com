@@ -29768,3 +29768,41 @@ test("bounds: spec-v1021 computeConcreteAnchorSteelStrength pins both K-State pu
   assert.ok("error" in _v1021({ ...base, futa_psi: 0 }));
   assert.ok("error" in _v1021({ ...base, anchor_dia_in: NaN }));
 });
+
+import { computeConcreteAnchorInteraction as _v1022 } from "../../calc-concrete.js";
+
+test("bounds: spec-v1022 computeConcreteAnchorInteraction pins all three trilinear branches, the 0.2 corner continuities, individual-cap enforcement inside exempt branches, the 1.2 seam, and error seams", () => {
+  const caps = { phi_nn_lb: 9831, phi_vn_lb: 5112 };
+  // Pinned worked example: both over 20%, sum 1.197 <= 1.2 - passes by a hair.
+  const r = _v1022({ nua_lb: 6000, vua_lb: 3000, ...caps });
+  assert.ok(Math.abs(r.tension_ratio - 6000 / 9831) < 1e-12);
+  assert.ok(Math.abs(r.shear_ratio - 3000 / 5112) < 1e-12);
+  assert.ok(r.limit === 1.2 && r.pass === true);
+  assert.ok(Math.abs(r.sum_ratio - 1.19715) < 0.0001);
+  // Nudge the tension demand up and the same anchor FAILS combined while both individuals still pass.
+  const f = _v1022({ nua_lb: 6100, vua_lb: 3000, ...caps });
+  assert.ok(f.tension_ratio < 1 && f.shear_ratio < 1 && f.pass === false);
+  // Exemption branches.
+  const te = _v1022({ nua_lb: 9000, vua_lb: 900, ...caps });
+  assert.ok(te.limit === 1 && te.pass === true && te.shear_ratio <= 0.2);
+  const se = _v1022({ nua_lb: 900, vua_lb: 4900, ...caps });
+  assert.ok(se.limit === 1 && se.pass === true && se.tension_ratio <= 0.2);
+  // Individual caps are never waived: over-capacity tension inside the shear-exempt branch FAILS.
+  const over = _v1022({ nua_lb: 10500, vua_lb: 100, ...caps });
+  assert.ok(over.pass === false && over.tension_ratio > 1);
+  // Corner continuity: at shear_ratio exactly 0.2 and tension_ratio exactly 1.0, both readings agree (pass).
+  const corner = _v1022({ nua_lb: 9831, vua_lb: 0.2 * 5112, ...caps });
+  assert.ok(corner.pass === true);
+  // Just past the corner in both: tension_ratio 1.0 with shear_ratio 0.21 -> interaction branch, sum 1.21 FAILS.
+  const past = _v1022({ nua_lb: 9831, vua_lb: 0.21 * 5112, ...caps });
+  assert.ok(past.limit === 1.2 && past.pass === false);
+  // Zero-demand degenerate cases pass at zero utilization on that axis.
+  assert.ok(_v1022({ nua_lb: 0, vua_lb: 5000, ...caps }).pass === true);
+  assert.ok(_v1022({ nua_lb: 9000, vua_lb: 0, ...caps }).pass === true);
+  // Error seams.
+  assert.ok("error" in _v1022({ nua_lb: -1, vua_lb: 0, ...caps }));
+  assert.ok("error" in _v1022({ nua_lb: 0, vua_lb: -1, ...caps }));
+  assert.ok("error" in _v1022({ nua_lb: 100, vua_lb: 100, phi_nn_lb: 0, phi_vn_lb: 5112 }));
+  assert.ok("error" in _v1022({ nua_lb: 100, vua_lb: 100, phi_nn_lb: 9831, phi_vn_lb: 0 }));
+  assert.ok("error" in _v1022({ nua_lb: Infinity, vua_lb: 100, ...caps }));
+});

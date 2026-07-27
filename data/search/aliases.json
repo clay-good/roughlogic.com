@@ -90582,6 +90582,36 @@
       "kind": "question"
     },
     {
+      "term": "anchor tension shear interaction",
+      "target": "concrete-anchor-interaction",
+      "kind": "industry"
+    },
+    {
+      "term": "combined tension and shear on an anchor",
+      "target": "concrete-anchor-interaction",
+      "kind": "industry"
+    },
+    {
+      "term": "aci 17.8",
+      "target": "concrete-anchor-interaction",
+      "kind": "redirect"
+    },
+    {
+      "term": "anchor unity check 1.2",
+      "target": "concrete-anchor-interaction",
+      "kind": "redirect"
+    },
+    {
+      "term": "nua phinn plus vua phivn",
+      "target": "concrete-anchor-interaction",
+      "kind": "question"
+    },
+    {
+      "term": "anchor passes tension and shear separately but combined",
+      "target": "concrete-anchor-interaction",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

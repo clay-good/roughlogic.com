@@ -1541,6 +1541,7 @@ const RELATED = {
   "concrete-anchor-shear-breakout": ["concrete-anchor-pryout","concrete-anchor-breakout","column-base-plate"],
   "concrete-anchor-pryout": ["concrete-anchor-shear-breakout","concrete-anchor-breakout","concrete-anchor-pullout"],
   "concrete-anchor-steel-strength": ["concrete-anchor-breakout","concrete-anchor-shear-breakout","bolt-shear-bearing"],
+  "concrete-anchor-interaction": ["concrete-anchor-steel-strength","concrete-anchor-breakout","concrete-anchor-shear-breakout"],
   "rc-slender-column-magnify": ["rc-column-axial","column-buckling-wood","concrete-longterm-defl"],
   "concrete-corbel-bracket": ["rc-shear-friction","rc-beam-shear","concrete-bearing-strength"],
   "rc-punching-shear": ["rc-beam-shear","rc-column-axial","footing-area"],
