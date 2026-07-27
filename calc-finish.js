@@ -595,3 +595,53 @@ FINISH_RENDERERS["step-flashing-count"] = _simpleRenderer({
   ],
   compute: computeStepFlashingCount,
 });
+
+// --- spec-v1025 E: Window / prehung-door rough opening (framing conventions) ---
+// Window: RO = frame + 1/2 in each way (1/4-in shim per side). Prehung door: RO = SLAB + 2 in wide,
+// + 2.5 in tall (jambs ~3/4 in each + shim; head jamb + floor clearance). Header rough length adds
+// two 1.5-in jack studs. Conventions are the widely published defaults; the MANUFACTURER'S stated
+// RO always governs when it differs - the tile says so and exposes the adders as inputs.
+// dims: in { opening_type: dimensionless, unit_width_in: L, unit_height_in: L, width_adder_in: L, height_adder_in: L } out: { ro_width_in: L, ro_height_in: L, header_length_in: L }
+export function computeRoughOpeningSize({ opening_type = "window", unit_width_in = 0, unit_height_in = 0, width_adder_in = -1, height_adder_in = -1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(unit_width_in) || 0;
+  const h = Number(unit_height_in) || 0;
+  let wa = Number(width_adder_in);
+  let ha = Number(height_adder_in);
+  if (!(w > 0)) return { error: "Unit width must be positive (in)." };
+  if (!(h > 0)) return { error: "Unit height must be positive (in)." };
+  if (opening_type !== "window" && opening_type !== "prehung-door") return { error: "Opening type must be window or prehung-door." };
+  const isWindow = opening_type === "window";
+  if (wa < 0) wa = isWindow ? 0.5 : 2.0;
+  if (ha < 0) ha = isWindow ? 0.5 : 2.5;
+  const ro_width_in = w + wa;
+  const ro_height_in = h + ha;
+  const header_length_in = ro_width_in + 3;
+  if (![ro_width_in, ro_height_in, header_length_in].every(Number.isFinite)) return { error: "Rough-opening math did not produce a finite value." };
+  return {
+    ro_width_in, ro_height_in, header_length_in, wa_used: wa, ha_used: ha,
+    note: (isWindow
+      ? "Window convention: the RO runs 1/2 in over the FRAME outside dimension each way - a 1/4-in shim space per side for plumb, level, and square, plus room for backer rod or low-expansion foam. "
+      : "Prehung-door convention: the RO runs 2 in over the SLAB width and 2.5 in over the slab height - that absorbs the two ~3/4-in jambs plus shim space, the head jamb, and floor clearance. Measure from the SLAB size (a 36 x 80 door wants a 38 x 82.5 RO), not the outside of the jambs. ")
+      + "The header's rough length adds 3 in for two 1.5-in jack studs. THE MANUFACTURER'S STATED RO GOVERNS whenever it differs from the convention - check the spec sheet before framing, and override the adders here to match it. Out-of-plumb or out-of-level framing eats the shim space fast; frame square.",
+  };
+}
+export const roughOpeningSizeExample = { inputs: { opening_type: "prehung-door", unit_width_in: 36, unit_height_in: 80, width_adder_in: -1, height_adder_in: -1 } };
+FINISH_RENDERERS["rough-opening-size"] = _simpleRenderer({
+  citation: "Citation: standard US framing conventions for rough openings - a window RO runs 1/2 in over the frame outside dimension each way (1/4-in shim space per side); a prehung door RO runs 2 in over the SLAB width and 2.5 in over the slab height (jambs + shim + floor clearance); the header rough length adds two 1.5-in jack studs. These are the widely published rules of thumb the trade frames to, and they are DEFAULTS only: the window or door manufacturer's stated rough opening governs whenever it differs, and the adders here are editable to match the spec sheet.",
+  example: roughOpeningSizeExample.inputs,
+  fields: [
+    { key: "opening_type", label: "Opening type", kind: "select", options: [{ value: "prehung-door", label: "Prehung door (enter SLAB size)", selected: true }, { value: "window", label: "Window (enter FRAME outside dims)" }] },
+    { key: "unit_width_in", label: "Unit width (in)", kind: "number" },
+    { key: "unit_height_in", label: "Unit height (in)", kind: "number" },
+    { key: "width_adder_in", label: "Width adder override (in, -1 = convention)", kind: "number", default: -1 },
+    { key: "height_adder_in", label: "Height adder override (in, -1 = convention)", kind: "number", default: -1 },
+  ],
+  outputs: [
+    { key: "row", id: "ros-out-w", label: "Rough opening width", value: (r) => fmt(r.ro_width_in, 2) + " in (+" + fmt(r.wa_used, 2) + ")" },
+    { key: "roh", id: "ros-out-h", label: "Rough opening height", value: (r) => fmt(r.ro_height_in, 2) + " in (+" + fmt(r.ha_used, 2) + ")" },
+    { key: "hdr", id: "ros-out-hdr", label: "Header rough length (RO + two jacks)", value: (r) => fmt(r.header_length_in, 2) + " in" },
+    { key: "n", id: "ros-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRoughOpeningSize,
+});

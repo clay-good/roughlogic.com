@@ -4,6 +4,24 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(finish): rough-opening-size, the framing dimension the catalog never produced; 2026-07-27
+
+No "rough opening" string existed anywhere -- not in tools-data.js, the alias index, standard-sizes.js, or
+any calc module. `header-sizing` answers the structural half (IRC R602.7 depth) and its own alias "what size
+header for a garage door opening" shows users arriving with opening questions, but the DIMENSIONAL half --
+what to frame for a given unit -- was absent. Adds one tile to `calc-finish.js` (Group E).
+
+`rough-opening-size` applies the published US framing conventions as editable defaults: a window RO runs
+1/2 in over the FRAME outside dimension each way (1/4-in shim per side); a prehung door RO runs 2 in over
+the SLAB width and 2.5 in over the slab height (a 36 x 80 door wants 38 x 82.5 -- measured from the slab,
+not the jambs). Adds the header rough length (+ two 1.5-in jacks). It is a convention tile and says so:
+the manufacturer's stated RO governs whenever it differs, and the adder inputs exist precisely so a spec
+sheet can be matched exactly. Conventions corroborated across multiple independent framing references.
+
+The window cross-check fixture is the tell: a 35.5 x 47.5 frame lands on the round 36 x 48 RO --
+manufacturers size frames 1/2 in under the framing number on purpose. Catalog 1,473 -> 1,474.
+Spec: spec-v1025. Cap ledger: calc-finish.js 12000 -> 15000 (was at 98.3%).
+
 ### feat(hvac): pipe-insulation-for-condensation, the cold-pipe sizing whose target the catalog could always compute but never did; 2026-07-27
 
 `insulation-thickness` solves the hot-pipe case to a USER-ENTERED surface limit; the condensation tiles

@@ -90677,6 +90677,36 @@
       "kind": "question"
     },
     {
+      "term": "rough opening",
+      "target": "rough-opening-size",
+      "kind": "industry"
+    },
+    {
+      "term": "door rough opening",
+      "target": "rough-opening-size",
+      "kind": "industry"
+    },
+    {
+      "term": "window rough opening",
+      "target": "rough-opening-size",
+      "kind": "industry"
+    },
+    {
+      "term": "what size opening for a 36 inch door",
+      "target": "rough-opening-size",
+      "kind": "question"
+    },
+    {
+      "term": "ro for a prehung door",
+      "target": "rough-opening-size",
+      "kind": "redirect"
+    },
+    {
+      "term": "framing size for a new window",
+      "target": "rough-opening-size",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

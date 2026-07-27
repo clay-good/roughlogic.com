@@ -15039,6 +15039,18 @@ export const CITATIONS = {
       { name: "Vapor retarder", value: "assumed continuous; failure moves condensation inside the insulation", source: "manufacturer design guides" },
     ],
   },
+  "rough-opening-size": {
+    formula: "Window: RO = frame outside dimension + 1/2 in each way (1/4-in shim per side). Prehung door: RO = SLAB + 2 in wide, + 2.5 in tall. Header rough length = RO width + 3 in (two 1.5-in jack studs). Adders editable.",
+    edition: "The widely published US framing conventions for rough openings, stated as DEFAULTS - not a code section; the unit manufacturer's stated RO governs whenever it differs.",
+    freeAccess: "The conventions are published freely across framing references and every window/door manufacturer's installation instructions.",
+    governance: GOVERNANCE.general,
+    editionNote: "A convention tile, not a code tile: the 1/2-in window and 2 / 2.5-in prehung-door adders are the rules of thumb the trade frames to, and both the note and the editable adder inputs point at the spec sheet as the authority. Door ROs measure from the SLAB (a 36 x 80 door wants 38 x 82.5), not the jamb outside. The header's structural DEPTH is the separate header-sizing tile; egress clearances, tempered-glazing triggers, and flashing details are code and manufacturer territory. Frame plumb, level, and square - out-of-plumb framing eats the shim space the adders exist to provide.",
+    assumptions: [
+      { name: "Window adder", value: "1/2 in over the frame outside dimension in each direction", source: "published framing convention; manufacturer RO governs" },
+      { name: "Prehung-door adder", value: "2 in wide / 2.5 in tall over the slab", source: "published framing convention; manufacturer RO governs" },
+      { name: "Header length", value: "RO width + two 1.5-in jack studs", source: "standard platform-framing practice" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

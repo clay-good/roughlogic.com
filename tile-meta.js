@@ -527,6 +527,7 @@ const _TILES = [
   ["turn-radius-bank", "K"],
   ["climb-gradient-roc", "K"],
   ["concrete-yield", "E"],
+  ["rough-opening-size", "E"],
   ["glass-weight", "E"],
   ["fineness-modulus", "E"], ["soil-gradation-coefficients", "E"],
   ["water-cement-ratio", "E"],

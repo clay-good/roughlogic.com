@@ -538,7 +538,7 @@ const TOOL_MODULES = (() => {
     // v97 hardscape
     "paver-patio", "retaining-wall-block",
     // v98 roofing trim-out
-    "attic-ventilation", "soffit-ridge-vent-count", "gutter-downspout", "gutter-downspout-takeoff", "deck-board-takeoff", "glass-weight",
+    "attic-ventilation", "soffit-ridge-vent-count", "gutter-downspout", "gutter-downspout-takeoff", "deck-board-takeoff", "rough-opening-size", "glass-weight",
     "cement-board-takeoff",
     "step-flashing-count",
   ]);

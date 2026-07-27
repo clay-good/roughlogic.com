@@ -29893,3 +29893,28 @@ test("bounds: spec-v1024 computePipeInsulationForCondensation pins the worked ex
   assert.ok("error" in _v1024({ ...base, k_btu_in_per_hr_ft2_F: 0 }));
   assert.ok("error" in _v1024({ ...base, pipe_od_in: NaN }));
 });
+
+import { computeRoughOpeningSize as _v1025 } from "../../calc-finish.js";
+
+test("bounds: spec-v1025 computeRoughOpeningSize pins both conventions, the override path, the header +3 identity, additivity, and error seams", () => {
+  // Prehung door: 36 x 80 slab -> 38 x 82.5, header 41.
+  const d = _v1025({ opening_type: "prehung-door", unit_width_in: 36, unit_height_in: 80 });
+  assert.ok(d.ro_width_in === 38 && d.ro_height_in === 82.5 && d.header_length_in === 41);
+  assert.ok(d.wa_used === 2 && d.ha_used === 2.5);
+  // Window: 35.5 x 47.5 frame -> the round 36 x 48 RO.
+  const w = _v1025({ opening_type: "window", unit_width_in: 35.5, unit_height_in: 47.5 });
+  assert.ok(w.ro_width_in === 36 && w.ro_height_in === 48 && w.wa_used === 0.5);
+  // Override path: a manufacturer RO spec of +0.75 wide is honored exactly, including zero.
+  const o = _v1025({ opening_type: "window", unit_width_in: 36, unit_height_in: 48, width_adder_in: 0.75, height_adder_in: 0 });
+  assert.ok(o.ro_width_in === 36.75 && o.ro_height_in === 48 && o.wa_used === 0.75 && o.ha_used === 0);
+  // Header identity: always RO width + 3.
+  for (const t of [d, w, o]) assert.ok(Math.abs(t.header_length_in - (t.ro_width_in + 3)) < 1e-12);
+  // Additivity: doubling the unit width moves the RO by exactly the same amount.
+  const d2 = _v1025({ opening_type: "prehung-door", unit_width_in: 72, unit_height_in: 80 });
+  assert.ok(Math.abs(d2.ro_width_in - d.ro_width_in - 36) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v1025({ opening_type: "prehung-door", unit_width_in: 0, unit_height_in: 80 }));
+  assert.ok("error" in _v1025({ opening_type: "prehung-door", unit_width_in: 36, unit_height_in: 0 }));
+  assert.ok("error" in _v1025({ opening_type: "sliding", unit_width_in: 36, unit_height_in: 80 }));
+  assert.ok("error" in _v1025({ opening_type: "window", unit_width_in: NaN, unit_height_in: 48 }));
+});
