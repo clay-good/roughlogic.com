@@ -2475,6 +2475,7 @@ cross-check.
 | calc-masonry.js | `computeCmuShearWall` | `{ fm_psi = 1500, b_in = 0, dv_in = 0, p_lb = 0, mvd = 0.5, av_in2 = 0, s_in =...` | _ | _ | _ |
 | calc-masonry.js | `computeCmuWallAxial` | `{ fm_psi = 2000, an_in2 = 0, ast_in2 = 0, h_in = 0, r_in = 0, fs_psi = 32000 ...` | _ | _ | _ |
 | calc-masonry.js | `computeCmuWallFlexure` | `{ fm_psi = 2000, as_in2 = 0, d_in = 0, b_in = 12, fs_psi = 32000 } = {}` | _ | _ | _ |
+| calc-masonry.js | `computeFireplaceFlueArea` | `{ opening_width_in = 0, opening_height_in = 0, flue_shape = "rectangular", fl...` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryAnchorBolt` | `{ fm_psi = 1500, lbe_in = 0, ab_in2 = 0, fy_psi = 36000 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryAnchorEmbedment` | `{ required_tension_lb = 0, fm_psi = 1500, ab_in2 = 0.442, fy_psi = 36000 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryJointReinforcement` | `{ wall_length_ft = 40, wall_height_ft = 12, vertical_spacing_in = 16, piece_l...` | _ | _ | _ |
@@ -3163,7 +3164,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1749.
+Row count: 1750.
 
 <!-- END function-corpus-v14 -->
 
@@ -3780,7 +3781,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (393 tiles)
+### Group E Construction (394 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3912,6 +3913,7 @@ per spec-v14 §13.1 second paragraph.
 | `fence-estimate` | Fence Material Takeoff | Standard fence-layout identities.; spec-v94 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fillet-weld-strength` | Fillet Weld Strength and Size | AWS D1.1 / AISC 360 §J2 (by name); 1/4 in E70 fillet, 6 in long, ASD -> throat 0.1768 in, 21... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fineness-modulus` | Aggregate Fineness Modulus (ASTM C136) | ASTM C136 / C125 (aggregate fineness ...; cumulative retained 2/12/32/57/82/95 -> sum 280 -> FM 2.8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fireplace-flue-area` | Masonry Fireplace Flue Area (IRC R1003.15.1) | International Code Council; 'Square chimney flues shall have a minimum net cross-sect... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flexible-pipe-deflection` | Buried Flexible Pipe Deflection (Modified Iowa) | Modified Iowa (Spangler) deflection f...; Wc = 12*120/144 = 10 psi; deflection = 1.5*0.1*10/(0.149*... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flooring-takeoff` | Resilient / LVP Flooring Takeoff | Published flooring waste rules of thu...; spec-v95 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `footing-area` | Footing Area for Soil Bearing | Project (first-principles); ASCE 7 / IRC R401 conceptual basis; bundled allowable bea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4851,6 +4853,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1502. Fixture-covered or reference-cadence: 1502 / 1502.
+Tile count: 1503. Fixture-covered or reference-cadence: 1503 / 1503.
 
 <!-- END tile-index-v14 -->

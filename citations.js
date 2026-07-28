@@ -15108,6 +15108,21 @@ export const CITATIONS = {
       { name: "Roughness entered", value: "n is a user input (about 0.013 concrete, 0.030 grassed earth, 0.035 natural); no table shipped", source: "user input" },
     ],
   },
+  "fireplace-flue-area": {
+    formula: "opening area = width x height; required net flue area = opening / 12 (round), / 10 (square or rectangular under 2:1), / 8 (rectangular 2:1 or greater); net area = pi d^2 / 4 round, a x b rectangular; smallest compliant round diameter = sqrt(4 (opening/12) / pi), smallest compliant square side = sqrt(opening/10).",
+    edition: "IRC R1003.15.1 (Option 1), Flue area (masonry fireplace), with the identical text at IBC 2113.16.1. The ratios are conditioned on a chimney at least 15 ft high measured from the firebox floor to the top of the chimney flue.",
+    freeAccess: "The three ratios and the 15-ft height condition are short prescriptive sentences in a widely adopted model code and are quoted in state amendments and code-viewer sites. The code's Option 2 sizing FIGURE (R1003.15.2) and the clay flue liner area tables (R1003.14) are not reproduced here.",
+    governance: GOVERNANCE.general,
+    editionNote: "Shape drives the allowance because a round flue moves smoke with the least loss and gets the smallest required fraction, while a narrow rectangle wastes part of its cross section in the corners and boundary layer and is held to the largest. The two traps this tile exists to catch: a clay flue liner's NOMINAL size is its outside size, and its net inside area is meaningfully smaller, so sizing off the nominal number silently overstates the flue - this tile takes the ACTUAL inside dimensions; and every one of these ratios is conditional on a chimney at least 15 ft tall from the firebox FLOOR to the top of the flue, so a short chimney has to be sized by the code's height-versus-opening figure instead and will want a larger flue. Flue AREA only. A flue that passes this test can still smoke, because draft also depends on chimney height and termination, the throat and smoke-chamber geometry, and whether the room has a combustion-air path; the chimney-draft and chimney-height-for-draft tiles cover the pressure side. A screen; the adopted code, the liner manufacturer's net-area data, and the AHJ govern.",
+    assumptions: [
+      { name: "Round flue ratio", value: "net area at least 1/12 of the fireplace opening", source: "IRC R1003.15.1 / IBC 2113.16.1" },
+      { name: "Square and under-2:1 rectangular ratio", value: "net area at least 1/10 of the opening", source: "IRC R1003.15.1 / IBC 2113.16.1" },
+      { name: "2:1 or greater rectangular ratio", value: "net area at least 1/8 of the opening", source: "IRC R1003.15.1 / IBC 2113.16.1" },
+      { name: "Minimum chimney height", value: "15 ft, firebox floor to top of flue; below that, Option 2 governs", source: "IRC R1003.15.1 condition" },
+      { name: "Liner net area", value: "user-entered ACTUAL inside dimensions; nominal size is the outside size", source: "stated scope limit; liner tables not reproduced" },
+      { name: "Area check only", value: "not a draft, throat, smoke-chamber, or termination check", source: "stated scope limit" },
+    ],
+  },
   "masonry-lintel-bearing": {
     formula: "Effective span = min(clear span + depth, distance between support centers); reaction = udl x eff span / 2; required bearing length = reaction / (allowable bearing stress x bearing width); governing = max(required, 4 in).",
     edition: "TMS 402 (MSJC) lintel provisions by section number: 2.3.3.4.1 effective span (clear span plus depth, not more than the distance between support centers) and 2.3.3.4.3 end bearing not less than 4 in.",

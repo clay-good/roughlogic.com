@@ -1737,6 +1737,36 @@
       "kind": "adjacent"
     },
     {
+      "term": "fireplace flue size",
+      "target": "fireplace-flue-area",
+      "kind": "industry"
+    },
+    {
+      "term": "what size flue for a fireplace",
+      "target": "fireplace-flue-area",
+      "kind": "question"
+    },
+    {
+      "term": "flue area 1/10 rule",
+      "target": "fireplace-flue-area",
+      "kind": "question"
+    },
+    {
+      "term": "chimney liner size for fireplace opening",
+      "target": "fireplace-flue-area",
+      "kind": "question"
+    },
+    {
+      "term": "clay flue liner net area",
+      "target": "fireplace-flue-area",
+      "kind": "industry"
+    },
+    {
+      "term": "is my chimney flue too small",
+      "target": "fireplace-flue-area",
+      "kind": "question"
+    },
+    {
       "term": "belt deflection tension",
       "target": "belt-deflection-tension",
       "kind": "industry"

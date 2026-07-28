@@ -31251,3 +31251,53 @@ test("bounds: spec-v1118 computeBeltDeflectionTension pins the span-cancels iden
   assert.ok("error" in _v1118({ ...base, belt_count: 2.5 }));
   assert.ok("error" in _v1118({ ...base, center_distance_in: Infinity }));
 });
+
+import { computeFireplaceFlueArea as _v1119 } from "../../calc-masonry.js";
+
+test("bounds: spec-v1119 computeFireplaceFlueArea pins the three IRC R1003.15.1 ratios, the 2:1 aspect seam, the 15-ft height condition, and error seams", () => {
+  const base = { opening_width_in: 36, opening_height_in: 29, flue_shape: "rectangular", flue_inside_a_in: 11.5, flue_inside_b_in: 11.5, chimney_height_ft: 20 };
+  const r = _v1119(base);
+  assert.ok(r.opening_area_sqin === 1044 && r.divisor === 10);
+  assert.ok(Math.abs(r.required_area_sqin - 104.4) < 1e-9 && r.actual_area_sqin === 132.25 && r.adequate);
+  // The three ratios, each read straight off the opening area.
+  assert.ok(Math.abs(_v1119({ ...base, flue_shape: "round", flue_inside_dia_in: 10 }).required_area_sqin - 1044 / 12) < 1e-9);
+  assert.ok(Math.abs(_v1119({ ...base, flue_inside_a_in: 20, flue_inside_b_in: 8 }).required_area_sqin - 1044 / 8) < 1e-9);
+  assert.ok(Math.abs(r.required_area_sqin - 1044 / 10) < 1e-9);
+  // THE ASPECT SEAM: exactly 2:1 takes the STRICTER 1/8, one hair under takes 1/10.
+  assert.ok(_v1119({ ...base, flue_inside_a_in: 16, flue_inside_b_in: 8 }).divisor === 8);
+  assert.ok(_v1119({ ...base, flue_inside_a_in: 15.99, flue_inside_b_in: 8 }).divisor === 10);
+  // Orientation must not matter - a and b are interchangeable.
+  const ab = _v1119({ ...base, flue_inside_a_in: 8, flue_inside_b_in: 20 });
+  const ba = _v1119({ ...base, flue_inside_a_in: 20, flue_inside_b_in: 8 });
+  assert.ok(ab.divisor === ba.divisor && ab.actual_area_sqin === ba.actual_area_sqin && ab.aspect_ratio === ba.aspect_ratio);
+  // A 10 in round pipe FAILS an opening a 12 in nominal square liner passes, even at the easier 1/12.
+  const rd = _v1119({ ...base, flue_shape: "round", flue_inside_dia_in: 10 });
+  assert.ok(!rd.adequate && rd.surplus_sqin < 0);
+  assert.ok(Math.abs(rd.actual_area_sqin - Math.PI * 25) < 1e-9 && rd.aspect_ratio === null);
+  // The reported minimum sizes are exactly the sizes that make each shape just pass.
+  const justRound = _v1119({ ...base, flue_shape: "round", flue_inside_dia_in: r.min_round_dia_in });
+  assert.ok(Math.abs(justRound.surplus_sqin) < 1e-9);
+  const justSquare = _v1119({ ...base, flue_inside_a_in: r.min_square_side_in, flue_inside_b_in: r.min_square_side_in });
+  assert.ok(Math.abs(justSquare.surplus_sqin) < 1e-9);
+  // Minimum sizes depend only on the OPENING, never on the flue actually entered.
+  assert.ok(rd.min_round_dia_in === r.min_round_dia_in && rd.min_square_side_in === r.min_square_side_in);
+  // HEIGHT: 15 ft exactly is compliant; below it the ratios do not apply and the note says so.
+  assert.ok(_v1119({ ...base, chimney_height_ft: 15 }).height_ok);
+  const short = _v1119({ ...base, chimney_height_ft: 14.9 });
+  assert.ok(!short.height_ok && /15-ft minimum|at least 15 ft/.test(short.note));
+  assert.ok(short.required_area_sqin === r.required_area_sqin, "height gates applicability, it does not change the ratio");
+  // Required area scales linearly with the opening; a bigger opening never needs a smaller flue.
+  assert.ok(Math.abs(_v1119({ ...base, opening_width_in: 72 }).required_area_sqin - 2 * r.required_area_sqin) < 1e-9);
+  let prev = 0;
+  for (const w of [24, 30, 36, 48, 60]) {
+    const t = _v1119({ ...base, opening_width_in: w });
+    assert.ok(t.required_area_sqin > prev); prev = t.required_area_sqin;
+  }
+  // Error seams.
+  assert.ok("error" in _v1119({ ...base, opening_width_in: 0 }));
+  assert.ok("error" in _v1119({ ...base, opening_height_in: 0 }));
+  assert.ok("error" in _v1119({ ...base, chimney_height_ft: 0 }));
+  assert.ok("error" in _v1119({ ...base, flue_inside_a_in: 0 }));
+  assert.ok("error" in _v1119({ ...base, flue_shape: "round", flue_inside_dia_in: 0 }));
+  assert.ok("error" in _v1119({ ...base, opening_width_in: Infinity }));
+});

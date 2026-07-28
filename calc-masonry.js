@@ -642,3 +642,87 @@ MASONRY_RENDERERS["masonry-lintel-bearing"] = _simpleRenderer({
   ],
   compute: computeMasonryLintelBearing,
 });
+
+
+// ===================== spec-v1119: masonry fireplace flue area (IRC R1003.15.1) =====================
+
+// The code's Option 1 ratio test. The flue must be big enough for the opening it serves, and
+// the required fraction depends on the flue's SHAPE, not just its area: a round flue moves
+// smoke most efficiently and is allowed the smallest fraction (1/12), a square or nearly
+// square flue needs 1/10, and a skinny rectangle 2:1 or worse needs 1/8 because the corners
+// and the boundary layer waste part of its cross section. All three ratios are conditioned on
+// a chimney at least 15 ft tall, measured from the firebox floor to the top of the flue.
+// Clay liner NOMINAL sizes are not their net areas, so this tile takes the ACTUAL inside
+// dimensions - the liner tables are code-document tables and are not reproduced here.
+// dims: in { opening_width_in: L, opening_height_in: L, flue_shape: dimensionless, flue_inside_dia_in: L, flue_inside_a_in: L, flue_inside_b_in: L, chimney_height_ft: L } out: { opening_area_sqin: L^2, required_area_sqin: L^2, actual_area_sqin: L^2, min_round_dia_in: L, min_square_side_in: L, aspect_ratio: dimensionless, surplus_sqin: L^2 }
+export function computeFireplaceFlueArea({ opening_width_in = 0, opening_height_in = 0, flue_shape = "rectangular", flue_inside_dia_in = 0, flue_inside_a_in = 0, flue_inside_b_in = 0, chimney_height_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(opening_width_in) || 0;
+  const h = Number(opening_height_in) || 0;
+  const dia = Number(flue_inside_dia_in) || 0;
+  const a = Number(flue_inside_a_in) || 0;
+  const b = Number(flue_inside_b_in) || 0;
+  const H = Number(chimney_height_ft) || 0;
+  const round = flue_shape === "round";
+  if (!(w > 0) || !(h > 0)) return { error: "Fireplace opening width and height must be positive (in)." };
+  if (!(H > 0)) return { error: "Chimney height must be positive (ft), measured from the firebox floor to the top of the flue." };
+  if (round) {
+    if (!(dia > 0)) return { error: "Flue inside diameter must be positive (in)." };
+  } else if (!(a > 0) || !(b > 0)) {
+    return { error: "Both flue inside dimensions must be positive (in)." };
+  }
+
+  const opening_area_sqin = w * h;
+  const aspect_ratio = round ? null : Math.max(a, b) / Math.min(a, b);
+  // R1003.15.1: round 1/12; square and rectangles under 2:1 get 1/10; 2:1 or worse gets 1/8.
+  const divisor = round ? 12 : aspect_ratio >= 2 ? 8 : 10;
+  const required_area_sqin = opening_area_sqin / divisor;
+  const actual_area_sqin = round ? Math.PI * dia * dia / 4 : a * b;
+  const surplus_sqin = actual_area_sqin - required_area_sqin;
+  const adequate = surplus_sqin >= 0;
+  const ratio_actual = actual_area_sqin > 0 ? opening_area_sqin / actual_area_sqin : null;
+  // The smallest liner of each shape that would satisfy this opening, so an undersized flue
+  // comes with the size to order rather than just a failure.
+  const min_round_dia_in = Math.sqrt(4 * (opening_area_sqin / 12) / Math.PI);
+  const min_square_side_in = Math.sqrt(opening_area_sqin / 10);
+  const height_ok = H >= 15;
+
+  const shapeWord = round ? "round" : aspect_ratio >= 2 ? "rectangular at " + aspect_ratio.toFixed(2) + ":1 (2:1 or worse)" : aspect_ratio > 1.001 ? "rectangular at " + aspect_ratio.toFixed(2) + ":1 (under 2:1)" : "square";
+  const note = "Opening " + w + " x " + h + " = " + opening_area_sqin.toFixed(0) + " sq in. A " + shapeWord
+    + " flue must be at least 1/" + (divisor === 8 ? "8" : divisor === 12 ? "12" : "10") + " of that, or " + required_area_sqin.toFixed(1) + " sq in net. "
+    + "This flue's net area is " + actual_area_sqin.toFixed(1) + " sq in"
+    + (ratio_actual ? " (the opening is " + ratio_actual.toFixed(1) + " times the flue)" : "") + " - "
+    + (adequate ? "ADEQUATE, with " + surplus_sqin.toFixed(1) + " sq in to spare. " : "UNDERSIZED by " + Math.abs(surplus_sqin).toFixed(1) + " sq in. ")
+    + "For this opening the smallest compliant flue is about " + min_round_dia_in.toFixed(1) + " in inside diameter round, or " + min_square_side_in.toFixed(1) + " in square. "
+    + (height_ok
+      ? "Chimney height " + H + " ft clears the 15-ft minimum these ratios require. "
+      : "WARNING: the chimney is only " + H + " ft. The 1/12, 1/10, and 1/8 ratios are conditioned on a chimney at least 15 ft tall measured from the firebox FLOOR to the top of the flue; a shorter chimney has to be sized by the code's height-versus-opening figure (Option 2) instead, and it will want a larger flue. ")
+    + "Shape matters because a round flue moves smoke with the least loss and gets the smallest allowance, while a narrow rectangle wastes cross section in its corners and boundary layer. Enter the liner's ACTUAL inside dimensions: a clay liner's nominal size is its outside size and its net area is smaller, so sizing off the nominal number silently overstates the flue. This checks flue AREA only - it is not a draft calculation, and a flue that passes here can still smoke from a short chimney, a bad termination, a missing combustion-air path, or a throat and smoke chamber built wrong. A screen against IRC R1003.15.1 / IBC 2113.16.1 Option 1; the adopted code, the liner manufacturer, and the AHJ govern.";
+
+  return { opening_area_sqin, required_area_sqin, actual_area_sqin, surplus_sqin, adequate, ratio_actual, aspect_ratio, divisor, min_round_dia_in, min_square_side_in, height_ok, note };
+}
+
+export const fireplaceFlueAreaExample = { inputs: { opening_width_in: 36, opening_height_in: 29, flue_shape: "rectangular", flue_inside_dia_in: 0, flue_inside_a_in: 11.5, flue_inside_b_in: 11.5, chimney_height_ft: 20 } };
+
+MASONRY_RENDERERS["fireplace-flue-area"] = _simpleRenderer({
+  citation: "Citation: IRC R1003.15.1 (Option 1) and the identical IBC 2113.16.1 - round chimney flues need a net cross-sectional area of at least 1/12 of the fireplace opening, square flues at least 1/10, rectangular flues with an aspect ratio under 2:1 at least 1/10, and rectangular flues 2:1 or greater at least 1/8. All are conditioned on a chimney at least 15 ft high measured from the firebox floor to the top of the chimney flue; below that height the code's Option 2 figure (R1003.15.2) governs and is not reproduced here. Clay flue liner net areas come from the code's liner tables, which are also not reproduced - enter the liner's ACTUAL inside dimensions. Flue AREA only; this is not a draft, throat, smoke-chamber, or termination check. A screen; the adopted code and the AHJ govern.",
+  example: fireplaceFlueAreaExample.inputs,
+  fields: [
+    { key: "opening_width_in", label: "Fireplace opening width (in)", kind: "number", default: 36 },
+    { key: "opening_height_in", label: "Fireplace opening height (in)", kind: "number", default: 29 },
+    { key: "flue_shape", label: "Flue shape", kind: "select", options: [{ value: "rectangular", label: "Square or rectangular liner", selected: true }, { value: "round", label: "Round liner or pipe" }] },
+    { key: "flue_inside_a_in", label: "Liner INSIDE dimension A (in)", kind: "number", default: 11.5 },
+    { key: "flue_inside_b_in", label: "Liner INSIDE dimension B (in)", kind: "number", default: 11.5 },
+    { key: "flue_inside_dia_in", label: "Round liner INSIDE diameter (in)", kind: "number", default: 0 },
+    { key: "chimney_height_ft", label: "Chimney height, firebox floor to flue top (ft)", kind: "number", default: 20 },
+  ],
+  outputs: [
+    { key: "o", id: "ffa-out-o", label: "Fireplace opening area", value: (r) => fmt(r.opening_area_sqin, 0) + " sq in" },
+    { key: "q", id: "ffa-out-q", label: "Required net flue area", value: (r) => fmt(r.required_area_sqin, 1) + " sq in (1/" + (r.divisor === 8 ? "8" : r.divisor === 12 ? "12" : "10") + " of the opening)" },
+    { key: "a", id: "ffa-out-a", label: "This flue's net area", value: (r) => fmt(r.actual_area_sqin, 1) + " sq in" + (r.ratio_actual ? " - opening is " + fmt(r.ratio_actual, 1) + "x the flue" : "") },
+    { key: "v", id: "ffa-out-v", label: "Verdict", value: (r) => (r.adequate ? "ADEQUATE, " + fmt(r.surplus_sqin, 1) + " sq in to spare" : "UNDERSIZED by " + fmt(Math.abs(r.surplus_sqin), 1) + " sq in") + (r.height_ok ? "" : " - and the chimney is under 15 ft, so Option 1 does not apply") },
+    { key: "m", id: "ffa-out-m", label: "Smallest compliant flue for this opening", value: (r) => fmt(r.min_round_dia_in, 1) + " in dia round, or " + fmt(r.min_square_side_in, 1) + " in square" },
+    { key: "n", id: "ffa-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFireplaceFlueArea,
+});

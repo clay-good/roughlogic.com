@@ -31,6 +31,7 @@ const RELATED = {
   "masonry-wall-weight": ["cmu-wall-axial", "cmu-grout-volume", "masonry-count", "masonry-lintel-loading"],
   "brick-veneer-anchor-spacing": ["masonry-count", "masonry-wall-weight", "masonry-coursing", "wind-cc-pressure"],
   "masonry-lintel-bearing": ["masonry-lintel-loading", "masonry-prism-fm", "masonry-wall-weight"],
+  "fireplace-flue-area": ["chimney-draft", "chimney-height-for-draft", "masonry-wall-weight", "step-flashing-count"],
   "masonry-lintel-loading": ["masonry-lintel-bearing", "masonry-wall-weight", "cmu-wall-flexure", "header-sizing", "beam-reactions"],
   "lighting-light-loss-factor": ["lumen-method", "lux-to-footcandle", "lighting-uniformity-ratio", "lighting-density"],
   "lighting-uniformity-ratio": ["lumen-method", "point-illuminance", "lighting-light-loss-factor", "egress-lighting-check"],
