@@ -32897,3 +32897,50 @@ test("bounds: spec-v1147 computeEgressWindowWell pins the tangent 36x36 minimums
   assert.ok("error" in _v1147({ ...base, ladder_inside_width_in: -1 }));
   assert.ok("error" in _v1147({ ...base, well_width_in: Infinity }));
 });
+
+import { computeScaffoldGuardrailCheck as _v1148 } from "../../calc-construction.js";
+
+test("bounds: spec-v1148 computeScaffoldGuardrailCheck pins the moving midrail target, the paired capacities, the height window, and error seams", () => {
+  const base = { top_rail_height_in: 42, midrail_height_in: 21, toeboard_height_in: 4, toprail_capacity_lb: 200, midrail_capacity_lb: 150, scaffold_type: "other", midrail_tolerance_in: 3 };
+  const r = _v1148(base);
+  assert.ok(r.top_ok && r.midrail_target_in === 21 && r.midrail_offset_in === 0 && r.midrail_ok);
+  assert.ok(r.required_toprail_lb === 200 && r.required_midrail_lb === 150 && r.toprail_cap_ok && r.midrail_cap_ok);
+  assert.ok(r.toeboard_ok && r.passes);
+  // THE MOVING TARGET: the midrail requirement tracks the top rail, always half of it.
+  for (const top of [38, 40, 42, 45]) {
+    const t = _v1148({ ...base, top_rail_height_in: top });
+    assert.ok(Math.abs(t.midrail_target_in - top / 2) < 1e-12);
+    assert.ok(Math.abs(t.midrail_offset_in - (21 - top / 2)) < 1e-12);
+  }
+  // A midrail set for a 45 in rail is 3.5 in high under a 38 in one - same midrail, different verdict.
+  const forTall = _v1148({ ...base, top_rail_height_in: 45, midrail_height_in: 22.5 });
+  const forShort = _v1148({ ...base, top_rail_height_in: 38, midrail_height_in: 22.5 });
+  assert.ok(forTall.midrail_offset_in === 0 && forTall.midrail_ok);
+  assert.ok(Math.abs(forShort.midrail_offset_in - 3.5) < 1e-12 && !forShort.midrail_ok);
+  // The band is a user judgment, and widening it changes the verdict without touching the target.
+  assert.ok(_v1148({ ...base, top_rail_height_in: 38, midrail_height_in: 22.5, midrail_tolerance_in: 4 }).midrail_ok);
+  assert.ok(_v1148({ ...base, top_rail_height_in: 38, midrail_height_in: 22.5, midrail_tolerance_in: 4 }).midrail_target_in === 19);
+  // HEIGHT WINDOW: both ends inclusive, and too-low is distinguished from too-high.
+  assert.ok(_v1148({ ...base, top_rail_height_in: 38 }).top_ok && _v1148({ ...base, top_rail_height_in: 45 }).top_ok);
+  assert.ok(!_v1148({ ...base, top_rail_height_in: 37.9 }).top_ok && _v1148({ ...base, top_rail_height_in: 37.9 }).top_low);
+  assert.ok(!_v1148({ ...base, top_rail_height_in: 45.1 }).top_ok && !_v1148({ ...base, top_rail_height_in: 45.1 }).top_low);
+  // PAIRED CAPACITIES: suspension drops the top rail to 100 AND removes the midrail figure.
+  const susp = _v1148({ ...base, scaffold_type: "suspension", toprail_capacity_lb: 100, midrail_capacity_lb: 0 });
+  assert.ok(susp.required_toprail_lb === 100 && susp.required_midrail_lb === null);
+  assert.ok(susp.toprail_cap_ok && susp.midrail_cap_ok === null && susp.passes);
+  assert.ok(!_v1148({ ...base, toprail_capacity_lb: 199 }).toprail_cap_ok);
+  assert.ok(!_v1148({ ...base, midrail_capacity_lb: 149 }).midrail_cap_ok);
+  assert.ok(_v1148({ ...base, toprail_capacity_lb: 0, midrail_capacity_lb: 0 }).toprail_cap_ok === null, "omitted capacities are not failures");
+  assert.ok(_v1148({ ...base, toprail_capacity_lb: 0, midrail_capacity_lb: 0 }).passes);
+  // Toeboard: 3.5 exactly passes, omitted yields null.
+  assert.ok(_v1148({ ...base, toeboard_height_in: 3.5 }).toeboard_ok && !_v1148({ ...base, toeboard_height_in: 3.4 }).toeboard_ok);
+  const noToe = _v1148({ ...base, toeboard_height_in: 0 });
+  assert.ok(noToe.toeboard_ok === null && !noToe.toeboard_entered && noToe.passes);
+  // Error seams.
+  assert.ok("error" in _v1148({ ...base, top_rail_height_in: 0 }));
+  assert.ok("error" in _v1148({ ...base, midrail_height_in: -1 }));
+  assert.ok("error" in _v1148({ ...base, toeboard_height_in: -1 }));
+  assert.ok("error" in _v1148({ ...base, toprail_capacity_lb: -1 }));
+  assert.ok("error" in _v1148({ ...base, midrail_tolerance_in: 0 }));
+  assert.ok("error" in _v1148({ ...base, top_rail_height_in: Infinity }));
+});

@@ -11505,3 +11505,94 @@ CONSTRUCTION_RENDERERS["egress-window-well"] = _simpleRenderer({
   ],
   compute: computeEgressWindowWell,
 });
+
+
+// --- spec-v1148: scaffold guardrail system check (OSHA 1926.451(g)(4)) ---
+// The catalog counts scaffold frames and braces and checks leg and mudsill loads, and its
+// own takeoff tile says "guardrails, ties, screw jacks, and access are taken off
+// separately." This is the guardrail. Two things make it more than a tape-measure check.
+// The midrail is specified by RELATION, not by a number - "approximately midway between the
+// top edge of the guardrail system and the platform surface" - so the target moves with the
+// toprail and a fixed height that suits a 45 in rail is wrong under a 38 in one. And the
+// capacities are PAIRED rather than independent: 200 lbf on the toprail for scaffolds
+// generally, 100 lbf for single- and two-point adjustable suspension scaffolds, and 150 lbf
+// on the midrail where the toprail carries 200.
+// OSHA regulations are US federal law and in the public domain, so the values are quoted.
+// dims: in { top_rail_height_in: L, midrail_height_in: L, toeboard_height_in: L, toprail_capacity_lb: M L T^-2, midrail_capacity_lb: M L T^-2, scaffold_type: dimensionless, midrail_tolerance_in: L } out: { midrail_target_in: L, midrail_offset_in: L, required_toprail_lb: M L T^-2, required_midrail_lb: M L T^-2 }
+export function computeScaffoldGuardrailCheck({ top_rail_height_in = 0, midrail_height_in = 0, toeboard_height_in = 0, toprail_capacity_lb = 0, midrail_capacity_lb = 0, scaffold_type = "other", midrail_tolerance_in = 3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const top = Number(top_rail_height_in) || 0;
+  const mid = Number(midrail_height_in) || 0;
+  const toe = Number(toeboard_height_in) || 0;
+  const topCap = Number(toprail_capacity_lb) || 0;
+  const midCap = Number(midrail_capacity_lb) || 0;
+  const tol = Number(midrail_tolerance_in) || 0;
+  const suspension = scaffold_type === "suspension";
+  if (!(top > 0)) return { error: "Top rail height must be positive (in)." };
+  if (mid < 0 || toe < 0) return { error: "Midrail and toeboard heights cannot be negative (in)." };
+  if (topCap < 0 || midCap < 0) return { error: "Capacities cannot be negative (lb)." };
+  if (!(tol > 0)) return { error: "Midrail tolerance must be positive (in) - the standard says approximately midway, so a band is required to test it." };
+
+  const TOP_MIN = 38, TOP_MAX = 45, TOE_MIN = 3.5;
+  const top_ok = top >= TOP_MIN && top <= TOP_MAX;
+  const top_low = top < TOP_MIN;
+
+  // "Approximately midway" - the target moves with the toprail, so it is computed, not fixed.
+  const midrail_target_in = top / 2;
+  const midrail_entered = mid > 0;
+  const midrail_offset_in = midrail_entered ? mid - midrail_target_in : 0;
+  const midrail_ok = midrail_entered ? Math.abs(midrail_offset_in) <= tol : null;
+
+  const toeboard_entered = toe > 0;
+  const toeboard_ok = toeboard_entered ? toe >= TOE_MIN : null;
+
+  // The capacities are paired, not independent.
+  const required_toprail_lb = suspension ? 100 : 200;
+  const required_midrail_lb = required_toprail_lb === 200 ? 150 : null;
+  const toprail_cap_entered = topCap > 0;
+  const toprail_cap_ok = toprail_cap_entered ? topCap >= required_toprail_lb : null;
+  const midrail_cap_entered = midCap > 0;
+  const midrail_cap_ok = midrail_cap_entered && required_midrail_lb !== null ? midCap >= required_midrail_lb : null;
+
+  const passes = top_ok && (midrail_ok !== false) && (toeboard_ok !== false) && (toprail_cap_ok !== false) && (midrail_cap_ok !== false);
+
+  const note = "TOP RAIL (1926.451(g)(4)): for a scaffold manufactured or placed in service after January 1, 2000, the top edge sits between " + TOP_MIN + " in and " + TOP_MAX + " in above the platform surface. This one is " + top + " in, " + (top_ok ? "in range. " : top_low ? "BELOW the range - and the standard does not allow a top edge under 36 in at all, so a low rail is not a paperwork problem. " : "ABOVE the range; the height may exceed 45 in where conditions warrant, but only if the system still meets every other criterion, so treat this as needing a justification rather than as automatically fine. ")
+    + "MIDRAIL: specified by RELATION, not by a number - approximately midway between the top edge and the platform surface. At a " + top + " in top rail that target is " + midrail_target_in.toFixed(1) + " in, "
+    + (midrail_entered ? "and " + mid + " in is " + Math.abs(midrail_offset_in).toFixed(1) + " in " + (midrail_offset_in >= 0 ? "above" : "below") + " it, " + (midrail_ok ? "within the " + tol + " in band used here. " : "outside the " + tol + " in band used here. ") : "and no midrail height was entered. ")
+    + "That relation is the part a fixed shop standard gets wrong: a midrail set for a 45 in top rail sits " + (45 / 2 - 38 / 2).toFixed(1) + " in high under a 38 in one. The standard says approximately, not a dimension, so the band above is a judgment the tile makes visible rather than a code number. "
+    + "CAPACITIES ARE PAIRED, not independent: " + (suspension ? "a single- or two-point adjustable suspension scaffold takes at least 100 lbf on the top rail, " : "a scaffold other than a single- or two-point adjustable suspension type takes at least 200 lbf on the top rail, ")
+    + (required_midrail_lb !== null ? "and where the top rail carries 200 lbf the midrail must carry at least 150 lbf. " : "and the 150 lbf midrail figure is tied to a 200 lbf top rail, so it does not apply here. ")
+    + (toprail_cap_entered ? "Top rail " + topCap + " lbf against " + required_toprail_lb + " required: " + (toprail_cap_ok ? "OK. " : "SHORT. ") : "")
+    + (midrail_cap_entered && required_midrail_lb !== null ? "Midrail " + midCap + " lbf against " + required_midrail_lb + " required: " + (midrail_cap_ok ? "OK. " : "SHORT. ") : "")
+    + "TOEBOARD: at least " + TOE_MIN + " in high from the top edge of the toeboard to the level of the walking or working surface. " + (toeboard_entered ? "This one is " + toe + " in, " + (toeboard_ok ? "OK. " : "SHORT. ") : "None entered. ")
+    + "WHETHER a toeboard is required at all is falling-object protection under 1926.451(h) and turns on whether anyone works or passes below - that is a different determination and this tile does not make it. "
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: whether guardrails are required in the first place, which depends on platform height and scaffold type; cross-bracing used as a top rail or midrail, which has its own height windows; gaps at ladder access, hoist areas, and end frames; the deflection limit that says a rail must not deflect below 38 in under the test load; posts, connections, and the surfaces that make a rail free of puncture and laceration hazards; personal fall arrest where it substitutes; erection and dismantling, when guardrails are often absent by necessity; or the competent-person judgments the standard reserves. A screen, not a scaffold plan; 29 CFR 1926 Subpart L and the competent person govern.";
+
+  return { top_ok, top_low, midrail_target_in, midrail_entered, midrail_offset_in, midrail_ok, toeboard_entered, toeboard_ok, suspension, required_toprail_lb, required_midrail_lb, toprail_cap_entered, toprail_cap_ok, midrail_cap_entered, midrail_cap_ok, passes, note };
+}
+
+export const scaffoldGuardrailCheckExample = { inputs: { top_rail_height_in: 42, midrail_height_in: 21, toeboard_height_in: 4, toprail_capacity_lb: 200, midrail_capacity_lb: 150, scaffold_type: "other", midrail_tolerance_in: 3 } };
+
+CONSTRUCTION_RENDERERS["scaffold-guardrail-check"] = _simpleRenderer({
+  citation: "Citation: OSHA 29 CFR 1926.451(g)(4), a US federal regulation in the public domain. The top edge height of toprails on scaffolds manufactured or placed in service after January 1, 2000 shall be between 38 in and 45 in above the platform surface; midrails shall be installed at a height approximately midway between the top edge of the guardrail system and the platform surface; toprails shall be capable of withstanding at least 200 lbf for guardrail systems installed on all other scaffolds and at least 100 lbf for single-point and two-point adjustable suspension scaffolds; midrails shall withstand at least 150 lbf where the toprail capacity is 200 lbf; and a toeboard shall be at least three and one-half inches high from its top edge to the level of the walking/working surface. Whether a toeboard is required at all is falling-object protection under 1926.451(h) and is not determined here. Also not checked: whether guardrails are required, cross-bracing used as a rail, gaps at access and hoist areas, the deflection limit, posts and connections, personal fall arrest as a substitute, or erection and dismantling. A screen, not a scaffold plan; Subpart L and the competent person govern.",
+  example: scaffoldGuardrailCheckExample.inputs,
+  fields: [
+    { key: "top_rail_height_in", label: "Top rail height above the platform (in)", kind: "number", default: 42 },
+    { key: "midrail_height_in", label: "Midrail height above the platform (in; 0 to skip)", kind: "number", default: 21 },
+    { key: "toeboard_height_in", label: "Toeboard height (in; 0 = none)", kind: "number", default: 4 },
+    { key: "scaffold_type", label: "Scaffold type", kind: "select", options: [{ value: "other", label: "All other scaffolds (200 lbf top rail)", selected: true }, { value: "suspension", label: "Single- or two-point adjustable suspension (100 lbf)" }] },
+    { key: "toprail_capacity_lb", label: "Top rail capacity (lbf; 0 to skip)", kind: "number", default: 0 },
+    { key: "midrail_capacity_lb", label: "Midrail capacity (lbf; 0 to skip)", kind: "number", default: 0 },
+    { key: "midrail_tolerance_in", label: "Band used for 'approximately midway' (in)", kind: "number", default: 3 },
+  ],
+  outputs: [
+    { key: "t", id: "sgc-out-t", label: "Top rail 38-45 in", value: (r) => r.top_ok ? "in range" : r.top_low ? "TOO LOW - under 36 in is never allowed" : "above 45 in - permitted only where conditions warrant and all other criteria are met" },
+    { key: "m", id: "sgc-out-m", label: "Midrail (approximately midway)", value: (r) => "target " + fmt(r.midrail_target_in, 1) + " in" + (r.midrail_ok === null ? " - none entered" : r.midrail_ok ? ", entered value within band" : ", entered value " + fmt(Math.abs(r.midrail_offset_in), 1) + " in outside the band") },
+    { key: "c", id: "sgc-out-c", label: "Required capacities (paired)", value: (r) => r.required_toprail_lb + " lbf top rail" + (r.required_midrail_lb === null ? "; the 150 lbf midrail figure does not apply to this type" : ", " + r.required_midrail_lb + " lbf midrail") },
+    { key: "b", id: "sgc-out-b", label: "Toeboard", value: (r) => r.toeboard_ok === null ? "none entered - whether one is required is 1926.451(h)" : r.toeboard_ok ? "3.5 in minimum met" : "SHORT of the 3.5 in minimum" },
+    { key: "v", id: "sgc-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "sgc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeScaffoldGuardrailCheck,
+});

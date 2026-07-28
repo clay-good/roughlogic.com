@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "scaffold guardrail height",
+      "target": "scaffold-guardrail-check",
+      "kind": "industry"
+    },
+    {
+      "term": "how high is a scaffold top rail",
+      "target": "scaffold-guardrail-check",
+      "kind": "question"
+    },
+    {
+      "term": "scaffold midrail height",
+      "target": "scaffold-guardrail-check",
+      "kind": "question"
+    },
+    {
+      "term": "scaffold toeboard 3.5 inches",
+      "target": "scaffold-guardrail-check",
+      "kind": "question"
+    },
+    {
+      "term": "guardrail 200 pound capacity osha",
+      "target": "scaffold-guardrail-check",
+      "kind": "industry"
+    },
+    {
       "term": "egress window well size",
       "target": "egress-window-well",
       "kind": "industry"
