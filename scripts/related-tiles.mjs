@@ -1368,6 +1368,7 @@ const RELATED = {
   "landing-check": ["door-maneuvering-clearance","stair-stringer-layout","guard-handrail-check","egress-window-check","ada-ramp-slope"],
   "door-maneuvering-clearance": ["landing-check","ada-ramp-slope","grab-bar-layout","rough-opening-size"],
   "dryer-duct-length": ["hood-exhaust","duct-metal-weight","combustion-air"],
+  "smoke-alarm-placement": ["egress-window-check","landing-check","guard-handrail-check"],
   "stair-code-check": ["stairs","guard-handrail-check","egress-capacity"],
   // spec-v114 smooth-bore nozzle flow (Group F)
   "smooth-bore-flow": ["fire-stream-reaction","master-stream","ladder-pipe-reach"],

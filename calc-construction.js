@@ -11263,3 +11263,81 @@ CONSTRUCTION_RENDERERS["dryer-duct-length"] = _simpleRenderer({
   ],
   compute: computeDryerDuctLength,
 });
+
+
+// --- spec-v1141: smoke alarm count and placement (IRC R314) ---
+// Two halves that get confused. R314.3 says HOW MANY and WHERE, and it is additive: one in
+// each sleeping room, one outside each separate sleeping area in the immediate vicinity of
+// the bedrooms, and one on each additional story including basements and habitable attics.
+// R314.3.1 says how far from things that cause nuisance alarms, and the distance depends
+// entirely on the SENSING TYPE: not less than 20 ft horizontally from a permanently
+// installed cooking appliance for an ionization alarm, 10 ft for an ionization alarm with a
+// silencing switch, and 6 ft for a photoelectric alarm or one marked as helping to reduce
+// cooking nuisance alarms. That is a better than three-to-one spread, and in an open plan
+// it is often the only thing that lets a required alarm sit where the code puts it.
+// Separately, 3 ft horizontally from the door or opening of a bathroom with a tub or shower.
+// dims: in { sleeping_rooms: dimensionless, sleeping_areas: dimensionless, additional_stories: dimensionless, alarm_type: dimensionless, distance_to_cooking_ft: L, distance_to_bath_door_ft: L } out: { required_alarms: dimensionless, required_cooking_ft: L, cooking_deficit_ft: L, bath_deficit_ft: L }
+export function computeSmokeAlarmPlacement({ sleeping_rooms = 0, sleeping_areas = 1, additional_stories = 0, alarm_type = "ionization", distance_to_cooking_ft = 0, distance_to_bath_door_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const rooms = Number(sleeping_rooms) || 0;
+  const areas = Number(sleeping_areas) || 0;
+  const stories = Number(additional_stories) || 0;
+  const dCook = Number(distance_to_cooking_ft) || 0;
+  const dBath = Number(distance_to_bath_door_ft) || 0;
+  if (!Number.isInteger(rooms) || rooms < 0) return { error: "Sleeping room count must be a whole number of 0 or more." };
+  if (!Number.isInteger(areas) || areas < 0) return { error: "Separate sleeping area count must be a whole number of 0 or more." };
+  if (!Number.isInteger(stories) || stories < 0) return { error: "Additional story count must be a whole number of 0 or more." };
+  if (dCook < 0 || dBath < 0) return { error: "Distances cannot be negative (ft)." };
+
+  const COOKING = { ionization: 20, "ionization-silencing": 10, photoelectric: 6, "nuisance-listed": 6 };
+  const required_cooking_ft = COOKING[alarm_type];
+  if (required_cooking_ft === undefined) return { error: "Alarm type must be ionization, ionization-silencing, photoelectric, or nuisance-listed." };
+
+  const required_alarms = rooms + areas + stories;
+  const cooking_ok = dCook >= required_cooking_ft;
+  const cooking_deficit_ft = Math.max(0, required_cooking_ft - dCook);
+  const BATH_MIN = 3;
+  const bath_entered = dBath > 0;
+  const bath_ok = bath_entered ? dBath >= BATH_MIN : null;
+  const bath_deficit_ft = bath_entered ? Math.max(0, BATH_MIN - dBath) : 0;
+  const passes = cooking_ok && (bath_ok !== false);
+  // What a change of sensing type would buy, since it is usually the cheapest fix.
+  const best_required_ft = 6;
+  const would_pass_photoelectric = dCook >= best_required_ft;
+  const type_would_fix = !cooking_ok && would_pass_photoelectric;
+
+  const note = "COUNT (R314.3) is additive and people undercount it: one in each sleeping room, one OUTSIDE each separate sleeping area in the immediate vicinity of the bedrooms, and one on each additional story including basements and habitable attics. Here that is " + rooms + " + " + areas + " + " + stories + " = " + required_alarms + " alarm" + (required_alarms === 1 ? "" : "s") + " as a minimum, before any interconnection or power requirements. The story count excludes crawl spaces and uninhabitable attics. "
+    + "COOKING CLEARANCE (R314.3.1) depends entirely on the SENSING TYPE, and the spread is better than three to one: an ionization alarm wants 20 ft horizontally from a permanently installed cooking appliance, an ionization alarm with a silencing switch 10 ft, and a photoelectric alarm - or one marked as helping to reduce cooking nuisance alarms - only 6 ft. "
+    + "This alarm needs " + required_cooking_ft + " ft and has " + dCook + " ft: " + (cooking_ok ? "OK. " : "SHORT by " + cooking_deficit_ft.toFixed(1) + " ft. ")
+    + (type_would_fix ? "But it would clear at 6 ft, so CHANGING THE SENSING TYPE fixes this without moving anything - in an open plan that is often the only way a required alarm can sit where the code puts it, and it is far cheaper than relocating a required location. " : "")
+    + (!cooking_ok && !would_pass_photoelectric ? "Even a photoelectric alarm needs 6 ft, so this location fails on every type and the alarm has to move. " : "")
+    + (bath_entered ? "BATHROOM: not less than 3 ft horizontally from the door or opening of a bathroom containing a bathtub or shower - " + dBath + " ft here, " + (bath_ok ? "OK. " : "SHORT by " + bath_deficit_ft.toFixed(1) + " ft. ") : "No bathroom distance entered; the 3 ft rule applies to the door or opening of any bathroom with a tub or shower. ")
+    + "Both the bathroom rule and the cooking distances carry the same escape: they do not apply where observing them would PREVENT placing an alarm in a location R314.3 requires. A required location wins over a nuisance separation - but that is a last resort to be documented, not a default, and changing the sensing type usually removes the conflict first. "
+    + (passes ? "The separations entered PASS. " : "The separations entered DO NOT pass. ")
+    + "Not checked: carbon monoxide alarms, which are a separate section with their own locations; interconnection so that all alarms sound together; primary power from the building wiring with battery backup and the conditions under which battery-only alarms are permitted in existing construction; alarms in existing dwellings undergoing alterations, repairs, or additions; ceiling and wall mounting geometry and the sloped, peaked, and tray ceiling rules; listing and the 10-year sealed-battery requirements some states add; or heat detection where it substitutes. A screen; the adopted code, the alarm's listing, and the AHJ govern.";
+
+  return { required_alarms, required_cooking_ft, cooking_ok, cooking_deficit_ft, bath_entered, bath_ok, bath_deficit_ft, passes, would_pass_photoelectric, type_would_fix, note };
+}
+
+export const smokeAlarmPlacementExample = { inputs: { sleeping_rooms: 3, sleeping_areas: 1, additional_stories: 1, alarm_type: "ionization", distance_to_cooking_ft: 8, distance_to_bath_door_ft: 4 } };
+
+CONSTRUCTION_RENDERERS["smoke-alarm-placement"] = _simpleRenderer({
+  citation: "Citation: IRC R314.3 Location - smoke alarms in each sleeping room, outside each separate sleeping area in the immediate vicinity of the bedrooms, and on each additional story of the dwelling including basements and habitable attics but not crawl spaces or uninhabitable attics; and not less than 3 ft horizontally from the door or opening of a bathroom that contains a bathtub or shower. IRC R314.3.1 - not less than 20 ft horizontally from a permanently installed cooking appliance for an ionization smoke alarm, 10 ft for an ionization alarm with an alarm-silencing switch, and 6 ft for a photoelectric alarm or an alarm marked as helping to reduce cooking nuisance alarms. Both separations carry the exception that they do not apply where observing them would prevent placement in a location R314.3 requires. Not checked: carbon monoxide alarms, interconnection, power source and battery backup, existing-dwelling alteration triggers, ceiling and wall mounting geometry, sloped and tray ceilings, state sealed-battery rules, or heat detection. A screen; the adopted code, the alarm's listing, and the AHJ govern.",
+  example: smokeAlarmPlacementExample.inputs,
+  fields: [
+    { key: "sleeping_rooms", label: "Sleeping rooms", kind: "number", default: 3 },
+    { key: "sleeping_areas", label: "Separate sleeping areas (one alarm outside each)", kind: "number", default: 1 },
+    { key: "additional_stories", label: "Additional stories, incl. basements and habitable attics", kind: "number", default: 1 },
+    { key: "alarm_type", label: "Sensing type", kind: "select", options: [{ value: "ionization", label: "Ionization (20 ft from cooking)", selected: true }, { value: "ionization-silencing", label: "Ionization with silencing switch (10 ft)" }, { value: "photoelectric", label: "Photoelectric (6 ft)" }, { value: "nuisance-listed", label: "Marked to reduce cooking nuisance alarms (6 ft)" }] },
+    { key: "distance_to_cooking_ft", label: "Horizontal distance to the cooking appliance (ft)", kind: "number", default: 8 },
+    { key: "distance_to_bath_door_ft", label: "Horizontal distance to a tub/shower bathroom door (ft; 0 to skip)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "c", id: "sap-out-c", label: "Minimum alarm count", value: (r) => r.required_alarms + " (sleeping rooms + outside each sleeping area + each additional story)" },
+    { key: "k", id: "sap-out-k", label: "Cooking clearance", value: (r) => "needs " + r.required_cooking_ft + " ft - " + (r.cooking_ok ? "OK" : "SHORT by " + fmt(r.cooking_deficit_ft, 1) + " ft") },
+    { key: "t", id: "sap-out-t", label: "Would a different sensing type fix it?", value: (r) => r.cooking_ok ? "not needed" : r.type_would_fix ? "YES - a photoelectric or nuisance-listed alarm needs only 6 ft" : "no - even 6 ft is not met, the alarm has to move" },
+    { key: "b", id: "sap-out-b", label: "Bathroom separation", value: (r) => r.bath_ok === null ? "- (enter a distance)" : r.bath_ok ? "3 ft OK" : "SHORT by " + fmt(r.bath_deficit_ft, 1) + " ft" },
+    { key: "n", id: "sap-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSmokeAlarmPlacement,
+});

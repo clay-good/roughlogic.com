@@ -32549,3 +32549,56 @@ test("bounds: spec-v1140 computeCleanoutLayout pins the three additive triggers,
   assert.ok("error" in _v1140({ ...base, clear_space_in: -1 }));
   assert.ok("error" in _v1140({ ...base, horizontal_run_ft: Infinity }));
 });
+
+import { computeSmokeAlarmPlacement as _v1141 } from "../../calc-construction.js";
+
+test("bounds: spec-v1141 computeSmokeAlarmPlacement pins the additive count, the four cooking clearances, the type-change fix, and error seams", () => {
+  const base = { sleeping_rooms: 3, sleeping_areas: 1, additional_stories: 1, alarm_type: "ionization", distance_to_cooking_ft: 8, distance_to_bath_door_ft: 4 };
+  const r = _v1141(base);
+  assert.ok(r.required_alarms === 5 && r.required_cooking_ft === 20 && !r.cooking_ok && r.cooking_deficit_ft === 12);
+  assert.ok(r.bath_ok && r.bath_deficit_ft === 0 && !r.passes && r.type_would_fix);
+  // THE TYPE CHANGE: same location, four types, four different verdicts from one spread.
+  const types = { ionization: 20, "ionization-silencing": 10, photoelectric: 6, "nuisance-listed": 6 };
+  for (const [t, d] of Object.entries(types)) {
+    const x = _v1141({ ...base, alarm_type: t });
+    assert.ok(x.required_cooking_ft === d, "wrong clearance for " + t);
+    assert.ok(x.cooking_ok === (8 >= d));
+    assert.ok(x.required_alarms === 5, "the count never depends on sensing type");
+  }
+  assert.ok(_v1141({ ...base, alarm_type: "photoelectric" }).passes);
+  // Below 6 ft nothing works, and the tile says so instead of suggesting a type change.
+  const tooClose = _v1141({ ...base, distance_to_cooking_ft: 4 });
+  assert.ok(!tooClose.would_pass_photoelectric && !tooClose.type_would_fix && !tooClose.cooking_ok);
+  assert.ok(/has to move/.test(tooClose.note));
+  // COUNT is additive across all three terms, independently.
+  for (const rooms of [0, 1, 4]) {
+    for (const areas of [0, 1, 2]) {
+      for (const st of [0, 1, 3]) {
+        const t = _v1141({ ...base, sleeping_rooms: rooms, sleeping_areas: areas, additional_stories: st });
+        assert.ok(t.required_alarms === rooms + areas + st);
+      }
+    }
+  }
+  // Cooking seams are exact at each threshold.
+  for (const [t, d] of Object.entries(types)) {
+    assert.ok(_v1141({ ...base, alarm_type: t, distance_to_cooking_ft: d }).cooking_ok);
+    assert.ok(!_v1141({ ...base, alarm_type: t, distance_to_cooking_ft: d - 0.1 }).cooking_ok);
+    assert.ok(Math.abs(_v1141({ ...base, alarm_type: t, distance_to_cooking_ft: 0 }).cooking_deficit_ft - d) < 1e-9);
+  }
+  // Bathroom: 3 ft exactly passes, omitted yields null not a failure.
+  assert.ok(_v1141({ ...base, distance_to_bath_door_ft: 3 }).bath_ok);
+  assert.ok(!_v1141({ ...base, distance_to_bath_door_ft: 2.9 }).bath_ok);
+  const noBath = _v1141({ ...base, distance_to_bath_door_ft: 0, alarm_type: "photoelectric" });
+  assert.ok(noBath.bath_ok === null && !noBath.bath_entered && noBath.passes);
+  // The bathroom rule alone can fail an otherwise-clear alarm.
+  assert.ok(!_v1141({ ...base, alarm_type: "photoelectric", distance_to_bath_door_ft: 1 }).passes);
+  // Error seams.
+  assert.ok("error" in _v1141({ ...base, sleeping_rooms: -1 }));
+  assert.ok("error" in _v1141({ ...base, sleeping_rooms: 2.5 }));
+  assert.ok("error" in _v1141({ ...base, sleeping_areas: -1 }));
+  assert.ok("error" in _v1141({ ...base, additional_stories: 1.5 }));
+  assert.ok("error" in _v1141({ ...base, distance_to_cooking_ft: -1 }));
+  assert.ok("error" in _v1141({ ...base, distance_to_bath_door_ft: -1 }));
+  assert.ok("error" in _v1141({ ...base, alarm_type: "nope" }));
+  assert.ok("error" in _v1141({ ...base, distance_to_cooking_ft: Infinity }));
+});

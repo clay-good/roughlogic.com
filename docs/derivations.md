@@ -1725,6 +1725,7 @@ cross-check.
 | calc-construction.js | `computeSidingTakeoff` | `{ wall_area_sf = 2000, opening_area_sf = 0, waste_pct = 12, exposure_in = 4 }...` | _ | _ | _ |
 | calc-construction.js | `computeSillPlateAnchorCount` | `{ wall_length_ft = 40, max_spacing_ft = 6, end_distance_in = 9 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSlidingSnowLoad` | `{ pf_upper_psf = 0, eave_ridge_ft = 0, lower_width_ft = 15 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeSmokeAlarmPlacement` | `{ sleeping_rooms = 0, sleeping_areas = 1, additional_stories = 0, alarm_type ...` | _ | _ | _ |
 | calc-construction.js | `computeSnowDriftLoad` | `{ lu_ft = 0, pg_psf = 0, hc_ft = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSnowGuardLayout` | `{ roof_snow_psf = 0, pitch_rise_per_12 = 0, rafter_length_ft = 0, eave_length...` | _ | _ | _ |
 | calc-construction.js | `computeSnowLoad` | `{ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0, Cs = 1.0, drift_upwind_length_ft = 0 }` | _ | _ | _ |
@@ -3185,7 +3186,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1771.
+Row count: 1772.
 
 <!-- END function-corpus-v14 -->
 
@@ -3808,7 +3809,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (406 tiles)
+### Group E Construction (407 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4120,6 +4121,7 @@ per spec-v14 §13.1 second paragraph.
 | `slope-stability-seepage` | Infinite Slope Stability with Seepage | Infinite-slope seepage stability (Das...; spec-v627 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slope-stake-cut-fill` | Slope-Stake Cut and Fill | FM 5-233 / FHWA construction-survey g...; existing 104.5, design 100.0 -> 4.5 ft cut; 2:1 slope, of... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sloped-backfill-earth-pressure` | Sloped-Backfill Earth Pressure (Rankine Inclined Surface) | Rankine sloped-backfill as compiled i...; spec-v626 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `smoke-alarm-placement` | Smoke Alarm Count and Placement (IRC R314) | International Code Council; R314.3 requires an alarm in each sleeping room, outside e... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `snow-drift-load` | Snow Drift Surcharge at a Roof Step or Parapet (ASCE 7 Ch. 7) | ASCE 7-22 Chapter 7; spec-v297 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `snow-guard-layout` | Snow Guard / Retention Row Layout | manufacturer snow-retention design me...; 40 psf, 4:12 (18.435 deg), 30-ft rafter, 40-ft eave, 500-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `snow-load` | Flat-Roof Snow Load | ASCE; Pg=30 psf ground snow / Ce=Ct=Is=1.0 -> Pf=21 psf flat-ro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4895,6 +4897,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1524. Fixture-covered or reference-cadence: 1524 / 1524.
+Tile count: 1525. Fixture-covered or reference-cadence: 1525 / 1525.
 
 <!-- END tile-index-v14 -->
