@@ -1707,6 +1707,7 @@ cross-check.
 | calc-construction.js | `computeScaffoldGuardrailCheck` | `{ top_rail_height_in = 0, midrail_height_in = 0, toeboard_height_in = 0, topr...` | _ | _ | _ |
 | calc-construction.js | `computeScaffoldLegLoad` | `{ platform_dead_lb = 100, num_workers = 2, worker_lb = 250, material_lb = 500...` | _ | _ | _ |
 | calc-construction.js | `computeScaffoldMudsillBearing` | `{ leg_load_lb = 0, plank_width_in = 0, plank_length_in = 0, allowable_psf = 0...` | _ | _ | _ |
+| calc-construction.js | `computeScaffoldPlatformCheck` | `{ plank_length_ft = 0, platform_width_in = 0, gap_between_units_in = 0, gap_t...` | _ | _ | _ |
 | calc-construction.js | `computeScaffoldTakeoff` | `{ run_length_ft = 40, bay_length_ft = 7, lifts = 1, planks_per_bay = 4 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSealantJointYield` | `{ joint_lf = 500, cartridge_in3 = 20.5, joint_width_in = 0.375, joint_depth_i...` | _ | _ | _ |
 | calc-construction.js | `computeSectionProperties` | `{ shape = "rectangle", b_in = 0, h_in = 0, d_in = 0, di_in = 0 } = {}` | _ | _ | _ |
@@ -3195,7 +3196,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1781.
+Row count: 1782.
 
 <!-- END function-corpus-v14 -->
 
@@ -3821,7 +3822,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (411 tiles)
+### Group E Construction (412 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4100,6 +4101,7 @@ per spec-v14 §13.1 second paragraph.
 | `scaffold-guardrail-check` | Scaffold Guardrail System Check (OSHA 1926.451(g)(4)) | Occupational Safety and Health Admini...; 'The top edge height of toprails... shall be between 38 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `scaffold-leg-load` | Scaffold Per-Leg Load and OSHA 4:1 Check | OSHA 1926.451(a)(1) capacity rule (fi...; total = 100+500+500 = 1,100; leg = 1100/4 = 275; SWL = 25... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `scaffold-mudsill-bearing` | Scaffold Mudsill Bearing Pressure and Sill Length | Bearing-pressure identity / OSHA 1926...; area = 9.25*24/144 = 1.542 ft^2; bearing = 4000/1.542 = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `scaffold-platform-check` | Scaffold Platform and Planking Check (OSHA 1926.451(b)) | Occupational Safety and Health Admini...; 'Each platform... 10 feet or less in length shall not ext... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `scaffold-takeoff` | Frame Scaffold Material Takeoff | Frame-scaffold takeoff geometry (firs...; bays = ceil(40/7) = 6; frames = 7*3 = 21; braces = 2*6*3 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sealant-joint-yield` | Caulk / Sealant Cartridge Yield from Joint Size | Sealant cartridge-yield identity (fir...; cross = 0.375*0.25 = 0.09375 in^2; lf/cart = 20.5/0.09375... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `section-properties` | Cross-Section Properties (A, I, S, r) | mechanics of materials; spec-v342 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4915,6 +4917,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1534. Fixture-covered or reference-cadence: 1534 / 1534.
+Tile count: 1535. Fixture-covered or reference-cadence: 1535 / 1535.
 
 <!-- END tile-index-v14 -->

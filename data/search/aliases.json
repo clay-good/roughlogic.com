@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "scaffold plank overhang",
+      "target": "scaffold-platform-check",
+      "kind": "industry"
+    },
+    {
+      "term": "how far can a scaffold plank stick out",
+      "target": "scaffold-platform-check",
+      "kind": "question"
+    },
+    {
+      "term": "scaffold platform gap 1 inch",
+      "target": "scaffold-platform-check",
+      "kind": "question"
+    },
+    {
+      "term": "minimum scaffold platform width",
+      "target": "scaffold-platform-check",
+      "kind": "question"
+    },
+    {
+      "term": "14 inches from the face of the work",
+      "target": "scaffold-platform-check",
+      "kind": "industry"
+    },
+    {
       "term": "fall arrest anchorage 5000 lb",
       "target": "fall-arrest-anchorage",
       "kind": "question"

@@ -1377,6 +1377,7 @@ const RELATED = {
   "egress-window-well": ["egress-window-check","landing-check","smoke-alarm-placement"],
   "scaffold-guardrail-check": ["scaffold-takeoff","scaffold-leg-load","scaffold-mudsill-bearing","guard-post-load"],
   "excavation-protection-trigger": ["trench-slope","excavation-bench-plan","spoil-setback","excavation"],
+  "scaffold-platform-check": ["scaffold-guardrail-check","scaffold-takeoff","scaffold-leg-load","scaffold-mudsill-bearing"],
   "stair-code-check": ["stairs","guard-handrail-check","egress-capacity"],
   // spec-v114 smooth-bore nozzle flow (Group F)
   "smooth-bore-flow": ["fire-stream-reaction","master-stream","ladder-pipe-reach"],

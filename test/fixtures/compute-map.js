@@ -1370,6 +1370,7 @@ export const COMPUTE_MAP = {
   "egress-window-well": { module: "../../calc-construction.js", fn: "computeEgressWindowWell" },
   "scaffold-guardrail-check": { module: "../../calc-construction.js", fn: "computeScaffoldGuardrailCheck" },
   "excavation-protection-trigger": { module: "../../calc-construction.js", fn: "computeExcavationProtectionTrigger" },
+  "scaffold-platform-check": { module: "../../calc-construction.js", fn: "computeScaffoldPlatformCheck" },
   "stair-code-check": { module: "../../calc-construction.js", fn: "computeStairCodeCheck" },
   "smooth-bore-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreFlow" },
   "smooth-bore-diameter-for-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreDiameterForFlow" },

@@ -33045,3 +33045,47 @@ test("bounds: spec-v1150 computeFallArrestAnchorage pins per-employee scaling, t
   assert.ok("error" in _v1150({ ...base, arresting_force_lb: -1 }));
   assert.ok("error" in _v1150({ ...base, free_fall_ft: Infinity }));
 });
+
+import { computeScaffoldPlatformCheck as _v1151 } from "../../calc-construction.js";
+
+test("bounds: spec-v1151 computeScaffoldPlatformCheck pins the length-driven overhang limit, both gap kinds, both escapes, and error seams", () => {
+  const base = { plank_length_ft: 8, platform_width_in: 19, gap_between_units_in: 0.75, gap_to_uprights_in: 1.5, overhang_in: 15, front_edge_gap_in: 12, cantilever_designed: "no", front_edge_protected: "no" };
+  const r = _v1151(base);
+  assert.ok(r.worst_gap_in === 1.5 && !r.gap_ok && r.gap_source === "between the platform and the uprights");
+  assert.ok(r.max_overhang_in === 12 && !r.overhang_within && r.overhang_excess_in === 3 && !r.overhang_ok);
+  assert.ok(r.width_ok && r.front_ok && !r.passes);
+  // THE LIMIT FOLLOWS THE BOARD: the same overhang passes or fails on plank length alone.
+  const long = _v1151({ ...base, plank_length_ft: 16, gap_to_uprights_in: 0.5 });
+  assert.ok(long.max_overhang_in === 18 && long.overhang_within && long.passes);
+  for (const L of [4, 10, 10.1, 16, 30]) {
+    const t = _v1151({ ...base, plank_length_ft: L });
+    assert.ok(t.max_overhang_in === (L > 10 ? 18 : 12) && t.long_plank === (L > 10));
+  }
+  assert.ok(_v1151({ ...base, plank_length_ft: 10 }).max_overhang_in === 12, "10 ft exactly is 'or less'");
+  // Both overhang seams are exact, on each side of the length break.
+  assert.ok(_v1151({ ...base, overhang_in: 12 }).overhang_within && !_v1151({ ...base, overhang_in: 12.1 }).overhang_within);
+  assert.ok(_v1151({ ...base, plank_length_ft: 16, overhang_in: 18 }).overhang_within);
+  assert.ok(!_v1151({ ...base, plank_length_ft: 16, overhang_in: 18.1 }).overhang_within);
+  // GAPS: the worst of the two governs, and either one alone can fail it.
+  assert.ok(_v1151({ ...base, gap_between_units_in: 2, gap_to_uprights_in: 0 }).worst_gap_in === 2);
+  assert.ok(_v1151({ ...base, gap_between_units_in: 2, gap_to_uprights_in: 0 }).gap_source === "between adjacent units");
+  assert.ok(_v1151({ ...base, gap_between_units_in: 1, gap_to_uprights_in: 1 }).gap_ok, "1 in exactly is compliant");
+  assert.ok(!_v1151({ ...base, gap_between_units_in: 1.01, gap_to_uprights_in: 0 }).gap_ok);
+  // BOTH ESCAPES turn a failure into a pass without changing the measurement.
+  const designed = _v1151({ ...base, gap_to_uprights_in: 0.5, cantilever_designed: "yes" });
+  assert.ok(!designed.overhang_within && designed.overhang_ok && designed.passes);
+  assert.ok(designed.overhang_excess_in === 3, "the escape does not erase the excess, it excuses it");
+  const wideFront = _v1151({ ...base, gap_to_uprights_in: 0.5, overhang_in: 6, front_edge_gap_in: 24 });
+  assert.ok(!wideFront.front_within && !wideFront.front_ok && !wideFront.passes);
+  assert.ok(_v1151({ ...base, gap_to_uprights_in: 0.5, overhang_in: 6, front_edge_gap_in: 24, front_edge_protected: "yes" }).front_ok);
+  // Width and front-edge seams.
+  assert.ok(_v1151({ ...base, platform_width_in: 18 }).width_ok && !_v1151({ ...base, platform_width_in: 17.9 }).width_ok);
+  assert.ok(_v1151({ ...base, front_edge_gap_in: 14 }).front_within && !_v1151({ ...base, front_edge_gap_in: 14.1 }).front_within);
+  assert.ok(Math.abs(_v1151({ ...base, platform_width_in: 12 }).width_deficit_in - 6) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v1151({ ...base, plank_length_ft: 0 }));
+  assert.ok("error" in _v1151({ ...base, platform_width_in: 0 }));
+  assert.ok("error" in _v1151({ ...base, gap_between_units_in: -1 }));
+  assert.ok("error" in _v1151({ ...base, overhang_in: -1 }));
+  assert.ok("error" in _v1151({ ...base, plank_length_ft: Infinity }));
+});

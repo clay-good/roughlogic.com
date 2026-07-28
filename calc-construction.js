@@ -11680,3 +11680,90 @@ CONSTRUCTION_RENDERERS["excavation-protection-trigger"] = _simpleRenderer({
   ],
   compute: computeExcavationProtectionTrigger,
 });
+
+
+// --- spec-v1151: scaffold platform and planking check (OSHA 1926.451(b)) ---
+// The deck the guardrail tile stands on. Four rules, and the one worth knowing is that the
+// maximum plank overhang depends on the PLANK LENGTH, not on the scaffold: not more than
+// 12 in over its support for a platform 10 ft or less, and not more than 18 in for one over
+// 10 ft. So swapping a 16 ft plank for two 8 ft planks tightens the allowable overhang from
+// 18 in to 12 without anything else changing. Both limits carry the same escape - unless
+// the platform is designed and installed so the cantilevered portion can support employees
+// and materials without tipping - so a long overhang is a design question rather than a
+// prohibition.
+// The 14 in front-edge limit likewise has an escape: guardrails along the front edge and/or
+// personal fall arrest. And gaps run two ways: between adjacent units AND between the
+// platform and the uprights, both capped at 1 in.
+// dims: in { plank_length_ft: L, platform_width_in: L, gap_between_units_in: L, gap_to_uprights_in: L, overhang_in: L, front_edge_gap_in: L, cantilever_designed: dimensionless, front_edge_protected: dimensionless } out: { max_overhang_in: L, overhang_excess_in: L, width_deficit_in: L, worst_gap_in: L }
+export function computeScaffoldPlatformCheck({ plank_length_ft = 0, platform_width_in = 0, gap_between_units_in = 0, gap_to_uprights_in = 0, overhang_in = 0, front_edge_gap_in = 0, cantilever_designed = "no", front_edge_protected = "no" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(plank_length_ft) || 0;
+  const w = Number(platform_width_in) || 0;
+  const g1 = Number(gap_between_units_in) || 0;
+  const g2 = Number(gap_to_uprights_in) || 0;
+  const oh = Number(overhang_in) || 0;
+  const fe = Number(front_edge_gap_in) || 0;
+  const designed = cantilever_designed === "yes";
+  const protectedEdge = front_edge_protected === "yes";
+  if (!(L > 0)) return { error: "Plank or platform length must be positive (ft)." };
+  if (!(w > 0)) return { error: "Platform width must be positive (in)." };
+  if (g1 < 0 || g2 < 0 || oh < 0 || fe < 0) return { error: "Gaps and distances cannot be negative (in)." };
+
+  const MAX_GAP = 1, MIN_WIDTH = 18, MAX_FRONT = 14, SHORT_LIMIT = 12, LONG_LIMIT = 18, LENGTH_BREAK = 10;
+  const worst_gap_in = Math.max(g1, g2);
+  const gap_ok = worst_gap_in <= MAX_GAP;
+  const gap_source = g1 >= g2 ? "between adjacent units" : "between the platform and the uprights";
+
+  const width_ok = w >= MIN_WIDTH;
+  const width_deficit_in = Math.max(0, MIN_WIDTH - w);
+
+  // The limit is set by the PLANK LENGTH, not by the scaffold.
+  const long_plank = L > LENGTH_BREAK;
+  const max_overhang_in = long_plank ? LONG_LIMIT : SHORT_LIMIT;
+  const overhang_excess_in = Math.max(0, oh - max_overhang_in);
+  const overhang_within = oh <= max_overhang_in;
+  const overhang_ok = overhang_within || designed;
+
+  const front_ok = fe <= MAX_FRONT || protectedEdge;
+  const front_within = fe <= MAX_FRONT;
+
+  const passes = gap_ok && width_ok && overhang_ok && front_ok;
+
+  const note = "GAPS run two ways and both are capped at " + MAX_GAP + " in: between adjacent units, and between the platform and the uprights. The worst here is " + worst_gap_in + " in " + gap_source + ", " + (gap_ok ? "OK. " : "OVER. ") + "The second one is the one that gets forgotten, because it is a gap against the frame rather than between two boards, and it is exactly where a foot goes. "
+    + "WIDTH: each scaffold platform and walkway at least " + MIN_WIDTH + " in wide - " + w + " in here, " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(1) + " in. ")
+    + "OVERHANG is set by the PLANK LENGTH, not by the scaffold: not more than " + SHORT_LIMIT + " in over its support for a platform " + LENGTH_BREAK + " ft or less, and not more than " + LONG_LIMIT + " in for one over " + LENGTH_BREAK + " ft. At " + L + " ft this platform is " + (long_plank ? "over" : "at or under") + " the break, so the limit is " + max_overhang_in + " in. "
+    + "This one overhangs " + oh + " in: " + (overhang_within ? "within it. " : "OVER by " + overhang_excess_in.toFixed(1) + " in" + (designed ? " - but the cantilevered portion is stated as designed and installed to support employees and materials without tipping, which is the escape the standard provides, so this is a design question rather than a violation. " : ", and no cantilever design is claimed. ") )
+    + "Swapping a 16 ft plank for two 8 ft planks tightens the allowable overhang from " + LONG_LIMIT + " in to " + SHORT_LIMIT + " with nothing else changing - the rule follows the board, not the bay. "
+    + "FRONT EDGE: not more than " + MAX_FRONT + " in from the face of the work" + (front_within ? " - " + fe + " in here, OK. " : " - " + fe + " in here, over" + (protectedEdge ? ", but guardrails along the front edge and/or personal fall arrest are stated as provided, which is the escape. " : ", and no front-edge guardrail or fall arrest is claimed. ")) + "Outrigger scaffolds and plastering and lathing operations carry their own front-edge figures, which this tile does not apply. "
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "NOT COMPUTED, and worth checking separately: the MINIMUM distance a plank must extend over the centerline of its support unless cleated or restrained. It is a real requirement in the same paragraph, it works in the opposite direction from the maximums above, and it is what stops a plank from being levered off its bearer - but it could not be confirmed from a primary source here, so no number is asserted. Read 1926.451(b) for it. "
+    + "Also not checked: whether the platform is fully planked or decked between the front upright and the guardrail; platform units overlapping and their end conditions; plank grade, span, and rated load, which is a strength calculation rather than a dimension; scaffold-grade lumber versus manufactured decks; ties, bracing, and foundations; and the guardrail system, which has its own tile. A screen, not a scaffold plan; 29 CFR 1926 Subpart L and the competent person govern.";
+
+  return { worst_gap_in, gap_ok, gap_source, width_ok, width_deficit_in, long_plank, max_overhang_in, overhang_in: oh, overhang_within, overhang_excess_in, overhang_ok, cantilever_designed: designed, front_within, front_ok, front_edge_protected: protectedEdge, passes, note };
+}
+
+export const scaffoldPlatformCheckExample = { inputs: { plank_length_ft: 8, platform_width_in: 19, gap_between_units_in: 0.75, gap_to_uprights_in: 1.5, overhang_in: 15, front_edge_gap_in: 12, cantilever_designed: "no", front_edge_protected: "no" } };
+
+CONSTRUCTION_RENDERERS["scaffold-platform-check"] = _simpleRenderer({
+  citation: "Citation: OSHA 29 CFR 1926.451(b), a US federal regulation in the public domain. Each platform unit shall be installed so that the space between adjacent units and the space between the platform and the uprights is no more than 1 inch wide; each scaffold platform and walkway shall be at least 18 inches wide; the front edge of all platforms shall not be more than 14 inches from the face of the work unless guardrail systems are erected along the front edge and/or personal fall arrest systems are used; a platform 10 feet or less in length shall not extend over its support more than 12 inches, and a platform greater than 10 feet in length shall not extend over its support more than 18 inches, in each case unless the platform is designed and installed so that the cantilevered portion can support employees and/or materials without tipping. The MINIMUM distance a plank must extend over the centerline of its support is a real requirement in the same paragraph but could not be confirmed from a primary source here, so no figure is asserted - read 1926.451(b). Outrigger scaffolds and plastering and lathing operations carry their own front-edge figures and are not applied. Also not checked: full planking between the front upright and the guardrail, unit overlap and end conditions, plank grade, span, and rated load, ties, bracing, foundations, or the guardrail system. A screen, not a scaffold plan; Subpart L and the competent person govern.",
+  example: scaffoldPlatformCheckExample.inputs,
+  fields: [
+    { key: "plank_length_ft", label: "Platform or plank length (ft)", kind: "number", default: 8 },
+    { key: "platform_width_in", label: "Platform width (in)", kind: "number", default: 19 },
+    { key: "gap_between_units_in", label: "Gap between adjacent platform units (in)", kind: "number", default: 0.75 },
+    { key: "gap_to_uprights_in", label: "Gap between the platform and the uprights (in)", kind: "number", default: 1.5 },
+    { key: "overhang_in", label: "Overhang past the support (in)", kind: "number", default: 15 },
+    { key: "front_edge_gap_in", label: "Front edge to the face of the work (in)", kind: "number", default: 12 },
+    { key: "cantilever_designed", label: "Cantilevered portion designed not to tip?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+    { key: "front_edge_protected", label: "Front-edge guardrail and/or personal fall arrest?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+  ],
+  outputs: [
+    { key: "g", id: "spc-out-g", label: "Gaps (1 in max, both kinds)", value: (r) => fmt(r.worst_gap_in, 2) + " in worst, " + r.gap_source + " - " + (r.gap_ok ? "OK" : "OVER") },
+    { key: "w", id: "spc-out-w", label: "Width (18 in min)", value: (r) => r.width_ok ? "OK" : "SHORT by " + fmt(r.width_deficit_in, 1) + " in" },
+    { key: "o", id: "spc-out-o", label: "Overhang limit (set by plank length)", value: (r) => r.max_overhang_in + " in for a " + (r.long_plank ? "platform over 10 ft" : "platform 10 ft or less") + " - " + (r.overhang_within ? "within" : "OVER by " + fmt(r.overhang_excess_in, 1) + " in" + (r.cantilever_designed ? ", covered by the cantilever design escape" : "")) },
+    { key: "f", id: "spc-out-f", label: "Front edge (14 in max)", value: (r) => r.front_within ? "OK" : r.front_edge_protected ? "over 14 in but guardrail/PFAS provided" : "OVER with no front-edge protection claimed" },
+    { key: "v", id: "spc-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "spc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeScaffoldPlatformCheck,
+});
