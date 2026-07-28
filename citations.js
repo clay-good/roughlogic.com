@@ -6202,6 +6202,20 @@ export const CITATIONS = {
       { name: "Pass-fail threshold", value: "1:12 (8.33%) maximum running slope; 1:48 max cross-slope", source: "ADA §405.2 / §403.3" },
     ],
   },
+  "accessible-parking-count": {
+    formula: "Table 208.2 by lot total: 1-25 -> 1; 26-50 -> 2; 51-75 -> 3; 76-100 -> 4; 101-150 -> 5; 151-200 -> 6; 201-300 -> 7; 301-400 -> 8; 401-500 -> 9; 501-1,000 -> 2% of the total; 1,001 and over -> 20 plus 1 for each 100 or fraction thereof over 1,000. Van spaces = ceil(required accessible / 6) per 208.2.4. The table is applied to each parking facility separately.",
+    edition: "2010 ADA Standards for Accessible Design, 208.2, Table 208.2, and 208.2.4. A US federal standard in the public domain, quoted directly.",
+    freeAccess: "The 2010 ADA Standards are published in full at no cost at ada.gov and by the US Access Board.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two rules run here and the second is the one that gets skipped. Table 208.2 sets the accessible count from the lot total, and 208.2.4 then requires that 'for every six or fraction of six parking spaces required by 208.2 to comply with 502, at least one shall be a van parking space complying with 502.' FRACTION OF SIX is the operative phrase: four accessible spaces still owe one van and seven owe two, and a van space is one OF the accessible spaces rather than an extra beyond them. Two branches of the table also get missed. From 501 to 1,000 spaces it stops being a lookup and becomes 2% of the total, which produces a step at the seam - the last table row (401 to 500) gives 9, while 501 spaces at 2% is 10.02 and rounds up to 11, so one space added to a 500-space lot adds two accessible spaces. Above 1,000 it is 20 plus one for each 100 or fraction thereof over 1,000. The fractional results round up throughout, because a count of spaces cannot be fractional and rounding down would provide fewer than the standard requires. The third thing people get wrong is the unit of counting: the table applies PER PARKING FACILITY, not per site. Four separate lots of 26 spaces owe eight accessible spaces where the same 104 spaces in a single lot would owe five, so splitting parking into separate lots raises the requirement rather than lowering it. Not checked: the geometry of the spaces under 502 - space and access-aisle widths, the wider space or wider aisle a van requires, the vertical clearance a van needs along its whole route in, surface slope, and signage; whether the spaces sit on the shortest accessible route to the entrance and are dispersed among entrances under 208.3; the higher ratios that apply at hospital outpatient, rehabilitation, and residential facilities under 208.2.1 through 208.2.3; and state and local requirements, several of which exceed these. A count, not a layout.",
+    assumptions: [
+      { name: "Counting unit", value: "each parking facility separately, not the site total", source: "2010 ADA Standards 208.2" },
+      { name: "501 to 1,000 spaces", value: "2% of the total, rounded up", source: "Table 208.2" },
+      { name: "Over 1,000 spaces", value: "20 plus 1 for each 100 or fraction thereof over 1,000", source: "Table 208.2" },
+      { name: "Van share", value: "one for every six or fraction of six accessible spaces required", source: "2010 ADA Standards 208.2.4" },
+      { name: "Van spaces", value: "counted within the required accessible spaces, not in addition to them", source: "2010 ADA Standards 208.2.4" },
+    ],
+  },
   "ada-ramp-slope": {
     formula: "run = rise x slope_ratio; slope_pct = 100 / slope_ratio; runs = ceil(rise / 30); landings = (runs - 1) x landing_len; total = run + landings; handrails if rise > 6 in.",
     edition: "IBC §1012 (ramps) and the ADA Standards for Accessible Design (2010) §405 / ICC A117.1, by name.",

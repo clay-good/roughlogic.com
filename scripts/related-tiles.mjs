@@ -904,6 +904,7 @@ const RELATED = {
   "wind-chill-wind-speed": ["wind-chill", "heat-stress", "noise-dose"],
   "ramp-slope": ["slope-from-level", "slope"],
   "ada-ramp-slope": ["ramp-slope", "stair-stringer", "egress-capacity", "egress-travel-distance"],
+  "accessible-parking-count": ["ada-ramp-slope", "striping-paint-quantity", "asphalt-paving-speed", "traffic-taper-length"],
   "rainwater-yield": ["rainwater-catchment-area", "stormwater-rational"],
   "rainwater-catchment-area": ["rainwater-yield", "stormwater-rational", "roof-drain-sizing"],
   "timesheet": ["overtime", "per-diem", "time-and-materials"],

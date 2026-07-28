@@ -1623,6 +1623,7 @@ export const COMPUTE_MAP = {
   "economic-conductor-sizing": { module: "../../calc-electrical.js", fn: "computeEconomicConductorSizing" },
   "generator-fuel-runtime": { module: "../../calc-electrical.js", fn: "computeGeneratorFuelRuntime" },
   "ada-ramp-slope": { module: "../../calc-construction.js", fn: "computeAdaRampSlope" },
+  "accessible-parking-count": { module: "../../calc-construction.js", fn: "computeAccessibleParkingCount" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 

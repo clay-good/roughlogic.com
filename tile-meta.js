@@ -907,7 +907,7 @@ const _TILES = [
   // spec-v520 transformer inrush coordination point
   ["transformer-inrush-point", "A"],
   ["termination-temp-ampacity", "A"],
-  ["ada-ramp-slope", "E"],
+  ["ada-ramp-slope", "E"], ["accessible-parking-count", "E"],
   ["pool-bonding-680-26", "A"],
 ];
 

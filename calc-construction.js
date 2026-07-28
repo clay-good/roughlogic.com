@@ -12048,3 +12048,99 @@ CONSTRUCTION_RENDERERS["material-stacking-limits"] = _simpleRenderer({
   ],
   compute: computeMaterialStackingLimits,
 });
+
+// ===================== spec-v1159: accessible parking count (2010 ADA Standards 208.2) =====================
+
+// Two rules, and people run the first and forget the second. Table 208.2 gives the accessible
+// count from the lot total; 208.2.4 then requires one VAN space for every six or FRACTION OF
+// SIX of those - so four accessible spaces still owe one van, and seven owe two.
+// The table also has two branches people miss. From 501 to 1,000 it stops being a lookup and
+// becomes 2 percent of the total; above 1,000 it is 20 plus one for each 100 or fraction over.
+// And the count is PER PARKING FACILITY, not per site: four separate lots of 26 owe eight
+// accessible spaces, while one lot of 104 owes five. Splitting a lot raises the requirement.
+// dims: in { total_spaces: dimensionless, facility_count: dimensionless, provided_accessible: dimensionless, provided_van: dimensionless } out: { required_accessible: dimensionless, required_van: dimensionless, required_car: dimensionless, site_required_accessible: dimensionless }
+export function computeAccessibleParkingCount({ total_spaces = 0, facility_count = 1, provided_accessible = 0, provided_van = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n = Number(total_spaces) || 0;
+  const lots = Number(facility_count) || 0;
+  const provA = Number(provided_accessible) || 0;
+  const provV = Number(provided_van) || 0;
+  if (!Number.isInteger(n) || n <= 0) return { error: "Spaces in one parking facility must be a positive whole number." };
+  if (!Number.isInteger(lots) || lots <= 0) return { error: "Number of parking facilities must be a positive whole number." };
+  if (!Number.isInteger(provA) || provA < 0) return { error: "Accessible spaces provided must be a whole number, zero or more." };
+  if (!Number.isInteger(provV) || provV < 0) return { error: "Van spaces provided must be a whole number, zero or more." };
+  if (provV > provA) return { error: "Van spaces provided cannot exceed the accessible spaces provided - a van space is one of them, not an extra." };
+
+  const BANDS = [[25, 1], [50, 2], [75, 3], [100, 4], [150, 5], [200, 6], [300, 7], [400, 8], [500, 9]];
+  let required_accessible = null, branch = "";
+  let percent_raw = null;
+  if (n <= 500) {
+    for (const [hi, req] of BANDS) if (n <= hi) { required_accessible = req; break; }
+    branch = "table lookup";
+  } else if (n <= 1000) {
+    percent_raw = n * 0.02;
+    required_accessible = Math.ceil(percent_raw - 1e-9);
+    branch = "2% of the total";
+  } else {
+    required_accessible = 20 + Math.ceil((n - 1000) / 100 - 1e-9);
+    branch = "20 plus 1 per 100 or fraction over 1,000";
+  }
+
+  const VAN_EVERY = 6;
+  const required_van = Math.ceil(required_accessible / VAN_EVERY);
+  const required_car = required_accessible - required_van;
+
+  const site_required_accessible = required_accessible * lots;
+  const site_required_van = required_van * lots;
+  const site_total_spaces = n * lots;
+
+  // What the same total would owe if it were ONE facility instead of several.
+  let combined_required = null;
+  if (lots > 1) {
+    const m = site_total_spaces;
+    if (m <= 500) { for (const [hi, req] of BANDS) if (m <= hi) { combined_required = req; break; } }
+    else if (m <= 1000) combined_required = Math.ceil(m * 0.02 - 1e-9);
+    else combined_required = 20 + Math.ceil((m - 1000) / 100 - 1e-9);
+  }
+  const split_penalty = combined_required === null ? null : site_required_accessible - combined_required;
+
+  const accessible_ok = provA >= site_required_accessible;
+  const van_ok = provV >= site_required_van;
+  const accessible_short = Math.max(0, site_required_accessible - provA);
+  const van_short = Math.max(0, site_required_van - provV);
+  const passes = accessible_ok && van_ok;
+  const van_only_failure = accessible_ok && !van_ok;
+
+  const note = "TWO RULES, and the second is the one that gets skipped. Table 208.2 sets the accessible count from the lot total; 208.2.4 then requires one VAN space for every six OR FRACTION OF SIX of those. "
+    + n + " spaces in one facility -> " + required_accessible + " accessible (" + branch + "), of which " + required_van + " must be van and " + required_car + " may be car. "
+    + (percent_raw !== null ? "The 2% comes to " + percent_raw.toFixed(2) + ", rounded up to " + required_accessible + " - a count of spaces cannot be fractional, and rounding down would provide fewer than the standard requires. " : "")
+    + (n >= 495 && n <= 520 ? "NOTE THE STEP AT 500: the last table row (401-500) gives 9, and at 501 the rule switches to 2% - 10.02 for 501, so 11. One space added to a 500-space lot adds TWO accessible spaces. " : "")
+    + "FRACTION OF SIX is the trap: " + required_accessible + " accessible spaces need " + required_van + " van, not " + Math.floor(required_accessible / VAN_EVERY) + ". Four accessible spaces still owe one van; seven owe two. And a van space is one OF the accessible spaces, not an extra one beyond them. "
+    + (lots > 1 ? "PER FACILITY, NOT PER SITE: the table is applied to each parking facility separately, so " + lots + " lots of " + n + " owe " + site_required_accessible + " accessible spaces and " + site_required_van + " van, while the same " + site_total_spaces + " spaces in ONE lot would owe " + combined_required + ". " + (split_penalty > 0 ? "Splitting the parking RAISES the requirement by " + split_penalty + ". " : split_penalty === 0 ? "Here the split happens to cost nothing. " : "") : "Counted for one parking facility. Where a site has several separate lots or structures, the table is applied to EACH one, and the totals rarely match what the combined count would have been. ")
+    + "Provided " + provA + " accessible / " + provV + " van: " + (passes ? "meets both. " : (accessible_ok ? "" : "SHORT " + accessible_short + " accessible. ") + (van_ok ? "" : "SHORT " + van_short + " van. "))
+    + (van_only_failure ? "The total is right and the MIX is wrong - the most common finding on a restripe, because the count gets checked and the van share does not. " : "")
+    + "Not checked: the geometry of the spaces themselves under 502 - space and access-aisle widths, the wider space or wider aisle a van requires, the 98 in vertical clearance a van needs along its whole route in, surface slope, and signage; whether spaces are on the shortest accessible route to the entrance and dispersed among the entrances under 208.3; the higher ratios for hospital outpatient, rehabilitation, and residential facilities under 208.2.1 through 208.2.3; state and local requirements, several of which exceed these; and enforcement of who parks there. A count, not a layout; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { required_accessible, required_van, required_car, branch, percent_raw, site_required_accessible, site_required_van, site_total_spaces, combined_required, split_penalty, accessible_ok, van_ok, accessible_short, van_short, van_only_failure, passes, note };
+}
+
+export const accessibleParkingCountExample = { inputs: { total_spaces: 100, facility_count: 1, provided_accessible: 4, provided_van: 0 } };
+
+CONSTRUCTION_RENDERERS["accessible-parking-count"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 208.2 and Table 208.2 (Parking Spaces) and 208.2.4 (Van Parking Spaces). A US federal standard in the public domain. Table 208.2 gives the minimum accessible spaces by lot total: 1 to 25 -> 1; 26 to 50 -> 2; 51 to 75 -> 3; 76 to 100 -> 4; 101 to 150 -> 5; 151 to 200 -> 6; 201 to 300 -> 7; 301 to 400 -> 8; 401 to 500 -> 9; 501 to 1,000 -> 2 percent of the total; 1,001 and over -> 20, plus 1 for each 100, or fraction thereof, over 1,000. Section 208.2.4: 'For every six or fraction of six parking spaces required by 208.2 to comply with 502, at least one shall be a van parking space complying with 502.' Not checked: the geometry of the spaces under 502, the accessible route and dispersion required by 208.3, the higher ratios at hospital outpatient, rehabilitation, and residential facilities under 208.2.1 through 208.2.3, or state and local requirements that exceed these. A count, not a layout.",
+  example: accessibleParkingCountExample.inputs,
+  fields: [
+    { key: "total_spaces", label: "Parking spaces in ONE parking facility", kind: "number", default: 100 },
+    { key: "facility_count", label: "Number of such facilities (separate lots) on the site", kind: "number", default: 1 },
+    { key: "provided_accessible", label: "Accessible spaces provided (site total)", kind: "number", default: 4 },
+    { key: "provided_van", label: "Of those, van spaces provided", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "a", id: "apc-out-a", label: "Required per facility", value: (r) => r.required_accessible + " accessible (" + r.branch + "): " + r.required_van + " van + " + r.required_car + " car" },
+    { key: "s", id: "apc-out-s", label: "Required site total", value: (r) => r.site_required_accessible + " accessible, of which " + r.site_required_van + " van" + (r.combined_required === null ? "" : "; as one lot of " + r.site_total_spaces + " it would be " + r.combined_required) },
+    { key: "p", id: "apc-out-p", label: "Provided vs required", value: (r) => r.passes ? "meets both the count and the van share" : [r.accessible_ok ? null : "short " + r.accessible_short + " accessible", r.van_ok ? null : "short " + r.van_short + " van"].filter(Boolean).join(", ") },
+    { key: "v", id: "apc-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES 208.2 and 208.2.4" : r.van_only_failure ? "COUNT OK, VAN SHARE SHORT" : "DOES NOT PASS" },
+    { key: "n", id: "apc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAccessibleParkingCount,
+});

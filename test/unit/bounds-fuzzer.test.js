@@ -33447,3 +33447,88 @@ test("bounds: spec-v1158 computeMasonryLimitedAccessZone pins height+4, the four
   assert.ok("error" in _v1158({ ...base, wall_height_ft: Infinity }));
   assert.ok("error" in _v1158({ ...base, wall_length_ft: NaN }));
 });
+
+import { computeAccessibleParkingCount as _v1159 } from "../../calc-construction.js";
+
+test("bounds: spec-v1159 computeAccessibleParkingCount pins Table 208.2, the 2% and over-1000 branches, the fraction-of-six van rule, and per-facility counting", () => {
+  const base = { total_spaces: 100, facility_count: 1, provided_accessible: 4, provided_van: 0 };
+  const r = _v1159(base);
+  assert.ok(r.required_accessible === 4 && r.required_van === 1 && r.required_car === 3);
+  assert.ok(r.accessible_ok && !r.van_ok && r.van_short === 1 && r.van_only_failure && !r.passes);
+  // TABLE 208.2, EVERY ROW AND EVERY SEAM.
+  const rows = [[1, 1], [25, 1], [26, 2], [50, 2], [51, 3], [75, 3], [76, 4], [100, 4], [101, 5], [150, 5], [151, 6], [200, 6], [201, 7], [300, 7], [301, 8], [400, 8], [401, 9], [500, 9]];
+  for (const [n, req] of rows) {
+    const t = _v1159({ ...base, total_spaces: n });
+    assert.ok(t.required_accessible === req, "table wrong at " + n + ": got " + t.required_accessible);
+    assert.ok(t.branch === "table lookup");
+  }
+  // THE STEP AT 500: 9 becomes 11, because 501 x 2% is 10.02 and rounds up.
+  assert.ok(_v1159({ ...base, total_spaces: 500 }).required_accessible === 9);
+  const s501 = _v1159({ ...base, total_spaces: 501 });
+  assert.ok(s501.required_accessible === 11 && Math.abs(s501.percent_raw - 10.02) < 1e-9);
+  assert.ok(s501.branch === "2% of the total");
+  // The 2% branch, including an exact multiple that must NOT be bumped by the rounding.
+  for (const [n, req] of [[550, 11], [600, 12], [650, 13], [1000, 20]]) {
+    const t = _v1159({ ...base, total_spaces: n });
+    assert.ok(t.required_accessible === req, "2% branch wrong at " + n + ": got " + t.required_accessible);
+  }
+  // The over-1,000 branch is continuous with the 2% branch at 1,000 -> 20.
+  for (const [n, req] of [[1001, 21], [1100, 21], [1101, 22], [1200, 22], [2000, 30], [2001, 31]]) {
+    const t = _v1159({ ...base, total_spaces: n });
+    assert.ok(t.required_accessible === req, "over-1000 branch wrong at " + n + ": got " + t.required_accessible);
+    assert.ok(t.branch === "20 plus 1 per 100 or fraction over 1,000");
+  }
+  // Required count never decreases as the lot grows, across the whole domain and both seams.
+  let prev = 0;
+  for (let n = 1; n <= 2100; n += 7) {
+    const t = _v1159({ ...base, total_spaces: n }).required_accessible;
+    assert.ok(t >= prev, "required count went DOWN at " + n); prev = t;
+  }
+  // FRACTION OF SIX: ceil, and the car remainder always closes the sum.
+  for (const [req, van] of [[1, 1], [2, 1], [5, 1], [6, 1], [7, 2], [12, 2], [13, 3], [20, 4], [30, 5], [31, 6]]) {
+    const n = req <= 9 ? [0, 1, 26, 51, 76, 101, 151, 201, 301, 401][req] : null;
+    if (n === null) continue;
+    const t = _v1159({ ...base, total_spaces: n });
+    assert.ok(t.required_accessible === req);
+    assert.ok(t.required_van === van, "van share wrong for " + req + " accessible");
+    assert.ok(t.required_van + t.required_car === t.required_accessible);
+  }
+  for (let n = 1; n <= 2100; n += 13) {
+    const t = _v1159({ ...base, total_spaces: n });
+    assert.ok(t.required_van === Math.ceil(t.required_accessible / 6));
+    assert.ok(t.required_van >= 1, "there is always at least one van space");
+    assert.ok(t.required_van + t.required_car === t.required_accessible);
+  }
+  // PER FACILITY, NOT PER SITE - and splitting a lot raises the requirement.
+  const split = _v1159({ total_spaces: 26, facility_count: 4, provided_accessible: 8, provided_van: 2 });
+  assert.ok(split.required_accessible === 2 && split.site_required_accessible === 8 && split.site_required_van === 4);
+  assert.ok(split.site_total_spaces === 104 && split.combined_required === 5 && split.split_penalty === 3);
+  assert.ok(split.accessible_ok && !split.van_ok && split.van_short === 2 && !split.passes);
+  // A single facility reports no combined comparison at all rather than a spurious zero.
+  assert.ok(r.combined_required === null && r.split_penalty === null);
+  // The site requirement is exactly the per-facility requirement times the lot count.
+  for (const lots of [1, 2, 3, 7, 50]) {
+    const t = _v1159({ ...base, facility_count: lots, provided_accessible: 999, provided_van: 999 });
+    assert.ok(t.site_required_accessible === t.required_accessible * lots);
+    assert.ok(t.site_required_van === t.required_van * lots);
+    assert.ok(t.site_total_spaces === 100 * lots && t.passes);
+  }
+  // Meeting the count exactly, with the van share, passes.
+  assert.ok(_v1159({ ...base, provided_accessible: 4, provided_van: 1 }).passes);
+  assert.ok(!_v1159({ ...base, provided_accessible: 3, provided_van: 1 }).passes, "count short still fails");
+  // Shortfalls are exact and never negative.
+  for (const p of [0, 1, 4, 40]) {
+    const t = _v1159({ ...base, provided_accessible: p, provided_van: Math.min(p, 1) });
+    assert.ok(t.accessible_short === Math.max(0, 4 - p) && t.accessible_short >= 0);
+  }
+  // Error seams, including the one that catches a real misunderstanding.
+  assert.ok("error" in _v1159({ ...base, provided_van: 5 }), "a van space is one OF the accessible spaces");
+  assert.ok("error" in _v1159({ ...base, total_spaces: 0 }));
+  assert.ok("error" in _v1159({ ...base, total_spaces: 10.5 }));
+  assert.ok("error" in _v1159({ ...base, total_spaces: -5 }));
+  assert.ok("error" in _v1159({ ...base, facility_count: 0 }));
+  assert.ok("error" in _v1159({ ...base, facility_count: 1.5 }));
+  assert.ok("error" in _v1159({ ...base, provided_accessible: -1 }));
+  assert.ok("error" in _v1159({ ...base, provided_accessible: 2.5 }));
+  assert.ok("error" in _v1159({ ...base, total_spaces: Infinity }));
+});

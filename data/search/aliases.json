@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "how many accessible parking spaces",
+      "target": "accessible-parking-count",
+      "kind": "question"
+    },
+    {
+      "term": "ada parking space count",
+      "target": "accessible-parking-count",
+      "kind": "industry"
+    },
+    {
+      "term": "how many van accessible spaces do i need",
+      "target": "accessible-parking-count",
+      "kind": "question"
+    },
+    {
+      "term": "handicap parking requirement by lot size",
+      "target": "accessible-parking-count",
+      "kind": "industry"
+    },
+    {
       "term": "limited access zone masonry wall",
       "target": "masonry-limited-access-zone",
       "kind": "industry"
