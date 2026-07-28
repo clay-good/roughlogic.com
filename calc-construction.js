@@ -11100,3 +11100,85 @@ CONSTRUCTION_RENDERERS["landing-check"] = _simpleRenderer({
   ],
   compute: computeLandingCheck,
 });
+
+
+// --- spec-v1138: door maneuvering clearance, front approach (2010 ADA Standards 404.2.4.1) ---
+// The clearance that decides whether an accessible door works, and the one a plan set gets
+// wrong most often - because it is asymmetric. On the PULL side you need 18 in of clear
+// wall BEYOND THE LATCH SIDE and 60 in out from the door. On the PUSH side, with no closer
+// and no latch, you need only the width of the doorway and 48 in out. Same door, opposite
+// faces, wildly different footprints: the pull side is where a corridor or a fixture kills
+// an otherwise legal layout, and the latch-side strip is what people forget entirely
+// because it is empty wall, not a door.
+// Only the FRONT approach is shipped here. Table 404.2.4.1 also covers hinge-side and
+// latch-side approaches and adds clearance where a closer and a latch are both provided;
+// those rows are not reproduced and the note says to read the table for them.
+// dims: in { clear_perpendicular_in: L, clear_latch_side_in: L, door_clear_width_in: L, side: dimensionless, min_pull_perpendicular_in: L, min_pull_latch_in: L, min_push_perpendicular_in: L } out: { required_perpendicular_in: L, required_latch_in: L, perpendicular_deficit_in: L, latch_deficit_in: L, required_area_sf: L^2 }
+export function computeDoorManeuveringClearance({ clear_perpendicular_in = 0, clear_latch_side_in = 0, door_clear_width_in = 32, side = "pull", min_pull_perpendicular_in = 60, min_pull_latch_in = 18, min_push_perpendicular_in = 48 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const perp = Number(clear_perpendicular_in) || 0;
+  const latch = Number(clear_latch_side_in) || 0;
+  const wide = Number(door_clear_width_in) || 0;
+  const P_PULL = Number(min_pull_perpendicular_in) || 0;
+  const L_PULL = Number(min_pull_latch_in) || 0;
+  const P_PUSH = Number(min_push_perpendicular_in) || 0;
+  const pull = side === "pull";
+  if (!(perp > 0)) return { error: "Clear depth perpendicular to the doorway must be positive (in)." };
+  if (latch < 0) return { error: "Clear width beyond the latch side cannot be negative (in)." };
+  if (!(wide > 0)) return { error: "Door clear width must be positive (in)." };
+  if (!(P_PULL > 0) || !(L_PULL > 0) || !(P_PUSH > 0)) return { error: "The clearance minimums must all be positive (in)." };
+
+  const required_perpendicular_in = pull ? P_PULL : P_PUSH;
+  const required_latch_in = pull ? L_PULL : 0;
+  const perp_ok = perp >= required_perpendicular_in;
+  const latch_ok = latch >= required_latch_in;
+  const perpendicular_deficit_in = Math.max(0, required_perpendicular_in - perp);
+  const latch_deficit_in = Math.max(0, required_latch_in - latch);
+  const passes = perp_ok && latch_ok;
+
+  // The footprint each face demands, so the asymmetry is a number and not an adjective.
+  const required_width_in = wide + required_latch_in;
+  const required_area_sf = (required_perpendicular_in * required_width_in) / 144;
+  const other_perp_in = pull ? P_PUSH : P_PULL;
+  const other_latch_in = pull ? 0 : L_PULL;
+  const other_area_sf = (other_perp_in * (wide + other_latch_in)) / 144;
+  const area_ratio = other_area_sf > 0 ? required_area_sf / other_area_sf : null;
+
+  const note = "FRONT approach, " + (pull ? "PULL" : "PUSH") + " side. "
+    + (pull
+      ? "The pull side needs " + L_PULL + " in of clear space BEYOND THE LATCH SIDE of the door and " + P_PULL + " in out from the doorway. That latch-side strip is the part people forget, because it is empty wall rather than door - and it is exactly where a corner, a corridor wall, a vanity, or a light switch kills an otherwise legal opening. "
+      : "The push side of a door with NO closer and NO latch needs only the width of the doorway and " + P_PUSH + " in out. No latch-side strip is required in that case. ")
+    + "This opening has " + perp + " in of depth against " + required_perpendicular_in + " required (" + (perp_ok ? "OK" : "SHORT by " + perpendicular_deficit_in.toFixed(1) + " in") + ")"
+    + (pull ? " and " + latch + " in beyond the latch side against " + L_PULL + " required (" + (latch_ok ? "OK" : "SHORT by " + latch_deficit_in.toFixed(1) + " in") + ")" : "") + ". " + (passes ? "PASSES. " : "DOES NOT PASS. ")
+    + "The asymmetry in numbers: this face wants a " + required_perpendicular_in + " by " + required_width_in + " in footprint, " + required_area_sf.toFixed(1) + " sq ft, against " + other_area_sf.toFixed(1) + " sq ft on the other face"
+    + (area_ratio !== null ? " - a factor of " + area_ratio.toFixed(2) + ". " : ". ")
+    + "Both faces have to work, so check the door twice; a layout that clears on the push side tells you nothing about the pull side. "
+    + "SCOPE - only the FRONT approach is checked here. Table 404.2.4.1 also covers hinge-side and latch-side approaches, which have different and generally larger requirements, and it ADDS clearance where a door has both a closer and a latch, including on the push side where none is otherwise required. Those rows are not reproduced; read the table for them, because a door with a closer is the common commercial case and the front-approach push-side numbers above do not apply to it. "
+    + "Also not checked: the 32 in clear width at 90 degrees, the level and unobstructed condition of the clearance floor and its 1:48 maximum slope, door opening force and closing speed, threshold height, hardware type and mounting height, doors in series, or the accessible route leading to the door. The 2010 ADA Standards and ANSI A117.1 differ in places and a state may adopt either; the minimums are editable inputs for that reason. A screen, not a certification of accessibility - the adopted standard and the AHJ govern.";
+
+  return { pull, required_perpendicular_in, required_latch_in, perp_ok, latch_ok, passes, perpendicular_deficit_in, latch_deficit_in, required_width_in, required_area_sf, other_area_sf, area_ratio, note };
+}
+
+export const doorManeuveringClearanceExample = { inputs: { clear_perpendicular_in: 60, clear_latch_side_in: 12, door_clear_width_in: 32, side: "pull", min_pull_perpendicular_in: 60, min_pull_latch_in: 18, min_push_perpendicular_in: 48 } };
+
+CONSTRUCTION_RENDERERS["door-maneuvering-clearance"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design 404.2.4.1, front approach at manual swinging doors - on the PULL side, maneuvering space extending 18 in minimum beyond the latch side of the door and 60 in minimum perpendicular to the doorway; on the PUSH side of doors NOT equipped with a closer or latch, space the same width as the door opening and 48 in minimum perpendicular to the doorway. Only the FRONT approach is reproduced: Table 404.2.4.1 also covers hinge-side and latch-side approaches and adds clearance where both a closer and a latch are provided, and those rows are not shipped here. Not checked: the 32 in clear width at 90 degrees, the level and unobstructed floor and its 1:48 slope limit, opening force, threshold height, hardware, doors in series, or the route to the door. The 2010 ADA Standards are a US federal regulation published at no cost; ANSI A117.1 differs in places and the minimums are editable for that reason. A screen, not a certification of accessibility - the adopted standard and the AHJ govern.",
+  example: doorManeuveringClearanceExample.inputs,
+  fields: [
+    { key: "side", label: "Which face", kind: "select", options: [{ value: "pull", label: "Pull side (60 in deep, 18 in past the latch)", selected: true }, { value: "push", label: "Push side, no closer and no latch (48 in deep)" }] },
+    { key: "clear_perpendicular_in", label: "Clear depth perpendicular to the doorway (in)", kind: "number", default: 60 },
+    { key: "clear_latch_side_in", label: "Clear width beyond the latch side (in)", kind: "number", default: 12 },
+    { key: "door_clear_width_in", label: "Door clear width (in)", kind: "number", default: 32 },
+    { key: "min_pull_perpendicular_in", label: "Pull-side depth minimum (in; ADA 60)", kind: "number", default: 60 },
+    { key: "min_pull_latch_in", label: "Pull-side latch-side minimum (in; ADA 18)", kind: "number", default: 18 },
+    { key: "min_push_perpendicular_in", label: "Push-side depth minimum (in; ADA 48)", kind: "number", default: 48 },
+  ],
+  outputs: [
+    { key: "v", id: "dmc-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the front-approach clearance for this face" : "FAILS: " + [!r.perp_ok ? "depth short " + fmt(r.perpendicular_deficit_in, 1) + " in" : null, !r.latch_ok ? "latch side short " + fmt(r.latch_deficit_in, 1) + " in" : null].filter(Boolean).join(", ") },
+    { key: "d", id: "dmc-out-d", label: "Depth perpendicular to the doorway", value: (r) => "needs " + fmt(r.required_perpendicular_in, 0) + " in - " + (r.perp_ok ? "OK" : "short by " + fmt(r.perpendicular_deficit_in, 1) + " in") },
+    { key: "l", id: "dmc-out-l", label: "Beyond the latch side", value: (r) => r.required_latch_in === 0 ? "not required on this face (no closer, no latch)" : "needs " + fmt(r.required_latch_in, 0) + " in - " + (r.latch_ok ? "OK" : "short by " + fmt(r.latch_deficit_in, 1) + " in") },
+    { key: "a", id: "dmc-out-a", label: "Footprint this face demands", value: (r) => fmt(r.required_perpendicular_in, 0) + " x " + fmt(r.required_width_in, 0) + " in = " + fmt(r.required_area_sf, 1) + " sq ft, against " + fmt(r.other_area_sf, 1) + " on the other face" },
+    { key: "n", id: "dmc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDoorManeuveringClearance,
+});

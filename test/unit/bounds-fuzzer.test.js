@@ -32397,3 +32397,50 @@ test("bounds: spec-v1137 computeGrabBarLayout pins the tangent rear-bar span, th
   assert.ok("error" in _v1137({ ...base, fastener_spacing_in: -1 }));
   assert.ok("error" in _v1137({ ...base, bar_height_in: Infinity }));
 });
+
+import { computeDoorManeuveringClearance as _v1138 } from "../../calc-construction.js";
+
+test("bounds: spec-v1138 computeDoorManeuveringClearance pins the pull/push asymmetry, the latch-side strip, and error seams", () => {
+  const base = { clear_perpendicular_in: 60, clear_latch_side_in: 12, door_clear_width_in: 32, side: "pull", min_pull_perpendicular_in: 60, min_pull_latch_in: 18, min_push_perpendicular_in: 48 };
+  const r = _v1138(base);
+  // Depth fine, latch-side strip short - the classic failure.
+  assert.ok(r.perp_ok && !r.latch_ok && r.latch_deficit_in === 6 && !r.passes);
+  assert.ok(r.required_perpendicular_in === 60 && r.required_latch_in === 18 && r.required_width_in === 50);
+  assert.ok(Math.abs(r.required_area_sf - 20.833333) < 1e-5 && Math.abs(r.area_ratio - 1.953125) < 1e-9);
+  // THE ASYMMETRY: the two faces are mirror images of each other's "other" figures.
+  const push = _v1138({ ...base, side: "push", clear_perpendicular_in: 48, clear_latch_side_in: 0 });
+  assert.ok(push.passes && push.required_latch_in === 0 && push.required_perpendicular_in === 48);
+  assert.ok(Math.abs(push.required_area_sf - r.other_area_sf) < 1e-9);
+  assert.ok(Math.abs(push.other_area_sf - r.required_area_sf) < 1e-9);
+  assert.ok(Math.abs(push.area_ratio * r.area_ratio - 1) < 1e-9, "the two ratios must be reciprocals");
+  // A push-side-legal clearance is NOT enough for the pull side.
+  assert.ok(!_v1138({ ...base, clear_perpendicular_in: 48, clear_latch_side_in: 0 }).passes);
+  // Seams: boundary values are compliant.
+  assert.ok(_v1138({ ...base, clear_latch_side_in: 18 }).latch_ok && !_v1138({ ...base, clear_latch_side_in: 17.9 }).latch_ok);
+  assert.ok(_v1138({ ...base, clear_perpendicular_in: 60 }).perp_ok && !_v1138({ ...base, clear_perpendicular_in: 59.9 }).perp_ok);
+  assert.ok(_v1138({ ...base, side: "push", clear_perpendicular_in: 48 }).perp_ok && !_v1138({ ...base, side: "push", clear_perpendicular_in: 47.9 }).perp_ok);
+  // The push side never requires a latch-side strip, whatever is entered.
+  for (const l of [0, 6, 18]) assert.ok(_v1138({ ...base, side: "push", clear_perpendicular_in: 48, clear_latch_side_in: l }).passes);
+  // Footprint identities hold on both faces and scale with door width.
+  for (const side of ["pull", "push"]) {
+    for (const w of [32, 36, 42]) {
+      const t = _v1138({ ...base, side, door_clear_width_in: w });
+      assert.ok(t.required_width_in === w + t.required_latch_in);
+      assert.ok(Math.abs(t.required_area_sf - t.required_perpendicular_in * t.required_width_in / 144) < 1e-12);
+      assert.ok(t.required_area_sf > 0 && t.other_area_sf > 0);
+      // Deficits never negative, verdict is exactly the conjunction.
+      assert.ok(t.perpendicular_deficit_in >= 0 && t.latch_deficit_in >= 0);
+      assert.ok(t.passes === (t.perp_ok && t.latch_ok));
+    }
+  }
+  // Editable minimums move the verdict.
+  assert.ok(_v1138({ ...base, min_pull_latch_in: 12 }).latch_ok);
+  assert.ok(!_v1138({ ...base, min_pull_perpendicular_in: 66 }).perp_ok);
+  // Error seams.
+  assert.ok("error" in _v1138({ ...base, clear_perpendicular_in: 0 }));
+  assert.ok("error" in _v1138({ ...base, clear_latch_side_in: -1 }));
+  assert.ok("error" in _v1138({ ...base, door_clear_width_in: 0 }));
+  assert.ok("error" in _v1138({ ...base, min_pull_perpendicular_in: 0 }));
+  assert.ok("error" in _v1138({ ...base, min_push_perpendicular_in: 0 }));
+  assert.ok("error" in _v1138({ ...base, clear_perpendicular_in: Infinity }));
+});

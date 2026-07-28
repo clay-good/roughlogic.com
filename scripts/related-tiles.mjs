@@ -1365,7 +1365,8 @@ const RELATED = {
   // spec-v113 guard and handrail code check (Group E)
   "guard-handrail-check": ["guard-post-load","stair-stringer-layout","deck-beam-post","equal-spacing"],
   "egress-window-check": ["rough-opening-size","guard-handrail-check","stair-stringer-layout","header-sizing"],
-  "landing-check": ["stair-stringer-layout","guard-handrail-check","egress-window-check","ada-ramp-slope"],
+  "landing-check": ["door-maneuvering-clearance","stair-stringer-layout","guard-handrail-check","egress-window-check","ada-ramp-slope"],
+  "door-maneuvering-clearance": ["landing-check","ada-ramp-slope","grab-bar-layout","rough-opening-size"],
   "stair-code-check": ["stairs","guard-handrail-check","egress-capacity"],
   // spec-v114 smooth-bore nozzle flow (Group F)
   "smooth-bore-flow": ["fire-stream-reaction","master-stream","ladder-pipe-reach"],
