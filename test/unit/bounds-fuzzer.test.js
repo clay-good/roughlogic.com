@@ -32602,3 +32602,52 @@ test("bounds: spec-v1141 computeSmokeAlarmPlacement pins the additive count, the
   assert.ok("error" in _v1141({ ...base, alarm_type: "nope" }));
   assert.ok("error" in _v1141({ ...base, distance_to_cooking_ft: Infinity }));
 });
+
+import { computeCoAlarmPlacement as _v1142 } from "../../calc-construction.js";
+import { computeSmokeAlarmPlacement as _v1142smoke } from "../../calc-construction.js";
+
+test("bounds: spec-v1142 computeCoAlarmPlacement pins the source trigger, the not-per-bedroom count, the bedroom exception, and error seams", () => {
+  const base = { sleeping_areas: 2, bedrooms_with_appliance: 0, has_fuel_appliance: "no", has_attached_garage: "yes", stories: 2, per_story_amendment: "no" };
+  const r = _v1142(base);
+  assert.ok(r.required && r.trigger === "an attached garage" && r.area_alarms === 2 && r.required_alarms === 2);
+  assert.ok(r.bedroom_alarms === 0 && r.story_alarms === 0 && !r.per_story_applied);
+  // THE TRIGGER: either source alone is enough; neither means none at all.
+  for (const fuel of ["yes", "no"]) {
+    for (const gar of ["yes", "no"]) {
+      const t = _v1142({ ...base, has_fuel_appliance: fuel, has_attached_garage: gar, bedrooms_with_appliance: 1 });
+      assert.ok(t.required === (fuel === "yes" || gar === "yes"));
+      if (!t.required) assert.ok(t.required_alarms === 0 && t.area_alarms === 0 && t.bedroom_alarms === 0, "no trigger means nothing, even with bedroom appliances entered");
+      else assert.ok(t.required_alarms === t.area_alarms + t.bedroom_alarms + t.story_alarms);
+    }
+  }
+  assert.ok(_v1142({ ...base, has_attached_garage: "no", has_fuel_appliance: "yes" }).trigger === "a fuel-fired appliance");
+  assert.ok(_v1142({ ...base, has_fuel_appliance: "yes" }).trigger === "a fuel-fired appliance AND an attached garage");
+  // NOT ONE PER BEDROOM: the CO count tracks sleeping AREAS, and diverges from the smoke count.
+  for (const areas of [0, 1, 2, 4]) {
+    const t = _v1142({ ...base, sleeping_areas: areas });
+    assert.ok(t.area_alarms === areas && t.required_alarms === areas);
+  }
+  const smoke = _v1142smoke({ sleeping_rooms: 4, sleeping_areas: 2, additional_stories: 1, alarm_type: "photoelectric", distance_to_cooking_ft: 20, distance_to_bath_door_ft: 5 });
+  const co = _v1142({ ...base, sleeping_areas: 2 });
+  assert.ok(smoke.required_alarms === 7 && co.required_alarms === 2, "the two sections give genuinely different counts");
+  assert.ok(co.required_alarms < smoke.required_alarms, "applying the smoke count to CO overbuys");
+  // The bedroom exception adds, one per bedroom with an appliance.
+  for (const n of [0, 1, 3]) {
+    const t = _v1142({ ...base, bedrooms_with_appliance: n });
+    assert.ok(t.bedroom_alarms === n && t.required_alarms === 2 + n);
+  }
+  // Per-story is OPT-IN and adds stories-minus-one, never on by default.
+  assert.ok(_v1142({ ...base, stories: 5 }).story_alarms === 0, "model IRC has no per-story rule");
+  for (const st of [1, 2, 4]) {
+    const t = _v1142({ ...base, stories: st, per_story_amendment: "yes" });
+    assert.ok(t.story_alarms === st - 1 && t.per_story_applied);
+  }
+  // Error seams.
+  assert.ok("error" in _v1142({ ...base, sleeping_areas: -1 }));
+  assert.ok("error" in _v1142({ ...base, sleeping_areas: 1.5 }));
+  assert.ok("error" in _v1142({ ...base, bedrooms_with_appliance: -1 }));
+  assert.ok("error" in _v1142({ ...base, bedrooms_with_appliance: 2.5 }));
+  assert.ok("error" in _v1142({ ...base, stories: 0 }));
+  assert.ok("error" in _v1142({ ...base, stories: 2.5 }));
+  assert.ok("error" in _v1142({ ...base, sleeping_areas: Infinity }));
+});

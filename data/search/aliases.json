@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "carbon monoxide alarm placement",
+      "target": "co-alarm-placement",
+      "kind": "industry"
+    },
+    {
+      "term": "do i need a co alarm",
+      "target": "co-alarm-placement",
+      "kind": "question"
+    },
+    {
+      "term": "co alarm attached garage requirement",
+      "target": "co-alarm-placement",
+      "kind": "question"
+    },
+    {
+      "term": "does every bedroom need a carbon monoxide alarm",
+      "target": "co-alarm-placement",
+      "kind": "question"
+    },
+    {
+      "term": "co alarm outside sleeping area",
+      "target": "co-alarm-placement",
+      "kind": "industry"
+    },
+    {
       "term": "smoke alarm placement",
       "target": "smoke-alarm-placement",
       "kind": "industry"

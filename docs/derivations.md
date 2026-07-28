@@ -1594,6 +1594,7 @@ cross-check.
 | calc-construction.js | `computeChainLinkFenceTakeoff` | `{ perimeter_ft = 200, height_ft = 4, gate_width_ft = 0, corners = 4, line_pos...` | _ | _ | _ |
 | calc-construction.js | `computeChipSealMcleod` | `{ median_size_in = 0, flakiness_index_pct = 0, loose_unit_weight_pcf = 0, bul...` | _ | _ | _ |
 | calc-construction.js | `computeCmuGroutVolume` | `{ wall_len_ft = 0, wall_ht_ft = 0, core_spacing_in = 0, core_area_in2 = 24, b...` | _ | _ | _ |
+| calc-construction.js | `computeCoAlarmPlacement` | `{ sleeping_areas = 1, bedrooms_with_appliance = 0, has_fuel_appliance = "yes"...` | _ | _ | _ |
 | calc-construction.js | `computeCoatingCoverageDft` | `{ vol_solids_pct, dft_mils, area_ft2, loss_pct = 35 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeColumnBucklingWood` | `{ b_in = 0, d_in = 0, le_in = 0, fc_star_psi = 0, emin_psi = 0, ke = 1 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeCombinedStressAxialBending` | `{ P_lb = 0, M_lbin = 0, A_in2 = 0, c_in = 0, I_in4 = 0, e_in = 0 } = {}` | _ | _ | _ |
@@ -3186,7 +3187,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1772.
+Row count: 1773.
 
 <!-- END function-corpus-v14 -->
 
@@ -3809,7 +3810,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (407 tiles)
+### Group E Construction (408 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3859,6 +3860,7 @@ per spec-v14 §13.1 second paragraph.
 | `cmu-shear-wall` | Reinforced CMU Shear Wall In-Plane Shear (TMS 402 ASD) | TMS 402-16 (ACI 530 / ASCE 5) via Mas...; spec-v270 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cmu-wall-axial` | Reinforced CMU Wall Axial Compression (TMS 402 ASD) | TMS 402-16 (ACI 530 / ASCE 5) via Mas...; spec-v271 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cmu-wall-flexure` | Reinforced CMU Wall Out-of-Plane Flexure (TMS 402 ASD) | TMS 402-16 (ACI 530 / ASCE 5) via Mas...; spec-v269 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `co-alarm-placement` | Carbon Monoxide Alarm Requirement and Count (IRC R315) | International Code Council; 'An approved carbon monoxide alarm shall be installed out... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coating-coverage-dft` | Coating Coverage from Volume-Solids and DFT | SSPC / AMPP PA 2; 60% volume-solids, 5.0 mil DFT, 2,000 ft^2, 35% loss -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cohesive-earth-pressure` | Rankine Active Earth Pressure on a Cohesive (Clay) Backfill | Rankine c-phi active earth pressure /...; Ka = (1 - sin 20)/(1 + sin 20) = 0.490291, sqrt(Ka) = 0.7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `coil-length` | Coil / Roll Stock Length | coil / roll stock annulus identity; spec-v802 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4897,6 +4899,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1525. Fixture-covered or reference-cadence: 1525 / 1525.
+Tile count: 1526. Fixture-covered or reference-cadence: 1526 / 1526.
 
 <!-- END tile-index-v14 -->

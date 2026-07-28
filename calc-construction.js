@@ -11341,3 +11341,76 @@ CONSTRUCTION_RENDERERS["smoke-alarm-placement"] = _simpleRenderer({
   ],
   compute: computeSmokeAlarmPlacement,
 });
+
+
+// --- spec-v1142: carbon monoxide alarm requirement and count (IRC R315) ---
+// The companion to the smoke-alarm tile, and the contrast is the point. Smoke alarms are
+// required in every dwelling and in every sleeping room. CO alarms are required only where
+// there is a source - R315.2 triggers on fuel-fired appliances installed in the dwelling
+// OR an attached garage - and even then the alarm goes OUTSIDE each separate sleeping area
+// in the immediate vicinity of the bedrooms, not in each bedroom. The one case that puts an
+// alarm inside a bedroom is R315.3's exception: a fuel-burning appliance located within
+// that bedroom or its attached bathroom. People routinely apply the smoke-alarm count to CO
+// and buy several too many, or miss the attached-garage trigger and buy none.
+// dims: in { sleeping_areas: dimensionless, bedrooms_with_appliance: dimensionless, has_fuel_appliance: dimensionless, has_attached_garage: dimensionless, stories: dimensionless, per_story_amendment: dimensionless } out: { required_alarms: dimensionless, area_alarms: dimensionless, bedroom_alarms: dimensionless, story_alarms: dimensionless }
+export function computeCoAlarmPlacement({ sleeping_areas = 1, bedrooms_with_appliance = 0, has_fuel_appliance = "yes", has_attached_garage = "no", stories = 1, per_story_amendment = "no" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const areas = Number(sleeping_areas) || 0;
+  const bedApp = Number(bedrooms_with_appliance) || 0;
+  const st = Number(stories) || 0;
+  const fuel = has_fuel_appliance === "yes";
+  const garage = has_attached_garage === "yes";
+  const perStory = per_story_amendment === "yes";
+  if (!Number.isInteger(areas) || areas < 0) return { error: "Separate sleeping area count must be a whole number of 0 or more." };
+  if (!Number.isInteger(bedApp) || bedApp < 0) return { error: "Count of bedrooms containing a fuel-burning appliance must be a whole number of 0 or more." };
+  if (!Number.isInteger(st) || st < 1) return { error: "Story count must be a whole number of 1 or more." };
+
+  const required = fuel || garage;
+  const trigger = !required ? "none" : fuel && garage ? "a fuel-fired appliance AND an attached garage" : fuel ? "a fuel-fired appliance" : "an attached garage";
+  const area_alarms = required ? areas : 0;
+  // R315.3 exception: an appliance inside a bedroom puts an alarm in that bedroom.
+  const bedroom_alarms = required ? bedApp : 0;
+  // Many states amend R315 to add one per story; off by default because the model code does not.
+  const story_alarms = required && perStory ? Math.max(0, st - 1) : 0;
+  const required_alarms = area_alarms + bedroom_alarms + story_alarms;
+
+  const note = (required
+    ? "REQUIRED, triggered by " + trigger + ". R315.2 makes carbon monoxide alarms a function of whether there is a SOURCE, not of the dwelling existing - which is the first difference from smoke alarms. "
+    : "NOT REQUIRED by R315.2 as entered: the section triggers on fuel-fired appliances installed in the dwelling or on an attached garage, and neither is present. Adding either one later triggers it. An all-electric house with a detached garage is the case that legitimately has none. ")
+    + (required
+      ? "COUNT: one OUTSIDE each separate sleeping area in the immediate vicinity of the bedrooms - " + areas + " here - NOT one in each bedroom. That is the second and larger difference from smoke alarms, and applying the smoke-alarm count to CO is how people end up buying several too many. "
+        + (bedApp > 0
+          ? "The one case that does put an alarm INSIDE a bedroom is R315.3's exception: a fuel-burning appliance located within the bedroom or its attached bathroom. " + bedApp + " bedroom" + (bedApp === 1 ? "" : "s") + " entered on that basis, adding " + bedroom_alarms + ". "
+          : "No bedroom contains a fuel-burning appliance, so nothing is added inside the bedrooms. A furnace, water heater, or gas fireplace in a bedroom or its attached bathroom would change that. ")
+        + (perStory ? "A per-story amendment is switched on, adding " + story_alarms + " for the stories beyond the first. That is NOT the model IRC - many states and cities add it, so it is an explicit toggle rather than a default. " : "No per-story amendment applied. The model IRC does not require one per story the way it does for smoke alarms; several states and cities amend it in, so check what your AHJ adopted before ordering. ")
+        + "TOTAL " + required_alarms + ". "
+      : "")
+    + "Placement detail the count cannot capture: 'in the immediate vicinity of the bedrooms' means the corridor or space serving them, so one alarm can cover several bedrooms off a single hall while bedrooms on opposite ends of a house are separate sleeping AREAS and each need their own. Count the areas, not the doors. "
+    + "Not checked: combination smoke/CO alarms and how they satisfy both sections at once; interconnection; primary power from the building wiring with battery backup, and the battery-only allowances in existing construction; the alteration, repair, and addition triggers that pull existing dwellings in; detector-and-panel systems used in place of alarms; mounting height, which the listing rather than the code usually governs; and state amendments, which are more common and more varied on CO than on smoke. A screen; the adopted code, the alarm's listing, and the AHJ govern.";
+
+  return { required, trigger, area_alarms, bedroom_alarms, story_alarms, required_alarms, per_story_applied: perStory, note };
+}
+
+export const coAlarmPlacementExample = { inputs: { sleeping_areas: 2, bedrooms_with_appliance: 0, has_fuel_appliance: "no", has_attached_garage: "yes", stories: 2, per_story_amendment: "no" } };
+
+CONSTRUCTION_RENDERERS["co-alarm-placement"] = _simpleRenderer({
+  citation: "Citation: IRC R315.2 - for new construction, an approved carbon monoxide alarm installed outside of each separate sleeping area in the immediate vicinity of the bedrooms in dwelling units within which fuel-fired appliances are installed and in dwelling units that have attached garages. IRC R315.3 - carbon monoxide alarms installed outside of each separate sleeping area in the immediate vicinity of the bedrooms, with the exception that where a fuel-burning appliance is located within a bedroom or its attached bathroom, an alarm shall be installed within that bedroom. A per-story requirement is NOT in the model IRC and is provided here as an explicit toggle because many states and cities amend one in. Not checked: combination smoke/CO alarms, interconnection, power source and battery backup, existing-dwelling alteration triggers, detector-and-panel systems, mounting height, or state amendments generally. A screen; the adopted code, the alarm's listing, and the AHJ govern.",
+  example: coAlarmPlacementExample.inputs,
+  fields: [
+    { key: "has_fuel_appliance", label: "Fuel-fired appliance installed in the dwelling?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
+    { key: "has_attached_garage", label: "Attached garage?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+    { key: "sleeping_areas", label: "Separate sleeping areas (one alarm outside each)", kind: "number", default: 2 },
+    { key: "bedrooms_with_appliance", label: "Bedrooms with a fuel-burning appliance in them or their bath", kind: "number", default: 0 },
+    { key: "stories", label: "Stories", kind: "number", default: 2 },
+    { key: "per_story_amendment", label: "Local amendment requiring one per story?", kind: "select", options: [{ value: "no", label: "No - model IRC", selected: true }, { value: "yes", label: "Yes - add one per additional story" }] },
+  ],
+  outputs: [
+    { key: "r", id: "cap-out-r", label: "Required at all?", value: (r) => r.required ? "YES - triggered by " + r.trigger : "NO - no fuel-fired appliance and no attached garage" },
+    { key: "t", id: "cap-out-t", label: "Total alarms", value: (r) => r.required_alarms + "" },
+    { key: "a", id: "cap-out-a", label: "Outside sleeping areas", value: (r) => r.area_alarms + " - NOT one per bedroom, which is the smoke-alarm rule" },
+    { key: "b", id: "cap-out-b", label: "Inside bedrooms (R315.3 exception)", value: (r) => r.bedroom_alarms + (r.bedroom_alarms > 0 ? " - fuel-burning appliance in the bedroom or its bath" : "") },
+    { key: "s", id: "cap-out-s", label: "From a per-story amendment", value: (r) => r.per_story_applied ? r.story_alarms + " (not model IRC)" : "none - the model IRC has no per-story rule" },
+    { key: "n", id: "cap-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCoAlarmPlacement,
+});
