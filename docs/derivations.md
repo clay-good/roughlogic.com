@@ -2654,6 +2654,7 @@ cross-check.
 | calc-plumbing.js | `computeTrapezoidalChannelFlow` | `{ bottom_width_ft = 0, side_slope_z = 2, depth_ft = 0, n = 0.03, s_slope = 0 ...` | _ | _ | _ |
 | calc-plumbing.js | `computeVelocityHead` | `{ V_fps = 0, gamma = 62.4, rho = 1.94 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeVentSizingStack` | `{ vent_dia_in = 0, connected_dfu = 0, developed_length_ft = 0, table_dfu = 0,...` | _ | _ | _ |
+| calc-plumbing.js | `computeVentTerminalCheck` | `{ height_above_roof_in = 6, snow_accumulation_in = 0, roof_other_use = "no", ...` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterHammerArrestor` | `{ wsfu, length_ft = 0, internal_diameter_in = 0, system_pressure_psi = 0 }` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterHammerSurge` | `{ material = "copper", pipe_size = "1", velocity_fps = 0, closure_time_s = 0,...` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterHeaterInput` | `{ heater_type = "gas_atmospheric", target_recovery_gph = 0, efficiency = null...` | _ | _ | _ |
@@ -3179,7 +3180,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1765.
+Row count: 1766.
 
 <!-- END function-corpus-v14 -->
 
@@ -3464,7 +3465,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (122 tiles)
+### Group B Plumbing (123 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3580,6 +3581,7 @@ per spec-v14 §13.1 second paragraph.
 | `trapezoidal-channel-flow` | Trapezoidal Channel / Swale Capacity (Manning) | Chow, Open-Channel Hydraulics; b 10 ft, z 2, y 3 ft, n 0.03, S 0.001 -> A 48 sf, P 23.41... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `velocity-head` | Velocity Head and Dynamic Pressure | fluid mechanics; spec-v371 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `vent-sizing-stack` | DWV Vent-Stack DFU / Length Check | IPC Chapter 9 / UPC Chapter 9 vent si...; 2-in vent, 24 DFU/120 ft permitted, 18 DFU over 90 ft -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `vent-terminal-check` | Vent Terminal Height, Frost Closure, and Location (IPC 903) | International Code Council; A 2 in vent 6 in above the roof, in a place with 18 in of... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-hammer-arrestor` | Water Hammer Arrestor Sizing | PDI; Sizing table: WSFU 12-32 -> AA-B; 25 ft of 1 in branch is... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-hammer-surge` | Water Hammer Pressure Surge (Joukowsky) | Project (first-principles); Copper Type L 1 in / water at 60 F / 8 fps velocity / 0.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-heater-input` | Water Heater Input for a Target Recovery | DOE / AHRI (inverse); round-trips the water-heater-recovery pinned example: 400... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4883,6 +4885,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1518. Fixture-covered or reference-cadence: 1518 / 1518.
+Tile count: 1519. Fixture-covered or reference-cadence: 1519 / 1519.
 
 <!-- END tile-index-v14 -->

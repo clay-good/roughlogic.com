@@ -32253,3 +32253,54 @@ test("bounds: spec-v1134 computeShowerCompartmentCheck pins the two-path rule, t
   assert.ok("error" in _v1134({ ...base, exception_min_dim_in: 0 }));
   assert.ok("error" in _v1134({ ...base, width_in: Infinity }));
 });
+
+import { computeVentTerminalCheck as _v1135 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v1135 computeVentTerminalCheck pins all three IPC 903 rules independently, their seams, and error seams", () => {
+  const base = { height_above_roof_in: 6, snow_accumulation_in: 18, roof_other_use: "no", design_temp_f: -10, vent_diameter_in: 2, increase_inside_envelope_in: 6, horizontal_to_opening_ft: 4, height_above_opening_ft: 1 };
+  const r = _v1135(base);
+  assert.ok(r.required_height_in === 24 && !r.height_ok && r.height_deficit_in === 18 && r.snow_governs);
+  assert.ok(r.frost_zone && !r.diameter_ok && r.increase_ok === false && r.frost_ok === false);
+  assert.ok(!r.location_ok && !r.clears_horizontally && !r.clears_vertically && !r.passes);
+  // Fixed on all three.
+  const good = { ...base, height_above_roof_in: 24, vent_diameter_in: 3, increase_inside_envelope_in: 18, height_above_opening_ft: 3 };
+  assert.ok(_v1135(good).passes && _v1135(good).clears_vertically && !_v1135(good).clears_horizontally);
+  // HEIGHT: snow governs above 0, and the 7 ft case overrides everything.
+  for (const snow of [0, 6, 18, 40]) {
+    const t = _v1135({ ...base, snow_accumulation_in: snow });
+    assert.ok(t.required_height_in === Math.max(6, snow + 6) && t.snow_governs === (snow > 0));
+  }
+  assert.ok(_v1135({ ...base, roof_other_use: "yes", snow_accumulation_in: 40 }).required_height_in === 84, "roof in use overrides snow");
+  assert.ok(_v1135({ ...base, height_above_roof_in: 24 }).height_ok && !_v1135({ ...base, height_above_roof_in: 23.9 }).height_ok);
+  // FROST: the trigger is at or below 0, and BOTH conditions must hold.
+  assert.ok(_v1135({ ...base, design_temp_f: 0 }).frost_zone && !_v1135({ ...base, design_temp_f: 0.1 }).frost_zone);
+  assert.ok(_v1135({ ...base, design_temp_f: 20 }).frost_ok === null && _v1135({ ...base, design_temp_f: 20 }).diameter_ok === null);
+  assert.ok(_v1135({ ...base, vent_diameter_in: 3 }).diameter_ok && !_v1135({ ...base, vent_diameter_in: 2.9 }).diameter_ok);
+  assert.ok(_v1135({ ...base, vent_diameter_in: 3, increase_inside_envelope_in: 12 }).frost_ok === true);
+  assert.ok(_v1135({ ...base, vent_diameter_in: 3, increase_inside_envelope_in: 11.9 }).frost_ok === false, "a shallow increaser fails even with the right diameter");
+  // Above 0 degF a 2 in vent is fine, so the frost rule never leaks into the verdict.
+  const warm = _v1135({ ...base, design_temp_f: 20, height_above_roof_in: 24, height_above_opening_ft: 3 });
+  assert.ok(warm.passes && warm.min_diameter_in === null && warm.min_increase_depth_in === null);
+  // LOCATION: either condition suffices, and both seams are exact.
+  for (const h of [0, 4, 9.9, 10, 20]) {
+    for (const a of [0, 1, 2.9, 3, 6]) {
+      const t = _v1135({ ...base, horizontal_to_opening_ft: h, height_above_opening_ft: a });
+      assert.ok(t.location_ok === (h >= 10 || a >= 3));
+      assert.ok(t.clears_horizontally === (h >= 10) && t.clears_vertically === (a >= 3));
+      // The three rules stay independent: location never changes the height verdict.
+      assert.ok(t.required_height_in === r.required_height_in && t.height_ok === r.height_ok);
+    }
+  }
+  // Overall pass requires all three, never two.
+  for (const t of [_v1135({ ...base, height_above_roof_in: 24 }), _v1135({ ...base, vent_diameter_in: 3, increase_inside_envelope_in: 18 }), _v1135({ ...base, height_above_opening_ft: 3 })]) {
+    assert.ok(!t.passes, "fixing one rule is not compliance");
+  }
+  // Error seams.
+  assert.ok("error" in _v1135({ ...base, height_above_roof_in: 0 }));
+  assert.ok("error" in _v1135({ ...base, snow_accumulation_in: -1 }));
+  assert.ok("error" in _v1135({ ...base, vent_diameter_in: 0 }));
+  assert.ok("error" in _v1135({ ...base, increase_inside_envelope_in: -1 }));
+  assert.ok("error" in _v1135({ ...base, horizontal_to_opening_ft: -1 }));
+  assert.ok("error" in _v1135({ ...base, height_above_opening_ft: -1 }));
+  assert.ok("error" in _v1135({ ...base, design_temp_f: Infinity }));
+});

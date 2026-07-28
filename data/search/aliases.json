@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "vent through roof height",
+      "target": "vent-terminal-check",
+      "kind": "industry"
+    },
+    {
+      "term": "how high must a plumbing vent be above the roof",
+      "target": "vent-terminal-check",
+      "kind": "question"
+    },
+    {
+      "term": "frost closure vent 3 inch",
+      "target": "vent-terminal-check",
+      "kind": "question"
+    },
+    {
+      "term": "vent terminal distance from a window",
+      "target": "vent-terminal-check",
+      "kind": "question"
+    },
+    {
+      "term": "plumbing vent snow accumulation",
+      "target": "vent-terminal-check",
+      "kind": "industry"
+    },
+    {
       "term": "minimum shower size",
       "target": "shower-compartment-check",
       "kind": "industry"

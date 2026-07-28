@@ -1417,6 +1417,7 @@ export const COMPUTE_MAP = {
   "plumbing-fixture-count": { module: "../../calc-construction.js", fn: "computePlumbingFixtureCount" },
   "fixture-clearance-check": { module: "../../calc-plumbing.js", fn: "computeFixtureClearanceCheck" },
   "shower-compartment-check": { module: "../../calc-plumbing.js", fn: "computeShowerCompartmentCheck" },
+  "vent-terminal-check": { module: "../../calc-plumbing.js", fn: "computeVentTerminalCheck" },
   // spec-v245..v247 cast-in-place placing-and-curing trio (3 tiles)
   "shore-post-load": { module: "../../calc-construction.js", fn: "computeShorePostLoad" },
   "scaffold-mudsill-bearing": { module: "../../calc-construction.js", fn: "computeScaffoldMudsillBearing" },
