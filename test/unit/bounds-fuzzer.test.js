@@ -34964,3 +34964,75 @@ test("bounds: spec-v1179 computeSubstantialImprovement pins the structure-only d
   assert.ok("error" in _v1179({ ...base, excluded_code_cost: 100000 }), "the exclusion cannot exceed the cost");
   assert.ok("error" in _v1179({ ...base, market_value: Infinity }));
 });
+
+import { computeAccessibleParkingGeometry as _v1180 } from "../../calc-construction.js";
+
+test("bounds: spec-v1180 computeAccessibleParkingGeometry pins the two legal van layouts, the aisle length and side, the 98 in clearance, and error seams", () => {
+  const base = { space_type: "van", space_width_in: 96, aisle_width_in: 60, space_length_in: 216, aisle_length_in: 216, angled: "no", aisle_side: "passenger", vertical_clearance_in: 98, surface_slope_ratio: 48 };
+  const r = _v1180(base);
+  assert.ok(r.required_space_width_in === 132 && r.required_aisle_width_in === 96 && !r.width_ok);
+  assert.ok(r.space_deficit_in === 36 && r.aisle_deficit_in === 36 && r.pair_width_in === 156 && r.min_pair_width_in === 192 && !r.passes);
+  // THE TWO LEGAL VAN LAYOUTS, and both consume the same pavement.
+  const wide = { ...base, space_width_in: 132, aisle_width_in: 60 };
+  const wideRes = _v1180(wide);
+  const wideAisle = _v1180({ ...base, space_width_in: 96, aisle_width_in: 96 });
+  assert.ok(wideRes.width_ok && wideRes.wide_van_path && !wideRes.wide_aisle_path && wideRes.passes);
+  assert.ok(wideAisle.width_ok && !wideAisle.wide_van_path && wideAisle.wide_aisle_path && wideAisle.passes);
+  assert.ok(wideRes.pair_width_in === 192 && wideAisle.pair_width_in === 192 && r.both_van_layouts_equal);
+  // Seams on both paths.
+  assert.ok(!_v1180({ ...base, space_width_in: 131.9, aisle_width_in: 60 }).width_ok);
+  assert.ok(!_v1180({ ...base, space_width_in: 96, aisle_width_in: 95.9 }).width_ok);
+  assert.ok(_v1180({ ...base, space_width_in: 96, aisle_width_in: 96 }).width_ok);
+  assert.ok(_v1180({ ...base, space_width_in: 132, aisle_width_in: 60 }).width_ok);
+  // Widening the AISLE fixes a 96 in van stall that a wider aisle alone would not have been expected to.
+  assert.ok(!_v1180({ ...base, aisle_width_in: 72 }).width_ok, "72 in of aisle is neither 60 with a 132 stall nor 96");
+  assert.ok(_v1180({ ...base, aisle_width_in: 96 }).width_ok);
+  // A CAR SPACE has one path and no 132 in option.
+  for (const [w, a, ok] of [[96, 60, true], [95.9, 60, false], [96, 59.9, false], [132, 60, true]]) {
+    assert.ok(_v1180({ ...base, space_type: "car", space_width_in: w, aisle_width_in: a }).width_ok === ok, "car widths wrong at " + w + "/" + a);
+  }
+  assert.ok(_v1180({ ...base, space_type: "car" }).required_space_width_in === 96);
+  assert.ok(_v1180({ ...base, space_type: "car" }).min_pair_width_in === 156);
+  assert.ok(!_v1180({ ...base, space_type: "car" }).both_van_layouts_equal);
+  // THE AISLE MUST RUN THE FULL LENGTH, with an exact deficit.
+  for (const [sl, al] of [[216, 216], [216, 120], [180, 200], [240, 240]]) {
+    const t = _v1180({ ...wide, space_length_in: sl, aisle_length_in: al });
+    assert.ok(t.length_ok === (al >= sl) && Math.abs(t.length_deficit_in - Math.max(0, sl - al)) < 1e-9);
+  }
+  assert.ok(!_v1180({ ...wide, aisle_length_in: 120 }).passes, "a stub aisle fails on its own");
+  // THE PASSENGER-SIDE RULE APPLIES ONLY TO ANGLED VAN SPACES.
+  assert.ok(_v1180({ ...wide, angled: "no", aisle_side: "driver" }).side_ok === null, "a straight van space may take either side");
+  assert.ok(_v1180({ ...wide, angled: "no", aisle_side: "driver" }).passes);
+  assert.ok(_v1180({ ...wide, angled: "yes", aisle_side: "passenger" }).side_ok === true);
+  assert.ok(_v1180({ ...wide, angled: "yes", aisle_side: "driver" }).side_ok === false);
+  assert.ok(!_v1180({ ...wide, angled: "yes", aisle_side: "driver" }).passes);
+  assert.ok(_v1180({ ...base, space_type: "car", space_width_in: 96, angled: "yes", aisle_side: "driver" }).side_ok === null, "the rule is van-only");
+  // THE 98 IN CLEARANCE is van-only and fails on its own.
+  for (const [vc, ok] of [[97.9, false], [98, true], [120, true]]) {
+    const t = _v1180({ ...wide, vertical_clearance_in: vc });
+    assert.ok(t.clearance_ok === ok && t.passes === ok, "clearance verdict wrong at " + vc);
+    assert.ok(Math.abs(t.clearance_deficit_in - Math.max(0, 98 - vc)) < 1e-9 && t.clearance_deficit_in >= 0);
+  }
+  const car = _v1180({ ...base, space_type: "car", space_width_in: 96, vertical_clearance_in: 84 });
+  assert.ok(car.clearance_ok === null && car.clearance_deficit_in === null && car.passes, "a car space has no 98 in requirement");
+  // SLOPE: 1:48 or flatter, and a steeper number is a smaller ratio.
+  assert.ok(_v1180({ ...wide, surface_slope_ratio: 48 }).slope_ok && _v1180({ ...wide, surface_slope_ratio: 60 }).slope_ok);
+  assert.ok(!_v1180({ ...wide, surface_slope_ratio: 47 }).slope_ok && !_v1180({ ...wide, surface_slope_ratio: 20 }).passes);
+  // Every check fails independently.
+  assert.ok(_v1180(wide).passes);
+  assert.ok(!_v1180({ ...wide, space_width_in: 100 }).passes);
+  assert.ok(!_v1180({ ...wide, aisle_length_in: 100 }).passes);
+  assert.ok(!_v1180({ ...wide, vertical_clearance_in: 90 }).passes);
+  assert.ok(!_v1180({ ...wide, surface_slope_ratio: 24 }).passes);
+  // Error seams.
+  assert.ok("error" in _v1180({ ...base, space_type: "motorcycle" }));
+  assert.ok("error" in _v1180({ ...base, angled: "sort of" }));
+  assert.ok("error" in _v1180({ ...base, aisle_side: "either" }));
+  assert.ok("error" in _v1180({ ...base, space_width_in: 0 }));
+  assert.ok("error" in _v1180({ ...base, aisle_width_in: 0 }));
+  assert.ok("error" in _v1180({ ...base, space_length_in: 0 }));
+  assert.ok("error" in _v1180({ ...base, aisle_length_in: 0 }));
+  assert.ok("error" in _v1180({ ...base, vertical_clearance_in: 0 }));
+  assert.ok("error" in _v1180({ ...base, surface_slope_ratio: 0 }));
+  assert.ok("error" in _v1180({ ...base, space_width_in: Infinity }));
+});

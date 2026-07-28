@@ -13608,3 +13608,107 @@ CONSTRUCTION_RENDERERS["substantial-improvement-check"] = _simpleRenderer({
   ],
   compute: computeSubstantialImprovement,
 });
+
+// ===================== spec-v1180: accessible parking space geometry (2010 ADA Standards 502) =====================
+
+// accessible-parking-count says how many. This says how big, and the van case is where lots go
+// wrong twice.
+// A car space is 96 in wide. A VAN space is 132 in - eleven feet - unless the access aisle is
+// widened to 96 in, in which case the van space may drop to 96 in too. So there are two legal
+// van layouts, 132 + 60 and 96 + 96, and both total 192 in; picking either is a striping
+// decision, not a compliance one.
+// The aisle is 60 in minimum and must run the FULL LENGTH of the space it serves, may not
+// overlap the vehicular way, and on ANGLED van spaces must sit on the PASSENGER side - the one
+// rule that cannot be satisfied by flipping the stripes at the end.
+// And a van space, its aisle, AND the vehicular route serving them need 98 in of vertical
+// clearance, which is what disqualifies most parking structures without any striping involved.
+// dims: in { space_width_in: L, aisle_width_in: L, space_length_in: L, aisle_length_in: L, vertical_clearance_in: L } out: { required_space_width_in: L, required_aisle_width_in: L, pair_width_in: L, space_deficit_in: L }
+export function computeAccessibleParkingGeometry({ space_type = "van", space_width_in = 0, aisle_width_in = 0, space_length_in = 0, aisle_length_in = 0, angled = "no", aisle_side = "passenger", vertical_clearance_in = 0, surface_slope_ratio = 48 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(space_width_in) || 0;
+  const a = Number(aisle_width_in) || 0;
+  const sl = Number(space_length_in) || 0;
+  const al = Number(aisle_length_in) || 0;
+  const vc = Number(vertical_clearance_in) || 0;
+  const slope = Number(surface_slope_ratio) || 0;
+  const isVan = space_type === "van";
+  const isAngled = angled === "yes";
+  const passengerSide = aisle_side === "passenger";
+  if (space_type !== "van" && space_type !== "car") return { error: "Space type must be van or car." };
+  if (angled !== "yes" && angled !== "no") return { error: "State whether the space is angled (yes or no)." };
+  if (aisle_side !== "passenger" && aisle_side !== "driver") return { error: "Aisle side must be passenger or driver." };
+  if (!(w > 0) || !(a > 0)) return { error: "Space width and access aisle width must be positive (in)." };
+  if (!(sl > 0) || !(al > 0)) return { error: "Space length and aisle length must be positive (in)." };
+  if (!(vc > 0)) return { error: "Vertical clearance must be positive (in)." };
+  if (!(slope > 0)) return { error: "Surface slope ratio must be positive (48 for the 1:48 maximum)." };
+
+  const CAR_W = 96, VAN_W = 132, VAN_ALT_W = 96, AISLE_W = 60, VAN_ALT_AISLE = 96;
+  const VAN_CLEAR = 98, SLOPE_MAX = 48;
+
+  // Two legal van layouts; a car space has one.
+  const wide_van_path = isVan && w >= VAN_W && a >= AISLE_W;
+  const wide_aisle_path = isVan && w >= VAN_ALT_W && a >= VAN_ALT_AISLE;
+  const required_space_width_in = isVan ? (a >= VAN_ALT_AISLE ? VAN_ALT_W : VAN_W) : CAR_W;
+  const required_aisle_width_in = isVan && w < VAN_W ? VAN_ALT_AISLE : AISLE_W;
+  const width_ok = isVan ? (wide_van_path || wide_aisle_path) : (w >= CAR_W && a >= AISLE_W);
+  const space_deficit_in = Math.max(0, required_space_width_in - w);
+  const aisle_deficit_in = Math.max(0, required_aisle_width_in - a);
+  const pair_width_in = w + a;
+  const min_pair_width_in = isVan ? VAN_W + AISLE_W : CAR_W + AISLE_W;
+  const both_van_layouts_equal = isVan && (VAN_W + AISLE_W) === (VAN_ALT_W + VAN_ALT_AISLE);
+
+  const length_ok = al >= sl;
+  const length_deficit_in = Math.max(0, sl - al);
+
+  const side_applies = isVan && isAngled;
+  const side_ok = side_applies ? passengerSide : null;
+
+  const clearance_applies = isVan;
+  const clearance_ok = clearance_applies ? vc >= VAN_CLEAR : null;
+  const clearance_deficit_in = clearance_applies ? Math.max(0, VAN_CLEAR - vc) : null;
+
+  const slope_ok = slope >= SLOPE_MAX;
+
+  const passes = width_ok && length_ok && (side_ok !== false) && (clearance_ok !== false) && slope_ok;
+
+  const note = "COUNT IS ONE QUESTION AND GEOMETRY IS ANOTHER, and the van case goes wrong twice. A car space is 96 in wide with a 60 in aisle. A VAN space is 132 in - eleven feet - UNLESS the access aisle is widened to 96 in, in which case the van space may drop to 96 in as well. "
+    + (both_van_layouts_equal ? "SO THERE ARE TWO LEGAL VAN LAYOUTS AND THEY COST THE SAME GROUND: 132 + 60 and 96 + 96 both total 192 in. Which one to stripe is a layout decision, not a compliance one, and knowing that is usually what unsticks a tight lot. " : "")
+    + "This is a " + (isVan ? "van" : "car") + " space: " + w + " in wide with a " + a + " in aisle, " + pair_width_in + " in of pavement together against a " + min_pair_width_in + " in minimum pair. "
+    + (width_ok ? "The widths comply" + (isVan ? (wide_aisle_path && !wide_van_path ? " on the wide-aisle path - the 96 in space is legal only because the aisle is 96 in. " : wide_van_path && wide_aisle_path ? " on both paths. " : " on the 132 in van path. ") : ". ") : "WIDTHS FAIL: at " + a + " in of aisle the space must be " + required_space_width_in + " in" + (space_deficit_in > 0 ? ", short by " + space_deficit_in.toFixed(1) + " in" : "") + (aisle_deficit_in > 0 ? ", and the aisle is short by " + aisle_deficit_in.toFixed(1) + " in" : "") + ". " + (isVan ? "Either widen the space to 132 in or widen the AISLE to 96 in - the second is often the cheaper stripe. " : ""))
+    + "THE AISLE MUST RUN THE FULL LENGTH of the space it serves: " + al + " in against " + sl + " in, " + (length_ok ? "OK. " : "SHORT by " + length_deficit_in.toFixed(1) + " in - a stub aisle at the head of a space is a common and easy failure. ")
+    + (side_applies ? "ANGLED VAN SPACES must have the access aisle on the PASSENGER side, and this one is on the " + aisle_side + " side" + (side_ok ? ". " : " - which is the one rule that cannot be fixed by flipping the stripes at the far end, because it is about which side the lift deploys from. ") : isVan ? "This van space is not angled, so the aisle may sit on either side; on an ANGLED van space it would have to be on the passenger side. " : "")
+    + (clearance_applies ? "VERTICAL CLEARANCE: 98 in minimum at the van space, its access aisle, AND the vehicular route serving them - which is the requirement that disqualifies most parking structures with no striping involved at all, because the route matters as much as the stall. Entered " + vc + " in: " + (clearance_ok ? "OK. " : "SHORT by " + clearance_deficit_in.toFixed(1) + " in. ") : "No vertical clearance requirement applies to a car space under this section. ")
+    + "SURFACE: the space and its aisle must be at the same level, with slopes no steeper than 1:48 in all directions. Entered 1:" + slope + ": " + (slope_ok ? "OK - and note that 1:48 is about 2%, which is flatter than most paving crews target for drainage, so this is the item that fails on a lot that drains well. " : "TOO STEEP. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: how many accessible and van spaces are required, which is a separate tile; whether the access aisle overlaps the vehicular way, which 502.3.4 prohibits and which a drawing shows better than a dimension; marking, which must discourage parking in the aisle; identification signage and its own mounting height; the accessible route from the space to the entrance and whether it crosses the vehicular way; curb ramps and their placement relative to the aisle; the location requirement that spaces be on the shortest accessible route; and state and local law, several of which require more. A geometry screen, not a striping plan; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { required_space_width_in, required_aisle_width_in, wide_van_path, wide_aisle_path, width_ok, space_deficit_in, aisle_deficit_in, pair_width_in, min_pair_width_in, both_van_layouts_equal, length_ok, length_deficit_in, side_applies, side_ok, clearance_applies, clearance_ok, clearance_deficit_in, slope_ok, passes, note };
+}
+
+export const accessibleParkingGeometryExample = { inputs: { space_type: "van", space_width_in: 96, aisle_width_in: 60, space_length_in: 216, aisle_length_in: 216, angled: "no", aisle_side: "passenger", vertical_clearance_in: 98, surface_slope_ratio: 48 } };
+
+CONSTRUCTION_RENDERERS["accessible-parking-geometry"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 502.2, 502.3.1, 502.3.2, 502.3.3, 502.3.4, 502.4, and 502.5. A US federal standard in the public domain. 502.2: car parking spaces shall be 96 in wide minimum and van parking spaces shall be 132 in wide minimum, shall be marked to define the width, and shall have an adjacent access aisle; exception - van parking spaces shall be permitted to be 96 in wide minimum where the access aisle is 96 in wide minimum. 502.3.1: access aisles serving car and van parking spaces shall be 60 in wide minimum. 502.3.2: access aisles shall extend the full length of the parking spaces they serve. 502.3.3: access aisles shall be marked so as to discourage parking in them. 502.3.4: access aisles shall not overlap the vehicular way; access aisles shall be permitted to be placed on either side of the parking space except for angled van parking spaces which shall have access aisles located on the passenger side of the parking spaces. 502.4: parking spaces and access aisles serving them shall comply with 302, access aisles shall be at the same level as the parking spaces they serve, and changes in level are not permitted; exception - slopes not steeper than 1:48 shall be permitted. 502.5: parking spaces for vans and access aisles and vehicular routes serving them shall provide a vertical clearance of 98 in minimum. Not checked: how many spaces are required, which is a separate tile; whether the aisle overlaps the vehicular way; marking; identification signage; the accessible route to the entrance; curb ramps; or state and local law. A geometry screen, not a striping plan.",
+  example: accessibleParkingGeometryExample.inputs,
+  fields: [
+    { key: "space_type", label: "Space type", kind: "select", options: [{ value: "van", label: "Van accessible", selected: true }, { value: "car", label: "Car accessible" }] },
+    { key: "space_width_in", label: "Space width (in)", kind: "number", default: 96 },
+    { key: "aisle_width_in", label: "Access aisle width (in)", kind: "number", default: 60 },
+    { key: "space_length_in", label: "Space length (in)", kind: "number", default: 216 },
+    { key: "aisle_length_in", label: "Access aisle length (in)", kind: "number", default: 216 },
+    { key: "angled", label: "Angled space?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+    { key: "aisle_side", label: "Aisle side", kind: "select", options: [{ value: "passenger", label: "Passenger side", selected: true }, { value: "driver", label: "Driver side" }] },
+    { key: "vertical_clearance_in", label: "Vertical clearance at the space, aisle, and route (in)", kind: "number", default: 98 },
+    { key: "surface_slope_ratio", label: "Surface slope, run per unit rise (48 = 1:48 maximum)", kind: "number", default: 48 },
+  ],
+  outputs: [
+    { key: "w", id: "apg-out-w", label: "Widths", value: (r) => r.width_ok ? "comply" + (r.wide_aisle_path && !r.wide_van_path ? " - on the wide-aisle path only" : "") : "space needs " + r.required_space_width_in + " in at this aisle width" + (r.space_deficit_in > 0 ? " (short " + fmt(r.space_deficit_in, 1) + ")" : "") + (r.aisle_deficit_in > 0 ? ", aisle short " + fmt(r.aisle_deficit_in, 1) : "") },
+    { key: "p", id: "apg-out-p", label: "Pavement together", value: (r) => r.pair_width_in + " in against a " + r.min_pair_width_in + " in minimum pair" + (r.both_van_layouts_equal ? " - and 132+60 and 96+96 both total 192 in" : "") },
+    { key: "l", id: "apg-out-l", label: "Aisle length", value: (r) => r.length_ok ? "runs the full length of the space" : "SHORT by " + fmt(r.length_deficit_in, 1) + " in" },
+    { key: "s", id: "apg-out-s", label: "Aisle side", value: (r) => r.side_ok === null ? "either side is permitted here" : r.side_ok ? "passenger side, as an angled van space requires" : "DRIVER side on an angled van space - not permitted" },
+    { key: "c", id: "apg-out-c", label: "Vertical clearance", value: (r) => r.clearance_ok === null ? "no 98 in requirement at a car space" : r.clearance_ok ? "98 in or more at the space, aisle, and route" : "SHORT by " + fmt(r.clearance_deficit_in, 1) + " in" },
+    { key: "v", id: "apg-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES 502" : "DOES NOT PASS" },
+    { key: "n", id: "apg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAccessibleParkingGeometry,
+});

@@ -907,7 +907,7 @@ const _TILES = [
   // spec-v520 transformer inrush coordination point
   ["transformer-inrush-point", "A"],
   ["termination-temp-ampacity", "A"],
-  ["ada-ramp-slope", "E"], ["accessible-parking-count", "E"], ["sign-character-height", "E"], ["reach-range", "E"], ["protruding-object-check", "E"], ["accessible-route-width", "E"], ["door-clear-width", "E"], ["floor-level-change", "E"], ["turning-clear-floor-space", "E"], ["handrail-geometry", "E"], ["knee-toe-clearance", "E"], ["flood-opening-area", "E"], ["ada-stair-check", "E"], ["tactile-sign-mounting", "E"], ["drinking-fountain-check", "E"], ["accessible-shower-check", "E"], ["substantial-improvement-check", "E"],
+  ["ada-ramp-slope", "E"], ["accessible-parking-count", "E"], ["sign-character-height", "E"], ["reach-range", "E"], ["protruding-object-check", "E"], ["accessible-route-width", "E"], ["door-clear-width", "E"], ["floor-level-change", "E"], ["turning-clear-floor-space", "E"], ["handrail-geometry", "E"], ["knee-toe-clearance", "E"], ["flood-opening-area", "E"], ["ada-stair-check", "E"], ["tactile-sign-mounting", "E"], ["drinking-fountain-check", "E"], ["accessible-shower-check", "E"], ["substantial-improvement-check", "E"], ["accessible-parking-geometry", "E"],
   ["pool-bonding-680-26", "A"],
 ];
 
