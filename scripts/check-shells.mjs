@@ -113,7 +113,7 @@ const TILE_GZIP_CAP = 6 * 1024;
 // spec-v1102 2026-07-27 (84 -> 88 KB): the Group E construction hub crossed 84 KB at 86,158 B as the
 // +100 campaign added corner-bead, siding-course, snow-guard, and advance-warning-sign tiles. This gate
 // is CI-only (not in `npm run lint`), so run `npm run check:shells` locally per Group-E tile.
-const GROUP_GZIP_CAP = 100 * 1024; // spec-v1147 2026-07-28 (92->100 KB): the Group E construction hub crossed 94,345 B gz as the +100 campaign added its 11th construction tile; raised with tail headroom. Group shells are pre-rendered HTML, not in the app payload. // spec-v1126 2026-07-27 (88->92 KB) // earlier: 84->88 KB
+const GROUP_GZIP_CAP = 112 * 1024; // spec-v1177 2026-07-28 (100->112 KB): the Group E construction hub crossed 102,658 B gz as the ADA batch added its tenth construction tile; raised with tail headroom. Group shells are pre-rendered HTML, not in the app payload. // spec-v1147 2026-07-28 (92->100 KB): the Group E construction hub crossed 94,345 B gz as the +100 campaign added its 11th construction tile; raised with tail headroom. Group shells are pre-rendered HTML, not in the app payload. // spec-v1126 2026-07-27 (88->92 KB) // earlier: 84->88 KB
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

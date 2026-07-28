@@ -13316,3 +13316,99 @@ CONSTRUCTION_RENDERERS["tactile-sign-mounting"] = _simpleRenderer({
   ],
   compute: computeTactileSignMounting,
 });
+
+// ===================== spec-v1177: drinking fountain heights and count (2010 ADA Standards 211, 602) =====================
+
+// One fountain is never enough. 211.2 requires no fewer than TWO: one for a person seated in a
+// wheelchair (602.1 through 602.6) and one for a person standing (602.7). A single unit counts
+// for both only if it complies with BOTH sets - which is what a hi-lo bi-level fountain is, and
+// why a single ordinary fountain, however well mounted, satisfies neither half of the rule.
+// The two heights are opposite ends: the wheelchair spout is 36 in MAXIMUM and the standing
+// spout is 38 in MINIMUM to 43 in maximum. A single spout at 37 in is out of both windows.
+// Two location rules ride along and get skipped: the spout must be at least 15 in from the
+// vertical support and not more than 5 in from the front edge INCLUDING BUMPERS, and the stream
+// must rise 4 in minimum so a cup can be filled under it.
+// dims: in { wheelchair_spout_in: L, standing_spout_in: L, spout_from_support_in: L, spout_from_front_in: L, water_flow_height_in: L } out: { wheelchair_excess_in: L, standing_deficit_in: L, support_deficit_in: L, front_excess_in: L }
+export function computeDrinkingFountainCheck({ units_provided = 0, bi_level = "no", wheelchair_spout_in = 0, standing_spout_in = 0, spout_from_support_in = 0, spout_from_front_in = 0, water_flow_height_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const units = Number(units_provided) || 0;
+  const wc = Number(wheelchair_spout_in) || 0;
+  const st = Number(standing_spout_in) || 0;
+  const sup = Number(spout_from_support_in) || 0;
+  const front = Number(spout_from_front_in) || 0;
+  const flow = Number(water_flow_height_in) || 0;
+  const bi = bi_level === "yes";
+  if (bi_level !== "yes" && bi_level !== "no") return { error: "State whether the unit is bi-level, complying with both height sets (yes or no)." };
+  if (!Number.isInteger(units) || units < 1) return { error: "Units provided must be a whole number, one or more." };
+  if (!(wc > 0)) return { error: "Wheelchair-height spout outlet must be positive (in)." };
+  if (!(st > 0)) return { error: "Standing-height spout outlet must be positive (in) - enter the same value as the wheelchair spout for a single-height unit." };
+  if (sup < 0) return { error: "Distance from the vertical support cannot be negative (in)." };
+  if (front < 0) return { error: "Distance from the front edge cannot be negative (in)." };
+  if (flow < 0) return { error: "Water flow height cannot be negative (in)." };
+
+  const WC_MAX = 36, STAND_MIN = 38, STAND_MAX = 43;
+  const SUPPORT_MIN = 15, FRONT_MAX = 5, FLOW_MIN = 4;
+
+  const wheelchair_ok = wc <= WC_MAX;
+  const wheelchair_excess_in = Math.max(0, wc - WC_MAX);
+  const standing_ok = st >= STAND_MIN && st <= STAND_MAX;
+  const standing_too_low = st < STAND_MIN;
+  const standing_deficit_in = standing_too_low ? STAND_MIN - st : Math.max(0, st - STAND_MAX);
+  // The dead band between the two windows: 36 to 38 in satisfies neither.
+  const dead_band_low_in = WC_MAX, dead_band_high_in = STAND_MIN;
+  const single_height = Math.abs(wc - st) < 1e-9;
+  const in_dead_band = single_height && wc > WC_MAX && wc < STAND_MIN;
+
+  // 211.2: two units, or one bi-level unit that complies with both.
+  const count_ok = units >= 2 || (units === 1 && bi);
+  const substitution_used = units === 1 && bi;
+  const units_short = count_ok ? 0 : 2 - units;
+
+  const support_ok = sup >= SUPPORT_MIN;
+  const support_deficit_in = Math.max(0, SUPPORT_MIN - sup);
+  const front_ok = front <= FRONT_MAX;
+  const front_excess_in = Math.max(0, front - FRONT_MAX);
+  const flow_ok = flow >= FLOW_MIN;
+  const flow_deficit_in = Math.max(0, FLOW_MIN - flow);
+
+  const passes = count_ok && wheelchair_ok && standing_ok && support_ok && front_ok && flow_ok;
+
+  const note = "ONE FOUNTAIN IS NEVER ENOUGH. 211.2 requires no fewer than TWO: one complying with 602.1 through 602.6, for a person seated in a wheelchair, and one complying with 602.7, for a person standing. A single unit substitutes for both ONLY if it complies with both sets - which is what a bi-level hi-lo fountain is, and why one ordinary fountain, however carefully mounted, satisfies neither half of the requirement. "
+    + units + " unit" + (units === 1 ? "" : "s") + " provided" + (bi ? ", bi-level" : "") + ": " + (count_ok ? (substitution_used ? "the single-unit substitution applies. " : "the count is met. ") : "SHORT by " + units_short + " - a single non-bi-level fountain is not a compliant installation whatever its height. ")
+    + "THE TWO HEIGHTS ARE OPPOSITE ENDS, and the gap between them is real: the wheelchair spout outlet is 36 in MAXIMUM and the standing spout is 38 in MINIMUM to 43 in maximum. Nothing between 36 and 38 in satisfies either. "
+    + "Wheelchair spout " + wc + " in: " + (wheelchair_ok ? "OK. " : "OVER by " + wheelchair_excess_in.toFixed(2) + " in. ")
+    + "Standing spout " + st + " in: " + (standing_ok ? "OK. " : standing_too_low ? "UNDER the 38 in minimum by " + standing_deficit_in.toFixed(2) + " in - a standing fountain can be too LOW, which is the half people never check because low reads as accessible. " : "OVER the 43 in maximum by " + standing_deficit_in.toFixed(2) + " in. ")
+    + (in_dead_band ? "BOTH SPOUTS ARE AT THE SAME HEIGHT AND THAT HEIGHT IS IN THE DEAD BAND between " + dead_band_low_in + " and " + dead_band_high_in + " in, so this installation satisfies NEITHER window - the classic single fountain set at a comfortable-looking height. " : single_height ? "Both spouts are at the same height, so this is a single-height unit and only one of the two windows can be satisfied. " : "")
+    + "TWO LOCATION RULES GET SKIPPED. The spout must be at least 15 in from the VERTICAL SUPPORT - entered " + sup + " in, " + (support_ok ? "OK" : "SHORT by " + support_deficit_in.toFixed(2) + " in") + " - and not more than 5 in from the front edge of the unit INCLUDING BUMPERS, which is the phrase that catches a retrofit: entered " + front + " in, " + (front_ok ? "OK. " : "OVER by " + front_excess_in.toFixed(2) + " in, and bumpers added later can push a compliant fountain out of tolerance without anyone touching the plumbing. ")
+    + "The stream must rise 4 in minimum so a cup can be filled under it - entered " + flow + " in, " + (flow_ok ? "OK. " : "SHORT by " + flow_deficit_in.toFixed(2) + " in. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: the clear floor space and forward approach the wheelchair unit needs, and the knee and toe clearance under it, which are separate tiles; the angle of the water stream, which the standard limits differently depending on how far the spout sits from the front; controls and their operating force and one-hand operation; whether drinking fountains are provided at all, and where more than the minimum are provided, the further requirement that they be distributed; wall-hung units as protruding objects, which is a separate section and a frequent failure at the same fixture; bottle fillers, which do not substitute for either unit; and state and local accessibility law and the plumbing code's own fixture counts. A fixture screen, not a rough-in; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { count_ok, substitution_used, units_short, wheelchair_ok, wheelchair_excess_in, standing_ok, standing_too_low, standing_deficit_in, single_height, in_dead_band, dead_band_low_in, dead_band_high_in, support_ok, support_deficit_in, front_ok, front_excess_in, flow_ok, flow_deficit_in, passes, note };
+}
+
+export const drinkingFountainCheckExample = { inputs: { units_provided: 1, bi_level: "no", wheelchair_spout_in: 37, standing_spout_in: 37, spout_from_support_in: 15, spout_from_front_in: 5, water_flow_height_in: 4 } };
+
+CONSTRUCTION_RENDERERS["drinking-fountain-check"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 211.2, 602.4, 602.5, 602.6, and 602.7. A US federal standard in the public domain. 211.2: no fewer than two drinking fountains shall be provided; one drinking fountain shall comply with 602.1 through 602.6 and one drinking fountain shall comply with 602.7; exception - where a single drinking fountain complies with 602.1 through 602.6 and 602.7, it shall be permitted to be substituted for two separate drinking fountains. 602.4: spout outlets shall be 36 in maximum above the finish floor or ground. 602.5: the spout shall be located 15 in minimum from the vertical support and 5 in maximum from the front edge of the unit, including bumpers. 602.6: the spout shall provide a flow of water 4 in high minimum. 602.7: spout outlets of drinking fountains for standing persons shall be 38 in minimum and 43 in maximum above the finish floor or ground. Not checked: clear floor space and knee and toe clearance at the wheelchair unit, which are separate tiles; the angle of the water stream; controls and their operation; whether fountains are provided at all and the distribution required where more than the minimum are provided; wall-hung units as protruding objects; bottle fillers, which do not substitute for either unit; or state and local law and the plumbing code's fixture counts. A fixture screen, not a rough-in.",
+  example: drinkingFountainCheckExample.inputs,
+  fields: [
+    { key: "units_provided", label: "Drinking fountains provided at this location", kind: "number", default: 1 },
+    { key: "bi_level", label: "Bi-level unit complying with both height sets?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+    { key: "wheelchair_spout_in", label: "Wheelchair-height spout outlet (in above the floor)", kind: "number", default: 37 },
+    { key: "standing_spout_in", label: "Standing-height spout outlet (in above the floor)", kind: "number", default: 37 },
+    { key: "spout_from_support_in", label: "Spout distance from the vertical support (in)", kind: "number", default: 15 },
+    { key: "spout_from_front_in", label: "Spout distance from the front edge, including bumpers (in)", kind: "number", default: 5 },
+    { key: "water_flow_height_in", label: "Height of the water stream (in)", kind: "number", default: 4 },
+  ],
+  outputs: [
+    { key: "c", id: "dfc-out-c", label: "Count", value: (r) => r.count_ok ? (r.substitution_used ? "one bi-level unit, substituting for two" : "two or more provided") : "SHORT by " + r.units_short + " - one ordinary fountain is never compliant" },
+    { key: "w", id: "dfc-out-w", label: "Wheelchair spout (36 in max)", value: (r) => r.wheelchair_ok ? "OK" : "over by " + fmt(r.wheelchair_excess_in, 2) + " in" },
+    { key: "s", id: "dfc-out-s", label: "Standing spout (38 to 43 in)", value: (r) => r.standing_ok ? "OK" : r.standing_too_low ? "UNDER 38 in by " + fmt(r.standing_deficit_in, 2) + " in" : "over 43 in by " + fmt(r.standing_deficit_in, 2) + " in" },
+    { key: "d", id: "dfc-out-d", label: "The dead band", value: (r) => r.in_dead_band ? "both spouts sit between " + r.dead_band_low_in + " and " + r.dead_band_high_in + " in, satisfying NEITHER window" : "not in the " + r.dead_band_low_in + " to " + r.dead_band_high_in + " in gap" },
+    { key: "l", id: "dfc-out-l", label: "Spout location and flow", value: (r) => [r.support_ok ? null : "under 15 in from the support", r.front_ok ? null : "over 5 in from the front edge", r.flow_ok ? null : "stream under 4 in"].filter(Boolean).join(", ") || "support distance, front distance, and stream height all met" },
+    { key: "v", id: "dfc-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "dfc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDrinkingFountainCheck,
+});

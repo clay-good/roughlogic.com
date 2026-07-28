@@ -34769,3 +34769,66 @@ test("bounds: spec-v1176 computeTactileSignMounting pins the two-baseline budget
   assert.ok("error" in _v1176({ ...base, clear_space_depth_in: 0 }));
   assert.ok("error" in _v1176({ ...base, lowest_baseline_in: Infinity }));
 });
+
+import { computeDrinkingFountainCheck as _v1177 } from "../../calc-construction.js";
+
+test("bounds: spec-v1177 computeDrinkingFountainCheck pins the two-unit rule, the dead band between the windows, the location rules, and error seams", () => {
+  const base = { units_provided: 1, bi_level: "no", wheelchair_spout_in: 37, standing_spout_in: 37, spout_from_support_in: 15, spout_from_front_in: 5, water_flow_height_in: 4 };
+  const r = _v1177(base);
+  assert.ok(!r.count_ok && r.units_short === 1 && !r.wheelchair_ok && r.wheelchair_excess_in === 1);
+  assert.ok(!r.standing_ok && r.standing_too_low && r.standing_deficit_in === 1 && r.in_dead_band && !r.passes);
+  // THE COUNT: one unit only works bi-level; two always works.
+  assert.ok(!_v1177({ ...base, units_provided: 1, bi_level: "no" }).count_ok);
+  assert.ok(_v1177({ ...base, units_provided: 1, bi_level: "yes" }).count_ok);
+  assert.ok(_v1177({ ...base, units_provided: 1, bi_level: "yes" }).substitution_used);
+  assert.ok(_v1177({ ...base, units_provided: 2 }).count_ok && !_v1177({ ...base, units_provided: 2 }).substitution_used);
+  assert.ok(_v1177({ ...base, units_provided: 5 }).count_ok);
+  // THE TWO WINDOWS AND THE DEAD BAND BETWEEN THEM.
+  for (const [h, ok] of [[30, true], [36, true], [36.01, false], [40, false]]) {
+    assert.ok(_v1177({ ...base, wheelchair_spout_in: h }).wheelchair_ok === ok, "wheelchair window wrong at " + h);
+  }
+  for (const [h, ok, low] of [[36, false, true], [37.9, false, true], [38, true, false], [43, true, false], [43.1, false, false], [48, false, false]]) {
+    const t = _v1177({ ...base, standing_spout_in: h });
+    assert.ok(t.standing_ok === ok && t.standing_too_low === low, "standing window wrong at " + h);
+  }
+  // Nothing in the dead band satisfies either window - checked directly.
+  for (const h of [36.01, 36.5, 37, 37.99]) {
+    const t = _v1177({ ...base, wheelchair_spout_in: h, standing_spout_in: h });
+    assert.ok(!t.wheelchair_ok && !t.standing_ok && t.in_dead_band, "the dead band leaked at " + h);
+  }
+  assert.ok(!_v1177({ ...base, wheelchair_spout_in: 36, standing_spout_in: 36 }).in_dead_band, "36 itself is a valid wheelchair height");
+  assert.ok(!_v1177({ ...base, wheelchair_spout_in: 38, standing_spout_in: 38 }).in_dead_band, "38 itself is a valid standing height");
+  assert.ok(!_v1177({ ...base, wheelchair_spout_in: 36, standing_spout_in: 40 }).single_height);
+  assert.ok(_v1177({ ...base, wheelchair_spout_in: 36, standing_spout_in: 36 }).single_height);
+  // Deficits are exact and non-negative on both sides of the standing window.
+  for (const h of [30, 38, 45]) {
+    const t = _v1177({ ...base, standing_spout_in: h });
+    const expected = h < 38 ? 38 - h : Math.max(0, h - 43);
+    assert.ok(Math.abs(t.standing_deficit_in - expected) < 1e-9 && t.standing_deficit_in >= 0);
+  }
+  // A fully compliant bi-level installation passes.
+  const good = { units_provided: 1, bi_level: "yes", wheelchair_spout_in: 36, standing_spout_in: 40, spout_from_support_in: 15, spout_from_front_in: 5, water_flow_height_in: 4 };
+  assert.ok(_v1177(good).passes);
+  // THE THREE LOCATION AND FLOW RULES, each failing alone at its own seam.
+  for (const [k, bad, edge] of [["spout_from_support_in", 14.9, 15], ["spout_from_front_in", 5.1, 5], ["water_flow_height_in", 3.9, 4]]) {
+    assert.ok(!_v1177({ ...good, [k]: bad }).passes, k + " must fail on its own");
+    assert.ok(_v1177({ ...good, [k]: edge }).passes, k + " must pass at its boundary");
+  }
+  for (const s of [0, 12, 15, 20]) assert.ok(Math.abs(_v1177({ ...good, spout_from_support_in: s }).support_deficit_in - Math.max(0, 15 - s)) < 1e-9);
+  for (const f of [0, 5, 7, 12]) assert.ok(Math.abs(_v1177({ ...good, spout_from_front_in: f }).front_excess_in - Math.max(0, f - 5)) < 1e-9);
+  for (const w of [0, 3, 4, 6]) assert.ok(Math.abs(_v1177({ ...good, water_flow_height_in: w }).flow_deficit_in - Math.max(0, 4 - w)) < 1e-9);
+  // Every check fails independently.
+  assert.ok(!_v1177({ ...good, bi_level: "no" }).passes);
+  assert.ok(!_v1177({ ...good, wheelchair_spout_in: 37 }).passes);
+  assert.ok(!_v1177({ ...good, standing_spout_in: 37 }).passes);
+  // Error seams.
+  assert.ok("error" in _v1177({ ...base, bi_level: "sort of" }));
+  assert.ok("error" in _v1177({ ...base, units_provided: 0 }));
+  assert.ok("error" in _v1177({ ...base, units_provided: 1.5 }));
+  assert.ok("error" in _v1177({ ...base, wheelchair_spout_in: 0 }));
+  assert.ok("error" in _v1177({ ...base, standing_spout_in: 0 }));
+  assert.ok("error" in _v1177({ ...base, spout_from_support_in: -1 }));
+  assert.ok("error" in _v1177({ ...base, spout_from_front_in: -1 }));
+  assert.ok("error" in _v1177({ ...base, water_flow_height_in: -1 }));
+  assert.ok("error" in _v1177({ ...base, wheelchair_spout_in: Infinity }));
+});

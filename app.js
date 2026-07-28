@@ -537,6 +537,7 @@ const TOOL_MODULES = (() => {
     "flood-opening-area",
     "ada-stair-check",
     "tactile-sign-mounting",
+    "drinking-fountain-check",
     // spec-v332..v334 wood-fastener withdrawal batch.
     "wood-nail-withdrawal", "wood-lag-withdrawal", "wood-screw-withdrawal",
     "cantilever-beam", "section-properties", "combined-stress-axial-bending",

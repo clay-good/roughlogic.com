@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "ada drinking fountain height",
+      "target": "drinking-fountain-check",
+      "kind": "industry"
+    },
+    {
+      "term": "do i need two drinking fountains",
+      "target": "drinking-fountain-check",
+      "kind": "question"
+    },
+    {
+      "term": "hi lo bi level fountain requirement",
+      "target": "drinking-fountain-check",
+      "kind": "industry"
+    },
+    {
+      "term": "how high should a water fountain spout be",
+      "target": "drinking-fountain-check",
+      "kind": "question"
+    },
+    {
       "term": "ada braille sign mounting height",
       "target": "tactile-sign-mounting",
       "kind": "industry"
