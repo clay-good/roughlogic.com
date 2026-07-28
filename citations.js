@@ -10687,6 +10687,21 @@ export const CITATIONS = {
       { name: "Geometry only", value: "no tooth-strength, backlash, or undercut check", source: "scope of this tile" },
     ],
   },
+  "gear-dynamic-tooth-stress": {
+    formula: "D = T / Pd; torque = 63,025 HP / rpm (in-lb); Wt = 2 x torque / D; V = pi D N / 12 (ft/min); Kv = (1200 + V)/1200 for cut or milled teeth, (600 + V)/600 for cast or crude; static sigma = Wt Pd / (F Y) delegated to the landed Lewis tile; dynamic sigma = static x Kv x 1.42 when the gear is an idler; allowable = Sut/3 when a material strength is entered.",
+    edition: "Barth velocity factor applied to the Lewis (1892, public domain) bending equation, as taught in the standard machine-design treatment. The worked example this tile reproduces exactly - a 43-tooth, 20 degree full involute, 8 diametral pitch, 0.5 in wide pinion transmitting 4 HP at 1,000 rpm, giving 8,152 psi - is from W. H. Dornfeld, ME312 Tooth Strength notes (Fairfield University, 2006), following Hamrock Eqs. 14.55 and following.",
+    freeAccess: "Lewis is public domain and the Barth factor is published in free university course notes and machine-design references. No AGMA table, quality-number chart, or geometry-factor curve is reproduced here - none is used.",
+    governance: GOVERNANCE.general,
+    editionNote: "The reason this tile exists is that the static Lewis number is badly optimistic on a real drive. In the pinned example the pitch line runs 1,407 ft/min, Kv comes out 2.17, and the bending stress MORE THAN DOUBLES from 3,752 to 8,152 psi - the same tooth, the same load, just moving. Cast or crude teeth take the harsher 600 base rather than 1200 because a rough profile hammers harder at every mesh. An idler carries an additional 1.42 because it is driven on one flank and drives on the other, so its teeth see a fully reversed cycle rather than a released one. Starting from horsepower and rpm rather than from a tangential load removes the step where most arithmetic errors happen. The static stress is delegated to the landed gear-tooth-bending-stress tile rather than reimplemented, and the fuzzer pins that the two agree exactly, so a fix to the Lewis form factor propagates automatically. Honest limits: Barth is an approximation and a conservative one - it is the ancestor of the AGMA dynamic factor Kv, which is tailored to a measured gear quality number and typically lands between 1 and 1.8, so this will read high against a good-quality gear. Sut/3 is the rough allowable used when no material value is on hand, not a rated endurance limit. Not modeled: the AGMA application, size, load-distribution, and rim-thickness factors, the geometry factor J that corrects Y for stress concentration, and any surface-durability (pitting) check - which frequently governs before bending does. A screen; AGMA 2001 and the gear maker govern.",
+    assumptions: [
+      { name: "Barth velocity factor", value: "(1200 + V)/1200 cut or milled; (600 + V)/600 cast or crude; V in ft/min", source: "Barth, as published in standard machine-design references" },
+      { name: "Load from power", value: "torque = 63,025 HP / rpm; Wt = 2 torque / D; V = pi D N / 12", source: "elementary kinematics" },
+      { name: "Static stress", value: "delegated to computeGearToothBendingStress, not reimplemented", source: "landed sibling tile" },
+      { name: "Idler factor", value: "1.42 for fully reversed bending", source: "standard machine-design treatment" },
+      { name: "Allowable", value: "Sut/3, a rough estimate when no material allowable is available", source: "stated scope limit" },
+      { name: "Not modeled", value: "AGMA Ka, Ks, Km, KB, the geometry factor J, and surface durability (pitting)", source: "stated scope limit" },
+    ],
+  },
   "gear-tooth-bending-stress": {
     formula: "sigma = Wt / (F pc y); pc = pi/Pd; y = a - b/T (20 deg full depth a,b = 0.154, 0.912; 14.5 deg full depth 0.124, 0.684; 20 deg stub 0.175, 0.841); Y = pi y gives sigma = Wt Pd/(F Y).",
     edition: "Lewis beam-strength equation (Wilfred Lewis, 1892; public domain) with the standard per-system form-factor closed forms (Shigley / Machinery's Handbook), by name.",

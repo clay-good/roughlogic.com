@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "barth velocity factor",
+      "target": "gear-dynamic-tooth-stress",
+      "kind": "industry"
+    },
+    {
+      "term": "gear tooth stress at speed",
+      "target": "gear-dynamic-tooth-stress",
+      "kind": "question"
+    },
+    {
+      "term": "gear dynamic factor kv",
+      "target": "gear-dynamic-tooth-stress",
+      "kind": "industry"
+    },
+    {
+      "term": "pitch line velocity gear stress",
+      "target": "gear-dynamic-tooth-stress",
+      "kind": "question"
+    },
+    {
+      "term": "idler gear reversed bending",
+      "target": "gear-dynamic-tooth-stress",
+      "kind": "question"
+    },
+    {
       "term": "overturning stability ratio",
       "target": "seismic-overturning-stability",
       "kind": "industry"

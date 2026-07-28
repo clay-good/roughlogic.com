@@ -3123,3 +3123,101 @@ MECHANIC_RENDERERS["belt-deflection-tension"] = _simpleRenderer({
   ],
   compute: computeBeltDeflectionTension,
 });
+
+
+// --- spec-v1125: gear tooth dynamic (Barth) bending stress ---
+// gear-tooth-bending-stress ends by naming exactly what it leaves out: "the Barth velocity
+// factor and the AGMA geometry (J) and load factors are not modeled, so it runs optimistic
+// at speed." This adds the velocity factor, and starts a step earlier - from horsepower and
+// rpm rather than from a tangential load the user has to work out first.
+// The static stress is DELEGATED to the landed Lewis tile so the two cannot drift; this one
+// only multiplies by Kv (and by the idler factor for reversed bending).
+// Kv = (1200 + V)/1200 for cut or milled teeth, (600 + V)/600 for cast or crude teeth, with
+// V the pitch-line velocity in feet per minute.
+// dims: in { horsepower: M L^2 T^-3, rpm: T^-1, number_of_teeth: dimensionless, diametral_pitch_1_in: L^-1, face_width_in: L, tooth_system: dimensionless, y_diametral_override: dimensionless, tooth_cut: dimensionless, is_idler: dimensionless, sut_psi: M L^-1 T^-2 } out: { pitch_diameter_in: L, torque_inlb: M L^2 T^-2, wt_lb: M L T^-2, velocity_fpm: L T^-1, kv: dimensionless, static_stress_psi: M L^-1 T^-2, dynamic_stress_psi: M L^-1 T^-2, allowable_psi: M L^-1 T^-2, safety_factor: dimensionless }
+export function computeGearDynamicToothStress({ horsepower = 0, rpm = 0, number_of_teeth = 0, diametral_pitch_1_in = 0, face_width_in = 0, tooth_system = "20-full-depth", y_diametral_override = 0, tooth_cut = "cut", is_idler = "no", sut_psi = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const hp = Number(horsepower) || 0, N = Number(rpm) || 0, T = Number(number_of_teeth) || 0;
+  const Pd = Number(diametral_pitch_1_in) || 0, F = Number(face_width_in) || 0;
+  const Yov = Number(y_diametral_override) || 0, Sut = Number(sut_psi) || 0;
+  if (!(hp > 0)) return { error: "Horsepower must be positive." };
+  if (!(N > 0)) return { error: "Speed must be positive (rpm)." };
+  if (!(Pd > 0)) return { error: "Diametral pitch must be positive (teeth per inch)." };
+  if (!(F > 0)) return { error: "Face width must be positive (in)." };
+  if (!(T >= 6)) return { error: "Number of teeth must be at least 6 for the Lewis form factor." };
+  if (Yov < 0) return { error: "Lewis Y override cannot be negative." };
+  if (Sut < 0) return { error: "Ultimate tensile strength cannot be negative (psi)." };
+
+  const pitch_diameter_in = T / Pd;
+  // 63,025 is 12 x 33,000 / (2 pi): horsepower to inch-pounds of torque at a given rpm.
+  const torque_inlb = 63025 * hp / N;
+  const wt_lb = 2 * torque_inlb / pitch_diameter_in;
+  const velocity_fpm = Math.PI * pitch_diameter_in * N / 12;
+
+  const cast = tooth_cut === "cast";
+  const kv_base = cast ? 600 : 1200;
+  const kv = (kv_base + velocity_fpm) / kv_base;
+
+  // Static Lewis stress from the landed tile, unless a Y is entered from a table or chart.
+  let static_stress_psi, lewis_Y_diametral, undercut_flag = null, y_source;
+  if (Yov > 0) {
+    static_stress_psi = wt_lb * Pd / (F * Yov);
+    lewis_Y_diametral = Yov;
+    y_source = "entered";
+  } else {
+    const base = computeGearToothBendingStress({ transmitted_load_lb: wt_lb, diametral_pitch_1_in: Pd, face_width_in: F, number_of_teeth: T, tooth_system });
+    if (base.error) return { error: base.error };
+    static_stress_psi = base.bending_stress_psi;
+    lewis_Y_diametral = base.lewis_Y_diametral;
+    undercut_flag = base.undercut_flag;
+    y_source = "Lewis y = a - b/T";
+  }
+
+  const idler = is_idler === "yes";
+  const ki = idler ? 1.42 : 1;
+  const dynamic_stress_psi = static_stress_psi * kv * ki;
+  const dynamic_penalty_pct = (dynamic_stress_psi / static_stress_psi - 1) * 100;
+  const allowable_psi = Sut > 0 ? Sut / 3 : null;
+  const safety_factor = allowable_psi !== null ? allowable_psi / dynamic_stress_psi : null;
+
+  const note = "A " + T + "-tooth gear at " + Pd + " diametral pitch is " + pitch_diameter_in.toFixed(3) + " in at the pitch circle, so " + hp + " HP at " + N + " rpm is " + torque_inlb.toFixed(1) + " in-lb of torque and " + wt_lb.toFixed(1) + " lb of tangential load, running at " + velocity_fpm.toFixed(0) + " ft/min at the pitch line. "
+    + "The static Lewis stress is " + static_stress_psi.toFixed(0) + " psi (Y = " + lewis_Y_diametral.toFixed(4) + ", " + y_source + "). "
+    + "Barth multiplies that by Kv = (" + kv_base + " + V)/" + kv_base + " = " + kv.toFixed(4) + " for " + (cast ? "CAST or crude teeth, which take the harsher 600 base because a rough profile hammers harder at every mesh" : "CUT or milled teeth") + ". "
+    + (idler ? "This gear is an IDLER, so the 1.42 reversed-bending factor also applies: an idler is pushed one way by the driver and the other way by the driven gear, and its teeth see a fully reversed cycle rather than a released one. " : "")
+    + "Dynamic stress " + dynamic_stress_psi.toFixed(0) + " psi, " + dynamic_penalty_pct.toFixed(0) + "% above the static value - which is the whole point: the static Lewis number is what the tooth would see if the mesh were quasi-static, and at " + velocity_fpm.toFixed(0) + " ft/min it is not. "
+    + (allowable_psi !== null
+      ? "Against an allowable of Sut/3 = " + allowable_psi.toFixed(0) + " psi the safety factor is " + safety_factor.toFixed(2) + (safety_factor >= 1 ? ". " : " - UNDER 1, the tooth is overstressed on this screen. ")
+      : "Enter an ultimate tensile strength to get the Sut/3 allowable screen. ")
+    + (undercut_flag ? undercut_flag + " " : "")
+    + "Barth is an approximation and a conservative one - it is the ancestor of the AGMA dynamic factor Kv, which is tailored to a measured gear quality number and typically lands between 1 and 1.8. The Sut/3 allowable is a rough estimate for when no material allowable is available, not a rated endurance limit. Not modeled: the AGMA application, size, load-distribution, and rim-thickness factors, the geometry factor J that corrects Y for stress concentration, or any surface-durability (pitting) check, which often governs before bending does. A screen; AGMA 2001 and the gear maker govern.";
+
+  return { pitch_diameter_in, torque_inlb, wt_lb, velocity_fpm, kv, kv_base, cast, static_stress_psi, lewis_Y_diametral, y_source, idler, ki, dynamic_stress_psi, dynamic_penalty_pct, allowable_psi, safety_factor, undercut_flag, note };
+}
+
+export const gearDynamicToothStressExample = { inputs: { horsepower: 4, rpm: 1000, number_of_teeth: 43, diametral_pitch_1_in: 8, face_width_in: 0.5, tooth_system: "20-full-depth", y_diametral_override: 0.4, tooth_cut: "cut", is_idler: "no", sut_psi: 0 } };
+
+MECHANIC_RENDERERS["gear-dynamic-tooth-stress"] = _simpleRenderer({
+  citation: "Citation: the Barth velocity factor applied to the Lewis bending stress - Kv = (1200 + V)/1200 for cut or milled teeth and (600 + V)/600 for cast or crude teeth, with V the pitch-line velocity in feet per minute, so sigma = (Wt Pd / (F Y)) x Kv. The static Lewis stress is delegated to the landed gear-tooth-bending-stress tile rather than reimplemented. Tangential load comes from horsepower and speed: torque = 63,025 HP / rpm in-lb, Wt = 2 T / D, V = pi D N / 12. The 1.42 idler factor accounts for fully reversed bending in a gear driven on one flank and driving on the other. The Sut/3 allowable is the rough estimate used when no material allowable is available, not a rated endurance limit. Barth is the ancestor of the AGMA dynamic factor and is conservative; the AGMA application, size, load-distribution, rim-thickness, and geometry (J) factors and any surface-durability check are not modeled. A screen; AGMA 2001 and the gear maker govern.",
+  example: gearDynamicToothStressExample.inputs,
+  fields: [
+    { key: "horsepower", label: "Transmitted horsepower", kind: "number", default: 4 },
+    { key: "rpm", label: "Gear speed (rpm)", kind: "number", default: 1000 },
+    { key: "number_of_teeth", label: "Number of teeth", kind: "number", default: 43 },
+    { key: "diametral_pitch_1_in", label: "Diametral pitch Pd (teeth per inch)", kind: "number", default: 8 },
+    { key: "face_width_in", label: "Face width F (in)", kind: "number", default: 0.5 },
+    { key: "tooth_system", label: "Tooth system", kind: "select", options: [{ value: "20-full-depth", label: "20 deg full depth", selected: true }, { value: "14.5-full-depth", label: "14.5 deg full depth" }, { value: "20-stub", label: "20 deg stub" }] },
+    { key: "y_diametral_override", label: "Lewis Y override (0 = derive from the tooth system)", kind: "number", default: 0 },
+    { key: "tooth_cut", label: "Tooth quality", kind: "select", options: [{ value: "cut", label: "Cut or milled (Kv base 1200)", selected: true }, { value: "cast", label: "Cast or crude (Kv base 600)" }] },
+    { key: "is_idler", label: "Is this gear an idler?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes - reversed bending, 1.42" }] },
+    { key: "sut_psi", label: "Material ultimate strength Sut (psi; 0 to skip)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "l", id: "gdt-out-l", label: "Tangential load and pitch-line speed", value: (r) => fmt(r.wt_lb, 1) + " lb at " + fmt(r.velocity_fpm, 0) + " ft/min (D = " + fmt(r.pitch_diameter_in, 3) + " in, T = " + fmt(r.torque_inlb, 1) + " in-lb)" },
+    { key: "s", id: "gdt-out-s", label: "Static Lewis stress", value: (r) => fmt(r.static_stress_psi, 0) + " psi (Y = " + fmt(r.lewis_Y_diametral, 4) + ")" },
+    { key: "k", id: "gdt-out-k", label: "Barth velocity factor", value: (r) => fmt(r.kv, 4) + " = (" + r.kv_base + " + " + fmt(r.velocity_fpm, 0) + ") / " + r.kv_base + (r.idler ? ", plus the 1.42 idler factor" : "") },
+    { key: "d", id: "gdt-out-d", label: "Dynamic bending stress", value: (r) => fmt(r.dynamic_stress_psi, 0) + " psi (+" + fmt(r.dynamic_penalty_pct, 0) + "% over static)" },
+    { key: "f", id: "gdt-out-f", label: "Against an Sut/3 allowable", value: (r) => r.allowable_psi === null ? "- (enter Sut)" : fmt(r.allowable_psi, 0) + " psi, safety factor " + fmt(r.safety_factor, 2) },
+    { key: "n", id: "gdt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGearDynamicToothStress,
+});

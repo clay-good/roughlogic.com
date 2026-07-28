@@ -31661,3 +31661,62 @@ test("bounds: spec-v1124 computeSeismicOverturningStability pins the Ev subtract
   assert.ok("error" in _v1124({ ...base, required_ratio: 0 }));
   assert.ok("error" in _v1124({ ...base, dead_load_kip: Infinity }));
 });
+
+import { computeGearDynamicToothStress as _v1125 } from "../../calc-mechanic.js";
+import { computeGearToothBendingStress as _v1125sib } from "../../calc-mechanic.js";
+
+test("bounds: spec-v1125 computeGearDynamicToothStress reproduces the published example, pins the Barth factor and the delegated Lewis stress, and covers the error seams", () => {
+  const base = { horsepower: 4, rpm: 1000, number_of_teeth: 43, diametral_pitch_1_in: 8, face_width_in: 0.5, tooth_system: "20-full-depth", y_diametral_override: 0.4, tooth_cut: "cut", is_idler: "no", sut_psi: 0 };
+  const r = _v1125(base);
+  assert.ok(r.pitch_diameter_in === 5.375 && Math.abs(r.torque_inlb - 252.1) < 1e-9);
+  assert.ok(Math.abs(r.wt_lb - 93.804651) < 1e-5 && Math.abs(r.velocity_fpm - 1407.171709) < 1e-5);
+  assert.ok(Math.abs(r.dynamic_stress_psi - 8152.16) < 0.01, "must reproduce the published 8152 psi");
+  // Velocity more than doubles the stress here, and Kv is exactly the published ratio.
+  assert.ok(Math.abs(r.kv - (1200 + r.velocity_fpm) / 1200) < 1e-15 && r.kv > 2);
+  assert.ok(Math.abs(r.dynamic_stress_psi / r.static_stress_psi - r.kv) < 1e-12);
+  // CROSS-IMPLEMENTATION: with no override the static stress must be exactly the Lewis tile's.
+  for (const T of [12, 20, 43, 80]) {
+    for (const sys of ["20-full-depth", "14.5-full-depth", "20-stub"]) {
+      const t = _v1125({ ...base, number_of_teeth: T, tooth_system: sys, y_diametral_override: 0 });
+      const sib = _v1125sib({ transmitted_load_lb: t.wt_lb, diametral_pitch_1_in: 8, face_width_in: 0.5, number_of_teeth: T, tooth_system: sys });
+      assert.ok(t.static_stress_psi === sib.bending_stress_psi, "delegated Lewis stress disagrees at T=" + T);
+      assert.ok(t.lewis_Y_diametral === sib.lewis_Y_diametral);
+    }
+  }
+  // An override replaces Y and nothing else; sigma is inversely proportional to it.
+  const ov = _v1125({ ...base, y_diametral_override: 0.8 });
+  assert.ok(Math.abs(ov.static_stress_psi * 2 - r.static_stress_psi) < 1e-9 && ov.y_source === "entered");
+  // Kv >= 1 always, equals 1 only at zero speed, and cast teeth are always penalized harder.
+  let prev = 0;
+  for (const N of [10, 100, 500, 1000, 3000]) {
+    const cut = _v1125({ ...base, rpm: N });
+    const cast = _v1125({ ...base, rpm: N, tooth_cut: "cast" });
+    assert.ok(cut.kv > 1 && cast.kv > cut.kv, "cast must take the harsher factor");
+    assert.ok(Math.abs(cast.kv - (600 + cast.velocity_fpm) / 600) < 1e-15);
+    assert.ok(cut.kv > prev); prev = cut.kv;
+    // Same speed, same geometry: only Kv differs between the two qualities.
+    assert.ok(Math.abs(cut.static_stress_psi - cast.static_stress_psi) < 1e-9);
+    assert.ok(Math.abs(cast.dynamic_stress_psi / cut.dynamic_stress_psi - cast.kv / cut.kv) < 1e-12);
+  }
+  // The idler factor is exactly 1.42 on top of everything else.
+  const idler = _v1125({ ...base, is_idler: "yes" });
+  assert.ok(Math.abs(idler.dynamic_stress_psi / r.dynamic_stress_psi - 1.42) < 1e-12 && idler.ki === 1.42);
+  assert.ok(idler.static_stress_psi === r.static_stress_psi, "the idler factor is not a static effect");
+  // Torque and load scale with power; speed raises Kv but lowers the load at fixed power.
+  assert.ok(Math.abs(_v1125({ ...base, horsepower: 8 }).wt_lb - 2 * r.wt_lb) < 1e-9);
+  assert.ok(_v1125({ ...base, rpm: 2000 }).wt_lb < r.wt_lb && _v1125({ ...base, rpm: 2000 }).kv > r.kv);
+  // The Sut/3 allowable and its safety factor.
+  const withSut = _v1125({ ...base, sut_psi: 60000 });
+  assert.ok(withSut.allowable_psi === 20000 && Math.abs(withSut.safety_factor - 20000 / withSut.dynamic_stress_psi) < 1e-12);
+  assert.ok(r.allowable_psi === null && r.safety_factor === null, "no Sut means no fabricated allowable");
+  // Error seams.
+  assert.ok("error" in _v1125({ ...base, horsepower: 0 }));
+  assert.ok("error" in _v1125({ ...base, rpm: 0 }));
+  assert.ok("error" in _v1125({ ...base, diametral_pitch_1_in: 0 }));
+  assert.ok("error" in _v1125({ ...base, face_width_in: 0 }));
+  assert.ok("error" in _v1125({ ...base, number_of_teeth: 5 }));
+  assert.ok("error" in _v1125({ ...base, y_diametral_override: -1 }));
+  assert.ok("error" in _v1125({ ...base, sut_psi: -1 }));
+  assert.ok("error" in _v1125({ ...base, tooth_system: "nope", y_diametral_override: 0 }));
+  assert.ok("error" in _v1125({ ...base, horsepower: Infinity }));
+});

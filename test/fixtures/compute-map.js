@@ -156,6 +156,7 @@ export const COMPUTE_MAP = {
   "helical-spring-rate": { module: "../../calc-mechanic.js", fn: "computeHelicalSpringRate" },
   "spring-wire-stress": { module: "../../calc-mechanic.js", fn: "computeSpringWireStress" },
   "gear-tooth-bending-stress": { module: "../../calc-mechanic.js", fn: "computeGearToothBendingStress" },
+  "gear-dynamic-tooth-stress": { module: "../../calc-mechanic.js", fn: "computeGearDynamicToothStress" },
   "trap-seal-loss": { module: "../../calc-plumbing.js", fn: "computeTrapSealLoss" },
   "water-meter-sizing": { module: "../../calc-plumbing.js", fn: "computeWaterMeterSizing" },
   "drying-chamber-co2": { module: "../../calc-restoration.js", fn: "computeDryingChamberCO2" },
