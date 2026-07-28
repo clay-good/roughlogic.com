@@ -35036,3 +35036,65 @@ test("bounds: spec-v1180 computeAccessibleParkingGeometry pins the two legal van
   assert.ok("error" in _v1180({ ...base, surface_slope_ratio: 0 }));
   assert.ok("error" in _v1180({ ...base, space_width_in: Infinity }));
 });
+
+import { computeWaterClosetLocation as _v1181 } from "../../calc-construction.js";
+
+test("bounds: spec-v1181 computeWaterClosetLocation pins both windows, the IPC comparison, the clearance, the flush side, and error seams", () => {
+  const base = { centerline_in: 15, seat_height_in: 16.5, clear_side_in: 60, clear_rear_in: 56, flush_side: "open", ambulatory: "no" };
+  const r = _v1181(base);
+  assert.ok(!r.centerline_ok && r.centerline_too_close && r.centerline_deficit_in === 1 && r.meets_ipc_only);
+  assert.ok(!r.seat_ok && r.seat_too_low && r.seat_deficit_in === 0.5 && r.clearance_ok && !r.passes);
+  assert.ok(Math.abs(r.clear_area_sf - r.required_area_sf) < 1e-9);
+  // THE CENTERLINE IS A WINDOW - and 15, the plumbing minimum, is outside it.
+  for (const [c, ok, close, ipc] of [[14.9, false, true, false], [15, false, true, true], [15.9, false, true, true], [16, true, false, false], [18, true, false, false], [18.1, false, false, false], [20, false, false, false]]) {
+    const t = _v1181({ ...base, centerline_in: c });
+    assert.ok(t.centerline_ok === ok && t.centerline_too_close === close, "centerline window wrong at " + c);
+    assert.ok(t.meets_ipc_only === ipc, "the IPC-only flag is wrong at " + c);
+  }
+  for (const c of [12, 15, 17, 22]) {
+    const t = _v1181({ ...base, centerline_in: c });
+    const expected = c < 16 ? 16 - c : Math.max(0, c - 18);
+    assert.ok(Math.abs(t.centerline_deficit_in - expected) < 1e-9 && t.centerline_deficit_in >= 0);
+  }
+  // THE SEAT IS A WINDOW TOO - too high is a real failure.
+  for (const [s, ok, low] of [[16.9, false, true], [17, true, false], [19, true, false], [19.1, false, false], [21, false, false]]) {
+    const t = _v1181({ ...base, seat_height_in: s });
+    assert.ok(t.seat_ok === ok && t.seat_too_low === low, "seat window wrong at " + s);
+  }
+  const good = { ...base, centerline_in: 17, seat_height_in: 18 };
+  assert.ok(_v1181(good).passes);
+  assert.ok(!_v1181({ ...good, seat_height_in: 20 }).passes && !_v1181({ ...good, seat_height_in: 20 }).seat_too_low);
+  // CLEARANCE: 60 side and 56 rear, each failing alone, with exact deficits.
+  for (const [cs, cr] of [[60, 56], [54, 56], [60, 50], [40, 40], [72, 72]]) {
+    const t = _v1181({ ...good, clear_side_in: cs, clear_rear_in: cr });
+    assert.ok(Math.abs(t.side_deficit_in - Math.max(0, 60 - cs)) < 1e-9 && t.side_deficit_in >= 0);
+    assert.ok(Math.abs(t.rear_deficit_in - Math.max(0, 56 - cr)) < 1e-9 && t.rear_deficit_in >= 0);
+    assert.ok(t.clearance_ok === (cs >= 60 && cr >= 56));
+    assert.ok(Math.abs(t.clear_area_sf - (cs * cr) / 144) < 1e-9);
+  }
+  assert.ok(!_v1181({ ...good, clear_side_in: 59.9 }).passes);
+  assert.ok(!_v1181({ ...good, clear_rear_in: 55.9 }).passes);
+  assert.ok(Math.abs(_v1181(good).required_area_sf - (60 * 56) / 144) < 1e-9);
+  // Clearance is optional and reports null rather than a pass when omitted.
+  const noClear = _v1181({ ...good, clear_side_in: 0, clear_rear_in: 0 });
+  assert.ok(!noClear.clearance_entered && noClear.clearance_ok === null && noClear.clear_area_sf === null && noClear.passes);
+  assert.ok(_v1181({ ...good, clear_side_in: 60, clear_rear_in: 0 }).clearance_entered, "either dimension counts as entered");
+  // FLUSH SIDE: open required, except in an ambulatory compartment where the rule does not apply.
+  assert.ok(_v1181({ ...good, flush_side: "open" }).flush_ok === true);
+  assert.ok(_v1181({ ...good, flush_side: "wall" }).flush_ok === false && !_v1181({ ...good, flush_side: "wall" }).passes);
+  assert.ok(_v1181({ ...good, flush_side: "wall", ambulatory: "yes" }).flush_ok === null);
+  assert.ok(_v1181({ ...good, flush_side: "wall", ambulatory: "yes" }).passes, "the rule is lifted in an ambulatory compartment");
+  assert.ok(!_v1181({ ...good, ambulatory: "yes" }).flush_rule_applies);
+  // Every check fails independently.
+  assert.ok(!_v1181({ ...good, centerline_in: 15 }).passes);
+  assert.ok(!_v1181({ ...good, seat_height_in: 16 }).passes);
+  assert.ok(!_v1181({ ...good, clear_side_in: 48 }).passes);
+  // Error seams.
+  assert.ok("error" in _v1181({ ...base, flush_side: "either" }));
+  assert.ok("error" in _v1181({ ...base, ambulatory: "maybe" }));
+  assert.ok("error" in _v1181({ ...base, centerline_in: 0 }));
+  assert.ok("error" in _v1181({ ...base, seat_height_in: 0 }));
+  assert.ok("error" in _v1181({ ...base, clear_side_in: -1 }));
+  assert.ok("error" in _v1181({ ...base, clear_rear_in: -1 }));
+  assert.ok("error" in _v1181({ ...base, centerline_in: Infinity }));
+});

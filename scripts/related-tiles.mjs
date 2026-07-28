@@ -906,6 +906,7 @@ const RELATED = {
   "ada-ramp-slope": ["ramp-slope", "stair-stringer", "egress-capacity", "egress-travel-distance"],
   "accessible-parking-count": ["ada-ramp-slope", "striping-paint-quantity", "asphalt-paving-speed", "accessible-parking-geometry", "sign-character-height"],
   "accessible-parking-geometry": ["accessible-parking-count", "ada-ramp-slope", "striping-paint-quantity", "accessible-route-width"],
+  "water-closet-location": ["grab-bar-layout", "accessible-toilet-compartment", "fixture-clearance-check", "knee-toe-clearance"],
   "sign-character-height": ["accessible-parking-count", "accessible-toilet-compartment", "ada-ramp-slope", "reach-range"],
   "reach-range": ["sign-character-height", "accessible-toilet-compartment", "grab-bar-layout", "protruding-object-check"],
   "protruding-object-check": ["reach-range", "sign-character-height", "accessible-route-width", "egress-capacity"],

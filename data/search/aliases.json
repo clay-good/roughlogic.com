@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "ada toilet centerline from wall",
+      "target": "water-closet-location",
+      "kind": "industry"
+    },
+    {
+      "term": "is 15 inches enough for an ada toilet",
+      "target": "water-closet-location",
+      "kind": "question"
+    },
+    {
+      "term": "ada toilet seat height 17 to 19",
+      "target": "water-closet-location",
+      "kind": "industry"
+    },
+    {
+      "term": "which side does the flush handle go on",
+      "target": "water-closet-location",
+      "kind": "question"
+    },
+    {
       "term": "ada van parking space width",
       "target": "accessible-parking-geometry",
       "kind": "industry"

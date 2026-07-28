@@ -13712,3 +13712,94 @@ CONSTRUCTION_RENDERERS["accessible-parking-geometry"] = _simpleRenderer({
   ],
   compute: computeAccessibleParkingGeometry,
 });
+
+// ===================== spec-v1181: water closet location and seat height (2010 ADA Standards 604) =====================
+
+// The centerline everyone remembers as "18 in" is a WINDOW of 16 to 18, and the plumbing code's
+// 15 in minimum is not in it. So a water closet roughed at the IPC minimum is code-compliant and
+// ADA-noncompliant by an inch, and a closet set at 20 in - which reads as generous - fails on the
+// other end. There is exactly three inches of usable rough-in between the two codes and two of
+// them are unusable.
+// The seat is 17 to 19 in to the TOP OF THE SEAT, so a standard 15 in bowl with a thick seat can
+// land under it and a comfort-height bowl with a thick seat can land over it.
+// The clearance around the closet is 60 in from the SIDE wall and 56 in from the REAR - and it is
+// clearance, not a compartment: it must be clear of everything, which is why a lavatory that fits
+// the room can still fail by standing in it.
+// dims: in { centerline_in: L, seat_height_in: L, clear_side_in: L, clear_rear_in: L } out: { centerline_deficit_in: L, seat_deficit_in: L, side_deficit_in: L, rear_deficit_in: L }
+export function computeWaterClosetLocation({ centerline_in = 0, seat_height_in = 0, clear_side_in = 0, clear_rear_in = 0, flush_side = "open", ambulatory = "no" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const c = Number(centerline_in) || 0;
+  const s = Number(seat_height_in) || 0;
+  const cs = Number(clear_side_in) || 0;
+  const cr = Number(clear_rear_in) || 0;
+  const amb = ambulatory === "yes";
+  if (flush_side !== "open" && flush_side !== "wall") return { error: "Flush control side must be open or wall." };
+  if (ambulatory !== "yes" && ambulatory !== "no") return { error: "State whether this is an ambulatory accessible compartment (yes or no)." };
+  if (!(c > 0)) return { error: "Centerline distance from the side wall must be positive (in)." };
+  if (!(s > 0)) return { error: "Seat height must be positive (in)." };
+  if (cs < 0 || cr < 0) return { error: "Clearances cannot be negative (in)." };
+
+  const C_MIN = 16, C_MAX = 18, S_MIN = 17, S_MAX = 19;
+  const SIDE_MIN = 60, REAR_MIN = 56, IPC_MIN = 15;
+
+  const centerline_ok = c >= C_MIN && c <= C_MAX;
+  const centerline_too_close = c < C_MIN;
+  const centerline_deficit_in = centerline_too_close ? C_MIN - c : Math.max(0, c - C_MAX);
+  const meets_ipc_only = c >= IPC_MIN && c < C_MIN;
+
+  const seat_ok = s >= S_MIN && s <= S_MAX;
+  const seat_too_low = s < S_MIN;
+  const seat_deficit_in = seat_too_low ? S_MIN - s : Math.max(0, s - S_MAX);
+
+  const clearance_entered = cs > 0 || cr > 0;
+  const side_ok = clearance_entered ? cs >= SIDE_MIN : null;
+  const rear_ok = clearance_entered ? cr >= REAR_MIN : null;
+  const side_deficit_in = clearance_entered ? Math.max(0, SIDE_MIN - cs) : null;
+  const rear_deficit_in = clearance_entered ? Math.max(0, REAR_MIN - cr) : null;
+  const clearance_ok = clearance_entered ? (side_ok && rear_ok) : null;
+  const clear_area_sf = clearance_entered ? (Math.max(cs, 0) * Math.max(cr, 0)) / 144 : null;
+  const required_area_sf = (SIDE_MIN * REAR_MIN) / 144;
+
+  // Flush controls go on the open side, except in an ambulatory compartment.
+  const flush_rule_applies = !amb;
+  const flush_ok = flush_rule_applies ? flush_side === "open" : null;
+
+  const passes = centerline_ok && seat_ok && (clearance_ok !== false) && (flush_ok !== false);
+
+  const note = "THE 18 IN EVERYONE REMEMBERS IS A WINDOW OF 16 TO 18, and the plumbing code's 15 in minimum is not inside it. A water closet roughed at the IPC minimum is code-compliant and ADA-noncompliant by an inch; one set at 20 in, which reads as generous, fails the other end. There are three inches of rough-in between the two codes and two of them do not work. "
+    + "Centerline " + c + " in: " + (centerline_ok ? "within 16 to 18. " : centerline_too_close ? "TOO CLOSE by " + centerline_deficit_in.toFixed(2) + " in" + (meets_ipc_only ? " - and note that it does satisfy the plumbing code's 15 in minimum, which is exactly how this gets roughed in wrong: the plumber met a code, just not this one. " : ". ") : "TOO FAR by " + centerline_deficit_in.toFixed(2) + " in - a centerline can be too far from the wall, because the grab bar has to be in reach from the seat. ")
+    + "SEAT: 17 to 19 in measured to the TOP OF THE SEAT, not the rim of the bowl - so a standard 15 in bowl with a thick seat can still land under, and a comfort-height bowl with a thick seat can land over. Entered " + s + " in: " + (seat_ok ? "OK. " : seat_too_low ? "UNDER by " + seat_deficit_in.toFixed(2) + " in. " : "OVER by " + seat_deficit_in.toFixed(2) + " in - too high is a real failure, because a transfer works both ways. ")
+    + (clearance_entered
+      ? "CLEARANCE: 60 in minimum measured perpendicular from the SIDE wall and 56 in from the REAR - " + required_area_sf.toFixed(2) + " sq ft of floor. Entered " + cs + " x " + cr + " in (" + clear_area_sf.toFixed(2) + " sq ft): " + (clearance_ok ? "OK. " : (side_ok ? "" : "side short by " + side_deficit_in.toFixed(1) + " in. ") + (rear_ok ? "" : "rear short by " + rear_deficit_in.toFixed(1) + " in. "))
+        + "IT IS CLEARANCE, NOT A COMPARTMENT: it must be clear of everything, which is why a lavatory that fits the room comfortably can still fail by standing in it. "
+      : "No clearance entered. The requirement is 60 in from the side wall by 56 in from the rear, and it must be clear of other fixtures rather than merely inside a compartment. ")
+    + "FLUSH CONTROLS go on the OPEN side of the water closet" + (amb ? ", except in an ambulatory accessible compartment - which this is, so the rule does not apply here. " : ", and this one is on the " + (flush_side === "open" ? "open side. " : "WALL side, which is the side a person transferring cannot reach. Handing is decided when the fixture is ordered, not when it is set, so this is a purchasing error more often than an installation one. "))
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: grab bars, which are a separate tile and whose reaches interact with the centerline; the toilet compartment around it, which has its own dimensions and its own tile; whether the flush control meets the operable-parts requirements for force and one-hand operation; dispensers and their position, which routinely intrude into the clearance; the clear floor space and the approach it permits; the water closet\\'s own rough-in dimension and carrier; children\\'s-use dimensions, which differ; and state and local accessibility law and the plumbing code, whose 15 in is a minimum rather than a target. A fixture location screen, not a rough-in drawing; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { centerline_ok, centerline_too_close, centerline_deficit_in, meets_ipc_only, seat_ok, seat_too_low, seat_deficit_in, clearance_entered, side_ok, rear_ok, side_deficit_in, rear_deficit_in, clearance_ok, clear_area_sf, required_area_sf, flush_rule_applies, flush_ok, passes, note };
+}
+
+export const waterClosetLocationExample = { inputs: { centerline_in: 15, seat_height_in: 16.5, clear_side_in: 60, clear_rear_in: 56, flush_side: "open", ambulatory: "no" } };
+
+CONSTRUCTION_RENDERERS["water-closet-location"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 604.2, 604.3.1, 604.4, and 604.6. A US federal standard in the public domain. 604.2: the water closet shall be positioned with a wall or partition to the rear and to one side, and the centerline of the water closet shall be 16 in minimum to 18 in maximum from the side wall or partition. 604.3.1: clearance around a water closet shall be 60 in minimum measured perpendicular from the side wall and 56 in minimum measured perpendicular from the rear wall. 604.4: the seat height of a water closet above the finish floor shall be 17 in minimum and 19 in maximum measured to the top of the seat. 604.6: flush controls shall be hand operated or automatic, hand operated flush controls shall comply with 309, and flush controls shall be located on the open side of the water closet except in ambulatory accessible compartments complying with 604.8.2. Not checked: grab bars, which are a separate tile; the toilet compartment, which has its own tile; whether the flush control meets the operable-parts requirements; dispensers, which routinely intrude into the clearance; the clear floor space; the fixture's own rough-in and carrier; children's-use dimensions; or state and local law and the plumbing code. A fixture location screen, not a rough-in drawing.",
+  example: waterClosetLocationExample.inputs,
+  fields: [
+    { key: "centerline_in", label: "Centerline from the side wall or partition (in)", kind: "number", default: 15 },
+    { key: "seat_height_in", label: "Seat height to the TOP of the seat (in)", kind: "number", default: 16.5 },
+    { key: "clear_side_in", label: "Clearance from the side wall (in; 0 = skip)", kind: "number", default: 60 },
+    { key: "clear_rear_in", label: "Clearance from the rear wall (in; 0 = skip)", kind: "number", default: 56 },
+    { key: "flush_side", label: "Flush control side", kind: "select", options: [{ value: "open", label: "Open side", selected: true }, { value: "wall", label: "Wall side" }] },
+    { key: "ambulatory", label: "Ambulatory accessible compartment?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+  ],
+  outputs: [
+    { key: "c", id: "wcl-out-c", label: "Centerline (16 to 18 in)", value: (r) => r.centerline_ok ? "within the window" : r.centerline_too_close ? "TOO CLOSE by " + fmt(r.centerline_deficit_in, 2) + " in" + (r.meets_ipc_only ? " - though it does meet the plumbing code's 15 in" : "") : "TOO FAR by " + fmt(r.centerline_deficit_in, 2) + " in" },
+    { key: "s", id: "wcl-out-s", label: "Seat height (17 to 19 in)", value: (r) => r.seat_ok ? "within the window" : r.seat_too_low ? "under by " + fmt(r.seat_deficit_in, 2) + " in" : "over by " + fmt(r.seat_deficit_in, 2) + " in" },
+    { key: "l", id: "wcl-out-l", label: "Clearance (60 side x 56 rear)", value: (r) => r.clearance_ok === null ? "not entered" : r.clearance_ok ? fmt(r.clear_area_sf, 2) + " sq ft - meets both" : [r.side_ok ? null : "side short " + fmt(r.side_deficit_in, 1), r.rear_ok ? null : "rear short " + fmt(r.rear_deficit_in, 1)].filter(Boolean).join(", ") + " in" },
+    { key: "f", id: "wcl-out-f", label: "Flush control", value: (r) => r.flush_ok === null ? "rule does not apply in an ambulatory compartment" : r.flush_ok ? "on the open side" : "on the WALL side - not permitted" },
+    { key: "v", id: "wcl-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "wcl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWaterClosetLocation,
+});
