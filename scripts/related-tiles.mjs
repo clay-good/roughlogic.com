@@ -1167,6 +1167,7 @@ const RELATED = {
   "hydronic-system-volume": ["glycol-mix", "expansion-tank", "radiant-loop-sizing"],
   "pex-homerun-takeoff": ["pipe-sizing", "wsfu-demand", "solder-joint-quantity"],
   "soffit-ridge-vent-count": ["attic-ventilation", "powered-attic-ventilator", "roofing-squares"],
+  "crawl-space-ventilation": ["attic-ventilation", "vapor-barrier-rolls", "soffit-ridge-vent-count"],
   "smoke-detector-spacing-count": ["sprinkler-head-layout", "standby-battery-sizing", "occupant-load"],
   "drypipe-air-compressor": ["fire-pump-curve", "sprinkler-system-demand", "sprinkler-head-layout"],
   "jockey-pump-sizing": ["fire-pump-curve", "sprinkler-system-demand", "drypipe-air-compressor"],

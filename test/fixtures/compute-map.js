@@ -1020,6 +1020,7 @@ export const COMPUTE_MAP = {
   "retaining-wall-block": { module: "../../calc-finish.js", fn: "computeRetainingWallBlock" },
   "srw-geogrid-spacing": { module: "../../calc-finish.js", fn: "computeSrwGeogridSpacing" },
   "attic-ventilation": { module: "../../calc-finish.js", fn: "computeAtticVentilation" },
+  "crawl-space-ventilation": { module: "../../calc-finish.js", fn: "computeCrawlSpaceVentilation" },
   "powered-attic-ventilator": { module: "../../calc-construction.js", fn: "computePoweredAtticVentilator" },
   "gutter-downspout": { module: "../../calc-finish.js", fn: "computeGutterDownspout" },
   "assembly-r-value": { module: "../../calc-hvac.js", fn: "computeAssemblyRValue" },

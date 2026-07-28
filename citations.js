@@ -11511,6 +11511,21 @@ export const CITATIONS = {
       { name: "Embedment + drainage", value: "bury ~1 in per ft, 2 ft x 6 in base pad, 12 in drainage zone (editable); engineered design over ~4 ft", source: "Allan Block / Versa-Lok" },
     ],
   },
+  "crawl-space-ventilation": {
+    formula: "required net free area = under-floor area / ratio, with ratio = the base denominator (IRC 150) or 1500 when an approved Class I vapor retarder covers the ground and the openings are placed for cross ventilation; sq in = sq ft x 144; vents by area = ceil(required sq in / net free area per vent); vents required = max(vents by area, corner count).",
+    edition: "IRC R408.1 / R408.2, under-floor space ventilation. Washington\'s adopted WAC 51-51-0408 amends the base ratio to 1/300, which is why the base denominator is an editable input here rather than a fixed 150.",
+    freeAccess: "The ratio, the 1/1500 exception, the corner rule, and the permitted opening coverings are short prescriptive provisions reproduced in state adoptions and building-department handouts; the 1/1500 exception language and the covering list were read from Washington\'s adopted text. No table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The vapor retarder is the whole story. Going from 1/150 to 1/1500 is a TEN-fold reduction in required opening area, and it is available for the price of covering the ground - which is where nearly all of a crawl space\'s moisture comes from in the first place. A 1,500 sq ft crawl space needs 1,440 sq in and 29 typical vents bare, and 144 sq in and four vents with the retarder, at which point the CORNER rule governs rather than the area: the code wants an opening within 3 ft of each corner regardless of how little area the ratio asks for, so a small or well-sealed crawl space is set by its corners. Both conditions of the exception have to be met - an approved Class I vapor retarder over the ground AND openings placed to provide cross ventilation - not just the plastic. Two further cautions. First, the areas are NET FREE area: a vent\'s mesh, louver, and frame consume a large share of the rough opening, and only the net free area printed on the product counts, so sizing off the hole overstates the ventilation. The code\'s permitted coverings carry minimum sizes of their own (hardware cloth of 0.035 in wire or heavier, corrosion-resistant wire mesh no finer than 1/8 in, and the listed perforated and expanded metal thicknesses), because finer mesh clogs and stops ventilating. Second, the base ratio is genuinely not universal - the base IRC says 1/150 and Washington says 1/300 - so it is an input and the note says to check the adopted code rather than trust a remembered number. An unvented, conditioned crawl space built to R408.3 (continuous sealed Class I vapor retarder lapped 6 in and carried up the stem wall, with conditioned air or a dehumidifier) is a different and often better assembly, and this tile does not size it. A screen; the adopted code and the AHJ govern.",
+    assumptions: [
+      { name: "Base ratio", value: "1 sq ft per 150 sq ft of under-floor area; editable, as jurisdictions amend it", source: "IRC R408.1; WAC 51-51-0408 uses 1/300" },
+      { name: "Vapor-retarder reduction", value: "1/1500, requiring BOTH an approved Class I retarder and cross ventilation", source: "IRC R408.1 exception" },
+      { name: "Corner rule", value: "an opening within 3 ft of each corner, a floor on the vent count", source: "IRC R408.1 / R408.2" },
+      { name: "Net free area", value: "product data off the vent, much less than the rough opening", source: "stated scope limit" },
+      { name: "Covering minimums", value: "hardware cloth 0.035 in wire or heavier; wire mesh no finer than 1/8 in", source: "code list of permitted coverings" },
+      { name: "Unvented alternative", value: "R408.3 conditioned crawl space is a different assembly, not sized here", source: "stated scope limit" },
+    ],
+  },
   "attic-ventilation": {
     formula: "Required NFA = floor area / divisor; x 144 to sq in; split half intake / half exhaust; vents = ceil(intake / per-vent NFA); ridge ft = exhaust / per-foot NFA.",
     edition: "IRC R806 attic-ventilation rule (by name).",

@@ -1067,3 +1067,77 @@ FINISH_RENDERERS["srw-geogrid-spacing"] = _simpleRenderer({
   ],
   compute: computeSrwGeogridSpacing,
 });
+
+
+// --- spec-v1129: crawl space (under-floor) ventilation ---
+// attic-ventilation does the roof; nothing does the floor. IRC R408.1 is the same idea with
+// different numbers and one much bigger lever: the base ratio is 1 sq ft of net free area
+// per 150 sq ft of under-floor area, but covering the ground with an approved Class I vapor
+// retarder and arranging the openings for cross ventilation drops it to 1/1500 - a TEN-fold
+// reduction, because the ground is where nearly all the moisture comes from.
+// The base ratio is an INPUT: jurisdictions amend it (Washington's WAC 51-51-0408 adopts
+// 1/300 rather than 1/150), so shipping one number as if it were universal would be wrong.
+// Net free area per vent is also an input - it is product data off the vent, and it is much
+// less than the rough opening once the mesh or louver is counted.
+// dims: in { floor_area_sf: L^2, base_ratio_denominator: dimensionless, vapor_retarder: dimensionless, vent_net_free_sqin: L^2, corner_count: dimensionless } out: { required_sf: L^2, required_sqin: L^2, ratio_used: dimensionless, vents_by_area: dimensionless, vents_required: dimensionless, provided_sqin: L^2, surplus_sqin: L^2 }
+export function computeCrawlSpaceVentilation({ floor_area_sf = 0, base_ratio_denominator = 150, vapor_retarder = "no", vent_net_free_sqin = 50, corner_count = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(floor_area_sf) || 0;
+  const den = Number(base_ratio_denominator) || 0;
+  const per = Number(vent_net_free_sqin) || 0;
+  const corners = Number(corner_count) || 0;
+  const retarder = vapor_retarder === "yes";
+  if (!(area > 0)) return { error: "Under-floor area must be positive (sq ft)." };
+  if (!(den > 0)) return { error: "The base ventilation ratio denominator must be positive (150 in the base IRC; some states amend it)." };
+  if (!(per > 0)) return { error: "Net free area per vent must be positive (sq in) - read it off the vent, not the rough opening." };
+  if (!Number.isInteger(corners) || corners < 0) return { error: "Corner count must be a whole number of 0 or more." };
+
+  const ratio_used = retarder ? 1500 : den;
+  const required_sf = area / ratio_used;
+  const required_sqin = required_sf * 144;
+  const vents_by_area = Math.ceil(required_sqin / per);
+  // R408.1 also wants an opening within 3 ft of each corner, so the corner count is a floor
+  // on the vent count no matter how little area the ratio asks for.
+  const vents_required = Math.max(vents_by_area, corners);
+  const corner_governs = corners > vents_by_area;
+  const provided_sqin = vents_required * per;
+  const surplus_sqin = provided_sqin - required_sqin;
+  // What the same crawl space would need the other way, so the trade is visible.
+  const alt_ratio = retarder ? den : 1500;
+  const alt_required_sqin = (area / alt_ratio) * 144;
+  const alt_vents = Math.ceil(alt_required_sqin / per);
+
+  const note = "A " + area.toFixed(0) + " sq ft under-floor area at 1/" + ratio_used + " needs " + required_sf.toFixed(2) + " sq ft = " + required_sqin.toFixed(0) + " sq in of NET FREE ventilation area. "
+    + "At " + per + " sq in per vent that is " + vents_by_area + " vent" + (vents_by_area === 1 ? "" : "s") + " by area"
+    + (corner_governs ? ", but the code also wants an opening within 3 ft of EACH corner, so " + corners + " governs - a small crawl space is set by its corners, not its square footage. " : ", and with " + corners + " corners to cover that is still the controlling number. ")
+    + "Order " + vents_required + ", giving " + provided_sqin.toFixed(0) + " sq in against the " + required_sqin.toFixed(0) + " required (" + surplus_sqin.toFixed(0) + " sq in spare). "
+    + (retarder
+      ? "The 1/1500 reduction is taken, which requires an APPROVED CLASS I VAPOR RETARDER over the ground AND the openings arranged for cross ventilation - both conditions, not just the plastic. Without it this same crawl space would need " + alt_required_sqin.toFixed(0) + " sq in and " + alt_vents + " vents. Covering the ground is the cheapest ventilation you can buy, because the ground is where nearly all the moisture comes from. "
+      : "Covering the ground with an approved Class I vapor retarder and arranging the openings for cross ventilation drops the requirement to 1/1500 - " + alt_required_sqin.toFixed(0) + " sq in and " + alt_vents + " vent" + (alt_vents === 1 ? "" : "s") + " instead, a ten-fold cut. That is almost always the cheaper move, because the ground is where nearly all the moisture comes from. ")
+    + "NET FREE AREA, not rough opening: a vent's mesh, louver, and frame eat a large share of the hole, and the net free area printed on the product is the number the code counts. Screening has minimum sizes of its own (hardware cloth of 0.035 in wire or heavier, corrosion-resistant wire mesh no finer than 1/8 in, and the perforated and expanded metal thicknesses the code lists) - finer mesh clogs and stops ventilating. "
+    + "The base ratio is an INPUT because jurisdictions amend it: the base IRC is 1/150 and Washington's adopted code uses 1/300, so check what your AHJ has actually adopted rather than trusting a remembered number. An UNVENTED, conditioned crawl space built to R408.3 is a different and often better assembly - continuous sealed Class I vapor retarder lapped 6 in and run up the stem wall, with conditioned air or a dehumidifier - and this tile does not size that. A screen; the adopted code and the AHJ govern.";
+
+  return { ratio_used, required_sf, required_sqin, vents_by_area, vents_required, corner_governs, provided_sqin, surplus_sqin, alt_ratio, alt_required_sqin, alt_vents, retarder, note };
+}
+
+export const crawlSpaceVentilationExample = { inputs: { floor_area_sf: 1500, base_ratio_denominator: 150, vapor_retarder: "no", vent_net_free_sqin: 50, corner_count: 4 } };
+
+FINISH_RENDERERS["crawl-space-ventilation"] = _simpleRenderer({
+  citation: "Citation: IRC R408.1 / R408.2 under-floor ventilation - a minimum net area of ventilation openings of 1 sq ft for each 150 sq ft of under-floor area, with one opening within 3 ft of each corner of the building, reduced to 1/1500 of the under-floor area where the ground is covered with an approved Class I vapor retarder AND the openings are placed to provide cross ventilation. The base ratio is an editable INPUT because jurisdictions amend it: Washington's WAC 51-51-0408 adopts 1/300 in place of 1/150. Areas are NET FREE area, which is product data off the vent and much less than the rough opening; the code's permitted coverings carry their own minimum sizes (hardware cloth of 0.035 in wire or heavier, corrosion-resistant wire mesh no finer than 1/8 in, and the listed perforated and expanded metal thicknesses). The R408.3 unvented conditioned crawl space is a different assembly and is not sized here. A screen; the adopted code and the AHJ govern.",
+  example: crawlSpaceVentilationExample.inputs,
+  fields: [
+    { key: "floor_area_sf", label: "Under-floor (crawl space) area (sq ft)", kind: "number", default: 1500 },
+    { key: "base_ratio_denominator", label: "Base ratio 1 per N sq ft (IRC 150; WA 300)", kind: "number", default: 150 },
+    { key: "vapor_retarder", label: "Class I vapor retarder over the ground, cross ventilated", kind: "select", options: [{ value: "no", label: "No - use the base ratio", selected: true }, { value: "yes", label: "Yes - the 1/1500 reduction applies" }] },
+    { key: "vent_net_free_sqin", label: "Net free area per vent (sq in, off the product)", kind: "number", default: 50 },
+    { key: "corner_count", label: "Building corners needing an opening within 3 ft", kind: "number", default: 4 },
+  ],
+  outputs: [
+    { key: "q", id: "csv-out-q", label: "Required net free area", value: (r) => fmt(r.required_sqin, 0) + " sq in (" + fmt(r.required_sf, 2) + " sq ft) at 1/" + r.ratio_used },
+    { key: "v", id: "csv-out-v", label: "Vents required", value: (r) => r.vents_required + (r.corner_governs ? " - the corner rule governs, not the area" : " (by area)") },
+    { key: "p", id: "csv-out-p", label: "Provided", value: (r) => fmt(r.provided_sqin, 0) + " sq in, " + fmt(r.surplus_sqin, 0) + " sq in over the requirement" },
+    { key: "a", id: "csv-out-a", label: "The other way", value: (r) => r.retarder ? "without the retarder: " + fmt(r.alt_required_sqin, 0) + " sq in, " + r.alt_vents + " vents" : "with a Class I retarder: " + fmt(r.alt_required_sqin, 0) + " sq in, " + r.alt_vents + " vents" },
+    { key: "n", id: "csv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCrawlSpaceVentilation,
+});

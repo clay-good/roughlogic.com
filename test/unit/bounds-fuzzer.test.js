@@ -31924,3 +31924,62 @@ test("bounds: spec-v1128 computeBallnoseFeedCusp pins the shared cusp geometry, 
   assert.ok("error" in _v1128({ ...base, flutes: 2.5 }));
   assert.ok("error" in _v1128({ ...base, r_in: Infinity }));
 });
+
+import { computeCrawlSpaceVentilation as _v1129 } from "../../calc-finish.js";
+
+test("bounds: spec-v1129 computeCrawlSpaceVentilation pins the 1/150 and 1/1500 ratios, the corner floor, the WA 1/300 amendment, and error seams", () => {
+  const base = { floor_area_sf: 1500, base_ratio_denominator: 150, vapor_retarder: "no", vent_net_free_sqin: 50, corner_count: 4 };
+  const r = _v1129(base);
+  assert.ok(r.ratio_used === 150 && r.required_sf === 10 && r.required_sqin === 1440);
+  assert.ok(r.vents_by_area === 29 && r.vents_required === 29 && !r.corner_governs && r.provided_sqin === 1450);
+  // THE TEN-FOLD LEVER: the retarder takes 1/150 to 1/1500 exactly.
+  const vr = _v1129({ ...base, vapor_retarder: "yes" });
+  assert.ok(vr.ratio_used === 1500 && vr.required_sqin === 144);
+  assert.ok(Math.abs(r.required_sqin / vr.required_sqin - 10) < 1e-12);
+  // ...and then the CORNER rule governs, because 3 vents by area is fewer than 4 corners.
+  assert.ok(vr.vents_by_area === 3 && vr.vents_required === 4 && vr.corner_governs);
+  // Each case reports the other correctly.
+  assert.ok(Math.abs(r.alt_required_sqin - vr.required_sqin) < 1e-9);
+  assert.ok(Math.abs(vr.alt_required_sqin - r.required_sqin) < 1e-9);
+  // The base denominator is honoured, including Washington's 1/300 amendment.
+  for (const den of [100, 150, 300, 500]) {
+    const t = _v1129({ ...base, base_ratio_denominator: den });
+    assert.ok(t.ratio_used === den && Math.abs(t.required_sqin - 1500 / den * 144) < 1e-9);
+    // ...but the retarder always overrides it with 1500, whatever the base is.
+    const tv = _v1129({ ...base, base_ratio_denominator: den, vapor_retarder: "yes" });
+    assert.ok(tv.ratio_used === 1500 && Math.abs(tv.required_sqin - 144) < 1e-9);
+  }
+  assert.ok(Math.abs(_v1129({ ...base, base_ratio_denominator: 300 }).required_sqin - 720) < 1e-9, "WA 1/300 halves it");
+  // Vent count always covers the requirement, and the corner floor is never violated.
+  for (const area of [200, 800, 1500, 4000]) {
+    for (const per of [12, 50, 144]) {
+      for (const corners of [0, 4, 8]) {
+        for (const vrx of ["no", "yes"]) {
+          const t = _v1129({ ...base, floor_area_sf: area, vent_net_free_sqin: per, corner_count: corners, vapor_retarder: vrx });
+          assert.ok(t.provided_sqin >= t.required_sqin - 1e-9, "vents must cover the requirement");
+          assert.ok(t.vents_required >= corners && t.vents_required >= t.vents_by_area);
+          assert.ok(t.surplus_sqin >= -1e-9 && t.provided_sqin === t.vents_required * per);
+          assert.ok(t.corner_governs === (corners > t.vents_by_area));
+          assert.ok(Math.abs(t.required_sqin - t.required_sf * 144) < 1e-9);
+        }
+      }
+    }
+  }
+  // Requirement is linear in area; a bigger vent means fewer of them.
+  assert.ok(Math.abs(_v1129({ ...base, floor_area_sf: 3000 }).required_sqin - 2 * r.required_sqin) < 1e-9);
+  let prev = Infinity;
+  for (const per of [12, 25, 50, 100, 200]) {
+    const t = _v1129({ ...base, vent_net_free_sqin: per });
+    assert.ok(t.vents_required <= prev); prev = t.vents_required;
+  }
+  // Zero corners is legal input and removes the floor entirely.
+  const noCorners = _v1129({ ...base, vapor_retarder: "yes", corner_count: 0 });
+  assert.ok(noCorners.vents_required === 3 && !noCorners.corner_governs);
+  // Error seams.
+  assert.ok("error" in _v1129({ ...base, floor_area_sf: 0 }));
+  assert.ok("error" in _v1129({ ...base, base_ratio_denominator: 0 }));
+  assert.ok("error" in _v1129({ ...base, vent_net_free_sqin: 0 }));
+  assert.ok("error" in _v1129({ ...base, corner_count: -1 }));
+  assert.ok("error" in _v1129({ ...base, corner_count: 3.5 }));
+  assert.ok("error" in _v1129({ ...base, floor_area_sf: Infinity }));
+});

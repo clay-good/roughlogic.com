@@ -557,7 +557,7 @@ const _TILES = [
   ["rebar-lap-splice", "E"],
   ["paver-patio", "E"],
   ["retaining-wall-block", "E"], ["srw-geogrid-spacing", "E"],
-  ["attic-ventilation", "E"], ["powered-attic-ventilator", "E"],
+  ["attic-ventilation", "E"], ["crawl-space-ventilation", "E"], ["powered-attic-ventilator", "E"],
   ["gutter-downspout", "E"], ["gutter-downspout-takeoff", "E"], ["soffit-ridge-vent-count", "E"],
   ["assembly-r-value", "C"],
   ["blown-insulation-coverage", "C"],
