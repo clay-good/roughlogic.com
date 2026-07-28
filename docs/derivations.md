@@ -1818,6 +1818,7 @@ cross-check.
 | calc-cross.js | `computeNoiseDose` | `{ rows = [] } = {}` | _ | _ | _ |
 | calc-cross.js | `computeOvertime` | `{ total_hours, regular_rate, overtime_multiplier = 1.5, double_time_multiplie...` | _ | _ | _ |
 | calc-cross.js | `computePerDiem` | `{ state, type = "lodging" }` | _ | _ | _ |
+| calc-cross.js | `computePortableLadderSetup` | `{ ladder_length_ft = 0, landing_height_ft = 0, extension_above_landing_ft = 0...` | _ | _ | _ |
 | calc-cross.js | `computePulleyMA` | `{ rig = "block_2", efficiency = 0.95 }` | _ | _ | _ |
 | calc-cross.js | `computePumpTdh` | `{ flow_gpm = 0, internal_diameter_in = 0, hw_c = 150, static_suction_lift_ft ...` | _ | _ | _ |
 | calc-cross.js | `computeRainwaterCatchmentArea` | `{ target_annual_gal = 0, annual_in = 0, efficiency = 0.62 } = {}` | _ | _ | _ |
@@ -3200,7 +3201,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1786.
+Row count: 1787.
 
 <!-- END function-corpus-v14 -->
 
@@ -4302,7 +4303,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (65 tiles)
+### Group G Cross-trade (66 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4340,6 +4341,7 @@ per spec-v14 §13.1 second paragraph.
 | `pipe-spacing-rack` | Insulated Pipe Rack Spacing | ASTM C585 + first-principles geometry...; 2.375 in OD + 1 in insulation -> 4.375 in insulated OD; +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-template-wrap` | Pipe Wraparound Template Ordinates | NCCER Pipefitting / standard layout r...; 45 deg cut on 6.625 in OD, 8 stations -> max ordinate 6.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `polygon-miter` | Regular Polygon Miter and Layout | First-principles regular-polygon geom...; regular hexagon, side 12 in -> 30 deg miter, 120 deg inte... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `portable-ladder-setup` | Portable Ladder Setup Geometry (OSHA 1926.1053) | Occupational Safety and Health Admini...; 'When portable ladders are used for access to an upper la... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `press-fit-interference-for-force` | Interference for a Target Press-Fit Holding Force | Lame interference-fit model (Machiner...; spec-v728 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `press-fit-pressure` | Interference Press-Fit Pressure and Holding Force (Lame) | Lame interference-fit model (Machiner...; spec-v511 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pulley-ma-gen` | Pulley System Mechanical Advantage | Project (first-principles); Triple block (block_3, 3 pulleys), efficiency 0.95 -> the... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4925,6 +4927,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1539. Fixture-covered or reference-cadence: 1539 / 1539.
+Tile count: 1540. Fixture-covered or reference-cadence: 1540 / 1540.
 
 <!-- END tile-index-v14 -->

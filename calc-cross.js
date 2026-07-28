@@ -3013,3 +3013,95 @@ const renderSwingFallGeometry = _simpleRendererG({
   compute: computeSwingFallGeometry,
 });
 CROSS_RENDERERS["swing-fall-geometry"] = renderSwingFallGeometry;
+
+// --- spec-v1156: portable ladder setup geometry (OSHA 1926.1053) ---
+// ladder-angle does the 4:1 base setback and stops there. Three other numbers decide whether
+// a ladder is usable, and the first one is the one people improvise around.
+// EXTENSION: side rails shall extend at least 3 ft above the upper landing surface - and the
+// consequence nobody computes is that the 3 ft comes out of the CLIMBABLE length. A 24 ft
+// extension ladder does not reach a 24 ft roof; after the 3 ft extension and the base setback
+// the highest landing it serves is materially lower, and the tile reports that number.
+// If the 3 ft is impossible, the ladder must be secured at its top to a rigid support and a
+// grasping device provided - an alternative, not an excuse.
+// RUNGS: spaced not less than 10 in nor more than 14 in apart, measured between centrelines.
+// It is a WINDOW, and too close fails as surely as too far.
+// WIDTH: minimum clear distance between side rails for all portable ladders is 11.5 in.
+// dims: in { ladder_length_ft: L, landing_height_ft: L, extension_above_landing_ft: L, rung_spacing_in: L, clear_width_in: L, secured_with_grasping_device: dimensionless, base_ratio: dimensionless } out: { required_extension_ft: L, base_setback_ft: L, max_landing_served_ft: L, climbable_height_ft: L }
+export function computePortableLadderSetup({ ladder_length_ft = 0, landing_height_ft = 0, extension_above_landing_ft = 0, rung_spacing_in = 12, clear_width_in = 12, secured_with_grasping_device = "no", base_ratio = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(ladder_length_ft) || 0;
+  const H = Number(landing_height_ft) || 0;
+  const ext = Number(extension_above_landing_ft) || 0;
+  const rs = Number(rung_spacing_in) || 0;
+  const cw = Number(clear_width_in) || 0;
+  const ratio = Number(base_ratio) || 0;
+  const secured = secured_with_grasping_device === "yes";
+  if (!(L > 0)) return { error: "Ladder length must be positive (ft)." };
+  if (!(H > 0)) return { error: "Landing height must be positive (ft)." };
+  if (ext < 0) return { error: "Extension above the landing cannot be negative (ft)." };
+  if (!(rs > 0)) return { error: "Rung spacing must be positive (in)." };
+  if (!(cw > 0)) return { error: "Clear width between side rails must be positive (in)." };
+  if (!(ratio > 0)) return { error: "The base ratio must be positive (4 for the 4:1 rule)." };
+
+  const REQ_EXT = 3, RUNG_MIN = 10, RUNG_MAX = 14, WIDTH_MIN = 11.5;
+  // Extension: required unless secured at the top with a grasping device.
+  const extension_ok = ext >= REQ_EXT || secured;
+  const extension_by_alternative = ext < REQ_EXT && secured;
+  const extension_shortfall_ft = Math.max(0, REQ_EXT - ext);
+
+  // The reach arithmetic nobody does: setback and extension both eat the ladder.
+  // A ladder at a b:1 ratio has its top at H, so its length along the rail is
+  // sqrt(H^2 + (H/ratio)^2) = H sqrt(1 + 1/ratio^2).
+  const railPerFootOfHeight = Math.sqrt(1 + 1 / (ratio * ratio));
+  const base_setback_ft = H / ratio;
+  const rail_used_to_landing_ft = H * railPerFootOfHeight;
+  const rail_used_total_ft = rail_used_to_landing_ft + REQ_EXT * railPerFootOfHeight;
+  const length_ok = rail_used_total_ft <= L;
+  const length_short_ft = Math.max(0, rail_used_total_ft - L);
+  // The highest landing this ladder can actually serve, with the 3 ft still above it.
+  const max_landing_served_ft = (L / railPerFootOfHeight) - REQ_EXT;
+  const climbable_height_ft = Math.min(H, Math.max(0, max_landing_served_ft));
+
+  // Rung spacing is a WINDOW.
+  const rung_ok = rs >= RUNG_MIN && rs <= RUNG_MAX;
+  const rung_too_close = rs < RUNG_MIN;
+  const width_ok = cw >= WIDTH_MIN;
+  const width_shortfall_in = Math.max(0, WIDTH_MIN - cw);
+
+  const passes = extension_ok && length_ok && rung_ok && width_ok;
+
+  const note = "EXTENSION: side rails shall extend at least " + REQ_EXT + " ft above the upper landing surface. Here " + ext + " ft, " + (ext >= REQ_EXT ? "OK. " : extension_by_alternative ? "SHORT by " + extension_shortfall_ft.toFixed(1) + " ft - but the ladder is stated as secured at its top to a rigid support with a grasping device provided, which is the alternative the standard allows. That is an alternative, not an excuse: it requires both the securing AND the grasping device, and it exists for landings where the extension is genuinely impossible. " : "SHORT by " + extension_shortfall_ft.toFixed(1) + " ft, with no securing and grasping device claimed. ")
+    + "THE ARITHMETIC NOBODY DOES: that " + REQ_EXT + " ft comes out of the CLIMBABLE length, and so does the setback. At a " + ratio + ":1 setup the base sits " + base_setback_ft.toFixed(1) + " ft out, so every foot of height costs " + railPerFootOfHeight.toFixed(4) + " ft of rail. Reaching a " + H + " ft landing takes " + rail_used_to_landing_ft.toFixed(1) + " ft of rail, plus " + (REQ_EXT * railPerFootOfHeight).toFixed(1) + " ft more for the extension - " + rail_used_total_ft.toFixed(1) + " ft against a " + L + " ft ladder. " + (length_ok ? "It reaches. " : "IT DOES NOT REACH, short by " + length_short_ft.toFixed(1) + " ft of rail. ")
+    + "The highest landing a " + L + " ft ladder can serve with the extension still above it is about " + max_landing_served_ft.toFixed(1) + " ft. A ladder never reaches its label - the number on the side is rail length, not working height, and buying the ladder that matches the roof height is the classic mistake. "
+    + "RUNG SPACING is a WINDOW, not a minimum: not less than " + RUNG_MIN + " in nor more than " + RUNG_MAX + " in between centrelines. " + rs + " in here, " + (rung_ok ? "in range. " : rung_too_close ? "TOO CLOSE - and too close fails as surely as too far, because a climber's stride is what the window is protecting. " : "TOO FAR APART. ")
+    + "CLEAR WIDTH between side rails for all portable ladders: at least " + WIDTH_MIN + " in. " + cw + " in here, " + (width_ok ? "OK. " : "SHORT by " + width_shortfall_in.toFixed(1) + " in. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: the 4:1 setup angle itself, which the ladder-angle tile computes and which this only uses to work out the rail budget; the ladder's duty rating and the load actually on it; securing the base and the footing it stands on; ladders used to access a roof versus a floor, and the extra rules for fixed ladders and for ladders on scaffolds; the prohibition on the top step of a stepladder; overlap between the sections of an extension ladder, which the extension-ladder-overlap tile computes and which reduces the usable length further; electrical clearance and conductive side rails near energized lines; and inspection and defect removal. A screen, not a ladder plan; 29 CFR 1926 Subpart X and the competent person govern.";
+
+  return { required_extension_ft: REQ_EXT, extension_ok, extension_by_alternative, extension_shortfall_ft, base_setback_ft, rail_used_to_landing_ft, rail_used_total_ft, length_ok, length_short_ft, max_landing_served_ft, climbable_height_ft, rung_ok, rung_too_close, width_ok, width_shortfall_in, passes, note };
+}
+
+export const portableLadderSetupExample = { inputs: { ladder_length_ft: 24, landing_height_ft: 22, extension_above_landing_ft: 3, rung_spacing_in: 12, clear_width_in: 12, secured_with_grasping_device: "no", base_ratio: 4 } };
+
+CROSS_RENDERERS["portable-ladder-setup"] = _simpleRendererG({
+  citation: "Citation: OSHA 29 CFR 1926.1053, a US federal regulation in the public domain. 'When portable ladders are used for access to an upper landing surface, the ladder side rails shall extend at least 3 feet above the upper landing surface' - and where that is not possible, the ladder shall be secured at its top to a rigid support that will not deflect, and a grasping device shall be provided. Rungs, cleats, and steps 'shall be spaced not less than 10 inches apart, nor more than 14 inches apart, as measured between center lines of the rungs, cleats, and steps.' 'The minimum clear distance between side rails for all portable ladders shall be 11 1/2 inches.' The rail-budget arithmetic is geometry from the setup ratio, not a code value. Not checked: the 4:1 angle itself (see ladder-angle), duty rating and load, base securing and footing, fixed ladders and ladders on scaffolds, the stepladder top step, section overlap (see extension-ladder-overlap), electrical clearance, or inspection. A screen, not a ladder plan; Subpart X and the competent person govern.",
+  example: portableLadderSetupExample.inputs,
+  fields: [
+    { key: "ladder_length_ft", label: "Ladder length (ft, as labelled)", kind: "number", default: 24 },
+    { key: "landing_height_ft", label: "Height of the upper landing surface (ft)", kind: "number", default: 22 },
+    { key: "extension_above_landing_ft", label: "Rails extend above the landing (ft)", kind: "number", default: 3 },
+    { key: "secured_with_grasping_device", label: "Secured at the top with a grasping device?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes - the 3 ft alternative" }] },
+    { key: "rung_spacing_in", label: "Rung spacing, centre to centre (in)", kind: "number", default: 12 },
+    { key: "clear_width_in", label: "Clear width between side rails (in)", kind: "number", default: 12 },
+    { key: "base_ratio", label: "Setup ratio (4 for the 4:1 rule)", kind: "number", default: 4 },
+  ],
+  outputs: [
+    { key: "e", id: "pls-out-e", label: "Extension above the landing", value: (r) => r.extension_ok ? (r.extension_by_alternative ? "short, but carried by the secured-and-grasping-device alternative" : "3 ft satisfied") : "SHORT by " + fmt(r.extension_shortfall_ft, 1) + " ft" },
+    { key: "r", id: "pls-out-r", label: "Rail budget", value: (r) => fmt(r.rail_used_total_ft, 1) + " ft needed (landing " + fmt(r.rail_used_to_landing_ft, 1) + " + extension) - " + (r.length_ok ? "reaches" : "SHORT by " + fmt(r.length_short_ft, 1) + " ft") },
+    { key: "m", id: "pls-out-m", label: "Highest landing this ladder serves", value: (r) => fmt(r.max_landing_served_ft, 1) + " ft, with the 3 ft still above it" },
+    { key: "s", id: "pls-out-s", label: "Rung spacing (10-14 in window)", value: (r) => r.rung_ok ? "in range" : r.rung_too_close ? "TOO CLOSE" : "TOO FAR APART" },
+    { key: "w", id: "pls-out-w", label: "Clear width (11.5 in min)", value: (r) => r.width_ok ? "OK" : "SHORT by " + fmt(r.width_shortfall_in, 1) + " in" },
+    { key: "n", id: "pls-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePortableLadderSetup,
+});

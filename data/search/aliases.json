@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "ladder 3 feet above the roof",
+      "target": "portable-ladder-setup",
+      "kind": "question"
+    },
+    {
+      "term": "what size ladder for a 22 foot roof",
+      "target": "portable-ladder-setup",
+      "kind": "question"
+    },
+    {
+      "term": "ladder rung spacing 10 to 14 inches",
+      "target": "portable-ladder-setup",
+      "kind": "question"
+    },
+    {
+      "term": "portable ladder clear width",
+      "target": "portable-ladder-setup",
+      "kind": "industry"
+    },
+    {
+      "term": "why does my ladder not reach",
+      "target": "portable-ladder-setup",
+      "kind": "question"
+    },
+    {
       "term": "oxygen acetylene separation",
       "target": "cylinder-storage-separation",
       "kind": "industry"
