@@ -33380,3 +33380,70 @@ test("bounds: spec-v1157 computeCranePowerLineClearance pins Table A, the two de
   assert.ok("error" in _v1157({ ...base, boom_length_ft: -1 }));
   assert.ok("error" in _v1157({ ...base, actual_clearance_ft: Infinity }));
 });
+
+import { computeMasonryLimitedAccessZone as _v1158 } from "../../calc-masonry.js";
+
+test("bounds: spec-v1158 computeMasonryLimitedAccessZone pins height+4, the four zone conditions, the 8 ft bracing trigger, and error seams", () => {
+  const base = { wall_height_ft: 12, wall_length_ft: 60, zone_width_provided_ft: 8, zone_runs_full_length: "yes", zone_on_unscaffolded_side: "yes", established_before_start: "yes", bracing_in_place: "no" };
+  const r = _v1158(base);
+  assert.ok(r.required_zone_width_ft === 16 && !r.width_ok && r.zone_width_shortfall_ft === 8);
+  assert.ok(r.zone_area_sf === 960 && r.provided_area_sf === 480);
+  assert.ok(r.bracing_required && r.bracing_ok === false && !r.passes);
+  // THE DIMENSION IS height + 4, EXACTLY, at every height - no rounding, no step table.
+  for (const h of [0.5, 4, 8, 8.1, 12, 20, 33.7, 100]) {
+    const t = _v1158({ ...base, wall_height_ft: h, zone_width_provided_ft: h + 4 });
+    assert.ok(Math.abs(t.required_zone_width_ft - (h + 4)) < 1e-9, "width wrong at " + h);
+    assert.ok(t.width_ok && t.zone_width_shortfall_ft === 0, "equality passes at " + h);
+    assert.ok(Math.abs(t.zone_area_sf - (h + 4) * 60) < 1e-9);
+  }
+  // It scales with the FINISHED height, so the zone is STRICTLY WIDER at every increment.
+  let prev = -1;
+  for (const h of [1, 2, 4, 8, 16, 32]) {
+    const w = _v1158({ ...base, wall_height_ft: h }).required_zone_width_ft;
+    assert.ok(w > prev, "not monotonic in height"); prev = w;
+  }
+  // Wall length moves the AREA and nothing else - the width is a function of height alone.
+  for (const L of [1, 10, 60, 400]) {
+    const t = _v1158({ ...base, wall_length_ft: L });
+    assert.ok(t.required_zone_width_ft === 16, "length must not touch the width");
+    assert.ok(Math.abs(t.zone_area_sf - 16 * L) < 1e-9);
+  }
+  // THE 8 FT BRACING TRIGGER: "over eight feet", so 8 itself does NOT trigger.
+  for (const [h, req] of [[4, false], [7.9, false], [8, false], [8.01, true], [12, true], [40, true]]) {
+    const t = _v1158({ ...base, wall_height_ft: h, zone_width_provided_ft: 99 });
+    assert.ok(t.bracing_required === req, "bracing trigger wrong at " + h);
+    assert.ok(t.bracing_ok === (req ? false : null), "untriggered bracing must be null, not a pass");
+    assert.ok(t.zone_ok, "zone itself is fine in every one of these");
+    assert.ok(t.passes === !req, "an unbraced wall over 8 ft cannot pass");
+  }
+  assert.ok(_v1158({ ...base, wall_height_ft: 12, zone_width_provided_ft: 16, bracing_in_place: "yes" }).passes);
+  // EACH of the four zone conditions fails ALONE - none is subsumed by another.
+  const wide = { ...base, zone_width_provided_ft: 16, bracing_in_place: "yes" };
+  assert.ok(_v1158(wide).passes && _v1158(wide).zone_ok);
+  for (const k of ["zone_runs_full_length", "zone_on_unscaffolded_side", "established_before_start"]) {
+    const t = _v1158({ ...wide, [k]: "no" });
+    assert.ok(!t.zone_ok && !t.passes, k + " must fail on its own");
+    assert.ok(t.required_zone_width_ft === 16 && t.width_ok, "and must not disturb the dimension");
+  }
+  assert.ok(!_v1158({ ...wide, zone_width_provided_ft: 15.9 }).passes, "width fails on its own");
+  // A short zone that does not run the full length occupies no compliant ground at all.
+  assert.ok(_v1158({ ...base, zone_runs_full_length: "no" }).provided_area_sf === 0);
+  // THE CROSS-CHECK CASE: correct width, wrong side, under the bracing trigger.
+  const c = _v1158({ wall_height_ft: 7, wall_length_ft: 40, zone_width_provided_ft: 11, zone_runs_full_length: "yes", zone_on_unscaffolded_side: "no", established_before_start: "yes", bracing_in_place: "no" });
+  assert.ok(c.required_zone_width_ft === 11 && c.width_ok && c.zone_width_shortfall_ft === 0);
+  assert.ok(!c.unscaffolded && !c.zone_ok && !c.bracing_required && c.bracing_ok === null && !c.passes);
+  assert.ok(c.zone_area_sf === 440);
+  // Shortfall is exact and never negative.
+  for (const p of [0, 5, 15.9, 16, 16.1, 500]) {
+    const t = _v1158({ ...base, zone_width_provided_ft: p });
+    assert.ok(t.zone_width_shortfall_ft >= 0);
+    assert.ok(Math.abs(t.zone_width_shortfall_ft - Math.max(0, 16 - p)) < 1e-9);
+  }
+  // Error seams.
+  assert.ok("error" in _v1158({ ...base, wall_height_ft: 0 }));
+  assert.ok("error" in _v1158({ ...base, wall_height_ft: -3 }));
+  assert.ok("error" in _v1158({ ...base, wall_length_ft: 0 }));
+  assert.ok("error" in _v1158({ ...base, zone_width_provided_ft: -1 }));
+  assert.ok("error" in _v1158({ ...base, wall_height_ft: Infinity }));
+  assert.ok("error" in _v1158({ ...base, wall_length_ft: NaN }));
+});

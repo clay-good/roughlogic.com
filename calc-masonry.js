@@ -726,3 +726,82 @@ MASONRY_RENDERERS["fireplace-flue-area"] = _simpleRenderer({
   ],
   compute: computeFireplaceFlueArea,
 });
+
+// ===================== spec-v1158: masonry limited access zone (OSHA 1926.706) =====================
+
+// The zone people set up as "a few feet of tape" is a computed dimension: equal to the
+// HEIGHT OF THE WALL TO BE CONSTRUCTED PLUS FOUR FEET, running the ENTIRE LENGTH of the
+// wall, on the side that will be UNSCAFFOLDED. Three things follow that get missed.
+// It scales with the FINISHED height, not with how high the wall is today - so the zone for
+// a 12 ft wall is 16 ft wide from the first course, before there is anything to fall on you.
+// It goes on the unscaffolded side specifically, because the scaffolded side has people who
+// are supposed to be there; the zone is about everyone else.
+// And it must be established BEFORE the wall starts, not once the wall gets tall.
+// Separately, a wall over 8 ft must be braced until the permanent supporting elements are in
+// place - which is usually long after the masons have finished and left.
+// dims: in { wall_height_ft: L, wall_length_ft: L, zone_width_provided_ft: L, zone_runs_full_length: dimensionless, zone_on_unscaffolded_side: dimensionless, established_before_start: dimensionless, bracing_in_place: dimensionless } out: { required_zone_width_ft: L, zone_width_shortfall_ft: L, zone_area_sf: L^2, bracing_required: dimensionless }
+export function computeMasonryLimitedAccessZone({ wall_height_ft = 0, wall_length_ft = 0, zone_width_provided_ft = 0, zone_runs_full_length = "yes", zone_on_unscaffolded_side = "yes", established_before_start = "yes", bracing_in_place = "no" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const h = Number(wall_height_ft) || 0;
+  const L = Number(wall_length_ft) || 0;
+  const provided = Number(zone_width_provided_ft) || 0;
+  const fullLength = zone_runs_full_length === "yes";
+  const unscaffolded = zone_on_unscaffolded_side === "yes";
+  const beforeStart = established_before_start === "yes";
+  const braced = bracing_in_place === "yes";
+  if (!(h > 0)) return { error: "Wall height to be constructed must be positive (ft)." };
+  if (!(L > 0)) return { error: "Wall length must be positive (ft)." };
+  if (provided < 0) return { error: "Zone width provided cannot be negative (ft)." };
+
+  const ADDER = 4, BRACE_TRIGGER = 8;
+  const required_zone_width_ft = h + ADDER;
+  const width_ok = provided >= required_zone_width_ft;
+  const zone_width_shortfall_ft = Math.max(0, required_zone_width_ft - provided);
+  const zone_area_sf = required_zone_width_ft * L;
+  const provided_area_sf = provided * (fullLength ? L : 0);
+
+  const bracing_required = h > BRACE_TRIGGER;
+  const bracing_ok = bracing_required ? braced : null;
+
+  const zone_ok = width_ok && fullLength && unscaffolded && beforeStart;
+  const passes = zone_ok && (bracing_ok !== false);
+
+  const note = "THE ZONE IS A COMPUTED DIMENSION, not a courtesy margin: equal to the height of the wall TO BE CONSTRUCTED plus " + ADDER + " ft, running the ENTIRE length of the wall, on the side that will be UNSCAFFOLDED, and established BEFORE the wall starts. "
+    + "For a " + h + " ft wall that is " + required_zone_width_ft + " ft wide by " + L + " ft long - " + zone_area_sf.toFixed(0) + " sq ft of ground nobody but the wall crew may enter. "
+    + "IT SCALES WITH THE FINISHED HEIGHT, not with how high the wall is today. The zone for a " + h + " ft wall is " + required_zone_width_ft + " ft wide from the first course, when there is nothing there yet to fall on anyone - which is exactly why it gets set narrow and grown later, and exactly why that is wrong. "
+    + "Width provided " + provided + " ft: " + (width_ok ? "OK. " : "SHORT by " + zone_width_shortfall_ft.toFixed(1) + " ft. ")
+    + (fullLength ? "" : "The zone does NOT run the entire length of the wall, which the standard requires without qualification - a wall does not fall only in the middle. ")
+    + (unscaffolded ? "" : "The zone is NOT on the unscaffolded side. That side is the point: the scaffolded side has people who are supposed to be there and who are watching the wall, and the zone exists for everyone else. ")
+    + (beforeStart ? "" : "The zone was NOT established before the start of construction. Establishing it once the wall gets tall inverts the rule - the period before anyone is worried is when the habit has to be set. ")
+    + "BRACING: a wall over " + BRACE_TRIGGER + " ft must be adequately braced to prevent overturning and collapse, unless it is adequately supported so it will not, and the bracing stays until the PERMANENT supporting elements of the structure are in place. This wall is " + h + " ft, so bracing is " + (bracing_required ? "REQUIRED - " + (braced ? "stated as in place. " : "and none is stated. ") : "not triggered by height. ")
+    + (bracing_required ? "The duration is the part that surprises people: not until the mortar cures, not until the crew leaves, but until the permanent supporting elements are in place - which on most jobs is long after the masons have finished and moved on, and is when the brace gets removed by someone with no idea what it was holding. " : "")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: the design of the bracing itself, which is an engineering question and not a rule of thumb; the adequacy of alternative support; wall stability during construction and the wind that governs it; the separate limited access zone rules that apply while the wall is being constructed versus after; protruding reinforcing steel and impalement protection, which is a different section; scaffold design on the working side; grout and mortar strength gain; and whether the wall is a structural element requiring an engineer's involvement. A screen, not a bracing design; 29 CFR 1926 Subpart Q and the engineer of record govern.";
+
+  return { required_zone_width_ft, width_ok, zone_width_shortfall_ft, zone_area_sf, provided_area_sf, full_length: fullLength, unscaffolded, before_start: beforeStart, zone_ok, bracing_required, bracing_ok, passes, note };
+}
+
+export const masonryLimitedAccessZoneExample = { inputs: { wall_height_ft: 12, wall_length_ft: 60, zone_width_provided_ft: 8, zone_runs_full_length: "yes", zone_on_unscaffolded_side: "yes", established_before_start: "yes", bracing_in_place: "no" } };
+
+MASONRY_RENDERERS["masonry-limited-access-zone"] = _simpleRenderer({
+  citation: "Citation: OSHA 29 CFR 1926.706, Subpart Q - Concrete and Masonry Construction. A US federal regulation in the public domain. A limited access zone shall be established prior to the start of construction of the wall; it shall be equal to the height of the wall to be constructed plus four feet and shall run the entire length of the wall; it shall be established on the side of the wall which will be unscaffolded; it shall be restricted to entry by employees actively engaged in constructing the wall and no other employees shall be permitted to enter the zone; and it shall remain in place until the wall is adequately supported to prevent overturning and collapse, unless the height of the wall is over eight feet, in which case it shall remain until the bracing requirement is met. Masonry walls over eight feet in height shall be adequately braced to prevent overturning and to prevent collapse unless the wall is adequately supported so that it will not overturn or collapse, and the bracing shall remain in place until permanent supporting elements of the structure are in place. Not checked: the design of the bracing or of any alternative support, wind during construction, impalement protection, scaffold design on the working side, mortar and grout strength gain, or whether an engineer's involvement is required. A screen, not a bracing design; Subpart Q and the engineer of record govern.",
+  example: masonryLimitedAccessZoneExample.inputs,
+  fields: [
+    { key: "wall_height_ft", label: "Height of the wall TO BE CONSTRUCTED (ft)", kind: "number", default: 12 },
+    { key: "wall_length_ft", label: "Wall length (ft)", kind: "number", default: 60 },
+    { key: "zone_width_provided_ft", label: "Zone width provided (ft)", kind: "number", default: 8 },
+    { key: "zone_runs_full_length", label: "Zone runs the entire length of the wall?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
+    { key: "zone_on_unscaffolded_side", label: "Zone on the unscaffolded side?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
+    { key: "established_before_start", label: "Established before the wall started?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
+    { key: "bracing_in_place", label: "Bracing in place (walls over 8 ft)?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+  ],
+  outputs: [
+    { key: "w", id: "mlz-out-w", label: "Required zone width", value: (r) => r.required_zone_width_ft + " ft (wall height + 4), " + (r.width_ok ? "provided" : "SHORT by " + fmt(r.zone_width_shortfall_ft, 1) + " ft") },
+    { key: "a", id: "mlz-out-a", label: "Ground the zone occupies", value: (r) => fmt(r.zone_area_sf, 0) + " sq ft, entire length, unscaffolded side" },
+    { key: "c", id: "mlz-out-c", label: "Zone conditions", value: (r) => [r.full_length ? null : "not full length", r.unscaffolded ? null : "wrong side", r.before_start ? null : "established late"].filter(Boolean).join(", ") || "all satisfied" },
+    { key: "b", id: "mlz-out-b", label: "Bracing (over 8 ft)", value: (r) => !r.bracing_required ? "not triggered at this height" : r.bracing_ok ? "required and in place" : "REQUIRED and not stated" },
+    { key: "v", id: "mlz-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "mlz-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMasonryLimitedAccessZone,
+});

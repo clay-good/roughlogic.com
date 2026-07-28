@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "limited access zone masonry wall",
+      "target": "masonry-limited-access-zone",
+      "kind": "industry"
+    },
+    {
+      "term": "how wide is the limited access zone",
+      "target": "masonry-limited-access-zone",
+      "kind": "question"
+    },
+    {
+      "term": "when must a masonry wall be braced",
+      "target": "masonry-limited-access-zone",
+      "kind": "question"
+    },
+    {
+      "term": "wall height plus four feet zone",
+      "target": "masonry-limited-access-zone",
+      "kind": "industry"
+    },
+    {
       "term": "fireplace flue size",
       "target": "fireplace-flue-area",
       "kind": "industry"

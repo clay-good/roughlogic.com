@@ -15528,6 +15528,21 @@ export const CITATIONS = {
       { name: "Roughness entered", value: "n is a user input (about 0.013 concrete, 0.030 grassed earth, 0.035 natural); no table shipped", source: "user input" },
     ],
   },
+  "masonry-limited-access-zone": {
+    formula: "required limited access zone width = height of the wall to be constructed + 4 ft; the zone runs the entire length of the wall and sits on the side that will be unscaffolded; ground occupied = required width x wall length; bracing is required where the wall height exceeds 8 ft.",
+    edition: "OSHA 29 CFR 1926.706, Subpart Q - Concrete and Masonry Construction. A US federal regulation in the public domain, quoted directly.",
+    freeAccess: "29 CFR is published in full at no cost by OSHA and the eCFR.",
+    governance: GOVERNANCE.general,
+    editionNote: "The limited access zone is a computed dimension rather than a courtesy margin, and three parts of the sentence get dropped. It scales with the height of the wall TO BE CONSTRUCTED, not with how high the wall stands today - so a 12 ft wall needs a 16 ft zone from the first course, at the moment when there is nothing there yet to fall on anyone. That is precisely why the zone gets set narrow and grown later, and precisely why doing so is wrong: the standard also requires it to be established BEFORE the start of construction of the wall. It runs the ENTIRE length, without qualification, because a wall does not fall only in the middle. And it goes on the side that will be UNSCAFFOLDED, which is the whole point - the scaffolded side has people who are supposed to be there and who are watching the wall; the zone exists for everyone else, and only employees actively engaged in constructing the wall may enter it. The bracing rule has a duration that surprises people. A wall over 8 ft must be adequately braced to prevent overturning and collapse unless it is adequately supported so that it will not, and the bracing shall remain in place until the PERMANENT SUPPORTING ELEMENTS of the structure are in place - not until the mortar cures, not until the crew leaves, but until the building is there to hold the wall up. On most jobs that is long after the masons have finished and moved on, which is when the brace gets removed by someone with no idea what it was holding. Not checked: the design of the bracing itself, which is an engineering question and not a rule of thumb; the adequacy of any alternative support; wall stability during construction and the wind that governs it; protruding reinforcing steel and impalement protection, which is a different section; scaffold design on the working side; mortar and grout strength gain; and whether the wall is a structural element requiring an engineer\'s involvement. A screen, not a bracing design; Subpart Q and the engineer of record govern.",
+    assumptions: [
+      { name: "Zone width", value: "the height of the wall TO BE CONSTRUCTED plus 4 ft", source: "29 CFR 1926.706" },
+      { name: "Zone length", value: "the entire length of the wall, without qualification", source: "29 CFR 1926.706" },
+      { name: "Zone side", value: "the side which will be unscaffolded", source: "29 CFR 1926.706" },
+      { name: "Timing", value: "established prior to the start of construction of the wall", source: "29 CFR 1926.706" },
+      { name: "Bracing trigger", value: "walls over 8 ft in height", source: "29 CFR 1926.706" },
+      { name: "Bracing duration", value: "until the permanent supporting elements of the structure are in place", source: "29 CFR 1926.706" },
+    ],
+  },
   "fireplace-flue-area": {
     formula: "opening area = width x height; required net flue area = opening / 12 (round), / 10 (square or rectangular under 2:1), / 8 (rectangular 2:1 or greater); net area = pi d^2 / 4 round, a x b rectangular; smallest compliant round diameter = sqrt(4 (opening/12) / pi), smallest compliant square side = sqrt(opening/10).",
     edition: "IRC R1003.15.1 (Option 1), Flue area (masonry fireplace), with the identical text at IBC 2113.16.1. The ratios are conditioned on a chimney at least 15 ft high measured from the firebox floor to the top of the chimney flue.",
