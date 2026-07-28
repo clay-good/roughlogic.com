@@ -4,6 +4,28 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): chip-seal-mcleod, four equations read out of a DOT procedure rather than recalled; 2026-07-27
+
+No "chip seal", "McLeod", or "sealcoat" string existed anywhere -- the "seal coat" alias misfires to
+`soot-cleaning-takeoff`. `asphalt-tack-coat-quantity` is tack gallons with no aggregate;
+`asphalt-spread-rate` is hot-mix yield. Adds one tile to `calc-construction.js` (Group E).
+
+All four equations are quoted **verbatim** from a public-domain state DOT test procedure that was located
+and read -- the ALD coefficients 1.139285 and 0.011506, the 46.8 and 2.244 constants, and the 62.4 term in
+the voids relation. A second DOT manual independently confirmed the 46.8 constant and the 0.60-0.85 traffic
+range.
+
+A chip seal is built ONE STONE THICK, so the controlling dimension is the average least dimension rather
+than the sieve size: traffic rolls each stone onto its flattest face. 18% flat particles pull a 3/8-in
+aggregate from 0.329 to 0.279 in. Two consequences the tile makes explicit: the **aggregate rate is purely
+geometric** and does not move with binder type, residual, surface, or traffic (the fuzzer pins that across
+four unrelated inputs), and **heavier traffic wants LESS binder** because traffic does the embedding -- the
+cross-check pins binder falling 0.3275 to 0.2680 gal/SY while the aggregate rate stays put.
+
+Pinned: 3/8-in aggregate at FI 18 gives 30.10 lb/SY (15.05 tons per 1,000 SY) and 0.3275 gal/SY emulsion.
+The agency-specific traffic, wastage, and surface factors are entered with their published ranges named
+rather than shipped. Catalog 1,497 -> 1,498. Spec: spec-v1114.
+
 ### feat(pipefit): asme-shell-thickness, the code form the bare hoop-stress tiles skip; 2026-07-27
 
 A self-declared gap: `hoop-stress-mawp` is the plain `P = 2tS/D` with no joint efficiency and no corrosion

@@ -91397,6 +91397,36 @@
       "kind": "industry"
     },
     {
+      "term": "chip seal design",
+      "target": "chip-seal-mcleod",
+      "kind": "industry"
+    },
+    {
+      "term": "mcleod method seal coat",
+      "target": "chip-seal-mcleod",
+      "kind": "redirect"
+    },
+    {
+      "term": "aggregate spread rate for a chip seal",
+      "target": "chip-seal-mcleod",
+      "kind": "question"
+    },
+    {
+      "term": "how much emulsion per square yard chip seal",
+      "target": "chip-seal-mcleod",
+      "kind": "question"
+    },
+    {
+      "term": "average least dimension aggregate",
+      "target": "chip-seal-mcleod",
+      "kind": "industry"
+    },
+    {
+      "term": "seal coat bleeding too much binder",
+      "target": "chip-seal-mcleod",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

@@ -10520,3 +10520,75 @@ CONSTRUCTION_RENDERERS["formwork-member-spacing"] = _simpleRenderer({
   ],
   compute: computeFormworkMemberSpacing,
 });
+
+// --- spec-v1114 E: Chip seal design by the McLeod method ---
+// asphalt-tack-coat-quantity covers tack gallons and asphalt-spread-rate covers hot-mix yield;
+// neither does a chip seal, which is a different design entirely (aggregate AND binder, sized to
+// embed one stone). All four equations are quoted verbatim from a public-domain state DOT test
+// procedure implementing McLeod:
+//   ALD        H = M / (1.139285 + 0.011506 FI)
+//   voids      V = 1 - W / (62.4 G)
+//   aggregate  C = 46.8 (1 - 0.4 V) H G E        lb/SY
+//   binder     B = (2.244 H T V + S + A) / R     gal/SY
+// The T, E, and S factors are DOT table lookups and are entered, with their published ranges named.
+// dims: in { median_size_in: L, flakiness_index_pct: dimensionless, loose_unit_weight_pcf: M L^-3, bulk_specific_gravity: dimensionless, wastage_factor: dimensionless, traffic_factor: dimensionless, surface_factor_gal_sy: L, absorption_gal_sy: L, residual_asphalt: dimensionless } out: { ald_in: L, voids: dimensionless, aggregate_lb_sy: M L^-2, binder_gal_sy: L }
+export function computeChipSealMcleod({ median_size_in = 0, flakiness_index_pct = 0, loose_unit_weight_pcf = 0, bulk_specific_gravity = 2.65, wastage_factor = 1.05, traffic_factor = 0.75, surface_factor_gal_sy = 0.02, absorption_gal_sy = 0, residual_asphalt = 0.67 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const M = Number(median_size_in) || 0;
+  const FI = Number(flakiness_index_pct);
+  const W = Number(loose_unit_weight_pcf) || 0;
+  const G = Number(bulk_specific_gravity) || 0;
+  const E = Number(wastage_factor) || 0;
+  const T = Number(traffic_factor) || 0;
+  const S = Number(surface_factor_gal_sy);
+  const A = Number(absorption_gal_sy);
+  const R = Number(residual_asphalt) || 0;
+  if (!(M > 0)) return { error: "Median particle size must be positive (in) - the 50%-passing size from the sieve analysis." };
+  if (!Number.isFinite(FI) || FI < 0 || FI > 100) return { error: "Flakiness index must be 0 to 100 percent." };
+  if (!(W > 0)) return { error: "Loose unit weight must be positive (pcf)." };
+  if (!(G > 0)) return { error: "Bulk specific gravity must be positive." };
+  if (!(E > 0)) return { error: "Wastage factor must be positive (about 1.05 to 1.10 for traffic whip-off)." };
+  if (!(T > 0 && T <= 1)) return { error: "Traffic correction factor must be over 0 and up to 1 (published range about 0.60 heavy traffic to 0.85 light)." };
+  if (!Number.isFinite(S) || S < 0) return { error: "Surface condition factor cannot be negative (gal/SY)." };
+  if (!Number.isFinite(A) || A < 0) return { error: "Aggregate absorption factor cannot be negative (gal/SY)." };
+  if (!(R > 0 && R <= 1)) return { error: "Residual asphalt must be over 0 and up to 1 (about 0.67 for a typical emulsion; 1.0 for asphalt cement)." };
+  const ald_in = M / (1.139285 + 0.011506 * FI);
+  const voids = 1 - W / (62.4 * G);
+  if (!(voids > 0 && voids < 1)) return { error: "The voids calculation is out of range - check the loose unit weight against the specific gravity (W must be under 62.4 x G)." };
+  const aggregate_lb_sy = 46.8 * (1 - 0.4 * voids) * ald_in * G * E;
+  const binder_gal_sy = (2.244 * ald_in * T * voids + S + A) / R;
+  const aggregate_ton_per_1000sy = aggregate_lb_sy * 1000 / 2000;
+  const binder_gal_per_1000sy = binder_gal_sy * 1000;
+  const residual_gal_sy = binder_gal_sy * R;
+  if (![ald_in, voids, aggregate_lb_sy, binder_gal_sy].every(Number.isFinite)) return { error: "Chip seal math did not produce a finite value." };
+  return {
+    ald_in, voids, aggregate_lb_sy, binder_gal_sy, aggregate_ton_per_1000sy, binder_gal_per_1000sy, residual_gal_sy,
+    note: "A chip seal is designed ONE STONE THICK, which is why the controlling dimension is the average least dimension rather than the sieve size: traffic rolls each stone onto its flattest face, so the mat ends up as deep as the stones are thin. That is what the flakiness index buys you - " + FI + "% flat particles pulls the effective thickness from " + (M / 1.139285).toFixed(3) + " in down to " + ald_in.toFixed(3) + " in, and both the aggregate and the binder follow it. "
+      + "The aggregate rate is fixed by geometry and does NOT change with binder type or pavement condition; only the binder does. Note the direction that surprises people: HEAVIER traffic wants LESS binder, because traffic itself embeds the stone - the traffic factor runs about 0.85 under 100 vehicles per day down to about 0.60 over 2,000. Too much binder bleeds and flushes, too little loses the chips, and there is not much room between them. "
+      + "The traffic, wastage, and surface-condition factors are DOT table lookups entered here rather than shipped, because they vary by agency. Binder is EMULSION gallons at the residual content entered (" + residual_gal_sy.toFixed(4) + " gal/SY residual); enter 1.0 for asphalt cement. Design values, and the field almost always adjusts the binder after a test strip - the agency's own design procedure and the test strip govern.",
+  };
+}
+export const chipSealMcleodExample = { inputs: { median_size_in: 0.375, flakiness_index_pct: 18, loose_unit_weight_pcf: 95, bulk_specific_gravity: 2.65, wastage_factor: 1.05, traffic_factor: 0.75, surface_factor_gal_sy: 0.02, absorption_gal_sy: 0, residual_asphalt: 0.67 } };
+CONSTRUCTION_RENDERERS["chip-seal-mcleod"] = _simpleRenderer({
+  citation: "Citation: the McLeod chip seal design method as published in a US state DOT test procedure (public domain), by name. Average least dimension H = M/(1.139285 + 0.011506 FI); voids in the loose aggregate V = 1 - W/(62.4 G); aggregate application rate C = 46.8 (1 - 0.4 V) H G E lb/SY; binder application rate B = (2.244 H T V + S + A)/R gal/SY. The traffic correction factor T (about 0.85 under 100 vehicles per day to 0.60 over 2,000), the wastage factor E, and the surface condition factor S are agency table lookups and are ENTERED here, not shipped. The seal is designed one stone thick, so the aggregate rate is fixed by geometry and does not vary with binder type or pavement condition. Binder is emulsion gallons at the residual content entered; use 1.0 for asphalt cement. Design values - the agency's own procedure and a field test strip govern.",
+  example: chipSealMcleodExample.inputs,
+  fields: [
+    { key: "median_size_in", label: "Median particle size M (in, 50% passing)", kind: "number" },
+    { key: "flakiness_index_pct", label: "Flakiness index FI (%)", kind: "number", default: 18 },
+    { key: "loose_unit_weight_pcf", label: "Dry loose unit weight W (pcf)", kind: "number" },
+    { key: "bulk_specific_gravity", label: "Bulk specific gravity G", kind: "number", default: 2.65 },
+    { key: "wastage_factor", label: "Wastage factor E (whip-off, ~1.05-1.10)", kind: "number", default: 1.05 },
+    { key: "traffic_factor", label: "Traffic factor T (0.85 light to 0.60 heavy)", kind: "number", default: 0.75 },
+    { key: "surface_factor_gal_sy", label: "Surface condition factor S (gal/SY)", kind: "number", default: 0.02 },
+    { key: "absorption_gal_sy", label: "Aggregate absorption A (gal/SY)", kind: "number", default: 0 },
+    { key: "residual_asphalt", label: "Residual asphalt R (0.67 emulsion, 1.0 AC)", kind: "number", default: 0.67 },
+  ],
+  outputs: [
+    { key: "h", id: "csm-out-h", label: "Average least dimension (mat thickness)", value: (r) => fmt(r.ald_in, 4) + " in" },
+    { key: "v", id: "csm-out-v", label: "Voids in the loose aggregate", value: (r) => fmt(r.voids * 100, 1) + "%" },
+    { key: "c", id: "csm-out-c", label: "Aggregate application rate", value: (r) => fmt(r.aggregate_lb_sy, 2) + " lb/SY (" + fmt(r.aggregate_ton_per_1000sy, 2) + " tons per 1,000 SY)" },
+    { key: "b", id: "csm-out-b", label: "Binder application rate", value: (r) => fmt(r.binder_gal_sy, 4) + " gal/SY emulsion (" + fmt(r.binder_gal_per_1000sy, 0) + " gal per 1,000 SY; " + fmt(r.residual_gal_sy, 4) + " gal/SY residual)" },
+    { key: "n", id: "csm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeChipSealMcleod,
+});

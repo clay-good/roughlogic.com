@@ -31000,3 +31000,57 @@ test("bounds: spec-v1113 computeAsmeShellThickness pins both UG-27 forms, the ex
   assert.ok("error" in _v1113({ ...base, corrosion_allowance_in: -1 }));
   assert.ok("error" in _v1113({ ...base, design_pressure_psi: Infinity }));
 });
+
+import { computeChipSealMcleod as _v1114 } from "../../calc-construction.js";
+
+test("bounds: spec-v1114 computeChipSealMcleod pins all four McLeod equations, the flakiness effect, the aggregate-is-geometric invariant, the inverse traffic direction, and error seams", () => {
+  const base = { median_size_in: 0.375, flakiness_index_pct: 18, loose_unit_weight_pcf: 95, bulk_specific_gravity: 2.65, wastage_factor: 1.05, traffic_factor: 0.75, surface_factor_gal_sy: 0.02, absorption_gal_sy: 0, residual_asphalt: 0.67 };
+  const r = _v1114(base);
+  // Each equation checked against its own algebra.
+  assert.ok(Math.abs(r.ald_in - 0.375 / (1.139285 + 0.011506 * 18)) < 1e-12);
+  assert.ok(Math.abs(r.voids - (1 - 95 / (62.4 * 2.65))) < 1e-12);
+  assert.ok(Math.abs(r.aggregate_lb_sy - 46.8 * (1 - 0.4 * r.voids) * r.ald_in * 2.65 * 1.05) < 1e-9);
+  assert.ok(Math.abs(r.binder_gal_sy - (2.244 * r.ald_in * 0.75 * r.voids + 0.02) / 0.67) < 1e-12);
+  assert.ok(Math.abs(r.ald_in - 0.278522) < 1e-6);
+  assert.ok(Math.abs(r.aggregate_lb_sy - 30.09641) < 1e-4);
+  assert.ok(Math.abs(r.binder_gal_sy - 0.327541) < 1e-6);
+  // Flakiness reduces the effective mat thickness; FI = 0 gives the pure M/1.139285 case.
+  const flat0 = _v1114({ ...base, flakiness_index_pct: 0 });
+  assert.ok(Math.abs(flat0.ald_in - 0.375 / 1.139285) < 1e-12);
+  assert.ok(flat0.ald_in > r.ald_in);
+  let prev = Infinity;
+  for (const fi of [0, 10, 18, 25, 40]) {
+    const t = _v1114({ ...base, flakiness_index_pct: fi });
+    assert.ok(t.ald_in < prev); prev = t.ald_in;
+  }
+  // THE INVARIANT: the aggregate rate is geometric - it does not move with traffic, surface, or binder.
+  for (const [k, v] of [["traffic_factor", 0.60], ["surface_factor_gal_sy", 0.10], ["residual_asphalt", 1.0], ["absorption_gal_sy", 0.03]]) {
+    const t = _v1114({ ...base, [k]: v });
+    assert.ok(Math.abs(t.aggregate_lb_sy - r.aggregate_lb_sy) < 1e-9, "aggregate moved with " + k);
+  }
+  // ...but the binder does, and heavier traffic (LOWER T) needs LESS binder.
+  const heavy = _v1114({ ...base, traffic_factor: 0.60 });
+  assert.ok(Math.abs(heavy.binder_gal_sy - 0.268003) < 1e-6);
+  assert.ok(heavy.binder_gal_sy < r.binder_gal_sy);
+  const light = _v1114({ ...base, traffic_factor: 0.85 });
+  assert.ok(light.binder_gal_sy > r.binder_gal_sy);
+  // Asphalt cement (R = 1) needs fewer gallons than emulsion for the same residual.
+  const ac = _v1114({ ...base, residual_asphalt: 1.0 });
+  assert.ok(ac.binder_gal_sy < r.binder_gal_sy);
+  assert.ok(Math.abs(ac.residual_gal_sy - ac.binder_gal_sy) < 1e-12);
+  assert.ok(Math.abs(r.residual_gal_sy - r.binder_gal_sy * 0.67) < 1e-12);
+  // Unit conversions.
+  assert.ok(Math.abs(r.aggregate_ton_per_1000sy - r.aggregate_lb_sy / 2) < 1e-9);
+  assert.ok(Math.abs(r.binder_gal_per_1000sy - r.binder_gal_sy * 1000) < 1e-9);
+  // A unit weight at or above 62.4 G leaves no voids and is caught.
+  assert.ok("error" in _v1114({ ...base, loose_unit_weight_pcf: 200 }));
+  // Error seams.
+  assert.ok("error" in _v1114({ ...base, median_size_in: 0 }));
+  assert.ok("error" in _v1114({ ...base, flakiness_index_pct: -1 }));
+  assert.ok("error" in _v1114({ ...base, flakiness_index_pct: 101 }));
+  assert.ok("error" in _v1114({ ...base, loose_unit_weight_pcf: 0 }));
+  assert.ok("error" in _v1114({ ...base, bulk_specific_gravity: 0 }));
+  assert.ok("error" in _v1114({ ...base, traffic_factor: 1.2 }));
+  assert.ok("error" in _v1114({ ...base, residual_asphalt: 0 }));
+  assert.ok("error" in _v1114({ ...base, median_size_in: Infinity }));
+});

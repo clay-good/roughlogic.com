@@ -15325,6 +15325,18 @@ export const CITATIONS = {
       { name: "Longitudinal-joint case only", value: "the circumferential-joint (longitudinal stress) equation is omitted rather than shipped unverified", source: "stated scope limit" },
     ],
   },
+  "chip-seal-mcleod": {
+    formula: "ALD H = M/(1.139285 + 0.011506 FI); voids V = 1 - W/(62.4 G); aggregate C = 46.8 (1 - 0.4 V) H G E lb/SY; binder B = (2.244 H T V + S + A)/R gal/SY.",
+    edition: "The McLeod seal-coat design method as published in a US state DOT test procedure (public domain), by name; all four equations are quoted verbatim from that source rather than recalled.",
+    freeAccess: "State DOT chip-seal design procedures implementing McLeod are published free, as are the TxDOT and Caltrans maintenance manual chapters covering the same method.",
+    governance: GOVERNANCE.general,
+    editionNote: "A chip seal is designed ONE STONE THICK, which is why the controlling dimension is the average least dimension rather than the sieve size: traffic rolls each stone onto its flattest face, so the mat ends up as deep as the stones are thin, and the flakiness index is what converts one to the other. The aggregate rate is fixed by that geometry and does NOT change with binder type or pavement condition - only the binder does. The direction that surprises people: HEAVIER traffic wants LESS binder, because traffic itself embeds the stone, so the traffic factor runs about 0.85 under 100 vehicles per day down to about 0.60 over 2,000. Too much binder bleeds and flushes, too little loses the chips, and there is little room between. The traffic, wastage, and surface-condition factors are agency TABLE LOOKUPS and are entered here rather than shipped, because they vary by agency. Binder is emulsion gallons at the residual content entered; use 1.0 for asphalt cement. These are design values and the field almost always adjusts the binder after a test strip - the agency's own procedure and the test strip govern.",
+    assumptions: [
+      { name: "One stone thick", value: "the average least dimension is the mat thickness; aggregate rate is geometric and independent of binder", source: "McLeod method" },
+      { name: "Traffic embeds", value: "higher traffic lowers the required binder via the T factor (about 0.85 to 0.60)", source: "state DOT traffic correction table" },
+      { name: "Agency factors entered", value: "T, E, and S are table lookups that vary by agency and are user inputs, not shipped values", source: "user input" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",
