@@ -13049,3 +13049,89 @@ CONSTRUCTION_RENDERERS["knee-toe-clearance"] = _simpleRenderer({
   ],
   compute: computeKneeToeClearance,
 });
+
+// ===================== spec-v1173: NFIP flood openings (44 CFR 60.3(c)(5)) =====================
+
+// The rule is one square inch of NET area per square foot of enclosed area, a MINIMUM OF TWO
+// openings, and the BOTTOM of every opening no higher than one foot above grade.
+// Three things get missed. Net free area is not the size of the hole - a block vent with a
+// louver and an insect screen passes a fraction of its gross opening, and the fraction is what
+// counts. The two-opening minimum is independent of the area, so a small enclosure that a
+// single large vent would satisfy on square inches still fails on count. And the ONE FOOT is
+// measured to the BOTTOM of the opening, not the top or the centre, so a vent set in the
+// second course of block is usually already too high.
+// Engineered openings are a different animal: they are certified by the square feet of
+// enclosure each one serves, and the square-inch rule does not apply to them at all.
+// dims: in { enclosed_area_sf: L^2, net_free_area_per_opening_sqin: L^2, coverage_sf_per_opening: L^2, bottom_height_in: L } out: { required_net_area_sqin: L^2, provided_net_area_sqin: L^2, net_area_deficit_sqin: L^2, openings_required: dimensionless }
+export function computeFloodOpeningArea({ enclosed_area_sf = 0, opening_type = "non-engineered", net_free_area_per_opening_sqin = 0, coverage_sf_per_opening = 0, openings_provided = 0, bottom_height_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(enclosed_area_sf) || 0;
+  const nfa = Number(net_free_area_per_opening_sqin) || 0;
+  const cov = Number(coverage_sf_per_opening) || 0;
+  const provided = Number(openings_provided) || 0;
+  const bottom = Number(bottom_height_in);
+  const engineered = opening_type === "engineered";
+  if (opening_type !== "engineered" && opening_type !== "non-engineered") return { error: "Opening type must be non-engineered or engineered - they are rated on completely different bases." };
+  if (!(area > 0)) return { error: "Enclosed area subject to flooding must be positive (sq ft)." };
+  if (!Number.isInteger(provided) || provided < 0) return { error: "Openings provided must be a whole number, zero or more." };
+  if (!Number.isFinite(bottom)) return { error: "Height to the bottom of the openings must be a number (in)." };
+  if (bottom < 0) return { error: "Height to the bottom of the openings cannot be negative (in) - an opening below grade does not admit floodwater, it admits everything." };
+  if (!engineered && !(nfa > 0)) return { error: "Net free area per opening must be positive (sq in) for non-engineered openings." };
+  if (engineered && !(cov > 0)) return { error: "Certified coverage per opening must be positive (sq ft) for engineered openings." };
+
+  const SQIN_PER_SF = 1, MIN_OPENINGS = 2, MAX_BOTTOM_IN = 12;
+
+  const required_net_area_sqin = engineered ? null : area * SQIN_PER_SF;
+  const provided_net_area_sqin = engineered ? null : provided * nfa;
+  const net_area_deficit_sqin = engineered ? null : Math.max(0, required_net_area_sqin - provided_net_area_sqin);
+  const openings_for_area = engineered ? Math.ceil(area / cov) : Math.ceil(required_net_area_sqin / nfa);
+  const openings_required = Math.max(MIN_OPENINGS, openings_for_area);
+  const count_governed_by_minimum = openings_for_area < MIN_OPENINGS;
+  const count_ok = provided >= openings_required;
+  const openings_short = Math.max(0, openings_required - provided);
+  const area_ok = engineered ? provided * cov >= area : provided_net_area_sqin >= required_net_area_sqin;
+  const coverage_provided_sf = engineered ? provided * cov : null;
+
+  const height_ok = bottom <= MAX_BOTTOM_IN;
+  const height_excess_in = Math.max(0, bottom - MAX_BOTTOM_IN);
+
+  const passes = count_ok && area_ok && height_ok;
+
+  const note = "ONE SQUARE INCH OF NET AREA PER SQUARE FOOT OF ENCLOSED AREA, a minimum of TWO openings, and the BOTTOM of every opening no higher than one foot above grade. "
+    + (engineered
+      ? "ENGINEERED OPENINGS ARE A DIFFERENT ANIMAL and the square-inch rule does not apply to them at all: each one is certified for the square feet of enclosure it serves. At " + cov + " sq ft per opening, " + area + " sq ft takes " + openings_for_area + " - and the two-opening minimum still applies on top of that, so the requirement is " + openings_required + ". Provided " + provided + ", covering " + coverage_provided_sf.toFixed(0) + " sq ft: " + (count_ok && area_ok ? "adequate. " : "SHORT by " + openings_short + " opening" + (openings_short === 1 ? "" : "s") + ". ") + "The certification is the whole basis here; an engineered vent without its certification is a hole in a wall. "
+      : "NET FREE AREA IS NOT THE SIZE OF THE HOLE. A block vent with a louver and an insect screen passes a fraction of its gross opening, and the fraction is what counts - which is why a 16 x 8 in vent is not 128 sq in of anything. This calculation uses " + nfa + " sq in of NET free area per opening, which should come off the product listing rather than a tape measure. "
+        + area + " sq ft needs " + required_net_area_sqin.toFixed(0) + " sq in, which takes " + openings_for_area + " opening" + (openings_for_area === 1 ? "" : "s") + " at " + nfa + " sq in each. "
+        + (count_governed_by_minimum ? "THE TWO-OPENING MINIMUM GOVERNS HERE, not the area: the square inches would be satisfied by " + openings_for_area + ", and the rule still demands 2. A single large vent is not compliant however generous it is, because the point is cross-flow rather than throughput. " : "")
+        + "Requirement: " + openings_required + " openings and " + required_net_area_sqin.toFixed(0) + " sq in. Provided " + provided + " opening" + (provided === 1 ? "" : "s") + " giving " + provided_net_area_sqin.toFixed(0) + " sq in: "
+        + (passes || (count_ok && area_ok) ? "adequate. " : (count_ok ? "" : "SHORT by " + openings_short + " opening" + (openings_short === 1 ? "" : "s") + ". ") + (area_ok ? "" : "SHORT by " + net_area_deficit_sqin.toFixed(0) + " sq in of net area. ")))
+    + "HEIGHT: the ONE FOOT is measured to the BOTTOM of the opening, not the top and not the centre, so a vent set in the second course of block is usually already too high before anyone measures. Entered " + bottom + " in: " + (height_ok ? "OK. " : "OVER by " + height_excess_in.toFixed(1) + " in, and no amount of extra net area fixes it - an opening above the water does nothing. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: which grade governs, where interior and exterior grades differ, which is a question for the floodplain administrator; the placement of openings, where FEMA guidance calls for them on at least two walls of each enclosed area so water can flow through rather than in; whether each separate enclosed area gets its own openings, which it must - a partition wall creates a second enclosure with its own requirement; whether the enclosure is used only for parking, access, or storage, since any other use is a different problem entirely; the alternative of a design certified by a registered professional engineer or architect, which 60.3(c)(5) permits in place of these criteria; screens, louvers, valves, and covers, which are allowed only if they permit AUTOMATIC entry and exit of floodwater, ruling out anything a person has to open; and the local floodplain ordinance, which is frequently stricter than the federal minimum. A vent-area screen, not a floodplain determination; 44 CFR 60.3 and the community's floodplain administrator govern.";
+
+  return { required_net_area_sqin, provided_net_area_sqin, net_area_deficit_sqin, openings_for_area, openings_required, count_governed_by_minimum, count_ok, openings_short, area_ok, coverage_provided_sf, height_ok, height_excess_in, passes, note };
+}
+
+export const floodOpeningAreaExample = { inputs: { enclosed_area_sf: 1200, opening_type: "non-engineered", net_free_area_per_opening_sqin: 51, coverage_sf_per_opening: 0, openings_provided: 8, bottom_height_in: 16 } };
+
+CONSTRUCTION_RENDERERS["flood-opening-area"] = _simpleRenderer({
+  citation: "Citation: 44 CFR 60.3(c)(5), the NFIP floodplain management criteria, a US federal regulation in the public domain. Fully enclosed areas below the lowest floor that are usable solely for parking of vehicles, building access, or storage in an area other than a basement, and which are subject to flooding, shall be designed to automatically equalize hydrostatic flood forces on exterior walls by allowing for the entry and exit of floodwaters; designs for meeting this requirement must either be certified by a registered professional engineer or architect or meet or exceed the following minimum criteria: a minimum of two openings having a total net area of not less than one square inch for every square foot of enclosed area subject to flooding shall be provided, the bottom of all openings shall be no higher than one foot above grade, and openings may be equipped with screens, louvers, valves, or other coverings or devices provided that they permit the automatic entry and exit of floodwaters. Engineered openings are certified for the square feet of enclosure each serves and the square-inch rule does not apply to them. Not checked: which grade governs where interior and exterior differ, the placement of openings on separate walls, whether each enclosed area has its own openings, the use of the enclosure, the certified-design alternative, whether coverings permit automatic entry and exit, or the local floodplain ordinance, which is frequently stricter. A vent-area screen, not a floodplain determination.",
+  example: floodOpeningAreaExample.inputs,
+  fields: [
+    { key: "enclosed_area_sf", label: "Enclosed area subject to flooding (sq ft)", kind: "number", default: 1200 },
+    { key: "opening_type", label: "Opening type", kind: "select", options: [{ value: "non-engineered", label: "Non-engineered (rated in net free area)", selected: true }, { value: "engineered", label: "Engineered (certified by coverage area)" }] },
+    { key: "net_free_area_per_opening_sqin", label: "NET free area per opening (sq in, from the product listing)", kind: "number", default: 51 },
+    { key: "coverage_sf_per_opening", label: "Engineered: certified coverage per opening (sq ft)", kind: "number", default: 0 },
+    { key: "openings_provided", label: "Openings provided", kind: "number", default: 8 },
+    { key: "bottom_height_in", label: "Height above grade to the BOTTOM of the openings (in)", kind: "number", default: 16 },
+  ],
+  outputs: [
+    { key: "a", id: "foa-out-a", label: "Net area required", value: (r) => r.required_net_area_sqin === null ? "not applicable - engineered openings are rated by coverage" : fmt(r.required_net_area_sqin, 0) + " sq in; provided " + fmt(r.provided_net_area_sqin, 0) + (r.area_ok ? "" : " (short " + fmt(r.net_area_deficit_sqin, 0) + ")") },
+    { key: "c", id: "foa-out-c", label: "Openings required", value: (r) => r.openings_required + (r.count_governed_by_minimum ? " - the two-opening minimum governs, not the area" : "") + "; provided " + (r.count_ok ? "enough" : "short by " + r.openings_short) },
+    { key: "g", id: "foa-out-g", label: "Coverage (engineered)", value: (r) => r.coverage_provided_sf === null ? "not applicable" : fmt(r.coverage_provided_sf, 0) + " sq ft covered" },
+    { key: "h", id: "foa-out-h", label: "Height to the BOTTOM of the openings", value: (r) => r.height_ok ? "within 12 in of grade" : "OVER by " + fmt(r.height_excess_in, 1) + " in - extra net area does not fix it" },
+    { key: "v", id: "foa-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the minimum criteria" : "DOES NOT PASS" },
+    { key: "n", id: "foa-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFloodOpeningArea,
+});

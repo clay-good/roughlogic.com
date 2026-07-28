@@ -34502,3 +34502,65 @@ test("bounds: spec-v1172 computeKneeToeClearance pins the 27 in zone gate, the t
   assert.ok("error" in _v1172({ ...base, clear_width_in: 0 }));
   assert.ok("error" in _v1172({ ...base, apron_height_in: Infinity }));
 });
+
+import { computeFloodOpeningArea as _v1173 } from "../../calc-construction.js";
+
+test("bounds: spec-v1173 computeFloodOpeningArea pins the 1 sq in per sq ft rule, the two-opening minimum, the engineered path, the height limit, and error seams", () => {
+  const base = { enclosed_area_sf: 1200, opening_type: "non-engineered", net_free_area_per_opening_sqin: 51, coverage_sf_per_opening: 0, openings_provided: 8, bottom_height_in: 16 };
+  const r = _v1173(base);
+  assert.ok(r.required_net_area_sqin === 1200 && r.provided_net_area_sqin === 408 && r.net_area_deficit_sqin === 792);
+  assert.ok(r.openings_required === 24 && !r.count_ok && !r.height_ok && r.height_excess_in === 4 && !r.passes);
+  // ONE SQUARE INCH PER SQUARE FOOT, exactly, at every area.
+  for (const a of [1, 64, 200, 1200, 5000]) {
+    const t = _v1173({ ...base, enclosed_area_sf: a });
+    assert.ok(t.required_net_area_sqin === a, "net area rule wrong at " + a);
+  }
+  // The opening count follows the net free area per vent, rounded up.
+  for (const [a, nfa, n] of [[1200, 51, 24], [1200, 50, 24], [1200, 100, 12], [200, 51, 4], [51, 51, 2], [100, 51, 2]]) {
+    const t = _v1173({ ...base, enclosed_area_sf: a, net_free_area_per_opening_sqin: nfa });
+    assert.ok(t.openings_required === n, "count wrong at " + a + " sq ft / " + nfa + " sq in: got " + t.openings_required);
+  }
+  // THE TWO-OPENING MINIMUM IS INDEPENDENT OF AREA and is flagged when it governs.
+  const one = _v1173({ ...base, enclosed_area_sf: 200, net_free_area_per_opening_sqin: 250, openings_provided: 1, bottom_height_in: 8 });
+  assert.ok(one.openings_for_area === 1 && one.openings_required === 2 && one.count_governed_by_minimum);
+  assert.ok(one.area_ok && !one.count_ok && one.openings_short === 1 && !one.passes, "area satisfied, count is not");
+  assert.ok(_v1173({ ...base, enclosed_area_sf: 200, net_free_area_per_opening_sqin: 250, openings_provided: 2, bottom_height_in: 8 }).passes);
+  assert.ok(!_v1173({ ...base, enclosed_area_sf: 1200, openings_provided: 24, bottom_height_in: 8 }).count_governed_by_minimum, "the area governs on a big enclosure");
+  // The required count never falls as the area rises, and never drops below two.
+  let prev = 0;
+  for (let a = 1; a <= 3000; a += 37) {
+    const t = _v1173({ ...base, enclosed_area_sf: a });
+    assert.ok(t.openings_required >= prev && t.openings_required >= 2, "count fell or dropped under two at " + a);
+    prev = t.openings_required;
+  }
+  // Providing the required count always satisfies the area too, on the non-engineered path.
+  for (const [a, nfa] of [[1200, 51], [77, 16], [640, 100], [3, 51]]) {
+    const t = _v1173({ ...base, enclosed_area_sf: a, net_free_area_per_opening_sqin: nfa, bottom_height_in: 6 });
+    const fixed = _v1173({ ...base, enclosed_area_sf: a, net_free_area_per_opening_sqin: nfa, openings_provided: t.openings_required, bottom_height_in: 6 });
+    assert.ok(fixed.passes, "the required count does not pass at " + a + "/" + nfa);
+    assert.ok(fixed.area_ok && fixed.count_ok && fixed.net_area_deficit_sqin === 0);
+  }
+  // THE ENGINEERED PATH ignores the square-inch rule and reports null for it.
+  const eng = _v1173({ ...base, opening_type: "engineered", net_free_area_per_opening_sqin: 0, coverage_sf_per_opening: 200, openings_provided: 6, bottom_height_in: 10 });
+  assert.ok(eng.required_net_area_sqin === null && eng.provided_net_area_sqin === null && eng.net_area_deficit_sqin === null);
+  assert.ok(eng.openings_required === 6 && eng.coverage_provided_sf === 1200 && eng.passes);
+  assert.ok(!_v1173({ ...eng, openings_provided: 5 }).passes);
+  assert.ok(_v1173({ ...base, opening_type: "engineered", coverage_sf_per_opening: 1000, openings_provided: 2, enclosed_area_sf: 1000, bottom_height_in: 6 }).openings_required === 2, "the two-opening minimum applies to engineered vents too");
+  assert.ok(_v1173({ ...base, opening_type: "engineered", coverage_sf_per_opening: 1000, openings_provided: 1, enclosed_area_sf: 1000, bottom_height_in: 6 }).passes === false);
+  assert.ok(_v1173(base).coverage_provided_sf === null, "coverage is null on the non-engineered path");
+  // HEIGHT is to the BOTTOM, at 12 in, and fails on its own however much area is provided.
+  for (const [h, ok] of [[0, true], [12, true], [12.1, false], [24, false]]) {
+    const t = _v1173({ ...base, openings_provided: 100, bottom_height_in: h });
+    assert.ok(t.height_ok === ok && t.passes === ok, "height verdict wrong at " + h);
+    assert.ok(Math.abs(t.height_excess_in - Math.max(0, h - 12)) < 1e-9 && t.height_excess_in >= 0);
+  }
+  // Error seams.
+  assert.ok("error" in _v1173({ ...base, opening_type: "improvised" }));
+  assert.ok("error" in _v1173({ ...base, enclosed_area_sf: 0 }));
+  assert.ok("error" in _v1173({ ...base, openings_provided: -1 }));
+  assert.ok("error" in _v1173({ ...base, openings_provided: 2.5 }));
+  assert.ok("error" in _v1173({ ...base, bottom_height_in: -1 }));
+  assert.ok("error" in _v1173({ ...base, net_free_area_per_opening_sqin: 0 }));
+  assert.ok("error" in _v1173({ ...base, opening_type: "engineered", coverage_sf_per_opening: 0 }));
+  assert.ok("error" in _v1173({ ...base, enclosed_area_sf: Infinity }));
+});

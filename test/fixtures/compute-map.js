@@ -1637,6 +1637,7 @@ export const COMPUTE_MAP = {
   "turning-clear-floor-space": { module: "../../calc-construction.js", fn: "computeTurningAndClearFloorSpace" },
   "handrail-geometry": { module: "../../calc-construction.js", fn: "computeHandrailGeometry" },
   "knee-toe-clearance": { module: "../../calc-construction.js", fn: "computeKneeToeClearance" },
+  "flood-opening-area": { module: "../../calc-construction.js", fn: "computeFloodOpeningArea" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 

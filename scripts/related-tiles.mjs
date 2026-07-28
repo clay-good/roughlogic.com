@@ -914,6 +914,7 @@ const RELATED = {
   "turning-clear-floor-space": ["accessible-route-width", "reach-range", "door-maneuvering-clearance", "handrail-geometry"],
   "handrail-geometry": ["guard-handrail-check", "ada-ramp-slope", "stair-stringer-layout", "knee-toe-clearance"],
   "knee-toe-clearance": ["turning-clear-floor-space", "reach-range", "fixture-clearance-check", "cabinet-linear-feet"],
+  "flood-opening-area": ["crawl-space-ventilation", "attic-ventilation", "sump-basin-sizing", "footing-area"],
   "rainwater-yield": ["rainwater-catchment-area", "stormwater-rational"],
   "rainwater-catchment-area": ["rainwater-yield", "stormwater-rational", "roof-drain-sizing"],
   "timesheet": ["overtime", "per-diem", "time-and-materials"],

@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "flood vent area calculator",
+      "target": "flood-opening-area",
+      "kind": "industry"
+    },
+    {
+      "term": "how many flood vents do i need",
+      "target": "flood-opening-area",
+      "kind": "question"
+    },
+    {
+      "term": "one square inch per square foot crawl space",
+      "target": "flood-opening-area",
+      "kind": "industry"
+    },
+    {
+      "term": "how high can a flood vent be above grade",
+      "target": "flood-opening-area",
+      "kind": "question"
+    },
+    {
       "term": "ada knee clearance under a sink",
       "target": "knee-toe-clearance",
       "kind": "industry"
