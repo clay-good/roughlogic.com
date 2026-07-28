@@ -1628,6 +1628,7 @@ export const COMPUTE_MAP = {
   "sign-character-height": { module: "../../calc-construction.js", fn: "computeSignCharacterHeight" },
   "reach-range": { module: "../../calc-construction.js", fn: "computeReachRange" },
   "protruding-object-check": { module: "../../calc-construction.js", fn: "computeProtrudingObject" },
+  "accessible-route-width": { module: "../../calc-construction.js", fn: "computeAccessibleRouteWidth" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 

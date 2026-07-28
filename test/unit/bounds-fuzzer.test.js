@@ -33800,3 +33800,78 @@ test("bounds: spec-v1163 computeProtrudingObject pins the 27-80 in band, the thr
   assert.ok("error" in _v1163({ ...base, barrier_edge_height_in: -1 }));
   assert.ok("error" in _v1163({ ...base, projection_in: Infinity }));
 });
+
+import { computeAccessibleRouteWidth as _v1164 } from "../../calc-construction.js";
+
+test("bounds: spec-v1164 computeAccessibleRouteWidth pins 36 in, the three-part pinch exception, the 180-degree turn, passing spaces, and error seams", () => {
+  const base = { clear_width_in: 36, pinch_present: "yes", pinch_width_in: 32, pinch_length_in: 30, separation_length_in: 48, turn_present: "no", turn_element_width_in: 0, approach_width_in: 0, at_turn_width_in: 0, route_length_ft: 250 };
+  const r = _v1164(base);
+  assert.ok(r.width_ok && r.width_deficit_in === 0 && !r.pinch_length_ok && r.pinch_length_excess_in === 6 && !r.pinch_ok && !r.passes);
+  assert.ok(r.passing_required && r.passing_spaces_required === 1 && r.longest_stretch_ft === 125);
+  // 36 IN IS THE WIDTH, and equality passes.
+  for (const [w, ok] of [[31, false], [35.9, false], [36, true], [48, true]]) {
+    const t = _v1164({ ...base, clear_width_in: w });
+    assert.ok(t.width_ok === ok && Math.abs(t.width_deficit_in - Math.max(0, 36 - w)) < 1e-9);
+  }
+  // THE PINCH IS THREE CONDITIONS - each fails alone and each has its own seam.
+  const goodPinch = { ...base, pinch_length_in: 24 };
+  assert.ok(_v1164(goodPinch).pinch_ok);
+  for (const [k, v] of [["pinch_width_in", 31.9], ["pinch_length_in", 24.1], ["separation_length_in", 47.9]]) {
+    const t = _v1164({ ...goodPinch, [k]: v });
+    assert.ok(t.pinch_ok === false && !t.passes, k + " must fail the pinch on its own");
+  }
+  for (const [k, v] of [["pinch_width_in", 32], ["pinch_length_in", 24], ["separation_length_in", 48]]) {
+    assert.ok(_v1164({ ...goodPinch, [k]: v }).pinch_ok, k + " boundary must pass");
+  }
+  for (const l of [10, 24, 25, 40]) {
+    assert.ok(Math.abs(_v1164({ ...base, pinch_length_in: l }).pinch_length_excess_in - Math.max(0, l - 24)) < 1e-9);
+  }
+  // No pinch entered reports null everywhere rather than a pass or a fail.
+  const noPinch = _v1164({ ...base, pinch_present: "no" });
+  assert.ok(noPinch.pinch_ok === null && noPinch.pinch_width_ok === null && noPinch.pinch_length_excess_in === null && noPinch.passes);
+  // THE TURN: triggered by the ELEMENT width, relieved by 60 in at the turn.
+  const turn = { ...base, pinch_present: "no", turn_present: "yes", turn_element_width_in: 36, approach_width_in: 36, at_turn_width_in: 36, route_length_ft: 100 };
+  const t0 = _v1164(turn);
+  assert.ok(t0.turn_applies && t0.turn_relieved === false && t0.required_approach_in === 42 && t0.required_at_turn_in === 48);
+  assert.ok(!t0.turn_approach_ok && !t0.turn_at_ok && !t0.turn_ok && !t0.passes);
+  for (const [ew, applies] of [[12, true], [47.9, true], [48, false], [60, false]]) {
+    const t = _v1164({ ...turn, turn_element_width_in: ew });
+    assert.ok(t.turn_applies === applies, "turn trigger wrong at element width " + ew);
+    if (!applies) assert.ok(t.turn_ok && t.passes, "a wide element leaves the ordinary 36 in governing");
+  }
+  for (const [at, relieved] of [[48, false], [59.9, false], [60, true], [72, true]]) {
+    const t = _v1164({ ...turn, at_turn_width_in: at, approach_width_in: 42 });
+    assert.ok(t.turn_relieved === relieved, "relief wrong at " + at);
+    assert.ok(t.turn_ok, "42 approaching with " + at + " at the turn complies either way");
+  }
+  // Both turn dimensions must be met where the relief does not apply; each fails alone.
+  assert.ok(_v1164({ ...turn, approach_width_in: 42, at_turn_width_in: 48 }).passes);
+  assert.ok(!_v1164({ ...turn, approach_width_in: 41.9, at_turn_width_in: 48 }).passes);
+  assert.ok(!_v1164({ ...turn, approach_width_in: 42, at_turn_width_in: 47.9 }).passes);
+  // A relieved turn reports null for the required dimensions rather than numbers nobody must meet.
+  const relieved = _v1164({ ...turn, at_turn_width_in: 60, approach_width_in: 36 });
+  assert.ok(relieved.required_at_turn_in === null && relieved.turn_approach_ok === null && relieved.turn_ok);
+  assert.ok(_v1164({ ...base, turn_present: "no" }).turn_ok === null);
+  // PASSING SPACES: triggered by width alone at 60 in, and the count keeps every stretch within 200 ft.
+  for (const [w, req] of [[36, true], [59.9, true], [60, false], [72, false]]) {
+    assert.ok(_v1164({ ...base, pinch_present: "no", clear_width_in: w }).passing_required === req, "passing trigger wrong at " + w);
+  }
+  for (const [L, n] of [[50, 0], [200, 0], [200.1, 1], [250, 1], [400, 1], [401, 2], [1000, 4], [1200, 5]]) {
+    const t = _v1164({ ...base, pinch_present: "no", route_length_ft: L });
+    assert.ok(t.passing_spaces_required === n, "passing count wrong at " + L + " ft: got " + t.passing_spaces_required);
+    assert.ok(t.longest_stretch_ft <= 200 + 1e-9, "a stretch exceeds the interval at " + L);
+  }
+  assert.ok(_v1164({ ...base, pinch_present: "no", clear_width_in: 60, route_length_ft: 5000 }).passing_spaces_required === 0);
+  assert.ok(_v1164({ ...base, pinch_present: "no", clear_width_in: 60, route_length_ft: 5000 }).longest_stretch_ft === 5000);
+  // Passing spaces are informational: they never flip the verdict on their own.
+  assert.ok(_v1164({ ...base, pinch_present: "no", route_length_ft: 5000 }).passes);
+  // Error seams.
+  assert.ok("error" in _v1164({ ...base, pinch_present: "sometimes" }));
+  assert.ok("error" in _v1164({ ...base, turn_present: "sometimes" }));
+  assert.ok("error" in _v1164({ ...base, clear_width_in: 0 }));
+  assert.ok("error" in _v1164({ ...base, route_length_ft: 0 }));
+  assert.ok("error" in _v1164({ ...base, pinch_length_in: 0 }));
+  assert.ok("error" in _v1164({ ...base, separation_length_in: -1 }));
+  assert.ok("error" in _v1164({ ...turn, at_turn_width_in: 0 }));
+  assert.ok("error" in _v1164({ ...base, clear_width_in: Infinity }));
+});

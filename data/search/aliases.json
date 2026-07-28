@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "accessible corridor width",
+      "target": "accessible-route-width",
+      "kind": "industry"
+    },
+    {
+      "term": "how narrow can an accessible hallway be",
+      "target": "accessible-route-width",
+      "kind": "question"
+    },
+    {
+      "term": "when are passing spaces required",
+      "target": "accessible-route-width",
+      "kind": "question"
+    },
+    {
+      "term": "32 inch clear width exception",
+      "target": "accessible-route-width",
+      "kind": "industry"
+    },
+    {
       "term": "how far can something stick out into a hallway",
       "target": "protruding-object-check",
       "kind": "question"

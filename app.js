@@ -528,6 +528,7 @@ const TOOL_MODULES = (() => {
     "sign-character-height",
     "reach-range",
     "protruding-object-check",
+    "accessible-route-width",
     // spec-v332..v334 wood-fastener withdrawal batch.
     "wood-nail-withdrawal", "wood-lag-withdrawal", "wood-screw-withdrawal",
     "cantilever-beam", "section-properties", "combined-stress-axial-bending",

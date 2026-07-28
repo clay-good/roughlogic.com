@@ -12411,3 +12411,113 @@ CONSTRUCTION_RENDERERS["protruding-object-check"] = _simpleRenderer({
   ],
   compute: computeProtrudingObject,
 });
+
+// ===================== spec-v1164: accessible route width, pinch points, turns, passing spaces (2010 ADA Standards 403.5) =====================
+
+// 36 in is the route width, and the three things around it are what get missed.
+// The 32 in figure people quote is not a width - it is a PINCH, allowed for 24 in of length at
+// most and only where the reduced segments are separated by full-width runs 48 in long. A hall
+// built at 32 in is not a hall with an exception, it is a noncompliant hall.
+// A 180 degree turn around an element narrower than 48 in needs 42 in approaching, 48 in AT the
+// turn and 42 in leaving - so a perfectly compliant 36 in corridor stops complying the moment
+// it doubles back around a narrow wall stub, unless the turn itself is 60 in.
+// And any route under 60 in wide owes passing spaces at intervals of 200 ft maximum, which is
+// nearly every corridor, and the one people never draw.
+// dims: in { clear_width_in: L, pinch_width_in: L, pinch_length_in: L, separation_length_in: L, turn_element_width_in: L, approach_width_in: L, at_turn_width_in: L, route_length_ft: L } out: { width_deficit_in: L, pinch_length_excess_in: L, required_at_turn_in: L, passing_spaces_required: dimensionless }
+export function computeAccessibleRouteWidth({ clear_width_in = 0, pinch_present = "no", pinch_width_in = 0, pinch_length_in = 0, separation_length_in = 0, turn_present = "no", turn_element_width_in = 0, approach_width_in = 0, at_turn_width_in = 0, route_length_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(clear_width_in) || 0;
+  const pw = Number(pinch_width_in) || 0;
+  const pl = Number(pinch_length_in) || 0;
+  const sep = Number(separation_length_in) || 0;
+  const tew = Number(turn_element_width_in) || 0;
+  const aw = Number(approach_width_in) || 0;
+  const tw = Number(at_turn_width_in) || 0;
+  const L = Number(route_length_ft) || 0;
+  const hasPinch = pinch_present === "yes";
+  const hasTurn = turn_present === "yes";
+  if (pinch_present !== "yes" && pinch_present !== "no") return { error: "State whether the route has a reduced-width pinch point (yes or no)." };
+  if (turn_present !== "yes" && turn_present !== "no") return { error: "State whether the route makes a 180 degree turn around an element (yes or no)." };
+  if (!(w > 0)) return { error: "Clear width of the route must be positive (in)." };
+  if (!(L > 0)) return { error: "Route length must be positive (ft)." };
+  if (hasPinch && (!(pw > 0) || !(pl > 0))) return { error: "Pinch width and length must be positive (in) where a pinch point is present." };
+  if (hasPinch && sep < 0) return { error: "Separation between reduced segments cannot be negative (in)." };
+  if (hasTurn && (!(tew > 0) || !(aw > 0) || !(tw > 0))) return { error: "Turn element width, approach width, and width at the turn must be positive (in) where a 180 degree turn is present." };
+
+  const MIN_W = 36, PINCH_MIN_W = 32, PINCH_MAX_L = 24, SEP_MIN = 48;
+  const TURN_ELEMENT = 48, TURN_APPROACH = 42, TURN_AT = 48, TURN_RELIEF = 60;
+  const PASSING_TRIGGER = 60, PASSING_INTERVAL_FT = 200;
+
+  const width_ok = w >= MIN_W;
+  const width_deficit_in = Math.max(0, MIN_W - w);
+
+  // The pinch exception: a width AND a length AND a separation, all three.
+  const pinch_width_ok = hasPinch ? pw >= PINCH_MIN_W : null;
+  const pinch_length_ok = hasPinch ? pl <= PINCH_MAX_L : null;
+  const pinch_separation_ok = hasPinch ? sep >= SEP_MIN : null;
+  const pinch_length_excess_in = hasPinch ? Math.max(0, pl - PINCH_MAX_L) : null;
+  const pinch_ok = hasPinch ? (pinch_width_ok && pinch_length_ok && pinch_separation_ok) : null;
+
+  // The turn: only where the element is narrower than 48 in, and relieved entirely at 60 in.
+  const turn_applies = hasTurn ? tew < TURN_ELEMENT : null;
+  const turn_relieved = hasTurn && turn_applies ? tw >= TURN_RELIEF : null;
+  const required_at_turn_in = hasTurn && turn_applies && !turn_relieved ? TURN_AT : null;
+  const required_approach_in = hasTurn && turn_applies && !turn_relieved ? TURN_APPROACH : null;
+  const turn_approach_ok = required_approach_in === null ? null : aw >= required_approach_in;
+  const turn_at_ok = required_at_turn_in === null ? null : tw >= required_at_turn_in;
+  const turn_ok = hasTurn ? (!turn_applies || turn_relieved === true || (turn_approach_ok && turn_at_ok)) : null;
+
+  // Passing spaces: triggered by width alone, spaced so no stretch exceeds 200 ft.
+  const passing_required = w < PASSING_TRIGGER;
+  const passing_spaces_required = passing_required ? Math.max(0, Math.ceil(L / PASSING_INTERVAL_FT) - 1) : 0;
+  const longest_stretch_ft = passing_required ? L / (passing_spaces_required + 1) : L;
+
+  const passes = width_ok && (pinch_ok !== false) && (turn_ok !== false);
+
+  const note = "36 IN IS THE ROUTE WIDTH, and the three rules around it are what get missed. The clear width of a walking surface is 36 in minimum; this route is " + w + " in: " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(1) + " in. ")
+    + (hasPinch
+      ? "THE 32 IN FIGURE IS NOT A WIDTH, IT IS A PINCH. The exception permits 32 in minimum for a length of 24 in MAXIMUM, and only where the reduced segments are separated by segments 48 in long minimum and 36 in wide minimum - three conditions, not one. This pinch is " + pw + " in wide over " + pl + " in of length with " + sep + " in of separation: "
+        + (pinch_ok ? "all three met. " : (pinch_width_ok ? "" : "WIDTH under 32 in. ") + (pinch_length_ok ? "" : "LENGTH over by " + pinch_length_excess_in.toFixed(1) + " in - past 24 in it stops being a pinch and becomes the width of the route. ") + (pinch_separation_ok ? "" : "SEPARATION under 48 in, so the reduced segments are not separated by a full-width run and read as one long narrow stretch. "))
+        + "A hall built at 32 in is not a hall with an exception; it is a noncompliant hall. "
+      : "No pinch point entered. Note that the 32 in people quote is a length-limited exception rather than a route width. ")
+    + (hasTurn
+      ? (turn_applies
+        ? "THE 180 DEGREE TURN BITES BECAUSE THE ELEMENT IS NARROW. Turning around an element less than 48 in wide - this one is " + tew + " in - requires 42 in approaching, 48 in AT the turn, and 42 in leaving, "
+          + (turn_relieved ? "unless the turn itself is 60 in minimum, which at " + tw + " in it is, so 403.5.2 does not apply. " : "and " + tw + " in at the turn does not reach the 60 in that would relieve it. Approach " + aw + " in: " + (turn_approach_ok ? "OK" : "SHORT") + "; at the turn " + tw + " in: " + (turn_at_ok ? "OK" : "SHORT") + ". A perfectly compliant 36 in corridor stops complying the moment it doubles back around a narrow stub - the width did not change, the geometry did. ")
+        : "The element turned around is " + tew + " in wide, which is 48 in or more, so 403.5.2 does not apply and the ordinary 36 in width governs through the turn. ")
+      : "")
+    + "PASSING SPACES: any accessible route with a clear width LESS than 60 in owes them at intervals of 200 ft maximum - which is nearly every corridor, and the thing that never gets drawn. At " + w + " in this route " + (passing_required ? "DOES owe them" : "does NOT owe them, being 60 in or wider") + ". "
+    + (passing_required ? "Over " + L + " ft, keeping every stretch at or under 200 ft takes " + passing_spaces_required + " passing space" + (passing_spaces_required === 1 ? "" : "s") + ", leaving the longest stretch at " + longest_stretch_ft.toFixed(0) + " ft. That count is the minimum needed so no run exceeds the interval; the standard states the interval, not a count, and where a space must go is a layout question. Each one is either 60 x 60 in, or the intersection of two walking surfaces forming a T-shaped space whose base and arms extend 48 in minimum beyond the intersection. " : "")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: running slope, cross slope, changes in level, and surface; whether this is an accessible route at all and where one is required; doors, their clear opening width, and maneuvering clearances, which routinely govern a corridor before its width does; turning space at the ends; protruding objects, which reduce the clear width separately; handrails and guards; and state and local accessibility law. A width screen, not a route design; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { width_ok, width_deficit_in, pinch_width_ok, pinch_length_ok, pinch_separation_ok, pinch_length_excess_in, pinch_ok, turn_applies, turn_relieved, required_approach_in, required_at_turn_in, turn_approach_ok, turn_at_ok, turn_ok, passing_required, passing_spaces_required, longest_stretch_ft, passes, note };
+}
+
+export const accessibleRouteWidthExample = { inputs: { clear_width_in: 36, pinch_present: "yes", pinch_width_in: 32, pinch_length_in: 30, separation_length_in: 48, turn_present: "no", turn_element_width_in: 0, approach_width_in: 0, at_turn_width_in: 0, route_length_ft: 250 } };
+
+CONSTRUCTION_RENDERERS["accessible-route-width"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 403.5.1, 403.5.2, and 403.5.3. A US federal standard in the public domain. 403.5.1: the clear width of walking surfaces shall be 36 in minimum; exception - the clear width shall be permitted to be reduced to 32 in minimum for a length of 24 in maximum provided that reduced width segments are separated by segments that are 48 in long minimum and 36 in wide minimum. 403.5.2: where the accessible route makes a 180 degree turn around an element which is less than 48 in wide, clear width shall be 42 in minimum approaching the turn, 48 in minimum at the turn and 42 in minimum leaving the turn; exception - where the clear width at the turn is 60 in minimum, compliance with 403.5.2 shall not be required. 403.5.3: an accessible route with a clear width less than 60 in shall provide passing spaces at intervals of 200 ft maximum; passing spaces shall be either a space 60 in minimum by 60 in minimum, or an intersection of two walking surfaces providing a T-shaped space complying with 304.3.2 where the base and arms of the T-shaped space extend 48 in minimum beyond the intersection. The passing-space COUNT here is the minimum needed so that no stretch exceeds the stated interval; the standard states the interval rather than a count, and placement is a layout question. Not checked: running slope, cross slope, changes in level, surface, doors and their maneuvering clearances, turning space, protruding objects, handrails, or state and local law. A width screen, not a route design.",
+  example: accessibleRouteWidthExample.inputs,
+  fields: [
+    { key: "clear_width_in", label: "Clear width of the route (in)", kind: "number", default: 36 },
+    { key: "route_length_ft", label: "Route length (ft)", kind: "number", default: 250 },
+    { key: "pinch_present", label: "Route has a reduced-width pinch point?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
+    { key: "pinch_width_in", label: "Pinch width (in)", kind: "number", default: 32 },
+    { key: "pinch_length_in", label: "Pinch length (in)", kind: "number", default: 30 },
+    { key: "separation_length_in", label: "Full-width separation between reduced segments (in)", kind: "number", default: 48 },
+    { key: "turn_present", label: "Route makes a 180 degree turn around an element?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+    { key: "turn_element_width_in", label: "Width of the element turned around (in)", kind: "number", default: 0 },
+    { key: "approach_width_in", label: "Clear width approaching and leaving the turn (in)", kind: "number", default: 0 },
+    { key: "at_turn_width_in", label: "Clear width at the turn (in)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "w", id: "arw-out-w", label: "Clear width", value: (r) => r.width_ok ? "meets the 36 in minimum" : "SHORT of 36 in by " + fmt(r.width_deficit_in, 1) + " in" },
+    { key: "p", id: "arw-out-p", label: "Pinch point (32 in exception)", value: (r) => r.pinch_ok === null ? "none entered" : r.pinch_ok ? "all three conditions met" : [r.pinch_width_ok ? null : "under 32 in wide", r.pinch_length_ok ? null : "over 24 in long by " + fmt(r.pinch_length_excess_in, 1) + " in", r.pinch_separation_ok ? null : "separation under 48 in"].filter(Boolean).join(", ") },
+    { key: "t", id: "arw-out-t", label: "180 degree turn", value: (r) => r.turn_ok === null ? "none entered" : !r.turn_applies ? "element is 48 in or wider - 403.5.2 does not apply" : r.turn_relieved ? "relieved: the turn is 60 in or wider" : (r.turn_approach_ok && r.turn_at_ok ? "meets 42 in approaching and 48 in at the turn" : "needs 42 in approaching and 48 in at the turn: " + [r.turn_approach_ok ? null : "approach short", r.turn_at_ok ? null : "turn short"].filter(Boolean).join(", ")) },
+    { key: "s", id: "arw-out-s", label: "Passing spaces", value: (r) => !r.passing_required ? "not required - the route is 60 in or wider" : r.passing_spaces_required + " needed over this length; longest stretch " + fmt(r.longest_stretch_ft, 0) + " ft" },
+    { key: "v", id: "arw-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "arw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAccessibleRouteWidth,
+});
