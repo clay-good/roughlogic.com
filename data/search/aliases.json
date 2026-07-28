@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "toilet clearance",
+      "target": "fixture-clearance-check",
+      "kind": "industry"
+    },
+    {
+      "term": "how much space does a toilet need",
+      "target": "fixture-clearance-check",
+      "kind": "question"
+    },
+    {
+      "term": "15 inches from centerline to wall",
+      "target": "fixture-clearance-check",
+      "kind": "question"
+    },
+    {
+      "term": "bathroom fixture spacing code",
+      "target": "fixture-clearance-check",
+      "kind": "industry"
+    },
+    {
+      "term": "will two fixtures fit on this wall",
+      "target": "fixture-clearance-check",
+      "kind": "question"
+    },
+    {
       "term": "egress window",
       "target": "egress-window-check",
       "kind": "industry"

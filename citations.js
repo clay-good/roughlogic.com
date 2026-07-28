@@ -15785,6 +15785,21 @@ export const CITATIONS = {
       { name: "Door minimum", value: "each leaf is floored at the §1010.1.1 32 in clear width; the sprinkler credit nearly halves the factor", source: "IBC 2021 §1010.1.1" },
     ],
   },
+  "fixture-clearance-check": {
+    formula: "pass requires centerline-to-obstruction >= 15 in on each side, adjacent fixture centers >= 30 in apart where no partition separates them, clearance in front >= 21 in, and a floor-mounted water-closet compartment >= 30 in wide by >= 60 in deep. Minimum wall-to-wall width for a row of n fixtures = 2 x 15 + (n - 1) x 30.",
+    edition: "IPC 405.3.1, Clearance of plumbing fixtures - a water closet, urinal, lavatory, or bidet not set closer than 15 in from its center to any side wall, partition, vanity, or other obstruction; adjacent fixtures not closer than 30 in center to center where partitions or other obstructions do not separate them; not less than 21 in of clearance in front to any wall, fixture, or door; water-closet compartments not less than 30 in wide and 60 in deep for floor-mounted closets.",
+    freeAccess: "The clearances are short prescriptive sentences quoted throughout free code commentary, state adoptions, and building-department handouts. No table is reproduced, and every minimum is an editable input.",
+    governance: GOVERNANCE.general,
+    editionNote: "The derived number is the one that settles a layout before anything is drawn: a row of n fixtures needs 2 x 15 + (n - 1) x 30 inches of wall-to-wall width, so two fixtures want 60 in and three want 90. A 5 ft wall holds two and not three, which is exactly where half-bath and powder-room layouts come apart. Three details cause most of the failures. Measure from the fixture CENTERLINE, not its edge. The obstruction is anything - a side wall, a partition, a vanity cabinet, a shower knee wall, a tub deck - not just a wall. And the 21 in in front is measured to any wall, fixture, OR DOOR, so a door swinging into that space is an obstruction just as a wall is; it is the clearance most often missed on a plan that otherwise fits. The most important caveat is what these numbers are NOT. They are the plumbing code FLOOR. An accessible layout is governed by ANSI A117.1 and the ADA Standards, which require substantially more - a different centerline range off the side wall rather than a bare minimum, a defined clear floor space rather than a front clearance, and grab-bar blocking - and a fixture laid out to the IPC minimums will not comply with them. The minimums are editable inputs because state and local amendments exist, so check what the AHJ actually adopted rather than assuming the model code. Wall-hung and floor-mounted compartments differ. The fixture\'s own rough-in dimension, supply and waste locations, and door hardware are separate. A screen, not a code-official determination; the adopted code and the AHJ govern.",
+    assumptions: [
+      { name: "Side clearance", value: "15 in from centerline to any side wall, partition, vanity, or obstruction", source: "IPC 405.3.1" },
+      { name: "Adjacent fixtures", value: "30 in center to center where no partition separates them", source: "IPC 405.3.1" },
+      { name: "Front clearance", value: "21 in to any wall, fixture, or door", source: "IPC 405.3.1" },
+      { name: "Compartment", value: "30 in wide by 60 in deep for a floor-mounted water closet", source: "IPC 405.3.1" },
+      { name: "Row width", value: "2 x 15 + (n - 1) x 30, derived from the two rules", source: "arithmetic on the code values" },
+      { name: "Not accessible design", value: "ANSI A117.1 and the ADA Standards require substantially more", source: "stated scope limit" },
+    ],
+  },
   "plumbing-fixture-count": {
     formula: "per_sex = ol x distribution; wc(sex) = ceil(min(per_sex, wc_tier) / wc_ratio) + (wc_ratio_over > 0 ? ceil(max(per_sex - wc_tier, 0) / wc_ratio_over) : 0); lav(sex) = ceil(per_sex / lav_ratio); fountains = ceil(ol / fountain_ratio); service = 1.",
     edition: "IBC 2021 §2902 and Table 2902.1 (minimum plumbing fixtures by occupancy, mirrored in IPC Table 403.1) and §2902.1.1 (round each ratio up), by name.",

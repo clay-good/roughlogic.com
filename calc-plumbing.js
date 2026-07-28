@@ -4471,3 +4471,95 @@ function _v1031renderTrapezoidalChannelFlow(inputRegion, outputRegion, citationE
   for (const f of [b, z, y, nn, s]) f.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["trapezoidal-channel-flow"] = _v1031renderTrapezoidalChannelFlow;
+
+// --- spec-v1132: plumbing fixture clearances (IPC 405.3.1) ---
+// The layout check every bathroom rough-in turns on and nothing in the catalog did.
+// IPC 405.3.1 gives four numbers: 15 in from a fixture centerline to any side wall,
+// partition, vanity, or other obstruction; 30 in center to center between adjacent fixtures
+// where no partition separates them; 21 in of clearance in front to any wall, fixture, or
+// door; and a water-closet compartment not less than 30 in wide by 60 in deep for a
+// floor-mounted closet. The useful derived number is the minimum wall-to-wall width for a
+// row of fixtures, 2 x 15 + (n - 1) x 30, which is what actually decides whether a layout
+// fits before anything is drawn.
+// dims: in { center_to_left_in: L, center_to_right_in: L, front_clearance_in: L, adjacent_center_in: L, fixture_count: dimensionless, compartment_width_in: L, compartment_depth_in: L, min_side_in: L, min_center_in: L, min_front_in: L } out: { min_row_width_in: L, side_deficit_in: L, front_deficit_in: L, center_deficit_in: L }
+export function computeFixtureClearanceCheck({ center_to_left_in = 0, center_to_right_in = 0, front_clearance_in = 0, adjacent_center_in = 0, fixture_count = 1, compartment_width_in = 0, compartment_depth_in = 0, min_side_in = 15, min_center_in = 30, min_front_in = 21 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(center_to_left_in) || 0;
+  const R = Number(center_to_right_in) || 0;
+  const F = Number(front_clearance_in) || 0;
+  const adj = Number(adjacent_center_in) || 0;
+  const n = Number(fixture_count) || 0;
+  const cw = Number(compartment_width_in) || 0;
+  const cd = Number(compartment_depth_in) || 0;
+  const minSide = Number(min_side_in) || 0;
+  const minCenter = Number(min_center_in) || 0;
+  const minFront = Number(min_front_in) || 0;
+  if (!(L > 0) || !(R > 0)) return { error: "Both centerline-to-obstruction distances must be positive (in)." };
+  if (!(F > 0)) return { error: "Clearance in front must be positive (in)." };
+  if (adj < 0) return { error: "Adjacent fixture center-to-center distance cannot be negative (in)." };
+  if (!Number.isInteger(n) || n < 1) return { error: "Fixture count must be a whole number of 1 or more." };
+  if (cw < 0 || cd < 0) return { error: "Compartment dimensions cannot be negative (in)." };
+  if (!(minSide > 0) || !(minCenter > 0) || !(minFront > 0)) return { error: "The code minimums must all be positive (in)." };
+
+  const left_ok = L >= minSide;
+  const right_ok = R >= minSide;
+  const front_ok = F >= minFront;
+  const has_adjacent = adj > 0;
+  const center_ok = has_adjacent ? adj >= minCenter : null;
+  const side_deficit_in = Math.max(0, minSide - Math.min(L, R));
+  const front_deficit_in = Math.max(0, minFront - F);
+  const center_deficit_in = has_adjacent ? Math.max(0, minCenter - adj) : 0;
+
+  const is_compartment = cw > 0 || cd > 0;
+  const compartment_width_ok = is_compartment ? cw >= 30 : null;
+  const compartment_depth_ok = is_compartment ? cd >= 60 : null;
+
+  // The number that decides a layout before anything is drawn.
+  const min_row_width_in = 2 * minSide + (n - 1) * minCenter;
+  const min_alcove_depth_in = minFront;
+  const passes = left_ok && right_ok && front_ok && (center_ok !== false) && (compartment_width_ok !== false) && (compartment_depth_ok !== false);
+
+  const note = "IPC 405.3.1 in four numbers: " + minSide + " in from a fixture centerline to any side wall, partition, vanity, or other obstruction; " + minCenter + " in center to center between adjacent fixtures where no partition separates them; " + minFront + " in of clearance in FRONT to any wall, fixture, or door; and a water-closet compartment not less than 30 in wide by 60 in deep for a floor-mounted closet. "
+    + "Left " + L + " in " + (left_ok ? "OK" : "FAILS") + ", right " + R + " in " + (right_ok ? "OK" : "FAILS") + ", front " + F + " in " + (front_ok ? "OK" : "FAILS by " + front_deficit_in.toFixed(1) + " in")
+    + (has_adjacent ? ", adjacent centers " + adj + " in " + (center_ok ? "OK" : "FAILS by " + center_deficit_in.toFixed(1) + " in") : ", no adjacent fixture entered")
+    + (is_compartment ? ", compartment " + cw + " x " + cd + " in (" + (compartment_width_ok ? "width OK" : "width FAILS") + ", " + (compartment_depth_ok ? "depth OK" : "depth FAILS") + ")" : "") + ". " + (passes ? "PASSES. " : "DOES NOT PASS. ")
+    + "The number that decides a layout before anything is drawn: a row of " + n + " fixture" + (n === 1 ? "" : "s") + " needs " + min_row_width_in + " in of wall-to-wall width, from 2 x " + minSide + " for the two end walls plus " + (n - 1) + " x " + minCenter + " between them. Two fixtures want 60 in, three want 90 - so a 5 ft wall holds two and not three, which is where most half-bath layouts come apart. Depth needs at least " + min_alcove_depth_in + " in clear in front of the fixture, measured to the nearest wall, fixture, OR DOOR - a door that swings into that space is an obstruction just as a wall is, and it is the clearance most often missed on a plan that otherwise fits. "
+    + "The obstruction is anything: a side wall, a partition, a vanity cabinet, a shower knee wall, a tub deck. Measure from the fixture CENTERLINE, not its edge. "
+    + "These are the IPC plumbing minimums and they are the FLOOR, not an accessible layout. ANSI A117.1 and the ADA Standards require substantially more - a different centerline range off the side wall, a defined clear floor space, and grab-bar blocking - and an accessible fixture designed to these numbers will not comply. The minimums are editable inputs because state and local amendments exist; check what your AHJ adopted. Wall-hung and floor-mounted compartments differ, and the fixture's own rough-in dimension, the supply and waste locations, and swing-door hardware are separate. A screen, not a code-official determination; the adopted code and the AHJ govern.";
+
+  return { left_ok, right_ok, front_ok, center_ok, has_adjacent, compartment_width_ok, compartment_depth_ok, is_compartment, passes, side_deficit_in, front_deficit_in, center_deficit_in, min_row_width_in, min_alcove_depth_in, note };
+}
+
+export const fixtureClearanceCheckExample = { inputs: { center_to_left_in: 15, center_to_right_in: 18, front_clearance_in: 24, adjacent_center_in: 30, fixture_count: 2, compartment_width_in: 0, compartment_depth_in: 0, min_side_in: 15, min_center_in: 30, min_front_in: 21 } };
+
+function _v1132renderFixtureClearanceCheck(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IPC 405.3.1 - a water closet, urinal, lavatory, or bidet not set closer than 15 in from its center to any side wall, partition, vanity, or other obstruction; adjacent fixtures not closer than 30 in center to center where no partition separates them; not less than 21 in of clearance in front to any wall, fixture, or door; and water-closet compartments not less than 30 in wide by 60 in deep for floor-mounted closets. The derived minimum wall-to-wall width for a row of n fixtures is 2 x 15 + (n - 1) x 30. All minimums are editable inputs because state and local amendments exist. These are the PLUMBING minimums, not an accessible layout: ANSI A117.1 and the ADA Standards require substantially more, including a different centerline range, a defined clear floor space, and grab-bar blocking. A screen, not a code-official determination; the adopted code and the AHJ govern.";
+  const l = makeNumber("Centerline to the left obstruction (in)", "fcc-l", { step: "any", min: "0" }); l.input.value = "15";
+  const r = makeNumber("Centerline to the right obstruction (in)", "fcc-r", { step: "any", min: "0" }); r.input.value = "18";
+  const f = makeNumber("Clearance in front (in)", "fcc-f", { step: "any", min: "0" }); f.input.value = "24";
+  const a = makeNumber("Adjacent fixture center to center (in; 0 = none)", "fcc-a", { step: "any", min: "0" }); a.input.value = "30";
+  const n = makeNumber("Fixtures in the row", "fcc-n", { step: "1", min: "1" }); n.input.value = "2";
+  const cw = makeNumber("Compartment width (in; 0 = not a compartment)", "fcc-cw", { step: "any", min: "0" }); cw.input.value = "0";
+  const cd = makeNumber("Compartment depth (in)", "fcc-cd", { step: "any", min: "0" }); cd.input.value = "0";
+  const ms = makeNumber("Minimum side clearance (in; IPC 15)", "fcc-ms", { step: "any", min: "0" }); ms.input.value = "15";
+  const mc = makeNumber("Minimum center to center (in; IPC 30)", "fcc-mc", { step: "any", min: "0" }); mc.input.value = "30";
+  const mf = makeNumber("Minimum front clearance (in; IPC 21)", "fcc-mf", { step: "any", min: "0" }); mf.input.value = "21";
+  for (const x of [l, r, f, a, n, cw, cd, ms, mc, mf]) inputRegion.appendChild(x.wrap);
+  attachExampleButton(inputRegion, () => { l.input.value = "15"; r.input.value = "18"; f.input.value = "24"; a.input.value = "30"; n.input.value = "2"; cw.input.value = "0"; cd.input.value = "0"; ms.input.value = "15"; mc.input.value = "30"; mf.input.value = "21"; update(); });
+  const oV = makeOutputLine(outputRegion, "Verdict", "fcc-out-v");
+  const oS = makeOutputLine(outputRegion, "Side clearances", "fcc-out-s");
+  const oF = makeOutputLine(outputRegion, "Front clearance", "fcc-out-f");
+  const oW = makeOutputLine(outputRegion, "Minimum wall-to-wall width for this row", "fcc-out-w");
+  const oNote = makeOutputLine(outputRegion, "Note", "fcc-out-note");
+  const update = debounce(() => {
+    const res = computeFixtureClearanceCheck({ center_to_left_in: Number(l.input.value) || 0, center_to_right_in: Number(r.input.value) || 0, front_clearance_in: Number(f.input.value) || 0, adjacent_center_in: Number(a.input.value) || 0, fixture_count: Number(n.input.value) || 0, compartment_width_in: Number(cw.input.value) || 0, compartment_depth_in: Number(cd.input.value) || 0, min_side_in: Number(ms.input.value) || 0, min_center_in: Number(mc.input.value) || 0, min_front_in: Number(mf.input.value) || 0 });
+    if (res.error) { oV.textContent = res.error; oS.textContent = "-"; oF.textContent = "-"; oW.textContent = "-"; oNote.textContent = "-"; return; }
+    oV.textContent = res.passes ? "PASSES the IPC 405.3.1 clearances entered" : "DOES NOT PASS";
+    oS.textContent = (res.left_ok ? "left OK" : "left SHORT") + ", " + (res.right_ok ? "right OK" : "right SHORT") + (res.has_adjacent ? ", adjacent centers " + (res.center_ok ? "OK" : "SHORT by " + fmt(res.center_deficit_in, 1) + " in") : "");
+    oF.textContent = res.front_ok ? "OK" : "SHORT by " + fmt(res.front_deficit_in, 1) + " in";
+    oW.textContent = res.min_row_width_in + " in, with at least " + res.min_alcove_depth_in + " in clear in front";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const x of [l, r, f, a, n, cw, cd, ms, mc, mf]) x.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["fixture-clearance-check"] = _v1132renderFixtureClearanceCheck;

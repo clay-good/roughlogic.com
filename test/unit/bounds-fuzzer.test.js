@@ -32086,3 +32086,60 @@ test("bounds: spec-v1131 computeEgressWindowCheck pins the unsatisfiable-minimum
   assert.ok("error" in _v1131({ ...base, min_area_override_sf: -1 }));
   assert.ok("error" in _v1131({ ...base, clear_width_in: Infinity }));
 });
+
+import { computeFixtureClearanceCheck as _v1132 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v1132 computeFixtureClearanceCheck pins the four IPC 405.3.1 clearances, the derived row width, and error seams", () => {
+  const base = { center_to_left_in: 15, center_to_right_in: 18, front_clearance_in: 24, adjacent_center_in: 30, fixture_count: 2, compartment_width_in: 0, compartment_depth_in: 0, min_side_in: 15, min_center_in: 30, min_front_in: 21 };
+  const r = _v1132(base);
+  assert.ok(r.passes && r.left_ok && r.right_ok && r.front_ok && r.center_ok === true);
+  assert.ok(r.min_row_width_in === 60 && r.min_alcove_depth_in === 21);
+  assert.ok(r.side_deficit_in === 0 && r.front_deficit_in === 0 && r.center_deficit_in === 0);
+  // THE DERIVED WIDTH: 2 x side + (n-1) x center, for every count.
+  for (const n of [1, 2, 3, 4, 8]) {
+    const t = _v1132({ ...base, fixture_count: n });
+    assert.ok(t.min_row_width_in === 2 * 15 + (n - 1) * 30, "row width wrong at n=" + n);
+  }
+  assert.ok(_v1132({ ...base, fixture_count: 1 }).min_row_width_in === 30);
+  assert.ok(_v1132({ ...base, fixture_count: 3 }).min_row_width_in === 90, "a 5 ft wall holds two, not three");
+  // Each clearance has its own seam, and the boundary value itself is compliant.
+  assert.ok(_v1132({ ...base, center_to_left_in: 15 }).left_ok && !_v1132({ ...base, center_to_left_in: 14.9 }).left_ok);
+  assert.ok(_v1132({ ...base, front_clearance_in: 21 }).front_ok && !_v1132({ ...base, front_clearance_in: 20.9 }).front_ok);
+  assert.ok(_v1132({ ...base, adjacent_center_in: 30 }).center_ok && !_v1132({ ...base, adjacent_center_in: 29.9 }).center_ok);
+  // Deficits are exact and never negative.
+  for (const L of [10, 14, 15, 20]) {
+    for (const F of [12, 18, 21, 30]) {
+      const t = _v1132({ ...base, center_to_left_in: L, front_clearance_in: F });
+      assert.ok(t.side_deficit_in === Math.max(0, 15 - Math.min(L, 18)));
+      assert.ok(t.front_deficit_in === Math.max(0, 21 - F));
+      assert.ok(t.side_deficit_in >= 0 && t.front_deficit_in >= 0);
+      assert.ok(t.passes === (t.left_ok && t.right_ok && t.front_ok && t.center_ok !== false));
+    }
+  }
+  // The deficit always uses the WORSE of the two sides.
+  assert.ok(_v1132({ ...base, center_to_left_in: 20, center_to_right_in: 12 }).side_deficit_in === 3);
+  // No adjacent fixture entered means no verdict on it, not a failure.
+  const solo = _v1132({ ...base, adjacent_center_in: 0 });
+  assert.ok(solo.center_ok === null && !solo.has_adjacent && solo.passes);
+  // Compartment checks only engage when a dimension is given, and use the fixed 30 x 60.
+  assert.ok(_v1132(base).compartment_width_ok === null && _v1132(base).compartment_depth_ok === null && !_v1132(base).is_compartment);
+  const comp = _v1132({ ...base, compartment_width_in: 30, compartment_depth_in: 56 });
+  assert.ok(comp.is_compartment && comp.compartment_width_ok && !comp.compartment_depth_ok && !comp.passes);
+  assert.ok(_v1132({ ...base, compartment_width_in: 30, compartment_depth_in: 60 }).passes);
+  assert.ok(!_v1132({ ...base, compartment_width_in: 29.9, compartment_depth_in: 60 }).compartment_width_ok);
+  // Editable minimums are honoured, in both directions.
+  const strict = _v1132({ ...base, min_side_in: 18, min_front_in: 30, min_center_in: 36 });
+  assert.ok(!strict.left_ok && !strict.front_ok && !strict.center_ok);
+  assert.ok(strict.min_row_width_in === 2 * 18 + 36);
+  assert.ok(_v1132({ ...base, min_front_in: 12 }).front_ok);
+  // Error seams.
+  assert.ok("error" in _v1132({ ...base, center_to_left_in: 0 }));
+  assert.ok("error" in _v1132({ ...base, center_to_right_in: 0 }));
+  assert.ok("error" in _v1132({ ...base, front_clearance_in: 0 }));
+  assert.ok("error" in _v1132({ ...base, adjacent_center_in: -1 }));
+  assert.ok("error" in _v1132({ ...base, fixture_count: 0 }));
+  assert.ok("error" in _v1132({ ...base, fixture_count: 2.5 }));
+  assert.ok("error" in _v1132({ ...base, compartment_width_in: -1 }));
+  assert.ok("error" in _v1132({ ...base, min_side_in: 0 }));
+  assert.ok("error" in _v1132({ ...base, center_to_left_in: Infinity }));
+});

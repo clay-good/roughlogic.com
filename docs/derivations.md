@@ -2609,6 +2609,7 @@ cross-check.
 | calc-plumbing.js | `computeChannelNormalDepth` | `{ b_ft = 0, q_cfs = 0, n = 0, s_slope = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeDrainageInvert` | `{ invert_in_ft = 0, slope = 0, slope_units = "in_per_ft", run_ft = 0, pipe_od...` | _ | _ | _ |
 | calc-plumbing.js | `computeExpansionTank` | `{ system_volume_gal = 0, fill_temperature_F = 60, max_temperature_F = 200, fi...` | _ | _ | _ |
+| calc-plumbing.js | `computeFixtureClearanceCheck` | `{ center_to_left_in = 0, center_to_right_in = 0, front_clearance_in = 0, adja...` | _ | _ | _ |
 | calc-plumbing.js | `computeFlowContinuity` | `{ V1_fps = 0, D1_in = 0, D2_in = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeFrictionLoss` | `{ method, material, nominal_size, length_ft, flow_gpm, internal_diameter_in }` | _ | _ | _ |
 | calc-plumbing.js | `computeGlycolMix` | `{ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene", prot...` | _ | _ | _ |
@@ -3176,7 +3177,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1762.
+Row count: 1763.
 
 <!-- END function-corpus-v14 -->
 
@@ -3461,7 +3462,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (120 tiles)
+### Group B Plumbing (121 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3481,6 +3482,7 @@ per spec-v14 §13.1 second paragraph.
 | `drywell-infiltration` | Dry Well / Infiltration Trench Sizing | Dry well / infiltration trench (void-...; excavation = 200/0.35 = 571.4; footprint = 571.4/4 = 142.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `expansion-guide-spacing` | Expansion Joint / Loop Guide Spacing (EJMA 4D/14D) | EJMA 4-diameter / 14-diameter guide-p...; spec-v205 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `expansion-tank` | Hydronic Expansion Tank | ASHRAE Handbook (HVAC Systems and Equ...; 100 gal system, 60 F -> 200 F, 12 psig fill, 30 psig reli... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fixture-clearance-check` | Plumbing Fixture Clearances (IPC 405.3.1) | International Code Council; 'A water closet, urinal, lavatory or bidet shall not be s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flange-rating` | Flange Pressure-Temperature Rating (ASME B16.5) | ASME B16.5 pressure-temperature ratin...; spec-v203 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `flash-steam-pct` | Flash Steam Percentage Across a Pressure Drop | Steam thermodynamics; ASME steam tabl...; spec-v157 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flow-continuity` | Flow Continuity Velocity at a Size Change | fluid mechanics; spec-v372 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4877,6 +4879,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1515. Fixture-covered or reference-cadence: 1515 / 1515.
+Tile count: 1516. Fixture-covered or reference-cadence: 1516 / 1516.
 
 <!-- END tile-index-v14 -->
