@@ -11182,3 +11182,84 @@ CONSTRUCTION_RENDERERS["door-maneuvering-clearance"] = _simpleRenderer({
   ],
   compute: computeDoorManeuveringClearance,
 });
+
+
+// --- spec-v1139: dryer exhaust duct developed length (IRC M1502.4.5) ---
+// The 35 ft everyone quotes is not the number that matters, because fittings eat it. The
+// code's own priority is worth following: M1502.4.5.2 says the SIZE AND MAXIMUM LENGTH are
+// determined by the dryer manufacturer's installation instructions, and Table M1502.4.5.1
+// is used only in the ABSENCE of fitting equivalent lengths from the manufacturer. So both
+// the ceiling and the per-fitting deductions are inputs here rather than shipped constants
+// - which is also why no code table is reproduced. What the tile adds is the arithmetic and
+// the one piece of judgment that decides most installs: the equivalent length of an elbow
+// swings enormously with its bend radius and whether it is mitered or smooth, so a tight
+// mitered 90 can cost more than three times what a wide smooth one does. Elbow selection,
+// not duct routing, is usually the lever that brings a run into compliance.
+// dims: in { straight_run_ft: L, elbow_90_count: dimensionless, elbow_45_count: dimensionless, eq_len_90_ft: L, eq_len_45_ft: L, max_length_ft: L, transition_duct_ft: L } out: { fitting_equivalent_ft: L, developed_length_ft: L, remaining_straight_ft: L, over_by_ft: L, label_required: dimensionless }
+export function computeDryerDuctLength({ straight_run_ft = 0, elbow_90_count = 0, elbow_45_count = 0, eq_len_90_ft = 0, eq_len_45_ft = 0, max_length_ft = 35, transition_duct_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const run = Number(straight_run_ft) || 0;
+  const n90 = Number(elbow_90_count) || 0;
+  const n45 = Number(elbow_45_count) || 0;
+  const e90 = Number(eq_len_90_ft) || 0;
+  const e45 = Number(eq_len_45_ft) || 0;
+  const maxL = Number(max_length_ft) || 0;
+  const trans = Number(transition_duct_ft) || 0;
+  if (!(run > 0)) return { error: "Straight duct run must be positive (ft)." };
+  if (!Number.isInteger(n90) || n90 < 0) return { error: "The 90-degree elbow count must be a whole number of 0 or more." };
+  if (!Number.isInteger(n45) || n45 < 0) return { error: "The 45-degree elbow count must be a whole number of 0 or more." };
+  if (e90 < 0 || e45 < 0) return { error: "Fitting equivalent lengths cannot be negative (ft)." };
+  if (!(maxL > 0)) return { error: "Maximum allowable length must be positive (ft)." };
+  if (trans < 0) return { error: "Transition duct length cannot be negative (ft)." };
+
+  const has_elbows = n90 + n45 > 0;
+  const equivalents_entered = (n90 === 0 || e90 > 0) && (n45 === 0 || e45 > 0);
+  const fitting_equivalent_ft = n90 * e90 + n45 * e45;
+  const developed_length_ft = run + fitting_equivalent_ft;
+  const within = developed_length_ft <= maxL;
+  const over_by_ft = Math.max(0, developed_length_ft - maxL);
+  const remaining_straight_ft = Math.max(0, maxL - developed_length_ft);
+  const fitting_share_pct = developed_length_ft > 0 ? (fitting_equivalent_ft / developed_length_ft) * 100 : 0;
+  // M1502.4.6: over 35 ft of equivalent length the duct has to be labelled at the connection.
+  const label_required = developed_length_ft > 35;
+  // M1502.4.3: the transition duct is a separate 8 ft listed assembly and is NOT counted here.
+  const transition_over = trans > 8;
+
+  const note = "Developed length is the straight run PLUS the equivalent length of every fitting, and the fittings are what actually consume the budget: "
+    + run + " ft of duct plus " + n90 + " ninety" + (n90 === 1 ? "" : "s") + " and " + n45 + " forty-five" + (n45 === 1 ? "" : "s") + " worth " + fitting_equivalent_ft.toFixed(2) + " ft = " + developed_length_ft.toFixed(2) + " ft against a " + maxL + " ft ceiling. "
+    + (within ? "WITHIN, with " + remaining_straight_ft.toFixed(2) + " ft of straight run still available. " : "OVER by " + over_by_ft.toFixed(2) + " ft. ")
+    + (has_elbows ? "Fittings are " + fitting_share_pct.toFixed(0) + "% of the total here" + (fitting_share_pct >= 40 ? " - more than the duct itself is doing, which is the usual situation on a short interior run and the reason a 35 ft rule of thumb misleads. " : ". ") : "No fittings entered, so this is a straight-shot run. ")
+    + (has_elbows && !equivalents_entered ? "WARNING: you entered elbows but left an equivalent length at zero, so this total is optimistic - it is counting those fittings as free. " : "")
+    + "WHERE THE EQUIVALENT LENGTHS COME FROM, in the code's own order of priority: M1502.4.5.2 says the size and maximum length of the exhaust duct are determined by the DRYER MANUFACTURER'S installation instructions, and the code's own table is used only in the ABSENCE of fitting equivalent lengths from the manufacturer. That is why both the ceiling and the per-fitting values are inputs here and nothing is shipped as a constant. "
+    + "The judgment that decides most installs: an elbow's equivalent length swings enormously with its bend radius and with whether it is mitered or smooth - a tight mitered ninety can cost more than three times what a wide smooth one does. Changing elbows, not rerouting duct, is usually what brings a long run into compliance, and it is worth pricing before opening a wall. "
+    + (label_required ? "Over 35 ft of equivalent length, M1502.4.6 requires the equivalent length to be identified on a permanent label or tag within 6 ft of the duct connection. " : "")
+    + "The TRANSITION duct - the flexible piece from the dryer to the rigid duct - is a separate listed assembly limited to 8 ft and is NOT part of this length" + (trans > 0 ? "; the " + trans + " ft entered " + (transition_over ? "EXCEEDS that 8 ft limit. " : "is within it. ") : ". ")
+    + "Not checked: the 4 in nominal diameter and smooth-interior metal construction, support at 12 ft maximum intervals, joints made in the direction of airflow with no screws penetrating more than 1/8 in, termination on the outside with a backdraft damper and NO screen, the 3 ft separation from openings where the manufacturer is silent, protective shield plates where fasteners could reach the duct, or booster fans, which have their own rules. A screen; the dryer manufacturer's instructions, the adopted code, and the AHJ govern.";
+
+  return { fitting_equivalent_ft, developed_length_ft, within, over_by_ft, remaining_straight_ft, fitting_share_pct, has_elbows, equivalents_entered, label_required, transition_over, note };
+}
+
+export const dryerDuctLengthExample = { inputs: { straight_run_ft: 22, elbow_90_count: 3, elbow_45_count: 2, eq_len_90_ft: 5, eq_len_45_ft: 2.5, max_length_ft: 35, transition_duct_ft: 6 } };
+
+CONSTRUCTION_RENDERERS["dryer-duct-length"] = _simpleRenderer({
+  citation: "Citation: IRC M1502.4.5 clothes dryer exhaust duct length - the maximum length measured from the connection to the transition duct to the outlet terminal, reduced by the equivalent length of each fitting, and not including the transition duct; M1502.4.5.2, which makes the DRYER MANUFACTURER'S installation instructions the determining source for both size and maximum length and allows the code's fitting table only in the absence of manufacturer equivalent lengths; M1502.4.6, requiring the equivalent length to be identified on a permanent label or tag within 6 ft of the duct connection where it exceeds 35 ft; and M1502.4.3, limiting the listed transition duct to 8 ft and excluding it from the duct length. The code's fitting-equivalent table is NOT reproduced: per M1502.4.5.2 the manufacturer's values take precedence, so the ceiling and the per-fitting equivalents are inputs. Not checked: diameter and material, support spacing, joint direction and fastener penetration, termination and backdraft damper, screens, shield plates, or booster fans. A screen; the manufacturer's instructions, the adopted code, and the AHJ govern.",
+  example: dryerDuctLengthExample.inputs,
+  fields: [
+    { key: "straight_run_ft", label: "Straight duct run (ft)", kind: "number", default: 22 },
+    { key: "elbow_90_count", label: "Number of 90-degree elbows", kind: "number", default: 3 },
+    { key: "elbow_45_count", label: "Number of 45-degree elbows", kind: "number", default: 2 },
+    { key: "eq_len_90_ft", label: "Equivalent length per 90 (ft; from the dryer maker or the code table)", kind: "number", default: 5 },
+    { key: "eq_len_45_ft", label: "Equivalent length per 45 (ft)", kind: "number", default: 2.5 },
+    { key: "max_length_ft", label: "Maximum allowable length (ft; IRC 35 absent maker data)", kind: "number", default: 35 },
+    { key: "transition_duct_ft", label: "Transition duct length (ft; not counted, 8 ft limit)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "d", id: "ddl-out-d", label: "Developed length", value: (r) => fmt(r.developed_length_ft, 2) + " ft" + (r.within ? " - WITHIN" : " - OVER by " + fmt(r.over_by_ft, 2) + " ft") },
+    { key: "f", id: "ddl-out-f", label: "Fittings cost", value: (r) => fmt(r.fitting_equivalent_ft, 2) + " ft, " + fmt(r.fitting_share_pct, 0) + "% of the total" },
+    { key: "r", id: "ddl-out-r", label: "Straight run still available", value: (r) => r.within ? fmt(r.remaining_straight_ft, 2) + " ft" : "none - already over" },
+    { key: "l", id: "ddl-out-l", label: "Label required (M1502.4.6)", value: (r) => r.label_required ? "yes - tag the equivalent length within 6 ft of the connection" : "no" },
+    { key: "t", id: "ddl-out-t", label: "Transition duct", value: (r) => r.transition_over ? "EXCEEDS the 8 ft limit" : "within the 8 ft limit (and not counted in the length above)" },
+    { key: "n", id: "ddl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDryerDuctLength,
+});

@@ -1617,6 +1617,7 @@ cross-check.
 | calc-construction.js | `computeDemoDebris` | `{ structure_type = "wood_frame", volume_yd3 = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeDoorManeuveringClearance` | `{ clear_perpendicular_in = 0, clear_latch_side_in = 0, door_clear_width_in = ...` | _ | _ | _ |
 | calc-construction.js | `computeDrainageBoardTakeoff` | `{ perimeter_ft = 150, below_grade_height_ft = 8, roll_width_ft = 4, roll_leng...` | _ | _ | _ |
+| calc-construction.js | `computeDryerDuctLength` | `{ straight_run_ft = 0, elbow_90_count = 0, elbow_45_count = 0, eq_len_90_ft =...` | _ | _ | _ |
 | calc-construction.js | `computeDrywall` | `{ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_size = "4x8", waste_percent ...` | _ | _ | _ |
 | calc-construction.js | `computeDrywallFastenerTakeoff` | `{ sheets = 100, sheet_length_ft = 8, sheet_width_ft = 4, stud_spacing_in = 16...` | _ | _ | _ |
 | calc-construction.js | `computeDuctBankConcrete` | `{ bank_width_ft = 2.0, bank_height_ft = 1.5, length_ft = 100, num_conduits = ...` | _ | _ | _ |
@@ -3183,7 +3184,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1769.
+Row count: 1770.
 
 <!-- END function-corpus-v14 -->
 
@@ -3805,7 +3806,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (405 tiles)
+### Group E Construction (406 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3920,6 +3921,7 @@ per spec-v14 §13.1 second paragraph.
 | `dozer-production` | Dozer Slot / Blade Production Rate | Caterpillar Performance Handbook slot...; 8 lcy blade, 100 ft push at 200 fpm, return 400 fpm, 0.05... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drainage-board-takeoff` | Foundation Drainage Board (Dimple Mat) Takeoff | Foundation drainage board (dimple mat...; area = 150 x 8 = 1,200 sf; rolls = ceil(1200 x 1.1 / 200)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drip-edge-takeoff` | Roof Drip Edge Rake / Eave Split and Piece Count | roof takeoff geometry; 80 ft of eave plus four 14-ft rakes at 6:12 -> slope fact... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `dryer-duct-length` | Dryer Exhaust Duct Developed Length (IRC M1502.4.5) | International Code Council; 'The maximum length of the exhaust duct shall be 35 feet ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drywall` | Drywall Sheet Count and Mud | Project (first-principles); sheets = ceil(1.10 * 1800 / 32) = 62; mud = 0.053 * 1800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drywall-fastener-takeoff` | Drywall Screw Fastener Takeoff | Drywall fastener identity (first-prin...; studs=floor(48/16)+1=4; screws/stud=floor(96/12)+1=9; per... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `duct-bank-concrete` | Electrical Duct-Bank Concrete Encasement Volume | Duct-bank encasement identity (first-...; net = 3.0 - 6*(PI/4)*(4.5/12)^2 = 2.337 ft^2; volume = 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4891,6 +4893,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1522. Fixture-covered or reference-cadence: 1522 / 1522.
+Tile count: 1523. Fixture-covered or reference-cadence: 1523 / 1523.
 
 <!-- END tile-index-v14 -->

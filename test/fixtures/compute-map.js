@@ -1360,6 +1360,7 @@ export const COMPUTE_MAP = {
   "egress-window-check": { module: "../../calc-construction.js", fn: "computeEgressWindowCheck" },
   "landing-check": { module: "../../calc-construction.js", fn: "computeLandingCheck" },
   "door-maneuvering-clearance": { module: "../../calc-construction.js", fn: "computeDoorManeuveringClearance" },
+  "dryer-duct-length": { module: "../../calc-construction.js", fn: "computeDryerDuctLength" },
   "stair-code-check": { module: "../../calc-construction.js", fn: "computeStairCodeCheck" },
   "smooth-bore-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreFlow" },
   "smooth-bore-diameter-for-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreDiameterForFlow" },

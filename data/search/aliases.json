@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "dryer vent length",
+      "target": "dryer-duct-length",
+      "kind": "industry"
+    },
+    {
+      "term": "how long can a dryer duct be",
+      "target": "dryer-duct-length",
+      "kind": "question"
+    },
+    {
+      "term": "dryer duct elbow equivalent length",
+      "target": "dryer-duct-length",
+      "kind": "question"
+    },
+    {
+      "term": "35 foot dryer duct rule",
+      "target": "dryer-duct-length",
+      "kind": "question"
+    },
+    {
+      "term": "dryer transition duct 8 feet",
+      "target": "dryer-duct-length",
+      "kind": "industry"
+    },
+    {
       "term": "door maneuvering clearance",
       "target": "door-maneuvering-clearance",
       "kind": "industry"

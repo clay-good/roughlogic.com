@@ -32444,3 +32444,55 @@ test("bounds: spec-v1138 computeDoorManeuveringClearance pins the pull/push asym
   assert.ok("error" in _v1138({ ...base, min_push_perpendicular_in: 0 }));
   assert.ok("error" in _v1138({ ...base, clear_perpendicular_in: Infinity }));
 });
+
+import { computeDryerDuctLength as _v1139 } from "../../calc-construction.js";
+
+test("bounds: spec-v1139 computeDryerDuctLength pins the developed-length arithmetic, the elbow-selection flip, the label and transition rules, and error seams", () => {
+  const base = { straight_run_ft: 22, elbow_90_count: 3, elbow_45_count: 2, eq_len_90_ft: 5, eq_len_45_ft: 2.5, max_length_ft: 35, transition_duct_ft: 6 };
+  const r = _v1139(base);
+  assert.ok(r.fitting_equivalent_ft === 20 && r.developed_length_ft === 42 && !r.within && r.over_by_ft === 7);
+  assert.ok(r.remaining_straight_ft === 0 && Math.abs(r.fitting_share_pct - 47.619048) < 1e-5);
+  assert.ok(r.label_required && !r.transition_over);
+  // THE FLIP: same run, same fitting count, wider elbows - compliance reverses.
+  const wide = _v1139({ ...base, eq_len_90_ft: 1.5, eq_len_45_ft: 0.75 });
+  assert.ok(wide.developed_length_ft === 28 && wide.within && wide.remaining_straight_ft === 7 && wide.over_by_ft === 0);
+  assert.ok(wide.fitting_equivalent_ft === 6 && !wide.label_required);
+  // The arithmetic identity holds everywhere, and the two paths are exclusive.
+  for (const run of [5, 22, 40]) {
+    for (const n90 of [0, 1, 3]) {
+      for (const n45 of [0, 2]) {
+        for (const e90 of [0, 1.5, 5]) {
+          const t = _v1139({ ...base, straight_run_ft: run, elbow_90_count: n90, elbow_45_count: n45, eq_len_90_ft: e90 });
+          assert.ok(Math.abs(t.fitting_equivalent_ft - (n90 * e90 + n45 * 2.5)) < 1e-9);
+          assert.ok(Math.abs(t.developed_length_ft - (run + t.fitting_equivalent_ft)) < 1e-9);
+          assert.ok(t.within === (t.developed_length_ft <= 35));
+          assert.ok(t.within ? t.over_by_ft === 0 : t.remaining_straight_ft === 0, "over and remaining are mutually exclusive");
+          assert.ok(t.over_by_ft >= 0 && t.remaining_straight_ft >= 0);
+          assert.ok(t.developed_length_ft >= run, "fittings never shorten the run");
+          assert.ok(t.has_elbows === (n90 + n45 > 0));
+          assert.ok(t.label_required === (t.developed_length_ft > 35));
+        }
+      }
+    }
+  }
+  // An elbow entered with a zero equivalent length is flagged as optimistic.
+  assert.ok(!_v1139({ ...base, eq_len_90_ft: 0 }).equivalents_entered);
+  assert.ok(_v1139({ ...base, elbow_90_count: 0, eq_len_90_ft: 0 }).equivalents_entered, "no elbows means nothing is missing");
+  assert.ok(/optimistic/.test(_v1139({ ...base, eq_len_45_ft: 0 }).note));
+  // The ceiling is editable and the label threshold stays pinned at 35 regardless.
+  const mfr = _v1139({ ...base, max_length_ft: 45 });
+  assert.ok(mfr.within && mfr.remaining_straight_ft === 3 && mfr.label_required, "still over 35 even though within a 45 ft ceiling");
+  assert.ok(!_v1139({ ...base, max_length_ft: 20 }).within);
+  // Transition duct: 8 ft is the limit, it never enters the length, and the seam is exact.
+  assert.ok(!_v1139({ ...base, transition_duct_ft: 8 }).transition_over);
+  assert.ok(_v1139({ ...base, transition_duct_ft: 8.1 }).transition_over);
+  assert.ok(_v1139({ ...base, transition_duct_ft: 8 }).developed_length_ft === r.developed_length_ft);
+  // Error seams.
+  assert.ok("error" in _v1139({ ...base, straight_run_ft: 0 }));
+  assert.ok("error" in _v1139({ ...base, elbow_90_count: -1 }));
+  assert.ok("error" in _v1139({ ...base, elbow_45_count: 1.5 }));
+  assert.ok("error" in _v1139({ ...base, eq_len_90_ft: -1 }));
+  assert.ok("error" in _v1139({ ...base, max_length_ft: 0 }));
+  assert.ok("error" in _v1139({ ...base, transition_duct_ft: -1 }));
+  assert.ok("error" in _v1139({ ...base, straight_run_ft: Infinity }));
+});
