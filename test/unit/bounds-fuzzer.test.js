@@ -32851,3 +32851,49 @@ test("bounds: spec-v1146 computeWaterServicePressureCheck pins the 80 psi cap, t
   assert.ok("error" in _v1146({ ...base, prv_setpoint_psi: -1 }));
   assert.ok("error" in _v1146({ ...base, static_pressure_psi: Infinity }));
 });
+
+import { computeEgressWindowWell as _v1147 } from "../../calc-construction.js";
+
+test("bounds: spec-v1147 computeEgressWindowWell pins the tangent 36x36 minimums, the partner dimensions, the ladder trigger, and error seams", () => {
+  const base = { well_width_in: 36, well_projection_in: 30, well_depth_in: 60, has_ladder: "no", ladder_inside_width_in: 0, ladder_projection_in: 0, ladder_spacing_in: 0, opening_fully_opens: "yes" };
+  const r = _v1147(base);
+  assert.ok(r.area_sf === 7.5 && !r.area_ok && r.area_deficit_sf === 1.5 && r.width_ok && !r.projection_ok);
+  assert.ok(r.projection_needed_in === 36 && Math.abs(r.width_needed_in - 43.2) < 1e-9);
+  assert.ok(r.ladder_required && !r.ladder_ok && !r.passes);
+  // THE TANGENCY: 36 x 36 is exactly 9 sq ft, so both minimums bind at once with no margin.
+  assert.ok(r.tangent && r.minimums_area_sf === 9);
+  const sq = _v1147({ ...base, well_projection_in: 36, has_ladder: "yes", ladder_inside_width_in: 12, ladder_projection_in: 3, ladder_spacing_in: 18 });
+  assert.ok(sq.area_sf === 9 && sq.area_ok && sq.width_ok && sq.projection_ok && sq.passes);
+  // Ladder rung values exactly on their limits all pass (two minima and one maximum).
+  assert.ok(sq.ladder_width_ok && sq.ladder_proj_ok && sq.ladder_spacing_ok && sq.ladder_ok);
+  const withLadder = (over) => _v1147({ ...base, well_projection_in: 36, has_ladder: "yes", ladder_inside_width_in: 12, ladder_projection_in: 3, ladder_spacing_in: 18, ...over });
+  assert.ok(!withLadder({ ladder_inside_width_in: 11.9 }).ladder_width_ok);
+  assert.ok(!withLadder({ ladder_projection_in: 2.9 }).ladder_proj_ok);
+  assert.ok(!withLadder({ ladder_spacing_in: 18.1 }).ladder_spacing_ok);
+  // A well under 36 in wide can NEVER pass, however far it projects.
+  for (const p of [36, 60, 200]) {
+    const t = _v1147({ ...base, well_width_in: 30, well_projection_in: p, well_depth_in: 40 });
+    assert.ok(!t.width_ok && !t.passes, "a narrow well cannot be rescued by projection");
+    assert.ok(t.projection_needed_in >= 36);
+  }
+  // The reported partner dimension always produces a passing well.
+  for (const w of [36, 40, 54]) {
+    const t = _v1147({ ...base, well_width_in: w, well_depth_in: 40 });
+    const fixed = _v1147({ ...base, well_width_in: w, well_projection_in: t.projection_needed_in, well_depth_in: 40 });
+    assert.ok(fixed.area_ok && fixed.passes, "the reported projection must make it pass at w=" + w);
+  }
+  // LADDER TRIGGER: greater than 44 in, so 44 exactly does not require one.
+  assert.ok(!_v1147({ ...base, well_depth_in: 44, well_projection_in: 36 }).ladder_required);
+  assert.ok(_v1147({ ...base, well_depth_in: 44.1, well_projection_in: 36 }).ladder_required);
+  assert.ok(_v1147({ ...base, well_depth_in: 44, well_projection_in: 36 }).ladder_ok === null);
+  assert.ok(_v1147({ ...base, well_depth_in: 44, well_projection_in: 36 }).passes);
+  // The full-opening condition fails on its own, with everything else perfect.
+  const blocked = _v1147({ ...base, well_projection_in: 60, well_depth_in: 40, opening_fully_opens: "no" });
+  assert.ok(blocked.area_ok && blocked.width_ok && blocked.projection_ok && !blocked.passes);
+  // Error seams.
+  assert.ok("error" in _v1147({ ...base, well_width_in: 0 }));
+  assert.ok("error" in _v1147({ ...base, well_projection_in: 0 }));
+  assert.ok("error" in _v1147({ ...base, well_depth_in: 0 }));
+  assert.ok("error" in _v1147({ ...base, ladder_inside_width_in: -1 }));
+  assert.ok("error" in _v1147({ ...base, well_width_in: Infinity }));
+});

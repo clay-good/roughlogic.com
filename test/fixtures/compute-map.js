@@ -1366,6 +1366,7 @@ export const COMPUTE_MAP = {
   "dryer-duct-length": { module: "../../calc-construction.js", fn: "computeDryerDuctLength" },
   "smoke-alarm-placement": { module: "../../calc-construction.js", fn: "computeSmokeAlarmPlacement" },
   "co-alarm-placement": { module: "../../calc-construction.js", fn: "computeCoAlarmPlacement" },
+  "egress-window-well": { module: "../../calc-construction.js", fn: "computeEgressWindowWell" },
   "stair-code-check": { module: "../../calc-construction.js", fn: "computeStairCodeCheck" },
   "smooth-bore-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreFlow" },
   "smooth-bore-diameter-for-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreDiameterForFlow" },

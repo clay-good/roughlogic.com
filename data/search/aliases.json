@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "egress window well size",
+      "target": "egress-window-well",
+      "kind": "industry"
+    },
+    {
+      "term": "how big does a window well have to be",
+      "target": "egress-window-well",
+      "kind": "question"
+    },
+    {
+      "term": "window well ladder required depth",
+      "target": "egress-window-well",
+      "kind": "question"
+    },
+    {
+      "term": "9 square feet window well",
+      "target": "egress-window-well",
+      "kind": "question"
+    },
+    {
+      "term": "basement window well code",
+      "target": "egress-window-well",
+      "kind": "industry"
+    },
+    {
       "term": "water pressure over 80 psi",
       "target": "water-service-pressure-check",
       "kind": "question"

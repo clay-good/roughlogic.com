@@ -1373,6 +1373,7 @@ const RELATED = {
   "dryer-duct-length": ["hood-exhaust","duct-metal-weight","combustion-air"],
   "smoke-alarm-placement": ["co-alarm-placement","egress-window-check","landing-check","guard-handrail-check"],
   "co-alarm-placement": ["smoke-alarm-placement","combustion-air","co-air-free","egress-window-check"],
+  "egress-window-well": ["egress-window-check","landing-check","smoke-alarm-placement"],
   "stair-code-check": ["stairs","guard-handrail-check","egress-capacity"],
   // spec-v114 smooth-bore nozzle flow (Group F)
   "smooth-bore-flow": ["fire-stream-reaction","master-stream","ladder-pipe-reach"],

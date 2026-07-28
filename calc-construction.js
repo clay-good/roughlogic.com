@@ -11414,3 +11414,94 @@ CONSTRUCTION_RENDERERS["co-alarm-placement"] = _simpleRenderer({
   ],
   compute: computeCoAlarmPlacement,
 });
+
+
+// --- spec-v1147: egress window well (IRC R310.2.3) ---
+// egress-window-check names window wells as a separate requirement it does not check.
+// This is that check, and it has the same shape as its sibling: minimums that are exactly
+// tangent. 9 sq ft of horizontal area with a minimum horizontal projection AND width of
+// 36 in - and 36 x 36 is exactly 9 sq ft, so the smallest compliant well is square and any
+// narrower one has to get deeper to compensate, by an amount this reports. Then two more:
+// the well must allow the escape opening to be FULLY OPENED, which an inward-swinging
+// casement into a shallow well quietly defeats, and a well deeper than 44 in needs a
+// permanently affixed ladder or steps usable with the window fully open.
+// dims: in { well_width_in: L, well_projection_in: L, well_depth_in: L, has_ladder: dimensionless, ladder_inside_width_in: L, ladder_projection_in: L, ladder_spacing_in: L, opening_fully_opens: dimensionless } out: { area_sf: L^2, required_area_sf: L^2, area_deficit_sf: L^2, projection_needed_in: L, width_needed_in: L }
+export function computeEgressWindowWell({ well_width_in = 0, well_projection_in = 0, well_depth_in = 0, has_ladder = "no", ladder_inside_width_in = 0, ladder_projection_in = 0, ladder_spacing_in = 0, opening_fully_opens = "yes" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(well_width_in) || 0;
+  const proj = Number(well_projection_in) || 0;
+  const depth = Number(well_depth_in) || 0;
+  const lw = Number(ladder_inside_width_in) || 0;
+  const lp = Number(ladder_projection_in) || 0;
+  const ls = Number(ladder_spacing_in) || 0;
+  const ladder = has_ladder === "yes";
+  const fullyOpens = opening_fully_opens === "yes";
+  if (!(w > 0)) return { error: "Window well width must be positive (in)." };
+  if (!(proj > 0)) return { error: "Window well horizontal projection must be positive (in)." };
+  if (!(depth > 0)) return { error: "Window well depth must be positive (in)." };
+  if (lw < 0 || lp < 0 || ls < 0) return { error: "Ladder dimensions cannot be negative (in)." };
+
+  const MIN_AREA_SF = 9, MIN_DIM = 36, LADDER_DEPTH = 44, LADDER_W = 12, LADDER_PROJ = 3, LADDER_SPACING = 18;
+  const area_sf = (w * proj) / 144;
+  const required_area_sf = MIN_AREA_SF;
+  const area_ok = area_sf >= MIN_AREA_SF;
+  const area_deficit_sf = Math.max(0, MIN_AREA_SF - area_sf);
+  const width_ok = w >= MIN_DIM;
+  const projection_ok = proj >= MIN_DIM;
+  // The partner dimension each one needs, floored at its own 36 in minimum.
+  const projection_needed_in = Math.max(MIN_DIM, MIN_AREA_SF * 144 / w);
+  const width_needed_in = Math.max(MIN_DIM, MIN_AREA_SF * 144 / proj);
+
+  const ladder_required = depth > LADDER_DEPTH;
+  const ladder_present_ok = ladder_required ? ladder : null;
+  const ladder_dims_entered = ladder && (lw > 0 || lp > 0 || ls > 0);
+  const ladder_width_ok = ladder_dims_entered ? lw >= LADDER_W : null;
+  const ladder_proj_ok = ladder_dims_entered ? lp >= LADDER_PROJ : null;
+  const ladder_spacing_ok = ladder_dims_entered ? ls <= LADDER_SPACING : null;
+  const ladder_ok = ladder_required ? (ladder && ladder_width_ok !== false && ladder_proj_ok !== false && ladder_spacing_ok !== false) : null;
+
+  const passes = area_ok && width_ok && projection_ok && fullyOpens && (ladder_ok !== false);
+  // The tangency: 36 x 36 is exactly 9 sq ft, so both minimums together only just work.
+  const minimums_area_sf = (MIN_DIM * MIN_DIM) / 144;
+  const tangent = Math.abs(minimums_area_sf - MIN_AREA_SF) < 1e-9;
+
+  const note = "AREA AND DIMENSIONS (R310.2.3): not less than 9 sq ft of horizontal area, with a minimum horizontal projection AND width of 36 in. "
+    + (tangent ? "Those minimums are exactly tangent - 36 x 36 is 9 sq ft precisely - so the smallest compliant well is square, and any well narrower than 36 in fails on the dimension no matter how deep it projects. " : "")
+    + "This well is " + w + " x " + proj + " in = " + area_sf.toFixed(2) + " sq ft: area " + (area_ok ? "OK" : "SHORT by " + area_deficit_sf.toFixed(2) + " sq ft") + ", width " + (width_ok ? "OK" : "under the 36 in minimum") + ", projection " + (projection_ok ? "OK" : "under the 36 in minimum") + ". "
+    + "At this width the projection must reach " + projection_needed_in.toFixed(1) + " in; at this projection the width must reach " + width_needed_in.toFixed(1) + " in. "
+    + "THE REQUIREMENT WITH NO NUMBER: the well must allow the escape opening to be FULLY OPENED. " + (fullyOpens ? "Stated as satisfied. " : "NOT satisfied, and this fails regardless of the square footage. ") + "An inward-swinging casement is fine, but an outward-swinging one, or a hopper, can foul the well wall in a shallow projection and leave an opening that measures compliant and does not open - the area is a floor, not a substitute for checking the sash through its swing. "
+    + "LADDER (R310.2.3.1): required where the vertical depth exceeds " + LADDER_DEPTH + " in, permanently affixed and usable with the window in the fully open position. This well is " + depth + " in deep, so a ladder is " + (ladder_required ? "REQUIRED - " + (ladder ? "present. " : "MISSING. ") : "not required. ")
+    + (ladder_required && ladder_dims_entered
+      ? "Rungs need an inside width of not less than " + LADDER_W + " in (" + lw + " entered, " + (ladder_width_ok ? "OK" : "SHORT") + "), a projection of not less than " + LADDER_PROJ + " in from the wall (" + lp + ", " + (ladder_proj_ok ? "OK" : "SHORT") + "), and spacing not more than " + LADDER_SPACING + " in on centre vertically for the full height of the well (" + ls + ", " + (ladder_spacing_ok ? "OK" : "TOO WIDE") + "). Note the code permits the ladder to encroach into the required dimensions - a ladder is not a reason to enlarge the well. "
+      : ladder_required ? "Enter the rung dimensions to check the 12 in inside width, 3 in projection, and 18 in maximum vertical spacing. " : "")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: the escape opening itself, which is the egress-window-check tile; a cover or grate over the well and whether it is releasable from inside without tools; drainage, which is what actually fails these wells in service - a well that fills with water is a hazard rather than an exit; the structural design of the well wall against soil pressure; guards around the well at grade; or whether the room needs an escape opening at all. A screen, not a code-official determination; the adopted code and the AHJ govern.";
+
+  return { area_sf, required_area_sf, area_ok, area_deficit_sf, width_ok, projection_ok, projection_needed_in, width_needed_in, ladder_required, ladder_present_ok, ladder_dims_entered, ladder_width_ok, ladder_proj_ok, ladder_spacing_ok, ladder_ok, fully_opens: fullyOpens, tangent, minimums_area_sf, passes, note };
+}
+
+export const egressWindowWellExample = { inputs: { well_width_in: 36, well_projection_in: 30, well_depth_in: 60, has_ladder: "no", ladder_inside_width_in: 0, ladder_projection_in: 0, ladder_spacing_in: 0, opening_fully_opens: "yes" } };
+
+CONSTRUCTION_RENDERERS["egress-window-well"] = _simpleRenderer({
+  citation: "Citation: IRC R310.2.3 window wells - a minimum horizontal area of 9 sq ft with a minimum horizontal projection and width of 36 in, and an area that allows the emergency escape and rescue opening to be fully opened. IRC R310.2.3.1 - window wells with a vertical depth greater than 44 in equipped with a permanently affixed ladder or steps usable with the window in the fully open position, with ladders or rungs having an inside width of not less than 12 in, projecting not less than 3 in from the wall, and spaced not more than 18 in on center vertically for the full height of the well; such ladders may encroach into the required dimensions. Not checked: the escape opening itself (see egress-window-check), covers and grates and their release from inside, well drainage, the structural design of the well wall, guards at grade, or whether an escape opening is required at all. A screen, not a code-official determination; the adopted code and the AHJ govern.",
+  example: egressWindowWellExample.inputs,
+  fields: [
+    { key: "well_width_in", label: "Well width (in)", kind: "number", default: 36 },
+    { key: "well_projection_in", label: "Well horizontal projection from the wall (in)", kind: "number", default: 30 },
+    { key: "well_depth_in", label: "Well vertical depth (in)", kind: "number", default: 60 },
+    { key: "opening_fully_opens", label: "Does the well let the window open FULLY?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
+    { key: "has_ladder", label: "Permanently affixed ladder or steps?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+    { key: "ladder_inside_width_in", label: "Ladder inside width (in; 0 to skip)", kind: "number", default: 0 },
+    { key: "ladder_projection_in", label: "Ladder projection from the wall (in)", kind: "number", default: 0 },
+    { key: "ladder_spacing_in", label: "Rung spacing on centre (in)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "a", id: "eww-out-a", label: "Horizontal area", value: (r) => fmt(r.area_sf, 2) + " sq ft vs 9 required" + (r.area_ok ? " - OK" : " - short by " + fmt(r.area_deficit_sf, 2)) },
+    { key: "d", id: "eww-out-d", label: "Width and projection", value: (r) => (r.width_ok ? "width OK" : "width under 36 in") + ", " + (r.projection_ok ? "projection OK" : "projection under 36 in") },
+    { key: "p", id: "eww-out-p", label: "Partner dimensions", value: (r) => "projection " + fmt(r.projection_needed_in, 1) + " in at this width; width " + fmt(r.width_needed_in, 1) + " in at this projection" },
+    { key: "l", id: "eww-out-l", label: "Ladder (over 44 in deep)", value: (r) => !r.ladder_required ? "not required at this depth" : r.ladder_ok ? "required and satisfied" : "REQUIRED - " + (r.ladder_present_ok ? "rung dimensions fail" : "missing") },
+    { key: "v", id: "eww-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES" : "DOES NOT PASS" + (r.fully_opens ? "" : " - the well does not let the window open fully, which fails on its own") },
+    { key: "n", id: "eww-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeEgressWindowWell,
+});
