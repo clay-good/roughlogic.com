@@ -34274,3 +34274,85 @@ test("bounds: spec-v1169 computeFloorLevelChange pins the three thresholds, the 
   assert.ok("error" in _v1169({ ...base, ramp_run_per_rise: 0 }));
   assert.ok("error" in _v1169({ ...base, level_change_in: Infinity }));
 });
+
+import { computeTurningAndClearFloorSpace as _v1170 } from "../../calc-construction.js";
+
+test("bounds: spec-v1170 computeTurningAndClearFloorSpace pins the orientation trap, both alcove triggers, the circle and the four T conditions, and error seams", () => {
+  const base = { cfs_width_in: 30, cfs_depth_in: 48, approach: "parallel", alcove_depth_in: 20, turning_type: "circular", turning_diameter_in: 60, t_square_in: 0, t_arm_width_in: 0, t_arm_clear_in: 0, t_base_clear_in: 0 };
+  const r = _v1170(base);
+  assert.ok(!r.cfs_oriented_ok && r.cfs_size_ok, "big enough, turned the wrong way");
+  assert.ok(r.is_alcove && r.alcove_trigger_in === 15 && r.required_alcove_width_in === 60 && r.alcove_width_deficit_in === 30);
+  assert.ok(r.turning_ok && !r.passes);
+  // ORIENTATION: the same two numbers pass one approach and fail the other.
+  assert.ok(_v1170({ ...base, cfs_width_in: 30, cfs_depth_in: 48, approach: "forward", alcove_depth_in: 0 }).cfs_oriented_ok);
+  assert.ok(!_v1170({ ...base, cfs_width_in: 30, cfs_depth_in: 48, approach: "parallel", alcove_depth_in: 0 }).cfs_oriented_ok);
+  assert.ok(_v1170({ ...base, cfs_width_in: 48, cfs_depth_in: 30, approach: "parallel", alcove_depth_in: 0 }).cfs_oriented_ok);
+  assert.ok(!_v1170({ ...base, cfs_width_in: 48, cfs_depth_in: 30, approach: "forward", alcove_depth_in: 0 }).cfs_oriented_ok);
+  // Both orientations report the same short and long sides - the area really is identical.
+  const a = _v1170({ ...base, cfs_width_in: 30, cfs_depth_in: 48, alcove_depth_in: 0 });
+  const b = _v1170({ ...base, cfs_width_in: 48, cfs_depth_in: 30, alcove_depth_in: 0 });
+  assert.ok(a.cfs_short_side_in === b.cfs_short_side_in && a.cfs_long_side_in === b.cfs_long_side_in && a.cfs_size_ok && b.cfs_size_ok);
+  // Size seams in each orientation.
+  for (const [w, d, ok] of [[30, 48, true], [29.9, 48, false], [30, 47.9, false], [36, 60, true]]) {
+    assert.ok(_v1170({ ...base, cfs_width_in: w, cfs_depth_in: d, approach: "forward", alcove_depth_in: 0 }).cfs_oriented_ok === ok, "forward size wrong at " + w + "x" + d);
+  }
+  // THE TWO ALCOVE TRIGGERS, on the correct side, with the widths that follow.
+  for (const [app, dep, isAlc, req] of [
+    ["forward", 24, false, null], ["forward", 24.1, true, 36], ["forward", 40, true, 36],
+    ["parallel", 15, false, null], ["parallel", 15.1, true, 60], ["parallel", 20, true, 60]]) {
+    const t = _v1170({ ...base, approach: app, alcove_depth_in: dep, cfs_width_in: app === "forward" ? 30 : 48, cfs_depth_in: app === "forward" ? 48 : 30 });
+    assert.ok(t.is_alcove === isAlc, "alcove trigger wrong at " + app + "/" + dep);
+    assert.ok(t.required_alcove_width_in === req, "alcove width wrong at " + app + "/" + dep);
+    assert.ok(t.alcove_trigger_in === (app === "forward" ? 24 : 15));
+    if (!isAlc) assert.ok(t.alcove_width_ok === null && t.alcove_width_deficit_in === null, "no alcove means null, not a pass");
+  }
+  // The same nook is an alcove on one approach and not on the other, and the widths differ by 24 in.
+  const nook = { ...base, alcove_depth_in: 20, cfs_width_in: 40 };
+  assert.ok(!_v1170({ ...nook, approach: "forward", cfs_depth_in: 48 }).is_alcove);
+  assert.ok(_v1170({ ...nook, approach: "parallel", cfs_depth_in: 30 }).is_alcove);
+  assert.ok(_v1170({ ...nook, approach: "forward", cfs_depth_in: 48 }).other_required_width_in === 60, "the parallel rule would have bitten");
+  assert.ok(_v1170({ ...base, approach: "parallel", alcove_depth_in: 30, cfs_width_in: 48, cfs_depth_in: 30 }).other_required_width_in === 36);
+  assert.ok(_v1170({ ...base, alcove_depth_in: 0 }).other_required_width_in === null);
+  // Alcove deficits are exact and non-negative, and a wide enough alcove passes.
+  for (const w of [30, 48, 59.9, 60, 72]) {
+    const t = _v1170({ ...base, cfs_width_in: w, cfs_depth_in: 30, approach: "parallel", alcove_depth_in: 20 });
+    assert.ok(Math.abs(t.alcove_width_deficit_in - Math.max(0, 60 - w)) < 1e-9 && t.alcove_width_deficit_in >= 0);
+    assert.ok(t.alcove_width_ok === (w >= 60));
+  }
+  // THE CIRCLE: 60 in, with the deficit exact.
+  for (const [dia, ok] of [[48, false], [59.9, false], [60, true], [72, true]]) {
+    const t = _v1170({ ...base, turning_diameter_in: dia });
+    assert.ok(t.turning_ok === ok && Math.abs(t.circle_deficit_in - Math.max(0, 60 - dia)) < 1e-9);
+  }
+  // THE T HAS FOUR CONDITIONS, and each fails alone.
+  const goodT = { ...base, turning_type: "t-shaped", turning_diameter_in: 0, t_square_in: 60, t_arm_width_in: 36, t_arm_clear_in: 12, t_base_clear_in: 24 };
+  assert.ok(_v1170(goodT).turning_ok);
+  for (const [k, v] of [["t_square_in", 59.9], ["t_arm_width_in", 35.9], ["t_arm_clear_in", 11.9], ["t_base_clear_in", 23.9]]) {
+    const t = _v1170({ ...goodT, [k]: v });
+    assert.ok(!t.turning_ok, k + " must fail the T on its own");
+  }
+  // The base carries a different number from the arms - 12 in of base clearance is not enough.
+  assert.ok(!_v1170({ ...goodT, t_base_clear_in: 12 }).turning_ok);
+  assert.ok(_v1170({ ...goodT, t_arm_clear_in: 24 }).turning_ok, "more arm clearance than required is fine");
+  // The circle outputs are null on a T and vice versa; "none" reports null for everything.
+  assert.ok(_v1170(goodT).circle_deficit_in === null && _v1170(base).t_square_ok === null);
+  const none = _v1170({ ...base, turning_type: "none" });
+  assert.ok(none.turning_ok === null && none.circle_deficit_in === null && none.t_square_ok === null);
+  assert.ok(_v1170({ ...base, cfs_width_in: 48, cfs_depth_in: 30, alcove_depth_in: 0, turning_type: "none" }).passes, "an absent turning space is not a failure here");
+  // The three checks fail independently.
+  const clean = { ...base, cfs_width_in: 60, cfs_depth_in: 30, alcove_depth_in: 0 };
+  assert.ok(_v1170(clean).passes);
+  assert.ok(!_v1170({ ...clean, cfs_depth_in: 29 }).passes);
+  assert.ok(!_v1170({ ...clean, alcove_depth_in: 20, cfs_width_in: 40 }).passes);
+  assert.ok(!_v1170({ ...clean, turning_diameter_in: 48 }).passes);
+  // Error seams.
+  assert.ok("error" in _v1170({ ...base, approach: "diagonal" }));
+  assert.ok("error" in _v1170({ ...base, turning_type: "hexagonal" }));
+  assert.ok("error" in _v1170({ ...base, cfs_width_in: 0 }));
+  assert.ok("error" in _v1170({ ...base, cfs_depth_in: 0 }));
+  assert.ok("error" in _v1170({ ...base, alcove_depth_in: -1 }));
+  assert.ok("error" in _v1170({ ...base, turning_diameter_in: 0 }));
+  assert.ok("error" in _v1170({ ...goodT, t_square_in: 0 }));
+  assert.ok("error" in _v1170({ ...goodT, t_arm_clear_in: -1 }));
+  assert.ok("error" in _v1170({ ...base, cfs_width_in: Infinity }));
+});

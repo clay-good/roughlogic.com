@@ -1634,6 +1634,7 @@ export const COMPUTE_MAP = {
   "accessible-route-width": { module: "../../calc-construction.js", fn: "computeAccessibleRouteWidth" },
   "door-clear-width": { module: "../../calc-construction.js", fn: "computeDoorClearWidth" },
   "floor-level-change": { module: "../../calc-construction.js", fn: "computeFloorLevelChange" },
+  "turning-clear-floor-space": { module: "../../calc-construction.js", fn: "computeTurningAndClearFloorSpace" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 

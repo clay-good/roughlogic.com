@@ -12726,3 +12726,127 @@ CONSTRUCTION_RENDERERS["floor-level-change"] = _simpleRenderer({
   ],
   compute: computeFloorLevelChange,
 });
+
+// ===================== spec-v1170: turning space, clear floor space, and alcoves (2010 ADA Standards 304, 305) =====================
+
+// Two spaces that get conflated and are not the same thing at all. CLEAR FLOOR SPACE is where a
+// person stands or parks to USE something: 30 x 48 in, oriented for a forward or a parallel
+// approach. TURNING SPACE is where they turn around: a 60 in circle, or a T within a 60 in
+// square. A room can have plenty of one and none of the other.
+// The T is the escape hatch when 60 in of circle will not fit, and it has more conditions than
+// people remember: the arms and base are 36 in wide minimum, each ARM must be clear of
+// obstructions 12 in minimum in each direction, and the BASE 24 in minimum.
+// The alcove rules are the ones that get skipped entirely. A clear floor space boxed in on three
+// sides is not the bare 30 x 48 any more: a forward-approach alcove deeper than 24 in must be
+// 36 in wide, and a parallel-approach alcove deeper than 15 in must be 60 in wide. That last
+// one turns a 30 in nook into a 60 in one - double - and it is why a washer squeezed into a
+// closet fails while the same washer on an open wall passes.
+// dims: in { cfs_width_in: L, cfs_depth_in: L, alcove_depth_in: L, turning_diameter_in: L, t_square_in: L, t_arm_width_in: L } out: { required_alcove_width_in: L, alcove_width_deficit_in: L, cfs_short_side_in: L }
+export function computeTurningAndClearFloorSpace({ cfs_width_in = 0, cfs_depth_in = 0, approach = "forward", alcove_depth_in = 0, turning_type = "circular", turning_diameter_in = 0, t_square_in = 0, t_arm_width_in = 0, t_arm_clear_in = 0, t_base_clear_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(cfs_width_in) || 0;
+  const d = Number(cfs_depth_in) || 0;
+  const alc = Number(alcove_depth_in) || 0;
+  const dia = Number(turning_diameter_in) || 0;
+  const sq = Number(t_square_in) || 0;
+  const armW = Number(t_arm_width_in) || 0;
+  const armC = Number(t_arm_clear_in) || 0;
+  const baseC = Number(t_base_clear_in) || 0;
+  const forward = approach === "forward";
+  const circular = turning_type === "circular";
+  const noTurning = turning_type === "none";
+  if (approach !== "forward" && approach !== "parallel") return { error: "Approach must be forward or parallel - the alcove rule differs by a factor of two between them." };
+  if (turning_type !== "circular" && turning_type !== "t-shaped" && turning_type !== "none") return { error: "Turning space must be circular, t-shaped, or none." };
+  if (!(w > 0) || !(d > 0)) return { error: "Clear floor space width and depth must be positive (in)." };
+  if (alc < 0) return { error: "Alcove depth cannot be negative (in) - enter 0 where the space is not confined on three sides." };
+  if (circular && !(dia > 0)) return { error: "Turning circle diameter must be positive (in)." };
+  if (turning_type === "t-shaped" && (!(sq > 0) || !(armW > 0))) return { error: "T-shaped turning space needs a positive square size and arm width (in)." };
+  if (turning_type === "t-shaped" && (armC < 0 || baseC < 0)) return { error: "T-shaped arm and base clearances cannot be negative (in)." };
+
+  const CFS_SHORT = 30, CFS_LONG = 48;
+  const FWD_TRIGGER = 24, FWD_WIDTH = 36, PAR_TRIGGER = 15, PAR_WIDTH = 60;
+  const CIRCLE = 60, T_SQUARE = 60, T_ARM_W = 36, T_ARM_CLEAR = 12, T_BASE_CLEAR = 24;
+
+  // 305.3 is 30 x 48 without regard to which way round, but the approach decides which is which:
+  // a forward approach puts the 48 in in the direction of travel toward the element.
+  const cfs_short_side_in = Math.min(w, d);
+  const cfs_long_side_in = Math.max(w, d);
+  const cfs_size_ok = cfs_short_side_in >= CFS_SHORT && cfs_long_side_in >= CFS_LONG;
+  const cfs_depth_ok = forward ? d >= CFS_LONG : d >= CFS_SHORT;
+  const cfs_width_ok = forward ? w >= CFS_SHORT : w >= CFS_LONG;
+  const cfs_oriented_ok = cfs_depth_ok && cfs_width_ok;
+
+  // 305.7 alcoves.
+  const alcove_trigger_in = forward ? FWD_TRIGGER : PAR_TRIGGER;
+  const is_alcove = alc > alcove_trigger_in;
+  const required_alcove_width_in = is_alcove ? (forward ? FWD_WIDTH : PAR_WIDTH) : null;
+  const alcove_width_ok = is_alcove ? w >= required_alcove_width_in : null;
+  const alcove_width_deficit_in = is_alcove ? Math.max(0, required_alcove_width_in - w) : null;
+  // What the other approach would have demanded of the same nook.
+  const other_required_width_in = alc > (forward ? PAR_TRIGGER : FWD_TRIGGER) ? (forward ? PAR_WIDTH : FWD_WIDTH) : null;
+
+  // 304.3 turning space.
+  let turning_ok = null, turning_detail = "";
+  let circle_deficit_in = null, t_square_ok = null, t_arm_width_ok = null, t_arm_clear_ok = null, t_base_clear_ok = null;
+  if (circular) {
+    turning_ok = dia >= CIRCLE;
+    circle_deficit_in = Math.max(0, CIRCLE - dia);
+    turning_detail = "a " + CIRCLE + " in circle";
+  } else if (turning_type === "t-shaped") {
+    t_square_ok = sq >= T_SQUARE;
+    t_arm_width_ok = armW >= T_ARM_W;
+    t_arm_clear_ok = armC >= T_ARM_CLEAR;
+    t_base_clear_ok = baseC >= T_BASE_CLEAR;
+    turning_ok = t_square_ok && t_arm_width_ok && t_arm_clear_ok && t_base_clear_ok;
+    turning_detail = "a T within a " + T_SQUARE + " in square";
+  }
+
+  const passes = cfs_oriented_ok && (alcove_width_ok !== false) && (turning_ok !== false);
+
+  const note = "TWO SPACES THAT GET CONFLATED AND ARE NOT THE SAME THING. Clear floor space is where a person stands or parks to USE something - 30 x 48 in. Turning space is where they turn around - a 60 in circle or a T in a 60 in square. A room can have plenty of one and none of the other, and satisfying 305 says nothing about 304. "
+    + "CLEAR FLOOR SPACE (305.3): 30 in minimum by 48 in minimum, positioned for a " + approach + " approach, which here means " + (forward ? "48 in deep toward the element and 30 in wide" : "48 in wide along the element and 30 in deep") + ". Entered " + w + " wide x " + d + " deep: " + (cfs_oriented_ok ? "OK. " : "SHORT. " + (cfs_size_ok ? "The two dimensions would satisfy 30 x 48 the other way round - the space is big enough and turned the wrong way, which is the failure that gets drawn most often because the area looks right on a plan. " : ""))
+    + (is_alcove
+      ? "ALCOVE (305.7): this space is confined on three sides at " + alc + " in deep, past the " + alcove_trigger_in + " in trigger for a " + approach + " approach, so it is no longer the bare 30 x 48 - it must be " + required_alcove_width_in + " in wide minimum. Entered " + w + " in: " + (alcove_width_ok ? "OK. " : "SHORT by " + alcove_width_deficit_in.toFixed(1) + " in. ")
+        + (forward ? "" : "THE PARALLEL CASE IS THE BRUTAL ONE: a nook deeper than 15 in must be 60 in wide, double the 30 in the bare clear floor space would have allowed. It is why an appliance squeezed between two walls fails where the same appliance on an open wall passes, and 15 in is barely the depth of the appliance itself. ")
+      : "ALCOVE (305.7): at " + alc + " in of confinement this is not an alcove for a " + approach + " approach, whose trigger is " + alcove_trigger_in + " in. " + (other_required_width_in !== null ? "Note that the SAME nook approached in " + (forward ? "parallel" : "forward") + " would be an alcove and would demand " + other_required_width_in + " in of width - the approach direction, not the geometry, decides. " : ""))
+    + (noTurning
+      ? "No turning space was entered. Note that where one is required, 305 does not provide it: a compliant clear floor space is not somewhere a person can turn around. "
+      : "TURNING SPACE (304.3): " + turning_detail + ". "
+        + (circular
+          ? "Entered " + dia + " in: " + (turning_ok ? "OK. " : "SHORT by " + circle_deficit_in.toFixed(1) + " in. The T-shaped alternative exists precisely for the rooms where 60 in of circle will not fit. ")
+          : "The T has more conditions than people remember: within a 60 in square minimum, arms and base 36 in wide minimum, each ARM clear of obstructions 12 in minimum in each direction, and the BASE clear 24 in minimum. Entered " + sq + " in square, " + armW + " in arms, " + armC + " in of arm clearance, " + baseC + " in of base clearance: "
+            + (turning_ok ? "all four met. " : [t_square_ok ? null : "the square is under 60 in", t_arm_width_ok ? null : "the arms are under 36 in", t_arm_clear_ok ? null : "an arm is not clear 12 in in each direction", t_base_clear_ok ? null : "the base is not clear 24 in"].filter(Boolean).join(", ") + ". "))
+        + "Doors are permitted to swing into a turning space, which is worth knowing before a layout gets redrawn to avoid it. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: whether a turning space or a clear floor space is required at this location at all, which turns on the element and the space type; knee and toe clearance under 306, which a T-shaped space may include at the end of the base or one arm and which changes what counts as clear; the surface itself and its slope, which 305.2 ties to 302 and 303; protruding objects into either space; the element being reached and its own reach ranges and operable parts; door maneuvering clearances, which overlap these spaces and are governed separately; and state and local accessibility law. A space screen, not a plan review; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { cfs_short_side_in, cfs_long_side_in, cfs_size_ok, cfs_depth_ok, cfs_width_ok, cfs_oriented_ok, alcove_trigger_in, is_alcove, required_alcove_width_in, alcove_width_ok, alcove_width_deficit_in, other_required_width_in, turning_ok, circle_deficit_in, t_square_ok, t_arm_width_ok, t_arm_clear_ok, t_base_clear_ok, passes, note };
+}
+
+export const turningAndClearFloorSpaceExample = { inputs: { cfs_width_in: 30, cfs_depth_in: 48, approach: "parallel", alcove_depth_in: 20, turning_type: "circular", turning_diameter_in: 60, t_square_in: 0, t_arm_width_in: 0, t_arm_clear_in: 0, t_base_clear_in: 0 } };
+
+CONSTRUCTION_RENDERERS["turning-clear-floor-space"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 304.3.1, 304.3.2, 304.4, 305.3, 305.5, 305.7.1, and 305.7.2. A US federal standard in the public domain. 305.3: the clear floor or ground space shall be 30 in minimum by 48 in minimum. 305.5: clear floor or ground space shall be positioned for either forward or parallel approach to an element. 305.7.1: alcoves shall be 36 in wide minimum where the depth exceeds 24 in (forward approach). 305.7.2: alcoves shall be 60 in wide minimum where the depth exceeds 15 in (parallel approach). 304.3.1: the turning space shall be a space of 60 in diameter minimum. 304.3.2: the turning space shall be a T-shaped space within a 60 in square minimum with arms and base 36 in wide minimum, each arm of the T clear of obstructions 12 in minimum in each direction and the base clear of obstructions 24 in minimum, and the space shall be permitted to include knee and toe clearance complying with 306 only at the end of either the base or one arm. 304.4: doors shall be permitted to swing into turning spaces. Not checked: whether either space is required at this location, knee and toe clearance under 306, the surface and its slope, protruding objects, the element being reached, door maneuvering clearances, or state and local law. A space screen, not a plan review.",
+  example: turningAndClearFloorSpaceExample.inputs,
+  fields: [
+    { key: "cfs_width_in", label: "Clear floor space width, along the element (in)", kind: "number", default: 30 },
+    { key: "cfs_depth_in", label: "Clear floor space depth, toward the element (in)", kind: "number", default: 48 },
+    { key: "approach", label: "Approach", kind: "select", options: [{ value: "forward", label: "Forward (perpendicular to the element)" }, { value: "parallel", label: "Parallel (alongside the element)", selected: true }] },
+    { key: "alcove_depth_in", label: "Depth of confinement on three sides (in; 0 = open)", kind: "number", default: 20 },
+    { key: "turning_type", label: "Turning space provided", kind: "select", options: [{ value: "circular", label: "Circular (60 in)", selected: true }, { value: "t-shaped", label: "T-shaped" }, { value: "none", label: "None entered" }] },
+    { key: "turning_diameter_in", label: "Turning circle diameter (in)", kind: "number", default: 60 },
+    { key: "t_square_in", label: "T-shaped: size of the enclosing square (in)", kind: "number", default: 0 },
+    { key: "t_arm_width_in", label: "T-shaped: width of the arms and base (in)", kind: "number", default: 0 },
+    { key: "t_arm_clear_in", label: "T-shaped: each arm clear of obstructions (in)", kind: "number", default: 0 },
+    { key: "t_base_clear_in", label: "T-shaped: base clear of obstructions (in)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "c", id: "tcf-out-c", label: "Clear floor space", value: (r) => r.cfs_oriented_ok ? "meets 30 x 48 in the right orientation" : r.cfs_size_ok ? "big enough but TURNED THE WRONG WAY for this approach" : "under 30 x 48 in" },
+    { key: "a", id: "tcf-out-a", label: "Alcove", value: (r) => !r.is_alcove ? "not an alcove at this depth (trigger is " + r.alcove_trigger_in + " in for this approach)" : "confined past " + r.alcove_trigger_in + " in, so it needs " + r.required_alcove_width_in + " in of width - " + (r.alcove_width_ok ? "OK" : "short by " + fmt(r.alcove_width_deficit_in, 1) + " in") },
+    { key: "o", id: "tcf-out-o", label: "The other approach", value: (r) => r.other_required_width_in === null ? "would not be an alcove either" : "the same nook would demand " + r.other_required_width_in + " in of width" },
+    { key: "t", id: "tcf-out-t", label: "Turning space", value: (r) => r.turning_ok === null ? "none entered" : r.turning_ok ? "meets 304.3" : r.circle_deficit_in !== null ? "circle short by " + fmt(r.circle_deficit_in, 1) + " in" : [r.t_square_ok ? null : "square under 60 in", r.t_arm_width_ok ? null : "arms under 36 in", r.t_arm_clear_ok ? null : "arm clearance under 12 in", r.t_base_clear_ok ? null : "base clearance under 24 in"].filter(Boolean).join(", ") },
+    { key: "v", id: "tcf-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "tcf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTurningAndClearFloorSpace,
+});

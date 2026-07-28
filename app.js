@@ -531,6 +531,7 @@ const TOOL_MODULES = (() => {
     "accessible-route-width",
     "door-clear-width",
     "floor-level-change",
+    "turning-clear-floor-space",
     // spec-v332..v334 wood-fastener withdrawal batch.
     "wood-nail-withdrawal", "wood-lag-withdrawal", "wood-screw-withdrawal",
     "cantilever-beam", "section-properties", "combined-stress-axial-bending",
