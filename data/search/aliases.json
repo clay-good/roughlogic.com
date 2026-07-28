@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "ada door clear width",
+      "target": "door-clear-width",
+      "kind": "industry"
+    },
+    {
+      "term": "does a 32 inch door meet ada",
+      "target": "door-clear-width",
+      "kind": "question"
+    },
+    {
+      "term": "how high can a threshold be",
+      "target": "door-clear-width",
+      "kind": "question"
+    },
+    {
+      "term": "distance between doors in series",
+      "target": "door-clear-width",
+      "kind": "industry"
+    },
+    {
       "term": "accessible corridor width",
       "target": "accessible-route-width",
       "kind": "industry"

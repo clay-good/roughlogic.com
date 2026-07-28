@@ -1629,6 +1629,7 @@ export const COMPUTE_MAP = {
   "reach-range": { module: "../../calc-construction.js", fn: "computeReachRange" },
   "protruding-object-check": { module: "../../calc-construction.js", fn: "computeProtrudingObject" },
   "accessible-route-width": { module: "../../calc-construction.js", fn: "computeAccessibleRouteWidth" },
+  "door-clear-width": { module: "../../calc-construction.js", fn: "computeDoorClearWidth" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 

@@ -33875,3 +33875,75 @@ test("bounds: spec-v1164 computeAccessibleRouteWidth pins 36 in, the three-part 
   assert.ok("error" in _v1164({ ...turn, at_turn_width_in: 0 }));
   assert.ok("error" in _v1164({ ...base, clear_width_in: Infinity }));
 });
+
+import { computeDoorClearWidth as _v1165 } from "../../calc-construction.js";
+
+test("bounds: spec-v1165 computeDoorClearWidth pins the leaf-to-clear loss, the 24 in deep rule, the alterations-only latch exception, thresholds, series, and error seams", () => {
+  const base = { leaf_width_in: 32, door_thickness_in: 1.75, measured_clear_width_in: 0, opening_depth_in: 5, is_alteration: "no", latch_stop_projection_in: 0, threshold_height_in: 0.5, threshold_beveled: "no", series_spacing_in: 0, series_door_width_in: 0 };
+  const r = _v1165(base);
+  assert.ok(r.estimated_clear_width_in === 29.75 && r.required_clear_width_in === 32 && !r.clear_width_ok);
+  assert.ok(r.clear_width_deficit_in === 2.25 && r.leaf_needed_in === 34.25 && !r.used_measured && !r.passes);
+  // THE LEAF LOSES ITS THICKNESS AND THE STOP, at every leaf and thickness.
+  for (const [leaf, th] of [[30, 1.375], [32, 1.75], [34, 1.75], [36, 1.75], [36, 2.25], [42, 1.75]]) {
+    const t = _v1165({ ...base, leaf_width_in: leaf, door_thickness_in: th });
+    assert.ok(Math.abs(t.estimated_clear_width_in - (leaf - th - 0.5)) < 1e-9, "estimate wrong at " + leaf + "/" + th);
+    assert.ok(Math.abs(t.leaf_needed_in - (t.required_clear_width_in + th + 0.5)) < 1e-9);
+    // The leaf the tile names must actually deliver the requirement.
+    assert.ok(_v1165({ ...base, leaf_width_in: t.leaf_needed_in, door_thickness_in: th }).clear_width_ok, "the named leaf does not comply at " + leaf + "/" + th);
+  }
+  // A 36 in leaf clears the ordinary minimum; a 34 in one is the seam.
+  assert.ok(_v1165({ ...base, leaf_width_in: 36 }).clear_width_ok);
+  assert.ok(_v1165({ ...base, leaf_width_in: 34.25 }).clear_width_ok);
+  assert.ok(!_v1165({ ...base, leaf_width_in: 34.24 }).clear_width_ok);
+  // A MEASURED OPENING OVERRIDES THE ESTIMATE.
+  const meas = _v1165({ ...base, measured_clear_width_in: 33 });
+  assert.ok(meas.used_measured && meas.clear_width_in === 33 && meas.clear_width_ok && meas.estimated_clear_width_in === 29.75);
+  assert.ok(!_v1165({ ...base, leaf_width_in: 36, measured_clear_width_in: 31 }).clear_width_ok, "a generous leaf does not rescue a measured 31 in");
+  // MORE THAN 24 IN DEEP OWES 36 IN. 24 itself does not.
+  for (const [d, req, deep] of [[4, 32, false], [24, 32, false], [24.1, 36, true], [30, 36, true]]) {
+    const t = _v1165({ ...base, opening_depth_in: d });
+    assert.ok(t.required_clear_width_in === req && t.is_deep === deep, "deep rule wrong at " + d);
+  }
+  const deepDoor = _v1165({ ...base, leaf_width_in: 36, opening_depth_in: 30 });
+  assert.ok(!deepDoor.clear_width_ok && deepDoor.clear_width_deficit_in === 2.25 && deepDoor.leaf_needed_in === 38.25);
+  assert.ok(_v1165({ ...base, leaf_width_in: 36, opening_depth_in: 24 }).clear_width_ok, "the same door passes in a shallower wall");
+  // THE LATCH-SIDE STOP EXCEPTION IS ALTERATIONS-ONLY.
+  const wide = { ...base, leaf_width_in: 36 };
+  assert.ok(_v1165({ ...wide, latch_stop_projection_in: 0.625, is_alteration: "yes" }).effective_clear_in === 33.75, "an allowed projection does not reduce the width");
+  assert.ok(_v1165({ ...wide, latch_stop_projection_in: 0.625, is_alteration: "no" }).effective_clear_in === 33.125, "in new construction the whole projection comes off");
+  assert.ok(_v1165({ ...wide, latch_stop_projection_in: 0.625, is_alteration: "yes" }).latch_projection_ok);
+  assert.ok(!_v1165({ ...wide, latch_stop_projection_in: 0.626, is_alteration: "yes" }).latch_projection_ok);
+  assert.ok(!_v1165({ ...wide, latch_stop_projection_in: 0.1, is_alteration: "no" }).latch_projection_ok, "no allowance exists in new construction");
+  assert.ok(_v1165({ ...wide, latch_stop_projection_in: 0, is_alteration: "no" }).latch_projection_ok);
+  assert.ok(_v1165({ ...wide, latch_stop_projection_in: 2, is_alteration: "yes" }).effective_clear_in === 33.75 - 1.375);
+  // THRESHOLDS: 3/4 in needs BOTH an alteration AND a bevel.
+  for (const [alt, bev, lim] of [["no", "no", 0.5], ["no", "yes", 0.5], ["yes", "no", 0.5], ["yes", "yes", 0.75]]) {
+    assert.ok(_v1165({ ...wide, is_alteration: alt, threshold_beveled: bev }).threshold_limit_in === lim, "threshold limit wrong at " + alt + "/" + bev);
+  }
+  for (const [h, alt, bev, ok] of [[0.5, "no", "no", true], [0.51, "no", "no", false], [0.75, "yes", "yes", true], [0.76, "yes", "yes", false], [0.75, "no", "no", false]]) {
+    const t = _v1165({ ...wide, threshold_height_in: h, is_alteration: alt, threshold_beveled: bev });
+    assert.ok(t.threshold_ok === ok, "threshold verdict wrong at " + h + "/" + alt + "/" + bev);
+    assert.ok(t.threshold_excess_in >= 0 && Math.abs(t.threshold_excess_in - Math.max(0, h - t.threshold_limit_in)) < 1e-9);
+  }
+  assert.ok(!_v1165({ ...wide, threshold_height_in: 1 }).passes, "the threshold fails the doorway on its own");
+  // DOORS IN SERIES: 48 PLUS the swinging width, and none entered reports null.
+  for (const [sp, dw, req] of [[60, 36, 84], [48, 0, 48], [100, 36, 84], [90, 42, 90]]) {
+    const t = _v1165({ ...wide, series_spacing_in: sp, series_door_width_in: dw });
+    assert.ok(t.required_series_spacing_in === req && t.series_ok === (sp >= req), "series wrong at " + sp + "/" + dw);
+    assert.ok(Math.abs(t.series_deficit_in - Math.max(0, req - sp)) < 1e-9);
+  }
+  const noSeries = _v1165(wide);
+  assert.ok(!noSeries.has_series && noSeries.series_ok === null && noSeries.required_series_spacing_in === null && noSeries.passes);
+  assert.ok(!_v1165({ ...wide, series_spacing_in: 48, series_door_width_in: 36 }).passes, "a flat 48 in vestibule fails whenever a door swings in");
+  // Error seams.
+  assert.ok("error" in _v1165({ ...base, is_alteration: "maybe" }));
+  assert.ok("error" in _v1165({ ...base, threshold_beveled: "partly" }));
+  assert.ok("error" in _v1165({ ...base, leaf_width_in: 0 }));
+  assert.ok("error" in _v1165({ ...base, door_thickness_in: 0 }));
+  assert.ok("error" in _v1165({ ...base, measured_clear_width_in: -1 }));
+  assert.ok("error" in _v1165({ ...base, opening_depth_in: 0 }));
+  assert.ok("error" in _v1165({ ...base, latch_stop_projection_in: -1 }));
+  assert.ok("error" in _v1165({ ...base, threshold_height_in: -1 }));
+  assert.ok("error" in _v1165({ ...base, series_spacing_in: -1 }));
+  assert.ok("error" in _v1165({ ...base, leaf_width_in: Infinity }));
+});

@@ -12521,3 +12521,108 @@ CONSTRUCTION_RENDERERS["accessible-route-width"] = _simpleRenderer({
   ],
   compute: computeAccessibleRouteWidth,
 });
+
+// ===================== spec-v1165: door clear width, thresholds, doors in series (2010 ADA Standards 404.2) =====================
+
+// 32 in is the CLEAR OPENING, not the door. It is measured between the face of the door open
+// 90 degrees and the stop, so the leaf loses its own thickness and the stop before anyone
+// measures - which is why a 32 in door yields roughly 30 in and does not comply, and why the
+// smallest leaf that reliably works is 36 in.
+// Two rules ride along that get skipped. An opening more than 24 in DEEP - a thick wall, a
+// vestibule, a deep jamb - needs 36 in of clear width rather than 32, so the same door fails
+// simply for being set in a thicker wall. And the 5/8 in latch-side stop projection everyone
+// quotes is an ALTERATIONS exception; in new construction it is not available.
+// dims: in { leaf_width_in: L, door_thickness_in: L, measured_clear_width_in: L, opening_depth_in: L, latch_stop_projection_in: L, threshold_height_in: L, series_spacing_in: L, series_door_width_in: L } out: { estimated_clear_width_in: L, required_clear_width_in: L, clear_width_deficit_in: L, required_series_spacing_in: L }
+export function computeDoorClearWidth({ leaf_width_in = 0, door_thickness_in = 1.75, measured_clear_width_in = 0, opening_depth_in = 5, is_alteration = "no", latch_stop_projection_in = 0, threshold_height_in = 0, threshold_beveled = "no", series_spacing_in = 0, series_door_width_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const leaf = Number(leaf_width_in) || 0;
+  const thick = Number(door_thickness_in) || 0;
+  const measured = Number(measured_clear_width_in) || 0;
+  const depth = Number(opening_depth_in) || 0;
+  const latchProj = Number(latch_stop_projection_in) || 0;
+  const thr = Number(threshold_height_in) || 0;
+  const spacing = Number(series_spacing_in) || 0;
+  const seriesDoor = Number(series_door_width_in) || 0;
+  const alteration = is_alteration === "yes";
+  const beveled = threshold_beveled === "yes";
+  if (is_alteration !== "yes" && is_alteration !== "no") return { error: "State whether this is an alteration (yes or no) - the latch-side stop projection is an alterations-only exception." };
+  if (threshold_beveled !== "yes" && threshold_beveled !== "no") return { error: "State whether the threshold is beveled on each side (yes or no)." };
+  if (!(leaf > 0)) return { error: "Door leaf width must be positive (in)." };
+  if (!(thick > 0)) return { error: "Door thickness must be positive (in) - the leaf blocks its own thickness at 90 degrees." };
+  if (measured < 0) return { error: "Measured clear width cannot be negative (in)." };
+  if (!(depth > 0)) return { error: "Opening depth must be positive (in)." };
+  if (latchProj < 0) return { error: "Latch-side stop projection cannot be negative (in)." };
+  if (thr < 0) return { error: "Threshold height cannot be negative (in)." };
+  if (spacing < 0 || seriesDoor < 0) return { error: "Doors-in-series spacing and door width cannot be negative (in)." };
+
+  const STOP = 0.5, MIN_CLEAR = 32, DEEP = 24, DEEP_CLEAR = 36;
+  const ALT_LATCH_MAX = 0.625, THR_MAX = 0.5, THR_ALT_MAX = 0.75, SERIES_BASE = 48;
+
+  const estimated_clear_width_in = leaf - thick - STOP;
+  const used_measured = measured > 0;
+  const clear_width_in = used_measured ? measured : estimated_clear_width_in;
+
+  const is_deep = depth > DEEP;
+  const required_clear_width_in = is_deep ? DEEP_CLEAR : MIN_CLEAR;
+  // The latch-side stop may eat into the required width only in an alteration.
+  const latch_allowance_in = alteration ? ALT_LATCH_MAX : 0;
+  const latch_projection_ok = latchProj <= latch_allowance_in;
+  const effective_clear_in = clear_width_in - Math.max(0, latchProj - latch_allowance_in);
+  const clear_width_ok = effective_clear_in >= required_clear_width_in;
+  const clear_width_deficit_in = Math.max(0, required_clear_width_in - effective_clear_in);
+  // The smallest leaf that would deliver the required width, on the same assumptions.
+  const leaf_needed_in = required_clear_width_in + thick + STOP;
+
+  const threshold_limit_in = alteration && beveled ? THR_ALT_MAX : THR_MAX;
+  const threshold_ok = thr <= threshold_limit_in;
+  const threshold_excess_in = Math.max(0, thr - threshold_limit_in);
+
+  const has_series = spacing > 0;
+  const required_series_spacing_in = has_series ? SERIES_BASE + seriesDoor : null;
+  const series_ok = has_series ? spacing >= required_series_spacing_in : null;
+  const series_deficit_in = has_series ? Math.max(0, required_series_spacing_in - spacing) : null;
+
+  const passes = clear_width_ok && threshold_ok && (series_ok !== false);
+
+  const note = "32 IN IS THE CLEAR OPENING, NOT THE DOOR. It is measured between the face of the door open 90 degrees and the stop, so the leaf loses its own thickness and the stop before anyone puts a tape on it. "
+    + "A " + leaf + " in leaf " + thick + " in thick, over a 1/2 in stop, estimates to " + estimated_clear_width_in.toFixed(2) + " in of clear opening" + (used_measured ? ", though the measured " + measured + " in entered is what governs here. " : " - and that estimate is what this check uses, since no measurement was entered. It is an estimate; the measured opening governs. ")
+    + "THIS IS WHY A 32 IN DOOR DOES NOT COMPLY: it nets roughly 30 in, and the smallest leaf that reliably delivers " + required_clear_width_in + " in on these assumptions is " + leaf_needed_in.toFixed(2) + " in. "
+    + "Required here: " + required_clear_width_in + " in, " + (is_deep ? "because the opening is " + depth + " in DEEP - more than 24 in - and a deep opening owes 36 in rather than 32. A thick wall, a vestibule, or a deep jamb can fail a door that would pass anywhere else, with nothing about the door changing. " : "the ordinary minimum, the opening being " + depth + " in deep. ")
+    + (latchProj > 0 ? "LATCH-SIDE STOP: " + latchProj + " in of projection entered. The 5/8 in everyone quotes is an ALTERATIONS exception, and this is " + (alteration ? "an alteration, so up to 5/8 in is permitted; " + (latch_projection_ok ? "this is within it. " : "this exceeds it by " + (latchProj - ALT_LATCH_MAX).toFixed(3) + " in and the excess comes off the clear width. ") : "NEW CONSTRUCTION, where the exception is not available at all - the full " + latchProj + " in comes off the required clear width. ") : "")
+    + "Effective clear width " + effective_clear_in.toFixed(2) + " in: " + (clear_width_ok ? "OK. " : "SHORT by " + clear_width_deficit_in.toFixed(2) + " in. ")
+    + "THRESHOLD: 1/2 in maximum, " + (alteration && beveled ? "or 3/4 in for an existing or altered threshold beveled on each side at a slope no steeper than 1:2, which is the limit applied here. " : "and the 3/4 in figure is available only for an EXISTING OR ALTERED threshold that is beveled on each side at no steeper than 1:2 - " + (alteration ? "this alteration's threshold is not stated as beveled, so 1/2 in governs. " : "this is new construction, so 1/2 in governs. ")) + "This one is " + thr + " in: " + (threshold_ok ? "OK. " : "OVER by " + threshold_excess_in.toFixed(3) + " in. ")
+    + (has_series ? "DOORS IN SERIES: the distance between two hinged or pivoted doors in series must be 48 in minimum PLUS the width of doors swinging into the space - here 48 + " + seriesDoor + " = " + required_series_spacing_in + " in, against " + spacing + " in provided: " + (series_ok ? "OK. " : "SHORT by " + series_deficit_in.toFixed(1) + " in. ") + "The additive term is the part that gets dropped, and it is why a vestibule laid out at a flat 48 in fails whenever either door swings into it. " : "")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: maneuvering clearances on each side, which are asymmetric and routinely govern before the width does; hardware type, height, and the requirement that it operate with one hand without tight grasping, pinching, or twisting; opening force and closing speed; the smooth surface at the bottom of the door; vision lights; automatic and power-assisted doors; two-leaf doors, where one leaf must provide the full clear width on its own; changes in level at the threshold beyond its height; and state and local accessibility law and the fire-door and egress requirements that apply at the same opening. A doorway screen, not a hardware schedule; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { estimated_clear_width_in, used_measured, clear_width_in, is_deep, required_clear_width_in, latch_allowance_in, latch_projection_ok, effective_clear_in, clear_width_ok, clear_width_deficit_in, leaf_needed_in, threshold_limit_in, threshold_ok, threshold_excess_in, has_series, required_series_spacing_in, series_ok, series_deficit_in, passes, note };
+}
+
+export const doorClearWidthExample = { inputs: { leaf_width_in: 32, door_thickness_in: 1.75, measured_clear_width_in: 0, opening_depth_in: 5, is_alteration: "no", latch_stop_projection_in: 0, threshold_height_in: 0.5, threshold_beveled: "no", series_spacing_in: 0, series_door_width_in: 0 } };
+
+CONSTRUCTION_RENDERERS["door-clear-width"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 404.2.3 Clear Width, 404.2.5 Thresholds, and 404.2.6 Doors in Series and Gates in Series. A US federal standard in the public domain. 404.2.3: door openings shall provide a clear width of 32 in minimum; clear openings of doorways with swinging doors shall be measured between the face of the door and the stop, with the door open 90 degrees; openings more than 24 in deep shall provide a clear opening of 36 in minimum. Exception: in alterations, a projection of 5/8 in maximum into the required clear width shall be permitted for the latch side stop. 404.2.5: thresholds, if provided at doorways, shall be 1/2 in high maximum; exception - existing or altered thresholds 3/4 in high maximum that have a beveled edge on each side with a slope not steeper than 1:2 shall not be required to comply. 404.2.6: the distance between two hinged or pivoted doors in series shall be 48 in minimum plus the width of doors swinging into the space. The clear-opening ESTIMATE from the leaf assumes the leaf loses its own thickness plus a 1/2 in stop; it is an estimate and the measured opening governs. Not checked: maneuvering clearances, hardware and its operation, opening force and closing speed, the smooth bottom surface, vision lights, automatic and power-assisted doors, two-leaf doors, changes in level beyond the threshold height, or state and local law and the fire-door and egress requirements at the same opening. A doorway screen, not a hardware schedule.",
+  example: doorClearWidthExample.inputs,
+  fields: [
+    { key: "leaf_width_in", label: "Door leaf width (in)", kind: "number", default: 32 },
+    { key: "door_thickness_in", label: "Door thickness (in)", kind: "number", default: 1.75 },
+    { key: "measured_clear_width_in", label: "MEASURED clear opening at 90 degrees (in; 0 = use the estimate)", kind: "number", default: 0 },
+    { key: "opening_depth_in", label: "Depth of the opening (in)", kind: "number", default: 5 },
+    { key: "is_alteration", label: "Alteration to an existing building?", kind: "select", options: [{ value: "no", label: "No - new construction", selected: true }, { value: "yes", label: "Yes" }] },
+    { key: "latch_stop_projection_in", label: "Latch-side stop projection into the opening (in)", kind: "number", default: 0 },
+    { key: "threshold_height_in", label: "Threshold height (in)", kind: "number", default: 0.5 },
+    { key: "threshold_beveled", label: "Threshold beveled on each side at 1:2 or flatter?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+    { key: "series_spacing_in", label: "Distance between doors in series (in; 0 = none)", kind: "number", default: 0 },
+    { key: "series_door_width_in", label: "Width of doors swinging into that space (in)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "c", id: "dcw-out-c", label: "Clear opening", value: (r) => fmt(r.clear_width_in, 2) + " in " + (r.used_measured ? "(measured)" : "(estimated from the leaf, less its thickness and a 1/2 in stop)") },
+    { key: "q", id: "dcw-out-q", label: "Required", value: (r) => r.required_clear_width_in + " in" + (r.is_deep ? " - the opening is more than 24 in deep" : "") + "; smallest leaf that delivers it: " + fmt(r.leaf_needed_in, 2) + " in" },
+    { key: "v", id: "dcw-out-v", label: "Effective clear width", value: (r) => fmt(r.effective_clear_in, 2) + " in - " + (r.clear_width_ok ? "OK" : "SHORT by " + fmt(r.clear_width_deficit_in, 2) + " in") },
+    { key: "t", id: "dcw-out-t", label: "Threshold", value: (r) => "limit " + r.threshold_limit_in + " in - " + (r.threshold_ok ? "OK" : "over by " + fmt(r.threshold_excess_in, 3) + " in") },
+    { key: "s", id: "dcw-out-s", label: "Doors in series", value: (r) => !r.has_series ? "none entered" : "needs " + r.required_series_spacing_in + " in (48 + the swinging door width) - " + (r.series_ok ? "OK" : "short by " + fmt(r.series_deficit_in, 1) + " in") },
+    { key: "d", id: "dcw-out-d", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "dcw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDoorClearWidth,
+});
