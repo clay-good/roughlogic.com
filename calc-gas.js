@@ -594,3 +594,99 @@ function _v977renderWobbeIndex(inputRegion, outputRegion, citationEl) {
   for (const f of [hv, sg]) f.input.addEventListener("input", update);
 }
 GAS_RENDERERS["wobbe-index"] = _v977renderWobbeIndex;
+
+// --- spec-v1145: gas appliance connection check (IFGC 408.4 / 409.5 / 411.1.3.1) ---
+// Three rules meet at the last three feet of gas piping, and one category cuts across all
+// of them. 409.5 puts the shutoff in the SAME ROOM, within 6 ft of the appliance, and
+// UPSTREAM of the union or connector. 408.4 wants a sediment trap downstream of that
+// shutoff and as close to the inlet as practical - except for illuminating appliances,
+// ranges, clothes dryers, decorative vented appliances for vented fireplaces, gas
+// fireplaces, and outdoor grills. 411.1.3.1 caps a connector at 3 ft, except ranges and
+// domestic clothes dryers at 6 ft. Notice that ranges and dryers appear in BOTH exceptions
+// and that 409.5 also deems a shutoff behind such an appliance accessible: the code has a
+// coherent idea of a movable appliance, and knowing that predicts all three answers.
+// dims: in { appliance: dimensionless, shutoff_same_room: dimensionless, shutoff_distance_ft: L, shutoff_upstream: dimensionless, trap_present: dimensionless, trap_in_appliance: dimensionless, connector_length_ft: L } out: { shutoff_distance_deficit_ft: L, connector_limit_ft: L, connector_over_ft: L }
+export function computeGasApplianceConnection({ appliance = "furnace", shutoff_same_room = "yes", shutoff_distance_ft = 0, shutoff_upstream = "yes", trap_present = "yes", trap_in_appliance = "no", connector_length_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const dist = Number(shutoff_distance_ft) || 0;
+  const conn = Number(connector_length_ft) || 0;
+  const sameRoom = shutoff_same_room === "yes";
+  const upstream = shutoff_upstream === "yes";
+  const trap = trap_present === "yes";
+  const trapBuiltIn = trap_in_appliance === "yes";
+  const MOVABLE = ["range", "dryer"];
+  const TRAP_EXEMPT = ["range", "dryer", "illuminating", "decorative-vented", "gas-fireplace", "outdoor-grill"];
+  const KNOWN = ["furnace", "water-heater", "boiler", "range", "dryer", "illuminating", "decorative-vented", "gas-fireplace", "outdoor-grill", "other"];
+  if (!KNOWN.includes(appliance)) return { error: "Appliance must be one of: " + KNOWN.join(", ") + "." };
+  if (dist < 0) return { error: "Shutoff distance cannot be negative (ft)." };
+  if (conn < 0) return { error: "Connector length cannot be negative (ft)." };
+
+  const MAX_DIST = 6, CONN_SHORT = 3, CONN_LONG = 6;
+  const movable = MOVABLE.includes(appliance);
+  const distance_ok = dist <= MAX_DIST;
+  const shutoff_distance_deficit_ft = Math.max(0, dist - MAX_DIST);
+  const shutoff_ok = sameRoom && distance_ok && upstream;
+
+  const trap_exempt = TRAP_EXEMPT.includes(appliance);
+  const trap_required = !trap_exempt && !trapBuiltIn;
+  const trap_ok = trap_required ? trap : null;
+
+  const connector_limit_ft = movable ? CONN_LONG : CONN_SHORT;
+  const has_connector = conn > 0;
+  const connector_ok = has_connector ? conn <= connector_limit_ft : null;
+  const connector_over_ft = has_connector ? Math.max(0, conn - connector_limit_ft) : 0;
+
+  const passes = shutoff_ok && (trap_ok !== false) && (connector_ok !== false);
+
+  const note = "SHUTOFF (409.5): in the SAME ROOM as the appliance, within " + MAX_DIST + " ft of it, and UPSTREAM of the union, connector, or quick-disconnect it serves. Here: " + (sameRoom ? "same room OK" : "NOT in the same room") + ", " + dist + " ft " + (distance_ok ? "OK" : "over by " + shutoff_distance_deficit_ft.toFixed(1) + " ft") + ", " + (upstream ? "upstream OK" : "NOT upstream - a valve downstream of the connector cannot isolate the connector, which is the part most likely to fail") + ". "
+    + (movable ? "For a movable appliance like this one, 409.5 also deems a shutoff installed behind it to be accessible, so being hidden behind the range or dryer is not itself a violation. " : "")
+    + "SEDIMENT TRAP (408.4): required downstream of the shutoff and as close to the inlet as practical, "
+    + (trap_exempt ? "but this appliance type is on the exemption list - illuminating appliances, ranges, clothes dryers, decorative vented appliances for vented fireplaces, gas fireplaces, and outdoor grills need not be so equipped. None required. "
+      : trapBuiltIn ? "and one is incorporated as part of the appliance, which satisfies it - 408.4 only applies where the appliance does not already have one. "
+      : "and this appliance needs one: " + (trap ? "present, OK. " : "MISSING. A drip leg on the wrong side of the shutoff is also not a trap - it has to be DOWNSTREAM, or it protects nothing when the valve is closed for service. "))
+    + "CONNECTOR (411.1.3.1): overall length not to exceed " + connector_limit_ft + " ft for this appliance"
+    + (movable ? " - ranges and domestic clothes dryers get 6 ft where everything else gets 3. " : ", the general 3 ft limit. ")
+    + (has_connector ? "This one is " + conn + " ft: " + (connector_ok ? "OK. " : "OVER by " + connector_over_ft.toFixed(1) + " ft. ") : "No connector length entered; hard-piped appliances have no connector to measure. ")
+    + "THE PATTERN WORTH SEEING: ranges and clothes dryers appear in BOTH exceptions and get the accessibility allowance too. The code has a coherent idea of a movable appliance - one that gets pulled out to clean behind - and once you spot it, all three answers follow from the category rather than from three memorised lists. "
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: whether the connector is listed and of an approved type, connectors passing through walls, floors, ceilings, or partitions, which is prohibited; reuse of an old connector, which is not permitted; the piping size and pressure feeding the valve; appliance clearances, venting, and combustion air; CSST bonding; the leak test; or whether the appliance is approved for the fuel and altitude. A screen; the adopted code, the appliance listing, and the AHJ govern.";
+
+  return { movable, shutoff_ok, distance_ok, shutoff_distance_deficit_ft, trap_exempt, trap_required, trap_ok, connector_limit_ft, has_connector, connector_ok, connector_over_ft, passes, note };
+}
+
+export const gasApplianceConnectionExample = { inputs: { appliance: "furnace", shutoff_same_room: "yes", shutoff_distance_ft: 4, shutoff_upstream: "yes", trap_present: "no", trap_in_appliance: "no", connector_length_ft: 4 } };
+
+function _v1145renderGasApplianceConnection(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IFGC 409.5 - the appliance shutoff valve located in the same room as the appliance, within 6 ft of it, and installed upstream of the union, connector, or quick-disconnect device it serves, with shutoff valves serving movable appliances such as cooking appliances and clothes dryers considered accessible where installed behind them. IFGC 408.4 - where a sediment trap is not incorporated as part of the appliance, a sediment trap installed downstream of the appliance shutoff valve as close to the inlet of the appliance as practical, with illuminating appliances, ranges, clothes dryers, decorative vented appliances for installation in vented fireplaces, gas fireplaces, and outdoor grills excepted. IFGC 411.1.3.1 - connectors with an overall length not to exceed 3 ft, except range and domestic clothes dryer connectors at 6 ft. Not checked: connector listing and type, connectors passing through building elements, connector reuse, upstream piping size and pressure, clearances, venting, combustion air, CSST bonding, leak testing, or fuel and altitude approval. A screen; the adopted code, the appliance listing, and the AHJ govern.";
+  const ap = makeSelect("Appliance", "gac-ap", [
+    { value: "furnace", label: "Furnace", selected: true }, { value: "water-heater", label: "Water heater" }, { value: "boiler", label: "Boiler" },
+    { value: "range", label: "Range / cooking appliance" }, { value: "dryer", label: "Clothes dryer" }, { value: "illuminating", label: "Illuminating appliance" },
+    { value: "decorative-vented", label: "Decorative appliance in a vented fireplace" }, { value: "gas-fireplace", label: "Gas fireplace" }, { value: "outdoor-grill", label: "Outdoor grill" }, { value: "other", label: "Other" },
+  ]);
+  const sr = makeSelect("Shutoff in the same room?", "gac-sr", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
+  const sd = makeNumber("Shutoff distance to the appliance (ft)", "gac-sd", { step: "any", min: "0" }); sd.input.value = "4";
+  const su = makeSelect("Shutoff upstream of the connector?", "gac-su", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
+  const tp = makeSelect("Sediment trap installed?", "gac-tp", [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }]);
+  const ti = makeSelect("Trap built into the appliance?", "gac-ti", [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }]);
+  const cl = makeNumber("Connector overall length (ft; 0 = hard piped)", "gac-cl", { step: "any", min: "0" }); cl.input.value = "4";
+  inputRegion.appendChild(ap.wrap); inputRegion.appendChild(sr.wrap); inputRegion.appendChild(sd.wrap);
+  inputRegion.appendChild(su.wrap); inputRegion.appendChild(tp.wrap); inputRegion.appendChild(ti.wrap); inputRegion.appendChild(cl.wrap);
+  attachExampleButton(inputRegion, () => { ap.select.value = "furnace"; sr.select.value = "yes"; sd.input.value = "4"; su.select.value = "yes"; tp.select.value = "no"; ti.select.value = "no"; cl.input.value = "4"; update(); });
+  const oV = makeOutputLine(outputRegion, "Verdict", "gac-out-v");
+  const oS = makeOutputLine(outputRegion, "Shutoff (409.5)", "gac-out-s");
+  const oT = makeOutputLine(outputRegion, "Sediment trap (408.4)", "gac-out-t");
+  const oC = makeOutputLine(outputRegion, "Connector (411.1.3.1)", "gac-out-c");
+  const oNote = makeOutputLine(outputRegion, "Note", "gac-out-note");
+  const update = debounce(() => {
+    const r = computeGasApplianceConnection({ appliance: ap.select.value, shutoff_same_room: sr.select.value, shutoff_distance_ft: Number(sd.input.value) || 0, shutoff_upstream: su.select.value, trap_present: tp.select.value, trap_in_appliance: ti.select.value, connector_length_ft: Number(cl.input.value) || 0 });
+    if (r.error) { oV.textContent = r.error; oS.textContent = "-"; oT.textContent = "-"; oC.textContent = "-"; oNote.textContent = "-"; return; }
+    oV.textContent = r.passes ? "PASSES the items entered" : "DOES NOT PASS";
+    oS.textContent = r.shutoff_ok ? "OK" : "FAILS" + (r.distance_ok ? "" : " - over 6 ft by " + fmt(r.shutoff_distance_deficit_ft, 1));
+    oT.textContent = r.trap_exempt ? "not required - this appliance type is excepted" : !r.trap_required ? "satisfied by a trap built into the appliance" : r.trap_ok ? "present, OK" : "REQUIRED and missing";
+    oC.textContent = r.connector_ok === null ? "hard piped - no connector" : "limit " + r.connector_limit_ft + " ft" + (r.movable ? " (movable appliance)" : "") + " - " + (r.connector_ok ? "OK" : "OVER by " + fmt(r.connector_over_ft, 1) + " ft");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of [sd, cl]) x.input.addEventListener("input", update);
+  for (const x of [ap, sr, su, tp, ti]) x.select.addEventListener("change", update);
+}
+GAS_RENDERERS["gas-appliance-connection"] = _v1145renderGasApplianceConnection;

@@ -32757,3 +32757,52 @@ test("bounds: spec-v1144 computeCondensateOverflowPan pins the overall-not-per-s
   assert.ok("error" in _v1144({ ...base, pan_depth_in: 0 }));
   assert.ok("error" in _v1144({ ...base, unit_width_in: Infinity }));
 });
+
+import { computeGasApplianceConnection as _v1145 } from "../../calc-gas.js";
+
+test("bounds: spec-v1145 computeGasApplianceConnection pins the movable-appliance category across all three IFGC rules, and the error seams", () => {
+  const base = { appliance: "furnace", shutoff_same_room: "yes", shutoff_distance_ft: 4, shutoff_upstream: "yes", trap_present: "no", trap_in_appliance: "no", connector_length_ft: 4 };
+  const r = _v1145(base);
+  assert.ok(r.shutoff_ok && !r.movable && r.trap_required && r.trap_ok === false);
+  assert.ok(r.connector_limit_ft === 3 && !r.connector_ok && r.connector_over_ft === 1 && !r.passes);
+  // THE CATEGORY: ranges and dryers are exempt from the trap AND get the longer connector.
+  for (const a of ["range", "dryer"]) {
+    const t = _v1145({ ...base, appliance: a, connector_length_ft: 5 });
+    assert.ok(t.movable && t.trap_exempt && !t.trap_required && t.connector_limit_ft === 6 && t.connector_ok && t.passes);
+  }
+  for (const a of ["furnace", "water-heater", "boiler", "other"]) {
+    const t = _v1145({ ...base, appliance: a });
+    assert.ok(!t.movable && !t.trap_exempt && t.trap_required && t.connector_limit_ft === 3);
+  }
+  // The other exempt types are exempt from the TRAP but keep the 3 ft connector limit.
+  for (const a of ["illuminating", "decorative-vented", "gas-fireplace", "outdoor-grill"]) {
+    const t = _v1145({ ...base, appliance: a });
+    assert.ok(t.trap_exempt && !t.trap_required && !t.movable && t.connector_limit_ft === 3, a + " is trap-exempt but not movable");
+  }
+  // A built-in trap satisfies 408.4 without the appliance being exempt.
+  const builtIn = _v1145({ ...base, trap_in_appliance: "yes", connector_length_ft: 3 });
+  assert.ok(!builtIn.trap_exempt && !builtIn.trap_required && builtIn.trap_ok === null && builtIn.passes);
+  // Each shutoff condition can fail on its own.
+  assert.ok(!_v1145({ ...base, shutoff_same_room: "no" }).shutoff_ok);
+  assert.ok(!_v1145({ ...base, shutoff_upstream: "no" }).shutoff_ok);
+  assert.ok(_v1145({ ...base, shutoff_distance_ft: 6 }).distance_ok && !_v1145({ ...base, shutoff_distance_ft: 6.1 }).distance_ok);
+  assert.ok(Math.abs(_v1145({ ...base, shutoff_distance_ft: 10 }).shutoff_distance_deficit_ft - 4) < 1e-9);
+  // Connector seams are exact at each limit, and zero means hard piped rather than a failure.
+  assert.ok(_v1145({ ...base, connector_length_ft: 3 }).connector_ok && !_v1145({ ...base, connector_length_ft: 3.1 }).connector_ok);
+  assert.ok(_v1145({ ...base, appliance: "range", connector_length_ft: 6 }).connector_ok);
+  assert.ok(!_v1145({ ...base, appliance: "range", connector_length_ft: 6.1 }).connector_ok);
+  const hardPiped = _v1145({ ...base, connector_length_ft: 0, trap_present: "yes" });
+  assert.ok(hardPiped.connector_ok === null && !hardPiped.has_connector && hardPiped.connector_over_ft === 0 && hardPiped.passes);
+  // The overall verdict is the conjunction of the three, with nulls not counting as failures.
+  for (const a of ["furnace", "range", "gas-fireplace"]) {
+    for (const conn of [0, 3, 5, 8]) {
+      const t = _v1145({ ...base, appliance: a, connector_length_ft: conn, trap_present: "yes" });
+      assert.ok(t.passes === (t.shutoff_ok && t.trap_ok !== false && t.connector_ok !== false));
+    }
+  }
+  // Error seams.
+  assert.ok("error" in _v1145({ ...base, appliance: "spaceship" }));
+  assert.ok("error" in _v1145({ ...base, shutoff_distance_ft: -1 }));
+  assert.ok("error" in _v1145({ ...base, connector_length_ft: -1 }));
+  assert.ok("error" in _v1145({ ...base, shutoff_distance_ft: Infinity }));
+});

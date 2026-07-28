@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "sediment trap",
+      "target": "gas-appliance-connection",
+      "kind": "industry"
+    },
+    {
+      "term": "does a dryer need a sediment trap",
+      "target": "gas-appliance-connection",
+      "kind": "question"
+    },
+    {
+      "term": "how long can a gas appliance connector be",
+      "target": "gas-appliance-connection",
+      "kind": "question"
+    },
+    {
+      "term": "gas shutoff valve within 6 feet",
+      "target": "gas-appliance-connection",
+      "kind": "question"
+    },
+    {
+      "term": "drip leg downstream of the shutoff",
+      "target": "gas-appliance-connection",
+      "kind": "industry"
+    },
+    {
       "term": "auxiliary drain pan size",
       "target": "condensate-overflow-pan",
       "kind": "industry"

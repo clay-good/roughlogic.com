@@ -1356,6 +1356,7 @@ export const COMPUTE_MAP = {
   "gas-altitude-derate": { module: "../../calc-gas.js", fn: "computeGasAltitudeDerate" },
   "gas-fuel-conversion": { module: "../../calc-gas.js", fn: "computeGasFuelConversion" },
   "wobbe-index": { module: "../../calc-gas.js", fn: "computeWobbeIndex" },
+  "gas-appliance-connection": { module: "../../calc-gas.js", fn: "computeGasApplianceConnection" },
   "water-heater-storage-sizing": { module: "../../calc-plumbing.js", fn: "computeWaterHeaterStorageSizing" },
   "guard-handrail-check": { module: "../../calc-construction.js", fn: "computeGuardHandrailCheck" },
   "guard-post-load": { module: "../../calc-construction.js", fn: "computeGuardPostLoad" },

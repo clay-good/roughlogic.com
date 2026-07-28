@@ -2197,6 +2197,7 @@ cross-check.
 | calc-firesprinkler.js | `computeSprinklerProtectionAreaForSupply` | `{ available_supply_gpm = 0, density = 0.20, hose_gpm = 250 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerSystemDemand` | `{ density = 0.20, design_area = 1500, hose_gpm = 250, duration_min = 90 } = {}` | _ | _ | _ |
 | calc-gas.js | `computeGasAltitudeDerate` | `{ nameplate_input_btuh = 0, elevation_ft = 0, derate_pct_per_1000 = 4, thresh...` | _ | _ | _ |
+| calc-gas.js | `computeGasApplianceConnection` | `{ appliance = "furnace", shutoff_same_room = "yes", shutoff_distance_ft = 0, ...` | _ | _ | _ |
 | calc-gas.js | `computeGasFuelConversion` | `{ appliance_input_btuh = 0, hv_from = 1030, hv_to = 2500, sg_from = 0.60, sg_...` | _ | _ | _ |
 | calc-gas.js | `computeGasLeakHoleDiameter` | `{ leak_rate_cfh, upstream_psi, gas, c = 0.7 }` | _ | _ | _ |
 | calc-gas.js | `computeGasLeakRate` | `{ orifice_diameter_in, upstream_psi, gas, c = 0.7 }` | _ | _ | _ |
@@ -3189,7 +3190,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1775.
+Row count: 1776.
 
 <!-- END function-corpus-v14 -->
 
@@ -3474,7 +3475,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (126 tiles)
+### Group B Plumbing (127 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3502,6 +3503,7 @@ per spec-v14 §13.1 second paragraph.
 | `flow-continuity` | Flow Continuity Velocity at a Size Change | fluid mechanics; spec-v372 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `friction-loss` | Friction Loss | Project (first-principles); 10 gpm through 100 ft of 1 in SCH40 PVC -> ~5.49 ft head ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gas-altitude-derate` | High-Altitude Appliance Input Derate | NFPA 54 (National Fuel Gas Code) / IF...; spec-v111 section 2.1 pinned example (100k at 6,000 ft ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `gas-appliance-connection` | Gas Appliance Connection Check (IFGC 408.4 / 409.5 / 411.1.3.1) | International Code Council; 'Where a sediment trap is not incorporated as part of the... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gas-appliance-demand` | Gas Appliance Connected Load (CFH) | IFGC 2021 Section 402 / NFPA 54; furnace 100,000 + WH 40,000 + range 65,000 + dryer 35,000... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gas-fuel-conversion` | Natural-Gas / Propane Conversion (Input and Orifice) | First-principles orifice flow Q ~ are...; spec-v111 section 2.2 pinned example (100k NG->LP -> 97.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `gas-leak-hole-diameter` | Gas Leak Equivalent Hole Diameter | Project (first-principles, solved for...; 3.15 cfh natural-gas leak at 0.25 psi -> ~0.050 in equiva... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4903,6 +4905,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1528. Fixture-covered or reference-cadence: 1528 / 1528.
+Tile count: 1529. Fixture-covered or reference-cadence: 1529 / 1529.
 
 <!-- END tile-index-v14 -->

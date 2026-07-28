@@ -1362,6 +1362,7 @@ const RELATED = {
   "gas-altitude-derate": ["gas-fuel-conversion","gas-meter-clock","gas-appliance-demand"],
   "gas-fuel-conversion": ["gas-altitude-derate","gas-pipe-sizing","gas-meter-clock"],
   "wobbe-index": ["gas-fuel-conversion","gas-appliance-demand","gas-altitude-derate"],
+  "gas-appliance-connection": ["gas-appliance-demand","gas-pipe-sizing","combustion-air"],
   // spec-v112 storage water-heater sizing (Group B)
   "water-heater-storage-sizing": ["water-heater-recovery","tankless-gpm","wh-expansion-tank"],
   // spec-v113 guard and handrail code check (Group E)

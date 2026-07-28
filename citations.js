@@ -12340,6 +12340,21 @@ export const CITATIONS = {
       { name: "Floor", value: "the derate factor is floored at zero", source: "first principles" },
     ],
   },
+  "gas-appliance-connection": {
+    formula: "shutoff passes when it is in the same room, within 6 ft of the appliance, and upstream of the union or connector; a sediment trap is required unless the appliance type is excepted or a trap is incorporated in the appliance; connector length limit is 6 ft for ranges and domestic clothes dryers and 3 ft otherwise.",
+    edition: "IFGC 409.5 (appliance shutoff valve location, and the allowance treating a shutoff behind a movable appliance as accessible), IFGC 408.4 (sediment trap, with its exception list), and IFGC 411.1.3.1 (maximum connector length).",
+    freeAccess: "All three are short prescriptive sentences reproduced in municipal adoptions and inspection checklists. No table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Three separate sections govern the last three feet of gas piping, and the useful observation is that one category cuts across all of them. Ranges and domestic clothes dryers are on 408.4\'s sediment-trap exception list, get 6 ft of connector under 411.1.3.1 where everything else gets 3, and are the appliances 409.5 has in mind when it deems a shutoff installed behind them to be accessible. The code has a coherent idea of a MOVABLE appliance - one that gets pulled out to clean behind - and once that is visible all three answers follow from the category rather than from three memorised lists. The tile demonstrates it directly: the same installation that fails as a furnace, on a missing trap and a 4 ft connector, passes as a dryer. Two details are worth stating rather than assuming. The shutoff must be UPSTREAM of the union, connector, or quick-disconnect it serves, because a valve downstream of the connector cannot isolate the connector - which is the component most likely to fail and the one most likely to be replaced. And a sediment trap has to be DOWNSTREAM of the shutoff: a drip leg on the wrong side protects nothing once the valve is closed for service, and it is a common field error that looks right in a photograph. 408.4 also applies only where a trap is not already incorporated as part of the appliance, so a built-in trap satisfies it. Not checked: whether the connector is listed and of an approved type; connectors passing through walls, floors, ceilings, or partitions, which is prohibited; reuse of an old connector, which is not permitted; the size and pressure of the piping feeding the valve; appliance clearances, venting, and combustion air; CSST bonding; leak testing; and whether the appliance is approved for the fuel and the altitude. A screen; the adopted code, the appliance listing, and the AHJ govern.",
+    assumptions: [
+      { name: "Shutoff location", value: "same room, within 6 ft, upstream of the union or connector", source: "IFGC 409.5" },
+      { name: "Movable-appliance access", value: "a shutoff behind a range or dryer is considered accessible", source: "IFGC 409.5" },
+      { name: "Sediment trap", value: "downstream of the shutoff, as close to the inlet as practical", source: "IFGC 408.4" },
+      { name: "Trap exceptions", value: "illuminating appliances, ranges, dryers, decorative vented appliances, gas fireplaces, outdoor grills", source: "IFGC 408.4" },
+      { name: "Connector length", value: "3 ft, except 6 ft for ranges and domestic clothes dryers", source: "IFGC 411.1.3.1" },
+      { name: "Not checked", value: "connector listing and routing, reuse, upstream piping, venting, combustion air, CSST bonding, leak test", source: "stated scope limit" },
+    ],
+  },
   "wobbe-index": {
     formula: "wobbe_index_btu_ft3 = hhv_btu_ft3 / sqrt(specific_gravity). Two gases of equal Wobbe deliver the same heat input through the same orifice at the same manifold pressure.",
     edition: "Wobbe index / fuel-gas interchangeability (AGA interchangeability practice; ISO 13686 natural-gas quality), by name; the gas supplier's certified analysis, the appliance listing, and the conversion kit and AHJ govern.",
