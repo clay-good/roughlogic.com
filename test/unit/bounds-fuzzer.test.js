@@ -33187,3 +33187,52 @@ test("bounds: spec-v1153 computeFlammableCabinetStorage pins the per-cabinet cap
   assert.ok("error" in _v1153({ ...base, cabinets_available: 1.5 }));
   assert.ok("error" in _v1153({ ...base, cat123_gallons: Infinity }));
 });
+
+import { computeMaterialStackingLimits as _v1154 } from "../../calc-construction.js";
+
+test("bounds: spec-v1154 computeMaterialStackingLimits pins the three rules, the height-vs-shape trap, and error seams", () => {
+  const base = { material: "brick", stack_height_ft: 5, taper_provided_in: 0, block_height_in: 8, block_length_in: 16, handled_manually: "no" };
+  const r = _v1154(base);
+  assert.ok(r.max_height_ft === 7 && r.height_ok && r.taper_required_in === 2 && !r.taper_ok && !r.passes);
+  // THE TRAP: legal in height, illegal in shape, across the whole band above the threshold.
+  for (const h of [4.5, 5, 6, 7]) {
+    const t = _v1154({ ...base, stack_height_ft: h });
+    assert.ok(t.height_ok && t.taper_required, "within 7 ft and still owing taper at " + h);
+    assert.ok(Math.abs(t.taper_required_in - (h - 4) * 2) < 1e-9);
+  }
+  // Thresholds and ceilings are separate: 4 ft exactly owes nothing, 7 ft exactly is the ceiling.
+  assert.ok(!_v1154({ ...base, stack_height_ft: 4 }).taper_required);
+  assert.ok(_v1154({ ...base, stack_height_ft: 4.1 }).taper_required);
+  assert.ok(_v1154({ ...base, stack_height_ft: 7, taper_provided_in: 6 }).passes);
+  assert.ok(!_v1154({ ...base, stack_height_ft: 7.1, taper_provided_in: 99 }).height_ok);
+  // BLOCK: per-TIER taper that scales with the unit, and no stated ceiling.
+  const blk = _v1154({ ...base, material: "block", stack_height_ft: 8 });
+  assert.ok(blk.max_height_ft === null && blk.height_ok === null);
+  assert.ok(blk.tiers_above_threshold === 3 && blk.taper_required_in === 24);
+  assert.ok(_v1154({ ...base, material: "block", stack_height_ft: 6 }).tiers_above_threshold === 0);
+  assert.ok(_v1154({ ...base, material: "block", stack_height_ft: 8, block_length_in: 8 }).taper_required_in === 12, "half of an 8 in unit");
+  assert.ok(_v1154({ ...base, material: "block", stack_height_ft: 8, block_height_in: 4 }).tiers_above_threshold === 6, "shorter courses mean more tiers");
+  assert.ok(_v1154({ ...base, material: "block", stack_height_ft: 8, taper_provided_in: 24 }).passes);
+  // LUMBER: the limit depends on how it comes DOWN, and there is no taper at all.
+  assert.ok(_v1154({ ...base, material: "lumber", stack_height_ft: 18 }).max_height_ft === 20);
+  assert.ok(_v1154({ ...base, material: "lumber", stack_height_ft: 18 }).passes);
+  const manual = _v1154({ ...base, material: "lumber", stack_height_ft: 18, handled_manually: "yes" });
+  assert.ok(manual.max_height_ft === 16 && !manual.height_ok && manual.height_over_ft === 2 && !manual.passes);
+  assert.ok(!_v1154({ ...base, material: "lumber", stack_height_ft: 18 }).taper_required);
+  assert.ok(_v1154({ ...base, material: "lumber", stack_height_ft: 16, handled_manually: "yes" }).height_ok);
+  assert.ok(_v1154({ ...base, material: "lumber", stack_height_ft: 20 }).height_ok);
+  assert.ok(!_v1154({ ...base, material: "lumber", stack_height_ft: 20.1 }).height_ok);
+  // Providing exactly the required taper always clears it.
+  for (const h of [5, 6, 7]) {
+    const need = _v1154({ ...base, stack_height_ft: h }).taper_required_in;
+    assert.ok(_v1154({ ...base, stack_height_ft: h, taper_provided_in: need }).taper_ok);
+    assert.ok(!_v1154({ ...base, stack_height_ft: h, taper_provided_in: need - 0.1 }).taper_ok);
+  }
+  // Error seams.
+  assert.ok("error" in _v1154({ ...base, material: "steel" }));
+  assert.ok("error" in _v1154({ ...base, stack_height_ft: 0 }));
+  assert.ok("error" in _v1154({ ...base, taper_provided_in: -1 }));
+  assert.ok("error" in _v1154({ ...base, material: "block", block_length_in: 0 }));
+  assert.ok("error" in _v1154({ ...base, material: "block", block_height_in: 0 }));
+  assert.ok("error" in _v1154({ ...base, stack_height_ft: Infinity }));
+});

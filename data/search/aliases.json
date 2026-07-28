@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "brick stack height limit",
+      "target": "material-stacking-limits",
+      "kind": "industry"
+    },
+    {
+      "term": "how high can you stack brick",
+      "target": "material-stacking-limits",
+      "kind": "question"
+    },
+    {
+      "term": "masonry block stack taper",
+      "target": "material-stacking-limits",
+      "kind": "question"
+    },
+    {
+      "term": "lumber pile 16 feet manual",
+      "target": "material-stacking-limits",
+      "kind": "question"
+    },
+    {
+      "term": "material storage stacking osha",
+      "target": "material-stacking-limits",
+      "kind": "industry"
+    },
+    {
       "term": "flammable storage cabinet limit",
       "target": "flammable-cabinet-storage",
       "kind": "industry"

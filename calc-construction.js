@@ -11951,3 +11951,100 @@ CONSTRUCTION_RENDERERS["flammable-cabinet-storage"] = _simpleRenderer({
   ],
   compute: computeFlammableCabinetStorage,
 });
+
+
+// --- spec-v1154: jobsite material stacking limits (OSHA 1926.250) ---
+// Three stacking rules that all share one idea and one trap. The idea: past a threshold a
+// stack has to lean AWAY from you, because a vertical face of loose units fails by toppling
+// toward whoever is standing at it. The trap: the threshold and the ceiling are different
+// numbers, so a stack can be legal in height and still illegal in shape.
+// Brick: not more than 7 ft, and once a loose stack reaches 4 ft it is tapered back 2 in for
+// every foot above the 4 ft level - so a full 7 ft stack owes 6 in of taper, and a 5 ft
+// stack that looks harmless already owes 2.
+// Masonry block: stacked higher than 6 ft, tapered back one-half block per tier above 6 ft.
+// Lumber: not more than 20 ft, and not more than 16 ft where it is handled manually - the
+// same pile is legal or not depending on how it will be taken down.
+// dims: in { material: dimensionless, stack_height_ft: L, taper_provided_in: L, block_height_in: L, block_length_in: L, handled_manually: dimensionless } out: { max_height_ft: L, taper_required_in: L, taper_shortfall_in: L, tiers_above_threshold: dimensionless }
+export function computeMaterialStackingLimits({ material = "brick", stack_height_ft = 0, taper_provided_in = 0, block_height_in = 8, block_length_in = 16, handled_manually = "no" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const h = Number(stack_height_ft) || 0;
+  const tp = Number(taper_provided_in) || 0;
+  const bh = Number(block_height_in) || 0;
+  const bl = Number(block_length_in) || 0;
+  const manual = handled_manually === "yes";
+  const KNOWN = ["brick", "block", "lumber"];
+  if (!KNOWN.includes(material)) return { error: "Material must be brick, block, or lumber." };
+  if (!(h > 0)) return { error: "Stack height must be positive (ft)." };
+  if (tp < 0) return { error: "Taper provided cannot be negative (in)." };
+  if (material === "block" && (!(bh > 0) || !(bl > 0))) return { error: "Block height and length must be positive (in) to compute the per-tier taper." };
+
+  const BRICK_MAX = 7, BRICK_THRESHOLD = 4, BRICK_TAPER_PER_FT = 2;
+  const BLOCK_THRESHOLD = 6, LUMBER_MAX = 20, LUMBER_MANUAL_MAX = 16;
+
+  let max_height_ft, taper_required_in = 0, tiers_above_threshold = 0, threshold_ft = null, rule;
+  if (material === "brick") {
+    max_height_ft = BRICK_MAX;
+    threshold_ft = BRICK_THRESHOLD;
+    taper_required_in = h > BRICK_THRESHOLD ? (h - BRICK_THRESHOLD) * BRICK_TAPER_PER_FT : 0;
+    rule = "brick: not more than " + BRICK_MAX + " ft, tapered back " + BRICK_TAPER_PER_FT + " in per foot above " + BRICK_THRESHOLD + " ft";
+  } else if (material === "block") {
+    max_height_ft = null; // the standard states no ceiling for block, only the taper
+    threshold_ft = BLOCK_THRESHOLD;
+    tiers_above_threshold = h > BLOCK_THRESHOLD ? Math.ceil((h - BLOCK_THRESHOLD) * 12 / bh) : 0;
+    taper_required_in = tiers_above_threshold * (bl / 2);
+    rule = "block: tapered back one-half block per tier above " + BLOCK_THRESHOLD + " ft";
+  } else {
+    max_height_ft = manual ? LUMBER_MANUAL_MAX : LUMBER_MAX;
+    rule = "lumber: not more than " + LUMBER_MAX + " ft, and not more than " + LUMBER_MANUAL_MAX + " ft where handled manually";
+  }
+
+  const height_ok = max_height_ft === null ? null : h <= max_height_ft;
+  const height_over_ft = max_height_ft === null ? 0 : Math.max(0, h - max_height_ft);
+  const taper_required = taper_required_in > 0;
+  const taper_ok = taper_required ? tp >= taper_required_in : null;
+  const taper_shortfall_in = taper_required ? Math.max(0, taper_required_in - tp) : 0;
+  const passes = (height_ok !== false) && (taper_ok !== false);
+
+  const note = "RULE - " + rule + ". "
+    + (material === "lumber"
+      ? "This pile is " + h + " ft against a " + max_height_ft + " ft limit" + (manual ? " because it is handled MANUALLY" : " for mechanically handled lumber") + ": " + (height_ok ? "OK. " : "OVER by " + height_over_ft.toFixed(1) + " ft. ")
+        + "The same pile is legal or not depending on how it will be taken DOWN, not how it went up - 20 ft with a forklift, 16 ft by hand. A pile built to 20 ft and then unstacked by hand because the machine left the site has become non-compliant without anyone touching it, and that is the realistic failure. "
+      : "This stack is " + h + " ft. "
+        + (material === "brick"
+          ? (height_ok ? "Within the " + BRICK_MAX + " ft ceiling. " : "OVER the " + BRICK_MAX + " ft ceiling by " + height_over_ft.toFixed(1) + " ft. ")
+          : "The standard sets no explicit height ceiling for block in this section - only the taper - so height alone is not the test here. ")
+        + (taper_required
+          ? "Above the " + threshold_ft + " ft threshold it owes " + taper_required_in.toFixed(1) + " in of taper"
+            + (material === "block" ? " (" + tiers_above_threshold + " tier" + (tiers_above_threshold === 1 ? "" : "s") + " above " + threshold_ft + " ft at half of a " + bl + " in block each)" : " (" + (h - threshold_ft).toFixed(1) + " ft above " + threshold_ft + " at " + BRICK_TAPER_PER_FT + " in per foot)")
+            + "; " + tp + " in provided, " + (taper_ok ? "OK. " : "SHORT by " + taper_shortfall_in.toFixed(1) + " in. ")
+          : "It is at or below the " + threshold_ft + " ft threshold, so no taper is required yet. ")
+        + "THE TRAP: the threshold and the ceiling are different numbers, so a stack can be perfectly legal in HEIGHT and still illegal in SHAPE. A 5 ft brick stack is nowhere near the 7 ft limit and already owes 2 in of taper. People check the height, see room to spare, and stop reading. ")
+    + "All three rules share one idea: past a threshold a stack has to lean AWAY, because a vertical face of loose units fails by toppling toward whoever is standing at it - which is the person unstacking it, at the moment they have removed the units that were holding the face. "
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: the ground the stack sits on and its bearing, drainage, and slope; banding, blocking, and interlocking of the units; bags and bundled material, which have their own rules; storage against a wall or inside a structure; aisles and passageways, which must be kept clear for free and safe movement of equipment and employees and kept in good repair; clearance from openings, edges, and excavations; and the weight the supporting floor or deck can carry, which is a structural question and is frequently the real limit indoors. A screen, not a storage plan; 29 CFR 1926.250 and the competent person govern.";
+
+  return { rule, max_height_ft, threshold_ft, height_ok, height_over_ft, taper_required, taper_required_in, taper_ok, taper_shortfall_in, tiers_above_threshold, manual, passes, note };
+}
+
+export const materialStackingLimitsExample = { inputs: { material: "brick", stack_height_ft: 5, taper_provided_in: 0, block_height_in: 8, block_length_in: 16, handled_manually: "no" } };
+
+CONSTRUCTION_RENDERERS["material-stacking-limits"] = _simpleRenderer({
+  citation: "Citation: OSHA 29 CFR 1926.250, a US federal regulation in the public domain. 'Brick stacks shall not be more than 7 feet in height. When a loose brick stack reaches a height of 4 feet, it shall be tapered back 2 inches in every foot of height above the 4-foot level.' 'When masonry blocks are stacked higher than 6 feet, the stack shall be tapered back one-half block per tier above the 6-foot level.' 'Lumber piles shall not exceed 20 feet in height provided that lumber to be handled manually shall not be stacked more than 16 feet high.' 'Aisles and passageways shall be kept clear to provide for the free and safe movement of material handling equipment or employees. Such areas shall be kept in good repair.' Not checked: the supporting ground or floor and its bearing capacity, banding and interlocking, bagged and bundled material, storage against walls, aisle clearances, or clearance from openings and excavations. A screen, not a storage plan; 1926.250 and the competent person govern.",
+  example: materialStackingLimitsExample.inputs,
+  fields: [
+    { key: "material", label: "Material", kind: "select", options: [{ value: "brick", label: "Brick (7 ft max, taper above 4 ft)", selected: true }, { value: "block", label: "Masonry block (taper above 6 ft)" }, { value: "lumber", label: "Lumber (20 ft, or 16 ft handled manually)" }] },
+    { key: "stack_height_ft", label: "Stack or pile height (ft)", kind: "number", default: 5 },
+    { key: "taper_provided_in", label: "Taper actually provided (in; brick and block)", kind: "number", default: 0 },
+    { key: "block_height_in", label: "Block height (in; for the tier count)", kind: "number", default: 8 },
+    { key: "block_length_in", label: "Block length (in; half of this per tier)", kind: "number", default: 16 },
+    { key: "handled_manually", label: "Lumber handled manually?", kind: "select", options: [{ value: "no", label: "No - mechanically handled", selected: true }, { value: "yes", label: "Yes - 16 ft limit" }] },
+  ],
+  outputs: [
+    { key: "h", id: "msl-out-h", label: "Height limit", value: (r) => r.max_height_ft === null ? "no explicit ceiling for block in this section" : r.max_height_ft + " ft - " + (r.height_ok ? "OK" : "OVER by " + fmt(r.height_over_ft, 1) + " ft") },
+    { key: "t", id: "msl-out-t", label: "Taper required", value: (r) => !r.taper_required ? "none - at or below the threshold" : fmt(r.taper_required_in, 1) + " in" + (r.tiers_above_threshold ? " (" + r.tiers_above_threshold + " tiers above the threshold)" : "") },
+    { key: "p", id: "msl-out-p", label: "Taper provided", value: (r) => r.taper_ok === null ? "n/a" : r.taper_ok ? "sufficient" : "SHORT by " + fmt(r.taper_shortfall_in, 1) + " in" },
+    { key: "v", id: "msl-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "msl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMaterialStackingLimits,
+});

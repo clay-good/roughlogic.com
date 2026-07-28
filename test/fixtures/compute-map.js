@@ -1373,6 +1373,7 @@ export const COMPUTE_MAP = {
   "scaffold-platform-check": { module: "../../calc-construction.js", fn: "computeScaffoldPlatformCheck" },
   "temporary-stairway-check": { module: "../../calc-construction.js", fn: "computeTemporaryStairwayCheck" },
   "flammable-cabinet-storage": { module: "../../calc-construction.js", fn: "computeFlammableCabinetStorage" },
+  "material-stacking-limits": { module: "../../calc-construction.js", fn: "computeMaterialStackingLimits" },
   "stair-code-check": { module: "../../calc-construction.js", fn: "computeStairCodeCheck" },
   "smooth-bore-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreFlow" },
   "smooth-bore-diameter-for-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreDiameterForFlow" },

@@ -1380,6 +1380,7 @@ const RELATED = {
   "scaffold-platform-check": ["scaffold-guardrail-check","scaffold-takeoff","scaffold-leg-load","scaffold-mudsill-bearing"],
   "temporary-stairway-check": ["landing-check","stair-stringer-layout","scaffold-guardrail-check","guard-handrail-check"],
   "flammable-cabinet-storage": ["extinguisher-coverage","excavation-protection-trigger","dumpster-count"],
+  "material-stacking-limits": ["masonry-count","brick-veneer-anchor-spacing","scaffold-platform-check","flammable-cabinet-storage"],
   "stair-code-check": ["stairs","guard-handrail-check","egress-capacity"],
   // spec-v114 smooth-bore nozzle flow (Group F)
   "smooth-bore-flow": ["fire-stream-reaction","master-stream","ladder-pipe-reach"],

@@ -12436,6 +12436,21 @@ export const CITATIONS = {
       { name: "Not determined", value: "which protective system, soil class, PE approval, inspections, water, utilities", source: "stated scope limit" },
     ],
   },
+  "material-stacking-limits": {
+    formula: "brick: ceiling 7 ft, taper = (height - 4 ft) x 2 in per foot above the 4 ft level; masonry block: tiers above 6 ft = ceil((height - 6 ft) x 12 / block height), taper = tiers x half the block length; lumber: ceiling 20 ft, or 16 ft where handled manually.",
+    edition: "OSHA 29 CFR 1926.250, a US federal regulation in the public domain, quoted directly.",
+    freeAccess: "29 CFR is published in full at no cost by OSHA and the eCFR.",
+    governance: GOVERNANCE.general,
+    editionNote: "Three rules, one idea, one trap. The idea is that past a threshold a stack has to lean AWAY from the working face, because a vertical face of loose units fails by toppling toward whoever is standing at it - and that person is the one unstacking it, at the moment they have removed the units that were holding the face together. The trap is that the threshold and the ceiling are DIFFERENT numbers, so a stack can be perfectly legal in height and still illegal in shape. A 5 ft brick stack is nowhere near the 7 ft ceiling and already owes 2 inches of taper; people check the height, see room to spare, and stop reading. The block rule is a per-TIER taper rather than a per-foot one, so it depends on the unit: an 8 ft stack of 8 in block is three tiers above the 6 ft level and owes half a block on each, 24 inches on a 16 in unit. The lumber rule is the one that changes without anyone touching the pile: 20 ft mechanically handled, 16 ft where it will be handled manually. The same pile is legal or not depending on how it comes DOWN rather than how it went up, so a 20 ft pile built with a forklift becomes non-compliant the day the machine leaves and someone starts unstacking by hand. The standard states no explicit height ceiling for masonry block in this section, only the taper, and the tile returns nothing for that rather than inventing one. Not checked: the ground or floor the stack sits on and its bearing, drainage, and slope; banding, blocking, and interlocking of units; bagged and bundled material, which have their own provisions; storage against a wall or inside a structure; aisles and passageways, which must be kept clear for free and safe movement of equipment and employees and kept in good repair; clearance from openings, edges, and excavations; and the load the supporting floor or deck can carry, which is a structural question and is frequently the real limit indoors. A screen, not a storage plan; 1926.250 and the competent person govern.",
+    assumptions: [
+      { name: "Brick", value: "not more than 7 ft; tapered back 2 in per foot above the 4 ft level", source: "29 CFR 1926.250" },
+      { name: "Masonry block", value: "tapered back one-half block per tier above the 6 ft level", source: "29 CFR 1926.250" },
+      { name: "Block ceiling", value: "the section states none - only the taper - and none is invented", source: "stated scope limit" },
+      { name: "Lumber", value: "not more than 20 ft, or 16 ft where handled manually", source: "29 CFR 1926.250" },
+      { name: "Threshold vs ceiling", value: "different numbers, so a stack can be legal in height and illegal in shape", source: "arithmetic on the two figures" },
+      { name: "Not checked", value: "bearing, banding, bags and bundles, aisles, edge clearance, supporting floor capacity", source: "stated scope limit" },
+    ],
+  },
   "flammable-cabinet-storage": {
     formula: "cabinets for Category 1-3 = ceil(gallons / 60); cabinets for Category 4 = ceil(gallons / 120); cabinets needed = the larger of the two, since the standard states a limit for each rather than a blending rule; the area ceiling is 3 cabinets, so 180 gal of Category 1-3 or 360 gal of Category 4 per storage area.",
     edition: "OSHA 29 CFR 1926.152(b)(3), a US federal regulation in the public domain, quoted directly. Quantities beyond what cabinets may hold go to specially constructed inside storage rooms under the same section.",
