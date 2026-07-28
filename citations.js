@@ -14219,6 +14219,20 @@ export const CITATIONS = {
       { name: "Internal focusing", value: "stadia constant C ~ 0; external-focusing instruments add a C term", source: "instrument convention" },
     ],
   },
+  "taping-normal-tension": {
+    formula: "set the tension correction equal and opposite to the sag correction, (P - P0) L / (A E) = w^2 L^3 / (24 P^2); substituting the span weight W = w L eliminates L and gives P^2 (P - P0) = A E W^2 / 24, solved by bisection. Square-rooting the same relation gives the textbook implicit form P = 0.204 W sqrt(A E) / sqrt(P - P0), where 0.204 = 1/sqrt(24).",
+    edition: "Normal tension as defined in the standard surveying references (Ghilani/Wolf, Elementary Surveying), by name. The component corrections are the same tension and sag expressions the taping-corrections tile uses, so the two tiles cannot drift.",
+    freeAccess: "Both corrections and the normal-tension condition are elementary mechanics published in every surveying text and in free course notes; nothing here is tabulated or proprietary.",
+    governance: GOVERNANCE.general,
+    editionNote: "The derivation is the interesting part and it is fully shown rather than asserted: pulling harder stretches the tape (a positive correction that grows linearly with P) while the tape's own weight sags the span (a negative correction that shrinks as 1/P^2), so exactly one pull makes them cancel. Writing the span weight as W = w L removes the length from both sides entirely, which is why normal tension depends on the tape and the span weight but not separately on how long the span is. The cubic is solved directly by bisection; the classic 0.204 constant is not a fitted coefficient but 1 over the square root of 24, and the fuzzer checks the bisection root against that closed form rather than against a memorized value. Practical limits are stated in the note: normal tension can exceed what a crew holds steadily or what the tape is rated for, a tape supported throughout has no sag to cancel, and cancelling these two corrections does nothing about temperature or the tape\'s own standardization error - those still need the taping-corrections tile. Steel modulus 29,000,000 psi by default; the tape\'s actual cross-sectional area and weight per foot come from its specification and move the answer substantially. A field aid; the tape calibration and the survey\'s procedure govern.",
+    assumptions: [
+      { name: "Cancellation condition", value: "tension correction = -(sag correction) at the normal tension", source: "definition of normal tension" },
+      { name: "Governing equation", value: "P^2 (P - P0) = A E W^2 / 24, length-independent once W = w L", source: "derived from the two correction formulas" },
+      { name: "0.204 constant", value: "1/sqrt(24) = 0.20412, derived rather than fitted", source: "algebra of the same relation" },
+      { name: "Steel modulus", value: "29,000,000 psi default, editable", source: "standard value for steel tapes" },
+      { name: "Scope", value: "does not address temperature or standardization error; may exceed a practical or rated pull", source: "stated scope limit" },
+    ],
+  },
   "taping-corrections": {
     formula: "Ct = alpha (T - T0) L; Ch = -h^2/(2L); Cp = (P - P0) L/(A E); Cs = -w^2 L^3/(24 P^2); corrected = L + Ct + Ch + Cp + Cs. (alpha = 6.45e-6 /degF)",
     edition: "The four steel-tape distance corrections (temperature, slope, tension, sag) added to the measured length, as compiled in the standard surveying references (Ghilani/Wolf), by name.",

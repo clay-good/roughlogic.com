@@ -1203,6 +1203,7 @@ export const COMPUTE_MAP = {
   "level-loop-adjustment": { module: "../../calc-survey.js", fn: "computeLevelLoopAdjustment" },
   "stadia-distance": { module: "../../calc-survey.js", fn: "computeStadiaDistance" },
   "taping-corrections": { module: "../../calc-survey.js", fn: "computeTapingCorrections" },
+  "taping-normal-tension": { module: "../../calc-survey.js", fn: "computeTapingNormalTension" },
   "cogo-forward-point": { module: "../../calc-survey.js", fn: "computeCogoForwardPoint" },
   "edm-slope-reduction": { module: "../../calc-survey.js", fn: "computeEdmSlopeReduction" },
   "leveling-curvature-refraction": { module: "../../calc-survey.js", fn: "computeLevelingCurvatureRefraction" },

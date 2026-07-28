@@ -31361,3 +31361,70 @@ test("bounds: spec-v1120 computeSrwGeogridSpacing pins both Keystone TIS-15 exam
   assert.ok("error" in _v1120({ ...base, block_depth_in: 6, block_height_in: 16 }));
   assert.ok("error" in _v1120({ ...base, wall_height_ft: Infinity }));
 });
+
+import { computeTapingNormalTension as _v1121 } from "../../calc-survey.js";
+import { computeTapingCorrections as _v1121sib } from "../../calc-survey.js";
+
+test("bounds: spec-v1121 computeTapingNormalTension pins cancellation, the 1/sqrt(24) closed form, agreement with the taping-corrections sibling, and error seams", () => {
+  const base = { span_ft: 100, tape_weight_plf: 0.02, tape_area_in2: 0.006, standard_pull_lb: 10, applied_pull_lb: 20, e_psi: 29e6 };
+  const r = _v1121(base);
+  assert.ok(Math.abs(r.normal_tension_lb - 34.443967) < 1e-5 && r.span_weight_lb === 2);
+  // THE DEFINITION: at normal tension the two corrections cancel, to machine precision.
+  assert.ok(Math.abs(r.residual_at_normal_ft) < 1e-12);
+  assert.ok(Math.abs(r.sag_at_normal_ft + r.pull_at_normal_ft) < 1e-12);
+  // THE CLOSED FORM: the bisection root must satisfy P = 0.204... W sqrt(AE) / sqrt(P - P0),
+  // checked against 1/sqrt(24) rather than a memorized constant, across many tapes.
+  const k = 1 / Math.sqrt(24);
+  for (const w of [0.008, 0.02, 0.05]) {
+    for (const A of [0.003, 0.006, 0.012]) {
+      for (const P0 of [0, 5, 10, 20]) {
+        for (const L of [50, 100, 200]) {
+          const t = _v1121({ ...base, tape_weight_plf: w, tape_area_in2: A, standard_pull_lb: P0, span_ft: L, applied_pull_lb: 0 });
+          const P = t.normal_tension_lb, W = w * L;
+          assert.ok(Math.abs(P - k * W * Math.sqrt(A * 29e6) / Math.sqrt(P - P0)) < 1e-6 * Math.max(1, P), "closed form mismatch");
+          // And the cubic itself.
+          assert.ok(Math.abs(P * P * (P - P0) - A * 29e6 * W * W / 24) < 1e-6 * Math.max(1, P * P * P));
+          assert.ok(Math.abs(t.residual_at_normal_ft) < 1e-10);
+          assert.ok(P > P0, "normal tension always exceeds the standardization pull when the tape has weight");
+        }
+      }
+    }
+  }
+  // CROSS-IMPLEMENTATION: the component terms must equal what the taping-corrections tile
+  // computes for the same tape and pull, or the two tiles have drifted.
+  for (const P of [15, 20, 34.443966539765945, 60]) {
+    const t = _v1121({ ...base, applied_pull_lb: P });
+    const sib = _v1121sib({ l_ft: 100, t_f: 68, t0_f: 68, h_ft: 0, p_lb: P, p0_lb: 10, a_in2: 0.006, w_plf: 0.02, e_psi: 29e6 });
+    assert.ok(Math.abs(t.sag_at_applied_ft - sib.cs_ft) < 1e-12, "sag disagrees with the sibling at P=" + P);
+    assert.ok(Math.abs(t.pull_at_applied_ft - sib.cp_ft) < 1e-12, "tension disagrees with the sibling at P=" + P);
+  }
+  // Under-pulling reads long (net negative), over-pulling reads short; the sign flips at normal tension.
+  assert.ok(_v1121({ ...base, applied_pull_lb: 20 }).applied_reads_short === true);
+  assert.ok(_v1121({ ...base, applied_pull_lb: 20 }).net_at_applied_ft < 0);
+  assert.ok(_v1121({ ...base, applied_pull_lb: 60 }).net_at_applied_ft > 0);
+  assert.ok(Math.abs(_v1121({ ...base, applied_pull_lb: r.normal_tension_lb }).net_at_applied_ft) < 1e-12);
+  // Halving the span does NOT halve the tension - the relation goes as W^2, not W.
+  const half = _v1121({ ...base, span_ft: 50 });
+  assert.ok(half.normal_tension_lb > r.normal_tension_lb / 2 && half.normal_tension_lb < r.normal_tension_lb);
+  // Monotone in span weight; heavier or longer always wants more pull.
+  let prev = 0;
+  for (const w of [0.005, 0.01, 0.02, 0.04, 0.08]) {
+    const t = _v1121({ ...base, tape_weight_plf: w });
+    assert.ok(t.normal_tension_lb > prev); prev = t.normal_tension_lb;
+  }
+  // A weightless tape has no sag to cancel, so only the standardization pull is correction-free.
+  const massless = _v1121({ ...base, tape_weight_plf: 0, applied_pull_lb: 0 });
+  assert.ok(massless.normal_tension_lb === 10 && massless.span_weight_lb === 0);
+  assert.ok(Math.abs(massless.pull_at_normal_ft) < 1e-15);
+  // No applied pull entered leaves the applied-case outputs null rather than fabricating zeros.
+  const noApplied = _v1121({ ...base, applied_pull_lb: 0 });
+  assert.ok(noApplied.net_at_applied_ft === null && noApplied.sag_at_applied_ft === null && noApplied.applied_reads_short === null);
+  // Error seams.
+  assert.ok("error" in _v1121({ ...base, span_ft: 0 }));
+  assert.ok("error" in _v1121({ ...base, tape_area_in2: 0 }));
+  assert.ok("error" in _v1121({ ...base, e_psi: 0 }));
+  assert.ok("error" in _v1121({ ...base, tape_weight_plf: -1 }));
+  assert.ok("error" in _v1121({ ...base, standard_pull_lb: -1 }));
+  assert.ok("error" in _v1121({ ...base, applied_pull_lb: -1 }));
+  assert.ok("error" in _v1121({ ...base, span_ft: Infinity }));
+});

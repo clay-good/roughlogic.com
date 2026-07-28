@@ -671,3 +671,102 @@ function renderCogoInverseLocate(inputRegion, outputRegion, citationEl) {
   for (const f of [n1.input, e1.input, n2.input, e2.input]) f.addEventListener("input", update);
 }
 SURVEY_RENDERERS["cogo-inverse-locate"] = renderCogoInverseLocate;
+
+// --- spec-v1121: normal tension for a suspended steel tape ---
+// taping-corrections computes the four corrections; this answers the field question that
+// comes next - what pull makes two of them cancel, so the tape reads right with no
+// arithmetic at all. Setting the tension correction equal and opposite to the sag
+// correction, (P - P0) L / (A E) = w^2 L^3 / (24 P^2), and substituting the span's total
+// weight W = w L collapses the length out entirely:
+//     P^2 (P - P0) = A E W^2 / 24
+// which is the cubic this solves by bisection. Taking the square root of both sides
+// recovers the textbook closed form P = 0.204 W sqrt(A E) / sqrt(P - P0), since
+// 1/sqrt(24) = 0.20412 - the same root, written implicitly. The fuzzer checks the
+// bisection against that identity rather than against a memorized number.
+// dims: in { span_ft: L, tape_weight_plf: M T^-2, tape_area_in2: L^2, standard_pull_lb: M L T^-2, applied_pull_lb: M L T^-2, e_psi: M L^-1 T^-2 } out: { normal_tension_lb: M L T^-2, span_weight_lb: M L T^-2, sag_at_normal_ft: L, pull_at_normal_ft: L, net_at_applied_ft: L, sag_at_applied_ft: L, pull_at_applied_ft: L }
+export function computeTapingNormalTension({ span_ft = 100, tape_weight_plf = 0.02, tape_area_in2 = 0.006, standard_pull_lb = 10, applied_pull_lb = 0, e_psi = 29e6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(span_ft) || 0;
+  const w = Number(tape_weight_plf) || 0;
+  const A = Number(tape_area_in2) || 0;
+  const P0 = Number(standard_pull_lb) || 0;
+  const Pa = Number(applied_pull_lb) || 0;
+  const E = Number(e_psi) || 0;
+  if (!(L > 0)) return { error: "Unsupported span must be positive (ft)." };
+  if (!(w >= 0)) return { error: "Tape weight per foot cannot be negative (lb/ft)." };
+  if (!(A > 0)) return { error: "Tape cross-sectional area must be positive (in^2)." };
+  if (!(E > 0)) return { error: "Tape modulus must be positive (psi)." };
+  if (P0 < 0) return { error: "Standardization pull cannot be negative (lb)." };
+  if (Pa < 0) return { error: "Applied pull cannot be negative (lb)." };
+
+  const span_weight_lb = w * L;
+  const ae = A * E;
+  const rhs = ae * span_weight_lb * span_weight_lb / 24;
+
+  // A weightless tape has no sag to cancel, so the only pull with no correction is the
+  // standardization pull itself.
+  let normal_tension_lb = P0;
+  if (rhs > 0) {
+    // f(P) = P^2 (P - P0) - rhs is strictly increasing for P > P0, so bisection is exact.
+    let lo = P0, hi = Math.max(P0 + 1, 1);
+    for (let i = 0; i < 200 && hi * hi * (hi - P0) < rhs; i++) hi *= 2;
+    for (let i = 0; i < 200; i++) {
+      const mid = (lo + hi) / 2;
+      if (mid * mid * (mid - P0) < rhs) lo = mid; else hi = mid;
+    }
+    normal_tension_lb = (lo + hi) / 2;
+  }
+
+  const sagAt = (P) => (P > 0 ? -(w * w * Math.pow(L, 3)) / (24 * P * P) : null);
+  const pullAt = (P) => ((P - P0) * L) / ae;
+  const sag_at_normal_ft = sagAt(normal_tension_lb);
+  const pull_at_normal_ft = pullAt(normal_tension_lb);
+  const residual_at_normal_ft = (sag_at_normal_ft === null ? 0 : sag_at_normal_ft) + pull_at_normal_ft;
+
+  const has_applied = Pa > 0;
+  const sag_at_applied_ft = has_applied ? sagAt(Pa) : null;
+  const pull_at_applied_ft = has_applied ? pullAt(Pa) : null;
+  const net_at_applied_ft = has_applied ? sag_at_applied_ft + pull_at_applied_ft : null;
+  const applied_reads_short = has_applied ? net_at_applied_ft < 0 : null;
+
+  const note = "A " + L + " ft unsupported span of this tape weighs " + span_weight_lb.toFixed(2) + " lb. "
+    + (rhs > 0
+      ? "Normal tension is " + normal_tension_lb.toFixed(1) + " lb: at that pull the tape stretches exactly as much as its own sag shortens it, so the sag term (" + sag_at_normal_ft.toFixed(4) + " ft) and the tension term (+" + pull_at_normal_ft.toFixed(4) + " ft) cancel and the tape reads true with no correction applied. "
+      : "With no tape weight there is no sag to cancel, so the only pull needing no correction is the standardization pull itself, " + P0.toFixed(1) + " lb. ")
+    + (has_applied
+      ? "At the " + Pa.toFixed(1) + " lb you entered the two terms are " + sag_at_applied_ft.toFixed(4) + " and " + (pull_at_applied_ft >= 0 ? "+" : "") + pull_at_applied_ft.toFixed(4) + " ft, a net " + (net_at_applied_ft >= 0 ? "+" : "") + net_at_applied_ft.toFixed(4) + " ft over the span - the tape reads " + (applied_reads_short ? "LONG, so the true distance is shorter than the reading" : "SHORT, so the true distance is longer than the reading") + " by that much. "
+      : "")
+    + "Why it collapses so cleanly: setting the tension correction (P - P0) L / (A E) equal and opposite to the sag correction w^2 L^3 / (24 P^2) and writing W = w L for the span weight removes the length from both sides, leaving P^2 (P - P0) = A E W^2 / 24. Square-rooting that gives the textbook P = 0.204 W sqrt(A E) / sqrt(P - P0), which is the same equation - 0.204 is just 1 over the square root of 24. This tile solves the cubic directly instead of iterating the implicit form. "
+    + "Normal tension is not always practical: it can exceed what a crew can hold steadily or what the tape is rated for, and a tape supported throughout has no sag to cancel in the first place. It also does nothing about temperature or the tape's own standardization error, which still need the correction tile. Steel at 29,000,000 psi by default; a tape's actual area and weight come from its own specification, and the difference between a light 100-ft tape and a heavy one moves this answer a lot. A field aid; the tape calibration and the survey's procedure govern.";
+
+  return { normal_tension_lb, span_weight_lb, sag_at_normal_ft, pull_at_normal_ft, residual_at_normal_ft, sag_at_applied_ft, pull_at_applied_ft, net_at_applied_ft, applied_reads_short, note };
+}
+
+export const tapingNormalTensionExample = { inputs: { span_ft: 100, tape_weight_plf: 0.02, tape_area_in2: 0.006, standard_pull_lb: 10, applied_pull_lb: 20, e_psi: 29e6 } };
+
+function renderTapingNormalTension(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: normal tension, the pull at which the tension and sag corrections to a suspended steel tape cancel. Derived, not tabulated: setting (P - P0) L / (A E) = w^2 L^3 / (24 P^2) and substituting the span weight W = w L eliminates the length and leaves P^2 (P - P0) = A E W^2 / 24, whose square root is the textbook implicit form P = 0.204 W sqrt(A E) / sqrt(P - P0) (0.204 = 1/sqrt(24)). Solved here by bisection on the cubic. The component corrections match the taping-corrections tile exactly. Steel modulus 29,000,000 psi by default; tape area and weight per foot come from the tape's specification. Does not address temperature or standardization error, and normal tension may exceed a practical or rated pull. A field aid; the tape calibration and the survey's procedure govern.";
+  const l = makeNumber("Unsupported span L (ft)", "tnt-l", { step: "any", min: "0" }); l.input.value = "100";
+  const w = makeNumber("Tape weight per foot (lb/ft)", "tnt-w", { step: "any", min: "0" }); w.input.value = "0.02";
+  const a = makeNumber("Tape cross-section A (in^2)", "tnt-a", { step: "any", min: "0" }); a.input.value = "0.006";
+  const p0 = makeNumber("Standardization pull P0 (lb)", "tnt-p0", { step: "any", min: "0" }); p0.input.value = "10";
+  const pa = makeNumber("Pull you actually used (lb, optional)", "tnt-pa", { step: "any", min: "0" }); pa.input.value = "20";
+  for (const f of [l, w, a, p0, pa]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { l.input.value = "100"; w.input.value = "0.02"; a.input.value = "0.006"; p0.input.value = "10"; pa.input.value = "20"; update(); });
+  const oNt = makeOutputLine(outputRegion, "Normal tension", "tnt-out-nt");
+  const oWt = makeOutputLine(outputRegion, "Weight of the suspended span", "tnt-out-wt");
+  const oCanc = makeOutputLine(outputRegion, "At normal tension: sag / tension terms", "tnt-out-canc");
+  const oApp = makeOutputLine(outputRegion, "At the pull you used: net error", "tnt-out-app");
+  const oNote = makeOutputLine(outputRegion, "Note", "tnt-out-note");
+  const update = debounce(() => {
+    const r = computeTapingNormalTension({ span_ft: Number(l.input.value) || 0, tape_weight_plf: Number(w.input.value) || 0, tape_area_in2: Number(a.input.value) || 0, standard_pull_lb: Number(p0.input.value) || 0, applied_pull_lb: Number(pa.input.value) || 0 });
+    if (r.error) { oNt.textContent = r.error; oWt.textContent = "-"; oCanc.textContent = "-"; oApp.textContent = "-"; oNote.textContent = "-"; return; }
+    oNt.textContent = fmt(r.normal_tension_lb, 1) + " lb";
+    oWt.textContent = fmt(r.span_weight_lb, 2) + " lb";
+    oCanc.textContent = fmt(r.sag_at_normal_ft, 4) + " ft and +" + fmt(r.pull_at_normal_ft, 4) + " ft - they cancel";
+    oApp.textContent = r.net_at_applied_ft === null ? "- (enter the pull you used)" : fmt(r.net_at_applied_ft, 4) + " ft over the span, tape reads " + (r.applied_reads_short ? "long" : "short");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [l.input, w.input, a.input, p0.input, pa.input]) f.addEventListener("input", update);
+}
+SURVEY_RENDERERS["taping-normal-tension"] = renderTapingNormalTension;

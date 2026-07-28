@@ -3029,6 +3029,7 @@ cross-check.
 | calc-survey.js | `computeLevelingCurvatureRefraction` | `{ sight_distance_ft = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeStadiaDistance` | `{ s_ft = 0, theta_deg = 0, k_f = 100, hi_ft = 0, rod_ft = 0, sta_elev = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeTapingCorrections` | `{ l_ft = 0, t_f = 68, t0_f = 68, h_ft = 0, p_lb = 0, p0_lb = 0, a_in2 = 0, w_...` | _ | _ | _ |
+| calc-survey.js | `computeTapingNormalTension` | `{ span_ft = 100, tape_weight_plf = 0.02, tape_area_in2 = 0.006, standard_pull...` | _ | _ | _ |
 | calc-survey.js | `computeTraverseClosure` | `{ courses, n0 = 0, e0 = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeBodTssLoadingRemoval` | `{ flow_mgd = 0, influent_mgl = 0, effluent_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeBreakpointChlorination` | `{ total_ppm = 0, free_ppm = 0, ratio = 10, gallons = 0, avail = 0 } = {}` | _ | _ | _ |
@@ -3165,7 +3166,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1751.
+Row count: 1752.
 
 <!-- END function-corpus-v14 -->
 
@@ -4656,7 +4657,7 @@ per spec-v14 §13.1 second paragraph.
 | `sous-vide-pasteurization` | Sous-Vide Pasteurization Time | FDA / Baldwin; Heisler-slab approximation Fo ~ 0.4; Annex 6 hold at 140 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `yield-ep` | Yield Percentage and Edible Portion | Project (first-principles) over Culin...; 10 lb AP / 1.5 lb trim / 15% cooking loss / $8/lb -> 72.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group P Field (25 tiles)
+### Group P Field (26 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4683,6 +4684,7 @@ per spec-v14 §13.1 second paragraph.
 | `sweat-rate-hydration` | Sweat Rate and Fluid Replacement | ACSM / NATA fluid-replacement (weigh-...; 180 lb pre, 177 lb post, 20 oz drunk, 2 hr -> 68 oz sweat... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sweep-width-correction` | Sweep Width Correction (Weather, Speed, Fatigue) | IAMSAR Manual Vol. II / US National S...; 120 ft raw width, weather 0.5, speed 1.0, fatigue 0.9 -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `taping-corrections` | Steel Tape Distance Corrections (Temperature, Slope, Tension, Sag) | Steel-tape corrections (Ghilani/Wolf); spec-v313 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `taping-normal-tension` | Normal Tension for a Suspended Steel Tape | standard surveying references (Ghilan...; A 100 ft span of tape at 0.02 lb/ft weighs W = 2 lb; A E ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `traverse-closure` | Traverse Closure and Adjustment | FM 5-233 Construction Surveying (by n...; courses (0 deg, 100 ft), (90 deg, 100 ft) -> sumLat 100, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `utm-conversion` | UTM and Lat-Lon Conversion | USGS / NGA WGS84 UTM forward (project...; lat 40 N / lon 105 W (central meridian of zone 13) -> zon... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
@@ -4855,6 +4857,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1504. Fixture-covered or reference-cadence: 1504 / 1504.
+Tile count: 1505. Fixture-covered or reference-cadence: 1505 / 1505.
 
 <!-- END tile-index-v14 -->

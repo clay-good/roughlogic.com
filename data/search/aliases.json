@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "normal tension",
+      "target": "taping-normal-tension",
+      "kind": "industry"
+    },
+    {
+      "term": "what pull for a steel tape",
+      "target": "taping-normal-tension",
+      "kind": "question"
+    },
+    {
+      "term": "tape pull that cancels sag",
+      "target": "taping-normal-tension",
+      "kind": "question"
+    },
+    {
+      "term": "surveying tape tension",
+      "target": "taping-normal-tension",
+      "kind": "industry"
+    },
+    {
+      "term": "how much tension to pull a survey tape",
+      "target": "taping-normal-tension",
+      "kind": "question"
+    },
+    {
       "term": "geogrid spacing",
       "target": "srw-geogrid-spacing",
       "kind": "industry"
