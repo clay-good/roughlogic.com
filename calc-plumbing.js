@@ -4928,3 +4928,99 @@ function _v1137renderGrabBarLayout(inputRegion, outputRegion, citationEl) {
   for (const x of [h, sl, sf, rl, rs, ro, ld, so, fs]) x.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["grab-bar-layout"] = _v1137renderGrabBarLayout;
+
+// --- spec-v1140: drainage cleanout layout (IPC 708) ---
+// Three separate triggers put cleanouts in a drain and they are additive, which is why a
+// count done from any one of them comes out low: spacing along the horizontal run, every
+// change of horizontal direction greater than 45 degrees, and the base of every waste or
+// soil stack. The subtlety is the grouping allowance - where more than one change over 45
+// degrees occurs within 40 ft of developed length, the cleanout at the FIRST change serves
+// all of them - which caps the change-driven count at ceil(run / 40) no matter how many
+// bends are drawn. This tile reports that cap alongside the entered count, because it is
+// the difference between a fitting on every elbow and a sane number of them.
+// dims: in { horizontal_run_ft: L, max_spacing_ft: L, direction_changes: dimensionless, changes_grouped_away: dimensionless, stack_count: dimensionless, pipe_size_in: L, clear_space_in: L, crawl_height_in: L } out: { spacing_cleanouts: dimensionless, change_cleanouts: dimensionless, change_cap: dimensionless, stack_cleanouts: dimensionless, total_cleanouts: dimensionless }
+export function computeCleanoutLayout({ horizontal_run_ft = 0, max_spacing_ft = 100, direction_changes = 0, changes_grouped_away = 0, stack_count = 0, pipe_size_in = 4, clear_space_in = 18, crawl_height_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(horizontal_run_ft) || 0;
+  const spacing = Number(max_spacing_ft) || 0;
+  const changes = Number(direction_changes) || 0;
+  const grouped = Number(changes_grouped_away) || 0;
+  const stacks = Number(stack_count) || 0;
+  const size = Number(pipe_size_in) || 0;
+  const clear = Number(clear_space_in) || 0;
+  const crawl = Number(crawl_height_in) || 0;
+  if (!(L > 0)) return { error: "Horizontal drain run must be positive (ft)." };
+  if (!(spacing > 0)) return { error: "Maximum cleanout spacing must be positive (ft)." };
+  if (!Number.isInteger(changes) || changes < 0) return { error: "Direction-change count must be a whole number of 0 or more." };
+  if (!Number.isInteger(grouped) || grouped < 0) return { error: "Grouped-away change count must be a whole number of 0 or more." };
+  if (grouped > changes) return { error: "More changes grouped away than entered." };
+  if (!Number.isInteger(stacks) || stacks < 0) return { error: "Stack count must be a whole number of 0 or more." };
+  if (!(size > 0)) return { error: "Pipe size must be positive (in)." };
+  if (clear < 0) return { error: "Clear space cannot be negative (in)." };
+  if (crawl < 0) return { error: "Crawl-space pathway height cannot be negative (in)." };
+
+  // Spacing: intermediate cleanouts along the run, assuming the run begins at one.
+  const spacing_cleanouts = Math.max(0, Math.ceil(L / spacing) - 1);
+  // Changes: the 40 ft grouping allowance caps how many can ever be required.
+  const change_cap = Math.ceil(L / 40);
+  const change_claimed = changes - grouped;
+  const change_cleanouts = Math.min(change_claimed, change_cap);
+  const cap_governs = change_claimed > change_cap;
+  const stack_cleanouts = stacks;
+  const total_cleanouts = spacing_cleanouts + change_cleanouts + stack_cleanouts;
+
+  const small_bore = size <= 6;
+  const clear_ok = small_bore ? clear >= 18 : null;
+  const in_crawl = crawl > 0;
+  const crawl_ok = in_crawl ? crawl >= 24 : null;
+  const access_ok = (clear_ok !== false) && (crawl_ok !== false);
+
+  const note = "Three triggers, and they ADD - counting from any one of them comes out low. "
+    + "SPACING (708.1): horizontal drains get cleanouts not more than " + spacing + " ft apart, so a " + L + " ft run takes " + spacing_cleanouts + " intermediate cleanout" + (spacing_cleanouts === 1 ? "" : "s") + " on top of whatever sits at its head. "
+    + "CHANGES OF DIRECTION: a cleanout at every change of horizontal direction greater than 45 degrees - but where more than one such change occurs within 40 ft of developed length, the cleanout at the FIRST change serves all of them. That caps the change-driven count at ceil(" + L + "/40) = " + change_cap + " for this run no matter how many bends are drawn. "
+    + "You entered " + changes + " change" + (changes === 1 ? "" : "s") + (grouped > 0 ? " with " + grouped + " grouped away" : "") + ", giving " + change_cleanouts + (cap_governs ? " - the 40 ft grouping CAP governs here, not your count, which is the allowance that keeps a bendy run from needing a fitting at every elbow. " : ". ")
+    + "STACK BASES: one at the base of each waste or soil stack, " + stack_cleanouts + " here. "
+    + "TOTAL " + total_cleanouts + ". "
+    + "ACCESS is a requirement, not a courtesy, and it is where cleanouts get valued-engineered into uselessness. "
+    + (small_bore ? "For a cleanout " + size + " in and smaller the opening needs at least 18 in of clear space in front - " + clear + " in entered, " + (clear_ok ? "OK. " : "SHORT. ") : "This is over 6 in, and larger cleanouts carry their own larger clearance requirement which this tile does not check - read the section. ")
+    + (in_crawl ? "In a crawl space the unobstructed height along the pathway to the cleanout must be at least 24 in - " + crawl + " in entered, " + (crawl_ok ? "OK. " : "TOO LOW, so the cleanout is not accessible even if it exists. ") : "")
+    + (access_ok ? "" : "A cleanout that cannot be reached and turned does not count as one. ")
+    + "The spacing count assumes the run BEGINS at a cleanout - a stack base, an upstream cleanout, or the point where the code otherwise requires one. If it does not, add one at the head. "
+    + "Not checked: cleanout SIZE relative to the pipe, which is its own rule; whether a fitting or a fixture is permitted to serve as the cleanout; the building drain and building sewer junction; manholes on large sewers; the direction the cleanout must face; concealed piping and access covers; or cleanout material and thread type. A screen; the adopted code and the AHJ govern.";
+
+  return { spacing_cleanouts, change_cap, change_cleanouts, cap_governs, stack_cleanouts, total_cleanouts, small_bore, clear_ok, in_crawl, crawl_ok, access_ok, note };
+}
+
+export const cleanoutLayoutExample = { inputs: { horizontal_run_ft: 240, max_spacing_ft: 100, direction_changes: 9, changes_grouped_away: 0, stack_count: 2, pipe_size_in: 4, clear_space_in: 18, crawl_height_in: 30 } };
+
+function _v1140renderCleanoutLayout(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IPC 708 - horizontal drains provided with cleanouts located not more than 100 ft apart; a cleanout where a horizontal drainage pipe, building drain, or building sewer has a change of horizontal direction greater than 45 degrees, with the allowance that where more than one such change occurs within 40 ft of developed length the cleanout at the first change serves all of them; a cleanout at the base of each waste or soil stack; a clear space of not less than 18 in at the opening of cleanouts 6 in and smaller; and, where a cleanout is in a crawl space, an unobstructed pathway height of not less than 24 in. Larger cleanouts carry their own clearance requirement, not checked here. Also not checked: cleanout size relative to the pipe, fittings or fixtures serving as cleanouts, the building drain and sewer junction, manholes, cleanout orientation, concealed piping and access covers, or material and threads. A screen; the adopted code and the AHJ govern.";
+  const L = makeNumber("Horizontal drain run (ft)", "clo-l", { step: "any", min: "0" }); L.input.value = "240";
+  const sp = makeNumber("Maximum cleanout spacing (ft; IPC 100)", "clo-sp", { step: "any", min: "0" }); sp.input.value = "100";
+  const dc = makeNumber("Changes of horizontal direction over 45 degrees", "clo-dc", { step: "1", min: "0" }); dc.input.value = "9";
+  const gp = makeNumber("Of those, how many are grouped away (0 = let the 40 ft cap decide)", "clo-gp", { step: "1", min: "0" }); gp.input.value = "0";
+  const st = makeNumber("Waste or soil stacks", "clo-st", { step: "1", min: "0" }); st.input.value = "2";
+  const ps = makeNumber("Cleanout / pipe size (in)", "clo-ps", { step: "any", min: "0" }); ps.input.value = "4";
+  const cs = makeNumber("Clear space at the opening (in)", "clo-cs", { step: "any", min: "0" }); cs.input.value = "18";
+  const ch = makeNumber("Crawl-space pathway height (in; 0 = not in a crawl space)", "clo-ch", { step: "any", min: "0" }); ch.input.value = "30";
+  for (const x of [L, sp, dc, gp, st, ps, cs, ch]) inputRegion.appendChild(x.wrap);
+  attachExampleButton(inputRegion, () => { L.input.value = "240"; sp.input.value = "100"; dc.input.value = "9"; gp.input.value = "0"; st.input.value = "2"; ps.input.value = "4"; cs.input.value = "18"; ch.input.value = "30"; update(); });
+  const oT = makeOutputLine(outputRegion, "Total cleanouts", "clo-out-t");
+  const oS = makeOutputLine(outputRegion, "From spacing", "clo-out-s");
+  const oC = makeOutputLine(outputRegion, "From changes of direction", "clo-out-c");
+  const oB = makeOutputLine(outputRegion, "From stack bases", "clo-out-b");
+  const oA = makeOutputLine(outputRegion, "Access", "clo-out-a");
+  const oNote = makeOutputLine(outputRegion, "Note", "clo-out-note");
+  const update = debounce(() => {
+    const r = computeCleanoutLayout({ horizontal_run_ft: Number(L.input.value) || 0, max_spacing_ft: Number(sp.input.value) || 0, direction_changes: Number(dc.input.value) || 0, changes_grouped_away: Number(gp.input.value) || 0, stack_count: Number(st.input.value) || 0, pipe_size_in: Number(ps.input.value) || 0, clear_space_in: Number(cs.input.value) || 0, crawl_height_in: Number(ch.input.value) || 0 });
+    if (r.error) { oT.textContent = r.error; oS.textContent = "-"; oC.textContent = "-"; oB.textContent = "-"; oA.textContent = "-"; oNote.textContent = "-"; return; }
+    oT.textContent = r.total_cleanouts + "";
+    oS.textContent = r.spacing_cleanouts + " intermediate along the run";
+    oC.textContent = r.change_cleanouts + (r.cap_governs ? " - the 40 ft grouping cap of " + r.change_cap + " governs, not the entered count" : " (the 40 ft cap for this run is " + r.change_cap + ")");
+    oB.textContent = r.stack_cleanouts + "";
+    oA.textContent = (r.clear_ok === null ? "over 6 in - its own clearance rule applies" : r.clear_ok ? "18 in clear space OK" : "clear space SHORT of 18 in") + (r.in_crawl ? ", crawl pathway " + (r.crawl_ok ? "OK" : "under 24 in - not accessible") : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of [L, sp, dc, gp, st, ps, cs, ch]) x.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["cleanout-layout"] = _v1140renderCleanoutLayout;

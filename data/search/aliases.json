@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "cleanout spacing",
+      "target": "cleanout-layout",
+      "kind": "industry"
+    },
+    {
+      "term": "how many cleanouts does a drain need",
+      "target": "cleanout-layout",
+      "kind": "question"
+    },
+    {
+      "term": "cleanout at every change of direction",
+      "target": "cleanout-layout",
+      "kind": "question"
+    },
+    {
+      "term": "cleanout clearance 18 inches",
+      "target": "cleanout-layout",
+      "kind": "question"
+    },
+    {
+      "term": "cleanout at the base of a stack",
+      "target": "cleanout-layout",
+      "kind": "industry"
+    },
+    {
       "term": "dryer vent length",
       "target": "dryer-duct-length",
       "kind": "industry"
