@@ -4563,3 +4563,91 @@ function _v1132renderFixtureClearanceCheck(inputRegion, outputRegion, citationEl
   for (const x of [l, r, f, a, n, cw, cd, ms, mc, mf]) x.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["fixture-clearance-check"] = _v1132renderFixtureClearanceCheck;
+
+// --- spec-v1134: shower compartment size (IPC 417.4) ---
+// The other "area is not the test" trap, and a two-path one. IPC 417.4 asks for BOTH not
+// less than 900 sq in of interior cross-sectional area AND not less than 30 in in least
+// dimension - so a 28 x 36 compartment has 1,008 sq in, comfortably past the area rule, and
+// still fails on the 28 in side. The exception gives a second path: a least dimension down
+// to 25 in is allowed if the area reaches 1,300 sq in. Both are measured from the FINISHED
+// interior at the top of the threshold, exclusive of valves, showerheads, soap dishes, and
+// grab bars, and the dimension has to hold up to 70 in above the drain.
+// dims: in { width_in: L, depth_in: L, base_min_area_sqin: L^2, base_min_dim_in: L, exception_min_area_sqin: L^2, exception_min_dim_in: L } out: { area_sqin: L^2, least_dim_in: L, area_needed_in: L^2, other_dim_needed_in: L }
+export function computeShowerCompartmentCheck({ width_in = 0, depth_in = 0, base_min_area_sqin = 900, base_min_dim_in = 30, exception_min_area_sqin = 1300, exception_min_dim_in = 25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(width_in) || 0;
+  const d = Number(depth_in) || 0;
+  const A0 = Number(base_min_area_sqin) || 0;
+  const D0 = Number(base_min_dim_in) || 0;
+  const A1 = Number(exception_min_area_sqin) || 0;
+  const D1 = Number(exception_min_dim_in) || 0;
+  if (!(w > 0) || !(d > 0)) return { error: "Both finished interior dimensions must be positive (in)." };
+  if (!(A0 > 0) || !(D0 > 0)) return { error: "The base minimum area and least dimension must be positive." };
+  if (!(A1 > 0) || !(D1 > 0)) return { error: "The exception minimum area and least dimension must be positive." };
+
+  const area_sqin = w * d;
+  const least_dim_in = Math.min(w, d);
+  const greater_dim_in = Math.max(w, d);
+
+  const base_area_ok = area_sqin >= A0;
+  const base_dim_ok = least_dim_in >= D0;
+  const base_path_ok = base_area_ok && base_dim_ok;
+  const exc_area_ok = area_sqin >= A1;
+  const exc_dim_ok = least_dim_in >= D1;
+  const exception_path_ok = exc_area_ok && exc_dim_ok;
+  const passes = base_path_ok || exception_path_ok;
+  const path = base_path_ok ? "the base 417.4 rule" : exception_path_ok ? "the 417.4 exception" : "neither path";
+
+  // A 30 in disc fits a rectangle exactly when the SHORT side reaches 30.
+  const disc_fits = least_dim_in >= D0;
+  // What it would take to comply, on each path, holding the least dimension where it is.
+  const base_other_needed_in = least_dim_in >= D0 ? Math.max(D0, A0 / least_dim_in) : null;
+  const exc_other_needed_in = least_dim_in >= D1 ? Math.max(D1, A1 / least_dim_in) : null;
+  const area_deficit_base = Math.max(0, A0 - area_sqin);
+  const area_deficit_exc = Math.max(0, A1 - area_sqin);
+
+  const note = "Finished interior " + w + " x " + d + " = " + area_sqin.toFixed(0) + " sq in with a least dimension of " + least_dim_in + " in. "
+    + "IPC 417.4 has TWO paths and both have two conditions. Base: at least " + A0 + " sq in AND at least " + D0 + " in in least dimension - here " + (base_area_ok ? "area OK" : "area short by " + area_deficit_base.toFixed(0)) + ", " + (base_dim_ok ? "dimension OK" : "dimension short by " + (D0 - least_dim_in).toFixed(1)) + ". "
+    + "Exception: a least dimension down to " + D1 + " in is allowed if the area reaches " + A1 + " sq in - here " + (exc_dim_ok ? "dimension OK" : "dimension short") + ", " + (exc_area_ok ? "area OK" : "area short by " + area_deficit_exc.toFixed(0)) + ". "
+    + (passes ? "PASSES via " + path + ". " : "FAILS both paths. ")
+    + "The trap is that area alone never settles it: a 28 x 36 compartment is 1,008 sq in, well past the 900, and still fails because 28 is under 30 and 1,008 is under the 1,300 the exception would want. Adding area in the long direction does nothing for the short one. "
+    + (base_other_needed_in !== null ? "At this " + least_dim_in + " in least dimension the other side must reach " + base_other_needed_in.toFixed(2) + " in for the base path" : "At " + least_dim_in + " in the base path is unavailable at any length - the least dimension itself is under " + D0)
+    + (exc_other_needed_in !== null ? ", or " + exc_other_needed_in.toFixed(2) + " in for the exception path. " : ", and the exception path is unavailable too. ")
+    + "A " + D0 + " in disc fits a rectangle exactly when the SHORT side reaches " + D0 + " in, so here it " + (disc_fits ? "fits" : "does NOT fit") + " - the disc test and the least-dimension test are the same test for a rectangle, which is why a long narrow stall never rescues itself with square inches. "
+    + "Measured from the FINISHED interior at the top of the threshold, exclusive of fixture valves, showerheads, soap dishes, and safety grab bars or rails - so tile, mud bed, and a bench all come out of the number, and the rough framing is not what is checked. The dimension has to continue to a height of at least 70 in above the shower drain outlet, so a sloped ceiling or a low soffit can fail a stall that measures fine at the curb. "
+    + "Rectangular compartments only: a neo-angle, round, or irregular stall needs the disc drawn on the actual plan. Not checked: the door or opening size and its swing, the receptor slope and drain, waterproofing, the 70 in height itself, or accessible (ANSI A117.1 / ADA) roll-in and transfer stalls, which are governed separately and are larger. All four thresholds are editable because local amendments exist. A screen, not a code-official determination; the adopted code and the AHJ govern.";
+
+  return { area_sqin, least_dim_in, greater_dim_in, base_area_ok, base_dim_ok, base_path_ok, exc_area_ok, exc_dim_ok, exception_path_ok, passes, path, disc_fits, base_other_needed_in, exc_other_needed_in, area_deficit_base, area_deficit_exc, note };
+}
+
+export const showerCompartmentCheckExample = { inputs: { width_in: 28, depth_in: 36, base_min_area_sqin: 900, base_min_dim_in: 30, exception_min_area_sqin: 1300, exception_min_dim_in: 25 } };
+
+function _v1134renderShowerCompartmentCheck(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IPC 417.4 - shower compartments not less than 900 sq in in interior cross-sectional area and not less than 30 in in least dimension, measured from the finished interior dimension at a height equal to the top of the threshold and at a point tangent to its centerline, exclusive of fixture valves, showerheads, soap dishes, and safety grab bars or rails, and continued to a height not less than 70 in above the shower drain outlet; with the exception permitting a least dimension of not less than 25 in where the compartment has not less than 1,300 sq in of cross-sectional area. Both conditions of a path must be met - area alone never settles it. Rectangular compartments only; a neo-angle or irregular stall needs the disc drawn on the plan. The door and its swing, the receptor and drain, waterproofing, the 70 in height, and accessible (ANSI A117.1 / ADA) stalls are not checked. All thresholds are editable inputs because local amendments exist. A screen, not a code-official determination; the adopted code and the AHJ govern.";
+  const w = makeNumber("Finished interior width (in)", "scc-w", { step: "any", min: "0" }); w.input.value = "28";
+  const d = makeNumber("Finished interior depth (in)", "scc-d", { step: "any", min: "0" }); d.input.value = "36";
+  const a0 = makeNumber("Base minimum area (sq in; IPC 900)", "scc-a0", { step: "any", min: "0" }); a0.input.value = "900";
+  const d0 = makeNumber("Base minimum least dimension (in; IPC 30)", "scc-d0", { step: "any", min: "0" }); d0.input.value = "30";
+  const a1 = makeNumber("Exception minimum area (sq in; IPC 1300)", "scc-a1", { step: "any", min: "0" }); a1.input.value = "1300";
+  const d1 = makeNumber("Exception minimum least dimension (in; IPC 25)", "scc-d1", { step: "any", min: "0" }); d1.input.value = "25";
+  for (const x of [w, d, a0, d0, a1, d1]) inputRegion.appendChild(x.wrap);
+  attachExampleButton(inputRegion, () => { w.input.value = "28"; d.input.value = "36"; a0.input.value = "900"; d0.input.value = "30"; a1.input.value = "1300"; d1.input.value = "25"; update(); });
+  const oV = makeOutputLine(outputRegion, "Verdict", "scc-out-v");
+  const oA = makeOutputLine(outputRegion, "Area and least dimension", "scc-out-a");
+  const oB = makeOutputLine(outputRegion, "Base path (900 and 30)", "scc-out-b");
+  const oE = makeOutputLine(outputRegion, "Exception path (1300 and 25)", "scc-out-e");
+  const oN = makeOutputLine(outputRegion, "What the other side would have to reach", "scc-out-n");
+  const oNote = makeOutputLine(outputRegion, "Note", "scc-out-note");
+  const update = debounce(() => {
+    const r = computeShowerCompartmentCheck({ width_in: Number(w.input.value) || 0, depth_in: Number(d.input.value) || 0, base_min_area_sqin: Number(a0.input.value) || 0, base_min_dim_in: Number(d0.input.value) || 0, exception_min_area_sqin: Number(a1.input.value) || 0, exception_min_dim_in: Number(d1.input.value) || 0 });
+    if (r.error) { oV.textContent = r.error; oA.textContent = "-"; oB.textContent = "-"; oE.textContent = "-"; oN.textContent = "-"; oNote.textContent = "-"; return; }
+    oV.textContent = r.passes ? "PASSES via " + r.path : "FAILS both paths";
+    oA.textContent = fmt(r.area_sqin, 0) + " sq in, least dimension " + fmt(r.least_dim_in, 2) + " in - a 30 in disc " + (r.disc_fits ? "fits" : "does NOT fit");
+    oB.textContent = (r.base_area_ok ? "area OK" : "area short by " + fmt(r.area_deficit_base, 0)) + ", " + (r.base_dim_ok ? "dimension OK" : "dimension short");
+    oE.textContent = (r.exc_area_ok ? "area OK" : "area short by " + fmt(r.area_deficit_exc, 0)) + ", " + (r.exc_dim_ok ? "dimension OK" : "dimension short");
+    oN.textContent = (r.base_other_needed_in === null ? "base path unavailable at this least dimension" : "base: " + fmt(r.base_other_needed_in, 2) + " in") + "; " + (r.exc_other_needed_in === null ? "exception unavailable" : "exception: " + fmt(r.exc_other_needed_in, 2) + " in");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of [w, d, a0, d0, a1, d1]) x.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["shower-compartment-check"] = _v1134renderShowerCompartmentCheck;

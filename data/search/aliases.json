@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "minimum shower size",
+      "target": "shower-compartment-check",
+      "kind": "industry"
+    },
+    {
+      "term": "does my shower meet code",
+      "target": "shower-compartment-check",
+      "kind": "question"
+    },
+    {
+      "term": "900 square inches shower",
+      "target": "shower-compartment-check",
+      "kind": "question"
+    },
+    {
+      "term": "30 inch circle shower compartment",
+      "target": "shower-compartment-check",
+      "kind": "question"
+    },
+    {
+      "term": "shower least dimension",
+      "target": "shower-compartment-check",
+      "kind": "industry"
+    },
+    {
       "term": "stair landing size",
       "target": "landing-check",
       "kind": "industry"

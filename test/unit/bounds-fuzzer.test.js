@@ -32194,3 +32194,62 @@ test("bounds: spec-v1133 computeLandingCheck pins the directional depth rule, th
   assert.ok("error" in _v1133({ ...base, max_threshold_drop_in: -1 }));
   assert.ok("error" in _v1133({ ...base, landing_depth_in: Infinity }));
 });
+
+import { computeShowerCompartmentCheck as _v1134 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v1134 computeShowerCompartmentCheck pins the two-path rule, the disc identity, both boundary cases, and error seams", () => {
+  const base = { width_in: 28, depth_in: 36, base_min_area_sqin: 900, base_min_dim_in: 30, exception_min_area_sqin: 1300, exception_min_dim_in: 25 };
+  const r = _v1134(base);
+  // THE TRAP: past the 900 sq in and failing both paths anyway.
+  assert.ok(r.area_sqin === 1008 && r.least_dim_in === 28);
+  assert.ok(r.base_area_ok && !r.base_dim_ok && !r.base_path_ok);
+  assert.ok(r.exc_dim_ok && !r.exc_area_ok && !r.exception_path_ok && !r.passes);
+  assert.ok(r.area_deficit_base === 0 && r.area_deficit_exc === 292);
+  assert.ok(r.base_other_needed_in === null && Math.abs(r.exc_other_needed_in - 1300 / 28) < 1e-9);
+  // BOTH BOUNDARY CASES pass exactly, one on each path.
+  const sq = _v1134({ ...base, width_in: 30, depth_in: 30 });
+  assert.ok(sq.area_sqin === 900 && sq.base_path_ok && sq.passes && sq.path === "the base 417.4 rule" && sq.disc_fits);
+  const exc = _v1134({ ...base, width_in: 25, depth_in: 52 });
+  assert.ok(exc.area_sqin === 1300 && exc.exception_path_ok && exc.passes && exc.path === "the 417.4 exception");
+  assert.ok(!exc.disc_fits, "the exception exists precisely for stalls a 30 in disc will not fit");
+  // Each of the four conditions has its own seam.
+  assert.ok(!_v1134({ ...base, width_in: 29.9, depth_in: 31 }).base_dim_ok);
+  assert.ok(!_v1134({ ...base, width_in: 30, depth_in: 29.9 }).base_area_ok);
+  assert.ok(!_v1134({ ...base, width_in: 24.9, depth_in: 60 }).exc_dim_ok);
+  assert.ok(!_v1134({ ...base, width_in: 25, depth_in: 51.9 }).exc_area_ok);
+  // THE DISC IDENTITY: for a rectangle, disc fits <=> least dimension >= 30, always.
+  // And orientation never matters.
+  for (const w of [20, 25, 28, 30, 36, 48]) {
+    for (const d of [20, 25, 30, 36, 52, 60]) {
+      const t = _v1134({ ...base, width_in: w, depth_in: d });
+      const flipped = _v1134({ ...base, width_in: d, depth_in: w });
+      assert.ok(t.disc_fits === (Math.min(w, d) >= 30));
+      assert.ok(t.least_dim_in === Math.min(w, d) && t.greater_dim_in === Math.max(w, d));
+      assert.ok(t.passes === flipped.passes && t.area_sqin === flipped.area_sqin && t.path === flipped.path);
+      assert.ok(t.passes === (t.base_path_ok || t.exception_path_ok));
+      // Feeding back the reported "other side needed" always produces a passing stall.
+      if (t.base_other_needed_in !== null) {
+        assert.ok(_v1134({ ...base, width_in: t.least_dim_in, depth_in: t.base_other_needed_in }).base_path_ok);
+      }
+      if (t.exc_other_needed_in !== null) {
+        assert.ok(_v1134({ ...base, width_in: t.least_dim_in, depth_in: t.exc_other_needed_in }).exception_path_ok);
+      }
+    }
+  }
+  // Any stall passing the base path also clears the exception's dimension - the base is stricter there.
+  for (const w of [30, 34, 40]) {
+    const t = _v1134({ ...base, width_in: w, depth_in: 40 });
+    if (t.base_path_ok) assert.ok(t.exc_dim_ok);
+  }
+  // Editable thresholds move the verdict.
+  assert.ok(_v1134({ ...base, base_min_dim_in: 28 }).base_path_ok);
+  assert.ok(_v1134({ ...base, exception_min_area_sqin: 1000 }).exception_path_ok);
+  // Error seams.
+  assert.ok("error" in _v1134({ ...base, width_in: 0 }));
+  assert.ok("error" in _v1134({ ...base, depth_in: 0 }));
+  assert.ok("error" in _v1134({ ...base, base_min_area_sqin: 0 }));
+  assert.ok("error" in _v1134({ ...base, base_min_dim_in: 0 }));
+  assert.ok("error" in _v1134({ ...base, exception_min_area_sqin: 0 }));
+  assert.ok("error" in _v1134({ ...base, exception_min_dim_in: 0 }));
+  assert.ok("error" in _v1134({ ...base, width_in: Infinity }));
+});

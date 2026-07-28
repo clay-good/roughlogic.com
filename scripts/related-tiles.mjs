@@ -1425,7 +1425,8 @@ const RELATED = {
   "ridge-cap-fasteners": ["roofing-squares","hip-valley-rafter","ice-barrier-coverage"],
   // spec-v242..v244 IBC/IPC occupancy trio
   "occupant-load": ["egress-capacity","plumbing-fixture-count","ashrae-622-ventilation"],
-  "fixture-clearance-check": ["plumbing-fixture-count","rough-opening-size","ada-ramp-slope"],
+  "fixture-clearance-check": ["shower-compartment-check","plumbing-fixture-count","rough-opening-size","ada-ramp-slope"],
+  "shower-compartment-check": ["fixture-clearance-check","plumbing-fixture-count","flooring-takeoff"],
   "egress-capacity": ["occupant-load","plumbing-fixture-count","stair-stringer"],
   "plumbing-fixture-count": ["occupant-load","sanitary-dfu","wsfu-demand"],
   // spec-v245..v247 cast-in-place placing-and-curing trio
