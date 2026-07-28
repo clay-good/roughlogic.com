@@ -33592,3 +33592,66 @@ test("bounds: spec-v1160 computeAccessibleToiletCompartment pins the OR trigger,
   assert.ok("error" in _v1160({ ...base, ambulatory_provided: "yes", ambulatory_width_in: 0, ambulatory_depth_in: 60 }));
   assert.ok("error" in _v1160({ ...base, wheelchair_depth_in: Infinity }));
 });
+
+import { computeSignCharacterHeight as _v1161 } from "../../calc-construction.js";
+
+test("bounds: spec-v1161 computeSignCharacterHeight pins the three bands, the 1/8-in-per-foot term, the band cliffs, the inverse, and error seams", () => {
+  const base = { baseline_height_in: 60, viewing_distance_in: 120, provided_character_height_in: 0.625 };
+  const r = _v1161(base);
+  assert.ok(Math.abs(r.required_character_height_in - 1.125) < 1e-9 && r.base_height_in === 0.625);
+  assert.ok(Math.abs(r.added_in - 0.5) < 1e-9 && r.distance_governs && !r.ok && Math.abs(r.shortfall_in - 0.5) < 1e-9);
+  assert.ok(r.max_viewing_distance_in === 72);
+  // THE THREE BANDS AND THEIR BOUNDARIES. 70 and 120 belong to the LOWER band each time.
+  for (const [h, b, th] of [[40, 0.625, 72], [55, 0.625, 72], [70, 0.625, 72], [70.1, 2, 180], [100, 2, 180], [120, 2, 180], [120.1, 3, 252], [200, 3, 252]]) {
+    const t = _v1161({ ...base, baseline_height_in: h });
+    assert.ok(t.base_height_in === b && t.threshold_in === th, "band wrong at " + h);
+  }
+  // 1/8 IN PER FOOT PAST THE THRESHOLD, and nothing below it.
+  for (const [h, v, req] of [
+    [60, 12, 0.625], [60, 71, 0.625], [60, 72, 0.625], [60, 84, 0.75], [60, 120, 1.125], [60, 240, 2.375],
+    [100, 179, 2], [100, 180, 2], [100, 192, 2.125], [100, 360, 3.875],
+    [130, 251, 3], [130, 252, 3], [130, 264, 3.125], [130, 360, 4.125]]) {
+    const t = _v1161({ ...base, baseline_height_in: h, viewing_distance_in: v });
+    assert.ok(Math.abs(t.required_character_height_in - req) < 1e-9, "required wrong at " + h + " in / " + v + " in: got " + t.required_character_height_in);
+  }
+  // The requirement never decreases with viewing distance, within any band.
+  for (const h of [50, 100, 150]) {
+    let prev = -1;
+    for (let v = 12; v <= 600; v += 6) {
+      const t = _v1161({ ...base, baseline_height_in: h, viewing_distance_in: v }).required_character_height_in;
+      assert.ok(t >= prev - 1e-12, "requirement fell with distance at " + h + "/" + v); prev = t;
+    }
+  }
+  // THE CLIFF: at 120 in of viewing distance, 70 in needs 1.125 and 70.1 in needs a flat 2.
+  const atSeam = _v1161({ ...base, baseline_height_in: 70, viewing_distance_in: 120, provided_character_height_in: 1.125 });
+  const overSeam = _v1161({ ...base, baseline_height_in: 70.1, viewing_distance_in: 120, provided_character_height_in: 1.125 });
+  assert.ok(atSeam.ok && Math.abs(atSeam.required_character_height_in - 1.125) < 1e-9);
+  assert.ok(!overSeam.ok && overSeam.required_character_height_in === 2 && Math.abs(overSeam.shortfall_in - 0.875) < 1e-9);
+  assert.ok(overSeam.added_in === 0, "120 in does not reach the second band's 180 in threshold");
+  // The next-band report exists in the two lower bands and is null in the top one.
+  assert.ok(atSeam.next_band_required_in === 2 && Math.abs(atSeam.cliff_multiple - 2 / 1.125) < 1e-9);
+  assert.ok(_v1161({ ...base, baseline_height_in: 130 }).next_band_required_in === null);
+  assert.ok(_v1161({ ...base, baseline_height_in: 130 }).cliff_multiple === null);
+  // THE INVERSE ROUND-TRIPS: feed the reported max viewing distance back in and it must still comply.
+  for (const [h, p] of [[60, 0.625], [60, 1.125], [60, 3], [100, 2], [100, 4], [130, 3], [130, 6]]) {
+    const t = _v1161({ baseline_height_in: h, viewing_distance_in: 100, provided_character_height_in: p });
+    assert.ok(t.max_viewing_distance_in !== null);
+    const back = _v1161({ baseline_height_in: h, viewing_distance_in: t.max_viewing_distance_in, provided_character_height_in: p });
+    assert.ok(back.ok, "the reported max viewing distance does not comply at " + h + "/" + p);
+    const past = _v1161({ baseline_height_in: h, viewing_distance_in: t.max_viewing_distance_in + 12, provided_character_height_in: p });
+    assert.ok(!past.ok, "a foot past the reported max still complies at " + h + "/" + p);
+  }
+  // Characters under the band's base height comply at NO distance, and say so rather than reporting zero.
+  assert.ok(_v1161({ ...base, provided_character_height_in: 0.5 }).max_viewing_distance_in === null);
+  assert.ok(_v1161({ ...base, baseline_height_in: 100, provided_character_height_in: 1.9 }).max_viewing_distance_in === null);
+  // Exact equality complies - the table says minimum.
+  assert.ok(_v1161({ ...base, provided_character_height_in: 1.125 }).ok);
+  assert.ok(!_v1161({ ...base, provided_character_height_in: 1.124 }).ok);
+  // Error seams, including the one the table itself creates below 40 in.
+  assert.ok("error" in _v1161({ ...base, baseline_height_in: 39.9 }));
+  assert.ok("error" in _v1161({ ...base, baseline_height_in: 0 }));
+  assert.ok("error" in _v1161({ ...base, viewing_distance_in: 0 }));
+  assert.ok("error" in _v1161({ ...base, provided_character_height_in: -1 }));
+  assert.ok("error" in _v1161({ ...base, viewing_distance_in: Infinity }));
+  assert.ok("error" in _v1161({ ...base, baseline_height_in: NaN }));
+});

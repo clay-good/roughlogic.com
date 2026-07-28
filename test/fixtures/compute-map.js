@@ -1625,6 +1625,7 @@ export const COMPUTE_MAP = {
   "generator-fuel-runtime": { module: "../../calc-electrical.js", fn: "computeGeneratorFuelRuntime" },
   "ada-ramp-slope": { module: "../../calc-construction.js", fn: "computeAdaRampSlope" },
   "accessible-parking-count": { module: "../../calc-construction.js", fn: "computeAccessibleParkingCount" },
+  "sign-character-height": { module: "../../calc-construction.js", fn: "computeSignCharacterHeight" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 

@@ -12144,3 +12144,82 @@ CONSTRUCTION_RENDERERS["accessible-parking-count"] = _simpleRenderer({
   ],
   compute: computeAccessibleParkingCount,
 });
+
+// ===================== spec-v1161: visual character height (2010 ADA Standards Table 703.5.5) =====================
+
+// The size of the letters on a sign is not a design choice - it is a function of how high the
+// sign sits and how close a person can actually get to it. Table 703.5.5 sets a base height by
+// mounting band and then adds 1/8 in for every foot of viewing distance past that band's
+// threshold. The band boundaries are cliffs, not ramps: a sign whose baseline sits at 70 in
+// needs 5/8 in characters, and the same sign raised a tenth of an inch needs 2 in - more than
+// three times as tall - because it has crossed into the next band.
+// Two measurement rules do most of the damage. The height is measured to the BASELINE of the
+// character, not to the top or bottom of the panel. And the viewing distance is the horizontal
+// distance to whatever OBSTRUCTION prevents further approach, not the distance from wherever a
+// person happens to stand - so a counter, a rail, or a planter in front of a sign is what sets
+// the letter height, and removing one later shortens the distance rather than lengthening it.
+// dims: in { baseline_height_in: L, viewing_distance_in: L, provided_character_height_in: L } out: { required_character_height_in: L, base_height_in: L, shortfall_in: L, max_viewing_distance_in: L }
+export function computeSignCharacterHeight({ baseline_height_in = 0, viewing_distance_in = 0, provided_character_height_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const h = Number(baseline_height_in) || 0;
+  const v = Number(viewing_distance_in) || 0;
+  const provided = Number(provided_character_height_in) || 0;
+  if (!(h > 0)) return { error: "Baseline height above the finish floor must be positive (in)." };
+  if (!(v > 0)) return { error: "Horizontal viewing distance must be positive (in)." };
+  if (provided < 0) return { error: "Provided character height cannot be negative (in)." };
+  if (h < 40) return { error: "Table 703.5.5 starts at 40 in: visual characters are not permitted below 40 in above the finish floor, so no required height can be read off the table for a baseline at " + h + " in." };
+
+  const PER_FT = 0.125;
+  let base_height_in, threshold_in, band;
+  if (h <= 70) { base_height_in = 0.625; threshold_in = 72; band = "40 to 70 in above the floor"; }
+  else if (h <= 120) { base_height_in = 2; threshold_in = 180; band = "over 70 to 120 in above the floor"; }
+  else { base_height_in = 3; threshold_in = 252; band = "over 120 in above the floor"; }
+
+  const excess_in = Math.max(0, v - threshold_in);
+  const added_in = (excess_in / 12) * PER_FT;
+  const required_character_height_in = base_height_in + added_in;
+  const distance_governs = excess_in > 0;
+
+  const ok = provided >= required_character_height_in - 1e-9;
+  const shortfall_in = Math.max(0, required_character_height_in - provided);
+
+  // The inverse: how far back this character height actually serves, in its own band.
+  const max_viewing_distance_in = provided >= base_height_in ? threshold_in + ((provided - base_height_in) / PER_FT) * 12 : null;
+
+  // The cliff: what the SAME sign would need one band up, where a band up exists.
+  const next_base_in = h <= 70 ? 2 : h <= 120 ? 3 : null;
+  const next_threshold_in = h <= 70 ? 180 : h <= 120 ? 252 : null;
+  const next_band_required_in = next_base_in === null ? null : next_base_in + (Math.max(0, v - next_threshold_in) / 12) * PER_FT;
+  const cliff_multiple = next_band_required_in === null ? null : next_band_required_in / required_character_height_in;
+
+  const note = "LETTER HEIGHT IS NOT A DESIGN CHOICE. Table 703.5.5 reads it off two things: how high the characters sit and how close a person can actually get. A baseline at " + h + " in falls in the band " + band + ", where the base height is " + base_height_in + " in and 1/8 in is added for every foot of viewing distance past " + threshold_in + " in. "
+    + "At " + v + " in of viewing distance that is " + (distance_governs ? base_height_in + " + " + added_in.toFixed(3) + " = " + required_character_height_in.toFixed(3) + " in, and THE DISTANCE GOVERNS - the base height alone would be short. " : "just the base " + base_height_in + " in, since " + v + " in does not reach the " + threshold_in + " in threshold. ")
+    + "Provided " + provided + " in: " + (ok ? "OK. " : "SHORT by " + shortfall_in.toFixed(3) + " in. ")
+    + (max_viewing_distance_in !== null ? provided + " in characters serve out to " + max_viewing_distance_in.toFixed(1) + " in (" + (max_viewing_distance_in / 12).toFixed(1) + " ft) in this band. " : provided + " in is under the band's base height, so there is no viewing distance at which it complies. ")
+    + (next_band_required_in !== null ? "THE BAND BOUNDARIES ARE CLIFFS, NOT RAMPS: raise this baseline past " + (h <= 70 ? 70 : 120) + " in and the same sign at the same distance needs " + next_band_required_in.toFixed(3) + " in - " + cliff_multiple.toFixed(2) + " times as tall - because the base jumps from " + base_height_in + " to " + next_base_in + " in. A sign nudged up to clear a door head can quadruple its required letter height without moving an inch closer or further away. " : "This is the top band; there is no higher one to cross into. ")
+    + "TWO MEASUREMENT RULES DO MOST OF THE DAMAGE. The height is measured to the BASELINE of the characters, not to the top or bottom of the panel - a tall panel hung low can put its lettering in a different band than the sign appears to occupy. And the viewing distance is the horizontal distance to whatever OBSTRUCTION prevents further approach toward the sign, not the distance from wherever a person happens to stand. A counter, a rail, or a planter in front of a sign is what sets the letter height; take one out and the distance gets SHORTER, not longer. Character height itself is based on the uppercase letter I, so it is the font's cap height rather than the panel, the lowercase, or the ascender. "
+    + "Not checked: whether this sign is required to have visual characters at all, or tactile ones, or both, which turns on what it identifies; the raised-character and Braille requirements and their own 48 to 60 in mounting range; stroke thickness, character width, spacing, line spacing, case, and the prohibition on italic, script, and highly decorative fonts; finish, contrast, and glare; the location requirement at doors; pictograms and their fields; and state and local accessibility law. A height check, not a sign design; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { required_character_height_in, base_height_in, threshold_in, band, excess_in, added_in, distance_governs, ok, shortfall_in, max_viewing_distance_in, next_band_required_in, cliff_multiple, note };
+}
+
+export const signCharacterHeightExample = { inputs: { baseline_height_in: 60, viewing_distance_in: 120, provided_character_height_in: 0.625 } };
+
+CONSTRUCTION_RENDERERS["sign-character-height"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 703.5.5 and Table 703.5.5 (Visual Character Height). A US federal standard in the public domain. The table sets the minimum height of visual characters from the height of the characters above the finish floor or ground, measured to the baseline, and the horizontal viewing distance: at 40 to 70 in above the floor, 5/8 in, plus 1/8 in per foot of viewing distance above 72 in; at over 70 to 120 in, 2 in, plus 1/8 in per foot of viewing distance above 180 in; at over 120 in, 3 in, plus 1/8 in per foot of viewing distance above 21 ft. Viewing distance is measured as the horizontal distance between the character and an obstruction preventing further approach towards the sign, and character height is based on the uppercase letter I. Not checked: whether visual characters, tactile characters, or both are required for this sign; raised-character and Braille requirements and their 48 to 60 in mounting range; stroke thickness, character width and spacing, line spacing, case, and font restrictions; finish, contrast, and glare; sign location at doors; pictograms; or state and local accessibility law. A height check, not a sign design.",
+  example: signCharacterHeightExample.inputs,
+  fields: [
+    { key: "baseline_height_in", label: "Height of the character BASELINE above the finish floor (in)", kind: "number", default: 60 },
+    { key: "viewing_distance_in", label: "Horizontal viewing distance to the obstruction preventing approach (in)", kind: "number", default: 120 },
+    { key: "provided_character_height_in", label: "Character height provided, uppercase I (in)", kind: "number", default: 0.625 },
+  ],
+  outputs: [
+    { key: "b", id: "sch-out-b", label: "Band and base", value: (r) => r.band + ": base " + r.base_height_in + " in, +1/8 in per ft past " + r.threshold_in + " in" },
+    { key: "r", id: "sch-out-r", label: "Required character height", value: (r) => fmt(r.required_character_height_in, 3) + " in" + (r.distance_governs ? " (the viewing distance governs, adding " + fmt(r.added_in, 3) + " in)" : " (base only; the distance does not reach the threshold)") },
+    { key: "v", id: "sch-out-v", label: "Provided vs required", value: (r) => r.ok ? "OK" : "SHORT by " + fmt(r.shortfall_in, 3) + " in" },
+    { key: "d", id: "sch-out-d", label: "How far these characters serve", value: (r) => r.max_viewing_distance_in === null ? "under the band's base height - no viewing distance complies" : fmt(r.max_viewing_distance_in, 1) + " in (" + fmt(r.max_viewing_distance_in / 12, 1) + " ft) in this band" },
+    { key: "c", id: "sch-out-c", label: "If the sign crossed into the next band", value: (r) => r.next_band_required_in === null ? "top band - none above it" : fmt(r.next_band_required_in, 3) + " in, " + fmt(r.cliff_multiple, 2) + "x as tall" },
+    { key: "n", id: "sch-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSignCharacterHeight,
+});

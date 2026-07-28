@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "ada sign letter height",
+      "target": "sign-character-height",
+      "kind": "industry"
+    },
+    {
+      "term": "how big do sign letters need to be",
+      "target": "sign-character-height",
+      "kind": "question"
+    },
+    {
+      "term": "character height viewing distance table",
+      "target": "sign-character-height",
+      "kind": "industry"
+    },
+    {
+      "term": "how tall should overhead sign lettering be",
+      "target": "sign-character-height",
+      "kind": "question"
+    },
+    {
       "term": "ada toilet stall size",
       "target": "accessible-toilet-compartment",
       "kind": "industry"
