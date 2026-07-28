@@ -260,6 +260,7 @@ export const COMPUTE_MAP = {
   "svi-sludge-index": { module: "../../calc-water.js", fn: "computeSVI" },
   "noise-dose": { module: "../../calc-cross.js", fn: "computeNoiseDose" },
   "hearing-protector-nrr": { module: "../../calc-cross.js", fn: "computeHearingProtectorNrr" },
+  "silica-table-1": { module: "../../calc-cross.js", fn: "computeSilicaTable1" },
   "nfpa-1142-water-supply": { module: "../../calc-fire.js", fn: "computeNFPA1142WaterSupply" },
   "excavation-bench-plan": { module: "../../calc-construction.js", fn: "computeExcavationBenchPlan" },
   "disinfection-ct": { module: "../../calc-water.js", fn: "computeDisinfectionCT" },

@@ -3215,3 +3215,130 @@ CROSS_RENDERERS["hearing-protector-nrr"] = _simpleRendererG({
   ],
   compute: computeHearingProtectorNrr,
 });
+
+// --- spec-v1167: OSHA silica Table 1 respirator lookup (29 CFR 1926.1153) ---
+// Table 1 is the shortcut: implement the listed controls for a listed task and you skip
+// exposure assessment entirely. Three things about it get missed.
+// It is ALL OR NOTHING. 1926.1153(c)(1) requires the engineering controls, work practices AND
+// respiratory protection to be fully and properly implemented; do part of it and Table 1 stops
+// applying at all, dropping the job into exposure assessment against the 50 ug/m3 PEL.
+// The duration column is a CLIFF at four hours, not a ramp. Tuckpointing goes from APF 10 to
+// APF 25 - a half mask to a PAPR or full facepiece - at four hours and one minute.
+// And several rows change or vanish indoors. A walk-behind saw needs nothing outdoors and APF
+// 10 indoors; a drivable saw has no indoor row at all, so taking it inside leaves Table 1.
+// dims: in { hours_per_shift: T, apf_provided: dimensionless } out: { required_apf: dimensionless, hours_to_upgrade: T }
+export function computeSilicaTable1({ task = "xi", location = "outdoors", hours_per_shift = 0, controls_fully_implemented = "yes", apf_provided = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const hrs = Number(hours_per_shift);
+  const provided = Number(apf_provided) || 0;
+  const indoors = location === "indoors";
+  const full = controls_fully_implemented === "yes";
+  // [label, outdoor <=4, outdoor >4, indoor <=4, indoor >4, outdoorOnly]
+  const T1 = {
+    i: ["Stationary masonry saws", 0, 0, 0, 0, false],
+    ii: ["Handheld power saws (blade diameter 12 in or less)", 0, 10, 10, 10, false],
+    iii: ["Handheld power saws for cutting fiber-cement board (blade 8 in or less)", 0, 0, null, null, true],
+    iv: ["Walk-behind saws", 0, 0, 10, 10, false],
+    v: ["Drivable saws", 0, 0, null, null, true],
+    vi: ["Rig-mounted core saws or drills", 0, 0, 0, 0, false],
+    vii: ["Handheld and stand-mounted drills, including impact and rotary hammer drills", 0, 0, 0, 0, false],
+    viii: ["Dowel drilling rigs for concrete", 10, 10, null, null, true],
+    ix: ["Vehicle-mounted drilling rigs for rock and concrete", 0, 0, 0, 0, false],
+    x: ["Jackhammers and handheld powered chipping tools", 0, 10, 10, 10, false],
+    xi: ["Handheld grinders for mortar removal (tuckpointing)", 10, 25, 10, 25, false],
+    xii: ["Handheld grinders for uses other than mortar removal", 0, 0, 0, 10, false],
+    xiii: ["Walk-behind milling machines and floor grinders", 0, 0, 0, 0, false],
+    xiv: ["Small drivable milling machines (less than half-lane)", 0, 0, 0, 0, false],
+    xv: ["Large drivable milling machines (half-lane and larger)", 0, 0, null, null, true],
+    xvi: ["Crushing machines", 0, 0, 0, 0, false],
+    xvii: ["Heavy equipment and utility vehicles used to abrade or fracture silica-containing materials", 0, 0, 0, 0, false],
+    xviii: ["Heavy equipment and utility vehicles for grading and excavating", 0, 0, 0, 0, false],
+  };
+  if (!(task in T1)) return { error: "Task must be one of the eighteen Table 1 entries (i through xviii)." };
+  if (location !== "outdoors" && location !== "indoors") return { error: "Location must be outdoors or indoors (indoors includes any enclosed area)." };
+  if (controls_fully_implemented !== "yes" && controls_fully_implemented !== "no") return { error: "State whether the Table 1 controls are fully and properly implemented (yes or no)." };
+  if (!Number.isFinite(hrs) || hrs <= 0) return { error: "Hours on the task per shift must be positive." };
+  if (hrs > 24) return { error: "Hours on the task per shift cannot exceed 24." };
+  if (provided < 0) return { error: "Assigned protection factor provided cannot be negative." };
+
+  const [task_label, out4, outOver, in4, inOver, outdoor_only] = T1[task];
+  const CLIFF = 4, PEL_UG = 50;
+  const over_four = hrs > CLIFF;
+  const indoor_permitted = !(outdoor_only && indoors);
+  const in_table_1 = full && indoor_permitted;
+
+  const required_apf = !in_table_1 ? null : indoors ? (over_four ? inOver : in4) : (over_four ? outOver : out4);
+  const low_apf = indoors ? in4 : out4;
+  const high_apf = indoors ? inOver : outOver;
+  const has_cliff = indoor_permitted && high_apf !== null && low_apf !== null && high_apf > low_apf;
+  const hours_to_upgrade = has_cliff && !over_four ? CLIFF - hrs : null;
+
+  const respirator_required = required_apf !== null && required_apf > 0;
+  const apf_ok = required_apf === null ? null : provided >= required_apf;
+  const apf_shortfall = required_apf === null ? null : Math.max(0, required_apf - provided);
+  const passes = in_table_1 && apf_ok === true;
+
+  // What the same task costs on the other side of each switch, so the tradeoffs are visible.
+  const other_location_apf = !indoor_permitted ? null : indoors ? (over_four ? outOver : out4) : (over_four ? inOver : in4);
+  const indoor_move_penalty = other_location_apf === null || required_apf === null ? null : (indoors ? required_apf - other_location_apf : other_location_apf - required_apf);
+
+  const note = "TABLE 1 IS THE SHORTCUT, AND IT IS ALL OR NOTHING. Implement the listed engineering controls, work practices AND respiratory protection for a listed task and you skip exposure assessment entirely; 1926.1153(c)(1) requires them 'fully and properly implemented,' so doing part of it does not get you part of the benefit. "
+    + "Task: " + task_label + " (" + task + "), " + location + ", " + hrs + " h/shift. "
+    + (!full ? "CONTROLS ARE NOT FULLY IMPLEMENTED, so Table 1 does not apply at all. The job falls to 1926.1153(d): assess exposure, apply feasible engineering and work practice controls first, and supplement with respiratory protection as needed so that no employee is exposed above " + PEL_UG + " ug/m3 as an 8-hour TWA. That is a monitoring obligation, not a respirator choice, and it is the expensive path Table 1 exists to avoid. "
+      : !indoor_permitted ? "THIS ROW IS LIMITED TO OUTDOOR USE. Table 1 provides no indoor entry for " + task_label.toLowerCase() + ", so running it indoors or in an enclosed area leaves Table 1 entirely and the job falls to 1926.1153(d) - exposure assessment against the " + PEL_UG + " ug/m3 PEL. Moving the work outside is usually cheaper than the monitoring. "
+      : "REQUIRED RESPIRATORY PROTECTION: " + (required_apf === 0 ? "none, provided the listed controls are in place and maintained. " : "APF " + required_apf + " minimum. ")
+        + (has_cliff
+          ? "THE DURATION COLUMN IS A CLIFF, NOT A RAMP. Four hours or less takes " + (low_apf === 0 ? "no respirator" : "APF " + low_apf) + "; more than four hours takes APF " + high_apf + ". "
+            + (over_four ? "This shift is over the line at " + hrs + " h. Coming back under four hours would drop the requirement to " + (low_apf === 0 ? "none" : "APF " + low_apf) + ". " : "This shift is under the line with " + hours_to_upgrade.toFixed(2) + " h of headroom; at four hours and one minute the requirement steps up to APF " + high_apf + ". ")
+            + (high_apf === 25 ? "That particular step is not a paperwork change: APF 10 is a half-mask, APF 25 is a PAPR or a full facepiece with the right cartridge, and it is a different purchase, a different fit test, and a different training record. " : "")
+          : "The requirement does not change with duration for this row" + (indoor_permitted && low_apf === high_apf && low_apf > 0 ? " - a respirator is required even for ten minutes of it, which is the assumption people get wrong in the other direction. " : ". "))
+        + (indoor_move_penalty !== null && indoor_move_penalty !== 0 ? "LOCATION MATTERS HERE: the same task and duration " + (indoors ? "outdoors would require " + (other_location_apf === 0 ? "no respirator" : "APF " + other_location_apf) : "indoors or in an enclosed area would require " + (other_location_apf === 0 ? "no respirator" : "APF " + other_location_apf)) + ". Enclosure is a control decision with a respirator attached to it. " : "")
+        + "Provided APF " + provided + ": " + (apf_ok ? "adequate. " : "SHORT - APF " + required_apf + " is required" + (apf_shortfall > 0 ? " and the shortfall is " + apf_shortfall + " " : " ") + ". "))
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: the engineering controls and work practices themselves, which Table 1 specifies task by task and which this tile assumes are in place rather than reproducing - read the row before relying on the respirator answer; whether the material actually contains crystalline silica; the written exposure control plan and the competent person the standard requires; respirator fit testing, medical evaluation, and the written respiratory protection program under 1910.134; housekeeping restrictions on dry sweeping and compressed air; medical surveillance and its 30-day-per-year trigger; multiple tasks in one shift, which this tile does not add together; and any state plan with more stringent requirements. A Table 1 lookup, not an exposure assessment; 29 CFR 1926.1153 and the competent person govern.";
+
+  return { task_label, over_four, outdoor_only, indoor_permitted, in_table_1, required_apf, low_apf, high_apf, has_cliff, hours_to_upgrade, respirator_required, apf_ok, apf_shortfall, other_location_apf, indoor_move_penalty, pel_ug_m3: PEL_UG, passes, note };
+}
+
+export const silicaTable1Example = { inputs: { task: "xi", location: "outdoors", hours_per_shift: 5, controls_fully_implemented: "yes", apf_provided: 10 } };
+
+CROSS_RENDERERS["silica-table-1"] = _simpleRendererG({
+  citation: "Citation: OSHA 29 CFR 1926.1153 Table 1 (Specified Exposure Control Methods When Working With Materials Containing Crystalline Silica), a US federal regulation in the public domain. Section 1926.1153(c)(1) requires that for each employee engaged in a task identified on Table 1, the employer shall fully and properly implement the engineering controls, work practices, and respiratory protection specified for that task, unless the employer assesses and limits exposure in accordance with 1926.1153(d). Under 1926.1153(d) the employer shall ensure that no employee is exposed to an airborne concentration of respirable crystalline silica in excess of 50 micrograms per cubic meter of air, calculated as an 8-hour TWA. This tile reproduces the respiratory protection column only - the required engineering controls and work practices are specified row by row in Table 1 and are ASSUMED here rather than reproduced; read the row before relying on the respirator answer. Not checked: whether the material contains crystalline silica, the written exposure control plan and competent person, fit testing and medical evaluation and the written respiratory protection program under 1910.134, housekeeping restrictions, medical surveillance and its 30-day trigger, multiple tasks in one shift, or state plans with more stringent requirements. A Table 1 lookup, not an exposure assessment.",
+  example: silicaTable1Example.inputs,
+  fields: [
+    { key: "task", label: "Table 1 task", kind: "select", options: [
+      { value: "i", label: "(i) Stationary masonry saws" },
+      { value: "ii", label: "(ii) Handheld power saws (blade 12 in or less)" },
+      { value: "iii", label: "(iii) Handheld power saws for fiber-cement board (blade 8 in or less)" },
+      { value: "iv", label: "(iv) Walk-behind saws" },
+      { value: "v", label: "(v) Drivable saws" },
+      { value: "vi", label: "(vi) Rig-mounted core saws or drills" },
+      { value: "vii", label: "(vii) Handheld and stand-mounted drills, including rotary hammers" },
+      { value: "viii", label: "(viii) Dowel drilling rigs for concrete" },
+      { value: "ix", label: "(ix) Vehicle-mounted drilling rigs for rock and concrete" },
+      { value: "x", label: "(x) Jackhammers and handheld powered chipping tools" },
+      { value: "xi", label: "(xi) Handheld grinders for mortar removal (tuckpointing)", selected: true },
+      { value: "xii", label: "(xii) Handheld grinders for uses other than mortar removal" },
+      { value: "xiii", label: "(xiii) Walk-behind milling machines and floor grinders" },
+      { value: "xiv", label: "(xiv) Small drivable milling machines (less than half-lane)" },
+      { value: "xv", label: "(xv) Large drivable milling machines (half-lane and larger)" },
+      { value: "xvi", label: "(xvi) Crushing machines" },
+      { value: "xvii", label: "(xvii) Heavy equipment abrading or fracturing silica materials" },
+      { value: "xviii", label: "(xviii) Heavy equipment for grading and excavating" },
+    ] },
+    { key: "location", label: "Where the work happens", kind: "select", options: [{ value: "outdoors", label: "Outdoors", selected: true }, { value: "indoors", label: "Indoors or an enclosed area" }] },
+    { key: "hours_per_shift", label: "Hours on this task per shift", kind: "number", default: 5 },
+    { key: "controls_fully_implemented", label: "Table 1 controls fully and properly implemented?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
+    { key: "apf_provided", label: "Assigned protection factor of the respirator provided (0 = none)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "t", id: "st1-out-t", label: "Task", value: (r) => r.task_label + (r.outdoor_only ? " - Table 1 lists this row for OUTDOOR use only" : "") },
+    { key: "r", id: "st1-out-r", label: "Required respiratory protection", value: (r) => r.required_apf === null ? "Table 1 does not apply here - go to 1926.1153(d) and the " + r.pel_ug_m3 + " ug/m3 PEL" : r.required_apf === 0 ? "none, with the listed controls in place" : "APF " + r.required_apf + " minimum" },
+    { key: "c", id: "st1-out-c", label: "Duration", value: (r) => !r.has_cliff ? "no change with duration on this row" : r.over_four ? "over four hours: APF " + r.high_apf + " (four hours or less would be " + (r.low_apf === 0 ? "none" : "APF " + r.low_apf) + ")" : fmt(r.hours_to_upgrade, 2) + " h of headroom before it steps to APF " + r.high_apf },
+    { key: "l", id: "st1-out-l", label: "The other location", value: (r) => r.other_location_apf === null ? "no entry for the other location" : (r.other_location_apf === 0 ? "no respirator" : "APF " + r.other_location_apf) },
+    { key: "p", id: "st1-out-p", label: "Respirator provided", value: (r) => r.apf_ok === null ? "not the question here - Table 1 does not apply" : r.apf_ok ? "adequate" : "SHORT of the required APF " + r.required_apf },
+    { key: "v", id: "st1-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the Table 1 path" : "DOES NOT pass the Table 1 path" },
+    { key: "n", id: "st1-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSilicaTable1,
+});

@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "silica table 1 respirator",
+      "target": "silica-table-1",
+      "kind": "industry"
+    },
+    {
+      "term": "do i need a respirator for tuckpointing",
+      "target": "silica-table-1",
+      "kind": "question"
+    },
+    {
+      "term": "osha silica four hour rule",
+      "target": "silica-table-1",
+      "kind": "industry"
+    },
+    {
+      "term": "cutting concrete indoors respirator",
+      "target": "silica-table-1",
+      "kind": "question"
+    },
+    {
       "term": "nrr derating calculator",
       "target": "hearing-protector-nrr",
       "kind": "industry"

@@ -34038,3 +34038,88 @@ test("bounds: spec-v1166 computeHearingProtectorNrr pins the 7 dB spectral step,
   assert.ok("error" in _v1166({ ...base, target_db: 0 }));
   assert.ok("error" in _v1166({ ...base, twa_db: Infinity }));
 });
+
+import { computeSilicaTable1 as _v1167 } from "../../calc-cross.js";
+
+test("bounds: spec-v1167 computeSilicaTable1 pins all eighteen rows, the four-hour cliff, the outdoor-only rows, the all-or-nothing rule, and error seams", () => {
+  const base = { task: "xi", location: "outdoors", hours_per_shift: 5, controls_fully_implemented: "yes", apf_provided: 10 };
+  const r = _v1167(base);
+  assert.ok(r.required_apf === 25 && r.low_apf === 10 && r.high_apf === 25 && r.apf_shortfall === 15 && !r.passes);
+  // ALL EIGHTEEN ROWS, both durations, both locations. null means the row has no entry there.
+  const TABLE = {
+    i: [0, 0, 0, 0], ii: [0, 10, 10, 10], iii: [0, 0, null, null], iv: [0, 0, 10, 10],
+    v: [0, 0, null, null], vi: [0, 0, 0, 0], vii: [0, 0, 0, 0], viii: [10, 10, null, null],
+    ix: [0, 0, 0, 0], x: [0, 10, 10, 10], xi: [10, 25, 10, 25], xii: [0, 0, 0, 10],
+    xiii: [0, 0, 0, 0], xiv: [0, 0, 0, 0], xv: [0, 0, null, null], xvi: [0, 0, 0, 0],
+    xvii: [0, 0, 0, 0], xviii: [0, 0, 0, 0],
+  };
+  for (const [task, [o4, oOver, i4, iOver]] of Object.entries(TABLE)) {
+    assert.ok(_v1167({ ...base, task, location: "outdoors", hours_per_shift: 2 }).required_apf === o4, "outdoor <=4 wrong for " + task);
+    assert.ok(_v1167({ ...base, task, location: "outdoors", hours_per_shift: 6 }).required_apf === oOver, "outdoor >4 wrong for " + task);
+    assert.ok(_v1167({ ...base, task, location: "indoors", hours_per_shift: 2 }).required_apf === i4, "indoor <=4 wrong for " + task);
+    assert.ok(_v1167({ ...base, task, location: "indoors", hours_per_shift: 6 }).required_apf === iOver, "indoor >4 wrong for " + task);
+    // A null indoor entry is an outdoor-only row and must leave Table 1 rather than default to zero.
+    const indoorOnlyNull = i4 === null;
+    const t = _v1167({ ...base, task, location: "indoors", hours_per_shift: 2 });
+    assert.ok(t.outdoor_only === indoorOnlyNull, "outdoor-only flag wrong for " + task);
+    assert.ok(t.in_table_1 === !indoorOnlyNull, "an outdoor-only row indoors must leave Table 1: " + task);
+    if (indoorOnlyNull) assert.ok(!t.passes && t.apf_ok === null && t.other_location_apf === null);
+  }
+  // THE CLIFF IS AT FOUR HOURS, and four itself is the LOW column.
+  for (const [h, apf] of [[0.1, 10], [3.9, 10], [4, 10], [4.01, 25], [8, 25]]) {
+    assert.ok(_v1167({ ...base, hours_per_shift: h }).required_apf === apf, "cliff wrong at " + h + " h");
+  }
+  assert.ok(_v1167({ ...base, hours_per_shift: 4 }).over_four === false);
+  assert.ok(_v1167({ ...base, hours_per_shift: 4.01 }).over_four === true);
+  // Headroom is reported only below the cliff, is exact, and is null once past it or where there is none.
+  for (const h of [0.5, 2, 4]) {
+    assert.ok(Math.abs(_v1167({ ...base, hours_per_shift: h }).hours_to_upgrade - (4 - h)) < 1e-9);
+  }
+  assert.ok(_v1167({ ...base, hours_per_shift: 5 }).hours_to_upgrade === null);
+  assert.ok(_v1167({ ...base, task: "i", hours_per_shift: 2 }).hours_to_upgrade === null, "no cliff, no headroom");
+  assert.ok(_v1167({ ...base, task: "i", hours_per_shift: 2 }).has_cliff === false);
+  assert.ok(_v1167({ ...base, task: "xii", location: "indoors", hours_per_shift: 2 }).has_cliff === true);
+  assert.ok(_v1167({ ...base, task: "xii", location: "outdoors", hours_per_shift: 2 }).has_cliff === false, "the same row has a cliff indoors and none outdoors");
+  // The requirement never falls as the hours rise, on any row or location.
+  for (const task of Object.keys(TABLE)) {
+    for (const loc of ["outdoors", "indoors"]) {
+      let prev = -1;
+      for (const h of [0.5, 2, 4, 4.5, 8, 12]) {
+        const a = _v1167({ ...base, task, location: loc, hours_per_shift: h }).required_apf;
+        if (a === null) continue;
+        assert.ok(a >= prev, "requirement fell with hours at " + task + "/" + loc); prev = a;
+      }
+    }
+  }
+  // Indoors is never less protective than outdoors on the same row and duration.
+  for (const task of Object.keys(TABLE)) {
+    for (const h of [2, 6]) {
+      const o = _v1167({ ...base, task, location: "outdoors", hours_per_shift: h }).required_apf;
+      const i = _v1167({ ...base, task, location: "indoors", hours_per_shift: h }).required_apf;
+      if (i === null || o === null) continue;
+      assert.ok(i >= o, "indoors is weaker than outdoors at " + task + "/" + h);
+    }
+  }
+  // ALL OR NOTHING: partial controls void Table 1 on every row, including the ones needing no respirator.
+  for (const task of ["i", "xi", "xviii"]) {
+    const t = _v1167({ ...base, task, controls_fully_implemented: "no", apf_provided: 100 });
+    assert.ok(!t.in_table_1 && t.required_apf === null && t.apf_ok === null && !t.passes, "partial controls must void " + task);
+    assert.ok(t.pel_ug_m3 === 50);
+  }
+  // A row needing no respirator passes with none provided; one needing APF 25 does not pass on APF 10.
+  assert.ok(_v1167({ ...base, task: "i", apf_provided: 0 }).passes);
+  assert.ok(_v1167({ ...base, apf_provided: 25 }).passes);
+  assert.ok(_v1167({ ...base, apf_provided: 24 }).apf_shortfall === 1);
+  assert.ok(_v1167({ ...base, apf_provided: 1000 }).apf_ok, "over-protecting is never a failure");
+  // The other-location figure is the same row's opposite cell.
+  assert.ok(_v1167({ ...base, task: "iv", location: "indoors", hours_per_shift: 2 }).other_location_apf === 0);
+  assert.ok(_v1167({ ...base, task: "iv", location: "outdoors", hours_per_shift: 2 }).other_location_apf === 10);
+  // Error seams.
+  assert.ok("error" in _v1167({ ...base, task: "xix" }));
+  assert.ok("error" in _v1167({ ...base, location: "underground" }));
+  assert.ok("error" in _v1167({ ...base, controls_fully_implemented: "mostly" }));
+  assert.ok("error" in _v1167({ ...base, hours_per_shift: 0 }));
+  assert.ok("error" in _v1167({ ...base, hours_per_shift: 25 }));
+  assert.ok("error" in _v1167({ ...base, apf_provided: -1 }));
+  assert.ok("error" in _v1167({ ...base, hours_per_shift: Infinity }));
+});
