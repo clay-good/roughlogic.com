@@ -15264,6 +15264,18 @@ export const CITATIONS = {
       { name: "No profile shift", value: "standard proportions assumed; profile shift is the usual fix for an undercut pinion and changes both outputs", source: "stated scope limit" },
     ],
   },
+  "mwbc-voltage-drop": {
+    formula: "Neutral current = |I_A - I_B|; with equal conductors of one-way resistance R, VD_A = R(2 I_A - I_B) and VD_B = R(2 I_B - I_A); balanced this is R x I, half a two-wire circuit's 2 R I.",
+    edition: "Circuit analysis of a 120/240 V three-wire multiwire branch circuit; NEC 210.4(B) common-disconnect and neutral-continuity requirements named by section, no table reproduced.",
+    freeAccess: "The circuit analysis is elementary; conductor resistance is computed by this catalog's own resistance model from the size, material, and temperature entered.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "The neutral carries the DIFFERENCE of the two legs, and its drop lands on both legs with OPPOSITE sign - which produces two results worth knowing. A balanced MWBC sees each leg drop only R x I, exactly HALF what the same load would drop on a two-wire circuit, because the neutral carries nothing. And a badly unbalanced one drives the lighter leg's drop NEGATIVE: that leg sits above nominal from real neutral shift, not an arithmetic artifact. THE HAZARD: if the shared neutral opens while both legs are loaded, the two loads go in series across 240 V and the lighter one sees a large overvoltage that destroys electronics and starts fires - so the neutral is pigtailed rather than run in series through a device yoke, and NEC 210.4(B) requires a common disconnect so both legs de-energize together. DC resistance only: AC reactance (which matters on long runs and larger conductors) and power factor are ignored, and the analysis is steady-state, so legs balanced on average can be badly unbalanced at any instant. The NEC as adopted and the AHJ govern.",
+    assumptions: [
+      { name: "Shared-neutral analysis", value: "neutral carries |I_A - I_B|; its drop signs oppositely on the two legs", source: "three-wire circuit analysis" },
+      { name: "Equal conductors", value: "hots and neutral the same size; the balanced case is half a two-wire drop", source: "stated assumption" },
+      { name: "DC resistance", value: "AC reactance and power factor not modeled", source: "stated scope limit" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

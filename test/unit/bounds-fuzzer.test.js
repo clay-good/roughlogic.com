@@ -30764,3 +30764,48 @@ test("bounds: spec-v1108 computeGearUndercutBacklash reproduces the classic 32/1
   assert.ok("error" in _v1108({ ...base, diametral_pitch: -1 }));
   assert.ok("error" in _v1108({ ...base, pressure_angle_deg: Infinity }));
 });
+
+import { computeMwbcVoltageDrop as _v1109 } from "../../calc-electrical.js";
+
+test("bounds: spec-v1109 computeMwbcVoltageDrop pins the balanced half-drop identity, the neutral-shift rise, the two-wire equivalence at full unbalance, symmetry, and error seams", () => {
+  const base = { awg: "12", material: "copper", one_way_length_ft: 100, load_a_amps: 16, load_b_amps: 4, source_volts: 120, temperature_C: 75 };
+  const r = _v1109(base);
+  assert.ok(r.neutral_amps === 12);
+  assert.ok(Math.abs(r.vd_a_volts - 5.40792) < 5e-4);
+  assert.ok(Math.abs(r.vd_b_volts + 1.54512) < 5e-4);
+  assert.ok(r.b_rises === true && r.volts_b > 120);
+  // The governing relations, checked against R directly.
+  assert.ok(Math.abs(r.vd_a_volts - r.r_ohms * (2 * 16 - 4)) < 1e-12);
+  assert.ok(Math.abs(r.vd_b_volts - r.r_ohms * (2 * 4 - 16)) < 1e-12);
+  // BALANCED: the neutral carries nothing and each leg drops exactly HALF the two-wire figure.
+  const bal = _v1109({ ...base, load_b_amps: 16 });
+  assert.ok(bal.neutral_amps === 0);
+  assert.ok(Math.abs(bal.vd_a_volts - bal.vd_b_volts) < 1e-12);
+  assert.ok(Math.abs(bal.vd_a_volts - bal.r_ohms * 16) < 1e-12);
+  assert.ok(Math.abs(bal.vd_a_volts * 2 - bal.two_wire_vd) < 1e-12);
+  assert.ok(bal.b_rises === false);
+  // FULLY UNBALANCED: one leg alone equals a two-wire circuit exactly.
+  const solo = _v1109({ ...base, load_b_amps: 0 });
+  assert.ok(solo.neutral_amps === 16);
+  assert.ok(Math.abs(solo.vd_a_volts - solo.two_wire_vd) < 1e-12);
+  // The rise threshold is exactly I_A = 2 I_B.
+  const atThreshold = _v1109({ ...base, load_a_amps: 16, load_b_amps: 8 });
+  assert.ok(Math.abs(atThreshold.vd_b_volts) < 1e-12 && atThreshold.b_rises === false);
+  assert.ok(_v1109({ ...base, load_a_amps: 16, load_b_amps: 7.9 }).b_rises === true);
+  // Symmetry: swapping the legs swaps the drops.
+  const swapped = _v1109({ ...base, load_a_amps: 4, load_b_amps: 16 });
+  assert.ok(Math.abs(swapped.vd_a_volts - r.vd_b_volts) < 1e-12);
+  assert.ok(Math.abs(swapped.vd_b_volts - r.vd_a_volts) < 1e-12);
+  assert.ok(swapped.a_rises === true);
+  // Resistance scales with length, and a bigger conductor drops less.
+  const long = _v1109({ ...base, one_way_length_ft: 200 });
+  assert.ok(Math.abs(long.vd_a_volts - 2 * r.vd_a_volts) < 1e-9);
+  assert.ok(_v1109({ ...base, awg: "10" }).vd_a_volts < r.vd_a_volts);
+  assert.ok(_v1109({ ...base, material: "aluminum" }).vd_a_volts > r.vd_a_volts);
+  // Error seams.
+  assert.ok("error" in _v1109({ ...base, one_way_length_ft: 0 }));
+  assert.ok("error" in _v1109({ ...base, load_a_amps: 0, load_b_amps: 0 }));
+  assert.ok("error" in _v1109({ ...base, load_a_amps: -1 }));
+  assert.ok("error" in _v1109({ ...base, source_volts: 0 }));
+  assert.ok("error" in _v1109({ ...base, one_way_length_ft: Infinity }));
+});

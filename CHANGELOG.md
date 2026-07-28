@@ -4,6 +4,27 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): mwbc-voltage-drop, the shared neutral the generic tile has no input for; 2026-07-27
+
+No "multiwire", "MWBC", or "shared neutral" string existed anywhere. `voltage-drop` takes one current and
+has no neutral; `neutral-imbalance` returns a neutral current but no drop. Adds one tile to
+`calc-electrical.js` (Group A). Conductor resistance comes from the catalog's own
+`conductorResistancePerKft`, so no wire table is shipped.
+
+The neutral carries the DIFFERENCE and its drop lands on both legs with OPPOSITE sign, which produces two
+results worth knowing. A balanced MWBC drops R x I per leg -- exactly **half** what the same load would
+drop on a two-wire circuit, because the neutral carries nothing. And a badly unbalanced one drives the
+lighter leg's drop **negative**: that leg sits above nominal. Pinned: 16 A against 4 A on 100 ft of 12 AWG
+gives leg A 5.41 V of drop and leg B a 1.55 V **rise**, with the crossover at exactly I_A = 2 I_B.
+
+The note carries the hazard a voltage-drop number alone would never surface: if the shared neutral opens
+while both legs are loaded, the two loads go in series across 240 V and the lighter one sees a large
+overvoltage. Hence the pigtailed neutral and the NEC 210.4(B) common disconnect.
+
+Fuzzer pins both relations against R directly, the balanced half-drop identity, the full-unbalance
+equivalence to a two-wire circuit, the rise threshold from both sides, leg-swap symmetry, and that
+aluminum drops more. Catalog 1,492 -> 1,493. Spec: spec-v1109.
+
 ### feat(machining): gear-undercut-backlash, deriving the numbers everyone looks up; 2026-07-27
 
 A self-declared gap, quoted from `spur-gear-geometry`'s citation: it "returns the geometry only; it does

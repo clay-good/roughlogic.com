@@ -91247,6 +91247,36 @@
       "kind": "question"
     },
     {
+      "term": "multiwire branch circuit voltage drop",
+      "target": "mwbc-voltage-drop",
+      "kind": "industry"
+    },
+    {
+      "term": "shared neutral voltage drop",
+      "target": "mwbc-voltage-drop",
+      "kind": "industry"
+    },
+    {
+      "term": "mwbc",
+      "target": "mwbc-voltage-drop",
+      "kind": "redirect"
+    },
+    {
+      "term": "why did voltage go up on the lightly loaded leg",
+      "target": "mwbc-voltage-drop",
+      "kind": "question"
+    },
+    {
+      "term": "open neutral on a shared neutral circuit",
+      "target": "mwbc-voltage-drop",
+      "kind": "question"
+    },
+    {
+      "term": "does a 3 wire circuit have less voltage drop",
+      "target": "mwbc-voltage-drop",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

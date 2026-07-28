@@ -1990,6 +1990,7 @@ cross-check.
 | calc-electrical.js | `computeMotorEfficiencyUpgradeSavings` | `{ hp = 0, load = 0, eff_standard = 0, eff_premium = 0, hours = 0, rate_kwh = ...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorFLA` | `{ hp, voltage, phase }` | _ | _ | _ |
 | calc-electrical.js | `computeMultiLoadVoltageDrop` | `{ material = "copper", awg = "12", source_voltage_V = 120, loads = [], }` | _ | _ | _ |
+| calc-electrical.js | `computeMwbcVoltageDrop` | `{ awg = "12", material = "copper", one_way_length_ft = 0, load_a_amps = 0, lo...` | _ | _ | _ |
 | calc-electrical.js | `computeOhmsLaw` | `{ V, I, R, P }` | _ | _ | _ |
 | calc-electrical.js | `computeOpenDeltaTransformer` | `{ transformer_kva_each = 25, required_load_kva = 40 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computePFCorrection` | `{ kW, pf1, pf2, system_V, phase = "single" }` | _ | _ | _ |
@@ -3153,7 +3154,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1739.
+Row count: 1740.
 
 <!-- END function-corpus-v14 -->
 
@@ -3234,7 +3235,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (197 tiles)
+### Group A Electrical (198 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3351,6 +3352,7 @@ per spec-v14 §13.1 second paragraph.
 | `motor-vd-starting` | Motor Starting Voltage Dip | Ohm's-law voltage-drop method (first ...; 480 V 3ph, LRC 180 A, 250 ft, 250 kcmil Cu -> V_drop 4.02... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `multi-load-vd` | Branch Voltage Drop With Multiple Loads | Project (first-principles); 12 AWG copper feeder at 120 V with 5 A @ 50 ft and 10 A @... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `multi-motor-feeder` | Feeder for a Group of Motors (NEC 430.24 / 430.62) | NFPA; spec-v124 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `mwbc-voltage-drop` | Multiwire Branch Circuit (3-Wire) Voltage Drop | three-wire circuit analysis; 12 AWG copper at 75 C, 100 ft one way (R 0.19314 ohm), 16... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `neutral-current-3ph` | Three-Phase Neutral Current | Phasor sum of three 120-degree-displa...; Ia=100, Ib=80, Ic=60 -> I_N = sqrt(1200) = 34.641 A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `neutral-demand-220-61` | Feeder/Service Neutral Demand Load (NEC 220.61) | NEC 2023 (NFPA 70); 200 A at 100% + 50 A at 70% = 200 + 35 = 235 A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `neutral-grounding-resistor` | Neutral Grounding Resistor Sizing (IEEE 142) | neutral grounding resistor sizing (IE...; spec-v525 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4831,6 +4833,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1492. Fixture-covered or reference-cadence: 1492 / 1492.
+Tile count: 1493. Fixture-covered or reference-cadence: 1493 / 1493.
 
 <!-- END tile-index-v14 -->

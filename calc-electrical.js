@@ -6144,3 +6144,105 @@ function _v989renderConduitNipple60Fill(inputRegion, outputRegion, citationEl) {
   for (const f of [ca, wa, nc]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["conduit-nipple-60-fill"] = _v989renderConduitNipple60Fill;
+
+// --- spec-v1109 A: Multiwire branch circuit (120/240 3-wire) voltage drop ---
+// The generic voltage-drop tile takes ONE current and no neutral. On a 3-wire MWBC the two hots
+// are out of phase and share a neutral that carries the DIFFERENCE, so the neutral drop shifts the
+// load-end neutral and lands on both legs with opposite sign. With equal conductors:
+//   VD_A = R(2 I_A - I_B),  VD_B = R(2 I_B - I_A),  R = one-way resistance of one conductor.
+// Balanced (I_A = I_B) collapses to R x I -- HALF a two-wire circuit, since the neutral carries
+// nothing. Badly unbalanced makes VD_B negative: the lightly loaded leg RISES above nominal.
+// Resistance comes from the repo's own conductorResistancePerKft, not a recalled table.
+// dims: in { awg: dimensionless, material: dimensionless, one_way_length_ft: L, load_a_amps: I, load_b_amps: I, source_volts: M L^2 T^-3 I^-1, temperature_C: T } out: { neutral_amps: I, vd_a_volts: M L^2 T^-3 I^-1, vd_b_volts: M L^2 T^-3 I^-1 }
+export function computeMwbcVoltageDrop({ awg = "12", material = "copper", one_way_length_ft = 0, load_a_amps = 0, load_b_amps = 0, source_volts = 120, temperature_C = 75 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const len = Number(one_way_length_ft) || 0;
+  const ia = Number(load_a_amps);
+  const ib = Number(load_b_amps);
+  const v = Number(source_volts) || 0;
+  const tC = Number(temperature_C);
+  if (!(len > 0)) return { error: "One-way circuit length must be positive (ft)." };
+  if (!Number.isFinite(ia) || ia < 0) return { error: "Leg A current cannot be negative (A)." };
+  if (!Number.isFinite(ib) || ib < 0) return { error: "Leg B current cannot be negative (A)." };
+  if (!(ia > 0 || ib > 0)) return { error: "Enter a load on at least one leg (A)." };
+  if (!(v > 0)) return { error: "Source voltage must be positive (V, line to neutral)." };
+  if (!Number.isFinite(tC)) return { error: "Conductor temperature must be a number (C)." };
+  let r_per_kft;
+  try {
+    r_per_kft = conductorResistancePerKft({ material, awg: String(awg), temperature_C: tC });
+  } catch (e) {
+    return { error: "Unknown conductor size or material - use a standard AWG size with copper or aluminum." };
+  }
+  if (!(r_per_kft > 0)) return { error: "Conductor resistance did not resolve - check the AWG size and material." };
+  const r_ohms = r_per_kft * len / 1000;
+  const neutral_amps = Math.abs(ia - ib);
+  const vd_a_volts = r_ohms * (2 * ia - ib);
+  const vd_b_volts = r_ohms * (2 * ib - ia);
+  const volts_a = v - vd_a_volts;
+  const volts_b = v - vd_b_volts;
+  const pct_a = vd_a_volts / v * 100;
+  const pct_b = vd_b_volts / v * 100;
+  const heavier = Math.max(ia, ib);
+  const two_wire_vd = 2 * r_ohms * heavier;
+  const balanced_vd = r_ohms * heavier;
+  const b_rises = vd_b_volts < 0;
+  const a_rises = vd_a_volts < 0;
+  const worst_pct = Math.max(pct_a, pct_b);
+  const over_3pct = worst_pct > 3;
+  if (![r_ohms, vd_a_volts, vd_b_volts, neutral_amps].every(Number.isFinite)) return { error: "Voltage-drop math did not produce a finite value." };
+  return {
+    r_per_kft, r_ohms, neutral_amps, vd_a_volts, vd_b_volts, volts_a, volts_b,
+    pct_a, pct_b, worst_pct, over_3pct, two_wire_vd, balanced_vd, b_rises, a_rises,
+    note: "A multiwire branch circuit shares one neutral between two out-of-phase hots, so the neutral carries the DIFFERENCE of the two legs - " + neutral_amps.toFixed(1) + " A here - and its drop lands on both legs with opposite sign. That is why a BALANCED MWBC is efficient: with the neutral carrying nothing, each leg sees only its own conductor, "
+      + balanced_vd.toFixed(2) + " V, exactly HALF the " + two_wire_vd.toFixed(2) + " V the same load would drop on a two-wire circuit. Unbalance spends that advantage: the heavier leg's drop grows toward the two-wire figure while the lighter leg's shrinks"
+      + (b_rises || a_rises ? " and, here, goes NEGATIVE - the lightly loaded leg sits ABOVE nominal because the shifted neutral pushes it up. That is real neutral shift, not an arithmetic artifact." : ".")
+      + " THE HAZARD THIS CIRCUIT CARRIES: if the shared neutral opens while both legs are loaded, the two loads go in series across 240 V and the lighter one sees a large overvoltage - which destroys electronics and starts fires. Terminate the neutral on a pigtail, never in series through a device yoke, and give the circuit a common disconnect so both legs de-energize together. Resistance is computed from the conductor and temperature you enter, DC resistance only: it ignores AC reactance, which matters on long runs and larger conductors, and it ignores power factor. Steady-state balance only - two legs that are balanced on average can be badly unbalanced at any instant. The NEC as adopted and the AHJ govern.",
+  };
+}
+export const mwbcVoltageDropExample = { inputs: { awg: "12", material: "copper", one_way_length_ft: 100, load_a_amps: 16, load_b_amps: 4, source_volts: 120, temperature_C: 75 } };
+function _v1109renderMwbcVoltageDrop(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: circuit analysis of a 120/240 V three-wire multiwire branch circuit. The two hots are out of phase and share a neutral carrying the difference of the leg currents, so with equal conductors of one-way resistance R the drops are VD_A = R(2 I_A - I_B) and VD_B = R(2 I_B - I_A). Balanced loading collapses to R x I - half the drop of a two-wire circuit, because the neutral carries nothing - and heavy unbalance drives the lighter leg's drop negative, a real neutral shift that raises it above nominal. Conductor resistance is computed from the entered size, material, and temperature by this catalog's own resistance model, not a recalled table; DC resistance only, ignoring AC reactance and power factor. NEC 210.4(B) requires a common disconnect, and the neutral must be pigtailed so removing a device cannot open it. The NEC as adopted and the AHJ govern.";
+  const aw = makeSelect("Conductor size (AWG)", "mwbc-awg", [
+    { value: "14", label: "14 AWG" }, { value: "12", label: "12 AWG" }, { value: "10", label: "10 AWG" },
+    { value: "8", label: "8 AWG" }, { value: "6", label: "6 AWG" },
+  ]);
+  aw.select.value = "12";
+  const mt = makeSelect("Conductor material", "mwbc-mat", [
+    { value: "copper", label: "Copper" }, { value: "aluminum", label: "Aluminum" },
+  ]);
+  mt.select.value = "copper";
+  const ln = makeNumber("One-way circuit length (ft)", "mwbc-len", { step: "any", min: "0", value: "100" });
+  ln.input.value = "100";
+  const la = makeNumber("Leg A load (A)", "mwbc-la", { step: "any", min: "0", value: "16" });
+  la.input.value = "16";
+  const lb = makeNumber("Leg B load (A)", "mwbc-lb", { step: "any", min: "0", value: "4" });
+  lb.input.value = "4";
+  const sv = makeNumber("Source volts, line to neutral", "mwbc-sv", { step: "any", min: "0", value: "120" });
+  sv.input.value = "120";
+  const tc = makeNumber("Conductor temperature (C)", "mwbc-tc", { step: "any", value: "75" });
+  tc.input.value = "75";
+  for (const f of [aw, mt, ln, la, lb, sv, tc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { aw.select.value = "12"; mt.select.value = "copper"; ln.input.value = "100"; la.input.value = "16"; lb.input.value = "4"; sv.input.value = "120"; tc.input.value = "75"; update(); });
+  const oN = makeOutputLine(outputRegion, "Neutral current (the difference)", "mwbc-out-n");
+  const oA = makeOutputLine(outputRegion, "Leg A drop", "mwbc-out-a");
+  const oB = makeOutputLine(outputRegion, "Leg B drop", "mwbc-out-b");
+  const oC = makeOutputLine(outputRegion, "Balanced vs two-wire comparison", "mwbc-out-c");
+  const oZ = makeOutputLine(outputRegion, "Note", "mwbc-out-z");
+  const update = debounce(() => {
+    const r = computeMwbcVoltageDrop({
+      awg: aw.select.value, material: mt.select.value, one_way_length_ft: Number(ln.input.value),
+      load_a_amps: Number(la.input.value), load_b_amps: Number(lb.input.value),
+      source_volts: Number(sv.input.value), temperature_C: Number(tc.input.value),
+    });
+    if (r.error) { oN.textContent = r.error; oA.textContent = "-"; oB.textContent = "-"; oC.textContent = "-"; oZ.textContent = "-"; return; }
+    oN.textContent = fmt(r.neutral_amps, 1) + " A";
+    oA.textContent = fmt(r.vd_a_volts, 2) + " V (" + fmt(r.pct_a, 2) + "%) to " + fmt(r.volts_a, 1) + " V";
+    oB.textContent = fmt(r.vd_b_volts, 2) + " V (" + fmt(r.pct_b, 2) + "%) to " + fmt(r.volts_b, 1) + " V" + (r.b_rises ? " - RISES above nominal" : "");
+    oC.textContent = "balanced would be " + fmt(r.balanced_vd, 2) + " V; two separate two-wire circuits " + fmt(r.two_wire_vd, 2) + " V" + (r.over_3pct ? " -- worst leg is over 3%" : "");
+    oZ.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ln, la, lb, sv, tc]) f.input.addEventListener("input", update);
+  for (const f of [aw, mt]) f.select.addEventListener("change", update);
+  update();
+}
+ELECTRICAL_RENDERERS["mwbc-voltage-drop"] = _v1109renderMwbcVoltageDrop;
