@@ -1442,6 +1442,7 @@ export const COMPUTE_MAP = {
   "steel-doubler-plate": { module: "../../calc-steel.js", fn: "computeSteelDoublerPlate" },
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (3 tiles, new calc-concrete.js)
   "rc-beam-flexure": { module: "../../calc-concrete.js", fn: "computeRcBeamFlexure" },
+  "rc-tbeam-flexure": { module: "../../calc-concrete.js", fn: "computeRcTBeamFlexure" },
   "rc-beam-shear": { module: "../../calc-concrete.js", fn: "computeRcBeamShear" },
   "concrete-torsion-threshold": { module: "../../calc-concrete.js", fn: "computeConcreteTorsionThreshold" },
   "glulam-volume-factor": { module: "../../calc-construction.js", fn: "computeGlulamVolumeFactor" },

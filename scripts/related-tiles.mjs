@@ -1455,7 +1455,8 @@ const RELATED = {
   "steel-doubler-plate": ["steel-panel-zone-shear","steel-web-local-strength","steel-column-capacity"],
   "steel-panel-zone-axial": ["steel-panel-zone-shear","steel-doubler-plate","steel-column-capacity"],
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (Group E, calc-concrete.js)
-  "rc-beam-flexure": ["rc-beam-shear","rc-development-length","steel-beam-flexure"],
+  "rc-beam-flexure": ["rc-tbeam-flexure","rc-beam-shear","rc-development-length","steel-beam-flexure"],
+  "rc-tbeam-flexure": ["t-beam-effective-flange-width","rc-beam-flexure","rc-beam-doubly-reinforced","concrete-beam-min-flexural-steel"],
   "rc-beam-shear": ["rc-beam-flexure","rc-development-length","steel-beam-shear"],
   "concrete-torsion-threshold": ["rc-beam-shear","rc-beam-flexure","concrete-beam-min-flexural-steel","combined-stress-axial-bending"],
   "glulam-volume-factor": ["wood-beam-bending","wood-beam-shear","beam-loading","lumber-spans"],

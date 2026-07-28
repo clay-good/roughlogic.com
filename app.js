@@ -635,7 +635,7 @@ const TOOL_MODULES = (() => {
   // Group E cluster, the RC companion to calc-steel.js one material over.
   // All three KEEP group "E" (module independent of group letter).
   declare("./calc-concrete.js", "CONCRETE_RENDERERS", [
-    "rc-beam-flexure", "rc-beam-shear", "rc-development-length",
+    "rc-beam-flexure", "rc-tbeam-flexure", "rc-beam-shear", "rc-development-length",
     "concrete-torsion-threshold",
     // spec-v284..v286 member depth batch
     "rc-column-axial", "rc-column-steel-for-load", "rc-punching-shear", "rc-hook-development",

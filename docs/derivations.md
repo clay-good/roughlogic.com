@@ -1563,6 +1563,7 @@ cross-check.
 | calc-concrete.js | `computeRcSlabMaxSpanForThickness` | `{ available_thickness_in = 0, support = "simply", fy_psi = 60000, wc_pcf = 14...` | _ | _ | _ |
 | calc-concrete.js | `computeRcSlabMinThickness` | `{ l_ft = 0, support = "simply", fy_psi = 60000, wc_pcf = 145 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcSlenderColumnMagnify` | `{ factored_axial_kip = 0, end_moment_m2_kft = 0, end_moment_m1_kft = 0, unbra...` | _ | _ | _ |
+| calc-concrete.js | `computeRcTBeamFlexure` | `{ fc_psi = 4000, fy_psi = 60000, as_in2 = 0, bw_in = 0, hf_in = 0, d_in = 0, ...` | _ | _ | _ |
 | calc-concrete.js | `computeSlabDowelSchedule` | `{ joint_length_ft = 40, slab_thickness_in = 6, dowel_spacing_in = 12, edge_cl...` | _ | _ | _ |
 | calc-concrete.js | `computeTBeamEffectiveFlangeWidth` | `{ bw_in = 0, hf_in = 0, ln_in = 0, sw_in = 0, beam_type = "interior" } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAbrasiveBlast` | `{ nozzle_bore_in, pressure_psi = 100, area_ft2, lb_per_ft2 = 8 } = {}` | _ | _ | _ |
@@ -3167,7 +3168,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1753.
+Row count: 1754.
 
 <!-- END function-corpus-v14 -->
 
@@ -3784,7 +3785,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (396 tiles)
+### Group E Construction (397 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4020,6 +4021,7 @@ per spec-v14 §13.1 second paragraph.
 | `rc-slab-max-span-for-thickness` | Max One-Way Slab / Beam Span for a Given Depth (ACI 318-19) | ACI 318-19 Table 7.3.1.1 / 9.3.1.1; 10 in, both ends continuous (l/28), Grade 60 normalweight... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rc-slab-min-thickness` | One-Way Slab / Beam Minimum Thickness for Deflection (ACI 318-19) | ACI 318-19 Table 7.3.1.1 / 9.3.1.1; spec-v299 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-slender-column-magnify` | Slender Column Moment Magnifier, Nonsway (ACI 318-19 6.6.4) | ACI 318-19 Section 6.6.4.5 (nonsway m...; Pu 200, M2 80, M1 50, lu 14 ft, k 1, EI 1.5e6, h 16 -> Cm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `rc-tbeam-flexure` | T-Beam Flexural Capacity (ACI 318-19) | American Concrete Institute; 22.2.2.4.1 stress block, 6.3.2 effective width, 21.2.2 ph... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ready-mix-concrete-order` | Ready-Mix Concrete Order (Trucks, Waste, Short Load) | concrete-supply practice; spec-v431 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rebar` | Rebar Spacing and Quantity | Project (first-principles slab grid l...; 20 ft x 10 ft slab / 12 in spacing / 3 in edge clearance ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rebar-chair-count` | Rebar Chair / Bar-Support Count | Bar-support count identity (first-pri...; chairs = ceil(1000/4^2*1.05) = ceil(65.6) = 66 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4859,6 +4861,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1506. Fixture-covered or reference-cadence: 1506 / 1506.
+Tile count: 1507. Fixture-covered or reference-cadence: 1507 / 1507.
 
 <!-- END tile-index-v14 -->

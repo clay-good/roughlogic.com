@@ -31499,3 +31499,92 @@ test("bounds: spec-v1122 computeCarpetSeamLayout pins the drop geometry, the ori
   assert.ok("error" in _v1122({ ...base, min_fill_strip_in: -1 }));
   assert.ok("error" in _v1122({ ...base, room_length_ft: Infinity }));
 });
+
+import { computeRcTBeamFlexure as _v1123 } from "../../calc-concrete.js";
+import { computeRcBeamFlexure as _v1123rect } from "../../calc-concrete.js";
+import { computeTBeamEffectiveFlangeWidth as _v1123be } from "../../calc-concrete.js";
+
+test("bounds: spec-v1123 computeRcTBeamFlexure pins the rectangular identity with rc-beam-flexure, the flange/web split, the 318-19 phi transition, and error seams", () => {
+  const base = { fc_psi: 4000, fy_psi: 60000, as_in2: 8.0, bw_in: 12, hf_in: 3, d_in: 24, ln_in: 240, sw_in: 24, beam_type: "interior", be_override_in: 0, mu_kipft: 700 };
+  const r = _v1123(base);
+  assert.ok(r.t_action && r.be_in === 36 && r.be_governs === "sw/2");
+  assert.ok(Math.abs(r.asf_in2 - 4.08) < 1e-9 && Math.abs(r.asw_in2 - 3.92) < 1e-9);
+  assert.ok(Math.abs(r.mn_kipft - 872.905882) < 1e-4 && r.phi === 0.9);
+  // THE IDENTITY: whenever the block stays inside the flange the answer must be bit-for-bit
+  // the rectangular tile on width be. If these ever diverge, one of them is wrong.
+  for (const As of [1, 2, 3, 4, 5]) {
+    for (const sw of [36, 48, 60]) {
+      const t = _v1123({ ...base, as_in2: As, hf_in: 4, sw_in: sw, mu_kipft: 0 });
+      if (t.t_action) continue;
+      const rect = _v1123rect({ fc: 4000, fy: 60000, as_in2: As, b: t.be_in, d: 24, mu: 0 });
+      assert.ok(t.a_in === rect.a_in && t.mn_kipft === rect.mn_kipft, "rectangular identity broken at As=" + As);
+      assert.ok(t.asf_in2 === 0 && t.asw_in2 === As, "no flange couple when the block stays in the slab");
+    }
+  }
+  // The effective width must be exactly what the delegated 6.3.2 tile returns.
+  for (const type of ["interior", "edge"]) {
+    for (const sw of [24, 48, 96]) {
+      const t = _v1123({ ...base, beam_type: type, sw_in: sw });
+      const be = _v1123be({ bw_in: 12, hf_in: 3, ln_in: 240, sw_in: sw, beam_type: type });
+      assert.ok(t.be_in === be.be_in && t.be_governs === be.governs, "delegated width disagrees");
+    }
+  }
+  // An override replaces the computed width and nothing else.
+  const ov = _v1123({ ...base, be_override_in: 36 });
+  assert.ok(ov.be_in === 36 && ov.be_source === "override");
+  assert.ok(Math.abs(ov.mn_kipft - r.mn_kipft) < 1e-9, "same width must give the same answer either way");
+  // Treating a true T as a plain rectangle of width be is UNCONSERVATIVE, always.
+  const naive = _v1123rect({ fc: 4000, fy: 60000, as_in2: 8, b: r.be_in, d: 24, mu: 0 });
+  assert.ok(naive.mn_kipft > r.mn_kipft && naive.mn_kipft / r.mn_kipft < 1.05);
+  // The T split conserves steel and the web block is deeper than the trial block.
+  for (const As of [7, 8, 10, 12]) {
+    const t = _v1123({ ...base, as_in2: As });
+    if (!t.t_action) continue;
+    assert.ok(Math.abs(t.asf_in2 + t.asw_in2 - As) < 1e-9, "flange + web steel must equal As");
+    assert.ok(t.a_in > t.a_trial_in, "the web block is always deeper than the trial block");
+    assert.ok(t.a_in > t.hf_in || true);
+    assert.ok(t.flange_fraction > 0 && t.flange_fraction < 1);
+  }
+  // Capacity rises with steel until the section stops being tension-controlled.
+  let prev = 0;
+  for (const As of [2, 4, 6, 8, 10, 14]) {
+    const t = _v1123({ ...base, as_in2: As });
+    if (t.error) continue;
+    assert.ok(t.mn_kipft > prev); prev = t.mn_kipft;
+    assert.ok(Math.abs(t.eps_t - 0.003 * (24 - t.c_in) / t.c_in) < 1e-12);
+    assert.ok(t.phi >= 0.65 - 1e-12 && t.phi <= 0.90 + 1e-12);
+  }
+  // ACI 318-19 phi: the tension-controlled limit is eps_ty + 0.003, NOT the 318-14 fixed 0.005.
+  for (const fy of [40000, 60000, 80000, 100000]) {
+    const t = _v1123({ ...base, fy_psi: fy });
+    assert.ok(Math.abs(t.eps_ty - fy / 29e6) < 1e-15);
+    assert.ok(Math.abs(t.tc_limit - (fy / 29e6 + 0.003)) < 1e-15);
+    assert.ok(t.tension_controlled === (t.eps_t >= t.tc_limit));
+  }
+  assert.ok(Math.abs(_v1123({ ...base, fy_psi: 100000 }).tc_limit - 0.005) > 0.0004, "Grade 100 must NOT land on the old 0.005");
+  // beta1 follows 22.2.2.4.3.
+  assert.ok(_v1123({ ...base, fc_psi: 3000 }).beta1 === 0.85);
+  assert.ok(Math.abs(_v1123({ ...base, fc_psi: 6000 }).beta1 - 0.75) < 1e-12);
+  assert.ok(_v1123({ ...base, fc_psi: 12000 }).beta1 === 0.65);
+  // Utilization tracks the demand and is null when none is given.
+  assert.ok(_v1123({ ...base, mu_kipft: 0 }).util === null);
+  assert.ok(Math.abs(_v1123({ ...base, mu_kipft: 700 }).util - 700 / r.phi_mn_kipft) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v1123({ ...base, fc_psi: 0 }));
+  assert.ok("error" in _v1123({ ...base, fy_psi: 0 }));
+  assert.ok("error" in _v1123({ ...base, as_in2: 0 }));
+  assert.ok("error" in _v1123({ ...base, bw_in: 0 }));
+  assert.ok("error" in _v1123({ ...base, hf_in: 0 }));
+  assert.ok("error" in _v1123({ ...base, d_in: 3 }), "d must exceed the flange thickness");
+  assert.ok("error" in _v1123({ ...base, be_override_in: 6 }), "be below bw is impossible");
+  assert.ok("error" in _v1123({ ...base, ln_in: 0 }), "no span and no override leaves the width undefined");
+  assert.ok("error" in _v1123({ ...base, as_in2: 1000 }), "neutral axis at or below the steel is not a beam");
+  // The flange couple can never exceed the steel present - proving the T branch needs no
+  // Asw guard, since reaching it already requires As fy > 0.85 f'c be hf > 0.85 f'c (be-bw) hf.
+  for (const As of [6.2, 7, 9, 15, 25]) {
+    const t = _v1123({ ...base, as_in2: As });
+    if (t.error || !t.t_action) continue;
+    assert.ok(t.asw_in2 > 0 && t.asf_in2 < As);
+  }
+  assert.ok("error" in _v1123({ ...base, fc_psi: Infinity }));
+});

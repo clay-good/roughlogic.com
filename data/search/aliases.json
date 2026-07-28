@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "t-beam flexural capacity",
+      "target": "rc-tbeam-flexure",
+      "kind": "industry"
+    },
+    {
+      "term": "does the stress block stay in the flange",
+      "target": "rc-tbeam-flexure",
+      "kind": "question"
+    },
+    {
+      "term": "concrete t beam moment capacity",
+      "target": "rc-tbeam-flexure",
+      "kind": "question"
+    },
+    {
+      "term": "flange couple and web couple",
+      "target": "rc-tbeam-flexure",
+      "kind": "industry"
+    },
+    {
+      "term": "when is a t beam just a rectangle",
+      "target": "rc-tbeam-flexure",
+      "kind": "question"
+    },
+    {
       "term": "carpet seam layout",
       "target": "carpet-seam-layout",
       "kind": "industry"

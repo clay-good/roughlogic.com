@@ -16075,6 +16075,21 @@ export const CITATIONS = {
       { name: "Capacity only", value: "the joint shear demand comes from the steel-panel-zone-shear sibling; this tile returns the reduced capacity", source: "AISC 360-16 J10.6" },
     ],
   },
+  "rc-tbeam-flexure": {
+    formula: "trial a = As fy / (0.85 f\'c be); if a <= hf the section is rectangular of width be and Mn = As fy (d - a/2); if a > hf then Asf = 0.85 f\'c (be - bw) hf / fy, Asw = As - Asf, a = Asw fy / (0.85 f\'c bw), and Mn = Asf fy (d - hf/2) + Asw fy (d - a/2). c = a/beta1; eps_t = 0.003 (d - c)/c; phi = 0.90 at eps_t >= eps_ty + 0.003, 0.65 at eps_t <= eps_ty = fy/Es, interpolated between.",
+    edition: "ACI 318-19: 22.2.2.4.1 equivalent rectangular stress block, 22.2.2.4.3 beta1, 6.3.2 effective flange width (delegated to the landed t-beam-effective-flange-width tile rather than reimplemented), and 21.2.2 strength-reduction factor.",
+    freeAccess: "The T-beam flexural derivation is standard reinforced-concrete mechanics reproduced in every textbook and in free university course notes; the code sections are cited by number and no table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The useful result is which of the two behaviors applies, because it is not obvious and it decides everything. For most positive-moment T-beams the compression block stays entirely inside the slab, and then the section is simply a wide rectangle - the web width does not enter the flexural answer at all, which surprises people who expect a T-beam to need T-beam math. Only when the steel is heavy enough to push the block past the flange does true T action appear, and then the overhanging flange carries its own couple at the longer lever arm d - hf/2 while the web carries the rest. Treating a true T as a plain rectangle of the effective width is UNCONSERVATIVE: the example section returns 872.9 kip-ft correctly against 881.6 as a rectangle, about 1% high, because the rectangle credits the overhang compression at too deep a centroid. The strength-reduction factor follows ACI 318-19 21.2.2, whose tension-controlled limit is eps_ty + 0.003 rather than the fixed 0.005 of the 2014 edition - the two coincide only near Grade 60 and diverge at Grade 80 and 100. POSITIVE MOMENT ONLY: over a support the slab is in tension, the flange contributes nothing, and the section reverts to a rectangle of the WEB width; using this tile there overstates the capacity badly. Singly reinforced - compression steel is the doubly-reinforced tile. Minimum steel (9.6.1.2), shear, deflection, bar spacing, and development are separate checks with their own tiles. A design aid, not a substitute for a licensed engineer\'s design; the engineer of record\'s stamped design governs.",
+    assumptions: [
+      { name: "Behavior test", value: "trial a on width be against hf decides rectangular versus true T", source: "ACI 318-19 22.2.2.4.1" },
+      { name: "Flange couple", value: "Asf = 0.85 f\'c (be - bw) hf / fy at lever arm d - hf/2", source: "standard T-beam resolution" },
+      { name: "Effective width", value: "delegated to computeTBeamEffectiveFlangeWidth (6.3.2), with an override", source: "ACI 318-19 6.3.2" },
+      { name: "phi", value: "21.2.2, tension-controlled at eps_ty + 0.003, not the 318-14 fixed 0.005", source: "ACI 318-19 21.2.2" },
+      { name: "Positive moment only", value: "at a support the flange is in tension and the section is a web-width rectangle", source: "stated scope limit" },
+      { name: "Singly reinforced", value: "compression steel, minimum steel, shear, deflection, and development are separate", source: "stated scope limit" },
+    ],
+  },
   "rc-beam-flexure": {
     formula: "a = As x fy / (0.85 x f'c x b); Mn = As x fy x (d - a/2); phi Mn = 0.90 x Mn (tension-controlled); util = Mu / phi Mn.",
     edition: "ACI 318-19 (Building Code Requirements for Structural Concrete), by name: §22.2.2.4.1 (equivalent rectangular stress block), §22.2 (nominal flexural strength), §21.2.2 (phi = 0.90 tension-controlled).",

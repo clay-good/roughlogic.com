@@ -2031,3 +2031,121 @@ CONCRETE_RENDERERS["concrete-premix-bags"] = _simpleRenderer({
   ],
   compute: computeConcretePremixBags,
 });
+
+// ===================== spec-v1123: T-beam flexural capacity (ACI 318-19) =====================
+
+// The flange action rc-beam-flexure names as a separate check and t-beam-effective-flange-width
+// stops one step short of. Two behaviors, and which one applies is the whole question:
+// if the stress block stays inside the slab (a <= hf) the section is just a rectangle of
+// width be and the answer must equal the rectangular tile exactly - the fuzzer pins that
+// against computeRcBeamFlexure. Only when a would run past the flange does the section
+// become a true T, and the capacity splits into a flange couple and a web couple.
+// The effective width is DELEGATED to computeTBeamEffectiveFlangeWidth so the two tiles
+// cannot disagree, with an override for a be taken from the engineer's drawings.
+// dims: in { fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2, as_in2: L^2, bw_in: L, hf_in: L, d_in: L, ln_in: L, sw_in: L, beam_type: dimensionless, be_override_in: L, mu_kipft: M L^2 T^-2 } out: { be_in: L, a_in: L, c_in: L, mn_kipft: M L^2 T^-2, phi_mn_kipft: M L^2 T^-2, asf_in2: L^2, asw_in2: L^2, eps_t: dimensionless, phi: dimensionless }
+export function computeRcTBeamFlexure({ fc_psi = 4000, fy_psi = 60000, as_in2 = 0, bw_in = 0, hf_in = 0, d_in = 0, ln_in = 0, sw_in = 0, beam_type = "interior", be_override_in = 0, mu_kipft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const fc = Number(fc_psi) || 0, fy = Number(fy_psi) || 0, As = Number(as_in2) || 0;
+  const bw = Number(bw_in) || 0, hf = Number(hf_in) || 0, d = Number(d_in) || 0;
+  const beOver = Number(be_override_in) || 0, mu = Number(mu_kipft) || 0;
+  if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (!(fy > 0)) return { error: "Steel yield fy must be positive (psi)." };
+  if (!(As > 0)) return { error: "Tension steel area As must be positive (in^2)." };
+  if (!(bw > 0)) return { error: "Web width bw must be positive (in)." };
+  if (!(hf > 0)) return { error: "Flange thickness hf must be positive (in)." };
+  if (!(d > hf)) return { error: "Effective depth d must exceed the flange thickness." };
+
+  let be_in, be_source, be_governs = null;
+  if (beOver > 0) {
+    be_in = beOver; be_source = "override";
+  } else {
+    const fw = computeTBeamEffectiveFlangeWidth({ bw_in: bw, hf_in: hf, ln_in: Number(ln_in) || 0, sw_in: Number(sw_in) || 0, beam_type });
+    if (fw.error) return { error: fw.error + " (or enter an effective flange width directly)" };
+    be_in = fw.be_in; be_source = "6.3.2"; be_governs = fw.governs;
+  }
+  if (be_in < bw) return { error: "Effective flange width cannot be less than the web width." };
+
+  const beta1 = _RC_BETA1(fc);
+  // Trial: assume the compression block stays within the flange.
+  const a_trial = (As * fy) / (0.85 * fc * be_in);
+  const t_action = a_trial > hf;
+
+  let a_in, c_in, mn_kipin, asf_in2 = 0, asw_in2 = As;
+  if (!t_action) {
+    // Rectangular behavior on width be - identical to the rectangular tile.
+    a_in = a_trial;
+    c_in = a_in / beta1;
+    mn_kipin = As * fy * (d - a_in / 2) / 1000;
+  } else {
+    // True T action: the overhanging flange carries one couple, the web the rest.
+    asf_in2 = 0.85 * fc * (be_in - bw) * hf / fy;
+    // Asw is always positive here: reaching this branch requires As fy > 0.85 f'c be hf,
+    // which already exceeds the 0.85 f'c (be - bw) hf that Asf represents. No guard needed.
+    asw_in2 = As - asf_in2;
+    a_in = (asw_in2 * fy) / (0.85 * fc * bw);
+    c_in = a_in / beta1;
+    mn_kipin = (asf_in2 * fy * (d - hf / 2) + asw_in2 * fy * (d - a_in / 2)) / 1000;
+  }
+
+  // ACI 318-19 21.2.2: the tension-controlled limit is eps_ty + 0.003, NOT the fixed 0.005
+  // the 2014 edition used - they coincide only near Grade 60.
+  // A neutral axis at or below the steel means the section is not a beam at any phi.
+  if (c_in >= d) return { error: "The neutral axis falls at or below the tension steel - this section is grossly over-reinforced and cannot be designed as a beam. Reduce As, widen the flange, or deepen the section." };
+
+  const eps_ty = fy / 29e6;
+  const tc_limit = eps_ty + 0.003;
+  const eps_t = 0.003 * (d - c_in) / c_in;
+  const tension_controlled = eps_t >= tc_limit;
+  const compression_controlled = eps_t <= eps_ty;
+  const phi = tension_controlled ? 0.90 : compression_controlled ? 0.65 : 0.65 + 0.25 * (eps_t - eps_ty) / 0.003;
+
+  const mn_kipft = mn_kipin / 12;
+  const phi_mn_kipft = phi * mn_kipft;
+  const util = mu > 0 ? mu / phi_mn_kipft : null;
+  const flange_fraction = t_action ? asf_in2 / As : 0;
+
+  const note = "Effective flange width " + be_in.toFixed(1) + " in"
+    + (be_source === "override" ? " (entered directly)" : ", from ACI 318-19 6.3.2 with " + be_governs + " governing")
+    + ". Trial stress-block depth on that width is " + a_trial.toFixed(2) + " in against a " + hf + " in flange, so "
+    + (t_action
+      ? "the block runs PAST the flange and the section acts as a true T. The overhanging flange develops " + asf_in2.toFixed(2) + " in^2 worth of compression (" + (flange_fraction * 100).toFixed(0) + "% of the steel) at a lever arm of d - hf/2, and the remaining " + asw_in2.toFixed(2) + " in^2 is balanced by the web with its own block " + a_in.toFixed(2) + " in deep. "
+      : "the whole compression block stays INSIDE the slab - which is the usual case for a positive-moment T-beam - so the section is simply a rectangle " + be_in.toFixed(1) + " in wide, and this returns exactly what the rectangular tile would. The web width does not enter the flexural answer at all. ")
+    + "Mn = " + mn_kipft.toFixed(1) + " kip-ft, phi Mn = " + phi_mn_kipft.toFixed(1) + " kip-ft at phi = " + phi.toFixed(3) + ". "
+    + "Net tensile strain is " + eps_t.toFixed(5) + " against a tension-controlled limit of " + tc_limit.toFixed(5) + " (eps_ty + 0.003 per 21.2.2, the 2019 edition's replacement for the old fixed 0.005 - they differ once you leave Grade 60), so the section is "
+    + (tension_controlled ? "tension-controlled and phi is the full 0.90. " : compression_controlled ? "COMPRESSION-CONTROLLED, phi drops to 0.65, and a beam should be redesigned rather than accepted here. " : "in the TRANSITION zone, so phi is interpolated and this section is more heavily reinforced than good practice for a beam. ")
+    + (util !== null ? "Against the " + mu + " kip-ft demand the utilization is " + util.toFixed(2) + (util <= 1 ? " - OK. " : " - OVER. ") : "")
+    + "Positive moment only: at a support the slab is in TENSION, the flange does nothing, and the section reverts to a rectangle of the WEB width - do not use this for negative moment. Singly reinforced; compression steel is the doubly-reinforced tile. Minimum steel (9.6.1.2), shear, deflection, bar spacing, and development are separate checks with their own tiles. A design aid, not a substitute for a licensed engineer's design - the engineer of record's stamped design governs.";
+
+  return { be_in, be_source, be_governs, a_trial_in: a_trial, t_action, a_in, c_in, beta1, asf_in2, asw_in2, flange_fraction, eps_ty, tc_limit, eps_t, tension_controlled, compression_controlled, phi, mn_kipft, phi_mn_kipft, util, note };
+}
+
+export const rcTBeamFlexureExample = { inputs: { fc_psi: 4000, fy_psi: 60000, as_in2: 8.0, bw_in: 12, hf_in: 3, d_in: 24, ln_in: 240, sw_in: 24, beam_type: "interior", be_override_in: 0, mu_kipft: 700 } };
+
+CONCRETE_RENDERERS["rc-tbeam-flexure"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 T-beam flexure - 22.2.2.4.1 equivalent rectangular stress block, 6.3.2 effective flange width (delegated to the landed t-beam-effective-flange-width tile so the two cannot disagree), and 21.2.2 for the strength-reduction factor. If the trial block a = As fy / (0.85 f'c be) stays within the flange the section is rectangular of width be and Mn = As fy (d - a/2), identical to the rectangular tile. If it runs past, the flange overhangs are resolved as Asf = 0.85 f'c (be - bw) hf / fy at a lever arm d - hf/2 and the remaining steel Asw = As - Asf is balanced by the web with a = Asw fy / (0.85 f'c bw). phi follows 21.2.2 - tension-controlled at eps_t >= eps_ty + 0.003, compression-controlled at eps_t <= eps_ty = fy/Es, interpolated between; the 2019 edition replaced the fixed 0.005 limit, which matters above Grade 60. POSITIVE MOMENT ONLY: over a support the slab is in tension and the section reverts to a rectangle of the web width. Singly reinforced; minimum steel, shear, deflection, spacing, and development are separate. A design aid, not a substitute for a licensed engineer's design.",
+  example: rcTBeamFlexureExample.inputs,
+  fields: [
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", default: 60000 },
+    { key: "as_in2", label: "Tension steel area As (in^2)", kind: "number", default: 8 },
+    { key: "bw_in", label: "Web width bw (in)", kind: "number", default: 12 },
+    { key: "hf_in", label: "Flange (slab) thickness hf (in)", kind: "number", default: 3 },
+    { key: "d_in", label: "Effective depth d (in)", kind: "number", default: 24 },
+    { key: "ln_in", label: "Clear span ln (in)", kind: "number", default: 240 },
+    { key: "sw_in", label: "Clear distance to the next web sw (in)", kind: "number", default: 24 },
+    { key: "beam_type", label: "Beam location", kind: "select", options: [{ value: "interior", label: "Interior (flange both sides)", selected: true }, { value: "edge", label: "Edge / spandrel (one side)" }] },
+    { key: "be_override_in", label: "Effective width override (in; 0 = compute it)", kind: "number", default: 0 },
+    { key: "mu_kipft", label: "Required moment Mu (kip-ft; 0 = capacity only)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "be", id: "rtb-out-be", label: "Effective flange width be", value: (r) => fmt(r.be_in, 1) + " in" + (r.be_source === "override" ? " (entered)" : " (" + r.be_governs + " governs)") },
+    { key: "bh", id: "rtb-out-bh", label: "Behavior", value: (r) => r.t_action ? "TRUE T - block " + fmt(r.a_in, 2) + " in deep runs past the " + fmt(r.a_trial_in, 2) + " in trial into the web" : "RECTANGULAR - block " + fmt(r.a_in, 2) + " in stays inside the flange" },
+    { key: "sp", id: "rtb-out-sp", label: "Steel split (flange / web)", value: (r) => r.t_action ? fmt(r.asf_in2, 2) + " / " + fmt(r.asw_in2, 2) + " in^2 (" + fmt(r.flange_fraction * 100, 0) + "% in the flange)" : "all in the flange couple - no web block" },
+    { key: "mn", id: "rtb-out-mn", label: "Nominal moment Mn", value: (r) => fmt(r.mn_kipft, 1) + " kip-ft" },
+    { key: "pm", id: "rtb-out-pm", label: "Design moment phi Mn", value: (r) => fmt(r.phi_mn_kipft, 1) + " kip-ft at phi = " + fmt(r.phi, 3) },
+    { key: "et", id: "rtb-out-et", label: "Net tensile strain", value: (r) => fmt(r.eps_t, 5) + " vs a " + fmt(r.tc_limit, 5) + " tension-controlled limit - " + (r.tension_controlled ? "tension-controlled" : r.compression_controlled ? "COMPRESSION-CONTROLLED" : "transition zone") },
+    { key: "ut", id: "rtb-out-ut", label: "Demand / capacity", value: (r) => r.util === null ? "- (no Mu entered)" : fmt(r.util, 2) + (r.util <= 1 ? " (OK)" : " (OVER)") },
+    { key: "n", id: "rtb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRcTBeamFlexure,
+});
