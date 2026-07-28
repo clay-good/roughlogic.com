@@ -33140,3 +33140,50 @@ test("bounds: spec-v1152 computeTemporaryStairwayCheck pins the whichever-is-les
   assert.ok("error" in _v1152({ ...base, riser_variation_in: -1 }));
   assert.ok("error" in _v1152({ ...base, riser_height_in: Infinity }));
 });
+
+import { computeFlammableCabinetStorage as _v1153 } from "../../calc-construction.js";
+
+test("bounds: spec-v1153 computeFlammableCabinetStorage pins the per-cabinet caps, the hard area ceiling, the larger-not-sum rule, and error seams", () => {
+  const base = { cat123_gallons: 200, cat4_gallons: 0, cabinets_available: 4, per_cabinet_cat123_gal: 60, per_cabinet_cat4_gal: 120, max_cabinets_per_area: 3 };
+  const r = _v1153(base);
+  assert.ok(r.cabinets_for_123 === 4 && r.cabinets_needed === 4 && !r.within_area_cap && r.room_required);
+  assert.ok(r.area_cap_cat123_gal === 180 && r.area_cap_cat4_gal === 360 && r.over_area_cap_gal === 20);
+  assert.ok(r.too_many_cabinets && !r.passes, "four cabinets on hand is itself over the area limit");
+  // THE HARD CEILING: more cabinets never rescues a quantity past the area cap.
+  for (const have of [3, 4, 10]) {
+    const t = _v1153({ ...base, cabinets_available: have });
+    assert.ok(!t.within_area_cap && !t.passes, "no cabinet count fixes 200 gal in one area");
+  }
+  assert.ok(_v1153({ ...base, cat123_gallons: 180, cabinets_available: 3 }).within_area_cap);
+  assert.ok(!_v1153({ ...base, cat123_gallons: 181, cabinets_available: 3 }).within_area_cap);
+  // Per-cabinet counting is a ceiling division, with the seams exact.
+  for (const [gal, n] of [[1, 1], [60, 1], [61, 2], [120, 2], [121, 3]]) {
+    assert.ok(_v1153({ ...base, cat123_gallons: gal, cabinets_available: 0 }).cabinets_for_123 === n);
+  }
+  for (const [gal, n] of [[1, 1], [120, 1], [121, 2], [360, 3]]) {
+    assert.ok(_v1153({ ...base, cat123_gallons: 0, cat4_gallons: gal, cabinets_available: 0 }).cabinets_for_4 === n);
+  }
+  // LARGER, NOT SUM: a mixed cabinet must satisfy both caps, so the count is the max.
+  const mixed = _v1153({ ...base, cat123_gallons: 100, cat4_gallons: 200, cabinets_available: 2 });
+  assert.ok(mixed.mixed && mixed.cabinets_for_123 === 2 && mixed.cabinets_for_4 === 2);
+  assert.ok(mixed.cabinets_needed === 2 && mixed.cabinets_needed !== mixed.cabinets_for_123 + mixed.cabinets_for_4);
+  assert.ok(mixed.within_area_cap && mixed.cabinets_ok && mixed.passes);
+  assert.ok(_v1153({ ...base, cat123_gallons: 60, cat4_gallons: 360, cabinets_available: 3 }).cabinets_needed === 3);
+  // Any non-zero quantity needs at least one cabinet.
+  assert.ok(_v1153({ ...base, cat123_gallons: 0.5, cabinets_available: 1 }).cabinets_needed === 1);
+  // The caps and the area limit are all editable and move the answer.
+  assert.ok(_v1153({ ...base, per_cabinet_cat123_gal: 100, cabinets_available: 2 }).cabinets_needed === 2);
+  assert.ok(_v1153({ ...base, max_cabinets_per_area: 4, cabinets_available: 4 }).within_area_cap);
+  assert.ok(_v1153({ ...base, max_cabinets_per_area: 4 }).area_cap_cat123_gal === 240);
+  // On-hand count is optional and never fabricates a verdict.
+  const noHave = _v1153({ ...base, cat123_gallons: 100, cabinets_available: 0 });
+  assert.ok(noHave.cabinets_ok === null && !noHave.have_entered && noHave.passes);
+  // Error seams.
+  assert.ok("error" in _v1153({ ...base, cat123_gallons: 0, cat4_gallons: 0 }), "nothing to store is not a question");
+  assert.ok("error" in _v1153({ ...base, cat123_gallons: -1 }));
+  assert.ok("error" in _v1153({ ...base, per_cabinet_cat123_gal: 0 }));
+  assert.ok("error" in _v1153({ ...base, max_cabinets_per_area: 0 }));
+  assert.ok("error" in _v1153({ ...base, max_cabinets_per_area: 2.5 }));
+  assert.ok("error" in _v1153({ ...base, cabinets_available: 1.5 }));
+  assert.ok("error" in _v1153({ ...base, cat123_gallons: Infinity }));
+});

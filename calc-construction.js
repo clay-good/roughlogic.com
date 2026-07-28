@@ -11859,3 +11859,95 @@ CONSTRUCTION_RENDERERS["temporary-stairway-check"] = _simpleRenderer({
   ],
   compute: computeTemporaryStairwayCheck,
 });
+
+
+// --- spec-v1153: flammable liquid cabinet storage (OSHA 1926.152(b)) ---
+// The rule people know is the per-cabinet one. The rule that decides a jobsite is the AREA
+// one: not more than 60 gallons of Category 1, 2 and/or 3 flammable liquids or 120 gallons
+// of Category 4 in any ONE storage cabinet, AND not more than THREE such cabinets in a
+// single storage area. That second sentence is a hard ceiling - 180 gallons of Category 1-3
+// per area - and you cannot buy your way past it with a fourth cabinet. Past that the
+// standard sends you to a specially constructed inside storage room, which is a building
+// problem rather than a purchasing one.
+// The category names also changed with GHS alignment: what older references call Class I
+// and II is Category 1, 2, and 3, and Class III is Category 4. A cabinet labelled to the
+// old scheme still holds the same gallons.
+// dims: in { cat123_gallons: L^3, cat4_gallons: L^3, cabinets_available: dimensionless, per_cabinet_cat123_gal: L^3, per_cabinet_cat4_gal: L^3, max_cabinets_per_area: dimensionless } out: { cabinets_needed: dimensionless, area_cap_cat123_gal: L^3, area_cap_cat4_gal: L^3, over_area_cap_gal: L^3 }
+export function computeFlammableCabinetStorage({ cat123_gallons = 0, cat4_gallons = 0, cabinets_available = 0, per_cabinet_cat123_gal = 60, per_cabinet_cat4_gal = 120, max_cabinets_per_area = 3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q123 = Number(cat123_gallons) || 0;
+  const q4 = Number(cat4_gallons) || 0;
+  const have = Number(cabinets_available) || 0;
+  const cap123 = Number(per_cabinet_cat123_gal) || 0;
+  const cap4 = Number(per_cabinet_cat4_gal) || 0;
+  const maxCab = Number(max_cabinets_per_area) || 0;
+  if (q123 < 0 || q4 < 0) return { error: "Quantities cannot be negative (gal)." };
+  if (!(q123 > 0) && !(q4 > 0)) return { error: "Enter a quantity of Category 1-3 or Category 4 liquid (gal)." };
+  if (!(cap123 > 0) || !(cap4 > 0)) return { error: "Per-cabinet capacities must be positive (gal)." };
+  if (!Number.isInteger(maxCab) || maxCab < 1) return { error: "Cabinets per storage area must be a whole number of 1 or more." };
+  if (!Number.isInteger(have) || have < 0) return { error: "Cabinets available must be a whole number of 0 or more." };
+
+  // Each category has its own per-cabinet cap, and the standard gives no blending rule -
+  // so a cabinet holding both must satisfy both, which is the conservative reading.
+  const cabinets_for_123 = q123 > 0 ? Math.ceil(q123 / cap123) : 0;
+  const cabinets_for_4 = q4 > 0 ? Math.ceil(q4 / cap4) : 0;
+  const cabinets_needed = Math.max(cabinets_for_123, cabinets_for_4, (q123 > 0 || q4 > 0) ? 1 : 0);
+  const mixed = q123 > 0 && q4 > 0;
+
+  // The area ceiling: three cabinets is a hard limit, not a starting point.
+  const area_cap_cat123_gal = maxCab * cap123;
+  const area_cap_cat4_gal = maxCab * cap4;
+  const over_123 = Math.max(0, q123 - area_cap_cat123_gal);
+  const over_4 = Math.max(0, q4 - area_cap_cat4_gal);
+  const over_area_cap_gal = Math.max(over_123, over_4);
+  const within_area_cap = cabinets_needed <= maxCab;
+  const room_required = !within_area_cap;
+
+  const have_entered = have > 0;
+  const cabinets_ok = have_entered ? have >= cabinets_needed : null;
+  const cabinets_short = have_entered ? Math.max(0, cabinets_needed - have) : 0;
+  const too_many_cabinets = have > maxCab;
+
+  const passes = within_area_cap && (cabinets_ok !== false) && !too_many_cabinets;
+
+  const note = "PER CABINET: not more than " + cap123 + " gal of Category 1, 2 and/or 3 flammable liquids, or " + cap4 + " gal of Category 4, in any one storage cabinet. "
+    + (q123 > 0 ? q123 + " gal of Category 1-3 needs " + cabinets_for_123 + " cabinet" + (cabinets_for_123 === 1 ? "" : "s") + ". " : "")
+    + (q4 > 0 ? q4 + " gal of Category 4 needs " + cabinets_for_4 + ". " : "")
+    + (mixed ? "Both categories are present, and the standard gives NO blending rule between them - it states a limit for each. The conservative reading, used here, is that a cabinet must satisfy both caps, so the requirement is the larger of the two counts rather than a sum. If your AHJ reads it as additive, the number goes up. " : "")
+    + "Total " + cabinets_needed + " cabinet" + (cabinets_needed === 1 ? "" : "s") + ". "
+    + (have_entered ? have + " available: " + (cabinets_ok ? "enough. " : "SHORT by " + cabinets_short + ". ") : "")
+    + "THE RULE THAT ACTUALLY DECIDES THE SITE is the second sentence: not more than " + maxCab + " such cabinets in a single storage area. That is a hard ceiling of " + area_cap_cat123_gal + " gal of Category 1-3 (or " + area_cap_cat4_gal + " gal of Category 4) per area, and you cannot buy your way past it with another cabinet. "
+    + (room_required
+      ? "This quantity needs " + cabinets_needed + " cabinets, which EXCEEDS that limit" + (over_area_cap_gal > 0 ? " by " + over_area_cap_gal.toFixed(0) + " gal beyond what the area can hold in cabinets" : "") + ". The answer is not a fourth cabinet - it is either a second storage area genuinely separated from the first, or a specially constructed inside storage room, which is a building problem with fire-resistive construction, self-closing fire doors, a noncombustible sill or ramp, ventilation, and restricted electrical equipment. That is a different order of expense and it is why the ceiling matters at the planning stage rather than at the inspection. "
+      : "This quantity fits within " + maxCab + " cabinets, with " + (maxCab - cabinets_needed) + " cabinet" + (maxCab - cabinets_needed === 1 ? "" : "s") + " of headroom in the area. ")
+    + (too_many_cabinets ? "NOTE: " + have + " cabinets are entered as available in the area, which is more than the " + maxCab + " the standard permits in one storage area regardless of how full they are. " : "")
+    + "A naming note that trips people reading older references: the GHS-aligned categories replaced the old classes. What older text calls Class I and Class II is Category 1, 2, and 3; Class III is Category 4. A cabinet stencilled to the old scheme still holds the same gallons. "
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: whether the cabinet is approved and its construction, labelling, and venting; container and portable tank sizes and approvals by category; what may be stored outside a cabinet in the work area, which has its own much smaller limits; separation from ignition sources, exits, and stairways; dispensing, bonding, and grounding; inside storage room construction and its ventilation and electrical requirements; fire extinguisher provision; and any state or local amendment, which on flammables is common. A screen, not a fire-protection plan; 29 CFR 1926.152, NFPA 30 as adopted, and the AHJ govern.";
+
+  return { cabinets_for_123, cabinets_for_4, cabinets_needed, mixed, area_cap_cat123_gal, area_cap_cat4_gal, over_area_cap_gal, within_area_cap, room_required, have_entered, cabinets_ok, cabinets_short, too_many_cabinets, passes, note };
+}
+
+export const flammableCabinetStorageExample = { inputs: { cat123_gallons: 200, cat4_gallons: 0, cabinets_available: 4, per_cabinet_cat123_gal: 60, per_cabinet_cat4_gal: 120, max_cabinets_per_area: 3 } };
+
+CONSTRUCTION_RENDERERS["flammable-cabinet-storage"] = _simpleRenderer({
+  citation: "Citation: OSHA 29 CFR 1926.152(b)(3), a US federal regulation in the public domain - 'Not more than 60 gallons of Category 1, 2 and/or 3 flammable liquids or 120 gallons of Category 4 flammable liquids shall be stored in any one storage cabinet. Not more than three such cabinets may be located in a single storage area.' Quantities exceeding what cabinets may hold go to specially constructed inside storage rooms under the same section, whose fire-resistive construction, doors, sills, ventilation, and electrical requirements are not evaluated here. The standard gives no blending rule for a cabinet holding both category groups; the conservative reading used here is that each cap applies independently, so the cabinet count is the larger of the two rather than a sum. GHS-aligned categories replaced the older classes: Class I and II correspond to Categories 1, 2, and 3, and Class III to Category 4. Not checked: cabinet approval, construction, labelling, and venting; container and portable tank sizes; quantities permitted outside a cabinet in the work area; separation from ignition sources and exits; dispensing, bonding, and grounding; extinguisher provision; or state and local amendments. A screen, not a fire-protection plan; 1926.152, NFPA 30 as adopted, and the AHJ govern.",
+  example: flammableCabinetStorageExample.inputs,
+  fields: [
+    { key: "cat123_gallons", label: "Category 1/2/3 liquid to store (gal; old Class I and II)", kind: "number", default: 200 },
+    { key: "cat4_gallons", label: "Category 4 liquid to store (gal; old Class III)", kind: "number", default: 0 },
+    { key: "cabinets_available", label: "Cabinets available in the area (0 to skip)", kind: "number", default: 4 },
+    { key: "per_cabinet_cat123_gal", label: "Per-cabinet Category 1/2/3 limit (gal)", kind: "number", default: 60 },
+    { key: "per_cabinet_cat4_gal", label: "Per-cabinet Category 4 limit (gal)", kind: "number", default: 120 },
+    { key: "max_cabinets_per_area", label: "Cabinets permitted in one storage area", kind: "number", default: 3 },
+  ],
+  outputs: [
+    { key: "c", id: "fcs-out-c", label: "Cabinets needed", value: (r) => r.cabinets_needed + (r.mixed ? " (larger of the two category counts, not a sum)" : "") },
+    { key: "a", id: "fcs-out-a", label: "Area ceiling", value: (r) => fmt(r.area_cap_cat123_gal, 0) + " gal Cat 1-3 or " + fmt(r.area_cap_cat4_gal, 0) + " gal Cat 4 per storage area" },
+    { key: "r", id: "fcs-out-r", label: "Within the area ceiling?", value: (r) => r.within_area_cap ? "yes" : "NO - a fourth cabinet is not the answer; this needs a separate area or an inside storage room" },
+    { key: "h", id: "fcs-out-h", label: "Cabinets on hand", value: (r) => r.cabinets_ok === null ? "- (none entered)" : r.cabinets_ok ? "enough" + (r.too_many_cabinets ? ", but more than the area permits" : "") : "SHORT by " + r.cabinets_short },
+    { key: "v", id: "fcs-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "fcs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFlammableCabinetStorage,
+});

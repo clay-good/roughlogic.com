@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "flammable storage cabinet limit",
+      "target": "flammable-cabinet-storage",
+      "kind": "industry"
+    },
+    {
+      "term": "how many gallons in a flammable cabinet",
+      "target": "flammable-cabinet-storage",
+      "kind": "question"
+    },
+    {
+      "term": "how many flammable cabinets in one area",
+      "target": "flammable-cabinet-storage",
+      "kind": "question"
+    },
+    {
+      "term": "60 gallon class i liquid cabinet",
+      "target": "flammable-cabinet-storage",
+      "kind": "question"
+    },
+    {
+      "term": "inside storage room flammable liquids",
+      "target": "flammable-cabinet-storage",
+      "kind": "redirect"
+    },
+    {
       "term": "temporary stair angle",
       "target": "temporary-stairway-check",
       "kind": "industry"

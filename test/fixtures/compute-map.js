@@ -1372,6 +1372,7 @@ export const COMPUTE_MAP = {
   "excavation-protection-trigger": { module: "../../calc-construction.js", fn: "computeExcavationProtectionTrigger" },
   "scaffold-platform-check": { module: "../../calc-construction.js", fn: "computeScaffoldPlatformCheck" },
   "temporary-stairway-check": { module: "../../calc-construction.js", fn: "computeTemporaryStairwayCheck" },
+  "flammable-cabinet-storage": { module: "../../calc-construction.js", fn: "computeFlammableCabinetStorage" },
   "stair-code-check": { module: "../../calc-construction.js", fn: "computeStairCodeCheck" },
   "smooth-bore-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreFlow" },
   "smooth-bore-diameter-for-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreDiameterForFlow" },
