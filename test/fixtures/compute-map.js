@@ -839,6 +839,7 @@ export const COMPUTE_MAP = {
   "duct-hanger-load": { module: "../../calc-construction.js", fn: "computeDuctHangerLoad" },
   "roof-underlayment-rolls": { module: "../../calc-construction.js", fn: "computeRoofUnderlaymentRolls" },
   "membrane-roof-takeoff": { module: "../../calc-construction.js", fn: "computeMembraneRoofTakeoff" },
+  "membrane-fastener-takeoff": { module: "../../calc-construction.js", fn: "computeMembraneFastenerTakeoff" },
   "tapered-roof-insulation": { module: "../../calc-construction.js", fn: "computeTaperedRoofInsulation" },
   "sheathing-takeoff": { module: "../../calc-construction.js", fn: "computeSheathingTakeoff" },
   "construction-adhesive-tubes": { module: "../../calc-construction.js", fn: "computeConstructionAdhesiveTubes" },

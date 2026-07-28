@@ -10785,3 +10785,82 @@ CONSTRUCTION_RENDERERS["seismic-overturning-stability"] = _simpleRenderer({
   ],
   compute: computeSeismicOverturningStability,
 });
+
+
+// --- spec-v1126: mechanically attached single-ply fastener and plate takeoff ---
+// membrane-roof-takeoff ends "Fasteners, plates, and cover tape are taken off separately."
+// This is that takeoff. The seam length comes from that tile so the two cannot disagree.
+// A mechanically attached single-ply is fastened THROUGH the side lap, so the fastener rows
+// are the seams: rows = seam length / row spacing, and the row spacing is the usable sheet
+// width, not the nominal roll width. Within a row the on-center spacing, and the tighter
+// spacing in the perimeter and corner zones, are wind-uplift and FM-approval values that
+// belong to the project - they are INPUTS here, not built in.
+// dims: in { roof_area_sf: L^2, roll_width_ft: L, sidelap_in: L, field_spacing_in: L, perimeter_spacing_in: L, perimeter_fraction_pct: dimensionless, field_seam_covered: dimensionless, waste_pct: dimensionless } out: { seam_lf: L, field_fasteners: dimensionless, perimeter_fasteners: dimensionless, total_fasteners: dimensionless, plates: dimensionless, cover_tape_lf: L, fasteners_per_square: dimensionless }
+export function computeMembraneFastenerTakeoff({ roof_area_sf = 8000, roll_width_ft = 10, sidelap_in = 6, field_spacing_in = 12, perimeter_spacing_in = 6, perimeter_fraction_pct = 25, field_seam_covered = "no", waste_pct = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(roof_area_sf) || 0;
+  const rw = Number(roll_width_ft) || 0;
+  const lap = Number(sidelap_in) || 0;
+  const sf = Number(field_spacing_in) || 0;
+  const sp = Number(perimeter_spacing_in) || 0;
+  const pf = Number(perimeter_fraction_pct) || 0;
+  const waste = Number(waste_pct) || 0;
+  if (!(area > 0)) return { error: "Roof area must be positive (ft^2)." };
+  if (!(sf > 0)) return { error: "Field fastener spacing must be positive (in)." };
+  if (!(sp > 0)) return { error: "Perimeter fastener spacing must be positive (in)." };
+  if (pf < 0 || pf > 100) return { error: "Perimeter and corner share must be between 0 and 100 percent." };
+  if (waste < 0 || waste > 50) return { error: "Waste allowance must be between 0 and 50 percent." };
+
+  // Seam geometry delegated so the row layout matches the sheet takeoff exactly.
+  const sheet = computeMembraneRoofTakeoff({ roof_area_sf: area, roll_width_ft: rw, roll_length_ft: 100, sidelap_in: lap, waste_pct: 0 });
+  if (sheet.error) return { error: sheet.error };
+  const usable_w_ft = sheet.usable_w_ft;
+  const seam_lf = sheet.seam_lf;
+
+  const perimeter_lf = seam_lf * (pf / 100);
+  const field_lf = seam_lf - perimeter_lf;
+  const field_fasteners = Math.ceil(field_lf * 12 / sf);
+  const perimeter_fasteners = Math.ceil(perimeter_lf * 12 / sp);
+  const base_fasteners = field_fasteners + perimeter_fasteners;
+  const total_fasteners = Math.ceil(base_fasteners * (1 + waste / 100));
+  const plates = total_fasteners;
+  const covered = field_seam_covered === "yes";
+  const cover_tape_lf = covered ? Math.ceil(seam_lf * (1 + waste / 100)) : 0;
+  const fasteners_per_square = total_fasteners / (area / 100);
+  const avg_spacing_in = seam_lf > 0 ? seam_lf * 12 / base_fasteners : null;
+
+  const note = "Usable sheet width is " + usable_w_ft.toFixed(2) + " ft after the " + lap + " in side lap, so a " + area.toFixed(0) + " sq ft roof has " + seam_lf.toFixed(0) + " LF of seam - and on a mechanically attached system the seams ARE the fastener rows, because the fasteners go through the side lap and the next sheet welds over them. "
+    + "Rows land on the usable width, not the nominal " + rw + " ft roll width; using the nominal width undercounts the rows and the fasteners with them. "
+    + "At " + sf + " in on center in the field and " + sp + " in in the perimeter and corner zones, with " + pf + "% of the seam length in those zones, that is " + field_fasteners + " field plus " + perimeter_fasteners + " enhanced = " + base_fasteners + " fasteners, " + total_fasteners + " with " + waste + "% waste. "
+    + "One plate per fastener, so " + plates + " plates. That works out to " + fasteners_per_square.toFixed(1) + " per square and an average of " + avg_spacing_in.toFixed(1) + " in along the seam. "
+    + (covered ? "Cover tape over the full " + seam_lf.toFixed(0) + " LF of seam: " + cover_tape_lf + " LF ordered. Tape is only needed where fasteners land in the FIELD of a sheet rather than in a lap that gets welded over - if every fastener is in a side lap, this is zero. " : "No cover tape counted, which is right when every fastener sits in a side lap the next sheet welds over. Switch it on if the design puts fasteners in the field of a sheet, where they need a covered batten or tape strip. ")
+    + "The spacings are the whole design and they are NOT built in here: fastener on-center spacing, the width of the perimeter and corner zones, and the share of the roof they occupy come from the wind-uplift calculation and the assembly's FM or UL approval listing for the specific deck, insulation, and membrane. ASCE 7 sets the uplift pressures and the zones; the approval sets what spacing resists them. A takeoff aid, not an uplift design - the roofing manufacturer's approved assembly and the engineer of record govern.";
+
+  return { usable_w_ft, seam_lf, perimeter_lf, field_lf, field_fasteners, perimeter_fasteners, base_fasteners, total_fasteners, plates, cover_tape_lf, covered, fasteners_per_square, avg_spacing_in, note };
+}
+
+export const membraneFastenerTakeoffExample = { inputs: { roof_area_sf: 8000, roll_width_ft: 10, sidelap_in: 6, field_spacing_in: 12, perimeter_spacing_in: 6, perimeter_fraction_pct: 25, field_seam_covered: "no", waste_pct: 5 } };
+
+CONSTRUCTION_RENDERERS["membrane-fastener-takeoff"] = _simpleRenderer({
+  citation: "Citation: mechanically attached single-ply fastener geometry. On a mechanically attached system the fasteners go through the side lap and the next sheet welds over them, so the fastener rows are the seams: seam length = area / usable width, with usable width = roll width - side lap, delegated to the landed membrane-roof-takeoff tile so the two cannot disagree. Fastener count = seam length x 12 / on-center spacing, split between field and enhanced perimeter/corner spacing at the share of seam length the user enters; one plate per fastener; cover tape counted over the full seam length only when fasteners land in the field of a sheet rather than in a welded lap. The SPACINGS ARE INPUTS, not built in: on-center spacing, zone widths, and the share of the roof in the perimeter and corner zones come from the wind-uplift calculation and the assembly's FM or UL approval for the specific deck, insulation, and membrane. ASCE 7 sets the uplift pressures and zones; the approval listing sets the spacing that resists them. No approval table is reproduced. A takeoff aid, not an uplift design; the manufacturer's approved assembly and the engineer of record govern.",
+  example: membraneFastenerTakeoffExample.inputs,
+  fields: [
+    { key: "roof_area_sf", label: "Roof area (sq ft)", kind: "number", default: 8000 },
+    { key: "roll_width_ft", label: "Membrane roll width (ft)", kind: "number", default: 10 },
+    { key: "sidelap_in", label: "Side lap (in)", kind: "number", default: 6 },
+    { key: "field_spacing_in", label: "Field fastener spacing (in o.c.)", kind: "number", default: 12 },
+    { key: "perimeter_spacing_in", label: "Perimeter / corner spacing (in o.c.)", kind: "number", default: 6 },
+    { key: "perimeter_fraction_pct", label: "Share of seam in perimeter / corner zones (%)", kind: "number", default: 25 },
+    { key: "field_seam_covered", label: "Fasteners in the field of a sheet (need cover tape)?", kind: "select", options: [{ value: "no", label: "No - all fasteners in welded side laps", selected: true }, { value: "yes", label: "Yes - count cover tape" }] },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
+  ],
+  outputs: [
+    { key: "s", id: "mft-out-s", label: "Seam length (the fastener rows)", value: (r) => fmt(r.seam_lf, 0) + " LF on a " + fmt(r.usable_w_ft, 2) + " ft usable width" },
+    { key: "f", id: "mft-out-f", label: "Fasteners (field / perimeter)", value: (r) => r.field_fasteners + " / " + r.perimeter_fasteners + " = " + r.base_fasteners + ", " + r.total_fasteners + " with waste" },
+    { key: "p", id: "mft-out-p", label: "Plates", value: (r) => r.plates + " (one per fastener)" },
+    { key: "t", id: "mft-out-t", label: "Cover tape", value: (r) => r.covered ? r.cover_tape_lf + " LF" : "none - all fasteners in welded laps" },
+    { key: "d", id: "mft-out-d", label: "Density check", value: (r) => fmt(r.fasteners_per_square, 1) + " per square, averaging " + fmt(r.avg_spacing_in, 1) + " in along the seam" },
+    { key: "n", id: "mft-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMembraneFastenerTakeoff,
+});

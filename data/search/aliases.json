@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "membrane fastener takeoff",
+      "target": "membrane-fastener-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "how many fasteners for a tpo roof",
+      "target": "membrane-fastener-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "single ply plates and fasteners",
+      "target": "membrane-fastener-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "perimeter and corner fastener spacing",
+      "target": "membrane-fastener-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "roof membrane cover tape",
+      "target": "membrane-fastener-takeoff",
+      "kind": "redirect"
+    },
+    {
       "term": "barth velocity factor",
       "target": "gear-dynamic-tooth-stress",
       "kind": "industry"

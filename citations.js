@@ -9375,6 +9375,21 @@ export const CITATIONS = {
       { name: "Lap + waste", value: "~10% for head and side laps plus offcuts; the code sets the lap", source: "code / manufacturer" },
     ],
   },
+  "membrane-fastener-takeoff": {
+    formula: "usable width = roll width - side lap; seam length = area / usable width (delegated to membrane-roof-takeoff); perimeter seam = seam x share; field seam = seam - perimeter; fasteners = ceil(length x 12 / on-center spacing) for each zone; total = ceil(sum x (1 + waste)); plates = fasteners; cover tape = ceil(seam x (1 + waste)) only when fasteners land in the field of a sheet; density = fasteners / (area / 100).",
+    edition: "Mechanically attached single-ply geometry. The rows follow the seams because the fasteners pass through the side lap and the succeeding sheet is welded over them. Spacings and zone extents are project values from the wind-uplift calculation and the assembly approval, not from this tile.",
+    freeAccess: "The geometry is arithmetic. No FM Approvals or UL assembly table, and no manufacturer spacing chart, is reproduced here - none is used, because every spacing is an input.",
+    governance: GOVERNANCE.general,
+    editionNote: "The trap this tile exists to catch is the row spacing. Rows land on the USABLE sheet width, after the side lap is deducted - a 10 ft roll with a 6 in lap covers 9.5 ft, so an 8,000 sq ft roof has 842 LF of seam rather than 800, and sizing the rows off the nominal roll width undercounts the fasteners. The enhanced perimeter and corner spacing is entered as a share of the seam length rather than derived, because the zone widths depend on the building dimensions and height under ASCE 7 and the tile has no business guessing them. What the tile deliberately does NOT supply is the spacing itself: on-center spacing, the width of the perimeter and corner zones, and the share of the roof they occupy come from the wind-uplift pressures and from the specific assembly\'s FM or UL approval listing for that deck, insulation, and membrane - the approval is what establishes the tested resistance, and substituting a remembered number for it is how an assembly ends up unapproved. Cover tape is counted only when fasteners sit in the field of a sheet rather than in a lap the next sheet welds over; when every fastener is in a lap it is correctly zero. One plate per fastener. A takeoff aid, not an uplift design; the roofing manufacturer\'s approved assembly and the engineer of record govern.",
+    assumptions: [
+      { name: "Rows follow the seams", value: "fasteners pass through the side lap and are welded over", source: "mechanically attached single-ply practice" },
+      { name: "Usable width", value: "roll width minus side lap, delegated to membrane-roof-takeoff", source: "landed sibling tile" },
+      { name: "Spacings", value: "field and perimeter on-center spacing are INPUTS from the uplift design and the approval", source: "stated scope limit" },
+      { name: "Zone share", value: "perimeter and corner share of seam length entered by the user, not derived", source: "stated scope limit" },
+      { name: "Plates", value: "one per fastener", source: "assembly practice" },
+      { name: "Cover tape", value: "counted only for fasteners in the field of a sheet, zero when all are in welded laps", source: "assembly practice" },
+    ],
+  },
   "membrane-roof-takeoff": {
     formula: "usable_w_ft = roll_width_ft - sidelap_in/12; rolls = ceil(roof_area_sf x (1 + waste_pct/100) / (usable_w_ft x roll_length_ft)); seam_lf = roof_area_sf / usable_w_ft.",
     edition: "Single-ply membrane takeoff identity by name (usable width nets the side lap; rolls from area / usable coverage; seam from area / usable width); first-principles takeoff arithmetic.",

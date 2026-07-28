@@ -31720,3 +31720,73 @@ test("bounds: spec-v1125 computeGearDynamicToothStress reproduces the published 
   assert.ok("error" in _v1125({ ...base, tooth_system: "nope", y_diametral_override: 0 }));
   assert.ok("error" in _v1125({ ...base, horsepower: Infinity }));
 });
+
+import { computeMembraneFastenerTakeoff as _v1126 } from "../../calc-construction.js";
+import { computeMembraneRoofTakeoff as _v1126sib } from "../../calc-construction.js";
+
+test("bounds: spec-v1126 computeMembraneFastenerTakeoff pins the usable-width rows, the delegated seam length, zone splitting, and error seams", () => {
+  const base = { roof_area_sf: 8000, roll_width_ft: 10, sidelap_in: 6, field_spacing_in: 12, perimeter_spacing_in: 6, perimeter_fraction_pct: 25, field_seam_covered: "no", waste_pct: 5 };
+  const r = _v1126(base);
+  assert.ok(r.usable_w_ft === 9.5 && Math.abs(r.seam_lf - 8000 / 9.5) < 1e-9);
+  assert.ok(r.field_fasteners === 632 && r.perimeter_fasteners === 422 && r.base_fasteners === 1054 && r.total_fasteners === 1107);
+  assert.ok(r.plates === r.total_fasteners && r.cover_tape_lf === 0);
+  // THE TRAP: rows follow the USABLE width, so the seam is always longer than area/roll width.
+  assert.ok(r.seam_lf > 8000 / 10, "ignoring the lap would undercount the seam");
+  // CROSS-IMPLEMENTATION: the seam length must be exactly the sheet tile's.
+  for (const rw of [6, 10, 12]) {
+    for (const lap of [3, 6, 9]) {
+      const t = _v1126({ ...base, roll_width_ft: rw, sidelap_in: lap });
+      const sib = _v1126sib({ roof_area_sf: 8000, roll_width_ft: rw, roll_length_ft: 100, sidelap_in: lap, waste_pct: 0 });
+      assert.ok(t.seam_lf === sib.seam_lf && t.usable_w_ft === sib.usable_w_ft, "seam disagrees with the sheet tile");
+    }
+  }
+  // A wider sheet always means fewer seams and fewer fasteners at the same spacings.
+  let prevSeam = Infinity, prevF = Infinity;
+  for (const rw of [6, 8, 10, 12, 15]) {
+    const t = _v1126({ ...base, roll_width_ft: rw });
+    assert.ok(t.seam_lf < prevSeam && t.total_fasteners <= prevF);
+    prevSeam = t.seam_lf; prevF = t.total_fasteners;
+  }
+  // Zone split: the two lengths always sum to the seam, and tighter perimeter spacing
+  // always raises the count.
+  for (const pf of [0, 10, 25, 50, 100]) {
+    const t = _v1126({ ...base, perimeter_fraction_pct: pf });
+    assert.ok(Math.abs(t.field_lf + t.perimeter_lf - t.seam_lf) < 1e-9);
+    assert.ok(Math.abs(t.perimeter_lf - t.seam_lf * pf / 100) < 1e-9);
+  }
+  assert.ok(_v1126({ ...base, perimeter_fraction_pct: 0 }).perimeter_fasteners === 0);
+  assert.ok(_v1126({ ...base, perimeter_fraction_pct: 100 }).field_fasteners === 0);
+  assert.ok(_v1126({ ...base, perimeter_fraction_pct: 50 }).base_fasteners > r.base_fasteners, "more enhanced zone = more fasteners");
+  // Equal spacings make the zone share irrelevant.
+  const flat = _v1126({ ...base, perimeter_spacing_in: 12 });
+  const flat2 = _v1126({ ...base, perimeter_spacing_in: 12, perimeter_fraction_pct: 80 });
+  assert.ok(Math.abs(flat.base_fasteners - flat2.base_fasteners) <= 1);
+  // Tighter spacing always means more fasteners; density and average spacing stay consistent.
+  let prevN = 0;
+  for (const s of [24, 18, 12, 9, 6]) {
+    const t = _v1126({ ...base, field_spacing_in: s, perimeter_spacing_in: s });
+    assert.ok(t.total_fasteners > prevN); prevN = t.total_fasteners;
+    assert.ok(Math.abs(t.fasteners_per_square - t.total_fasteners / (8000 / 100)) < 1e-9);
+    assert.ok(Math.abs(t.avg_spacing_in - t.seam_lf * 12 / t.base_fasteners) < 1e-9);
+  }
+  // Plates always track fasteners exactly; waste scales the order, never the geometry.
+  for (const w of [0, 5, 20, 50]) {
+    const t = _v1126({ ...base, waste_pct: w });
+    assert.ok(t.plates === t.total_fasteners);
+    assert.ok(t.base_fasteners === r.base_fasteners, "waste must not change the base count");
+    assert.ok(t.total_fasteners === Math.ceil(r.base_fasteners * (1 + w / 100)));
+  }
+  // Cover tape is the full seam only when switched on.
+  const taped = _v1126({ ...base, field_seam_covered: "yes" });
+  assert.ok(taped.covered && taped.cover_tape_lf === Math.ceil(r.seam_lf * 1.05));
+  assert.ok(taped.total_fasteners === r.total_fasteners, "tape does not change the fastener count");
+  // Error seams.
+  assert.ok("error" in _v1126({ ...base, roof_area_sf: 0 }));
+  assert.ok("error" in _v1126({ ...base, field_spacing_in: 0 }));
+  assert.ok("error" in _v1126({ ...base, perimeter_spacing_in: 0 }));
+  assert.ok("error" in _v1126({ ...base, perimeter_fraction_pct: -1 }));
+  assert.ok("error" in _v1126({ ...base, perimeter_fraction_pct: 101 }));
+  assert.ok("error" in _v1126({ ...base, waste_pct: 60 }));
+  assert.ok("error" in _v1126({ ...base, sidelap_in: 240 }), "a lap wider than the roll leaves no usable width");
+  assert.ok("error" in _v1126({ ...base, roof_area_sf: Infinity }));
+});
