@@ -31428,3 +31428,74 @@ test("bounds: spec-v1121 computeTapingNormalTension pins cancellation, the 1/sqr
   assert.ok("error" in _v1121({ ...base, applied_pull_lb: -1 }));
   assert.ok("error" in _v1121({ ...base, span_ft: Infinity }));
 });
+
+import { computeCarpetSeamLayout as _v1122 } from "../../calc-construction.js";
+
+test("bounds: spec-v1122 computeCarpetSeamLayout pins the drop geometry, the orientation comparison, whole-repeat cutting, and error seams", () => {
+  const base = { room_length_ft: 30, room_width_ft: 20, roll_width_ft: 12, pattern_repeat_in: 0, waste_pct: 5, min_fill_strip_in: 6 };
+  const r = _v1122(base);
+  assert.ok(r.drops === 2 && r.seam_count === 1 && r.seam_length_ft === 30 && r.fill_strip_in === 96);
+  assert.ok(r.running_ft === 60 && r.alt_running_ft === 60 && r.alt_seam_count === 2, "same material, more seams the other way");
+  assert.ok(Math.abs(r.waste_actual_pct - 26) < 1e-9 && r.waste_sf === 156);
+  // A wider roll cuts the waste dramatically and can FLIP the winning orientation.
+  const wide = _v1122({ ...base, roll_width_ft: 15, pattern_repeat_in: 27 });
+  assert.ok(wide.waste_actual_pct < r.waste_actual_pct / 3 && wide.lengthwise_better === false);
+  assert.ok(Math.abs(wide.cut_length_ft - 20.25) < 1e-9 && Math.abs(wide.running_ft - 40.5) < 1e-9);
+  // Invariants that must hold for every room and roll.
+  for (const L of [8, 11, 14, 20, 30, 47]) {
+    for (const W of [9, 12, 13.5, 20, 33]) {
+      for (const RW of [6, 12, 13.5, 15]) {
+        const t = _v1122({ ...base, room_length_ft: L, room_width_ft: W, roll_width_ft: RW });
+        assert.ok(t.seam_count === t.drops - 1, "seams are always one fewer than drops");
+        assert.ok(t.drops >= 1 && Number.isInteger(t.drops));
+        assert.ok(t.fill_strip_in >= 0 && t.fill_strip_in <= RW * 12 + 1e-9);
+        // The chosen orientation never needs more roll than the alternative.
+        assert.ok(t.running_ft <= t.alt_running_ft + 1e-9);
+        // You can never order less carpet than the room area.
+        assert.ok(t.with_waste_sf >= t.room_sf - 1e-9 && t.waste_sf >= -1e-9);
+        assert.ok(Math.abs(t.roll_sf - t.running_ft * RW) < 1e-9);
+        assert.ok(Math.abs(t.sy - t.with_waste_sf / 9) < 1e-9);
+        assert.ok(Math.abs(t.order_running_ft * RW - t.with_waste_sf) < 1e-9);
+        assert.ok(t.seamless === (t.seam_count === 0));
+      }
+    }
+  }
+  // A room narrower than the roll in BOTH directions is seamless, one drop, no fill strip.
+  const small = _v1122({ ...base, room_length_ft: 14, room_width_ft: 11 });
+  assert.ok(small.seamless && small.drops === 1 && small.fill_strip_in === 0 && small.running_ft === 14);
+  // Exactly the roll width divides evenly: no fill strip, and the seam count steps at the boundary.
+  assert.ok(_v1122({ ...base, room_width_ft: 24 }).fill_strip_in === 0);
+  assert.ok(_v1122({ ...base, room_width_ft: 24 }).drops === 2);
+  assert.ok(_v1122({ ...base, room_width_ft: 24.01 }).drops === 3);
+  // A pattern repeat only ever LENGTHENS the cut, never shortens it, and lands on a whole repeat.
+  for (const rep of [9, 13, 18, 27, 36]) {
+    const t = _v1122({ ...base, pattern_repeat_in: rep });
+    // The run is the room dimension the drops travel along, which depends on the
+    // orientation the tile picked - a repeat can flip that choice, as 27 in does here.
+    const run = t.lengthwise_better ? 30 : 20;
+    assert.ok(t.cut_length_ft >= run - 1e-9);
+    assert.ok(Math.abs((t.cut_length_ft * 12 / rep) - Math.round(t.cut_length_ft * 12 / rep)) < 1e-9);
+    assert.ok(t.cut_length_ft - run < rep / 12 + 1e-9, "never rounds up by a whole extra repeat");
+  }
+  assert.ok(_v1122({ ...base, pattern_repeat_in: 27 }).lengthwise_better === false, "a repeat can flip the orientation");
+  // The narrow-fill flag fires only on a real, too-small strip.
+  const sq = { ...base, room_length_ft: 12.5, room_width_ft: 12.5 };
+  assert.ok(_v1122(sq).fill_strip_in === 6);
+  assert.ok(_v1122({ ...sq, min_fill_strip_in: 8 }).narrow_fill === true);
+  assert.ok(_v1122({ ...sq, min_fill_strip_in: 2 }).narrow_fill === false);
+  assert.ok(_v1122({ ...sq, min_fill_strip_in: 6 }).narrow_fill === false, "a strip exactly at the minimum is acceptable");
+  assert.ok(_v1122({ ...base, room_width_ft: 24 }).narrow_fill === false, "no strip at all is not a narrow strip");
+  // Waste allowance scales the order but never the geometry.
+  const w20 = _v1122({ ...base, waste_pct: 20 });
+  assert.ok(w20.drops === r.drops && w20.running_ft === r.running_ft);
+  assert.ok(Math.abs(w20.order_running_ft - r.running_ft * 1.2) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v1122({ ...base, room_length_ft: 0 }));
+  assert.ok("error" in _v1122({ ...base, room_width_ft: 0 }));
+  assert.ok("error" in _v1122({ ...base, roll_width_ft: 0 }));
+  assert.ok("error" in _v1122({ ...base, pattern_repeat_in: -1 }));
+  assert.ok("error" in _v1122({ ...base, waste_pct: -1 }));
+  assert.ok("error" in _v1122({ ...base, waste_pct: 60 }));
+  assert.ok("error" in _v1122({ ...base, min_fill_strip_in: -1 }));
+  assert.ok("error" in _v1122({ ...base, room_length_ft: Infinity }));
+});

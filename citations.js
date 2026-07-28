@@ -9496,6 +9496,21 @@ export const CITATIONS = {
       { name: "Average thickness", value: "the average pour depth from a floor-flatness survey; deep spots raise it", source: "field survey" },
     ],
   },
+  "carpet-seam-layout": {
+    formula: "drops = ceil(across / roll width); fill strip = (across - (drops - 1) x roll width) x 12 in; seams = drops - 1; seam length = seams x run; cut length = ceil(run x 12 / repeat) x repeat / 12 when a repeat is given; running length = drops x cut length; order = running x (1 + waste) ; actual waste % = (ordered area - room area) / room area x 100. Both orientations are computed and the one needing less roll is reported, with the other shown for comparison.",
+    edition: "Roll-goods layout geometry. No table, no fitted constant, and no proprietary data; the only judgment values are the waste allowance and the minimum acceptable fill-strip width, both editable inputs.",
+    freeAccess: "Elementary geometry - nothing here is licensed or tabulated.",
+    governance: GOVERNANCE.general,
+    editionNote: "The number worth seeing is the ACTUAL waste. Carpet is bought in one fixed width, so the waste is set by how the room divides into that width, not by a trim allowance: a 30 by 20 ft room off a 12 ft roll needs 60 linear ft either way, which is 720 sq ft of carpet for a 600 sq ft room - 26% over, against the 5% allowance a takeoff would apply. That gap is geometry and no amount of careful cutting recovers it; a 15 ft roll often does. The orientation comparison is the other point: here both directions take the same 60 ft, so the choice is entirely about seams (1 lengthwise versus 2 crosswise) and not about material at all. When the two differ, the tile reports both rather than picking for you, because a seam in the wrong place costs more than the yardage saved. A patterned carpet must be cut to whole repeats to match across a seam, so the cut length rounds UP to the repeat and the order grows accordingly. Scope: rectangular room, no credit for doorways, closets, bays, stairs, or transitions. Seam PLACEMENT is a craft decision this cannot make - seams run with the traffic and the light and not across a doorway - and nap direction must be consistent across every drop or the seams read as a color change. A takeoff aid; the installer\'s seam diagram and the carpet manufacturer\'s instructions govern.",
+    assumptions: [
+      { name: "Fixed roll width", value: "drops = ceil(across / roll width), remainder is a fill strip", source: "roll-goods geometry" },
+      { name: "Seam count", value: "drops - 1, each running the full length of the drop", source: "roll-goods geometry" },
+      { name: "Pattern repeat", value: "cut length rounds UP to a whole repeat so the pattern matches across a seam", source: "standard patterned-goods practice" },
+      { name: "Orientation", value: "both computed; the lower running length reported, the other shown", source: "computed, not assumed" },
+      { name: "Minimum fill strip", value: "6 in default, editable; a narrower strip is flagged as poor practice", source: "editable judgment input" },
+      { name: "Scope", value: "rectangular room, no openings, stairs, or transitions; seam placement is the installer's", source: "stated scope limit" },
+    ],
+  },
   "carpet-takeoff": {
     formula: "gross_sf = area_sf x (1 + waste_pct/100); carpet_sy = gross_sf / 9; linear_ft = gross_sf / roll_width_ft.",
     edition: "Carpet takeoff identity by name (gross area with waste, then square yards and roll length); first-principles unit conversion.",

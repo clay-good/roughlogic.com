@@ -849,6 +849,7 @@ export const COMPUTE_MAP = {
   "sealant-joint-yield": { module: "../../calc-construction.js", fn: "computeSealantJointYield" },
   "self-leveler-bags": { module: "../../calc-construction.js", fn: "computeSelfLevelerBags" },
   "carpet-takeoff": { module: "../../calc-construction.js", fn: "computeCarpetTakeoff" },
+  "carpet-seam-layout": { module: "../../calc-construction.js", fn: "computeCarpetSeamLayout" },
   "sfrm-takeoff": { module: "../../calc-construction.js", fn: "computeSfrmTakeoff" },
   "spray-foam-board-feet": { module: "../../calc-construction.js", fn: "computeSprayFoamBoardFeet" },
   "metal-deck-takeoff": { module: "../../calc-construction.js", fn: "computeMetalDeckTakeoff" },

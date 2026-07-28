@@ -10592,3 +10592,106 @@ CONSTRUCTION_RENDERERS["chip-seal-mcleod"] = _simpleRenderer({
   ],
   compute: computeChipSealMcleod,
 });
+
+
+// --- spec-v1122: carpet seam and drop layout ---
+// carpet-takeoff buys the yardage and says nothing about where the seams land - its own
+// description just charges "higher waste for seam layout and pattern" as a flat percentage.
+// This is that layout. Roll goods come in one fixed width, so a room wider than the roll
+// gets full drops plus a fill strip, and the ONLY real decision is which way to run the
+// roll: the direction with fewer seams is usually, but not always, the direction with less
+// waste, and the tile computes both and says which is which rather than assuming.
+// dims: in { room_length_ft: L, room_width_ft: L, roll_width_ft: L, pattern_repeat_in: L, waste_pct: dimensionless, min_fill_strip_in: L } out: { drops: dimensionless, fill_strip_in: L, seam_count: dimensionless, seam_length_ft: L, running_ft: L, roll_sf: L^2, room_sf: L^2, waste_sf: L^2, waste_actual_pct: dimensionless, alt_seam_count: dimensionless, alt_running_ft: L }
+export function computeCarpetSeamLayout({ room_length_ft = 0, room_width_ft = 0, roll_width_ft = 12, pattern_repeat_in = 0, waste_pct = 5, min_fill_strip_in = 6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(room_length_ft) || 0;
+  const W = Number(room_width_ft) || 0;
+  const RW = Number(roll_width_ft) || 0;
+  const rep = Number(pattern_repeat_in) || 0;
+  const waste = Number(waste_pct) || 0;
+  const minFill = Number(min_fill_strip_in) || 0;
+  if (!(L > 0) || !(W > 0)) return { error: "Room length and width must be positive (ft)." };
+  if (!(RW > 0)) return { error: "Roll width must be positive (ft)." };
+  if (rep < 0) return { error: "Pattern repeat cannot be negative (in)." };
+  if (waste < 0 || waste > 50) return { error: "Waste allowance must be between 0 and 50 percent." };
+  if (minFill < 0) return { error: "Minimum fill-strip width cannot be negative (in)." };
+
+  // One orientation: drops run the length of the room, laid across its width.
+  const lay = (runLen, acrossW) => {
+    const drops = Math.ceil(acrossW / RW);
+    const covered = drops * RW;
+    // The last drop's width. When it comes out full width the drops divide evenly and
+    // there is no fill strip at all, so report 0 rather than the roll width.
+    const last_in = drops > 1 ? (acrossW - (drops - 1) * RW) * 12 : 0;
+    const fill_in = Math.abs(last_in - RW * 12) < 1e-9 ? 0 : last_in;
+    // Each drop must be cut to a whole number of repeats so the pattern matches across a seam.
+    const cut_len_ft = rep > 0 ? Math.ceil(runLen * 12 / rep) * rep / 12 : runLen;
+    const running_ft = drops * cut_len_ft;
+    return { drops, covered, fill_in, cut_len_ft, running_ft, seam_count: Math.max(0, drops - 1), seam_length_ft: Math.max(0, drops - 1) * runLen };
+  };
+  const a = lay(L, W);   // drops run lengthwise
+  const b = lay(W, L);   // drops run crosswise
+  const lengthwise_better = a.running_ft <= b.running_ft;
+  const best = lengthwise_better ? a : b;
+  const alt = lengthwise_better ? b : a;
+
+  const room_sf = L * W;
+  const roll_sf = best.running_ft * RW;
+  const with_waste_sf = roll_sf * (1 + waste / 100);
+  const order_running_ft = with_waste_sf / RW;
+  const waste_sf = with_waste_sf - room_sf;
+  const waste_actual_pct = room_sf > 0 ? (waste_sf / room_sf) * 100 : null;
+  const sy = with_waste_sf / 9;
+  const narrow_fill = best.fill_in > 0 && best.fill_in < minFill;
+  const seamless = best.seam_count === 0;
+
+  const dir = lengthwise_better ? "along the " + L + " ft length" : "across the " + W + " ft width";
+  const note = (seamless
+    ? "SEAMLESS: the " + RW + " ft roll covers this room in one drop run " + dir + ", so there is no seam to place at all - which is worth reorienting a room for whenever it is possible. "
+    : best.drops + " drops run " + dir + ", giving " + best.seam_count + " seam" + (best.seam_count === 1 ? "" : "s") + " totalling " + best.seam_length_ft.toFixed(1) + " ft. ")
+    + (best.fill_in > 0
+      ? "The last drop is a " + best.fill_in.toFixed(1) + " in fill strip"
+      + (narrow_fill ? " - NARROWER than the " + minFill + " in you set as a minimum. A skinny fill strip is fragile, hard to stretch true, and shows; either shift the layout so the waste splits between two wider strips, or accept more waste to avoid it. " : ", wide enough to lay and stretch. ")
+      : "The drops divide the room evenly, with no fill strip. ")
+    + (alt.seam_count !== best.seam_count || Math.abs(alt.running_ft - best.running_ft) > 0.01
+      ? "Running the other way takes " + alt.drops + " drops, " + alt.seam_count + " seam" + (alt.seam_count === 1 ? "" : "s") + ", and " + alt.running_ft.toFixed(1) + " ft of roll against " + best.running_ft.toFixed(1) + " - "
+        + (alt.seam_count < best.seam_count ? "FEWER seams but more material, which is a judgment call rather than a calculation: a seam in the wrong place costs more than the yardage saved. "
+          : Math.abs(alt.running_ft - best.running_ft) < 0.01 ? "the same material for more seams, so this orientation wins outright. "
+          : "more of both, so this orientation wins outright. ")
+      : "Both orientations come out the same. ")
+    + (rep > 0 ? "Each drop is cut to a whole number of " + rep + " in repeats so the pattern matches across the seams, which is why the cut length is " + best.cut_len_ft.toFixed(2) + " ft rather than the room dimension. " : "No pattern repeat entered, so drops are cut to the room dimension; a patterned carpet must be cut to whole repeats and will need more. ")
+    + "Order " + order_running_ft.toFixed(1) + " linear ft off the " + RW + " ft roll (" + sy.toFixed(1) + " SY) at " + waste + "% waste, " + waste_actual_pct.toFixed(1) + "% over the room's " + room_sf.toFixed(0) + " sq ft once the drop geometry is counted. "
+    + "Rectangular room, no doorways, closets, or bays credited, and no allowance for a stair or a transition. Seams should run WITH the traffic and the light rather than across a doorway, so the layout this produces is a starting point a good installer will move. Nap direction must be consistent across every drop or the seams will read as a color change. A takeoff aid; the installer's seam diagram and the carpet manufacturer's instructions govern.";
+
+  return {
+    drops: best.drops, fill_strip_in: best.fill_in, seam_count: best.seam_count, seam_length_ft: best.seam_length_ft,
+    cut_length_ft: best.cut_len_ft, running_ft: best.running_ft, order_running_ft, roll_sf, with_waste_sf, sy,
+    room_sf, waste_sf, waste_actual_pct, lengthwise_better, narrow_fill, seamless,
+    alt_drops: alt.drops, alt_seam_count: alt.seam_count, alt_running_ft: alt.running_ft, note,
+  };
+}
+
+export const carpetSeamLayoutExample = { inputs: { room_length_ft: 30, room_width_ft: 20, roll_width_ft: 12, pattern_repeat_in: 0, waste_pct: 5, min_fill_strip_in: 6 } };
+
+CONSTRUCTION_RENDERERS["carpet-seam-layout"] = _simpleRenderer({
+  citation: "Citation: roll-goods layout geometry - drops = ceil(across / roll width), fill strip = the remainder, seams = drops - 1, running length = drops x cut length, and the cut length rounded up to a whole pattern repeat so the pattern matches across a seam. No table and no fitted constant; the only judgment values are the waste allowance and the minimum acceptable fill-strip width, both editable inputs. Both roll orientations are computed and compared rather than assumed. Rectangular room only, with no credit for doorways, closets, bays, stairs, or transitions. Seam PLACEMENT is a craft decision the geometry cannot make: seams run with the traffic and the light and not across a doorway, and nap direction must be consistent across every drop. A takeoff aid; the installer's seam diagram and the carpet manufacturer's instructions govern.",
+  example: carpetSeamLayoutExample.inputs,
+  fields: [
+    { key: "room_length_ft", label: "Room length (ft)", kind: "number", default: 30 },
+    { key: "room_width_ft", label: "Room width (ft)", kind: "number", default: 20 },
+    { key: "roll_width_ft", label: "Roll width (ft; 12 or 15 typical)", kind: "number", default: 12 },
+    { key: "pattern_repeat_in", label: "Pattern repeat (in; 0 for plain)", kind: "number", default: 0 },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
+    { key: "min_fill_strip_in", label: "Minimum acceptable fill strip (in)", kind: "number", default: 6 },
+  ],
+  outputs: [
+    { key: "d", id: "csl-out-d", label: "Drops and direction", value: (r) => r.drops + " drop" + (r.drops === 1 ? "" : "s") + " run " + (r.lengthwise_better ? "lengthwise" : "crosswise") },
+    { key: "s", id: "csl-out-s", label: "Seams", value: (r) => r.seamless ? "none - single drop covers it" : r.seam_count + " seam" + (r.seam_count === 1 ? "" : "s") + ", " + fmt(r.seam_length_ft, 1) + " ft total" },
+    { key: "f", id: "csl-out-f", label: "Fill strip", value: (r) => r.fill_strip_in <= 0 ? "none - drops divide evenly" : fmt(r.fill_strip_in, 1) + " in" + (r.narrow_fill ? " - too narrow, reconsider the layout" : "") },
+    { key: "o", id: "csl-out-o", label: "Order", value: (r) => fmt(r.order_running_ft, 1) + " LF of roll (" + fmt(r.sy, 1) + " SY), cut length " + fmt(r.cut_length_ft, 2) + " ft" },
+    { key: "w", id: "csl-out-w", label: "Actual waste over room area", value: (r) => fmt(r.waste_sf, 0) + " sq ft, " + fmt(r.waste_actual_pct, 1) + "% of " + fmt(r.room_sf, 0) + " sq ft" },
+    { key: "a", id: "csl-out-a", label: "The other orientation", value: (r) => r.alt_drops + " drops, " + r.alt_seam_count + " seam" + (r.alt_seam_count === 1 ? "" : "s") + ", " + fmt(r.alt_running_ft, 1) + " LF" },
+    { key: "n", id: "csl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCarpetSeamLayout,
+});
