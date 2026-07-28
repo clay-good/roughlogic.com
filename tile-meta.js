@@ -556,7 +556,7 @@ const _TILES = [
   ["control-joint-spacing", "E"],
   ["rebar-lap-splice", "E"],
   ["paver-patio", "E"],
-  ["retaining-wall-block", "E"],
+  ["retaining-wall-block", "E"], ["srw-geogrid-spacing", "E"],
   ["attic-ventilation", "E"], ["powered-attic-ventilator", "E"],
   ["gutter-downspout", "E"], ["gutter-downspout-takeoff", "E"], ["soffit-ridge-vent-count", "E"],
   ["assembly-r-value", "C"],

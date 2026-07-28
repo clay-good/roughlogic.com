@@ -1015,6 +1015,7 @@ export const COMPUTE_MAP = {
   "rebar-lap-splice": { module: "../../calc-construction.js", fn: "computeRebarLapSplice" },
   "paver-patio": { module: "../../calc-finish.js", fn: "computePaverPatio" },
   "retaining-wall-block": { module: "../../calc-finish.js", fn: "computeRetainingWallBlock" },
+  "srw-geogrid-spacing": { module: "../../calc-finish.js", fn: "computeSrwGeogridSpacing" },
   "attic-ventilation": { module: "../../calc-finish.js", fn: "computeAtticVentilation" },
   "powered-attic-ventilator": { module: "../../calc-construction.js", fn: "computePoweredAtticVentilator" },
   "gutter-downspout": { module: "../../calc-finish.js", fn: "computeGutterDownspout" },

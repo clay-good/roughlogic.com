@@ -2118,6 +2118,7 @@ cross-check.
 | calc-finish.js | `computeRetainingWallBlock` | `{ wall_length_ft = 0, exposed_height_ft = 0, block_length_in = 18, block_heig...` | _ | _ | _ |
 | calc-finish.js | `computeRoughOpeningSize` | `{ opening_type = "window", unit_width_in = 0, unit_height_in = 0, width_adder...` | _ | _ | _ |
 | calc-finish.js | `computeSoffitRidgeVentCount` | `{ attic_area_sf = 1500, vent_ratio = 300, soffit_vent_nfa_in2 = 26, ridge_nfa...` | _ | _ | _ |
+| calc-finish.js | `computeSrwGeogridSpacing` | `{ wall_height_ft = 0, block_depth_in = 12, block_height_in = 8, base_course_b...` | _ | _ | _ |
 | calc-finish.js | `computeStepFlashingCount` | `{ wall_run_ft = 20, shingle_exposure_in = 5, waste_pct = 5 } = {}` | _ | _ | _ |
 | calc-finish.js | `computeThinsetCoverage` | `{ area_sqft = 0, trowel = "quarter_three_eighths", coverage_per_bag = 0, bag_...` | _ | _ | _ |
 | calc-finish.js | `computeValleyFlashingTakeoff` | `{ valley_run_ft = 0, valley_count = 1, pitch_rise_per_12 = 6, metal_width_in ...` | _ | _ | _ |
@@ -3164,7 +3165,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1750.
+Row count: 1751.
 
 <!-- END function-corpus-v14 -->
 
@@ -3781,7 +3782,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (394 tiles)
+### Group E Construction (395 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4102,6 +4103,7 @@ per spec-v14 §13.1 second paragraph.
 | `spt-bearing-capacity` | SPT Allowable Bearing on Sand (Meyerhof) | Meyerhof / Das; spec-v415 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spt-required-n60` | Required SPT N60 for a Target Bearing (Meyerhof) | Meyerhof / Das; 5 ksf target, B 6 ft, D 2 ft -> N60 ~19.86 (design 20) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `square-footage` | Square Footage | Project (first-principles); 10 ft x 12 ft rectangle -> 120 ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `srw-geogrid-spacing` | SRW Geogrid Layer Spacing and Layout | Keystone Retaining Wall Systems (quot...; 'For a 8" tall x 9" deep unit, the vertical spacing is li... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stair-code-check` | Stair Geometry Code Check (IBC 1011 / IRC R311) | IBC 2021 §1011.5.2 / §1011.2 (by sect...; spec-v481 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stair-stringer` | Stair Stringer Length | Project (first-principles); 9 ft rise / 12 ft run -> 180 in stringer (15 ft); 21.09 B... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stair-stringer-layout` | Stair Stringer Layout (with code check) | IRC R311 (residential stair geometry;...; 108 in rise / 6.75 in preferred riser -> 16 risers / 6.75... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4853,6 +4855,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1503. Fixture-covered or reference-cadence: 1503 / 1503.
+Tile count: 1504. Fixture-covered or reference-cadence: 1504 / 1504.
 
 <!-- END tile-index-v14 -->

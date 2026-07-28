@@ -1737,6 +1737,36 @@
       "kind": "adjacent"
     },
     {
+      "term": "geogrid spacing",
+      "target": "srw-geogrid-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "how many layers of geogrid in a retaining wall",
+      "target": "srw-geogrid-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "segmental retaining wall reinforcement layout",
+      "target": "srw-geogrid-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum geogrid length for wall height",
+      "target": "srw-geogrid-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "block wall geogrid every how many courses",
+      "target": "srw-geogrid-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "srw compaction lift thickness",
+      "target": "srw-geogrid-spacing",
+      "kind": "redirect"
+    },
+    {
       "term": "fireplace flue size",
       "target": "fireplace-flue-area",
       "kind": "industry"

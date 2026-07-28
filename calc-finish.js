@@ -972,3 +972,98 @@ FINISH_RENDERERS["valley-flashing-takeoff"] = _simpleRenderer({
   ],
   compute: computeValleyFlashingTakeoff,
 });
+
+
+// --- spec-v1120: SRW geogrid layer spacing and layout ---
+// retaining-wall-block's own description ends with "over 4 ft needs an engineered design
+// with geogrid" and then stops. This is the layout half of that sentence: how many
+// reinforcement levels, at which courses, how long, and how much material - plus the
+// constructability check that three separate standards impose the same way and that gets
+// missed on site, because the spacing limit is set by the BLOCK, not by the soil.
+//   NCMA Design Manual 3rd ed. 7.2.2: 24 in suggested maximum, never more than 32 in, and
+//     for modular blocks 10 in deep or less no more than twice the unit depth.
+//   AASHTO LRFD 11.10.2.3.1: twice the unit width Wu or 2.7 ft, whichever is less.
+//   FHWA NHI-10-024 4.4.7.d: twice the block depth or 32 in, whichever is less.
+// The three agree on 2 x depth; they differ only in the absolute ceiling, so the tile takes
+// the most restrictive and says which rule produced it.
+// dims: in { wall_height_ft: L, block_depth_in: L, block_height_in: L, base_course_buried_in: L, ncma_suggested_max_in: L, grid_length_basis: dimensionless } out: { spacing_limit_in: L, actual_spacing_in: L, courses_per_layer: dimensionless, layer_count: dimensionless, first_layer_height_in: L, top_layer_height_in: L, unreinforced_crest_in: L, grid_length_ft: L, grid_sf_per_lf: L, compaction_lifts: dimensionless }
+export function computeSrwGeogridSpacing({ wall_height_ft = 0, block_depth_in = 12, block_height_in = 8, base_course_buried_in = 0, ncma_suggested_max_in = 24, grid_length_basis = 0.6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const H_ft = Number(wall_height_ft) || 0;
+  const Wu = Number(block_depth_in) || 0;
+  const hb = Number(block_height_in) || 0;
+  const buried = Number(base_course_buried_in) || 0;
+  const suggested = Number(ncma_suggested_max_in) || 0;
+  const basis = Number(grid_length_basis) || 0;
+  if (!(H_ft > 0)) return { error: "Wall height must be positive (ft)." };
+  if (!(Wu > 0)) return { error: "Block depth (front face to back face) must be positive (in)." };
+  if (!(hb > 0)) return { error: "Block height must be positive (in)." };
+  if (buried < 0) return { error: "Buried base-course depth cannot be negative (in)." };
+  if (!(suggested > 0) || suggested > 32) return { error: "The suggested maximum spacing must be between 0 and 32 in." };
+  if (!(basis >= 0.4) || basis > 1.2) return { error: "Grid length basis must be between 0.4 and 1.2 times the wall height." };
+
+  const H_in = H_ft * 12;
+  const twice_depth_in = 2 * Wu;
+  const aashto_ceiling_in = 2.7 * 12;
+  const absolute_ceiling_in = 32;
+  const spacing_limit_in = Math.min(twice_depth_in, absolute_ceiling_in, aashto_ceiling_in, suggested);
+  const governing_rule = spacing_limit_in === twice_depth_in ? "twice the block depth (all three standards)"
+    : spacing_limit_in === suggested ? "the NCMA suggested maximum of " + suggested + " in"
+    : "the 32 in absolute ceiling (NCMA/FHWA; AASHTO's 2.7 ft is 32.4 in)";
+
+  // Grid lands on a course JOINT, so the usable spacing is a whole number of courses.
+  const courses_per_layer = Math.floor(spacing_limit_in / hb);
+  if (courses_per_layer < 1) return { error: "The block is taller than the spacing limit - a single course already exceeds " + spacing_limit_in.toFixed(1) + " in, so this unit cannot be reinforced to these rules." };
+  const actual_spacing_in = courses_per_layer * hb;
+
+  // Levels are counted upward from the joint above the base course. The crest above the top
+  // layer is left unreinforced and is the height AASHTO asks the designer to evaluate.
+  const total_courses = Math.floor(H_in / hb);
+  const first_layer_height_in = hb;
+  const layer_count = total_courses >= 1 ? Math.floor((total_courses - 1) / courses_per_layer) + 1 : 0;
+  const top_layer_height_in = layer_count > 0 ? first_layer_height_in + (layer_count - 1) * actual_spacing_in : 0;
+  const unreinforced_crest_in = H_in - top_layer_height_in;
+
+  const grid_length_ft = Math.max(basis * H_ft, 4);
+  const length_governed_by_minimum = basis * H_ft < 4;
+  const grid_sf_per_lf = layer_count * grid_length_ft;
+  const compaction_lifts = Math.ceil(actual_spacing_in / 8);
+  const exposed_ft = Math.max(0, H_ft - buried / 12);
+
+  const note = "Spacing limit " + spacing_limit_in.toFixed(1) + " in, set by " + governing_rule
+    + ". A " + hb + " in block divides that into " + courses_per_layer + " whole course" + (courses_per_layer === 1 ? "" : "s") + ", so the working spacing is " + actual_spacing_in + " in - grid lands on a joint, never mid-block. "
+    + "That gives " + layer_count + " reinforcement level" + (layer_count === 1 ? "" : "s") + " on a " + H_ft + " ft wall, the first at " + first_layer_height_in + " in above the base and the top at " + top_layer_height_in + " in, leaving " + unreinforced_crest_in.toFixed(1) + " in of unreinforced facing above it"
+    + (unreinforced_crest_in > actual_spacing_in ? " - which EXCEEDS the layer spacing and is the facing height AASHTO 11.10.2.3.1 asks the designer to check for bulging; consider adding a level near the top. " : ". ")
+    + "Grid length " + grid_length_ft.toFixed(1) + " ft" + (length_governed_by_minimum ? " (the 4 ft practical minimum governs, not " + basis + "H)" : " at " + basis + " times the wall height, the NCMA minimum for global stability in good soil") + ", so about " + grid_sf_per_lf.toFixed(1) + " sq ft of grid per linear foot of wall. "
+    + "Each " + actual_spacing_in + " in of fill takes at least " + compaction_lifts + " compaction lift" + (compaction_lifts === 1 ? "" : "s") + ": NCMA caps a lift at 8 in loose thickness regardless of grid spacing, and that is the rule most often broken on a fast job. "
+    + (Wu <= 10 ? "This unit is 10 in deep or less, so NCMA's twice-the-depth rule applies to it explicitly rather than as general practice. " : "")
+    + (exposed_ft > 0 && buried > 0 ? "Exposed height is " + exposed_ft.toFixed(2) + " ft with " + buried + " in of base course buried; the spacing rules use the FULL wall height including the buried portion. " : "")
+    + "SCOPE: this is spacing, layout, and quantity only. It does NOT size the grid. The required long-term design strength, the pullout length beyond the failure plane, the block-to-grid connection strength, and global and compound stability all take a project-specific analysis with the soil report, the grid manufacturer's reduction factors, and the specific block. A wall over 4 ft, or any wall with a surcharge, slope above, or water, needs an engineered design. A layout and takeoff aid; the wall designer of record and the AHJ govern.";
+
+  return { spacing_limit_in, twice_depth_in, actual_spacing_in, courses_per_layer, total_courses, layer_count, first_layer_height_in, top_layer_height_in, unreinforced_crest_in, crest_exceeds_spacing: unreinforced_crest_in > actual_spacing_in, grid_length_ft, length_governed_by_minimum, grid_sf_per_lf, compaction_lifts, exposed_ft, governing_rule, note };
+}
+
+export const srwGeogridSpacingExample = { inputs: { wall_height_ft: 8, block_depth_in: 12, block_height_in: 8, base_course_buried_in: 6, ncma_suggested_max_in: 24, grid_length_basis: 0.6 } };
+
+FINISH_RENDERERS["srw-geogrid-spacing"] = _simpleRenderer({
+  citation: "Citation: geogrid vertical spacing limits as they appear in three independent documents that agree on the controlling rule - NCMA Design Manual for Segmental Retaining Walls, 3rd ed. Section 7.2.2 (24 in suggested maximum, never more than 32 in, and for modular blocks 10 in deep or less no more than twice the unit depth, with compaction lifts never exceeding 8 in), AASHTO LRFD Bridge Design Specifications 2016 Section 11.10.2.3.1 (twice the unit width Wu or 2.7 ft, whichever is less, plus an evaluation of the facing height above the uppermost reinforcement layer), and FHWA NHI-10-024 Section 4.4.7.d (twice the block depth or 32 in, whichever is less). Minimum grid length 0.6H per NCMA, which is the length that satisfies global stability for basic loading in good soil, with a 4 ft practical floor. The tile applies the most restrictive limit and names the rule that produced it; no proprietary table is reproduced. LAYOUT AND QUANTITY ONLY - it does not size the grid, check pullout, connection strength, or global stability. A wall over 4 ft needs an engineered design; the designer of record and the AHJ govern.",
+  example: srwGeogridSpacingExample.inputs,
+  fields: [
+    { key: "wall_height_ft", label: "Total wall height, including buried course (ft)", kind: "number", default: 8 },
+    { key: "block_depth_in", label: "Block depth, front face to back face (in)", kind: "number", default: 12 },
+    { key: "block_height_in", label: "Block height (in)", kind: "number", default: 8 },
+    { key: "base_course_buried_in", label: "Base course buried (in)", kind: "number", default: 6 },
+    { key: "ncma_suggested_max_in", label: "Suggested maximum spacing (in)", kind: "number", default: 24 },
+    { key: "grid_length_basis", label: "Grid length as a fraction of wall height", kind: "number", default: 0.6 },
+  ],
+  outputs: [
+    { key: "l", id: "srwg-out-l", label: "Governing spacing limit", value: (r) => fmt(r.spacing_limit_in, 1) + " in - " + r.governing_rule },
+    { key: "s", id: "srwg-out-s", label: "Working spacing (whole courses)", value: (r) => r.actual_spacing_in + " in (" + r.courses_per_layer + " course" + (r.courses_per_layer === 1 ? "" : "s") + ")" },
+    { key: "c", id: "srwg-out-c", label: "Reinforcement levels", value: (r) => r.layer_count + " (first at " + r.first_layer_height_in + " in, top at " + r.top_layer_height_in + " in)" },
+    { key: "u", id: "srwg-out-u", label: "Unreinforced facing above the top layer", value: (r) => fmt(r.unreinforced_crest_in, 1) + " in" + (r.crest_exceeds_spacing ? " - exceeds the layer spacing, check facing stability" : "") },
+    { key: "g", id: "srwg-out-g", label: "Grid length and quantity", value: (r) => fmt(r.grid_length_ft, 1) + " ft deep" + (r.length_governed_by_minimum ? " (4 ft minimum governs)" : "") + ", " + fmt(r.grid_sf_per_lf, 1) + " sq ft per LF of wall" },
+    { key: "p", id: "srwg-out-p", label: "Compaction lifts between layers", value: (r) => r.compaction_lifts + " at the 8 in maximum" },
+    { key: "n", id: "srwg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSrwGeogridSpacing,
+});

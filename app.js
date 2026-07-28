@@ -541,7 +541,7 @@ const TOOL_MODULES = (() => {
     // v95 interior finish
     "thinset-coverage", "flooring-takeoff",
     // v97 hardscape
-    "paver-patio", "retaining-wall-block",
+    "paver-patio", "retaining-wall-block", "srw-geogrid-spacing",
     // v98 roofing trim-out
     "attic-ventilation", "soffit-ridge-vent-count", "gutter-downspout", "gutter-downspout-takeoff", "deck-board-takeoff", "rough-opening-size", "closet-shelf-takeoff", "countertop-overhang-support", "cabinet-linear-feet", "drip-edge-takeoff", "valley-flashing-takeoff", "glass-weight",
     "cement-board-takeoff",

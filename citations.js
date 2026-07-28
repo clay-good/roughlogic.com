@@ -11425,6 +11425,22 @@ export const CITATIONS = {
       { name: "Base depth band", value: "~4-6 in walkway/patio, 8-12 in driveway, ~1 in bedding sand (editable)", source: "ICPI" },
     ],
   },
+  "srw-geogrid-spacing": {
+    formula: "spacing limit = min(2 x block depth, 32 in, 2.7 ft, suggested max); working spacing = floor(limit / block height) x block height; levels = floor((floor(H/hb) - 1) / courses_per_layer) + 1, first level one course above the base; unreinforced crest = H - top level height; grid length = max(0.6 H, 4 ft); grid area = levels x length; compaction lifts = ceil(spacing / 8 in).",
+    edition: "NCMA Design Manual for Segmental Retaining Walls, 3rd edition, Section 7.2.2; AASHTO LRFD Bridge Design Specifications 2016, Section 11.10.2.3.1; FHWA NHI-10-024, Section 4.4.7.d. All three are quoted side by side in Keystone Retaining Wall Systems TIS-15 (2021), whose two published spacing examples this tile reproduces exactly.",
+    freeAccess: "The spacing rule is stated identically in three independent design documents and is reproduced in manufacturers' free technical bulletins. No proprietary geogrid strength table, reduction factor, or connection curve is reproduced here - none is used.",
+    governance: GOVERNANCE.general,
+    editionNote: "The point of the tile is that the vertical spacing limit comes from the BLOCK, not from the soil or the loading: all three standards cap it at twice the unit depth, and they differ only in the absolute ceiling (NCMA and FHWA say 32 in, AASHTO says 2.7 ft, which is 32.4 in, and NCMA separately suggests 24 in to reduce construction stability problems). NCMA states the twice-the-depth rule explicitly for modular blocks 10 in deep or less; the other two apply it generally. Because grid lands on a course joint and never mid-block, the limit divides into whole courses and rounds DOWN - the two examples in Keystone TIS-15 make this concrete, an 8 in tall by 9 in deep unit being limited to 18 in but built at 16, and a 6 in tall by 10 in deep unit limited to 20 but built at 18. Both are pinned as fixtures. The unreinforced facing above the uppermost layer is reported because AASHTO 11.10.2.3.1 asks for it to be evaluated for bulging, and it is easy to leave too tall when the courses do not divide evenly. Compaction lifts are capped at 8 in loose thickness regardless of grid spacing. SCOPE: layout, spacing compliance, and quantity ONLY. This tile does not size the reinforcement - the required long-term design strength, pullout length beyond the failure plane, block-to-grid connection strength, and global and compound stability all require a project-specific analysis with the geotechnical report, the manufacturer\'s reduction factors, and the specific unit. A wall over 4 ft, or any wall with a surcharge, a slope above, or water, needs an engineered design. The designer of record and the AHJ govern.",
+    assumptions: [
+      { name: "Twice the unit depth", value: "the controlling spacing rule in all three standards", source: "NCMA 7.2.2 / AASHTO 11.10.2.3.1 / FHWA NHI-10-024 4.4.7.d" },
+      { name: "Absolute ceiling", value: "32 in (NCMA, FHWA); AASHTO 2.7 ft = 32.4 in; the most restrictive is applied", source: "the three cited sections" },
+      { name: "NCMA suggested maximum", value: "24 in, editable; reduces construction stability issues", source: "NCMA 7.2.2" },
+      { name: "Whole-course rounding", value: "grid lands on a joint, so the limit rounds DOWN to a course multiple", source: "Keystone TIS-15 worked examples" },
+      { name: "Minimum grid length", value: "0.6 times wall height, with a 4 ft practical floor", source: "NCMA global-stability minimum" },
+      { name: "Compaction lift", value: "8 in loose maximum regardless of grid spacing", source: "NCMA 7.2.2" },
+      { name: "Not a strength design", value: "no LTDS, pullout, connection, or global-stability check", source: "stated scope limit" },
+    ],
+  },
   "retaining-wall-block": {
     formula: "Buried = max(1 in/ft of height, one block height); courses = ceil(total height / block height); total = courses x ceil(run x 12 / block length); gravel by zone geometry.",
     edition: "Segmental retaining-wall maker guidance (Allan Block / Versa-Lok, by name).",

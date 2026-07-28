@@ -31301,3 +31301,63 @@ test("bounds: spec-v1119 computeFireplaceFlueArea pins the three IRC R1003.15.1 
   assert.ok("error" in _v1119({ ...base, flue_shape: "round", flue_inside_dia_in: 0 }));
   assert.ok("error" in _v1119({ ...base, opening_width_in: Infinity }));
 });
+
+import { computeSrwGeogridSpacing as _v1120 } from "../../calc-finish.js";
+
+test("bounds: spec-v1120 computeSrwGeogridSpacing pins both Keystone TIS-15 examples, the three standards' spacing ceilings, whole-course rounding, and error seams", () => {
+  const base = { wall_height_ft: 8, block_depth_in: 12, block_height_in: 8, base_course_buried_in: 6, ncma_suggested_max_in: 24, grid_length_basis: 0.6 };
+  const r = _v1120(base);
+  assert.ok(r.spacing_limit_in === 24 && r.actual_spacing_in === 24 && r.courses_per_layer === 3 && r.layer_count === 4);
+  // The two PUBLISHED examples, which differ in how the limit rounds.
+  const ex1 = _v1120({ ...base, block_depth_in: 9, block_height_in: 8, base_course_buried_in: 0 });
+  assert.ok(ex1.spacing_limit_in === 18 && ex1.actual_spacing_in === 16 && ex1.courses_per_layer === 2);
+  const ex2 = _v1120({ ...base, block_depth_in: 10, block_height_in: 6, base_course_buried_in: 0 });
+  assert.ok(ex2.spacing_limit_in === 20 && ex2.actual_spacing_in === 18 && ex2.courses_per_layer === 3);
+  // The limit is ALWAYS the most restrictive of 2x depth, 32 in, AASHTO's 2.7 ft, and the suggested max.
+  for (const depth of [6, 8, 9, 10, 12, 16, 24, 40]) {
+    for (const sug of [18, 24, 32]) {
+      const t = _v1120({ ...base, block_depth_in: depth, ncma_suggested_max_in: sug });
+      assert.ok(Math.abs(t.spacing_limit_in - Math.min(2 * depth, 32, 2.7 * 12, sug)) < 1e-9, "limit wrong at depth " + depth);
+      // Working spacing never exceeds the limit and is always a whole number of courses.
+      assert.ok(t.actual_spacing_in <= t.spacing_limit_in + 1e-9);
+      assert.ok(Math.abs(t.actual_spacing_in / base.block_height_in - t.courses_per_layer) < 1e-12);
+    }
+  }
+  // A deeper block can never force a TIGHTER limit.
+  let prev = 0;
+  for (const depth of [4, 6, 9, 12, 20]) {
+    const t = _v1120({ ...base, block_depth_in: depth, ncma_suggested_max_in: 32 });
+    assert.ok(t.spacing_limit_in >= prev); prev = t.spacing_limit_in;
+  }
+  // Layer geometry is internally consistent: the top layer sits where the count puts it,
+  // and the unreinforced crest is whatever is left.
+  for (const H of [4, 6, 8, 10, 14]) {
+    const t = _v1120({ ...base, wall_height_ft: H });
+    assert.ok(Math.abs(t.top_layer_height_in - (t.first_layer_height_in + (t.layer_count - 1) * t.actual_spacing_in)) < 1e-9);
+    assert.ok(Math.abs(t.unreinforced_crest_in - (H * 12 - t.top_layer_height_in)) < 1e-9);
+    assert.ok(t.unreinforced_crest_in >= 0 && t.layer_count >= 1);
+    assert.ok(Math.abs(t.grid_sf_per_lf - t.layer_count * t.grid_length_ft) < 1e-9);
+  }
+  // Grid length: 0.6H until the 4 ft floor takes over, and the flag tracks which.
+  assert.ok(Math.abs(r.grid_length_ft - 4.8) < 1e-9 && !r.length_governed_by_minimum);
+  const shortWall = _v1120({ ...base, wall_height_ft: 5 });
+  assert.ok(shortWall.grid_length_ft === 4 && shortWall.length_governed_by_minimum);
+  assert.ok(Math.abs(_v1120({ ...base, wall_height_ft: 20 }).grid_length_ft - 12) < 1e-9);
+  // Compaction lifts never let a lift exceed 8 in.
+  for (const t of [r, ex1, ex2]) assert.ok(t.actual_spacing_in / t.compaction_lifts <= 8 + 1e-9);
+  // Buried depth changes the exposed height but NEVER the spacing rules.
+  const buriedMore = _v1120({ ...base, base_course_buried_in: 12 });
+  assert.ok(buriedMore.actual_spacing_in === r.actual_spacing_in && buriedMore.layer_count === r.layer_count);
+  assert.ok(Math.abs(buriedMore.exposed_ft - 7) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v1120({ ...base, wall_height_ft: 0 }));
+  assert.ok("error" in _v1120({ ...base, block_depth_in: 0 }));
+  assert.ok("error" in _v1120({ ...base, block_height_in: 0 }));
+  assert.ok("error" in _v1120({ ...base, base_course_buried_in: -1 }));
+  assert.ok("error" in _v1120({ ...base, ncma_suggested_max_in: 40 }));
+  assert.ok("error" in _v1120({ ...base, grid_length_basis: 0.3 }));
+  assert.ok("error" in _v1120({ ...base, grid_length_basis: 1.5 }));
+  // A block taller than its own spacing limit cannot be reinforced to these rules at all.
+  assert.ok("error" in _v1120({ ...base, block_depth_in: 6, block_height_in: 16 }));
+  assert.ok("error" in _v1120({ ...base, wall_height_ft: Infinity }));
+});
