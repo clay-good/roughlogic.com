@@ -11022,3 +11022,81 @@ CONSTRUCTION_RENDERERS["egress-window-check"] = _simpleRenderer({
   ],
   compute: computeEgressWindowCheck,
 });
+
+
+// --- spec-v1133: stairway and exterior-door landing check ---
+// stair-stringer-layout lays out the flight and the stair-code tile checks the riser and
+// tread. Neither checks the flat part at each end, which has its own rules and its own
+// classic failures. IRC R311.7.6: a floor or landing at the top AND bottom of every
+// stairway, at least as WIDE as the flight it serves, and at least 36 in DEEP in the
+// direction of travel on a straight run. IRC R311.3: a landing on each side of an exterior
+// door, also 36 in in the direction of travel, with the floor or landing at the required
+// exit door not more than 1.5 in below the top of the threshold.
+// The 1.5 in rule is the one that catches people: a landing set a full step down at a door
+// is a fall, not a step, and it fails whether or not the landing itself is big enough.
+// dims: in { landing_depth_in: L, landing_width_in: L, flight_width_in: L, threshold_drop_in: L, kind: dimensionless, min_depth_in: L, max_threshold_drop_in: L } out: { depth_deficit_in: L, width_deficit_in: L, drop_excess_in: L, min_landing_area_sf: L^2 }
+export function computeLandingCheck({ landing_depth_in = 0, landing_width_in = 0, flight_width_in = 36, threshold_drop_in = 0, kind = "stair", min_depth_in = 36, max_threshold_drop_in = 1.5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const d = Number(landing_depth_in) || 0;
+  const w = Number(landing_width_in) || 0;
+  const fw = Number(flight_width_in) || 0;
+  const drop = Number(threshold_drop_in) || 0;
+  const minD = Number(min_depth_in) || 0;
+  const maxDrop = Number(max_threshold_drop_in) || 0;
+  if (!(d > 0)) return { error: "Landing depth in the direction of travel must be positive (in)." };
+  if (!(w > 0)) return { error: "Landing width must be positive (in)." };
+  if (!(fw > 0)) return { error: "Served flight or door width must be positive (in)." };
+  if (drop < 0) return { error: "Threshold drop cannot be negative (in) - a landing above the threshold is a different condition." };
+  if (!(minD > 0)) return { error: "Minimum landing depth must be positive (in)." };
+  if (maxDrop < 0) return { error: "Maximum threshold drop cannot be negative (in)." };
+
+  const is_door = kind === "door";
+  const depth_ok = d >= minD;
+  const width_ok = w >= fw;
+  const depth_deficit_in = Math.max(0, minD - d);
+  const width_deficit_in = Math.max(0, fw - w);
+  // The threshold drop only applies at a door.
+  const drop_ok = is_door ? drop <= maxDrop : null;
+  const drop_excess_in = is_door ? Math.max(0, drop - maxDrop) : 0;
+  const passes = depth_ok && width_ok && (drop_ok !== false);
+  const min_landing_area_sf = (minD * fw) / 144;
+  const provided_area_sf = (d * w) / 144;
+
+  const note = (is_door
+    ? "IRC R311.3 at an exterior door: a landing on each side, not less than " + minD + " in measured in the DIRECTION OF TRAVEL, at least as wide as the door it serves, and - the rule that catches people - the floor or landing at the required exit door not more than " + maxDrop + " in below the top of the threshold. "
+    : "IRC R311.7.6 at a stairway: a floor or landing at the TOP AND BOTTOM of every flight, at least as WIDE as the flight it serves, and on a straight run at least " + minD + " in deep in the direction of travel. ")
+    + "This landing is " + d + " in deep by " + w + " in wide serving a " + fw + " in " + (is_door ? "door" : "flight") + ": depth " + (depth_ok ? "OK" : "SHORT by " + depth_deficit_in.toFixed(1) + " in") + ", width " + (width_ok ? "OK" : "SHORT by " + width_deficit_in.toFixed(1) + " in")
+    + (is_door ? ", threshold drop " + drop + " in " + (drop_ok ? "OK" : "EXCEEDS the limit by " + drop_excess_in.toFixed(2) + " in") : "") + ". " + (passes ? "PASSES. " : "DOES NOT PASS. ")
+    + "The smallest compliant landing here is " + minD + " x " + fw + " in = " + min_landing_area_sf.toFixed(2) + " sq ft; this one is " + provided_area_sf.toFixed(2) + " sq ft. Area alone does not settle it - a landing can have plenty of area and still fail on depth, because the " + minD + " in is measured along the path a person actually walks, not across the landing. "
+    + (is_door
+      ? "The threshold rule is worth restating: a landing set a full step below a door is a fall, not a step, and it fails whether or not the landing itself is big enough. Exceptions exist for a door that does not swing over the landing and for certain non-required doors, and a screen door or storm door swinging out over the landing changes the geometry - check the section as adopted. "
+      : "Depth is measured in the direction of travel, so on a straight run it is the dimension you walk across; a landing where the stair turns has its own geometry and the straight-run number does not simply apply. ")
+    + "Both minimums are editable inputs because commercial work and local amendments differ - IBC stairway landings follow their own section, and an accessible route under ANSI A117.1 and the ADA Standards wants more than either. Not checked here: whether a landing is required at all in the specific configuration (there are exceptions, including the common one for a door at the top of an interior flight), guards and handrail extensions over the landing, headroom, slope and drainage on an exterior landing, or the framing that carries it. A screen, not a code-official determination; the adopted code and the AHJ govern.";
+
+  return { depth_ok, width_ok, drop_ok, is_door, passes, depth_deficit_in, width_deficit_in, drop_excess_in, min_landing_area_sf, provided_area_sf, note };
+}
+
+export const landingCheckExample = { inputs: { landing_depth_in: 36, landing_width_in: 36, flight_width_in: 36, threshold_drop_in: 1.5, kind: "door", min_depth_in: 36, max_threshold_drop_in: 1.5 } };
+
+CONSTRUCTION_RENDERERS["landing-check"] = _simpleRenderer({
+  citation: "Citation: IRC R311.7.6 - a floor or landing at the top and bottom of each stairway, the width perpendicular to the direction of travel not less than the width of the flight served, and where the stairway has a straight run the depth in the direction of travel not less than 36 in. IRC R311.3 - landings at exterior doors not less than 36 in measured in the direction of travel, with the floor or landing at the required exit door not more than 1.5 in lower than the top of the threshold. Both minimums are editable inputs because IBC stairway landings follow their own section, local amendments exist, and an accessible route under ANSI A117.1 and the ADA Standards requires more than either. Whether a landing is required at all in a given configuration, the exceptions, guards and handrail extensions, headroom, exterior slope and drainage, and the supporting framing are not checked. A screen, not a code-official determination; the adopted code and the AHJ govern.",
+  example: landingCheckExample.inputs,
+  fields: [
+    { key: "kind", label: "Landing serves", kind: "select", options: [{ value: "stair", label: "A stairway (R311.7.6)", selected: true }, { value: "door", label: "An exterior door (R311.3)" }] },
+    { key: "landing_depth_in", label: "Landing depth in the direction of travel (in)", kind: "number", default: 36 },
+    { key: "landing_width_in", label: "Landing width (in)", kind: "number", default: 36 },
+    { key: "flight_width_in", label: "Width of the flight or door served (in)", kind: "number", default: 36 },
+    { key: "threshold_drop_in", label: "Landing below the threshold (in; doors only)", kind: "number", default: 0 },
+    { key: "min_depth_in", label: "Minimum landing depth (in; IRC 36)", kind: "number", default: 36 },
+    { key: "max_threshold_drop_in", label: "Maximum threshold drop (in; IRC 1.5)", kind: "number", default: 1.5 },
+  ],
+  outputs: [
+    { key: "v", id: "lnd-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES" : "FAILS: " + [!r.depth_ok ? "depth short " + fmt(r.depth_deficit_in, 1) + " in" : null, !r.width_ok ? "width short " + fmt(r.width_deficit_in, 1) + " in" : null, r.drop_ok === false ? "threshold drop over by " + fmt(r.drop_excess_in, 2) + " in" : null].filter(Boolean).join(", ") },
+    { key: "d", id: "lnd-out-d", label: "Depth in the direction of travel", value: (r) => r.depth_ok ? "OK" : "SHORT by " + fmt(r.depth_deficit_in, 1) + " in" },
+    { key: "w", id: "lnd-out-w", label: "Width against the served opening", value: (r) => r.width_ok ? "OK" : "SHORT by " + fmt(r.width_deficit_in, 1) + " in" },
+    { key: "t", id: "lnd-out-t", label: "Threshold drop", value: (r) => r.drop_ok === null ? "- (stairway landing; the threshold rule is a door rule)" : r.drop_ok ? "OK" : "OVER by " + fmt(r.drop_excess_in, 2) + " in" },
+    { key: "a", id: "lnd-out-a", label: "Smallest compliant landing here", value: (r) => fmt(r.min_landing_area_sf, 2) + " sq ft; this one is " + fmt(r.provided_area_sf, 2) },
+    { key: "n", id: "lnd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLandingCheck,
+});

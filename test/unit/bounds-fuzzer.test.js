@@ -32143,3 +32143,54 @@ test("bounds: spec-v1132 computeFixtureClearanceCheck pins the four IPC 405.3.1 
   assert.ok("error" in _v1132({ ...base, min_side_in: 0 }));
   assert.ok("error" in _v1132({ ...base, center_to_left_in: Infinity }));
 });
+
+import { computeLandingCheck as _v1133 } from "../../calc-construction.js";
+
+test("bounds: spec-v1133 computeLandingCheck pins the directional depth rule, the door-only threshold rule, and error seams", () => {
+  const base = { landing_depth_in: 36, landing_width_in: 36, flight_width_in: 36, threshold_drop_in: 1.5, kind: "door", min_depth_in: 36, max_threshold_drop_in: 1.5 };
+  const r = _v1133(base);
+  assert.ok(r.passes && r.depth_ok && r.width_ok && r.drop_ok === true && r.is_door);
+  assert.ok(r.min_landing_area_sf === 9 && r.provided_area_sf === 9);
+  // THE TRAP: more area than the minimum, and it still fails on directional depth.
+  const wide = _v1133({ ...base, landing_depth_in: 30, landing_width_in: 48, threshold_drop_in: 0 });
+  assert.ok(wide.provided_area_sf > wide.min_landing_area_sf && !wide.depth_ok && !wide.passes);
+  assert.ok(wide.width_ok && wide.depth_deficit_in === 6);
+  // Boundary values are compliant, one tenth under is not.
+  assert.ok(_v1133({ ...base, landing_depth_in: 36 }).depth_ok && !_v1133({ ...base, landing_depth_in: 35.9 }).depth_ok);
+  assert.ok(_v1133({ ...base, landing_width_in: 36 }).width_ok && !_v1133({ ...base, landing_width_in: 35.9 }).width_ok);
+  assert.ok(_v1133({ ...base, threshold_drop_in: 1.5 }).drop_ok && !_v1133({ ...base, threshold_drop_in: 1.51 }).drop_ok);
+  // The threshold rule is a DOOR rule only - a stairway landing gets no verdict on it.
+  const stair = _v1133({ ...base, kind: "stair", threshold_drop_in: 12 });
+  assert.ok(stair.drop_ok === null && !stair.is_door && stair.drop_excess_in === 0 && stair.passes);
+  assert.ok(stair.depth_ok === r.depth_ok && stair.width_ok === r.width_ok, "the other two rules are identical either way");
+  // Width is measured against the SERVED opening, not a fixed number.
+  for (const fw of [30, 36, 42, 48]) {
+    const t = _v1133({ ...base, flight_width_in: fw });
+    assert.ok(t.width_ok === (36 >= fw) && t.width_deficit_in === Math.max(0, fw - 36));
+    assert.ok(Math.abs(t.min_landing_area_sf - 36 * fw / 144) < 1e-12, "the minimum area follows the served width");
+  }
+  // Deficits are exact and never negative, over a sweep.
+  for (const d of [24, 30, 36, 48]) {
+    for (const w of [30, 36, 48]) {
+      for (const drop of [0, 1.5, 4, 8]) {
+        const t = _v1133({ ...base, landing_depth_in: d, landing_width_in: w, threshold_drop_in: drop });
+        assert.ok(t.depth_deficit_in === Math.max(0, 36 - d) && t.width_deficit_in === Math.max(0, 36 - w));
+        assert.ok(t.drop_excess_in === Math.max(0, drop - 1.5));
+        assert.ok(t.passes === (d >= 36 && w >= 36 && drop <= 1.5));
+        assert.ok(Math.abs(t.provided_area_sf - d * w / 144) < 1e-12);
+      }
+    }
+  }
+  // Editable minimums move every verdict.
+  assert.ok(!_v1133({ ...base, min_depth_in: 48 }).depth_ok);
+  assert.ok(_v1133({ ...base, threshold_drop_in: 4, max_threshold_drop_in: 7.75 }).drop_ok);
+  assert.ok(Math.abs(_v1133({ ...base, min_depth_in: 48 }).min_landing_area_sf - 12) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v1133({ ...base, landing_depth_in: 0 }));
+  assert.ok("error" in _v1133({ ...base, landing_width_in: 0 }));
+  assert.ok("error" in _v1133({ ...base, flight_width_in: 0 }));
+  assert.ok("error" in _v1133({ ...base, threshold_drop_in: -1 }));
+  assert.ok("error" in _v1133({ ...base, min_depth_in: 0 }));
+  assert.ok("error" in _v1133({ ...base, max_threshold_drop_in: -1 }));
+  assert.ok("error" in _v1133({ ...base, landing_depth_in: Infinity }));
+});

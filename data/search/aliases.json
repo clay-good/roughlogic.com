@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "stair landing size",
+      "target": "landing-check",
+      "kind": "industry"
+    },
+    {
+      "term": "how big does a landing have to be",
+      "target": "landing-check",
+      "kind": "question"
+    },
+    {
+      "term": "door landing 36 inches direction of travel",
+      "target": "landing-check",
+      "kind": "question"
+    },
+    {
+      "term": "step down at exterior door threshold",
+      "target": "landing-check",
+      "kind": "question"
+    },
+    {
+      "term": "landing at top and bottom of stairs",
+      "target": "landing-check",
+      "kind": "industry"
+    },
+    {
       "term": "toilet clearance",
       "target": "fixture-clearance-check",
       "kind": "industry"

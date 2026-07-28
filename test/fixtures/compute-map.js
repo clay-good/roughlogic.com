@@ -1358,6 +1358,7 @@ export const COMPUTE_MAP = {
   "guard-handrail-check": { module: "../../calc-construction.js", fn: "computeGuardHandrailCheck" },
   "guard-post-load": { module: "../../calc-construction.js", fn: "computeGuardPostLoad" },
   "egress-window-check": { module: "../../calc-construction.js", fn: "computeEgressWindowCheck" },
+  "landing-check": { module: "../../calc-construction.js", fn: "computeLandingCheck" },
   "stair-code-check": { module: "../../calc-construction.js", fn: "computeStairCodeCheck" },
   "smooth-bore-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreFlow" },
   "smooth-bore-diameter-for-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreDiameterForFlow" },
