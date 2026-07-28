@@ -33726,3 +33726,77 @@ test("bounds: spec-v1162 computeReachRange pins all four rules, the no-permitted
   assert.ok("error" in _v1162({ ...base, obstruction_height_in: -1 }));
   assert.ok("error" in _v1162({ ...base, element_height_in: Infinity }));
 });
+
+import { computeProtrudingObject as _v1163 } from "../../calc-construction.js";
+
+test("bounds: spec-v1163 computeProtrudingObject pins the 27-80 in band, the three mounting limits, the three fixes, 307.4 and 307.5, and error seams", () => {
+  const base = { mounting: "wall", leading_edge_height_in: 48, projection_in: 6, corridor_width_in: 44, required_route_width_in: 36, vertical_clearance_in: 80, barrier_edge_height_in: 0 };
+  const r = _v1163(base);
+  assert.ok(r.in_zone && r.max_projection_in === 4 && !r.projection_ok && r.projection_excess_in === 2);
+  assert.ok(r.drop_to_cane_zone_in === 21 && r.raise_above_zone_in === 32 && r.remaining_width_in === 38 && r.width_ok && !r.passes);
+  // THE BAND: more than 27 and not more than 80. Both endpoints belong OUTSIDE the limit at 27 and INSIDE at 80.
+  for (const [h, inZone] of [[10, false], [27, false], [27.1, true], [48, true], [80, true], [80.1, false], [96, false]]) {
+    const t = _v1163({ ...base, leading_edge_height_in: h });
+    assert.ok(t.in_zone === inZone, "band wrong at " + h);
+    assert.ok(t.projection_ok === (inZone ? false : true), "a 6 in projection is limited only inside the band, at " + h);
+    assert.ok(t.max_projection_in === (inZone ? 4 : null));
+  }
+  // THE THREE MOUNTINGS DIFFER BY A FACTOR OF THREE.
+  for (const [m, lim] of [["wall", 4], ["handrail", 4.5], ["post", 12]]) {
+    const t = _v1163({ ...base, mounting: m });
+    assert.ok(t.max_projection_in === lim, "limit wrong for " + m);
+    assert.ok(t.projection_ok === (6 <= lim));
+  }
+  // The same 4.5 in projection passes as a handrail and fails on a wall.
+  assert.ok(_v1163({ ...base, mounting: "handrail", projection_in: 4.5 }).projection_ok);
+  assert.ok(!_v1163({ ...base, mounting: "wall", projection_in: 4.5 }).projection_ok);
+  // Exact equality passes at every limit; a tenth more fails.
+  for (const [m, lim] of [["wall", 4], ["handrail", 4.5], ["post", 12]]) {
+    assert.ok(_v1163({ ...base, mounting: m, projection_in: lim, corridor_width_in: 60 }).projection_ok);
+    assert.ok(!_v1163({ ...base, mounting: m, projection_in: lim + 0.1, corridor_width_in: 60 }).projection_ok);
+  }
+  // THE THREE FIXES ROUND-TRIP: each reported move must actually produce a pass.
+  for (const h of [30, 48, 60, 79]) {
+    const t = _v1163({ ...base, leading_edge_height_in: h, projection_in: 9 });
+    assert.ok(!t.projection_ok && t.drop_to_cane_zone_in > 0 && t.raise_above_zone_in > 0);
+    assert.ok(_v1163({ ...base, leading_edge_height_in: h - t.drop_to_cane_zone_in, projection_in: 9 }).projection_ok, "lowering by the reported amount did not fix it at " + h);
+    assert.ok(_v1163({ ...base, leading_edge_height_in: h + t.raise_above_zone_in + 0.1, projection_in: 9 }).projection_ok, "raising by the reported amount did not fix it at " + h);
+    assert.ok(_v1163({ ...base, leading_edge_height_in: h, projection_in: 9 - t.projection_excess_in }).projection_ok, "shrinking by the reported amount did not fix it at " + h);
+  }
+  assert.ok(_v1163({ ...base, projection_in: 4 }).drop_to_cane_zone_in === null, "nothing to fix reports null, not zero");
+  assert.ok(_v1163({ ...base, leading_edge_height_in: 90 }).raise_above_zone_in === null);
+  // 307.5: A COMPLIANT PROJECTION CAN STILL FAIL ON WIDTH.
+  const narrow = _v1163({ ...base, projection_in: 4, corridor_width_in: 38, vertical_clearance_in: 80 });
+  assert.ok(narrow.projection_ok && !narrow.width_ok && narrow.remaining_width_in === 34 && narrow.width_deficit_in === 2 && !narrow.passes);
+  for (const [w, p, rem] of [[44, 6, 38], [36, 0, 36], [60, 12, 48], [40, 4, 36]]) {
+    const t = _v1163({ ...base, corridor_width_in: w, projection_in: p, mounting: "post" });
+    assert.ok(Math.abs(t.remaining_width_in - rem) < 1e-9 && t.width_ok, "width wrong at " + w + "/" + p);
+  }
+  assert.ok(_v1163({ ...base, required_route_width_in: 48, projection_in: 4 }).width_ok === false, "the required width is an input and tightening it bites");
+  // 307.4: 80 IN, AND THE BARRIER'S LEADING EDGE IS THE TEST.
+  for (const [vc, ok] of [[79.9, false], [80, true], [96, true]]) {
+    assert.ok(_v1163({ ...base, vertical_clearance_in: vc, projection_in: 4 }).vertical_ok === ok);
+  }
+  assert.ok(_v1163({ ...base, vertical_clearance_in: 96 }).barrier_ok === null, "no barrier question where the clearance is adequate");
+  for (const [b, ok] of [[0, false], [20, true], [27, true], [27.1, false], [34, false]]) {
+    const t = _v1163({ ...base, projection_in: 4, vertical_clearance_in: 78, barrier_edge_height_in: b });
+    assert.ok(t.barrier_ok === ok, "barrier verdict wrong at " + b);
+    assert.ok(t.overhead_ok === ok && t.passes === ok);
+  }
+  assert.ok(_v1163({ ...base, projection_in: 4, vertical_clearance_in: 78, barrier_edge_height_in: 0 }).barrier_present === false);
+  // All three checks are independent - each fails alone.
+  const clean = { ...base, projection_in: 4, corridor_width_in: 60, vertical_clearance_in: 84 };
+  assert.ok(_v1163(clean).passes);
+  assert.ok(!_v1163({ ...clean, projection_in: 5 }).passes);
+  assert.ok(!_v1163({ ...clean, corridor_width_in: 39 }).passes);
+  assert.ok(!_v1163({ ...clean, vertical_clearance_in: 78 }).passes);
+  // Error seams.
+  assert.ok("error" in _v1163({ ...base, mounting: "ceiling" }));
+  assert.ok("error" in _v1163({ ...base, leading_edge_height_in: 0 }));
+  assert.ok("error" in _v1163({ ...base, projection_in: -1 }));
+  assert.ok("error" in _v1163({ ...base, corridor_width_in: 0 }));
+  assert.ok("error" in _v1163({ ...base, required_route_width_in: 0 }));
+  assert.ok("error" in _v1163({ ...base, vertical_clearance_in: 0 }));
+  assert.ok("error" in _v1163({ ...base, barrier_edge_height_in: -1 }));
+  assert.ok("error" in _v1163({ ...base, projection_in: Infinity }));
+});

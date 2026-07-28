@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "how far can something stick out into a hallway",
+      "target": "protruding-object-check",
+      "kind": "question"
+    },
+    {
+      "term": "protruding object 4 inch rule",
+      "target": "protruding-object-check",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum headroom under a stair",
+      "target": "protruding-object-check",
+      "kind": "question"
+    },
+    {
+      "term": "cane detectable barrier height",
+      "target": "protruding-object-check",
+      "kind": "industry"
+    },
+    {
       "term": "ada outlet height",
       "target": "reach-range",
       "kind": "industry"

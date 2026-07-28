@@ -1627,6 +1627,7 @@ export const COMPUTE_MAP = {
   "accessible-parking-count": { module: "../../calc-construction.js", fn: "computeAccessibleParkingCount" },
   "sign-character-height": { module: "../../calc-construction.js", fn: "computeSignCharacterHeight" },
   "reach-range": { module: "../../calc-construction.js", fn: "computeReachRange" },
+  "protruding-object-check": { module: "../../calc-construction.js", fn: "computeProtrudingObject" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 

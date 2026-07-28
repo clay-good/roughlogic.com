@@ -12319,3 +12319,95 @@ CONSTRUCTION_RENDERERS["reach-range"] = _simpleRenderer({
   ],
   compute: computeReachRange,
 });
+
+// ===================== spec-v1163: protruding objects (2010 ADA Standards 307) =====================
+
+// The rule everybody half-remembers is "4 inches", and the half that gets dropped is WHERE.
+// The 4 in limit applies only to objects whose leading edge is MORE than 27 in and NOT MORE
+// than 80 in above the floor - the band a cane sweeps under and a person walks into. Below
+// 27 in a cane finds the object, above 80 in you walk under it, and in neither case does 307.2
+// limit how far it sticks out. So the fix for an over-projecting wall object is often to LOWER
+// it rather than shrink it, which is the opposite of what people try.
+// A free-standing object on posts gets 12 in, three times a wall-mounted one. Overhead, the
+// clearance is 80 in and anything less needs a barrier whose LEADING EDGE is 27 in maximum -
+// a rail at waist height is not a barrier, because the cane has to find it.
+// dims: in { mounting: dimensionless, leading_edge_height_in: L, projection_in: L, corridor_width_in: L, required_route_width_in: L, vertical_clearance_in: L, barrier_edge_height_in: L } out: { max_projection_in: L, projection_excess_in: L, remaining_width_in: L, width_deficit_in: L, drop_to_cane_zone_in: L }
+export function computeProtrudingObject({ mounting = "wall", leading_edge_height_in = 0, projection_in = 0, corridor_width_in = 0, required_route_width_in = 36, vertical_clearance_in = 80, barrier_edge_height_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const h = Number(leading_edge_height_in) || 0;
+  const p = Number(projection_in) || 0;
+  const w = Number(corridor_width_in) || 0;
+  const reqW = Number(required_route_width_in) || 0;
+  const vc = Number(vertical_clearance_in) || 0;
+  const barrier = Number(barrier_edge_height_in) || 0;
+  if (mounting !== "wall" && mounting !== "handrail" && mounting !== "post") return { error: "Mounting must be wall, handrail, or post - the permitted projection differs by a factor of three between them." };
+  if (!(h > 0)) return { error: "Leading edge height above the finish floor must be positive (in)." };
+  if (p < 0) return { error: "Projection into the circulation path cannot be negative (in)." };
+  if (!(w > 0)) return { error: "Circulation path width must be positive (in)." };
+  if (!(reqW > 0)) return { error: "Required clear width must be positive (in)." };
+  if (!(vc > 0)) return { error: "Vertical clearance must be positive (in)." };
+  if (barrier < 0) return { error: "Barrier leading edge height cannot be negative (in)." };
+
+  const LOW = 27, HIGH = 80, MIN_VERT = 80, BARRIER_MAX = 27;
+  const in_zone = h > LOW && h <= HIGH;
+  const LIMIT = { wall: 4, handrail: 4.5, post: 12 };
+  const max_projection_in = in_zone ? LIMIT[mounting] : null;
+  const projection_ok = in_zone ? p <= max_projection_in : true;
+  const projection_excess_in = in_zone ? Math.max(0, p - max_projection_in) : 0;
+  // The move people do not think of: drop the leading edge into the cane-detectable zone.
+  const drop_to_cane_zone_in = in_zone && !projection_ok ? h - LOW : null;
+  const raise_above_zone_in = in_zone && !projection_ok ? HIGH - h : null;
+
+  // 307.5: a compliant projection still may not eat the required route width.
+  const remaining_width_in = w - p;
+  const width_ok = remaining_width_in >= reqW;
+  const width_deficit_in = Math.max(0, reqW - remaining_width_in);
+
+  // 307.4: overhead.
+  const vertical_ok = vc >= MIN_VERT;
+  const barrier_present = barrier > 0;
+  const barrier_ok = vertical_ok ? null : (barrier_present ? barrier <= BARRIER_MAX : false);
+  const overhead_ok = vertical_ok || barrier_ok === true;
+
+  const passes = projection_ok && width_ok && overhead_ok;
+
+  const note = "THE RULE IS 4 INCHES, AND THE HALF THAT GETS DROPPED IS WHERE. 307.2 limits protrusion only for objects whose leading edge is MORE than 27 in and NOT MORE than 80 in above the floor - the band a cane sweeps under and a person walks into. "
+    + "This leading edge is at " + h + " in, which is " + (in_zone ? "INSIDE that band" : h <= LOW ? "at or below 27 in, where a cane finds the object before a knee does" : "above 80 in, where a person walks under it") + ". "
+    + (in_zone
+      ? "A " + (mounting === "post" ? "free-standing object on posts or pylons may overhang the path 12 in" : mounting === "handrail" ? "handrail may protrude 4 1/2 in" : "wall-mounted object may protrude 4 in") + " maximum. This one projects " + p + " in: " + (projection_ok ? "OK. " : "OVER by " + projection_excess_in.toFixed(1) + " in. "
+        + "THREE MOVES FIX IT, and the obvious one is the hardest: shrink the projection by " + projection_excess_in.toFixed(1) + " in, or LOWER the leading edge " + drop_to_cane_zone_in.toFixed(1) + " in to 27 in, or RAISE it " + raise_above_zone_in.toFixed(1) + " in to above 80 in. Lowering is the move people do not think of, because the limit is about detection rather than size - once a cane finds the object, how far it sticks out stops being 307.2's concern. ")
+      : "307.2 does not limit how far it projects at this height. " + (h > HIGH ? "But note the vertical clearance rule below - clearing 80 in for the protrusion and providing 80 in of headroom are different questions. " : ""))
+    + (mounting === "post" && in_zone ? "A post-mounted object gets THREE TIMES the wall-mounted allowance, which is why the same drinking fountain is a violation recessed into a wall and compliant on a pylon. Where a sign is mounted BETWEEN posts more than 12 in apart, its lowest edge must be 27 in maximum or 80 in minimum - there is no permitted middle. " : "")
+    + "CLEAR WIDTH (307.5): a protruding object may not reduce the clear width an accessible route requires, and a projection that passes 307.2 can still fail this. " + w + " in less " + p + " in leaves " + remaining_width_in.toFixed(1) + " in against " + reqW + " in required: " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(1) + " in. ")
+    + "VERTICAL CLEARANCE (307.4): 80 in minimum. This path has " + vc + " in: " + (vertical_ok ? "OK. " : "UNDER, so a guardrail or barrier is required, and its LEADING EDGE must be 27 in maximum above the floor. " + (barrier_present ? "The barrier entered is at " + barrier + " in: " + (barrier_ok ? "OK. " : "TOO HIGH - a rail at waist height is not a barrier here, because the cane has to find it before the head does. ") : "None is stated. The classic case is the open space under a stair, where a rail gets added at hand height and the actual hazard is at head height. ") + "Door closers and door stops are the stated exception, permitted at 78 in minimum. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: whether this path is an accessible route or a circulation path at all; the required route width itself, which is an input here because it varies with the situation; turning space, passing space, and maneuvering clearances; the object's own operable parts and reach ranges; doors and their hardware; whether a barrier is structurally adequate or detectable in practice; and state and local accessibility law. A protrusion screen, not a route design; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { in_zone, max_projection_in, projection_ok, projection_excess_in, drop_to_cane_zone_in, raise_above_zone_in, remaining_width_in, width_ok, width_deficit_in, vertical_ok, barrier_present, barrier_ok, overhead_ok, passes, note };
+}
+
+export const protrudingObjectExample = { inputs: { mounting: "wall", leading_edge_height_in: 48, projection_in: 6, corridor_width_in: 44, required_route_width_in: 36, vertical_clearance_in: 80, barrier_edge_height_in: 0 } };
+
+CONSTRUCTION_RENDERERS["protruding-object-check"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 307 Protruding Objects. A US federal standard in the public domain. 307.2: objects with leading edges more than 27 in and not more than 80 in above the finish floor shall protrude 4 in maximum horizontally into the circulation path; handrails shall be permitted to protrude 4 1/2 in maximum. 307.3: free-standing objects mounted on posts or pylons shall overhang circulation paths 12 in maximum when located 27 in minimum and 80 in maximum above the finish floor, and where a sign or other obstruction is mounted between posts or pylons more than 12 in apart, the lowest edge of such sign or obstruction shall be 27 in maximum or 80 in minimum above the finish floor. 307.4: vertical clearance shall be 80 in high minimum; guardrails or other barriers shall be provided where the vertical clearance is less than 80 in high, and the leading edge of such guardrail or barrier shall be located 27 in maximum above the finish floor, with door closers and door stops permitted at 78 in minimum. 307.5: protruding objects shall not reduce the clear width required for accessible routes. Not checked: whether the path is an accessible route, the required width itself, turning and passing space, maneuvering clearances, the object's own operable parts, doors and hardware, whether a barrier is structurally adequate, or state and local law. A protrusion screen, not a route design.",
+  example: protrudingObjectExample.inputs,
+  fields: [
+    { key: "mounting", label: "Mounting", kind: "select", options: [{ value: "wall", label: "Wall-mounted (4 in)", selected: true }, { value: "handrail", label: "Handrail (4 1/2 in)" }, { value: "post", label: "Free-standing on posts or pylons (12 in)" }] },
+    { key: "leading_edge_height_in", label: "Leading edge height above the finish floor (in)", kind: "number", default: 48 },
+    { key: "projection_in", label: "Horizontal projection into the path (in)", kind: "number", default: 6 },
+    { key: "corridor_width_in", label: "Circulation path width before the object (in)", kind: "number", default: 44 },
+    { key: "required_route_width_in", label: "Clear width the route requires (in)", kind: "number", default: 36 },
+    { key: "vertical_clearance_in", label: "Vertical clearance (headroom) along the path (in)", kind: "number", default: 80 },
+    { key: "barrier_edge_height_in", label: "Barrier leading edge height, if headroom is under 80 in (in; 0 = none)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "z", id: "po-out-z", label: "Is the leading edge in the limited band?", value: (r) => r.in_zone ? "yes - over 27 in and not over 80 in, so 307.2 applies" : "no - 307.2 places no limit on the projection at this height" },
+    { key: "p", id: "po-out-p", label: "Projection", value: (r) => !r.in_zone ? "unlimited by 307.2 here" : r.projection_ok ? "within the " + r.max_projection_in + " in maximum" : "OVER the " + r.max_projection_in + " in maximum by " + fmt(r.projection_excess_in, 1) + " in" },
+    { key: "f", id: "po-out-f", label: "Three ways to fix it", value: (r) => r.projection_ok || !r.in_zone ? "nothing to fix" : "shrink " + fmt(r.projection_excess_in, 1) + " in, lower " + fmt(r.drop_to_cane_zone_in, 1) + " in to 27 in, or raise " + fmt(r.raise_above_zone_in, 1) + " in above 80 in" },
+    { key: "w", id: "po-out-w", label: "Clear width left (307.5)", value: (r) => fmt(r.remaining_width_in, 1) + " in - " + (r.width_ok ? "meets the required width" : "SHORT by " + fmt(r.width_deficit_in, 1) + " in") },
+    { key: "v", id: "po-out-v", label: "Vertical clearance (307.4)", value: (r) => r.vertical_ok ? "80 in or more - OK" : r.barrier_ok ? "under 80 in, but a barrier is provided at a compliant leading edge" : r.barrier_present ? "under 80 in and the barrier leading edge is above 27 in" : "under 80 in and no barrier is stated" },
+    { key: "d", id: "po-out-d", label: "Verdict", value: (r) => r.passes ? "PASSES 307" : "DOES NOT PASS" },
+    { key: "n", id: "po-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeProtrudingObject,
+});
