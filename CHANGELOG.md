@@ -4,6 +4,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Added
+- **Valley flashing takeoff (spec-v1117).** `valley-flashing-takeoff` in calc-finish.js (Group E) turns a valley's PLAN run into ordered metal: the 17-inch-rule multiplier sqrt(pitch^2 + 288)/12, sloped length per valley and total, sticks after lap and waste, metal area, and a valley ice-barrier allowance. At 6:12 the multiplier is exactly 1.5 -- a 12-ft plan run is 18 ft of valley, against 13.42 ft of common rafter, which is exactly the shortfall you get ordering off the plan dimension. Fills the gap `ice-barrier-coverage` names in its own note ("a separate manual add") and that `step-flashing-count` (sidewall) and `hip-valley-rafter` (framing only, no metal) both leave open. The multiplier is computed inline rather than importing calc-construction.js, and the bounds fuzzer imports BOTH tiles to pin exact agreement at six pitches -- equivalence without the runtime coupling. Also pinned: the sqrt(2) geometric floor as pitch approaches zero, and that a valley always exceeds the common rafter on the same run.
+
 ### feat(finish): drip-edge-takeoff, because rakes run up the slope and eaves do not; 2026-07-27
 
 Scoped deliberately narrow: `roofing-squares` already returns `drip_edge_lf`, but it is a bare passthrough

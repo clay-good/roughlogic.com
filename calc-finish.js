@@ -905,3 +905,70 @@ FINISH_RENDERERS["drip-edge-takeoff"] = _simpleRenderer({
   ],
   compute: computeDripEdgeTakeoff,
 });
+
+// --- spec-v1117 E: Valley flashing takeoff ---
+// step-flashing-count is roof-to-WALL sidewall flashing; ice-barrier-coverage does eaves and says
+// valley coverage is a separate manual add; hip-valley-rafter gives the framing length but no metal.
+// The valley run multiplier is the same 17-inch-rule geometry, sqrt(pitch^2 + 288)/12 - computed
+// inline rather than imported so no cross-module runtime dependency is created, with the bounds
+// fuzzer pinning that it agrees with computeHipValleyRafter exactly.
+// dims: in { valley_run_ft: L, valley_count: dimensionless, pitch_rise_per_12: dimensionless, metal_width_in: L, stock_length_ft: L, lap_in: L, waste_pct: dimensionless } out: { valley_multiplier: dimensionless, valley_length_ft: L, total_valley_lf: L, pieces: dimensionless, metal_area_sf: L^2 }
+export function computeValleyFlashingTakeoff({ valley_run_ft = 0, valley_count = 1, pitch_rise_per_12 = 6, metal_width_in = 24, stock_length_ft = 10, lap_in = 6, waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const run = Number(valley_run_ft) || 0;
+  const n = Number(valley_count) || 0;
+  const pitch = Number(pitch_rise_per_12);
+  const width = Number(metal_width_in) || 0;
+  const stock = Number(stock_length_ft) || 0;
+  const lap = Number(lap_in);
+  const waste = Number(waste_pct);
+  if (!(run > 0)) return { error: "Valley run must be positive (ft) - the horizontal plan run of one valley." };
+  if (!(n >= 1) || !Number.isInteger(n)) return { error: "Valley count must be a whole number of at least 1." };
+  if (!Number.isFinite(pitch) || pitch <= 0) return { error: "Pitch must be positive (rise per 12) - a flat roof has no valley." };
+  if (!(width > 0)) return { error: "Valley metal width must be positive (in)." };
+  if (!(stock > 0)) return { error: "Stock length must be positive (ft)." };
+  if (!Number.isFinite(lap) || lap < 0) return { error: "Lap cannot be negative (in)." };
+  if (!(lap / 12 < stock)) return { error: "The lap is as long as a stick - check the lap and stock length." };
+  if (!(waste >= 0 && waste <= 50)) return { error: "Waste must be 0-50 percent." };
+  // The 17-inch rule: a valley runs diagonally in plan AND rises, so its multiplier carries 288
+  // (two 12s squared) where a common rafter carries 144.
+  const valley_multiplier = Math.sqrt(pitch * pitch + 288) / 12;
+  const common_multiplier = Math.sqrt(pitch * pitch + 144) / 12;
+  const valley_length_ft = run * valley_multiplier;
+  const total_valley_lf = n * valley_length_ft;
+  const total_with_waste_lf = total_valley_lf * (1 + waste / 100);
+  const effective_piece_ft = stock - lap / 12;
+  const pieces = Math.ceil(total_with_waste_lf / effective_piece_ft);
+  const metal_area_sf = total_valley_lf * width / 12;
+  const ice_barrier_sf = metal_area_sf;
+  if (![valley_multiplier, valley_length_ft, pieces, metal_area_sf].every(Number.isFinite)) return { error: "Valley-flashing math did not produce a finite value." };
+  return {
+    valley_multiplier, common_multiplier, valley_length_ft, total_valley_lf,
+    total_with_waste_lf, effective_piece_ft, pieces, metal_area_sf, ice_barrier_sf,
+    note: "A valley is the longest run on the roof for its plan dimension, because it goes diagonally AND uphill at once: its multiplier carries 288 under the radical where a common rafter carries 144, so at this pitch a " + run + " ft plan run is " + valley_length_ft.toFixed(2) + " ft of valley against " + (run * common_multiplier).toFixed(2) + " ft of common rafter. Ordering valley metal off the plan dimension comes up badly short. "
+      + "The lap on valley metal is generous on purpose - " + lap + " in here - because a valley concentrates the water from two planes into one channel and a short lap there is the leak that finds it. Run the metal from the eave UP, so each piece laps over the one below. "
+      + "Ice barrier belongs in valleys in cold climates and the eave ice-barrier tile does not cover it: budget about " + ice_barrier_sf.toFixed(0) + " sq ft here at the same width as the metal, more if your code calls for wider valley coverage. Open valley (exposed metal) is assumed; a closed-cut or woven valley uses shingles instead of metal and this tile does not apply. Hips take no valley metal. The roofing plan and the manufacturer's instructions govern.",
+  };
+}
+export const valleyFlashingTakeoffExample = { inputs: { valley_run_ft: 12, valley_count: 2, pitch_rise_per_12: 6, metal_width_in: 24, stock_length_ft: 10, lap_in: 6, waste_pct: 10 } };
+FINISH_RENDERERS["valley-flashing-takeoff"] = _simpleRenderer({
+  citation: "Citation: valley geometry by the framing-square 17-inch rule - a valley runs diagonally in plan and rises at the same time, so its length multiplier is sqrt(pitch^2 + 288)/12 where a common rafter's is sqrt(pitch^2 + 144)/12. Valley length = plan run x that multiplier; pieces are figured on the stock length minus the lap, since every joint consumes it; metal area = length x width. Open (exposed-metal) valley assumed - closed-cut and woven valleys use shingles and this does not apply. Ice barrier in valleys is called out because the eave ice-barrier tile does not cover it. The roofing plan and the manufacturer's installation instructions govern.",
+  example: valleyFlashingTakeoffExample.inputs,
+  fields: [
+    { key: "valley_run_ft", label: "Plan run of ONE valley (ft)", kind: "number" },
+    { key: "valley_count", label: "Number of valleys", kind: "number", default: 1 },
+    { key: "pitch_rise_per_12", label: "Roof pitch (rise per 12)", kind: "number", default: 6 },
+    { key: "metal_width_in", label: "Valley metal width (in)", kind: "number", default: 24 },
+    { key: "stock_length_ft", label: "Stock length (ft)", kind: "number", default: 10 },
+    { key: "lap_in", label: "Lap at each joint (in)", kind: "number", default: 6 },
+    { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "m", id: "vft-out-m", label: "Valley multiplier (vs common rafter)", value: (r) => fmt(r.valley_multiplier, 4) + " vs " + fmt(r.common_multiplier, 4) },
+    { key: "l", id: "vft-out-l", label: "Valley length", value: (r) => fmt(r.valley_length_ft, 2) + " ft each, " + fmt(r.total_valley_lf, 2) + " ft total" },
+    { key: "p", id: "vft-out-p", label: "Pieces", value: (r) => fmt(r.pieces, 0) + " at " + fmt(r.effective_piece_ft, 2) + " ft effective (" + fmt(r.total_with_waste_lf, 1) + " ft with waste)" },
+    { key: "a", id: "vft-out-a", label: "Metal area / valley ice barrier", value: (r) => fmt(r.metal_area_sf, 1) + " sq ft of metal; budget the same for valley ice barrier" },
+    { key: "n", id: "vft-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeValleyFlashingTakeoff,
+});

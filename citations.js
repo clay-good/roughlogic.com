@@ -15361,6 +15361,18 @@ export const CITATIONS = {
       { name: "Profiles differ", value: "eave drip installs under the underlayment, rake drip over; counted separately", source: "manufacturer installation instructions" },
     ],
   },
+  "valley-flashing-takeoff": {
+    formula: "valley multiplier = sqrt(pitch^2 + 288)/12 (the framing-square 17-inch rule) against a common rafter's sqrt(pitch^2 + 144)/12; valley length = plan run x multiplier; pieces = ceil(LF x (1 + waste)/(stock - lap/12)); metal area = LF x width/12.",
+    edition: "Valley geometry by the framing-square 17-inch rule - public geometry, no table reproduced.",
+    freeAccess: "The 17-inch rule is in every framing reference and on the framing square itself.",
+    governance: GOVERNANCE.general,
+    editionNote: "A valley is the longest run on the roof for its plan dimension because it travels diagonally in plan AND rises at the same time - the 288 under the radical is two 12s squared, against the common rafter's single 144. Ordering valley metal off the plan dimension comes up badly short. The lap on valley metal is generous on purpose, because a valley concentrates the water from two roof planes into one channel and a short lap there is the leak that finds it; run the metal from the eave UP so each piece laps over the one below. Ice barrier belongs in valleys in cold climates and the eave ice-barrier tile does not cover it, so an allowance is reported at the metal width - widen it if your code requires. OPEN (exposed-metal) valley assumed: a closed-cut or woven valley uses shingles instead of metal and this tile does not apply, and hips take no valley metal at all. The roofing plan and the manufacturer's installation instructions govern.",
+    assumptions: [
+      { name: "17-inch rule", value: "valley multiplier sqrt(pitch^2 + 288)/12; the fuzzer pins agreement with the hip-valley-rafter tile", source: "framing-square geometry" },
+      { name: "Open valley", value: "exposed metal; closed-cut and woven valleys use shingles and are out of scope", source: "stated scope limit" },
+      { name: "Valley ice barrier", value: "reported as an allowance at the metal width; the eave ice-barrier tile does not include valleys", source: "stated gap in the sibling tile" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

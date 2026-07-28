@@ -91487,6 +91487,36 @@
       "kind": "question"
     },
     {
+      "term": "valley flashing",
+      "target": "valley-flashing-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "valley metal takeoff",
+      "target": "valley-flashing-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "how long is a roof valley",
+      "target": "valley-flashing-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "open valley metal width and lap",
+      "target": "valley-flashing-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "ice barrier in valleys",
+      "target": "valley-flashing-takeoff",
+      "kind": "redirect"
+    },
+    {
+      "term": "17 inch rule valley length",
+      "target": "valley-flashing-takeoff",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

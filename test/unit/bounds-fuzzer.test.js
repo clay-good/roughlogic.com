@@ -31150,3 +31150,48 @@ test("bounds: spec-v1116 computeDripEdgeTakeoff pins the slope factor on rakes o
   assert.ok("error" in _v1116({ ...base, waste_pct: 60 }));
   assert.ok("error" in _v1116({ ...base, eave_length_ft: Infinity }));
 });
+
+import { computeValleyFlashingTakeoff as _v1117 } from "../../calc-finish.js";
+import { computeHipValleyRafter as _v1117sib } from "../../calc-construction.js";
+
+test("bounds: spec-v1117 computeValleyFlashingTakeoff pins the 17-inch rule, EXACT agreement with the hip-valley-rafter sibling, the sqrt(288)/12 geometric floor, and error seams", () => {
+  const base = { valley_run_ft: 12, valley_count: 2, pitch_rise_per_12: 6, metal_width_in: 24, stock_length_ft: 10, lap_in: 6, waste_pct: 10 };
+  const r = _v1117(base);
+  // 6:12 is the clean case: sqrt(36+288) = 18, so the multiplier is EXACTLY 1.5.
+  assert.ok(r.valley_multiplier === 1.5 && r.valley_length_ft === 18);
+  assert.ok(r.total_valley_lf === 36 && r.pieces === 5 && r.metal_area_sf === 72);
+  assert.ok(Math.abs(r.effective_piece_ft - 9.5) < 1e-12);
+  // CROSS-IMPLEMENTATION: the multiplier must match the landed framing tile exactly, at every pitch.
+  for (const pitch of [3, 4, 6, 8, 10, 12]) {
+    const t = _v1117({ ...base, pitch_rise_per_12: pitch, valley_count: 1 });
+    const sib = _v1117sib({ run_ft: 12, pitch, overhang_in: 0, jack_oc_in: 16 });
+    assert.ok(Math.abs(t.valley_length_ft - sib.hip_length_ft) < 1e-9, "valley length disagrees with the framing tile at " + pitch);
+    assert.ok(Math.abs(t.valley_multiplier - Math.sqrt(pitch * pitch + 288) / 12) < 1e-12);
+    assert.ok(Math.abs(t.common_multiplier - Math.sqrt(pitch * pitch + 144) / 12) < 1e-12);
+    // A valley is ALWAYS longer than the common rafter on the same run.
+    assert.ok(t.valley_multiplier > t.common_multiplier);
+  }
+  // GEOMETRIC FLOOR: as pitch approaches zero the multiplier approaches the plan diagonal sqrt(2).
+  const flatish = _v1117({ ...base, pitch_rise_per_12: 0.01, valley_count: 1 });
+  assert.ok(Math.abs(flatish.valley_multiplier - Math.SQRT2) < 1e-5);
+  assert.ok(flatish.valley_multiplier > Math.SQRT2 - 1e-9);
+  // Monotonic in pitch, and linear in run and count.
+  let prev = 0;
+  for (const p of [1, 4, 6, 9, 12, 18]) {
+    const t = _v1117({ ...base, pitch_rise_per_12: p });
+    assert.ok(t.valley_multiplier > prev); prev = t.valley_multiplier;
+  }
+  assert.ok(Math.abs(_v1117({ ...base, valley_run_ft: 24 }).total_valley_lf - 2 * r.total_valley_lf) < 1e-9);
+  assert.ok(Math.abs(_v1117({ ...base, valley_count: 4 }).total_valley_lf - 2 * r.total_valley_lf) < 1e-9);
+  // Metal area follows the width exactly; ice-barrier allowance mirrors it.
+  assert.ok(Math.abs(_v1117({ ...base, metal_width_in: 36 }).metal_area_sf - 1.5 * r.metal_area_sf) < 1e-9);
+  assert.ok(r.ice_barrier_sf === r.metal_area_sf);
+  // Error seams.
+  assert.ok("error" in _v1117({ ...base, valley_run_ft: 0 }));
+  assert.ok("error" in _v1117({ ...base, valley_count: 0 }));
+  assert.ok("error" in _v1117({ ...base, valley_count: 1.5 }));
+  assert.ok("error" in _v1117({ ...base, pitch_rise_per_12: 0 }));
+  assert.ok("error" in _v1117({ ...base, metal_width_in: 0 }));
+  assert.ok("error" in _v1117({ ...base, lap_in: 240 }));
+  assert.ok("error" in _v1117({ ...base, valley_run_ft: Infinity }));
+});
