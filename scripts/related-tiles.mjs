@@ -97,6 +97,7 @@ const RELATED = {
   "tanker-shuttle-cycle": ["tanker-shuttle-flow", "water-supply-duration", "nfpa-1142-water-supply"],
   "tanker-fleet-size": ["tanker-shuttle-flow", "tanker-shuttle-cycle", "nfpa-1142-water-supply"],
   "foam-eductor-limit": ["foam", "pdp", "relay-pump-distance"],
+  "extinguisher-coverage": ["egress-travel-distance", "occupant-load", "sprinkler-density"],
   "debt-yield": ["cap-rate-dscr", "rental-worksheet", "break-even-occupancy", "loan-payment"],
   "break-even-occupancy": ["cap-rate-dscr", "debt-yield", "rental-worksheet", "rent-roll-vacancy"],
   "max-offer-70-rule": ["cap-rate-dscr", "rent-vs-buy", "seller-net-sheet", "material-cost"],

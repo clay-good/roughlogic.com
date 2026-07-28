@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "fire extinguisher spacing",
+      "target": "extinguisher-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "how many fire extinguishers do i need",
+      "target": "extinguisher-coverage",
+      "kind": "question"
+    },
+    {
+      "term": "75 foot travel distance extinguisher",
+      "target": "extinguisher-coverage",
+      "kind": "question"
+    },
+    {
+      "term": "extinguisher coverage area 11250",
+      "target": "extinguisher-coverage",
+      "kind": "question"
+    },
+    {
+      "term": "class k extinguisher 30 feet",
+      "target": "extinguisher-coverage",
+      "kind": "industry"
+    },
+    {
       "term": "carbon monoxide alarm placement",
       "target": "co-alarm-placement",
       "kind": "industry"

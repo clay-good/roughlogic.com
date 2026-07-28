@@ -32651,3 +32651,59 @@ test("bounds: spec-v1142 computeCoAlarmPlacement pins the source trigger, the no
   assert.ok("error" in _v1142({ ...base, stories: 2.5 }));
   assert.ok("error" in _v1142({ ...base, sleeping_areas: Infinity }));
 });
+
+import { computeExtinguisherCoverage as _v1143 } from "../../calc-fire.js";
+
+test("bounds: spec-v1143 computeExtinguisherCoverage pins the 2d^2 identity against the 11,250 ceiling, class handling, and error seams", () => {
+  const base = { floor_area_sf: 40000, hazard_class: "A", travel_distance_ft: 0, area_cap_sf: 11250 };
+  const r = _v1143(base);
+  assert.ok(r.travel_used_ft === 75 && Math.abs(r.grid_spacing_ft - 75 * Math.SQRT2) < 1e-9);
+  // THE IDENTITY: 2 x 75^2 is exactly the code's 11,250 ceiling.
+  assert.ok(r.area_per_unit_sf === 11250 && r.cap_matches_geometry);
+  assert.ok(r.by_travel === 4 && r.by_area_cap === 4 && r.required_extinguishers === 4);
+  // Geometry holds at every travel distance, and the grid relation is self-consistent.
+  for (const d of [15, 30, 50, 75, 100]) {
+    const t = _v1143({ ...base, hazard_class: "B", travel_distance_ft: d });
+    assert.ok(Math.abs(t.area_per_unit_sf - 2 * d * d) < 1e-9);
+    assert.ok(Math.abs(t.grid_spacing_ft - d * Math.SQRT2) < 1e-9);
+    // The worst-case corner-to-centre distance on that grid is exactly the travel distance.
+    assert.ok(Math.abs(t.grid_spacing_ft * Math.SQRT2 / 2 - d) < 1e-9);
+    assert.ok(Math.abs(t.area_per_unit_sf - t.grid_spacing_ft * t.grid_spacing_ft) < 1e-9);
+    assert.ok(t.cap_matches_geometry === (Math.abs(2 * d * d - 11250) < 1e-9));
+  }
+  // Class K: 30 ft, and travel governs by a wide margin over the area ceiling.
+  const k = _v1143({ ...base, hazard_class: "K" });
+  assert.ok(k.travel_used_ft === 30 && k.area_per_unit_sf === 1800);
+  assert.ok(k.by_travel === 23 && k.by_area_cap === 4 && k.required_extinguishers === 23 && k.travel_governs);
+  // The required count is always the larger of the two, and never below either.
+  for (const area of [500, 11250, 40000, 250000]) {
+    for (const cls of ["A", "K"]) {
+      const t = _v1143({ ...base, floor_area_sf: area, hazard_class: cls });
+      assert.ok(t.required_extinguishers === Math.max(t.by_travel, t.by_area_cap));
+      assert.ok(t.required_extinguishers >= 1 && t.travel_governs === (t.by_travel >= t.by_area_cap));
+      assert.ok(t.by_travel === Math.ceil(area / t.area_per_unit_sf));
+      assert.ok(t.by_area_cap === Math.ceil(area / 11250));
+    }
+  }
+  // An area exactly on a boundary does not round up.
+  assert.ok(_v1143({ ...base, floor_area_sf: 11250 }).required_extinguishers === 1);
+  assert.ok(_v1143({ ...base, floor_area_sf: 11250.1 }).required_extinguishers === 2);
+  // A tighter area cap can take over from travel distance.
+  const tightCap = _v1143({ ...base, area_cap_sf: 5000 });
+  assert.ok(tightCap.by_area_cap === 8 && tightCap.required_extinguishers === 8 && !tightCap.travel_governs);
+  assert.ok(!tightCap.cap_matches_geometry);
+  // Class B demands an explicit travel distance; Class D is refused rather than guessed.
+  assert.ok("error" in _v1143({ ...base, hazard_class: "B" }));
+  assert.ok("error" in _v1143({ ...base, hazard_class: "B", travel_distance_ft: 0 }));
+  assert.ok(!("error" in _v1143({ ...base, hazard_class: "B", travel_distance_ft: 50 })));
+  assert.ok(_v1143({ ...base, hazard_class: "B", travel_distance_ft: 50 }).travel_used_ft === 50);
+  assert.ok("error" in _v1143({ ...base, hazard_class: "D" }), "Class D distances are not shipped");
+  assert.ok("error" in _v1143({ ...base, hazard_class: "C" }));
+  // A Class B distance entered does not disturb the fixed classes.
+  assert.ok(_v1143({ ...base, travel_distance_ft: 999 }).travel_used_ft === 75);
+  // Error seams.
+  assert.ok("error" in _v1143({ ...base, floor_area_sf: 0 }));
+  assert.ok("error" in _v1143({ ...base, area_cap_sf: 0 }));
+  assert.ok("error" in _v1143({ ...base, travel_distance_ft: -1 }));
+  assert.ok("error" in _v1143({ ...base, floor_area_sf: Infinity }));
+});

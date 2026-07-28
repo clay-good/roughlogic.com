@@ -1283,6 +1283,7 @@ export const COMPUTE_MAP = {
   "tanker-shuttle-cycle": { module: "../../calc-fire.js", fn: "computeTankerShuttleCycle" },
   "tanker-fleet-size": { module: "../../calc-fire.js", fn: "computeTankerFleetSize" },
   "foam-eductor-limit": { module: "../../calc-fire.js", fn: "computeFoamEductorLimit" },
+  "extinguisher-coverage": { module: "../../calc-fire.js", fn: "computeExtinguisherCoverage" },
   // spec-v332..v334 wood-fastener withdrawal batch (3 tiles)
   "wood-nail-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodNailWithdrawal" },
   "wood-lag-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodLagWithdrawal" },

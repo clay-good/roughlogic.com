@@ -2140,6 +2140,7 @@ cross-check.
 | calc-fire.js | `computeConfinedSpaceVent` | `{ length_ft = 0, width_ft = 0, height_ft = 0, volume_ft3 = null, blower_cfm =...` | _ | _ | _ |
 | calc-fire.js | `computeDraftLiftMax` | `{ site_elevation_ft = 0, pump_factor = 0.667, suction_losses_ft = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeElevationPressureLoss` | `{ mode = "floors", value = 0, floor_height_ft = 10, direction = "up" } = {}` | _ | _ | _ |
+| calc-fire.js | `computeExtinguisherCoverage` | `{ floor_area_sf = 0, hazard_class = "A", travel_distance_ft = 0, area_cap_sf ...` | _ | _ | _ |
 | calc-fire.js | `computeFireFriction` | `{ hose_diameter, gpm, length_ft }` | _ | _ | _ |
 | calc-fire.js | `computeFireStreamReaction` | `{ nozzle_type = "smooth", bore_in = 0, flow_gpm = 0, nozzle_pressure_psi = 0 ...` | _ | _ | _ |
 | calc-fire.js | `computeFoam` | `{ fire_area_ft2, application_rate_gpm_per_ft2 = 0.10, foam_percentage = 3, du...` | _ | _ | _ |
@@ -3187,7 +3188,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1773.
+Row count: 1774.
 
 <!-- END function-corpus-v14 -->
 
@@ -4223,7 +4224,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (48 tiles)
+### Group F Fire-ground (49 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4234,6 +4235,7 @@ per spec-v14 §13.1 second paragraph.
 | `draft-lift-max` | Drafting Maximum Lift (Altitude-Corrected) | IFSTA / NWCG firefighter math; 3,000 ft, 0.667 factor, no suction loss -> 30.9 ft theore... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drypipe-air-compressor` | Dry-Pipe / Preaction Air Compressor CFM | dry-pipe air compressor sizing (NFPA 13); ft3 = 400/7.48 = 53.48; CFM = 53.48*(40/14.7)/30 = 4.85 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `elevation-pressure-loss` | Elevation Pressure Loss / Gain | Hydrostatic head 0.434 psi/ft + IFSTA...; 9 floors above pump -> exact ~39.06 psi, rule 45 psi | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `extinguisher-coverage` | Portable Fire Extinguisher Coverage (NFPA 10) | National Fire Protection Association; Class A travel distance is 75 ft at all hazard levels and... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fall-arrest-clearance` | Required Fall-Arrest Clearance (ANSI Z359) | ANSI Z359.1 / OSHA 1926 Subpart M; free fall 6 + deceleration 3.5 + worker 5 + margin 3 = 17... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fire-friction` | Fire Hose Friction Loss | National Fire Academy; FL = C * Q^2 * L; 2.5 in C = 2; FL = 2 * (2.5)^2 * 2 = 25... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fire-pump-curve` | Fire Pump Rated / Churn / Overload Curve Check (NFPA 20) | NFPA 20 (Standard for the Installatio...; spec-v248 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -4899,6 +4901,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1526. Fixture-covered or reference-cadence: 1526 / 1526.
+Tile count: 1527. Fixture-covered or reference-cadence: 1527 / 1527.
 
 <!-- END tile-index-v14 -->

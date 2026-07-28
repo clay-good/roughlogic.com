@@ -2369,3 +2369,85 @@ function renderFoamEductorLimit(inputRegion, outputRegion, citationEl) {
   for (const f of [inlet, Q, C, nozzle, elev]) f.input.addEventListener("input", update);
 }
 FIRE_RENDERERS["foam-eductor-limit"] = renderFoamEductorLimit;
+
+// --- spec-v1143: portable fire extinguisher coverage (NFPA 10) ---
+// Two independent limits, and the interesting thing is that they are the same limit.
+// NFPA 10 caps travel distance to a Class A extinguisher at 75 ft, and 6.1.3.3 caps
+// coverage at 11,250 sq ft per extinguisher. Those are not separate numbers: on an
+// idealised clear floor with extinguishers on a square grid, the worst-case point sits at
+// the centre of a square, so the spacing can be d x sqrt(2) and the area per unit is
+// 2 d^2 - and 2 x 75^2 is exactly 11,250. The area ceiling IS the geometry of the travel
+// distance, which is worth knowing because it tells you the ceiling already assumes a
+// perfectly open floor. Every wall, rack, and locked door makes the real coverage smaller.
+// dims: in { floor_area_sf: L^2, hazard_class: dimensionless, travel_distance_ft: L, area_cap_sf: L^2 } out: { travel_used_ft: L, grid_spacing_ft: L, area_per_unit_sf: L^2, by_travel: dimensionless, by_area_cap: dimensionless, required_extinguishers: dimensionless }
+export function computeExtinguisherCoverage({ floor_area_sf = 0, hazard_class = "A", travel_distance_ft = 0, area_cap_sf = 11250 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(floor_area_sf) || 0;
+  const dIn = Number(travel_distance_ft) || 0;
+  const cap = Number(area_cap_sf) || 0;
+  if (!(area > 0)) return { error: "Floor area must be positive (sq ft)." };
+  if (!(cap > 0)) return { error: "Area cap per extinguisher must be positive (sq ft)." };
+  if (dIn < 0) return { error: "Travel distance cannot be negative (ft)." };
+
+  const FIXED = { A: 75, K: 30 };
+  const fixed_travel = FIXED[hazard_class];
+  const needs_entry = hazard_class === "B";
+  if (fixed_travel === undefined && !needs_entry) {
+    return { error: "Hazard class must be A, B, or K. Class D travel distances are not shipped here - read NFPA 10 for combustible metals." };
+  }
+  if (needs_entry && !(dIn > 0)) return { error: "For Class B, enter the travel distance (30 or 50 ft) that matches the extinguisher's B rating and the hazard level." };
+  const travel_used_ft = needs_entry ? dIn : fixed_travel;
+
+  // Idealised square grid: worst case is the centre of a square, at s x sqrt(2)/2.
+  const grid_spacing_ft = travel_used_ft * Math.SQRT2;
+  const area_per_unit_sf = 2 * travel_used_ft * travel_used_ft;
+  const by_travel = Math.ceil(area / area_per_unit_sf);
+  const by_area_cap = Math.ceil(area / cap);
+  const required_extinguishers = Math.max(by_travel, by_area_cap);
+  const travel_governs = by_travel >= by_area_cap;
+  // The identity that ties the two limits together, checked rather than asserted.
+  const cap_matches_geometry = Math.abs(area_per_unit_sf - cap) < 1e-9;
+
+  const note = "Two limits, and for Class A they are the SAME limit. NFPA 10 caps travel distance to a Class A extinguisher at 75 ft, and 6.1.3.3 caps coverage at 11,250 sq ft per extinguisher. Those are not independent numbers: on a clear floor with units on a square grid the worst-case point is the centre of a square, so the spacing can be d x sqrt(2) and the area per unit is 2 d^2 - and 2 x 75 x 75 is exactly 11,250. "
+    + "At " + travel_used_ft + " ft of travel the idealised grid spacing is " + grid_spacing_ft.toFixed(1) + " ft and each unit covers " + area_per_unit_sf.toFixed(0) + " sq ft"
+    + (cap_matches_geometry ? " - which is exactly the area cap entered, as it should be. " : ", against an entered cap of " + cap.toFixed(0) + " sq ft. ")
+    + "For " + area.toFixed(0) + " sq ft that is " + by_travel + " by travel distance and " + by_area_cap + " by the area cap, so " + required_extinguishers + " governs" + (travel_governs ? " on travel distance. " : " on the area cap. ")
+    + "THE CAVEAT THAT MATTERS MORE THAN THE ARITHMETIC: travel distance is measured along the PATH OF TRAVEL, not in a straight line. The grid figure above assumes a perfectly open floor with no walls, racking, machinery, or locked doors, which is exactly what a warehouse or an office floor is not. A 75 ft path around a partition wall can be 40 ft as the crow flies, so a layout that passes on area can fail badly on the walk. Treat this count as a FLOOR to start from and then walk the routes; the number of extinguishers only ever goes up from here. "
+    + "What this does NOT determine is the extinguisher RATING. NFPA 10 also sets a maximum floor area per unit of A by hazard classification - light, ordinary, and extra hazard each have their own - and that table decides whether a 2-A or a 4-A or something larger is needed. It is not reproduced here and it is a separate check; a floor with enough extinguishers of too small a rating still fails. "
+    + (hazard_class === "K" ? "Class K: a wet-chemical unit within 30 ft of the cooking appliance, in ADDITION to whatever the room needs for Class A - it does not substitute. " : "")
+    + (needs_entry ? "Class B travel distance is 30 or 50 ft depending on the extinguisher's B rating and the hazard level, which is why it is entered rather than assumed; read the Class B table for your combination. " : "")
+    + "Also not checked: mounting height and the weight thresholds that change it, visibility and signage, obstruction of the extinguisher itself, the specific hazards that need Class D or specialised agents, inspection and maintenance intervals, or whether an occupancy requires extinguishers at all. A planning aid, not a fire-protection design; NFPA 10 as adopted, the fire code official, and the AHJ govern.";
+
+  return { travel_used_ft, grid_spacing_ft, area_per_unit_sf, by_travel, by_area_cap, required_extinguishers, travel_governs, cap_matches_geometry, note };
+}
+
+export const extinguisherCoverageExample = { inputs: { floor_area_sf: 40000, hazard_class: "A", travel_distance_ft: 0, area_cap_sf: 11250 } };
+
+function _v1143renderExtinguisherCoverage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NFPA 10 - a maximum travel distance to a Class A extinguisher of 75 ft at all hazard levels, a maximum travel distance of 30 ft for Class K, a Class B travel distance of 30 or 50 ft depending on the extinguisher's B rating and the hazard level (entered, not assumed), and the 6.1.3.3 ceiling of 11,250 sq ft of coverage per extinguisher. The square-grid relation area = 2 x travel^2 is geometry, not a code value, and it reproduces the 11,250 exactly at 75 ft. Travel distance is measured along the PATH OF TRAVEL, not in a straight line, so the grid figure is an open-floor best case. The extinguisher RATING is a separate determination from NFPA 10's maximum-area-per-unit-of-A table by hazard classification, which is not reproduced here. Class D travel distances are not shipped. Also not checked: mounting height, signage, obstruction, inspection intervals, or whether extinguishers are required at all. A planning aid, not a fire-protection design; NFPA 10 as adopted and the AHJ govern.";
+  const a = makeNumber("Floor area (sq ft)", "exc-a", { step: "any", min: "0" }); a.input.value = "40000";
+  const hc = makeSelect("Hazard class", "exc-hc", [
+    { value: "A", label: "Class A - ordinary combustibles (75 ft)", selected: true },
+    { value: "B", label: "Class B - flammable liquids (enter 30 or 50 ft)" },
+    { value: "K", label: "Class K - cooking media (30 ft)" },
+  ]);
+  const td = makeNumber("Travel distance for Class B (ft)", "exc-td", { step: "any", min: "0" }); td.input.value = "0";
+  const cp = makeNumber("Area cap per extinguisher (sq ft; NFPA 11,250)", "exc-cp", { step: "any", min: "0" }); cp.input.value = "11250";
+  inputRegion.appendChild(a.wrap); inputRegion.appendChild(hc.wrap); inputRegion.appendChild(td.wrap); inputRegion.appendChild(cp.wrap);
+  attachExampleButton(inputRegion, () => { a.input.value = "40000"; hc.select.value = "A"; td.input.value = "0"; cp.input.value = "11250"; update(); });
+  const oN = makeOutputLine(outputRegion, "Extinguishers required", "exc-out-n");
+  const oG = makeOutputLine(outputRegion, "Idealised grid", "exc-out-g");
+  const oW = makeOutputLine(outputRegion, "Which limit governs", "exc-out-w");
+  const oNote = makeOutputLine(outputRegion, "Note", "exc-out-note");
+  const update = debounce(() => {
+    const r = computeExtinguisherCoverage({ floor_area_sf: Number(a.input.value) || 0, hazard_class: hc.select.value, travel_distance_ft: Number(td.input.value) || 0, area_cap_sf: Number(cp.input.value) || 0 });
+    if (r.error) { oN.textContent = r.error; oG.textContent = "-"; oW.textContent = "-"; oNote.textContent = "-"; return; }
+    oN.textContent = r.required_extinguishers + " (a FLOOR - walk the paths before trusting it)";
+    oG.textContent = fmt(r.grid_spacing_ft, 1) + " ft spacing, " + fmt(r.area_per_unit_sf, 0) + " sq ft per unit at " + fmt(r.travel_used_ft, 0) + " ft of travel" + (r.cap_matches_geometry ? " - exactly the area cap" : "");
+    oW.textContent = r.travel_governs ? "travel distance (" + r.by_travel + " vs " + r.by_area_cap + " by area cap)" : "the area cap (" + r.by_area_cap + " vs " + r.by_travel + " by travel)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of [a, td, cp]) x.input.addEventListener("input", update);
+  hc.select.addEventListener("change", update);
+}
+FIRE_RENDERERS["extinguisher-coverage"] = _v1143renderExtinguisherCoverage;
