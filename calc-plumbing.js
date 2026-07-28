@@ -5109,3 +5109,115 @@ function _v1146renderWaterServicePressureCheck(inputRegion, outputRegion, citati
   for (const x of [cb, wh, ec]) x.select.addEventListener("change", update);
 }
 PLUMBING_RENDERERS["water-service-pressure-check"] = _v1146renderWaterServicePressureCheck;
+
+// --- spec-v1160: accessible toilet compartments (2010 ADA Standards 213.3.1, 604.8) ---
+// Where toilet compartments are provided at least one must be WHEELCHAIR accessible, and a
+// second, AMBULATORY accessible compartment is required in addition where six or more
+// compartments are provided OR where urinals and water closets together total six or more
+// fixtures. That OR is the trap: a room with four stalls and three urinals is seven fixtures
+// and owes an ambulatory compartment even though nobody counted six stalls.
+// The wheelchair compartment is 60 in wide minimum and 56 in deep for a WALL HUNG water
+// closet or 59 in for a FLOOR MOUNTED one - so swapping the fixture type breaks a 56 in stall
+// without moving a partition.
+// The ambulatory compartment's width is a WINDOW, 35 in minimum to 37 in maximum: a 40 in
+// stall is too WIDE to qualify, because the point is grab bars on both sides within reach.
+// dims: in { compartment_count: dimensionless, urinal_count: dimensionless, water_closet_count: dimensionless, wheelchair_width_in: L, wheelchair_depth_in: L, wc_mounting: dimensionless, ambulatory_provided: dimensionless, ambulatory_width_in: L, ambulatory_depth_in: L } out: { required_wheelchair_depth_in: L, wheelchair_depth_deficit_in: L, wheelchair_width_deficit_in: L, fixture_total: dimensionless }
+export function computeAccessibleToiletCompartment({ compartment_count = 0, urinal_count = 0, water_closet_count = 0, wheelchair_width_in = 0, wheelchair_depth_in = 0, wc_mounting = "wall-hung", ambulatory_provided = "no", ambulatory_width_in = 0, ambulatory_depth_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const stalls = Number(compartment_count) || 0;
+  const urinals = Number(urinal_count) || 0;
+  const wcs = Number(water_closet_count) || 0;
+  const wW = Number(wheelchair_width_in) || 0;
+  const wD = Number(wheelchair_depth_in) || 0;
+  const aW = Number(ambulatory_width_in) || 0;
+  const aD = Number(ambulatory_depth_in) || 0;
+  const floorMounted = wc_mounting === "floor-mounted";
+  const ambProvided = ambulatory_provided === "yes";
+  if (wc_mounting !== "wall-hung" && wc_mounting !== "floor-mounted") return { error: "Water closet mounting must be wall-hung or floor-mounted - the required compartment depth differs by 3 in between them." };
+  if (!Number.isInteger(stalls) || stalls <= 0) return { error: "Toilet compartments provided must be a positive whole number." };
+  if (!Number.isInteger(urinals) || urinals < 0) return { error: "Urinal count must be a whole number, zero or more." };
+  if (!Number.isInteger(wcs) || wcs <= 0) return { error: "Water closet count must be a positive whole number." };
+  if (!(wW > 0) || !(wD > 0)) return { error: "Wheelchair compartment width and depth must be positive (in)." };
+  if (ambProvided && (!(aW > 0) || !(aD > 0))) return { error: "Ambulatory compartment width and depth must be positive (in) when one is provided." };
+
+  const MIN_W = 60, DEPTH_WALL = 56, DEPTH_FLOOR = 59;
+  const AMB_MIN_W = 35, AMB_MAX_W = 37, AMB_MIN_D = 60;
+  const TRIGGER = 6;
+
+  const required_wheelchair_depth_in = floorMounted ? DEPTH_FLOOR : DEPTH_WALL;
+  const wheelchair_width_ok = wW >= MIN_W;
+  const wheelchair_depth_ok = wD >= required_wheelchair_depth_in;
+  const wheelchair_width_deficit_in = Math.max(0, MIN_W - wW);
+  const wheelchair_depth_deficit_in = Math.max(0, required_wheelchair_depth_in - wD);
+  const wheelchair_ok = wheelchair_width_ok && wheelchair_depth_ok;
+  // The same stall as the other mounting, for the swap nobody prices.
+  const other_mounting_depth_in = floorMounted ? DEPTH_WALL : DEPTH_FLOOR;
+  const survives_mounting_swap = wD >= other_mounting_depth_in;
+
+  const fixture_total = urinals + wcs;
+  const by_compartments = stalls >= TRIGGER;
+  const by_fixtures = fixture_total >= TRIGGER;
+  const ambulatory_required = by_compartments || by_fixtures;
+  const fixtures_alone_trigger = by_fixtures && !by_compartments;
+
+  const ambulatory_width_ok = ambProvided ? (aW >= AMB_MIN_W && aW <= AMB_MAX_W) : null;
+  const ambulatory_too_wide = ambProvided ? aW > AMB_MAX_W : null;
+  const ambulatory_depth_ok = ambProvided ? aD >= AMB_MIN_D : null;
+  const ambulatory_ok = ambProvided ? (ambulatory_width_ok && ambulatory_depth_ok) : null;
+  const ambulatory_missing = ambulatory_required && !ambProvided;
+
+  const passes = wheelchair_ok && !ambulatory_missing && (ambulatory_required ? ambulatory_ok === true : true);
+
+  const note = "TWO COMPARTMENTS CAN BE OWED, and the second is triggered by an OR that people read as an AND. 213.3.1 requires one WHEELCHAIR accessible compartment wherever toilet compartments are provided, and one AMBULATORY accessible compartment IN ADDITION where six or more compartments are provided OR where urinals and water closets together total six or more fixtures. "
+    + "This room has " + stalls + " compartment" + (stalls === 1 ? "" : "s") + " and " + fixture_total + " fixtures (" + wcs + " water closet" + (wcs === 1 ? "" : "s") + " + " + urinals + " urinal" + (urinals === 1 ? "" : "s") + "): an ambulatory compartment is " + (ambulatory_required ? "REQUIRED" : "not required") + ". "
+    + (fixtures_alone_trigger ? "NOTE WHICH LIMB FIRED: only " + stalls + " compartments, which is under six, but the FIXTURE count is " + fixture_total + " - the urinals carry it over. This is the case that gets missed, because the stalls get counted and the urinals do not. " : "")
+    + "WHEELCHAIR COMPARTMENT (604.8.1.1): 60 in wide minimum, and " + required_wheelchair_depth_in + " in deep minimum for a " + (floorMounted ? "FLOOR MOUNTED" : "WALL HUNG") + " water closet. Provided " + wW + " x " + wD + " in: "
+    + (wheelchair_ok ? "OK. " : (wheelchair_width_ok ? "" : "WIDTH short by " + wheelchair_width_deficit_in.toFixed(1) + " in. ") + (wheelchair_depth_ok ? "" : "DEPTH short by " + wheelchair_depth_deficit_in.toFixed(1) + " in. "))
+    + "THE DEPTH FOLLOWS THE FIXTURE: 56 in for wall hung, 59 in for floor mounted. " + (survives_mounting_swap ? "This stall would still comply if the mounting changed. " : "Changing to a " + (floorMounted ? "wall hung" : "floor mounted") + " water closet " + (floorMounted ? "would relax the depth to 56 in" : "would demand 59 in and this stall has " + wD + " in") + " - a fixture substitution that moves no partition can pass or fail the compartment. ")
+    + (ambulatory_required
+      ? (ambProvided
+        ? "AMBULATORY COMPARTMENT (604.8.2.1): 60 in deep minimum, and a width WINDOW of 35 in minimum to 37 in maximum. Provided " + aW + " x " + aD + " in: " + (ambulatory_ok ? "OK. " : (ambulatory_width_ok ? "" : (ambulatory_too_wide ? "TOO WIDE at " + aW + " in - and too wide is a real failure, not a bonus, because the compartment exists to put grab bars on BOTH side walls within reach of someone who walks but needs support. A generous stall defeats it. " : "TOO NARROW at " + aW + " in. ")) + (ambulatory_depth_ok ? "" : "DEPTH short by " + (AMB_MIN_D - aD).toFixed(1) + " in. "))
+        : "AMBULATORY COMPARTMENT: REQUIRED and none provided. It is IN ADDITION to the wheelchair compartment, not an alternative to it - a room with one large accessible stall and five ordinary ones does not comply. ")
+      : "No ambulatory compartment is required at this count. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: door swing and the requirement that a compartment door not swing into the minimum required area, door opening width and location; toe clearance under the front and side partitions and the exception at greater depths; grab bar length, height, and position; water closet centerline location; the clear floor space and turning space in the room itself; lavatory, dispenser, and mirror requirements; the accessible route to the room; children's-use dimensions, which differ; and the higher or additional requirements in ANSI A117.1, the adopted building code, and state and local accessibility law. A compartment sizing screen, not a restroom design; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { required_wheelchair_depth_in, wheelchair_width_ok, wheelchair_depth_ok, wheelchair_width_deficit_in, wheelchair_depth_deficit_in, wheelchair_ok, other_mounting_depth_in, survives_mounting_swap, fixture_total, by_compartments, by_fixtures, fixtures_alone_trigger, ambulatory_required, ambulatory_provided: ambProvided, ambulatory_width_ok, ambulatory_too_wide, ambulatory_depth_ok, ambulatory_ok, ambulatory_missing, passes, note };
+}
+
+export const accessibleToiletCompartmentExample = { inputs: { compartment_count: 4, urinal_count: 3, water_closet_count: 4, wheelchair_width_in: 60, wheelchair_depth_in: 56, wc_mounting: "floor-mounted", ambulatory_provided: "no", ambulatory_width_in: 0, ambulatory_depth_in: 0 } };
+
+function _v1160renderAccessibleToiletCompartment(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: 2010 ADA Standards for Accessible Design, 213.3.1 and 604.8. Section 213.3.1: where toilet compartments are provided, at least one shall comply with 604.8.1, and in addition at least one shall comply with 604.8.2 where six or more toilet compartments are provided or where the combination of urinals and water closets totals six or more fixtures. Section 604.8.1.1: wheelchair accessible compartments shall be 60 in wide minimum measured perpendicular to the side wall, and 56 in deep minimum for wall hung water closets and 59 in deep minimum for floor mounted water closets measured perpendicular to the rear wall. Section 604.8.2.1: ambulatory accessible compartments shall have a depth of 60 in minimum and a width of 35 in minimum and 37 in maximum. A US federal standard in the public domain. Not checked: door swing and the requirement that the door not swing into the minimum required area, toe clearance under the partitions and its exception at greater depths, grab bars, water closet centerline, clear floor and turning space in the room, lavatories and dispensers, the accessible route, children's-use dimensions, or the additional requirements of ANSI A117.1 and state and local accessibility law. A compartment sizing screen, not a restroom design; the 2010 ADA Standards and the AHJ govern.";
+  const nStall = makeNumber("Toilet compartments in the room", "atc-n", { step: "1", min: "1" }); nStall.input.value = "4";
+  const nWc = makeNumber("Water closets in the room", "atc-wc", { step: "1", min: "1" }); nWc.input.value = "4";
+  const nUr = makeNumber("Urinals in the room", "atc-ur", { step: "1", min: "0" }); nUr.input.value = "3";
+  const mount = makeSelect("Water closet mounting", "atc-mount", [{ value: "wall-hung", label: "Wall hung (56 in deep min)" }, { value: "floor-mounted", label: "Floor mounted (59 in deep min)" }]);
+  mount.select.value = "floor-mounted";
+  const wW = makeNumber("Wheelchair compartment width (in)", "atc-ww", { step: "any", min: "0" }); wW.input.value = "60";
+  const wD = makeNumber("Wheelchair compartment depth (in)", "atc-wd", { step: "any", min: "0" }); wD.input.value = "56";
+  const ambP = makeSelect("Ambulatory compartment provided?", "atc-ap", [{ value: "no", label: "No" }, { value: "yes", label: "Yes" }]);
+  const aW = makeNumber("Ambulatory compartment width (in)", "atc-aw", { step: "any", min: "0" }); aW.input.value = "0";
+  const aD = makeNumber("Ambulatory compartment depth (in)", "atc-ad", { step: "any", min: "0" }); aD.input.value = "0";
+  for (const x of [nStall, nWc, nUr, mount, wW, wD, ambP, aW, aD]) inputRegion.appendChild(x.wrap);
+  attachExampleButton(inputRegion, () => { nStall.input.value = "4"; nWc.input.value = "4"; nUr.input.value = "3"; mount.select.value = "floor-mounted"; wW.input.value = "60"; wD.input.value = "56"; ambP.select.value = "no"; aW.input.value = "0"; aD.input.value = "0"; update(); });
+  const oV = makeOutputLine(outputRegion, "Verdict", "atc-out-v");
+  const oT = makeOutputLine(outputRegion, "What is required", "atc-out-t");
+  const oW = makeOutputLine(outputRegion, "Wheelchair compartment", "atc-out-w");
+  const oA = makeOutputLine(outputRegion, "Ambulatory compartment", "atc-out-a");
+  const oS = makeOutputLine(outputRegion, "If the water closet mounting changed", "atc-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "atc-out-note");
+  const update = debounce(() => {
+    const r = computeAccessibleToiletCompartment({ compartment_count: Number(nStall.input.value) || 0, water_closet_count: Number(nWc.input.value) || 0, urinal_count: Number(nUr.input.value) || 0, wc_mounting: mount.select.value, wheelchair_width_in: Number(wW.input.value) || 0, wheelchair_depth_in: Number(wD.input.value) || 0, ambulatory_provided: ambP.select.value, ambulatory_width_in: Number(aW.input.value) || 0, ambulatory_depth_in: Number(aD.input.value) || 0 });
+    if (r.error) { oV.textContent = r.error; oT.textContent = "-"; oW.textContent = "-"; oA.textContent = "-"; oS.textContent = "-"; oNote.textContent = "-"; return; }
+    oV.textContent = r.passes ? "PASSES the items entered" : "DOES NOT PASS";
+    oT.textContent = "1 wheelchair compartment" + (r.ambulatory_required ? " + 1 ambulatory (triggered by " + (r.fixtures_alone_trigger ? r.fixture_total + " fixtures, not by the compartment count" : r.by_compartments && r.by_fixtures ? "both the compartment and fixture counts" : "the compartment count") + ")" : "; no ambulatory required at this count");
+    oW.textContent = "needs 60 x " + r.required_wheelchair_depth_in + " in: " + (r.wheelchair_ok ? "OK" : [r.wheelchair_width_ok ? null : "width short " + fmt(r.wheelchair_width_deficit_in, 1) + " in", r.wheelchair_depth_ok ? null : "depth short " + fmt(r.wheelchair_depth_deficit_in, 1) + " in"].filter(Boolean).join(", "));
+    oA.textContent = !r.ambulatory_required ? "not required" : r.ambulatory_missing ? "REQUIRED and not provided" : r.ambulatory_ok ? "OK (35-37 in wide, 60 in deep min)" : [r.ambulatory_width_ok ? null : (r.ambulatory_too_wide ? "too WIDE for the 35-37 in window" : "too narrow"), r.ambulatory_depth_ok ? null : "depth under 60 in"].filter(Boolean).join(", ");
+    oS.textContent = r.survives_mounting_swap ? "still complies at " + r.other_mounting_depth_in + " in" : "would need " + r.other_mounting_depth_in + " in deep and has " + fmt(Number(wD.input.value) || 0, 1) + " in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of [nStall, nWc, nUr, wW, wD, aW, aD]) x.input.addEventListener("input", update);
+  for (const x of [mount, ambP]) x.select.addEventListener("change", update);
+}
+PLUMBING_RENDERERS["accessible-toilet-compartment"] = _v1160renderAccessibleToiletCompartment;

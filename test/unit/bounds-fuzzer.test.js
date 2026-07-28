@@ -33532,3 +33532,63 @@ test("bounds: spec-v1159 computeAccessibleParkingCount pins Table 208.2, the 2% 
   assert.ok("error" in _v1159({ ...base, provided_accessible: 2.5 }));
   assert.ok("error" in _v1159({ ...base, total_spaces: Infinity }));
 });
+
+import { computeAccessibleToiletCompartment as _v1160 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v1160 computeAccessibleToiletCompartment pins the OR trigger, the mounting-dependent depth, the 35-37 in width window, and error seams", () => {
+  const base = { compartment_count: 4, urinal_count: 3, water_closet_count: 4, wheelchair_width_in: 60, wheelchair_depth_in: 56, wc_mounting: "floor-mounted", ambulatory_provided: "no", ambulatory_width_in: 0, ambulatory_depth_in: 0 };
+  const r = _v1160(base);
+  assert.ok(r.required_wheelchair_depth_in === 59 && r.wheelchair_depth_deficit_in === 3 && !r.wheelchair_ok);
+  assert.ok(r.fixture_total === 7 && r.fixtures_alone_trigger && r.ambulatory_required && r.ambulatory_missing && !r.passes);
+  // THE TRIGGER IS AN OR - each limb fires alone, and the compartment limb alone is not enough to hide the other.
+  const big = { ...base, wheelchair_depth_in: 60, ambulatory_provided: "yes", ambulatory_width_in: 36, ambulatory_depth_in: 60 };
+  for (const [stalls, wcs, urinals, req, aloneFix] of [
+    [1, 1, 0, false, false], [5, 5, 0, false, false], [5, 5, 1, true, true], [6, 6, 0, true, false],
+    [4, 4, 3, true, true], [3, 3, 2, false, false], [3, 3, 3, true, true], [7, 7, 0, true, false], [6, 3, 3, true, false]]) {
+    const t = _v1160({ ...big, compartment_count: stalls, water_closet_count: wcs, urinal_count: urinals });
+    assert.ok(t.ambulatory_required === req, "trigger wrong at " + stalls + " stalls / " + wcs + " wc / " + urinals + " ur");
+    assert.ok(t.fixtures_alone_trigger === aloneFix, "which limb fired is wrong at " + stalls + "/" + wcs + "/" + urinals);
+    assert.ok(t.fixture_total === wcs + urinals);
+  }
+  // Urinals alone carry a room over: same four stalls, one urinal at a time.
+  assert.ok(!_v1160({ ...big, compartment_count: 4, water_closet_count: 4, urinal_count: 1 }).ambulatory_required);
+  assert.ok(_v1160({ ...big, compartment_count: 4, water_closet_count: 4, urinal_count: 2 }).ambulatory_required);
+  // THE DEPTH FOLLOWS THE FIXTURE, and 56 vs 59 is the whole difference.
+  for (const [mount, depth, other] of [["wall-hung", 56, 59], ["floor-mounted", 59, 56]]) {
+    const t = _v1160({ ...base, wc_mounting: mount });
+    assert.ok(t.required_wheelchair_depth_in === depth && t.other_mounting_depth_in === other);
+  }
+  assert.ok(_v1160({ ...base, wc_mounting: "wall-hung" }).wheelchair_depth_ok, "56 in passes wall hung");
+  assert.ok(!_v1160({ ...base, wc_mounting: "floor-mounted" }).wheelchair_depth_ok, "the same stall fails floor mounted");
+  assert.ok(_v1160({ ...base, wc_mounting: "wall-hung" }).survives_mounting_swap === false, "56 in would not survive the swap to 59");
+  assert.ok(_v1160({ ...base, wheelchair_depth_in: 59, wc_mounting: "wall-hung" }).survives_mounting_swap === true);
+  // Wheelchair seams: 60 in wide and each depth boundary pass exactly, a tenth under fails.
+  for (const [w, ok] of [[59.9, false], [60, true], [72, true]]) assert.ok(_v1160({ ...base, wheelchair_width_in: w }).wheelchair_width_ok === ok);
+  for (const [d, ok] of [[58.9, false], [59, true], [60, true]]) assert.ok(_v1160({ ...base, wheelchair_depth_in: d }).wheelchair_depth_ok === ok);
+  for (const [d, ok] of [[55.9, false], [56, true]]) assert.ok(_v1160({ ...base, wc_mounting: "wall-hung", wheelchair_depth_in: d }).wheelchair_depth_ok === ok);
+  // THE AMBULATORY WIDTH IS A WINDOW - too wide fails as surely as too narrow, and they are distinguished.
+  for (const [w, ok, wide] of [[34.9, false, false], [35, true, false], [36, true, false], [37, true, false], [37.1, false, true], [40, false, true], [60, false, true]]) {
+    const t = _v1160({ ...big, ambulatory_width_in: w });
+    assert.ok(t.ambulatory_width_ok === ok, "ambulatory width window wrong at " + w);
+    assert.ok(t.ambulatory_too_wide === wide, "too-wide flag wrong at " + w);
+  }
+  for (const [d, ok] of [[59.9, false], [60, true], [72, true]]) assert.ok(_v1160({ ...big, ambulatory_depth_in: d }).ambulatory_depth_ok === ok);
+  // A wider stall is NOT a safer stall here - the fuzzer pins the non-monotonicity explicitly.
+  assert.ok(_v1160({ ...big, ambulatory_width_in: 36 }).passes && !_v1160({ ...big, ambulatory_width_in: 48 }).passes);
+  // IN ADDITION, not instead: a compliant wheelchair compartment never satisfies the ambulatory requirement.
+  const missing = _v1160({ ...big, ambulatory_provided: "no" });
+  assert.ok(missing.wheelchair_ok && missing.ambulatory_missing && !missing.passes);
+  assert.ok(missing.ambulatory_ok === null && missing.ambulatory_width_ok === null, "an absent compartment is null, not a pass");
+  // Where no ambulatory compartment is required, its absence is not a failure.
+  const small = _v1160({ ...big, compartment_count: 2, water_closet_count: 2, urinal_count: 0, ambulatory_provided: "no" });
+  assert.ok(!small.ambulatory_required && !small.ambulatory_missing && small.passes);
+  // Error seams.
+  assert.ok("error" in _v1160({ ...base, wc_mounting: "pedestal" }));
+  assert.ok("error" in _v1160({ ...base, compartment_count: 0 }));
+  assert.ok("error" in _v1160({ ...base, compartment_count: 2.5 }));
+  assert.ok("error" in _v1160({ ...base, water_closet_count: 0 }));
+  assert.ok("error" in _v1160({ ...base, urinal_count: -1 }));
+  assert.ok("error" in _v1160({ ...base, wheelchair_width_in: 0 }));
+  assert.ok("error" in _v1160({ ...base, ambulatory_provided: "yes", ambulatory_width_in: 0, ambulatory_depth_in: 60 }));
+  assert.ok("error" in _v1160({ ...base, wheelchair_depth_in: Infinity }));
+});

@@ -1450,6 +1450,7 @@ const RELATED = {
   "vent-terminal-check": ["aav-install-check","fixture-clearance-check","plumbing-fixture-count","roofing-squares"],
   "aav-install-check": ["vent-terminal-check","fixture-clearance-check","plumbing-fixture-count"],
   "grab-bar-layout": ["fixture-clearance-check","shower-compartment-check","ada-ramp-slope","guard-post-load"],
+  "accessible-toilet-compartment": ["fixture-clearance-check","grab-bar-layout","plumbing-fixture-count","accessible-parking-count"],
   "cleanout-layout": ["vent-terminal-check","aav-install-check","plumbing-fixture-count"],
   "water-service-pressure-check": ["wh-expansion-tank","water-hammer-arrestor","pipe-sizing"],
   "egress-capacity": ["occupant-load","plumbing-fixture-count","stair-stringer"],

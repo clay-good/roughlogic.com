@@ -1435,6 +1435,7 @@ export const COMPUTE_MAP = {
   "plumbing-fixture-count": { module: "../../calc-construction.js", fn: "computePlumbingFixtureCount" },
   "fixture-clearance-check": { module: "../../calc-plumbing.js", fn: "computeFixtureClearanceCheck" },
   "shower-compartment-check": { module: "../../calc-plumbing.js", fn: "computeShowerCompartmentCheck" },
+  "accessible-toilet-compartment": { module: "../../calc-plumbing.js", fn: "computeAccessibleToiletCompartment" },
   "vent-terminal-check": { module: "../../calc-plumbing.js", fn: "computeVentTerminalCheck" },
   "aav-install-check": { module: "../../calc-plumbing.js", fn: "computeAavInstallCheck" },
   "grab-bar-layout": { module: "../../calc-plumbing.js", fn: "computeGrabBarLayout" },

@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "ada toilet stall size",
+      "target": "accessible-toilet-compartment",
+      "kind": "industry"
+    },
+    {
+      "term": "when is an ambulatory stall required",
+      "target": "accessible-toilet-compartment",
+      "kind": "question"
+    },
+    {
+      "term": "ambulatory accessible compartment width",
+      "target": "accessible-toilet-compartment",
+      "kind": "industry"
+    },
+    {
+      "term": "how deep does a handicap stall need to be",
+      "target": "accessible-toilet-compartment",
+      "kind": "question"
+    },
+    {
       "term": "how many accessible parking spaces",
       "target": "accessible-parking-count",
       "kind": "question"
