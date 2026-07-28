@@ -1643,6 +1643,7 @@ export const COMPUTE_MAP = {
   "tactile-sign-mounting": { module: "../../calc-construction.js", fn: "computeTactileSignMounting" },
   "drinking-fountain-check": { module: "../../calc-construction.js", fn: "computeDrinkingFountainCheck" },
   "accessible-shower-check": { module: "../../calc-construction.js", fn: "computeAccessibleShowerCheck" },
+  "substantial-improvement-check": { module: "../../calc-construction.js", fn: "computeSubstantialImprovement" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 

@@ -34895,3 +34895,72 @@ test("bounds: spec-v1178 computeAccessibleShowerCheck pins all three type geomet
   assert.ok("error" in _v1178({ ...base, clearance_length_in: -1 }));
   assert.ok("error" in _v1178({ ...base, width_in: Infinity }));
 });
+
+import { computeSubstantialImprovement as _v1179 } from "../../calc-construction.js";
+
+test("bounds: spec-v1179 computeSubstantialImprovement pins the structure-only denominator, the cumulative rule, both exclusions, and error seams", () => {
+  const base = { market_value: 180000, improvement_cost: 95000, prior_costs: 0, threshold_pct: 50, land_value: 220000, excluded_code_cost: 0, historic_structure: "no" };
+  const r = _v1179(base);
+  assert.ok(r.threshold === 90000 && Math.abs(r.ratio_pct - 52.7777778) < 1e-6 && r.single_triggers && r.over_by === 5000 && r.triggers);
+  assert.ok(Math.abs(r.wrong_ratio_pct - 23.75) < 1e-9 && Math.abs(r.land_share_pct - 55) < 1e-9 && r.property_value === 400000);
+  // THE DENOMINATOR IS THE STRUCTURE: land never moves the verdict.
+  for (const land of [0, 50000, 220000, 5000000]) {
+    const t = _v1179({ ...base, land_value: land });
+    assert.ok(t.ratio_pct === r.ratio_pct && t.triggers === r.triggers && t.threshold === 90000, "land moved the verdict at " + land);
+  }
+  assert.ok(_v1179({ ...base, land_value: 0 }).wrong_ratio_pct === null && _v1179({ ...base, land_value: 0 }).land_share_pct === null);
+  // The threshold seam: equal to 50 percent TRIGGERS ("equals or exceeds").
+  for (const [cost, trig] of [[89999, false], [90000, true], [90001, true]]) {
+    assert.ok(_v1179({ ...base, improvement_cost: cost }).triggers === trig, "threshold seam wrong at " + cost);
+  }
+  // The percent is editable and communities may adopt lower.
+  for (const [pct, th] of [[50, 90000], [40, 72000], [25, 45000], [100, 180000]]) {
+    const t = _v1179({ ...base, threshold_pct: pct });
+    assert.ok(Math.abs(t.threshold - th) < 1e-9, "threshold wrong at " + pct + "%");
+  }
+  assert.ok(!_v1179({ ...base, improvement_cost: 50000, threshold_pct: 50 }).triggers);
+  assert.ok(_v1179({ ...base, improvement_cost: 50000, threshold_pct: 25 }).triggers, "a lower local threshold catches it");
+  // THE CUMULATIVE RULE: under alone, over together, and flagged as such.
+  const cum = _v1179({ ...base, improvement_cost: 60000, prior_costs: 40000, land_value: 0 });
+  assert.ok(!cum.single_triggers && cum.cumulative_triggers && cum.cumulative_only && cum.triggers);
+  assert.ok(cum.cumulative_cost === 100000 && cum.over_by === 10000 && Math.abs(cum.cumulative_ratio_pct - 55.5555556) < 1e-6);
+  assert.ok(!_v1179({ ...base, improvement_cost: 60000, prior_costs: 0, land_value: 0 }).triggers);
+  assert.ok(!_v1179({ ...base, prior_costs: 40000 }).cumulative_only, "already triggering alone is not cumulative-only");
+  // Headroom is exact and goes negative once over.
+  for (const [cost, prior] of [[10000, 0], [60000, 0], [90000, 0], [60000, 40000]]) {
+    const t = _v1179({ ...base, improvement_cost: cost, prior_costs: prior, land_value: 0 });
+    assert.ok(Math.abs(t.headroom - (90000 - (cost + prior))) < 1e-9);
+    assert.ok(Math.abs(t.over_by - Math.max(0, cost + prior - 90000)) < 1e-9 && t.over_by >= 0);
+  }
+  // THE CODE-CORRECTION EXCLUSION comes off before the ratio.
+  const exc = _v1179({ ...base, excluded_code_cost: 20000, land_value: 0 });
+  assert.ok(exc.countable_cost === 75000 && Math.abs(exc.ratio_pct - 41.6666667) < 1e-6 && !exc.single_triggers && !exc.triggers);
+  assert.ok(exc.headroom === 15000);
+  assert.ok(_v1179({ ...base, excluded_code_cost: 0, land_value: 0 }).countable_cost === 95000);
+  assert.ok(_v1179({ ...base, excluded_code_cost: 95000, land_value: 0 }).countable_cost === 0);
+  // THE HISTORIC EXCLUSION overrides a triggering ratio without hiding the arithmetic.
+  const hist = _v1179({ ...base, historic_structure: "yes" });
+  assert.ok(hist.historic_excluded && !hist.triggers && hist.single_triggers && hist.over_by === 5000, "the numbers still report while the exclusion applies");
+  // Ratios follow the market value exactly.
+  for (const mv of [50000, 180000, 500000]) {
+    const t = _v1179({ ...base, market_value: mv, land_value: 0 });
+    assert.ok(Math.abs(t.ratio_pct - (95000 / mv) * 100) < 1e-9 && Math.abs(t.threshold - mv / 2) < 1e-9);
+  }
+  // A more valuable structure is harder to trigger - monotonic in market value.
+  let prevTrig = true;
+  for (const mv of [100000, 180000, 190000, 300000]) {
+    const t = _v1179({ ...base, market_value: mv, land_value: 0 }).triggers;
+    assert.ok(!(t && !prevTrig), "triggering came back as the structure got more valuable"); prevTrig = t;
+  }
+  // Error seams.
+  assert.ok("error" in _v1179({ ...base, historic_structure: "maybe" }));
+  assert.ok("error" in _v1179({ ...base, market_value: 0 }));
+  assert.ok("error" in _v1179({ ...base, improvement_cost: -1 }));
+  assert.ok("error" in _v1179({ ...base, prior_costs: -1 }));
+  assert.ok("error" in _v1179({ ...base, threshold_pct: 0 }));
+  assert.ok("error" in _v1179({ ...base, threshold_pct: 101 }));
+  assert.ok("error" in _v1179({ ...base, land_value: -1 }));
+  assert.ok("error" in _v1179({ ...base, excluded_code_cost: -1 }));
+  assert.ok("error" in _v1179({ ...base, excluded_code_cost: 100000 }), "the exclusion cannot exceed the cost");
+  assert.ok("error" in _v1179({ ...base, market_value: Infinity }));
+});

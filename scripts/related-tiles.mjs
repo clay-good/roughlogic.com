@@ -919,6 +919,7 @@ const RELATED = {
   "tactile-sign-mounting": ["sign-character-height", "door-clear-width", "door-maneuvering-clearance", "drinking-fountain-check"],
   "drinking-fountain-check": ["knee-toe-clearance", "plumbing-fixture-count", "reach-range", "accessible-shower-check"],
   "accessible-shower-check": ["shower-compartment-check", "grab-bar-layout", "accessible-toilet-compartment", "turning-clear-floor-space"],
+  "substantial-improvement-check": ["flood-opening-area", "material-cost", "footing-area", "crawl-space-ventilation"],
   "rainwater-yield": ["rainwater-catchment-area", "stormwater-rational"],
   "rainwater-catchment-area": ["rainwater-yield", "stormwater-rational", "roof-drain-sizing"],
   "timesheet": ["overtime", "per-diem", "time-and-materials"],

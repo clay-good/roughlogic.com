@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "50 percent rule flood zone remodel",
+      "target": "substantial-improvement-check",
+      "kind": "industry"
+    },
+    {
+      "term": "will my remodel trigger substantial improvement",
+      "target": "substantial-improvement-check",
+      "kind": "question"
+    },
+    {
+      "term": "substantial damage flood insurance",
+      "target": "substantial-improvement-check",
+      "kind": "industry"
+    },
+    {
+      "term": "does land count toward the 50 percent rule",
+      "target": "substantial-improvement-check",
+      "kind": "question"
+    },
+    {
       "term": "ada roll in shower size",
       "target": "accessible-shower-check",
       "kind": "industry"

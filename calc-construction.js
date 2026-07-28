@@ -13516,3 +13516,95 @@ CONSTRUCTION_RENDERERS["accessible-shower-check"] = _simpleRenderer({
   ],
   compute: computeAccessibleShowerCheck,
 });
+
+// ===================== spec-v1179: NFIP substantial improvement and damage (44 CFR 59.1) =====================
+
+// The 50 percent rule decides whether a remodel in a flood zone is a remodel or a rebuild, and
+// almost nobody prices it before starting.
+// SUBSTANTIAL IMPROVEMENT: any reconstruction, rehabilitation, addition, or other improvement
+// whose COST equals or exceeds 50 percent of the MARKET VALUE OF THE STRUCTURE before the start
+// of construction. Cross that line and the whole building must be brought into compliance -
+// elevated above the base flood elevation, flood openings, the works - which is a different
+// project with a different budget.
+// SUBSTANTIAL DAMAGE: the same 50 percent, measured as the cost of restoring the structure to
+// its before-damaged condition against its market value BEFORE the damage. A structure that is
+// substantially damaged is treated as substantially improved when it is repaired.
+// The two things people get wrong: the denominator is the STRUCTURE, not the property - the land
+// is not in it, which on an expensive lot with a modest house makes the threshold far lower than
+// expected - and many communities count cumulative work over a period rather than one permit.
+// dims: in { market_value: dimensionless, improvement_cost: dimensionless, prior_costs: dimensionless } out: { threshold: dimensionless, headroom: dimensionless, ratio_pct: dimensionless }
+export function computeSubstantialImprovement({ market_value = 0, improvement_cost = 0, prior_costs = 0, threshold_pct = 50, land_value = 0, excluded_code_cost = 0, historic_structure = "no" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const mv = Number(market_value) || 0;
+  const cost = Number(improvement_cost) || 0;
+  const prior = Number(prior_costs) || 0;
+  const pct = Number(threshold_pct);
+  const land = Number(land_value) || 0;
+  const excluded = Number(excluded_code_cost) || 0;
+  const historic = historic_structure === "yes";
+  if (historic_structure !== "yes" && historic_structure !== "no") return { error: "State whether this is a historic structure (yes or no)." };
+  if (!(mv > 0)) return { error: "Market value of the STRUCTURE must be positive - the land is not part of it." };
+  if (cost < 0 || prior < 0) return { error: "Costs cannot be negative." };
+  if (!Number.isFinite(pct) || pct <= 0 || pct > 100) return { error: "Threshold percent must be between 0 and 100 (50 is the federal figure; communities may adopt a lower one)." };
+  if (land < 0) return { error: "Land value cannot be negative." };
+  if (excluded < 0) return { error: "Excluded code-correction cost cannot be negative." };
+  if (excluded > cost) return { error: "The excluded code-correction cost cannot exceed the total improvement cost." };
+
+  const FEDERAL_PCT = 50;
+  const threshold = mv * (pct / 100);
+  const countable_cost = Math.max(0, cost - excluded);
+  const cumulative_cost = countable_cost + prior;
+  const ratio_pct = (countable_cost / mv) * 100;
+  const cumulative_ratio_pct = (cumulative_cost / mv) * 100;
+
+  const single_triggers = countable_cost >= threshold;
+  const cumulative_triggers = cumulative_cost >= threshold;
+  const cumulative_only = cumulative_triggers && !single_triggers;
+  const headroom = threshold - cumulative_cost;
+  const over_by = Math.max(0, cumulative_cost - threshold);
+
+  // The land trap: what the ratio would look like if the property value were used instead.
+  const property_value = mv + land;
+  const wrong_ratio_pct = land > 0 ? (countable_cost / property_value) * 100 : null;
+  const land_share_pct = land > 0 ? (land / property_value) * 100 : null;
+
+  const triggers = cumulative_triggers && !historic;
+  const note = "THE 50 PERCENT RULE DECIDES WHETHER THIS IS A REMODEL OR A REBUILD, and almost nobody prices it before starting. Substantial improvement is any reconstruction, rehabilitation, addition, or other improvement whose COST equals or exceeds 50 percent of the MARKET VALUE OF THE STRUCTURE before the start of construction. Cross the line and the whole building has to be brought into compliance - elevated above the base flood elevation, flood openings, the rest of it - which is a different project with a different budget. "
+    + "THE DENOMINATOR IS THE STRUCTURE, NOT THE PROPERTY. The land is not in it. " + (land > 0 ? "With land at " + land.toLocaleString("en-US") + " the property is worth " + property_value.toLocaleString("en-US") + ", and a cost of " + countable_cost.toLocaleString("en-US") + " reads as " + wrong_ratio_pct.toFixed(1) + "% of THAT while being " + ratio_pct.toFixed(1) + "% of the structure. The land is " + land_share_pct.toFixed(0) + "% of the property here, and on an expensive lot with a modest house that gap is the whole argument. " : "No land value entered; note that using the property value or the tax assessment instead of the structure value is the single most common way this comes out wrong. ")
+    + "Threshold: " + pct + "% of " + mv.toLocaleString("en-US") + " = " + threshold.toLocaleString("en-US", { maximumFractionDigits: 0 }) + ". "
+    + (excluded > 0 ? "EXCLUDED: " + excluded.toLocaleString("en-US") + " of the " + cost.toLocaleString("en-US") + " is code-correction work. 59.1 excludes any project to correct existing violations of state or local health, sanitary, or safety code specifications that have been IDENTIFIED BY THE LOCAL CODE ENFORCEMENT OFFICIAL and are the minimum necessary to assure safe living conditions - two conditions, not one, and the official has to have identified them. That leaves " + countable_cost.toLocaleString("en-US") + " countable. " : "")
+    + "This work is " + ratio_pct.toFixed(1) + "% of structure value" + (prior > 0 ? ", and with " + prior.toLocaleString("en-US") + " of prior work it is " + cumulative_ratio_pct.toFixed(1) + "% cumulatively" : "") + ": "
+    + (single_triggers ? "OVER the threshold on this work alone. " : cumulative_only ? "under the threshold ALONE and OVER it cumulatively - which matters because many communities count improvements over a rolling period rather than one permit at a time, and that local rule is what catches a house improved in stages. " : "under the threshold, with " + headroom.toLocaleString("en-US", { maximumFractionDigits: 0 }) + " of room left. ")
+    + (over_by > 0 ? "Over by " + over_by.toLocaleString("en-US", { maximumFractionDigits: 0 }) + ". " : "")
+    + (historic ? "HISTORIC STRUCTURE: 59.1 excludes any alteration of a historic structure provided the alteration will not preclude the structure's continued designation as a historic structure - so this does not count as substantial improvement, subject to that proviso holding. " : "")
+    + "SUBSTANTIAL DAMAGE runs on the same 50 percent from the other direction: damage of any origin where the cost of RESTORING the structure to its before-damaged condition would equal or exceed 50 percent of the market value BEFORE the damage. A structure that is substantially damaged is treated as substantially improved when it is repaired, whatever the owner intended to spend. "
+    + (triggers ? "VERDICT: this work TRIGGERS substantial improvement. " : "VERDICT: on the figures entered, it does not trigger. ")
+    + "Not checked: what counts as cost, which communities define differently and which commonly includes materials, labour, overhead, profit, and donated or discounted work at market rates while excluding plans, permits, and site work outside the structure; how market value is established, whether by appraisal, adjusted assessment, or replacement cost less depreciation, which the community chooses and which changes the answer; whether the community has adopted a threshold BELOW 50 percent or a cumulative period, both of which are common and both of which are stricter than the federal minimum; the base flood elevation and freeboard the building would have to meet if triggered; whether the structure is in a Special Flood Hazard Area at all; and the separate insurance consequences. A threshold screen, not a determination - the community's floodplain administrator makes that call, and 44 CFR 59.1 and the local ordinance govern.";
+
+  return { threshold, countable_cost, cumulative_cost, ratio_pct, cumulative_ratio_pct, single_triggers, cumulative_triggers, cumulative_only, headroom, over_by, property_value, wrong_ratio_pct, land_share_pct, historic_excluded: historic, triggers, federal_pct: FEDERAL_PCT, note };
+}
+
+export const substantialImprovementExample = { inputs: { market_value: 180000, improvement_cost: 95000, prior_costs: 0, threshold_pct: 50, land_value: 220000, excluded_code_cost: 0, historic_structure: "no" } };
+
+CONSTRUCTION_RENDERERS["substantial-improvement-check"] = _simpleRenderer({
+  citation: "Citation: 44 CFR 59.1, the NFIP definitions, a US federal regulation in the public domain. 'Substantial improvement means any reconstruction, rehabilitation, addition, or other improvement of a structure, the cost of which equals or exceeds 50 percent of the market value of the structure before the start of construction of the improvement. This term includes structures which have incurred substantial damage, regardless of the actual repair work performed. The term does not, however, include either: (1) Any project for improvement of a structure to correct existing violations of state or local health, sanitary, or safety code specifications which have been identified by the local code enforcement official and which are the minimum necessary to assure safe living conditions or (2) Any alteration of a historic structure, provided that the alteration will not preclude the structure's continued designation as a historic structure.' 'Substantial damage means damage of any origin sustained by a structure whereby the cost of restoring the structure to its before damaged condition would equal or exceed 50 percent of the market value of the structure before the damage occurred.' The denominator is the market value of the STRUCTURE, not the property, and the land is not included. Not checked: what counts as cost, how market value is established, whether the community has adopted a lower threshold or a cumulative period, the base flood elevation the building would have to meet, whether the structure is in a Special Flood Hazard Area, or the insurance consequences. A threshold screen, not a determination - the community's floodplain administrator makes that call.",
+  example: substantialImprovementExample.inputs,
+  fields: [
+    { key: "market_value", label: "Market value of the STRUCTURE, before construction ($)", kind: "number", default: 180000 },
+    { key: "improvement_cost", label: "Cost of the improvement ($)", kind: "number", default: 95000 },
+    { key: "excluded_code_cost", label: "Of that, code-correction work identified by the official ($)", kind: "number", default: 0 },
+    { key: "prior_costs", label: "Prior improvements counted by a cumulative local rule ($)", kind: "number", default: 0 },
+    { key: "threshold_pct", label: "Threshold percent (50 federal; communities may adopt lower)", kind: "number", default: 50 },
+    { key: "land_value", label: "Land value, for comparison only ($; 0 = skip)", kind: "number", default: 220000 },
+    { key: "historic_structure", label: "Historic structure?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+  ],
+  outputs: [
+    { key: "t", id: "sic-out-t", label: "Threshold", value: (r) => "$" + fmt(r.threshold, 0) + " of countable cost" },
+    { key: "r", id: "sic-out-r", label: "This work", value: (r) => "$" + fmt(r.countable_cost, 0) + " = " + fmt(r.ratio_pct, 1) + "% of structure value" + (r.cumulative_cost !== r.countable_cost ? "; cumulative " + fmt(r.cumulative_ratio_pct, 1) + "%" : "") },
+    { key: "l", id: "sic-out-l", label: "The land trap", value: (r) => r.wrong_ratio_pct === null ? "no land value entered" : "against the whole property it would read as only " + fmt(r.wrong_ratio_pct, 1) + "% - the land is " + fmt(r.land_share_pct, 0) + "% of the property and is NOT in the denominator" },
+    { key: "h", id: "sic-out-h", label: "Headroom", value: (r) => r.over_by > 0 ? "OVER by $" + fmt(r.over_by, 0) : "$" + fmt(r.headroom, 0) + " left before the threshold" },
+    { key: "v", id: "sic-out-v", label: "Verdict", value: (r) => r.historic_excluded ? "historic structure - excluded, subject to the designation proviso" : r.triggers ? (r.cumulative_only ? "TRIGGERS cumulatively, though not on this work alone" : "TRIGGERS substantial improvement") : "does not trigger on these figures" },
+    { key: "n", id: "sic-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSubstantialImprovement,
+});
