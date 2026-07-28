@@ -1667,7 +1667,8 @@ const RELATED = {
   "radial-chip-thinning": ["cutting-speed-rpm","material-removal-rate","spindle-power-torque"],
   "boring-bar-deflection": ["boring-bar-max-overhang","spindle-power-torque","radial-chip-thinning","turning-surface-finish"],
   "boring-bar-max-overhang": ["boring-bar-deflection","spindle-power-torque","radial-chip-thinning","feed-for-surface-finish"],
-  "ballnose-scallop-height": ["turning-surface-finish","radial-chip-thinning","cutting-speed-rpm"],
+  "ballnose-scallop-height": ["ballnose-feed-cusp","turning-surface-finish","radial-chip-thinning","cutting-speed-rpm"],
+  "ballnose-feed-cusp": ["ballnose-scallop-height","turning-surface-finish","radial-chip-thinning","material-removal-rate"],
   // spec-v320..v322 refrigeration-cycle batch (Group C)
   "refrigerant-mass-flow": ["refrigerant-velocity","refrigeration-cop","condenser-heat-rejection"],
   "refrigeration-cop": ["refrigerant-mass-flow","condenser-heat-rejection","seer-eer"],

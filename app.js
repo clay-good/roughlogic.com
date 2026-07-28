@@ -992,7 +992,7 @@ const TOOL_MODULES = (() => {
     // v135 cutting power and spindle torque from MRR
     "spindle-power-torque", "spindle-max-mrr",
     // spec-v317..v319 machining depth batch
-    "radial-chip-thinning", "boring-bar-deflection", "boring-bar-max-overhang", "ballnose-scallop-height",
+    "radial-chip-thinning", "boring-bar-deflection", "boring-bar-max-overhang", "ballnose-scallop-height", "ballnose-feed-cusp",
     // spec-v401 spur gear tooth geometry
     "spur-gear-geometry", "gear-undercut-backlash", "gear-identification", "gear-chordal-thickness",
     // spec-v504 rolling-bearing L10 rating life (ISO 281)

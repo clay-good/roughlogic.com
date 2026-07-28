@@ -1222,6 +1222,7 @@ export const COMPUTE_MAP = {
   "boring-bar-deflection": { module: "../../calc-machining.js", fn: "computeBoringBarDeflection" },
   "boring-bar-max-overhang": { module: "../../calc-machining.js", fn: "computeBoringBarMaxOverhang" },
   "ballnose-scallop-height": { module: "../../calc-machining.js", fn: "computeBallnoseScallopHeight" },
+  "ballnose-feed-cusp": { module: "../../calc-machining.js", fn: "computeBallnoseFeedCusp" },
   // spec-v320..v322 refrigeration-cycle batch (3 tiles)
   "refrigerant-mass-flow": { module: "../../calc-refrigerant.js", fn: "computeRefrigerantMassFlow" },
   "refrigeration-cop": { module: "../../calc-refrigerant.js", fn: "computeRefrigerationCop" },

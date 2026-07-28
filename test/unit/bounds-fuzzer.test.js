@@ -31858,3 +31858,69 @@ test("bounds: spec-v1127 computeBarNesting pins the FFD packing, per-cut kerf ac
   assert.ok("error" in _v1127({ ...base, end_trim_in: 240 }));
   assert.ok("error" in _v1127({ ...base, stock_length_in: Infinity }));
 });
+
+import { computeBallnoseFeedCusp as _v1128 } from "../../calc-machining.js";
+import { computeBallnoseScallopHeight as _v1128sib } from "../../calc-machining.js";
+
+test("bounds: spec-v1128 computeBallnoseFeedCusp pins the shared cusp geometry, the governing rule, the balance point, and error seams", () => {
+  const base = { r_in: 0.25, stepover_in: 0.030, feed_per_tooth_in: 0.006, rpm: 8000, flutes: 2 };
+  const r = _v1128(base);
+  assert.ok(Math.abs(r.stepover_cusp_in - 0.00045041) < 1e-7 && Math.abs(r.feed_cusp_in - 0.000018001) < 1e-7);
+  assert.ok(!r.feed_governs && r.governing_cusp_in === r.stepover_cusp_in && r.feedrate_ipm === 96);
+  // CROSS-IMPLEMENTATION: the across-passes cusp is exactly the landed tile's.
+  for (const R of [0.0625, 0.125, 0.25, 0.5]) {
+    for (const s of [0.004, 0.01, 0.03, 0.06]) {
+      const t = _v1128({ ...base, r_in: R, stepover_in: s });
+      const sib = _v1128sib({ r_in: R, mode: "scallop-from-stepover", s_in: s });
+      assert.ok(t.stepover_cusp_in === sib.out_in, "stepover cusp disagrees with the sibling");
+      // The feed cusp uses the SAME function, so swapping the roles must swap the answers.
+      const swapped = _v1128({ ...base, r_in: R, stepover_in: t.feed_cusp_in > 0 ? base.feed_per_tooth_in : s, feed_per_tooth_in: s });
+      assert.ok(Math.abs(swapped.feed_cusp_in - t.stepover_cusp_in) < 1e-15, "the two directions must share one geometry");
+    }
+  }
+  // The governing cusp is always the max, and the flag agrees with it.
+  for (const s of [0.002, 0.006, 0.012, 0.03, 0.08]) {
+    for (const fz of [0.002, 0.006, 0.012, 0.03]) {
+      const t = _v1128({ ...base, stepover_in: s, feed_per_tooth_in: fz });
+      assert.ok(t.governing_cusp_in === Math.max(t.feed_cusp_in, t.stepover_cusp_in));
+      assert.ok(t.feed_governs === (t.feed_cusp_in > t.stepover_cusp_in));
+      assert.ok(t.feed_governs === (fz > s), "the larger spacing always makes the larger cusp");
+      // Both cusps are positive, below the radius, and match the w^2/(8R) approximation closely.
+      for (const [exact, approx] of [[t.feed_cusp_in, t.approx_feed_cusp_in], [t.stepover_cusp_in, t.approx_stepover_cusp_in]]) {
+        assert.ok(exact > 0 && exact < 0.25);
+        assert.ok(Math.abs(exact - approx) / exact < 0.02, "small-cusp approximation should be within 2%");
+        assert.ok(approx <= exact + 1e-15, "the w^2/(8R) form under-predicts");
+      }
+    }
+  }
+  // BALANCE POINT: equal spacings give exactly equal cusps.
+  const bal = _v1128({ ...base, stepover_in: 0.008, feed_per_tooth_in: 0.008 });
+  assert.ok(bal.feed_cusp_in === bal.stepover_cusp_in && !bal.feed_governs && bal.ratio === 1);
+  assert.ok(bal.balanced_feed_in === 0.008 && bal.balanced_stepover_in === 0.008);
+  // Setting either spacing to the other's balance value equalises the cusps.
+  const fixed = _v1128({ ...base, feed_per_tooth_in: r.balanced_feed_in });
+  assert.ok(Math.abs(fixed.feed_cusp_in - fixed.stepover_cusp_in) < 1e-18);
+  // SQUARE LAW: doubling a spacing quadruples its cusp, to within the small-angle error.
+  const dbl = _v1128({ ...base, stepover_in: 0.006, feed_per_tooth_in: 0.012 });
+  assert.ok(Math.abs(dbl.ratio - 4) < 0.01 && dbl.feed_governs);
+  // A bigger ball always leaves a smaller cusp at fixed spacing.
+  let prev = Infinity;
+  for (const R of [0.0625, 0.125, 0.25, 0.5, 1]) {
+    const t = _v1128({ ...base, r_in: R });
+    assert.ok(t.governing_cusp_in < prev); prev = t.governing_cusp_in;
+  }
+  // Feedrate is exactly fz x flutes x rpm, and null when no speed is given.
+  assert.ok(_v1128({ ...base, rpm: 0 }).feedrate_ipm === null);
+  assert.ok(Math.abs(_v1128({ ...base, flutes: 4 }).feedrate_ipm - 192) < 1e-9);
+  assert.ok(_v1128({ ...base, rpm: 0 }).governing_cusp_in === r.governing_cusp_in, "speed never changes the geometry");
+  // Error seams.
+  assert.ok("error" in _v1128({ ...base, r_in: 0 }));
+  assert.ok("error" in _v1128({ ...base, stepover_in: 0 }));
+  assert.ok("error" in _v1128({ ...base, feed_per_tooth_in: 0 }));
+  assert.ok("error" in _v1128({ ...base, stepover_in: 0.6 }), "stepover past the cutter diameter");
+  assert.ok("error" in _v1128({ ...base, feed_per_tooth_in: 0.6 }));
+  assert.ok("error" in _v1128({ ...base, rpm: -1 }));
+  assert.ok("error" in _v1128({ ...base, flutes: 0 }));
+  assert.ok("error" in _v1128({ ...base, flutes: 2.5 }));
+  assert.ok("error" in _v1128({ ...base, r_in: Infinity }));
+});

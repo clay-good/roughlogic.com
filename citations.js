@@ -14232,6 +14232,21 @@ export const CITATIONS = {
       { name: "Static estimate", value: "static solid-round model, not a stability-lobe analysis", source: "machining practice" },
     ],
   },
+  "ballnose-feed-cusp": {
+    formula: "cusp h = R - sqrt(R^2 - (w/2)^2) evaluated twice: with w = stepover for the cusp across the passes (delegated to ballnose-scallop-height) and with w = feed per tooth for the cusp along the feed. Governing cusp = max of the two; the two are equal when feed per tooth = stepover. Near the bottom both reduce to w^2/(8R). Feedrate = feed per tooth x flutes x rpm.",
+    edition: "Ballnose cusp geometry as used in CAM and mold machining. Both directions are the same circular-segment construction; nothing here is tabulated or proprietary.",
+    freeAccess: "Circular-segment geometry. No chart, table, or manufacturer data is used.",
+    governance: GOVERNANCE.general,
+    editionNote: "The reason to compute both cusps together is that only the larger one shows up on the part. A machinist who halves the stepover while leaving a coarse feed has spent cycle time on the cusp that was not governing, and the reverse mistake is just as common. The worked example is lopsided on purpose: a 1/2 in ballnose at 0.030 in stepover and 0.006 in per tooth leaves 0.000450 in across the passes against 0.000018 in along the feed, a factor of 25, so the finish is entirely a stepover question. The balance point is simple - the two cusps are equal exactly when the feed per tooth equals the stepover, because the geometry is identical in both directions. Both scale with the SQUARE of their spacing, so halving either cuts its cusp by four and doubling it quadruples it. One caution the tile states explicitly rather than leaving implied: geometric headroom on the feed is not permission to use it. Chip load, tool strength, deflection, and the machine\'s ability to hold the path at speed are what actually cap the feed and they usually bind first; all this says is that FINISH is not the reason to keep the feed low. These are theoretical geometric cusps on a flat surface cut at the tool tip. A sloped surface changes both the effective stepover and the effective cutting radius, and a ballnose at its tip is cutting at zero surface speed, which is its own finish problem. Tool deflection, runout, and servo behavior at direction changes all add to the real finish. Neither cusp converts to Ra: Ra is an averaged roughness and these are peak-to-valley geometry. A shop aid; the tool, the deflection, and the surface slope govern.",
+    assumptions: [
+      { name: "Same geometry both ways", value: "h = R - sqrt(R^2 - (w/2)^2) with w = stepover or feed per tooth", source: "circular-segment geometry" },
+      { name: "Governing cusp", value: "the larger of the two is what appears on the part", source: "surface geometry" },
+      { name: "Balance point", value: "the cusps are equal when feed per tooth = stepover", source: "follows from the shared formula" },
+      { name: "Stepover cusp", value: "delegated to computeBallnoseScallopHeight, not reimplemented", source: "landed sibling tile" },
+      { name: "Feed headroom", value: "geometric only; chip load, deflection, and the machine usually bind first", source: "stated caution" },
+      { name: "Not Ra", value: "peak-to-valley geometry on a flat surface at the tool tip; slope, deflection, and runout excluded", source: "stated scope limit" },
+    ],
+  },
   "ballnose-scallop-height": {
     formula: "scallop mode: h = R - sqrt(R^2 - (s/2)^2); stepover mode: s = 2 sqrt(R^2 - (R - h)^2); approx h ~ s^2/(8R).",
     edition: "The ballnose scallop (cusp) height geometry and its inverse, with the small-scallop approximation, as compiled in the CAM and mold-machining references, by name.",

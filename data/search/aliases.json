@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "feed direction cusp",
+      "target": "ballnose-feed-cusp",
+      "kind": "industry"
+    },
+    {
+      "term": "does stepover or feed control my finish",
+      "target": "ballnose-feed-cusp",
+      "kind": "question"
+    },
+    {
+      "term": "ballnose finish from feed per tooth",
+      "target": "ballnose-feed-cusp",
+      "kind": "question"
+    },
+    {
+      "term": "cusp along the toolpath",
+      "target": "ballnose-feed-cusp",
+      "kind": "industry"
+    },
+    {
+      "term": "balance stepover and feed for surface finish",
+      "target": "ballnose-feed-cusp",
+      "kind": "question"
+    },
+    {
       "term": "bar nesting",
       "target": "bar-nesting",
       "kind": "industry"

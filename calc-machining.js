@@ -1267,3 +1267,93 @@ function renderGearUndercutBacklash(inputRegion, outputRegion, citationEl) {
   update();
 }
 MACHINING_RENDERERS["gear-undercut-backlash"] = renderGearUndercutBacklash;
+
+// --- spec-v1128: ballnose feed-direction cusp and the governing finish ---
+// ballnose-scallop-height computes the cusp ACROSS the passes and says in its own note that
+// "the cusp along the feed direction" is separate. It is the same geometry rotated ninety
+// degrees: between two successive tooth marks the ball leaves a ridge
+//     h = R - sqrt(R^2 - (fz/2)^2)
+// with fz the feed per tooth in place of the stepover. The point of putting both in one
+// tile is that the finish you actually get is the LARGER of the two, and a machinist who
+// halves the stepover while leaving a coarse feed has spent time on the cusp that was not
+// governing. The stepover cusp is delegated to the landed tile so the two cannot drift.
+// dims: in { r_in: L, stepover_in: L, feed_per_tooth_in: L, rpm: T^-1, flutes: dimensionless } out: { feed_cusp_in: L, stepover_cusp_in: L, governing_cusp_in: L, feedrate_ipm: L T^-1, balanced_feed_in: L, balanced_stepover_in: L }
+export function computeBallnoseFeedCusp({ r_in = 0.25, stepover_in = 0.03, feed_per_tooth_in = 0.004, rpm = 0, flutes = 2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R = Number(r_in) || 0;
+  const s = Number(stepover_in) || 0;
+  const fz = Number(feed_per_tooth_in) || 0;
+  const N = Number(rpm) || 0;
+  const z = Number(flutes) || 0;
+  if (!(R > 0)) return { error: "Ballnose radius must be positive (in)." };
+  if (!(s > 0)) return { error: "Stepover must be positive (in)." };
+  if (!(fz > 0)) return { error: "Feed per tooth must be positive (in)." };
+  if (s > 2 * R) return { error: "The stepover exceeds the cutter diameter (s > 2R) - adjacent passes do not overlap." };
+  if (fz > 2 * R) return { error: "Feed per tooth exceeds the cutter diameter - not a physical cut." };
+  if (N < 0) return { error: "Spindle speed cannot be negative (rpm)." };
+  if (!Number.isInteger(z) || z < 1) return { error: "Flute count must be a whole number of 1 or more." };
+
+  const cusp = (w) => R - Math.sqrt(R * R - (w / 2) * (w / 2));
+  const feed_cusp_in = cusp(fz);
+  // Delegated: the across-passes cusp must be exactly what the landed tile returns.
+  const across = computeBallnoseScallopHeight({ r_in: R, mode: "scallop-from-stepover", s_in: s });
+  if (across.error) return { error: across.error };
+  const stepover_cusp_in = across.out_in;
+
+  const feed_governs = feed_cusp_in > stepover_cusp_in;
+  const governing_cusp_in = Math.max(feed_cusp_in, stepover_cusp_in);
+  const governed_by = feed_governs ? "the FEED direction" : "the STEPOVER direction";
+  const ratio = stepover_cusp_in > 0 ? feed_cusp_in / stepover_cusp_in : null;
+  // The setting that would make the two cusps equal - past it, tightening further buys nothing.
+  const balanced_feed_in = s;
+  const balanced_stepover_in = fz;
+  const feedrate_ipm = N > 0 ? fz * z * N : null;
+  // Both cusps go as the square of their spacing near the bottom, so a 2x change is 4x.
+  const approx_feed_cusp_in = fz * fz / (8 * R);
+  const approx_stepover_cusp_in = s * s / (8 * R);
+
+  const note = "A " + (2 * R).toFixed(4) + " in ballnose stepping " + s + " in and feeding " + fz + " in per tooth leaves two cusps, not one: "
+    + stepover_cusp_in.toFixed(6) + " in ACROSS the passes and " + feed_cusp_in.toFixed(6) + " in ALONG the feed. "
+    + "The surface you get is the larger of the two, so " + governed_by + " governs here at " + governing_cusp_in.toFixed(6) + " in"
+    + (ratio !== null ? " (the feed cusp is " + ratio.toFixed(2) + " times the stepover cusp)" : "") + ". "
+    + (feed_governs
+      ? "Tightening the STEPOVER any further buys nothing until the feed comes down - a common way to spend cycle time on the cusp that was not governing. Drop the feed per tooth to " + balanced_stepover_in + " in to match the stepover cusp. "
+      : Math.abs(feed_cusp_in - stepover_cusp_in) < 1e-12
+        ? "The two are balanced, which is the efficient point: neither setting is wasting time on a cusp the other already dominates. "
+        : "The stepover governs, so the feed has geometric headroom: the cusp would not care until " + balanced_feed_in + " in per tooth. Geometric headroom is not permission - chip load, tool strength, deflection, and the machine's ability to hold the path at speed are what actually cap the feed, and they usually bind first. What this tells you is only that the FINISH is not the reason to keep the feed low. ")
+    + "Both cusps follow the same geometry, h = R - sqrt(R^2 - (w/2)^2) with w the stepover or the feed per tooth, and near the bottom both reduce to w^2/(8R) - so they scale with the SQUARE of the spacing and halving either one cuts its cusp by four. "
+    + (feedrate_ipm !== null ? "At " + N + " rpm on " + z + " flutes that feed is " + feedrate_ipm.toFixed(1) + " in/min. " : "")
+    + "Theoretical geometric cusps on a FLAT surface cut at the tool tip. A sloped surface changes the effective stepover and the effective cutting radius (a ballnose at the tip is cutting at zero surface speed, which is its own finish problem); tool deflection, runout, and the machine's servo behavior at direction changes all add to the real finish. Neither cusp converts to Ra - Ra is an averaged roughness and these are peak-to-valley geometry. A shop aid; the actual finish depends on the tool, the deflection, and the surface slope.";
+
+  return { feed_cusp_in, stepover_cusp_in, governing_cusp_in, feed_governs, governed_by, ratio, balanced_feed_in, balanced_stepover_in, feedrate_ipm, approx_feed_cusp_in, approx_stepover_cusp_in, note };
+}
+export const ballnoseFeedCuspExample = { inputs: { r_in: 0.25, stepover_in: 0.030, feed_per_tooth_in: 0.006, rpm: 8000, flutes: 2 } };
+
+function _v1128renderBallnoseFeedCusp(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: the ballnose cusp geometry h = R - sqrt(R^2 - (w/2)^2) applied twice - once with w = the stepover, giving the cusp across the passes (delegated to the landed ballnose-scallop-height tile so the two cannot disagree), and once with w = the feed per tooth, giving the cusp along the feed direction that the stepover tile names as separate. Near the bottom both reduce to w^2/(8R), so each scales with the square of its spacing. The finish is the LARGER of the two cusps; the two are balanced when the feed per tooth equals the stepover. Theoretical geometric cusps on a flat surface cut at the tool tip: a sloped surface changes the effective stepover and cutting radius, and tool deflection, runout, and servo behavior at direction changes add to the real finish. Neither converts to Ra, which is an averaged roughness rather than peak-to-valley geometry. A shop aid; the tool, the deflection, and the surface slope govern.";
+  const r = makeNumber("Ballnose radius R (in = cutter dia / 2)", "bfc-r", { step: "any", min: "0" }); r.input.value = "0.25";
+  const s = makeNumber("Stepover (in)", "bfc-s", { step: "any", min: "0" }); s.input.value = "0.030";
+  const fz = makeNumber("Feed per tooth (in)", "bfc-fz", { step: "any", min: "0" }); fz.input.value = "0.006";
+  const n = makeNumber("Spindle speed (rpm; 0 to skip the feedrate)", "bfc-n", { step: "any", min: "0" }); n.input.value = "8000";
+  const z = makeNumber("Flutes", "bfc-z", { step: "1", min: "1" }); z.input.value = "2";
+  for (const f of [r, s, fz, n, z]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { r.input.value = "0.25"; s.input.value = "0.030"; fz.input.value = "0.006"; n.input.value = "8000"; z.input.value = "2"; update(); });
+  const oAcross = makeOutputLine(outputRegion, "Cusp across the passes (stepover)", "bfc-out-across");
+  const oAlong = makeOutputLine(outputRegion, "Cusp along the feed", "bfc-out-along");
+  const oGov = makeOutputLine(outputRegion, "What you actually get", "bfc-out-gov");
+  const oBal = makeOutputLine(outputRegion, "To balance the two", "bfc-out-bal");
+  const oFeed = makeOutputLine(outputRegion, "Feedrate", "bfc-out-feed");
+  const oNote = makeOutputLine(outputRegion, "Note", "bfc-out-note");
+  const update = debounce(() => {
+    const res = computeBallnoseFeedCusp({ r_in: Number(r.input.value) || 0, stepover_in: Number(s.input.value) || 0, feed_per_tooth_in: Number(fz.input.value) || 0, rpm: Number(n.input.value) || 0, flutes: Number(z.input.value) || 0 });
+    if (res.error) { oAcross.textContent = res.error; oAlong.textContent = "-"; oGov.textContent = "-"; oBal.textContent = "-"; oFeed.textContent = "-"; oNote.textContent = "-"; return; }
+    oAcross.textContent = fmt(res.stepover_cusp_in, 6) + " in";
+    oAlong.textContent = fmt(res.feed_cusp_in, 6) + " in";
+    oGov.textContent = fmt(res.governing_cusp_in, 6) + " in - " + res.governed_by + " governs";
+    oBal.textContent = res.feed_governs ? "drop the feed to " + fmt(res.balanced_stepover_in, 4) + " in/tooth" : "the feed could open to " + fmt(res.balanced_feed_in, 4) + " in/tooth for free";
+    oFeed.textContent = res.feedrate_ipm === null ? "- (enter an rpm)" : fmt(res.feedrate_ipm, 1) + " in/min";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [r, s, fz, n, z]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["ballnose-feed-cusp"] = _v1128renderBallnoseFeedCusp;
