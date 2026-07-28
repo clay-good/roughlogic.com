@@ -11767,3 +11767,95 @@ CONSTRUCTION_RENDERERS["scaffold-platform-check"] = _simpleRenderer({
   ],
   compute: computeScaffoldPlatformCheck,
 });
+
+
+// --- spec-v1152: temporary stairway check (OSHA 1926.1052) ---
+// landing-check (spec-v1133) does IRC landings for finished stairs. This is the construction
+// stairway, and it is governed differently in three ways worth knowing.
+// First, the trigger is a DOUBLE condition read the unusual way: four or more risers OR
+// rising more than 30 in, WHICHEVER IS LESS - so a three-riser flight that climbs 32 in is
+// caught by the height even though it fails the riser count, and a four-riser flight is
+// caught even if it climbs only 24 in. Whichever is less means whichever comes FIRST.
+// Second, the angle is bounded on BOTH sides: between 30 and 50 degrees. Too shallow is a
+// violation, not a courtesy - a 25-degree run is a ramp with steps in it.
+// Third, uniformity is measured as a VARIATION across the flight, not a tolerance on each
+// step: not over 1/4 in in any stairway system.
+// dims: in { riser_count: dimensionless, total_rise_in: L, riser_height_in: L, tread_depth_in: L, riser_variation_in: L, tread_variation_in: L, stairrail_height_in: L, landing_depth_in: L } out: { angle_deg: dimensionless, rail_required: dimensionless, worst_variation_in: L }
+export function computeTemporaryStairwayCheck({ riser_count = 0, total_rise_in = 0, riser_height_in = 0, tread_depth_in = 0, riser_variation_in = 0, tread_variation_in = 0, stairrail_height_in = 0, landing_depth_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n = Number(riser_count) || 0;
+  const rise = Number(total_rise_in) || 0;
+  const rh = Number(riser_height_in) || 0;
+  const td = Number(tread_depth_in) || 0;
+  const rv = Number(riser_variation_in) || 0;
+  const tv = Number(tread_variation_in) || 0;
+  const rail = Number(stairrail_height_in) || 0;
+  const land = Number(landing_depth_in) || 0;
+  if (!Number.isInteger(n) || n < 1) return { error: "Riser count must be a whole number of 1 or more." };
+  if (!(rh > 0)) return { error: "Riser height must be positive (in)." };
+  if (!(td > 0)) return { error: "Tread depth must be positive (in)." };
+  if (rise < 0 || rv < 0 || tv < 0 || rail < 0 || land < 0) return { error: "Rises, variations, and heights cannot be negative (in)." };
+
+  const ANGLE_MIN = 30, ANGLE_MAX = 50, VAR_MAX = 0.25, RISER_TRIGGER = 4, RISE_TRIGGER = 30, RAIL_MIN = 36, LANDING_MIN = 30;
+  const total_rise_used_in = rise > 0 ? rise : n * rh;
+  // Angle from the actual step geometry.
+  const angle_deg = Math.atan(rh / td) * 180 / Math.PI;
+  const angle_ok = angle_deg >= ANGLE_MIN && angle_deg <= ANGLE_MAX;
+  const too_shallow = angle_deg < ANGLE_MIN;
+
+  // "Four or more risers OR rising more than 30 inches, whichever is less" - whichever
+  // comes FIRST, so either condition alone triggers it.
+  const by_risers = n >= RISER_TRIGGER;
+  const by_height = total_rise_used_in > RISE_TRIGGER;
+  const rail_required = by_risers || by_height;
+  const trigger = !rail_required ? "neither" : by_risers && by_height ? "both the riser count and the rise" : by_risers ? "the riser count alone" : "the rise alone";
+
+  const worst_variation_in = Math.max(rv, tv);
+  const uniform_ok = worst_variation_in <= VAR_MAX;
+  const variation_source = rv >= tv ? "riser height" : "tread depth";
+
+  const rail_entered = rail > 0;
+  const rail_height_ok = rail_required && rail_entered ? rail >= RAIL_MIN : null;
+  const landing_entered = land > 0;
+  const landing_ok = landing_entered ? land >= LANDING_MIN : null;
+
+  const passes = angle_ok && uniform_ok && (rail_height_ok !== false) && (landing_ok !== false) && !(rail_required && !rail_entered);
+
+  const note = "ANGLE is bounded on BOTH sides: stairs shall be installed between " + ANGLE_MIN + " and " + ANGLE_MAX + " degrees from horizontal. A " + rh + " in riser on a " + td + " in tread is " + angle_deg.toFixed(1) + " degrees, " + (angle_ok ? "in range. " : too_shallow ? "TOO SHALLOW - and too shallow is a violation, not a courtesy. A run under 30 degrees is a ramp with steps in it, and people trip on it precisely because it does not read as stairs. " : "TOO STEEP. ")
+    + "STAIRRAIL TRIGGER, read the unusual way: four or more risers OR rising more than " + RISE_TRIGGER + " in, WHICHEVER IS LESS - which means whichever comes FIRST, so either condition alone catches it. Here " + n + " riser" + (n === 1 ? "" : "s") + " and " + total_rise_used_in.toFixed(1) + " in of rise trigger it via " + trigger + ". "
+    + (rail_required
+      ? "So a handrail and stairrail system is REQUIRED on unprotected sides. " + (rail_entered ? "The stairrail entered is " + rail + " in from its upper surface to the tread surface, against the " + RAIL_MIN + " in minimum for a post-1991 installation: " + (rail_height_ok ? "OK. " : "SHORT. ") : "No stairrail height entered, so this cannot be confirmed compliant. ")
+      : "A three-riser flight climbing 30 in or less escapes both halves - but only just, and adding a single riser or an inch of rise flips it. ")
+    + "UNIFORMITY is a VARIATION ACROSS THE FLIGHT, not a tolerance on each step: riser height and tread depth uniform within each flight, with variation not over " + VAR_MAX + " in in any stairway system. The worst here is " + worst_variation_in + " in in " + variation_source + ", " + (uniform_ok ? "OK. " : "OVER. ") + "That distinction matters because a flight of individually reasonable steps can still fail if the first and last differ by more than a quarter inch - and the step people fall on is the odd one, not the average one. "
+    + (landing_entered ? "LANDINGS: not less than " + LANDING_MIN + " in in the direction of travel, at every 12 ft or less of vertical rise - " + land + " in entered, " + (landing_ok ? "OK. " : "SHORT. ") : "No landing depth entered; landings are required at every 12 ft or less of vertical rise and want at least " + LANDING_MIN + " in in the direction of travel. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: the 22 in landing width; handrail height and clearance, which differ from the stairrail figures; midrails and the openings between them; whether a stairway is required at all versus a ladder or ramp; slippery conditions and the prohibition on using stairs with unfilled metal pan treads; temporary treads and landings during construction; spiral and alternating tread devices; and the finished-stair geometry, which is a different code entirely - see the landing-check and stair-code tiles for IRC and IBC. A screen, not a stair design; 29 CFR 1926 Subpart X and the competent person govern.";
+
+  return { angle_deg, angle_ok, too_shallow, total_rise_used_in, by_risers, by_height, rail_required, trigger, worst_variation_in, uniform_ok, variation_source, rail_entered, rail_height_ok, landing_entered, landing_ok, passes, note };
+}
+
+export const temporaryStairwayCheckExample = { inputs: { riser_count: 3, total_rise_in: 32, riser_height_in: 10.67, tread_depth_in: 11, riser_variation_in: 0.5, tread_variation_in: 0.125, stairrail_height_in: 0, landing_depth_in: 0 } };
+
+CONSTRUCTION_RENDERERS["temporary-stairway-check"] = _simpleRenderer({
+  citation: "Citation: OSHA 29 CFR 1926.1052, Subpart X - Stairways and Ladders. A US federal regulation in the public domain. Stairs shall be installed between 30 degrees and 50 degrees from horizontal; riser height and tread depth shall be uniform within each flight of stairs, with variations not over 1/4 inch in any stairway system; landings not less than 30 inches in the direction of travel and at least 22 inches in width at every 12 feet or less of vertical rise; stairways having four or more risers or rising more than 30 inches, whichever is less, shall be equipped with handrail and stairrail systems on unprotected sides; and for installations after March 15, 1991 the height of stairrails shall be not less than 36 inches from the upper surface of the stairrail system to the surface of the tread. Not checked: the 22 in landing width, handrail height and clearance, midrails and openings, whether a stairway is required at all, unfilled metal pan treads, temporary treads and landings, spiral and alternating tread devices, or finished-stair geometry under the IRC and IBC. A screen, not a stair design; Subpart X and the competent person govern.",
+  example: temporaryStairwayCheckExample.inputs,
+  fields: [
+    { key: "riser_count", label: "Risers in the flight", kind: "number", default: 3 },
+    { key: "total_rise_in", label: "Total rise (in; 0 = risers x riser height)", kind: "number", default: 32 },
+    { key: "riser_height_in", label: "Riser height (in)", kind: "number", default: 10.67 },
+    { key: "tread_depth_in", label: "Tread depth (in)", kind: "number", default: 11 },
+    { key: "riser_variation_in", label: "Largest riser-height variation in the flight (in)", kind: "number", default: 0.5 },
+    { key: "tread_variation_in", label: "Largest tread-depth variation in the flight (in)", kind: "number", default: 0.125 },
+    { key: "stairrail_height_in", label: "Stairrail height above the tread (in; 0 = none)", kind: "number", default: 0 },
+    { key: "landing_depth_in", label: "Landing depth in the direction of travel (in; 0 to skip)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "a", id: "tsc-out-a", label: "Angle (30-50 degrees)", value: (r) => fmt(r.angle_deg, 1) + " deg - " + (r.angle_ok ? "in range" : r.too_shallow ? "TOO SHALLOW" : "TOO STEEP") },
+    { key: "t", id: "tsc-out-t", label: "Stairrail trigger", value: (r) => r.rail_required ? "REQUIRED via " + r.trigger : "not triggered - under 4 risers and 30 in or less of rise" },
+    { key: "h", id: "tsc-out-h", label: "Stairrail height (36 in min)", value: (r) => !r.rail_required ? "n/a" : !r.rail_entered ? "required but none entered" : r.rail_height_ok ? "OK" : "SHORT of 36 in" },
+    { key: "u", id: "tsc-out-u", label: "Uniformity (1/4 in across the flight)", value: (r) => fmt(r.worst_variation_in, 3) + " in in " + r.variation_source + " - " + (r.uniform_ok ? "OK" : "OVER") },
+    { key: "v", id: "tsc-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "tsc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTemporaryStairwayCheck,
+});

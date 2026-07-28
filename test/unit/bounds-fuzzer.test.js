@@ -33089,3 +33089,54 @@ test("bounds: spec-v1151 computeScaffoldPlatformCheck pins the length-driven ove
   assert.ok("error" in _v1151({ ...base, overhang_in: -1 }));
   assert.ok("error" in _v1151({ ...base, plank_length_ft: Infinity }));
 });
+
+import { computeTemporaryStairwayCheck as _v1152 } from "../../calc-construction.js";
+
+test("bounds: spec-v1152 computeTemporaryStairwayCheck pins the whichever-is-less trigger, the two-sided angle, flight-wide uniformity, and error seams", () => {
+  const base = { riser_count: 3, total_rise_in: 32, riser_height_in: 10.67, tread_depth_in: 11, riser_variation_in: 0.5, tread_variation_in: 0.125, stairrail_height_in: 0, landing_depth_in: 0 };
+  const r = _v1152(base);
+  assert.ok(r.angle_ok && Math.abs(r.angle_deg - 44.127543) < 1e-4);
+  assert.ok(!r.by_risers && r.by_height && r.rail_required && r.trigger === "the rise alone");
+  assert.ok(r.worst_variation_in === 0.5 && !r.uniform_ok && !r.passes);
+  // WHICHEVER IS LESS = whichever comes FIRST: either condition alone triggers the rail.
+  for (const [n, rise, expected] of [[3, 24, false], [3, 31, true], [4, 24, true], [6, 42, true], [1, 30, false]]) {
+    const t = _v1152({ ...base, riser_count: n, total_rise_in: rise });
+    assert.ok(t.rail_required === expected, "trigger wrong at " + n + " risers / " + rise + " in");
+    assert.ok(t.by_risers === (n >= 4) && t.by_height === (rise > 30));
+  }
+  assert.ok(_v1152({ ...base, riser_count: 3, total_rise_in: 30 }).rail_required === false, "30 in exactly is not MORE than 30");
+  assert.ok(_v1152({ ...base, riser_count: 3, total_rise_in: 30.1 }).rail_required);
+  // The rise falls back to risers x riser height when not entered.
+  const derived = _v1152({ ...base, riser_count: 6, total_rise_in: 0, riser_height_in: 7 });
+  assert.ok(derived.total_rise_used_in === 42 && derived.by_height && derived.by_risers);
+  // ANGLE is bounded BOTH ways, and too-shallow is distinguished from too-steep.
+  assert.ok(_v1152({ ...base, riser_height_in: 8, tread_depth_in: 18 }).too_shallow);
+  assert.ok(!_v1152({ ...base, riser_height_in: 8, tread_depth_in: 18 }).angle_ok);
+  const steep = _v1152({ ...base, riser_height_in: 14, tread_depth_in: 9 });
+  assert.ok(!steep.angle_ok && !steep.too_shallow);
+  for (const [rh, td] of [[6, 10.392], [10, 8.391]]) {
+    const t = _v1152({ ...base, riser_height_in: rh, tread_depth_in: td });
+    assert.ok(t.angle_ok, "boundary geometry should sit inside the window");
+    assert.ok(Math.abs(t.angle_deg - Math.atan(rh / td) * 180 / Math.PI) < 1e-9);
+  }
+  // UNIFORMITY: the worst of the two governs, and 1/4 in exactly is compliant.
+  assert.ok(_v1152({ ...base, riser_variation_in: 0.25, tread_variation_in: 0.25 }).uniform_ok);
+  assert.ok(!_v1152({ ...base, riser_variation_in: 0.26, tread_variation_in: 0 }).uniform_ok);
+  assert.ok(_v1152({ ...base, riser_variation_in: 0, tread_variation_in: 0.5 }).variation_source === "tread depth");
+  assert.ok(_v1152({ ...base, riser_variation_in: 0.5, tread_variation_in: 0 }).variation_source === "riser height");
+  // A required rail with no height entered cannot pass; entering a compliant one clears it.
+  const needsRail = _v1152({ ...base, riser_variation_in: 0.125 });
+  assert.ok(needsRail.rail_required && !needsRail.rail_entered && !needsRail.passes);
+  assert.ok(_v1152({ ...base, riser_variation_in: 0.125, stairrail_height_in: 36 }).passes);
+  assert.ok(!_v1152({ ...base, riser_variation_in: 0.125, stairrail_height_in: 35.9 }).rail_height_ok);
+  // Landing check engages only when entered.
+  assert.ok(_v1152({ ...base, landing_depth_in: 0 }).landing_ok === null);
+  assert.ok(_v1152({ ...base, landing_depth_in: 30 }).landing_ok && !_v1152({ ...base, landing_depth_in: 29.9 }).landing_ok);
+  // Error seams.
+  assert.ok("error" in _v1152({ ...base, riser_count: 0 }));
+  assert.ok("error" in _v1152({ ...base, riser_count: 2.5 }));
+  assert.ok("error" in _v1152({ ...base, riser_height_in: 0 }));
+  assert.ok("error" in _v1152({ ...base, tread_depth_in: 0 }));
+  assert.ok("error" in _v1152({ ...base, riser_variation_in: -1 }));
+  assert.ok("error" in _v1152({ ...base, riser_height_in: Infinity }));
+});

@@ -12436,6 +12436,21 @@ export const CITATIONS = {
       { name: "Not determined", value: "which protective system, soil class, PE approval, inspections, water, utilities", source: "stated scope limit" },
     ],
   },
+  "temporary-stairway-check": {
+    formula: "angle = atan(riser height / tread depth) in degrees, required between 30 and 50; a stairrail is required where risers >= 4 OR total rise > 30 in (whichever comes first); uniformity passes where the worst of the riser-height and tread-depth variations is <= 1/4 in; stairrail height >= 36 in from its upper surface to the tread surface; landing depth >= 30 in in the direction of travel.",
+    edition: "OSHA 29 CFR 1926.1052, Subpart X - Stairways and Ladders. A US federal regulation in the public domain, quoted directly.",
+    freeAccess: "29 CFR is published in full at no cost by OSHA and the eCFR.",
+    governance: GOVERNANCE.general,
+    editionNote: "Three things separate a construction stairway from a finished one. The stairrail trigger is a double condition phrased in a way that reads backwards at first: four or more risers OR rising more than 30 inches, WHICHEVER IS LESS. Whichever is less means whichever comes FIRST, so either condition alone catches the flight - a three-riser flight climbing 32 in is caught by the rise despite failing the riser count, and a four-riser flight climbing 24 in is caught by the count despite failing the rise. Reading it as requiring both is the common error and it exempts flights the standard covers. The angle is bounded on BOTH sides, between 30 and 50 degrees from horizontal, and too shallow is a violation rather than a courtesy: a run under 30 degrees is a ramp with steps in it, and people trip on it precisely because it does not read as stairs from above. Uniformity is the third: riser height and tread depth uniform within each flight, with variation not over 1/4 inch in any stairway system. That is a variation ACROSS the flight rather than a tolerance on each step, so a flight of individually reasonable steps still fails if the first and last differ by more than a quarter inch - and the step people fall on is the odd one, not the average one. Not checked: the 22 in landing width; handrail height and clearance, which differ from the stairrail figures; midrails and the openings between them; whether a stairway is required at all rather than a ladder or ramp; the prohibition on using stairs with unfilled metal pan treads; temporary treads and landings during construction; spiral and alternating tread devices; and finished-stair geometry, which is a different code entirely and has its own tiles. A screen, not a stair design; Subpart X and the competent person govern.",
+    assumptions: [
+      { name: "Angle", value: "between 30 and 50 degrees from horizontal - bounded both ways", source: "29 CFR 1926.1052(a)" },
+      { name: "Stairrail trigger", value: "four or more risers OR rising more than 30 in, whichever comes first", source: "29 CFR 1926.1052(c)(1)" },
+      { name: "Stairrail height", value: "not less than 36 in from the upper surface to the tread, post-1991", source: "29 CFR 1926.1052(c)" },
+      { name: "Uniformity", value: "variation not over 1/4 in ACROSS the flight, not per step", source: "29 CFR 1926.1052(a)" },
+      { name: "Landing depth", value: "not less than 30 in in the direction of travel, at every 12 ft or less of rise", source: "29 CFR 1926.1052(a)" },
+      { name: "Not checked", value: "landing width, handrails, midrails, metal pan treads, spiral and alternating treads", source: "stated scope limit" },
+    ],
+  },
   "scaffold-platform-check": {
     formula: "worst gap = max(gap between adjacent units, gap between platform and uprights), capped at 1 in; platform width >= 18 in; maximum overhang = 12 in where the platform length is 10 ft or less and 18 in where it is greater, satisfied either within the limit or by a designed non-tipping cantilever; front edge <= 14 in from the face of the work, satisfied either within the limit or by front-edge guardrails and/or personal fall arrest.",
     edition: "OSHA 29 CFR 1926.451(b), Subpart L - Scaffolds. A US federal regulation in the public domain, quoted directly.",
