@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "ada braille sign mounting height",
+      "target": "tactile-sign-mounting",
+      "kind": "industry"
+    },
+    {
+      "term": "how high do i mount a room sign",
+      "target": "tactile-sign-mounting",
+      "kind": "question"
+    },
+    {
+      "term": "can a sign go on the door",
+      "target": "tactile-sign-mounting",
+      "kind": "question"
+    },
+    {
+      "term": "48 to 60 inch baseline tactile",
+      "target": "tactile-sign-mounting",
+      "kind": "industry"
+    },
+    {
       "term": "ada stair riser and tread",
       "target": "ada-stair-check",
       "kind": "industry"

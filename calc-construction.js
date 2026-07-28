@@ -13230,3 +13230,89 @@ CONSTRUCTION_RENDERERS["ada-stair-check"] = _simpleRenderer({
   ],
   compute: computeAdaStairCheck,
 });
+
+// ===================== spec-v1176: tactile sign mounting (2010 ADA Standards 703.4) =====================
+
+// The rule reads like a range and is not one. 703.4.1 is TWO measurements taken from TWO
+// different characters: 48 in minimum from the baseline of the LOWEST tactile character, and
+// 60 in maximum from the baseline of the HIGHEST. A tall sign therefore has a usable window
+// far narrower than 12 in, and a sign whose tactile block is more than 12 in tall cannot be
+// mounted compliantly at all - no height satisfies both ends at once.
+// 703.4.2 puts it alongside the door at the LATCH side, not on the door, because a person
+// reading it has to stand still while the door stays shut. And the 18 x 18 in clear floor space
+// must sit beyond the arc of the door swing between closed and 45 degrees open, which is what
+// rules out the wall a door swings back against.
+// dims: in { lowest_baseline_in: L, tactile_block_height_in: L, clear_space_width_in: L, clear_space_depth_in: L } out: { highest_baseline_in: L, window_height_in: L, lowest_min_in: L, lowest_max_in: L }
+export function computeTactileSignMounting({ lowest_baseline_in = 0, tactile_block_height_in = 0, sign_position = "latch-side", clear_space_width_in = 0, clear_space_depth_in = 0, beyond_door_arc = "yes" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const low = Number(lowest_baseline_in) || 0;
+  const block = Number(tactile_block_height_in);
+  const w = Number(clear_space_width_in) || 0;
+  const d = Number(clear_space_depth_in) || 0;
+  const beyond = beyond_door_arc === "yes";
+  const POSITIONS = { "latch-side": "alongside the door at the latch side", "on-door": "on the door leaf itself", "hinge-side": "alongside the door at the hinge side", "inactive-leaf": "on the inactive leaf of a pair with one active leaf", "right-of-right": "to the right of the right-hand door of a pair with two active leaves" };
+  if (!(sign_position in POSITIONS)) return { error: "Sign position must be latch-side, on-door, hinge-side, inactive-leaf, or right-of-right." };
+  if (beyond_door_arc !== "yes" && beyond_door_arc !== "no") return { error: "State whether the clear floor space sits beyond the door swing arc (yes or no)." };
+  if (!(low > 0)) return { error: "Baseline height of the lowest tactile character must be positive (in)." };
+  if (!Number.isFinite(block) || block < 0) return { error: "Height of the tactile character block must be zero or more (in)." };
+  if (!(w > 0) || !(d > 0)) return { error: "Clear floor space width and depth must be positive (in)." };
+
+  const LOW_MIN = 48, HIGH_MAX = 60, SPACE_MIN = 18;
+  const highest_baseline_in = low + block;
+  const window_height_in = HIGH_MAX - LOW_MIN;
+  const mountable = block <= window_height_in;
+  const lowest_min_in = LOW_MIN;
+  const lowest_max_in = mountable ? HIGH_MAX - block : null;
+
+  const low_ok = low >= LOW_MIN;
+  const high_ok = highest_baseline_in <= HIGH_MAX;
+  const low_deficit_in = Math.max(0, LOW_MIN - low);
+  const high_excess_in = Math.max(0, highest_baseline_in - HIGH_MAX);
+  const height_ok = low_ok && high_ok;
+  const usable_range_in = mountable ? lowest_max_in - lowest_min_in : 0;
+
+  const position_ok = sign_position !== "on-door" && sign_position !== "hinge-side";
+  const space_size_ok = w >= SPACE_MIN && d >= SPACE_MIN;
+  const space_ok = space_size_ok && beyond;
+  const space_deficit_in = Math.max(0, SPACE_MIN - Math.min(w, d));
+
+  const passes = height_ok && mountable && position_ok && space_ok;
+
+  const note = "IT READS LIKE A RANGE AND IT IS NOT ONE. 703.4.1 is TWO measurements taken from TWO different characters: 48 in minimum from the baseline of the LOWEST tactile character, and 60 in maximum from the baseline of the HIGHEST. "
+    + "With a tactile block " + block + " in tall, the lowest baseline may sit between " + lowest_min_in + " in and " + (mountable ? lowest_max_in.toFixed(2) + " in - a usable window of " + usable_range_in.toFixed(2) + " in, not the 12 in the two numbers suggest. " : "nothing, because the block is taller than the 12 in the two limits leave. ")
+    + (mountable ? "" : "A SIGN WHOSE TACTILE BLOCK EXCEEDS 12 IN CANNOT BE MOUNTED COMPLIANTLY AT ALL - no height satisfies both ends at once, and the answer is a shorter sign or fewer tactile lines rather than a different height. ")
+    + "Entered: lowest baseline " + low + " in, highest " + highest_baseline_in.toFixed(2) + " in. "
+    + (height_ok ? "Both ends are satisfied. " : (low_ok ? "" : "The LOWEST baseline is " + low_deficit_in.toFixed(2) + " in under 48. ") + (high_ok ? "" : "The HIGHEST baseline is " + high_excess_in.toFixed(2) + " in over 60. "))
+    + "POSITION (703.4.2): " + POSITIONS[sign_position] + ". "
+    + (sign_position === "on-door" ? "A tactile sign at a door goes ALONGSIDE the door at the latch side, not on the leaf - because a person reading it has to stand still while the door stays shut, and a sign on the door moves away the moment anyone opens it. " : sign_position === "hinge-side" ? "The latch side is specified, not either side: the hinge side puts a reader in the swing of the door. " : "")
+    + "CLEAR FLOOR SPACE: 18 x 18 in minimum, centered on the tactile characters, and BEYOND THE ARC of any door swing between the closed position and 45 degrees open. Entered " + w + " x " + d + " in, " + (beyond ? "clear of the swing. " : "INSIDE the swing arc - which is what rules out the wall a door swings back against, and it is a location problem rather than a size problem. ")
+    + (space_size_ok ? "" : "The space is " + space_deficit_in.toFixed(2) + " in short on its smaller dimension. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: whether this sign needs tactile characters at all, which turns on what it identifies - a room designation needs them, a directional sign does not; raised character height, style, case, and the requirement that they be duplicated in Braille with its own position and spacing rules; visual character requirements, which are a separate section and a separate tile; pictograms and their fields; finish, contrast, and glare; signs at doors to exits and stairs, which carry additional content requirements; and state and local accessibility law. A mounting screen, not a signage package; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { highest_baseline_in, window_height_in, mountable, lowest_min_in, lowest_max_in, usable_range_in, low_ok, high_ok, low_deficit_in, high_excess_in, height_ok, position_ok, space_size_ok, space_deficit_in, beyond_arc: beyond, space_ok, passes, note };
+}
+
+export const tactileSignMountingExample = { inputs: { lowest_baseline_in: 60, tactile_block_height_in: 4, sign_position: "latch-side", clear_space_width_in: 18, clear_space_depth_in: 18, beyond_door_arc: "yes" } };
+
+CONSTRUCTION_RENDERERS["tactile-sign-mounting"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 703.4.1 and 703.4.2. A US federal standard in the public domain. 703.4.1: tactile characters on signs shall be located 48 in minimum above the finish floor or ground surface, measured from the baseline of the lowest tactile character, and 60 in maximum above the finish floor or ground surface, measured from the baseline of the highest tactile character. 703.4.2: where a tactile sign is provided at a door, the sign shall be located alongside the door at the latch side; where provided at double doors with one active leaf, the sign shall be located on the inactive leaf; where provided at double doors with two active leaves, the sign shall be located to the right of the right hand door; and signs containing tactile characters shall be located so that a clear floor space of 18 in minimum by 18 in minimum, centered on the tactile characters, is provided beyond the arc of any door swing between the closed position and 45 degree open position. Not checked: whether the sign requires tactile characters at all, raised character height and style, Braille and its own position and spacing rules, visual character requirements, pictograms, finish and contrast, additional content requirements at exits and stairs, or state and local law. A mounting screen, not a signage package.",
+  example: tactileSignMountingExample.inputs,
+  fields: [
+    { key: "lowest_baseline_in", label: "Baseline of the LOWEST tactile character (in above the floor)", kind: "number", default: 60 },
+    { key: "tactile_block_height_in", label: "Height from the lowest baseline to the highest (in)", kind: "number", default: 4 },
+    { key: "sign_position", label: "Where the sign is mounted", kind: "select", options: [{ value: "latch-side", label: "Alongside the door, latch side", selected: true }, { value: "on-door", label: "On the door leaf" }, { value: "hinge-side", label: "Alongside the door, hinge side" }, { value: "inactive-leaf", label: "On the inactive leaf (pair, one active)" }, { value: "right-of-right", label: "Right of the right-hand door (pair, two active)" }] },
+    { key: "clear_space_width_in", label: "Clear floor space width (in)", kind: "number", default: 18 },
+    { key: "clear_space_depth_in", label: "Clear floor space depth (in)", kind: "number", default: 18 },
+    { key: "beyond_door_arc", label: "Clear floor space beyond the door swing arc?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
+  ],
+  outputs: [
+    { key: "w", id: "tsm-out-w", label: "Where the lowest baseline may sit", value: (r) => !r.mountable ? "nowhere - the tactile block is taller than the 12 in the two limits leave" : r.lowest_min_in + " to " + fmt(r.lowest_max_in, 2) + " in, a usable window of " + fmt(r.usable_range_in, 2) + " in" },
+    { key: "h", id: "tsm-out-h", label: "Heights as entered", value: (r) => "lowest " + (r.low_ok ? "OK" : "under 48 by " + fmt(r.low_deficit_in, 2)) + "; highest " + fmt(r.highest_baseline_in, 2) + " in " + (r.high_ok ? "OK" : "over 60 by " + fmt(r.high_excess_in, 2)) },
+    { key: "p", id: "tsm-out-p", label: "Position", value: (r) => r.position_ok ? "acceptable under 703.4.2" : "NOT acceptable - the sign goes alongside the door at the latch side" },
+    { key: "s", id: "tsm-out-s", label: "Clear floor space", value: (r) => r.space_ok ? "18 x 18 in and clear of the swing" : [r.space_size_ok ? null : "short by " + fmt(r.space_deficit_in, 2) + " in", r.beyond_arc ? null : "inside the door swing arc"].filter(Boolean).join(", ") },
+    { key: "v", id: "tsm-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "tsm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTactileSignMounting,
+});

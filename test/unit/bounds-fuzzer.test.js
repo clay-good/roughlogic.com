@@ -34710,3 +34710,62 @@ test("bounds: spec-v1175 computeAdaStairCheck pins the 4-7 in riser window, the 
   assert.ok("error" in _v1175({ ...base, riser_slope_deg: 91 }));
   assert.ok("error" in _v1175({ ...base, total_rise_in: Infinity }));
 });
+
+import { computeTactileSignMounting as _v1176 } from "../../calc-construction.js";
+
+test("bounds: spec-v1176 computeTactileSignMounting pins the two-baseline budget, the unmountable block, the location rule, the clear space, and error seams", () => {
+  const base = { lowest_baseline_in: 60, tactile_block_height_in: 4, sign_position: "latch-side", clear_space_width_in: 18, clear_space_depth_in: 18, beyond_door_arc: "yes" };
+  const r = _v1176(base);
+  assert.ok(r.highest_baseline_in === 64 && r.high_excess_in === 4 && r.low_ok && !r.high_ok && !r.passes);
+  assert.ok(r.lowest_max_in === 56 && r.usable_range_in === 8 && r.window_height_in === 12 && r.mountable);
+  // THE BLOCK CONSUMES THE BUDGET: the usable window is 12 in less the block height.
+  for (const b of [0, 2, 4, 8, 11.9, 12]) {
+    const t = _v1176({ ...base, tactile_block_height_in: b, lowest_baseline_in: 48 });
+    assert.ok(t.mountable && Math.abs(t.usable_range_in - (12 - b)) < 1e-9, "window wrong at block " + b);
+    assert.ok(Math.abs(t.lowest_max_in - (60 - b)) < 1e-9);
+    // The extremes of the reported window must both comply.
+    assert.ok(_v1176({ ...base, tactile_block_height_in: b, lowest_baseline_in: t.lowest_min_in }).height_ok, "the bottom of the window fails at block " + b);
+    assert.ok(_v1176({ ...base, tactile_block_height_in: b, lowest_baseline_in: t.lowest_max_in }).height_ok, "the top of the window fails at block " + b);
+    // And a tenth past either end must not.
+    assert.ok(!_v1176({ ...base, tactile_block_height_in: b, lowest_baseline_in: t.lowest_min_in - 0.1 }).height_ok);
+    if (t.usable_range_in > 0.2) assert.ok(!_v1176({ ...base, tactile_block_height_in: b, lowest_baseline_in: t.lowest_max_in + 0.1 }).height_ok);
+  }
+  // A BLOCK OVER 12 IN IS UNMOUNTABLE AT ANY HEIGHT - reported as null, and never passing.
+  for (const b of [12.1, 14, 24]) {
+    const t = _v1176({ ...base, tactile_block_height_in: b, lowest_baseline_in: 50 });
+    assert.ok(!t.mountable && t.lowest_max_in === null && t.usable_range_in === 0);
+    for (const h of [40, 48, 50, 55, 60]) assert.ok(!_v1176({ ...base, tactile_block_height_in: b, lowest_baseline_in: h }).passes, "block " + b + " must fail at every height, including " + h);
+  }
+  // Both ends of the height rule fail independently.
+  assert.ok(!_v1176({ ...base, lowest_baseline_in: 47.9, tactile_block_height_in: 2 }).low_ok);
+  assert.ok(_v1176({ ...base, lowest_baseline_in: 48, tactile_block_height_in: 2 }).height_ok);
+  assert.ok(!_v1176({ ...base, lowest_baseline_in: 58.1, tactile_block_height_in: 2 }).high_ok);
+  assert.ok(_v1176({ ...base, lowest_baseline_in: 58, tactile_block_height_in: 2 }).height_ok);
+  for (const h of [40, 48, 52]) {
+    const t = _v1176({ ...base, lowest_baseline_in: h, tactile_block_height_in: 4 });
+    assert.ok(Math.abs(t.low_deficit_in - Math.max(0, 48 - h)) < 1e-9 && t.low_deficit_in >= 0);
+    assert.ok(Math.abs(t.high_excess_in - Math.max(0, h + 4 - 60)) < 1e-9 && t.high_excess_in >= 0);
+  }
+  // POSITION: the door leaf and the hinge side both fail; the three permitted placements pass.
+  const good = { ...base, lowest_baseline_in: 50 };
+  for (const p of ["latch-side", "inactive-leaf", "right-of-right"]) assert.ok(_v1176({ ...good, sign_position: p }).position_ok && _v1176({ ...good, sign_position: p }).passes, p + " should pass");
+  for (const p of ["on-door", "hinge-side"]) assert.ok(!_v1176({ ...good, sign_position: p }).position_ok && !_v1176({ ...good, sign_position: p }).passes, p + " should fail");
+  // CLEAR FLOOR SPACE: size and swing-arc position fail independently.
+  assert.ok(_v1176(good).space_ok);
+  assert.ok(!_v1176({ ...good, clear_space_width_in: 17.9 }).space_ok && !_v1176({ ...good, clear_space_width_in: 17.9 }).space_size_ok);
+  assert.ok(!_v1176({ ...good, clear_space_depth_in: 12 }).space_ok);
+  const inArc = _v1176({ ...good, beyond_door_arc: "no" });
+  assert.ok(inArc.space_size_ok && !inArc.space_ok && !inArc.passes, "a big enough space inside the arc still fails");
+  for (const [w, d] of [[12, 18], [18, 12], [10, 10], [24, 24]]) {
+    const t = _v1176({ ...good, clear_space_width_in: w, clear_space_depth_in: d });
+    assert.ok(Math.abs(t.space_deficit_in - Math.max(0, 18 - Math.min(w, d))) < 1e-9);
+  }
+  // Error seams.
+  assert.ok("error" in _v1176({ ...base, sign_position: "on-the-ceiling" }));
+  assert.ok("error" in _v1176({ ...base, beyond_door_arc: "mostly" }));
+  assert.ok("error" in _v1176({ ...base, lowest_baseline_in: 0 }));
+  assert.ok("error" in _v1176({ ...base, tactile_block_height_in: -1 }));
+  assert.ok("error" in _v1176({ ...base, clear_space_width_in: 0 }));
+  assert.ok("error" in _v1176({ ...base, clear_space_depth_in: 0 }));
+  assert.ok("error" in _v1176({ ...base, lowest_baseline_in: Infinity }));
+});

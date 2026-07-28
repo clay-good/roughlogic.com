@@ -1640,6 +1640,7 @@ export const COMPUTE_MAP = {
   "knee-toe-clearance": { module: "../../calc-construction.js", fn: "computeKneeToeClearance" },
   "flood-opening-area": { module: "../../calc-construction.js", fn: "computeFloodOpeningArea" },
   "ada-stair-check": { module: "../../calc-construction.js", fn: "computeAdaStairCheck" },
+  "tactile-sign-mounting": { module: "../../calc-construction.js", fn: "computeTactileSignMounting" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 
