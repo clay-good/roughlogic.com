@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "ada outlet height",
+      "target": "reach-range",
+      "kind": "industry"
+    },
+    {
+      "term": "how high can a switch be mounted",
+      "target": "reach-range",
+      "kind": "question"
+    },
+    {
+      "term": "reach range over a counter",
+      "target": "reach-range",
+      "kind": "industry"
+    },
+    {
+      "term": "how low can a receptacle be",
+      "target": "reach-range",
+      "kind": "question"
+    },
+    {
       "term": "ada sign letter height",
       "target": "sign-character-height",
       "kind": "industry"

@@ -12223,3 +12223,99 @@ CONSTRUCTION_RENDERERS["sign-character-height"] = _simpleRenderer({
   ],
   compute: computeSignCharacterHeight,
 });
+
+// ===================== spec-v1162: reach ranges (2010 ADA Standards 308) =====================
+
+// Where an outlet, switch, thermostat, dispenser, or control may sit is not a rule of thumb -
+// it is four rules that depend on which way a person approaches and what is in the way.
+// Forward, unobstructed: 15 to 48 in. Forward over an obstruction: still 48 in where the reach
+// depth is 20 in or less, but 44 in past that, and past 25 in of depth there is NO permitted
+// reach at all - the element has to move rather than come down.
+// Side, unobstructed: 15 to 48 in. Side over an obstruction: 48 in to 10 in of depth, 46 in
+// from 10 to 24 in, and the OBSTRUCTION ITSELF may be no more than 34 in high and 24 in deep.
+// That last number is the one that ends arguments: a standard 36 in counter is too TALL to be
+// reached over under this section at all, whatever the height of the thing behind it.
+// dims: in { approach: dimensionless, obstructed: dimensionless, obstruction_depth_in: L, obstruction_height_in: L, element_height_in: L } out: { max_height_in: L, min_height_in: L, height_excess_in: L, max_obstruction_depth_in: L }
+export function computeReachRange({ approach = "forward", obstructed = "yes", obstruction_depth_in = 0, obstruction_height_in = 0, element_height_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const depth = Number(obstruction_depth_in) || 0;
+  const obsH = Number(obstruction_height_in) || 0;
+  const h = Number(element_height_in) || 0;
+  const isSide = approach === "side";
+  const isObs = obstructed === "yes";
+  if (approach !== "forward" && approach !== "side") return { error: "Approach must be forward or side - the two have different reach ranges and different obstruction limits." };
+  if (obstructed !== "yes" && obstructed !== "no") return { error: "State whether the reach is over an obstruction (yes or no)." };
+  if (!(h > 0)) return { error: "Element height above the finish floor must be positive (in)." };
+  if (isObs && !(depth > 0)) return { error: "Reach depth over the obstruction must be positive (in) - an obstructed reach with no depth is an unobstructed reach." };
+  if (isObs && obsH < 0) return { error: "Obstruction height cannot be negative (in)." };
+
+  const LOW = 15;
+  const MAX_OBS_HEIGHT = 34;
+  const max_obstruction_depth_in = isObs ? (isSide ? 24 : 25) : null;
+
+  let max_height_in = null, rule = "", depth_permitted = true;
+  if (!isObs) { max_height_in = 48; rule = isSide ? "unobstructed side reach (308.3.1)" : "unobstructed forward reach (308.2.1)"; }
+  else if (isSide) {
+    rule = "obstructed high side reach (308.3.2)";
+    if (depth <= 10) max_height_in = 48;
+    else if (depth <= 24) max_height_in = 46;
+    else { max_height_in = null; depth_permitted = false; }
+  } else {
+    rule = "obstructed high forward reach (308.2.2)";
+    if (depth <= 20) max_height_in = 48;
+    else if (depth <= 25) max_height_in = 44;
+    else { max_height_in = null; depth_permitted = false; }
+  }
+
+  // The obstruction's own height ceiling applies to the side case only.
+  const obstruction_height_ok = isObs && isSide ? obsH <= MAX_OBS_HEIGHT : null;
+
+  const high_ok = max_height_in === null ? false : h <= max_height_in;
+  const low_ok = h >= LOW;
+  const height_excess_in = max_height_in === null ? null : Math.max(0, h - max_height_in);
+  const low_deficit_in = Math.max(0, LOW - h);
+  const passes = depth_permitted && high_ok && low_ok && (obstruction_height_ok !== false);
+
+  // What trimming the reach depth would buy, where a shallower band exists.
+  const shallow_limit_in = isObs ? (isSide ? 10 : 20) : null;
+  const depth_to_gain_in = isObs && depth > shallow_limit_in ? depth - shallow_limit_in : null;
+
+  const note = "REACH RANGE IS FOUR RULES, not one number, and which one applies turns on the approach and on what is in the way. This is a " + rule + ". "
+    + (isObs ? "Reach depth " + depth + " in: " : "")
+    + (max_height_in === null
+      ? "THERE IS NO PERMITTED REACH AT THIS DEPTH. " + (isSide ? "The side-reach obstruction may be 24 in deep at most" : "The forward reach depth may be 25 in at most") + ", and " + depth + " in exceeds it - so the element does not need to come DOWN, it needs to MOVE. Lowering it does not help, because no height complies. "
+      : "the high reach is " + max_height_in + " in maximum" + (isObs ? " (48 in only out to " + shallow_limit_in + " in of depth" + (isSide ? ", 46 in from there to 24 in" : ", 44 in from there to 25 in") + ")" : "") + ", and the low reach is " + LOW + " in minimum. ")
+    + "Element at " + h + " in: " + (max_height_in === null ? "" : high_ok && low_ok ? "within range. " : (high_ok ? "" : "TOO HIGH by " + height_excess_in.toFixed(1) + " in. ") + (low_ok ? "" : "TOO LOW by " + low_deficit_in.toFixed(1) + " in - the 15 in floor is a rule, not a courtesy, and a receptacle set at the framer's usual 12 in fails it. "))
+    + (depth_to_gain_in !== null ? "TRIMMING THE DEPTH BUYS HEIGHT: pull the reach depth back " + depth_to_gain_in.toFixed(1) + " in, to " + shallow_limit_in + " in, and the maximum returns to 48 in. " : "")
+    + (isObs && isSide
+      ? "THE OBSTRUCTION HAS ITS OWN CEILING, and this is the number that ends arguments: it may be no more than 34 in high and 24 in deep. This one is " + obsH + " in high - " + (obstruction_height_ok ? "OK. " : "OVER, so there is no compliant side reach across it at any element height. A standard 36 in kitchen counter is too TALL to be reached over under this section, whatever is behind it. ") + "The section allows exactly two exceptions: the top of washing machines and clothes dryers may be 36 in maximum, and operable parts of fuel dispensers may be 54 in maximum measured from the vehicular way where the dispensers are on existing curbs. "
+      : "")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: whether a clear floor or ground space of the right size and orientation is actually there, which every one of these rules presumes - a forward reach needs a forward approach and a side reach needs a parallel one, and without the space the range does not apply; the 5 lbf operating force and the requirement that operable parts work with one hand and without tight grasping, pinching, or twisting of the wrist; which elements are operable parts at all and which are exempt; kitchen and kitchenette work surfaces, appliances, and storage, which are governed by their own sections; knee and toe clearance under a forward approach; and state and local accessibility law and the electrical code, which sets its own mounting heights for different reasons. A reach check, not a rough-in schedule; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { max_height_in, min_height_in: LOW, rule, depth_permitted, max_obstruction_depth_in, shallow_limit_in, depth_to_gain_in, obstruction_height_ok, max_obstruction_height_in: isObs && isSide ? MAX_OBS_HEIGHT : null, high_ok, low_ok, height_excess_in, low_deficit_in, passes, note };
+}
+
+export const reachRangeExample = { inputs: { approach: "side", obstructed: "yes", obstruction_depth_in: 24, obstruction_height_in: 34, element_height_in: 48 } };
+
+CONSTRUCTION_RENDERERS["reach-range"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 308 Reach Ranges. A US federal standard in the public domain. 308.2.1: high forward reach 48 in maximum and low forward reach 15 in minimum above the finish floor. 308.2.2: high forward reach 48 in maximum where the reach depth is 20 in maximum; where the reach depth exceeds 20 in, the high forward reach shall be 44 in maximum and the reach depth 25 in maximum. 308.3.1: high side reach 48 in maximum and low side reach 15 in minimum. 308.3.2: where a clear floor space allows a parallel approach and the high side reach is over an obstruction, the obstruction shall be 34 in high maximum and 24 in deep maximum; the high side reach shall be 48 in maximum for a reach depth of 10 in maximum, and where the reach depth exceeds 10 in the high side reach shall be 46 in maximum for a reach depth of 24 in maximum. Exceptions: the top of washing machines and clothes dryers may be 36 in maximum; operable parts of fuel dispensers may be 54 in maximum from the vehicular way where installed on existing curbs. Not checked: whether the required clear floor space and approach direction are present, operating force and one-hand operation, which elements are operable parts, kitchen work surfaces and appliances governed by their own sections, knee and toe clearance, or state and local law and electrical-code mounting heights. A reach check, not a rough-in schedule.",
+  example: reachRangeExample.inputs,
+  fields: [
+    { key: "approach", label: "Approach", kind: "select", options: [{ value: "forward", label: "Forward (perpendicular)" }, { value: "side", label: "Side (parallel)", selected: true }] },
+    { key: "obstructed", label: "Reach is over an obstruction?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
+    { key: "obstruction_depth_in", label: "Reach depth over the obstruction (in)", kind: "number", default: 24 },
+    { key: "obstruction_height_in", label: "Height of the obstruction itself (in; side reach only)", kind: "number", default: 34 },
+    { key: "element_height_in", label: "Height of the outlet, switch, or control (in)", kind: "number", default: 48 },
+  ],
+  outputs: [
+    { key: "r", id: "rr-out-r", label: "Rule that applies", value: (r) => r.rule },
+    { key: "m", id: "rr-out-m", label: "Permitted range", value: (r) => r.max_height_in === null ? "NONE at this reach depth - the maximum is " + r.max_obstruction_depth_in + " in" : r.min_height_in + " to " + r.max_height_in + " in above the finish floor" },
+    { key: "e", id: "rr-out-e", label: "Element height", value: (r) => r.max_height_in === null ? "no height complies; the element must move, not drop" : r.high_ok && r.low_ok ? "within range" : [r.high_ok ? null : "too high by " + fmt(r.height_excess_in, 1) + " in", r.low_ok ? null : "too low by " + fmt(r.low_deficit_in, 1) + " in"].filter(Boolean).join(", ") },
+    { key: "o", id: "rr-out-o", label: "Obstruction itself", value: (r) => r.obstruction_height_ok === null ? "no height limit applies to this case" : r.obstruction_height_ok ? "within the 34 in maximum" : "OVER the 34 in maximum - no compliant side reach across it at any height" },
+    { key: "t", id: "rr-out-t", label: "What trimming the depth buys", value: (r) => r.depth_to_gain_in === null ? "nothing to trim - already in the shallow band" : "pull back " + fmt(r.depth_to_gain_in, 1) + " in to " + r.shallow_limit_in + " in and the maximum returns to 48 in" },
+    { key: "v", id: "rr-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES 308" : "DOES NOT PASS" },
+    { key: "n", id: "rr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeReachRange,
+});

@@ -1626,6 +1626,7 @@ export const COMPUTE_MAP = {
   "ada-ramp-slope": { module: "../../calc-construction.js", fn: "computeAdaRampSlope" },
   "accessible-parking-count": { module: "../../calc-construction.js", fn: "computeAccessibleParkingCount" },
   "sign-character-height": { module: "../../calc-construction.js", fn: "computeSignCharacterHeight" },
+  "reach-range": { module: "../../calc-construction.js", fn: "computeReachRange" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 

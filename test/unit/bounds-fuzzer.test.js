@@ -33655,3 +33655,74 @@ test("bounds: spec-v1161 computeSignCharacterHeight pins the three bands, the 1/
   assert.ok("error" in _v1161({ ...base, viewing_distance_in: Infinity }));
   assert.ok("error" in _v1161({ ...base, baseline_height_in: NaN }));
 });
+
+import { computeReachRange as _v1162 } from "../../calc-construction.js";
+
+test("bounds: spec-v1162 computeReachRange pins all four rules, the no-permitted-reach depths, the 34 in obstruction ceiling, and error seams", () => {
+  const base = { approach: "side", obstructed: "yes", obstruction_depth_in: 24, obstruction_height_in: 34, element_height_in: 48 };
+  const r = _v1162(base);
+  assert.ok(r.max_height_in === 46 && r.min_height_in === 15 && r.height_excess_in === 2 && !r.passes);
+  assert.ok(r.depth_to_gain_in === 14 && r.max_obstruction_depth_in === 24 && r.obstruction_height_ok);
+  // THE FOUR RULES. Unobstructed is 48 either way; obstructed differs by approach.
+  assert.ok(_v1162({ ...base, obstructed: "no" }).max_height_in === 48);
+  assert.ok(_v1162({ ...base, approach: "forward", obstructed: "no" }).max_height_in === 48);
+  for (const [d, max] of [[1, 48], [10, 48], [10.1, 46], [20, 46], [24, 46], [24.1, null], [40, null]]) {
+    assert.ok(_v1162({ ...base, obstruction_depth_in: d }).max_height_in === max, "side band wrong at " + d);
+  }
+  for (const [d, max] of [[1, 48], [20, 48], [20.1, 44], [25, 44], [25.1, null], [40, null]]) {
+    assert.ok(_v1162({ ...base, approach: "forward", obstruction_depth_in: d }).max_height_in === max, "forward band wrong at " + d);
+  }
+  // The two approaches genuinely differ at the same depth - 15 in is 48 forward and 46 side.
+  assert.ok(_v1162({ ...base, obstruction_depth_in: 15 }).max_height_in === 46);
+  assert.ok(_v1162({ ...base, approach: "forward", obstruction_depth_in: 15 }).max_height_in === 48);
+  // PAST THE MAXIMUM DEPTH NO HEIGHT COMPLIES - and it is null, not zero, and never passes.
+  for (const h of [15, 30, 40, 44, 48]) {
+    const deep = _v1162({ ...base, approach: "forward", obstruction_depth_in: 26, element_height_in: h });
+    assert.ok(deep.max_height_in === null && !deep.depth_permitted && !deep.passes && deep.height_excess_in === null);
+  }
+  assert.ok(_v1162({ ...base, obstruction_depth_in: 30 }).depth_permitted === false);
+  // The maximum height never increases with reach depth, in either approach.
+  for (const app of ["forward", "side"]) {
+    let prev = 99;
+    for (let d = 1; d <= 24; d += 0.5) {
+      const m = _v1162({ ...base, approach: app, obstruction_depth_in: d }).max_height_in;
+      if (m === null) continue;
+      assert.ok(m <= prev, "max height rose with depth at " + app + "/" + d); prev = m;
+    }
+  }
+  // THE 34 IN OBSTRUCTION CEILING - side reach only, and it fails the whole reach on its own.
+  for (const [oh, ok] of [[20, true], [34, true], [34.1, false], [36, false]]) {
+    const t = _v1162({ ...base, obstruction_height_in: oh, element_height_in: 40 });
+    assert.ok(t.obstruction_height_ok === ok, "obstruction ceiling wrong at " + oh);
+    assert.ok(t.passes === ok, "a too-tall obstruction must fail the reach outright");
+  }
+  assert.ok(_v1162({ ...base, approach: "forward", obstruction_height_in: 36, element_height_in: 40 }).obstruction_height_ok === null, "no obstruction ceiling on a forward reach");
+  assert.ok(_v1162({ ...base, obstructed: "no", element_height_in: 40 }).obstruction_height_ok === null);
+  // THE 15 IN LOW LIMIT, which is the end that gets missed on rough-in.
+  for (const [h, ok] of [[11, false], [14.9, false], [15, true], [18, true]]) {
+    const t = _v1162({ ...base, obstructed: "no", element_height_in: h });
+    assert.ok(t.low_ok === ok, "low limit wrong at " + h);
+    assert.ok(t.passes === ok);
+    assert.ok(Math.abs(t.low_deficit_in - Math.max(0, 15 - h)) < 1e-9 && t.low_deficit_in >= 0);
+  }
+  // High seams pass at exact equality - these are maximums.
+  assert.ok(_v1162({ ...base, element_height_in: 46 }).passes && !_v1162({ ...base, element_height_in: 46.1 }).passes);
+  assert.ok(_v1162({ ...base, obstructed: "no", element_height_in: 48 }).passes && !_v1162({ ...base, obstructed: "no", element_height_in: 48.1 }).passes);
+  // WHAT TRIMMING BUYS round-trips: pull back the reported amount and the maximum is 48.
+  for (const [app, d] of [["side", 24], ["side", 11], ["forward", 25], ["forward", 21], ["forward", 26]]) {
+    const t = _v1162({ ...base, approach: app, obstruction_depth_in: d });
+    assert.ok(t.depth_to_gain_in !== null);
+    const trimmed = _v1162({ ...base, approach: app, obstruction_depth_in: d - t.depth_to_gain_in });
+    assert.ok(trimmed.max_height_in === 48, "trimming the reported depth did not restore 48 at " + app + "/" + d);
+  }
+  assert.ok(_v1162({ ...base, obstruction_depth_in: 8 }).depth_to_gain_in === null, "already shallow - nothing to trim");
+  assert.ok(_v1162({ ...base, obstructed: "no" }).depth_to_gain_in === null);
+  assert.ok(_v1162({ ...base, obstructed: "no" }).max_obstruction_depth_in === null);
+  // Error seams.
+  assert.ok("error" in _v1162({ ...base, approach: "diagonal" }));
+  assert.ok("error" in _v1162({ ...base, obstructed: "maybe" }));
+  assert.ok("error" in _v1162({ ...base, element_height_in: 0 }));
+  assert.ok("error" in _v1162({ ...base, obstruction_depth_in: 0 }));
+  assert.ok("error" in _v1162({ ...base, obstruction_height_in: -1 }));
+  assert.ok("error" in _v1162({ ...base, element_height_in: Infinity }));
+});
