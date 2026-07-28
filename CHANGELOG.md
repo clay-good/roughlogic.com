@@ -4,6 +4,27 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(machining): gear-undercut-backlash, deriving the numbers everyone looks up; 2026-07-27
+
+A self-declared gap, quoted from `spur-gear-geometry`'s citation: it "returns the geometry only; it does
+not check tooth strength, backlash, or undercutting." Tooth strength was closed by spec-v1015; the other
+two were still open. Adds one tile to `calc-machining.js` (Group K). No table shipped -- both results are
+closed form.
+
+The verification is that the formula reproduces the famous numbers: `2k/sin^2(phi)` gives 31.90, 17.10, and
+11.20 at 14.5, 20, and 25 degrees, ceiling to **32, 18, and 12 teeth** -- the exact minimums every gear
+reference tabulates. The tile derives values that are normally looked up, and the fuzzer asserts all three.
+It also explains a piece of industry history: 25 degrees is what lets a 12-tooth pinion exist, and the
+pinned 14-tooth pinion that is undercut at 20 degrees clears at 25.
+
+The backlash relation is the one people get wrong. Opening the center distance by dC does not open backlash
+by dC -- the flanks separate along the line of action, so B = 2 dC tan(phi). At 20 degrees, 0.010 in of
+center distance gives 0.00728 in of backlash, less than the movement rather than more.
+
+Fuzzer pins all three classic minimums, the exact identity across five pressure-angle and addendum
+combinations, monotonic decrease with pressure angle, the stub-tooth reduction, and the backlash relation
+plus its linearity. Catalog 1,491 -> 1,492. Spec: spec-v1108.
+
 ### feat(mechanic): injector-flow-at-pressure, the rail pressure injector-size says it skips; 2026-07-27
 
 A self-declared gap, quoted from `injector-size`'s own note: it "does not cover a return-versus-returnless

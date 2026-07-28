@@ -15252,6 +15252,18 @@ export const CITATIONS = {
       { name: "Static flow only", value: "full-open capacity; dead time and pulse-width delivery are not modeled", source: "stated scope limit" },
     ],
   },
+  "gear-undercut-backlash": {
+    formula: "Undercut minimum Nmin = 2k / sin^2(pressure angle), k = addendum coefficient (1.0 full depth, 0.8 stub); backlash from center-distance change B = 2 x dC x tan(pressure angle).",
+    edition: "Involute gear geometry as compiled in Machinery's Handbook and the AGMA standard proportions, by name - closed-form, no table reproduced.",
+    freeAccess: "Both relations are elementary involute geometry and are published across free gear-design references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The undercut minimum comes straight from the geometry and reproduces the familiar published values EXACTLY - 32 teeth at 14.5 degrees, 18 at 20 degrees, 12 at 25 degrees - which is the reason the industry moved to higher pressure angles for small pinions. Below the minimum the cutter sweeps material out of the root while generating the flank, weakening the tooth right where the bending stress peaks and destroying part of the involute, which costs contact ratio and adds noise; the fixes in order of preference are a higher pressure angle, profile shift (a long-addendum pinion with a matching short-addendum gear), or a stub tooth. Backlash from opening the center distance is 2 tan(phi) per unit, NOT one-for-one, because the flanks separate along the line of action. Backlash is not a defect - a mesh needs it for lubricant film and thermal growth - but too much gives lost motion and impact on reversal, and too little binds. Standard proportions with NO profile shift assumed; profile shift changes both results. The gear drawing and the AGMA standard govern.",
+    assumptions: [
+      { name: "Undercut limit", value: "Nmin = 2k/sin^2(phi); reproduces 32 / 18 / 12 teeth at 14.5 / 20 / 25 degrees", source: "involute generating geometry" },
+      { name: "Backlash relation", value: "B = 2 dC tan(phi); the factor 2 tan(phi) comes from separation along the line of action", source: "involute mesh geometry" },
+      { name: "No profile shift", value: "standard proportions assumed; profile shift is the usual fix for an undercut pinion and changes both outputs", source: "stated scope limit" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

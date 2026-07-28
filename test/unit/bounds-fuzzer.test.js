@@ -30709,3 +30709,58 @@ test("bounds: spec-v1107 computeInjectorFlowAtPressure pins the returnless boost
   assert.ok("error" in _v1107({ ...base, system_type: "direct" }));
   assert.ok("error" in _v1107({ ...base, manifold_pressure_psig: Infinity }));
 });
+
+import { computeGearUndercutBacklash as _v1108 } from "../../calc-machining.js";
+
+test("bounds: spec-v1108 computeGearUndercutBacklash reproduces the classic 32/18/12 undercut minimums, pins the backlash relation, the stub-tooth case, and error seams", () => {
+  const base = { pressure_angle_deg: 20, teeth: 14, addendum_coefficient: 1.0, center_distance_change_in: 0.010, diametral_pitch: 10 };
+  const r = _v1108(base);
+  assert.ok(Math.abs(r.min_teeth_exact - 17.097263) < 1e-5);
+  assert.ok(r.min_teeth === 18 && r.undercut === true && r.shortfall === 4);
+  assert.ok(Math.abs(r.backlash_in - 0.007279) < 1e-6);
+  assert.ok(Math.abs(r.circular_pitch_in - Math.PI / 10) < 1e-12);
+  assert.ok(Math.abs(r.backlash_pct_of_pitch - 2.317085) < 1e-4);
+  // THE CLASSIC PUBLISHED MINIMUMS, reproduced from the formula rather than tabulated.
+  assert.ok(_v1108({ ...base, pressure_angle_deg: 14.5 }).min_teeth === 32);
+  assert.ok(_v1108({ ...base, pressure_angle_deg: 20 }).min_teeth === 18);
+  assert.ok(_v1108({ ...base, pressure_angle_deg: 25 }).min_teeth === 12);
+  // Raising the pressure angle rescues the same pinion - the point of the tile.
+  assert.ok(_v1108({ ...base, pressure_angle_deg: 25 }).undercut === false);
+  // The exact 2k/sin^2 identity across a sweep, and a stub tooth lowers the minimum.
+  for (const [phi, k] of [[14.5, 1], [20, 1], [25, 1], [20, 0.8], [22.5, 1]]) {
+    const t = _v1108({ ...base, pressure_angle_deg: phi, addendum_coefficient: k });
+    const exact = 2 * k / Math.pow(Math.sin(phi * Math.PI / 180), 2);
+    assert.ok(Math.abs(t.min_teeth_exact - exact) < 1e-12);
+    assert.ok(t.min_teeth === Math.ceil(exact));
+  }
+  assert.ok(_v1108({ ...base, addendum_coefficient: 0.8 }).min_teeth < _v1108({ ...base, addendum_coefficient: 1.0 }).min_teeth);
+  // A higher pressure angle always lowers the minimum.
+  let prev = Infinity;
+  for (const phi of [14.5, 17.5, 20, 22.5, 25]) {
+    const t = _v1108({ ...base, pressure_angle_deg: phi });
+    assert.ok(t.min_teeth_exact < prev);
+    prev = t.min_teeth_exact;
+  }
+  // BACKLASH: exactly 2 tan(phi) per unit of center-distance change - not one-for-one.
+  for (const [dC, phi] of [[0.005, 20], [0.010, 14.5], [0.020, 25], [0.050, 20]]) {
+    const t = _v1108({ ...base, center_distance_change_in: dC, pressure_angle_deg: phi });
+    assert.ok(Math.abs(t.backlash_in - 2 * dC * Math.tan(phi * Math.PI / 180)) < 1e-12);
+    assert.ok(t.backlash_in < 2 * dC); // tan(phi) < 1 below 45 deg, so backlash is less than 2 dC
+  }
+  // Backlash is linear in the center-distance change.
+  const b1 = _v1108({ ...base, center_distance_change_in: 0.010 });
+  const b2 = _v1108({ ...base, center_distance_change_in: 0.020 });
+  assert.ok(Math.abs(b2.backlash_in - 2 * b1.backlash_in) < 1e-12);
+  // Optional inputs at 0 skip cleanly.
+  const skip = _v1108({ ...base, center_distance_change_in: 0, diametral_pitch: 0 });
+  assert.ok(skip.backlash_in === 0 && skip.circular_pitch_in === null && skip.backlash_pct_of_pitch === null);
+  // Error seams.
+  assert.ok("error" in _v1108({ ...base, pressure_angle_deg: 0 }));
+  assert.ok("error" in _v1108({ ...base, pressure_angle_deg: 90 }));
+  assert.ok("error" in _v1108({ ...base, teeth: 0 }));
+  assert.ok("error" in _v1108({ ...base, teeth: 14.5 }));
+  assert.ok("error" in _v1108({ ...base, addendum_coefficient: 0 }));
+  assert.ok("error" in _v1108({ ...base, center_distance_change_in: -1 }));
+  assert.ok("error" in _v1108({ ...base, diametral_pitch: -1 }));
+  assert.ok("error" in _v1108({ ...base, pressure_angle_deg: Infinity }));
+});

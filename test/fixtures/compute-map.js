@@ -735,6 +735,7 @@ export const COMPUTE_MAP = {
   "tolerance-stack-rss": { module: "../../calc-shop.js", fn: "computeToleranceStackRss" },
   "cone-flat-pattern": { module: "../../calc-shop.js", fn: "computeConeFlatPattern" },
   "spur-gear-geometry": { module: "../../calc-machining.js", fn: "computeSpurGearGeometry" },
+  "gear-undercut-backlash": { module: "../../calc-machining.js", fn: "computeGearUndercutBacklash" },
   "gear-identification": { module: "../../calc-machining.js", fn: "computeGearIdentification" },
   "gear-chordal-thickness": { module: "../../calc-machining.js", fn: "computeGearChordalThickness" },
   "tank-volume": { module: "../../calc-cross.js", fn: "computeTankVolume" },

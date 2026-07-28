@@ -1195,3 +1195,75 @@ function _v1006renderThreadSingleDepth(inputRegion, outputRegion, citationEl) {
   tp.input.addEventListener("input", update);
 }
 MACHINING_RENDERERS["thread-single-depth"] = _v1006renderThreadSingleDepth;
+
+// --- spec-v1108 K: Gear undercut minimum tooth count and backlash ---
+// spur-gear-geometry's citation says it "returns the geometry only; it does not check tooth
+// strength, backlash, or undercutting." Both missing checks are closed-form geometry:
+//   Nmin = 2k / sin^2(phi)   -- the tooth count below which the cutter undercuts the root.
+//     Reproduces the classic published values exactly: 32 at 14.5 deg, 18 at 20, 12 at 25.
+//   B = 2 dC tan(phi)        -- backlash produced by opening the center distance by dC.
+// dims: in { pressure_angle_deg: dimensionless, teeth: dimensionless, addendum_coefficient: dimensionless, center_distance_change_in: L, diametral_pitch: L^-1 } out: { min_teeth: dimensionless, backlash_in: L, center_distance_for_backlash_in: L }
+export function computeGearUndercutBacklash({ pressure_angle_deg = 20, teeth = 0, addendum_coefficient = 1.0, center_distance_change_in = 0, diametral_pitch = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const phi = Number(pressure_angle_deg) || 0;
+  const n = Number(teeth) || 0;
+  const k = Number(addendum_coefficient) || 0;
+  const dC = Number(center_distance_change_in);
+  const pd = Number(diametral_pitch) || 0;
+  if (!(phi > 0 && phi < 90)) return { error: "Pressure angle must be between 0 and 90 degrees (14.5, 20, and 25 are the standard ones)." };
+  if (!(n > 0) || !Number.isInteger(n)) return { error: "Tooth count must be a whole number of at least 1." };
+  if (!(k > 0)) return { error: "Addendum coefficient must be positive (1.0 full depth, 0.8 stub)." };
+  if (!Number.isFinite(dC) || dC < 0) return { error: "Center-distance change cannot be negative (in); enter 0 to skip the backlash calculation." };
+  if (pd < 0) return { error: "Diametral pitch cannot be negative (teeth/in); enter 0 to skip the tooth-thickness output." };
+  const phi_rad = phi * Math.PI / 180;
+  const sin_phi = Math.sin(phi_rad);
+  const min_teeth_exact = 2 * k / (sin_phi * sin_phi);
+  const min_teeth = Math.ceil(min_teeth_exact);
+  const undercut = n < min_teeth;
+  const shortfall = undercut ? min_teeth - n : 0;
+  const backlash_in = 2 * dC * Math.tan(phi_rad);
+  const circular_pitch_in = pd > 0 ? Math.PI / pd : null;
+  const backlash_pct_of_pitch = circular_pitch_in ? backlash_in / circular_pitch_in * 100 : null;
+  if (![min_teeth_exact, min_teeth, backlash_in].every(Number.isFinite)) return { error: "Gear-geometry math did not produce a finite value." };
+  return {
+    min_teeth_exact, min_teeth, undercut, shortfall, backlash_in,
+    circular_pitch_in, backlash_pct_of_pitch,
+    note: (undercut
+      ? "UNDERCUT: " + n + " teeth is below the " + min_teeth + "-tooth minimum for a " + phi + "-degree pressure angle, so the cutter sweeps material out of the root as it generates the flank. The tooth is weakened right where the bending stress peaks and part of the involute is destroyed, which costs contact ratio and adds noise. The fixes, in order of preference: raise the pressure angle (25 degrees drops the minimum to 12 teeth), use profile shift (a long-addendum pinion with a matching short-addendum gear), or use a stub tooth. Simply cutting " + shortfall + " more teeth also works if the ratio allows. "
+      : n + " teeth clears the " + min_teeth + "-tooth undercut minimum for a " + phi + "-degree pressure angle. ")
+      + "The minimum comes straight from the geometry as 2k/sin^2(phi) and reproduces the familiar published values exactly - 32 teeth at 14.5 degrees, 18 at 20, 12 at 25 - which is why the industry moved to higher pressure angles for small pinions. "
+      + (dC > 0 ? "Opening the center distance by " + dC + " in produces " + backlash_in.toFixed(5) + " in of backlash: the flanks separate along the line of action, so the effect is 2 tan(phi) per unit of center-distance change, not one-for-one. " : "Enter a center-distance change to see the backlash it produces. ")
+      + "Backlash is not a defect - a mesh needs it for lubricant film and thermal growth - but too much makes lost motion and impact on reversal, and too little binds. Standard geometry, no profile shift assumed. A shop aid; the gear drawing and the AGMA standard govern.",
+  };
+}
+export const gearUndercutBacklashExample = { inputs: { pressure_angle_deg: 20, teeth: 14, addendum_coefficient: 1.0, center_distance_change_in: 0.010, diametral_pitch: 10 } };
+function renderGearUndercutBacklash(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: involute gear geometry. The undercut limit is Nmin = 2k / sin^2(pressure angle), where k is the addendum coefficient (1.0 full depth, 0.8 stub) - it reproduces the standard published minimums of 32 teeth at 14.5 degrees, 18 at 20 degrees, and 12 at 25 degrees. Backlash from opening the center distance is B = 2 x (center-distance change) x tan(pressure angle), because the flanks separate along the line of action. Standard proportions with no profile shift assumed; profile shift (long-addendum pinion) is the usual fix for an undercut pinion and changes both results. A shop aid; the gear drawing and the AGMA standard govern.";
+  const pa = makeNumber("Pressure angle (deg)", "gub-pa", { step: "any", min: "0" }); pa.input.value = "20";
+  const n = makeNumber("Number of teeth N", "gub-n", { step: "1", min: "1" }); n.input.value = "14";
+  const k = makeNumber("Addendum coefficient (1.0 full, 0.8 stub)", "gub-k", { step: "any", min: "0" }); k.input.value = "1.0";
+  const dc = makeNumber("Center-distance increase (in, 0 = skip)", "gub-dc", { step: "any", min: "0" }); dc.input.value = "0.010";
+  const pd = makeNumber("Diametral pitch (teeth/in, 0 = skip)", "gub-pd", { step: "any", min: "0" }); pd.input.value = "10";
+  for (const f of [pa, n, k, dc, pd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { pa.input.value = "20"; n.input.value = "14"; k.input.value = "1.0"; dc.input.value = "0.010"; pd.input.value = "10"; update(); });
+  const oM = makeOutputLine(outputRegion, "Undercut minimum", "gub-out-m");
+  const oV = makeOutputLine(outputRegion, "This gear", "gub-out-v");
+  const oB = makeOutputLine(outputRegion, "Backlash from the center-distance change", "gub-out-b");
+  const oN = makeOutputLine(outputRegion, "Note", "gub-out-n");
+  const update = debounce(() => {
+    const r = computeGearUndercutBacklash({
+      pressure_angle_deg: Number(pa.input.value), teeth: Number(n.input.value), addendum_coefficient: Number(k.input.value),
+      center_distance_change_in: Number(dc.input.value), diametral_pitch: Number(pd.input.value),
+    });
+    if (r.error) { oM.textContent = r.error; oV.textContent = "-"; oB.textContent = "-"; oN.textContent = "-"; return; }
+    oM.textContent = r.min_teeth + " teeth (exact " + fmt(r.min_teeth_exact, 3) + ")";
+    oV.textContent = r.undercut ? "UNDERCUT - short by " + r.shortfall + " teeth" : "clears the minimum";
+    oB.textContent = r.backlash_in > 0
+      ? fmt(r.backlash_in, 5) + " in" + (r.backlash_pct_of_pitch !== null ? " (" + fmt(r.backlash_pct_of_pitch, 2) + "% of the " + fmt(r.circular_pitch_in, 4) + " in circular pitch)" : "")
+      : "not calculated";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [pa, n, k, dc, pd]) f.input.addEventListener("input", update);
+  update();
+}
+MACHINING_RENDERERS["gear-undercut-backlash"] = renderGearUndercutBacklash;
