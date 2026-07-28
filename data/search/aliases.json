@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "horizontal lifeline anchor load",
+      "target": "lifeline-tension",
+      "kind": "industry"
+    },
+    {
+      "term": "how much force does a lifeline put on the anchors",
+      "target": "lifeline-tension",
+      "kind": "question"
+    },
+    {
+      "term": "cable sag tension fall arrest",
+      "target": "lifeline-tension",
+      "kind": "industry"
+    },
+    {
+      "term": "is 5000 lb enough for a lifeline anchor",
+      "target": "lifeline-tension",
+      "kind": "question"
+    },
+    {
       "term": "flood vent area calculator",
       "target": "flood-opening-area",
       "kind": "industry"

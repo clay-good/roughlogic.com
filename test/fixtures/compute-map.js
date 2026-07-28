@@ -261,6 +261,7 @@ export const COMPUTE_MAP = {
   "noise-dose": { module: "../../calc-cross.js", fn: "computeNoiseDose" },
   "hearing-protector-nrr": { module: "../../calc-cross.js", fn: "computeHearingProtectorNrr" },
   "silica-table-1": { module: "../../calc-cross.js", fn: "computeSilicaTable1" },
+  "lifeline-tension": { module: "../../calc-cross.js", fn: "computeLifelineTension" },
   "nfpa-1142-water-supply": { module: "../../calc-fire.js", fn: "computeNFPA1142WaterSupply" },
   "excavation-bench-plan": { module: "../../calc-construction.js", fn: "computeExcavationBenchPlan" },
   "disinfection-ct": { module: "../../calc-water.js", fn: "computeDisinfectionCT" },

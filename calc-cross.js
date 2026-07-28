@@ -3342,3 +3342,96 @@ CROSS_RENDERERS["silica-table-1"] = _simpleRendererG({
   ],
   compute: computeSilicaTable1,
 });
+
+// --- spec-v1174: horizontal lifeline tension and anchorage demand (OSHA 1926.502(d)) ---
+// The number that surprises everyone: a horizontal lifeline multiplies the arrest force it is
+// asked to catch, and the multiplier is set by SAG. A cable pulled tight has almost no vertical
+// component to work with, so the tension runs away - halve the sag and the tension roughly
+// doubles. A 1,800 lb arrest at midspan of a 30 ft line sagging 1 ft puts over 13,000 lb into
+// each end anchor, which is why a lifeline strung between two roof-hatch handles is not a
+// lifeline.
+// Statics at midspan: 2 T sin(theta) = W, sin(theta) = s / sqrt((L/2)^2 + s^2), so
+// T = W sqrt((L/2)^2 + s^2) / (2 s), with a horizontal pull H = W L / (4 s) at each anchor.
+// OSHA then puts a factor on top: 1926.502(d)(8) requires a horizontal lifeline to maintain a
+// safety factor of at least two, and (d)(15) wants an anchorage good for 5,000 lb per employee
+// unless the whole system is engineered to that factor of two by a qualified person.
+// dims: in { span_ft: L, sag_ft: L, arrest_force_lb: F, workers: dimensionless } out: { cable_tension_lb: F, horizontal_pull_lb: F, anchorage_demand_lb: F, sag_for_target_ft: L }
+export function computeLifelineTension({ span_ft = 0, sag_ft = 0, arrest_force_lb = 1800, workers = 1, safety_factor = 2, anchorage_capacity_lb = 0, target_tension_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(span_ft) || 0;
+  const s = Number(sag_ft) || 0;
+  const W = Number(arrest_force_lb) || 0;
+  const n = Number(workers) || 0;
+  const sf = Number(safety_factor) || 0;
+  const cap = Number(anchorage_capacity_lb) || 0;
+  const target = Number(target_tension_lb) || 0;
+  if (!(L > 0)) return { error: "Span between anchors must be positive (ft)." };
+  if (!(s > 0)) return { error: "Midspan sag must be positive (ft) - a lifeline with no sag has no vertical component to arrest against, and the tension is unbounded." };
+  if (!(W > 0)) return { error: "Arrest force must be positive (lb)." };
+  if (!Number.isInteger(n) || n < 1) return { error: "Number of workers attached must be a whole number, one or more." };
+  if (!(sf > 0)) return { error: "Safety factor must be positive." };
+  if (cap < 0) return { error: "Anchorage capacity cannot be negative (lb)." };
+  if (target < 0) return { error: "Target tension cannot be negative (lb)." };
+  if (s >= L) return { error: "Sag cannot equal or exceed the span - check the units." };
+
+  const MAF_HARNESS = 1800, PER_WORKER = 5000, FREE_FALL_MAX = 6, DECEL_MAX = 3.5;
+  const half = L / 2;
+  const slant_ft = Math.sqrt(half * half + s * s);
+  const cable_tension_lb = W * slant_ft / (2 * s);
+  const horizontal_pull_lb = W * half / (2 * s);
+  const tension_multiple = cable_tension_lb / W;
+  const angle_deg = Math.atan2(s, half) * 180 / Math.PI;
+
+  const anchorage_demand_lb = cable_tension_lb * sf;
+  const prescriptive_anchorage_lb = PER_WORKER * n;
+  const governing_anchorage_lb = Math.max(anchorage_demand_lb, prescriptive_anchorage_lb);
+  const engineered_governs = anchorage_demand_lb > prescriptive_anchorage_lb;
+  const anchorage_ok = cap > 0 ? cap >= governing_anchorage_lb : null;
+  const anchorage_deficit_lb = cap > 0 ? Math.max(0, governing_anchorage_lb - cap) : null;
+
+  // The inverse: the sag that would bring the cable tension down to a target.
+  // T = W sqrt((L/2)^2 + s^2)/(2 s)  ->  s = W (L/2) / sqrt(4 T^2 - W^2)
+  const sag_for_target_ft = target > W / 2 ? (W * half) / Math.sqrt(4 * target * target - W * W) : null;
+  // Doubling the sag from here, to show the trade.
+  const tension_at_double_sag_lb = W * Math.sqrt(half * half + 4 * s * s) / (4 * s);
+  const arrest_over_harness = W > MAF_HARNESS;
+
+  const note = "A HORIZONTAL LIFELINE MULTIPLIES THE FORCE IT IS ASKED TO CATCH, and the multiplier is set by SAG. At midspan the two halves of the cable have to turn a vertical arrest force into two axial pulls, and the flatter the cable the less vertical component there is to work with. "
+    + "A " + W + " lb arrest at midspan of a " + L + " ft line sagging " + s + " ft puts " + cable_tension_lb.toFixed(0) + " lb in the cable - " + tension_multiple.toFixed(1) + " times the arrest force - with a horizontal pull of " + horizontal_pull_lb.toFixed(0) + " lb at each anchor, the cable sitting at " + angle_deg.toFixed(1) + " degrees off horizontal. "
+    + "HALVE THE SAG AND THE TENSION ROUGHLY DOUBLES; double it and this drops to about " + tension_at_double_sag_lb.toFixed(0) + " lb. That is the whole design trade, and it runs the opposite way from intuition: a lifeline pulled drum-tight is the dangerous one, and the slack that looks sloppy is what keeps the anchors alive. It also costs fall clearance below, which is a separate calculation and the reason sag cannot simply be maximised. "
+    + "ANCHORAGE: 1926.502(d)(8) requires a horizontal lifeline to be designed, installed, and used under the supervision of a QUALIFIED PERSON as part of a complete personal fall arrest system maintaining a safety factor of at least two - so at a factor of " + sf + " the engineered demand is " + anchorage_demand_lb.toFixed(0) + " lb per anchor. "
+    + "1926.502(d)(15) separately wants an anchorage capable of supporting at least 5,000 lb PER EMPLOYEE ATTACHED, which for " + n + " worker" + (n === 1 ? "" : "s") + " is " + prescriptive_anchorage_lb.toFixed(0) + " lb, unless the system is engineered to that factor of two by a qualified person. "
+    + "Governing here: " + governing_anchorage_lb.toFixed(0) + " lb, from the " + (engineered_governs ? "ENGINEERED path - the geometry demands more than the 5,000 lb per worker figure, which is the case people never expect and the reason a flat lifeline cannot be signed off on the prescriptive number alone. " : "prescriptive 5,000 lb per worker figure, which exceeds what this geometry demands. ")
+    + (cap > 0 ? "Anchorage capacity entered " + cap + " lb: " + (anchorage_ok ? "adequate. " : "SHORT by " + anchorage_deficit_lb.toFixed(0) + " lb. ") : "No anchorage capacity entered, so nothing is checked against it. ")
+    + (sag_for_target_ft !== null ? "TO BRING THE CABLE TENSION TO " + target + " LB the sag would have to be " + sag_for_target_ft.toFixed(2) + " ft" + (sag_for_target_ft > s ? " - more than the " + s + " ft entered, so the line needs to be let out. " : " - less than the " + s + " ft entered, which this line already beats. ") : target > 0 ? "The target tension entered is at or below half the arrest force, which no sag can achieve: each half of the cable can never carry less than half the load it turns. " : "")
+    + (arrest_over_harness ? "NOTE THE ARREST FORCE ENTERED: " + W + " lb exceeds the 1,800 lb that 1926.502(d)(16)(ii) permits on an employee with a body harness, so the system fails on the worker before the anchors are reached. " : "")
+    + "Not checked: the fall clearance below the lifeline, which grows with sag and is the reason sag cannot simply be maximised - that is a separate tile; the cable, its terminations, turnbuckles, and connectors, whose ratings are usually what governs before the anchor does; dynamic and impact effects beyond the static midspan case modelled here, and load applied off midspan, which changes the geometry; more than one worker loading the line at once, which this does not superpose; sag under self-weight before anyone falls; the maximum arresting force, deceleration distance of 3.5 ft, and 6 ft free-fall limits of 1926.502(d)(16); the structure the anchors are attached to, which is the usual real limit; and the requirement, which is not optional, that the whole system be designed and supervised by a QUALIFIED PERSON. A tension estimate, not a lifeline design; 29 CFR 1926 Subpart M and that qualified person govern.";
+
+  return { slant_ft, cable_tension_lb, horizontal_pull_lb, tension_multiple, angle_deg, anchorage_demand_lb, prescriptive_anchorage_lb, governing_anchorage_lb, engineered_governs, anchorage_ok, anchorage_deficit_lb, sag_for_target_ft, tension_at_double_sag_lb, arrest_over_harness, max_arresting_force_lb: MAF_HARNESS, free_fall_max_ft: FREE_FALL_MAX, decel_max_ft: DECEL_MAX, note };
+}
+
+export const lifelineTensionExample = { inputs: { span_ft: 30, sag_ft: 1, arrest_force_lb: 1800, workers: 1, safety_factor: 2, anchorage_capacity_lb: 5000, target_tension_lb: 5000 } };
+
+CROSS_RENDERERS["lifeline-tension"] = _simpleRendererG({
+  citation: "Citation: statics of a cable loaded at midspan - T = W x sqrt((L/2)^2 + s^2) / (2 s) - with the regulatory requirements from OSHA 29 CFR 1926.502(d), a US federal regulation in the public domain. 1926.502(d)(8): 'Horizontal lifelines shall be designed, installed, and used, under the supervision of a qualified person, as part of a complete personal fall arrest system, which maintains a safety factor of at least two.' 1926.502(d)(15): anchorages used for attachment of personal fall arrest equipment shall be independent of any anchorage being used to support or suspend platforms and capable of supporting at least 5,000 pounds per employee attached, or shall be designed, installed, and used as part of a complete personal fall arrest system which maintains a safety factor of at least two and under the supervision of a qualified person. 1926.502(d)(16): systems shall limit maximum arresting force on an employee to 900 lb with a body belt and 1,800 lb with a body harness, be rigged such that an employee can neither free fall more than 6 ft nor contact any lower level, bring an employee to a complete stop and limit the maximum deceleration distance to 3.5 ft, and have sufficient strength to withstand twice the potential impact energy of an employee free falling 6 ft or the free fall distance permitted by the system, whichever is less. The tension model is the static midspan case; dynamic effects, off-midspan loading, multiple simultaneous loads, cable and connector ratings, and the supporting structure are not modelled. A tension estimate, not a lifeline design; the qualified person governs.",
+  example: lifelineTensionExample.inputs,
+  fields: [
+    { key: "span_ft", label: "Span between anchors (ft)", kind: "number", default: 30 },
+    { key: "sag_ft", label: "Midspan sag under load (ft)", kind: "number", default: 1 },
+    { key: "arrest_force_lb", label: "Arrest force applied at midspan (lb)", kind: "number", default: 1800 },
+    { key: "workers", label: "Workers attached", kind: "number", default: 1 },
+    { key: "safety_factor", label: "Safety factor (2 is the OSHA minimum)", kind: "number", default: 2 },
+    { key: "anchorage_capacity_lb", label: "Anchorage capacity available (lb; 0 = not checked)", kind: "number", default: 5000 },
+    { key: "target_tension_lb", label: "Target cable tension, to solve for sag (lb; 0 = skip)", kind: "number", default: 5000 },
+  ],
+  outputs: [
+    { key: "t", id: "llt-out-t", label: "Cable tension", value: (r) => fmt(r.cable_tension_lb, 0) + " lb - " + fmt(r.tension_multiple, 1) + "x the arrest force, at " + fmt(r.angle_deg, 1) + " degrees off horizontal" },
+    { key: "h", id: "llt-out-h", label: "Horizontal pull at each anchor", value: (r) => fmt(r.horizontal_pull_lb, 0) + " lb" },
+    { key: "d", id: "llt-out-d", label: "Double the sag", value: (r) => "tension falls to about " + fmt(r.tension_at_double_sag_lb, 0) + " lb" },
+    { key: "a", id: "llt-out-a", label: "Anchorage required", value: (r) => fmt(r.governing_anchorage_lb, 0) + " lb - the " + (r.engineered_governs ? "engineered demand (" + fmt(r.anchorage_demand_lb, 0) + ") exceeds the 5,000 lb per worker figure" : "prescriptive 5,000 lb per worker figure exceeds the engineered demand (" + fmt(r.anchorage_demand_lb, 0) + ")") },
+    { key: "c", id: "llt-out-c", label: "Against the capacity entered", value: (r) => r.anchorage_ok === null ? "not checked" : r.anchorage_ok ? "adequate" : "SHORT by " + fmt(r.anchorage_deficit_lb, 0) + " lb" },
+    { key: "s", id: "llt-out-s", label: "Sag needed for the target tension", value: (r) => r.sag_for_target_ft === null ? "no sag reaches that target - each half carries at least half the load" : fmt(r.sag_for_target_ft, 2) + " ft" },
+    { key: "n", id: "llt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLifelineTension,
+});

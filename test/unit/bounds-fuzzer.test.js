@@ -34564,3 +34564,90 @@ test("bounds: spec-v1173 computeFloodOpeningArea pins the 1 sq in per sq ft rule
   assert.ok("error" in _v1173({ ...base, opening_type: "engineered", coverage_sf_per_opening: 0 }));
   assert.ok("error" in _v1173({ ...base, enclosed_area_sf: Infinity }));
 });
+
+import { computeLifelineTension as _v1174 } from "../../calc-cross.js";
+
+test("bounds: spec-v1174 computeLifelineTension pins the midspan statics, the 1/sag behaviour, the governing anchorage, the inverse, and error seams", () => {
+  const base = { span_ft: 30, sag_ft: 1, arrest_force_lb: 1800, workers: 1, safety_factor: 2, anchorage_capacity_lb: 5000, target_tension_lb: 5000 };
+  const r = _v1174(base);
+  assert.ok(Math.abs(r.cable_tension_lb - 1800 * Math.sqrt(226) / 2) < 1e-6);
+  assert.ok(Math.abs(r.horizontal_pull_lb - 13500) < 1e-9 && Math.abs(r.tension_multiple - r.cable_tension_lb / 1800) < 1e-12);
+  assert.ok(r.engineered_governs && Math.abs(r.anchorage_demand_lb - 2 * r.cable_tension_lb) < 1e-9 && !r.anchorage_ok);
+  // THE STATICS, closed form, at every geometry - and the vertical components must sum to the load.
+  for (const [L, s, W] of [[30, 1, 1800], [30, 3, 1800], [10, 0.5, 900], [100, 5, 1800], [20, 10, 1000]]) {
+    const t = _v1174({ ...base, span_ft: L, sag_ft: s, arrest_force_lb: W });
+    const expT = W * Math.sqrt((L / 2) * (L / 2) + s * s) / (2 * s);
+    assert.ok(Math.abs(t.cable_tension_lb - expT) < 1e-9, "tension wrong at " + L + "/" + s + "/" + W);
+    assert.ok(Math.abs(t.horizontal_pull_lb - W * L / (4 * s)) < 1e-9);
+    // Two cable halves, each lifting T sin(theta): they must add to exactly the arrest force.
+    const sinT = s / Math.sqrt((L / 2) * (L / 2) + s * s);
+    assert.ok(Math.abs(2 * t.cable_tension_lb * sinT - W) < 1e-9, "vertical equilibrium broken at " + L + "/" + s);
+    assert.ok(Math.abs(t.angle_deg - Math.atan2(s, L / 2) * 180 / Math.PI) < 1e-9);
+    assert.ok(t.cable_tension_lb >= t.horizontal_pull_lb, "the axial pull is never less than its horizontal component");
+    assert.ok(t.cable_tension_lb >= W / 2 - 1e-9, "each half always carries at least half the load");
+  }
+  // TENSION FALLS AS SAG GROWS, monotonically, and roughly doubles when the sag halves.
+  let prev = Infinity;
+  for (const s of [0.25, 0.5, 1, 2, 4, 8]) {
+    const t = _v1174({ ...base, sag_ft: s }).cable_tension_lb;
+    assert.ok(t < prev, "tension did not fall as sag grew at " + s); prev = t;
+  }
+  const half = _v1174({ ...base, sag_ft: 0.5 }).cable_tension_lb;
+  const full = _v1174({ ...base, sag_ft: 1 }).cable_tension_lb;
+  assert.ok(half / full > 1.9 && half / full < 2.05, "halving the sag should roughly double the tension");
+  // The reported double-sag tension matches an actual run at double the sag.
+  for (const s of [0.5, 1, 3]) {
+    const t = _v1174({ ...base, sag_ft: s });
+    const dbl = _v1174({ ...base, sag_ft: 2 * s }).cable_tension_lb;
+    assert.ok(Math.abs(t.tension_at_double_sag_lb - dbl) < 1e-9, "double-sag report wrong at " + s);
+  }
+  // THE GOVERNING ANCHORAGE is the larger of the engineered demand and 5,000 lb per worker.
+  for (const [s, n, eng] of [[1, 1, true], [3, 1, true], [12, 1, false], [12, 4, false], [1, 10, false]]) {
+    const t = _v1174({ ...base, sag_ft: s, workers: n });
+    assert.ok(t.prescriptive_anchorage_lb === 5000 * n);
+    assert.ok(t.governing_anchorage_lb === Math.max(t.anchorage_demand_lb, t.prescriptive_anchorage_lb));
+    assert.ok(t.engineered_governs === eng, "which path governs is wrong at sag " + s + ", " + n + " workers");
+  }
+  // Which path governs flips BOTH ways: a flat line on one worker is engineered, and the same
+  // flat line with ten workers attached is back to the prescriptive 50,000 lb.
+  assert.ok(_v1174({ ...base, sag_ft: 1, workers: 1 }).engineered_governs);
+  assert.ok(!_v1174({ ...base, sag_ft: 1, workers: 10 }).engineered_governs);
+  assert.ok(_v1174({ ...base, sag_ft: 1, workers: 10 }).governing_anchorage_lb === 50000);
+  // The safety factor scales the engineered demand exactly and never the prescriptive figure.
+  for (const sf of [1, 2, 3]) {
+    const t = _v1174({ ...base, safety_factor: sf });
+    assert.ok(Math.abs(t.anchorage_demand_lb - sf * t.cable_tension_lb) < 1e-9 && t.prescriptive_anchorage_lb === 5000);
+  }
+  // Capacity checking is optional and reports null rather than a pass when omitted.
+  const noCap = _v1174({ ...base, anchorage_capacity_lb: 0 });
+  assert.ok(noCap.anchorage_ok === null && noCap.anchorage_deficit_lb === null);
+  assert.ok(_v1174({ ...base, anchorage_capacity_lb: 1e6 }).anchorage_ok);
+  assert.ok(Math.abs(_v1174({ ...base, anchorage_capacity_lb: 5000 }).anchorage_deficit_lb - (r.governing_anchorage_lb - 5000)) < 1e-9);
+  // THE INVERSE ROUND-TRIPS: the sag reported for a target tension produces that tension.
+  for (const [L, W, target] of [[30, 1800, 5000], [30, 1800, 3000], [100, 1800, 10000], [20, 900, 1000]]) {
+    const t = _v1174({ ...base, span_ft: L, arrest_force_lb: W, target_tension_lb: target });
+    assert.ok(t.sag_for_target_ft !== null && t.sag_for_target_ft > 0);
+    const back = _v1174({ ...base, span_ft: L, arrest_force_lb: W, sag_ft: t.sag_for_target_ft });
+    assert.ok(Math.abs(back.cable_tension_lb - target) < 1e-6, "the reported sag misses the target at " + L + "/" + W + "/" + target);
+  }
+  // A target at or below half the arrest force is unreachable at any sag, and says so with null.
+  assert.ok(_v1174({ ...base, target_tension_lb: 900 }).sag_for_target_ft === null);
+  assert.ok(_v1174({ ...base, target_tension_lb: 899 }).sag_for_target_ft === null);
+  assert.ok(_v1174({ ...base, target_tension_lb: 901 }).sag_for_target_ft !== null);
+  assert.ok(_v1174({ ...base, target_tension_lb: 0 }).sag_for_target_ft === null);
+  // The harness limit is flagged without being enforced as an error.
+  assert.ok(!_v1174(base).arrest_over_harness && _v1174({ ...base, arrest_force_lb: 1801 }).arrest_over_harness);
+  assert.ok(_v1174(base).max_arresting_force_lb === 1800 && _v1174(base).free_fall_max_ft === 6 && _v1174(base).decel_max_ft === 3.5);
+  // Error seams.
+  assert.ok("error" in _v1174({ ...base, span_ft: 0 }));
+  assert.ok("error" in _v1174({ ...base, sag_ft: 0 }));
+  assert.ok("error" in _v1174({ ...base, sag_ft: 30 }), "sag cannot equal the span");
+  assert.ok("error" in _v1174({ ...base, sag_ft: 40 }));
+  assert.ok("error" in _v1174({ ...base, arrest_force_lb: 0 }));
+  assert.ok("error" in _v1174({ ...base, workers: 0 }));
+  assert.ok("error" in _v1174({ ...base, workers: 1.5 }));
+  assert.ok("error" in _v1174({ ...base, safety_factor: 0 }));
+  assert.ok("error" in _v1174({ ...base, anchorage_capacity_lb: -1 }));
+  assert.ok("error" in _v1174({ ...base, target_tension_lb: -1 }));
+  assert.ok("error" in _v1174({ ...base, span_ft: Infinity }));
+});
