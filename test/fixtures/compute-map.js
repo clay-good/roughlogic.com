@@ -1052,6 +1052,7 @@ export const COMPUTE_MAP = {
   "steel-beam-ltb": { module: "../../calc-steel.js", fn: "computeSteelBeamLtb" },
   "steel-block-shear": { module: "../../calc-steel.js", fn: "computeSteelBlockShear" },
   "steel-tension-member": { module: "../../calc-steel.js", fn: "computeSteelTensionMember" },
+  "staggered-net-width": { module: "../../calc-steel.js", fn: "computeStaggeredNetWidth" },
   // spec-v284..v286 reinforced-concrete member depth batch (3 tiles)
   "rc-column-axial": { module: "../../calc-concrete.js", fn: "computeRcColumnAxial" },
   "rc-column-steel-for-load": { module: "../../calc-concrete.js", fn: "computeRcColumnSteelForLoad" },

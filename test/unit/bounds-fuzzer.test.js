@@ -34123,3 +34123,78 @@ test("bounds: spec-v1167 computeSilicaTable1 pins all eighteen rows, the four-ho
   assert.ok("error" in _v1167({ ...base, apf_provided: -1 }));
   assert.ok("error" in _v1167({ ...base, hours_per_shift: Infinity }));
 });
+
+import { computeStaggeredNetWidth as _v1168 } from "../../calc-steel.js";
+
+test("bounds: spec-v1168 computeStaggeredNetWidth pins the s^2/4g credit, the governing chain, the stagger ceiling, and error seams", () => {
+  const base = { plate_width_in: 12, thickness_in: 0.5, bolt_dia_in: 0.75, hole_allowance_in: 0.125, gage_in: 3, pitch_in: 2, holes_straight: 2, holes_zigzag: 3, gage_spaces_zigzag: 2 };
+  const r = _v1168(base);
+  assert.ok(r.hole_dia_in === 0.875 && r.net_width_straight_in === 10.25);
+  assert.ok(Math.abs(r.net_width_zigzag_in - 10.0416666667) < 1e-9 && Math.abs(r.stagger_credit_in - 2 / 3) < 1e-9);
+  assert.ok(r.zigzag_governs && Math.abs(r.net_area_in2 - 5.0208333333) < 1e-9);
+  assert.ok(Math.abs(r.pitch_where_straight_governs_in - Math.sqrt(5.25)) < 1e-9 && !r.stagger_maxed_out);
+  // THE HOLE IS THE BOLT PLUS THE ALLOWANCE, on every hole in both chains.
+  for (const [db, al] of [[0.75, 0.125], [0.875, 0.125], [1, 0.1875], [0.625, 0]]) {
+    const t = _v1168({ ...base, bolt_dia_in: db, hole_allowance_in: al });
+    assert.ok(Math.abs(t.hole_dia_in - (db + al)) < 1e-12);
+    assert.ok(Math.abs(t.net_width_straight_in - (12 - 2 * (db + al))) < 1e-9);
+    assert.ok(Math.abs(t.net_width_zigzag_in - (12 - 3 * (db + al) + 2 / 3)) < 1e-9);
+  }
+  // Using the bolt diameter instead of the hole overstates the net area, by exactly n x allowance.
+  const noAllow = _v1168({ ...base, hole_allowance_in: 0 });
+  assert.ok(Math.abs(noAllow.net_width_straight_in - r.net_width_straight_in - 2 * 0.125) < 1e-9);
+  // s^2/4g, at every pitch and gage, scaled by the number of gage spaces.
+  for (const [s, g, k] of [[2, 3, 1], [2, 3, 2], [3, 4, 2], [1.5, 2.5, 3], [5, 6, 1]]) {
+    const t = _v1168({ ...base, pitch_in: s, gage_in: g, gage_spaces_zigzag: k, holes_zigzag: 3 + k });
+    assert.ok(Math.abs(t.stagger_credit_in - k * s * s / (4 * g)) < 1e-9, "credit wrong at " + s + "/" + g + "/" + k);
+  }
+  // The credit grows with the square of the pitch and shrinks with the gage.
+  let prev = -1;
+  for (const s of [0.5, 1, 2, 3, 4]) { const c = _v1168({ ...base, pitch_in: s }).stagger_credit_in; assert.ok(c > prev); prev = c; }
+  prev = 1e9;
+  for (const g of [2, 3, 4, 6]) { const c = _v1168({ ...base, gage_in: g }).stagger_credit_in; assert.ok(c < prev); prev = c; }
+  // THE SMALLER NET WIDTH GOVERNS, and the governing chain flips at the ceiling pitch.
+  const crit = r.pitch_where_straight_governs_in;
+  assert.ok(_v1168({ ...base, pitch_in: crit - 0.01 }).zigzag_governs, "just under the ceiling the zigzag governs");
+  assert.ok(!_v1168({ ...base, pitch_in: crit + 0.01 }).zigzag_governs, "just over it the straight chain governs");
+  const atCrit = _v1168({ ...base, pitch_in: crit });
+  assert.ok(Math.abs(atCrit.net_width_zigzag_in - atCrit.net_width_straight_in) < 1e-9, "at the ceiling the chains are equal");
+  assert.ok(atCrit.margin_in < 1e-9 && atCrit.stagger_maxed_out);
+  for (const s of [0.5, 1, 2, 2.29, 3, 6]) {
+    const t = _v1168({ ...base, pitch_in: s });
+    assert.ok(t.net_width_in === Math.min(t.net_width_straight_in, t.net_width_zigzag_in));
+    assert.ok(t.stagger_maxed_out === (s >= t.pitch_where_straight_governs_in));
+    assert.ok(Math.abs(t.pitch_headroom_in - Math.max(0, t.pitch_where_straight_governs_in - s)) < 1e-9);
+    assert.ok(t.pitch_headroom_in >= 0);
+  }
+  // The governing net width never exceeds the straight chain, whatever the stagger does.
+  for (const s of [0.5, 2, 4, 12]) assert.ok(_v1168({ ...base, pitch_in: s }).net_width_in <= 10.25 + 1e-12);
+  // Net area follows the governing width and the thickness exactly.
+  for (const t0 of [0.25, 0.5, 1]) {
+    const t = _v1168({ ...base, thickness_in: t0 });
+    assert.ok(Math.abs(t.net_area_in2 - t.net_width_in * t0) < 1e-9);
+    assert.ok(Math.abs(t.gross_area_in2 - 12 * t0) < 1e-9);
+    assert.ok(Math.abs(t.efficiency - t.net_area_in2 / t.gross_area_in2) < 1e-12);
+  }
+  // Equal hole counts: the zigzag can never govern, and no ceiling pitch exists.
+  const equalChains = _v1168({ ...base, holes_straight: 3, holes_zigzag: 3 });
+  assert.ok(!equalChains.zigzag_governs && equalChains.pitch_where_straight_governs_in === null && equalChains.stagger_maxed_out);
+  // No gage space crossed: no credit, no ceiling, and the straight-line result stands.
+  const noStagger = _v1168({ ...base, gage_spaces_zigzag: 0, holes_zigzag: 3 });
+  assert.ok(noStagger.stagger_credit_in === 0 && noStagger.pitch_where_straight_governs_in === null && noStagger.zigzag_governs);
+  assert.ok(noStagger.net_width_in === 12 - 3 * 0.875);
+  // Error seams.
+  assert.ok("error" in _v1168({ ...base, plate_width_in: 0 }));
+  assert.ok("error" in _v1168({ ...base, thickness_in: 0 }));
+  assert.ok("error" in _v1168({ ...base, bolt_dia_in: 0 }));
+  assert.ok("error" in _v1168({ ...base, hole_allowance_in: -0.1 }));
+  assert.ok("error" in _v1168({ ...base, holes_straight: 0 }));
+  assert.ok("error" in _v1168({ ...base, holes_zigzag: 2.5 }));
+  assert.ok("error" in _v1168({ ...base, gage_spaces_zigzag: -1 }));
+  assert.ok("error" in _v1168({ ...base, gage_in: 0 }));
+  assert.ok("error" in _v1168({ ...base, pitch_in: 0 }));
+  assert.ok("error" in _v1168({ ...base, holes_straight: 4, holes_zigzag: 3 }), "a zigzag crossing fewer holes is not a stagger");
+  assert.ok("error" in _v1168({ ...base, plate_width_in: 1.5 }), "holes consuming the whole width");
+  assert.ok(!("error" in _v1168({ ...base, plate_width_in: 2 })), "a thin but positive remainder is arithmetic, not an error");
+  assert.ok("error" in _v1168({ ...base, plate_width_in: Infinity }));
+});

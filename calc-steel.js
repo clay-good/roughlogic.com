@@ -1316,3 +1316,102 @@ STEEL_RENDERERS["slip-critical-with-tension"] = _simpleRenderer({
   ],
   compute: computeSlipCriticalWithTension,
 });
+
+// ===================== spec-v1168: staggered-hole net width (AISC 360 B4.3b) =====================
+
+// steel-tension-member computes the net area for holes in a single transverse line and says in
+// so many words that the staggered s^2/4g chain is not handled. This is that chain.
+// B4.3b: for a chain of holes extending across a part in any diagonal or zigzag line, deduct the
+// sum of the diameters of ALL holes in the chain from the gross width, then ADD s^2/4g for each
+// gage space in the chain, where s is the longitudinal pitch and g the transverse gage.
+// Two things get missed. The hole is deducted at the bolt diameter plus 1/8 in, not the bolt
+// diameter - a 1/16 for the standard hole and another 1/16 for damage around it. And staggering
+// has a ceiling: past a certain pitch the straight chain governs and further stagger buys
+// nothing, which is a number worth having before redrawing the pattern.
+// dims: in { plate_width_in: L, thickness_in: L, bolt_dia_in: L, hole_allowance_in: L, gage_in: L, pitch_in: L, holes_straight: dimensionless, holes_zigzag: dimensionless, gage_spaces_zigzag: dimensionless } out: { hole_dia_in: L, net_width_straight_in: L, net_width_zigzag_in: L, net_width_in: L, gross_area_in2: L^2, net_area_in2: L^2, stagger_credit_in: L, pitch_where_straight_governs_in: L }
+export function computeStaggeredNetWidth({ plate_width_in = 0, thickness_in = 0, bolt_dia_in = 0, hole_allowance_in = 0.125, gage_in = 0, pitch_in = 0, holes_straight = 0, holes_zigzag = 0, gage_spaces_zigzag = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const W = Number(plate_width_in) || 0;
+  const t = Number(thickness_in) || 0;
+  const db = Number(bolt_dia_in) || 0;
+  const allow = Number(hole_allowance_in);
+  const g = Number(gage_in) || 0;
+  const s = Number(pitch_in) || 0;
+  const nS = Number(holes_straight) || 0;
+  const nZ = Number(holes_zigzag) || 0;
+  const k = Number(gage_spaces_zigzag) || 0;
+  if (!(W > 0)) return { error: "Plate width must be positive (in)." };
+  if (!(t > 0)) return { error: "Plate thickness must be positive (in)." };
+  if (!(db > 0)) return { error: "Bolt diameter must be positive (in)." };
+  if (!Number.isFinite(allow) || allow < 0) return { error: "Hole allowance must be zero or more (in)." };
+  if (!Number.isInteger(nS) || nS < 1) return { error: "The straight chain must cross at least one hole." };
+  if (!Number.isInteger(nZ) || nZ < 1) return { error: "The zigzag chain must cross at least one hole." };
+  if (!Number.isInteger(k) || k < 0) return { error: "Gage spaces in the zigzag chain must be a whole number, zero or more." };
+  if (k > 0 && !(g > 0)) return { error: "Gage must be positive (in) where the zigzag chain crosses a gage space." };
+  if (k > 0 && !(s > 0)) return { error: "Pitch must be positive (in) where the zigzag chain crosses a gage space." };
+  if (nZ < nS) return { error: "A zigzag chain crossing fewer holes than the straight chain is not a stagger - check which chain is which." };
+
+  const hole_dia_in = db + allow;
+  const gross_area_in2 = W * t;
+  const net_width_straight_in = W - nS * hole_dia_in;
+  const stagger_credit_in = k > 0 ? k * (s * s) / (4 * g) : 0;
+  const net_width_zigzag_in = W - nZ * hole_dia_in + stagger_credit_in;
+  if (net_width_straight_in <= 0 || net_width_zigzag_in <= 0) return { error: "The holes consume the whole width - check the width, hole count, and hole diameter." };
+
+  const zigzag_governs = net_width_zigzag_in < net_width_straight_in;
+  const net_width_in = Math.min(net_width_straight_in, net_width_zigzag_in);
+  const net_area_in2 = net_width_in * t;
+  const efficiency = net_area_in2 / gross_area_in2;
+  const margin_in = Math.abs(net_width_zigzag_in - net_width_straight_in);
+
+  // The pitch at which the zigzag stops governing: k s^2/(4g) = (nZ - nS) x hole
+  const extra_holes = nZ - nS;
+  const pitch_where_straight_governs_in = k > 0 && extra_holes > 0 ? Math.sqrt(4 * g * extra_holes * hole_dia_in / k) : null;
+  const stagger_maxed_out = pitch_where_straight_governs_in === null ? (k > 0 && extra_holes === 0) : s >= pitch_where_straight_governs_in;
+  // What a straight-line pattern with the same number of gage lines would have given.
+  const no_stagger_net_width_in = W - nZ * hole_dia_in;
+  const stagger_gain_in = net_width_in - Math.min(net_width_straight_in, no_stagger_net_width_in);
+  const pitch_headroom_in = pitch_where_straight_governs_in === null ? null : Math.max(0, pitch_where_straight_governs_in - s);
+
+  const note = "AISC 360 B4.3b: for a chain of holes running across a part on any DIAGONAL OR ZIGZAG line, deduct the diameters of ALL the holes in that chain from the gross width, then ADD s^2/4g for each gage space the chain crosses. Every possible chain has to be checked and the SMALLEST net width governs. "
+    + "THE HOLE IS NOT THE BOLT: it is deducted at " + db + " + " + allow + " = " + hole_dia_in.toFixed(3) + " in - a 1/16 for the standard hole and another 1/16 for damage around it - and using the bolt diameter overstates the net area on every hole in the chain. "
+    + "STRAIGHT CHAIN: " + W + " - " + nS + " x " + hole_dia_in.toFixed(3) + " = " + net_width_straight_in.toFixed(3) + " in. "
+    + "ZIGZAG CHAIN: " + W + " - " + nZ + " x " + hole_dia_in.toFixed(3) + (k > 0 ? " + " + k + " x " + s + "^2/(4 x " + g + ") = " + net_width_zigzag_in.toFixed(3) : " = " + net_width_zigzag_in.toFixed(3)) + " in"
+    + (k > 0 ? ", where the stagger credit is " + stagger_credit_in.toFixed(3) + " in across " + k + " gage space" + (k === 1 ? "" : "s") + ". " : ". ")
+    + "GOVERNING net width " + net_width_in.toFixed(3) + " in (" + (zigzag_governs ? "the ZIGZAG chain, by " + margin_in.toFixed(3) + " in" : "the STRAIGHT chain, by " + margin_in.toFixed(3) + " in") + "), so An = " + net_area_in2.toFixed(3) + " in^2 against Ag = " + gross_area_in2.toFixed(3) + " in^2 - " + (efficiency * 100).toFixed(1) + "% of the gross. "
+    + (pitch_where_straight_governs_in !== null
+      ? "STAGGERING HAS A CEILING, and this is the number worth having before the pattern gets redrawn: at a pitch of " + pitch_where_straight_governs_in.toFixed(3) + " in the two chains are equal, and past it the STRAIGHT chain governs and further stagger buys nothing at all. "
+        + (stagger_maxed_out ? "This pattern is already at or past that pitch, so opening the stagger further is wasted drawing - the remaining net width is set by the straight line of holes. " : "This pattern is at " + s + " in, so there is still " + (pitch_where_straight_governs_in - s).toFixed(3) + " in of pitch that would still be buying net width. ")
+      : k > 0 ? "The two chains cross the same number of holes, so the zigzag chain can never govern here - the stagger credit is pure gain. " : "No gage space is crossed, so there is no stagger credit to compute; this is a straight-line net section. ")
+    + "Not checked: the tension member itself - yielding on the gross section, rupture on the effective net section, and the shear-lag factor U that turns An into Ae are separate checks and a separate tile; block shear at the connection; the bolt shear and bearing; slenderness; whether these are the governing chains, which is a drawing question and not an arithmetic one; oversized, short-slotted, and long-slotted holes, which deduct more than a standard hole; angles and other shapes, where the gage across the back of the leg uses the developed flat width and this rectangular treatment does not apply; and staggered holes in a shape rather than a plate. A net-width check, not a member design; AISC 360 and the engineer of record govern.";
+
+  return { hole_dia_in, gross_area_in2, net_width_straight_in, net_width_zigzag_in, stagger_credit_in, zigzag_governs, net_width_in, net_area_in2, efficiency, margin_in, pitch_where_straight_governs_in, pitch_headroom_in, stagger_maxed_out, no_stagger_net_width_in, stagger_gain_in, note };
+}
+
+export const staggeredNetWidthExample = { inputs: { plate_width_in: 12, thickness_in: 0.5, bolt_dia_in: 0.75, hole_allowance_in: 0.125, gage_in: 3, pitch_in: 2, holes_straight: 2, holes_zigzag: 3, gage_spaces_zigzag: 2 } };
+
+STEEL_RENDERERS["staggered-net-width"] = _simpleRenderer({
+  citation: "Citation: AISC 360 B4.3b (Net Area). For a chain of holes extending across a part in any diagonal or zigzag line, the net width of the part shall be obtained by deducting from the gross width the sum of the diameters of all holes in the chain, and adding, for each gage space in the chain, the quantity s^2/4g, where s is the longitudinal center-to-center spacing (pitch) of any two consecutive holes and g is the transverse center-to-center spacing (gage) between fastener gage lines. Every possible chain must be checked and the smallest net width governs. The hole is deducted at the bolt diameter plus 1/8 in by default - 1/16 for the standard hole and 1/16 for damage around it - and the allowance is an editable input because oversized and slotted holes deduct more. Not checked: gross-section yielding, net-section rupture, or the shear-lag factor U that turns An into Ae (separate tile); block shear; bolt shear and bearing; slenderness; whether the chains entered are the governing ones, which is a drawing question; and angles and other shapes, where the gage across the back of a leg uses the developed flat width and this rectangular treatment does not apply. A net-width check, not a member design.",
+  example: staggeredNetWidthExample.inputs,
+  fields: [
+    { key: "plate_width_in", label: "Gross plate width (in)", kind: "number", default: 12 },
+    { key: "thickness_in", label: "Plate thickness (in)", kind: "number", default: 0.5 },
+    { key: "bolt_dia_in", label: "Bolt diameter (in)", kind: "number", default: 0.75 },
+    { key: "hole_allowance_in", label: "Hole allowance over the bolt diameter (in)", kind: "number", default: 0.125 },
+    { key: "gage_in", label: "Gage, transverse spacing between gage lines (in)", kind: "number", default: 3 },
+    { key: "pitch_in", label: "Pitch, longitudinal spacing between staggered holes (in)", kind: "number", default: 2 },
+    { key: "holes_straight", label: "Holes crossed by the straight chain", kind: "number", default: 2 },
+    { key: "holes_zigzag", label: "Holes crossed by the zigzag chain", kind: "number", default: 3 },
+    { key: "gage_spaces_zigzag", label: "Gage spaces crossed by the zigzag chain", kind: "number", default: 2 },
+  ],
+  outputs: [
+    { key: "h", id: "snw-out-h", label: "Hole deducted", value: (r) => fmt(r.hole_dia_in, 3) + " in (bolt + allowance), not the bolt diameter" },
+    { key: "s", id: "snw-out-s", label: "Straight chain", value: (r) => fmt(r.net_width_straight_in, 3) + " in net width" },
+    { key: "z", id: "snw-out-z", label: "Zigzag chain", value: (r) => fmt(r.net_width_zigzag_in, 3) + " in net width, including a stagger credit of " + fmt(r.stagger_credit_in, 3) + " in" },
+    { key: "g", id: "snw-out-g", label: "Governing", value: (r) => fmt(r.net_width_in, 3) + " in - the " + (r.zigzag_governs ? "zigzag" : "straight") + " chain, by " + fmt(r.margin_in, 3) + " in" },
+    { key: "a", id: "snw-out-a", label: "Net area", value: (r) => fmt(r.net_area_in2, 3) + " in2 of " + fmt(r.gross_area_in2, 3) + " gross (" + fmt(r.efficiency * 100, 1) + "%)" },
+    { key: "p", id: "snw-out-p", label: "Pitch at which stagger stops paying", value: (r) => r.pitch_where_straight_governs_in === null ? "not applicable to this chain" : fmt(r.pitch_where_straight_governs_in, 3) + " in" + (r.stagger_maxed_out ? " - already at or past it" : ", still " + fmt(r.pitch_headroom_in, 3) + " in of useful pitch left") },
+    { key: "n", id: "snw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeStaggeredNetWidth,
+});

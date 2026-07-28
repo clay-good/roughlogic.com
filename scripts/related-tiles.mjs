@@ -1601,7 +1601,8 @@ const RELATED = {
   // spec-v281..v283 steel members-and-connections depth batch (Group E)
   "steel-beam-ltb": ["steel-beam-flexure","steel-beam-shear","steel-column-capacity"],
   "steel-block-shear": ["steel-beam-shear","bolt-shear-bearing","steel-tension-member"],
-  "steel-tension-member": ["steel-block-shear","steel-column-capacity","bolt-shear-bearing"],
+  "steel-tension-member": ["steel-block-shear","steel-column-capacity","bolt-shear-bearing","staggered-net-width"],
+  "staggered-net-width": ["steel-tension-member","steel-block-shear","bolt-shear-bearing","slip-critical-with-tension"],
   // spec-v284..v286 reinforced-concrete member depth batch (Group E)
   "rc-column-axial": ["rc-beam-flexure","rc-beam-shear","steel-column-capacity"],
   "rc-column-steel-for-load": ["rc-column-axial","rc-beam-flexure","steel-column-capacity"],
