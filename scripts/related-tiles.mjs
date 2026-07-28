@@ -1073,6 +1073,7 @@ const RELATED = {
   "restrained-pipe-length": ["thrust-block-sizing", "pipe-flotation", "pipe-bedding-backfill"],
   "hdd-pullback": ["pipe-flotation", "restrained-pipe-length", "pipe-bedding-backfill"],
   "scaffold-leg-load": ["scaffold-mudsill-bearing", "guard-handrail-check", "shore-post-load"],
+  "guard-post-load": ["guard-handrail-check", "baluster-picket-count", "deck-board-takeoff", "wood-beam-bending"],
   "scaffold-takeoff": ["scaffold-leg-load", "scaffold-mudsill-bearing", "material-quantity"],
   "dust-control-water": ["water-for-compaction", "dewatering-rate", "haul-cycle-production"],
   "haul-road-resistance": ["haul-cycle-production", "drawbar-pull", "dozer-production"],

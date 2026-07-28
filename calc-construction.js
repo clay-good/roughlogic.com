@@ -10864,3 +10864,87 @@ CONSTRUCTION_RENDERERS["membrane-fastener-takeoff"] = _simpleRenderer({
   ],
   compute: computeMembraneFastenerTakeoff,
 });
+
+
+// --- spec-v1130: guard post load and base connection ---
+// guard-handrail-check does the dimensions and ends "the assembly must also carry a 200 lb
+// load". This is that load, and the point of it is that the post is almost never what
+// fails. A 200 lb push at the top of a 36 in guard is 7,200 in-lb of moment, and a 4x4 post
+// shrugs that off; the base connection has to resolve the same moment into a couple over a
+// few inches of bolt spacing, which multiplies the force enormously. Two bolts 4 in apart
+// see 1,800 lb each from a 200 lb push. That ratio - the lever arm going from 36 in down to
+// 4 in - is why deck guards fail at the rim joist and not at the post.
+// IBC 1607.8.1: a 50 plf uniform load and a 200 lb concentrated load, NOT concurrent.
+// dims: in { post_height_in: L, post_spacing_ft: L, concentrated_lb: M L T^-2, uniform_plf: M T^-2, post_b_in: L, post_d_in: L, allowable_fb_psi: M L^-1 T^-2, connection_lever_in: L } out: { governing_load_lb: M L T^-2, moment_inlb: M L^2 T^-2, section_modulus_in3: L^3, required_fb_psi: M L^-1 T^-2, connection_force_lb: M L T^-2, force_multiplier: dimensionless }
+export function computeGuardPostLoad({ post_height_in = 36, post_spacing_ft = 6, concentrated_lb = 200, uniform_plf = 50, post_b_in = 3.5, post_d_in = 3.5, allowable_fb_psi = 0, connection_lever_in = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const h = Number(post_height_in) || 0;
+  const spacing = Number(post_spacing_ft) || 0;
+  const P = Number(concentrated_lb) || 0;
+  const w = Number(uniform_plf) || 0;
+  const b = Number(post_b_in) || 0;
+  const d = Number(post_d_in) || 0;
+  const Fb = Number(allowable_fb_psi) || 0;
+  const lever = Number(connection_lever_in) || 0;
+  if (!(h > 0)) return { error: "Post height above the connection must be positive (in)." };
+  if (!(spacing > 0)) return { error: "Post spacing must be positive (ft)." };
+  if (!(P > 0)) return { error: "Concentrated load must be positive (lb)." };
+  if (w < 0) return { error: "Uniform load cannot be negative (plf)." };
+  if (!(b > 0) || !(d > 0)) return { error: "Post dimensions must be positive (in) - use ACTUAL sizes, not nominal." };
+  if (Fb < 0) return { error: "Allowable bending stress cannot be negative (psi)." };
+  if (!(lever > 0)) return { error: "Connection lever arm must be positive (in)." };
+
+  // 1607.8.1: the two loads are not concurrent, so the post sees whichever is worse.
+  const uniform_at_post_lb = w * spacing;
+  const governing_load_lb = Math.max(P, uniform_at_post_lb);
+  const concentrated_governs = P >= uniform_at_post_lb;
+  const moment_inlb = governing_load_lb * h;
+  const moment_ftlb = moment_inlb / 12;
+
+  // The post itself, bending about the axis the push acts on.
+  const section_modulus_in3 = b * d * d / 6;
+  const required_fb_psi = moment_inlb / section_modulus_in3;
+  const post_ok = Fb > 0 ? required_fb_psi <= Fb : null;
+  const post_utilization = Fb > 0 ? required_fb_psi / Fb : null;
+
+  // The connection resolves the SAME moment over the bolt spacing, not the post height.
+  const connection_force_lb = moment_inlb / lever;
+  const force_multiplier = connection_force_lb / governing_load_lb;
+
+  const note = "IBC 1607.8.1 puts two loads on a guard and says they do NOT act together: a 200 lb concentrated load anywhere along the top, and a 50 plf uniform load. At " + spacing + " ft of post spacing the uniform load delivers " + uniform_at_post_lb.toFixed(0) + " lb to a post, so "
+    + (concentrated_governs ? "the " + P + " lb CONCENTRATED load governs here" : "the UNIFORM load governs here at " + uniform_at_post_lb.toFixed(0) + " lb - posts spaced past " + (P / w).toFixed(1) + " ft cross over to it")
+    + ". "
+    + "That load " + h + " in up is " + moment_inlb.toFixed(0) + " in-lb (" + moment_ftlb.toFixed(0) + " ft-lb) at the base. "
+    + "The post carries it easily: a " + b + " x " + d + " in section has S = " + section_modulus_in3.toFixed(2) + " in^3, needing only " + required_fb_psi.toFixed(0) + " psi of bending stress"
+    + (Fb > 0 ? " against the " + Fb + " psi allowable you entered - " + (post_ok ? "OK at " + (post_utilization * 100).toFixed(0) + "% utilization. " : "OVER at " + (post_utilization * 100).toFixed(0) + "%. ") : ". Enter an allowable bending stress for the species, grade, and adjustment factors to get a utilization. ")
+    + "THE CONNECTION IS THE PROBLEM. The same " + moment_inlb.toFixed(0) + " in-lb has to be resolved into a couple across only " + lever + " in of fastener spacing, so each side of that couple carries " + connection_force_lb.toFixed(0) + " lb - " + force_multiplier.toFixed(1) + " times the load that was applied. The lever arm collapsed from " + h + " in to " + lever + " in and multiplied the force by exactly that ratio. This is why residential deck guards fail at the rim joist rather than at the post, why lag screws into the end grain of a rim are not acceptable, and why the tested details use through-bolts with washers plus blocking, or a proprietary tension hold-down. "
+    + "Notching a post at the connection to clear the rim cuts the section right where the moment is highest - use the notched dimensions here if that is the detail. "
+    + "Scope: one post, one direction, bending only. The load is applied in ANY direction by the code, including outward, inward, and vertically, so the worst case may not be the one modeled. Intermediate rails, balusters, and infill take a separate 50 lb concentrated load (1607.8.1.1 / 1607.8.1.2). Not checked here: shear and bearing in the post, withdrawal and shear capacity of the specific fasteners, tension capacity of the rim or blocking, the load path back into the framing and the diaphragm, deflection, or fatigue. Wood values need the NDS adjustment factors. A screen; the tested guard detail, the adopted code, and the engineer of record govern.";
+
+  return { uniform_at_post_lb, governing_load_lb, concentrated_governs, moment_inlb, moment_ftlb, section_modulus_in3, required_fb_psi, post_ok, post_utilization, connection_force_lb, force_multiplier, note };
+}
+
+export const guardPostLoadExample = { inputs: { post_height_in: 36, post_spacing_ft: 6, concentrated_lb: 200, uniform_plf: 50, post_b_in: 3.5, post_d_in: 3.5, allowable_fb_psi: 1000, connection_lever_in: 4 } };
+
+CONSTRUCTION_RENDERERS["guard-post-load"] = _simpleRenderer({
+  citation: "Citation: IBC 1607.8.1 - handrails and guards designed to resist a linear load of 50 pounds per linear foot and a concentrated load of 200 pounds, with the uniform load not assumed to act concurrently with the concentrated load; intermediate rails, balusters, panel fillers, and guard infill take a separate 50 pound concentrated load (1607.8.1.1 / 1607.8.1.2), which this tile reports but does not check. Statics from there: moment at the base = governing load x post height; post section modulus S = b d^2 / 6 using ACTUAL dimensions; required bending stress = moment / S; the base connection resolves the same moment into a couple across the fastener spacing, so the force per side = moment / lever arm. The allowable bending stress is an INPUT because it depends on species, grade, and the NDS adjustment factors, none of which are shipped here. One post, one direction, bending only - the code applies the load in ANY direction. Fastener withdrawal and shear, rim and blocking tension, the load path into the framing, deflection, and fatigue are not checked. A screen; the tested guard detail, the adopted code, and the engineer of record govern.",
+  example: guardPostLoadExample.inputs,
+  fields: [
+    { key: "post_height_in", label: "Top of guard above the connection (in)", kind: "number", default: 36 },
+    { key: "post_spacing_ft", label: "Post spacing (ft)", kind: "number", default: 6 },
+    { key: "concentrated_lb", label: "Concentrated load (lb; IBC 200)", kind: "number", default: 200 },
+    { key: "uniform_plf", label: "Uniform load (plf; IBC 50)", kind: "number", default: 50 },
+    { key: "post_b_in", label: "Post width, actual (in)", kind: "number", default: 3.5 },
+    { key: "post_d_in", label: "Post depth in the load direction, actual (in)", kind: "number", default: 3.5 },
+    { key: "allowable_fb_psi", label: "Allowable bending stress Fb' (psi; 0 to skip)", kind: "number", default: 0 },
+    { key: "connection_lever_in", label: "Base connection lever arm / fastener spacing (in)", kind: "number", default: 4 },
+  ],
+  outputs: [
+    { key: "l", id: "gpl-out-l", label: "Governing load at the post", value: (r) => fmt(r.governing_load_lb, 0) + " lb - " + (r.concentrated_governs ? "the 200 lb concentrated case" : "the uniform case at " + fmt(r.uniform_at_post_lb, 0) + " lb") },
+    { key: "m", id: "gpl-out-m", label: "Moment at the base", value: (r) => fmt(r.moment_inlb, 0) + " in-lb (" + fmt(r.moment_ftlb, 0) + " ft-lb)" },
+    { key: "p", id: "gpl-out-p", label: "Post bending", value: (r) => "S = " + fmt(r.section_modulus_in3, 2) + " in^3, needs " + fmt(r.required_fb_psi, 0) + " psi" + (r.post_ok === null ? "" : r.post_ok ? " - OK at " + fmt(r.post_utilization * 100, 0) + "%" : " - OVER at " + fmt(r.post_utilization * 100, 0) + "%") },
+    { key: "c", id: "gpl-out-c", label: "Force in the base connection", value: (r) => fmt(r.connection_force_lb, 0) + " lb per side - " + fmt(r.force_multiplier, 1) + "x the applied load" },
+    { key: "n", id: "gpl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGuardPostLoad,
+});

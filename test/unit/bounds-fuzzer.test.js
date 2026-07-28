@@ -31983,3 +31983,53 @@ test("bounds: spec-v1129 computeCrawlSpaceVentilation pins the 1/150 and 1/1500 
   assert.ok("error" in _v1129({ ...base, corner_count: 3.5 }));
   assert.ok("error" in _v1129({ ...base, floor_area_sf: Infinity }));
 });
+
+import { computeGuardPostLoad as _v1130 } from "../../calc-construction.js";
+
+test("bounds: spec-v1130 computeGuardPostLoad pins the non-concurrent load pair, the 4 ft crossover, the lever-arm multiplier, and error seams", () => {
+  const base = { post_height_in: 36, post_spacing_ft: 6, concentrated_lb: 200, uniform_plf: 50, post_b_in: 3.5, post_d_in: 3.5, allowable_fb_psi: 1000, connection_lever_in: 4 };
+  const r = _v1130(base);
+  assert.ok(r.uniform_at_post_lb === 300 && r.governing_load_lb === 300 && !r.concentrated_governs);
+  assert.ok(r.moment_inlb === 10800 && Math.abs(r.section_modulus_in3 - 3.5 * 3.5 * 3.5 / 6) < 1e-12);
+  assert.ok(Math.abs(r.required_fb_psi - 1511.37026) < 1e-4 && r.post_ok === false);
+  assert.ok(r.connection_force_lb === 2700 && r.force_multiplier === 9);
+  // THE CROSSOVER: the uniform case takes over at exactly 200/50 = 4 ft of spacing.
+  assert.ok(_v1130({ ...base, post_spacing_ft: 3.9 }).concentrated_governs);
+  assert.ok(_v1130({ ...base, post_spacing_ft: 4 }).concentrated_governs, "a tie goes to the concentrated case");
+  assert.ok(!_v1130({ ...base, post_spacing_ft: 4.1 }).concentrated_governs);
+  assert.ok(_v1130({ ...base, post_spacing_ft: 2 }).governing_load_lb === 200, "below the crossover the load is flat at 200");
+  // THE MULTIPLIER is always exactly the ratio of the two lever arms, whatever the load.
+  for (const h of [30, 36, 42, 48]) {
+    for (const lever of [2, 4, 6, 12]) {
+      for (const spacing of [3, 6, 10]) {
+        const t = _v1130({ ...base, post_height_in: h, connection_lever_in: lever, post_spacing_ft: spacing });
+        assert.ok(Math.abs(t.force_multiplier - h / lever) < 1e-12, "multiplier must be height/lever");
+        assert.ok(Math.abs(t.connection_force_lb - t.moment_inlb / lever) < 1e-9);
+        assert.ok(Math.abs(t.moment_inlb - t.governing_load_lb * h) < 1e-9);
+        assert.ok(t.governing_load_lb === Math.max(200, 50 * spacing));
+        // A tighter connection ALWAYS means a bigger force - the point of the tile.
+        assert.ok(t.connection_force_lb >= t.governing_load_lb, "the connection never sees less than the applied load");
+      }
+    }
+  }
+  // Section modulus and required stress follow the actual dimensions.
+  assert.ok(Math.abs(_v1130({ ...base, post_d_in: 7 }).section_modulus_in3 - 3.5 * 49 / 6) < 1e-12);
+  assert.ok(Math.abs(_v1130({ ...base, post_d_in: 7 }).required_fb_psi - r.required_fb_psi / 4) < 1e-9, "depth squared");
+  assert.ok(Math.abs(_v1130({ ...base, post_b_in: 7 }).required_fb_psi - r.required_fb_psi / 2) < 1e-9, "width linear");
+  // Utilization tracks the allowable, and omitting it yields null rather than a verdict.
+  assert.ok(_v1130({ ...base, allowable_fb_psi: 0 }).post_ok === null && _v1130({ ...base, allowable_fb_psi: 0 }).post_utilization === null);
+  assert.ok(_v1130({ ...base, allowable_fb_psi: 2000 }).post_ok === true);
+  assert.ok(Math.abs(_v1130({ ...base, allowable_fb_psi: 2000 }).post_utilization - r.required_fb_psi / 2000) < 1e-12);
+  // The allowable never changes the geometry or the connection force.
+  assert.ok(_v1130({ ...base, allowable_fb_psi: 5000 }).connection_force_lb === r.connection_force_lb);
+  // Error seams.
+  assert.ok("error" in _v1130({ ...base, post_height_in: 0 }));
+  assert.ok("error" in _v1130({ ...base, post_spacing_ft: 0 }));
+  assert.ok("error" in _v1130({ ...base, concentrated_lb: 0 }));
+  assert.ok("error" in _v1130({ ...base, uniform_plf: -1 }));
+  assert.ok("error" in _v1130({ ...base, post_b_in: 0 }));
+  assert.ok("error" in _v1130({ ...base, post_d_in: 0 }));
+  assert.ok("error" in _v1130({ ...base, allowable_fb_psi: -1 }));
+  assert.ok("error" in _v1130({ ...base, connection_lever_in: 0 }));
+  assert.ok("error" in _v1130({ ...base, post_height_in: Infinity }));
+});

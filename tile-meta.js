@@ -736,7 +736,7 @@ const _TILES = [
   // spec-v112 storage water-heater sizing (Group B)
   ["water-heater-storage-sizing", "B"],
   // spec-v113 guard and handrail code check (Group E)
-  ["guard-handrail-check", "E"],
+  ["guard-handrail-check", "E"], ["guard-post-load", "E"],
   ["stair-code-check", "E"],
   // spec-v114 smooth-bore nozzle flow (Group F)
   ["smooth-bore-flow", "F"],

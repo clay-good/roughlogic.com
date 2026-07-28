@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "guard post load",
+      "target": "guard-post-load",
+      "kind": "industry"
+    },
+    {
+      "term": "200 lb guardrail load",
+      "target": "guard-post-load",
+      "kind": "question"
+    },
+    {
+      "term": "why do deck railings fail at the rim joist",
+      "target": "guard-post-load",
+      "kind": "question"
+    },
+    {
+      "term": "deck guard post connection force",
+      "target": "guard-post-load",
+      "kind": "question"
+    },
+    {
+      "term": "railing uniform load 50 plf",
+      "target": "guard-post-load",
+      "kind": "industry"
+    },
+    {
       "term": "crawl space vents",
       "target": "crawl-space-ventilation",
       "kind": "industry"

@@ -486,7 +486,7 @@ const TOOL_MODULES = (() => {
     "fence-estimate", "post-hole-concrete",
     "control-joint-spacing", "rebar-lap-splice",
     // spec-v113 guard and handrail code check (IRC R312 / R311.7.8).
-    "guard-handrail-check",
+    "guard-handrail-check", "guard-post-load",
     // spec-v481 stair geometry code check (IBC 1011 / IRC R311).
     "stair-code-check",
     // spec-v212..v214 masonry grout / coursing and wallcovering takeoffs.

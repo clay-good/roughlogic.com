@@ -1356,6 +1356,7 @@ export const COMPUTE_MAP = {
   "wobbe-index": { module: "../../calc-gas.js", fn: "computeWobbeIndex" },
   "water-heater-storage-sizing": { module: "../../calc-plumbing.js", fn: "computeWaterHeaterStorageSizing" },
   "guard-handrail-check": { module: "../../calc-construction.js", fn: "computeGuardHandrailCheck" },
+  "guard-post-load": { module: "../../calc-construction.js", fn: "computeGuardPostLoad" },
   "stair-code-check": { module: "../../calc-construction.js", fn: "computeStairCodeCheck" },
   "smooth-bore-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreFlow" },
   "smooth-bore-diameter-for-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreDiameterForFlow" },
