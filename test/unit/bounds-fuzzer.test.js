@@ -33331,3 +33331,52 @@ test("bounds: spec-v1156 computePortableLadderSetup pins the rail budget, the ex
   assert.ok("error" in _v1156({ ...base, base_ratio: 0 }));
   assert.ok("error" in _v1156({ ...base, ladder_length_ft: Infinity }));
 });
+
+import { computeCranePowerLineClearance as _v1157 } from "../../calc-rigging.js";
+
+test("bounds: spec-v1157 computeCranePowerLineClearance pins Table A, the two defaults, the dangerous-direction flag, and error seams", () => {
+  const base = { option: "default", voltage_kv: 0, actual_clearance_ft: 12, boom_length_ft: 80 };
+  const r = _v1157(base);
+  assert.ok(r.required_clearance_ft === 20 && r.default_assumed && !r.clearance_ok && r.clearance_shortfall_ft === 8);
+  assert.ok(r.boom_reaches && !r.passes);
+  // TABLE A, every band, reproduced from the public-domain federal table.
+  for (const [kv, ft] of [[10, 10], [50, 10], [50.1, 15], [200, 15], [200.1, 20], [350, 20], [350.1, 25], [500, 25], [500.1, 35], [750, 35], [750.1, 45], [1000, 45]]) {
+    const t = _v1157({ ...base, option: "table-a", voltage_kv: kv });
+    assert.ok(t.table_a_ft === ft, "Table A wrong at " + kv + " kV");
+    assert.ok(t.required_clearance_ft === ft);
+  }
+  assert.ok(_v1157({ ...base, option: "table-a", voltage_kv: 1000.1 }).table_a_ft === null);
+  assert.ok(_v1157({ ...base, option: "table-a", voltage_kv: 1200 }).over_1000kv);
+  assert.ok(!_v1157({ ...base, option: "table-a", voltage_kv: 1200 }).determinable);
+  assert.ok(!_v1157({ ...base, option: "table-a", voltage_kv: 1200, actual_clearance_ft: 99 }).passes, "an undeterminable distance never passes");
+  // THE TWO DEFAULTS: 20 ft up to 350 kV, 50 ft above.
+  for (const [kv, def] of [[50, 20], [350, 20], [350.1, 50], [765, 50]]) {
+    assert.ok(_v1157({ ...base, voltage_kv: kv }).default_clearance_ft === def, "default wrong at " + kv);
+  }
+  assert.ok(_v1157({ ...base, voltage_kv: 0 }).default_clearance_ft === 20 && _v1157({ ...base, voltage_kv: 0 }).default_assumed);
+  assert.ok(!_v1157({ ...base, voltage_kv: 100 }).default_assumed);
+  // THE DANGEROUS DIRECTION: a clearance that satisfies an inapplicable 20 ft default.
+  const bad = _v1157({ ...base, voltage_kv: 500, actual_clearance_ft: 25, boom_length_ft: 0 });
+  assert.ok(bad.default_clearance_ft === 50 && bad.default_is_unsafe && !bad.clearance_ok);
+  assert.ok(!_v1157({ ...base, voltage_kv: 500, actual_clearance_ft: 55 }).default_is_unsafe, "adequate clearance is not flagged");
+  assert.ok(!_v1157({ ...base, voltage_kv: 100, actual_clearance_ft: 25 }).default_is_unsafe, "under 350 kV the 20 ft default does apply");
+  // WHAT DETERMINING BUYS: only where Table A is below the default.
+  assert.ok(_v1157({ ...base, option: "table-a", voltage_kv: 12 }).table_a_saving_ft === 10);
+  assert.ok(_v1157({ ...base, option: "table-a", voltage_kv: 300 }).table_a_saving_ft === 0, "20 vs 20 buys nothing");
+  assert.ok(_v1157({ ...base, option: "table-a", voltage_kv: 400 }).table_a_saving_ft === 25, "25 against a 50 ft default");
+  // Deenergized needs no distance at all.
+  const dead = _v1157({ ...base, option: "deenergized", actual_clearance_ft: 0 });
+  assert.ok(dead.required_clearance_ft === 0 && dead.passes);
+  // Table A refuses to run without the determination that is its whole point.
+  assert.ok("error" in _v1157({ ...base, option: "table-a", voltage_kv: 0 }));
+  // Boom-reach reporting is informational and never changes the verdict.
+  const noBoom = _v1157({ ...base, boom_length_ft: 0 });
+  assert.ok(noBoom.boom_reaches === null && noBoom.passes === r.passes);
+  assert.ok(_v1157({ ...base, boom_length_ft: 5 }).boom_reaches === false);
+  // Error seams.
+  assert.ok("error" in _v1157({ ...base, option: "wish-it-away" }));
+  assert.ok("error" in _v1157({ ...base, voltage_kv: -1 }));
+  assert.ok("error" in _v1157({ ...base, actual_clearance_ft: -1 }));
+  assert.ok("error" in _v1157({ ...base, boom_length_ft: -1 }));
+  assert.ok("error" in _v1157({ ...base, actual_clearance_ft: Infinity }));
+});

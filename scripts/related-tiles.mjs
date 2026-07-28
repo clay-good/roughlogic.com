@@ -1042,7 +1042,8 @@ const RELATED = {
 
   // spec-v65 Group Z (Rigging and Heavy Lift)
   "cg-load-share": ["tandem-lift-share", "crane-net-capacity", "sling-angle"],
-  "crane-net-capacity": ["crane-lift-quick", "crane-ground-bearing", "cg-load-share"],
+  "crane-net-capacity": ["crane-lift-quick", "crane-ground-bearing", "cg-load-share", "crane-power-line-clearance"],
+  "crane-power-line-clearance": ["crane-net-capacity", "crane-ground-bearing", "crane-lift-quick"],
   "crane-ground-bearing": ["crane-net-capacity", "helical-pile", "excavation-bench-plan"],
   "sling-d-d-efficiency": ["sling-angle", "rigging-check", "crane-net-capacity"],
   "wind-on-load": ["tagline-force", "wind-pressure", "crane-net-capacity"],

@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "crane power line clearance",
+      "target": "crane-power-line-clearance",
+      "kind": "industry"
+    },
+    {
+      "term": "how close can a crane work to a power line",
+      "target": "crane-power-line-clearance",
+      "kind": "question"
+    },
+    {
+      "term": "20 foot rule power line crane",
+      "target": "crane-power-line-clearance",
+      "kind": "question"
+    },
+    {
+      "term": "table a minimum clearance distance",
+      "target": "crane-power-line-clearance",
+      "kind": "industry"
+    },
+    {
+      "term": "clearance from a 500 kv transmission line",
+      "target": "crane-power-line-clearance",
+      "kind": "question"
+    },
+    {
       "term": "ladder 3 feet above the roof",
       "target": "portable-ladder-setup",
       "kind": "question"

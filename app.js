@@ -1289,7 +1289,7 @@ const TOOL_MODULES = (() => {
   // Group Z (Rigging and Heavy Lift): the lift-planning core (spec-v65), a
   // new module behind RIGGING_RENDERERS. All seven carry GOVERNANCE.rigging.
   declare("./calc-rigging.js", "RIGGING_RENDERERS", [
-    "cg-load-share", "crane-net-capacity", "crane-ground-bearing",
+    "cg-load-share", "crane-net-capacity", "crane-ground-bearing", "crane-power-line-clearance",
     "sling-d-d-efficiency", "wind-on-load", "max-wind-speed-for-lift", "tagline-force", "tandem-lift-share",
     // v66 hardware and below-the-hook
     "shackle-eyebolt-wll", "spreader-beam", "spreader-beam-min-height", "forklift-capacity-derate",

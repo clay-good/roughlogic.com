@@ -477,7 +477,7 @@ const _TILES = [
   ["groove-weld-strength", "E"], ["groove-weld-length-for-load", "E"], ["duct-static-pressure-total", "C"], ["compression-ratio-refrig", "C"], ["duct-transition-length", "C"], ["duct-static-regain", "C"],
 
   // v65 Group Z (Rigging and Heavy Lift)
-  ["cg-load-share", "Z"], ["crane-net-capacity", "Z"], ["crane-ground-bearing", "Z"],
+  ["cg-load-share", "Z"], ["crane-net-capacity", "Z"], ["crane-ground-bearing", "Z"], ["crane-power-line-clearance", "Z"],
   ["sling-d-d-efficiency", "Z"], ["wind-on-load", "Z"], ["max-wind-speed-for-lift", "Z"], ["tagline-force", "Z"], ["tandem-lift-share", "Z"],
   // v66 Group Z hardware and below-the-hook
   ["shackle-eyebolt-wll", "Z"], ["spreader-beam", "Z"], ["spreader-beam-min-height", "Z"], ["forklift-capacity-derate", "Z"],

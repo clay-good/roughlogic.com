@@ -1741,3 +1741,111 @@ function _v996renderGuyWireTension(inputRegion, outputRegion, citationEl) {
   for (const f of [hl, ah, al]) f.input.addEventListener("input", update);
 }
 RIGGING_RENDERERS["guy-wire-tension"] = _v996renderGuyWireTension;
+
+// --- spec-v1157: crane power line clearance (OSHA 1926.1408) ---
+// The number everyone carries is 20 ft. It is a DEFAULT you take when you have not
+// determined the voltage - one of three options, and usually the most expensive one on a
+// tight site. Option (2) keeps everything 20 ft away. Option (3) lets you determine the
+// line's voltage and use Table A instead, and Table A starts at 10 FEET for lines up to
+// 50 kV - which is most distribution. Halving the exclusion zone by making a phone call to
+// the utility is the cheapest thing on this page. Option (1) is deenergize and visibly
+// ground, which removes the problem entirely.
+// The trap: 20 ft is only the default for lines UP TO 350 kV. Above that the default is
+// 50 ft, and Table A keeps climbing past it - so on transmission the number people carry
+// is not conservative, it is wrong in the dangerous direction.
+// Table A is a US federal regulation table and is in the public domain.
+// dims: in { option: dimensionless, voltage_kv: L^2 M T^-3 I^-1, actual_clearance_ft: L, boom_length_ft: L } out: { required_clearance_ft: L, default_clearance_ft: L, clearance_shortfall_ft: L, table_a_saving_ft: L }
+export function computeCranePowerLineClearance({ option = "default", voltage_kv = 0, actual_clearance_ft = 0, boom_length_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const kv = Number(voltage_kv) || 0;
+  const act = Number(actual_clearance_ft) || 0;
+  const boom = Number(boom_length_ft) || 0;
+  const KNOWN = ["deenergized", "default", "table-a"];
+  if (!KNOWN.includes(option)) return { error: "Option must be deenergized, default, or table-a." };
+  if (kv < 0) return { error: "Voltage cannot be negative (kV)." };
+  if (act < 0) return { error: "Actual clearance cannot be negative (ft)." };
+  if (boom < 0) return { error: "Boom length cannot be negative (ft)." };
+  if (option === "table-a" && !(kv > 0)) return { error: "Table A requires the line voltage - that determination is the whole point of the option." };
+
+  // Table A, 29 CFR 1926.1408 - a federal regulation table, public domain.
+  const tableA = (v) => v <= 50 ? 10 : v <= 200 ? 15 : v <= 350 ? 20 : v <= 500 ? 25 : v <= 750 ? 35 : v <= 1000 ? 45 : null;
+  const table_a_ft = kv > 0 ? tableA(kv) : null;
+  const over_1000kv = kv > 1000;
+
+  // The default is 20 ft only up to 350 kV; above that it is 50.
+  const voltage_known = kv > 0;
+  const default_clearance_ft = voltage_known ? (kv <= 350 ? 20 : 50) : 20;
+  const default_assumed = !voltage_known;
+
+  let required_clearance_ft, route;
+  if (option === "deenergized") {
+    required_clearance_ft = 0;
+    route = "deenergized and visibly grounded";
+  } else if (option === "table-a") {
+    required_clearance_ft = table_a_ft;
+    route = "Table A at " + kv + " kV";
+  } else {
+    required_clearance_ft = default_clearance_ft;
+    route = "the default clearance";
+  }
+
+  const determinable = required_clearance_ft !== null;
+  const clearance_ok = determinable ? act >= required_clearance_ft : null;
+  const clearance_shortfall_ft = determinable ? Math.max(0, required_clearance_ft - act) : 0;
+  // What determining the voltage would buy, against the default you would otherwise take.
+  const table_a_saving_ft = table_a_ft !== null ? Math.max(0, default_clearance_ft - table_a_ft) : 0;
+  const table_a_helps = table_a_saving_ft > 0;
+  const default_is_unsafe = voltage_known && kv > 350 && option === "default" && act >= 20 && act < 50;
+  const boom_reaches = boom > 0 && determinable ? boom > act : null;
+
+  const passes = option === "deenergized" || (clearance_ok === true);
+
+  const note = "THE 20 FT EVERYONE CARRIES IS A DEFAULT, not the rule. 1926.1408 gives three options and the default is the one you take when you have NOT determined the voltage. "
+    + "Option 1, deenergize and visibly ground the line at the worksite, removes the problem entirely. Option 2 keeps every part of the equipment, load line, and load - including rigging and lifting accessories - at least 20 ft away. Option 3 lets you DETERMINE the line's voltage and use Table A instead. "
+    + "Table A starts at 10 FT for lines up to 50 kV, which is most distribution. "
+    + (table_a_helps ? "Here that is " + table_a_ft + " ft against a " + default_clearance_ft + " ft default - determining the voltage buys back " + table_a_saving_ft + " ft of working radius, and it costs a phone call to the utility. On a tight site that is the cheapest thing on the page. " : voltage_known ? "At " + kv + " kV Table A gives " + (table_a_ft === null ? "no figure - over 1,000 kV the distance comes from the utility owner or a qualified engineer" : table_a_ft + " ft, which is no better than the " + default_clearance_ft + " ft default here") + ". " : "")
+    + "THE TRAP RUNS THE OTHER WAY TOO: 20 ft is the default only for lines UP TO 350 kV. Above that the default is 50 ft and Table A keeps climbing - 25 ft over 350, 35 over 500, 45 over 750 - so on transmission the number people carry is not conservative, it is wrong in the dangerous direction. "
+    + (default_assumed ? "No voltage was entered, so the 20 ft default shown assumes the line is at or under 350 kV. If it is not, that assumption is the failure. " : "")
+    + (over_1000kv ? "Over 1,000 kV Table A gives no number: the minimum clearance is established by the utility owner or operator or by a registered professional engineer who is a qualified person with respect to electrical power transmission and distribution. " : "")
+    + "This setup: " + route + (determinable ? ", requiring " + required_clearance_ft + " ft, with " + act + " ft actual - " + (clearance_ok ? "OK. " : "SHORT by " + clearance_shortfall_ft.toFixed(1) + " ft. ") : ", which this tile cannot reduce to a number. ")
+    + (default_is_unsafe ? "WARNING: this line is over 350 kV and the clearance entered would satisfy a 20 ft default that does not apply to it. " : "")
+    + (boom_reaches ? "The boom at " + boom + " ft is longer than the clearance being held, so the line is inside the machine's reach - which is exactly the condition the encroachment-prevention measures exist for, and it means clearance is a matter of control rather than geometry. " : "")
+    + "Not checked: the encroachment-prevention measures the options require - a dedicated spotter, proximity alarms, range control, insulating links, or a range limiting device - which are conditions of using the clearance rather than optional extras; the planning meeting and the requirement to identify the work zone; assembly and disassembly near power lines, which has its own section; travel under or near lines with no load; the utility's confirmation of voltage; and the separate rules for lines over 350 kV and for equipment operating near transmission. A screen, not a lift plan; 29 CFR 1926 Subpart CC, the utility owner or operator, and the qualified person govern.";
+
+  return { route, required_clearance_ft, default_clearance_ft, default_assumed, table_a_ft, table_a_saving_ft, table_a_helps, over_1000kv, determinable, clearance_ok, clearance_shortfall_ft, default_is_unsafe, boom_reaches, passes, note };
+}
+
+export const cranePowerLineClearanceExample = { inputs: { option: "default", voltage_kv: 0, actual_clearance_ft: 12, boom_length_ft: 80 } };
+
+function _v1157renderCranePowerLineClearance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: OSHA 29 CFR 1926.1408, a US federal regulation in the public domain. For power lines up to 350 kV the employer must either confirm from the utility owner or operator that the line has been deenergized and visibly grounded at the worksite; or ensure that no part of the equipment, load line, or load - including rigging and lifting accessories - gets closer than 20 feet to the line while implementing the encroachment-prevention measures of paragraph (b); or determine the line's voltage and use the Table A minimum clearance distance while implementing those same measures. Table A: up to 50 kV, 10 ft; over 50 to 200 kV, 15 ft; over 200 to 350 kV, 20 ft; over 350 to 500 kV, 25 ft; over 500 to 750 kV, 35 ft; over 750 to 1,000 kV, 45 ft; over 1,000 kV, as established by the utility owner or operator or a registered professional engineer who is a qualified person with respect to electrical power transmission and distribution. Not checked: the encroachment-prevention measures themselves, the planning meeting and work-zone identification, assembly and disassembly near power lines, travel with no load, or the utility's voltage confirmation. A screen, not a lift plan; Subpart CC, the utility, and the qualified person govern.";
+  const op = makeSelect("Which option", "cpc-op", [
+    { value: "default", label: "Default clearance (voltage not determined)", selected: true },
+    { value: "table-a", label: "Table A (voltage determined)" },
+    { value: "deenergized", label: "Deenergized and visibly grounded" },
+  ]);
+  const kv = makeNumber("Line voltage (kV; 0 = not determined)", "cpc-kv", { step: "any", min: "0" }); kv.input.value = "0";
+  const ac = makeNumber("Actual clearance held (ft)", "cpc-ac", { step: "any", min: "0" }); ac.input.value = "12";
+  const bl = makeNumber("Boom length (ft; 0 to skip)", "cpc-bl", { step: "any", min: "0" }); bl.input.value = "80";
+  inputRegion.appendChild(op.wrap); inputRegion.appendChild(kv.wrap); inputRegion.appendChild(ac.wrap); inputRegion.appendChild(bl.wrap);
+  attachExampleButton(inputRegion, () => { op.select.value = "default"; kv.input.value = "0"; ac.input.value = "12"; bl.input.value = "80"; update(); });
+  const oR = makeOutputLine(outputRegion, "Required clearance", "cpc-out-r");
+  const oV = makeOutputLine(outputRegion, "Verdict", "cpc-out-v");
+  const oT = makeOutputLine(outputRegion, "What determining the voltage buys", "cpc-out-t");
+  const oD = makeOutputLine(outputRegion, "Default in force", "cpc-out-d");
+  const oB = makeOutputLine(outputRegion, "Boom vs clearance", "cpc-out-b");
+  const oN = makeOutputLine(outputRegion, "Note", "cpc-out-n");
+  const update = debounce(() => {
+    const r = computeCranePowerLineClearance({ option: op.select.value, voltage_kv: Number(kv.input.value) || 0, actual_clearance_ft: Number(ac.input.value) || 0, boom_length_ft: Number(bl.input.value) || 0 });
+    if (r.error) { oR.textContent = r.error; oV.textContent = "-"; oT.textContent = "-"; oD.textContent = "-"; oB.textContent = "-"; oN.textContent = "-"; return; }
+    oR.textContent = r.required_clearance_ft === null ? "not a number - utility or qualified engineer sets it" : r.required_clearance_ft + " ft via " + r.route;
+    oV.textContent = r.passes ? "PASSES the clearance entered" : r.clearance_ok === null ? "cannot be determined here" : "SHORT by " + fmt(r.clearance_shortfall_ft, 1) + " ft";
+    oT.textContent = r.table_a_ft === null ? "-" : r.table_a_helps ? r.table_a_saving_ft + " ft of working radius (" + r.table_a_ft + " ft vs a " + r.default_clearance_ft + " ft default)" : "nothing at this voltage";
+    oD.textContent = r.default_clearance_ft + " ft" + (r.default_assumed ? " - ASSUMES the line is 350 kV or under, since no voltage was entered" : "");
+    oB.textContent = r.boom_reaches === null ? "-" : r.boom_reaches ? "the line is inside the machine's reach - clearance is control, not geometry" : "the boom cannot reach the line";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of [kv, ac, bl]) x.input.addEventListener("input", update);
+  op.select.addEventListener("change", update);
+}
+RIGGING_RENDERERS["crane-power-line-clearance"] = _v1157renderCranePowerLineClearance;

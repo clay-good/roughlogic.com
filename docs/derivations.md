@@ -2899,6 +2899,7 @@ cross-check.
 | calc-rigging.js | `computeCraneLoadRadiusBoom` | `{ boom_length_ft = 30, boom_angle_deg = 60, boom_foot_offset_ft = 4, boom_foo...` | _ | _ | _ |
 | calc-rigging.js | `computeCraneNetCapacity` | `{ gross_chart_lb, hook_block_lb = 0, jib_attach_lb = 0, wire_rope_lb = 0, bel...` | _ | _ | _ |
 | calc-rigging.js | `computeCraneOutriggerReaction` | `{ gross_load_kip, counterweight_kip = 0, load_radius_ft, cw_radius_ft = 0, ou...` | _ | _ | _ |
+| calc-rigging.js | `computeCranePowerLineClearance` | `{ option = "default", voltage_kv = 0, actual_clearance_ft = 0, boom_length_ft...` | _ | _ | _ |
 | calc-rigging.js | `computeForkliftCapacityDerate` | `{ rated_cap_lb, rated_lc_in = 24, actual_lc_in, load_lb } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeGuyWireTension` | `{ horizontal_load_lb = 500, attachment_height_ft = 20, anchor_lead_ft = 20 } ...` | _ | _ | _ |
 | calc-rigging.js | `computeLiftingLugDesign` | `{ applied_load_kip, plate_thick_in, hole_dia_in, pin_dia_in, edge_dist_in, pl...` | _ | _ | _ |
@@ -3201,7 +3202,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1787.
+Row count: 1788.
 
 <!-- END function-corpus-v14 -->
 
@@ -4891,7 +4892,7 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Z (unnamed) (31 tiles)
+### Group Z (unnamed) (32 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4905,6 +4906,7 @@ per spec-v14 §13.1 second paragraph.
 | `crane-load-radius-boom` | Crane Load Radius and Boom-Tip Height from Boom Geometry | Crane boom geometry (load radius / ti...; R = 4 + 30*cos(60) = 19; H = 6 + 30*sin(60) = 31.98; angl... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `crane-net-capacity` | Crane Net Capacity After Deductions | OSHA 1926.1417(o) / ASME B30.5; gross 30,000, hook 800, wire 400, below-hook 600, load 22... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crane-outrigger-reaction` | Crane Outrigger Reaction from Lift Geometry | Crane load-moment method / SAE J1063 ...; 40 kip at 30 ft, 30 kip CW at 12 ft, 20 ft spread -> even... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `crane-power-line-clearance` | Crane Power Line Clearance (OSHA 1926.1408) | Occupational Safety and Health Admini...; Table A: up to 50 kV, 10 ft. Having determined the line i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `forklift-capacity-derate` | Forklift Load-Center Capacity Derate | ASME B56.1 / truck data plate; 5,000 lb @ 24 in handling a load at 36 in, 3,000 lb -> 3,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `guy-wire-tension` | Guy-Wire / Down-Guy Tension and Mast Download | Guy-wire / down-guy tension and mast ...; theta = atan(20/20) = 45 deg; tension = 500/cos45 = 707.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lifting-lug-design` | Lifting Lug / Padeye Pin-Hole Check | ASME BTH-1 Section 3-3.3 (pin-connect...; 20 kip; t 1.0, hole 1.06, pin 1.0, edge 2.0, width 4.0, A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4927,6 +4929,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1540. Fixture-covered or reference-cadence: 1540 / 1540.
+Tile count: 1541. Fixture-covered or reference-cadence: 1541 / 1541.
 
 <!-- END tile-index-v14 -->

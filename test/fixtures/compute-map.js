@@ -783,6 +783,7 @@ export const COMPUTE_MAP = {
   "cg-load-share": { module: "../../calc-rigging.js", fn: "computeCgLoadShare" },
   "crane-net-capacity": { module: "../../calc-rigging.js", fn: "computeCraneNetCapacity" },
   "crane-ground-bearing": { module: "../../calc-rigging.js", fn: "computeCraneGroundBearing" },
+  "crane-power-line-clearance": { module: "../../calc-rigging.js", fn: "computeCranePowerLineClearance" },
   "sling-d-d-efficiency": { module: "../../calc-rigging.js", fn: "computeSlingDdEfficiency" },
   "wind-on-load": { module: "../../calc-rigging.js", fn: "computeWindOnLoad" },
   "max-wind-speed-for-lift": { module: "../../calc-rigging.js", fn: "computeMaxWindSpeedForLift" },
