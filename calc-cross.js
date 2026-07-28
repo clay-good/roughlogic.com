@@ -3105,3 +3105,113 @@ CROSS_RENDERERS["portable-ladder-setup"] = _simpleRendererG({
   ],
   compute: computePortableLadderSetup,
 });
+
+// --- spec-v1166: hearing protector attenuation (OSHA 1910.95 Appendix B, NIOSH derating) ---
+// noise-dose gives the TWA. This is the other half: what the protector actually leaves at the
+// ear, and the answer is never the number on the package.
+// Appendix B is explicit that the NRR comes off a C-WEIGHTED measurement directly, but that an
+// A-weighted measurement - which is what a dosimeter reports and what everyone actually has -
+// requires SUBTRACTING 7 FROM THE NRR FIRST, for spectral uncertainty. That single step is the
+// most commonly skipped number in hearing conservation, and it is worth 7 dB every time.
+// On top of that sits derating, which is guidance rather than Appendix B text: OSHA's field
+// guidance halves the adjusted value, and NIOSH derates the LABELLED NRR by type - 25% for
+// earmuffs, 50% for slow-recovery formable earplugs, 70% for all other earplugs - because a
+// laboratory fit is not a jobsite fit.
+// dims: in { twa_db: dimensionless, weighting: dimensionless, nrr_db: dimensionless, method: dimensionless, dual_protection: dimensionless, dual_bonus_db: dimensionless, target_db: dimensionless } out: { protected_twa_db: dimensionless, effective_attenuation_db: dimensionless, margin_db: dimensionless, label_vs_real_db: dimensionless }
+export function computeHearingProtectorNrr({ twa_db = 0, weighting = "A", nrr_db = 0, method = "appendix-b", dual_protection = "no", dual_bonus_db = 5, target_db = 85 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const twa = Number(twa_db);
+  const nrr = Number(nrr_db) || 0;
+  const bonus = Number(dual_bonus_db) || 0;
+  const target = Number(target_db);
+  const isA = weighting === "A";
+  const dual = dual_protection === "yes";
+  const METHODS = { "appendix-b": null, "osha-50": 0.5, "niosh-muff": 0.75, "niosh-formable": 0.5, "niosh-other": 0.3 };
+  if (weighting !== "A" && weighting !== "C") return { error: "Weighting must be A or C - Appendix B treats them differently, and the difference is 7 dB." };
+  if (!(method in METHODS)) return { error: "Method must be appendix-b, osha-50, niosh-muff, niosh-formable, or niosh-other." };
+  if (dual_protection !== "yes" && dual_protection !== "no") return { error: "State whether dual protection is worn (yes or no)." };
+  if (!Number.isFinite(twa) || twa <= 0) return { error: "Measured TWA must be a positive number (dB)." };
+  if (!(nrr > 0)) return { error: "Noise reduction rating must be positive (dB)." };
+  if (bonus < 0) return { error: "Dual-protection bonus cannot be negative (dB)." };
+  if (!Number.isFinite(target) || target <= 0) return { error: "Target exposure must be a positive number (dB)." };
+
+  const SPECTRAL = 7;
+  // Appendix B: the NRR applies directly to a C-weighted measurement, less 7 for an A-weighted one.
+  const appendix_b_attenuation_db = isA ? nrr - SPECTRAL : nrr;
+  // Derating, where a method other than Appendix B as written is chosen.
+  const keep = METHODS[method];
+  const derated_nrr_db = keep === null ? nrr : (method === "osha-50" ? nrr : nrr * keep);
+  // OSHA's methods carry the 7 dB spectral adjustment. NIOSH's type-specific derating is its own
+  // adjustment for real-world fit and is applied to the labelled NRR directly, so the 7 is not
+  // stacked on top of it - that is this tile's stated reading, and it is why the two families
+  // report different spectral terms.
+  const niosh = method.startsWith("niosh-");
+  let base_attenuation_db;
+  if (keep === null) base_attenuation_db = appendix_b_attenuation_db;
+  else if (method === "osha-50") base_attenuation_db = appendix_b_attenuation_db / 2;
+  else base_attenuation_db = derated_nrr_db;
+
+  const dual_bonus_applied_db = dual ? bonus : 0;
+  const effective_attenuation_db = Math.max(0, base_attenuation_db + dual_bonus_applied_db);
+  const attenuation_floored = base_attenuation_db + dual_bonus_applied_db < 0;
+  const protected_twa_db = twa - effective_attenuation_db;
+  const meets_target = protected_twa_db <= target;
+  const margin_db = target - protected_twa_db;
+
+  // What the package number would have suggested, versus what the method leaves.
+  const label_vs_real_db = nrr - effective_attenuation_db;
+  // The NRR that would be needed to reach the target by this method.
+  const spectral_term = niosh ? 0 : (isA ? SPECTRAL : 0);
+  const needed_attenuation_db = Math.max(0, twa - target - dual_bonus_applied_db);
+  let nrr_needed_db;
+  if (keep === null) nrr_needed_db = needed_attenuation_db + spectral_term;
+  else if (method === "osha-50") nrr_needed_db = needed_attenuation_db * 2 + spectral_term;
+  else nrr_needed_db = needed_attenuation_db / keep;
+
+  const METHOD_LABEL = {
+    "appendix-b": "Appendix B as written, no derating",
+    "osha-50": "OSHA field guidance: the adjusted value halved",
+    "niosh-muff": "NIOSH earmuffs: labelled NRR less 25%",
+    "niosh-formable": "NIOSH slow-recovery formable earplugs: labelled NRR less 50%",
+    "niosh-other": "NIOSH all other earplugs: labelled NRR less 70%",
+  };
+
+  const note = "THE NUMBER ON THE PACKAGE IS NEVER THE PROTECTION. Appendix B applies the NRR directly to a C-WEIGHTED measurement, but requires SUBTRACTING 7 dB FIRST where the measurement is A-weighted - which is what a dosimeter reports and what everyone actually has. "
+    + "This exposure is " + twa + " dB" + weighting + ", so under OSHA's methods " + (isA ? "the 7 dB spectral adjustment applies and an NRR of " + nrr + " becomes " + appendix_b_attenuation_db.toFixed(1) + " dB before anything else. That single step is the most commonly skipped number in hearing conservation, and it is worth 7 dB every time. " : "the NRR applies directly, with no 7 dB adjustment - measuring in dBC is worth 7 dB of paper protection relative to the same job measured in dBA. ")
+    + "METHOD: " + METHOD_LABEL[method] + ". "
+    + (keep === null ? "Appendix B contains no derating instruction; it says only that calculated values are realistic to the extent the protectors are properly fitted and worn, which is the whole problem. " : method === "osha-50" ? "OSHA field guidance halves the adjusted value as a safety factor, giving " + base_attenuation_db.toFixed(1) + " dB. This is enforcement guidance rather than Appendix B text. " : "NIOSH derates the LABELLED NRR by protector type because a laboratory fit is not a jobsite fit: " + nrr + " becomes " + derated_nrr_db.toFixed(1) + " dB. NIOSH's derating IS its adjustment for real-world performance, so this tile does not stack OSHA's separate 7 dB on top of it; that is a stated reading rather than a quoted instruction, and it is why the two families report different spectral terms. ")
+    + (dual ? "DUAL PROTECTION adds " + dual_bonus_applied_db + " dB here. That value is editable and it is not from Appendix B: OSHA's Technical Manual guidance commonly adds 5 dB to the higher-rated device, while NIOSH recommends double protection above a 100 dBA TWA without quantifying the gain. Two protectors do not add their ratings - the second one is working against the sound that gets in by bone conduction and around the first. " : "")
+    + "RESULT: " + effective_attenuation_db.toFixed(1) + " dB of effective attenuation leaves " + protected_twa_db.toFixed(1) + " dB at the ear against a " + target + " dB target - " + (meets_target ? "MEETS it with " + margin_db.toFixed(1) + " dB to spare. " : "OVER by " + (-margin_db).toFixed(1) + " dB. ")
+    + (attenuation_floored ? "The method produced a negative attenuation, which is meaningless, so it is reported as zero; the protector is not credited with making things worse. " : "")
+    + "THE TWO FAMILIES CROSS OVER, which is worth knowing before arguing about which is stricter: an A-weighted Appendix B figure loses a flat 7 dB while a NIOSH figure loses a percentage, so at a low NRR the NIOSH earmuff number is the MORE generous of the two and at a high NRR it is the less. Neither method dominates the other. "
+    + "LABEL VERSUS REALITY: the package says " + nrr + " dB and this method credits " + effective_attenuation_db.toFixed(1) + " dB, a gap of " + label_vs_real_db.toFixed(1) + " dB. "
+    + (meets_target ? "" : "To reach the target by this method the NRR would have to be about " + nrr_needed_db.toFixed(1) + " dB" + (nrr_needed_db > 33 ? " - which exceeds anything on the market, so the answer is engineering controls, administrative limits, or dual protection rather than a better earplug. " : ". "))
+    + "Not checked: whether the exposure itself is measured correctly, which is the TWA calculation and a separate question; the noise spectrum, since the NRR is a single number standing in for a curve and low-frequency noise defeats it; fit, which is what the derating exists to approximate and which fit-testing measures directly rather than estimating; wearing time, where taking a protector off for even a few minutes of an eight-hour shift costs far more than any derating; whether the protector is undamaged, the right size, and correctly inserted; the audiometric testing, training, and recordkeeping the standard also requires; and the significant-threshold-shift provision, which requires attenuation sufficient to reduce exposure to a TWA of 85 dB. An attenuation estimate, not a hearing conservation program; 29 CFR 1910.95 and the program administrator govern.";
+
+  return { appendix_b_attenuation_db, derated_nrr_db, base_attenuation_db, dual_bonus_applied_db, effective_attenuation_db, attenuation_floored, protected_twa_db, meets_target, margin_db, label_vs_real_db, nrr_needed_db, spectral_adjustment_db: spectral_term, note };
+}
+
+export const hearingProtectorNrrExample = { inputs: { twa_db: 98, weighting: "A", nrr_db: 29, method: "niosh-other", dual_protection: "no", dual_bonus_db: 5, target_db: 85 } };
+
+CROSS_RENDERERS["hearing-protector-nrr"] = _simpleRendererG({
+  citation: "Citation: OSHA 29 CFR 1910.95 Appendix B, Methods for Estimating the Adequacy of Hearing Protector Attenuation, a US federal regulation in the public domain. Where the measurement is C-weighted the NRR is subtracted directly; where it is A-weighted, 'subtract 7 dB from the NRR' and subtract the remainder from the A-weighted TWA. Appendix B also states that calculated attenuation values reflect realistic values only to the extent that the protectors are properly fitted and worn, and that for employees who have experienced a significant threshold shift, attenuation must be sufficient to reduce exposure to a TWA of 85 dB. Derating is NOT Appendix B text: the 50% field adjustment is OSHA enforcement guidance, and the type-specific factors are NIOSH's, and this tile applies them to the labelled NRR without also taking OSHA's 7 dB, on the reading that NIOSH's derating IS its own real-world adjustment - 'earmuffs: subtract 25% from the manufacturers' labeled NRR; slow-recovery formable earplugs: subtract 50%; all other earplugs: subtract 70%' (NIOSH Criteria for a Recommended Standard, Occupational Noise Exposure). The dual-protection bonus is an editable input, defaulted to the 5 dB commonly applied under OSHA Technical Manual guidance; NIOSH recommends double protection above a 100 dBA TWA without quantifying the gain. Not checked: the TWA measurement itself (see noise-dose), the noise spectrum, fit, wearing time, protector condition, or the audiometric testing, training, and recordkeeping the standard also requires. An attenuation estimate, not a hearing conservation program.",
+  example: hearingProtectorNrrExample.inputs,
+  fields: [
+    { key: "twa_db", label: "Measured 8-hr TWA (dB)", kind: "number", default: 98 },
+    { key: "weighting", label: "Weighting of the measurement", kind: "select", options: [{ value: "A", label: "A-weighted (dBA) - the usual dosimeter reading", selected: true }, { value: "C", label: "C-weighted (dBC)" }] },
+    { key: "nrr_db", label: "Noise reduction rating on the package (dB)", kind: "number", default: 29 },
+    { key: "method", label: "Method", kind: "select", options: [{ value: "appendix-b", label: "Appendix B as written (no derating)" }, { value: "osha-50", label: "OSHA field guidance (halve the adjusted value)" }, { value: "niosh-muff", label: "NIOSH earmuffs (NRR less 25%)" }, { value: "niosh-formable", label: "NIOSH formable earplugs (NRR less 50%)" }, { value: "niosh-other", label: "NIOSH all other earplugs (NRR less 70%)", selected: true }] },
+    { key: "dual_protection", label: "Plugs and muffs worn together?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+    { key: "dual_bonus_db", label: "Dual-protection bonus (dB; editable, not from Appendix B)", kind: "number", default: 5 },
+    { key: "target_db", label: "Target exposure at the ear (dB)", kind: "number", default: 85 },
+  ],
+  outputs: [
+    { key: "s", id: "hpn-out-s", label: "Spectral adjustment", value: (r) => r.spectral_adjustment_db === 0 ? "none applied - either the measurement is C-weighted, or the NIOSH derating stands in its place" : "7 dB comes off the NRR because the measurement is A-weighted" },
+    { key: "a", id: "hpn-out-a", label: "Effective attenuation", value: (r) => fmt(r.effective_attenuation_db, 1) + " dB" + (r.dual_bonus_applied_db > 0 ? " (including " + fmt(r.dual_bonus_applied_db, 1) + " dB for dual protection)" : "") },
+    { key: "p", id: "hpn-out-p", label: "Exposure at the ear", value: (r) => fmt(r.protected_twa_db, 1) + " dB - " + (r.meets_target ? "meets the target with " + fmt(r.margin_db, 1) + " dB to spare" : "OVER by " + fmt(-r.margin_db, 1) + " dB") },
+    { key: "g", id: "hpn-out-g", label: "Label versus reality", value: (r) => "package " + fmt(r.label_vs_real_db + r.effective_attenuation_db, 0) + " dB, credited " + fmt(r.effective_attenuation_db, 1) + " dB - a gap of " + fmt(r.label_vs_real_db, 1) + " dB" },
+    { key: "n2", id: "hpn-out-n2", label: "NRR that would reach the target", value: (r) => r.meets_target ? "already met" : fmt(r.nrr_needed_db, 1) + " dB by this method" + (r.nrr_needed_db > 33 ? " - beyond anything on the market" : "") },
+    { key: "n", id: "hpn-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHearingProtectorNrr,
+});

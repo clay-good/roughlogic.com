@@ -33947,3 +33947,94 @@ test("bounds: spec-v1165 computeDoorClearWidth pins the leaf-to-clear loss, the 
   assert.ok("error" in _v1165({ ...base, series_spacing_in: -1 }));
   assert.ok("error" in _v1165({ ...base, leaf_width_in: Infinity }));
 });
+
+import { computeHearingProtectorNrr as _v1166 } from "../../calc-cross.js";
+
+test("bounds: spec-v1166 computeHearingProtectorNrr pins the 7 dB spectral step, the three NIOSH factors, the OSHA halving, the inverse, and error seams", () => {
+  const base = { twa_db: 98, weighting: "A", nrr_db: 29, method: "niosh-other", dual_protection: "no", dual_bonus_db: 5, target_db: 85 };
+  const r = _v1166(base);
+  assert.ok(Math.abs(r.derated_nrr_db - 8.7) < 1e-9 && Math.abs(r.effective_attenuation_db - 8.7) < 1e-9);
+  assert.ok(Math.abs(r.protected_twa_db - 89.3) < 1e-9 && !r.meets_target && r.spectral_adjustment_db === 0);
+  // THE 7 dB STEP: dBA takes it, dBC does not, under OSHA's methods.
+  const appA = _v1166({ ...base, method: "appendix-b" });
+  const appC = _v1166({ ...base, method: "appendix-b", weighting: "C" });
+  assert.ok(appA.effective_attenuation_db === 22 && appA.protected_twa_db === 76 && appA.spectral_adjustment_db === 7);
+  assert.ok(appC.effective_attenuation_db === 29 && appC.protected_twa_db === 69 && appC.spectral_adjustment_db === 0);
+  assert.ok(appC.effective_attenuation_db - appA.effective_attenuation_db === 7, "the weighting is worth exactly 7 dB");
+  // OSHA's halving works on the ADJUSTED value, not the label.
+  const osha = _v1166({ ...base, method: "osha-50" });
+  assert.ok(osha.effective_attenuation_db === 11 && osha.protected_twa_db === 87 && osha.spectral_adjustment_db === 7);
+  assert.ok(_v1166({ ...base, method: "osha-50", weighting: "C" }).effective_attenuation_db === 14.5);
+  // THE THREE NIOSH FACTORS, and none of them takes the 7 as well.
+  for (const [m, keep] of [["niosh-muff", 0.75], ["niosh-formable", 0.5], ["niosh-other", 0.3]]) {
+    for (const wgt of ["A", "C"]) {
+      const t = _v1166({ ...base, method: m, weighting: wgt });
+      assert.ok(Math.abs(t.derated_nrr_db - 29 * keep) < 1e-9, "derating wrong for " + m);
+      assert.ok(Math.abs(t.effective_attenuation_db - 29 * keep) < 1e-9, "the 7 must not stack onto " + m);
+      assert.ok(t.spectral_adjustment_db === 0);
+    }
+  }
+  // WITHIN each family the ordering is fixed, and BETWEEN them it is not - which is worth pinning,
+  // because the two families cross over. At NRR 20 an A-weighted Appendix B credits 13 dB while
+  // NIOSH earmuffs credit 15; at NRR 29 it is 22 against 21.75. Neither method dominates.
+  for (const n of [10, 20, 29, 33]) {
+    const muff = _v1166({ ...base, nrr_db: n, method: "niosh-muff" }).effective_attenuation_db;
+    const form = _v1166({ ...base, nrr_db: n, method: "niosh-formable" }).effective_attenuation_db;
+    const other = _v1166({ ...base, nrr_db: n, method: "niosh-other" }).effective_attenuation_db;
+    assert.ok(muff >= form && form >= other, "NIOSH ordering broke at NRR " + n);
+    const app = _v1166({ ...base, nrr_db: n, method: "appendix-b" }).effective_attenuation_db;
+    const half = _v1166({ ...base, nrr_db: n, method: "osha-50" }).effective_attenuation_db;
+    assert.ok(app >= half, "OSHA ordering broke at NRR " + n);
+  }
+  assert.ok(_v1166({ ...base, nrr_db: 20, method: "niosh-muff" }).effective_attenuation_db > _v1166({ ...base, nrr_db: 20, method: "appendix-b" }).effective_attenuation_db, "at a low NRR the NIOSH muff figure is the more generous one");
+  assert.ok(_v1166({ ...base, nrr_db: 33, method: "appendix-b" }).effective_attenuation_db > _v1166({ ...base, nrr_db: 33, method: "niosh-muff" }).effective_attenuation_db, "at a high NRR it reverses");
+  // Attenuation rises with the NRR and the exposure at the ear falls, in every method.
+  for (const m of ["appendix-b", "osha-50", "niosh-muff", "niosh-formable", "niosh-other"]) {
+    let prev = -1;
+    for (const n of [5, 10, 20, 25, 29, 33]) {
+      const t = _v1166({ ...base, method: m, nrr_db: n });
+      assert.ok(t.effective_attenuation_db >= prev, "attenuation fell with NRR in " + m); prev = t.effective_attenuation_db;
+      assert.ok(Math.abs(t.protected_twa_db - (98 - t.effective_attenuation_db)) < 1e-9);
+    }
+  }
+  // A negative attenuation is floored at zero rather than credited as harm.
+  const tiny = _v1166({ ...base, method: "appendix-b", nrr_db: 3 });
+  assert.ok(tiny.effective_attenuation_db === 0 && tiny.attenuation_floored && tiny.protected_twa_db === 98);
+  assert.ok(!_v1166({ ...base, method: "appendix-b", nrr_db: 20 }).attenuation_floored);
+  // DUAL PROTECTION adds the editable bonus, and only when it is worn.
+  assert.ok(_v1166({ ...base, dual_protection: "no" }).dual_bonus_applied_db === 0);
+  assert.ok(_v1166({ ...base, dual_protection: "yes" }).dual_bonus_applied_db === 5);
+  assert.ok(Math.abs(_v1166({ ...base, dual_protection: "yes" }).effective_attenuation_db - 13.7) < 1e-9);
+  assert.ok(Math.abs(_v1166({ ...base, dual_protection: "yes", dual_bonus_db: 0 }).effective_attenuation_db - 8.7) < 1e-9);
+  assert.ok(Math.abs(_v1166({ ...base, dual_protection: "yes", dual_bonus_db: 12 }).effective_attenuation_db - 20.7) < 1e-9);
+  // THE INVERSE ROUND-TRIPS: the NRR the tile names must actually reach the target, in every method.
+  for (const m of ["appendix-b", "osha-50", "niosh-muff", "niosh-formable", "niosh-other"]) {
+    for (const wgt of ["A", "C"]) {
+      const t = _v1166({ ...base, method: m, weighting: wgt });
+      if (t.meets_target) continue;
+      const fixed = _v1166({ ...base, method: m, weighting: wgt, nrr_db: t.nrr_needed_db });
+      assert.ok(fixed.meets_target, "the named NRR misses the target in " + m + "/" + wgt);
+      assert.ok(Math.abs(fixed.protected_twa_db - 85) < 1e-6, "the named NRR overshoots in " + m + "/" + wgt);
+    }
+  }
+  // The label-versus-reality gap is exactly what the method gave away.
+  for (const m of ["appendix-b", "osha-50", "niosh-muff", "niosh-other"]) {
+    const t = _v1166({ ...base, method: m });
+    assert.ok(Math.abs(t.label_vs_real_db - (29 - t.effective_attenuation_db)) < 1e-9);
+  }
+  // The target is editable and the margin follows it exactly.
+  for (const tgt of [80, 85, 90]) {
+    const t = _v1166({ ...base, target_db: tgt });
+    assert.ok(Math.abs(t.margin_db - (tgt - t.protected_twa_db)) < 1e-9);
+    assert.ok(t.meets_target === (t.protected_twa_db <= tgt));
+  }
+  // Error seams.
+  assert.ok("error" in _v1166({ ...base, weighting: "Z" }));
+  assert.ok("error" in _v1166({ ...base, method: "wishful" }));
+  assert.ok("error" in _v1166({ ...base, dual_protection: "sometimes" }));
+  assert.ok("error" in _v1166({ ...base, twa_db: 0 }));
+  assert.ok("error" in _v1166({ ...base, nrr_db: 0 }));
+  assert.ok("error" in _v1166({ ...base, dual_bonus_db: -1 }));
+  assert.ok("error" in _v1166({ ...base, target_db: 0 }));
+  assert.ok("error" in _v1166({ ...base, twa_db: Infinity }));
+});

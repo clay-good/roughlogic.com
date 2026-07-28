@@ -814,6 +814,7 @@ const TOOL_MODULES = (() => {
     "fall-protection-clearance",
     // v9
     "noise-dose",
+    "hearing-protector-nrr",
     // v15
     "pump-tdh", "hydraulic-cylinder", "vbelt-drive", "belt-hp-transmitted", "gear-cascade",
     // v24 rolling offset

@@ -259,6 +259,7 @@ export const COMPUTE_MAP = {
   "sous-vide-pasteurization": { module: "../../calc-kitchen.js", fn: "computeSousVidePasteurization" },
   "svi-sludge-index": { module: "../../calc-water.js", fn: "computeSVI" },
   "noise-dose": { module: "../../calc-cross.js", fn: "computeNoiseDose" },
+  "hearing-protector-nrr": { module: "../../calc-cross.js", fn: "computeHearingProtectorNrr" },
   "nfpa-1142-water-supply": { module: "../../calc-fire.js", fn: "computeNFPA1142WaterSupply" },
   "excavation-bench-plan": { module: "../../calc-construction.js", fn: "computeExcavationBenchPlan" },
   "disinfection-ct": { module: "../../calc-water.js", fn: "computeDisinfectionCT" },
