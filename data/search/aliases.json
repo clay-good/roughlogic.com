@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "oxygen acetylene separation",
+      "target": "cylinder-storage-separation",
+      "kind": "industry"
+    },
+    {
+      "term": "how far apart to store oxygen and fuel gas",
+      "target": "cylinder-storage-separation",
+      "kind": "question"
+    },
+    {
+      "term": "20 feet or a barrier cylinder storage",
+      "target": "cylinder-storage-separation",
+      "kind": "question"
+    },
+    {
+      "term": "cylinder valve protection cap",
+      "target": "cylinder-storage-separation",
+      "kind": "industry"
+    },
+    {
+      "term": "half hour fire rated barrier cylinders",
+      "target": "cylinder-storage-separation",
+      "kind": "question"
+    },
+    {
       "term": "brick stack height limit",
       "target": "material-stacking-limits",
       "kind": "industry"

@@ -10409,6 +10409,21 @@ export const CITATIONS = {
       { name: "Flow setting", value: "set the flow to the gun and the joint, not higher -- excess gas wastes money and causes turbulence and porosity; a windscreen beats cranking the flow", source: "welding practice" },
     ],
   },
+  "cylinder-storage-separation": {
+    formula: "separation is satisfied when the distance between oxygen and fuel-gas cylinders or combustible materials is at least 20 ft, OR when a barrier is present that is simultaneously noncombustible, at least 5 ft high, and rated at least one-half hour. Handling adds two independent conditions: cylinders secured upright, and valve protection caps in place and secured.",
+    edition: "OSHA 29 CFR 1926.350, a US federal regulation in the public domain, quoted directly.",
+    freeAccess: "29 CFR is published in full at no cost by OSHA and the eCFR.",
+    governance: GOVERNANCE.general,
+    editionNote: "The provision everyone half-remembers as a 20 foot rule is an OR, and the alternative is usually the cheaper compliance path: a noncombustible barrier at least 5 ft high with a fire-resistance rating of at least one-half hour. On a tight site, 20 ft of clear floor is expensive and a 5 ft barrier is not, so knowing the alternative exists is worth more than knowing the distance. But the barrier route carries THREE conditions that must all hold, and two of them fail silently. A sheet of plywood is the right shape and stands the right height, and it satisfies neither the noncombustible condition nor the rating - and nobody measures a fire-resistance rating on a jobsite, so the failure is invisible at a glance. The tile names which of the three failed rather than reporting a bare no. The scope of the separation is also wider than it usually gets applied: it runs to fuel-gas cylinders OR COMBUSTIBLE MATERIALS, especially oil or grease. Oxygen stored 20 ft from the acetylene and hard against the parts washer, the oil drums, or a rag bin has not addressed the hazard the rule exists for, because oxygen enrichment makes ordinary combustibles behave in ways nobody is expecting. Two handling requirements travel with the storage question and are checked alongside it: cylinders secured in an upright position at all times except for short periods while actually being hoisted or carried, and valve protection caps in place and secured - the cap being what stands between a knocked-over cylinder and a sheared valve. Not checked: whether cylinders are in use rather than in storage, which changes what applies; acetylene-specific storage and the waiting period after a cylinder has been on its side; regulator, hose, and torch condition; flashback arrestors and check valves; prohibited hoisting by caps, magnets, or slings; transport in enclosed vehicles; indoor storage and its quantity limits; and NFPA 55 or state rules, which are often stricter. A screen, not a gas-storage plan; 1926.350, the gas supplier, and the AHJ govern.",
+    assumptions: [
+      { name: "Distance route", value: "a minimum of 20 ft between oxygen and fuel gas or combustibles", source: "29 CFR 1926.350" },
+      { name: "Barrier route", value: "noncombustible AND at least 5 ft high AND at least a half-hour rating", source: "29 CFR 1926.350" },
+      { name: "Either satisfies", value: "the provision is an OR, not a distance requirement with an exception", source: "29 CFR 1926.350" },
+      { name: "Scope", value: "combustible MATERIALS, especially oil or grease, not only fuel-gas cylinders", source: "29 CFR 1926.350" },
+      { name: "Upright", value: "secured upright except briefly while being hoisted or carried", source: "29 CFR 1926.350" },
+      { name: "Caps", value: "valve protection caps in place and secured", source: "29 CFR 1926.350" },
+    ],
+  },
   "oxyfuel-cutting-gas": {
     formula: "Cut time = cut length / cut speed; oxygen used = oxygen flow x cut time / 60; fuel used = fuel flow x cut time / 60; runtime per cylinder = cylinder volume / flow.",
     edition: "Torch maker's tip charts, by name.",

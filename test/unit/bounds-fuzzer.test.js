@@ -33236,3 +33236,45 @@ test("bounds: spec-v1154 computeMaterialStackingLimits pins the three rules, the
   assert.ok("error" in _v1154({ ...base, material: "block", block_height_in: 0 }));
   assert.ok("error" in _v1154({ ...base, stack_height_ft: Infinity }));
 });
+
+import { computeCylinderStorageSeparation as _v1155 } from "../../calc-shop.js";
+
+test("bounds: spec-v1155 computeCylinderStorageSeparation pins the OR, the three barrier conditions, the handling checks, and error seams", () => {
+  const base = { separation_ft: 8, barrier_present: "yes", barrier_height_ft: 4, barrier_noncombustible: "yes", barrier_rating_hr: 1, cylinders_upright: "yes", valve_caps_secured: "yes" };
+  const r = _v1155(base);
+  assert.ok(!r.distance_ok && r.separation_shortfall_ft === 12);
+  assert.ok(r.barrier_noncomb_ok && r.barrier_rating_ok && !r.barrier_height_ok && !r.barrier_ok);
+  assert.ok(r.barrier_failures.length === 1 && r.barrier_failures[0] === "under 5 ft");
+  assert.ok(!r.separation_satisfied && !r.passes);
+  // THE OR: either route alone satisfies it.
+  const tallBarrier = _v1155({ ...base, barrier_height_ft: 6 });
+  assert.ok(tallBarrier.barrier_ok && tallBarrier.separation_satisfied && !tallBarrier.distance_ok);
+  assert.ok(tallBarrier.route === "a compliant barrier" && tallBarrier.passes);
+  const farApart = _v1155({ ...base, separation_ft: 20, barrier_present: "no", barrier_height_ft: 0 });
+  assert.ok(farApart.distance_ok && farApart.separation_satisfied && !farApart.barrier_ok && farApart.passes);
+  assert.ok(_v1155({ ...base, separation_ft: 25, barrier_height_ft: 6 }).route === "both the 20 ft distance and a compliant barrier");
+  // Distance seam is exact.
+  assert.ok(_v1155({ ...base, separation_ft: 20, barrier_present: "no" }).distance_ok);
+  assert.ok(!_v1155({ ...base, separation_ft: 19.9, barrier_present: "no" }).distance_ok);
+  // ALL THREE barrier conditions are required; each fails independently and is named.
+  assert.ok(!_v1155({ ...base, barrier_height_ft: 6, barrier_noncombustible: "no" }).barrier_ok);
+  assert.ok(_v1155({ ...base, barrier_height_ft: 6, barrier_noncombustible: "no" }).barrier_failures.includes("not stated noncombustible"));
+  assert.ok(!_v1155({ ...base, barrier_height_ft: 6, barrier_rating_hr: 0.4 }).barrier_ok);
+  assert.ok(_v1155({ ...base, barrier_height_ft: 6, barrier_rating_hr: 0.4 }).barrier_failures.includes("under a half-hour rating"));
+  assert.ok(_v1155({ ...base, barrier_height_ft: 5, barrier_rating_hr: 0.5 }).barrier_ok, "both minimums exactly");
+  const allThreeBad = _v1155({ ...base, barrier_height_ft: 3, barrier_noncombustible: "no", barrier_rating_hr: 0 });
+  assert.ok(allThreeBad.barrier_failures.length === 3);
+  // No barrier means the barrier route is simply unavailable, not a failure of its own.
+  const noBarrier = _v1155({ ...base, barrier_present: "no", barrier_height_ft: 0, separation_ft: 25 });
+  assert.ok(!noBarrier.has_barrier && !noBarrier.barrier_ok && noBarrier.barrier_height_ok === null && noBarrier.passes);
+  // HANDLING is independent: either can fail an otherwise compliant layout.
+  for (const k of ["cylinders_upright", "valve_caps_secured"]) {
+    const t = _v1155({ ...base, separation_ft: 25, barrier_present: "no", barrier_height_ft: 0, [k]: "no" });
+    assert.ok(t.separation_satisfied && !t.passes, k + " alone must fail it");
+  }
+  // Error seams.
+  assert.ok("error" in _v1155({ ...base, separation_ft: -1 }));
+  assert.ok("error" in _v1155({ ...base, barrier_rating_hr: -1 }));
+  assert.ok("error" in _v1155({ ...base, barrier_height_ft: 0 }), "a barrier with no height cannot be tested");
+  assert.ok("error" in _v1155({ ...base, separation_ft: Infinity }));
+});

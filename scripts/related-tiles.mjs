@@ -836,7 +836,8 @@ const RELATED = {
   "speeds-feeds": ["bend-allowance", "weld-usage"],
   "weld-usage": ["bend-allowance", "speeds-feeds"],
   "shielding-gas-runtime": ["weld-usage", "weld-cost-per-foot", "weld-duty-cycle"],
-  "oxyfuel-cutting-gas": ["weld-usage", "metal-weight"],
+  "oxyfuel-cutting-gas": ["weld-usage", "metal-weight", "cylinder-storage-separation"],
+  "cylinder-storage-separation": ["oxyfuel-cutting-gas", "shielding-gas-runtime", "flammable-cabinet-storage", "extinguisher-coverage"],
   "weld-preheat-fuel": ["carbon-equivalent", "weld-heat-input"],
   "weld-cost-per-foot": ["weld-usage", "shielding-gas-runtime", "weld-duty-cycle"],
   // v129..v135 metal-trades batch

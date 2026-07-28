@@ -440,7 +440,7 @@ const _TILES = [
   // spec-v512 roller chain length in pitches (ANSI B29.1)
   ["roller-chain-length", "K"],
   // spec-v801 sprocket pitch diameter (ANSI B29.1)
-  ["sprocket-pitch-diameter", "K"],
+  ["sprocket-pitch-diameter", "K"], ["cylinder-storage-separation", "E"],
   // spec-v504 rolling-bearing L10 rating life (ISO 281)
   ["bearing-l10-life", "K"], ["bearing-max-load", "K"],
   // spec-v509 countersink diameter and cutting depth

@@ -1090,6 +1090,7 @@ export const COMPUTE_MAP = {
   "press-fit-interference-for-force": { module: "../../calc-shop.js", fn: "computePressFitInterferenceForForce" },
   "roller-chain-length": { module: "../../calc-shop.js", fn: "computeRollerChainLength" },
   "sprocket-pitch-diameter": { module: "../../calc-shop.js", fn: "computeSprocketPitchDiameter" },
+  "cylinder-storage-separation": { module: "../../calc-shop.js", fn: "computeCylinderStorageSeparation" },
   "coil-length": { module: "../../calc-fab.js", fn: "computeCoilLength" },
   "barstock-cutlist": { module: "../../calc-fab.js", fn: "computeBarstockCutlist" },
   "bar-nesting": { module: "../../calc-fab.js", fn: "computeBarNesting" },

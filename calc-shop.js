@@ -1408,3 +1408,98 @@ function _v801renderSprocketPitchDiameter(inputRegion, outputRegion, citationEl)
   for (const f of [p, n]) f.input.addEventListener("input", update);
 }
 SHOP_RENDERERS["sprocket-pitch-diameter"] = _v801renderSprocketPitchDiameter;
+
+// --- spec-v1155: compressed gas cylinder storage separation (OSHA 1926.350) ---
+// The rule everyone half-remembers as "20 feet" is actually an OR, and the alternative is
+// usually the cheaper one: oxygen cylinders in storage separated from fuel-gas cylinders or
+// combustible materials by a minimum of 20 ft OR by a noncombustible barrier at least 5 ft
+// high with a fire-resistance rating of at least one-half hour. On a tight site 20 ft of
+// clear floor is expensive and a 5 ft barrier is not, so knowing the alternative exists is
+// worth more than knowing the distance.
+// The barrier has THREE conditions - noncombustible, at least 5 ft high, and at least a
+// half-hour rating - and a plywood sheet satisfies none of them while looking like a
+// barrier. Two of the three are silent failures: nobody measures the rating.
+// Note the separation applies to combustible MATERIALS too, especially oil or grease, not
+// only to fuel-gas cylinders - so oxygen stored 20 ft from the acetylene but next to the
+// parts washer has not solved anything.
+// dims: in { separation_ft: L, barrier_present: dimensionless, barrier_height_ft: L, barrier_noncombustible: dimensionless, barrier_rating_hr: T, cylinders_upright: dimensionless, valve_caps_secured: dimensionless } out: { required_separation_ft: L, separation_shortfall_ft: L, required_barrier_height_ft: L, required_rating_hr: T }
+export function computeCylinderStorageSeparation({ separation_ft = 0, barrier_present = "no", barrier_height_ft = 0, barrier_noncombustible = "no", barrier_rating_hr = 0, cylinders_upright = "yes", valve_caps_secured = "yes" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const sep = Number(separation_ft) || 0;
+  const bh = Number(barrier_height_ft) || 0;
+  const br = Number(barrier_rating_hr) || 0;
+  const hasBarrier = barrier_present === "yes";
+  const nonComb = barrier_noncombustible === "yes";
+  const upright = cylinders_upright === "yes";
+  const caps = valve_caps_secured === "yes";
+  if (sep < 0) return { error: "Separation distance cannot be negative (ft)." };
+  if (bh < 0 || br < 0) return { error: "Barrier height and rating cannot be negative." };
+  if (hasBarrier && !(bh > 0)) return { error: "Enter the barrier height (ft) to test it against the 5 ft minimum." };
+
+  const REQ_SEP = 20, REQ_H = 5, REQ_RATING = 0.5;
+  const distance_ok = sep >= REQ_SEP;
+  const separation_shortfall_ft = Math.max(0, REQ_SEP - sep);
+
+  // The barrier route has THREE conditions and they all have to hold.
+  const barrier_height_ok = hasBarrier ? bh >= REQ_H : null;
+  const barrier_noncomb_ok = hasBarrier ? nonComb : null;
+  const barrier_rating_ok = hasBarrier ? br >= REQ_RATING : null;
+  const barrier_ok = hasBarrier ? (barrier_height_ok && barrier_noncomb_ok && barrier_rating_ok) : false;
+  const barrier_failures = hasBarrier
+    ? [barrier_noncomb_ok ? null : "not stated noncombustible", barrier_height_ok ? null : "under 5 ft", barrier_rating_ok ? null : "under a half-hour rating"].filter(Boolean)
+    : [];
+
+  const separation_satisfied = distance_ok || barrier_ok;
+  const route = distance_ok && barrier_ok ? "both the 20 ft distance and a compliant barrier" : distance_ok ? "the 20 ft distance" : barrier_ok ? "a compliant barrier" : "neither";
+  const passes = separation_satisfied && upright && caps;
+
+  const note = "THE RULE IS AN OR, NOT A DISTANCE. Oxygen cylinders in storage shall be separated from fuel-gas cylinders OR COMBUSTIBLE MATERIALS - especially oil or grease - by a minimum of " + REQ_SEP + " ft, OR by a noncombustible barrier at least " + REQ_H + " ft high having a fire-resistance rating of at least one-half hour. On a tight site " + REQ_SEP + " ft of clear floor is expensive and a " + REQ_H + " ft barrier is not, so the alternative is usually the cheaper compliance path and is worth more than knowing the distance. "
+    + "Distance here is " + sep + " ft: " + (distance_ok ? "satisfies the rule on its own. " : separation_shortfall_ft.toFixed(1) + " ft short of " + REQ_SEP + ". ")
+    + (hasBarrier
+      ? "The barrier route has THREE conditions and all must hold: noncombustible, at least " + REQ_H + " ft high, and at least a " + REQ_RATING + " hour fire-resistance rating. "
+        + (barrier_ok ? "All three are satisfied, so the barrier carries it regardless of the distance. " : "This barrier fails on " + barrier_failures.join(" and ") + ". Two of the three are SILENT failures - a sheet of plywood is the right shape, stands the right height, and satisfies neither the noncombustible nor the rating condition, and nobody measures a rating on site. A barrier that looks like a barrier is not the test. ")
+      : "No barrier entered, so the distance is the only route available here. ")
+    + (separation_satisfied ? "Separation is satisfied by " + route + ". " : "SEPARATION IS NOT SATISFIED by either route. ")
+    + "SCOPE OF THE SEPARATION, which is wider than people apply it: it runs to combustible MATERIALS, not only to fuel-gas cylinders. Oxygen stored " + REQ_SEP + " ft from the acetylene and hard against the parts washer, the oil drums, or a greasy rag bin has not solved the problem the rule exists for - oxygen enrichment makes ordinary combustibles behave in ways nobody is expecting. "
+    + "HANDLING, checked here because they travel with the storage question: cylinders shall be secured in an UPRIGHT position at all times except, if necessary, for short periods while actually being hoisted or carried - " + (upright ? "stated as satisfied. " : "NOT satisfied, and a cylinder lying loose is the one that gets rolled into and has its valve struck. ")
+    + "Valve protection caps shall be in place and secured - " + (caps ? "stated as satisfied. " : "NOT satisfied, and the cap is what stands between a knocked-over cylinder and a sheared valve. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: whether cylinders are in use rather than in storage, which changes what applies; the separate rules for acetylene cylinders stored valve-end up and for the waiting period after a cylinder has been on its side; regulator, hose, and torch condition; flashback arrestors and check valves; hoisting cylinders by their caps or with magnets and slings, which is prohibited; transport in enclosed vehicles; storage inside buildings and the quantity limits that come with it; and NFPA 55 or state rules, which are often stricter. A screen, not a gas-storage plan; 29 CFR 1926.350, the gas supplier, and the AHJ govern.";
+
+  return { required_separation_ft: REQ_SEP, distance_ok, separation_shortfall_ft, has_barrier: hasBarrier, required_barrier_height_ft: REQ_H, required_rating_hr: REQ_RATING, barrier_height_ok, barrier_noncomb_ok, barrier_rating_ok, barrier_ok, barrier_failures, separation_satisfied, route, upright, caps, passes, note };
+}
+
+export const cylinderStorageSeparationExample = { inputs: { separation_ft: 8, barrier_present: "yes", barrier_height_ft: 4, barrier_noncombustible: "yes", barrier_rating_hr: 1, cylinders_upright: "yes", valve_caps_secured: "yes" } };
+
+function _v1155renderCylinderStorageSeparation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: OSHA 29 CFR 1926.350, a US federal regulation in the public domain. 'Oxygen cylinders in storage shall be separated from fuel-gas cylinders or combustible materials (especially oil or grease), a minimum distance of 20 feet (6.1 m) or by a noncombustible barrier at least 5 feet (1.5 m) high having a fire-resistance rating of at least one-half hour.' 'Compressed gas cylinders shall be secured in an upright position at all times except, if necessary, for short periods of time while cylinders are actually being hoisted or carried.' 'Valve protection caps shall be in place and secured.' Not checked: cylinders in use rather than in storage; acetylene-specific storage and the waiting period after a cylinder has been on its side; regulator, hose, and torch condition; flashback arrestors; prohibited hoisting methods; transport in enclosed vehicles; indoor storage quantity limits; or NFPA 55 and state rules, which are often stricter. A screen, not a gas-storage plan; 1926.350, the gas supplier, and the AHJ govern.";
+  const sp = makeNumber("Distance between oxygen and fuel gas or combustibles (ft)", "css-sp", { step: "any", min: "0" }); sp.input.value = "8";
+  const bp = makeSelect("Barrier between them?", "css-bp", [{ value: "no", label: "No" }, { value: "yes", label: "Yes", selected: true }]);
+  const bh = makeNumber("Barrier height (ft)", "css-bh", { step: "any", min: "0" }); bh.input.value = "4";
+  const bn = makeSelect("Barrier is noncombustible?", "css-bn", [{ value: "no", label: "No" }, { value: "yes", label: "Yes", selected: true }]);
+  const br = makeNumber("Barrier fire-resistance rating (hours)", "css-br", { step: "any", min: "0" }); br.input.value = "1";
+  const up = makeSelect("Cylinders secured upright?", "css-up", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
+  const vc = makeSelect("Valve protection caps in place and secured?", "css-vc", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
+  inputRegion.appendChild(sp.wrap); inputRegion.appendChild(bp.wrap); inputRegion.appendChild(bh.wrap);
+  inputRegion.appendChild(bn.wrap); inputRegion.appendChild(br.wrap); inputRegion.appendChild(up.wrap); inputRegion.appendChild(vc.wrap);
+  attachExampleButton(inputRegion, () => { sp.input.value = "8"; bp.select.value = "yes"; bh.input.value = "4"; bn.select.value = "yes"; br.input.value = "1"; up.select.value = "yes"; vc.select.value = "yes"; update(); });
+  const oD = makeOutputLine(outputRegion, "Distance route (20 ft)", "css-out-d");
+  const oB = makeOutputLine(outputRegion, "Barrier route (noncombustible, 5 ft, half-hour)", "css-out-b");
+  const oS = makeOutputLine(outputRegion, "Separation satisfied?", "css-out-s");
+  const oH = makeOutputLine(outputRegion, "Handling", "css-out-h");
+  const oV = makeOutputLine(outputRegion, "Verdict", "css-out-v");
+  const oN = makeOutputLine(outputRegion, "Note", "css-out-n");
+  const update = debounce(() => {
+    const r = computeCylinderStorageSeparation({ separation_ft: Number(sp.input.value) || 0, barrier_present: bp.select.value, barrier_height_ft: Number(bh.input.value) || 0, barrier_noncombustible: bn.select.value, barrier_rating_hr: Number(br.input.value) || 0, cylinders_upright: up.select.value, valve_caps_secured: vc.select.value });
+    if (r.error) { oD.textContent = r.error; oB.textContent = "-"; oS.textContent = "-"; oH.textContent = "-"; oV.textContent = "-"; oN.textContent = "-"; return; }
+    oD.textContent = r.distance_ok ? "satisfied" : "short by " + fmt(r.separation_shortfall_ft, 1) + " ft";
+    oB.textContent = !r.has_barrier ? "no barrier entered" : r.barrier_ok ? "all three conditions satisfied" : "FAILS: " + r.barrier_failures.join(", ");
+    oS.textContent = r.separation_satisfied ? "yes, by " + r.route : "NO - neither route is met";
+    oH.textContent = (r.upright ? "upright OK" : "NOT secured upright") + ", " + (r.caps ? "caps OK" : "caps NOT secured");
+    oV.textContent = r.passes ? "PASSES the items entered" : "DOES NOT PASS";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of [sp, bh, br]) x.input.addEventListener("input", update);
+  for (const x of [bp, bn, up, vc]) x.select.addEventListener("change", update);
+}
+SHOP_RENDERERS["cylinder-storage-separation"] = _v1155renderCylinderStorageSeparation;

@@ -889,7 +889,7 @@ const TOOL_MODULES = (() => {
     // spec-v512 roller chain length in pitches (ANSI B29.1)
     "roller-chain-length",
     // spec-v801 sprocket pitch diameter (ANSI B29.1)
-    "sprocket-pitch-diameter",
+    "sprocket-pitch-diameter", "cylinder-storage-separation",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [
