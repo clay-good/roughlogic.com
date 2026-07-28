@@ -1438,6 +1438,7 @@ const RELATED = {
   "aav-install-check": ["vent-terminal-check","fixture-clearance-check","plumbing-fixture-count"],
   "grab-bar-layout": ["fixture-clearance-check","shower-compartment-check","ada-ramp-slope","guard-post-load"],
   "cleanout-layout": ["vent-terminal-check","aav-install-check","plumbing-fixture-count"],
+  "water-service-pressure-check": ["wh-expansion-tank","water-hammer-arrestor","pipe-sizing"],
   "egress-capacity": ["occupant-load","plumbing-fixture-count","stair-stringer"],
   "plumbing-fixture-count": ["occupant-load","sanitary-dfu","wsfu-demand"],
   // spec-v245..v247 cast-in-place placing-and-curing trio

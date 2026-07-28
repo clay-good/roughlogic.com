@@ -32806,3 +32806,48 @@ test("bounds: spec-v1145 computeGasApplianceConnection pins the movable-applianc
   assert.ok("error" in _v1145({ ...base, connector_length_ft: -1 }));
   assert.ok("error" in _v1145({ ...base, shutoff_distance_ft: Infinity }));
 });
+
+import { computeWaterServicePressureCheck as _v1146 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v1146 computeWaterServicePressureCheck pins the 80 psi cap, the closed-system chain, and error seams", () => {
+  const base = { static_pressure_psi: 95, min_fixture_pressure_psi: 20, has_check_or_backflow: "no", has_storage_water_heater: "yes", expansion_control_present: "no", prv_setpoint_psi: 60 };
+  const r = _v1146(base);
+  assert.ok(r.prv_required && r.over_by_psi === 15 && r.setpoint_ok && r.delivered_psi === 60 && r.headroom_psi === 40);
+  assert.ok(r.closed_system && r.expansion_required && r.expansion_ok === false && !r.passes);
+  // THE CAP: 80 exactly is compliant, above it is not, and the overage is exact.
+  assert.ok(!_v1146({ ...base, static_pressure_psi: 80 }).prv_required);
+  assert.ok(_v1146({ ...base, static_pressure_psi: 80.1 }).prv_required);
+  for (const p of [40, 80, 95, 150]) {
+    const t = _v1146({ ...base, static_pressure_psi: p });
+    assert.ok(t.over_by_psi === Math.max(0, p - 80) && t.prv_required === (p > 80));
+  }
+  // THE CHAIN: a PRV closes the system; so does a check valve or backflow preventer, alone.
+  const lowWithBackflow = _v1146({ ...base, static_pressure_psi: 65, has_check_or_backflow: "yes", prv_setpoint_psi: 0 });
+  assert.ok(!lowWithBackflow.prv_required && lowWithBackflow.closed_system && lowWithBackflow.expansion_required);
+  assert.ok(!lowWithBackflow.passes, "no PRV needed and it still fails on expansion control");
+  const openLow = _v1146({ ...base, static_pressure_psi: 65, prv_setpoint_psi: 0 });
+  assert.ok(!openLow.closed_system && !openLow.expansion_required && openLow.expansion_ok === null && openLow.passes);
+  // No storage heater means 607.3 is not triggered even on a closed system.
+  const noHeater = _v1146({ ...base, has_storage_water_heater: "no" });
+  assert.ok(noHeater.closed_system && !noHeater.expansion_required && noHeater.expansion_ok === null && noHeater.passes);
+  // Present control satisfies it.
+  assert.ok(_v1146({ ...base, expansion_control_present: "yes" }).passes);
+  // Delivered pressure follows the setpoint only where a PRV is actually required.
+  assert.ok(_v1146({ ...base, static_pressure_psi: 65, prv_setpoint_psi: 50 }).delivered_psi === 65, "a setpoint on an uncapped service does not reduce the reported pressure");
+  assert.ok(_v1146({ ...base, prv_setpoint_psi: 0 }).delivered_psi === 95);
+  // Headroom is exact and can go negative.
+  for (const mf of [0, 20, 45, 80]) {
+    const t = _v1146({ ...base, min_fixture_pressure_psi: mf });
+    assert.ok(Math.abs(t.headroom_psi - (60 - mf)) < 1e-9 && t.fixture_ok === (60 - mf >= 0));
+  }
+  assert.ok(!_v1146({ ...base, min_fixture_pressure_psi: 70 }).passes);
+  // A setpoint over the cap is itself a failure.
+  assert.ok(_v1146({ ...base, prv_setpoint_psi: 80 }).setpoint_ok);
+  assert.ok(!_v1146({ ...base, prv_setpoint_psi: 85 }).setpoint_ok);
+  assert.ok(_v1146({ ...base, prv_setpoint_psi: 0 }).setpoint_ok === null);
+  // Error seams.
+  assert.ok("error" in _v1146({ ...base, static_pressure_psi: 0 }));
+  assert.ok("error" in _v1146({ ...base, min_fixture_pressure_psi: -1 }));
+  assert.ok("error" in _v1146({ ...base, prv_setpoint_psi: -1 }));
+  assert.ok("error" in _v1146({ ...base, static_pressure_psi: Infinity }));
+});

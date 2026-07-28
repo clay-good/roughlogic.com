@@ -5024,3 +5024,88 @@ function _v1140renderCleanoutLayout(inputRegion, outputRegion, citationEl) {
   for (const x of [L, sp, dc, gp, st, ps, cs, ch]) x.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["cleanout-layout"] = _v1140renderCleanoutLayout;
+
+// --- spec-v1146: water service static pressure, PRV, and the closed system it creates ---
+// A causal chain people walk into one step at a time. IPC 604.8 caps static water pressure
+// at 80 psi and requires an approved pressure-reducing valve where the main exceeds it.
+// Fitting that valve solves the pressure problem and creates a NEW one: 607.3 says a
+// storage water heater supplied through a check valve, pressure-reducing valve, or backflow
+// preventer needs a thermal expansion control device downstream of all of them, because the
+// system is now CLOSED and heated water has nowhere to expand back to. The homeowner who
+// fixes banging pipes with a PRV and then wonders why the T&P valve started weeping has
+// completed the chain without being told it existed. This tile walks it in one place.
+// dims: in { static_pressure_psi: L^-1, min_fixture_pressure_psi: L^-1, has_check_or_backflow: dimensionless, has_storage_water_heater: dimensionless, expansion_control_present: dimensionless, prv_setpoint_psi: L^-1 } out: { over_by_psi: L^-1, headroom_psi: L^-1 }
+export function computeWaterServicePressureCheck({ static_pressure_psi = 0, min_fixture_pressure_psi = 20, has_check_or_backflow = "no", has_storage_water_heater = "yes", expansion_control_present = "no", prv_setpoint_psi = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const p = Number(static_pressure_psi) || 0;
+  const minFix = Number(min_fixture_pressure_psi) || 0;
+  const set = Number(prv_setpoint_psi) || 0;
+  const otherClosure = has_check_or_backflow === "yes";
+  const heater = has_storage_water_heater === "yes";
+  const control = expansion_control_present === "yes";
+  if (!(p > 0)) return { error: "Static water pressure must be positive (psi)." };
+  if (minFix < 0) return { error: "Minimum fixture pressure cannot be negative (psi)." };
+  if (set < 0) return { error: "PRV setpoint cannot be negative (psi)." };
+
+  const MAX = 80;
+  const prv_required = p > MAX;
+  const over_by_psi = Math.max(0, p - MAX);
+  const setpoint_entered = set > 0;
+  const setpoint_ok = setpoint_entered ? set <= MAX : null;
+  const delivered = setpoint_entered && prv_required ? set : p;
+  const headroom_psi = delivered - minFix;
+  const fixture_ok = headroom_psi >= 0;
+
+  // The closed system: a PRV, a check valve, or a backflow preventer all close it.
+  const closed_system = prv_required || otherClosure;
+  const expansion_required = closed_system && heater;
+  const expansion_ok = expansion_required ? control : null;
+  const passes = (!prv_required || setpoint_ok !== false) && fixture_ok && (expansion_ok !== false);
+
+  const note = "STATIC PRESSURE (604.8): the cap is " + MAX + " psi, and at " + p + " psi this service is "
+    + (prv_required ? over_by_psi.toFixed(1) + " psi OVER, so an approved pressure-reducing valve conforming to ASSE 1003 or CSA B356 is required on the branch main or riser at the connection to the water service pipe. High static pressure is not a comfort complaint - it is what splits supply lines, wears out fill valves and cartridges, and makes a house sound like it is being hit with a hammer every time a valve closes. " : "within the cap, so no pressure-reducing valve is required on pressure grounds. ")
+    + (setpoint_entered ? "The PRV setpoint entered is " + set + " psi, " + (setpoint_ok ? "which is at or under the cap. " : "which is ABOVE the 80 psi cap and defeats the purpose of fitting it. ") : "")
+    + "AT THE FIXTURE: " + delivered.toFixed(1) + " psi delivered against a " + minFix + " psi minimum leaves " + headroom_psi.toFixed(1) + " psi of headroom" + (fixture_ok ? ". Remember this is STATIC pressure - friction loss, elevation, and the meter all come off it under flow, so headroom on paper is not headroom at the shower head. " : " - NEGATIVE, so the setpoint is too low for the fixtures before a drop of flow loss is counted. ")
+    + "THE PART PEOPLE WALK INTO: " + (closed_system
+      ? "this system is CLOSED" + (prv_required && otherClosure ? " by both the required PRV and a check valve or backflow preventer" : prv_required ? " by the pressure-reducing valve the pressure rule just required" : " by a check valve or backflow preventer") + ". "
+        + (heater
+          ? "With a storage water heater on it, 607.3 requires a thermal expansion control device on the cold water supply, downstream of ALL check valves, pressure-reducing valves, and backflow preventers - " + (control ? "present, OK. " : "MISSING. Heated water expands and in a closed system it has nowhere to go back to, so the pressure climbs until the T and P relief valve weeps. The classic sequence is someone fixing banging pipes with a PRV and then, weeks later, wondering why the water heater started dripping - they completed a chain nobody told them about. An expansion tank sized per the manufacturer, so the system pressure still stays under 604.8, is the fix; a relief valve is not a substitute for one. ")
+          : "There is no storage water heater, so 607.3's expansion control requirement is not triggered - it is written around a storage heater being supplied through the closure. ")
+      : "the system is OPEN - no PRV required and no check valve or backflow preventer entered - so expanding hot water can push back toward the main and 607.3 is not triggered. Adding any of those three devices later closes it and does trigger it, which is worth knowing BEFORE a backflow preventer goes in for irrigation. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: the expansion tank SIZE or precharge, which follows the manufacturer's instructions and the water heater volume; the minimum flow pressure and flow rate each specific fixture needs; pipe sizing and the friction, elevation, and meter losses that separate static from flowing pressure; whether the service pressure varies through the day or season, which it usually does; PRV maintenance and the fact that they fail high; or the water heater's own T and P relief and discharge piping. A screen; the adopted code, the device listings, and the AHJ govern.";
+
+  return { prv_required, over_by_psi, setpoint_entered, setpoint_ok, delivered_psi: delivered, headroom_psi, fixture_ok, closed_system, expansion_required, expansion_ok, passes, note };
+}
+
+export const waterServicePressureCheckExample = { inputs: { static_pressure_psi: 95, min_fixture_pressure_psi: 20, has_check_or_backflow: "no", has_storage_water_heater: "yes", expansion_control_present: "no", prv_setpoint_psi: 60 } };
+
+function _v1146renderWaterServicePressureCheck(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IPC 604.8 - static water pressure not greater than 80 psi, with an approved pressure-reducing valve conforming to ASSE 1003 or CSA B356 installed on the domestic water branch main or riser at the connection to the water service pipe where the main pressure exceeds it. IPC 607.3 - where a storage water heater is supplied with cold water that passes through a check valve, pressure-reducing valve, or backflow preventer, a thermal expansion control device connected to the cold water supply downstream of all such devices, and expansion tanks sized per the manufacturer so that system pressure does not exceed what 604.8 requires. Not checked: expansion tank size or precharge, per-fixture flow pressure and flow rate, pipe sizing and the friction, elevation, and meter losses between static and flowing pressure, seasonal pressure variation, PRV maintenance and failure modes, or the water heater's T and P relief and discharge piping. A screen; the adopted code, the device listings, and the AHJ govern.";
+  const sp = makeNumber("Static water pressure at the service (psi)", "wsp-sp", { step: "any", min: "0" }); sp.input.value = "95";
+  const ps = makeNumber("PRV setpoint if one is fitted (psi; 0 = none)", "wsp-ps", { step: "any", min: "0" }); ps.input.value = "60";
+  const mf = makeNumber("Minimum pressure the fixtures need (psi)", "wsp-mf", { step: "any", min: "0" }); mf.input.value = "20";
+  const cb = makeSelect("Check valve or backflow preventer on the service?", "wsp-cb", [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }]);
+  const wh = makeSelect("Storage water heater?", "wsp-wh", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
+  const ec = makeSelect("Thermal expansion control installed?", "wsp-ec", [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }]);
+  for (const x of [sp, ps, mf]) inputRegion.appendChild(x.wrap);
+  inputRegion.appendChild(cb.wrap); inputRegion.appendChild(wh.wrap); inputRegion.appendChild(ec.wrap);
+  attachExampleButton(inputRegion, () => { sp.input.value = "95"; ps.input.value = "60"; mf.input.value = "20"; cb.select.value = "no"; wh.select.value = "yes"; ec.select.value = "no"; update(); });
+  const oV = makeOutputLine(outputRegion, "Verdict", "wsp-out-v");
+  const oP = makeOutputLine(outputRegion, "Pressure (604.8)", "wsp-out-p");
+  const oF = makeOutputLine(outputRegion, "Headroom at the fixtures", "wsp-out-f");
+  const oE = makeOutputLine(outputRegion, "Closed system and expansion (607.3)", "wsp-out-e");
+  const oNote = makeOutputLine(outputRegion, "Note", "wsp-out-note");
+  const update = debounce(() => {
+    const r = computeWaterServicePressureCheck({ static_pressure_psi: Number(sp.input.value) || 0, prv_setpoint_psi: Number(ps.input.value) || 0, min_fixture_pressure_psi: Number(mf.input.value) || 0, has_check_or_backflow: cb.select.value, has_storage_water_heater: wh.select.value, expansion_control_present: ec.select.value });
+    if (r.error) { oV.textContent = r.error; oP.textContent = "-"; oF.textContent = "-"; oE.textContent = "-"; oNote.textContent = "-"; return; }
+    oV.textContent = r.passes ? "PASSES the items entered" : "DOES NOT PASS";
+    oP.textContent = r.prv_required ? "over 80 psi by " + fmt(r.over_by_psi, 1) + " - a PRV is required" + (r.setpoint_ok === false ? ", and the setpoint entered is itself over 80" : "") : "within the 80 psi cap";
+    oF.textContent = fmt(r.delivered_psi, 1) + " psi delivered, " + fmt(r.headroom_psi, 1) + " psi of static headroom" + (r.fixture_ok ? "" : " - NEGATIVE");
+    oE.textContent = !r.closed_system ? "open system - 607.3 not triggered" : !r.expansion_required ? "closed, but no storage water heater - 607.3 not triggered" : r.expansion_ok ? "closed with a storage heater - expansion control present, OK" : "closed with a storage heater - expansion control REQUIRED and missing";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of [sp, ps, mf]) x.input.addEventListener("input", update);
+  for (const x of [cb, wh, ec]) x.select.addEventListener("change", update);
+}
+PLUMBING_RENDERERS["water-service-pressure-check"] = _v1146renderWaterServicePressureCheck;

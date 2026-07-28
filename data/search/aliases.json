@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "water pressure over 80 psi",
+      "target": "water-service-pressure-check",
+      "kind": "question"
+    },
+    {
+      "term": "do i need a pressure reducing valve",
+      "target": "water-service-pressure-check",
+      "kind": "question"
+    },
+    {
+      "term": "why is my water heater t and p valve dripping",
+      "target": "water-service-pressure-check",
+      "kind": "question"
+    },
+    {
+      "term": "closed system thermal expansion",
+      "target": "water-service-pressure-check",
+      "kind": "industry"
+    },
+    {
+      "term": "backflow preventer expansion tank required",
+      "target": "water-service-pressure-check",
+      "kind": "question"
+    },
+    {
       "term": "sediment trap",
       "target": "gas-appliance-connection",
       "kind": "industry"

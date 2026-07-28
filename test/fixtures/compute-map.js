@@ -1428,6 +1428,7 @@ export const COMPUTE_MAP = {
   "aav-install-check": { module: "../../calc-plumbing.js", fn: "computeAavInstallCheck" },
   "grab-bar-layout": { module: "../../calc-plumbing.js", fn: "computeGrabBarLayout" },
   "cleanout-layout": { module: "../../calc-plumbing.js", fn: "computeCleanoutLayout" },
+  "water-service-pressure-check": { module: "../../calc-plumbing.js", fn: "computeWaterServicePressureCheck" },
   // spec-v245..v247 cast-in-place placing-and-curing trio (3 tiles)
   "shore-post-load": { module: "../../calc-construction.js", fn: "computeShorePostLoad" },
   "scaffold-mudsill-bearing": { module: "../../calc-construction.js", fn: "computeScaffoldMudsillBearing" },
