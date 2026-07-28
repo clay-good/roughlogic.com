@@ -30896,3 +30896,59 @@ test("bounds: spec-v1111 computeEgcParallelRaceways pins the full-size-per-racew
   assert.ok("error" in _v1111({ ocpd_A: 400, raceway_count: 2, material: "steel" }));
   assert.ok("error" in _v1111({ ocpd_A: Infinity, raceway_count: 2, material: "copper" }));
 });
+
+import { computeSlipCriticalWithTension as _v1112 } from "../../calc-steel.js";
+import { computeSteelBoltSlipCritical as _v1112sib } from "../../calc-steel.js";
+
+test("bounds: spec-v1112 computeSlipCriticalWithTension pins the J3-5a factor, exact reduction to the unreduced sibling at zero tension, the ksc = 0 floor, linearity, and error seams", () => {
+  const base = { mu: 0.30, tb_kip: 28, ns: 1, n: 4, hf: 1.0, du: 1.13, applied_tension_kip: 30 };
+  const r = _v1112(base);
+  assert.ok(Math.abs(r.clamp_total_kip - 1.13 * 28 * 4) < 1e-9);
+  assert.ok(Math.abs(r.ksc - (1 - 30 / (1.13 * 28 * 4))) < 1e-12);
+  assert.ok(Math.abs(r.reduced_rn_bolt_kip - 7.242) < 1e-4);
+  assert.ok(Math.abs(r.lrfd_total_kip - 28.968) < 1e-4);
+  assert.ok(Math.abs(r.loss_pct - 23.7042) < 1e-4);
+  assert.ok(r.fully_relieved === false);
+  // CROSS-IMPLEMENTATION: zero tension must reproduce the landed slip tile EXACTLY.
+  {
+    const zero = _v1112({ ...base, applied_tension_kip: 0 });
+    const sib = _v1112sib({ mu: 0.30, tb_kip: 28, ns: 1, n: 4, hf: 1.0, du: 1.13 });
+    assert.ok(zero.ksc === 1);
+    assert.ok(Math.abs(zero.reduced_rn_bolt_kip - sib.rn_bolt_kip) < 1e-12);
+    assert.ok(Math.abs(zero.lrfd_total_kip - sib.lrfd_total_kip) < 1e-12);
+    assert.ok(Math.abs(zero.asd_total_kip - sib.asd_total_kip) < 1e-12);
+  }
+  // The unreduced value reported alongside always equals the sibling's, at any tension.
+  for (const tu of [0, 10, 30, 60, 120]) {
+    const t = _v1112({ ...base, applied_tension_kip: tu });
+    assert.ok(Math.abs(t.unreduced_lrfd_total_kip - 37.968) < 1e-4);
+    assert.ok(Math.abs(t.lrfd_total_kip - t.unreduced_lrfd_total_kip * t.ksc) < 1e-9);
+  }
+  // ksc is exactly linear in applied tension, and hits zero at Du Tb nb.
+  const half = _v1112({ ...base, applied_tension_kip: 63.28 });
+  assert.ok(Math.abs(half.ksc - 0.5) < 1e-9);
+  const atZero = _v1112({ ...base, applied_tension_kip: 126.56 });
+  assert.ok(Math.abs(atZero.ksc) < 1e-9 && atZero.fully_relieved === true);
+  assert.ok(atZero.lrfd_total_kip < 1e-9);
+  // Past the clamping force ksc FLOORS at zero rather than going negative.
+  const past = _v1112({ ...base, applied_tension_kip: 200 });
+  assert.ok(past.ksc === 0 && past.fully_relieved === true && past.lrfd_total_kip === 0);
+  // ASD is exactly the LRFD nominal over 1.5, per bolt and total.
+  assert.ok(Math.abs(r.asd_bolt_kip * 1.5 - r.reduced_rn_bolt_kip) < 1e-12);
+  assert.ok(Math.abs(r.asd_total_kip * 1.5 - r.lrfd_total_kip) < 1e-12);
+  // Class B doubles-ish the base but leaves ksc untouched - the factor is independent of mu.
+  const classB = _v1112({ ...base, mu: 0.50 });
+  assert.ok(Math.abs(classB.ksc - r.ksc) < 1e-12);
+  assert.ok(classB.lrfd_total_kip > r.lrfd_total_kip);
+  // More bolts raise the clamping force, so the SAME tension costs proportionally less.
+  const more = _v1112({ ...base, n: 8 });
+  assert.ok(more.ksc > r.ksc);
+  // Error seams (including those inherited from the sibling's guards).
+  assert.ok("error" in _v1112({ ...base, applied_tension_kip: -1 }));
+  assert.ok("error" in _v1112({ ...base, tb_kip: 0 }));
+  assert.ok("error" in _v1112({ ...base, n: 0 }));
+  assert.ok("error" in _v1112({ ...base, n: 2.5 }));
+  assert.ok("error" in _v1112({ ...base, mu: 1.5 }));
+  assert.ok("error" in _v1112({ ...base, du: 0 }));
+  assert.ok("error" in _v1112({ ...base, applied_tension_kip: Infinity }));
+});

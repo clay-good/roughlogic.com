@@ -618,7 +618,7 @@ const TOOL_MODULES = (() => {
     // spec-v281..v283 members-and-connections depth batch
     "steel-beam-ltb", "steel-block-shear", "steel-tension-member",
     // spec-v293..v295 connection/detailing depth batch
-    "steel-web-local-strength", "steel-bolt-slip-critical", "steel-fillet-weld-size",
+    "steel-web-local-strength", "steel-bolt-slip-critical", "slip-critical-with-tension", "steel-fillet-weld-size",
     // spec-v314..v316 beam-column-and-connection depth batch
     "steel-h1-interaction", "steel-effective-length-k", "steel-bolt-tension-shear",
     // spec-v411..v413 composite-beam trio

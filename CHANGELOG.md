@@ -4,6 +4,29 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(steel): slip-critical-with-tension, the interaction the slip tile calls separate; 2026-07-27
+
+A self-declared gap, quoted from `steel-bolt-slip-critical`'s own note: "the tension-slip interaction
+(J3.9) and the pretensioning method are separate." That tile returns the unreduced Rn;
+`steel-bolt-tension-shear` is the strength-level J3.7 ellipse, a different limit state. Adds one tile to
+`calc-steel.js` (Group E). The unreduced resistance is obtained by CALLING the landed slip tile, so the two
+cannot drift and its input validation is reused.
+
+Applied tension relieves the clamping force a slip-critical joint runs on, so the resistance scales by
+ksc = 1 - Tu/(Du Tb nb). One detail worth stating: the denominator uses Du Tb, the MEAN installed
+pretension rather than the specified minimum, because the reduction is measured against the clamp actually
+present. Past Tu = Du Tb nb the raw factor goes negative -- the tile floors it at zero and says the joint
+has no slip resistance left, bolts intact or not.
+
+Pinned: four Class A bolts at Tb 28 kip with 30 kip of tension lose 23.7%, 37.97 down to 28.97 kip LRFD.
+The cross-check pins that zero tension reproduces the sibling exactly.
+
+Fuzzer pins the J3-5a factor, cross-implementation agreement at zero tension AND that
+`lrfd_total = unreduced x ksc` at five tension levels, exact linearity, the zero floor and beyond, the
+ASD/1.5 identities, that ksc is independent of mu, and that more bolts make the same tension cost less.
+The note keeps the framing honest: slip is a serviceability limit, the rupture and bearing checks are
+separate, and prying action is not modeled. Catalog 1,495 -> 1,496. Spec: spec-v1112.
+
 ### feat(electrical): egc-parallel-raceways, the 250.122 paragraph the catalog skipped; 2026-07-27
 
 `egc-upsize-proportional` implements 250.122(B) and says so; `egc-sizing` does the table lookup;

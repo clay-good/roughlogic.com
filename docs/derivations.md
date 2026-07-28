@@ -2992,6 +2992,7 @@ cross-check.
 | calc-steel.js | `computeCompositeBeamFlexure` | `{ as_in2 = 0, fy_ksi = 50, d_in = 0, tslab_in = 0, be_in = 0, fc_ksi = 4 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeRequiredSectionModulus` | `{ fy = 50, moment_kipft = 0, method = "lrfd" } = {}` | _ | _ | _ |
 | calc-steel.js | `computeShearStudStrength` | `{ asc_in2 = 0, fc_psi = 4000, ec_psi = 0, fu_ksi = 65, rg = 1.0, rp = 0.75, v...` | _ | _ | _ |
+| calc-steel.js | `computeSlipCriticalWithTension` | `{ mu = 0.30, tb_kip = 0, ns = 1, n = 1, hf = 1.0, du = 1.13, applied_tension_...` | _ | _ | _ |
 | calc-steel.js | `computeSteelBeamFlexure` | `{ fy = 50, zx = 0, mu = 0 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelBeamLtb` | `{ fy = 50, zx = 0, sx = 0, ry = 0, rts = 0, j = 0, ho = 0, lb_ft = 0, cb = 1....` | _ | _ | _ |
 | calc-steel.js | `computeSteelBeamShear` | `{ fy = 50, d = 0, tw = 0, cv1 = 1.0, omega_v = 1.50, vu = 0 } = {}` | _ | _ | _ |
@@ -3156,7 +3157,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1742.
+Row count: 1743.
 
 <!-- END function-corpus-v14 -->
 
@@ -3772,7 +3773,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (389 tiles)
+### Group E Construction (390 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4064,6 +4065,7 @@ per spec-v14 §13.1 second paragraph.
 | `silt-fence-drainage` | Silt Fence Drainage-Area and Length Check | Silt-fence drainage-area guideline (g...; required = 0.5*400 = 200 ft (250 adequate); max area = 25... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slab-dowel-schedule` | Slab Load-Transfer Dowel Schedule (ACI 302) | Slab load-transfer dowel schedule (AC...; per joint = floor((40*12-2*6)/12)+1 = floor(468/12)+1 = 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sliding-snow-load` | Sliding Snow Load on a Lower Roof (ASCE 7 7.9) | ASCE 7 §7.9; spec-v469 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `slip-critical-with-tension` | Slip-Critical Bolt with Applied Tension (AISC 360 J3.9) | AISC 360; mu 0.30, Tb 28 kip, 4 bolts, single slip plane, Du 1.13, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slope-failure-depth-for-fs` | Infinite Slope Critical Depth for a Target FS | Infinite-slope stability (Das / NAVFA...; spec-v749 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `slope-stability-infinite` | Infinite Slope Stability Factor of Safety | Infinite-slope stability (Das / NAVFA...; spec-v289 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slope-stability-seepage` | Infinite Slope Stability with Seepage | Infinite-slope seepage stability (Das...; spec-v627 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4837,6 +4839,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1495. Fixture-covered or reference-cadence: 1495 / 1495.
+Tile count: 1496. Fixture-covered or reference-cadence: 1496 / 1496.
 
 <!-- END tile-index-v14 -->

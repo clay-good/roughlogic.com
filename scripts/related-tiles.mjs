@@ -1586,7 +1586,8 @@ const RELATED = {
   "wood-combined-bending-axial": ["column-buckling-wood","wood-beam-bending","wall-bracing-length"],
   // spec-v293..v295 steel connection/detailing depth batch (Group E)
   "steel-web-local-strength": ["steel-beam-shear","steel-beam-ltb","column-base-plate"],
-  "steel-bolt-slip-critical": ["bolt-shear-bearing","bolt-group-eccentric","bolt-torque"],
+  "slip-critical-with-tension": ["steel-bolt-slip-critical","steel-bolt-tension-shear","bolt-shear-bearing"],
+  "steel-bolt-slip-critical": ["slip-critical-with-tension","bolt-shear-bearing","bolt-group-eccentric","bolt-torque"],
   "steel-fillet-weld-size": ["fillet-weld-strength","groove-weld-strength","weld-metal-volume"],
   // spec-v296..v298 ASCE 7 wind-and-snow load depth batch (Group E)
   "wind-cc-pressure": ["wind-pressure","wind-mwfrs-pressure","asce7-load-combinations"],

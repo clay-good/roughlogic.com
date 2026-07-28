@@ -15300,6 +15300,19 @@ export const CITATIONS = {
       { name: "Edition sensitive", value: "the 2026 NEC revision caps the EGC at the largest ungrounded conductor in the raceway", source: "NEC 250.122(F), 2026 revision" },
     ],
   },
+  "slip-critical-with-tension": {
+    formula: "ksc = 1 - Tu/(Du Tb nb) (Eq. J3-5a, LRFD), floored at 0; reduced slip resistance = ksc x Rn where Rn = mu Du hf Tb ns; phi = 1.00, Omega = 1.50 for standard holes.",
+    edition: "AISC 360 Section J3.9, slip-critical connections subject to combined tension and shear, by section number; the unreduced resistance comes from this catalog's landed slip-critical tile rather than being recomputed.",
+    freeAccess: "AISC 360 is available through AISC; the J3.9 interaction expression is a published code equation.",
+    governance: GOVERNANCE.structural,
+    editionNote: "Applied tension relieves part of the clamping force a slip-critical joint runs on, so the slip resistance is scaled by ksc. Note the denominator uses Du Tb - the MEAN installed pretension, not the specified minimum - because the reduction is measured against the pretension actually present, which is why Du appears here as well as in the base resistance. Past Tu = Du Tb nb the factor reaches zero and the joint has NO slip resistance left: the bolts may be intact but the faying surfaces are free to move. THIS IS THE SLIP CHECK ONLY, and slip is a SERVICEABILITY limit - the strength-level bolt shear and bearing check (bolt-shear-bearing) and the J3.7 combined tension-shear rupture check (steel-bolt-tension-shear) are separate, and a joint can pass all three or fail any one independently. Prying action increases the tension the bolts actually see beyond the applied load and is NOT modeled; it matters most on thin end plates and tees. Standard holes assumed. AISC 360 and the engineer of record govern.",
+    assumptions: [
+      { name: "ksc interaction", value: "1 - Tu/(Du Tb nb), floored at zero", source: "AISC 360 Eq. J3-5a" },
+      { name: "Mean pretension", value: "Du Tb, not the specified minimum, is the clamping force the tension is measured against", source: "AISC 360 J3.9" },
+      { name: "Slip only", value: "serviceability limit; shear/bearing and J3.7 rupture are separate checks", source: "AISC 360 J3.7, J3.10" },
+      { name: "No prying", value: "prying action raises the actual bolt tension and is not modeled", source: "stated scope limit" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

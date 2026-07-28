@@ -1143,6 +1143,7 @@ export const COMPUTE_MAP = {
   // spec-v293..v295 steel connection/detailing depth batch (3 tiles)
   "steel-web-local-strength": { module: "../../calc-steel.js", fn: "computeSteelWebLocalStrength" },
   "steel-bolt-slip-critical": { module: "../../calc-steel.js", fn: "computeSteelBoltSlipCritical" },
+  "slip-critical-with-tension": { module: "../../calc-steel.js", fn: "computeSlipCriticalWithTension" },
   "steel-fillet-weld-size": { module: "../../calc-steel.js", fn: "computeSteelFilletWeldSize" },
   // spec-v296..v298 ASCE 7 wind-and-snow load depth batch (3 tiles)
   "wind-cc-pressure": { module: "../../calc-construction.js", fn: "computeWindCcPressure" },

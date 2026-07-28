@@ -1256,3 +1256,63 @@ STEEL_RENDERERS["steel-panel-zone-axial"] = _simpleRenderer({
   ],
   compute: computeSteelPanelZoneAxial,
 });
+
+// --- spec-v1112 E: Slip-critical bolt with applied tension (AISC 360 J3.9) ---
+// steel-bolt-slip-critical's own note says "the tension-slip interaction (J3.9) ... are separate."
+// Applied tension relieves part of the clamping force that makes a slip-critical joint work, so the
+// slip resistance is multiplied by ksc = 1 - Tu/(Du Tb nb) (Eq. J3-5a, LRFD). The unreduced Rn is
+// obtained by CALLING the landed computeSteelBoltSlipCritical so the two tiles cannot drift.
+// dims: in { mu: dimensionless, tb_kip: M L T^-2, ns: dimensionless, n: dimensionless, hf: dimensionless, du: dimensionless, applied_tension_kip: M L T^-2 } out: { ksc: dimensionless, reduced_rn_bolt_kip: M L T^-2, lrfd_total_kip: M L T^-2, asd_total_kip: M L T^-2 }
+export function computeSlipCriticalWithTension({ mu = 0.30, tb_kip = 0, ns = 1, n = 1, hf = 1.0, du = 1.13, applied_tension_kip = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const tu = Number(applied_tension_kip);
+  if (!Number.isFinite(tu) || tu < 0) return { error: "Applied tension cannot be negative (kip); enter 0 for shear alone." };
+  const base = computeSteelBoltSlipCritical({ mu, tb_kip, ns, n, hf, du });
+  if (base.error) return { error: base.error };
+  const nb = Number(n);
+  const tb = Number(tb_kip);
+  const duv = Number(du);
+  const clamp_total_kip = duv * tb * nb;
+  const ksc_raw = 1 - tu / clamp_total_kip;
+  const ksc = Math.max(0, ksc_raw);
+  const fully_relieved = ksc_raw <= 0;
+  const reduced_rn_bolt_kip = base.rn_bolt_kip * ksc;
+  const lrfd_bolt_kip = 1.0 * reduced_rn_bolt_kip;
+  const asd_bolt_kip = reduced_rn_bolt_kip / 1.5;
+  const lrfd_total_kip = nb * lrfd_bolt_kip;
+  const asd_total_kip = nb * asd_bolt_kip;
+  const unreduced_lrfd_total_kip = base.lrfd_total_kip;
+  const loss_pct = (1 - ksc) * 100;
+  if (![ksc, reduced_rn_bolt_kip, lrfd_total_kip].every(Number.isFinite)) return { error: "Slip-tension interaction math did not produce a finite value." };
+  return {
+    unreduced_rn_bolt_kip: base.rn_bolt_kip, clamp_total_kip, ksc, fully_relieved,
+    reduced_rn_bolt_kip, lrfd_bolt_kip, asd_bolt_kip, lrfd_total_kip, asd_total_kip,
+    unreduced_lrfd_total_kip, loss_pct,
+    note: (fully_relieved
+      ? "THE TENSION HAS CONSUMED THE ENTIRE CLAMPING FORCE: at " + tu + " kip against " + clamp_total_kip.toFixed(1) + " kip of mean pretension, ksc falls to zero and the joint has NO slip resistance left. It is no longer a slip-critical connection in any meaningful sense - the bolts may still be intact, but the faying surfaces are free to move. "
+      : "Applied tension relieves part of the clamping force that makes a slip-critical joint work, so the slip resistance drops by the factor ksc = 1 - Tu/(Du Tb nb) - " + loss_pct.toFixed(1) + "% here. ")
+      + "Note the denominator uses Du Tb, the MEAN installed pretension, not the specified minimum: the reduction is measured against the pretension actually present, which is why Du appears here as well as in the base resistance. This is the SLIP check only. The bolts must ALSO pass strength-level shear and bearing (bolt-shear-bearing) and the J3.7 combined tension-shear rupture check (steel-bolt-tension-shear) - a joint can pass all three or fail any one of them independently, and slip is a serviceability limit while rupture is not. Prying action increases the tension the bolts actually see beyond the applied load; it is not modeled here and matters most on thin end plates and tees. Standard holes assumed, as in the base resistance. AISC 360 and the engineer of record govern.",
+  };
+}
+export const slipCriticalWithTensionExample = { inputs: { mu: 0.30, tb_kip: 28, ns: 1, n: 4, hf: 1.0, du: 1.13, applied_tension_kip: 30 } };
+STEEL_RENDERERS["slip-critical-with-tension"] = _simpleRenderer({
+  citation: "Citation: AISC 360 Section J3.9, slip-critical connections subject to combined tension and shear. The slip resistance is multiplied by ksc = 1 - Tu/(Du Tb nb) (Eq. J3-5a, LRFD), where Du = 1.13 is the mean-to-specified pretension multiplier, Tb is the Table J3.1 minimum pretension, and nb is the number of bolts carrying the applied tension. The unreduced resistance Rn = mu Du hf Tb ns comes from this catalog's landed slip-critical tile rather than being recomputed. Slip is a SERVICEABILITY limit: the strength-level shear and bearing check and the J3.7 combined tension-shear rupture check are separate and must also pass. Prying action is not modeled. Standard holes. AISC 360 and the engineer of record govern.",
+  example: slipCriticalWithTensionExample.inputs,
+  fields: [
+    { key: "mu", label: "Slip coefficient mu (0.30 A / 0.50 B)", kind: "number", default: 0.30 },
+    { key: "tb_kip", label: "Minimum pretension Tb (kip, Table J3.1)", kind: "number" },
+    { key: "applied_tension_kip", label: "Applied tension on the connection Tu (kip)", kind: "number" },
+    { key: "n", label: "Number of bolts", kind: "number", attrs: { step: "1", min: "1" }, default: 1 },
+    { key: "ns", label: "Slip planes ns (1 single, 2 double)", kind: "number", attrs: { step: "1", min: "1" }, default: 1 },
+    { key: "hf", label: "Filler factor hf", kind: "number", default: 1.0 },
+    { key: "du", label: "Du multiplier", kind: "number", default: 1.13 },
+  ],
+  outputs: [
+    { key: "k", id: "scwt-out-k", label: "Tension reduction factor ksc", value: (r) => fmt(r.ksc, 4) + " (" + fmt(r.loss_pct, 1) + "% of the slip resistance lost)" + (r.fully_relieved ? " - NO slip resistance remains" : "") },
+    { key: "b", id: "scwt-out-b", label: "Reduced resistance per bolt", value: (r) => fmt(r.reduced_rn_bolt_kip, 3) + " kip nominal (from " + fmt(r.unreduced_rn_bolt_kip, 3) + " unreduced)" },
+    { key: "t", id: "scwt-out-t", label: "Connection total", value: (r) => fmt(r.lrfd_total_kip, 2) + " kip LRFD / " + fmt(r.asd_total_kip, 2) + " kip ASD (unreduced LRFD was " + fmt(r.unreduced_lrfd_total_kip, 2) + ")" },
+    { key: "c", id: "scwt-out-c", label: "Total clamping force Du x Tb x nb", value: (r) => fmt(r.clamp_total_kip, 1) + " kip" },
+    { key: "n", id: "scwt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSlipCriticalWithTension,
+});

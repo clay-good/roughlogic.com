@@ -91337,6 +91337,36 @@
       "kind": "industry"
     },
     {
+      "term": "slip critical bolt with tension",
+      "target": "slip-critical-with-tension",
+      "kind": "industry"
+    },
+    {
+      "term": "ksc reduction factor",
+      "target": "slip-critical-with-tension",
+      "kind": "redirect"
+    },
+    {
+      "term": "does tension reduce slip resistance",
+      "target": "slip-critical-with-tension",
+      "kind": "question"
+    },
+    {
+      "term": "aisc j3.9 combined tension and shear slip",
+      "target": "slip-critical-with-tension",
+      "kind": "redirect"
+    },
+    {
+      "term": "hanger load on a slip critical connection",
+      "target": "slip-critical-with-tension",
+      "kind": "question"
+    },
+    {
+      "term": "pretension relieved by applied tension",
+      "target": "slip-critical-with-tension",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"
