@@ -2342,6 +2342,7 @@ cross-check.
 | calc-hvacservice.js | `computeCoAirFree` | `{ measured_co_ppm = 0, measured_o2_pct = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeCombustionLambda` | `{ fuel = "natural_gas", flue_o2_pct = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeCondensateDrain` | `{ tons = 0, pints_per_ton_hr = 3, run_ft = 0, slope_in_per_ft = 0.125 } = {}` | _ | _ | _ |
+| calc-hvacservice.js | `computeCondensateOverflowPan` | `{ unit_width_in = 0, unit_length_in = 0, pan_width_in = 0, pan_length_in = 0,...` | _ | _ | _ |
 | calc-hvacservice.js | `computeCondensateTrapDepth` | `{ configuration = "draw-through", static_pressure_in_wc = 0, pipe_diameter_in...` | _ | _ | _ |
 | calc-hvacservice.js | `computeCondensingFlueCondensate` | `{ input_btu_hr = 100000, water_lb_per_therm = 9.4, condensing_fraction = 0.85...` | _ | _ | _ |
 | calc-hvacservice.js | `computeDraftHoodDilution` | `{ appliance_o2_pct = 0, diluted_o2_pct = 0 } = {}` | _ | _ | _ |
@@ -3188,7 +3189,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1774.
+Row count: 1775.
 
 <!-- END function-corpus-v14 -->
 
@@ -3604,7 +3605,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (146 tiles)
+### Group C HVAC (147 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3647,6 +3648,7 @@ per spec-v14 §13.1 second paragraph.
 | `compressor-short-cycle` | Compressor Short-Cycle Protection | Copeland / ASHRAE; N = 6*4*0.5*0.5 = 6 cph; on = 0.5*60/6 = 5 min < 10 min o... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compressor-volumetric-efficiency` | Compressor Volumetric Efficiency (Clearance Re-Expansion) | Reciprocating compressor clearance vo...; ratio = 300/70 = 4.286; VE = 100*(1+0.045-0.045*4.286^(1/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `condensate-drain` | Condensate Rate and Drain Size | IMC 307.2.2 (drain size by capacity) ...; spec-v102 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `condensate-overflow-pan` | Auxiliary Condensate Drain Pan (IRC M1411.3.1) | International Code Council; 'The pan shall have a minimum depth of 1.5 inches, shall ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `condensate-trap-depth` | Condensate Drain Trap Depth from Fan Static | Trane condensate-trapping bulletin; 2.0 in w.c. worst-case negative static, 1-in drain, 0.5-i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `condenser-cop-for-heat-rejection` | COP Implied by the Heat of Rejection | THR = Q_evap (1 + 1/COP), solved for COP; spec-v761 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `condenser-heat-rejection` | Condenser Total Heat of Rejection | Total heat of rejection THR = Q_evap ...; spec-v322 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4901,6 +4903,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1527. Fixture-covered or reference-cadence: 1527 / 1527.
+Tile count: 1528. Fixture-covered or reference-cadence: 1528 / 1528.
 
 <!-- END tile-index-v14 -->

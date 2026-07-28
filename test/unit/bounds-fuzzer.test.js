@@ -32707,3 +32707,53 @@ test("bounds: spec-v1143 computeExtinguisherCoverage pins the 2d^2 identity agai
   assert.ok("error" in _v1143({ ...base, travel_distance_ft: -1 }));
   assert.ok("error" in _v1143({ ...base, floor_area_sf: Infinity }));
 });
+
+import { computeCondensateOverflowPan as _v1144 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v1144 computeCondensateOverflowPan pins the overall-not-per-side margin, the depth minimum, method handling, and error seams", () => {
+  const base = { unit_width_in: 21, unit_length_in: 45, pan_width_in: 24, pan_length_in: 48, pan_depth_in: 1.5, method: "pan-with-drain" };
+  const r = _v1144(base);
+  assert.ok(r.needs_pan && r.required_width_in === 24 && r.required_length_in === 48 && r.passes);
+  assert.ok(r.misread_width_in === 27 && r.misread_length_in === 51 && !r.oversized);
+  assert.ok(r.pan_area_sf === 8 && r.width_deficit_in === 0 && r.depth_deficit_in === 0);
+  // THE MARGIN is on the overall dimension, and the misread figure is always +6.
+  for (const w of [12, 21, 30]) {
+    for (const l of [24, 45, 60]) {
+      const t = _v1144({ ...base, unit_width_in: w, unit_length_in: l, pan_width_in: w + 3, pan_length_in: l + 3 });
+      assert.ok(t.required_width_in === w + 3 && t.required_length_in === l + 3 && t.passes);
+      assert.ok(t.misread_width_in === w + 6 && t.misread_length_in === l + 6);
+      // Exactly at the minimum passes; a tenth under does not.
+      assert.ok(!_v1144({ ...base, unit_width_in: w, unit_length_in: l, pan_width_in: w + 2.9, pan_length_in: l + 3 }).width_ok);
+      assert.ok(!_v1144({ ...base, unit_width_in: w, unit_length_in: l, pan_width_in: w + 3, pan_length_in: l + 2.9 }).length_ok);
+    }
+  }
+  // Depth is independent of the footprint, and its seam is exact.
+  assert.ok(_v1144({ ...base, pan_depth_in: 1.5 }).depth_ok && !_v1144({ ...base, pan_depth_in: 1.4 }).depth_ok);
+  assert.ok(!_v1144({ ...base, pan_depth_in: 1 }).passes && _v1144({ ...base, pan_depth_in: 1 }).width_ok);
+  // Deficits are exact and never negative.
+  for (const pw of [18, 22, 24, 40]) {
+    const t = _v1144({ ...base, pan_width_in: pw });
+    assert.ok(t.width_deficit_in === Math.max(0, 24 - pw) && t.width_deficit_in >= 0);
+    assert.ok(t.passes === (pw >= 24));
+  }
+  // A pan sized by the per-side misreading is flagged as oversized but still compliant.
+  const big = _v1144({ ...base, pan_width_in: 27, pan_length_in: 51 });
+  assert.ok(big.passes && big.oversized);
+  assert.ok(!_v1144({ ...base, pan_width_in: 27, pan_length_in: 48 }).oversized, "both dimensions must be oversized");
+  // The two non-pan methods skip the dimension checks entirely and never fail on them.
+  for (const m of ["overflow-line", "device-only"]) {
+    const t = _v1144({ unit_width_in: 0, unit_length_in: 0, pan_width_in: 0, pan_length_in: 0, pan_depth_in: 0, method: m });
+    assert.ok(!t.needs_pan && t.passes && t.required_width_in === null && t.width_ok === null);
+    assert.ok(t.pan_area_sf === null && t.width_deficit_in === 0);
+  }
+  // The pan-with-device method DOES need a pan.
+  assert.ok(_v1144({ ...base, method: "pan-with-device" }).needs_pan);
+  assert.ok("error" in _v1144({ ...base, method: "pan-with-device", pan_depth_in: 0 }));
+  // Error seams.
+  assert.ok("error" in _v1144({ ...base, method: "nope" }));
+  assert.ok("error" in _v1144({ ...base, unit_width_in: 0 }));
+  assert.ok("error" in _v1144({ ...base, unit_length_in: 0 }));
+  assert.ok("error" in _v1144({ ...base, pan_width_in: 0 }));
+  assert.ok("error" in _v1144({ ...base, pan_depth_in: 0 }));
+  assert.ok("error" in _v1144({ ...base, unit_width_in: Infinity }));
+});

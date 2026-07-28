@@ -1202,3 +1202,89 @@ HVACSERVICE_RENDERERS["condensate-trap-depth"] = _simpleRenderer({
   ],
   compute: computeCondensateTrapDepth,
 });
+
+// --- spec-v1144: auxiliary condensate drain pan (IRC M1411.3.1) ---
+// condensate-drain sizes the primary line. This is the overflow protection that has to sit
+// behind it, and it turns on one sentence people misread: the auxiliary pan shall be not
+// less than 3 in larger than the unit or coil dimensions in WIDTH AND LENGTH. That is 3 in
+// on the overall dimension, not 3 in of clearance on each side - so a 21 in wide air
+// handler wants a 24 in pan, not a 27 in one. Getting it wrong the generous way wastes
+// money and attic room; getting it wrong the other way fails inspection. Plus a 1.5 in
+// minimum depth, and a choice among the four methods the section allows.
+// dims: in { unit_width_in: L, unit_length_in: L, pan_width_in: L, pan_length_in: L, pan_depth_in: L, method: dimensionless } out: { required_width_in: L, required_length_in: L, width_deficit_in: L, length_deficit_in: L, depth_deficit_in: L, pan_area_sf: L^2 }
+export function computeCondensateOverflowPan({ unit_width_in = 0, unit_length_in = 0, pan_width_in = 0, pan_length_in = 0, pan_depth_in = 0, method = "pan-with-drain" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const uw = Number(unit_width_in) || 0;
+  const ul = Number(unit_length_in) || 0;
+  const pw = Number(pan_width_in) || 0;
+  const pl = Number(pan_length_in) || 0;
+  const pd = Number(pan_depth_in) || 0;
+  const METHODS = {
+    "pan-with-drain": "an auxiliary drain pan with a SEPARATE drain, discharging to a conspicuous point of disposal",
+    "overflow-line": "a separate OVERFLOW DRAIN LINE connected to the equipment drain pan above the primary connection, discharging to a conspicuous point of disposal",
+    "pan-with-device": "an auxiliary drain pan WITHOUT a separate drain, with a water-level detection device that shuts the equipment off",
+    "device-only": "a water-level detection device conforming to UL 508 that shuts the equipment off, in the primary line, the overflow line, or the equipment pan",
+  };
+  const method_text = METHODS[method];
+  if (!method_text) return { error: "Method must be pan-with-drain, overflow-line, pan-with-device, or device-only." };
+  const needs_pan = method === "pan-with-drain" || method === "pan-with-device";
+  if (needs_pan) {
+    if (!(uw > 0) || !(ul > 0)) return { error: "Unit or coil width and length must be positive (in) for a pan method." };
+    if (!(pw > 0) || !(pl > 0)) return { error: "Pan width and length must be positive (in) for a pan method." };
+    if (!(pd > 0)) return { error: "Pan depth must be positive (in) for a pan method." };
+  }
+
+  const MARGIN = 3, MIN_DEPTH = 1.5;
+  const required_width_in = needs_pan ? uw + MARGIN : null;
+  const required_length_in = needs_pan ? ul + MARGIN : null;
+  const width_ok = needs_pan ? pw >= required_width_in : null;
+  const length_ok = needs_pan ? pl >= required_length_in : null;
+  const depth_ok = needs_pan ? pd >= MIN_DEPTH : null;
+  const width_deficit_in = needs_pan ? Math.max(0, required_width_in - pw) : 0;
+  const length_deficit_in = needs_pan ? Math.max(0, required_length_in - pl) : 0;
+  const depth_deficit_in = needs_pan ? Math.max(0, MIN_DEPTH - pd) : 0;
+  const pan_area_sf = needs_pan ? (pw * pl) / 144 : null;
+  // What the common misreading would have you buy.
+  const misread_width_in = needs_pan ? uw + 2 * MARGIN : null;
+  const misread_length_in = needs_pan ? ul + 2 * MARGIN : null;
+  const oversized = needs_pan ? pw >= misread_width_in && pl >= misread_length_in : false;
+  const passes = needs_pan ? (width_ok && length_ok && depth_ok) : true;
+
+  const note = "METHOD: " + method_text + ". IRC M1411.3.1 allows four, and only two of them involve an auxiliary pan at all - the other two rely on an overflow line or a shutoff device, which is often the practical answer in a tight attic. "
+    + (needs_pan
+      ? "PAN SIZE, and the sentence people misread: not less than 3 in larger than the unit or coil dimensions in WIDTH AND LENGTH. That is 3 in on the overall dimension, NOT 3 in of clearance per side. A " + uw + " in unit wants a " + required_width_in + " in pan, not " + misread_width_in + ". "
+        + "This pan is " + pw + " x " + pl + " in against " + required_width_in + " x " + required_length_in + " required: width " + (width_ok ? "OK" : "SHORT by " + width_deficit_in.toFixed(1) + " in") + ", length " + (length_ok ? "OK" : "SHORT by " + length_deficit_in.toFixed(1) + " in") + ". "
+        + "Depth " + pd + " in against the 1.5 in minimum: " + (depth_ok ? "OK. " : "SHORT by " + depth_deficit_in.toFixed(1) + " in. ")
+        + (oversized ? "Note that this pan is at least as big as the per-side misreading would demand - fine for compliance, but if it was sized that way it is bigger and pricier than the code asks, and in an attic that space is not free. " : "")
+        + (method === "pan-with-drain" ? "With a separate drain, that drain must discharge to a CONSPICUOUS point of disposal - the point is that a homeowner sees water somewhere odd and calls before the ceiling comes down. A secondary drain routed quietly into the same place as the primary defeats the entire method. " : "With no separate pan drain, the water-level detection device is what makes this method work, and it has to actually shut the equipment off rather than merely alarm. ")
+      : "This method uses no auxiliary pan, so the pan dimensions are not checked. "
+        + (method === "overflow-line" ? "The overflow line connects to the equipment drain pan at a HIGHER level than the primary connection - connect it level with or below the primary and it drains continuously instead of signalling a blockage - and it too must discharge to a conspicuous point of disposal. " : "A device-only method puts a UL 508 water-level detection device in the primary line, the overflow line, or the equipment pan, above the primary connection and below the pan's overflow rim. Position is the whole design: too low and it trips on normal operation, too high and the pan overflows before it acts. "))
+    + "WHEN ANY OF THIS IS REQUIRED is the prior question this tile does not answer: the section applies where damage may occur from condensate overflow, which in practice means equipment above a finished space - an attic air handler over a bedroom ceiling is the classic case, and a unit in a slab-on-grade garage generally is not. "
+    + (passes ? "The dimensions entered PASS. " : "The dimensions entered DO NOT pass. ")
+    + "Not checked: the primary drain size and slope, which the condensate-drain tile covers; the material and support of either line; trap requirements and the trap depth, which has its own tile; where the discharge may legally terminate; the pan's own material and corrosion resistance; whether the pan needs to catch a leaking humidifier or water heater rather than a coil; or the UL 508 listing of a specific device. A screen; the adopted code, the equipment listing, and the AHJ govern.";
+
+  return { method_text, needs_pan, required_width_in, required_length_in, width_ok, length_ok, depth_ok, width_deficit_in, length_deficit_in, depth_deficit_in, pan_area_sf, misread_width_in, misread_length_in, oversized, passes, note };
+}
+
+export const condensateOverflowPanExample = { inputs: { unit_width_in: 21, unit_length_in: 45, pan_width_in: 24, pan_length_in: 48, pan_depth_in: 1.5, method: "pan-with-drain" } };
+
+HVACSERVICE_RENDERERS["condensate-overflow-pan"] = _simpleRenderer({
+  citation: "Citation: IRC M1411.3.1 auxiliary and secondary drain systems - where damage may occur from condensate overflow, one of four methods is required: an auxiliary drain pan with a separate drain discharging to a conspicuous point of disposal; a separate overflow drain line connected to the equipment drain pan at a higher level than the primary connection and discharging to a conspicuous point of disposal; an auxiliary drain pan without a separate drain served by a water-level detection device that shuts off the equipment; or a water-level detection device conforming to UL 508 installed in the primary drain line, the overflow drain line, or the equipment-supplied drain pan, above the primary connection and below the overflow rim. An auxiliary pan shall have a minimum depth of 1.5 in and be not less than 3 in larger than the unit or coil dimensions in width and length - 3 in on the overall dimension, not per side. Whether the section applies at all, the primary drain size and slope, trap requirements, discharge termination, pan material, and device listings are not checked. A screen; the adopted code, the equipment listing, and the AHJ govern.",
+  example: condensateOverflowPanExample.inputs,
+  fields: [
+    { key: "method", label: "Method (M1411.3.1)", kind: "select", options: [{ value: "pan-with-drain", label: "Auxiliary pan with a separate drain", selected: true }, { value: "overflow-line", label: "Separate overflow line off the equipment pan" }, { value: "pan-with-device", label: "Auxiliary pan, no drain, with a shutoff device" }, { value: "device-only", label: "Water-level detection device only" }] },
+    { key: "unit_width_in", label: "Unit or coil width (in)", kind: "number", default: 21 },
+    { key: "unit_length_in", label: "Unit or coil length (in)", kind: "number", default: 45 },
+    { key: "pan_width_in", label: "Pan width (in)", kind: "number", default: 24 },
+    { key: "pan_length_in", label: "Pan length (in)", kind: "number", default: 48 },
+    { key: "pan_depth_in", label: "Pan depth (in)", kind: "number", default: 1.5 },
+  ],
+  outputs: [
+    { key: "m", id: "cop-out-m", label: "Method", value: (r) => r.needs_pan ? "uses an auxiliary pan" : "no auxiliary pan - dimensions not checked" },
+    { key: "r", id: "cop-out-r", label: "Required pan size", value: (r) => r.needs_pan ? fmt(r.required_width_in, 1) + " x " + fmt(r.required_length_in, 1) + " in (3 in on the OVERALL dimension, not per side)" : "-" },
+    { key: "v", id: "cop-out-v", label: "Verdict", value: (r) => !r.needs_pan ? "no pan dimensions to check" : r.passes ? "PASSES" : "FAILS: " + [!r.width_ok ? "width short " + fmt(r.width_deficit_in, 1) : null, !r.length_ok ? "length short " + fmt(r.length_deficit_in, 1) : null, !r.depth_ok ? "depth short " + fmt(r.depth_deficit_in, 1) : null].filter(Boolean).join(", ") + " in" },
+    { key: "o", id: "cop-out-o", label: "The per-side misreading would demand", value: (r) => r.needs_pan ? fmt(r.misread_width_in, 1) + " x " + fmt(r.misread_length_in, 1) + " in" + (r.oversized ? " - this pan is that big or bigger" : "") : "-" },
+    { key: "n", id: "cop-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCondensateOverflowPan,
+});

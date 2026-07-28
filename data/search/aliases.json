@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "auxiliary drain pan size",
+      "target": "condensate-overflow-pan",
+      "kind": "industry"
+    },
+    {
+      "term": "how big does a condensate drain pan need to be",
+      "target": "condensate-overflow-pan",
+      "kind": "question"
+    },
+    {
+      "term": "secondary condensate drain pan 3 inches larger",
+      "target": "condensate-overflow-pan",
+      "kind": "question"
+    },
+    {
+      "term": "float switch instead of a drain pan",
+      "target": "condensate-overflow-pan",
+      "kind": "question"
+    },
+    {
+      "term": "attic air handler overflow pan",
+      "target": "condensate-overflow-pan",
+      "kind": "industry"
+    },
+    {
       "term": "fire extinguisher spacing",
       "target": "extinguisher-coverage",
       "kind": "industry"

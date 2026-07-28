@@ -12100,6 +12100,21 @@ export const CITATIONS = {
       { name: "Average maintained", value: "sizes the average level over the work plane, not a point value or uniformity; a photometric layout governs spacing", source: "IES lumen method" },
     ],
   },
+  "condensate-overflow-pan": {
+    formula: "required pan width = unit or coil width + 3 in; required pan length = unit or coil length + 3 in; minimum pan depth 1.5 in. The 3 in applies to the OVERALL dimension, not to each side, so the per-side misreading would demand width + 6 and length + 6.",
+    edition: "IRC M1411.3.1 auxiliary and secondary drain systems, with its four permitted methods and the auxiliary pan dimensions.",
+    freeAccess: "The pan dimensions and the four methods are short prescriptive provisions reproduced in state adoptions and inspection guidance. No table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "One sentence carries this tile: the auxiliary pan shall be not less than 3 in larger than the unit or coil dimensions in WIDTH AND LENGTH. That is 3 in on the overall dimension, not 3 in of clearance on each side, so a 21 in wide air handler wants a 24 in pan rather than a 27 in one. The misreading runs in the expensive direction - a bigger pan than the code asks for, in an attic where the space and the money are not free - and the tile prints what the per-side reading would have demanded so the difference is visible rather than argued about. The depth minimum is 1.5 in. Equally worth knowing is that only TWO of the section\'s four methods involve an auxiliary pan at all. The other two rely on a separate overflow drain line connected to the equipment pan ABOVE the primary connection - connect it level with or below and it drains continuously instead of signalling a blockage - or on a UL 508 water-level detection device that shuts the equipment off, positioned above the primary connection and below the pan\'s overflow rim, where too low trips on normal operation and too high lets the pan overflow before it acts. In a tight attic a device is frequently the practical answer, and a tile that only knew about pans would push people the wrong way. Where a separate pan drain IS used, it must discharge to a CONSPICUOUS point of disposal: the entire point is that an occupant sees water somewhere odd and calls, so a secondary drain routed quietly into the same place as the primary defeats the method while appearing to satisfy it. The prior question this does not answer is WHEN any of it is required - the section applies where damage may occur from condensate overflow, which in practice means equipment above a finished space. Not checked: the primary drain size and slope (the condensate-drain tile), material and support, trap requirements and depth (the condensate-trap-depth tile), where the discharge may legally terminate, pan material and corrosion resistance, whether the pan must also catch a humidifier or water heater, and the listing of any specific device. A screen; the adopted code, the equipment listing, and the AHJ govern.",
+    assumptions: [
+      { name: "Pan size", value: "unit or coil dimension + 3 in in width AND length - overall, not per side", source: "IRC M1411.3.1" },
+      { name: "Pan depth", value: "1.5 in minimum", source: "IRC M1411.3.1" },
+      { name: "Four methods", value: "only two use an auxiliary pan; the others use an overflow line or a shutoff device", source: "IRC M1411.3.1" },
+      { name: "Overflow line", value: "connects ABOVE the primary connection, discharging to a conspicuous point", source: "IRC M1411.3.1" },
+      { name: "Detection device", value: "UL 508, above the primary connection and below the overflow rim, shuts the equipment off", source: "IRC M1411.3.1" },
+      { name: "Applicability", value: "where damage may occur from overflow - the prior question, not checked here", source: "stated scope limit" },
+    ],
+  },
   "condensate-drain": {
     formula: "rate_gph = tons x pints_per_ton_hr / 8. Drain size by IMC 307.2.2 capacity steps (3/4 in to 20 tons, then 1, 1-1/4, 1-1/2, 2 in). fall = run x slope (>= 1/8 in/ft per 307.2.5).",
     edition: "IMC 307.2.2 (drain size by capacity) and 307.2.5 (slope) (by name).",

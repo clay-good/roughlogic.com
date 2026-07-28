@@ -1320,6 +1320,7 @@ export const COMPUTE_MAP = {
   "luminaire-spacing-mh-ratio": { module: "../../calc-elecdesign.js", fn: "computeLuminaireSpacingMh" },
   "condensate-trap-depth": { module: "../../calc-hvacservice.js", fn: "computeCondensateTrapDepth" },
   "condensate-drain": { module: "../../calc-hvacservice.js", fn: "computeCondensateDrain" },
+  "condensate-overflow-pan": { module: "../../calc-hvacservice.js", fn: "computeCondensateOverflowPan" },
   "recovery-cylinder": { module: "../../calc-hvacservice.js", fn: "computeRecoveryCylinder" },
   "hvac-equipment-circuit": { module: "../../calc-hvacservice.js", fn: "computeHvacEquipmentCircuit" },
   "run-capacitor-microfarad": { module: "../../calc-hvacservice.js", fn: "computeRunCapacitorMicrofarad" },
