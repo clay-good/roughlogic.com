@@ -12626,3 +12626,103 @@ CONSTRUCTION_RENDERERS["door-clear-width"] = _simpleRenderer({
   ],
   compute: computeDoorClearWidth,
 });
+
+// ===================== spec-v1169: changes in level and floor surfaces (2010 ADA Standards 302, 303) =====================
+
+// Three thresholds, and the last one is a cliff rather than a step.
+// Up to 1/4 in a change in level may be vertical - a square edge, no transition at all.
+// Between 1/4 and 1/2 in it must be beveled at a slope no steeper than 1:2, which means the
+// run has to be at least twice the rise; a transition strip cut at 1:1 looks beveled and is not.
+// Over 1/2 in it stops being a threshold detail and becomes a RAMP under 405 or 406 - which is
+// 1:12 at best, so a 5/8 in change needs 7.5 in of run instead of 1.25, and brings landings,
+// edge protection, and handrails with it. One sixteenth of an inch is the difference.
+// dims: in { level_change_in: L, bevel_run_in: L, carpet_pile_in: L, opening_size_in: L, ramp_run_per_rise: dimensionless } out: { required_bevel_run_in: L, bevel_run_deficit_in: L, ramp_run_required_in: L, vertical_allowance_in: L }
+export function computeFloorLevelChange({ level_change_in = 0, bevel_run_in = 0, carpet_pile_in = 0, opening_size_in = 0, opening_elongated = "no", opening_perpendicular = "yes", ramp_run_per_rise = 12 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const h = Number(level_change_in) || 0;
+  const run = Number(bevel_run_in) || 0;
+  const pile = Number(carpet_pile_in) || 0;
+  const open = Number(opening_size_in) || 0;
+  const rampRatio = Number(ramp_run_per_rise) || 0;
+  const elongated = opening_elongated === "yes";
+  const perpendicular = opening_perpendicular === "yes";
+  if (opening_elongated !== "yes" && opening_elongated !== "no") return { error: "State whether the opening is elongated (yes or no)." };
+  if (opening_perpendicular !== "yes" && opening_perpendicular !== "no") return { error: "State whether an elongated opening runs perpendicular to the dominant direction of travel (yes or no)." };
+  if (h < 0) return { error: "Change in level cannot be negative (in)." };
+  if (run < 0) return { error: "Bevel run cannot be negative (in)." };
+  if (pile < 0) return { error: "Carpet pile height cannot be negative (in)." };
+  if (open < 0) return { error: "Opening size cannot be negative (in)." };
+  if (!(rampRatio > 0)) return { error: "Ramp run per unit rise must be positive (12 for the 1:12 maximum)." };
+
+  const VERTICAL_MAX = 0.25, BEVEL_MAX = 0.5, BEVEL_SLOPE_RUN = 2;
+  const PILE_MAX = 0.5, SPHERE_MAX = 0.5;
+
+  let category, needs_bevel = false, needs_ramp = false;
+  if (h === 0) category = "no change in level";
+  else if (h <= VERTICAL_MAX) category = "vertical permitted";
+  else if (h <= BEVEL_MAX) { category = "must be beveled at 1:2 or flatter"; needs_bevel = true; }
+  else { category = "must be a ramp under 405 or 406"; needs_ramp = true; }
+
+  const required_bevel_run_in = needs_bevel ? h * BEVEL_SLOPE_RUN : null;
+  const bevel_run_deficit_in = needs_bevel ? Math.max(0, required_bevel_run_in - run) : null;
+  const bevel_slope_run_per_rise = needs_bevel && h > 0 ? run / h : null;
+  const bevel_ok = needs_bevel ? run >= required_bevel_run_in : null;
+
+  const ramp_run_required_in = needs_ramp ? h * rampRatio : null;
+  // What the same change would have cost had it landed a hair under the 1/2 in line.
+  const bevel_run_if_under_in = needs_ramp ? BEVEL_MAX * BEVEL_SLOPE_RUN : null;
+  const cliff_multiple = needs_ramp ? ramp_run_required_in / bevel_run_if_under_in : null;
+  const over_by_in = needs_ramp ? h - BEVEL_MAX : null;
+
+  const has_carpet = pile > 0;
+  const carpet_ok = has_carpet ? pile <= PILE_MAX : null;
+  const has_opening = open > 0;
+  const opening_size_ok = has_opening ? open <= SPHERE_MAX : null;
+  const opening_orientation_ok = has_opening && elongated ? perpendicular : null;
+  const opening_ok = has_opening ? (opening_size_ok && opening_orientation_ok !== false) : null;
+
+  const level_ok = needs_ramp ? false : needs_bevel ? bevel_ok : true;
+  const passes = level_ok && (carpet_ok !== false) && (opening_ok !== false);
+
+  const note = "THREE THRESHOLDS, AND THE LAST ONE IS A CLIFF. Up to 1/4 in a change in level may be VERTICAL - a square edge, no transition at all. Between 1/4 and 1/2 in it must be BEVELED at a slope no steeper than 1:2. Over 1/2 in it stops being a threshold detail and becomes a RAMP under 405 or 406. "
+    + "This change is " + h + " in: " + category + ". "
+    + (needs_bevel
+      ? "A 1:2 bevel means the run must be at least TWICE the rise, so " + h + " in needs " + required_bevel_run_in.toFixed(3) + " in of run. This one has " + run + " in, a slope of 1:" + bevel_slope_run_per_rise.toFixed(2) + " - " + (bevel_ok ? "flat enough. " : "TOO STEEP, short by " + bevel_run_deficit_in.toFixed(3) + " in of run. A transition strip cut at 1:1 looks beveled and is not; the test is the run, not the appearance. ")
+      : "")
+    + (needs_ramp
+      ? "OVER THE LINE BY " + over_by_in.toFixed(3) + " IN, and that is the expensive sixteenth. At 1:" + rampRatio + " this change needs " + ramp_run_required_in.toFixed(2) + " in of run, against the " + bevel_run_if_under_in.toFixed(2) + " in a 1/2 in change would have needed as a bevel - " + cliff_multiple.toFixed(1) + " times as much. And the run is the small part: a ramp under 405 brings landings top and bottom, edge protection, and handrails on both sides where the rise exceeds 6 in, none of which a bevel needs. Taking the change down to 1/2 in is almost always cheaper than ramping it. "
+      : "")
+    + (h > 0 && h <= VERTICAL_MAX ? "No transition is required at this height, though a vertical edge is still an edge; the standard permits it rather than recommending it. " : "")
+    + (has_carpet ? "CARPET (302.2): pile height 1/2 in maximum, on a level loop, textured loop, level cut pile, or level cut/uncut pile texture, with exposed edges fastened and trimmed. This pile is " + pile + " in: " + (carpet_ok ? "OK. " : "OVER by " + (pile - PILE_MAX).toFixed(3) + " in - and a thick pad under a compliant carpet defeats it just as surely, because the standard is about what the wheel sinks into. ") : "")
+    + (has_opening ? "OPENINGS (302.3): must not allow passage of a sphere more than 1/2 in in diameter, and elongated openings must be placed so the long dimension runs PERPENDICULAR to the dominant direction of travel. This opening is " + open + " in: " + (opening_size_ok ? "within the sphere limit" : "TOO LARGE") + (elongated ? ", elongated and " + (perpendicular ? "correctly oriented. " : "running WITH travel rather than across it, which is the orientation that catches a caster or a cane tip. ") : ". ") : "")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: whether the surface is stable, firm, and slip resistant, which 302.1 requires and no dimension captures; the ramp itself where one is required - slope, rise per run, landings, edge protection, handrails, and cross slope are 405 and a separate tile; door thresholds, which have their own 1/2 in rule and their own bevel exception at 404.2.5; grating placement relative to a curb ramp or a crossing; carpet padding and its effect underfoot; the accessible route this surface sits on; and state and local accessibility law. A surface screen, not a floor detail; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { category, needs_bevel, needs_ramp, required_bevel_run_in, bevel_run_deficit_in, bevel_slope_run_per_rise, bevel_ok, ramp_run_required_in, bevel_run_if_under_in, cliff_multiple, over_by_in, has_carpet, carpet_ok, has_opening, opening_size_ok, opening_orientation_ok, opening_ok, level_ok, vertical_allowance_in: VERTICAL_MAX, passes, note };
+}
+
+export const floorLevelChangeExample = { inputs: { level_change_in: 0.5, bevel_run_in: 0.5, carpet_pile_in: 0, opening_size_in: 0, opening_elongated: "no", opening_perpendicular: "yes", ramp_run_per_rise: 12 } };
+
+CONSTRUCTION_RENDERERS["floor-level-change"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 302.2 (Carpet), 302.3 (Openings), 303.2 (Vertical), 303.3 (Beveled), and 303.4 (Ramps). A US federal standard in the public domain. 303.2: changes in level of 1/4 in high maximum shall be permitted to be vertical. 303.3: changes in level between 1/4 in high minimum and 1/2 in high maximum shall be beveled with a slope not steeper than 1:2. 303.4: changes in level greater than 1/2 in high shall be ramped, and shall comply with 405 or 406. 302.2: carpet or carpet tile shall be securely attached, have a firm cushion, pad, or backing or no cushion or pad, have a level loop, textured loop, level cut pile, or level cut/uncut pile texture, and a pile height of 1/2 in maximum, with exposed edges fastened and trim complying with 303. 302.3: openings in floor or ground surfaces shall not allow passage of a sphere more than 1/2 in diameter, and elongated openings shall be placed so that the long dimension is perpendicular to the dominant direction of travel. Not checked: whether the surface is stable, firm, and slip resistant under 302.1; the ramp itself where one is required, which is 405 and a separate tile; door thresholds, which have their own rule at 404.2.5; grating placement at curb ramps and crossings; carpet padding; or state and local law. A surface screen, not a floor detail.",
+  example: floorLevelChangeExample.inputs,
+  fields: [
+    { key: "level_change_in", label: "Change in level (in)", kind: "number", default: 0.5 },
+    { key: "bevel_run_in", label: "Horizontal run of the transition provided (in)", kind: "number", default: 0.5 },
+    { key: "ramp_run_per_rise", label: "Ramp run per unit rise, where a ramp is required (12 = 1:12)", kind: "number", default: 12 },
+    { key: "carpet_pile_in", label: "Carpet pile height (in; 0 = no carpet)", kind: "number", default: 0 },
+    { key: "opening_size_in", label: "Largest opening in the surface (in; 0 = none)", kind: "number", default: 0 },
+    { key: "opening_elongated", label: "Is the opening elongated?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+    { key: "opening_perpendicular", label: "If elongated, does the long dimension run across the direction of travel?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
+  ],
+  outputs: [
+    { key: "c", id: "flc-out-c", label: "Which rule applies", value: (r) => r.category },
+    { key: "b", id: "flc-out-b", label: "Bevel", value: (r) => !r.needs_bevel ? "not required at this height" : "needs " + fmt(r.required_bevel_run_in, 3) + " in of run for 1:2; provided slope is 1:" + fmt(r.bevel_slope_run_per_rise, 2) + " - " + (r.bevel_ok ? "OK" : "short by " + fmt(r.bevel_run_deficit_in, 3) + " in") },
+    { key: "r", id: "flc-out-r", label: "If it must be ramped", value: (r) => !r.needs_ramp ? "not required" : fmt(r.ramp_run_required_in, 2) + " in of run against " + fmt(r.bevel_run_if_under_in, 2) + " in for a 1/2 in bevel - " + fmt(r.cliff_multiple, 1) + "x, plus landings, edge protection, and handrails" },
+    { key: "p", id: "flc-out-p", label: "Carpet", value: (r) => r.carpet_ok === null ? "none entered" : r.carpet_ok ? "pile within the 1/2 in maximum" : "pile over the 1/2 in maximum" },
+    { key: "o", id: "flc-out-o", label: "Openings", value: (r) => r.opening_ok === null ? "none entered" : r.opening_ok ? "within the 1/2 in sphere and correctly oriented" : [r.opening_size_ok ? null : "passes a sphere over 1/2 in", r.opening_orientation_ok === false ? "elongated the wrong way" : null].filter(Boolean).join(", ") },
+    { key: "v", id: "flc-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "flc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFloorLevelChange,
+});

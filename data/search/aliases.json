@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "ada threshold height transition",
+      "target": "floor-level-change",
+      "kind": "industry"
+    },
+    {
+      "term": "how big a floor height change needs a ramp",
+      "target": "floor-level-change",
+      "kind": "question"
+    },
+    {
+      "term": "1 to 2 bevel transition strip",
+      "target": "floor-level-change",
+      "kind": "industry"
+    },
+    {
+      "term": "maximum carpet pile height accessible",
+      "target": "floor-level-change",
+      "kind": "question"
+    },
+    {
       "term": "staggered bolt hole net area",
       "target": "staggered-net-width",
       "kind": "industry"

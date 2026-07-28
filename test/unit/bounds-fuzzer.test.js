@@ -34198,3 +34198,79 @@ test("bounds: spec-v1168 computeStaggeredNetWidth pins the s^2/4g credit, the go
   assert.ok(!("error" in _v1168({ ...base, plate_width_in: 2 })), "a thin but positive remainder is arithmetic, not an error");
   assert.ok("error" in _v1168({ ...base, plate_width_in: Infinity }));
 });
+
+import { computeFloorLevelChange as _v1169 } from "../../calc-construction.js";
+
+test("bounds: spec-v1169 computeFloorLevelChange pins the three thresholds, the 1:2 arithmetic, the ramp cliff, carpet and openings, and error seams", () => {
+  const base = { level_change_in: 0.5, bevel_run_in: 0.5, carpet_pile_in: 0, opening_size_in: 0, opening_elongated: "no", opening_perpendicular: "yes", ramp_run_per_rise: 12 };
+  const r = _v1169(base);
+  assert.ok(r.needs_bevel && r.required_bevel_run_in === 1 && r.bevel_run_deficit_in === 0.5);
+  assert.ok(r.bevel_slope_run_per_rise === 1 && !r.bevel_ok && !r.passes && r.vertical_allowance_in === 0.25);
+  // THE THREE BANDS, with both seams on the correct side.
+  for (const [h, vert, bev, ramp] of [[0, false, false, false], [0.125, true, false, false], [0.25, true, false, false],
+    [0.2501, false, true, false], [0.375, false, true, false], [0.5, false, true, false], [0.5001, false, false, true], [2, false, false, true]]) {
+    const t = _v1169({ ...base, level_change_in: h, bevel_run_in: 99 });
+    assert.ok(t.needs_bevel === bev && t.needs_ramp === ramp, "band wrong at " + h);
+    if (vert || h === 0) assert.ok(t.level_ok && !t.needs_bevel && !t.needs_ramp, "vertical is permitted at " + h);
+    if (ramp) assert.ok(!t.level_ok && !t.passes, "a ramp case never passes as a threshold detail");
+  }
+  // A 1/4 in change needs no transition at all, even with zero run.
+  assert.ok(_v1169({ ...base, level_change_in: 0.25, bevel_run_in: 0 }).passes);
+  assert.ok(!_v1169({ ...base, level_change_in: 0.26, bevel_run_in: 0 }).passes);
+  // 1:2 MEANS TWICE THE RISE, at every height in the band.
+  for (const h of [0.26, 0.3125, 0.375, 0.4375, 0.5]) {
+    const t = _v1169({ ...base, level_change_in: h, bevel_run_in: 2 * h });
+    assert.ok(Math.abs(t.required_bevel_run_in - 2 * h) < 1e-12, "required run wrong at " + h);
+    assert.ok(t.bevel_ok && t.bevel_run_deficit_in === 0 && Math.abs(t.bevel_slope_run_per_rise - 2) < 1e-12);
+    assert.ok(!_v1169({ ...base, level_change_in: h, bevel_run_in: 2 * h - 0.01 }).bevel_ok, "a hundredth short must fail at " + h);
+    assert.ok(_v1169({ ...base, level_change_in: h, bevel_run_in: 4 * h }).bevel_ok, "flatter than 1:2 passes at " + h);
+  }
+  // Outside the bevel band the bevel outputs are null rather than numbers nobody must meet.
+  for (const h of [0.125, 0.25, 0.75]) {
+    const t = _v1169({ ...base, level_change_in: h });
+    assert.ok(t.required_bevel_run_in === null && t.bevel_ok === null && t.bevel_run_deficit_in === null);
+  }
+  // THE CLIFF: the ramp run and what it would have cost as a bevel.
+  const cliff = _v1169({ ...base, level_change_in: 0.625, bevel_run_in: 2 });
+  assert.ok(cliff.ramp_run_required_in === 7.5 && cliff.bevel_run_if_under_in === 1 && cliff.cliff_multiple === 7.5);
+  assert.ok(Math.abs(cliff.over_by_in - 0.125) < 1e-12);
+  for (const [h, ratio, run] of [[0.5001, 12, 6.0012], [0.75, 12, 9], [1, 12, 12], [1, 20, 20], [2, 8, 16]]) {
+    const t = _v1169({ ...base, level_change_in: h, ramp_run_per_rise: ratio });
+    assert.ok(Math.abs(t.ramp_run_required_in - run) < 1e-9, "ramp run wrong at " + h + "/1:" + ratio);
+    assert.ok(t.bevel_run_if_under_in === 1, "the comparison is always the 1/2 in bevel");
+  }
+  // The ramp run rises with both the change and the slope ratio, and the multiple never drops below 1.
+  for (const h of [0.51, 0.75, 1, 3]) assert.ok(_v1169({ ...base, level_change_in: h }).cliff_multiple > 6);
+  // Below the ramp band the ramp outputs are null.
+  assert.ok(_v1169({ ...base, level_change_in: 0.5 }).ramp_run_required_in === null);
+  assert.ok(_v1169({ ...base, level_change_in: 0.5 }).cliff_multiple === null);
+  // CARPET: 1/2 in, and none entered is null rather than a pass.
+  for (const [p, ok] of [[0.25, true], [0.5, true], [0.51, false], [0.75, false]]) {
+    assert.ok(_v1169({ ...base, level_change_in: 0.25, carpet_pile_in: p }).carpet_ok === ok, "carpet wrong at " + p);
+    assert.ok(_v1169({ ...base, level_change_in: 0.25, carpet_pile_in: p }).passes === ok);
+  }
+  assert.ok(_v1169({ ...base, level_change_in: 0.25 }).carpet_ok === null && _v1169({ ...base, level_change_in: 0.25 }).has_carpet === false);
+  // OPENINGS: the sphere limit and the orientation rule fail independently.
+  const flat = { ...base, level_change_in: 0.25 };
+  assert.ok(_v1169({ ...flat, opening_size_in: 0.5 }).opening_ok);
+  assert.ok(!_v1169({ ...flat, opening_size_in: 0.51 }).opening_ok);
+  assert.ok(_v1169({ ...flat, opening_size_in: 0.5, opening_elongated: "yes", opening_perpendicular: "yes" }).opening_ok);
+  assert.ok(!_v1169({ ...flat, opening_size_in: 0.5, opening_elongated: "yes", opening_perpendicular: "no" }).opening_ok);
+  assert.ok(_v1169({ ...flat, opening_size_in: 0.5, opening_elongated: "no", opening_perpendicular: "no" }).opening_ok, "orientation only matters for an elongated opening");
+  assert.ok(_v1169({ ...flat, opening_size_in: 0.5 }).opening_orientation_ok === null);
+  assert.ok(_v1169(flat).opening_ok === null && _v1169(flat).has_opening === false);
+  // All three checks fail independently.
+  assert.ok(_v1169(flat).passes);
+  assert.ok(!_v1169({ ...flat, level_change_in: 0.4, bevel_run_in: 0.5 }).passes);
+  assert.ok(!_v1169({ ...flat, carpet_pile_in: 0.75 }).passes);
+  assert.ok(!_v1169({ ...flat, opening_size_in: 1 }).passes);
+  // Error seams.
+  assert.ok("error" in _v1169({ ...base, opening_elongated: "maybe" }));
+  assert.ok("error" in _v1169({ ...base, opening_perpendicular: "sort of" }));
+  assert.ok("error" in _v1169({ ...base, level_change_in: -1 }));
+  assert.ok("error" in _v1169({ ...base, bevel_run_in: -1 }));
+  assert.ok("error" in _v1169({ ...base, carpet_pile_in: -1 }));
+  assert.ok("error" in _v1169({ ...base, opening_size_in: -1 }));
+  assert.ok("error" in _v1169({ ...base, ramp_run_per_rise: 0 }));
+  assert.ok("error" in _v1169({ ...base, level_change_in: Infinity }));
+});
