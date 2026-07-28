@@ -242,6 +242,7 @@ const RELATED = {
   "pipe-heat-loss-radial": ["insulation-thickness", "insulation-heat-loss", "duct-sizing"],
   "insulation-thickness-for-heat-loss": ["pipe-heat-loss-radial", "insulation-thickness", "insulation-heat-loss"],
   "pipe-insulation-for-condensation": ["insulation-thickness", "surface-condensation-risk", "wet-bulb-psychrometer"],
+  "economic-insulation-thickness": ["insulation-thickness", "insulation-heat-loss", "pipe-insulation-for-condensation"],
   "fan-motor-bhp": ["fan-motor-max-airflow", "duct-sizing", "cfm-per-ton", "duct-velocity-pressure"],
   "fan-motor-max-airflow": ["fan-motor-bhp", "fan-affinity-laws", "duct-sizing", "cfm-per-ton"],
   "thermal-expansion-volume": ["expansion-tank", "wh-expansion-tank", "water-heater-recovery"],

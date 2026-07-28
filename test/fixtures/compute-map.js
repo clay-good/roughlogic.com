@@ -1449,6 +1449,7 @@ export const COMPUTE_MAP = {
   "cohesive-earth-pressure": { module: "../../calc-geotech.js", fn: "computeCohesiveEarthPressure" },
   "pole-embedment-depth": { module: "../../calc-geotech.js", fn: "computePoleEmbedmentDepth" },
   "pipe-insulation-for-condensation": { module: "../../calc-hvac.js", fn: "computePipeInsulationForCondensation" },
+  "economic-insulation-thickness": { module: "../../calc-hvac.js", fn: "computeEconomicInsulationThickness" },
   "retaining-wall-stability": { module: "../../calc-geotech.js", fn: "computeRetainingWallStability" },
   "consolidation-time-rate": { module: "../../calc-geotech.js", fn: "computeConsolidationTimeRate" },
   "consolidation-degree": { module: "../../calc-geotech.js", fn: "computeConsolidationDegree" },

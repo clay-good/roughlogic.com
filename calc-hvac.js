@@ -4778,3 +4778,97 @@ function renderFanSheaveForTargetCfm(inputRegion, outputRegion, citationEl) {
   sync();
 }
 HVAC_RENDERERS["fan-sheave-for-target-cfm"] = renderFanSheaveForTargetCfm;
+
+// --- spec-v1110 C: Economic insulation thickness ---
+// The insulation tiles size to a SURFACE TEMPERATURE or a heat-loss budget; neither asks what
+// thickness costs least over its life. Total annual cost = energy through the assembly + the
+// annualized installed cost of the insulation, and it has a closed-form minimum:
+//   annual energy $  = dT/(R0 + t/k) x hours x $/MMBtu / (1e6 x efficiency)
+//   annual capital $ = price_per_in_sf x t x CRF,  CRF = i/(1-(1+i)^-n)
+//   d/dt = 0  ->  t_opt = k ( sqrt( C / (k x price x CRF) ) - R0 ),  C = dT x hours x $ / (1e6 eff)
+// The closed form was checked against a brute-force scan and agrees to four decimals.
+// dims: in { delta_t_f: T, bare_r_value: dimensionless, k_btu_in: dimensionless, operating_hours: T, energy_cost_per_mmbtu: dimensionless, system_efficiency: dimensionless, installed_cost_per_in_sf: dimensionless, life_years: T, discount_rate: dimensionless } out: { optimum_thickness_in: L, total_annual_cost: dimensionless, annual_savings: dimensionless, simple_payback_years: T }
+export function computeEconomicInsulationThickness({ delta_t_f = 0, bare_r_value = 0.5, k_btu_in = 0.27, operating_hours = 8000, energy_cost_per_mmbtu = 12, system_efficiency = 0.8, installed_cost_per_in_sf = 3, life_years = 10, discount_rate = 0.08 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const dT = Number(delta_t_f) || 0;
+  const R0 = Number(bare_r_value);
+  const k = Number(k_btu_in) || 0;
+  const hours = Number(operating_hours) || 0;
+  const cost = Number(energy_cost_per_mmbtu) || 0;
+  const eff = Number(system_efficiency) || 0;
+  const price = Number(installed_cost_per_in_sf) || 0;
+  const life = Number(life_years) || 0;
+  const rate = Number(discount_rate);
+  if (!(dT > 0)) return { error: "Temperature difference must be positive (F)." };
+  if (!Number.isFinite(R0) || R0 <= 0) return { error: "Bare surface R-value must be positive (the film resistance of the uninsulated surface, about 0.5)." };
+  if (!(k > 0)) return { error: "Insulation k must be positive (BTU-in/hr-ft^2-F)." };
+  if (!(hours > 0)) return { error: "Operating hours must be positive (h/yr)." };
+  if (!(cost > 0)) return { error: "Energy cost must be positive ($/MMBtu)." };
+  if (!(eff > 0 && eff <= 1)) return { error: "System efficiency must be over 0 and up to 1." };
+  if (!(price > 0)) return { error: "Installed insulation cost must be positive ($ per inch of thickness per ft^2)." };
+  if (!(life > 0)) return { error: "Service life must be positive (years)." };
+  if (!Number.isFinite(rate) || rate < 0) return { error: "Discount rate cannot be negative (0.08 = 8%); use 0 for simple straight-line." };
+  const crf = rate > 0 ? rate / (1 - Math.pow(1 + rate, -life)) : 1 / life;
+  const C = dT * hours * cost / (1e6 * eff);
+  const optimum_thickness_in = Math.max(0, k * (Math.sqrt(C / (k * price * crf)) - R0));
+  const not_justified = optimum_thickness_in <= 0;
+  const r_at_optimum = R0 + optimum_thickness_in / k;
+  const q_optimum = dT / r_at_optimum;
+  const q_bare = dT / R0;
+  const annual_energy_cost = C / r_at_optimum;
+  const annual_capital_cost = price * optimum_thickness_in * crf;
+  const total_annual_cost = annual_energy_cost + annual_capital_cost;
+  const bare_annual_cost = C / R0;
+  const annual_savings = bare_annual_cost - total_annual_cost;
+  const first_cost = price * optimum_thickness_in;
+  const energy_saved_annual = bare_annual_cost - annual_energy_cost;
+  const simple_payback_years = energy_saved_annual > 0 ? first_cost / energy_saved_annual : null;
+  const heat_loss_reduction_pct = (1 - q_optimum / q_bare) * 100;
+  if (![optimum_thickness_in, total_annual_cost, annual_savings].every(Number.isFinite)) return { error: "Economic-thickness math did not produce a finite value." };
+  return {
+    crf, optimum_thickness_in, not_justified, r_at_optimum, q_optimum, q_bare,
+    annual_energy_cost, annual_capital_cost, total_annual_cost, bare_annual_cost,
+    annual_savings, first_cost, simple_payback_years, heat_loss_reduction_pct,
+    note: (not_justified
+      ? "NO thickness pays for itself at these numbers - the energy saved by the first inch is worth less than the inch costs. Check the operating hours and the energy price before concluding that; a line that runs seasonally or on cheap fuel genuinely may not justify insulation on economics alone, though freeze protection, personnel protection, and condensation control are separate reasons that do not care about payback. "
+      : "The least-cost thickness is where one more inch stops paying for itself: the energy curve falls as 1/R while the insulation cost rises linearly, so the total has a single minimum and it is " + optimum_thickness_in.toFixed(2) + " in here. ")
+      + "This is a cost optimum, not a performance requirement - it is deliberately THINNER than what a surface-temperature or condensation-control limit would demand, and those are the separate insulation-thickness and pipe-insulation-for-condensation tiles. Because the curve is flat near the bottom, rounding to the next stock thickness costs almost nothing, which is why a shop should round UP rather than agonize over a decimal. The result is sensitive to the two numbers people guess at: operating HOURS and the energy PRICE - a line that runs 2,000 hours instead of 8,000 wants far less insulation. Flat-surface (plane wall) geometry: a small pipe's curvature makes each added inch cover more area, so a pipe optimum runs thicker than this. The capital recovery factor annualizes the installed cost over the entered life and discount rate; enter 0 for straight-line. Installed cost, fuel price, and the owner's hurdle rate govern.",
+  };
+}
+export const economicInsulationThicknessExample = { inputs: { delta_t_f: 250, bare_r_value: 0.5, k_btu_in: 0.27, operating_hours: 8000, energy_cost_per_mmbtu: 12, system_efficiency: 0.8, installed_cost_per_in_sf: 3, life_years: 10, discount_rate: 0.08 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderEconomicInsulationThickness(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: economic (least-cost) insulation thickness. Total annual cost = energy through the assembly plus the annualized installed cost of the insulation: energy $ = dT/(R0 + t/k) x hours x $/MMBtu / (1e6 x efficiency), capital $ = price per inch per ft^2 x t x CRF, with the capital recovery factor CRF = i/(1-(1+i)^-n). Setting the derivative to zero gives the closed form t_opt = k(sqrt(C/(k x price x CRF)) - R0) where C = dT x hours x $/MMBtu / (1e6 x efficiency); this was verified against a brute-force scan. A COST optimum, not a performance requirement - it is thinner than a surface-temperature or condensation limit would require, and those are separate tiles. Flat-surface geometry; a pipe optimum runs thicker because curvature adds area with each inch. Installed cost, fuel price, and the owner's hurdle rate govern.";
+  const dt = makeNumber("Temperature difference (F)", "eit-dt", { step: "any", value: "250" }); dt.input.value = "250";
+  const r0 = makeNumber("Bare surface R-value (film, ~0.5)", "eit-r0", { step: "any", value: "0.5" }); r0.input.value = "0.5";
+  const kk = makeNumber("Insulation k (BTU-in/hr-ft^2-F)", "eit-k", { step: "any", value: "0.27" }); kk.input.value = "0.27";
+  const hr = makeNumber("Operating hours (h/yr)", "eit-hr", { step: "any", value: "8000" }); hr.input.value = "8000";
+  const en = makeNumber("Energy cost ($/MMBtu)", "eit-en", { step: "any", value: "12" }); en.input.value = "12";
+  const ef = makeNumber("System efficiency (0-1)", "eit-ef", { step: "any", value: "0.8" }); ef.input.value = "0.8";
+  const pr = makeNumber("Installed cost ($ per in per ft^2)", "eit-pr", { step: "any", value: "3" }); pr.input.value = "3";
+  const lf = makeNumber("Service life (years)", "eit-lf", { step: "any", value: "10" }); lf.input.value = "10";
+  const dr = makeNumber("Discount rate (0.08 = 8%, 0 = straight line)", "eit-dr", { step: "any", value: "0.08" }); dr.input.value = "0.08";
+  for (const f of [dt, r0, kk, hr, en, ef, pr, lf, dr]) inputRegion.appendChild(f.wrap);
+  const oT = makeOutputLine(outputRegion, "Economic thickness", "eit-out-t");
+  const oC = makeOutputLine(outputRegion, "Annual cost at the optimum", "eit-out-c");
+  const oS = makeOutputLine(outputRegion, "Versus bare", "eit-out-s");
+  const oN = makeOutputLine(outputRegion, "Note", "eit-out-n");
+  const sync = () => {
+    const r = computeEconomicInsulationThickness({
+      delta_t_f: Number(dt.input.value), bare_r_value: Number(r0.input.value), k_btu_in: Number(kk.input.value),
+      operating_hours: Number(hr.input.value), energy_cost_per_mmbtu: Number(en.input.value),
+      system_efficiency: Number(ef.input.value), installed_cost_per_in_sf: Number(pr.input.value),
+      life_years: Number(lf.input.value), discount_rate: Number(dr.input.value),
+    });
+    if (r.error) { oT.textContent = r.error; oC.textContent = ""; oS.textContent = ""; oN.textContent = ""; return; }
+    oT.textContent = r.optimum_thickness_in.toFixed(2) + " in (R " + r.r_at_optimum.toFixed(2) + ")" + (r.not_justified ? " - not economically justified" : "");
+    oC.textContent = "$" + r.total_annual_cost.toFixed(3) + "/ft^2-yr = $" + r.annual_energy_cost.toFixed(3) + " energy + $" + r.annual_capital_cost.toFixed(3) + " capital (CRF " + r.crf.toFixed(4) + ")";
+    oS.textContent = "bare costs $" + r.bare_annual_cost.toFixed(3) + "/ft^2-yr; saves $" + r.annual_savings.toFixed(3) + "/ft^2-yr, cuts heat loss " + r.heat_loss_reduction_pct.toFixed(1) + "%"
+      + (r.simple_payback_years !== null ? ", simple payback " + r.simple_payback_years.toFixed(2) + " yr" : "");
+    oN.textContent = r.note;
+  };
+  for (const f of [dt, r0, kk, hr, en, ef, pr, lf, dr]) f.input.addEventListener("input", sync);
+  sync();
+}
+HVAC_RENDERERS["economic-insulation-thickness"] = renderEconomicInsulationThickness;

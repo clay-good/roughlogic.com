@@ -2253,6 +2253,7 @@ cross-check.
 | calc-hvac.js | `computeDuctHeatGain` | `{ R_duct = 0, A_ft2 = 0, dT_F = 0, cfm = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDuctLeakage` | `{ design_cfm = 0, measured_cfm = 0, duct_surface_ft2 = 0, test_pressure_inwc ...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctSize` | `{ cfm, friction_in_wc_per_100ft = 0.08, roughness_ft = DUCT_ROUGHNESS_FT }` | _ | _ | _ |
+| calc-hvac.js | `computeEconomicInsulationThickness` | `{ delta_t_f = 0, bare_r_value = 0.5, k_btu_in = 0.27, operating_hours = 8000,...` | _ | _ | _ |
 | calc-hvac.js | `computeEconomizerEnthalpyChangeover` | `{ mode = "differential_enthalpy", h_outdoor = 0, h_return = 0, t_outdoor_f = ...` | _ | _ | _ |
 | calc-hvac.js | `computeEconomizerSavingsHours` | `{ cfm = 0, delta_t_f = 0, hours = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeEquivalentLength` | `{ items = [] }` | _ | _ | _ |
@@ -3154,7 +3155,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1740.
+Row count: 1741.
 
 <!-- END function-corpus-v14 -->
 
@@ -3562,7 +3563,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (145 tiles)
+### Group C HVAC (146 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3625,6 +3626,7 @@ per spec-v14 §13.1 second paragraph.
 | `duct-static-regain` | Duct Static Regain at a Velocity Decrease | Duct static-regain method (SMACNA / A...; VP_up = (2000/4005)^2 = 0.2494; VP_dn = (1500/4005)^2 = 0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `duct-transition-length` | Duct Transition (Reducer) Length from Slope | duct transition length geometry (SMACNA); concentric = ((20-12)/2)/tan(15) = 4/0.26795 = 14.93; ecc... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `duct-velocity-pressure` | Duct Velocity Pressure | ACCA Manual D / ASHRAE Fundamentals (...; VP 0.25 in. w.c. -> V = 4005 * 0.5 = 2002.5 fpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `economic-insulation-thickness` | Economic (Least-Cost) Insulation Thickness | economic-thickness analysis; dT 250, R0 0.5, k 0.27, 8,000 h, $12/MMBtu at 80% efficie... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `economizer-enthalpy-changeover` | Economizer Enthalpy Changeover | ASHRAE 90.1; spec-v443 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `economizer-savings-hours` | Air-Side Economizer Free-Cooling Hours | ASHRAE sensible-heat relation + Stand...; 4000 CFM, dT 20 F -> 86,400 BTU/hr | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `envelope-conduction-load` | Opaque-Envelope Conduction Cooling Load (Sol-Air CLTD) | ASHRAE / ACCA Manual J opaque envelope; spec-v229 section 2.1 pinned example (dark roof) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4833,6 +4835,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1493. Fixture-covered or reference-cadence: 1493 / 1493.
+Tile count: 1494. Fixture-covered or reference-cadence: 1494 / 1494.
 
 <!-- END tile-index-v14 -->

@@ -4,6 +4,29 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): economic-insulation-thickness, and a calculus check turned into a regression test; 2026-07-27
+
+The catalog has three insulation-thickness tiles and none of them costs anything -- they solve to a surface
+temperature, a heat-loss budget, or the dew point. Zero hits for "economic thickness". Adds one tile to
+`calc-hvac.js` (Group C).
+
+Energy falls as 1/R while insulation cost rises linearly, so the total annual cost has exactly one interior
+minimum and differentiating gives it in closed form:
+`t = k(sqrt(C/(k x price x CRF)) - R0)`. The derivation was checked against a brute-force scan of the cost
+curve and agreed to four decimals -- and **the fuzzer keeps that check permanently**, rescanning the curve
+at 0.05-in steps from 0.05 to 12 in and asserting no thickness beats the reported optimum. A piece of
+calculus becomes a standing regression test.
+
+Pinned: a 250 F line at 8,000 h/yr on $12/MMBtu wants 4.12 in, cutting heat loss 96.8% and paying back in
+0.21 years against $60.00/ft^2-yr bare. The cross-check returns `not_justified` for a seasonal line on
+cheap fuel with expensive insulation.
+
+The tile is careful about what it is: a COST optimum, deliberately thinner than a surface-temperature or
+condensation limit, which win wherever they apply. It notes the curve is flat near the minimum so rounding
+up to stock costs almost nothing, that the answer is most sensitive to the two numbers people guess at
+(hours and energy price), that flat-surface geometry makes a pipe optimum thicker, and that freeze,
+personnel, and condensation protection do not care about payback. Catalog 1,493 -> 1,494. Spec: spec-v1110.
+
 ### feat(electrical): mwbc-voltage-drop, the shared neutral the generic tile has no input for; 2026-07-27
 
 No "multiwire", "MWBC", or "shared neutral" string existed anywhere. `voltage-drop` takes one current and

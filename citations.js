@@ -15276,6 +15276,18 @@ export const CITATIONS = {
       { name: "DC resistance", value: "AC reactance and power factor not modeled", source: "stated scope limit" },
     ],
   },
+  "economic-insulation-thickness": {
+    formula: "Annual energy $ = dT/(R0 + t/k) x hours x $/MMBtu / (1e6 x efficiency); annual capital $ = price_per_in_sf x t x CRF with CRF = i/(1-(1+i)^-n); the minimum of the sum is t_opt = k(sqrt(C/(k x price x CRF)) - R0), C = dT x hours x $/MMBtu / (1e6 x efficiency).",
+    edition: "Economic-thickness (least-life-cost) analysis built from the standard conduction relation and a capital recovery factor - closed form, no table reproduced.",
+    freeAccess: "Both the conduction relation and the capital recovery factor are public engineering and finance formulas.",
+    governance: GOVERNANCE.general,
+    editionNote: "A COST optimum, not a performance requirement: it comes out deliberately THINNER than what a surface-temperature limit or condensation control would demand, and those are the separate insulation-thickness and pipe-insulation-for-condensation tiles, which win wherever they apply. The closed form was verified against a brute-force scan of the total-cost curve. Because that curve is FLAT near its minimum, rounding to the next stock thickness costs almost nothing - round up rather than agonize over a decimal. The answer is most sensitive to the two numbers people guess at, operating HOURS and the energy PRICE: a line running 2,000 hours instead of 8,000 wants far less insulation. FLAT-SURFACE geometry - a small pipe's curvature makes each added inch cover more area, so a pipe optimum runs thicker than this. Where no thickness pays back, freeze protection, personnel protection, and condensation control are separate reasons that do not care about payback. Installed cost, fuel price, and the owner's hurdle rate govern.",
+    assumptions: [
+      { name: "Closed-form optimum", value: "t_opt from setting the derivative of total annual cost to zero; checked against a numerical scan", source: "calculus on the cost model" },
+      { name: "Capital recovery factor", value: "CRF = i/(1-(1+i)^-n) annualizes installed cost; 0 rate gives straight-line 1/n", source: "standard engineering economics" },
+      { name: "Flat surface", value: "plane-wall conduction; a pipe optimum runs thicker because curvature adds area per inch", source: "stated scope limit" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

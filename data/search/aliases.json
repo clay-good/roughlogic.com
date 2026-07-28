@@ -91277,6 +91277,36 @@
       "kind": "question"
     },
     {
+      "term": "economic insulation thickness",
+      "target": "economic-insulation-thickness",
+      "kind": "industry"
+    },
+    {
+      "term": "least cost insulation thickness",
+      "target": "economic-insulation-thickness",
+      "kind": "industry"
+    },
+    {
+      "term": "how thick should insulation be to save the most money",
+      "target": "economic-insulation-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "insulation payback thickness",
+      "target": "economic-insulation-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "is more insulation worth it",
+      "target": "economic-insulation-thickness",
+      "kind": "redirect"
+    },
+    {
+      "term": "optimum insulation for a hot pipe economics",
+      "target": "economic-insulation-thickness",
+      "kind": "question"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

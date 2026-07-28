@@ -30809,3 +30809,53 @@ test("bounds: spec-v1109 computeMwbcVoltageDrop pins the balanced half-drop iden
   assert.ok("error" in _v1109({ ...base, source_volts: 0 }));
   assert.ok("error" in _v1109({ ...base, one_way_length_ft: Infinity }));
 });
+
+import { computeEconomicInsulationThickness as _v1110 } from "../../calc-hvac.js";
+
+test("bounds: spec-v1110 computeEconomicInsulationThickness pins the closed-form optimum against a NUMERICAL SCAN of the cost curve, the CRF, the not-justified branch, and error seams", () => {
+  const base = { delta_t_f: 250, bare_r_value: 0.5, k_btu_in: 0.27, operating_hours: 8000, energy_cost_per_mmbtu: 12, system_efficiency: 0.8, installed_cost_per_in_sf: 3, life_years: 10, discount_rate: 0.08 };
+  const r = _v1110(base);
+  assert.ok(Math.abs(r.crf - 0.149029) < 1e-6);
+  assert.ok(Math.abs(r.optimum_thickness_in - 4.121433) < 1e-5);
+  assert.ok(Math.abs(r.total_annual_cost - 3.74565) < 1e-4);
+  assert.ok(Math.abs(r.bare_annual_cost - 60) < 1e-9);
+  // THE KEY PIN: the closed form really is the minimum of the modelled cost curve.
+  // Scan the curve independently and confirm no thickness beats the reported optimum.
+  {
+    const { delta_t_f: dT, bare_r_value: R0, k_btu_in: k, operating_hours: h, energy_cost_per_mmbtu: c, system_efficiency: e, installed_cost_per_in_sf: p } = base;
+    const C = dT * h * c / (1e6 * e);
+    const cost = (t) => C / (R0 + t / k) + p * t * r.crf;
+    const best = cost(r.optimum_thickness_in);
+    for (let t = 0.05; t <= 12; t += 0.05) {
+      assert.ok(cost(t) >= best - 1e-9, "a thickness beat the reported optimum at t=" + t);
+    }
+    // And the reported total matches the curve evaluated there.
+    assert.ok(Math.abs(best - r.total_annual_cost) < 1e-9);
+  }
+  // The two cost halves sum to the total, and the optimum really reduces total cost vs bare.
+  assert.ok(Math.abs(r.annual_energy_cost + r.annual_capital_cost - r.total_annual_cost) < 1e-12);
+  assert.ok(r.total_annual_cost < r.bare_annual_cost && r.annual_savings > 0);
+  assert.ok(Math.abs(r.r_at_optimum - (0.5 + r.optimum_thickness_in / 0.27)) < 1e-12);
+  // CRF: straight-line when the rate is zero, and always above 1/n when positive.
+  assert.ok(Math.abs(_v1110({ ...base, discount_rate: 0 }).crf - 0.1) < 1e-12);
+  assert.ok(r.crf > 1 / 10);
+  // NOT JUSTIFIED: a seasonal line on cheap fuel with expensive insulation.
+  const nope = _v1110({ ...base, delta_t_f: 60, operating_hours: 300, energy_cost_per_mmbtu: 3, installed_cost_per_in_sf: 12 });
+  assert.ok(nope.optimum_thickness_in === 0 && nope.not_justified === true);
+  assert.ok(Math.abs(nope.r_at_optimum - 0.5) < 1e-12);
+  // Sensitivity direction: more hours, pricier energy, or bigger dT all want MORE insulation.
+  assert.ok(_v1110({ ...base, operating_hours: 2000 }).optimum_thickness_in < r.optimum_thickness_in);
+  assert.ok(_v1110({ ...base, energy_cost_per_mmbtu: 24 }).optimum_thickness_in > r.optimum_thickness_in);
+  assert.ok(_v1110({ ...base, delta_t_f: 500 }).optimum_thickness_in > r.optimum_thickness_in);
+  // Pricier insulation or a shorter life wants LESS.
+  assert.ok(_v1110({ ...base, installed_cost_per_in_sf: 9 }).optimum_thickness_in < r.optimum_thickness_in);
+  assert.ok(_v1110({ ...base, life_years: 3 }).optimum_thickness_in < r.optimum_thickness_in);
+  // Error seams.
+  for (const key of ["delta_t_f", "bare_r_value", "k_btu_in", "operating_hours", "energy_cost_per_mmbtu", "installed_cost_per_in_sf", "life_years"]) {
+    assert.ok("error" in _v1110({ ...base, [key]: 0 }), "expected error for zero " + key);
+  }
+  assert.ok("error" in _v1110({ ...base, system_efficiency: 0 }));
+  assert.ok("error" in _v1110({ ...base, system_efficiency: 1.5 }));
+  assert.ok("error" in _v1110({ ...base, discount_rate: -0.01 }));
+  assert.ok("error" in _v1110({ ...base, delta_t_f: Infinity }));
+});
