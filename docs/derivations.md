@@ -2602,6 +2602,7 @@ cross-check.
 | calc-pipefit.js | `computeSteamPrvAreaForCapacity` | `{ required_capacity_lb_hr = 0, upstream_p_psia = 0, discharge_coeff = 0.9 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamPrvNapier` | `{ orifice_area_in2 = 0, upstream_p_psia = 0, downstream_p_psia = 0, discharge...` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamTrapSizing` | `{ heat_duty_btuhr = 0, hfg_btulb = 0, safety_factor = 2 } = {}` | _ | _ | _ |
+| calc-plumbing.js | `computeAavInstallCheck` | `{ height_above_drain_in = 0, height_above_insulation_in = 0, has_outdoor_vent...` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflow` | `` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflowLoss` | `{ device_class = "RP", flow_gpm = 0, pipe_size_in = "1" }` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflowSizing` | `{ service_flow_gpm = 0, hazard = "high", assembly_type = "RP", pipe_size_in =...` | _ | _ | _ |
@@ -3180,7 +3181,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1766.
+Row count: 1767.
 
 <!-- END function-corpus-v14 -->
 
@@ -3465,10 +3466,11 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (123 tiles)
+### Group B Plumbing (124 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
+| `aav-install-check` | Air Admittance Valve Installation Check (IPC 918) | International Code Council; 'Individual and branch-type air admittance valves shall b... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `asme-shell-thickness` | ASME UG-27 Shell Thickness (Joint Efficiency and Corrosion) | ASME BPVC VIII-1 UG-27; P 150 psig, R 24 in, S 17,500 psi, E 0.85, CA 0.0625 -> S... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `backflow` | Backflow Reference | IPC 2024 + project bundled backflow-p...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `backflow-loss` | Backflow Preventer Pressure Loss | Watts Regulator; 1 in RP at 30 gpm -> ~8.5 psi typical loss across the ass... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4885,6 +4887,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1519. Fixture-covered or reference-cadence: 1519 / 1519.
+Tile count: 1520. Fixture-covered or reference-cadence: 1520 / 1520.
 
 <!-- END tile-index-v14 -->

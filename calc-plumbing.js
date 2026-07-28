@@ -4755,3 +4755,86 @@ function _v1135renderVentTerminalCheck(inputRegion, outputRegion, citationEl) {
   ru.select.addEventListener("change", update);
 }
 PLUMBING_RENDERERS["vent-terminal-check"] = _v1135renderVentTerminalCheck;
+
+// --- spec-v1136: air admittance valve installation check (IPC 918) ---
+// The AAV is sold as the thing that saves you a vent through the roof, and 918.7 says
+// plainly that it does not: at least one vent pipe must still extend to the OUTDOORS,
+// because an AAV admits air to relieve negative pressure and can do nothing about positive
+// pressure. A system vented entirely by AAVs has no path for the air a discharging stack
+// pushes ahead of it. The rest is placement: not less than 4 in above the horizontal branch
+// or fixture drain being vented (918.4), not less than 6 in above insulation (918.6), in a
+// ventilated space with access, and rated for the fixture units it serves.
+// dims: in { height_above_drain_in: L, height_above_insulation_in: L, has_outdoor_vent: dimensionless, ventilated_space: dimensionless, accessible: dimensionless, dfu_served: dimensionless, valve_dfu_rating: dimensionless } out: { drain_deficit_in: L, insulation_deficit_in: L, dfu_margin: dimensionless }
+export function computeAavInstallCheck({ height_above_drain_in = 0, height_above_insulation_in = 0, has_outdoor_vent = "yes", ventilated_space = "yes", accessible = "yes", dfu_served = 0, valve_dfu_rating = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const hd = Number(height_above_drain_in) || 0;
+  const hi = Number(height_above_insulation_in) || 0;
+  const dfu = Number(dfu_served) || 0;
+  const rating = Number(valve_dfu_rating) || 0;
+  const outdoor = has_outdoor_vent === "yes";
+  const ventilated = ventilated_space === "yes";
+  const access = accessible === "yes";
+  if (!(hd > 0)) return { error: "Height above the branch or fixture drain must be positive (in)." };
+  if (hi < 0) return { error: "Height above insulation cannot be negative (in)." };
+  if (dfu < 0) return { error: "Drainage fixture units served cannot be negative." };
+  if (rating < 0) return { error: "Valve DFU rating cannot be negative." };
+
+  const MIN_DRAIN = 4, MIN_INSUL = 6;
+  const drain_ok = hd >= MIN_DRAIN;
+  const drain_deficit_in = Math.max(0, MIN_DRAIN - hd);
+  const has_insulation = hi > 0;
+  const insulation_ok = has_insulation ? hi >= MIN_INSUL : null;
+  const insulation_deficit_in = has_insulation ? Math.max(0, MIN_INSUL - hi) : 0;
+  const rated = rating > 0 && dfu > 0;
+  const dfu_ok = rated ? rating >= dfu : null;
+  const dfu_margin = rated ? rating - dfu : null;
+
+  const passes = outdoor && ventilated && access && drain_ok && (insulation_ok !== false) && (dfu_ok !== false);
+
+  const note = "THE ONE THAT VOIDS THE REST: IPC 918.7 requires at least one vent pipe to extend to the OUTDOORS even where air admittance valves are used, and this system "
+    + (outdoor ? "has one. " : "does NOT. An AAV admits air to relieve NEGATIVE pressure and can do nothing about POSITIVE pressure - the air a discharging stack pushes ahead of it has to go somewhere, and with every vent capped by a valve there is no path for it. Venting a whole building on AAVs is the failure this rule exists to prevent, and no amount of correct placement fixes it. ")
+    + "PLACEMENT: 918.4 puts the valve not less than " + MIN_DRAIN + " in above the horizontal branch drain or fixture drain being vented - this one is " + hd + " in, " + (drain_ok ? "OK" : "SHORT by " + drain_deficit_in.toFixed(1) + " in") + ". "
+    + (has_insulation
+      ? "918.6 puts it not less than " + MIN_INSUL + " in above insulation materials - this one is " + hi + " in, " + (insulation_ok ? "OK. " : "SHORT by " + insulation_deficit_in.toFixed(1) + " in. ")
+      : "No insulation height entered; where the valve sits above insulation 918.6 wants at least " + MIN_INSUL + " in of clearance, since buried or blanketed valves are a common attic failure. ")
+    + "The valve must be in a VENTILATED space - " + (ventilated ? "stated as ventilated" : "NOT stated as ventilated, and a valve sealed inside a tight cabinet or a closed wall cavity has no air to admit") + " - and must remain ACCESSIBLE - " + (access ? "stated as accessible" : "NOT accessible, and a valve is a mechanical device with a diaphragm that eventually fails, so burying it behind finished work guarantees an expensive repair") + ". "
+    + (rated ? "Capacity: the valve is rated " + rating + " DFU against " + dfu + " served, " + (dfu_ok ? "with " + dfu_margin + " DFU of margin. " : "which is UNDER by " + Math.abs(dfu_margin) + " DFU. ") : "Enter the served fixture units and the valve's rating to check capacity; ratings are listed per ASSE 1051 or 1050 and are not interchangeable between individual, branch, and stack types. ")
+    + (passes ? "PASSES the checks entered. " : "DOES NOT PASS. ")
+    + "Not checked: whether AAVs are permitted at all by the adopted code and the AHJ - several jurisdictions restrict or prohibit them, and that is the first question, not the last; the developed length and sizing of the vent the valve terminates; the relief vent a horizontal branch more than four branch intervals below the top of the stack requires; use in a return-air plenum or where prohibited by the manufacturer's listing; or the trap seal and fixture arrangement below. A screen, not a code-official determination; the adopted code, the valve's listing, and the AHJ govern.";
+
+  return { drain_ok, drain_deficit_in, has_insulation, insulation_ok, insulation_deficit_in, outdoor_vent_ok: outdoor, ventilated_ok: ventilated, accessible_ok: access, rated, dfu_ok, dfu_margin, passes, note };
+}
+
+export const aavInstallCheckExample = { inputs: { height_above_drain_in: 4, height_above_insulation_in: 6, has_outdoor_vent: "yes", ventilated_space: "yes", accessible: "yes", dfu_served: 6, valve_dfu_rating: 20 } };
+
+function _v1136renderAavInstallCheck(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IPC 918 - individual and branch-type air admittance valves located not less than 4 in above the horizontal branch drain or fixture drain being vented (918.4); installed not less than 6 in above insulation materials (918.6); located in a ventilated space and remaining accessible; and, the requirement that governs everything else, at least one vent pipe extending to the OUTDOORS even where air admittance valves are used (918.7), because a valve admits air to relieve negative pressure and provides no relief of positive pressure. Valve capacity is rated in drainage fixture units per its ASSE 1051 or 1050 listing and is not interchangeable between individual, branch, and stack types. Not checked: whether AAVs are permitted at all by the adopted code and the AHJ, the developed length and sizing of the vent, the relief vent required where a horizontal branch is more than four branch intervals from the top of the stack, plenum restrictions, or the fixture arrangement below. A screen, not a code-official determination; the adopted code, the valve's listing, and the AHJ govern.";
+  const hd = makeNumber("Height above the branch or fixture drain (in)", "aav-hd", { step: "any", min: "0" }); hd.input.value = "4";
+  const hi = makeNumber("Height above insulation (in; 0 = no insulation below)", "aav-hi", { step: "any", min: "0" }); hi.input.value = "6";
+  const ov = makeSelect("At least one vent extends to the outdoors?", "aav-ov", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
+  const vs = makeSelect("Valve is in a ventilated space?", "aav-vs", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
+  const ac = makeSelect("Valve remains accessible?", "aav-ac", [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }]);
+  const df = makeNumber("Drainage fixture units served", "aav-df", { step: "any", min: "0" }); df.input.value = "6";
+  const vr = makeNumber("Valve DFU rating (from its listing)", "aav-vr", { step: "any", min: "0" }); vr.input.value = "20";
+  inputRegion.appendChild(hd.wrap); inputRegion.appendChild(hi.wrap);
+  inputRegion.appendChild(ov.wrap); inputRegion.appendChild(vs.wrap); inputRegion.appendChild(ac.wrap);
+  inputRegion.appendChild(df.wrap); inputRegion.appendChild(vr.wrap);
+  attachExampleButton(inputRegion, () => { hd.input.value = "4"; hi.input.value = "6"; ov.select.value = "yes"; vs.select.value = "yes"; ac.select.value = "yes"; df.input.value = "6"; vr.input.value = "20"; update(); });
+  const oV = makeOutputLine(outputRegion, "Verdict", "aav-out-v");
+  const oO = makeOutputLine(outputRegion, "Outdoor vent still required (918.7)", "aav-out-o");
+  const oP = makeOutputLine(outputRegion, "Placement", "aav-out-p");
+  const oC = makeOutputLine(outputRegion, "Capacity", "aav-out-c");
+  const oNote = makeOutputLine(outputRegion, "Note", "aav-out-note");
+  const update = debounce(() => {
+    const r = computeAavInstallCheck({ height_above_drain_in: Number(hd.input.value) || 0, height_above_insulation_in: Number(hi.input.value) || 0, has_outdoor_vent: ov.select.value, ventilated_space: vs.select.value, accessible: ac.select.value, dfu_served: Number(df.input.value) || 0, valve_dfu_rating: Number(vr.input.value) || 0 });
+    if (r.error) { oV.textContent = r.error; oO.textContent = "-"; oP.textContent = "-"; oC.textContent = "-"; oNote.textContent = "-"; return; }
+    oV.textContent = r.passes ? "PASSES the checks entered" : "DOES NOT PASS";
+    oO.textContent = r.outdoor_vent_ok ? "present - OK" : "MISSING; an AAV relieves negative pressure only and cannot substitute";
+    oP.textContent = (r.drain_ok ? "4 in above the drain OK" : "SHORT by " + fmt(r.drain_deficit_in, 1) + " in above the drain") + ", " + (r.insulation_ok === null ? "no insulation entered" : r.insulation_ok ? "6 in above insulation OK" : "SHORT by " + fmt(r.insulation_deficit_in, 1) + " in above insulation") + ", " + (r.ventilated_ok ? "ventilated" : "NOT ventilated") + ", " + (r.accessible_ok ? "accessible" : "NOT accessible");
+    oC.textContent = r.dfu_ok === null ? "- (enter the served DFU and the valve rating)" : r.dfu_ok ? "OK with " + fmt(r.dfu_margin, 0) + " DFU of margin" : "UNDER by " + fmt(Math.abs(r.dfu_margin), 0) + " DFU";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of [hd, hi, df, vr]) x.input.addEventListener("input", update);
+  for (const x of [ov, vs, ac]) x.select.addEventListener("change", update);
+}
+PLUMBING_RENDERERS["aav-install-check"] = _v1136renderAavInstallCheck;

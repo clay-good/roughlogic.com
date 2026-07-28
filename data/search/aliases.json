@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "air admittance valve",
+      "target": "aav-install-check",
+      "kind": "industry"
+    },
+    {
+      "term": "can an aav replace a vent through the roof",
+      "target": "aav-install-check",
+      "kind": "question"
+    },
+    {
+      "term": "studor vent installation height",
+      "target": "aav-install-check",
+      "kind": "question"
+    },
+    {
+      "term": "how high above the drain does an aav go",
+      "target": "aav-install-check",
+      "kind": "question"
+    },
+    {
+      "term": "aav dfu rating",
+      "target": "aav-install-check",
+      "kind": "industry"
+    },
+    {
       "term": "vent through roof height",
       "target": "vent-terminal-check",
       "kind": "industry"

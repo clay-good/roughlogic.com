@@ -32304,3 +32304,47 @@ test("bounds: spec-v1135 computeVentTerminalCheck pins all three IPC 903 rules i
   assert.ok("error" in _v1135({ ...base, height_above_opening_ft: -1 }));
   assert.ok("error" in _v1135({ ...base, design_temp_f: Infinity }));
 });
+
+import { computeAavInstallCheck as _v1136 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v1136 computeAavInstallCheck pins the 918.7 outdoor-vent override, both placement minimums, capacity, and error seams", () => {
+  const base = { height_above_drain_in: 4, height_above_insulation_in: 6, has_outdoor_vent: "yes", ventilated_space: "yes", accessible: "yes", dfu_served: 6, valve_dfu_rating: 20 };
+  const r = _v1136(base);
+  assert.ok(r.passes && r.drain_ok && r.insulation_ok && r.outdoor_vent_ok && r.dfu_ok && r.dfu_margin === 14);
+  assert.ok(r.drain_deficit_in === 0 && r.insulation_deficit_in === 0);
+  // THE OVERRIDE: no outdoor vent fails no matter how perfect everything else is.
+  const noVent = _v1136({ ...base, has_outdoor_vent: "no" });
+  assert.ok(!noVent.passes && !noVent.outdoor_vent_ok);
+  assert.ok(noVent.drain_ok && noVent.insulation_ok && noVent.dfu_ok, "everything else is still fine and it still fails");
+  // Each boolean condition can fail the whole check on its own.
+  for (const k of ["has_outdoor_vent", "ventilated_space", "accessible"]) {
+    assert.ok(!_v1136({ ...base, [k]: "no" }).passes, k + " alone must fail it");
+  }
+  // Placement seams: the boundary values are compliant.
+  assert.ok(_v1136({ ...base, height_above_drain_in: 4 }).drain_ok && !_v1136({ ...base, height_above_drain_in: 3.9 }).drain_ok);
+  assert.ok(_v1136({ ...base, height_above_insulation_in: 6 }).insulation_ok && !_v1136({ ...base, height_above_insulation_in: 5.9 }).insulation_ok);
+  // No insulation entered yields null, not a failure.
+  const noIns = _v1136({ ...base, height_above_insulation_in: 0 });
+  assert.ok(noIns.insulation_ok === null && !noIns.has_insulation && noIns.passes && noIns.insulation_deficit_in === 0);
+  // Deficits are exact and never negative.
+  for (const hd of [1, 2, 4, 8]) {
+    for (const hi of [0, 3, 6, 12]) {
+      const t = _v1136({ ...base, height_above_drain_in: hd, height_above_insulation_in: hi });
+      assert.ok(t.drain_deficit_in === Math.max(0, 4 - hd));
+      assert.ok(t.insulation_deficit_in === (hi > 0 ? Math.max(0, 6 - hi) : 0));
+      assert.ok(t.drain_deficit_in >= 0 && t.insulation_deficit_in >= 0);
+      assert.ok(t.passes === (hd >= 4 && (hi === 0 || hi >= 6)));
+    }
+  }
+  // Capacity: margin is exact, a tie passes, and omitting either value yields null.
+  assert.ok(_v1136({ ...base, dfu_served: 20 }).dfu_ok && _v1136({ ...base, dfu_served: 20 }).dfu_margin === 0);
+  assert.ok(!_v1136({ ...base, dfu_served: 24 }).dfu_ok && _v1136({ ...base, dfu_served: 24 }).dfu_margin === -4);
+  assert.ok(_v1136({ ...base, valve_dfu_rating: 0 }).dfu_ok === null && _v1136({ ...base, valve_dfu_rating: 0 }).passes);
+  assert.ok(_v1136({ ...base, dfu_served: 0 }).dfu_ok === null && !_v1136({ ...base, dfu_served: 0 }).rated);
+  // Error seams.
+  assert.ok("error" in _v1136({ ...base, height_above_drain_in: 0 }));
+  assert.ok("error" in _v1136({ ...base, height_above_insulation_in: -1 }));
+  assert.ok("error" in _v1136({ ...base, dfu_served: -1 }));
+  assert.ok("error" in _v1136({ ...base, valve_dfu_rating: -1 }));
+  assert.ok("error" in _v1136({ ...base, height_above_drain_in: Infinity }));
+});

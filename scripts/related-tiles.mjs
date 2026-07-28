@@ -1427,7 +1427,8 @@ const RELATED = {
   "occupant-load": ["egress-capacity","plumbing-fixture-count","ashrae-622-ventilation"],
   "fixture-clearance-check": ["shower-compartment-check","plumbing-fixture-count","rough-opening-size","ada-ramp-slope"],
   "shower-compartment-check": ["fixture-clearance-check","plumbing-fixture-count","flooring-takeoff"],
-  "vent-terminal-check": ["fixture-clearance-check","plumbing-fixture-count","roofing-squares"],
+  "vent-terminal-check": ["aav-install-check","fixture-clearance-check","plumbing-fixture-count","roofing-squares"],
+  "aav-install-check": ["vent-terminal-check","fixture-clearance-check","plumbing-fixture-count"],
   "egress-capacity": ["occupant-load","plumbing-fixture-count","stair-stringer"],
   "plumbing-fixture-count": ["occupant-load","sanitary-dfu","wsfu-demand"],
   // spec-v245..v247 cast-in-place placing-and-curing trio
