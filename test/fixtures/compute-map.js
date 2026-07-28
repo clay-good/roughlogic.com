@@ -1635,6 +1635,7 @@ export const COMPUTE_MAP = {
   "door-clear-width": { module: "../../calc-construction.js", fn: "computeDoorClearWidth" },
   "floor-level-change": { module: "../../calc-construction.js", fn: "computeFloorLevelChange" },
   "turning-clear-floor-space": { module: "../../calc-construction.js", fn: "computeTurningAndClearFloorSpace" },
+  "handrail-geometry": { module: "../../calc-construction.js", fn: "computeHandrailGeometry" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 

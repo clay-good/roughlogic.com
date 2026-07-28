@@ -34356,3 +34356,81 @@ test("bounds: spec-v1170 computeTurningAndClearFloorSpace pins the orientation t
   assert.ok("error" in _v1170({ ...goodT, t_arm_clear_in: -1 }));
   assert.ok("error" in _v1170({ ...base, cfs_width_in: Infinity }));
 });
+
+import { computeHandrailGeometry as _v1171 } from "../../calc-construction.js";
+
+test("bounds: spec-v1171 computeHandrailGeometry pins the height range, the grip windows, the asymmetric extensions, and error seams", () => {
+  const base = { rail_height_in: 36, clearance_in: 1.5, grip_shape: "circular", diameter_in: 2.5, perimeter_in: 0, cross_section_in: 0, flight_type: "stair", tread_depth_in: 11, top_extension_in: 12, bottom_extension_in: 12 };
+  const r = _v1171(base);
+  assert.ok(r.height_ok && r.clearance_ok && !r.diameter_ok && r.diameter_too_fat && !r.passes);
+  assert.ok(r.required_bottom_extension_in === 11 && r.bottom_vs_flat_in === -1 && r.bottom_ok);
+  // HEIGHT IS A RANGE - too high fails, and the flag distinguishes the two directions.
+  for (const [h, ok, high] of [[33.9, false, false], [34, true, false], [36, true, false], [38, true, false], [38.1, false, true], [42, false, true]]) {
+    const t = _v1171({ ...base, rail_height_in: h });
+    assert.ok(t.height_ok === ok && t.height_too_high === high, "height wrong at " + h);
+  }
+  // CLEARANCE at its seam, with an exact deficit.
+  for (const [c, ok] of [[1.4, false], [1.5, true], [3, true]]) {
+    const t = _v1171({ ...base, clearance_in: c });
+    assert.ok(t.clearance_ok === ok && Math.abs(t.clearance_deficit_in - Math.max(0, 1.5 - c)) < 1e-9);
+  }
+  // THE CIRCULAR GRIP IS A WINDOW, and too fat is distinguished from too thin.
+  for (const [d, ok, fat] of [[1.24, false, false], [1.25, true, false], [1.5, true, false], [2, true, false], [2.01, false, true], [2.5, false, true]]) {
+    const t = _v1171({ ...base, diameter_in: d });
+    assert.ok(t.diameter_ok === ok && t.diameter_too_fat === fat, "diameter window wrong at " + d);
+    assert.ok(t.grip_ok === ok);
+  }
+  // A wider rail is NOT a safer rail - pinned directly.
+  assert.ok(_v1171({ ...base, diameter_in: 1.5 }).grip_ok && !_v1171({ ...base, diameter_in: 3 }).grip_ok);
+  // THE NON-CIRCULAR GRIP HAS TWO CONDITIONS, and each fails alone.
+  const nc = { ...base, grip_shape: "non-circular", diameter_in: 0, perimeter_in: 5, cross_section_in: 2 };
+  assert.ok(_v1171(nc).grip_ok && _v1171(nc).perimeter_ok && _v1171(nc).cross_section_ok);
+  assert.ok(!_v1171({ ...nc, perimeter_in: 3.9 }).grip_ok);
+  assert.ok(!_v1171({ ...nc, perimeter_in: 6.26 }).grip_ok);
+  assert.ok(!_v1171({ ...nc, cross_section_in: 2.26 }).grip_ok);
+  assert.ok(_v1171({ ...nc, perimeter_in: 4 }).grip_ok && _v1171({ ...nc, perimeter_in: 6.25 }).grip_ok && _v1171({ ...nc, cross_section_in: 2.25 }).grip_ok);
+  // A wide flat rail meets the perimeter and fails the cross section.
+  const flat = _v1171({ ...nc, perimeter_in: 6, cross_section_in: 2.5 });
+  assert.ok(flat.perimeter_ok && !flat.cross_section_ok && !flat.grip_ok);
+  // The unused grip family reports null rather than a verdict.
+  assert.ok(_v1171(base).perimeter_ok === null && _v1171(base).cross_section_ok === null);
+  assert.ok(_v1171(nc).diameter_ok === null && _v1171(nc).diameter_too_fat === null);
+  // EXTENSIONS ARE ASYMMETRIC: the top is always 12, the stair bottom is the tread depth.
+  for (const tread of [9, 11, 12, 13, 18]) {
+    const t = _v1171({ ...base, tread_depth_in: tread, diameter_in: 1.5, bottom_extension_in: tread });
+    assert.ok(t.required_top_extension_in === 12, "the top extension never varies");
+    assert.ok(Math.abs(t.required_bottom_extension_in - tread) < 1e-12, "bottom extension wrong at tread " + tread);
+    assert.ok(Math.abs(t.bottom_vs_flat_in - (tread - 12)) < 1e-12);
+    assert.ok(t.bottom_ok && t.bottom_deficit_in === 0);
+    assert.ok(!_v1171({ ...base, tread_depth_in: tread, diameter_in: 1.5, bottom_extension_in: tread - 0.01 }).bottom_ok);
+  }
+  // A 12 in bottom extension is short on a 13 in tread and generous on an 11 in one.
+  assert.ok(!_v1171({ ...base, diameter_in: 1.5, tread_depth_in: 13 }).bottom_ok);
+  assert.ok(_v1171({ ...base, diameter_in: 1.5, tread_depth_in: 11 }).bottom_ok);
+  assert.ok(_v1171({ ...base, diameter_in: 1.5, tread_depth_in: 13 }).bottom_deficit_in === 1);
+  // At a ramp BOTH ends are a flat 12 and the tread does not enter.
+  for (const tread of [0, 11, 18]) {
+    const t = _v1171({ ...base, flight_type: "ramp", diameter_in: 1.5, tread_depth_in: tread });
+    assert.ok(t.required_bottom_extension_in === 12 && t.required_top_extension_in === 12 && t.bottom_vs_flat_in === 0);
+  }
+  // Extension deficits are exact and non-negative, and each end fails alone.
+  const good = { ...base, diameter_in: 1.5 };
+  assert.ok(_v1171(good).passes);
+  assert.ok(!_v1171({ ...good, top_extension_in: 11.9 }).passes && _v1171({ ...good, top_extension_in: 11.9 }).bottom_ok);
+  assert.ok(!_v1171({ ...good, bottom_extension_in: 10.9 }).passes && _v1171({ ...good, bottom_extension_in: 10.9 }).top_ok);
+  assert.ok(Math.abs(_v1171({ ...good, top_extension_in: 5 }).top_deficit_in - 7) < 1e-9);
+  // All four checks fail independently.
+  assert.ok(!_v1171({ ...good, rail_height_in: 40 }).passes);
+  assert.ok(!_v1171({ ...good, clearance_in: 1 }).passes);
+  assert.ok(!_v1171({ ...good, diameter_in: 3 }).passes);
+  // Error seams.
+  assert.ok("error" in _v1171({ ...base, grip_shape: "oval-ish" }));
+  assert.ok("error" in _v1171({ ...base, flight_type: "escalator" }));
+  assert.ok("error" in _v1171({ ...base, rail_height_in: 0 }));
+  assert.ok("error" in _v1171({ ...base, clearance_in: -1 }));
+  assert.ok("error" in _v1171({ ...base, diameter_in: 0 }));
+  assert.ok("error" in _v1171({ ...nc, perimeter_in: 0 }));
+  assert.ok("error" in _v1171({ ...base, tread_depth_in: 0 }));
+  assert.ok("error" in _v1171({ ...base, top_extension_in: -1 }));
+  assert.ok("error" in _v1171({ ...base, rail_height_in: Infinity }));
+});

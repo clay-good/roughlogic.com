@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "ada handrail extension at stairs",
+      "target": "handrail-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "how far does a handrail have to extend past the bottom step",
+      "target": "handrail-geometry",
+      "kind": "question"
+    },
+    {
+      "term": "handrail diameter limit",
+      "target": "handrail-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "can a handrail be too high",
+      "target": "handrail-geometry",
+      "kind": "question"
+    },
+    {
       "term": "ada turning radius 60 inch",
       "target": "turning-clear-floor-space",
       "kind": "industry"

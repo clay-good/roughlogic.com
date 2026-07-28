@@ -12850,3 +12850,110 @@ CONSTRUCTION_RENDERERS["turning-clear-floor-space"] = _simpleRenderer({
   ],
   compute: computeTurningAndClearFloorSpace,
 });
+
+// ===================== spec-v1171: handrail geometry and extensions (2010 ADA Standards 505) =====================
+
+// The height everybody knows is 34 to 38 in. The three that get missed are the grip, the
+// clearance behind it, and the extensions - and the extensions are asymmetric.
+// At the TOP of a stair the handrail extends 12 in horizontally beginning directly above the
+// first riser nosing. At the BOTTOM it extends AT THE SLOPE OF THE FLIGHT for a horizontal
+// distance of one TREAD DEPTH beyond the last riser nosing - so the bottom extension is a
+// function of the stair, not a fixed number, and on an 11 in tread it is 11 in of run at the
+// pitch, not 12 in of level rail. At a ramp both ends take a flat 12 in horizontal.
+// The grip is a window in both directions: a circular rail is 1-1/4 to 2 in in diameter, so a
+// 2-1/2 in rail is too FAT to grip and fails as surely as a thin one.
+// dims: in { rail_height_in: L, clearance_in: L, diameter_in: L, perimeter_in: L, cross_section_in: L, tread_depth_in: L, top_extension_in: L, bottom_extension_in: L } out: { required_top_extension_in: L, required_bottom_extension_in: L, top_deficit_in: L, bottom_deficit_in: L }
+export function computeHandrailGeometry({ rail_height_in = 0, clearance_in = 0, grip_shape = "circular", diameter_in = 0, perimeter_in = 0, cross_section_in = 0, flight_type = "stair", tread_depth_in = 0, top_extension_in = 0, bottom_extension_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const h = Number(rail_height_in) || 0;
+  const clr = Number(clearance_in) || 0;
+  const dia = Number(diameter_in) || 0;
+  const per = Number(perimeter_in) || 0;
+  const cs = Number(cross_section_in) || 0;
+  const tread = Number(tread_depth_in) || 0;
+  const topE = Number(top_extension_in) || 0;
+  const botE = Number(bottom_extension_in) || 0;
+  const circular = grip_shape === "circular";
+  const isStair = flight_type === "stair";
+  if (grip_shape !== "circular" && grip_shape !== "non-circular") return { error: "Grip shape must be circular or non-circular - they are measured differently." };
+  if (flight_type !== "stair" && flight_type !== "ramp") return { error: "Flight type must be stair or ramp - the bottom extension differs between them." };
+  if (!(h > 0)) return { error: "Handrail height above the walking surface must be positive (in)." };
+  if (clr < 0) return { error: "Clearance behind the handrail cannot be negative (in)." };
+  if (circular && !(dia > 0)) return { error: "Circular handrail diameter must be positive (in)." };
+  if (!circular && (!(per > 0) || !(cs > 0))) return { error: "A non-circular handrail needs a positive perimeter and cross-section dimension (in)." };
+  if (isStair && !(tread > 0)) return { error: "Tread depth must be positive (in) - the bottom extension at a stair is one tread depth." };
+  if (topE < 0 || botE < 0) return { error: "Handrail extensions cannot be negative (in)." };
+
+  const H_MIN = 34, H_MAX = 38, CLR_MIN = 1.5;
+  const DIA_MIN = 1.25, DIA_MAX = 2, PER_MIN = 4, PER_MAX = 6.25, CS_MAX = 2.25;
+  const EXT_FLAT = 12;
+
+  const height_ok = h >= H_MIN && h <= H_MAX;
+  const height_too_high = h > H_MAX;
+  const clearance_ok = clr >= CLR_MIN;
+  const clearance_deficit_in = Math.max(0, CLR_MIN - clr);
+
+  const diameter_ok = circular ? dia >= DIA_MIN && dia <= DIA_MAX : null;
+  const diameter_too_fat = circular ? dia > DIA_MAX : null;
+  const perimeter_ok = circular ? null : per >= PER_MIN && per <= PER_MAX;
+  const cross_section_ok = circular ? null : cs <= CS_MAX;
+  const grip_ok = circular ? diameter_ok : (perimeter_ok && cross_section_ok);
+
+  const required_top_extension_in = EXT_FLAT;
+  const required_bottom_extension_in = isStair ? tread : EXT_FLAT;
+  const top_ok = topE >= required_top_extension_in;
+  const bottom_ok = botE >= required_bottom_extension_in;
+  const top_deficit_in = Math.max(0, required_top_extension_in - topE);
+  const bottom_deficit_in = Math.max(0, required_bottom_extension_in - botE);
+  const extensions_ok = top_ok && bottom_ok;
+  // The asymmetry, priced: what the bottom would be if the flat 12 in were assumed.
+  const bottom_vs_flat_in = isStair ? required_bottom_extension_in - EXT_FLAT : 0;
+
+  const passes = height_ok && clearance_ok && grip_ok && extensions_ok;
+
+  const note = "THE HEIGHT IS THE PART EVERYBODY KNOWS. 34 in minimum to 38 in maximum, to the TOP OF THE GRIPPING SURFACE, measured vertically above walking surfaces, stair NOSINGS, and ramp surfaces - so on a stair it is measured from the nosing line and not from the tread. This one is " + h + " in: " + (height_ok ? "OK. " : height_too_high ? "OVER the 38 in maximum by " + (h - H_MAX).toFixed(2) + " in - a handrail can be too HIGH, which surprises people who treat 34 as the only number. " : "UNDER the 34 in minimum by " + (H_MIN - h).toFixed(2) + " in. ")
+    + "CLEARANCE (505.5): 1-1/2 in minimum between the gripping surface and any adjacent surface. Entered " + clr + " in: " + (clearance_ok ? "OK. " : "SHORT by " + clearance_deficit_in.toFixed(3) + " in - and this is the one a wall-mounted bracket eats without anyone noticing, because the rail looks clear until a hand wraps it. ")
+    + "GRIP (505.7): "
+    + (circular
+      ? "a circular rail is 1-1/4 in minimum to 2 in maximum in outside diameter - a WINDOW, so " + dia + " in is " + (diameter_ok ? "within it. " : diameter_too_fat ? "TOO FAT to grip, which fails as surely as a thin one; a 2-1/2 in rail is not a generous handrail, it is a noncompliant one. " : "TOO THIN. ")
+      : "a non-circular rail needs a perimeter of 4 in minimum to 6-1/4 in maximum AND a cross-section dimension of 2-1/4 in maximum - two conditions, and a wide flat rail can meet the perimeter while failing the cross-section. Entered " + per + " in perimeter, " + cs + " in cross section: " + (grip_ok ? "both met. " : (perimeter_ok ? "" : "PERIMETER outside 4 to 6-1/4 in. ") + (cross_section_ok ? "" : "CROSS SECTION over 2-1/4 in. ")))
+    + "EXTENSIONS (505.10) ARE ASYMMETRIC, and this is the part that gets built wrong. "
+    + (isStair
+      ? "At the TOP of a stair the rail extends 12 in horizontally, beginning directly above the first riser nosing. At the BOTTOM it extends AT THE SLOPE OF THE FLIGHT for a horizontal distance at least equal to ONE TREAD DEPTH beyond the last riser nosing - so the bottom is a function of the stair rather than a fixed number, and on an " + tread + " in tread it is " + required_bottom_extension_in.toFixed(2) + " in of horizontal run at the pitch, not 12 in of level rail. "
+        + (bottom_vs_flat_in < 0 ? "That is " + (-bottom_vs_flat_in).toFixed(2) + " in LESS than the 12 in people assume, so assuming 12 in here is merely wasteful. " : bottom_vs_flat_in > 0 ? "That is " + bottom_vs_flat_in.toFixed(2) + " in MORE than the 12 in people assume, so assuming 12 in here is short. " : "Which happens to equal 12 in on this tread. ")
+      : "At a ramp BOTH ends take a flat 12 in horizontal above the landing, beyond the top and bottom of the ramp run - the sloped-extension rule belongs to stairs. ")
+    + "Top " + topE + " in: " + (top_ok ? "OK" : "SHORT by " + top_deficit_in.toFixed(2) + " in") + ". Bottom " + botE + " in against " + required_bottom_extension_in.toFixed(2) + " in required: " + (bottom_ok ? "OK. " : "SHORT by " + bottom_deficit_in.toFixed(2) + " in. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: continuity, which 505.6 requires along the tops and sides of the gripping surface without obstruction, and the related limits on how far a support may intrude; whether handrails are required on this run at all and on how many sides; the 505.10 exceptions, including those for aisle handrails and for extensions that would be hazardous or intrude into a circulation path; the rail's structural capacity, which is a code load case and not a dimension; the stair or ramp itself - riser, tread, nosing profile, slope, landings, and cross slope; guards, which are a different element with different heights; and state and local accessibility law and the building code, which sets its own handrail rules for different reasons. A handrail dimension screen, not a stair design; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { height_ok, height_too_high, clearance_ok, clearance_deficit_in, diameter_ok, diameter_too_fat, perimeter_ok, cross_section_ok, grip_ok, required_top_extension_in, required_bottom_extension_in, top_ok, bottom_ok, top_deficit_in, bottom_deficit_in, extensions_ok, bottom_vs_flat_in, passes, note };
+}
+
+export const handrailGeometryExample = { inputs: { rail_height_in: 36, clearance_in: 1.5, grip_shape: "circular", diameter_in: 2.5, perimeter_in: 0, cross_section_in: 0, flight_type: "stair", tread_depth_in: 11, top_extension_in: 12, bottom_extension_in: 12 } };
+
+CONSTRUCTION_RENDERERS["handrail-geometry"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 505.4, 505.5, 505.7.1, 505.7.2, 505.10.1, 505.10.2, and 505.10.3. A US federal standard in the public domain. 505.4: top of gripping surfaces of handrails shall be 34 in minimum and 38 in maximum vertically above walking surfaces, stair nosings, and ramp surfaces. 505.5: clearance between handrail gripping surfaces and adjacent surfaces shall be 1 1/2 in minimum. 505.7.1: handrail gripping surfaces with a circular cross section shall have an outside diameter of 1 1/4 in minimum and 2 in maximum. 505.7.2: handrail gripping surfaces with a non-circular cross section shall have a perimeter dimension of 4 in minimum and 6 1/4 in maximum, and a cross-section dimension of 2 1/4 in maximum. 505.10.1: ramp handrails shall extend horizontally above the landing for 12 in minimum beyond the top and bottom of ramp runs. 505.10.2: at the top of a stair flight, handrails shall extend horizontally above the landing for 12 in minimum beginning directly above the first riser nosing. 505.10.3: at the bottom of a stair flight, handrails shall extend at the slope of the stair flight for a horizontal distance at least equal to one tread depth beyond the last riser nosing. Not checked: continuity under 505.6, whether handrails are required and on how many sides, the 505.10 exceptions, structural capacity, the stair or ramp itself, guards, or state and local law and the building code. A handrail dimension screen, not a stair design.",
+  example: handrailGeometryExample.inputs,
+  fields: [
+    { key: "rail_height_in", label: "Height to the top of the gripping surface (in)", kind: "number", default: 36 },
+    { key: "clearance_in", label: "Clearance between the grip and the adjacent surface (in)", kind: "number", default: 1.5 },
+    { key: "grip_shape", label: "Gripping surface", kind: "select", options: [{ value: "circular", label: "Circular", selected: true }, { value: "non-circular", label: "Non-circular" }] },
+    { key: "diameter_in", label: "Circular: outside diameter (in)", kind: "number", default: 2.5 },
+    { key: "perimeter_in", label: "Non-circular: perimeter (in)", kind: "number", default: 0 },
+    { key: "cross_section_in", label: "Non-circular: largest cross-section dimension (in)", kind: "number", default: 0 },
+    { key: "flight_type", label: "Flight", kind: "select", options: [{ value: "stair", label: "Stair", selected: true }, { value: "ramp", label: "Ramp" }] },
+    { key: "tread_depth_in", label: "Tread depth, for the bottom extension at a stair (in)", kind: "number", default: 11 },
+    { key: "top_extension_in", label: "Top extension provided (in, horizontal)", kind: "number", default: 12 },
+    { key: "bottom_extension_in", label: "Bottom extension provided (in, horizontal)", kind: "number", default: 12 },
+  ],
+  outputs: [
+    { key: "h", id: "hrg-out-h", label: "Height (34-38 in)", value: (r) => r.height_ok ? "within range" : r.height_too_high ? "OVER the 38 in maximum" : "under the 34 in minimum" },
+    { key: "c", id: "hrg-out-c", label: "Clearance (1 1/2 in min)", value: (r) => r.clearance_ok ? "OK" : "short by " + fmt(r.clearance_deficit_in, 3) + " in" },
+    { key: "g", id: "hrg-out-g", label: "Grip", value: (r) => r.grip_ok ? "within the gripping-surface limits" : r.diameter_too_fat ? "TOO FAT - over the 2 in maximum diameter" : r.diameter_ok === false ? "under the 1 1/4 in minimum diameter" : [r.perimeter_ok ? null : "perimeter outside 4 to 6 1/4 in", r.cross_section_ok ? null : "cross section over 2 1/4 in"].filter(Boolean).join(", ") },
+    { key: "e", id: "hrg-out-e", label: "Extensions required", value: (r) => "top " + r.required_top_extension_in + " in horizontal; bottom " + fmt(r.required_bottom_extension_in, 2) + " in" + (r.bottom_vs_flat_in !== 0 ? " (" + (r.bottom_vs_flat_in > 0 ? "+" : "") + fmt(r.bottom_vs_flat_in, 2) + " in against the 12 in people assume)" : "") },
+    { key: "p", id: "hrg-out-p", label: "Extensions provided", value: (r) => r.extensions_ok ? "both met" : [r.top_ok ? null : "top short " + fmt(r.top_deficit_in, 2) + " in", r.bottom_ok ? null : "bottom short " + fmt(r.bottom_deficit_in, 2) + " in"].filter(Boolean).join(", ") },
+    { key: "v", id: "hrg-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "hrg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHandrailGeometry,
+});
