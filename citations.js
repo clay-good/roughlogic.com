@@ -15240,6 +15240,20 @@ export const CITATIONS = {
       { name: "Countertop differs", value: "the top runs the full corner, so corner length is added back for it", source: "cabinet layout geometry" },
     ],
   },
+  "belt-deflection-tension": {
+    formula: "span t = sqrt(C^2 - ((D - d)/2)^2); deflection = t/64; static tension T = 16 F (from F = 4 T x deflection / t at deflection = t/64); wrap on the small sheave theta = 180 - 2 asin((D - d)/(2C)) deg; static shaft side load = 2 T n sin(theta/2).",
+    edition: "Force-deflection tensioning as published by the V-belt manufacturers - Carlisle/Timken (reproduced in Greenheck Fan Application FA/127-11), Gates, TB Wood's, and Bestorq all give the same 1/64 in of deflection per inch of span. The span and wrap expressions are plane geometry and the tension relation is statics; neither is a table lookup.",
+    freeAccess: "The 1/64-per-inch rule and the procedure are published free in manufacturer application guides and fan-industry bulletins. The recommended force VALUES are section- and drive-specific manufacturer tables and are entered by the user rather than reproduced here.",
+    governance: GOVERNANCE.general,
+    editionNote: "Why the rule is size-independent: a force F at the midspan is resisted by the two half-spans pulling back, giving F = 4 T x deflection / t for a small deflection, and setting deflection = t/64 cancels the span entirely to T = 16 F. That is the whole reason one deflection rule covers every drive - a 5.5 lb reading means 88 lb of static tension on a 6 in drive and on a 60 in drive alike. New (unseated) belts are commonly tensioned to about 1.3 times the run-in range because they shed tension fast in the first day or two of running; that multiplier is an editable input here and the belt maker's own figure governs. The recommended min/max force is proprietary table data indexed by belt section, small-sheave diameter, and speed, so it is an INPUT to this tile, not built in - read it from the maker's table for your belt. Over-tensioning is the failure mode people do not expect: only the DIFFERENCE between tight- and slack-side tension transmits power, so extra tension adds no capacity and instead loads the shafts and bearings, whose L10 life falls as the cube of the load. Under-tension slips, and a slipping belt fails from friction heat, not from the load. Measure at the midpoint of the span with a tensiometer, read every belt of a multi-belt drive and average, and re-check after the run-in period. A field aid; the drive manufacturer's instructions govern.",
+    assumptions: [
+      { name: "Deflection rule", value: "1/64 in of deflection per 1 in of belt span", source: "Carlisle/Gates/TB Wood's/Bestorq published field procedure" },
+      { name: "Tension from force", value: "T = 16 F, derived from midspan statics at deflection = t/64", source: "statics, not a table" },
+      { name: "Recommended force range", value: "user-entered from the belt maker's table; not reproduced", source: "stated scope limit" },
+      { name: "New-belt factor", value: "1.3 default, editable; the manufacturer's figure governs", source: "commonly published run-in allowance" },
+      { name: "Small-deflection approximation", value: "the 1/64 slope is shallow enough that sin(angle) is taken as the tangent", source: "stated scope limit" },
+    ],
+  },
   "injector-flow-at-pressure": {
     formula: "flow_new = flow_rated x sqrt(dP_new / dP_rated); returnless dP = rail - manifold pressure, return (manifold-referenced) dP = the regulator's base setting; lb/h = cc/min / 10.5.",
     edition: "Orifice flow scaling with the square root of the pressure differential - public physics, no table and no fitted constant. The cc/min to lb/h factor matches the landed injector-size tile (gasoline about 0.72 specific gravity).",

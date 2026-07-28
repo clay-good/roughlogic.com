@@ -31195,3 +31195,59 @@ test("bounds: spec-v1117 computeValleyFlashingTakeoff pins the 17-inch rule, EXA
   assert.ok("error" in _v1117({ ...base, lap_in: 240 }));
   assert.ok("error" in _v1117({ ...base, valley_run_ft: Infinity }));
 });
+
+import { computeBeltDeflectionTension as _v1118 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v1118 computeBeltDeflectionTension pins the span-cancels identity T = 16F, the equal-sheave degenerate case, the new-belt factor, and error seams", () => {
+  const base = { center_distance_in: 32, large_sheave_dia_in: 12, small_sheave_dia_in: 4, measured_force_lb: 5.5, rec_min_force_lb: 4.8, rec_max_force_lb: 7.2, belt_condition: "used", new_belt_factor: 1.3, belt_count: 2 };
+  const r = _v1118(base);
+  assert.ok(Math.abs(r.span_in - Math.sqrt(32 * 32 - 16)) < 1e-9);
+  assert.ok(Math.abs(r.deflection_in - r.span_in / 64) < 1e-12);
+  assert.ok(r.status === "IN RANGE" && !r.under && !r.over);
+  // THE IDENTITY: tension is exactly 16x the force, independent of every geometric input.
+  for (const C of [10, 20, 32, 60, 200]) {
+    for (const F of [1, 5.5, 10, 40]) {
+      const t = _v1118({ ...base, center_distance_in: C, measured_force_lb: F });
+      assert.ok(Math.abs(t.static_tension_lb - 16 * F) < 1e-9, "T != 16F at C=" + C + " F=" + F);
+    }
+  }
+  // EQUAL SHEAVES degenerate to the center distance, 180 deg of wrap, and the published 10 lb -> 160 lb pair.
+  const eq = _v1118({ ...base, center_distance_in: 20, large_sheave_dia_in: 8, small_sheave_dia_in: 8, measured_force_lb: 10, rec_min_force_lb: 8, rec_max_force_lb: 12, belt_count: 1 });
+  assert.ok(eq.span_in === 20 && eq.deflection_in === 0.3125 && eq.static_tension_lb === 160);
+  assert.ok(Math.abs(eq.wrap_angle_deg - 180) < 1e-9 && Math.abs(eq.shaft_load_lb - 320) < 1e-9);
+  // Span is always SHORTER than the center distance unless the sheaves match, and wrap is always under 180.
+  assert.ok(r.span_in < 32 && r.wrap_angle_deg < 180 && r.wrap_angle_deg > 90);
+  // NEW belt raises the target range by exactly the factor and can flip an in-range reading to under.
+  const nb = _v1118({ ...base, belt_condition: "new" });
+  assert.ok(Math.abs(nb.target_min_force_lb - 4.8 * 1.3) < 1e-9 && Math.abs(nb.target_max_force_lb - 7.2 * 1.3) < 1e-9);
+  assert.ok(nb.under && nb.status === "UNDER-TENSIONED");
+  assert.ok(nb.static_tension_lb === r.static_tension_lb, "the factor moves the TARGET, never the measurement");
+  assert.ok(_v1118({ ...base, belt_condition: "new", new_belt_factor: 1 }).target_min_force_lb === r.target_min_force_lb);
+  // Verdict seams sit exactly on the range endpoints.
+  assert.ok(_v1118({ ...base, measured_force_lb: 4.8 }).status === "IN RANGE");
+  assert.ok(_v1118({ ...base, measured_force_lb: 4.79 }).status === "UNDER-TENSIONED");
+  assert.ok(_v1118({ ...base, measured_force_lb: 7.2 }).status === "IN RANGE");
+  assert.ok(_v1118({ ...base, measured_force_lb: 7.21 }).status === "OVER-TENSIONED");
+  // Shaft load is linear in belt count and in the measured force.
+  assert.ok(Math.abs(_v1118({ ...base, belt_count: 4 }).shaft_load_lb - 2 * r.shaft_load_lb) < 1e-9);
+  assert.ok(Math.abs(_v1118({ ...base, measured_force_lb: 11 }).shaft_load_lb - 2 * r.shaft_load_lb) < 1e-9);
+  // Monotone: pulling the sheaves apart lengthens the span and increases wrap on the small sheave.
+  let ps = 0, pw = 0;
+  for (const C of [9, 12, 20, 40, 100]) {
+    const t = _v1118({ ...base, center_distance_in: C });
+    assert.ok(t.span_in > ps && t.wrap_angle_deg > pw); ps = t.span_in; pw = t.wrap_angle_deg;
+  }
+  // Error seams.
+  assert.ok("error" in _v1118({ ...base, center_distance_in: 0 }));
+  assert.ok("error" in _v1118({ ...base, center_distance_in: 4 }), "C equal to the half-difference leaves no span");
+  assert.ok("error" in _v1118({ ...base, small_sheave_dia_in: 20 }), "small larger than large must be rejected, not silently swapped");
+  assert.ok("error" in _v1118({ ...base, large_sheave_dia_in: 0 }));
+  assert.ok("error" in _v1118({ ...base, measured_force_lb: -1 }));
+  assert.ok("error" in _v1118({ ...base, rec_min_force_lb: 0 }));
+  assert.ok("error" in _v1118({ ...base, rec_max_force_lb: 3 }), "max below min");
+  assert.ok("error" in _v1118({ ...base, new_belt_factor: 0.9 }));
+  assert.ok("error" in _v1118({ ...base, new_belt_factor: 2.5 }));
+  assert.ok("error" in _v1118({ ...base, belt_count: 0 }));
+  assert.ok("error" in _v1118({ ...base, belt_count: 2.5 }));
+  assert.ok("error" in _v1118({ ...base, center_distance_in: Infinity }));
+});

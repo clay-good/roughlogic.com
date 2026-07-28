@@ -1298,6 +1298,7 @@ export const COMPUTE_MAP = {
   "hydraulic-pump-flow": { module: "../../calc-mechanic.js", fn: "computeHydraulicPumpFlow" },
   "hydraulic-line-velocity": { module: "../../calc-mechanic.js", fn: "computeHydraulicLineVelocity" },
   "injector-flow-at-pressure": { module: "../../calc-mechanic.js", fn: "computeInjectorFlowAtPressure" },
+  "belt-deflection-tension": { module: "../../calc-mechanic.js", fn: "computeBeltDeflectionTension" },
   "cooling-system-flow": { module: "../../calc-mechanic.js", fn: "computeCoolingSystemFlow" },
   "prop-pitch-selection": { module: "../../calc-mechanic.js", fn: "computePropPitchSelection" },
   "engine-fuel-burn-gph": { module: "../../calc-mechanic.js", fn: "computeEngineFuelBurnGph" },

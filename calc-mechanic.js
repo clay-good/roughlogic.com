@@ -3029,3 +3029,97 @@ MECHANIC_RENDERERS["injector-flow-at-pressure"] = _simpleRenderer({
   ],
   compute: computeInjectorFlowAtPressure,
 });
+
+
+// --- spec-v1118: V-Belt Force-Deflection Tensioning ---
+// The field procedure for SETTING belt tension, which the three existing belt tiles all
+// assume has already been done. Span is the external tangent between the two sheaves,
+// pure geometry: t = sqrt(C^2 - ((D-d)/2)^2). Deflect the midspan 1/64 in per inch of
+// span. The force that takes is proportional to the static tension: at midspan a force F
+// is balanced by the two half-spans pulling back, F = 4 T d / t for a small deflection,
+// and substituting d = t/64 collapses the span out entirely to F = T/16. So the measured
+// deflection force times 16 IS the static tension per belt, which is why the 1/64 rule
+// works on any drive without knowing its size.
+// dims: in { center_distance_in: L, large_sheave_dia_in: L, small_sheave_dia_in: L, measured_force_lb: M L T^-2, rec_min_force_lb: M L T^-2, rec_max_force_lb: M L T^-2, belt_condition: dimensionless, new_belt_factor: dimensionless, belt_count: dimensionless } out: { span_in: L, deflection_in: L, static_tension_lb: M L T^-2, target_min_force_lb: M L T^-2, target_max_force_lb: M L T^-2, wrap_angle_deg: dimensionless, shaft_load_lb: M L T^-2 }
+export function computeBeltDeflectionTension({ center_distance_in = 0, large_sheave_dia_in = 0, small_sheave_dia_in = 0, measured_force_lb = 0, rec_min_force_lb = 0, rec_max_force_lb = 0, belt_condition = "used", new_belt_factor = 1.3, belt_count = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const C = Number(center_distance_in) || 0;
+  const D = Number(large_sheave_dia_in) || 0;
+  const d = Number(small_sheave_dia_in) || 0;
+  const F = Number(measured_force_lb) || 0;
+  const fmin = Number(rec_min_force_lb) || 0;
+  const fmax = Number(rec_max_force_lb) || 0;
+  const kNew = Number(new_belt_factor) || 0;
+  const n = Number(belt_count) || 0;
+  if (C <= 0 || D <= 0 || d <= 0) return { error: "Center distance and both sheave diameters must be greater than zero." };
+  if (d > D) return { error: "The small sheave diameter cannot exceed the large sheave diameter - swap the two entries." };
+  if (!Number.isInteger(n) || n < 1) return { error: "Belt count must be a whole number of 1 or more." };
+  if (F < 0) return { error: "Measured deflection force cannot be negative." };
+  if (fmin <= 0 || fmax <= 0) return { error: "Enter the manufacturer's recommended minimum and maximum deflection force (both greater than zero)." };
+  if (fmax < fmin) return { error: "The recommended maximum force cannot be below the recommended minimum." };
+  if (kNew < 1 || kNew > 2) return { error: "New-belt factor must be between 1.0 and 2.0." };
+  const halfDiff = (D - d) / 2;
+  if (C <= halfDiff) return { error: "Center distance is too small for these sheaves - the belt has no straight span." };
+
+  const span_in = Math.sqrt(C * C - halfDiff * halfDiff);
+  const deflection_in = span_in / 64;
+  const deflection_64ths = Math.round(span_in);
+  const static_tension_lb = 16 * F;
+  const isNew = belt_condition === "new";
+  const factor = isNew ? kNew : 1;
+  const target_min_force_lb = fmin * factor;
+  const target_max_force_lb = fmax * factor;
+  const under = F < target_min_force_lb;
+  const over = F > target_max_force_lb;
+  const status = under ? "UNDER-TENSIONED" : over ? "OVER-TENSIONED" : "IN RANGE";
+  const pct_of_min = target_min_force_lb > 0 ? (F / target_min_force_lb) * 100 : null;
+
+  // Wrap on the SMALL sheave (the limiting one) and the static side load the drive puts
+  // into the shafts and bearings with no torque applied. Both belt strands pull toward the
+  // other sheave, so the resultant is 2 T sin(theta/2) per belt.
+  const wrap_rad = Math.PI - 2 * Math.asin(Math.min(1, halfDiff / C));
+  const wrap_angle_deg = wrap_rad * 180 / Math.PI;
+  const shaft_load_lb = 2 * static_tension_lb * n * Math.sin(wrap_rad / 2);
+  const target_tension_min_lb = 16 * target_min_force_lb;
+  const target_tension_max_lb = 16 * target_max_force_lb;
+
+  const note = "Span " + span_in.toFixed(2) + " in, so deflect the midspan " + deflection_in.toFixed(3)
+    + " in (about " + deflection_64ths + "/64 in) and read the force there. "
+    + "At the 1/64-per-inch deflection the span cancels out of the statics and the force is exactly one sixteenth of the static tension, so " + F.toFixed(1) + " lb of force = " + static_tension_lb.toFixed(0) + " lb per belt. "
+    + (isNew
+      ? "NEW belt: the target range is the manufacturer's " + fmin.toFixed(1) + "-" + fmax.toFixed(1) + " lb multiplied by " + kNew + " (" + target_min_force_lb.toFixed(1) + "-" + target_max_force_lb.toFixed(1) + " lb), because an unseated belt sheds tension fast. Re-check and drop to the plain range after the first day or two of running. "
+      : "RUN-IN belt: the target is the manufacturer's plain " + target_min_force_lb.toFixed(1) + "-" + target_max_force_lb.toFixed(1) + " lb range. ")
+    + status + ". "
+    + (under ? "Under-tension slips, and a slipping belt turns the lost power into heat that glazes the sidewalls - it fails from the friction, not the load. "
+      : over ? "Over-tension buys no extra capacity: only the DIFFERENCE between the tight and slack sides transmits power. What it buys is roughly " + shaft_load_lb.toFixed(0) + " lb of static side load on the shafts, and bearing life falls off as the cube of the load. "
+      : "Static side load into the shafts is about " + shaft_load_lb.toFixed(0) + " lb across " + n + " belt" + (n === 1 ? "" : "s") + " at " + wrap_angle_deg.toFixed(0) + " degrees of wrap on the small sheave. ")
+    + "The recommended force range is manufacturer and belt-section specific - read it off the belt maker's own table for your section, small-sheave diameter, and speed; this tile does not supply it. Measure at the midpoint of the span with a tensiometer, take a reading on each belt of a multi-belt drive and average, and never tension a matched set by feel. Single-belt drives read against a straightedge across both sheave rims. A field aid; the drive manufacturer's instructions govern.";
+
+  return { span_in, deflection_in, deflection_64ths, static_tension_lb, target_min_force_lb, target_max_force_lb, target_tension_min_lb, target_tension_max_lb, wrap_angle_deg, shaft_load_lb, pct_of_min, under, over, status, note };
+}
+export const beltDeflectionTensionExample = { inputs: { center_distance_in: 32, large_sheave_dia_in: 12, small_sheave_dia_in: 4, measured_force_lb: 5.5, rec_min_force_lb: 4.8, rec_max_force_lb: 7.2, belt_condition: "used", new_belt_factor: 1.3, belt_count: 2 } };
+MECHANIC_RENDERERS["belt-deflection-tension"] = _simpleRenderer({
+  citation: "Citation: force-deflection tensioning per the belt manufacturers' standard field procedure (Carlisle/Timken, Gates, TB Wood's, Bestorq all publish the same rule) - deflect the midspan 1/64 in for each 1 in of span and compare the force to the maker's recommended range. Span is the external tangent between the sheaves, t = sqrt(C^2 - ((D-d)/2)^2), pure geometry. The static tension follows from statics, not a table: a midspan force F against two half-spans gives F = 4 T x deflection / t, and at deflection = t/64 the span cancels to T = 16 F. The 1.3 multiplier for an unseated new belt is the commonly published run-in allowance and is editable here; the maker's own figure governs. The recommended force range itself is belt-section, sheave-diameter, and speed specific proprietary table data and is an INPUT, not built in. A field aid; the drive manufacturer's instructions govern.",
+  example: beltDeflectionTensionExample.inputs,
+  fields: [
+    { key: "center_distance_in", label: "Center distance (in)", kind: "number", default: 32 },
+    { key: "large_sheave_dia_in", label: "Large sheave pitch diameter (in)", kind: "number", default: 12 },
+    { key: "small_sheave_dia_in", label: "Small sheave pitch diameter (in)", kind: "number", default: 4 },
+    { key: "measured_force_lb", label: "Measured deflection force (lb)", kind: "number", default: 5.5 },
+    { key: "rec_min_force_lb", label: "Maker's recommended min force (lb)", kind: "number", default: 4.8 },
+    { key: "rec_max_force_lb", label: "Maker's recommended max force (lb)", kind: "number", default: 7.2 },
+    { key: "belt_condition", label: "Belt condition", kind: "select", options: [{ value: "used", label: "Run-in (used) belt", selected: true }, { value: "new", label: "New belt (not yet seated)" }] },
+    { key: "new_belt_factor", label: "New-belt factor", kind: "number", default: 1.3 },
+    { key: "belt_count", label: "Number of belts", kind: "number", default: 2 },
+  ],
+  outputs: [
+    { key: "s", id: "bdt-out-s", label: "Belt span", value: (r) => fmt(r.span_in, 2) + " in" },
+    { key: "d", id: "bdt-out-d", label: "Deflect the midspan", value: (r) => fmt(r.deflection_in, 3) + " in (about " + r.deflection_64ths + "/64 in)" },
+    { key: "t", id: "bdt-out-t", label: "Static tension at the measured force", value: (r) => fmt(r.static_tension_lb, 0) + " lb per belt" },
+    { key: "r", id: "bdt-out-r", label: "Target force range", value: (r) => fmt(r.target_min_force_lb, 1) + " - " + fmt(r.target_max_force_lb, 1) + " lb (" + fmt(r.target_tension_min_lb, 0) + " - " + fmt(r.target_tension_max_lb, 0) + " lb tension)" },
+    { key: "v", id: "bdt-out-v", label: "Verdict", value: (r) => r.status + " (" + fmt(r.pct_of_min, 0) + "% of the target minimum)" },
+    { key: "l", id: "bdt-out-l", label: "Static shaft side load", value: (r) => fmt(r.shaft_load_lb, 0) + " lb at " + fmt(r.wrap_angle_deg, 0) + " deg wrap" },
+    { key: "n", id: "bdt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBeltDeflectionTension,
+});

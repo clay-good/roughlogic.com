@@ -933,7 +933,7 @@ const TOOL_MODULES = (() => {
     // v100 auto-body 2K paint mix
     "paint-mix-ratio",
     // spec-v396..v398 fluid-power / cooling trio
-    "hydraulic-pump-horsepower", "hydraulic-drive-flow-limit", "hydraulic-motor-torque-speed", "hydraulic-pump-flow", "hydraulic-line-velocity", "injector-flow-at-pressure", "cooling-system-flow",
+    "hydraulic-pump-horsepower", "hydraulic-drive-flow-limit", "hydraulic-motor-torque-speed", "hydraulic-pump-flow", "hydraulic-line-velocity", "injector-flow-at-pressure", "belt-deflection-tension", "cooling-system-flow",
     // spec-v462..v464 marine/engine/electrical mechanic trio
     "prop-pitch-selection", "engine-fuel-burn-gph", "alternator-charging-load",
     // spec-v485 torque wrench extension / crowfoot correction
