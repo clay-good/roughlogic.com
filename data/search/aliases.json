@@ -91367,6 +91367,36 @@
       "kind": "question"
     },
     {
+      "term": "asme shell thickness",
+      "target": "asme-shell-thickness",
+      "kind": "industry"
+    },
+    {
+      "term": "ug-27",
+      "target": "asme-shell-thickness",
+      "kind": "redirect"
+    },
+    {
+      "term": "pressure vessel wall thickness with joint efficiency",
+      "target": "asme-shell-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "does radiography reduce required wall thickness",
+      "target": "asme-shell-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "corrosion allowance added to shell thickness",
+      "target": "asme-shell-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "spherical shell thickness internal pressure",
+      "target": "asme-shell-thickness",
+      "kind": "industry"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

@@ -30952,3 +30952,51 @@ test("bounds: spec-v1112 computeSlipCriticalWithTension pins the J3-5a factor, e
   assert.ok("error" in _v1112({ ...base, du: 0 }));
   assert.ok("error" in _v1112({ ...base, applied_tension_kip: Infinity }));
 });
+
+import { computeAsmeShellThickness as _v1113 } from "../../calc-pipefit.js";
+
+test("bounds: spec-v1113 computeAsmeShellThickness pins both UG-27 forms, the exact MAWP round trip, the joint-efficiency cost, both validity limits, and error seams", () => {
+  const base = { design_pressure_psi: 150, inside_radius_in: 24, allowable_stress_psi: 17500, joint_efficiency: 0.85, corrosion_allowance_in: 0.0625, geometry: "cylindrical" };
+  const r = _v1113(base);
+  assert.ok(Math.abs(r.se - 14875) < 1e-9);
+  assert.ok(Math.abs(r.t_required_in - 150 * 24 / (14875 - 0.6 * 150)) < 1e-12);
+  assert.ok(Math.abs(r.t_required_in - 0.243490) < 5e-6);
+  assert.ok(Math.abs(r.t_with_allowance_in - (r.t_required_in + 0.0625)) < 1e-12);
+  assert.ok(r.outside_ug27 === false);
+  // MAWP ROUND TRIP: inverting the same relation at the required thickness returns the design pressure.
+  assert.ok(Math.abs(r.mawp_psi - 150) < 1e-9);
+  // Sphere: same inputs, roughly half the wall - and its own exact formula.
+  const sph = _v1113({ ...base, geometry: "spherical" });
+  assert.ok(Math.abs(sph.t_required_in - 150 * 24 / (2 * 14875 - 0.2 * 150)) < 1e-12);
+  assert.ok(sph.t_required_in < r.t_required_in && sph.t_required_in > 0.45 * r.t_required_in);
+  assert.ok(Math.abs(sph.mawp_psi - 150) < 1e-9); // the sphere inverse round-trips too
+  // Joint efficiency is the lever the tile exists to show: no RT costs about 30% more wall.
+  const noRt = _v1113({ ...base, joint_efficiency: 0.70 });
+  const fullRt = _v1113({ ...base, joint_efficiency: 1.0 });
+  assert.ok(noRt.t_required_in > r.t_required_in && r.t_required_in > fullRt.t_required_in);
+  assert.ok(noRt.t_required_in / fullRt.t_required_in > 1.4);
+  // The corrosion allowance is purely additive and never affects the strength thickness.
+  const noCa = _v1113({ ...base, corrosion_allowance_in: 0 });
+  assert.ok(Math.abs(noCa.t_required_in - r.t_required_in) < 1e-12);
+  assert.ok(Math.abs(noCa.t_with_allowance_in - noCa.t_required_in) < 1e-12);
+  // VALIDITY LIMITS: the 0.385 S E pressure ceiling and the t <= R/2 thickness ceiling both fire.
+  assert.ok(Math.abs(r.pressure_limit_psi - 0.385 * 14875) < 1e-9);
+  const hiP = _v1113({ ...base, design_pressure_psi: 6000 });
+  assert.ok(hiP.over_pressure_limit === true && hiP.outside_ug27 === true);
+  const thick = _v1113({ ...base, design_pressure_psi: 5000, allowable_stress_psi: 12000, joint_efficiency: 0.70 });
+  assert.ok(thick.outside_ug27 === true);
+  // Thickness scales linearly with radius at fixed pressure and stress.
+  const dbl = _v1113({ ...base, inside_radius_in: 48 });
+  assert.ok(Math.abs(dbl.t_required_in - 2 * r.t_required_in) < 1e-12);
+  // A pressure that drives the denominator non-positive errors rather than returning nonsense.
+  assert.ok("error" in _v1113({ ...base, design_pressure_psi: 30000 }));
+  // Error seams.
+  assert.ok("error" in _v1113({ ...base, geometry: "conical" }));
+  assert.ok("error" in _v1113({ ...base, design_pressure_psi: 0 }));
+  assert.ok("error" in _v1113({ ...base, inside_radius_in: 0 }));
+  assert.ok("error" in _v1113({ ...base, allowable_stress_psi: 0 }));
+  assert.ok("error" in _v1113({ ...base, joint_efficiency: 0 }));
+  assert.ok("error" in _v1113({ ...base, joint_efficiency: 1.2 }));
+  assert.ok("error" in _v1113({ ...base, corrosion_allowance_in: -1 }));
+  assert.ok("error" in _v1113({ ...base, design_pressure_psi: Infinity }));
+});

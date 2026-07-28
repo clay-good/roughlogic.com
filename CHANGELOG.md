@@ -4,6 +4,32 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(pipefit): asme-shell-thickness, the code form the bare hoop-stress tiles skip; 2026-07-27
+
+A self-declared gap: `hoop-stress-mawp` is the plain `P = 2tS/D` with no joint efficiency and no corrosion
+allowance, and its citation says a code-required version of both is missing. Adds one tile to
+`calc-pipefit.js` (Group B). No allowable-stress or joint-efficiency table is reproduced -- both are
+entered.
+
+Joint efficiency and corrosion allowance both belong in this calculation and both move the answer a long
+way: choosing not to radiograph takes E from 1.00 to 0.70 and costs about **30% more wall** (the fuzzer
+pins that ratio), and the allowance is added AFTER the strength calculation on a radius already taken in
+the corroded condition -- the step most often skipped. Pinned: 150 psig on a 24-in radius at 17,500 psi
+with E 0.85 needs 0.24349 in, 0.30599 with allowance, and the MAWP inverse returns exactly 150 psi. The
+sphere cross-check gives half the wall.
+
+**One equation deliberately left out.** The cylindrical form, the spherical form, and both UG-27 validity
+limits were each confirmed against two independent published sources. The longitudinal-stress case on the
+circumferential joint could NOT be double-confirmed -- one source returned the outside-radius variant
+instead -- so it is not shipped, and both the note and the citation say so. It rarely governs a cylinder
+anyway.
+
+**Also this session: a discovery candidate killed by the dupe check.** Batch 8 proposed an ACI 22.5.1.2 Vs
+section-size cap tile, citing `rc-beam-shear`'s note that it "does not check the §22.5.1.2 upper limit."
+Reading the sibling showed `rc-min-shear-reinforcement` already computes that cap -- the note is stale.
+Third time this campaign a self-declared gap turned out closed by a later sibling: the phrase is a lead,
+never a verdict. Catalog 1,496 -> 1,497. Spec: spec-v1113.
+
 ### feat(steel): slip-critical-with-tension, the interaction the slip tile calls separate; 2026-07-27
 
 A self-declared gap, quoted from `steel-bolt-slip-critical`'s own note: "the tension-slip interaction

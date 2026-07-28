@@ -1153,3 +1153,91 @@ function _v990renderRadiatorEdrOutput(inputRegion, outputRegion, citationEl) {
   for (const f of [ed, sk, pf]) f.input.addEventListener("input", update);
 }
 PIPEFIT_RENDERERS["radiator-edr-output"] = _v990renderRadiatorEdrOutput;
+
+// --- spec-v1113 B: ASME UG-27 shell thickness with joint efficiency and corrosion allowance ---
+// hoop-stress-mawp is the plain mechanics-of-materials P = 2tS/D with no joint efficiency and no
+// corrosion allowance, and its own note says a pressure-vessel code governs. This is the code form:
+//   cylinder (circumferential stress on the LONGITUDINAL seam):  t = P R / (S E - 0.6 P)
+//   sphere:                                                      t = P R / (2 S E - 0.2 P)
+// R is the INSIDE radius, E the joint efficiency, and the corrosion allowance is added AFTER.
+// Validity: t <= R/2, and for the cylinder P <= 0.385 S E. Both formulas and both limits were
+// confirmed against two independent published sources before shipping.
+// dims: in { design_pressure_psi: M L^-1 T^-2, inside_radius_in: L, allowable_stress_psi: M L^-1 T^-2, joint_efficiency: dimensionless, corrosion_allowance_in: L, geometry: dimensionless } out: { t_required_in: L, t_with_allowance_in: L, mawp_psi: M L^-1 T^-2 }
+export function computeAsmeShellThickness({ design_pressure_psi = 0, inside_radius_in = 0, allowable_stress_psi = 0, joint_efficiency = 0.85, corrosion_allowance_in = 0.0625, geometry = "cylindrical" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const P = Number(design_pressure_psi) || 0;
+  const R = Number(inside_radius_in) || 0;
+  const S = Number(allowable_stress_psi) || 0;
+  const E = Number(joint_efficiency) || 0;
+  const CA = Number(corrosion_allowance_in);
+  if (geometry !== "cylindrical" && geometry !== "spherical") return { error: "Geometry must be cylindrical or spherical." };
+  if (!(P > 0)) return { error: "Design pressure must be positive (psi, gauge)." };
+  if (!(R > 0)) return { error: "Inside radius must be positive (in) - the INSIDE radius in the corroded condition, not the outside diameter." };
+  if (!(S > 0)) return { error: "Allowable stress must be positive (psi) at the DESIGN temperature, from the code's material tables." };
+  if (!(E > 0 && E <= 1)) return { error: "Joint efficiency must be over 0 and up to 1.0." };
+  if (!Number.isFinite(CA) || CA < 0) return { error: "Corrosion allowance cannot be negative (in)." };
+  const cylindrical = geometry === "cylindrical";
+  const se = S * E;
+  const denom = cylindrical ? se - 0.6 * P : 2 * se - 0.2 * P;
+  if (!(denom > 0)) return { error: "The design pressure is too high for this material and joint efficiency - the formula's denominator has gone to zero or negative. The section is outside the UG-27 thin-shell range entirely." };
+  const t_required_in = P * R / denom;
+  const t_with_allowance_in = t_required_in + CA;
+  // null, not Infinity: the v21 contract sweep rejects a non-finite numeric field, and the
+  // 0.385 S E ceiling is a cylinder-only limit that simply does not exist for a sphere.
+  const pressure_limit_psi = cylindrical ? 0.385 * se : null;
+  const thickness_limit_in = R / 2;
+  const over_pressure_limit = cylindrical && P > pressure_limit_psi;
+  const over_thickness_limit = t_required_in > thickness_limit_in;
+  const outside_ug27 = over_pressure_limit || over_thickness_limit;
+  // MAWP for the required thickness, inverting the same relation.
+  const mawp_psi = cylindrical
+    ? se * t_required_in / (R + 0.6 * t_required_in)
+    : 2 * se * t_required_in / (R + 0.2 * t_required_in);
+  if (![t_required_in, t_with_allowance_in, mawp_psi].every(Number.isFinite)) return { error: "Shell-thickness math did not produce a finite value." };
+  return {
+    t_required_in, t_with_allowance_in, mawp_psi, se, pressure_limit_psi, thickness_limit_in,
+    over_pressure_limit, over_thickness_limit, outside_ug27, cylindrical,
+    note: "The code form of a calculation the plain hoop-stress tile does without: joint efficiency and corrosion allowance both belong in it, and they move the answer a long way. "
+      + "E is the weld joint efficiency - roughly 1.00 for a fully radiographed Type 1 butt joint, 0.85 for spot radiography, and 0.70 for no radiography - so choosing not to radiograph costs about 30% more wall. The corrosion allowance is ADDED after the strength calculation (" + CA.toFixed(4) + " in here) and the radius entered should be the inside radius in the CORRODED condition, which is the step most often skipped. "
+      + (outside_ug27
+        ? "OUTSIDE THE UG-27 RANGE: " + (over_thickness_limit ? "the required thickness exceeds half the inside radius" : "") + (over_thickness_limit && over_pressure_limit ? " and " : "") + (over_pressure_limit ? "the pressure exceeds 0.385 S E" : "") + " - the thin-shell equations do not apply and the thick-wall rules (Appendix 1) govern. "
+        : "Inside the UG-27 thin-shell range: the thickness is under half the inside radius" + (cylindrical ? " and the pressure is under 0.385 S E" : "") + ". ")
+      + "SCOPE: this is the CIRCUMFERENTIAL-stress case, the hoop force on the LONGITUDINAL seam, which governs a cylinder and is the check people actually run - the longitudinal-stress case on the circumferential seam is a separate and rarely governing equation, and it is deliberately not included here because it could not be confirmed against two independent sources. Nozzle reinforcement, heads, external pressure and buckling, discontinuity stresses, and the allowable-stress table itself are all outside this tile. The allowable stress must come from the code's table at the design TEMPERATURE, not room temperature. ASME BPVC Section VIII and the vessel engineer govern - this is a check, not a stamped design.",
+  };
+}
+export const asmeShellThicknessExample = { inputs: { design_pressure_psi: 150, inside_radius_in: 24, allowable_stress_psi: 17500, joint_efficiency: 0.85, corrosion_allowance_in: 0.0625, geometry: "cylindrical" } };
+
+function _v1113renderAsmeShellThickness(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASME BPVC Section VIII Division 1, UG-27 shell thickness under internal pressure, by section number. Cylindrical shell, circumferential stress on the longitudinal joint: t = P R / (S E - 0.6 P). Spherical shell: t = P R / (2 S E - 0.2 P). R is the INSIDE radius in the corroded condition, S the allowable stress at the design temperature, and E the joint efficiency; the corrosion allowance is added after the strength calculation. Validity: thickness not more than half the inside radius, and for the cylinder pressure not more than 0.385 S E - beyond either, the thick-wall rules of Appendix 1 govern. Both formulas and both limits were confirmed against two independent published sources. The longitudinal-stress case on the circumferential joint is a separate, rarely governing equation and is deliberately not included. No allowable-stress or joint-efficiency table is reproduced - both are entered. ASME BPVC Section VIII and the vessel engineer govern.";
+  const p = makeNumber("Design pressure (psig)", "ast-p", { step: "any", min: "0", value: "150" }); p.input.value = "150";
+  const r = makeNumber("Inside radius, corroded (in)", "ast-r", { step: "any", min: "0", value: "24" }); r.input.value = "24";
+  const s = makeNumber("Allowable stress at design temp (psi)", "ast-s", { step: "any", min: "0", value: "17500" }); s.input.value = "17500";
+  const e = makeNumber("Joint efficiency E (1.00 full RT, 0.85 spot, 0.70 none)", "ast-e", { step: "any", min: "0", max: "1", value: "0.85" }); e.input.value = "0.85";
+  const c = makeNumber("Corrosion allowance (in)", "ast-c", { step: "any", min: "0", value: "0.0625" }); c.input.value = "0.0625";
+  const g = makeSelect("Geometry", "ast-g", [{ value: "cylindrical", label: "Cylindrical shell" }, { value: "spherical", label: "Spherical shell" }]);
+  g.select.value = "cylindrical";
+  for (const f of [p, r, s, e, c, g]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { p.input.value = "150"; r.input.value = "24"; s.input.value = "17500"; e.input.value = "0.85"; c.input.value = "0.0625"; g.select.value = "cylindrical"; update(); });
+  const oT = makeOutputLine(outputRegion, "Required thickness", "ast-out-t");
+  const oV = makeOutputLine(outputRegion, "UG-27 validity", "ast-out-v");
+  const oM = makeOutputLine(outputRegion, "MAWP at the required thickness", "ast-out-m");
+  const oN = makeOutputLine(outputRegion, "Note", "ast-out-n");
+  const update = debounce(() => {
+    const res = computeAsmeShellThickness({
+      design_pressure_psi: Number(p.input.value), inside_radius_in: Number(r.input.value),
+      allowable_stress_psi: Number(s.input.value), joint_efficiency: Number(e.input.value),
+      corrosion_allowance_in: Number(c.input.value), geometry: g.select.value,
+    });
+    if (res.error) { oT.textContent = res.error; oV.textContent = "-"; oM.textContent = "-"; oN.textContent = "-"; return; }
+    oT.textContent = fmt(res.t_required_in, 4) + " in by strength, " + fmt(res.t_with_allowance_in, 4) + " in with the corrosion allowance";
+    oV.textContent = res.outside_ug27
+      ? "OUTSIDE the thin-shell range - Appendix 1 governs"
+      : "inside the range (t limit " + fmt(res.thickness_limit_in, 2) + " in" + (res.cylindrical ? ", P limit " + fmt(res.pressure_limit_psi, 0) + " psi" : "") + ")";
+    oM.textContent = fmt(res.mawp_psi, 1) + " psi (S x E = " + fmt(res.se, 0) + " psi)";
+    oN.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [p, r, s, e, c]) f.input.addEventListener("input", update);
+  g.select.addEventListener("change", update);
+  update();
+}
+PIPEFIT_RENDERERS["asme-shell-thickness"] = _v1113renderAsmeShellThickness;

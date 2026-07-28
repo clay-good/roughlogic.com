@@ -185,7 +185,7 @@ const TOOL_MODULES = (() => {
     "steam-boiler-blowdown",
     "boiler-horsepower",
     "radiator-edr-output",
-    "pipe-pressure-rating", "pipe-filled-support-load", "hanger-rod-sizing",
+    "pipe-pressure-rating", "asme-shell-thickness", "pipe-filled-support-load", "hanger-rod-sizing",
     // spec-v200..v203 condensate return + fabrication/process layout tiles.
     "condensate-return-sizing", "branch-saddle-cutback", "reducer-offset",
     "flange-rating",

@@ -15313,6 +15313,18 @@ export const CITATIONS = {
       { name: "No prying", value: "prying action raises the actual bolt tension and is not modeled", source: "stated scope limit" },
     ],
   },
+  "asme-shell-thickness": {
+    formula: "Cylinder (circumferential stress, longitudinal joint): t = P R / (S E - 0.6 P). Sphere: t = P R / (2 S E - 0.2 P). Corrosion allowance added after. Validity: t <= R/2, and for the cylinder P <= 0.385 S E.",
+    edition: "ASME BPVC Section VIII Division 1, UG-27, shell thickness under internal pressure, by section number; no allowable-stress or joint-efficiency table is reproduced - both are entered.",
+    freeAccess: "The UG-27 equations are reproduced across published engineering references and manufacturer design guides; the BPVC itself is available through ASME.",
+    governance: GOVERNANCE.general,
+    editionNote: "Joint efficiency and corrosion allowance both belong in this calculation and both move the answer a long way, which is why the plain hoop-stress tiles are not a substitute. E is roughly 1.00 for a fully radiographed Type 1 butt joint, 0.85 for spot radiography, and 0.70 for none - choosing not to radiograph costs about 30% more wall. The corrosion allowance is ADDED after the strength calculation, and the radius entered should be the inside radius in the CORRODED condition, which is the step most often skipped. SCOPE: this is the CIRCUMFERENTIAL-stress case, the hoop force on the longitudinal seam, which governs a cylinder and is the check actually run; the longitudinal-stress case on the circumferential seam is a separate and rarely governing equation, and it is deliberately NOT included because it could not be confirmed against two independent sources. Both shipped formulas and both validity limits were confirmed against two independent published sources. Nozzle reinforcement, heads, external pressure and buckling, and discontinuity stresses are outside this tile, and the allowable stress must come from the code's table at the DESIGN temperature, not room temperature. ASME BPVC Section VIII and the vessel engineer govern - a check, not a stamped design.",
+    assumptions: [
+      { name: "Inside radius, corroded", value: "R is the inside radius in the corroded condition; the allowance is added to the computed thickness", source: "ASME BPVC VIII-1 UG-27" },
+      { name: "Validity limits", value: "t <= R/2, and P <= 0.385 S E for the cylinder; beyond either, Appendix 1 thick-wall rules govern", source: "ASME BPVC VIII-1 UG-27" },
+      { name: "Longitudinal-joint case only", value: "the circumferential-joint (longitudinal stress) equation is omitted rather than shipped unverified", source: "stated scope limit" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

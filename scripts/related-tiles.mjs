@@ -1019,7 +1019,8 @@ const RELATED = {
   "branch-reinforcement": ["pipe-pressure-rating", "branch-saddle-cutback", "flange-rating"],
   "expansion-guide-spacing": ["pipe-expansion-loop", "pipe-cold-spring", "pipe-spacing-rack"],
   "medgas-demand": ["gas-appliance-demand", "gas-pipe-sizing", "pipe-velocity"],
-  "pipe-pressure-rating": ["hydrostatic-test", "pipe-velocity", "flange-bolt-torque"],
+  "asme-shell-thickness": ["pipe-pressure-rating", "hoop-stress-mawp", "hoop-stress-thin-wall"],
+  "pipe-pressure-rating": ["asme-shell-thickness", "hydrostatic-test", "pipe-velocity", "flange-bolt-torque"],
   "pipe-filled-support-load": ["hanger-rod-sizing", "pipe-support-spacing", "pipe-volume"],
   "hanger-rod-sizing": ["pipe-filled-support-load", "pipe-support-spacing", "flange-bolt-torque"],
 
