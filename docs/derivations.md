@@ -1504,6 +1504,7 @@ cross-check.
 | calc-arborist.js | `computeQuadraticMeanDiameter` | `{ tally = "" } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeReinekeSdi` | `{ trees_per_acre = 0, qmd_in = 0, sdi_max = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeThinningTargetTpa` | `{ sdi_max = 0, target_pct = 0, qmd_in = 0, current_tpa = 0 } = {}` | _ | _ | _ |
+| calc-arborist.js | `computeTreeAppraisalCtla` | `{ dbh_in = 0, unit_cost_per_sq_in = 60, species_pct = 100, condition_pct = 10...` | _ | _ | _ |
 | calc-arborist.js | `computeTreeCrzEncroachment` | `{ dbh_in = 0, radius_factor = 1.0, limit_distance_ft = 0, species_tolerance =...` | _ | _ | _ |
 | calc-arborist.js | `computeTreeHeightClinometer` | `{ horizontal_distance_ft = 0, top_reading_pct = 0, base_reading_pct = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeTreeOpenCavity` | `{ diameter_in = 0, shell_thick_in = 0, opening_width_in = 0 } = {}` | _ | _ | _ |
@@ -3159,7 +3160,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1745.
+Row count: 1746.
 
 <!-- END function-corpus-v14 -->
 
@@ -4450,7 +4451,7 @@ per spec-v14 §13.1 second paragraph.
 | `waterline-for-hull-speed` | Waterline Length for a Target Hull Speed | displacement hull-speed relation (Fro...; 8 kn target displacement hull -> 35.6 ft waterline | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (70 tiles)
+### Group L Agriculture (71 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4515,6 +4516,7 @@ per spec-v14 §13.1 second paragraph.
 | `thinning-target-tpa` | Thinning Target TPA From a Target SDI | Reineke 1933 / USDA FS stocking-guide...; SDI_max 450 at 35%, QMD 10 in, current 300 TPA -> target ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `timber-cruise` | Timber Cruise (Doyle / Scribner / International 1/4) | Project (first-principles); Doyle rule (public-domain timber-cruising convention) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tractor-ballast` | Tractor Ballast for a Target Weight-to-Power Ratio | tractor ballasting rule (ASABE); target = 125*180 = 22500; change = 22500 - 18000 = 4500 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `tree-appraisal-ctla` | Tree Appraisal by the CTLA Trunk Formula | CTLA trunk formula method; 24 in DBH -> trunk area pi/4 x 576 = 452.39 sq in; basic ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tree-crz-encroachment` | Critical Root Zone Encroachment Percent | ANSI A300 Part 5 tree protection / ar...; 20-in DBH, 1.0 ft/in factor (R 20 ft), limit line 5 ft fr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tree-height-clinometer` | Clinometer Tree Height (Percent-Slope) | USDA Forest Service mensuration / hyp...; H = 100 x (58 - (-4))/100 = 62 ft (58 ft above eye + 4 ft... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tree-open-cavity` | Open-Cavity Trunk Strength Loss (Smiley & Fraedrich) | Smiley & Fraedrich (1992) open-cavity...; 24-in trunk, 3-in wall, 8-in opening -> R 0.106, open los... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4843,6 +4845,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1498. Fixture-covered or reference-cadence: 1498 / 1498.
+Tile count: 1499. Fixture-covered or reference-cadence: 1499 / 1499.
 
 <!-- END tile-index-v14 -->

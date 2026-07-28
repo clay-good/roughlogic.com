@@ -893,3 +893,70 @@ function renderFirewoodCord(inputRegion, outputRegion, citationEl) {
   for (const f of [l, h, d]) f.input.addEventListener("input", update);
 }
 ARBORIST_RENDERERS["firewood-cord"] = renderFirewoodCord;
+
+// --- spec-v1115 L: CTLA trunk formula tree appraisal ---
+// The arborist bench is all biomechanics and geometry - decay, cavity, protection zone, rigging -
+// and none of it answers what a tree is WORTH, which is the number a claim or a removal dispute
+// turns on. The CTLA trunk formula: value = unit cost x trunk cross-sectional area x species x
+// condition x location. Every factor here is an INPUT: the unit cost is regional and the three
+// percentages come from a regional plant appraisal committee guide, so no table is shipped.
+// dims: in { dbh_in: L, unit_cost_per_sq_in: dimensionless, species_pct: dimensionless, condition_pct: dimensionless, location_pct: dimensionless } out: { trunk_area_sq_in: L^2, basic_value: dimensionless, appraised_value: dimensionless }
+export function computeTreeAppraisalCtla({ dbh_in = 0, unit_cost_per_sq_in = 60, species_pct = 100, condition_pct = 100, location_pct = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const d = Number(dbh_in) || 0;
+  const unit = Number(unit_cost_per_sq_in) || 0;
+  const sp = Number(species_pct);
+  const cond = Number(condition_pct);
+  const loc = Number(location_pct);
+  if (!(d > 0)) return { error: "Trunk diameter must be positive (in)." };
+  if (!(unit > 0)) return { error: "Unit tree cost must be positive ($ per square inch of trunk area) - a regional figure from your plant appraisal committee." };
+  for (const [label, v] of [["Species", sp], ["Condition", cond], ["Location", loc]]) {
+    if (!Number.isFinite(v) || v < 0 || v > 100) return { error: label + " rating must be 0 to 100 percent." };
+  }
+  const trunk_area_sq_in = Math.PI / 4 * d * d;
+  const basic_value = unit * trunk_area_sq_in;
+  const species_f = sp / 100, condition_f = cond / 100, location_f = loc / 100;
+  const combined_factor = species_f * condition_f * location_f;
+  const appraised_value = basic_value * combined_factor;
+  const depreciation_pct = (1 - combined_factor) * 100;
+  const measure_at = d > 12 ? "4.5 ft above grade (DBH)" : "1 ft above grade";
+  const large_trunk = d > 12;
+  if (![trunk_area_sq_in, basic_value, appraised_value].every(Number.isFinite)) return { error: "Appraisal math did not produce a finite value." };
+  return {
+    trunk_area_sq_in, basic_value, species_f, condition_f, location_f,
+    combined_factor, appraised_value, depreciation_pct, measure_at, large_trunk,
+    note: "Value scales with trunk AREA, not diameter, so it goes as the square: doubling the trunk quadruples the basic value, which is why a large tree is so much harder to replace than two small ones and why removal disputes over mature trees carry the numbers they do. Measure this trunk " + measure_at + " - the CTLA rule switches at 12 in diameter, and using the wrong height on a flaring trunk is the most common measurement error. "
+      + "The three ratings are multiplicative, so they compound quickly: " + sp + "% x " + cond + "% x " + loc + "% leaves " + (combined_factor * 100).toFixed(1) + "% of the basic value, a " + depreciation_pct.toFixed(1) + "% depreciation. A mediocre tree in a mediocre spot is worth far less than either rating alone suggests. "
+      + "EVERY FACTOR IS YOURS TO SUPPLY: the unit cost is regional and moves with nursery prices, and the species, condition, and location percentages come from your regional plant appraisal committee's guide - none of them is shipped here, because a national default would be wrong everywhere. Single-stem trunks only; a multi-stem tree uses a different area rule, and very large or historic specimens may call for the cost-of-cure or income approaches instead of the trunk formula. This is an ESTIMATING aid, not an appraisal: a defensible appraisal is a qualified appraiser's report, and courts and insurers look at the appraiser, not the arithmetic.",
+  };
+}
+export const treeAppraisalCtlaExample = { inputs: { dbh_in: 24, unit_cost_per_sq_in: 60, species_pct: 80, condition_pct: 70, location_pct: 75 } };
+
+function renderTreeAppraisalCtla(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: the CTLA (Council of Tree and Landscape Appraisers) trunk formula method, by name: appraised value = unit tree cost x trunk cross-sectional area x species rating x condition rating x location rating. Trunk area is measured at 4.5 ft above grade for trunks over 12 in diameter, and at 1 ft above grade at or below 12 in. The unit cost and all three ratings are regional values from a plant appraisal committee guide and are entered here - no table is shipped, because a national default would be wrong everywhere. Single-stem trunks; multi-stem trees use a different area rule, and cost-of-cure or income approaches may fit better for very large or historic specimens. An estimating aid, not an appraisal - a defensible appraisal is a qualified appraiser's report.";
+  const d = makeNumber("Trunk diameter (in)", "tac-d", { step: "any", min: "0", value: "24" }); d.input.value = "24";
+  const u = makeNumber("Unit tree cost ($ per sq in of trunk)", "tac-u", { step: "any", min: "0", value: "60" }); u.input.value = "60";
+  const s = makeNumber("Species rating (%)", "tac-s", { step: "any", min: "0", max: "100", value: "80" }); s.input.value = "80";
+  const c = makeNumber("Condition rating (%)", "tac-c", { step: "any", min: "0", max: "100", value: "70" }); c.input.value = "70";
+  const l = makeNumber("Location rating (%)", "tac-l", { step: "any", min: "0", max: "100", value: "75" }); l.input.value = "75";
+  for (const f of [d, u, s, c, l]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { d.input.value = "24"; u.input.value = "60"; s.input.value = "80"; c.input.value = "70"; l.input.value = "75"; update(); });
+  const oA = makeOutputLine(outputRegion, "Trunk area / measure at", "tac-out-a");
+  const oB = makeOutputLine(outputRegion, "Basic value (undepreciated)", "tac-out-b");
+  const oV = makeOutputLine(outputRegion, "Appraised value", "tac-out-v");
+  const oN = makeOutputLine(outputRegion, "Note", "tac-out-n");
+  const update = debounce(() => {
+    const r = computeTreeAppraisalCtla({
+      dbh_in: Number(d.input.value), unit_cost_per_sq_in: Number(u.input.value),
+      species_pct: Number(s.input.value), condition_pct: Number(c.input.value), location_pct: Number(l.input.value),
+    });
+    if (r.error) { oA.textContent = r.error; oB.textContent = "-"; oV.textContent = "-"; oN.textContent = "-"; return; }
+    oA.textContent = fmt(r.trunk_area_sq_in, 1) + " sq in, measured " + r.measure_at;
+    oB.textContent = "$" + fmt(r.basic_value, 0);
+    oV.textContent = "$" + fmt(r.appraised_value, 0) + " (" + fmt(r.combined_factor * 100, 1) + "% of basic, " + fmt(r.depreciation_pct, 1) + "% depreciation)";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [d, u, s, c, l]) f.input.addEventListener("input", update);
+  update();
+}
+ARBORIST_RENDERERS["tree-appraisal-ctla"] = renderTreeAppraisalCtla;

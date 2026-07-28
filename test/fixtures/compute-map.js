@@ -934,6 +934,7 @@ export const COMPUTE_MAP = {
   "trunk-decay-strength": { module: "../../calc-arborist.js", fn: "computeTrunkDecayStrength" },
   "trunk-min-shell-thickness": { module: "../../calc-arborist.js", fn: "computeTrunkMinShellThickness" },
   "tree-open-cavity": { module: "../../calc-arborist.js", fn: "computeTreeOpenCavity" },
+  "tree-appraisal-ctla": { module: "../../calc-arborist.js", fn: "computeTreeAppraisalCtla" },
   "tree-protection-zone": { module: "../../calc-arborist.js", fn: "computeTreeProtectionZone" },
   "tree-crz-encroachment": { module: "../../calc-arborist.js", fn: "computeTreeCrzEncroachment" },
   "crown-pruning-dose": { module: "../../calc-arborist.js", fn: "computeCrownPruningDose" },

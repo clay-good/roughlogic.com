@@ -4,6 +4,28 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(arborist): tree-appraisal-ctla, the number the whole biomechanics bench never produced; 2026-07-27
+
+Zero hits for "CTLA", "trunk formula", or "tree appraisal" anywhere -- the "appraisal" aliases all hit
+real-estate tiles. The eight existing arborist tiles are entirely biomechanics and geometry; none answers
+what a tree is worth, which is the number a damage claim or removal dispute turns on. Adds one tile to
+`calc-arborist.js` (Group L).
+
+Three things the tile makes explicit. Value scales with trunk AREA, so it goes as the **square** of
+diameter -- doubling the trunk quadruples the basic value. The measurement height switches at 12 in
+diameter, and using the wrong one on a flaring trunk is the most common measurement error. And the three
+ratings are **multiplicative**: 90/90/90 is 72.9%, not 90% and not 70% -- reading them as additive is the
+error that makes appraisals argue, so the fuzzer pins exactly that case.
+
+Pinned: a 24-in trunk at $60/sq in with 80/70/75 ratings gives 452.39 sq in, a $27,143 basic value, and
+**$11,400 appraised** at 42% of basic. The cross-check pins both the quarter-value square law at 12 in and
+that exactly 12 in still measures at 1 ft above grade.
+
+Every factor is a regional user input -- unit cost moves with nursery prices and the ratings come from a
+plant appraisal committee guide, so a national default would be wrong everywhere and none ships. The note
+says plainly that this is an estimating aid, not an appraisal: courts and insurers look at the appraiser,
+not the arithmetic. Catalog 1,498 -> 1,499. Spec: spec-v1115.
+
 ### feat(construction): chip-seal-mcleod, four equations read out of a DOT procedure rather than recalled; 2026-07-27
 
 No "chip seal", "McLeod", or "sealcoat" string existed anywhere -- the "seal coat" alias misfires to

@@ -31054,3 +31054,50 @@ test("bounds: spec-v1114 computeChipSealMcleod pins all four McLeod equations, t
   assert.ok("error" in _v1114({ ...base, residual_asphalt: 0 }));
   assert.ok("error" in _v1114({ ...base, median_size_in: Infinity }));
 });
+
+import { computeTreeAppraisalCtla as _v1115 } from "../../calc-arborist.js";
+
+test("bounds: spec-v1115 computeTreeAppraisalCtla pins the trunk-formula chain, the square-law scaling, the 12-in measurement boundary, multiplicative ratings, and error seams", () => {
+  const base = { dbh_in: 24, unit_cost_per_sq_in: 60, species_pct: 80, condition_pct: 70, location_pct: 75 };
+  const r = _v1115(base);
+  assert.ok(Math.abs(r.trunk_area_sq_in - Math.PI / 4 * 576) < 1e-9);
+  assert.ok(Math.abs(r.basic_value - 60 * r.trunk_area_sq_in) < 1e-9);
+  assert.ok(Math.abs(r.combined_factor - 0.42) < 1e-12);
+  assert.ok(Math.abs(r.appraised_value - r.basic_value * 0.42) < 1e-9);
+  assert.ok(Math.abs(r.depreciation_pct - 58) < 1e-9);
+  assert.ok(r.large_trunk === true && r.measure_at.includes("4.5"));
+  // SQUARE LAW: halving the diameter quarters the value.
+  const half = _v1115({ ...base, dbh_in: 12 });
+  assert.ok(Math.abs(half.trunk_area_sq_in * 4 - r.trunk_area_sq_in) < 1e-9);
+  assert.ok(Math.abs(half.appraised_value * 4 - r.appraised_value) < 1e-9);
+  for (const d of [6, 10, 18, 30, 48]) {
+    const t = _v1115({ ...base, dbh_in: d });
+    assert.ok(Math.abs(t.trunk_area_sq_in - Math.PI / 4 * d * d) < 1e-9);
+    assert.ok(Math.abs(t.appraised_value / r.appraised_value - (d * d) / 576) < 1e-9);
+  }
+  // MEASUREMENT BOUNDARY: the rule switches ABOVE 12 in, so exactly 12 stays on the 1-ft rule.
+  assert.ok(_v1115({ ...base, dbh_in: 12 }).large_trunk === false);
+  assert.ok(_v1115({ ...base, dbh_in: 12.1 }).large_trunk === true);
+  assert.ok(_v1115({ ...base, dbh_in: 12 }).measure_at.includes("1 ft"));
+  // Ratings are MULTIPLICATIVE, not additive - the whole point of the compounding warning.
+  const allFull = _v1115({ ...base, species_pct: 100, condition_pct: 100, location_pct: 100 });
+  assert.ok(Math.abs(allFull.appraised_value - allFull.basic_value) < 1e-9);
+  assert.ok(allFull.depreciation_pct === 0);
+  const each90 = _v1115({ ...base, species_pct: 90, condition_pct: 90, location_pct: 90 });
+  assert.ok(Math.abs(each90.combined_factor - 0.729) < 1e-12); // not 0.70, and not 0.90
+  assert.ok(each90.combined_factor < 0.9 && each90.combined_factor > 0.7);
+  // A zero rating on any single axis zeroes the value.
+  for (const k of ["species_pct", "condition_pct", "location_pct"]) {
+    const t = _v1115({ ...base, [k]: 0 });
+    assert.ok(t.appraised_value === 0 && t.depreciation_pct === 100);
+  }
+  // Unit cost is exactly linear.
+  assert.ok(Math.abs(_v1115({ ...base, unit_cost_per_sq_in: 120 }).appraised_value - 2 * r.appraised_value) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v1115({ ...base, dbh_in: 0 }));
+  assert.ok("error" in _v1115({ ...base, unit_cost_per_sq_in: 0 }));
+  assert.ok("error" in _v1115({ ...base, species_pct: -1 }));
+  assert.ok("error" in _v1115({ ...base, condition_pct: 101 }));
+  assert.ok("error" in _v1115({ ...base, location_pct: 150 }));
+  assert.ok("error" in _v1115({ ...base, dbh_in: Infinity }));
+});

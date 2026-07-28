@@ -91427,6 +91427,36 @@
       "kind": "question"
     },
     {
+      "term": "tree appraisal",
+      "target": "tree-appraisal-ctla",
+      "kind": "industry"
+    },
+    {
+      "term": "ctla trunk formula",
+      "target": "tree-appraisal-ctla",
+      "kind": "redirect"
+    },
+    {
+      "term": "what is this tree worth",
+      "target": "tree-appraisal-ctla",
+      "kind": "question"
+    },
+    {
+      "term": "value of a tree that was cut down",
+      "target": "tree-appraisal-ctla",
+      "kind": "question"
+    },
+    {
+      "term": "tree damage claim value",
+      "target": "tree-appraisal-ctla",
+      "kind": "question"
+    },
+    {
+      "term": "trunk cross sectional area appraisal",
+      "target": "tree-appraisal-ctla",
+      "kind": "industry"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

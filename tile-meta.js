@@ -494,7 +494,7 @@ const _TILES = [
   ["quadratic-mean-diameter", "L"],
   ["trunk-decay-strength", "L"],
   ["trunk-min-shell-thickness", "L"],
-  ["tree-open-cavity", "L"],
+  ["tree-open-cavity", "L"], ["tree-appraisal-ctla", "L"],
   ["tree-protection-zone", "L"],
   ["tree-crz-encroachment", "L"],
   ["crown-pruning-dose", "L"],

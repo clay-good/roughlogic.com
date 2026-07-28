@@ -15337,6 +15337,18 @@ export const CITATIONS = {
       { name: "Agency factors entered", value: "T, E, and S are table lookups that vary by agency and are user inputs, not shipped values", source: "user input" },
     ],
   },
+  "tree-appraisal-ctla": {
+    formula: "appraised value = unit tree cost ($/sq in) x trunk cross-sectional area (pi/4 d^2) x species rating x condition rating x location rating; trunk measured at 4.5 ft above grade over 12 in diameter, 1 ft at or below.",
+    edition: "The CTLA (Council of Tree and Landscape Appraisers) trunk formula method, by name; no unit-cost or rating table is reproduced - all four are regional inputs.",
+    freeAccess: "The trunk formula's structure is published across extension and industry references; regional unit costs and ratings come from a plant appraisal committee guide.",
+    governance: GOVERNANCE.general,
+    editionNote: "Value scales with trunk AREA, not diameter, so it goes as the square - doubling the trunk quadruples the basic value, which is why a mature tree is so much harder to replace than two small ones. The measurement height switches at 12 in diameter (4.5 ft above grade over that, 1 ft at or below), and using the wrong height on a flaring trunk is the most common measurement error. The three ratings are MULTIPLICATIVE and compound quickly: 80% x 70% x 75% leaves only 42% of the basic value. EVERY FACTOR IS A USER INPUT - the unit cost is regional and moves with nursery prices, and the species, condition, and location percentages come from a regional plant appraisal committee guide; a national default would be wrong everywhere, so none is shipped. Single-stem trunks only: a multi-stem tree uses a different area rule, and very large or historic specimens may call for the cost-of-cure or income approaches instead. This is an ESTIMATING aid, not an appraisal - a defensible appraisal is a qualified appraiser's report, and courts and insurers look at the appraiser rather than the arithmetic.",
+    assumptions: [
+      { name: "Area, not diameter", value: "value goes as the square of trunk diameter through the cross-sectional area", source: "CTLA trunk formula" },
+      { name: "Measurement height", value: "4.5 ft above grade over 12 in diameter; 1 ft at or below", source: "CTLA trunk formula" },
+      { name: "All factors regional", value: "unit cost and the three ratings are entered from a regional plant appraisal committee guide", source: "user input" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",
