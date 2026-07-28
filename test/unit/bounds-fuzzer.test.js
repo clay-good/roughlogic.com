@@ -34832,3 +34832,66 @@ test("bounds: spec-v1177 computeDrinkingFountainCheck pins the two-unit rule, th
   assert.ok("error" in _v1177({ ...base, water_flow_height_in: -1 }));
   assert.ok("error" in _v1177({ ...base, wheelchair_spout_in: Infinity }));
 });
+
+import { computeAccessibleShowerCheck as _v1178 } from "../../calc-construction.js";
+
+test("bounds: spec-v1178 computeAccessibleShowerCheck pins all three type geometries, the outside clearances, the would-satisfy report, and error seams", () => {
+  const base = { shower_type: "standard-roll-in", width_in: 32, depth_in: 60, entry_width_in: 32, clearance_width_in: 30, clearance_length_in: 60 };
+  const r = _v1178(base);
+  assert.ok(r.required_width_in === 30 && r.required_entry_in === 60 && r.width_ok && r.depth_ok && !r.entry_ok);
+  assert.ok(r.entry_deficit_in === 28 && r.inside_area_sf === 12.5 && r.total_footprint_sf === 25 && !r.passes);
+  assert.ok(r.fits.length === 0, "32 in is under the 36 the other two types need");
+  // THE THREE TYPE GEOMETRIES.
+  const SPECS = { transfer: [36, 36, 36, 36, 48], "standard-roll-in": [30, 60, 60, 30, 60], "alternate-roll-in": [36, 60, 36, 30, 60] };
+  for (const [type, [w, d, e, cw, cl]] of Object.entries(SPECS)) {
+    const t = _v1178({ ...base, shower_type: type, width_in: w, depth_in: d, entry_width_in: e, clearance_width_in: cw, clearance_length_in: cl });
+    assert.ok(t.required_width_in === w && t.required_depth_in === d && t.required_entry_in === e, "inside spec wrong for " + type);
+    assert.ok(t.required_clearance_width_in === cw && t.required_clearance_length_in === cl, "clearance spec wrong for " + type);
+    assert.ok(t.passes, "the exact minimum of " + type + " must pass");
+    // A tenth under any one of the three inside dimensions fails.
+    for (const [k, v] of [["width_in", w - 0.1], ["depth_in", d - 0.1], ["entry_width_in", e - 0.1]]) {
+      assert.ok(!_v1178({ ...base, shower_type: type, width_in: w, depth_in: d, entry_width_in: e, clearance_width_in: cw, clearance_length_in: cl, [k]: v }).passes, k + " must fail a tenth under for " + type);
+    }
+  }
+  // THE SAME STALL PASSES ONE TYPE AND FAILS ANOTHER - the point of the tile.
+  const stall = { width_in: 36, depth_in: 60, entry_width_in: 36, clearance_width_in: 30, clearance_length_in: 60 };
+  assert.ok(_v1178({ ...stall, shower_type: "alternate-roll-in" }).passes);
+  assert.ok(!_v1178({ ...stall, shower_type: "standard-roll-in" }).passes, "the 60 in entry is what it lacks");
+  assert.ok(_v1178({ ...stall, shower_type: "standard-roll-in" }).entry_deficit_in === 24);
+  // THE TRANSFER CLEARANCE IS DEEPER THAN THE STALL - a perfect stall fails on it.
+  const perfect = { shower_type: "transfer", width_in: 36, depth_in: 36, entry_width_in: 36, clearance_width_in: 36, clearance_length_in: 36 };
+  const t2 = _v1178(perfect);
+  assert.ok(t2.inside_ok && !t2.clearance_ok && t2.clearance_length_deficit_in === 12 && !t2.passes);
+  assert.ok(t2.inside_area_sf === 9 && t2.total_footprint_sf === 21);
+  assert.ok(_v1178({ ...perfect, clearance_length_in: 48 }).passes);
+  // Clearance is optional and reports null rather than a pass when omitted.
+  const noClear = _v1178({ ...perfect, clearance_width_in: 0, clearance_length_in: 0 });
+  assert.ok(!noClear.clearance_entered && noClear.clearance_ok === null && noClear.clearance_width_ok === null && noClear.passes);
+  assert.ok(_v1178({ ...perfect, clearance_width_in: 36, clearance_length_in: 0 }).clearance_entered, "either dimension counts as entered");
+  // Clearance width and length fail independently, with exact non-negative deficits.
+  for (const [cw, cl] of [[30, 48], [36, 40], [40, 60], [10, 10]]) {
+    const t = _v1178({ ...perfect, clearance_width_in: cw, clearance_length_in: cl });
+    assert.ok(Math.abs(t.clearance_width_deficit_in - Math.max(0, 36 - cw)) < 1e-9 && t.clearance_width_deficit_in >= 0);
+    assert.ok(Math.abs(t.clearance_length_deficit_in - Math.max(0, 48 - cl)) < 1e-9 && t.clearance_length_deficit_in >= 0);
+  }
+  // THE WOULD-SATISFY REPORT, including the rotated case.
+  assert.ok(_v1178({ ...base, width_in: 36, depth_in: 36, entry_width_in: 36 }).fits.includes("transfer type"));
+  const rotated = _v1178({ ...base, width_in: 60, depth_in: 36, entry_width_in: 36 });
+  assert.ok(rotated.fits.some((f) => f.includes("alternate roll-in type")), "a rotated 60 x 36 should be recognised");
+  assert.ok(_v1178({ ...base, width_in: 20, depth_in: 20, entry_width_in: 20 }).fits.length === 0);
+  // A generous stall satisfies more than one type at once.
+  assert.ok(_v1178({ ...base, width_in: 72, depth_in: 72, entry_width_in: 72 }).fits.length >= 3);
+  // Footprint arithmetic follows the type rather than what was entered.
+  for (const [type, area, total] of [["transfer", 9, 21], ["standard-roll-in", 12.5, 25], ["alternate-roll-in", 15, 27.5]]) {
+    const t = _v1178({ ...base, shower_type: type });
+    assert.ok(Math.abs(t.inside_area_sf - area) < 1e-9 && Math.abs(t.total_footprint_sf - total) < 1e-9, "footprint wrong for " + type);
+  }
+  // Error seams.
+  assert.ok("error" in _v1178({ ...base, shower_type: "walk-in" }));
+  assert.ok("error" in _v1178({ ...base, width_in: 0 }));
+  assert.ok("error" in _v1178({ ...base, depth_in: 0 }));
+  assert.ok("error" in _v1178({ ...base, entry_width_in: 0 }));
+  assert.ok("error" in _v1178({ ...base, clearance_width_in: -1 }));
+  assert.ok("error" in _v1178({ ...base, clearance_length_in: -1 }));
+  assert.ok("error" in _v1178({ ...base, width_in: Infinity }));
+});

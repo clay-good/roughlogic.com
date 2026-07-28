@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "ada roll in shower size",
+      "target": "accessible-shower-check",
+      "kind": "industry"
+    },
+    {
+      "term": "how big does an accessible shower need to be",
+      "target": "accessible-shower-check",
+      "kind": "question"
+    },
+    {
+      "term": "transfer shower 36 by 36",
+      "target": "accessible-shower-check",
+      "kind": "industry"
+    },
+    {
+      "term": "can i fit an accessible shower where the tub was",
+      "target": "accessible-shower-check",
+      "kind": "question"
+    },
+    {
       "term": "ada drinking fountain height",
       "target": "drinking-fountain-check",
       "kind": "industry"

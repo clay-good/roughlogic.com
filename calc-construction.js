@@ -13412,3 +13412,107 @@ CONSTRUCTION_RENDERERS["drinking-fountain-check"] = _simpleRenderer({
   ],
   compute: computeDrinkingFountainCheck,
 });
+
+// ===================== spec-v1178: accessible shower compartments (2010 ADA Standards 608.2) =====================
+
+// Three shower types with three different geometries, and picking the wrong one is what puts a
+// bathroom remodel a foot short in the wrong direction.
+// TRANSFER: 36 x 36 in clear inside, a 36 in wide entry, and a 36 x 48 in clearance OUTSIDE
+// extending from the control wall - the small stall, and the one whose exterior clearance is
+// deeper than the stall itself.
+// STANDARD ROLL-IN: 30 x 60 in clear inside with a 60 in wide entry - the entry is the WHOLE
+// long side, which is what a curb, a jamb, or a door defeats.
+// ALTERNATE ROLL-IN: 36 x 60 in inside with a 36 in wide entry on one long side.
+// The transfer type is the only one that fits in a standard 36 in alcove, and the roll-in types
+// are the ones people draw at 32 or 34 in wide because that is what the tub was.
+// dims: in { width_in: L, depth_in: L, entry_width_in: L, clearance_width_in: L, clearance_length_in: L } out: { required_width_in: L, required_depth_in: L, required_entry_in: L, width_deficit_in: L }
+export function computeAccessibleShowerCheck({ shower_type = "transfer", width_in = 0, depth_in = 0, entry_width_in = 0, clearance_width_in = 0, clearance_length_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(width_in) || 0;
+  const d = Number(depth_in) || 0;
+  const e = Number(entry_width_in) || 0;
+  const cw = Number(clearance_width_in) || 0;
+  const cl = Number(clearance_length_in) || 0;
+  // [label, width, depth, entry, clearance width, clearance length]
+  const TYPES = {
+    transfer: ["transfer type", 36, 36, 36, 36, 48],
+    "standard-roll-in": ["standard roll-in type", 30, 60, 60, 30, 60],
+    "alternate-roll-in": ["alternate roll-in type", 36, 60, 36, 30, 60],
+  };
+  if (!(shower_type in TYPES)) return { error: "Shower type must be transfer, standard-roll-in, or alternate-roll-in." };
+  if (!(w > 0) || !(d > 0)) return { error: "Compartment width and depth must be positive (in)." };
+  if (!(e > 0)) return { error: "Entry width must be positive (in)." };
+  if (cw < 0 || cl < 0) return { error: "Clearance dimensions cannot be negative (in)." };
+
+  const [type_label, reqW, reqD, reqE, reqCW, reqCL] = TYPES[shower_type];
+  const is_transfer = shower_type === "transfer";
+
+  const width_ok = w >= reqW;
+  const depth_ok = d >= reqD;
+  const entry_ok = e >= reqE;
+  const width_deficit_in = Math.max(0, reqW - w);
+  const depth_deficit_in = Math.max(0, reqD - d);
+  const entry_deficit_in = Math.max(0, reqE - e);
+  const inside_ok = width_ok && depth_ok && entry_ok;
+
+  const clearance_entered = cw > 0 || cl > 0;
+  const clearance_width_ok = clearance_entered ? cw >= reqCW : null;
+  const clearance_length_ok = clearance_entered ? cl >= reqCL : null;
+  const clearance_ok = clearance_entered ? (clearance_width_ok && clearance_length_ok) : null;
+  const clearance_width_deficit_in = clearance_entered ? Math.max(0, reqCW - cw) : null;
+  const clearance_length_deficit_in = clearance_entered ? Math.max(0, reqCL - cl) : null;
+
+  // The footprint the stall itself takes, and the total with the clearance in front.
+  const inside_area_sf = (reqW * reqD) / 144;
+  const total_footprint_sf = (reqW * reqD + reqCW * reqCL) / 144;
+
+  // Which of the three this compartment would satisfy as built, so the answer is not just "no".
+  const fits = [];
+  for (const [key, [label, tw, td, te]] of Object.entries(TYPES)) {
+    if (w >= tw && d >= td && e >= te) fits.push(label);
+    else if (d >= tw && w >= td && e >= te) fits.push(label + " rotated");
+  }
+
+  const passes = inside_ok && (clearance_ok !== false);
+
+  const note = "THREE TYPES, THREE GEOMETRIES, and picking the wrong one is what puts a remodel a foot short in the wrong direction. This is the " + type_label + ": " + reqW + " x " + reqD + " in clear inside, a " + reqE + " in wide entry, and a " + reqCW + " x " + reqCL + " in clearance outside it. "
+    + (is_transfer ? "THE TRANSFER TYPE IS THE SMALL ONE - a 36 in square, which is the only one of the three that fits a standard 36 in alcove where a tub used to be. What surprises people is its OUTSIDE clearance: 36 x 48 in extending from the CONTROL WALL, deeper than the stall itself, so the fixture is small and the room it needs is not. "
+      : shower_type === "standard-roll-in" ? "THE STANDARD ROLL-IN ENTRY IS THE WHOLE LONG SIDE: 60 in wide minimum on a 60 in compartment, which means no curb, no jamb, and no door narrowing it. A 30 in deep stall reads as tight on a plan and is correct; what defeats it is anything built across the opening. "
+      : "THE ALTERNATE ROLL-IN trades depth of entry for width of stall: 36 x 60 in inside with a 36 in entry on one LONG side, which is the type that fits where a 60 in tub was and a full-width opening is impossible. ")
+    + "Entered " + w + " x " + d + " in with a " + e + " in entry: "
+    + (inside_ok ? "the inside dimensions and entry are met. " : (width_ok ? "" : "WIDTH short by " + width_deficit_in.toFixed(1) + " in. ") + (depth_ok ? "" : "DEPTH short by " + depth_deficit_in.toFixed(1) + " in. ") + (entry_ok ? "" : "ENTRY short by " + entry_deficit_in.toFixed(1) + " in. "))
+    + (fits.length > 0 ? "AS BUILT THIS COMPARTMENT WOULD SATISFY: " + fits.join(", ") + " - worth knowing before it is torn out, because a stall that fails one type often meets another. " : "As built this compartment satisfies none of the three types in any orientation. ")
+    + (clearance_entered
+      ? "CLEARANCE OUTSIDE: " + reqCW + " x " + reqCL + " in required" + (is_transfer ? ", extending from the control wall" : ", adjacent to the open face") + ". Entered " + cw + " x " + cl + " in: " + (clearance_ok ? "OK. " : (clearance_width_ok ? "" : "width short by " + clearance_width_deficit_in.toFixed(1) + " in. ") + (clearance_length_ok ? "" : "length short by " + clearance_length_deficit_in.toFixed(1) + " in. "))
+      : "No outside clearance entered, so it is not checked - but it is required, and on the transfer type it is the dimension that decides whether the room works. ")
+    + "The stall alone is " + inside_area_sf.toFixed(2) + " sq ft; with its clearance the footprint is " + total_footprint_sf.toFixed(2) + " sq ft. "
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: grab bars, which differ by type and are the reason the three are not interchangeable; the seat, which a transfer shower requires and a standard roll-in requires only in some configurations; controls, faucets, and the hand shower, whose location is tied to the seat and the entry; thresholds and the 1/2 in limit on a roll-in curb; the shower spray unit, hose length, and the fixed-head option; enclosures, which may not obstruct transfer or the clear floor space; drainage and slope; and state and local accessibility law and the plumbing code. A compartment sizing screen, not a bathroom design; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { type_label, required_width_in: reqW, required_depth_in: reqD, required_entry_in: reqE, required_clearance_width_in: reqCW, required_clearance_length_in: reqCL, width_ok, depth_ok, entry_ok, width_deficit_in, depth_deficit_in, entry_deficit_in, inside_ok, clearance_entered, clearance_width_ok, clearance_length_ok, clearance_ok, clearance_width_deficit_in, clearance_length_deficit_in, inside_area_sf, total_footprint_sf, fits, passes, note };
+}
+
+export const accessibleShowerCheckExample = { inputs: { shower_type: "standard-roll-in", width_in: 32, depth_in: 60, entry_width_in: 32, clearance_width_in: 30, clearance_length_in: 60 } };
+
+CONSTRUCTION_RENDERERS["accessible-shower-check"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 608.2.1, 608.2.2, and 608.2.3. A US federal standard in the public domain. 608.2.1: transfer type shower compartments shall be 36 in by 36 in clear inside dimensions measured at the center points of opposing sides and shall have a 36 in wide minimum entry on the face of the shower compartment, with a clearance of 36 in wide minimum by 48 in long minimum measured from the control wall. 608.2.2: standard roll-in type shower compartments shall be 30 in wide minimum by 60 in deep minimum clear inside dimensions measured at the center point of opposing sides and shall have a 60 in wide minimum entry on the face of the shower compartment, with a clearance of 30 in wide minimum by 60 in long minimum adjacent to the open face of the compartment. 608.2.3: alternate roll-in type shower compartments shall be 36 in wide and 60 in deep minimum clear inside dimensions measured at the center point of opposing sides, with a 36 in wide minimum entry provided at one end of the long side of the compartment. Not checked: grab bars, which differ by type; seats; controls, faucets, and the hand shower; thresholds and the roll-in curb limit; enclosures, which may not obstruct transfer or the clear floor space; drainage; or state and local law and the plumbing code. A compartment sizing screen, not a bathroom design.",
+  example: accessibleShowerCheckExample.inputs,
+  fields: [
+    { key: "shower_type", label: "Shower type", kind: "select", options: [{ value: "transfer", label: "Transfer (36 x 36 in)" }, { value: "standard-roll-in", label: "Standard roll-in (30 x 60 in, full-width entry)", selected: true }, { value: "alternate-roll-in", label: "Alternate roll-in (36 x 60 in, 36 in entry)" }] },
+    { key: "width_in", label: "Clear inside width (in)", kind: "number", default: 32 },
+    { key: "depth_in", label: "Clear inside depth (in)", kind: "number", default: 60 },
+    { key: "entry_width_in", label: "Entry width (in)", kind: "number", default: 32 },
+    { key: "clearance_width_in", label: "Clearance outside the compartment, width (in; 0 = skip)", kind: "number", default: 30 },
+    { key: "clearance_length_in", label: "Clearance outside the compartment, length (in; 0 = skip)", kind: "number", default: 60 },
+  ],
+  outputs: [
+    { key: "r", id: "asc2-out-r", label: "Required for this type", value: (r) => r.required_width_in + " x " + r.required_depth_in + " in inside, " + r.required_entry_in + " in entry, " + r.required_clearance_width_in + " x " + r.required_clearance_length_in + " in clearance" },
+    { key: "i", id: "asc2-out-i", label: "Inside and entry", value: (r) => r.inside_ok ? "met" : [r.width_ok ? null : "width short " + fmt(r.width_deficit_in, 1), r.depth_ok ? null : "depth short " + fmt(r.depth_deficit_in, 1), r.entry_ok ? null : "entry short " + fmt(r.entry_deficit_in, 1)].filter(Boolean).join(", ") + " in" },
+    { key: "f", id: "asc2-out-f", label: "What it would satisfy as built", value: (r) => r.fits.length ? r.fits.join(", ") : "none of the three, in any orientation" },
+    { key: "c", id: "asc2-out-c", label: "Clearance outside", value: (r) => r.clearance_ok === null ? "not entered - but it is required" : r.clearance_ok ? "met" : [r.clearance_width_ok ? null : "width short " + fmt(r.clearance_width_deficit_in, 1), r.clearance_length_ok ? null : "length short " + fmt(r.clearance_length_deficit_in, 1)].filter(Boolean).join(", ") + " in" },
+    { key: "a", id: "asc2-out-a", label: "Footprint", value: (r) => fmt(r.inside_area_sf, 2) + " sq ft of stall, " + fmt(r.total_footprint_sf, 2) + " sq ft with its clearance" },
+    { key: "v", id: "asc2-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "asc2-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAccessibleShowerCheck,
+});

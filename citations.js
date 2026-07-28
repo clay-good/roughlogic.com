@@ -6247,6 +6247,20 @@ export const CITATIONS = {
       { name: "Pass-fail threshold", value: "1:12 (8.33%) maximum running slope; 1:48 max cross-slope", source: "ADA §405.2 / §403.3" },
     ],
   },
+  "accessible-shower-check": {
+    formula: "transfer type: 36 x 36 in clear inside, 36 in wide entry, 36 x 48 in clearance from the control wall. Standard roll-in: 30 in wide by 60 in deep clear inside, 60 in wide entry, 30 x 60 in clearance adjacent to the open face. Alternate roll-in: 36 in wide by 60 in deep clear inside, 36 in wide entry at one end of the long side.",
+    edition: "2010 ADA Standards for Accessible Design, 608.2.1, 608.2.2, and 608.2.3. A US federal standard in the public domain, quoted directly.",
+    freeAccess: "The 2010 ADA Standards are published in full at no cost at ada.gov and by the US Access Board.",
+    governance: GOVERNANCE.general,
+    editionNote: "Three types with three different geometries, and picking the wrong one is what puts a bathroom remodel a foot short in the wrong direction. The TRANSFER type is the small one - 36 in square, the only one of the three that fits a standard 36 in alcove where a tub used to be - and what surprises people is its OUTSIDE clearance: 36 in wide by 48 in long measured from the CONTROL WALL, deeper than the stall itself. The fixture is small and the room it needs is not, which is the reverse of how a plan reads. The STANDARD ROLL-IN is 30 in wide by 60 in deep, and its entry is the WHOLE LONG SIDE at 60 in wide minimum - so a 30 in stall that reads as tight on a plan is correct, and what defeats it is anything built across the opening: a curb, a jamb, a door, a fixed panel. The ALTERNATE ROLL-IN trades entry width for stall width, 36 by 60 in inside with a 36 in wide entry at one end of the long side, and it is the type that fits where a 60 in tub was and a full-width opening is impossible. Because the three overlap in confusing ways, the tile also reports which types a compartment as built WOULD satisfy, in either orientation - worth knowing before anything is torn out, since a stall that fails the type it was drawn as often meets another. Not checked: grab bars, which differ by type and are the reason the three are not interchangeable; the seat, which a transfer shower requires and a standard roll-in requires only in some configurations; controls, faucets, and the hand shower, whose location is tied to the seat and the entry; thresholds and the limit on a roll-in curb; the shower spray unit and hose; enclosures, which may not obstruct transfer or the clear floor space; drainage and slope; and state and local accessibility law and the plumbing code. A compartment sizing screen, not a bathroom design.",
+    assumptions: [
+      { name: "Transfer type", value: "36 x 36 in inside, 36 in entry, 36 x 48 in clearance from the control wall", source: "2010 ADA Standards 608.2.1" },
+      { name: "Standard roll-in", value: "30 x 60 in inside, 60 in entry, 30 x 60 in clearance at the open face", source: "2010 ADA Standards 608.2.2" },
+      { name: "Alternate roll-in", value: "36 x 60 in inside, 36 in entry at one end of the long side", source: "2010 ADA Standards 608.2.3" },
+      { name: "Inside dimensions", value: "measured at the center points of opposing sides", source: "2010 ADA Standards 608.2" },
+      { name: "What it would satisfy", value: "reported in either orientation, as information rather than a verdict", source: "roughlogic addition, stated" },
+    ],
+  },
   "drinking-fountain-check": {
     formula: "count: no fewer than two units, one complying with 602.1 through 602.6 and one with 602.7, unless a single unit complies with both. Heights: wheelchair spout outlet 36 in maximum; standing spout outlet 38 in minimum to 43 in maximum, leaving a dead band from 36 to 38 in that satisfies neither. Location: spout 15 in minimum from the vertical support and 5 in maximum from the front edge including bumpers; water stream 4 in high minimum.",
     edition: "2010 ADA Standards for Accessible Design, 211.2, 602.4, 602.5, 602.6, and 602.7. A US federal standard in the public domain, quoted directly.",

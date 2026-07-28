@@ -1642,6 +1642,7 @@ export const COMPUTE_MAP = {
   "ada-stair-check": { module: "../../calc-construction.js", fn: "computeAdaStairCheck" },
   "tactile-sign-mounting": { module: "../../calc-construction.js", fn: "computeTactileSignMounting" },
   "drinking-fountain-check": { module: "../../calc-construction.js", fn: "computeDrinkingFountainCheck" },
+  "accessible-shower-check": { module: "../../calc-construction.js", fn: "computeAccessibleShowerCheck" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 
