@@ -32033,3 +32033,56 @@ test("bounds: spec-v1130 computeGuardPostLoad pins the non-concurrent load pair,
   assert.ok("error" in _v1130({ ...base, connection_lever_in: 0 }));
   assert.ok("error" in _v1130({ ...base, post_height_in: Infinity }));
 });
+
+import { computeEgressWindowCheck as _v1131 } from "../../calc-construction.js";
+
+test("bounds: spec-v1131 computeEgressWindowCheck pins the unsatisfiable-minimums trap, the partner dimensions, every pass/fail seam, and error seams", () => {
+  const base = { clear_width_in: 20, clear_height_in: 24, sill_height_in: 40, location: "above-grade", min_area_override_sf: 0 };
+  const r = _v1131(base);
+  // THE TRAP: both dimensional minimums met, and it still fails on area.
+  assert.ok(r.width_ok && r.height_ok && r.sill_ok && !r.area_ok && !r.passes);
+  assert.ok(r.clear_area_sqin === 480 && Math.abs(r.required_area_sqin - 820.8) < 1e-9);
+  assert.ok(Math.abs(r.area_deficit_sqin - 340.8) < 1e-9 && Math.abs(r.minimums_shortfall_sqin - 340.8) < 1e-9);
+  assert.ok(Math.abs(r.width_needed_in - 34.2) < 1e-9 && Math.abs(r.height_needed_in - 41.04) < 1e-9);
+  // The partner dimensions are exactly the sizes that make the area break even, floored at
+  // the code minimums - so applying either one produces a passing opening.
+  for (const h of [24, 30, 36, 41.04, 48]) {
+    const t = _v1131({ ...base, clear_height_in: h });
+    const fixed = _v1131({ ...base, clear_height_in: h, clear_width_in: t.width_needed_in });
+    assert.ok(fixed.area_ok && fixed.passes, "the reported width must make it pass at h=" + h);
+    assert.ok(t.width_needed_in >= 20 - 1e-12);
+    assert.ok(Math.abs(t.width_needed_in - Math.max(20, 820.8 / h)) < 1e-9);
+  }
+  for (const w of [20, 30, 34.2, 40]) {
+    const t = _v1131({ ...base, clear_width_in: w });
+    const fixed = _v1131({ ...base, clear_width_in: w, clear_height_in: t.height_needed_in });
+    assert.ok(fixed.area_ok && fixed.passes, "the reported height must make it pass at w=" + w);
+    assert.ok(t.height_needed_in >= 24 - 1e-12);
+  }
+  // Every criterion has its own seam, and the boundary value itself is compliant.
+  assert.ok(_v1131({ ...base, clear_width_in: 20 }).width_ok && !_v1131({ ...base, clear_width_in: 19.9 }).width_ok);
+  assert.ok(_v1131({ ...base, clear_height_in: 24 }).height_ok && !_v1131({ ...base, clear_height_in: 23.9 }).height_ok);
+  assert.ok(_v1131({ ...base, sill_height_in: 44 }).sill_ok && !_v1131({ ...base, sill_height_in: 44.1 }).sill_ok);
+  assert.ok(_v1131({ ...base, clear_width_in: 34.2 }).area_ok && !_v1131({ ...base, clear_width_in: 34.19 }).area_ok);
+  // Grade floor relaxes only the AREA, never the dimensions or the sill.
+  const gf = _v1131({ ...base, location: "grade-floor" });
+  assert.ok(gf.required_area_sqin === 720 && gf.grade_floor);
+  assert.ok(gf.width_ok === r.width_ok && gf.height_ok === r.height_ok && gf.sill_ok === r.sill_ok);
+  assert.ok(!gf.area_ok, "even 5.0 sq ft beats 20 x 24");
+  assert.ok(Math.abs(_v1131({ ...base, clear_width_in: 30, location: "grade-floor" }).width_needed_in - 30) < 1e-9);
+  // The override replaces the required area and nothing else.
+  const ov = _v1131({ ...base, min_area_override_sf: 3 });
+  assert.ok(ov.required_area_sqin === 432 && ov.area_ok && ov.passes);
+  assert.ok(ov.width_needed_in === 20 && ov.height_needed_in === 24, "a small override falls back to the dimensional minimums");
+  // A passing opening passes all four, and area scales with both dimensions.
+  const good = _v1131({ clear_width_in: 34, clear_height_in: 24, sill_height_in: 44, location: "grade-floor", min_area_override_sf: 0 });
+  assert.ok(good.passes && good.clear_area_sqin === 816 && good.area_deficit_sqin === 0);
+  assert.ok(Math.abs(_v1131({ ...base, clear_width_in: 40 }).clear_area_sqin - 2 * r.clear_area_sqin) < 1e-9);
+  assert.ok(Math.abs(r.clear_area_sf - r.clear_area_sqin / 144) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v1131({ ...base, clear_width_in: 0 }));
+  assert.ok("error" in _v1131({ ...base, clear_height_in: 0 }));
+  assert.ok("error" in _v1131({ ...base, sill_height_in: -1 }));
+  assert.ok("error" in _v1131({ ...base, min_area_override_sf: -1 }));
+  assert.ok("error" in _v1131({ ...base, clear_width_in: Infinity }));
+});

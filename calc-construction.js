@@ -10948,3 +10948,77 @@ CONSTRUCTION_RENDERERS["guard-post-load"] = _simpleRenderer({
   ],
   compute: computeGuardPostLoad,
 });
+
+
+// --- spec-v1131: emergency escape and rescue opening (egress window) ---
+// The check with the trap built into it. IRC R310.2.1 sets THREE minimums and they cannot
+// all be met at once: 24 in of net clear height and 20 in of net clear width multiply to
+// 480 sq in = 3.33 sq ft, well under the 5.7 sq ft (820.8 sq in) the same section requires.
+// So one dimension always has to exceed its minimum, and by how much depends on the other.
+// That is the number this tile exists to produce - the minimum PARTNER dimension.
+// dims: in { clear_width_in: L, clear_height_in: L, sill_height_in: L, location: dimensionless, min_area_override_sf: L^2 } out: { clear_area_sqin: L^2, clear_area_sf: L^2, required_area_sf: L^2, required_area_sqin: L^2, width_needed_in: L, height_needed_in: L, area_deficit_sqin: L^2 }
+export function computeEgressWindowCheck({ clear_width_in = 0, clear_height_in = 0, sill_height_in = 0, location = "above-grade", min_area_override_sf = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(clear_width_in) || 0;
+  const h = Number(clear_height_in) || 0;
+  const sill = Number(sill_height_in) || 0;
+  const override = Number(min_area_override_sf) || 0;
+  if (!(w > 0)) return { error: "Net clear width must be positive (in)." };
+  if (!(h > 0)) return { error: "Net clear height must be positive (in)." };
+  if (sill < 0) return { error: "Sill height above the floor cannot be negative (in)." };
+  if (override < 0) return { error: "Minimum-area override cannot be negative (sq ft)." };
+
+  const MIN_W = 20, MIN_H = 24, MAX_SILL = 44;
+  const grade_floor = location === "grade-floor";
+  const required_area_sf = override > 0 ? override : (grade_floor ? 5.0 : 5.7);
+  const required_area_sqin = required_area_sf * 144;
+
+  const clear_area_sqin = w * h;
+  const clear_area_sf = clear_area_sqin / 144;
+  const width_ok = w >= MIN_W;
+  const height_ok = h >= MIN_H;
+  const area_ok = clear_area_sqin >= required_area_sqin;
+  const sill_ok = sill <= MAX_SILL;
+  const passes = width_ok && height_ok && area_ok && sill_ok;
+  const area_deficit_sqin = Math.max(0, required_area_sqin - clear_area_sqin);
+
+  // The partner dimension each one needs, held to its own minimum as well.
+  const width_needed_in = Math.max(MIN_W, required_area_sqin / h);
+  const height_needed_in = Math.max(MIN_H, required_area_sqin / w);
+  // The two minimums together fall far short - the trap, quantified.
+  const minimums_area_sqin = MIN_W * MIN_H;
+  const minimums_shortfall_sqin = required_area_sqin - minimums_area_sqin;
+
+  const note = "Net clear opening " + w + " x " + h + " = " + clear_area_sqin.toFixed(0) + " sq in (" + clear_area_sf.toFixed(2) + " sq ft) against "
+    + (override > 0 ? "your " + required_area_sf + " sq ft override" : (grade_floor ? "the 5.0 sq ft grade-floor minimum" : "the 5.7 sq ft minimum")) + " = " + required_area_sqin.toFixed(1) + " sq in. "
+    + "Width " + (width_ok ? "OK" : "FAILS") + " against 20 in, height " + (height_ok ? "OK" : "FAILS") + " against 24 in, area " + (area_ok ? "OK" : "FAILS by " + area_deficit_sqin.toFixed(0) + " sq in") + ", sill " + sill + " in " + (sill_ok ? "OK" : "FAILS") + " against the 44 in maximum. " + (passes ? "PASSES all four. " : "DOES NOT PASS. ")
+    + "The trap worth knowing: the three minimums cannot all be met at once. Twenty inches by twenty-four is only " + minimums_area_sqin + " sq in, " + minimums_shortfall_sqin.toFixed(0) + " sq in short of the area requirement, so ONE dimension always has to exceed its minimum and how far depends on the other. "
+    + "At this opening's " + h + " in height the width must reach " + width_needed_in.toFixed(2) + " in; at its " + w + " in width the height must reach " + height_needed_in.toFixed(2) + " in. Meeting 20 and 24 and stopping there is the most common way an egress window fails inspection. "
+    + "NET CLEAR opening, not the rough opening, not the unit size, and not the glass: it is the actual free hole with the sash operated normally from the inside, so the frame, the stops, and a casement's own sash all subtract. A single-hung window loses roughly half its height to the fixed upper sash, which is why a single-hung that looks large often will not qualify. "
+    + "This checks the four dimensional criteria only. Also required and NOT checked here: openable from the inside without keys, tools, or special knowledge and without removing the sash; a window well where the sill is below grade, with its own minimum area and projection and a ladder or steps where it is deeper than 44 in; bars, grilles, or covers being releasable from the inside; and which rooms need an opening at all. Grade-floor and below-grade rules differ. A screen, not a code-official determination; the adopted code and the AHJ govern.";
+
+  return { clear_area_sqin, clear_area_sf, required_area_sf, required_area_sqin, width_ok, height_ok, area_ok, sill_ok, passes, area_deficit_sqin, width_needed_in, height_needed_in, minimums_area_sqin, minimums_shortfall_sqin, grade_floor, note };
+}
+
+export const egressWindowCheckExample = { inputs: { clear_width_in: 20, clear_height_in: 24, sill_height_in: 40, location: "above-grade", min_area_override_sf: 0 } };
+
+CONSTRUCTION_RENDERERS["egress-window-check"] = _simpleRenderer({
+  citation: "Citation: IRC R310.2.1 and R310.2.2 - an emergency escape and rescue opening needs a net clear opening of not less than 5.7 sq ft (5.0 sq ft for a grade-floor opening), a net clear height of not less than 24 in, a net clear width of not less than 20 in, and the bottom of the clear opening not more than 44 in above the floor, all achieved through the normal operation of the opening from the inside. The tile reports the minimum PARTNER dimension because the three minimums are mutually unsatisfiable: 20 x 24 is 480 sq in against the 820.8 sq in the area rule demands. NET CLEAR opening only - not the rough opening, the unit size, or the glass. Dimensional criteria only; the openability requirement, window wells and their ladders, releasable bars and grilles, and which rooms require an opening are not checked. A screen, not a code-official determination; the adopted code and the AHJ govern.",
+  example: egressWindowCheckExample.inputs,
+  fields: [
+    { key: "clear_width_in", label: "Net clear width (in)", kind: "number", default: 20 },
+    { key: "clear_height_in", label: "Net clear height (in)", kind: "number", default: 24 },
+    { key: "sill_height_in", label: "Sill height above the floor (in)", kind: "number", default: 40 },
+    { key: "location", label: "Opening location", kind: "select", options: [{ value: "above-grade", label: "Upper floor / below grade (5.7 sq ft)", selected: true }, { value: "grade-floor", label: "Grade floor (5.0 sq ft)" }] },
+    { key: "min_area_override_sf", label: "Minimum-area override (sq ft; 0 = use the code value)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "a", id: "ewc-out-a", label: "Net clear area", value: (r) => fmt(r.clear_area_sqin, 0) + " sq in (" + fmt(r.clear_area_sf, 2) + " sq ft) vs " + fmt(r.required_area_sf, 1) + " sq ft required" },
+    { key: "v", id: "ewc-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES all four criteria" : "FAILS: " + [!r.width_ok ? "width" : null, !r.height_ok ? "height" : null, !r.area_ok ? "area by " + fmt(r.area_deficit_sqin, 0) + " sq in" : null, !r.sill_ok ? "sill height" : null].filter(Boolean).join(", ") },
+    { key: "w", id: "ewc-out-w", label: "Width needed at this height", value: (r) => fmt(r.width_needed_in, 2) + " in" },
+    { key: "h", id: "ewc-out-h", label: "Height needed at this width", value: (r) => fmt(r.height_needed_in, 2) + " in" },
+    { key: "t", id: "ewc-out-t", label: "Why both minimums are not enough", value: (r) => "20 x 24 = " + r.minimums_area_sqin + " sq in, " + fmt(r.minimums_shortfall_sqin, 0) + " sq in short" },
+    { key: "n", id: "ewc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeEgressWindowCheck,
+});

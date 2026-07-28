@@ -12361,6 +12361,21 @@ export const CITATIONS = {
       { name: "Infill", value: "the separate 50 lb load on balusters and panel fillers is named but not checked", source: "IBC 1607.8.1.1 / 1607.8.1.2" },
     ],
   },
+  "egress-window-check": {
+    formula: "net clear area = width x height; required = 5.7 sq ft (820.8 sq in), or 5.0 sq ft (720 sq in) for a grade-floor opening, or an override; width needed = max(20, required area / height); height needed = max(24, required area / width); pass requires width >= 20 in, height >= 24 in, area >= required, and sill <= 44 in.",
+    edition: "IRC R310.2.1 (minimum opening area, net clear height, and net clear width, with the grade-floor exception) and R310.2.2 (bottom of the clear opening not more than 44 in above the floor), with all dimensions achieved through the normal operation of the opening from the inside.",
+    freeAccess: "The four dimensional criteria are short prescriptive sentences quoted in state adoptions, building-department handouts, and window manufacturers\' free code guides. No table is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "The reason this needs a calculator at all is that the code\'s three minimums are mutually unsatisfiable: 20 in of net clear width by 24 in of net clear height is 480 sq in, and the same section demands 820.8 sq in - a 340.8 sq in shortfall. So one dimension ALWAYS has to exceed its minimum, and how far depends on the other. At 24 in of height the width has to reach 34.2 in; at 20 in of width the height has to reach 41.04 in. Meeting 20 and 24 and stopping there is the single most common way an egress window fails inspection, and the tile reports the required partner dimension rather than just a pass or fail. The other recurring error is measuring the wrong opening. NET CLEAR means the actual free hole with the sash operated normally from the inside - not the rough opening, not the unit size, not the glass - so the frame, the stops, and a casement\'s own sash all subtract, and a single-hung loses roughly half its height to the fixed upper sash, which is why a single-hung that looks generous often will not qualify. Scope: the four dimensional criteria only. Also required and NOT checked here are that the opening be operable from the inside without keys, tools, or special knowledge and without removing the sash; a window well where the sill is below grade, with its own minimum area and horizontal projection and a permanently affixed ladder or steps where it is deeper than 44 in; that any bars, grilles, covers, or screens be releasable from the inside without tools or special knowledge; and which rooms and stories require an opening in the first place. Grade-floor and below-grade cases differ, and the minimum area is overridable because local amendments exist. A screen, not a code-official determination; the adopted code and the AHJ govern.",
+    assumptions: [
+      { name: "Minimum area", value: "5.7 sq ft, or 5.0 sq ft for a grade-floor opening; overridable", source: "IRC R310.2.1" },
+      { name: "Minimum dimensions", value: "24 in net clear height and 20 in net clear width", source: "IRC R310.2.1" },
+      { name: "Sill height", value: "bottom of the clear opening not more than 44 in above the floor", source: "IRC R310.2.2" },
+      { name: "The three minimums conflict", value: "20 x 24 = 480 sq in, 340.8 short of 820.8; a partner dimension is always required", source: "arithmetic on the code values" },
+      { name: "Net clear opening", value: "the free hole with the sash normally operated; not rough opening, unit size, or glass", source: "IRC R310.2.1 wording" },
+      { name: "Not checked", value: "openability, window wells and ladders, releasable bars and grilles, which rooms need an opening", source: "stated scope limit" },
+    ],
+  },
   "guard-handrail-check": {
     formula: "guard required where surface_height > 30 in; min guard 36 in residential / 42 in commercial; max infill 4.0 in level (4.375 in stair triangle); stair handrail 34-38 in. Each measured value is compared to its limit; a 200 lb concentrated load applies regardless.",
     edition: "IRC 2021 (International Residential Code) Section R312 (guards) / R311.7.8 (handrails) and IBC 2021 Section 1015 by section; dimensional minimums only, not reproduced.",

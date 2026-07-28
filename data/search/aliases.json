@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "egress window",
+      "target": "egress-window-check",
+      "kind": "industry"
+    },
+    {
+      "term": "does my bedroom window meet egress",
+      "target": "egress-window-check",
+      "kind": "question"
+    },
+    {
+      "term": "5.7 square feet net clear opening",
+      "target": "egress-window-check",
+      "kind": "question"
+    },
+    {
+      "term": "emergency escape and rescue opening",
+      "target": "egress-window-check",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum egress window width and height",
+      "target": "egress-window-check",
+      "kind": "question"
+    },
+    {
       "term": "guard post load",
       "target": "guard-post-load",
       "kind": "industry"
