@@ -34434,3 +34434,71 @@ test("bounds: spec-v1171 computeHandrailGeometry pins the height range, the grip
   assert.ok("error" in _v1171({ ...base, top_extension_in: -1 }));
   assert.ok("error" in _v1171({ ...base, rail_height_in: Infinity }));
 });
+
+import { computeKneeToeClearance as _v1172 } from "../../calc-construction.js";
+
+test("bounds: spec-v1172 computeKneeToeClearance pins the 27 in zone gate, the two knee depths, the taper rate, toe and width, and error seams", () => {
+  const base = { apron_height_in: 26, knee_depth_at_9_in: 17, knee_depth_at_27_in: 14, toe_depth_in: 17, clear_width_in: 30 };
+  const r = _v1172(base);
+  assert.ok(!r.has_knee_zone && r.apron_shortfall_in === 1 && !r.knee_ok && !r.passes);
+  assert.ok(r.toe_ok && r.width_ok && r.taper_allowed_in === 3);
+  // THE 27 IN GATE: below it there is no knee zone at all, and the knee outputs are null.
+  for (const [a, has] of [[20, false], [26.9, false], [27, true], [29, true], [34, true]]) {
+    const t = _v1172({ ...base, apron_height_in: a, knee_depth_at_9_in: 11, knee_depth_at_27_in: 8 });
+    assert.ok(t.has_knee_zone === has, "zone gate wrong at " + a);
+    assert.ok(t.knee_9_ok === (has ? true : null) && t.actual_taper_in === (has ? 3 : null));
+    assert.ok(t.passes === has, "no knee zone can never pass");
+    assert.ok(Math.abs(t.apron_shortfall_in - (has ? 0 : 27 - a)) < 1e-9);
+  }
+  // No depth below rescues an underside under 27 in.
+  assert.ok(!_v1172({ ...base, apron_height_in: 26, knee_depth_at_9_in: 25, knee_depth_at_27_in: 25 }).passes);
+  // THE TWO KNEE DEPTHS, each failing alone at its own seam.
+  const ok = { ...base, apron_height_in: 29, knee_depth_at_9_in: 11, knee_depth_at_27_in: 8 };
+  assert.ok(_v1172(ok).passes);
+  assert.ok(!_v1172({ ...ok, knee_depth_at_9_in: 10.9 }).knee_9_ok);
+  assert.ok(!_v1172({ ...ok, knee_depth_at_27_in: 7.9 }).knee_27_ok);
+  assert.ok(_v1172({ ...ok, knee_depth_at_9_in: 10.9 }).knee_27_ok, "the 27 in depth is unaffected");
+  assert.ok(Math.abs(_v1172({ ...ok, knee_depth_at_9_in: 9 }).knee_deficit_in - 2) < 1e-9);
+  assert.ok(Math.abs(_v1172({ ...ok, knee_depth_at_27_in: 5 }).knee_deficit_in - 3) < 1e-9);
+  // THE TAPER RATE IS A SEPARATE FAILURE: both depths can pass and the rate still fail.
+  const taper = _v1172({ ...ok, knee_depth_at_9_in: 17, knee_depth_at_27_in: 12 });
+  assert.ok(taper.knee_9_ok && taper.knee_27_ok && taper.knee_deficit_in === 0);
+  assert.ok(taper.actual_taper_in === 5 && !taper.taper_ok && !taper.knee_ok && !taper.passes);
+  for (const [k9, k27, rateOk] of [[11, 8, true], [14, 11, true], [14, 10.9, false], [20, 17, true], [20, 16, false], [11, 11, true]]) {
+    const t = _v1172({ ...ok, knee_depth_at_9_in: k9, knee_depth_at_27_in: k27 });
+    assert.ok(t.taper_ok === rateOk, "taper verdict wrong at " + k9 + "/" + k27);
+    assert.ok(Math.abs(t.actual_taper_in - (k9 - k27)) < 1e-12);
+  }
+  // The allowed taper is the rate over the zone, and it reconciles the two stated depths exactly.
+  assert.ok(_v1172(ok).taper_allowed_in === (27 - 9) / 6 && _v1172(ok).taper_allowed_in === 11 - 8);
+  // Gaining depth with height is not a violation of a REDUCTION rate.
+  assert.ok(_v1172({ ...ok, knee_depth_at_9_in: 11, knee_depth_at_27_in: 14 }).taper_ok);
+  // The 25 in maximum applies to both zones.
+  assert.ok(_v1172({ ...ok, knee_depth_at_9_in: 25.1, knee_depth_at_27_in: 23 }).knee_depth_over_max);
+  assert.ok(!_v1172({ ...ok, knee_depth_at_9_in: 25, knee_depth_at_27_in: 23 }).knee_depth_over_max);
+  assert.ok(_v1172({ ...ok, toe_depth_in: 25.1 }).toe_over_max && !_v1172({ ...ok, toe_depth_in: 25.1 }).passes);
+  assert.ok(!_v1172({ ...ok, toe_depth_in: 25 }).toe_over_max);
+  // TOE at its seam with an exact deficit.
+  for (const [t0, tok] of [[16.9, false], [17, true], [20, true]]) {
+    const t = _v1172({ ...ok, toe_depth_in: t0 });
+    assert.ok(t.toe_ok === tok && Math.abs(t.toe_deficit_in - Math.max(0, 17 - t0)) < 1e-9 && t.toe_deficit_in >= 0);
+  }
+  // WIDTH at its seam, exact deficit, and failing the whole thing alone.
+  for (const [w, wok] of [[29.9, false], [30, true], [36, true]]) {
+    const t = _v1172({ ...ok, clear_width_in: w });
+    assert.ok(t.width_ok === wok && Math.abs(t.width_deficit_in - Math.max(0, 30 - w)) < 1e-9);
+    assert.ok(t.passes === wok);
+  }
+  // Every check fails independently.
+  assert.ok(!_v1172({ ...ok, apron_height_in: 26 }).passes);
+  assert.ok(!_v1172({ ...ok, knee_depth_at_9_in: 10 }).passes);
+  assert.ok(!_v1172({ ...ok, toe_depth_in: 12 }).passes);
+  assert.ok(!_v1172({ ...ok, clear_width_in: 24 }).passes);
+  // Error seams.
+  assert.ok("error" in _v1172({ ...base, apron_height_in: 0 }));
+  assert.ok("error" in _v1172({ ...base, knee_depth_at_9_in: -1 }));
+  assert.ok("error" in _v1172({ ...base, knee_depth_at_27_in: -1 }));
+  assert.ok("error" in _v1172({ ...base, toe_depth_in: -1 }));
+  assert.ok("error" in _v1172({ ...base, clear_width_in: 0 }));
+  assert.ok("error" in _v1172({ ...base, apron_height_in: Infinity }));
+});

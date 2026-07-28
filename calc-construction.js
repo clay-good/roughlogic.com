@@ -12957,3 +12957,95 @@ CONSTRUCTION_RENDERERS["handrail-geometry"] = _simpleRenderer({
   ],
   compute: computeHandrailGeometry,
 });
+
+// ===================== spec-v1172: knee and toe clearance (2010 ADA Standards 306) =====================
+
+// What makes a lavatory, a work surface, or a sink actually usable, and the part that gets built
+// wrong because a plumber sees an open space and calls it clear.
+// Two stacked zones. TOE is floor to 9 in, KNEE is 9 in to 27 in, both 30 in wide minimum.
+// The knee depth is not one number: 11 in minimum at 9 in above the floor and 8 in minimum at
+// 27 in, and between those it may taper at 1 in of depth per 6 in of height - no faster. A
+// slanted apron or a bowl that hangs down eats the depth exactly where a knee needs it.
+// The 27 in figure is the one that decides a job: a lavatory whose apron sits at 26 in has NO
+// knee clearance at all under this section, whatever the space below it looks like.
+// dims: in { knee_depth_at_9_in: L, knee_depth_at_27_in: L, toe_depth_in: L, clear_width_in: L, apron_height_in: L } out: { required_knee_depth_at_27_in: L, taper_allowed_in: L, knee_deficit_in: L, toe_deficit_in: L }
+export function computeKneeToeClearance({ apron_height_in = 0, knee_depth_at_9_in = 0, knee_depth_at_27_in = 0, toe_depth_in = 0, clear_width_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const apron = Number(apron_height_in) || 0;
+  const k9 = Number(knee_depth_at_9_in) || 0;
+  const k27 = Number(knee_depth_at_27_in) || 0;
+  const toe = Number(toe_depth_in) || 0;
+  const w = Number(clear_width_in) || 0;
+  if (!(apron > 0)) return { error: "Height of the underside of the element must be positive (in)." };
+  if (k9 < 0 || k27 < 0) return { error: "Knee depths cannot be negative (in)." };
+  if (toe < 0) return { error: "Toe depth cannot be negative (in)." };
+  if (!(w > 0)) return { error: "Clear width under the element must be positive (in)." };
+
+  const TOE_TOP = 9, KNEE_TOP = 27, MAX_DEPTH = 25, WIDTH_MIN = 30;
+  const TOE_MIN = 17, KNEE_MIN_AT_9 = 11, KNEE_MIN_AT_27 = 8;
+  const TAPER_DEPTH_PER = 1, TAPER_HEIGHT_PER = 6;
+
+  const has_knee_zone = apron >= KNEE_TOP;
+  const knee_height_available_in = Math.min(apron, KNEE_TOP);
+  // Taper allowance over the 18 in from 9 to 27: 1 in per 6 in = 3 in total, which is exactly
+  // the 11 -> 8 the section states. Reported so the rate is visible rather than assumed.
+  const taper_allowed_in = ((KNEE_TOP - TOE_TOP) / TAPER_HEIGHT_PER) * TAPER_DEPTH_PER;
+  const required_knee_depth_at_9_in = KNEE_MIN_AT_9;
+  const required_knee_depth_at_27_in = KNEE_MIN_AT_27;
+
+  const knee_9_ok = has_knee_zone ? k9 >= KNEE_MIN_AT_9 : null;
+  const knee_27_ok = has_knee_zone ? k27 >= KNEE_MIN_AT_27 : null;
+  const actual_taper_in = has_knee_zone ? k9 - k27 : null;
+  const taper_ok = has_knee_zone ? actual_taper_in <= taper_allowed_in + 1e-9 : null;
+  const knee_depth_over_max = has_knee_zone ? k9 > MAX_DEPTH : null;
+  const knee_deficit_in = has_knee_zone ? Math.max(Math.max(0, KNEE_MIN_AT_9 - k9), Math.max(0, KNEE_MIN_AT_27 - k27)) : null;
+  const knee_ok = has_knee_zone ? (knee_9_ok && knee_27_ok && taper_ok && !knee_depth_over_max) : false;
+
+  const toe_ok = toe >= TOE_MIN;
+  const toe_deficit_in = Math.max(0, TOE_MIN - toe);
+  const toe_over_max = toe > MAX_DEPTH;
+  const width_ok = w >= WIDTH_MIN;
+  const width_deficit_in = Math.max(0, WIDTH_MIN - w);
+
+  const apron_shortfall_in = has_knee_zone ? 0 : KNEE_TOP - apron;
+  const passes = has_knee_zone && knee_ok && toe_ok && !toe_over_max && width_ok;
+
+  const note = "TWO STACKED ZONES, and calling an open space clear is how this gets built wrong. Space between the floor and 9 in is TOE clearance; space between 9 in and 27 in is KNEE clearance. Both are 30 in wide minimum and neither may extend more than 25 in under the element. "
+    + "THE 27 IN FIGURE DECIDES THE JOB. The underside entered is " + apron + " in: "
+    + (has_knee_zone ? "at or above 27 in, so a knee zone exists. " : "BELOW 27 in by " + apron_shortfall_in.toFixed(2) + " in, so there is NO knee clearance under this section at all, whatever the space below it looks like. A lavatory whose apron sits at 26 in does not have shallow knee clearance; it has none, and no depth below can rescue it. ")
+    + (has_knee_zone
+      ? "KNEE DEPTH IS NOT ONE NUMBER: 11 in minimum at 9 in above the floor, and 8 in minimum at 27 in. Entered " + k9 + " in at 9 in and " + k27 + " in at 27 in: " + (knee_9_ok && knee_27_ok ? "both met" : (knee_9_ok ? "" : "the 9 in depth is short") + (knee_9_ok || knee_27_ok ? "" : " and ") + (knee_27_ok ? "" : "the 27 in depth is short")) + ". "
+        + "BETWEEN THEM IT MAY TAPER AT 1 IN OF DEPTH PER 6 IN OF HEIGHT AND NO FASTER, which over the 18 in from 9 to 27 is " + taper_allowed_in.toFixed(0) + " in total - exactly the 11 to 8 the section states, so the two depths and the rate are the same rule read two ways. This one loses " + actual_taper_in.toFixed(2) + " in: " + (taper_ok ? "within the rate. " : "TOO FAST. A slanted apron or a bowl hanging down eats the depth precisely where a knee needs it, and the taper limit is what catches that. ")
+        + (knee_depth_over_max ? "The knee depth entered exceeds the 25 in maximum any clearance may extend under an element. " : "")
+      : "")
+    + "TOE (306.2): the clearance must extend " + TOE_MIN + " in minimum under the element where toe clearance is required, and " + MAX_DEPTH + " in maximum. Entered " + toe + " in: " + (toe_over_max ? "past the 25 in maximum. " : toe_ok ? "OK. " : "SHORT by " + toe_deficit_in.toFixed(2) + " in. ")
+    + "WIDTH: 30 in minimum for both zones. Entered " + w + " in: " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(2) + " in - and this is the one a pedestal, a trap arm, or a cabinet gable takes out on one side without changing the apparent opening. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: whether knee and toe clearance are required at this element at all, which turns on the element and on whether a forward approach is required - a parallel approach needs neither; the 306.2.4 rule that space extending more than 6 in beyond the available knee clearance at 9 in above the floor does not count as toe clearance, which requires the two zones to be read together and a section drawn; the clear floor space in front, which is a separate requirement and a separate tile; pipe insulation and the requirement that exposed pipes and surfaces be configured to protect against contact; the element's own rim or counter height and reach ranges; and state and local accessibility law. A clearance screen, not a fixture rough-in; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { has_knee_zone, apron_shortfall_in, knee_height_available_in, required_knee_depth_at_9_in, required_knee_depth_at_27_in, taper_allowed_in, actual_taper_in, taper_ok, knee_9_ok, knee_27_ok, knee_depth_over_max, knee_deficit_in, knee_ok, toe_ok, toe_deficit_in, toe_over_max, width_ok, width_deficit_in, passes, note };
+}
+
+export const kneeToeClearanceExample = { inputs: { apron_height_in: 26, knee_depth_at_9_in: 17, knee_depth_at_27_in: 14, toe_depth_in: 17, clear_width_in: 30 } };
+
+CONSTRUCTION_RENDERERS["knee-toe-clearance"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 306.2 and 306.3. A US federal standard in the public domain. 306.2.1: space under an element between the finish floor or ground and 9 in above the finish floor or ground shall be considered toe clearance. 306.2.2: toe clearance shall extend 25 in maximum under an element. 306.2.3: where toe clearance is required at an element as part of a clear floor space, the toe clearance shall extend 17 in minimum under the element. 306.2.4: space extending greater than 6 in beyond the available knee clearance at 9 in above the finish floor or ground shall not be considered toe clearance. 306.2.5: toe clearance shall be 30 in wide minimum. 306.3.1: space under an element between 9 in and 27 in above the finish floor or ground shall be considered knee clearance. 306.3.2: knee clearance shall extend 25 in maximum under an element at 9 in above the finish floor or ground. 306.3.3: where knee clearance is required under an element as part of a clear floor space, the knee clearance shall be 11 in deep minimum at 9 in above the finish floor or ground, and 8 in deep minimum at 27 in above the finish floor or ground. 306.3.4: between 9 in and 27 in above the finish floor or ground, the knee clearance shall be permitted to reduce at a rate of 1 in in depth for each 6 in in height. 306.3.5: knee clearance shall be 30 in wide minimum. Not checked: whether knee and toe clearance are required at this element, the 306.2.4 interaction between the two zones, the clear floor space in front, pipe protection, the element's own height and reach ranges, or state and local law. A clearance screen, not a fixture rough-in.",
+  example: kneeToeClearanceExample.inputs,
+  fields: [
+    { key: "apron_height_in", label: "Height of the underside of the element (in)", kind: "number", default: 26 },
+    { key: "knee_depth_at_9_in", label: "Knee depth available at 9 in above the floor (in)", kind: "number", default: 17 },
+    { key: "knee_depth_at_27_in", label: "Knee depth available at 27 in above the floor (in)", kind: "number", default: 14 },
+    { key: "toe_depth_in", label: "Toe depth available below 9 in (in)", kind: "number", default: 17 },
+    { key: "clear_width_in", label: "Clear width under the element (in)", kind: "number", default: 30 },
+  ],
+  outputs: [
+    { key: "k", id: "ktc-out-k", label: "Is there a knee zone at all?", value: (r) => r.has_knee_zone ? "yes - the underside is at or above 27 in" : "NO - the underside is " + fmt(r.apron_shortfall_in, 2) + " in below 27 in, so no depth below can rescue it" },
+    { key: "d", id: "ktc-out-d", label: "Knee depth", value: (r) => !r.has_knee_zone ? "not applicable" : "needs " + r.required_knee_depth_at_9_in + " in at 9 in and " + r.required_knee_depth_at_27_in + " in at 27 in - " + (r.knee_9_ok && r.knee_27_ok ? "both met" : "short by " + fmt(r.knee_deficit_in, 2) + " in") },
+    { key: "t", id: "ktc-out-t", label: "Taper", value: (r) => !r.has_knee_zone ? "not applicable" : "may lose " + fmt(r.taper_allowed_in, 0) + " in over the 18 in of height (1 in per 6 in); loses " + fmt(r.actual_taper_in, 2) + " in - " + (r.taper_ok ? "within the rate" : "TOO FAST") },
+    { key: "o", id: "ktc-out-o", label: "Toe clearance", value: (r) => r.toe_over_max ? "past the 25 in maximum" : r.toe_ok ? "meets the 17 in minimum" : "short of 17 in by " + fmt(r.toe_deficit_in, 2) + " in" },
+    { key: "w", id: "ktc-out-w", label: "Width", value: (r) => r.width_ok ? "meets the 30 in minimum" : "short by " + fmt(r.width_deficit_in, 2) + " in" },
+    { key: "v", id: "ktc-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "ktc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeKneeToeClearance,
+});
