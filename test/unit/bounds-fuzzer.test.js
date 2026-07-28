@@ -35169,3 +35169,70 @@ test("bounds: spec-v1182 computeLavatoryTubClearance pins the higher-of rule, th
   assert.ok("error" in _v1182({ ...base, clear_length_in: -1 }));
   assert.ok("error" in _v1182({ ...base, rim_height_in: Infinity }));
 });
+
+import { computeRampDetailCheck as _v1183 } from "../../calc-construction.js";
+
+test("bounds: spec-v1183 computeRampDetailCheck pins the cross slope, the between-handrails width, the turning landing, edge protection, and error seams", () => {
+  const base = { cross_slope_ratio: 40, clear_width_in: 36, handrails: "yes", handrail_intrusion_in: 6, landing_length_in: 60, landing_width_in: 48, run_width_in: 36, changes_direction: "yes", edge_protection: "none" };
+  const r = _v1183(base);
+  assert.ok(!r.cross_slope_ok && r.cross_slope_pct === 2.5 && r.effective_width_in === 30 && r.width_deficit_in === 6);
+  assert.ok(r.handrails_cost_compliance && r.width_needed_between_rails_in === 42);
+  assert.ok(r.required_landing_width_in === 60 && r.landing_width_deficit_in === 12 && r.turn_drives_width && !r.edge_ok && !r.passes);
+  // CROSS SLOPE: a bigger ratio is flatter, and 1:48 is inclusive.
+  for (const [x, ok] of [[24, false], [47, false], [48, true], [100, true]]) {
+    const t = _v1183({ ...base, cross_slope_ratio: x });
+    assert.ok(t.cross_slope_ok === ok && Math.abs(t.cross_slope_pct - 100 / x) < 1e-12, "cross slope wrong at 1:" + x);
+  }
+  // WIDTH IS MEASURED BETWEEN THE HANDRAILS where they are provided.
+  const good = { ...base, cross_slope_ratio: 48, clear_width_in: 42, landing_width_in: 60, edge_protection: "curb-or-barrier" };
+  assert.ok(_v1183(good).passes && _v1183(good).effective_width_in === 36);
+  for (const [w, intr, eff] of [[42, 6, 36], [36, 0, 36], [48, 12, 36], [40, 6, 34]]) {
+    const t = _v1183({ ...good, clear_width_in: w, handrail_intrusion_in: intr });
+    assert.ok(Math.abs(t.effective_width_in - eff) < 1e-9, "effective width wrong at " + w + "/" + intr);
+    assert.ok(t.width_ok === (eff >= 36));
+    assert.ok(Math.abs(t.width_needed_between_rails_in - (36 + intr)) < 1e-9);
+  }
+  // Without handrails the intrusion is ignored entirely.
+  assert.ok(_v1183({ ...good, handrails: "no", clear_width_in: 36, handrail_intrusion_in: 12 }).effective_width_in === 36);
+  assert.ok(_v1183({ ...good, handrails: "no", clear_width_in: 36, handrail_intrusion_in: 12 }).width_needed_between_rails_in === 36);
+  assert.ok(!_v1183({ ...good, handrails: "no", clear_width_in: 35.9 }).width_ok);
+  // The handrails-cost-compliance flag fires only when the RUN was wide enough on its own.
+  assert.ok(_v1183({ ...good, clear_width_in: 36, handrail_intrusion_in: 6 }).handrails_cost_compliance);
+  assert.ok(!_v1183({ ...good, clear_width_in: 30, handrail_intrusion_in: 6 }).handrails_cost_compliance, "an already-narrow ramp is not the rails' fault");
+  assert.ok(!_v1183({ ...good, clear_width_in: 42, handrail_intrusion_in: 6 }).handrails_cost_compliance, "nothing to flag when it passes");
+  // THE TURNING LANDING is 60 x 60; a straight landing follows the run width.
+  for (const [turns, rw, reqL, reqW, drives] of [
+    ["no", 36, 60, 36, false], ["no", 72, 60, 72, false],
+    ["yes", 36, 60, 60, true], ["yes", 72, 60, 72, false], ["yes", 60, 60, 60, false]]) {
+    const t = _v1183({ ...good, changes_direction: turns, run_width_in: rw, landing_width_in: 96 });
+    assert.ok(t.required_landing_length_in === reqL && t.required_landing_width_in === reqW, "landing requirement wrong at " + turns + "/" + rw);
+    assert.ok(t.turn_drives_width === drives);
+  }
+  // Landing length and width fail independently with exact deficits.
+  for (const [ll, lw] of [[60, 60], [48, 60], [60, 48], [30, 30]]) {
+    const t = _v1183({ ...good, landing_length_in: ll, landing_width_in: lw });
+    assert.ok(Math.abs(t.landing_length_deficit_in - Math.max(0, 60 - ll)) < 1e-9 && t.landing_length_deficit_in >= 0);
+    assert.ok(Math.abs(t.landing_width_deficit_in - Math.max(0, 60 - lw)) < 1e-9 && t.landing_width_deficit_in >= 0);
+    assert.ok(t.landing_ok === (ll >= 60 && lw >= 60));
+  }
+  // EDGE PROTECTION: both listed forms satisfy it and none does not.
+  assert.ok(!_v1183({ ...good, edge_protection: "none" }).edge_ok && !_v1183({ ...good, edge_protection: "none" }).passes);
+  assert.ok(_v1183({ ...good, edge_protection: "extended-floor" }).edge_ok && _v1183({ ...good, edge_protection: "extended-floor" }).passes);
+  assert.ok(_v1183({ ...good, edge_protection: "curb-or-barrier" }).edge_ok);
+  // Every check fails independently.
+  assert.ok(!_v1183({ ...good, cross_slope_ratio: 24 }).passes);
+  assert.ok(!_v1183({ ...good, clear_width_in: 40 }).passes);
+  assert.ok(!_v1183({ ...good, landing_length_in: 48 }).passes);
+  assert.ok(!_v1183({ ...good, edge_protection: "none" }).passes);
+  // Error seams.
+  assert.ok("error" in _v1183({ ...base, edge_protection: "a rail" }));
+  assert.ok("error" in _v1183({ ...base, handrails: "some" }));
+  assert.ok("error" in _v1183({ ...base, changes_direction: "maybe" }));
+  assert.ok("error" in _v1183({ ...base, cross_slope_ratio: 0 }));
+  assert.ok("error" in _v1183({ ...base, clear_width_in: 0 }));
+  assert.ok("error" in _v1183({ ...base, handrail_intrusion_in: -1 }));
+  assert.ok("error" in _v1183({ ...base, landing_length_in: 0 }));
+  assert.ok("error" in _v1183({ ...base, landing_width_in: 0 }));
+  assert.ok("error" in _v1183({ ...base, run_width_in: 0 }));
+  assert.ok("error" in _v1183({ ...base, clear_width_in: Infinity }));
+});

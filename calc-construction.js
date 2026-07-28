@@ -13896,3 +13896,105 @@ CONSTRUCTION_RENDERERS["lavatory-tub-clearance"] = _simpleRenderer({
   ],
   compute: computeLavatoryTubClearance,
 });
+
+// ===================== spec-v1183: ramp cross slope, width, and edge protection (2010 ADA Standards 405) =====================
+
+// ada-ramp-slope lays the ramp out - running slope, runs, landings. These are the four rules on
+// the same ramp that get built wrong after the layout is right.
+// CROSS SLOPE is 1:48 - about 2% - across the direction of travel, which is flatter than the
+// drainage most sitework targets, so the ramp that sheds water well is the one that fails.
+// CLEAR WIDTH is 36 in, and where handrails are provided it is measured BETWEEN THE HANDRAILS,
+// so a 36 in ramp with rails on both sides is not a 36 in ramp any more.
+// A LANDING is 60 in long minimum and at least as wide as the widest run reaching it - and where
+// the ramp CHANGES DIRECTION the landing is 60 x 60, which is the one that turns a switchback
+// into a wider footprint than anyone drew.
+// EDGE PROTECTION is either the floor surface extended 12 in beyond the handrail or a curb or
+// barrier that stops a 4 in sphere within 4 in of the surface - a rail alone is not edge
+// protection, because the hazard is at the wheel and not at the hand.
+// dims: in { clear_width_in: L, handrail_intrusion_in: L, landing_length_in: L, landing_width_in: L, run_width_in: L } out: { effective_width_in: L, width_deficit_in: L, required_landing_width_in: L, landing_deficit_in: L }
+export function computeRampDetailCheck({ cross_slope_ratio = 48, clear_width_in = 0, handrails = "yes", handrail_intrusion_in = 0, landing_length_in = 0, landing_width_in = 0, run_width_in = 0, changes_direction = "no", edge_protection = "none" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const xs = Number(cross_slope_ratio) || 0;
+  const w = Number(clear_width_in) || 0;
+  const intr = Number(handrail_intrusion_in) || 0;
+  const ll = Number(landing_length_in) || 0;
+  const lw = Number(landing_width_in) || 0;
+  const rw = Number(run_width_in) || 0;
+  const rails = handrails === "yes";
+  const turns = changes_direction === "yes";
+  const EDGES = { none: "none provided", "extended-floor": "the floor surface extended 12 in beyond the handrail", "curb-or-barrier": "a curb or barrier stopping a 4 in sphere within 4 in of the surface" };
+  if (!(edge_protection in EDGES)) return { error: "Edge protection must be none, extended-floor, or curb-or-barrier." };
+  if (handrails !== "yes" && handrails !== "no") return { error: "State whether handrails are provided (yes or no)." };
+  if (changes_direction !== "yes" && changes_direction !== "no") return { error: "State whether the ramp changes direction at this landing (yes or no)." };
+  if (!(xs > 0)) return { error: "Cross slope ratio must be positive (48 for the 1:48 maximum)." };
+  if (!(w > 0)) return { error: "Clear width of the ramp run must be positive (in)." };
+  if (intr < 0) return { error: "Handrail intrusion cannot be negative (in)." };
+  if (!(ll > 0) || !(lw > 0)) return { error: "Landing length and width must be positive (in)." };
+  if (!(rw > 0)) return { error: "Width of the widest run reaching the landing must be positive (in)." };
+
+  const XS_MAX = 48, WIDTH_MIN = 36, LANDING_LEN = 60, TURN_DIM = 60;
+
+  const cross_slope_ok = xs >= XS_MAX;
+  const cross_slope_pct = 100 / xs;
+
+  // Where handrails are provided the clear width is measured between them.
+  const effective_width_in = rails ? w - intr : w;
+  const width_ok = effective_width_in >= WIDTH_MIN;
+  const width_deficit_in = Math.max(0, WIDTH_MIN - effective_width_in);
+  const handrails_cost_compliance = rails && w >= WIDTH_MIN && !width_ok;
+  const width_needed_between_rails_in = rails ? WIDTH_MIN + intr : WIDTH_MIN;
+
+  const required_landing_length_in = turns ? TURN_DIM : LANDING_LEN;
+  const required_landing_width_in = turns ? Math.max(TURN_DIM, rw) : rw;
+  const landing_length_ok = ll >= required_landing_length_in;
+  const landing_width_ok = lw >= required_landing_width_in;
+  const landing_length_deficit_in = Math.max(0, required_landing_length_in - ll);
+  const landing_width_deficit_in = Math.max(0, required_landing_width_in - lw);
+  const landing_ok = landing_length_ok && landing_width_ok;
+  const turn_drives_width = turns && TURN_DIM > rw;
+
+  const edge_ok = edge_protection !== "none";
+
+  const passes = cross_slope_ok && width_ok && landing_ok && edge_ok;
+
+  const note = "THE LAYOUT CAN BE RIGHT AND THE RAMP STILL WRONG. These are the four rules on the same ramp that get built wrong after the slope, the runs, and the landing count are settled. "
+    + "CROSS SLOPE (405.3): not steeper than 1:48 - about 2% - measured ACROSS the direction of travel. Entered 1:" + xs + ", which is " + cross_slope_pct.toFixed(2) + "%: " + (cross_slope_ok ? "OK. " : "TOO STEEP. ")
+    + "This is flatter than the drainage most sitework targets, so the ramp that sheds water beautifully is the one that fails, and it fails after the concrete is down. "
+    + "CLEAR WIDTH (405.5): 36 in minimum - and where handrails are provided it is measured BETWEEN THE HANDRAILS. "
+    + (rails ? "With rails taking " + intr + " in, a " + w + " in ramp leaves " + effective_width_in.toFixed(1) + " in between them: " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(1) + " in. ") + (handrails_cost_compliance ? "NOTE WHAT HAPPENED: the ramp itself is 36 in or wider and the HANDRAILS took it under. A 36 in ramp with rails on both sides is not a 36 in ramp any more, and the fix is a wider slab rather than a different rail - " + width_needed_between_rails_in.toFixed(1) + " in of ramp to leave 36 between the rails. " : "") : "No handrails entered, so the full " + w + " in is the clear width: " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(1) + " in. ") + "Note that adding handrails later measures BETWEEN them and can take a compliant ramp under. ")
+    + "LANDING (405.7): 60 in long minimum and at least as wide as the widest run leading to it" + (turns ? " - and this ramp CHANGES DIRECTION here, so the landing must be 60 x 60 minimum" + (turn_drives_width ? ", which at a " + rw + " in run is the 60 in that governs rather than the run width. This is the rule that turns a switchback into a wider footprint than anyone drew. " : ". ") : ". ")
+    + "Required " + required_landing_length_in + " x " + required_landing_width_in + " in; entered " + ll + " x " + lw + " in: " + (landing_ok ? "OK. " : (landing_length_ok ? "" : "length short by " + landing_length_deficit_in.toFixed(1) + " in. ") + (landing_width_ok ? "" : "width short by " + landing_width_deficit_in.toFixed(1) + " in. "))
+    + "EDGE PROTECTION (405.9): " + EDGES[edge_protection] + ". " + (edge_ok ? "" : "NONE IS PROVIDED, and a handrail is not edge protection - the hazard is at the WHEEL, not at the hand. The two ways to satisfy it are the floor surface extended 12 in beyond the handrail, or a curb or barrier that stops a 4 in sphere from passing within 4 in of the surface. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: the running slope, the number of runs, the 30 in maximum rise per run, and the total ramp length, which are a separate tile; handrail height, grip, clearance, and extensions, which are their own tile; the surface, changes in level, and openings on the ramp and its landings; doors opening onto landings and the maneuvering clearance they need, which routinely conflicts with the 60 in landing; wet conditions and the requirement that outdoor ramps and their approaches be designed so water does not accumulate; the structure and its frost depth; curb ramps, which are section 406 and a different set of rules; and state and local accessibility law. A ramp detail screen, not a ramp design; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { cross_slope_ok, cross_slope_pct, effective_width_in, width_ok, width_deficit_in, handrails_cost_compliance, width_needed_between_rails_in, required_landing_length_in, required_landing_width_in, landing_length_ok, landing_width_ok, landing_length_deficit_in, landing_width_deficit_in, landing_ok, turn_drives_width, edge_ok, passes, note };
+}
+
+export const rampDetailCheckExample = { inputs: { cross_slope_ratio: 40, clear_width_in: 36, handrails: "yes", handrail_intrusion_in: 6, landing_length_in: 60, landing_width_in: 48, run_width_in: 36, changes_direction: "yes", edge_protection: "none" } };
+
+CONSTRUCTION_RENDERERS["ramp-detail-check"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 405.3, 405.5, 405.7.2, 405.7.3, 405.7.4, and 405.9. A US federal standard in the public domain. 405.3: cross slope of ramp runs shall not be steeper than 1:48. 405.5: the clear width of a ramp run and, where handrails are provided, the clear width between handrails shall be 36 in minimum. 405.7.2: the landing clear width shall be at least as wide as the widest ramp run leading to the landing. 405.7.3: the landing clear length shall be 60 in long minimum. 405.7.4: ramps that change direction between runs at landings shall have a clear landing 60 in minimum by 60 in minimum. 405.9: edge protection complying with 405.9.1 or 405.9.2 shall be provided on each side of ramp runs and at each side of ramp landings - either the surface of the ramp run or landing extending 12 in minimum beyond the inside face of a handrail, or a curb or barrier constructed so that the curb or barrier prevents the passage of a 4 in diameter sphere where any portion of the sphere is within 4 in of the finish floor or ground surface. Not checked: running slope, the number of runs, the 30 in maximum rise, and total length, which are a separate tile; handrail height, grip, clearance, and extensions, which are their own tile; the surface and changes in level; doors opening onto landings; drainage; curb ramps, which are section 406; or state and local law. A ramp detail screen, not a ramp design.",
+  example: rampDetailCheckExample.inputs,
+  fields: [
+    { key: "cross_slope_ratio", label: "Cross slope, run per unit rise (48 = the 1:48 maximum)", kind: "number", default: 40 },
+    { key: "clear_width_in", label: "Clear width of the ramp run (in)", kind: "number", default: 36 },
+    { key: "handrails", label: "Handrails provided?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
+    { key: "handrail_intrusion_in", label: "Total width the handrails take from the run (in)", kind: "number", default: 6 },
+    { key: "landing_length_in", label: "Landing clear length (in)", kind: "number", default: 60 },
+    { key: "landing_width_in", label: "Landing clear width (in)", kind: "number", default: 48 },
+    { key: "run_width_in", label: "Width of the widest run reaching the landing (in)", kind: "number", default: 36 },
+    { key: "changes_direction", label: "Ramp changes direction at this landing?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
+    { key: "edge_protection", label: "Edge protection", kind: "select", options: [{ value: "none", label: "None provided", selected: true }, { value: "extended-floor", label: "Floor extended 12 in beyond the handrail" }, { value: "curb-or-barrier", label: "Curb or barrier stopping a 4 in sphere" }] },
+  ],
+  outputs: [
+    { key: "x", id: "rdc-out-x", label: "Cross slope (1:48 max)", value: (r) => fmt(r.cross_slope_pct, 2) + "% - " + (r.cross_slope_ok ? "OK" : "TOO STEEP") },
+    { key: "w", id: "rdc-out-w", label: "Clear width", value: (r) => fmt(r.effective_width_in, 1) + " in " + (r.handrails_cost_compliance ? "between the handrails - the ramp is wide enough and the RAILS took it under; needs " + fmt(r.width_needed_between_rails_in, 1) + " in of ramp" : r.width_ok ? "- OK" : "- short by " + fmt(r.width_deficit_in, 1) + " in") },
+    { key: "l", id: "rdc-out-l", label: "Landing required", value: (r) => r.required_landing_length_in + " x " + r.required_landing_width_in + " in" + (r.turn_drives_width ? " - the change in direction drives the width, not the run" : "") },
+    { key: "p", id: "rdc-out-p", label: "Landing provided", value: (r) => r.landing_ok ? "meets both" : [r.landing_length_ok ? null : "length short " + fmt(r.landing_length_deficit_in, 1), r.landing_width_ok ? null : "width short " + fmt(r.landing_width_deficit_in, 1)].filter(Boolean).join(", ") + " in" },
+    { key: "e", id: "rdc-out-e", label: "Edge protection", value: (r) => r.edge_ok ? "provided" : "NONE - and a handrail is not edge protection" },
+    { key: "v", id: "rdc-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "rdc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRampDetailCheck,
+});
