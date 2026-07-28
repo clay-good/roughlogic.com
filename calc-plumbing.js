@@ -4838,3 +4838,93 @@ function _v1136renderAavInstallCheck(inputRegion, outputRegion, citationEl) {
   for (const x of [ov, vs, ac]) x.select.addEventListener("change", update);
 }
 PLUMBING_RENDERERS["aav-install-check"] = _v1136renderAavInstallCheck;
+
+// --- spec-v1137: ADA grab bar layout and blocking load (2010 ADA Standards 604.5 / 609) ---
+// The accessible-fixture geometry the IPC clearance tile explicitly says it does not cover,
+// plus the number nobody puts on a drawing: 609.8 requires the bar and its mounting to
+// sustain 250 lbf, and a bar standing 1.5 in off the wall turns that into a prying moment
+// the blocking has to resolve over the fastener spacing - the same lever-arm collapse the
+// guard-post tile shows, in miniature. A bar screwed to drywall anchors meets none of it.
+// dims: in { bar_height_in: L, side_bar_length_in: L, side_bar_from_rear_in: L, rear_bar_length_in: L, rear_toward_side_in: L, rear_toward_open_in: L, load_lb: M L T^-2, standoff_in: L, fastener_spacing_in: L } out: { pull_out_lb: M L T^-2, prying_moment_inlb: M L^2 T^-2, fastener_force_lb: M L T^-2 }
+export function computeGrabBarLayout({ bar_height_in = 34, side_bar_length_in = 42, side_bar_from_rear_in = 12, rear_bar_length_in = 36, rear_toward_side_in = 12, rear_toward_open_in = 24, load_lb = 250, standoff_in = 1.5, fastener_spacing_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const h = Number(bar_height_in) || 0;
+  const sl = Number(side_bar_length_in) || 0;
+  const sf = Number(side_bar_from_rear_in) || 0;
+  const rl = Number(rear_bar_length_in) || 0;
+  const rs = Number(rear_toward_side_in) || 0;
+  const ro = Number(rear_toward_open_in) || 0;
+  const P = Number(load_lb) || 0;
+  const off = Number(standoff_in) || 0;
+  const fs = Number(fastener_spacing_in) || 0;
+  if (!(h > 0)) return { error: "Grab bar height must be positive (in)." };
+  if (!(sl > 0) || !(rl > 0)) return { error: "Both grab bar lengths must be positive (in)." };
+  if (sf < 0 || rs < 0 || ro < 0) return { error: "Grab bar positions cannot be negative (in)." };
+  if (!(P > 0)) return { error: "Design load must be positive (lb)." };
+  if (off < 0) return { error: "Standoff from the wall cannot be negative (in)." };
+  if (fs < 0) return { error: "Fastener spacing cannot be negative (in)." };
+
+  const H_MIN = 33, H_MAX = 36, SIDE_MIN = 42, SIDE_FROM_REAR_MAX = 12, REAR_MIN = 36, REAR_SIDE_MIN = 12, REAR_OPEN_MIN = 24;
+  const height_ok = h >= H_MIN && h <= H_MAX;
+  const side_length_ok = sl >= SIDE_MIN;
+  const side_position_ok = sf <= SIDE_FROM_REAR_MAX;
+  const rear_length_ok = rl >= REAR_MIN;
+  const rear_side_ok = rs >= REAR_SIDE_MIN;
+  const rear_open_ok = ro >= REAR_OPEN_MIN;
+  // A rear bar has to reach both ways from the centerline, so its length is not independent
+  // of the two extensions - this is the check people miss on a 36 in bar.
+  const rear_span_needed_in = rs + ro;
+  const rear_span_ok = rl >= rear_span_needed_in;
+  const layout_ok = height_ok && side_length_ok && side_position_ok && rear_length_ok && rear_side_ok && rear_open_ok && rear_span_ok;
+
+  // 609.8: the bar AND its mounting sustain the load. Standoff turns a pull into a pry.
+  const pull_out_lb = P;
+  const prying_moment_inlb = P * off;
+  const fastener_force_lb = fs > 0 ? prying_moment_inlb / fs : null;
+  const force_multiplier = fs > 0 ? off / fs : null;
+
+  const note = "POSITION (609.4): horizontal, " + H_MIN + " to " + H_MAX + " in above the finish floor to the TOP of the gripping surface - this one is at " + h + " in, " + (height_ok ? "OK. " : "OUT OF RANGE. ")
+    + "SIDE WALL (604.5.1): at least " + SIDE_MIN + " in long, no more than " + SIDE_FROM_REAR_MAX + " in from the rear wall - this one is " + sl + " in at " + sf + " in, " + (side_length_ok ? "length OK" : "TOO SHORT") + " and " + (side_position_ok ? "position OK" : "TOO FAR from the rear wall") + ". "
+    + "REAR WALL: at least " + REAR_MIN + " in long, extending at least " + REAR_SIDE_MIN + " in from the water closet centerline toward the side wall and at least " + REAR_OPEN_MIN + " in toward the open side - this one is " + rl + " in reaching " + rs + " and " + ro + " in, " + (rear_length_ok ? "length OK" : "TOO SHORT") + ", " + (rear_side_ok ? "side extension OK" : "side extension SHORT") + ", " + (rear_open_ok ? "open extension OK" : "open extension SHORT") + ". "
+    + "The check people miss: those two extensions have to fit ON the bar. They add to " + rear_span_needed_in + " in, so a " + REAR_MIN + " in bar only works when they total " + REAR_MIN + " or less - here the bar is " + rl + " in and " + (rear_span_ok ? "covers it. " : "does NOT cover it, so the bar has to grow even though every individual dimension reads compliant. ")
+    + "LOAD (609.8): the bar and its MOUNTING must sustain " + P + " lbf. That is not a fastener count, it is a load path. A bar standing " + off + " in off the wall converts a straight " + P + " lb pull into " + prying_moment_inlb.toFixed(0) + " in-lb of prying moment at the flange"
+    + (fs > 0 ? ", and resolving that across " + fs + " in of fastener spacing puts " + fastener_force_lb.toFixed(0) + " lb on the outer fastener - " + force_multiplier.toFixed(2) + " times the applied load, before the straight pull-out is even counted. " : ". Enter the flange's fastener spacing to see what that does to the outer fastener. ")
+    + "Which is why this fails in practice on the anchor and not the bar: drywall toggles and plastic anchors do not carry it, and the answer is solid blocking or a steel backing plate behind the finish, installed before the board goes up. Retrofitting into an existing wall usually means opening it. "
+    + (layout_ok ? "The layout dimensions entered PASS. " : "The layout dimensions entered DO NOT all pass. ")
+    + "Scope: the standard water-closet configuration with a side wall and a rear wall. Ambulatory-accessible stalls, bathtubs, and roll-in and transfer showers each have their own bar layouts under 604.8, 607, and 608 and are NOT this. Not checked: the clear floor space, the water closet centerline at 16-18 in, seat height, flush-control side, dispenser locations, the 1-1/4 to 2 in gripping diameter, or the 1-1/2 in clearance behind the bar. The 2010 ADA Standards and ANSI A117.1 differ in places and a state may adopt either; a screen, not a certification of accessibility - the adopted standard and the AHJ govern.";
+
+  return { height_ok, side_length_ok, side_position_ok, rear_length_ok, rear_side_ok, rear_open_ok, rear_span_needed_in, rear_span_ok, layout_ok, pull_out_lb, prying_moment_inlb, fastener_force_lb, force_multiplier, note };
+}
+
+export const grabBarLayoutExample = { inputs: { bar_height_in: 34, side_bar_length_in: 42, side_bar_from_rear_in: 12, rear_bar_length_in: 36, rear_toward_side_in: 12, rear_toward_open_in: 24, load_lb: 250, standoff_in: 1.5, fastener_spacing_in: 3 } };
+
+function _v1137renderGrabBarLayout(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: 2010 ADA Standards for Accessible Design - 609.4, grab bars installed in a horizontal position 33 in minimum and 36 in maximum above the finish floor measured to the top of the gripping surface; 604.5.1, a side-wall grab bar 42 in minimum long located 12 in maximum from the rear wall, and a rear-wall grab bar 36 in minimum long extending at least 12 in from the water closet centerline toward the side wall and at least 24 in toward the open side; 609.8, grab bars and their mounting sustaining 250 lbf. Prying moment and fastener force are statics from the standoff and flange geometry, not code values. Standard water-closet configuration only: ambulatory stalls, bathtubs, and roll-in and transfer showers have their own layouts under 604.8, 607, and 608. Clear floor space, the 16-18 in centerline, seat height, gripping diameter, and the 1-1/2 in clearance behind the bar are not checked. The 2010 ADA Standards and ANSI A117.1 differ in places; a screen, not a certification of accessibility - the adopted standard and the AHJ govern.";
+  const h = makeNumber("Bar height to the top of the gripping surface (in)", "gbl-h", { step: "any", min: "0" }); h.input.value = "34";
+  const sl = makeNumber("Side-wall bar length (in)", "gbl-sl", { step: "any", min: "0" }); sl.input.value = "42";
+  const sf = makeNumber("Side bar distance from the rear wall (in)", "gbl-sf", { step: "any", min: "0" }); sf.input.value = "12";
+  const rl = makeNumber("Rear-wall bar length (in)", "gbl-rl", { step: "any", min: "0" }); rl.input.value = "36";
+  const rs = makeNumber("Rear bar reach toward the side wall (in)", "gbl-rs", { step: "any", min: "0" }); rs.input.value = "12";
+  const ro = makeNumber("Rear bar reach toward the open side (in)", "gbl-ro", { step: "any", min: "0" }); ro.input.value = "24";
+  const ld = makeNumber("Design load (lbf; ADA 250)", "gbl-ld", { step: "any", min: "0" }); ld.input.value = "250";
+  const so = makeNumber("Standoff from the wall to the bar centerline (in)", "gbl-so", { step: "any", min: "0" }); so.input.value = "1.5";
+  const fs = makeNumber("Flange fastener spacing (in; 0 to skip)", "gbl-fs", { step: "any", min: "0" }); fs.input.value = "3";
+  for (const x of [h, sl, sf, rl, rs, ro, ld, so, fs]) inputRegion.appendChild(x.wrap);
+  attachExampleButton(inputRegion, () => { h.input.value = "34"; sl.input.value = "42"; sf.input.value = "12"; rl.input.value = "36"; rs.input.value = "12"; ro.input.value = "24"; ld.input.value = "250"; so.input.value = "1.5"; fs.input.value = "3"; update(); });
+  const oV = makeOutputLine(outputRegion, "Layout verdict", "gbl-out-v");
+  const oS = makeOutputLine(outputRegion, "Side wall bar", "gbl-out-s");
+  const oR = makeOutputLine(outputRegion, "Rear wall bar", "gbl-out-r");
+  const oL = makeOutputLine(outputRegion, "Blocking load path (609.8)", "gbl-out-l");
+  const oNote = makeOutputLine(outputRegion, "Note", "gbl-out-note");
+  const update = debounce(() => {
+    const r = computeGrabBarLayout({ bar_height_in: Number(h.input.value) || 0, side_bar_length_in: Number(sl.input.value) || 0, side_bar_from_rear_in: Number(sf.input.value) || 0, rear_bar_length_in: Number(rl.input.value) || 0, rear_toward_side_in: Number(rs.input.value) || 0, rear_toward_open_in: Number(ro.input.value) || 0, load_lb: Number(ld.input.value) || 0, standoff_in: Number(so.input.value) || 0, fastener_spacing_in: Number(fs.input.value) || 0 });
+    if (r.error) { oV.textContent = r.error; oS.textContent = "-"; oR.textContent = "-"; oL.textContent = "-"; oNote.textContent = "-"; return; }
+    oV.textContent = (r.layout_ok ? "PASSES" : "DOES NOT PASS") + "; height " + (r.height_ok ? "OK" : "out of the 33-36 in range");
+    oS.textContent = (r.side_length_ok ? "42 in length OK" : "TOO SHORT") + ", " + (r.side_position_ok ? "within 12 in of the rear wall" : "TOO FAR from the rear wall");
+    oR.textContent = (r.rear_length_ok ? "36 in length OK" : "TOO SHORT") + ", reaches " + (r.rear_side_ok ? "OK" : "SHORT") + " / " + (r.rear_open_ok ? "OK" : "SHORT") + ", and the two reaches need " + fmt(r.rear_span_needed_in, 0) + " in of bar - " + (r.rear_span_ok ? "covered" : "NOT covered");
+    oL.textContent = fmt(r.pull_out_lb, 0) + " lb pull-out plus " + fmt(r.prying_moment_inlb, 0) + " in-lb of pry" + (r.fastener_force_lb === null ? "" : " = " + fmt(r.fastener_force_lb, 0) + " lb on the outer fastener (" + fmt(r.force_multiplier, 2) + "x)");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of [h, sl, sf, rl, rs, ro, ld, so, fs]) x.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["grab-bar-layout"] = _v1137renderGrabBarLayout;

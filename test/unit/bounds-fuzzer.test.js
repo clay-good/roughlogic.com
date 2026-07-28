@@ -32348,3 +32348,52 @@ test("bounds: spec-v1136 computeAavInstallCheck pins the 918.7 outdoor-vent over
   assert.ok("error" in _v1136({ ...base, valve_dfu_rating: -1 }));
   assert.ok("error" in _v1136({ ...base, height_above_drain_in: Infinity }));
 });
+
+import { computeGrabBarLayout as _v1137 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v1137 computeGrabBarLayout pins the tangent rear-bar span, the 33-36 window, the 609.8 load path, and error seams", () => {
+  const base = { bar_height_in: 34, side_bar_length_in: 42, side_bar_from_rear_in: 12, rear_bar_length_in: 36, rear_toward_side_in: 12, rear_toward_open_in: 24, load_lb: 250, standoff_in: 1.5, fastener_spacing_in: 3 };
+  const r = _v1137(base);
+  assert.ok(r.layout_ok && r.height_ok && r.side_length_ok && r.side_position_ok && r.rear_length_ok);
+  // THE TANGENT: the two minimum reaches sum to exactly the minimum bar length.
+  assert.ok(r.rear_span_needed_in === 36 && r.rear_span_ok);
+  assert.ok(_v1137({ ...base, rear_toward_open_in: 24.1 }).rear_span_ok === false, "any wider layout needs a longer bar");
+  assert.ok(_v1137({ ...base, rear_toward_side_in: 14, rear_toward_open_in: 26 }).rear_span_needed_in === 40);
+  // ...and the individual reaches can each pass while the span fails.
+  const wide = _v1137({ ...base, rear_toward_side_in: 14, rear_toward_open_in: 26 });
+  assert.ok(wide.rear_side_ok && wide.rear_open_ok && wide.rear_length_ok && !wide.rear_span_ok && !wide.layout_ok);
+  // HEIGHT is a WINDOW, not a minimum - too high fails just as too low does.
+  assert.ok(_v1137({ ...base, bar_height_in: 33 }).height_ok && _v1137({ ...base, bar_height_in: 36 }).height_ok);
+  assert.ok(!_v1137({ ...base, bar_height_in: 32.9 }).height_ok && !_v1137({ ...base, bar_height_in: 36.1 }).height_ok);
+  // Side bar: a length minimum and a distance MAXIMUM, in opposite directions.
+  assert.ok(_v1137({ ...base, side_bar_length_in: 42 }).side_length_ok && !_v1137({ ...base, side_bar_length_in: 41.9 }).side_length_ok);
+  assert.ok(_v1137({ ...base, side_bar_from_rear_in: 12 }).side_position_ok && !_v1137({ ...base, side_bar_from_rear_in: 12.1 }).side_position_ok);
+  assert.ok(_v1137({ ...base, side_bar_length_in: 60 }).side_length_ok, "longer is always fine");
+  // THE LOAD PATH: moment = load x standoff, fastener force = moment / spacing, exactly.
+  for (const P of [250, 300, 500]) {
+    for (const off of [0, 1.5, 3]) {
+      for (const fs of [2, 3, 6]) {
+        const t = _v1137({ ...base, load_lb: P, standoff_in: off, fastener_spacing_in: fs });
+        assert.ok(t.pull_out_lb === P);
+        assert.ok(Math.abs(t.prying_moment_inlb - P * off) < 1e-9);
+        assert.ok(Math.abs(t.fastener_force_lb - P * off / fs) < 1e-9);
+        assert.ok(Math.abs(t.force_multiplier - off / fs) < 1e-12);
+        // A flush bar has no pry; the load path never depends on the layout dimensions.
+        if (off === 0) assert.ok(t.prying_moment_inlb === 0 && t.fastener_force_lb === 0);
+        assert.ok(t.layout_ok === r.layout_ok, "load inputs must not change the layout verdict");
+      }
+    }
+  }
+  // Omitting the fastener spacing yields null rather than a fabricated force.
+  const noFs = _v1137({ ...base, fastener_spacing_in: 0 });
+  assert.ok(noFs.fastener_force_lb === null && noFs.force_multiplier === null && noFs.prying_moment_inlb === 375);
+  // Error seams.
+  assert.ok("error" in _v1137({ ...base, bar_height_in: 0 }));
+  assert.ok("error" in _v1137({ ...base, side_bar_length_in: 0 }));
+  assert.ok("error" in _v1137({ ...base, rear_bar_length_in: 0 }));
+  assert.ok("error" in _v1137({ ...base, side_bar_from_rear_in: -1 }));
+  assert.ok("error" in _v1137({ ...base, load_lb: 0 }));
+  assert.ok("error" in _v1137({ ...base, standoff_in: -1 }));
+  assert.ok("error" in _v1137({ ...base, fastener_spacing_in: -1 }));
+  assert.ok("error" in _v1137({ ...base, bar_height_in: Infinity }));
+});

@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "grab bar height",
+      "target": "grab-bar-layout",
+      "kind": "industry"
+    },
+    {
+      "term": "ada grab bar layout at a toilet",
+      "target": "grab-bar-layout",
+      "kind": "question"
+    },
+    {
+      "term": "how long does a rear grab bar have to be",
+      "target": "grab-bar-layout",
+      "kind": "question"
+    },
+    {
+      "term": "grab bar blocking 250 pounds",
+      "target": "grab-bar-layout",
+      "kind": "question"
+    },
+    {
+      "term": "can you mount a grab bar to drywall anchors",
+      "target": "grab-bar-layout",
+      "kind": "question"
+    },
+    {
       "term": "air admittance valve",
       "target": "aav-install-check",
       "kind": "industry"
