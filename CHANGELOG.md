@@ -26,6 +26,24 @@ Fuzzer pins the J3-5a factor, cross-implementation agreement at zero tension AND
 ASD/1.5 identities, that ksc is independent of mu, and that more bolts make the same tension cost less.
 The note keeps the framing honest: slip is a serviceability limit, the rupture and bearing checks are
 separate, and prying action is not modeled. Catalog 1,495 -> 1,496. Spec: spec-v1112.
+### chore(caps): second cap-pressure sweep -- 13 modules, with a deliberately minimal raise on calc-construction.js; 2026-07-27
+
+The concurrent landing run past spec-v1100 pushed a fresh set of modules to the edge within a couple of hours of the
+first sweep. `calc-machining.js` was at **99.7% -- about 67 bytes, less than one tile row** -- and `calc-finish.js` at
+99.1%. Both were one landing away from turning CI red mid-push.
+
+Twelve small/medium modules get ~20% above current usage rather than the usual few-percent step, specifically to stop
+re-raising every few tiles while the landing run is going: accounting, concrete, fab, finish, hvac, lowvoltage,
+machining, realestate, refrigerant, service, treatment, trucking.
+
+**`calc-construction.js` is deliberately different: +8%, not +20%.** At ~173 KB gz it is by far the largest calc
+module and its own ledger has asked for a split three times. A generous raise there would quietly remove the forcing
+function, so this buys only a few tiles of room and leaves the split overdue. spec-v1030 / v1036 show the pattern that
+worked on `calc-plumbing.js` (99.4% -> 86.1%); Group E is the harder case because it is where the concurrent session
+is landing, so it wants a deliberate, uncontended pass rather than being folded into a cap sweep.
+
+Cap changes only -- no source touched. Full lint, 5,892 unit tests passing, build and
+check-dist / shells / module-sizes / readme-counts / data:verify green.
 
 ### feat(electrical): egc-parallel-raceways, the 250.122 paragraph the catalog skipped; 2026-07-27
 
