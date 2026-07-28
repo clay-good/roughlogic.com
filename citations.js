@@ -15349,6 +15349,18 @@ export const CITATIONS = {
       { name: "All factors regional", value: "unit cost and the three ratings are entered from a regional plant appraisal committee guide", source: "user input" },
     ],
   },
+  "drip-edge-takeoff": {
+    formula: "slope factor = sqrt(1 + (rise/12)^2); rake LF = rake count x plan run x slope factor; eave LF = plan eave length; pieces = ceil(LF x (1 + waste) / (stock - lap/12)).",
+    edition: "Roof takeoff geometry - no standard claimed; the eave-under / rake-over installation convention is manufacturer installation guidance.",
+    freeAccess: "Geometry; drip-edge installation direction is published in every manufacturer's instructions.",
+    governance: GOVERNANCE.general,
+    editionNote: "RAKES RUN UP THE SLOPE AND EAVES DO NOT - that is the whole reason to split them, and it is what a single perimeter number silently loses: a 6:12 rake measured off the plan under-orders by about 12%, an 8:12 by 20%. The second reason to separate them is that the profiles differ and install opposite ways relative to the underlayment - eave drip goes UNDER so water leaving the shingles is carried past the fascia, rake drip goes OVER - and reversing either is a leak. Pieces are figured on an effective stick length of stock minus the lap, since every joint consumes that lap. Valley metal, step flashing at walls, and the starter course are separate items, and hips and ridges carry no drip edge at all. The roofing plan and the manufacturer's installation instructions govern.",
+    assumptions: [
+      { name: "Slope factor on rakes only", value: "rakes take sqrt(1 + (rise/12)^2); eaves are horizontal and take plan length", source: "roof geometry" },
+      { name: "Effective stick length", value: "stock length minus the lap at each joint", source: "takeoff practice" },
+      { name: "Profiles differ", value: "eave drip installs under the underlayment, rake drip over; counted separately", source: "manufacturer installation instructions" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

@@ -839,3 +839,69 @@ FINISH_RENDERERS["cabinet-linear-feet"] = _simpleRenderer({
   ],
   compute: computeCabinetLinearFeet,
 });
+
+// --- spec-v1116 E: Roof drip edge rake/eave split and piece count ---
+// roofing-squares returns drip_edge_lf as a bare passthrough of the entered perimeter, which hides
+// the one thing that matters: RAKES run up the slope and eaves do not. A rake measured off the
+// plan under-orders by the slope factor sqrt(1 + (rise/12)^2) - 12% on a 6:12, 20% on a 8:12. The
+// two also take different profiles, so they are counted separately, and pieces account for the lap.
+// dims: in { eave_length_ft: L, rake_run_ft: L, rake_count: dimensionless, pitch_rise_per_12: dimensionless, stock_length_ft: L, lap_in: L, waste_pct: dimensionless } out: { slope_factor: dimensionless, eave_lf: L, rake_lf: L, total_lf: L, pieces: dimensionless }
+export function computeDripEdgeTakeoff({ eave_length_ft = 0, rake_run_ft = 0, rake_count = 0, pitch_rise_per_12 = 0, stock_length_ft = 10, lap_in = 2, waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const eave = Number(eave_length_ft) || 0;
+  const run = Number(rake_run_ft) || 0;
+  const nRake = Number(rake_count) || 0;
+  const rise = Number(pitch_rise_per_12);
+  const stock = Number(stock_length_ft) || 0;
+  const lap = Number(lap_in);
+  const waste = Number(waste_pct);
+  if (eave < 0 || run < 0) return { error: "Lengths cannot be negative (ft)." };
+  if (!(eave > 0 || (run > 0 && nRake > 0))) return { error: "Enter an eave length, or a rake run with a rake count." };
+  if (!Number.isInteger(nRake) || nRake < 0) return { error: "Rake count must be a whole number (0 or more)." };
+  if (!Number.isFinite(rise) || rise < 0) return { error: "Pitch cannot be negative (rise per 12); use 0 for a flat run." };
+  if (!(stock > 0)) return { error: "Stock length must be positive (ft)." };
+  if (!Number.isFinite(lap) || lap < 0) return { error: "Lap cannot be negative (in)." };
+  if (!(lap / 12 < stock)) return { error: "The lap is as long as a stick - check the lap and stock length." };
+  if (!(waste >= 0 && waste <= 50)) return { error: "Waste must be 0-50 percent." };
+  const slope_factor = Math.sqrt(1 + Math.pow(rise / 12, 2));
+  const eave_lf = eave;
+  const rake_plan_lf = nRake * run;
+  const rake_lf = rake_plan_lf * slope_factor;
+  const rake_slope_gain_lf = rake_lf - rake_plan_lf;
+  const total_lf = eave_lf + rake_lf;
+  const total_with_waste_lf = total_lf * (1 + waste / 100);
+  const effective_piece_ft = stock - lap / 12;
+  const pieces = Math.ceil(total_with_waste_lf / effective_piece_ft);
+  const eave_pieces = eave_lf > 0 ? Math.ceil(eave_lf * (1 + waste / 100) / effective_piece_ft) : 0;
+  const rake_pieces = rake_lf > 0 ? Math.ceil(rake_lf * (1 + waste / 100) / effective_piece_ft) : 0;
+  if (![slope_factor, rake_lf, total_lf, pieces].every(Number.isFinite)) return { error: "Drip-edge math did not produce a finite value." };
+  return {
+    slope_factor, eave_lf, rake_plan_lf, rake_lf, rake_slope_gain_lf, total_lf,
+    total_with_waste_lf, effective_piece_ft, pieces, eave_pieces, rake_pieces,
+    note: "RAKES RUN UP THE SLOPE AND EAVES DO NOT, which is the whole reason to split them. Measuring a rake off the plan under-orders it by the slope factor - " + slope_factor.toFixed(4) + " at this pitch, so these rakes are " + rake_lf.toFixed(1) + " ft of metal against " + rake_plan_lf.toFixed(1) + " ft of plan dimension, " + rake_slope_gain_lf.toFixed(1) + " ft that a perimeter number silently loses. "
+      + "Count them separately for a second reason: the profiles differ. Eave drip goes UNDER the underlayment so water leaving the shingles is carried past the fascia, while rake drip goes OVER it - installing either one the other way is a leak, and the two are different extrusions on most orders. "
+      + "Pieces are figured on an effective length of " + effective_piece_ft.toFixed(2) + " ft after the " + lap + "-in lap, because every joint eats that lap. Valley metal, step flashing at walls, and the starter course are separate items - this counts only the drip edge at eaves and rakes. Hips and ridges carry no drip edge at all. The roofing plan and the manufacturer's installation instructions govern.",
+  };
+}
+export const dripEdgeTakeoffExample = { inputs: { eave_length_ft: 80, rake_run_ft: 14, rake_count: 4, pitch_rise_per_12: 6, stock_length_ft: 10, lap_in: 2, waste_pct: 10 } };
+FINISH_RENDERERS["drip-edge-takeoff"] = _simpleRenderer({
+  citation: "Citation: roof drip-edge takeoff geometry. Eaves are horizontal so they take their plan length; RAKES run up the slope and take the slope factor sqrt(1 + (rise/12)^2), which a perimeter measurement misses. Pieces are figured on an effective stick length of the stock length minus the lap, since every joint consumes that lap. Eave and rake drip are different profiles and install opposite ways relative to the underlayment (eave under, rake over), which is why they are counted separately. Valley metal, step flashing, and starter course are separate items; hips and ridges take no drip edge. The roofing plan and the manufacturer's installation instructions govern.",
+  example: dripEdgeTakeoffExample.inputs,
+  fields: [
+    { key: "eave_length_ft", label: "Total eave length (ft, plan)", kind: "number" },
+    { key: "rake_run_ft", label: "Horizontal run of ONE rake (ft, plan)", kind: "number", default: 0 },
+    { key: "rake_count", label: "Number of rakes", kind: "number", default: 0 },
+    { key: "pitch_rise_per_12", label: "Roof pitch (rise per 12)", kind: "number", default: 6 },
+    { key: "stock_length_ft", label: "Stock length (ft)", kind: "number", default: 10 },
+    { key: "lap_in", label: "Lap at each joint (in)", kind: "number", default: 2 },
+    { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "e", id: "det-out-e", label: "Eave drip edge", value: (r) => fmt(r.eave_lf, 1) + " ft (" + fmt(r.eave_pieces, 0) + " sticks)" },
+    { key: "r", id: "det-out-r", label: "Rake drip edge", value: (r) => fmt(r.rake_lf, 1) + " ft (" + fmt(r.rake_pieces, 0) + " sticks) -- " + fmt(r.rake_slope_gain_lf, 1) + " ft more than the plan dimension" },
+    { key: "s", id: "det-out-s", label: "Slope factor", value: (r) => fmt(r.slope_factor, 4) },
+    { key: "t", id: "det-out-t", label: "Total", value: (r) => fmt(r.total_lf, 1) + " ft, " + fmt(r.total_with_waste_lf, 1) + " ft with waste, " + fmt(r.pieces, 0) + " sticks at " + fmt(r.effective_piece_ft, 2) + " ft effective" },
+    { key: "n", id: "det-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDripEdgeTakeoff,
+});

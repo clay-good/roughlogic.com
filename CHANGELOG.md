@@ -4,6 +4,26 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(finish): drip-edge-takeoff, because rakes run up the slope and eaves do not; 2026-07-27
+
+Scoped deliberately narrow: `roofing-squares` already returns `drip_edge_lf`, but it is a bare passthrough
+of the entered perimeter with no rake/eave split, no slope factor, and no piece count. This tile adds only
+the part that was missing and does not re-emit squares, bundles, or underlayment. Adds one tile to
+`calc-finish.js` (Group E).
+
+The one fact it exists for: a perimeter measurement treats rakes and eaves alike and therefore under-orders
+every rake by the slope factor -- 12% at 6:12, 20% at 8:12. In the pinned example four 14-ft rakes are
+**62.6 ft of metal against 56 ft of plan run**, 6.6 ft a single perimeter number silently loses. The fuzzer
+pins that the eave never moves with pitch while the rake always does, across five pitches.
+
+The note carries the second reason to split them: the profiles install opposite ways relative to the
+underlayment -- eave drip UNDER so water leaving the shingles clears the fascia, rake drip OVER -- and
+reversing either is a leak. Pieces are figured on stock minus the lap, since every joint eats it.
+
+Pinned: 80 ft of eave plus four 14-ft rakes at 6:12 gives 142.61 ft and 16 sticks at a 9.833-ft effective
+length. Cross-check at 0 pitch returns a factor of exactly 1 and zero gain. Catalog 1,499 -> 1,500.
+Spec: spec-v1116.
+
 ### feat(arborist): tree-appraisal-ctla, the number the whole biomechanics bench never produced; 2026-07-27
 
 Zero hits for "CTLA", "trunk formula", or "tree appraisal" anywhere -- the "appraisal" aliases all hit

@@ -1261,6 +1261,7 @@ const RELATED = {
   "closet-shelf-takeoff": ["trim-linear-footage","equal-spacing","rough-opening-size"],
   "countertop-overhang-support": ["cabinet-linear-feet","glass-weight","trim-linear-footage"],
   "cabinet-linear-feet": ["countertop-overhang-support","trim-linear-footage","closet-shelf-takeoff"],
+  "drip-edge-takeoff": ["roofing-squares","step-flashing-count","gutter-downspout-takeoff"],
   "fineness-modulus": ["relative-compaction","atterberg-indices","soil-phase-relations","soil-gradation-coefficients"],
   "soil-gradation-coefficients": ["atterberg-indices","fineness-modulus","relative-compaction","soil-phase-relations"],
   "shadow-length": ["pv-row-spacing","pv-row-shade-angle","pv-array-sizing"],

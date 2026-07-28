@@ -980,6 +980,7 @@ export const COMPUTE_MAP = {
   "closet-shelf-takeoff": { module: "../../calc-finish.js", fn: "computeClosetShelfTakeoff" },
   "countertop-overhang-support": { module: "../../calc-finish.js", fn: "computeCountertopOverhangSupport" },
   "cabinet-linear-feet": { module: "../../calc-finish.js", fn: "computeCabinetLinearFeet" },
+  "drip-edge-takeoff": { module: "../../calc-finish.js", fn: "computeDripEdgeTakeoff" },
   "fineness-modulus": { module: "../../calc-earthwork.js", fn: "computeFinenessModulus" },
   "soil-gradation-coefficients": { module: "../../calc-earthwork.js", fn: "computeSoilGradationCoefficients" },
   "water-cement-ratio": { module: "../../calc-construction.js", fn: "computeWaterCementRatio" },

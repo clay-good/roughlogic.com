@@ -31101,3 +31101,52 @@ test("bounds: spec-v1115 computeTreeAppraisalCtla pins the trunk-formula chain, 
   assert.ok("error" in _v1115({ ...base, location_pct: 150 }));
   assert.ok("error" in _v1115({ ...base, dbh_in: Infinity }));
 });
+
+import { computeDripEdgeTakeoff as _v1116 } from "../../calc-finish.js";
+
+test("bounds: spec-v1116 computeDripEdgeTakeoff pins the slope factor on rakes only, the flat degenerate case, the lap-adjusted piece count, and error seams", () => {
+  const base = { eave_length_ft: 80, rake_run_ft: 14, rake_count: 4, pitch_rise_per_12: 6, stock_length_ft: 10, lap_in: 2, waste_pct: 10 };
+  const r = _v1116(base);
+  assert.ok(Math.abs(r.slope_factor - Math.sqrt(1.25)) < 1e-12);
+  assert.ok(r.eave_lf === 80 && Math.abs(r.rake_plan_lf - 56) < 1e-12);
+  assert.ok(Math.abs(r.rake_lf - 56 * Math.sqrt(1.25)) < 1e-12);
+  assert.ok(Math.abs(r.rake_slope_gain_lf - (r.rake_lf - 56)) < 1e-12);
+  assert.ok(Math.abs(r.total_lf - (80 + r.rake_lf)) < 1e-12);
+  assert.ok(Math.abs(r.effective_piece_ft - (10 - 2 / 12)) < 1e-12);
+  assert.ok(r.pieces === 16);
+  // THE POINT: the slope factor applies to rakes ONLY - the eave never moves with pitch.
+  for (const rise of [0, 3, 6, 8, 12]) {
+    const t = _v1116({ ...base, pitch_rise_per_12: rise });
+    assert.ok(t.eave_lf === 80, "eave moved with pitch");
+    assert.ok(Math.abs(t.slope_factor - Math.sqrt(1 + (rise / 12) ** 2)) < 1e-12);
+    assert.ok(Math.abs(t.rake_lf - 56 * t.slope_factor) < 1e-12);
+    assert.ok(t.rake_slope_gain_lf >= -1e-12);
+  }
+  // Flat run: factor exactly 1, no gain - the degenerate case proving the factor does the work.
+  const flat = _v1116({ ...base, pitch_rise_per_12: 0 });
+  assert.ok(flat.slope_factor === 1 && Math.abs(flat.rake_lf - 56) < 1e-12 && flat.rake_slope_gain_lf === 0);
+  // A steeper roof always needs more rake metal.
+  let prev = 0;
+  for (const rise of [0, 4, 6, 9, 12, 18]) {
+    const t = _v1116({ ...base, pitch_rise_per_12: rise });
+    assert.ok(t.rake_lf >= prev); prev = t.rake_lf;
+  }
+  // The lap shortens every stick, so a bigger lap needs more pieces.
+  assert.ok(_v1116({ ...base, lap_in: 6 }).effective_piece_ft < r.effective_piece_ft);
+  assert.ok(_v1116({ ...base, lap_in: 6 }).pieces >= r.pieces);
+  assert.ok(Math.abs(_v1116({ ...base, lap_in: 0 }).effective_piece_ft - 10) < 1e-12);
+  // Eave-only and rake-only roofs both work.
+  const eaveOnly = _v1116({ ...base, rake_run_ft: 0, rake_count: 0 });
+  assert.ok(eaveOnly.rake_lf === 0 && eaveOnly.rake_pieces === 0 && eaveOnly.total_lf === 80);
+  const rakeOnly = _v1116({ ...base, eave_length_ft: 0 });
+  assert.ok(rakeOnly.eave_lf === 0 && rakeOnly.eave_pieces === 0);
+  // Error seams.
+  assert.ok("error" in _v1116({ ...base, eave_length_ft: 0, rake_run_ft: 0, rake_count: 0 }));
+  assert.ok("error" in _v1116({ ...base, eave_length_ft: -1 }));
+  assert.ok("error" in _v1116({ ...base, rake_count: 2.5 }));
+  assert.ok("error" in _v1116({ ...base, pitch_rise_per_12: -1 }));
+  assert.ok("error" in _v1116({ ...base, stock_length_ft: 0 }));
+  assert.ok("error" in _v1116({ ...base, lap_in: 240 }));
+  assert.ok("error" in _v1116({ ...base, waste_pct: 60 }));
+  assert.ok("error" in _v1116({ ...base, eave_length_ft: Infinity }));
+});
