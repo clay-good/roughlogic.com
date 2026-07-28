@@ -34651,3 +34651,62 @@ test("bounds: spec-v1174 computeLifelineTension pins the midspan statics, the 1/
   assert.ok("error" in _v1174({ ...base, target_tension_lb: -1 }));
   assert.ok("error" in _v1174({ ...base, span_ft: Infinity }));
 });
+
+import { computeAdaStairCheck as _v1175 } from "../../calc-construction.js";
+
+test("bounds: spec-v1175 computeAdaStairCheck pins the 4-7 in riser window, the 11 in tread, the compliance cost, the nosing rules, and error seams", () => {
+  const base = { riser_height_in: 7.75, tread_depth_in: 10, total_rise_in: 108.5, open_risers: "no", nosing_projection_in: 1, leading_edge_radius_in: 0.25, riser_slope_deg: 0 };
+  const r = _v1175(base);
+  assert.ok(!r.riser_ok && r.riser_too_tall && r.riser_deficit_in === 0.75 && !r.tread_ok && r.tread_deficit_in === 1);
+  assert.ok(r.risers_as_built === 14 && r.risers_required === 16 && Math.abs(r.compliant_riser_in - 6.78125) < 1e-9);
+  assert.ok(r.run_as_built_in === 130 && r.run_required_in === 165 && r.run_added_in === 35 && !r.passes);
+  // THE RISER IS A WINDOW - too short fails too, and the two directions are distinguished.
+  for (const [h, ok, tall] of [[3.9, false, false], [4, true, false], [6, true, false], [7, true, false], [7.01, false, true], [7.75, false, true]]) {
+    const t = _v1175({ ...base, riser_height_in: h });
+    assert.ok(t.riser_ok === ok && t.riser_too_tall === tall, "riser window wrong at " + h);
+  }
+  assert.ok(Math.abs(_v1175({ ...base, riser_height_in: 3 }).riser_deficit_in - 1) < 1e-9, "the short-side deficit is measured to 4 in");
+  // THE TREAD IS A MINIMUM, inclusive.
+  for (const [d, ok] of [[10.9, false], [11, true], [13, true]]) {
+    const t = _v1175({ ...base, tread_depth_in: d });
+    assert.ok(t.tread_ok === ok && Math.abs(t.tread_deficit_in - Math.max(0, 11 - d)) < 1e-9);
+  }
+  // THE COMPLIANCE COST: risers required is ceil(rise / 7) and never fewer, at every total rise.
+  for (const total of [28, 49, 100, 108.5, 140, 200]) {
+    const t = _v1175({ ...base, total_rise_in: total });
+    assert.ok(t.risers_required === Math.ceil(total / 7), "required risers wrong at " + total);
+    assert.ok(t.compliant_riser_in <= 7 + 1e-12, "the derived riser must not exceed 7 in at " + total);
+    assert.ok(Math.abs(t.compliant_riser_in * t.risers_required - total) < 1e-9, "the derived risers must sum to the total rise");
+    assert.ok(t.run_required_in === (t.risers_required - 1) * 11);
+  }
+  // A flight already at 7 and 11 needs no change and adds no run.
+  const good = _v1175({ ...base, riser_height_in: 7, tread_depth_in: 11 });
+  assert.ok(good.riser_ok && good.tread_ok && good.run_added_in === 0 && good.risers_added === 0 && good.passes);
+  // Making the riser shorter than needed never REDUCES the required count below the ceiling.
+  assert.ok(_v1175({ ...base, riser_height_in: 6 }).risers_required === 16);
+  // A deeper-than-minimum tread means the compliant run is shorter than what is built.
+  const deep = _v1175({ ...base, riser_height_in: 7, tread_depth_in: 14 });
+  assert.ok(deep.run_added_in < 0 && deep.passes, "a generous tread is compliant and the reported run change is negative");
+  // OPEN RISERS ARE ABSOLUTE - they fail a flight that is otherwise perfect.
+  const perfect = { ...base, riser_height_in: 7, tread_depth_in: 11 };
+  assert.ok(_v1175(perfect).passes);
+  assert.ok(!_v1175({ ...perfect, open_risers: "yes" }).passes && !_v1175({ ...perfect, open_risers: "yes" }).open_ok);
+  // THE THREE NOSING RULES, each failing alone at its own seam.
+  for (const [k, bad, good2] of [["leading_edge_radius_in", 0.51, 0.5], ["nosing_projection_in", 1.51, 1.5], ["riser_slope_deg", 30.1, 30]]) {
+    assert.ok(!_v1175({ ...perfect, [k]: bad }).passes, k + " must fail on its own");
+    assert.ok(_v1175({ ...perfect, [k]: good2 }).passes, k + " must pass at its boundary");
+  }
+  assert.ok(!_v1175({ ...perfect, leading_edge_radius_in: 1 }).radius_ok);
+  assert.ok(!_v1175({ ...perfect, nosing_projection_in: 2 }).nosing_ok);
+  assert.ok(!_v1175({ ...perfect, riser_slope_deg: 45 }).slope_ok);
+  // Error seams.
+  assert.ok("error" in _v1175({ ...base, open_risers: "partly" }));
+  assert.ok("error" in _v1175({ ...base, riser_height_in: 0 }));
+  assert.ok("error" in _v1175({ ...base, tread_depth_in: 0 }));
+  assert.ok("error" in _v1175({ ...base, total_rise_in: 0 }));
+  assert.ok("error" in _v1175({ ...base, nosing_projection_in: -1 }));
+  assert.ok("error" in _v1175({ ...base, leading_edge_radius_in: -1 }));
+  assert.ok("error" in _v1175({ ...base, riser_slope_deg: -1 }));
+  assert.ok("error" in _v1175({ ...base, riser_slope_deg: 91 }));
+  assert.ok("error" in _v1175({ ...base, total_rise_in: Infinity }));
+});

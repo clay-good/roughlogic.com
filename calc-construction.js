@@ -13135,3 +13135,98 @@ CONSTRUCTION_RENDERERS["flood-opening-area"] = _simpleRenderer({
   ],
   compute: computeFloodOpeningArea,
 });
+
+// ===================== spec-v1175: ADA stair treads and risers (2010 ADA Standards 504) =====================
+
+// The trap in one sentence: a stair that satisfies the building code can fail the ADA, and the
+// usual builder's stair does. 504.2 wants risers 4 to 7 in and treads 11 in MINIMUM, where the
+// IBC commonly allows a 7 in riser with an 11 in tread and the IRC as much as 7-3/4 in on a
+// 10 in tread. So the ordinary residential-style flight - 7-3/4 and 10 - misses BOTH numbers,
+// and the fix is not a trim adjustment: holding the same total rise, dropping to a 7 in riser
+// adds treads, and each added tread adds 11 in of run.
+// Three more rules ride along. Open risers are not permitted at all. The leading edge may have
+// a radius of 1/2 in maximum. A nosing may project 1-1/2 in maximum over the tread below, and
+// a riser may slope under the tread at 30 degrees maximum from vertical.
+// dims: in { riser_height_in: L, tread_depth_in: L, total_rise_in: L, nosing_projection_in: L, leading_edge_radius_in: L } out: { risers_required: dimensionless, run_required_in: L, run_added_in: L, riser_deficit_in: L, tread_deficit_in: L }
+export function computeAdaStairCheck({ riser_height_in = 0, tread_depth_in = 0, total_rise_in = 0, open_risers = "no", nosing_projection_in = 0, leading_edge_radius_in = 0, riser_slope_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const rise = Number(riser_height_in) || 0;
+  const tread = Number(tread_depth_in) || 0;
+  const total = Number(total_rise_in) || 0;
+  const nose = Number(nosing_projection_in) || 0;
+  const radius = Number(leading_edge_radius_in) || 0;
+  const slope = Number(riser_slope_deg) || 0;
+  const open = open_risers === "yes";
+  if (open_risers !== "yes" && open_risers !== "no") return { error: "State whether the risers are open (yes or no)." };
+  if (!(rise > 0)) return { error: "Riser height must be positive (in)." };
+  if (!(tread > 0)) return { error: "Tread depth must be positive (in)." };
+  if (!(total > 0)) return { error: "Total rise of the flight must be positive (in)." };
+  if (nose < 0) return { error: "Nosing projection cannot be negative (in)." };
+  if (radius < 0) return { error: "Leading-edge radius cannot be negative (in)." };
+  if (slope < 0 || slope > 90) return { error: "Riser slope under the tread must be between 0 and 90 degrees from vertical." };
+
+  const RISER_MIN = 4, RISER_MAX = 7, TREAD_MIN = 11;
+  const RADIUS_MAX = 0.5, NOSE_MAX = 1.5, SLOPE_MAX = 30;
+
+  const riser_ok = rise >= RISER_MIN && rise <= RISER_MAX;
+  const riser_too_tall = rise > RISER_MAX;
+  const riser_deficit_in = riser_too_tall ? rise - RISER_MAX : Math.max(0, RISER_MIN - rise);
+  const tread_ok = tread >= TREAD_MIN;
+  const tread_deficit_in = Math.max(0, TREAD_MIN - tread);
+
+  const open_ok = !open;
+  const radius_ok = radius <= RADIUS_MAX;
+  const nosing_ok = nose <= NOSE_MAX;
+  const slope_ok = slope <= SLOPE_MAX;
+
+  // What holding the same total rise costs once the riser comes down to 7 in.
+  const risers_as_built = Math.round(total / rise);
+  const risers_required = Math.ceil(total / RISER_MAX);
+  const compliant_riser_in = total / risers_required;
+  const treads_as_built = Math.max(0, risers_as_built - 1);
+  const treads_required = Math.max(0, risers_required - 1);
+  const run_as_built_in = treads_as_built * tread;
+  const run_required_in = treads_required * TREAD_MIN;
+  const run_added_in = run_required_in - run_as_built_in;
+  const risers_added = risers_required - risers_as_built;
+
+  const passes = riser_ok && tread_ok && open_ok && radius_ok && nosing_ok && slope_ok;
+
+  const note = "A STAIR THAT SATISFIES THE BUILDING CODE CAN FAIL THE ADA, and the usual builder's flight does. 504.2 wants risers 4 in minimum to 7 in MAXIMUM and treads 11 in MINIMUM. The IRC commonly allows 7-3/4 in on a 10 in tread, so an ordinary residential-style flight misses BOTH numbers at once. "
+    + "Riser " + rise + " in: " + (riser_ok ? "within 4 to 7. " : riser_too_tall ? "OVER the 7 in maximum by " + riser_deficit_in.toFixed(2) + " in. " : "UNDER the 4 in minimum by " + riser_deficit_in.toFixed(2) + " in - a riser can be too SHORT, which catches shallow entry flights and transitions. ")
+    + "Tread " + tread + " in: " + (tread_ok ? "meets the 11 in minimum. " : "SHORT by " + tread_deficit_in.toFixed(2) + " in. ")
+    + "THE FIX IS NOT A TRIM ADJUSTMENT. Holding the same " + total + " in of total rise, a 7 in maximum riser takes " + risers_required + " risers at " + compliant_riser_in.toFixed(3) + " in each"
+    + (risers_added > 0 ? " - " + risers_added + " more than the " + risers_as_built + " this flight has - and each added tread adds 11 in of run. " : ", the same count this flight has. ")
+    + "Run goes from " + run_as_built_in.toFixed(1) + " in to " + run_required_in.toFixed(1) + " in" + (run_added_in > 0 ? ", " + run_added_in.toFixed(1) + " in (" + (run_added_in / 12).toFixed(2) + " ft) LONGER. That extra run is the real cost, and it is why an accessible stair rarely fits the opening a code stair was framed for. " : run_added_in < 0 ? ", which is " + (-run_added_in).toFixed(1) + " in shorter - this flight is already deeper than the minimum demands. " : ", unchanged. ")
+    + "THREE MORE RULES RIDE ALONG. Open risers are NOT PERMITTED at all: " + (open ? "these are open, and that is not a dimension to adjust but a stair to rebuild. " : "these are closed. ") + "The leading edge may have a radius of 1/2 in maximum - entered " + radius + " in, " + (radius_ok ? "OK. " : "OVER. ") + "A nosing may project 1-1/2 in maximum over the tread below - entered " + nose + " in, " + (nosing_ok ? "OK. " : "OVER by " + (nose - NOSE_MAX).toFixed(2) + " in. ") + "And a riser may slope under the tread at 30 degrees maximum from vertical - entered " + slope + " degrees, " + (slope_ok ? "OK. " : "OVER. ")
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: handrails, which 504.6 requires complying with 505 and which is a separate tile; the tread surface, which 504.4 ties to the floor-surface rules; landings, headroom, width, and the guard, which are building-code questions this section does not touch; uniformity of risers and treads within a flight, which the building code polices and which an inspector will measure; whether the stair is on an accessible route or is an alternative to an elevator, which decides whether 504 applies at all; and state and local accessibility law. A stair dimension screen, not a stair design; the 2010 ADA Standards, the adopted building code, and the authority having jurisdiction govern.";
+
+  return { riser_ok, riser_too_tall, riser_deficit_in, tread_ok, tread_deficit_in, open_ok, radius_ok, nosing_ok, slope_ok, risers_as_built, risers_required, compliant_riser_in, risers_added, treads_as_built, treads_required, run_as_built_in, run_required_in, run_added_in, passes, note };
+}
+
+export const adaStairCheckExample = { inputs: { riser_height_in: 7.75, tread_depth_in: 10, total_rise_in: 108.5, open_risers: "no", nosing_projection_in: 1, leading_edge_radius_in: 0.25, riser_slope_deg: 0 } };
+
+CONSTRUCTION_RENDERERS["ada-stair-check"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 504.2, 504.3, 504.5, and 504.6. A US federal standard in the public domain. 504.2: risers shall be 4 in high minimum and 7 in high maximum, and treads shall be 11 in deep minimum. 504.3: open risers are not permitted. 504.5: the radius of curvature at the leading edge of the tread shall be 1/2 in maximum; nosings that project beyond risers shall have the underside of the leading edge curved or beveled, risers shall be permitted to slope under the tread at an angle of 30 degrees maximum from vertical, and the permitted projection of the nosing shall extend 1 1/2 in maximum over the tread below. 504.6: stairs shall have handrails complying with 505. Not checked: handrails, which are a separate tile; the tread surface under 504.4; landings, headroom, width, and guards, which are building-code questions; uniformity of risers and treads within a flight; whether the stair is on an accessible route or serves as an alternative to an elevator, which decides whether 504 applies; or state and local law. A stair dimension screen, not a stair design.",
+  example: adaStairCheckExample.inputs,
+  fields: [
+    { key: "riser_height_in", label: "Riser height (in)", kind: "number", default: 7.75 },
+    { key: "tread_depth_in", label: "Tread depth (in)", kind: "number", default: 10 },
+    { key: "total_rise_in", label: "Total rise of the flight (in)", kind: "number", default: 108.5 },
+    { key: "open_risers", label: "Open risers?", kind: "select", options: [{ value: "no", label: "No - closed", selected: true }, { value: "yes", label: "Yes - open" }] },
+    { key: "nosing_projection_in", label: "Nosing projection over the tread below (in)", kind: "number", default: 1 },
+    { key: "leading_edge_radius_in", label: "Radius at the leading edge (in)", kind: "number", default: 0.25 },
+    { key: "riser_slope_deg", label: "Riser slope under the tread (degrees from vertical)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "r", id: "asc-out-r", label: "Riser (4 to 7 in)", value: (r) => r.riser_ok ? "within range" : r.riser_too_tall ? "OVER by " + fmt(r.riser_deficit_in, 2) + " in" : "under the 4 in minimum by " + fmt(r.riser_deficit_in, 2) + " in" },
+    { key: "t", id: "asc-out-t", label: "Tread (11 in min)", value: (r) => r.tread_ok ? "meets the minimum" : "short by " + fmt(r.tread_deficit_in, 2) + " in" },
+    { key: "c", id: "asc-out-c", label: "What compliance costs", value: (r) => r.risers_required + " risers at " + fmt(r.compliant_riser_in, 3) + " in (" + (r.risers_added > 0 ? "+" + r.risers_added : "no change") + "); run " + fmt(r.run_as_built_in, 1) + " to " + fmt(r.run_required_in, 1) + " in" + (r.run_added_in > 0 ? " (+" + fmt(r.run_added_in / 12, 2) + " ft)" : "") },
+    { key: "o", id: "asc-out-o", label: "Open risers", value: (r) => r.open_ok ? "closed - OK" : "OPEN - not permitted at all" },
+    { key: "d", id: "asc-out-d", label: "Nosing details", value: (r) => [r.radius_ok ? null : "leading-edge radius over 1/2 in", r.nosing_ok ? null : "projection over 1 1/2 in", r.slope_ok ? null : "riser slope over 30 degrees"].filter(Boolean).join(", ") || "radius, projection, and riser slope all within limits" },
+    { key: "v", id: "asc-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES 504" : "DOES NOT PASS" },
+    { key: "n", id: "asc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAdaStairCheck,
+});

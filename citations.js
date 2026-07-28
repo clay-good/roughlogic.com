@@ -6247,6 +6247,21 @@ export const CITATIONS = {
       { name: "Pass-fail threshold", value: "1:12 (8.33%) maximum running slope; 1:48 max cross-slope", source: "ADA §405.2 / §403.3" },
     ],
   },
+  "ada-stair-check": {
+    formula: "risers 4 in minimum to 7 in maximum; treads 11 in deep minimum; open risers not permitted; leading-edge radius 1/2 in maximum; nosing projection 1-1/2 in maximum over the tread below; riser slope under the tread 30 degrees maximum from vertical. Compliance cost at a fixed total rise: risers required = ceil(total rise / 7), and the run required = (risers - 1) x 11 in.",
+    edition: "2010 ADA Standards for Accessible Design, 504.2, 504.3, 504.5, and 504.6. A US federal standard in the public domain, quoted directly.",
+    freeAccess: "The 2010 ADA Standards are published in full at no cost at ada.gov and by the US Access Board.",
+    governance: GOVERNANCE.general,
+    editionNote: "The trap fits in one sentence: a stair that satisfies the building code can fail the ADA, and the ordinary builder\'s flight does. Section 504.2 wants risers 4 in minimum to 7 in MAXIMUM and treads 11 in MINIMUM, where the IRC commonly allows a 7-3/4 in riser on a 10 in tread - so a residential-style flight misses BOTH numbers at once, and the riser limit catches the other direction too, since a riser can be too SHORT at under 4 in, which is what shallow entry flights and transitions run into. What makes this expensive rather than annoying is that the fix is not a trim adjustment. The total rise is fixed by the building, so bringing the riser down to 7 in ADDS risers, and every added riser adds a tread, and every tread adds at least 11 in of run. A 108-1/2 in rise built at 7-3/4 and 10 is fourteen risers and 130 in of run; at the ADA maximum it becomes sixteen risers and 165 in of run, nearly three feet longer. That extra run is the real cost and the reason an accessible stair rarely fits the opening a code stair was framed for - it is a floor-plan problem, not a carpentry one. Three more rules ride along and one of them is absolute: open risers are NOT PERMITTED, which is a stair to rebuild rather than a dimension to adjust. The leading edge may have a radius of 1/2 in maximum, a nosing may project 1-1/2 in maximum over the tread below, and a riser may slope under the tread at 30 degrees maximum from vertical. Not checked: handrails, which 504.6 requires complying with 505 and which is a separate tile; the tread surface, which 504.4 ties to the floor-surface rules; landings, headroom, width, and guards, which are building-code questions this section does not touch; uniformity of risers and treads within a flight, which the building code polices and an inspector will measure; whether the stair is on an accessible route or serves as an alternative to an elevator, which decides whether 504 applies at all; and state and local accessibility law. A stair dimension screen, not a stair design.",
+    assumptions: [
+      { name: "Risers", value: "4 in high minimum, 7 in high maximum", source: "2010 ADA Standards 504.2" },
+      { name: "Treads", value: "11 in deep minimum", source: "2010 ADA Standards 504.2" },
+      { name: "Open risers", value: "not permitted", source: "2010 ADA Standards 504.3" },
+      { name: "Leading edge", value: "radius of curvature 1/2 in maximum", source: "2010 ADA Standards 504.5" },
+      { name: "Nosing", value: "projection 1-1/2 in maximum over the tread below; riser slope 30 degrees maximum from vertical", source: "2010 ADA Standards 504.5" },
+      { name: "Compliance cost", value: "total rise held constant; risers = ceil(rise / 7) and run = (risers - 1) x 11 in", source: "derived from 504.2" },
+    ],
+  },
   "flood-opening-area": {
     formula: "non-engineered openings: required net area = 1 sq in per sq ft of enclosed area; openings required = max(2, ceil(required net area / net free area per opening)). Engineered openings: openings required = max(2, ceil(enclosed area / certified coverage per opening)), and the square-inch rule does not apply. The bottom of all openings must be no higher than 12 in above grade.",
     edition: "44 CFR 60.3(c)(5), the NFIP floodplain management criteria. A US federal regulation in the public domain, quoted directly.",

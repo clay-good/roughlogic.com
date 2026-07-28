@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "ada stair riser and tread",
+      "target": "ada-stair-check",
+      "kind": "industry"
+    },
+    {
+      "term": "does my stair meet ada",
+      "target": "ada-stair-check",
+      "kind": "question"
+    },
+    {
+      "term": "are open risers allowed",
+      "target": "ada-stair-check",
+      "kind": "question"
+    },
+    {
+      "term": "7 inch riser 11 inch tread rule",
+      "target": "ada-stair-check",
+      "kind": "industry"
+    },
+    {
       "term": "horizontal lifeline anchor load",
       "target": "lifeline-tension",
       "kind": "industry"

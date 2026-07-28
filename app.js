@@ -535,6 +535,7 @@ const TOOL_MODULES = (() => {
     "handrail-geometry",
     "knee-toe-clearance",
     "flood-opening-area",
+    "ada-stair-check",
     // spec-v332..v334 wood-fastener withdrawal batch.
     "wood-nail-withdrawal", "wood-lag-withdrawal", "wood-screw-withdrawal",
     "cantilever-beam", "section-properties", "combined-stress-axial-bending",
