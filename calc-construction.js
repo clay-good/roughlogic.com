@@ -10695,3 +10695,93 @@ CONSTRUCTION_RENDERERS["carpet-seam-layout"] = _simpleRenderer({
   ],
   compute: computeCarpetSeamLayout,
 });
+
+
+// --- spec-v1124: seismic overturning stability ratio at the soil interface ---
+// seismic-overturning-moment produces the demand and its own note hands off three things:
+// "the resisting dead load, the foundation stability ratio, and the shear-wall hold-downs
+// are separate checks." This is the first two. The load combination is the whole subtlety:
+// the same vertical acceleration that shakes the building sideways also lifts it, so the
+// dead load available to resist overturning is NOT D. ASCE 7 combination 7 pairs 0.9D with
+// E, and E carries Ev = 0.2 SDS D acting upward in that case, leaving (0.9 - 0.2 SDS) D.
+// The ASD form composes two separately stated pieces - the 0.6D combination and the 0.7
+// factor ASD applies to seismic - giving (0.6 - 0.7 x 0.2 SDS) D; the arithmetic is shown
+// in the note rather than presented as a memorized coefficient.
+// dims: in { overturning_moment_kipft: M L^2 T^-2, dead_load_kip: M L T^-2, footprint_width_ft: L, arm_override_ft: L, sds: dimensionless, design_method: dimensionless, apply_soil_reduction: dimensionless, required_ratio: dimensionless } out: { ev_coeff: dimensionless, dead_coeff: dimensionless, w_eff_kip: M L T^-2, arm_ft: L, m_resist_kipft: M L^2 T^-2, m_demand_kipft: M L^2 T^-2, ratio: dimensionless, eccentricity_ft: L, kern_ft: L }
+export function computeSeismicOverturningStability({ overturning_moment_kipft = 0, dead_load_kip = 0, footprint_width_ft = 0, arm_override_ft = 0, sds = 1.0, design_method = "lrfd", apply_soil_reduction = "yes", required_ratio = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const M0 = Number(overturning_moment_kipft) || 0;
+  const D = Number(dead_load_kip) || 0;
+  const B = Number(footprint_width_ft) || 0;
+  const armOv = Number(arm_override_ft) || 0;
+  const SDS = Number(sds) || 0;
+  const req = Number(required_ratio) || 0;
+  const asd = design_method === "asd";
+  const reduce = apply_soil_reduction === "yes";
+  if (!(M0 > 0)) return { error: "Overturning moment must be positive (kip-ft), at the strength (E) level." };
+  if (!(D > 0)) return { error: "Resisting dead load must be positive (kips)." };
+  if (!(B > 0) && !(armOv > 0)) return { error: "Enter the footprint width (ft), or a resisting lever arm directly." };
+  if (SDS < 0 || SDS > 3) return { error: "SDS must be between 0 and 3 (the highest mapped US values are around 2 to 2.5)." };
+  if (!(req > 0)) return { error: "Required stability ratio must be positive." };
+
+  // ASD applies 0.7 to the seismic effect, and that same 0.7 scales Ev inside it.
+  const seismic_factor = asd ? 0.7 : 1.0;
+  const gravity_coeff = asd ? 0.6 : 0.9;
+  const ev_coeff = seismic_factor * 0.2 * SDS;
+  // Always positive: the SDS <= 3 bound caps Ev at 0.6 (LRFD) and 0.42 (ASD), below the
+  // 0.9 and 0.6 gravity coefficients respectively. No zero-divide guard is reachable.
+  const dead_coeff = gravity_coeff - ev_coeff;
+
+  const w_eff_kip = dead_coeff * D;
+  const arm_ft = armOv > 0 ? armOv : B / 2;
+  const m_resist_kipft = w_eff_kip * arm_ft;
+  const m_demand_kipft = M0 * seismic_factor * (reduce ? 0.75 : 1);
+  const ratio = m_resist_kipft / m_demand_kipft;
+  const passes = ratio >= req;
+
+  // Where the resultant lands on the base, and whether it stays in the kern.
+  const eccentricity_ft = m_demand_kipft / w_eff_kip;
+  const kern_ft = B > 0 ? B / 6 : null;
+  const in_kern = kern_ft !== null ? eccentricity_ft <= kern_ft : null;
+  const uplift = B > 0 ? eccentricity_ft > B / 2 : null;
+
+  const note = "Load combination: " + (asd ? "ASD, which pairs 0.6D with 0.7E" : "LRFD combination 7, which pairs 0.9D with 1.0E") + ". "
+    + "The dead load available to resist is NOT D. The same vertical acceleration that pushes the building sideways also lifts it, and ASCE 7 carries that as Ev = 0.2 SDS D acting UPWARD in the overturning case. At SDS = " + SDS + " that removes " + ev_coeff.toFixed(3) + (asd ? " (0.7 x 0.2 x " + SDS + ")" : " (0.2 x " + SDS + ")") + " from the " + gravity_coeff + " gravity coefficient, leaving " + dead_coeff.toFixed(3) + " D = " + w_eff_kip.toFixed(0) + " kips of the " + D + " kips present. Skipping that term is the classic way an overturning check passes on paper and should not. "
+    + "Resisting moment " + w_eff_kip.toFixed(0) + " kips x " + arm_ft.toFixed(2) + " ft arm = " + m_resist_kipft.toFixed(0) + " kip-ft"
+    + (armOv > 0 ? " (arm entered directly)" : " (half the " + B + " ft footprint, which assumes the resultant dead load is centered - an eccentric building needs its own arm entered)") + ". "
+    + "Demand " + M0 + " kip-ft" + (asd ? " x 0.7 for ASD" : "") + (reduce ? " x 0.75, the reduction ASCE 7 12.13.4 permits at the SOIL-STRUCTURE INTERFACE only" : " with no 12.13.4 reduction taken") + " = " + m_demand_kipft.toFixed(0) + " kip-ft. "
+    + "Stability ratio " + ratio.toFixed(2) + " against the " + req + " required - " + (passes ? "OK. " : "FAILS; widen the footprint, add ballast, or design hold-downs for the net uplift. ")
+    + (kern_ft !== null
+      ? "The resultant sits " + eccentricity_ft.toFixed(2) + " ft off center against a kern of B/6 = " + kern_ft.toFixed(2) + " ft, so the base is "
+        + (in_kern ? "in full bearing across its width. " : uplift ? "PAST the edge entirely - the footing has lifted off and this is not a bearing problem any more, it is an anchorage one. " : "partly in uplift: bearing is concentrated on a reduced width and the toe pressure is higher than a uniform check would show. ")
+      : "")
+    + "The 12.13.4 reduction applies at the soil interface and NOT to the members above it - do not carry it up into the shear wall, its chords, or its hold-downs. This checks global stability only. Sliding, soil bearing under the concentrated toe pressure, the hold-down forces themselves, and any pile or tiedown capacity are separate checks. A design aid, not a substitute for a licensed engineer's design; the engineer of record governs.";
+
+  return { seismic_factor, gravity_coeff, ev_coeff, dead_coeff, w_eff_kip, arm_ft, m_resist_kipft, m_demand_kipft, ratio, passes, eccentricity_ft, kern_ft, in_kern, uplift, note };
+}
+
+export const seismicOverturningStabilityExample = { inputs: { overturning_moment_kipft: 5422, dead_load_kip: 900, footprint_width_ft: 20, arm_override_ft: 0, sds: 1.0, design_method: "lrfd", apply_soil_reduction: "yes", required_ratio: 1.0 } };
+
+CONSTRUCTION_RENDERERS["seismic-overturning-stability"] = _simpleRenderer({
+  citation: "Citation: ASCE 7 overturning stability at the foundation. The resisting dead load follows the uplift load combination - LRFD combination 7 (0.9D + 1.0E) or the ASD 0.6D + 0.7E pair - with the vertical seismic effect Ev = 0.2 SDS D acting upward, giving an effective dead-load coefficient of (0.9 - 0.2 SDS) for LRFD and, composing the separately stated 0.6D combination with the 0.7 factor ASD applies to seismic, (0.6 - 0.7 x 0.2 SDS) for ASD; the arithmetic is shown in the note rather than presented as a memorized coefficient. The 25% reduction in overturning at the SOIL-STRUCTURE INTERFACE is ASCE 7 12.13.4 and is optional here; it does not apply to the members above the foundation. Resisting moment = effective dead load x lever arm, taken as half the footprint unless an arm is entered. Eccentricity is compared to the B/6 kern to report full bearing, partial uplift, or a resultant off the base entirely. Global stability only - sliding, toe bearing pressure, hold-down forces, and pile or tiedown capacity are separate. A design aid, not a substitute for a licensed engineer's design.",
+  example: seismicOverturningStabilityExample.inputs,
+  fields: [
+    { key: "overturning_moment_kipft", label: "Overturning moment M0 (kip-ft, strength level)", kind: "number", default: 5422 },
+    { key: "dead_load_kip", label: "Resisting dead load D (kips)", kind: "number", default: 900 },
+    { key: "footprint_width_ft", label: "Footprint width in the direction of loading (ft)", kind: "number", default: 20 },
+    { key: "arm_override_ft", label: "Resisting lever arm override (ft; 0 = half the footprint)", kind: "number", default: 0 },
+    { key: "sds", label: "SDS", kind: "number", default: 1.0 },
+    { key: "design_method", label: "Design method", kind: "select", options: [{ value: "lrfd", label: "LRFD (0.9D + 1.0E)", selected: true }, { value: "asd", label: "ASD (0.6D + 0.7E)" }] },
+    { key: "apply_soil_reduction", label: "Take the 12.13.4 soil-interface reduction", kind: "select", options: [{ value: "yes", label: "Yes - 25% reduction", selected: true }, { value: "no", label: "No - full moment" }] },
+    { key: "required_ratio", label: "Required stability ratio", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "w", id: "sos-out-w", label: "Dead load that actually resists", value: (r) => fmt(r.dead_coeff, 3) + " D = " + fmt(r.w_eff_kip, 0) + " kips (Ev removes " + fmt(r.ev_coeff, 3) + ")" },
+    { key: "mr", id: "sos-out-mr", label: "Resisting moment", value: (r) => fmt(r.m_resist_kipft, 0) + " kip-ft on a " + fmt(r.arm_ft, 2) + " ft arm" },
+    { key: "md", id: "sos-out-md", label: "Design overturning moment", value: (r) => fmt(r.m_demand_kipft, 0) + " kip-ft" },
+    { key: "ra", id: "sos-out-ra", label: "Stability ratio", value: (r) => fmt(r.ratio, 2) + (r.passes ? " - OK" : " - FAILS") },
+    { key: "ec", id: "sos-out-ec", label: "Resultant eccentricity vs the B/6 kern", value: (r) => r.kern_ft === null ? "- (enter a footprint width)" : fmt(r.eccentricity_ft, 2) + " ft vs " + fmt(r.kern_ft, 2) + " ft - " + (r.in_kern ? "full bearing" : r.uplift ? "resultant off the base" : "partial uplift") },
+    { key: "n", id: "sos-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSeismicOverturningStability,
+});

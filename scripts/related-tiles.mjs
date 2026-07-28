@@ -1511,7 +1511,8 @@ const RELATED = {
   "asce7-load-combinations": ["snow-load","wind-pressure","rain-load-ponding"],
   "seismic-base-shear": ["wind-pressure","asce7-load-combinations","snow-load"],
   "seismic-vertical-distribution": ["seismic-base-shear","seismic-story-drift","seismic-pdelta-stability"],
-  "seismic-overturning-moment": ["seismic-vertical-distribution","seismic-base-shear","shearwall-overturning"],
+  "seismic-overturning-moment": ["seismic-overturning-stability","seismic-vertical-distribution","seismic-base-shear","shearwall-overturning"],
+  "seismic-overturning-stability": ["seismic-overturning-moment","shearwall-overturning","soil-bearing-capacity","footing-eccentric-pressure"],
   // spec-v227..v229 cooling-load-components batch (Group C)
   "window-solar-heat-gain": ["manual-j-cooling","internal-heat-gains","envelope-conduction-load"],
   "window-overhang-shade": ["window-solar-heat-gain","solar-times","manual-j-cooling","envelope-conduction-load"],

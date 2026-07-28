@@ -31588,3 +31588,76 @@ test("bounds: spec-v1123 computeRcTBeamFlexure pins the rectangular identity wit
   }
   assert.ok("error" in _v1123({ ...base, fc_psi: Infinity }));
 });
+
+import { computeSeismicOverturningStability as _v1124 } from "../../calc-construction.js";
+import { computeSeismicOverturningMoment as _v1124sib } from "../../calc-construction.js";
+
+test("bounds: spec-v1124 computeSeismicOverturningStability pins the Ev subtraction, both load combinations, the 12.13.4 reduction, the kern check, and error seams", () => {
+  const base = { overturning_moment_kipft: 5422, dead_load_kip: 900, footprint_width_ft: 20, arm_override_ft: 0, sds: 1.0, design_method: "lrfd", apply_soil_reduction: "yes", required_ratio: 1.0 };
+  const r = _v1124(base);
+  assert.ok(Math.abs(r.dead_coeff - 0.7) < 1e-12 && r.w_eff_kip === 630 && r.arm_ft === 10);
+  assert.ok(Math.abs(r.m_demand_kipft - 4066.5) < 1e-9 && Math.abs(r.ratio - 1.549244) < 1e-5 && r.passes);
+  // THE POINT: global stability passes while the base is already partly in uplift.
+  assert.ok(Math.abs(r.eccentricity_ft - 6.454762) < 1e-5 && Math.abs(r.kern_ft - 20 / 6) < 1e-12);
+  assert.ok(!r.in_kern && !r.uplift, "outside the kern but not off the base");
+  // Ev is subtracted from the gravity coefficient, at the right factor for each method.
+  for (const SDS of [0, 0.25, 0.5, 1.0, 1.5, 2.0]) {
+    const l = _v1124({ ...base, sds: SDS });
+    const a = _v1124({ ...base, sds: SDS, design_method: "asd" });
+    assert.ok(Math.abs(l.dead_coeff - (0.9 - 0.2 * SDS)) < 1e-12, "LRFD coefficient wrong at SDS " + SDS);
+    assert.ok(Math.abs(a.dead_coeff - (0.6 - 0.7 * 0.2 * SDS)) < 1e-12, "ASD coefficient wrong at SDS " + SDS);
+    assert.ok(Math.abs(l.ev_coeff - 0.2 * SDS) < 1e-12 && Math.abs(a.ev_coeff - 0.14 * SDS) < 1e-12);
+    // More shaking always leaves less dead load and never more capacity.
+    assert.ok(l.dead_coeff <= 0.9 + 1e-12 && a.dead_coeff <= 0.6 + 1e-12);
+  }
+  // At SDS = 0 the vertical term vanishes and the coefficients are the bare 0.9 / 0.6.
+  assert.ok(_v1124({ ...base, sds: 0 }).dead_coeff === 0.9);
+  assert.ok(_v1124({ ...base, sds: 0, design_method: "asd" }).dead_coeff === 0.6);
+  // ASD is NOT the same answer as LRFD - the two scale gravity and seismic differently.
+  const asd = _v1124({ ...base, design_method: "asd" });
+  assert.ok(Math.abs(asd.ratio - 1.454391) < 1e-5 && Math.abs(asd.ratio - r.ratio) > 0.05);
+  assert.ok(Math.abs(asd.m_demand_kipft - 5422 * 0.7 * 0.75) < 1e-9);
+  // The 12.13.4 reduction scales the demand by exactly 0.75 and nothing else.
+  const full = _v1124({ ...base, apply_soil_reduction: "no" });
+  assert.ok(Math.abs(full.m_demand_kipft - 5422) < 1e-9);
+  assert.ok(Math.abs(r.m_demand_kipft / full.m_demand_kipft - 0.75) < 1e-12);
+  assert.ok(full.w_eff_kip === r.w_eff_kip && full.m_resist_kipft === r.m_resist_kipft);
+  assert.ok(Math.abs(r.ratio / full.ratio - 1 / 0.75) < 1e-9);
+  // Monotonicity and the identity ratio = arm / eccentricity.
+  for (const D of [400, 900, 1500, 3000]) {
+    const t = _v1124({ ...base, dead_load_kip: D });
+    assert.ok(Math.abs(t.ratio - t.arm_ft / t.eccentricity_ft) < 1e-9, "ratio must equal arm/eccentricity");
+    assert.ok(Math.abs(t.m_resist_kipft - t.w_eff_kip * t.arm_ft) < 1e-9);
+  }
+  let prev = 0;
+  for (const D of [200, 400, 900, 1800]) { const t = _v1124({ ...base, dead_load_kip: D }); assert.ok(t.ratio > prev); prev = t.ratio; }
+  let prevR = Infinity;
+  for (const M of [2000, 5422, 9000, 20000]) { const t = _v1124({ ...base, overturning_moment_kipft: M }); assert.ok(t.ratio < prevR); prevR = t.ratio; }
+  // Kern seams: exactly at B/6 is still full bearing; past B/2 the resultant is off the base.
+  const wide = _v1124({ ...base, footprint_width_ft: 60 });
+  assert.ok(wide.in_kern && !wide.uplift);
+  const tippy = _v1124({ ...base, footprint_width_ft: 6 });
+  assert.ok(tippy.uplift && !tippy.passes, "off the base must also fail the ratio");
+  // An arm override replaces the half-footprint arm and nothing else.
+  const ov = _v1124({ ...base, arm_override_ft: 10 });
+  assert.ok(ov.arm_ft === 10 && Math.abs(ov.ratio - r.ratio) < 1e-12);
+  assert.ok(_v1124({ ...base, arm_override_ft: 4 }).arm_ft === 4);
+  // The demand can come straight from the sibling tile that names this check.
+  const sib = _v1124sib({ base_shear_kip: 200, period_s: 0.5, stories: [{ w: 1000, h: 12 }, { w: 1000, h: 24 }, { w: 800, h: 36 }] });
+  const chained = _v1124({ ...base, overturning_moment_kipft: sib.m_base_kipft, apply_soil_reduction: "yes" });
+  assert.ok(Math.abs(chained.m_demand_kipft - sib.m_base_reduced_kipft) < 1e-9, "the tile's 0.75 must match the sibling's own reduced moment");
+  // Error seams.
+  assert.ok("error" in _v1124({ ...base, overturning_moment_kipft: 0 }));
+  assert.ok("error" in _v1124({ ...base, dead_load_kip: 0 }));
+  assert.ok("error" in _v1124({ ...base, footprint_width_ft: 0 }), "no width and no arm leaves the resisting moment undefined");
+  assert.ok(!("error" in _v1124({ ...base, footprint_width_ft: 0, arm_override_ft: 10 })), "an arm alone is enough");
+  assert.ok("error" in _v1124({ ...base, sds: -1 }));
+  assert.ok("error" in _v1124({ ...base, sds: 5 }));
+  assert.ok("error" in _v1124({ ...base, sds: 3.01 }));
+  // The SDS <= 3 bound guarantees a positive effective dead-load coefficient in BOTH
+  // combinations, so no zero-divide guard is reachable - checked at the bound itself.
+  assert.ok(_v1124({ ...base, sds: 3 }).dead_coeff > 0);
+  assert.ok(_v1124({ ...base, sds: 3, design_method: "asd" }).dead_coeff > 0);
+  assert.ok("error" in _v1124({ ...base, required_ratio: 0 }));
+  assert.ok("error" in _v1124({ ...base, dead_load_kip: Infinity }));
+});

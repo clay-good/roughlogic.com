@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "overturning stability ratio",
+      "target": "seismic-overturning-stability",
+      "kind": "industry"
+    },
+    {
+      "term": "how much dead load resists overturning",
+      "target": "seismic-overturning-stability",
+      "kind": "question"
+    },
+    {
+      "term": "vertical seismic ev 0.2 sds",
+      "target": "seismic-overturning-stability",
+      "kind": "industry"
+    },
+    {
+      "term": "does my building uplift in an earthquake",
+      "target": "seismic-overturning-stability",
+      "kind": "question"
+    },
+    {
+      "term": "25 percent overturning reduction at the foundation",
+      "target": "seismic-overturning-stability",
+      "kind": "question"
+    },
+    {
       "term": "t-beam flexural capacity",
       "target": "rc-tbeam-flexure",
       "kind": "industry"

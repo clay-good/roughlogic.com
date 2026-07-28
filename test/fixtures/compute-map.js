@@ -1402,6 +1402,7 @@ export const COMPUTE_MAP = {
   "seismic-base-shear": { module: "../../calc-construction.js", fn: "computeSeismicBaseShear" },
   "seismic-vertical-distribution": { module: "../../calc-construction.js", fn: "computeSeismicVerticalDistribution" },
   "seismic-overturning-moment": { module: "../../calc-construction.js", fn: "computeSeismicOverturningMoment" },
+  "seismic-overturning-stability": { module: "../../calc-construction.js", fn: "computeSeismicOverturningStability" },
   // spec-v242..v244 IBC/IPC occupancy trio (3 tiles)
   "occupant-load": { module: "../../calc-construction.js", fn: "computeOccupantLoad" },
   "egress-capacity": { module: "../../calc-construction.js", fn: "computeEgressCapacity" },
