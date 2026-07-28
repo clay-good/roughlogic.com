@@ -32944,3 +32944,55 @@ test("bounds: spec-v1148 computeScaffoldGuardrailCheck pins the moving midrail t
   assert.ok("error" in _v1148({ ...base, midrail_tolerance_in: 0 }));
   assert.ok("error" in _v1148({ ...base, top_rail_height_in: Infinity }));
 });
+
+import { computeExcavationProtectionTrigger as _v1149 } from "../../calc-construction.js";
+
+test("bounds: spec-v1149 computeExcavationProtectionTrigger pins the 4 ft and 5 ft triggers in the right order, the two-condition exception, and error seams", () => {
+  const base = { depth_ft: 4.5, trench_length_ft: 120, egress_points: 2, stable_rock: "no", competent_person_exam: "yes" };
+  const r = _v1149(base);
+  assert.ok(r.egress_required && r.max_lateral_travel_ft === 25 && r.egress_points_needed === 3 && !r.egress_ok);
+  assert.ok(r.worst_travel_ft === 30 && !r.protection_required && r.shallow_exception);
+  // THE ORDER: the access rule bites BEFORE the cave-in rule, so there is a band between them.
+  for (const d of [4, 4.5, 4.99]) {
+    const t = _v1149({ ...base, depth_ft: d });
+    assert.ok(t.egress_required && !t.protection_required, "between 4 and 5 ft: ladder yes, shoring no (when examined)");
+  }
+  assert.ok(!_v1149({ ...base, depth_ft: 3.9 }).egress_required);
+  assert.ok(_v1149({ ...base, depth_ft: 4 }).egress_required, "4 ft exactly triggers egress");
+  assert.ok(!_v1149({ ...base, depth_ft: 4.99 }).protection_required);
+  assert.ok(_v1149({ ...base, depth_ft: 5 }).protection_required, "5 ft exactly is no longer 'less than 5'");
+  // THE TWO CONDITIONS: removing the examination flips the same trench.
+  const unexamined = _v1149({ ...base, competent_person_exam: "no" });
+  assert.ok(unexamined.protection_required && unexamined.shallow_but_unexamined && !unexamined.shallow_exception);
+  // Stable rock exempts at any depth, and outranks the examination question.
+  for (const d of [4, 12, 40]) {
+    const t = _v1149({ ...base, depth_ft: d, stable_rock: "yes", competent_person_exam: "no" });
+    assert.ok(!t.protection_required && t.stable_rock && !t.shallow_but_unexamined);
+  }
+  // Examination alone does NOT exempt a deep trench.
+  assert.ok(_v1149({ ...base, depth_ft: 12 }).protection_required);
+  // POINT COUNT: each point covers 50 ft of run, at least one whenever egress is required.
+  for (const L of [10, 50, 51, 120, 300]) {
+    const t = _v1149({ ...base, trench_length_ft: L, depth_ft: 6 });
+    assert.ok(t.egress_points_needed === Math.max(1, Math.ceil(L / 50)));
+    assert.ok(t.egress_points_needed >= 1);
+  }
+  assert.ok(_v1149({ ...base, trench_length_ft: 50, depth_ft: 6 }).egress_points_needed === 1);
+  assert.ok(_v1149({ ...base, trench_length_ft: 51, depth_ft: 6 }).egress_points_needed === 2);
+  // Providing the needed count clears it and brings the worst-case travel within 25 ft.
+  const needed = _v1149({ ...base, depth_ft: 6 }).egress_points_needed;
+  const fixed = _v1149({ ...base, depth_ft: 6, egress_points: needed });
+  assert.ok(fixed.egress_ok && fixed.worst_travel_ft <= 25 + 1e-9);
+  // No egress required means no points needed and no verdict.
+  const shallow = _v1149({ ...base, depth_ft: 3, egress_points: 0 });
+  assert.ok(!shallow.egress_required && shallow.egress_points_needed === 0 && shallow.egress_ok === null);
+  // No length entered still reports the requirement, just not a count.
+  const noLen = _v1149({ ...base, trench_length_ft: 0, depth_ft: 6 });
+  assert.ok(noLen.egress_required && !noLen.has_length && noLen.egress_points_needed === 1);
+  // Error seams.
+  assert.ok("error" in _v1149({ ...base, depth_ft: 0 }));
+  assert.ok("error" in _v1149({ ...base, trench_length_ft: -1 }));
+  assert.ok("error" in _v1149({ ...base, egress_points: -1 }));
+  assert.ok("error" in _v1149({ ...base, egress_points: 1.5 }));
+  assert.ok("error" in _v1149({ ...base, depth_ft: Infinity }));
+});

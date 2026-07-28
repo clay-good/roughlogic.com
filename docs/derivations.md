@@ -1631,6 +1631,7 @@ cross-check.
 | calc-construction.js | `computeEgressWindowCheck` | `{ clear_width_in = 0, clear_height_in = 0, sill_height_in = 0, location = "ab...` | _ | _ | _ |
 | calc-construction.js | `computeEgressWindowWell` | `{ well_width_in = 0, well_projection_in = 0, well_depth_in = 0, has_ladder = ...` | _ | _ | _ |
 | calc-construction.js | `computeExcavationBenchPlan` | `{ depth_ft = 0, soil_class = "B", surcharge = false, length_ft = 0, bottom_wi...` | _ | _ | _ |
+| calc-construction.js | `computeExcavationProtectionTrigger` | `{ depth_ft = 0, trench_length_ft = 0, egress_points = 0, stable_rock = "no", ...` | _ | _ | _ |
 | calc-construction.js | `computeExcavationVolume` | `{ length_ft, width_ft, depth_ft, side_slope_angle_deg = 90 }` | _ | _ | _ |
 | calc-construction.js | `computeExteriorOpeningProtection` | `{ fsd_ft = 0, wall_area = 0, protected: prot = false, actual_opening = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeFenceEstimate` | `{ length_ft = 0, post_spacing_ft = 8, rails_per_section = 2, picket_width_in ...` | _ | _ | _ |
@@ -3193,7 +3194,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1779.
+Row count: 1780.
 
 <!-- END function-corpus-v14 -->
 
@@ -3819,7 +3820,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (410 tiles)
+### Group E Construction (411 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3954,6 +3955,7 @@ per spec-v14 §13.1 second paragraph.
 | `erosion-blanket-coverage` | Erosion Blanket (RECP) Roll and Staple Takeoff | Lapped-roll takeoff identity (RECP in...; coverage = 18000/9 = 2,000 sy; roll = 100 sy; rolls = cei... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `excavation` | Excavation Volume | Project (first-principles); vertical (90 deg) -> setback=0; A1=A2=100 ft^2; V = D/3 *... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `excavation-bench-plan` | Excavation Slope and Bench-Step Plan | OSHA; Type B ratio 1:1; bench 4 ft per layer; bottom width 2 ft... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `excavation-protection-trigger` | Excavation Protective System and Egress Triggers (OSHA Subpart P) | Occupational Safety and Health Admini...; 'A stairway, ladder, ramp or other safe means of egress s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `exterior-opening-protection` | Exterior Wall Opening Limit by Fire Separation Distance (IBC Table 705.8) | IBC 2021 Table 705.8; spec-v253 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fastener-pullout` | Nail and Screw Pull-Out | Project (public fastener-engineering ...; 16d common nail (D=0.162 in) in DF-L (G=0.50), 1.5 in pen... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fence-estimate` | Fence Material Takeoff | Standard fence-layout identities.; spec-v94 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4911,6 +4913,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1532. Fixture-covered or reference-cadence: 1532 / 1532.
+Tile count: 1533. Fixture-covered or reference-cadence: 1533 / 1533.
 
 <!-- END tile-index-v14 -->

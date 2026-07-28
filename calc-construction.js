@@ -11596,3 +11596,87 @@ CONSTRUCTION_RENDERERS["scaffold-guardrail-check"] = _simpleRenderer({
   ],
   compute: computeScaffoldGuardrailCheck,
 });
+
+
+// --- spec-v1149: excavation protective-system and egress triggers (OSHA Subpart P) ---
+// trench-slope and excavation-bench-plan both assume you already know a protective system
+// is required. This answers the prior question, and the surprise is that the two triggers
+// are at DIFFERENT depths and in the counterintuitive order. 1926.651(c)(2) puts a means of
+// egress in trenches 4 FT or more deep, no more than 25 ft of lateral travel away.
+// 1926.652(a)(1) requires cave-in protection unless the excavation is entirely in stable
+// rock, OR it is less than 5 FT deep and a competent person's examination shows no
+// indication of a potential cave-in. So a 4.5 ft trench needs a ladder and may need no
+// shoring at all - the shallower rule is the access one, not the cave-in one, and people
+// routinely have it backwards.
+// Also note the 5 ft exception has TWO conditions, not one: under 5 ft AND examined. Depth
+// alone does not exempt anything.
+// dims: in { depth_ft: L, trench_length_ft: L, egress_points: dimensionless, stable_rock: dimensionless, competent_person_exam: dimensionless } out: { egress_required: dimensionless, max_lateral_travel_ft: L, egress_points_needed: dimensionless, protection_required: dimensionless }
+export function computeExcavationProtectionTrigger({ depth_ft = 0, trench_length_ft = 0, egress_points = 0, stable_rock = "no", competent_person_exam = "no" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const d = Number(depth_ft) || 0;
+  const L = Number(trench_length_ft) || 0;
+  const pts = Number(egress_points) || 0;
+  const rock = stable_rock === "yes";
+  const examined = competent_person_exam === "yes";
+  if (!(d > 0)) return { error: "Excavation depth must be positive (ft)." };
+  if (L < 0) return { error: "Trench length cannot be negative (ft)." };
+  if (!Number.isInteger(pts) || pts < 0) return { error: "Egress point count must be a whole number of 0 or more." };
+
+  const EGRESS_DEPTH = 4, LATERAL = 25, SHALLOW = 5;
+  // 651(c)(2): egress in trenches 4 ft or more deep, within 25 ft of lateral travel.
+  const egress_required = d >= EGRESS_DEPTH;
+  const max_lateral_travel_ft = LATERAL;
+  // Each point covers 25 ft each way, so 50 ft of run, and the ends must be reachable.
+  const has_length = L > 0;
+  const egress_points_needed = egress_required && has_length ? Math.max(1, Math.ceil(L / (2 * LATERAL))) : egress_required ? 1 : 0;
+  const egress_ok = egress_required ? pts >= egress_points_needed : null;
+  const worst_travel_ft = egress_required && has_length && pts > 0 ? L / (2 * pts) : null;
+
+  // 652(a)(1): protection required unless stable rock, OR under 5 ft AND examined.
+  const shallow_exception = d < SHALLOW && examined;
+  const shallow_but_unexamined = d < SHALLOW && !examined && !rock;
+  const protection_required = !(rock || shallow_exception);
+  // Only the egress COUNT is a pass/fail here. Whether cave-in protection is required is a
+  // determination, not a compliance test - the design that satisfies it is another tile.
+  const egress_count_ok = egress_ok !== false;
+
+  const note = "TWO TRIGGERS, AT DIFFERENT DEPTHS, IN THE ORDER PEOPLE GET BACKWARDS. "
+    + "EGRESS (651(c)(2)): a stairway, ladder, ramp, or other safe means of egress in trench excavations that are " + EGRESS_DEPTH + " FT OR MORE in depth, so as to require no more than " + LATERAL + " ft of lateral travel. At " + d + " ft this is " + (egress_required ? "REQUIRED. " : "not triggered. ")
+    + "CAVE-IN PROTECTION (652(a)(1)): required unless the excavation is made entirely in stable rock, OR it is LESS THAN " + SHALLOW + " ft deep AND examination of the ground by a competent person provides no indication of a potential cave-in. Here: "
+    + (rock ? "entirely in stable rock, so the first exception applies and no protective system is required on that basis. "
+      : shallow_exception ? "under " + SHALLOW + " ft and examined by a competent person with no indication of a potential cave-in, so the second exception applies. "
+      : shallow_but_unexamined ? "under " + SHALLOW + " ft but NOT examined by a competent person - and that exception has TWO conditions, not one. Depth alone exempts nothing, so a protective system is required until the examination is made and documented. "
+      : "at " + d + " ft it is at or over the " + SHALLOW + " ft line, so a protective system is REQUIRED and no examination changes that. ")
+    + "The ordering is the point: the ACCESS rule bites at 4 ft and the CAVE-IN rule at 5, so a 4.5 ft trench needs a ladder and may need no shoring at all. Most people carry it the other way round and put the shallower threshold on the shoring. "
+    + (egress_required
+      ? (has_length
+        ? "Over " + L + " ft of trench, each egress point serves " + LATERAL + " ft in each direction, so " + egress_points_needed + " point" + (egress_points_needed === 1 ? "" : "s") + " placed on that spacing covers it; " + pts + " entered, " + (egress_ok ? "OK" : "SHORT") + ". " + (worst_travel_ft !== null ? "Evenly spaced, " + pts + " point" + (pts === 1 ? "" : "s") + " leaves a worst-case travel of about " + worst_travel_ft.toFixed(1) + " ft. " : "")
+        : "Enter a trench length to get a point count; the requirement is a spacing rule, not a single ladder. ")
+      : "")
+    + "The 25 ft is LATERAL TRAVEL, measured along the trench to the egress - not a straight line and not a diagonal out of the excavation. It is also travel for a person who may be moving away from a collapse, which is the reason the number is small. "
+    + "Not checked: WHICH protective system is appropriate and its design, which is sloping, benching, shoring, or shielding under 652(b) and (c) - the trench-slope and excavation-bench-plan tiles cover the sloping and benching geometry once the requirement is established; soil classification, which drives all of it; the design requirements and any registered-professional-engineer approval that the deeper design options carry, which is a separate determination in 652(b) and (c); the daily and after-event inspections a competent person owes; water accumulation, adjacent structures, and underground installations; atmospheric testing; and the spoil-pile setback, which has its own tile. A screen, not an excavation plan; 29 CFR 1926 Subpart P and the competent person govern.";
+
+  return { egress_required, max_lateral_travel_ft, has_length, egress_points_needed, egress_ok, worst_travel_ft, stable_rock: rock, shallow_exception, shallow_but_unexamined, protection_required, egress_count_ok, note };
+}
+
+export const excavationProtectionTriggerExample = { inputs: { depth_ft: 4.5, trench_length_ft: 120, egress_points: 2, stable_rock: "no", competent_person_exam: "yes" } };
+
+CONSTRUCTION_RENDERERS["excavation-protection-trigger"] = _simpleRenderer({
+  citation: "Citation: OSHA 29 CFR 1926.651(c)(2) - 'A stairway, ladder, ramp or other safe means of egress shall be located in trench excavations that are 4 feet or more in depth so as to require no more than 25 feet of lateral travel for employees.' And 29 CFR 1926.652(a)(1) - 'Each employee in an excavation shall be protected from cave-ins by an adequate protective system designed in accordance with paragraph (b) or (c) of this section except when: excavations are made entirely in stable rock; or excavations are less than 5 feet in depth and examination of the ground by a competent person provides no indication of a potential cave-in.' Both are US federal regulations in the public domain and are quoted directly. Not checked: which protective system is appropriate and its design under 652(b) or (c), soil classification, any registered-professional-engineer approval the deeper design options carry, competent-person inspections, water accumulation, adjacent structures, underground installations, atmospheric testing, or the spoil-pile setback. A screen, not an excavation plan; Subpart P and the competent person govern.",
+  example: excavationProtectionTriggerExample.inputs,
+  fields: [
+    { key: "depth_ft", label: "Excavation depth (ft)", kind: "number", default: 4.5 },
+    { key: "trench_length_ft", label: "Trench length (ft; 0 to skip the egress point count)", kind: "number", default: 120 },
+    { key: "egress_points", label: "Egress points provided", kind: "number", default: 2 },
+    { key: "stable_rock", label: "Made entirely in stable rock?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+    { key: "competent_person_exam", label: "Competent person examined, no indication of cave-in?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
+  ],
+  outputs: [
+    { key: "e", id: "ept-out-e", label: "Means of egress (4 ft trigger)", value: (r) => r.egress_required ? "REQUIRED, within 25 ft of lateral travel" : "not triggered at this depth" },
+    { key: "n", id: "ept-out-n", label: "Egress points", value: (r) => !r.egress_required ? "-" : !r.has_length ? "enter a trench length" : r.egress_points_needed + " needed - " + (r.egress_ok ? "satisfied" : "SHORT") + (r.worst_travel_ft === null ? "" : "; worst-case travel about " + fmt(r.worst_travel_ft, 1) + " ft as placed") },
+    { key: "p", id: "ept-out-p", label: "Cave-in protection (5 ft trigger)", value: (r) => r.protection_required ? "REQUIRED" : r.stable_rock ? "not required - entirely in stable rock" : "not required - under 5 ft and examined by a competent person" },
+    { key: "w", id: "ept-out-w", label: "Watch out", value: (r) => r.shallow_but_unexamined ? "under 5 ft but NOT examined - the exception has two conditions, and depth alone exempts nothing" : "the access rule bites at 4 ft and the cave-in rule at 5, not the other way round" },
+    { key: "z", id: "ept-out-z", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeExcavationProtectionTrigger,
+});

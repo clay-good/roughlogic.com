@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "when does a trench need shoring",
+      "target": "excavation-protection-trigger",
+      "kind": "question"
+    },
+    {
+      "term": "trench ladder every 25 feet",
+      "target": "excavation-protection-trigger",
+      "kind": "question"
+    },
+    {
+      "term": "excavation 5 foot rule",
+      "target": "excavation-protection-trigger",
+      "kind": "question"
+    },
+    {
+      "term": "trench egress requirement",
+      "target": "excavation-protection-trigger",
+      "kind": "industry"
+    },
+    {
+      "term": "protective system required excavation",
+      "target": "excavation-protection-trigger",
+      "kind": "industry"
+    },
+    {
       "term": "scaffold guardrail height",
       "target": "scaffold-guardrail-check",
       "kind": "industry"
