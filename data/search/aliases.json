@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "bar nesting",
+      "target": "bar-nesting",
+      "kind": "industry"
+    },
+    {
+      "term": "cutting stock problem",
+      "target": "bar-nesting",
+      "kind": "industry"
+    },
+    {
+      "term": "how many sticks for a mixed cut list",
+      "target": "bar-nesting",
+      "kind": "question"
+    },
+    {
+      "term": "nest cut list into stock lengths",
+      "target": "bar-nesting",
+      "kind": "question"
+    },
+    {
+      "term": "minimize drop on bar stock",
+      "target": "bar-nesting",
+      "kind": "question"
+    },
+    {
       "term": "membrane fastener takeoff",
       "target": "membrane-fastener-takeoff",
       "kind": "industry"

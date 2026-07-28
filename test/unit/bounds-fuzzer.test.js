@@ -31790,3 +31790,71 @@ test("bounds: spec-v1126 computeMembraneFastenerTakeoff pins the usable-width ro
   assert.ok("error" in _v1126({ ...base, sidelap_in: 240 }), "a lap wider than the roll leaves no usable width");
   assert.ok("error" in _v1126({ ...base, roof_area_sf: Infinity }));
 });
+
+import { computeBarNesting as _v1127 } from "../../calc-fab.js";
+
+test("bounds: spec-v1127 computeBarNesting pins the FFD packing, per-cut kerf accounting, the material balance, and error seams", () => {
+  const base = { cut_list: "62,4\n38,6\n27,9\n14.5,12", stock_length_in: 240, kerf_in: 0.125, end_trim_in: 1 };
+  const r = _v1127(base);
+  assert.ok(r.sticks === 4 && r.total_pieces === 31 && r.usable_in === 239);
+  assert.ok(Math.abs(r.total_piece_in - 893) < 1e-9 && Math.abs(r.total_kerf_in - 3.375) < 1e-9);
+  assert.ok(Math.abs(r.yield_pct - 93.020833) < 1e-5 && r.theoretical_min_sticks === 4 && r.at_theoretical_min);
+  // The first stick fills to exactly zero drop: 238.5 in of part + 4 kerfs = 239.
+  assert.ok(Math.abs(r.patterns[0].drop_in) < 1e-9);
+  // MATERIAL BALANCE must close exactly, on every input.
+  for (const kerf of [0, 0.0625, 0.125, 0.25]) {
+    for (const trim of [0, 1, 3]) {
+      for (const stock of [120, 240, 288]) {
+        const t = _v1127({ ...base, kerf_in: kerf, end_trim_in: trim, stock_length_in: stock });
+        if (t.error) continue;
+        assert.ok(Math.abs(t.total_stock_in - (t.total_piece_in + t.total_kerf_in + t.total_trim_in + t.total_drop_in)) < 1e-8, "material balance broken");
+        assert.ok(t.total_stock_in === t.sticks * stock && t.total_trim_in === t.sticks * trim);
+        assert.ok(t.total_drop_in >= -1e-9 && t.yield_pct > 0 && t.yield_pct <= 100);
+        // Every piece is placed exactly once and no stick overflows.
+        assert.ok(t.patterns.reduce((a, p) => a + p.parts.length, 0) === t.total_pieces);
+        for (const p of t.patterns) {
+          const used = p.parts.reduce((a, b) => a + b, 0) + Math.max(0, p.parts.length - 1) * kerf;
+          assert.ok(used <= t.usable_in + 1e-9, "a stick overflowed");
+          assert.ok(Math.abs(p.drop_in - (t.usable_in - used)) < 1e-9);
+          assert.ok(p.parts.length >= 1);
+        }
+        // Kerf is per CUT: total kerf = (pieces - sticks) x kerf, since each stick loses one.
+        assert.ok(Math.abs(t.total_kerf_in - (t.total_pieces - t.sticks) * kerf) < 1e-9);
+      }
+    }
+  }
+  // FFD places longest first, so every stick's parts come out in descending order.
+  for (const p of r.patterns) {
+    for (let i = 1; i < p.parts.length; i++) assert.ok(p.parts[i] <= p.parts[i - 1], "pieces not placed longest-first");
+  }
+  // Zero kerf and trim recover material but do not always save a stick.
+  const clean = _v1127({ ...base, kerf_in: 0, end_trim_in: 0 });
+  assert.ok(clean.sticks === r.sticks && clean.total_kerf_in === 0 && clean.total_trim_in === 0);
+  assert.ok(Math.abs(clean.total_drop_in - 67) < 1e-9 && Math.abs(clean.yield_pct - r.yield_pct) < 1e-9);
+  // More stock length never needs more sticks; a tighter kerf never needs more either.
+  let prev = Infinity;
+  for (const stock of [120, 180, 240, 360, 480]) {
+    const t = _v1127({ ...base, stock_length_in: stock });
+    assert.ok(t.sticks <= prev); prev = t.sticks;
+  }
+  assert.ok(_v1127({ ...base, kerf_in: 0 }).sticks <= _v1127({ ...base, kerf_in: 2 }).sticks);
+  // The count and total scale with quantity; a single size reduces to plain division.
+  const single = _v1127({ cut_list: "14.5,100", stock_length_in: 240, kerf_in: 0.125, end_trim_in: 0 });
+  const perStick = Math.floor((240 + 0.125) / (14.5 + 0.125));
+  assert.ok(single.sticks === Math.ceil(100 / perStick), "one size must match the plain cut-list division");
+  // Parsing: whitespace or comma separated, blank lines ignored.
+  const spaced = _v1127({ ...base, cut_list: "62 4\n\n38 6\n27 9\n14.5 12\n" });
+  assert.ok(spaced.sticks === r.sticks && spaced.total_pieces === r.total_pieces);
+  // Error seams.
+  assert.ok("error" in _v1127({ ...base, cut_list: "" }));
+  assert.ok("error" in _v1127({ ...base, cut_list: "62" }), "a line needs a length and a quantity");
+  assert.ok("error" in _v1127({ ...base, cut_list: "62,0" }));
+  assert.ok("error" in _v1127({ ...base, cut_list: "62,2.5" }), "quantity must be a whole number");
+  assert.ok("error" in _v1127({ ...base, cut_list: "-5,2" }));
+  assert.ok("error" in _v1127({ ...base, cut_list: "abc,2" }));
+  assert.ok("error" in _v1127({ ...base, cut_list: "300,1" }), "a piece longer than the usable stick cannot be cut");
+  assert.ok("error" in _v1127({ ...base, stock_length_in: 0 }));
+  assert.ok("error" in _v1127({ ...base, kerf_in: -1 }));
+  assert.ok("error" in _v1127({ ...base, end_trim_in: 240 }));
+  assert.ok("error" in _v1127({ ...base, stock_length_in: Infinity }));
+});

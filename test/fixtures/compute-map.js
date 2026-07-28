@@ -1090,6 +1090,7 @@ export const COMPUTE_MAP = {
   "sprocket-pitch-diameter": { module: "../../calc-shop.js", fn: "computeSprocketPitchDiameter" },
   "coil-length": { module: "../../calc-fab.js", fn: "computeCoilLength" },
   "barstock-cutlist": { module: "../../calc-fab.js", fn: "computeBarstockCutlist" },
+  "bar-nesting": { module: "../../calc-fab.js", fn: "computeBarNesting" },
   "vessel-head-volume": { module: "../../calc-fab.js", fn: "computeVesselHeadVolume" },
   "asce-live-load-reduction": { module: "../../calc-construction.js", fn: "computeAsceLiveLoadReduction" },
   "awg-wire-geometry": { module: "../../calc-electrical.js", fn: "computeAwgWireGeometry" },

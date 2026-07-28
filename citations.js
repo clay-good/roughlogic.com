@@ -10507,6 +10507,21 @@ export const CITATIONS = {
       { name: "Usable length", value: "the last wrap and core stub trim the usable length slightly", source: "shop practice" },
     ],
   },
+  "bar-nesting": {
+    formula: "usable = stock - end trim; pieces sorted descending; first-fit-decreasing places each piece in the first stick where used + length + (kerf if the stick is not empty) <= usable, opening a new stick otherwise; total kerf = sum over sticks of (pieces on that stick - 1) x kerf; drop = total stock - part - kerf - trim; yield = part / total stock; lower bound = ceil((total part + (pieces - sticks) x kerf) / usable).",
+    edition: "One-dimensional cutting-stock, packed by the first-fit-decreasing heuristic - a standard, near-optimal bin-packing method, not a proprietary nesting algorithm.",
+    freeAccess: "First-fit-decreasing is textbook combinatorial optimization; nothing here is licensed or tabulated.",
+    governance: GOVERNANCE.general,
+    editionNote: "Why longest-first: the long pieces have the least flexibility, so placing them while every stick is still empty leaves the short pieces to fill the gaps they leave behind. Reversing the order strands long pieces on sticks that short ones have already nibbled, and the stick count goes up. The kerf accounting is the detail hand estimates miss - kerf is charged per CUT, not per piece, so a stick holding n pieces takes n-1 kerfs, and a stick that happens to cut clean to its end takes one fewer than a stick with drop left over. The worked example makes that concrete: three 62s, a 38, and a 14.5 come to 238.5 in of part plus four 0.125 in kerfs, exactly filling the 239 in usable length with ZERO drop. Honesty about the method: first-fit-decreasing is a heuristic, not an optimum. The tile computes a material lower bound alongside its answer and states plainly whether the packing has reached it - when it has, no rearrangement saves a stick; when it has not, a hand rearrangement or a true cutting-stock solver may do better. Not modeled: clamping and chuck loss, grain or finish direction, mill tolerance on the stock length, reusable drop carried in from an earlier job, or nesting across more than one stock size. The longest single drop is reported precisely so it can be checked against the next cut list before it goes in the rack. Verify the pattern against the saw setup before cutting. A material-ordering aid; the cut list and the shop govern.",
+    assumptions: [
+      { name: "Heuristic", value: "first-fit-decreasing; near-optimal but not guaranteed optimal", source: "standard bin-packing method" },
+      { name: "Kerf accounting", value: "charged per cut, so n pieces on a stick take n-1 kerfs", source: "saw geometry" },
+      { name: "End trim", value: "deducted from every stick before packing", source: "stated input" },
+      { name: "Lower bound", value: "material-based; reported so the user knows whether the packing can be beaten", source: "computed, not assumed" },
+      { name: "Not modeled", value: "clamping loss, grain direction, stock tolerance, reusable drop, multiple stock sizes", source: "stated scope limit" },
+      { name: "Size limit", value: "5,000 pieces, to keep the packing responsive in the browser", source: "implementation limit" },
+    ],
+  },
   "barstock-cutlist": {
     formula: "pieces_per_stick = floor( (stock_length + kerf) / (piece_length + kerf) ); drop = stock_length - [pieces_per_stick x piece_length + (pieces_per_stick - 1) x kerf]; sticks = ceil(pieces_needed / pieces_per_stick); yield% = pieces_needed x piece_length / (sticks x stock_length) x 100.",
     edition: "Linear cut-list yield identity, first-principles; the stock length, cut length, saw kerf, and quantity come from the job.",

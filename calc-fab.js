@@ -24,7 +24,7 @@
 // =====================================================================
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeSelect,
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
@@ -1575,3 +1575,119 @@ function _v962renderBendSpringback(inputRegion, outputRegion, citationEl) {
   for (const f of [rr, tt, yy, ee]) f.input.addEventListener("input", update);
 }
 FAB_RENDERERS["bend-springback"] = _v962renderBendSpringback;
+
+// --- spec-v1127: mixed-length bar nesting (cutting stock) ---
+// barstock-cutlist handles ONE piece length and says so: "Mixed-length nesting, end trim,
+// and clamping loss are not modeled." A real cut list is several lengths at once, and then
+// the question stops being division and becomes packing: which pieces share a stick. The
+// classic and near-optimal heuristic is first-fit-decreasing - sort the pieces longest
+// first and drop each into the first stick it fits, opening a new stick only when none has
+// room. Longest-first matters: the big pieces are the ones with no flexibility, so placing
+// them while every stick is still empty leaves the short ones to fill the gaps they leave.
+// Kerf is charged per CUT, and a stick that is cut to its very end takes one fewer kerf
+// than a stick with drop left over, which is the detail hand estimates usually miss.
+// dims: in { cut_list: dimensionless, stock_length_in: L, kerf_in: L, end_trim_in: L } out: { sticks: dimensionless, total_pieces: dimensionless, total_stock_in: L, total_piece_in: L, total_kerf_in: L, total_drop_in: L, yield_pct: dimensionless, longest_drop_in: L }
+export function computeBarNesting({ cut_list = "", stock_length_in = 240, kerf_in = 0.125, end_trim_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const stock = Number(stock_length_in) || 0;
+  const kerf = Number(kerf_in) || 0;
+  const trim = Number(end_trim_in) || 0;
+  if (!(stock > 0)) return { error: "Stock length must be positive (in)." };
+  if (kerf < 0) return { error: "Kerf cannot be negative (in)." };
+  if (trim < 0) return { error: "End trim cannot be negative (in)." };
+  const usable = stock - trim;
+  if (!(usable > 0)) return { error: "End trim consumes the whole stick - no usable length left." };
+
+  const lines = String(cut_list || "").split("\n").map((l) => l.trim()).filter(Boolean);
+  if (lines.length === 0) return { error: "Enter a cut list, one line per size as length,quantity." };
+  const pieces = [];
+  for (const line of lines) {
+    const parts = line.split(/[,\s]+/).filter(Boolean);
+    if (parts.length < 2) return { error: "Each line needs a length and a quantity: " + line };
+    const len = Number(parts[0]);
+    const qty = Number(parts[1]);
+    if (!Number.isFinite(len) || !(len > 0)) return { error: "Piece length must be a positive number: " + line };
+    if (!Number.isFinite(qty) || !Number.isInteger(qty) || qty < 1) return { error: "Quantity must be a whole number of 1 or more: " + line };
+    if (len > usable) return { error: "A " + len + " in piece does not fit a " + usable + " in usable stick." };
+    for (let i = 0; i < qty; i++) pieces.push(len);
+    if (pieces.length > 5000) return { error: "Cut list is too large for this tool (over 5,000 pieces)." };
+  }
+
+  // First-fit-decreasing. A stick holds `used` inches of pieces plus the kerf for each cut
+  // already made; adding one more piece to a non-empty stick costs a kerf as well.
+  pieces.sort((a, b) => b - a);
+  const bins = [];
+  for (const len of pieces) {
+    let placed = false;
+    for (const bin of bins) {
+      const cost = len + (bin.parts.length > 0 ? kerf : 0);
+      if (bin.used + cost <= usable + 1e-9) { bin.used += cost; bin.parts.push(len); placed = true; break; }
+    }
+    if (!placed) bins.push({ used: len, parts: [len] });
+  }
+
+  const sticks = bins.length;
+  const total_pieces = pieces.length;
+  const total_piece_in = pieces.reduce((a, b) => a + b, 0);
+  const total_kerf_in = bins.reduce((a, b) => a + Math.max(0, b.parts.length - 1) * kerf, 0);
+  const total_trim_in = sticks * trim;
+  const total_stock_in = sticks * stock;
+  const total_drop_in = total_stock_in - total_piece_in - total_kerf_in - total_trim_in;
+  const yield_pct = (total_piece_in / total_stock_in) * 100;
+  const drops = bins.map((b) => usable - b.used);
+  const longest_drop_in = drops.reduce((a, b) => Math.max(a, b), 0);
+  const patterns = bins.map((b, i) => ({ stick: i + 1, parts: b.parts.slice(), drop_in: usable - b.used }));
+  // Every stick must hold at least the longest piece, so this is a hard floor no packing beats.
+  const theoretical_min_sticks = Math.ceil((total_piece_in + Math.max(0, total_pieces - sticks) * kerf) / usable);
+  const at_theoretical_min = sticks <= theoretical_min_sticks;
+
+  const patternSummary = patterns.slice(0, 12).map((p) => {
+    const counts = new Map();
+    for (const v of p.parts) counts.set(v, (counts.get(v) || 0) + 1);
+    return "#" + p.stick + ": " + [...counts.entries()].map(([len, n]) => n + " x " + len).join(" + ") + " (drop " + p.drop_in.toFixed(2) + ")";
+  }).join("; ");
+
+  const note = total_pieces + " pieces in " + lines.length + " size" + (lines.length === 1 ? "" : "s") + " nest into " + sticks + " stick" + (sticks === 1 ? "" : "s") + " of " + stock + " in"
+    + (trim > 0 ? " (" + usable.toFixed(2) + " in usable after " + trim + " in of end trim per stick)" : "") + ", at " + yield_pct.toFixed(1) + "% yield. "
+    + "Pattern" + (patterns.length > 12 ? "s (first 12)" : "s") + " - " + patternSummary + ". "
+    + "The method is first-fit-decreasing: sort longest first, drop each piece into the first stick it fits, open a new stick only when none has room. Longest-first is what makes it work - the big pieces have the least flexibility, so they get placed while every stick is still empty and the short ones fill the gaps they leave. "
+    + "Kerf is charged per CUT, not per piece: " + total_kerf_in.toFixed(2) + " in total, and a stick cut clean to its end takes one fewer kerf than a stick with drop left, which is the detail a hand estimate usually misses. "
+    + "Of " + total_stock_in.toFixed(1) + " in bought, " + total_piece_in.toFixed(1) + " in is finished part, " + total_kerf_in.toFixed(2) + " in is sawdust" + (trim > 0 ? ", " + total_trim_in.toFixed(1) + " in is end trim" : "") + ", and " + total_drop_in.toFixed(1) + " in is drop. The longest single drop is " + longest_drop_in.toFixed(2) + " in - worth checking against the cut list before it goes in the rack. "
+    + (at_theoretical_min ? "This packing is at the material lower bound, so no rearrangement saves a stick. " : "A lower bound on the material says " + theoretical_min_sticks + " stick" + (theoretical_min_sticks === 1 ? "" : "s") + " might be possible; first-fit-decreasing is a heuristic, not an optimum, and on some lists a hand rearrangement or a true cutting-stock solver does better. ")
+    + "Not modeled: clamping and chuck loss, grain or finish direction, mill tolerance on the stock length, reusable drop from a previous job, or nesting across different stock sizes. Verify the pattern against the saw setup before cutting. A material-ordering aid; the cut list and the shop govern.";
+
+  return { sticks, total_pieces, size_count: lines.length, usable_in: usable, total_stock_in, total_piece_in, total_kerf_in, total_trim_in, total_drop_in, yield_pct, longest_drop_in, theoretical_min_sticks, at_theoretical_min, patterns, note };
+}
+
+export const barNestingExample = { inputs: { cut_list: "62,4\n38,6\n27,9\n14.5,12", stock_length_in: 240, kerf_in: 0.125, end_trim_in: 1 } };
+
+function _v1127renderBarNesting(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: one-dimensional cutting-stock packed by the first-fit-decreasing heuristic - sort the pieces longest first, place each in the first stick with room, open a new stick only when none fits. Kerf is charged per CUT, so a stick holding n pieces takes n-1 kerfs and a stick cut clean to its end takes one fewer than a stick with drop remaining. End trim is deducted from every stick before packing. First-fit-decreasing is a heuristic and not guaranteed optimal; the tile reports a material lower bound alongside its answer and says plainly when the packing is already at it. Not modeled: clamping and chuck loss, grain or finish direction, mill tolerance on stock length, reusable drop from earlier jobs, or nesting across different stock sizes. A material-ordering aid; the cut list and the shop govern.";
+  const list = makeTextarea("Cut list, one line per size as length,quantity", "bn-list", { rows: "5" });
+  list.input.value = barNestingExample.inputs.cut_list;
+  inputRegion.appendChild(list.wrap);
+  const stock = makeNumber("Stock length (in)", "bn-stock", { step: "any", min: "0" }); stock.input.value = "240";
+  const kerf = makeNumber("Saw kerf (in)", "bn-kerf", { step: "any", min: "0" }); kerf.input.value = "0.125";
+  const trim = makeNumber("End trim per stick (in)", "bn-trim", { step: "any", min: "0" }); trim.input.value = "1";
+  for (const f of [stock, kerf, trim]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { list.input.value = barNestingExample.inputs.cut_list; stock.input.value = "240"; kerf.input.value = "0.125"; trim.input.value = "1"; update(); });
+  const oSticks = makeOutputLine(outputRegion, "Sticks required", "bn-out-sticks");
+  const oYield = makeOutputLine(outputRegion, "Yield", "bn-out-yield");
+  const oSplit = makeOutputLine(outputRegion, "Where the material goes", "bn-out-split");
+  const oDrop = makeOutputLine(outputRegion, "Longest single drop", "bn-out-drop");
+  const oPat = makeOutputLine(outputRegion, "Cutting patterns", "bn-out-pat");
+  const oNote = makeOutputLine(outputRegion, "Note", "bn-out-note");
+  const update = debounce(() => {
+    const r = computeBarNesting({ cut_list: list.input.value, stock_length_in: Number(stock.input.value) || 0, kerf_in: Number(kerf.input.value) || 0, end_trim_in: Number(trim.input.value) || 0 });
+    if (r.error) { oSticks.textContent = r.error; oYield.textContent = "-"; oSplit.textContent = "-"; oDrop.textContent = "-"; oPat.textContent = "-"; oNote.textContent = "-"; return; }
+    oSticks.textContent = r.sticks + " (" + r.total_pieces + " pieces in " + r.size_count + " sizes)" + (r.at_theoretical_min ? " - at the material lower bound" : ", lower bound " + r.theoretical_min_sticks);
+    oYield.textContent = fmt(r.yield_pct, 1) + "%";
+    oSplit.textContent = fmt(r.total_piece_in, 1) + " in part / " + fmt(r.total_kerf_in, 2) + " in kerf / " + fmt(r.total_trim_in, 1) + " in trim / " + fmt(r.total_drop_in, 1) + " in drop of " + fmt(r.total_stock_in, 1) + " in bought";
+    oDrop.textContent = fmt(r.longest_drop_in, 2) + " in";
+    oPat.textContent = r.patterns.slice(0, 12).map((p) => "#" + p.stick + ": " + p.parts.join(" + ") + " (drop " + fmt(p.drop_in, 2) + ")").join("  |  ") + (r.patterns.length > 12 ? "  |  ..." : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  list.input.addEventListener("input", update);
+  for (const f of [stock, kerf, trim]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["bar-nesting"] = _v1127renderBarNesting;
