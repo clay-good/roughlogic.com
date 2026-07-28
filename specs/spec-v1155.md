@@ -15,7 +15,7 @@ provisions are quoted.
 v14 dims lint, worked-example registry, bounds-fuzzer, reviewer signoff. v18/v21 contract: a negative
 distance, height, or rating, or a barrier claimed with no height, return `{ error }`. Hand-written
 renderer -- **calc-shop.js has no `_simpleRenderer` factory**, which the first draft assumed and which
-failed immediately on import.
+failed immediately on import. `check-module-sizes` cap for calc-shop.js raised 26500 -> 31000.
 
 ## 2. The tile
 
