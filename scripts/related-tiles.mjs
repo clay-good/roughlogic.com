@@ -389,6 +389,7 @@ const RELATED = {
   "ladder-angle": ["extension-ladder-overlap", "fall-protection-clearance", "sling-angle"],
   "extension-ladder-overlap": ["ladder-angle", "fall-protection-clearance", "roofing-squares"],
   "swing-fall-geometry": ["fall-protection-clearance", "fall-arrest-clearance", "ladder-angle"],
+  "fall-arrest-anchorage": ["fall-arrest-clearance", "swing-fall-geometry", "scaffold-guardrail-check", "guard-post-load"],
   "pulley-ma-gen": ["rope-ma", "sling-angle"],
 
   // Group J: Trucking. dim-weight, freight-density, pallet-loadout are

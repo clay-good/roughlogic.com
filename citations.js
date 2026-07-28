@@ -5921,6 +5921,21 @@ export const CITATIONS = {
       { name: "Detection model", value: "exponential (random-search) POD = 1 - e^(-coverage); conservative vs parallel-track", source: "NSARC / USCG" },
     ],
   },
+  "fall-arrest-anchorage": {
+    formula: "prescriptive anchorage requirement = 5,000 lb x employees attached; engineered requirement = 2 x the design load the system can impose; achieved safety factor = capacity / design load. System checks: arresting force <= 1,800 lb with a body harness, deceleration distance <= 3.5 ft, free fall <= 6 ft.",
+    edition: "OSHA 29 CFR 1926.502(d)(15) and (d)(16), Subpart M - Fall Protection. US federal regulations in the public domain, quoted directly.",
+    freeAccess: "29 CFR is published in full at no cost by OSHA and the eCFR.",
+    governance: GOVERNANCE.general,
+    editionNote: "The point is that the two figures everyone quotes are not the same number and do not measure the same thing. The 5,000 lb is what the ANCHORAGE must support; the 1,800 lb is the maximum arresting force the SYSTEM may impose on the WORKER. An anchor rated for 5,000 lb says nothing about whether the lanyard will keep the body under 1,800, and a system that limits force beautifully says nothing about the strength of what it is tied to. Two further traps sit in the anchorage sentence. First, the 5,000 lb is PER EMPLOYEE ATTACHED, so two workers on one anchor is 10,000 lb - the per-employee wording is routinely dropped. Second, the 5,000 lb is only one of two routes: an anchorage designed, installed, and used as part of a complete personal fall arrest system maintaining a safety factor of at least two, under the supervision of a qualified person, is equally compliant and can legitimately be far below 5,000 lb. The prescriptive number exists for attachment points nobody analysed, which is why it is so large. On system performance, the free-fall rule has a second half with no number in it - nor contact any lower level - so a 4 ft free fall satisfies the 6 ft limit and still fails if the worker reaches the deck; that clearance is the fall-arrest-clearance tile and is deliberately not duplicated here. The strength requirement is also written in ENERGY rather than force: twice the potential impact energy of an employee free falling 6 ft, or the free fall distance the system permits, whichever is less - so a device that shortens the permitted free fall lowers that bar, which is part of why a self-retracting device changes the anchorage conversation. Not checked: clearance below the anchor, body belts (prohibited for fall arrest), horizontal lifelines, which require a qualified person and behave nothing like a fixed anchor, swing fall, snaphook compatibility and rollout, equipment ratings and inspection, post-fall rescue, and positioning or restraint anchorages, which carry different numbers. A screen, not a fall-protection plan; Subpart M, the manufacturer, and a qualified person govern.",
+    assumptions: [
+      { name: "Prescriptive anchorage", value: "5,000 lb PER EMPLOYEE ATTACHED", source: "29 CFR 1926.502(d)(15)" },
+      { name: "Engineered alternative", value: "safety factor of at least two, under a qualified person", source: "29 CFR 1926.502(d)(15)" },
+      { name: "Arresting force", value: "1,800 lb maximum on the employee with a body harness", source: "29 CFR 1926.502(d)(16)" },
+      { name: "Deceleration and free fall", value: "3.5 ft and 6 ft maximums, and no contact with a lower level", source: "29 CFR 1926.502(d)(16)" },
+      { name: "Strength in energy", value: "twice the impact energy of a 6 ft free fall, or the permitted free fall, whichever is less", source: "29 CFR 1926.502(d)(16)" },
+      { name: "Not checked", value: "clearance, body belts, horizontal lifelines, swing fall, snaphooks, inspection, rescue", source: "stated scope limit" },
+    ],
+  },
   "fall-arrest-clearance": {
     formula: "required_clearance = free_fall_distance + deceleration_distance + worker_height (D-ring to feet) + safety_margin; margin = available_clearance - required_clearance; adequate when margin >= 0.",
     edition: "ANSI Z359.1 (Fall Protection Code) and OSHA 1926 Subpart M fall-clearance calculation, by name.",

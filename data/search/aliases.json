@@ -1737,6 +1737,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "fall arrest anchorage 5000 lb",
+      "target": "fall-arrest-anchorage",
+      "kind": "question"
+    },
+    {
+      "term": "how strong does a tie off point need to be",
+      "target": "fall-arrest-anchorage",
+      "kind": "question"
+    },
+    {
+      "term": "two workers on one anchor point",
+      "target": "fall-arrest-anchorage",
+      "kind": "question"
+    },
+    {
+      "term": "maximum arresting force 1800 pounds",
+      "target": "fall-arrest-anchorage",
+      "kind": "industry"
+    },
+    {
+      "term": "engineered anchorage safety factor of two",
+      "target": "fall-arrest-anchorage",
+      "kind": "industry"
+    },
+    {
       "term": "when does a trench need shoring",
       "target": "excavation-protection-trigger",
       "kind": "question"

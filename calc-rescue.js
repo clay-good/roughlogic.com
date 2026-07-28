@@ -488,3 +488,99 @@ export const RESCUE_RENDERERS = {
   "searcher-hours": renderSearcherHours,
   "sweep-width-correction": renderSweepWidthCorrection,
 };
+
+// --- spec-v1150: fall arrest anchorage and system force check (OSHA 1926.502(d)) ---
+// fall-arrest-clearance answers how far below the anchor a worker needs. This answers what
+// the anchor and the system have to WITHSTAND, and the useful part is that the two governing
+// numbers are not the same number and are not measuring the same thing.
+// 502(d)(15): an anchorage capable of supporting at least 5,000 lb PER EMPLOYEE ATTACHED -
+// or, alternatively, designed as part of a complete system maintaining a safety factor of
+// at least two, under the supervision of a qualified person. The 5,000 lb is the crude
+// route for an undesigned attachment point; an engineered anchorage can legitimately be far
+// less, and two workers on one anchor is 10,000 lb, not 5,000.
+// 502(d)(16): the SYSTEM must limit arresting force on the employee to 1,800 lb with a body
+// harness, limit deceleration distance to 3.5 ft, and be rigged so free fall is not more
+// than 6 ft nor contact any lower level. That 1,800 lb is what the body sees - it is not a
+// smaller version of the anchorage number.
+// dims: in { workers_attached: dimensionless, anchorage_capacity_lb: M L T^-2, design_route: dimensionless, design_load_lb: M L T^-2, arresting_force_lb: M L T^-2, deceleration_distance_ft: L, free_fall_ft: L } out: { required_anchorage_lb: M L T^-2, anchorage_shortfall_lb: M L T^-2, achieved_safety_factor: dimensionless }
+export function computeFallArrestAnchorage({ workers_attached = 1, anchorage_capacity_lb = 0, design_route = "prescriptive", design_load_lb = 0, arresting_force_lb = 0, deceleration_distance_ft = 0, free_fall_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n = Number(workers_attached) || 0;
+  const cap = Number(anchorage_capacity_lb) || 0;
+  const dl = Number(design_load_lb) || 0;
+  const af = Number(arresting_force_lb) || 0;
+  const dd = Number(deceleration_distance_ft) || 0;
+  const ff = Number(free_fall_ft) || 0;
+  const engineered = design_route === "engineered";
+  if (!Number.isInteger(n) || n < 1) return { error: "Workers attached must be a whole number of 1 or more." };
+  if (cap < 0 || dl < 0 || af < 0 || dd < 0 || ff < 0) return { error: "Loads and distances cannot be negative." };
+  if (engineered && !(dl > 0)) return { error: "The engineered route needs the design load the system can impose (lb) to test the safety factor of two." };
+
+  const PER_WORKER = 5000, MAX_FORCE = 1800, MAX_DECEL = 3.5, MAX_FREEFALL = 6, SF = 2;
+  // Prescriptive route: 5,000 lb PER EMPLOYEE ATTACHED.
+  const required_anchorage_lb = engineered ? SF * dl : PER_WORKER * n;
+  const anchorage_entered = cap > 0;
+  const anchorage_ok = anchorage_entered ? cap >= required_anchorage_lb : null;
+  const anchorage_shortfall_lb = anchorage_entered ? Math.max(0, required_anchorage_lb - cap) : 0;
+  const achieved_safety_factor = anchorage_entered && dl > 0 ? cap / dl : null;
+
+  // System performance, 502(d)(16). Each is independent of the anchorage.
+  const force_entered = af > 0;
+  const force_ok = force_entered ? af <= MAX_FORCE : null;
+  const decel_entered = dd > 0;
+  const decel_ok = decel_entered ? dd <= MAX_DECEL : null;
+  const freefall_entered = ff > 0;
+  const freefall_ok = freefall_entered ? ff <= MAX_FREEFALL : null;
+  const system_ok = (force_ok !== false) && (decel_ok !== false) && (freefall_ok !== false);
+  const passes = (anchorage_ok !== false) && system_ok;
+
+  const note = "TWO NUMBERS THAT ARE NOT THE SAME NUMBER. The 5,000 lb is what the ANCHORAGE must support; the 1,800 lb is what the SYSTEM may impose on the WORKER. They measure different things and neither is a version of the other - an anchor rated for 5,000 lb says nothing about whether the lanyard will keep the body under 1,800. "
+    + "ANCHORAGE (502(d)(15)): " + (engineered
+      ? "the engineered route - designed, installed, and used as part of a complete personal fall arrest system maintaining a safety factor of at least two, under the supervision of a qualified person. Against a " + dl + " lb design load that is " + required_anchorage_lb.toFixed(0) + " lb. An engineered anchorage can legitimately be far below 5,000 lb, which is the whole point of the alternative - the prescriptive number exists for attachment points nobody analysed. "
+      : "the prescriptive route - at least 5,000 lb PER EMPLOYEE ATTACHED, independent of any anchorage used to support or suspend platforms. With " + n + " worker" + (n === 1 ? "" : "s") + " that is " + required_anchorage_lb.toFixed(0) + " lb" + (n > 1 ? " - the per-employee wording is the part that gets missed, and two workers on one anchor is 10,000 lb, not 5,000. " : ". "))
+    + (anchorage_entered ? "Capacity entered is " + cap.toFixed(0) + " lb: " + (anchorage_ok ? "OK. " : "SHORT by " + anchorage_shortfall_lb.toFixed(0) + " lb. ") : "No anchorage capacity entered. ")
+    + (achieved_safety_factor !== null ? "Against the " + dl + " lb design load the capacity gives a safety factor of " + achieved_safety_factor.toFixed(2) + ". " : "")
+    + "SYSTEM PERFORMANCE (502(d)(16)), each condition independent of the anchorage: arresting force on the employee not more than " + MAX_FORCE + " lb with a body harness"
+    + (force_entered ? " - " + af + " lb, " + (force_ok ? "OK" : "OVER") : " - not entered") + "; deceleration distance not more than " + MAX_DECEL + " ft"
+    + (decel_entered ? " - " + dd + " ft, " + (decel_ok ? "OK" : "OVER") : " - not entered") + "; and rigged so the employee can neither free fall more than " + MAX_FREEFALL + " ft nor contact any lower level"
+    + (freefall_entered ? " - " + ff + " ft, " + (freefall_ok ? "OK" : "OVER") : " - not entered") + ". "
+    + "Note the free-fall rule has a second half with no number in it: NOR CONTACT ANY LOWER LEVEL. A 4 ft free fall satisfies the 6 ft limit and still fails if the worker reaches the deck, which is what the fall-arrest-clearance tile computes and this one does not. "
+    + "The strength requirement also reads in energy, not force: sufficient strength to withstand twice the potential impact energy of an employee free falling 6 ft, or the free fall distance the system permits, whichever is less. A shorter permitted free fall lowers that bar, which is one reason a self-retracting device changes the anchorage conversation. "
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: the clearance below the anchor, which is the fall-arrest-clearance tile; body-belt systems, which are prohibited for fall arrest; horizontal lifelines, which need a qualified person and behave nothing like a fixed anchor; swing fall, which has its own tile and its own geometry; snaphook compatibility and rollout; lanyard, harness, and connector ratings and their inspection; rescue after a fall, which is a plan, not a calculation; and anchorages for positioning or restraint, which carry different numbers entirely. A screen, not a fall-protection plan; 29 CFR 1926 Subpart M, the manufacturer, and a qualified person govern.";
+
+  return { engineered, required_anchorage_lb, anchorage_entered, anchorage_ok, anchorage_shortfall_lb, achieved_safety_factor, force_ok, decel_ok, freefall_ok, system_ok, passes, note };
+}
+
+export const fallArrestAnchorageExample = { inputs: { workers_attached: 2, anchorage_capacity_lb: 5000, design_route: "prescriptive", design_load_lb: 0, arresting_force_lb: 1600, deceleration_distance_ft: 3.5, free_fall_ft: 6 } };
+
+function _v1150renderFallArrestAnchorage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: OSHA 29 CFR 1926.502(d)(15) - anchorages used for attachment of personal fall arrest equipment shall be independent of any anchorage being used to support or suspend platforms and capable of supporting at least 5,000 pounds per employee attached, or shall be designed, installed, and used as part of a complete personal fall arrest system which maintains a safety factor of at least two, under the supervision of a qualified person. 29 CFR 1926.502(d)(16) - personal fall arrest systems shall limit maximum arresting force on an employee to 1,800 pounds when used with a body harness, limit the maximum deceleration distance an employee travels to 3.5 feet, be rigged such that an employee can neither free fall more than 6 feet nor contact any lower level, and have sufficient strength to withstand twice the potential impact energy of an employee free falling 6 feet or the free fall distance permitted by the system, whichever is less. US federal regulations in the public domain, quoted directly. Not checked: clearance below the anchor (see fall-arrest-clearance), body belts, horizontal lifelines, swing fall, snaphook compatibility and rollout, equipment ratings and inspection, post-fall rescue, or positioning and restraint anchorages. A screen, not a fall-protection plan; Subpart M, the manufacturer, and a qualified person govern.";
+  const wk = _mnF("Workers attached to this anchorage", "faa-wk", { step: "1", min: "1" }); wk.input.value = "2";
+  const rt = _msF("Anchorage route", "faa-rt", [{ value: "prescriptive", label: "Prescriptive - 5,000 lb per employee", selected: true }, { value: "engineered", label: "Engineered - safety factor of two, qualified person" }]);
+  const dl = _mnF("Design load the system can impose (lb; engineered route)", "faa-dl", { step: "any", min: "0" }); dl.input.value = "0";
+  const cp = _mnF("Anchorage capacity (lb; 0 to skip)", "faa-cp", { step: "any", min: "0" }); cp.input.value = "5000";
+  const af = _mnF("Maximum arresting force on the worker (lb; 0 to skip)", "faa-af", { step: "any", min: "0" }); af.input.value = "1600";
+  const dd = _mnF("Deceleration distance (ft; 0 to skip)", "faa-dd", { step: "any", min: "0" }); dd.input.value = "3.5";
+  const ff = _mnF("Free fall distance (ft; 0 to skip)", "faa-ff", { step: "any", min: "0" }); ff.input.value = "6";
+  inputRegion.appendChild(wk.wrap); inputRegion.appendChild(rt.wrap);
+  for (const x of [dl, cp, af, dd, ff]) inputRegion.appendChild(x.wrap);
+  _aeF(inputRegion, () => { wk.input.value = "2"; rt.select.value = "prescriptive"; dl.input.value = "0"; cp.input.value = "5000"; af.input.value = "1600"; dd.input.value = "3.5"; ff.input.value = "6"; update(); });
+  const oA = _moF(outputRegion, "Anchorage required", "faa-out-a");
+  const oC = _moF(outputRegion, "Anchorage verdict", "faa-out-c");
+  const oS = _moF(outputRegion, "System performance (502(d)(16))", "faa-out-s");
+  const oV = _moF(outputRegion, "Verdict", "faa-out-v");
+  const oN = _moF(outputRegion, "Note", "faa-out-n");
+  const update = _debF(() => {
+    const r = computeFallArrestAnchorage({ workers_attached: Number(wk.input.value) || 0, anchorage_capacity_lb: Number(cp.input.value) || 0, design_route: rt.select.value, design_load_lb: Number(dl.input.value) || 0, arresting_force_lb: Number(af.input.value) || 0, deceleration_distance_ft: Number(dd.input.value) || 0, free_fall_ft: Number(ff.input.value) || 0 });
+    if (r.error) { oA.textContent = r.error; oC.textContent = "-"; oS.textContent = "-"; oV.textContent = "-"; oN.textContent = "-"; return; }
+    oA.textContent = _fmtF(r.required_anchorage_lb, 0) + " lb" + (r.engineered ? " (twice the design load)" : " (5,000 per employee attached)");
+    oC.textContent = r.anchorage_ok === null ? "- (enter a capacity)" : r.anchorage_ok ? "OK" + (r.achieved_safety_factor === null ? "" : ", safety factor " + _fmtF(r.achieved_safety_factor, 2)) : "SHORT by " + _fmtF(r.anchorage_shortfall_lb, 0) + " lb";
+    oS.textContent = [r.force_ok === null ? "force n/a" : r.force_ok ? "force OK" : "force OVER 1,800 lb", r.decel_ok === null ? "decel n/a" : r.decel_ok ? "decel OK" : "decel OVER 3.5 ft", r.freefall_ok === null ? "free fall n/a" : r.freefall_ok ? "free fall OK" : "free fall OVER 6 ft"].join(", ");
+    oV.textContent = r.passes ? "PASSES the items entered" : "DOES NOT PASS";
+    oN.textContent = r.note;
+  }, _DF);
+  for (const x of [wk, dl, cp, af, dd, ff]) x.input.addEventListener("input", update);
+  rt.select.addEventListener("change", update);
+}
+RESCUE_RENDERERS["fall-arrest-anchorage"] = _v1150renderFallArrestAnchorage;

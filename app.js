@@ -772,7 +772,7 @@ const TOOL_MODULES = (() => {
     // spec-v614
     "sweep-width-correction",
     // spec-v779
-    "fall-arrest-clearance",
+    "fall-arrest-clearance", "fall-arrest-anchorage",
   ]);
   // spec-v248..v250 fire-sprinkler system-design trio: a new lazy Group F
   // cluster split off beside calc-fire.js exactly as calc-rescue.js was (the

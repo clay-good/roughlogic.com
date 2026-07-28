@@ -32996,3 +32996,52 @@ test("bounds: spec-v1149 computeExcavationProtectionTrigger pins the 4 ft and 5 
   assert.ok("error" in _v1149({ ...base, egress_points: 1.5 }));
   assert.ok("error" in _v1149({ ...base, depth_ft: Infinity }));
 });
+
+import { computeFallArrestAnchorage as _v1150 } from "../../calc-rescue.js";
+
+test("bounds: spec-v1150 computeFallArrestAnchorage pins per-employee scaling, the engineered alternative, the independent system limits, and error seams", () => {
+  const base = { workers_attached: 2, anchorage_capacity_lb: 5000, design_route: "prescriptive", design_load_lb: 0, arresting_force_lb: 1600, deceleration_distance_ft: 3.5, free_fall_ft: 6 };
+  const r = _v1150(base);
+  assert.ok(r.required_anchorage_lb === 10000 && !r.anchorage_ok && r.anchorage_shortfall_lb === 5000);
+  assert.ok(r.force_ok && r.decel_ok && r.freefall_ok && r.system_ok, "the system side is fine; the anchor is not");
+  assert.ok(!r.passes);
+  // PER EMPLOYEE ATTACHED: the requirement scales with the count, exactly.
+  for (const n of [1, 2, 3, 5]) {
+    const t = _v1150({ ...base, workers_attached: n });
+    assert.ok(t.required_anchorage_lb === 5000 * n);
+    assert.ok(t.anchorage_shortfall_lb === Math.max(0, 5000 * n - 5000));
+  }
+  // ENGINEERED ROUTE: twice the design load, independent of the worker count, and can be
+  // far below 5,000 lb - which is the whole point of the alternative.
+  const eng = _v1150({ ...base, workers_attached: 1, design_route: "engineered", design_load_lb: 1000, anchorage_capacity_lb: 2500 });
+  assert.ok(eng.engineered && eng.required_anchorage_lb === 2000 && eng.anchorage_ok);
+  assert.ok(Math.abs(eng.achieved_safety_factor - 2.5) < 1e-12 && eng.required_anchorage_lb < 5000);
+  for (const n of [1, 4]) {
+    assert.ok(_v1150({ ...base, workers_attached: n, design_route: "engineered", design_load_lb: 1000 }).required_anchorage_lb === 2000);
+  }
+  // The engineered route demands a design load rather than silently assuming one.
+  assert.ok("error" in _v1150({ ...base, design_route: "engineered", design_load_lb: 0 }));
+  // The safety-factor seam is exact.
+  assert.ok(_v1150({ ...base, design_route: "engineered", design_load_lb: 1000, anchorage_capacity_lb: 2000 }).anchorage_ok);
+  assert.ok(!_v1150({ ...base, design_route: "engineered", design_load_lb: 1000, anchorage_capacity_lb: 1999 }).anchorage_ok);
+  // SYSTEM LIMITS are independent of the anchorage and of each other; each is exact.
+  assert.ok(_v1150({ ...base, arresting_force_lb: 1800 }).force_ok && !_v1150({ ...base, arresting_force_lb: 1801 }).force_ok);
+  assert.ok(_v1150({ ...base, deceleration_distance_ft: 3.5 }).decel_ok && !_v1150({ ...base, deceleration_distance_ft: 3.6 }).decel_ok);
+  assert.ok(_v1150({ ...base, free_fall_ft: 6 }).freefall_ok && !_v1150({ ...base, free_fall_ft: 6.1 }).freefall_ok);
+  for (const k of ["arresting_force_lb", "deceleration_distance_ft", "free_fall_ft"]) {
+    const t = _v1150({ ...base, workers_attached: 1, [k]: k === "arresting_force_lb" ? 2000 : 99 });
+    assert.ok(!t.system_ok && !t.passes, k + " alone must fail the system");
+    assert.ok(t.anchorage_ok, "and it must not disturb the anchorage verdict");
+  }
+  // Omitted values yield null rather than a failure, and a bare anchorage check still works.
+  const bare = _v1150({ ...base, workers_attached: 1, arresting_force_lb: 0, deceleration_distance_ft: 0, free_fall_ft: 0 });
+  assert.ok(bare.force_ok === null && bare.decel_ok === null && bare.freefall_ok === null && bare.system_ok && bare.passes);
+  const noCap = _v1150({ ...base, anchorage_capacity_lb: 0 });
+  assert.ok(noCap.anchorage_ok === null && noCap.achieved_safety_factor === null && noCap.passes);
+  // Error seams.
+  assert.ok("error" in _v1150({ ...base, workers_attached: 0 }));
+  assert.ok("error" in _v1150({ ...base, workers_attached: 1.5 }));
+  assert.ok("error" in _v1150({ ...base, anchorage_capacity_lb: -1 }));
+  assert.ok("error" in _v1150({ ...base, arresting_force_lb: -1 }));
+  assert.ok("error" in _v1150({ ...base, free_fall_ft: Infinity }));
+});

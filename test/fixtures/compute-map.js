@@ -589,6 +589,7 @@ export const COMPUTE_MAP = {
   "sweat-rate-hydration": { module: "../../calc-rescue.js", fn: "computeSweatRateHydration" },
   "searcher-hours": { module: "../../calc-rescue.js", fn: "computeSearcherHours" },
   "fall-arrest-clearance": { module: "../../calc-rescue.js", fn: "computeFallArrestClearance" },
+  "fall-arrest-anchorage": { module: "../../calc-rescue.js", fn: "computeFallArrestAnchorage" },
   "sweep-width-correction": { module: "../../calc-rescue.js", fn: "computeSweepWidthCorrection" },
   "lab-dilution": { module: "../../calc-water.js", fn: "computeDilution" },
   "pump-eff-w2w": { module: "../../calc-water.js", fn: "computePumpEfficiency" },
