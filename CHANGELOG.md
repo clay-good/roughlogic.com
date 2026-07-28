@@ -4,6 +4,27 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): egc-parallel-raceways, the 250.122 paragraph the catalog skipped; 2026-07-27
+
+`egc-upsize-proportional` implements 250.122(B) and says so; `egc-sizing` does the table lookup;
+`parallel-conductor-derate` handles paralleled ampacity but no EGC. The string "250.122(F)" appeared
+nowhere. Adds one tile to `calc-electrical.js` (Group A). **No NEC table is duplicated** -- the Table
+250.122 lookup is delegated to the landed `computeEGCSize`, the same reuse pattern spec-v1020 used.
+
+The tile shows the wrong answer on purpose. The mistake is sizing the EGC from the divided per-raceway
+current, because that is how the ungrounded conductors work -- but a 400 A feeder in two raceways takes
+**two #3 copper EGCs, not the #6** that 200 A would give. The reason, in the note: a ground fault in one
+raceway returns through *that* raceway's EGC alone, so each must carry the full available fault current
+until the device opens. And it says when the mistake would not show -- at 60 A both methods give #10, so
+the tile reports `same_either_way` rather than letting anyone conclude the divided method is safe.
+
+Edition sensitivity is stated prominently: this is the 2023-and-earlier rule, and the **2026 NEC revises
+250.122(F)** so the EGC in each raceway need not exceed the largest ungrounded conductor there.
+
+Fuzzer pins cross-implementation agreement with the landed sizer across four rating/material pairs, that
+the per-raceway size is independent of raceway count while the count is not, and that an out-of-table
+rating errors rather than guessing. Catalog 1,494 -> 1,495. Spec: spec-v1111.
+
 ### feat(hvac): economic-insulation-thickness, and a calculus check turned into a regression test; 2026-07-27
 
 The catalog has three insulation-thickness tiles and none of them costs anything -- they solve to a surface

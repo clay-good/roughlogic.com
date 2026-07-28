@@ -15,7 +15,7 @@ const TOOL_MODULES = (() => {
   const map = {};
   const declare = (path, exportName, ids) => { for (const id of ids) map[id] = { path, exportName }; };
   declare("./calc-electrical.js", "ELECTRICAL_RENDERERS", [
-    "ohms-law", "wire-ampacity", "voltage-drop", "mwbc-voltage-drop", "conduit-fill", "box-fill",
+    "ohms-law", "wire-ampacity", "voltage-drop", "mwbc-voltage-drop", "egc-parallel-raceways", "conduit-fill", "box-fill",
     "awg-wire-geometry",
     "breaker-sizing", "motor-fla", "transformer-sizing", "three-phase",
     "copper-resistance", "egc-sizing",

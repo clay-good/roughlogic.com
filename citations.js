@@ -15288,6 +15288,18 @@ export const CITATIONS = {
       { name: "Flat surface", value: "plane-wall conduction; a pipe optimum runs thicker because curvature adds area per inch", source: "stated scope limit" },
     ],
   },
+  "egc-parallel-raceways": {
+    formula: "Each parallel raceway carries a full-size EGC sized from Table 250.122 to the WHOLE circuit's overcurrent device rating; total EGC runs = number of raceways. The EGC is not divided among the parallel sets.",
+    edition: "NEC 250.122(F), equipment grounding conductors for conductors in parallel, by section number - the 2023-and-earlier rule; no table is reproduced here because the sizing is delegated to this catalog's existing egc-sizing model.",
+    freeAccess: "The NEC is viewable free through the NFPA online access portal; 250.122 is in every adopted edition.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "The mistake this tile exists to catch: sizing the EGC from the divided per-raceway current instead of the whole circuit's overcurrent device. A 400 A feeder in two raceways takes two full-size EGCs sized to 400 A, not to 200 A - the ungrounded conductors divide the load, the EGC does not divide the fault. The reason is fault current: a ground fault in one raceway returns through THAT raceway's EGC alone, not through all of them sharing the job, so each must carry the full available fault current long enough for the device to open. WATCH THE EDITION: this is the 2023-and-earlier rule, and the 2026 NEC revises 250.122(F) so the EGC in each raceway need not be larger than the largest ungrounded conductor in that raceway - check which edition your jurisdiction has adopted. 250.122(B) proportional upsizing for voltage-drop-upsized conductors still applies (that is the egc-upsize-proportional tile), as does the 250.122(A) rule that an EGC never needs to exceed the circuit conductors. The NEC as adopted and the AHJ govern.",
+    assumptions: [
+      { name: "Full size per raceway", value: "each raceway's EGC is sized to the whole circuit's OCPD, not the divided current", source: "NEC 250.122(F)" },
+      { name: "Sizing delegated", value: "the Table 250.122 lookup comes from the landed egc-sizing model, not a duplicated table", source: "internal reuse" },
+      { name: "Edition sensitive", value: "the 2026 NEC revision caps the EGC at the largest ungrounded conductor in the raceway", source: "NEC 250.122(F), 2026 revision" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

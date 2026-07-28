@@ -91307,6 +91307,36 @@
       "kind": "question"
     },
     {
+      "term": "egc in parallel raceways",
+      "target": "egc-parallel-raceways",
+      "kind": "industry"
+    },
+    {
+      "term": "250.122 f",
+      "target": "egc-parallel-raceways",
+      "kind": "redirect"
+    },
+    {
+      "term": "ground wire size for parallel feeders",
+      "target": "egc-parallel-raceways",
+      "kind": "question"
+    },
+    {
+      "term": "does each conduit need a full size ground",
+      "target": "egc-parallel-raceways",
+      "kind": "question"
+    },
+    {
+      "term": "can i divide the ground between parallel runs",
+      "target": "egc-parallel-raceways",
+      "kind": "question"
+    },
+    {
+      "term": "paralleled feeder equipment ground",
+      "target": "egc-parallel-raceways",
+      "kind": "industry"
+    },
+    {
       "term": "panel zone high axial",
       "target": "steel-panel-zone-axial",
       "kind": "industry"

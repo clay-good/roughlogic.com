@@ -6246,3 +6246,65 @@ function _v1109renderMwbcVoltageDrop(inputRegion, outputRegion, citationEl) {
   update();
 }
 ELECTRICAL_RENDERERS["mwbc-voltage-drop"] = _v1109renderMwbcVoltageDrop;
+
+// --- spec-v1111 A: EGC for conductors in parallel raceways (NEC 250.122(F)) ---
+// egc-upsize-proportional implements 250.122(B); nothing implemented (F). The rule people get
+// wrong: with a feeder paralleled across several raceways, EACH raceway needs a FULL-SIZE EGC
+// sized to the whole circuit's OCPD - the EGC is NOT divided among the sets the way the ungrounded
+// conductors are. The table lookup is delegated to the landed computeEGCSize so no NEC table is
+// duplicated here; this tile adds the parallel rule and shows the wrong answer for contrast.
+// dims: in { ocpd_A: I, raceway_count: dimensionless, material: dimensionless } out: { egc_per_raceway_awg: dimensionless, total_egc_count: dimensionless }
+export function computeEgcParallelRaceways({ ocpd_A = 0, raceway_count = 2, material = "copper" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ocpd = Number(ocpd_A) || 0;
+  const n = Number(raceway_count) || 0;
+  if (!(ocpd > 0)) return { error: "Overcurrent device rating must be positive (A)." };
+  if (!(n >= 2) || !Number.isInteger(n)) return { error: "Raceway count must be a whole number of at least 2 (a single raceway is the ordinary 250.122 case - use egc-sizing)." };
+  if (material !== "copper" && material !== "aluminum") return { error: "Material must be copper or aluminum." };
+  const correct = computeEGCSize({ ocpd_A: ocpd, material });
+  if (correct.error) return { error: correct.error };
+  const divided_ocpd_A = ocpd / n;
+  const wrong = computeEGCSize({ ocpd_A: divided_ocpd_A, material });
+  const egc_per_raceway_awg = correct.egc_awg;
+  const undersized_awg = wrong.error ? null : wrong.egc_awg;
+  const same_either_way = undersized_awg === egc_per_raceway_awg;
+  const total_egc_count = n;
+  if (!egc_per_raceway_awg) return { error: "EGC size did not resolve for this overcurrent rating." };
+  return {
+    egc_per_raceway_awg, total_egc_count, divided_ocpd_A, undersized_awg, same_either_way, ocpd_A: ocpd,
+    note: "Each of the " + n + " raceways gets its OWN full-size EGC sized to the WHOLE circuit's " + ocpd + " A overcurrent device: " + n + " runs of " + egc_per_raceway_awg + " AWG " + material + ". The EGC is NOT divided among the parallel sets the way the ungrounded conductors are"
+      + (same_either_way ? " - though at this rating the table happens to give the same size either way, so the error would not show up here. " : ", and the common mistake is to size it from " + ocpd + "/" + n + " = " + divided_ocpd_A.toFixed(0) + " A, which would give " + undersized_awg + " AWG and be UNDERSIZED. ")
+      + "The reason is fault current: a ground fault in one raceway returns through THAT raceway's EGC, not through all of them sharing the job, so each one has to carry the full available fault current long enough for the device to open. NOTE THE EDITION: this is the 2023-and-earlier rule. The 2026 NEC revises 250.122(F) so the EGC in each raceway need not be larger than the largest ungrounded conductor in that raceway - check which edition your jurisdiction has adopted before applying either. If the ungrounded conductors were upsized for voltage drop, 250.122(B) requires the EGC be upsized proportionally too (that is the egc-upsize-proportional tile), and 250.122(A) still says the EGC never needs to exceed the circuit conductors. The NEC as adopted and the AHJ govern.",
+  };
+}
+export const egcParallelRacewaysExample = { inputs: { ocpd_A: 400, raceway_count: 2, material: "copper" } };
+
+function _v1111renderEgcParallelRaceways(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 250.122(F), equipment grounding conductors for conductors in parallel, by section number. Where circuit conductors are paralleled in separate raceways, a full-size EGC sized from Table 250.122 to the rating of the circuit's overcurrent device is required in EACH raceway - the EGC is not divided among the parallel sets. The table lookup is delegated to this catalog's existing egc-sizing model rather than duplicated. EDITION NOTE: this is the 2023-and-earlier rule; the 2026 NEC revises 250.122(F) so the EGC in each raceway need not exceed the largest ungrounded conductor in that raceway. 250.122(B) proportional upsizing and the 250.122(A) never-larger-than-the-circuit-conductors limit still apply. The NEC as adopted and the AHJ govern.";
+  const oc = makeNumber("Overcurrent device rating (A)", "egcp-oc", { step: "any", min: "0", value: "400" });
+  oc.input.value = "400";
+  const rc = makeNumber("Number of parallel raceways", "egcp-rc", { step: "1", min: "2", value: "2" });
+  rc.input.value = "2";
+  const mt = makeSelect("Conductor material", "egcp-mt", [
+    { value: "copper", label: "Copper" }, { value: "aluminum", label: "Aluminum" },
+  ]);
+  mt.select.value = "copper";
+  for (const f of [oc, rc, mt]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { oc.input.value = "400"; rc.input.value = "2"; mt.select.value = "copper"; update(); });
+  const oE = makeOutputLine(outputRegion, "EGC in EACH raceway", "egcp-out-e");
+  const oW = makeOutputLine(outputRegion, "The common mistake", "egcp-out-w");
+  const oN = makeOutputLine(outputRegion, "Note", "egcp-out-n");
+  const update = debounce(() => {
+    const r = computeEgcParallelRaceways({ ocpd_A: Number(oc.input.value), raceway_count: Number(rc.input.value), material: mt.select.value });
+    if (r.error) { oE.textContent = r.error; oW.textContent = "-"; oN.textContent = "-"; return; }
+    oE.textContent = r.total_egc_count + " runs of " + r.egc_per_raceway_awg + " AWG " + mt.select.value + " (one per raceway, sized to the full " + r.ocpd_A + " A)";
+    oW.textContent = r.same_either_way
+      ? "sizing from the divided " + fmt(r.divided_ocpd_A, 0) + " A gives the same size at this rating"
+      : "sizing from the divided " + fmt(r.divided_ocpd_A, 0) + " A would give " + r.undersized_awg + " AWG - UNDERSIZED";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [oc, rc]) f.input.addEventListener("input", update);
+  mt.select.addEventListener("change", update);
+  update();
+}
+ELECTRICAL_RENDERERS["egc-parallel-raceways"] = _v1111renderEgcParallelRaceways;

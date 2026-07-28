@@ -30859,3 +30859,40 @@ test("bounds: spec-v1110 computeEconomicInsulationThickness pins the closed-form
   assert.ok("error" in _v1110({ ...base, discount_rate: -0.01 }));
   assert.ok("error" in _v1110({ ...base, delta_t_f: Infinity }));
 });
+
+import { computeEgcParallelRaceways as _v1111 } from "../../calc-electrical.js";
+import { computeEGCSize as _v1111sib } from "../../calc-electrical.js";
+
+test("bounds: spec-v1111 computeEgcParallelRaceways pins the full-size-per-raceway rule, agreement with the landed sizer, independence from raceway count, the undersizing contrast, and error seams", () => {
+  const r = _v1111({ ocpd_A: 400, raceway_count: 2, material: "copper" });
+  assert.ok(r.egc_per_raceway_awg === "3" && r.total_egc_count === 2);
+  assert.ok(r.divided_ocpd_A === 200 && r.undersized_awg === "6" && r.same_either_way === false);
+  // CROSS-IMPLEMENTATION: the per-raceway size is exactly what the landed sizer gives for the FULL OCPD.
+  for (const [ocpd, mat] of [[400, "copper"], [200, "copper"], [600, "aluminum"], [100, "aluminum"]]) {
+    const t = _v1111({ ocpd_A: ocpd, raceway_count: 3, material: mat });
+    const direct = _v1111sib({ ocpd_A: ocpd, material: mat });
+    if (direct.error) { assert.ok("error" in t); continue; }
+    assert.ok(t.egc_per_raceway_awg === direct.egc_awg);
+  }
+  // THE RULE: the per-raceway EGC does NOT change with the number of raceways; only the count does.
+  const sizes = [2, 3, 4, 6].map((n) => _v1111({ ocpd_A: 400, raceway_count: n, material: "copper" }));
+  for (const t of sizes) assert.ok(t.egc_per_raceway_awg === "3");
+  assert.deepStrictEqual(sizes.map((t) => t.total_egc_count), [2, 3, 4, 6]);
+  // More raceways divides the (wrong) per-raceway current further, so the mistake gets worse.
+  assert.ok(sizes[0].divided_ocpd_A === 200 && sizes[3].divided_ocpd_A === 400 / 6);
+  // Aluminum is a larger conductor than copper at the same rating.
+  const cu = _v1111({ ocpd_A: 400, raceway_count: 2, material: "copper" });
+  const al = _v1111({ ocpd_A: 400, raceway_count: 2, material: "aluminum" });
+  assert.ok(cu.egc_per_raceway_awg !== al.egc_per_raceway_awg);
+  // At a low rating the table collapses and the tile SAYS the two methods agree rather than hiding it.
+  const low = _v1111({ ocpd_A: 60, raceway_count: 2, material: "copper" });
+  assert.ok(low.egc_per_raceway_awg === "10" && low.undersized_awg === "10" && low.same_either_way === true);
+  // Beyond the bundled table the tile errors rather than guessing.
+  assert.ok("error" in _v1111({ ocpd_A: 5000, raceway_count: 2, material: "copper" }));
+  // Error seams.
+  assert.ok("error" in _v1111({ ocpd_A: 0, raceway_count: 2, material: "copper" }));
+  assert.ok("error" in _v1111({ ocpd_A: 400, raceway_count: 1, material: "copper" }));
+  assert.ok("error" in _v1111({ ocpd_A: 400, raceway_count: 2.5, material: "copper" }));
+  assert.ok("error" in _v1111({ ocpd_A: 400, raceway_count: 2, material: "steel" }));
+  assert.ok("error" in _v1111({ ocpd_A: Infinity, raceway_count: 2, material: "copper" }));
+});

@@ -136,6 +136,7 @@ export const COMPUTE_MAP = {
   "freight-density": { module: "../../calc-trucking.js", fn: "computeFreightDensity" },
   "voltage-drop": { module: "../../calc-electrical.js", fn: "computeVoltageDrop" },
   "mwbc-voltage-drop": { module: "../../calc-electrical.js", fn: "computeMwbcVoltageDrop" },
+  "egc-parallel-raceways": { module: "../../calc-electrical.js", fn: "computeEgcParallelRaceways" },
   "footing-area": { module: "../../calc-construction.js", fn: "computeFootingArea" },
   "header-sizing": { module: "../../calc-construction.js", fn: "computeHeaderSizing" },
   "stud-notch-bore-limit": { module: "../../calc-construction.js", fn: "computeStudNotchBoreLimit" },

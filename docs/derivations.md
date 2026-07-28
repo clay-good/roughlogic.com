@@ -1972,6 +1972,7 @@ cross-check.
 | calc-electrical.js | `computeDeltaWyeLinePhase` | `{ configuration = "wye", line_voltage_v = 0, line_current_a = 0, power_factor...` | _ | _ | _ |
 | calc-electrical.js | `computeEGCSize` | `{ ocpd_A, material }` | _ | _ | _ |
 | calc-electrical.js | `computeEconomicConductorSizing` | `{ current_a = 0, r_small_ohm = 0, r_big_ohm = 0, hours = 0, rate_kwh = 0, ups...` | _ | _ | _ |
+| calc-electrical.js | `computeEgcParallelRaceways` | `{ ocpd_A = 0, raceway_count = 2, material = "copper" } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeEgcUpsizeProportional` | `{ base_egc_cmil = 0, base_phase_cmil = 0, installed_phase_cmil = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeGFCIReference` | `` | _ | _ | _ |
 | calc-electrical.js | `computeGeneratorFuelRuntime` | `{ tank_capacity_gal = 0, consumption_gph = 0, usable_pct = 90, target_runtime...` | _ | _ | _ |
@@ -3155,7 +3156,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1741.
+Row count: 1742.
 
 <!-- END function-corpus-v14 -->
 
@@ -3236,7 +3237,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (198 tiles)
+### Group A Electrical (199 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3291,6 +3292,7 @@ per spec-v14 §13.1 second paragraph.
 | `dp-level-hydrostatic` | Hydrostatic DP Level Transmitter (Head to Level) | Hydrostatic DP level transmitter (P =...; level = 4.33/(0.433*1.0) = 10 ft; span = 0.433*1.0*20 = 8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dryer-demand-220-54` | Household Clothes Dryer Demand Load (NEC 220.54) | NEC 2023 (NFPA 70); each at 5000 W floor; 4 x 5000 = 20000 W at 100% = 83.3 A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `economic-conductor-sizing` | Economic Conductor Sizing (I2R Payback) | economic conductor sizing (I2R); spec-v473 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `egc-parallel-raceways` | EGC for Parallel Raceways (NEC 250.122(F)) | NEC 250.122(F); 400 A OCPD, 2 raceways, copper -> #3 AWG in EACH raceway ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `egc-sizing` | Equipment Grounding Conductor Sizing | NFPA; Table 250.122 (60 A OCPD -> 10 AWG copper EGC) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `egc-upsize-proportional` | EGC Proportional Upsize for Increased Conductors (NEC 250.122(B)) | NFPA; spec-v127 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `egress-lighting-check` | Egress Lighting Illuminance Compliance Check (NFPA 101 / IBC) | NFPA 101 / IBC; spec-v367 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4835,6 +4837,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1494. Fixture-covered or reference-cadence: 1494 / 1494.
+Tile count: 1495. Fixture-covered or reference-cadence: 1495 / 1495.
 
 <!-- END tile-index-v14 -->
