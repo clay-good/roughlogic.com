@@ -1646,6 +1646,7 @@ export const COMPUTE_MAP = {
   "substantial-improvement-check": { module: "../../calc-construction.js", fn: "computeSubstantialImprovement" },
   "accessible-parking-geometry": { module: "../../calc-construction.js", fn: "computeAccessibleParkingGeometry" },
   "water-closet-location": { module: "../../calc-construction.js", fn: "computeWaterClosetLocation" },
+  "lavatory-tub-clearance": { module: "../../calc-construction.js", fn: "computeLavatoryTubClearance" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 

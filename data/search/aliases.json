@@ -2697,6 +2697,26 @@
       "kind": "redirect"
     },
     {
+      "term": "ada lavatory counter height 34",
+      "target": "lavatory-tub-clearance",
+      "kind": "industry"
+    },
+    {
+      "term": "does a vessel sink meet ada",
+      "target": "lavatory-tub-clearance",
+      "kind": "question"
+    },
+    {
+      "term": "clearance in front of an accessible tub",
+      "target": "lavatory-tub-clearance",
+      "kind": "industry"
+    },
+    {
+      "term": "how long does a metering faucet have to run",
+      "target": "lavatory-tub-clearance",
+      "kind": "question"
+    },
+    {
       "term": "ada toilet centerline from wall",
       "target": "water-closet-location",
       "kind": "industry"

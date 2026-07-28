@@ -35098,3 +35098,74 @@ test("bounds: spec-v1181 computeWaterClosetLocation pins both windows, the IPC c
   assert.ok("error" in _v1181({ ...base, clear_rear_in: -1 }));
   assert.ok("error" in _v1181({ ...base, centerline_in: Infinity }));
 });
+
+import { computeLavatoryTubClearance as _v1182 } from "../../calc-construction.js";
+
+test("bounds: spec-v1182 computeLavatoryTubClearance pins the higher-of rule, the metering minimum, the head-end 12 in, and error seams", () => {
+  const base = { rim_height_in: 33, counter_height_in: 36, metering_seconds: 6, tub_length_in: 60, permanent_seat: "yes", clear_width_in: 30, clear_length_in: 60 };
+  const r = _v1182(base);
+  assert.ok(r.governing_lav_height_in === 36 && r.counter_governs && !r.lav_ok && r.lav_excess_in === 2 && r.hidden_by_counter);
+  assert.ok(!r.metering_ok && r.metering_deficit_s === 4 && r.required_clear_length_in === 72 && r.clear_length_deficit_in === 12 && !r.passes);
+  assert.ok(r.clear_area_sf === 15);
+  // THE HIGHER OF THE TWO GOVERNS, at every combination.
+  for (const [rim, counter, gov] of [[33, 36, 36], [36, 33, 36], [34, 0, 34], [30, 30, 30], [34, 34, 34]]) {
+    const t = _v1182({ ...base, rim_height_in: rim, counter_height_in: counter });
+    assert.ok(t.governing_lav_height_in === gov, "governing height wrong at " + rim + "/" + counter);
+    assert.ok(t.counter_governs === (counter > rim));
+  }
+  // The 34 in limit is inclusive, and the hidden-by-counter flag fires only when the rim alone passes.
+  for (const [h, ok] of [[33.9, true], [34, true], [34.1, false], [38, false]]) {
+    assert.ok(_v1182({ ...base, rim_height_in: h, counter_height_in: 0 }).lav_ok === ok, "lavatory limit wrong at " + h);
+  }
+  assert.ok(_v1182({ ...base, rim_height_in: 33, counter_height_in: 36 }).hidden_by_counter);
+  assert.ok(!_v1182({ ...base, rim_height_in: 36, counter_height_in: 36 }).hidden_by_counter, "a tall rim is not hidden by the counter");
+  assert.ok(!_v1182({ ...base, rim_height_in: 33, counter_height_in: 33 }).hidden_by_counter, "nothing to hide when both pass");
+  for (const [rim, counter] of [[33, 36], [40, 0], [30, 42]]) {
+    const t = _v1182({ ...base, rim_height_in: rim, counter_height_in: counter });
+    assert.ok(Math.abs(t.lav_excess_in - Math.max(0, Math.max(rim, counter) - 34)) < 1e-9 && t.lav_excess_in >= 0);
+  }
+  // METERING FAUCETS: 10 s, inclusive, optional, and null when not entered.
+  for (const [s, ok] of [[9.9, false], [10, true], [15, true]]) {
+    assert.ok(_v1182({ ...base, metering_seconds: s }).metering_ok === ok, "metering wrong at " + s);
+  }
+  const noMeter = _v1182({ ...base, metering_seconds: 0 });
+  assert.ok(!noMeter.metering_entered && noMeter.metering_ok === null && noMeter.metering_deficit_s === null);
+  assert.ok(_v1182({ ...base, rim_height_in: 34, counter_height_in: 0, metering_seconds: 0, clear_length_in: 72 }).passes, "an absent metering faucet is not a failure");
+  // THE HEAD-END 12 IN is the only thing the seat changes.
+  for (const tub of [48, 60, 66, 72]) {
+    const withSeat = _v1182({ ...base, tub_length_in: tub, permanent_seat: "yes" });
+    const without = _v1182({ ...base, tub_length_in: tub, permanent_seat: "no" });
+    assert.ok(withSeat.required_clear_length_in === tub + 12, "seat length wrong at " + tub);
+    assert.ok(without.required_clear_length_in === tub, "no-seat length wrong at " + tub);
+    assert.ok(withSeat.required_clear_length_in - without.required_clear_length_in === 12);
+    assert.ok(withSeat.seat_extra_in === 12 && without.seat_extra_in === 0);
+  }
+  // Tub clearance: length and width fail independently with exact deficits.
+  for (const [cl, cw] of [[72, 30], [60, 30], [72, 24], [40, 20]]) {
+    const t = _v1182({ ...base, clear_length_in: cl, clear_width_in: cw });
+    assert.ok(Math.abs(t.clear_length_deficit_in - Math.max(0, 72 - cl)) < 1e-9 && t.clear_length_deficit_in >= 0);
+    assert.ok(Math.abs(t.clear_width_deficit_in - Math.max(0, 30 - cw)) < 1e-9 && t.clear_width_deficit_in >= 0);
+    assert.ok(t.tub_ok === (cl >= 72 && cw >= 30));
+  }
+  // The required clearance area follows the required length at the fixed 30 in width.
+  for (const tub of [48, 60, 72]) {
+    const t = _v1182({ ...base, tub_length_in: tub });
+    assert.ok(Math.abs(t.clear_area_sf - ((tub + 12) * 30) / 144) < 1e-9);
+  }
+  // Every check fails independently.
+  const good = { ...base, rim_height_in: 34, counter_height_in: 0, metering_seconds: 10, clear_length_in: 72, clear_width_in: 30 };
+  assert.ok(_v1182(good).passes);
+  assert.ok(!_v1182({ ...good, counter_height_in: 36 }).passes);
+  assert.ok(!_v1182({ ...good, metering_seconds: 5 }).passes);
+  assert.ok(!_v1182({ ...good, clear_length_in: 71 }).passes);
+  assert.ok(!_v1182({ ...good, clear_width_in: 29 }).passes);
+  // Error seams.
+  assert.ok("error" in _v1182({ ...base, permanent_seat: "sometimes" }));
+  assert.ok("error" in _v1182({ ...base, rim_height_in: 0 }));
+  assert.ok("error" in _v1182({ ...base, counter_height_in: -1 }));
+  assert.ok("error" in _v1182({ ...base, metering_seconds: -1 }));
+  assert.ok("error" in _v1182({ ...base, tub_length_in: 0 }));
+  assert.ok("error" in _v1182({ ...base, clear_width_in: -1 }));
+  assert.ok("error" in _v1182({ ...base, clear_length_in: -1 }));
+  assert.ok("error" in _v1182({ ...base, rim_height_in: Infinity }));
+});

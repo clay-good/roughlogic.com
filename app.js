@@ -542,6 +542,7 @@ const TOOL_MODULES = (() => {
     "substantial-improvement-check",
     "accessible-parking-geometry",
     "water-closet-location",
+    "lavatory-tub-clearance",
     // spec-v332..v334 wood-fastener withdrawal batch.
     "wood-nail-withdrawal", "wood-lag-withdrawal", "wood-screw-withdrawal",
     "cantilever-beam", "section-properties", "combined-stress-axial-bending",

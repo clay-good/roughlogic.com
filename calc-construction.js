@@ -13803,3 +13803,96 @@ CONSTRUCTION_RENDERERS["water-closet-location"] = _simpleRenderer({
   ],
   compute: computeWaterClosetLocation,
 });
+
+// ===================== spec-v1182: lavatory and bathtub clearances (2010 ADA Standards 606, 607) =====================
+
+// Two fixtures whose rules are short enough to be skipped and specific enough to fail a
+// remodel that measured fine everywhere else.
+// LAVATORY (606.3): the front of the HIGHER of the rim or the counter surface is 34 in MAXIMUM.
+// Not the bowl, not the faucet - the higher of the two, so a vessel sink on a 34 in counter is
+// out by the height of the vessel, and a thick stone top on a standard-height cabinet can be out
+// by an inch before anything is set on it.
+// Metering faucets must stay open 10 SECONDS minimum, which is longer than most are shipped set.
+// BATHTUB (607.2): the clearance in front runs THE LENGTH OF THE TUB and is 30 in wide minimum -
+// and where there is a permanent seat at the head end it extends 12 in BEYOND the wall at that
+// end, so the fixture is 60 in and the clearance is 72.
+// dims: in { rim_height_in: L, counter_height_in: L, metering_seconds: T, tub_length_in: L, clear_width_in: L, clear_length_in: L } out: { governing_lav_height_in: L, lav_excess_in: L, required_clear_length_in: L, clear_length_deficit_in: L }
+export function computeLavatoryTubClearance({ rim_height_in = 0, counter_height_in = 0, metering_seconds = 0, tub_length_in = 0, permanent_seat = "no", clear_width_in = 0, clear_length_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const rim = Number(rim_height_in) || 0;
+  const counter = Number(counter_height_in) || 0;
+  const meter = Number(metering_seconds) || 0;
+  const tub = Number(tub_length_in) || 0;
+  const cw = Number(clear_width_in) || 0;
+  const cl = Number(clear_length_in) || 0;
+  const seat = permanent_seat === "yes";
+  if (permanent_seat !== "yes" && permanent_seat !== "no") return { error: "State whether there is a permanent seat at the head end (yes or no)." };
+  if (!(rim > 0)) return { error: "Lavatory rim height must be positive (in)." };
+  if (counter < 0) return { error: "Counter height cannot be negative (in) - enter 0 where there is no surrounding counter." };
+  if (meter < 0) return { error: "Metering faucet open time cannot be negative (seconds)." };
+  if (!(tub > 0)) return { error: "Bathtub length must be positive (in)." };
+  if (cw < 0 || cl < 0) return { error: "Clearances cannot be negative (in)." };
+
+  const LAV_MAX = 34, METER_MIN = 10, TUB_CLEAR_W = 30, SEAT_EXTRA = 12;
+
+  const governing_lav_height_in = Math.max(rim, counter);
+  const counter_governs = counter > rim;
+  const lav_ok = governing_lav_height_in <= LAV_MAX;
+  const lav_excess_in = Math.max(0, governing_lav_height_in - LAV_MAX);
+  const rim_alone_ok = rim <= LAV_MAX;
+  const hidden_by_counter = rim_alone_ok && !lav_ok;
+
+  const metering_entered = meter > 0;
+  const metering_ok = metering_entered ? meter >= METER_MIN : null;
+  const metering_deficit_s = metering_entered ? Math.max(0, METER_MIN - meter) : null;
+
+  const required_clear_length_in = tub + (seat ? SEAT_EXTRA : 0);
+  const clear_length_ok = cl >= required_clear_length_in;
+  const clear_length_deficit_in = Math.max(0, required_clear_length_in - cl);
+  const clear_width_ok = cw >= TUB_CLEAR_W;
+  const clear_width_deficit_in = Math.max(0, TUB_CLEAR_W - cw);
+  const tub_ok = clear_length_ok && clear_width_ok;
+  const seat_extra_in = seat ? SEAT_EXTRA : 0;
+  const clear_area_sf = (required_clear_length_in * TUB_CLEAR_W) / 144;
+
+  const passes = lav_ok && tub_ok && (metering_ok !== false);
+
+  const note = "TWO FIXTURES WHOSE RULES ARE SHORT ENOUGH TO SKIP AND SPECIFIC ENOUGH TO FAIL A REMODEL THAT MEASURED FINE EVERYWHERE ELSE. "
+    + "LAVATORY (606.3): the front of the HIGHER of the rim or the counter surface is 34 in MAXIMUM. Not the bowl, not the faucet - the higher of the two. Rim " + rim + " in, counter " + counter + " in, so " + governing_lav_height_in + " in governs" + (counter_governs ? " and it is the COUNTER, not the fixture. " : ". ")
+    + (lav_ok ? "Within the 34 in maximum. " : "OVER by " + lav_excess_in.toFixed(2) + " in. ")
+    + (hidden_by_counter ? "NOTE WHAT HAPPENED: the rim alone would have passed and the counter around it does not, which is exactly how a vessel sink or a thick stone top fails a lavatory that was specified correctly. The fixture was never the problem. " : "")
+    + (metering_entered ? "METERING FAUCETS (606.4) must remain open 10 SECONDS MINIMUM, which is longer than most are shipped set and is adjusted at the cartridge rather than specified at purchase. Entered " + meter + " s: " + (metering_ok ? "OK. " : "SHORT by " + metering_deficit_s.toFixed(1) + " s. ") : "No metering faucet entered; note that a hand-operated metering faucet must stay open 10 seconds minimum. ")
+    + "BATHTUB (607.2): the clearance in front runs THE LENGTH OF THE TUB and is 30 in wide minimum. " + (seat ? "With a permanent seat at the head end it extends 12 in BEYOND the wall at that end, so a " + tub + " in tub needs " + required_clear_length_in + " in of clearance - the fixture is one length and the floor it needs is another, which is the part that gets drawn short. " : "With no permanent seat the clearance is the tub length, " + required_clear_length_in + " in; adding a permanent seat at the head end would push it to " + (tub + SEAT_EXTRA) + " in. ")
+    + "Entered " + cl + " in long x " + cw + " in wide: " + (tub_ok ? "OK. " : (clear_length_ok ? "" : "LENGTH short by " + clear_length_deficit_in.toFixed(1) + " in. ") + (clear_width_ok ? "" : "WIDTH short by " + clear_width_deficit_in.toFixed(1) + " in. "))
+    + "That clearance is " + clear_area_sf.toFixed(2) + " sq ft of floor that has to stay empty in front of the tub. "
+    + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
+    + "Not checked: the clear floor space at the lavatory and the knee and toe clearance under it, which are separate tiles and which a cabinet defeats before the height does; whether the lavatory faucet controls meet the operable-parts requirements for force and one-hand operation; the requirement that water supply and drain pipes under a lavatory be insulated or otherwise configured to protect against contact, and that there be no sharp or abrasive surfaces beneath; grab bars at the tub, which have their own geometry and are a separate tile; the tub seat itself, whether permanent at the head end or removable in-tub, and its own dimensions; controls, faucets, and the hand shower at the tub; enclosures, which may not obstruct transfer; and state and local accessibility law and the plumbing code. A clearance screen, not a bathroom design; the 2010 ADA Standards and the authority having jurisdiction govern.";
+
+  return { governing_lav_height_in, counter_governs, lav_ok, lav_excess_in, rim_alone_ok, hidden_by_counter, metering_entered, metering_ok, metering_deficit_s, required_clear_length_in, seat_extra_in, clear_length_ok, clear_length_deficit_in, clear_width_ok, clear_width_deficit_in, tub_ok, clear_area_sf, passes, note };
+}
+
+export const lavatoryTubClearanceExample = { inputs: { rim_height_in: 33, counter_height_in: 36, metering_seconds: 6, tub_length_in: 60, permanent_seat: "yes", clear_width_in: 30, clear_length_in: 60 } };
+
+CONSTRUCTION_RENDERERS["lavatory-tub-clearance"] = _simpleRenderer({
+  citation: "Citation: 2010 ADA Standards for Accessible Design, 606.3, 606.4, 606.5, 607.2, and 607.3. A US federal standard in the public domain. 606.3: lavatories and sinks shall be installed with the front of the higher of the rim or counter surface 34 in maximum above the finish floor or ground. 606.4: controls for faucets shall comply with 309, and hand-operated metering faucets shall remain open for 10 seconds minimum. 606.5: water supply and drain pipes under lavatories and sinks shall be insulated or otherwise configured to protect against contact, and there shall be no sharp or abrasive surfaces under lavatories and sinks. 607.2: clearance in front of bathtubs shall extend the length of the bathtub and shall be 30 in wide minimum, and where a permanent seat is provided at the head end of the bathtub, the clearance shall extend 12 in minimum beyond the wall at the head end of the bathtub. 607.3: a permanent seat at the head end of the bathtub or a removable in-tub seat shall be provided. Not checked: clear floor space and knee and toe clearance at the lavatory, which are separate tiles; whether faucet controls meet the operable-parts requirements; the pipe-protection requirement, which is stated but not measured here; grab bars at the tub; the tub seat's own dimensions; controls and the hand shower; enclosures; or state and local law and the plumbing code. A clearance screen, not a bathroom design.",
+  example: lavatoryTubClearanceExample.inputs,
+  fields: [
+    { key: "rim_height_in", label: "Lavatory rim height (in)", kind: "number", default: 33 },
+    { key: "counter_height_in", label: "Surrounding counter height (in; 0 = none)", kind: "number", default: 36 },
+    { key: "metering_seconds", label: "Metering faucet open time (s; 0 = not a metering faucet)", kind: "number", default: 6 },
+    { key: "tub_length_in", label: "Bathtub length (in)", kind: "number", default: 60 },
+    { key: "permanent_seat", label: "Permanent seat at the head end?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
+    { key: "clear_length_in", label: "Clearance in front of the tub, length (in)", kind: "number", default: 60 },
+    { key: "clear_width_in", label: "Clearance in front of the tub, width (in)", kind: "number", default: 30 },
+  ],
+  outputs: [
+    { key: "l", id: "ltc-out-l", label: "Lavatory height (34 in max)", value: (r) => (r.counter_governs ? "the COUNTER governs at " : "the rim governs at ") + r.governing_lav_height_in + " in - " + (r.lav_ok ? "OK" : "over by " + fmt(r.lav_excess_in, 2) + " in") },
+    { key: "h", id: "ltc-out-h", label: "What the counter did", value: (r) => r.hidden_by_counter ? "the rim alone would have passed - the counter around it is what fails" : "the counter is not what decides this one" },
+    { key: "m", id: "ltc-out-m", label: "Metering faucet (10 s min)", value: (r) => r.metering_ok === null ? "not entered" : r.metering_ok ? "OK" : "short by " + fmt(r.metering_deficit_s, 1) + " s" },
+    { key: "t", id: "ltc-out-t", label: "Tub clearance required", value: (r) => r.required_clear_length_in + " in long x 30 in wide" + (r.seat_extra_in > 0 ? " (tub length plus 12 in past the head-end wall)" : " (the tub length)") + " = " + fmt(r.clear_area_sf, 2) + " sq ft" },
+    { key: "p", id: "ltc-out-p", label: "Tub clearance provided", value: (r) => r.tub_ok ? "meets both" : [r.clear_length_ok ? null : "length short " + fmt(r.clear_length_deficit_in, 1), r.clear_width_ok ? null : "width short " + fmt(r.clear_width_deficit_in, 1)].filter(Boolean).join(", ") + " in" },
+    { key: "v", id: "ltc-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
+    { key: "n", id: "ltc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLavatoryTubClearance,
+});
