@@ -40,6 +40,27 @@ const TOOLS = [
         limit: { type: "number", description: "Max results (default 30)." },
       },
     },
+    outputSchema: {
+      type: "object",
+      properties: {
+        total: { type: "number" },
+        returned: { type: "number" },
+        results: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              id: { type: "string" }, name: { type: "string" }, group: { type: "string" },
+              trades: { type: "array", items: { type: "string" } }, desc: { type: "string" },
+            },
+          },
+        },
+        trades: {
+          type: "array",
+          items: { type: "object", properties: { trade: { type: "string" }, count: { type: "number" } } },
+        },
+      },
+    },
   },
   {
     name: "describe_calculator",
@@ -49,6 +70,21 @@ const TOOLS = [
       type: "object",
       properties: { id: { type: "string", description: "Calculator id, e.g. 'voltage-drop'." } },
       required: ["id"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "string" }, name: { type: "string" }, group: { type: "string" },
+        trades: { type: "array", items: { type: "string" } }, desc: { type: "string" },
+        runnable: { type: "boolean" },
+        inputs_source: { type: "string", enum: ["renderer", "compute"] },
+        inputs: { type: "array", description: "Field descriptors (key, label, kind, options, default, attrs) or compute params." },
+        outputs: { type: "array", items: { type: "object", properties: { key: { type: "string" }, label: { type: "string" }, unit: { type: ["string", "null"] } } } },
+        example: { type: "object" },
+        source: { type: "string" },
+        limitation: { type: ["object", "null"] },
+      },
+      required: ["id", "name", "runnable"],
     },
   },
   {
@@ -62,6 +98,19 @@ const TOOLS = [
         inputs: { type: "object", description: "Named input values for the calculator." },
       },
       required: ["id"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "string" },
+        inputs: { type: "object" },
+        usedExample: { type: "boolean" },
+        result: { type: "object", description: "The raw compute result object." },
+        outputs: { type: "array", items: { type: "object", properties: { key: { type: "string" }, label: { type: "string" }, unit: { type: ["string", "null"] }, display: { type: ["string", "null"] } } } },
+        warnings: { type: "array", items: { type: "object", properties: { key: { type: "string" }, rule: { type: "string" }, limit: { type: "number" }, message: { type: "string" } } } },
+        limitation: { type: ["object", "null"] },
+      },
+      required: ["id", "result"],
     },
   },
   {
@@ -85,6 +134,14 @@ const TOOLS = [
         },
       },
       required: ["calls"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        count: { type: "number" },
+        results: { type: "array", description: "One entry per call: a run_calculator result, or { id, error }." },
+      },
+      required: ["count", "results"],
     },
   },
 ];
@@ -137,7 +194,12 @@ async function handle(msg) {
       case "tools/call": {
         const toolName = params && params.name;
         const data = await dispatchTool(toolName, params && params.arguments);
-        reply(id, { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] });
+        // spec-v1192: return the typed object in the structured channel and keep
+        // the JSON text as a fallback for clients that predate structured output.
+        reply(id, {
+          content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
+          structuredContent: data,
+        });
         return;
       }
       default:
