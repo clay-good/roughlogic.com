@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
   "total_tiles": 1567,
-  "covered_count": 546,
+  "covered_count": 548,
   "covered": [
     "abv-from-gravity",
     "abyc-dc-wire",
@@ -310,6 +310,7 @@
     "neutral-imbalance",
     "niosh-lifting",
     "nitrogen-pressure-test",
+    "ohms-law",
     "oil-burner-firing-rate",
     "outside-air-percent-temps",
     "overrun-percent",
@@ -523,6 +524,7 @@
     "valve-flow-coefficient",
     "vapor-barrier-rolls",
     "vehicle-load",
+    "voltage-drop",
     "wall-bracing-length",
     "wall-condensation-gradient",
     "wallpaper-rolls",

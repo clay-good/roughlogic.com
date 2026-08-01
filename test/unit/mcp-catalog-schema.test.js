@@ -52,7 +52,7 @@ test("describe outputs carry label + unit but never leak the format closure", as
 });
 
 test("a bespoke-renderer tile has no rendered outputs and does not crash", async () => {
-  const r = await run({ id: "voltage-drop" });
+  const r = await run({ id: "conduit-fill" }); // still bespoke (no retained schema)
   assert.ok(!("outputs" in r));
   assert.ok(r.result && typeof r.result === "object");
 });
@@ -130,8 +130,22 @@ test("related drops a dangling id that points at a never-landed tile (spec-v1185
   assert.ok(!d.related.some((r) => r.id === "rc-beam-doubly-reinforced"), "the dangling id is dropped");
 });
 
+test("flagship electrical tiles expose hand-authored schemas (spec-v1184 coverage growth)", async () => {
+  const vd = await describe({ id: "voltage-drop" });
+  assert.equal(vd.inputs_source, "renderer");
+  assert.deepEqual(vd.inputs.find((i) => i.key === "phase").options.map((o) => o.value), ["single", "three"]);
+  await assert.rejects(
+    () => run({ id: "voltage-drop", inputs: { phase: "dual", material: "copper", awg: "12", length_ft: 100, current_A: 20, source_voltage_V: 120 } }),
+    /Allowed: "single", "three"/,
+  );
+  const r = await run({ id: "voltage-drop", inputs: { phase: "single", material: "copper", awg: "12", length_ft: 100, current_A: 20, source_voltage_V: 120 } });
+  assert.match(r.outputs.find((o) => o.key === "drop_V").display, /V$/);
+  const ol = await describe({ id: "ohms-law" });
+  assert.equal(ol.inputs_source, "renderer");
+});
+
 test("a bespoke-renderer tile degrades to compute introspection, no crash", async () => {
-  const d = await describe({ id: "voltage-drop" });
+  const d = await describe({ id: "conduit-fill" }); // still bespoke (no retained schema)
   assert.equal(d.inputs_source, "compute");
   assert.ok(Array.isArray(d.inputs) && d.inputs.length > 0);
   assert.ok(d.inputs.every((i) => typeof i.name === "string"));

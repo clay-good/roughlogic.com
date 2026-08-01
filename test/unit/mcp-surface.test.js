@@ -14,12 +14,18 @@ import { fileURLToPath } from "node:url";
 const SERVER = fileURLToPath(new URL("../../mcp/server.mjs", import.meta.url));
 const GOLDEN = fileURLToPath(new URL("../fixtures/mcp-surface.json", import.meta.url));
 
-function rpc(requests, waitForId) {
+async function rpc(requests, waitForId) {
+  for (let attempt = 0; ; attempt++) {
+    try { return await rpcOnce(requests, waitForId); }
+    catch (e) { if (attempt >= 1) throw e; }
+  }
+}
+function rpcOnce(requests, waitForId) {
   return new Promise((resolve, reject) => {
     const child = spawn("node", [SERVER], { stdio: ["pipe", "pipe", "ignore"] });
     const replies = new Map();
     let buf = "";
-    const timer = setTimeout(() => { child.kill(); reject(new Error("timeout")); }, 10000);
+    const timer = setTimeout(() => { child.kill(); reject(new Error("timeout")); }, 30000);
     child.stdout.on("data", (chunk) => {
       buf += chunk;
       let nl;

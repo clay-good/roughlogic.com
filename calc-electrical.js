@@ -6308,3 +6308,45 @@ function _v1111renderEgcParallelRaceways(inputRegion, outputRegion, citationEl) 
   update();
 }
 ELECTRICAL_RENDERERS["egc-parallel-raceways"] = _v1111renderEgcParallelRaceways;
+
+// spec-v1184: hand-authored field schemas for flagship bespoke renderers, so an
+// agent learns their select options and units the way the factory tiles expose
+// theirs. Input keys match each compute function's parameters exactly (the
+// check-renderer-schema gate enforces this); output formatters are pure. The
+// property is attached to the module-scope render functions; the browser
+// ignores it.
+renderVoltageDrop.schema = {
+  inputs: [
+    { key: "phase", label: "Phase", kind: "select", options: [{ value: "single", label: "Single" }, { value: "three", label: "Three" }], default: null, attrs: null },
+    { key: "material", label: "Material", kind: "select", options: [{ value: "copper", label: "Copper" }, { value: "aluminum", label: "Aluminum" }], default: null, attrs: null },
+    { key: "awg", label: "AWG", kind: "select", options: awgOptions(), default: null, attrs: null },
+    { key: "length_ft", label: "Length one-way (ft)", kind: "number", options: null, default: null, attrs: { step: "any", min: "0" } },
+    { key: "current_A", label: "Current (A)", kind: "number", options: null, default: null, attrs: { step: "any", min: "0" } },
+    { key: "source_voltage_V", label: "Source voltage (V)", kind: "number", options: null, default: null, attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "drop_V", label: "Voltage drop", unit: "V", format: (r) => (r.drop_V == null ? "-" : fmt(r.drop_V, 2) + " V") },
+    { key: "percent", label: "Percent drop", unit: "%", format: (r) => (r.percent == null ? "-" : fmt(r.percent, 2) + " %") },
+    { key: "voltage_at_load_V", label: "Voltage at load", unit: "V", format: (r) => (r.voltage_at_load_V == null ? "-" : fmt(r.voltage_at_load_V, 2) + " V") },
+    { key: "flag", label: "Status", unit: null, format: (r) => (r.flag == null ? "-" : String(r.flag)) },
+  ],
+  citation: "Citation: V_drop = 2*K*I*D / cmils (single phase); sqrt(3) replaces 2 for three phase. K is the conductor resistivity in ohm*cmil/ft.",
+  scope: null,
+};
+
+renderOhmsLaw.schema = {
+  inputs: [
+    { key: "V", label: "Voltage (V)", kind: "number", options: null, default: null, attrs: { step: "any" } },
+    { key: "I", label: "Current (A)", kind: "number", options: null, default: null, attrs: { step: "any" } },
+    { key: "R", label: "Resistance (ohm)", kind: "number", options: null, default: null, attrs: { step: "any" } },
+    { key: "P", label: "Power (W)", kind: "number", options: null, default: null, attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "V", label: "Voltage", unit: "V", format: (r) => (r.V == null ? "-" : fmt(r.V, 2) + " V") },
+    { key: "I", label: "Current", unit: "A", format: (r) => (r.I == null ? "-" : fmt(r.I, 2) + " A") },
+    { key: "R", label: "Resistance", unit: "ohm", format: (r) => (r.R == null ? "-" : fmt(r.R, 2) + " ohm") },
+    { key: "P", label: "Power", unit: "W", format: (r) => (r.P == null ? "-" : fmt(r.P, 2) + " W") },
+  ],
+  citation: "Citation: Ohm's Law (V = I*R) and power equations (P = V*I).",
+  scope: null,
+};

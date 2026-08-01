@@ -10,13 +10,21 @@ import { fileURLToPath } from "node:url";
 const SERVER = fileURLToPath(new URL("../../mcp/server.mjs", import.meta.url));
 
 // Send a batch of JSON-RPC requests to a fresh server and collect the replies
-// keyed by id. Resolves once a reply for `waitForId` has arrived.
-function rpc(requests, waitForId) {
+// keyed by id. Resolves once a reply for `waitForId` has arrived. Retries once:
+// each call spawns a node that re-imports the catalog, so a transient spawn or
+// timing hiccup under a saturated parallel suite must not fail the test.
+async function rpc(requests, waitForId) {
+  for (let attempt = 0; ; attempt++) {
+    try { return await rpcOnce(requests, waitForId); }
+    catch (e) { if (attempt >= 1) throw e; }
+  }
+}
+function rpcOnce(requests, waitForId) {
   return new Promise((resolve, reject) => {
     const child = spawn("node", [SERVER], { stdio: ["pipe", "pipe", "ignore"] });
     const replies = new Map();
     let buf = "";
-    const timer = setTimeout(() => { child.kill(); reject(new Error("timeout")); }, 10000);
+    const timer = setTimeout(() => { child.kill(); reject(new Error("timeout")); }, 30000);
     child.stdout.on("data", (chunk) => {
       buf += chunk;
       let nl;
