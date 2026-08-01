@@ -25,6 +25,10 @@ try { ({ RELATED } = await import("../scripts/related-tiles.mjs")); } catch { RE
 // fallback; schemaIfConsistent still degrades any entry whose keys diverge.
 let BESPOKE_SCHEMAS = {};
 try { ({ BESPOKE_SCHEMAS } = await import("../test/fixtures/bespoke-schemas.js")); } catch { BESPOKE_SCHEMAS = {}; }
+// spec-v1185: literal citation strings extracted from bespoke renderers, so
+// describe can attribute a result even when the tile carries no schema citation.
+let RENDERER_CITATIONS = {};
+try { ({ RENDERER_CITATIONS } = await import("../test/fixtures/renderer-citations.js")); } catch { RENDERER_CITATIONS = {}; }
 
 const COMPUTE_MAP_URL = new URL("../test/fixtures/compute-map.js", import.meta.url);
 const RENDERER_MAP_URL = new URL("../test/fixtures/renderer-map.js", import.meta.url);
@@ -330,7 +334,7 @@ export async function describe({ id } = {}) {
     }
     // spec-v1185: the cited section + formula shown in the browser, retained on
     // the schema even for the unit-wrapper tiles whose inputs degrade.
-    out._citationText = rawSchema && rawSchema.citation ? rawSchema.citation : null;
+    out._citationText = (rawSchema && rawSchema.citation) || RENDERER_CITATIONS[id] || null;
     out._scope = rawSchema && rawSchema.scope ? rawSchema.scope : null;
   }
   const exView = (row) => ({

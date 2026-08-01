@@ -159,6 +159,8 @@ test("a bespoke-renderer tile degrades to compute introspection, no crash", asyn
   assert.equal(d.inputs_source, "compute");
   assert.ok(Array.isArray(d.inputs) && d.inputs.length > 0);
   assert.ok(d.inputs.every((i) => typeof i.name === "string"));
+  // ...but its citation is still exposed via the extracted renderer citations.
+  assert.match(d.citation.text, /Citation:/);
 });
 
 test("a tile whose renderer wraps compute with unit conversion degrades to the runnable params", async () => {
