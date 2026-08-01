@@ -16,6 +16,10 @@
 import { readFile } from "node:fs/promises";
 import { normalizeQuery, rankTools } from "../search-discovery.js";
 import { getLimitationCopy } from "../limitation-banner.js";
+// spec-v1185: the curated per-tile cross-links the browser shows as "related
+// tiles". Build-time data; a missing/unreadable module degrades to no related.
+let RELATED = {};
+try { ({ RELATED } = await import("../scripts/related-tiles.mjs")); } catch { RELATED = {}; }
 
 const COMPUTE_MAP_URL = new URL("../test/fixtures/compute-map.js", import.meta.url);
 const RENDERER_MAP_URL = new URL("../test/fixtures/renderer-map.js", import.meta.url);
@@ -309,7 +313,8 @@ export async function describe({ id } = {}) {
     // Prefer the renderer's field descriptor (labels, select options, units in
     // the label, min/max in attrs); fall back to compute-param introspection
     // (names + defaults only) for tiles whose renderer is still bespoke.
-    const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
+    const rawSchema = await readSchema(id, RENDERER_MAP, modCache);
+    const schema = schemaIfConsistent(rawSchema, fn);
     if (schema) {
       out.inputs = schema.inputs;
       out.outputs = describeOutputs(schema);
@@ -318,6 +323,10 @@ export async function describe({ id } = {}) {
       out.inputs = introspectInputs(fn);
       out.inputs_source = "compute";
     }
+    // spec-v1185: the cited section + formula shown in the browser, retained on
+    // the schema even for the unit-wrapper tiles whose inputs degrade.
+    out._citationText = rawSchema && rawSchema.citation ? rawSchema.citation : null;
+    out._scope = rawSchema && rawSchema.scope ? rawSchema.scope : null;
   }
   const exView = (row) => ({
     inputs: row.inputs,
@@ -331,6 +340,22 @@ export async function describe({ id } = {}) {
     out.example = { inputs: ex.inputs, outputs: exView(ex).outputs };
     out.source = exView(ex).source;
   }
+  // spec-v1185: structured attribution and navigation. The citation names the
+  // source and locator the site already shows (never the copyrighted table
+  // contents); related resolves the curated cross-links to names, dropping any
+  // dangling id (a spec's related list can point at a never-landed tile).
+  out.citation = {
+    text: out._citationText || null,
+    publisher: ex ? ex.source_publisher : null,
+    title: ex ? ex.source_title : null,
+    locator: ex ? ex.source_section_or_page : null,
+  };
+  out.scope_note = out._scope || null;
+  out.related = (RELATED[id] || [])
+    .map((rid) => (byId.get(rid) ? { id: rid, name: byId.get(rid).name } : null))
+    .filter(Boolean);
+  delete out._citationText;
+  delete out._scope;
   // spec-v1190: the simplified-screening banner a person sees above the inputs
   // ("Not a Manual J load calculation"), when this tile has one.
   out.limitation = getLimitationCopy(id) || null;

@@ -112,6 +112,24 @@ test("describe returns the full example gallery with an example alias (spec-v119
   assert.equal(d.source, d.examples[0].source);
 });
 
+test("describe returns a structured citation and resolved related tiles (spec-v1185)", async () => {
+  const d = await describe({ id: "pull-box-sizing" });
+  assert.match(d.citation.text, /NEC/);
+  assert.ok(d.citation.locator, "locator from the worked example");
+  assert.ok(Array.isArray(d.related) && d.related.length > 0);
+  assert.ok(d.related.every((r) => typeof r.id === "string" && typeof r.name === "string"));
+  // The flat `source` string stays as a compatibility alias.
+  assert.equal(typeof d.source, "string");
+});
+
+test("related drops a dangling id that points at a never-landed tile (spec-v1185)", async () => {
+  // rc-tbeam-flexure's curated list includes rc-beam-doubly-reinforced, which
+  // is not a real tile; the resolver must drop it rather than surface a name-less id.
+  const d = await describe({ id: "rc-tbeam-flexure" });
+  assert.ok(d.related.every((r) => r.name), "every related id resolved to a real name");
+  assert.ok(!d.related.some((r) => r.id === "rc-beam-doubly-reinforced"), "the dangling id is dropped");
+});
+
 test("a bespoke-renderer tile degrades to compute introspection, no crash", async () => {
   const d = await describe({ id: "voltage-drop" });
   assert.equal(d.inputs_source, "compute");
