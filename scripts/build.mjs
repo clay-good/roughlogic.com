@@ -163,6 +163,24 @@ async function checkRuntimeFilesEnumerated() {
   }
 }
 
+// spec-v1188: emit /llms.txt, /.well-known/mcp.json, and /AGENTS.md into dist,
+// with counts derived from the live catalog so they cannot drift.
+async function emitAgentDiscovery() {
+  const { renderLlmsTxt, renderMcpManifest } = await import("./agent-discovery.mjs");
+  const toolsData = await readFile(resolve(ROOT, "tools-data.js"), "utf8");
+  const tiles = (toolsData.match(/^\s*\{ id: "/gm) || []).length;
+  const files = await readdir(ROOT);
+  const modules = files.filter((f) => /^calc-.*\.js$/.test(f)).length;
+  const version = JSON.parse(await readFile(resolve(ROOT, "package.json"), "utf8")).version;
+
+  await writeFile(resolve(DIST, "llms.txt"), renderLlmsTxt({ tiles, modules }), "utf8");
+  await mkdir(resolve(DIST, ".well-known"), { recursive: true });
+  await writeFile(resolve(DIST, ".well-known", "mcp.json"), renderMcpManifest({ version, tiles }), "utf8");
+  if (existsSync(resolve(ROOT, "AGENTS.md"))) {
+    await copyFile(resolve(ROOT, "AGENTS.md"), resolve(DIST, "AGENTS.md"));
+  }
+}
+
 async function main() {
   await checkRuntimeFilesEnumerated();
   if (existsSync(DIST)) await rm(DIST, { recursive: true, force: true });
@@ -187,6 +205,11 @@ async function main() {
 
   // Copy data/ wholesale.
   await copyDir(resolve(ROOT, "data"), resolve(DIST, "data"));
+
+  // spec-v1188/v1194: static agent-discovery files, generated from the live
+  // catalog so their counts never drift. AGENTS.md is copied so a browsing
+  // agent reaches it at /AGENTS.md next to /llms.txt.
+  await emitAgentDiscovery();
 
   // Stamp build hash into a small build-info file (used by the service worker
   // diff and by the data-version footer line).
