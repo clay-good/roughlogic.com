@@ -287,7 +287,7 @@ const _finiteGuardPool = (o) => {
 // Compact renderer factory for the number-input pool dosing tiles (same
 // shape as the kitchen/stage _r and trucking _simpleRenderer factories).
 function _rPool(spec) {
-  return function (inputRegion, outputRegion, citationEl) {
+  const _rlRender = function (inputRegion, outputRegion, citationEl) {
     citationEl.textContent = spec.citation;
     attachExampleButton(inputRegion, () => fillExample(spec.example));
     const fields = {};
@@ -312,6 +312,12 @@ function _rPool(spec) {
     }, DEBOUNCE_MS);
     for (const f of spec.fields) fields[f.key].input.addEventListener("input", update);
   };
+
+  _rlRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label })),
+  };
+  return _rlRender;
 }
 
 // dims: in { gallons: dimensionless, current_ta_ppm: dimensionless, target_ta_ppm: dimensionless } out: { delta_ppm: dimensionless, bicarb_lb: dimensionless, acid_floz: dimensionless }

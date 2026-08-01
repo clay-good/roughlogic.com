@@ -270,7 +270,7 @@ export const srtFMExample = { inputs: { aeration_volume_gal: 1500000, mlss_mg_l:
 // --- Renderers ---
 
 function _r(spec) {
-  return function (inputRegion, outputRegion, citationEl) {
+  const _rlRender = function (inputRegion, outputRegion, citationEl) {
     citationEl.textContent = spec.citation;
     attachExampleButton(inputRegion, () => fillExample(spec.example));
     const fields = {};
@@ -314,6 +314,12 @@ function _r(spec) {
       el.addEventListener("input", update);
     }
   };
+
+  _rlRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label })),
+  };
+  return _rlRender;
 }
 
 const renderPounds = _r({

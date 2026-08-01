@@ -3004,7 +3004,7 @@ const _finiteGuardEnv = (o) => {
   return null;
 };
 function _rEnv(spec) {
-  return function (inputRegion, outputRegion, citationEl) {
+  const _rlRender = function (inputRegion, outputRegion, citationEl) {
     citationEl.textContent = spec.citation;
     attachExampleButton(inputRegion, () => fillExample(spec.example));
     const fields = {};
@@ -3026,6 +3026,12 @@ function _rEnv(spec) {
     }, DEBOUNCE_MS);
     for (const f of spec.fields) fields[f.key].input.addEventListener("input", update);
   };
+
+  _rlRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label })),
+  };
+  return _rlRender;
 }
 
 // dims: in { cavity_r: dimensionless, continuous_r: dimensionless, stud_depth_in: L, framing_factor: dimensionless, air_films_r: dimensionless, finish_layers_r: dimensionless } out: { r_assembly: dimensionless, r_center: dimensionless }

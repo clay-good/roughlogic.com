@@ -17,6 +17,7 @@ import { readFile } from "node:fs/promises";
 import { normalizeQuery, rankTools } from "../search-discovery.js";
 
 const COMPUTE_MAP_URL = new URL("../test/fixtures/compute-map.js", import.meta.url);
+const RENDERER_MAP_URL = new URL("../test/fixtures/renderer-map.js", import.meta.url);
 const EXAMPLES_URL = new URL("../test/fixtures/worked-examples.json", import.meta.url);
 const ALIASES_URL = new URL("../data/search/aliases.json", import.meta.url);
 
@@ -24,9 +25,13 @@ let _state = null;
 
 async function load() {
   if (_state) return _state;
-  const [{ TOOLS }, { COMPUTE_MAP }, examplesRaw, aliasesRaw] = await Promise.all([
+  const [{ TOOLS }, { COMPUTE_MAP }, { RENDERER_MAP }, examplesRaw, aliasesRaw] = await Promise.all([
     import(new URL("../tools-data.js", import.meta.url).href),
     import(COMPUTE_MAP_URL.href),
+    // Renderer registry map (spec-v1184): the mirror of compute-map, resolving
+    // a tile to the module/export whose render fn carries `render.schema`.
+    // A missing map degrades every tile to compute-param introspection.
+    import(RENDERER_MAP_URL.href).catch(() => ({ RENDERER_MAP: {} })),
     readFile(EXAMPLES_URL, "utf8"),
     // Alias shard for search parity with the browser combobox
     // (spec-v589); a missing or unreadable shard degrades to no aliases.
@@ -57,8 +62,66 @@ async function load() {
     }
   } catch { /* degrade to no aliases */ }
 
-  _state = { TOOLS, COMPUTE_MAP, examples, byId, modCache, aliases };
+  _state = { TOOLS, COMPUTE_MAP, RENDERER_MAP, examples, byId, modCache, aliases };
   return _state;
+}
+
+// Read the retained `render.schema` (spec-v1184) for a tile, or null when the
+// tile's renderer is bespoke and carries none (the schema is added by the
+// declarative renderer factories; hand-written renderers do not yet have it).
+// Reuses the same lazy, cached module import as compute — the renderer and the
+// compute function live in the same calc-*.js file.
+async function readSchema(id, rendererMap, modCache) {
+  const rreg = rendererMap[id];
+  if (!rreg) return null;
+  const url = new URL(rreg.module, RENDERER_MAP_URL).href;
+  let mod = modCache.get(url);
+  if (!mod) {
+    mod = await import(url);
+    modCache.set(url, mod);
+  }
+  const registry = mod[rreg.exportName];
+  const renderFn = registry && registry[id];
+  const schema = renderFn && renderFn.schema;
+  return schema && Array.isArray(schema.inputs) ? schema : null;
+}
+
+// Expose a renderer schema only when every field key it advertises is an
+// actual parameter of the tile's runnable compute function (spec-v1184). A few
+// tiles wrap compute in a unit-converting closure whose field keys differ from
+// the raw compute params the MCP layer calls; advertising those keys would let
+// an agent build a `run` call the compute silently ignores. When the schema is
+// inconsistent, the caller degrades to compute-param introspection instead, so
+// `describe` never advertises an input `run` cannot honor.
+function schemaIfConsistent(schema, fn) {
+  if (!schema) return null;
+  const params = new Set(introspectInputs(fn).map((p) => p.name));
+  return schema.inputs.every((f) => params.has(f.key)) ? schema : null;
+}
+
+// The allowed values of a select field, tolerating both the {value,label}
+// option shape the factories use and a bare-string option.
+function selectValues(field) {
+  if (!field || !Array.isArray(field.options)) return null;
+  return field.options.map((o) => (o && typeof o === "object" ? o.value : o));
+}
+
+// Validate any input whose field is a `select` against that field's options
+// (spec-v1184). A bad enum throws with the allowed values named, instead of
+// silently coercing to a wrong answer. Numbers and free fields are untouched.
+function validateSelects(schema, inputs) {
+  if (!schema || !inputs) return;
+  const byKey = new Map(schema.inputs.map((f) => [f.key, f]));
+  for (const [key, value] of Object.entries(inputs)) {
+    const field = byKey.get(key);
+    if (!field || field.kind !== "select") continue;
+    const allowed = selectValues(field);
+    if (allowed && !allowed.includes(value)) {
+      throw new Error(
+        `invalid value for "${key}": ${JSON.stringify(value)}. Allowed: ${allowed.map((v) => JSON.stringify(v)).join(", ")}.`,
+      );
+    }
+  }
 }
 
 // Resolve and import the calc module for a wired tile, caching by URL.
@@ -171,7 +234,7 @@ export async function search({ query = "", trade = "", limit = 30 } = {}) {
 }
 
 export async function describe({ id } = {}) {
-  const { COMPUTE_MAP, examples, byId, modCache } = await load();
+  const { COMPUTE_MAP, RENDERER_MAP, examples, byId, modCache } = await load();
   const meta = byId.get(id);
   if (!meta) throw new Error(`unknown calculator id: ${id}`);
 
@@ -184,7 +247,18 @@ export async function describe({ id } = {}) {
 
   if (reg) {
     const fn = await importCompute(reg, modCache);
-    out.inputs = introspectInputs(fn);
+    // Prefer the renderer's field descriptor (labels, select options, units in
+    // the label, min/max in attrs); fall back to compute-param introspection
+    // (names + defaults only) for tiles whose renderer is still bespoke.
+    const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
+    if (schema) {
+      out.inputs = schema.inputs;
+      out.outputs = schema.outputs;
+      out.inputs_source = "renderer";
+    } else {
+      out.inputs = introspectInputs(fn);
+      out.inputs_source = "compute";
+    }
   }
   if (ex) {
     out.example = { inputs: ex.inputs, outputs: Object.fromEntries(Object.entries(ex.outputs).map(([k, v]) => [k, v.value])) };
@@ -194,7 +268,7 @@ export async function describe({ id } = {}) {
 }
 
 export async function run({ id, inputs } = {}) {
-  const { COMPUTE_MAP, examples, modCache, byId } = await load();
+  const { COMPUTE_MAP, RENDERER_MAP, examples, modCache, byId } = await load();
   if (!byId.has(id)) throw new Error(`unknown calculator id: ${id}`);
   const reg = COMPUTE_MAP[id];
   if (!reg) throw new Error(`calculator "${id}" has no compute function wired (reference/lookup tile)`);
@@ -207,6 +281,14 @@ export async function run({ id, inputs } = {}) {
   if (args == null || (typeof args === "object" && Object.keys(args).length === 0)) {
     const ex = examples.get(id);
     if (ex) { args = ex.inputs; usedExample = true; }
+  }
+  // spec-v1184: reject an out-of-set select value with the allowed values
+  // named, rather than coercing a bad enum into a wrong number. Only enforced
+  // for caller-supplied inputs (the worked example is already valid) and only
+  // where the tile's renderer exposes a schema.
+  if (!usedExample) {
+    const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
+    validateSelects(schema, args);
   }
   const result = fn({ ...(args || {}) });
   return { id, inputs: args || {}, usedExample, result };

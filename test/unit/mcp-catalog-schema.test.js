@@ -1,0 +1,54 @@
+// spec-v1184: the MCP catalog exposes renderer field schemas (select options,
+// labels, units-in-label, min/max) and validates enums on run.
+
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { describe, run } from "../../mcp/catalog.mjs";
+
+test("describe exposes select options for a schema-covered tile", async () => {
+  const d = await describe({ id: "pull-box-sizing" });
+  assert.equal(d.inputs_source, "renderer");
+  const pt = d.inputs.find((i) => i.key === "pull_type");
+  assert.ok(pt, "pull_type field present");
+  assert.equal(pt.kind, "select");
+  const values = pt.options.map((o) => o.value);
+  assert.deepEqual(values, ["straight", "angle"]);
+  // Outputs are exposed with their human labels.
+  assert.ok(Array.isArray(d.outputs) && d.outputs.length > 0);
+  assert.ok(d.outputs.every((o) => typeof o.key === "string" && typeof o.label === "string"));
+});
+
+test("run rejects an out-of-set enum, naming the allowed values", async () => {
+  await assert.rejects(
+    () => run({ id: "pull-box-sizing", inputs: { pull_type: "diagonal", largest_raceway_in: 3, other_raceways_in: 0 } }),
+    (e) => {
+      assert.match(e.message, /pull_type/);
+      assert.match(e.message, /"straight"/);
+      assert.match(e.message, /"angle"/);
+      return true;
+    },
+  );
+});
+
+test("run accepts a valid enum and computes", async () => {
+  const r = await run({ id: "pull-box-sizing", inputs: { pull_type: "angle", largest_raceway_in: 3, other_raceways_in: 2 } });
+  assert.equal(r.result.angle_min, 20); // 6*3 + 2
+  assert.equal(r.result.governing, 20);
+});
+
+test("a bespoke-renderer tile degrades to compute introspection, no crash", async () => {
+  const d = await describe({ id: "voltage-drop" });
+  assert.equal(d.inputs_source, "compute");
+  assert.ok(Array.isArray(d.inputs) && d.inputs.length > 0);
+  assert.ok(d.inputs.every((i) => typeof i.name === "string"));
+});
+
+test("a tile whose renderer wraps compute with unit conversion degrades to the runnable params", async () => {
+  // dyno-correction-sae's fields are US units (baro_inhg) but its compute-map
+  // fn takes SI params (baro_mbar); describe must advertise what run honors.
+  const d = await describe({ id: "dyno-correction-sae" });
+  assert.equal(d.inputs_source, "compute");
+  const keys = d.inputs.map((i) => i.name);
+  assert.ok(keys.includes("baro_mbar"), "advertises the compute param, not the renderer field key");
+  assert.ok(!keys.includes("baro_inhg"));
+});

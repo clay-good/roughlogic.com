@@ -2198,7 +2198,7 @@ export const REALESTATE_RENDERERS = {
 // v23 shared simple-renderer (select + number fields). Non-exported.
 // =====================================================================
 function _v23SimpleRenderer(spec) {
-  return function (inputRegion, outputRegion, citationEl) {
+  const _rlRender = function (inputRegion, outputRegion, citationEl) {
     citationEl.textContent = spec.citation;
     attachExampleButton(inputRegion, () => fillExample(spec.example));
     const fields = {};
@@ -2226,6 +2226,12 @@ function _v23SimpleRenderer(spec) {
     }, DEBOUNCE_MS);
     for (const f of spec.fields) (f.kind === "select" ? fields[f.key].select : fields[f.key].input).addEventListener("input", update);
   };
+
+  _rlRender.schema = {
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label })),
+  };
+  return _rlRender;
 }
 
 // =====================================================================
