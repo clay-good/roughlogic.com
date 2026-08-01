@@ -5,7 +5,9 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { describe as describeTile } from "../../mcp/catalog.mjs";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { describe as describeTile, run as runTile } from "../../mcp/catalog.mjs";
 
 const load = async () => {
   const { TOOLS } = await import("../../tools-data.js");
@@ -43,4 +45,24 @@ test("every tile describes over MCP without throwing and carries the structured 
     }
   }
   assert.deepEqual(failures.slice(0, 20), [], `${failures.length} tile(s) failed to describe`);
+});
+
+test("every schema-covered tile runs over MCP and renders its outputs (spec-v1189 end-to-end)", async () => {
+  // Drive the full run() path — schema consistency, enum handling, and output
+  // formatting — for every covered tile against its worked example. Catches a
+  // hand-authored or factory schema whose keys or formatters break run(), which
+  // the describe-only sweep and the compute-only worked-example runner miss.
+  const covered = JSON.parse(readFileSync(fileURLToPath(new URL("../fixtures/renderer-schema-coverage.json", import.meta.url)), "utf8")).covered;
+  const failures = [];
+  for (const id of covered) {
+    try {
+      const r = await runTile({ id }); // no inputs → worked-example fallback
+      if (r.result && r.result.error) { failures.push(`${id}: result.error ${r.result.error}`); continue; }
+      if (!Array.isArray(r.outputs)) failures.push(`${id}: no rendered outputs`);
+      else if (r.outputs.some((o) => o.display === undefined)) failures.push(`${id}: an output has no display field`);
+    } catch (e) {
+      failures.push(`${id}: threw ${e.message}`);
+    }
+  }
+  assert.deepEqual(failures.slice(0, 20), [], `${failures.length} covered tile(s) failed to run over MCP`);
 });
