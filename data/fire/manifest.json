@@ -1,9 +1,9 @@
 {
   "name": "fire",
-  "version": "2026-07-27",
-  "fetched": "2026-07-27",
-  "edition": "NFA hose-friction training materials (U.S. government, public domain); ISO Public Protection Classification fire-flow formulas + NFF construction-class table; verified 2026-07-27.",
-  "asOf": "2026-07-27",
+  "version": "2026-08-01",
+  "fetched": "2026-08-01",
+  "edition": "NFA hose-friction training materials (U.S. government, public domain); ISO Public Protection Classification fire-flow formulas + NFF construction-class table; verified 2026-08-01.",
+  "asOf": "2026-08-01",
   "refresh_cadence": "annual",
   "shards": [
     {
