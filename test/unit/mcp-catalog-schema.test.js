@@ -150,6 +150,8 @@ test("extracted bespoke schemas expose enum options and validate (spec-v1184 gro
   const conduit = d.inputs.find((i) => i.key === "conduit");
   assert.deepEqual(conduit.options.map((o) => o.value), ["EMT", "PVC_40", "RMC"]);
   await assert.rejects(() => run({ id: "conduit-fill", inputs: { conduit: "FLEX" } }), /Allowed/);
+  // The extractor also carries the tile's citation text (attribution).
+  assert.match(d.citation.text, /NEC/);
 });
 
 test("a bespoke-renderer tile degrades to compute introspection, no crash", async () => {

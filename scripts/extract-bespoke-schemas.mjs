@@ -58,6 +58,13 @@ function parseFields(body) {
   return fields;
 }
 
+// The tile's citation string, set literally on citationEl at the top of the
+// renderer (the same text the browser shows in the citation footer).
+function parseCitation(body) {
+  const m = body.match(/citationEl\.textContent\s*=\s*("(?:[^"\\]|\\.)*")\s*;/);
+  return m ? JSON.parse(m[1]) : null;
+}
+
 // Parse the `computeXxx({ key: EXPR, ... })` call: map each compute-param key to
 // { var, coerced }. Returns null if no direct object-literal compute call found.
 function parseComputeCall(body) {
@@ -151,7 +158,8 @@ async function main() {
     }
     if (typeMismatch) { stats.skip_numeric_select++; continue; }
     if (!hasSelect) { stats.skip_no_selects++; continue; } // no enum value to add; leave to compute introspection
-    emitted[id] = { inputs };
+    const citation = parseCitation(body);
+    emitted[id] = citation ? { inputs, citation } : { inputs };
     stats.emitted++;
     if (samples.length < 8) samples.push({ id, inputs });
   }
