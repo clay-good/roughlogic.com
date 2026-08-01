@@ -99,6 +99,32 @@ function schemaIfConsistent(schema, fn) {
   return schema.inputs.every((f) => params.has(f.key)) ? schema : null;
 }
 
+// Render the outputs the way the browser does (spec-v1189): each output's pure
+// `format` closure turns the compute result into the exact display string a
+// person sees ("24.0 in (straight pull)"), carrying the unit the raw number
+// lacks. The closures are pure (no DOM); a throwing or non-string one degrades
+// to display: null with the raw `result` still authoritative.
+function renderOutputs(schema, result) {
+  if (!schema || !Array.isArray(schema.outputs)) return undefined;
+  return schema.outputs.map((o) => {
+    let display = null;
+    if (typeof o.format === "function") {
+      try {
+        const s = o.format(result);
+        if (typeof s === "string" || typeof s === "number") display = String(s);
+      } catch { display = null; }
+    }
+    return { key: o.key, label: o.label, unit: o.unit ?? null, display };
+  });
+}
+
+// The output descriptors as exposed by `describe` — labels and units, without
+// the (non-serializable) format closure `run` uses to build display strings.
+function describeOutputs(schema) {
+  if (!schema || !Array.isArray(schema.outputs)) return undefined;
+  return schema.outputs.map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null }));
+}
+
 // The allowed values of a select field, tolerating both the {value,label}
 // option shape the factories use and a bare-string option.
 function selectValues(field) {
@@ -253,7 +279,7 @@ export async function describe({ id } = {}) {
     const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
     if (schema) {
       out.inputs = schema.inputs;
-      out.outputs = schema.outputs;
+      out.outputs = describeOutputs(schema);
       out.inputs_source = "renderer";
     } else {
       out.inputs = introspectInputs(fn);
@@ -286,10 +312,13 @@ export async function run({ id, inputs } = {}) {
   // named, rather than coercing a bad enum into a wrong number. Only enforced
   // for caller-supplied inputs (the worked example is already valid) and only
   // where the tile's renderer exposes a schema.
-  if (!usedExample) {
-    const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
-    validateSelects(schema, args);
-  }
+  const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
+  if (!usedExample) validateSelects(schema, args);
   const result = fn({ ...(args || {}) });
-  return { id, inputs: args || {}, usedExample, result };
+  const out = { id, inputs: args || {}, usedExample, result };
+  // spec-v1189: alongside the raw result, the rendered outputs a person sees —
+  // each with its unit and the formatted display string.
+  const outputs = renderOutputs(schema, result);
+  if (outputs) out.outputs = outputs;
+  return out;
 }

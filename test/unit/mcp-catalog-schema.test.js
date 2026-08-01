@@ -36,6 +36,27 @@ test("run accepts a valid enum and computes", async () => {
   assert.equal(r.result.governing, 20);
 });
 
+test("run renders outputs with the display string a person sees (spec-v1189)", async () => {
+  const r = await run({ id: "pull-box-sizing", inputs: { pull_type: "straight", largest_raceway_in: 3, other_raceways_in: 0 } });
+  assert.ok(Array.isArray(r.outputs));
+  const g = r.outputs.find((o) => o.key === "g");
+  assert.equal(g.display, "24.0 in (straight pull)");
+  assert.equal(g.label, "Minimum box dimension");
+  // The raw result stays authoritative alongside the rendered view.
+  assert.equal(r.result.governing, 24);
+});
+
+test("describe outputs carry label + unit but never leak the format closure", async () => {
+  const d = await describe({ id: "pull-box-sizing" });
+  assert.ok(d.outputs.every((o) => typeof o.label === "string" && !("format" in o)));
+});
+
+test("a bespoke-renderer tile has no rendered outputs and does not crash", async () => {
+  const r = await run({ id: "voltage-drop" });
+  assert.ok(!("outputs" in r));
+  assert.ok(r.result && typeof r.result === "object");
+});
+
 test("a bespoke-renderer tile degrades to compute introspection, no crash", async () => {
   const d = await describe({ id: "voltage-drop" });
   assert.equal(d.inputs_source, "compute");

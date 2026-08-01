@@ -22,6 +22,7 @@ import { parseDeclares } from "./build-renderer-map.mjs";
 const ROOT = new URL("../", import.meta.url);
 const RMAP_URL = new URL("test/fixtures/renderer-map.js", ROOT);
 const CMAP_URL = new URL("test/fixtures/compute-map.js", ROOT);
+const EXAMPLES_URL = new URL("test/fixtures/worked-examples.json", ROOT);
 const BASELINE_URL = new URL("test/fixtures/renderer-schema-coverage.json", ROOT);
 
 const write = process.argv.includes("--write");
@@ -84,6 +85,39 @@ async function main() {
     else inconsistent.push(id);
   }
   covered.sort();
+
+  // spec-v1189: the output `format` closures must be pure — evaluable in Node
+  // to build the display strings the MCP layer returns. Run each covered tile's
+  // formatters against its worked example; a throw or non-string return means a
+  // formatter reached for the DOM or broke, and would silently null the display.
+  const examples = new Map();
+  try {
+    for (const row of JSON.parse(readFileSync(EXAMPLES_URL, "utf8")).rows) {
+      if (!examples.has(row.tile_id)) examples.set(row.tile_id, row.inputs);
+    }
+  } catch { /* no examples: skip the render probe */ }
+  const badFormat = [];
+  for (const id of covered) {
+    const inputs = examples.get(id);
+    if (!inputs) continue;
+    const rreg = RENDERER_MAP[id];
+    const rmod = await imp(rreg.module);
+    const schema = rmod[rreg.exportName][id].schema;
+    const creg = COMPUTE_MAP[id];
+    const fn = (await imp(creg.module))[creg.fn];
+    let result;
+    try { result = fn({ ...inputs }); } catch { continue; }
+    for (const o of schema.outputs || []) {
+      if (typeof o.format !== "function") continue;
+      try {
+        const s = o.format(result);
+        if (typeof s !== "string" && typeof s !== "number") { badFormat.push(`${id}/${o.key} (returned ${typeof s})`); }
+      } catch (e) { badFormat.push(`${id}/${o.key} (${e.message})`); }
+    }
+  }
+  if (badFormat.length) {
+    fail(`output formatter(s) not render-safe (spec-v1189): ${badFormat.slice(0, 10).join(", ")}${badFormat.length > 10 ? ` … +${badFormat.length - 10}` : ""}`);
+  }
 
   // --- 3. coverage ratchet ---
   let baseline = { covered: [] };

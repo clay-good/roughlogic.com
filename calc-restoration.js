@@ -1217,7 +1217,7 @@ function _v23SimpleRenderer(spec) {
 
   _rlRender.schema = {
     inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
-    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label })),
+    outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
   };
   return _rlRender;
 }
