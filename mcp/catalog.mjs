@@ -15,6 +15,7 @@
 
 import { readFile } from "node:fs/promises";
 import { normalizeQuery, rankTools } from "../search-discovery.js";
+import { getLimitationCopy } from "../limitation-banner.js";
 
 const COMPUTE_MAP_URL = new URL("../test/fixtures/compute-map.js", import.meta.url);
 const RENDERER_MAP_URL = new URL("../test/fixtures/renderer-map.js", import.meta.url);
@@ -130,6 +131,33 @@ function describeOutputs(schema) {
 function selectValues(field) {
   if (!field || !Array.isArray(field.options)) return null;
   return field.options.map((o) => (o && typeof o === "object" ? o.value : o));
+}
+
+// Numeric range guardrails (spec-v1190): warn when a caller's number falls
+// outside the field's min/max — the same bounds the browser enforces via
+// HTML5 validity — instead of computing silently on an out-of-range value.
+// Advisory, never fatal: the compute functions are total, and a deliberate
+// sensitivity sweep past a nominal bound is legitimate; the warning just tells
+// the agent where a person would see the field flag red.
+function validateNumbers(schema, inputs) {
+  const warnings = [];
+  if (!schema || !inputs) return warnings;
+  const byKey = new Map(schema.inputs.map((f) => [f.key, f]));
+  for (const [key, raw] of Object.entries(inputs)) {
+    const field = byKey.get(key);
+    if (!field || field.kind === "select") continue;
+    const attrs = field.attrs;
+    if (!attrs) continue;
+    const value = Number(raw);
+    if (!Number.isFinite(value)) continue;
+    if (attrs.min != null && attrs.min !== "" && value < Number(attrs.min)) {
+      warnings.push({ key, value, rule: "min", limit: Number(attrs.min), message: `${key} is below the field minimum (${attrs.min}).` });
+    }
+    if (attrs.max != null && attrs.max !== "" && value > Number(attrs.max)) {
+      warnings.push({ key, value, rule: "max", limit: Number(attrs.max), message: `${key} is above the field maximum (${attrs.max}).` });
+    }
+  }
+  return warnings;
 }
 
 // Validate any input whose field is a `select` against that field's options
@@ -290,6 +318,9 @@ export async function describe({ id } = {}) {
     out.example = { inputs: ex.inputs, outputs: Object.fromEntries(Object.entries(ex.outputs).map(([k, v]) => [k, v.value])) };
     out.source = [ex.source_publisher, ex.source_title, ex.source_section_or_page].filter((s) => s && s !== "n/a").join(" — ");
   }
+  // spec-v1190: the simplified-screening banner a person sees above the inputs
+  // ("Not a Manual J load calculation"), when this tile has one.
+  out.limitation = getLimitationCopy(id) || null;
   return out;
 }
 
@@ -320,5 +351,10 @@ export async function run({ id, inputs } = {}) {
   // each with its unit and the formatted display string.
   const outputs = renderOutputs(schema, result);
   if (outputs) out.outputs = outputs;
+  // spec-v1190: advisory range warnings for caller-supplied numbers, and the
+  // tile's limitation banner. A verified worked example is in-range by
+  // construction, so only caller inputs are checked.
+  out.warnings = usedExample ? [] : validateNumbers(schema, args);
+  out.limitation = getLimitationCopy(id) || null;
   return out;
 }

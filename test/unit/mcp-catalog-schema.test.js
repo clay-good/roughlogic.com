@@ -57,6 +57,33 @@ test("a bespoke-renderer tile has no rendered outputs and does not crash", async
   assert.ok(r.result && typeof r.result === "object");
 });
 
+test("run warns on an out-of-range number but still returns a result (spec-v1190)", async () => {
+  const inputs = { mounting_height_ft: 10, angle_deg: 95, target_fc: 30 };
+  const r = await run({ id: "luminaire-height-for-illuminance", inputs });
+  const w = r.warnings.find((x) => x.key === "angle_deg");
+  assert.ok(w, "angle_deg warning present");
+  assert.equal(w.rule, "max");
+  assert.equal(w.limit, 89.9);
+  assert.ok("result" in r, "result still returned despite the warning");
+});
+
+test("run on an in-range worked example carries no warnings", async () => {
+  const r = await run({ id: "pull-box-sizing" });
+  assert.deepEqual(r.warnings, []);
+});
+
+test("describe and run expose the limitation banner for a screening tile (spec-v1190)", async () => {
+  const d = await describe({ id: "manual-j-cooling" });
+  assert.match(d.limitation.headline, /Not a Manual J/);
+  const r = await run({ id: "manual-j-cooling" });
+  assert.match(r.limitation.headline, /Not a Manual J/);
+});
+
+test("a tile without a limitation banner reports limitation: null", async () => {
+  const d = await describe({ id: "pull-box-sizing" });
+  assert.equal(d.limitation, null);
+});
+
 test("a bespoke-renderer tile degrades to compute introspection, no crash", async () => {
   const d = await describe({ id: "voltage-drop" });
   assert.equal(d.inputs_source, "compute");
