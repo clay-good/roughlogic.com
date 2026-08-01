@@ -325,7 +325,16 @@ export async function describe({ id } = {}) {
     const rawSchema = await readSchema(id, RENDERER_MAP, modCache);
     const schema = schemaIfConsistent(rawSchema, fn);
     if (schema) {
-      out.inputs = schema.inputs;
+      // A partially-mapped renderer schema (e.g. a select tile whose other
+      // inputs the extractor could not resolve) is completed from the compute
+      // function's parameters, so `describe` advertises the full input set --
+      // rich descriptors where known, plain param entries for the rest -- and
+      // never under-reports an input an agent must supply.
+      const known = new Set(schema.inputs.map((f) => f.key));
+      const extra = introspectInputs(fn)
+        .filter((p) => !known.has(p.name))
+        .map((p) => ({ key: p.name, label: null, kind: null, options: null, default: p.default ?? null, attrs: null }));
+      out.inputs = extra.length ? [...schema.inputs, ...extra] : schema.inputs;
       out.outputs = describeOutputs(schema);
       out.inputs_source = "renderer";
     } else {

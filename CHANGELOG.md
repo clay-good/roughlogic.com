@@ -4,6 +4,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Added
+- **MCP field schemas for numeric calculators too: coverage 751 -> 1151 (spec-v1184).** The bespoke-schema extractor covered only tiles with a dropdown; it also had a bug -- its `makeNumber` matcher expected two arguments when the real helper takes three (label, id, attrs) -- so number fields never parsed, and the select tiles it did cover silently under-reported their numeric inputs. Fixing the matcher, resolving inputs that pass through an intermediate `const` (Manual J-style renderers), and capturing each input's default now lets the extractor cover pure-numeric calculators in full (every compute parameter mapped, with labels, units, and min/max) and complete the select tiles. And the catalog now completes any partially-mapped schema from the compute signature, so `describe_calculator` advertises the whole input set -- rich descriptors where known, plain entries for the rest -- and never hides an input an agent must supply. **1,151 of 1,567 tiles (73%)** now expose a field schema, and 1,566 carry a citation. Guarded by the end-to-end run gate over every covered tile and the worked-example option check.
+
 ### Fixed
 - **Two declarative renderer factories were missing their field schema (spec-v1184, coverage 735 -> 751).** The original schema-retention pass listed the `_v23SimpleRenderer` factory in four modules but missed the copies in calc-agriculture.js and calc-water.js, so their tiles (pesticide REI/PHI, the sprinkler and irrigation calculators, UV dose, RAS/aeration wastewater tiles, and more) fell back to compute-parameter names with no citation over MCP. Applying the same retention gives them the full schema -- input labels and select options, output labels and units, and the cited standard -- and drops the tiles missing `citation.text` from 17 to 1.
 

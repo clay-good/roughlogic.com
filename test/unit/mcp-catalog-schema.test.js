@@ -52,7 +52,7 @@ test("describe outputs carry label + unit but never leak the format closure", as
 });
 
 test("a bespoke-renderer tile has no rendered outputs and does not crash", async () => {
-  const r = await run({ id: "three-phase" }); // still bespoke, pure-numeric (no schema)
+  const r = await run({ id: "wire-ampacity" }); // bespoke, numeric-select excluded (no schema)
   assert.ok(!("outputs" in r));
   assert.ok(r.result && typeof r.result === "object");
 });
@@ -155,7 +155,7 @@ test("extracted bespoke schemas expose enum options and validate (spec-v1184 gro
 });
 
 test("a bespoke-renderer tile degrades to compute introspection, no crash", async () => {
-  const d = await describe({ id: "three-phase" }); // still bespoke, pure-numeric (no schema)
+  const d = await describe({ id: "wire-ampacity" }); // bespoke, numeric-select excluded (no schema)
   assert.equal(d.inputs_source, "compute");
   assert.ok(Array.isArray(d.inputs) && d.inputs.length > 0);
   assert.ok(d.inputs.every((i) => typeof i.name === "string"));

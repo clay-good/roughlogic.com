@@ -49,10 +49,12 @@ function parseFields(body) {
   for (const m of body.matchAll(/\b([A-Za-z_$][\w$]*)\s*=\s*makeSelect\(\s*("(?:[^"\\]|\\.)*")\s*,\s*("(?:[^"\\]|\\.)*")\s*,\s*(\[[\s\S]*?\])\s*\)/g)) {
     fields.set(m[1], { kind: "select", label: JSON.parse(m[2]), options: parseOptions(m[4]) });
   }
-  for (const m of body.matchAll(/\b([A-Za-z_$][\w$]*)\s*=\s*makeNumber\(\s*("(?:[^"\\]|\\.)*")\s*(?:,\s*(\{[^}]*\}))?\s*\)/g)) {
+  // makeNumber(label, id[, attrs]) -- three args (the id is required); attrs is
+  // the optional 4th capture.
+  for (const m of body.matchAll(/\b([A-Za-z_$][\w$]*)\s*=\s*makeNumber\(\s*("(?:[^"\\]|\\.)*")\s*,\s*("(?:[^"\\]|\\.)*")\s*(?:,\s*(\{[^}]*\}))?\s*\)/g)) {
     if (fields.has(m[1])) continue;
     let attrs = null;
-    if (m[3]) { try { attrs = JSON.parse(m[3].replace(/([{,]\s*)([A-Za-z_]\w*):/g, '$1"$2":').replace(/'/g, '"')); } catch { attrs = null; } }
+    if (m[4]) { try { attrs = JSON.parse(m[4].replace(/([{,]\s*)([A-Za-z_]\w*):/g, '$1"$2":').replace(/'/g, '"')); } catch { attrs = null; } }
     fields.set(m[1], { kind: "number", label: JSON.parse(m[2]), attrs });
   }
   return fields;
@@ -73,7 +75,12 @@ function parseCitation(body) {
 // (string/number values, not `.select.value`) never match. First mapping wins.
 function parseComputeCall(body) {
   const map = new Map();
-  for (const m of body.matchAll(/([A-Za-z_$][\w$]*)\s*:\s*(Number\(\s*)?([A-Za-z_$][\w$]*)\.(select|input)\.value/g)) {
+  // Matches both an explicit object property (`key: fieldvar.input.value`) and
+  // an intermediate const later used as object shorthand
+  // (`const key = Number(fieldvar.input.value)` then `{ ..., key }`) -- the `[:=]`
+  // covers both. Spurious matches to non-params are ignored (only real compute
+  // params are looked up).
+  for (const m of body.matchAll(/([A-Za-z_$][\w$]*)\s*[:=]\s*(Number\(\s*)?([A-Za-z_$][\w$]*)\.(select|input)\.value/g)) {
     if (!map.has(m[1])) map.set(m[1], { var: m[3], coerced: Boolean(m[2]), accessor: m[4] });
   }
   return map;
@@ -97,15 +104,16 @@ async function computeParams(reg) {
     if (!name || name.startsWith("...")) return null;
     // Classify the default so a string-select mapped to a number/boolean param
     // (a type-mismatch that would break enum validation) can be rejected.
-    let defType = "none";
+    let defType = "none", defValue = null;
     if (eq >= 0) {
       const raw = p.slice(eq + 1).trim();
       if (/^["']/.test(raw)) defType = "string";
       else if (/^(true|false)\b/.test(raw)) defType = "boolean";
       else if (/^-?\d/.test(raw)) defType = "number";
       else defType = "other";
+      try { defValue = JSON.parse(raw.replace(/'/g, '"')); } catch { defValue = null; }
     }
-    return { name, defType };
+    return { name, defType, defValue };
   }).filter(Boolean);
 }
 
@@ -138,26 +146,31 @@ async function main() {
     // numeric-coerced select (Number(x.select.value)) is a hard skip for the
     // WHOLE tile: run() would feed the compute a string it coerces differently,
     // a silent-wrong-value risk we refuse to introduce.
-    let typeMismatch = false, hasSelect = false;
+    let typeMismatch = false, hasSelect = false, anyUnmapped = false;
     const inputs = [];
-    for (const { name: key, defType } of params) {
+    for (const { name: key, defType, defValue } of params) {
       const ref = callMap.get(key);
-      if (!ref) continue; // unmappable param — omit (compute has a default)
+      if (!ref) { anyUnmapped = true; continue; } // param not sourced from a field
       const field = fields.get(ref.var);
-      if (!field) continue;
+      if (!field) { anyUnmapped = true; continue; }
       if (field.kind === "select") {
         // A string-select feeding a param that is coerced with Number() or whose
         // compute default is a number/boolean is a type mismatch: run() would
         // pass the string option verbatim and the compute would reject or
         // mis-handle it. Refuse the whole tile.
         if (ref.coerced || defType === "number" || defType === "boolean") { typeMismatch = true; break; }
-        if (!field.options || field.options.length === 0) continue; // dynamic options — omit
+        if (!field.options || field.options.length === 0) { anyUnmapped = true; continue; } // dynamic options — omit
         hasSelect = true;
       }
-      inputs.push({ key, label: field.label, kind: field.kind, options: field.kind === "select" ? field.options : null, default: null, attrs: field.attrs ?? null });
+      inputs.push({ key, label: field.label, kind: field.kind, options: field.kind === "select" ? field.options : null, default: defValue ?? null, attrs: field.attrs ?? null });
     }
     if (typeMismatch) { stats.skip_numeric_select++; continue; }
-    if (!hasSelect) { stats.skip_no_selects++; continue; } // no enum value to add; leave to compute introspection
+    if (inputs.length === 0) { stats.skip_no_fields = (stats.skip_no_fields || 0) + 1; continue; }
+    // A select tile may map a subset: the enum values are the payoff, and the
+    // catalog completes the input list from compute introspection so nothing is
+    // under-reported. A pure-numeric tile with no select earns its schema only
+    // by mapping EVERY param (otherwise introspection alone is just as good).
+    if (!hasSelect && anyUnmapped) { stats.skip_incomplete_numeric = (stats.skip_incomplete_numeric || 0) + 1; continue; }
     const citation = parseCitation(body);
     emitted[id] = citation ? { inputs, citation } : { inputs };
     stats.emitted++;
