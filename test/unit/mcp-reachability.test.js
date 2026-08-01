@@ -1,0 +1,46 @@
+// spec-v1191: every tool a person can use in the browser is reachable by an
+// agent over MCP. Walk the whole catalog through the catalog layer and assert
+// each tile describes without throwing and carries the structured surfaces
+// (inputs, citation, related), and that the id sets never drift apart.
+
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { describe as describeTile } from "../../mcp/catalog.mjs";
+
+const load = async () => {
+  const { TOOLS } = await import("../../tools-data.js");
+  const { COMPUTE_MAP } = await import("../../test/fixtures/compute-map.js");
+  const { RENDERER_MAP } = await import("../../test/fixtures/renderer-map.js");
+  return { TOOLS, COMPUTE_MAP, RENDERER_MAP };
+};
+
+test("the tool, compute, and renderer id sets are identical (no tile hidden from agents)", async () => {
+  const { TOOLS, COMPUTE_MAP, RENDERER_MAP } = await load();
+  const toolIds = new Set(TOOLS.map((t) => t.id));
+  const computeIds = new Set(Object.keys(COMPUTE_MAP));
+  const rendererIds = new Set(Object.keys(RENDERER_MAP));
+  assert.equal(computeIds.size, toolIds.size, "compute-map covers every tile");
+  assert.equal(rendererIds.size, toolIds.size, "renderer-map covers every tile");
+  for (const id of toolIds) {
+    assert.ok(computeIds.has(id), `${id} missing from compute-map`);
+    assert.ok(rendererIds.has(id), `${id} missing from renderer-map`);
+  }
+});
+
+test("every tile describes over MCP without throwing and carries the structured surfaces", async () => {
+  const { TOOLS } = await load();
+  const failures = [];
+  for (const t of TOOLS) {
+    try {
+      const d = await describeTile({ id: t.id });
+      if (!d.runnable) { failures.push(`${t.id}: not runnable`); continue; }
+      if (!Array.isArray(d.inputs)) failures.push(`${t.id}: no inputs array`);
+      if (!d.citation || typeof d.citation !== "object") failures.push(`${t.id}: no citation object`);
+      if (!Array.isArray(d.related)) failures.push(`${t.id}: no related array`);
+      if (!("limitation" in d)) failures.push(`${t.id}: no limitation field`);
+    } catch (e) {
+      failures.push(`${t.id}: threw ${e.message}`);
+    }
+  }
+  assert.deepEqual(failures.slice(0, 20), [], `${failures.length} tile(s) failed to describe`);
+});
