@@ -64,16 +64,22 @@ async function main() {
 
   // --- 2. parity + build the consistently-covered set ---
   const { COMPUTE_MAP } = await import(CMAP_URL.href);
+  let BESPOKE = {};
+  try { ({ BESPOKE_SCHEMAS: BESPOKE } = await import(new URL("test/fixtures/bespoke-schemas.js", ROOT).href)); } catch { BESPOKE = {}; }
   const modCache = new Map();
   const imp = async (rel) => { const u = new URL(rel, CMAP_URL).href; let m = modCache.get(u); if (!m) { m = await import(u); modCache.set(u, m); } return m; };
+  // A tile's effective schema: in-source render.schema, else the extracted fallback.
+  const schemaOf = (id, rmod, rreg) => {
+    const rf = rmod[rreg.exportName] && rmod[rreg.exportName][id];
+    return (rf && rf.schema) || BESPOKE[id] || null;
+  };
 
   const covered = [];
   const inconsistent = [];
   for (const id of order) {
     const rreg = RENDERER_MAP[id];
     const rmod = await imp(rreg.module);
-    const rf = rmod[rreg.exportName] && rmod[rreg.exportName][id];
-    const schema = rf && rf.schema;
+    const schema = schemaOf(id, rmod, rreg);
     if (!schema || !Array.isArray(schema.inputs)) continue;
     const creg = COMPUTE_MAP[id];
     if (!creg) { inconsistent.push(id); continue; }
@@ -86,23 +92,49 @@ async function main() {
   }
   covered.sort();
 
-  // spec-v1189: the output `format` closures must be pure — evaluable in Node
-  // to build the display strings the MCP layer returns. Run each covered tile's
-  // formatters against its worked example; a throw or non-string return means a
-  // formatter reached for the DOM or broke, and would silently null the display.
+  // Worked examples, keyed by tile — used by both the option check and the
+  // output-formatter probe below.
   const examples = new Map();
   try {
     for (const row of JSON.parse(readFileSync(EXAMPLES_URL, "utf8")).rows) {
       if (!examples.has(row.tile_id)) examples.set(row.tile_id, row.inputs);
     }
-  } catch { /* no examples: skip the render probe */ }
+  } catch { /* no examples: both probes degrade to no-op */ }
+
+  // spec-v1184: a covered tile's select options must contain its worked-example
+  // value for that field — otherwise the extracted/authored options are wrong and
+  // an agent replaying the example would be rejected. Hard gate.
+  const badOptions = [];
+  for (const id of covered) {
+    const inputs = examples.get(id);
+    if (!inputs) continue;
+    const rreg = RENDERER_MAP[id];
+    const schema = schemaOf(id, await imp(rreg.module), rreg);
+    for (const f of schema.inputs) {
+      if (f.kind !== "select" || !Array.isArray(f.options)) continue;
+      const v = inputs[f.key];
+      if (v === undefined) continue;
+      // Loose (string) equality: a numeric-quantity select stores its example
+      // value as a number (60) while the option is the string "60"; that is a
+      // valid selection, not a wrong option set.
+      if (!f.options.some((o) => String(o && typeof o === "object" ? o.value : o) === String(v))) {
+        badOptions.push(`${id}.${f.key}: example ${JSON.stringify(v)} not in options`);
+      }
+    }
+  }
+  if (badOptions.length) fail(`select options contradict the worked example (spec-v1184): ${badOptions.slice(0, 10).join("; ")}`);
+
+  // spec-v1189: the output `format` closures must be pure — evaluable in Node
+  // to build the display strings the MCP layer returns. Run each covered tile's
+  // formatters against its worked example; a throw or non-string return means a
+  // formatter reached for the DOM or broke, and would silently null the display.
   const badFormat = [];
   for (const id of covered) {
     const inputs = examples.get(id);
     if (!inputs) continue;
     const rreg = RENDERER_MAP[id];
     const rmod = await imp(rreg.module);
-    const schema = rmod[rreg.exportName][id].schema;
+    const schema = schemaOf(id, rmod, rreg);
     const creg = COMPUTE_MAP[id];
     const fn = (await imp(creg.module))[creg.fn];
     let result;

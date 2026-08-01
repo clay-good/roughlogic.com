@@ -58,8 +58,13 @@ test("every schema-covered tile runs over MCP and renders its outputs (spec-v118
     try {
       const r = await runTile({ id }); // no inputs → worked-example fallback
       if (r.result && r.result.error) { failures.push(`${id}: result.error ${r.result.error}`); continue; }
-      if (!Array.isArray(r.outputs)) failures.push(`${id}: no rendered outputs`);
-      else if (r.outputs.some((o) => o.display === undefined)) failures.push(`${id}: an output has no display field`);
+      // Rendered outputs are present for factory/hand-authored schemas (which
+      // retain output formatters) and absent for the inputs-only bespoke
+      // extractions — both are valid, but when present they must be well-formed.
+      if (r.outputs !== undefined) {
+        if (!Array.isArray(r.outputs)) failures.push(`${id}: outputs is not an array`);
+        else if (r.outputs.some((o) => o.display === undefined)) failures.push(`${id}: an output has no display field`);
+      }
     } catch (e) {
       failures.push(`${id}: threw ${e.message}`);
     }

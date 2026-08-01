@@ -20,6 +20,11 @@ import { getLimitationCopy } from "../limitation-banner.js";
 // tiles". Build-time data; a missing/unreadable module degrades to no related.
 let RELATED = {};
 try { ({ RELATED } = await import("../scripts/related-tiles.mjs")); } catch { RELATED = {}; }
+// spec-v1184 coverage growth: statically-extracted field schemas for bespoke
+// (hand-written) renderers that carry no in-source render.schema. Read as a
+// fallback; schemaIfConsistent still degrades any entry whose keys diverge.
+let BESPOKE_SCHEMAS = {};
+try { ({ BESPOKE_SCHEMAS } = await import("../test/fixtures/bespoke-schemas.js")); } catch { BESPOKE_SCHEMAS = {}; }
 
 const COMPUTE_MAP_URL = new URL("../test/fixtures/compute-map.js", import.meta.url);
 const RENDERER_MAP_URL = new URL("../test/fixtures/renderer-map.js", import.meta.url);
@@ -91,7 +96,7 @@ async function readSchema(id, rendererMap, modCache) {
   }
   const registry = mod[rreg.exportName];
   const renderFn = registry && registry[id];
-  const schema = renderFn && renderFn.schema;
+  const schema = (renderFn && renderFn.schema) || BESPOKE_SCHEMAS[id];
   return schema && Array.isArray(schema.inputs) ? schema : null;
 }
 

@@ -52,7 +52,7 @@ test("describe outputs carry label + unit but never leak the format closure", as
 });
 
 test("a bespoke-renderer tile has no rendered outputs and does not crash", async () => {
-  const r = await run({ id: "conduit-fill" }); // still bespoke (no retained schema)
+  const r = await run({ id: "three-phase" }); // still bespoke, pure-numeric (no schema)
   assert.ok(!("outputs" in r));
   assert.ok(r.result && typeof r.result === "object");
 });
@@ -144,8 +144,16 @@ test("flagship electrical tiles expose hand-authored schemas (spec-v1184 coverag
   assert.equal(ol.inputs_source, "renderer");
 });
 
+test("extracted bespoke schemas expose enum options and validate (spec-v1184 growth)", async () => {
+  const d = await describe({ id: "conduit-fill" }); // bespoke renderer, schema from the extractor fixture
+  assert.equal(d.inputs_source, "renderer");
+  const conduit = d.inputs.find((i) => i.key === "conduit");
+  assert.deepEqual(conduit.options.map((o) => o.value), ["EMT", "PVC_40", "RMC"]);
+  await assert.rejects(() => run({ id: "conduit-fill", inputs: { conduit: "FLEX" } }), /Allowed/);
+});
+
 test("a bespoke-renderer tile degrades to compute introspection, no crash", async () => {
-  const d = await describe({ id: "conduit-fill" }); // still bespoke (no retained schema)
+  const d = await describe({ id: "three-phase" }); // still bespoke, pure-numeric (no schema)
   assert.equal(d.inputs_source, "compute");
   assert.ok(Array.isArray(d.inputs) && d.inputs.length > 0);
   assert.ok(d.inputs.every((i) => typeof i.name === "string"));

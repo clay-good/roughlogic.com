@@ -1,0 +1,191 @@
+#!/usr/bin/env node
+// spec-v1184 coverage growth: statically extract a render.schema for bespoke
+// (hand-written) renderers by parsing each render function's own source, so the
+// MCP layer can expose their field metadata the way the declarative factories do.
+//
+// SAFETY: only emits a schema when it is confident and safe —
+//   - every compute parameter maps to a makeSelect/makeNumber field in the body,
+//   - the compute() call is a direct object literal,
+//   - no select value is Number()-coerced (that string→number mismatch would feed
+//     a wrong-typed value to run(); those tiles are skipped),
+//   - select options are a literal [{value,label}] array (dynamic options skipped).
+// Anything less confident is skipped (the tile keeps degrading to compute
+// introspection). And mcp/catalog.mjs `schemaIfConsistent` degrades any emitted
+// schema whose keys do not match the compute params, so a mis-parse is harmless.
+//
+// Default mode: analysis (report counts + a sample). `--write` emits the data
+// file test/fixtures/bespoke-schemas.js that catalog.mjs reads as a fallback.
+
+import { readFileSync, writeFileSync } from "node:fs";
+
+const ROOT = new URL("../", import.meta.url);
+const CMAP_URL = new URL("test/fixtures/compute-map.js", ROOT);
+const write = process.argv.includes("--write");
+const verbose = process.argv.includes("--verbose");
+
+// Parse a literal [{ value: "..", label: ".." }, ...] options array from source.
+function parseOptions(src) {
+  const opts = [];
+  const re = /\{\s*value:\s*("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')\s*,\s*label:\s*("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g;
+  let m;
+  while ((m = re.exec(src))) {
+    opts.push({ value: JSON.parse(m[1].replace(/'/g, '"')), label: JSON.parse(m[2].replace(/'/g, '"')) });
+  }
+  return opts;
+}
+
+// Find `NAME = makeSelect("label", "id", OPTS)` / `makeNumber("label","id",ATTRS)`
+// declarations in a render function body, keyed by the local variable NAME.
+function parseFields(body) {
+  const fields = new Map();
+  // makeSelect with a literal options array (skip dynamic like awgOptions()).
+  for (const m of body.matchAll(/\b([A-Za-z_$][\w$]*)\s*=\s*makeSelect\(\s*("(?:[^"\\]|\\.)*")\s*,\s*("(?:[^"\\]|\\.)*")\s*,\s*(\[[\s\S]*?\])\s*\)/g)) {
+    fields.set(m[1], { kind: "select", label: JSON.parse(m[2]), options: parseOptions(m[4]) });
+  }
+  for (const m of body.matchAll(/\b([A-Za-z_$][\w$]*)\s*=\s*makeNumber\(\s*("(?:[^"\\]|\\.)*")\s*(?:,\s*(\{[^}]*\}))?\s*\)/g)) {
+    if (fields.has(m[1])) continue;
+    let attrs = null;
+    if (m[3]) { try { attrs = JSON.parse(m[3].replace(/([{,]\s*)([A-Za-z_]\w*):/g, '$1"$2":').replace(/'/g, '"')); } catch { attrs = null; } }
+    fields.set(m[1], { kind: "number", label: JSON.parse(m[2]), attrs });
+  }
+  return fields;
+}
+
+// Parse the `computeXxx({ key: EXPR, ... })` call: map each compute-param key to
+// { var, coerced }. Returns null if no direct object-literal compute call found.
+function parseComputeCall(body) {
+  const call = body.match(/compute[A-Za-z0-9_]*\(\s*\{([\s\S]*?)\}\s*\)/);
+  if (!call) return null;
+  const inner = call[1];
+  const map = new Map();
+  // key: [Number(]VAR.(select|input).value
+  for (const m of inner.matchAll(/([A-Za-z_$][\w$]*)\s*:\s*(Number\(\s*)?([A-Za-z_$][\w$]*)\.(select|input)\.value/g)) {
+    map.set(m[1], { var: m[3], coerced: Boolean(m[2]), accessor: m[4] });
+  }
+  return map;
+}
+
+async function computeParams(reg) {
+  const mod = await import(new URL(reg.module, CMAP_URL).href);
+  const fn = mod[reg.fn];
+  if (typeof fn !== "function") return null;
+  const s = fn.toString();
+  const o = s.indexOf("("); const b = s.indexOf("{", o);
+  if (b < 0 || s.slice(o, b).includes(")")) return [];
+  let d = 0, e = -1;
+  for (let i = b; i < s.length; i++) { if (s[i] === "{") d++; else if (s[i] === "}") { d--; if (!d) { e = i; break; } } }
+  const parts = []; d = 0; let cur = "";
+  for (const ch of s.slice(b + 1, e)) { if ("([{".includes(ch)) d++; else if (")]}".includes(ch)) d--; if (ch === "," && !d) { parts.push(cur); cur = ""; } else cur += ch; }
+  if (cur.trim()) parts.push(cur);
+  return parts.map((p) => {
+    const eq = p.indexOf("=");
+    const name = (eq < 0 ? p : p.slice(0, eq)).trim();
+    if (!name || name.startsWith("...")) return null;
+    // Classify the default so a string-select mapped to a number/boolean param
+    // (a type-mismatch that would break enum validation) can be rejected.
+    let defType = "none";
+    if (eq >= 0) {
+      const raw = p.slice(eq + 1).trim();
+      if (/^["']/.test(raw)) defType = "string";
+      else if (/^(true|false)\b/.test(raw)) defType = "boolean";
+      else if (/^-?\d/.test(raw)) defType = "number";
+      else defType = "other";
+    }
+    return { name, defType };
+  }).filter(Boolean);
+}
+
+async function main() {
+  const { RENDERER_MAP } = await import(new URL("test/fixtures/renderer-map.js", ROOT).href);
+  const { COMPUTE_MAP } = await import(CMAP_URL.href);
+  const modCache = new Map();
+  const imp = async (rel) => { const u = new URL(rel, CMAP_URL).href; let m = modCache.get(u); if (!m) { m = await import(u); modCache.set(u, m); } return m; };
+
+  const emitted = {};
+  const stats = { total: 0, alreadySchema: 0, emitted: 0, skip_no_call: 0, skip_numeric_select: 0, skip_unmapped: 0, skip_no_selects: 0 };
+  const samples = [];
+
+  for (const id of Object.keys(RENDERER_MAP)) {
+    stats.total++;
+    const rreg = RENDERER_MAP[id];
+    const rmod = await imp(rreg.module);
+    const rf = rmod[rreg.exportName] && rmod[rreg.exportName][id];
+    if (!rf) continue;
+    if (rf.schema) { stats.alreadySchema++; continue; }
+    const body = rf.toString();
+    const fields = parseFields(body);
+    const callMap = parseComputeCall(body);
+    if (!callMap || callMap.size === 0) { stats.skip_no_call++; continue; }
+    const params = await computeParams(COMPUTE_MAP[id]);
+    if (!params) { stats.skip_no_call++; continue; }
+
+    // Include every compute param we can confidently map to a parsed field
+    // (a subset is safe — schemaIfConsistent only needs inputs ⊆ params). But a
+    // numeric-coerced select (Number(x.select.value)) is a hard skip for the
+    // WHOLE tile: run() would feed the compute a string it coerces differently,
+    // a silent-wrong-value risk we refuse to introduce.
+    let typeMismatch = false, hasSelect = false;
+    const inputs = [];
+    for (const { name: key, defType } of params) {
+      const ref = callMap.get(key);
+      if (!ref) continue; // unmappable param — omit (compute has a default)
+      const field = fields.get(ref.var);
+      if (!field) continue;
+      if (field.kind === "select") {
+        // A string-select feeding a param that is coerced with Number() or whose
+        // compute default is a number/boolean is a type mismatch: run() would
+        // pass the string option verbatim and the compute would reject or
+        // mis-handle it. Refuse the whole tile.
+        if (ref.coerced || defType === "number" || defType === "boolean") { typeMismatch = true; break; }
+        if (!field.options || field.options.length === 0) continue; // dynamic options — omit
+        hasSelect = true;
+      }
+      inputs.push({ key, label: field.label, kind: field.kind, options: field.kind === "select" ? field.options : null, default: null, attrs: field.attrs ?? null });
+    }
+    if (typeMismatch) { stats.skip_numeric_select++; continue; }
+    if (!hasSelect) { stats.skip_no_selects++; continue; } // no enum value to add; leave to compute introspection
+    emitted[id] = { inputs };
+    stats.emitted++;
+    if (samples.length < 8) samples.push({ id, inputs });
+  }
+
+  // Correctness check: every emitted select's worked-example value must be one
+  // of the extracted options. A miss means the parse got the options wrong.
+  const examples = new Map();
+  for (const row of JSON.parse(readFileSync(new URL("test/fixtures/worked-examples.json", ROOT), "utf8")).rows) {
+    if (!examples.has(row.tile_id)) examples.set(row.tile_id, row.inputs);
+  }
+  const mismatches = [];
+  for (const [id, sc] of Object.entries(emitted)) {
+    const ex = examples.get(id);
+    if (!ex) continue;
+    for (const f of sc.inputs) {
+      if (f.kind !== "select") continue;
+      const v = ex[f.key];
+      if (v === undefined) continue;
+      if (!f.options.some((o) => String(o.value) === String(v))) mismatches.push(`${id}.${f.key}: example ${JSON.stringify(v)} not in ${JSON.stringify(f.options.map((o) => o.value))}`);
+    }
+  }
+  // Belt and suspenders: drop any tile whose worked example still contradicts
+  // its extracted options, so the shipped set is provably example-consistent.
+  const dropped = new Set(mismatches.map((m) => m.split(".")[0]));
+  for (const id of dropped) delete emitted[id];
+  stats.emitted = Object.keys(emitted).length;
+  stats.dropped_by_example_check = dropped.size;
+
+  console.log("bespoke-schema extraction:", JSON.stringify(stats, null, 2));
+  if (dropped.size) { console.log("\nDROPPED (example contradicts extracted options):"); for (const m of mismatches) console.log("  " + m); }
+  if (verbose || !write) {
+    for (const s of samples) {
+      console.log(`\n${s.id}:`);
+      for (const i of s.inputs) console.log(`  ${i.key} [${i.kind}]${i.options ? " opts=" + JSON.stringify(i.options.map((o) => o.value)) : ""}`);
+    }
+  }
+  if (write) {
+    const rows = Object.keys(emitted).sort().map((id) => `  ${JSON.stringify(id)}: ${JSON.stringify(emitted[id])},`).join("\n");
+    writeFileSync(new URL("test/fixtures/bespoke-schemas.js", ROOT), `// GENERATED by scripts/extract-bespoke-schemas.mjs. Do not hand-edit.\n// spec-v1184 coverage growth: statically-extracted field schemas for bespoke\n// (hand-written) renderers with string selects. mcp/catalog.mjs reads this as a\n// fallback when a renderer carries no in-source render.schema; schemaIfConsistent\n// still degrades any entry whose keys diverge from the compute params.\nexport const BESPOKE_SCHEMAS = {\n${rows}\n};\n`);
+    console.log(`\nwrote ${stats.emitted} bespoke schemas to test/fixtures/bespoke-schemas.js`);
+  }
+}
+
+main().catch((e) => { console.error(e); process.exit(1); });
