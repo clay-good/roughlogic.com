@@ -378,6 +378,52 @@ export async function run({ id, inputs } = {}) {
 // collapses them. Total and bounded: a bad item fails that item, not the batch,
 // and the module cache is shared so a same-module sweep imports once.
 const RUN_MANY_CAP = 50;
+// --- MCP resources (spec-v1186) -----------------------------------------
+// Views of the same catalog, addressable under a `roughlogic://` scheme, so a
+// client can browse or attach content without knowing the tool names. A small,
+// stable set (overview + one per trade) plus a per-tile URI template — the same
+// restraint that made the tool surface meta-tools, not 1,567 tools.
+
+function jsonResource(uri, data) {
+  return { contents: [{ uri, mimeType: "application/json", text: JSON.stringify(data, null, 2) }] };
+}
+
+export async function listResources() {
+  const overview = await search({});
+  const resources = [
+    { uri: "roughlogic://catalog", name: "roughlogic catalog overview", description: "Trade overview with calculator counts.", mimeType: "application/json" },
+  ];
+  for (const t of overview.trades) {
+    resources.push({
+      uri: `roughlogic://trade/${encodeURIComponent(t.trade)}`,
+      name: `${t.trade} calculators (${t.count})`,
+      description: `Every calculator in the ${t.trade} trade.`,
+      mimeType: "application/json",
+    });
+  }
+  return { resources };
+}
+
+export function listResourceTemplates() {
+  return {
+    resourceTemplates: [{
+      uriTemplate: "roughlogic://calculator/{id}",
+      name: "Calculator card",
+      description: "Inputs (with options and units), outputs, worked examples, citation, and limitation for one calculator id.",
+      mimeType: "application/json",
+    }],
+  };
+}
+
+export async function readResource(uri) {
+  const u = String(uri || "");
+  let m;
+  if (u === "roughlogic://catalog") return jsonResource(u, await search({}));
+  if ((m = u.match(/^roughlogic:\/\/trade\/(.+)$/))) return jsonResource(u, await search({ trade: decodeURIComponent(m[1]) }));
+  if ((m = u.match(/^roughlogic:\/\/calculator\/(.+)$/))) return jsonResource(u, await describe({ id: decodeURIComponent(m[1]) }));
+  throw new Error(`unknown resource uri: ${uri}`);
+}
+
 export async function runMany({ calls } = {}) {
   if (!Array.isArray(calls)) throw new Error("`calls` must be an array of { id, inputs } objects.");
   if (calls.length > RUN_MANY_CAP) {

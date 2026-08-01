@@ -25,6 +25,15 @@ Typical flow: `search_calculators({query:"voltage drop", trade:"electrical"})`
 inputs:{phase:"single", material:"copper", awg:"10", length_ft:150,
 current_A:20, source_voltage_V:240}})`.
 
+### Resources and prompts
+
+The server also implements the MCP `resources/*` and `prompts/*` surfaces, so a
+client can browse the catalog and start a common task without knowing the tool
+names. Resources: `roughlogic://catalog` (trade overview), `roughlogic://trade/{trade}`
+(one trade's calculators), and the template `roughlogic://calculator/{id}` (one
+tile's full card). Prompts: `find-calculator`, `run-with-inputs`, and
+`size-and-check` — plain templates with argument substitution, no model call.
+
 The compute functions, their input shapes, and the example values are read
 straight from the repo (`tools-data.js`, `test/fixtures/compute-map.js`,
 `test/fixtures/worked-examples.json`), so the MCP surface can never drift from

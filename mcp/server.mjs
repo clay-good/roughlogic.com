@@ -16,7 +16,10 @@
 
 import { createInterface } from "node:readline";
 import { readFileSync } from "node:fs";
-import { search, describe, run, runMany } from "./catalog.mjs";
+import {
+  search, describe, run, runMany,
+  listResources, listResourceTemplates, readResource,
+} from "./catalog.mjs";
 
 // Report the site's version: the server exposes the site's catalog verbatim,
 // so its version is the root package.json version, read at startup.
@@ -150,6 +153,46 @@ const TOOLS = [
   },
 ];
 
+// --- Prompts (spec-v1186) ------------------------------------------------
+// Static task templates the client surfaces in its prompt picker. Plain string
+// substitution — no model call, consistent with the site's "no AI at runtime"
+// constraint. Each expands into a first user message wired to the tools.
+const PROMPTS = [
+  {
+    name: "find-calculator",
+    description: "Find the best calculator for a need and describe it.",
+    arguments: [{ name: "need", description: "What you need to calculate.", required: true }],
+    template: (a) =>
+      `Search the roughlogic catalog for "${a.need ?? ""}" with search_calculators, then call describe_calculator on the best match and summarize its inputs (with valid options), outputs, and the cited source.`,
+  },
+  {
+    name: "run-with-inputs",
+    description: "Run a calculator and cite the source.",
+    arguments: [
+      { name: "id", description: "Calculator id.", required: true },
+      { name: "inputs", description: "JSON object of named inputs.", required: false },
+    ],
+    template: (a) =>
+      `Call run_calculator with id "${a.id ?? ""}"${a.inputs ? ` and inputs ${a.inputs}` : " (worked example)"}. Report each output with its unit and display value, note any warnings, then cite the source from describe_calculator.`,
+  },
+  {
+    name: "size-and-check",
+    description: "Size something, then check it against the code limit.",
+    arguments: [{ name: "task", description: "The sizing task in plain language.", required: true }],
+    template: (a) =>
+      `Task: ${a.task ?? ""}. Search the catalog, pick the calculator, run its worked example to learn the shape, then run it again with the real numbers and report the result against the code limit with its citation and any limitation banner.`,
+  },
+];
+
+function getPrompt(name, args) {
+  const p = PROMPTS.find((x) => x.name === name);
+  if (!p) throw new Error(`unknown prompt: ${name}`);
+  return {
+    description: p.description,
+    messages: [{ role: "user", content: { type: "text", text: p.template(args || {}) } }],
+  };
+}
+
 async function dispatchTool(name, args) {
   switch (name) {
     case "search_calculators": return search(args || {});
@@ -183,7 +226,7 @@ async function handle(msg) {
       case "initialize": {
         const requested = params && params.protocolVersion;
         const protocolVersion = typeof requested === "string" ? requested : DEFAULT_PROTOCOL;
-        reply(id, { protocolVersion, capabilities: { tools: {} }, serverInfo: SERVER_INFO });
+        reply(id, { protocolVersion, capabilities: { tools: {}, resources: {}, prompts: {} }, serverInfo: SERVER_INFO });
         return;
       }
       case "notifications/initialized":
@@ -194,6 +237,23 @@ async function handle(msg) {
         return;
       case "tools/list":
         reply(id, { tools: TOOLS });
+        return;
+      case "resources/list":
+        reply(id, await listResources());
+        return;
+      case "resources/templates/list":
+        reply(id, listResourceTemplates());
+        return;
+      case "resources/read": {
+        const uri = params && params.uri;
+        reply(id, await readResource(uri));
+        return;
+      }
+      case "prompts/list":
+        reply(id, { prompts: PROMPTS.map(({ name, description, arguments: a }) => ({ name, description, arguments: a })) });
+        return;
+      case "prompts/get":
+        reply(id, getPrompt(params && params.name, params && params.arguments));
         return;
       case "tools/call": {
         const toolName = params && params.name;

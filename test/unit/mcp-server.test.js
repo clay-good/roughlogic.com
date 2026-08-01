@@ -46,6 +46,40 @@ test("tools/list declares an object outputSchema for every tool", async () => {
   }
 });
 
+test("initialize advertises tools, resources, and prompts capabilities (spec-v1186)", async () => {
+  const replies = await rpc([
+    { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {} } },
+  ], 1);
+  const caps = replies.get(1).result.capabilities;
+  assert.ok(caps.tools && caps.resources && caps.prompts);
+});
+
+test("resources round-trip: list, template, and read a calculator card (spec-v1186)", async () => {
+  const replies = await rpc([
+    { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {} } },
+    { jsonrpc: "2.0", id: 2, method: "resources/list" },
+    { jsonrpc: "2.0", id: 3, method: "resources/templates/list" },
+    { jsonrpc: "2.0", id: 4, method: "resources/read", params: { uri: "roughlogic://calculator/pull-box-sizing" } },
+  ], 4);
+  assert.ok(replies.get(2).result.resources.some((r) => r.uri === "roughlogic://catalog"));
+  assert.equal(replies.get(3).result.resourceTemplates[0].uriTemplate, "roughlogic://calculator/{id}");
+  const card = JSON.parse(replies.get(4).result.contents[0].text);
+  assert.equal(card.id, "pull-box-sizing");
+  assert.ok(Array.isArray(card.inputs));
+});
+
+test("prompts round-trip: list and get with argument substitution (spec-v1186)", async () => {
+  const replies = await rpc([
+    { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {} } },
+    { jsonrpc: "2.0", id: 2, method: "prompts/list" },
+    { jsonrpc: "2.0", id: 3, method: "prompts/get", params: { name: "run-with-inputs", arguments: { id: "voltage-drop" } } },
+  ], 3);
+  assert.ok(replies.get(2).result.prompts.some((p) => p.name === "run-with-inputs"));
+  const msg = replies.get(3).result.messages[0];
+  assert.equal(msg.role, "user");
+  assert.match(msg.content.text, /voltage-drop/);
+});
+
 test("every tool is annotated read-only, idempotent, non-destructive, closed-world (spec-v1193)", async () => {
   const replies = await rpc([
     { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {} } },
