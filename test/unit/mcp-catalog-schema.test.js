@@ -103,6 +103,15 @@ test("run_calculators rejects an over-cap batch, naming the cap", async () => {
   );
 });
 
+test("describe returns the full example gallery with an example alias (spec-v1193)", async () => {
+  const d = await describe({ id: "ohms-law" }); // ohms-law ships two worked examples
+  assert.ok(Array.isArray(d.examples) && d.examples.length >= 2);
+  assert.ok(d.examples.every((e) => e.inputs && e.outputs));
+  // The single `example`/`source` aliases stay = examples[0] for older callers.
+  assert.deepEqual(d.example.inputs, d.examples[0].inputs);
+  assert.equal(d.source, d.examples[0].source);
+});
+
 test("a bespoke-renderer tile degrades to compute introspection, no crash", async () => {
   const d = await describe({ id: "voltage-drop" });
   assert.equal(d.inputs_source, "compute");

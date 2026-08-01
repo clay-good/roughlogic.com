@@ -30,6 +30,7 @@ const DEFAULT_PROTOCOL = "2024-11-05";
 const TOOLS = [
   {
     name: "search_calculators",
+    annotations: { title: "Search calculators", readOnlyHint: true, idempotentHint: true, destructiveHint: false, openWorldHint: false },
     description:
       "Search the roughlogic catalog of trades calculators (electrical, plumbing, HVAC, construction, restoration, and more). Filter by keyword and/or trade. Call with no arguments to get a trade overview with counts.",
     inputSchema: {
@@ -64,6 +65,7 @@ const TOOLS = [
   },
   {
     name: "describe_calculator",
+    annotations: { title: "Describe calculator", readOnlyHint: true, idempotentHint: true, destructiveHint: false, openWorldHint: false },
     description:
       "Get the input fields (with defaults), a publisher-verified worked example, and the cited source for one calculator. Use the id from search_calculators.",
     inputSchema: {
@@ -89,6 +91,7 @@ const TOOLS = [
   },
   {
     name: "run_calculator",
+    annotations: { title: "Run calculator", readOnlyHint: true, idempotentHint: true, destructiveHint: false, openWorldHint: false },
     description:
       "Evaluate a calculator. Pass `id` and an `inputs` object of named field values (see describe_calculator for field names). With no inputs, the worked example is run.",
     inputSchema: {
@@ -115,6 +118,7 @@ const TOOLS = [
   },
   {
     name: "run_calculators",
+    annotations: { title: "Run calculators (batch)", readOnlyHint: true, idempotentHint: true, destructiveHint: false, openWorldHint: false },
     description:
       "Evaluate up to 50 calculator calls in one request — for sweeps and comparisons (e.g. one voltage-drop across several wire gauges). Pass `calls`: an array of { id, inputs }. Each item is evaluated independently; a bad item returns { id, error } in place without failing the batch.",
     inputSchema: {

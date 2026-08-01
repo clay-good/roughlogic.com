@@ -39,11 +39,15 @@ async function load() {
     readFile(ALIASES_URL, "utf8").catch(() => "{}"),
   ]);
 
-  // First worked example per tile id (a tile can have several rows; the first
-  // is a representative, runnable input set).
+  // All worked-example rows per tile id (spec-v1193). A tile can demonstrate
+  // several cases — a straight pull and an angle pull, copper and aluminum —
+  // and each is a publisher-verified, runnable input set. Row order is
+  // preserved; rows[0] is the representative example used as the run fallback.
   const examples = new Map();
   for (const row of JSON.parse(examplesRaw).rows) {
-    if (!examples.has(row.tile_id)) examples.set(row.tile_id, row);
+    const rows = examples.get(row.tile_id);
+    if (rows) rows.push(row);
+    else examples.set(row.tile_id, [row]);
   }
 
   const byId = new Map(TOOLS.map((t) => [t.id, t]));
@@ -293,7 +297,8 @@ export async function describe({ id } = {}) {
   if (!meta) throw new Error(`unknown calculator id: ${id}`);
 
   const reg = COMPUTE_MAP[id];
-  const ex = examples.get(id);
+  const exRows = examples.get(id) || [];
+  const ex = exRows[0];
   const out = {
     id, name: meta.name, group: meta.group, trades: meta.trades, desc: meta.desc,
     runnable: Boolean(reg),
@@ -314,9 +319,17 @@ export async function describe({ id } = {}) {
       out.inputs_source = "compute";
     }
   }
+  const exView = (row) => ({
+    inputs: row.inputs,
+    outputs: Object.fromEntries(Object.entries(row.outputs).map(([k, v]) => [k, v.value])),
+    source: [row.source_publisher, row.source_title, row.source_section_or_page].filter((s) => s && s !== "n/a").join(" — "),
+  });
   if (ex) {
-    out.example = { inputs: ex.inputs, outputs: Object.fromEntries(Object.entries(ex.outputs).map(([k, v]) => [k, v.value])) };
-    out.source = [ex.source_publisher, ex.source_title, ex.source_section_or_page].filter((s) => s && s !== "n/a").join(" — ");
+    // spec-v1193: the full example gallery — every case the tile's authors
+    // demonstrate — with the first row kept as `example`/`source` aliases.
+    out.examples = exRows.map(exView);
+    out.example = { inputs: ex.inputs, outputs: exView(ex).outputs };
+    out.source = exView(ex).source;
   }
   // spec-v1190: the simplified-screening banner a person sees above the inputs
   // ("Not a Manual J load calculation"), when this tile has one.
@@ -336,8 +349,8 @@ export async function run({ id, inputs } = {}) {
   let usedExample = false;
   let args = inputs;
   if (args == null || (typeof args === "object" && Object.keys(args).length === 0)) {
-    const ex = examples.get(id);
-    if (ex) { args = ex.inputs; usedExample = true; }
+    const rows = examples.get(id);
+    if (rows && rows[0]) { args = rows[0].inputs; usedExample = true; }
   }
   // spec-v1184: reject an out-of-set select value with the allowed values
   // named, rather than coercing a bad enum into a wrong number. Only enforced

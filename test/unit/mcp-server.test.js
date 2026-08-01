@@ -46,6 +46,21 @@ test("tools/list declares an object outputSchema for every tool", async () => {
   }
 });
 
+test("every tool is annotated read-only, idempotent, non-destructive, closed-world (spec-v1193)", async () => {
+  const replies = await rpc([
+    { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {} } },
+    { jsonrpc: "2.0", id: 2, method: "tools/list" },
+  ], 2);
+  for (const t of replies.get(2).result.tools) {
+    const a = t.annotations;
+    assert.ok(a, `${t.name} has annotations`);
+    assert.equal(a.readOnlyHint, true);
+    assert.equal(a.idempotentHint, true);
+    assert.equal(a.destructiveHint, false);
+    assert.equal(a.openWorldHint, false);
+  }
+});
+
 test("tools/call returns structuredContent plus a matching text fallback", async () => {
   const replies = await rpc([
     { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {} } },
