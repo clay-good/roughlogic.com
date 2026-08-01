@@ -65,16 +65,16 @@ function parseCitation(body) {
   return m ? JSON.parse(m[1]) : null;
 }
 
-// Parse the `computeXxx({ key: EXPR, ... })` call: map each compute-param key to
-// { var, coerced }. Returns null if no direct object-literal compute call found.
+// Map each compute-param key to the field variable that supplies it, by scanning
+// the whole renderer body for `key: [Number(]VAR.(select|input).value`. This is
+// the object the renderer passes to its compute (whether inline `compute({...})`,
+// a `const p = {...}` variable, or a `runInWorker({inputs}, fn)` call). The
+// pattern is specific enough that literal `fillExample({...})` default objects
+// (string/number values, not `.select.value`) never match. First mapping wins.
 function parseComputeCall(body) {
-  const call = body.match(/compute[A-Za-z0-9_]*\(\s*\{([\s\S]*?)\}\s*\)/);
-  if (!call) return null;
-  const inner = call[1];
   const map = new Map();
-  // key: [Number(]VAR.(select|input).value
-  for (const m of inner.matchAll(/([A-Za-z_$][\w$]*)\s*:\s*(Number\(\s*)?([A-Za-z_$][\w$]*)\.(select|input)\.value/g)) {
-    map.set(m[1], { var: m[3], coerced: Boolean(m[2]), accessor: m[4] });
+  for (const m of body.matchAll(/([A-Za-z_$][\w$]*)\s*:\s*(Number\(\s*)?([A-Za-z_$][\w$]*)\.(select|input)\.value/g)) {
+    if (!map.has(m[1])) map.set(m[1], { var: m[3], coerced: Boolean(m[2]), accessor: m[4] });
   }
   return map;
 }
