@@ -43,7 +43,7 @@ function checkPattern(readme, re, expected, label, errors) {
   let m, found = 0;
   while ((m = re.exec(readme))) {
     found++;
-    const n = Number(m[1]);
+    const n = Number(String(m[1]).replace(/,/g, ""));
     if (n !== expected) {
       errors.push(`README: "${m[0].replace(/\\n/g, "\\n").trim()}" states ${n}, but the live ${label} is ${expected}.`);
     }
@@ -86,6 +86,12 @@ async function main() {
   let checked = 0;
 
   checked += await checkIndexHtml(live.tiles, errors);
+
+  // AGENTS.md (spec-v1194) states the catalog size for agents landing in the
+  // repo; anchor on its labels so the numbers cannot rot.
+  const agents = await readFile(resolve(ROOT, "AGENTS.md"), "utf8");
+  checked += checkPattern(agents, /([\d,]+) calculators\*\* for/g, live.tiles, "tile count (AGENTS.md)", errors);
+  checked += checkPattern(agents, /([\d,]+) calc modules/g, live.modules, "calc-* module count (AGENTS.md)", errors);
 
   // Tile count: the /tools/ shell-diagram node and the prose "(N)".
   // ("static shells" also labels the /groups/ node, so anchor on the path.)
