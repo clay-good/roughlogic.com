@@ -3,7 +3,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { describe, run } from "../../mcp/catalog.mjs";
+import { describe, run, runMany } from "../../mcp/catalog.mjs";
 
 test("describe exposes select options for a schema-covered tile", async () => {
   const d = await describe({ id: "pull-box-sizing" });
@@ -82,6 +82,25 @@ test("describe and run expose the limitation banner for a screening tile (spec-v
 test("a tile without a limitation banner reports limitation: null", async () => {
   const d = await describe({ id: "pull-box-sizing" });
   assert.equal(d.limitation, null);
+});
+
+test("run_calculators evaluates a batch, isolating a bad item (spec-v1187)", async () => {
+  const r = await runMany({ calls: [
+    { id: "pull-box-sizing", inputs: { pull_type: "straight", largest_raceway_in: 2, other_raceways_in: 0 } },
+    { id: "no-such-tile", inputs: {} },
+    { id: "pull-box-sizing", inputs: { pull_type: "straight", largest_raceway_in: 3, other_raceways_in: 0 } },
+  ] });
+  assert.equal(r.count, 3);
+  assert.equal(r.results[0].result.governing, 16);
+  assert.match(r.results[1].error, /no-such-tile/);
+  assert.equal(r.results[2].result.governing, 24);
+});
+
+test("run_calculators rejects an over-cap batch, naming the cap", async () => {
+  await assert.rejects(
+    () => runMany({ calls: new Array(51).fill({ id: "pull-box-sizing" }) }),
+    /max 50/,
+  );
 });
 
 test("a bespoke-renderer tile degrades to compute introspection, no crash", async () => {

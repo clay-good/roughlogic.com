@@ -358,3 +358,25 @@ export async function run({ id, inputs } = {}) {
   out.limitation = getLimitationCopy(id) || null;
   return out;
 }
+
+// spec-v1187: bounded batch evaluation. The real agent tasks are plural — sweep
+// a voltage drop across wire gauges, compare two layouts, re-run at three
+// occupancy counts — each of which is a separate round-trip today. One call
+// collapses them. Total and bounded: a bad item fails that item, not the batch,
+// and the module cache is shared so a same-module sweep imports once.
+const RUN_MANY_CAP = 50;
+export async function runMany({ calls } = {}) {
+  if (!Array.isArray(calls)) throw new Error("`calls` must be an array of { id, inputs } objects.");
+  if (calls.length > RUN_MANY_CAP) {
+    throw new Error(`too many calls: ${calls.length} (max ${RUN_MANY_CAP} per run_calculators).`);
+  }
+  const results = [];
+  for (const call of calls) {
+    try {
+      results.push(await run(call || {}));
+    } catch (e) {
+      results.push({ id: call && call.id, error: e && e.message ? e.message : String(e) });
+    }
+  }
+  return { count: results.length, results };
+}

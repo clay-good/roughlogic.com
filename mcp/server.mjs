@@ -16,7 +16,7 @@
 
 import { createInterface } from "node:readline";
 import { readFileSync } from "node:fs";
-import { search, describe, run } from "./catalog.mjs";
+import { search, describe, run, runMany } from "./catalog.mjs";
 
 // Report the site's version: the server exposes the site's catalog verbatim,
 // so its version is the root package.json version, read at startup.
@@ -64,6 +64,29 @@ const TOOLS = [
       required: ["id"],
     },
   },
+  {
+    name: "run_calculators",
+    description:
+      "Evaluate up to 50 calculator calls in one request — for sweeps and comparisons (e.g. one voltage-drop across several wire gauges). Pass `calls`: an array of { id, inputs }. Each item is evaluated independently; a bad item returns { id, error } in place without failing the batch.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        calls: {
+          type: "array",
+          description: "Up to 50 { id, inputs } objects, each evaluated like run_calculator.",
+          items: {
+            type: "object",
+            properties: {
+              id: { type: "string", description: "Calculator id." },
+              inputs: { type: "object", description: "Named input values." },
+            },
+            required: ["id"],
+          },
+        },
+      },
+      required: ["calls"],
+    },
+  },
 ];
 
 async function dispatchTool(name, args) {
@@ -71,6 +94,7 @@ async function dispatchTool(name, args) {
     case "search_calculators": return search(args || {});
     case "describe_calculator": return describe(args || {});
     case "run_calculator": return run(args || {});
+    case "run_calculators": return runMany(args || {});
     default: throw new Error(`unknown tool: ${name}`);
   }
 }

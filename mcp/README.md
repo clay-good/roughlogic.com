@@ -10,14 +10,15 @@ step, no dependencies beyond Node 18+.
 
 ## Tools
 
-The catalog is exposed as three meta-tools (not one tool per calculator, which
+The catalog is exposed as four meta-tools (not one tool per calculator, which
 would overwhelm a client's tool list):
 
 | Tool | Purpose |
 | --- | --- |
 | `search_calculators` | Find calculators by keyword and/or trade. Call with no arguments for a trade overview with counts. |
-| `describe_calculator` | Input fields (with defaults), a publisher-verified worked example, and the cited source for one calculator. |
-| `run_calculator` | Evaluate a calculator with your own inputs. With no inputs, the worked example is run. |
+| `describe_calculator` | Input fields with labels, select options, units, and min/max; the outputs; a publisher-verified worked example; the cited source; and any limitation banner. |
+| `run_calculator` | Evaluate a calculator with your own inputs. Returns the raw result plus rendered outputs (units + display strings), range warnings, and the limitation banner. With no inputs, the worked example is run. |
+| `run_calculators` | Evaluate up to 50 `{ id, inputs }` calls in one request — for sweeps and comparisons. A bad item returns `{ id, error }` without failing the batch. |
 
 Typical flow: `search_calculators({query:"voltage drop", trade:"electrical"})`
 → `describe_calculator({id:"voltage-drop"})` → `run_calculator({id:"voltage-drop",
