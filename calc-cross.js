@@ -3363,7 +3363,7 @@ CROSS_RENDERERS["silica-table-1"] = _simpleRendererG({
 // OSHA then puts a factor on top: 1926.502(d)(8) requires a horizontal lifeline to maintain a
 // safety factor of at least two, and (d)(15) wants an anchorage good for 5,000 lb per employee
 // unless the whole system is engineered to that factor of two by a qualified person.
-// dims: in { span_ft: L, sag_ft: L, arrest_force_lb: F, workers: dimensionless } out: { cable_tension_lb: F, horizontal_pull_lb: F, anchorage_demand_lb: F, sag_for_target_ft: L }
+// dims: in { span_ft: L, sag_ft: L, arrest_force_lb: M L T^-2, workers: dimensionless } out: { cable_tension_lb: M L T^-2, horizontal_pull_lb: M L T^-2, anchorage_demand_lb: M L T^-2, sag_for_target_ft: L }
 export function computeLifelineTension({ span_ft = 0, sag_ft = 0, arrest_force_lb = 1800, workers = 1, safety_factor = 2, anchorage_capacity_lb = 0, target_tension_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(span_ft) || 0;

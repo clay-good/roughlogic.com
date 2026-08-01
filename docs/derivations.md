@@ -1567,7 +1567,12 @@ cross-check.
 | calc-concrete.js | `computeSlabDowelSchedule` | `{ joint_length_ft = 40, slab_thickness_in = 6, dowel_spacing_in = 12, edge_cl...` | _ | _ | _ |
 | calc-concrete.js | `computeTBeamEffectiveFlangeWidth` | `{ bw_in = 0, hf_in = 0, ln_in = 0, sw_in = 0, beam_type = "interior" } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAbrasiveBlast` | `{ nozzle_bore_in, pressure_psi = 100, area_ft2, lb_per_ft2 = 8 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeAccessibleParkingCount` | `{ total_spaces = 0, facility_count = 1, provided_accessible = 0, provided_van...` | _ | _ | _ |
+| calc-construction.js | `computeAccessibleParkingGeometry` | `{ space_type = "van", space_width_in = 0, aisle_width_in = 0, space_length_in...` | _ | _ | _ |
+| calc-construction.js | `computeAccessibleRouteWidth` | `{ clear_width_in = 0, pinch_present = "no", pinch_width_in = 0, pinch_length_...` | _ | _ | _ |
+| calc-construction.js | `computeAccessibleShowerCheck` | `{ shower_type = "transfer", width_in = 0, depth_in = 0, entry_width_in = 0, c...` | _ | _ | _ |
 | calc-construction.js | `computeAdaRampSlope` | `{ rise_in = 0, slope_ratio = 12, landing_in = 60 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeAdaStairCheck` | `{ riser_height_in = 0, tread_depth_in = 0, total_rise_in = 0, open_risers = "...` | _ | _ | _ |
 | calc-construction.js | `computeAdvanceWarningSignSpacing` | `{ road_type = "rural", sign_count = 3, speed_mph = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAggregate` | `{ area_ft2 = 0, depth_in = 0, material = "crushed_stone" }` | _ | _ | _ |
 | calc-construction.js | `computeAllowableArea` | `{ tabular_area = 0, ns_area = 0, frontage_ft = 0, perimeter_ft = 0, open_widt...` | _ | _ | _ |
@@ -1616,8 +1621,10 @@ cross-check.
 | calc-construction.js | `computeDeckBeamPost` | `{ joist_span_ft = 0, beam_span_ft = 0, post_height_ft = 8, live_load_psf = 40...` | _ | _ | _ |
 | calc-construction.js | `computeDeckLedgerFasteners` | `{ joist_span_ft = 0, spacing_in = 0, ledger_length_ft = 0, fastener = "lag" }...` | _ | _ | _ |
 | calc-construction.js | `computeDemoDebris` | `{ structure_type = "wood_frame", volume_yd3 = 0 }` | _ | _ | _ |
+| calc-construction.js | `computeDoorClearWidth` | `{ leaf_width_in = 0, door_thickness_in = 1.75, measured_clear_width_in = 0, o...` | _ | _ | _ |
 | calc-construction.js | `computeDoorManeuveringClearance` | `{ clear_perpendicular_in = 0, clear_latch_side_in = 0, door_clear_width_in = ...` | _ | _ | _ |
 | calc-construction.js | `computeDrainageBoardTakeoff` | `{ perimeter_ft = 150, below_grade_height_ft = 8, roll_width_ft = 4, roll_leng...` | _ | _ | _ |
+| calc-construction.js | `computeDrinkingFountainCheck` | `{ units_provided = 0, bi_level = "no", wheelchair_spout_in = 0, standing_spou...` | _ | _ | _ |
 | calc-construction.js | `computeDryerDuctLength` | `{ straight_run_ft = 0, elbow_90_count = 0, elbow_45_count = 0, eq_len_90_ft =...` | _ | _ | _ |
 | calc-construction.js | `computeDrywall` | `{ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_size = "4x8", waste_percent ...` | _ | _ | _ |
 | calc-construction.js | `computeDrywallFastenerTakeoff` | `{ sheets = 100, sheet_length_ft = 8, sheet_width_ft = 4, stud_spacing_in = 16...` | _ | _ | _ |
@@ -1637,6 +1644,8 @@ cross-check.
 | calc-construction.js | `computeFenceEstimate` | `{ length_ft = 0, post_spacing_ft = 8, rails_per_section = 2, picket_width_in ...` | _ | _ | _ |
 | calc-construction.js | `computeFilletWeldStrength` | `{ mode = "capacity-from-size", leg_in = 0, length_in = 0, electrode = "E70", ...` | _ | _ | _ |
 | calc-construction.js | `computeFlammableCabinetStorage` | `{ cat123_gallons = 0, cat4_gallons = 0, cabinets_available = 0, per_cabinet_c...` | _ | _ | _ |
+| calc-construction.js | `computeFloodOpeningArea` | `{ enclosed_area_sf = 0, opening_type = "non-engineered", net_free_area_per_op...` | _ | _ | _ |
+| calc-construction.js | `computeFloorLevelChange` | `{ level_change_in = 0, bevel_run_in = 0, carpet_pile_in = 0, opening_size_in ...` | _ | _ | _ |
 | calc-construction.js | `computeFootingArea` | `{ column_load_lb, soil_class, applied_moment_lbft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeFormworkMemberSpacing` | `{ pressure_psf = 0, tributary_in = 12, width_b_in = 1.5, depth_d_in = 3.5, fb...` | _ | _ | _ |
 | calc-construction.js | `computeFormworkPressure` | `{ pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", un...` | _ | _ | _ |
@@ -1646,6 +1655,7 @@ cross-check.
 | calc-construction.js | `computeGlulamVolumeFactor` | `{ span_ft = 0, depth_in = 0, width_in = 0, x = 10, kl = 1.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeGuardHandrailCheck` | `{ occupancy = "residential", surface_height_in = 0, measured_guard_in = 0, me...` | _ | _ | _ |
 | calc-construction.js | `computeGuardPostLoad` | `{ post_height_in = 36, post_spacing_ft = 6, concentrated_lb = 200, uniform_pl...` | _ | _ | _ |
+| calc-construction.js | `computeHandrailGeometry` | `{ rail_height_in = 0, clearance_in = 0, grip_shape = "circular", diameter_in ...` | _ | _ | _ |
 | calc-construction.js | `computeHeaderSizing` | `{ header_span_ft = 0, tributary_width_ft = 0, floors_above = 0, ground_snow_p...` | _ | _ | _ |
 | calc-construction.js | `computeHelicalPile` | `{ shaft = "1.5_inch_solid", torque_ft_lb = 0, factor_of_safety = 2.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeHelicalPileTorque` | `{ shaft = "1.5_inch_solid", target_capacity_lb = 0, capacity_basis = "allowab...` | _ | _ | _ |
@@ -1660,7 +1670,9 @@ cross-check.
 | calc-construction.js | `computeJoistDeflection` | `{ uniform_load_plf, span_ft, E_psi, I_in4 }` | _ | _ | _ |
 | calc-construction.js | `computeJoistHangerCount` | `{ run_width_ft = 16, spacing_in = 16, ends_per_joist = 2, nails_per_hanger = ...` | _ | _ | _ |
 | calc-construction.js | `computeJoistNotchBoreLimit` | `{ joist_depth_in = 9.25 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeKneeToeClearance` | `{ apron_height_in = 0, knee_depth_at_9_in = 0, knee_depth_at_27_in = 0, toe_d...` | _ | _ | _ |
 | calc-construction.js | `computeLandingCheck` | `{ landing_depth_in = 0, landing_width_in = 0, flight_width_in = 36, threshold...` | _ | _ | _ |
+| calc-construction.js | `computeLavatoryTubClearance` | `{ rim_height_in = 0, counter_height_in = 0, metering_seconds = 0, tub_length_...` | _ | _ | _ |
 | calc-construction.js | `computeLayoutSquaring` | `{ mode, side_a, side_b, diag1, diag2 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeLumberSpan` | `{ species_grade, nominal_size, total_load_psf, tributary_width_in = 16, defle...` | _ | _ | _ |
 | calc-construction.js | `computeMasonryControlJointLayout` | `{ wall_length_ft = 80, wall_height_ft = 16, max_spacing_cap_ft = 25 } = {}` | _ | _ | _ |
@@ -1687,10 +1699,13 @@ cross-check.
 | calc-construction.js | `computePolymericSandBags` | `{ area_sf = 400, coverage_per_bag_sf = 75, waste_pct = 5 } = {}` | _ | _ | _ |
 | calc-construction.js | `computePostHoleConcrete` | `{ num_posts = 0, hole_diameter_in = 0, hole_depth_in = 0, post_side_in = 0, b...` | _ | _ | _ |
 | calc-construction.js | `computePoweredAtticVentilator` | `{ attic_area_ft2 = 0, cfm_per_ft2 = 0.7, dark_roof = "no" } = {}` | _ | _ | _ |
+| calc-construction.js | `computeProtrudingObject` | `{ mounting = "wall", leading_edge_height_in = 0, projection_in = 0, corridor_...` | _ | _ | _ |
 | calc-construction.js | `computePullout` | `{ fastener_type, fastener_size, species, penetration_in }` | _ | _ | _ |
 | calc-construction.js | `computeRafter` | `{ horizontal_span_ft, pitch_rise_per_12, overhang_ft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeRainLoadPonding` | `{ static_head_in = 0, hydraulic_head_in = 0, roof_area_ft2 = 0, rainfall_in_h...` | _ | _ | _ |
 | calc-construction.js | `computeRainOnSnowSurcharge` | `{ pf_psf = 0, pg_psf = 0, slope_deg = 0, eave_to_ridge_ft = 0, surcharge_psf ...` | _ | _ | _ |
+| calc-construction.js | `computeRampDetailCheck` | `{ cross_slope_ratio = 48, clear_width_in = 0, handrails = "yes", handrail_int...` | _ | _ | _ |
+| calc-construction.js | `computeReachRange` | `{ approach = "forward", obstructed = "yes", obstruction_depth_in = 0, obstruc...` | _ | _ | _ |
 | calc-construction.js | `computeReadyMixConcreteOrder` | `{ volume_yd3 = 0, waste_pct = 8, load_yd3 = 10, min_yd3 = 10, price_per_yd3 =...` | _ | _ | _ |
 | calc-construction.js | `computeRebar` | `{ length_ft, width_ft, spacing_in, edge_clearance_in = 3, bar_size = "#4" }` | _ | _ | _ |
 | calc-construction.js | `computeRebarChairCount` | `{ slab_area_sf = 1000, support_spacing_ft = 4, waste_pct = 5 } = {}` | _ | _ | _ |
@@ -1730,6 +1745,7 @@ cross-check.
 | calc-construction.js | `computeShotcreteReboundQuantity` | `{ area_sf = 0, thickness_in = 0, rebound_pct = 20 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSidingCourseLayout` | `{ wall_height_ft = 0, wall_length_ft = 0, target_exposure_in = 7, board_heigh...` | _ | _ | _ |
 | calc-construction.js | `computeSidingTakeoff` | `{ wall_area_sf = 2000, opening_area_sf = 0, waste_pct = 12, exposure_in = 4 }...` | _ | _ | _ |
+| calc-construction.js | `computeSignCharacterHeight` | `{ baseline_height_in = 0, viewing_distance_in = 0, provided_character_height_...` | _ | _ | _ |
 | calc-construction.js | `computeSillPlateAnchorCount` | `{ wall_length_ft = 40, max_spacing_ft = 6, end_distance_in = 9 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSlidingSnowLoad` | `{ pf_upper_psf = 0, eave_ridge_ft = 0, lower_width_ft = 15 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSmokeAlarmPlacement` | `{ sleeping_rooms = 0, sleeping_areas = 1, additional_stories = 0, alarm_type ...` | _ | _ | _ |
@@ -1747,7 +1763,9 @@ cross-check.
 | calc-construction.js | `computeStripingPaintQuantity` | `{ length_ft = 5280, width_in = 4, coverage_sf_per_gal = 320, bead_rate_lb_per...` | _ | _ | _ |
 | calc-construction.js | `computeStuccoCoverage` | `{ area_sf = 1000, total_thickness_in = 0.875, bag_yield_sf_in = 10.1, waste_p...` | _ | _ | _ |
 | calc-construction.js | `computeStudNotchBoreLimit` | `{ stud_width_in = 5.5 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeSubstantialImprovement` | `{ market_value = 0, improvement_cost = 0, prior_costs = 0, threshold_pct = 50...` | _ | _ | _ |
 | calc-construction.js | `computeSuspendedCeilingGrid` | `{ room_length_ft = 24, room_width_ft = 40 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeTactileSignMounting` | `{ lowest_baseline_in = 0, tactile_block_height_in = 0, sign_position = "latch...` | _ | _ | _ |
 | calc-construction.js | `computeTaperedRoofInsulation` | `{ run_ft = 40, slope_in_per_ft = 0.25, start_thk_in = 0.5, area_sf = 2000, r_...` | _ | _ | _ |
 | calc-construction.js | `computeTemporaryStairwayCheck` | `{ riser_count = 0, total_rise_in = 0, riser_height_in = 0, tread_depth_in = 0...` | _ | _ | _ |
 | calc-construction.js | `computeThermalStressMaxDeltaT` | `{ allowable_stress_psi = 0, E_psi = 0, alpha = 0, restraint = 1 } = {}` | _ | _ | _ |
@@ -1755,10 +1773,12 @@ cross-check.
 | calc-construction.js | `computeTileCount` | `{ area_ft2, tile_width_in, tile_height_in, grout_joint_width_in = 0.125, tile...` | _ | _ | _ |
 | calc-construction.js | `computeTrafficTaperLength` | `{ offset_width_ft = 12, speed_mph = 55, device_spacing_ft = 40 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeTrimLinearFootage` | `{ perimeter_ft = 0, openings_ft = 0, waste_pct = 10, stock_len_ft = 16, sprin...` | _ | _ | _ |
+| calc-construction.js | `computeTurningAndClearFloorSpace` | `{ cfs_width_in = 0, cfs_depth_in = 0, approach = "forward", alcove_depth_in =...` | _ | _ | _ |
 | calc-construction.js | `computeVaporBarrierRolls` | `{ area_sf = 3000, roll_coverage_sf = 1000, overlap_waste_pct = 10, roll_width...` | _ | _ | _ |
 | calc-construction.js | `computeWallBracingLength` | `{ wall_line_length_ft = 0, bracing_percent = 0, provided_length_ft = 0, metho...` | _ | _ | _ |
 | calc-construction.js | `computeWallpaperRolls` | `{ perimeter_in = 0, height_in = 0, roll_width_in = 0, roll_len_in = 0, repeat...` | _ | _ | _ |
 | calc-construction.js | `computeWaterCementRatio` | `{ water_lb = 0, cement_lb = 0, scm_lb = 0, exposure_class = "none" } = {}` | _ | _ | _ |
+| calc-construction.js | `computeWaterClosetLocation` | `{ centerline_in = 0, seat_height_in = 0, clear_side_in = 0, clear_rear_in = 0...` | _ | _ | _ |
 | calc-construction.js | `computeWeldHeatInput` | `{ process, voltage_V, current_A, travel_in_min, efficiency, wps_min_kj_in, wp...` | _ | _ | _ |
 | calc-construction.js | `computeWeldUsage` | `{ process = "GMAW", weld_cross_section_in2 = 0, weld_length_in = 0, depositio...` | _ | _ | _ |
 | calc-construction.js | `computeWeldedWireMesh` | `{ slab_area_sf = 0, sheet_width_ft = 5, sheet_length_ft = 10, side_lap_in = 6...` | _ | _ | _ |
@@ -1806,9 +1826,11 @@ cross-check.
 | calc-cross.js | `computeGearCascade` | `{ stages = [], input_rpm = 0, input_torque = 0, efficiency = 0.97, } = {}` | _ | _ | _ |
 | calc-cross.js | `computeGeometry` | `{ shape, ...args }` | _ | _ | _ |
 | calc-cross.js | `computeHaversineDistance` | `{ lat1, lon1, lat2, lon2 }` | _ | _ | _ |
+| calc-cross.js | `computeHearingProtectorNrr` | `{ twa_db = 0, weighting = "A", nrr_db = 0, method = "appendix-b", dual_protec...` | _ | _ | _ |
 | calc-cross.js | `computeHeatStress` | `{ T_F = 0, RH_percent = 0, solar = false }` | _ | _ | _ |
 | calc-cross.js | `computeHydraulicCylinder` | `{ bore_in = 0, rod_in = 0, pressure_psi = 0, flow_gpm = 0, direction = "exten...` | _ | _ | _ |
 | calc-cross.js | `computeLadderAngle` | `{ ladder_length_ft = 0, working_height_ft = 0 }` | _ | _ | _ |
+| calc-cross.js | `computeLifelineTension` | `{ span_ft = 0, sag_ft = 0, arrest_force_lb = 1800, workers = 1, safety_factor...` | _ | _ | _ |
 | calc-cross.js | `computeLinearInterpolation` | `{ x1 = 0, y1 = 0, x2 = 0, y2 = 0, x = 0 } = {}` | _ | _ | _ |
 | calc-cross.js | `computeLoanPayment` | `{ principal, apr_percent, term_months }` | _ | _ | _ |
 | calc-cross.js | `computeMarkup` | `{ cost, mode, value }` | _ | _ | _ |
@@ -1826,6 +1848,7 @@ cross-check.
 | calc-cross.js | `computeRampSlope` | `{ rise_in = 0, run_in = 0 }` | _ | _ | _ |
 | calc-cross.js | `computeRollingOffset` | `{ rise_in, roll_in, angle_deg }` | _ | _ | _ |
 | calc-cross.js | `computeSalesTax` | `{ state, subtotal, custom_rate_percent = null }` | _ | _ | _ |
+| calc-cross.js | `computeSilicaTable1` | `{ task = "xi", location = "outdoors", hours_per_shift = 0, controls_fully_imp...` | _ | _ | _ |
 | calc-cross.js | `computeSlopeFromLevel` | `{ value, from }` | _ | _ | _ |
 | calc-cross.js | `computeSwingFallGeometry` | `{ horizontal_offset_ft = 0, anchor_height_ft = 0, base_required_clearance_ft ...` | _ | _ | _ |
 | calc-cross.js | `computeTankVolume` | `{ orientation = "horizontal", linear_unit = "in", diameter = 0, length = 0, d...` | _ | _ | _ |
@@ -2505,6 +2528,7 @@ cross-check.
 | calc-masonry.js | `computeMasonryAnchorBolt` | `{ fm_psi = 1500, lbe_in = 0, ab_in2 = 0, fy_psi = 36000 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryAnchorEmbedment` | `{ required_tension_lb = 0, fm_psi = 1500, ab_in2 = 0.442, fy_psi = 36000 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryJointReinforcement` | `{ wall_length_ft = 40, wall_height_ft = 12, vertical_spacing_in = 16, piece_l...` | _ | _ | _ |
+| calc-masonry.js | `computeMasonryLimitedAccessZone` | `{ wall_height_ft = 0, wall_length_ft = 0, zone_width_provided_ft = 0, zone_ru...` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryLintelBearing` | `{ clear_span_ft = 0, lintel_depth_in = 8, support_center_ft = 0, udl_plf = 0,...` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryLintelLoading` | `{ span_ft = 0, wall_psf = 0, wall_h_above = 0 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryPrismFm` | `{ unit_type = "concrete", unit_strength_psi = 2000, mortar_type = "ms" } = {}` | _ | _ | _ |
@@ -2618,6 +2642,7 @@ cross-check.
 | calc-pipefit.js | `computeSteamPrvNapier` | `{ orifice_area_in2 = 0, upstream_p_psia = 0, downstream_p_psia = 0, discharge...` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamTrapSizing` | `{ heat_duty_btuhr = 0, hfg_btulb = 0, safety_factor = 2 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeAavInstallCheck` | `{ height_above_drain_in = 0, height_above_insulation_in = 0, has_outdoor_vent...` | _ | _ | _ |
+| calc-plumbing.js | `computeAccessibleToiletCompartment` | `{ compartment_count = 0, urinal_count = 0, water_closet_count = 0, wheelchair...` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflow` | `` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflowLoss` | `{ device_class = "RP", flow_gpm = 0, pipe_size_in = "1" }` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflowSizing` | `{ service_flow_gpm = 0, hazard = "high", assembly_type = "RP", pipe_size_in =...` | _ | _ | _ |
@@ -3037,6 +3062,7 @@ cross-check.
 | calc-steel.js | `computeRequiredSectionModulus` | `{ fy = 50, moment_kipft = 0, method = "lrfd" } = {}` | _ | _ | _ |
 | calc-steel.js | `computeShearStudStrength` | `{ asc_in2 = 0, fc_psi = 4000, ec_psi = 0, fu_ksi = 65, rg = 1.0, rp = 0.75, v...` | _ | _ | _ |
 | calc-steel.js | `computeSlipCriticalWithTension` | `{ mu = 0.30, tb_kip = 0, ns = 1, n = 1, hf = 1.0, du = 1.13, applied_tension_...` | _ | _ | _ |
+| calc-steel.js | `computeStaggeredNetWidth` | `{ plate_width_in = 0, thickness_in = 0, bolt_dia_in = 0, hole_allowance_in = ...` | _ | _ | _ |
 | calc-steel.js | `computeSteelBeamFlexure` | `{ fy = 50, zx = 0, mu = 0 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelBeamLtb` | `{ fy = 50, zx = 0, sx = 0, ry = 0, rts = 0, j = 0, ho = 0, lb_ft = 0, cb = 1....` | _ | _ | _ |
 | calc-steel.js | `computeSteelBeamShear` | `{ fy = 50, d = 0, tw = 0, cv1 = 1.0, omega_v = 1.50, vu = 0 } = {}` | _ | _ | _ |
@@ -3202,7 +3228,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1788.
+Row count: 1814.
 
 <!-- END function-corpus-v14 -->
 
@@ -3487,11 +3513,12 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (128 tiles)
+### Group B Plumbing (129 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `aav-install-check` | Air Admittance Valve Installation Check (IPC 918) | International Code Council; 'Individual and branch-type air admittance valves shall b... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `accessible-toilet-compartment` | Accessible Toilet Compartment Sizing (2010 ADA Standards 604.8) | US Department of Justice / US Access ...; 213.3.1 triggers the ambulatory compartment where six or ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `asme-shell-thickness` | ASME UG-27 Shell Thickness (Joint Efficiency and Corrosion) | ASME BPVC VIII-1 UG-27; P 150 psig, R 24 in, S 17,500 psi, E 0.85, CA 0.0625 -> S... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `backflow` | Backflow Reference | IPC 2024 + project bundled backflow-p...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `backflow-loss` | Backflow Preventer Pressure Loss | Watts Regulator; 1 in RP at 30 gpm -> ~8.5 psi typical loss across the ass... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3828,12 +3855,17 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (416 tiles)
+### Group E Construction (438 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `abrasive-blast` | Abrasive Blast Air and Abrasive Consumption | SSPC / AMPP SP specs / nozzle manufac...; 3/8 in nozzle at 100 psi, 3,000 ft^2 at 8 lb/ft^2 -> 283 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `accessible-parking-count` | Accessible Parking Space Count (2010 ADA Standards 208.2) | US Department of Justice / US Access ...; Table 208.2 row '76 to 100' gives 4. Section 208.2.4: 'Fo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `accessible-parking-geometry` | Accessible Parking Space Geometry (2010 ADA Standards 502) | US Department of Justice / US Access ...; 502.2: 'Car parking spaces shall be 96 inches wide minimu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `accessible-route-width` | Accessible Route Width, Pinch Points, and Passing Spaces (2010 ADA Standards 403.5) | US Department of Justice / US Access ...; 403.5.1 Exception: 'The clear width shall be permitted to... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `accessible-shower-check` | Accessible Shower Compartment Types (2010 ADA Standards 608.2) | US Department of Justice / US Access ...; 608.2.2 requires a standard roll-in compartment '30 inche... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ada-ramp-slope` | ADA Ramp Slope, Runs, and Landings (IBC 1012 / ADA) | IBC 1012 / ADA; spec-v474 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `ada-stair-check` | ADA Stair Treads and Risers (2010 ADA Standards 504) | US Department of Justice / US Access ...; 504.2: 'Risers shall be 4 inches high minimum and 7 inche... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `advance-warning-sign-spacing` | Work Zone Advance Warning Sign Spacing (MUTCD 6C-1) | FHWA MUTCD; rural 500/500/500 -> signs at 500, 1,000, and 1,500 ft up... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `aggregate` | Aggregate / Gravel Cubic Yards | Project (first-principles); volume = 1000 * 4/12 = 333.33 ft^3; cubic_yards = 333.33/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `allowable-area` | Allowable Building Area per Story (IBC Chapter 5) | IBC 2021 §506.2 / §506.3 and Table 506.2; spec-v251 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3941,9 +3973,11 @@ per spec-v14 §13.1 second paragraph.
 | `dewatering-rate` | Excavation Dewatering Pump Rate | First-principles volume / pumping rate; 20 x 12 pit, draw 3 ft in 30 min, inflow 40 gpm, 25% marg... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `diaphragm-collector-force` | Collector / Drag Strut Axial Force (ASCE 7 12.10) | ASCE 7-22 Section 12.10 (collectors a...; 300 plf dragged 40 ft -> 12000 lb; Omega0 2.5 -> 30000 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `diaphragm-shear` | Wood Diaphragm Unit Shear and Chord Force (SDPWS) | AWC SDPWS flexible-diaphragm model (A...; spec-v272 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `door-clear-width` | Door Clear Width, Thresholds, and Doors in Series (2010 ADA Standards 404.2) | US Department of Justice / US Access ...; 404.2.3: 'Door openings shall provide a clear width of 32... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `door-maneuvering-clearance` | Door Maneuvering Clearance, Front Approach (ADA 404.2.4.1) | US Access Board / Department of Justice; 'Maneuvering space on the pull side extends 18 inches min... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dozer-production` | Dozer Slot / Blade Production Rate | Caterpillar Performance Handbook slot...; 8 lcy blade, 100 ft push at 200 fpm, return 400 fpm, 0.05... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drainage-board-takeoff` | Foundation Drainage Board (Dimple Mat) Takeoff | Foundation drainage board (dimple mat...; area = 150 x 8 = 1,200 sf; rolls = ceil(1200 x 1.1 / 200)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `drinking-fountain-check` | Drinking Fountain Heights and Count (2010 ADA Standards 211, 602) | US Department of Justice / US Access ...; 602.4 puts the wheelchair spout outlet at 36 in MAXIMUM a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drip-edge-takeoff` | Roof Drip Edge Rake / Eave Split and Piece Count | roof takeoff geometry; 80 ft of eave plus four 14-ft rakes at 6:12 -> slope fact... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dryer-duct-length` | Dryer Exhaust Duct Developed Length (IRC M1502.4.5) | International Code Council; 'The maximum length of the exhaust duct shall be 35 feet ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drywall` | Drywall Sheet Count and Mud | Project (first-principles); sheets = ceil(1.10 * 1800 / 32) = 62; mud = 0.053 * 1800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3973,6 +4007,8 @@ per spec-v14 §13.1 second paragraph.
 | `fireplace-flue-area` | Masonry Fireplace Flue Area (IRC R1003.15.1) | International Code Council; 'Square chimney flues shall have a minimum net cross-sect... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flammable-cabinet-storage` | Flammable Liquid Cabinet Storage (OSHA 1926.152(b)) | Occupational Safety and Health Admini...; 'Not more than 60 gallons of Category 1, 2 and/or 3 flamm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flexible-pipe-deflection` | Buried Flexible Pipe Deflection (Modified Iowa) | Modified Iowa (Spangler) deflection f...; Wc = 12*120/144 = 10 psi; deflection = 1.5*0.1*10/(0.149*... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `flood-opening-area` | NFIP Flood Opening Area (44 CFR 60.3) | Federal Emergency Management Agency; 'A minimum of two openings having a total net area of not... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `floor-level-change` | Changes in Level and Floor Surfaces (2010 ADA Standards 302, 303) | US Department of Justice / US Access ...; 303.3: 'Changes in level between 1/4 inch high minimum an... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flooring-takeoff` | Resilient / LVP Flooring Takeoff | Published flooring waste rules of thu...; spec-v95 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `footing-area` | Footing Area for Soil Bearing | Project (first-principles); ASCE 7 / IRC R401 conceptual basis; bundled allowable bea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `footing-eccentric-pressure` | Eccentric Footing Bearing Pressure and Kern Check | Eccentric footing bearing pressure (k...; spec-v309 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3991,6 +4027,7 @@ per spec-v14 §13.1 second paragraph.
 | `guard-post-load` | Guard Post Load and Base Connection | International Code Council; 'Handrails and guards shall be designed to resist a linea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gutter-downspout` | Gutter and Downspout Sizing | SMACNA / standard residential gutter ...; spec-v98 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gutter-downspout-takeoff` | Gutter LF and Downspout Count Takeoff | Gutter takeoff identity (first-princi...; downspouts=ceil(2400/800)=3; pipe=3*10=30; hangers=ceil(1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `handrail-geometry` | Handrail Height, Grip, and Extensions (2010 ADA Standards 505) | US Department of Justice / US Access ...; 505.7.1: 'Handrail gripping surfaces with a circular cros... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `haul-cycle-production` | Haul-Cycle Production and Fleet Match | Caterpillar Performance Handbook cycl...; 12 lcy truck, load 2.0, haul 8.0, dump 1.5, return 6.0, s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `haul-road-resistance` | Haul-Road Total Resistance and Required Rimpull | Haul-road resistance identity (first-...; total = 5+4 = 9%; rimpull = 0.09*150000 = 13,500 lb; per ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hdd-pullback` | HDD Pullback Force First-Order Estimate | Simplified HDD pullback identity (AST...; pullback = 0.3*5*800*1.5 = 1,800 lb; utilization = 1800/2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4011,8 +4048,10 @@ per spec-v14 §13.1 second paragraph.
 | `joist-deflection` | Joist Mid-Span Deflection | Project (first-principles); 50 plf / 12 ft span / E 1.6e6 psi / I 47.6 in^4 (typical ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `joist-hanger-count` | Joist Hanger and Connector-Nail Count | Joist-hanger count identity (first-pr...; joists = ceil(16*12/16)+1 = 13; hangers = 13*2 = 26; nail... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `joist-notch-bore-limit` | Floor Joist Notching and Boring Limits (IRC R502.8.1) | floor joist notch/bore limits (IRC R5...; end = 9.25/4 = 2.3125; depth = 9.25/6 = 1.5417; length = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `knee-toe-clearance` | Knee and Toe Clearance (2010 ADA Standards 306) | US Department of Justice / US Access ...; 306.3.1: 'Space under an element between 9 inches and 27 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `landing-check` | Stairway and Exterior-Door Landing Check | International Code Council; 'Landings shall have a dimension of not less than 36 inch... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lateral-earth-pressure` | Lateral Earth Pressure and Thrust (Rankine) | Rankine (1857) as compiled in Das / N...; spec-v261 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `lavatory-tub-clearance` | Lavatory Height and Bathtub Clearance (2010 ADA Standards 606, 607) | US Department of Justice / US Access ...; 606.3: 'Lavatories and sinks shall be installed with the ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `layout-squaring` | Layout Squaring (3-4-5) | Pythagorean 3-4-5 method (public); sides 3 and 4 -> diagonal 5 exactly (the 3-4-5 right tria... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `liquefaction-screening` | Liquefaction Triggering Screening (Seed-Idriss CSR) | Seed-Idriss; spec-v416 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `loader-production` | Wheel-Loader / Excavator Bucket Production Rate | Caterpillar Performance Handbook cycl...; 3.5 lcy bucket, 0.95 fill, 0.50 min cycle, 50-min hour, 8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4023,6 +4062,7 @@ per spec-v14 §13.1 second paragraph.
 | `masonry-count` | Brick and CMU Count | Project (first-principles face-area c...; 100 ft^2 wall / CMU 8x8x16 (15.625x7.625 actual) / 3/8 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `masonry-coursing` | Masonry Coursing and Course-Out Check | BIA Technical Notes / NCMA TEK; spec-v213 section 2.1 pinned example (CMU wall on module) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-joint-reinforcement` | Masonry Horizontal Joint-Reinforcement Takeoff (IRC R606.12.2) | masonry joint-reinforcement takeoff (...; courses = ceil(144/16) = 9; per course = ceil(40/10) = 4;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `masonry-limited-access-zone` | Masonry Limited Access Zone and Bracing (OSHA 1926.706) | Occupational Safety and Health Admini...; 'The limited access zone shall be equal to the height of ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-lintel-bearing` | Masonry Lintel Bearing Length (TMS 402) | TMS 402 (MSJC); 6-ft clear span, 8-in lintel, 500 plf, 7.625-in bearing w... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-lintel-loading` | Masonry Lintel Arching Load (Triangular Load Over an Opening) | masonry design method; spec-v370 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-prism-fm` | Masonry Compressive Strength f'm, Unit-Strength Method (TMS 602 Table 2) | TMS 602-16 (ACI 530.1 / ASCE 6) Table...; spec-v551 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4060,9 +4100,11 @@ per spec-v14 §13.1 second paragraph.
 | `powered-attic-ventilator` | Powered Attic Ventilator Sizing | attic-fan sizing practice; spec-v467 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `press-brake-max-thickness` | Press-Brake Max Bendable Thickness | Press-brake air-bend tonnage chart + ...; 100 tons, V 0.5 in, L 4 ft, mild steel -> 0.1474 in max t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `press-brake-tonnage` | Press-Brake Air-Bend Tonnage | Press-brake air-bend tonnage chart + ...; T 0.125 in, L 4 ft, V 1 in, mild steel -> 8.9844 tons/ft,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `protruding-object-check` | Protruding Objects and Headroom (2010 ADA Standards 307) | US Department of Justice / US Access ...; 307.2: 'Objects with leading edges more than 27 inches an... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rafter` | Rafter Length | Project (first-principles); Pythagoras on rise / 12 run with overhang | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rain-load-ponding` | Roof Rain Load and Secondary-Drainage Flow (ASCE 7 Ch. 8) | ASCE 7 Ch. 8 + IPC drainage; spec-v224 section 2.1 pinned example (typical scupper) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rain-on-snow-surcharge` | Rain-on-Snow Surcharge (ASCE 7-22 7.10) | ASCE 7-22 §7.10; spec-v468 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `ramp-detail-check` | Ramp Cross Slope, Width, and Edge Protection (2010 ADA Standards 405) | US Department of Justice / US Access ...; 405.5: 'The clear width of a ramp run and, where handrail... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-beam-flexure` | Reinforced Concrete Beam Flexural Capacity (ACI 318-19) | ACI 318-19 (Building Code Requirement...; spec-v257 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-beam-shear` | Reinforced Concrete Beam Shear and Stirrup Spacing (ACI 318-19) | ACI 318-19 (Building Code Requirement...; spec-v258 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-column-axial` | RC Tied Column Axial Capacity (ACI 318-19 22.4) | ACI 318-19 22.4.2 / 22.4.2.1; spec-v284 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4079,6 +4121,7 @@ per spec-v14 §13.1 second paragraph.
 | `rc-slab-min-thickness` | One-Way Slab / Beam Minimum Thickness for Deflection (ACI 318-19) | ACI 318-19 Table 7.3.1.1 / 9.3.1.1; spec-v299 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-slender-column-magnify` | Slender Column Moment Magnifier, Nonsway (ACI 318-19 6.6.4) | ACI 318-19 Section 6.6.4.5 (nonsway m...; Pu 200, M2 80, M1 50, lu 14 ft, k 1, EI 1.5e6, h 16 -> Cm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-tbeam-flexure` | T-Beam Flexural Capacity (ACI 318-19) | American Concrete Institute; 22.2.2.4.1 stress block, 6.3.2 effective width, 21.2.2 ph... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `reach-range` | Reach Ranges for Outlets and Controls (2010 ADA Standards 308) | US Department of Justice / US Access ...; 308.3.2: 'The high side reach shall be 48 inches maximum ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ready-mix-concrete-order` | Ready-Mix Concrete Order (Trucks, Waste, Short Load) | concrete-supply practice; spec-v431 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rebar` | Rebar Spacing and Quantity | Project (first-principles slab grid l...; 20 ft x 10 ft slab / 12 in spacing / 3 in edge clearance ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rebar-chair-count` | Rebar Chair / Bar-Support Count | Bar-support count identity (first-pri...; chairs = ceil(1000/4^2*1.05) = ceil(65.6) = 66 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4138,6 +4181,7 @@ per spec-v14 §13.1 second paragraph.
 | `shotcrete-rebound-quantity` | Shotcrete / Gunite Order Quantity with Rebound | Rebound gross-up identity (first-prin...; in-place = 500*(4/12)/27 = 6.173 cy; shot = 6.173/0.80 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `siding-course-layout` | Siding Course Layout (Story Pole) | story-pole practice; 9 ft at a 7-in target on 8-in board (1-in min lap) -> 16 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `siding-takeoff` | Lap / Panel Siding Squares and Linear Footage | Siding-takeoff identity (first-princi...; net = 2000-200 = 1800; squares = 1800*1.12/100 = 20.16; l... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `sign-character-height` | Sign Character Height and Viewing Distance (2010 ADA Standards 703.5.5) | US Department of Justice / US Access ...; A baseline at 60 in falls in the 40-to-70-in band, where ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sill-plate-anchor-count` | Sill-Plate Anchor Bolt Count (IRC R403.1.6) | IRC R403.1.6 anchor-count rule; effective = 40 - 2*(9/12) = 38.5 ft; bolts = max(2, ceil(... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `silt-fence-drainage` | Silt Fence Drainage-Area and Length Check | Silt-fence drainage-area guideline (g...; required = 0.5*400 = 200 ft (250 adequate); max area = 25... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slab-dowel-schedule` | Slab Load-Transfer Dowel Schedule (ACI 302) | Slab load-transfer dowel schedule (AC...; per joint = floor((40*12-2*6)/12)+1 = floor(468/12)+1 = 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4170,6 +4214,7 @@ per spec-v14 §13.1 second paragraph.
 | `spt-required-n60` | Required SPT N60 for a Target Bearing (Meyerhof) | Meyerhof / Das; 5 ksf target, B 6 ft, D 2 ft -> N60 ~19.86 (design 20) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `square-footage` | Square Footage | Project (first-principles); 10 ft x 12 ft rectangle -> 120 ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `srw-geogrid-spacing` | SRW Geogrid Layer Spacing and Layout | Keystone Retaining Wall Systems (quot...; 'For a 8" tall x 9" deep unit, the vertical spacing is li... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `staggered-net-width` | Staggered-Hole Net Width (AISC 360 B4.3b) | American Institute of Steel Construction; Holes deduct at 3/4 + 1/8 = 0.875 in. The straight chain ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stair-code-check` | Stair Geometry Code Check (IBC 1011 / IRC R311) | IBC 2021 §1011.5.2 / §1011.2 (by sect...; spec-v481 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stair-stringer` | Stair Stringer Length | Project (first-principles); 9 ft rise / 12 ft run -> 180 in stringer (15 ft); 21.09 B... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stair-stringer-layout` | Stair Stringer Layout (with code check) | IRC R311 (residential stair geometry;...; 108 in rise / 6.75 in preferred riser -> 16 risers / 6.75... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4198,10 +4243,12 @@ per spec-v14 §13.1 second paragraph.
 | `stucco-coverage` | Portland-Cement Plaster (Stucco) Material Takeoff | Portland-cement plaster bag-count ide...; bags = ceil(1000*0.875/10.1*1.10) = ceil(95.30) = 96 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stud-notch-bore-limit` | Wall Stud Notching and Boring Limits (IRC R602.6) | wall stud notch/bore limits (IRC R602.6); notch bearing = 0.25*5.5 = 1.375; bore single = 0.40*5.5 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `submerged-earth-pressure` | Submerged-Backfill Earth Pressure (Buoyant + Hydrostatic) | Rankine effective-stress as compiled ...; spec-v625 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `substantial-improvement-check` | NFIP Substantial Improvement 50% Rule (44 CFR 59.1) | Federal Emergency Management Agency; 'Substantial improvement means any reconstruction, rehabi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `superelevation` | Superelevation / Min Curve Radius (AASHTO) | AASHTO Green Book; spec-v335 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `superelevation-safe-curve-speed` | Safe Curve Speed from Radius and Superelevation | AASHTO Green Book (solved for speed); spec-v756 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `suspended-ceiling-grid` | Suspended Acoustical Ceiling Grid Takeoff | Suspended-ceiling 2x4 grid takeoff ra...; panels = ceil(960/8) = 120; main = 240; cross = 480; wall... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `t-beam-effective-flange-width` | T-Beam Effective Flange Width (ACI 318-19 6.3.2) | ACI 318-19 6.3.2; spec-v393 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `tactile-sign-mounting` | Tactile Sign Mounting Height and Location (2010 ADA Standards 703.4) | US Department of Justice / US Access ...; 703.4.1: tactile characters shall be located '48 inches m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tapered-roof-insulation` | Tapered Roof Insulation Average Thickness and Quantity | Tapered-insulation identity (first-pr...; avg = 0.5 + 0.25*40/2 = 5.5 in; board-feet = 2000*5.5 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `temporary-stairway-check` | Temporary Stairway Check (OSHA 1926.1052) | Occupational Safety and Health Admini...; 'Stairways having four or more risers or rising more than... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thermal-stress-max-deltat` | Max Temperature Change for a Stress Limit | mechanics of materials (inverse); spec-v674 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4210,6 +4257,7 @@ per spec-v14 §13.1 second paragraph.
 | `tile-count` | Tile Count and Grout Volume | Project (first-principles); 100 ft^2 with 12x12 tiles, default 1/8 in grout, 10% wast... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `traffic-taper-length` | Work-Zone Merging Taper Length and Device Count (MUTCD) | MUTCD merging-taper identity (public-...; S >= 45: L = 12*55 = 660 ft; devices = ceil(660/40)+1 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trim-linear-footage` | Trim Linear Footage and Miters | finish-carpentry practice; spec-v440 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `turning-clear-floor-space` | Turning Space and Clear Floor Space (2010 ADA Standards 304, 305) | US Department of Justice / US Access ...; 305.3 gives 30 in by 48 in and 305.5 requires it 'positio... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `unit-cost-earthwork` | Earthwork Production Unit Cost | Production unit-cost identity (first-...; hourly = 150+65 = 215; unit cost = 215/656 = $0.328/cy | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `valley-flashing-takeoff` | Valley Flashing Takeoff (Metal, Pieces, Ice Barrier) | framing-square 17-inch rule; 6:12 gives sqrt(36+288)/12 = sqrt(324)/12 = 18/12 = exact... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `vapor-barrier-rolls` | Under-Slab Vapor Barrier Rolls and Seam Tape | Roll-takeoff identity (first-principles); rolls = ceil(3000*1.10/1000) = ceil(3.3) = 4; seam tape =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4219,6 +4267,7 @@ per spec-v14 §13.1 second paragraph.
 | `wall-bracing-length` | Braced-Wall-Panel Length (IRC R602.10) | IRC R602.10 (wall bracing); 40 ft line at 20% -> 8 ft required; 9 ft provided -> pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wallpaper-rolls` | Wallcovering Roll Takeoff With Pattern Repeat | Wallcovering industry estimating prac...; spec-v214 section 2.1 pinned example (Euro roll, modest r... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-cement-ratio` | Water-Cementitious Ratio and Exposure Cap (ACI 318) | ACI 318 Table 19.3.2.1; ACI 211.1 (wa...; 282 lb water / (470 cement + 94 fly ash = 564) = 0.50, ex... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `water-closet-location` | Water Closet Location and Seat Height (2010 ADA Standards 604) | US Department of Justice / US Access ...; 604.2: 'The centerline of the water closet shall be 16 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-for-compaction` | Water to Reach Optimum Moisture for Compaction | Gravimetric water-content identity (f...; dry weight = 100*27*105 = 283,500 lb; water = 0.05*283,50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `weld-cost-per-foot` | All-In Welding Cost per Foot | AWS welding cost and consumable refer...; 0.10 lb/ft, 95% eff, $2.50/lb, 8 lb/hr, 30% factor, $65/h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `weld-dilution` | Weld Dilution Ratio | welding metallurgy / AWS; spec-v356 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4304,7 +4353,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (66 tiles)
+### Group G Cross-trade (69 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4325,9 +4374,11 @@ per spec-v14 §13.1 second paragraph.
 | `gear-cascade` | Gear Ratio and RPM Cascade | First-principles / AGMA; overall = product of stage ratios; RPM_out = RPM_in/overa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `geometry` | Geometry Pack | Project (first-principles); r=10 ft / sector 90 deg -> circumference 62.832 / area 31... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `haversine` | GPS Distance (Haversine) | Project (first-principles); Haversine identity over Earth radius 3958.8 mi | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `hearing-protector-nrr` | Hearing Protector Attenuation (OSHA 1910.95 App. B) | Occupational Safety and Health Admini...; NIOSH derates the labelled NRR by protector type: 'all ot... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `heat-stress` | Heat Stress (WBGT and Heat Index) | NWS; NWS Technical Attachment SR 90-23 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydraulic-cylinder` | Hydraulic Cylinder Force and Speed | NFPA (fluid power); F = P*A; v = GPM*231/(60*A); A_extend = pi*(bore/2)^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ladder-angle` | Ladder Placement Angle | OSHA; OSHA 1926.1053(b)(5) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `lifeline-tension` | Horizontal Lifeline Tension and Anchorage (OSHA 1926.502) | roughlogic; At midspan, 2 T sin(theta) = W with sin(theta) = s / sqrt... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `linear-interpolation` | Linear Interpolation | First-principles linear interpolation; (0,10) and (10,30), x = 4 -> y = 18, slope 2 (within range) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `loan-payment` | Loan Payment | Project (first-principles); Closed-form annuity-immediate at monthly rate r = APR/12/100 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `markup` | Markup and Margin | Project (first-principles); selling_price = cost * (1 + markup); margin = profit / price | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4356,6 +4407,7 @@ per spec-v14 §13.1 second paragraph.
 | `rolling-offset` | Rolling Offset | NCCER pipefitting / standard fitter's...; rise 12, roll 9 -> true offset 15; at 45 deg travel 21.21 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sales-tax` | Sales Tax | Texas Comptroller of Public Accounts; $1,000 subtotal in TX (6.25%) -> $62.50 tax / $1062.50 total | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shrink-fit` | Interference Shrink-Fit Temperature | first-principles thermal-expansion re...; 4 in fit, 0.004 in interference, 0.002 in clearance, stee... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `silica-table-1` | Silica Table 1 Respirator Lookup (OSHA 1926.1153) | Occupational Safety and Health Admini...; Row (xi), handheld grinders for mortar removal (tuckpoint... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sine-bar` | Sine Bar Angle Setup | First-principles sine-bar trigonometr...; 5-in sine bar on a 2.5-in stack -> arcsin(0.5) = 30.000 deg | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `slope-from-level` | Slope from Digital Level | Project (first-principles); Trig conversion arctan / tan | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `swing-fall-geometry` | Swing Fall Geometry (Pendulum Drop and Arc) | pendulum geometry; asin(10/20) = exactly 30 deg; drop 20 - sqrt(400-100) = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4929,6 +4981,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1541. Fixture-covered or reference-cadence: 1541 / 1541.
+Tile count: 1567. Fixture-covered or reference-cadence: 1567 / 1567.
 
 <!-- END tile-index-v14 -->
