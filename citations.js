@@ -14610,6 +14610,18 @@ export const CITATIONS = {
       { name: "Plasticity split", value: "LL = 50 separates low (L) from high (H) plasticity", source: "USCS chart" },
     ],
   },
+  "soil-activity": {
+    formula: "A = PI / (percent clay finer than 2 microns); A < 0.75 inactive, 0.75-1.25 normal, A > 1.25 active.",
+    edition: "Skempton (1953) soil activity, the ratio of plasticity index to clay fraction, and its inactive/normal/active bands, a standard geotechnical result, by name.",
+    freeAccess: "Skempton's activity definition and its classification bands are public geotechnical results; PI comes from the ASTM D4318 limit tests and the clay fraction from the ASTM D7928 / D422 hydrometer analysis.",
+    governance: GOVERNANCE.general,
+    editionNote: "Skempton (1953) activity A = PI / (percent clay finer than 2 microns) collapses a fine-grained soil's plasticity index and clay content into one number that tracks its clay mineralogy and swell: A < 0.75 inactive (kaolinite ~0.4), 0.75-1.25 normal (illite ~0.9), A > 1.25 active (Na-montmorillonite runs several times higher). The same PI on less clay means a more active mineral, so a soil with a modest PI can still be strongly expansive if its clay fraction is small. This returns the activity number and its class; it is a mineralogy and swell screen, not a swell-pressure or heave calculation. An engineering aid; the soil test data and the geotechnical engineer govern.",
+    assumptions: [
+      { name: "Activity", value: "A = PI / (percent by mass finer than 2 microns)", source: "Skempton 1953" },
+      { name: "Classification", value: "A < 0.75 inactive, 0.75-1.25 normal, A > 1.25 active", source: "Skempton 1953" },
+      { name: "Clay fraction", value: "percent finer than 2 microns from the hydrometer analysis", source: "ASTM D7928 / D422" },
+    ],
+  },
   "injector-size": {
     formula: "total_lbh = HP x BSFC; inj_lbh = total_lbh / (n_cyl x duty); inj_ccmin = inj_lbh x 10.5.",
     edition: "The fuel-injector-sizing relation lb/h = HP x BSFC / (n_cyl x duty), with the BSFC ranges, the customary 80% duty cycle, and the gasoline cc/min conversion, a standard tuning-reference result, by name.",

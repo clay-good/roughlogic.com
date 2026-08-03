@@ -1302,6 +1302,7 @@ const RELATED = {
   "valley-flashing-takeoff": ["hip-valley-rafter","step-flashing-count","ice-barrier-coverage"],
   "fineness-modulus": ["fine-aggregate-grading","relative-compaction","atterberg-indices","soil-gradation-coefficients"],
   "fine-aggregate-grading": ["fineness-modulus","soil-gradation-coefficients","water-cement-ratio","relative-compaction"],
+  "soil-activity": ["atterberg-indices","soil-gradation-coefficients","soil-phase-relations","relative-compaction"],
   "soil-gradation-coefficients": ["atterberg-indices","fineness-modulus","relative-compaction","soil-phase-relations"],
   "shadow-length": ["pv-row-spacing","pv-row-shade-angle","pv-array-sizing"],
   "powered-attic-ventilator": ["attic-ventilation","ridge-cap-fasteners","blown-insulation-coverage","insulation-heat-loss"],
@@ -1754,7 +1755,7 @@ const RELATED = {
   "relative-compaction": ["soil-swell-shrink","soil-phase-relations","soil-bearing-capacity"],
   "water-for-compaction": ["relative-compaction","soil-phase-relations","compaction-roller-production"],
   "soil-phase-relations": ["relative-compaction","soil-consolidation-settlement","atterberg-indices"],
-  "atterberg-indices": ["soil-phase-relations","relative-compaction","soil-swell-shrink","soil-gradation-coefficients"],
+  "atterberg-indices": ["soil-activity","soil-phase-relations","relative-compaction","soil-gradation-coefficients"],
   // spec-v329..v331 building-energy batch (Group C)
   "building-ua": ["assembly-r-value","degree-day-energy","infiltration-load"],
   "degree-day-energy": ["building-ua","manual-j-heating","heat-pump-seasonal-energy"],

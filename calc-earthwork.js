@@ -1824,6 +1824,56 @@ function _v328renderAtterbergIndices(inputRegion, outputRegion, citationEl) {
 }
 EARTHWORK_RENDERERS["atterberg-indices"] = _v328renderAtterbergIndices;
 
+// ===================== spec-v1196: soil activity (Skempton 1953) =====================
+// The mineralogy / swell index that atterberg-indices names as its own gap: "it does
+// not compute the shrink-swell potential, the activity, or the coarse-fraction sieve
+// classification." Skempton's activity A = PI / (percent clay finer than 2 um)
+// collapses plasticity and clay content into one number that tracks the clay mineral,
+// and therefore its swell: the SAME PI on LESS clay means a more active mineral.
+// dims: in { ll: dimensionless, pl: dimensionless, clay_fraction_pct: dimensionless } out: { pi: dimensionless, activity: dimensionless }
+export function computeSoilActivity({ ll = 0, pl = 0, clay_fraction_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(ll > 0)) return { error: "Liquid limit must be positive (%)." };
+  if (!(pl > 0)) return { error: "Plastic limit must be positive (%)." };
+  if (!(ll > pl)) return { error: "The liquid limit must exceed the plastic limit (a soil with PL >= LL is nonplastic)." };
+  if (!(clay_fraction_pct > 0)) return { error: "Clay fraction (percent finer than 2 microns) must be positive." };
+  if (clay_fraction_pct > 100) return { error: "Clay fraction cannot exceed 100%." };
+  const pi = ll - pl;
+  const activity = pi / clay_fraction_pct;
+  let activity_class, mineral;
+  if (activity < 0.75) { activity_class = "inactive"; mineral = "kaolinite-like -- low swell"; }
+  else if (activity <= 1.25) { activity_class = "normal"; mineral = "illite-like -- moderate swell"; }
+  else { activity_class = "active"; mineral = "montmorillonite / smectite-like -- high swell, potentially expansive"; }
+  return {
+    pi, activity, activity_class, mineral,
+    note: "Skempton (1953) activity A = PI / (percent clay finer than 2 microns) reduces a fine-grained soil's plasticity and clay content to one number that tracks its clay MINERALOGY, and therefore its swell. PI " + pi.toFixed(0) + " over " + clay_fraction_pct + "% clay gives A = " + activity.toFixed(2) + " -- " + activity_class + " (" + mineral + "). The bands: A < 0.75 inactive (kaolinite ~0.4), 0.75-1.25 normal (illite ~0.9), A > 1.25 active (Na-montmorillonite runs several times higher). The point the plasticity index alone hides: the SAME PI on LESS clay means a more active mineral, so a soil that reads a modest PI can still be strongly expansive if its clay fraction is small. Activity is a mineralogy and swell SCREEN, not a swell-pressure or heave calculation; the clay fraction is the hydrometer's percent finer than 2 microns (ASTM D7928 / D422). An engineering aid; the soil test data and the geotechnical engineer govern.",
+  };
+}
+export const soilActivityExample = { inputs: { ll: 52, pl: 22, clay_fraction_pct: 25 } };
+
+function _v1196renderSoilActivity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Skempton (1953) soil activity A = PI / (percent clay finer than 2 microns), by name; classification A < 0.75 inactive, 0.75-1.25 normal, A > 1.25 active. PI = LL - PL (ASTM D4318); clay fraction from the hydrometer (ASTM D7928 / D422). A mineralogy / swell screen, not a heave calculation; the soil test data and the geotechnical engineer govern.";
+  const ll = makeNumber("Liquid limit LL (%)", "act-ll", { step: "any", min: "0" });
+  const pl = makeNumber("Plastic limit PL (%)", "act-pl", { step: "any", min: "0" });
+  const cf = makeNumber("Clay fraction (% finer than 2 microns)", "act-cf", { step: "any", min: "0", max: "100" });
+  for (const f of [ll, pl, cf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ll.input.value = "52"; pl.input.value = "22"; cf.input.value = "25"; update(); });
+  const oAct = makeOutputLine(outputRegion, "Activity A = PI / % clay", "act-out-a");
+  const oClass = makeOutputLine(outputRegion, "Classification", "act-out-class");
+  const oPi = makeOutputLine(outputRegion, "Plasticity index PI", "act-out-pi");
+  const oNote = makeOutputLine(outputRegion, "Note", "act-out-note");
+  const update = debounce(() => {
+    const r = computeSoilActivity({ ll: Number(ll.input.value) || 0, pl: Number(pl.input.value) || 0, clay_fraction_pct: Number(cf.input.value) || 0 });
+    if (r.error) { oAct.textContent = r.error; oClass.textContent = "-"; oPi.textContent = "-"; oNote.textContent = "-"; return; }
+    oAct.textContent = fmt(r.activity, 2);
+    oClass.textContent = r.activity_class + " (" + r.mineral + ")";
+    oPi.textContent = fmt(r.pi, 1);
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ll, pl, cf]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["soil-activity"] = _v1196renderSoilActivity;
+
 // ===================== spec-v799: aggregate fineness modulus (ASTM C136/C125) =====================
 // FM = sum of the cumulative percent retained on the standard sieves / 100. For fine aggregate the
 // contributing sieves are #4, #8, #16, #30, #50, #100 (coarser sieves retain ~0% of a sand).

@@ -33517,6 +33517,31 @@
       "kind": "question"
     },
     {
+      "term": "soil activity skempton",
+      "target": "soil-activity",
+      "kind": "industry"
+    },
+    {
+      "term": "is my clay expansive from plasticity index",
+      "target": "soil-activity",
+      "kind": "question"
+    },
+    {
+      "term": "clay activity from atterberg limits and clay fraction",
+      "target": "soil-activity",
+      "kind": "question"
+    },
+    {
+      "term": "montmorillonite illite kaolinite activity",
+      "target": "soil-activity",
+      "kind": "industry"
+    },
+    {
+      "term": "swelling clay mineralogy screen",
+      "target": "soil-activity",
+      "kind": "question"
+    },
+    {
       "term": "total head from pressure velocity and elevation",
       "target": "bernoulli-head",
       "kind": "question"

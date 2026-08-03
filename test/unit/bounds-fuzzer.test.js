@@ -23353,6 +23353,27 @@ test("bounds: spec-v1195 computeFineAggregateGrading pins the three C33 §6 legs
   assert.ok("error" in _v1195({ p38: 100, p4: 98, p8: 85, p16: 99, p30: 45, p50: 18, p100: 5 })); // #16 passes more than #8
 });
 
+import { computeSoilActivity as _v1196 } from "../../calc-earthwork.js";
+
+test("bounds: spec-v1196 computeSoilActivity pins A = PI / clay fraction, the bands, and error seams", () => {
+  // PI 30 over 25% clay -> A 1.20, normal.
+  const r = _v1196({ ll: 52, pl: 22, clay_fraction_pct: 25 });
+  assert.ok(Math.abs(r.pi - 30) < 1e-9);
+  assert.ok(Math.abs(r.activity - 1.2) < 1e-9);
+  assert.strictEqual(r.activity_class, "normal");
+  // The same PI on less clay is more active; on more clay, less active.
+  assert.strictEqual(_v1196({ ll: 52, pl: 22, clay_fraction_pct: 15 }).activity_class, "active"); // 30/15 = 2.0
+  assert.strictEqual(_v1196({ ll: 40, pl: 20, clay_fraction_pct: 50 }).activity_class, "inactive"); // 20/50 = 0.4
+  // Band edges: 0.75 and 1.25 are both "normal" (inactive is strictly < 0.75, active strictly > 1.25).
+  assert.strictEqual(_v1196({ ll: 37, pl: 22, clay_fraction_pct: 20 }).activity_class, "normal"); // 15/20 = 0.75
+  assert.strictEqual(_v1196({ ll: 47, pl: 22, clay_fraction_pct: 20 }).activity_class, "normal"); // 25/20 = 1.25
+  // Error seams: non-finite, PL >= LL (nonplastic), and a non-positive / over-100 clay fraction.
+  assert.ok("error" in _v1196({ ll: Infinity, pl: 22, clay_fraction_pct: 25 }));
+  assert.ok("error" in _v1196({ ll: 20, pl: 25, clay_fraction_pct: 25 }));
+  assert.ok("error" in _v1196({ ll: 52, pl: 22, clay_fraction_pct: 0 }));
+  assert.ok("error" in _v1196({ ll: 52, pl: 22, clay_fraction_pct: 120 }));
+});
+
 import { computeGlassWeight as _v798 } from "../../calc-finish.js";
 
 test("bounds: spec-v798 computeGlassWeight pins the lite weight, per-sqft, two-person flag, and error seams", () => {
