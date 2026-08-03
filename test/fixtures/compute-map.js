@@ -992,6 +992,7 @@ export const COMPUTE_MAP = {
   "drip-edge-takeoff": { module: "../../calc-finish.js", fn: "computeDripEdgeTakeoff" },
   "valley-flashing-takeoff": { module: "../../calc-finish.js", fn: "computeValleyFlashingTakeoff" },
   "fineness-modulus": { module: "../../calc-earthwork.js", fn: "computeFinenessModulus" },
+  "fine-aggregate-grading": { module: "../../calc-earthwork.js", fn: "computeFineAggregateGrading" },
   "soil-gradation-coefficients": { module: "../../calc-earthwork.js", fn: "computeSoilGradationCoefficients" },
   "water-cement-ratio": { module: "../../calc-construction.js", fn: "computeWaterCementRatio" },
   "load-profitability": { module: "../../calc-trucking.js", fn: "computeLoadProfitability" },

@@ -1870,6 +1870,93 @@ function _v799renderFinenessModulus(inputRegion, outputRegion, citationEl) {
 }
 EARTHWORK_RENDERERS["fineness-modulus"] = _v799renderFinenessModulus;
 
+// ===================== spec-v1195: fine-aggregate grading check (ASTM C33 §6) =====================
+// The full sieve-band acceptance that fineness-modulus names as its own gap: "it
+// does not check whether each sieve meets its C33 grading band, and two very
+// different gradations can share an FM." ASTM C33 §6 accepts a concrete sand only
+// if THREE things hold, all read off the same percent-passing curve:
+//   §6.1  each of the 7 standard sieves passes within its band, AND
+//   §6.2  no more than 45% is retained between any two consecutive sieves, AND
+//   §6.2  the fineness modulus is 2.3-3.1.
+// The FM leg is delegated to computeFinenessModulus so the summary tile and this
+// acceptance tile can never drift on the FM definition or its band.
+// dims: in { p38: dimensionless, p4: dimensionless, p8: dimensionless, p16: dimensionless, p30: dimensionless, p50: dimensionless, p100: dimensionless } out: { fm: dimensionless, max_retained_pct: dimensionless }
+export function computeFineAggregateGrading({ p38 = 100, p4 = 100, p8 = 90, p16 = 68, p30 = 45, p50 = 18, p100 = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // ASTM C33 §6.1 fine-aggregate grading limits (percent passing).
+  const sieves = [
+    { key: "3/8 in", p: Number(p38), lo: 100, hi: 100 },
+    { key: "#4", p: Number(p4), lo: 95, hi: 100 },
+    { key: "#8", p: Number(p8), lo: 80, hi: 100 },
+    { key: "#16", p: Number(p16), lo: 50, hi: 85 },
+    { key: "#30", p: Number(p30), lo: 25, hi: 60 },
+    { key: "#50", p: Number(p50), lo: 5, hi: 30 },
+    { key: "#100", p: Number(p100), lo: 0, hi: 10 },
+  ];
+  if (!sieves.every((s) => Number.isFinite(s.p))) return { error: "Enter a valid percent passing for every sieve." };
+  if (!sieves.every((s) => s.p >= 0 && s.p <= 100)) return { error: "Each percent passing must be between 0 and 100." };
+  // A finer sieve cannot pass more than a coarser one -- percent passing must not increase down the stack.
+  for (let i = 1; i < sieves.length; i++) {
+    if (sieves[i].p > sieves[i - 1].p) return { error: `Percent passing must not increase from a coarser to a finer sieve (${sieves[i].key} passes more than ${sieves[i - 1].key}).` };
+  }
+  // §6.1: each sieve within its band.
+  const out_of_band = sieves.filter((s) => s.p < s.lo || s.p > s.hi);
+  const band_ok = out_of_band.length === 0;
+  const band_detail = band_ok
+    ? "all 7 sieves within band"
+    : out_of_band.map((s) => `${s.key} ${s.p}% (band ${s.lo === s.hi ? s.lo : s.lo + "-" + s.hi})`).join("; ");
+  // §6.2: not more than 45% passing any sieve and retained on the next consecutive sieve.
+  let max_retained_pct = 0, max_retained_gap = "";
+  for (let i = 1; i < sieves.length; i++) {
+    const retained = sieves[i - 1].p - sieves[i].p;
+    if (retained > max_retained_pct) { max_retained_pct = retained; max_retained_gap = `${sieves[i - 1].key} to ${sieves[i].key}`; }
+  }
+  const consecutive_ok = max_retained_pct <= 45;
+  // §6.2: fineness modulus 2.3-3.1, delegated so the two tiles cannot drift.
+  const fmRes = computeFinenessModulus({ r4: 100 - sieves[1].p, r8: 100 - sieves[2].p, r16: 100 - sieves[3].p, r30: 100 - sieves[4].p, r50: 100 - sieves[5].p, r100: 100 - sieves[6].p });
+  if (fmRes.error) return { error: fmRes.error };
+  const fm = fmRes.fm;
+  const fm_ok = fm >= 2.3 && fm <= 3.1;
+  const conforms = band_ok && consecutive_ok && fm_ok;
+  const failures = [];
+  if (!band_ok) failures.push(`grading band (${band_detail})`);
+  if (!consecutive_ok) failures.push(`the 45% consecutive-sieve limit (${max_retained_pct.toFixed(0)}% retained ${max_retained_gap})`);
+  if (!fm_ok) failures.push(`fineness modulus ${fm.toFixed(2)} outside 2.3-3.1`);
+  const verdict = conforms
+    ? "CONFORMS to ASTM C33 §6 fine-aggregate grading"
+    : "DOES NOT conform -- fails " + failures.join("; ");
+  return {
+    conforms, band_ok, consecutive_ok, fm_ok, fm, max_retained_pct, max_retained_gap, band_detail, verdict,
+    note: "ASTM C33 §6 accepts a concrete sand only if THREE things hold on the same sieve analysis, which is why the fineness modulus alone is not enough -- two very different gradations can share an FM. (1) §6.1: each of the 7 standard sieves passes within its band -- 3/8 in 100, #4 95-100, #8 80-100, #16 50-85, #30 25-60, #50 5-30, #100 0-10. Entered gradation: " + band_detail + ". (2) §6.2: no more than 45% of the sample may pass one sieve and be retained on the next; the widest gap here is " + max_retained_pct.toFixed(0) + "% (" + (max_retained_gap || "n/a") + "), " + (consecutive_ok ? "within the 45% limit" : "OVER the 45% limit -- a gap that starves the mix of one size") + ". (3) §6.2: the fineness modulus must be 2.3-3.1; this sand is " + fm.toFixed(2) + " (" + (fm_ok ? "in band" : "out of band") + "). Sand failing §6.1 may still be accepted under §6.3 with supplementary cementitious material and a demonstrated record, and the No. 50 / No. 100 minimums can govern workability, bleeding, and pumping. Percent passing must not increase down the stack. A QC / acceptance screen on your own C136 sieve analysis; the sieve report, the mix design, and the specifier govern.",
+  };
+}
+export const fineAggregateGradingExample = { inputs: { p38: 100, p4: 98, p8: 85, p16: 68, p30: 45, p50: 18, p100: 5 } };
+
+function _v1195renderFineAggregateGrading(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASTM C33/C33M §6 fine-aggregate grading, by name. §6.1 limits (percent passing): 3/8 in 100, No.4 95-100, No.8 80-100, No.16 50-85, No.30 25-60, No.50 5-30, No.100 0-10. §6.2: not more than 45% passing any sieve and retained on the next consecutive sieve, and fineness modulus 2.3-3.1. The FM is delegated to the fineness-modulus tile so the two cannot drift. An acceptance screen on your own C136 sieve analysis; the sieve report and the mix design govern.";
+  const defs = [["p38", "% passing, 3/8 in"], ["p4", "#4"], ["p8", "#8"], ["p16", "#16"], ["p30", "#30"], ["p50", "#50"], ["p100", "#100"]];
+  const fields = {};
+  for (const [key, label] of defs) { fields[key] = makeNumber(label, "fag-" + key, { step: "any", min: "0", max: "100" }); inputRegion.appendChild(fields[key].wrap); }
+  attachExampleButton(inputRegion, () => { const ex = fineAggregateGradingExample.inputs; for (const [key] of defs) fields[key].input.value = String(ex[key]); update(); });
+  const oVerdict = makeOutputLine(outputRegion, "Against ASTM C33 §6", "fag-out-verdict");
+  const oBand = makeOutputLine(outputRegion, "Grading band (§6.1)", "fag-out-band");
+  const oGap = makeOutputLine(outputRegion, "Widest consecutive gap (§6.2, 45% max)", "fag-out-gap");
+  const oFm = makeOutputLine(outputRegion, "Fineness modulus (2.3-3.1)", "fag-out-fm");
+  const oNote = makeOutputLine(outputRegion, "Note", "fag-out-note");
+  const update = debounce(() => {
+    const args = {}; for (const [key] of defs) args[key] = Number(fields[key].input.value) || 0;
+    const r = computeFineAggregateGrading(args);
+    if (r.error) { oVerdict.textContent = r.error; oBand.textContent = "-"; oGap.textContent = "-"; oFm.textContent = "-"; oNote.textContent = "-"; return; }
+    oVerdict.textContent = r.verdict;
+    oBand.textContent = r.band_ok ? "all 7 sieves within band" : r.band_detail;
+    oGap.textContent = fmt(r.max_retained_pct, 0) + "% " + (r.max_retained_gap ? "(" + r.max_retained_gap + ") " : "") + (r.consecutive_ok ? "- OK" : "- OVER 45%");
+    oFm.textContent = fmt(r.fm, 2) + (r.fm_ok ? " - in band" : " - out of band");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const [key] of defs) fields[key].input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["fine-aggregate-grading"] = _v1195renderFineAggregateGrading;
+
 // ===================== spec-v1018: soil gradation coefficients Cu / Cc (ASTM D2487) =====================
 // The coarse-fraction half of USCS that atterberg-indices names as its own gap
 // ("the full USCS also needs the fines content and gradation for a coarse or

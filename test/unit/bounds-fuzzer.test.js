@@ -23319,6 +23319,40 @@ test("bounds: spec-v799 computeFinenessModulus pins the FM sum, the C33 band, an
   assert.ok("error" in _v799({ r4: 2, r8: 12, r16: 32, r30: 20, r50: 82, r100: 95 })); // r30 < r16
 });
 
+import { computeFineAggregateGrading as _v1195 } from "../../calc-earthwork.js";
+
+test("bounds: spec-v1195 computeFineAggregateGrading pins the three C33 §6 legs and error seams", () => {
+  // A conforming sand: every sieve in band, widest consecutive gap 27% (#30->#50), FM 2.81.
+  const r = _v1195({ p38: 100, p4: 98, p8: 85, p16: 68, p30: 45, p50: 18, p100: 5 });
+  assert.strictEqual(r.conforms, true);
+  assert.strictEqual(r.band_ok, true);
+  assert.strictEqual(r.consecutive_ok, true);
+  assert.strictEqual(r.fm_ok, true);
+  assert.ok(Math.abs(r.fm - 2.81) < 1e-9);
+  assert.ok(Math.abs(r.max_retained_pct - 27) < 1e-9);
+  // §6.1 band: #16 at 90% exceeds its 50-85 band; FM and the 45% rule still pass, so band alone fails it.
+  const band = _v1195({ p38: 100, p4: 98, p8: 95, p16: 90, p30: 45, p50: 18, p100: 5 });
+  assert.strictEqual(band.band_ok, false);
+  assert.strictEqual(band.consecutive_ok, true);
+  assert.strictEqual(band.conforms, false);
+  // §6.2 45% rule in isolation: every sieve in band, but the #16->#30 gap is 60% (85-25), FM 3.05 in band.
+  const gap = _v1195({ p38: 100, p4: 95, p8: 85, p16: 85, p30: 25, p50: 5, p100: 0 });
+  assert.strictEqual(gap.band_ok, true);
+  assert.strictEqual(gap.consecutive_ok, false);
+  assert.ok(Math.abs(gap.max_retained_pct - 60) < 1e-9);
+  assert.strictEqual(gap.conforms, false);
+  // §6.2 FM leg in isolation: bands and the 45% rule pass, but a coarse edge gradation reads FM 3.45.
+  const fmleg = _v1195({ p38: 100, p4: 95, p8: 80, p16: 50, p30: 25, p50: 5, p100: 0 });
+  assert.strictEqual(fmleg.band_ok, true);
+  assert.strictEqual(fmleg.consecutive_ok, true);
+  assert.strictEqual(fmleg.fm_ok, false);
+  assert.strictEqual(fmleg.conforms, false);
+  // Error seams: non-finite, out-of-[0,100], and a finer sieve passing more than a coarser one.
+  assert.ok("error" in _v1195({ p38: Infinity, p4: 98, p8: 85, p16: 68, p30: 45, p50: 18, p100: 5 }));
+  assert.ok("error" in _v1195({ p38: 100, p4: 120, p8: 85, p16: 68, p30: 45, p50: 18, p100: 5 }));
+  assert.ok("error" in _v1195({ p38: 100, p4: 98, p8: 85, p16: 99, p30: 45, p50: 18, p100: 5 })); // #16 passes more than #8
+});
+
 import { computeGlassWeight as _v798 } from "../../calc-finish.js";
 
 test("bounds: spec-v798 computeGlassWeight pins the lite weight, per-sqft, two-person flag, and error seams", () => {

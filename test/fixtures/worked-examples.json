@@ -26658,6 +26658,38 @@
    }
   },
   {
+   "tile_id": "fine-aggregate-grading",
+   "source_publisher": "ASTM C33/C33M §6 (fine-aggregate grading)",
+   "source_title": "each sieve within its §6.1 band; <=45% retained between consecutive sieves; FM 2.3-3.1",
+   "source_edition_or_year": "spec-v1195 worked example (machine-verified)",
+   "source_section_or_page": "passing 100/98/85/68/45/18/5 -> retained 2/15/32/55/82/95 -> FM 2.81; widest consecutive gap 27% (#30->#50); conforms",
+   "verified_by": "rl",
+   "verified_on": "2026-08-03",
+   "inputs": {
+    "p38": 100,
+    "p4": 98,
+    "p8": 85,
+    "p16": 68,
+    "p30": 45,
+    "p50": 18,
+    "p100": 5
+   },
+   "outputs": {
+    "fm": {
+     "value": 2.81,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "max_retained_pct": {
+     "value": 27,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "glass-weight",
    "source_publisher": "NGA Glazing Manual glass-weight table; ASTM C1036",
    "source_title": "weight = 156.1 lb/ft3 x area_ft2 x thickness_in/12 (~13.0 lb/ft2 per inch)",

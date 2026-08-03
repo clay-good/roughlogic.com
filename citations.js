@@ -14586,6 +14586,18 @@ export const CITATIONS = {
       { name: "C33 band", value: "concrete sand FM 2.3-3.1; drift limited to 0.20 without a mix adjustment", source: "ASTM C33" },
     ],
   },
+  "fine-aggregate-grading": {
+    formula: "ASTM C33 §6 fine-aggregate acceptance: §6.1 each sieve within its band (3/8 in 100, #4 95-100, #8 80-100, #16 50-85, #30 25-60, #50 5-30, #100 0-10); §6.2 no more than 45% retained between consecutive sieves; §6.2 fineness modulus 2.3-3.1.",
+    edition: "ASTM C33/C33M §6 concrete-aggregate grading limits, by name; the sieve analysis and the mix design govern.",
+    freeAccess: "The §6 grading limits are the published acceptance criteria of a material specification adopted by reference into the building code, not a proprietary lookup table; the percent-passing values are the user's own ASTM C136 sieve analysis. The fineness-modulus leg is computed by the companion tile.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASTM C33 §6 accepts a concrete sand only if THREE things hold on the same sieve analysis, which is why the fineness modulus alone is not enough -- two very different gradations can share an FM. §6.1: each of the 7 standard sieves passes within its band (3/8 in 100, #4 95-100, #8 80-100, #16 50-85, #30 25-60, #50 5-30, #100 0-10). §6.2: no more than 45% of the sample may pass one sieve and be retained on the next, and the fineness modulus must be 2.3-3.1. Sand failing §6.1 may still be accepted under §6.3 with supplementary cementitious material and a demonstrated record. An acceptance screen on the user's own C136 sieve analysis, not a full mix design.",
+    assumptions: [
+      { name: "Grading bands", value: "the 7 fine-aggregate percent-passing limits of ASTM C33 §6.1", source: "ASTM C33" },
+      { name: "Consecutive-sieve limit", value: "not more than 45% passing any sieve and retained on the next consecutive sieve", source: "ASTM C33 §6.2" },
+      { name: "Fineness modulus", value: "2.3-3.1, delegated to the fineness-modulus tile so the two cannot drift", source: "ASTM C33 §6.2" },
+    ],
+  },
   "atterberg-indices": {
     formula: "PI = LL - PL; LI = (w - PL)/PI; A-line PI = 0.73(LL - 20); above A-line -> clay (CL/CH), below -> silt (ML/MH), split at LL = 50.",
     edition: "The Atterberg-limit indices (plasticity index, liquidity index) and the USCS A-line classification, with the ASTM D4318 limit tests, by name.",

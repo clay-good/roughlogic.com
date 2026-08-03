@@ -531,7 +531,7 @@ const _TILES = [
   ["closet-shelf-takeoff", "E"], ["cabinet-linear-feet", "E"], ["drip-edge-takeoff", "E"], ["valley-flashing-takeoff", "E"],
   ["countertop-overhang-support", "E"],
   ["glass-weight", "E"],
-  ["fineness-modulus", "E"], ["soil-gradation-coefficients", "E"],
+  ["fineness-modulus", "E"], ["fine-aggregate-grading", "E"], ["soil-gradation-coefficients", "E"],
   ["water-cement-ratio", "E"],
   // spec-v803 ASCE 7 live load reduction
   ["asce-live-load-reduction", "E"],

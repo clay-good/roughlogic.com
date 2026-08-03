@@ -941,6 +941,7 @@ export const RENDERER_MAP = {
   "soil-phase-relations": { module: "../../calc-earthwork.js", exportName: "EARTHWORK_RENDERERS" },
   "atterberg-indices": { module: "../../calc-earthwork.js", exportName: "EARTHWORK_RENDERERS" },
   "fineness-modulus": { module: "../../calc-earthwork.js", exportName: "EARTHWORK_RENDERERS" },
+  "fine-aggregate-grading": { module: "../../calc-earthwork.js", exportName: "EARTHWORK_RENDERERS" },
   "soil-gradation-coefficients": { module: "../../calc-earthwork.js", exportName: "EARTHWORK_RENDERERS" },
   "fire-friction": { module: "../../calc-fire.js", exportName: "FIRE_RENDERERS" },
   "pdp": { module: "../../calc-fire.js", exportName: "FIRE_RENDERERS" },
