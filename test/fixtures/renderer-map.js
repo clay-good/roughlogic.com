@@ -666,6 +666,7 @@ export const RENDERER_MAP = {
   "exterior-opening-protection": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wood-beam-bending": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wood-beam-shear": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
+  "wood-beam-compression-notch": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wood-bolt-connection": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wood-bearing-perpendicular": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wood-tension-member": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },

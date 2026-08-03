@@ -44773,6 +44773,49 @@
    }
   },
   {
+   "tile_id": "wood-beam-compression-notch",
+   "source_publisher": "NDS 3.4.3.2(e) (2018 Eq 3.4-5), National Design Specification for Wood Construction",
+   "source_title": "4x12 (Fv' 180) notched 2 in on the compression face, 3 in from the support -> de 10.60 in, Vr' 4,453 lb vs 2,626 lb tension side",
+   "source_edition_or_year": "spec-v1197 worked example (machine-verified vs AWC NDS 2018 Chapter 3)",
+   "source_section_or_page": "NDS 3.4.3.2(e) Eq 3.4-5, verified against AWC awc.org Chapter 03 PDF",
+   "verified_by": "rl",
+   "verified_on": "2026-08-03",
+   "inputs": {
+    "fv_prime_psi": 180,
+    "b_in": 3.5,
+    "d_in": 11.25,
+    "dn_in": 9.25,
+    "e_in": 3,
+    "v_applied_lb": 2000
+   },
+   "outputs": {
+    "de_in": {
+     "value": 10.6013514,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "vr_lb": {
+     "value": 4452.5676,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "vr_tension_lb": {
+     "value": 2626.4519,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "dcr": {
+     "value": 0.4491790,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wood-beam-shear",
    "source_publisher": "NDS 3.4.2 / 3.4.3.2 (National Design Specification for Wood Construction)",
    "source_title": "cross-check: no notch (dn = d = 11.25) -> Vr' equals Vr 4,725 lb (continuity seam)",

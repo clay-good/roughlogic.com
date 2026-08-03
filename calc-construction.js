@@ -6244,6 +6244,67 @@ const _renderWoodBeamShear = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["wood-beam-shear"] = _renderWoodBeamShear;
 
+// ----- spec-v1197: Wood Bending Member Compression-Side End-Notch Shear (NDS 3.4.3.2(e)) -----
+// The other half of the notch rule that wood-beam-shear names as its own gap
+// ("does not cover compression-side notches, a different rule"). A notch on the
+// COMPRESSION face at the end is far less severe than the same notch on the
+// tension face, because the effective depth grows back toward the full d as the
+// notch moves away from the support. NDS 2018 Eq 3.4-5: Vr' = (2/3) Fv' b [d -
+// ((d - dn)/dn) e], with e the distance the notch extends from the inner edge of
+// the support, valid for e <= dn (for e > dn, dn governs per Eq 3.4-2). At e = 0
+// (notch at the bearing) the effective depth is the full d -- no reduction at all.
+// dims: in { fv_prime_psi: M L^-1 T^-2, b_in: L, d_in: L, dn_in: L, e_in: L, v_applied_lb: M L T^-2 } out: { de_in: L, vr_lb: M L T^-2, vr_tension_lb: M L T^-2, fv_psi: M L^-1 T^-2, dcr: dimensionless }
+export function computeWoodBeamCompressionNotch({ fv_prime_psi = 0, b_in = 0, d_in = 0, dn_in = 0, e_in = 0, v_applied_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fv_prime_psi > 0)) return { error: "Fv' must be positive (psi)." };
+  if (!(b_in > 0)) return { error: "Breadth b must be positive (in)." };
+  if (!(d_in > 0)) return { error: "Full depth d must be positive (in)." };
+  if (!(dn_in > 0)) return { error: "Net depth dn must be positive (in)." };
+  if (dn_in > d_in) return { error: "Net depth dn cannot exceed the full depth d (a notch cannot be deeper than the beam)." };
+  if (e_in < 0) return { error: "Notch distance from the support e cannot be negative (in)." };
+  if (v_applied_lb < 0) return { error: "Applied shear cannot be negative (lb)." };
+  // NDS 3.4-5: effective depth for a compression-side end notch. For e >= dn the
+  // notch depth dn governs (Eq 3.4-2), which is exactly what the formula yields at
+  // e = dn, so it is continuous; cap e at dn.
+  const e_eff = Math.min(e_in, dn_in);
+  const de = d_in - ((d_in - dn_in) / dn_in) * e_eff;
+  const vr = (2 / 3) * fv_prime_psi * b_in * de;
+  // The same notch on the TENSION side (NDS 3.4-4), for contrast.
+  const ratio = dn_in / d_in;
+  const vr_tension = (2 / 3) * fv_prime_psi * b_in * dn_in * ratio * ratio;
+  const relief_factor = vr_tension > 0 ? vr / vr_tension : null;
+  const fv = v_applied_lb > 0 ? 3 * v_applied_lb / (2 * b_in * de) : null;
+  const dcr = v_applied_lb > 0 ? v_applied_lb / vr : null;
+  return { de_in: de, vr_lb: vr, vr_tension_lb: vr_tension, relief_factor, fv_psi: fv, dcr, e_capped: e_in > dn_in };
+}
+
+export const woodBeamCompressionNotchExample = {
+  inputs: { fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 9.25, e_in: 3, v_applied_lb: 2000 },
+};
+
+const _renderWoodBeamCompressionNotch = _simpleRenderer({
+  citation: "Citation: NDS 3.4.3.2(e) compression-side end-notch rule (2018 Eq 3.4-5): Vr' = (2/3) Fv' b [d - ((d - dn)/dn) e], the adjusted design shear for a bending member notched on the compression face at the end, with e the distance the notch extends from the inner edge of the support and e <= dn (if e > dn, the net depth dn governs per Eq 3.4-2). Fv' is the reference shear value already multiplied by every applicable adjustment factor (the user supplies it; the reference Fv and the factors come from the NDS Supplement for the actual species, grade, and service condition). The tension-side value shown for contrast is Eq 3.4-4, V' = (2/3) Fv' b dn (dn/d)^2. Compression-side end-notch case only; does not cover tension-side notches (the wood-beam-shear tile), notches away from the end, sloped / bevel / round notches, or the Cvr factor for members with connections in the shear zone. Loads within a distance d of the support may be neglected in V per NDS 3.4.3.1 (the user applies that to the input). A design aid, not a substitute for the engineer of record.",
+  example: woodBeamCompressionNotchExample.inputs,
+  fields: [
+    { key: "fv_prime_psi", label: "Adjusted shear value Fv' (psi)", kind: "number" },
+    { key: "b_in", label: "Breadth b (in)", kind: "number" },
+    { key: "d_in", label: "Full depth d (in)", kind: "number" },
+    { key: "dn_in", label: "Net depth at notch dn (in)", kind: "number" },
+    { key: "e_in", label: "Notch distance from inner edge of support e (in)", kind: "number" },
+    { key: "v_applied_lb", label: "Applied end shear V (lb, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "de", id: "wcn-out-de", label: "Effective depth de (NDS 3.4-5)", value: (r) => _fmtC(r.de_in, 2) + " in" + (r.e_capped ? " (e > dn: dn governs)" : "") },
+    { key: "vr", id: "wcn-out-vr", label: "Compression-side allowable Vr'", value: (r) => _fmtC(r.vr_lb, 0) + " lb" },
+    { key: "vt", id: "wcn-out-vt", label: "Same notch, tension side (for contrast)", value: (r) => _fmtC(r.vr_tension_lb, 0) + " lb" },
+    { key: "rf", id: "wcn-out-rf", label: "Compression keeps this much more", value: (r) => r.relief_factor === null ? "-" : _fmtC(r.relief_factor, 2) + "x the tension-side allowable" },
+    { key: "fv", id: "wcn-out-fv", label: "Actual stress fv", value: (r) => r.fv_psi === null ? "-" : _fmtC(r.fv_psi, 1) + " psi" },
+    { key: "dc", id: "wcn-out-dc", label: "Demand / capacity", value: (r) => r.dcr === null ? "-" : _fmtC(r.dcr, 2) + (r.dcr > 1 ? " (OVERSTRESS)" : "") },
+  ],
+  compute: computeWoodBeamCompressionNotch,
+});
+CONSTRUCTION_RENDERERS["wood-beam-compression-notch"] = _renderWoodBeamCompressionNotch;
+
 // ----- spec-v265: Single-Shear Bolted/Dowel Lateral Design Value (NDS Yield-Limit Z) -----
 
 // dims: in { d_in: L, lm_in: L, ls_in: L, gm: dimensionless, gs: dimensionless, fyb_psi: M L^-1 T^-2, theta_deg: dimensionless } out: { fem_psi: M L^-1 T^-2, fes_psi: M L^-1 T^-2, re: dimensionless, rt: dimensionless, ktheta: dimensionless, k1: dimensionless, k2: dimensionless, k3: dimensionless, z_im: M L T^-2, z_is: M L T^-2, z_ii: M L T^-2, z_iiim: M L T^-2, z_iiis: M L T^-2, z_iv: M L T^-2, z_lb: M L T^-2 }

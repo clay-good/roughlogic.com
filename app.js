@@ -515,7 +515,7 @@ const TOOL_MODULES = (() => {
     // spec-v251..v253 IBC plan-review trio.
     "allowable-area", "egress-travel-distance", "exterior-opening-protection",
     // spec-v263..v265 NDS sawn-lumber design trio.
-    "wood-beam-bending", "wood-beam-shear", "wood-bolt-connection",
+    "wood-beam-bending", "wood-beam-shear", "wood-beam-compression-notch", "wood-bolt-connection",
     // spec-v290..v292 NDS wood-member depth batch.
     "wood-bearing-perpendicular", "wood-tension-member", "wood-combined-bending-axial",
     // spec-v296..v298 ASCE 7 wind-and-snow load depth batch.

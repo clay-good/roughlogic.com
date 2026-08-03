@@ -1464,6 +1464,7 @@ export const COMPUTE_MAP = {
   // spec-v263..v265 NDS sawn-lumber design trio (3 tiles)
   "wood-beam-bending": { module: "../../calc-construction.js", fn: "computeWoodBeamBending" },
   "wood-beam-shear": { module: "../../calc-construction.js", fn: "computeWoodBeamShear" },
+  "wood-beam-compression-notch": { module: "../../calc-construction.js", fn: "computeWoodBeamCompressionNotch" },
   "wood-bolt-connection": { module: "../../calc-construction.js", fn: "computeWoodBoltConnection" },
   // spec-v254..v256 + v266..v268 AISC 360 steel member + connection trio (6 tiles, new calc-steel.js)
   "steel-beam-flexure": { module: "../../calc-steel.js", fn: "computeSteelBeamFlexure" },

@@ -14167,6 +14167,26 @@
       "kind": "adjacent"
     },
     {
+      "term": "compression side notch beam shear",
+      "target": "wood-beam-compression-notch",
+      "kind": "industry"
+    },
+    {
+      "term": "notch on the compression face nds",
+      "target": "wood-beam-compression-notch",
+      "kind": "question"
+    },
+    {
+      "term": "which side of the beam is safer to notch",
+      "target": "wood-beam-compression-notch",
+      "kind": "question"
+    },
+    {
+      "term": "notched beam effective depth de",
+      "target": "wood-beam-compression-notch",
+      "kind": "adjacent"
+    },
+    {
       "term": "bolt connection",
       "target": "wood-bolt-connection",
       "kind": "industry"

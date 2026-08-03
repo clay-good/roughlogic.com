@@ -14874,7 +14874,7 @@ test("bounds: spec-v253 computeExteriorOpeningProtection pins the FSD bands, the
 
 // ===================== spec-v263..v265 NDS sawn-lumber design trio =====================
 import {
-  computeWoodBeamBending as _v263, computeWoodBeamShear as _v264, computeWoodBoltConnection as _v265,
+  computeWoodBeamBending as _v263, computeWoodBeamShear as _v264, computeWoodBoltConnection as _v265, computeWoodBeamCompressionNotch as _v1197,
 } from "../../calc-construction.js";
 
 test("bounds: spec-v263 computeWoodBeamBending pins RB/FbE/CL/Fb'/M', the buckling seam, and error/clamp seams", () => {
@@ -14925,6 +14925,33 @@ test("bounds: spec-v264 computeWoodBeamShear pins Vr/ratio/Vr'/fv/dcr, the no-no
   assert.ok("error" in _v264({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 12 })); // dn > d
   assert.ok("error" in _v264({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 9.25, v_applied_lb: -1 }));
   assert.ok("error" in _v264({ fv_prime_psi: Infinity, b_in: 3.5, d_in: 11.25, dn_in: 9.25 }));
+});
+
+test("bounds: spec-v1197 computeWoodBeamCompressionNotch pins NDS 3.4-5 de/Vr', the e=0 and e=dn seams, and errors", () => {
+  // 4x12 (Fv' 180) notched 2 in on the compression face, 3 in from the support.
+  const r = _v1197({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 9.25, e_in: 3, v_applied_lb: 2000 });
+  assert.ok(Math.abs(r.de_in - 10.6013514) < 1e-4); // d - ((d-dn)/dn) e
+  assert.ok(Math.abs(r.vr_lb - 4452.5676) < 1e-3);
+  assert.ok(Math.abs(r.vr_tension_lb - 2626.4519) < 1e-3); // same notch, tension side (3.4-4)
+  assert.ok(r.vr_lb > r.vr_tension_lb); // compression side keeps more shear
+  assert.ok(Math.abs(r.dcr - 0.4491790) < 1e-6);
+  // e = 0 (notch at the bearing): effective depth is the full d, so Vr' is the un-notched value.
+  const e0 = _v1197({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 9.25, e_in: 0, v_applied_lb: 0 });
+  assert.ok(Math.abs(e0.de_in - 11.25) < 1e-9);
+  assert.ok(Math.abs(e0.vr_lb - 4725) < 1e-9); // (2/3) Fv' b d
+  // e = dn and e > dn both collapse to de = dn (Eq 3.4-2), continuous; e > dn sets the cap flag.
+  const edn = _v1197({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 9.25, e_in: 9.25, v_applied_lb: 0 });
+  const eover = _v1197({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 9.25, e_in: 20, v_applied_lb: 0 });
+  assert.ok(Math.abs(edn.de_in - 9.25) < 1e-9);
+  assert.ok(Math.abs(eover.de_in - 9.25) < 1e-9);
+  assert.strictEqual(eover.e_capped, true);
+  // No applied shear -> stress/dcr are null, not NaN.
+  assert.strictEqual(_v1197({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 9.25, e_in: 3, v_applied_lb: 0 }).fv_psi, null);
+  // Error seams.
+  assert.ok("error" in _v1197({ fv_prime_psi: 0, b_in: 3.5, d_in: 11.25, dn_in: 9.25, e_in: 3 }));
+  assert.ok("error" in _v1197({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 12, e_in: 3 })); // dn > d
+  assert.ok("error" in _v1197({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 9.25, e_in: -1 }));
+  assert.ok("error" in _v1197({ fv_prime_psi: Infinity, b_in: 3.5, d_in: 11.25, dn_in: 9.25, e_in: 3 }));
 });
 
 test("bounds: spec-v265 computeWoodBoltConnection pins all six modes, the governing selection, and the Hankinson/error seams", () => {

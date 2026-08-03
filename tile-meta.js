@@ -799,7 +799,7 @@ const _TILES = [
   // spec-v251..v253 IBC plan-review trio
   ["allowable-area", "E"], ["egress-travel-distance", "E"], ["exterior-opening-protection", "E"],
   // spec-v263..v265 NDS sawn-lumber design trio
-  ["wood-beam-bending", "E"], ["wood-beam-shear", "E"], ["wood-bolt-connection", "E"],
+  ["wood-beam-bending", "E"], ["wood-beam-shear", "E"], ["wood-beam-compression-notch", "E"], ["wood-bolt-connection", "E"],
   // spec-v254..v256 + v266..v268 AISC 360 steel member + connection trio (calc-steel.js)
   ["steel-beam-flexure", "E"], ["required-section-modulus", "E"], ["steel-beam-shear", "E"], ["steel-column-capacity", "E"],
   ["bolt-group-eccentric", "E"], ["bolt-shear-bearing", "E"], ["column-base-plate", "E"],

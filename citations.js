@@ -16808,6 +16808,18 @@ export const CITATIONS = {
       { name: "Loads near support", value: "loads within a distance d of the support may be neglected in V per NDS 3.4.3.1; the user applies that to the input", source: "NDS 3.4.3.1" },
     ],
   },
+  "wood-beam-compression-notch": {
+    formula: "de = d - ((d - dn)/dn) e (capped at dn for e >= dn); Vr' = (2/3) Fv' b de; tension-side contrast Vr' = (2/3) Fv' b dn (dn/d)^2; fv = 3V / (2 b de); dcr = V / Vr'.",
+    edition: "NDS 3.4.3.2(e) compression-side end-notch rule (2018 Eq 3.4-5), by name; the adjusted shear value comes from the NDS Supplement.",
+    freeAccess: "The compression-side end-notch rule is stated in NDS 3.4.3.2, published free read-only by AWC at awc.org; the arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The NDS 3.4.3.2(e) rule for a bending member notched on the COMPRESSION face at the end (2018 Eq 3.4-5): Vr' = (2/3) Fv' b [d - ((d - dn)/dn) e], where e is the distance the notch extends from the inner edge of the support, valid for e <= dn; for e > dn the net depth dn governs (Eq 3.4-2). At e = 0 (notch at the bearing) the effective depth is the full d, so there is no reduction; the effective depth falls to dn as e reaches dn. This is far less severe than the same notch on the tension side (Eq 3.4-4, (dn/d)^2), which is why the compression face is the preferred place to notch. Fv' is the reference shear value already multiplied by every applicable adjustment factor - the user supplies it, and the reference Fv and the factors come from the NDS Supplement. Compression-side end-notch case only; does not cover tension-side notches (the wood-beam-shear tile), notches away from the end, sloped/bevel/round notches, or the Cvr factor. A design aid, not a substitute for the engineer of record.",
+    assumptions: [
+      { name: "Effective depth", value: "de = d - ((d - dn)/dn) e grows back to the full d as the notch moves toward the support; e is capped at dn (dn governs beyond)", source: "NDS 3.4.3.2(e) Eq 3.4-5" },
+      { name: "Compression vs tension", value: "the compression-side notch keeps far more shear than the tension-side (dn/d)^2 rule for the same net depth", source: "NDS 3.4.3.2" },
+      { name: "Fv' user-supplied", value: "Fv' is the reference shear value times every applicable factor; the reference and factors come from the NDS Supplement", source: "NDS Supplement" },
+    ],
+  },
   "wood-bolt-connection": {
     formula: "Fe|| = 11,200 G; Fe_perp = 6,100 G^1.45 / sqrt(D); Hankinson blend to theta; Re = Fem/Fes; Rt = lm/ls; Ktheta = 1 + 0.25(theta/90); the six single-shear yield modes Z_Im..Z_IV of Table 12.3.1A; Z = min of the six.",
     edition: "NDS Table 12.3.1A single-shear yield-limit equations, the 12.3.3 dowel bearing strengths, and the Table 12.3.1B reduction terms, by name.",
