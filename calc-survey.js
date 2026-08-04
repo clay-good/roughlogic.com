@@ -437,7 +437,7 @@ export function computeCogoForwardPoint({ start_n = 0, start_e = 0, azimuth_deg 
 export const cogoForwardPointExample = { inputs: { start_n: 5000, start_e: 5000, azimuth_deg: 45, distance_ft: 200 } };
 
 function renderCogoForwardPoint(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: coordinate geometry forward locate - latitude (delta N) = D cos(Az), departure (delta E) = D sin(Az), with the azimuth measured clockwise from north; N2 = N1 + delta N, E2 = E1 + delta E. First-principles latitude/departure per the standard route-surveying references (Ghilani & Wolf; FM 5-233), by name. For a quadrant bearing (N45E) convert to azimuth first (the bearing-conversion tile handles the quadrant / declination). A computational aid; the project control and datum govern.";
+  citationEl.textContent = "Citation: coordinate geometry forward locate - latitude (delta N) = D cos(Az), departure (delta E) = D sin(Az), with the azimuth measured clockwise from north; N2 = N1 + delta N, E2 = E1 + delta E. First-principles latitude/departure per the standard route-surveying references (Ghilani & Wolf; FM 5-233), by name. For a quadrant bearing (N45E) convert to azimuth first (the azimuth-bearing-conversion tile does the quadrant conversion; the bearing-conversion tile handles magnetic declination). A computational aid; the project control and datum govern.";
   const n0 = makeNumber("Start northing N (ft)", "cf-n", { step: "any" });
   const e0 = makeNumber("Start easting E (ft)", "cf-e", { step: "any" });
   const az = makeNumber("Azimuth (deg, clockwise from north)", "cf-az", { step: "any", min: "0", max: "360" });
@@ -639,7 +639,7 @@ export function computeCogoInverseLocate({ start_n = 0, start_e = 0, end_n = 0, 
   if (azimuth_deg < 0) azimuth_deg += 360;
   return {
     distance_ft, azimuth_deg, delta_n, delta_e,
-    note: "The COGO inverse: from two known points, the straight-line distance and the azimuth of the line from the first to the second. Distance = sqrt(dN^2 + dE^2), azimuth = atan2(dE, dN) measured clockwise from north (0-360 deg). This is the exact inverse of the cogo-forward-point tile (a point plus a bearing and distance): running the forward tile from the first point on this azimuth and distance lands on the second. To read it as a quadrant bearing (N45E, S30W), the bearing-conversion tile takes the azimuth. Plane (grid) geometry - no earth curvature or grid scale factor; the project control and datum govern.",
+    note: "The COGO inverse: from two known points, the straight-line distance and the azimuth of the line from the first to the second. Distance = sqrt(dN^2 + dE^2), azimuth = atan2(dE, dN) measured clockwise from north (0-360 deg). This is the exact inverse of the cogo-forward-point tile (a point plus a bearing and distance): running the forward tile from the first point on this azimuth and distance lands on the second. To read it as a quadrant bearing (N45E, S30W), the azimuth-bearing-conversion tile takes the azimuth. Plane (grid) geometry - no earth curvature or grid scale factor; the project control and datum govern.",
   };
 }
 export const cogoInverseLocateExample = { inputs: { start_n: 5000, start_e: 5000, end_n: 5141.42, end_e: 5141.42 } };
