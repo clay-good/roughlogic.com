@@ -709,6 +709,7 @@ const RELATED = {
   "manning-slope": ["manning-pipe-capacity", "slope", "stormwater-rational", "trap-arm"],
   "manning-pipe-capacity": ["manning-slope", "channel-froude-number", "stormwater-rational", "weir-flow"],
   "pipe-partial-flow-depth": ["manning-pipe-capacity","manning-slope","channel-normal-depth","channel-froude-number"],
+  "tr55-time-of-concentration": ["time-of-concentration","stormwater-rational","manning-pipe-capacity","stormwater-detention-volume"],
   "drainage-invert": ["slope", "manning-slope", "trench-slope"],
   "hydrostatic-test": ["gas-leak-rate", "pressure-conversion"],
   "grease-trap": ["septic-tank", "septic-drainfield"],
@@ -1688,7 +1689,7 @@ const RELATED = {
   "concrete-beam-min-flexural-steel": ["rc-beam-flexure","t-beam-effective-flange-width","concrete-shrinkage-temperature-steel","rc-doubly-reinforced"],
   "concrete-crack-control-spacing": ["concrete-beam-min-flexural-steel","rc-development-length","rebar-lap-splice","concrete-shrinkage-temperature-steel"],
   // spec-v302..v304 site-hydraulics depth batch (Group B)
-  "time-of-concentration": ["stormwater-rational","manning-slope","orifice-flow"],
+  "time-of-concentration": ["tr55-time-of-concentration","stormwater-rational","manning-slope","orifice-flow"],
   "orifice-flow": ["orifice-diameter-for-flow","weir-flow","time-of-concentration","pipe-velocity"],
   "orifice-diameter-for-flow": ["orifice-flow","tank-drain-time","weir-flow","time-of-concentration"],
   "tank-drain-time": ["orifice-flow","weir-flow","detention-time"],

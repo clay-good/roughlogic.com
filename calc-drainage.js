@@ -608,3 +608,114 @@ function _v1011renderPipePartialFlowDepth(inputRegion, outputRegion, citationEl)
 DRAINAGE_RENDERERS["pipe-partial-flow-depth"] = _v1011renderPipePartialFlowDepth;
 DRAINAGE_RENDERERS["manning-slope"] = renderManningSlope;
 DRAINAGE_RENDERERS["manning-pipe-capacity"] = renderManningPipeCapacity;
+
+// ===================== spec-v1200: TR-55 three-segment time of concentration =====================
+// The time-of-concentration tile computes only the Kirpich single-channel estimate
+// and its own note names the gap: it is "not the TR-55 three-segment (sheet +
+// shallow concentrated + channel) travel-time sum." This adds that method -- the
+// NRCS TR-55 velocity method that modern US stormwater design actually uses.
+// Constants verified against the TR-55 (1986) Chapter 3 worked example.
+// dims: in { sheet_n: dimensionless, sheet_length_ft: L, p2_in: L, sheet_slope: dimensionless, shallow_surface: dimensionless, shallow_length_ft: L, shallow_slope: dimensionless, channel_n: dimensionless, channel_hyd_radius_ft: L, channel_length_ft: L, channel_slope: dimensionless } out: { tt_sheet_min: T, tt_shallow_min: T, tt_channel_min: T, tc_min: T, tc_hr: T, v_shallow_fps: L T^-1, v_channel_fps: L T^-1 }
+export function computeTr55TimeOfConcentration({
+  sheet_n = 0, sheet_length_ft = 0, p2_in = 0, sheet_slope = 0,
+  shallow_surface = "unpaved", shallow_length_ft = 0, shallow_slope = 0,
+  channel_n = 0, channel_hyd_radius_ft = 0, channel_length_ft = 0, channel_slope = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const num = (x) => Number(x) || 0;
+  const sL = num(sheet_length_ft), shL = num(shallow_length_ft), chL = num(channel_length_ft);
+  if (sL < 0 || shL < 0 || chL < 0) return { error: "Segment lengths cannot be negative (ft)." };
+  if (!(sL > 0 || shL > 0 || chL > 0)) return { error: "Enter a length for at least one flow segment (sheet, shallow concentrated, or channel)." };
+
+  // Sheet flow (TR-55 Eq 3-3): Tt = 0.007 (n L)^0.8 / (P2^0.5 s^0.4), hr.
+  let tt_sheet_hr = 0, sheet_over_100 = false;
+  if (sL > 0) {
+    if (!(num(sheet_n) > 0)) return { error: "Sheet-flow Manning roughness must be positive." };
+    if (!(num(p2_in) > 0)) return { error: "The 2-year, 24-hour rainfall P2 must be positive (in)." };
+    if (!(num(sheet_slope) > 0)) return { error: "Sheet-flow slope must be positive (ft/ft)." };
+    tt_sheet_hr = 0.007 * Math.pow(num(sheet_n) * sL, 0.8) / (Math.sqrt(num(p2_in)) * Math.pow(num(sheet_slope), 0.4));
+    sheet_over_100 = sL > 100;
+  }
+
+  // Shallow concentrated flow: V = k sqrt(s), k = 16.1345 unpaved / 20.3282 paved; Tt = L/(3600 V), hr.
+  let tt_shallow_hr = 0, v_shallow_fps = null;
+  if (shL > 0) {
+    if (!(num(shallow_slope) > 0)) return { error: "Shallow-concentrated slope must be positive (ft/ft)." };
+    const paved = String(shallow_surface).toLowerCase() === "paved";
+    v_shallow_fps = (paved ? 20.3282 : 16.1345) * Math.sqrt(num(shallow_slope));
+    tt_shallow_hr = shL / (3600 * v_shallow_fps);
+  }
+
+  // Channel flow: Manning V = (1.49/n) R^(2/3) sqrt(s); Tt = L/(3600 V), hr.
+  let tt_channel_hr = 0, v_channel_fps = null;
+  if (chL > 0) {
+    if (!(num(channel_n) > 0)) return { error: "Channel Manning roughness must be positive." };
+    if (!(num(channel_hyd_radius_ft) > 0)) return { error: "Channel hydraulic radius must be positive (ft)." };
+    if (!(num(channel_slope) > 0)) return { error: "Channel slope must be positive (ft/ft)." };
+    v_channel_fps = (1.49 / num(channel_n)) * Math.pow(num(channel_hyd_radius_ft), 2 / 3) * Math.sqrt(num(channel_slope));
+    tt_channel_hr = chL / (3600 * v_channel_fps);
+  }
+
+  const tc_hr = tt_sheet_hr + tt_shallow_hr + tt_channel_hr;
+  if (!Number.isFinite(tc_hr)) return { error: "Time-of-concentration math is not a finite value." };
+  return {
+    tt_sheet_min: tt_sheet_hr * 60,
+    tt_shallow_min: tt_shallow_hr * 60,
+    tt_channel_min: tt_channel_hr * 60,
+    tc_min: tc_hr * 60,
+    tc_hr,
+    v_shallow_fps,
+    v_channel_fps,
+    sheet_over_100,
+    note: "The NRCS TR-55 travel-time (velocity) method sums the time through up to three flow regimes to the time of concentration: SHEET flow over the plane at the head of the watershed (Tt = 0.007 (n L)^0.8 / (P2^0.5 s^0.4), with n the overland roughness -- about 0.011 smooth paved, 0.15 short grass, 0.24 dense grass, 0.40 light woods -- and P2 the local 2-year 24-hour rainfall), SHALLOW CONCENTRATED flow in rills and swales (V = 16.13 sqrt(s) unpaved or 20.33 sqrt(s) paved), and open CHANNEL flow by Manning. Enter a length of 0 to skip a segment. TR-55 caps sheet flow at 100 ft (the 2010 revision); beyond that the flow has concentrated, so a length over 100 ft is flagged. This is the method Kirpich (the time-of-concentration tile) approximates in one channel equation. A design aid; the local drainage manual and the engineer of record govern.",
+  };
+}
+export const tr55TimeOfConcentrationExample = { inputs: { sheet_n: 0.24, sheet_length_ft: 100, p2_in: 3.6, sheet_slope: 0.01, shallow_surface: "unpaved", shallow_length_ft: 1400, shallow_slope: 0.01, channel_n: 0.05, channel_hyd_radius_ft: 0.75, channel_length_ft: 3000, channel_slope: 0.005 } };
+
+function renderTr55TimeOfConcentration(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NRCS TR-55 (Urban Hydrology for Small Watersheds, 1986) Chapter 3 velocity method: sheet-flow Tt = 0.007 (n L)^0.8 / (P2^0.5 s^0.4), shallow-concentrated V = 16.1345 sqrt(s) (unpaved) / 20.3282 sqrt(s) (paved), channel V = (1.49/n) R^(2/3) sqrt(s), Tt = L/(3600 V); Tc = sum. A public USDA/NRCS document. Sheet flow capped at 100 ft. The overland roughness and the 2-year 24-hour rainfall are user-supplied. A design aid; the local drainage manual and the engineer of record govern.";
+  const mk = (label, id, val) => { const f = makeNumber(label, id, { step: "any", min: "0" }); if (val !== undefined) f.input.value = String(val); return f; };
+  const sN = mk("Sheet: Manning n (overland)", "tr-sn", 0.24);
+  const sL = mk("Sheet: length (ft, <= 100)", "tr-sl", 100);
+  const p2 = mk("Sheet: 2-yr 24-hr rainfall P2 (in)", "tr-p2", 3.6);
+  const sS = mk("Sheet: slope (ft/ft)", "tr-ss", 0.01);
+  const shSurf = makeSelect("Shallow concentrated: surface", "tr-shsurf", [
+    { value: "unpaved", label: "Unpaved (V = 16.13 sqrt s)", selected: true },
+    { value: "paved", label: "Paved (V = 20.33 sqrt s)" },
+  ]);
+  const shL = mk("Shallow: length (ft, 0 to skip)", "tr-shl", 1400);
+  const shS = mk("Shallow: slope (ft/ft)", "tr-shs", 0.01);
+  const cN = mk("Channel: Manning n", "tr-cn", 0.05);
+  const cR = mk("Channel: hydraulic radius R (ft)", "tr-cr", 0.75);
+  const cL = mk("Channel: length (ft, 0 to skip)", "tr-cl", 3000);
+  const cS = mk("Channel: slope (ft/ft)", "tr-cs", 0.005);
+  for (const f of [sN, sL, p2, sS]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(shSurf.wrap);
+  for (const f of [shL, shS, cN, cR, cL, cS]) inputRegion.appendChild(f.wrap);
+  const oTc = makeOutputLine(outputRegion, "Time of concentration", "tr-out-tc");
+  const oSeg = makeOutputLine(outputRegion, "By segment (sheet / shallow / channel)", "tr-out-seg");
+  const oVel = makeOutputLine(outputRegion, "Velocities (shallow / channel)", "tr-out-vel");
+  const oNote = makeOutputLine(outputRegion, "Note", "tr-out-note");
+  attachExampleButton(inputRegion, () => {
+    sN.input.value = "0.24"; sL.input.value = "100"; p2.input.value = "3.6"; sS.input.value = "0.01";
+    shSurf.select.value = "unpaved"; shL.input.value = "1400"; shS.input.value = "0.01";
+    cN.input.value = "0.05"; cR.input.value = "0.75"; cL.input.value = "3000"; cS.input.value = "0.005"; update();
+  });
+  const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
+  const update = debounce(() => {
+    const r = computeTr55TimeOfConcentration({
+      sheet_n: rd(sN.input), sheet_length_ft: rd(sL.input), p2_in: rd(p2.input), sheet_slope: rd(sS.input),
+      shallow_surface: shSurf.select.value, shallow_length_ft: rd(shL.input), shallow_slope: rd(shS.input),
+      channel_n: rd(cN.input), channel_hyd_radius_ft: rd(cR.input), channel_length_ft: rd(cL.input), channel_slope: rd(cS.input),
+    });
+    if (r.error) { oTc.textContent = r.error; oSeg.textContent = "-"; oVel.textContent = "-"; oNote.textContent = ""; return; }
+    oTc.textContent = fmt(r.tc_min, 1) + " min (" + fmt(r.tc_hr, 3) + " hr)" + (r.sheet_over_100 ? " -- sheet length over 100 ft, TR-55 caps it" : "");
+    oSeg.textContent = fmt(r.tt_sheet_min, 1) + " / " + fmt(r.tt_shallow_min, 1) + " / " + fmt(r.tt_channel_min, 1) + " min";
+    oVel.textContent = (r.v_shallow_fps === null ? "-" : fmt(r.v_shallow_fps, 2) + " ft/s") + " / " + (r.v_channel_fps === null ? "-" : fmt(r.v_channel_fps, 2) + " ft/s");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [sN, sL, p2, sS, shL, shS, cN, cR, cL, cS]) f.input.addEventListener("input", update);
+  shSurf.select.addEventListener("change", update);
+  update();
+}
+DRAINAGE_RENDERERS["tr55-time-of-concentration"] = renderTr55TimeOfConcentration;

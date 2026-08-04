@@ -17817,6 +17817,26 @@
       "kind": "industry"
     },
     {
+      "term": "tr-55 velocity method",
+      "target": "tr55-time-of-concentration",
+      "kind": "industry"
+    },
+    {
+      "term": "three segment time of concentration",
+      "target": "tr55-time-of-concentration",
+      "kind": "question"
+    },
+    {
+      "term": "sheet shallow channel travel time",
+      "target": "tr55-time-of-concentration",
+      "kind": "question"
+    },
+    {
+      "term": "tr55 sheet flow travel time",
+      "target": "tr55-time-of-concentration",
+      "kind": "industry"
+    },
+    {
       "term": "rational method time",
       "target": "time-of-concentration",
       "kind": "adjacent"

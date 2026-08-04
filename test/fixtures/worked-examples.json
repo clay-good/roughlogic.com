@@ -51947,6 +51947,36 @@
    }
   },
   {
+   "tile_id": "tr55-time-of-concentration",
+   "source_publisher": "USDA NRCS TR-55 (1986), Chapter 3",
+   "source_title": "TR-55 Ch. 3 velocity-method example: sheet + shallow + channel -> 61.0 min (spec-v1200)",
+   "source_edition_or_year": "TR-55 1986, Chapter 3 worked example",
+   "source_section_or_page": "Sheet n 0.24 dense grass, L 100 ft, P2 3.6 in, s 0.01: Tt = 0.007 (0.24 x 100)^0.8 / (3.6^0.5 x 0.01^0.4) = 0.296 hr = 17.75 min. Shallow unpaved L 1400 ft s 0.01: V = 16.1345 sqrt(0.01) = 1.6135 ft/s, Tt = 1400 / (3600 x 1.6135) = 0.241 hr = 14.46 min. Channel n 0.05 R 0.75 ft s 0.005 L 3000 ft: V = (1.49/0.05) 0.75^(2/3) sqrt(0.005) = 1.7394 ft/s, Tt = 3000 / (3600 x 1.7394) = 0.479 hr = 28.74 min. Tc = 17.75 + 14.46 + 28.74 = 60.96 min.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-04",
+   "inputs": {
+    "sheet_n": 0.24,
+    "sheet_length_ft": 100,
+    "p2_in": 3.6,
+    "sheet_slope": 0.01,
+    "shallow_surface": "unpaved",
+    "shallow_length_ft": 1400,
+    "shallow_slope": 0.01,
+    "channel_n": 0.05,
+    "channel_hyd_radius_ft": 0.75,
+    "channel_length_ft": 3000,
+    "channel_slope": 0.005
+   },
+   "outputs": {
+    "tt_sheet_min": { "value": 17.7528, "tolerance": { "abs": 0.01 } },
+    "tt_shallow_min": { "value": 14.4618, "tolerance": { "abs": 0.01 } },
+    "tt_channel_min": { "value": 28.7449, "tolerance": { "abs": 0.01 } },
+    "tc_min": { "value": 60.9595, "tolerance": { "abs": 0.02 } },
+    "v_shallow_fps": { "value": 1.6135, "tolerance": { "abs": 0.001 } },
+    "v_channel_fps": { "value": 1.7394, "tolerance": { "abs": 0.001 } }
+   }
+  },
+  {
    "tile_id": "time-of-concentration",
    "source_publisher": "Kirpich (1940) / USDA TR-55",
    "source_title": "1,000 ft flow path at 2% slope -> 7.2 min",

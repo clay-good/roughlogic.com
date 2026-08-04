@@ -15373,6 +15373,19 @@ export const CITATIONS = {
       { name: "Advisory guidelines", value: "~8,500 traditional design limit and ~11,000 reliability threshold are advisory practice, not a hard code limit", source: "Hydraulic Institute / pump-reliability studies" },
     ],
   },
+  "tr55-time-of-concentration": {
+    formula: "Tc = Tt_sheet + Tt_shallow + Tt_channel. Sheet (TR-55 Eq 3-3): Tt = 0.007 (n L)^0.8 / (P2^0.5 s^0.4) hr. Shallow concentrated: V = 16.1345 sqrt(s) unpaved / 20.3282 sqrt(s) paved, Tt = L/(3600 V) hr. Channel (Manning): V = (1.49/n) R^(2/3) sqrt(s), Tt = L/(3600 V) hr.",
+    edition: "The NRCS TR-55 (Urban Hydrology for Small Watersheds, 1986) Chapter 3 velocity method for time of concentration, by name; constants verified against the TR-55 Chapter 3 worked example.",
+    freeAccess: "TR-55 is a free USDA NRCS publication; the sheet/shallow/channel travel-time equations and their constants are published in it and in every hydrology text.",
+    governance: GOVERNANCE.general,
+    editionNote: "The TR-55 velocity method sums the travel time through up to three flow regimes to the time of concentration. SHEET flow (the plane at the head of the watershed, capped at 100 ft in the 2010 revision) uses Tt = 0.007 (n L)^0.8 / (P2^0.5 s^0.4) with n the overland roughness (about 0.011 smooth paved, 0.15 short grass, 0.24 dense grass, 0.40 light woods) and P2 the local 2-year 24-hour rainfall. SHALLOW CONCENTRATED flow in rills and swales uses V = 16.13 sqrt(s) unpaved or 20.33 sqrt(s) paved. CHANNEL flow uses Manning V = (1.49/n) R^(2/3) sqrt(s). Enter a length of 0 to skip a segment. This is the three-segment method the Kirpich time-of-concentration tile approximates in one channel equation. The overland roughness and the 2-year rainfall are user-supplied; a low d/D or a bad n shifts the answer. A design aid, not a substitute for a licensed civil engineer's drainage report; the engineer of record and the local drainage manual govern.",
+    assumptions: [
+      { name: "Sheet flow", value: "Tt = 0.007 (n L)^0.8 / (P2^0.5 s^0.4), L capped at 100 ft", source: "TR-55 Eq 3-3" },
+      { name: "Shallow concentrated", value: "V = 16.1345 sqrt(s) unpaved / 20.3282 sqrt(s) paved", source: "TR-55 Figure 3-1" },
+      { name: "Channel", value: "Manning V = (1.49/n) R^(2/3) sqrt(s), Tt = L / (3600 V)", source: "TR-55 Chapter 3" },
+      { name: "Use", value: "Tc sets the design storm duration read off the local IDF curve, not a routed hydrograph", source: "NRCS drainage practice" },
+    ],
+  },
   "time-of-concentration": {
     formula: "tc_min = 0.0078 L^0.77 S^(-0.385) (tc minutes, L feet, S ft/ft); tc_hr = tc_min / 60.",
     edition: "The Kirpich (1940) time-of-concentration equation tc = 0.0078 L^0.77 S^(-0.385), as compiled in the USDA TR-55 and NRCS drainage references, by name.",

@@ -29261,6 +29261,39 @@ test("bounds: spec-v1011 computePipePartialFlowDepth pins the circular partial-f
   assert.ok("error" in _v1011({ ...base, slope: Infinity }));
 });
 
+import { computeTr55TimeOfConcentration as _v1200 } from "../../calc-drainage.js";
+
+test("bounds: spec-v1200 computeTr55TimeOfConcentration pins the three-segment travel times, the TR-55 example, additivity, and error seams", () => {
+  const ex = { sheet_n: 0.24, sheet_length_ft: 100, p2_in: 3.6, sheet_slope: 0.01, shallow_surface: "unpaved", shallow_length_ft: 1400, shallow_slope: 0.01, channel_n: 0.05, channel_hyd_radius_ft: 0.75, channel_length_ft: 3000, channel_slope: 0.005 };
+  const r = _v1200(ex);
+  // Against the TR-55 Chapter 3 worked example.
+  assert.ok(Math.abs(r.tt_sheet_min - 17.7528) < 1e-3);
+  assert.ok(Math.abs(r.tt_shallow_min - 14.4618) < 1e-3);
+  assert.ok(Math.abs(r.tt_channel_min - 28.7449) < 1e-3);
+  // Tc is exactly the sum of the segments, and tc_hr = tc_min/60.
+  assert.ok(Math.abs(r.tc_min - (r.tt_sheet_min + r.tt_shallow_min + r.tt_channel_min)) < 1e-9);
+  assert.ok(Math.abs(r.tc_hr - r.tc_min / 60) < 1e-12);
+  // Shallow velocity constants: paved is faster than unpaved at the same slope by the fixed ratio.
+  const un = _v1200({ shallow_length_ft: 500, shallow_slope: 0.04 });
+  const pv = _v1200({ shallow_surface: "paved", shallow_length_ft: 500, shallow_slope: 0.04 });
+  assert.ok(Math.abs(un.v_shallow_fps - 16.1345 * Math.sqrt(0.04)) < 1e-6);
+  assert.ok(Math.abs(pv.v_shallow_fps / un.v_shallow_fps - 20.3282 / 16.1345) < 1e-9);
+  // A single active segment works; skipped segments contribute exactly zero.
+  const sheetOnly = _v1200({ sheet_n: 0.15, sheet_length_ft: 80, p2_in: 3, sheet_slope: 0.02 });
+  assert.ok(sheetOnly.tt_shallow_min === 0 && sheetOnly.tt_channel_min === 0 && sheetOnly.tc_min > 0 && sheetOnly.v_shallow_fps === null);
+  // Sheet length over 100 ft is flagged (TR-55 cap).
+  assert.strictEqual(_v1200({ sheet_n: 0.15, sheet_length_ft: 150, p2_in: 3, sheet_slope: 0.02 }).sheet_over_100, true);
+  assert.strictEqual(sheetOnly.sheet_over_100, false);
+  // Monotonic: a steeper channel drains faster (shorter travel time).
+  assert.ok(_v1200({ ...ex, channel_slope: 0.02 }).tt_channel_min < r.tt_channel_min);
+  // Error seams.
+  assert.ok("error" in _v1200({})); // no active segment
+  assert.ok("error" in _v1200({ sheet_length_ft: 100 })); // sheet active but missing n/P2/slope
+  assert.ok("error" in _v1200({ shallow_length_ft: -5 })); // negative length
+  assert.ok("error" in _v1200({ channel_length_ft: 100, channel_n: 0.03, channel_hyd_radius_ft: 1 })); // channel missing slope
+  assert.ok("error" in _v1200({ sheet_n: 0.2, sheet_length_ft: 100, p2_in: 3, sheet_slope: Infinity }));
+});
+
 import { computeWindowOverhangShade as _v1012 } from "../../calc-hvacsystems.js";
 
 test("bounds: spec-v1012 computeWindowOverhangShade pins the profile angle, the seasonal shade line, the no-direct-sun branch, and error seams", () => {

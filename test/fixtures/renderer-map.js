@@ -308,6 +308,7 @@ export const RENDERER_MAP = {
   "manning-slope": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },
   "manning-pipe-capacity": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },
   "pipe-partial-flow-depth": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },
+  "tr55-time-of-concentration": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },
   "gas-pipe-sizing": { module: "../../calc-gas.js", exportName: "GAS_RENDERERS" },
   "gas-leak-rate": { module: "../../calc-gas.js", exportName: "GAS_RENDERERS" },
   "gas-leak-hole-diameter": { module: "../../calc-gas.js", exportName: "GAS_RENDERERS" },

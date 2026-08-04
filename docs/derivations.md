@@ -1893,6 +1893,7 @@ cross-check.
 | calc-drainage.js | `computeScupperWidthForFlow` | `{ required_gpm = 0, head_in = 0 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeSewageForceMainVelocity` | `{ gpm = 0, id_in = 0 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeSumpBasinSizing` | `{ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60 } = {}` | _ | _ | _ |
+| calc-drainage.js | `computeTr55TimeOfConcentration` | `{ sheet_n = 0, sheet_length_ft = 0, p2_in = 0, sheet_slope = 0, shallow_surfa...` | _ | _ | _ |
 | calc-drainage.js | `renderManningSlope` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-earthwork.js | `computeAtterbergIndices` | `{ ll = 0, pl = 0, w_pct = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeCheckDamSpacing` | `{ dam_height_ft = 0, channel_slope_pct = 0, reach_length_ft = 0 } = {}` | _ | _ | _ |
@@ -3234,7 +3235,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1820.
+Row count: 1821.
 
 <!-- END function-corpus-v14 -->
 
@@ -3519,7 +3520,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (129 tiles)
+### Group B Plumbing (130 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3634,6 +3635,7 @@ per spec-v14 §13.1 second paragraph.
 | `thrust-block-sizing` | Thrust Block Bearing Area at a Pipe Bend (AWWA M41) | AWWA M41; spec-v388 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `time-of-concentration` | Time of Concentration (Kirpich) | Kirpich (1940) / USDA TR-55; spec-v302 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tpr-discharge` | Water-Heater T&P Relief and Discharge | IPC 2021 Section 504 / ANSI Z21.22; heater input 50,000, T&P valve 150,000, 3/4 in outlet -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tr55-time-of-concentration` | Time of Concentration (TR-55 Velocity Method) | USDA NRCS TR-55 (1986), Chapter 3; Sheet n 0.24 dense grass, L 100 ft, P2 3.6 in, s 0.01: Tt... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `trap-arm` | Trap Arm Length | IPC; Table 906.1: 2 in trap arm at 1/4 in/ft slope -> 8 ft max... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `trap-primer` | Trap Primer Sizing | ICC / manufacturer; primers = ceil(6/4) = 2; water = 6*(8/128)*365 = 136.875 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `trap-seal-loss` | Trap-Seal Protection Check | IPC/UPC §1002 (trap-to-vent); 6 ft used of 8 ft permitted -> pass, 75% | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4992,6 +4994,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1572. Fixture-covered or reference-cadence: 1572 / 1572.
+Tile count: 1573. Fixture-covered or reference-cadence: 1573 / 1573.
 
 <!-- END tile-index-v14 -->
