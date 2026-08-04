@@ -9703,7 +9703,7 @@ import {
   computeDuctVelocityPressure, renderDuctVelocityPressure,
   computeRefrigerantVelocity, renderRefrigerantVelocity,
   computeRefrigerantLineSize, renderRefrigerantLineSize,
-  renderPitotTraverseCfm,
+  renderPitotTraverseCfm, renderPitotTraverseAverage,
 } from "../../calc-velocity.js";
 
 test("bounds: calc-hvac computeDuctVelocityPressure pins V = 4005*sqrt(VP) + inverse + rejects non-positive/Infinity", () => {
@@ -9806,7 +9806,7 @@ test("bounds: calc-edu computeCurveGradeScaler pins flat/sqrt/linear + clamp + r
 });
 
 test("bounds: v23 export-function renderers are callable functions (DOM-bound sentinel)", () => {
-  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderRefrigerantLineSize, renderPitotTraverseCfm, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
+  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderRefrigerantLineSize, renderPitotTraverseCfm, renderPitotTraverseAverage, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
     assert.strictEqual(typeof fn, "function", "render symbol must be a function");
   }
 });
@@ -19761,6 +19761,39 @@ test("bounds: spec-v385 computePitotTraverseCfm pins V = 4005 sqrt(VP), CFM = V 
   assert.ok("error" in _v385({ vp_avg_inwc: 0.15, w_in: 0, h_in: 12 }));
   assert.ok("error" in _v385({ vp_avg_inwc: 0.15, w_in: 24, h_in: 0 }));
   assert.ok("error" in _v385({ vp_avg_inwc: Infinity, w_in: 24, h_in: 12 }));
+});
+
+import { computePitotTraverseAverage as _v1199 } from "../../calc-velocity.js";
+
+test("bounds: spec-v1199 computePitotTraverseAverage pins velocity-averaging, the concavity over-read, uniform agreement, and error seams", () => {
+  const r = _v1199({ vp_readings: [0.09, 0.16, 0.25, 0.16], w_in: 24, h_in: 12 });
+  // Velocity average = mean of 4005 sqrt(VP_i), NOT 4005 sqrt(mean VP).
+  const vs = [0.09, 0.16, 0.25, 0.16].map((v) => 4005 * Math.sqrt(v));
+  const vmean = vs.reduce((a, b) => a + b, 0) / 4;
+  assert.ok(Math.abs(r.v_avg_fpm - vmean) < 1e-9 && Math.abs(r.v_avg_fpm - 1602) < 1e-9);
+  assert.ok(Math.abs(r.area_ft2 - 2.0) < 1e-12 && Math.abs(r.cfm - r.v_avg_fpm * 2.0) < 1e-9);
+  assert.ok(Math.abs(r.v_vp_average_fpm - 4005 * Math.sqrt(0.165)) < 1e-9);
+  // THE POINT: averaging VP first always reads high (sqrt is concave), so the
+  // shortcut velocity strictly exceeds the correct velocity average for varied readings.
+  assert.ok(r.v_vp_average_fpm > r.v_avg_fpm && r.overread_pct > 0);
+  assert.ok(Math.abs(r.overread_pct - (r.v_vp_average_fpm / r.v_avg_fpm - 1) * 100) < 1e-9);
+  // Concavity holds across many random-ish varied traverses (deterministic sweep).
+  for (const set of [[0.02, 0.2], [0.1, 0.1, 0.4], [0.3, 0.05, 0.15, 0.25, 0.35], [0.5, 0.01]]) {
+    const t = _v1199({ vp_readings: set, w_in: 12, h_in: 12 });
+    assert.ok(t.v_vp_average_fpm >= t.v_avg_fpm - 1e-9 && t.overread_pct >= -1e-9, "concavity violated for " + set.join(","));
+    assert.ok(t.point_count === set.length);
+  }
+  // Uniform readings: the two methods agree exactly, over-read is 0.
+  const uni = _v1199({ vp_readings: [0.16, 0.16, 0.16, 0.16], w_in: 24, h_in: 12 });
+  assert.ok(Math.abs(uni.overread_pct) < 1e-12 && Math.abs(uni.v_avg_fpm - uni.v_vp_average_fpm) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v1199({ vp_readings: [], w_in: 24, h_in: 12 }));
+  assert.ok("error" in _v1199({ vp_readings: [0.1, -0.2], w_in: 24, h_in: 12 }));
+  assert.ok("error" in _v1199({ vp_readings: [0.1, 0], w_in: 24, h_in: 12 }));
+  assert.ok("error" in _v1199({ vp_readings: [0.1, Infinity], w_in: 24, h_in: 12 }));
+  assert.ok("error" in _v1199({ vp_readings: "0.1", w_in: 24, h_in: 12 }));
+  assert.ok("error" in _v1199({ vp_readings: [0.1], w_in: 0, h_in: 12 }));
+  assert.ok("error" in _v1199({ vp_readings: [0.1], w_in: 24, h_in: 0 }));
 });
 
 test("bounds: spec-v386 computeOutsideAirPercentTemps pins the balance, the band/spread flags, and error seams", () => {

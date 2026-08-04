@@ -62175,6 +62175,86 @@
    }
   },
   {
+   "tile_id": "pitot-traverse-average",
+   "source_publisher": "ASHRAE Fundamentals / AABC-NEBB",
+   "source_title": "four traverse points 0.09/0.16/0.25/0.16 in wc, 24 x 12 duct -> 1602 fpm, 3204 CFM velocity-averaged (spec-v1199)",
+   "source_edition_or_year": "spec-v1199 worked example (machine-verified)",
+   "source_section_or_page": "Point velocities 4005 x sqrt(VP) = 1201.5, 1602, 2002.5, 1602 fpm; their mean is 1602 fpm and CFM = 1602 x 2.0 ft^2 = 3204. The single-average-VP shortcut takes sqrt of mean VP 0.165 = 0.40620, so 1626.84 fpm and 3253.68 CFM -- 1.55 percent high, because the square root is concave.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-04",
+   "inputs": {
+    "vp_readings": [0.09, 0.16, 0.25, 0.16],
+    "w_in": 24,
+    "h_in": 12
+   },
+   "outputs": {
+    "v_avg_fpm": {
+     "value": 1602,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "area_ft2": {
+     "value": 2.0,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "cfm": {
+     "value": 3204,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "v_vp_average_fpm": {
+     "value": 1626.84,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "overread_pct": {
+     "value": 1.5505,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "point_count": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pitot-traverse-average",
+   "source_publisher": "ASHRAE Fundamentals / AABC-NEBB",
+   "source_title": "cross-check: uniform readings make the two averaging methods agree (over-read 0)",
+   "source_edition_or_year": "spec-v1199 worked example (machine-verified)",
+   "source_section_or_page": "With four identical 0.16 in wc readings every point velocity is 1602 fpm, so the velocity average and the single-average-VP shortcut both give 1602 fpm and the over-read is exactly 0 -- the shortcut error appears only when the readings vary, which they always do in a real duct.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-04",
+   "inputs": {
+    "vp_readings": [0.16, 0.16, 0.16, 0.16],
+    "w_in": 24,
+    "h_in": 12
+   },
+   "outputs": {
+    "v_avg_fpm": {
+     "value": 1602,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "overread_pct": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "outside-air-percent-temps",
    "source_publisher": "ASHRAE / AABC-NEBB",
    "source_title": "RA 75, MA 68, OA 40 F -> 20.0% outside air",

@@ -14,6 +14,7 @@ import {
   DEBOUNCE_MS as _V23H_DEB, debounce as _v23h_debounce, fmt as _v23h_fmt,
   makeNumber as _v23h_makeNumber, makeSelect as _v23h_makeSelect,
   attachExampleButton as _v23h_attachEx, makeOutputLine as _v23h_makeOut,
+  makeTextarea as _v23h_makeTextarea,
 } from "./ui-fields.js";
 
 export const VELOCITY_RENDERERS = {};
@@ -191,7 +192,7 @@ export const pitotTraverseCfmExample = { inputs: { vp_avg_inwc: 0.15, w_in: 24, 
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPitotTraverseCfm(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Pitot-tube traverse airflow (ASHRAE Fundamentals / AABC-NEBB field practice): velocity V = 4005 x sqrt(VP) for standard air (0.075 lb/ft^3, sea level) from the traverse-average velocity pressure, then CFM = V x duct area. Average the velocity pressures across the equal-area traverse points (root-mean-square of the VP readings is more exact); apply a density correction at altitude or high temperature. A field measurement, not a substitute for a calibrated flow station.";
+  citationEl.textContent = "Citation: Pitot-tube traverse airflow (ASHRAE Fundamentals / AABC-NEBB field practice): velocity V = 4005 x sqrt(VP) for standard air (0.075 lb/ft^3, sea level) from a single traverse-average velocity pressure, then CFM = V x duct area. This takes one pre-averaged VP; the more exact method converts each point's VP to a velocity and averages the velocities (the pitot-traverse-average tile), which reads slightly lower because the square root is concave. Apply a density correction at altitude or high temperature. A field measurement, not a substitute for a calibrated flow station.";
   const vp = _v23h_makeNumber("Average velocity pressure (in. w.c.)", "ptc-vp", { step: "any", min: "0" });
   vp.input.value = "0.15";
   const w = _v23h_makeNumber("Duct width (in)", "ptc-w", { step: "any", min: "0" });
@@ -214,3 +215,73 @@ export function renderPitotTraverseCfm(inputRegion, outputRegion, citationEl) {
   for (const f of [vp.input, w.input, h.input]) f.addEventListener("input", update);
 }
 VELOCITY_RENDERERS["pitot-traverse-cfm"] = renderPitotTraverseCfm;
+
+// ===================== spec-v1199: pitot traverse from raw point readings =====================
+// The pitot-traverse-cfm tile takes ONE already-averaged velocity pressure and
+// its own note flags the shortcut: averaging the velocity pressures first and
+// taking a single square root reads high, because velocity (not velocity
+// pressure) is what integrates to flow over the equal-area points. This tile
+// takes the raw per-point VP readings, converts EACH to a velocity, and averages
+// the velocities -- the method NEBB/AABC/ASHRAE actually require -- and shows how
+// much the single-average-VP shortcut over-reads.
+// dims: in { vp_readings: dimensionless, w_in: L, h_in: L } out: { v_avg_fpm: L T^-1, area_ft2: L^2, cfm: L^3 T^-1, v_vp_average_fpm: L T^-1, cfm_vp_average: L^3 T^-1, overread_pct: dimensionless, point_count: dimensionless }
+export function computePitotTraverseAverage({ vp_readings, w_in = 0, h_in = 0 } = {}) {
+  const w = Number(w_in) || 0;
+  const h = Number(h_in) || 0;
+  if (!Array.isArray(vp_readings) || vp_readings.length < 1) return { error: "Enter at least one traverse-point velocity pressure (in. w.c.)." };
+  for (const vp of vp_readings) { if (!Number.isFinite(vp) || !(vp > 0)) return { error: "Every velocity-pressure reading must be positive (in. w.c.)." }; }
+  if (!(w > 0 && Number.isFinite(w))) return { error: "Duct width must be positive (in)." };
+  if (!(h > 0 && Number.isFinite(h))) return { error: "Duct height must be positive (in)." };
+  const K = 4005; // standard-air velocity constant (0.075 lb/ft^3, sea level)
+  const velocities = vp_readings.map((vp) => K * Math.sqrt(vp));
+  const n = velocities.length;
+  const v_avg_fpm = velocities.reduce((a, b) => a + b, 0) / n;
+  const vp_mean = vp_readings.reduce((a, b) => a + b, 0) / n;
+  const v_vp_average_fpm = K * Math.sqrt(vp_mean);
+  const area_ft2 = (w * h) / 144;
+  const cfm = v_avg_fpm * area_ft2;
+  const cfm_vp_average = v_vp_average_fpm * area_ft2;
+  const overread_pct = (v_vp_average_fpm / v_avg_fpm - 1) * 100;
+  return {
+    v_avg_fpm, area_ft2, cfm, v_vp_average_fpm, cfm_vp_average, overread_pct, point_count: n,
+    note: "The correct pitot-traverse average converts each equal-area point's velocity pressure to a velocity (V = 4005 sqrt(VP) for standard air) and averages the VELOCITIES, because velocity is what integrates to flow across the duct; CFM = average velocity x duct area. Averaging the velocity pressures first and taking one square root (the pitot-traverse-cfm tile's single-input shortcut) always reads high, since the square root is concave -- here by " + overread_pct.toFixed(2) + " percent. Space the points on an equal-area or log-Tchebycheff traverse per NEBB/AABC/ASHRAE, use enough points, and apply a density correction at altitude or high temperature. A field measurement, not a substitute for a calibrated flow station.",
+  };
+}
+export const pitotTraverseAverageExample = { inputs: { vp_readings: [0.09, 0.16, 0.25, 0.16], w_in: 24, h_in: 12 } };
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderPitotTraverseAverage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Pitot-tube traverse airflow averaged the correct way (ASHRAE Fundamentals / AABC / NEBB field practice, by name): convert each equal-area point's velocity pressure to a velocity V = 4005 x sqrt(VP) for standard air (0.075 lb/ft^3, sea level), average the velocities, then CFM = average velocity x duct area. Averaging the velocity pressures first reads high because the square root is concave. Apply a density correction at altitude or high temperature. A field measurement, not a substitute for a calibrated flow station.";
+  const reads = _v23h_makeTextarea("Velocity pressure at each traverse point (in. w.c.), one per line", "pta-reads", { rows: "5" });
+  reads.input.value = "0.09\n0.16\n0.25\n0.16";
+  const w = _v23h_makeNumber("Duct width (in)", "pta-w", { step: "any", min: "0", value: "24" });
+  w.input.value = "24";
+  const h = _v23h_makeNumber("Duct height (in)", "pta-h", { step: "any", min: "0", value: "12" });
+  h.input.value = "12";
+  for (const f of [reads, w, h]) inputRegion.appendChild(f.wrap);
+  _v23h_attachEx(inputRegion, () => { reads.input.value = "0.09\n0.16\n0.25\n0.16"; w.input.value = "24"; h.input.value = "12"; update(); });
+  const oV = _v23h_makeOut(outputRegion, "Average velocity (velocity-averaged)", "pta-out-v");
+  const oCfm = _v23h_makeOut(outputRegion, "Airflow", "pta-out-cfm");
+  const oShortcut = _v23h_makeOut(outputRegion, "VP-average shortcut (over-reads)", "pta-out-short");
+  const oNote = _v23h_makeOut(outputRegion, "Note", "pta-out-note");
+  function parseNums(text) {
+    const out = [];
+    for (const raw of String(text).split("\n")) {
+      const line = raw.trim(); if (!line) continue;
+      const v = Number(line); if (!Number.isFinite(v)) return null; out.push(v);
+    }
+    return out;
+  }
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = _v23h_debounce(() => {
+    const list = parseNums(reads.input.value);
+    if (list === null) { oV.textContent = "Each velocity pressure must be a finite number, one per line."; oCfm.textContent = "-"; oShortcut.textContent = "-"; oNote.textContent = ""; return; }
+    const r = computePitotTraverseAverage({ vp_readings: list, w_in: readNum(w.input), h_in: readNum(h.input) });
+    if (r.error) { oV.textContent = r.error; oCfm.textContent = "-"; oShortcut.textContent = "-"; oNote.textContent = ""; return; }
+    oV.textContent = _v23h_fmt(r.v_avg_fpm, 0) + " fpm over " + r.point_count + " points (" + _v23h_fmt(r.area_ft2, 2) + " ft^2)";
+    oCfm.textContent = _v23h_fmt(r.cfm, 0) + " CFM";
+    oShortcut.textContent = _v23h_fmt(r.cfm_vp_average, 0) + " CFM (" + _v23h_fmt(r.overread_pct, 2) + " percent high)";
+    oNote.textContent = r.note;
+  }, _V23H_DEB);
+  for (const f of [reads.input, w.input, h.input]) f.addEventListener("input", update);
+}
+VELOCITY_RENDERERS["pitot-traverse-average"] = renderPitotTraverseAverage;

@@ -3155,10 +3155,12 @@ cross-check.
 | calc-trucking.js | `renderSsdDesignSpeed` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-trucking.js | `renderStoppingSightDistance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `computeDuctVelocityPressure` | `{ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0 } = {}` | _ | _ | _ |
+| calc-velocity.js | `computePitotTraverseAverage` | `{ vp_readings, w_in = 0, h_in = 0 } = {}` | _ | _ | _ |
 | calc-velocity.js | `computePitotTraverseCfm` | `{ vp_avg_inwc = 0, w_in = 0, h_in = 0 } = {}` | _ | _ | _ |
 | calc-velocity.js | `computeRefrigerantLineSize` | `{ mass_flow_lb_hr = 0, specific_volume_ft3_lb = 0, target_velocity_fpm = 1500...` | _ | _ | _ |
 | calc-velocity.js | `computeRefrigerantVelocity` | `{ mass_flow_lb_hr = 0, line_id_in = 0, specific_volume_ft3_lb = 0, orientatio...` | _ | _ | _ |
 | calc-velocity.js | `renderDuctVelocityPressure` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-velocity.js | `renderPitotTraverseAverage` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderPitotTraverseCfm` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderRefrigerantLineSize` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderRefrigerantVelocity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -3232,7 +3234,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1818.
+Row count: 1820.
 
 <!-- END function-corpus-v14 -->
 
@@ -3651,7 +3653,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (147 tiles)
+### Group C HVAC (148 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3769,6 +3771,7 @@ per spec-v14 §13.1 second paragraph.
 | `outside-air-percent-temps` | Measured Outside-Air Percent from Mixed-Air Temperatures | ASHRAE / AABC-NEBB; spec-v386 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pipe-heat-loss-radial` | Insulated Pipe Heat Loss (Radial) | Fourier cylindrical-shell conduction ...; r1=1 in, r2=2 in, k=0.25, 200 vs 70 F -> ~24.55 BTU/hr-ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-insulation-for-condensation` | Pipe Insulation for Condensation Control (Cold Lines) | public engineering relations; 1-in OD at 40 F in 75 F / 50% RH -> dew point 55.1 F, min... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pitot-traverse-average` | Pitot Traverse Airflow from Point Readings (Velocity-Averaged) | ASHRAE Fundamentals / AABC-NEBB; Point velocities 4005 x sqrt(VP) = 1201.5, 1602, 2002.5, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pitot-traverse-cfm` | Pitot Traverse Airflow (Velocity Pressure to CFM) | ASHRAE Fundamentals / AABC-NEBB; spec-v385 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `product-pull-down-load` | Product Pull-Down Load | ASHRAE Refrigeration; spec-v433 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `product-pull-down-time` | Product Pull-Down Time | ASHRAE Refrigeration; spec-v698 section 2.1 pinned example (inverse of spec-v433) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4989,6 +4992,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1571. Fixture-covered or reference-cadence: 1571 / 1571.
+Tile count: 1572. Fixture-covered or reference-cadence: 1572 / 1572.
 
 <!-- END tile-index-v14 -->
