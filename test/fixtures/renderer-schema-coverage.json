@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1567,
-  "covered_count": 1151,
+  "total_tiles": 1571,
+  "covered_count": 1154,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -49,6 +49,7 @@
     "at-rest-earth-pressure",
     "atterberg-indices",
     "attic-ventilation",
+    "azimuth-bearing-conversion",
     "backcountry-needs",
     "backflow-sizing",
     "backflow-test-psi",
@@ -919,6 +920,7 @@
     "sod-takeoff",
     "soffit-ridge-vent-count",
     "softener-sizing",
+    "soil-activity",
     "soil-bearing-capacity",
     "soil-consolidation-settlement",
     "soil-gradation-coefficients",
@@ -1143,6 +1145,7 @@
     "wireway-fill",
     "wobbe-index",
     "wood-beam-bending",
+    "wood-beam-compression-notch",
     "wood-beam-shear",
     "wood-bearing-perpendicular",
     "wood-bolt-connection",

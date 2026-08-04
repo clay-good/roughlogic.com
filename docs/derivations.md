@@ -3085,6 +3085,7 @@ cross-check.
 | calc-steel.js | `computeSteelTensionMember` | `{ ag_in2 = 0, fy = 36, fu = 58, t_in = 0, dh_in = 0.875, nh = 0, xbar_in = 0,...` | _ | _ | _ |
 | calc-steel.js | `computeSteelWebLocalStrength` | `{ fy = 50, tw = 0, tf = 0, k_in = 0, d_in = 0, lb_in = 0, location = "interio...` | _ | _ | _ |
 | calc-survey.js | `computeAreaByCoordinates` | `{ points } = {}` | _ | _ | _ |
+| calc-survey.js | `computeAzimuthBearing` | `{ mode = "azimuth_to_bearing", azimuth_deg = 0, quadrant = "NE", quadrant_ang...` | _ | _ | _ |
 | calc-survey.js | `computeCogoForwardPoint` | `{ start_n = 0, start_e = 0, azimuth_deg = 0, distance_ft = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeCogoInverseLocate` | `{ start_n = 0, start_e = 0, end_n = 0, end_e = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeDifferentialLeveling` | `{ bm_elev = 0, bs, fs, known_close = null } = {}` | _ | _ | _ |
@@ -3231,7 +3232,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1817.
+Row count: 1818.
 
 <!-- END function-corpus-v14 -->
 
@@ -4786,11 +4787,12 @@ per spec-v14 §13.1 second paragraph.
 | `sous-vide-pasteurization` | Sous-Vide Pasteurization Time | FDA / Baldwin; Heisler-slab approximation Fo ~ 0.4; Annex 6 hold at 140 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `yield-ep` | Yield Percentage and Edible Portion | Project (first-principles) over Culin...; 10 lb AP / 1.5 lb trim / 15% cooking loss / $8/lb -> 72.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group P Field (26 tiles)
+### Group P Field (27 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `area-by-coordinates` | Area by Coordinates | FM 5-233 Construction Surveying (by n...; 100 ft x 100 ft square from four corners -> 10000 ft^2, p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `azimuth-bearing-conversion` | Azimuth and Quadrant Bearing Conversion | standard surveying references (Ghilan...; An azimuth of 138.5 deg lies between 90 and 180 deg, so i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `backcountry-needs` | Backcountry Water and Caloric Requirement | USGS / NOLS backcountry-planning bund...; 170 lb / moderate / moderate / 3 days / solo -> 3.5 L/day... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bearing-conversion` | Magnetic Declination and Bearing Conversion | Project (first-principles); true = magnetic + east declination = 280 + 12 = 292 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cogo-forward-point` | COGO Forward Locate (Bearing and Distance) | Coordinate geometry (Ghilani & Wolf; ...; dN = 200 cos45 = 141.421; dE = 200 sin45 = 141.421; N2 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4987,6 +4989,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1570. Fixture-covered or reference-cadence: 1570 / 1570.
+Tile count: 1571. Fixture-covered or reference-cadence: 1571 / 1571.
 
 <!-- END tile-index-v14 -->

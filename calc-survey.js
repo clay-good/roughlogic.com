@@ -770,3 +770,99 @@ function renderTapingNormalTension(inputRegion, outputRegion, citationEl) {
   for (const f of [l.input, w.input, a.input, p0.input, pa.input]) f.addEventListener("input", update);
 }
 SURVEY_RENDERERS["taping-normal-tension"] = renderTapingNormalTension;
+
+// --- spec-v1198: azimuth <-> quadrant-bearing conversion ---
+// The cogo-forward-point and cogo-inverse-locate tiles both tell the user to
+// "read it as a quadrant bearing (N45E)" and point at the bearing-conversion
+// tile - but that tile only shifts a direction by magnetic declination; it does
+// no azimuth/quadrant conversion at all. Deeds and plats are written in quadrant
+// bearings (N 41 deg 30 min E), while all the coordinate math runs on azimuths
+// clockwise from north. This closes the round trip between the two.
+// Non-exported DMS formatter (no v14 corpus row): decimal degrees to D deg M' S".
+function _toDms(deg) {
+  let D = Math.floor(Math.abs(deg));
+  const mFloat = (Math.abs(deg) - D) * 60;
+  let M = Math.floor(mFloat);
+  let S = Math.round((mFloat - M) * 60);
+  if (S >= 60) { S -= 60; M += 1; }
+  if (M >= 60) { M -= 60; D += 1; }
+  const pad = (n) => (n < 10 ? "0" + n : "" + n);
+  return D + "°" + pad(M) + "'" + pad(S) + "\"";
+}
+// dims: in { mode: dimensionless, azimuth_deg: dimensionless, quadrant: dimensionless, quadrant_angle_deg: dimensionless } out: { azimuth_deg: dimensionless, quadrant_angle_deg: dimensionless }
+export function computeAzimuthBearing({ mode = "azimuth_to_bearing", azimuth_deg = 0, quadrant = "NE", quadrant_angle_deg = 0 } = {}) {
+  const _g = _finiteGuard({ azimuth_deg, quadrant_angle_deg }); if (_g) return _g;
+  const m = String(mode || "").toLowerCase();
+  let A;
+  if (m === "azimuth_to_bearing") {
+    A = Number(azimuth_deg);
+    if (!(A >= 0 && A <= 360)) return { error: "Azimuth must be between 0 and 360 degrees (clockwise from north)." };
+  } else if (m === "bearing_to_azimuth") {
+    const b = Number(quadrant_angle_deg);
+    if (!(b >= 0 && b <= 90)) return { error: "Bearing angle must be between 0 and 90 degrees." };
+    const q = String(quadrant || "").toUpperCase();
+    if (q === "NE") A = b;
+    else if (q === "SE") A = 180 - b;
+    else if (q === "SW") A = 180 + b;
+    else if (q === "NW") A = 360 - b;
+    else return { error: "Quadrant must be NE, SE, SW, or NW." };
+  } else {
+    return { error: "Mode must be 'azimuth_to_bearing' or 'bearing_to_azimuth'." };
+  }
+  if (A >= 360) A -= 360;
+  // Canonical azimuth in hand, derive the quadrant-bearing representation.
+  let quad, ang;
+  if (A <= 90) { quad = "NE"; ang = A; }
+  else if (A <= 180) { quad = "SE"; ang = 180 - A; }
+  else if (A <= 270) { quad = "SW"; ang = A - 180; }
+  else { quad = "NW"; ang = 360 - A; }
+  const cardinal = A === 0 ? "due North" : A === 90 ? "due East" : A === 180 ? "due South" : A === 270 ? "due West" : null;
+  const letters = { NE: ["N", "E"], SE: ["S", "E"], SW: ["S", "W"], NW: ["N", "W"] }[quad];
+  const bearing_label = cardinal || (letters[0] + " " + _toDms(ang) + " " + letters[1]);
+  return {
+    azimuth_deg: A,
+    quadrant_angle_deg: ang,
+    quadrant: quad,
+    bearing_label,
+    azimuth_dms: _toDms(A),
+    note: "Azimuths (0 to 360 deg, clockwise from north) drive coordinate geometry, while deeds and plats are written as quadrant bearings (N or S, an angle from 0 to 90 deg, then E or W); the two name the same direction. An azimuth in the first quadrant reads N az E; in the second, S the supplement E; in the third, S the excess over 180 W; in the fourth, N the deficit from 360 W. The cardinal azimuths read as due north, east, south, or west. The bearing angle is shown to the nearest second. This is plane-direction bookkeeping: it does not apply magnetic declination (the bearing-conversion tile does) or a grid convergence. A computational aid; the recorded plat and the surveyor of record govern.",
+  };
+}
+export const azimuthBearingExample = { inputs: { mode: "azimuth_to_bearing", azimuth_deg: 138.5, quadrant: "NE", quadrant_angle_deg: 0 } };
+
+function renderAzimuthBearing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: azimuth / quadrant-bearing conversion - an azimuth 0 to 360 deg clockwise from north maps to a quadrant bearing (N or S, 0 to 90 deg, E or W) quadrant by quadrant: N az E, then S the supplement E, then S the excess over 180 W, then N the deficit from 360 W, and the reverse runs each rule backward. First-principles plane-direction geometry per the standard surveying references (Ghilani & Wolf; FM 5-233), by name. Does not apply magnetic declination (the bearing-conversion tile) or grid convergence. A computational aid; the recorded plat and the surveyor of record govern.";
+  const mode = makeSelect("Convert", "azb-mode", [
+    { value: "azimuth_to_bearing", label: "Azimuth -> quadrant bearing" },
+    { value: "bearing_to_azimuth", label: "Quadrant bearing -> azimuth" },
+  ]);
+  inputRegion.appendChild(mode.wrap);
+  const az = makeNumber("Azimuth (deg, 0 to 360, clockwise from north)", "azb-az", { step: "any", min: "0", max: "360", value: "138.5" });
+  az.input.value = "138.5";
+  const quad = makeSelect("Bearing quadrant", "azb-quad", [
+    { value: "NE", label: "NE (N _ E)" },
+    { value: "SE", label: "SE (S _ E)" },
+    { value: "SW", label: "SW (S _ W)" },
+    { value: "NW", label: "NW (N _ W)" },
+  ]);
+  const ang = makeNumber("Bearing angle (deg, 0 to 90)", "azb-ang", { step: "any", min: "0", max: "90", value: "41.5" });
+  ang.input.value = "41.5";
+  for (const f of [az, quad, ang]) inputRegion.appendChild(f.wrap);
+  const oAz = makeOutputLine(outputRegion, "Azimuth", "azb-out-az");
+  const oBearing = makeOutputLine(outputRegion, "Quadrant bearing", "azb-out-bearing");
+  const oQuad = makeOutputLine(outputRegion, "Quadrant / bearing angle", "azb-out-quad");
+  const oNote = makeOutputLine(outputRegion, "Note", "azb-out-note");
+  const update = debounce(() => {
+    const r = computeAzimuthBearing({ mode: mode.select.value, azimuth_deg: Number(az.input.value) || 0, quadrant: quad.select.value, quadrant_angle_deg: Number(ang.input.value) || 0 });
+    if (r.error) { oAz.textContent = r.error; oBearing.textContent = "-"; oQuad.textContent = "-"; oNote.textContent = ""; return; }
+    oAz.textContent = fmt(r.azimuth_deg, 4) + " deg (" + r.azimuth_dms + ")";
+    oBearing.textContent = r.bearing_label;
+    oQuad.textContent = r.quadrant + ", " + fmt(r.quadrant_angle_deg, 4) + " deg";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { mode.select.value = "azimuth_to_bearing"; az.input.value = "138.5"; quad.select.value = "NE"; ang.input.value = "41.5"; update(); });
+  for (const f of [az.input, ang.input]) f.addEventListener("input", update);
+  for (const s of [mode.select, quad.select]) s.addEventListener("change", update);
+  update();
+}
+SURVEY_RENDERERS["azimuth-bearing-conversion"] = renderAzimuthBearing;

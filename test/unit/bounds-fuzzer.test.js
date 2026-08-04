@@ -31511,6 +31511,43 @@ test("bounds: spec-v1121 computeTapingNormalTension pins cancellation, the 1/sqr
   assert.ok("error" in _v1121({ ...base, span_ft: Infinity }));
 });
 
+import { computeAzimuthBearing as _v1198 } from "../../calc-survey.js";
+
+test("bounds: spec-v1198 computeAzimuthBearing pins the quadrant rules, cardinal edges, round-trip invertibility, and error seams", () => {
+  // THE FOUR QUADRANT RULES, from a known azimuth to its quadrant bearing.
+  const fwd = (a) => _v1198({ mode: "azimuth_to_bearing", azimuth_deg: a });
+  assert.ok(fwd(45).quadrant === "NE" && Math.abs(fwd(45).quadrant_angle_deg - 45) < 1e-12);
+  assert.ok(fwd(138.5).quadrant === "SE" && Math.abs(fwd(138.5).quadrant_angle_deg - 41.5) < 1e-12);
+  assert.ok(fwd(210).quadrant === "SW" && Math.abs(fwd(210).quadrant_angle_deg - 30) < 1e-12);
+  assert.ok(fwd(318.5).quadrant === "NW" && Math.abs(fwd(318.5).quadrant_angle_deg - 41.5) < 1e-12);
+  // THE REVERSE RULES, from a quadrant bearing to its azimuth.
+  const rev = (q, b) => _v1198({ mode: "bearing_to_azimuth", quadrant: q, quadrant_angle_deg: b });
+  assert.ok(Math.abs(rev("NE", 45).azimuth_deg - 45) < 1e-12);
+  assert.ok(Math.abs(rev("SE", 41.5).azimuth_deg - 138.5) < 1e-12);
+  assert.ok(Math.abs(rev("SW", 30).azimuth_deg - 210) < 1e-12);
+  assert.ok(Math.abs(rev("NW", 41.5).azimuth_deg - 318.5) < 1e-12);
+  // ROUND-TRIP INVERTIBILITY: azimuth -> bearing -> azimuth returns the original, every quadrant.
+  for (let a = 0.25; a < 360; a += 0.5) {
+    const f = _v1198({ mode: "azimuth_to_bearing", azimuth_deg: a });
+    const back = _v1198({ mode: "bearing_to_azimuth", quadrant: f.quadrant, quadrant_angle_deg: f.quadrant_angle_deg });
+    assert.ok(Math.abs(back.azimuth_deg - a) < 1e-9, "round trip failed at azimuth " + a);
+    assert.ok(f.quadrant_angle_deg >= 0 && f.quadrant_angle_deg <= 90, "bearing angle out of range at " + a);
+    assert.ok(f.azimuth_deg >= 0 && f.azimuth_deg < 360);
+  }
+  // CARDINAL EDGES read as due directions, and 360 wraps to 0 (due north).
+  assert.ok(fwd(0).bearing_label === "due North" && fwd(360).bearing_label === "due North" && fwd(360).azimuth_deg === 0);
+  assert.ok(fwd(90).bearing_label === "due East" && fwd(180).bearing_label === "due South" && fwd(270).bearing_label === "due West");
+  // DMS formatting carries the fractional degree to whole seconds.
+  assert.ok(fwd(138.5).bearing_label === "S 41°30'00\" E");
+  // ERROR SEAMS.
+  assert.ok("error" in _v1198({ mode: "azimuth_to_bearing", azimuth_deg: 400 }));
+  assert.ok("error" in _v1198({ mode: "azimuth_to_bearing", azimuth_deg: -1 }));
+  assert.ok("error" in _v1198({ mode: "bearing_to_azimuth", quadrant: "SE", quadrant_angle_deg: 91 }));
+  assert.ok("error" in _v1198({ mode: "bearing_to_azimuth", quadrant: "ZZ", quadrant_angle_deg: 10 }));
+  assert.ok("error" in _v1198({ mode: "nonsense", azimuth_deg: 10 }));
+  assert.ok("error" in _v1198({ mode: "azimuth_to_bearing", azimuth_deg: Infinity }));
+});
+
 import { computeCarpetSeamLayout as _v1122 } from "../../calc-construction.js";
 
 test("bounds: spec-v1122 computeCarpetSeamLayout pins the drop geometry, the orientation comparison, whole-repeat cutting, and error seams", () => {

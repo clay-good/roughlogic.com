@@ -14976,6 +14976,19 @@ export const CITATIONS = {
       { name: "Internal focusing", value: "stadia constant C ~ 0; external-focusing instruments add a C term", source: "instrument convention" },
     ],
   },
+  "azimuth-bearing-conversion": {
+    formula: "an azimuth A (0 to 360 deg clockwise from north) maps to a quadrant bearing by quadrant: A in [0,90] is N A E; A in [90,180] is S (180 minus A) E; A in [180,270] is S (A minus 180) W; A in [270,360] is N (360 minus A) W. The reverse runs each rule backward: N b E gives A = b, S b E gives A = 180 minus b, S b W gives A = 180 plus b, N b W gives A = 360 minus b. The cardinal azimuths 0/90/180/270 read as due north/east/south/west.",
+    edition: "Azimuth and quadrant (deed) bearing are the two standard ways to write a plane direction in US surveying references (Ghilani/Wolf, Elementary Surveying; FM 5-233, public-domain), by name; the conversion is exact plane geometry.",
+    freeAccess: "The quadrant rules are elementary geometry stated in every surveying text and in free course notes and the public-domain FM 5-233; nothing here is tabulated or proprietary.",
+    governance: GOVERNANCE.general,
+    editionNote: "The two notations name the same direction; the tile round-trips between them in either direction and always shows both plus the bearing angle to the nearest second. It is direction bookkeeping only: it does not apply magnetic declination, which shifts a direction between magnetic and true north (the bearing-conversion tile does that), and it does not apply the grid convergence between a state-plane grid azimuth and geodetic north. Convert a deed's quadrant bearing to an azimuth here before feeding it to the COGO forward-locate tile, and convert a computed azimuth from the COGO inverse tile back to a quadrant bearing here to match the deed. A computational aid; the recorded plat and the surveyor of record govern.",
+    assumptions: [
+      { name: "Azimuth convention", value: "0 to 360 deg measured clockwise from north", source: "standard surveying convention" },
+      { name: "Quadrant bearing", value: "N or S, an angle 0 to 90 deg, then E or W", source: "deed and plat convention" },
+      { name: "Cardinals", value: "azimuth 0/90/180/270 read as due north/east/south/west", source: "boundary cases of the quadrant rules" },
+      { name: "Scope", value: "no magnetic declination and no grid convergence; plane direction only", source: "stated scope limit" },
+    ],
+  },
   "taping-normal-tension": {
     formula: "set the tension correction equal and opposite to the sag correction, (P - P0) L / (A E) = w^2 L^3 / (24 P^2); substituting the span weight W = w L eliminates L and gives P^2 (P - P0) = A E W^2 / 24, solved by bisection. Square-rooting the same relation gives the textbook implicit form P = 0.204 W sqrt(A E) / sqrt(P - P0), where 0.204 = 1/sqrt(24).",
     edition: "Normal tension as defined in the standard surveying references (Ghilani/Wolf, Elementary Surveying), by name. The component corrections are the same tension and sag expressions the taping-corrections tile uses, so the two tiles cannot drift.",

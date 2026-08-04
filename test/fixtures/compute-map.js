@@ -1219,6 +1219,7 @@ export const COMPUTE_MAP = {
   "stadia-distance": { module: "../../calc-survey.js", fn: "computeStadiaDistance" },
   "taping-corrections": { module: "../../calc-survey.js", fn: "computeTapingCorrections" },
   "taping-normal-tension": { module: "../../calc-survey.js", fn: "computeTapingNormalTension" },
+  "azimuth-bearing-conversion": { module: "../../calc-survey.js", fn: "computeAzimuthBearing" },
   "cogo-forward-point": { module: "../../calc-survey.js", fn: "computeCogoForwardPoint" },
   "edm-slope-reduction": { module: "../../calc-survey.js", fn: "computeEdmSlopeReduction" },
   "leveling-curvature-refraction": { module: "../../calc-survey.js", fn: "computeLevelingCurvatureRefraction" },

@@ -18337,6 +18337,26 @@
       "kind": "question"
     },
     {
+      "term": "azimuth to quadrant bearing",
+      "target": "azimuth-bearing-conversion",
+      "kind": "question"
+    },
+    {
+      "term": "quadrant bearing to azimuth",
+      "target": "azimuth-bearing-conversion",
+      "kind": "question"
+    },
+    {
+      "term": "convert azimuth to deed bearing",
+      "target": "azimuth-bearing-conversion",
+      "kind": "question"
+    },
+    {
+      "term": "azimuth quadrant bearing conversion",
+      "target": "azimuth-bearing-conversion",
+      "kind": "industry"
+    },
+    {
       "term": "ice cream overrun",
       "target": "overrun-percent",
       "kind": "industry"

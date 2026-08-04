@@ -637,7 +637,7 @@ const _TILES = [
   // spec-v308..v310 geotechnical depth-2 batch (calc-geotech.js Group E)
   ["soil-consolidation-settlement", "E"], ["settlement-limit-load", "E"], ["footing-eccentric-pressure", "E"], ["boussinesq-surcharge-wall", "E"],
   // spec-v311..v313 field-surveying depth batch (calc-survey.js Group P)
-  ["differential-leveling", "P"], ["level-loop-adjustment", "P"], ["stadia-distance", "P"], ["taping-corrections", "P"], ["taping-normal-tension", "P"],
+  ["differential-leveling", "P"], ["level-loop-adjustment", "P"], ["stadia-distance", "P"], ["taping-corrections", "P"], ["taping-normal-tension", "P"], ["azimuth-bearing-conversion", "P"],
   ["cogo-forward-point", "P"],
   ["edm-slope-reduction", "P"],
   ["leveling-curvature-refraction", "P"],

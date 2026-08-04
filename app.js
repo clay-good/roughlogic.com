@@ -1206,7 +1206,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-survey.js", "SURVEY_RENDERERS", [
     "area-by-coordinates", "traverse-closure",
     // spec-v311..v313 field-surveying depth batch
-    "differential-leveling", "level-loop-adjustment", "stadia-distance", "taping-corrections", "taping-normal-tension",
+    "differential-leveling", "level-loop-adjustment", "stadia-distance", "taping-corrections", "taping-normal-tension", "azimuth-bearing-conversion",
     "cogo-forward-point", "edm-slope-reduction", "leveling-curvature-refraction", "grid-to-ground", "cogo-inverse-locate",
   ]);
   // v4 Group Q: Historical Reference Data (utility 233).
