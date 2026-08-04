@@ -721,6 +721,64 @@ GEOTECH_RENDERERS["soil-consolidation-settlement"] = _simpleRenderer({
   compute: computeSoilConsolidationSettlement,
 });
 
+// spec-v1202: over-consolidated primary consolidation. The NC-clay tile above uses Cc alone;
+// most natural clays are OVER-consolidated, where settlement follows the flat recompression
+// index Cr until the load pushes the stress past the preconsolidation pressure sigma'p, then
+// the steep virgin Cc. Below sigma'p the settlement is a fraction of the NC value -- the whole
+// reason knowing sigma'p matters. Reduces exactly to the NC tile when sigma'p = sigma'0.
+// dims: in { cc: dimensionless, cr: dimensionless, h_ft: L, e0: dimensionless, sig0_psf: M L^-1 T^-2, sigp_psf: M L^-1 T^-2, dsig_psf: M L^-1 T^-2 } out: { sc_ft: L, sc_in: L, ocr: dimensionless }
+export function computeOverconsolidatedSettlement({ cc = 0, cr = 0, h_ft = 0, e0 = 0, sig0_psf = 0, sigp_psf = 0, dsig_psf = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(cc > 0)) return { error: "The compression index Cc must be positive." };
+  if (!(cr > 0)) return { error: "The recompression index Cr must be positive (typically Cr is about 0.1 to 0.2 of Cc)." };
+  if (cr > cc) return { error: "The recompression index Cr cannot exceed the compression index Cc." };
+  if (!(h_ft > 0)) return { error: "Layer thickness must be positive (ft)." };
+  if (!(1 + e0 > 0)) return { error: "The void ratio e0 must give a positive (1 + e0)." };
+  if (!(sig0_psf > 0)) return { error: "The initial effective stress must be positive (psf)." };
+  if (!(sigp_psf >= sig0_psf)) return { error: "The preconsolidation stress cannot be less than the current effective stress (that soil is under-consolidated, a different case)." };
+  if (dsig_psf < 0) return { error: "The stress increase cannot be negative (psf)." };
+  const factor = h_ft / (1 + e0);
+  const final_stress_psf = sig0_psf + dsig_psf;
+  let sc_ft, crosses_preconsolidation;
+  if (final_stress_psf <= sigp_psf) {
+    // Stays on the recompression curve.
+    sc_ft = cr * factor * Math.log10(final_stress_psf / sig0_psf);
+    crosses_preconsolidation = false;
+  } else {
+    // Recompression up to sigma'p, then virgin compression beyond it.
+    sc_ft = cr * factor * Math.log10(sigp_psf / sig0_psf) + cc * factor * Math.log10(final_stress_psf / sigp_psf);
+    crosses_preconsolidation = true;
+  }
+  const sc_in = sc_ft * 12;
+  const ocr = sigp_psf / sig0_psf;
+  if (![sc_ft, sc_in, ocr].every(Number.isFinite)) return { error: "Consolidation math is not a finite value." };
+  return {
+    sc_ft, sc_in, ocr, crosses_preconsolidation, final_stress_psf,
+    note: "Terzaghi primary consolidation of an OVER-consolidated clay, the common natural case the NC-clay tile does not cover: settlement follows the flat recompression index Cr while the effective stress stays below the preconsolidation pressure sigma'p, and only the portion of the load that pushes the stress past sigma'p follows the steep virgin compression index Cc. So Sc = (Cr H/(1+e0)) log10(sigma'p/sigma'0) + (Cc H/(1+e0)) log10((sigma'0+d_sigma)/sigma'p) when the load crosses sigma'p, or just the recompression term when it does not -- and in that case the settlement is a small fraction of what the NC formula predicts, which is the whole reason an over-consolidation ratio (OCR = sigma'p/sigma'0) matters. Cr is typically 0.1 to 0.2 of Cc; sigma'p comes from a consolidation (oedometer) test by the Casagrande construction. At OCR = 1 (sigma'p = sigma'0) this reduces exactly to the NC tile. Primary consolidation only -- the secondary compression and the time rate are separate (consolidation-time-rate). A design aid; the oedometer data and the geotechnical engineer of record govern.",
+  };
+}
+export const overconsolidatedSettlementExample = { inputs: { cc: 0.25, cr: 0.05, h_ft: 10, e0: 0.90, sig0_psf: 2000, sigp_psf: 3000, dsig_psf: 2000 } };
+
+GEOTECH_RENDERERS["overconsolidated-settlement"] = _simpleRenderer({
+  citation: "Citation: Terzaghi primary consolidation of an over-consolidated clay, Sc = (Cr H/(1+e0)) log10(sigma'p/sigma'0) + (Cc H/(1+e0)) log10((sigma'0+d_sigma)/sigma'p) when the load crosses the preconsolidation pressure sigma'p, else the recompression term alone, as compiled in Das / NAVFAC, by name. Cr is typically 0.1 to 0.2 of Cc; sigma'p is from a consolidation (oedometer) test. Reduces to the NC-clay tile at OCR = 1. A design aid; the oedometer data and the geotechnical engineer of record govern.",
+  example: overconsolidatedSettlementExample.inputs,
+  fields: [
+    { key: "cc", label: "Compression index Cc (virgin)", kind: "number" },
+    { key: "cr", label: "Recompression index Cr (~0.1 to 0.2 Cc)", kind: "number" },
+    { key: "h_ft", label: "Clay layer thickness H (ft)", kind: "number" },
+    { key: "e0", label: "Initial void ratio e0", kind: "number" },
+    { key: "sig0_psf", label: "Initial effective stress at mid-layer (psf)", kind: "number" },
+    { key: "sigp_psf", label: "Preconsolidation pressure sigma'p (psf)", kind: "number" },
+    { key: "dsig_psf", label: "Stress increase from load (psf)", kind: "number" },
+  ],
+  outputs: [
+    { key: "sc", id: "ocs-out-sc", label: "Primary consolidation settlement Sc", value: (r) => fmt(r.sc_in, 2) + " in (" + fmt(r.sc_ft, 4) + " ft)" },
+    { key: "ocr", id: "ocs-out-ocr", label: "Over-consolidation ratio / load path", value: (r) => "OCR " + fmt(r.ocr, 2) + " -- " + (r.crosses_preconsolidation ? "load crosses sigma'p into virgin compression" : "stays below sigma'p (recompression only)") },
+    { key: "n", id: "ocs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeOverconsolidatedSettlement,
+});
+
 // dims: in { sc_allow_in: L, cc: dimensionless, h_ft: L, e0: dimensionless, sig0_psf: M L^-1 T^-2 } out: { dsig_psf: M L^-1 T^-2, final_stress_psf: M L^-1 T^-2, stress_ratio: dimensionless }
 export function computeSettlementLimitLoad({ sc_allow_in = 0, cc = 0, h_ft = 0, e0 = 0, sig0_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

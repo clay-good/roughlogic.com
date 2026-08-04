@@ -883,6 +883,7 @@ export const RENDERER_MAP = {
   "slope-stability-seepage": { module: "../../calc-geotech.js", exportName: "GEOTECH_RENDERERS" },
   "frost-depth-berggren": { module: "../../calc-geotech.js", exportName: "GEOTECH_RENDERERS" },
   "soil-consolidation-settlement": { module: "../../calc-geotech.js", exportName: "GEOTECH_RENDERERS" },
+  "overconsolidated-settlement": { module: "../../calc-geotech.js", exportName: "GEOTECH_RENDERERS" },
   "settlement-limit-load": { module: "../../calc-geotech.js", exportName: "GEOTECH_RENDERERS" },
   "footing-eccentric-pressure": { module: "../../calc-geotech.js", exportName: "GEOTECH_RENDERERS" },
   "boussinesq-surcharge-wall": { module: "../../calc-geotech.js", exportName: "GEOTECH_RENDERERS" },

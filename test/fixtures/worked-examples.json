@@ -52663,6 +52663,50 @@
    }
   },
   {
+   "tile_id": "overconsolidated-settlement",
+   "source_publisher": "Terzaghi primary consolidation, OC clay (Das / NAVFAC)",
+   "source_title": "10 ft OC clay: a load crossing sigma'p settles 2.53 in, a smaller load below it only 0.31 in (spec-v1202)",
+   "source_edition_or_year": "Das, Principles of Geotechnical Engineering",
+   "source_section_or_page": "Cc 0.25, Cr 0.05, H 10 ft, e0 0.90, sigma'0 2,000 psf, sigma'p 3,000 psf. A d_sigma of 2,000 psf gives a final stress 4,000 > 3,000, so Sc = (0.05 x 10/1.9) log10(3000/2000) + (0.25 x 10/1.9) log10(4000/3000) = 0.04635 + 0.16439 = 0.2107 ft = 2.529 in. OCR = 3000/2000 = 1.5.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-04",
+   "inputs": {
+    "cc": 0.25,
+    "cr": 0.05,
+    "h_ft": 10,
+    "e0": 0.90,
+    "sig0_psf": 2000,
+    "sigp_psf": 3000,
+    "dsig_psf": 2000
+   },
+   "outputs": {
+    "sc_in": { "value": 2.529, "tolerance": { "abs": 0.01 } },
+    "sc_ft": { "value": 0.2107, "tolerance": { "abs": 0.001 } },
+    "ocr": { "value": 1.5, "tolerance": { "abs": 0.0001 } }
+   }
+  },
+  {
+   "tile_id": "overconsolidated-settlement",
+   "source_publisher": "Terzaghi primary consolidation, OC clay (Das / NAVFAC)",
+   "source_title": "cross-check: a load that stays below sigma'p rides the flat recompression curve",
+   "source_edition_or_year": "Das, Principles of Geotechnical Engineering",
+   "source_section_or_page": "The same clay under a d_sigma of only 500 psf gives a final stress 2,500 < sigma'p 3,000, so it never reaches virgin compression: Sc = (0.05 x 10/1.9) log10(2500/2000) = 0.0255 ft = 0.306 in -- about an eighth of the 2.53 in the larger load causes, and a fraction of what the NC formula (Cc alone) would predict. That gap is why sigma'p matters.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-04",
+   "inputs": {
+    "cc": 0.25,
+    "cr": 0.05,
+    "h_ft": 10,
+    "e0": 0.90,
+    "sig0_psf": 2000,
+    "sigp_psf": 3000,
+    "dsig_psf": 500
+   },
+   "outputs": {
+    "sc_in": { "value": 0.306, "tolerance": { "abs": 0.01 } }
+   }
+  },
+  {
    "tile_id": "soil-consolidation-settlement",
    "source_publisher": "Terzaghi primary consolidation (Das / NAVFAC)",
    "source_title": "10 ft NC clay, Cc 0.25, e0 0.90, sig0 2,000, dsig 1,000 psf -> 2.78 in",

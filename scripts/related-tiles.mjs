@@ -1705,7 +1705,8 @@ const RELATED = {
   "pump-specific-speed": ["pump-tdh","pump-operating-point","affinity-laws"],
   "pump-suction-specific-speed": ["pump-specific-speed","npsh-a","pump-tdh"],
   // spec-v308..v310 geotechnical depth-2 batch (Group E)
-  "soil-consolidation-settlement": ["settlement-limit-load","soil-settlement-elastic","soil-bearing-capacity","consolidation-time-rate"],
+  "overconsolidated-settlement": ["soil-consolidation-settlement","consolidation-time-rate","settlement-limit-load","soil-vertical-effective-stress"],
+  "soil-consolidation-settlement": ["overconsolidated-settlement","settlement-limit-load","soil-settlement-elastic","soil-bearing-capacity","consolidation-time-rate"],
   "settlement-limit-load": ["soil-consolidation-settlement","consolidation-time-rate","soil-bearing-capacity","soil-settlement-elastic"],
   "footing-eccentric-pressure": ["soil-bearing-capacity","retaining-wall-stability","footing-area"],
   "boussinesq-surcharge-wall": ["lateral-earth-pressure","retaining-wall-stability","footing-eccentric-pressure"],

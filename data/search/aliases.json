@@ -18082,6 +18082,26 @@
       "kind": "industry"
     },
     {
+      "term": "over-consolidated clay settlement",
+      "target": "overconsolidated-settlement",
+      "kind": "industry"
+    },
+    {
+      "term": "recompression index settlement",
+      "target": "overconsolidated-settlement",
+      "kind": "question"
+    },
+    {
+      "term": "preconsolidation pressure settlement",
+      "target": "overconsolidated-settlement",
+      "kind": "question"
+    },
+    {
+      "term": "overconsolidation ratio settlement",
+      "target": "overconsolidated-settlement",
+      "kind": "question"
+    },
+    {
       "term": "primary consolidation",
       "target": "soil-consolidation-settlement",
       "kind": "industry"

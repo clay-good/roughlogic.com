@@ -14348,6 +14348,19 @@ export const CITATIONS = {
       { name: "Adjusted values", value: "Fc' enters carrying the column-stability Cp; Fb' carrying the beam-stability CL", source: "NDS 2018 3.7 / 3.3.3" },
     ],
   },
+  "overconsolidated-settlement": {
+    formula: "final = sigma'0 + d_sigma. If final <= sigma'p: Sc = (Cr H/(1+e0)) log10(final/sigma'0). Else: Sc = (Cr H/(1+e0)) log10(sigma'p/sigma'0) + (Cc H/(1+e0)) log10(final/sigma'p). OCR = sigma'p/sigma'0.",
+    edition: "Terzaghi primary consolidation of an over-consolidated clay with the recompression index Cr and the preconsolidation pressure sigma'p, as compiled in the Das and NAVFAC references, by name; reduces to the NC-clay tile at OCR = 1.",
+    freeAccess: "The over-consolidated consolidation equations are standard soil-mechanics theory in every geotechnical text; no proprietary table is used, and Cc, Cr, and sigma'p are the user's own oedometer results.",
+    governance: GOVERNANCE.general,
+    editionNote: "Most natural clays are over-consolidated, and the NC-clay settlement tile does not cover them. An over-consolidated clay settles on the flat recompression index Cr while the effective stress stays below the preconsolidation pressure sigma'p, and only the portion of the load that pushes the stress past sigma'p follows the steep virgin compression index Cc. So Sc = (Cr H/(1+e0)) log10(sigma'p/sigma'0) + (Cc H/(1+e0)) log10((sigma'0+d_sigma)/sigma'p) when the load crosses sigma'p, or the recompression term alone when it stays below it -- in which case the settlement is a small fraction of the NC value, which is the whole reason the over-consolidation ratio (OCR = sigma'p/sigma'0) matters. Cr is typically 0.1 to 0.2 of Cc, and sigma'p comes from a consolidation (oedometer) test by the Casagrande construction. At OCR = 1 (sigma'p = sigma'0) this reduces exactly to the NC tile. Primary consolidation only; the secondary compression and the time rate are separate. A design aid; the oedometer data and the geotechnical engineer of record govern.",
+    assumptions: [
+      { name: "Recompression branch", value: "Sc = (Cr H/(1+e0)) log10(final/sigma'0) while final <= sigma'p", source: "Terzaghi / Das" },
+      { name: "Virgin branch", value: "add (Cc H/(1+e0)) log10(final/sigma'p) once the load crosses sigma'p", source: "Terzaghi / Das" },
+      { name: "Indices", value: "Cr about 0.1 to 0.2 of Cc; sigma'p from an oedometer test (Casagrande)", source: "NAVFAC / soil-mechanics practice" },
+      { name: "Reduction", value: "reduces to the NC-clay tile at OCR = sigma'p/sigma'0 = 1", source: "consistency check" },
+    ],
+  },
   "soil-consolidation-settlement": {
     formula: "Sc_ft = (Cc H / (1 + e0)) log10((sigma'0 + d_sigma) / sigma'0); Sc_in = 12 Sc_ft.",
     edition: "The Terzaghi primary consolidation settlement of a normally-consolidated clay Sc = (Cc H/(1 + e0)) log10((sigma'0 + d_sigma)/sigma'0), with the compression index Cc, as compiled in the Das and NAVFAC references, by name.",

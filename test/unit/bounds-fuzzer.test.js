@@ -16593,6 +16593,36 @@ test("bounds: spec-v308 computeSoilConsolidationSettlement pins the settlement, 
   assert.ok("error" in _v308({ cc: Infinity, h_ft: 10, e0: 0.9, sig0_psf: 2000, dsig_psf: 1000 }));
 });
 
+import { computeOverconsolidatedSettlement as _v1202, computeSoilConsolidationSettlement as _v1202nc } from "../../calc-geotech.js";
+
+test("bounds: spec-v1202 computeOverconsolidatedSettlement pins the two branches, the NC reduction, monotonicity, and error seams", () => {
+  const base = { cc: 0.25, cr: 0.05, h_ft: 10, e0: 0.90, sig0_psf: 2000, sigp_psf: 3000 };
+  // Crossing sigma'p: recompression term + virgin term (Das example).
+  const cross = _v1202({ ...base, dsig_psf: 2000 });
+  const factor = 10 / 1.9;
+  const expected = 0.05 * factor * Math.log10(3000 / 2000) + 0.25 * factor * Math.log10(4000 / 3000);
+  assert.ok(Math.abs(cross.sc_ft - expected) < 1e-9 && Math.abs(cross.sc_in - 2.529) < 0.01);
+  assert.ok(cross.crosses_preconsolidation === true && Math.abs(cross.ocr - 1.5) < 1e-12);
+  // Staying below sigma'p: recompression only, a small fraction of the crossing case.
+  const below = _v1202({ ...base, dsig_psf: 500 });
+  assert.ok(below.crosses_preconsolidation === false);
+  assert.ok(Math.abs(below.sc_ft - 0.05 * factor * Math.log10(2500 / 2000)) < 1e-9);
+  assert.ok(below.sc_in < cross.sc_in / 5); // far smaller than crossing
+  // THE REDUCTION: at OCR = 1 (sigma'p = sigma'0) it equals the NC-clay tile exactly.
+  const oc1 = _v1202({ ...base, sigp_psf: 2000, dsig_psf: 1000 });
+  const nc = _v1202nc({ cc: 0.25, h_ft: 10, e0: 0.90, sig0_psf: 2000, dsig_psf: 1000 });
+  assert.ok(Math.abs(oc1.sc_in - nc.sc_in) < 1e-9);
+  // Monotone: a bigger load always settles at least as much.
+  assert.ok(_v1202({ ...base, dsig_psf: 3000 }).sc_in > cross.sc_in);
+  // Error seams.
+  assert.ok("error" in _v1202({ ...base, cc: 0, dsig_psf: 1000 }));
+  assert.ok("error" in _v1202({ ...base, cr: 0, dsig_psf: 1000 }));
+  assert.ok("error" in _v1202({ ...base, cr: 0.5, dsig_psf: 1000 })); // Cr > Cc
+  assert.ok("error" in _v1202({ ...base, sigp_psf: 1500, dsig_psf: 1000 })); // sigma'p < sigma'0
+  assert.ok("error" in _v1202({ ...base, dsig_psf: -100 }));
+  assert.ok("error" in _v1202({ ...base, sig0_psf: Infinity, dsig_psf: 1000 }));
+});
+
 import { computeSettlementLimitLoad as _v648 } from "../../calc-geotech.js";
 
 test("bounds: spec-v648 computeSettlementLimitLoad inverts the consolidation settlement, round-trips it, holds the tighter-limit-less-load property, and pins error seams", () => {
