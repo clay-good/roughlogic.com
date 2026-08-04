@@ -29294,6 +29294,41 @@ test("bounds: spec-v1200 computeTr55TimeOfConcentration pins the three-segment t
   assert.ok("error" in _v1200({ sheet_n: 0.2, sheet_length_ft: 100, p2_in: 3, sheet_slope: Infinity }));
 });
 
+import { computeCurveNumberRunoff as _v1201 } from "../../calc-drainage.js";
+
+test("bounds: spec-v1201 computeCurveNumberRunoff pins the SCS runoff equation, the Ia threshold, CN limits, volume, and error seams", () => {
+  const r = _v1201({ rainfall_in: 5, curve_number: 80, area_acres: 10 });
+  // Against the TR-55 runoff figure: P=5, CN=80 -> Q=2.89 in.
+  assert.ok(Math.abs(r.retention_s_in - 2.5) < 1e-9 && Math.abs(r.initial_abstraction_in - 0.5) < 1e-9);
+  assert.ok(Math.abs(r.runoff_in - 20.25 / 7) < 1e-9);
+  assert.ok(Math.abs(r.runoff_coefficient - r.runoff_in / 5) < 1e-12);
+  // Volume: (Q/12) x acres = acre-ft, then x 43560 ft^3, x 7.48052 gal.
+  assert.ok(Math.abs(r.runoff_volume_acreft - (r.runoff_in / 12) * 10) < 1e-9);
+  assert.ok(Math.abs(r.runoff_volume_ft3 - r.runoff_volume_acreft * 43560) < 1e-6);
+  assert.ok(Math.abs(r.runoff_gal - r.runoff_volume_ft3 * 7.48052) < 1e-6);
+  // Ia threshold: a storm at or below Ia produces exactly zero runoff.
+  assert.strictEqual(_v1201({ rainfall_in: 0.3, curve_number: 70 }).runoff_in, 0);
+  assert.strictEqual(_v1201({ rainfall_in: 0.85, curve_number: 70 }).runoff_coefficient, 0);
+  // CN = 100 -> S = 0, all rain runs off (Q = P).
+  assert.ok(Math.abs(_v1201({ rainfall_in: 4, curve_number: 100 }).runoff_in - 4) < 1e-9);
+  // Monotone: a higher CN sheds more runoff, and runoff never exceeds rainfall.
+  let prev = -1;
+  for (const CN of [50, 65, 80, 95]) {
+    const q = _v1201({ rainfall_in: 3, curve_number: CN }).runoff_in;
+    assert.ok(q > prev && q <= 3 + 1e-12, "runoff must rise with CN and stay below P");
+    prev = q;
+  }
+  // No area given -> volume outputs are null, not fabricated zeros.
+  const noArea = _v1201({ rainfall_in: 5, curve_number: 80 });
+  assert.ok(noArea.runoff_volume_acreft === null && noArea.runoff_gal === null);
+  // Error seams.
+  assert.ok("error" in _v1201({}));
+  assert.ok("error" in _v1201({ rainfall_in: 5, curve_number: 0 }));
+  assert.ok("error" in _v1201({ rainfall_in: 5, curve_number: 101 }));
+  assert.ok("error" in _v1201({ rainfall_in: 5, curve_number: 80, area_acres: -1 }));
+  assert.ok("error" in _v1201({ rainfall_in: Infinity, curve_number: 80 }));
+});
+
 import { computeWindowOverhangShade as _v1012 } from "../../calc-hvacsystems.js";
 
 test("bounds: spec-v1012 computeWindowOverhangShade pins the profile angle, the seasonal shade line, the no-direct-sun branch, and error seams", () => {

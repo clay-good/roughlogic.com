@@ -719,3 +719,61 @@ function renderTr55TimeOfConcentration(inputRegion, outputRegion, citationEl) {
   update();
 }
 DRAINAGE_RENDERERS["tr55-time-of-concentration"] = renderTr55TimeOfConcentration;
+
+// ===================== spec-v1201: SCS/NRCS Curve Number runoff depth =====================
+// The stormwater-rational tile gives the peak flow rate (Q = C i A) and tr55-time-of-concentration
+// the timing, but neither gives the runoff DEPTH/volume a detention basin is sized on. The
+// NRCS Curve Number method (TR-55 Chapter 2) is the standard for that: from a rainfall depth and
+// a curve number it returns the runoff depth, and with a drainage area the runoff volume.
+// Verified against the TR-55 runoff figure (P=5 in, CN=80 -> Q=2.89 in).
+// dims: in { rainfall_in: L, curve_number: dimensionless, area_acres: dimensionless } out: { retention_s_in: L, initial_abstraction_in: L, runoff_in: L, runoff_coefficient: dimensionless, runoff_volume_acreft: L^3, runoff_volume_ft3: L^3, runoff_gal: L^3 }
+export function computeCurveNumberRunoff({ rainfall_in = 0, curve_number = 0, area_acres = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const P = Number(rainfall_in) || 0;
+  const CN = Number(curve_number) || 0;
+  const area = Number(area_acres) || 0;
+  if (!(P > 0)) return { error: "Rainfall depth must be positive (in)." };
+  if (!(CN > 0 && CN <= 100)) return { error: "Curve number must be between 0 and 100 (typical 30 to 98)." };
+  if (area < 0) return { error: "Drainage area cannot be negative (acres)." };
+  const S = 1000 / CN - 10;                                  // potential maximum retention (in)
+  const Ia = 0.2 * S;                                        // initial abstraction (in)
+  const runoff_in = P <= Ia ? 0 : Math.pow(P - Ia, 2) / (P - Ia + S); // runoff depth (in)
+  const runoff_coefficient = runoff_in / P;
+  let runoff_volume_acreft = null, runoff_volume_ft3 = null, runoff_gal = null;
+  if (area > 0) {
+    runoff_volume_acreft = (runoff_in / 12) * area;          // in x acres / 12 = acre-ft
+    runoff_volume_ft3 = runoff_volume_acreft * 43560;
+    runoff_gal = runoff_volume_ft3 * 7.48052;
+  }
+  if (![S, Ia, runoff_in, runoff_coefficient].every(Number.isFinite)) return { error: "Curve-number math is not a finite value." };
+  return {
+    retention_s_in: S, initial_abstraction_in: Ia, runoff_in, runoff_coefficient,
+    runoff_volume_acreft, runoff_volume_ft3, runoff_gal,
+    note: "The NRCS Curve Number method (TR-55 Chapter 2) for the runoff DEPTH from a storm, which the rational method (a peak flow rate) and the time-of-concentration tiles do not give: the potential maximum retention S = 1000/CN - 10 (in), the initial abstraction Ia = 0.2 S (the rain that soaks in, wets surfaces, and ponds before any runoff), and the runoff Q = (P - Ia)^2 / (P - Ia + S) for P above Ia, else zero. The curve number (30 to 98) comes from the land cover and the hydrologic soil group (NRCS TR-55 Table 2-2, user-supplied) - a paved lot is near 98, woods on sandy soil near 30. A higher CN means less retention and more runoff; because of the Ia threshold, a small storm on a low CN produces no runoff at all. With a drainage area the runoff depth becomes a volume for sizing a detention basin. The standard Ia = 0.2 S is used here (some agencies now use 0.05 S, which raises runoff on small storms); a single design storm, not a continuous simulation or a routed hydrograph. A design aid; the local drainage manual and the engineer of record govern.",
+  };
+}
+export const curveNumberRunoffExample = { inputs: { rainfall_in: 5, curve_number: 80, area_acres: 10 } };
+function renderCurveNumberRunoff(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NRCS Curve Number runoff method (TR-55 Urban Hydrology for Small Watersheds, Chapter 2): S = 1000/CN - 10, Ia = 0.2 S, Q = (P - Ia)^2 / (P - Ia + S) for P > Ia (runoff depth, in). A public USDA/NRCS document. The curve number (from land cover and hydrologic soil group, TR-55 Table 2-2) and the rainfall depth are user-supplied; Ia = 0.2 S is the standard assumption. A design aid; the local drainage manual and the engineer of record govern.";
+  const p = makeNumber("Storm rainfall depth P (in)", "cnr-p", { step: "any", min: "0", value: "5" }); p.input.value = "5";
+  const cn = makeNumber("Curve number CN (30 to 98)", "cnr-cn", { step: "any", min: "0", max: "100", value: "80" }); cn.input.value = "80";
+  const ac = makeNumber("Drainage area (acres, optional)", "cnr-ac", { step: "any", min: "0", value: "10" }); ac.input.value = "10";
+  for (const f of [p, cn, ac]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { p.input.value = "5"; cn.input.value = "80"; ac.input.value = "10"; update(); });
+  const oQ = makeOutputLine(outputRegion, "Runoff depth Q", "cnr-out-q");
+  const oSIa = makeOutputLine(outputRegion, "Retention S / initial abstraction Ia", "cnr-out-sia");
+  const oVol = makeOutputLine(outputRegion, "Runoff volume (at this area)", "cnr-out-vol");
+  const oNote = makeOutputLine(outputRegion, "Note", "cnr-out-note");
+  const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
+  const update = debounce(() => {
+    const r = computeCurveNumberRunoff({ rainfall_in: rd(p.input), curve_number: rd(cn.input), area_acres: rd(ac.input) });
+    if (r.error) { oQ.textContent = r.error; oSIa.textContent = "-"; oVol.textContent = "-"; oNote.textContent = ""; return; }
+    oQ.textContent = fmt(r.runoff_in, 3) + " in (" + fmt(r.runoff_coefficient * 100, 0) + "% of the " + fmt(rd(p.input), 2) + " in storm)";
+    oSIa.textContent = fmt(r.retention_s_in, 3) + " in / " + fmt(r.initial_abstraction_in, 3) + " in";
+    oVol.textContent = r.runoff_volume_acreft === null ? "- (enter a drainage area)" : fmt(r.runoff_volume_acreft, 3) + " acre-ft (" + fmt(r.runoff_volume_ft3, 0) + " ft^3, " + fmt(r.runoff_gal, 0) + " gal)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [p, cn, ac]) f.input.addEventListener("input", update);
+  update();
+}
+DRAINAGE_RENDERERS["curve-number-runoff"] = renderCurveNumberRunoff;

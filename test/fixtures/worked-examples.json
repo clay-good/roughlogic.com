@@ -51977,6 +51977,44 @@
    }
   },
   {
+   "tile_id": "curve-number-runoff",
+   "source_publisher": "USDA NRCS TR-55 (1986), Chapter 2",
+   "source_title": "SCS curve-number runoff: P 5 in on CN 80 -> 2.89 in over 10 acres = 2.41 acre-ft (spec-v1201)",
+   "source_edition_or_year": "TR-55 1986, Chapter 2 runoff equation",
+   "source_section_or_page": "S = 1000/80 - 10 = 2.5 in; Ia = 0.2 x 2.5 = 0.5 in; Q = (5 - 0.5)^2 / (5 - 0.5 + 2.5) = 20.25 / 7 = 2.8929 in, matching the TR-55 runoff figure for CN 80 at P 5 in. Over 10 acres the volume is (2.8929/12) x 10 = 2.4107 acre-ft = 105,011 ft^3 = 785,535 gal.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-04",
+   "inputs": {
+    "rainfall_in": 5,
+    "curve_number": 80,
+    "area_acres": 10
+   },
+   "outputs": {
+    "retention_s_in": { "value": 2.5, "tolerance": { "abs": 0.0001 } },
+    "initial_abstraction_in": { "value": 0.5, "tolerance": { "abs": 0.0001 } },
+    "runoff_in": { "value": 2.8929, "tolerance": { "abs": 0.001 } },
+    "runoff_coefficient": { "value": 0.5786, "tolerance": { "abs": 0.001 } },
+    "runoff_volume_acreft": { "value": 2.4107, "tolerance": { "abs": 0.001 } }
+   }
+  },
+  {
+   "tile_id": "curve-number-runoff",
+   "source_publisher": "USDA NRCS TR-55 (1986), Chapter 2",
+   "source_title": "cross-check: a small storm below the initial abstraction yields zero runoff",
+   "source_edition_or_year": "TR-55 1986, Chapter 2 runoff equation",
+   "source_section_or_page": "On CN 70, S = 1000/70 - 10 = 4.286 in and Ia = 0.857 in, so a 0.3 in storm never exceeds Ia and the runoff is exactly 0 -- the threshold behavior the curve-number method captures and a constant runoff coefficient cannot.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-04",
+   "inputs": {
+    "rainfall_in": 0.3,
+    "curve_number": 70
+   },
+   "outputs": {
+    "runoff_in": { "value": 0, "tolerance": { "abs": 0.0001 } },
+    "runoff_coefficient": { "value": 0, "tolerance": { "abs": 0.0001 } }
+   }
+  },
+  {
    "tile_id": "time-of-concentration",
    "source_publisher": "Kirpich (1940) / USDA TR-55",
    "source_title": "1,000 ft flow path at 2% slope -> 7.2 min",

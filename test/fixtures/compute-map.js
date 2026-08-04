@@ -377,6 +377,7 @@ export const COMPUTE_MAP = {
   "manning-pipe-capacity": { module: "../../calc-drainage.js", fn: "computeManningPipeCapacity" },
   "pipe-partial-flow-depth": { module: "../../calc-drainage.js", fn: "computePipePartialFlowDepth" },
   "tr55-time-of-concentration": { module: "../../calc-drainage.js", fn: "computeTr55TimeOfConcentration" },
+  "curve-number-runoff": { module: "../../calc-drainage.js", fn: "computeCurveNumberRunoff" },
   "drainage-invert": { module: "../../calc-plumbing.js", fn: "computeDrainageInvert" },
   "radiant-loop-sizing": { module: "../../calc-plumbing.js", fn: "computeRadiantLoopSizing" },
   "water-hammer-arrestor": { module: "../../calc-plumbing.js", fn: "computeWaterHammerArrestor" },

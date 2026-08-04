@@ -17837,6 +17837,26 @@
       "kind": "industry"
     },
     {
+      "term": "curve number runoff",
+      "target": "curve-number-runoff",
+      "kind": "industry"
+    },
+    {
+      "term": "scs runoff depth",
+      "target": "curve-number-runoff",
+      "kind": "question"
+    },
+    {
+      "term": "runoff from rainfall and curve number",
+      "target": "curve-number-runoff",
+      "kind": "question"
+    },
+    {
+      "term": "nrcs runoff volume",
+      "target": "curve-number-runoff",
+      "kind": "industry"
+    },
+    {
       "term": "rational method time",
       "target": "time-of-concentration",
       "kind": "adjacent"

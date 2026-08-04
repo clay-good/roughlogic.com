@@ -15373,6 +15373,19 @@ export const CITATIONS = {
       { name: "Advisory guidelines", value: "~8,500 traditional design limit and ~11,000 reliability threshold are advisory practice, not a hard code limit", source: "Hydraulic Institute / pump-reliability studies" },
     ],
   },
+  "curve-number-runoff": {
+    formula: "S = 1000/CN - 10 (in); Ia = 0.2 S; Q = (P - Ia)^2 / (P - Ia + S) for P > Ia, else 0 (runoff depth, in). Volume = (Q/12) x area(acres) acre-ft.",
+    edition: "The NRCS (SCS) Curve Number runoff method (TR-55 Urban Hydrology for Small Watersheds, Chapter 2), by name; verified against the TR-55 runoff figure (P = 5 in, CN = 80 -> Q = 2.89 in).",
+    freeAccess: "TR-55 is a free USDA NRCS publication; the curve-number runoff equation is published in it and in every hydrology text.",
+    governance: GOVERNANCE.general,
+    editionNote: "The NRCS Curve Number method for the runoff DEPTH from a design storm, which the rational method (a peak flow rate) does not give: the potential maximum retention S = 1000/CN - 10, the initial abstraction Ia = 0.2 S (rain that soaks in and ponds before runoff begins), and Q = (P - Ia)^2 / (P - Ia + S) for rainfall above Ia. The curve number (30 to 98) comes from the land cover and the hydrologic soil group in TR-55 Table 2-2 (user-supplied, not reproduced): a paved lot is near 98, woods on sandy soil near 30. Because of the Ia threshold, a small storm on a low CN produces no runoff at all. With a drainage area the depth becomes a volume for detention sizing. The standard Ia = 0.2 S is used (some agencies now use 0.05 S, which raises small-storm runoff); a single design storm, not a continuous simulation or a routed hydrograph. A design aid; the local drainage manual and the engineer of record govern.",
+    assumptions: [
+      { name: "Retention", value: "S = 1000/CN - 10 (in), CN from land cover and hydrologic soil group", source: "SCS/NRCS TR-55 Ch. 2" },
+      { name: "Initial abstraction", value: "Ia = 0.2 S (the standard assumption)", source: "TR-55" },
+      { name: "Runoff", value: "Q = (P - Ia)^2 / (P - Ia + S) for P > Ia, else 0", source: "SCS runoff equation" },
+      { name: "Use", value: "runoff depth/volume for detention sizing, one design storm, not a routed hydrograph", source: "NRCS drainage practice" },
+    ],
+  },
   "tr55-time-of-concentration": {
     formula: "Tc = Tt_sheet + Tt_shallow + Tt_channel. Sheet (TR-55 Eq 3-3): Tt = 0.007 (n L)^0.8 / (P2^0.5 s^0.4) hr. Shallow concentrated: V = 16.1345 sqrt(s) unpaved / 20.3282 sqrt(s) paved, Tt = L/(3600 V) hr. Channel (Manning): V = (1.49/n) R^(2/3) sqrt(s), Tt = L/(3600 V) hr.",
     edition: "The NRCS TR-55 (Urban Hydrology for Small Watersheds, 1986) Chapter 3 velocity method for time of concentration, by name; constants verified against the TR-55 Chapter 3 worked example.",
