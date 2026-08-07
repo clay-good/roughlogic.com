@@ -777,3 +777,110 @@ function renderCurveNumberRunoff(inputRegion, outputRegion, citationEl) {
   update();
 }
 DRAINAGE_RENDERERS["curve-number-runoff"] = renderCurveNumberRunoff;
+
+// ===================== TR-55 Chapter 4: graphical peak discharge =====================
+// Table F-1 (TR-55 Appendix F, public-domain USDA/NRCS, 1986): coefficients for the unit
+// peak discharge log10(qu) = C0 + C1 log10(Tc) + C2 (log10 Tc)^2, keyed by rainfall type;
+// each row is [Ia/P, C0, C1, C2]. Verified against TR-55 example 4-1.
+const TR55_QU_COEFFS = {
+  I: [[0.10, 2.30550, -0.51429, -0.11750], [0.20, 2.23537, -0.50387, -0.08929], [0.25, 2.18219, -0.48488, -0.06589], [0.30, 2.10624, -0.45695, -0.02835], [0.35, 2.00303, -0.40769, 0.01983], [0.40, 1.87733, -0.32274, 0.05754], [0.45, 1.76312, -0.15644, 0.00453], [0.50, 1.67889, -0.06930, 0.0]],
+  IA: [[0.10, 2.03250, -0.31583, -0.13748], [0.20, 1.91978, -0.28215, -0.07020], [0.25, 1.83842, -0.25543, -0.02597], [0.30, 1.72657, -0.19826, 0.02633], [0.50, 1.63417, -0.09100, 0.0]],
+  II: [[0.10, 2.55323, -0.61512, -0.16403], [0.30, 2.46532, -0.62257, -0.11657], [0.35, 2.41896, -0.61594, -0.08820], [0.40, 2.36409, -0.59857, -0.05621], [0.45, 2.29238, -0.57005, -0.02281], [0.50, 2.20282, -0.51599, -0.01259]],
+  III: [[0.10, 2.47317, -0.51848, -0.17083], [0.30, 2.39628, -0.51202, -0.13245], [0.35, 2.35477, -0.49735, -0.11985], [0.40, 2.30726, -0.46541, -0.11094], [0.45, 2.24876, -0.41314, -0.11508], [0.50, 2.17772, -0.36803, -0.09525]],
+};
+// Table 4-2: pond/swamp adjustment factor Fp, [percent of Am, Fp].
+const TR55_FP_TABLE = [[0, 1.00], [0.2, 0.97], [1.0, 0.87], [3.0, 0.75], [5.0, 0.72]];
+function _tr55InterpTable(table, x, yLo, yHi) {
+  if (x <= table[0][0]) return table[0][yLo === undefined ? 1 : yLo];
+  const last = table[table.length - 1];
+  if (x >= last[0]) return last[1];
+  for (let i = 0; i < table.length - 1; i++) {
+    if (x >= table[i][0] && x <= table[i + 1][0]) {
+      const t = (x - table[i][0]) / (table[i + 1][0] - table[i][0]);
+      return table[i][1] + t * (table[i + 1][1] - table[i][1]);
+    }
+  }
+  return last[1];
+}
+// dims: in { tc_hr: T, curve_number: dimensionless, rainfall_in: L, area_mi2: L^2, pond_pct: dimensionless }
+//       out: { qp_cfs: L^3 T^-1, runoff_in: L, retention_s_in: L, initial_abstraction_in: L }
+// (qu is the empirical unit peak discharge in csm/in and Ia/P, Fp are dimensionless ratios;
+//  the peak discharge qp = qu*Am*Q*Fp resolves to a volumetric flow L^3 T^-1.)
+export function computeTr55GraphicalPeakDischarge({ tc_hr = 0, curve_number = 0, rainfall_in = 0, area_mi2 = 0, rainfall_type = "II", pond_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Tc = Number(tc_hr) || 0;
+  const CN = Number(curve_number) || 0;
+  const P = Number(rainfall_in) || 0;
+  const Am = Number(area_mi2) || 0;
+  const pond = Number(pond_pct) || 0;
+  const coeffs = TR55_QU_COEFFS[rainfall_type];
+  if (!coeffs) return { error: "Rainfall type must be I, IA, II, or III." };
+  if (!(Tc > 0)) return { error: "Time of concentration must be positive (hr)." };
+  if (!(CN > 40 && CN <= 100)) return { error: "Curve number must be above 40 and at most 100 (the graphical method requires CN > 40)." };
+  if (!(P > 0)) return { error: "Design rainfall depth must be positive (in)." };
+  if (!(Am > 0)) return { error: "Drainage area must be positive (mi^2)." };
+  if (pond < 0) return { error: "Pond/swamp percentage cannot be negative." };
+  const S = 1000 / CN - 10;
+  const Ia = 0.2 * S;
+  const Q = P <= Ia ? 0 : Math.pow(P - Ia, 2) / (P - Ia + S);
+  // TR-55 bounds Tc to 0.1-10 hr and Ia/P to the exhibit range; hold at the limit and flag.
+  let tcUsed = Tc, tcClamped = false;
+  if (Tc < 0.1) { tcUsed = 0.1; tcClamped = true; } else if (Tc > 10) { tcUsed = 10; tcClamped = true; }
+  const iaPraw = Ia / P;
+  const lo = coeffs[0][0], hi = coeffs[coeffs.length - 1][0];
+  let iaP = iaPraw, iaPClamped = false;
+  if (iaPraw < lo) { iaP = lo; iaPClamped = true; } else if (iaPraw > hi) { iaP = hi; iaPClamped = true; }
+  const logTc = Math.log10(tcUsed);
+  const quAt = (row) => Math.pow(10, row[1] + row[2] * logTc + row[3] * logTc * logTc);
+  let qu;
+  if (iaP <= coeffs[0][0]) qu = quAt(coeffs[0]);
+  else if (iaP >= coeffs[coeffs.length - 1][0]) qu = quAt(coeffs[coeffs.length - 1]);
+  else {
+    for (let i = 0; i < coeffs.length - 1; i++) {
+      if (iaP >= coeffs[i][0] && iaP <= coeffs[i + 1][0]) {
+        const t = (iaP - coeffs[i][0]) / (coeffs[i + 1][0] - coeffs[i][0]);
+        qu = quAt(coeffs[i]) + t * (quAt(coeffs[i + 1]) - quAt(coeffs[i]));
+        break;
+      }
+    }
+  }
+  const fp = _tr55InterpTable(TR55_FP_TABLE, pond);
+  const qp = qu * Am * Q * fp;
+  if (![S, Ia, Q, qu, fp, qp].every(Number.isFinite)) return { error: "Peak-discharge math is not a finite value." };
+  return {
+    qp_cfs: qp, qu_csm_in: qu, runoff_in: Q, ia_over_p: iaPraw, ia_over_p_used: iaP, fp,
+    retention_s_in: S, initial_abstraction_in: Ia, tc_used_hr: tcUsed, ia_p_clamped: iaPClamped, tc_clamped: tcClamped,
+    note: "The NRCS TR-55 Graphical Peak Discharge method (Chapter 4) for the PEAK flow rate qp, which the runoff-depth tile (a volume) and the rational method (a different empirical peak) do not give from a curve-number watershed: qp = qu Am Q Fp. The unit peak discharge qu (csm/in) comes from the time of concentration Tc and the ratio Ia/P through the Appendix F regression log10(qu) = C0 + C1 log10(Tc) + C2 (log10 Tc)^2 for the chosen rainfall type (I, IA, II, III); Am is the drainage area (mi^2), Q is the runoff depth (in) from the curve number, and Fp is the pond/swamp adjustment (Table 4-2, 1.0 at zero percent). Tc is held to 0.1-10 hr and Ia/P to the exhibit range (about 0.1 to 0.5); values outside are pinned to the limit and flagged. TR-55 example 4-1 (0.39 mi^2, CN 75, a 6 in type-II storm, Tc 1.53 hr) gives Ia/P 0.11, qu 269 csm/in, Q 3.28 in, and qp 344 cfs. One homogeneous watershed with a single CN and main channel; no reservoir routing and no hydrograph (use the tabular hydrograph method or TR-20 for those). A design aid; the local drainage manual and the engineer of record govern.",
+  };
+}
+export const tr55GraphicalPeakDischargeExample = { inputs: { tc_hr: 1.53, curve_number: 75, rainfall_in: 6.0, area_mi2: 0.39, rainfall_type: "II", pond_pct: 0 } };
+function renderTr55GraphicalPeakDischarge(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NRCS TR-55 Graphical Peak Discharge method (Urban Hydrology for Small Watersheds, Chapter 4 with Appendix F Table F-1 and Table 4-2): qp = qu Am Q Fp, with the unit peak discharge log10(qu) = C0 + C1 log10(Tc) + C2 (log10 Tc)^2 by rainfall type and Ia/P. A public USDA/NRCS document; Tc from Chapter 3, Q from the curve number (Chapter 2), Fp from Table 4-2. Valid for Tc 0.1 to 10 hr, Ia/P 0.1 to 0.5, and CN above 40. A design aid; the local drainage manual and the engineer of record govern.";
+  const tc = makeNumber("Time of concentration Tc (hr, 0.1 to 10)", "tpd-tc", { step: "any", min: "0", value: "1.53" }); tc.input.value = "1.53";
+  const cn = makeNumber("Curve number CN (above 40)", "tpd-cn", { step: "any", min: "0", max: "100", value: "75" }); cn.input.value = "75";
+  const p = makeNumber("Design rainfall P, 24-hr (in)", "tpd-p", { step: "any", min: "0", value: "6" }); p.input.value = "6";
+  const area = makeNumber("Drainage area (mi^2)", "tpd-area", { step: "any", min: "0", value: "0.39" }); area.input.value = "0.39";
+  const type = makeSelect("Rainfall distribution", "tpd-type", [
+    { value: "I", label: "Type I" }, { value: "IA", label: "Type IA" }, { value: "II", label: "Type II", selected: true }, { value: "III", label: "Type III" },
+  ]);
+  const pond = makeNumber("Pond/swamp area (% of watershed)", "tpd-pond", { step: "any", min: "0", value: "0" }); pond.input.value = "0";
+  for (const f of [tc, cn, p, area, type, pond]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { tc.input.value = "1.53"; cn.input.value = "75"; p.input.value = "6"; area.input.value = "0.39"; type.select.value = "II"; pond.input.value = "0"; update(); });
+  const oQp = makeOutputLine(outputRegion, "Peak discharge qp", "tpd-out-qp");
+  const oQu = makeOutputLine(outputRegion, "Unit peak discharge qu / runoff Q", "tpd-out-qu");
+  const oIaP = makeOutputLine(outputRegion, "Ia/P / pond factor Fp", "tpd-out-iap");
+  const oNote = makeOutputLine(outputRegion, "Note", "tpd-out-note");
+  const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
+  const update = debounce(() => {
+    const r = computeTr55GraphicalPeakDischarge({ tc_hr: rd(tc.input), curve_number: rd(cn.input), rainfall_in: rd(p.input), area_mi2: rd(area.input), rainfall_type: type.select.value, pond_pct: rd(pond.input) });
+    if (r.error) { oQp.textContent = r.error; oQu.textContent = "-"; oIaP.textContent = "-"; oNote.textContent = ""; return; }
+    oQp.textContent = fmt(r.qp_cfs, 0) + " cfs" + (r.runoff_in === 0 ? " (no runoff: storm below Ia)" : "");
+    oQu.textContent = fmt(r.qu_csm_in, 0) + " csm/in / " + fmt(r.runoff_in, 2) + " in" + (r.tc_clamped ? " (Tc held at the 0.1-10 hr limit)" : "");
+    oIaP.textContent = fmt(r.ia_over_p, 3) + (r.ia_p_clamped ? " -> held at " + fmt(r.ia_over_p_used, 2) + " (exhibit limit)" : "") + " / Fp " + fmt(r.fp, 2);
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [tc, cn, p, area, pond]) f.input.addEventListener("input", update);
+  type.select.addEventListener("change", update);
+  update();
+}
+DRAINAGE_RENDERERS["tr55-graphical-peak-discharge"] = renderTr55GraphicalPeakDischarge;

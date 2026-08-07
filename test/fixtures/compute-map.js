@@ -378,6 +378,7 @@ export const COMPUTE_MAP = {
   "pipe-partial-flow-depth": { module: "../../calc-drainage.js", fn: "computePipePartialFlowDepth" },
   "tr55-time-of-concentration": { module: "../../calc-drainage.js", fn: "computeTr55TimeOfConcentration" },
   "curve-number-runoff": { module: "../../calc-drainage.js", fn: "computeCurveNumberRunoff" },
+  "tr55-graphical-peak-discharge": { module: "../../calc-drainage.js", fn: "computeTr55GraphicalPeakDischarge" },
   "drainage-invert": { module: "../../calc-plumbing.js", fn: "computeDrainageInvert" },
   "radiant-loop-sizing": { module: "../../calc-plumbing.js", fn: "computeRadiantLoopSizing" },
   "water-hammer-arrestor": { module: "../../calc-plumbing.js", fn: "computeWaterHammerArrestor" },

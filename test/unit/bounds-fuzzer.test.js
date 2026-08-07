@@ -29359,6 +29359,42 @@ test("bounds: spec-v1201 computeCurveNumberRunoff pins the SCS runoff equation, 
   assert.ok("error" in _v1201({ rainfall_in: Infinity, curve_number: 80 }));
 });
 
+import { computeTr55GraphicalPeakDischarge as _v1203 } from "../../calc-drainage.js";
+
+test("bounds: spec-v1203 computeTr55GraphicalPeakDischarge pins TR-55 example 4-1, the pond factor, the Ia/P and Tc clamps, CN>40, and error seams", () => {
+  const ex = { tc_hr: 1.53, curve_number: 75, rainfall_in: 6.0, area_mi2: 0.39, rainfall_type: "II", pond_pct: 0 };
+  const r = _v1203(ex);
+  // TR-55 example 4-1: qp ~ 345 cfs, qu ~ 270 csm/in, Q 3.28 in, Ia/P 0.11.
+  assert.ok(Math.abs(r.runoff_in - 3.282) < 0.01);
+  assert.ok(Math.abs(r.ia_over_p - 0.1111) < 0.001);
+  assert.ok(Math.abs(r.qu_csm_in - 269) < 2);
+  assert.ok(Math.abs(r.qp_cfs - 344.2) < 1.5);
+  // qp = qu x Am x Q x Fp identity.
+  assert.ok(Math.abs(r.qp_cfs - r.qu_csm_in * 0.39 * r.runoff_in * r.fp) < 1e-6);
+  // Table 4-2 pond factor: 3% -> Fp 0.75 exactly; qp scales by it.
+  const pond3 = _v1203({ ...ex, pond_pct: 3 });
+  assert.ok(Math.abs(pond3.fp - 0.75) < 1e-9);
+  assert.ok(Math.abs(pond3.qp_cfs - 0.75 * r.qp_cfs) < 1e-6);
+  // A storm at or below Ia produces zero runoff and zero peak.
+  assert.strictEqual(_v1203({ ...ex, rainfall_in: 0.5 }).qp_cfs, 0);
+  // Ia/P above the exhibit range is held at 0.5 and flagged.
+  const hi = _v1203({ tc_hr: 2, curve_number: 55, rainfall_in: 3, area_mi2: 1, rainfall_type: "II", pond_pct: 0 });
+  assert.ok(hi.ia_p_clamped === true && Math.abs(hi.ia_over_p_used - 0.5) < 1e-9);
+  // Tc below 0.1 hr is held at the 0.1 hr floor and flagged.
+  const lowTc = _v1203({ ...ex, tc_hr: 0.05 });
+  assert.ok(lowTc.tc_clamped === true && Math.abs(lowTc.tc_used_hr - 0.1) < 1e-9);
+  // All four rainfall distributions resolve to a finite positive peak.
+  for (const t of ["I", "IA", "II", "III"]) assert.ok(_v1203({ ...ex, rainfall_type: t }).qp_cfs > 0);
+  // Error seams.
+  assert.ok("error" in _v1203({}));
+  assert.ok("error" in _v1203({ ...ex, rainfall_type: "X" }));
+  assert.ok("error" in _v1203({ ...ex, curve_number: 40 }));
+  assert.ok("error" in _v1203({ ...ex, area_mi2: 0 }));
+  assert.ok("error" in _v1203({ ...ex, tc_hr: 0 }));
+  assert.ok("error" in _v1203({ ...ex, pond_pct: -1 }));
+  assert.ok("error" in _v1203({ ...ex, tc_hr: Infinity }));
+});
+
 import { computeWindowOverhangShade as _v1012 } from "../../calc-hvacsystems.js";
 
 test("bounds: spec-v1012 computeWindowOverhangShade pins the profile angle, the seasonal shade line, the no-direct-sun branch, and error seams", () => {

@@ -52015,6 +52015,51 @@
    }
   },
   {
+   "tile_id": "tr55-graphical-peak-discharge",
+   "source_publisher": "USDA NRCS TR-55 (1986), Chapter 4 + Appendix F",
+   "source_title": "TR-55 example 4-1 (Heavenly Acres, Dyer County TN): 0.39 mi^2, CN 75, 6 in type-II storm -> qp 345 cfs (spec-v1203)",
+   "source_edition_or_year": "TR-55 1986, Graphical Peak Discharge method",
+   "source_section_or_page": "S = 1000/75 - 10 = 3.333 in; Ia = 0.667 in; Ia/P = 0.667/6 = 0.111; Q = (6 - 0.667)^2 / (6 - 0.667 + 3.333) = 3.282 in. The type-II Appendix F regression at Tc 1.53 hr, interpolated over Ia/P 0.10-0.30, gives qu = 269 csm/in (exhibit 4-II reads 270). qp = qu x Am x Q x Fp = 268.9 x 0.39 x 3.282 x 1.0 = 344 cfs, matching the TR-55 worksheet 4 result of 345 cfs.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-07",
+   "inputs": {
+    "tc_hr": 1.53,
+    "curve_number": 75,
+    "rainfall_in": 6.0,
+    "area_mi2": 0.39,
+    "rainfall_type": "II",
+    "pond_pct": 0
+   },
+   "outputs": {
+    "qp_cfs": { "value": 344.2, "tolerance": { "abs": 1.0 } },
+    "qu_csm_in": { "value": 268.9, "tolerance": { "abs": 1.0 } },
+    "runoff_in": { "value": 3.282, "tolerance": { "abs": 0.01 } },
+    "ia_over_p": { "value": 0.1111, "tolerance": { "abs": 0.001 } },
+    "fp": { "value": 1.0, "tolerance": { "abs": 0.001 } }
+   }
+  },
+  {
+   "tile_id": "tr55-graphical-peak-discharge",
+   "source_publisher": "USDA NRCS TR-55 (1986), Table 4-2",
+   "source_title": "cross-check: 3% pond/swamp area applies the Fp = 0.75 adjustment (Table 4-2)",
+   "source_edition_or_year": "TR-55 1986, Table 4-2",
+   "source_section_or_page": "The same watershed with 3% pond/swamp area spread through it takes Fp = 0.75 straight from Table 4-2, dropping qp to 0.75 x 344.2 = 258 cfs.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-07",
+   "inputs": {
+    "tc_hr": 1.53,
+    "curve_number": 75,
+    "rainfall_in": 6.0,
+    "area_mi2": 0.39,
+    "rainfall_type": "II",
+    "pond_pct": 3
+   },
+   "outputs": {
+    "fp": { "value": 0.75, "tolerance": { "abs": 0.0001 } },
+    "qp_cfs": { "value": 258.2, "tolerance": { "abs": 1.0 } }
+   }
+  },
+  {
    "tile_id": "time-of-concentration",
    "source_publisher": "Kirpich (1940) / USDA TR-55",
    "source_title": "1,000 ft flow path at 2% slope -> 7.2 min",

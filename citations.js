@@ -15399,6 +15399,19 @@ export const CITATIONS = {
       { name: "Use", value: "runoff depth/volume for detention sizing, one design storm, not a routed hydrograph", source: "NRCS drainage practice" },
     ],
   },
+  "tr55-graphical-peak-discharge": {
+    formula: "qp = qu Am Q Fp (cfs). qu = 10^(C0 + C1 log10(Tc) + C2 (log10 Tc)^2) csm/in, with C0/C1/C2 from TR-55 Table F-1 by rainfall type (I, IA, II, III) and Ia/P. S = 1000/CN - 10; Ia = 0.2 S; Q = (P - Ia)^2/(P - Ia + S); Fp from Table 4-2.",
+    edition: "The NRCS TR-55 (Urban Hydrology for Small Watersheds, 1986) Chapter 4 Graphical Peak Discharge method with the Appendix F Table F-1 regression, by name; verified against TR-55 example 4-1 (0.39 mi^2, CN 75, a 6 in type-II storm -> qp 345 cfs).",
+    freeAccess: "TR-55 is a free USDA NRCS publication; the peak-discharge equation qp = qu Am Q Fp, the Appendix F unit-peak-discharge coefficients, and the Table 4-2 pond/swamp factors are published in it.",
+    governance: GOVERNANCE.general,
+    editionNote: "The TR-55 Graphical Peak Discharge method (Chapter 4) for the PEAK flow rate qp from a curve-number watershed, which the runoff-depth tile (a volume) and the rational method (a different empirical peak) do not give. qp = qu Am Q Fp: the unit peak discharge qu (csm/in) comes from the time of concentration Tc and the ratio Ia/P through the Appendix F regression log10(qu) = C0 + C1 log10(Tc) + C2 (log10 Tc)^2 for the chosen rainfall type; Am is the drainage area (mi^2), Q is the curve-number runoff depth (in), and Fp is the pond/swamp adjustment (Table 4-2, 1.0 at zero percent). Tc is held to 0.1 to 10 hr and Ia/P to the exhibit range (about 0.1 to 0.5); values outside are pinned to the limit. The watershed must be hydrologically homogeneous with one CN and one main channel, CN above 40; no reservoir routing and no hydrograph (use the tabular hydrograph method or TR-20). A design aid; the local drainage manual and the engineer of record govern.",
+    assumptions: [
+      { name: "Peak discharge", value: "qp = qu Am Q Fp (cfs)", source: "TR-55 Ch. 4" },
+      { name: "Unit peak discharge", value: "log10(qu) = C0 + C1 log10(Tc) + C2 (log10 Tc)^2, coefficients by type and Ia/P", source: "TR-55 Appendix F Table F-1" },
+      { name: "Pond/swamp factor", value: "Fp from percent pond/swamp area (1.00 at 0%, 0.75 at 3%)", source: "TR-55 Table 4-2" },
+      { name: "Range", value: "Tc 0.1 to 10 hr, Ia/P 0.1 to 0.5, CN above 40, one homogeneous watershed", source: "TR-55 Ch. 4 limitations" },
+    ],
+  },
   "tr55-time-of-concentration": {
     formula: "Tc = Tt_sheet + Tt_shallow + Tt_channel. Sheet (TR-55 Eq 3-3): Tt = 0.007 (n L)^0.8 / (P2^0.5 s^0.4) hr. Shallow concentrated: V = 16.1345 sqrt(s) unpaved / 20.3282 sqrt(s) paved, Tt = L/(3600 V) hr. Channel (Manning): V = (1.49/n) R^(2/3) sqrt(s), Tt = L/(3600 V) hr.",
     edition: "The NRCS TR-55 (Urban Hydrology for Small Watersheds, 1986) Chapter 3 velocity method for time of concentration, by name; constants verified against the TR-55 Chapter 3 worked example.",
