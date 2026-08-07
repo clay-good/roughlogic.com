@@ -15399,6 +15399,18 @@ export const CITATIONS = {
       { name: "Use", value: "runoff depth/volume for detention sizing, one design storm, not a routed hydrograph", source: "NRCS drainage practice" },
     ],
   },
+  "composite-curve-number": {
+    formula: "Connected (figure 2-3): CNc = CNp + (Pimp/100)(98 - CNp). Unconnected, total impervious under 30% (figure 2-4): CNc = CNp + (Pimp/100)(98 - CNp)(1 - 0.5 R), R = unconnected fraction of the impervious area.",
+    edition: "The NRCS TR-55 (Urban Hydrology for Small Watersheds, 1986) Chapter 2 composite curve number for impervious area, figures 2-3 and 2-4, by name; verified against TR-55 example 2-4 (CNp 74, 25% impervious, R 0.5 -> CNc 78.5).",
+    freeAccess: "TR-55 is a free USDA NRCS publication; the connected and unconnected composite-CN equations are published in it.",
+    governance: GOVERNANCE.general,
+    editionNote: "The TR-55 Chapter 2 composite curve number for a developed area with impervious cover, the CN the runoff calculation needs before it can run. Directly connected impervious area (roofs and pavement piped straight to the storm system) uses figure 2-3: CNc = CNp + (Pimp/100)(98 - CNp), blending the pervious CN with the CN 98 of the impervious fraction. Unconnected impervious area (that drains across pervious ground first, so some runoff re-infiltrates) uses figure 2-4: CNc = CNp + (Pimp/100)(98 - CNp)(1 - 0.5 R), where R is the fraction of the impervious area that is unconnected -- which is why disconnecting downspouts onto a lawn lowers the effective CN. Figure 2-4 applies only when the total impervious area is under 30%; above that, treat it as connected. The pervious CN itself (from land cover and hydrologic soil group, Table 2-2) is the user's input. A design aid; the local drainage manual and the engineer of record govern.",
+    assumptions: [
+      { name: "Connected impervious", value: "CNc = CNp + (Pimp/100)(98 - CNp)", source: "TR-55 figure 2-3" },
+      { name: "Unconnected impervious", value: "CNc = CNp + (Pimp/100)(98 - CNp)(1 - 0.5 R), total impervious under 30%", source: "TR-55 figure 2-4" },
+      { name: "Pervious CN", value: "CNp from land cover and hydrologic soil group (user-supplied)", source: "TR-55 Table 2-2" },
+    ],
+  },
   "tr55-graphical-peak-discharge": {
     formula: "qp = qu Am Q Fp (cfs). qu = 10^(C0 + C1 log10(Tc) + C2 (log10 Tc)^2) csm/in, with C0/C1/C2 from TR-55 Table F-1 by rainfall type (I, IA, II, III) and Ia/P. S = 1000/CN - 10; Ia = 0.2 S; Q = (P - Ia)^2/(P - Ia + S); Fp from Table 4-2.",
     edition: "The NRCS TR-55 (Urban Hydrology for Small Watersheds, 1986) Chapter 4 Graphical Peak Discharge method with the Appendix F Table F-1 regression, by name; verified against TR-55 example 4-1 (0.39 mi^2, CN 75, a 6 in type-II storm -> qp 345 cfs).",

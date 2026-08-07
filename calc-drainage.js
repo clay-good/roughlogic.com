@@ -952,3 +952,61 @@ function renderTr55DetentionStorage(inputRegion, outputRegion, citationEl) {
   update();
 }
 DRAINAGE_RENDERERS["tr55-detention-storage"] = renderTr55DetentionStorage;
+
+// ===================== TR-55 Chapter 2: composite curve number (impervious area) =====================
+// dims: in { pervious_cn: dimensionless, impervious_pct: dimensionless, unconnected_ratio: dimensionless }
+//       out: { composite_cn: dimensionless, impervious_add: dimensionless }
+// (Curve numbers and percentages/ratios are all dimensionless; the composite CN is a
+//  weighted blend of the pervious CN and the impervious CN of 98.)
+export function computeCompositeCurveNumber({ pervious_cn = 0, impervious_pct = 0, connection = "connected", unconnected_ratio = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const CNp = Number(pervious_cn) || 0;
+  const Pimp = Number(impervious_pct) || 0;
+  const R = Number(unconnected_ratio) || 0;
+  if (!(CNp > 0 && CNp <= 100)) return { error: "The pervious curve number must be between 0 and 100 (typically 30 to 98)." };
+  if (!(Pimp >= 0 && Pimp <= 100)) return { error: "The impervious percentage must be between 0 and 100." };
+  if (connection !== "connected" && connection !== "unconnected") return { error: "Connection must be 'connected' or 'unconnected'." };
+  const impervious_gap = (98 - CNp) * (Pimp / 100);            // the lift from adding impervious cover at CN 98
+  let composite_cn, unconnected_out_of_range = false;
+  if (connection === "unconnected") {
+    if (!(R >= 0 && R <= 1)) return { error: "The unconnected-impervious ratio must be between 0 and 1." };
+    // TR-55 figure 2-4 applies only when total impervious area is under 30%.
+    unconnected_out_of_range = Pimp >= 30;
+    composite_cn = CNp + impervious_gap * (1 - 0.5 * R);
+  } else {
+    composite_cn = CNp + impervious_gap;                        // TR-55 figure 2-3 (connected)
+  }
+  const impervious_add = composite_cn - CNp;
+  if (![composite_cn, impervious_add].every(Number.isFinite)) return { error: "Composite-CN math is not a finite value." };
+  return {
+    composite_cn, impervious_add, pervious_cn: CNp, connection, unconnected_out_of_range,
+    note: "The area-weighted composite curve number for a developed area with impervious cover, TR-55 Chapter 2 -- the CN the runoff tile needs before it can run, and the one a mixed land use gets wrong if you read a single table row. Directly connected impervious area (roofs and pavement piped straight to the storm system) uses figure 2-3: CNc = CNp + (Pimp/100)(98 - CNp), blending the pervious CN with the CN 98 of the impervious fraction. UNconnected impervious area (that drains across pervious ground first, so some of its runoff re-infiltrates) uses figure 2-4: CNc = CNp + (Pimp/100)(98 - CNp)(1 - 0.5 R), where R is the fraction of the impervious area that is unconnected -- which is why disconnecting downspouts onto a lawn lowers the effective CN and the runoff. Figure 2-4 applies only when the total impervious area is under 30 percent; above that, treat it as connected. TR-55 example 2-4 -- a pervious (lawn, good condition) CN of 74 with 25 percent impervious, half of it unconnected (R = 0.5) -- gives a composite CN of 78.5, versus 80.0 if that impervious were all connected. The pervious CN itself (from land cover and hydrologic soil group, TR-55 Table 2-2) is the user's input. A design aid; the local drainage manual and the engineer of record govern.",
+  };
+}
+export const compositeCurveNumberExample = { inputs: { pervious_cn: 74, impervious_pct: 25, connection: "unconnected", unconnected_ratio: 0.5 } };
+function renderCompositeCurveNumber(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NRCS TR-55 composite curve number for impervious area (Urban Hydrology for Small Watersheds, Chapter 2, figures 2-3 and 2-4): connected CNc = CNp + (Pimp/100)(98 - CNp); unconnected (total impervious under 30%) CNc = CNp + (Pimp/100)(98 - CNp)(1 - 0.5 R). A public USDA/NRCS document; the pervious CN (from land cover and hydrologic soil group, Table 2-2) is user-supplied. A design aid; the local drainage manual and the engineer of record govern.";
+  const cnp = makeNumber("Pervious curve number CNp", "ccn-cnp", { step: "any", min: "0", max: "100", value: "74" }); cnp.input.value = "74";
+  const pimp = makeNumber("Impervious area (% of the area)", "ccn-pimp", { step: "any", min: "0", max: "100", value: "25" }); pimp.input.value = "25";
+  const conn = makeSelect("Impervious connection", "ccn-conn", [
+    { value: "connected", label: "Directly connected" }, { value: "unconnected", label: "Unconnected (drains over pervious)", selected: true },
+  ]);
+  const rr = makeNumber("Unconnected fraction R (0 to 1)", "ccn-r", { step: "any", min: "0", max: "1", value: "0.5" }); rr.input.value = "0.5";
+  for (const f of [cnp, pimp, conn, rr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cnp.input.value = "74"; pimp.input.value = "25"; conn.select.value = "unconnected"; rr.input.value = "0.5"; update(); });
+  const oCN = makeOutputLine(outputRegion, "Composite CN", "ccn-out-cn");
+  const oAdd = makeOutputLine(outputRegion, "Lift over the pervious CN", "ccn-out-add");
+  const oNote = makeOutputLine(outputRegion, "Note", "ccn-out-note");
+  const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
+  const update = debounce(() => {
+    const r = computeCompositeCurveNumber({ pervious_cn: rd(cnp.input), impervious_pct: rd(pimp.input), connection: conn.select.value, unconnected_ratio: rd(rr.input) });
+    if (r.error) { oCN.textContent = r.error; oAdd.textContent = "-"; oNote.textContent = ""; return; }
+    oCN.textContent = fmt(r.composite_cn, 1) + (r.unconnected_out_of_range ? " -- WARNING: figure 2-4 needs impervious under 30%; treat as connected" : "");
+    oAdd.textContent = "+" + fmt(r.impervious_add, 1) + " CN (from " + fmt(r.pervious_cn, 0) + " pervious)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [cnp, pimp, rr]) f.input.addEventListener("input", update);
+  conn.select.addEventListener("change", update);
+  update();
+}
+DRAINAGE_RENDERERS["composite-curve-number"] = renderCompositeCurveNumber;

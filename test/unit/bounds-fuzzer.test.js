@@ -29359,6 +29359,34 @@ test("bounds: spec-v1201 computeCurveNumberRunoff pins the SCS runoff equation, 
   assert.ok("error" in _v1201({ rainfall_in: Infinity, curve_number: 80 }));
 });
 
+import { computeCompositeCurveNumber as _v1205 } from "../../calc-drainage.js";
+
+test("bounds: spec-v1205 computeCompositeCurveNumber pins TR-55 examples 2-3/2-4, the connected/unconnected forms, the R and 30% seams, and errors", () => {
+  // TR-55 example 2-4: CNp 74, 25% impervious, R 0.5 unconnected -> 78.5.
+  const un = _v1205({ pervious_cn: 74, impervious_pct: 25, connection: "unconnected", unconnected_ratio: 0.5 });
+  assert.ok(Math.abs(un.composite_cn - 78.5) < 1e-9 && Math.abs(un.impervious_add - 4.5) < 1e-9);
+  // Connected form (figure 2-3): same 25% impervious -> 80.0.
+  assert.ok(Math.abs(_v1205({ pervious_cn: 74, impervious_pct: 25, connection: "connected" }).composite_cn - 80) < 1e-9);
+  assert.ok(Math.abs(_v1205({ pervious_cn: 74, impervious_pct: 35, connection: "connected" }).composite_cn - 82.4) < 1e-9);
+  // R = 0 unconnected reduces exactly to the connected result; R = 1 halves the impervious lift.
+  assert.ok(Math.abs(_v1205({ pervious_cn: 74, impervious_pct: 25, connection: "unconnected", unconnected_ratio: 0 }).composite_cn - 80) < 1e-9);
+  assert.ok(Math.abs(_v1205({ pervious_cn: 74, impervious_pct: 25, connection: "unconnected", unconnected_ratio: 1 }).composite_cn - 77) < 1e-9);
+  // Composite CN never exceeds 98 and never drops below the pervious CN.
+  const hi = _v1205({ pervious_cn: 60, impervious_pct: 100, connection: "connected" });
+  assert.ok(Math.abs(hi.composite_cn - 98) < 1e-9);
+  // Figure 2-4 flags total impervious at/above 30%.
+  assert.strictEqual(_v1205({ pervious_cn: 74, impervious_pct: 35, connection: "unconnected", unconnected_ratio: 0.5 }).unconnected_out_of_range, true);
+  assert.strictEqual(_v1205({ pervious_cn: 74, impervious_pct: 25, connection: "unconnected", unconnected_ratio: 0.5 }).unconnected_out_of_range, false);
+  // Error seams.
+  assert.ok("error" in _v1205({}));
+  assert.ok("error" in _v1205({ pervious_cn: 0 }));
+  assert.ok("error" in _v1205({ pervious_cn: 101 }));
+  assert.ok("error" in _v1205({ pervious_cn: 74, impervious_pct: 101 }));
+  assert.ok("error" in _v1205({ pervious_cn: 74, connection: "x" }));
+  assert.ok("error" in _v1205({ pervious_cn: 74, connection: "unconnected", unconnected_ratio: 1.5 }));
+  assert.ok("error" in _v1205({ pervious_cn: Infinity }));
+});
+
 import { computeTr55GraphicalPeakDischarge as _v1203 } from "../../calc-drainage.js";
 
 test("bounds: spec-v1203 computeTr55GraphicalPeakDischarge pins TR-55 example 4-1, the pond factor, the Ia/P and Tc clamps, CN>40, and error seams", () => {

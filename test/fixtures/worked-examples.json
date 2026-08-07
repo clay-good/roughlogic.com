@@ -52015,6 +52015,42 @@
    }
   },
   {
+   "tile_id": "composite-curve-number",
+   "source_publisher": "USDA NRCS TR-55 (1986), Chapter 2",
+   "source_title": "TR-55 example 2-4: pervious CN 74, 25% impervious, half unconnected -> composite CN 78.5 (spec-v1205)",
+   "source_edition_or_year": "TR-55 1986, figure 2-4 (unconnected impervious)",
+   "source_section_or_page": "Figure 2-4: CNc = CNp + (Pimp/100)(98 - CNp)(1 - 0.5 R) = 74 + (25/100)(98 - 74)(1 - 0.5 x 0.5) = 74 + 0.25 x 24 x 0.75 = 74 + 4.5 = 78.5, matching TR-55 example 2-4 for the unconnected-impervious lots.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-07",
+   "inputs": {
+    "pervious_cn": 74,
+    "impervious_pct": 25,
+    "connection": "unconnected",
+    "unconnected_ratio": 0.5
+   },
+   "outputs": {
+    "composite_cn": { "value": 78.5, "tolerance": { "abs": 0.05 } },
+    "impervious_add": { "value": 4.5, "tolerance": { "abs": 0.05 } }
+   }
+  },
+  {
+   "tile_id": "composite-curve-number",
+   "source_publisher": "USDA NRCS TR-55 (1986), Chapter 2",
+   "source_title": "cross-check: the same 25% impervious fully connected gives CN 80.0 (figure 2-3)",
+   "source_edition_or_year": "TR-55 1986, figure 2-3 (connected impervious)",
+   "source_section_or_page": "Figure 2-3: CNc = CNp + (Pimp/100)(98 - CNp) = 74 + (25/100)(98 - 74) = 74 + 6 = 80.0. Connecting the same impervious area directly to the storm system raises the composite CN from 78.5 to 80.0 -- the runoff penalty for not disconnecting.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-07",
+   "inputs": {
+    "pervious_cn": 74,
+    "impervious_pct": 25,
+    "connection": "connected"
+   },
+   "outputs": {
+    "composite_cn": { "value": 80.0, "tolerance": { "abs": 0.05 } }
+   }
+  },
+  {
    "tile_id": "tr55-graphical-peak-discharge",
    "source_publisher": "USDA NRCS TR-55 (1986), Chapter 4 + Appendix F",
    "source_title": "TR-55 example 4-1 (Heavenly Acres, Dyer County TN): 0.39 mi^2, CN 75, 6 in type-II storm -> qp 345 cfs (spec-v1203)",
