@@ -485,6 +485,11 @@ main {
   font-size: 1.05rem;
   color: var(--fg-muted);
   margin: 0 0 var(--space-4);
+  /* A tile description may carry a long unbreakable formula token (e.g.
+     log10((sigma'0+d_sigma)/sigma'p)) whose intrinsic width sets the block's
+     min-content size. On a wider-metric font (CI's Linux WebKit) that token
+     pushes the view-region past a 320 px viewport; let it break anywhere. */
+  overflow-wrap: anywhere;
 }
 
 .inline-notice {
