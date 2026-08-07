@@ -52060,6 +52060,48 @@
    }
   },
   {
+   "tile_id": "tr55-detention-storage",
+   "source_publisher": "USDA NRCS TR-55 (1986), Chapter 6 + Appendix F",
+   "source_title": "TR-55 example 6-1: 0.117 mi^2 type-II watershed, 360 cfs held to 180 cfs -> Vs 5.9 acre-ft (spec-v1204)",
+   "source_edition_or_year": "TR-55 1986, Storage Volume for Detention Basins",
+   "source_section_or_page": "qo/qi = 180/360 = 0.5. Type-II Table F-2: Vs/Vr = 0.682 - 1.43(0.5) + 1.64(0.5)^2 - 0.804(0.5)^3 = 0.2765. Vr = 53.33 x 3.4 x 0.117 = 21.21 acre-ft. Vs = 0.2765 x 21.21 = 5.87 acre-ft, matching the TR-55 worksheet 6a result of 5.9 acre-ft.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-07",
+   "inputs": {
+    "qi_cfs": 360,
+    "qo_cfs": 180,
+    "runoff_in": 3.4,
+    "area_mi2": 0.117,
+    "rainfall_type": "II"
+   },
+   "outputs": {
+    "vs_acreft": { "value": 5.87, "tolerance": { "abs": 0.05 } },
+    "vs_vr": { "value": 0.2765, "tolerance": { "abs": 0.001 } },
+    "qo_qi": { "value": 0.5, "tolerance": { "abs": 0.0001 } },
+    "vr_acreft": { "value": 21.21, "tolerance": { "abs": 0.05 } }
+   }
+  },
+  {
+   "tile_id": "tr55-detention-storage",
+   "source_publisher": "USDA NRCS TR-55 (1986), Appendix F Table F-2",
+   "source_title": "cross-check: type-I distribution uses the other Table F-2 coefficient set",
+   "source_edition_or_year": "TR-55 1986, figure 6-1",
+   "source_section_or_page": "Same discharges as example 6-1 but a type-I storm: Vs/Vr = 0.660 - 1.76(0.5) + 1.96(0.25) - 0.730(0.125) = 0.1788, so Vs = 0.1788 x 21.21 = 3.79 acre-ft -- a smaller basin, since the type-I distribution is less peaked.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-07",
+   "inputs": {
+    "qi_cfs": 360,
+    "qo_cfs": 180,
+    "runoff_in": 3.4,
+    "area_mi2": 0.117,
+    "rainfall_type": "I"
+   },
+   "outputs": {
+    "vs_vr": { "value": 0.1788, "tolerance": { "abs": 0.001 } },
+    "vs_acreft": { "value": 3.79, "tolerance": { "abs": 0.05 } }
+   }
+  },
+  {
    "tile_id": "time-of-concentration",
    "source_publisher": "Kirpich (1940) / USDA TR-55",
    "source_title": "1,000 ft flow path at 2% slope -> 7.2 min",

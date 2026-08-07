@@ -29395,6 +29395,36 @@ test("bounds: spec-v1203 computeTr55GraphicalPeakDischarge pins TR-55 example 4-
   assert.ok("error" in _v1203({ ...ex, tc_hr: Infinity }));
 });
 
+import { computeTr55DetentionStorage as _v1204 } from "../../calc-drainage.js";
+
+test("bounds: spec-v1204 computeTr55DetentionStorage pins TR-55 example 6-1, the Vr conversion, the type coefficient sets, the qo<qi rule, and error seams", () => {
+  const ex = { qi_cfs: 360, qo_cfs: 180, runoff_in: 3.4, area_mi2: 0.117, rainfall_type: "II" };
+  const r = _v1204(ex);
+  // TR-55 example 6-1: qo/qi 0.5, Vs/Vr 0.277, Vr 21.2 acre-ft, Vs 5.9 acre-ft.
+  assert.ok(Math.abs(r.qo_qi - 0.5) < 1e-9);
+  assert.ok(Math.abs(r.vs_vr - 0.2765) < 0.001);
+  assert.ok(Math.abs(r.vr_acreft - 53.33 * 3.4 * 0.117) < 1e-6);
+  assert.ok(Math.abs(r.vs_acreft - 5.87) < 0.05);
+  // Vs = (Vs/Vr) x Vr identity, and ft^3 = acre-ft x 43560.
+  assert.ok(Math.abs(r.vs_acreft - r.vs_vr * r.vr_acreft) < 1e-6);
+  assert.ok(Math.abs(r.vs_ft3 - r.vs_acreft * 43560) < 1e-3);
+  // Types I/IA share a coefficient set distinct from II/III: type I gives a smaller basin.
+  const typeI = _v1204({ ...ex, rainfall_type: "I" });
+  assert.ok(Math.abs(typeI.vs_vr - 0.17875) < 0.001 && typeI.vs_acreft < r.vs_acreft);
+  assert.ok(Math.abs(_v1204({ ...ex, rainfall_type: "IA" }).vs_vr - typeI.vs_vr) < 1e-12);
+  assert.ok(Math.abs(_v1204({ ...ex, rainfall_type: "III" }).vs_vr - r.vs_vr) < 1e-12);
+  // qo/qi outside the 0.1-0.8 chart range is flagged.
+  assert.strictEqual(_v1204({ qi_cfs: 400, qo_cfs: 20, runoff_in: 3, area_mi2: 0.1, rainfall_type: "II" }).out_of_range, true);
+  // Error seams: outflow must be below inflow, positive inputs, known type.
+  assert.ok("error" in _v1204({}));
+  assert.ok("error" in _v1204({ ...ex, qo_cfs: 360 }));
+  assert.ok("error" in _v1204({ ...ex, qo_cfs: 400 }));
+  assert.ok("error" in _v1204({ ...ex, rainfall_type: "Z" }));
+  assert.ok("error" in _v1204({ ...ex, runoff_in: 0 }));
+  assert.ok("error" in _v1204({ ...ex, area_mi2: 0 }));
+  assert.ok("error" in _v1204({ ...ex, qi_cfs: Infinity }));
+});
+
 import { computeWindowOverhangShade as _v1012 } from "../../calc-hvacsystems.js";
 
 test("bounds: spec-v1012 computeWindowOverhangShade pins the profile angle, the seasonal shade line, the no-direct-sun branch, and error seams", () => {

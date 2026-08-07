@@ -17882,6 +17882,31 @@
       "kind": "industry"
     },
     {
+      "term": "tr-55 detention storage",
+      "target": "tr55-detention-storage",
+      "kind": "industry"
+    },
+    {
+      "term": "detention basin storage volume tr55",
+      "target": "tr55-detention-storage",
+      "kind": "question"
+    },
+    {
+      "term": "storage from peak inflow and outflow",
+      "target": "tr55-detention-storage",
+      "kind": "question"
+    },
+    {
+      "term": "vs vr ratio detention",
+      "target": "tr55-detention-storage",
+      "kind": "industry"
+    },
+    {
+      "term": "size a detention pond for allowable release",
+      "target": "tr55-detention-storage",
+      "kind": "question"
+    },
+    {
       "term": "rational method time",
       "target": "time-of-concentration",
       "kind": "adjacent"

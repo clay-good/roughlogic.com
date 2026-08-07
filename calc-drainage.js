@@ -884,3 +884,71 @@ function renderTr55GraphicalPeakDischarge(inputRegion, outputRegion, citationEl)
   update();
 }
 DRAINAGE_RENDERERS["tr55-graphical-peak-discharge"] = renderTr55GraphicalPeakDischarge;
+
+// ===================== TR-55 Chapter 6: detention storage volume =====================
+// Table F-2 (TR-55 Appendix F, public-domain USDA/NRCS): coefficients for the storage
+// ratio Vs/Vr = C0 + C1 r + C2 r^2 + C3 r^3, r = qo/qi (figure 6-1). Types I/IA and II/III
+// share a coefficient set. Verified against TR-55 example 6-1.
+const TR55_STORAGE_COEFFS = {
+  I: [0.660, -1.76, 1.96, -0.730], IA: [0.660, -1.76, 1.96, -0.730],
+  II: [0.682, -1.43, 1.64, -0.804], III: [0.682, -1.43, 1.64, -0.804],
+};
+// dims: in { qi_cfs: L^3 T^-1, qo_cfs: L^3 T^-1, runoff_in: L, area_mi2: L^2, rainfall_type: dimensionless }
+//       out: { vs_acreft: L^3, vs_ft3: L^3, vr_acreft: L^3 }
+// (Vs/Vr and qo/qi are dimensionless ratios; the runoff volume Vr = 53.33 Q Am and the
+//  storage Vs = (Vs/Vr) Vr are volumes.)
+export function computeTr55DetentionStorage({ qi_cfs = 0, qo_cfs = 0, runoff_in = 0, area_mi2 = 0, rainfall_type = "II" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const qi = Number(qi_cfs) || 0;
+  const qo = Number(qo_cfs) || 0;
+  const Q = Number(runoff_in) || 0;
+  const Am = Number(area_mi2) || 0;
+  const c = TR55_STORAGE_COEFFS[rainfall_type];
+  if (!c) return { error: "Rainfall type must be I, IA, II, or III." };
+  if (!(qi > 0)) return { error: "Peak inflow discharge must be positive (cfs)." };
+  if (!(qo > 0)) return { error: "Peak outflow (allowable release) must be positive (cfs)." };
+  if (!(qo < qi)) return { error: "The allowable outflow must be less than the peak inflow (otherwise no detention storage is required)." };
+  if (!(Q > 0)) return { error: "Runoff depth must be positive (in)." };
+  if (!(Am > 0)) return { error: "Drainage area must be positive (mi^2)." };
+  const ratio = qo / qi;
+  const vsvr = c[0] + c[1] * ratio + c[2] * ratio * ratio + c[3] * ratio * ratio * ratio;
+  const vr_acreft = 53.33 * Q * Am;
+  const vs_acreft = Math.max(0, vsvr) * vr_acreft;
+  const vs_ft3 = vs_acreft * 43560;
+  const out_of_range = ratio < 0.1 || ratio > 0.8;
+  if (![ratio, vsvr, vr_acreft, vs_acreft, vs_ft3].every(Number.isFinite)) return { error: "Storage math is not a finite value." };
+  return {
+    vs_acreft, vs_ft3, vs_vr: vsvr, qo_qi: ratio, vr_acreft, out_of_range,
+    note: "The NRCS TR-55 Chapter 6 approximate detention-storage sizing, the step after the peak discharge: given the peak inflow qi (from the graphical-peak-discharge tile), the allowable peak outflow qo the downstream channel or the ordinance permits, and the runoff Q and area, it estimates the storage volume Vs a basin must hold to throttle qi down to qo. Vs/Vr = C0 + C1 (qo/qi) + C2 (qo/qi)^2 + C3 (qo/qi)^3 from figure 6-1 by rainfall type (Table F-2 coefficients; I/IA and II/III share a set), the runoff volume Vr = 53.33 Q Am (acre-ft), and Vs = (Vs/Vr) Vr. TR-55 example 6-1 -- a 0.117 mi^2 (75 ac) type-II watershed whose developed 25-yr peak of 360 cfs must be held to the channel's 180 cfs (qo/qi 0.5), with Q 3.4 in -- gives Vs/Vr 0.28, Vr 21.2 acre-ft, and Vs 5.9 acre-ft. The chart is drawn for qo/qi about 0.1 to 0.8; outside that the estimate is flagged. An approximate preliminary size for a single-stage structure; the final basin comes from a stage-storage routing (TR-20 or a reservoir routing), and the local drainage manual and the engineer of record govern.",
+  };
+}
+export const tr55DetentionStorageExample = { inputs: { qi_cfs: 360, qo_cfs: 180, runoff_in: 3.4, area_mi2: 0.117, rainfall_type: "II" } };
+function renderTr55DetentionStorage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NRCS TR-55 Detention Storage sizing (Urban Hydrology for Small Watersheds, Chapter 6 with figure 6-1 and Appendix F Table F-2): Vs/Vr = C0 + C1 r + C2 r^2 + C3 r^3 with r = qo/qi, Vr = 53.33 Q Am (acre-ft), Vs = (Vs/Vr) Vr. A public USDA/NRCS document. An approximate preliminary single-stage size; the final basin comes from a stage-storage routing. The local drainage manual and the engineer of record govern.";
+  const qi = makeNumber("Peak inflow qi (cfs)", "tds-qi", { step: "any", min: "0", value: "360" }); qi.input.value = "360";
+  const qo = makeNumber("Allowable peak outflow qo (cfs)", "tds-qo", { step: "any", min: "0", value: "180" }); qo.input.value = "180";
+  const q = makeNumber("Runoff depth Q (in)", "tds-q", { step: "any", min: "0", value: "3.4" }); q.input.value = "3.4";
+  const area = makeNumber("Drainage area (mi^2)", "tds-area", { step: "any", min: "0", value: "0.117" }); area.input.value = "0.117";
+  const type = makeSelect("Rainfall distribution", "tds-type", [
+    { value: "I", label: "Type I" }, { value: "IA", label: "Type IA" }, { value: "II", label: "Type II", selected: true }, { value: "III", label: "Type III" },
+  ]);
+  for (const f of [qi, qo, q, area, type]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { qi.input.value = "360"; qo.input.value = "180"; q.input.value = "3.4"; area.input.value = "0.117"; type.select.value = "II"; update(); });
+  const oVs = makeOutputLine(outputRegion, "Required storage Vs", "tds-out-vs");
+  const oRatio = makeOutputLine(outputRegion, "Vs/Vr / qo/qi", "tds-out-ratio");
+  const oVr = makeOutputLine(outputRegion, "Runoff volume Vr", "tds-out-vr");
+  const oNote = makeOutputLine(outputRegion, "Note", "tds-out-note");
+  const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
+  const update = debounce(() => {
+    const r = computeTr55DetentionStorage({ qi_cfs: rd(qi.input), qo_cfs: rd(qo.input), runoff_in: rd(q.input), area_mi2: rd(area.input), rainfall_type: type.select.value });
+    if (r.error) { oVs.textContent = r.error; oRatio.textContent = "-"; oVr.textContent = "-"; oNote.textContent = ""; return; }
+    oVs.textContent = fmt(r.vs_acreft, 2) + " acre-ft (" + fmt(r.vs_ft3, 0) + " ft^3)" + (r.out_of_range ? " -- qo/qi outside the 0.1-0.8 chart range" : "");
+    oRatio.textContent = fmt(r.vs_vr, 3) + " / " + fmt(r.qo_qi, 3);
+    oVr.textContent = fmt(r.vr_acreft, 2) + " acre-ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [qi, qo, q, area]) f.input.addEventListener("input", update);
+  type.select.addEventListener("change", update);
+  update();
+}
+DRAINAGE_RENDERERS["tr55-detention-storage"] = renderTr55DetentionStorage;

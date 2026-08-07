@@ -15412,6 +15412,19 @@ export const CITATIONS = {
       { name: "Range", value: "Tc 0.1 to 10 hr, Ia/P 0.1 to 0.5, CN above 40, one homogeneous watershed", source: "TR-55 Ch. 4 limitations" },
     ],
   },
+  "tr55-detention-storage": {
+    formula: "Vs/Vr = C0 + C1 r + C2 r^2 + C3 r^3 (r = qo/qi), C0-C3 from TR-55 Table F-2 by rainfall type (I/IA vs II/III). Vr = 53.33 Q Am (acre-ft). Vs = (Vs/Vr) Vr.",
+    edition: "The NRCS TR-55 (Urban Hydrology for Small Watersheds, 1986) Chapter 6 approximate detention-storage sizing with the figure 6-1 / Appendix F Table F-2 regression, by name; verified against TR-55 example 6-1 (0.117 mi^2 type-II, 360 cfs held to 180 cfs -> Vs 5.9 acre-ft).",
+    freeAccess: "TR-55 is a free USDA NRCS publication; the storage-ratio equation, the figure 6-1 coefficients, and the Vr conversion are published in it.",
+    governance: GOVERNANCE.general,
+    editionNote: "The TR-55 Chapter 6 approximate detention-storage sizing, the step after the peak discharge. Given the peak inflow qi (from the graphical-peak-discharge tile), the allowable peak outflow qo the downstream channel or ordinance permits, and the runoff Q and area, it estimates the storage volume Vs a basin must hold to throttle qi down to qo: Vs/Vr = C0 + C1 (qo/qi) + C2 (qo/qi)^2 + C3 (qo/qi)^3 from figure 6-1 (Table F-2 coefficients, with types I/IA sharing one set and II/III another), the runoff volume Vr = 53.33 Q Am (acre-ft), and Vs = (Vs/Vr) Vr. The chart is drawn for qo/qi about 0.1 to 0.8; outside that the estimate is flagged. An approximate preliminary size for a single-stage structure; the final basin comes from a stage-storage routing (TR-20 or a reservoir routing). A design aid; the local drainage manual and the engineer of record govern.",
+    assumptions: [
+      { name: "Storage ratio", value: "Vs/Vr = C0 + C1 r + C2 r^2 + C3 r^3, r = qo/qi", source: "TR-55 figure 6-1 / Table F-2" },
+      { name: "Runoff volume", value: "Vr = 53.33 Q Am (acre-ft), Q the curve-number runoff, Am in mi^2", source: "TR-55 eq. 6-1" },
+      { name: "Storage volume", value: "Vs = (Vs/Vr) Vr", source: "TR-55 eq. 6-2" },
+      { name: "Range/use", value: "qo/qi about 0.1 to 0.8, single-stage preliminary size, final by stage-storage routing", source: "TR-55 Ch. 6 limitations" },
+    ],
+  },
   "tr55-time-of-concentration": {
     formula: "Tc = Tt_sheet + Tt_shallow + Tt_channel. Sheet (TR-55 Eq 3-3): Tt = 0.007 (n L)^0.8 / (P2^0.5 s^0.4) hr. Shallow concentrated: V = 16.1345 sqrt(s) unpaved / 20.3282 sqrt(s) paved, Tt = L/(3600 V) hr. Channel (Manning): V = (1.49/n) R^(2/3) sqrt(s), Tt = L/(3600 V) hr.",
     edition: "The NRCS TR-55 (Urban Hydrology for Small Watersheds, 1986) Chapter 3 velocity method for time of concentration, by name; constants verified against the TR-55 Chapter 3 worked example.",
