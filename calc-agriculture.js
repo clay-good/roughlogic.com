@@ -54,7 +54,7 @@ export const gpaExample = { inputs: { gpm: 0.4, spacing_in: 20, speed_mph: 5, ta
 // --- 204: Timber Cruise (Doyle, Scribner, International 1/4) ---
 //
 // Doyle:        BF = ((D-4)^2) * (L/16)
-// Int'l 1/4:    BF = (0.22 D^2 - 0.71 D)  (board feet per 16 ft log)
+// Int'l 1/4:    BF = (0.22 D^2 - 0.71 D)  (board feet per 4 ft section, x L/4)
 // Scribner:     bundled public-domain table per small-end DIB.
 
 export const SCRIBNER_TABLE_16FT = {
@@ -371,7 +371,7 @@ const renderGPA = _r({
 });
 
 const renderTimberCruise = _r({
-  citation: "Citation: Public USDA Forest Service technical reports by name only. Doyle: BF = (D-4)^2 * (L/16). International 1/4: BF = (0.22 D^2 - 0.71 D) per 16 ft log.",
+  citation: "Citation: Public USDA Forest Service technical reports by name only. Doyle: BF = (D-4)^2 * (L/16). International 1/4: BF = (0.22 D^2 - 0.71 D) per 4 ft section (x L/4).",
   example: timberCruiseExample.inputs,
   fields: [
     { key: "small_end_dib_in", label: "Small-end DIB (in)", kind: "number" },
