@@ -1249,6 +1249,75 @@ CONCRETE_RENDERERS["rc-compression-dev-length"] = _simpleRenderer({
   compute: computeRcCompressionDevLength,
 });
 
+// ===================== spec-v1237: effective moment of inertia Ie (ACI 318-19 §24.2.3.5, Bischoff) =====================
+// The Ie the cracking-moment tile names ("the value behind the Ie deflection analysis") and the value the
+// long-term-deflection tile takes as a hand-entered input but nobody derives. ACI 318-19 replaced Branson's cubic
+// with Bischoff's form: Ie = Ig when Ma <= (2/3)Mcr (Eq 24.2.3.5b), else Ie = Icr/[1 - (Mcr/Ma)^2 (1 - Icr/Ig)]
+// (Eq 24.2.3.5a). Mcr = fr Ig/yt, fr = 7.5 lambda sqrt(f'c). Icr is the cracked transformed section (singly
+// reinforced rectangular): n = Es/Ec, kd = d(sqrt((rho n)^2 + 2 rho n) - rho n), Icr = b kd^3/3 + n As (d-kd)^2.
+// dims: in { b_in: L, h_in: L, d_in: L, as_in2: L^2, fc_psi: M L^-1 T^-2, ma_kipft: M L^2 T^-2, lambda: dimensionless } out: { ig_in4: L^4, icr_in4: L^4, ie_in4: L^4, mcr_kipft: M L^2 T^-2 }
+export function computeConcreteEffectiveInertia({ b_in = 0, h_in = 0, d_in = 0, as_in2 = 0, fc_psi = 4000, ma_kipft = 0, lambda = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const b = Number(b_in), h = Number(h_in), d = Number(d_in), As = Number(as_in2);
+  const fc = Number(fc_psi), Ma_kipft = Number(ma_kipft), lam = Number(lambda);
+  if (!(b > 0)) return { error: "Section width b must be positive (in)." };
+  if (!(h > 0)) return { error: "Section total depth h must be positive (in)." };
+  if (!(d > 0)) return { error: "Effective depth d must be positive (in)." };
+  if (!(d < h)) return { error: "Effective depth d must be less than the total depth h." };
+  if (!(As > 0)) return { error: "Tension steel area As must be positive (in^2)." };
+  if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (!(Ma_kipft > 0)) return { error: "Service moment Ma must be positive (kip-ft)." };
+  if (!(lam > 0)) return { error: "Lightweight factor lambda must be positive." };
+  const Es = 29000000; // psi
+  const Ec = 57000 * Math.sqrt(fc); // ACI 19.2.2.1(b) normalweight
+  const n = Es / Ec;
+  const ig_in4 = b * h * h * h / 12;
+  const yt = h / 2;
+  const fr = 7.5 * lam * Math.sqrt(fc);
+  const mcr_lbin = fr * ig_in4 / yt;
+  const mcr_kipft = mcr_lbin / 12000;
+  const ma_lbin = Ma_kipft * 12000;
+  const rho = As / (b * d);
+  const rn = rho * n;
+  const kd = d * (Math.sqrt(rn * rn + 2 * rn) - rn);
+  const icr_in4 = b * kd * kd * kd / 3 + n * As * (d - kd) * (d - kd);
+  const cracked = ma_lbin > (2 / 3) * mcr_lbin;
+  let ie_in4;
+  if (!cracked) {
+    ie_in4 = ig_in4; // Eq 24.2.3.5b
+  } else {
+    ie_in4 = icr_in4 / (1 - Math.pow(mcr_lbin / ma_lbin, 2) * (1 - icr_in4 / ig_in4)); // Eq 24.2.3.5a
+    if (ie_in4 > ig_in4) ie_in4 = ig_in4; // Ie can never exceed Ig
+  }
+  if (![ig_in4, icr_in4, ie_in4, mcr_kipft, kd].every(Number.isFinite)) return { error: "Effective-inertia math is not a finite value." };
+  return {
+    ig_in4, icr_in4, ie_in4, mcr_kipft, kd_in: kd, ec_psi: Ec, n, ie_ratio: ie_in4 / ig_in4, cracked,
+    note: "ACI 318-19 §24.2.3.5 effective moment of inertia for deflection, the value the cracking-moment tile points to and the immediate deflection the long-term-deflection tile needs. The 2019 code replaced Branson's cubic with Bischoff's form: if the service moment Ma <= (2/3) Mcr the section is essentially uncracked and Ie = Ig; once Ma exceeds (2/3) Mcr, Ie = Icr / [1 - (Mcr/Ma)^2 (1 - Icr/Ig)], which drops rapidly toward the cracked value Icr as the load grows. Mcr = fr Ig/yt with fr = 7.5 lambda sqrt(f'c); Icr is the cracked transformed section n = Es/Ec, kd = d(sqrt((rho n)^2 + 2 rho n) - rho n), Icr = b kd^3/3 + n As (d-kd)^2 for a singly-reinforced rectangular beam (Es = 29,000,000 psi, Ec = 57000 sqrt(f'c) normalweight). The immediate deflection is then (a load-case coefficient) w L^4 / (Ec Ie); feed that into concrete-longterm-defl for creep and shrinkage. Bischoff's form predicts larger deflections than the old Branson equation, especially for lightly reinforced slabs. Singly-reinforced rectangular section; a T-beam or doubly-reinforced section uses the appropriate transformed Icr. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const concreteEffectiveInertiaExample = { inputs: { b_in: 12, h_in: 20, d_in: 17.5, as_in2: 3.0, fc_psi: 4000, ma_kipft: 60, lambda: 1.0 } };
+CONCRETE_RENDERERS["concrete-effective-inertia"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 §24.2.3.5 effective moment of inertia (Bischoff): Ie = Ig for Ma <= (2/3)Mcr (Eq 24.2.3.5b), else Ie = Icr/[1 - (Mcr/Ma)^2 (1 - Icr/Ig)] (Eq 24.2.3.5a). Mcr = fr Ig/yt, fr = 7.5 lambda sqrt(f'c) (§19.2.3.1); Icr is the cracked transformed section (singly-reinforced rectangular) with n = Es/Ec and Ec = 57000 sqrt(f'c) (§19.2.2.1). The 2019 code removed Branson's cubic. Confirmed against the ACI 318-19 code change (StructurePoint / PCA). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: concreteEffectiveInertiaExample.inputs,
+  fields: [
+    { key: "b_in", label: "Section width b (in)", kind: "number", default: 12 },
+    { key: "h_in", label: "Total depth h (in)", kind: "number", default: 20 },
+    { key: "d_in", label: "Effective depth d to tension steel (in)", kind: "number", default: 17.5 },
+    { key: "as_in2", label: "Tension steel area As (in^2)", kind: "number", default: 3.0 },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "ma_kipft", label: "Service moment Ma (kip-ft)", kind: "number", default: 60 },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "ie", id: "cei-out-ie", label: "Effective inertia Ie", value: (r) => fmt(r.ie_in4, 0) + " in^4 (" + fmt(r.ie_ratio * 100, 0) + "% of Ig" + (r.cracked ? ", cracked" : ", uncracked -> Ig") + ")" },
+    { key: "icr", id: "cei-out-icr", label: "Cracked inertia Icr", value: (r) => fmt(r.icr_in4, 0) + " in^4 (kd = " + fmt(r.kd_in, 2) + " in)" },
+    { key: "ig", id: "cei-out-ig", label: "Gross inertia Ig", value: (r) => fmt(r.ig_in4, 0) + " in^4" },
+    { key: "mcr", id: "cei-out-mcr", label: "Cracking moment Mcr", value: (r) => fmt(r.mcr_kipft, 2) + " kip-ft" },
+    { key: "n", id: "cei-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteEffectiveInertia,
+});
+
 // ===================== spec-v497: long-term deflection multiplier (ACI 318-19 §24.2.4.1) =====================
 
 // dims: in { immediate_defl_in: L, duration_months: T, comp_steel_ratio: dimensionless } out: { xi: dimensionless, lambda: dimensionless, additional_defl_in: L, total_defl_in: L }

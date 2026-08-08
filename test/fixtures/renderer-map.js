@@ -857,6 +857,7 @@ export const RENDERER_MAP = {
   "concrete-modulus-of-rupture": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "concrete-strength-from-rupture": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "concrete-cracking-moment": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
+  "concrete-effective-inertia": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "concrete-depth-for-cracking-moment": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "concrete-shrinkage-temperature-steel": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "t-beam-effective-flange-width": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },

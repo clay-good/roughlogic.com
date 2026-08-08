@@ -620,7 +620,7 @@ const _TILES = [
   // spec-v491 rebar compression development length (ACI 318-19 §25.4.9)
   ["rc-compression-dev-length", "E"],
   // spec-v497 long-term deflection multiplier (ACI 318-19 §24.2.4.1)
-  ["concrete-longterm-defl", "E"],
+  ["concrete-effective-inertia", "E"], ["concrete-longterm-defl", "E"],
   ["concrete-anchor-breakout", "E"],
   ["concrete-anchor-pullout", "E"],
   ["concrete-anchor-shear-breakout", "E"],

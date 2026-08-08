@@ -52307,6 +52307,26 @@
       "kind": "industry"
     },
     {
+      "term": "effective moment of inertia concrete",
+      "target": "concrete-effective-inertia",
+      "kind": "industry"
+    },
+    {
+      "term": "ie deflection aci bischoff",
+      "target": "concrete-effective-inertia",
+      "kind": "industry"
+    },
+    {
+      "term": "cracked moment of inertia icr",
+      "target": "concrete-effective-inertia",
+      "kind": "question"
+    },
+    {
+      "term": "concrete beam immediate deflection inertia",
+      "target": "concrete-effective-inertia",
+      "kind": "question"
+    },
+    {
       "term": "depth for cracking moment",
       "target": "concrete-depth-for-cracking-moment",
       "kind": "industry"

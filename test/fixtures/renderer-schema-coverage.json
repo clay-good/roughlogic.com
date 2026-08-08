@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1609,
-  "covered_count": 1180,
+  "total_tiles": 1610,
+  "covered_count": 1181,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -211,6 +211,7 @@
     "concrete-crack-control-spacing",
     "concrete-cracking-moment",
     "concrete-depth-for-cracking-moment",
+    "concrete-effective-inertia",
     "concrete-elastic-modulus",
     "concrete-evaporation-rate",
     "concrete-isolation-joint",

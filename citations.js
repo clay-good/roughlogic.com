@@ -16016,6 +16016,18 @@ export const CITATIONS = {
       { name: "Gross section", value: "reinforcement transform neglected; a T-beam uses the transformed Ig", source: "scope of this tile" },
     ],
   },
+  "concrete-effective-inertia": {
+    formula: "Mcr = fr Ig/yt, fr = 7.5 lambda sqrt(f'c); Icr = b kd^3/3 + n As (d-kd)^2 with n = Es/Ec, kd = d(sqrt((rho n)^2 + 2 rho n) - rho n); Ie = Ig if Ma <= (2/3)Mcr, else Ie = Icr/[1 - (Mcr/Ma)^2 (1 - Icr/Ig)].",
+    edition: "The ACI 318-19 24.2.3.5 effective moment of inertia (Bischoff form), which replaced the Branson equation of ACI 318-14, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 24.2.3.5 effective-inertia and 19.2.2/19.2.3 modulus provisions are in the published code. The Branson-to-Bischoff change is documented by StructurePoint/PCA.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 effective moment of inertia for deflection. The 2019 code replaced Branson's cubic Ie with Bischoff's form: if the service moment Ma <= (2/3)Mcr the member is treated as uncracked and Ie = Ig (Eq 24.2.3.5b); once Ma exceeds (2/3)Mcr, Ie = Icr/[1 - (Mcr/Ma)^2 (1 - Icr/Ig)] (Eq 24.2.3.5a), dropping toward the cracked value Icr as load grows. Mcr = fr Ig/yt with fr = 7.5 lambda sqrt(f'c); Icr is the cracked transformed section for a singly-reinforced rectangular beam with n = Es/Ec and Ec = 57000 sqrt(f'c) (normalweight, 19.2.2.1). The immediate deflection is (a load-case coefficient) w L^4/(Ec Ie); feed it into the long-term-deflection tile for creep and shrinkage. Bischoff predicts larger deflections than Branson, especially for lightly reinforced slabs. Singly-reinforced rectangular section; a T-beam or doubly-reinforced section uses the appropriate transformed Icr. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Bischoff Ie", value: "Ie = Icr/[1 - (Mcr/Ma)^2 (1 - Icr/Ig)] for Ma > (2/3)Mcr; else Ie = Ig", source: "ACI 318-19 24.2.3.5" },
+      { name: "Cracked section", value: "Icr = b kd^3/3 + n As (d-kd)^2, n = Es/Ec, Ec = 57000 sqrt(f'c)", source: "ACI 318-19 19.2.2.1 / transformed section" },
+      { name: "Singly-reinforced rectangular", value: "compression steel and T-flanges neglected; those use the appropriate transformed Icr", source: "scope of this tile" },
+    ],
+  },
   "concrete-shrinkage-temperature-steel": {
     formula: "ratio = 0.0018 (Grade 60) or 0.0020 (Grade 40/50), never below 0.0014; As,min = ratio x b x h; s_max = min(5h, 18 in).",
     edition: "The ACI 318-19 24.4 shrinkage and temperature reinforcement provisions, by name.",
