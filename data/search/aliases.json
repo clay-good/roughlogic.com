@@ -842,6 +842,21 @@
       "kind": "industry"
     },
     {
+      "term": "cipolletti weir",
+      "target": "cipolletti-weir",
+      "kind": "industry"
+    },
+    {
+      "term": "trapezoidal weir flow",
+      "target": "cipolletti-weir",
+      "kind": "industry"
+    },
+    {
+      "term": "irrigation ditch weir discharge",
+      "target": "cipolletti-weir",
+      "kind": "question"
+    },
+    {
       "term": "v-notch weir",
       "target": "weir-flow",
       "kind": "redirect"

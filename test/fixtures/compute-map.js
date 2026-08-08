@@ -54,6 +54,7 @@ export const COMPUTE_MAP = {
   "dough-water-temperature": { module: "../../calc-kitchen.js", fn: "computeDoughWaterTemperature" },
   "power-distro": { module: "../../calc-stage.js", fn: "computePowerDistro" },
   "weir-flow": { module: "../../calc-treatment.js", fn: "computeWeirFlow" },
+  "cipolletti-weir": { module: "../../calc-treatment.js", fn: "computeCipollettiWeir" },
   "weir-head-from-flow": { module: "../../calc-treatment.js", fn: "computeWeirHeadFromFlow" },
   "langelier-index": { module: "../../calc-treatment.js", fn: "computeLangelierIndex" },
   "chemical-feed-pump": { module: "../../calc-treatment.js", fn: "computeChemicalFeedPump" },

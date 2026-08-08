@@ -20359,6 +20359,62 @@
    }
   },
   {
+   "tile_id": "cipolletti-weir",
+   "source_publisher": "USBR Water Measurement Manual / King's Handbook (Cipolletti weir)",
+   "source_title": "3 ft crest at 0.5 ft head -> 3.57 cfs, 1,603 GPM, 2.31 MGD (spec-v1227)",
+   "source_edition_or_year": "Q = 3.367 x L x H^(3/2)",
+   "source_section_or_page": "Q = 3.367 x 3 x 0.5^1.5 = 3.367 x 3 x 0.353553 = 3.571 cfs; x 448.831 = 1602.9 GPM; x 1440/1e6 = 2.308 MGD.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "crest_length_ft": 3,
+    "head_ft": 0.5,
+    "coeff": 0
+   },
+   "outputs": {
+    "flow_cfs": {
+     "value": 3.571,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "flow_gpm": {
+     "value": 1602.9,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "flow_mgd": {
+     "value": 2.308,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cipolletti-weir",
+   "source_publisher": "Cipolletti weir (linearity cross-check)",
+   "source_title": "cross-check: doubling the crest length to 6 ft doubles the flow to 7.14 cfs",
+   "source_edition_or_year": "Q linear in crest length L",
+   "source_section_or_page": "Q = 3.367 x 6 x 0.5^1.5 = 7.142 cfs -- exactly twice the 3 ft result, since the Cipolletti rating is linear in the full crest length (no contraction deduction).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "crest_length_ft": 6,
+    "head_ft": 0.5,
+    "coeff": 0
+   },
+   "outputs": {
+    "flow_cfs": {
+     "value": 7.142,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "weir-flow",
    "source_publisher": "USBR Water Measurement Manual (V-notch / Francis weirs)",
    "source_title": "V-notch Q = 2.49 * H^2.48; 1 cfs = 448.831 GPM",

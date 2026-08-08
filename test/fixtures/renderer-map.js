@@ -1372,6 +1372,7 @@ export const RENDERER_MAP = {
   "was-srt-control": { module: "../../calc-water.js", exportName: "WATER_RENDERERS" },
   "aeration-oxygen-demand": { module: "../../calc-water.js", exportName: "WATER_RENDERERS" },
   "weir-flow": { module: "../../calc-treatment.js", exportName: "TREATMENT_RENDERERS" },
+  "cipolletti-weir": { module: "../../calc-treatment.js", exportName: "TREATMENT_RENDERERS" },
   "weir-head-from-flow": { module: "../../calc-treatment.js", exportName: "TREATMENT_RENDERERS" },
   "langelier-index": { module: "../../calc-treatment.js", exportName: "TREATMENT_RENDERERS" },
   "chemical-feed-pump": { module: "../../calc-treatment.js", exportName: "TREATMENT_RENDERERS" },

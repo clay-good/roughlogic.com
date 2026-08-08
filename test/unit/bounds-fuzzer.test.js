@@ -10284,6 +10284,28 @@ test("bounds: spec-v658 computeWeirHeadFromFlow inverts the weir equations (clos
   assert.ok("error" in _v658({ weir_type: "vnotch90", target_flow_cfs: Infinity }));
 });
 
+import { computeCipollettiWeir as _v1227 } from "../../calc-treatment.js";
+
+test("bounds: spec-v1227 computeCipollettiWeir pins Q = 3.367 L H^1.5, the unit conversions, linearity in L, and error seams", () => {
+  // 3 ft crest, 0.5 ft head: 3.571 cfs, 1602.9 gpm, 2.308 MGD.
+  const r = _v1227({ crest_length_ft: 3, head_ft: 0.5, coeff: 0 });
+  assert.ok(Math.abs(r.flow_cfs - 3.367 * 3 * Math.pow(0.5, 1.5)) < 1e-9);
+  assert.ok(Math.abs(r.flow_cfs - 3.571) < 0.005);
+  assert.ok(Math.abs(r.flow_gpm - r.flow_cfs * 448.831) < 1e-6 && Math.abs(r.flow_gpm - 1602.9) < 1);
+  assert.ok(Math.abs(r.flow_mgd - r.flow_gpm * 1440 / 1e6) < 1e-9);
+  // Linear in crest length: doubling L doubles the flow (no contraction deduction).
+  assert.ok(Math.abs(_v1227({ crest_length_ft: 6, head_ft: 0.5 }).flow_cfs - 2 * r.flow_cfs) < 1e-9);
+  // Head scales as H^1.5; a custom coefficient overrides the 3.367 default.
+  assert.ok(Math.abs(_v1227({ crest_length_ft: 3, head_ft: 1.0 }).flow_cfs / r.flow_cfs - Math.pow(2, 1.5)) < 1e-9);
+  assert.ok(Math.abs(_v1227({ crest_length_ft: 3, head_ft: 0.5, coeff: 3.4 }).flow_cfs - 3.4 * 3 * Math.pow(0.5, 1.5)) < 1e-9);
+  // A very low head is flagged low-accuracy but not errored.
+  assert.ok(_v1227({ crest_length_ft: 3, head_ft: 0.1 }).low_accuracy === true);
+  // Error seams: non-positive crest length or head, non-finite.
+  assert.ok("error" in _v1227({ crest_length_ft: 0, head_ft: 0.5 }));
+  assert.ok("error" in _v1227({ crest_length_ft: 3, head_ft: 0 }));
+  assert.ok("error" in _v1227({ crest_length_ft: 3, head_ft: Infinity }));
+});
+
 test("bounds: calc-agriculture v20 L + calc-water v20 M tiles pin constants + reject non-finite", () => {
   assert.strictEqual(_l1({ days_series: [{ tmax: 92, tmin: 64 }], base_f: 50, cutoff_f: 86, method: "modified" }).accumulated_gdd, 25);
   assert.ok("error" in _l1({ days_series: [], base_f: 50 }));

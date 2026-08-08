@@ -81,6 +81,52 @@ function renderWeirFlow(inputRegion, outputRegion, citationEl) {
 }
 TREATMENT_RENDERERS["weir-flow"] = renderWeirFlow;
 
+// ===================== spec-v1227: Cipolletti (trapezoidal) weir flow =====================
+// The third canonical sharp-crested weir the weir-flow tile (90-deg V-notch + rectangular Francis) leaves
+// out. A Cipolletti weir is trapezoidal with 1H:4V side slopes chosen so the slope exactly compensates
+// the end-contraction, letting a simple rectangular-form equation use the full crest length: Q = 3.367 L
+// H^(3/2) (cfs, L and H in ft). USBR Water Measurement Manual Ch. 7 / King's Handbook of Hydraulics.
+// dims: in { crest_length_ft: L, head_ft: L, coeff: dimensionless } out: { flow_cfs: L^3 T^-1, flow_gpm: L^3 T^-1, flow_mgd: L^3 T^-1 }
+export function computeCipollettiWeir({ crest_length_ft = 0, head_ft = 0, coeff = 0 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  const L = Number(crest_length_ft) || 0;
+  const H = Number(head_ft) || 0;
+  if (!(L > 0)) return { error: "Crest length must be positive (ft)." };
+  if (!(H > 0)) return { error: "Head over crest must be positive (ft)." };
+  const C = coeff > 0 ? coeff : 3.367;
+  const cfs = C * L * Math.pow(H, 1.5);
+  const gpm = cfs * 448.831;
+  const mgd = gpm * 1440 / 1e6;
+  if (![cfs, gpm, mgd].every(Number.isFinite)) return { error: "Cipolletti-weir math is not a finite value." };
+  return {
+    flow_cfs: cfs, flow_gpm: gpm, flow_mgd: mgd,
+    low_accuracy: H < 0.2 || H > L,
+    note: "The free-flow discharge over a Cipolletti weir, the trapezoidal sharp-crested weir with 1-horizontal-to-4-vertical side slopes: Q = 3.367 x L x H^(3/2) (cfs, crest length L and head H in ft; the coefficient is editable). The Cipolletti is the third standard sharp-crested weir alongside the 90-degree V-notch and the rectangular (Francis) weir the weir-flow tile already covers; its cleverness is that the 4:1 side batter is chosen so the added flow through the sloping ends exactly makes up the loss from end-contraction, so it behaves like a full-width suppressed rectangular weir and uses the full crest length L with no 0.2H contraction deduction. A 3 ft crest at 0.5 ft of head passes 3.57 cfs (1,603 gpm, 2.31 MGD). It is the common field weir for ditches and irrigation turnouts because the rating is simple and the crest length reads straight off the notch. Requires a fully-contracted, ventilated, sharp-crested weir with FREE (non-submerged) flow, the head measured upstream at about 4H back from the crest, and the approach-velocity correction is ignored; a head below about 0.2 ft or greater than the crest length is a low-accuracy reading and flagged. An operations aid; the USBR Water Measurement Manual, the weir's calibration, and the operator of record govern.",
+  };
+}
+export const cipollettiWeirExample = { inputs: { crest_length_ft: 3, head_ft: 0.5, coeff: 0 } };
+function renderCipollettiWeir(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Cipolletti (trapezoidal, 1H:4V) sharp-crested weir free-flow discharge Q = 3.367 x L x H^(3/2) (cfs, ft), per the USBR Water Measurement Manual (public domain) / King's Handbook of Hydraulics; the 4:1 side slopes compensate end-contraction so the full crest length is used. Requires a ventilated, free-flow, sharp-crested weir; the head is measured about 4H upstream. Free at usbr.gov/tsc/techreferences/mands/wmm.";
+  const L = makeNumber("Crest length L (ft)", "cip-l", { step: "any", min: "0", value: "3" }); L.input.value = "3";
+  const H = makeNumber("Head over crest H (ft)", "cip-h", { step: "any", min: "0", value: "0.5" }); H.input.value = "0.5";
+  const coeff = makeNumber("Weir coefficient (0 = default 3.367)", "cip-c", { step: "any", min: "0" });
+  for (const f of [L, H, coeff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { L.input.value = "3"; H.input.value = "0.5"; coeff.input.value = ""; update(); });
+  const oCfs = makeOutputLine(outputRegion, "Flow (cfs)", "cip-out-cfs");
+  const oGpm = makeOutputLine(outputRegion, "Flow (GPM / MGD)", "cip-out-gpm");
+  const oNote = makeOutputLine(outputRegion, "Note", "cip-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCipollettiWeir({ crest_length_ft: readNum(L.input), head_ft: readNum(H.input), coeff: readNum(coeff.input) });
+    if (r.error) { oCfs.textContent = r.error; oGpm.textContent = ""; oNote.textContent = ""; return; }
+    oCfs.textContent = fmt(r.flow_cfs, 3) + " cfs" + (r.low_accuracy ? " (head outside ~0.2 ft to L -- low accuracy)" : "");
+    oGpm.textContent = fmt(r.flow_gpm, 1) + " GPM (" + fmt(r.flow_mgd, 3) + " MGD)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [L.input, H.input, coeff.input]) f.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["cipolletti-weir"] = renderCipollettiWeir;
+
 // --- spec-v658 M: weir head from a target flow (inverse of weir-flow) ---
 // V-notch H = (Q/C)^(1/2.48); rect suppressed H = (Q/(C L))^(2/3); rect
 // contracted solves L-0.2H by a few fixed-point passes seeded from suppressed.

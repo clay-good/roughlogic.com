@@ -638,6 +638,18 @@ export const CITATIONS = {
       { name: "Weir condition", value: "fully-contracted, ventilated, sharp-crested, free-flow", source: "USBR Water Measurement Manual" },
     ],
   },
+  "cipolletti-weir": {
+    formula: "Q = 3.367 x L x H^(3/2) (cfs, crest length L and head H in ft); 1 cfs = 448.831 GPM; MGD = GPM x 1440 / 1e6. Coefficient editable.",
+    edition: "Per the USBR Water Measurement Manual (public domain) and King's Handbook of Hydraulics - the Cipolletti (trapezoidal, 1H:4V) sharp-crested weir discharge equation, by name.",
+    freeAccess: "Free at usbr.gov/tsc/techreferences/mands/wmm; the 3.367 Cipolletti coefficient is a fixed published constant and the user may override it with a site calibration.",
+    governance: GOVERNANCE.general,
+    editionNote: "The free-flow discharge over a Cipolletti weir, the trapezoidal sharp-crested weir with 1-horizontal-to-4-vertical side slopes: Q = 3.367 x L x H^(3/2), with the crest length L and the head H in feet. The Cipolletti is the third standard sharp-crested weir alongside the 90-degree V-notch and the rectangular (Francis) weir the weir-flow tile covers; the 4:1 side batter is chosen so the extra flow through the sloping ends exactly compensates the end-contraction, so it behaves like a full-width suppressed rectangular weir and the full crest length L is used with no 0.2H contraction deduction. A 3 ft crest at 0.5 ft of head passes 3.57 cfs (1,603 gpm, 2.31 MGD). It is the common field weir for ditches and irrigation turnouts. It requires a fully-contracted, ventilated, sharp-crested weir with FREE (non-submerged) flow, the head measured upstream about 4H back from the crest, and it ignores the approach-velocity correction; a head below about 0.2 ft or greater than the crest length is low-accuracy and flagged. An operations aid; the USBR Water Measurement Manual, the weir's calibration, and the operator of record govern.",
+    assumptions: [
+      { name: "Cipolletti discharge", value: "Q = 3.367 L H^(3/2) (cfs, ft); coefficient editable", source: "USBR Water Measurement Manual / King's Handbook" },
+      { name: "Contraction compensation", value: "1H:4V side slopes cancel end-contraction, so the full crest length L is used", source: "Cipolletti weir geometry" },
+      { name: "Weir condition", value: "fully-contracted, ventilated, sharp-crested, free flow; head ~4H upstream", source: "USBR Water Measurement Manual" },
+    ],
+  },
   "weir-head-from-flow": {
     formula: "90-degree V-notch: H = (Q/C)^(1/2.48), C=2.49. Suppressed rectangular: H = (Q/(C L))^(2/3), C=3.33. Contracted rectangular: L-0.2H solved by fixed-point from the suppressed seed. 1 cfs = 448.831 GPM.",
     edition: "Per the USBR Water Measurement Manual (public domain) - the V-notch and Francis rectangular-weir equations solved for the head, the inverse of the weir-flow tile, by name.",
