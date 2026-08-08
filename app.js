@@ -494,7 +494,7 @@ const TOOL_MODULES = (() => {
     // spec-v215..v217 roofing material-takeoff batch.
     "ice-barrier-coverage", "metal-roof-panels", "ridge-cap-fasteners",
     // spec-v224..v226 ASCE 7 structural design-loads batch.
-    "rain-load-ponding", "asce7-load-combinations", "seismic-base-shear",
+    "rain-load-ponding", "asce7-load-combinations", "seismic-approximate-period", "seismic-base-shear",
     // spec-v477 ELF vertical distribution (the v226/v383 follow-on).
     "seismic-vertical-distribution",
     // spec-v480 ELF overturning moment (the v477 §12.8.5 follow-on).

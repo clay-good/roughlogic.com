@@ -14196,6 +14196,33 @@ test("bounds: spec-v226 computeSeismicBaseShear pins Cs, base shear, the cap/min
   assert.ok("error" in _v226({ weight_kip: Infinity, sds: 1.0, r_factor: 6.5, period_s: 0.3 }));
 });
 
+import { computeSeismicApproximatePeriod as _v1214 } from "../../calc-construction.js";
+
+test("bounds: spec-v1214 computeSeismicApproximatePeriod pins Ta = Ct hn^x, the system coefficients, the Cu Ta cap, the feed into base shear, and error seams", () => {
+  // Steel MRF, 120 ft, SD1 0.6: Ta = 0.028 * 120^0.8 = 1.29 s; Cu = 1.4; Cu Ta = 1.806.
+  const r = _v1214({ system: "steel_mrf", hn_ft: 120, sd1: 0.6 });
+  assert.ok(Math.abs(r.ta_s - 0.028 * Math.pow(120, 0.8)) < 1e-12);
+  assert.ok(Math.abs(r.ta_s - 1.290) < 0.005 && r.ct === 0.028 && r.x_exp === 0.8);
+  assert.ok(r.cu === 1.4 && Math.abs(r.cu_ta_s - 1.4 * r.ta_s) < 1e-12);
+  // Each system uses its own Ct/x.
+  assert.ok(Math.abs(_v1214({ system: "concrete_mrf", hn_ft: 120 }).ta_s - 0.016 * Math.pow(120, 0.9)) < 1e-12);
+  assert.ok(Math.abs(_v1214({ system: "steel_ebf_brbf", hn_ft: 120 }).ta_s - 0.03 * Math.pow(120, 0.75)) < 1e-12);
+  const other = _v1214({ system: "other", hn_ft: 48 });
+  assert.ok(Math.abs(other.ta_s - 0.365) < 0.005 && other.cu === null && other.cu_ta_s === null); // no SD1 -> no cap
+  // Cu interpolates: SD1 0.2 -> 1.5, SD1 0.1 or below -> 1.7.
+  assert.ok(_v1214({ system: "other", hn_ft: 48, sd1: 0.2 }).cu === 1.5);
+  assert.ok(_v1214({ system: "other", hn_ft: 48, sd1: 0.05 }).cu === 1.7);
+  // Ta grows with height.
+  assert.ok(_v1214({ system: "steel_mrf", hn_ft: 240 }).ta_s > r.ta_s);
+  // The result feeds the base-shear tile as period_s (finite Cs).
+  assert.ok(_v226({ weight_kip: 200, sds: 1.0, sd1: 0.6, r_factor: 6.5, ie: 1.0, period_s: r.ta_s }).cs > 0);
+  // Error seams: bad system, non-positive height, negative SD1, non-finite.
+  assert.ok("error" in _v1214({ system: "timber", hn_ft: 120 }));
+  assert.ok("error" in _v1214({ system: "steel_mrf", hn_ft: 0 }));
+  assert.ok("error" in _v1214({ system: "steel_mrf", hn_ft: 120, sd1: -0.1 }));
+  assert.ok("error" in _v1214({ system: "steel_mrf", hn_ft: Infinity }));
+});
+
 // ===================== spec-v227..v229 cooling-load-components batch =====================
 import { computeWindowSolarHeatGain as _v227, computeInternalHeatGains as _v228, computeEnvelopeConductionLoad as _v229 } from "../../calc-hvacsystems.js";
 

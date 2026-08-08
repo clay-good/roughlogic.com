@@ -13497,6 +13497,21 @@
       "kind": "redirect"
     },
     {
+      "term": "approximate fundamental period",
+      "target": "seismic-approximate-period",
+      "kind": "industry"
+    },
+    {
+      "term": "ta ct hn seismic period",
+      "target": "seismic-approximate-period",
+      "kind": "industry"
+    },
+    {
+      "term": "building period for base shear",
+      "target": "seismic-approximate-period",
+      "kind": "question"
+    },
+    {
       "term": "seismic base shear",
       "target": "seismic-base-shear",
       "kind": "industry"

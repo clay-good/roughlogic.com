@@ -5011,6 +5011,72 @@ CONSTRUCTION_RENDERERS["seismic-base-shear"] = _simpleRenderer({
   compute: computeSeismicBaseShear,
 });
 
+// ===================== spec-v1214: ASCE 7 approximate fundamental period Ta =====================
+// The seismic-base-shear, seismic-vertical-distribution, and seismic-overturning-moment tiles all take
+// period_s as a required input (base-shear even labels the field "Fundamental period Ta"), but no tile
+// computes it. ASCE 7 §12.8.2.1 Eq. 12.8-7: Ta = Ct hn^x, with the Table 12.8-2 coefficients by system
+// (3-value set, inlined like the wind tiles). A period from a rational analysis may be used but not more
+// than Cu Ta (Table 12.8-1, from SD1); this reports that upper limit when SD1 is given.
+const SEISMIC_CT_X = {
+  steel_mrf: { ct: 0.028, x: 0.8 },
+  concrete_mrf: { ct: 0.016, x: 0.9 },
+  steel_ebf_brbf: { ct: 0.03, x: 0.75 },
+  other: { ct: 0.02, x: 0.75 },
+};
+const _seismicCu = (sd1) => {
+  // ASCE 7 Table 12.8-1, piecewise linear: SD1 <= 0.1 -> 1.7, 0.15 -> 1.6, 0.2 -> 1.5, 0.3 -> 1.4, >= 0.4 -> 1.4.
+  const pts = [[0.1, 1.7], [0.15, 1.6], [0.2, 1.5], [0.3, 1.4], [0.4, 1.4]];
+  if (sd1 <= pts[0][0]) return pts[0][1];
+  if (sd1 >= pts[pts.length - 1][0]) return pts[pts.length - 1][1];
+  for (let i = 0; i < pts.length - 1; i++) {
+    if (sd1 >= pts[i][0] && sd1 <= pts[i + 1][0]) {
+      const t = (sd1 - pts[i][0]) / (pts[i + 1][0] - pts[i][0]);
+      return pts[i][1] + t * (pts[i + 1][1] - pts[i][1]);
+    }
+  }
+  return pts[pts.length - 1][1];
+};
+// dims: in { system: dimensionless, hn_ft: L, sd1: dimensionless } out: { ta_s: T, ct: dimensionless, x_exp: dimensionless, cu: dimensionless, cu_ta_s: T }
+export function computeSeismicApproximatePeriod({ system = "other", hn_ft = 0, sd1 = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const p = SEISMIC_CT_X[system];
+  if (!p) return { error: "System must be steel_mrf, concrete_mrf, steel_ebf_brbf, or other." };
+  const hn = Number(hn_ft) || 0;
+  const s1 = Number(sd1) || 0;
+  if (!(hn > 0)) return { error: "Structural height hn must be positive (ft)." };
+  if (s1 < 0) return { error: "SD1 cannot be negative (g)." };
+  const ta_s = p.ct * Math.pow(hn, p.x);
+  const cu = s1 > 0 ? _seismicCu(s1) : null;
+  const cu_ta_s = cu != null ? cu * ta_s : null;
+  if (!Number.isFinite(ta_s)) return { error: "Period math is not a finite value." };
+  return {
+    ta_s, ct: p.ct, x_exp: p.x, cu, cu_ta_s,
+    note: "The ASCE 7 §12.8.2.1 approximate fundamental period Ta, the period the seismic-base-shear, vertical-distribution, and overturning tiles take as an input but no tile computed. Ta = Ct hn^x (Eq. 12.8-7), where hn is the structural height (base to roof, ft) and Ct/x are the Table 12.8-2 coefficients: steel moment frames 0.028/0.8, concrete moment frames 0.016/0.9, steel eccentrically braced and buckling-restrained braced frames 0.03/0.75, and all other structural systems 0.02/0.75. A 120 ft steel moment frame gives Ta = 0.028 x 120^0.8 = 1.29 s. Ta is always permitted and is conservative (a shorter period lands higher on the response spectrum, so a larger Cs); a period T computed from a rational (modal or Rayleigh) analysis may be used but not more than Cu Ta, the upper limit from Table 12.8-1 (Cu falls from 1.7 at SD1 <= 0.1 to 1.4 at SD1 >= 0.4) -- enter SD1 to see it. The moment-frame Ct/x apply only where the frame resists 100% of the seismic force and is not enclosed by stiffer components. A design aid, not a substitute for a licensed engineer's design.",
+  };
+}
+const seismicApproximatePeriodExample = { inputs: { system: "steel_mrf", hn_ft: 120, sd1: 0.6 } };
+CONSTRUCTION_RENDERERS["seismic-approximate-period"] = _simpleRenderer({
+  citation: "Citation: ASCE 7 §12.8.2.1 approximate fundamental period Ta = Ct hn^x (Eq. 12.8-7), with the Table 12.8-2 coefficients (steel MRF 0.028/0.8, concrete MRF 0.016/0.9, EBF/BRBF 0.03/0.75, other 0.02/0.75) and the Cu Ta upper limit from Table 12.8-1, by name. Feeds the seismic-base-shear tile as the period. A design aid, not a substitute for a licensed engineer's design.",
+  example: seismicApproximatePeriodExample.inputs,
+  fields: [
+    { key: "system", label: "Structural system", kind: "select", default: "other", options: [
+      { value: "steel_mrf", label: "Steel moment frame (0.028/0.8)" },
+      { value: "concrete_mrf", label: "Concrete moment frame (0.016/0.9)" },
+      { value: "steel_ebf_brbf", label: "Steel EBF / BRBF (0.03/0.75)" },
+      { value: "other", label: "All other systems (0.02/0.75)" },
+    ] },
+    { key: "hn_ft", label: "Structural height hn, base to roof (ft)", kind: "number", default: 120 },
+    { key: "sd1", label: "SD1, 1-second (g) -- optional, for the Cu Ta cap", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "ta", id: "sap-out-ta", label: "Approximate period Ta", value: (r) => _fmtC(r.ta_s, 3) + " s" },
+    { key: "cap", id: "sap-out-cap", label: "Upper limit on a computed T (Cu Ta)", value: (r) => (r.cu_ta_s != null ? _fmtC(r.cu_ta_s, 3) + " s (Cu " + _fmtC(r.cu, 2) + ")" : "(enter SD1 for the Cu Ta cap)") },
+    { key: "ctx", id: "sap-out-ctx", label: "Ct / x", value: (r) => _fmtC(r.ct, 3) + " / " + _fmtC(r.x_exp, 2) },
+    { key: "n", id: "sap-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSeismicApproximatePeriod,
+});
+
 // ----- spec-v477: Vertical Distribution of Seismic Forces (ASCE 7-22 12.8.3 / 12.8.4) -----
 
 // dims: in { base_shear_kip: M L T^-2, period_s: T, stories: dimensionless } out: { k: dimensionless, sigma_wh: dimensionless, fx_top_kip: M L T^-2, vx_base_kip: M L T^-2, level_count: dimensionless }

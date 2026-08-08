@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1586,
-  "covered_count": 1164,
+  "total_tiles": 1587,
+  "covered_count": 1165,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -860,6 +860,7 @@
     "sediment-basin-volume",
     "seed-rate",
     "seer-eer",
+    "seismic-approximate-period",
     "seismic-base-shear",
     "seismic-design-spectral-acceleration",
     "seismic-earth-pressure",

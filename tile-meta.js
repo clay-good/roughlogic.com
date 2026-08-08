@@ -784,7 +784,7 @@ const _TILES = [
   ["metal-roof-panels", "E"],
   ["ridge-cap-fasteners", "E"],
   // spec-v224..v226 ASCE 7 structural design-loads batch
-  ["rain-load-ponding", "E"], ["asce7-load-combinations", "E"], ["seismic-base-shear", "E"],
+  ["rain-load-ponding", "E"], ["asce7-load-combinations", "E"], ["seismic-approximate-period", "E"], ["seismic-base-shear", "E"],
   // spec-v477 ELF vertical distribution
   ["seismic-vertical-distribution", "E"],
   ["seismic-overturning-moment", "E"], ["seismic-overturning-stability", "E"],

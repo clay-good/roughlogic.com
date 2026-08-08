@@ -591,6 +591,7 @@ export const RENDERER_MAP = {
   "ridge-cap-fasteners": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "rain-load-ponding": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "asce7-load-combinations": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
+  "seismic-approximate-period": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "seismic-base-shear": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "seismic-vertical-distribution": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "seismic-overturning-moment": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },

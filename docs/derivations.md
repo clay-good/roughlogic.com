@@ -1728,6 +1728,7 @@ cross-check.
 | calc-construction.js | `computeScaffoldTakeoff` | `{ run_length_ft = 40, bay_length_ft = 7, lifts = 1, planks_per_bay = 4 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSealantJointYield` | `{ joint_lf = 500, cartridge_in3 = 20.5, joint_width_in = 0.375, joint_depth_i...` | _ | _ | _ |
 | calc-construction.js | `computeSectionProperties` | `{ shape = "rectangle", b_in = 0, h_in = 0, d_in = 0, di_in = 0 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeSeismicApproximatePeriod` | `{ system = "other", hn_ft = 0, sd1 = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSeismicBaseShear` | `{ weight_kip = 0, sds = 0, sd1 = 0, r_factor = 0, ie = 1.0, period_s = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSeismicDesignSpectralAcceleration` | `{ ss = 0, s1 = 0, fa = 0, fv = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSeismicOverturningMoment` | `{ base_shear_kip = 0, period_s = 0, stories = [] } = {}` | _ | _ | _ |
@@ -3248,7 +3249,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1834.
+Row count: 1835.
 
 <!-- END function-corpus-v14 -->
 
@@ -3882,7 +3883,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (448 tiles)
+### Group E Construction (449 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4189,6 +4190,7 @@ per spec-v14 §13.1 second paragraph.
 | `secondary-compression-settlement` | Secondary Compression (Creep) Settlement | Das, Principles of Geotechnical Engin...; C-alpha-eps = C-alpha/(1+ep) = 0.02/1.85 = 0.010811. Ss =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `section-properties` | Cross-Section Properties (A, I, S, r) | mechanics of materials; spec-v342 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sediment-basin-volume` | Sediment Basin / Trap Storage Volume | Sediment-basin storage identity (cons...; required = 5*3600 = 18,000 cf (667 cy); surface = 18000/3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `seismic-approximate-period` | Approximate Fundamental Period Ta (ASCE 7 §12.8.2.1) | ASCE 7 §12.8.2.1 approximate fundamen...; Ta = Ct hn^x = 0.028 x 120^0.8 = 0.028 x 46.06 = 1.290 s;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seismic-base-shear` | Seismic Base Shear (ASCE 7 §12.8 Equivalent Lateral Force) | ASCE 7 §12.8 equivalent lateral force; spec-v226 section 2.1 pinned example (short period) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seismic-design-spectral-acceleration` | Design Spectral Response Accelerations SDS / SD1 (ASCE 7-22 11.4) | ASCE 7-22 11.4; spec-v381 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seismic-earth-pressure` | Mononobe-Okabe Seismic Active Earth Pressure | Mononobe-Okabe (Okabe 1926; Mononobe ...; psi = arctan(0.15) = 8.5308 deg; Kae = 0.34053 (the publi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5020,6 +5022,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1586. Fixture-covered or reference-cadence: 1586 / 1586.
+Tile count: 1587. Fixture-covered or reference-cadence: 1587 / 1587.
 
 <!-- END tile-index-v14 -->

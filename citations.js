@@ -16582,6 +16582,18 @@ export const CITATIONS = {
       { name: "Signed wind", value: "wind is entered signed: positive downward (pressure), negative upward (uplift)", source: "first principles" },
     ],
   },
+  "seismic-approximate-period": {
+    formula: "Ta = Ct hn^x. Table 12.8-2: steel MRF 0.028/0.8, concrete MRF 0.016/0.9, steel EBF/BRBF 0.03/0.75, other 0.02/0.75. Cu Ta upper limit from Table 12.8-1 (SD1).",
+    edition: "The ASCE 7 §12.8.2.1 approximate fundamental period Ta = Ct hn^x, with the Table 12.8-2 coefficients and the Table 12.8-1 Cu upper-limit factor, by name.",
+    freeAccess: "The approximate-period equation and the Ct/x and Cu tables are stated in ASCE 7 §12.8.2.1; the arithmetic is public. The structural height and SD1 are the user's own site/design inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ASCE 7 §12.8.2.1 approximate fundamental period Ta = Ct hn^x (Eq. 12.8-7), the period the seismic-base-shear, vertical-distribution, and overturning tiles require but do not compute. hn is the structural height (base to roof, ft); Ct and x are the Table 12.8-2 coefficients by system (steel moment frames 0.028/0.8, concrete moment frames 0.016/0.9, steel eccentrically braced and buckling-restrained braced frames 0.03/0.75, all other structural systems 0.02/0.75). Ta is always permitted and is conservative (a shorter period lands higher on the design spectrum, giving a larger Cs); a period T from a rational (modal or Rayleigh) analysis may be used but not more than Cu Ta, the upper limit from Table 12.8-1 (Cu falls from 1.7 at SD1 <= 0.1 to 1.4 at SD1 >= 0.4). The moment-frame Ct/x apply only where the frame resists 100% of the seismic force and is not enclosed by more rigid components. A design aid, not a substitute for a licensed engineer's design.",
+    assumptions: [
+      { name: "Approximate period", value: "Ta = Ct hn^x (hn base-to-roof structural height, ft)", source: "ASCE 7 §12.8.2.1 Eq. 12.8-7" },
+      { name: "System coefficients", value: "steel MRF 0.028/0.8; concrete MRF 0.016/0.9; EBF/BRBF 0.03/0.75; other 0.02/0.75", source: "ASCE 7 Table 12.8-2" },
+      { name: "Cu Ta cap", value: "a computed T may be used up to Cu Ta; Cu 1.7 (SD1 <= 0.1) to 1.4 (SD1 >= 0.4)", source: "ASCE 7 Table 12.8-1" },
+    ],
+  },
   "seismic-base-shear": {
     formula: "cs_basic = sds / (R / Ie); cs_cap = sd1 / (period_s x (R / Ie)); cs_min = max(0.044 x sds x Ie, 0.01); cs = max(cs_min, min(cs_basic, cs_cap)); base_shear = cs x weight.",
     edition: "ASCE 7 §12.8 equivalent lateral force (Cs = SDS / (R / Ie), the cap Cs <= SD1 / (T x (R / Ie)) for T <= TL, the minimum Cs >= max(0.044 x SDS x Ie, 0.01), V = Cs x W), by name.",

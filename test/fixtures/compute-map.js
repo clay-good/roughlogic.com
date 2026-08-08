@@ -1446,6 +1446,7 @@ export const COMPUTE_MAP = {
   // spec-v224..v226 ASCE 7 structural design-loads batch (3 tiles)
   "rain-load-ponding": { module: "../../calc-construction.js", fn: "computeRainLoadPonding" },
   "asce7-load-combinations": { module: "../../calc-construction.js", fn: "computeAsce7LoadCombinations" },
+  "seismic-approximate-period": { module: "../../calc-construction.js", fn: "computeSeismicApproximatePeriod" },
   "seismic-base-shear": { module: "../../calc-construction.js", fn: "computeSeismicBaseShear" },
   "seismic-vertical-distribution": { module: "../../calc-construction.js", fn: "computeSeismicVerticalDistribution" },
   "seismic-overturning-moment": { module: "../../calc-construction.js", fn: "computeSeismicOverturningMoment" },

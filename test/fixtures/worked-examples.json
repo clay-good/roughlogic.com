@@ -33581,6 +33581,56 @@
    }
   },
   {
+   "tile_id": "seismic-approximate-period",
+   "source_publisher": "ASCE 7 §12.8.2.1 approximate fundamental period",
+   "source_title": "120 ft steel moment frame, SD1 0.6 -> Ta 1.29 s, Cu Ta 1.81 s (spec-v1214)",
+   "source_edition_or_year": "ASCE 7 Table 12.8-2 / 12.8-1",
+   "source_section_or_page": "Ta = Ct hn^x = 0.028 x 120^0.8 = 0.028 x 46.06 = 1.290 s; SD1 0.6 >= 0.4 so Cu = 1.4; Cu Ta = 1.806 s.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "system": "steel_mrf",
+    "hn_ft": 120,
+    "sd1": 0.6
+   },
+   "outputs": {
+    "ta_s": {
+     "value": 1.290,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "cu_ta_s": {
+     "value": 1.806,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "seismic-approximate-period",
+   "source_publisher": "ASCE 7 Table 12.8-2 (all-other systems)",
+   "source_title": "cross-check: a 48 ft other-system building gives Ta 0.36 s (0.02 x 48^0.75)",
+   "source_edition_or_year": "Ta = Ct hn^x, Ct 0.02, x 0.75",
+   "source_section_or_page": "Ta = 0.02 x 48^0.75 = 0.02 x 18.24 = 0.365 s -- the short period typical of a stiff low-rise building; no SD1 entered so no Cu Ta cap is reported.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "system": "other",
+    "hn_ft": 48,
+    "sd1": 0
+   },
+   "outputs": {
+    "ta_s": {
+     "value": 0.365,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "seismic-base-shear",
    "source_publisher": "ASCE 7 §12.8 equivalent lateral force",
    "source_title": "200 kip, SDS 1.0, R 6.5, 0.3 s -> Cs 0.154, 30.8 kips",
