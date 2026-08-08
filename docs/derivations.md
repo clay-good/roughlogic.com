@@ -1437,6 +1437,7 @@ cross-check.
 | calc-accounting.js | `computeSalesTaxCompound` | `{ pre_tax = 0, post_tax = 0, rate1_pct = 0, rate2_pct = 0, }` | _ | _ | _ |
 | calc-accounting.js | `computeSection179` | `{ cost = 0, business_use_pct = 100, taxable_income = 0, tax_year = 2025, bonu...` | _ | _ | _ |
 | calc-accounting.js | `computeStraightLine` | `{ cost = 0, salvage = 0, life_years = 0, year_of_interest = 1 }` | _ | _ | _ |
+| calc-accounting.js | `computeSumOfYearsDigitsDepreciation` | `{ cost = 0, salvage = 0, life_yr = 0, year = 1 } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeSuretyBondPremium` | `{ contract_usd = 0, rate1_per_k = 25, rate2_per_k = 15, rate3_per_k = 10 } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeUnitsOfProductionDepr` | `{ cost_basis = 0, salvage_value = 0, total_units = 0, period_units = 0, accum...` | _ | _ | _ |
 | calc-accounting.js | `computeWipPercentComplete` | `{ contract_usd = 0, cost_to_date_usd = 0, est_total_cost_usd = 0, billed_to_d...` | _ | _ | _ |
@@ -3265,7 +3266,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1851.
+Row count: 1852.
 
 <!-- END function-corpus-v14 -->
 
@@ -4887,7 +4888,7 @@ per spec-v14 §13.1 second paragraph.
 | --- | --- | --- | --- |
 | `historical-pricing` | Historical Pricing Context | BLS PPI / EIA / USDA NASS / FRED fede...; copper / 12-month lookback over the bundled 2026-05-08 sh... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group R Accounting (28 tiles)
+### Group R Accounting (29 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4915,6 +4916,7 @@ per spec-v14 §13.1 second paragraph.
 | `se-tax` | Self-Employment Tax (Schedule SE) | IRS Schedule SE (Form 1040); $80,000 net SE earnings / no W-2 wages / single / 2025 ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `section-179` | Section 179 and Bonus Depreciation | IRC sec. 179 (annual indexed limits; ...; $50,000 cost / 100% business use / $200k taxable income /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `straight-line-depreciation` | Straight-Line Depreciation | Project (first-principles); annual = (cost - salvage) / life | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sum-of-years-digits-depreciation` | Sum-of-the-Years'-Digits Depreciation (Book) | GAAP book depreciation (ASC 360); $50,000 cost, $5,000 salvage, 5 yr: SYD 15, Yr1 = 5/15 x ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `surety-bond-premium` | Surety Bond Premium (Tiered Rate) | surety pricing (tiered rate schedule); spec-v444 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `units-of-production-depr` | Units-of-Production Depreciation | units-of-production (activity) deprec...; spec-v531 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wip-percent-complete` | Work-in-Progress Percent Complete and Over/Under Billing | construction accounting (cost-to-cost...; spec-v390 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5054,6 +5056,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1603. Fixture-covered or reference-cadence: 1603 / 1603.
+Tile count: 1604. Fixture-covered or reference-cadence: 1604 / 1604.
 
 <!-- END tile-index-v14 -->

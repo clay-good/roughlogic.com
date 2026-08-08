@@ -407,6 +407,17 @@ export const CITATIONS = {
     ],
   },
 
+  "sum-of-years-digits-depreciation": {
+    formula: "SYD = n(n+1)/2; year k depreciation = (cost - salvage) * (n - k + 1) / SYD. Accumulated is the running sum; book value = cost - accumulated.",
+    edition: "GAAP book depreciation - ASC 360 (Property, Plant, and Equipment), by name; sum-of-the-years'-digits accelerated method. Distinct from the macrs-depreciation tile (IRS Pub 946 tax method).",
+    freeAccess: "Accounting information, not advice; a CPA and current GAAP govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "SYD subtracts salvage first (like straight-line, unlike declining-balance), so the schedule lands exactly on salvage in the final year with no plug. The year 1 fraction is n/SYD, falling by 1/SYD each year.",
+    assumptions: [
+      { name: "Depreciable base", value: "(cost - salvage), fully allocated over the life; the fractions n/SYD ... 1/SYD sum to 1", source: "ASC 360" },
+    ],
+  },
+
   "markup-vs-margin": {
     formula: "markup% = (price-cost)/cost*100; margin% = (price-cost)/price*100; margin% = markup%/(1+markup%); markup% = margin%/(1-margin%); price = cost*(1+markup%) = cost/(1-margin%).",
     edition: "Standard managerial-accounting pricing identity (cost-volume-profit), universal public formula; AICPA / introductory managerial-accounting texts, by name.",

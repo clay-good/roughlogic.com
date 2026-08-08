@@ -1217,6 +1217,64 @@ function renderDecliningBalanceDepreciation(inputRegion, outputRegion, citationE
 }
 ACCOUNTING_RENDERERS["declining-balance-depreciation"] = renderDecliningBalanceDepreciation;
 
+// --- spec-v1231 R: Sum-of-the-years'-digits depreciation (`sum-of-years-digits-depreciation`) ---
+// SYD = n(n+1)/2; year k depreciation = (cost - salvage) x (n - k + 1) / SYD. Accelerated time-based method.
+// dims: in { cost: dimensionless, salvage: dimensionless, life_yr: dimensionless, year: dimensionless } out: { year_depreciation: dimensionless, accumulated_depreciation: dimensionless, book_value: dimensionless }
+export function computeSumOfYearsDigitsDepreciation({ cost = 0, salvage = 0, life_yr = 0, year = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const C = Number(cost) || 0;
+  const S = Number(salvage) || 0;
+  const life = Math.round(Number(life_yr) || 0);
+  const yr = Math.round(Number(year) || 0);
+  if (!(C > 0 && Number.isFinite(C))) return { error: "Cost must be positive ($)." };
+  if (S < 0 || !Number.isFinite(S)) return { error: "Salvage must be non-negative ($)." };
+  if (S >= C) return { error: "Salvage must be below cost." };
+  if (!(life >= 1)) return { error: "Useful life must be at least 1 year." };
+  if (life > 100) return { error: "Useful life must be 100 years or fewer." };
+  const base = C - S;
+  const syd = (life * (life + 1)) / 2;
+  const schedule = [];
+  let accumulated = 0;
+  for (let y = 1; y <= life; y++) {
+    const dep = base * (life - y + 1) / syd;
+    accumulated += dep;
+    schedule.push({ year: y, depreciation: dep, accumulated, book_value: C - accumulated });
+  }
+  const row = schedule[Math.min(Math.max(yr, 1), life) - 1];
+  return {
+    syd_denominator: syd,
+    schedule,
+    year_depreciation: row ? row.depreciation : null,
+    accumulated_depreciation: row ? row.accumulated : null,
+    book_value: row ? row.book_value : null,
+    note: "SYD subtracts salvage first (like straight-line, unlike declining-balance), so the schedule always lands exactly on salvage in the final year. The year 1 fraction is n/SYD, falling by 1/SYD each year. A GAAP/book accelerated method, not tax MACRS.",
+  };
+}
+export const sumOfYearsDigitsDepreciationExample = { inputs: { cost: 50000, salvage: 5000, life_yr: 5, year: 1 } };
+
+function renderSumOfYearsDigitsDepreciation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: GAAP book depreciation - ASC 360 (Property, Plant, and Equipment), by name; sum-of-the-years'-digits accelerated method. Distinct from the macrs-depreciation tile (IRS Pub 946 tax method). Accounting information, not advice; a CPA and current GAAP govern.";
+  const cost = makeNumber("Cost ($)", "syd-cost", { step: "any", min: "0", value: "50000" }); cost.input.value = "50000";
+  const salvage = makeNumber("Salvage ($)", "syd-salv", { step: "any", min: "0", value: "5000" }); salvage.input.value = "5000";
+  const life = makeNumber("Useful life (yr)", "syd-life", { step: "1", min: "1", value: "5" }); life.input.value = "5";
+  const year = makeNumber("Year of interest", "syd-year", { step: "1", min: "1", value: "1" }); year.input.value = "1";
+  for (const f of [cost, salvage, life, year]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cost.input.value = "50000"; salvage.input.value = "5000"; life.input.value = "5"; year.input.value = "1"; update(); });
+  const oDep = makeOutputLine(outputRegion, "Year depreciation", "syd-out-dep");
+  const oBook = makeOutputLine(outputRegion, "Accumulated / book value", "syd-out-book");
+  const oNote = makeOutputLine(outputRegion, "Note", "syd-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeSumOfYearsDigitsDepreciation({ cost: readNum(cost.input), salvage: readNum(salvage.input), life_yr: readNum(life.input), year: readNum(year.input) });
+    if (r.error) { oDep.textContent = r.error; oBook.textContent = ""; oNote.textContent = ""; return; }
+    oDep.textContent = "$" + fmt(r.year_depreciation, 2);
+    oBook.textContent = "$" + fmt(r.accumulated_depreciation, 2) + " accumulated, $" + fmt(r.book_value, 2) + " book";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [cost.input, salvage.input, life.input, year.input]) f.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["sum-of-years-digits-depreciation"] = renderSumOfYearsDigitsDepreciation;
+
 // --- v20 R.2: Markup vs. margin converter (`markup-vs-margin`) ---
 // markup% = (price-cost)/cost*100; margin% = (price-cost)/price*100.
 // dims: in { cost: dimensionless, price: dimensionless, markup_pct: dimensionless, margin_pct: dimensionless, units: dimensionless } out: { markup_pct: dimensionless, margin_pct: dimensionless }

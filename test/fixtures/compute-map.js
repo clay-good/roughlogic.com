@@ -37,6 +37,7 @@ export const COMPUTE_MAP = {
   "michaelis-menten": { module: "../../calc-lab.js", fn: "computeMichaelisMenten" },
   "substrate-for-velocity": { module: "../../calc-lab.js", fn: "computeSubstrateForVelocity" },
   "declining-balance-depreciation": { module: "../../calc-accounting.js", fn: "computeDecliningBalanceDepreciation" },
+  "sum-of-years-digits-depreciation": { module: "../../calc-accounting.js", fn: "computeSumOfYearsDigitsDepreciation" },
   "markup-vs-margin": { module: "../../calc-accounting.js", fn: "computeMarkupVsMargin" },
   "employer-payroll-tax": { module: "../../calc-accounting.js", fn: "computeEmployerPayrollTax" },
   "labor-burden-rate": { module: "../../calc-accounting.js", fn: "computeLaborBurdenRate" },

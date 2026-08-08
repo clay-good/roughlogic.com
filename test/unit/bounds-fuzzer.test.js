@@ -10450,7 +10450,25 @@ test("bounds: calc-stage N + calc-kitchen O + calc-field P v20 tiles pin constan
   assert.ok("error" in _p1({ pod_list: [200], poa_pct: 60 }));
 });
 
-import { computeDecliningBalanceDepreciation as _r1, computeMarkupVsMargin as _r2, computeEmployerPayrollTax as _r3 } from "../../calc-accounting.js";
+import { computeDecliningBalanceDepreciation as _r1, computeMarkupVsMargin as _r2, computeEmployerPayrollTax as _r3, computeSumOfYearsDigitsDepreciation } from "../../calc-accounting.js";
+test("bounds: spec-v1231 computeSumOfYearsDigitsDepreciation pins schedule, salvage landing, and error seams", () => {
+  // $50,000 cost, $5,000 salvage, 5 yr: SYD 15, schedule 15000/12000/9000/6000/3000.
+  const y1 = computeSumOfYearsDigitsDepreciation({ cost: 50000, salvage: 5000, life_yr: 5, year: 1 });
+  assert.equal(y1.syd_denominator, 15);
+  assert.ok(Math.abs(y1.year_depreciation - 15000) < 1e-9 && Math.abs(y1.book_value - 35000) < 1e-9);
+  assert.deepEqual(y1.schedule.map((s) => Math.round(s.depreciation)), [15000, 12000, 9000, 6000, 3000]);
+  // The schedule lands exactly on salvage in the final year (no plug).
+  assert.ok(Math.abs(y1.schedule[4].book_value - 5000) < 1e-9);
+  // The depreciable base (cost - salvage) is fully allocated.
+  assert.ok(Math.abs(y1.schedule.reduce((a, s) => a + s.depreciation, 0) - 45000) < 1e-9);
+  // Year 3 is 3/15 of the base.
+  assert.ok(Math.abs(computeSumOfYearsDigitsDepreciation({ cost: 50000, salvage: 5000, life_yr: 5, year: 3 }).year_depreciation - 9000) < 1e-9);
+  // Error seams: non-positive cost, salvage >= cost, zero life, non-finite.
+  assert.ok("error" in computeSumOfYearsDigitsDepreciation({ cost: 0, salvage: 0, life_yr: 5 }));
+  assert.ok("error" in computeSumOfYearsDigitsDepreciation({ cost: 100, salvage: 100, life_yr: 5 }));
+  assert.ok("error" in computeSumOfYearsDigitsDepreciation({ cost: 100, salvage: 0, life_yr: 0 }));
+  assert.ok("error" in computeSumOfYearsDigitsDepreciation({ cost: Infinity, salvage: 0, life_yr: 5 }));
+});
 import { computePrimerTm as _t1, computeCfuPlateCount as _t2 } from "../../calc-lab.js";
 import { computeGrossRentMultiplier as _x1, computePmiCancellationDate as _x2, computeSellerNetSheet as _x3 } from "../../calc-realestate.js";
 import { computeFinalGradeNeeded as _y1, computeCategoryWeightedGrade as _y2, computeTwoSampleTTest as _y3 } from "../../calc-edu.js";

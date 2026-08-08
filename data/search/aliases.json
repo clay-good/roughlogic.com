@@ -687,6 +687,21 @@
       "kind": "adjacent"
     },
     {
+      "term": "sum of the years digits depreciation",
+      "target": "sum-of-years-digits-depreciation",
+      "kind": "industry"
+    },
+    {
+      "term": "syd depreciation",
+      "target": "sum-of-years-digits-depreciation",
+      "kind": "redirect"
+    },
+    {
+      "term": "accelerated depreciation schedule",
+      "target": "sum-of-years-digits-depreciation",
+      "kind": "adjacent"
+    },
+    {
       "term": "markup vs margin",
       "target": "markup-vs-margin",
       "kind": "industry"

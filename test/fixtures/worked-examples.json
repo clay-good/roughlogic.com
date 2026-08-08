@@ -21367,6 +21367,64 @@
    }
   },
   {
+   "tile_id": "sum-of-years-digits-depreciation",
+   "source_publisher": "GAAP book depreciation (ASC 360)",
+   "source_title": "SYD = n(n+1)/2; year k = (cost - salvage)(n - k + 1)/SYD",
+   "source_edition_or_year": "ASC 360",
+   "source_section_or_page": "$50,000 cost, $5,000 salvage, 5 yr: SYD 15, Yr1 = 5/15 x $45,000 = $15,000, book $35,000",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "cost": 50000,
+    "salvage": 5000,
+    "life_yr": 5,
+    "year": 1
+   },
+   "outputs": {
+    "year_depreciation": {
+     "value": 15000,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "book_value": {
+     "value": 35000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sum-of-years-digits-depreciation",
+   "source_publisher": "GAAP book depreciation (ASC 360, final-year cross-check)",
+   "source_title": "SYD lands exactly on salvage in the final year",
+   "source_edition_or_year": "ASC 360",
+   "source_section_or_page": "same asset, year 5 = 1/15 x $45,000 = $3,000; book value $5,000 = salvage exactly",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "cost": 50000,
+    "salvage": 5000,
+    "life_yr": 5,
+    "year": 5
+   },
+   "outputs": {
+    "year_depreciation": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "book_value": {
+     "value": 5000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "markup-vs-margin",
    "source_publisher": "Managerial-accounting CVP pricing identity (AICPA)",
    "source_title": "price = cost*(1+markup%); margin% = (price-cost)/price",
