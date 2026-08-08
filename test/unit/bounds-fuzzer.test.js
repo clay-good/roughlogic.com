@@ -9965,6 +9965,30 @@ test("bounds: spec-v746 insulation thickness for a target heat loss (inverse of 
   assert.ok("error" in _v746({ od_in: 2, k_value: 0.25, hot_f: Infinity, amb_f: 70, target_q_per_ft_btuh: 40 }));
 });
 
+import { computeIndirectEvaporativeCooling as _v1217, computeEvaporativeCoolerEffectiveness as _v1217d } from "../../calc-hvac.js";
+
+test("bounds: spec-v1217 computeIndirectEvaporativeCooling pins the sensible cool toward the secondary wet-bulb, the dry-vs-direct contrast, monotonicity, and error seams", () => {
+  // 95 F product air, 65 F secondary wet-bulb, eff 0.65: drop 19.5, leaving 75.5 F.
+  const r = _v1217({ dry_bulb_F: 95, secondary_wet_bulb_F: 65, effectiveness: 0.65 });
+  assert.ok(Math.abs(r.wet_bulb_depression_F - 30) < 1e-9);
+  assert.ok(Math.abs(r.temp_drop_F - 0.65 * 30) < 1e-9);
+  assert.ok(Math.abs(r.leaving_db_F - 75.5) < 1e-9);
+  // Same air, same effectiveness: the leaving dry-bulb equals the direct-pad relation form (both are eff x depression),
+  // but the indirect stage adds no moisture -- here compared against the direct tile at the SAME 0.65 to confirm the identical arithmetic.
+  const d = _v1217d({ dry_bulb_F: 95, wet_bulb_F: 65, effectiveness: 0.65 });
+  assert.ok(Math.abs(r.leaving_db_F - d.leaving_db_F) < 1e-9);
+  // A higher effectiveness cools more; the leaving dry-bulb approaches but never passes the secondary wet-bulb.
+  assert.ok(_v1217({ dry_bulb_F: 95, secondary_wet_bulb_F: 65, effectiveness: 0.75 }).leaving_db_F < r.leaving_db_F);
+  assert.ok(_v1217({ dry_bulb_F: 95, secondary_wet_bulb_F: 65, effectiveness: 1.0 }).leaving_db_F >= 65 - 1e-9);
+  // A drier secondary stream (lower wet-bulb) cools further.
+  assert.ok(_v1217({ dry_bulb_F: 95, secondary_wet_bulb_F: 55, effectiveness: 0.65 }).leaving_db_F < r.leaving_db_F);
+  // Error seams: dry-bulb must exceed the secondary wet-bulb, effectiveness in (0,1], non-finite.
+  assert.ok("error" in _v1217({ dry_bulb_F: 60, secondary_wet_bulb_F: 65, effectiveness: 0.65 }));
+  assert.ok("error" in _v1217({ dry_bulb_F: 95, secondary_wet_bulb_F: 65, effectiveness: 0 }));
+  assert.ok("error" in _v1217({ dry_bulb_F: 95, secondary_wet_bulb_F: 65, effectiveness: 1.2 }));
+  assert.ok("error" in _v1217({ dry_bulb_F: Infinity, secondary_wet_bulb_F: 65, effectiveness: 0.65 }));
+});
+
 test("bounds: spec-v686 computeFanMotorMaxAirflow pins CFM = 6356 BHP eta_fan / TSP, the motor/brake basis, round-trips through computeFanMotorBhp, and error seams", () => {
   const r = _v686({ power_hp: 1.9363896015878395, power_basis: "brake", tsp_inwc: 2.0, eta_fan: 0.65, eta_drive: 1 });
   assert.ok(!r.error, JSON.stringify(r));

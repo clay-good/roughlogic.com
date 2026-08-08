@@ -2200,6 +2200,62 @@
    }
   },
   {
+   "tile_id": "indirect-evaporative-cooling",
+   "source_publisher": "ASHRAE Handbook HVAC Systems & Equipment Ch. 41 (indirect evaporative)",
+   "source_title": "95 F product air, 65 F secondary wet-bulb, eff 0.65 -> 75.5 F leaving air, dry (spec-v1217)",
+   "source_edition_or_year": "T_out = T_ent - eff x (T_ent - T_wb,secondary)",
+   "source_section_or_page": "depression = 95 - 65 = 30; drop = 0.65 x 30 = 19.5; leaving = 95 - 19.5 = 75.5 F (sensible, no moisture added)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "dry_bulb_F": 95,
+    "secondary_wet_bulb_F": 65,
+    "effectiveness": 0.65
+   },
+   "outputs": {
+    "leaving_db_F": {
+     "value": 75.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "temp_drop_F": {
+     "value": 19.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "wet_bulb_depression_F": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "indirect-evaporative-cooling",
+   "source_publisher": "indirect-evaporative sensible-effectiveness relation",
+   "source_title": "cross-check vs the direct pad: indirect leaves warmer (75.5 vs 69.5 F) but dry, the design tradeoff",
+   "source_edition_or_year": "same 95/65 air, eff 0.65 indirect",
+   "source_section_or_page": "A direct 0.85 pad on the same air reaches 69.5 F near saturation; the indirect 0.65 stage reaches 75.5 F but adds no moisture, so a direct pad can follow it (two-stage) to beat the direct-only result.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "dry_bulb_F": 95,
+    "secondary_wet_bulb_F": 65,
+    "effectiveness": 0.65
+   },
+   "outputs": {
+    "leaving_db_F": {
+     "value": 75.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "drawbar-power",
    "source_publisher": "ASABE",
    "source_title": "4500 lb pull at 4.5 mph on firm soil (tractive eff 0.72)",

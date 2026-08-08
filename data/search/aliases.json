@@ -18442,6 +18442,21 @@
       "kind": "question"
     },
     {
+      "term": "indirect evaporative cooling",
+      "target": "indirect-evaporative-cooling",
+      "kind": "industry"
+    },
+    {
+      "term": "two stage evaporative cooler",
+      "target": "indirect-evaporative-cooling",
+      "kind": "question"
+    },
+    {
+      "term": "indirect direct evaporative idec",
+      "target": "indirect-evaporative-cooling",
+      "kind": "industry"
+    },
+    {
       "term": "evaporative cooler leaving temperature",
       "target": "evaporative-cooler-effectiveness",
       "kind": "question"

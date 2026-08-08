@@ -343,6 +343,7 @@ export const RENDERER_MAP = {
   "economic-insulation-thickness": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "evaporative-cooling": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "evaporative-cooler-effectiveness": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
+  "indirect-evaporative-cooling": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "affinity-laws": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "belt-pulley": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "air-receiver": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },

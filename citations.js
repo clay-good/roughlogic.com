@@ -4446,6 +4446,18 @@ export const CITATIONS = {
       { name: "Direct single-stage", value: "adds moisture (constant wet-bulb line); indirect / two-stage is separate", source: "scope of this tile" },
     ],
   },
+  "indirect-evaporative-cooling": {
+    formula: "T_out = T_ent - indirect_effectiveness x (T_ent - T_wb,secondary); temp_drop = eff x (T_ent - T_wb,secondary); wet_bulb_depression = T_ent - T_wb,secondary.",
+    edition: "ASHRAE Handbook (HVAC Systems & Equipment, Ch. 41) indirect-evaporative sensible-effectiveness relation, by name; classical psychrometrics.",
+    freeAccess: "The sensible-effectiveness relation is the direct analog already used for the direct-evap tile; published in engineering texts. The exchanger effectiveness is a manufacturer rating.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "The leaving dry-bulb of an indirect-evaporative cooler: T_out = T_ent - indirect_effectiveness x (T_ent - T_wb,secondary). The secondary (scavenger) air stream is evaporatively cooled and then cools the product air across a heat exchanger, so the product air is cooled SENSIBLY toward the secondary stream's wet-bulb and, unlike a direct swamp cooler, NO moisture is added to the product air (its humidity ratio is unchanged and its relative humidity falls). Indirect exchangers run a lower effectiveness than a direct pad, about 0.5 to 0.75, so the drop is smaller: 95 F product air against a 65 F secondary wet-bulb at eff 0.65 leaves at 75.5 F but bone dry, where a direct pad would reach ~69 F near saturation. The payoff is the two-stage (indirect/direct, IDEC) machine: the dry pre-cool lowers the product air's wet-bulb, so a direct pad downstream cools below a single direct stage without the full humidity penalty (chain the leaving air through the direct evaporative-cooler tile). Standard indirect approaches the secondary wet-bulb; a regenerative dew-point (Maisotsenko) design can go lower and is separate. A shop estimate; the equipment data govern.",
+    assumptions: [
+      { name: "Sensible effectiveness", value: "eff = (T_ent - T_out)/(T_ent - T_wb,secondary); user-entered, ~0.5-0.75", source: "ASHRAE / manufacturer rating" },
+      { name: "No moisture added", value: "the product air is cooled at constant humidity ratio (sensible only)", source: "psychrometrics of an indirect exchanger" },
+      { name: "Secondary wet-bulb floor", value: "the leaving dry-bulb approaches but cannot fall below the secondary stream's wet-bulb", source: "scope of this tile" },
+    ],
+  },
   "affinity-laws": {
     formula: "Q2/Q1 = (N2/N1); H2/H1 = (N2/N1)²; P2/P1 = (N2/N1)³. Laws apply for geometrically similar fans / pumps at the same point of operation.",
     edition: "Hydraulic Institute / AMCA by name; classical pump and fan theory.",

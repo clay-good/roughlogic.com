@@ -308,6 +308,7 @@ export const COMPUTE_MAP = {
   "excavation": { module: "../../calc-construction.js", fn: "computeExcavationVolume" },
   "evaporative-cooling": { module: "../../calc-hvac.js", fn: "computeEvaporativeCooling" },
   "evaporative-cooler-effectiveness": { module: "../../calc-hvac.js", fn: "computeEvaporativeCoolerEffectiveness" },
+  "indirect-evaporative-cooling": { module: "../../calc-hvac.js", fn: "computeIndirectEvaporativeCooling" },
   "conduit-fill": { module: "../../calc-electrical.js", fn: "computeConduitFill" },
   "battery-runtime": { module: "../../calc-solar.js", fn: "computeBatteryRuntime" },
   "dc-shunt-sizing": { module: "../../calc-solar.js", fn: "computeDcShuntSizing" },

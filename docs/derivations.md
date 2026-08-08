@@ -2338,6 +2338,7 @@ cross-check.
 | calc-hvac.js | `computeHeatPumpSeasonalEnergy` | `{ seasonal_load_mmbtu = 0, hspf = 0, rate_kwh = 0, afue = 0.95, rate_therm = ...` | _ | _ | _ |
 | calc-hvac.js | `computeHoodExhaust` | `{ hood_type = "wall-canopy", hood_class = "I", duty = "medium", length_ft = 0...` | _ | _ | _ |
 | calc-hvac.js | `computeHydronicGpmDeltat` | `{ load = 0, unit_tons = 0, dt_f = 0, factor = 500 } = {}` | _ | _ | _ |
+| calc-hvac.js | `computeIndirectEvaporativeCooling` | `{ dry_bulb_F, secondary_wet_bulb_F, effectiveness = 0.65 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationHeatLoss` | `{ pipe_OD_in = 0, surface_T_F = 0, ambient_T_F = 0, air_velocity_fpm = 0, ins...` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationThickness` | `{ pipe_od_in, surface_temp_F, ambient_F, surface_limit_F, k_btu_in_per_hr_ft2...` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationThicknessForHeatLoss` | `{ od_in = 0, k_value = 0, hot_f = 0, amb_f = 0, target_q_per_ft_btuh = 0 } = {}` | _ | _ | _ |
@@ -3251,7 +3252,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1837.
+Row count: 1838.
 
 <!-- END function-corpus-v14 -->
 
@@ -3676,7 +3677,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (148 tiles)
+### Group C HVAC (149 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3774,6 +3775,7 @@ per spec-v14 §13.1 second paragraph.
 | `hydronic-buffer-tank` | Hydronic Buffer Tank Sizing (Anti-Short-Cycle) | ASHRAE / Idronics (Caleffi); 10 min on-time, 60,000 Btu/hr boiler min, zero load, 20 F... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydronic-gpm-deltat` | Hydronic System Flow from Load and Delta-T | Water-side heat transport Q = 500 GPM dT; spec-v306 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydronic-injection-mixing` | Hydronic Injection-Mixing Loop Flow | hydronic injection-mixing loop (prima...; inj = 10*(110-90)/(180-90) = 10*20/90 = 2.222 gpm; %sec =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `indirect-evaporative-cooling` | Indirect Evaporative Cooler Leaving Temperature | ASHRAE Handbook HVAC Systems & Equipm...; depression = 95 - 65 = 30; drop = 0.65 x 30 = 19.5; leavi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `infiltration-load` | Infiltration Heating / Cooling Load (Sensible + Latent) | ASHRAE Handbook of Fundamentals (air-...; spec-v220 section 2.1 pinned example (winter heating) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `insulation-heat-loss` | Pipe Insulation Heat Loss (bare vs insulated) | ASHRAE Handbook (Fundamentals) / manu...; 2.375 in OD pipe at 200 F into 70 F still air with 1.5 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `insulation-thickness` | Pipe Insulation Thickness | ASHRAE Handbook (Fundamentals); 1 in OD pipe at 250 F into 75 F ambient, 120 F surface li... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5026,6 +5028,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1589. Fixture-covered or reference-cadence: 1589 / 1589.
+Tile count: 1590. Fixture-covered or reference-cadence: 1590 / 1590.
 
 <!-- END tile-index-v14 -->

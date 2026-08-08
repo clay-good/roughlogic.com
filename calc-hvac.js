@@ -679,6 +679,54 @@ function renderEvaporativeCoolerEffectiveness(inputRegion, outputRegion, citatio
   for (const f of [db.input, wb.input, eff.input]) f.addEventListener("input", update);
 }
 
+// ===================== spec-v1217: indirect evaporative cooler leaving temperature =====================
+// The direct-evap tile's own note names this gap: "Direct (single-stage) only; an indirect or
+// indirect/direct stage is separate." This adds the indirect stage. Unlike a direct pad, an indirect
+// exchanger cools the product air SENSIBLY (no moisture added), approaching the SECONDARY (scavenger)
+// stream's wet-bulb: T_out = T_ent - eff_ix (T_ent - T_wb,secondary). The product air stays dry, so a
+// direct pad can follow it (a two-stage/IDEC machine) to reach below the direct-only result.
+// dims: in { dry_bulb_F: T, secondary_wet_bulb_F: T, effectiveness: dimensionless } out: { leaving_db_F: T, temp_drop_F: T, wet_bulb_depression_F: T }
+export function computeIndirectEvaporativeCooling({ dry_bulb_F, secondary_wet_bulb_F, effectiveness = 0.65 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const db = Number(dry_bulb_F);
+  const wb = Number(secondary_wet_bulb_F);
+  const eff = Number(effectiveness);
+  if (!Number.isFinite(db)) return { error: "Entering dry-bulb temperature must be a number (F)." };
+  if (!Number.isFinite(wb)) return { error: "Secondary-stream wet-bulb temperature must be a number (F)." };
+  if (!(db > wb)) return { error: "Entering dry-bulb must be greater than the secondary wet-bulb (the secondary wet-bulb is the sensible-cooling floor)." };
+  if (!(eff > 0 && eff <= 1)) return { error: "Indirect effectiveness must be in (0, 1] (a fraction, e.g. 0.65)." };
+  const wet_bulb_depression_F = db - wb;
+  const temp_drop_F = eff * wet_bulb_depression_F;
+  const leaving_db_F = db - temp_drop_F;
+  if (![leaving_db_F, temp_drop_F, wet_bulb_depression_F].every(Number.isFinite)) return { error: "Indirect-cooling math is not a finite value." };
+  return {
+    leaving_db_F, temp_drop_F, wet_bulb_depression_F,
+    note: "Indirect-evaporative cooler leaving dry-bulb: T_out = T_ent - indirect_effectiveness x (T_ent - T_wb,secondary). The secondary (scavenger) air is evaporatively cooled and then cools the product air through a heat exchanger, so the product air is cooled SENSIBLY toward the secondary stream's wet-bulb -- and, unlike a direct swamp cooler, NO moisture is added to the product air (its humidity ratio is unchanged and its relative humidity actually falls). Indirect exchangers run a lower effectiveness than a direct pad, about 0.5 to 0.75, so the temperature drop is smaller: 95 F product air against a 65 F secondary wet-bulb at eff 0.65 leaves at 75.5 F but bone dry, where a direct pad would reach ~69 F but leave the air near saturation. The payoff is a two-stage (indirect/direct, IDEC) machine: because the indirect stage pre-cools the product air dry, its wet-bulb drops, so a direct pad placed downstream (run through the direct evaporative-cooler tile on this leaving air) cools below what a single direct stage could, without the full humidity penalty. Standard indirect approaches the secondary wet-bulb; a regenerative/dew-point (Maisotsenko) design can go lower and is separate. The exchanger effectiveness is a manufacturer rating; a shop estimate, and the equipment data govern.",
+  };
+}
+export const indirectEvaporativeCoolingExample = { inputs: { dry_bulb_F: 95, secondary_wet_bulb_F: 65, effectiveness: 0.65 } };
+function renderIndirectEvaporativeCooling(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: indirect-evaporative cooler leaving dry-bulb T_out = T_ent - indirect_effectiveness x (T_ent - T_wb,secondary), the ASHRAE Handbook (HVAC Systems & Equipment, Ch. 41) sensible-effectiveness relation. The product air is cooled sensibly (no added moisture) toward the secondary stream's wet-bulb; indirect effectiveness ~0.5-0.75. A shop estimate; the equipment data govern.";
+  const db = makeNumber("Entering product dry-bulb (F)", "iec-db", { step: "any", value: "95" }); db.input.value = "95";
+  const wb = makeNumber("Secondary-stream wet-bulb (F)", "iec-wb", { step: "any", value: "65" }); wb.input.value = "65";
+  const eff = makeNumber("Indirect effectiveness (0-1, ~0.5-0.75)", "iec-eff", { step: "any", min: "0", max: "1", value: "0.65" }); eff.input.value = "0.65";
+  for (const f of [db, wb, eff]) inputRegion.appendChild(f.wrap);
+  const oT = makeOutputLine(outputRegion, "Leaving dry-bulb (dry, no moisture added)", "iec-out-t");
+  const oD = makeOutputLine(outputRegion, "Temperature drop", "iec-out-d");
+  const oW = makeOutputLine(outputRegion, "Wet-bulb depression (max drop)", "iec-out-w");
+  const oNote = makeOutputLine(outputRegion, "Note", "iec-out-note");
+  const update = debounce(() => {
+    const r = computeIndirectEvaporativeCooling({ dry_bulb_F: Number(db.input.value), secondary_wet_bulb_F: Number(wb.input.value), effectiveness: Number(eff.input.value) });
+    if (r.error) { oT.textContent = r.error; oD.textContent = "-"; oW.textContent = "-"; oNote.textContent = ""; return; }
+    oT.textContent = fmt(r.leaving_db_F, 1) + " F";
+    oD.textContent = fmt(r.temp_drop_F, 1) + " F";
+    oW.textContent = fmt(r.wet_bulb_depression_F, 1) + " F";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { db.input.value = "95"; wb.input.value = "65"; eff.input.value = "0.65"; update(); });
+  for (const f of [db.input, wb.input, eff.input]) f.addEventListener("input", update);
+}
+
 // --- v2 view renderers ---
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -1727,6 +1775,7 @@ export const HVAC_RENDERERS = {
   "insulation-thickness": renderInsulationThickness,
   "evaporative-cooling": renderEvaporativeCooling,
   "evaporative-cooler-effectiveness": renderEvaporativeCoolerEffectiveness,
+  "indirect-evaporative-cooling": renderIndirectEvaporativeCooling,
   // v3
   "affinity-laws": renderAffinityLaws,
   "belt-pulley": renderBeltAndPulley,
