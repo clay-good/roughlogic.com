@@ -10942,6 +10942,7 @@ test("bounds: spec-v1221 computeSpiralCurve pins theta_s, throw, tangent/externa
 });
 
 import { computeCompoundCurve as _v1222 } from "../../calc-civil.js";
+import { computeReverseCurve as _v1259 } from "../../calc-civil.js";
 
 test("bounds: spec-v1222 computeCompoundCurve pins the semi-tangents, the law-of-sines PI tangents, the simple-curve reduction, and error seams", () => {
   // R1 500/30, R2 800/25: T1 133.97, T2 177.36, back 294.60, fwd 367.39, total 610.87.
@@ -10960,6 +10961,31 @@ test("bounds: spec-v1222 computeCompoundCurve pins the semi-tangents, the law-of
   assert.ok("error" in _v1222({ r1_ft: 500, r2_ft: 800, delta1_deg: 0, delta2_deg: 25 }));
   assert.ok("error" in _v1222({ r1_ft: 500, r2_ft: 800, delta1_deg: 100, delta2_deg: 90 }));
   assert.ok("error" in _v1222({ r1_ft: 500, r2_ft: Infinity, delta1_deg: 30, delta2_deg: 25 }));
+});
+
+test("bounds: spec-v1259 computeReverseCurve pins the shared central angle, the offset relation, equal-radius symmetry, and error seams", () => {
+  // Equal 500 ft radii, 60 ft offset: I = arccos(1 - 60/1000) = 19.9484 deg; T = 500 tan(I/2) = 87.93; dist = 1000 sin I = 341.17.
+  const r = _v1259({ r1_ft: 500, r2_ft: 500, offset_ft: 60 });
+  const I = Math.acos(1 - 60 / 1000);
+  assert.ok(Math.abs(r.central_angle_deg - I * 180 / Math.PI) < 1e-9);
+  assert.ok(Math.abs(r.central_angle_deg - 19.9484) < 0.01);
+  assert.ok(Math.abs(r.arc1_tangent_ft - 500 * Math.tan(I / 2)) < 1e-9);
+  assert.ok(Math.abs(r.distance_ft - 1000 * Math.sin(I)) < 1e-9);
+  assert.ok(Math.abs(r.total_length_ft - 2 * 500 * I) < 1e-9);
+  // Equal radii: the two arcs are mirror images (same tangent, same length).
+  assert.ok(Math.abs(r.arc1_tangent_ft - r.arc2_tangent_ft) < 1e-12 && Math.abs(r.arc1_length_ft - r.arc2_length_ft) < 1e-12);
+  // The offset relation inverts exactly: p = (R1+R2)(1 - cos I).
+  assert.ok(Math.abs((1000) * (1 - Math.cos(I)) - 60) < 1e-9);
+  // Unequal radii share ONE central angle (that is what keeps the tangents parallel); lengths split by radius.
+  const u = _v1259({ r1_ft: 400, r2_ft: 600, offset_ft: 50 });
+  const Iu = Math.acos(1 - 50 / 1000);
+  assert.ok(Math.abs(u.arc1_length_ft - 400 * Iu) < 1e-9 && Math.abs(u.arc2_length_ft - 600 * Iu) < 1e-9);
+  assert.ok(Math.abs(u.arc2_length_ft / u.arc1_length_ft - 1.5) < 1e-9);
+  // Error seams: non-positive radii/offset, offset >= 2(R1+R2) (acos domain), non-finite.
+  assert.ok("error" in _v1259({ r1_ft: 0, r2_ft: 500, offset_ft: 60 }));
+  assert.ok("error" in _v1259({ r1_ft: 500, r2_ft: 500, offset_ft: 0 }));
+  assert.ok("error" in _v1259({ r1_ft: 100, r2_ft: 100, offset_ft: 400 }));
+  assert.ok("error" in _v1259({ r1_ft: 500, r2_ft: Infinity, offset_ft: 60 }));
 });
 
 test("bounds: spec-v767 curve-deflection-stakeout pins the deflection/chord, the degree mode, cross-checks horizontal-curve, and error seams", () => {

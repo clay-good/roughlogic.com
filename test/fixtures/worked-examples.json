@@ -22859,6 +22859,86 @@
    }
   },
   {
+   "tile_id": "reverse-curve",
+   "source_publisher": "Ghilani & Wolf, Elementary Surveying / AASHTO Green Book",
+   "source_title": "equal 500 ft radii, 60 ft offset -> I 19.948 deg, T 87.93, dist 341.17, 348.17 ft (spec-v1259)",
+   "source_edition_or_year": "reverse-curve parallel-tangent geometry",
+   "source_section_or_page": "I = arccos(1 - 60/1000) = arccos(0.94) = 19.9484 deg; T = 500 tan(9.9742) = 87.93; dist = 1000 sin(19.9484) = 341.17; L = 2 x 500 x 0.348167 rad = 348.17.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "r1_ft": 500,
+    "r2_ft": 500,
+    "offset_ft": 60
+   },
+   "outputs": {
+    "central_angle_deg": {
+     "value": 19.9484,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "arc1_tangent_ft": {
+     "value": 87.93,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "distance_ft": {
+     "value": 341.17,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "total_length_ft": {
+     "value": 348.17,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "reverse-curve",
+   "source_publisher": "reverse-curve geometry (unequal radii cross-check)",
+   "source_title": "unequal radii 400/600, 50 ft offset -> both arcs share I 18.195 deg, lengths split 127.02 / 190.54",
+   "source_edition_or_year": "equal central angle keeps the tangents parallel",
+   "source_section_or_page": "I = arccos(1 - 50/1000) = 18.1949 deg for BOTH arcs (the shared angle is what keeps the outgoing tangent parallel); L1 = 400 x 0.317560 = 127.02, L2 = 600 x 0.317560 = 190.54, dist = 1000 sin(18.1949) = 312.25.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "r1_ft": 400,
+    "r2_ft": 600,
+    "offset_ft": 50
+   },
+   "outputs": {
+    "central_angle_deg": {
+     "value": 18.1949,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "arc1_length_ft": {
+     "value": 127.02,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "arc2_length_ft": {
+     "value": 190.54,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "distance_ft": {
+     "value": 312.25,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "compound-curve",
    "source_publisher": "AASHTO Green Book / Ghilani & Wolf, Elementary Surveying",
    "source_title": "R1 500/30 deg into R2 800/25 deg -> T1 133.97, T2 177.36, back 294.60, fwd 367.39, 610.87 ft (spec-v1222)",

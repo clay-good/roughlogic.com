@@ -268,6 +268,71 @@ function renderCompoundCurve(inputRegion, outputRegion, citationEl) {
 }
 CIVIL_RENDERERS["compound-curve"] = renderCompoundCurve;
 
+// --- spec-v1259: reverse (S) curve between parallel tangents ---
+// The compound-curve note names its own missing sibling: "The two arcs must turn the SAME way (a reverse
+// curve, turning opposite ways, is a separate case)." This builds that case. A reverse curve joins two
+// PARALLEL tangents (a track crossover, a lane shift) with two circular arcs of OPPOSITE curvature meeting
+// at a point of reverse curvature (PRC). For the outgoing tangent to end up parallel to the incoming one,
+// both arcs must sweep the SAME central angle I; the perpendicular offset between the tangents is then
+// p = (R1 + R2)(1 - cos I), so I = arccos(1 - p/(R1 + R2)). Each arc has T = R tan(I/2) and L = R I_rad; the
+// distance between the tangent points measured along the tangent direction is (R1 + R2) sin I.
+// dims: in { r1_ft: L, r2_ft: L, offset_ft: L } out: { central_angle_deg: dimensionless, arc1_tangent_ft: L, arc2_tangent_ft: L, distance_ft: L, arc1_length_ft: L, arc2_length_ft: L, total_length_ft: L }
+export function computeReverseCurve({ r1_ft = 0, r2_ft = 0, offset_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R1 = Number(r1_ft) || 0;
+  const R2 = Number(r2_ft) || 0;
+  const p = Number(offset_ft) || 0;
+  if (!(R1 > 0)) return { error: "The first radius R1 must be positive (ft)." };
+  if (!(R2 > 0)) return { error: "The second radius R2 must be positive (ft)." };
+  if (!(p > 0)) return { error: "The offset between the parallel tangents must be positive (ft)." };
+  const sumR = R1 + R2;
+  if (!(p < 2 * sumR)) return { error: "The offset is too large for these radii: p must be less than 2(R1 + R2). Increase the radii or reduce the offset." };
+  const rad = Math.PI / 180;
+  const cosI = 1 - p / sumR;
+  const I_rad = Math.acos(cosI);
+  const central_angle_deg = I_rad / rad;
+  const arc1_tangent_ft = R1 * Math.tan(I_rad / 2);
+  const arc2_tangent_ft = R2 * Math.tan(I_rad / 2);
+  const distance_ft = sumR * Math.sin(I_rad);
+  const arc1_length_ft = R1 * I_rad;
+  const arc2_length_ft = R2 * I_rad;
+  const total_length_ft = arc1_length_ft + arc2_length_ft;
+  if (![central_angle_deg, arc1_tangent_ft, arc2_tangent_ft, distance_ft, arc1_length_ft, arc2_length_ft, total_length_ft].every(Number.isFinite)) {
+    return { error: "Reverse-curve math is not a finite value." };
+  }
+  return {
+    central_angle_deg, arc1_tangent_ft, arc2_tangent_ft, distance_ft,
+    arc1_length_ft, arc2_length_ft, total_length_ft,
+    note: "A reverse (S) curve, the alignment element the compound curve leaves out: two circular arcs of OPPOSITE curvature meeting at a point of reverse curvature (PRC), the shape of a railroad crossover or a lane shift that returns the roadway to a line parallel to where it started. Because the outgoing tangent must end up parallel to the incoming one, both arcs sweep the SAME central angle I, found from the perpendicular offset between the two parallel tangents: p = (R1 + R2)(1 - cos I), so I = arccos(1 - p/(R1 + R2)). Each arc then has its semi-tangent T = R tan(I/2) and arc length L = R x I (radians), and the two tangent points are (R1 + R2) sin I apart along the tangent direction. Shifting between tracks 60 ft apart on 500 ft radii turns each arc 19.9 degrees, 348 ft of curve over a 341 ft reach. With equal radii the two arcs are mirror images. A reverse curve gives no room to run out superelevation between the arcs, so AASHTO and AREMA want a tangent (or spiral) inserted at the PRC on anything but low speeds. A design aid; AASHTO/AREMA and the engineer of record govern.",
+  };
+}
+export const reverseCurveExample = { inputs: { r1_ft: 500, r2_ft: 500, offset_ft: 60 } };
+function renderReverseCurve(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: reverse-curve geometry between parallel tangents per Ghilani & Wolf, Elementary Surveying, and AASHTO A Policy on Geometric Design of Highways and Streets: equal central angle I = arccos(1 - p/(R1+R2)); each arc T = R tan(I/2), L = R I_rad; tangent-point distance (R1+R2) sin I. Opposite-curvature arcs; insert a tangent/spiral at the PRC for superelevation runout. The engineer of record governs.";
+  const r1 = makeNumber("First radius R1 (ft)", "rc-r1", { step: "any", min: "0", value: "500" }); r1.input.value = "500";
+  const r2 = makeNumber("Second radius R2 (ft)", "rc-r2", { step: "any", min: "0", value: "500" }); r2.input.value = "500";
+  const p = makeNumber("Offset between parallel tangents p (ft)", "rc-p", { step: "any", min: "0", value: "60" }); p.input.value = "60";
+  for (const f of [r1, r2, p]) inputRegion.appendChild(f.wrap);
+  const oI = makeOutputLine(outputRegion, "Central angle I (each arc)", "rc-out-i");
+  const oT = makeOutputLine(outputRegion, "Arc semi-tangents T1 / T2", "rc-out-t");
+  const oD = makeOutputLine(outputRegion, "Tangent-point distance", "rc-out-d");
+  const oL = makeOutputLine(outputRegion, "Arc lengths / total", "rc-out-l");
+  const oNote = makeOutputLine(outputRegion, "Note", "rc-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeReverseCurve({ r1_ft: readNum(r1.input), r2_ft: readNum(r2.input), offset_ft: readNum(p.input) });
+    if (r.error) { oI.textContent = r.error; oT.textContent = "-"; oD.textContent = "-"; oL.textContent = "-"; oNote.textContent = ""; return; }
+    oI.textContent = fmt(r.central_angle_deg, 3) + " deg";
+    oT.textContent = fmt(r.arc1_tangent_ft, 2) + " ft / " + fmt(r.arc2_tangent_ft, 2) + " ft";
+    oD.textContent = fmt(r.distance_ft, 2) + " ft";
+    oL.textContent = fmt(r.arc1_length_ft, 2) + " + " + fmt(r.arc2_length_ft, 2) + " = " + fmt(r.total_length_ft, 2) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { r1.input.value = "500"; r2.input.value = "500"; p.input.value = "60"; update(); });
+  for (const f of [r1.input, r2.input, p.input]) f.addEventListener("input", update);
+}
+CIVIL_RENDERERS["reverse-curve"] = renderReverseCurve;
+
 // --- v766+ E.x: Curve deflection-angle stakeout (`curve-deflection-stakeout`) ---
 // The deflection-angle method of setting a circular curve: from the PC, an arc
 // length l along the curve subtends a deflection angle (from the back tangent)

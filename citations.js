@@ -8023,6 +8023,18 @@ export const CITATIONS = {
       { name: "Scope", value: "same-direction arcs (not a reverse curve); reduces to a simple curve at equal radii/angles", source: "scope of this tile" },
     ],
   },
+  "reverse-curve": {
+    formula: "parallel tangents: both arcs sweep the same central angle I = arccos(1 - p/(R1+R2)) for a perpendicular offset p; T = R tan(I/2) and L = R I_rad per arc; tangent-point distance = (R1+R2) sin I.",
+    edition: "Reverse (S) curve geometry between parallel tangents per Ghilani & Wolf, Elementary Surveying, and the AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book), by name; first-principles circular-curve trig.",
+    freeAccess: "The reverse-curve offset geometry (equal central angle from the tangent offset, semi-tangents, arc lengths) is standard published route-surveying math; the design of record and the engineer of record govern the alignment.",
+    governance: GOVERNANCE.engineer_of_record,
+    editionNote: "A reverse (S) curve: two circular arcs of opposite curvature meeting at a point of reverse curvature (PRC), the geometry of a railroad crossover or a lane shift that returns the alignment to a line parallel to where it began. Because the outgoing tangent must end up parallel to the incoming one, both arcs sweep the same central angle I, found from the perpendicular offset between the two parallel tangents: p = (R1 + R2)(1 - cos I), so I = arccos(1 - p/(R1 + R2)). Each arc then has its semi-tangent T = R tan(I/2) and arc length L = R I (radians), and the two tangent points are (R1 + R2) sin I apart along the tangent direction. With equal radii the two arcs are mirror images. A reverse curve gives no room to run out superelevation between the arcs, so AASHTO and AREMA want a tangent (or spiral) inserted at the PRC on anything but low speeds. A design aid; AASHTO/AREMA and the engineer of record govern.",
+    assumptions: [
+      { name: "Equal central angle", value: "I = arccos(1 - p/(R1+R2)); both arcs sweep I so the tangents stay parallel", source: "AASHTO / Ghilani & Wolf" },
+      { name: "Semi-tangents and lengths", value: "T = R tan(I/2); L = R I_rad per arc; tangent-point distance (R1+R2) sin I", source: "first-principles circular-curve trig" },
+      { name: "Scope", value: "opposite-curvature arcs between parallel tangents; insert a tangent/spiral at the PRC for superelevation runout", source: "scope of this tile" },
+    ],
+  },
   "curve-deflection-stakeout": {
     formula: "deflection from the back tangent at the PC: delta = (l / (2R)) x (180/pi) deg for an arc length l; sub-chord from the PC c = 2R sin(l / (2R)); arc-definition D = 5729.58 / R. The deflection at the PT equals half the curve's total central angle.",
     edition: "Deflection-angle curve-stakeout method per FM 5-233 Construction Surveying and the AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book), by name; first-principles trig.",

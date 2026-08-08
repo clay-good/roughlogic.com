@@ -706,6 +706,7 @@ export const COMPUTE_MAP = {
   "horizontal-curve": { module: "../../calc-civil.js", fn: "computeHorizontalCurve" },
   "spiral-curve": { module: "../../calc-civil.js", fn: "computeSpiralCurve" },
   "compound-curve": { module: "../../calc-civil.js", fn: "computeCompoundCurve" },
+  "reverse-curve": { module: "../../calc-civil.js", fn: "computeReverseCurve" },
   "curve-deflection-stakeout": { module: "../../calc-civil.js", fn: "computeCurveDeflectionStakeout" },
   "superelevation": { module: "../../calc-civil.js", fn: "computeSuperelevation" },
   "superelevation-safe-curve-speed": { module: "../../calc-civil.js", fn: "computeSuperelevationSafeCurveSpeed" },

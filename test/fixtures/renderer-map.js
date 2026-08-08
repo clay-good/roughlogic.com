@@ -804,6 +804,7 @@ export const RENDERER_MAP = {
   "horizontal-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
   "spiral-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
   "compound-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
+  "reverse-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
   "vertical-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
   "earthwork-end-area": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
   "slope-stake-cut-fill": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },

@@ -48046,6 +48046,31 @@
       "kind": "question"
     },
     {
+      "term": "reverse curve",
+      "target": "reverse-curve",
+      "kind": "industry"
+    },
+    {
+      "term": "s curve alignment",
+      "target": "reverse-curve",
+      "kind": "industry"
+    },
+    {
+      "term": "railroad crossover geometry",
+      "target": "reverse-curve",
+      "kind": "question"
+    },
+    {
+      "term": "lane shift between parallel tangents",
+      "target": "reverse-curve",
+      "kind": "question"
+    },
+    {
+      "term": "central angle from tangent offset",
+      "target": "reverse-curve",
+      "kind": "question"
+    },
+    {
       "term": "spiral curve",
       "target": "spiral-curve",
       "kind": "industry"
