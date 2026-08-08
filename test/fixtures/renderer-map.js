@@ -893,6 +893,7 @@ export const RENDERER_MAP = {
   "boussinesq-surcharge-wall": { module: "../../calc-geotech.js", exportName: "GEOTECH_RENDERERS" },
   "consolidation-time-rate": { module: "../../calc-geotech.js", exportName: "GEOTECH_RENDERERS" },
   "consolidation-degree": { module: "../../calc-geotech.js", exportName: "GEOTECH_RENDERERS" },
+  "coefficient-of-consolidation": { module: "../../calc-geotech.js", exportName: "GEOTECH_RENDERERS" },
   "spt-bearing-capacity": { module: "../../calc-geotech.js", exportName: "GEOTECH_RENDERERS" },
   "spt-required-n60": { module: "../../calc-geotech.js", exportName: "GEOTECH_RENDERERS" },
   "liquefaction-screening": { module: "../../calc-geotech.js", exportName: "GEOTECH_RENDERERS" },

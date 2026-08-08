@@ -1515,6 +1515,7 @@ export const COMPUTE_MAP = {
   "retaining-wall-stability": { module: "../../calc-geotech.js", fn: "computeRetainingWallStability" },
   "consolidation-time-rate": { module: "../../calc-geotech.js", fn: "computeConsolidationTimeRate" },
   "consolidation-degree": { module: "../../calc-geotech.js", fn: "computeConsolidationDegree" },
+  "coefficient-of-consolidation": { module: "../../calc-geotech.js", fn: "computeCoefficientOfConsolidation" },
   "spt-bearing-capacity": { module: "../../calc-geotech.js", fn: "computeSptBearingCapacity" },
   "spt-required-n60": { module: "../../calc-geotech.js", fn: "computeSptRequiredN60" },
   "liquefaction-screening": { module: "../../calc-geotech.js", fn: "computeLiquefactionScreening" },

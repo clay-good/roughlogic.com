@@ -21117,6 +21117,41 @@ test("bounds: spec-v645 computeConsolidationDegree inverts Terzaghi for U, round
   assert.ok("error" in _v645({ cv_ft2_day: 0.1, hdr_ft: 10, t_days: Infinity }));
 });
 
+import { computeCoefficientOfConsolidation as _v1207, computeConsolidationTimeRate as _v1207f } from "../../calc-geotech.js";
+
+test("bounds: spec-v1207 computeCoefficientOfConsolidation pins both fitting methods, the drainage-path and unit conversions, and feeds the time-rate tile", () => {
+  const r = _v1207({ method: "casagrande", t_fit_min: 5, specimen_height_in: 1.0, drainage: "double" });
+  // Casagrande: Tv = 0.197, Hdr = H/2 = 0.5 in, cv = 0.197 x 0.25 / 5 = 0.00985 in^2/min.
+  assert.ok(Math.abs(r.tv - 0.197) < 1e-12);
+  assert.ok(Math.abs(r.hdr_in - 0.5) < 1e-12);
+  assert.ok(Math.abs(r.cv_in2_min - 0.197 * 0.25 / 5) < 1e-12);
+  assert.ok(Math.abs(r.cv_in2_min - 0.00985) < 1e-9);
+  // Unit conversions: 1 in^2/min = 10 ft^2/day and 6.4516/60 cm^2/s.
+  assert.ok(Math.abs(r.cv_ft2_day - r.cv_in2_min * 10) < 1e-12);
+  assert.ok(Math.abs(r.cv_cm2_s - r.cv_in2_min * (6.4516 / 60)) < 1e-12);
+  assert.ok(Math.abs(r.cv_ft2_day - 0.0985) < 1e-9);
+  // Taylor uses Tv = 0.848 at U = 90%.
+  const t = _v1207({ method: "taylor", t_fit_min: 20, specimen_height_in: 1.0, drainage: "double" });
+  assert.ok(Math.abs(t.tv - 0.848) < 1e-12);
+  assert.ok(Math.abs(t.cv_ft2_day - 0.106) < 1e-9);
+  // Single (one-way) drainage uses the full specimen height -> 4x the cv of double drainage.
+  const single = _v1207({ method: "casagrande", t_fit_min: 5, specimen_height_in: 1.0, drainage: "single" });
+  assert.ok(Math.abs(single.hdr_in - 1.0) < 1e-12);
+  assert.ok(Math.abs(single.cv_ft2_day - 4 * r.cv_ft2_day) < 1e-9);
+  // cv drops inversely with the fitting time and rises with the square of the specimen height.
+  assert.ok(Math.abs(_v1207({ method: "casagrande", t_fit_min: 10, specimen_height_in: 1.0, drainage: "double" }).cv_ft2_day - r.cv_ft2_day / 2) < 1e-9);
+  assert.ok(Math.abs(_v1207({ method: "casagrande", t_fit_min: 5, specimen_height_in: 2.0, drainage: "double" }).cv_ft2_day - 4 * r.cv_ft2_day) < 1e-9);
+  // The output feeds the field consolidation-time tile as its cv input (finite time results).
+  assert.ok(_v1207f({ u_percent: 90, cv_ft2_day: r.cv_ft2_day, hdr_ft: 10 }).t_days > 0);
+  // Error seams: bad method / drainage, non-positive time or height, non-finite.
+  assert.ok("error" in _v1207({}));
+  assert.ok("error" in _v1207({ method: "bogus", t_fit_min: 5, specimen_height_in: 1.0, drainage: "double" }));
+  assert.ok("error" in _v1207({ method: "casagrande", t_fit_min: 5, specimen_height_in: 1.0, drainage: "bogus" }));
+  assert.ok("error" in _v1207({ method: "casagrande", t_fit_min: 0, specimen_height_in: 1.0, drainage: "double" }));
+  assert.ok("error" in _v1207({ method: "casagrande", t_fit_min: 5, specimen_height_in: 0, drainage: "double" }));
+  assert.ok("error" in _v1207({ method: "casagrande", t_fit_min: Infinity, specimen_height_in: 1.0, drainage: "double" }));
+});
+
 test("bounds: spec-v415 computeSptBearingCapacity pins both branches, the depth factor, and error seams", () => {
   const r = _v415({ n60: 20, b_ft: 6, d_ft: 2 });
   assert.ok(Math.abs(r.qa_base_ksf - (20 / 6) * Math.pow(7 / 6, 2)) < 1e-9 && r.small_footing === false);

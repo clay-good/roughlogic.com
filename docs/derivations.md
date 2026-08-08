@@ -2250,6 +2250,7 @@ cross-check.
 | calc-gas.js | `spitzglassFlow` | `{ d_in, dP_in_wc, specific_gravity, L_ft }` | _ | _ | _ |
 | calc-geotech.js | `computeAtRestEarthPressure` | `{ phi = 0, gamma = 120, h_ft = 0, q = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeBoussinesqSurchargeWall` | `{ ql_plf = 0, h_ft = 0, x_ft = 0, z_ft = 0 } = {}` | _ | _ | _ |
+| calc-geotech.js | `computeCoefficientOfConsolidation` | `{ method = "casagrande", t_fit_min = 0, specimen_height_in = 0, drainage = "d...` | _ | _ | _ |
 | calc-geotech.js | `computeCohesiveEarthPressure` | `{ phi = 0, c_psf = 0, gamma = 120, h_ft = 0, q = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeConsolidationDegree` | `{ cv_ft2_day = 0, hdr_ft = 0, t_days = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeConsolidationTimeRate` | `{ u_percent = 0, cv_ft2_day = 0, hdr_ft = 0 } = {}` | _ | _ | _ |
@@ -3241,7 +3242,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1827.
+Row count: 1828.
 
 <!-- END function-corpus-v14 -->
 
@@ -3874,7 +3875,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (443 tiles)
+### Group E Construction (444 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3931,6 +3932,7 @@ per spec-v14 §13.1 second paragraph.
 | `cmu-wall-flexure` | Reinforced CMU Wall Out-of-Plane Flexure (TMS 402 ASD) | TMS 402-16 (ACI 530 / ASCE 5) via Mas...; spec-v269 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `co-alarm-placement` | Carbon Monoxide Alarm Requirement and Count (IRC R315) | International Code Council; 'An approved carbon monoxide alarm shall be installed out... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coating-coverage-dft` | Coating Coverage from Volume-Solids and DFT | SSPC / AMPP PA 2; 60% volume-solids, 5.0 mil DFT, 2,000 ft^2, 35% loss -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `coefficient-of-consolidation` | Coefficient of Consolidation cv from Oedometer Curve | Das, Principles of Geotechnical Engin...; cv = T50 Hdr^2/t50 = 0.197 x (0.5)^2 / 5 = 0.197 x 0.25 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cohesive-earth-pressure` | Rankine Active Earth Pressure on a Cohesive (Clay) Backfill | Rankine c-phi active earth pressure /...; Ka = (1 - sin 20)/(1 + sin 20) = 0.490291, sqrt(Ka) = 0.7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `coil-length` | Coil / Roll Stock Length | coil / roll stock annulus identity; spec-v802 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `column-base-plate` | Column Base Plate under Axial Load (AISC Design Guide 1) | AISC Design Guide 1 §3.1 / AISC 360-2...; spec-v268 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5006,6 +5008,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1579. Fixture-covered or reference-cadence: 1579 / 1579.
+Tile count: 1580. Fixture-covered or reference-cadence: 1580 / 1580.
 
 <!-- END tile-index-v14 -->

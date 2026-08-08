@@ -1010,6 +1010,64 @@ GEOTECH_RENDERERS["consolidation-degree"] = _simpleRenderer({
   compute: computeConsolidationDegree,
 });
 
+// ===================== spec-v1207: coefficient of consolidation cv from an oedometer curve =====================
+// The consolidation-time-rate and consolidation-degree tiles both REQUIRE cv as an input, but
+// nothing in the catalog produced it. cv comes from fitting the oedometer (ASTM D2435) dial-reading
+// vs. time curve of one load increment by one of the two standard curve-fitting methods:
+//   Casagrande log-time (find t50):  cv = T50 Hdr^2 / t50, T50 = 0.197
+//   Taylor square-root-time (find t90): cv = T90 Hdr^2 / t90, T90 = 0.848
+// Hdr is the drainage path of the TEST SPECIMEN during that increment: half the specimen height for
+// the usual two-way (top-and-bottom porous stone) drainage, the full height for one-way. Output is
+// in^2/min (lab), cm^2/s (lab), and ft^2/day (the unit the two consolidation-time tiles consume).
+// dims: in { method: dimensionless, t_fit_min: T, specimen_height_in: L, drainage: dimensionless }
+//       out: { tv: dimensionless, hdr_in: L, cv_in2_min: L^2 T^-1, cv_cm2_s: L^2 T^-1, cv_ft2_day: L^2 T^-1 }
+export function computeCoefficientOfConsolidation({ method = "casagrande", t_fit_min = 0, specimen_height_in = 0, drainage = "double" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const t = Number(t_fit_min) || 0;
+  const H = Number(specimen_height_in) || 0;
+  const m = String(method).toLowerCase();
+  const d = String(drainage).toLowerCase();
+  if (m !== "casagrande" && m !== "taylor") return { error: "Method must be 'casagrande' (log-time, t50) or 'taylor' (sqrt-time, t90)." };
+  if (d !== "double" && d !== "single") return { error: "Drainage must be 'double' (two-way) or 'single' (one-way)." };
+  if (!(t > 0)) return { error: "The fitting time (t50 for Casagrande, t90 for Taylor) must be positive (min)." };
+  if (!(H > 0)) return { error: "Specimen height must be positive (in)." };
+  const tv = m === "casagrande" ? 0.197 : 0.848;
+  const hdr_in = d === "double" ? H / 2 : H;
+  const cv_in2_min = tv * hdr_in * hdr_in / t;
+  const cv_ft2_day = cv_in2_min * 10; // 1 in^2/min = (1/144 ft^2)/(1/1440 day) = 10 ft^2/day.
+  const cv_cm2_s = cv_in2_min * (6.4516 / 60); // 1 in^2 = 6.4516 cm^2, 1 min = 60 s.
+  if (![tv, hdr_in, cv_in2_min, cv_ft2_day, cv_cm2_s].every(Number.isFinite)) return { error: "Coefficient-of-consolidation math is not a finite value." };
+  return {
+    tv, hdr_in, cv_in2_min, cv_ft2_day, cv_cm2_s,
+    fit_percent: m === "casagrande" ? 50 : 90,
+    note: "The coefficient of consolidation cv, the one input the consolidation-time-rate and consolidation-degree tiles need but the catalog did not produce, from an oedometer (ASTM D2435) time-settlement curve. Two standard curve-fitting methods: Casagrande's LOG-TIME method reads the time t50 at 50% consolidation and uses cv = T50 Hdr^2/t50 with T50 = 0.197; Taylor's SQUARE-ROOT-TIME method reads t90 at 90% and uses cv = T90 Hdr^2/t90 with T90 = 0.848. Hdr is the drainage path of the small TEST SPECIMEN during the load increment - half the specimen height for the usual two-way drainage (porous stones top and bottom), the full height for one-way - not the field layer thickness. A 1 in specimen drained both ways (Hdr 0.5 in) with a Casagrande t50 of 5 min gives cv 0.00985 in^2/min = 0.0985 ft^2/day = 1.06e-3 cm^2/s, which is then fed to the time-rate tiles with the FIELD drainage path. Report cv from several load increments (it varies with stress); the two methods often differ, and Taylor tends to run higher. A design aid; the oedometer data and the geotechnical engineer of record govern.",
+  };
+}
+export const coefficientOfConsolidationExample = { inputs: { method: "casagrande", t_fit_min: 5, specimen_height_in: 1.0, drainage: "double" } };
+GEOTECH_RENDERERS["coefficient-of-consolidation"] = _simpleRenderer({
+  citation: "Citation: coefficient of consolidation from an oedometer (ASTM D2435) time-settlement curve by the two standard fitting methods - Casagrande log-time cv = T50 Hdr^2/t50 (T50 = 0.197) and Taylor square-root-time cv = T90 Hdr^2/t90 (T90 = 0.848), with Hdr the specimen drainage path (half the specimen height for two-way drainage), as compiled in Das / Holtz-Kovacs / Terzaghi, by name. Feeds the consolidation-time-rate and consolidation-degree tiles. A design aid; the oedometer data and the engineer of record govern.",
+  example: coefficientOfConsolidationExample.inputs,
+  fields: [
+    { key: "method", label: "Fitting method", kind: "select", default: "casagrande", options: [
+      { value: "casagrande", label: "Casagrande log-time (t50, T50 = 0.197)" },
+      { value: "taylor", label: "Taylor sqrt-time (t90, T90 = 0.848)" },
+    ] },
+    { key: "t_fit_min", label: "Fitting time t50 or t90 (min)", kind: "number", default: 5 },
+    { key: "specimen_height_in", label: "Specimen height (in)", kind: "number", default: 1.0 },
+    { key: "drainage", label: "Specimen drainage", kind: "select", default: "double", options: [
+      { value: "double", label: "Two-way (Hdr = H/2)" },
+      { value: "single", label: "One-way (Hdr = H)" },
+    ] },
+  ],
+  outputs: [
+    { key: "cv", id: "coc-out-cv", label: "cv (feed the time-rate tiles)", value: (r) => fmt(r.cv_ft2_day, 4) + " ft^2/day" },
+    { key: "cvlab", id: "coc-out-cvlab", label: "cv (lab units)", value: (r) => fmt(r.cv_in2_min, 5) + " in^2/min / " + r.cv_cm2_s.toExponential(3) + " cm^2/s" },
+    { key: "tvhdr", id: "coc-out-tvhdr", label: "Time factor Tv / specimen Hdr", value: (r) => fmt(r.tv, 3) + " (U " + fmt(r.fit_percent, 0) + "%) / " + fmt(r.hdr_in, 3) + " in" },
+    { key: "n", id: "coc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCoefficientOfConsolidation,
+});
+
 // dims: in { n60: dimensionless, b_ft: L, d_ft: L } out: { qa_base_ksf: M L^-1 T^-2, kd: dimensionless, qa_ksf: M L^-1 T^-2 }
 export function computeSptBearingCapacity({ n60 = 0, b_ft = 0, d_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

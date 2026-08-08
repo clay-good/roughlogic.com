@@ -17315,6 +17315,19 @@ export const CITATIONS = {
       { name: "Drainage path", value: "Hdr = full layer (single) or half (double drainage)", source: "scope of this tile" },
     ],
   },
+  "coefficient-of-consolidation": {
+    formula: "Casagrande: cv = 0.197 Hdr^2 / t50. Taylor: cv = 0.848 Hdr^2 / t90. Hdr = H/2 (double) or H (single).",
+    edition: "The coefficient of consolidation cv from an oedometer (ASTM D2435) time-settlement curve by the Casagrande log-time and Taylor square-root-time fitting methods, as compiled in Das, Principles of Geotechnical Engineering / Holtz-Kovacs / Terzaghi, by name.",
+    freeAccess: "The Terzaghi time factors (T50 = 0.197, T90 = 0.848) and the cv = Tv Hdr^2/t relation are standard published soil-mechanics results; the fitting times t50/t90 are the user's own oedometer readings.",
+    governance: GOVERNANCE.general,
+    editionNote: "The coefficient of consolidation cv, the one input the consolidation-time-rate and consolidation-degree tiles require but the catalog did not otherwise produce, from an oedometer (ASTM D2435) time-settlement curve of a single load increment. Two standard curve-fitting methods: Casagrande's logarithm-of-time method reads the time t50 at 50% consolidation and gives cv = T50 Hdr^2/t50 with the theoretical time factor T50 = 0.197; Taylor's square-root-of-time method reads t90 at 90% and gives cv = T90 Hdr^2/t90 with T90 = 0.848. The drainage path Hdr is that of the small TEST SPECIMEN during the increment - half the specimen height for the usual two-way drainage (porous stones top and bottom), the full height for one-way - not the field layer thickness. cv varies with the stress level, so it is reported for several load increments; the two methods often disagree and Taylor tends to run higher. A design aid; the oedometer data and the geotechnical engineer of record govern.",
+    assumptions: [
+      { name: "Casagrande (log-time)", value: "cv = 0.197 Hdr^2 / t50 (T50 = 0.197 at U = 50%)", source: "Casagrande / Terzaghi consolidation theory" },
+      { name: "Taylor (sqrt-time)", value: "cv = 0.848 Hdr^2 / t90 (T90 = 0.848 at U = 90%)", source: "Taylor / Terzaghi consolidation theory" },
+      { name: "Drainage path", value: "Hdr = specimen height/2 (two-way) or full height (one-way)", source: "oedometer specimen geometry" },
+      { name: "Scope", value: "one load increment; feeds the field consolidation-time tiles with the FIELD Hdr", source: "consistency with the time-rate tiles" },
+    ],
+  },
   "spt-bearing-capacity": {
     formula: "qa_base = N60/4 (B <= 4 ft) or (N60/6)((B+1)/B)^2; Kd = min(1 + 0.33 D/B, 1.33); qa = qa_base Kd (ksf, 1 in settlement).",
     edition: "The Meyerhof SPT settlement-based allowable bearing on sand, as compiled in Das, Principles of Foundation Engineering, by name.",

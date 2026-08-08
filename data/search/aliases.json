@@ -25222,6 +25222,31 @@
       "kind": "industry"
     },
     {
+      "term": "coefficient of consolidation",
+      "target": "coefficient-of-consolidation",
+      "kind": "industry"
+    },
+    {
+      "term": "cv from oedometer test",
+      "target": "coefficient-of-consolidation",
+      "kind": "question"
+    },
+    {
+      "term": "casagrande log time method",
+      "target": "coefficient-of-consolidation",
+      "kind": "industry"
+    },
+    {
+      "term": "taylor square root time method",
+      "target": "coefficient-of-consolidation",
+      "kind": "industry"
+    },
+    {
+      "term": "how to find cv for consolidation settlement",
+      "target": "coefficient-of-consolidation",
+      "kind": "question"
+    },
+    {
       "term": "spt bearing capacity",
       "target": "spt-bearing-capacity",
       "kind": "industry"

@@ -47084,6 +47084,82 @@
    }
   },
   {
+   "tile_id": "coefficient-of-consolidation",
+   "source_publisher": "Das, Principles of Geotechnical Engineering / Holtz-Kovacs / Terzaghi",
+   "source_title": "Casagrande log-time: 1 in specimen, two-way drainage (Hdr 0.5 in), t50 5 min -> cv 0.0985 ft^2/day (spec-v1207)",
+   "source_edition_or_year": "standard oedometer curve-fitting relation",
+   "source_section_or_page": "cv = T50 Hdr^2/t50 = 0.197 x (0.5)^2 / 5 = 0.197 x 0.25 / 5 = 0.00985 in^2/min; x 10 = 0.0985 ft^2/day; x (6.4516/60) = 1.0591e-3 cm^2/s.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "method": "casagrande",
+    "t_fit_min": 5,
+    "specimen_height_in": 1.0,
+    "drainage": "double"
+   },
+   "outputs": {
+    "cv_in2_min": {
+     "value": 0.00985,
+     "tolerance": {
+      "abs": 0.00001
+     }
+    },
+    "cv_ft2_day": {
+     "value": 0.0985,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "tv": {
+     "value": 0.197,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "hdr_in": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "coefficient-of-consolidation",
+   "source_publisher": "standard oedometer curve-fitting relation",
+   "source_title": "cross-check Taylor sqrt-time: same specimen, t90 20 min -> cv 0.106 ft^2/day",
+   "source_edition_or_year": "cv = T90 Hdr^2/t90",
+   "source_section_or_page": "cv = 0.848 x (0.5)^2 / 20 = 0.848 x 0.25 / 20 = 0.0106 in^2/min; x 10 = 0.106 ft^2/day. Taylor's t90 fit runs slightly higher than Casagrande's t50 fit on the same curve.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "method": "taylor",
+    "t_fit_min": 20,
+    "specimen_height_in": 1.0,
+    "drainage": "double"
+   },
+   "outputs": {
+    "cv_in2_min": {
+     "value": 0.0106,
+     "tolerance": {
+      "abs": 0.00001
+     }
+    },
+    "cv_ft2_day": {
+     "value": 0.106,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "tv": {
+     "value": 0.848,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "consolidation-degree",
    "source_publisher": "Terzaghi consolidation theory (inverted for U)",
    "source_title": "cv 0.1 ft^2/day, Hdr 10 ft, 848 days -> Tv 0.848, U 90% (round-trips the consolidation-time example)",
