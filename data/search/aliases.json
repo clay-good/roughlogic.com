@@ -387,6 +387,21 @@
       "kind": "adjacent"
     },
     {
+      "term": "one sample t test",
+      "target": "one-sample-t-test",
+      "kind": "industry"
+    },
+    {
+      "term": "test mean against target value",
+      "target": "one-sample-t-test",
+      "kind": "question"
+    },
+    {
+      "term": "is the mean different from a spec",
+      "target": "one-sample-t-test",
+      "kind": "question"
+    },
+    {
       "term": "paired t test",
       "target": "paired-t-test",
       "kind": "industry"

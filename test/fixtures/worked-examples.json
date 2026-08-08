@@ -22131,6 +22131,43 @@
    }
   },
   {
+   "tile_id": "one-sample-t-test",
+   "source_publisher": "OpenIntro Statistics Ch. 7 (single mean)",
+   "source_title": "t = (x_bar - mu0)/(s/sqrt(n)) on n-1 df",
+   "source_edition_or_year": "OpenIntro",
+   "source_section_or_page": "mean 16.1, SD 0.3, n 25 vs target 16.0 -> t = 0.1/(0.3/sqrt(25)) = 1.667, df 24, two-sided p 0.1086 (matches scipy stats.t)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "sample_mean": 16.1,
+    "sample_sd": 0.3,
+    "n": 25,
+    "hypothesized_mean": 16.0,
+    "tail": "two",
+    "alpha": 0.05
+   },
+   "outputs": {
+    "t_stat": {
+     "value": 1.667,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "df": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "p_value": {
+     "value": 0.1086,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "paired-t-test",
    "source_publisher": "OpenIntro Statistics Ch. 7 (paired data)",
    "source_title": "t = d_bar/(s_d/sqrt(n)) on n-1 df (one-sample t on the differences)",

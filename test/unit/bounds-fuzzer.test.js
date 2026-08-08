@@ -10494,7 +10494,28 @@ test("bounds: spec-v1231 computeSumOfYearsDigitsDepreciation pins schedule, salv
 });
 import { computePrimerTm as _t1, computeCfuPlateCount as _t2 } from "../../calc-lab.js";
 import { computeGrossRentMultiplier as _x1, computePmiCancellationDate as _x2, computeSellerNetSheet as _x3 } from "../../calc-realestate.js";
-import { computeFinalGradeNeeded as _y1, computeCategoryWeightedGrade as _y2, computeTwoSampleTTest as _y3, computePairedTTest as _v1234 } from "../../calc-edu.js";
+import { computeFinalGradeNeeded as _y1, computeCategoryWeightedGrade as _y2, computeTwoSampleTTest as _y3, computePairedTTest as _v1234, computeOneSampleTTest as _v1236 } from "../../calc-edu.js";
+test("bounds: spec-v1236 computeOneSampleTTest pins t = (x_bar-mu0)/(s/sqrt(n)), df, tails, and error seams", () => {
+  // mean 16.1, SD 0.3, n 25 vs target 16.0: t = 1.667, df 24, two-sided p ~ 0.1086.
+  const r = _v1236({ sample_mean: 16.1, sample_sd: 0.3, n: 25, hypothesized_mean: 16.0, tail: "two" });
+  assert.ok(Math.abs(r.t_stat - (16.1 - 16.0) / (0.3 / Math.sqrt(25))) < 1e-12);
+  assert.ok(Math.abs(r.t_stat - 1.6667) < 1e-3 && r.df === 24);
+  assert.ok(Math.abs(r.p_value - 0.1086) < 2e-3 && r.significant === false);
+  // One-tailed p is half the two-tailed p.
+  const one = _v1236({ sample_mean: 16.1, sample_sd: 0.3, n: 25, hypothesized_mean: 16.0, tail: "one" });
+  assert.ok(Math.abs(one.p_value - r.p_value / 2) < 1e-9);
+  // A sample mean exactly on target gives t = 0, p = 1.
+  const on = _v1236({ sample_mean: 16.0, sample_sd: 0.3, n: 25, hypothesized_mean: 16.0 });
+  assert.ok(on.t_stat === 0 && Math.abs(on.p_value - 1) < 1e-9 && on.significant === false);
+  // A larger sample sharpens the same effect into significance.
+  const big = _v1236({ sample_mean: 16.1, sample_sd: 0.3, n: 400, hypothesized_mean: 16.0 });
+  assert.ok(big.significant === true && big.t_stat > r.t_stat);
+  // Error seams: n < 2, negative SD, zero spread, non-finite.
+  assert.ok("error" in _v1236({ sample_mean: 1, sample_sd: 1, n: 1, hypothesized_mean: 0 }));
+  assert.ok("error" in _v1236({ sample_mean: 1, sample_sd: -1, n: 5, hypothesized_mean: 0 }));
+  assert.ok("error" in _v1236({ sample_mean: 5, sample_sd: 0, n: 5, hypothesized_mean: 0 }));
+  assert.ok("error" in _v1236({ sample_mean: Infinity, sample_sd: 1, n: 5, hypothesized_mean: 0 }));
+});
 test("bounds: spec-v1234 computePairedTTest pins t = d_bar/(s_d/sqrt(n)), df, the two/one-tail p, and error seams", () => {
   // mean diff 2.5, SD 3.0, n 20: t = 2.5/(3/sqrt(20)) = 3.727, df 19, two-sided p ~ 0.00143.
   const r = _v1234({ mean_diff: 2.5, sd_diff: 3.0, n_pairs: 20, tail: "two" });

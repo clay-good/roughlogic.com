@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1608,
-  "covered_count": 1179,
+  "total_tiles": 1609,
+  "covered_count": 1180,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -659,6 +659,7 @@
     "ohms-law",
     "oil-burner-firing-rate",
     "oil-water-separator-sizing",
+    "one-sample-t-test",
     "open-delta-transformer",
     "orifice-diameter-for-flow",
     "orifice-flow",

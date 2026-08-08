@@ -2345,3 +2345,55 @@ function renderPairedTTest(inputRegion, outputRegion, citationEl) {
   for (const f of [md.input, sd.input, n.input, tail.select]) f.addEventListener("input", update);
 }
 EDU_RENDERERS["paired-t-test"] = renderPairedTTest;
+
+// --- spec-v1236 Y: One-sample t-test (`one-sample-t-test`) ---
+// Tests a sample mean against a hypothesized/target value mu0: t = (x_bar - mu0)/(s/sqrt(n)), df = n-1, p from tcdf.
+// dims: in { sample_mean: dimensionless, sample_sd: dimensionless, n: dimensionless, hypothesized_mean: dimensionless, tail: dimensionless, alpha: dimensionless } out: { t_stat: dimensionless, df: dimensionless, p_value: dimensionless }
+export function computeOneSampleTTest({ sample_mean = 0, sample_sd = 0, n = 0, hypothesized_mean = 0, tail = "two", alpha = 0.05 } = {}) {
+  const xbar = Number(sample_mean), s = Number(sample_sd), nn = Number(n), mu0 = Number(hypothesized_mean);
+  if (![xbar, s, nn, mu0].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
+  if (!(nn >= 2)) return { error: "Need at least n = 2 observations." };
+  if (s < 0) return { error: "The sample standard deviation must be non-negative." };
+  const se = s / Math.sqrt(nn);
+  if (!(se > 0)) return { error: "Standard error is zero (the sample has no spread) - t is not defined." };
+  const t = (xbar - mu0) / se;
+  const df = nn - 1;
+  const cdf = tcdf(Math.abs(t), df);
+  const pTwo = 2 * (1 - cdf);
+  const pOne = 1 - cdf;
+  const p = tail === "one" ? pOne : pTwo;
+  return {
+    t_stat: Number.isFinite(t) ? t : null,
+    df,
+    se: Number.isFinite(se) ? se : null,
+    mean_diff: xbar - mu0,
+    p_value: Number.isFinite(p) ? p : null,
+    significant: Number.isFinite(p) ? p < (Number(alpha) || 0.05) : null,
+    note: "The one-sample t-test asks whether a sample mean differs from a fixed target or spec value mu0: t = (x_bar - mu0) / (s / sqrt(n)) on df = n - 1, where x_bar and s are the sample mean and standard deviation. It is the everyday QC question - is the mean fill weight really 16.0 oz, is the mean cure strength really 4,000 psi - as opposed to the two-sample test (two groups) or the paired test (before/after on the same subjects). A sample of 25 with mean 16.1, SD 0.3, tested against 16.0 gives t = 1.67 on 24 df, two-sided p = 0.109 (not significant at 0.05). Small n (< 30) leans on approximate normality of the sample; the t-CDF reuses the bundled special-function helper.",
+  };
+}
+export const oneSampleTTestExample = { inputs: { sample_mean: 16.1, sample_sd: 0.3, n: 25, hypothesized_mean: 16.0, tail: "two", alpha: 0.05 } };
+
+function renderOneSampleTTest(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per OpenIntro Statistics Chapter 7 (inference for a single mean) - the one-sample t-test, t = (x_bar - mu0)/(s/sqrt(n)) on n-1 df, by name; the t-CDF reuses the bundled special-function helper. Free at openintro.org.";
+  const xb = makeNumber("Sample mean x_bar", "ostt-xb", { step: "any", value: "16.1" }); xb.input.value = "16.1";
+  const sd = makeNumber("Sample SD s", "ostt-sd", { step: "any", min: "0", value: "0.3" }); sd.input.value = "0.3";
+  const n = makeNumber("Sample size n", "ostt-n", { step: "1", min: "2", value: "25" }); n.input.value = "25";
+  const mu0 = makeNumber("Hypothesized / target mean mu0", "ostt-mu", { step: "any", value: "16.0" }); mu0.input.value = "16.0";
+  const tail = makeSelect("Tail", "ostt-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided" }]);
+  for (const f of [xb, sd, n, mu0, tail]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { xb.input.value = "16.1"; sd.input.value = "0.3"; n.input.value = "25"; mu0.input.value = "16.0"; tail.select.value = "two"; update(); });
+  const oT = makeOutputLine(outputRegion, "t-statistic / df", "ostt-out-t");
+  const oP = makeOutputLine(outputRegion, "p-value / significance", "ostt-out-p");
+  const oNote = makeOutputLine(outputRegion, "Note", "ostt-out-note");
+  function readNum(i) { if (i.value === "") return NaN; const v = Number(i.value); return Number.isFinite(v) ? v : NaN; }
+  const update = debounce(() => {
+    const r = computeOneSampleTTest({ sample_mean: readNum(xb.input), sample_sd: readNum(sd.input), n: readNum(n.input), hypothesized_mean: readNum(mu0.input), tail: tail.select.value });
+    if (r.error) { oT.textContent = r.error; oP.textContent = ""; oNote.textContent = ""; return; }
+    oT.textContent = "t = " + fmt(r.t_stat, 3) + ", df = " + r.df;
+    oP.textContent = "p = " + fmt(r.p_value, 4) + " (" + (r.significant ? "significant" : "not significant") + " at alpha)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [xb.input, sd.input, n.input, mu0.input, tail.select]) f.addEventListener("input", update);
+}
+EDU_RENDERERS["one-sample-t-test"] = renderOneSampleTTest;

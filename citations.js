@@ -123,6 +123,17 @@ export const CITATIONS = {
     ],
   },
 
+  "one-sample-t-test": {
+    formula: "t = (x_bar - mu0) / (s / sqrt(n)) on df = n - 1, where x_bar and s are the sample mean and standard deviation and mu0 is the hypothesized/target mean; p from the Student-t CDF.",
+    edition: "Per OpenIntro Statistics Chapter 7 (inference for a single mean) - the one-sample t-test, by name; the t-CDF reuses the bundled special-function helper.",
+    freeAccess: "Free at openintro.org.",
+    governance: GOVERNANCE.general,
+    editionNote: "Tests whether a sample mean differs from a fixed target or spec value mu0, the third member of the t-test family alongside the two-sample test (two groups) and the paired test (before/after on the same subjects). The everyday QC use: is the mean fill weight really 16.0 oz, is the mean cure strength really 4,000 psi. n < 2, or a sample with no spread, is rejected. Small n (< 30) leans on approximate normality of the sample.",
+    assumptions: [
+      { name: "One-sample t", value: "t = (x_bar - mu0)/(s/sqrt(n)), df = n - 1", source: "OpenIntro Ch. 7" },
+      { name: "Target value", value: "mu0 is a fixed hypothesized/spec mean, not a second sample", source: "OpenIntro Ch. 7" },
+    ],
+  },
   "paired-t-test": {
     formula: "On the n paired differences d_i: t = d_bar / (s_d / sqrt(n)) on df = n - 1, where d_bar and s_d are the mean and standard deviation of the differences; p from the Student-t CDF.",
     edition: "Per OpenIntro Statistics Chapter 7 (inference for paired data) - the paired t-test is a one-sample t on the differences, by name; the t-CDF reuses the bundled special-function helper.",

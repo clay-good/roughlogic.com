@@ -1584,6 +1584,7 @@ export const RENDERER_MAP = {
   "category-weighted-grade": { module: "../../calc-edu.js", exportName: "EDU_RENDERERS" },
   "two-sample-t-test": { module: "../../calc-edu.js", exportName: "EDU_RENDERERS" },
   "paired-t-test": { module: "../../calc-edu.js", exportName: "EDU_RENDERERS" },
+  "one-sample-t-test": { module: "../../calc-edu.js", exportName: "EDU_RENDERERS" },
   "cg-load-share": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },
   "crane-net-capacity": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },
   "crane-ground-bearing": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },

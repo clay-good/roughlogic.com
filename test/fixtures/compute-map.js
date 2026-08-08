@@ -19,6 +19,7 @@ export const COMPUTE_MAP = {
   "category-weighted-grade": { module: "../../calc-edu.js", fn: "computeCategoryWeightedGrade" },
   "two-sample-t-test": { module: "../../calc-edu.js", fn: "computeTwoSampleTTest" },
   "paired-t-test": { module: "../../calc-edu.js", fn: "computePairedTTest" },
+  "one-sample-t-test": { module: "../../calc-edu.js", fn: "computeOneSampleTTest" },
   "gross-rent-multiplier": { module: "../../calc-realestate.js", fn: "computeGrossRentMultiplier" },
   "pmi-cancellation-date": { module: "../../calc-realestate.js", fn: "computePmiCancellationDate" },
   "seller-net-sheet": { module: "../../calc-realestate.js", fn: "computeSellerNetSheet" },
