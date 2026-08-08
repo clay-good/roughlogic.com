@@ -319,7 +319,7 @@ const _TILES = [
   // spec-v24 conduit-bending / audio + spec-v25 surveying additions.
   ["conduit-offset", "A"], ["conduit-saddle", "A"], ["conduit-90-stub", "A"],
   ["weld-heat-input", "E"], ["metal-weight", "E"], ["layout-squaring", "E"],
-  ["horizontal-curve", "E"], ["spiral-curve", "E"], ["vertical-curve", "E"], ["earthwork-end-area", "E"], ["slope-stake-cut-fill", "E"],
+  ["horizontal-curve", "E"], ["spiral-curve", "E"], ["compound-curve", "E"], ["vertical-curve", "E"], ["earthwork-end-area", "E"], ["slope-stake-cut-fill", "E"],
   ["curve-deflection-stakeout", "E"],
   ["superelevation", "E"], ["superelevation-safe-curve-speed", "E"], ["vertical-curve-sight-distance", "E"], ["sag-vertical-curve", "E"], ["sag-vertical-curve-comfort", "E"], ["horizontal-sightline-offset", "E"],
   ["rolling-offset", "G"],

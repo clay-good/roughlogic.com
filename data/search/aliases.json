@@ -47711,6 +47711,21 @@
       "kind": "question"
     },
     {
+      "term": "compound curve",
+      "target": "compound-curve",
+      "kind": "industry"
+    },
+    {
+      "term": "two radius compound curve tangents",
+      "target": "compound-curve",
+      "kind": "question"
+    },
+    {
+      "term": "interchange ramp compound curve",
+      "target": "compound-curve",
+      "kind": "question"
+    },
+    {
       "term": "spiral curve",
       "target": "spiral-curve",
       "kind": "industry"

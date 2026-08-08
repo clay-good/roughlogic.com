@@ -21999,6 +21999,82 @@
    }
   },
   {
+   "tile_id": "compound-curve",
+   "source_publisher": "AASHTO Green Book / Ghilani & Wolf, Elementary Surveying",
+   "source_title": "R1 500/30 deg into R2 800/25 deg -> T1 133.97, T2 177.36, back 294.60, fwd 367.39, 610.87 ft (spec-v1222)",
+   "source_edition_or_year": "compound-curve route-surveying geometry",
+   "source_section_or_page": "T1 = 500 tan15 = 133.97; T2 = 800 tan12.5 = 177.36; delta = 55, sin55 = 0.81915; back = 133.97 + 311.33 sin25/sin55 = 294.60; fwd = 177.36 + 311.33 sin30/sin55 = 367.39; L = 261.80 + 349.07 = 610.87.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "r1_ft": 500,
+    "r2_ft": 800,
+    "delta1_deg": 30,
+    "delta2_deg": 25
+   },
+   "outputs": {
+    "arc1_tangent_ft": {
+     "value": 133.97,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "arc2_tangent_ft": {
+     "value": 177.36,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "back_tangent_ft": {
+     "value": 294.6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "forward_tangent_ft": {
+     "value": 367.39,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "total_length_ft": {
+     "value": 610.87,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "compound-curve",
+   "source_publisher": "compound-curve geometry (degenerate cross-check)",
+   "source_title": "cross-check: equal radii (1000) and equal angles (15+15) reduce to the simple curve, back tangent 267.95",
+   "source_edition_or_year": "reduces to R tan(delta/2) at equal arcs",
+   "source_section_or_page": "R1 = R2 = 1000, delta1 = delta2 = 15: back tangent = 267.95 ft = 1000 tan(15) = the simple-curve tangent for a 30-deg deflection, confirming the compound formula collapses to the simple case.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "r1_ft": 1000,
+    "r2_ft": 1000,
+    "delta1_deg": 15,
+    "delta2_deg": 15
+   },
+   "outputs": {
+    "back_tangent_ft": {
+     "value": 267.95,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "forward_tangent_ft": {
+     "value": 267.95,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "horizontal-curve",
    "source_publisher": "AASHTO Green Book / FM 5-233 (by name)",
    "source_title": "Circular curve T, L, M, LC and arc-definition degree of curve",

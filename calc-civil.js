@@ -203,6 +203,71 @@ function renderSpiralCurve(inputRegion, outputRegion, citationEl) {
 }
 CIVIL_RENDERERS["spiral-curve"] = renderSpiralCurve;
 
+// ===================== spec-v1222: compound circular curve =====================
+// Completes the horizontal-alignment family: simple circular (horizontal-curve) and spiral (spiral-curve)
+// exist; the compound curve -- two circular arcs of different radii turning the same way, sharing a point
+// of compound curvature (PCC) -- is the standard geometry at interchange ramps and intersection returns.
+// Each arc: T = R tan(delta/2), L = R delta_rad. The tangent distances from the PI come from the law of
+// sines on the vertex triangle: back tangent t1 = T1 + (T1+T2) sin(delta2)/sin(delta), forward tangent
+// t2 = T2 + (T1+T2) sin(delta1)/sin(delta), delta = delta1 + delta2.
+// dims: in { r1_ft: L, r2_ft: L, delta1_deg: dimensionless, delta2_deg: dimensionless } out: { arc1_tangent_ft: L, arc2_tangent_ft: L, back_tangent_ft: L, forward_tangent_ft: L, arc1_length_ft: L, arc2_length_ft: L, total_length_ft: L, total_delta_deg: dimensionless }
+export function computeCompoundCurve({ r1_ft = 0, r2_ft = 0, delta1_deg = 0, delta2_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R1 = Number(r1_ft) || 0;
+  const R2 = Number(r2_ft) || 0;
+  const d1 = Number(delta1_deg) || 0;
+  const d2 = Number(delta2_deg) || 0;
+  if (!(R1 > 0)) return { error: "The first radius R1 must be positive (ft)." };
+  if (!(R2 > 0)) return { error: "The second radius R2 must be positive (ft)." };
+  if (!(d1 > 0)) return { error: "The first central angle delta1 must be positive (deg)." };
+  if (!(d2 > 0)) return { error: "The second central angle delta2 must be positive (deg)." };
+  const total = d1 + d2;
+  if (!(total < 180)) return { error: "The total deflection (delta1 + delta2) must be less than 180 deg." };
+  const rad = Math.PI / 180;
+  const arc1_tangent_ft = R1 * Math.tan(d1 * rad / 2);
+  const arc2_tangent_ft = R2 * Math.tan(d2 * rad / 2);
+  const sumT = arc1_tangent_ft + arc2_tangent_ft;
+  const sinTotal = Math.sin(total * rad);
+  const back_tangent_ft = arc1_tangent_ft + sumT * Math.sin(d2 * rad) / sinTotal;
+  const forward_tangent_ft = arc2_tangent_ft + sumT * Math.sin(d1 * rad) / sinTotal;
+  const arc1_length_ft = R1 * d1 * rad;
+  const arc2_length_ft = R2 * d2 * rad;
+  const total_length_ft = arc1_length_ft + arc2_length_ft;
+  if (![arc1_tangent_ft, arc2_tangent_ft, back_tangent_ft, forward_tangent_ft, arc1_length_ft, arc2_length_ft].every(Number.isFinite)) {
+    return { error: "Compound-curve math is not a finite value." };
+  }
+  return {
+    arc1_tangent_ft, arc2_tangent_ft, back_tangent_ft, forward_tangent_ft,
+    arc1_length_ft, arc2_length_ft, total_length_ft, total_delta_deg: total,
+    note: "A compound circular curve, the alignment element between the simple curve and the spiral: two circular arcs of DIFFERENT radii that turn the same direction and meet at a point of compound curvature (PCC), the standard shape of an interchange ramp or an intersection curb return where one radius eases into another. Each arc has its own semi-tangent T = R tan(delta/2) and arc length L = R x delta (radians); the shared common tangent at the PCC is T1 + T2. The tangent distances back to the point of intersection (PI) of the two outer tangents follow from the law of sines on the vertex triangle: the back tangent (PI to the PC) t1 = T1 + (T1 + T2) sin(delta2)/sin(delta), and the forward tangent (PI to the PT) t2 = T2 + (T1 + T2) sin(delta1)/sin(delta), with delta = delta1 + delta2. A 500 ft arc turning 30 degrees compounding into an 800 ft arc turning 25 degrees gives semi-tangents of 134.0 and 177.4 ft, a 294.6 ft back tangent, a 367.4 ft forward tangent, and 610.9 ft of total curve. With equal radii and equal central angles this reduces exactly to the simple curve. The two arcs must turn the SAME way (a reverse curve, turning opposite ways, is a separate case), and a large radius ratio makes an abrupt steering change -- AASHTO limits successive compound radii to about a 1.5:1 ratio on the mainline. A design aid; AASHTO and the engineer of record govern.",
+  };
+}
+export const compoundCurveExample = { inputs: { r1_ft: 500, r2_ft: 800, delta1_deg: 30, delta2_deg: 25 } };
+function renderCompoundCurve(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: compound circular curve geometry per AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) and Ghilani & Wolf, Elementary Surveying: each arc T = R tan(delta/2), L = R delta_rad; back tangent t1 = T1 + (T1+T2) sin(delta2)/sin(delta), forward tangent t2 = T2 + (T1+T2) sin(delta1)/sin(delta), delta = delta1 + delta2 (law of sines on the vertex triangle). Same-direction arcs; the engineer of record governs.";
+  const r1 = makeNumber("First radius R1 (ft)", "cc-r1", { step: "any", min: "0", value: "500" }); r1.input.value = "500";
+  const d1 = makeNumber("First central angle delta1 (deg)", "cc-d1", { step: "any", min: "0", value: "30" }); d1.input.value = "30";
+  const r2 = makeNumber("Second radius R2 (ft)", "cc-r2", { step: "any", min: "0", value: "800" }); r2.input.value = "800";
+  const d2 = makeNumber("Second central angle delta2 (deg)", "cc-d2", { step: "any", min: "0", value: "25" }); d2.input.value = "25";
+  for (const f of [r1, d1, r2, d2]) inputRegion.appendChild(f.wrap);
+  const oT = makeOutputLine(outputRegion, "Arc semi-tangents T1 / T2", "cc-out-t");
+  const oPI = makeOutputLine(outputRegion, "Back / forward tangent (PI to PC / PT)", "cc-out-pi");
+  const oL = makeOutputLine(outputRegion, "Arc lengths / total", "cc-out-l");
+  const oNote = makeOutputLine(outputRegion, "Note", "cc-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCompoundCurve({ r1_ft: readNum(r1.input), r2_ft: readNum(r2.input), delta1_deg: readNum(d1.input), delta2_deg: readNum(d2.input) });
+    if (r.error) { oT.textContent = r.error; oPI.textContent = "-"; oL.textContent = "-"; oNote.textContent = ""; return; }
+    oT.textContent = fmt(r.arc1_tangent_ft, 2) + " ft / " + fmt(r.arc2_tangent_ft, 2) + " ft";
+    oPI.textContent = fmt(r.back_tangent_ft, 2) + " ft / " + fmt(r.forward_tangent_ft, 2) + " ft";
+    oL.textContent = fmt(r.arc1_length_ft, 2) + " + " + fmt(r.arc2_length_ft, 2) + " = " + fmt(r.total_length_ft, 2) + " ft (delta " + fmt(r.total_delta_deg, 1) + " deg)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { r1.input.value = "500"; d1.input.value = "30"; r2.input.value = "800"; d2.input.value = "25"; update(); });
+  for (const f of [r1.input, d1.input, r2.input, d2.input]) f.addEventListener("input", update);
+}
+CIVIL_RENDERERS["compound-curve"] = renderCompoundCurve;
+
 // --- v766+ E.x: Curve deflection-angle stakeout (`curve-deflection-stakeout`) ---
 // The deflection-angle method of setting a circular curve: from the PC, an arc
 // length l along the curve subtends a deflection angle (from the back tangent)

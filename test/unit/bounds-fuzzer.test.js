@@ -10544,6 +10544,27 @@ test("bounds: spec-v1221 computeSpiralCurve pins theta_s, throw, tangent/externa
   assert.ok("error" in _v1221({ radius_ft: Infinity, spiral_length_ft: 250, delta_deg: 20 }));
 });
 
+import { computeCompoundCurve as _v1222 } from "../../calc-civil.js";
+
+test("bounds: spec-v1222 computeCompoundCurve pins the semi-tangents, the law-of-sines PI tangents, the simple-curve reduction, and error seams", () => {
+  // R1 500/30, R2 800/25: T1 133.97, T2 177.36, back 294.60, fwd 367.39, total 610.87.
+  const r = _v1222({ r1_ft: 500, r2_ft: 800, delta1_deg: 30, delta2_deg: 25 });
+  assert.ok(Math.abs(r.arc1_tangent_ft - 500 * Math.tan(15 * Math.PI / 180)) < 1e-9);
+  assert.ok(Math.abs(r.arc2_tangent_ft - 800 * Math.tan(12.5 * Math.PI / 180)) < 1e-9);
+  assert.ok(Math.abs(r.arc1_tangent_ft - 133.97) < 0.01 && Math.abs(r.arc2_tangent_ft - 177.36) < 0.01);
+  assert.ok(Math.abs(r.back_tangent_ft - 294.60) < 0.02 && Math.abs(r.forward_tangent_ft - 367.39) < 0.02);
+  assert.ok(Math.abs(r.total_length_ft - (500 * 30 + 800 * 25) * Math.PI / 180) < 1e-6 && r.total_delta_deg === 55);
+  // Degenerate: equal radii and equal central angles reduce EXACTLY to the simple curve T = R tan(delta/2).
+  const s = _v1222({ r1_ft: 1000, r2_ft: 1000, delta1_deg: 15, delta2_deg: 15 });
+  assert.ok(Math.abs(s.back_tangent_ft - 1000 * Math.tan(15 * Math.PI / 180)) < 1e-9);
+  assert.ok(Math.abs(s.back_tangent_ft - s.forward_tangent_ft) < 1e-9); // symmetric
+  // Error seams: non-positive radii/angles, total deflection >= 180, non-finite.
+  assert.ok("error" in _v1222({ r1_ft: 0, r2_ft: 800, delta1_deg: 30, delta2_deg: 25 }));
+  assert.ok("error" in _v1222({ r1_ft: 500, r2_ft: 800, delta1_deg: 0, delta2_deg: 25 }));
+  assert.ok("error" in _v1222({ r1_ft: 500, r2_ft: 800, delta1_deg: 100, delta2_deg: 90 }));
+  assert.ok("error" in _v1222({ r1_ft: 500, r2_ft: Infinity, delta1_deg: 30, delta2_deg: 25 }));
+});
+
 test("bounds: spec-v767 curve-deflection-stakeout pins the deflection/chord, the degree mode, cross-checks horizontal-curve, and error seams", () => {
   // Spec example: R 500, arc 100 -> delta = (100/1000)(180/pi) = 5.72958 deg; chord = 1000 sin(0.1) = 99.833; D = 11.4592.
   const r = _v767({ mode: "radius", radius_ft: 500, arc_length_ft: 100 });

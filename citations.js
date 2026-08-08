@@ -7833,6 +7833,18 @@ export const CITATIONS = {
       { name: "Scope", value: "symmetric equal spirals, series approximation; Ls is a separate superelevation/comfort design step", source: "scope of this tile" },
     ],
   },
+  "compound-curve": {
+    formula: "T1 = R1 tan(delta1/2); T2 = R2 tan(delta2/2); L = R delta_rad; back tangent t1 = T1 + (T1+T2) sin(delta2)/sin(delta); forward tangent t2 = T2 + (T1+T2) sin(delta1)/sin(delta); delta = delta1 + delta2.",
+    edition: "Compound circular-curve geometry per the AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) and Ghilani & Wolf, Elementary Surveying, by name; first-principles trig with the law of sines.",
+    freeAccess: "The compound-curve tangent geometry (semi-tangents and the law-of-sines vertex triangle) is standard published route-surveying math; the design of record and the engineer of record govern the alignment.",
+    governance: GOVERNANCE.engineer_of_record,
+    editionNote: "A compound circular curve: two circular arcs of different radii turning the same direction and meeting at a point of compound curvature (PCC), the geometry of an interchange ramp or an intersection curb return where one radius eases into another. Each arc has its own semi-tangent T = R tan(delta/2) and arc length L = R delta (radians); the common tangent at the PCC has length T1 + T2. The tangent distances back to the point of intersection (PI) of the two outer tangents come from the law of sines on the vertex triangle: the back tangent (PI to the PC) t1 = T1 + (T1 + T2) sin(delta2)/sin(delta), and the forward tangent (PI to the PT) t2 = T2 + (T1 + T2) sin(delta1)/sin(delta), with delta = delta1 + delta2. With equal radii and equal central angles this reduces exactly to the simple circular curve. The two arcs must turn the same direction (a reverse curve is a separate case), and AASHTO limits the ratio of successive compound radii to about 1.5:1 on the mainline to keep the steering change gradual. A design aid; AASHTO and the engineer of record govern.",
+    assumptions: [
+      { name: "Semi-tangents and lengths", value: "T = R tan(delta/2); L = R delta_rad per arc", source: "AASHTO / Ghilani & Wolf" },
+      { name: "PI tangents", value: "t1 = T1 + (T1+T2) sin(delta2)/sin(delta); t2 = T2 + (T1+T2) sin(delta1)/sin(delta)", source: "law of sines on the vertex triangle" },
+      { name: "Scope", value: "same-direction arcs (not a reverse curve); reduces to a simple curve at equal radii/angles", source: "scope of this tile" },
+    ],
+  },
   "curve-deflection-stakeout": {
     formula: "deflection from the back tangent at the PC: delta = (l / (2R)) x (180/pi) deg for an arc length l; sub-chord from the PC c = 2R sin(l / (2R)); arc-definition D = 5729.58 / R. The deflection at the PT equals half the curve's total central angle.",
     edition: "Deflection-angle curve-stakeout method per FM 5-233 Construction Surveying and the AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book), by name; first-principles trig.",
