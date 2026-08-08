@@ -150,6 +150,56 @@ function _renderWirelessFspl(inputRegion, outputRegion, citationEl) {
 }
 LOWVOLTAGE_RENDERERS["wireless-fspl"] = _renderWirelessFspl;
 
+// ---------------------------------------------------------------------
+// spec-v1250: Fresnel zone radius and 60% line-of-sight clearance for a point-to-point RF link.
+// r_n(m) = 17.32 sqrt(n d1 d2 / (f_GHz D)), d1/d2/D in km (D = d1 + d2); 17.32 = sqrt(300) from
+// r_n = sqrt(n lambda d1 d2 / D). The link is considered clear when >= 60% of the FIRST zone (n=1)
+// is unobstructed. ITU-R P.526 / first-principles diffraction.
+// dims: in { frequency_ghz: dimensionless, d1_km: dimensionless, d2_km: dimensionless, zone_number: dimensionless } out: { radius_m: dimensionless, first_zone_radius_m: dimensionless, clearance_60pct_m: dimensionless, total_distance_km: dimensionless }
+export function computeFresnelZoneClearance({ frequency_ghz = 0, d1_km = 0, d2_km = 0, zone_number = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const f = Number(frequency_ghz);
+  const d1 = Number(d1_km);
+  const d2 = Number(d2_km);
+  const n = Math.round(Number(zone_number) || 0);
+  if (!(f > 0)) return { error: "Frequency must be positive (GHz)." };
+  if (!(d1 > 0)) return { error: "Distance from end 1 to the obstruction must be positive (km)." };
+  if (!(d2 > 0)) return { error: "Distance from end 2 to the obstruction must be positive (km)." };
+  if (!(n >= 1)) return { error: "Fresnel zone number must be a positive integer (1 for the first zone)." };
+  const D = d1 + d2;
+  const first_zone_radius_m = 17.32 * Math.sqrt(d1 * d2 / (f * D));
+  const radius_m = 17.32 * Math.sqrt(n * d1 * d2 / (f * D));
+  const clearance_60pct_m = 0.6 * first_zone_radius_m;
+  if (![radius_m, first_zone_radius_m, clearance_60pct_m].every(Number.isFinite)) return { error: "Fresnel-zone math is not a finite value." };
+  return {
+    radius_m, first_zone_radius_m, clearance_60pct_m, total_distance_km: D,
+    note: "The Fresnel zone radius and the line-of-sight clearance a point-to-point radio link needs, the geometry a wireless-bridge path survey turns on. Radio energy spreads through an ellipsoidal zone around the straight line between antennas, not just the line itself, so an obstruction that is technically below the sightline still robs signal by diffraction. The first-zone radius at the obstruction is r1 = 17.32 sqrt(d1 d2 / (f_GHz D)), with d1 and d2 the distances (km) from each end to the obstruction and D their sum; the radius is largest at midspan. A 2.4 GHz link 5 km long has a 12.5 m first-zone radius at its midpoint. The industry rule of thumb is to keep at least 60% of the FIRST Fresnel zone clear of terrain, buildings, and trees (here 7.5 m of clearance above the obstruction) -- less than that and the link loses margin to diffraction even with a nominally clear sightline. Higher zones (n = 2, 3) are reported for reference but the 60%-of-first-zone rule is what governs. Add earth curvature (bulge = D^2/8k, k ~ 4/3) and antenna height to the clearance budget separately. A planning geometry; the path survey and a link test govern.",
+  };
+}
+export const fresnelZoneClearanceExample = { inputs: { frequency_ghz: 2.4, d1_km: 2.5, d2_km: 2.5, zone_number: 1 } };
+function _renderFresnelZoneClearance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Fresnel zone radius r_n = 17.32 sqrt(n d1 d2 / (f_GHz D)) (d1, d2, D in km; 17.32 = sqrt(300) from r_n = sqrt(n lambda d1 d2 / D)) and the 60%-of-first-zone line-of-sight clearance rule, per ITU-R P.526 / first-principles diffraction. Earth curvature and antenna height are added to the clearance budget separately. A planning geometry; the path survey governs.";
+  const f = makeNumber("Frequency (GHz)", "frz-f", { step: "any", min: "0", value: "2.4" }); f.input.value = "2.4";
+  const d1 = makeNumber("Distance end 1 to obstruction (km)", "frz-d1", { step: "any", min: "0", value: "2.5" }); d1.input.value = "2.5";
+  const d2 = makeNumber("Distance end 2 to obstruction (km)", "frz-d2", { step: "any", min: "0", value: "2.5" }); d2.input.value = "2.5";
+  const n = makeNumber("Zone number (1 = first)", "frz-n", { step: "1", min: "1", value: "1" }); n.input.value = "1";
+  for (const fld of [f, d1, d2, n]) inputRegion.appendChild(fld.wrap);
+  attachExampleButton(inputRegion, () => { f.input.value = "2.4"; d1.input.value = "2.5"; d2.input.value = "2.5"; n.input.value = "1"; update(); });
+  const oR = makeOutputLine(outputRegion, "Fresnel zone radius", "frz-out-r");
+  const oC = makeOutputLine(outputRegion, "60% clearance needed (first zone)", "frz-out-c");
+  const oNote = makeOutputLine(outputRegion, "Note", "frz-out-n");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeFresnelZoneClearance({ frequency_ghz: readNum(f.input), d1_km: readNum(d1.input), d2_km: readNum(d2.input), zone_number: readNum(n.input) });
+    if (r.error) { oR.textContent = r.error; oC.textContent = "-"; oNote.textContent = ""; return; }
+    oR.textContent = fmt(r.radius_m, 2) + " m (first zone " + fmt(r.first_zone_radius_m, 2) + " m, over " + fmt(r.total_distance_km, 2) + " km)";
+    oC.textContent = fmt(r.clearance_60pct_m, 2) + " m";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const fld of [f, d1, d2, n]) fld.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["fresnel-zone-clearance"] = _renderFresnelZoneClearance;
+
 // dims: in { max_channel_loss_db: dimensionless, attenuation_db_km: dimensionless, connector_count: dimensionless, splice_count: dimensionless } out: { max_length_m: L, max_length_ft: L }
 export function computeFiberMaxLength({ max_channel_loss_db = 0, attenuation_db_km = 0, connector_count = 0, loss_per_connector_db = 0.75, splice_count = 0, loss_per_splice_db = 0.3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

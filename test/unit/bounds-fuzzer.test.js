@@ -12348,7 +12348,31 @@ import {
   computeSpeaker70vLine as _cv28z4, computeStandbyBatterySizing as _cv28z5, computeCoaxRgLoss as _cv28z6, computeStandbyBatteryRuntime as _v687,
   computeCctvRetentionDays as _v696,
   computeWirelessFspl as _v1249,
+  computeFresnelZoneClearance as _v1250,
 } from "../../calc-lowvoltage.js";
+test("bounds: spec-v1250 computeFresnelZoneClearance pins r_n = 17.32 sqrt(n d1 d2/(f D)), the 60% rule, the sqrt(n) scaling, and error seams", () => {
+  // 2.4 GHz, 5 km link, midspan: first-zone radius 12.5 m, 60% 7.5 m.
+  const r = _v1250({ frequency_ghz: 2.4, d1_km: 2.5, d2_km: 2.5, zone_number: 1 });
+  assert.ok(Math.abs(r.first_zone_radius_m - 17.32 * Math.sqrt(2.5 * 2.5 / (2.4 * 5))) < 1e-9);
+  assert.ok(Math.abs(r.first_zone_radius_m - 12.5) < 0.05);
+  assert.ok(Math.abs(r.clearance_60pct_m - 0.6 * r.first_zone_radius_m) < 1e-12 && Math.abs(r.clearance_60pct_m - 7.5) < 0.05);
+  assert.ok(Math.abs(r.total_distance_km - 5) < 1e-12);
+  // The n-th zone radius scales as sqrt(n).
+  const z2 = _v1250({ frequency_ghz: 2.4, d1_km: 2.5, d2_km: 2.5, zone_number: 2 });
+  assert.ok(Math.abs(z2.radius_m - Math.sqrt(2) * r.first_zone_radius_m) < 1e-9);
+  // The zone is widest at midspan: an off-center obstruction has a smaller radius.
+  const off = _v1250({ frequency_ghz: 2.4, d1_km: 1, d2_km: 4, zone_number: 1 });
+  assert.ok(off.first_zone_radius_m < r.first_zone_radius_m);
+  // Higher frequency shrinks the zone (radius proportional to 1/sqrt(f)).
+  const hi = _v1250({ frequency_ghz: 5.8, d1_km: 2.5, d2_km: 2.5, zone_number: 1 });
+  assert.ok(hi.first_zone_radius_m < r.first_zone_radius_m);
+  // Error seams: non-positive frequency/distances, zone < 1, non-finite.
+  assert.ok("error" in _v1250({ frequency_ghz: 0, d1_km: 2.5, d2_km: 2.5 }));
+  assert.ok("error" in _v1250({ frequency_ghz: 2.4, d1_km: 0, d2_km: 2.5 }));
+  assert.ok("error" in _v1250({ frequency_ghz: 2.4, d1_km: 2.5, d2_km: 0 }));
+  assert.ok("error" in _v1250({ frequency_ghz: 2.4, d1_km: 2.5, d2_km: 2.5, zone_number: 0 }));
+  assert.ok("error" in _v1250({ frequency_ghz: Infinity, d1_km: 2.5, d2_km: 2.5 }));
+});
 test("bounds: spec-v1249 computeWirelessFspl pins FSPL = 32.44 + 20log(d) + 20log(f), Pr = Pt+Gt+Gr-FSPL, the 6-dB octaves, and error seams", () => {
   // 2.4 GHz, 1 km, 20 dBm, 12 dBi each end: FSPL 100.04, Pr -56.04.
   const r = _v1249({ distance_km: 1, frequency_mhz: 2400, tx_power_dbm: 20, tx_gain_dbi: 12, rx_gain_dbi: 12 });

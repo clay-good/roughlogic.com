@@ -313,6 +313,18 @@
       "match": "Link distance (km)",
       "family": "RF / wireless link budget (spec-v1249)",
       "justification": "free-space path loss is metric-native: the Friis constant 32.44 is defined for km and MHz, and RF engineering (including US practice) states link distance in km and frequency in MHz; there is no US-customary form of the FSPL equation in common use."
+    },
+    {
+      "module": "calc-lowvoltage.js",
+      "match": "Distance end 1 to obstruction (km)",
+      "family": "RF / Fresnel-zone geometry (spec-v1250)",
+      "justification": "Fresnel-zone radius is metric-native: the 17.32 constant (sqrt(300)) is defined for km and GHz, and RF path surveys state distances in km; no US-customary form of the Fresnel-zone equation is in common use."
+    },
+    {
+      "module": "calc-lowvoltage.js",
+      "match": "Distance end 2 to obstruction (km)",
+      "family": "RF / Fresnel-zone geometry (spec-v1250)",
+      "justification": "Fresnel-zone radius is metric-native: the 17.32 constant (sqrt(300)) is defined for km and GHz, and RF path surveys state distances in km; no US-customary form of the Fresnel-zone equation is in common use."
     }
   ]
 }

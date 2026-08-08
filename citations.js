@@ -11563,6 +11563,17 @@ export const CITATIONS = {
       { name: "Received power", value: "Pr = Pt + Gt + Gr - FSPL (dB); ideal free space, no cable/atmospheric/obstruction loss", source: "Friis transmission equation" },
     ],
   },
+  "fresnel-zone-clearance": {
+    formula: "r_n(m) = 17.32 sqrt(n d1 d2 / (f_GHz D)), d1/d2/D in km, D = d1 + d2 (17.32 = sqrt(300) from r_n = sqrt(n lambda d1 d2 / D)); recommended clearance = 0.6 x first-zone radius.",
+    edition: "The Fresnel zone radius and the 60%-of-first-zone line-of-sight clearance rule, per ITU-R P.526, by name; first-principles diffraction.",
+    freeAccess: "The Fresnel-zone geometry is public first-principles physics and ITU-R P.526 is a free ITU download; the frequency and obstruction geometry are the user's link inputs.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "The Fresnel zone radius and the line-of-sight clearance a point-to-point radio link needs. Radio energy travels through an ellipsoidal zone around the straight line between antennas, so an obstruction below the sightline still robs signal by diffraction. The first-zone radius at the obstruction is r1 = 17.32 sqrt(d1 d2 / (f_GHz D)), with d1 and d2 the distances (km) from each end to the obstruction and D their sum; it is largest at midspan - a 2.4 GHz 5 km link has a 12.5 m first-zone radius at its midpoint. The industry rule keeps at least 60% of the FIRST Fresnel zone clear of terrain, buildings, and trees (7.5 m here); below that the link loses margin to diffraction even with a nominally clear sightline. Higher zones (n = 2, 3) are reported for reference but the 60%-of-first-zone rule governs. Earth curvature (bulge = D^2/8k, k ~ 4/3) and antenna height are added to the clearance budget separately. A planning geometry; the path survey and a link test govern.",
+    assumptions: [
+      { name: "Fresnel radius", value: "r_n = 17.32 sqrt(n d1 d2 / (f_GHz D)), km and GHz", source: "ITU-R P.526 / Fresnel geometry" },
+      { name: "60% rule", value: "keep >= 60% of the first (n=1) zone clear; earth curvature and antenna height are separate", source: "RF path-survey practice" },
+    ],
+  },
   "fiber-max-length": {
     formula: "len_max_m = 1000 x (max_channel_loss - connectors x loss_per_connector - splices x loss_per_splice) / attenuation_dB_km. The inverse of loss = attenuation x length_km + connectors + splices.",
     edition: "Optical link loss budget solved for length, per the TIA-568 / TIA-526 fiber-test methods and the IEEE 802.3 channel-loss limits, by name; first-principles.",

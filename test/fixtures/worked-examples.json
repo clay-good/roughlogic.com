@@ -24068,6 +24068,58 @@
    }
   },
   {
+   "tile_id": "fresnel-zone-clearance",
+   "source_publisher": "ITU-R P.526 / first-principles Fresnel diffraction",
+   "source_title": "2.4 GHz, 5 km link, obstruction at midspan -> 12.5 m first-zone radius, 7.5 m clearance (spec-v1250)",
+   "source_edition_or_year": "r1 = 17.32 sqrt(d1 d2 / (f_GHz D))",
+   "source_section_or_page": "d1 = d2 = 2.5 km, D = 5 km; r1 = 17.32 sqrt(2.5 x 2.5 / (2.4 x 5)) = 17.32 x 0.7217 = 12.50 m; 60% clearance = 0.6 x 12.50 = 7.50 m.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "frequency_ghz": 2.4,
+    "d1_km": 2.5,
+    "d2_km": 2.5,
+    "zone_number": 1
+   },
+   "outputs": {
+    "first_zone_radius_m": {
+     "value": 12.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "clearance_60pct_m": {
+     "value": 7.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fresnel-zone-clearance",
+   "source_publisher": "Fresnel zone (higher-zone cross-check)",
+   "source_title": "the n-th zone radius scales as sqrt(n)",
+   "source_edition_or_year": "r_n = sqrt(n) x r1",
+   "source_section_or_page": "same 2.4 GHz midspan case, zone 2: r2 = 17.32 sqrt(2 x 2.5 x 2.5 / (2.4 x 5)) = 17.68 m = sqrt(2) x 12.50 m.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "frequency_ghz": 2.4,
+    "d1_km": 2.5,
+    "d2_km": 2.5,
+    "zone_number": 2
+   },
+   "outputs": {
+    "radius_m": {
+     "value": 17.68,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fiber-max-length",
    "source_publisher": "TIA-568 / IEEE 802.3 (by name), inverse",
    "source_title": "len_max = 1000 * (max_channel_loss - connector_loss - splice_loss) / attenuation",

@@ -2513,6 +2513,7 @@ cross-check.
 | calc-lowvoltage.js | `computeFiberLossBudget` | `{ length_m = 0, attenuation_db_km = 0, connector_count = 0, loss_per_connecto...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeFiberMaxLength` | `{ max_channel_loss_db = 0, attenuation_db_km = 0, connector_count = 0, loss_p...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeFireAlarmNacVoltageDrop` | `{ nominal_voltage_v = 24, total_current_a = 0.8, run_length_ft = 250, resista...` | _ | _ | _ |
+| calc-lowvoltage.js | `computeFresnelZoneClearance` | `{ frequency_ghz = 0, d1_km = 0, d2_km = 0, zone_number = 1 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeLoopSignalScaling` | `{ signal_ma = 12, range_low = 0, range_high = 100 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeLoopVoltageBudget` | `{ supply_v = 24, transmitter_min_v = 10.5, load_resistance_ohms = 250, wire_r...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeLvCablePullFootage` | `{ drops = 48, avg_run_ft = 120, slack_ft = 15, box_ft = 1000 } = {}` | _ | _ | _ |
@@ -3284,7 +3285,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1870.
+Row count: 1871.
 
 <!-- END function-corpus-v14 -->
 
@@ -3365,7 +3366,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (204 tiles)
+### Group A Electrical (205 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3437,6 +3438,7 @@ per spec-v14 §13.1 second paragraph.
 | `fiber-loss-budget` | Fiber Optic Loss Budget | TIA-568 / TIA-526 / IEEE 802.3 (by name); 300 m OM4 @ 850 nm (3.0 dB/km, 2 connectors @ 0.75 dB) ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fiber-max-length` | Fiber Max Length for a Loss Budget | TIA-568 / IEEE 802.3 (by name), inverse; 2.6 dB budget, OM4 3.0 dB/km, 2 connectors @ 0.75 dB -> 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fire-alarm-nac-voltage-drop` | Fire-Alarm NAC Circuit Voltage Drop (End-of-Line) | fire-alarm NAC voltage drop (NFPA 72); CUSTV = 0.85*24 = 20.4; loop R = 2*250*(2.525/1000) = 1.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `fresnel-zone-clearance` | Fresnel Zone Radius and 60% Clearance | ITU-R P.526 / first-principles Fresne...; d1 = d2 = 2.5 km, D = 5 km; r1 = 17.32 sqrt(2.5 x 2.5 / (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `generator-conductor-445` | Generator Output Conductor at 115% (NEC 445.13) | NEC 2023 445.13(A); spec-v493 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `generator-fuel-runtime` | Generator Fuel Runtime and Backup Duration | generator fuel runtime (first-princip...; spec-v487 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `generator-motor-starting` | Generator Sizing for Motor Starting | NEC 430.110 + manufacturer locked-rot...; 25 hp Code G + 10 hp Code F + 5 hp Code B motors, 15 kW n... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5092,6 +5094,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1622. Fixture-covered or reference-cadence: 1622 / 1622.
+Tile count: 1623. Fixture-covered or reference-cadence: 1623 / 1623.
 
 <!-- END tile-index-v14 -->

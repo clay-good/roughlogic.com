@@ -39831,6 +39831,21 @@
       "kind": "question"
     },
     {
+      "term": "fresnel zone",
+      "target": "fresnel-zone-clearance",
+      "kind": "industry"
+    },
+    {
+      "term": "line of sight clearance wireless link",
+      "target": "fresnel-zone-clearance",
+      "kind": "question"
+    },
+    {
+      "term": "60 percent fresnel clearance",
+      "target": "fresnel-zone-clearance",
+      "kind": "question"
+    },
+    {
       "term": "db loss per connector and splice",
       "target": "fiber-loss-budget",
       "kind": "question"
