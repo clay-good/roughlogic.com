@@ -16107,6 +16107,18 @@ export const CITATIONS = {
       { name: "Range/use", value: "qo/qi about 0.1 to 0.8, single-stage preliminary size, final by stage-storage routing", source: "TR-55 Ch. 6 limitations" },
     ],
   },
+  "culvert-inlet-control": {
+    formula: "Inlet control HW/D (circular barrel): unsubmerged Form 1 HW/D = Hc/D + K[Q/(A sqrt D)]^M + Ks S; submerged HW/D = c[Q/(A sqrt D)]^2 + Y + Ks S; Ks = -0.5 (mitered +0.7). Barrel A = pi D^2/4; critical depth from g A^3 = Q^2 T on the circular segment, Hc = dc + Vc^2/2g. HW = (HW/D) D.",
+    edition: "FHWA HDS-5, Hydraulic Design of Highway Culverts, 3rd ed. (FHWA-HIF-12-026, 2012), Appendix A equations A.1 and A.3 and the Table A.1 constants for circular concrete and corrugated-metal pipe, by name; the equation assembly and slope term verified against the HDS-5 Appendix A worked values, and the circular critical-depth solve against the Froude = 1 definition.",
+    freeAccess: "HDS-5 is a public-domain FHWA publication (FHWA-HIF-12-026); the inlet-control equations and the Table A.1 constants are reproduced from it. Diameter, discharge, slope, and the inlet configuration are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "FHWA HDS-5 culvert headwater by INLET control for a circular barrel: the inlet - its size, shape, and edge - not the barrel length or the outlet, sets the ponding depth. Two regimes: unsubmerged at low flow (the inlet acts like a weir) uses HW/D = Hc/D + K[Q/(A sqrt D)]^M + Ks S, with the specific head at critical depth Hc = dc + Vc^2/2g found by iterating the circular-segment geometry (A = (D^2/8)(theta - sin theta), T = D sin(theta/2)); submerged at high flow (the inlet acts like an orifice) uses HW/D = c[Q/(A sqrt D)]^2 + Y + Ks S; between flow factors 3.5 and 4.0 the two are blended. Ks = -0.5 (mitered inlets +0.7) is the barrel-slope correction, and the K, M, c, Y constants are the HDS-5 Table A.1 values for the chosen shape and inlet edge. The ACTUAL headwater is the GREATER of inlet and outlet control - outlet control (barrel friction, tailwater, length) is a separate calculation - so this is one of two checks, not the final answer. HW is measured above the inlet invert. A design aid; the HDS-5 nomographs themselves carry about +/-10%, and the engineer of record and the DOT drainage manual govern.",
+    assumptions: [
+      { name: "Unsubmerged Form 1", value: "HW/D = Hc/D + K[Q/(A sqrt D)]^M + Ks S; Hc from the circular critical depth", source: "HDS-5 Eq A.1, Table A.1" },
+      { name: "Submerged", value: "HW/D = c[Q/(A sqrt D)]^2 + Y + Ks S, above flow factor ~4.0", source: "HDS-5 Eq A.3, Table A.1" },
+      { name: "Slope / scope", value: "Ks = -0.5 (mitered +0.7); circular barrels only; inlet control only (outlet control is a separate check)", source: "HDS-5 Appendix A" },
+    ],
+  },
   "tr55-time-of-concentration": {
     formula: "Tc = Tt_sheet + Tt_shallow + Tt_channel. Sheet (TR-55 Eq 3-3): Tt = 0.007 (n L)^0.8 / (P2^0.5 s^0.4) hr. Shallow concentrated: V = 16.1345 sqrt(s) unpaved / 20.3282 sqrt(s) paved, Tt = L/(3600 V) hr. Channel (Manning): V = (1.49/n) R^(2/3) sqrt(s), Tt = L/(3600 V) hr.",
     edition: "The NRCS TR-55 (Urban Hydrology for Small Watersheds, 1986) Chapter 3 velocity method for time of concentration, by name; constants verified against the TR-55 Chapter 3 worked example.",

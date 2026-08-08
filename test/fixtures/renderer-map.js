@@ -318,6 +318,7 @@ export const RENDERER_MAP = {
   "pipe-partial-flow-depth": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },
   "tr55-time-of-concentration": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },
   "composite-curve-number": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },
+  "culvert-inlet-control": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },
   "curve-number-runoff": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },
   "tr55-graphical-peak-discharge": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },
   "tr55-detention-storage": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },

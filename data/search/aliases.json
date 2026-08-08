@@ -18371,6 +18371,51 @@
       "kind": "question"
     },
     {
+      "term": "culvert inlet control",
+      "target": "culvert-inlet-control",
+      "kind": "industry"
+    },
+    {
+      "term": "HDS-5 headwater",
+      "target": "culvert-inlet-control",
+      "kind": "industry"
+    },
+    {
+      "term": "culvert headwater depth",
+      "target": "culvert-inlet-control",
+      "kind": "industry"
+    },
+    {
+      "term": "HW/D culvert",
+      "target": "culvert-inlet-control",
+      "kind": "adjacent"
+    },
+    {
+      "term": "culvert sizing",
+      "target": "culvert-inlet-control",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pipe culvert entrance ponding",
+      "target": "culvert-inlet-control",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how high will water pond at my culvert",
+      "target": "culvert-inlet-control",
+      "kind": "question"
+    },
+    {
+      "term": "will this culvert overtop the road",
+      "target": "culvert-inlet-control",
+      "kind": "question"
+    },
+    {
+      "term": "headwater for a 36 inch pipe at this flow",
+      "target": "culvert-inlet-control",
+      "kind": "question"
+    },
+    {
       "term": "rational method time",
       "target": "time-of-concentration",
       "kind": "adjacent"

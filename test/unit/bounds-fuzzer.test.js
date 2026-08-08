@@ -10905,6 +10905,37 @@ test("bounds: spec-v1268 computeRadiantHeatExchange pins the Stefan-Boltzmann ex
   assert.ok("error" in _v1268({ area_ft2: 10, emissivity: 0.9, surface_temp_f: -500, surroundings_temp_f: 70 }));
   assert.ok("error" in _v1268({ area_ft2: 10, emissivity: 0.9, surface_temp_f: Infinity, surroundings_temp_f: 70 }));
 });
+import { computeCulvertInletControl as _v1269 } from "../../calc-drainage.js";
+test("bounds: spec-v1269 computeCulvertInletControl pins the HDS-5 inlet-control regimes, critical depth, monotonicity, and error seams", () => {
+  // 36 in concrete pipe, square edge w/headwall, 30 cfs, 1% slope: unsubmerged (flow factor 2.45).
+  const r = _v1269({ diameter_in: 36, flow_cfs: 30, slope: 0.01, config: "concrete_square_headwall" });
+  assert.ok(r.regime === "unsubmerged" && Math.abs(r.flow_factor - 2.4504) < 1e-3);
+  assert.ok(Math.abs(r.hw_ft - 2.6735) < 1e-3 && Math.abs(r.hw_over_d - 0.89116) < 1e-4);
+  // Critical depth satisfies the Froude = 1 definition g A_c^3 = Q^2 T_c on the circular segment.
+  const D = 3, th = 2 * Math.acos(1 - 2 * r.dc_ft / D);
+  const Ac = (D * D / 8) * (th - Math.sin(th)), Tc = D * Math.sin(th / 2);
+  assert.ok(Math.abs(32.2 * Math.pow(Ac, 3) - 30 * 30 * Tc) < 1e-3);
+  assert.ok(Math.abs(r.hw_ft - r.hw_over_d * r.d_ft) < 1e-9 && r.hw_ft > r.dc_ft);
+  // Same barrel as CMP projecting at 60 cfs is submerged; the orifice equation governs.
+  const sub = _v1269({ diameter_in: 36, flow_cfs: 60, slope: 0.01, config: "cmp_projecting" });
+  assert.ok(sub.regime === "submerged" && Math.abs(sub.hw_ft - 5.5894) < 1e-3);
+  // Headwater rises monotonically with discharge (weir then orifice, no dip at the transition).
+  let prev = -Infinity;
+  for (const q of [10, 30, 60, 90, 120, 200]) {
+    const hw = _v1269({ diameter_in: 36, flow_cfs: q, slope: 0.01, config: "concrete_groove_headwall" }).hw_ft;
+    assert.ok(hw > prev); prev = hw;
+  }
+  // The mitered inlet carries the +0.7 slope correction, so steeper slope raises its HW (others fall).
+  const mLow = _v1269({ diameter_in: 36, flow_cfs: 30, slope: 0.0, config: "cmp_mitered" }).hw_ft;
+  const mHigh = _v1269({ diameter_in: 36, flow_cfs: 30, slope: 0.06, config: "cmp_mitered" }).hw_ft;
+  assert.ok(mHigh > mLow);
+  // Error seams: non-positive diameter, non-positive flow, negative slope, unknown config, non-finite.
+  assert.ok("error" in _v1269({ diameter_in: 0, flow_cfs: 30, slope: 0.01, config: "concrete_square_headwall" }));
+  assert.ok("error" in _v1269({ diameter_in: 36, flow_cfs: 0, slope: 0.01, config: "concrete_square_headwall" }));
+  assert.ok("error" in _v1269({ diameter_in: 36, flow_cfs: 30, slope: -0.01, config: "concrete_square_headwall" }));
+  assert.ok("error" in _v1269({ diameter_in: 36, flow_cfs: 30, slope: 0.01, config: "bogus" }));
+  assert.ok("error" in _v1269({ diameter_in: Infinity, flow_cfs: 30, slope: 0.01, config: "concrete_square_headwall" }));
+});
 test("bounds: spec-v53 linear-interpolation pins y + slope + extrapolation flag + reject non-finite", () => {
   // (0,10),(10,30), x=4 -> y=18, slope 2, within range
   const a = _cli({ x1: 0, y1: 10, x2: 10, y2: 30, x: 4 });

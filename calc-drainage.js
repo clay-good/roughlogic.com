@@ -1010,3 +1010,108 @@ function renderCompositeCurveNumber(inputRegion, outputRegion, citationEl) {
   update();
 }
 DRAINAGE_RENDERERS["composite-curve-number"] = renderCompositeCurveNumber;
+
+// ===================== spec-v1269: FHWA HDS-5 culvert headwater by inlet control =====================
+// The Manning and TR-55 tiles size the pipe and the storm; none answered the
+// culvert question -- how high does the water pond at the entrance? Inlet
+// control is the case where the inlet (its size, shape, and edge), NOT the
+// barrel length or the outlet, sets the headwater. HDS-5 (FHWA-HIF-12-026)
+// Appendix A gives the two-regime equations; Table A.1 gives the constants.
+// Circular barrels only here (all Table A.1 circular rows are Form 1), so the
+// unsubmerged branch needs the specific head at critical depth, found by
+// iterating the same circular-segment geometry the partial-flow tile uses.
+const _CULVERT_INLET = {
+  concrete_square_headwall:   { K: 0.0098, M: 2.0,  c: 0.0398, Y: 0.67, Ks: -0.5, label: "Concrete pipe, square edge with headwall" },
+  concrete_groove_headwall:   { K: 0.0018, M: 2.0,  c: 0.0292, Y: 0.74, Ks: -0.5, label: "Concrete pipe, groove end with headwall" },
+  concrete_groove_projecting: { K: 0.0045, M: 2.0,  c: 0.0317, Y: 0.69, Ks: -0.5, label: "Concrete pipe, groove end projecting" },
+  cmp_headwall:               { K: 0.0078, M: 2.0,  c: 0.0379, Y: 0.69, Ks: -0.5, label: "Corrugated metal (CMP), headwall" },
+  cmp_mitered:                { K: 0.0210, M: 1.33, c: 0.0463, Y: 0.75, Ks: 0.7,  label: "Corrugated metal (CMP), mitered to slope" },
+  cmp_projecting:             { K: 0.0340, M: 1.50, c: 0.0553, Y: 0.54, Ks: -0.5, label: "Corrugated metal (CMP), projecting" },
+};
+
+// dims: in { diameter_in: L, flow_cfs: L^3 T^-1, slope: dimensionless, config: dimensionless } out: { d_ft: L, barrel_area_ft2: L^2, dc_ft: L, hc_ft: L, hw_ft: L, hw_over_d: dimensionless, hc_over_d: dimensionless }
+export function computeCulvertInletControl({ diameter_in = 0, flow_cfs = 0, slope = 0, config = "concrete_groove_headwall" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const C = _CULVERT_INLET[config];
+  if (!C) return { error: "Unknown culvert shape / inlet configuration." };
+  if (!(diameter_in > 0)) return { error: "Culvert diameter must be positive (in)." };
+  if (!(flow_cfs > 0)) return { error: "Discharge must be positive (cfs)." };
+  if (!(slope >= 0)) return { error: "Barrel slope must be zero or positive (ft/ft)." };
+  const G = 32.2;
+  const D = diameter_in / 12;
+  const A = Math.PI * D * D / 4;                 // full barrel area, ft^2
+  const Q = flow_cfs;
+  // HDS-5 flow factor Q/(A D^0.5); US-customary unit constant Ku = 1.0.
+  const flowFactor = Q / (A * Math.sqrt(D));
+  // Critical depth in the circular barrel: at critical flow the Froude number
+  // is 1, i.e. g A_c^3 = Q^2 T_c. A_c = (D^2/8)(theta - sin theta), top width
+  // T = D sin(theta/2), depth y = (D/2)(1 - cos(theta/2)). g A^3 - Q^2 T rises
+  // monotonically from negative (small theta) to positive (near full), so it
+  // has a single root; bisect on theta.
+  const areaOf = (th) => (D * D / 8) * (th - Math.sin(th));
+  const topOf = (th) => D * Math.sin(th / 2);
+  let lo = 1e-9, hi = 2 * Math.PI * (1 - 1e-9);
+  for (let i = 0; i < 200; i++) {
+    const mid = (lo + hi) / 2;
+    if (G * Math.pow(areaOf(mid), 3) - Q * Q * topOf(mid) < 0) lo = mid; else hi = mid;
+  }
+  const thetaC = (lo + hi) / 2;
+  const ac = areaOf(thetaC);
+  const dc = (D / 2) * (1 - Math.cos(thetaC / 2));
+  const vc = Q / ac;
+  const hc = dc + vc * vc / (2 * G);             // specific head at critical depth
+  const hcD = hc / D;
+  // Unsubmerged Form 1 (Eq A.1) and submerged (Eq A.3); Ks S is the slope term.
+  const hwUns = hcD + C.K * Math.pow(flowFactor, C.M) + C.Ks * slope;
+  const hwSub = C.c * flowFactor * flowFactor + C.Y + C.Ks * slope;
+  let hwD, regime;
+  if (flowFactor <= 3.5) { hwD = hwUns; regime = "unsubmerged"; }
+  else if (flowFactor >= 4.0) { hwD = hwSub; regime = "submerged"; }
+  else { const w = (flowFactor - 3.5) / 0.5; hwD = (1 - w) * hwUns + w * hwSub; regime = "transition"; }
+  const hw = hwD * D;
+  if (![dc, hc, hwD, hw].every(Number.isFinite)) return { error: "Inlet-control headwater is not a finite value; check the inputs." };
+  return {
+    d_ft: D, barrel_area_ft2: A, dc_ft: dc, hc_ft: hc, hw_ft: hw,
+    hw_over_d: hwD, hc_over_d: hcD, flow_factor: flowFactor, vc_fps: vc,
+    regime, config_label: C.label, submerged: flowFactor >= 4.0,
+    note: "FHWA HDS-5 culvert headwater by INLET control for a circular barrel: the inlet (its size, shape, and edge) - not the barrel length or the outlet - sets the ponding depth. Two regimes: unsubmerged at low flow (the inlet acts like a weir) uses HW/D = Hc/D + K[Q/(A D^0.5)]^M + Ks S, with the specific head at critical depth Hc = dc + Vc^2/2g found by iterating the circular-segment geometry; submerged at high flow (the inlet acts like an orifice) uses HW/D = c[Q/(A D^0.5)]^2 + Y + Ks S; between flow factors 3.5 and 4.0 the two are blended. Ks = -0.5 (mitered inlets +0.7) is the barrel-slope correction, and the K, M, c, Y constants are the HDS-5 Table A.1 values for the chosen shape and inlet edge. The ACTUAL headwater is the GREATER of inlet and outlet control - outlet control (barrel friction, tailwater, length) is a separate calculation - so this is one of the two checks, not the final answer. HW is measured above the inlet invert. A design aid; the HDS-5 nomographs themselves carry about +/-10%, and the engineer of record and the DOT drainage manual govern.",
+  };
+}
+export const culvertInletControlExample = { inputs: { diameter_in: 36, flow_cfs: 30, slope: 0.01, config: "concrete_square_headwall" } };
+
+function renderCulvertInletControl(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: FHWA HDS-5, Hydraulic Design of Highway Culverts, 3rd ed. (FHWA-HIF-12-026), Appendix A inlet-control equations A.1 (unsubmerged Form 1) and A.3 (submerged) with the Table A.1 constants for circular concrete and corrugated-metal pipe. Critical depth for the unsubmerged branch is solved from g A^3 = Q^2 T on the circular-segment geometry. Inlet control only (outlet control is a separate check); the actual headwater is the greater of the two. A public-domain US DOT reference. A design aid; the engineer of record and the DOT drainage manual govern.";
+  attachExampleButton(inputRegion, () => { dia.input.value = "36"; q.input.value = "30"; s.input.value = "0.01"; cfg.select.value = "concrete_square_headwall"; update(); });
+  const dia = makeNumber("Culvert diameter (in)", "cic-d", { step: "any", min: "0" });
+  const q = makeNumber("Design discharge Q (cfs)", "cic-q", { step: "any", min: "0" });
+  const s = makeNumber("Barrel slope S (ft/ft)", "cic-s", { step: "any", min: "0", value: "0.01" });
+  const cfg = makeSelect("Shape and inlet edge", "cic-cfg", Object.keys(_CULVERT_INLET).map((k) => ({ value: k, label: _CULVERT_INLET[k].label })));
+  for (const f of [dia, q, s]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(cfg.wrap);
+  const oHW = makeOutputLine(outputRegion, "Headwater HW (inlet control)", "cic-out-hw");
+  const oHWD = makeOutputLine(outputRegion, "HW / D", "cic-out-hwd");
+  const oReg = makeOutputLine(outputRegion, "Flow regime", "cic-out-reg");
+  const oDc = makeOutputLine(outputRegion, "Critical depth dc", "cic-out-dc");
+  const oNote = makeOutputLine(outputRegion, "Note", "cic-out-n");
+  const update = debounce(() => {
+    const r = computeCulvertInletControl({
+      diameter_in: Number(dia.input.value) || 0,
+      flow_cfs: Number(q.input.value) || 0,
+      slope: s.input.value === "" ? 0 : Number(s.input.value) || 0,
+      config: cfg.select.value,
+    });
+    if (r.error) {
+      oHW.textContent = r.error;
+      for (const o of [oHWD, oReg, oDc, oNote]) o.textContent = "-";
+      return;
+    }
+    oHW.textContent = fmt(r.hw_ft, 2) + " ft above the inlet invert";
+    oHWD.textContent = fmt(r.hw_over_d, 3) + (r.hw_over_d > 1.5 ? " -- over 1.5; check the allowable headwater and outlet control" : "");
+    oReg.textContent = r.regime + " (flow factor Q/(A sqrt D) = " + fmt(r.flow_factor, 2) + ")";
+    oDc.textContent = fmt(r.dc_ft, 2) + " ft (d/D " + fmt(r.dc_ft / r.d_ft, 2) + "), specific head Hc " + fmt(r.hc_ft, 2) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [dia, q, s]) f.input.addEventListener("input", update);
+  cfg.select.addEventListener("change", update);
+}
+DRAINAGE_RENDERERS["culvert-inlet-control"] = renderCulvertInletControl;
