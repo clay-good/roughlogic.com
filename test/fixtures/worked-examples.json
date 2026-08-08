@@ -24014,6 +24014,60 @@
    }
   },
   {
+   "tile_id": "wireless-fspl",
+   "source_publisher": "Friis transmission equation / ITU-R P.525",
+   "source_title": "2.4 GHz over 1 km -> 100.0 dB FSPL, -56.0 dBm received (20 dBm, 12 dBi each end) (spec-v1249)",
+   "source_edition_or_year": "FSPL = 32.44 + 20 log10(d_km) + 20 log10(f_MHz)",
+   "source_section_or_page": "FSPL = 32.44 + 20 log10(1) + 20 log10(2400) = 32.44 + 0 + 67.60 = 100.04 dB; Pr = 20 + 12 + 12 - 100.04 = -56.04 dBm.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "distance_km": 1,
+    "frequency_mhz": 2400,
+    "tx_power_dbm": 20,
+    "tx_gain_dbi": 12,
+    "rx_gain_dbi": 12
+   },
+   "outputs": {
+    "fspl_db": {
+     "value": 100.04,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "rx_power_dbm": {
+     "value": -56.04,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wireless-fspl",
+   "source_publisher": "Friis / FSPL (6-dB-per-octave cross-check)",
+   "source_title": "doubling distance or frequency adds ~6 dB of path loss",
+   "source_edition_or_year": "20 log10(2) = 6.02 dB",
+   "source_section_or_page": "the same 2.4 GHz link at 2 km loses 106.06 dB, 6.02 dB more than at 1 km; at 5.8 GHz over 1 km it is 107.71 dB.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "distance_km": 2,
+    "frequency_mhz": 2400,
+    "tx_power_dbm": 20,
+    "tx_gain_dbi": 12,
+    "rx_gain_dbi": 12
+   },
+   "outputs": {
+    "fspl_db": {
+     "value": 106.06,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fiber-max-length",
    "source_publisher": "TIA-568 / IEEE 802.3 (by name), inverse",
    "source_title": "len_max = 1000 * (max_channel_loss - connector_loss - splice_loss) / attenuation",

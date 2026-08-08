@@ -39816,6 +39816,21 @@
       "kind": "question"
     },
     {
+      "term": "free space path loss",
+      "target": "wireless-fspl",
+      "kind": "industry"
+    },
+    {
+      "term": "friis equation",
+      "target": "wireless-fspl",
+      "kind": "industry"
+    },
+    {
+      "term": "wireless bridge link distance db loss",
+      "target": "wireless-fspl",
+      "kind": "question"
+    },
+    {
       "term": "db loss per connector and splice",
       "target": "fiber-loss-budget",
       "kind": "question"

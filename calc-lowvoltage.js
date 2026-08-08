@@ -101,6 +101,55 @@ function _renderFiberLossBudget(inputRegion, outputRegion, citationEl) {
 }
 LOWVOLTAGE_RENDERERS["fiber-loss-budget"] = _renderFiberLossBudget;
 
+// ---------------------------------------------------------------------
+// spec-v1249: free-space path loss (Friis) for a wireless bridge/point-to-point link.
+// RF link math was entirely absent; this is the wireless sibling of the fiber/coax loss budgets.
+// FSPL(dB) = 32.44 + 20 log10(d_km) + 20 log10(f_MHz); received power Pr = Pt + Gt + Gr - FSPL.
+// Friis transmission equation / ITU-R P.525 (free). The 32.44 constant is for km and MHz.
+// dims: in { distance_km: dimensionless, frequency_mhz: dimensionless, tx_power_dbm: dimensionless, tx_gain_dbi: dimensionless, rx_gain_dbi: dimensionless } out: { fspl_db: dimensionless, rx_power_dbm: dimensionless }
+export function computeWirelessFspl({ distance_km = 0, frequency_mhz = 0, tx_power_dbm = 20, tx_gain_dbi = 0, rx_gain_dbi = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const d = Number(distance_km);
+  const f = Number(frequency_mhz);
+  const pt = Number(tx_power_dbm);
+  const gt = Number(tx_gain_dbi);
+  const gr = Number(rx_gain_dbi);
+  if (!(d > 0)) return { error: "Distance must be positive (km)." };
+  if (!(f > 0)) return { error: "Frequency must be positive (MHz)." };
+  if (![pt, gt, gr].every(Number.isFinite)) return { error: "Transmit power and antenna gains must be numbers (dBm / dBi)." };
+  const fspl_db = 32.44 + 20 * Math.log10(d) + 20 * Math.log10(f);
+  const rx_power_dbm = pt + gt + gr - fspl_db;
+  if (![fspl_db, rx_power_dbm].every(Number.isFinite)) return { error: "Path-loss math is not a finite value." };
+  return {
+    fspl_db, rx_power_dbm,
+    note: "The free-space path loss (FSPL) of a line-of-sight radio link and the resulting received signal, the wireless sibling of the fiber and coax loss budgets. From the Friis transmission equation, FSPL(dB) = 32.44 + 20 log10(d_km) + 20 log10(f_MHz) - the 32.44 constant is for distance in kilometers and frequency in megahertz, and the loss climbs 6 dB every time either the distance or the frequency doubles. A 2.4 GHz link over 1 km loses 100.0 dB; the same distance at 5.8 GHz loses about 107.7 dB, which is why higher bands need more antenna gain or shorter hops. The received power is Pr = Pt + Gt + Gr - FSPL (all in dB), so a 20 dBm radio with 12 dBi antennas each end over that 1 km 2.4 GHz path delivers -56 dBm at the far receiver. This is IDEAL free space only: it excludes cable and connector loss, atmospheric and rain attenuation, obstruction and Fresnel-zone diffraction, multipath, and terrain - real links add a fade margin over this. Compare Pr against the receiver's sensitivity (the fade margin) separately. A planning estimate; the path survey and radio spec govern.",
+  };
+}
+export const wirelessFsplExample = { inputs: { distance_km: 1, frequency_mhz: 2400, tx_power_dbm: 20, tx_gain_dbi: 12, rx_gain_dbi: 12 } };
+function _renderWirelessFspl(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: free-space path loss FSPL(dB) = 32.44 + 20 log10(d_km) + 20 log10(f_MHz) and received power Pr = Pt + Gt + Gr - FSPL, from the Friis transmission equation / ITU-R P.525 (free); the 32.44 constant is for km and MHz. Ideal free space only - cable/connector loss, rain and atmospheric attenuation, obstruction/Fresnel diffraction, and multipath are separate; a real link carries a fade margin over this. The path survey and radio spec govern.";
+  const d = makeNumber("Link distance (km)", "fspl-d", { step: "any", min: "0", value: "1" }); d.input.value = "1";
+  const f = makeNumber("Frequency (MHz)", "fspl-f", { step: "any", min: "0", value: "2400" }); f.input.value = "2400";
+  const pt = makeNumber("Transmit power (dBm)", "fspl-pt", { step: "any", value: "20" }); pt.input.value = "20";
+  const gt = makeNumber("Transmit antenna gain (dBi)", "fspl-gt", { step: "any", value: "12" }); gt.input.value = "12";
+  const gr = makeNumber("Receive antenna gain (dBi)", "fspl-gr", { step: "any", value: "12" }); gr.input.value = "12";
+  for (const fld of [d, f, pt, gt, gr]) inputRegion.appendChild(fld.wrap);
+  attachExampleButton(inputRegion, () => { d.input.value = "1"; f.input.value = "2400"; pt.input.value = "20"; gt.input.value = "12"; gr.input.value = "12"; update(); });
+  const oFspl = makeOutputLine(outputRegion, "Free-space path loss", "fspl-out-l");
+  const oRx = makeOutputLine(outputRegion, "Received power (before margin)", "fspl-out-rx");
+  const oNote = makeOutputLine(outputRegion, "Note", "fspl-out-n");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeWirelessFspl({ distance_km: readNum(d.input), frequency_mhz: readNum(f.input), tx_power_dbm: readNum(pt.input), tx_gain_dbi: readNum(gt.input), rx_gain_dbi: readNum(gr.input) });
+    if (r.error) { oFspl.textContent = r.error; oRx.textContent = "-"; oNote.textContent = ""; return; }
+    oFspl.textContent = fmt(r.fspl_db, 2) + " dB";
+    oRx.textContent = fmt(r.rx_power_dbm, 1) + " dBm";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const fld of [d, f, pt, gt, gr]) fld.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["wireless-fspl"] = _renderWirelessFspl;
+
 // dims: in { max_channel_loss_db: dimensionless, attenuation_db_km: dimensionless, connector_count: dimensionless, splice_count: dimensionless } out: { max_length_m: L, max_length_ft: L }
 export function computeFiberMaxLength({ max_channel_loss_db = 0, attenuation_db_km = 0, connector_count = 0, loss_per_connector_db = 0.75, splice_count = 0, loss_per_splice_db = 0.3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

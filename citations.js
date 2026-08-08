@@ -11552,6 +11552,17 @@ export const CITATIONS = {
       { name: "Component losses", value: "per-connector 0.75 dB and per-splice 0.3 dB defaults; user-supplied", source: "TIA-568 component data" },
     ],
   },
+  "wireless-fspl": {
+    formula: "FSPL(dB) = 32.44 + 20 log10(d_km) + 20 log10(f_MHz); received power Pr = Pt + Gt + Gr - FSPL (all dB). The 32.44 constant is for distance in km and frequency in MHz.",
+    edition: "The Friis transmission equation / free-space path loss, per ITU-R P.525, by name; first-principles RF.",
+    freeAccess: "The Friis / FSPL relation is public first-principles physics and ITU-R P.525 is a free ITU download; the distance, frequency, power, and antenna gains are the user's link inputs.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "The free-space path loss of a line-of-sight radio link and the resulting received signal, the wireless sibling of the fiber and coax loss budgets. FSPL(dB) = 32.44 + 20 log10(d_km) + 20 log10(f_MHz), so the loss climbs 6 dB every time distance or frequency doubles - a 2.4 GHz link over 1 km loses 100.0 dB, and at 5.8 GHz about 107.7 dB. The received power is Pr = Pt + Gt + Gr - FSPL, so a 20 dBm radio with 12 dBi antennas each end over that 1 km 2.4 GHz path delivers -56 dBm. This is IDEAL free space only: it excludes cable and connector loss, atmospheric and rain attenuation, obstruction and Fresnel-zone diffraction, multipath, and terrain, and a real link carries a fade margin over this - compare the received power to the receiver sensitivity separately. A planning estimate; the path survey and radio spec govern.",
+    assumptions: [
+      { name: "Free-space path loss", value: "FSPL = 32.44 + 20 log10(d_km) + 20 log10(f_MHz)", source: "Friis / ITU-R P.525" },
+      { name: "Received power", value: "Pr = Pt + Gt + Gr - FSPL (dB); ideal free space, no cable/atmospheric/obstruction loss", source: "Friis transmission equation" },
+    ],
+  },
   "fiber-max-length": {
     formula: "len_max_m = 1000 x (max_channel_loss - connectors x loss_per_connector - splices x loss_per_splice) / attenuation_dB_km. The inverse of loss = attenuation x length_km + connectors + splices.",
     edition: "Optical link loss budget solved for length, per the TIA-568 / TIA-526 fiber-test methods and the IEEE 802.3 channel-loss limits, by name; first-principles.",

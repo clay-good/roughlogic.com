@@ -12347,7 +12347,27 @@ import {
   computeFiberLossBudget as _cv28z1, computeCableTrayFill as _cv28z2, computeCctvStorage as _cv28z3, computeFiberMaxLength as _v693,
   computeSpeaker70vLine as _cv28z4, computeStandbyBatterySizing as _cv28z5, computeCoaxRgLoss as _cv28z6, computeStandbyBatteryRuntime as _v687,
   computeCctvRetentionDays as _v696,
+  computeWirelessFspl as _v1249,
 } from "../../calc-lowvoltage.js";
+test("bounds: spec-v1249 computeWirelessFspl pins FSPL = 32.44 + 20log(d) + 20log(f), Pr = Pt+Gt+Gr-FSPL, the 6-dB octaves, and error seams", () => {
+  // 2.4 GHz, 1 km, 20 dBm, 12 dBi each end: FSPL 100.04, Pr -56.04.
+  const r = _v1249({ distance_km: 1, frequency_mhz: 2400, tx_power_dbm: 20, tx_gain_dbi: 12, rx_gain_dbi: 12 });
+  assert.ok(Math.abs(r.fspl_db - (32.44 + 20 * Math.log10(1) + 20 * Math.log10(2400))) < 1e-9);
+  assert.ok(Math.abs(r.fspl_db - 100.04) < 0.05);
+  assert.ok(Math.abs(r.rx_power_dbm - (20 + 12 + 12 - r.fspl_db)) < 1e-9 && Math.abs(r.rx_power_dbm - (-56.04)) < 0.05);
+  // +6.02 dB per doubling of distance, and per doubling of frequency.
+  const d2 = _v1249({ distance_km: 2, frequency_mhz: 2400 });
+  const f2 = _v1249({ distance_km: 1, frequency_mhz: 4800 });
+  assert.ok(Math.abs(d2.fspl_db - r.fspl_db - 20 * Math.log10(2)) < 1e-9);
+  assert.ok(Math.abs(f2.fspl_db - r.fspl_db - 20 * Math.log10(2)) < 1e-9);
+  // Antenna gain raises received power dB-for-dB.
+  const g = _v1249({ distance_km: 1, frequency_mhz: 2400, tx_power_dbm: 20, tx_gain_dbi: 15, rx_gain_dbi: 12 });
+  assert.ok(Math.abs(g.rx_power_dbm - r.rx_power_dbm - 3) < 1e-9);
+  // Error seams: non-positive distance/frequency, non-finite gain.
+  assert.ok("error" in _v1249({ distance_km: 0, frequency_mhz: 2400 }));
+  assert.ok("error" in _v1249({ distance_km: 1, frequency_mhz: 0 }));
+  assert.ok("error" in _v1249({ distance_km: 1, frequency_mhz: 2400, tx_power_dbm: Infinity }));
+});
 
 test("bounds: spec-v28 low-voltage cabling tiles pin constants + reject non-finite", () => {
   // fiber-loss-budget: 300 m OM4 + 2 connectors -> 2.4 dB; length 0 rejected

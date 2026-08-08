@@ -307,6 +307,12 @@
       "match": "Distance (km)",
       "family": "secondary output (spec-v593 section 1)",
       "justification": "lightning-countdown secondary metric output line; the primary Distance (mi) output line precedes it -- the sanctioned US-primary + metric-secondary pattern."
+    },
+    {
+      "module": "calc-lowvoltage.js",
+      "match": "Link distance (km)",
+      "family": "RF / wireless link budget (spec-v1249)",
+      "justification": "free-space path loss is metric-native: the Friis constant 32.44 is defined for km and MHz, and RF engineering (including US practice) states link distance in km and frequency in MHz; there is no US-customary form of the FSPL equation in common use."
     }
   ]
 }

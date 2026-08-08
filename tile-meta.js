@@ -467,7 +467,7 @@ const _TILES = [
   ["equal-spacing", "G"],
 
   // v28 low-voltage / data / security cabling (Group A pending Group-Z signoff)
-  ["fiber-loss-budget", "A"], ["fiber-max-length", "A"], ["cable-tray-fill", "A"], ["cctv-storage", "A"], ["cctv-retention-days", "A"],
+  ["fiber-loss-budget", "A"], ["fiber-max-length", "A"], ["wireless-fspl", "A"], ["cable-tray-fill", "A"], ["cctv-storage", "A"], ["cctv-retention-days", "A"],
   ["speaker-70v-line", "A"], ["standby-battery-sizing", "A"], ["standby-battery-runtime", "A"], ["coax-rg-loss", "A"],
   ["camera-lens-fov", "A"], ["camera-max-distance-for-ppf", "A"], ["ceiling-speaker-coverage", "A"], ["ceiling-speaker-coverage-angle", "A"], ["structured-cabling-channel", "A"], ["lv-cable-pull-footage", "A"], ["cable-support-jhook", "A"], ["access-control-power-supply", "A"], ["fire-alarm-nac-voltage-drop", "A"], ["loop-signal-scaling", "A"], ["dp-flow-signal-scaling", "A"], ["rtd-resistance-to-temp", "A"], ["pulse-flowmeter-k-factor", "A"], ["loop-voltage-budget", "A"], ["thermistor-beta-temp", "A"], ["thermistor-steinhart-hart", "A"], ["dp-level-hydrostatic", "A"], ["pid-tuning-ziegler-nichols", "A"],
 

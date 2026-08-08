@@ -787,6 +787,7 @@ export const COMPUTE_MAP = {
   "equal-spacing": { module: "../../calc-layout.js", fn: "computeEqualSpacing" },
   // spec-v28 low-voltage / data / security cabling.
   "fiber-loss-budget": { module: "../../calc-lowvoltage.js", fn: "computeFiberLossBudget" },
+  "wireless-fspl": { module: "../../calc-lowvoltage.js", fn: "computeWirelessFspl" },
   "fiber-max-length": { module: "../../calc-lowvoltage.js", fn: "computeFiberMaxLength" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", fn: "computeCableTrayFill" },
   "cctv-storage": { module: "../../calc-lowvoltage.js", fn: "computeCctvStorage" },

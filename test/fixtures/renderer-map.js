@@ -152,6 +152,7 @@ export const RENDERER_MAP = {
   "ev-load-management-ems": { module: "../../calc-feeder.js", exportName: "FEEDER_RENDERERS" },
   "ev-charger-throttle": { module: "../../calc-feeder.js", exportName: "FEEDER_RENDERERS" },
   "fiber-loss-budget": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
+  "wireless-fspl": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "fiber-max-length": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "cctv-storage": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
