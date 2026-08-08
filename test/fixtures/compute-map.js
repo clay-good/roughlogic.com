@@ -688,6 +688,7 @@ export const COMPUTE_MAP = {
   "traverse-closure": { module: "../../calc-survey.js", fn: "computeTraverseClosure" },
   "hiking-time": { module: "../../calc-field.js", fn: "computeHikingTime" },
   "horizontal-curve": { module: "../../calc-civil.js", fn: "computeHorizontalCurve" },
+  "spiral-curve": { module: "../../calc-civil.js", fn: "computeSpiralCurve" },
   "curve-deflection-stakeout": { module: "../../calc-civil.js", fn: "computeCurveDeflectionStakeout" },
   "superelevation": { module: "../../calc-civil.js", fn: "computeSuperelevation" },
   "superelevation-safe-curve-speed": { module: "../../calc-civil.js", fn: "computeSuperelevationSafeCurveSpeed" },

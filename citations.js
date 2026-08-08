@@ -7821,6 +7821,18 @@ export const CITATIONS = {
       { name: "Degree definition", value: "arc definition D = 5729.58 / R unless the chord toggle is set", source: "AASHTO / FM 5-233" },
     ],
   },
+  "spiral-curve": {
+    formula: "theta_s = Ls/(2R); p = Ls^2/(24R); k = Ls/2 - Ls^3/(240 R^2); Ts = (R+p) tan(delta/2) + k; Es = (R+p)/cos(delta/2) - R; SC deflection = theta_s/3; circular central = delta - 2 theta_s; total length = 2 Ls + R (delta - 2 theta_s).",
+    edition: "Spiral (transition/clothoid) curve geometry per the AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) and Ghilani & Wolf, Elementary Surveying, by name; standard route-surveying series approximation.",
+    freeAccess: "The spiral geometry (theta_s, throw, tangent, external, deflection) is standard published route-surveying math; the design of record and the engineer of record govern the alignment.",
+    governance: GOVERNANCE.engineer_of_record,
+    editionNote: "The spiral (transition/clothoid) curve, the alignment element the simple circular-curve tile leaves out and the one superelevation is run in over: the radius eases from infinity at the tangent-to-spiral (TS) point down to the circular radius R at the spiral-to-curve (SC) point, so steering and banking change gradually. The spiral angle theta_s = Ls/(2R) is the deflection turned through the spiral; the circular arc between the two spirals turns the remaining delta - 2 theta_s. The circular curve is shifted inward by the throw p = Ls^2/(24R); the tangent from the PI to the TS is Ts = (R+p) tan(delta/2) + k with k = Ls/2 - Ls^3/(240 R^2); the external is Es = (R+p)/cos(delta/2) - R; and the SC is staked from the TS by a deflection of about theta_s/3. This assumes symmetric equal spirals at both ends and the standard series approximation for the throw and k (valid where Ls is small next to R, as for highway spirals; a railroad or very sharp spiral may want the exact clothoid). The spiral length Ls comes from a superelevation-runoff or comfort criterion, a separate design step. A design aid; AASHTO and the engineer of record govern.",
+    assumptions: [
+      { name: "Spiral angle and throw", value: "theta_s = Ls/(2R); p = Ls^2/(24R)", source: "AASHTO / Ghilani & Wolf" },
+      { name: "Tangent and external", value: "Ts = (R+p) tan(delta/2) + k, k = Ls/2 - Ls^3/(240 R^2); Es = (R+p)/cos(delta/2) - R", source: "route-surveying geometry" },
+      { name: "Scope", value: "symmetric equal spirals, series approximation; Ls is a separate superelevation/comfort design step", source: "scope of this tile" },
+    ],
+  },
   "curve-deflection-stakeout": {
     formula: "deflection from the back tangent at the PC: delta = (l / (2R)) x (180/pi) deg for an arc length l; sub-chord from the PC c = 2R sin(l / (2R)); arc-definition D = 5729.58 / R. The deflection at the PT equals half the curve's total central angle.",
     edition: "Deflection-angle curve-stakeout method per FM 5-233 Construction Surveying and the AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book), by name; first-principles trig.",

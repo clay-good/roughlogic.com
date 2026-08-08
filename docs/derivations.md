@@ -1519,6 +1519,7 @@ cross-check.
 | calc-civil.js | `computeSagVerticalCurve` | `{ A_pct, S_ft } = {}` | _ | _ | _ |
 | calc-civil.js | `computeSagVerticalCurveComfort` | `{ A_pct, V_mph } = {}` | _ | _ | _ |
 | calc-civil.js | `computeSlopeStakeCutFill` | `{ existing_elev_ft, design_elev_ft, slope_ratio_h, offset_at_hinge_ft } = {}` | _ | _ | _ |
+| calc-civil.js | `computeSpiralCurve` | `{ radius_ft = 0, spiral_length_ft = 0, delta_deg = 0 } = {}` | _ | _ | _ |
 | calc-civil.js | `computeSuperelevation` | `{ mode, V_mph, R_ft, e_max, f } = {}` | _ | _ | _ |
 | calc-civil.js | `computeSuperelevationSafeCurveSpeed` | `{ R_ft, e, f } = {}` | _ | _ | _ |
 | calc-civil.js | `computeVerticalCurve` | `{ g1_pct, g2_pct, length_ft, pvi_station_ft, pvi_elevation_ft, eval_station_f...` | _ | _ | _ |
@@ -3255,7 +3256,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1841.
+Row count: 1842.
 
 <!-- END function-corpus-v14 -->
 
@@ -3890,7 +3891,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (451 tiles)
+### Group E Construction (452 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4249,6 +4250,7 @@ per spec-v14 §13.1 second paragraph.
 | `soil-swell-shrink` | Soil Swell / Shrinkage Volume Conversion | Caterpillar Performance Handbook soil...; 100 bank cy common earth, swell 25%, shrink 15% -> 125 lo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `soil-vertical-effective-stress` | Soil Vertical Total and Effective Stress (Terzaghi) | Terzaghi effective-stress principle (...; spec-v1013 section 2.1; buoyant cross-check 120x10 + (125... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `speeds-feeds` | Shop Speeds and Feeds | Machining Data Handbook / project bun...; drill / steel / 0.5 in / 2 flutes -> SFM 80, chipload 0.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `spiral-curve` | Spiral (Transition) Curve Layout | AASHTO Green Book / Ghilani & Wolf, E...; theta_s = 250/2000 = 0.125 rad = 7.162 deg; p = 250^2/240... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spoil-setback` | Trench Spoil Pile Setback and Surcharge | OSHA 29 CFR 1926.651(j) / Subpart P; 10 ft trench, 4 ft pile at 34 deg, 2 ft minimum -> 5.93 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spray-foam-board-feet` | Spray Foam Board-Feet and Set Count | Spray-foam board-feet identity (first...; board-feet = 2000*3 = 6,000; sets = ceil(6000*1.10/4800) = 2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spt-bearing-capacity` | SPT Allowable Bearing on Sand (Meyerhof) | Meyerhof / Das; spec-v415 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5034,6 +5036,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1593. Fixture-covered or reference-cadence: 1593 / 1593.
+Tile count: 1594. Fixture-covered or reference-cadence: 1594 / 1594.
 
 <!-- END tile-index-v14 -->

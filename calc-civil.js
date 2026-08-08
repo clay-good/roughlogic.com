@@ -140,6 +140,69 @@ function renderHorizontalCurve(inputRegion, outputRegion, citationEl) {
 }
 CIVIL_RENDERERS["horizontal-curve"] = renderHorizontalCurve;
 
+// ===================== spec-v1221: spiral (transition) curve =====================
+// The horizontal-alignment family has the simple circular curve (horizontal-curve), its deflection
+// stakeout, the vertical curves, and superelevation -- but not the SPIRAL/transition (clothoid) curve
+// that superelevation is actually run in over. This adds it. Standard route-surveying geometry:
+// spiral angle theta_s = Ls/(2R); throw p = Ls^2/(24R); k = Ls/2 - Ls^3/(240 R^2);
+// total tangent Ts = (R+p) tan(delta/2) + k; external Es = (R+p)/cos(delta/2) - R; SC deflection = theta_s/3.
+// dims: in { radius_ft: L, spiral_length_ft: L, delta_deg: dimensionless } out: { theta_s_deg: dimensionless, throw_p_ft: L, k_ft: L, total_tangent_ft: L, external_ft: L, sc_deflection_deg: dimensionless, circular_central_deg: dimensionless, total_length_ft: L }
+export function computeSpiralCurve({ radius_ft = 0, spiral_length_ft = 0, delta_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R = Number(radius_ft) || 0;
+  const Ls = Number(spiral_length_ft) || 0;
+  const delta = Number(delta_deg) || 0;
+  if (!(R > 0)) return { error: "Radius R (at the SC) must be positive (ft)." };
+  if (!(Ls > 0)) return { error: "Spiral length Ls must be positive (ft)." };
+  if (!(delta > 0 && delta < 180)) return { error: "Total deflection angle must be between 0 and 180 deg (exclusive)." };
+  const theta_s_rad = Ls / (2 * R);
+  const theta_s_deg = theta_s_rad * 180 / Math.PI;
+  const deltaRad = delta * Math.PI / 180;
+  const circular_central_rad = deltaRad - 2 * theta_s_rad;
+  if (!(circular_central_rad >= 0)) return { error: "The spiral is too long for this curve: two spirals consume more than the total deflection (2 x theta_s > delta). Shorten Ls, sharpen the radius, or use a spiral-to-spiral curve." };
+  const throw_p_ft = Ls * Ls / (24 * R);
+  const k_ft = Ls / 2 - Ls * Ls * Ls / (240 * R * R);
+  const half = deltaRad / 2;
+  const total_tangent_ft = (R + throw_p_ft) * Math.tan(half) + k_ft;
+  const external_ft = (R + throw_p_ft) / Math.cos(half) - R;
+  const sc_deflection_deg = theta_s_deg / 3;
+  const circular_central_deg = circular_central_rad * 180 / Math.PI;
+  const total_length_ft = 2 * Ls + R * circular_central_rad;
+  if (![theta_s_deg, throw_p_ft, k_ft, total_tangent_ft, external_ft, sc_deflection_deg, circular_central_deg, total_length_ft].every(Number.isFinite)) {
+    return { error: "Spiral-curve math is not a finite value." };
+  }
+  return {
+    theta_s_deg, throw_p_ft, k_ft, total_tangent_ft, external_ft, sc_deflection_deg, circular_central_deg, total_length_ft,
+    note: "The spiral (transition/clothoid) curve, the alignment element the simple circular-curve tile leaves out and the one superelevation is run in over: a curve whose radius eases from infinity at the tangent (TS) down to the circular radius R at the spiral-to-curve point (SC), so a vehicle's steering and the roadway's banking change gradually instead of instantly. The spiral angle theta_s = Ls/(2R) is the deflection the spiral turns through; the circular arc between the two spirals then turns the remaining delta - 2 theta_s. The circular curve is shifted inward from the tangent by the throw p = Ls^2/(24R), and the tangent distance from the PI to the TS is Ts = (R + p) tan(delta/2) + k with k = Ls/2 - Ls^3/(240 R^2); the external distance is Es = (R + p)/cos(delta/2) - R. From the TS, the SC is staked by a deflection angle of about theta_s/3. A 1,000 ft curve with a 250 ft spiral on a 20-degree total deflection: theta_s 7.16 deg, throw 2.60 ft, Ts 301.7 ft, Es 18.1 ft, a 5.68-degree circular arc, and 599 ft of total curve. Symmetric equal spirals at both ends and the approximate (series) throw and k, which are standard for highway spirals where Ls is small next to R; a railroad or a very sharp spiral may want the exact clothoid. The spiral length Ls itself comes from a superelevation runoff or comfort criterion (a separate design step). A design aid; AASHTO and the engineer of record govern.",
+  };
+}
+export const spiralCurveExample = { inputs: { radius_ft: 1000, spiral_length_ft: 250, delta_deg: 20 } };
+function renderSpiralCurve(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: spiral (transition/clothoid) curve geometry per AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) and Ghilani & Wolf, Elementary Surveying: theta_s = Ls/(2R), throw p = Ls^2/(24R), k = Ls/2 - Ls^3/(240 R^2), Ts = (R+p) tan(delta/2) + k, Es = (R+p)/cos(delta/2) - R, SC deflection = theta_s/3. Symmetric spirals, series approximation. The design of record and engineer of record govern.";
+  const rad = makeNumber("Radius R at the SC (ft)", "sc-r", { step: "any", min: "0", value: "1000" }); rad.input.value = "1000";
+  const ls = makeNumber("Spiral length Ls (ft)", "sc-ls", { step: "any", min: "0", value: "250" }); ls.input.value = "250";
+  const delta = makeNumber("Total deflection angle delta (deg)", "sc-delta", { step: "any", min: "0", value: "20" }); delta.input.value = "20";
+  for (const f of [rad, ls, delta]) inputRegion.appendChild(f.wrap);
+  const oTheta = makeOutputLine(outputRegion, "Spiral angle theta_s / SC deflection", "sc-out-theta");
+  const oPK = makeOutputLine(outputRegion, "Throw p / k", "sc-out-pk");
+  const oTs = makeOutputLine(outputRegion, "Total tangent Ts / external Es", "sc-out-ts");
+  const oLen = makeOutputLine(outputRegion, "Circular central angle / total length", "sc-out-len");
+  const oNote = makeOutputLine(outputRegion, "Note", "sc-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeSpiralCurve({ radius_ft: readNum(rad.input), spiral_length_ft: readNum(ls.input), delta_deg: readNum(delta.input) });
+    if (r.error) { oTheta.textContent = r.error; oPK.textContent = "-"; oTs.textContent = "-"; oLen.textContent = "-"; oNote.textContent = ""; return; }
+    oTheta.textContent = fmt(r.theta_s_deg, 3) + " deg / " + fmt(r.sc_deflection_deg, 3) + " deg";
+    oPK.textContent = fmt(r.throw_p_ft, 3) + " ft / " + fmt(r.k_ft, 3) + " ft";
+    oTs.textContent = fmt(r.total_tangent_ft, 2) + " ft / " + fmt(r.external_ft, 2) + " ft";
+    oLen.textContent = fmt(r.circular_central_deg, 3) + " deg / " + fmt(r.total_length_ft, 2) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { rad.input.value = "1000"; ls.input.value = "250"; delta.input.value = "20"; update(); });
+  for (const f of [rad.input, ls.input, delta.input]) f.addEventListener("input", update);
+}
+CIVIL_RENDERERS["spiral-curve"] = renderSpiralCurve;
+
 // --- v766+ E.x: Curve deflection-angle stakeout (`curve-deflection-stakeout`) ---
 // The deflection-angle method of setting a circular curve: from the PC, an arc
 // length l along the curve subtends a deflection angle (from the back tangent)

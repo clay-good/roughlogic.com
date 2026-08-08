@@ -21931,6 +21931,74 @@
    }
   },
   {
+   "tile_id": "spiral-curve",
+   "source_publisher": "AASHTO Green Book / Ghilani & Wolf, Elementary Surveying",
+   "source_title": "R 1000, Ls 250, delta 20 deg -> theta_s 7.16, Ts 301.72, Es 18.07, 599 ft total (spec-v1221)",
+   "source_edition_or_year": "spiral/clothoid route-surveying geometry",
+   "source_section_or_page": "theta_s = 250/2000 = 0.125 rad = 7.162 deg; p = 250^2/24000 = 2.604; k = 125 - 250^3/(240e6) = 124.935; Ts = 1002.604 tan(10) + 124.935 = 301.72; Es = 1002.604/cos(10) - 1000 = 18.07; circular = 20 - 2(7.162) = 5.676 deg.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "radius_ft": 1000,
+    "spiral_length_ft": 250,
+    "delta_deg": 20
+   },
+   "outputs": {
+    "theta_s_deg": {
+     "value": 7.162,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "throw_p_ft": {
+     "value": 2.604,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "total_tangent_ft": {
+     "value": 301.72,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "external_ft": {
+     "value": 18.07,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "circular_central_deg": {
+     "value": 5.676,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spiral-curve",
+   "source_publisher": "spiral geometry (SC deflection cross-check)",
+   "source_title": "cross-check: the SC is staked from the TS at a deflection of theta_s/3 = 2.387 deg",
+   "source_edition_or_year": "SC deflection = theta_s/3",
+   "source_section_or_page": "spiral deflection to the SC = 7.162/3 = 2.387 deg (one third of the spiral angle), the classic spiral-stakeout rule.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "radius_ft": 1000,
+    "spiral_length_ft": 250,
+    "delta_deg": 20
+   },
+   "outputs": {
+    "sc_deflection_deg": {
+     "value": 2.387,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "horizontal-curve",
    "source_publisher": "AASHTO Green Book / FM 5-233 (by name)",
    "source_title": "Circular curve T, L, M, LC and arc-definition degree of curve",

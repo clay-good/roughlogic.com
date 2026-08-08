@@ -47711,6 +47711,21 @@
       "kind": "question"
     },
     {
+      "term": "spiral curve",
+      "target": "spiral-curve",
+      "kind": "industry"
+    },
+    {
+      "term": "transition curve clothoid",
+      "target": "spiral-curve",
+      "kind": "industry"
+    },
+    {
+      "term": "spiral curve tangent and throw",
+      "target": "spiral-curve",
+      "kind": "question"
+    },
+    {
       "term": "curve deflection angle",
       "target": "curve-deflection-stakeout",
       "kind": "question"

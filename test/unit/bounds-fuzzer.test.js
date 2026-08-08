@@ -10516,6 +10516,34 @@ test("bounds: spec-v24/v25 conduit, civil, audio, and surveying tiles pin consta
   assert.ok("error" in _cp2({ courses: [{ azimuth_deg: 0, distance: 100 }] }));
 });
 
+import { computeSpiralCurve as _v1221 } from "../../calc-civil.js";
+
+test("bounds: spec-v1221 computeSpiralCurve pins theta_s, throw, tangent/external, the circular-arc split, the SC deflection, and error seams", () => {
+  // R 1000, Ls 250, delta 20: theta_s 7.162 deg, p 2.604, Ts 301.72, Es 18.07, circular 5.676 deg.
+  const r = _v1221({ radius_ft: 1000, spiral_length_ft: 250, delta_deg: 20 });
+  assert.ok(Math.abs(r.theta_s_deg - (250 / 2000) * 180 / Math.PI) < 1e-9);
+  assert.ok(Math.abs(r.theta_s_deg - 7.162) < 0.005);
+  assert.ok(Math.abs(r.throw_p_ft - 250 * 250 / (24 * 1000)) < 1e-9);
+  assert.ok(Math.abs(r.k_ft - (250 / 2 - 250 ** 3 / (240 * 1000 ** 2))) < 1e-9);
+  assert.ok(Math.abs(r.total_tangent_ft - 301.72) < 0.05);
+  assert.ok(Math.abs(r.external_ft - 18.07) < 0.05);
+  assert.ok(Math.abs(r.sc_deflection_deg - r.theta_s_deg / 3) < 1e-12);
+  // The circular arc turns delta - 2 theta_s.
+  assert.ok(Math.abs(r.circular_central_deg - (20 - 2 * r.theta_s_deg)) < 1e-9);
+  // Total length = 2 Ls + circular arc length.
+  assert.ok(Math.abs(r.total_length_ft - (2 * 250 + 1000 * r.circular_central_deg * Math.PI / 180)) < 1e-6);
+  // A longer spiral throws the curve farther in and turns more of the deflection.
+  const longer = _v1221({ radius_ft: 1000, spiral_length_ft: 300, delta_deg: 20 });
+  assert.ok(longer.throw_p_ft > r.throw_p_ft && longer.theta_s_deg > r.theta_s_deg && longer.circular_central_deg < r.circular_central_deg);
+  // Error seams: non-positive R/Ls, delta out of range, and a spiral too long for the deflection (2 theta_s > delta).
+  assert.ok("error" in _v1221({ radius_ft: 0, spiral_length_ft: 250, delta_deg: 20 }));
+  assert.ok("error" in _v1221({ radius_ft: 1000, spiral_length_ft: 0, delta_deg: 20 }));
+  assert.ok("error" in _v1221({ radius_ft: 1000, spiral_length_ft: 250, delta_deg: 0 }));
+  assert.ok("error" in _v1221({ radius_ft: 1000, spiral_length_ft: 250, delta_deg: 180 }));
+  assert.ok("error" in _v1221({ radius_ft: 1000, spiral_length_ft: 4000, delta_deg: 20 })); // 2 theta_s > delta
+  assert.ok("error" in _v1221({ radius_ft: Infinity, spiral_length_ft: 250, delta_deg: 20 }));
+});
+
 test("bounds: spec-v767 curve-deflection-stakeout pins the deflection/chord, the degree mode, cross-checks horizontal-curve, and error seams", () => {
   // Spec example: R 500, arc 100 -> delta = (100/1000)(180/pi) = 5.72958 deg; chord = 1000 sin(0.1) = 99.833; D = 11.4592.
   const r = _v767({ mode: "radius", radius_ft: 500, arc_length_ft: 100 });
