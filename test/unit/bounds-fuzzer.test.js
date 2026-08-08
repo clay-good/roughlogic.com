@@ -3825,6 +3825,7 @@ import {
   computeSerialDilution as computeLabSerialDilution,
   computeMolecularWeight,
   computeMassMoles,
+  computeIdealGasLaw,
   computeRcf,
   computeResuspension,
   computePcrMix,
@@ -3921,6 +3922,31 @@ test("bounds: calc-lab computeMassMoles pins mass = moles * MW and moles = mass 
       assert.ok(Math.abs(back.mass_g - mass_g) < 1e-9, `mass round-trip`);
     }
   }
+});
+
+test("bounds: spec-v1228 computeIdealGasLaw pins PV=nRT solved four ways, round-trips, and error seams", () => {
+  const R = 0.0820573;
+  // solve volume: 1 mol, 1 atm, 25 C -> 24.465 L.
+  const v = computeIdealGasLaw({ solve_for: "volume", pressure_atm: 1, moles: 1, temperature_c: 25 });
+  assert.ok(Math.abs(v.volume_l - 1 * R * 298.15 / 1) < 1e-9 && Math.abs(v.volume_l - 24.465) < 0.01);
+  assert.ok(Math.abs(v.molar_volume_l - v.volume_l) < 1e-12);
+  // solve moles at STP -> 1.000 mol.
+  assert.ok(Math.abs(computeIdealGasLaw({ solve_for: "moles", pressure_atm: 1, volume_l: 22.414, temperature_c: 0 }).moles - 1) < 0.002);
+  // solve pressure: 2 mol, 10 L, 25 C.
+  assert.ok(Math.abs(computeIdealGasLaw({ solve_for: "pressure", moles: 2, volume_l: 10, temperature_c: 25 }).pressure_atm - 2 * R * 298.15 / 10) < 1e-9);
+  // solve temperature: round-trips the volume example back to 25 C.
+  assert.ok(Math.abs(computeIdealGasLaw({ solve_for: "temperature", pressure_atm: 1, volume_l: v.volume_l, moles: 1 }).temperature_c - 25) < 1e-6);
+  // Boyle's law behavior: at fixed n,T, doubling pressure halves the volume.
+  const v1 = computeIdealGasLaw({ solve_for: "volume", pressure_atm: 1, moles: 1, temperature_c: 25 }).volume_l;
+  const v2 = computeIdealGasLaw({ solve_for: "volume", pressure_atm: 2, moles: 1, temperature_c: 25 }).volume_l;
+  assert.ok(Math.abs(v2 - v1 / 2) < 1e-9);
+  // Error seams: missing required inputs per mode, bad solve_for, sub-absolute-zero, non-finite.
+  assert.ok("error" in computeIdealGasLaw({ solve_for: "moles", pressure_atm: 0, volume_l: 10, temperature_c: 25 }));
+  assert.ok("error" in computeIdealGasLaw({ solve_for: "pressure", moles: 1, volume_l: 0, temperature_c: 25 }));
+  assert.ok("error" in computeIdealGasLaw({ solve_for: "volume", moles: 1, pressure_atm: 1, temperature_c: -300 }));
+  assert.ok("error" in computeIdealGasLaw({ solve_for: "temperature", pressure_atm: 1, volume_l: 10, moles: 0 }));
+  assert.ok("error" in computeIdealGasLaw({ solve_for: "bogus", pressure_atm: 1, volume_l: 10, moles: 1 }));
+  assert.ok("error" in computeIdealGasLaw({ solve_for: "moles", pressure_atm: Infinity, volume_l: 10, temperature_c: 25 }));
 });
 
 test("bounds: calc-lab computeMassMoles rejects non-positive MW or under-/over-specified inputs (documented)", () => {

@@ -85,9 +85,9 @@ test("Hemo: zero squares errors", () => { assert.ok(computeHemocytometer({ total
 // Renderer registry
 test("LAB_RENDERERS exposes all 12 utilities", () => {
   const ids = Object.keys(LAB_RENDERERS);
-  assert.equal(ids.length, 21);
+  assert.equal(ids.length, 22);
   for (const id of [
-    "molarity-dilution", "serial-dilution", "molecular-weight", "mass-moles",
+    "molarity-dilution", "serial-dilution", "molecular-weight", "mass-moles", "ideal-gas-law",
     "rcf-rpm", "resuspension-volume", "pcr-master-mix", "beer-lambert",
     "henderson-hasselbalch", "hemocytometer", "od600-cell-count", "gel-percent-agarose",
   ]) assert.ok(typeof LAB_RENDERERS[id] === "function", id);

@@ -202,6 +202,7 @@ export const COMPUTE_MAP = {
   "time-and-materials": { module: "../../calc-cross.js", fn: "computeTimeAndMaterials" },
   "molecular-weight": { module: "../../calc-lab.js", fn: "computeMolecularWeight" },
   "mass-moles": { module: "../../calc-lab.js", fn: "computeMassMoles" },
+  "ideal-gas-law": { module: "../../calc-lab.js", fn: "computeIdealGasLaw" },
   "rcf-rpm": { module: "../../calc-lab.js", fn: "computeRcf" },
   "slope-from-level": { module: "../../calc-cross.js", fn: "computeSlopeFromLevel" },
   "pounds-formula": { module: "../../calc-water.js", fn: "computePoundsFormula" },

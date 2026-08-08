@@ -2458,6 +2458,7 @@ cross-check.
 | calc-lab.js | `computeGrowthProjectedCount` | `{ initial_count = 0, doubling_time = 0, elapsed_time = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeHemocytometer` | `{ total_cells_counted = 0, squares_counted = 4, dilution_factor = 1, dead_cel...` | _ | _ | _ |
 | calc-lab.js | `computeHendersonHasselbalch` | `{ pKa = 0, target_pH = 0, total_buffer_concentration = 0, total_volume = 0, }` | _ | _ | _ |
+| calc-lab.js | `computeIdealGasLaw` | `{ solve_for = "moles", pressure_atm = 0, volume_l = 0, moles = 0, temperature...` | _ | _ | _ |
 | calc-lab.js | `computeLigationMolarRatio` | `{ vector_ng = 0, vector_length_bp = 0, insert_length_bp = 0, molar_ratio = 3 ...` | _ | _ | _ |
 | calc-lab.js | `computeMassMoles` | `{ mass_g, moles, molecular_weight }` | _ | _ | _ |
 | calc-lab.js | `computeMichaelisMenten` | `{ vmax = 0, km = 0, substrate = 0 } = {}` | _ | _ | _ |
@@ -3262,7 +3263,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1848.
+Row count: 1849.
 
 <!-- END function-corpus-v14 -->
 
@@ -4917,7 +4918,7 @@ per spec-v14 §13.1 second paragraph.
 | `wip-percent-complete` | Work-in-Progress Percent Complete and Over/Under Billing | construction accounting (cost-to-cost...; spec-v390 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `workers-comp-emr-premium` | Workers-Comp Premium and Experience Mod | workers-comp rating (NCCI-style); spec-v445 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group T Lab (21 tiles)
+### Group T Lab (22 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4928,6 +4929,7 @@ per spec-v14 §13.1 second paragraph.
 | `growth-projected-count` | Projected Cell Count from Doubling Time | Exponential-growth kinetics (solved f...; 1e5 cells, 8 h doubling, 24 h -> 8e5 (3 doublings, 8x) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hemocytometer` | Hemocytometer Cell Count | Improved Neubauer hemocytometer (proj...; 240 cells / 4 squares / 1:2 dilution / 12 dead -> 60 avg,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `henderson-hasselbalch` | Henderson-Hasselbalch Buffer | Project (first-principles); pH = pKa + log10([A-]/[HA]) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ideal-gas-law` | Ideal Gas Law (PV = nRT) | Ideal gas law (general chemistry); V = nRT/P = 1 x 0.0820573 x 298.15 / 1 = 24.465 L; molar ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ligation-molar-ratio` | Ligation Insert:Vector Molar Ratio | Standard molecular cloning (ligation ...; 50 ng of a 5000 bp vector, 1000 bp insert, 3:1 -> 30 ng i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mass-moles` | Mass-to-Moles and Moles-to-Mass | Project (first-principles); Mole identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `michaelis-menten` | Michaelis-Menten Enzyme Kinetics | Enzyme kinetics (Michaelis-Menten equ...; Vmax 100, Km 25, [S]=25=Km -> v 50 (exactly Vmax/2), 50% ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5048,6 +5050,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1600. Fixture-covered or reference-cadence: 1600 / 1600.
+Tile count: 1601. Fixture-covered or reference-cadence: 1601 / 1601.
 
 <!-- END tile-index-v14 -->

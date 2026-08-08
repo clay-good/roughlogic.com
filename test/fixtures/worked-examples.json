@@ -1294,6 +1294,60 @@
    }
   },
   {
+   "tile_id": "ideal-gas-law",
+   "source_publisher": "Ideal gas law (general chemistry)",
+   "source_title": "solve volume: 1 mol at 1 atm, 25 C -> 24.47 L (molar volume) (spec-v1228)",
+   "source_edition_or_year": "PV = nRT, R = 0.0820573 L*atm/(mol*K)",
+   "source_section_or_page": "V = nRT/P = 1 x 0.0820573 x 298.15 / 1 = 24.465 L; molar volume 24.465 L/mol.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "solve_for": "volume",
+    "pressure_atm": 1,
+    "volume_l": 0,
+    "moles": 1,
+    "temperature_c": 25
+   },
+   "outputs": {
+    "volume_l": {
+     "value": 24.465,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "molar_volume_l": {
+     "value": 24.465,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ideal-gas-law",
+   "source_publisher": "Ideal gas law (STP cross-check)",
+   "source_title": "cross-check: solve moles at STP (1 atm, 22.414 L, 0 C) -> 1.000 mol",
+   "source_edition_or_year": "n = PV/RT",
+   "source_section_or_page": "n = (1 x 22.414) / (0.0820573 x 273.15) = 22.414 / 22.4162 = 1.000 mol -- the 22.4 L/mol molar volume at standard temperature and pressure.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "solve_for": "moles",
+    "pressure_atm": 1,
+    "volume_l": 22.414,
+    "moles": 0,
+    "temperature_c": 0
+   },
+   "outputs": {
+    "moles": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rcf-rpm",
    "source_publisher": "Project (first-principles)",
    "source_title": "RCF = 1.118e-5 * r_cm * RPM^2",

@@ -270,6 +270,47 @@ export function computeMassMoles({ mass_g, moles, molecular_weight }) {
 
 export const massMolesExample = { inputs: { mass_g: 5, molecular_weight: 58.44 } };
 
+// --- spec-v1228: ideal gas law (PV = nRT) ---
+// The lab basic-chemistry set has mass-moles, molecular-weight, and molarity-dilution but no gas law --
+// the member that connects moles to a gas's pressure, volume, and temperature. This adds it: PV = nRT,
+// solvable for any one of the four, with R = 0.0820573 L*atm/(mol*K). Density needs the molar mass
+// (see molecular-weight / mass-moles).
+// dims: in { solve_for: dimensionless, pressure_atm: M L^-1 T^-2, volume_l: L^3, moles: N, temperature_c: T } out: { pressure_atm: M L^-1 T^-2, volume_l: L^3, moles: N, temperature_c: T, molar_volume_l: L^3 }
+export function computeIdealGasLaw({ solve_for = "moles", pressure_atm = 0, volume_l = 0, moles = 0, temperature_c = 25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R = 0.0820573; // L*atm/(mol*K)
+  const P = Number(pressure_atm) || 0;
+  const V = Number(volume_l) || 0;
+  const n = Number(moles) || 0;
+  const Tc = Number(temperature_c);
+  if (!["moles", "pressure", "volume", "temperature"].includes(solve_for)) return { error: "Solve-for must be moles, pressure, volume, or temperature." };
+  if (!Number.isFinite(Tc) && solve_for !== "temperature") return { error: "Temperature must be a number (C)." };
+  const Tk = Tc + 273.15;
+  const out = { pressure_atm: P, volume_l: V, moles: n, temperature_c: Tc, temperature_k: Tk };
+  if (solve_for === "moles") {
+    if (!(P > 0) || !(V > 0)) return { error: "Pressure and volume must be positive (atm, L)." };
+    if (!(Tk > 0)) return { error: "Temperature must be above absolute zero (-273.15 C)." };
+    out.moles = P * V / (R * Tk);
+  } else if (solve_for === "pressure") {
+    if (!(n > 0) || !(V > 0)) return { error: "Moles and volume must be positive (mol, L)." };
+    if (!(Tk > 0)) return { error: "Temperature must be above absolute zero (-273.15 C)." };
+    out.pressure_atm = n * R * Tk / V;
+  } else if (solve_for === "volume") {
+    if (!(n > 0) || !(P > 0)) return { error: "Moles and pressure must be positive (mol, atm)." };
+    if (!(Tk > 0)) return { error: "Temperature must be above absolute zero (-273.15 C)." };
+    out.volume_l = n * R * Tk / P;
+  } else { // temperature
+    if (!(P > 0) || !(V > 0) || !(n > 0)) return { error: "Pressure, volume, and moles must be positive (atm, L, mol)." };
+    out.temperature_k = P * V / (n * R);
+    out.temperature_c = out.temperature_k - 273.15;
+  }
+  out.molar_volume_l = out.moles > 0 ? out.volume_l / out.moles : null;
+  if (![out.pressure_atm, out.volume_l, out.moles, out.temperature_k].every(Number.isFinite)) return { error: "Ideal-gas math is not a finite value." };
+  out.note = "The ideal gas law PV = nRT, the member that links moles (from the mass-moles or molecular-weight tiles) to a gas's pressure, volume, and temperature -- solvable for whichever of the four is unknown, with R = 0.0820573 L*atm/(mol*K) and the temperature in kelvin (entered in C). One mole of any ideal gas fills 22.41 L at STP (0 C, 1 atm) and 24.47 L at 25 C and 1 atm, so a bench chemist reads moles straight off a measured gas volume. Solving for pressure gives a sealed vessel's pressure as it is heated or filled; solving for volume sizes a gas-collection or displacement setup; solving for temperature backs out the gas temperature from a closed P-V state. Real gases deviate at high pressure or near condensation (a van der Waals or compressibility Z correction is separate); the density = P x molar_mass / (R x T) needs the molar mass, which the molecular-weight tile supplies. A first-principles chemistry aid; the measurement conditions and the gas's real behavior govern.";
+  return out;
+}
+export const idealGasLawExample = { inputs: { solve_for: "volume", pressure_atm: 1, volume_l: 0, moles: 1, temperature_c: 25 } };
+
 // --- 259: Centrifuge RPM <-> RCF ---
 //
 // RCF (g) = 1.118e-5 * r_cm * RPM^2  (r in cm, RPM in revolutions / minute)
@@ -557,6 +598,40 @@ function renderMassMoles(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { mass.input.value = 5; moles.input.value = 0; mw.input.value = 58.44; update(); });
 }
 
+function renderIdealGasLaw(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ideal gas law PV = nRT, R = 0.0820573 L*atm/(mol*K), temperatures in kelvin; solvable for any of P, V, n, T (any general chemistry text). Real gases deviate at high pressure / near condensation (van der Waals or a Z factor is separate); density needs the molar mass. First principles.";
+  inputRegion.appendChild(makeNotice(LAB_NOTICE));
+  const solve = makeSelect("Solve for", "igl-solve", [
+    { value: "moles", label: "Moles n" },
+    { value: "pressure", label: "Pressure P (atm)" },
+    { value: "volume", label: "Volume V (L)", selected: true },
+    { value: "temperature", label: "Temperature T (C)" },
+  ]);
+  const p = makeNumber("Pressure (atm)", "igl-p", { step: "any", min: "0", value: "1" }); p.input.value = "1";
+  const v = makeNumber("Volume (L)", "igl-v", { step: "any", min: "0" });
+  const n = makeNumber("Moles (mol)", "igl-n", { step: "any", min: "0", value: "1" }); n.input.value = "1";
+  const t = makeNumber("Temperature (C)", "igl-t", { step: "any", value: "25" }); t.input.value = "25";
+  for (const f of [solve, p, v, n, t]) inputRegion.appendChild(f.wrap);
+  const oRes = makeOutputLine(outputRegion, "Result", "igl-out-res");
+  const oMv = makeOutputLine(outputRegion, "Molar volume", "igl-out-mv");
+  const oNote = makeOutputLine(outputRegion, "Note", "igl-out-note");
+  const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
+  const update = debounce(() => {
+    const r = computeIdealGasLaw({ solve_for: solve.select.value, pressure_atm: rd(p.input), volume_l: rd(v.input), moles: rd(n.input), temperature_c: t.input.value === "" ? 25 : Number(t.input.value) });
+    if (r.error) { oRes.textContent = r.error; oMv.textContent = "-"; oNote.textContent = ""; return; }
+    const sf = solve.select.value;
+    if (sf === "moles") oRes.textContent = fmt(r.moles, 5) + " mol";
+    else if (sf === "pressure") oRes.textContent = fmt(r.pressure_atm, 4) + " atm";
+    else if (sf === "volume") oRes.textContent = fmt(r.volume_l, 4) + " L";
+    else oRes.textContent = fmt(r.temperature_c, 2) + " C (" + fmt(r.temperature_k, 2) + " K)";
+    oMv.textContent = r.molar_volume_l == null ? "-" : fmt(r.molar_volume_l, 3) + " L/mol";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { solve.select.value = "volume"; p.input.value = "1"; v.input.value = ""; n.input.value = "1"; t.input.value = "25"; update(); });
+  for (const f of [p, v, n, t]) f.input.addEventListener("input", update);
+  solve.select.addEventListener("change", update);
+}
+
 function renderRcf(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: RCF (g) = 1.118e-5 * r(cm) * RPM^2. First principles.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
@@ -719,6 +794,7 @@ export const LAB_RENDERERS = {
   "serial-dilution": renderSerialDilution,
   "molecular-weight": renderMolecularWeight,
   "mass-moles": renderMassMoles,
+  "ideal-gas-law": renderIdealGasLaw,
   "rcf-rpm": renderRcf,
   "resuspension-volume": renderResuspend,
   "pcr-master-mix": renderPcrMix,

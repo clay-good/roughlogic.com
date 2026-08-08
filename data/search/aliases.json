@@ -84702,6 +84702,26 @@
       "kind": "question"
     },
     {
+      "term": "ideal gas law",
+      "target": "ideal-gas-law",
+      "kind": "industry"
+    },
+    {
+      "term": "pv=nrt",
+      "target": "ideal-gas-law",
+      "kind": "industry"
+    },
+    {
+      "term": "moles of gas from pressure volume temperature",
+      "target": "ideal-gas-law",
+      "kind": "question"
+    },
+    {
+      "term": "molar volume of a gas",
+      "target": "ideal-gas-law",
+      "kind": "question"
+    },
+    {
       "term": "moles to grams from molecular weight",
       "target": "mass-moles",
       "kind": "question"

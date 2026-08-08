@@ -7140,6 +7140,18 @@ export const CITATIONS = {
     editionNote: "Single-edition (chemistry).",
     assumptions: [],
   },
+  "ideal-gas-law": {
+    formula: "PV = nRT, R = 0.0820573 L*atm/(mol*K), T in kelvin (Tc + 273.15); solve n = PV/RT, P = nRT/V, V = nRT/P, or T = PV/(nR). Molar volume = V/n.",
+    edition: "The ideal gas law (any general chemistry text; Brown/LeMay, Atkins). First principles.",
+    freeAccess: "The ideal gas law and the gas constant R are public first-principles chemistry; all four state variables are user inputs.",
+    governance: GOVERNANCE.lab,
+    editionNote: "The ideal gas law PV = nRT, the member that links moles (from the mass-moles or molecular-weight tiles) to a gas's pressure, volume, and temperature, solvable for whichever of the four is unknown, with the gas constant R = 0.0820573 L*atm/(mol*K) and the temperature in kelvin (entered in Celsius). One mole of an ideal gas fills 22.41 L at STP (0 C, 1 atm) and 24.47 L at 25 C and 1 atm. Solving for pressure gives a sealed vessel's pressure as it is heated or filled; solving for volume sizes a gas-collection or displacement setup; solving for temperature backs the gas temperature out of a closed pressure-volume state. Real gases deviate from the ideal law at high pressure or near condensation, where a van der Waals equation or a compressibility factor Z is used instead; the gas density = P x molar_mass / (R x T) requires the molar mass, which the molecular-weight tile supplies. A first-principles chemistry aid; the measurement conditions and the gas's real behavior govern.",
+    assumptions: [
+      { name: "Ideal gas law", value: "PV = nRT; R = 0.0820573 L*atm/(mol*K); T in kelvin", source: "general chemistry" },
+      { name: "Four-way solve", value: "n = PV/RT, P = nRT/V, V = nRT/P, T = PV/(nR)", source: "algebra of PV = nRT" },
+      { name: "Scope", value: "ideal gas only (van der Waals / Z for real gases); density needs the molar mass", source: "scope of this tile" },
+    ],
+  },
   "rcf-rpm": {
     formula: "RCF (g) = 1.118e-5 * r(cm) * RPM^2. Both directions: RPM = sqrt(RCF / (1.118e-5 * r_cm)).",
     edition: "Standard centrifuge formula. First principles. Manufacturer rotor radii bundled in CENTRIFUGE_ROTORS (data/lab/centrifuge-rotors.json) with per-entry attribution.",
