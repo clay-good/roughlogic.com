@@ -17452,6 +17452,29 @@ test("bounds: spec-v310 computeBoussinesqSurchargeWall pins both branches, the s
 // ===================== spec-v311..v313 field-surveying depth batch =====================
 import { computeDifferentialLeveling as _v311, computeStadiaDistance as _v312, computeTapingCorrections as _v313 } from "../../calc-survey.js";
 import { computeCogoForwardPoint as _v766 } from "../../calc-survey.js";
+import { computeDistanceDistanceIntersect as _v1256 } from "../../calc-survey.js";
+test("bounds: spec-v1256 computeDistanceDistanceIntersect pins the two-circle solutions, the round-trip distances, the tangent case, and error seams", () => {
+  // P0 N5000/E5000, P1 N5000/E5100, 70.711 ft to each: solutions N4950/E5050 and N5050/E5050.
+  const r = _v1256({ n0_ft: 5000, e0_ft: 5000, dist0_ft: 70.711, n1_ft: 5000, e1_ft: 5100, dist1_ft: 70.711 });
+  assert.ok(Math.abs(r.d_ft - 100) < 1e-9);
+  // Both solutions are exactly the two measured distances from both control points.
+  for (const [n, e] of [[r.sol1_n_ft, r.sol1_e_ft], [r.sol2_n_ft, r.sol2_e_ft]]) {
+    assert.ok(Math.abs(Math.hypot(n - 5000, e - 5000) - 70.711) < 1e-3);
+    assert.ok(Math.abs(Math.hypot(n - 5000, e - 5100) - 70.711) < 1e-3);
+  }
+  // The two solutions are distinct mirror images (not tangent here).
+  assert.ok(r.tangent === false && Math.abs(r.sol1_n_ft - r.sol2_n_ft) > 1);
+  // Tangent case (d = r0 + r1): a single solution on the line, h = 0.
+  const tan = _v1256({ n0_ft: 0, e0_ft: 0, dist0_ft: 40, n1_ft: 100, e1_ft: 0, dist1_ft: 60 });
+  assert.ok(tan.tangent === true && Math.abs(tan.offset_h_ft) < 1e-6 && Math.abs(tan.sol1_n_ft - 40) < 1e-9 && Math.abs(tan.sol1_e_ft) < 1e-9);
+  // Error seams: too short to meet (d > r0+r1), one circle inside the other (d < |r0-r1|),
+  // coincident control points, non-positive distance, non-finite.
+  assert.ok("error" in _v1256({ n0_ft: 0, e0_ft: 0, dist0_ft: 10, n1_ft: 0, e1_ft: 100, dist1_ft: 10 }));
+  assert.ok("error" in _v1256({ n0_ft: 0, e0_ft: 0, dist0_ft: 100, n1_ft: 0, e1_ft: 10, dist1_ft: 5 }));
+  assert.ok("error" in _v1256({ n0_ft: 0, e0_ft: 0, dist0_ft: 10, n1_ft: 0, e1_ft: 0, dist1_ft: 10 }));
+  assert.ok("error" in _v1256({ n0_ft: 0, e0_ft: 0, dist0_ft: 0, n1_ft: 0, e1_ft: 100, dist1_ft: 10 }));
+  assert.ok("error" in _v1256({ n0_ft: Infinity, e0_ft: 0, dist0_ft: 70, n1_ft: 0, e1_ft: 100, dist1_ft: 70 }));
+});
 import { computeEdmSlopeReduction as _v769 } from "../../calc-survey.js";
 import { computeLevelingCurvatureRefraction as _v771 } from "../../calc-survey.js";
 import { computeGridToGround as _v776 } from "../../calc-survey.js";

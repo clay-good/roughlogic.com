@@ -1482,6 +1482,7 @@ export const RENDERER_MAP = {
   "taping-normal-tension": { module: "../../calc-survey.js", exportName: "SURVEY_RENDERERS" },
   "azimuth-bearing-conversion": { module: "../../calc-survey.js", exportName: "SURVEY_RENDERERS" },
   "cogo-forward-point": { module: "../../calc-survey.js", exportName: "SURVEY_RENDERERS" },
+  "distance-distance-intersection": { module: "../../calc-survey.js", exportName: "SURVEY_RENDERERS" },
   "edm-slope-reduction": { module: "../../calc-survey.js", exportName: "SURVEY_RENDERERS" },
   "leveling-curvature-refraction": { module: "../../calc-survey.js", exportName: "SURVEY_RENDERERS" },
   "grid-to-ground": { module: "../../calc-survey.js", exportName: "SURVEY_RENDERERS" },

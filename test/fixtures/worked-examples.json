@@ -55807,6 +55807,74 @@
    }
   },
   {
+   "tile_id": "distance-distance-intersection",
+   "source_publisher": "Euclidean geometry / trilateration (Ghilani & Wolf)",
+   "source_title": "point 1 N5000/E5000, point 2 N5000/E5100, 70.711 ft to each -> N4950/E5050 and N5050/E5050 (spec-v1256)",
+   "source_edition_or_year": "two-circle intersection",
+   "source_section_or_page": "d = 100 ft; a = (70.711^2 - 70.711^2 + 100^2)/(2*100) = 50; h = sqrt(70.711^2 - 50^2) = 50; midpoint N5000/E5050; solutions +/- 50 in N -> N4950/E5050 and N5050/E5050 (each 70.711 ft from both points).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "n0_ft": 5000,
+    "e0_ft": 5000,
+    "dist0_ft": 70.711,
+    "n1_ft": 5000,
+    "e1_ft": 5100,
+    "dist1_ft": 70.711
+   },
+   "outputs": {
+    "d_ft": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "sol1_n_ft": {
+     "value": 4950,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "sol2_n_ft": {
+     "value": 5050,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "distance-distance-intersection",
+   "source_publisher": "Distance-distance (tangent cross-check)",
+   "source_title": "when the swing circles just touch (d = r0 + r1) there is a single solution on the line",
+   "source_edition_or_year": "tangent case, h = 0",
+   "source_section_or_page": "points 100 ft apart, 40 ft to point 1 and 60 ft to point 2: d = 100 = 40 + 60, so a = 40, h = 0 and the single tangent point is N40/E0 (40 ft from point 1, 60 ft from point 2, on the line between them).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "n0_ft": 0,
+    "e0_ft": 0,
+    "dist0_ft": 40,
+    "n1_ft": 100,
+    "e1_ft": 0,
+    "dist1_ft": 60
+   },
+   "outputs": {
+    "sol1_n_ft": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "offset_h_ft": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "edm-slope-reduction",
    "source_publisher": "Ghilani, Elementary Surveying (plane-survey reduction)",
    "source_title": "250 ft slope shot at an 86 deg zenith -> 249.39 ft horizontal, 17.44 ft up",

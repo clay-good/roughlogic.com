@@ -639,7 +639,7 @@ const _TILES = [
   ["soil-consolidation-settlement", "E"], ["overconsolidated-settlement", "E"], ["secondary-compression-settlement", "E"], ["settlement-limit-load", "E"], ["footing-eccentric-pressure", "E"], ["boussinesq-surcharge-wall", "E"],
   // spec-v311..v313 field-surveying depth batch (calc-survey.js Group P)
   ["differential-leveling", "P"], ["level-loop-adjustment", "P"], ["stadia-distance", "P"], ["taping-corrections", "P"], ["taping-normal-tension", "P"], ["azimuth-bearing-conversion", "P"],
-  ["cogo-forward-point", "P"],
+  ["cogo-forward-point", "P"], ["distance-distance-intersection", "P"],
   ["edm-slope-reduction", "P"],
   ["leveling-curvature-refraction", "P"],
   ["grid-to-ground", "P"],

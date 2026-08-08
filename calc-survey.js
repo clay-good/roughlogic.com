@@ -460,6 +460,64 @@ function renderCogoForwardPoint(inputRegion, outputRegion, citationEl) {
 }
 SURVEY_RENDERERS["cogo-forward-point"] = renderCogoForwardPoint;
 
+// spec-v1256: distance-distance (swing-tie) intersection. The COGO tiles locate a point by a bearing
+// and distance (polar) or reduce two points to a bearing/distance (inverse); this locates a point from
+// two MEASURED DISTANCES to two known points -- the classic tape swing-tie / as-built / batter-board
+// method. Two-circle intersection: d = |P1-P0|, a = (r0^2 - r1^2 + d^2)/(2d), h = sqrt(r0^2 - a^2);
+// midpoint Pm = P0 + a*(P1-P0)/d, solutions = Pm +/- h*perpendicular. First-principles Euclidean geometry.
+// dims: in { n0_ft: L, e0_ft: L, dist0_ft: L, n1_ft: L, e1_ft: L, dist1_ft: L } out: { d_ft: L, sol1_n_ft: L, sol1_e_ft: L, sol2_n_ft: L, sol2_e_ft: L }
+export function computeDistanceDistanceIntersect({ n0_ft = 0, e0_ft = 0, dist0_ft = 0, n1_ft = 0, e1_ft = 0, dist1_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n0 = Number(n0_ft), e0 = Number(e0_ft), r0 = Number(dist0_ft);
+  const n1 = Number(n1_ft), e1 = Number(e1_ft), r1 = Number(dist1_ft);
+  if (![n0, e0, n1, e1].every(Number.isFinite)) return { error: "All control-point coordinates must be numbers (ft)." };
+  if (!(r0 > 0)) return { error: "Distance from control point 1 must be positive (ft)." };
+  if (!(r1 > 0)) return { error: "Distance from control point 2 must be positive (ft)." };
+  const dN = n1 - n0, dE = e1 - e0;
+  const d = Math.hypot(dN, dE);
+  if (!(d > 0)) return { error: "The two control points must be different (they are at the same location)." };
+  if (d > r0 + r1) return { error: "The two distances are too short to meet: the control points are " + fmt(d, 3) + " ft apart, more than the " + fmt(r0 + r1, 3) + " ft the distances span. Re-check the tape readings." };
+  if (d < Math.abs(r0 - r1)) return { error: "One swing circle lies entirely inside the other (|r0 - r1| = " + fmt(Math.abs(r0 - r1), 3) + " ft exceeds the " + fmt(d, 3) + " ft between points): the distances cannot both be satisfied." };
+  const a = (r0 * r0 - r1 * r1 + d * d) / (2 * d);
+  const h = Math.sqrt(Math.max(0, r0 * r0 - a * a));
+  const nm = n0 + a * dN / d, em = e0 + a * dE / d;
+  // perpendicular unit vector (-dE/d, dN/d) in (N, E)
+  const sol1_n_ft = nm + h * (-dE / d), sol1_e_ft = em + h * (dN / d);
+  const sol2_n_ft = nm - h * (-dE / d), sol2_e_ft = em - h * (dN / d);
+  const tangent = h < 1e-9;
+  if (![d, sol1_n_ft, sol1_e_ft, sol2_n_ft, sol2_e_ft].every(Number.isFinite)) return { error: "Intersection math is not a finite value." };
+  return {
+    d_ft: d, sol1_n_ft, sol1_e_ft, sol2_n_ft, sol2_e_ft, tangent, offset_h_ft: h,
+    note: "The distance-distance (swing-tie) intersection: the coordinates of a point located by measuring its distance to two known control points, the tape method behind an as-built tie, a batter-board corner, or a two-tape locate when there is no total station. Geometrically it is where two circles cross, one of radius r0 about control point 1 and one of radius r1 about control point 2: with the points d apart, the foot of the crossing chord is a = (r0^2 - r1^2 + d^2)/(2d) along the line from point 1, and the two intersection points sit h = sqrt(r0^2 - a^2) to each side. There are almost always TWO solutions, mirror images across the line between the control points; the field sketch or a rough third tie tells you which side the point is on. The tile flags the impossible cases the tape readings can fall into: distances too short to meet (d > r0 + r1) or one circle inside the other (d < |r0 - r1|), and the tangent case (a single solution when the circles just touch). Coordinates are plane northing/easting on the project grid (this is flat-plane geometry; grid scale factor and elevation are separate). A computational aid; the project control and datum govern.",
+  };
+}
+export const distanceDistanceIntersectExample = { inputs: { n0_ft: 5000, e0_ft: 5000, dist0_ft: 70.711, n1_ft: 5000, e1_ft: 5100, dist1_ft: 70.711 } };
+function renderDistanceDistanceIntersect(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: distance-distance (swing-tie) intersection - the two-circle crossing d = |P1-P0|, a = (r0^2 - r1^2 + d^2)/(2d), h = sqrt(r0^2 - a^2), solutions = midpoint +/- h*perpendicular. First-principles Euclidean geometry, the standard swing-tie / trilateration locate in the route-surveying references (Ghilani & Wolf, Elementary Surveying), by name. Plane grid coordinates; two mirror-image solutions -- the field sketch picks the side. The project control and datum govern.";
+  const n0 = makeNumber("Point 1 northing N (ft)", "ddi-n0", { step: "any" });
+  const e0 = makeNumber("Point 1 easting E (ft)", "ddi-e0", { step: "any" });
+  const r0 = makeNumber("Distance from point 1 (ft)", "ddi-r0", { step: "any", min: "0" });
+  const n1 = makeNumber("Point 2 northing N (ft)", "ddi-n1", { step: "any" });
+  const e1 = makeNumber("Point 2 easting E (ft)", "ddi-e1", { step: "any" });
+  const r1 = makeNumber("Distance from point 2 (ft)", "ddi-r1", { step: "any", min: "0" });
+  for (const f of [n0, e0, r0, n1, e1, r1]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { n0.input.value = "5000"; e0.input.value = "5000"; r0.input.value = "70.711"; n1.input.value = "5000"; e1.input.value = "5100"; r1.input.value = "70.711"; update(); });
+  const oSol1 = makeOutputLine(outputRegion, "Solution A (N, E)", "ddi-out-1");
+  const oSol2 = makeOutputLine(outputRegion, "Solution B (N, E)", "ddi-out-2");
+  const oD = makeOutputLine(outputRegion, "Between control points", "ddi-out-d");
+  const oNote = makeOutputLine(outputRegion, "Note", "ddi-out-note");
+  const update = debounce(() => {
+    const r = computeDistanceDistanceIntersect({ n0_ft: Number(n0.input.value) || 0, e0_ft: Number(e0.input.value) || 0, dist0_ft: Number(r0.input.value) || 0, n1_ft: Number(n1.input.value) || 0, e1_ft: Number(e1.input.value) || 0, dist1_ft: Number(r1.input.value) || 0 });
+    if (r.error) { oSol1.textContent = r.error; oSol2.textContent = "-"; oD.textContent = "-"; oNote.textContent = ""; return; }
+    oSol1.textContent = "N " + fmt(r.sol1_n_ft, 3) + ", E " + fmt(r.sol1_e_ft, 3) + " ft";
+    oSol2.textContent = r.tangent ? "(tangent - single solution)" : "N " + fmt(r.sol2_n_ft, 3) + ", E " + fmt(r.sol2_e_ft, 3) + " ft";
+    oD.textContent = fmt(r.d_ft, 3) + " ft (offset from chord " + fmt(r.offset_h_ft, 3) + " ft)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [n0.input, e0.input, r0.input, n1.input, e1.input, r1.input]) f.addEventListener("input", update);
+}
+SURVEY_RENDERERS["distance-distance-intersection"] = renderDistanceDistanceIntersect;
+
 // dims: in { slope_distance_ft: L, angle_deg: dimensionless, angle_mode: dimensionless, hi_ft: L, hr_ft: L } out: { horizontal_ft: L, vertical_ft: L, elev_diff_ft: L }
 // Total-station / EDM slope-to-horizontal reduction (right-triangle trig).
 // Zenith angle Z (from vertical): H = S sin Z, V = S cos Z.

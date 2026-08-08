@@ -18871,6 +18871,21 @@
       "kind": "question"
     },
     {
+      "term": "swing tie locate",
+      "target": "distance-distance-intersection",
+      "kind": "industry"
+    },
+    {
+      "term": "distance distance intersection",
+      "target": "distance-distance-intersection",
+      "kind": "industry"
+    },
+    {
+      "term": "locate point from two tape measurements",
+      "target": "distance-distance-intersection",
+      "kind": "question"
+    },
+    {
       "term": "new coordinate from azimuth and distance",
       "target": "cogo-forward-point",
       "kind": "question"

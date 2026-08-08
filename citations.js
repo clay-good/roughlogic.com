@@ -15554,6 +15554,18 @@ export const CITATIONS = {
       { name: "Sign convention", value: "delta N positive north, delta E positive east", source: "surveying references" },
     ],
   },
+  "distance-distance-intersection": {
+    formula: "d = |P1-P0|; a = (r0^2 - r1^2 + d^2)/(2d); h = sqrt(r0^2 - a^2); Pm = P0 + a*(P1-P0)/d; solutions = Pm +/- h*(perpendicular unit). Real iff |r0-r1| <= d <= r0+r1.",
+    edition: "First-principles Euclidean geometry (two-circle / trilateration intersection), the standard swing-tie locate as compiled in the route-surveying references (Ghilani & Wolf, Elementary Surveying), by name.",
+    freeAccess: "The two-circle intersection is public first-principles geometry; the control coordinates and the two measured distances are the user's field data.",
+    governance: GOVERNANCE.general,
+    editionNote: "The distance-distance (swing-tie) intersection: the coordinates of a point located by measuring its distance to two known control points, the tape method behind an as-built tie, a batter-board corner, or a two-tape locate. It is where two circles cross - one of radius r0 about control point 1, one of radius r1 about control point 2. With the points d apart, the foot of the crossing chord is a = (r0^2 - r1^2 + d^2)/(2d) from point 1 and the two crossings are h = sqrt(r0^2 - a^2) to each side, so there are two mirror-image solutions across the line between the control points; the field sketch or a rough third tie tells which side. A real solution exists only when |r0 - r1| <= d <= r0 + r1: if d > r0 + r1 the distances are too short to meet, and if d < |r0 - r1| one circle lies inside the other - both flagged, as is the tangent (single-solution) case. Coordinates are plane northing/easting on the project grid (flat-plane geometry; grid scale factor and elevation are separate). A computational aid; the project control and datum govern.",
+    assumptions: [
+      { name: "Two-circle intersection", value: "a = (r0^2 - r1^2 + d^2)/(2d), h = sqrt(r0^2 - a^2); solutions = midpoint +/- h*perpendicular", source: "Euclidean geometry / trilateration" },
+      { name: "Two solutions", value: "mirror images across the control line; the field sketch or a third tie resolves the side", source: "surveying practice" },
+      { name: "Plane geometry", value: "plane grid northing/easting; grid scale factor and elevation are separate", source: "plane-survey assumption" },
+    ],
+  },
   "edm-slope-reduction": {
     formula: "zenith angle Z: H = S sin(Z), V = S cos(Z). vertical angle a: H = S cos(a), V = S sin(a). ground-to-ground elevation difference = V + instrument_height - reflector_height.",
     edition: "Standard plane-survey EDM/total-station slope reduction by right-triangle trigonometry, as compiled in the standard surveying references (Ghilani, Elementary Surveying), by name.",

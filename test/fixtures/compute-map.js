@@ -1270,6 +1270,7 @@ export const COMPUTE_MAP = {
   "taping-normal-tension": { module: "../../calc-survey.js", fn: "computeTapingNormalTension" },
   "azimuth-bearing-conversion": { module: "../../calc-survey.js", fn: "computeAzimuthBearing" },
   "cogo-forward-point": { module: "../../calc-survey.js", fn: "computeCogoForwardPoint" },
+  "distance-distance-intersection": { module: "../../calc-survey.js", fn: "computeDistanceDistanceIntersect" },
   "edm-slope-reduction": { module: "../../calc-survey.js", fn: "computeEdmSlopeReduction" },
   "leveling-curvature-refraction": { module: "../../calc-survey.js", fn: "computeLevelingCurvatureRefraction" },
   "grid-to-ground": { module: "../../calc-survey.js", fn: "computeGridToGround" },
