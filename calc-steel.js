@@ -814,6 +814,74 @@ STEEL_RENDERERS["steel-effective-length-k"] = _simpleRenderer({
   compute: computeSteelEffectiveLengthK,
 });
 
+// ===================== spec-v1210: alignment-chart stiffness ratio G from member sizes =====================
+// The steel-effective-length-k tile takes GA and GB as required inputs and its own note names the gap:
+// "enter G (or 10 pinned / 1 fixed) - it does not compute G from member sizes." This does. At a joint,
+// G = sum(EI/L)_columns / sum(EI/L)_girders; the elastic modulus E is the same steel throughout and
+// cancels, so G = sum(I/L)_columns / sum(I/L)_girders. Girder stiffness is adjusted for the far-end
+// condition by the standard AISC modifiers: braced (sidesway inhibited) far-pinned x1.5 / far-fixed x2.0,
+// moment (sidesway uninhibited) far-pinned x0.5 / far-fixed x0.67, rigid both ends x1.0. The result feeds
+// straight into steel-effective-length-k as GA (or GB). AISC 360 Commentary App. 7 / Salmon & Johnson.
+// dims: in { ic1: L^4, lc1: L, ic2: L^4, lc2: L, ig1: L^4, lg1: L, ig2: L^4, lg2: L, girder_far_end: dimensionless } out: { g_ratio: dimensionless, col_stiffness: L^3, girder_stiffness: L^3, girder_modifier: dimensionless }
+export function computeSteelColumnStiffnessRatioG({ ic1 = 0, lc1 = 0, ic2 = 0, lc2 = 0, ig1 = 0, lg1 = 0, ig2 = 0, lg2 = 0, girder_far_end = "rigid" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n = (x) => Number(x) || 0;
+  const GIRDER_MOD = { rigid: 1.0, braced_pinned: 1.5, braced_fixed: 2.0, sway_pinned: 0.5, sway_fixed: 0.67 };
+  const m = GIRDER_MOD[girder_far_end];
+  if (m === undefined) return { error: "Girder far-end condition must be rigid, braced_pinned, braced_fixed, sway_pinned, or sway_fixed." };
+  let col_stiffness = 0, colCount = 0;
+  for (const [I, L] of [[ic1, lc1], [ic2, lc2]]) {
+    if (n(L) > 0) {
+      if (!(n(I) > 0)) return { error: "Each column with a length needs a positive moment of inertia I (in^4)." };
+      col_stiffness += n(I) / n(L); colCount++;
+    } else if (n(I) > 0) return { error: "Enter a length for each column that has an I (a length of 0 skips a column)." };
+  }
+  let girder_stiffness = 0, girderCount = 0;
+  for (const [I, L] of [[ig1, lg1], [ig2, lg2]]) {
+    if (n(L) > 0) {
+      if (!(n(I) > 0)) return { error: "Each girder with a length needs a positive moment of inertia I (in^4)." };
+      girder_stiffness += n(I) / n(L); girderCount++;
+    } else if (n(I) > 0) return { error: "Enter a length for each girder that has an I (a length of 0 skips a girder)." };
+  }
+  if (colCount === 0) return { error: "Enter at least one column (I and length)." };
+  if (girderCount === 0) return { error: "Enter at least one girder; a joint with no restraining girders is a pin (use G = 10) or a fixed base (G = 1) in the K tile." };
+  girder_stiffness *= m;
+  const g_ratio = col_stiffness / girder_stiffness;
+  if (![g_ratio, col_stiffness, girder_stiffness].every(Number.isFinite)) return { error: "Stiffness-ratio math is not a finite value." };
+  return {
+    g_ratio, col_stiffness, girder_stiffness, girder_modifier: m, col_count: colCount, girder_count: girderCount,
+    note: "The alignment-chart joint stiffness ratio G, the input steel-effective-length-k needs but does not compute: G = sum(EI/L)_columns / sum(EI/L)_girders at the joint, and because the elastic modulus E is the same steel throughout it cancels, leaving G = sum(I/L)_columns / sum(I/L)_girders. Enter the moment of inertia I (in^4, the strong-axis Ix for strong-axis buckling) and length of the columns meeting at the joint (the one being designed plus any continuing column) and of the girders framing in; a length of 0 skips a member. The girder stiffness carries the standard far-end modifier: for a braced (sidesway-inhibited) frame multiply by 1.5 (far end pinned) or 2.0 (far end fixed), for a moment (sidesway-uninhibited) frame by 0.5 (far end pinned) or 0.67 (far end fixed), and 1.0 when the girder is rigidly framed at both ends. Two columns (Ix 800 in^4, 12 ft) over two girders (Ix 1,200 in^4, 24 ft), rigid, gives G = 133.3/100 = 1.33; feed it as GA (or GB) to the K tile. A stiff column on flexible beams gives a large G (toward pinned); the convention is G = 10 at a pin support and G = 1 at a fixed base. The chart's idealizing assumptions apply (elastic, all columns buckling together); it does not apply the inelastic tau_b reduction. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const steelColumnStiffnessRatioGExample = { inputs: { ic1: 800, lc1: 12, ic2: 800, lc2: 12, ig1: 1200, lg1: 24, ig2: 1200, lg2: 24, girder_far_end: "rigid" } };
+STEEL_RENDERERS["steel-column-stiffness-ratio-g"] = _simpleRenderer({
+  citation: "Citation: AISC alignment-chart joint stiffness ratio G = sum(EI/L)_columns / sum(EI/L)_girders (E cancels for all-steel frames, so sum(I/L)), with the standard girder far-end modifiers (braced 1.5 pinned / 2.0 fixed; moment 0.5 pinned / 0.67 fixed; 1.0 rigid), as compiled in AISC 360 Commentary Appendix 7 / Salmon & Johnson, by name. Feeds the steel-effective-length-k tile as GA or GB; G = 10 at a pin, 1 at a fixed base. A design aid, not a substitute for the engineer of record.",
+  example: steelColumnStiffnessRatioGExample.inputs,
+  fields: [
+    { key: "ic1", label: "Column 1 moment of inertia Ix (in^4)", kind: "number", default: 800 },
+    { key: "lc1", label: "Column 1 length (ft)", kind: "number", default: 12 },
+    { key: "ic2", label: "Column 2 Ix (in^4, continuing column; 0 to skip)", kind: "number", default: 800 },
+    { key: "lc2", label: "Column 2 length (ft, 0 to skip)", kind: "number", default: 12 },
+    { key: "ig1", label: "Girder 1 moment of inertia Ix (in^4)", kind: "number", default: 1200 },
+    { key: "lg1", label: "Girder 1 length (ft)", kind: "number", default: 24 },
+    { key: "ig2", label: "Girder 2 Ix (in^4, 0 to skip)", kind: "number", default: 1200 },
+    { key: "lg2", label: "Girder 2 length (ft, 0 to skip)", kind: "number", default: 24 },
+    { key: "girder_far_end", label: "Girder far-end condition", kind: "select", default: "rigid", options: [
+      { value: "rigid", label: "Rigid both ends (x1.0)" },
+      { value: "braced_pinned", label: "Braced frame, far end pinned (x1.5)" },
+      { value: "braced_fixed", label: "Braced frame, far end fixed (x2.0)" },
+      { value: "sway_pinned", label: "Moment frame, far end pinned (x0.5)" },
+      { value: "sway_fixed", label: "Moment frame, far end fixed (x0.67)" },
+    ] },
+  ],
+  outputs: [
+    { key: "g", id: "scsg-out-g", label: "Stiffness ratio G (feed the K tile)", value: (r) => fmt(r.g_ratio, 3) },
+    { key: "stiff", id: "scsg-out-stiff", label: "Column / girder stiffness (I/L sum)", value: (r) => fmt(r.col_stiffness, 2) + " / " + fmt(r.girder_stiffness, 2) + " in^4/ft" },
+    { key: "n", id: "scsg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelColumnStiffnessRatioG,
+});
+
 // dims: in { fnt_ksi: M L^-1 T^-2, fnv_ksi: M L^-1 T^-2, ab_in2: L^2, frv_ksi: M L^-1 T^-2, method: dimensionless } out: { fpnt_ksi: M L^-1 T^-2, avail_tension_kip: M L T^-2 }
 export function computeSteelBoltTensionShear({ fnt_ksi = 90, fnv_ksi = 54, ab_in2 = 0, frv_ksi = 0, method = "LRFD" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

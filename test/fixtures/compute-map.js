@@ -1237,6 +1237,7 @@ export const COMPUTE_MAP = {
   // spec-v314..v316 steel beam-column-and-connection depth batch (3 tiles)
   "steel-h1-interaction": { module: "../../calc-steel.js", fn: "computeSteelH1Interaction" },
   "steel-effective-length-k": { module: "../../calc-steel.js", fn: "computeSteelEffectiveLengthK" },
+  "steel-column-stiffness-ratio-g": { module: "../../calc-steel.js", fn: "computeSteelColumnStiffnessRatioG" },
   "steel-bolt-tension-shear": { module: "../../calc-steel.js", fn: "computeSteelBoltTensionShear" },
   // spec-v317..v319 machining depth batch (3 tiles)
   "radial-chip-thinning": { module: "../../calc-machining.js", fn: "computeRadialChipThinning" },

@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1582,
-  "covered_count": 1161,
+  "total_tiles": 1583,
+  "covered_count": 1162,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -986,6 +986,7 @@
     "steel-bolt-tension-shear",
     "steel-camber",
     "steel-column-capacity",
+    "steel-column-stiffness-ratio-g",
     "steel-doubler-plate",
     "steel-effective-length-k",
     "steel-fillet-weld-size",

@@ -53790,6 +53790,80 @@
    }
   },
   {
+   "tile_id": "steel-column-stiffness-ratio-g",
+   "source_publisher": "AISC 360 Commentary App. 7 / Salmon & Johnson (alignment-chart stiffness ratio)",
+   "source_title": "Two columns (Ix 800, 12 ft) over two girders (Ix 1200, 24 ft), rigid -> G 1.333 (spec-v1210)",
+   "source_edition_or_year": "standard alignment-chart stiffness ratio",
+   "source_section_or_page": "col sum = 800/12 + 800/12 = 133.333 in^4/ft; girder sum = (1200/24 + 1200/24) x 1.0 = 100 in^4/ft; G = 133.333/100 = 1.333.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "ic1": 800,
+    "lc1": 12,
+    "ic2": 800,
+    "lc2": 12,
+    "ig1": 1200,
+    "lg1": 24,
+    "ig2": 1200,
+    "lg2": 24,
+    "girder_far_end": "rigid"
+   },
+   "outputs": {
+    "g_ratio": {
+     "value": 1.3333,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "col_stiffness": {
+     "value": 133.333,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "girder_stiffness": {
+     "value": 100.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-column-stiffness-ratio-g",
+   "source_publisher": "standard alignment-chart girder far-end modifier",
+   "source_title": "cross-check: a moment-frame far-pinned girder (x0.5) doubles G to 2.667",
+   "source_edition_or_year": "girder modifier m = 0.5 (moment frame, far end pinned)",
+   "source_section_or_page": "girder sum = 100 x 0.5 = 50 in^4/ft; G = 133.333/50 = 2.667 -- halving the girder stiffness doubles G versus the rigid case.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "ic1": 800,
+    "lc1": 12,
+    "ic2": 800,
+    "lc2": 12,
+    "ig1": 1200,
+    "lg1": 24,
+    "ig2": 1200,
+    "lg2": 24,
+    "girder_far_end": "sway_pinned"
+   },
+   "outputs": {
+    "g_ratio": {
+     "value": 2.6667,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "girder_modifier": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-bolt-tension-shear",
    "source_publisher": "AISC 360-22 J3.7",
    "source_title": "3/4 A325, 20 ksi required shear, LRFD -> F'nt 72.6 ksi, available tension 24.1 kip",

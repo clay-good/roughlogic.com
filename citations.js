@@ -14110,6 +14110,19 @@ export const CITATIONS = {
       { name: "Chart assumptions", value: "elastic behavior, simultaneous column buckling, equal L/r; no tau_b", source: "AISC Commentary" },
     ],
   },
+  "steel-column-stiffness-ratio-g": {
+    formula: "G = sum(I/L)_columns / (m * sum(I/L)_girders), E cancels; girder modifier m = 1.5 (braced far-pinned), 2.0 (braced far-fixed), 0.5 (moment far-pinned), 0.67 (moment far-fixed), 1.0 (rigid).",
+    edition: "The AISC alignment-chart joint stiffness ratio G computed from member sizes, with the standard girder far-end stiffness modifiers, as compiled in AISC 360 Commentary Appendix 7 / Salmon & Johnson, by name.",
+    freeAccess: "The stiffness-ratio definition and the girder far-end modification factors are public results in the AISC Commentary and the standard steel-design references; the member I and L are the user's own section and framing data.",
+    governance: GOVERNANCE.general,
+    editionNote: "The alignment-chart joint stiffness ratio G, the input the steel-effective-length-k tile requires but does not compute from member sizes: G = sum(EI/L)_columns / sum(EI/L)_girders at the joint, and because the elastic modulus E is the same steel throughout it cancels, leaving G = sum(I/L)_columns / sum(I/L)_girders. The strong-axis moment of inertia Ix and length of each column meeting at the joint (the designed column plus any continuing column) and of each girder framing in are entered; a length of 0 skips a member. The girder stiffness carries the standard far-end modifier: for a braced (sidesway-inhibited) frame multiply by 1.5 (far end pinned) or 2.0 (far end fixed), for a moment (sidesway-uninhibited) frame by 0.5 (far end pinned) or 0.67 (far end fixed), and 1.0 when the girder is rigidly framed at both ends. The result feeds steel-effective-length-k as GA or GB; the convention is G = 10 at a pin support and G = 1 at a fixed base. It uses the chart's idealizing assumptions (elastic, all columns buckling simultaneously) and does not apply the inelastic tau_b reduction. A design aid, not a substitute for the structural engineer of record.",
+    assumptions: [
+      { name: "Stiffness ratio", value: "G = sum(I/L)_columns / sum(I/L)_girders (E cancels for all-steel frames)", source: "AISC Commentary alignment charts" },
+      { name: "Girder far-end modifier", value: "braced 1.5 (pin) / 2.0 (fix); moment 0.5 (pin) / 0.67 (fix); 1.0 rigid", source: "AISC 360 Commentary App. 7 / Salmon & Johnson" },
+      { name: "End-condition convention", value: "G = 10 at a pin support, G = 1 at a fixed base", source: "AISC Commentary" },
+      { name: "Feeds", value: "supplies GA or GB to the steel-effective-length-k tile", source: "scope of this tile" },
+    ],
+  },
   "steel-bolt-tension-shear": {
     formula: "k = (LRFD) Fnt/(0.75 Fnv), (ASD) 2.00 Fnt/Fnv; F'nt = min(1.3 Fnt - k frv, Fnt) (floored at 0); available tension = 0.75 F'nt Ab (LRFD) or F'nt Ab/2.00 (ASD).",
     edition: "The AISC 360-22 Section J3.7 reduced tensile stress for a bearing-type bolt in combined tension and shear, with the Table J3.2 nominal stresses, by name.",

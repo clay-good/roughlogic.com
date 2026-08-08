@@ -18727,6 +18727,26 @@
       "kind": "industry"
     },
     {
+      "term": "stiffness ratio g column",
+      "target": "steel-column-stiffness-ratio-g",
+      "kind": "industry"
+    },
+    {
+      "term": "compute g from member sizes",
+      "target": "steel-column-stiffness-ratio-g",
+      "kind": "question"
+    },
+    {
+      "term": "alignment chart g factor",
+      "target": "steel-column-stiffness-ratio-g",
+      "kind": "industry"
+    },
+    {
+      "term": "girder far end stiffness modifier",
+      "target": "steel-column-stiffness-ratio-g",
+      "kind": "question"
+    },
+    {
       "term": "alignment chart",
       "target": "steel-effective-length-k",
       "kind": "industry"

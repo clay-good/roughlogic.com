@@ -17002,6 +17002,36 @@ test("bounds: spec-v315 computeSteelEffectiveLengthK pins sway vs braced, the fi
   assert.ok("error" in _v315({ ga: NaN, gb: 2, frame: "sway" }));
 });
 
+import { computeSteelColumnStiffnessRatioG as _v1210, computeSteelEffectiveLengthK as _v1210k } from "../../calc-steel.js";
+
+test("bounds: spec-v1210 computeSteelColumnStiffnessRatioG pins the ratio, the far-end modifier, member skipping, the K feed, and error seams", () => {
+  const ex = { ic1: 800, lc1: 12, ic2: 800, lc2: 12, ig1: 1200, lg1: 24, ig2: 1200, lg2: 24, girder_far_end: "rigid" };
+  const r = _v1210(ex);
+  // col sum = 2 x 800/12 = 133.333; girder sum = 2 x 1200/24 = 100 (rigid); G = 1.333.
+  assert.ok(Math.abs(r.col_stiffness - (2 * 800 / 12)) < 1e-9);
+  assert.ok(Math.abs(r.girder_stiffness - 100) < 1e-9);
+  assert.ok(Math.abs(r.g_ratio - (2 * 800 / 12) / 100) < 1e-9);
+  assert.ok(Math.abs(r.g_ratio - 1.33333) < 1e-4);
+  assert.ok(r.girder_modifier === 1.0 && r.col_count === 2 && r.girder_count === 2);
+  // The far-end modifier scales the girder stiffness: moment-frame far-pinned (x0.5) doubles G.
+  const mp = _v1210({ ...ex, girder_far_end: "sway_pinned" });
+  assert.ok(mp.girder_modifier === 0.5 && Math.abs(mp.g_ratio - 2 * r.g_ratio) < 1e-9);
+  // Braced far-fixed (x2.0) halves G.
+  const bf = _v1210({ ...ex, girder_far_end: "braced_fixed" });
+  assert.ok(bf.girder_modifier === 2.0 && Math.abs(bf.g_ratio - r.g_ratio / 2) < 1e-9);
+  // A length of 0 skips a member: dropping the continuing column halves the column stiffness sum.
+  const one = _v1210({ ...ex, ic2: 0, lc2: 0 });
+  assert.ok(one.col_count === 1 && Math.abs(one.col_stiffness - 800 / 12) < 1e-9 && Math.abs(one.g_ratio - r.g_ratio / 2) < 1e-9);
+  // The result feeds the K tile as GA/GB (finite K).
+  assert.ok(_v1210k({ ga: r.g_ratio, gb: r.g_ratio, frame: "sway" }).k_factor > 1);
+  // Error seams: bad far-end, a member with I but no length, no columns, no girders, non-finite.
+  assert.ok("error" in _v1210({ ...ex, girder_far_end: "bogus" }));
+  assert.ok("error" in _v1210({ ...ex, ic2: 500, lc2: 0 }));
+  assert.ok("error" in _v1210({ ...ex, ic1: 0, lc1: 0, ic2: 0, lc2: 0 }));
+  assert.ok("error" in _v1210({ ...ex, ig1: 0, lg1: 0, ig2: 0, lg2: 0 }));
+  assert.ok("error" in _v1210({ ...ex, ic1: Infinity }));
+});
+
 test("bounds: spec-v316 computeSteelBoltTensionShear pins the reduction, the cap and floor, the ASD branch, and error seams", () => {
   const r = _v316({ fnt_ksi: 90, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: 20, method: "LRFD" });
   assert.ok(Math.abs(r.fpnt_ksi - (1.3 * 90 - 90 / (0.75 * 54) * 20)) < 1e-9);
