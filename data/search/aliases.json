@@ -84941,6 +84941,21 @@
       "kind": "question"
     },
     {
+      "term": "osmotic pressure vant hoff",
+      "target": "osmolarity",
+      "kind": "question"
+    },
+    {
+      "term": "solution osmolarity calculator",
+      "target": "osmolarity",
+      "kind": "industry"
+    },
+    {
+      "term": "mosm per liter solution",
+      "target": "osmolarity",
+      "kind": "question"
+    },
+    {
       "term": "nernst equation",
       "target": "nernst-equation",
       "kind": "industry"

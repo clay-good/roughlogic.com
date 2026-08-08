@@ -213,6 +213,7 @@ export const COMPUTE_MAP = {
   "ideal-gas-law": { module: "../../calc-lab.js", fn: "computeIdealGasLaw" },
   "arrhenius-equation": { module: "../../calc-lab.js", fn: "computeArrheniusEquation" },
   "clausius-clapeyron": { module: "../../calc-lab.js", fn: "computeClausiusClapeyron" },
+  "osmolarity": { module: "../../calc-lab.js", fn: "computeOsmolarity" },
   "nernst-equation": { module: "../../calc-lab.js", fn: "computeNernstEquation" },
   "rcf-rpm": { module: "../../calc-lab.js", fn: "computeRcf" },
   "slope-from-level": { module: "../../calc-cross.js", fn: "computeSlopeFromLevel" },

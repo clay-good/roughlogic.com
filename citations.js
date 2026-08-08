@@ -7258,6 +7258,18 @@ export const CITATIONS = {
       { name: "Scope", value: "single mechanism over the interval (a curved Arrhenius plot signals a mechanism change)", source: "scope of this tile" },
     ],
   },
+  "osmolarity": {
+    formula: "Osmolarity Osm = i x C (i the van't Hoff factor: 1 glucose/urea, 2 NaCl/KCl, 3 CaCl2/MgCl2/Na2SO4); osmotic pressure Pi = Osm x R x T, R = 0.08206 L*atm/(mol*K), T in kelvin. mOsm/L = 1000 x Osm.",
+    edition: "The van't Hoff colligative-property relations (osmolarity and osmotic pressure); standard physical chemistry. First principles.",
+    freeAccess: "van't Hoff's law and the dissociation factors are public first-principles chemistry; the concentration and solute are the user's inputs.",
+    governance: GOVERNANCE.lab,
+    editionNote: "The osmolarity and osmotic pressure of a solution from the molar concentration and the van't Hoff factor, the colligative-property member the lab chemistry set leaves out. Osmolarity Osm = i x C counts the effective number of dissolved particles: i is 1 for a non-dissociating solute (glucose, urea), 2 for a 1:1 salt (NaCl, KCl), and 3 for a 1:2 salt (CaCl2, MgCl2, Na2SO4). Osmotic pressure Pi = Osm x R x T follows from van't Hoff's law (the ideal-solution analog of the ideal gas law), R = 0.08206 L*atm/(mol*K), T in kelvin. Physiological saline (0.9% NaCl = 0.154 mol/L, i = 2) is 0.308 Osmol/L (308 mOsm/L) and about 7.8 atm at body temperature, which is why isotonic fluids are formulated near 300 mOsm/L. This is the ideal dilute-solution form; at higher concentration the real i falls below the nominal value (ion pairing) and an osmotic coefficient corrects it. Osmolarity is per liter of solution (osmolality is per kg of solvent). A first-principles chemistry aid; the osmometer reading governs.",
+    assumptions: [
+      { name: "Osmolarity", value: "Osm = i x C; i = 1 (glucose/urea), 2 (NaCl/KCl), 3 (CaCl2/MgCl2)", source: "van't Hoff colligative properties" },
+      { name: "Osmotic pressure", value: "Pi = Osm x R x T, R = 0.08206 L*atm/(mol*K), T in kelvin", source: "van't Hoff's law" },
+      { name: "Ideal dilute solution", value: "the real i falls below nominal at high concentration (an osmotic coefficient corrects it); per liter of solution", source: "scope of this tile" },
+    ],
+  },
   "clausius-clapeyron": {
     formula: "ln(P2/P1) = -(dHvap/R)(1/T2 - 1/T1), so dHvap = R ln(P2/P1) / (1/T1 - 1/T2); R = 8.314 J/(mol*K), T in kelvin. Only the pressure ratio enters. Slope of ln(P) vs 1/T is -dHvap/R.",
     edition: "The Clausius-Clapeyron equation; standard physical chemistry / thermodynamics. First principles.",

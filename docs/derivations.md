@@ -2475,6 +2475,7 @@ cross-check.
 | calc-lab.js | `computeNernstEquation` | `{ standard_potential_v = 0, electrons_n = 1, reaction_quotient = 1, temperatu...` | _ | _ | _ |
 | calc-lab.js | `computeNucleicAcidA260` | `{ a260 = 0, na_type = "dsDNA", dilution_factor = 1, a280 = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeOd600CellCount` | `{ od600 = 0, factor_cells_per_od = 0, dilution = 1 } = {}` | _ | _ | _ |
+| calc-lab.js | `computeOsmolarity` | `{ concentration_mol_l = 0, vant_hoff_i = 1, temperature_c = 37 } = {}` | _ | _ | _ |
 | calc-lab.js | `computePcrMix` | `{ number_of_reactions = 1, components = [], fudge_factor_pct = 10, }` | _ | _ | _ |
 | calc-lab.js | `computePrimerTm` | `{ sequence = "", method = "auto" } = {}` | _ | _ | _ |
 | calc-lab.js | `computeRcf` | `{ rotor_radius_mm = 0, rpm, rcf }` | _ | _ | _ |
@@ -3280,7 +3281,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1866.
+Row count: 1867.
 
 <!-- END function-corpus-v14 -->
 
@@ -4947,7 +4948,7 @@ per spec-v14 §13.1 second paragraph.
 | `wip-percent-complete` | Work-in-Progress Percent Complete and Over/Under Billing | construction accounting (cost-to-cost...; spec-v390 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `workers-comp-emr-premium` | Workers-Comp Premium and Experience Mod | workers-comp rating (NCCI-style); spec-v445 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group T Lab (25 tiles)
+### Group T Lab (26 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4970,6 +4971,7 @@ per spec-v14 §13.1 second paragraph.
 | `nernst-equation` | Nernst Equation (Cell Potential vs Concentration) | Nernst equation (physical chemistry, ...; E = 1.10 - (8.314 x 298.15 / (2 x 96485)) x ln(0.01) = 1.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `nucleic-acid-a260` | Nucleic Acid Concentration (A260) | Standard spectrophotometric nucleic-a...; A260 0.6, dsDNA (50), 1:50 dilution, A280 0.324 -> 1500 n... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `od600-cell-count` | OD600 to Cell Density | Standard microbiology spectrophotomet...; OD 0.5 * 8e8 cells/mL/OD * 1 -> 4.0e8 cells/mL | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `osmolarity` | Osmolarity and Osmotic Pressure (van't Hoff) | van't Hoff colligative properties (ph...; Osm = 2 x 0.154 = 0.308 Osmol/L = 308 mOsm/L; Pi = 0.308 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pcr-master-mix` | PCR Master Mix | Project (first-principles); 24 reactions / 10% extra / 25 uL total per rxn (12.5 mast... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `primer-tm` | Primer Melting Temperature | Wallace 1979 / Marmur & Doty 1962 (pr...; GCGGATCCATG (11 nt) via Wallace -> Tm 36 C | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rcf-rpm` | Centrifuge RPM and RCF | Project (first-principles); Centrifuge G-force identity (r in cm, rpm in revolutions/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5084,6 +5086,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1618. Fixture-covered or reference-cadence: 1618 / 1618.
+Tile count: 1619. Fixture-covered or reference-cadence: 1619 / 1619.
 
 <!-- END tile-index-v14 -->

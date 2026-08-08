@@ -1498,6 +1498,56 @@
    }
   },
   {
+   "tile_id": "osmolarity",
+   "source_publisher": "van't Hoff colligative properties (physical chemistry)",
+   "source_title": "0.9% saline (0.154 M NaCl, i 2) at 37 C -> 308 mOsm/L, 7.84 atm (spec-v1246)",
+   "source_edition_or_year": "Osm = i C; Pi = Osm R T, R 0.08206",
+   "source_section_or_page": "Osm = 2 x 0.154 = 0.308 Osmol/L = 308 mOsm/L; Pi = 0.308 x 0.08206 x 310.15 = 7.84 atm (blood ~7.7-7.9).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "concentration_mol_l": 0.154,
+    "vant_hoff_i": 2,
+    "temperature_c": 37
+   },
+   "outputs": {
+    "osmolarity_mosmol_l": {
+     "value": 308,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "osmotic_pressure_atm": {
+     "value": 7.84,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "osmolarity",
+   "source_publisher": "van't Hoff (dissociation-factor cross-check)",
+   "source_title": "a non-dissociating solute (glucose, i 1) at the same molarity gives half the osmolarity of NaCl",
+   "source_edition_or_year": "Osm = i C",
+   "source_section_or_page": "0.154 M glucose (i 1) -> 0.154 Osmol/L = 154 mOsm/L, half the 308 mOsm/L of 0.154 M NaCl (i 2).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "concentration_mol_l": 0.154,
+    "vant_hoff_i": 1,
+    "temperature_c": 37
+   },
+   "outputs": {
+    "osmolarity_mosmol_l": {
+     "value": 154,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rcf-rpm",
    "source_publisher": "Project (first-principles)",
    "source_title": "RCF = 1.118e-5 * r_cm * RPM^2",

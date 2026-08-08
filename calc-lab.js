@@ -369,6 +369,33 @@ export function computeClausiusClapeyron({ pressure1 = 0, temp1_c = 0, pressure2
 }
 export const clausiusClapeyronExample = { inputs: { pressure1: 760, temp1_c: 100, pressure2: 525.9, temp2_c: 90 } };
 
+// --- spec-v1246: solution osmolarity and osmotic pressure (van't Hoff) ---
+// The colligative-property member the lab set (molarity, dilution, Beer-Lambert, Henderson-Hasselbalch)
+// leaves out. Osmolarity = i * C (i the van't Hoff dissociation number: 1 glucose/urea, 2 NaCl/KCl,
+// 3 CaCl2/MgCl2/Na2SO4); osmotic pressure Pi = Osm * R * T, R = 0.08206 L*atm/(mol*K), T in kelvin.
+// dims: in { concentration_mol_l: dimensionless, vant_hoff_i: dimensionless, temperature_c: T } out: { osmolarity_osmol_l: dimensionless, osmolarity_mosmol_l: dimensionless, osmotic_pressure_atm: dimensionless }
+export function computeOsmolarity({ concentration_mol_l = 0, vant_hoff_i = 1, temperature_c = 37 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const C = Number(concentration_mol_l) || 0;
+  const i = Number(vant_hoff_i) || 0;
+  const Tc = Number(temperature_c);
+  if (!(C > 0)) return { error: "Molar concentration must be positive (mol/L)." };
+  if (!(i > 0)) return { error: "The van't Hoff factor i must be positive (1 = non-dissociating, 2 = NaCl/KCl, 3 = CaCl2)." };
+  if (!Number.isFinite(Tc)) return { error: "Temperature must be a number (C)." };
+  const T = Tc + 273.15;
+  if (!(T > 0)) return { error: "Temperature must be above absolute zero (-273.15 C)." };
+  const R = 0.08206; // L*atm/(mol*K)
+  const osmolarity_osmol_l = i * C;
+  const osmolarity_mosmol_l = osmolarity_osmol_l * 1000;
+  const osmotic_pressure_atm = osmolarity_osmol_l * R * T;
+  if (![osmolarity_osmol_l, osmolarity_mosmol_l, osmotic_pressure_atm].every(Number.isFinite)) return { error: "Osmolarity math is not a finite value." };
+  return {
+    osmolarity_osmol_l, osmolarity_mosmol_l, osmotic_pressure_atm,
+    note: "The osmolarity and osmotic pressure of a solution from the molar concentration and the van't Hoff factor, the colligative-property member the lab chemistry set leaves out. Osmolarity Osm = i x C counts the effective number of dissolved particles: the van't Hoff factor i is 1 for a non-dissociating solute (glucose, urea), 2 for a 1:1 salt (NaCl, KCl), and 3 for a 1:2 salt (CaCl2, MgCl2, Na2SO4). The osmotic pressure Pi = Osm x R x T follows from van't Hoff's law (the ideal-solution analog of the ideal gas law), with R = 0.08206 L*atm/(mol*K) and T in kelvin. Physiological saline, 0.9% NaCl = 0.154 mol/L with i = 2, is 0.308 Osmol/L (308 mOsm/L) and exerts about 7.8 atm at body temperature - the reason isotonic fluids are formulated to about 300 mOsm/L so cells neither swell nor shrink. This is the ideal (dilute-solution) form; at higher concentrations the real i falls below the nominal value (ion pairing) and an osmotic coefficient corrects it. Report osmolarity per liter of SOLUTION (osmolality is per kg of solvent, slightly different). A first-principles chemistry aid; the measured osmometer reading governs.",
+  };
+}
+export const osmolarityExample = { inputs: { concentration_mol_l: 0.154, vant_hoff_i: 2, temperature_c: 37 } };
+
 // --- spec-v1230: Nernst equation (cell / electrode potential) ---
 // The lab chemistry set has no electrochemistry member. This adds the Nernst equation
 // E = E0 - (RT/nF) ln Q, R = 8.314 J/(mol*K), F = 96485 C/mol; at 25 C the slope RT ln(10)/(nF) is
@@ -765,6 +792,28 @@ function renderClausiusClapeyron(inputRegion, outputRegion, citationEl) {
   for (const f of [p1, t1, p2, t2]) f.input.addEventListener("input", update);
 }
 
+function renderOsmolarity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: osmolarity Osm = i x C (i the van't Hoff dissociation number: 1 glucose/urea, 2 NaCl/KCl, 3 CaCl2/MgCl2) and osmotic pressure Pi = Osm R T, R = 0.08206 L*atm/(mol*K), T in kelvin (van't Hoff's law; standard physical chemistry). Ideal dilute-solution form; report per liter of solution. First principles.";
+  inputRegion.appendChild(makeNotice(LAB_NOTICE));
+  const c = makeNumber("Molar concentration C (mol/L)", "osm-c", { step: "any", min: "0", value: "0.154" }); c.input.value = "0.154";
+  const i = makeNumber("van't Hoff factor i (1 glucose, 2 NaCl, 3 CaCl2)", "osm-i", { step: "any", min: "0", value: "2" }); i.input.value = "2";
+  const t = makeNumber("Temperature (C)", "osm-t", { step: "any", value: "37" }); t.input.value = "37";
+  for (const f of [c, i, t]) inputRegion.appendChild(f.wrap);
+  const oOsm = makeOutputLine(outputRegion, "Osmolarity", "osm-out-osm");
+  const oPi = makeOutputLine(outputRegion, "Osmotic pressure", "osm-out-pi");
+  const oNote = makeOutputLine(outputRegion, "Note", "osm-out-note");
+  const rd = (x) => (x.value === "" ? 0 : Number(x.value) || 0);
+  const update = debounce(() => {
+    const r = computeOsmolarity({ concentration_mol_l: rd(c.input), vant_hoff_i: rd(i.input), temperature_c: t.input.value === "" ? 37 : Number(t.input.value) });
+    if (r.error) { oOsm.textContent = r.error; oPi.textContent = "-"; oNote.textContent = ""; return; }
+    oOsm.textContent = fmt(r.osmolarity_osmol_l, 4) + " Osmol/L (" + fmt(r.osmolarity_mosmol_l, 0) + " mOsm/L)";
+    oPi.textContent = fmt(r.osmotic_pressure_atm, 2) + " atm";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { c.input.value = "0.154"; i.input.value = "2"; t.input.value = "37"; update(); });
+  for (const f of [c, i, t]) f.input.addEventListener("input", update);
+}
+
 function renderNernstEquation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Nernst equation E = E0 - (RT/nF) ln Q, R = 8.314 J/(mol*K), F = 96485 C/mol; at 25 C the slope is 0.05916/n V per decade of Q (Nernst; standard electrochemistry). Uses activities approximated by concentrations; excludes junction potential and overpotential. First principles.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
@@ -953,6 +1002,7 @@ export const LAB_RENDERERS = {
   "ideal-gas-law": renderIdealGasLaw,
   "arrhenius-equation": renderArrheniusEquation,
   "clausius-clapeyron": renderClausiusClapeyron,
+  "osmolarity": renderOsmolarity,
   "nernst-equation": renderNernstEquation,
   "rcf-rpm": renderRcf,
   "resuspension-volume": renderResuspend,

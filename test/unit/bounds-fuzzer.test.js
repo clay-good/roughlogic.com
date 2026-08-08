@@ -3830,6 +3830,7 @@ import {
   computeIdealGasLaw,
   computeArrheniusEquation,
   computeClausiusClapeyron,
+  computeOsmolarity,
   computeNernstEquation,
   computeRcf,
   computeResuspension,
@@ -4016,6 +4017,27 @@ test("bounds: spec-v1235 computeClausiusClapeyron pins dHvap from two P/T points
   assert.ok("error" in computeClausiusClapeyron({ pressure1: 760, temp1_c: 100, pressure2: 0, temp2_c: 90 }));
   assert.ok("error" in computeClausiusClapeyron({ pressure1: 760, temp1_c: 100, pressure2: 525.9, temp2_c: 100 }));
   assert.ok("error" in computeClausiusClapeyron({ pressure1: 760, temp1_c: 100, pressure2: Infinity, temp2_c: 90 }));
+});
+
+test("bounds: spec-v1246 computeOsmolarity pins Osm = i C, Pi = Osm R T, the dissociation scaling, and error seams", () => {
+  const R = 0.08206;
+  // 0.9% saline (0.154 M NaCl, i 2) at 37 C: 0.308 Osmol/L, 7.84 atm.
+  const r = computeOsmolarity({ concentration_mol_l: 0.154, vant_hoff_i: 2, temperature_c: 37 });
+  assert.ok(Math.abs(r.osmolarity_osmol_l - 2 * 0.154) < 1e-12);
+  assert.ok(Math.abs(r.osmolarity_mosmol_l - 308) < 0.5);
+  assert.ok(Math.abs(r.osmotic_pressure_atm - 2 * 0.154 * R * 310.15) < 1e-9);
+  assert.ok(Math.abs(r.osmotic_pressure_atm - 7.84) < 0.05);
+  // A non-dissociating solute (i 1) at the same molarity gives half the osmolarity of NaCl (i 2).
+  const glu = computeOsmolarity({ concentration_mol_l: 0.154, vant_hoff_i: 1, temperature_c: 37 });
+  assert.ok(Math.abs(glu.osmolarity_osmol_l - r.osmolarity_osmol_l / 2) < 1e-12);
+  // Osmotic pressure scales with absolute temperature.
+  const cold = computeOsmolarity({ concentration_mol_l: 0.154, vant_hoff_i: 2, temperature_c: 0 });
+  assert.ok(cold.osmotic_pressure_atm < r.osmotic_pressure_atm && Math.abs(cold.osmotic_pressure_atm - 2 * 0.154 * R * 273.15) < 1e-9);
+  // Error seams: non-positive concentration, non-positive i, absolute zero, non-finite.
+  assert.ok("error" in computeOsmolarity({ concentration_mol_l: 0, vant_hoff_i: 2 }));
+  assert.ok("error" in computeOsmolarity({ concentration_mol_l: 0.1, vant_hoff_i: 0 }));
+  assert.ok("error" in computeOsmolarity({ concentration_mol_l: 0.1, vant_hoff_i: 2, temperature_c: -273.15 }));
+  assert.ok("error" in computeOsmolarity({ concentration_mol_l: Infinity, vant_hoff_i: 2 }));
 });
 
 test("bounds: calc-lab computeMassMoles rejects non-positive MW or under-/over-specified inputs (documented)", () => {
