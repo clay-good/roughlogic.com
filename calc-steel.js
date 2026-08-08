@@ -406,6 +406,47 @@ STEEL_RENDERERS["column-base-plate"] = _simpleRenderer({
 // end (J4.3), and the tension member's yield/rupture with shear lag (D2/D3).
 const _E_STEEL = 29000; // ksi
 
+// ===================== spec-v1215: AISC lateral-torsional-buckling moment-gradient factor Cb =====================
+// The steel-beam-ltb tile takes cb as a hand-entered input defaulting to the conservative 1.0, and its
+// note/citation both say "Cb must match the moment diagram (1.0 is conservative)." No tile computed it.
+// AISC 360 Eq. F1-1: Cb = 12.5 Mmax / (2.5 Mmax + 3 MA + 4 MB + 3 MC), absolute moments at the ends'
+// max and the quarter / mid / three-quarter points of the unbraced segment (Rm = 1 for a doubly
+// symmetric member). Uniform moment gives Cb = 1.0; a simple-span UDL beam braced only at the ends
+// gives 1.14 -- a 14% bump in the LTB capacity the beam-ltb tile otherwise leaves on the table.
+// dims: in { mmax: M L^2 T^-2, ma: M L^2 T^-2, mb: M L^2 T^-2, mc: M L^2 T^-2 } out: { cb: dimensionless }
+export function computeSteelCb({ mmax = 0, ma = 0, mb = 0, mc = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Mmax = Math.abs(Number(mmax) || 0);
+  const MA = Math.abs(Number(ma) || 0);
+  const MB = Math.abs(Number(mb) || 0);
+  const MC = Math.abs(Number(mc) || 0);
+  if (!(Mmax > 0)) return { error: "The maximum moment Mmax in the unbraced segment must be positive (kip-ft)." };
+  if (MA > Mmax || MB > Mmax || MC > Mmax) return { error: "The quarter/mid/three-quarter-point moments cannot exceed Mmax (Mmax is the largest moment in the segment)." };
+  const denom = 2.5 * Mmax + 3 * MA + 4 * MB + 3 * MC;
+  const cb = 12.5 * Mmax / denom;
+  if (!Number.isFinite(cb)) return { error: "Cb math is not a finite value." };
+  return {
+    cb,
+    note: "The AISC 360 Eq. F1-1 lateral-torsional-buckling moment-gradient factor Cb, the value the steel-beam-ltb tile takes as an input but defaults to a conservative 1.0. Cb = 12.5 Mmax / (2.5 Mmax + 3 MA + 4 MB + 3 MC), using the ABSOLUTE moments at the maximum and at the quarter (MA), mid (MB), and three-quarter (MC) points of the UNBRACED segment (Rm = 1 for a doubly symmetric I-shape). It rewards a moment diagram that is not uniform: uniform moment (equal end moments bending in single curvature) gives Cb = 1.0, a simple-span uniformly loaded beam braced only at its ends gives 1.14, and a beam with the moment concentrated near midspan and light quarter-point moments goes higher -- each a direct multiplier on the LTB nominal moment Mn (capped at Mp). Because Mmax is the largest moment in the segment, Cb is always at least 1.0 here. Feed it into steel-beam-ltb as Cb. Take Cb = 1.0 for a cantilever with a free end unbraced, and recompute per unbraced segment (the value changes between brace points). A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const steelCbExample = { inputs: { mmax: 100, ma: 75, mb: 100, mc: 75 } };
+STEEL_RENDERERS["steel-cb"] = _simpleRenderer({
+  citation: "Citation: AISC 360 Eq. F1-1 lateral-torsional-buckling moment-gradient factor Cb = 12.5 Mmax / (2.5 Mmax + 3 MA + 4 MB + 3 MC), the absolute moments at the max and the quarter/mid/three-quarter points of the unbraced segment (Rm = 1, doubly symmetric), by name. Uniform moment gives 1.0; a simple-span UDL beam braced at the ends gives 1.14. Feeds the steel-beam-ltb tile. A design aid, not a substitute for the engineer of record.",
+  example: steelCbExample.inputs,
+  fields: [
+    { key: "mmax", label: "Max moment in the unbraced segment Mmax (kip-ft)", kind: "number", default: 100 },
+    { key: "ma", label: "Moment at the quarter point MA (kip-ft)", kind: "number", default: 75 },
+    { key: "mb", label: "Moment at midspan MB (kip-ft)", kind: "number", default: 100 },
+    { key: "mc", label: "Moment at the three-quarter point MC (kip-ft)", kind: "number", default: 75 },
+  ],
+  outputs: [
+    { key: "cb", id: "scb-out-cb", label: "Moment-gradient factor Cb", value: (r) => fmt(r.cb, 3) },
+    { key: "n", id: "scb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelCb,
+});
+
 // dims: in { fy: M L^-1 T^-2, zx: L^3, sx: L^3, ry: L, rts: L, j: L^4, ho: L, lb_ft: L, cb: dimensionless } out: { mp_kipft: M L^2 T^-2, lp_ft: L, lr_ft: L, mn_kipft: M L^2 T^-2, ma_kipft: M L^2 T^-2, phi_mn: M L^2 T^-2 }
 export function computeSteelBeamLtb({ fy = 50, zx = 0, sx = 0, ry = 0, rts = 0, j = 0, ho = 0, lb_ft = 0, cb = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

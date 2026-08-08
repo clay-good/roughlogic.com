@@ -16582,6 +16582,21 @@
       "kind": "redirect"
     },
     {
+      "term": "moment gradient factor cb",
+      "target": "steel-cb",
+      "kind": "industry"
+    },
+    {
+      "term": "compute cb for lateral torsional buckling",
+      "target": "steel-cb",
+      "kind": "question"
+    },
+    {
+      "term": "aisc f1-1 cb",
+      "target": "steel-cb",
+      "kind": "industry"
+    },
+    {
       "term": "lateral torsional buckling",
       "target": "steel-beam-ltb",
       "kind": "industry"

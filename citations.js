@@ -16484,6 +16484,18 @@ export const CITATIONS = {
       { name: "Scope", value: "compact doubly-symmetric I-shapes about the strong axis; section properties from the AISC Manual", source: "AISC 360-22 F2 user note" },
     ],
   },
+  "steel-cb": {
+    formula: "Cb = 12.5 Mmax / (2.5 Mmax + 3 MA + 4 MB + 3 MC), absolute moments at the max and the quarter (MA), mid (MB), and three-quarter (MC) points of the unbraced segment; Rm = 1 (doubly symmetric).",
+    edition: "The AISC 360-22 Eq. F1-1 lateral-torsional-buckling moment-gradient factor Cb, by name.",
+    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); Eq. F1-1 is in Chapter F. The four segment moments are the user's own analysis results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AISC 360-22 Eq. F1-1 lateral-torsional-buckling moment-gradient factor Cb, the value the steel-beam-ltb tile takes as an input but defaults to a conservative 1.0: Cb = 12.5 Mmax / (2.5 Mmax + 3 MA + 4 MB + 3 MC), using the ABSOLUTE moments at the maximum and at the quarter (MA), mid (MB), and three-quarter (MC) points of the unbraced segment, with Rm = 1.0 for a doubly symmetric member. It rewards a moment diagram that is not uniform: uniform moment (equal end moments in single curvature) gives Cb = 1.0, a simple-span uniformly loaded beam braced only at its ends gives 1.14, and a diagram peaked near midspan with light quarter-point moments goes higher -- each a direct multiplier on the LTB nominal moment Mn (capped at Mp). Because Mmax is the largest moment in the segment, Cb is at least 1.0. Take Cb = 1.0 for a cantilever with a free unbraced end, and recompute for each unbraced segment. A design aid, not a substitute for the structural engineer of record.",
+    assumptions: [
+      { name: "Moment-gradient factor", value: "Cb = 12.5 Mmax / (2.5 Mmax + 3 MA + 4 MB + 3 MC)", source: "AISC 360-22 Eq. F1-1" },
+      { name: "Absolute moments", value: "MA, MB, MC at the 1/4, 1/2, 3/4 points of the unbraced segment; Rm = 1 for a doubly symmetric shape", source: "AISC 360-22 F1" },
+      { name: "Bounds", value: "uniform moment -> 1.0; Cb >= 1.0 since Mmax is the segment maximum; feeds steel-beam-ltb", source: "AISC 360-22 F1 / scope of this tile" },
+    ],
+  },
   "steel-block-shear": {
     formula: "Lgv = end + (n - 1) s; Agv = Lgv t; Anv = (Lgv - (n - 0.5) dh) t; Ant = (edge - 0.5 dh) t; Rn = min(0.6 Fu Anv + Ubs Fu Ant, 0.6 Fy Agv + Ubs Fu Ant); ASD = Rn/2.00; LRFD = 0.75 Rn.",
     edition: "The AISC 360-22 Section J4.3 block-shear rupture strength (shear rupture plus tension rupture, capped by shear yielding plus tension rupture, Ubs = 1.0 for uniform tension) with the standard-hole net-area deductions, by name; Omega = 2.00 / phi = 0.75 are named factors.",

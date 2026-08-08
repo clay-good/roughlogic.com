@@ -636,7 +636,7 @@ const TOOL_MODULES = (() => {
     "steel-beam-flexure", "required-section-modulus", "steel-beam-shear", "steel-column-capacity",
     "bolt-group-eccentric", "bolt-shear-bearing", "column-base-plate",
     // spec-v281..v283 members-and-connections depth batch
-    "steel-beam-ltb", "steel-block-shear", "steel-tension-member", "staggered-net-width",
+    "steel-beam-ltb", "steel-cb", "steel-block-shear", "steel-tension-member", "staggered-net-width",
     // spec-v293..v295 connection/detailing depth batch
     "steel-web-local-strength", "steel-bolt-slip-critical", "slip-critical-with-tension", "steel-fillet-weld-size",
     // spec-v314..v316 beam-column-and-connection depth batch

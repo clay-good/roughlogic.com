@@ -15815,6 +15815,34 @@ test("bounds: spec-v281 computeSteelBeamLtb pins the three F2 zones, the Cb cap,
   assert.ok("error" in _v281({ ...P, lb_ft: Infinity }));
 });
 
+import { computeSteelCb as _v1215 } from "../../calc-steel.js";
+
+test("bounds: spec-v1215 computeSteelCb pins Eq. F1-1, the uniform-moment baseline, the >= 1 bound, the feed into beam-ltb, and error seams", () => {
+  // Simple-span UDL beam braced at the ends: MA = MC = 0.75 Mmax, MB = Mmax -> Cb = 1.136 (~1.14).
+  const r = _v1215({ mmax: 100, ma: 75, mb: 100, mc: 75 });
+  assert.ok(Math.abs(r.cb - 12.5 * 100 / (2.5 * 100 + 3 * 75 + 4 * 100 + 3 * 75)) < 1e-12);
+  assert.ok(Math.abs(r.cb - 1.13636) < 1e-4);
+  // Uniform moment (all equal) is exactly 1.0.
+  assert.ok(Math.abs(_v1215({ mmax: 100, ma: 100, mb: 100, mc: 100 }).cb - 1.0) < 1e-12);
+  // A more peaked diagram gives a larger Cb; Cb is scale-invariant (depends on the ratios, not the magnitude).
+  assert.ok(_v1215({ mmax: 100, ma: 50, mb: 100, mc: 50 }).cb > r.cb);
+  assert.ok(Math.abs(_v1215({ mmax: 200, ma: 150, mb: 200, mc: 150 }).cb - r.cb) < 1e-12); // doubled magnitude, same Cb
+  // Cb is always >= 1 when the quarter moments do not exceed Mmax.
+  for (const t of [[100, 0, 0, 0], [100, 100, 0, 100], [100, 33, 66, 99]]) {
+    assert.ok(_v1215({ mmax: t[0], ma: t[1], mb: t[2], mc: t[3] }).cb >= 1 - 1e-12);
+  }
+  // Signs are taken as absolute (a reverse-curvature diagram uses magnitudes).
+  assert.ok(Math.abs(_v1215({ mmax: 100, ma: -75, mb: -100, mc: -75 }).cb - r.cb) < 1e-12);
+  // The result feeds the beam-ltb tile as Cb and raises the inelastic-zone capacity.
+  const P = { fy: 50, zx: 101, sx: 88.9, ry: 1.65, rts: 1.98, j: 1.24, ho: 17.4, lb_ft: 10 };
+  assert.ok(_v281({ ...P, cb: r.cb }).mn_kipft > _v281({ ...P, cb: 1.0 }).mn_kipft);
+  // Error seams: Mmax must be positive; a quarter moment cannot exceed Mmax; non-finite.
+  assert.ok("error" in _v1215({}));
+  assert.ok("error" in _v1215({ mmax: 0, ma: 0, mb: 0, mc: 0 }));
+  assert.ok("error" in _v1215({ mmax: 100, ma: 120, mb: 50, mc: 50 }));
+  assert.ok("error" in _v1215({ mmax: Infinity, ma: 50, mb: 50, mc: 50 }));
+});
+
 test("bounds: spec-v282 computeSteelBlockShear pins the governing-path min(), the end-distance sensitivity, and error seams", () => {
   const P = { t_in: 0.5, fy: 36, fu: 58, n: 3, s_in: 3, end_in: 1.5, edge_in: 1.5, dh_in: 0.875, ubs: 1.0 };
   const r = _v282(P);

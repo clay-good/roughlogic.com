@@ -810,6 +810,7 @@ export const RENDERER_MAP = {
   "bolt-shear-bearing": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "column-base-plate": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-beam-ltb": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
+  "steel-cb": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-block-shear": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-tension-member": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "staggered-net-width": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },

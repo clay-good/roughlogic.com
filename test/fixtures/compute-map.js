@@ -1061,6 +1061,7 @@ export const COMPUTE_MAP = {
   "continuous-load-ocpd": { module: "../../calc-feeder.js", fn: "computeContinuousLoadOcpd" },
   // spec-v281..v283 steel members-and-connections depth batch (3 tiles)
   "steel-beam-ltb": { module: "../../calc-steel.js", fn: "computeSteelBeamLtb" },
+  "steel-cb": { module: "../../calc-steel.js", fn: "computeSteelCb" },
   "steel-block-shear": { module: "../../calc-steel.js", fn: "computeSteelBlockShear" },
   "steel-tension-member": { module: "../../calc-steel.js", fn: "computeSteelTensionMember" },
   "staggered-net-width": { module: "../../calc-steel.js", fn: "computeStaggeredNetWidth" },

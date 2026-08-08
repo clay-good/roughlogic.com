@@ -592,7 +592,7 @@ const _TILES = [
   ["ev-load-management-ems", "A"],
   ["ev-charger-throttle", "A"],
   // spec-v281..v283 steel members-and-connections depth batch
-  ["steel-beam-ltb", "E"], ["steel-block-shear", "E"], ["steel-tension-member", "E"], ["staggered-net-width", "E"],
+  ["steel-beam-ltb", "E"], ["steel-cb", "E"], ["steel-block-shear", "E"], ["steel-tension-member", "E"], ["staggered-net-width", "E"],
   // spec-v284..v286 reinforced-concrete member depth batch
   ["rc-column-axial", "E"], ["rc-column-steel-for-load", "E"], ["rc-punching-shear", "E"], ["rc-hook-development", "E"],
   // spec-v1008 ACI 318-19 one-way shear without stirrups (detailed size-effect method)

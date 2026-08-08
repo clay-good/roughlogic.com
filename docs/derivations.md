@@ -3086,6 +3086,7 @@ cross-check.
 | calc-steel.js | `computeSteelBoltSlipCritical` | `{ mu = 0.30, tb_kip = 0, ns = 1, n = 1, hf = 1.0, du = 1.13 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelBoltTensionShear` | `{ fnt_ksi = 90, fnv_ksi = 54, ab_in2 = 0, frv_ksi = 0, method = "LRFD" } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelCamber` | `{ w_kip_ft = 0, span_ft = 0, moi_in4 = 0, e_ksi = 29000, fraction = 0.80 } = {}` | _ | _ | _ |
+| calc-steel.js | `computeSteelCb` | `{ mmax = 0, ma = 0, mb = 0, mc = 0 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelColumnCapacity` | `{ fy = 50, e_mod = 29000, k = 1.0, l_ft = 0, r_in = 0, ag = 0, pu = 0 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelColumnStiffnessRatioG` | `{ ic1 = 0, lc1 = 0, ic2 = 0, lc2 = 0, ig1 = 0, lg1 = 0, ig2 = 0, lg2 = 0, gir...` | _ | _ | _ |
 | calc-steel.js | `computeSteelDoublerPlate` | `{ required_shear_kip = 0, fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0...` | _ | _ | _ |
@@ -3249,7 +3250,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1835.
+Row count: 1836.
 
 <!-- END function-corpus-v14 -->
 
@@ -3883,7 +3884,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (449 tiles)
+### Group E Construction (450 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4260,6 +4261,7 @@ per spec-v14 §13.1 second paragraph.
 | `steel-bolt-slip-critical` | Slip-Critical Bolt Design Strength (AISC 360 J3.8) | AISC 360-22 J3.8 / Table J3.1; spec-v294 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-bolt-tension-shear` | Bolt Combined Tension and Shear (AISC 360 J3.7) | AISC 360-22 J3.7; spec-v316 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-camber` | Steel Beam Camber from Dead-Load Deflection | AISC / fabrication practice; spec-v413 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `steel-cb` | LTB Moment-Gradient Factor Cb (AISC 360 Eq. F1-1) | AISC 360-22 Eq. F1-1 moment-gradient ...; UDL simple beam: MA = MC = 0.75 Mmax, MB = Mmax. Cb = 12.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-column-capacity` | Steel Column Compressive Capacity (AISC 360 Ch. E, Flexural Buckling) | AISC 360-22 Chapter E / Steel Constru...; spec-v256 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-column-stiffness-ratio-g` | Column Alignment-Chart Stiffness Ratio G (from member EI/L) | AISC 360 Commentary App. 7 / Salmon &...; col sum = 800/12 + 800/12 = 133.333 in^4/ft; girder sum =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-doubler-plate` | Panel-Zone Doubler-Plate Thickness (AISC 360 J10.6) | AISC 360-16 Section J10.6 (panel-zone...; W14 column, 300-kip demand: phiRn_bare 183 kip, shortfall... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5022,6 +5024,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1587. Fixture-covered or reference-cadence: 1587 / 1587.
+Tile count: 1588. Fixture-covered or reference-cadence: 1588 / 1588.
 
 <!-- END tile-index-v14 -->

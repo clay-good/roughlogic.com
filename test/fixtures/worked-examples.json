@@ -49356,6 +49356,52 @@
    }
   },
   {
+   "tile_id": "steel-cb",
+   "source_publisher": "AISC 360-22 Eq. F1-1 moment-gradient factor",
+   "source_title": "Simple-span uniformly loaded beam braced only at the ends -> Cb 1.14 (spec-v1215)",
+   "source_edition_or_year": "AISC 360-22 Eq. F1-1",
+   "source_section_or_page": "UDL simple beam: MA = MC = 0.75 Mmax, MB = Mmax. Cb = 12.5(100)/(2.5(100) + 3(75) + 4(100) + 3(75)) = 1250/1100 = 1.136 -- the classic ~1.14.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "mmax": 100,
+    "ma": 75,
+    "mb": 100,
+    "mc": 75
+   },
+   "outputs": {
+    "cb": {
+     "value": 1.136,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-cb",
+   "source_publisher": "AISC 360-22 Eq. F1-1 (uniform-moment case)",
+   "source_title": "cross-check: uniform moment (all four moments equal) gives Cb = 1.0 exactly",
+   "source_edition_or_year": "AISC 360-22 Eq. F1-1",
+   "source_section_or_page": "MA = MB = MC = Mmax: Cb = 12.5/(2.5 + 3 + 4 + 3) = 12.5/12.5 = 1.0 -- the conservative baseline the beam-ltb tile defaults to.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "mmax": 100,
+    "ma": 100,
+    "mb": 100,
+    "mc": 100
+   },
+   "outputs": {
+    "cb": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-beam-ltb",
    "source_publisher": "AISC 360-22 Section F2 (AISC Manual W18x50 properties)",
    "source_title": "W18x50 A992 braced at 10 ft, Cb 1.0 -> inelastic zone, Mn 360.2 kip-ft (ASD 215.7)",
