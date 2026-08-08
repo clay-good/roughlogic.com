@@ -1830,3 +1830,50 @@ TRUCKING_RENDERERS["static-rollover-threshold"] = _simpleRenderer({
   ],
   compute: computeStaticRolloverThreshold,
 });
+
+// =====================================================================
+// spec-v1253 J: traction-limited startable grade (truck-startability)
+// =====================================================================
+// The steepest grade a truck can START on is limited by drive-axle traction, not power:
+// available tractive effort mu x W_drive must overcome grade + rolling resistance
+// W_gross x (sin theta + f cos theta). Small-angle field form: max grade (%) = 100 (mu (W_drive/W_gross) - f).
+// First-principles Newtonian statics (SAE J2188 defines gradeability; the physics is public).
+// dims: in { gross_weight_lb: M, drive_axle_weight_lb: M, friction_coeff: dimensionless, rolling_resistance_coeff: dimensionless } out: { max_grade_pct: dimensionless, tractive_effort_lb: M, drive_fraction_pct: dimensionless }
+export function computeTruckStartability({ gross_weight_lb = 0, drive_axle_weight_lb = 0, friction_coeff = 0.6, rolling_resistance_coeff = 0.012 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const wg = Number(gross_weight_lb) || 0;
+  const wd = Number(drive_axle_weight_lb) || 0;
+  const mu = Number(friction_coeff);
+  const f = Number(rolling_resistance_coeff);
+  if (!(wg > 0)) return { error: "Gross combination weight must be positive (lb)." };
+  if (!(wd > 0)) return { error: "Drive-axle weight must be positive (lb)." };
+  if (!(wd <= wg)) return { error: "Drive-axle weight cannot exceed the gross combination weight." };
+  if (!(mu > 0 && mu <= 1)) return { error: "Tire-road friction coefficient must be over 0 and up to 1.0 (about 0.6 dry, 0.3 wet, 0.15 ice)." };
+  if (!Number.isFinite(f) || f < 0) return { error: "Rolling resistance coefficient must be zero or positive (about 0.012 on pavement)." };
+  const k = wd / wg;
+  const max_grade_pct = 100 * (mu * k - f);
+  const tractive_effort_lb = mu * wd;
+  const drive_fraction_pct = 100 * k;
+  if (![max_grade_pct, tractive_effort_lb, drive_fraction_pct].every(Number.isFinite)) return { error: "Startability math is not a finite value." };
+  return {
+    max_grade_pct, tractive_effort_lb, drive_fraction_pct,
+    note: "The steepest grade a truck can START on, limited by DRIVE-AXLE TRACTION, not engine power. The drive tires can only push with the friction they have on the weight over them: available tractive effort = mu x W_drive, where mu is the tire-road friction coefficient (about 0.6 dry, 0.3 wet, 0.15 on ice/snow) and W_drive is the weight carried by the driven axles. To start moving up a grade that force must beat the grade resistance plus rolling resistance, W_gross x (grade + f), so the maximum startable grade is (%) = 100 (mu x (W_drive/W_gross) - f), with f the rolling-resistance coefficient (~0.012 on pavement). A 80,000 lb combination with 34,000 lb on the drives (a 42.5% drive fraction) can start on about a 24% grade when dry, but only about 5% on ice - which is why loaded rigs get stuck on icy grades that look mild. More weight on the drive axles (a heavier tractor, sliding the trailer tandems forward) and better traction raise the limit; this is a STARTING (traction) limit, not a sustained-speed (power) limit - a truck may start a grade it cannot climb at road speed, or the reverse. The small-angle field form is used; wheel slip, weight transfer to the rear on the grade, and differential/traction-control behavior shift the real number. A planning estimate; the driver, the surface, and the truck govern.",
+  };
+}
+export const truckStartabilityExample = { inputs: { gross_weight_lb: 80000, drive_axle_weight_lb: 34000, friction_coeff: 0.6, rolling_resistance_coeff: 0.012 } };
+TRUCKING_RENDERERS["truck-startability"] = _simpleRenderer({
+  citation: "Citation: traction-limited startable grade (first-principles statics; SAE J2188 defines gradeability): max grade (%) = 100 (mu (W_drive/W_gross) - f), where mu is the tire-road friction (~0.6 dry, 0.3 wet, 0.15 ice) and f the rolling-resistance coefficient (~0.012 on pavement); available tractive effort = mu x W_drive. Small-angle field form; a STARTING (traction) limit, not a sustained-climb (power) limit. Wheel slip and weight transfer shift the real number. The driver, the surface, and the truck govern.",
+  example: truckStartabilityExample.inputs,
+  fields: [
+    { key: "gross_weight_lb", label: "Gross combination weight (lb)", kind: "number", default: 80000 },
+    { key: "drive_axle_weight_lb", label: "Weight on drive axles (lb)", kind: "number", default: 34000 },
+    { key: "friction_coeff", label: "Tire-road friction (0.6 dry, 0.3 wet, 0.15 ice)", kind: "number", default: 0.6 },
+    { key: "rolling_resistance_coeff", label: "Rolling resistance coefficient (~0.012 pavement)", kind: "number", default: 0.012 },
+  ],
+  outputs: [
+    { key: "grade", id: "tsg-out-grade", label: "Max startable grade", value: (r) => fmt(r.max_grade_pct, 1) + "%" + (r.max_grade_pct <= 0 ? " (cannot start on any upgrade)" : "") },
+    { key: "te", id: "tsg-out-te", label: "Available tractive effort", value: (r) => fmt(r.tractive_effort_lb, 0) + " lb (drive fraction " + fmt(r.drive_fraction_pct, 1) + "%)" },
+    { key: "n", id: "tsg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTruckStartability,
+});

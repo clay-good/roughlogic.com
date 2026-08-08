@@ -936,7 +936,7 @@ const TOOL_MODULES = (() => {
     // spec-v508 diesel exhaust fluid (DEF) consumption and range
     "def-consumption",
     // spec-v913 static rollover threshold
-    "static-rollover-threshold",
+    "static-rollover-threshold", "truck-startability",
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [

@@ -41287,6 +41287,58 @@
    }
   },
   {
+   "tile_id": "truck-startability",
+   "source_publisher": "Traction-limited gradeability (first-principles statics)",
+   "source_title": "80,000 lb combo, 34,000 lb on drives, dry (mu 0.6) -> 24.3% max startable grade (spec-v1253)",
+   "source_edition_or_year": "max grade (%) = 100 (mu (W_drive/W_gross) - f)",
+   "source_section_or_page": "drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.425 - 0.012) = 100 (0.255 - 0.012) = 24.3%; tractive effort = 0.6 x 34000 = 20,400 lb.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "gross_weight_lb": 80000,
+    "drive_axle_weight_lb": 34000,
+    "friction_coeff": 0.6,
+    "rolling_resistance_coeff": 0.012
+   },
+   "outputs": {
+    "max_grade_pct": {
+     "value": 24.3,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "tractive_effort_lb": {
+     "value": 20400,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "truck-startability",
+   "source_publisher": "Traction limit (icy-surface cross-check)",
+   "source_title": "the same rig on ice (mu 0.15) can only start on about 5% grade",
+   "source_edition_or_year": "grade scales with the friction coefficient",
+   "source_section_or_page": "grade = 100 (0.15 x 0.425 - 0.012) = 100 (0.0638 - 0.012) = 5.2% -- why loaded rigs get stuck on icy grades that look mild.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "gross_weight_lb": 80000,
+    "drive_axle_weight_lb": 34000,
+    "friction_coeff": 0.15,
+    "rolling_resistance_coeff": 0.012
+   },
+   "outputs": {
+    "max_grade_pct": {
+     "value": 5.2,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "vessel-head-volume",
    "source_publisher": "dished-head volume geometry (first-principles)",
    "source_title": "48 in ID 2:1 semi-elliptical head -> 14,477 in3 = 62.67 gal",

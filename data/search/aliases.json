@@ -4296,6 +4296,21 @@
       "kind": "industry"
     },
     {
+      "term": "truck startability",
+      "target": "truck-startability",
+      "kind": "industry"
+    },
+    {
+      "term": "steepest grade a truck can start on",
+      "target": "truck-startability",
+      "kind": "question"
+    },
+    {
+      "term": "drive axle traction grade",
+      "target": "truck-startability",
+      "kind": "question"
+    },
+    {
       "term": "static stability factor",
       "target": "static-rollover-threshold",
       "kind": "industry"

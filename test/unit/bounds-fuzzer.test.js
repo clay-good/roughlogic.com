@@ -28600,6 +28600,27 @@ test("bounds: spec-v938 computeWireRopeClips pins the OSHA Table H-2 count, spac
 });
 
 import { computeStaticRolloverThreshold as _v913 } from "../../calc-trucking.js";
+import { computeTruckStartability as _v1253 } from "../../calc-trucking.js";
+test("bounds: spec-v1253 computeTruckStartability pins max grade = 100(mu k - f), tractive effort, the friction scaling, and error seams", () => {
+  // 80,000 lb, 34,000 on drives, dry (0.6): 24.3% grade, 20,400 lb TE.
+  const r = _v1253({ gross_weight_lb: 80000, drive_axle_weight_lb: 34000, friction_coeff: 0.6, rolling_resistance_coeff: 0.012 });
+  assert.ok(Math.abs(r.max_grade_pct - 100 * (0.6 * (34000 / 80000) - 0.012)) < 1e-9);
+  assert.ok(Math.abs(r.max_grade_pct - 24.3) < 0.05);
+  assert.ok(Math.abs(r.tractive_effort_lb - 0.6 * 34000) < 1e-9 && Math.abs(r.drive_fraction_pct - 42.5) < 1e-9);
+  // Lower friction (ice) drops the startable grade sharply.
+  const ice = _v1253({ gross_weight_lb: 80000, drive_axle_weight_lb: 34000, friction_coeff: 0.15 });
+  assert.ok(Math.abs(ice.max_grade_pct - 5.2) < 0.1 && ice.max_grade_pct < r.max_grade_pct);
+  // More weight on the drives raises the limit.
+  assert.ok(_v1253({ gross_weight_lb: 80000, drive_axle_weight_lb: 40000, friction_coeff: 0.6 }).max_grade_pct > r.max_grade_pct);
+  // A very slick surface can yield a non-positive startable grade.
+  assert.ok(_v1253({ gross_weight_lb: 80000, drive_axle_weight_lb: 8000, friction_coeff: 0.1, rolling_resistance_coeff: 0.012 }).max_grade_pct <= 0);
+  // Error seams: non-positive weights, drive > gross, friction out of range, negative rolling coeff, non-finite.
+  assert.ok("error" in _v1253({ gross_weight_lb: 0, drive_axle_weight_lb: 34000, friction_coeff: 0.6 }));
+  assert.ok("error" in _v1253({ gross_weight_lb: 30000, drive_axle_weight_lb: 34000, friction_coeff: 0.6 }));
+  assert.ok("error" in _v1253({ gross_weight_lb: 80000, drive_axle_weight_lb: 34000, friction_coeff: 0 }));
+  assert.ok("error" in _v1253({ gross_weight_lb: 80000, drive_axle_weight_lb: 34000, friction_coeff: 0.6, rolling_resistance_coeff: -1 }));
+  assert.ok("error" in _v1253({ gross_weight_lb: Infinity, drive_axle_weight_lb: 34000, friction_coeff: 0.6 }));
+});
 
 test("bounds: spec-v913 computeStaticRolloverThreshold pins the SRT, rollover speed, and error seams", () => {
   const r = _v913({ track_width_in: 72, cg_height_in: 80, curve_radius_ft: 200 });

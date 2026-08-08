@@ -12512,6 +12512,17 @@ export const CITATIONS = {
       { name: "Steady curve", value: "the rollover speed assumes a constant-radius steady turn; a fast steer or ramp is worse", source: "vehicle dynamics" },
     ],
   },
+  "truck-startability": {
+    formula: "max startable grade (%) = 100 (mu x (W_drive/W_gross) - f); available tractive effort = mu x W_drive. mu = tire-road friction, f = rolling-resistance coefficient (small-angle field form of mu W_drive >= W_gross (sin theta + f cos theta)).",
+    edition: "Traction-limited gradeability, first-principles Newtonian statics; SAE J2188 defines gradeability, but the physics is public and self-contained.",
+    freeAccess: "The traction/grade-resistance balance is first-principles statics; the weights and friction/rolling coefficients are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The steepest grade a truck can START on, set by DRIVE-AXLE TRACTION rather than engine power. The driven tires push only with the friction on the weight over them, so the available tractive effort is mu x W_drive; to begin moving up a grade it must exceed the grade resistance plus rolling resistance W_gross x (sin theta + f cos theta), which in the small-angle field form gives a maximum startable grade (%) = 100 (mu x (W_drive/W_gross) - f). mu is about 0.6 dry, 0.3 wet, and 0.15 on ice or snow; f is about 0.012 for tires on pavement. An 80,000 lb combination with 34,000 lb on the drives (a 42.5% drive fraction) can start on about a 24% grade dry but only about 5% on ice, which is why loaded rigs get stuck on icy grades that look mild. More weight on the drive axles and better traction raise the limit. This is a STARTING (traction) limit, not a sustained-speed (power) limit - a truck may start a grade it cannot climb at road speed, or the reverse. Wheel slip, weight transfer to the rear on the grade, and differential/traction-control behavior shift the real number. A planning estimate; the driver, the surface, and the truck govern.",
+    assumptions: [
+      { name: "Traction limit", value: "max grade (%) = 100 (mu (W_drive/W_gross) - f); tractive effort = mu W_drive", source: "Newtonian statics / SAE J2188" },
+      { name: "Small-angle field form", value: "grade ~ sin theta; wheel slip and weight transfer shift the real number; a starting limit, not a sustained-climb limit", source: "scope of this tile" },
+    ],
+  },
   "abyc-dc-wire": {
     formula: "V_drop = drop_pct/100 x system_voltage; CM = 10.75 x current x (2 x length) / V_drop; AWG = smallest standard size with circular-mil area >= CM.",
     edition: "The ABYC E-11 (AC & DC Electrical Systems on Boats) DC conductor sizing by voltage drop, on the round-trip length, by name; the standard, the wire's temperature rating, and the installation govern.",

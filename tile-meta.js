@@ -129,7 +129,7 @@ const _TILES = [
   ["drill-point-angle-from-length", "K"],
   ["cost-per-mile", "J"],
   ["deadhead-percent", "J"],
-  ["axle-load-distribution", "J"], ["static-rollover-threshold", "J"],
+  ["axle-load-distribution", "J"], ["static-rollover-threshold", "J"], ["truck-startability", "J"],
   ["detention-demurrage-billing", "J"], ["driver-pay-cpm-vs-percentage", "J"], ["invoice-factoring-cost", "J"],
   // spec-v486 trailer tongue weight and sway check (Group J)
   ["trailer-tongue-weight", "J"],
