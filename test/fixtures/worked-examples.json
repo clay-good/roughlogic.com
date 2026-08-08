@@ -70367,6 +70367,54 @@
    }
   },
   {
+   "tile_id": "true-airspeed",
+   "source_publisher": "FAA PHAK / ICAO Standard Atmosphere (TAS from CAS)",
+   "source_title": "120 KCAS at 8,000 ft density altitude -> 135.4 KTAS, sigma 0.786 (spec-v1252)",
+   "source_edition_or_year": "TAS = CAS / sqrt(sigma), sigma = (1 - 6.87535e-6 h)^4.2559",
+   "source_section_or_page": "sigma = (1 - 6.87535e-6 x 8000)^4.2559 = (0.945)^4.2559 = 0.7860; TAS = 120 / sqrt(0.7860) = 120 / 0.8866 = 135.4 KTAS; rule of thumb 120 x (1 + 0.02 x 8) = 139.2.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "cas_kt": 120,
+    "density_altitude_ft": 8000
+   },
+   "outputs": {
+    "tas_kt": {
+     "value": 135.4,
+     "tolerance": {
+      "abs": 0.2
+     }
+    },
+    "density_ratio": {
+     "value": 0.786,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "true-airspeed",
+   "source_publisher": "True airspeed (sea-level cross-check)",
+   "source_title": "at sea-level density altitude TAS equals CAS",
+   "source_edition_or_year": "sigma = 1 at h = 0",
+   "source_section_or_page": "at 0 ft density altitude sigma = 1, so TAS = CAS / sqrt(1) = 120 KTAS exactly.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "cas_kt": 120,
+    "density_altitude_ft": 0
+   },
+   "outputs": {
+    "tas_kt": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "crosswind-component",
    "source_publisher": "runway wind-component resolution (FAA vector method)",
    "source_title": "runway 36 (heading 360), wind 030 at 20 kt -> 30 deg off, 10.0 kt crosswind, 17.3 kt headwind",

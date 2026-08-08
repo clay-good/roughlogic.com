@@ -2628,6 +2628,7 @@ cross-check.
 | calc-mechanic.js | `computeTireGearing` | `{ original_size = "", new_size = "", axle_ratio = 0, top_gear_ratio = 1, targ...` | _ | _ | _ |
 | calc-mechanic.js | `computeTorqueAdapterCorrection` | `{ target_torque_ftlb = 0, wrench_length_in = 0, adapter_length_in = 0, adapte...` | _ | _ | _ |
 | calc-mechanic.js | `computeTrapSpeedHorsepower` | `{ weight_lb = 0, trap_mph = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeTrueAirspeed` | `{ cas_kt = 0, density_altitude_ft = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeTurboMaxBoostForChargeTemp` | `{ max_charge_temp_f = 0, inlet_temp_f = 0, compressor_eff_pct = 70, ambient_p...` | _ | _ | _ |
 | calc-mechanic.js | `computeTurboPressureRatio` | `{ boost_psi = 0, ambient_psia = 14.7, inlet_temp_f = 0, compressor_eff_pct = ...` | _ | _ | _ |
 | calc-mechanic.js | `computeTurnRadiusBank` | `{ airspeed_kt = 0, bank_angle_deg = 0 } = {}` | _ | _ | _ |
@@ -3286,7 +3287,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1872.
+Row count: 1873.
 
 <!-- END function-corpus-v14 -->
 
@@ -4572,7 +4573,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (105 tiles)
+### Group K Mechanic (106 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4671,6 +4672,7 @@ per spec-v14 §13.1 second paragraph.
 | `tire-gearing` | Tire Size and Effective Gear Ratio | Project (first-principles) over Tire ...; P265/70R17 -> 33x12.50R17 / 3.73 axle / 0.84 top gear / 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `torque-adapter-correction` | Torque Wrench Extension / Crowfoot Correction | Standard torque-adapter correction (S...; spec-v485 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trap-speed-horsepower` | Horsepower from Quarter-Mile Trap Speed | Hale quarter-mile trap-speed relation; spec-v325 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `true-airspeed` | True Airspeed from CAS and Density Altitude | FAA PHAK / ICAO Standard Atmosphere (...; sigma = (1 - 6.87535e-6 x 8000)^4.2559 = (0.945)^4.2559 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `turbo-max-boost-for-charge-temp` | Max Boost Before a Charge-Air Temperature Limit | turbocharger charge-air-temperature m...; 250 F limit, 80 F inlet, 70% eff, 14.7 psia -> 15.0 psi m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `turbo-pressure-ratio` | Turbocharger Pressure Ratio and Charge-Air Temp | turbocharger pressure-ratio and charg...; spec-v506 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `turn-radius-bank` | Coordinated Turn Radius and Rate | FAA Airplane Flying Handbook (coordin...; 120 kt at 30 deg bank -> 2208 ft radius, 5.25 deg/s rate ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5096,6 +5098,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1624. Fixture-covered or reference-cadence: 1624 / 1624.
+Tile count: 1625. Fixture-covered or reference-cadence: 1625 / 1625.
 
 <!-- END tile-index-v14 -->

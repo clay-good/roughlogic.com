@@ -964,7 +964,7 @@ const TOOL_MODULES = (() => {
     // spec-v323..v325 engine-build performance batch
     "injector-size", "injector-max-hp", "mean-piston-speed", "max-rpm-from-piston-speed", "trap-speed-horsepower", "et-horsepower",
     // spec-v500 density altitude and pressure altitude
-    "density-altitude",
+    "density-altitude", "true-airspeed",
     // spec-v501 crosswind and headwind component
     "crosswind-component",
     // spec-v502 displacement hull speed and speed/length ratio

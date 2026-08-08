@@ -12777,6 +12777,18 @@ export const CITATIONS = {
       { name: "Dry air", value: "ignores humidity, which lowers density and raises DA further", source: "scope of this tile" },
     ],
   },
+  "true-airspeed": {
+    formula: "sigma = (1 - 6.87535e-6 h)^4.2559 (h = density altitude in ft, troposphere); TAS = CAS / sqrt(sigma). Rule of thumb: TAS ~ CAS (1 + 0.02 h/1000).",
+    edition: "True airspeed from calibrated airspeed and the ISA density ratio, per the FAA Pilot's Handbook of Aeronautical Knowledge and the ICAO Standard Atmosphere, by name; first-principles.",
+    freeAccess: "The TAS = CAS/sqrt(sigma) relation and the ISA density-ratio formula are public FAA/ICAO standard-atmosphere physics; the CAS and density altitude are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The true airspeed from the calibrated airspeed and the density altitude, the conversion the density-altitude tile leads up to and the turn-radius-bank tile consumes. The airspeed indicator senses dynamic pressure (half rho V squared), so in thinner air the same indicated speed is a faster true speed: TAS = CAS / sqrt(sigma), sigma the density ratio rho/rho0. At the density altitude sigma = (1 - 6.87535e-6 h)^4.2559 with h in feet - 1.000 at sea level, 0.862 at 5,000 ft (TAS 7.7% over CAS), 0.739 at 10,000 ft (16.4% over). A 120 KCAS climb at 8,000 ft density altitude is 135 KTAS. The +2%/1000 ft rule of thumb tracks the exact value within a few knots to about 10,000 ft, then reads a touch low. This treats CAS as equal to equivalent airspeed (the low-speed assumption; the compressibility correction to EAS matters only at high speed and altitude), and TAS is airspeed - add the wind vector for ground speed. A planning estimate; the aircraft flight manual and the pilot in command govern.",
+    assumptions: [
+      { name: "TAS relation", value: "TAS = CAS / sqrt(sigma), sigma the ISA density ratio at the density altitude", source: "FAA PHAK / ICAO ISA" },
+      { name: "Density ratio", value: "sigma = (1 - 6.87535e-6 h)^4.2559, h in ft (troposphere, <= 36,089 ft)", source: "ICAO Standard Atmosphere" },
+      { name: "Low-speed", value: "CAS ~ EAS assumed; the compressibility correction matters only at high speed/altitude; TAS is not ground speed", source: "scope of this tile" },
+    ],
+  },
   "torque-adapter-correction": {
     formula: "E_eff = adapter_length x cos(adapter_angle); TW = target x wrench_length / (wrench_length + E_eff); actual_if_uncorrected = target x (wrench_length + E_eff) / wrench_length; correction_pct = (TW - target) / target x 100.",
     edition: "Standard torque-adapter correction (Snap-on / FAA AC 43.13.1B torque-wrench extension relation) by name; first-principles lever statics.",

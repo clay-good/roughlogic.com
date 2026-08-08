@@ -22947,6 +22947,25 @@ test("bounds: spec-v722 computeMotorMaxHpForStartingCurrent pins max_hp = LRA / 
 });
 
 import { computeDensityAltitude as _v500 } from "../../calc-mechanic.js";
+import { computeTrueAirspeed as _v1252 } from "../../calc-mechanic.js";
+test("bounds: spec-v1252 computeTrueAirspeed pins TAS = CAS/sqrt(sigma), the ISA density ratio, the sea-level identity, and error seams", () => {
+  // 120 KCAS at 8000 ft DA: sigma 0.786, TAS 135.4.
+  const r = _v1252({ cas_kt: 120, density_altitude_ft: 8000 });
+  assert.ok(Math.abs(r.density_ratio - Math.pow(1 - 6.87535e-6 * 8000, 4.2559)) < 1e-9);
+  assert.ok(Math.abs(r.density_ratio - 0.786) < 0.002);
+  assert.ok(Math.abs(r.tas_kt - 120 / Math.sqrt(r.density_ratio)) < 1e-9 && Math.abs(r.tas_kt - 135.4) < 0.2);
+  assert.ok(Math.abs(r.rule_of_thumb_kt - 120 * (1 + 0.02 * 8)) < 1e-9);
+  // Sea level: sigma = 1, TAS = CAS exactly.
+  const sl = _v1252({ cas_kt: 120, density_altitude_ft: 0 });
+  assert.ok(Math.abs(sl.density_ratio - 1) < 1e-12 && Math.abs(sl.tas_kt - 120) < 1e-12);
+  // Higher density altitude gives more TAS for the same CAS; below sea level gives less.
+  assert.ok(_v1252({ cas_kt: 120, density_altitude_ft: 12000 }).tas_kt > r.tas_kt);
+  assert.ok(_v1252({ cas_kt: 120, density_altitude_ft: -1000 }).tas_kt < 120);
+  // Error seams: non-positive CAS, above the troposphere, non-finite.
+  assert.ok("error" in _v1252({ cas_kt: 0, density_altitude_ft: 8000 }));
+  assert.ok("error" in _v1252({ cas_kt: 120, density_altitude_ft: 40000 }));
+  assert.ok("error" in _v1252({ cas_kt: 120, density_altitude_ft: Infinity }));
+});
 
 test("bounds: spec-v500 computeDensityAltitude pins the hot-day DA, the ISA lapse, the cold-day sign, and error seams", () => {
   const hot = _v500({ field_elevation_ft: 5000, altimeter_in_hg: 29.92, oat_f: 95 });

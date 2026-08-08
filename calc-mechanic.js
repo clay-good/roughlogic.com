@@ -1835,6 +1835,46 @@ MECHANIC_RENDERERS["density-altitude"] = _simpleRenderer({
   compute: computeDensityAltitude,
 });
 
+// ===================== spec-v1252: true airspeed from CAS and density altitude =====================
+// The companion the density-altitude tile feeds and turn-radius-bank consumes: no tile converted CAS
+// to TAS. TAS = CAS / sqrt(sigma), sigma the ISA density ratio at the density altitude,
+// sigma = (1 - 6.87535e-6 h)^4.2559 (h = density altitude in ft, troposphere). FAA PHAK / ICAO ISA.
+// dims: in { cas_kt: dimensionless, density_altitude_ft: dimensionless } out: { tas_kt: dimensionless, density_ratio: dimensionless, rule_of_thumb_kt: dimensionless }
+export function computeTrueAirspeed({ cas_kt = 0, density_altitude_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cas = Number(cas_kt);
+  const da = Number(density_altitude_ft);
+  if (!(cas > 0)) return { error: "Calibrated airspeed must be positive (kt)." };
+  if (!Number.isFinite(da)) return { error: "Density altitude must be a number (ft)." };
+  if (da > 36089) return { error: "This ISA density-ratio form is for the troposphere (density altitude at or below 36,089 ft); above the tropopause a different relation applies." };
+  const base = 1 - 6.87535e-6 * da;
+  if (!(base > 0)) return { error: "Density altitude is out of range for the ISA density-ratio formula." };
+  const density_ratio = Math.pow(base, 4.2559);
+  const tas_kt = cas / Math.sqrt(density_ratio);
+  const rule_of_thumb_kt = cas * (1 + 0.02 * da / 1000);
+  if (![density_ratio, tas_kt, rule_of_thumb_kt].every(Number.isFinite)) return { error: "True-airspeed math is not a finite value." };
+  return {
+    tas_kt, density_ratio, rule_of_thumb_kt,
+    note: "The true airspeed from the calibrated airspeed and the density altitude, the conversion the density-altitude tile leads up to and the turn-radius-bank tile takes as an input. The airspeed indicator senses dynamic pressure (half rho V squared), so in thinner air the same indicated speed is a faster true speed: TAS = CAS / sqrt(sigma), where sigma is the air-density ratio rho/rho0. At the density altitude, sigma equals the ISA value sigma = (1 - 6.87535e-6 h)^4.2559 with h in feet, which is 1.000 at sea level, 0.862 at 5,000 ft (TAS 7.7% over CAS), and 0.739 at 10,000 ft (16.4% over). A 120 KCAS climb at an 8,000 ft density altitude is really 135 KTAS across the ground-referenced air mass. The field rule of thumb, add 2% per 1,000 ft of density altitude, is shown alongside; it tracks the exact value to a few knots up to about 10,000 ft, then reads a touch low. This treats CAS as equal to equivalent airspeed (the low-speed assumption; the compressibility correction to EAS matters only at high speed and altitude), and TAS is still airspeed - add the wind vector to get ground speed. A planning estimate; the aircraft flight manual and the pilot in command govern.",
+  };
+}
+export const trueAirspeedExample = { inputs: { cas_kt: 120, density_altitude_ft: 8000 } };
+MECHANIC_RENDERERS["true-airspeed"] = _simpleRenderer({
+  citation: "Citation: true airspeed TAS = CAS / sqrt(sigma), with the ISA density ratio sigma = (1 - 6.87535e-6 h)^4.2559 at the density altitude h (ft), per the FAA Pilot's Handbook of Aeronautical Knowledge and the ICAO Standard Atmosphere; the +2%/1000 ft rule of thumb is shown for comparison. Treats CAS = equivalent airspeed (low-speed assumption); add wind for ground speed. A planning estimate; the aircraft flight manual and the pilot in command govern.",
+  example: trueAirspeedExample.inputs,
+  fields: [
+    { key: "cas_kt", label: "Calibrated airspeed CAS (kt)", kind: "number", default: 120 },
+    { key: "density_altitude_ft", label: "Density altitude (ft, from the density-altitude tile)", kind: "number", default: 8000 },
+  ],
+  outputs: [
+    { key: "tas", id: "tas-out-tas", label: "True airspeed", value: (r) => fmt(r.tas_kt, 1) + " kt" },
+    { key: "sig", id: "tas-out-sig", label: "Density ratio sigma", value: (r) => fmt(r.density_ratio, 4) },
+    { key: "rot", id: "tas-out-rot", label: "Rule of thumb (+2%/1000 ft)", value: (r) => fmt(r.rule_of_thumb_kt, 1) + " kt" },
+    { key: "n", id: "tas-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTrueAirspeed,
+});
+
 // ===================== spec-v501: crosswind and headwind component =====================
 
 // dims: in { runway_heading_deg: dimensionless, wind_dir_deg: dimensionless, wind_speed_kt: L T^-1, gust_kt: L T^-1, max_demo_xwind_kt: L T^-1 } out: { angle_deg: dimensionless, crosswind_kt: L T^-1, headwind_kt: L T^-1, gust_xwind_kt: L T^-1, tailwind: dimensionless, exceeds: dimensionless }

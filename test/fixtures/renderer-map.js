@@ -1226,6 +1226,7 @@ export const RENDERER_MAP = {
   "trap-speed-horsepower": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "et-horsepower": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "density-altitude": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
+  "true-airspeed": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "crosswind-component": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "hull-speed": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "waterline-for-hull-speed": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },

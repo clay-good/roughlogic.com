@@ -1116,6 +1116,7 @@ export const COMPUTE_MAP = {
   "motor-locked-rotor-kva": { module: "../../calc-motor.js", fn: "computeMotorLockedRotorKva" },
   "motor-max-hp-for-starting-current": { module: "../../calc-motor.js", fn: "computeMotorMaxHpForStartingCurrent" },
   "density-altitude": { module: "../../calc-mechanic.js", fn: "computeDensityAltitude" },
+  "true-airspeed": { module: "../../calc-mechanic.js", fn: "computeTrueAirspeed" },
   "crosswind-component": { module: "../../calc-mechanic.js", fn: "computeCrosswindComponent" },
   "hull-speed": { module: "../../calc-mechanic.js", fn: "computeHullSpeed" },
   "hull-displacement": { module: "../../calc-mechanic.js", fn: "computeHullDisplacement" },

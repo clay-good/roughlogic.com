@@ -686,7 +686,7 @@ const _TILES = [
   // spec-v485 torque wrench extension / crowfoot correction (Group K)
   ["torque-adapter-correction", "K"],
   // spec-v500 density altitude and pressure altitude
-  ["density-altitude", "K"],
+  ["density-altitude", "K"], ["true-airspeed", "K"],
   // spec-v501 crosswind and headwind component
   ["crosswind-component", "K"],
   // spec-v502 displacement hull speed and speed/length ratio

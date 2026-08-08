@@ -29466,6 +29466,21 @@
       "kind": "industry"
     },
     {
+      "term": "true airspeed",
+      "target": "true-airspeed",
+      "kind": "industry"
+    },
+    {
+      "term": "cas to tas",
+      "target": "true-airspeed",
+      "kind": "redirect"
+    },
+    {
+      "term": "calibrated to true airspeed density altitude",
+      "target": "true-airspeed",
+      "kind": "question"
+    },
+    {
       "term": "pressure altitude",
       "target": "density-altitude",
       "kind": "industry"
