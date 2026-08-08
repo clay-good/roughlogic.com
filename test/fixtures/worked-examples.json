@@ -1348,6 +1348,58 @@
    }
   },
   {
+   "tile_id": "arrhenius-equation",
+   "source_publisher": "Arrhenius equation (physical chemistry, 1889)",
+   "source_title": "rate doubles from 25 to 35 C -> Ea 52.95 kJ/mol, A 1.89e9, Q10 2.0 (spec-v1229)",
+   "source_edition_or_year": "Ea = R ln(k2/k1)/(1/T1 - 1/T2), R = 8.314",
+   "source_section_or_page": "Ea = 8.314 x ln(2)/(1/298.15 - 1/308.15) = 8.314 x 0.69315 / 1.0885e-4 = 52,946 J/mol = 52.95 kJ/mol; A = 1 x exp(52946/(8.314 x 298.15)) = 1.89e9; Q10 = 2^(10/10) = 2.0.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "k1": 1.0,
+    "temp1_c": 25,
+    "k2": 2.0,
+    "temp2_c": 35
+   },
+   "outputs": {
+    "ea_kj_mol": {
+     "value": 52.95,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "q10": {
+     "value": 2.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "arrhenius-equation",
+   "source_publisher": "Arrhenius (Q10 cross-check)",
+   "source_title": "cross-check: a rate that triples over 10 C gives Q10 = 3.0",
+   "source_edition_or_year": "Q10 = (k2/k1)^(10/dT)",
+   "source_section_or_page": "k1 1, k2 3, 20->30 C: Q10 = 3^(10/10) = 3.0; the steeper temperature response corresponds to a higher activation energy.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "k1": 1.0,
+    "temp1_c": 20,
+    "k2": 3.0,
+    "temp2_c": 30
+   },
+   "outputs": {
+    "q10": {
+     "value": 3.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rcf-rpm",
    "source_publisher": "Project (first-principles)",
    "source_title": "RCF = 1.118e-5 * r_cm * RPM^2",

@@ -7152,6 +7152,18 @@ export const CITATIONS = {
       { name: "Scope", value: "ideal gas only (van der Waals / Z for real gases); density needs the molar mass", source: "scope of this tile" },
     ],
   },
+  "arrhenius-equation": {
+    formula: "k = A exp(-Ea/RT); two-point Ea = R ln(k2/k1)/(1/T1 - 1/T2), R = 8.314 J/(mol*K), T in kelvin; A = k1 exp(Ea/(R T1)); Q10 = (k2/k1)^(10/dT_C).",
+    edition: "The Arrhenius equation (Arrhenius, 1889); standard physical-chemistry kinetics. First principles.",
+    freeAccess: "The Arrhenius equation and the gas constant R are public first-principles chemistry; the rate constants and temperatures are the user's own measurements.",
+    governance: GOVERNANCE.lab,
+    editionNote: "The Arrhenius activation energy from two rate measurements. A reaction's rate constant rises with temperature as k = A exp(-Ea/RT); measuring k at two temperatures and taking the ratio cancels the pre-exponential A and gives the activation energy Ea = R ln(k2/k1)/(1/T1 - 1/T2), with R = 8.314 J/(mol*K) and the temperatures in kelvin. A reaction whose rate doubles from 25 to 35 C has Ea = 52.9 kJ/mol; once Ea is known the pre-exponential A = k1 exp(Ea/(R T1)) follows, and the rate at any other temperature is A exp(-Ea/RT). The Q10 temperature coefficient, the factor the rate changes per 10 C ((k2/k1)^(10/dT)), is the everyday shorthand in biology and food science (Q10 = 2 means the rate doubles per 10 C). A higher Ea means a more temperature-sensitive reaction. This assumes Arrhenius behavior over the interval -- a single mechanism with no change of rate-limiting step; a curved Arrhenius plot signals a mechanism change. A first-principles chemistry aid; the measured kinetics govern.",
+    assumptions: [
+      { name: "Arrhenius equation", value: "k = A exp(-Ea/RT); Ea = R ln(k2/k1)/(1/T1 - 1/T2)", source: "Arrhenius (1889)" },
+      { name: "Derived", value: "A = k1 exp(Ea/(R T1)); Q10 = (k2/k1)^(10/dT_C)", source: "kinetics" },
+      { name: "Scope", value: "single mechanism over the interval (a curved Arrhenius plot signals a mechanism change)", source: "scope of this tile" },
+    ],
+  },
   "rcf-rpm": {
     formula: "RCF (g) = 1.118e-5 * r(cm) * RPM^2. Both directions: RPM = sqrt(RCF / (1.118e-5 * r_cm)).",
     edition: "Standard centrifuge formula. First principles. Manufacturer rotor radii bundled in CENTRIFUGE_ROTORS (data/lab/centrifuge-rotors.json) with per-entry attribution.",

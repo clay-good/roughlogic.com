@@ -311,6 +311,36 @@ export function computeIdealGasLaw({ solve_for = "moles", pressure_atm = 0, volu
 }
 export const idealGasLawExample = { inputs: { solve_for: "volume", pressure_atm: 1, volume_l: 0, moles: 1, temperature_c: 25 } };
 
+// --- spec-v1229: Arrhenius rate/temperature dependence ---
+// The lab kinetics set (doubling-time, growth-projected-count, michaelis-menten) has no rate-vs-temperature
+// member. This adds the Arrhenius equation via its two-point form: from two rate constants at two
+// temperatures, solve the activation energy Ea = R ln(k2/k1) / (1/T1 - 1/T2), the pre-exponential A, and
+// the Q10 temperature coefficient. R = 8.314 J/(mol*K), temperatures in kelvin.
+// dims: in { k1: dimensionless, temp1_c: T, k2: dimensionless, temp2_c: T } out: { ea_j_mol: dimensionless, ea_kj_mol: dimensionless, pre_exponential_a: dimensionless, q10: dimensionless }
+export function computeArrheniusEquation({ k1 = 0, temp1_c = 0, k2 = 0, temp2_c = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R = 8.314; // J/(mol*K)
+  const K1 = Number(k1) || 0;
+  const K2 = Number(k2) || 0;
+  const t1c = Number(temp1_c);
+  const t2c = Number(temp2_c);
+  if (!(K1 > 0) || !(K2 > 0)) return { error: "Both rate constants k1 and k2 must be positive." };
+  if (!Number.isFinite(t1c) || !Number.isFinite(t2c)) return { error: "Both temperatures must be numbers (C)." };
+  const T1 = t1c + 273.15;
+  const T2 = t2c + 273.15;
+  if (!(T1 > 0) || !(T2 > 0)) return { error: "Temperatures must be above absolute zero (-273.15 C)." };
+  if (t1c === t2c) return { error: "The two temperatures must differ." };
+  const ea_j_mol = R * Math.log(K2 / K1) / (1 / T1 - 1 / T2);
+  const pre_exponential_a = K1 * Math.exp(ea_j_mol / (R * T1));
+  const q10 = Math.pow(K2 / K1, 10 / (t2c - t1c));
+  if (![ea_j_mol, pre_exponential_a, q10].every(Number.isFinite)) return { error: "Arrhenius math is not a finite value." };
+  return {
+    ea_j_mol, ea_kj_mol: ea_j_mol / 1000, pre_exponential_a, q10,
+    note: "The Arrhenius activation energy from two rate measurements, the rate-vs-temperature member the lab kinetics set (doubling-time, Michaelis-Menten) leaves out. Reaction rate rises with temperature as k = A exp(-Ea/RT); measuring the rate constant k at two temperatures and taking the ratio cancels the pre-exponential A and gives the activation energy Ea = R ln(k2/k1) / (1/T1 - 1/T2), with R = 8.314 J/(mol*K) and the temperatures in kelvin. A reaction whose rate doubles from 25 to 35 C has Ea = 52.9 kJ/mol; once Ea is known the pre-exponential A = k1 exp(Ea/(R T1)) follows, and k at any other temperature is A exp(-Ea/RT). The tile also reports the Q10 temperature coefficient (the factor the rate changes per 10 C, (k2/k1)^(10/dT)), the everyday shorthand in biology and food science -- Q10 = 2 means the rate doubles per 10 C. A higher Ea means a more temperature-sensitive reaction. Assumes Arrhenius behavior over the interval (a single mechanism, no change of rate-limiting step); a curved Arrhenius plot signals a mechanism change. A first-principles chemistry aid; the measured kinetics govern.",
+  };
+}
+export const arrheniusEquationExample = { inputs: { k1: 1.0, temp1_c: 25, k2: 2.0, temp2_c: 35 } };
+
 // --- 259: Centrifuge RPM <-> RCF ---
 //
 // RCF (g) = 1.118e-5 * r_cm * RPM^2  (r in cm, RPM in revolutions / minute)
@@ -632,6 +662,29 @@ function renderIdealGasLaw(inputRegion, outputRegion, citationEl) {
   solve.select.addEventListener("change", update);
 }
 
+function renderArrheniusEquation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Arrhenius equation k = A exp(-Ea/RT), two-point form Ea = R ln(k2/k1)/(1/T1 - 1/T2), R = 8.314 J/(mol*K), temperatures in kelvin (Arrhenius, 1889). Q10 = (k2/k1)^(10/dT). Assumes a single mechanism over the interval. First principles.";
+  inputRegion.appendChild(makeNotice(LAB_NOTICE));
+  const k1 = makeNumber("Rate constant k1", "arr-k1", { step: "any", min: "0", value: "1" }); k1.input.value = "1";
+  const t1 = makeNumber("Temperature 1 (C)", "arr-t1", { step: "any", value: "25" }); t1.input.value = "25";
+  const k2 = makeNumber("Rate constant k2", "arr-k2", { step: "any", min: "0", value: "2" }); k2.input.value = "2";
+  const t2 = makeNumber("Temperature 2 (C)", "arr-t2", { step: "any", value: "35" }); t2.input.value = "35";
+  for (const f of [k1, t1, k2, t2]) inputRegion.appendChild(f.wrap);
+  const oEa = makeOutputLine(outputRegion, "Activation energy Ea", "arr-out-ea");
+  const oA = makeOutputLine(outputRegion, "Pre-exponential A / Q10", "arr-out-a");
+  const oNote = makeOutputLine(outputRegion, "Note", "arr-out-note");
+  const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
+  const update = debounce(() => {
+    const r = computeArrheniusEquation({ k1: rd(k1.input), temp1_c: t1.input.value === "" ? 0 : Number(t1.input.value), k2: rd(k2.input), temp2_c: t2.input.value === "" ? 0 : Number(t2.input.value) });
+    if (r.error) { oEa.textContent = r.error; oA.textContent = "-"; oNote.textContent = ""; return; }
+    oEa.textContent = fmt(r.ea_kj_mol, 2) + " kJ/mol (" + fmt(r.ea_j_mol, 0) + " J/mol)";
+    oA.textContent = r.pre_exponential_a.toExponential(3) + " / Q10 " + fmt(r.q10, 3);
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { k1.input.value = "1"; t1.input.value = "25"; k2.input.value = "2"; t2.input.value = "35"; update(); });
+  for (const f of [k1, t1, k2, t2]) f.input.addEventListener("input", update);
+}
+
 function renderRcf(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: RCF (g) = 1.118e-5 * r(cm) * RPM^2. First principles.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
@@ -795,6 +848,7 @@ export const LAB_RENDERERS = {
   "molecular-weight": renderMolecularWeight,
   "mass-moles": renderMassMoles,
   "ideal-gas-law": renderIdealGasLaw,
+  "arrhenius-equation": renderArrheniusEquation,
   "rcf-rpm": renderRcf,
   "resuspension-volume": renderResuspend,
   "pcr-master-mix": renderPcrMix,

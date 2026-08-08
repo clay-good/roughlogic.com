@@ -3826,6 +3826,7 @@ import {
   computeMolecularWeight,
   computeMassMoles,
   computeIdealGasLaw,
+  computeArrheniusEquation,
   computeRcf,
   computeResuspension,
   computePcrMix,
@@ -3947,6 +3948,27 @@ test("bounds: spec-v1228 computeIdealGasLaw pins PV=nRT solved four ways, round-
   assert.ok("error" in computeIdealGasLaw({ solve_for: "temperature", pressure_atm: 1, volume_l: 10, moles: 0 }));
   assert.ok("error" in computeIdealGasLaw({ solve_for: "bogus", pressure_atm: 1, volume_l: 10, moles: 1 }));
   assert.ok("error" in computeIdealGasLaw({ solve_for: "moles", pressure_atm: Infinity, volume_l: 10, temperature_c: 25 }));
+});
+
+test("bounds: spec-v1229 computeArrheniusEquation pins Ea from two points, A, Q10, and error seams", () => {
+  const R = 8.314;
+  // rate doubles from 25 to 35 C: Ea 52.95 kJ/mol, A 1.89e9, Q10 2.0.
+  const r = computeArrheniusEquation({ k1: 1, temp1_c: 25, k2: 2, temp2_c: 35 });
+  assert.ok(Math.abs(r.ea_j_mol - R * Math.log(2) / (1 / 298.15 - 1 / 308.15)) < 1e-6);
+  assert.ok(Math.abs(r.ea_kj_mol - 52.95) < 0.05);
+  assert.ok(Math.abs(r.pre_exponential_a - 1 * Math.exp(r.ea_j_mol / (R * 298.15))) < 1);
+  assert.ok(Math.abs(r.q10 - 2.0) < 1e-9);
+  // Recovered Ea and A reproduce k2 at T2 via k = A exp(-Ea/RT).
+  assert.ok(Math.abs(r.pre_exponential_a * Math.exp(-r.ea_j_mol / (R * 308.15)) - 2) < 1e-6);
+  // A steeper temperature response (triple per 10 C) gives Q10 3 and a higher Ea.
+  const trip = computeArrheniusEquation({ k1: 1, temp1_c: 20, k2: 3, temp2_c: 30 });
+  assert.ok(Math.abs(trip.q10 - 3.0) < 1e-9 && trip.ea_j_mol > r.ea_j_mol);
+  // A rate that falls with temperature yields a negative Ea (reported, not errored).
+  assert.ok(computeArrheniusEquation({ k1: 2, temp1_c: 25, k2: 1, temp2_c: 35 }).ea_j_mol < 0);
+  // Error seams: non-positive k, equal temperatures, non-finite.
+  assert.ok("error" in computeArrheniusEquation({ k1: 0, temp1_c: 25, k2: 2, temp2_c: 35 }));
+  assert.ok("error" in computeArrheniusEquation({ k1: 1, temp1_c: 25, k2: 2, temp2_c: 25 }));
+  assert.ok("error" in computeArrheniusEquation({ k1: 1, temp1_c: 25, k2: Infinity, temp2_c: 35 }));
 });
 
 test("bounds: calc-lab computeMassMoles rejects non-positive MW or under-/over-specified inputs (documented)", () => {
