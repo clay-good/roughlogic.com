@@ -2526,3 +2526,82 @@ function renderChiSquareIndependence(inputRegion, outputRegion, citationEl) {
   t.input.addEventListener("input", update);
 }
 EDU_RENDERERS["chi-square-independence"] = renderChiSquareIndependence;
+
+// --- spec-v1263: Spearman rank correlation (`spearman-rank-correlation`) ---
+// The correlation/regression family has Pearson r and linear regression but no nonparametric rank correlation --
+// the standard companion when the relationship is monotonic-but-not-linear or the data are ordinal. Spearman's
+// rho is simply Pearson's r computed on the RANKS of the two series (ties take the average rank). The two-sided
+// p-value uses the same t approximation scipy.stats.spearmanr does: t = rho sqrt((n-2)/(1-rho^2)) on n-2 df.
+function _averageRanks(arr) {
+  const idx = arr.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]);
+  const ranks = new Array(arr.length);
+  let i = 0;
+  while (i < idx.length) {
+    let j = i;
+    while (j + 1 < idx.length && idx[j + 1][0] === idx[i][0]) j++;
+    const avg = (i + j) / 2 + 1; // 1-based average rank for the tie block
+    for (let k = i; k <= j; k++) ranks[idx[k][1]] = avg;
+    i = j + 1;
+  }
+  return ranks;
+}
+// dims: in { x_values: dimensionless, y_values: dimensionless, alpha: dimensionless } out: { n: dimensionless, rho: dimensionless, rho_squared: dimensionless, df: dimensionless, t: dimensionless, p_value: dimensionless }
+export function computeSpearman({ x_values, y_values, alpha = 0.05 } = {}) {
+  const xs = Array.isArray(x_values) ? x_values.filter(Number.isFinite) : parseNumberList(x_values);
+  const ys = Array.isArray(y_values) ? y_values.filter(Number.isFinite) : parseNumberList(y_values);
+  if (xs.length < 3 || ys.length < 3) return { error: "Enter at least 3 paired (x, y) values in each series." };
+  if (xs.length !== ys.length) return { error: "The x and y series must have the same number of values (" + xs.length + " x vs " + ys.length + " y)." };
+  const n = xs.length;
+  const rx = _averageRanks(xs);
+  const ry = _averageRanks(ys);
+  const mrx = rx.reduce((a, b) => a + b, 0) / n;
+  const mry = ry.reduce((a, b) => a + b, 0) / n;
+  let sxy = 0, sxx = 0, syy = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = rx[i] - mrx, dy = ry[i] - mry;
+    sxy += dx * dy; sxx += dx * dx; syy += dy * dy;
+  }
+  if (sxx === 0 || syy === 0) return { error: "A series with no variation (all values tied) has no defined rank correlation." };
+  const rho = Math.max(-1, Math.min(1, sxy / Math.sqrt(sxx * syy)));
+  const rho2 = rho * rho;
+  const df = n - 2;
+  let t, p_value, perfect_fit = false;
+  if (rho2 >= 1) {
+    t = null; p_value = 0; perfect_fit = true;
+  } else {
+    t = (rho * Math.sqrt(df)) / Math.sqrt(1 - rho2);
+    p_value = 2 * (1 - tcdf(Math.abs(t), df));
+  }
+  const a = Number.isFinite(Number(alpha)) && Number(alpha) > 0 && Number(alpha) < 1 ? Number(alpha) : 0.05;
+  const warnings = [];
+  if (n < 10) warnings.push("Small sample (n < 10): the p-value approximation is rough; inspect a scatter plot.");
+  return {
+    n, rho, rho_squared: rho2,
+    direction: rho > 0 ? "positive" : rho < 0 ? "negative" : "none",
+    strength: _pearsonStrength(Math.abs(rho)),
+    df, t, perfect_fit, p_value, alpha: a, significant: p_value < a, warnings,
+    note: "Spearman's rank correlation rho, the nonparametric companion to Pearson's r: it is Pearson's r computed on the RANKS of the two series rather than their raw values (tied values take the average rank). Because it works on ranks it measures any MONOTONIC relationship, not just a straight-line one, and it shrugs off outliers and non-normal data - the right tool for ordinal ratings or a curved but steadily-rising trend. rho runs from -1 (perfectly decreasing) through 0 (no monotonic trend) to +1 (perfectly increasing). The two-sided p-value tests rho = 0 with t = rho sqrt((n-2)/(1-rho^2)) on n-2 df, the same approximation scipy.stats.spearmanr uses; for very small samples it is only approximate. A statistics aid; the study design governs.",
+  };
+}
+export const spearmanExample = { inputs: { x_values: "1, 2, 3, 4, 5", y_values: "2, 4, 5, 4, 5", alpha: 0.05 } };
+function renderSpearman(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Spearman's rank correlation per OpenIntro Statistics (nonparametric association), by name: rho is Pearson's r on the average-tied ranks; two-sided p from t = rho sqrt((n-2)/(1-rho^2)) on n-2 df, reusing the bundled Student-t CDF. Verified against scipy.stats.spearmanr. Free at openintro.org.";
+  const X = makeTextarea("X series (values separated by commas, spaces, or new lines)", "spr-x", { placeholder: "1, 2, 3, 4, 5", rows: "3" });
+  const Y = makeTextarea("Y series (same count as X)", "spr-y", { placeholder: "2, 4, 5, 4, 5", rows: "3" });
+  for (const f of [X, Y]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { X.input.value = "1, 2, 3, 4, 5"; Y.input.value = "2, 4, 5, 4, 5"; update(); });
+  const oR = makeOutputLine(outputRegion, "Spearman rho / strength", "spr-out-r");
+  const oP = makeOutputLine(outputRegion, "p-value / significance", "spr-out-p");
+  const oW = makeOutputLine(outputRegion, "Warnings", "spr-out-w");
+  const oNote = makeOutputLine(outputRegion, "Note", "spr-out-note");
+  const update = debounce(() => {
+    const rr = computeSpearman({ x_values: X.input.value || "", y_values: Y.input.value || "" });
+    if (rr.error) { oR.textContent = rr.error; oP.textContent = ""; oW.textContent = ""; oNote.textContent = ""; return; }
+    oR.textContent = "rho = " + fmt(rr.rho, 4) + " (" + rr.direction + ", " + rr.strength + "); n = " + rr.n;
+    oP.textContent = rr.perfect_fit ? "p = 0 (perfect monotonic fit)" : "p = " + fmt(rr.p_value, 4) + " (" + (rr.significant ? "significant" : "not significant") + " at 0.05)";
+    oW.textContent = rr.warnings.length ? rr.warnings.join(" ") : "none";
+    oNote.textContent = rr.note;
+  }, DEBOUNCE_MS);
+  for (const f of [X.input, Y.input]) f.addEventListener("input", update);
+}
+EDU_RENDERERS["spearman-rank-correlation"] = renderSpearman;

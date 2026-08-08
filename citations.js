@@ -7815,6 +7815,18 @@ export const CITATIONS = {
       { name: "Student-t CDF", value: "derived from the regularized incomplete beta function I_x(df/2, 1/2)", source: "Numerical Recipes 6.4" },
     ],
   },
+  "spearman-rank-correlation": {
+    formula: "Spearman rho = Pearson r on the ranks of x and y (ties take the average rank). Two-sided test for rho = 0: t = rho * sqrt(n - 2) / sqrt(1 - rho^2) on n - 2 df; p = 2 * (1 - tcdf(|t|, n - 2)).",
+    edition: "OpenIntro Statistics 4th ed. (nonparametric association / rank correlation) by name; the Student-t CDF via the regularized incomplete beta function per Numerical Recipes in C 2nd ed. §6.4. Verified against scipy.stats.spearmanr.",
+    freeAccess: "OpenIntro Statistics free at openintro.org; Numerical Recipes chapters free at numerical.recipes.",
+    governance: GOVERNANCE.education,
+    editionNote: "Spearman's rho is Pearson's r applied to the ranks rather than the raw values, so it captures any monotonic relationship (not just linear) and resists outliers and non-normality - the right measure for ordinal data or a curved but steadily-rising trend. Tied values receive the average of the ranks they span. The two-sided p-value uses the t approximation t = rho sqrt((n-2)/(1-rho^2)) on n-2 df, matching scipy.stats.spearmanr; for very small samples it is only approximate (an exact permutation test is preferred). A perfect monotonic relationship (rho = +/-1) makes the t-statistic unbounded and is reported as a perfect-fit flag with p = 0, never a non-finite field.",
+    assumptions: [
+      { name: "Rank transform", value: "rho = Pearson r on average-tied ranks of both series", source: "OpenIntro Statistics (rank correlation)" },
+      { name: "Two-sided p-value", value: "t = rho sqrt((n-2)/(1-rho^2)) on n-2 df; p = 2(1 - tcdf(|t|, n-2))", source: "scipy.stats.spearmanr t-approximation" },
+      { name: "Scope", value: "monotonic (not linear) association; small-n p-value is approximate; perfect fit flagged, not left non-finite", source: "scope of this tile" },
+    ],
+  },
   "chi-square-gof": {
     formula: "Chi-square statistic = sum((observed - expected)^2 / expected) over k categories, on k - 1 degrees of freedom. p-value = 1 - chi2Cdf(chi-square, k - 1). Expected proportions are scaled to the observed total. Reject H0 (the observed counts follow the expected distribution) when p < alpha.",
     edition: "OpenIntro Statistics 4th ed. Chapter 6 (inference for categorical data) by name; the chi-square CDF via the regularized lower incomplete gamma function per Numerical Recipes in C 2nd ed. §6.2.",

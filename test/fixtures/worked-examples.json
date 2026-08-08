@@ -22513,6 +22513,54 @@
    }
   },
   {
+   "tile_id": "spearman-rank-correlation",
+   "source_publisher": "scipy.stats.spearmanr (cross-verified)",
+   "source_title": "x 1..10, y 3 1 4 1 5 9 2 6 5 8 -> rho 0.62806, p 0.05184 (spec-v1263)",
+   "source_edition_or_year": "rho = Pearson r on ranks; t = rho sqrt((n-2)/(1-rho^2))",
+   "source_section_or_page": "scipy.stats.spearmanr returns statistic=0.6280604563186774, pvalue=0.05184120984456854 on n=10.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "x_values": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10",
+    "y_values": "3, 1, 4, 1, 5, 9, 2, 6, 5, 8"
+   },
+   "outputs": {
+    "rho": {
+     "value": 0.62806,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "p_value": {
+     "value": 0.05184,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spearman-rank-correlation",
+   "source_publisher": "Spearman rho with ties (scipy cross-checked)",
+   "source_title": "x 1..5, y 2 4 5 4 5 -> rho 0.73786 (average ranks for the tied y values)",
+   "source_edition_or_year": "tied y values take the average rank",
+   "source_section_or_page": "y ranks with ties: 1, 2.5, 4.5, 2.5, 4.5; Pearson r on those against 1..5 gives rho = 0.7378648; scipy.stats.spearmanr agrees (0.7378647873726218).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "x_values": "1, 2, 3, 4, 5",
+    "y_values": "2, 4, 5, 4, 5"
+   },
+   "outputs": {
+    "rho": {
+     "value": 0.737865,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "chi-square-independence",
    "source_publisher": "scipy.stats.chi2_contingency (cross-verified, correction=False)",
    "source_title": "2x3 table 10 20 30 / 30 20 10 -> chi2 20.0, df 2, p 4.54e-5, Cramer V 0.408 (spec-v1262)",

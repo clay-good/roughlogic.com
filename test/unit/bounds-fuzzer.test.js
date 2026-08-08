@@ -10696,6 +10696,7 @@ import { computeGrossRentMultiplier as _x1, computePmiCancellationDate as _x2, c
 import { computeFinalGradeNeeded as _y1, computeCategoryWeightedGrade as _y2, computeTwoSampleTTest as _y3, computePairedTTest as _v1234, computeOneSampleTTest as _v1236 } from "../../calc-edu.js";
 import { computeOneWayAnova as _v1261 } from "../../calc-edu.js";
 import { computeChiSquareIndependence as _v1262 } from "../../calc-edu.js";
+import { computeSpearman as _v1263 } from "../../calc-edu.js";
 test("bounds: spec-v1236 computeOneSampleTTest pins t = (x_bar-mu0)/(s/sqrt(n)), df, tails, and error seams", () => {
   // mean 16.1, SD 0.3, n 25 vs target 16.0: t = 1.667, df 24, two-sided p ~ 0.1086.
   const r = _v1236({ sample_mean: 16.1, sample_sd: 0.3, n: 25, hypothesized_mean: 16.0, tail: "two" });
@@ -10740,6 +10741,28 @@ test("bounds: spec-v1261 computeOneWayAnova pins the variance partition, F, the 
   assert.ok("error" in _v1261({ groups_text: "5 5 5\n5 5 5" }));
   assert.ok("error" in _v1261({ groups_text: "" }));
   assert.ok("error" in _v1261({ groups_text: 42 }));
+});
+test("bounds: spec-v1263 computeSpearman pins rho as Pearson-on-ranks, the tie handling, the scipy-checked p, perfect fit, and error seams", () => {
+  // n=10, cross-checked against scipy.stats.spearmanr: rho=0.6280604563186774, p=0.05184120984456854.
+  const r = _v1263({ x_values: "1,2,3,4,5,6,7,8,9,10", y_values: "3,1,4,1,5,9,2,6,5,8" });
+  assert.ok(Math.abs(r.rho - 0.6280604563186774) < 1e-9);
+  assert.ok(Math.abs(r.p_value - 0.05184120984456854) < 1e-6);
+  assert.ok(r.n === 10 && r.df === 8 && r.direction === "positive");
+  // Ties take the average rank (scipy agrees: 0.7378647873726218).
+  const tie = _v1263({ x_values: "1,2,3,4,5", y_values: "2,4,5,4,5" });
+  assert.ok(Math.abs(tie.rho - 0.7378647873726218) < 1e-9);
+  // A perfectly increasing monotonic (even nonlinear) relation gives rho = 1 and the perfect-fit flag.
+  const perf = _v1263({ x_values: "1,2,3,4,5", y_values: "1,4,9,16,25" });
+  assert.ok(perf.rho === 1 && perf.perfect_fit === true && perf.p_value === 0 && perf.t === null);
+  // A perfectly decreasing relation gives rho = -1.
+  const dec = _v1263({ x_values: "1,2,3,4,5", y_values: "5,4,3,2,1" });
+  assert.ok(dec.rho === -1 && dec.direction === "negative");
+  // Spaces and newlines parse like commas.
+  assert.ok(Math.abs(_v1263({ x_values: "1 2 3 4 5", y_values: "2\n4\n5\n4\n5" }).rho - 0.7378647873726218) < 1e-9);
+  // Error seams: too few points, mismatched lengths, no variation.
+  assert.ok("error" in _v1263({ x_values: "1,2", y_values: "1,2" }));
+  assert.ok("error" in _v1263({ x_values: "1,2,3,4", y_values: "1,2,3" }));
+  assert.ok("error" in _v1263({ x_values: "5,5,5", y_values: "1,2,3" }));
 });
 test("bounds: spec-v1262 computeChiSquareIndependence pins the margin-built expected counts, chi2, the scipy-checked p, Cramer's V, and error seams", () => {
   // 2x3 table [[10,20,30],[30,20,10]]: all expected = 60*40/120 = 20; chi2 = 4*(100/20) = 20 on 2 df; scipy p=4.539993e-5; V=0.4082.

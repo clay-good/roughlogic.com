@@ -406,6 +406,26 @@
       "kind": "question"
     },
     {
+      "term": "spearman rank correlation",
+      "target": "spearman-rank-correlation",
+      "kind": "industry"
+    },
+    {
+      "term": "rank correlation coefficient",
+      "target": "spearman-rank-correlation",
+      "kind": "industry"
+    },
+    {
+      "term": "nonparametric correlation for ordinal data",
+      "target": "spearman-rank-correlation",
+      "kind": "question"
+    },
+    {
+      "term": "monotonic association between two variables",
+      "target": "spearman-rank-correlation",
+      "kind": "question"
+    },
+    {
       "term": "chi square test of independence",
       "target": "chi-square-independence",
       "kind": "industry"
