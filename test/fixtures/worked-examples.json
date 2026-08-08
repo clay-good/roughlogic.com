@@ -65483,6 +65483,60 @@
    }
   },
   {
+   "tile_id": "dp-flow-meter",
+   "source_publisher": "Bernoulli / ISO 5167 primary element (SI cross-computed)",
+   "source_title": "2 in orifice in 4 in water line, 1 psi, Cd 0.61 -> 75.2 gpm, beta 0.5 (spec-v1267)",
+   "source_edition_or_year": "Q = Cd A2 sqrt(2 dP/(rho(1-beta^4)))",
+   "source_section_or_page": "d=0.0508 m, A2=0.0020268 m2; dP=6894.76 Pa; rho=999.6 kg/m3; beta=0.5, 1-beta^4=0.9375; Q=0.61*0.0020268*sqrt(2*6894.76/(999.6*0.9375))=0.004744 m3/s = 75.2 gpm.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "pipe_id_in": 4,
+    "bore_in": 2,
+    "dp_psi": 1,
+    "cd": 0.61,
+    "fluid_density_lb_ft3": 62.4
+   },
+   "outputs": {
+    "flow_gpm": {
+     "value": 75.175,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "beta_ratio": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dp-flow-meter",
+   "source_publisher": "DP flow meter (larger line cross-check)",
+   "source_title": "3 in bore in 6 in water line, 2 psi, Cd 0.61 -> 239.2 gpm",
+   "source_edition_or_year": "same beta 0.5, larger area and dP",
+   "source_section_or_page": "geometrically similar to the 4/2 case (same beta) but 2.25x the throat area and sqrt(2)x the dP factor: 75.175 * 2.25 * sqrt(2) = 239.2 gpm.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "pipe_id_in": 6,
+    "bore_in": 3,
+    "dp_psi": 2,
+    "cd": 0.61,
+    "fluid_density_lb_ft3": 62.4
+   },
+   "outputs": {
+    "flow_gpm": {
+     "value": 239.204,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pitot-traverse-cfm",
    "source_publisher": "ASHRAE Fundamentals / AABC-NEBB",
    "source_title": "0.15 in wc, 24 x 12 in duct -> 1551 fpm, 2.0 ft^2, 3102 CFM",

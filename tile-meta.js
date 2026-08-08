@@ -664,7 +664,7 @@ const _TILES = [
   ["adpi-diffuser-selection", "C"],
   ["vibration-isolation", "C"], ["isolator-deflection", "C"],
   ["moist-air-enthalpy", "C"], ["drybulb-from-enthalpy", "C"], ["cooling-coil-total-load", "C"], ["coil-bypass-factor", "C"],
-  ["fan-affinity-laws", "C"], ["fan-sheave-for-target-cfm", "C"], ["pitot-traverse-cfm", "C"], ["pitot-traverse-average", "C"], ["outside-air-percent-temps", "C"],
+  ["fan-affinity-laws", "C"], ["fan-sheave-for-target-cfm", "C"], ["pitot-traverse-cfm", "C"], ["pitot-traverse-average", "C"], ["dp-flow-meter", "C"], ["outside-air-percent-temps", "C"],
   ["colebrook-friction-factor", "C"], ["thrust-block-sizing", "B"], ["thrust-block-max-pressure", "B"], ["hydrant-available-flow", "F"], ["fall-arrest-clearance", "F"], ["fall-arrest-anchorage", "F"],
   ["nfa-fireground-flow", "F"],
   ["iowa-rate-of-flow", "F"],

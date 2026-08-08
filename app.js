@@ -397,7 +397,7 @@ const TOOL_MODULES = (() => {
   // module) into calc-velocity.js. They keep group: "C" (group letter
   // independent of module, the v42/v70/v71/v72/v73 precedent).
   declare("./calc-velocity.js", "VELOCITY_RENDERERS", [
-    "duct-velocity-pressure", "refrigerant-velocity", "refrigerant-line-size", "pitot-traverse-cfm", "pitot-traverse-average",
+    "duct-velocity-pressure", "refrigerant-velocity", "refrigerant-line-size", "pitot-traverse-cfm", "pitot-traverse-average", "dp-flow-meter",
   ]);
   declare("./calc-restoration.js", "RESTORATION_RENDERERS", [
     "psychrometric", "drying-goal", "dehumidifier", "air-movers",

@@ -9939,6 +9939,7 @@ import {
   computeRefrigerantVelocity, renderRefrigerantVelocity,
   computeRefrigerantLineSize, renderRefrigerantLineSize,
   renderPitotTraverseCfm, renderPitotTraverseAverage,
+  renderDpFlowMeter,
 } from "../../calc-velocity.js";
 
 test("bounds: calc-hvac computeDuctVelocityPressure pins V = 4005*sqrt(VP) + inverse + rejects non-positive/Infinity", () => {
@@ -10041,7 +10042,7 @@ test("bounds: calc-edu computeCurveGradeScaler pins flat/sqrt/linear + clamp + r
 });
 
 test("bounds: v23 export-function renderers are callable functions (DOM-bound sentinel)", () => {
-  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderRefrigerantLineSize, renderPitotTraverseCfm, renderPitotTraverseAverage, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
+  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderRefrigerantLineSize, renderPitotTraverseCfm, renderPitotTraverseAverage, renderDpFlowMeter, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
     assert.strictEqual(typeof fn, "function", "render symbol must be a function");
   }
 });
@@ -20824,7 +20825,30 @@ test("bounds: spec-v383 computeSeismicPdeltaStability pins theta, theta_max, all
 // ===================== spec-v384..v386 HVAC airflow field-methods trio (3 modules) =====================
 import { computeFanAffinityLaws as _v384 } from "../../calc-hvac.js";
 import { computePitotTraverseCfm as _v385 } from "../../calc-velocity.js";
+import { computeDpFlowMeter as _v1267 } from "../../calc-velocity.js";
 import { computeOutsideAirPercentTemps as _v386 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v1267 computeDpFlowMeter pins the Bernoulli DP-flow, sqrt(dP) and Cd scaling, geometry, and error seams", () => {
+  // 2 in bore in 4 in water line at 1 psi, Cd 0.61: 75.18 gpm, beta 0.5, throat = 4x pipe velocity.
+  const r = _v1267({ pipe_id_in: 4, bore_in: 2, dp_psi: 1, cd: 0.61, fluid_density_lb_ft3: 62.4 });
+  assert.ok(Math.abs(r.flow_gpm - 75.175) < 0.1 && Math.abs(r.beta_ratio - 0.5) < 1e-12);
+  assert.ok(Math.abs(r.throat_velocity_fps - 4 * r.pipe_velocity_fps) < 1e-9); // A_throat = A_pipe/4 at beta 0.5
+  // Flow scales as sqrt(dP): 4x the dP doubles the flow.
+  const q4 = _v1267({ pipe_id_in: 4, bore_in: 2, dp_psi: 4, cd: 0.61, fluid_density_lb_ft3: 62.4 });
+  assert.ok(Math.abs(q4.flow_gpm - 2 * r.flow_gpm) < 1e-6);
+  // Flow scales linearly with Cd: a venturi (0.98) over an orifice (0.61).
+  const ven = _v1267({ pipe_id_in: 4, bore_in: 2, dp_psi: 1, cd: 0.98, fluid_density_lb_ft3: 62.4 });
+  assert.ok(Math.abs(ven.flow_gpm - r.flow_gpm * (0.98 / 0.61)) < 1e-6);
+  // Denser fluid flows less at the same dP (Q ~ 1/sqrt(rho)): compare to a lighter fluid.
+  const light = _v1267({ pipe_id_in: 4, bore_in: 2, dp_psi: 1, cd: 0.61, fluid_density_lb_ft3: 50 });
+  assert.ok(Math.abs(light.flow_gpm - r.flow_gpm * Math.sqrt(62.4 / 50)) < 1e-6);
+  // Error seams: bore >= pipe ID, non-positive dP, Cd out of range, non-positive density, non-finite.
+  assert.ok("error" in _v1267({ pipe_id_in: 2, bore_in: 2, dp_psi: 1, cd: 0.61, fluid_density_lb_ft3: 62.4 }));
+  assert.ok("error" in _v1267({ pipe_id_in: 4, bore_in: 2, dp_psi: 0, cd: 0.61, fluid_density_lb_ft3: 62.4 }));
+  assert.ok("error" in _v1267({ pipe_id_in: 4, bore_in: 2, dp_psi: 1, cd: 1.5, fluid_density_lb_ft3: 62.4 }));
+  assert.ok("error" in _v1267({ pipe_id_in: 4, bore_in: 2, dp_psi: 1, cd: 0.61, fluid_density_lb_ft3: 0 }));
+  assert.ok("error" in _v1267({ pipe_id_in: 4, bore_in: 2, dp_psi: Infinity, cd: 0.61, fluid_density_lb_ft3: 62.4 }));
+});
 
 test("bounds: spec-v384 computeFanAffinityLaws pins the speed/square/cube laws and error seams", () => {
   const r = _v384({ q1_cfm: 10000, sp1_inwg: 1.0, bhp1_hp: 5.0, n1: 900, n2: 1200 });

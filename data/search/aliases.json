@@ -23571,6 +23571,31 @@
       "kind": "industry"
     },
     {
+      "term": "orifice plate flow",
+      "target": "dp-flow-meter",
+      "kind": "industry"
+    },
+    {
+      "term": "venturi flow meter",
+      "target": "dp-flow-meter",
+      "kind": "industry"
+    },
+    {
+      "term": "flow from differential pressure",
+      "target": "dp-flow-meter",
+      "kind": "question"
+    },
+    {
+      "term": "orifice sizing for flow",
+      "target": "dp-flow-meter",
+      "kind": "question"
+    },
+    {
+      "term": "beta ratio flow element",
+      "target": "dp-flow-meter",
+      "kind": "question"
+    },
+    {
       "term": "pitot traverse",
       "target": "pitot-traverse-cfm",
       "kind": "industry"

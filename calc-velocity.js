@@ -285,3 +285,64 @@ export function renderPitotTraverseAverage(inputRegion, outputRegion, citationEl
   for (const f of [reads.input, w.input, h.input]) f.addEventListener("input", update);
 }
 VELOCITY_RENDERERS["pitot-traverse-average"] = renderPitotTraverseAverage;
+
+// ===================== spec-v1267: differential-pressure flow meter (orifice / venturi / nozzle) =====================
+// The dp-flow-signal-scaling tile linearizes the 4-20 mA loop but says the "primary element's discharge coefficient
+// and beta ratio are already baked into the transmitter's calibrated range" -- it does NOT compute the physical flow.
+// This adds the primary-element equation itself: Bernoulli across a restriction gives the volumetric flow of an
+// (incompressible) liquid, Q = Cd A2 sqrt( 2 dP / (rho (1 - beta^4)) ), with A2 the throat area, beta = d/D the
+// diameter ratio (the 1 - beta^4 term is the velocity-of-approach correction). Cd ~ 0.61 square-edge orifice,
+// ~0.98 venturi, ~0.97 flow nozzle (editable). Liquid only (an expansion factor Y is separate for gases).
+// dims: in { pipe_id_in: L, bore_in: L, dp_psi: M L^-1 T^-2, cd: dimensionless, fluid_density_lb_ft3: M L^-3 } out: { flow_gpm: L^3 T^-1, throat_velocity_fps: L T^-1, pipe_velocity_fps: L T^-1, beta_ratio: dimensionless }
+export function computeDpFlowMeter({ pipe_id_in = 0, bore_in = 0, dp_psi = 0, cd = 0.61, fluid_density_lb_ft3 = 62.4 } = {}) {
+  const D = Number(pipe_id_in), d = Number(bore_in), dp = Number(dp_psi), Cd = Number(cd), rhoUS = Number(fluid_density_lb_ft3);
+  if (![D, d, dp, Cd, rhoUS].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
+  if (!(D > 0)) return { error: "Pipe inside diameter must be positive (in)." };
+  if (!(d > 0)) return { error: "Bore / throat diameter must be positive (in)." };
+  if (!(d < D)) return { error: "The bore diameter must be smaller than the pipe inside diameter." };
+  if (!(dp > 0)) return { error: "Differential pressure must be positive (psi)." };
+  if (!(Cd > 0) || Cd > 1.2) return { error: "Discharge coefficient must be between 0 and 1.2 (orifice ~0.61, venturi ~0.98)." };
+  if (!(rhoUS > 0)) return { error: "Fluid density must be positive (lb/ft^3)." };
+  const D_m = D * 0.0254, d_m = d * 0.0254;
+  const A2 = Math.PI / 4 * d_m * d_m; // throat area, m^2
+  const Apipe = Math.PI / 4 * D_m * D_m; // pipe area, m^2
+  const beta = d / D;
+  const dp_pa = dp * 6894.757;
+  const rho = rhoUS * 16.018463; // kg/m^3
+  const q_m3s = Cd * A2 * Math.sqrt(2 * dp_pa / (rho * (1 - Math.pow(beta, 4))));
+  const flow_gpm = q_m3s * 15850.323;
+  const throat_velocity_fps = (q_m3s / A2) * 3.2808399;
+  const pipe_velocity_fps = (q_m3s / Apipe) * 3.2808399;
+  if (![flow_gpm, throat_velocity_fps, pipe_velocity_fps, beta].every(Number.isFinite)) return { error: "DP-flow math is not a finite value." };
+  return {
+    flow_gpm, throat_velocity_fps, pipe_velocity_fps, beta_ratio: beta,
+    note: "The liquid flow through an orifice plate, venturi, or flow nozzle from the differential pressure across it, the physical primary-element equation the DP-loop scaling tile leaves to the transmitter's calibration: Q = Cd A2 sqrt( 2 dP / (rho (1 - beta^4)) ). The restriction speeds the fluid up and drops its pressure; measuring that drop backs out the flow, which is why flow tracks the SQUARE ROOT of dP (four times the flow reads as sixteen times the dP). beta = bore / pipe ID sets the range and the permanent pressure loss; the 1 - beta^4 term corrects for the velocity the fluid already has approaching the plate. The discharge coefficient Cd accounts for the vena contracta and friction: about 0.61 for a square-edge orifice, 0.98 for a classical venturi, 0.97 for a flow nozzle -- a venturi passes far more flow at the same dP and recovers most of the pressure. Enter dP in psi (1 psi = 27.7 in w.c.) and the fluid density (water 62.4 lb/ft^3). This is the incompressible-liquid form; a gas needs a separate expansion factor Y, and a precise Cd comes from ISO 5167 / the meter's calibration. A field/sizing estimate; the calibrated meter governs.",
+  };
+}
+export const dpFlowMeterExample = { inputs: { pipe_id_in: 4, bore_in: 2, dp_psi: 1, cd: 0.61, fluid_density_lb_ft3: 62.4 } };
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderDpFlowMeter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: differential-pressure flow meter (orifice / venturi / nozzle), Bernoulli primary-element equation Q = Cd A2 sqrt(2 dP / (rho (1 - beta^4))), beta = d/D, by name (ISO 5167 defines the precise Cd; the equation is public physics). Cd ~ 0.61 orifice, 0.98 venturi, 0.97 nozzle. Incompressible liquid only (a gas needs an expansion factor Y). The calibrated meter governs.";
+  const D = _v23h_makeNumber("Pipe inside diameter (in)", "dpf-D", { step: "any", min: "0" }); D.input.value = "4";
+  const d = _v23h_makeNumber("Bore / throat diameter (in)", "dpf-d", { step: "any", min: "0" }); d.input.value = "2";
+  const dp = _v23h_makeNumber("Differential pressure (psi)", "dpf-dp", { step: "any", min: "0" }); dp.input.value = "1";
+  const cd = _v23h_makeNumber("Discharge coefficient Cd (orifice 0.61, venturi 0.98)", "dpf-cd", { step: "any", min: "0" }); cd.input.value = "0.61";
+  const rho = _v23h_makeNumber("Fluid density (lb/ft3, water 62.4)", "dpf-rho", { step: "any", min: "0" }); rho.input.value = "62.4";
+  for (const f of [D, d, dp, cd, rho]) inputRegion.appendChild(f.wrap);
+  const oQ = _v23h_makeOut(outputRegion, "Flow rate", "dpf-out-q");
+  const oV = _v23h_makeOut(outputRegion, "Throat / pipe velocity", "dpf-out-v");
+  const oB = _v23h_makeOut(outputRegion, "Beta ratio (d/D)", "dpf-out-b");
+  const oNote = _v23h_makeOut(outputRegion, "Note", "dpf-out-n");
+  function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
+  const update = _v23h_debounce(() => {
+    const r = computeDpFlowMeter({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), dp_psi: readNum(dp.input), cd: readNum(cd.input), fluid_density_lb_ft3: readNum(rho.input) });
+    if (r.error) { oQ.textContent = r.error; oV.textContent = "-"; oB.textContent = "-"; oNote.textContent = ""; return; }
+    oQ.textContent = _v23h_fmt(r.flow_gpm, 1) + " gpm";
+    oV.textContent = _v23h_fmt(r.throat_velocity_fps, 2) + " / " + _v23h_fmt(r.pipe_velocity_fps, 2) + " ft/s";
+    oB.textContent = _v23h_fmt(r.beta_ratio, 3);
+    oNote.textContent = r.note;
+  }, _V23H_DEB);
+  _v23h_attachEx(inputRegion, () => { D.input.value = "4"; d.input.value = "2"; dp.input.value = "1"; cd.input.value = "0.61"; rho.input.value = "62.4"; update(); });
+  for (const f of [D, d, dp, cd, rho]) f.input.addEventListener("input", update);
+}
+VELOCITY_RENDERERS["dp-flow-meter"] = renderDpFlowMeter;

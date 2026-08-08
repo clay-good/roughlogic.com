@@ -1342,6 +1342,7 @@ export const COMPUTE_MAP = {
   "fan-affinity-laws": { module: "../../calc-hvac.js", fn: "computeFanAffinityLaws" },
   "fan-sheave-for-target-cfm": { module: "../../calc-hvac.js", fn: "computeFanSheaveForTargetCfm" },
   "pitot-traverse-cfm": { module: "../../calc-velocity.js", fn: "computePitotTraverseCfm" },
+  "dp-flow-meter": { module: "../../calc-velocity.js", fn: "computeDpFlowMeter" },
   "pitot-traverse-average": { module: "../../calc-velocity.js", fn: "computePitotTraverseAverage" },
   "outside-air-percent-temps": { module: "../../calc-hvacservice.js", fn: "computeOutsideAirPercentTemps" },
   "colebrook-friction-factor": { module: "../../calc-hvac.js", fn: "computeColebrookFrictionFactor" },

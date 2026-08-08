@@ -15913,6 +15913,18 @@ export const CITATIONS = {
       { name: "Standard air", value: "apply a density correction at altitude or high temperature", source: "scope of this tile" },
     ],
   },
+  "dp-flow-meter": {
+    formula: "Q = Cd A2 sqrt( 2 dP / (rho (1 - beta^4)) ); A2 = pi/4 d^2 (throat area); beta = d/D (bore/pipe-ID ratio); the 1 - beta^4 term is the velocity-of-approach factor. Incompressible liquid.",
+    edition: "The differential-pressure primary-element (orifice / venturi / flow-nozzle) flow equation; ISO 5167 defines the precise discharge coefficient Cd and installation, but the Bernoulli equation itself is public physics, cited by name.",
+    freeAccess: "The Bernoulli DP-flow equation is first-principles fluid mechanics; a typical Cd (0.61 orifice, 0.98 venturi, 0.97 nozzle) is editable and the meter's own calibration governs the exact value.",
+    governance: GOVERNANCE.general,
+    editionNote: "Volumetric flow of an incompressible liquid through a restriction from the differential pressure across it: Q = Cd A2 sqrt(2 dP / (rho (1 - beta^4))). The restriction accelerates the fluid and drops its pressure; the drop backs out the flow, so flow tracks the SQUARE ROOT of dP (four times the flow reads as sixteen times the dP). beta = bore/pipe-ID sets the range and the permanent pressure loss, and the 1 - beta^4 term corrects for the approach velocity the fluid already has. The discharge coefficient Cd captures the vena contracta and friction: about 0.61 for a square-edge orifice, 0.98 for a classical venturi, 0.97 for a flow nozzle, so a venturi passes far more flow at the same dP and recovers most of the pressure. This is the incompressible-liquid form; a compressible gas needs a separate expansion factor Y, and a precise Cd (a function of beta and Reynolds number) comes from ISO 5167 or the meter's calibration. A field / sizing estimate; the calibrated meter governs.",
+    assumptions: [
+      { name: "DP-flow equation", value: "Q = Cd A2 sqrt(2 dP/(rho (1 - beta^4))); flow ~ sqrt(dP)", source: "Bernoulli / ISO 5167 primary elements" },
+      { name: "Discharge coefficient", value: "Cd ~ 0.61 orifice, 0.98 venturi, 0.97 nozzle (editable); precise Cd from ISO 5167 / calibration", source: "ISO 5167" },
+      { name: "Scope", value: "incompressible liquid only; a gas needs an expansion factor Y", source: "scope of this tile" },
+    ],
+  },
   "outside-air-percent-temps": {
     formula: "%OA = 100 (T_ra - T_ma) / (T_ra - T_oa).",
     edition: "The mixed-air temperature balance for the outside-air fraction from ASHRAE / AABC-NEBB field practice, by name.",
