@@ -858,7 +858,7 @@ const TOOL_MODULES = (() => {
     "weld-metal-volume", "wire-feed-deposition", "wire-feed-speed-for-deposition", "weld-transverse-shrinkage",
     "weld-group-eccentric", "min-bend-radius", "shrink-fit",
     "bend-springback",
-    "weld-dilution", "weld-passes-arc-time", "weld-travel-speed",
+    "weld-dilution", "weld-deposit-composition", "weld-passes-arc-time", "weld-travel-speed",
     // spec-v802 coil / roll stock length (group E)
     "coil-length",
     // spec-v909 bar / tube stock cut list yield (group E)

@@ -25957,6 +25957,26 @@
       "kind": "industry"
     },
     {
+      "term": "weld deposit composition",
+      "target": "weld-deposit-composition",
+      "kind": "industry"
+    },
+    {
+      "term": "diluted alloy composition weld",
+      "target": "weld-deposit-composition",
+      "kind": "question"
+    },
+    {
+      "term": "overlay chromium after dilution",
+      "target": "weld-deposit-composition",
+      "kind": "question"
+    },
+    {
+      "term": "first layer overlay dilution chemistry",
+      "target": "weld-deposit-composition",
+      "kind": "question"
+    },
+    {
       "term": "overlay dilution",
       "target": "weld-dilution",
       "kind": "industry"

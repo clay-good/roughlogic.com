@@ -1091,6 +1091,7 @@ export const RENDERER_MAP = {
   "shrink-fit": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "bend-springback": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "weld-dilution": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
+  "weld-deposit-composition": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "weld-passes-arc-time": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "weld-travel-speed": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "coil-length": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },

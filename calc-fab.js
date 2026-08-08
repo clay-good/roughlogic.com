@@ -1261,6 +1261,60 @@ function _v356renderWeldDilution(inputRegion, outputRegion, citationEl) {
 }
 FAB_RENDERERS["weld-dilution"] = _v356renderWeldDilution;
 
+// ===================== spec-v1209: diluted weld-deposit composition =====================
+// The weld-dilution tile's own note names this gap: it "does not itself compute the diluted
+// alloy composition (that needs each metal's chemistry)." This does. For any one alloy element,
+// the as-deposited content is the dilution-weighted blend of the base metal and the filler:
+//   deposit% = D * base% + (1 - D) * filler%,   D = dilution fraction (from the weld-dilution tile).
+// The classic use is a corrosion or hardfacing overlay: dilution drags the first layer toward the
+// base chemistry, which is why overlays use over-alloyed filler (e.g. 309 for a stainless first layer).
+// dims: in { dilution_pct: dimensionless, base_pct: dimensionless, filler_pct: dimensionless } out: { deposit_pct: dimensionless, base_contribution_pct: dimensionless, filler_contribution_pct: dimensionless, shift_from_filler_pct: dimensionless }
+export function computeWeldDepositComposition({ dilution_pct = 0, base_pct = 0, filler_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D = Number(dilution_pct) || 0;
+  const base = Number(base_pct) || 0;
+  const filler = Number(filler_pct) || 0;
+  if (!(D >= 0 && D <= 100)) return { error: "Dilution must be between 0 and 100%." };
+  if (!(base >= 0 && base <= 100)) return { error: "Base-metal element content must be between 0 and 100%." };
+  if (!(filler >= 0 && filler <= 100)) return { error: "Filler element content must be between 0 and 100%." };
+  const d = D / 100;
+  const base_contribution_pct = d * base;
+  const filler_contribution_pct = (1 - d) * filler;
+  const deposit_pct = base_contribution_pct + filler_contribution_pct;
+  const shift_from_filler_pct = deposit_pct - filler;
+  if (![deposit_pct, base_contribution_pct, filler_contribution_pct, shift_from_filler_pct].every(Number.isFinite)) {
+    return { error: "Deposit-composition math is not a finite value." };
+  }
+  return {
+    deposit_pct, base_contribution_pct, filler_contribution_pct, shift_from_filler_pct,
+    note: "The as-deposited content of one alloy element after dilution, the step the weld-dilution tile stops short of: deposit% = D x base% + (1 - D) x filler%, where D is the dilution fraction (the melted-base share, from the weld-dilution tile), base% is the element's content in the base metal, and filler% its content in the undiluted filler. Dilution drags the deposit toward the base chemistry -- the whole reason a stainless or nickel overlay uses an over-alloyed filler. A 309L filler at 23% Cr welded onto carbon steel (0% Cr) at 30% dilution deposits only 0.70 x 23 = 16.1% Cr, below the ~18% a 304-equivalent surface needs, which is why the first layer is run at low dilution (or a second layer is added) to bring the surface chemistry up. Run it for each critical element (C for cracking, Cr and Ni for corrosion or the ferrite number). One element, one pass, well-mixed pool; it does not predict microstructure, ferrite number, or hardness (a Schaeffler/WRC diagram uses these compositions). A process aid; the WPS, the filler certs, and the base-metal MTR govern.",
+  };
+}
+export const weldDepositCompositionExample = { inputs: { dilution_pct: 30, base_pct: 0, filler_pct: 23 } };
+function renderWeldDepositComposition(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: diluted weld-deposit composition, the standard welding-metallurgy mixing rule (by name): deposit% = D x base% + (1 - D) x filler%, with D the dilution fraction from the weld-dilution tile. One element, one pass, well-mixed pool; microstructure and ferrite come from a Schaeffler/WRC diagram, not this. The WPS, the filler certs, and the base-metal MTR govern.";
+  const dil = makeNumber("Dilution D (%, from the weld-dilution tile)", "wdc-dil", { step: "any", min: "0", max: "100" }); dil.input.value = "30";
+  const base = makeNumber("Element content in base metal (%)", "wdc-base", { step: "any", min: "0", max: "100" }); base.input.value = "0";
+  const filler = makeNumber("Element content in filler (%)", "wdc-filler", { step: "any", min: "0", max: "100" }); filler.input.value = "23";
+  for (const f of [dil, base, filler]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dil.input.value = "30"; base.input.value = "0"; filler.input.value = "23"; update(); });
+  const oDep = makeOutputLine(outputRegion, "Deposit content (as-welded)", "wdc-out-dep");
+  const oSplit = makeOutputLine(outputRegion, "From base / from filler", "wdc-out-split");
+  const oShift = makeOutputLine(outputRegion, "Shift from the filler nominal", "wdc-out-shift");
+  const oNote = makeOutputLine(outputRegion, "Note", "wdc-out-note");
+  const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
+  const update = debounce(() => {
+    const r = computeWeldDepositComposition({ dilution_pct: rd(dil.input), base_pct: rd(base.input), filler_pct: rd(filler.input) });
+    if (r.error) { oDep.textContent = r.error; oSplit.textContent = "-"; oShift.textContent = "-"; oNote.textContent = ""; return; }
+    oDep.textContent = fmt(r.deposit_pct, 3) + "%";
+    oSplit.textContent = fmt(r.base_contribution_pct, 3) + "% / " + fmt(r.filler_contribution_pct, 3) + "%";
+    oShift.textContent = (r.shift_from_filler_pct >= 0 ? "+" : "") + fmt(r.shift_from_filler_pct, 3) + "% vs filler " + fmt(rd(filler.input), 3) + "%";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [dil, base, filler]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["weld-deposit-composition"] = renderWeldDepositComposition;
+
 // dims: in { A_groove: L^2, length_in: L, a_pass: L^2, dep_rate: M T^-1, density: M L^-3, op_factor: dimensionless } out: { passes: dimensionless, weight_lb: M, arc_h: T, total_h: T }
 export function computeWeldPassesArcTime({ A_groove = 0, length_in = 0, a_pass = 0, dep_rate = 0, density = 0.283, op_factor = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

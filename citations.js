@@ -10973,6 +10973,19 @@ export const CITATIONS = {
       { name: "Area ratio only", value: "uses entered areas; does not compute the diluted alloy composition", source: "scope of this tile" },
     ],
   },
+  "weld-deposit-composition": {
+    formula: "deposit% = D x base% + (1 - D) x filler%; base_contribution = D x base%; filler_contribution = (1 - D) x filler%; shift = deposit% - filler% (D = dilution/100).",
+    edition: "The standard welding-metallurgy dilution mixing rule for the as-deposited alloy composition, by name.",
+    freeAccess: "The dilution mixing rule is a standard welding-metallurgy relation in AWS references and filler-metal literature; the base and filler chemistries are the user's own MTR/cert values. The WPS and the filler-metal data govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The as-deposited content of one alloy element after dilution, the step the weld-dilution tile names as separate: deposit% = D x base% + (1 - D) x filler%, where D is the dilution fraction (the melted-base share, from the weld-dilution tile), base% is the element's content in the base metal, and filler% its content in the undiluted filler. Dilution drags the deposit toward the base chemistry, the whole reason a stainless or nickel overlay uses an over-alloyed filler: a 309L filler at 23% Cr onto carbon steel (0% Cr) at 30% dilution deposits only 16.1% Cr, below the ~18% a 304-equivalent surface needs, so the first layer is run at low dilution or a second layer is added. Run it for each critical element (C for cracking, Cr and Ni for corrosion or the ferrite number). One element, one pass, well-mixed pool; it does not predict microstructure, ferrite number, or hardness (a Schaeffler/WRC diagram uses these compositions). A process aid; the WPS, the filler certs, and the base-metal MTR govern.",
+    assumptions: [
+      { name: "Mixing rule", value: "deposit% = D x base% + (1 - D) x filler%", source: "welding metallurgy / AWS" },
+      { name: "Dilution source", value: "D is the dilution fraction from the weld-dilution tile", source: "welding metallurgy" },
+      { name: "Overlay lesson", value: "dilution pulls the deposit toward the base; overlays use over-alloyed filler (e.g. 309)", source: "welding practice" },
+      { name: "Scope", value: "one element, one pass; not microstructure/ferrite (Schaeffler/WRC)", source: "scope of this tile" },
+    ],
+  },
   "weld-passes-arc-time": {
     formula: "passes = ceil(A_groove / a_pass); weight = A_groove x length x density; arc_h = weight / dep_rate; total_h = arc_h / op_factor.",
     edition: "The standard welding-cost estimating relations (passes, deposited weight, arc time, operator factor), by name.",

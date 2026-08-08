@@ -63993,6 +63993,62 @@
    }
   },
   {
+   "tile_id": "weld-deposit-composition",
+   "source_publisher": "welding metallurgy / AWS (dilution mixing rule)",
+   "source_title": "309L overlay: 23% Cr filler onto carbon steel (0% Cr) at 30% dilution -> 16.1% Cr deposit (spec-v1209)",
+   "source_edition_or_year": "standard welding-metallurgy dilution mixing rule",
+   "source_section_or_page": "deposit% = D x base% + (1 - D) x filler% = 0.30 x 0 + 0.70 x 23 = 16.1% Cr; shift = 16.1 - 23 = -6.9% (below the ~18% a 304-equivalent surface needs).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "dilution_pct": 30,
+    "base_pct": 0,
+    "filler_pct": 23
+   },
+   "outputs": {
+    "deposit_pct": {
+     "value": 16.1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "filler_contribution_pct": {
+     "value": 16.1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "shift_from_filler_pct": {
+     "value": -6.9,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weld-deposit-composition",
+   "source_publisher": "standard welding-metallurgy dilution mixing rule",
+   "source_title": "cross-check carbon pickup: base C 0.25%, filler C 0.08%, 35% dilution -> 0.1395% C deposit",
+   "source_edition_or_year": "deposit% = D x base% + (1 - D) x filler%",
+   "source_section_or_page": "deposit% = 0.35 x 0.25 + 0.65 x 0.08 = 0.0875 + 0.052 = 0.1395% C; dilution raises the deposit carbon above the filler's 0.08% because the base is richer.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "dilution_pct": 35,
+    "base_pct": 0.25,
+    "filler_pct": 0.08
+   },
+   "outputs": {
+    "deposit_pct": {
+     "value": 0.1395,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "weld-passes-arc-time",
    "source_publisher": "welding-cost estimating",
    "source_title": "12 in weld, 0.15 in^2 groove, 0.03 in^2/pass, 8 lb/h -> 5 passes, 0.509 lb, 3.8 min arc",

@@ -2119,6 +2119,7 @@ cross-check.
 | calc-fab.js | `computeShrinkFit` | `{ nominal_dia_in = 0, interference_in = 0, clearance_in = 0, alpha_per_f = 0....` | _ | _ | _ |
 | calc-fab.js | `computeVesselHeadVolume` | `{ inside_diameter_in = 48, head_type = "elliptical", straight_flange_in = 0 }...` | _ | _ | _ |
 | calc-fab.js | `computeWeldCostPerFoot` | `{ deposit_lb_per_ft, deposition_eff_pct = 95, filler_cost_per_lb = 0, deposit...` | _ | _ | _ |
+| calc-fab.js | `computeWeldDepositComposition` | `{ dilution_pct = 0, base_pct = 0, filler_pct = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeWeldDilution` | `{ A_base = 0, A_filler = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeWeldGroupEccentric` | `{ load_lb = 0, ecc_in = 0, weld_len_in = 0, separation_in = 0, allow_per_16 =...` | _ | _ | _ |
 | calc-fab.js | `computeWeldMetalVolume` | `{ joint_type = "fillet", fillet_leg_in = 0, groove_area_in2 = 0, length_in = ...` | _ | _ | _ |
@@ -3243,7 +3244,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1829.
+Row count: 1830.
 
 <!-- END function-corpus-v14 -->
 
@@ -3876,7 +3877,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (444 tiles)
+### Group E Construction (445 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4296,6 +4297,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-closet-location` | Water Closet Location and Seat Height (2010 ADA Standards 604) | US Department of Justice / US Access ...; 604.2: 'The centerline of the water closet shall be 16 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-for-compaction` | Water to Reach Optimum Moisture for Compaction | Gravimetric water-content identity (f...; dry weight = 100*27*105 = 283,500 lb; water = 0.05*283,50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `weld-cost-per-foot` | All-In Welding Cost per Foot | AWS welding cost and consumable refer...; 0.10 lb/ft, 95% eff, $2.50/lb, 8 lb/hr, 30% factor, $65/h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `weld-deposit-composition` | Diluted Weld Deposit Composition | welding metallurgy / AWS (dilution mi...; deposit% = D x base% + (1 - D) x filler% = 0.30 x 0 + 0.7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weld-dilution` | Weld Dilution Ratio | welding metallurgy / AWS; spec-v356 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weld-duty-cycle` | Welder Duty Cycle | NEMA EW-1 inverse-square duty-cycle r...; 250 A at 60% -> at 300 A: 41.67%, A100 193.6 A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weld-group-eccentric` | Eccentric Fillet Weld Group (Elastic Method) | AISC 360 / Steel Construction Manual ...; 12 kip at 6 in, two 10 in welds 4 in apart -> J 246.7 in3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5010,6 +5012,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1581. Fixture-covered or reference-cadence: 1581 / 1581.
+Tile count: 1582. Fixture-covered or reference-cadence: 1582 / 1582.
 
 <!-- END tile-index-v14 -->

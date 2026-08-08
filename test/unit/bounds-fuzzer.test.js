@@ -19098,6 +19098,35 @@ test("bounds: spec-v356 computeWeldDilution pins the ratio, the filler complemen
   assert.ok("error" in _v356({ A_base: Infinity, A_filler: 0.05 }));
 });
 
+import { computeWeldDepositComposition as _v1209 } from "../../calc-fab.js";
+
+test("bounds: spec-v1209 computeWeldDepositComposition pins the mixing rule, the endpoints, the contribution split, and error seams", () => {
+  // 309L overlay: 23% Cr filler onto carbon steel (0% Cr) at 30% dilution -> 16.1% Cr.
+  const r = _v1209({ dilution_pct: 30, base_pct: 0, filler_pct: 23 });
+  assert.ok(Math.abs(r.deposit_pct - 16.1) < 1e-9);
+  assert.ok(Math.abs(r.deposit_pct - (0.30 * 0 + 0.70 * 23)) < 1e-12);
+  assert.ok(Math.abs(r.base_contribution_pct - 0) < 1e-12);
+  assert.ok(Math.abs(r.filler_contribution_pct - 16.1) < 1e-9);
+  assert.ok(Math.abs(r.shift_from_filler_pct - (16.1 - 23)) < 1e-9);
+  // The split always sums to the deposit.
+  assert.ok(Math.abs(r.base_contribution_pct + r.filler_contribution_pct - r.deposit_pct) < 1e-12);
+  // Endpoints: D=0 -> pure filler, D=100 -> pure base.
+  assert.ok(Math.abs(_v1209({ dilution_pct: 0, base_pct: 0, filler_pct: 23 }).deposit_pct - 23) < 1e-12);
+  assert.ok(Math.abs(_v1209({ dilution_pct: 100, base_pct: 5, filler_pct: 23 }).deposit_pct - 5) < 1e-12);
+  // Carbon pickup: a base richer than the filler raises the deposit above the filler nominal.
+  const c = _v1209({ dilution_pct: 35, base_pct: 0.25, filler_pct: 0.08 });
+  assert.ok(Math.abs(c.deposit_pct - 0.1395) < 1e-9 && c.shift_from_filler_pct > 0);
+  // Monotonic in dilution toward the base value (base 0 < filler 23 -> more dilution lowers the deposit).
+  assert.ok(_v1209({ dilution_pct: 50, base_pct: 0, filler_pct: 23 }).deposit_pct < r.deposit_pct);
+  // Error seams: out-of-range dilution or content, non-finite. Zero content is VALID (an absent element).
+  assert.ok(!("error" in _v1209({ dilution_pct: 30, base_pct: 0, filler_pct: 0 })));
+  assert.ok("error" in _v1209({ dilution_pct: 101, base_pct: 0, filler_pct: 23 }));
+  assert.ok("error" in _v1209({ dilution_pct: -1, base_pct: 0, filler_pct: 23 }));
+  assert.ok("error" in _v1209({ dilution_pct: 30, base_pct: 120, filler_pct: 23 }));
+  assert.ok("error" in _v1209({ dilution_pct: 30, base_pct: 0, filler_pct: 101 }));
+  assert.ok("error" in _v1209({ dilution_pct: Infinity, base_pct: 0, filler_pct: 23 }));
+});
+
 test("bounds: spec-v357 computeWeldPassesArcTime pins the ceil passes, weight, arc time, operator total, and error seams", () => {
   const r = _v357({ A_groove: 0.15, length_in: 12, a_pass: 0.03, dep_rate: 8, density: 0.283, op_factor: 0.40 });
   assert.strictEqual(r.passes, 5);

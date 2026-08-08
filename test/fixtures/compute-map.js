@@ -513,6 +513,7 @@ export const COMPUTE_MAP = {
   "bend-springback": { module: "../../calc-fab.js", fn: "computeBendSpringback" },
   "shrink-fit": { module: "../../calc-fab.js", fn: "computeShrinkFit" },
   "weld-dilution": { module: "../../calc-fab.js", fn: "computeWeldDilution" },
+  "weld-deposit-composition": { module: "../../calc-fab.js", fn: "computeWeldDepositComposition" },
   "weld-passes-arc-time": { module: "../../calc-fab.js", fn: "computeWeldPassesArcTime" },
   "weld-travel-speed": { module: "../../calc-fab.js", fn: "computeWeldTravelSpeed" },
   "spindle-power-torque": { module: "../../calc-machining.js", fn: "computeSpindlePowerTorque" },
