@@ -1745,3 +1745,62 @@ function _v1127renderBarNesting(inputRegion, outputRegion, citationEl) {
   for (const f of [stock, kerf, trim]) f.input.addEventListener("input", update);
 }
 FAB_RENDERERS["bar-nesting"] = _v1127renderBarNesting;
+
+// =====================================================================
+// spec-v1257: sheet-metal / plate gauge -> decimal thickness (sheet-metal-gauge)
+// A gauge number means a different thickness by material. Standard (uncoated)
+// steel uses the Manufacturers' Standard Gage (MSG, fixed by the U.S. Act of
+// Congress of March 3, 1893; thickness = weight_lb_ft2 / 41.82). Galvanized
+// steel (GSG) is MSG plus the zinc coating. Aluminum / brass / copper follow
+// the Brown & Sharpe geometric formula t = 0.005 x 92^((36 - n)/39) in - the
+// same relation the awg-wire-geometry tile uses. Public-domain reference.
+// =====================================================================
+const _MSG_STEEL_IN = { 3: 0.2391, 4: 0.2242, 5: 0.2092, 6: 0.1943, 7: 0.1793, 8: 0.1644, 9: 0.1495, 10: 0.1345, 11: 0.1196, 12: 0.1046, 13: 0.0897, 14: 0.0747, 15: 0.0673, 16: 0.0598, 17: 0.0538, 18: 0.0478, 19: 0.0418, 20: 0.0359, 21: 0.0329, 22: 0.0299, 23: 0.0269, 24: 0.0239, 25: 0.0209, 26: 0.0179, 27: 0.0164, 28: 0.0149, 29: 0.0135, 30: 0.0120 };
+const _GSG_GALV_IN = { 8: 0.1719, 9: 0.1563, 10: 0.1406, 11: 0.1250, 12: 0.1094, 13: 0.0938, 14: 0.0781, 15: 0.0703, 16: 0.0625, 17: 0.0563, 18: 0.0500, 19: 0.0438, 20: 0.0375, 21: 0.0344, 22: 0.0313, 23: 0.0281, 24: 0.0250, 25: 0.0219, 26: 0.0188, 27: 0.0172, 28: 0.0156, 29: 0.0141, 30: 0.0125 };
+// dims: in { gauge: dimensionless, material: dimensionless } out: { thickness_in: L, thickness_mm: L }
+export function computeSheetMetalGauge({ gauge = 0, material = "steel" } = {}) {
+  const _g = _finiteGuard({ gauge }); if (_g) return _g;
+  const n = Math.round(Number(gauge) || 0);
+  const mat = String(material);
+  if (mat !== "steel" && mat !== "galvanized" && mat !== "aluminum") return { error: "Material must be steel, galvanized, or aluminum." };
+  let thickness_in;
+  if (mat === "steel") {
+    if (!(n >= 3 && n <= 30)) return { error: "Standard-steel gauge must be a whole number 3 to 30 (Manufacturers' Standard Gage)." };
+    thickness_in = _MSG_STEEL_IN[n];
+  } else if (mat === "galvanized") {
+    if (!(n >= 8 && n <= 30)) return { error: "Galvanized-steel gauge must be a whole number 8 to 30 (thinner than 8 ga is not a standard galvanized sheet gauge)." };
+    thickness_in = _GSG_GALV_IN[n];
+  } else {
+    if (!(n >= 3 && n <= 30)) return { error: "Aluminum (Brown & Sharpe) gauge must be a whole number 3 to 30." };
+    thickness_in = 0.005 * Math.pow(92, (36 - n) / 39);
+  }
+  if (!Number.isFinite(thickness_in)) return { error: "No standard thickness for that gauge and material." };
+  const thickness_mm = thickness_in * 25.4;
+  return {
+    thickness_in, thickness_mm, gauge: n, material: mat,
+    note: "The decimal thickness of a sheet-metal or plate gauge, which differs by MATERIAL - the mistake behind a mis-ordered sheet. Standard (uncoated) steel uses the Manufacturers' Standard Gage (MSG), fixed by the U.S. Act of Congress of March 3, 1893, where the thickness is the sheet weight divided by 41.82 lb/ft^2 per inch (16 ga = 0.0598 in, 14 ga = 0.0747 in, 10 ga = 0.1345 in). Galvanized steel (GSG) uses the same gauge number but reads a few thousandths thicker because the published thickness includes the zinc coating (16 ga galvanized = 0.0625 in). Aluminum, brass, and copper follow the Brown & Sharpe (American Wire Gage) geometric formula t = 0.005 x 92^((36 - n)/39) in, so 16 ga aluminum is 0.0508 in - noticeably thinner than 16 ga steel. Higher gauge numbers are always thinner. Stainless sheet is commonly specified by MSG (close to the steel column) but some mills use their own gauge, so confirm against the mill certificate. A reference; the material spec and a caliper govern the delivered sheet.",
+  };
+}
+export const sheetMetalGaugeExample = { inputs: { gauge: 16, material: "steel" } };
+function _renderSheetMetalGauge(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: sheet-metal gauge to decimal thickness - standard (uncoated) steel by the Manufacturers' Standard Gage (MSG, U.S. Act of Congress March 3, 1893; thickness = weight/41.82); galvanized (GSG) = MSG plus the zinc coating; aluminum/brass/copper by the Brown & Sharpe geometric formula t = 0.005 x 92^((36 - n)/39) in (the same relation the awg-wire-geometry tile uses), by name; public-domain. Stainless is commonly MSG but some mills differ. A reference; the material spec and a caliper govern the delivered sheet.";
+  const g = makeNumber("Gauge number", "smg-g", { step: "1", value: "16" }); g.input.value = "16";
+  const mat = makeSelect("Material", "smg-mat", [
+    { value: "steel", label: "Standard steel (MSG)", selected: true },
+    { value: "galvanized", label: "Galvanized steel (GSG)" },
+    { value: "aluminum", label: "Aluminum / brass / copper (B&S)" },
+  ]);
+  for (const f of [g, mat]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { g.input.value = "16"; mat.select.value = "steel"; update(); });
+  const oIn = makeOutputLine(outputRegion, "Decimal thickness", "smg-out-in");
+  const oNote = makeOutputLine(outputRegion, "Note", "smg-out-note");
+  const update = debounce(() => {
+    const r = computeSheetMetalGauge({ gauge: Number(g.input.value) || 0, material: mat.select.value });
+    if (r.error) { oIn.textContent = r.error; oNote.textContent = ""; return; }
+    oIn.textContent = fmt(r.thickness_in, 4) + " in (" + fmt(r.thickness_mm, 2) + " mm)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  g.input.addEventListener("input", update);
+  mat.select.addEventListener("change", update);
+}
+FAB_RENDERERS["sheet-metal-gauge"] = _renderSheetMetalGauge;

@@ -425,7 +425,7 @@ const _TILES = [
   ["weld-group-eccentric", "E"], ["min-bend-radius", "E"], ["bend-springback", "E"], ["shrink-fit", "G"],
   ["weld-dilution", "E"], ["weld-deposit-composition", "E"], ["weld-passes-arc-time", "E"], ["weld-travel-speed", "E"],
   // spec-v802 coil / roll stock length (calc-fab.js, group E)
-  ["coil-length", "E"], ["barstock-cutlist", "E"], ["bar-nesting", "E"], ["vessel-head-volume", "E"],
+  ["coil-length", "E"], ["barstock-cutlist", "E"], ["bar-nesting", "E"], ["sheet-metal-gauge", "E"], ["vessel-head-volume", "E"],
   // v135 machining cut-planning (calc-machining.js)
   ["spindle-power-torque", "K"], ["spindle-max-mrr", "K"],
 

@@ -2636,6 +2636,21 @@
       "kind": "industry"
     },
     {
+      "term": "sheet metal gauge to thickness",
+      "target": "sheet-metal-gauge",
+      "kind": "industry"
+    },
+    {
+      "term": "16 gauge steel thickness",
+      "target": "sheet-metal-gauge",
+      "kind": "question"
+    },
+    {
+      "term": "gauge decimal inches chart",
+      "target": "sheet-metal-gauge",
+      "kind": "question"
+    },
+    {
       "term": "cutting stock problem",
       "target": "bar-nesting",
       "kind": "industry"

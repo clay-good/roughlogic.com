@@ -1119,6 +1119,7 @@ export const RENDERER_MAP = {
   "coil-length": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "barstock-cutlist": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "bar-nesting": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
+  "sheet-metal-gauge": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "vessel-head-volume": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "center-of-gravity-2point": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },
   "bolt-circle": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },

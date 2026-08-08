@@ -2126,6 +2126,7 @@ cross-check.
 | calc-fab.js | `computePipeFittingTakeout` | `{ reference = "center-to-center", dimension_in = 0, takeout_a_in = 0, takeout...` | _ | _ | _ |
 | calc-fab.js | `computePipeMiterCut` | `{ total_angle_deg = 90, pieces = 2, outside_diameter_in = 0, centerline_radiu...` | _ | _ | _ |
 | calc-fab.js | `computePipeTemplateWrap` | `{ outside_diameter_in = 0, cut_angle_deg = 0, stations = 8 } = {}` | _ | _ | _ |
+| calc-fab.js | `computeSheetMetalGauge` | `{ gauge = 0, material = "steel" } = {}` | _ | _ | _ |
 | calc-fab.js | `computeShieldingGasRuntime` | `{ flow_cfh, arc_on_min, cylinder_ft3, gas_cost = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeShrinkFit` | `{ nominal_dia_in = 0, interference_in = 0, clearance_in = 0, alpha_per_f = 0....` | _ | _ | _ |
 | calc-fab.js | `computeVesselHeadVolume` | `{ inside_diameter_in = 48, head_type = "elliptical", straight_flange_in = 0 }...` | _ | _ | _ |
@@ -3291,7 +3292,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1877.
+Row count: 1878.
 
 <!-- END function-corpus-v14 -->
 
@@ -3935,7 +3936,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (456 tiles)
+### Group E Construction (457 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4264,6 +4265,7 @@ per spec-v14 §13.1 second paragraph.
 | `shearwall-deflection` | Wood Shear Wall Deflection (SDPWS Eq 4.3-1) | AWC SDPWS Equation 4.3-1 (AWC/APA des...; spec-v274 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shearwall-overturning` | Wood Shear Wall Unit Shear and Holdown (SDPWS / ASD) | AWC SDPWS segmented shear wall + ASCE...; spec-v273 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sheathing-takeoff` | Wall / Roof Sheathing Panel and Nail Takeoff | Sheathing takeoff identity (first-pri...; sheets = ceil(1600*1.08/32) = ceil(54.0) = 54; nails = 54... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `sheet-metal-gauge` | Sheet-Metal Gauge to Decimal Thickness | Manufacturers' Standard Gage (U.S. Ac...; Steel 16 ga MSG = 2.5 lb/ft2 / 41.82 = 0.0598 in; galvani... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shielding-gas-runtime` | Shielding-Gas Cylinder Runtime and Cost | Torch / regulator maker's flow charts...; 35 cfh, 120 min arc-on, 251 ft3 cylinder, $60/cylinder ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `shingle-nails` | Roofing Nail Count by Wind Zone | Roofing fastener-count identity (firs...; nails = 30*80*6 = 14,400; weight = 14400/140 = 102.9 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shore-post-load` | Formwork Shore Post Load and Spacing (ACI 347) | ACI 347 Guide to Formwork for Concrete; spec-v245 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5106,6 +5108,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1629. Fixture-covered or reference-cadence: 1629 / 1629.
+Tile count: 1630. Fixture-covered or reference-cadence: 1630 / 1630.
 
 <!-- END tile-index-v14 -->

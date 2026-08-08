@@ -862,7 +862,7 @@ const TOOL_MODULES = (() => {
     // spec-v802 coil / roll stock length (group E)
     "coil-length",
     // spec-v909 bar / tube stock cut list yield (group E)
-    "barstock-cutlist", "bar-nesting",
+    "barstock-cutlist", "bar-nesting", "sheet-metal-gauge",
     // spec-v912 dished tank / vessel head volume (group E)
     "vessel-head-volume",
   ]);

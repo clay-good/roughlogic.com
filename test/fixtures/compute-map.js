@@ -1146,6 +1146,7 @@ export const COMPUTE_MAP = {
   "coil-length": { module: "../../calc-fab.js", fn: "computeCoilLength" },
   "barstock-cutlist": { module: "../../calc-fab.js", fn: "computeBarstockCutlist" },
   "bar-nesting": { module: "../../calc-fab.js", fn: "computeBarNesting" },
+  "sheet-metal-gauge": { module: "../../calc-fab.js", fn: "computeSheetMetalGauge" },
   "vessel-head-volume": { module: "../../calc-fab.js", fn: "computeVesselHeadVolume" },
   "asce-live-load-reduction": { module: "../../calc-construction.js", fn: "computeAsceLiveLoadReduction" },
   "awg-wire-geometry": { module: "../../calc-electrical.js", fn: "computeAwgWireGeometry" },

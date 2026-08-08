@@ -11208,6 +11208,18 @@ export const CITATIONS = {
       { name: "Usable length", value: "the last wrap and core stub trim the usable length slightly", source: "shop practice" },
     ],
   },
+  "sheet-metal-gauge": {
+    formula: "Steel (MSG): thickness = weight / 41.82 lb-ft2-in (table). Galvanized (GSG) = MSG + zinc coating (table). Aluminum/brass/copper (Brown & Sharpe): t = 0.005 x 92^((36 - n)/39) in. mm = in x 25.4.",
+    edition: "The Manufacturers' Standard Gage for steel (U.S. Act of Congress, March 3, 1893) and the Brown & Sharpe (American Wire Gage) geometric formula for nonferrous sheet, by name; public domain.",
+    freeAccess: "MSG is a public-domain statutory gage (the 41.82 lb-ft2-in basis) and Brown & Sharpe is the same public geometric formula the awg-wire-geometry tile uses; the gauge number and material are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The decimal thickness of a sheet-metal or plate gauge, which differs by MATERIAL. Standard (uncoated) steel uses the Manufacturers' Standard Gage (MSG), fixed by the U.S. Act of Congress of March 3, 1893, where the thickness is the sheet weight divided by 41.82 lb per square foot per inch (16 ga = 0.0598 in, 14 ga = 0.0747 in, 10 ga = 0.1345 in). Galvanized steel (GSG) uses the same gauge number but reads a few thousandths thicker because the published thickness includes the zinc coating (16 ga galvanized = 0.0625 in). Aluminum, brass, and copper follow the Brown & Sharpe geometric formula t = 0.005 x 92^((36 - n)/39) in, so 16 ga aluminum is 0.0508 in, noticeably thinner than 16 ga steel. Higher gauge numbers are always thinner. Stainless sheet is commonly specified by MSG (close to the steel column) but some mills use their own gauge, so confirm against the mill certificate. A reference; the material spec and a caliper govern the delivered sheet.",
+    assumptions: [
+      { name: "Steel MSG", value: "Manufacturers' Standard Gage table; thickness = weight/41.82 lb-ft2-in (1893 Act)", source: "U.S. Act of Congress March 3, 1893" },
+      { name: "Galvanized GSG", value: "MSG plus the zinc coating; reads a few thousandths thicker at the same gauge", source: "galvanized-sheet standard" },
+      { name: "Nonferrous B&S", value: "t = 0.005 x 92^((36 - n)/39) in for aluminum/brass/copper", source: "Brown & Sharpe / AWG" },
+    ],
+  },
   "bar-nesting": {
     formula: "usable = stock - end trim; pieces sorted descending; first-fit-decreasing places each piece in the first stick where used + length + (kerf if the stick is not empty) <= usable, opening a new stick otherwise; total kerf = sum over sticks of (pieces on that stick - 1) x kerf; drop = total stock - part - kerf - trim; yield = part / total stock; lower bound = ceil((total part + (pieces - sticks) x kerf) / usable).",
     edition: "One-dimensional cutting-stock, packed by the first-fit-decreasing heuristic - a standard, near-optimal bin-packing method, not a proprietary nesting algorithm.",

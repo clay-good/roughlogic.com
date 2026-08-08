@@ -33396,6 +33396,29 @@ test("bounds: spec-v1126 computeMembraneFastenerTakeoff pins the usable-width ro
 });
 
 import { computeBarNesting as _v1127 } from "../../calc-fab.js";
+import { computeSheetMetalGauge as _v1257 } from "../../calc-fab.js";
+test("bounds: spec-v1257 computeSheetMetalGauge pins the MSG/GSG tables, the B&S aluminum formula, the material spread, and error seams", () => {
+  // 16 ga: steel 0.0598, galvanized 0.0625, aluminum 0.0508 (three different thicknesses).
+  const steel = _v1257({ gauge: 16, material: "steel" });
+  const galv = _v1257({ gauge: 16, material: "galvanized" });
+  const alum = _v1257({ gauge: 16, material: "aluminum" });
+  assert.ok(Math.abs(steel.thickness_in - 0.0598) < 1e-9);
+  assert.ok(Math.abs(galv.thickness_in - 0.0625) < 1e-9 && galv.thickness_in > steel.thickness_in);
+  assert.ok(Math.abs(alum.thickness_in - 0.005 * Math.pow(92, (36 - 16) / 39)) < 1e-9 && Math.abs(alum.thickness_in - 0.0508) < 5e-4);
+  assert.ok(alum.thickness_in < steel.thickness_in); // aluminum thinner at the same gauge
+  assert.ok(Math.abs(steel.thickness_mm - 0.0598 * 25.4) < 1e-6);
+  // Higher gauge number is thinner (MSG steel 10 vs 16).
+  assert.ok(_v1257({ gauge: 10, material: "steel" }).thickness_in > steel.thickness_in);
+  assert.ok(Math.abs(_v1257({ gauge: 10, material: "steel" }).thickness_in - 0.1345) < 1e-9);
+  // MSG steel matches the 41.82 lb/ft2-in basis at 10 ga (5.625 lb/ft2).
+  assert.ok(Math.abs(_v1257({ gauge: 10, material: "steel" }).thickness_in - 5.625 / 41.82) < 5e-4);
+  // Error seams: bad material, steel gauge out of 3-30, galvanized below 8, aluminum above 30, non-finite.
+  assert.ok("error" in _v1257({ gauge: 16, material: "titanium" }));
+  assert.ok("error" in _v1257({ gauge: 2, material: "steel" }));
+  assert.ok("error" in _v1257({ gauge: 5, material: "galvanized" }));
+  assert.ok("error" in _v1257({ gauge: 31, material: "aluminum" }));
+  assert.ok("error" in _v1257({ gauge: Infinity, material: "steel" }));
+});
 
 test("bounds: spec-v1127 computeBarNesting pins the FFD packing, per-cut kerf accounting, the material balance, and error seams", () => {
   const base = { cut_list: "62,4\n38,6\n27,9\n14.5,12", stock_length_in: 240, kerf_in: 0.125, end_trim_in: 1 };
