@@ -43182,6 +43182,26 @@
       "kind": "question"
     },
     {
+      "term": "solar altitude angle",
+      "target": "solar-altitude-angle",
+      "kind": "industry"
+    },
+    {
+      "term": "winter design sun elevation",
+      "target": "solar-altitude-angle",
+      "kind": "question"
+    },
+    {
+      "term": "sun elevation angle at noon",
+      "target": "solar-altitude-angle",
+      "kind": "question"
+    },
+    {
+      "term": "profile angle for pv row spacing",
+      "target": "solar-altitude-angle",
+      "kind": "question"
+    },
+    {
       "term": "flagpole shadow length",
       "target": "shadow-length",
       "kind": "question"

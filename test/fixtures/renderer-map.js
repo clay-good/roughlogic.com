@@ -131,6 +131,7 @@ export const RENDERER_MAP = {
   "ev-dcfc-time": { module: "../../calc-solar.js", exportName: "SOLAR_RENDERERS" },
   "solar-egc-690-45": { module: "../../calc-solar.js", exportName: "SOLAR_RENDERERS" },
   "shadow-length": { module: "../../calc-solar.js", exportName: "SOLAR_RENDERERS" },
+  "solar-altitude-angle": { module: "../../calc-solar.js", exportName: "SOLAR_RENDERERS" },
   "parallel-conductor-derate": { module: "../../calc-powerquality.js", exportName: "POWERQUALITY_RENDERERS" },
   "neutral-current-3ph": { module: "../../calc-powerquality.js", exportName: "POWERQUALITY_RENDERERS" },
   "motor-vd-starting": { module: "../../calc-powerquality.js", exportName: "POWERQUALITY_RENDERERS" },

@@ -5,7 +5,7 @@ Guidance for AI agents working in or with this repository. (Humans: see
 
 ## What this repo is
 
-**roughlogic.com** is a static, offline-first site of **1,585 calculators** for the
+**roughlogic.com** is a static, offline-first site of **1,586 calculators** for the
 trades (electrical, plumbing, HVAC, construction, restoration, and more) across
 **57 calc modules**, plus a local, zero-cost **MCP server** that exposes every one
 of them to an AI agent. US standards only. No AI at runtime. No hosted service —

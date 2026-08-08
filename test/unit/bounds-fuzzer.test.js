@@ -23530,6 +23530,30 @@ test("bounds: spec-v790 computeShadowLength pins shadow = h/tan(altitude), monot
   assert.ok("error" in _v790({ object_height_ft: 10, sun_altitude_deg: 95 }));
 });
 
+import { computeSolarAltitude as _v1213 } from "../../calc-solar.js";
+
+test("bounds: spec-v1213 computeSolarAltitude pins the noon and hour-angle altitude, the solstice extremes, the below-horizon flag, and error seams", () => {
+  // 40 N, winter solstice (n=355), solar noon -> dec -23.45, altitude 26.55 = 90 - |40 - (-23.45)|.
+  const r = _v1213({ latitude_deg: 40, day_of_year: 355, hours_from_solar_noon: 0 });
+  assert.ok(Math.abs(r.declination_deg - (-23.45)) < 0.05);
+  assert.ok(Math.abs(r.altitude_deg - (90 - Math.abs(40 - r.declination_deg))) < 1e-9); // noon reduces to 90 - |lat - dec|
+  assert.ok(Math.abs(r.altitude_deg - 26.55) < 0.1 && r.below_horizon === false && r.hour_angle_deg === 0);
+  // 3 p.m. (H = 45 deg) drops the winter sun to ~14 deg.
+  const pm = _v1213({ latitude_deg: 40, day_of_year: 355, hours_from_solar_noon: 3 });
+  assert.ok(pm.hour_angle_deg === 45 && Math.abs(pm.altitude_deg - 13.95) < 0.1 && pm.altitude_deg < r.altitude_deg);
+  // Summer solstice (n=172) noon is far higher: 90 - |40 - 23.45| = 73.45.
+  const summer = _v1213({ latitude_deg: 40, day_of_year: 172, hours_from_solar_noon: 0 });
+  assert.ok(summer.declination_deg > 23 && Math.abs(summer.altitude_deg - 73.45) < 0.1 && summer.altitude_deg > r.altitude_deg);
+  // Late enough in the day the sun is below the horizon (reported, not errored).
+  const eve = _v1213({ latitude_deg: 40, day_of_year: 355, hours_from_solar_noon: 7 });
+  assert.ok(eve.altitude_deg < 0 && eve.below_horizon === true && !("error" in eve));
+  // Error seams: latitude out of range, day out of range, hours out of range, non-finite.
+  assert.ok("error" in _v1213({ latitude_deg: 100, day_of_year: 355, hours_from_solar_noon: 0 }));
+  assert.ok("error" in _v1213({ latitude_deg: 40, day_of_year: 0, hours_from_solar_noon: 0 }));
+  assert.ok("error" in _v1213({ latitude_deg: 40, day_of_year: 355, hours_from_solar_noon: 13 }));
+  assert.ok("error" in _v1213({ latitude_deg: Infinity, day_of_year: 355, hours_from_solar_noon: 0 }));
+});
+
 import { computeDeckBoardTakeoff as _v789 } from "../../calc-finish.js";
 
 test("bounds: spec-v789 computeDeckBoardTakeoff pins the board / joist / screw counts, waste scaling, and error seams", () => {

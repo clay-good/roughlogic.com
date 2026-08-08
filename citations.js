@@ -13633,6 +13633,19 @@ export const CITATIONS = {
       { name: "Worst-case sun angle", value: "use the winter-design (lowest midday) sun elevation for the longest shadow", source: "solar-access practice" },
     ],
   },
+  "solar-altitude-angle": {
+    formula: "dec = 23.45 sin(360 (284 + n)/365); H = 15 (hours from solar noon); sin(altitude) = sin(lat) sin(dec) + cos(lat) cos(dec) cos(H); at noon altitude = 90 - |lat - dec|.",
+    edition: "The solar altitude (elevation) angle from the standard NOAA/ASHRAE solar-geometry relation, with the declination from Cooper's equation, by name.",
+    freeAccess: "The solar-position equations are public-domain solar geometry (NOAA/ASHRAE); the latitude, date, and time are the user's own site inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The solar altitude (elevation) angle, the sun position the shadow-length and pv-row-spacing tiles need but no tile produced (solar-times returns sunrise/sunset and declination, not altitude). sin(altitude) = sin(lat) sin(dec) + cos(lat) cos(dec) cos(H), with the declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365) for day-of-year n and the hour angle H = 15 x (hours from solar noon), negative in the morning. At solar noon (H = 0) this reduces to altitude = 90 - |lat - dec|, the winter-design sun elevation a shading, solar-access, tree, or setback study turns on: at 40 deg N on the winter solstice (n = 355, dec = -23.4) the noon sun reaches only 26.6 deg, and by 3 p.m. about 14 deg. A negative altitude means the sun is below the horizon (reported, not errored). True solar time and a flat horizon are assumed; the equation of time, atmospheric refraction near the horizon, and terrain are separate. A site-planning geometry, not a full sun-path shading study.",
+    assumptions: [
+      { name: "Altitude", value: "sin(altitude) = sin(lat) sin(dec) + cos(lat) cos(dec) cos(H)", source: "NOAA/ASHRAE solar geometry" },
+      { name: "Declination", value: "dec = 23.45 sin(360 (284 + n)/365) (Cooper's equation)", source: "Cooper (1969)" },
+      { name: "Hour angle", value: "H = 15 x (hours from solar noon); solar-noon form altitude = 90 - |lat - dec|", source: "solar geometry" },
+      { name: "Scope", value: "true solar time, flat horizon; refraction and the equation of time are separate", source: "scope of this tile" },
+    ],
+  },
   "pv-max-ambient-for-power": {
     formula: "T_cell = 25 + (target_power/P_stc - 1) x 100/gamma; max_ambient = T_cell - (NOCT - 20) x G/800. The inverse of P = P_stc x (1 + gamma/100 x (T_cell - 25)) and T_cell = T_amb + (NOCT - 20) x G/800.",
     edition: "The PV NOCT cell-temperature model and the datasheet power temperature coefficient, by name, solved for the ambient temperature.",

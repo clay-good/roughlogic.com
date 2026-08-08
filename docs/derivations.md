@@ -3038,6 +3038,7 @@ cross-check.
 | calc-solar.js | `computePvRowSpacing` | `{ module_length_ft = 0, tilt_deg = 0, profile_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvStringFusing` | `{ Isc_A = 0, max_fuse_A = 0, n_strings = 1 } = {}` | _ | _ | _ |
 | calc-solar.js | `computeShadowLength` | `{ object_height_ft = 0, sun_altitude_deg = 0 } = {}` | _ | _ | _ |
+| calc-solar.js | `computeSolarAltitude` | `{ latitude_deg = 0, day_of_year = 355, hours_from_solar_noon = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computeSolarEgc69045` | `{ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsized = "no" } = {}` | _ | _ | _ |
 | calc-solar.js | `renderBatteryRuntime` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-solar.js | `renderEvChargerLoad` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -3247,7 +3248,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1833.
+Row count: 1834.
 
 <!-- END function-corpus-v14 -->
 
@@ -3328,7 +3329,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (199 tiles)
+### Group A Electrical (200 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3501,6 +3502,7 @@ per spec-v14 §13.1 second paragraph.
 | `shock-approach-boundary` | Shock Approach Boundaries (NFPA 70E Table 130.4) | NFPA 70E-2024; 151-750 V: limited fixed 3 ft 6 in, limited movable 10 ft... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `short-circuit-pp` | Short-Circuit Current at Panel (Point-to-Point) | NEMA / Bussmann (Cooper); 1500 kVA / 5.75 %Z / 480 V three-phase utility -> 31,379 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `soil-resistivity-wenner` | Wenner 4-Pin Soil Resistivity | Wenner 4-pin soil resistivity (IEEE 8...; rho = 2*pi*(10*0.3048)*5 = 2*pi*3.048*5 = 95.76 ohm-m; x1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `solar-altitude-angle` | Solar Altitude / Winter-Design Sun Elevation | NOAA/ASHRAE solar geometry (Cooper's ...; dec = 23.45 sin(360 (284+355)/365) = -23.45; at solar noo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `solar-egc-690-45` | PV Equipment Grounding Conductor (NEC 690.45) | NFPA; 20 A OCPD -> 12 AWG copper EGC (above the 14 AWG floor) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `speaker-70v-line` | 70-Volt Distributed Speaker Line | constant-voltage distributed audio pr...; sixteen 8 W taps (128 W) on a 200 W amp at 20% headroom -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standby-battery-runtime` | Standby Battery Runtime from Capacity | NFPA 72 §10.6 (by name), inverse; 14.6 Ah, 0.5 A standby, 2 A / 5 min alarm, derate 1.2 -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5018,6 +5020,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1585. Fixture-covered or reference-cadence: 1585 / 1585.
+Tile count: 1586. Fixture-covered or reference-cadence: 1586 / 1586.
 
 <!-- END tile-index-v14 -->

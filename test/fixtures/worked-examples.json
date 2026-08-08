@@ -26528,6 +26528,62 @@
    }
   },
   {
+   "tile_id": "solar-altitude-angle",
+   "source_publisher": "NOAA/ASHRAE solar geometry (Cooper's declination)",
+   "source_title": "40 deg N, winter solstice (day 355), solar noon -> altitude 26.6 deg, dec -23.45 (spec-v1213)",
+   "source_edition_or_year": "standard solar-position relation",
+   "source_section_or_page": "dec = 23.45 sin(360 (284+355)/365) = -23.45; at solar noon (H=0) altitude = 90 - |40 - (-23.45)| = 90 - 63.45 = 26.55 deg.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "latitude_deg": 40,
+    "day_of_year": 355,
+    "hours_from_solar_noon": 0
+   },
+   "outputs": {
+    "altitude_deg": {
+     "value": 26.55,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "declination_deg": {
+     "value": -23.45,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "solar-altitude-angle",
+   "source_publisher": "standard solar-position relation (hour angle)",
+   "source_title": "cross-check: same site at 3 p.m. (H 45 deg) drops to 14.0 deg -- the winter 3 p.m. profile angle",
+   "source_edition_or_year": "sin(alt) = sin(lat) sin(dec) + cos(lat) cos(dec) cos(H)",
+   "source_section_or_page": "H = 15 x 3 = 45 deg; sin(alt) = sin40 sin(-23.45) + cos40 cos(-23.45) cos45 = -0.2558 + 0.4969 = 0.2411; alt = 13.95 deg -- the low sun that governs PV inter-row spacing.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "latitude_deg": 40,
+    "day_of_year": 355,
+    "hours_from_solar_noon": 3
+   },
+   "outputs": {
+    "altitude_deg": {
+     "value": 13.95,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "hour_angle_deg": {
+     "value": 45,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "deck-board-takeoff",
    "source_publisher": "First-principles deck-surface takeoff",
    "source_title": "boards = ceil((width_in + gap) / (face + gap)); screws = boards x joists x 2",

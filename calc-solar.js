@@ -1533,6 +1533,58 @@ function renderShadowLength(inputRegion, outputRegion, citationEl) {
 }
 SOLAR_RENDERERS["shadow-length"] = renderShadowLength;
 
+// ===================== spec-v1213: solar altitude / winter-design sun elevation =====================
+// The shadow-length tile takes sun_altitude_deg and the pv-row-spacing tile takes profile_angle_deg,
+// and both notes point at a source that does not exist: "the winter-design sun elevation ... from the
+// site latitude, or from solar-times." But solar-times (calc-field.js) returns only sunrise/sunset/
+// declination -- never the altitude. This computes it. sin(altitude) = sin(lat) sin(dec) + cos(lat)
+// cos(dec) cos(H), the standard NOAA/ASHRAE relation, with the declination from Cooper's equation
+// dec = 23.45 sin(360 (284 + n)/365) and the hour angle H = 15 (hours from solar noon). At solar noon
+// this reduces to altitude = 90 - |lat - dec|, the winter-design sun elevation the shading tiles need.
+// dims: in { latitude_deg: dimensionless, day_of_year: dimensionless, hours_from_solar_noon: dimensionless } out: { altitude_deg: dimensionless, declination_deg: dimensionless, hour_angle_deg: dimensionless }
+export function computeSolarAltitude({ latitude_deg = 0, day_of_year = 355, hours_from_solar_noon = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const lat = Number(latitude_deg) || 0;
+  const n = Number(day_of_year) || 0;
+  const hrs = Number(hours_from_solar_noon) || 0;
+  if (!(lat >= -90 && lat <= 90)) return { error: "Latitude must be between -90 and 90 degrees." };
+  if (!(n >= 1 && n <= 366)) return { error: "Day of year must be between 1 and 366." };
+  if (!(hrs >= -12 && hrs <= 12)) return { error: "Hours from solar noon must be between -12 and 12." };
+  const rad = Math.PI / 180;
+  const declination_deg = 23.45 * Math.sin(360 * (284 + n) / 365 * rad);
+  const hour_angle_deg = 15 * hrs;
+  const sinAlt = Math.sin(lat * rad) * Math.sin(declination_deg * rad)
+    + Math.cos(lat * rad) * Math.cos(declination_deg * rad) * Math.cos(hour_angle_deg * rad);
+  const altitude_deg = Math.asin(Math.max(-1, Math.min(1, sinAlt))) / rad;
+  if (![declination_deg, hour_angle_deg, altitude_deg].every(Number.isFinite)) return { error: "Solar-altitude math is not a finite value." };
+  return {
+    altitude_deg, declination_deg, hour_angle_deg, below_horizon: altitude_deg <= 0,
+    note: "The solar altitude (elevation) angle, the sun position the shadow-length and pv-row-spacing tiles need but no tile produced (solar-times gives sunrise/sunset and declination, not altitude). sin(altitude) = sin(lat) sin(dec) + cos(lat) cos(dec) cos(H), with the declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365) for day-of-year n and the hour angle H = 15 x (hours from solar noon), negative in the morning. At solar noon (H = 0) this reduces to altitude = 90 - |lat - dec|, the WINTER-DESIGN sun elevation a shading, solar-access, tree, or setback study turns on: at 40 deg N on the winter solstice (n = 355, dec = -23.4) the noon sun reaches only 26.6 deg, and by 3 p.m. it has dropped to about 14 deg. Feed the altitude into the shadow-length tile or the noon/3 p.m. value into pv-row-spacing as the profile angle. A negative altitude means the sun is below the horizon (reported, not errored). True solar time and a flat horizon are assumed; the equation of time (from solar-times), refraction near the horizon, and terrain are separate. A site-planning geometry; the engineer of record and the actual sun path govern.",
+  };
+}
+export const solarAltitudeExample = { inputs: { latitude_deg: 40, day_of_year: 355, hours_from_solar_noon: 0 } };
+function renderSolarAltitude(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: solar altitude angle (NOAA/ASHRAE solar geometry): sin(altitude) = sin(lat) sin(dec) + cos(lat) cos(dec) cos(H), with the declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365) and the hour angle H = 15 (hours from solar noon); at solar noon altitude = 90 - |lat - dec|. True solar time and a flat horizon assumed; refraction and the equation of time are separate. A site-planning geometry; the actual sun path governs.";
+  const lat = makeNumber("Latitude (deg, + north)", "salt-lat", { step: "any" }); lat.input.value = "40";
+  const doy = makeNumber("Day of year (1-365; 355 = winter solstice)", "salt-doy", { step: "1", min: "1", max: "366" }); doy.input.value = "355";
+  const hrs = makeNumber("Hours from solar noon (- morning, + afternoon)", "salt-hrs", { step: "any", min: "-12", max: "12" }); hrs.input.value = "0";
+  for (const f of [lat, doy, hrs]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { lat.input.value = "40"; doy.input.value = "355"; hrs.input.value = "0"; update(); });
+  const oAlt = makeOutputLine(outputRegion, "Solar altitude (elevation)", "salt-out-alt");
+  const oDec = makeOutputLine(outputRegion, "Declination / hour angle", "salt-out-dec");
+  const oNote = makeOutputLine(outputRegion, "Note", "salt-out-n");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeSolarAltitude({ latitude_deg: readNum(lat.input), day_of_year: readNum(doy.input), hours_from_solar_noon: readNum(hrs.input) });
+    if (r.error) { oAlt.textContent = r.error; oDec.textContent = "-"; oNote.textContent = ""; return; }
+    oAlt.textContent = fmt(r.altitude_deg, 1) + " deg" + (r.below_horizon ? " (sun below the horizon)" : "");
+    oDec.textContent = fmt(r.declination_deg, 2) + " deg / " + fmt(r.hour_angle_deg, 1) + " deg";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [lat, doy, hrs]) f.input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["solar-altitude-angle"] = renderSolarAltitude;
+
 // pv-rail-clamp-takeoff (spec-v896): PV racking rail, clamp, and splice takeoff.
 // dims: in { rows: dimensionless, modules_per_row: dimensionless, module_width_ft: L, gap_ft: L, rails_per_row: dimensionless, rail_stock_ft: L } out: { run_len_ft: L, rail_lf: L, mid_clamps: dimensionless, end_clamps: dimensionless, splices: dimensionless }
 export function computePvRailClampTakeoff({ rows = 2, modules_per_row = 12, module_width_ft = 3.42, gap_ft = 0, rails_per_row = 2, rail_stock_ft = 14 } = {}) {
