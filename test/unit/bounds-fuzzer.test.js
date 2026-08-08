@@ -10378,6 +10378,33 @@ test("bounds: spec-v658 computeWeirHeadFromFlow inverts the weir equations (clos
 });
 
 import { computeCipollettiWeir as _v1227 } from "../../calc-treatment.js";
+import { computeSluiceGateFlow as _v1240 } from "../../calc-treatment.js";
+test("bounds: spec-v1240 computeSluiceGateFlow pins Cd = Cc/sqrt(1+Cc a/y1), Q = Cd b a sqrt(2 g y1), the shear scaling, and error seams", () => {
+  const g = 32.2, Cc = 0.61;
+  // 1 ft opening, 5 ft wide, 6 ft upstream depth: Cd 0.5812, Q 57.12 cfs.
+  const r = _v1240({ gate_opening_ft: 1, gate_width_ft: 5, upstream_depth_ft: 6, contraction_coeff: 0 });
+  assert.ok(Math.abs(r.discharge_coeff - Cc / Math.sqrt(1 + Cc * 1 / 6)) < 1e-12);
+  assert.ok(Math.abs(r.discharge_coeff - 0.5812) < 5e-4);
+  assert.ok(Math.abs(r.flow_cfs - r.discharge_coeff * 5 * 1 * Math.sqrt(2 * g * 6)) < 1e-9);
+  assert.ok(Math.abs(r.flow_cfs - 57.12) < 0.05);
+  assert.ok(Math.abs(r.flow_gpm - r.flow_cfs * 448.831) < 1e-6);
+  // Flow scales linearly with gate width.
+  const wide = _v1240({ gate_opening_ft: 1, gate_width_ft: 10, upstream_depth_ft: 6, contraction_coeff: 0 });
+  assert.ok(Math.abs(wide.flow_cfs - 2 * r.flow_cfs) < 1e-9);
+  // A smaller opening relative to head pushes Cd toward Cc (the a/y1 term shrinks).
+  const small = _v1240({ gate_opening_ft: 0.2, gate_width_ft: 5, upstream_depth_ft: 6, contraction_coeff: 0 });
+  assert.ok(small.discharge_coeff > r.discharge_coeff && small.discharge_coeff < Cc);
+  // An overridden contraction coefficient is used verbatim in the Cd formula.
+  const cc7 = _v1240({ gate_opening_ft: 1, gate_width_ft: 5, upstream_depth_ft: 6, contraction_coeff: 0.7 });
+  assert.ok(Math.abs(cc7.discharge_coeff - 0.7 / Math.sqrt(1 + 0.7 * 1 / 6)) < 1e-12);
+  // Error seams: non-positive opening/width/depth, opening >= depth, Cc out of range, non-finite.
+  assert.ok("error" in _v1240({ gate_opening_ft: 0, gate_width_ft: 5, upstream_depth_ft: 6 }));
+  assert.ok("error" in _v1240({ gate_opening_ft: 1, gate_width_ft: 0, upstream_depth_ft: 6 }));
+  assert.ok("error" in _v1240({ gate_opening_ft: 1, gate_width_ft: 5, upstream_depth_ft: 0 }));
+  assert.ok("error" in _v1240({ gate_opening_ft: 6, gate_width_ft: 5, upstream_depth_ft: 6 }));
+  assert.ok("error" in _v1240({ gate_opening_ft: 1, gate_width_ft: 5, upstream_depth_ft: 6, contraction_coeff: 1.5 }));
+  assert.ok("error" in _v1240({ gate_opening_ft: Infinity, gate_width_ft: 5, upstream_depth_ft: 6 }));
+});
 
 test("bounds: spec-v1227 computeCipollettiWeir pins Q = 3.367 L H^1.5, the unit conversions, linearity in L, and error seams", () => {
   // 3 ft crest, 0.5 ft head: 3.571 cfs, 1602.9 gpm, 2.308 MGD.

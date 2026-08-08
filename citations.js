@@ -684,6 +684,18 @@ export const CITATIONS = {
       { name: "Weir condition", value: "fully-contracted, ventilated, sharp-crested, free flow; head ~4H upstream", source: "USBR Water Measurement Manual" },
     ],
   },
+  "sluice-gate-flow": {
+    formula: "Q = Cd x b x a x sqrt(2 g y1), g = 32.2 ft/s^2; Cd = Cc / sqrt(1 + Cc a / y1), Cc ~ 0.61. 1 cfs = 448.831 GPM; MGD = GPM x 1440 / 1e6.",
+    edition: "First-principles open-channel hydraulics - the free-flow sluice (underflow) gate discharge (Henderson, Open Channel Flow) and the USBR Water Measurement Manual submerged-orifice/check-gate section, by name.",
+    freeAccess: "Free at usbr.gov/tsc/techreferences/mands/wmm; the sluice-gate free-flow relation and the ~0.61 contraction coefficient are standard published open-channel hydraulics, and the user may override Cc with a site calibration.",
+    governance: GOVERNANCE.general,
+    editionNote: "The free-flow discharge under a sluice (underflow) gate, the third canal-control structure alongside the overflow weir (weir-flow, cipolletti-weir) and the submerged orifice (orifice-flow). Water is drawn UNDER a raised gate: Q = Cd x b x a x sqrt(2 g y1), with a the gate opening, b the width, y1 the upstream depth above the channel floor, and g = 32.2 ft/s^2. The discharge coefficient Cd = Cc / sqrt(1 + Cc a / y1) comes from the jet contraction at the gate lip (the vena contracta), with the contraction coefficient Cc about 0.61 for a sharp-edged vertical gate, so Cd is typically 0.55-0.60. A 1 ft opening on a 5 ft-wide gate under 6 ft of head passes about 57 cfs. This is the FREE-flow rating: the downstream tailwater must be low enough that the contracted jet is not drowned; submerged flow reduces the discharge and needs a separate energy balance. The head is the upstream depth above the floor, not the head on the opening. An operations aid; the USBR Water Measurement Manual, the gate's calibration, and the operator of record govern.",
+    assumptions: [
+      { name: "Sluice-gate free flow", value: "Q = Cd b a sqrt(2 g y1); Cd = Cc / sqrt(1 + Cc a / y1)", source: "Henderson, Open Channel Flow / USBR Water Measurement Manual" },
+      { name: "Contraction coefficient", value: "Cc ~ 0.61 for a sharp-edged vertical gate (editable); Cd typically 0.55-0.60", source: "open-channel hydraulics" },
+      { name: "Free-flow condition", value: "the tailwater must not drown the contracted jet; y1 is the upstream depth above the floor", source: "USBR Water Measurement Manual" },
+    ],
+  },
   "weir-head-from-flow": {
     formula: "90-degree V-notch: H = (Q/C)^(1/2.48), C=2.49. Suppressed rectangular: H = (Q/(C L))^(2/3), C=3.33. Contracted rectangular: L-0.2H solved by fixed-point from the suppressed seed. 1 cfs = 448.831 GPM.",
     edition: "Per the USBR Water Measurement Manual (public domain) - the V-notch and Francis rectangular-weir equations solved for the head, the inverse of the weir-flow tile, by name.",

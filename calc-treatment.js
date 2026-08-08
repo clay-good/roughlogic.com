@@ -127,6 +127,60 @@ function renderCipollettiWeir(inputRegion, outputRegion, citationEl) {
 }
 TREATMENT_RENDERERS["cipolletti-weir"] = renderCipollettiWeir;
 
+// spec-v1240: sluice-gate (underflow) free-flow discharge -- the third canal-control structure
+// alongside the overflow weir and the submerged orifice. Free-flow: Q = Cd b a sqrt(2 g y1),
+// with the discharge coefficient Cd = Cc / sqrt(1 + Cc a / y1) from the contraction coefficient
+// Cc (~0.61 for a sharp-edged vertical gate). First-principles open-channel hydraulics (Henderson,
+// Open Channel Flow) / USBR Water Measurement Manual. g = 32.2 ft/s^2.
+// dims: in { gate_opening_ft: L, gate_width_ft: L, upstream_depth_ft: L, contraction_coeff: dimensionless } out: { discharge_coeff: dimensionless, flow_cfs: L^3 T^-1, flow_gpm: L^3 T^-1, flow_mgd: L^3 T^-1 }
+export function computeSluiceGateFlow({ gate_opening_ft = 0, gate_width_ft = 0, upstream_depth_ft = 0, contraction_coeff = 0 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  const a = Number(gate_opening_ft) || 0;
+  const b = Number(gate_width_ft) || 0;
+  const y1 = Number(upstream_depth_ft) || 0;
+  if (!(a > 0)) return { error: "Gate opening must be positive (ft)." };
+  if (!(b > 0)) return { error: "Gate width must be positive (ft)." };
+  if (!(y1 > 0)) return { error: "Upstream water depth must be positive (ft)." };
+  if (!(a < y1)) return { error: "The gate opening must be less than the upstream depth (an underflow gate); if the opening reaches the water surface it is not a sluice gate." };
+  const Cc = contraction_coeff > 0 ? contraction_coeff : 0.61;
+  if (!(Cc > 0 && Cc <= 1)) return { error: "Contraction coefficient must be over 0 and up to 1.0 (about 0.61 for a sharp-edged vertical gate)." };
+  const g = 32.2; // ft/s^2
+  const Cd = Cc / Math.sqrt(1 + Cc * a / y1);
+  const cfs = Cd * b * a * Math.sqrt(2 * g * y1);
+  const gpm = cfs * 448.831;
+  const mgd = gpm * 1440 / 1e6;
+  if (![Cd, cfs, gpm, mgd].every(Number.isFinite)) return { error: "Sluice-gate math is not a finite value." };
+  return {
+    discharge_coeff: Cd, flow_cfs: cfs, flow_gpm: gpm, flow_mgd: mgd,
+    note: "The free-flow discharge under a sluice (underflow) gate, the third canal-control structure alongside the overflow weir (weir-flow, cipolletti-weir) and the submerged orifice (orifice-flow). Water is drawn UNDER a raised gate rather than over a crest: Q = Cd x b x a x sqrt(2 g y1), with a the gate opening, b the gate width, y1 the upstream depth measured from the channel floor, and g = 32.2 ft/s^2. The discharge coefficient Cd = Cc / sqrt(1 + Cc a / y1) comes from the jet contraction downstream of the gate lip (the vena contracta), with the contraction coefficient Cc about 0.61 for a sharp-edged vertical gate; Cd is typically 0.55-0.60. A 1 ft opening on a 5 ft-wide gate under 6 ft of head passes about 57 cfs. This is the FREE-flow rating: the downstream tailwater must be low enough that the contracted jet is not drowned (submerged flow reduces the discharge and needs a separate energy balance). The head is the upstream depth above the floor, not the head on the opening. An operations aid; the USBR Water Measurement Manual, the gate's calibration, and the operator of record govern.",
+  };
+}
+export const sluiceGateFlowExample = { inputs: { gate_opening_ft: 1, gate_width_ft: 5, upstream_depth_ft: 6, contraction_coeff: 0 } };
+function renderSluiceGateFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: free-flow sluice (underflow) gate discharge Q = Cd b a sqrt(2 g y1), with Cd = Cc / sqrt(1 + Cc a / y1) and the contraction coefficient Cc ~ 0.61 for a sharp-edged vertical gate (first-principles open-channel hydraulics, Henderson Open Channel Flow / USBR Water Measurement Manual). g = 32.2 ft/s^2; a = gate opening, b = width, y1 = upstream depth above the floor. Free-flow only: the tailwater must not drown the contracted jet. Free at usbr.gov/tsc/techreferences/mands/wmm.";
+  const a = makeNumber("Gate opening a (ft)", "slg-a", { step: "any", min: "0", value: "1" }); a.input.value = "1";
+  const b = makeNumber("Gate width b (ft)", "slg-b", { step: "any", min: "0", value: "5" }); b.input.value = "5";
+  const y1 = makeNumber("Upstream depth y1, above floor (ft)", "slg-y1", { step: "any", min: "0", value: "6" }); y1.input.value = "6";
+  const cc = makeNumber("Contraction coeff Cc (0 = default 0.61)", "slg-cc", { step: "any", min: "0", max: "1" });
+  for (const f of [a, b, y1, cc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { a.input.value = "1"; b.input.value = "5"; y1.input.value = "6"; cc.input.value = ""; update(); });
+  const oCfs = makeOutputLine(outputRegion, "Flow (cfs)", "slg-out-cfs");
+  const oGpm = makeOutputLine(outputRegion, "Flow (GPM / MGD)", "slg-out-gpm");
+  const oCd = makeOutputLine(outputRegion, "Discharge coefficient Cd", "slg-out-cd");
+  const oNote = makeOutputLine(outputRegion, "Note", "slg-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeSluiceGateFlow({ gate_opening_ft: readNum(a.input), gate_width_ft: readNum(b.input), upstream_depth_ft: readNum(y1.input), contraction_coeff: readNum(cc.input) });
+    if (r.error) { oCfs.textContent = r.error; oGpm.textContent = ""; oCd.textContent = "-"; oNote.textContent = ""; return; }
+    oCfs.textContent = fmt(r.flow_cfs, 2) + " cfs";
+    oGpm.textContent = fmt(r.flow_gpm, 0) + " GPM (" + fmt(r.flow_mgd, 2) + " MGD)";
+    oCd.textContent = fmt(r.discharge_coeff, 4);
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [a.input, b.input, y1.input, cc.input]) f.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["sluice-gate-flow"] = renderSluiceGateFlow;
+
 // --- spec-v658 M: weir head from a target flow (inverse of weir-flow) ---
 // V-notch H = (Q/C)^(1/2.48); rect suppressed H = (Q/(C L))^(2/3); rect
 // contracted solves L-0.2H by a few fixed-point passes seeded from suppressed.

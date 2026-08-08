@@ -3159,6 +3159,7 @@ cross-check.
 | calc-treatment.js | `computePoolSaltDose` | `{ gallons = 0, current_salt_ppm = 0, target_salt_ppm = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolTileCopingPerimeter` | `{ length_ft = 32, width_ft = 16, tile_length_in = 6, courses = 1, coping_leng...` | _ | _ | _ |
 | calc-treatment.js | `computePoolVolume` | `{ shape = "rectangle", length_ft = 0, width_ft = 0, diameter_ft = 0, shallow_...` | _ | _ | _ |
+| calc-treatment.js | `computeSluiceGateFlow` | `{ gate_opening_ft = 0, gate_width_ft = 0, upstream_depth_ft = 0, contraction_...` | _ | _ | _ |
 | calc-treatment.js | `computeTaperedFlocculationG` | `{ stage1_g_per_s = 0, stage2_g_per_s = 0, stage3_g_per_s = 0, stage_volume_m3...` | _ | _ | _ |
 | calc-treatment.js | `computeTdsFromConductivity` | `{ conductivity_us_cm = 0, k_factor = 0.65 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeVaAlkalinityRatio` | `{ volatile_acids_mgl = 0, alkalinity_mgl = 0 } = {}` | _ | _ | _ |
@@ -3274,7 +3275,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1860.
+Row count: 1861.
 
 <!-- END function-corpus-v14 -->
 
@@ -4741,7 +4742,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (63 tiles)
+### Group M Water and wastewater (64 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4795,6 +4796,7 @@ per spec-v14 §13.1 second paragraph.
 | `ras-flow-rate` | Return Activated Sludge (RAS) Flow Rate | WEF / Sacramento activated-sludge man...; 5 MGD, 2500 MLSS, 8000 RAS_SS -> 2.27 MGD, 45% return | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ras-svi-settleability` | Settleability-Based RAS Rate (from SVI) | WEF / Sacramento activated-sludge ope...; 4 MGD, 2,500 mg/L MLSS, SVI 100 -> Xr 10,000 mg/L, 33% re... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ro-recovery-concentration` | RO Recovery, Concentrate Flow, and Concentration Factor | RO mass balance (AMTA / AWWA); R = 7.5/10 = 0.75; reject = 2.5; CF = 1/(1-0.75) = 4; rej... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `sluice-gate-flow` | Sluice-Gate (Underflow) Free-Flow Discharge | Open-channel hydraulics (Henderson) /...; Cd = 0.61/sqrt(1 + 0.61 x 1/6) = 0.5812; Q = 0.5812 x 5 x... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `srt-fm-ratio` | SRT and F/M Ratio | WEF MOP 11 + Metcalf & Eddy activated...; 1 MG aeration / 2500 mg/L MLSS / 2000 mg/L MLVSS / 0.05 M... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `svi-sludge-index` | Sludge Volume Index (SVI) | USEPA / WEF; SVI = SV30 * 1000 / MLSS | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tapered-flocculation-g` | Tapered Flocculation G Schedule | Camp & Stein 1943 / Ten States Standards; G 50/30/20 per s, three 100 m3 stages, 15 C (mu 1.138e-3)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5072,6 +5074,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1612. Fixture-covered or reference-cadence: 1612 / 1612.
+Tile count: 1613. Fixture-covered or reference-cadence: 1613 / 1613.
 
 <!-- END tile-index-v14 -->

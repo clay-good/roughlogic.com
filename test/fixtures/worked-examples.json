@@ -20664,6 +20664,58 @@
    }
   },
   {
+   "tile_id": "sluice-gate-flow",
+   "source_publisher": "Open-channel hydraulics (Henderson) / USBR Water Measurement Manual",
+   "source_title": "1 ft opening, 5 ft wide, 6 ft upstream depth -> Cd 0.581, ~57 cfs (spec-v1240)",
+   "source_edition_or_year": "Q = Cd b a sqrt(2 g y1), Cd = Cc/sqrt(1 + Cc a/y1), Cc 0.61",
+   "source_section_or_page": "Cd = 0.61/sqrt(1 + 0.61 x 1/6) = 0.5812; Q = 0.5812 x 5 x 1 x sqrt(2 x 32.2 x 6) = 0.5812 x 5 x 19.657 = 57.12 cfs; x 448.831 = 25,638 GPM.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "gate_opening_ft": 1,
+    "gate_width_ft": 5,
+    "upstream_depth_ft": 6,
+    "contraction_coeff": 0
+   },
+   "outputs": {
+    "discharge_coeff": {
+     "value": 0.5812,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "flow_cfs": {
+     "value": 57.12,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sluice-gate-flow",
+   "source_publisher": "Sluice gate (contraction cross-check)",
+   "source_title": "a smaller opening relative to head raises Cd toward Cc",
+   "source_edition_or_year": "Cd = Cc/sqrt(1 + Cc a/y1)",
+   "source_section_or_page": "at a 0.2 ft opening under the same 6 ft head, Cd = 0.61/sqrt(1 + 0.61 x 0.2/6) = 0.6039, closer to the 0.61 contraction coefficient because the a/y1 term shrinks.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "gate_opening_ft": 0.2,
+    "gate_width_ft": 5,
+    "upstream_depth_ft": 6,
+    "contraction_coeff": 0
+   },
+   "outputs": {
+    "discharge_coeff": {
+     "value": 0.6039,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "weir-flow",
    "source_publisher": "USBR Water Measurement Manual (V-notch / Francis weirs)",
    "source_title": "V-notch Q = 2.49 * H^2.48; 1 cfs = 448.831 GPM",

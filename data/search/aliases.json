@@ -906,6 +906,26 @@
       "kind": "question"
     },
     {
+      "term": "sluice gate flow",
+      "target": "sluice-gate-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "underflow gate discharge",
+      "target": "sluice-gate-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "flow under a canal gate",
+      "target": "sluice-gate-flow",
+      "kind": "question"
+    },
+    {
+      "term": "gate opening discharge coefficient",
+      "target": "sluice-gate-flow",
+      "kind": "question"
+    },
+    {
       "term": "v-notch weir",
       "target": "weir-flow",
       "kind": "redirect"
