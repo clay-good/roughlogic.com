@@ -16327,6 +16327,33 @@ test("bounds: spec-v298 computeWindMwfrsPressure pins the walls, the internal-ca
   assert.ok("error" in _v298({ qz_psf: Infinity, qh_psf: 25.9 }));
 });
 
+import { computeWindGustEffectFactor as _v1211 } from "../../calc-construction.js";
+
+test("bounds: spec-v1211 computeWindGustEffectFactor pins the rigid G, the intermediate factors, the zmin floor, the exposure/size trends, and error seams", () => {
+  const r = _v1211({ exposure: "C", h_ft: 30, b_ft: 100 });
+  // zbar = max(0.6*30, 15) = 18; Iz = 0.20*(33/18)^(1/6); G ~ 0.863.
+  assert.ok(Math.abs(r.zbar_ft - 18) < 1e-9 && r.zbar_clamped === false);
+  assert.ok(Math.abs(r.iz - 0.20 * Math.pow(33 / 18, 1 / 6)) < 1e-12);
+  assert.ok(Math.abs(r.lz_ft - 500 * Math.pow(18 / 33, 1 / 5)) < 1e-9);
+  assert.ok(Math.abs(r.q - Math.sqrt(1 / (1 + 0.63 * Math.pow(130 / r.lz_ft, 0.63)))) < 1e-12);
+  assert.ok(Math.abs(r.g_factor - 0.925 * (1 + 1.7 * 3.4 * r.iz * r.q) / (1 + 1.7 * 3.4 * r.iz)) < 1e-12);
+  assert.ok(Math.abs(r.g_factor - 0.863) < 0.002);
+  // Exposure B floors zbar at zmin = 30 (0.6*30 = 18 < 30) and gives ~0.840.
+  const b = _v1211({ exposure: "B", h_ft: 30, b_ft: 100 });
+  assert.ok(Math.abs(b.zbar_ft - 30) < 1e-9 && b.zbar_clamped === true);
+  assert.ok(Math.abs(b.g_factor - 0.840) < 0.003);
+  // A narrower building (smaller B) raises Q and G; a wider one lowers it.
+  assert.ok(_v1211({ exposure: "C", h_ft: 30, b_ft: 40 }).g_factor > r.g_factor);
+  assert.ok(_v1211({ exposure: "C", h_ft: 30, b_ft: 300 }).g_factor < r.g_factor);
+  // G stays in a physically reasonable band across the inputs.
+  assert.ok(r.g_factor > 0.8 && r.g_factor < 1.0);
+  // Error seams: bad exposure, non-positive h or B, non-finite.
+  assert.ok("error" in _v1211({ exposure: "A", h_ft: 30, b_ft: 100 }));
+  assert.ok("error" in _v1211({ exposure: "C", h_ft: 0, b_ft: 100 }));
+  assert.ok("error" in _v1211({ exposure: "C", h_ft: 30, b_ft: 0 }));
+  assert.ok("error" in _v1211({ exposure: "C", h_ft: Infinity, b_ft: 100 }));
+});
+
 // ===================== spec-v299..v301 reinforced-concrete depth-2 batch =====================
 import { computeRcSlabMinThickness as _v299, computeRcDoublyReinforced as _v300, computeRcShearFriction as _v301 } from "../../calc-concrete.js";
 import { computeRcSlabMaxSpanForThickness as _v707 } from "../../calc-concrete.js";

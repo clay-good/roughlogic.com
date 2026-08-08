@@ -1180,6 +1180,7 @@ export const COMPUTE_MAP = {
   "snow-guard-layout": { module: "../../calc-construction.js", fn: "computeSnowGuardLayout" },
   "minimum-roof-snow": { module: "../../calc-construction.js", fn: "computeMinimumRoofSnow" },
   "wind-mwfrs-pressure": { module: "../../calc-construction.js", fn: "computeWindMwfrsPressure" },
+  "wind-gust-effect-factor": { module: "../../calc-construction.js", fn: "computeWindGustEffectFactor" },
   "wind-solid-sign": { module: "../../calc-construction.js", fn: "computeWindSolidSign" },
   "snow-unbalanced-gable": { module: "../../calc-construction.js", fn: "computeSnowUnbalancedGable" },
   // spec-v299..v301 reinforced-concrete depth-2 batch (3 tiles)

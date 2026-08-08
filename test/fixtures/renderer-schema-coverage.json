@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1583,
-  "covered_count": 1162,
+  "total_tiles": 1584,
+  "covered_count": 1163,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -1136,6 +1136,7 @@
     "wind-cc-pressure",
     "wind-chill",
     "wind-chill-wind-speed",
+    "wind-gust-effect-factor",
     "wind-mwfrs-pressure",
     "wind-on-load",
     "wind-pressure",

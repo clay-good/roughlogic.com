@@ -17457,6 +17457,26 @@
       "kind": "industry"
     },
     {
+      "term": "gust effect factor",
+      "target": "wind-gust-effect-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "gust factor g asce 7",
+      "target": "wind-gust-effect-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "compute gust factor instead of 0.85",
+      "target": "wind-gust-effect-factor",
+      "kind": "question"
+    },
+    {
+      "term": "rigid building gust factor",
+      "target": "wind-gust-effect-factor",
+      "kind": "industry"
+    },
+    {
       "term": "wind wall pressure",
       "target": "wind-mwfrs-pressure",
       "kind": "industry"

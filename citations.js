@@ -14086,6 +14086,19 @@ export const CITATIONS = {
       { name: "Net cancels internal", value: "the internal pressure acts equally outward on both walls, so the net horizontal pressure is the external difference", source: "ASCE 7-22 Ch. 27 commentary" },
     ],
   },
+  "wind-gust-effect-factor": {
+    formula: "G = 0.925 (1 + 1.7 gQ Iz Q)/(1 + 1.7 gv Iz), gQ = gv = 3.4; Iz = c (33/zbar)^(1/6); Lz = l (zbar/33)^eps; Q = sqrt(1/(1 + 0.63 ((B+h)/Lz)^0.63)); zbar = max(0.6h, zmin).",
+    edition: "The ASCE 7 §26.11.4 rigid-building gust-effect factor G, with the Table 26.11-1 terrain exposure constants (c, l, eps, zmin), by name.",
+    freeAccess: "ASCE 7 is available through the ASCE Library at ascelibrary.org; the §26.11 gust-effect-factor provisions and the Table 26.11-1 exposure constants are public. B and h are the user's own building dimensions.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ASCE 7 §26.11.4 rigid-building gust-effect factor G, the value the wind-pressure, wind-mwfrs-wall, and wind-solid-sign tiles take as an input but default to a flat 0.85. The code permits either 0.85 or the calculated G = 0.925 (1 + 1.7 gQ Iz Q)/(1 + 1.7 gv Iz), with the peak factors gQ = gv = 3.4, the intensity of turbulence Iz = c (33/zbar)^(1/6), the integral length scale of turbulence Lz = l (zbar/33)^eps, and the background response factor Q = sqrt(1/(1 + 0.63 ((B + h)/Lz)^0.63)); zbar is the equivalent height 0.6h but not less than zmin, and c, l, eps, zmin are the Table 26.11-1 terrain constants for Exposure B, C, or D. B is the horizontal building dimension normal to the wind and h the mean roof height. A 30 ft tall, 100 ft wide building in Exposure C computes G = 0.86, so the 0.85 default is close but slightly unconservative; a taller, narrower building or a smoother exposure raises it. This is the RIGID G only (fundamental frequency at or above 1 Hz); a flexible or dynamically sensitive building needs the gust-effect factor Gf with the resonant response factor R, which this does not compute. A design aid, not a substitute for the structural engineer of record.",
+    assumptions: [
+      { name: "Rigid gust factor", value: "G = 0.925 (1 + 1.7 gQ Iz Q)/(1 + 1.7 gv Iz), gQ = gv = 3.4", source: "ASCE 7 §26.11.4" },
+      { name: "Turbulence and length scale", value: "Iz = c (33/zbar)^(1/6); Lz = l (zbar/33)^eps; zbar = max(0.6h, zmin)", source: "ASCE 7 §26.11.4 / Table 26.11-1" },
+      { name: "Background response", value: "Q = sqrt(1/(1 + 0.63 ((B+h)/Lz)^0.63))", source: "ASCE 7 §26.11.4" },
+      { name: "Scope", value: "rigid buildings only; a flexible building needs Gf with the resonant response R", source: "ASCE 7 §26.11.5" },
+    ],
+  },
   "steel-h1-interaction": {
     formula: "ratio = Pr/Pc; ratio >= 0.2: I = Pr/Pc + (8/9)(Mrx/Mcx + Mry/Mcy); ratio < 0.2: I = Pr/(2Pc) + (Mrx/Mcx + Mry/Mcy); pass when I <= 1.0.",
     edition: "The AISC 360-22 Section H1.1 combined-force (axial plus flexure) bilinear interaction equations, consistent for ASD or LRFD, by name.",

@@ -1783,6 +1783,7 @@ cross-check.
 | calc-construction.js | `computeWeldUsage` | `{ process = "GMAW", weld_cross_section_in2 = 0, weld_length_in = 0, depositio...` | _ | _ | _ |
 | calc-construction.js | `computeWeldedWireMesh` | `{ slab_area_sf = 0, sheet_width_ft = 5, sheet_length_ft = 10, side_lap_in = 6...` | _ | _ | _ |
 | calc-construction.js | `computeWindCcPressure` | `{ v_mph = 0, kz = 0, gcp = 0, kzt = 1.0, kd = 0.85, ke = 1.0, gcpi = 0.18 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeWindGustEffectFactor` | `{ exposure = "C", h_ft = 0, b_ft = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeWindMwfrsPressure` | `{ qz_psf = 0, qh_psf = 0, cp_ww = 0.8, cp_lw = -0.5, g_f = 0.85, gcpi = 0.18 ...` | _ | _ | _ |
 | calc-construction.js | `computeWindPressure` | `{ V_mph, exposure = "C", Kz = 0, Kzt = 1.0, Kd = 0.85, G = 0.85 }` | _ | _ | _ |
 | calc-construction.js | `computeWindSolidSign` | `{ velocity_pressure_psf = 0, gust_factor = 0.85, force_coefficient = 0, solid...` | _ | _ | _ |
@@ -3245,7 +3246,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1831.
+Row count: 1832.
 
 <!-- END function-corpus-v14 -->
 
@@ -3878,7 +3879,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (446 tiles)
+### Group E Construction (447 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4312,6 +4313,7 @@ per spec-v14 §13.1 second paragraph.
 | `weld-usage` | Welding Rod and Wire Usage | AWS / Lincoln / Miller welding-engine...; GMAW / 0.05 in^2 cross-section / 120 in weld / 4 lb/min -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `welded-wire-mesh` | Welded-Wire Reinforcement (Mesh) Sheet Takeoff | Lapped-coverage identity (first-princ...; effective = (5-0.5)(10-0.5) = 42.75 sf; gross = 2000*1.05... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wind-cc-pressure` | Wind Components and Cladding Pressure (ASCE 7 Ch. 30) | ASCE 7-22 Chapter 30; spec-v296 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `wind-gust-effect-factor` | Gust-Effect Factor G (ASCE 7 §26.11) | ASCE 7 §26.11.4 rigid gust-effect factor; zbar = max(0.6*30, 15) = 18 ft; Iz = 0.20*(33/18)^(1/6) =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wind-mwfrs-pressure` | MWFRS Wall Pressure (ASCE 7 Ch. 27) | ASCE 7-22 Chapter 27; spec-v298 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wind-pressure` | Wind Velocity Pressure | ASCE; 100 mph basic wind, Exposure C (Kz=0.98 at 30 ft per ASCE... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-solid-sign` | Wind Force on Solid Freestanding Wall / Sign | ASCE 7-22 Section 29.3 (solid freesta...; qh 17 psf, G 0.85, Cf 1.35, As 64 ft^2, B 8 ft -> F 1248 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5014,6 +5016,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1583. Fixture-covered or reference-cadence: 1583 / 1583.
+Tile count: 1584. Fixture-covered or reference-cadence: 1584 / 1584.
 
 <!-- END tile-index-v14 -->

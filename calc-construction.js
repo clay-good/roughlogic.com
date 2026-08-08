@@ -6651,6 +6651,64 @@ const _renderWindMwfrsPressure = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["wind-mwfrs-pressure"] = _renderWindMwfrsPressure;
 
+// ===================== spec-v1211: ASCE 7 rigid gust-effect factor G =====================
+// The wind-pressure, wind-mwfrs-wall, and wind-solid-sign tiles all take the gust-effect factor G
+// as an input hard-defaulted to 0.85, and the MWFRS wall note names the gap ("does not compute ...
+// the flexible-building Gf"). ASCE 7 §26.11.4 lets a rigid building use 0.85 OR the calculated
+// value G = 0.925 (1 + 1.7 gQ Iz Q)/(1 + 1.7 gv Iz), gQ = gv = 3.4, with the turbulence intensity
+// Iz = c (33/zbar)^(1/6), the integral length scale Lz = l (zbar/33)^eps, the background response
+// Q = sqrt(1/(1 + 0.63 ((B+h)/Lz)^0.63)), and zbar = max(0.6h, zmin). The exposure constants
+// c, l, eps, zmin are the small Table 26.11-1 terrain set (not a copyrighted data table). This is
+// the RIGID G only; a flexible/dynamically-sensitive building adds the resonant response R (Gf).
+const WIND_GUST_EXPOSURE = {
+  B: { c: 0.30, l: 320, eps: 1 / 3.0, zmin: 30 },
+  C: { c: 0.20, l: 500, eps: 1 / 5.0, zmin: 15 },
+  D: { c: 0.15, l: 650, eps: 1 / 8.0, zmin: 7 },
+};
+// dims: in { exposure: dimensionless, h_ft: L, b_ft: L } out: { g_factor: dimensionless, iz: dimensionless, lz_ft: L, q: dimensionless, zbar_ft: L }
+export function computeWindGustEffectFactor({ exposure = "C", h_ft = 0, b_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const k = WIND_GUST_EXPOSURE[exposure];
+  if (!k) return { error: "Exposure must be B, C, or D." };
+  const h = Number(h_ft) || 0;
+  const B = Number(b_ft) || 0;
+  if (!(h > 0)) return { error: "Mean roof height h must be positive (ft)." };
+  if (!(B > 0)) return { error: "Building width B (normal to the wind) must be positive (ft)." };
+  const zbar = Math.max(0.6 * h, k.zmin);
+  const iz = k.c * Math.pow(33 / zbar, 1 / 6);
+  const lz = k.l * Math.pow(zbar / 33, k.eps);
+  const q = Math.sqrt(1 / (1 + 0.63 * Math.pow((B + h) / lz, 0.63)));
+  const gQ = 3.4, gv = 3.4;
+  const g_factor = 0.925 * (1 + 1.7 * gQ * iz * q) / (1 + 1.7 * gv * iz);
+  if (![zbar, iz, lz, q, g_factor].every(Number.isFinite)) return { error: "Gust-factor math is not a finite value." };
+  return {
+    g_factor, iz, lz_ft: lz, q, zbar_ft: zbar, zbar_clamped: 0.6 * h < k.zmin,
+    note: "The ASCE 7 §26.11.4 rigid-building gust-effect factor G, the value the wind-pressure and MWFRS tiles take as an input but default to a flat 0.85. The code permits either 0.85 or the calculated G = 0.925 (1 + 1.7 gQ Iz Q)/(1 + 1.7 gv Iz), with the peak factors gQ = gv = 3.4, the turbulence intensity Iz = c (33/zbar)^(1/6), the integral length scale Lz = l (zbar/33)^eps, and the background response Q = sqrt(1/(1 + 0.63 ((B + h)/Lz)^0.63)), where zbar = 0.6h but not less than zmin and c, l, eps, zmin are the Table 26.11-1 terrain constants for the exposure (B/C/D). B is the building width normal to the wind and h the mean roof height. A 30 ft tall, 100 ft wide building in Exposure C computes G = 0.86, so the 0.85 default is close but slightly unconservative; a taller, narrower building or a smoother exposure raises it. RIGID buildings only (fundamental frequency at or above 1 Hz -- most low-rise buildings with h at most 60 ft and h/least-width under about 4 qualify); a flexible or dynamically sensitive building needs the gust-effect factor Gf with the resonant response factor R, which this does not compute. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const windGustEffectFactorExample = { inputs: { exposure: "C", h_ft: 30, b_ft: 100 } };
+const _renderWindGustEffectFactor = _simpleRenderer({
+  citation: "Citation: ASCE 7 §26.11.4 rigid-building gust-effect factor G = 0.925 (1 + 1.7 gQ Iz Q)/(1 + 1.7 gv Iz), gQ = gv = 3.4, Iz = c (33/zbar)^(1/6), Lz = l (zbar/33)^eps, Q = sqrt(1/(1 + 0.63 ((B+h)/Lz)^0.63)), zbar = max(0.6h, zmin), with the Table 26.11-1 exposure constants, by name. Rigid buildings only; a flexible building needs Gf with the resonant response R. A design aid, not a substitute for the engineer of record.",
+  example: windGustEffectFactorExample.inputs,
+  fields: [
+    { key: "exposure", label: "Exposure category", kind: "select", default: "C", options: [
+      { value: "B", label: "B (urban/suburban, wooded)" },
+      { value: "C", label: "C (open terrain)" },
+      { value: "D", label: "D (flat/unobstructed, water)" },
+    ] },
+    { key: "h_ft", label: "Mean roof height h (ft)", kind: "number", default: 30 },
+    { key: "b_ft", label: "Building width B, normal to wind (ft)", kind: "number", default: 100 },
+  ],
+  outputs: [
+    { key: "g", id: "wgef-out-g", label: "Gust-effect factor G", value: (r) => fmt(r.g_factor, 3) + (r.g_factor > 0.85 ? " (above the 0.85 default)" : " (at or below 0.85)") },
+    { key: "izq", id: "wgef-out-izq", label: "Turbulence Iz / background Q", value: (r) => fmt(r.iz, 3) + " / " + fmt(r.q, 3) },
+    { key: "lz", id: "wgef-out-lz", label: "Length scale Lz / zbar", value: (r) => fmt(r.lz_ft, 0) + " ft / " + fmt(r.zbar_ft, 1) + " ft" + (r.zbar_clamped ? " (zbar held at zmin)" : "") },
+    { key: "n", id: "wgef-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWindGustEffectFactor,
+});
+CONSTRUCTION_RENDERERS["wind-gust-effect-factor"] = _renderWindGustEffectFactor;
+
 // ===================== spec-v332..v334: wood-fastener withdrawal batch =====================
 // The NDS withdrawal design equations the typical-value fastener-pullout tile
 // only tabulates: the nail (12.2.3), the lag screw (12.2.1), and the wood screw
