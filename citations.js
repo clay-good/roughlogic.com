@@ -10678,6 +10678,17 @@ export const CITATIONS = {
       { name: "Equivalence basis", value: "equal friction, not equal velocity", source: "ASHRAE Fundamentals" },
     ],
   },
+  "flat-oval-duct": {
+    formula: "A = (pi/4) b^2 + b (a - b); P = pi b + 2 (a - b); De = 1.55 A^0.625 / P^0.25 (a = major axis, b = minor axis). Equal-friction equivalent round diameter.",
+    edition: "The ASHRAE equal-friction equivalent round diameter of a flat-oval duct, De = 1.55 A^0.625 / P^0.25, per ASHRAE Fundamentals (duct design) and SMACNA, by name; first-principles.",
+    freeAccess: "First-principles equal-friction equivalence (not equal-velocity); the flat-oval area and perimeter are standard geometry. The fabrication drawing governs.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "The flat-oval companion to the round-to-rect-duct tile. A flat oval is a rectangle of width (a - b) capped by two semicircles of diameter b, so its area is A = (pi/4) b^2 + b (a - b) and its perimeter P = pi b + 2 (a - b); the ASHRAE equal-friction equivalent round diameter is De = 1.55 A^0.625 / P^0.25. A 20 x 10 in flat oval carries air like a 14.8 in round, slightly under the 15.1 in equal-area round because the flatter shape has more rubbing surface per unit area; at a = b the shape is a round of diameter b. Equal-friction, not equal-velocity - size the round for friction and the flat oval for the space. Pairs with duct-sizing and round-to-rect-duct. A design aid; the duct-design method and the fabrication drawing govern.",
+    assumptions: [
+      { name: "Equivalence basis", value: "equal friction, not equal velocity; De = 1.55 A^0.625 / P^0.25", source: "ASHRAE Fundamentals" },
+      { name: "Flat-oval geometry", value: "A = (pi/4) b^2 + b (a - b); P = pi b + 2 (a - b), a = major, b = minor", source: "flat-oval geometry" },
+    ],
+  },
   "center-of-gravity-2point": {
     formula: "Two-scale weigh: W = S1 + S2; CG distance from point 1 = S2*L / (S1+S2) (moment balance); percent at each point = S_i / W. Inverse solves the reading each pick point would see from a known total weight and CG.",
     edition: "Center of gravity from a two-point weigh by moment balance (x = S2*L / (S1+S2)), per the standard rigging practice in the ASME B30.9 / ITI rigging references, by name; first-principles statics.",

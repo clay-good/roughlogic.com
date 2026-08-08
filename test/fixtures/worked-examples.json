@@ -23948,6 +23948,60 @@
    }
   },
   {
+   "tile_id": "flat-oval-duct",
+   "source_publisher": "ASHRAE Fundamentals (duct design) / SMACNA (by name)",
+   "source_title": "20 x 10 in flat oval -> 14.79 in equivalent round (spec-v1254)",
+   "source_edition_or_year": "De = 1.55 A^0.625 / P^0.25",
+   "source_section_or_page": "A = (pi/4)(10^2) + 10(20-10) = 78.54 + 100 = 178.54 in^2; P = pi(10) + 2(10) = 51.42 in; De = 1.55 x 178.54^0.625 / 51.42^0.25 = 14.79 in (slightly under the 15.08 equal-area round).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "major_axis_in": 20,
+    "minor_axis_in": 10
+   },
+   "outputs": {
+    "equivalent_diameter_in": {
+     "value": 14.79,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "area_in2": {
+     "value": 178.54,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "perimeter_in": {
+     "value": 51.42,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flat-oval-duct",
+   "source_publisher": "Flat-oval duct (round-degeneration cross-check)",
+   "source_title": "at major = minor the flat oval is a round of that diameter",
+   "source_edition_or_year": "De -> b as a -> b",
+   "source_section_or_page": "10 x 10 in: A = (pi/4)(100) = 78.54 in^2, P = pi(10) = 31.42 in; De = 1.55 x 78.54^0.625 / 31.42^0.25 = 10.0 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "major_axis_in": 10,
+    "minor_axis_in": 10
+   },
+   "outputs": {
+    "equivalent_diameter_in": {
+     "value": 10.01,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "center-of-gravity-2point",
    "source_publisher": "ASME B30.9 / ITI rigging references (by name)",
    "source_title": "W = S1 + S2; CG from point 1 = S2*L / (S1+S2)",

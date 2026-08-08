@@ -404,7 +404,7 @@ const _TILES = [
   ["pipe-template-wrap", "G"], ["flange-bolt-torque", "G"],
 
   // v27 welding bench (E), sheet-metal bench (C), rigger's bench (G)
-  ["fillet-weld-strength", "E"], ["round-to-rect-duct", "C"], ["center-of-gravity-2point", "G"],
+  ["fillet-weld-strength", "E"], ["round-to-rect-duct", "C"], ["flat-oval-duct", "C"], ["center-of-gravity-2point", "G"],
   ["bolt-circle", "G"],
   ["decimal-to-fraction", "G"],
   ["sine-bar", "G"],

@@ -325,7 +325,7 @@ const TOOL_MODULES = (() => {
     // v20
     "economizer-savings-hours", "pipe-heat-loss-radial", "insulation-thickness-for-heat-loss", "fan-motor-bhp", "fan-motor-max-airflow",
     // v27 round-to-rectangular duct equivalent
-    "round-to-rect-duct",
+    "round-to-rect-duct", "flat-oval-duct",
     // v99 building-envelope insulation
     "assembly-r-value", "blown-insulation-coverage",
     // spec-v233..v235 heat-pump heating-mode batch

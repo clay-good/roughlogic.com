@@ -64131,6 +64131,21 @@
       "kind": "question"
     },
     {
+      "term": "flat oval duct equivalent round",
+      "target": "flat-oval-duct",
+      "kind": "industry"
+    },
+    {
+      "term": "flat oval duct size",
+      "target": "flat-oval-duct",
+      "kind": "question"
+    },
+    {
+      "term": "equivalent round for flat oval duct",
+      "target": "flat-oval-duct",
+      "kind": "question"
+    },
+    {
       "term": "rectangular duct equal to 12 inch round",
       "target": "round-to-rect-duct",
       "kind": "question"

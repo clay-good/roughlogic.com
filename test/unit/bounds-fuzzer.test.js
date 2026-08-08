@@ -11781,6 +11781,27 @@ test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles
 // ---------------------------------------------------------------------------
 import { computeFilletWeldStrength as _cv27e1 } from "../../calc-construction.js";
 import { computeRoundToRectDuct as _cv27c2 } from "../../calc-hvac.js";
+import { computeFlatOvalDuct as _v1254 } from "../../calc-hvac.js";
+test("bounds: spec-v1254 computeFlatOvalDuct pins A, P, De = 1.55 A^0.625/P^0.25, the round degeneration, and error seams", () => {
+  // 20 x 10 flat oval: A 178.54, P 51.42, De 14.79.
+  const r = _v1254({ major_axis_in: 20, minor_axis_in: 10 });
+  assert.ok(Math.abs(r.area_in2 - ((Math.PI / 4) * 100 + 10 * 10)) < 1e-9);
+  assert.ok(Math.abs(r.perimeter_in - (Math.PI * 10 + 20)) < 1e-9);
+  assert.ok(Math.abs(r.equivalent_diameter_in - 1.55 * Math.pow(r.area_in2, 0.625) / Math.pow(r.perimeter_in, 0.25)) < 1e-9);
+  assert.ok(Math.abs(r.equivalent_diameter_in - 14.79) < 0.02);
+  // The equal-friction round is a bit smaller than the equal-area round.
+  assert.ok(r.equivalent_diameter_in < Math.sqrt(4 * r.area_in2 / Math.PI));
+  // At major = minor the flat oval degenerates to a round of that diameter.
+  const round = _v1254({ major_axis_in: 10, minor_axis_in: 10 });
+  assert.ok(Math.abs(round.equivalent_diameter_in - 10) < 0.05);
+  // De grows with the major axis at fixed minor.
+  assert.ok(_v1254({ major_axis_in: 30, minor_axis_in: 10 }).equivalent_diameter_in > r.equivalent_diameter_in);
+  // Error seams: non-positive axes, major < minor, non-finite.
+  assert.ok("error" in _v1254({ major_axis_in: 0, minor_axis_in: 10 }));
+  assert.ok("error" in _v1254({ major_axis_in: 20, minor_axis_in: 0 }));
+  assert.ok("error" in _v1254({ major_axis_in: 8, minor_axis_in: 10 }));
+  assert.ok("error" in _v1254({ major_axis_in: Infinity, minor_axis_in: 10 }));
+});
 import { computeCenterOfGravity2Point as _cv27g2 } from "../../calc-layout.js";
 
 test("bounds: spec-v27 fillet weld, round-to-rect duct, and two-point CG pin constants + reject non-finite", () => {

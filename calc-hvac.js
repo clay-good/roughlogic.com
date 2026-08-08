@@ -3035,6 +3035,50 @@ function _v27renderRoundToRectDuct(inputRegion, outputRegion, citationEl) {
 }
 HVAC_RENDERERS["round-to-rect-duct"] = _v27renderRoundToRectDuct;
 
+// spec-v1254: flat-oval duct equivalent round diameter. The round-to-rect tile covers rectangular;
+// this is the flat-oval companion for tight plenum/ceiling runs. ASHRAE equal-friction:
+// A = (pi/4) b^2 + b (a - b); P = pi b + 2 (a - b); De = 1.55 A^0.625 / P^0.25 (a = major, b = minor).
+// dims: in { major_axis_in: L, minor_axis_in: L } out: { equivalent_diameter_in: L, area_in2: L^2, perimeter_in: L }
+export function computeFlatOvalDuct({ major_axis_in = 0, minor_axis_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const a = Number(major_axis_in), b = Number(minor_axis_in);
+  if (!(a > 0)) return { error: "Major axis must be positive (in)." };
+  if (!(b > 0)) return { error: "Minor axis must be positive (in)." };
+  if (a < b) return { error: "The major axis must be at least the minor axis (a flat oval is a rectangle capped by semicircles; set major >= minor)." };
+  const area_in2 = (Math.PI / 4) * b * b + b * (a - b);
+  const perimeter_in = Math.PI * b + 2 * (a - b);
+  const equivalent_diameter_in = 1.55 * Math.pow(area_in2, 0.625) / Math.pow(perimeter_in, 0.25);
+  if (![area_in2, perimeter_in, equivalent_diameter_in].every(Number.isFinite)) return { error: "Flat-oval-duct math is not a finite value." };
+  return {
+    equivalent_diameter_in, area_in2, perimeter_in, aspect_ratio: a / b,
+    notes: [
+      "Equal-friction equivalence (not equal-velocity); enter the equivalent round into the friction-loss or velocity tiles. The fabrication drawing governs.",
+      "A flat oval is a rectangle of width (a - b) capped by two semicircles of diameter b; at a = b it becomes a round of diameter b.",
+    ],
+    note: "The equal-friction equivalent round diameter of a flat-oval duct, the flat-oval companion to the round-to-rectangular tile. Flat-oval duct (a rectangle of the minor-axis height capped by two semicircular ends) is the standard shape where a round won't fit the plenum or ceiling depth and rectangular would leak or drum, so a tech needs its equal-friction round size to enter into the friction-loss, velocity, or fan tiles. From the ASHRAE duct-design relation, the cross-section area A = (pi/4) b^2 + b (a - b) and the perimeter P = pi b + 2 (a - b) for a major axis a and minor axis b, and the equivalent round diameter De = 1.55 A^0.625 / P^0.25. A 20 x 10 in flat oval (178.5 in^2, 51.4 in perimeter) carries air like a 14.8 in round - a little smaller than the 15.1 in equal-AREA round, because the flatter shape has more rubbing surface per unit area. As the minor axis approaches the major the shape becomes round and De approaches that diameter. This is the same equal-friction basis as the rectangular equivalent, not an equal-velocity match; size the round for friction and the flat-oval for the space. A design aid; the duct-design method and the fabrication drawing govern.",
+  };
+}
+export const flatOvalDuctExample = { inputs: { major_axis_in: 20, minor_axis_in: 10 } };
+function _renderFlatOvalDuct(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASHRAE equal-friction equivalent round diameter of a flat-oval duct, De = 1.55 A^0.625 / P^0.25 with A = (pi/4) b^2 + b (a - b) and P = pi b + 2 (a - b) (a = major axis, b = minor axis), per ASHRAE Fundamentals (duct design) and SMACNA, by name; first-principles. An equal-friction equivalence, not equal-velocity. The fabrication drawing governs.";
+  const a = _v27hMakeNumber("Major axis a (in)", "fov-a", { step: "any", min: "0", value: "20" }); a.input.value = "20";
+  const b = _v27hMakeNumber("Minor axis b (in)", "fov-b", { step: "any", min: "0", value: "10" }); b.input.value = "10";
+  for (const f of [a, b]) inputRegion.appendChild(f.wrap);
+  _v27hAttachEx(inputRegion, () => { a.input.value = "20"; b.input.value = "10"; update(); });
+  const oDe = _v27hMakeOut(outputRegion, "Equivalent round diameter", "fov-out-de");
+  const oAP = _v27hMakeOut(outputRegion, "Area / perimeter", "fov-out-ap");
+  const oNote = _v27hMakeOut(outputRegion, "Notes", "fov-out-note");
+  const update = _v27hDebounce(() => {
+    const r = computeFlatOvalDuct({ major_axis_in: Number(a.input.value) || 0, minor_axis_in: Number(b.input.value) || 0 });
+    if (r.error) { oDe.textContent = r.error; oAP.textContent = "-"; oNote.textContent = ""; return; }
+    oDe.textContent = "D_e " + _v27hFmt(r.equivalent_diameter_in, 2) + " in";
+    oAP.textContent = _v27hFmt(r.area_in2, 1) + " in^2 / " + _v27hFmt(r.perimeter_in, 1) + " in";
+    oNote.textContent = r.notes.join(" ");
+  }, _V27H_DEB);
+  for (const f of [a.input, b.input]) f.addEventListener("input", update);
+}
+HVAC_RENDERERS["flat-oval-duct"] = _renderFlatOvalDuct;
+
 // =====================================================================
 // spec-v99 C - building-envelope insulation: assembly-r-value,
 // blown-insulation-coverage. The opaque-envelope numbers the pipe-radial
