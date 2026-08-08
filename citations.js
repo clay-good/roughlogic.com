@@ -16119,6 +16119,18 @@ export const CITATIONS = {
       { name: "Slope / scope", value: "Ks = -0.5 (mitered +0.7); circular barrels only; inlet control only (outlet control is a separate check)", source: "HDS-5 Appendix A" },
     ],
   },
+  "box-culvert-inlet-control": {
+    formula: "Box inlet control HW/D: unsubmerged Form 1 (wingwall flares) HW/D = Hc/D + K[Q/(A sqrt D)]^M + Ks S; Form 2 (headwalls) HW/D = K[Q/(A sqrt D)]^M + Ks S; submerged HW/D = c[Q/(A sqrt D)]^2 + Y + Ks S; Ks = -0.5. D = rise, A = span x rise; rectangular critical depth dc = (Q^2/(g B^2))^(1/3), Hc = 1.5 dc. HW = (HW/D) D.",
+    edition: "FHWA HDS-5, Hydraulic Design of Highway Culverts, 3rd ed. (FHWA-HIF-12-026, 2012), Appendix A equations A.1/A.2/A.3 and the Table A.1 concrete-box constants (Chart 8 wingwall flares Form 1; Chart 10 headwall chamfers/bevels Form 2), by name; the equation assembly verified against the HDS-5 Appendix A worked values and the rectangular critical depth against its closed form Hc = 1.5 dc.",
+    freeAccess: "HDS-5 is a public-domain FHWA publication (FHWA-HIF-12-026); the inlet-control equations and the Table A.1 box constants are reproduced from it. Span, rise, discharge, slope, and the inlet configuration are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "FHWA HDS-5 headwater by INLET control for a rectangular concrete BOX culvert, the companion to the circular tile. The inlet (its size and edge treatment), not the barrel length or the outlet, sets the ponding depth. Two inlet families from Table A.1: WINGWALL FLARES (Chart 8, equation Form 1) carry the specific head at critical depth, HW/D = Hc/D + K[Q/(A sqrt D)]^M + Ks S, with the rectangular critical depth dc = (Q^2/(g B^2))^(1/3) and Hc = 1.5 dc (closed form, no iteration); 90-degree HEADWALLS with chamfers or bevels (Chart 10, Form 2) drop the Hc term, HW/D = K[Q/(A sqrt D)]^M + Ks S. Above a flow factor of about 4 both go submerged (orifice-like), HW/D = c[Q/(A sqrt D)]^2 + Y + Ks S, and the 3.5-4.0 band is blended. D is the box RISE (interior height), A = span x rise, and Ks = -0.5. The beveled and flared edges (lower K) always beat a square headwall. The ACTUAL headwater is the GREATER of inlet and outlet control - outlet control (barrel friction, tailwater, length) is a separate calculation - so this is one of two checks, not the final answer. HW is measured above the inlet invert. A design aid; the HDS-5 nomographs themselves carry about +/-10%, and the engineer of record and the DOT drainage manual govern.",
+    assumptions: [
+      { name: "Wingwall flares (Form 1)", value: "HW/D = Hc/D + K[Q/(A sqrt D)]^M + Ks S; dc = (Q^2/(g B^2))^(1/3), Hc = 1.5 dc", source: "HDS-5 Eq A.1, Table A.1 Chart 8" },
+      { name: "Headwall chamfers/bevels (Form 2)", value: "HW/D = K[Q/(A sqrt D)]^M + Ks S (no Hc term)", source: "HDS-5 Eq A.2, Table A.1 Chart 10" },
+      { name: "Submerged / scope", value: "HW/D = c[Q/(A sqrt D)]^2 + Y + Ks S above flow factor ~4; Ks = -0.5; inlet control only (outlet control is separate)", source: "HDS-5 Eq A.3, Appendix A" },
+    ],
+  },
   "tr55-time-of-concentration": {
     formula: "Tc = Tt_sheet + Tt_shallow + Tt_channel. Sheet (TR-55 Eq 3-3): Tt = 0.007 (n L)^0.8 / (P2^0.5 s^0.4) hr. Shallow concentrated: V = 16.1345 sqrt(s) unpaved / 20.3282 sqrt(s) paved, Tt = L/(3600 V) hr. Channel (Manning): V = (1.49/n) R^(2/3) sqrt(s), Tt = L/(3600 V) hr.",
     edition: "The NRCS TR-55 (Urban Hydrology for Small Watersheds, 1986) Chapter 3 velocity method for time of concentration, by name; constants verified against the TR-55 Chapter 3 worked example.",

@@ -291,7 +291,7 @@ const TOOL_MODULES = (() => {
     "overflow-scupper-sizing", "scupper-width-for-flow", "sewage-force-main-velocity",
     "drywell-infiltration",
       // spec-v1036 cap-relief move from calc-plumbing.js (shared MANNING_ROUGHNESS)
-    "manning-slope", "manning-pipe-capacity", "pipe-partial-flow-depth", "tr55-time-of-concentration", "composite-curve-number", "curve-number-runoff", "tr55-graphical-peak-discharge", "tr55-detention-storage", "culvert-inlet-control",
+    "manning-slope", "manning-pipe-capacity", "pipe-partial-flow-depth", "tr55-time-of-concentration", "composite-curve-number", "curve-number-runoff", "tr55-graphical-peak-discharge", "tr55-detention-storage", "culvert-inlet-control", "box-culvert-inlet-control",
   ]);
   // spec-v42 cap-relief split: the three fuel-gas tiles relocated out of
   // calc-plumbing.js (which had reached 98.9% of cap) into calc-gas.js. They

@@ -10936,6 +10936,39 @@ test("bounds: spec-v1269 computeCulvertInletControl pins the HDS-5 inlet-control
   assert.ok("error" in _v1269({ diameter_in: 36, flow_cfs: 30, slope: 0.01, config: "bogus" }));
   assert.ok("error" in _v1269({ diameter_in: Infinity, flow_cfs: 30, slope: 0.01, config: "concrete_square_headwall" }));
 });
+import { computeBoxCulvertInletControl as _v1270 } from "../../calc-drainage.js";
+test("bounds: spec-v1270 computeBoxCulvertInletControl pins the HDS-5 box regimes, rectangular critical depth, Form 1 vs 2, monotonicity, and error seams", () => {
+  // 6x4 ft box, 30-75 deg wingwall flares (Form 1), 150 cfs, 1% slope: unsubmerged (flow factor 3.125).
+  const r = _v1270({ span_in: 72, rise_in: 48, flow_cfs: 150, slope: 0.01, config: "wingwall_30_75" });
+  assert.ok(r.form === 1 && r.regime === "unsubmerged" && Math.abs(r.flow_factor - 3.125) < 1e-6);
+  assert.ok(Math.abs(r.hw_ft - 4.33618) < 1e-3 && Math.abs(r.hw_over_d - 1.08405) < 1e-4);
+  // Rectangular closed-form critical depth dc = (Q^2/(g B^2))^(1/3), Hc = 1.5 dc.
+  const B = 6, dc = Math.cbrt(150 * 150 / (32.2 * B * B));
+  assert.ok(Math.abs(r.dc_ft - dc) < 1e-9 && Math.abs(r.hc_ft - 1.5 * dc) < 1e-9);
+  assert.ok(Math.abs(r.hw_ft - r.hw_over_d * r.rise_ft) < 1e-9);
+  // Form 2 headwall drops the Hc term: HW/D = K FF^M + Ks S, no critical depth.
+  const f2 = _v1270({ span_in: 96, rise_in: 60, flow_cfs: 300, slope: 0.005, config: "headwall_bevel45" });
+  assert.ok(f2.form === 2 && Math.abs(f2.hw_ft - 5.53548) < 1e-3);
+  const ffB = f2.flow_factor;
+  assert.ok(Math.abs(f2.hw_over_d - (0.495 * Math.pow(ffB, 0.667) - 0.5 * 0.005)) < 1e-9);
+  // Headwater rises monotonically with discharge (no dip across the transition).
+  let prev = -Infinity;
+  for (const q of [40, 100, 160, 250, 400, 700]) {
+    const hw = _v1270({ span_in: 72, rise_in: 48, flow_cfs: q, slope: 0.01, config: "wingwall_30_75" }).hw_ft;
+    assert.ok(hw > prev); prev = hw;
+  }
+  // Beveled/flared edges (lower K) beat a plain square headwall at the same flow.
+  const flare = _v1270({ span_in: 72, rise_in: 48, flow_cfs: 300, slope: 0.01, config: "wingwall_30_75" }).hw_ft;
+  const chamfer = _v1270({ span_in: 72, rise_in: 48, flow_cfs: 300, slope: 0.01, config: "headwall_chamfer" }).hw_ft;
+  assert.ok(flare < chamfer);
+  // Error seams: non-positive span/rise/flow, negative slope, unknown config, non-finite.
+  assert.ok("error" in _v1270({ span_in: 0, rise_in: 48, flow_cfs: 150, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1270({ span_in: 72, rise_in: 0, flow_cfs: 150, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1270({ span_in: 72, rise_in: 48, flow_cfs: 0, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1270({ span_in: 72, rise_in: 48, flow_cfs: 150, slope: -0.01, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1270({ span_in: 72, rise_in: 48, flow_cfs: 150, config: "bogus" }));
+  assert.ok("error" in _v1270({ span_in: Infinity, rise_in: 48, flow_cfs: 150, config: "wingwall_30_75" }));
+});
 test("bounds: spec-v53 linear-interpolation pins y + slope + extrapolation flag + reject non-finite", () => {
   // (0,10),(10,30), x=4 -> y=18, slope 2, within range
   const a = _cli({ x1: 0, y1: 10, x2: 10, y2: 30, x: 4 });

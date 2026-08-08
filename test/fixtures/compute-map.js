@@ -407,6 +407,7 @@ export const COMPUTE_MAP = {
   "curve-number-runoff": { module: "../../calc-drainage.js", fn: "computeCurveNumberRunoff" },
   "composite-curve-number": { module: "../../calc-drainage.js", fn: "computeCompositeCurveNumber" },
   "culvert-inlet-control": { module: "../../calc-drainage.js", fn: "computeCulvertInletControl" },
+  "box-culvert-inlet-control": { module: "../../calc-drainage.js", fn: "computeBoxCulvertInletControl" },
   "tr55-graphical-peak-discharge": { module: "../../calc-drainage.js", fn: "computeTr55GraphicalPeakDischarge" },
   "tr55-detention-storage": { module: "../../calc-drainage.js", fn: "computeTr55DetentionStorage" },
   "drainage-invert": { module: "../../calc-plumbing.js", fn: "computeDrainageInvert" },

@@ -1115,3 +1115,100 @@ function renderCulvertInletControl(inputRegion, outputRegion, citationEl) {
   cfg.select.addEventListener("change", update);
 }
 DRAINAGE_RENDERERS["culvert-inlet-control"] = renderCulvertInletControl;
+
+// ===================== spec-v1270: HDS-5 box (rectangular) culvert inlet control =====================
+// The companion to culvert-inlet-control (circular): the other dominant
+// culvert shape, a concrete box. Same HDS-5 Appendix A equations, the Table
+// A.1 box rows. Two inlet families: wingwall flares (Chart 8, Form 1 -- needs
+// the specific head at critical depth) and 90-degree headwalls with chamfers
+// or bevels (Chart 10, Form 2 -- no critical depth term at all). A rectangular
+// section has a closed-form critical depth dc = (Q^2/(g B^2))^(1/3) with
+// Hc = 1.5 dc, so no iteration is needed (unlike the circular barrel).
+const _BOX_CULVERT_INLET = {
+  wingwall_30_75:     { K: 0.026, M: 1.0,   c: 0.0347, Y: 0.81,  form: 1, label: "Wingwall flares 30 to 75 deg" },
+  wingwall_90_15:     { K: 0.061, M: 0.75,  c: 0.0400, Y: 0.80,  form: 1, label: "Wingwall flares 90 and 15 deg" },
+  wingwall_0:         { K: 0.061, M: 0.75,  c: 0.0423, Y: 0.82,  form: 1, label: "Wingwall flares 0 deg (extended sides)" },
+  headwall_chamfer:   { K: 0.515, M: 0.667, c: 0.0375, Y: 0.79,  form: 2, label: "90 deg headwall, 3/4 in chamfers" },
+  headwall_bevel45:   { K: 0.495, M: 0.667, c: 0.0314, Y: 0.82,  form: 2, label: "90 deg headwall, 45 deg bevels" },
+  headwall_bevel337:  { K: 0.486, M: 0.667, c: 0.0252, Y: 0.865, form: 2, label: "90 deg headwall, 33.7 deg bevels" },
+};
+
+// dims: in { span_in: L, rise_in: L, flow_cfs: L^3 T^-1, slope: dimensionless, config: dimensionless } out: { span_ft: L, rise_ft: L, barrel_area_ft2: L^2, dc_ft: L, hc_ft: L, hw_ft: L, hw_over_d: dimensionless, hc_over_d: dimensionless }
+export function computeBoxCulvertInletControl({ span_in = 0, rise_in = 0, flow_cfs = 0, slope = 0, config = "wingwall_30_75" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const C = _BOX_CULVERT_INLET[config];
+  if (!C) return { error: "Unknown box inlet configuration." };
+  if (!(span_in > 0)) return { error: "Box span (width) must be positive (in)." };
+  if (!(rise_in > 0)) return { error: "Box rise (height) must be positive (in)." };
+  if (!(flow_cfs > 0)) return { error: "Discharge must be positive (cfs)." };
+  if (!(slope >= 0)) return { error: "Barrel slope must be zero or positive (ft/ft)." };
+  const G = 32.2, Ks = -0.5;
+  const B = span_in / 12, D = rise_in / 12;      // span (width), rise (height), ft
+  const A = B * D;                                // full barrel area, ft^2
+  const Q = flow_cfs;
+  const flowFactor = Q / (A * Math.sqrt(D));      // HDS-5 Q/(A D^0.5), D = rise; Ku = 1.0 (US)
+  // Rectangular critical depth (closed form): dc = (Q^2/(g B^2))^(1/3), capped
+  // at the rise D (a box that would be critical above the crown is running
+  // full). Hc = dc + Vc^2/2g; for a rectangular section that is 1.5 dc uncapped.
+  let dc = Math.cbrt(Q * Q / (G * B * B));
+  const dcCapped = dc > D;
+  if (dcCapped) dc = D;
+  const vc = Q / (B * dc);
+  const hc = dc + vc * vc / (2 * G);
+  const hcD = hc / D;
+  // Form 1 carries the Hc/D term (wingwall flares); Form 2 omits it (headwalls).
+  const hwUns = (C.form === 1 ? hcD : 0) + C.K * Math.pow(flowFactor, C.M) + Ks * slope;
+  const hwSub = C.c * flowFactor * flowFactor + C.Y + Ks * slope;
+  let hwD, regime;
+  if (flowFactor <= 3.5) { hwD = hwUns; regime = "unsubmerged"; }
+  else if (flowFactor >= 4.0) { hwD = hwSub; regime = "submerged"; }
+  else { const w = (flowFactor - 3.5) / 0.5; hwD = (1 - w) * hwUns + w * hwSub; regime = "transition"; }
+  const hw = hwD * D;
+  if (![dc, hc, hwD, hw].every(Number.isFinite)) return { error: "Inlet-control headwater is not a finite value; check the inputs." };
+  return {
+    span_ft: B, rise_ft: D, barrel_area_ft2: A, dc_ft: dc, hc_ft: hc, hw_ft: hw,
+    hw_over_d: hwD, hc_over_d: hcD, flow_factor: flowFactor, vc_fps: vc,
+    regime, config_label: C.label, form: C.form, submerged: flowFactor >= 4.0,
+    note: "FHWA HDS-5 headwater by INLET control for a rectangular concrete BOX culvert - the companion to the circular tile. The inlet (its size and edge treatment), not the barrel length or the outlet, sets the ponding depth. Two inlet families from Table A.1: WINGWALL FLARES (Chart 8, equation Form 1) carry the specific head at critical depth, HW/D = Hc/D + K[Q/(A sqrt D)]^M + Ks S, with the rectangular critical depth dc = (Q^2/(g B^2))^(1/3) and Hc = 1.5 dc (closed form, no iteration); 90-degree HEADWALLS with chamfers or bevels (Chart 10, Form 2) drop the Hc term, HW/D = K[Q/(A sqrt D)]^M + Ks S. Above a flow factor of about 4 both go submerged (orifice-like), HW/D = c[Q/(A sqrt D)]^2 + Y + Ks S, and the 3.5-4.0 band is blended. Here D is the box RISE (interior height), A = span x rise, and Ks = -0.5. A 6 x 4 ft box with 30-75 degree wingwall flares passing 150 cfs on a 1% slope heads up 4.34 ft (HW/D 1.08); the bevels on a headwall box cut the headwater at the same flow. The beveled and flared edges (lower K) always beat the square headwall. The ACTUAL headwater is the GREATER of inlet and outlet control - outlet control is a separate check - and HW is measured above the inlet invert. A design aid; the HDS-5 nomographs carry about +/-10%, and the engineer of record and the DOT drainage manual govern.",
+  };
+}
+export const boxCulvertInletControlExample = { inputs: { span_in: 72, rise_in: 48, flow_cfs: 150, slope: 0.01, config: "wingwall_30_75" } };
+
+function renderBoxCulvertInletControl(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: FHWA HDS-5, Hydraulic Design of Highway Culverts, 3rd ed. (FHWA-HIF-12-026), Appendix A inlet-control equations A.1/A.2 (unsubmerged Form 1 for wingwall flares, Form 2 for headwalls) and A.3 (submerged) with the Table A.1 concrete-box constants (Chart 8 wingwall flares, Chart 10 headwall chamfers/bevels). Rectangular critical depth dc = (Q^2/(g B^2))^(1/3), Hc = 1.5 dc, closed form. Inlet control only (outlet control is a separate check); the actual headwater is the greater of the two. A public-domain US DOT reference. A design aid; the engineer of record and the DOT drainage manual govern.";
+  attachExampleButton(inputRegion, () => { sp.input.value = "72"; ri.input.value = "48"; q.input.value = "150"; s.input.value = "0.01"; cfg.select.value = "wingwall_30_75"; update(); });
+  const sp = makeNumber("Box span / width B (in)", "bcic-b", { step: "any", min: "0" });
+  const ri = makeNumber("Box rise / height D (in)", "bcic-d", { step: "any", min: "0" });
+  const q = makeNumber("Design discharge Q (cfs)", "bcic-q", { step: "any", min: "0" });
+  const s = makeNumber("Barrel slope S (ft/ft)", "bcic-s", { step: "any", min: "0", value: "0.01" });
+  const cfg = makeSelect("Inlet edge / wingwall", "bcic-cfg", Object.keys(_BOX_CULVERT_INLET).map((k) => ({ value: k, label: _BOX_CULVERT_INLET[k].label })));
+  for (const f of [sp, ri, q, s]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(cfg.wrap);
+  const oHW = makeOutputLine(outputRegion, "Headwater HW (inlet control)", "bcic-out-hw");
+  const oHWD = makeOutputLine(outputRegion, "HW / D (rise)", "bcic-out-hwd");
+  const oReg = makeOutputLine(outputRegion, "Flow regime", "bcic-out-reg");
+  const oDc = makeOutputLine(outputRegion, "Critical depth dc", "bcic-out-dc");
+  const oNote = makeOutputLine(outputRegion, "Note", "bcic-out-n");
+  const update = debounce(() => {
+    const r = computeBoxCulvertInletControl({
+      span_in: Number(sp.input.value) || 0,
+      rise_in: Number(ri.input.value) || 0,
+      flow_cfs: Number(q.input.value) || 0,
+      slope: s.input.value === "" ? 0 : Number(s.input.value) || 0,
+      config: cfg.select.value,
+    });
+    if (r.error) {
+      oHW.textContent = r.error;
+      for (const o of [oHWD, oReg, oDc, oNote]) o.textContent = "-";
+      return;
+    }
+    oHW.textContent = fmt(r.hw_ft, 2) + " ft above the inlet invert";
+    oHWD.textContent = fmt(r.hw_over_d, 3) + (r.hw_over_d > 1.5 ? " -- over 1.5; check the allowable headwater and outlet control" : "");
+    oReg.textContent = r.regime + " (Form " + r.form + ", flow factor Q/(A sqrt D) = " + fmt(r.flow_factor, 2) + ")";
+    oDc.textContent = r.form === 1 ? fmt(r.dc_ft, 2) + " ft (specific head Hc " + fmt(r.hc_ft, 2) + " ft)" : "not used (Form 2 headwall)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [sp, ri, q, s]) f.input.addEventListener("input", update);
+  cfg.select.addEventListener("change", update);
+}
+DRAINAGE_RENDERERS["box-culvert-inlet-control"] = renderBoxCulvertInletControl;

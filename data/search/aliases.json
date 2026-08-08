@@ -18416,6 +18416,41 @@
       "kind": "question"
     },
     {
+      "term": "box culvert headwater",
+      "target": "box-culvert-inlet-control",
+      "kind": "industry"
+    },
+    {
+      "term": "box culvert inlet control",
+      "target": "box-culvert-inlet-control",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete box culvert sizing",
+      "target": "box-culvert-inlet-control",
+      "kind": "industry"
+    },
+    {
+      "term": "wingwall flare culvert",
+      "target": "box-culvert-inlet-control",
+      "kind": "adjacent"
+    },
+    {
+      "term": "RCB culvert",
+      "target": "box-culvert-inlet-control",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how high will water pond at a box culvert",
+      "target": "box-culvert-inlet-control",
+      "kind": "question"
+    },
+    {
+      "term": "headwater for a 6 by 4 box culvert",
+      "target": "box-culvert-inlet-control",
+      "kind": "question"
+    },
+    {
       "term": "rational method time",
       "target": "time-of-concentration",
       "kind": "adjacent"
