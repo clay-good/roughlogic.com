@@ -39846,6 +39846,21 @@
       "kind": "question"
     },
     {
+      "term": "wireless link budget",
+      "target": "wireless-link-budget",
+      "kind": "industry"
+    },
+    {
+      "term": "eirp fade margin",
+      "target": "wireless-link-budget",
+      "kind": "industry"
+    },
+    {
+      "term": "will my wireless bridge link close",
+      "target": "wireless-link-budget",
+      "kind": "question"
+    },
+    {
       "term": "db loss per connector and splice",
       "target": "fiber-loss-budget",
       "kind": "question"

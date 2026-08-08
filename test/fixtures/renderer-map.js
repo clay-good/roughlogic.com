@@ -154,6 +154,7 @@ export const RENDERER_MAP = {
   "fiber-loss-budget": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "wireless-fspl": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "fresnel-zone-clearance": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
+  "wireless-link-budget": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "fiber-max-length": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "cctv-storage": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },

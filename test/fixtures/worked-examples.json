@@ -24120,6 +24120,72 @@
    }
   },
   {
+   "tile_id": "wireless-link-budget",
+   "source_publisher": "Friis transmission equation / ITU-R P.525 (link budget)",
+   "source_title": "20 dBm, 12 dBi + 1 dB each end, 1 km 2.4 GHz, -80 dBm receiver -> 22 dB fade margin (spec-v1251)",
+   "source_edition_or_year": "EIRP = Pt+Gt-Ltx; Prx = EIRP-FSPL+Gr-Lrx; fade = Prx-sens",
+   "source_section_or_page": "EIRP = 20+12-1 = 31 dBm; FSPL = 100.04 dB; Prx = 31 - 100.04 + 12 - 1 = -58.04 dBm; fade margin = -58.04 - (-80) = 21.96 dB (adequate, >= 10).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "tx_power_dbm": 20,
+    "tx_gain_dbi": 12,
+    "tx_cable_loss_db": 1,
+    "distance_km": 1,
+    "frequency_mhz": 2400,
+    "rx_gain_dbi": 12,
+    "rx_cable_loss_db": 1,
+    "rx_sensitivity_dbm": -80
+   },
+   "outputs": {
+    "eirp_dbm": {
+     "value": 31,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "rx_power_dbm": {
+     "value": -58.04,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "fade_margin_db": {
+     "value": 21.96,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wireless-link-budget",
+   "source_publisher": "Link budget (inadequate-margin cross-check)",
+   "source_title": "a weak long link fails the fade-margin target",
+   "source_edition_or_year": "fade margin = Prx - sensitivity",
+   "source_section_or_page": "10 dBm, 6 dBi + 2 dB each end, 10 km 5.8 GHz, -75 dBm receiver: FSPL 127.71 dB, EIRP 14 dBm, Prx -109.71 dBm, fade margin -34.71 dB -- far below the 10 dB target, so the link will not close.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "tx_power_dbm": 10,
+    "tx_gain_dbi": 6,
+    "tx_cable_loss_db": 2,
+    "distance_km": 10,
+    "frequency_mhz": 5800,
+    "rx_gain_dbi": 6,
+    "rx_cable_loss_db": 2,
+    "rx_sensitivity_dbm": -75
+   },
+   "outputs": {
+    "fade_margin_db": {
+     "value": -34.71,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fiber-max-length",
    "source_publisher": "TIA-568 / IEEE 802.3 (by name), inverse",
    "source_title": "len_max = 1000 * (max_channel_loss - connector_loss - splice_loss) / attenuation",

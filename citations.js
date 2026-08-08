@@ -11574,6 +11574,17 @@ export const CITATIONS = {
       { name: "60% rule", value: "keep >= 60% of the first (n=1) zone clear; earth curvature and antenna height are separate", source: "RF path-survey practice" },
     ],
   },
+  "wireless-link-budget": {
+    formula: "EIRP = Pt + Gt - Lcable(tx); FSPL = 32.44 + 20 log10(d_km) + 20 log10(f_MHz); Prx = EIRP - FSPL + Gr - Lcable(rx); fade margin = Prx - Rx sensitivity. All in dB; target margin >= 10 dB.",
+    edition: "The point-to-point wireless link budget - EIRP, free-space path loss, and fade margin - from the Friis transmission equation / ITU-R P.525, by name; first-principles dB accounting.",
+    freeAccess: "The link-budget dB accounting and the Friis / FSPL relation are public first-principles RF (ITU-R P.525 is a free ITU download); the powers, gains, cable losses, distance, frequency, and receiver sensitivity are the user's link inputs.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "The full point-to-point wireless link budget, the RF endpoint that consumes free-space path loss the way fiber-loss-budget totals an optical channel. EIRP = Pt + Gt - Lcable(tx) leaves the transmit antenna; FSPL = 32.44 + 20 log10(d_km) + 20 log10(f_MHz) is subtracted over the path; the receive gain is added and receive cable loss subtracted for Prx = EIRP - FSPL + Gr - Lcable(rx); the fade margin = Prx - the receiver's sensitivity is the headroom against rain, multipath, and misalignment. A 20 dBm radio with 12 dBi antennas and 1 dB of cable each end over a 1 km 2.4 GHz path into a -80 dBm receiver delivers -58 dBm for a 22 dB fade margin. Aim for at least 10 dB of fade margin (20+ dB for a carrier-class or long/rainy link); a margin near zero or negative will not hold up. Free space only - atmospheric and rain attenuation (significant above ~10 GHz), obstruction and Fresnel-zone diffraction, and interference are separate. A planning estimate; the path survey, spectrum, and a commissioning test govern.",
+    assumptions: [
+      { name: "Link budget", value: "EIRP = Pt + Gt - Lcable(tx); Prx = EIRP - FSPL + Gr - Lcable(rx); fade margin = Prx - sensitivity", source: "Friis / ITU-R P.525" },
+      { name: "Target margin", value: "aim for >= 10 dB fade margin (20+ for carrier-class); free space only, rain/obstruction/interference separate", source: "RF link-design practice" },
+    ],
+  },
   "fiber-max-length": {
     formula: "len_max_m = 1000 x (max_channel_loss - connectors x loss_per_connector - splices x loss_per_splice) / attenuation_dB_km. The inverse of loss = attenuation x length_km + connectors + splices.",
     edition: "Optical link loss budget solved for length, per the TIA-568 / TIA-526 fiber-test methods and the IEEE 802.3 channel-loss limits, by name; first-principles.",

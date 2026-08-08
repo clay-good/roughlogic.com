@@ -12349,7 +12349,30 @@ import {
   computeCctvRetentionDays as _v696,
   computeWirelessFspl as _v1249,
   computeFresnelZoneClearance as _v1250,
+  computeWirelessLinkBudget as _v1251,
 } from "../../calc-lowvoltage.js";
+test("bounds: spec-v1251 computeWirelessLinkBudget pins EIRP, Prx, the fade margin, the >=10 dB verdict, and error seams", () => {
+  // 20 dBm, 12 dBi + 1 dB each end, 1 km 2.4 GHz, -80 dBm rx: EIRP 31, Prx -58.04, fade 21.96.
+  const r = _v1251({ tx_power_dbm: 20, tx_gain_dbi: 12, tx_cable_loss_db: 1, distance_km: 1, frequency_mhz: 2400, rx_gain_dbi: 12, rx_cable_loss_db: 1, rx_sensitivity_dbm: -80 });
+  assert.ok(Math.abs(r.eirp_dbm - 31) < 1e-9);
+  assert.ok(Math.abs(r.fspl_db - (32.44 + 20 * Math.log10(1) + 20 * Math.log10(2400))) < 1e-9);
+  assert.ok(Math.abs(r.rx_power_dbm - (31 - r.fspl_db + 12 - 1)) < 1e-9 && Math.abs(r.rx_power_dbm - (-58.04)) < 0.05);
+  assert.ok(Math.abs(r.fade_margin_db - (r.rx_power_dbm - (-80))) < 1e-12 && Math.abs(r.fade_margin_db - 21.96) < 0.05);
+  assert.ok(r.adequate === true);
+  // Consistency with the standalone FSPL tile.
+  assert.ok(Math.abs(r.fspl_db - _v1249({ distance_km: 1, frequency_mhz: 2400 }).fspl_db) < 1e-12);
+  // A weak long link fails the fade-margin target (adequate false, margin < 10).
+  const weak = _v1251({ tx_power_dbm: 10, tx_gain_dbi: 6, tx_cable_loss_db: 2, distance_km: 10, frequency_mhz: 5800, rx_gain_dbi: 6, rx_cable_loss_db: 2, rx_sensitivity_dbm: -75 });
+  assert.ok(weak.adequate === false && Math.abs(weak.fade_margin_db - (-34.71)) < 0.1);
+  // A more sensitive receiver (more negative sensitivity) raises the fade margin dB-for-dB.
+  const sens = _v1251({ tx_power_dbm: 20, tx_gain_dbi: 12, tx_cable_loss_db: 1, distance_km: 1, frequency_mhz: 2400, rx_gain_dbi: 12, rx_cable_loss_db: 1, rx_sensitivity_dbm: -90 });
+  assert.ok(Math.abs(sens.fade_margin_db - r.fade_margin_db - 10) < 1e-9);
+  // Error seams: non-positive distance/frequency, negative cable loss, non-finite.
+  assert.ok("error" in _v1251({ distance_km: 0, frequency_mhz: 2400 }));
+  assert.ok("error" in _v1251({ distance_km: 1, frequency_mhz: 0 }));
+  assert.ok("error" in _v1251({ distance_km: 1, frequency_mhz: 2400, tx_cable_loss_db: -1 }));
+  assert.ok("error" in _v1251({ distance_km: 1, frequency_mhz: 2400, tx_power_dbm: Infinity }));
+});
 test("bounds: spec-v1250 computeFresnelZoneClearance pins r_n = 17.32 sqrt(n d1 d2/(f D)), the 60% rule, the sqrt(n) scaling, and error seams", () => {
   // 2.4 GHz, 5 km link, midspan: first-zone radius 12.5 m, 60% 7.5 m.
   const r = _v1250({ frequency_ghz: 2.4, d1_km: 2.5, d2_km: 2.5, zone_number: 1 });

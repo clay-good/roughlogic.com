@@ -200,6 +200,62 @@ function _renderFresnelZoneClearance(inputRegion, outputRegion, citationEl) {
 }
 LOWVOLTAGE_RENDERERS["fresnel-zone-clearance"] = _renderFresnelZoneClearance;
 
+// ---------------------------------------------------------------------
+// spec-v1251: wireless point-to-point link budget with EIRP and fade margin. The RF endpoint that
+// consumes free-space path loss, mirroring the fiber-loss-budget margin/pass logic for the radio path.
+// EIRP = Pt + Gt - Lcable_tx; Prx = EIRP - FSPL + Gr - Lcable_rx; fade margin = Prx - Rx_sensitivity.
+// FSPL = 32.44 + 20 log10(d_km) + 20 log10(f_MHz). All dB; a >= 10 dB fade margin is the usual target.
+// dims: in { tx_power_dbm: dimensionless, tx_gain_dbi: dimensionless, tx_cable_loss_db: dimensionless, distance_km: dimensionless, frequency_mhz: dimensionless, rx_gain_dbi: dimensionless, rx_cable_loss_db: dimensionless, rx_sensitivity_dbm: dimensionless } out: { eirp_dbm: dimensionless, fspl_db: dimensionless, rx_power_dbm: dimensionless, fade_margin_db: dimensionless }
+export function computeWirelessLinkBudget({ tx_power_dbm = 20, tx_gain_dbi = 0, tx_cable_loss_db = 0, distance_km = 0, frequency_mhz = 0, rx_gain_dbi = 0, rx_cable_loss_db = 0, rx_sensitivity_dbm = -80 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const pt = Number(tx_power_dbm), gt = Number(tx_gain_dbi), ltx = Number(tx_cable_loss_db);
+  const d = Number(distance_km), f = Number(frequency_mhz);
+  const gr = Number(rx_gain_dbi), lrx = Number(rx_cable_loss_db), sens = Number(rx_sensitivity_dbm);
+  if (![pt, gt, ltx, gr, lrx, sens].every(Number.isFinite)) return { error: "Powers, gains, cable losses, and sensitivity must be numbers (dB)." };
+  if (!(d > 0)) return { error: "Distance must be positive (km)." };
+  if (!(f > 0)) return { error: "Frequency must be positive (MHz)." };
+  if (ltx < 0 || lrx < 0) return { error: "Cable losses cannot be negative (dB)." };
+  const eirp_dbm = pt + gt - ltx;
+  const fspl_db = 32.44 + 20 * Math.log10(d) + 20 * Math.log10(f);
+  const rx_power_dbm = eirp_dbm - fspl_db + gr - lrx;
+  const fade_margin_db = rx_power_dbm - sens;
+  const adequate = fade_margin_db >= 10;
+  if (![eirp_dbm, fspl_db, rx_power_dbm, fade_margin_db].every(Number.isFinite)) return { error: "Link-budget math is not a finite value." };
+  return {
+    eirp_dbm, fspl_db, rx_power_dbm, fade_margin_db, adequate,
+    note: "The full point-to-point wireless link budget, the RF endpoint that consumes free-space path loss the way fiber-loss-budget totals an optical channel. It walks the signal from transmitter to receiver in decibels: the effective isotropic radiated power EIRP = Pt + Gt - Lcable(tx) leaves the transmit antenna; free-space path loss FSPL = 32.44 + 20 log10(d_km) + 20 log10(f_MHz) is subtracted over the path; the receive antenna gain is added and the receive-side cable loss subtracted, giving the received power Prx = EIRP - FSPL + Gr - Lcable(rx). The fade margin = Prx - the receiver's sensitivity (the weakest signal it can demodulate) is the headroom the link has against rain, multipath, and misalignment. A 20 dBm radio with 12 dBi antennas and 1 dB of cable each end, over a 1 km 2.4 GHz path into a -80 dBm receiver, delivers -58 dBm for a 22 dB fade margin. Rules of thumb: aim for at least 10 dB of fade margin (20+ dB for a carrier-class or long/rainy link); a margin near zero or negative will not hold up. This is free-space only - it excludes atmospheric and rain attenuation (significant above ~10 GHz), obstruction and Fresnel-zone diffraction (check fresnel-zone-clearance), and interference. A planning estimate; the path survey, spectrum, and a commissioning test govern.",
+  };
+}
+export const wirelessLinkBudgetExample = { inputs: { tx_power_dbm: 20, tx_gain_dbi: 12, tx_cable_loss_db: 1, distance_km: 1, frequency_mhz: 2400, rx_gain_dbi: 12, rx_cable_loss_db: 1, rx_sensitivity_dbm: -80 } };
+function _renderWirelessLinkBudget(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: wireless link budget - EIRP = Pt + Gt - Lcable(tx); Prx = EIRP - FSPL + Gr - Lcable(rx); fade margin = Prx - Rx sensitivity; FSPL = 32.44 + 20 log10(d_km) + 20 log10(f_MHz) (Friis / ITU-R P.525). Aim for >= 10 dB fade margin (20+ for carrier-class). Free space only - rain/atmospheric attenuation, obstruction/Fresnel diffraction, and interference are separate. The path survey and a commissioning test govern.";
+  const pt = makeNumber("Transmit power (dBm)", "wlb-pt", { step: "any", value: "20" }); pt.input.value = "20";
+  const gt = makeNumber("Transmit antenna gain (dBi)", "wlb-gt", { step: "any", value: "12" }); gt.input.value = "12";
+  const ltx = makeNumber("Transmit cable/connector loss (dB)", "wlb-ltx", { step: "any", min: "0", value: "1" }); ltx.input.value = "1";
+  const d = makeNumber("Link distance (km)", "wlb-d", { step: "any", min: "0", value: "1" }); d.input.value = "1";
+  const f = makeNumber("Frequency (MHz)", "wlb-f", { step: "any", min: "0", value: "2400" }); f.input.value = "2400";
+  const gr = makeNumber("Receive antenna gain (dBi)", "wlb-gr", { step: "any", value: "12" }); gr.input.value = "12";
+  const lrx = makeNumber("Receive cable/connector loss (dB)", "wlb-lrx", { step: "any", min: "0", value: "1" }); lrx.input.value = "1";
+  const sens = makeNumber("Receiver sensitivity (dBm)", "wlb-sens", { step: "any", value: "-80" }); sens.input.value = "-80";
+  for (const fld of [pt, gt, ltx, d, f, gr, lrx, sens]) inputRegion.appendChild(fld.wrap);
+  attachExampleButton(inputRegion, () => { pt.input.value = "20"; gt.input.value = "12"; ltx.input.value = "1"; d.input.value = "1"; f.input.value = "2400"; gr.input.value = "12"; lrx.input.value = "1"; sens.input.value = "-80"; update(); });
+  const oEirp = makeOutputLine(outputRegion, "EIRP / path loss", "wlb-out-eirp");
+  const oRx = makeOutputLine(outputRegion, "Received power", "wlb-out-rx");
+  const oFade = makeOutputLine(outputRegion, "Fade margin / verdict", "wlb-out-fade");
+  const oNote = makeOutputLine(outputRegion, "Note", "wlb-out-n");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeWirelessLinkBudget({ tx_power_dbm: readNum(pt.input), tx_gain_dbi: readNum(gt.input), tx_cable_loss_db: readNum(ltx.input), distance_km: readNum(d.input), frequency_mhz: readNum(f.input), rx_gain_dbi: readNum(gr.input), rx_cable_loss_db: readNum(lrx.input), rx_sensitivity_dbm: readNum(sens.input) });
+    if (r.error) { oEirp.textContent = r.error; oRx.textContent = "-"; oFade.textContent = "-"; oNote.textContent = ""; return; }
+    oEirp.textContent = fmt(r.eirp_dbm, 1) + " dBm EIRP, " + fmt(r.fspl_db, 2) + " dB path loss";
+    oRx.textContent = fmt(r.rx_power_dbm, 1) + " dBm";
+    oFade.textContent = fmt(r.fade_margin_db, 1) + " dB - " + (r.adequate ? "adequate (>= 10 dB)" : "LOW (aim for >= 10 dB)");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const fld of [pt, gt, ltx, d, f, gr, lrx, sens]) fld.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["wireless-link-budget"] = _renderWirelessLinkBudget;
+
 // dims: in { max_channel_loss_db: dimensionless, attenuation_db_km: dimensionless, connector_count: dimensionless, splice_count: dimensionless } out: { max_length_m: L, max_length_ft: L }
 export function computeFiberMaxLength({ max_channel_loss_db = 0, attenuation_db_km = 0, connector_count = 0, loss_per_connector_db = 0.75, splice_count = 0, loss_per_splice_db = 0.3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
