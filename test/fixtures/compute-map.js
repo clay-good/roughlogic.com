@@ -1032,6 +1032,7 @@ export const COMPUTE_MAP = {
   "projector-max-screen-size": { module: "../../calc-stage.js", fn: "computeProjectorMaxScreenSize" },
   "room-acoustics": { module: "../../calc-stage.js", fn: "computeRoomAcoustics" },
   "eyring-reverberation": { module: "../../calc-stage.js", fn: "computeEyringReverberation" },
+  "partition-mass-law-tl": { module: "../../calc-stage.js", fn: "computeMassLawTL" },
   "room-absorption-target": { module: "../../calc-stage.js", fn: "computeRoomAbsorptionTarget" },
   "counterweight-arbor-load": { module: "../../calc-stage.js", fn: "computeCounterweightArborLoad" },
   "led-tape-run": { module: "../../calc-stage.js", fn: "computeLedTapeRun" },

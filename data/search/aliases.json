@@ -8791,6 +8791,21 @@
       "kind": "question"
     },
     {
+      "term": "mass law transmission loss",
+      "target": "partition-mass-law-tl",
+      "kind": "industry"
+    },
+    {
+      "term": "wall sound transmission loss",
+      "target": "partition-mass-law-tl",
+      "kind": "question"
+    },
+    {
+      "term": "drywall sound attenuation db",
+      "target": "partition-mass-law-tl",
+      "kind": "question"
+    },
+    {
       "term": "room modes",
       "target": "room-acoustics",
       "kind": "industry"

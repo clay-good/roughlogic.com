@@ -1159,7 +1159,7 @@ const TOOL_MODULES = (() => {
     // v92 LED video wall + projection
     "led-video-wall", "projector-brightness", "projector-max-screen-size",
     // v120 room acoustics
-    "room-acoustics", "eyring-reverberation", "room-absorption-target",
+    "room-acoustics", "eyring-reverberation", "partition-mass-law-tl", "room-absorption-target",
     // spec-v542
     "counterweight-arbor-load",
     // spec-v543

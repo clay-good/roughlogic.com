@@ -1355,6 +1355,48 @@ const renderEyringReverberation = _r({
 });
 STAGE_RENDERERS["eyring-reverberation"] = renderEyringReverberation;
 
+// spec-v1242: single-panel mass-law transmission loss. The room-acoustics family (reverberation,
+// levels, absorption) has no partition/wall attenuation tile. Field-incidence limp-mass law:
+// TL = 20 log10(m f) - 47 dB, m the surface mass (kg/m^2), f the frequency (Hz); normal-incidence
+// uses -42. +6 dB per doubling of mass or frequency. Surface mass entered in lb/ft^2 (US), converted
+// at 1 lb/ft^2 = 4.88243 kg/m^2. First-principles acoustics (panel mass reactance; Bies & Hansen /
+// FHWA). Scoped to the closed-form mass-law TL, not the ASTM E413 STC rating (which needs a spectrum).
+// dims: in { surface_mass_psf: M L^-2, frequency_hz: T^-1, incidence: dimensionless } out: { transmission_loss_db: dimensionless, surface_mass_kgm2: M L^-2 }
+export function computeMassLawTL({ surface_mass_psf = 0, frequency_hz = 0, incidence = "field" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const psf = Number(surface_mass_psf) || 0;
+  const f = Number(frequency_hz) || 0;
+  if (!(psf > 0)) return { error: "Surface mass must be positive (lb/ft^2)." };
+  if (!(f > 0)) return { error: "Frequency must be positive (Hz)." };
+  if (incidence !== "field" && incidence !== "normal") return { error: "Incidence must be field or normal." };
+  const surface_mass_kgm2 = psf * 4.88243;
+  const constant = incidence === "normal" ? 42 : 47;
+  const transmission_loss_db = 20 * Math.log10(surface_mass_kgm2 * f) - constant;
+  const below_floor = transmission_loss_db < 0;
+  if (![transmission_loss_db, surface_mass_kgm2].every(Number.isFinite)) return { error: "Mass-law math is not a finite value." };
+  return {
+    transmission_loss_db, surface_mass_kgm2, below_floor,
+    note: "The single-panel mass-law transmission loss, the partition-attenuation member the room-acoustics family (reverberation, levels, absorption) leaves out. A limp, non-rigid panel resists airborne sound in proportion to its mass per unit area and the frequency: TL = 20 log10(m f) - 47 dB for random (field) incidence, or - 42 for normal incidence, with m the surface mass in kg/m^2 (entered here in lb/ft^2 and converted at 1 lb/ft^2 = 4.88 kg/m^2) and f in Hz. The signature is +6 dB per doubling of either mass or frequency (the mass law), so heavier walls and higher pitches are attenuated more. A single layer of 1/2 in gypsum (~2 lb/ft^2) gives about 27 dB at 500 Hz. This is the idealized mass law only: it does NOT capture the coincidence (critical-frequency) dip where TL falls sharply, the stiffness-controlled low-frequency region, cavity/stud resonances, flanking, or leaks, and it is NOT the ASTM E413 Sound Transmission Class (STC), which is a single-number rating fit to the whole third-octave TL spectrum. Use it to compare bare single-leaf partitions and to see the mass and frequency trends; a lab-tested assembly rating and the acoustician govern.",
+  };
+}
+const massLawTLExample = { inputs: { surface_mass_psf: 2.0, frequency_hz: 500, incidence: "field" } };
+const renderMassLawTL = _r({
+  citation: "Citation: field-incidence limp-mass law TL = 20 log10(m f) - 47 dB (normal incidence - 42), m the surface mass in kg/m^2 and f in Hz; +6 dB per doubling of mass or frequency (first-principles panel acoustics, Bies & Hansen / FHWA highway-noise guidance). Surface mass entered in lb/ft^2, converted at 1 lb/ft^2 = 4.88243 kg/m^2. Idealized mass law only -- excludes the coincidence dip, stiffness region, and flanking, and is not the ASTM E413 STC rating; the acoustician governs.",
+  example: massLawTLExample.inputs,
+  fields: [
+    { key: "surface_mass_psf", label: "Surface mass (lb/ft^2; 1/2in gypsum ~2.0)", kind: "number", attrs: { step: "any", min: "0" }, default: 2.0 },
+    { key: "frequency_hz", label: "Frequency (Hz)", kind: "number", attrs: { step: "any", min: "0" }, default: 500 },
+    { key: "incidence", label: "Incidence", kind: "select", options: [{ value: "field", label: "Field / random (-47)" }, { value: "normal", label: "Normal (-42)" }] },
+  ],
+  outputs: [
+    { key: "tl", id: "mltl-out-tl", label: "Transmission loss TL", value: (r) => fmt(r.transmission_loss_db, 1) + " dB" + (r.below_floor ? " (below the mass-law range at this m*f)" : "") },
+    { key: "m", id: "mltl-out-m", label: "Surface mass", value: (r) => fmt(r.surface_mass_kgm2, 1) + " kg/m^2" },
+    { key: "n", id: "mltl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMassLawTL,
+});
+STAGE_RENDERERS["partition-mass-law-tl"] = renderMassLawTL;
+
 // --- spec-v664 N: absorption needed for a target RT60 (inverse of room-acoustics) ---
 // dims: in { volume_ft3: L^3, target_rt60_s: T, existing_sabins: L^2, sabine_coeff: dimensionless } out: { required_sabins: L^2, additional_sabins: L^2 }
 export function computeRoomAbsorptionTarget({ volume_ft3 = 0, target_rt60_s = 0, existing_sabins = 0, sabine_coeff = 0.049 } = {}) {

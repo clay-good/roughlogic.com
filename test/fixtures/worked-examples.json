@@ -28392,6 +28392,56 @@
    }
   },
   {
+   "tile_id": "partition-mass-law-tl",
+   "source_publisher": "Mass law (Bies & Hansen / FHWA highway-noise guidance)",
+   "source_title": "1/2 in gypsum ~2 lb/ft^2 at 500 Hz -> ~26.8 dB field-incidence TL (spec-v1242)",
+   "source_edition_or_year": "TL = 20 log10(m f) - 47 (field)",
+   "source_section_or_page": "m = 2.0 x 4.88243 = 9.765 kg/m^2; TL = 20 log10(9.765 x 500) - 47 = 20 log10(4882.4) - 47 = 73.77 - 47 = 26.8 dB.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "surface_mass_psf": 2.0,
+    "frequency_hz": 500,
+    "incidence": "field"
+   },
+   "outputs": {
+    "surface_mass_kgm2": {
+     "value": 9.765,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "transmission_loss_db": {
+     "value": 26.8,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "partition-mass-law-tl",
+   "source_publisher": "Mass law (+6 dB per doubling cross-check)",
+   "source_title": "doubling the surface mass adds ~6 dB",
+   "source_edition_or_year": "20 log10(2) = 6.02 dB",
+   "source_section_or_page": "at 4.0 lb/ft^2 and 500 Hz, TL = 20 log10(19.53 x 500) - 47 = 32.8 dB, 6.0 dB above the 2.0 lb/ft^2 value.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "surface_mass_psf": 4.0,
+    "frequency_hz": 500,
+    "incidence": "field"
+   },
+   "outputs": {
+    "transmission_loss_db": {
+     "value": 32.82,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "room-acoustics",
    "source_publisher": "W.C. Sabine reverberation equation (public domain); axial room-mode relation f = c / (2 x L).",
    "source_title": "RT60 = 0.049 x V / A; first axial mode = 1130 / (2 x dimension), c = 1130 ft/s.",

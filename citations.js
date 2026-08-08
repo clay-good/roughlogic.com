@@ -11917,6 +11917,18 @@ export const CITATIONS = {
       { name: "When to use", value: "Eyring for high-absorption (well-treated) rooms; Sabine over-predicts there", source: "acoustics practice" },
     ],
   },
+  "partition-mass-law-tl": {
+    formula: "TL = 20 log10(m f) - 47 dB (field/random incidence), or - 42 (normal incidence); m the surface mass in kg/m^2 (lb/ft^2 x 4.88243), f in Hz. +6 dB per doubling of m or f.",
+    edition: "First-principles panel acoustics - the limp-mass law - as given in Bies & Hansen, Engineering Noise Control, and FHWA highway-noise guidance, by name.",
+    freeAccess: "The mass law TL = 20 log10(m f) - 47 is standard published acoustics (Bies & Hansen; FHWA public highway-noise material); the surface mass and frequency are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The single-panel mass-law transmission loss, the partition-attenuation member the room-acoustics family (reverberation, levels, absorption) leaves out. A limp, non-rigid panel resists airborne sound in proportion to its surface mass and the frequency: TL = 20 log10(m f) - 47 dB for random (field) incidence, or - 42 for normal incidence, with m in kg/m^2 (entered in lb/ft^2 and converted at 1 lb/ft^2 = 4.88243 kg/m^2) and f in Hz. The signature is +6 dB per doubling of either mass or frequency. A single 1/2 in gypsum layer (~2 lb/ft^2) gives about 27 dB at 500 Hz. This is the IDEALIZED mass law only: it does not capture the coincidence (critical-frequency) dip where TL falls sharply, the stiffness-controlled low-frequency region, cavity or stud resonances, flanking paths, or leaks, and it is NOT the ASTM E413 Sound Transmission Class (STC), a single-number rating fit to the whole third-octave TL spectrum. Use it to compare bare single-leaf partitions and to see the mass and frequency trends; a lab-tested assembly rating and the acoustician govern.",
+    assumptions: [
+      { name: "Mass law", value: "TL = 20 log10(m f) - 47 (field) or - 42 (normal); +6 dB per doubling of m or f", source: "Bies & Hansen / FHWA" },
+      { name: "Idealized single leaf", value: "excludes the coincidence dip, stiffness region, cavity/stud resonances, flanking, and leaks", source: "scope of this tile" },
+      { name: "Not STC", value: "the closed-form mass-law TL, not the ASTM E413 STC single-number rating", source: "scope of this tile" },
+    ],
+  },
   "room-absorption-target": {
     formula: "A_required = 0.049 x V / RT60_target (sabins); A_additional = max(0, A_required - A_existing).",
     edition: "W.C. Sabine reverberation equation (public domain) solved for the required absorption, the inverse of the room-acoustics tile.",

@@ -3077,6 +3077,7 @@ cross-check.
 | calc-stage.js | `computeLedVideoWall` | `{ cab_w_px = 0, cab_h_px = 0, pixel_pitch_mm = 0, cols = 0, rows = 0, cab_wei...` | _ | _ | _ |
 | calc-stage.js | `computeLightingBeam` | `{ beam_angle_deg = 0, throw_distance = 0, distance_unit = "ft", source = "can...` | _ | _ | _ |
 | calc-stage.js | `computeLightingThrowForPool` | `{ target_pool_diameter = 0, beam_angle_deg = 0, distance_unit = "ft" } = {}` | _ | _ | _ |
+| calc-stage.js | `computeMassLawTL` | `{ surface_mass_psf = 0, frequency_hz = 0, incidence = "field" } = {}` | _ | _ | _ |
 | calc-stage.js | `computeNeutralImbalance` | `{ I_A = 0, I_B = 0, I_C = 0, harmonic_loads = false }` | _ | _ | _ |
 | calc-stage.js | `computePowerDistro` | `{ watts = 0, voltage_v = 208, phase = "three", rating_a = 0, pf = 1, derate =...` | _ | _ | _ |
 | calc-stage.js | `computeProjectorBrightness` | `{ screen_w_ft = 0, screen_h_ft = 0, screen_gain = 1.0, target_foot_lamberts =...` | _ | _ | _ |
@@ -3276,7 +3277,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1862.
+Row count: 1863.
 
 <!-- END function-corpus-v14 -->
 
@@ -4813,7 +4814,7 @@ per spec-v14 §13.1 second paragraph.
 | `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `well-max-yield` | Well Sustainable Yield from Specific Capacity | AWWA / USGS (inverse); 1.0 GPM/ft, 30 ft allowable drawdown -> 30 GPM (round-tri... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group N Stage (25 tiles)
+### Group N Stage (26 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4829,6 +4830,7 @@ per spec-v14 §13.1 second paragraph.
 | `lighting-beam` | Stage Lighting Beam and Throw | first-principles theatrical photometr...; 20 deg beam, 30 ft throw, 100000 cd -> 10.58 ft pool, 111... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lighting-throw-for-pool` | Throw Distance for a Target Beam Pool | first-principles theatrical photometr...; 10.58 ft pool from a 20 deg beam -> 30 ft throw (round-tr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `neutral-imbalance` | Three-Phase Neutral Imbalance and Distro | Project (first-principles); Standard symmetric-components root for balanced magnitude... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `partition-mass-law-tl` | Partition Mass-Law Transmission Loss | Mass law (Bies & Hansen / FHWA highwa...; m = 2.0 x 4.88243 = 9.765 kg/m^2; TL = 20 log10(9.765 x 5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `power-distro` | Power Distro Per-Leg Loading | First-principles AC power + NEC 80% c...; 12,000 W on 120/208 3-phase, 60 A/leg -> 33.3 A/leg, pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `projector-brightness` | Projector Brightness and Throw | Standard AV screen-luminance identity...; spec-v92 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `projector-max-screen-size` | Max Screen Size for a Projector | Standard AV screen-luminance identity...; spec-v727 section 2 pinned example: 5,000 lm, gain 1.0, 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5076,6 +5078,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1614. Fixture-covered or reference-cadence: 1614 / 1614.
+Tile count: 1615. Fixture-covered or reference-cadence: 1615 / 1615.
 
 <!-- END tile-index-v14 -->

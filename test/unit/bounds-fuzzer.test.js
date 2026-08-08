@@ -1899,6 +1899,7 @@ import {
   computeRoomAcoustics,
   computeRoomAbsorptionTarget,
   computeEyringReverberation,
+  computeMassLawTL,
   computeSPLDistanceForLevel,
 } from "../../calc-stage.js";
 
@@ -4930,6 +4931,29 @@ test("bounds: spec-v1224 computeEyringReverberation pins RT60 = 0.049 V/(-S ln(1
   assert.ok("error" in computeEyringReverberation({ volume_ft3: 5000, surface_area_ft2: 1300, avg_absorption: 0 }));
   assert.ok("error" in computeEyringReverberation({ volume_ft3: 5000, surface_area_ft2: 1300, avg_absorption: 1 }));
   assert.ok("error" in computeEyringReverberation({ volume_ft3: Infinity, surface_area_ft2: 1300, avg_absorption: 0.3 }));
+});
+
+test("bounds: spec-v1242 computeMassLawTL pins TL = 20 log10(m f) - 47, the field/normal offset, the +6 dB doubling, and error seams", () => {
+  // 2 lb/ft^2 at 500 Hz, field: m 9.765 kg/m^2, TL 26.8 dB.
+  const r = computeMassLawTL({ surface_mass_psf: 2.0, frequency_hz: 500, incidence: "field" });
+  assert.ok(Math.abs(r.surface_mass_kgm2 - 2.0 * 4.88243) < 1e-9);
+  assert.ok(Math.abs(r.transmission_loss_db - (20 * Math.log10(r.surface_mass_kgm2 * 500) - 47)) < 1e-12);
+  assert.ok(Math.abs(r.transmission_loss_db - 26.8) < 0.1);
+  // Normal incidence is exactly 5 dB higher than field (47 - 42).
+  const n = computeMassLawTL({ surface_mass_psf: 2.0, frequency_hz: 500, incidence: "normal" });
+  assert.ok(Math.abs(n.transmission_loss_db - r.transmission_loss_db - 5) < 1e-9);
+  // Mass law: +6 dB per doubling of mass, and per doubling of frequency.
+  const m2 = computeMassLawTL({ surface_mass_psf: 4.0, frequency_hz: 500, incidence: "field" });
+  const f2 = computeMassLawTL({ surface_mass_psf: 2.0, frequency_hz: 1000, incidence: "field" });
+  assert.ok(Math.abs(m2.transmission_loss_db - r.transmission_loss_db - 20 * Math.log10(2)) < 1e-9);
+  assert.ok(Math.abs(f2.transmission_loss_db - r.transmission_loss_db - 20 * Math.log10(2)) < 1e-9);
+  // A very light panel at low frequency can fall below the mass-law floor (flagged, still returned).
+  assert.ok(computeMassLawTL({ surface_mass_psf: 0.05, frequency_hz: 50, incidence: "field" }).below_floor === true);
+  // Error seams: non-positive mass or frequency, bad incidence, non-finite.
+  assert.ok("error" in computeMassLawTL({ surface_mass_psf: 0, frequency_hz: 500 }));
+  assert.ok("error" in computeMassLawTL({ surface_mass_psf: 2, frequency_hz: 0 }));
+  assert.ok("error" in computeMassLawTL({ surface_mass_psf: 2, frequency_hz: 500, incidence: "grazing" }));
+  assert.ok("error" in computeMassLawTL({ surface_mass_psf: Infinity, frequency_hz: 500 }));
 });
 
 test("bounds: calc-stage computeRoomAbsorptionTarget pins A_required = 0.049 * V / RT60 and round-trips through computeRoomAcoustics across the venue sweep, and rejects non-positive inputs", () => {
