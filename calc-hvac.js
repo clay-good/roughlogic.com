@@ -3079,6 +3079,45 @@ function _renderFlatOvalDuct(inputRegion, outputRegion, citationEl) {
 }
 HVAC_RENDERERS["flat-oval-duct"] = _renderFlatOvalDuct;
 
+// spec-v1255: fixed-orifice (piston / cap-tube) target superheat for charging. Every superheat tile
+// MEASURES superheat; this computes the TARGET a fixed-orifice system should be charged to for the
+// conditions. Standard field regression of the manufacturer charging charts (EPA 608 practice):
+// Target SH = (3 x IDWB - 80 - ODT) / 2, IDWB = indoor return wet-bulb (F), ODT = outdoor dry-bulb (F).
+// dims: in { indoor_wetbulb_f: dimensionless, outdoor_drybulb_f: dimensionless } out: { target_superheat_f: dimensionless }
+export function computeFixedOrificeTargetSuperheat({ indoor_wetbulb_f = 0, outdoor_drybulb_f = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const idwb = Number(indoor_wetbulb_f);
+  const odt = Number(outdoor_drybulb_f);
+  if (!Number.isFinite(idwb)) return { error: "Indoor return-air wet-bulb temperature must be a number (F)." };
+  if (!Number.isFinite(odt)) return { error: "Outdoor dry-bulb temperature must be a number (F)." };
+  const target_superheat_f = (3 * idwb - 80 - odt) / 2;
+  const low_ambient = odt < 55;
+  const out_of_range = target_superheat_f <= 0;
+  if (!Number.isFinite(target_superheat_f)) return { error: "Target-superheat math is not a finite value." };
+  return {
+    target_superheat_f, low_ambient, out_of_range,
+    note: "The TARGET superheat a fixed-orifice (piston or cap-tube) air conditioner should be charged to for the current indoor and outdoor conditions - the number a tech charges AGAINST, as opposed to the superheat the gauges MEASURE. A fixed metering device does not hold a set superheat the way a TXV does, so the correct charge shifts with the load: Target SH = (3 x IDWB - 80 - ODT) / 2, where IDWB is the indoor return-air wet-bulb (a wet-bulb, not dry-bulb - it captures the latent load) and ODT is the outdoor dry-bulb, both in F. On a hot day (indoor 63 F WB, outdoor 95 F) the target is only about 7 F; on a mild day (outdoor 75 F) it climbs to about 17 F, so the same system wants very different superheat as the weather changes. Charge until the measured superheat (the superheat-subcool or refrigerant-charging tile) reaches this target: below target means overcharged, above means undercharged. This is the standard EPA 608 / manufacturer-chart charging method, an empirical regression of the charging charts (not a first-principles derivation), valid roughly for outdoor temperatures at or above 55 F and away from extreme low indoor loads - below about 55 F outdoors, or when the target comes out at or below zero, do not charge by superheat (use weigh-in or subcooling on a TXV system). A field aid; the equipment's own charging chart and the manufacturer govern.",
+  };
+}
+export const fixedOrificeTargetSuperheatExample = { inputs: { indoor_wetbulb_f: 63, outdoor_drybulb_f: 95 } };
+function _renderFixedOrificeTargetSuperheat(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: fixed-orifice target-superheat charging method, Target SH = (3 x IDWB - 80 - ODT)/2 (IDWB = indoor return wet-bulb F, ODT = outdoor dry-bulb F), the standard EPA 608 / manufacturer charging-chart field regression (AC Service Tech and equivalent field references), by name; empirical, not first-principles. Valid roughly for outdoor >= 55 F; below that or at/below a zero target, do not charge by superheat. A field aid; the equipment charging chart and the manufacturer govern.";
+  const idwb = _v27hMakeNumber("Indoor return-air WET-bulb (F)", "tsh-idwb", { step: "any", value: "63" }); idwb.input.value = "63";
+  const odt = _v27hMakeNumber("Outdoor dry-bulb (F)", "tsh-odt", { step: "any", value: "95" }); odt.input.value = "95";
+  for (const f of [idwb, odt]) inputRegion.appendChild(f.wrap);
+  _v27hAttachEx(inputRegion, () => { idwb.input.value = "63"; odt.input.value = "95"; update(); });
+  const oT = _v27hMakeOut(outputRegion, "Target superheat", "tsh-out-t");
+  const oNote = _v27hMakeOut(outputRegion, "Note", "tsh-out-note");
+  const update = _v27hDebounce(() => {
+    const r = computeFixedOrificeTargetSuperheat({ indoor_wetbulb_f: Number(idwb.input.value) || 0, outdoor_drybulb_f: Number(odt.input.value) || 0 });
+    if (r.error) { oT.textContent = r.error; oNote.textContent = ""; return; }
+    oT.textContent = _v27hFmt(r.target_superheat_f, 1) + " F" + (r.out_of_range ? " (at/below zero -- do not charge by superheat)" : r.low_ambient ? " (outdoor < 55 F -- do not charge by superheat)" : "");
+    oNote.textContent = r.note;
+  }, _V27H_DEB);
+  for (const f of [idwb.input, odt.input]) f.input.addEventListener("input", update);
+}
+HVAC_RENDERERS["fixed-orifice-target-superheat"] = _renderFixedOrificeTargetSuperheat;
+
 // =====================================================================
 // spec-v99 C - building-envelope insulation: assembly-r-value,
 // blown-insulation-coverage. The opaque-envelope numbers the pipe-radial

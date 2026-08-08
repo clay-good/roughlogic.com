@@ -10678,6 +10678,18 @@ export const CITATIONS = {
       { name: "Equivalence basis", value: "equal friction, not equal velocity", source: "ASHRAE Fundamentals" },
     ],
   },
+  "fixed-orifice-target-superheat": {
+    formula: "Target SH = (3 x IDWB - 80 - ODT) / 2, IDWB = indoor return-air wet-bulb (F), ODT = outdoor dry-bulb (F). Charge until measured superheat reaches this target.",
+    edition: "The fixed-orifice target-superheat charging method, the standard EPA 608 / manufacturer charging-chart field regression, by name; empirical (a regression of the charging charts, not a first-principles derivation).",
+    freeAccess: "The (3 x IDWB - 80 - ODT)/2 target-superheat relation is public-domain and appears verbatim across free HVAC field-training references (AC Service Tech and equivalent); the wet-bulb and outdoor temperature are the technician's own measurements.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "The TARGET superheat a fixed-orifice (piston or cap-tube) air conditioner should be charged to, the number a technician charges AGAINST rather than the superheat the gauges measure. Because a fixed metering device does not hold a set superheat the way a TXV does, the correct charge shifts with the load: Target SH = (3 x IDWB - 80 - ODT)/2, with IDWB the indoor return-air wet-bulb (a wet-bulb, capturing the latent load) and ODT the outdoor dry-bulb, both in F. A hot day (63 F WB indoor, 95 F outdoor) targets about 7 F; a mild day (75 F outdoor) about 17 F. Charge until the measured superheat reaches the target - below target is overcharged, above is undercharged. This is the standard EPA 608 / manufacturer-chart charging method, an empirical regression of the charts (not first-principles), valid roughly for outdoor temperatures at or above 55 F and away from extreme low indoor loads; below about 55 F outdoors, or when the target is at or below zero, do not charge by superheat (weigh in the charge, or use subcooling on a TXV system). A field aid; the equipment's own charging chart and the manufacturer govern.",
+    assumptions: [
+      { name: "Target superheat", value: "Target SH = (3 x IDWB - 80 - ODT)/2 (IDWB indoor wet-bulb, ODT outdoor dry-bulb, F)", source: "EPA 608 / manufacturer charging charts" },
+      { name: "Fixed orifice only", value: "for piston/cap-tube systems; a TXV holds superheat and is charged by subcooling instead", source: "charging practice" },
+      { name: "Valid range", value: "outdoor >= ~55 F and a positive target; otherwise weigh in the charge", source: "charging practice" },
+    ],
+  },
   "flat-oval-duct": {
     formula: "A = (pi/4) b^2 + b (a - b); P = pi b + 2 (a - b); De = 1.55 A^0.625 / P^0.25 (a = major axis, b = minor axis). Equal-friction equivalent round diameter.",
     edition: "The ASHRAE equal-friction equivalent round diameter of a flat-oval duct, De = 1.55 A^0.625 / P^0.25, per ASHRAE Fundamentals (duct design) and SMACNA, by name; first-principles.",

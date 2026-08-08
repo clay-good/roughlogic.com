@@ -743,6 +743,7 @@ export const COMPUTE_MAP = {
   "fillet-weld-strength": { module: "../../calc-construction.js", fn: "computeFilletWeldStrength" },
   "round-to-rect-duct": { module: "../../calc-hvac.js", fn: "computeRoundToRectDuct" },
   "flat-oval-duct": { module: "../../calc-hvac.js", fn: "computeFlatOvalDuct" },
+  "fixed-orifice-target-superheat": { module: "../../calc-hvac.js", fn: "computeFixedOrificeTargetSuperheat" },
   "center-of-gravity-2point": { module: "../../calc-layout.js", fn: "computeCenterOfGravity2Point" },
   "bolt-circle": { module: "../../calc-layout.js", fn: "computeBoltCircle" },
   "decimal-to-fraction": { module: "../../calc-layout.js", fn: "computeDecimalToFraction" },

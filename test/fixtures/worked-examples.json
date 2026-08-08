@@ -23948,6 +23948,48 @@
    }
   },
   {
+   "tile_id": "fixed-orifice-target-superheat",
+   "source_publisher": "EPA 608 / manufacturer charging-chart regression (AC Service Tech)",
+   "source_title": "indoor 63 F WB, outdoor 95 F -> 7 F target superheat (spec-v1255)",
+   "source_edition_or_year": "Target SH = (3 x IDWB - 80 - ODT)/2",
+   "source_section_or_page": "Target SH = (3 x 63 - 80 - 95)/2 = (189 - 175)/2 = 14/2 = 7 F; the low target a fixed-orifice system wants on a hot day.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "indoor_wetbulb_f": 63,
+    "outdoor_drybulb_f": 95
+   },
+   "outputs": {
+    "target_superheat_f": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fixed-orifice-target-superheat",
+   "source_publisher": "Target superheat (mild-day cross-check)",
+   "source_title": "a milder outdoor temperature raises the target superheat",
+   "source_edition_or_year": "Target SH = (3 x IDWB - 80 - ODT)/2",
+   "source_section_or_page": "same indoor 63 F WB, outdoor 75 F: Target SH = (189 - 80 - 75)/2 = 34/2 = 17 F -- 10 F higher than the 95 F day, so the same system is charged to a different superheat as the weather changes.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "indoor_wetbulb_f": 63,
+    "outdoor_drybulb_f": 75
+   },
+   "outputs": {
+    "target_superheat_f": {
+     "value": 17,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "flat-oval-duct",
    "source_publisher": "ASHRAE Fundamentals (duct design) / SMACNA (by name)",
    "source_title": "20 x 10 in flat oval -> 14.79 in equivalent round (spec-v1254)",

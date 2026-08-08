@@ -372,6 +372,7 @@ export const RENDERER_MAP = {
   "fan-motor-max-airflow": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "round-to-rect-duct": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "flat-oval-duct": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
+  "fixed-orifice-target-superheat": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "assembly-r-value": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "blown-insulation-coverage": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "heat-pump-seasonal-energy": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },

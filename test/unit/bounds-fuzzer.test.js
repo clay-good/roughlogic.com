@@ -11781,6 +11781,25 @@ test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles
 // ---------------------------------------------------------------------------
 import { computeFilletWeldStrength as _cv27e1 } from "../../calc-construction.js";
 import { computeRoundToRectDuct as _cv27c2 } from "../../calc-hvac.js";
+import { computeFixedOrificeTargetSuperheat as _v1255 } from "../../calc-hvac.js";
+test("bounds: spec-v1255 computeFixedOrificeTargetSuperheat pins Target SH = (3 IDWB - 80 - ODT)/2, the weather trend, the range flags, and error seams", () => {
+  // indoor 63 F WB, outdoor 95 F: 7 F target.
+  const r = _v1255({ indoor_wetbulb_f: 63, outdoor_drybulb_f: 95 });
+  assert.ok(Math.abs(r.target_superheat_f - (3 * 63 - 80 - 95) / 2) < 1e-9 && Math.abs(r.target_superheat_f - 7) < 1e-9);
+  assert.ok(r.out_of_range === false && r.low_ambient === false);
+  // A milder outdoor temperature raises the target (10 F higher at 75 F).
+  const mild = _v1255({ indoor_wetbulb_f: 63, outdoor_drybulb_f: 75 });
+  assert.ok(Math.abs(mild.target_superheat_f - 17) < 1e-9 && mild.target_superheat_f > r.target_superheat_f);
+  // Each degree of outdoor temperature drops the target by half a degree.
+  assert.ok(Math.abs(_v1255({ indoor_wetbulb_f: 63, outdoor_drybulb_f: 97 }).target_superheat_f - (r.target_superheat_f - 1)) < 1e-9);
+  // Extreme hot/dry conditions drive the target to zero or below (flagged, not errored).
+  assert.ok(_v1255({ indoor_wetbulb_f: 55, outdoor_drybulb_f: 105 }).out_of_range === true);
+  // A low outdoor ambient is flagged (do not charge by superheat below ~55 F).
+  assert.ok(_v1255({ indoor_wetbulb_f: 63, outdoor_drybulb_f: 50 }).low_ambient === true);
+  // Error seams: non-finite inputs.
+  assert.ok("error" in _v1255({ indoor_wetbulb_f: Infinity, outdoor_drybulb_f: 95 }));
+  assert.ok("error" in _v1255({ indoor_wetbulb_f: 63, outdoor_drybulb_f: NaN }));
+});
 import { computeFlatOvalDuct as _v1254 } from "../../calc-hvac.js";
 test("bounds: spec-v1254 computeFlatOvalDuct pins A, P, De = 1.55 A^0.625/P^0.25, the round degeneration, and error seams", () => {
   // 20 x 10 flat oval: A 178.54, P 51.42, De 14.79.

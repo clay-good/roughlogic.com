@@ -60152,7 +60152,7 @@
     },
     {
       "term": "superheat on a fixed orifice system",
-      "target": "superheat-subcool",
+      "target": "fixed-orifice-target-superheat",
       "kind": "question"
     },
     {
@@ -61572,7 +61572,17 @@
     },
     {
       "term": "target superheat check r410a",
-      "target": "refrigerant-charging",
+      "target": "fixed-orifice-target-superheat",
+      "kind": "question"
+    },
+    {
+      "term": "fixed orifice target superheat",
+      "target": "fixed-orifice-target-superheat",
+      "kind": "industry"
+    },
+    {
+      "term": "what superheat to charge a piston system to",
+      "target": "fixed-orifice-target-superheat",
       "kind": "question"
     },
     {
