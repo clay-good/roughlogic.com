@@ -1245,6 +1245,7 @@ export const RENDERER_MAP = {
   "cutting-speed-rpm": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "thread-single-depth": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "acme-thread-depth": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
+  "stub-acme-thread-depth": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "cutting-diameter-for-rpm": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "drill-point-depth": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "drill-point-angle-from-length": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },

@@ -29820,6 +29820,30 @@ test("bounds: spec-v1006 computeThreadSingleDepth pins the UN external thread de
 });
 
 import { computeAcmeThreadDepth as _v1220 } from "../../calc-machining.js";
+import { computeStubAcmeThreadDepth as _v1238 } from "../../calc-machining.js";
+test("bounds: spec-v1238 computeStubAcmeThreadDepth pins the 0.3P Stub Acme dimensions, the published 1-5 values, and error seams", () => {
+  // 1-5 Stub Acme: pitch 0.200, depth 0.060, pitch dia 0.940, minor 0.880, crest flat 0.0845.
+  const r = _v1238({ major_dia_in: 1.0, tpi: 5 });
+  assert.ok(Math.abs(r.pitch_in - 0.2) < 1e-12);
+  assert.ok(Math.abs(r.thread_depth_in - 0.06) < 1e-12); // 0.3 P
+  assert.ok(Math.abs(r.pitch_dia_in - 0.94) < 1e-12);   // D - 0.3 P
+  assert.ok(Math.abs(r.minor_dia_in - 0.88) < 1e-12);   // D - 0.6 P
+  assert.ok(Math.abs(r.crest_flat_in - (0.1 - 0.06 * Math.tan(14.5 * Math.PI / 180))) < 1e-12);
+  assert.ok(Math.abs(r.crest_flat_in - 0.4224 * 0.2) < 5e-5); // 0.4224 P
+  // Stub is shallower than general-purpose Acme at the same spec (0.3P vs P/2+0.010).
+  const gen = _v1220({ major_dia_in: 1.0, tpi: 5 });
+  assert.ok(r.thread_depth_in < gen.thread_depth_in && r.minor_dia_in > gen.minor_dia_in);
+  // The wider crest flat of the shallower thread (0.4224 P > 0.3707 P).
+  assert.ok(r.crest_flat_in > gen.crest_flat_in);
+  // Depth is exactly 0.3 P across pitches.
+  const coarse = _v1238({ major_dia_in: 1.5, tpi: 4 });
+  assert.ok(Math.abs(coarse.thread_depth_in - 0.3 * 0.25) < 1e-12);
+  // Error seams: non-positive diameter / TPI, too-coarse (minor <= 0), non-finite.
+  assert.ok("error" in _v1238({ major_dia_in: 0, tpi: 5 }));
+  assert.ok("error" in _v1238({ major_dia_in: 1, tpi: 0 }));
+  assert.ok("error" in _v1238({ major_dia_in: 0.1, tpi: 1 }));
+  assert.ok("error" in _v1238({ major_dia_in: Infinity, tpi: 5 }));
+});
 
 test("bounds: spec-v1220 computeAcmeThreadDepth pins the general-purpose Acme dimensions, the published 1-5 values, coarser-is-deeper, and error seams", () => {
   // 1-5 Acme: pitch 0.200, depth 0.110, pitch dia 0.900, minor 0.780, crest flat 0.0741.

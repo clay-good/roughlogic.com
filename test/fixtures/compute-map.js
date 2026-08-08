@@ -94,6 +94,7 @@ export const COMPUTE_MAP = {
   "cutting-speed-rpm": { module: "../../calc-machining.js", fn: "computeCuttingSpeed" },
   "thread-single-depth": { module: "../../calc-machining.js", fn: "computeThreadSingleDepth" },
   "acme-thread-depth": { module: "../../calc-machining.js", fn: "computeAcmeThreadDepth" },
+  "stub-acme-thread-depth": { module: "../../calc-machining.js", fn: "computeStubAcmeThreadDepth" },
   "knurl-blank-diameter": { module: "../../calc-machining.js", fn: "computeKnurlBlankDiameter" },
   "grinding-wheel-rpm": { module: "../../calc-machining.js", fn: "computeGrindingWheelRpm" },
   "reaming-drill-allowance": { module: "../../calc-machining.js", fn: "computeReamingDrillAllowance" },

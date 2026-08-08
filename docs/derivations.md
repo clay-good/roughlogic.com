@@ -2547,6 +2547,7 @@ cross-check.
 | calc-machining.js | `computeSpindleMaxMrr` | `{ available_motor_hp = 0, unit_power_hp = 1.0, efficiency_pct = 80 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeSpindlePowerTorque` | `{ mrr_in3_min = 0, unit_power_hp = 1.0, efficiency_pct = 80, rpm = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeSpurGearGeometry` | `{ diametral_pitch = 0, teeth = 0, mating_teeth = 0 } = {}` | _ | _ | _ |
+| calc-machining.js | `computeStubAcmeThreadDepth` | `{ major_dia_in = 0, tpi = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeTaylorToolLife` | `{ taylor_c = 300, taylor_n = 0.2, cutting_speed_sfm = 200, target_life_min = ...` | _ | _ | _ |
 | calc-machining.js | `computeThreadSingleDepth` | `{ tpi = 13 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeWormGearGeometry` | `{ axial_pitch_in = 0, worm_starts = 0, worm_pitch_dia_in = 0, wheel_teeth = 0...` | _ | _ | _ |
@@ -3272,7 +3273,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1858.
+Row count: 1859.
 
 <!-- END function-corpus-v14 -->
 
@@ -4553,7 +4554,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (103 tiles)
+### Group K Mechanic (104 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4640,6 +4641,7 @@ per spec-v14 §13.1 second paragraph.
 | `spring-wire-stress` | Spring Wire Stress (Wahl), Solid Height, and Buckling | Machinery's Handbook / Shigley (Wahl ...; C = 0.75/0.080 = 9.375; Kw = 36.5/33.5 + 0.0656 = 1.15515... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sprocket-pitch-diameter` | Sprocket Pitch Diameter (ANSI B29.1) | ANSI B29.1 sprocket geometry; spec-v801 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spur-gear-geometry` | Spur Gear Tooth Geometry (Diametral Pitch) | Machinery's Handbook / AGMA; spec-v401 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `stub-acme-thread-depth` | Stub Acme (29-degree) Thread Depth and Dimensions | Stub Acme thread (Machinery's Handboo...; pitch = 1/5 = 0.200; depth = 0.3 x 0.200 = 0.060; pitch d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tailstock-setover` | Tailstock Setover for Taper Turning | Machinery's Handbook (Industrial Press); spec-v805 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tap-drill-size` | Tap Drill Size | First-principles 60-degree thread geo...; 1/4-20 UNC at 75% -> 0.201286 in (#7 drill 0.201 in); nea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `taper-calc` | Taper per Foot and Angle | First-principles taper trigonometry +...; D 1.0, d 0.75, L 3.0 -> TPF 1.0 in/ft, angle/side 2.38594... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5068,6 +5070,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1610. Fixture-covered or reference-cadence: 1610 / 1610.
+Tile count: 1611. Fixture-covered or reference-cadence: 1611 / 1611.
 
 <!-- END tile-index-v14 -->

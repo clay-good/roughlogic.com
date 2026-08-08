@@ -1091,6 +1091,18 @@ export const CITATIONS = {
       { name: "Crest flat and angle", value: "crest flat = 0.3707 P; included angle 29 degrees; general-purpose class only", source: "ASME B1.5" },
     ],
   },
+  "stub-acme-thread-depth": {
+    formula: "pitch = 1/TPI; thread depth h = 0.3 P; pitch dia = D - 0.3 P; external minor = D - 2h = D - 0.6 P; crest flat = P/2 - h tan(14.5 deg) = 0.4224 P; 29-degree included angle.",
+    edition: "Stub Acme (29-degree) thread dimensions (Machinery's Handbook / ASME B1.8), by name.",
+    freeAccess: "The Stub Acme geometry (0.3 P depth, 0.4224 P crest flat, D - 0.3 P pitch diameter) is standard published machining reference (Machinery's Handbook); the major diameter and TPI are the thread's spec.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Stub Acme (29-degree) thread dimensions, the shallower form the general-purpose acme-thread-depth tile names as different. It keeps the 29-degree flank of general Acme but cuts the thread height to h = 0.3 P (against P/2), leaving a stronger root and a shallower engagement where axial space or thread strength matters more than travel. The pitch P = 1/TPI; the basic thread depth h = 0.3 P; the basic pitch diameter = D - 0.3 P; the external minor (root) diameter = D - 2h = D - 0.6 P; and the crest flat = P/2 - h tan(14.5 degrees) = 0.4224 P, wider than the general form's 0.3707 P because the shorter flanks leave more crest. A 1 inch, 5-TPI Stub Acme has a 0.200 inch pitch, a 0.060 inch thread depth, a 0.940 inch pitch diameter, a 0.880 inch minor diameter, and a 0.0845 inch crest flat. The stub form suits hardened or heavily loaded lead screws, valve stems, and thin-wall parts where a full-depth Acme would over-weaken the root. Cut with a 29-degree tool ground to the crest-flat width, and verify the pitch diameter over wires. ASME B1.8 and the thread gauge govern the finished fit.",
+    assumptions: [
+      { name: "Stub Acme depth", value: "external thread depth h = 0.3 P (vs P/2 for general Acme)", source: "Machinery's Handbook / ASME B1.8" },
+      { name: "Diameters", value: "pitch dia = D - 0.3 P; external minor = D - 0.6 P", source: "Stub Acme thread geometry" },
+      { name: "Crest flat and angle", value: "crest flat = P/2 - 0.3P tan(14.5 deg) = 0.4224 P; included angle 29 degrees", source: "ASME B1.8" },
+    ],
+  },
   "cutting-speed-rpm": {
     formula: "RPM = 12 * SFM / (pi * dia(in)); feed IPM = RPM * flutes * chip_load(in/tooth); 12/pi = 3.8197.",
     edition: "First-principles cutting geometry; the speeds-and-feeds method as in Machinery's Handbook (Industrial Press), by name.",

@@ -1002,7 +1002,7 @@ const TOOL_MODULES = (() => {
   // precedent).
   declare("./calc-machining.js", "MACHINING_RENDERERS", [
     // v31, v34
-    "cutting-speed-rpm", "thread-single-depth", "acme-thread-depth", "cutting-diameter-for-rpm", "drill-point-depth", "drill-point-angle-from-length",
+    "cutting-speed-rpm", "thread-single-depth", "acme-thread-depth", "stub-acme-thread-depth", "cutting-diameter-for-rpm", "drill-point-depth", "drill-point-angle-from-length",
     // spec-v910 knurling blank diameter for clean tracking
     "knurl-blank-diameter",
     // spec-v911 grinding wheel surface speed and max safe RPM
