@@ -1190,6 +1190,7 @@ export const RENDERER_MAP = {
   "def-consumption": { module: "../../calc-trucking.js", exportName: "TRUCKING_RENDERERS" },
   "static-rollover-threshold": { module: "../../calc-trucking.js", exportName: "TRUCKING_RENDERERS" },
   "truck-startability": { module: "../../calc-trucking.js", exportName: "TRUCKING_RENDERERS" },
+  "hydroplaning-speed": { module: "../../calc-trucking.js", exportName: "TRUCKING_RENDERERS" },
   "prop-slip": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "displacement-cr": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "dynamic-compression-ratio": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },

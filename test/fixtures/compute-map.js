@@ -116,6 +116,7 @@ export const COMPUTE_MAP = {
   "axle-load-distribution": { module: "../../calc-trucking.js", fn: "computeAxleLoadDistribution" },
   "static-rollover-threshold": { module: "../../calc-trucking.js", fn: "computeStaticRolloverThreshold" },
   "truck-startability": { module: "../../calc-trucking.js", fn: "computeTruckStartability" },
+  "hydroplaning-speed": { module: "../../calc-trucking.js", fn: "computeHydroplaningSpeed" },
   "detention-demurrage-billing": { module: "../../calc-trucking.js", fn: "computeDetentionDemurrageBilling" },
   "driver-pay-cpm-vs-percentage": { module: "../../calc-trucking.js", fn: "computeDriverPayCpmVsPercentage" },
   "invoice-factoring-cost": { module: "../../calc-trucking.js", fn: "computeInvoiceFactoringCost" },

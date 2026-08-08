@@ -4401,6 +4401,26 @@
       "kind": "industry"
     },
     {
+      "term": "hydroplaning speed",
+      "target": "hydroplaning-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "aquaplaning speed",
+      "target": "hydroplaning-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "speed tires hydroplane on wet road",
+      "target": "hydroplaning-speed",
+      "kind": "question"
+    },
+    {
+      "term": "tire pressure hydroplaning",
+      "target": "hydroplaning-speed",
+      "kind": "question"
+    },
+    {
       "term": "truck startability",
       "target": "truck-startability",
       "kind": "industry"

@@ -28859,6 +28859,23 @@ test("bounds: spec-v938 computeWireRopeClips pins the OSHA Table H-2 count, spac
 
 import { computeStaticRolloverThreshold as _v913 } from "../../calc-trucking.js";
 import { computeTruckStartability as _v1253 } from "../../calc-trucking.js";
+import { computeHydroplaningSpeed as _v1266 } from "../../calc-trucking.js";
+test("bounds: spec-v1266 computeHydroplaningSpeed pins the NASA 9 sqrt(P) spin-down, 7.7 sqrt(P) spin-up, knots->mph, and error seams", () => {
+  // 100 psi: spin-down 9*sqrt(100)=90 kn = 103.57 mph; spin-up 7.7*sqrt(100)=77 kn.
+  const r = _v1266({ tire_pressure_psi: 100 });
+  assert.ok(Math.abs(r.hydroplaning_speed_knots - 90) < 1e-9);
+  assert.ok(Math.abs(r.hydroplaning_speed_mph - 90 * 1.1507794) < 1e-6 && Math.abs(r.hydroplaning_speed_mph - 103.57) < 0.05);
+  assert.ok(Math.abs(r.spinup_onset_knots - 77) < 1e-9 && r.spinup_onset_knots < r.hydroplaning_speed_knots);
+  // Scales as sqrt(P): quadrupling the pressure doubles the speed.
+  const q = _v1266({ tire_pressure_psi: 400 });
+  assert.ok(Math.abs(q.hydroplaning_speed_knots - 2 * r.hydroplaning_speed_knots) < 1e-9);
+  // Car tire 32 psi -> 58.6 mph.
+  assert.ok(Math.abs(_v1266({ tire_pressure_psi: 32 }).hydroplaning_speed_mph - 58.59) < 0.05);
+  // Error seams: non-positive pressure, non-finite.
+  assert.ok("error" in _v1266({ tire_pressure_psi: 0 }));
+  assert.ok("error" in _v1266({ tire_pressure_psi: -10 }));
+  assert.ok("error" in _v1266({ tire_pressure_psi: Infinity }));
+});
 test("bounds: spec-v1253 computeTruckStartability pins max grade = 100(mu k - f), tractive effort, the friction scaling, and error seams", () => {
   // 80,000 lb, 34,000 on drives, dry (0.6): 24.3% grade, 20,400 lb TE.
   const r = _v1253({ gross_weight_lb: 80000, drive_axle_weight_lb: 34000, friction_coeff: 0.6, rolling_resistance_coeff: 0.012 });

@@ -41793,6 +41793,52 @@
    }
   },
   {
+   "tile_id": "hydroplaning-speed",
+   "source_publisher": "NASA TN D-2056 (Horne & Dreher) / FAA AC 91-6A",
+   "source_title": "100 psi tire -> 90 kn spin-down = 103.6 mph; 88.6 mph spin-up onset (spec-v1266)",
+   "source_edition_or_year": "Vp = 9 sqrt(P) knots (spin-down); 7.7 sqrt(P) knots (spin-up)",
+   "source_section_or_page": "9 x sqrt(100) = 90 kn x 1.1507794 = 103.57 mph; spin-up 7.7 x sqrt(100) = 77 kn x 1.1507794 = 88.61 mph.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "tire_pressure_psi": 100
+   },
+   "outputs": {
+    "hydroplaning_speed_knots": {
+     "value": 90.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "hydroplaning_speed_mph": {
+     "value": 103.57,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydroplaning-speed",
+   "source_publisher": "hydroplaning speed (passenger-car tire pressure)",
+   "source_title": "32 psi tire -> 50.9 kn spin-down = 58.6 mph",
+   "source_edition_or_year": "Vp = 9 sqrt(P) knots",
+   "source_section_or_page": "9 x sqrt(32) = 50.91 kn x 1.1507794 = 58.59 mph -- a common highway hydroplaning speed for a properly inflated car tire.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "tire_pressure_psi": 32
+   },
+   "outputs": {
+    "hydroplaning_speed_mph": {
+     "value": 58.59,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "truck-startability",
    "source_publisher": "Traction-limited gradeability (first-principles statics)",
    "source_title": "80,000 lb combo, 34,000 lb on drives, dry (mu 0.6) -> 24.3% max startable grade (spec-v1253)",

@@ -1877,3 +1877,45 @@ TRUCKING_RENDERERS["truck-startability"] = _simpleRenderer({
   ],
   compute: computeTruckStartability,
 });
+
+// =====================================================================
+// spec-v1266 J: dynamic hydroplaning speed (hydroplaning-speed)
+// =====================================================================
+// The speed at which a tire rides up on a water film and loses road contact. NASA TN D-2056
+// (Horne & Dreher) / FAA AC 91-6A: dynamic hydroplaning speed depends only on tire inflation
+// pressure -- spin-down (a rolling wheel that loses traction) Vp = 9 sqrt(P) knots = 10.35 sqrt(P) mph;
+// spin-up (a stationary/locked wheel starting to roll through standing water) onset Vp = 7.7 sqrt(P) knots,
+// the more conservative figure. P in psi. First-principles-scaled public-domain constant (no table).
+// dims: in { tire_pressure_psi: M L^-1 T^-2 } out: { hydroplaning_speed_mph: L T^-1, hydroplaning_speed_knots: L T^-1, spinup_onset_mph: L T^-1, spinup_onset_knots: L T^-1 }
+export function computeHydroplaningSpeed({ tire_pressure_psi = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const P = Number(tire_pressure_psi);
+  if (!(P > 0)) return { error: "Tire inflation pressure must be positive (psi)." };
+  const KNOTS_TO_MPH = 1.1507794;
+  const hydroplaning_speed_knots = 9 * Math.sqrt(P);
+  const hydroplaning_speed_mph = hydroplaning_speed_knots * KNOTS_TO_MPH;
+  const spinup_onset_knots = 7.7 * Math.sqrt(P);
+  const spinup_onset_mph = spinup_onset_knots * KNOTS_TO_MPH;
+  if (![hydroplaning_speed_mph, hydroplaning_speed_knots, spinup_onset_mph, spinup_onset_knots].every(Number.isFinite)) {
+    return { error: "Hydroplaning-speed math is not a finite value." };
+  }
+  return {
+    hydroplaning_speed_mph, hydroplaning_speed_knots, spinup_onset_mph, spinup_onset_knots,
+    note: "Dynamic hydroplaning speed from the NASA/FAA relation that depends only on tire inflation pressure: a rolling wheel loses contact at about Vp = 10.35 sqrt(P) mph (9 sqrt(P) knots), the spin-down value usually quoted as the hydroplaning speed; a stationary or locked wheel begins to hydroplane earlier, near 7.7 sqrt(P) knots, so hard braking into standing water is the worse case. A truck tire at 100 psi hydroplanes near 104 mph, a car tire at 32 psi near 59 mph, an underinflated 24 psi tire near 51 mph -- which is why low pressure is dangerous in rain. This is a screening figure: it assumes standing water at least about 0.1 in deep and smooth or worn tread; deeper water, bald tires, or a smooth pavement lower it, while good tread channels water and raises it. Slow well below this and keep tread and pressure up. A safety screen; road conditions and the driver govern.",
+  };
+}
+export const hydroplaningSpeedExample = { inputs: { tire_pressure_psi: 100 } };
+
+TRUCKING_RENDERERS["hydroplaning-speed"] = _simpleRenderer({
+  citation: "Citation: dynamic hydroplaning speed per NASA TN D-2056 (Horne & Dreher) and FAA AC 91-6A, by name: spin-down Vp = 9 sqrt(P) knots (10.35 sqrt(P) mph), spin-up onset 7.7 sqrt(P) knots, P = tire inflation pressure (psi). Assumes standing water ~0.1 in and smooth/worn tread. Public domain. Road conditions and the driver govern.",
+  example: hydroplaningSpeedExample.inputs,
+  fields: [
+    { key: "tire_pressure_psi", label: "Tire inflation pressure (psi)", kind: "number", default: 100 },
+  ],
+  outputs: [
+    { key: "s", id: "hyd-out-s", label: "Hydroplaning speed (spin-down)", value: (r) => fmt(r.hydroplaning_speed_mph, 0) + " mph (" + fmt(r.hydroplaning_speed_knots, 0) + " kn)" },
+    { key: "o", id: "hyd-out-o", label: "Spin-up onset (locked wheel)", value: (r) => fmt(r.spinup_onset_mph, 0) + " mph (" + fmt(r.spinup_onset_knots, 0) + " kn)" },
+    { key: "n", id: "hyd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHydroplaningSpeed,
+});

@@ -12642,6 +12642,18 @@ export const CITATIONS = {
       { name: "Small-angle field form", value: "grade ~ sin theta; wheel slip and weight transfer shift the real number; a starting limit, not a sustained-climb limit", source: "scope of this tile" },
     ],
   },
+  "hydroplaning-speed": {
+    formula: "spin-down (rolling wheel) Vp = 9 sqrt(P) knots = 10.35 sqrt(P) mph; spin-up (locked wheel) onset Vp = 7.7 sqrt(P) knots; P = tire inflation pressure (psi). 1 knot = 1.1507794 mph.",
+    edition: "Dynamic hydroplaning speed per NASA Technical Note D-2056 (Horne & Dreher, 1963) and FAA Advisory Circular AC 91-6A, by name; both public.",
+    freeAccess: "NASA TN D-2056 and FAA AC 91-6A are public-domain U.S. Government documents; the relation depends only on the user's tire pressure.",
+    governance: GOVERNANCE.general,
+    editionNote: "The speed at which a tire rides up on a water film and loses contact with the road. The NASA/FAA relation depends only on tire inflation pressure: a rolling wheel loses traction near Vp = 10.35 sqrt(P) mph (9 sqrt(P) knots), the spin-down value usually quoted as the hydroplaning speed, while a stationary or locked wheel begins to hydroplane earlier near 7.7 sqrt(P) knots, so hard braking into standing water is the worse case. A truck tire at 100 psi hydroplanes near 104 mph, a car tire at 32 psi near 59 mph, and an underinflated 24 psi tire near 51 mph, which is why low pressure is dangerous in rain. This is a screening figure assuming standing water at least about 0.1 in deep and smooth or worn tread; deeper water, bald tires, or smooth pavement lower it, while good tread channels water and raises it. A safety screen; road conditions and the driver govern.",
+    assumptions: [
+      { name: "Spin-down speed", value: "Vp = 9 sqrt(P) knots = 10.35 sqrt(P) mph (rolling wheel), P in psi", source: "NASA TN D-2056 / FAA AC 91-6A" },
+      { name: "Spin-up onset", value: "Vp = 7.7 sqrt(P) knots (locked/stationary wheel), the more conservative onset", source: "NASA TN D-2056" },
+      { name: "Scope", value: "assumes ~0.1 in standing water and smooth/worn tread; a screening figure, not a tread-and-water-depth model", source: "scope of this tile" },
+    ],
+  },
   "abyc-dc-wire": {
     formula: "V_drop = drop_pct/100 x system_voltage; CM = 10.75 x current x (2 x length) / V_drop; AWG = smallest standard size with circular-mil area >= CM.",
     edition: "The ABYC E-11 (AC & DC Electrical Systems on Boats) DC conductor sizing by voltage drop, on the round-trip length, by name; the standard, the wire's temperature rating, and the installation govern.",
