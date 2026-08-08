@@ -3114,7 +3114,7 @@ function _renderFixedOrificeTargetSuperheat(inputRegion, outputRegion, citationE
     oT.textContent = _v27hFmt(r.target_superheat_f, 1) + " F" + (r.out_of_range ? " (at/below zero -- do not charge by superheat)" : r.low_ambient ? " (outdoor < 55 F -- do not charge by superheat)" : "");
     oNote.textContent = r.note;
   }, _V27H_DEB);
-  for (const f of [idwb.input, odt.input]) f.input.addEventListener("input", update);
+  for (const f of [idwb, odt]) f.input.addEventListener("input", update);
 }
 HVAC_RENDERERS["fixed-orifice-target-superheat"] = _renderFixedOrificeTargetSuperheat;
 
