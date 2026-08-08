@@ -1503,6 +1503,7 @@ export const RENDERER_MAP = {
   "mass-moles": { module: "../../calc-lab.js", exportName: "LAB_RENDERERS" },
   "ideal-gas-law": { module: "../../calc-lab.js", exportName: "LAB_RENDERERS" },
   "arrhenius-equation": { module: "../../calc-lab.js", exportName: "LAB_RENDERERS" },
+  "nernst-equation": { module: "../../calc-lab.js", exportName: "LAB_RENDERERS" },
   "rcf-rpm": { module: "../../calc-lab.js", exportName: "LAB_RENDERERS" },
   "resuspension-volume": { module: "../../calc-lab.js", exportName: "LAB_RENDERERS" },
   "pcr-master-mix": { module: "../../calc-lab.js", exportName: "LAB_RENDERERS" },

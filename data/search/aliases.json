@@ -84737,6 +84737,26 @@
       "kind": "industry"
     },
     {
+      "term": "nernst equation",
+      "target": "nernst-equation",
+      "kind": "industry"
+    },
+    {
+      "term": "cell potential from concentration",
+      "target": "nernst-equation",
+      "kind": "question"
+    },
+    {
+      "term": "electrode potential nernst",
+      "target": "nernst-equation",
+      "kind": "industry"
+    },
+    {
+      "term": "59 mv per ph slope",
+      "target": "nernst-equation",
+      "kind": "question"
+    },
+    {
       "term": "moles to grams from molecular weight",
       "target": "mass-moles",
       "kind": "question"

@@ -336,7 +336,7 @@ const _TILES = [
 
 
   ["molarity-dilution", "T"], ["serial-dilution", "T"], ["molecular-weight", "T"],
-  ["mass-moles", "T"], ["ideal-gas-law", "T"], ["arrhenius-equation", "T"], ["rcf-rpm", "T"], ["resuspension-volume", "T"],
+  ["mass-moles", "T"], ["ideal-gas-law", "T"], ["arrhenius-equation", "T"], ["nernst-equation", "T"], ["rcf-rpm", "T"], ["resuspension-volume", "T"],
   ["pcr-master-mix", "T"], ["beer-lambert", "T"], ["henderson-hasselbalch", "T"],
   ["hemocytometer", "T"], ["od600-cell-count", "T"],
 

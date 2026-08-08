@@ -1400,6 +1400,58 @@
    }
   },
   {
+   "tile_id": "nernst-equation",
+   "source_publisher": "Nernst equation (physical chemistry, 1889)",
+   "source_title": "Daniell cell E0 1.10 V, n 2, Q 0.01, 25 C -> E 1.1592 V, slope 29.58 mV/decade (spec-v1230)",
+   "source_edition_or_year": "E = E0 - (RT/nF) ln Q, R = 8.314, F = 96485",
+   "source_section_or_page": "E = 1.10 - (8.314 x 298.15 / (2 x 96485)) x ln(0.01) = 1.10 - 0.012848 x (-4.60517) = 1.10 + 0.05917 = 1.1592 V; slope = 8.314 x 298.15 x ln(10) / (2 x 96485) = 0.02958 V = 29.58 mV/decade.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "standard_potential_v": 1.10,
+    "electrons_n": 2,
+    "reaction_quotient": 0.01,
+    "temperature_c": 25
+   },
+   "outputs": {
+    "cell_potential_v": {
+     "value": 1.1592,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "nernst_slope_v": {
+     "value": 0.02958,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nernst-equation",
+   "source_publisher": "Nernst (standard-state cross-check)",
+   "source_title": "cross-check: at Q = 1 the potential equals E0",
+   "source_edition_or_year": "E = E0 - (RT/nF) ln(1) = E0",
+   "source_section_or_page": "ln(1) = 0, so E = E0 = 1.10 V exactly regardless of n or temperature.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "standard_potential_v": 1.10,
+    "electrons_n": 2,
+    "reaction_quotient": 1,
+    "temperature_c": 25
+   },
+   "outputs": {
+    "cell_potential_v": {
+     "value": 1.10,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rcf-rpm",
    "source_publisher": "Project (first-principles)",
    "source_title": "RCF = 1.118e-5 * r_cm * RPM^2",

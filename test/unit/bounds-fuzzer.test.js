@@ -3827,6 +3827,7 @@ import {
   computeMassMoles,
   computeIdealGasLaw,
   computeArrheniusEquation,
+  computeNernstEquation,
   computeRcf,
   computeResuspension,
   computePcrMix,
@@ -3969,6 +3970,27 @@ test("bounds: spec-v1229 computeArrheniusEquation pins Ea from two points, A, Q1
   assert.ok("error" in computeArrheniusEquation({ k1: 0, temp1_c: 25, k2: 2, temp2_c: 35 }));
   assert.ok("error" in computeArrheniusEquation({ k1: 1, temp1_c: 25, k2: 2, temp2_c: 25 }));
   assert.ok("error" in computeArrheniusEquation({ k1: 1, temp1_c: 25, k2: Infinity, temp2_c: 35 }));
+});
+
+test("bounds: spec-v1230 computeNernstEquation pins cell potential, slope, and error seams", () => {
+  const R = 8.314, F = 96485;
+  // Daniell cell E0 1.10 V, n 2, Q 0.01, 25 C: E 1.1592 V, slope 29.58 mV/decade.
+  const r = computeNernstEquation({ standard_potential_v: 1.10, electrons_n: 2, reaction_quotient: 0.01, temperature_c: 25 });
+  assert.ok(Math.abs(r.cell_potential_v - (1.10 - (R * 298.15 / (2 * F)) * Math.log(0.01))) < 1e-9);
+  assert.ok(Math.abs(r.cell_potential_v - 1.1592) < 0.001);
+  assert.ok(Math.abs(r.nernst_slope_v - R * 298.15 * Math.log(10) / (2 * F)) < 1e-12);
+  assert.ok(Math.abs(r.nernst_slope_v - 0.02958) < 0.0001);
+  // At Q = 1 the potential equals E0 exactly (ln 1 = 0).
+  assert.ok(Math.abs(computeNernstEquation({ standard_potential_v: 1.10, electrons_n: 2, reaction_quotient: 1 }).cell_potential_v - 1.10) < 1e-12);
+  // A one-electron electrode at 25 C has the 59 mV/decade slope (59 mV/pH).
+  assert.ok(Math.abs(computeNernstEquation({ standard_potential_v: 0, electrons_n: 1, reaction_quotient: 10 }).nernst_slope_v - 0.05916) < 0.0001);
+  // Q > 1 lowers the potential below E0; Q < 1 raises it.
+  assert.ok(computeNernstEquation({ standard_potential_v: 1.10, electrons_n: 2, reaction_quotient: 100 }).cell_potential_v < 1.10);
+  // Error seams: non-positive n, non-positive Q, non-finite, absolute zero.
+  assert.ok("error" in computeNernstEquation({ standard_potential_v: 1, electrons_n: 0, reaction_quotient: 1 }));
+  assert.ok("error" in computeNernstEquation({ standard_potential_v: 1, electrons_n: 2, reaction_quotient: 0 }));
+  assert.ok("error" in computeNernstEquation({ standard_potential_v: 1, electrons_n: 2, reaction_quotient: Infinity }));
+  assert.ok("error" in computeNernstEquation({ standard_potential_v: 1, electrons_n: 2, reaction_quotient: 1, temperature_c: -273.15 }));
 });
 
 test("bounds: calc-lab computeMassMoles rejects non-positive MW or under-/over-specified inputs (documented)", () => {

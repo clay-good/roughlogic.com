@@ -7164,6 +7164,18 @@ export const CITATIONS = {
       { name: "Scope", value: "single mechanism over the interval (a curved Arrhenius plot signals a mechanism change)", source: "scope of this tile" },
     ],
   },
+  "nernst-equation": {
+    formula: "E = E0 - (RT/nF) ln Q; R = 8.314 J/(mol*K), F = 96485 C/mol, T in kelvin. At 25 C the slope is 0.05916/n V per decade of Q. Nernst slope = RT ln(10)/(nF).",
+    edition: "The Nernst equation (Nernst, 1889); standard electrochemistry. First principles.",
+    freeAccess: "The Nernst equation and the constants R and F are public first-principles chemistry; the standard potential, electron count, and reaction quotient are the user's own inputs.",
+    governance: GOVERNANCE.lab,
+    editionNote: "The cell or electrode potential away from standard conditions. The Nernst equation corrects the standard potential E0 for the actual mix of reactants and products: E = E0 - (RT/nF) ln Q, where n is the electrons transferred, F = 96485 C/mol is the Faraday constant, and Q is the reaction quotient (the ratio of product to reactant activities, approximated by concentrations). At 25 C the group RT/F ln(10) is 0.05916 V, so each tenfold change in Q shifts the potential by 0.05916/n V; a one-electron pH electrode gives the familiar 59 mV per pH unit. When Q = 1 the potential equals E0. This uses concentrations for activities and ignores liquid-junction potential and kinetic overpotential; for accurate work at high ionic strength use activities. A first-principles chemistry aid; the measured electrochemistry governs.",
+    assumptions: [
+      { name: "Nernst equation", value: "E = E0 - (RT/nF) ln Q; R = 8.314, F = 96485, T in kelvin", source: "Nernst (1889)" },
+      { name: "25 C slope", value: "0.05916/n V per decade of Q (59 mV/pH for n = 1)", source: "RT ln(10)/F at 298.15 K" },
+      { name: "Scope", value: "activities approximated by concentrations; excludes junction potential and overpotential", source: "scope of this tile" },
+    ],
+  },
   "rcf-rpm": {
     formula: "RCF (g) = 1.118e-5 * r(cm) * RPM^2. Both directions: RPM = sqrt(RCF / (1.118e-5 * r_cm)).",
     edition: "Standard centrifuge formula. First principles. Manufacturer rotor radii bundled in CENTRIFUGE_ROTORS (data/lab/centrifuge-rotors.json) with per-entry attribution.",

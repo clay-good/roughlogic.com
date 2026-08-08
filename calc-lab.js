@@ -341,6 +341,35 @@ export function computeArrheniusEquation({ k1 = 0, temp1_c = 0, k2 = 0, temp2_c 
 }
 export const arrheniusEquationExample = { inputs: { k1: 1.0, temp1_c: 25, k2: 2.0, temp2_c: 35 } };
 
+// --- spec-v1230: Nernst equation (cell / electrode potential) ---
+// The lab chemistry set has no electrochemistry member. This adds the Nernst equation
+// E = E0 - (RT/nF) ln Q, R = 8.314 J/(mol*K), F = 96485 C/mol; at 25 C the slope RT ln(10)/(nF) is
+// 0.05916/n V per decade of Q. Practical for battery, corrosion, and ion/pH-electrode work.
+// dims: in { standard_potential_v: dimensionless, electrons_n: dimensionless, reaction_quotient: dimensionless, temperature_c: T } out: { cell_potential_v: dimensionless, nernst_slope_v: dimensionless }
+export function computeNernstEquation({ standard_potential_v = 0, electrons_n = 1, reaction_quotient = 1, temperature_c = 25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R = 8.314; // J/(mol*K)
+  const F = 96485; // C/mol
+  const E0 = Number(standard_potential_v);
+  const n = Number(electrons_n) || 0;
+  const Q = Number(reaction_quotient) || 0;
+  const Tc = Number(temperature_c);
+  if (!Number.isFinite(E0)) return { error: "Standard potential E0 must be a number (V)." };
+  if (!(n > 0)) return { error: "The number of electrons transferred n must be positive." };
+  if (!(Q > 0)) return { error: "The reaction quotient Q must be positive (a ratio of activities/concentrations)." };
+  if (!Number.isFinite(Tc)) return { error: "Temperature must be a number (C)." };
+  const T = Tc + 273.15;
+  if (!(T > 0)) return { error: "Temperature must be above absolute zero (-273.15 C)." };
+  const cell_potential_v = E0 - (R * T / (n * F)) * Math.log(Q);
+  const nernst_slope_v = (R * T * Math.log(10)) / (n * F);
+  if (![cell_potential_v, nernst_slope_v].every(Number.isFinite)) return { error: "Nernst math is not a finite value." };
+  return {
+    cell_potential_v, nernst_slope_v,
+    note: "The Nernst equation, the electrochemistry member the lab chemistry set leaves out: the actual cell (or electrode) potential at non-standard conditions, E = E0 - (RT/nF) ln Q, where E0 is the standard potential, n the electrons transferred, Q the reaction quotient (the products-over-reactants activity ratio), R = 8.314 J/(mol*K), and F = 96485 C/mol (the Faraday constant). At 25 C the term RT ln(10)/(nF) collapses to the familiar 0.05916/n volts per DECADE of Q, so a Zn-Cu (Daniell) cell with E0 = 1.10 V and n = 2 rises to 1.16 V when the products are diluted 100-fold (Q = 0.01) and falls to 1.04 V when they are concentrated 100-fold (Q = 100). Set Q = 1 (standard conditions) and E = E0. The same relation is the basis of the pH electrode (a 59 mV-per-pH-unit slope at 25 C for n = 1) and of corrosion and battery-state-of-charge estimates. Uses activities approximated by concentrations (dilute-solution assumption); it does not include the junction potential, activity coefficients at high ionic strength, or kinetic overpotential. A first-principles electrochemistry aid; the measured cell and reference electrode govern.",
+  };
+}
+export const nernstEquationExample = { inputs: { standard_potential_v: 1.10, electrons_n: 2, reaction_quotient: 0.01, temperature_c: 25 } };
+
 // --- 259: Centrifuge RPM <-> RCF ---
 //
 // RCF (g) = 1.118e-5 * r_cm * RPM^2  (r in cm, RPM in revolutions / minute)
@@ -685,6 +714,29 @@ function renderArrheniusEquation(inputRegion, outputRegion, citationEl) {
   for (const f of [k1, t1, k2, t2]) f.input.addEventListener("input", update);
 }
 
+function renderNernstEquation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Nernst equation E = E0 - (RT/nF) ln Q, R = 8.314 J/(mol*K), F = 96485 C/mol; at 25 C the slope is 0.05916/n V per decade of Q (Nernst; standard electrochemistry). Uses activities approximated by concentrations; excludes junction potential and overpotential. First principles.";
+  inputRegion.appendChild(makeNotice(LAB_NOTICE));
+  const e0 = makeNumber("Standard potential E0 (V)", "ns-e0", { step: "any", value: "1.10" }); e0.input.value = "1.10";
+  const n = makeNumber("Electrons transferred n", "ns-n", { step: "any", min: "0", value: "2" }); n.input.value = "2";
+  const q = makeNumber("Reaction quotient Q", "ns-q", { step: "any", min: "0", value: "0.01" }); q.input.value = "0.01";
+  const t = makeNumber("Temperature (C)", "ns-t", { step: "any", value: "25" }); t.input.value = "25";
+  for (const f of [e0, n, q, t]) inputRegion.appendChild(f.wrap);
+  const oE = makeOutputLine(outputRegion, "Cell / electrode potential E", "ns-out-e");
+  const oS = makeOutputLine(outputRegion, "Nernst slope (per decade of Q)", "ns-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "ns-out-note");
+  const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
+  const update = debounce(() => {
+    const r = computeNernstEquation({ standard_potential_v: e0.input.value === "" ? 0 : Number(e0.input.value), electrons_n: rd(n.input), reaction_quotient: rd(q.input), temperature_c: t.input.value === "" ? 25 : Number(t.input.value) });
+    if (r.error) { oE.textContent = r.error; oS.textContent = "-"; oNote.textContent = ""; return; }
+    oE.textContent = fmt(r.cell_potential_v, 4) + " V";
+    oS.textContent = fmt(r.nernst_slope_v * 1000, 2) + " mV/decade";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { e0.input.value = "1.10"; n.input.value = "2"; q.input.value = "0.01"; t.input.value = "25"; update(); });
+  for (const f of [e0, n, q, t]) f.input.addEventListener("input", update);
+}
+
 function renderRcf(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: RCF (g) = 1.118e-5 * r(cm) * RPM^2. First principles.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
@@ -849,6 +901,7 @@ export const LAB_RENDERERS = {
   "mass-moles": renderMassMoles,
   "ideal-gas-law": renderIdealGasLaw,
   "arrhenius-equation": renderArrheniusEquation,
+  "nernst-equation": renderNernstEquation,
   "rcf-rpm": renderRcf,
   "resuspension-volume": renderResuspend,
   "pcr-master-mix": renderPcrMix,

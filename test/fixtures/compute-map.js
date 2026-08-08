@@ -204,6 +204,7 @@ export const COMPUTE_MAP = {
   "mass-moles": { module: "../../calc-lab.js", fn: "computeMassMoles" },
   "ideal-gas-law": { module: "../../calc-lab.js", fn: "computeIdealGasLaw" },
   "arrhenius-equation": { module: "../../calc-lab.js", fn: "computeArrheniusEquation" },
+  "nernst-equation": { module: "../../calc-lab.js", fn: "computeNernstEquation" },
   "rcf-rpm": { module: "../../calc-lab.js", fn: "computeRcf" },
   "slope-from-level": { module: "../../calc-cross.js", fn: "computeSlopeFromLevel" },
   "pounds-formula": { module: "../../calc-water.js", fn: "computePoundsFormula" },
