@@ -38207,6 +38207,70 @@
    }
   },
   {
+   "tile_id": "dp-flow-signal-scaling",
+   "source_publisher": "DP flow transmitter square-root extraction (ISA / instrumentation practice)",
+   "source_title": "12 mA on a 0-500 gpm DP flow loop -> 70.7% flow, 353.6 gpm (not the linear 50%) (spec-v1226)",
+   "source_edition_or_year": "flow% = sqrt((mA-4)/16)",
+   "source_section_or_page": "fraction = (12-4)/16 = 0.5; flow% = sqrt(0.5) = 70.71%; value = 0 + 0.7071*(500-0) = 353.55 gpm, vs the linear 250 gpm the loop-signal-scaling tile would give.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "signal_ma": 12,
+    "flow_low": 0,
+    "flow_high": 500,
+    "low_flow_cutoff_pct": 0
+   },
+   "outputs": {
+    "flow_percent": {
+     "value": 70.71,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "flow_value": {
+     "value": 353.55,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "linear_percent": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dp-flow-signal-scaling",
+   "source_publisher": "DP flow square-root extraction (quarter-signal cross-check)",
+   "source_title": "cross-check: 8 mA (25% of signal) is 50% of flow -> 250 gpm",
+   "source_edition_or_year": "flow% = sqrt((mA-4)/16)",
+   "source_section_or_page": "fraction = (8-4)/16 = 0.25; flow% = sqrt(0.25) = 50%; value = 0.5*500 = 250 gpm -- a quarter of the signal is half the flow, the signature of a DP flow loop.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "signal_ma": 8,
+    "flow_low": 0,
+    "flow_high": 500,
+    "low_flow_cutoff_pct": 0
+   },
+   "outputs": {
+    "flow_percent": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "flow_value": {
+     "value": 250,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "loop-signal-scaling",
    "source_publisher": "4-20 mA current-loop live-zero scaling (ANSI/ISA-50.00.01)",
    "source_title": "12 mA on a 0-100 psi range -> 50% of span, 50 psi",

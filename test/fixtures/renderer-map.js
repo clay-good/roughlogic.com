@@ -169,6 +169,7 @@ export const RENDERER_MAP = {
   "access-control-power-supply": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "fire-alarm-nac-voltage-drop": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "loop-signal-scaling": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
+  "dp-flow-signal-scaling": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "rtd-resistance-to-temp": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "pulse-flowmeter-k-factor": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "loop-voltage-budget": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },

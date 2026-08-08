@@ -1098,6 +1098,71 @@ function _v946renderLoopSignalScaling(inputRegion, outputRegion, citationEl) {
 }
 LOWVOLTAGE_RENDERERS["loop-signal-scaling"] = _v946renderLoopSignalScaling;
 
+// ===================== spec-v1226: DP (square-root-extracted) flow transmitter scaling =====================
+// The loop-signal-scaling tile is LINEAR and its own note says "a square-root-extracted flow transmitter
+// (differential-pressure flow) needs the sqrt of the fraction." This adds it: an orifice/venturi DP flow
+// transmitter outputs DP linearly on 4-20 mA, but flow ~ sqrt(DP), so flow% = sqrt((mA-4)/16), with a
+// low-flow cutoff to kill the noisy sqrt near zero. Loop linearization only (the primary element's Cd is
+// already in the transmitter's calibration).
+// dims: in { signal_ma: I, flow_low: dimensionless, flow_high: dimensionless, low_flow_cutoff_pct: dimensionless } out: { flow_percent: dimensionless, flow_value: dimensionless, linear_percent: dimensionless }
+export function computeDpFlowSignalScaling({ signal_ma = 12, flow_low = 0, flow_high = 100, low_flow_cutoff_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const I = Number(signal_ma);
+  const qLo = Number(flow_low) || 0;
+  const qHi = Number(flow_high) || 0;
+  const cutoff = Number(low_flow_cutoff_pct) || 0;
+  if (!Number.isFinite(I)) return { error: "Loop signal must be a number (mA)." };
+  if (qHi === qLo) return { error: "Flow at 20 mA and at 4 mA must differ (the span cannot be zero)." };
+  if (!(cutoff >= 0 && cutoff < 100)) return { error: "Low-flow cutoff must be between 0 and 100% (exclusive of 100)." };
+  const fraction = (I - 4) / 16; // linear DP fraction of span
+  const linear_percent = fraction * 100;
+  let flow_percent = fraction > 0 ? Math.sqrt(fraction) * 100 : 0;
+  const below_cutoff = flow_percent > 0 && flow_percent < cutoff;
+  if (below_cutoff) flow_percent = 0;
+  const flow_value = qLo + (flow_percent / 100) * (qHi - qLo);
+  let status;
+  if (I <= 3.6) status = "fault-low (<=3.6 mA: sensor/loop fault, NAMUR NE43)";
+  else if (I < 4) status = "underrange (below 4 mA live zero)";
+  else if (I >= 21) status = "fault-high (>=21 mA: sensor/loop fault, NAMUR NE43)";
+  else if (I > 20.5) status = "overrange (above 20.5 mA)";
+  else if (I > 20) status = "overrange (above 20 mA full scale)";
+  else status = below_cutoff ? "in range, below low-flow cutoff (forced to 0)" : "in range (4-20 mA)";
+  if (![flow_percent, flow_value, linear_percent].every(Number.isFinite)) return { error: "DP-flow scaling math is not a finite value." };
+  return {
+    flow_percent, flow_value, linear_percent, status,
+    note: "The flow a differential-pressure (orifice, venturi, flow-nozzle, or averaging-pitot) transmitter's 4-20 mA signal represents, which the linear loop-scaling tile gets wrong. A DP transmitter measures the differential PRESSURE across the primary element and outputs it linearly on the loop, but flow is proportional to the SQUARE ROOT of that pressure, so the flow is the square root of the signal fraction: flow% = sqrt((mA - 4)/16). That means midscale is not midflow -- 12 mA (50% of the signal) is sqrt(0.5) = 70.7% of flow, and 8 mA (25% signal) is 50% flow -- the classic error when a DP flow loop is scaled linearly. The value = flow_low + flow% x (flow_high - flow_low), where flow_high is the flow at 20 mA (full scale). Modern smart transmitters can do the square-root extraction internally and output flow linearly (then use the linear loop-scaling tile instead); this tile is for the traditional case where the extraction happens in the receiver/PLC. A low-flow cutoff (commonly 5-10%) forces the reading to zero near 4 mA, where the steep square root amplifies noise and zero drift into a phantom flow. This is loop linearization only: the primary element's discharge coefficient and beta ratio are already baked into the transmitter's calibrated range. The transmitter range, damping, and the flow element's calibration govern.",
+  };
+}
+export const dpFlowSignalScalingExample = { inputs: { signal_ma: 12, flow_low: 0, flow_high: 500, low_flow_cutoff_pct: 0 } };
+function renderDpFlowSignalScaling(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: differential-pressure flow transmitter square-root extraction on a 4-20 mA loop, by name (ISA / instrumentation practice; NAMUR NE43 fault levels). flow% = sqrt((mA - 4)/16), value = flow_low + flow% x (flow_high - flow_low); a low-flow cutoff zeroes the noisy square root near 4 mA. Loop linearization only (the flow element's Cd is in the transmitter calibration). The transmitter range and calibration govern.";
+  const ma = makeNumber("Loop signal (mA)", "dfs-ma", { step: "any", value: "12" }); ma.input.value = "12";
+  const lo = makeNumber("Flow at 4 mA (usually 0)", "dfs-lo", { step: "any", value: "0" }); lo.input.value = "0";
+  const hi = makeNumber("Flow at 20 mA (full scale)", "dfs-hi", { step: "any", value: "500" }); hi.input.value = "500";
+  const cut = makeNumber("Low-flow cutoff (% of flow, e.g. 5)", "dfs-cut", { step: "any", min: "0", max: "100", value: "0" }); cut.input.value = "0";
+  for (const f of [ma, lo, hi, cut]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ma.input.value = "12"; lo.input.value = "0"; hi.input.value = "500"; cut.input.value = "0"; update(); });
+  const oVal = makeOutputLine(outputRegion, "Flow value", "dfs-out-v");
+  const oPct = makeOutputLine(outputRegion, "Flow % (vs linear %)", "dfs-out-p");
+  const oStatus = makeOutputLine(outputRegion, "Signal status", "dfs-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "dfs-out-n");
+  const update = debounce(() => {
+    const r = computeDpFlowSignalScaling({
+      signal_ma: ma.input.value === "" ? 12 : Number(ma.input.value),
+      flow_low: lo.input.value === "" ? 0 : Number(lo.input.value),
+      flow_high: hi.input.value === "" ? 500 : Number(hi.input.value),
+      low_flow_cutoff_pct: cut.input.value === "" ? 0 : Number(cut.input.value),
+    });
+    if (r.error) { oVal.textContent = r.error; oPct.textContent = "-"; oStatus.textContent = "-"; oNote.textContent = ""; return; }
+    oVal.textContent = fmt(r.flow_value, 2);
+    oPct.textContent = fmt(r.flow_percent, 2) + "% (linear would read " + fmt(r.linear_percent, 2) + "%)";
+    oStatus.textContent = r.status;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ma, lo, hi, cut]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["dp-flow-signal-scaling"] = renderDpFlowSignalScaling;
+
 // ===================== spec-v947: RTD (Pt100 / Pt1000) resistance to temperature =====================
 // dims: in { args: dimensionless } out: { temperature_c: dimensionless, temperature_f: dimensionless }
 export function computeRtdResistanceToTemp({ resistance_ohms = 119.397, r0_ohms = 100 } = {}) {

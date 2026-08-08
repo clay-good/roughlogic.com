@@ -9221,6 +9221,18 @@ export const CITATIONS = {
       { name: "NAMUR NE43 fault levels", value: "3.8-20.5 mA valid; <=3.6 mA downscale fault, >=21 mA upscale fault; below 4 / above 20 is under/overrange", source: "NAMUR NE43" },
     ],
   },
+  "dp-flow-signal-scaling": {
+    formula: "fraction = (signal_ma - 4)/16; flow_percent = sqrt(fraction) x 100 (0 if fraction<=0 or below the low-flow cutoff); flow_value = flow_low + (flow_percent/100)(flow_high - flow_low). NAMUR NE43 fault band as in the linear tile.",
+    edition: "Differential-pressure flow transmitter square-root extraction on a 4-20 mA loop, by name (ISA / instrumentation practice; NAMUR NE43 fault-signal levels); the transmitter's range and calibration govern.",
+    freeAccess: "The square-root relation between flow and differential pressure and the 4-20 mA live-zero scaling are public instrumentation practice; the transmitter's engineering-unit range comes from its configuration.",
+    governance: GOVERNANCE.general,
+    editionNote: "The flow a differential-pressure (orifice, venturi, flow-nozzle, or averaging-pitot) transmitter's 4-20 mA signal represents, the case the linear loop-scaling tile explicitly excludes. A DP transmitter measures the differential pressure across the primary element and outputs it linearly on the loop, but flow is proportional to the SQUARE ROOT of that differential pressure, so the flow is the square root of the signal fraction: flow% = sqrt((mA - 4)/16). Midscale is therefore not midflow -- 12 mA (50% of the signal) is sqrt(0.5) = 70.7% of flow, and 8 mA (25% of the signal) is 50% of flow -- which is the classic error when a DP flow loop is scaled linearly. The engineering value is flow_low + flow% x (flow_high - flow_low), with flow_high the flow at 20 mA. A modern smart transmitter can perform the square-root extraction internally and output flow linearly (use the linear loop-scaling tile then); this covers the traditional case where the extraction is done in the receiver or PLC. A low-flow cutoff (commonly 5-10%) forces the reading to zero near 4 mA, where the steep square root amplifies signal noise and zero drift into a phantom flow. This is loop linearization only: the primary element's discharge coefficient and beta ratio are already in the transmitter's calibrated range. The transmitter's range, damping, and the flow element's calibration govern the real reading.",
+    assumptions: [
+      { name: "Square-root extraction", value: "flow% = sqrt((mA - 4)/16); flow ~ sqrt(differential pressure)", source: "instrumentation practice" },
+      { name: "Loop linearization only", value: "the flow element's Cd and beta are already in the transmitter calibration", source: "scope of this tile" },
+      { name: "Low-flow cutoff", value: "reading forced to zero below the cutoff percent to reject near-zero square-root noise", source: "instrumentation practice" },
+    ],
+  },
   "rtd-resistance-to-temp": {
     formula: "R = R0 (1 + A T + B T^2), A = 3.9083e-3, B = -5.775e-7 (IEC 60751), solved for T: T = (-A + sqrt(A^2 - 4B(1 - R/R0))) / (2B). R0 = 100 (Pt100) or 1000 (Pt1000).",
     edition: "IEC 60751 platinum RTD Callendar-Van Dusen resistance-temperature relation with the standard A/B coefficients, by name (not reproduced from a table); the sensor calibration and tolerance class govern.",

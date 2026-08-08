@@ -904,6 +904,7 @@ export const COMPUTE_MAP = {
   "access-control-power-supply": { module: "../../calc-lowvoltage.js", fn: "computeAccessControlPowerSupply" },
   "fire-alarm-nac-voltage-drop": { module: "../../calc-lowvoltage.js", fn: "computeFireAlarmNacVoltageDrop" },
   "loop-signal-scaling": { module: "../../calc-lowvoltage.js", fn: "computeLoopSignalScaling" },
+  "dp-flow-signal-scaling": { module: "../../calc-lowvoltage.js", fn: "computeDpFlowSignalScaling" },
   "rtd-resistance-to-temp": { module: "../../calc-lowvoltage.js", fn: "computeRtdResistanceToTemp" },
   "pulse-flowmeter-k-factor": { module: "../../calc-lowvoltage.js", fn: "computePulseFlowmeterRate" },
   "loop-voltage-budget": { module: "../../calc-lowvoltage.js", fn: "computeLoopVoltageBudget" },

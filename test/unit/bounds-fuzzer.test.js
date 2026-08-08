@@ -28207,6 +28207,30 @@ test("bounds: spec-v946 computeLoopSignalScaling pins the live-zero linear scali
   assert.ok("error" in _v946({ signal_ma: Infinity, range_low: 0, range_high: 100 }));
 });
 
+import { computeDpFlowSignalScaling as _v1226 } from "../../calc-lowvoltage.js";
+
+test("bounds: spec-v1226 computeDpFlowSignalScaling pins flow% = sqrt((mA-4)/16), the vs-linear gap, the cutoff, and error seams", () => {
+  // 12 mA (50% signal) -> sqrt(0.5) = 70.71% flow, 353.55 gpm; linear would be 50%/250.
+  const r = _v1226({ signal_ma: 12, flow_low: 0, flow_high: 500, low_flow_cutoff_pct: 0 });
+  assert.ok(Math.abs(r.flow_percent - Math.sqrt(0.5) * 100) < 1e-9 && Math.abs(r.flow_percent - 70.71) < 0.02);
+  assert.ok(Math.abs(r.flow_value - 353.55) < 0.1 && Math.abs(r.linear_percent - 50) < 1e-9);
+  // 8 mA (25% signal) is exactly 50% flow (sqrt(0.25)); endpoints hold.
+  assert.ok(Math.abs(_v1226({ signal_ma: 8, flow_low: 0, flow_high: 500 }).flow_percent - 50) < 1e-9);
+  assert.ok(Math.abs(_v1226({ signal_ma: 20, flow_low: 0, flow_high: 500 }).flow_value - 500) < 1e-9);
+  assert.ok(Math.abs(_v1226({ signal_ma: 4, flow_low: 0, flow_high: 500 }).flow_value - 0) < 1e-9);
+  // The square-root reading exceeds the linear reading everywhere in-span (concave sqrt).
+  assert.ok(r.flow_percent > r.linear_percent);
+  // Low-flow cutoff forces a near-zero reading to 0.
+  const cut = _v1226({ signal_ma: 4.1, flow_low: 0, flow_high: 500, low_flow_cutoff_pct: 10 });
+  assert.ok(cut.flow_percent === 0 && /cutoff/.test(cut.status));
+  // A nonzero flow_low offsets the value.
+  assert.ok(Math.abs(_v1226({ signal_ma: 12, flow_low: 100, flow_high: 500 }).flow_value - (100 + 0.70710678 * 400)) < 0.01);
+  // Error seams: zero span, bad cutoff, non-finite.
+  assert.ok("error" in _v1226({ signal_ma: 12, flow_low: 50, flow_high: 50 }));
+  assert.ok("error" in _v1226({ signal_ma: 12, flow_low: 0, flow_high: 500, low_flow_cutoff_pct: 100 }));
+  assert.ok("error" in _v1226({ signal_ma: Infinity, flow_low: 0, flow_high: 500 }));
+});
+
 import { computeRtdResistanceToTemp as _v947 } from "../../calc-lowvoltage.js";
 
 test("bounds: spec-v947 computeRtdResistanceToTemp pins the Callendar-Van Dusen inverse and error seams", () => {
