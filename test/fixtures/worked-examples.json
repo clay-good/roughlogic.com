@@ -37833,6 +37833,58 @@
    }
   },
   {
+   "tile_id": "thermistor-steinhart-hart",
+   "source_publisher": "NTC thermistor Steinhart-Hart equation (Steinhart & Hart 1968)",
+   "source_title": "10 kohm on a sensor with A 1.1253e-3, B 2.3471e-4, C 8.566e-8 -> 25.00 C (spec-v1223)",
+   "source_edition_or_year": "1/T = A + B ln(R) + C (ln R)^3",
+   "source_section_or_page": "lnR = ln(10000) = 9.21034; 1/T = 1.1253e-3 + 2.3471e-4(9.21034) + 8.566e-8(9.21034)^3 = 3.35402e-3; T = 298.15 K = 25.00 C.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "resistance_ohms": 10000,
+    "coeff_a": 0.001125308852122,
+    "coeff_b": 0.000234711863267,
+    "coeff_c": 0.000000085663516
+   },
+   "outputs": {
+    "temperature_c": {
+     "value": 25.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "temperature_f": {
+     "value": 77.0,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thermistor-steinhart-hart",
+   "source_publisher": "Steinhart-Hart NTC cross-check",
+   "source_title": "cross-check: the same sensor at 3.9 kohm reads ~47.9 C (NTC: lower R = hotter)",
+   "source_edition_or_year": "1/T = A + B ln(R) + C (ln R)^3",
+   "source_section_or_page": "at R 3900 ohm, lnR = 8.2687; 1/T = 1.1253e-3 + 2.3471e-4(8.2687) + 8.566e-8(8.2687)^3 -> T = 321.08 K = 47.93 C, confirming resistance and temperature move in opposite directions.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "resistance_ohms": 3900,
+    "coeff_a": 0.001125308852122,
+    "coeff_b": 0.000234711863267,
+    "coeff_c": 0.000000085663516
+   },
+   "outputs": {
+    "temperature_c": {
+     "value": 47.93,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "thermistor-beta-temp",
    "source_publisher": "NTC thermistor beta (B-parameter) equation",
    "source_title": "20 kohm reading on a 10 kohm/3950 K sensor -> 10.18 C (NTC: higher R = colder)",

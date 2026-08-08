@@ -9265,6 +9265,18 @@ export const CITATIONS = {
       { name: "Two-point fit accuracy", value: "~+/-0.2-1 C near T0; a wide span or tight accuracy uses the 3-constant Steinhart-Hart equation", source: "thermistor datasheet" },
     ],
   },
+  "thermistor-steinhart-hart": {
+    formula: "1/T = A + B ln(R) + C (ln R)^3, T in kelvin; T = 1/(A + B ln R + C (ln R)^3); output in C and F. A, B, C from the datasheet or a 3-point calibration.",
+    edition: "NTC thermistor 3-constant Steinhart-Hart resistance-temperature equation, by name (Steinhart & Hart, Deep-Sea Research, 1968); the sensor datasheet R-T curve and tolerance govern.",
+    freeAccess: "The Steinhart-Hart equation is public; A, B, and C are the three datasheet coefficients (or are fit from three known resistance-temperature points), and R is the field reading.",
+    governance: GOVERNANCE.general,
+    editionNote: "The accurate 3-constant temperature form for an NTC thermistor that the beta (B-parameter) equation is the two-point simplification of: 1/T = A + B ln(R) + C (ln R)^3, with T in kelvin. The coefficients A, B, and C come from the sensor datasheet or are fit from three known (resistance, temperature) calibration points; C is usually tiny (about 1e-7), and dropping it leaves a two-constant form. Because it curve-fits three points, Steinhart-Hart holds to roughly +/-0.01 to 0.02 C across a wide span (about -50 to 150 C) where the beta equation drifts to +/-0.2 to 1 C away from its reference point. Like all NTC sensors it is negative-coefficient, so resistance falls as temperature rises; a 10 kohm sensor with A 1.1253e-3, B 2.3471e-4, C 8.566e-8 reads 25.0 C at 10 kohm, about 2 C at 29 kohm, and about 48 C at 3.9 kohm. This is distinct from a platinum RTD, which is positive-coefficient and follows the Callendar-Van Dusen curve. A lead-compensated reading is assumed; the datasheet R-T table, the tolerance grade, and self-heating set the real field accuracy.",
+    assumptions: [
+      { name: "Steinhart-Hart equation", value: "1/T = A + B ln(R) + C (ln R)^3, kelvin; NTC, so R falls as T rises", source: "Steinhart & Hart (1968) / NTC datasheet" },
+      { name: "Coefficients", value: "A, B, C from the datasheet or a 3-point calibration; C ~ 1e-7 (drop it for a 2-constant form)", source: "thermistor datasheet" },
+      { name: "Accuracy", value: "~+/-0.01-0.02 C over a wide span vs +/-0.2-1 C for the two-point beta equation", source: "thermistor practice" },
+    ],
+  },
   "pid-tuning-ziegler-nichols": {
     formula: "PID: Kp = 0.6 Ku, Ti = 0.5 Tu, Td = 0.125 Tu; PI: Kp = 0.45 Ku, Ti = Tu/1.2; P: Kp = 0.5 Ku. Proportional band = 100/Kp. Ku, Tu = the gain and period at the stability limit (steady oscillation).",
     edition: "Ziegler-Nichols closed-loop (ultimate-sensitivity) tuning rules (Ziegler & Nichols, 1942), by name; the process dynamics, the controller's algorithm form, and the commissioning technician govern the final tune.",

@@ -28252,6 +28252,32 @@ test("bounds: spec-v950 computeThermistorBetaTemp pins the NTC beta equation and
   assert.ok("error" in _v950({ resistance_ohms: Infinity, r0_ohms: 10000, beta_k: 3950, ref_temp_c: 25 }));
 });
 
+import { computeThermistorSteinhartHart as _v1223 } from "../../calc-lowvoltage.js";
+
+test("bounds: spec-v1223 computeThermistorSteinhartHart pins the 3-constant equation, the NTC direction, and error seams", () => {
+  const A = 0.001125308852122, B = 0.000234711863267, C = 0.000000085663516;
+  // 10 kohm -> 25.00 C exactly for these calibrated coefficients.
+  const r = _v1223({ resistance_ohms: 10000, coeff_a: A, coeff_b: B, coeff_c: C });
+  const lnR = Math.log(10000);
+  assert.ok(Math.abs(r.temperature_k - 1 / (A + B * lnR + C * lnR ** 3)) < 1e-9);
+  assert.ok(Math.abs(r.temperature_c - 25.0) < 0.05 && Math.abs(r.temperature_f - 77.0) < 0.1);
+  // NTC: lower resistance -> higher temperature; higher resistance -> lower.
+  const hot = _v1223({ resistance_ohms: 3900, coeff_a: A, coeff_b: B, coeff_c: C });
+  const cold = _v1223({ resistance_ohms: 29000, coeff_a: A, coeff_b: B, coeff_c: C });
+  assert.ok(Math.abs(hot.temperature_c - 47.93) < 0.1 && hot.temperature_c > r.temperature_c);
+  assert.ok(cold.temperature_c < r.temperature_c);
+  // Monotonic decreasing in resistance across a sweep.
+  assert.ok(_v1223({ resistance_ohms: 8000, coeff_a: A, coeff_b: B, coeff_c: C }).temperature_c >
+            _v1223({ resistance_ohms: 12000, coeff_a: A, coeff_b: B, coeff_c: C }).temperature_c);
+  // Dropping C (two-constant form) still returns a finite temperature.
+  assert.ok(Number.isFinite(_v1223({ resistance_ohms: 10000, coeff_a: A, coeff_b: B, coeff_c: 0 }).temperature_c));
+  // Error seams: non-positive resistance, non-finite coefficient, coefficients giving no positive T.
+  assert.ok("error" in _v1223({ resistance_ohms: 0, coeff_a: A, coeff_b: B, coeff_c: C }));
+  assert.ok("error" in _v1223({ resistance_ohms: 10000, coeff_a: NaN, coeff_b: B, coeff_c: C }));
+  assert.ok("error" in _v1223({ resistance_ohms: 10000, coeff_a: -1, coeff_b: -1, coeff_c: -1 }));
+  assert.ok("error" in _v1223({ resistance_ohms: Infinity, coeff_a: A, coeff_b: B, coeff_c: C }));
+});
+
 import { computeSoilResistivityWenner as _v951 } from "../../calc-electrical.js";
 
 test("bounds: spec-v951 computeSoilResistivityWenner pins rho = 2 pi a R and error seams", () => {

@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1595,
-  "covered_count": 1171,
+  "total_tiles": 1596,
+  "covered_count": 1172,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -1037,6 +1037,7 @@
     "thermal-stress-max-deltat",
     "thermal-stress-restrained",
     "thermistor-beta-temp",
+    "thermistor-steinhart-hart",
     "thi-livestock",
     "thinning-target-tpa",
     "thinset-coverage",

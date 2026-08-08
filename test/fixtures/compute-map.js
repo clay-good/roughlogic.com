@@ -907,6 +907,7 @@ export const COMPUTE_MAP = {
   "pulse-flowmeter-k-factor": { module: "../../calc-lowvoltage.js", fn: "computePulseFlowmeterRate" },
   "loop-voltage-budget": { module: "../../calc-lowvoltage.js", fn: "computeLoopVoltageBudget" },
   "thermistor-beta-temp": { module: "../../calc-lowvoltage.js", fn: "computeThermistorBetaTemp" },
+  "thermistor-steinhart-hart": { module: "../../calc-lowvoltage.js", fn: "computeThermistorSteinhartHart" },
   "dp-level-hydrostatic": { module: "../../calc-lowvoltage.js", fn: "computeDpLevelHydrostatic" },
   "pid-tuning-ziegler-nichols": { module: "../../calc-lowvoltage.js", fn: "computePidTuningZieglerNichols" },
   "polymeric-sand-bags": { module: "../../calc-construction.js", fn: "computePolymericSandBags" },

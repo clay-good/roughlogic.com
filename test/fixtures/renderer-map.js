@@ -173,6 +173,7 @@ export const RENDERER_MAP = {
   "pulse-flowmeter-k-factor": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "loop-voltage-budget": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "thermistor-beta-temp": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
+  "thermistor-steinhart-hart": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "dp-level-hydrostatic": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "pid-tuning-ziegler-nichols": { module: "../../calc-lowvoltage.js", exportName: "LOWVOLTAGE_RENDERERS" },
   "pipe-cold-spring": { module: "../../calc-pipefit.js", exportName: "PIPEFIT_RENDERERS" },

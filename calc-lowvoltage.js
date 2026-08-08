@@ -1297,6 +1297,59 @@ function _v950renderThermistorBetaTemp(inputRegion, outputRegion, citationEl) {
 }
 LOWVOLTAGE_RENDERERS["thermistor-beta-temp"] = _v950renderThermistorBetaTemp;
 
+// ===================== spec-v1223: NTC thermistor Steinhart-Hart equation (3-constant) =====================
+// The thermistor-beta-temp tile's own note says a wider/tighter job "uses the 3-constant Steinhart-Hart
+// equation instead" -- the accurate temperature-sensor form the beta 2-point equation approximates. This
+// adds it: 1/T = A + B ln(R) + C (ln R)^3, T in kelvin, A/B/C from the datasheet or a 3-point calibration.
+// dims: in { resistance_ohms: dimensionless, coeff_a: dimensionless, coeff_b: dimensionless, coeff_c: dimensionless } out: { temperature_c: T, temperature_f: T, temperature_k: T }
+export function computeThermistorSteinhartHart({ resistance_ohms = 10000, coeff_a = 0.001125308852122, coeff_b = 0.000234711863267, coeff_c = 0.000000085663516, } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R = Number(resistance_ohms) || 0;
+  const A = Number(coeff_a);
+  const B = Number(coeff_b);
+  const C = Number(coeff_c);
+  if (!(R > 0)) return { error: "Measured resistance must be positive (ohms)." };
+  if (![A, B, C].every(Number.isFinite)) return { error: "The Steinhart-Hart coefficients A, B, and C must be finite numbers (from the datasheet)." };
+  const lnR = Math.log(R);
+  const inv_t = A + B * lnR + C * lnR * lnR * lnR;
+  if (!(inv_t > 0)) return { error: "Resistance is outside the thermistor's valid range (no positive temperature solution); check the coefficients and resistance." };
+  const temperature_k = 1 / inv_t;
+  const temperature_c = temperature_k - 273.15;
+  const temperature_f = temperature_c * 9 / 5 + 32;
+  if (![temperature_k, temperature_c, temperature_f].every(Number.isFinite)) return { error: "Steinhart-Hart temperature math is not a finite value." };
+  return {
+    temperature_k, temperature_c, temperature_f,
+    note: "The temperature an NTC (negative-temperature-coefficient) thermistor's measured resistance corresponds to, by the 3-constant Steinhart-Hart equation 1/T = A + B ln(R) + C (ln R)^3 with T in kelvin -- the accurate standard the beta (B-parameter) equation is the cheap two-point simplification of. The coefficients A, B, and C come from the sensor datasheet, or are fit from three known (resistance, temperature) calibration points; C is usually tiny (about 1e-7), and dropping it leaves a two-constant form. Because it curve-fits three points instead of two, Steinhart-Hart holds to roughly +/-0.01 to 0.02 C across a wide span (about -50 to 150 C) where the beta equation drifts to +/-0.2 to 1 C away from its reference point. Being NEGATIVE-coefficient, resistance FALLS as temperature RISES. A typical 10 kohm sensor with A 1.1253e-3, B 2.3471e-4, C 8.566e-8 reads about 25 C at 10 kohm, near 0 C at ~29 kohm, and near 50 C at ~3.9 kohm. This is distinct from a platinum RTD, which is POSITIVE-coefficient and follows the Callendar-Van Dusen curve. Assumes a lead-compensated reading; the datasheet R-T curve, tolerance, and self-heating govern the field accuracy.",
+  };
+}
+export const thermistorSteinhartHartExample = { inputs: { resistance_ohms: 10000, coeff_a: 0.001125308852122, coeff_b: 0.000234711863267, coeff_c: 0.000000085663516 } };
+function renderThermistorSteinhartHart(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NTC thermistor 3-constant Steinhart-Hart equation, by name: 1/T = A + B ln(R) + C (ln R)^3, T in kelvin; A, B, C from the datasheet or a 3-point calibration. The accurate form the beta (B-parameter) equation approximates (~+/-0.01-0.02 C over a wide span). Distinct from a positive-coefficient platinum RTD. The datasheet R-T curve, tolerance, and self-heating govern.";
+  const rm = makeNumber("Measured resistance (ohms)", "sh-rm", { step: "any", min: "0", value: "10000" }); rm.input.value = "10000";
+  const a = makeNumber("Coefficient A", "sh-a", { step: "any", value: "0.001125308852122" }); a.input.value = "0.001125308852122";
+  const b = makeNumber("Coefficient B", "sh-b", { step: "any", value: "0.000234711863267" }); b.input.value = "0.000234711863267";
+  const c = makeNumber("Coefficient C", "sh-c", { step: "any", value: "0.000000085663516" }); c.input.value = "0.000000085663516";
+  for (const f of [rm, a, b, c]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { rm.input.value = "10000"; a.input.value = "0.001125308852122"; b.input.value = "0.000234711863267"; c.input.value = "0.000000085663516"; update(); });
+  const oC = makeOutputLine(outputRegion, "Temperature (C)", "sh-out-c");
+  const oF = makeOutputLine(outputRegion, "Temperature (F)", "sh-out-f");
+  const oNote = makeOutputLine(outputRegion, "Note", "sh-out-n");
+  const update = debounce(() => {
+    const r = computeThermistorSteinhartHart({
+      resistance_ohms: rm.input.value === "" ? 10000 : Number(rm.input.value),
+      coeff_a: a.input.value === "" ? 0 : Number(a.input.value),
+      coeff_b: b.input.value === "" ? 0 : Number(b.input.value),
+      coeff_c: c.input.value === "" ? 0 : Number(c.input.value),
+    });
+    if (r.error) { oC.textContent = r.error; oF.textContent = "-"; oNote.textContent = ""; return; }
+    oC.textContent = fmt(r.temperature_c, 2) + " C";
+    oF.textContent = fmt(r.temperature_f, 2) + " F";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [rm, a, b, c]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["thermistor-steinhart-hart"] = renderThermistorSteinhartHart;
+
 // ===================== spec-v958: hydrostatic DP level transmitter (head to level) =====================
 // dims: in { args: dimensionless } out: { level_ft: dimensionless, level_pct: dimensionless, span_psi: dimensionless }
 export function computeDpLevelHydrostatic({ measured_pressure_psi = 4.33, specific_gravity = 1.0, max_level_ft = 20 } = {}) {

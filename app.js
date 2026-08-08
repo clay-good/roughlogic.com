@@ -171,7 +171,7 @@ const TOOL_MODULES = (() => {
     "rtd-resistance-to-temp",
     "pulse-flowmeter-k-factor",
     "loop-voltage-budget",
-    "thermistor-beta-temp",
+    "thermistor-beta-temp", "thermistor-steinhart-hart",
     "dp-level-hydrostatic",
     "pid-tuning-ziegler-nichols",
   ]);
