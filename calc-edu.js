@@ -2459,3 +2459,70 @@ function renderOneWayAnova(inputRegion, outputRegion, citationEl) {
   t.input.addEventListener("input", update);
 }
 EDU_RENDERERS["one-way-anova"] = renderOneWayAnova;
+
+// --- spec-v1262: chi-square test of independence (`chi-square-independence`) ---
+// The chi-square family has only goodness-of-fit (one row of categories vs an expected distribution). The test
+// of INDEPENDENCE works on an r x c contingency table (two categorical variables cross-tabulated) and asks
+// whether the row and column variables are related. It builds its own expected cells from the margins --
+// E[i][j] = row_total_i * col_total_j / N -- so it is a distinct calculation, not the GOF tile: chi2 = sum
+// (O - E)^2/E on df = (r-1)(c-1); p from the bundled chi-square CDF. Cramer's V = sqrt(chi2/(N min(r-1,c-1)))
+// is the effect size. Verified against scipy.stats.chi2_contingency (correction=False for non-2x2 tables).
+// dims: in { table_text: dimensionless } out: { chi_square: dimensionless, df: dimensionless, p_value: dimensionless, cramers_v: dimensionless, rows: dimensionless, cols: dimensionless, n_total: dimensionless, min_expected: dimensionless }
+export function computeChiSquareIndependence({ table_text = "" } = {}) {
+  if (typeof table_text !== "string") return { error: "Provide the contingency table as text, one row per line." };
+  const rows = table_text.split("\n").map((l) => l.trim()).filter((l) => l.length > 0)
+    .map((l) => l.split(/[\s,]+/).map(Number));
+  if (rows.length < 2) return { error: "Enter at least two rows (one row per line, cells separated by spaces or commas)." };
+  const c = rows[0].length;
+  if (c < 2) return { error: "Each row needs at least two columns (a 2x2 table or larger)." };
+  if (rows.some((row) => row.length !== c)) return { error: "Every row must have the same number of columns." };
+  if (rows.some((row) => row.some((v) => !Number.isFinite(v) || v < 0))) return { error: "All cells must be non-negative numbers." };
+  const r = rows.length;
+  const rowTot = rows.map((row) => row.reduce((a, b) => a + b, 0));
+  const colTot = [];
+  for (let j = 0; j < c; j++) { let s = 0; for (let i = 0; i < r; i++) s += rows[i][j]; colTot.push(s); }
+  const N = rowTot.reduce((a, b) => a + b, 0);
+  if (!(N > 0)) return { error: "The table totals to zero." };
+  if (rowTot.some((t) => !(t > 0)) || colTot.some((t) => !(t > 0))) return { error: "Every row and column must have a positive total (an all-zero row or column has no expected count)." };
+  let chi2 = 0, minExp = Infinity;
+  for (let i = 0; i < r; i++) for (let j = 0; j < c; j++) {
+    const e = rowTot[i] * colTot[j] / N;
+    if (e < minExp) minExp = e;
+    chi2 += Math.pow(rows[i][j] - e, 2) / e;
+  }
+  const df = (r - 1) * (c - 1);
+  const p = 1 - chi2Cdf(chi2, df);
+  const cramers_v = Math.sqrt(chi2 / (N * Math.min(r - 1, c - 1)));
+  if (![chi2, p, cramers_v].every(Number.isFinite)) return { error: "Chi-square math is not a finite value." };
+  const warnings = [];
+  if (minExp < 5) warnings.push("An expected cell below 5 (" + minExp.toFixed(2) + ") weakens the chi-square approximation; consider combining categories or Fisher's exact test.");
+  return {
+    chi_square: chi2, df, p_value: p, cramers_v,
+    rows: r, cols: c, n_total: N, min_expected: minExp,
+    significant: p < 0.05, warnings,
+    note: "The chi-square test of independence, the contingency-table member the goodness-of-fit tile is not: it cross-tabulates TWO categorical variables (rows x columns) and tests whether they are related or independent. Unlike goodness-of-fit, which compares one row against an expected distribution you supply, this builds its own expected counts from the margins -- E = row total x column total / grand total, the counts you would see if the variables were unrelated -- then chi2 = sum (observed - expected)^2 / expected on (r-1)(c-1) degrees of freedom. A small p says the two variables ARE associated. Cramer's V = sqrt(chi2/(N min(r-1,c-1))) rates the strength from 0 (no association) to 1. The approximation weakens when an expected cell drops below 5, flagged as a warning. A statistics aid; the study design governs.",
+  };
+}
+export const chiSquareIndependenceExample = { inputs: { table_text: "10 20 30\n30 20 10" } };
+function renderChiSquareIndependence(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: chi-square test of independence per OpenIntro Statistics Chapter 6 (contingency tables), by name: expected E = row total x col total / N, chi2 = sum (O-E)^2/E on (r-1)(c-1) df; the chi-square CDF reuses the bundled special-function helper. Cramer's V effect size. Verified against scipy.stats.chi2_contingency. Free at openintro.org.";
+  const t = makeTextarea("Contingency table (one row per line; cells separated by spaces or commas)", "chi2i-t", { placeholder: "10 20 30\n30 20 10", rows: "4" });
+  inputRegion.appendChild(t.wrap);
+  attachExampleButton(inputRegion, () => { t.input.value = "10 20 30\n30 20 10"; update(); });
+  const oC = makeOutputLine(outputRegion, "Chi-square / df", "chi2i-out-c");
+  const oP = makeOutputLine(outputRegion, "p-value / significance", "chi2i-out-p");
+  const oV = makeOutputLine(outputRegion, "Cramer's V (effect size)", "chi2i-out-v");
+  const oW = makeOutputLine(outputRegion, "Warnings", "chi2i-out-w");
+  const oNote = makeOutputLine(outputRegion, "Note", "chi2i-out-note");
+  const update = debounce(() => {
+    const rr = computeChiSquareIndependence({ table_text: t.input.value });
+    if (rr.error) { oC.textContent = rr.error; oP.textContent = ""; oV.textContent = ""; oW.textContent = ""; oNote.textContent = ""; return; }
+    oC.textContent = "chi2 = " + fmt(rr.chi_square, 3) + " (df " + rr.df + "); " + rr.rows + "x" + rr.cols + " table, N = " + rr.n_total;
+    oP.textContent = "p = " + fmt(rr.p_value, 4) + " (" + (rr.significant ? "significant" : "not significant") + " at 0.05)";
+    oV.textContent = "V = " + fmt(rr.cramers_v, 3);
+    oW.textContent = rr.warnings.length ? rr.warnings.join(" ") : "none";
+    oNote.textContent = rr.note;
+  }, DEBOUNCE_MS);
+  t.input.addEventListener("input", update);
+}
+EDU_RENDERERS["chi-square-independence"] = renderChiSquareIndependence;

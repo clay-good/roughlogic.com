@@ -1951,6 +1951,7 @@ cross-check.
 | calc-edu.js | `computeBellCurve` | `{ raw_score, mean, sd }` | _ | _ | _ |
 | calc-edu.js | `computeCategoryWeightedGrade` | `{ categories = [] } = {}` | _ | _ | _ |
 | calc-edu.js | `computeChiSquareGof` | `{ observed, expected, expected_type = "counts", alpha = 0.05 }` | _ | _ | _ |
+| calc-edu.js | `computeChiSquareIndependence` | `{ table_text = "" } = {}` | _ | _ | _ |
 | calc-edu.js | `computeConfidenceInterval` | `{ mode, n, proportion, mean, sd, confidence_pct }` | _ | _ | _ |
 | calc-edu.js | `computeCurveGradeScaler` | `{ method = "flat", raw_score = 0, param = 0, class_mean = 0 } = {}` | _ | _ | _ |
 | calc-edu.js | `computeFinalGradeNeeded` | `{ current_pct = 0, final_weight_pct = 0, target_pct = 0 } = {}` | _ | _ | _ |
@@ -3296,7 +3297,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1882.
+Row count: 1883.
 
 <!-- END function-corpus-v14 -->
 
@@ -5048,7 +5049,7 @@ per spec-v14 §13.1 second paragraph.
 | `section-121-exclusion` | Home-Sale Capital-Gains Exclusion (§121) | 26 USC 121 / IRS Pub 523 (public); Worked example MFJ: sale $850k, costs $45k, basis $300k +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seller-net-sheet` | Seller Net Proceeds Sheet | TILA-RESPA Closing Disclosure (12 CFR...; $400,000 sale, $250,000 payoff, 5.5% commission, 0.5% tra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Y Educators (26 tiles)
+### Group Y Educators (27 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5057,6 +5058,7 @@ per spec-v14 §13.1 second paragraph.
 | `bell-curve-zscore` | Bell Curve / z-Score and Percentile | Abramowitz + Stegun (AMS 55, 1965), f...; z = (85 - 75)/10 = 1.0; percentile ~ 84.13%; band: A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `category-weighted-grade` | Weighted Category Grade | Weighted-mean arithmetic + standard U...; HW 92% @20%, Quiz 85% @30%, Final 78% @50% -> 82.9% (B) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chi-square-gof` | Chi-Square Goodness-of-Fit | OpenIntro / Numerical Recipes; chi2 = (15^2 + 5^2 + 5^2 + 15^2)/25 = (225+25+25+225)/25 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `chi-square-independence` | Chi-Square Test of Independence (Contingency Table) | scipy.stats.chi2_contingency (cross-v...; all expected cells 60x40/120 = 20; chi2 = 4x(10^2/20) = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `codon-table` | Genetic Codon Table (DNA / RNA) | Standard genetic code (universal); Worked example AUGGCCUAA -> 3 codons: Met/START, Ala, STOP | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `confidence-interval` | Confidence Interval (Proportion or Mean) | Wald (1943); standard inferential sta...; phat = 0.6, n = 100, z = 1.96 -> SE = sqrt(0.6*0.4/100) =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `curve-grade-scaler` | Grade-Curve Scaler | Standard psychometric score scaling; square-root curve: raw 49 -> 10 * sqrt(49) = 70 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5116,6 +5118,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1634. Fixture-covered or reference-cadence: 1634 / 1634.
+Tile count: 1635. Fixture-covered or reference-cadence: 1635 / 1635.
 
 <!-- END tile-index-v14 -->

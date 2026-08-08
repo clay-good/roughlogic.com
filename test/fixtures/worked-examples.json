@@ -22513,6 +22513,58 @@
    }
   },
   {
+   "tile_id": "chi-square-independence",
+   "source_publisher": "scipy.stats.chi2_contingency (cross-verified, correction=False)",
+   "source_title": "2x3 table 10 20 30 / 30 20 10 -> chi2 20.0, df 2, p 4.54e-5, Cramer V 0.408 (spec-v1262)",
+   "source_edition_or_year": "E = row total x col total / N; chi2 = sum (O-E)^2/E",
+   "source_section_or_page": "all expected cells 60x40/120 = 20; chi2 = 4x(10^2/20) = 20.0 on (2-1)(3-1)=2 df; scipy chi2_contingency gives 20.0, p=4.539993e-5; V = sqrt(20/(120x1)) = 0.408.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "table_text": "10 20 30\n30 20 10"
+   },
+   "outputs": {
+    "chi_square": {
+     "value": 20.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "cramers_v": {
+     "value": 0.4082,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "chi-square-independence",
+   "source_publisher": "chi-square independence (2x2, no Yates; scipy cross-checked)",
+   "source_title": "2x2 table 20 30 / 30 20 -> chi2 4.0, df 1, p 0.0455",
+   "source_edition_or_year": "correction=False to match the uncorrected r x c formula",
+   "source_section_or_page": "expected all 50x50/100 = 25; chi2 = 4x(5^2/25) = 4.0 on 1 df; scipy chi2_contingency(correction=False) gives 4.0, p=0.04550026.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "table_text": "20 30\n30 20"
+   },
+   "outputs": {
+    "chi_square": {
+     "value": 4.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "p_value": {
+     "value": 0.0455,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "one-way-anova",
    "source_publisher": "scipy.stats.f_oneway (cross-verified)",
    "source_title": "three groups 88 90 92 85 91 / 79 82 80 78 84 / 93 95 91 90 94 -> F 32.236, p 1.49e-5 (spec-v1261)",

@@ -1307,7 +1307,7 @@ const TOOL_MODULES = (() => {
     "curve-grade-scaler",
   
     // v20
-    "final-grade-needed", "category-weighted-grade", "two-sample-t-test", "paired-t-test", "one-sample-t-test", "one-way-anova",
+    "final-grade-needed", "category-weighted-grade", "two-sample-t-test", "paired-t-test", "one-sample-t-test", "one-way-anova", "chi-square-independence",
   ]);
   // Group Z (Rigging and Heavy Lift): the lift-planning core (spec-v65), a
   // new module behind RIGGING_RENDERERS. All seven carry GOVERNANCE.rigging.

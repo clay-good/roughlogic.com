@@ -406,6 +406,26 @@
       "kind": "question"
     },
     {
+      "term": "chi square test of independence",
+      "target": "chi-square-independence",
+      "kind": "industry"
+    },
+    {
+      "term": "contingency table test",
+      "target": "chi-square-independence",
+      "kind": "industry"
+    },
+    {
+      "term": "are two categorical variables related",
+      "target": "chi-square-independence",
+      "kind": "question"
+    },
+    {
+      "term": "cramers v effect size",
+      "target": "chi-square-independence",
+      "kind": "question"
+    },
+    {
       "term": "one way anova",
       "target": "one-way-anova",
       "kind": "industry"

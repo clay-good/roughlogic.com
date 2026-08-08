@@ -7827,6 +7827,18 @@ export const CITATIONS = {
       { name: "Chi-square CDF", value: "regularized lower incomplete gamma P(df/2, x/2)", source: "Numerical Recipes 6.2" },
     ],
   },
+  "chi-square-independence": {
+    formula: "Expected E[i][j] = row_total_i * col_total_j / N; chi-square = sum((observed - expected)^2 / expected) on (r-1)(c-1) degrees of freedom; p-value = 1 - chi2Cdf(chi-square, df). Cramer's V = sqrt(chi-square / (N * min(r-1, c-1))).",
+    edition: "OpenIntro Statistics 4th ed. Chapter 6 (inference for categorical data, two-way tables) by name; the chi-square CDF via the regularized lower incomplete gamma function per Numerical Recipes in C 2nd ed. §6.2. Verified against scipy.stats.chi2_contingency (correction=False).",
+    freeAccess: "OpenIntro Statistics free at openintro.org; Numerical Recipes chapters free at numerical.recipes.",
+    governance: GOVERNANCE.education,
+    editionNote: "The test of independence works on an r x c contingency table (two categorical variables cross-tabulated) and asks whether the row and column variables are associated. It differs from goodness-of-fit in two ways: it builds its own expected counts from the margins (E = row total x column total / N, the counts under independence) rather than taking an expected distribution as input, and its degrees of freedom are (r-1)(c-1) rather than k-1. Cramer's V rescales chi-square to a 0-to-1 association strength. The chi-square approximation degrades when an expected cell drops below 5; the tile flags it and suggests combining categories or Fisher's exact test. This tile does not apply the Yates continuity correction, so a 2x2 result matches scipy's chi2_contingency with correction=False.",
+    assumptions: [
+      { name: "Expected from margins", value: "E[i][j] = row_total_i * col_total_j / N (the counts under independence)", source: "OpenIntro Statistics Ch. 6" },
+      { name: "Degrees of freedom", value: "(r-1)(c-1) for an r x c table", source: "OpenIntro Statistics Ch. 6" },
+      { name: "Effect size and scope", value: "Cramer's V = sqrt(chi2/(N min(r-1,c-1))); no Yates correction (matches scipy correction=False); expected cells should be at least 5", source: "scope of this tile" },
+    ],
+  },
   "linear-regression": {
     formula: "Least squares: slope = sum((x - xbar)(y - ybar)) / sum((x - xbar)^2); intercept = ybar - slope * xbar. R^2 = r^2. Residual sum of squares RSS = Syy - slope * Sxy; residual standard error = sqrt(RSS / (n - 2)). Slope t-test for slope = 0: t = slope / (RSE / sqrt(Sxx)) on n - 2 df, two-tailed p = 2 * (1 - tcdf(|t|, n - 2)). Prediction y-hat = intercept + slope * x.",
     edition: "OpenIntro Statistics 4th ed. Chapter 8 (introduction to linear regression) by name; the Student-t CDF via the regularized incomplete beta function per Numerical Recipes in C 2nd ed. §6.4.",

@@ -10695,6 +10695,7 @@ import { computePrimerTm as _t1, computeCfuPlateCount as _t2 } from "../../calc-
 import { computeGrossRentMultiplier as _x1, computePmiCancellationDate as _x2, computeSellerNetSheet as _x3 } from "../../calc-realestate.js";
 import { computeFinalGradeNeeded as _y1, computeCategoryWeightedGrade as _y2, computeTwoSampleTTest as _y3, computePairedTTest as _v1234, computeOneSampleTTest as _v1236 } from "../../calc-edu.js";
 import { computeOneWayAnova as _v1261 } from "../../calc-edu.js";
+import { computeChiSquareIndependence as _v1262 } from "../../calc-edu.js";
 test("bounds: spec-v1236 computeOneSampleTTest pins t = (x_bar-mu0)/(s/sqrt(n)), df, tails, and error seams", () => {
   // mean 16.1, SD 0.3, n 25 vs target 16.0: t = 1.667, df 24, two-sided p ~ 0.1086.
   const r = _v1236({ sample_mean: 16.1, sample_sd: 0.3, n: 25, hypothesized_mean: 16.0, tail: "two" });
@@ -10739,6 +10740,30 @@ test("bounds: spec-v1261 computeOneWayAnova pins the variance partition, F, the 
   assert.ok("error" in _v1261({ groups_text: "5 5 5\n5 5 5" }));
   assert.ok("error" in _v1261({ groups_text: "" }));
   assert.ok("error" in _v1261({ groups_text: 42 }));
+});
+test("bounds: spec-v1262 computeChiSquareIndependence pins the margin-built expected counts, chi2, the scipy-checked p, Cramer's V, and error seams", () => {
+  // 2x3 table [[10,20,30],[30,20,10]]: all expected = 60*40/120 = 20; chi2 = 4*(100/20) = 20 on 2 df; scipy p=4.539993e-5; V=0.4082.
+  const r = _v1262({ table_text: "10 20 30\n30 20 10" });
+  assert.ok(Math.abs(r.chi_square - 20) < 1e-9 && r.df === 2);
+  assert.ok(Math.abs(r.p_value - 4.539993e-5) < 1e-7);
+  assert.ok(Math.abs(r.cramers_v - Math.sqrt(20 / (120 * 1))) < 1e-12 && Math.abs(r.cramers_v - 0.4082) < 1e-3);
+  assert.ok(r.rows === 2 && r.cols === 3 && r.n_total === 120 && r.significant === true);
+  // 2x2 uncorrected (matches scipy chi2_contingency correction=False): chi2 = 4.0, p = 0.04550026, df 1.
+  const s = _v1262({ table_text: "20 30\n30 20" });
+  assert.ok(Math.abs(s.chi_square - 4.0) < 1e-9 && s.df === 1 && Math.abs(s.p_value - 0.04550026) < 1e-6);
+  // Independent variables (proportional rows) give chi2 ~ 0.
+  const indep = _v1262({ table_text: "10 20\n20 40" });
+  assert.ok(Math.abs(indep.chi_square) < 1e-9 && Math.abs(indep.p_value - 1) < 1e-9 && indep.significant === false);
+  // Comma separators parse the same as spaces.
+  assert.ok(Math.abs(_v1262({ table_text: "10,20,30\n30,20,10" }).chi_square - 20) < 1e-9);
+  // A small expected cell raises a warning but still computes.
+  assert.ok(_v1262({ table_text: "1 2\n2 1" }).warnings.length > 0);
+  // Error seams: single row, single column, ragged rows, all-zero column, non-string.
+  assert.ok("error" in _v1262({ table_text: "10 20 30" }));
+  assert.ok("error" in _v1262({ table_text: "10\n20\n30" }));
+  assert.ok("error" in _v1262({ table_text: "1 2 3\n4 5" }));
+  assert.ok("error" in _v1262({ table_text: "0 5\n0 5" }));
+  assert.ok("error" in _v1262({ table_text: 7 }));
 });
 test("bounds: spec-v1234 computePairedTTest pins t = d_bar/(s_d/sqrt(n)), df, the two/one-tail p, and error seams", () => {
   // mean diff 2.5, SD 3.0, n 20: t = 2.5/(3/sqrt(20)) = 3.727, df 19, two-sided p ~ 0.00143.

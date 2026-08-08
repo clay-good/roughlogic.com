@@ -21,6 +21,7 @@ export const COMPUTE_MAP = {
   "paired-t-test": { module: "../../calc-edu.js", fn: "computePairedTTest" },
   "one-sample-t-test": { module: "../../calc-edu.js", fn: "computeOneSampleTTest" },
   "one-way-anova": { module: "../../calc-edu.js", fn: "computeOneWayAnova" },
+  "chi-square-independence": { module: "../../calc-edu.js", fn: "computeChiSquareIndependence" },
   "gross-rent-multiplier": { module: "../../calc-realestate.js", fn: "computeGrossRentMultiplier" },
   "pmi-cancellation-date": { module: "../../calc-realestate.js", fn: "computePmiCancellationDate" },
   "seller-net-sheet": { module: "../../calc-realestate.js", fn: "computeSellerNetSheet" },
