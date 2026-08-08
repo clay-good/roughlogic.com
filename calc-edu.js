@@ -2295,3 +2295,53 @@ function renderTwoSampleTTest(inputRegion, outputRegion, citationEl) {
   for (const f of [m1.input, s1.input, n1.input, m2.input, s2.input, n2.input, tail.select]) f.addEventListener("input", update);
 }
 EDU_RENDERERS["two-sample-t-test"] = renderTwoSampleTTest;
+
+// --- spec-v1234 Y: Paired (dependent-samples) t-test (`paired-t-test`) ---
+// On the n differences d_i (before-after / matched pairs): t = d_bar / (s_d / sqrt(n)), df = n-1, p from tcdf.
+// dims: in { mean_diff: dimensionless, sd_diff: dimensionless, n_pairs: dimensionless, tail: dimensionless, alpha: dimensionless } out: { t_stat: dimensionless, df: dimensionless, p_value: dimensionless }
+export function computePairedTTest({ mean_diff = 0, sd_diff = 0, n_pairs = 0, tail = "two", alpha = 0.05 } = {}) {
+  const d = Number(mean_diff), sd = Number(sd_diff), n = Number(n_pairs);
+  if (![d, sd, n].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
+  if (!(n >= 2)) return { error: "Need at least n = 2 pairs." };
+  if (sd < 0) return { error: "The standard deviation of the differences must be non-negative." };
+  const se = sd / Math.sqrt(n);
+  if (!(se > 0)) return { error: "Standard error is zero (the differences have no spread) - t is not defined." };
+  const t = d / se;
+  const df = n - 1;
+  const cdf = tcdf(Math.abs(t), df);
+  const pTwo = 2 * (1 - cdf);
+  const pOne = 1 - cdf;
+  const p = tail === "one" ? pOne : pTwo;
+  return {
+    t_stat: Number.isFinite(t) ? t : null,
+    df,
+    se: Number.isFinite(se) ? se : null,
+    p_value: Number.isFinite(p) ? p : null,
+    significant: Number.isFinite(p) ? p < (Number(alpha) || 0.05) : null,
+    note: "The paired (dependent-samples) t-test collapses matched before/after pairs to their n differences and runs a one-sample t on them: t = d_bar / (s_d / sqrt(n)) on df = n - 1, where d_bar and s_d are the mean and standard deviation of the differences (NOT of the two groups). Pairing removes the between-subject variation, so a paired test is usually far more powerful than a two-sample test on the same data - but it requires genuinely matched pairs (same subject, twins, before/after). Enter the summary of the differences you already computed. Small n (< 30) leans on the normality of the differences; the t-CDF reuses the bundled special-function helper.",
+  };
+}
+export const pairedTTestExample = { inputs: { mean_diff: 2.5, sd_diff: 3.0, n_pairs: 20, tail: "two", alpha: 0.05 } };
+
+function renderPairedTTest(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per OpenIntro Statistics Chapter 7 (inference for paired data) - the paired t-test is a one-sample t on the differences, t = d_bar/(s_d/sqrt(n)) on n-1 df, by name; the t-CDF reuses the bundled special-function helper. Free at openintro.org.";
+  const md = makeNumber("Mean of the differences d_bar", "ptt-md", { step: "any", value: "2.5" }); md.input.value = "2.5";
+  const sd = makeNumber("SD of the differences s_d", "ptt-sd", { step: "any", min: "0", value: "3" }); sd.input.value = "3";
+  const n = makeNumber("Number of pairs n", "ptt-n", { step: "1", min: "2", value: "20" }); n.input.value = "20";
+  const tail = makeSelect("Tail", "ptt-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided" }]);
+  for (const f of [md, sd, n, tail]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { md.input.value = "2.5"; sd.input.value = "3"; n.input.value = "20"; tail.select.value = "two"; update(); });
+  const oT = makeOutputLine(outputRegion, "t-statistic / df", "ptt-out-t");
+  const oP = makeOutputLine(outputRegion, "p-value / significance", "ptt-out-p");
+  const oNote = makeOutputLine(outputRegion, "Note", "ptt-out-note");
+  function readNum(i) { if (i.value === "") return NaN; const v = Number(i.value); return Number.isFinite(v) ? v : NaN; }
+  const update = debounce(() => {
+    const r = computePairedTTest({ mean_diff: readNum(md.input), sd_diff: readNum(sd.input), n_pairs: readNum(n.input), tail: tail.select.value });
+    if (r.error) { oT.textContent = r.error; oP.textContent = ""; oNote.textContent = ""; return; }
+    oT.textContent = "t = " + fmt(r.t_stat, 3) + ", df = " + r.df;
+    oP.textContent = "p = " + fmt(r.p_value, 4) + " (" + (r.significant ? "significant" : "not significant") + " at alpha)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [md.input, sd.input, n.input, tail.select]) f.addEventListener("input", update);
+}
+EDU_RENDERERS["paired-t-test"] = renderPairedTTest;

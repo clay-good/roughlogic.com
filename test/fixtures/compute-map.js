@@ -18,6 +18,7 @@ export const COMPUTE_MAP = {
   "final-grade-needed": { module: "../../calc-edu.js", fn: "computeFinalGradeNeeded" },
   "category-weighted-grade": { module: "../../calc-edu.js", fn: "computeCategoryWeightedGrade" },
   "two-sample-t-test": { module: "../../calc-edu.js", fn: "computeTwoSampleTTest" },
+  "paired-t-test": { module: "../../calc-edu.js", fn: "computePairedTTest" },
   "gross-rent-multiplier": { module: "../../calc-realestate.js", fn: "computeGrossRentMultiplier" },
   "pmi-cancellation-date": { module: "../../calc-realestate.js", fn: "computePmiCancellationDate" },
   "seller-net-sheet": { module: "../../calc-realestate.js", fn: "computeSellerNetSheet" },

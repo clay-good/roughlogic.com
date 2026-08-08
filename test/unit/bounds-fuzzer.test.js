@@ -10471,7 +10471,28 @@ test("bounds: spec-v1231 computeSumOfYearsDigitsDepreciation pins schedule, salv
 });
 import { computePrimerTm as _t1, computeCfuPlateCount as _t2 } from "../../calc-lab.js";
 import { computeGrossRentMultiplier as _x1, computePmiCancellationDate as _x2, computeSellerNetSheet as _x3 } from "../../calc-realestate.js";
-import { computeFinalGradeNeeded as _y1, computeCategoryWeightedGrade as _y2, computeTwoSampleTTest as _y3 } from "../../calc-edu.js";
+import { computeFinalGradeNeeded as _y1, computeCategoryWeightedGrade as _y2, computeTwoSampleTTest as _y3, computePairedTTest as _v1234 } from "../../calc-edu.js";
+test("bounds: spec-v1234 computePairedTTest pins t = d_bar/(s_d/sqrt(n)), df, the two/one-tail p, and error seams", () => {
+  // mean diff 2.5, SD 3.0, n 20: t = 2.5/(3/sqrt(20)) = 3.727, df 19, two-sided p ~ 0.00143.
+  const r = _v1234({ mean_diff: 2.5, sd_diff: 3.0, n_pairs: 20, tail: "two" });
+  assert.ok(Math.abs(r.t_stat - 2.5 / (3.0 / Math.sqrt(20))) < 1e-12);
+  assert.ok(Math.abs(r.t_stat - 3.7268) < 1e-3 && r.df === 19);
+  assert.ok(Math.abs(r.p_value - 0.00143) < 2e-4 && r.significant === true);
+  // One-tailed p is exactly half the two-tailed p.
+  const one = _v1234({ mean_diff: 2.5, sd_diff: 3.0, n_pairs: 20, tail: "one" });
+  assert.ok(Math.abs(one.p_value - r.p_value / 2) < 1e-9);
+  // A zero mean difference gives t = 0 and p = 1 (not significant).
+  const zero = _v1234({ mean_diff: 0, sd_diff: 3.0, n_pairs: 20 });
+  assert.ok(zero.t_stat === 0 && Math.abs(zero.p_value - 1) < 1e-9 && zero.significant === false);
+  // A negative mean difference flips the sign of t but not the two-tailed p.
+  const neg = _v1234({ mean_diff: -2.5, sd_diff: 3.0, n_pairs: 20 });
+  assert.ok(neg.t_stat < 0 && Math.abs(neg.p_value - r.p_value) < 1e-12);
+  // Error seams: fewer than 2 pairs, negative SD, zero spread, non-finite.
+  assert.ok("error" in _v1234({ mean_diff: 1, sd_diff: 1, n_pairs: 1 }));
+  assert.ok("error" in _v1234({ mean_diff: 1, sd_diff: -1, n_pairs: 5 }));
+  assert.ok("error" in _v1234({ mean_diff: 1, sd_diff: 0, n_pairs: 5 }));
+  assert.ok("error" in _v1234({ mean_diff: Infinity, sd_diff: 1, n_pairs: 5 }));
+});
 
 // ---------------------------------------------------------------------------
 // spec-v24 conduit-bending / welding / metal / layout / rolling-offset / audio

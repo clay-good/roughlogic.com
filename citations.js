@@ -123,6 +123,18 @@ export const CITATIONS = {
     ],
   },
 
+  "paired-t-test": {
+    formula: "On the n paired differences d_i: t = d_bar / (s_d / sqrt(n)) on df = n - 1, where d_bar and s_d are the mean and standard deviation of the differences; p from the Student-t CDF.",
+    edition: "Per OpenIntro Statistics Chapter 7 (inference for paired data) - the paired t-test is a one-sample t on the differences, by name; the t-CDF reuses the bundled special-function helper.",
+    freeAccess: "Free at openintro.org.",
+    governance: GOVERNANCE.general,
+    editionNote: "The paired (dependent-samples) t-test collapses matched before/after pairs to their n differences and runs a one-sample t on them; d_bar and s_d are of the DIFFERENCES, not the two groups. Pairing removes between-subject variation, so it is usually more powerful than a two-sample test on the same data, but it requires genuinely matched pairs. n < 2 pairs, or differences with no spread, are rejected. Small n (< 30) leans on the normality of the differences.",
+    assumptions: [
+      { name: "One-sample t on differences", value: "t = d_bar/(s_d/sqrt(n)), df = n - 1", source: "OpenIntro Ch. 7" },
+      { name: "Matched pairs", value: "requires genuinely paired data (same subject, twins, before/after)", source: "OpenIntro Ch. 7" },
+    ],
+  },
+
   "gross-rent-multiplier": {
     formula: "GRM_annual = price / gross_annual_rent; GRM_monthly = price / gross_monthly_rent; implied_value = market_GRM * gross_rent; gross_yield% = 1/GRM_annual * 100.",
     edition: "Standard income-approach screening metric per the Appraisal Institute's The Appraisal of Real Estate income approach, by name; USPAP governs the appraiser's value opinion.",

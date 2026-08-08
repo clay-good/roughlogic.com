@@ -387,6 +387,21 @@
       "kind": "adjacent"
     },
     {
+      "term": "paired t test",
+      "target": "paired-t-test",
+      "kind": "industry"
+    },
+    {
+      "term": "dependent samples t test",
+      "target": "paired-t-test",
+      "kind": "redirect"
+    },
+    {
+      "term": "before after matched pairs significance",
+      "target": "paired-t-test",
+      "kind": "question"
+    },
+    {
       "term": "gross income multiplier",
       "target": "gross-rent-multiplier",
       "kind": "adjacent"

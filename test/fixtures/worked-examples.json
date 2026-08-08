@@ -22085,6 +22085,42 @@
    }
   },
   {
+   "tile_id": "paired-t-test",
+   "source_publisher": "OpenIntro Statistics Ch. 7 (paired data)",
+   "source_title": "t = d_bar/(s_d/sqrt(n)) on n-1 df (one-sample t on the differences)",
+   "source_edition_or_year": "OpenIntro",
+   "source_section_or_page": "mean diff 2.5, SD 3.0, n 20 -> t = 2.5/(3/sqrt(20)) = 3.727, df 19, two-sided p 0.00143 (matches scipy stats.t)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "mean_diff": 2.5,
+    "sd_diff": 3.0,
+    "n_pairs": 20,
+    "tail": "two",
+    "alpha": 0.05
+   },
+   "outputs": {
+    "t_stat": {
+     "value": 3.727,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "df": {
+     "value": 19,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "p_value": {
+     "value": 0.00143,
+     "tolerance": {
+      "abs": 0.0002
+     }
+    }
+   }
+  },
+  {
    "tile_id": "conduit-offset",
    "source_publisher": "Ugly's Electrical References / NECA bending guidance (by name)",
    "source_title": "Conduit offset: mark spacing = offset / sin(angle); shrink = offset * tan(angle/2)",
