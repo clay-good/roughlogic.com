@@ -1251,6 +1251,53 @@ function _v1006renderThreadSingleDepth(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["thread-single-depth"] = _v1006renderThreadSingleDepth;
 
+// ===================== spec-v1220: general-purpose Acme (29-degree) thread depth =====================
+// The thread-single-depth tile is 60-degree UN only; the 29-degree Acme lead-screw form has no tile.
+// General-purpose Acme (Machinery's Handbook / ASME B1.5): pitch P = 1/TPI; external thread depth
+// h = P/2 + 0.010 in; basic pitch dia = D - P/2; external minor (root) = D - 2h = D - P - 0.020;
+// width of flat at the crest = 0.3707 P; included thread angle 29 degrees.
+// dims: in { major_dia_in: L, tpi: dimensionless } out: { pitch_in: L, thread_depth_in: L, pitch_dia_in: L, minor_dia_in: L, crest_flat_in: L }
+export function computeAcmeThreadDepth({ major_dia_in = 0, tpi = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D = Number(major_dia_in) || 0;
+  const n = Number(tpi) || 0;
+  if (!(D > 0)) return { error: "Major (nominal) diameter must be positive (in)." };
+  if (!(n > 0)) return { error: "Threads per inch must be positive." };
+  const pitch_in = 1 / n;
+  const thread_depth_in = pitch_in / 2 + 0.010;
+  const pitch_dia_in = D - pitch_in / 2;
+  const minor_dia_in = D - 2 * thread_depth_in;
+  const crest_flat_in = 0.3707 * pitch_in;
+  if (!(minor_dia_in > 0)) return { error: "The pitch is too coarse for this diameter (the computed minor diameter is not positive); check the TPI and major diameter." };
+  if (![pitch_in, thread_depth_in, pitch_dia_in, minor_dia_in, crest_flat_in].every(Number.isFinite)) return { error: "Acme-thread math is not a finite value." };
+  return {
+    pitch_in, thread_depth_in, pitch_dia_in, minor_dia_in, crest_flat_in,
+    note: "General-purpose Acme (29-degree) thread dimensions, the lead-screw / power-transmission form the 60-degree UN thread-single-depth tile does not cover. The pitch P = 1/TPI; the external thread depth (crest to root) h = P/2 + 0.010 in (half the pitch plus the 0.010 in general-purpose clearance); the basic pitch diameter = D - P/2; the external minor (root) diameter = D - 2h = D - P - 0.020; and the width of the flat at the crest = 0.3707 P (from the 29-degree flank geometry). A 1 in, 5-TPI Acme (\"1-5 Acme\") has a 0.200 in pitch, a 0.110 in thread depth, a 0.900 in pitch diameter, a 0.780 in minor diameter, and a 0.0741 in crest flat. Acme threads carry axial load with less friction and less wedging than a V-thread, which is why they run vises, presses, and machine lead screws; the 29-degree flank also clears chips and tolerates wear. Cut with a 29-degree Acme tool ground to the crest-flat width, and check the pitch diameter over wires (the three-wire method) rather than trusting the depth alone. General-purpose class; the Stub Acme (0.3 P depth) and the centralizing (C) classes differ, and ASME B1.5 and the thread gauge govern the finished fit.",
+  };
+}
+export const acmeThreadDepthExample = { inputs: { major_dia_in: 1.0, tpi: 5 } };
+function renderAcmeThreadDepth(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: general-purpose Acme (29-degree) thread dimensions (Machinery's Handbook / ASME B1.5): pitch = 1/TPI, external thread depth = P/2 + 0.010 in, pitch dia = D - P/2, external minor = D - P - 0.020, crest flat = 0.3707 P. Cut with a 29-degree tool and verify over wires. General-purpose class; Stub Acme and centralizing classes differ; ASME B1.5 and a thread gauge govern.";
+  const D = makeNumber("Major (nominal) diameter (in)", "acme-d", { step: "any", min: "0", value: "1" }); D.input.value = "1";
+  const tp = makeNumber("Threads per inch (TPI)", "acme-tpi", { step: "any", min: "0", value: "5" }); tp.input.value = "5";
+  for (const f of [D, tp]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D.input.value = "1"; tp.input.value = "5"; update(); });
+  const oDepth = makeOutputLine(outputRegion, "Thread depth / pitch", "acme-out-depth");
+  const oDia = makeOutputLine(outputRegion, "Pitch / minor diameter", "acme-out-dia");
+  const oFlat = makeOutputLine(outputRegion, "Crest flat width", "acme-out-flat");
+  const oNote = makeOutputLine(outputRegion, "Note", "acme-out-n");
+  const update = debounce(() => {
+    const r = computeAcmeThreadDepth({ major_dia_in: Number(D.input.value) || 0, tpi: Number(tp.input.value) || 0 });
+    if (r.error) { oDepth.textContent = r.error; oDia.textContent = "-"; oFlat.textContent = "-"; oNote.textContent = ""; return; }
+    oDepth.textContent = fmt(r.thread_depth_in, 4) + " in (pitch " + fmt(r.pitch_in, 4) + " in)";
+    oDia.textContent = fmt(r.pitch_dia_in, 4) + " in / " + fmt(r.minor_dia_in, 4) + " in";
+    oFlat.textContent = fmt(r.crest_flat_in, 4) + " in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [D, tp]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["acme-thread-depth"] = renderAcmeThreadDepth;
+
 // --- spec-v1108 K: Gear undercut minimum tooth count and backlash ---
 // spur-gear-geometry's citation says it "returns the geometry only; it does not check tooth
 // strength, backlash, or undercutting." Both missing checks are closed-form geometry:

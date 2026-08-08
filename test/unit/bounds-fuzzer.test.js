@@ -29446,6 +29446,31 @@ test("bounds: spec-v1006 computeThreadSingleDepth pins the UN external thread de
   assert.ok("error" in _v1006({ tpi: Infinity }));
 });
 
+import { computeAcmeThreadDepth as _v1220 } from "../../calc-machining.js";
+
+test("bounds: spec-v1220 computeAcmeThreadDepth pins the general-purpose Acme dimensions, the published 1-5 values, coarser-is-deeper, and error seams", () => {
+  // 1-5 Acme: pitch 0.200, depth 0.110, pitch dia 0.900, minor 0.780, crest flat 0.0741.
+  const r = _v1220({ major_dia_in: 1.0, tpi: 5 });
+  assert.ok(Math.abs(r.pitch_in - 0.2) < 1e-12);
+  assert.ok(Math.abs(r.thread_depth_in - (0.2 / 2 + 0.010)) < 1e-12 && Math.abs(r.thread_depth_in - 0.110) < 1e-9);
+  assert.ok(Math.abs(r.pitch_dia_in - 0.900) < 1e-9);
+  assert.ok(Math.abs(r.minor_dia_in - (1.0 - 0.2 - 0.020)) < 1e-12 && Math.abs(r.minor_dia_in - 0.780) < 1e-9);
+  assert.ok(Math.abs(r.crest_flat_in - 0.3707 * 0.2) < 1e-12);
+  // Minor = major - 2 x depth (consistency).
+  assert.ok(Math.abs(r.minor_dia_in - (1.0 - 2 * r.thread_depth_in)) < 1e-12);
+  // A coarser thread (lower TPI) is deeper and cuts a smaller minor.
+  const coarse = _v1220({ major_dia_in: 1.5, tpi: 4 });
+  assert.ok(Math.abs(coarse.thread_depth_in - 0.135) < 1e-9 && Math.abs(coarse.minor_dia_in - 1.23) < 1e-9);
+  assert.ok(coarse.thread_depth_in > r.thread_depth_in);
+  // Depth falls toward the 0.010 floor as TPI rises (finer pitch).
+  assert.ok(_v1220({ major_dia_in: 1.0, tpi: 10 }).thread_depth_in < r.thread_depth_in);
+  // Error seams: non-positive diameter/TPI, a pitch too coarse for the diameter (non-positive minor), non-finite.
+  assert.ok("error" in _v1220({ major_dia_in: 0, tpi: 5 }));
+  assert.ok("error" in _v1220({ major_dia_in: 1.0, tpi: 0 }));
+  assert.ok("error" in _v1220({ major_dia_in: 0.15, tpi: 2 })); // minor would be <= 0
+  assert.ok("error" in _v1220({ major_dia_in: Infinity, tpi: 5 }));
+});
+
 import { computeFlywheelEnergy as _v1007 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v1007 computeFlywheelEnergy pins the rotational KE and speed fluctuation", () => {

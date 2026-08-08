@@ -2509,6 +2509,7 @@ cross-check.
 | calc-lowvoltage.js | `computeStandbyBatterySizing` | `{ standby_current_a = 0, standby_hours = 0, alarm_current_a = 0, alarm_minute...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeStructuredCablingChannel` | `{ permanent_link_m = 0, cords_m = 0, temp_c = 20, derate_per_c = 0.004 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeThermistorBetaTemp` | `{ resistance_ohms = 10000, r0_ohms = 10000, beta_k = 3950, ref_temp_c = 25 } ...` | _ | _ | _ |
+| calc-machining.js | `computeAcmeThreadDepth` | `{ major_dia_in = 0, tpi = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeBallnoseFeedCusp` | `{ r_in = 0.25, stepover_in = 0.03, feed_per_tooth_in = 0.004, rpm = 0, flutes...` | _ | _ | _ |
 | calc-machining.js | `computeBallnoseScallopHeight` | `{ r_in = 0, mode = "scallop-from-stepover", s_in = 0, h_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeBearingL10Life` | `{ dynamic_rating_lbf = 0, equivalent_load_lbf = 0, speed_rpm = 0, bearing_typ...` | _ | _ | _ |
@@ -3254,7 +3255,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1840.
+Row count: 1841.
 
 <!-- END function-corpus-v14 -->
 
@@ -4527,11 +4528,12 @@ per spec-v14 §13.1 second paragraph.
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (102 tiles)
+### Group K Mechanic (103 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `abyc-dc-wire` | ABYC E-11 Marine DC Wire Sizing | ABYC E-11 DC wire sizing by voltage drop; spec-v517 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `acme-thread-depth` | Acme (29-degree) Thread Depth and Dimensions | General-purpose Acme thread (Machiner...; pitch = 1/5 = 0.200; depth = 0.200/2 + 0.010 = 0.110; pit... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `aircraft-weight-balance` | Aircraft Weight and Balance (CG Envelope) | station-moment weight and balance (FA...; spec-v516 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `alternator-charging-load` | Alternator Charging Load Balance | automotive-electrical practice; spec-v464 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `anchor-rode-scope` | Anchor Rode Scope and Swing Radius | anchor rode scope and swing radius (s...; spec-v505 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5032,6 +5034,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1592. Fixture-covered or reference-cadence: 1592 / 1592.
+Tile count: 1593. Fixture-covered or reference-cadence: 1593 / 1593.
 
 <!-- END tile-index-v14 -->

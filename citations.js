@@ -1033,6 +1033,18 @@ export const CITATIONS = {
       { name: "Compound infeed", value: "compound set to 29.5 degrees; infeed = radial depth / cos(29.5) so the tool cuts on the leading flank; verify with a gauge / three-wire method", source: "single-point threading practice" },
     ],
   },
+  "acme-thread-depth": {
+    formula: "pitch = 1/TPI; thread depth h = P/2 + 0.010 in; pitch dia = D - P/2; external minor = D - 2h = D - P - 0.020; crest flat = 0.3707 P; 29-degree included angle.",
+    edition: "General-purpose Acme (29-degree) thread dimensions (Machinery's Handbook / ASME B1.5), by name.",
+    freeAccess: "The general-purpose Acme geometry (P/2 + 0.010 depth, 0.3707 P crest flat, D - P/2 pitch diameter) is standard published machining reference (Machinery's Handbook); the major diameter and TPI are the thread's spec.",
+    governance: GOVERNANCE.general,
+    editionNote: "The general-purpose Acme (29-degree) thread dimensions, the lead-screw and power-transmission form the 60-degree UN thread-single-depth tile does not cover. The pitch P = 1/TPI; the external thread depth (crest to root) h = P/2 + 0.010 inch (half the pitch plus the 0.010 inch general-purpose clearance); the basic pitch diameter = D - P/2; the external minor (root) diameter = D - 2h = D - P - 0.020; and the width of the flat at the crest = 0.3707 P, from the 29-degree flank geometry. A 1 inch, 5-TPI Acme has a 0.200 inch pitch, a 0.110 inch thread depth, a 0.900 inch pitch diameter, a 0.780 inch minor diameter, and a 0.0741 inch crest flat. Acme threads transmit axial load with less friction and less wedging than a V-thread, so they run vises, presses, and machine lead screws; the 29-degree flank clears chips and tolerates wear. Cut with a 29-degree Acme tool ground to the crest-flat width, and verify the pitch diameter over wires rather than trusting the depth alone. This is the general-purpose class; the Stub Acme (0.3 P depth) and the centralizing (C) classes differ, and ASME B1.5 and the thread gauge govern the finished fit.",
+    assumptions: [
+      { name: "Acme depth", value: "external thread depth h = P/2 + 0.010 in (general-purpose clearance)", source: "Machinery's Handbook / ASME B1.5" },
+      { name: "Diameters", value: "pitch dia = D - P/2; external minor = D - P - 0.020", source: "Acme thread geometry" },
+      { name: "Crest flat and angle", value: "crest flat = 0.3707 P; included angle 29 degrees; general-purpose class only", source: "ASME B1.5" },
+    ],
+  },
   "cutting-speed-rpm": {
     formula: "RPM = 12 * SFM / (pi * dia(in)); feed IPM = RPM * flutes * chip_load(in/tooth); 12/pi = 3.8197.",
     edition: "First-principles cutting geometry; the speeds-and-feeds method as in Machinery's Handbook (Industrial Press), by name.",

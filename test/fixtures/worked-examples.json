@@ -17856,6 +17856,78 @@
    }
   },
   {
+   "tile_id": "acme-thread-depth",
+   "source_publisher": "General-purpose Acme thread (Machinery's Handbook / ASME B1.5)",
+   "source_title": "1-5 Acme (1 in major, 5 TPI) -> 0.110 in depth, 0.900 in pitch dia, 0.780 in minor (spec-v1220)",
+   "source_edition_or_year": "Acme geometry (first-principles)",
+   "source_section_or_page": "pitch = 1/5 = 0.200; depth = 0.200/2 + 0.010 = 0.110; pitch dia = 1 - 0.100 = 0.900; minor = 1 - 0.200 - 0.020 = 0.780; crest flat = 0.3707 x 0.200 = 0.0741.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "major_dia_in": 1.0,
+    "tpi": 5
+   },
+   "outputs": {
+    "pitch_in": {
+     "value": 0.2,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "thread_depth_in": {
+     "value": 0.11,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "pitch_dia_in": {
+     "value": 0.9,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "minor_dia_in": {
+     "value": 0.78,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "crest_flat_in": {
+     "value": 0.0741,
+     "tolerance": {
+      "abs": 0.0002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "acme-thread-depth",
+   "source_publisher": "General-purpose Acme thread (coarser cross-check)",
+   "source_title": "cross-check: a 1.5-4 Acme -> 0.250 in pitch, 0.135 in depth, 1.230 in minor",
+   "source_edition_or_year": "depth = P/2 + 0.010, minor = D - P - 0.020",
+   "source_section_or_page": "pitch = 1/4 = 0.250; depth = 0.125 + 0.010 = 0.135; minor = 1.5 - 0.250 - 0.020 = 1.230 in -- the coarser pitch cuts a deeper thread.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "major_dia_in": 1.5,
+    "tpi": 4
+   },
+   "outputs": {
+    "thread_depth_in": {
+     "value": 0.135,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "minor_dia_in": {
+     "value": 1.23,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "thread-single-depth",
    "source_publisher": "Single-point thread cutting depth (60-degree UN external; Machinery's Handbook)",
    "source_title": "cross-check: coarser 3/4-10 thread -> 0.0613 in radial depth",
