@@ -1456,3 +1456,60 @@ TREATMENT_RENDERERS["pool-calcium-hardness-dose"] = _rPool({
   ],
   compute: computePoolCalciumHardnessDose,
 });
+
+// ===================== spec-v1208: design flow from population (average, peak, minimum) =====================
+// Nearly every water/wastewater tile takes the design flow flow_mgd as an INPUT (the pounds formula,
+// population-equivalent, clarifier loading, chemical-feed pump, RAS/WAS control, BOD/TSS loading, ...),
+// but no tile produced it, and the only population/flow tile (population-equivalent) runs the OTHER way
+// (a flow into a population). This is the standard first step of a collection-system or plant design:
+// the average daily flow from population and per-capita flow, then the peak and minimum via the
+// classic empirical factors. Harmon peaking PF = 1 + 14/(4 + sqrt(P_thousands)); Gifft minimum ratio
+// = 0.2 * (P_thousands)^(1/6). Textbook sanitary engineering (Metcalf & Eddy, Ten States Standards).
+// dims: in { population: dimensionless, per_capita_gpcd: dimensionless } out: { avg_flow_mgd: dimensionless, avg_flow_gpm: dimensionless, peak_flow_mgd: dimensionless, peak_flow_gpm: dimensionless, min_flow_mgd: dimensionless, min_flow_gpm: dimensionless, harmon_pf: dimensionless, gifft_min_ratio: dimensionless }
+export function computeDesignFlowPeaking({ population = 0, per_capita_gpcd = 100 } = {}) {
+  const P = Number(population) || 0;
+  const q = Number(per_capita_gpcd) || 0;
+  if (!(P > 0 && Number.isFinite(P))) return { error: "Population must be positive." };
+  if (!(q > 0 && Number.isFinite(q))) return { error: "Per-capita flow must be positive (gpcd)." };
+  const Pth = P / 1000;
+  const avg_gpd = P * q;
+  const avg_flow_mgd = avg_gpd / 1e6;
+  const avg_flow_gpm = avg_gpd / 1440;
+  const harmon_pf = 1 + 14 / (4 + Math.sqrt(Pth));
+  const peak_flow_mgd = avg_flow_mgd * harmon_pf;
+  const peak_flow_gpm = avg_flow_gpm * harmon_pf;
+  const gifft_min_ratio = 0.2 * Math.pow(Pth, 1 / 6);
+  const min_flow_mgd = avg_flow_mgd * gifft_min_ratio;
+  const min_flow_gpm = avg_flow_gpm * gifft_min_ratio;
+  if (![avg_flow_mgd, avg_flow_gpm, peak_flow_mgd, peak_flow_gpm, min_flow_mgd, min_flow_gpm, harmon_pf, gifft_min_ratio].every(Number.isFinite)) {
+    return { error: "Design-flow math is not a finite value." };
+  }
+  return {
+    avg_flow_mgd, avg_flow_gpm, peak_flow_mgd, peak_flow_gpm, min_flow_mgd, min_flow_gpm, harmon_pf, gifft_min_ratio,
+    small_system: Pth < 1,
+    note: "The design flow the rest of the water/wastewater bench takes as an input (flow_mgd) but no tile produced. The AVERAGE daily flow = population x per-capita flow (gpcd): the flow to feed the pounds-formula, population-equivalent, clarifier-loading, chemical-feed, and BOD/TSS tiles. The PEAK flow, which sizes the hydraulic units (sewers, pumps, clarifier surface area), = average x the Harmon peaking factor PF = 1 + 14/(4 + sqrt(P)), P the population in thousands; the peak factor falls as the system grows (2.26 at 50,000 people, 1.39 at 1,000,000) because diversity smooths the demand. The MINIMUM flow, which governs self-cleansing sewer velocity and low-flow channel design, = average x the Gifft ratio 0.2 x P^(1/6). A 50,000-person system at 100 gpcd averages 5.0 MGD, peaks at 11.3 MGD, and drops to 1.9 MGD. Domestic sanitary flow only: per-capita is the user's own basis (roughly 60-100 gpcd domestic; add infiltration/inflow and any industrial load separately), and the Harmon factor is drawn for populations of about 1,000 to 1,000,000. A design aid; Ten States Standards and the state design criteria and the engineer of record govern.",
+  };
+}
+export const designFlowPeakingExample = { inputs: { population: 50000, per_capita_gpcd: 100 } };
+function renderDesignFlowPeaking(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: sanitary design flow from population (Metcalf & Eddy, Wastewater Engineering / Ten States Standards): average daily flow = population x per-capita flow (gpcd); Harmon peaking factor PF = 1 + 14/(4 + sqrt(P)) and Gifft minimum ratio 0.2 x P^(1/6), P the population in thousands. Domestic sanitary flow only; infiltration/inflow and industrial load are added separately. The Harmon factor is drawn for populations of about 1,000 to 1,000,000. A design aid; Ten States Standards and the state design criteria and the engineer of record govern.";
+  const pop = makeNumber("Population (persons)", "dfp-pop", { step: "any", min: "0" }); pop.input.value = "50000";
+  const gpcd = makeNumber("Per-capita flow (gpcd, ~60-100 domestic)", "dfp-gpcd", { step: "any", min: "0" }); gpcd.input.value = "100";
+  for (const f of [pop, gpcd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { pop.input.value = "50000"; gpcd.input.value = "100"; update(); });
+  const oAvg = makeOutputLine(outputRegion, "Average daily flow (feed flow_mgd)", "dfp-out-avg");
+  const oPeak = makeOutputLine(outputRegion, "Peak flow / Harmon factor", "dfp-out-peak");
+  const oMin = makeOutputLine(outputRegion, "Minimum flow / Gifft ratio", "dfp-out-min");
+  const oNote = makeOutputLine(outputRegion, "Note", "dfp-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeDesignFlowPeaking({ population: readNum(pop.input), per_capita_gpcd: readNum(gpcd.input) });
+    if (r.error) { oAvg.textContent = r.error; oPeak.textContent = "-"; oMin.textContent = "-"; oNote.textContent = ""; return; }
+    oAvg.textContent = fmt(r.avg_flow_mgd, 3) + " MGD (" + fmt(r.avg_flow_gpm, 0) + " gpm)";
+    oPeak.textContent = fmt(r.peak_flow_mgd, 3) + " MGD (" + fmt(r.peak_flow_gpm, 0) + " gpm) / PF " + fmt(r.harmon_pf, 2) + (r.small_system ? " -- below 1,000 people, outside the Harmon range" : "");
+    oMin.textContent = fmt(r.min_flow_mgd, 3) + " MGD (" + fmt(r.min_flow_gpm, 0) + " gpm) / " + fmt(r.gifft_min_ratio, 2) + " x avg";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [pop, gpcd]) f.input.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["design-flow-peaking"] = renderDesignFlowPeaking;

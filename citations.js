@@ -707,6 +707,19 @@ export const CITATIONS = {
       { name: "Upset", value: "effluent above influent is a negative removal, reported not errored", source: "scope of this tile" },
     ],
   },
+  "design-flow-peaking": {
+    formula: "avg_gpd = population x gpcd; avg_mgd = avg_gpd/1e6; PF = 1 + 14/(4 + sqrt(P)); peak = avg x PF; min = avg x 0.2 x P^(1/6) (P = population/1000).",
+    edition: "Sanitary design flow from population with the Harmon peaking factor and the Gifft minimum-flow ratio, standard sanitary-engineering practice (Metcalf & Eddy, Wastewater Engineering; Ten States Standards), by name.",
+    freeAccess: "The Harmon and Gifft empirical factors and the average-flow-from-population relation are standard published sanitary-engineering results; the per-capita flow is the user's own design basis.",
+    governance: GOVERNANCE.water,
+    editionNote: "The design flow the rest of the water/wastewater bench takes as an input (flow_mgd) but no tile produced, and the reverse of the population-equivalent tile. The AVERAGE daily flow = population x per-capita flow (gpcd) is the value fed to the pounds-formula, population-equivalent, clarifier-loading, chemical-feed, and BOD/TSS tiles. The PEAK flow that sizes the hydraulic units (sewers, pumps, clarifier surface area) = average x the Harmon peaking factor PF = 1 + 14/(4 + sqrt(P)) with P the population in thousands; the factor falls as the system grows (about 2.26 at 50,000 people, 1.39 at 1,000,000) because demand diversity smooths the peak. The MINIMUM flow that governs self-cleansing sewer velocity and low-flow channel design = average x the Gifft ratio 0.2 x P^(1/6). Domestic sanitary flow only: the per-capita basis is the user's (roughly 60-100 gpcd domestic), and infiltration/inflow and any industrial load are added separately. The Harmon factor is drawn for populations of about 1,000 to 1,000,000. A design aid; Ten States Standards, the state design criteria, and the engineer of record govern.",
+    assumptions: [
+      { name: "Average daily flow", value: "population x per-capita flow (gpcd)", source: "sanitary engineering" },
+      { name: "Harmon peaking factor", value: "PF = 1 + 14/(4 + sqrt(P)), P in thousands (peak = avg x PF)", source: "Harmon / Metcalf & Eddy" },
+      { name: "Gifft minimum ratio", value: "min/avg = 0.2 x P^(1/6), P in thousands", source: "Gifft (1945)" },
+      { name: "Scope", value: "domestic sanitary flow only; I&I and industrial load added separately", source: "scope of this tile" },
+    ],
+  },
   "chlorine-cylinder-withdrawal": {
     formula: "per_container = base(type) x temperature-derate (base ~40 lb/day cylinder, ~400 lb/day ton at ~70 F); containers = ceil(feed_rate / per_container).",
     edition: "Gas chlorine container withdrawal rate (The Chlorine Institute; state operator training), by name.",

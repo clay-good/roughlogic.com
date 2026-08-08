@@ -20330,6 +20330,78 @@
    }
   },
   {
+   "tile_id": "design-flow-peaking",
+   "source_publisher": "Metcalf & Eddy, Wastewater Engineering / Ten States Standards (Harmon peaking, Gifft minimum)",
+   "source_title": "50,000 people at 100 gpcd -> 5.0 MGD avg, 11.32 MGD peak (PF 2.26), 1.92 MGD min (spec-v1208)",
+   "source_edition_or_year": "standard sanitary-engineering design-flow relations",
+   "source_section_or_page": "avg = 50000 x 100 / 1e6 = 5.0 MGD; PF = 1 + 14/(4 + sqrt(50)) = 1 + 14/11.0711 = 2.2645; peak = 5.0 x 2.2645 = 11.323 MGD; Gifft = 0.2 x 50^(1/6) = 0.2 x 1.9193 = 0.38387; min = 5.0 x 0.38387 = 1.9193 MGD.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "population": 50000,
+    "per_capita_gpcd": 100
+   },
+   "outputs": {
+    "avg_flow_mgd": {
+     "value": 5.0,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "harmon_pf": {
+     "value": 2.2645,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "peak_flow_mgd": {
+     "value": 11.323,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "min_flow_mgd": {
+     "value": 1.9193,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "design-flow-peaking",
+   "source_publisher": "standard sanitary-engineering design-flow relations",
+   "source_title": "cross-check: the Harmon factor falls with size -- 1,000,000 people gives PF 1.39 (vs 2.26 at 50,000)",
+   "source_edition_or_year": "Harmon PF = 1 + 14/(4 + sqrt(P)), P in thousands",
+   "source_section_or_page": "P = 1000 thousands: PF = 1 + 14/(4 + sqrt(1000)) = 1 + 14/35.6228 = 1.3930; avg = 1e6 x 100 / 1e6 = 100 MGD; peak = 139.30 MGD; Gifft = 0.2 x 1000^(1/6) = 0.2 x 3.1623 = 0.63246; min = 63.25 MGD.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "population": 1000000,
+    "per_capita_gpcd": 100
+   },
+   "outputs": {
+    "avg_flow_mgd": {
+     "value": 100.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "harmon_pf": {
+     "value": 1.3930,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "peak_flow_mgd": {
+     "value": 139.30,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "tds-from-conductivity",
    "source_publisher": "Standard Methods 2510",
    "source_title": "1000 uS/cm, k 0.65 -> 650 mg/L",

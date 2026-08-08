@@ -24592,6 +24592,31 @@
       "kind": "industry"
     },
     {
+      "term": "design flow from population",
+      "target": "design-flow-peaking",
+      "kind": "question"
+    },
+    {
+      "term": "harmon peaking factor",
+      "target": "design-flow-peaking",
+      "kind": "industry"
+    },
+    {
+      "term": "average daily flow gpcd",
+      "target": "design-flow-peaking",
+      "kind": "industry"
+    },
+    {
+      "term": "peak wastewater flow",
+      "target": "design-flow-peaking",
+      "kind": "industry"
+    },
+    {
+      "term": "population to sewage flow",
+      "target": "design-flow-peaking",
+      "kind": "question"
+    },
+    {
       "term": "npdes loading",
       "target": "bod-tss-loading-removal",
       "kind": "industry"

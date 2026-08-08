@@ -1361,6 +1361,7 @@ export const RENDERER_MAP = {
   "clarifier-surface-loading": { module: "../../calc-treatment.js", exportName: "TREATMENT_RENDERERS" },
   "clarifier-area-for-loading": { module: "../../calc-treatment.js", exportName: "TREATMENT_RENDERERS" },
   "bod-tss-loading-removal": { module: "../../calc-treatment.js", exportName: "TREATMENT_RENDERERS" },
+  "design-flow-peaking": { module: "../../calc-treatment.js", exportName: "TREATMENT_RENDERERS" },
   "tds-from-conductivity": { module: "../../calc-treatment.js", exportName: "TREATMENT_RENDERERS" },
   "conductivity-from-tds": { module: "../../calc-treatment.js", exportName: "TREATMENT_RENDERERS" },
   "digester-vs-loading": { module: "../../calc-treatment.js", exportName: "TREATMENT_RENDERERS" },

@@ -60,6 +60,7 @@ export const COMPUTE_MAP = {
   "clarifier-surface-loading": { module: "../../calc-treatment.js", fn: "computeClarifierSurfaceLoading" },
   "clarifier-area-for-loading": { module: "../../calc-treatment.js", fn: "computeClarifierAreaForLoading" },
   "bod-tss-loading-removal": { module: "../../calc-treatment.js", fn: "computeBodTssLoadingRemoval" },
+  "design-flow-peaking": { module: "../../calc-treatment.js", fn: "computeDesignFlowPeaking" },
   "tds-from-conductivity": { module: "../../calc-treatment.js", fn: "computeTdsFromConductivity" },
   "conductivity-from-tds": { module: "../../calc-treatment.js", fn: "computeConductivityFromTds" },
   "digester-vs-loading": { module: "../../calc-treatment.js", fn: "computeDigesterVsLoading" },

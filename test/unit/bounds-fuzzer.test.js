@@ -20894,6 +20894,39 @@ test("bounds: spec-v406 computeBodTssLoadingRemoval pins the loads, removal, the
   assert.ok("error" in _v406({ flow_mgd: Infinity, influent_mgl: 200, effluent_mgl: 20 }));
 });
 
+import { computeDesignFlowPeaking as _v1208 } from "../../calc-treatment.js";
+
+test("bounds: spec-v1208 computeDesignFlowPeaking pins the average/peak/min, the Harmon and Gifft factors, the size trend, and error seams", () => {
+  const r = _v1208({ population: 50000, per_capita_gpcd: 100 });
+  // avg = 50000 x 100 / 1e6 = 5.0 MGD; gpm = 5e6/1440.
+  assert.ok(Math.abs(r.avg_flow_mgd - 5.0) < 1e-12);
+  assert.ok(Math.abs(r.avg_flow_gpm - 5e6 / 1440) < 1e-9);
+  // Harmon PF = 1 + 14/(4 + sqrt(50)) = 2.26454; peak = avg x PF.
+  assert.ok(Math.abs(r.harmon_pf - (1 + 14 / (4 + Math.sqrt(50)))) < 1e-12);
+  assert.ok(Math.abs(r.harmon_pf - 2.26454) < 1e-4);
+  assert.ok(Math.abs(r.peak_flow_mgd - r.avg_flow_mgd * r.harmon_pf) < 1e-12);
+  assert.ok(Math.abs(r.peak_flow_mgd - 11.3227) < 1e-3);
+  // Gifft minimum ratio = 0.2 x 50^(1/6) = 0.38387; min = avg x ratio.
+  assert.ok(Math.abs(r.gifft_min_ratio - 0.2 * Math.pow(50, 1 / 6)) < 1e-12);
+  assert.ok(Math.abs(r.min_flow_mgd - r.avg_flow_mgd * r.gifft_min_ratio) < 1e-12);
+  assert.ok(Math.abs(r.min_flow_mgd - 1.9193) < 1e-3);
+  // The average scales linearly with population and per-capita flow.
+  assert.ok(Math.abs(_v1208({ population: 100000, per_capita_gpcd: 100 }).avg_flow_mgd - 10.0) < 1e-12);
+  assert.ok(Math.abs(_v1208({ population: 50000, per_capita_gpcd: 200 }).avg_flow_mgd - 10.0) < 1e-12);
+  // The Harmon peak factor DECREASES as the system grows (diversity smooths the peak).
+  const big = _v1208({ population: 1000000, per_capita_gpcd: 100 });
+  assert.ok(Math.abs(big.harmon_pf - 1.3930) < 1e-3);
+  assert.ok(big.harmon_pf < r.harmon_pf);
+  assert.ok(big.small_system === false && _v1208({ population: 500, per_capita_gpcd: 100 }).small_system === true);
+  // Ordering always holds: min < avg < peak.
+  assert.ok(r.min_flow_mgd < r.avg_flow_mgd && r.avg_flow_mgd < r.peak_flow_mgd);
+  // Error seams: non-positive population or per-capita, non-finite.
+  assert.ok("error" in _v1208({}));
+  assert.ok("error" in _v1208({ population: 0, per_capita_gpcd: 100 }));
+  assert.ok("error" in _v1208({ population: 50000, per_capita_gpcd: 0 }));
+  assert.ok("error" in _v1208({ population: Infinity, per_capita_gpcd: 100 }));
+});
+
 test("bounds: spec-v407 computeTdsFromConductivity pins TDS, the k-band, and error seams", () => {
   const r = _v407({ conductivity_us_cm: 1000, k_factor: 0.65 });
   assert.ok(Math.abs(r.tds_mgl - 650) < 1e-9);
