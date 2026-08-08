@@ -1482,6 +1482,7 @@ cross-check.
 | calc-agriculture.js | `computePivotApplicationRate` | `{ pass_depth_in = 0, pivot_length_ft = 0, revolution_hr = 0, wetted_band_ft =...` | _ | _ | _ |
 | calc-agriculture.js | `computePivotTimerDepth` | `{ system_flow_gpm = 0, area_acres = 0, revolution_100_hr = 0, timer_pct = 0 }...` | _ | _ | _ |
 | calc-agriculture.js | `computePlantSpacingCount` | `{ bed_ft2 = 0, spacing_in = 0 } = {}` | _ | _ | _ |
+| calc-agriculture.js | `computeReferenceEt0` | `{ latitude_deg = 0, month = "jul", tmax_f = 0, tmin_f = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeSeedRate` | `{ row_width_in = 0, in_row_spacing_in = 0, target_pop_per_acre = 0, seeds_per...` | _ | _ | _ |
 | calc-agriculture.js | `computeSodTakeoff` | `{ lawn_ft2 = 0, waste_pct = 0, slab_ft2 = 10, pallet_ft2 = 450 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeSprayDriftBuffer` | `{ base_buffer_ft = 0, droplet_class = "medium", wind_mph, boom_height_in = 20...` | _ | _ | _ |
@@ -3299,7 +3300,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1885.
+Row count: 1886.
 
 <!-- END function-corpus-v14 -->
 
@@ -4702,7 +4703,7 @@ per spec-v14 §13.1 second paragraph.
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `worm-gear-geometry` | Worm and Worm-Wheel Geometry | Machinery's Handbook (worm gearing); lead = 0.5 x 1 = 0.5 in; lead angle = atan(0.5/(pi x 2)) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (71 tiles)
+### Group L Agriculture (72 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4754,6 +4755,7 @@ per spec-v14 §13.1 second paragraph.
 | `plant-spacing-count` | Plant Spacing Count (Square and Triangular) | Nursery / landscape estimating refere...; spec-v210 section 2.1 pinned example (1 ft on center) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `porta-wrap-friction` | Friction-Device Hold Force by Wraps | Capstan (Euler-Eytelwein) / ANSI Z133...; 800 lb load side, friction 0.20 -> 1 wrap 227.7 lb, 2 wra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `quadratic-mean-diameter` | Quadratic Mean Diameter (from a Tally) | USDA Forest Service forest-mensuratio...; Five-tree tally 8, 10, 10, 12, 14 in -> sum_sq 604, QMD s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `reference-et0` | Reference Evapotranspiration ET0 (Hargreaves / FAO-56) | Hargreaves & Samani 1985 / FAO-56 (Ra...; J=197 (mid-July); Tmax=30C, Tmin=15C, Tmean=22.5C, dT=15;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `reineke-sdi` | Reineke Stand Density Index | Reineke Stand Density Index (Reineke ...; 300 TPA, QMD 10 in, SDI_max 400 -> SDI 300, 75% of max (u... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seed-rate` | Planting Density and Seed Rate | Project (first-principles); 30 in rows / 32,000 plants/ac target / 1,500 seeds/lb / 9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sod-takeoff` | Sod Takeoff (Slabs and Pallets) | Turfgrass producer / landscape estima...; spec-v211 section 2.1 pinned example (residential lawn) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5122,6 +5124,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1637. Fixture-covered or reference-cadence: 1637 / 1637.
+Tile count: 1638. Fixture-covered or reference-cadence: 1638 / 1638.
 
 <!-- END tile-index-v14 -->

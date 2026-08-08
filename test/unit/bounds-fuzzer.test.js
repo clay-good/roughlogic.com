@@ -10446,6 +10446,7 @@ test("bounds: spec-v732 cutter diameter for a spindle RPM (inverse of cutting-sp
 });
 
 import { computeGrowingDegreeDays as _l1, computePearsonSquareRation as _l2, computeLivestockWaterRequirement as _l3, computeTwoStrokeMix as _l4 } from "../../calc-agriculture.js";
+import { computeReferenceEt0 as _v1265 } from "../../calc-agriculture.js";
 import { computeWeirFlow as _m1, computeLangelierIndex as _m2, computeChemicalFeedPump as _m3 } from "../../calc-treatment.js"; // spec-v75: v20 Phase M bench relocated out of calc-water.js
 
 import { computeWeirHeadFromFlow as _v658 } from "../../calc-treatment.js";
@@ -10572,6 +10573,28 @@ test("bounds: calc-agriculture v20 L + calc-water v20 M tiles pin constants + re
 
 import { computeTwoStrokeMixRatioCheck as _v653 } from "../../calc-agriculture.js";
 
+test("bounds: spec-v1265 computeReferenceEt0 pins the FAO-56 Ra, the Hargreaves ET0, F->C, and error seams", () => {
+  // 45N, July (J=197), 86/59 F = 30/15 C: Ra ~ 40.49 MJ/m2/day (FAO Table 2.6 ~40.5); ET0 = 5.93 mm/day = 0.234 in/day.
+  const r = _v1265({ latitude_deg: 45, month: "jul", tmax_f: 86, tmin_f: 59 });
+  assert.ok(Math.abs(r.ra_mj_m2_day - 40.49) < 0.1);
+  assert.ok(Math.abs(r.et0_mm_day - 5.933) < 0.02 && Math.abs(r.et0_in_day - r.et0_mm_day / 25.4) < 1e-12);
+  assert.ok(r.day_of_year === 197 && Math.abs(r.tmean_f - 72.5) < 1e-9);
+  // Hargreaves closed form re-derived: ET0 = 0.0023*(Ra/2.45)*(Tmean_C+17.8)*sqrt(dT_C).
+  const raMm = r.ra_mj_m2_day / 2.45;
+  assert.ok(Math.abs(r.et0_mm_day - 0.0023 * raMm * (22.5 + 17.8) * Math.sqrt(15)) < 1e-9);
+  // A wider temperature range (drier/clearer proxy) raises ET0 at the same mean.
+  const wide = _v1265({ latitude_deg: 45, month: "jul", tmax_f: 95, tmin_f: 50 });
+  assert.ok(wide.et0_mm_day > r.et0_mm_day);
+  // Southern hemisphere January (its summer) reads higher than July at the same |lat|.
+  const sJan = _v1265({ latitude_deg: -30, month: "jan", tmax_f: 90, tmin_f: 60 });
+  const sJul = _v1265({ latitude_deg: -30, month: "jul", tmax_f: 90, tmin_f: 60 });
+  assert.ok(sJan.ra_mj_m2_day > sJul.ra_mj_m2_day);
+  // Error seams: latitude past the polar circle, Tmax < Tmin, bad month, non-finite.
+  assert.ok("error" in _v1265({ latitude_deg: 80, month: "jul", tmax_f: 80, tmin_f: 60 }));
+  assert.ok("error" in _v1265({ latitude_deg: 45, month: "jul", tmax_f: 50, tmin_f: 60 }));
+  assert.ok("error" in _v1265({ latitude_deg: 45, month: "xxx", tmax_f: 80, tmin_f: 60 }));
+  assert.ok("error" in _v1265({ latitude_deg: Infinity, month: "jul", tmax_f: 80, tmin_f: 60 }));
+});
 test("bounds: spec-v653 computeTwoStrokeMixRatioCheck inverts the mix tile, round-trips it, flags lean/rich, and pins error seams", () => {
   const r = _v653({ fuel_amount: 1, fuel_unit: "gallon", oil_amount: 2.56, target_ratio: 50 });
   assert.ok(Math.abs(r.ratio - 50) < 1e-9); // 128 / 2.56

@@ -20232,6 +20232,64 @@
    }
   },
   {
+   "tile_id": "reference-et0",
+   "source_publisher": "Hargreaves & Samani 1985 / FAO-56 (Ra cross-checked vs FAO Annex 2 Table 2.6)",
+   "source_title": "45N July 86/59 F -> Ra 40.49 MJ/m2/day, ET0 0.234 in/day (5.93 mm) (spec-v1265)",
+   "source_edition_or_year": "ET0 = 0.0023 (Tmean+17.8) sqrt(Tmax-Tmin) Ra",
+   "source_section_or_page": "J=197 (mid-July); Tmax=30C, Tmin=15C, Tmean=22.5C, dT=15; Ra=40.49 MJ/m2/day (FAO Table 2.6 45N ~40.5); Ra_mm=16.53; ET0=0.0023*16.53*40.3*sqrt(15)=5.933 mm = 0.2336 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "latitude_deg": 45,
+    "month": "jul",
+    "tmax_f": 86,
+    "tmin_f": 59
+   },
+   "outputs": {
+    "et0_mm_day": {
+     "value": 5.9334,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ra_mj_m2_day": {
+     "value": 40.494,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "reference-et0",
+   "source_publisher": "Hargreaves / FAO-56 (second latitude/month check)",
+   "source_title": "33N April 90/60 F -> Ra 36.46 MJ/m2/day, ET0 0.229 in/day (5.83 mm)",
+   "source_edition_or_year": "mid-April J=106",
+   "source_section_or_page": "J=106; Tmax=32.22C, Tmin=15.56C, Tmean=23.89C, dT=16.67; Ra=36.46 MJ/m2/day; ET0=5.826 mm = 0.2294 in/day.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "latitude_deg": 33,
+    "month": "apr",
+    "tmax_f": 90,
+    "tmin_f": 60
+   },
+   "outputs": {
+    "et0_mm_day": {
+     "value": 5.8255,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ra_mj_m2_day": {
+     "value": 36.461,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "growing-degree-days",
    "source_publisher": "USDA / NWS GDD method + McMaster & Wilhelm 1997",
    "source_title": "modified GDD = (min(Tmax,86) + max(Tmin,50))/2 - 50",

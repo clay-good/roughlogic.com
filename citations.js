@@ -939,6 +939,18 @@ export const CITATIONS = {
     ],
   },
 
+  "reference-et0": {
+    formula: "Hargreaves: ET0 = 0.0023 (Tmean + 17.8) sqrt(Tmax - Tmin) Ra (Ra as equivalent evaporation, mm/day = Ra_MJ/2.45). Ra (FAO-56 Annex 2): dr = 1 + 0.033 cos(2pi J/365); dec = 0.409 sin(2pi J/365 - 1.39); ws = arccos(-tan(phi) tan(dec)); Ra = (24*60/pi) 0.0820 dr (ws sin(phi) sin(dec) + cos(phi) cos(dec) sin(ws)). J = mid-month day; temperatures converted from F to C.",
+    edition: "Hargreaves & Samani (1985) reference-ET equation as presented in FAO Irrigation & Drainage Paper 56 (Allen, Pereira, Raes, Smith 1998), Annex 2 for the extraterrestrial-radiation equations, by name.",
+    freeAccess: "FAO-56 is a free public PDF at fao.org; the Hargreaves equation and the FAO-56 astronomical Ra equations are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "Reference evapotranspiration ET0 is the daily water use of a short, well-watered reference grass, the baseline every crop's demand scales from (crop ET = Kc x ET0). Hargreaves is the temperature-only method FAO-56 recommends where reliable air temperature is the only input; the daily temperature range (Tmax - Tmin) proxies for cloudiness and humidity, so a clear arid site reads higher than a humid one at the same mean temperature. The extraterrestrial radiation Ra is computed directly from latitude and the mid-month day of year by the FAO-56 Annex 2 equations rather than a table. Latitudes beyond the polar circles (|lat| > 66.5) are out of range. A planning aid; a local weather-station ET0 (CIMIS, Mesonet) and the full FAO-56 Penman-Monteith method govern when full climate data exist.",
+    assumptions: [
+      { name: "Hargreaves ET0", value: "ET0 = 0.0023 (Tmean+17.8) sqrt(Tmax-Tmin) Ra; Ra as mm/day = Ra_MJ/2.45", source: "Hargreaves & Samani 1985 / FAO-56" },
+      { name: "Extraterrestrial radiation Ra", value: "FAO-56 Annex 2 astronomical equations from latitude and day of year (mid-month J)", source: "FAO-56 Annex 2" },
+      { name: "Scope", value: "temperature-only estimate; |lat| <= 66.5; a local station ET0 and Penman-Monteith govern with full data", source: "scope of this tile" },
+    ],
+  },
   "pearson-square-ration": {
     formula: "parts_a = |B - target|; parts_b = |A - target|; pct_a = parts_a/(parts_a+parts_b)*100. The target must lie strictly between A and B.",
     edition: "Pearson square method - standard land-grant animal-science ration formulation (USDA / university extension; Ensminger 'Feeds & Nutrition'), by name.",

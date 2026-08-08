@@ -1039,7 +1039,7 @@ const TOOL_MODULES = (() => {
     "pesticide-rei-phi",
   
     // v20
-    "growing-degree-days", "pearson-square-ration", "livestock-water-requirement",
+    "growing-degree-days", "pearson-square-ration", "livestock-water-requirement", "reference-et0",
     // spec-v417..v419 landscape/agriculture
     "mulch-topsoil-volume", "grain-drying-energy", "manure-nutrient-application",
     // spec-v568

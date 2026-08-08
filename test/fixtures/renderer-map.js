@@ -1314,6 +1314,7 @@ export const RENDERER_MAP = {
   "growing-degree-days": { module: "../../calc-agriculture.js", exportName: "AGRICULTURE_RENDERERS" },
   "pearson-square-ration": { module: "../../calc-agriculture.js", exportName: "AGRICULTURE_RENDERERS" },
   "livestock-water-requirement": { module: "../../calc-agriculture.js", exportName: "AGRICULTURE_RENDERERS" },
+  "reference-et0": { module: "../../calc-agriculture.js", exportName: "AGRICULTURE_RENDERERS" },
   "mulch-topsoil-volume": { module: "../../calc-agriculture.js", exportName: "AGRICULTURE_RENDERERS" },
   "grain-drying-energy": { module: "../../calc-agriculture.js", exportName: "AGRICULTURE_RENDERERS" },
   "manure-nutrient-application": { module: "../../calc-agriculture.js", exportName: "AGRICULTURE_RENDERERS" },

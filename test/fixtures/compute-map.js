@@ -83,6 +83,7 @@ export const COMPUTE_MAP = {
   "flocculator-paddle-power": { module: "../../calc-treatment.js", fn: "computeFlocculatorPaddlePower" },
   "chlorine-cylinder-withdrawal": { module: "../../calc-treatment.js", fn: "computeChlorineCylinderWithdrawal" },
   "growing-degree-days": { module: "../../calc-agriculture.js", fn: "computeGrowingDegreeDays" },
+  "reference-et0": { module: "../../calc-agriculture.js", fn: "computeReferenceEt0" },
   "pearson-square-ration": { module: "../../calc-agriculture.js", fn: "computePearsonSquareRation" },
   "livestock-water-requirement": { module: "../../calc-agriculture.js", fn: "computeLivestockWaterRequirement" },
   "mulch-topsoil-volume": { module: "../../calc-agriculture.js", fn: "computeMulchTopsoilVolume" },

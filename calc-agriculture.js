@@ -3417,3 +3417,64 @@ AGRICULTURE_RENDERERS["dressing-percentage"] = _r({
   ],
   compute: computeDressingPercentage,
 });
+
+// --- spec-v1265: reference evapotranspiration ET0 (Hargreaves / FAO-56) ---
+// The irrigation tiles (acre-foot ET requirement, irrigation scheduling) CONSUME a reference ET (ET0) but
+// none computes it -- the note at the crop-Kc table says ET0 "is user-supplied from the local CIMIS / Mesonet /
+// NOAA station." This fills that needed-input gap with the Hargreaves (1985) equation, the temperature-only
+// method FAO-56 recommends when only air temperature is reliable: ET0 = 0.0023 (Tmean + 17.8) sqrt(Tmax - Tmin) Ra,
+// with Ra the extraterrestrial radiation computed from latitude and day of year by the FAO-56 astronomical
+// equations (Annex 2) -- no table lookup. Temperatures in F (US practice), ET0 out in in/day and mm/day.
+// dims: in { latitude_deg: dimensionless, month: dimensionless, tmax_f: T, tmin_f: T } out: { et0_in_day: L T^-1, et0_mm_day: L T^-1, ra_mj_m2_day: dimensionless, day_of_year: dimensionless, tmean_f: T }
+export function computeReferenceEt0({ latitude_deg = 0, month = "jul", tmax_f = 0, tmin_f = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+  const mi = MONTHS.indexOf(String(month));
+  if (mi < 0) return { error: "Month must be one of jan..dec." };
+  const lat = Number(latitude_deg);
+  const tmaxF = Number(tmax_f);
+  const tminF = Number(tmin_f);
+  if (!Number.isFinite(lat) || lat < -66.5 || lat > 66.5) return { error: "Latitude must be between -66.5 and 66.5 degrees (+ north, - south); the polar circles are outside this method." };
+  if (!Number.isFinite(tmaxF) || !Number.isFinite(tminF)) return { error: "Both temperatures must be numbers (F)." };
+  if (!(tmaxF >= tminF)) return { error: "The daily high (Tmax) must be at or above the daily low (Tmin)." };
+  const J = Math.floor(30.4 * (mi + 1) - 15); // FAO-56 mid-month day of year
+  const tmaxC = (tmaxF - 32) * 5 / 9;
+  const tminC = (tminF - 32) * 5 / 9;
+  const tmeanC = (tmaxC + tminC) / 2;
+  const dT = tmaxC - tminC;
+  const phi = lat * Math.PI / 180;
+  const dr = 1 + 0.033 * Math.cos(2 * Math.PI * J / 365);
+  const dec = 0.409 * Math.sin(2 * Math.PI * J / 365 - 1.39);
+  const ws = Math.acos(Math.max(-1, Math.min(1, -Math.tan(phi) * Math.tan(dec))));
+  const Ra = (24 * 60 / Math.PI) * 0.0820 * dr * (ws * Math.sin(phi) * Math.sin(dec) + Math.cos(phi) * Math.cos(dec) * Math.sin(ws)); // MJ/m^2/day
+  const raMm = Ra / 2.45; // equivalent evaporation, mm/day
+  const et0Mm = 0.0023 * raMm * (tmeanC + 17.8) * Math.sqrt(dT);
+  const et0In = et0Mm / 25.4;
+  if (![Ra, et0Mm, et0In].every(Number.isFinite) || et0Mm < 0) return { error: "ET0 math is not a finite non-negative value; check the inputs." };
+  return {
+    et0_in_day: et0In, et0_mm_day: et0Mm, ra_mj_m2_day: Ra, day_of_year: J, tmean_f: (tmaxF + tminF) / 2,
+    note: "Reference evapotranspiration ET0 by the Hargreaves equation, the value the irrigation tiles ask you to look up: ET0 = 0.0023 (Tmean + 17.8) sqrt(Tmax - Tmin) Ra. It is the water a short, well-watered reference grass would use per day, the baseline every crop's demand is scaled from (crop ET = Kc x ET0, the acre-foot and scheduling tiles). Hargreaves is the temperature-only method FAO-56 recommends where only reliable air temperature is available; the extraterrestrial radiation Ra is computed from your latitude and the middle of the selected month using the FAO-56 astronomical equations, so no radiation table is needed. The daily temperature range stands in for cloudiness and humidity, which is why a clear, dry site reads higher than a humid one at the same mean temperature. Expect roughly 0.05-0.10 in/day in cool weather and 0.25-0.35 in/day at a hot, arid mid-summer peak. A planning aid; a local weather-station ET0 (CIMIS, Mesonet) and the full FAO-56 Penman-Monteith method govern when full climate data exist.",
+  };
+}
+export const referenceEt0Example = { inputs: { latitude_deg: 45, month: "jul", tmax_f: 86, tmin_f: 59 } };
+AGRICULTURE_RENDERERS["reference-et0"] = _r({
+  citation: "Citation: Hargreaves reference ET (Hargreaves & Samani 1985) as presented in FAO Irrigation & Drainage Paper 56 (Allen et al. 1998), by name: ET0 = 0.0023 (Tmean + 17.8) sqrt(Tmax - Tmin) Ra; extraterrestrial radiation Ra from the FAO-56 Annex 2 astronomical equations by latitude and day of year. Free at fao.org. A local station ET0 and the full Penman-Monteith method govern when full climate data exist.",
+  example: referenceEt0Example.inputs,
+  fields: [
+    { key: "latitude_deg", label: "Latitude (deg, + north / - south)", kind: "number", default: 45, attrs: { step: "any" } },
+    { key: "month", label: "Month", kind: "select", default: "jul", options: [
+      { value: "jan", label: "January" }, { value: "feb", label: "February" }, { value: "mar", label: "March" },
+      { value: "apr", label: "April" }, { value: "may", label: "May" }, { value: "jun", label: "June" },
+      { value: "jul", label: "July" }, { value: "aug", label: "August" }, { value: "sep", label: "September" },
+      { value: "oct", label: "October" }, { value: "nov", label: "November" }, { value: "dec", label: "December" },
+    ] },
+    { key: "tmax_f", label: "Daily high Tmax (F)", kind: "number", default: 86, attrs: { step: "any" } },
+    { key: "tmin_f", label: "Daily low Tmin (F)", kind: "number", default: 59, attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "e", id: "et0-out-e", label: "Reference ET0", value: (r) => fmt(r.et0_in_day, 3) + " in/day (" + fmt(r.et0_mm_day, 2) + " mm/day)" },
+    { key: "r", id: "et0-out-r", label: "Extraterrestrial radiation Ra", value: (r) => fmt(r.ra_mj_m2_day, 1) + " MJ/m2/day (mid-month day " + r.day_of_year + ")" },
+    { key: "n", id: "et0-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeReferenceEt0,
+});
