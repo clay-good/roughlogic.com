@@ -90,6 +90,31 @@ async function main() {
           );
         }
       }
+
+      // Double-unwrap in a wiring loop: `for (const f of [a.input, b.input]) f.input.addEventListener(...)`.
+      // When the iterated list literal already unwraps each field to its DOM
+      // element (its members carry `.input` / `.select`), the loop variable IS
+      // that element, so `f.input` / `f.select` is undefined and throws at render
+      // time. Shipped once as fixed-orifice-target-superheat (calc-hvac.js,
+      // spec-v1255). The correct forms are `for (const f of [a, b]) f.input...`
+      // (bare field vars in the list) or `for (const f of [a.input, b.input]) f.addEventListener(...)`
+      // (bare element in the body). Single-statement loop bodies (the wiring style
+      // used across every renderer here).
+      for (const lm of chunk.matchAll(/for\s*\(\s*(?:const|let|var)\s+(\w+)\s+of\s+\[([^\]]*)\]\s*\)([^\n]*)/g)) {
+        const [, loopVar, list, body] = lm;
+        if (!/\.(?:input|select)\b/.test(list)) continue; // list holds bare field vars -> loopVar.input is correct
+        checkedVars++;
+        const badAccess = new RegExp("\\b" + loopVar + "\\.(input|select)\\b");
+        const bm = body.match(badAccess);
+        if (bm) {
+          fail(
+            file + ": " + name + ": the loop 'for (const " + loopVar + " of [" + list.trim() +
+            "])' iterates already-unwrapped field elements, so '" + loopVar + "' is a DOM node with no '." +
+            bm[1] + "'. '" + loopVar + "." + bm[1] + "' throws at render time. Use '" + loopVar +
+            ".addEventListener(...)' directly, or put the bare field vars in the list.",
+          );
+        }
+      }
     }
   }
 
