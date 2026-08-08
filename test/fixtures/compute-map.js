@@ -41,6 +41,7 @@ export const COMPUTE_MAP = {
   "declining-balance-depreciation": { module: "../../calc-accounting.js", fn: "computeDecliningBalanceDepreciation" },
   "sum-of-years-digits-depreciation": { module: "../../calc-accounting.js", fn: "computeSumOfYearsDigitsDepreciation" },
   "future-value-of-annuity": { module: "../../calc-accounting.js", fn: "computeFutureValueOfAnnuity" },
+  "effective-annual-rate": { module: "../../calc-accounting.js", fn: "computeEffectiveAnnualRate" },
   "markup-vs-margin": { module: "../../calc-accounting.js", fn: "computeMarkupVsMargin" },
   "employer-payroll-tax": { module: "../../calc-accounting.js", fn: "computeEmployerPayrollTax" },
   "labor-burden-rate": { module: "../../calc-accounting.js", fn: "computeLaborBurdenRate" },

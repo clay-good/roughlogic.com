@@ -1418,6 +1418,7 @@ cross-check.
 | calc-accounting.js | `computeCashConversionCycle` | `{ dso = 0, dio = 0, dpo = 0 }` | _ | _ | _ |
 | calc-accounting.js | `computeChangeOrderMarkup` | `{ direct_cost_usd = 0, overhead_pct = 10, profit_pct = 10, current_contract_u...` | _ | _ | _ |
 | calc-accounting.js | `computeDecliningBalanceDepreciation` | `{ cost = 0, salvage = 0, life_yr = 0, factor = 2, year = 1, sl_switch = true ...` | _ | _ | _ |
+| calc-accounting.js | `computeEffectiveAnnualRate` | `{ apr_pct = 0, compounding = "monthly" } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeEmployerPayrollTax` | `{ wages = 0, ss_base = 0, futa_base = 7000, futa_rate_pct = 0.6, suta_rate_pc...` | _ | _ | _ |
 | calc-accounting.js | `computeEoqOrderQuantity` | `{ annual_demand = 0, order_cost = 0, holding_cost = 0 } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeEquipmentHourlyRate` | `{ purchase = 0, salvage = 0, life_hr = 0, annual_hr = 0, iit_pct = 0, fuel_gp...` | _ | _ | _ |
@@ -3279,7 +3280,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1865.
+Row count: 1866.
 
 <!-- END function-corpus-v14 -->
 
@@ -4910,7 +4911,7 @@ per spec-v14 §13.1 second paragraph.
 | --- | --- | --- | --- |
 | `historical-pricing` | Historical Pricing Context | BLS PPI / EIA / USDA NASS / FRED fede...; copper / 12-month lookback over the bundled 2026-05-08 sh... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group R Accounting (30 tiles)
+### Group R Accounting (31 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4918,6 +4919,7 @@ per spec-v14 §13.1 second paragraph.
 | `cash-conversion-cycle` | Cash Conversion Cycle | Project (first-principles); DSO 45 / DIO 60 / DPO 30 -> CCC 75 days | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `change-order-markup` | Change Order Price with Overhead and Profit | construction estimating (AIA G701); spec-v391 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `declining-balance-depreciation` | Declining-Balance Depreciation (Book) | GAAP book depreciation (ASC 360); $50,000 cost, $5,000 salvage, 5 yr, 200% DDB -> Yr1 $20,000 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `effective-annual-rate` | Effective Annual Rate (APR to APY) | Compounding identity / TILA Reg Z APY...; EAR = (1 + 0.12/12)^12 - 1 = 1.01^12 - 1 = 0.126825 = 12.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `employer-payroll-tax` | Employer Payroll Tax | FICA/FUTA (26 USC 3101-3306 + IRS Pub...; $200,000 wages above the SS base ($168,600) -> SS capped ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `eoq-order-quantity` | Economic Order Quantity (Wilson EOQ) | Wilson economic order quantity (EOQ) ...; spec-v529 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `equipment-hourly-rate` | Equipment Owning and Operating Hourly Rate | CAT / AED method; spec-v363 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5082,6 +5084,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1617. Fixture-covered or reference-cadence: 1617 / 1617.
+Tile count: 1618. Fixture-covered or reference-cadence: 1618 / 1618.
 
 <!-- END tile-index-v14 -->

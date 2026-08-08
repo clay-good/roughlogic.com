@@ -21676,6 +21676,54 @@
    }
   },
   {
+   "tile_id": "effective-annual-rate",
+   "source_publisher": "Compounding identity / TILA Reg Z APY (12 CFR 1030)",
+   "source_title": "12% APR compounded monthly -> 12.6825% effective (APY) (spec-v1245)",
+   "source_edition_or_year": "EAR = (1 + APR/m)^m - 1",
+   "source_section_or_page": "EAR = (1 + 0.12/12)^12 - 1 = 1.01^12 - 1 = 0.126825 = 12.6825%; periodic rate 0.12/12 = 1%/month.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "apr_pct": 12,
+    "compounding": "monthly"
+   },
+   "outputs": {
+    "ear_pct": {
+     "value": 12.6825,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "periodic_rate_pct": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "effective-annual-rate",
+   "source_publisher": "Continuous-compounding cross-check",
+   "source_title": "the continuous limit is e^APR - 1",
+   "source_edition_or_year": "EAR = e^APR - 1",
+   "source_section_or_page": "at 12% APR compounded continuously, EAR = e^0.12 - 1 = 0.127497 = 12.7497%, just above the 12.7475% daily figure.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "apr_pct": 12,
+    "compounding": "continuous"
+   },
+   "outputs": {
+    "ear_pct": {
+     "value": 12.7497,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "markup-vs-margin",
    "source_publisher": "Managerial-accounting CVP pricing identity (AICPA)",
    "source_title": "price = cost*(1+markup%); margin% = (price-cost)/price",

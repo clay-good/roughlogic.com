@@ -83,7 +83,7 @@ const _TILES = [
   ["growth-projected-count", "T"],
   ["michaelis-menten", "T"], ["substrate-for-velocity", "T"],
   ["declining-balance-depreciation", "R"],
-  ["sum-of-years-digits-depreciation", "R"], ["future-value-of-annuity", "R"],
+  ["sum-of-years-digits-depreciation", "R"], ["future-value-of-annuity", "R"], ["effective-annual-rate", "R"],
   ["markup-vs-margin", "R"],
   ["employer-payroll-tax", "R"],
   ["labor-burden-rate", "R"], ["equipment-hourly-rate", "R"], ["overhead-recovery-rate", "R"],

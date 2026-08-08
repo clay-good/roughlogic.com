@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1617,
-  "covered_count": 1186,
+  "total_tiles": 1618,
+  "covered_count": 1187,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -352,6 +352,7 @@
     "economic-insulation-thickness",
     "economizer-enthalpy-changeover",
     "edm-slope-reduction",
+    "effective-annual-rate",
     "egc-parallel-raceways",
     "egc-sizing",
     "egc-upsize-proportional",

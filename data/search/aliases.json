@@ -756,6 +756,21 @@
       "kind": "question"
     },
     {
+      "term": "effective annual rate",
+      "target": "effective-annual-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "apr to apy",
+      "target": "effective-annual-rate",
+      "kind": "redirect"
+    },
+    {
+      "term": "annual percentage yield",
+      "target": "effective-annual-rate",
+      "kind": "industry"
+    },
+    {
       "term": "markup vs margin",
       "target": "markup-vs-margin",
       "kind": "industry"

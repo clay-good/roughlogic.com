@@ -453,6 +453,18 @@ export const CITATIONS = {
     ],
   },
 
+  "effective-annual-rate": {
+    formula: "EAR = (1 + APR/m)^m - 1 for m compounds/year, or e^APR - 1 continuous; periodic rate = APR/m; inverse APR = m[(1+EAR)^(1/m) - 1].",
+    edition: "Standard compounding identity (public-domain finance); the TILA/Reg Z APY definition, 12 CFR 1030 Appendix A, by name.",
+    freeAccess: "The (1+APR/m)^m - 1 identity is a universal public formula, and 12 CFR 1030 (Reg Z / Truth in Savings APY) is a free US government regulation.",
+    governance: GOVERNANCE.general,
+    editionNote: "The effective annual rate (EAR = APY) from a nominal APR and its compounding frequency. A nominal rate equals the effective rate only when it compounds once a year; more frequent compounding raises it, so a 12% APR is 12.36% semiannually, 12.68% monthly, 12.75% daily, and 12.75% continuously (e^APR - 1). This is the figure that makes loans or savings accounts with different compounding comparable, and the APY a US deposit account discloses under TILA/Reg Z. The periodic rate APR/m is what one compounding period applies (1% a month for a 12% monthly APR); the inverse nominal rate from a stated EAR is APR = m[(1+EAR)^(1/m) - 1]. Simple interest and fees (which the APR may or may not fold in) are separate. Accounting information, not advice; the account disclosure and a CPA govern.",
+    assumptions: [
+      { name: "Compounding identity", value: "EAR = (1 + APR/m)^m - 1; continuous EAR = e^APR - 1", source: "time-value-of-money" },
+      { name: "APY disclosure", value: "the effective rate is the APY defined by TILA/Reg Z (12 CFR 1030)", source: "12 CFR 1030 Appendix A" },
+    ],
+  },
+
   "markup-vs-margin": {
     formula: "markup% = (price-cost)/cost*100; margin% = (price-cost)/price*100; margin% = markup%/(1+markup%); markup% = margin%/(1-margin%); price = cost*(1+markup%) = cost/(1-margin%).",
     edition: "Standard managerial-accounting pricing identity (cost-volume-profit), universal public formula; AICPA / introductory managerial-accounting texts, by name.",

@@ -10573,7 +10573,32 @@ test("bounds: calc-stage N + calc-kitchen O + calc-field P v20 tiles pin constan
   assert.ok("error" in _p1({ pod_list: [200], poa_pct: 60 }));
 });
 
-import { computeDecliningBalanceDepreciation as _r1, computeMarkupVsMargin as _r2, computeEmployerPayrollTax as _r3, computeSumOfYearsDigitsDepreciation, computeFutureValueOfAnnuity } from "../../calc-accounting.js";
+import { computeDecliningBalanceDepreciation as _r1, computeMarkupVsMargin as _r2, computeEmployerPayrollTax as _r3, computeSumOfYearsDigitsDepreciation, computeFutureValueOfAnnuity, computeEffectiveAnnualRate } from "../../calc-accounting.js";
+test("bounds: spec-v1245 computeEffectiveAnnualRate pins (1+APR/m)^m-1, the continuous limit, the frequency ordering, and error seams", () => {
+  // 12% APR monthly -> 12.6825% EAR, 1%/period.
+  const r = computeEffectiveAnnualRate({ apr_pct: 12, compounding: "monthly" });
+  assert.ok(Math.abs(r.ear_pct - (Math.pow(1 + 0.12 / 12, 12) - 1) * 100) < 1e-9);
+  assert.ok(Math.abs(r.ear_pct - 12.6825) < 1e-3 && Math.abs(r.periodic_rate_pct - 1) < 1e-9);
+  // Annual compounding: EAR equals the nominal APR exactly.
+  assert.ok(Math.abs(computeEffectiveAnnualRate({ apr_pct: 12, compounding: "annual" }).ear_pct - 12) < 1e-9);
+  // Continuous is e^APR - 1 and is the upper bound above daily.
+  const cont = computeEffectiveAnnualRate({ apr_pct: 12, compounding: "continuous" });
+  const daily = computeEffectiveAnnualRate({ apr_pct: 12, compounding: "daily" });
+  assert.ok(Math.abs(cont.ear_pct - (Math.exp(0.12) - 1) * 100) < 1e-9 && cont.periodic_rate_pct === null);
+  assert.ok(cont.ear_pct > daily.ear_pct && daily.ear_pct > r.ear_pct);
+  // More frequent compounding gives a higher effective rate.
+  const semi = computeEffectiveAnnualRate({ apr_pct: 12, compounding: "semiannual" });
+  assert.ok(r.ear_pct > semi.ear_pct);
+  // Inverse round-trip: APR = m[(1+EAR)^(1/m)-1] recovers 12% from the monthly EAR.
+  const ear = r.ear_pct / 100;
+  assert.ok(Math.abs(12 * (Math.pow(1 + ear, 1 / 12) - 1) * 100 - 12) < 1e-9);
+  // 0% APR gives 0% EAR.
+  assert.ok(Math.abs(computeEffectiveAnnualRate({ apr_pct: 0, compounding: "monthly" }).ear_pct) < 1e-12);
+  // Error seams: negative APR, unknown compounding, non-finite.
+  assert.ok("error" in computeEffectiveAnnualRate({ apr_pct: -1, compounding: "monthly" }));
+  assert.ok("error" in computeEffectiveAnnualRate({ apr_pct: 12, compounding: "weekly" }));
+  assert.ok("error" in computeEffectiveAnnualRate({ apr_pct: Infinity, compounding: "monthly" }));
+});
 test("bounds: spec-v1244 computeFutureValueOfAnnuity pins FV/PV, the annuity-due factor, the zero-rate limit, and error seams", () => {
   // $500/mo at 0.5%/mo for 120 mo: FV 81,939.67, PV 45,036.73.
   const r = computeFutureValueOfAnnuity({ payment: 500, rate_pct: 0.5, periods: 120, timing: "ordinary" });

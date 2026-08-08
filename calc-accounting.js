@@ -1335,6 +1335,57 @@ function renderFutureValueOfAnnuity(inputRegion, outputRegion, citationEl) {
 }
 ACCOUNTING_RENDERERS["future-value-of-annuity"] = renderFutureValueOfAnnuity;
 
+// --- spec-v1245 R: Effective annual rate / APY (`effective-annual-rate`) ---
+// Converts a nominal APR at m compounds/year to the effective annual rate: EAR = (1 + APR/m)^m - 1,
+// or e^APR - 1 for continuous compounding. The finance set takes a rate as given but never converts
+// compounding bases. TILA/Reg Z (12 CFR 1030) APY definition.
+const _EAR_FREQ = { annual: 1, semiannual: 2, quarterly: 4, monthly: 12, daily: 365 };
+// dims: in { apr_pct: dimensionless, compounding: dimensionless } out: { ear_pct: dimensionless, periodic_rate_pct: dimensionless }
+export function computeEffectiveAnnualRate({ apr_pct = 0, compounding = "monthly" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const apr = Number(apr_pct);
+  if (!Number.isFinite(apr) || apr < 0) return { error: "Nominal APR must be zero or positive (%)." };
+  const isContinuous = compounding === "continuous";
+  const m = _EAR_FREQ[compounding];
+  if (!isContinuous && !(m >= 1)) return { error: "Compounding must be annual, semiannual, quarterly, monthly, daily, or continuous." };
+  const r = apr / 100;
+  const ear = isContinuous ? Math.exp(r) - 1 : Math.pow(1 + r / m, m) - 1;
+  const ear_pct = ear * 100;
+  const periodic_rate_pct = isContinuous ? null : apr / m;
+  if (!Number.isFinite(ear_pct)) return { error: "Effective-rate math is not a finite value." };
+  return {
+    ear_pct, periodic_rate_pct, continuous: isContinuous, periods_per_year: isContinuous ? null : m,
+    note: "The effective annual rate (EAR, the same thing as APY) from a nominal APR and its compounding frequency: EAR = (1 + APR/m)^m - 1 for m compounds per year, or e^APR - 1 in the continuous limit. A nominal rate only equals the effective rate when it compounds once a year; more frequent compounding earns (or costs) more, so a 12% APR is really 12.36% compounded semiannually, 12.68% monthly, 12.75% daily, and 12.75% continuously. This is the number that makes two loans or two savings accounts with different compounding actually comparable, and it is the APY a US deposit account must disclose under TILA/Reg Z. The periodic rate (APR/m) is what one compounding period actually applies -- 1% a month for a 12% monthly APR. To go the other way, the nominal rate from a stated EAR is APR = m [(1+EAR)^(1/m) - 1]. Simple interest and fees (which the APR itself may or may not fold in) are separate; a bookkeeping aid, the account disclosure and a CPA govern.",
+  };
+}
+export const effectiveAnnualRateExample = { inputs: { apr_pct: 12, compounding: "monthly" } };
+
+function renderEffectiveAnnualRate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: effective annual rate / APY = (1 + APR/m)^m - 1 (or e^APR - 1 continuous), the compounding identity behind the TILA/Reg Z (12 CFR 1030) APY disclosure. Inverse nominal APR = m[(1+EAR)^(1/m) - 1]. Accounting information, not advice; the account disclosure and a CPA govern.";
+  const apr = makeNumber("Nominal APR (%)", "ear-apr", { step: "any", min: "0", value: "12" }); apr.input.value = "12";
+  const comp = makeSelect("Compounding", "ear-comp", [
+    { value: "annual", label: "Annually" }, { value: "semiannual", label: "Semiannually" },
+    { value: "quarterly", label: "Quarterly" }, { value: "monthly", label: "Monthly", selected: true },
+    { value: "daily", label: "Daily (365)" }, { value: "continuous", label: "Continuous" },
+  ]);
+  for (const f of [apr, comp]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { apr.input.value = "12"; comp.select.value = "monthly"; update(); });
+  const oEar = makeOutputLine(outputRegion, "Effective annual rate (APY)", "ear-out-ear");
+  const oPer = makeOutputLine(outputRegion, "Periodic rate", "ear-out-per");
+  const oNote = makeOutputLine(outputRegion, "Note", "ear-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeEffectiveAnnualRate({ apr_pct: readNum(apr.input), compounding: comp.select.value });
+    if (r.error) { oEar.textContent = r.error; oPer.textContent = ""; oNote.textContent = ""; return; }
+    oEar.textContent = fmt(r.ear_pct, 4) + "%";
+    oPer.textContent = r.continuous ? "continuous (no discrete period)" : fmt(r.periodic_rate_pct, 4) + "% per period (" + r.periods_per_year + "/yr)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [apr.input]) f.addEventListener("input", update);
+  comp.select.addEventListener("change", update);
+}
+ACCOUNTING_RENDERERS["effective-annual-rate"] = renderEffectiveAnnualRate;
+
 // --- v20 R.2: Markup vs. margin converter (`markup-vs-margin`) ---
 // markup% = (price-cost)/cost*100; margin% = (price-cost)/price*100.
 // dims: in { cost: dimensionless, price: dimensionless, markup_pct: dimensionless, margin_pct: dimensionless, units: dimensionless } out: { markup_pct: dimensionless, margin_pct: dimensionless }
