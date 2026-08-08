@@ -419,6 +419,48 @@ function renderCircularArc(inputRegion, outputRegion, citationEl) {
 }
 LAYOUT_RENDERERS["circular-arc"] = renderCircularArc;
 
+// spec-v1225: circular-segment-area -- the enclosed AREA the circle-layout family (circular-arc, its
+// inverse, circle-from-3-points, bolt-circle) gives lengths and angles for but never the area. From the
+// same chord + rise inputs: R = (chord^2/4 + rise^2)/(2 rise), central angle theta = 2 acos((R-rise)/R),
+// segment area A = (1/2) R^2 (theta - sin theta). Machinery's Handbook (segment of a circle).
+// dims: in { chord_in: L, rise_in: L } out: { segment_area_in2: L^2, radius_in: L, central_angle_deg: dimensionless }
+export function computeCircularSegmentArea({ chord_in = 0, rise_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const c = Number(chord_in) || 0, h = Number(rise_in) || 0;
+  if (!(c > 0)) return { error: "Chord (span) must be positive (in)." };
+  if (!(h > 0)) return { error: "Rise (sagitta) must be positive (in)." };
+  const a = c / 2;
+  const radius_in = (a * a + h * h) / (2 * h);
+  const central_angle_rad = 2 * Math.acos((radius_in - h) / radius_in);
+  const central_angle_deg = central_angle_rad * 180 / Math.PI;
+  const segment_area_in2 = 0.5 * radius_in * radius_in * (central_angle_rad - Math.sin(central_angle_rad));
+  if (![radius_in, central_angle_rad, segment_area_in2].every(Number.isFinite)) return { error: "Segment-area math is not a finite value." };
+  return {
+    segment_area_in2, radius_in, central_angle_deg,
+    note: "The area of a circular segment -- the region between a chord and its arc -- the enclosed area the circle-layout family (circular-arc, circle-from-3-points, bolt-circle) never gives. From the same chord and rise (sagitta) a layout person already has: the radius R = (chord^2/4 + rise^2)/(2 x rise), the central angle theta = 2 x acos((R - rise)/R), and the segment area A = (1/2) R^2 (theta - sin theta), equivalently R^2 x acos((R - h)/R) - (R - h) x sqrt(2 R h - h^2). A 24 in chord bowed 4 in gives a 20 in radius, a 73.74 degree arc, and a 65.40 in^2 segment -- the sheet-metal blank of an arched panel, the cross-section of a partly-filled round tank or pipe, the concrete in a curved-top opening, or the waste cut from a rectangle to make an arched head. It is the sector area minus the triangle: for a rise ABOVE the radius (a major segment, more than a semicircle) the formula still holds because theta passes 180 degrees. Area only -- the arc length and layout come from the circular-arc tile. A shop aid; first-principles circle geometry as in Machinery's Handbook.",
+  };
+}
+export const circularSegmentAreaExample = { inputs: { chord_in: 24, rise_in: 4 } };
+function renderCircularSegmentArea(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: circular segment area A = (1/2) R^2 (theta - sin theta), with R = (chord^2/4 + rise^2)/(2 x rise) and theta = 2 x acos((R - rise)/R) from the chord and rise (sagitta). First-principles circle geometry (segment of a circle), as in Machinery's Handbook (Industrial Press), by name.";
+  const chord = makeNumber("Chord / span (in)", "cs-chord", { step: "any", min: "0" });
+  const rise = makeNumber("Rise at midspan (sagitta, in)", "cs-rise", { step: "any", min: "0" });
+  for (const f of [chord, rise]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { chord.input.value = "24"; rise.input.value = "4"; update(); });
+  const oArea = makeOutputLine(outputRegion, "Segment area", "cs-out-area");
+  const oRad = makeOutputLine(outputRegion, "Radius / central angle", "cs-out-rad");
+  const oNote = makeOutputLine(outputRegion, "Note", "cs-out-note");
+  const update = debounce(() => {
+    const r = computeCircularSegmentArea({ chord_in: Number(chord.input.value) || 0, rise_in: Number(rise.input.value) || 0 });
+    if (r.error) { oArea.textContent = r.error; oRad.textContent = "-"; oNote.textContent = ""; return; }
+    oArea.textContent = fmt(r.segment_area_in2, 3) + " in^2";
+    oRad.textContent = fmt(r.radius_in, 4) + " in / " + fmt(r.central_angle_deg, 3) + " deg";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [chord.input, rise.input]) f.addEventListener("input", update);
+}
+LAYOUT_RENDERERS["circular-segment-area"] = renderCircularSegmentArea;
+
 // circular-arc-rise-from-radius: inverse of circular-arc. The forward tile gives the radius from a chord and rise; the
 // inverse recovers the rise (sagitta / middle ordinate) from a known radius and chord, so a layout person marks the arc
 // height at midspan when the radius is set. From R = ((chord/2)^2 + rise^2) / (2 rise), rise^2 - 2 R rise + (chord/2)^2 = 0,

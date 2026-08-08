@@ -3854,6 +3854,21 @@
       "kind": "industry"
     },
     {
+      "term": "circular segment area",
+      "target": "circular-segment-area",
+      "kind": "industry"
+    },
+    {
+      "term": "area between chord and arc",
+      "target": "circular-segment-area",
+      "kind": "question"
+    },
+    {
+      "term": "arched panel blank area",
+      "target": "circular-segment-area",
+      "kind": "question"
+    },
+    {
       "term": "rise from radius",
       "target": "circular-arc-rise-from-radius",
       "kind": "industry"

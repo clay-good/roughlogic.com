@@ -11306,6 +11306,17 @@ export const CITATIONS = {
       { name: "Chord and rise", value: "the chord (span) and the perpendicular rise at midspan are user-supplied measurements of the same arc", source: "circle geometry" },
     ],
   },
+  "circular-segment-area": {
+    formula: "R = (chord^2/4 + rise^2)/(2 x rise); theta = 2 x acos((R - rise)/R); segment area A = (1/2) R^2 (theta - sin theta) = R^2 acos((R-h)/R) - (R-h) sqrt(2 R h - h^2).",
+    edition: "Area of a circular segment (the region between a chord and its arc) - first-principles circle geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure circle geometry, public; the chord and rise are user-supplied field measurements of the same arc.",
+    governance: GOVERNANCE.general,
+    editionNote: "The area of a circular segment, the enclosed region between a chord and its arc, from the same chord and rise (sagitta) the circular-arc tile uses: the radius R = (chord^2/4 + rise^2)/(2 x rise), the central angle theta = 2 x acos((R - rise)/R), and the segment area A = (1/2) R^2 (theta - sin theta), which is the circular sector minus the triangle. A 24 in chord bowed 4 in gives R = 20 in, theta = 73.74 degrees, and a 65.40 in^2 segment; a chord equal to the diameter (rise = radius) gives exactly half the circle. This is the everyday area question for an arched panel blank, the cross-section of a partly-filled round tank or pipe, or the material cut to form an arched opening. Valid for minor and major segments (a rise above the radius carries theta past 180 degrees). It returns area only; the arc length and the layout method come from the circular-arc tile. A shop aid; first-principles circle geometry.",
+    assumptions: [
+      { name: "Segment area", value: "A = (1/2) R^2 (theta - sin theta), the sector minus the triangle", source: "circle geometry / Machinery's Handbook" },
+      { name: "Chord and rise", value: "R and theta from the chord (span) and rise (sagitta) of the same arc", source: "circle geometry" },
+    ],
+  },
   "circle-from-3-points": {
     formula: "Circumcircle of the triangle on the three points: D = 2(x1(y2-y3) + x2(y3-y1) + x3(y1-y2)); center = ((|P1|^2(y2-y3)+|P2|^2(y3-y1)+|P3|^2(y1-y2))/D, (|P1|^2(x3-x2)+|P2|^2(x1-x3)+|P3|^2(x2-x1))/D); radius = distance(center, P1).",
     edition: "Circle through three points (the triangle's circumcircle) - first-principles coordinate geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",

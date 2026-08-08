@@ -19570,6 +19570,60 @@
    }
   },
   {
+   "tile_id": "circular-segment-area",
+   "source_publisher": "First-principles circle geometry (Machinery's Handbook, segment of a circle)",
+   "source_title": "chord 24 in, rise 4 in -> R 20 in, 73.74 deg, segment area 65.40 in^2 (spec-v1225)",
+   "source_edition_or_year": "A = (1/2) R^2 (theta - sin theta)",
+   "source_section_or_page": "R = (144 + 16)/8 = 20; theta = 2 acos(16/20) = 1.28700 rad (73.74 deg); A = 0.5 x 400 x (1.28700 - sin 1.28700) = 200 x 0.32700 = 65.40 in^2 (cross-checks R^2 acos(0.8) - 16 sqrt(144) = 257.40 - 192 = 65.40).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "chord_in": 24,
+    "rise_in": 4
+   },
+   "outputs": {
+    "segment_area_in2": {
+     "value": 65.4,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "radius_in": {
+     "value": 20,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "central_angle_deg": {
+     "value": 73.739795,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "circular-segment-area",
+   "source_publisher": "circle geometry (semicircle cross-check)",
+   "source_title": "cross-check: a chord equal to the diameter (chord 20, rise 10) gives exactly half the circle, 157.08 in^2",
+   "source_edition_or_year": "A = (1/2) R^2 (theta - sin theta), theta = 180 deg",
+   "source_section_or_page": "R = (100 + 100)/20 = 10; theta = 2 acos(0) = 180 deg = pi rad; A = 0.5 x 100 x (pi - 0) = 157.08 in^2 = pi R^2 / 2, exactly half the circle.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "chord_in": 20,
+    "rise_in": 10
+   },
+   "outputs": {
+    "segment_area_in2": {
+     "value": 157.08,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "circular-arc",
    "source_publisher": "First-principles circle geometry (sagitta relation)",
    "source_title": "R = (chord^2/4 + rise^2)/(2 rise); arc = R x 2 acos((R-rise)/R)",

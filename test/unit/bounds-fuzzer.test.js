@@ -11538,6 +11538,29 @@ test("bounds: spec-v44 circular-arc pins radius/arc/angle from chord+rise + reje
   assert.ok("error" in _cv44g1({ chord_in: Infinity, rise_in: 4 }));
 });
 
+import { computeCircularSegmentArea as _v1225 } from "../../calc-layout.js";
+
+test("bounds: spec-v1225 computeCircularSegmentArea pins A = (1/2)R^2(theta - sin theta), the semicircle case, monotonicity, and error seams", () => {
+  // chord 24, rise 4 -> R 20, theta 73.74 deg, segment area 65.40 in^2.
+  const r = _v1225({ chord_in: 24, rise_in: 4 });
+  assert.ok(Math.abs(r.radius_in - 20) < 1e-9);
+  const theta = 2 * Math.acos((20 - 4) / 20);
+  assert.ok(Math.abs(r.segment_area_in2 - 0.5 * 400 * (theta - Math.sin(theta))) < 1e-9);
+  assert.ok(Math.abs(r.segment_area_in2 - 65.40) < 0.02);
+  // Cross-check the alternate closed form R^2 acos((R-h)/R) - (R-h) sqrt(2Rh - h^2).
+  assert.ok(Math.abs(r.segment_area_in2 - (400 * Math.acos(0.8) - 16 * Math.sqrt(2 * 20 * 4 - 16))) < 1e-9);
+  // A chord equal to the diameter (rise = radius) gives exactly half the circle.
+  const semi = _v1225({ chord_in: 20, rise_in: 10 });
+  assert.ok(Math.abs(semi.radius_in - 10) < 1e-9 && Math.abs(semi.central_angle_deg - 180) < 1e-9);
+  assert.ok(Math.abs(semi.segment_area_in2 - Math.PI * 100 / 2) < 1e-6);
+  // More rise on the same chord -> more area.
+  assert.ok(_v1225({ chord_in: 24, rise_in: 6 }).segment_area_in2 > r.segment_area_in2);
+  // Error seams: non-positive chord/rise, non-finite.
+  assert.ok("error" in _v1225({ chord_in: 0, rise_in: 4 }));
+  assert.ok("error" in _v1225({ chord_in: 24, rise_in: 0 }));
+  assert.ok("error" in _v1225({ chord_in: 24, rise_in: Infinity }));
+});
+
 import { computeCircularArcRiseFromRadius as _v751 } from "../../calc-layout.js";
 test("bounds: spec-v751 arc rise (sagitta) from radius and chord (inverse of circular-arc)", () => {
   const p = _v751({ chord_in: 24, radius_in: 20 });

@@ -1115,6 +1115,7 @@ export const RENDERER_MAP = {
   "sine-bar": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },
   "thread-pitch": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },
   "circular-arc": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },
+  "circular-segment-area": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },
   "circular-arc-rise-from-radius": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },
   "circle-from-3-points": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },
   "polygon-miter": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },

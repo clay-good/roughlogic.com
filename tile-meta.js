@@ -453,7 +453,7 @@ const _TILES = [
   ["tank-volume", "G"], ["linear-interpolation", "G"],
 
   // v44 cross-trade circular-arc layout (calc-layout.js)
-  ["circular-arc", "G"],
+  ["circular-arc", "G"], ["circular-segment-area", "G"],
   ["circular-arc-rise-from-radius", "G"],
 
   // v47 cross-trade circle-from-3-points layout (calc-layout.js)
