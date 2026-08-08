@@ -1009,8 +1009,61 @@ function renderTruckOffTracking(inputRegion, outputRegion, citationEl) {
   for (const f of [R.input, l1.input, l2.input]) f.addEventListener("input", update);
 }
 
+// --- spec-v1218: swept-path width (`truck-swept-path-width`) ---
+// The truck-off-tracking tile names this gap ("the trailer swept-path width (add
+// the vehicle width) are separate"). The swept path is the total roadway width a
+// turning vehicle covers: SPW = vehicle width + off-tracking (+ the outer front
+// corner's swing-out). OT = R - sqrt(R^2 - sum(L_i^2)) as in the sibling.
+// dims: in { turn_radius_ft: L, wheelbase1_ft: L, wheelbase2_ft: L, vehicle_width_ft: L, front_swingout_ft: L } out: { off_tracking_ft: L, swept_path_width_ft: L, effective_wheelbase_ft: L }
+export function computeTruckSweptPathWidth({ turn_radius_ft = 0, wheelbase1_ft = 0, wheelbase2_ft = 0, vehicle_width_ft = 8.5, front_swingout_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R = Number(turn_radius_ft) || 0;
+  const L1 = Number(wheelbase1_ft) || 0;
+  const L2 = Number(wheelbase2_ft) || 0;
+  const W = Number(vehicle_width_ft) || 0;
+  const FS = Number(front_swingout_ft) || 0;
+  if (!(R > 0)) return { error: "Turn radius must be positive (ft)." };
+  if (!(L1 > 0)) return { error: "The first (tractor) wheelbase must be positive (ft)." };
+  if (L2 < 0) return { error: "The second wheelbase cannot be negative (ft)." };
+  if (!(W > 0)) return { error: "Vehicle width must be positive (ft)." };
+  if (FS < 0) return { error: "Front swing-out cannot be negative (ft)." };
+  const sum_wb_sq = L1 * L1 + L2 * L2;
+  const effective_wheelbase_ft = Math.sqrt(sum_wb_sq);
+  if (!(R > effective_wheelbase_ft)) return { error: "Turn radius must exceed the effective wheelbase (sqrt of the sum of squared wheelbases); the vehicle cannot hold this turn." };
+  const off_tracking_ft = R - Math.sqrt(R * R - sum_wb_sq);
+  const swept_path_width_ft = W + off_tracking_ft + FS;
+  if (![off_tracking_ft, swept_path_width_ft, effective_wheelbase_ft].every(Number.isFinite)) return { error: "Swept-path math is not a finite value." };
+  return {
+    off_tracking_ft, swept_path_width_ft, effective_wheelbase_ft, vehicle_width_ft: W, front_swingout_ft: FS,
+    note: "The swept-path width, the total roadway width a turning vehicle covers, the number a turn lane or intersection is sized on: SPW = vehicle width + low-speed off-tracking (+ the outer front corner's swing-out). The off-tracking OT = R - sqrt(R^2 - sum(L_i^2)) is how far the rearmost axle tracks INSIDE the front axle's turn radius R (each L_i a unit's wheelbase, summed in quadrature -- tractor wheelbase plus the trailer kingpin-to-axle for a combination), exactly the truck-off-tracking tile's value. Adding the body width W gives the band of pavement the vehicle occupies. A single unit (20 ft wheelbase, 8.5 ft wide) on a 50 ft turn sweeps 12.7 ft; a tractor-trailer (20 ft + 40 ft) on the same turn sweeps 36.1 ft -- why a long combination needs a wide turn lane or a larger curb radius. The front swing-out (the outer front corner reaching outboard of the front wheel path) is added if entered, from the design vehicle's turning template; it defaults to zero. This is the steady-state low-speed value; high-speed off-tracking (the rear swinging OUTward at speed) is separate. Per the AASHTO Green Book; the design vehicle and the agency govern.",
+  };
+}
+export const truckSweptPathWidthExample = { inputs: { turn_radius_ft: 50, wheelbase1_ft: 20, wheelbase2_ft: 40, vehicle_width_ft: 8.5, front_swingout_ft: 0 } };
+function renderTruckSweptPathWidth(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AASHTO Green Book swept-path width SPW = vehicle width + off-tracking (+ front swing-out), with OT = R - sqrt(R^2 - sum(L_i^2)) the low-speed off-tracking (R the turn radius, L_i each unit's wheelbase in quadrature). The roadway width a turning truck covers; high-speed off-tracking is separate. The design vehicle and the agency govern.";
+  const R = makeNumber("Turn radius R (ft)", "tsp-r", { step: "any", min: "0", value: "50" }); R.input.value = "50";
+  const l1 = makeNumber("Tractor / unit wheelbase (ft)", "tsp-l1", { step: "any", min: "0", value: "20" }); l1.input.value = "20";
+  const l2 = makeNumber("Trailer kingpin-to-axle (ft; 0 if single unit)", "tsp-l2", { step: "any", min: "0", value: "40" }); l2.input.value = "40";
+  const w = makeNumber("Vehicle width (ft; ~8.5 legal max)", "tsp-w", { step: "any", min: "0", value: "8.5" }); w.input.value = "8.5";
+  const fs = makeNumber("Front swing-out (ft; 0, or from the turning template)", "tsp-fs", { step: "any", min: "0", value: "0" }); fs.input.value = "0";
+  for (const f of [R, l1, l2, w, fs]) inputRegion.appendChild(f.wrap);
+  const oSPW = makeOutputLine(outputRegion, "Swept-path width", "tsp-out-spw");
+  const oOT = makeOutputLine(outputRegion, "Off-tracking (rear inside front)", "tsp-out-ot");
+  const oNote = makeOutputLine(outputRegion, "Note", "tsp-out-note");
+  const update = debounce(() => {
+    const r = computeTruckSweptPathWidth({ turn_radius_ft: Number(R.input.value) || 0, wheelbase1_ft: Number(l1.input.value) || 0, wheelbase2_ft: Number(l2.input.value) || 0, vehicle_width_ft: Number(w.input.value) || 0, front_swingout_ft: Number(fs.input.value) || 0 });
+    if (r.error) { oSPW.textContent = r.error; oOT.textContent = "-"; oNote.textContent = ""; return; }
+    oSPW.textContent = fmt(r.swept_path_width_ft, 2) + " ft";
+    oOT.textContent = fmt(r.off_tracking_ft, 2) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { R.input.value = "50"; l1.input.value = "20"; l2.input.value = "40"; w.input.value = "8.5"; fs.input.value = "0"; update(); });
+  for (const f of [R.input, l1.input, l2.input, w.input, fs.input]) f.addEventListener("input", update);
+}
+
 export const TRUCKING_RENDERERS = {
   "truck-off-tracking": renderTruckOffTracking,
+  "truck-swept-path-width": renderTruckSweptPathWidth,
   "ssd-design-speed": renderSsdDesignSpeed,
   "dim-weight":      renderDIM,
   "freight-density": renderFreightDensity,

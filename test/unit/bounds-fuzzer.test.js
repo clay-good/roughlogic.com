@@ -4742,6 +4742,30 @@ test("bounds: spec-v774 truck-off-tracking pins OT = R - sqrt(R^2 - sum(L^2)), q
   assert.ok("error" in _v774({ turn_radius_ft: Infinity, wheelbase1_ft: 20, wheelbase2_ft: 0 }));
 });
 
+import { computeTruckSweptPathWidth as _v1218, computeTruckOffTracking as _v1218ot } from "../../calc-trucking.js";
+
+test("bounds: spec-v1218 computeTruckSweptPathWidth pins SPW = W + OT (+ swing-out), the off-tracking identity, monotonicity, and error seams", () => {
+  // Tractor-trailer 20 + 40 ft, 8.5 ft wide, 50 ft turn: OT = 50 - sqrt(2500-2000) = 27.639; SPW = 36.139.
+  const r = _v1218({ turn_radius_ft: 50, wheelbase1_ft: 20, wheelbase2_ft: 40, vehicle_width_ft: 8.5, front_swingout_ft: 0 });
+  assert.ok(Math.abs(r.off_tracking_ft - (50 - Math.sqrt(2500 - 2000))) < 1e-9);
+  assert.ok(Math.abs(r.swept_path_width_ft - (8.5 + r.off_tracking_ft)) < 1e-12);
+  assert.ok(Math.abs(r.swept_path_width_ft - 36.139) < 1e-3);
+  // The off-tracking term matches the standalone truck-off-tracking tile exactly (shared relation).
+  assert.ok(Math.abs(r.off_tracking_ft - _v1218ot({ turn_radius_ft: 50, wheelbase1_ft: 20, wheelbase2_ft: 40 }).off_tracking_ft) < 1e-12);
+  // Front swing-out adds directly to the swept path.
+  assert.ok(Math.abs(_v1218({ turn_radius_ft: 50, wheelbase1_ft: 20, wheelbase2_ft: 40, vehicle_width_ft: 8.5, front_swingout_ft: 2 }).swept_path_width_ft - (r.swept_path_width_ft + 2)) < 1e-9);
+  // A single unit sweeps far less than the combination; a wider body sweeps more.
+  assert.ok(_v1218({ turn_radius_ft: 50, wheelbase1_ft: 20, wheelbase2_ft: 0, vehicle_width_ft: 8.5, front_swingout_ft: 0 }).swept_path_width_ft < r.swept_path_width_ft);
+  assert.ok(_v1218({ turn_radius_ft: 50, wheelbase1_ft: 20, wheelbase2_ft: 40, vehicle_width_ft: 10, front_swingout_ft: 0 }).swept_path_width_ft > r.swept_path_width_ft);
+  // Error seams: R must exceed the effective wheelbase; positive R/L1/width; non-negative L2/swing-out; non-finite.
+  assert.ok("error" in _v1218({ turn_radius_ft: 40, wheelbase1_ft: 30, wheelbase2_ft: 30, vehicle_width_ft: 8.5 }));
+  assert.ok("error" in _v1218({ turn_radius_ft: 0, wheelbase1_ft: 20, wheelbase2_ft: 0, vehicle_width_ft: 8.5 }));
+  assert.ok("error" in _v1218({ turn_radius_ft: 50, wheelbase1_ft: 20, wheelbase2_ft: 0, vehicle_width_ft: 0 }));
+  assert.ok("error" in _v1218({ turn_radius_ft: 50, wheelbase1_ft: 20, wheelbase2_ft: 0, vehicle_width_ft: 8.5, front_swingout_ft: -1 }));
+  assert.ok("error" in _v1218({ turn_radius_ft: 50, wheelbase1_ft: 20, wheelbase2_ft: -5, vehicle_width_ft: 8.5 }));
+  assert.ok("error" in _v1218({ turn_radius_ft: Infinity, wheelbase1_ft: 20, wheelbase2_ft: 0, vehicle_width_ft: 8.5 }));
+});
+
 test("bounds: calc-stage computeSPLAtmospheric pins inverse_square = 20 * log10(d2/d1) and rejects the documented out-of-domain inputs", () => {
   // Spec-v9 §H.2 worked example: 95 dB at 1 m, 20 C, 50% RH; report at 30 m.
   const r = computeSPLAtmospheric({ source_SPL_dB: 95, d_ref_m: 1, d_far_m: 30, temperature_C: 20, RH_percent: 50 });

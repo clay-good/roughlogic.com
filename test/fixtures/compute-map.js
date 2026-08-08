@@ -253,6 +253,7 @@ export const COMPUTE_MAP = {
   "stopping-sight-distance": { module: "../../calc-trucking.js", fn: "computeStoppingSightDistance" },
   "ssd-design-speed": { module: "../../calc-trucking.js", fn: "computeSsdDesignSpeed" },
   "truck-off-tracking": { module: "../../calc-trucking.js", fn: "computeTruckOffTracking" },
+  "truck-swept-path-width": { module: "../../calc-trucking.js", fn: "computeTruckSweptPathWidth" },
   "lightning-countdown": { module: "../../calc-field.js", fn: "computeLightningCountdown" },
   "magnetic-declination": { module: "../../calc-field.js", fn: "computeMagneticDeclination" },
   "thi-livestock": { module: "../../calc-agriculture.js", fn: "computeTHI" },

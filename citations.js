@@ -2594,6 +2594,19 @@ export const CITATIONS = {
     ],
   },
 
+  "truck-swept-path-width": {
+    formula: "OT = R - sqrt(R^2 - sum(L_i^2)); SPW = vehicle_width + OT + front_swingout. R the turn radius, L_i each unit's wheelbase.",
+    edition: "AASHTO Green Book (Policy on Geometric Design of Highways and Streets) swept-path width = off-tracking plus vehicle width; standard turning geometry.",
+    freeAccess: "transportation.org for TOC; the swept-path relation (off-tracking plus width) is public. AASHTO design-vehicle turning templates are licensed.",
+    governance: GOVERNANCE.trucking,
+    editionNote: "The swept-path width, the total roadway width a turning vehicle covers and the number a turn lane or intersection is sized on: SPW = vehicle width + low-speed off-tracking (+ the outer front corner's swing-out). The off-tracking OT = R - sqrt(R^2 - sum(L_i^2)) is how far the rearmost axle tracks INSIDE the front axle's turn radius R, each L_i a unit's wheelbase summed in quadrature (tractor wheelbase plus the trailer kingpin-to-rear-axle for a combination); adding the body width W gives the pavement band the vehicle occupies. A single unit (20 ft wheelbase, 8.5 ft wide) on a 50 ft turn sweeps 12.7 ft, a tractor-semitrailer (20 + 40 ft) sweeps 36.1 ft. The front swing-out (the outer front corner reaching outboard of the front wheel path) is added when entered, from the design vehicle's turning template. This is the steady-state low-speed value; HIGH-speed off-tracking (the rear swinging OUTward at speed) is a separate analysis. A design aid; the design vehicle and the roadway agency govern.",
+    assumptions: [
+      { name: "Swept-path width", value: "SPW = vehicle width + OT + front swing-out", source: "AASHTO Green Book" },
+      { name: "Off-tracking", value: "OT = R - sqrt(R^2 - sum(L_i^2)), rear tracks inside the front", source: "AASHTO Green Book / truck-off-tracking tile" },
+      { name: "Scope", value: "low-speed steady-state; high-speed off-tracking (rear swings out) is separate", source: "analysis scope" },
+    ],
+  },
+
   "excavation-bench-plan": {
     formula: "horizontal_offset = depth * ratio (A 0.75 / B 1.0 / C 1.5). top_width = bottom_width + 2 * offset. cross_section = (top + bottom) / 2 * depth. volume_yd3 = cross_section * length / 27. Bench layout (A/B): 4 ft per bench; horizontal_step = bench_height * ratio.",
     edition: "OSHA 29 CFR 1926 Subpart P Appendix B and §1926.652.",

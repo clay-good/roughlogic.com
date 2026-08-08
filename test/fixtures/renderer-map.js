@@ -1153,6 +1153,7 @@ export const RENDERER_MAP = {
   "stopping-sight-distance": { module: "../../calc-trucking.js", exportName: "TRUCKING_RENDERERS" },
   "ssd-design-speed": { module: "../../calc-trucking.js", exportName: "TRUCKING_RENDERERS" },
   "truck-off-tracking": { module: "../../calc-trucking.js", exportName: "TRUCKING_RENDERERS" },
+  "truck-swept-path-width": { module: "../../calc-trucking.js", exportName: "TRUCKING_RENDERERS" },
   "cargo-securement-wll": { module: "../../calc-trucking.js", exportName: "TRUCKING_RENDERERS" },
   "fuel-tax-ifta": { module: "../../calc-trucking.js", exportName: "TRUCKING_RENDERERS" },
   "cost-per-mile": { module: "../../calc-trucking.js", exportName: "TRUCKING_RENDERERS" },

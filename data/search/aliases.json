@@ -80508,7 +80508,17 @@
     },
     {
       "term": "trailer swept path",
-      "target": "truck-off-tracking",
+      "target": "truck-swept-path-width",
+      "kind": "question"
+    },
+    {
+      "term": "swept path width",
+      "target": "truck-swept-path-width",
+      "kind": "industry"
+    },
+    {
+      "term": "turn lane width for a truck",
+      "target": "truck-swept-path-width",
       "kind": "question"
     },
     {

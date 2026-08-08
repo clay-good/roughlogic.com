@@ -3769,6 +3769,60 @@
    }
   },
   {
+   "tile_id": "truck-swept-path-width",
+   "source_publisher": "AASHTO Green Book (swept-path width = off-tracking + vehicle width)",
+   "source_title": "Tractor-trailer (20 + 40 ft), 8.5 ft wide, 50 ft turn -> 36.1 ft swept path (spec-v1218)",
+   "source_edition_or_year": "SPW = W + OT, OT = R - sqrt(R^2 - sum(L^2))",
+   "source_section_or_page": "OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50 - 22.361 = 27.639 ft; SPW = 8.5 + 27.639 = 36.139 ft.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "turn_radius_ft": 50,
+    "wheelbase1_ft": 20,
+    "wheelbase2_ft": 40,
+    "vehicle_width_ft": 8.5,
+    "front_swingout_ft": 0
+   },
+   "outputs": {
+    "swept_path_width_ft": {
+     "value": 36.139,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "off_tracking_ft": {
+     "value": 27.639,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "truck-swept-path-width",
+   "source_publisher": "AASHTO Green Book (single-unit cross-check)",
+   "source_title": "cross-check: a single unit (20 ft wheelbase) on the same turn sweeps only 12.7 ft",
+   "source_edition_or_year": "SPW = W + OT",
+   "source_section_or_page": "OT = 50 - sqrt(2500 - 400) = 4.174 ft; SPW = 8.5 + 4.174 = 12.674 ft -- far less than the 36.1 ft the tractor-trailer needs, why a long combination governs the turn-lane width.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "turn_radius_ft": 50,
+    "wheelbase1_ft": 20,
+    "wheelbase2_ft": 0,
+    "vehicle_width_ft": 8.5,
+    "front_swingout_ft": 0
+   },
+   "outputs": {
+    "swept_path_width_ft": {
+     "value": 12.674,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "scba-cylinder-time",
    "source_publisher": "NFPA / NIOSH",
    "source_title": "SCBA cylinder gas-law: scf to alarm and to empty (60-min 4500 psi rating at 40 L/min light-work breathing rate)",
