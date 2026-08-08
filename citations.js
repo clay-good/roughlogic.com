@@ -15125,6 +15125,18 @@ export const CITATIONS = {
       { name: "Saturation", value: "S = w Gs/e; gamma_w = 62.4 pcf fresh water, Gs ~ 2.65-2.72", source: "soil mechanics" },
     ],
   },
+  "soil-permeability": {
+    formula: "constant head (ASTM D2434): k = Q L/(A h t); falling head (ASTM D5084): k = (a L/(A t)) ln(h1/h2); k in cm/s, 1 cm/s = 2834.6456 ft/day.",
+    edition: "Darcy's-law permeameter tests -- ASTM D2434 (constant head) and ASTM D5084 (falling head) -- by name, with the Terzaghi/Das drainage-class ranges; no ASTM table text reproduced.",
+    freeAccess: "Darcy's law and the two permeameter reductions are public soil-mechanics results printed in every geotechnical text; ASTM D2434/D5084 are purchased standards cited by name only.",
+    governance: GOVERNANCE.general,
+    editionNote: "Soil hydraulic conductivity k from a laboratory permeameter test, the value soil-phase-relations names as out of scope. Both tests are Darcy's law v = k i solved for k. The constant-head test (ASTM D2434), for coarse free-draining soils, holds the head h fixed and collects a volume Q through a sample of length L and area A over a time t: k = Q L/(A h t). The falling-head test (ASTM D5084), for finer soils where the flow is too slow to collect a volume, times the water dropping from head h1 to h2 in a standpipe of area a: k = (a L/(A t)) ln(h1/h2). k is reported in cm/s and ft/day (1 cm/s = 2834.6 ft/day) with the standard Terzaghi/Das drainage class: above 1e-1 cm/s clean gravel, 1e-3 to 1e-1 sand, 1e-5 to 1e-3 fine or silty sand, 1e-7 to 1e-5 silt, below 1e-7 practically impervious clay. Report k at the test temperature and correct to 20 C for a standard value; a single lab specimen can miss field fabric, layering, and fractures, so field values often run higher. An engineering aid; the soil test data and the geotechnical engineer govern.",
+    assumptions: [
+      { name: "Constant-head reduction", value: "k = Q L/(A h t); Darcy's law at a fixed head, for coarse soils", source: "ASTM D2434" },
+      { name: "Falling-head reduction", value: "k = (a L/(A t)) ln(h1/h2); the head falls in a standpipe of area a, for fine soils", source: "ASTM D5084" },
+      { name: "Drainage class and scope", value: "Terzaghi/Das ranges; correct to 20 C; one specimen can miss field fabric, so field k often runs higher", source: "soil mechanics" },
+    ],
+  },
   "soil-gradation-coefficients": {
     formula: "Cu = D60 / D10; Cc = D30^2 / (D10 x D60); well graded requires Cu >= 4 (gravel) or Cu >= 6 (sand) AND 1 <= Cc <= 3; Hazen k (cm/s) = D10^2 (D10 in mm).",
     edition: "ASTM D2487 (Unified Soil Classification System) gradation criteria and ASTM D6913 (sieve analysis) by name, with the Hazen (1892) permeability estimate; no ASTM table text reproduced.",

@@ -135,6 +135,12 @@
       "justification": "Grain-size and sieve-opening diameters are stated in mm by ASTM D2487 / D6913 and printed in mm on every US geotechnical gradation report; there is no US-customary equivalent in use."
     },
     {
+      "module": "calc-earthwork.js",
+      "match": "(cm)",
+      "family": "geotechnical lab testing",
+      "justification": "Permeameter tests (ASTM D2434 constant head, D5084 falling head) are run in metric in US geotechnical labs: sample length, standpipe/burette heads, and mold dimensions are read in cm off the apparatus, and hydraulic conductivity k is reported in cm/s universally. There is no US-customary equivalent in lab practice."
+    },
+    {
       "module": "calc-lowvoltage.js",
       "match": "Sensor width (mm",
       "family": "product/spec conventions",

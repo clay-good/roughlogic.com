@@ -18163,6 +18163,7 @@ test("bounds: spec-v662 computeEtHorsepower inverts the ET relation, round-trips
 
 // ===================== spec-v326..v328 soil characterization / QC batch =====================
 import { computeRelativeCompaction as _v326, computeSoilPhaseRelations as _v327, computeAtterbergIndices as _v328 } from "../../calc-earthwork.js";
+import { computeSoilPermeability as _v1260 } from "../../calc-earthwork.js";
 import { computeWaterForCompaction as _v821wfc } from "../../calc-earthwork.js";
 import { computeRusleSoilLoss as _v822rsl } from "../../calc-earthwork.js";
 import { computeRiprapD50 as _v823rr } from "../../calc-earthwork.js";
@@ -19283,6 +19284,25 @@ test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the 
   assert.ok("error" in _v327({ gamma_pcf: 120, w_pct: 15, gs: 0 }));
   assert.ok("error" in _v327({ gamma_pcf: 200, w_pct: 0, gs: 2.70 })); // impossibly dense -> e <= 0
   assert.ok("error" in _v327({ gamma_pcf: NaN, w_pct: 15, gs: 2.70 }));
+});
+
+test("bounds: spec-v1260 computeSoilPermeability pins both Darcy permeameter reductions, the ft/day conversion, and error seams", () => {
+  // Constant head: k = QL/(Aht) = 250*12/(78.5*30*60) = 0.0212314 cm/s.
+  const c = _v1260({ method: "constant-head", q_cm3: 250, head_cm: 30, t_s: 60, l_cm: 12, a_sample_cm2: 78.5 });
+  assert.ok(Math.abs(c.k_cm_s - 250 * 12 / (78.5 * 30 * 60)) < 1e-12);
+  assert.ok(Math.abs(c.k_cm_s - 0.0212314) < 1e-6);
+  assert.ok(Math.abs(c.k_ft_day - c.k_cm_s * 2834.6456) < 1e-9);
+  assert.ok(/sand/.test(c.drainage_class));
+  // Falling head: k = (aL/At) ln(h1/h2) = (1*10/(30*120)) ln(100/90) = 0.000292668 cm/s.
+  const f = _v1260({ method: "falling-head", a_pipe_cm2: 1.0, l_cm: 10, a_sample_cm2: 30, t_s: 120, h1_cm: 100, h2_cm: 90 });
+  assert.ok(Math.abs(f.k_cm_s - (1.0 * 10 / (30 * 120)) * Math.log(100 / 90)) < 1e-12);
+  assert.ok(Math.abs(f.k_cm_s - 0.000292668) < 1e-8);
+  // Error seams: bad method, non-positive dims, falling head with h1 <= h2, non-finite.
+  assert.ok("error" in _v1260({ method: "pumping", q_cm3: 250, head_cm: 30, t_s: 60, l_cm: 12, a_sample_cm2: 78.5 }));
+  assert.ok("error" in _v1260({ method: "constant-head", q_cm3: 0, head_cm: 30, t_s: 60, l_cm: 12, a_sample_cm2: 78.5 }));
+  assert.ok("error" in _v1260({ method: "constant-head", q_cm3: 250, head_cm: 30, t_s: 0, l_cm: 12, a_sample_cm2: 78.5 }));
+  assert.ok("error" in _v1260({ method: "falling-head", a_pipe_cm2: 1.0, l_cm: 10, a_sample_cm2: 30, t_s: 120, h1_cm: 90, h2_cm: 100 }));
+  assert.ok("error" in _v1260({ method: "falling-head", a_pipe_cm2: 1.0, l_cm: 10, a_sample_cm2: 30, t_s: 120, h1_cm: Infinity, h2_cm: 90 }));
 });
 
 test("bounds: spec-v328 computeAtterbergIndices pins the A-line classification, the LL split, and error seams", () => {

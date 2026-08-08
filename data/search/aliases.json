@@ -22196,6 +22196,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "soil permeability",
+      "target": "soil-permeability",
+      "kind": "industry"
+    },
+    {
+      "term": "hydraulic conductivity",
+      "target": "soil-permeability",
+      "kind": "industry"
+    },
+    {
+      "term": "constant head permeameter test",
+      "target": "soil-permeability",
+      "kind": "question"
+    },
+    {
+      "term": "falling head permeability test",
+      "target": "soil-permeability",
+      "kind": "question"
+    },
+    {
+      "term": "coefficient of permeability k of soil",
+      "target": "soil-permeability",
+      "kind": "question"
+    },
+    {
       "term": "soil phase relations",
       "target": "soil-phase-relations",
       "kind": "industry"

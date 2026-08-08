@@ -42,7 +42,7 @@
 // =====================================================================
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeOutputLine, attachExampleButton, fmt,
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard (copied from calc-construction.js; non-exported, so
@@ -1782,6 +1782,93 @@ function _v327renderSoilPhaseRelations(inputRegion, outputRegion, citationEl) {
   for (const f of [g, w, gs]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["soil-phase-relations"] = _v327renderSoilPhaseRelations;
+
+// --- spec-v1260: soil hydraulic conductivity (permeability) from a permeameter test ---
+// The soil-phase-relations note names its own gap: "it does not compute the permeability, the effective
+// stress, or the compaction relative density." This builds the permeability. Both standard lab permeameter
+// tests are Darcy's law rearranged: the constant-head test (ASTM D2434, coarse soils) collects a volume Q
+// over a time t under a fixed head h, so k = Q L / (A h t); the falling-head test (ASTM D5084, fine soils)
+// times the head dropping from h1 to h2 in a standpipe of area a, so k = (a L)/(A t) ln(h1/h2). L is the
+// sample length, A the sample cross-section. k comes out in cm/s; 1 cm/s = 2834.6456 ft/day.
+const _K_CM_S_TO_FT_DAY = 2834.6456; // (1 cm/s)(86400 s/day)/(30.48 cm/ft)
+function _permeabilityDrainageClass(k) {
+  if (k >= 1e-1) return "high -- clean gravel, free-draining";
+  if (k >= 1e-3) return "medium -- sand and sand-gravel mixtures";
+  if (k >= 1e-5) return "low -- fine sand, silty sand";
+  if (k >= 1e-7) return "very low -- silt, clayey silt";
+  return "practically impervious -- clay";
+}
+// dims: in { method: dimensionless, q_cm3: L^3, head_cm: L, t_s: T, l_cm: L, a_sample_cm2: L^2, a_pipe_cm2: L^2, h1_cm: L, h2_cm: L } out: { k_cm_s: L T^-1, k_ft_day: L T^-1 }
+export function computeSoilPermeability({ method = "constant-head", q_cm3 = 0, head_cm = 0, t_s = 0, l_cm = 0, a_sample_cm2 = 0, a_pipe_cm2 = 0, h1_cm = 0, h2_cm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (method !== "constant-head" && method !== "falling-head") return { error: "Method must be constant-head or falling-head." };
+  const L = Number(l_cm) || 0;
+  const A = Number(a_sample_cm2) || 0;
+  const t = Number(t_s) || 0;
+  if (!(L > 0)) return { error: "Sample length L must be positive (cm)." };
+  if (!(A > 0)) return { error: "Sample cross-section area A must be positive (cm2)." };
+  if (!(t > 0)) return { error: "Elapsed time t must be positive (s)." };
+  let k;
+  if (method === "constant-head") {
+    const Q = Number(q_cm3) || 0;
+    const h = Number(head_cm) || 0;
+    if (!(Q > 0)) return { error: "Collected volume Q must be positive (cm3)." };
+    if (!(h > 0)) return { error: "Constant head h must be positive (cm)." };
+    k = (Q * L) / (A * h * t);
+  } else {
+    const a = Number(a_pipe_cm2) || 0;
+    const h1 = Number(h1_cm) || 0;
+    const h2 = Number(h2_cm) || 0;
+    if (!(a > 0)) return { error: "Standpipe area a must be positive (cm2)." };
+    if (!(h1 > 0) || !(h2 > 0)) return { error: "Both heads h1 and h2 must be positive (cm)." };
+    if (!(h1 > h2)) return { error: "The starting head h1 must be greater than the ending head h2 (the head falls)." };
+    k = (a * L) / (A * t) * Math.log(h1 / h2);
+  }
+  if (!(k > 0) || !Number.isFinite(k)) return { error: "Permeability math is not a finite positive value." };
+  const k_ft_day = k * _K_CM_S_TO_FT_DAY;
+  return {
+    k_cm_s: k, k_ft_day,
+    drainage_class: _permeabilityDrainageClass(k),
+    note: "Soil hydraulic conductivity (permeability) k from a laboratory permeameter test, the value the soil-phase-relations tile leaves out. Both tests are Darcy's law v = k i rearranged for k. The constant-head test (ASTM D2434), used for coarse, free-draining soils, holds the head h fixed and collects a volume Q through a sample of length L and area A over a time t: k = Q L / (A h t). The falling-head test (ASTM D5084), used for finer soils where flow is too slow to collect a volume, times the water dropping from head h1 to h2 in a standpipe of area a: k = (a L)/(A t) ln(h1/h2). k here is in cm/s (1 cm/s = 2834.6 ft/day). The drainage class follows the standard Terzaghi/Das ranges: above 1e-1 cm/s clean gravel, 1e-3 to 1e-1 sand, 1e-5 to 1e-3 fine/silty sand, 1e-7 to 1e-5 silt, below 1e-7 practically impervious clay. Report k at the test temperature and correct to 20 C for a standard value; a single lab specimen can miss field fabric, layering, and fractures, so field values often run higher. An engineering aid; the soil test data and the geotechnical engineer govern.",
+  };
+}
+export const soilPermeabilityExample = { inputs: { method: "constant-head", q_cm3: 250, head_cm: 30, t_s: 60, l_cm: 12, a_sample_cm2: 78.5, a_pipe_cm2: 0, h1_cm: 0, h2_cm: 0 } };
+function _v1260renderSoilPermeability(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Darcy's-law permeameter tests -- constant-head k = QL/(Aht) (ASTM D2434), falling-head k = (aL/At) ln(h1/h2) (ASTM D5084), by name; k in cm/s (1 cm/s = 2834.6 ft/day). Drainage ranges per Terzaghi/Das. Correct k to 20 C; a lab specimen can miss field fabric. The geotechnical engineer governs.";
+  const method = makeSelect("Test method", "sp-m", [
+    { value: "constant-head", label: "Constant head (ASTM D2434, coarse soils)", selected: true },
+    { value: "falling-head", label: "Falling head (ASTM D5084, fine soils)" },
+  ]);
+  const l = makeNumber("Sample length L (cm)", "sp-l", { step: "any", min: "0", value: "12" }); l.input.value = "12";
+  const a = makeNumber("Sample area A (cm2)", "sp-a", { step: "any", min: "0", value: "78.5" }); a.input.value = "78.5";
+  const t = makeNumber("Elapsed time t (s)", "sp-t", { step: "any", min: "0", value: "60" }); t.input.value = "60";
+  const q = makeNumber("[Constant head] Volume collected Q (cm3)", "sp-q", { step: "any", min: "0", value: "250" }); q.input.value = "250";
+  const h = makeNumber("[Constant head] Constant head h (cm)", "sp-h", { step: "any", min: "0", value: "30" }); h.input.value = "30";
+  const ap = makeNumber("[Falling head] Standpipe area a (cm2)", "sp-ap", { step: "any", min: "0", value: "1.0" }); ap.input.value = "1.0";
+  const h1 = makeNumber("[Falling head] Head start h1 (cm)", "sp-h1", { step: "any", min: "0", value: "100" }); h1.input.value = "100";
+  const h2 = makeNumber("[Falling head] Head end h2 (cm)", "sp-h2", { step: "any", min: "0", value: "90" }); h2.input.value = "90";
+  for (const f of [method, l, a, t, q, h, ap, h1, h2]) inputRegion.appendChild(f.wrap);
+  const oK = makeOutputLine(outputRegion, "Hydraulic conductivity k", "sp-out-k");
+  const oKf = makeOutputLine(outputRegion, "k (ft/day)", "sp-out-kf");
+  const oC = makeOutputLine(outputRegion, "Drainage class", "sp-out-c");
+  const oNote = makeOutputLine(outputRegion, "Note", "sp-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeSoilPermeability({
+      method: method.select.value, q_cm3: readNum(q.input), head_cm: readNum(h.input), t_s: readNum(t.input),
+      l_cm: readNum(l.input), a_sample_cm2: readNum(a.input), a_pipe_cm2: readNum(ap.input), h1_cm: readNum(h1.input), h2_cm: readNum(h2.input),
+    });
+    if (r.error) { oK.textContent = r.error; oKf.textContent = "-"; oC.textContent = "-"; oNote.textContent = ""; return; }
+    oK.textContent = r.k_cm_s.toExponential(3) + " cm/s";
+    oKf.textContent = fmt(r.k_ft_day, 3) + " ft/day";
+    oC.textContent = r.drainage_class;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { method.select.value = "constant-head"; l.input.value = "12"; a.input.value = "78.5"; t.input.value = "60"; q.input.value = "250"; h.input.value = "30"; ap.input.value = "1.0"; h1.input.value = "100"; h2.input.value = "90"; update(); });
+  for (const f of [l, a, t, q, h, ap, h1, h2]) f.input.addEventListener("input", update);
+  method.select.addEventListener("change", update);
+}
+EARTHWORK_RENDERERS["soil-permeability"] = _v1260renderSoilPermeability;
 
 // dims: in { ll: dimensionless, pl: dimensionless, w_pct: dimensionless } out: { pi: dimensionless, aline: dimensionless, li: dimensionless }
 export function computeAtterbergIndices({ ll = 0, pl = 0, w_pct = 0 } = {}) {

@@ -1938,6 +1938,7 @@ cross-check.
 | calc-earthwork.js | `computeSiltFenceDrainage` | `{ tributary_area_ac = 0, fence_length_ft = 0, slope_length_ft = 0, max_slope_...` | _ | _ | _ |
 | calc-earthwork.js | `computeSoilActivity` | `{ ll = 0, pl = 0, clay_fraction_pct = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeSoilGradationCoefficients` | `{ d10_mm = 0, d30_mm = 0, d60_mm = 0, pct_coarse_passing_no4 = 60, pct_fines ...` | _ | _ | _ |
+| calc-earthwork.js | `computeSoilPermeability` | `{ method = "constant-head", q_cm3 = 0, head_cm = 0, t_s = 0, l_cm = 0, a_samp...` | _ | _ | _ |
 | calc-earthwork.js | `computeSoilPhaseRelations` | `{ gamma_pcf = 0, w_pct = 0, gs = 2.70 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeSoilRelativeDensity` | `{ field_wet_pcf = 0, w_pct = 0, gamma_dmin_pcf = 0, gamma_dmax_pcf = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeSoilStabilizationQuantity` | `{ application_pct = 6, soil_density_pcf = 110, depth_in = 8, area_sy = 10000 ...` | _ | _ | _ |
@@ -3294,7 +3295,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1880.
+Row count: 1881.
 
 <!-- END function-corpus-v14 -->
 
@@ -3938,7 +3939,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (458 tiles)
+### Group E Construction (459 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4296,6 +4297,7 @@ per spec-v14 §13.1 second paragraph.
 | `soil-bearing-capacity` | Shallow Foundation Bearing Capacity (Vesic) | Das, Principles of Foundation Enginee...; spec-v260 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-consolidation-settlement` | Primary Consolidation Settlement (NC Clay) | Terzaghi primary consolidation (Das /...; spec-v308 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-gradation-coefficients` | Soil Gradation Coefficients Cu / Cc (USCS, ASTM D2487) | ASTM D2487 (Unified Soil Classificati...; Cu = 1.2/0.15 = 8.0 (>= 6 for a sand, OK); Cc = 0.55^2/(0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `soil-permeability` | Soil Permeability (Hydraulic Conductivity from a Permeameter Test) | Darcy's-law constant-head permeameter...; k = 250 x 12 / (78.5 x 30 x 60) = 3000 / 141300 = 0.02123... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-phase-relations` | Soil Phase Relations (Void Ratio, Porosity, Saturation) | Soil phase relations (Das / NAVFAC); spec-v327 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-relative-density` | Relative Density (Density Index) of a Cohesionless Soil | Relative density (density index), dry...; spec-v1014 section 2.1; cross-checked against the void-ra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-settlement-elastic` | Shallow Foundation Elastic (Immediate) Settlement | Theory-of-elasticity immediate settle...; spec-v287 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5112,6 +5114,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1632. Fixture-covered or reference-cadence: 1632 / 1632.
+Tile count: 1633. Fixture-covered or reference-cadence: 1633 / 1633.
 
 <!-- END tile-index-v14 -->

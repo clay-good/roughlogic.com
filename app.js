@@ -741,7 +741,7 @@ const TOOL_MODULES = (() => {
     "relative-compaction",
     // spec-v1014 relative density (density index) for cohesionless soil
     "soil-relative-density",
-    "water-for-compaction", "soil-phase-relations", "atterberg-indices", "soil-activity", "fineness-modulus", "fine-aggregate-grading", "soil-gradation-coefficients",
+    "water-for-compaction", "soil-phase-relations", "soil-permeability", "atterberg-indices", "soil-activity", "fineness-modulus", "fine-aggregate-grading", "soil-gradation-coefficients",
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",

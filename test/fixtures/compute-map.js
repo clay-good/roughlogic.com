@@ -1317,6 +1317,7 @@ export const COMPUTE_MAP = {
   "soil-relative-density": { module: "../../calc-earthwork.js", fn: "computeSoilRelativeDensity" },
   "water-for-compaction": { module: "../../calc-earthwork.js", fn: "computeWaterForCompaction" },
   "soil-phase-relations": { module: "../../calc-earthwork.js", fn: "computeSoilPhaseRelations" },
+  "soil-permeability": { module: "../../calc-earthwork.js", fn: "computeSoilPermeability" },
   "atterberg-indices": { module: "../../calc-earthwork.js", fn: "computeAtterbergIndices" },
   // spec-v329..v331 building-energy batch (3 tiles)
   "building-ua": { module: "../../calc-hvac.js", fn: "computeBuildingUa" },

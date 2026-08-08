@@ -62792,6 +62792,63 @@
    }
   },
   {
+   "tile_id": "soil-permeability",
+   "source_publisher": "Darcy's-law constant-head permeameter (ASTM D2434)",
+   "source_title": "Q 250 cm3, h 30 cm, t 60 s, L 12 cm, A 78.5 cm2 -> k 2.123e-2 cm/s = 60.18 ft/day (spec-v1260)",
+   "source_edition_or_year": "k = Q L / (A h t)",
+   "source_section_or_page": "k = 250 x 12 / (78.5 x 30 x 60) = 3000 / 141300 = 0.0212314 cm/s; x 2834.6456 = 60.18 ft/day (medium-permeability sand).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "method": "constant-head",
+    "q_cm3": 250,
+    "head_cm": 30,
+    "t_s": 60,
+    "l_cm": 12,
+    "a_sample_cm2": 78.5
+   },
+   "outputs": {
+    "k_cm_s": {
+     "value": 0.0212314,
+     "tolerance": {
+      "abs": 1e-6
+     }
+    },
+    "k_ft_day": {
+     "value": 60.18,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "soil-permeability",
+   "source_publisher": "Darcy's-law falling-head permeameter (ASTM D5084)",
+   "source_title": "a 1.0 cm2, L 10 cm, A 30 cm2, t 120 s, h1 100 -> h2 90 cm -> k 2.927e-4 cm/s (silty sand)",
+   "source_edition_or_year": "k = (a L / (A t)) ln(h1/h2)",
+   "source_section_or_page": "k = (1.0 x 10 / (30 x 120)) x ln(100/90) = 0.00277778 x 0.105361 = 0.000292668 cm/s -- a low-permeability fine/silty sand.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "method": "falling-head",
+    "a_pipe_cm2": 1.0,
+    "l_cm": 10,
+    "a_sample_cm2": 30,
+    "t_s": 120,
+    "h1_cm": 100,
+    "h2_cm": 90
+   },
+   "outputs": {
+    "k_cm_s": {
+     "value": 0.000292668,
+     "tolerance": {
+      "abs": 1e-8
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-phase-relations",
    "source_publisher": "Soil phase relations (Das / NAVFAC)",
    "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",

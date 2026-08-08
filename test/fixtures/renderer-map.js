@@ -972,6 +972,7 @@ export const RENDERER_MAP = {
   "soil-relative-density": { module: "../../calc-earthwork.js", exportName: "EARTHWORK_RENDERERS" },
   "water-for-compaction": { module: "../../calc-earthwork.js", exportName: "EARTHWORK_RENDERERS" },
   "soil-phase-relations": { module: "../../calc-earthwork.js", exportName: "EARTHWORK_RENDERERS" },
+  "soil-permeability": { module: "../../calc-earthwork.js", exportName: "EARTHWORK_RENDERERS" },
   "atterberg-indices": { module: "../../calc-earthwork.js", exportName: "EARTHWORK_RENDERERS" },
   "soil-activity": { module: "../../calc-earthwork.js", exportName: "EARTHWORK_RENDERERS" },
   "fineness-modulus": { module: "../../calc-earthwork.js", exportName: "EARTHWORK_RENDERERS" },
