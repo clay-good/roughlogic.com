@@ -441,6 +441,18 @@ export const CITATIONS = {
     ],
   },
 
+  "future-value-of-annuity": {
+    formula: "Ordinary annuity FV = PMT [((1+i)^n - 1)/i]; PV = PMT [(1-(1+i)^-n)/i]; annuity-due multiplies each by (1+i). At i = 0 both reduce to PMT n. i is the periodic rate, n the number of payments; sinking-fund deposit PMT = FV i/((1+i)^n - 1).",
+    edition: "Standard time-value-of-money identities (public-domain finance); the TILA/Reg Z (12 CFR 1030) compounding convention, by name.",
+    freeAccess: "The annuity FV/PV identities are universal public formulas; a finance text or the SEC investor.gov compound-interest material covers them.",
+    governance: GOVERNANCE.general,
+    editionNote: "The future and present value of a level annuity. FV = PMT [((1+i)^n - 1)/i] is what a stream of equal deposits grows to (a sinking fund); PV = PMT [(1-(1+i)^-n)/i] is the lump sum today worth that stream (a loan balance or lease). An annuity-due (payments at the start of each period) multiplies both by (1+i); the default is an ordinary annuity (end of period). The rate must be per PERIOD, not per year -- divide an annual rate by the periods per year first. $500 a month at 0.5%/month for 120 months grows to $81,940 ($60,000 contributed, $21,940 interest). To size the deposit for a target FV, rearrange to PMT = FV i/((1+i)^n - 1). Accounting information, not advice; the account terms, compounding convention, and taxes govern.",
+    assumptions: [
+      { name: "Annuity FV/PV", value: "FV = PMT [((1+i)^n - 1)/i], PV = PMT [(1-(1+i)^-n)/i]; due x (1+i)", source: "time-value-of-money identities" },
+      { name: "Per-period rate", value: "i is the rate per payment period (annual rate / periods per year); n is the number of payments", source: "TVM convention" },
+    ],
+  },
+
   "markup-vs-margin": {
     formula: "markup% = (price-cost)/cost*100; margin% = (price-cost)/price*100; margin% = markup%/(1+markup%); markup% = margin%/(1-margin%); price = cost*(1+markup%) = cost/(1-margin%).",
     edition: "Standard managerial-accounting pricing identity (cost-volume-profit), universal public formula; AICPA / introductory managerial-accounting texts, by name.",

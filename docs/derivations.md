@@ -1422,6 +1422,7 @@ cross-check.
 | calc-accounting.js | `computeEoqOrderQuantity` | `{ annual_demand = 0, order_cost = 0, holding_cost = 0 } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeEquipmentHourlyRate` | `{ purchase = 0, salvage = 0, life_hr = 0, annual_hr = 0, iit_pct = 0, fuel_gp...` | _ | _ | _ |
 | calc-accounting.js | `computeEstimatedTax` | `{ projected_current_tax = 0, prior_year_tax = 0, current_withholding = 0, pri...` | _ | _ | _ |
+| calc-accounting.js | `computeFutureValueOfAnnuity` | `{ payment = 0, rate_pct = 0, periods = 0, timing = "ordinary" } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeHomeOffice` | `{ office_ft2 = 0, home_ft2 = 0, total_home_expenses = 0, } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeInventoryTurnover` | `{ cogs = 0, beginning_inventory = 0, ending_inventory = 0, period_days = 365,...` | _ | _ | _ |
 | calc-accounting.js | `computeLaborBurdenRate` | `{ wage = 0, payroll_pct = 9.15, wc_pct = 0, liab_pct = 0, benefits = 0, produ...` | _ | _ | _ |
@@ -3278,7 +3279,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1864.
+Row count: 1865.
 
 <!-- END function-corpus-v14 -->
 
@@ -4909,7 +4910,7 @@ per spec-v14 §13.1 second paragraph.
 | --- | --- | --- | --- |
 | `historical-pricing` | Historical Pricing Context | BLS PPI / EIA / USDA NASS / FRED fede...; copper / 12-month lookback over the bundled 2026-05-08 sh... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group R Accounting (29 tiles)
+### Group R Accounting (30 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4921,6 +4922,7 @@ per spec-v14 §13.1 second paragraph.
 | `eoq-order-quantity` | Economic Order Quantity (Wilson EOQ) | Wilson economic order quantity (EOQ) ...; spec-v529 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `equipment-hourly-rate` | Equipment Owning and Operating Hourly Rate | CAT / AED method; spec-v363 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `estimated-tax` | Quarterly Estimated Tax | IRS Form 1040-ES + Pub 505 estimated-...; $20k projected / $18k prior / $4k withheld / 100% prior m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `future-value-of-annuity` | Future Value of an Annuity (and Present Value) | Time-value-of-money annuity identitie...; i 0.005, n 120: FV = 500 x ((1.005^120 - 1)/0.005) = 500 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `home-office` | Home-Office Deduction (Simplified vs Actual) | IRS; simplified = 200 x $5 = $1,000; actual = (200/2000) x 24,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `inventory-turnover` | Inventory Turnover and DSI | Project (financial-analysis identity); $2,000,000 COGS / $250k beginning / $270k ending / 365 da... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `labor-burden-rate` | Fully-Burdened Labor Rate | contractor estimating; spec-v362 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5080,6 +5082,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1616. Fixture-covered or reference-cadence: 1616 / 1616.
+Tile count: 1617. Fixture-covered or reference-cadence: 1617 / 1617.
 
 <!-- END tile-index-v14 -->

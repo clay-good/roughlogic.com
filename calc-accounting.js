@@ -1275,6 +1275,66 @@ function renderSumOfYearsDigitsDepreciation(inputRegion, outputRegion, citationE
 }
 ACCOUNTING_RENDERERS["sum-of-years-digits-depreciation"] = renderSumOfYearsDigitsDepreciation;
 
+// --- spec-v1244 R: Future value of an annuity (`future-value-of-annuity`) ---
+// The forward time-value-of-money primitive the finance set (amortization, ROI/NPV) lacks. Ordinary
+// annuity FV = PMT [((1+i)^n - 1)/i], PV = PMT [(1-(1+i)^-n)/i]; annuity-due multiplies each by (1+i).
+// At i = 0 both reduce to PMT n. i is the periodic rate (rate_pct/100), n the number of payments.
+// dims: in { payment: dimensionless, rate_pct: dimensionless, periods: dimensionless, timing: dimensionless } out: { future_value: dimensionless, present_value: dimensionless, total_contributions: dimensionless, interest_earned: dimensionless }
+export function computeFutureValueOfAnnuity({ payment = 0, rate_pct = 0, periods = 0, timing = "ordinary" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const PMT = Number(payment) || 0;
+  const rate = Number(rate_pct);
+  const n = Math.round(Number(periods) || 0);
+  if (!(PMT > 0)) return { error: "Payment per period must be positive ($)." };
+  if (!Number.isFinite(rate) || rate < 0) return { error: "Periodic interest rate must be zero or positive (%)." };
+  if (!(n >= 1)) return { error: "Number of periods must be at least 1." };
+  if (n > 100000) return { error: "Number of periods must be 100,000 or fewer." };
+  if (timing !== "ordinary" && timing !== "due") return { error: "Timing must be ordinary (end of period) or due (start of period)." };
+  const i = rate / 100;
+  const dueFactor = timing === "due" ? 1 + i : 1;
+  let future_value, present_value;
+  if (i === 0) {
+    future_value = PMT * n;
+    present_value = PMT * n;
+  } else {
+    future_value = PMT * ((Math.pow(1 + i, n) - 1) / i) * dueFactor;
+    present_value = PMT * ((1 - Math.pow(1 + i, -n)) / i) * dueFactor;
+  }
+  const total_contributions = PMT * n;
+  const interest_earned = future_value - total_contributions;
+  if (![future_value, present_value, total_contributions, interest_earned].every(Number.isFinite)) return { error: "Annuity math is not a finite value." };
+  return {
+    future_value, present_value, total_contributions, interest_earned,
+    note: "The future and present value of a level annuity, the forward time-value-of-money primitive the finance set (loan-amortization, upgrade-roi) builds on but never states outright. For a payment PMT made every period at a periodic rate i (the annual rate divided by the number of periods per year) over n periods: the future value FV = PMT [((1+i)^n - 1)/i] is what a stream of equal deposits grows to (a sinking fund - saving toward equipment replacement, a bond, a goal), and the present value PV = PMT [(1-(1+i)^-n)/i] is the lump sum today worth that same stream (the basis of a loan balance or a lease). An 'annuity-due' (payments at the START of each period, like rent or a lease) multiplies both by (1+i); the default here is an ordinary annuity (end of period). Depositing $500 a month at 0.5%/month (6%/yr) for 120 months grows to $81,940, of which $60,000 is your own contributions and $21,940 is interest. The rate must be per PERIOD, not per year - divide an annual rate by the periods per year first. To find the deposit needed to reach a target (the sinking-fund payment), rearrange: PMT = FV i / ((1+i)^n - 1). A bookkeeping aid; the actual account terms, compounding convention, and taxes govern.",
+  };
+}
+export const futureValueOfAnnuityExample = { inputs: { payment: 500, rate_pct: 0.5, periods: 120, timing: "ordinary" } };
+
+function renderFutureValueOfAnnuity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: time-value-of-money annuity identities - ordinary annuity FV = PMT [((1+i)^n - 1)/i], PV = PMT [(1-(1+i)^-n)/i], annuity-due x (1+i); i the periodic rate, n the number of payments (standard finance, public-domain; TILA/Reg Z compounding). The rate must be per period, not per year. Accounting information, not advice; the account terms and a CPA govern.";
+  const pmt = makeNumber("Payment per period ($)", "fva-pmt", { step: "any", min: "0", value: "500" }); pmt.input.value = "500";
+  const rate = makeNumber("Interest rate PER PERIOD (%)", "fva-rate", { step: "any", min: "0", value: "0.5" }); rate.input.value = "0.5";
+  const periods = makeNumber("Number of periods", "fva-n", { step: "1", min: "1", value: "120" }); periods.input.value = "120";
+  const timing = makeSelect("Payment timing", "fva-timing", [{ value: "ordinary", label: "Ordinary (end of period)", selected: true }, { value: "due", label: "Annuity-due (start of period)" }]);
+  for (const f of [pmt, rate, periods, timing]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { pmt.input.value = "500"; rate.input.value = "0.5"; periods.input.value = "120"; timing.select.value = "ordinary"; update(); });
+  const oFv = makeOutputLine(outputRegion, "Future value", "fva-out-fv");
+  const oPv = makeOutputLine(outputRegion, "Present value", "fva-out-pv");
+  const oInt = makeOutputLine(outputRegion, "Contributions / interest", "fva-out-int");
+  const oNote = makeOutputLine(outputRegion, "Note", "fva-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeFutureValueOfAnnuity({ payment: readNum(pmt.input), rate_pct: readNum(rate.input), periods: readNum(periods.input), timing: timing.select.value });
+    if (r.error) { oFv.textContent = r.error; oPv.textContent = ""; oInt.textContent = ""; oNote.textContent = ""; return; }
+    oFv.textContent = "$" + fmt(r.future_value, 2);
+    oPv.textContent = "$" + fmt(r.present_value, 2);
+    oInt.textContent = "$" + fmt(r.total_contributions, 2) + " contributed, $" + fmt(r.interest_earned, 2) + " interest";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [pmt.input, rate.input, periods.input, timing.select]) f.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["future-value-of-annuity"] = renderFutureValueOfAnnuity;
+
 // --- v20 R.2: Markup vs. margin converter (`markup-vs-margin`) ---
 // markup% = (price-cost)/cost*100; margin% = (price-cost)/price*100.
 // dims: in { cost: dimensionless, price: dimensionless, markup_pct: dimensionless, margin_pct: dimensionless, units: dimensionless } out: { markup_pct: dimensionless, margin_pct: dimensionless }

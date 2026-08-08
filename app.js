@@ -1222,7 +1222,7 @@ const TOOL_MODULES = (() => {
     "home-office",
   
     // v20
-    "declining-balance-depreciation", "sum-of-years-digits-depreciation", "markup-vs-margin", "employer-payroll-tax",
+    "declining-balance-depreciation", "sum-of-years-digits-depreciation", "future-value-of-annuity", "markup-vs-margin", "employer-payroll-tax",
     "labor-burden-rate", "equipment-hourly-rate", "overhead-recovery-rate",
     "wip-percent-complete", "change-order-markup", "retainage-tracker",
     "surety-bond-premium", "workers-comp-emr-premium", "prevailing-wage-fringe",

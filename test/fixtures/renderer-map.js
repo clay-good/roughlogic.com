@@ -1493,6 +1493,7 @@ export const RENDERER_MAP = {
   "home-office": { module: "../../calc-accounting.js", exportName: "ACCOUNTING_RENDERERS" },
   "declining-balance-depreciation": { module: "../../calc-accounting.js", exportName: "ACCOUNTING_RENDERERS" },
   "sum-of-years-digits-depreciation": { module: "../../calc-accounting.js", exportName: "ACCOUNTING_RENDERERS" },
+  "future-value-of-annuity": { module: "../../calc-accounting.js", exportName: "ACCOUNTING_RENDERERS" },
   "markup-vs-margin": { module: "../../calc-accounting.js", exportName: "ACCOUNTING_RENDERERS" },
   "employer-payroll-tax": { module: "../../calc-accounting.js", exportName: "ACCOUNTING_RENDERERS" },
   "labor-burden-rate": { module: "../../calc-accounting.js", exportName: "ACCOUNTING_RENDERERS" },

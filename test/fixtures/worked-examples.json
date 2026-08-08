@@ -21618,6 +21618,64 @@
    }
   },
   {
+   "tile_id": "future-value-of-annuity",
+   "source_publisher": "Time-value-of-money annuity identities (public-domain finance)",
+   "source_title": "$500/mo at 0.5%/mo for 120 mo -> FV $81,939.67, PV $45,036.73 (spec-v1244)",
+   "source_edition_or_year": "FV = PMT [((1+i)^n - 1)/i]",
+   "source_section_or_page": "i 0.005, n 120: FV = 500 x ((1.005^120 - 1)/0.005) = 500 x 163.879 = 81,939.67; PV = 500 x ((1 - 1.005^-120)/0.005) = 45,036.73; contributed 60,000, interest 21,939.67.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "payment": 500,
+    "rate_pct": 0.5,
+    "periods": 120,
+    "timing": "ordinary"
+   },
+   "outputs": {
+    "future_value": {
+     "value": 81939.67,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "present_value": {
+     "value": 45036.73,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "interest_earned": {
+     "value": 21939.67,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "future-value-of-annuity",
+   "source_publisher": "Annuity-due and zero-rate cross-checks",
+   "source_title": "annuity-due is (1+i) larger; at 0% FV equals the contributions",
+   "source_edition_or_year": "due x (1+i); i=0 -> PMT n",
+   "source_section_or_page": "same stream as annuity-due: FV = 81,939.67 x 1.005 = 82,349.37; at 0% interest FV = 500 x 120 = 60,000 (all principal).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "payment": 500,
+    "rate_pct": 0.5,
+    "periods": 120,
+    "timing": "due"
+   },
+   "outputs": {
+    "future_value": {
+     "value": 82349.37,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "markup-vs-margin",
    "source_publisher": "Managerial-accounting CVP pricing identity (AICPA)",
    "source_title": "price = cost*(1+markup%); margin% = (price-cost)/price",

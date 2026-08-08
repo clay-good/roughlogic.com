@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1616,
-  "covered_count": 1185,
+  "total_tiles": 1617,
+  "covered_count": 1186,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -434,6 +434,7 @@
     "fuel-tax-ifta",
     "furnace-airflow-to-rise",
     "furnace-temp-rise",
+    "future-value-of-annuity",
     "gas-altitude-derate",
     "gas-appliance-connection",
     "gas-appliance-demand",

@@ -736,6 +736,26 @@
       "kind": "adjacent"
     },
     {
+      "term": "future value of annuity",
+      "target": "future-value-of-annuity",
+      "kind": "industry"
+    },
+    {
+      "term": "sinking fund payment",
+      "target": "future-value-of-annuity",
+      "kind": "question"
+    },
+    {
+      "term": "present value of annuity",
+      "target": "future-value-of-annuity",
+      "kind": "industry"
+    },
+    {
+      "term": "how much will monthly savings grow to",
+      "target": "future-value-of-annuity",
+      "kind": "question"
+    },
+    {
       "term": "markup vs margin",
       "target": "markup-vs-margin",
       "kind": "industry"

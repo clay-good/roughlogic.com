@@ -10573,7 +10573,32 @@ test("bounds: calc-stage N + calc-kitchen O + calc-field P v20 tiles pin constan
   assert.ok("error" in _p1({ pod_list: [200], poa_pct: 60 }));
 });
 
-import { computeDecliningBalanceDepreciation as _r1, computeMarkupVsMargin as _r2, computeEmployerPayrollTax as _r3, computeSumOfYearsDigitsDepreciation } from "../../calc-accounting.js";
+import { computeDecliningBalanceDepreciation as _r1, computeMarkupVsMargin as _r2, computeEmployerPayrollTax as _r3, computeSumOfYearsDigitsDepreciation, computeFutureValueOfAnnuity } from "../../calc-accounting.js";
+test("bounds: spec-v1244 computeFutureValueOfAnnuity pins FV/PV, the annuity-due factor, the zero-rate limit, and error seams", () => {
+  // $500/mo at 0.5%/mo for 120 mo: FV 81,939.67, PV 45,036.73.
+  const r = computeFutureValueOfAnnuity({ payment: 500, rate_pct: 0.5, periods: 120, timing: "ordinary" });
+  assert.ok(Math.abs(r.future_value - 500 * ((Math.pow(1.005, 120) - 1) / 0.005)) < 1e-6);
+  assert.ok(Math.abs(r.future_value - 81939.67) < 0.5);
+  assert.ok(Math.abs(r.present_value - 500 * ((1 - Math.pow(1.005, -120)) / 0.005)) < 1e-6);
+  assert.ok(Math.abs(r.present_value - 45036.73) < 0.5);
+  assert.ok(Math.abs(r.total_contributions - 60000) < 1e-9);
+  assert.ok(Math.abs(r.interest_earned - (r.future_value - 60000)) < 1e-9);
+  // Annuity-due is exactly (1+i) times the ordinary annuity.
+  const due = computeFutureValueOfAnnuity({ payment: 500, rate_pct: 0.5, periods: 120, timing: "due" });
+  assert.ok(Math.abs(due.future_value - r.future_value * 1.005) < 1e-6);
+  // Zero rate: FV and PV both equal the sum of the payments (all principal).
+  const zero = computeFutureValueOfAnnuity({ payment: 500, rate_pct: 0, periods: 120, timing: "ordinary" });
+  assert.ok(Math.abs(zero.future_value - 60000) < 1e-9 && Math.abs(zero.present_value - 60000) < 1e-9 && Math.abs(zero.interest_earned) < 1e-9);
+  // Sinking-fund round-trip: the deposit to reach the FV reproduces the payment.
+  const pmtForTarget = r.future_value * 0.005 / (Math.pow(1.005, 120) - 1);
+  assert.ok(Math.abs(pmtForTarget - 500) < 1e-6);
+  // Error seams: non-positive payment, negative rate, zero periods, bad timing, non-finite.
+  assert.ok("error" in computeFutureValueOfAnnuity({ payment: 0, rate_pct: 0.5, periods: 120 }));
+  assert.ok("error" in computeFutureValueOfAnnuity({ payment: 500, rate_pct: -1, periods: 120 }));
+  assert.ok("error" in computeFutureValueOfAnnuity({ payment: 500, rate_pct: 0.5, periods: 0 }));
+  assert.ok("error" in computeFutureValueOfAnnuity({ payment: 500, rate_pct: 0.5, periods: 120, timing: "weekly" }));
+  assert.ok("error" in computeFutureValueOfAnnuity({ payment: Infinity, rate_pct: 0.5, periods: 120 }));
+});
 test("bounds: spec-v1231 computeSumOfYearsDigitsDepreciation pins schedule, salvage landing, and error seams", () => {
   // $50,000 cost, $5,000 salvage, 5 yr: SYD 15, schedule 15000/12000/9000/6000/3000.
   const y1 = computeSumOfYearsDigitsDepreciation({ cost: 50000, salvage: 5000, life_yr: 5, year: 1 });
