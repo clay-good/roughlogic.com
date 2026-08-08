@@ -2535,6 +2535,7 @@ cross-check.
 | calc-machining.js | `computeSpurGearGeometry` | `{ diametral_pitch = 0, teeth = 0, mating_teeth = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeTaylorToolLife` | `{ taylor_c = 300, taylor_n = 0.2, cutting_speed_sfm = 200, target_life_min = ...` | _ | _ | _ |
 | calc-machining.js | `computeThreadSingleDepth` | `{ tpi = 13 } = {}` | _ | _ | _ |
+| calc-machining.js | `computeWormGearGeometry` | `{ axial_pitch_in = 0, worm_starts = 0, worm_pitch_dia_in = 0, wheel_teeth = 0...` | _ | _ | _ |
 | calc-masonry.js | `computeBrickVeneerAnchorSpacing` | `{ area_ft2 = 0, area_per = 2.67, max_horiz_in = 32, max_vert_in = 24 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeBrickVeneerWeepCount` | `{ wall_length_ft = 30, max_spacing_in = 33, flashing_lines = 1 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeCmuShearWall` | `{ fm_psi = 1500, b_in = 0, dv_in = 0, p_lb = 0, mvd = 0.5, av_in2 = 0, s_in =...` | _ | _ | _ |
@@ -3253,7 +3254,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1839.
+Row count: 1840.
 
 <!-- END function-corpus-v14 -->
 
@@ -4526,7 +4527,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (101 tiles)
+### Group K Mechanic (102 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4631,6 +4632,7 @@ per spec-v14 §13.1 second paragraph.
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `waterline-for-hull-speed` | Waterline Length for a Target Hull Speed | displacement hull-speed relation (Fro...; 8 kn target displacement hull -> 35.6 ft waterline | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `worm-gear-geometry` | Worm and Worm-Wheel Geometry | Machinery's Handbook (worm gearing); lead = 0.5 x 1 = 0.5 in; lead angle = atan(0.5/(pi x 2)) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
 ### Group L Agriculture (71 tiles)
 
@@ -5030,6 +5032,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1591. Fixture-covered or reference-cadence: 1591 / 1591.
+Tile count: 1592. Fixture-covered or reference-cadence: 1592 / 1592.
 
 <!-- END tile-index-v14 -->

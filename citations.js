@@ -11171,6 +11171,18 @@ export const CITATIONS = {
       { name: "Geometry only", value: "no tooth-strength, backlash, or undercut check", source: "scope of this tile" },
     ],
   },
+  "worm-gear-geometry": {
+    formula: "lead = axial_pitch x starts; lead_angle = atan(lead/(pi x d_worm)); ratio = wheel_teeth/starts; wheel_pitch_dia = N x axial_pitch/pi; center = (d_worm + d_wheel)/2.",
+    edition: "Worm and worm-wheel geometry (Machinery's Handbook; AGMA worm-gearing), first-principles, by name.",
+    freeAccess: "The worm-gear lead, lead-angle, ratio, and center-distance relations are standard published gear geometry (Machinery's Handbook).",
+    governance: GOVERNANCE.general,
+    editionNote: "Worm and worm-wheel geometry, the right-angle high-ratio pair the spur-gear tiles leave out. The worm is a screw whose axial pitch equals the wheel's circular pitch: the lead L = axial pitch x number of starts (the wheel advance per worm turn), the lead angle lambda = atan(L/(pi x d_worm)), the gear ratio = wheel teeth / worm starts (a single-start worm on a 40-tooth wheel is 40:1 in one stage), the wheel pitch diameter = N x axial pitch / pi, and the center distance = (d_worm + d_wheel)/2. The lead angle decides back-driving: a small lead angle (below about 5 degrees, friction dependent) tends to SELF-LOCK, so a single-start high-ratio worm holds a hoist or jack load, while a multi-start low-ratio worm back-drives. This returns geometry only; the load rating, efficiency, and heat depend on the material pair and lubrication. A shop aid; the gear drawing and the AGMA / Machinery's Handbook data govern.",
+    assumptions: [
+      { name: "Lead and lead angle", value: "lead = axial pitch x starts; lambda = atan(lead/(pi x d_worm))", source: "Machinery's Handbook worm gearing" },
+      { name: "Ratio and sizing", value: "ratio = wheel teeth/starts; wheel pitch dia = N x axial pitch/pi; center = (d_worm + d_wheel)/2", source: "gear geometry" },
+      { name: "Self-locking", value: "a lead angle below ~5 deg tends to self-lock (friction dependent); geometry only, not load/efficiency", source: "scope of this tile" },
+    ],
+  },
   "gear-dynamic-tooth-stress": {
     formula: "D = T / Pd; torque = 63,025 HP / rpm (in-lb); Wt = 2 x torque / D; V = pi D N / 12 (ft/min); Kv = (1200 + V)/1200 for cut or milled teeth, (600 + V)/600 for cast or crude; static sigma = Wt Pd / (F Y) delegated to the landed Lewis tile; dynamic sigma = static x Kv x 1.42 when the gear is an idler; allowable = Sut/3 when a material strength is entered.",
     edition: "Barth velocity factor applied to the Lewis (1892, public domain) bending equation, as taught in the standard machine-design treatment. The worked example this tile reproduces exactly - a 43-tooth, 20 degree full involute, 8 diametral pitch, 0.5 in wide pinion transmitting 4 HP at 1,000 rpm, giving 8,152 psi - is from W. H. Dornfeld, ME312 Tooth Strength notes (Fairfield University, 2006), following Hamrock Eqs. 14.55 and following.",

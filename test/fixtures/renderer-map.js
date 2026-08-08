@@ -1252,6 +1252,7 @@ export const RENDERER_MAP = {
   "ballnose-scallop-height": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "ballnose-feed-cusp": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "spur-gear-geometry": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
+  "worm-gear-geometry": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "gear-undercut-backlash": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "gear-identification": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "gear-chordal-thickness": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },

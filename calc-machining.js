@@ -603,6 +603,61 @@ function renderSpurGearGeometry(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["spur-gear-geometry"] = renderSpurGearGeometry;
 
+// ===================== spec-v1219: worm and worm-wheel geometry =====================
+// The one gear type absent from an otherwise complete Group K gear suite (spur geometry,
+// identification, chordal thickness, undercut/backlash, Lewis bending, Barth dynamic). A worm drive
+// is the right-angle, high-ratio, often self-locking pair used in hoists, jacks, and rotary tables.
+// Machinery's Handbook, first-principles: lead L = axial pitch x starts; lead angle lambda =
+// atan(L/(pi d_worm)); ratio = wheel teeth / worm starts; wheel pitch dia = N px / pi; center
+// distance = (d_worm + d_wheel)/2; a small lead angle tends to self-lock (no back-driving).
+// dims: in { axial_pitch_in: L, worm_starts: dimensionless, worm_pitch_dia_in: L, wheel_teeth: dimensionless } out: { lead_in: L, lead_angle_deg: dimensionless, gear_ratio: dimensionless, wheel_pitch_dia_in: L, center_distance_in: L }
+export function computeWormGearGeometry({ axial_pitch_in = 0, worm_starts = 0, worm_pitch_dia_in = 0, wheel_teeth = 0 } = {}) {
+  const _g = _finiteGuard({ axial_pitch_in, worm_starts, worm_pitch_dia_in, wheel_teeth }); if (_g) return _g;
+  const px = Number(axial_pitch_in) || 0;
+  const nw = Number(worm_starts) || 0;
+  const dw = Number(worm_pitch_dia_in) || 0;
+  const ng = Number(wheel_teeth) || 0;
+  if (!(px > 0)) return { error: "Axial pitch must be positive (in)." };
+  if (!(nw > 0)) return { error: "The number of worm starts (threads) must be positive (1 to 4 typical)." };
+  if (!(dw > 0)) return { error: "Worm pitch diameter must be positive (in)." };
+  if (!(ng > 0)) return { error: "The number of worm-wheel teeth must be positive." };
+  const lead_in = px * nw;
+  const lead_angle_deg = Math.atan(lead_in / (Math.PI * dw)) * 180 / Math.PI;
+  const gear_ratio = ng / nw;
+  const wheel_pitch_dia_in = ng * px / Math.PI;
+  const center_distance_in = (dw + wheel_pitch_dia_in) / 2;
+  const self_locking = lead_angle_deg < 5;
+  if (![lead_in, lead_angle_deg, gear_ratio, wheel_pitch_dia_in, center_distance_in].every(Number.isFinite)) return { error: "Worm-gear math is not a finite value." };
+  return {
+    lead_in, lead_angle_deg, gear_ratio, wheel_pitch_dia_in, center_distance_in, self_locking,
+    note: "Worm and worm-wheel geometry, the right-angle high-ratio pair the spur-gear suite leaves out. The worm is a screw whose axial pitch equals the wheel's circular pitch: the lead L = axial pitch x number of starts (the distance the wheel advances per worm turn), the lead angle lambda = atan(L/(pi x d_worm)), the gear ratio = wheel teeth / worm starts (a single-start worm on a 40-tooth wheel is 40:1 in one stage -- the reason worm drives give huge reductions compactly), the wheel pitch diameter = N x axial_pitch / pi, and the center distance = (d_worm + d_wheel)/2. The lead angle sets whether the drive back-drives: a small lead angle (below about 5 degrees, friction dependent) tends to SELF-LOCK, which is why a single-start, high-ratio worm is chosen for a hoist or jack that must hold its load, while a multi-start, low-ratio worm (steeper lead angle) back-drives freely. A 0.5 in axial pitch single-start worm of 2 in pitch diameter on a 40-tooth wheel gives a 0.5 in lead, a 4.55 degree lead angle (self-locking), a 40:1 ratio, a 6.37 in wheel, and a 4.18 in center distance. Geometry only -- the load rating, efficiency, and heat all depend on the material pair and lubrication. A shop aid; the gear drawing and the AGMA / Machinery's Handbook data govern.",
+  };
+}
+export const wormGearGeometryExample = { inputs: { axial_pitch_in: 0.5, worm_starts: 1, worm_pitch_dia_in: 2, wheel_teeth: 40 } };
+function renderWormGearGeometry(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: worm and worm-wheel geometry (Machinery's Handbook, first-principles): lead = axial pitch x starts, lead angle = atan(lead/(pi x worm pitch dia)), ratio = wheel teeth / starts, wheel pitch dia = N x axial pitch / pi, center distance = (d_worm + d_wheel)/2; a lead angle below ~5 degrees tends to self-lock. A shop aid; the gear drawing and the AGMA / Machinery's Handbook data govern.";
+  const px = makeNumber("Worm axial pitch (in)", "wgg-px", { step: "any", min: "0" }); px.input.value = "0.5";
+  const nw = makeNumber("Worm starts (threads, 1-4)", "wgg-nw", { step: "any", min: "0" }); nw.input.value = "1";
+  const dw = makeNumber("Worm pitch diameter (in)", "wgg-dw", { step: "any", min: "0" }); dw.input.value = "2";
+  const ng = makeNumber("Worm-wheel teeth N", "wgg-ng", { step: "any", min: "0" }); ng.input.value = "40";
+  for (const f of [px, nw, dw, ng]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { px.input.value = "0.5"; nw.input.value = "1"; dw.input.value = "2"; ng.input.value = "40"; update(); });
+  const oLead = makeOutputLine(outputRegion, "Lead / lead angle", "wgg-out-lead");
+  const oRatio = makeOutputLine(outputRegion, "Gear ratio", "wgg-out-ratio");
+  const oWheel = makeOutputLine(outputRegion, "Wheel pitch dia / center distance", "wgg-out-wheel");
+  const oNote = makeOutputLine(outputRegion, "Note", "wgg-out-n");
+  const update = debounce(() => {
+    const r = computeWormGearGeometry({ axial_pitch_in: Number(px.input.value) || 0, worm_starts: Number(nw.input.value) || 0, worm_pitch_dia_in: Number(dw.input.value) || 0, wheel_teeth: Number(ng.input.value) || 0 });
+    if (r.error) { oLead.textContent = r.error; oRatio.textContent = "-"; oWheel.textContent = "-"; oNote.textContent = ""; return; }
+    oLead.textContent = fmt(r.lead_in, 3) + " in / " + fmt(r.lead_angle_deg, 2) + " deg" + (r.self_locking ? " (self-locking)" : " (back-drivable)");
+    oRatio.textContent = fmt(r.gear_ratio, 2) + " : 1";
+    oWheel.textContent = fmt(r.wheel_pitch_dia_in, 3) + " in / " + fmt(r.center_distance_in, 3) + " in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [px, nw, dw, ng]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["worm-gear-geometry"] = renderWormGearGeometry;
+
 // ===================== spec-v649: gear identification (inverse of spur gear geometry) =====================
 // Standard diametral-pitch series (Machinery's Handbook coarse + fine), used only
 // to snap a measured Pd to the nearest catalog value for identification.

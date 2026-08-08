@@ -20973,6 +20973,34 @@ test("bounds: spec-v401 computeSpurGearGeometry pins the tooth proportions, cent
   assert.ok("error" in _v401({ diametral_pitch: Infinity, teeth: 40 }));
 });
 
+import { computeWormGearGeometry as _v1219 } from "../../calc-machining.js";
+
+test("bounds: spec-v1219 computeWormGearGeometry pins the lead, lead angle, ratio, sizing, self-locking, and error seams", () => {
+  // 0.5 in single-start worm, 2 in pitch dia, 40-tooth wheel.
+  const r = _v1219({ axial_pitch_in: 0.5, worm_starts: 1, worm_pitch_dia_in: 2, wheel_teeth: 40 });
+  assert.ok(Math.abs(r.lead_in - 0.5) < 1e-12);
+  assert.ok(Math.abs(r.lead_angle_deg - Math.atan(0.5 / (Math.PI * 2)) * 180 / Math.PI) < 1e-12);
+  assert.ok(Math.abs(r.lead_angle_deg - 4.55) < 0.02);
+  assert.ok(r.gear_ratio === 40);
+  assert.ok(Math.abs(r.wheel_pitch_dia_in - 40 * 0.5 / Math.PI) < 1e-12);
+  assert.ok(Math.abs(r.center_distance_in - (2 + 40 * 0.5 / Math.PI) / 2) < 1e-12);
+  assert.ok(r.self_locking === true);
+  // A 4-start worm on the same wheel: lead 2.0, angle 17.66 deg, ratio 10, back-drivable.
+  const quad = _v1219({ axial_pitch_in: 0.5, worm_starts: 4, worm_pitch_dia_in: 2, wheel_teeth: 40 });
+  assert.ok(Math.abs(quad.lead_in - 2.0) < 1e-12 && quad.gear_ratio === 10);
+  assert.ok(Math.abs(quad.lead_angle_deg - 17.66) < 0.02 && quad.self_locking === false);
+  assert.ok(quad.lead_angle_deg > r.lead_angle_deg); // more starts -> steeper lead
+  // Ratio falls with more starts; a larger worm diameter lowers the lead angle (more self-locking).
+  assert.ok(_v1219({ axial_pitch_in: 0.5, worm_starts: 2, worm_pitch_dia_in: 2, wheel_teeth: 40 }).gear_ratio === 20);
+  assert.ok(_v1219({ axial_pitch_in: 0.5, worm_starts: 4, worm_pitch_dia_in: 4, wheel_teeth: 40 }).lead_angle_deg < quad.lead_angle_deg);
+  // Error seams: non-positive pitch/starts/diameter/teeth, non-finite.
+  assert.ok("error" in _v1219({ axial_pitch_in: 0, worm_starts: 1, worm_pitch_dia_in: 2, wheel_teeth: 40 }));
+  assert.ok("error" in _v1219({ axial_pitch_in: 0.5, worm_starts: 0, worm_pitch_dia_in: 2, wheel_teeth: 40 }));
+  assert.ok("error" in _v1219({ axial_pitch_in: 0.5, worm_starts: 1, worm_pitch_dia_in: 0, wheel_teeth: 40 }));
+  assert.ok("error" in _v1219({ axial_pitch_in: 0.5, worm_starts: 1, worm_pitch_dia_in: 2, wheel_teeth: 0 }));
+  assert.ok("error" in _v1219({ axial_pitch_in: Infinity, worm_starts: 1, worm_pitch_dia_in: 2, wheel_teeth: 40 }));
+});
+
 import { computeGearIdentification as _v649 } from "../../calc-machining.js";
 
 test("bounds: spec-v649 computeGearIdentification inverts the gear geometry, round-trips it, snaps to the standard pitch, and pins error seams", () => {

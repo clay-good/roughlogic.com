@@ -19075,6 +19075,82 @@
    }
   },
   {
+   "tile_id": "worm-gear-geometry",
+   "source_publisher": "Machinery's Handbook (worm gearing)",
+   "source_title": "0.5 in single-start worm, 2 in pitch dia, 40-tooth wheel -> 40:1, 4.55 deg lead angle, self-locking (spec-v1219)",
+   "source_edition_or_year": "worm-gear geometry (first-principles)",
+   "source_section_or_page": "lead = 0.5 x 1 = 0.5 in; lead angle = atan(0.5/(pi x 2)) = atan(0.079577) = 4.55 deg; ratio = 40/1 = 40; wheel pitch dia = 40 x 0.5/pi = 6.366 in; center = (2 + 6.366)/2 = 4.183 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "axial_pitch_in": 0.5,
+    "worm_starts": 1,
+    "worm_pitch_dia_in": 2,
+    "wheel_teeth": 40
+   },
+   "outputs": {
+    "lead_in": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "lead_angle_deg": {
+     "value": 4.55,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "gear_ratio": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "wheel_pitch_dia_in": {
+     "value": 6.366,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "center_distance_in": {
+     "value": 4.183,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "worm-gear-geometry",
+   "source_publisher": "Machinery's Handbook (multi-start cross-check)",
+   "source_title": "cross-check: a 4-start worm on the same wheel is 10:1 with a 17.66 deg lead angle -- back-drivable",
+   "source_edition_or_year": "worm-gear geometry (first-principles)",
+   "source_section_or_page": "lead = 0.5 x 4 = 2.0 in; lead angle = atan(2.0/(pi x 2)) = 17.66 deg; ratio = 40/4 = 10. The steeper lead angle back-drives, unlike the single-start self-locking case.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "axial_pitch_in": 0.5,
+    "worm_starts": 4,
+    "worm_pitch_dia_in": 2,
+    "wheel_teeth": 40
+   },
+   "outputs": {
+    "lead_angle_deg": {
+     "value": 17.66,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "gear_ratio": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spur-gear-geometry",
    "source_publisher": "Machinery's Handbook / AGMA",
    "source_title": "cross-check: a finer Pd 20 halves every dimension -> PD 2.000, OD 2.100 in",

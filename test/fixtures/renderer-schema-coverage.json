@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1591,
-  "covered_count": 1169,
+  "total_tiles": 1592,
+  "covered_count": 1170,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -1170,6 +1170,7 @@
     "wood-nail-withdrawal",
     "wood-screw-withdrawal",
     "wood-tension-member",
+    "worm-gear-geometry",
     "wsfu-demand",
     "yield-ep"
   ]
