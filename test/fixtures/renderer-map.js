@@ -810,6 +810,7 @@ export const RENDERER_MAP = {
   "sag-vertical-curve-comfort": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
   "steel-beam-flexure": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "required-section-modulus": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
+  "shear-flow-connector-spacing": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-beam-shear": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-column-capacity": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "bolt-group-eccentric": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },

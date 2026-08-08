@@ -27064,6 +27064,28 @@ test("bounds: spec-v633 computeIsolatorDeflection pins the required deflection, 
 });
 
 import { computeRequiredSectionModulus as _v634, computeSteelBeamFlexure as _v634fwd } from "../../calc-steel.js";
+import { computeShearFlowConnectorSpacing as _v1239 } from "../../calc-steel.js";
+test("bounds: spec-v1239 computeShearFlowConnectorSpacing pins Q, q = VQ/I, s = nR/q, the shear scaling, and error seams", () => {
+  // 6 in^2 plate at y_bar 8, I 800, V 50 kip, two 10 kip bolts: Q 48, q 3.0 kip/in, s 6.67 in.
+  const r = _v1239({ shear_kip: 50, area_in2: 6, ybar_in: 8, inertia_in4: 800, connector_kip: 10, connectors_per_row: 2 });
+  assert.ok(Math.abs(r.first_moment_in3 - 48) < 1e-12);         // Q = A y_bar
+  assert.ok(Math.abs(r.q_kip_in - 50 * 48 / 800) < 1e-12);      // q = V Q / I = 3.0
+  assert.ok(Math.abs(r.spacing_in - 2 * 10 / 3.0) < 1e-9);      // s = n R / q = 6.667
+  // Shear flow scales linearly with V, so the spacing scales inversely: doubling V halves s.
+  const dbl = _v1239({ shear_kip: 100, area_in2: 6, ybar_in: 8, inertia_in4: 800, connector_kip: 10, connectors_per_row: 2 });
+  assert.ok(Math.abs(dbl.q_kip_in - 2 * r.q_kip_in) < 1e-9 && Math.abs(dbl.spacing_in - r.spacing_in / 2) < 1e-9);
+  // A stronger or more numerous connector row widens the spacing proportionally.
+  const more = _v1239({ shear_kip: 50, area_in2: 6, ybar_in: 8, inertia_in4: 800, connector_kip: 10, connectors_per_row: 4 });
+  assert.ok(Math.abs(more.spacing_in - 2 * r.spacing_in) < 1e-9);
+  // Error seams: non-positive V, area, y_bar, I, connector capacity; fewer than one connector; non-finite.
+  assert.ok("error" in _v1239({ shear_kip: 0, area_in2: 6, ybar_in: 8, inertia_in4: 800, connector_kip: 10 }));
+  assert.ok("error" in _v1239({ shear_kip: 50, area_in2: 0, ybar_in: 8, inertia_in4: 800, connector_kip: 10 }));
+  assert.ok("error" in _v1239({ shear_kip: 50, area_in2: 6, ybar_in: 0, inertia_in4: 800, connector_kip: 10 }));
+  assert.ok("error" in _v1239({ shear_kip: 50, area_in2: 6, ybar_in: 8, inertia_in4: 0, connector_kip: 10 }));
+  assert.ok("error" in _v1239({ shear_kip: 50, area_in2: 6, ybar_in: 8, inertia_in4: 800, connector_kip: 0 }));
+  assert.ok("error" in _v1239({ shear_kip: 50, area_in2: 6, ybar_in: 8, inertia_in4: 800, connector_kip: 10, connectors_per_row: 0 }));
+  assert.ok("error" in _v1239({ shear_kip: Infinity, area_in2: 6, ybar_in: 8, inertia_in4: 800, connector_kip: 10 }));
+});
 
 test("bounds: spec-v634 computeRequiredSectionModulus pins the LRFD/ASD required Zx, the exact round-trip through the forward tile, and error seams", () => {
   const r = _v634({ fy: 50, moment_kipft: 200, method: "lrfd" });

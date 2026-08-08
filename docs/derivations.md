@@ -3096,6 +3096,7 @@ cross-check.
 | calc-steel.js | `computeColumnBasePlate` | `{ pu_kip = 0, fc_ksi = 4, fy_ksi = 36, d_in = 0, bf_in = 0, b_in = 0, n_in = ...` | _ | _ | _ |
 | calc-steel.js | `computeCompositeBeamFlexure` | `{ as_in2 = 0, fy_ksi = 50, d_in = 0, tslab_in = 0, be_in = 0, fc_ksi = 4 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeRequiredSectionModulus` | `{ fy = 50, moment_kipft = 0, method = "lrfd" } = {}` | _ | _ | _ |
+| calc-steel.js | `computeShearFlowConnectorSpacing` | `{ shear_kip = 0, area_in2 = 0, ybar_in = 0, inertia_in4 = 0, connector_kip = ...` | _ | _ | _ |
 | calc-steel.js | `computeShearStudStrength` | `{ asc_in2 = 0, fc_psi = 4000, ec_psi = 0, fu_ksi = 65, rg = 1.0, rp = 0.75, v...` | _ | _ | _ |
 | calc-steel.js | `computeSlipCriticalWithTension` | `{ mu = 0.30, tb_kip = 0, ns = 1, n = 1, hf = 1.0, du = 1.13, applied_tension_...` | _ | _ | _ |
 | calc-steel.js | `computeStaggeredNetWidth` | `{ plate_width_in = 0, thickness_in = 0, bolt_dia_in = 0, hole_allowance_in = ...` | _ | _ | _ |
@@ -3273,7 +3274,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1859.
+Row count: 1860.
 
 <!-- END function-corpus-v14 -->
 
@@ -3911,7 +3912,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (455 tiles)
+### Group E Construction (456 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4235,6 +4236,7 @@ per spec-v14 §13.1 second paragraph.
 | `sfrm-takeoff` | Spray Fireproofing (SFRM) Material Takeoff | SFRM material-takeoff identity (first...; volume = 5000*1.5/12 = 625 ft^3; weight = 9,375 lb; bags ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shaft-diameter-for-torsion` | Solid Shaft Diameter for an Allowable Torsion | mechanics of materials (solid shaft, ...; spec-v747 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shaft-torsion` | Shaft Torsional Shear Stress and Angle of Twist | mechanics of materials; spec-v359 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `shear-flow-connector-spacing` | Shear Flow and Connector Spacing (Built-Up Beam) | Mechanics of materials (shear flow q ...; Q = 6 x 8 = 48 in^3; q = 50 x 48 / 800 = 3.0 kip/in; s = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shear-stud-strength` | Composite Shear Stud Strength and Count (AISC 360-22 I8) | AISC 360-22 I8; spec-v411 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shearwall-deflection` | Wood Shear Wall Deflection (SDPWS Eq 4.3-1) | AWC SDPWS Equation 4.3-1 (AWC/APA des...; spec-v274 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shearwall-overturning` | Wood Shear Wall Unit Shear and Holdown (SDPWS / ASD) | AWC SDPWS segmented shear wall + ASCE...; spec-v273 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5070,6 +5072,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1611. Fixture-covered or reference-cadence: 1611 / 1611.
+Tile count: 1612. Fixture-covered or reference-cadence: 1612 / 1612.
 
 <!-- END tile-index-v14 -->

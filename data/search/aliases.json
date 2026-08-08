@@ -94666,6 +94666,26 @@
       "kind": "industry"
     },
     {
+      "term": "shear flow vq over i",
+      "target": "shear-flow-connector-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "built up beam fastener spacing",
+      "target": "shear-flow-connector-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "bolt spacing for a cover plate",
+      "target": "shear-flow-connector-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "connector spacing plate girder shear",
+      "target": "shear-flow-connector-spacing",
+      "kind": "question"
+    },
+    {
       "term": "required zx",
       "target": "required-section-modulus",
       "kind": "industry"

@@ -17333,6 +17333,17 @@ export const CITATIONS = {
       { name: "Compact + braced", value: "Mn = Mp = Fy Zx (the plastic plateau); a noncompact or unbraced beam needs the F3 / F2.2 lateral-torsional-buckling check", source: "AISC 360-22 F2" },
     ],
   },
+  "shear-flow-connector-spacing": {
+    formula: "Q = A y_bar (first moment of the connected element about the neutral axis); q = V Q / I (shear flow); s = n R / q (max connector spacing).",
+    edition: "First-principles mechanics of materials (shear flow in a built-up beam), as in Hibbeler Mechanics of Materials and Gere; the connector capacity R is from AISC and entered.",
+    freeAccess: "The shear-flow relation q = VQ/I and the connector-spacing s = nR/q are standard published mechanics-of-materials results (Hibbeler, Gere, Roark), reproduced in every strength-of-materials text.",
+    governance: GOVERNANCE.general,
+    editionNote: "The horizontal shear flow at a connected interface of a built-up beam and the connector spacing that carries it. q = V Q / I, where V is the transverse shear at the section, I is the moment of inertia of the WHOLE built-up section about its neutral axis, and Q = A y_bar is the first moment of the CONNECTED element (the area on one side of the interface) about that neutral axis. The connectors carry q per inch, so the maximum spacing is s = n R / q with R the capacity of one connector and n the connectors per row. The spacing tightens where the shear is largest (near supports); a fabricator often steps the bolt pattern along the shear diagram. First-principles mechanics; the connector capacity R (bolt shear, weld strength) comes from AISC and is entered here. A design aid, not a substitute for the engineer of record.",
+    assumptions: [
+      { name: "Shear flow", value: "q = V Q / I, Q = A y_bar of the connected element about the section neutral axis", source: "mechanics of materials (Hibbeler / Gere)" },
+      { name: "Connector spacing", value: "s = n R / q; the connector capacity R is entered (from AISC bolt/weld strength)", source: "built-up-member connection design" },
+    ],
+  },
   "steel-beam-shear": {
     formula: "Aw = d x tw; Vn = 0.6 x Fy x Aw x Cv1; Va = Vn / Omega_v; phi_v Vn (phi_v paired to Omega_v: 1.50/1.00 or 1.67/0.90); util = Vu / Va.",
     edition: "AISC 360-22 Chapter G (G2.1) and §B3.1 / §B3.2, by name; d and tw are read from the AISC Manual for the actual shape.",

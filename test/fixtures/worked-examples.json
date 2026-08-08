@@ -46306,6 +46306,68 @@
    }
   },
   {
+   "tile_id": "shear-flow-connector-spacing",
+   "source_publisher": "Mechanics of materials (shear flow q = VQ/I; Hibbeler / Gere)",
+   "source_title": "6 in^2 plate at y_bar 8 in, I 800 in^4, V 50 kip -> q 3.0 kip/in, s 6.67 in (two 10 kip bolts)",
+   "source_edition_or_year": "spec-v1239 worked example (first-principles, machine-verified)",
+   "source_section_or_page": "Q = 6 x 8 = 48 in^3; q = 50 x 48 / 800 = 3.0 kip/in; s = 2 x 10 / 3.0 = 6.67 in",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "shear_kip": 50,
+    "area_in2": 6,
+    "ybar_in": 8,
+    "inertia_in4": 800,
+    "connector_kip": 10,
+    "connectors_per_row": 2
+   },
+   "outputs": {
+    "first_moment_in3": {
+     "value": 48,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "q_kip_in": {
+     "value": 3.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "spacing_in": {
+     "value": 6.6667,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "shear-flow-connector-spacing",
+   "source_publisher": "Mechanics of materials (shear-diagram stepping cross-check)",
+   "source_title": "doubling the shear halves the spacing",
+   "source_edition_or_year": "spec-v1239 worked example (machine-verified)",
+   "source_section_or_page": "same section at V 100 kip: q = 6.0 kip/in, s = 2 x 10 / 6.0 = 3.33 in",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "shear_kip": 100,
+    "area_in2": 6,
+    "ybar_in": 8,
+    "inertia_in4": 800,
+    "connector_kip": 10,
+    "connectors_per_row": 2
+   },
+   "outputs": {
+    "spacing_in": {
+     "value": 3.3333,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-beam-shear",
    "source_publisher": "AISC 360-22 Chapter G / Steel Construction Manual Table 3-2",
    "source_title": "W18x50 A992 (d 17.99, tw 0.355) -> Aw 6.39, Vn 191.6, Va 128 kips",

@@ -141,6 +141,51 @@ export function computeRequiredSectionModulus({ fy = 50, moment_kipft = 0, metho
   };
 }
 export const requiredSectionModulusExample = { inputs: { fy: 50, moment_kipft: 200, method: "lrfd" } };
+
+// ===================== spec-v1239: shear flow and connector spacing in a built-up member =====================
+// The horizontal shear flow at the interface between connected elements of a built-up beam and the fastener/weld
+// spacing that carries it -- q = V Q / I, s = n R / q. Q = A_connected * y_bar (first moment of the connected area
+// about the neutral axis). Standard mechanics of materials (Hibbeler, Gere, Roark). Not a code equation.
+// dims: in { shear_kip: M L T^-2, area_in2: L^2, ybar_in: L, inertia_in4: L^4, connector_kip: M L T^-2, connectors_per_row: dimensionless } out: { q_kip_in: M T^-2, spacing_in: L, first_moment_in3: L^3 }
+export function computeShearFlowConnectorSpacing({ shear_kip = 0, area_in2 = 0, ybar_in = 0, inertia_in4 = 0, connector_kip = 0, connectors_per_row = 2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const V = Number(shear_kip), A = Number(area_in2), y = Number(ybar_in), I = Number(inertia_in4);
+  const R = Number(connector_kip), n = Number(connectors_per_row);
+  if (!(V > 0)) return { error: "Transverse shear V at the section must be positive (kip)." };
+  if (!(A > 0)) return { error: "Connected-element area must be positive (in^2)." };
+  if (!(y > 0)) return { error: "The connected element's centroid distance from the neutral axis must be positive (in) - an element at the neutral axis carries no shear flow." };
+  if (!(I > 0)) return { error: "Moment of inertia of the whole built-up section must be positive (in^4)." };
+  if (!(R > 0)) return { error: "Capacity per connector must be positive (kip)." };
+  if (!(n >= 1)) return { error: "There must be at least one connector per row." };
+  const first_moment_in3 = A * y; // Q
+  const q_kip_in = V * first_moment_in3 / I; // shear flow
+  const spacing_in = n * R / q_kip_in; // s = n R / q
+  if (![first_moment_in3, q_kip_in, spacing_in].every(Number.isFinite)) return { error: "Shear-flow math is not a finite value." };
+  return {
+    first_moment_in3, q_kip_in, spacing_in,
+    note: "The horizontal shear flow at a connected interface of a built-up beam and the connector spacing that carries it. Shear flow q = V Q / I, where V is the transverse shear at the section, I is the moment of inertia of the WHOLE built-up section about its neutral axis, and Q = A y_bar is the first moment of the CONNECTED element (the area on one side of the interface) about that neutral axis. The connectors at the interface must carry q per inch of length, so the maximum spacing is s = n R / q, with R the capacity of one connector (bolt shear or weld-increment strength) and n the number of connectors per row (2 for a pair of bolt lines or a weld each side). A cover plate of 6 in^2 at y_bar 8 in on a section with I 800 in^4 under a 50 kip shear carries q = 3.0 kip/in, so two 10 kip bolts per row space at 6.7 in. Where the shear V is largest (near supports) the spacing tightens; a fabricator often uses a stepped bolt pattern following the shear diagram. First-principles mechanics of materials (Hibbeler / Gere); the connector capacity itself (bolt shear, weld strength) comes from AISC and is entered here. A design aid; the engineer of record governs.",
+  };
+}
+export const shearFlowConnectorSpacingExample = { inputs: { shear_kip: 50, area_in2: 6, ybar_in: 8, inertia_in4: 800, connector_kip: 10, connectors_per_row: 2 } };
+STEEL_RENDERERS["shear-flow-connector-spacing"] = _simpleRenderer({
+  citation: "Citation: shear flow in a built-up beam q = V Q / I with Q = A y_bar the first moment of the connected element about the neutral axis, and connector spacing s = n R / q, by name. First-principles mechanics of materials (Hibbeler / Gere / Roark); the connector capacity R (bolt shear or weld strength) is from AISC and entered here. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: shearFlowConnectorSpacingExample.inputs,
+  fields: [
+    { key: "shear_kip", label: "Transverse shear V at the section (kip)", kind: "number", default: 50 },
+    { key: "area_in2", label: "Connected element area A (in^2)", kind: "number", default: 6 },
+    { key: "ybar_in", label: "Connected element centroid distance from NA, y_bar (in)", kind: "number", default: 8 },
+    { key: "inertia_in4", label: "Moment of inertia of whole section I (in^4)", kind: "number", default: 800 },
+    { key: "connector_kip", label: "Capacity per connector R (kip)", kind: "number", default: 10 },
+    { key: "connectors_per_row", label: "Connectors per row n (2 = a pair of lines)", kind: "number", default: 2 },
+  ],
+  outputs: [
+    { key: "s", id: "sfc-out-s", label: "Maximum connector spacing s", value: (r) => fmt(r.spacing_in, 2) + " in" },
+    { key: "q", id: "sfc-out-q", label: "Shear flow q = V Q / I", value: (r) => fmt(r.q_kip_in, 3) + " kip/in" },
+    { key: "qq", id: "sfc-out-qq", label: "First moment Q = A y_bar", value: (r) => fmt(r.first_moment_in3, 1) + " in^3" },
+    { key: "n", id: "sfc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeShearFlowConnectorSpacing,
+});
 STEEL_RENDERERS["required-section-modulus"] = _simpleRenderer({
   citation: "Citation: required plastic section modulus for a compact braced beam, AISC 360 Chapter F Mp = Fy Zx inverted -- LRFD Zx >= 12 Mu/(0.90 Fy), ASD Zx >= 12(1.67)Ma/Fy, by name. Compact, fully braced (Lb <= Lp, Mn = Mp); select the lightest W-shape with Zx >= this. A design aid; the engineer of record governs.",
   example: requiredSectionModulusExample.inputs,

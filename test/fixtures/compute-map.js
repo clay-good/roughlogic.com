@@ -1507,6 +1507,7 @@ export const COMPUTE_MAP = {
   // spec-v254..v256 + v266..v268 AISC 360 steel member + connection trio (6 tiles, new calc-steel.js)
   "steel-beam-flexure": { module: "../../calc-steel.js", fn: "computeSteelBeamFlexure" },
   "required-section-modulus": { module: "../../calc-steel.js", fn: "computeRequiredSectionModulus" },
+  "shear-flow-connector-spacing": { module: "../../calc-steel.js", fn: "computeShearFlowConnectorSpacing" },
   "steel-beam-shear": { module: "../../calc-steel.js", fn: "computeSteelBeamShear" },
   "steel-column-capacity": { module: "../../calc-steel.js", fn: "computeSteelColumnCapacity" },
   "bolt-group-eccentric": { module: "../../calc-steel.js", fn: "computeBoltGroupEccentric" },
