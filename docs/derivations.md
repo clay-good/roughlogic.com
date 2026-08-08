@@ -1855,6 +1855,7 @@ cross-check.
 | calc-cross.js | `computePortableLadderSetup` | `{ ladder_length_ft = 0, landing_height_ft = 0, extension_above_landing_ft = 0...` | _ | _ | _ |
 | calc-cross.js | `computePulleyMA` | `{ rig = "block_2", efficiency = 0.95 }` | _ | _ | _ |
 | calc-cross.js | `computePumpTdh` | `{ flow_gpm = 0, internal_diameter_in = 0, hw_c = 150, static_suction_lift_ft ...` | _ | _ | _ |
+| calc-cross.js | `computeRadiantHeatExchange` | `{ area_ft2 = 0, emissivity = 0.9, surface_temp_f = 0, surroundings_temp_f = 0...` | _ | _ | _ |
 | calc-cross.js | `computeRainwaterCatchmentArea` | `{ target_annual_gal = 0, annual_in = 0, efficiency = 0.62 } = {}` | _ | _ | _ |
 | calc-cross.js | `computeRainwaterYield` | `{ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.62 }` | _ | _ | _ |
 | calc-cross.js | `computeRampSlope` | `{ rise_in = 0, run_in = 0 }` | _ | _ | _ |
@@ -3303,7 +3304,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1889.
+Row count: 1890.
 
 <!-- END function-corpus-v14 -->
 
@@ -4467,7 +4468,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (70 tiles)
+### Group G Cross-trade (71 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4515,6 +4516,7 @@ per spec-v14 §13.1 second paragraph.
 | `pump-tdh` | Pump Total Dynamic Head (TDH) | Crane / Hazen-Williams; TDH = static + suction + discharge + fittings friction; h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `punch-capacity` | Punch Capacity: Max Hole or Thickness | First-principles shear (inverse); 9.8175 ton press, 0.5 in hole, 50,000 psi shear -> 0.25 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `punch-force` | Punch / Shear Force | First-principles shear + Machinery's ...; round 0.5 in hole, T 0.25 in, tau 50,000 psi -> 19,634.95... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `radiant-heat-exchange` | Radiant Heat Exchange (Stefan-Boltzmann) | Stefan-Boltzmann law (SI cross-checked); Ts = 659.67 R, Tsurr = 529.67 R; q = 0.9 x 1 x 0.1714e-8 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rainwater-catchment-area` | Catchment Area for a Target Harvest | ARCSA / NOAA (inverse); 11,593 gal target, 30 in, 0.62 efficiency -> about 1,000 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rainwater-yield` | Rainwater Harvesting Yield | Project (first-principles); Standard 0.6233 gal-per-in-per-ft^2 conversion factor | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ramp-slope` | Ramp Slope (ADA) | Project (first-principles); ADA 4.8.2 1:12 maximum running slope (cited by name) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5129,6 +5131,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1640. Fixture-covered or reference-cadence: 1640 / 1640.
+Tile count: 1641. Fixture-covered or reference-cadence: 1641 / 1641.
 
 <!-- END tile-index-v14 -->

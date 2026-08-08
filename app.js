@@ -830,7 +830,7 @@ const TOOL_MODULES = (() => {
     "noise-dose",
     "hearing-protector-nrr",
     "silica-table-1",
-    "lifeline-tension",
+    "lifeline-tension", "radiant-heat-exchange",
     // v15
     "pump-tdh", "hydraulic-cylinder", "vbelt-drive", "belt-hp-transmitted", "gear-cascade",
     // v24 rolling offset

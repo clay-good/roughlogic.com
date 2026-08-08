@@ -3126,6 +3126,31 @@
       "kind": "industry"
     },
     {
+      "term": "radiant heat exchange",
+      "target": "radiant-heat-exchange",
+      "kind": "industry"
+    },
+    {
+      "term": "stefan boltzmann heat loss",
+      "target": "radiant-heat-exchange",
+      "kind": "industry"
+    },
+    {
+      "term": "radiant heat loss from a hot surface",
+      "target": "radiant-heat-exchange",
+      "kind": "question"
+    },
+    {
+      "term": "how much heat does a surface radiate",
+      "target": "radiant-heat-exchange",
+      "kind": "question"
+    },
+    {
+      "term": "emissivity radiation heat transfer",
+      "target": "radiant-heat-exchange",
+      "kind": "question"
+    },
+    {
       "term": "horizontal lifeline anchor load",
       "target": "lifeline-tension",
       "kind": "industry"

@@ -2238,6 +2238,18 @@ export const CITATIONS = {
 
   // --- v9 Group A extensions ---
 
+  "radiant-heat-exchange": {
+    formula: "q = eps F sigma A (T_s^4 - T_surr^4); sigma = 0.1714e-8 BTU/(hr ft^2 R^4); T in absolute Rankine (F + 459.67); q in BTU/hr, W = BTU/hr / 3.412142. Positive = net loss from the surface.",
+    edition: "The Stefan-Boltzmann law of thermal radiation (sigma from NIST/CODATA); first-principles physics, cited by name.",
+    freeAccess: "The Stefan-Boltzmann law and its constant are public first-principles physics; emissivity, area, view factor, and the two temperatures are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Net radiant heat exchanged between a surface and what it faces: q = eps F sigma A (T_s^4 - T_surr^4), with sigma the Stefan-Boltzmann constant (0.1714e-8 BTU/(hr ft^2 R^4)) and temperatures in absolute Rankine. A positive result is heat lost from the surface (it is hotter than its surroundings); a negative result is heat gained. Because the emission goes as the FOURTH power of absolute temperature, a hot surface radiates far more than a warm one, and the emissivity eps multiplies it directly, so a bright low-emissivity metal (eps ~ 0.05) radiates a small fraction of what a dull high-emissivity surface (paint, rust, most nonmetals, eps ~ 0.9) does at the same temperature. The view factor F is the fraction of the surface's radiation intercepted by the target - 1 for a small object fully surrounded by a large room, less for two partly-facing surfaces. This is the radiation term ONLY; the total surface heat transfer adds convection and conduction, and this is the NET between two temperatures, not an absolute emission. A first-principles estimate; the real emissivity, geometry, and full heat balance govern.",
+    assumptions: [
+      { name: "Stefan-Boltzmann", value: "q = eps F sigma A (T_s^4 - T_surr^4); sigma = 0.1714e-8 BTU/(hr ft^2 R^4); T in Rankine", source: "Stefan-Boltzmann law (NIST constant)" },
+      { name: "Emissivity and view factor", value: "eps ~ 0.05 bright metal, ~0.9 paint/nonmetals; F = 1 for a small object in a large room", source: "radiation heat-transfer texts" },
+      { name: "Scope", value: "radiation only (add convection + conduction for the total); net between two temperatures", source: "scope of this tile" },
+    ],
+  },
   "lifeline-tension": {
     formula: "static midspan cable: T = W x sqrt((L/2)^2 + s^2) / (2 s); horizontal pull at each anchor H = W x L / (4 s). Anchorage demand = T x the safety factor, compared against the prescriptive 5,000 lb per employee attached; the larger governs. Inverse: the sag for a target tension is s = W (L/2) / sqrt(4 T^2 - W^2), which has no solution for a target at or below W/2.",
     edition: "Cable statics, with the regulatory requirements from OSHA 29 CFR 1926.502(d)(8), (d)(15), and (d)(16). A US federal regulation in the public domain, quoted directly.",

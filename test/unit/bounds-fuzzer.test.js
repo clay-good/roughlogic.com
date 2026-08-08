@@ -10882,6 +10882,29 @@ import {
 import { computeRollingOffset as _cg1 } from "../../calc-cross.js";
 import { computeTankVolume as _ctv } from "../../calc-cross.js";
 import { computeLinearInterpolation as _cli } from "../../calc-cross.js";
+import { computeRadiantHeatExchange as _v1268 } from "../../calc-cross.js";
+test("bounds: spec-v1268 computeRadiantHeatExchange pins the Stefan-Boltzmann exchange, T^4 and emissivity scaling, sign, and error seams", () => {
+  // 10 ft2, eps 0.9, 200 F surface, 70 F room, F 1: q = 0.9 x 0.1714e-8 x 10 x (659.67^4 - 529.67^4) = 1707 BTU/hr.
+  const r = _v1268({ area_ft2: 10, emissivity: 0.9, surface_temp_f: 200, surroundings_temp_f: 70, view_factor: 1 });
+  const expect = 0.9 * 0.1714e-8 * 10 * (Math.pow(659.67, 4) - Math.pow(529.67, 4));
+  assert.ok(Math.abs(r.heat_rate_btu_hr - expect) < 1e-6 && Math.abs(r.heat_rate_btu_hr - 1707) < 2);
+  assert.ok(Math.abs(r.heat_rate_w - r.heat_rate_btu_hr / 3.412142) < 1e-9);
+  assert.ok(r.direction === "net loss from the surface");
+  // Emissivity scales the result linearly.
+  const shiny = _v1268({ area_ft2: 10, emissivity: 0.05, surface_temp_f: 200, surroundings_temp_f: 70, view_factor: 1 });
+  assert.ok(Math.abs(shiny.heat_rate_btu_hr - r.heat_rate_btu_hr * (0.05 / 0.9)) < 1e-6);
+  // A colder surface than its surroundings gains heat (negative q).
+  const cold = _v1268({ area_ft2: 10, emissivity: 0.9, surface_temp_f: 40, surroundings_temp_f: 70, view_factor: 1 });
+  assert.ok(cold.heat_rate_btu_hr < 0 && cold.direction === "net gain to the surface");
+  // Equal temperatures give zero net exchange.
+  assert.ok(Math.abs(_v1268({ area_ft2: 10, emissivity: 0.9, surface_temp_f: 70, surroundings_temp_f: 70, view_factor: 1 }).heat_rate_btu_hr) < 1e-9);
+  // Error seams: non-positive area, emissivity out of (0,1], view factor out of (0,1], sub-absolute-zero, non-finite.
+  assert.ok("error" in _v1268({ area_ft2: 0, emissivity: 0.9, surface_temp_f: 200, surroundings_temp_f: 70 }));
+  assert.ok("error" in _v1268({ area_ft2: 10, emissivity: 1.2, surface_temp_f: 200, surroundings_temp_f: 70 }));
+  assert.ok("error" in _v1268({ area_ft2: 10, emissivity: 0.9, surface_temp_f: 200, surroundings_temp_f: 70, view_factor: 1.5 }));
+  assert.ok("error" in _v1268({ area_ft2: 10, emissivity: 0.9, surface_temp_f: -500, surroundings_temp_f: 70 }));
+  assert.ok("error" in _v1268({ area_ft2: 10, emissivity: 0.9, surface_temp_f: Infinity, surroundings_temp_f: 70 }));
+});
 test("bounds: spec-v53 linear-interpolation pins y + slope + extrapolation flag + reject non-finite", () => {
   // (0,10),(10,30), x=4 -> y=18, slope 2, within range
   const a = _cli({ x1: 0, y1: 10, x2: 10, y2: 30, x: 4 });

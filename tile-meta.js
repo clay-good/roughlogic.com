@@ -451,7 +451,7 @@ const _TILES = [
   ["keyseat-key-size", "K"], ["knurl-blank-diameter", "K"], ["grinding-wheel-rpm", "K"], ["reaming-drill-allowance", "K"], ["taylor-tool-life", "K"],
 
   // v43 cross-trade tank gauging (calc-cross.js)
-  ["tank-volume", "G"], ["linear-interpolation", "G"],
+  ["tank-volume", "G"], ["linear-interpolation", "G"], ["radiant-heat-exchange", "G"],
 
   // v44 cross-trade circular-arc layout (calc-layout.js)
   ["circular-arc", "G"], ["circular-segment-area", "G"],

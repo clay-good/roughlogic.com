@@ -1086,6 +1086,7 @@ export const RENDERER_MAP = {
   "hearing-protector-nrr": { module: "../../calc-cross.js", exportName: "CROSS_RENDERERS" },
   "silica-table-1": { module: "../../calc-cross.js", exportName: "CROSS_RENDERERS" },
   "lifeline-tension": { module: "../../calc-cross.js", exportName: "CROSS_RENDERERS" },
+  "radiant-heat-exchange": { module: "../../calc-cross.js", exportName: "CROSS_RENDERERS" },
   "pump-tdh": { module: "../../calc-cross.js", exportName: "CROSS_RENDERERS" },
   "hydraulic-cylinder": { module: "../../calc-cross.js", exportName: "CROSS_RENDERERS" },
   "vbelt-drive": { module: "../../calc-cross.js", exportName: "CROSS_RENDERERS" },

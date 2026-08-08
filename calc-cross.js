@@ -3443,3 +3443,49 @@ CROSS_RENDERERS["lifeline-tension"] = _simpleRendererG({
   ],
   compute: computeLifelineTension,
 });
+
+// --- spec-v1268: two-surface net radiant heat exchange (radiant-heat-exchange) ---
+// The Stefan-Boltzmann law is embedded in the insulation and ampacity thermal models but exists nowhere as a
+// standalone tool. This adds the general radiant exchange between a surface and its surroundings (or a second
+// surface it faces): q = eps F sigma A (T_s^4 - T_surr^4), sigma = 0.1714e-8 BTU/(hr ft^2 R^4), temperatures
+// in absolute Rankine (F + 459.67). eps is the surface emissivity, F the view (configuration) factor to the
+// surroundings (1 for a small object fully enclosed by a large room). The T^4 dependence is why a hot surface
+// sheds heat far faster than a warm one and why emissivity dominates radiant panel and freeze-protection design.
+// First-principles / public (NIST). dims: in { area_ft2: L^2, emissivity: dimensionless, surface_temp_f: T, surroundings_temp_f: T, view_factor: dimensionless } out: { heat_rate_btu_hr: M L^2 T^-3, heat_rate_w: M L^2 T^-3, surface_temp_r: T, surroundings_temp_r: T }
+export function computeRadiantHeatExchange({ area_ft2 = 0, emissivity = 0.9, surface_temp_f = 0, surroundings_temp_f = 0, view_factor = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const A = Number(area_ft2), eps = Number(emissivity), F = Number(view_factor);
+  const tsF = Number(surface_temp_f), tsurrF = Number(surroundings_temp_f);
+  if (![A, eps, F, tsF, tsurrF].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
+  if (!(A > 0)) return { error: "Surface area must be positive (ft^2)." };
+  if (!(eps > 0) || eps > 1) return { error: "Emissivity must be between 0 and 1 (a shiny metal ~0.05, flat paint or most nonmetals ~0.9)." };
+  if (!(F > 0) || F > 1) return { error: "View factor must be between 0 and 1 (1 = a small object fully surrounded by the far surface)." };
+  const SIGMA = 0.1714e-8; // BTU/(hr ft^2 R^4)
+  const tsR = tsF + 459.67, tsurrR = tsurrF + 459.67;
+  if (!(tsR > 0) || !(tsurrR > 0)) return { error: "Temperatures must be above absolute zero (-459.67 F)." };
+  const heat_rate_btu_hr = eps * F * SIGMA * A * (Math.pow(tsR, 4) - Math.pow(tsurrR, 4));
+  const heat_rate_w = heat_rate_btu_hr / 3.412142;
+  if (![heat_rate_btu_hr, heat_rate_w].every(Number.isFinite)) return { error: "Radiant-exchange math is not a finite value." };
+  const direction = heat_rate_btu_hr > 0 ? "net loss from the surface" : heat_rate_btu_hr < 0 ? "net gain to the surface" : "balanced (equal temperatures)";
+  return {
+    heat_rate_btu_hr, heat_rate_w, surface_temp_r: tsR, surroundings_temp_r: tsurrR, direction,
+    note: "Net radiant heat exchange between a surface and what it faces, by the Stefan-Boltzmann law q = eps F sigma A (T_s^4 - T_surr^4) with sigma = 0.1714e-8 BTU/(hr ft^2 R^4) and temperatures in absolute Rankine (F + 459.67). A positive result is heat LOST from the surface (it is hotter than its surroundings); a negative result is heat gained. Because it goes as the FOURTH power of absolute temperature, a hot surface radiates far more than a warm one -- a 400 F pipe sheds several times the radiant heat of a 150 F pipe of the same size -- and the emissivity multiplies it directly, so a bright, low-emissivity (shiny metal, eps ~ 0.05) surface radiates a fraction of what a dull, high-emissivity (paint, rust, most nonmetals, eps ~ 0.9) one does at the same temperature. The view factor F is the fraction of the surface's radiation that lands on the target: use 1 for a small object fully surrounded by a large room, and less for two surfaces that only partly face each other. This is radiation ONLY; add convection and conduction for the total heat transfer, and this is the net between two temperatures, not an absolute emission. A first-principles estimate; the real emissivity, geometry, and the full heat balance govern.",
+  };
+}
+export const radiantHeatExchangeExample = { inputs: { area_ft2: 10, emissivity: 0.9, surface_temp_f: 200, surroundings_temp_f: 70, view_factor: 1 } };
+CROSS_RENDERERS["radiant-heat-exchange"] = _simpleRendererG({
+  citation: "Citation: Stefan-Boltzmann net radiant exchange q = eps F sigma A (T_s^4 - T_surr^4), sigma = 0.1714e-8 BTU/(hr ft^2 R^4), temperatures in absolute Rankine (NIST / first-principles radiation), by name. Radiation only -- add convection and conduction for the total. eps ~ 0.05 bright metal, ~0.9 paint/nonmetals; F = 1 for a small object in a large room. The real emissivity, geometry, and full heat balance govern.",
+  example: radiantHeatExchangeExample.inputs,
+  fields: [
+    { key: "area_ft2", label: "Radiating surface area (ft^2)", kind: "number", default: 10 },
+    { key: "emissivity", label: "Surface emissivity (shiny metal ~0.05, paint/nonmetal ~0.9)", kind: "number", default: 0.9 },
+    { key: "surface_temp_f", label: "Surface temperature (F)", kind: "number", default: 200 },
+    { key: "surroundings_temp_f", label: "Surroundings / facing-surface temperature (F)", kind: "number", default: 70 },
+    { key: "view_factor", label: "View factor to surroundings (1 = fully surrounded)", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "q", id: "rhx-out-q", label: "Net radiant heat", value: (r) => fmt(r.heat_rate_btu_hr, 0) + " BTU/hr (" + fmt(r.heat_rate_w, 0) + " W) - " + r.direction },
+    { key: "n", id: "rhx-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRadiantHeatExchange,
+});
