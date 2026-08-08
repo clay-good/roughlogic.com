@@ -1900,6 +1900,7 @@ import {
   computeRoomAbsorptionTarget,
   computeEyringReverberation,
   computeMassLawTL,
+  computeSpeedOfSoundAir,
   computeSPLDistanceForLevel,
 } from "../../calc-stage.js";
 
@@ -4954,6 +4955,27 @@ test("bounds: spec-v1242 computeMassLawTL pins TL = 20 log10(m f) - 47, the fiel
   assert.ok("error" in computeMassLawTL({ surface_mass_psf: 2, frequency_hz: 0 }));
   assert.ok("error" in computeMassLawTL({ surface_mass_psf: 2, frequency_hz: 500, incidence: "grazing" }));
   assert.ok("error" in computeMassLawTL({ surface_mass_psf: Infinity, frequency_hz: 500 }));
+});
+
+test("bounds: spec-v1243 computeSpeedOfSoundAir pins c = 331.3 sqrt(1+T_C/273.15), the delay, the sqrt-T scaling, and error seams", () => {
+  // 68 F: 1126 ft/s, 0.888 ms/ft.
+  const r = computeSpeedOfSoundAir({ temperature_f: 68 });
+  const tc = (68 - 32) / 1.8;
+  assert.ok(Math.abs(r.speed_mps - 331.3 * Math.sqrt(1 + tc / 273.15)) < 1e-9);
+  assert.ok(Math.abs(r.speed_ftps - r.speed_mps * 3.28084) < 1e-9);
+  assert.ok(Math.abs(r.speed_ftps - 1126.0) < 0.5);
+  assert.ok(Math.abs(r.delay_ms_per_ft - 1000 / r.speed_ftps) < 1e-12);
+  assert.ok(Math.abs(r.delay_ms_per_ft - 0.888) < 0.002);
+  // Warmer air is faster (c rises with absolute temperature), so the per-foot delay drops.
+  const hot = computeSpeedOfSoundAir({ temperature_f: 95 });
+  const cold = computeSpeedOfSoundAir({ temperature_f: 32 });
+  assert.ok(cold.speed_ftps < r.speed_ftps && r.speed_ftps < hot.speed_ftps);
+  assert.ok(hot.delay_ms_per_ft < r.delay_ms_per_ft);
+  assert.ok(Math.abs(cold.speed_ftps - 1086.9) < 0.5 && Math.abs(hot.speed_ftps - 1154.5) < 0.5);
+  // Error seams: at/below absolute zero, non-finite.
+  assert.ok("error" in computeSpeedOfSoundAir({ temperature_f: -459.67 }));
+  assert.ok("error" in computeSpeedOfSoundAir({ temperature_f: -500 }));
+  assert.ok("error" in computeSpeedOfSoundAir({ temperature_f: Infinity }));
 });
 
 test("bounds: calc-stage computeRoomAbsorptionTarget pins A_required = 0.049 * V / RT60 and round-trips through computeRoomAcoustics across the venue sweep, and rejects non-positive inputs", () => {

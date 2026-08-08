@@ -11917,6 +11917,18 @@ export const CITATIONS = {
       { name: "When to use", value: "Eyring for high-absorption (well-treated) rooms; Sabine over-predicts there", source: "acoustics practice" },
     ],
   },
+  "speed-of-sound-air": {
+    formula: "c = 331.3 sqrt(1 + T_C/273.15) m/s (dry air, from c = sqrt(gamma R T / M)); ft/s = m/s x 3.28084; propagation delay = 1000 / c_ftps ms per foot. T_C = (T_F - 32)/1.8.",
+    edition: "First-principles kinetic theory (c = sqrt(gamma R T / M)) with the NIST/standard 331.3 m/s dry-air reference at 0 C, by name.",
+    freeAccess: "The speed-of-sound-vs-temperature relation is public first-principles physics; the 331.3 m/s reference at 0 C is a standard NIST value and the air temperature is the user's input.",
+    governance: GOVERNANCE.general,
+    editionNote: "The speed of sound in dry air from the temperature, c = 331.3 sqrt(1 + T_C/273.15) m/s (equivalently sqrt(gamma R T / M) with gamma 1.4 and air's molar mass), converted to ft/s. It is the propagation speed the time-alignment and ceiling-speaker-coverage tiles assume as a fixed ~1130 ft/s, but it swings about 6% from a freezing morning to a hot afternoon: 1,087 ft/s at 32 F, 1,126 ft/s at 68 F (the usual 1,130 rule of thumb), 1,155 ft/s at 95 F. Because the delay required at a fixed distance is inversely proportional to c, re-timing an outdoor delay tower for the day's temperature keeps arrivals aligned; the propagation delay is 1000 / c ms per foot (about 0.888 ms/ft at 68 F). This is dry air; humidity raises c slightly (a small second-order term) and altitude alone does not change it (temperature does). A first-principles aid; the measured system tuning governs.",
+    assumptions: [
+      { name: "Speed of sound", value: "c = 331.3 sqrt(1 + T_C/273.15) m/s (dry air), from c = sqrt(gamma R T / M)", source: "kinetic theory / NIST" },
+      { name: "Propagation delay", value: "1000 / c_ftps ms per foot; delay is inversely proportional to c", source: "acoustics" },
+      { name: "Dry air", value: "humidity is a small second-order correction; altitude alone does not change c", source: "scope of this tile" },
+    ],
+  },
   "partition-mass-law-tl": {
     formula: "TL = 20 log10(m f) - 47 dB (field/random incidence), or - 42 (normal incidence); m the surface mass in kg/m^2 (lb/ft^2 x 4.88243), f in Hz. +6 dB per doubling of m or f.",
     edition: "First-principles panel acoustics - the limp-mass law - as given in Bies & Hansen, Engineering Noise Control, and FHWA highway-noise guidance, by name.",

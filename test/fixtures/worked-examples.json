@@ -28442,6 +28442,52 @@
    }
   },
   {
+   "tile_id": "speed-of-sound-air",
+   "source_publisher": "Kinetic theory / NIST (dry-air speed of sound)",
+   "source_title": "68 F -> 1126 ft/s, 0.888 ms/ft (the ~1130 rule of thumb) (spec-v1243)",
+   "source_edition_or_year": "c = 331.3 sqrt(1 + T_C/273.15) m/s",
+   "source_section_or_page": "T_C = (68-32)/1.8 = 20; c = 331.3 sqrt(1 + 20/273.15) = 343.2 m/s x 3.28084 = 1126.0 ft/s; delay = 1000/1126.0 = 0.888 ms/ft.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "temperature_f": 68
+   },
+   "outputs": {
+    "speed_ftps": {
+     "value": 1126.0,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "delay_ms_per_ft": {
+     "value": 0.888,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "speed-of-sound-air",
+   "source_publisher": "Speed of sound (hot-day cross-check)",
+   "source_title": "at 95 F the speed rises to ~1155 ft/s (a ~6% swing from freezing)",
+   "source_edition_or_year": "c proportional to sqrt(absolute temperature)",
+   "source_section_or_page": "T_C = 35; c = 331.3 sqrt(1 + 35/273.15) = 351.9 m/s = 1154.5 ft/s, vs 1086.9 ft/s at 32 F -- delay towers need re-timing for the day's temperature.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "temperature_f": 95
+   },
+   "outputs": {
+    "speed_ftps": {
+     "value": 1154.5,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "room-acoustics",
    "source_publisher": "W.C. Sabine reverberation equation (public domain); axial room-mode relation f = c / (2 x L).",
    "source_title": "RT60 = 0.049 x V / A; first axial mode = 1130 / (2 x dimension), c = 1130 ft/s.",

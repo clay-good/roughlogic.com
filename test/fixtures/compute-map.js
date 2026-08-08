@@ -1033,6 +1033,7 @@ export const COMPUTE_MAP = {
   "room-acoustics": { module: "../../calc-stage.js", fn: "computeRoomAcoustics" },
   "eyring-reverberation": { module: "../../calc-stage.js", fn: "computeEyringReverberation" },
   "partition-mass-law-tl": { module: "../../calc-stage.js", fn: "computeMassLawTL" },
+  "speed-of-sound-air": { module: "../../calc-stage.js", fn: "computeSpeedOfSoundAir" },
   "room-absorption-target": { module: "../../calc-stage.js", fn: "computeRoomAbsorptionTarget" },
   "counterweight-arbor-load": { module: "../../calc-stage.js", fn: "computeCounterweightArborLoad" },
   "led-tape-run": { module: "../../calc-stage.js", fn: "computeLedTapeRun" },

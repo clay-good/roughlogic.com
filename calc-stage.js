@@ -1397,6 +1397,43 @@ const renderMassLawTL = _r({
 });
 STAGE_RENDERERS["partition-mass-law-tl"] = renderMassLawTL;
 
+// spec-v1243: speed of sound in air vs temperature. time-alignment and ceiling-speaker-coverage
+// assume a fixed ~1130 ft/s; this derives it from air temperature (a ~6% swing from freezing to a
+// hot day, which shifts delay-tower timing). c = 331.3 sqrt(1 + T_C/273.15) m/s (dry air, from
+// c = sqrt(gamma R T / M)); ft/s = m/s x 3.28084; propagation delay = 1000 / c_ftps ms per foot.
+// First-principles kinetic theory / NIST. Humidity raises c slightly (a small second-order term, omitted).
+// dims: in { temperature_f: T } out: { speed_ftps: L T^-1, speed_mps: L T^-1, delay_ms_per_ft: T L^-1 }
+export function computeSpeedOfSoundAir({ temperature_f = 68 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const tf = Number(temperature_f);
+  if (!Number.isFinite(tf)) return { error: "Temperature must be a number (F)." };
+  const tc = (tf - 32) / 1.8;
+  if (!(tc > -273.15)) return { error: "Temperature must be above absolute zero (-459.67 F)." };
+  const speed_mps = 331.3 * Math.sqrt(1 + tc / 273.15);
+  const speed_ftps = speed_mps * 3.28084;
+  const delay_ms_per_ft = 1000 / speed_ftps;
+  if (![speed_mps, speed_ftps, delay_ms_per_ft].every(Number.isFinite)) return { error: "Speed-of-sound math is not a finite value." };
+  return {
+    speed_ftps, speed_mps, delay_ms_per_ft, temperature_c: tc,
+    note: "The speed of sound in dry air from the temperature, c = 331.3 sqrt(1 + T_C/273.15) m/s (from c = sqrt(gamma R T / M) with gamma 1.4 and air's molar mass), converted to ft/s. It is the propagation speed the time-alignment and ceiling-speaker-coverage tiles assume as a fixed ~1130 ft/s -- but it swings about 6% from a freezing morning to a hot afternoon: 1,087 ft/s at 32 F, 1,126 ft/s at 68 F (the usual 1,130 rule of thumb), and 1,155 ft/s at 95 F. That shift matters for a delay tower: at a fixed distance the required delay is inversely proportional to c, so re-timing an outdoor system for the day's temperature keeps the arrivals aligned. The propagation delay is 1000 / c ms per foot (about 0.888 ms/ft at 68 F). This is dry air; humidity raises c slightly (a small second-order term) and altitude alone does not change it (temperature does). A first-principles aid; the measured system tuning governs.",
+  };
+}
+const speedOfSoundAirExample = { inputs: { temperature_f: 68 } };
+const renderSpeedOfSoundAir = _r({
+  citation: "Citation: speed of sound in dry air c = 331.3 sqrt(1 + T_C/273.15) m/s, from c = sqrt(gamma R T / M) (kinetic theory; NIST), converted to ft/s (x 3.28084); propagation delay = 1000/c ms per foot. 1,126 ft/s at 68 F, the ~1,130 ft/s rule of thumb. Dry air; humidity is a small second-order correction. A first-principles aid; the system tuning governs.",
+  example: speedOfSoundAirExample.inputs,
+  fields: [
+    { key: "temperature_f", label: "Air temperature (F)", kind: "number", attrs: { step: "any" }, default: 68 },
+  ],
+  outputs: [
+    { key: "ft", id: "sos-out-ft", label: "Speed of sound", value: (r) => fmt(r.speed_ftps, 1) + " ft/s (" + fmt(r.speed_mps, 1) + " m/s)" },
+    { key: "d", id: "sos-out-d", label: "Propagation delay", value: (r) => fmt(r.delay_ms_per_ft, 3) + " ms/ft" },
+    { key: "n", id: "sos-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSpeedOfSoundAir,
+});
+STAGE_RENDERERS["speed-of-sound-air"] = renderSpeedOfSoundAir;
+
 // --- spec-v664 N: absorption needed for a target RT60 (inverse of room-acoustics) ---
 // dims: in { volume_ft3: L^3, target_rt60_s: T, existing_sabins: L^2, sabine_coeff: dimensionless } out: { required_sabins: L^2, additional_sabins: L^2 }
 export function computeRoomAbsorptionTarget({ volume_ft3 = 0, target_rt60_s = 0, existing_sabins = 0, sabine_coeff = 0.049 } = {}) {

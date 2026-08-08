@@ -1430,6 +1430,7 @@ export const RENDERER_MAP = {
   "room-acoustics": { module: "../../calc-stage.js", exportName: "STAGE_RENDERERS" },
   "eyring-reverberation": { module: "../../calc-stage.js", exportName: "STAGE_RENDERERS" },
   "partition-mass-law-tl": { module: "../../calc-stage.js", exportName: "STAGE_RENDERERS" },
+  "speed-of-sound-air": { module: "../../calc-stage.js", exportName: "STAGE_RENDERERS" },
   "room-absorption-target": { module: "../../calc-stage.js", exportName: "STAGE_RENDERERS" },
   "counterweight-arbor-load": { module: "../../calc-stage.js", exportName: "STAGE_RENDERERS" },
   "led-tape-run": { module: "../../calc-stage.js", exportName: "STAGE_RENDERERS" },

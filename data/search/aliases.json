@@ -8806,6 +8806,21 @@
       "kind": "question"
     },
     {
+      "term": "speed of sound in air",
+      "target": "speed-of-sound-air",
+      "kind": "industry"
+    },
+    {
+      "term": "speed of sound temperature",
+      "target": "speed-of-sound-air",
+      "kind": "question"
+    },
+    {
+      "term": "delay tower timing per foot",
+      "target": "speed-of-sound-air",
+      "kind": "question"
+    },
+    {
       "term": "room modes",
       "target": "room-acoustics",
       "kind": "industry"

@@ -3089,6 +3089,7 @@ cross-check.
 | calc-stage.js | `computeSPLAtmospheric` | `{ source_SPL_dB = 0, d_ref_m = 1, d_far_m = 0, temperature_C = 20, RH_percent...` | _ | _ | _ |
 | calc-stage.js | `computeSPLDistanceForLevel` | `{ L1_dB = 0, d1 = 1, target_L2_dB = 0, mode = "free_field", n_sources = 1 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeSpeakerImpedance` | `{ topology, z_ohm, count, series_per_branch, branches, amp_min_ohm, power_w }` | _ | _ | _ |
+| calc-stage.js | `computeSpeedOfSoundAir` | `{ temperature_f = 68 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeTimeAlignment` | `{ d_main_ft = 0, d_delay_ft = 0, ambient_C = 20, haas_offset_ms = 15 }` | _ | _ | _ |
 | calc-stage.js | `computeTrussCapacity` | `{ truss_model = "16in_box", span_ft = 0, point_loads = [] }` | _ | _ | _ |
 | calc-stage.js | `computeWinchFleetAngle` | `{ lateral_offset = 0, lead_distance = 0 } = {}` | _ | _ | _ |
@@ -3277,7 +3278,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1863.
+Row count: 1864.
 
 <!-- END function-corpus-v14 -->
 
@@ -4814,7 +4815,7 @@ per spec-v14 §13.1 second paragraph.
 | `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `well-max-yield` | Well Sustainable Yield from Specific Capacity | AWWA / USGS (inverse); 1.0 GPM/ft, 30 ft allowable drawdown -> 30 GPM (round-tri... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group N Stage (26 tiles)
+### Group N Stage (27 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4838,6 +4839,7 @@ per spec-v14 §13.1 second paragraph.
 | `room-absorption-target` | Absorption Needed for a Target RT60 | W.C. Sabine reverberation equation (p...; spec-v664 section 2 pinned example: 5,000 ft^3 targeting ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `room-acoustics` | Room Acoustics: RT60 and Axial Modes | W.C. Sabine reverberation equation (p...; spec-v120 section 2 pinned example: 5,000 ft^3 / 500 sabi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `speaker-impedance` | Speaker Impedance Network | Ohm's-law network theory (public); four 8-ohm drivers in parallel -> 2 ohm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `speed-of-sound-air` | Speed of Sound in Air vs Temperature | Kinetic theory / NIST (dry-air speed ...; T_C = (68-32)/1.8 = 20; c = 331.3 sqrt(1 + 20/273.15) = 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spl-atmospheric` | SPL with Atmospheric Absorption (ANSI S1.26) | ANSI; Inverse-square 20*log10(30) = 29.54 dB; absorption at 1 k... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spl-distance` | SPL and Inverse Square Law | Project (first-principles); Free-field SPL attenuation; 110 dB at 1 m -> ~80.5 dB at ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spl-distance-for-level` | Distance for a Target SPL | Project (inverse-square law, inverse); 110 dB at 1 ft free-field falls to 84 dB at about 20 ft (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5078,6 +5080,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1615. Fixture-covered or reference-cadence: 1615 / 1615.
+Tile count: 1616. Fixture-covered or reference-cadence: 1616 / 1616.
 
 <!-- END tile-index-v14 -->
