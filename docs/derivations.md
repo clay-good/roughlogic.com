@@ -2647,6 +2647,7 @@ cross-check.
 | calc-motor.js | `computeReducedVoltageStarter` | `{ across_line_lra_a = 0, across_line_lrt_pct = 100, starter_type = "autotrans...` | _ | _ | _ |
 | calc-motor.js | `computeRotaryPhaseConverter` | `{ largest_motor_hp = 10, total_running_hp = 15, start_factor = 2 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeVfdReflectedWave` | `{ rise_time_us = 0, velocity_pct = 50, system_voltage_v = 0, run_length_ft = ...` | _ | _ | _ |
+| calc-pipefit.js | `computeAsmeHeadThickness` | `{ design_pressure_psi = 0, inside_diameter_in = 0, allowable_stress_psi = 0, ...` | _ | _ | _ |
 | calc-pipefit.js | `computeAsmeShellThickness` | `{ design_pressure_psi = 0, inside_radius_in = 0, allowable_stress_psi = 0, jo...` | _ | _ | _ |
 | calc-pipefit.js | `computeBoilerHorsepower` | `{ output_btuhr = 0 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeBranchReinforcement` | `{ run_od_in = 0, run_wall_in = 0, run_treq_in = 0, branch_od_in = 0, branch_w...` | _ | _ | _ |
@@ -3267,7 +3268,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1853.
+Row count: 1854.
 
 <!-- END function-corpus-v14 -->
 
@@ -3555,12 +3556,13 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (134 tiles)
+### Group B Plumbing (135 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `aav-install-check` | Air Admittance Valve Installation Check (IPC 918) | International Code Council; 'Individual and branch-type air admittance valves shall b... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `accessible-toilet-compartment` | Accessible Toilet Compartment Sizing (2010 ADA Standards 604.8) | US Department of Justice / US Access ...; 213.3.1 triggers the ambulatory compartment where six or ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `asme-head-thickness` | ASME UG-32 Formed-Head Thickness (Ellipsoidal, Hemispherical, Torispherical) | ASME BPVC VIII-1 UG-32; P 150 psig, D 48 in, S 17,500 psi, E 0.85, CA 0.0625 -> S... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `asme-shell-thickness` | ASME UG-27 Shell Thickness (Joint Efficiency and Corrosion) | ASME BPVC VIII-1 UG-27; P 150 psig, R 24 in, S 17,500 psi, E 0.85, CA 0.0625 -> S... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `backflow` | Backflow Reference | IPC 2024 + project bundled backflow-p...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `backflow-loss` | Backflow Preventer Pressure Loss | Watts Regulator; 1 in RP at 30 gpm -> ~8.5 psi typical loss across the ass... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5058,6 +5060,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1605. Fixture-covered or reference-cadence: 1605 / 1605.
+Tile count: 1606. Fixture-covered or reference-cadence: 1606 / 1606.
 
 <!-- END tile-index-v14 -->

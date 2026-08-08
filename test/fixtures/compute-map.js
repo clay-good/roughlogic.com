@@ -1581,6 +1581,7 @@ export const COMPUTE_MAP = {
   "steam-prv-area-for-capacity": { module: "../../calc-pipefit.js", fn: "computeSteamPrvAreaForCapacity" },
   "pipe-pressure-rating": { module: "../../calc-pipefit.js", fn: "computePipePressureRating" },
   "asme-shell-thickness": { module: "../../calc-pipefit.js", fn: "computeAsmeShellThickness" },
+  "asme-head-thickness": { module: "../../calc-pipefit.js", fn: "computeAsmeHeadThickness" },
   "pipe-filled-support-load": { module: "../../calc-pipefit.js", fn: "computePipeFilledSupportLoad" },
   "hanger-rod-sizing": { module: "../../calc-pipefit.js", fn: "computeHangerRodSizing" },
   "condensate-return-sizing": { module: "../../calc-pipefit.js", fn: "computeCondensateReturnSizing" },

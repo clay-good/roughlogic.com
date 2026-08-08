@@ -32008,6 +32008,43 @@ test("bounds: spec-v1113 computeAsmeShellThickness pins both UG-27 forms, the ex
   assert.ok("error" in _v1113({ ...base, design_pressure_psi: Infinity }));
 });
 
+import { computeAsmeHeadThickness as _v1233 } from "../../calc-pipefit.js";
+test("bounds: spec-v1233 computeAsmeHeadThickness pins the three UG-32 head forms, the MAWP round trips, the head-shape ranking, and error seams", () => {
+  const base = { design_pressure_psi: 150, inside_diameter_in: 48, allowable_stress_psi: 17500, joint_efficiency: 0.85, corrosion_allowance_in: 0.0625, head_type: "ellipsoidal" };
+  const ell = _v1233(base);
+  assert.ok(Math.abs(ell.se - 14875) < 1e-9);
+  // 2:1 ellipsoidal: t = P D / (2 S E - 0.2 P).
+  assert.ok(Math.abs(ell.t_required_in - 150 * 48 / (2 * 14875 - 0.2 * 150)) < 1e-12);
+  assert.ok(Math.abs(ell.t_required_in - 0.242261) < 5e-6);
+  assert.ok(Math.abs(ell.t_with_allowance_in - (ell.t_required_in + 0.0625)) < 1e-12);
+  assert.ok(Math.abs(ell.mawp_psi - 150) < 1e-9);
+  // Hemispherical: t = P R / (2 S E - 0.2 P), R = D/2, so exactly half the ellipsoidal wall.
+  const hemi = _v1233({ ...base, head_type: "hemispherical" });
+  assert.ok(Math.abs(hemi.t_required_in - 150 * 24 / (2 * 14875 - 0.2 * 150)) < 1e-12);
+  assert.ok(Math.abs(hemi.t_required_in - ell.t_required_in / 2) < 1e-12);
+  assert.ok(Math.abs(hemi.mawp_psi - 150) < 1e-9);
+  // Standard F&D torispherical: t = 0.885 P L / (S E - 0.1 P), L = D; the thickest of the three.
+  const tori = _v1233({ ...base, head_type: "torispherical" });
+  assert.ok(Math.abs(tori.t_required_in - 0.885 * 150 * 48 / (14875 - 0.1 * 150)) < 1e-12);
+  assert.ok(Math.abs(tori.mawp_psi - 150) < 1e-9);
+  // Head-shape ranking: hemispherical < ellipsoidal < torispherical wall for the same duty.
+  assert.ok(hemi.t_required_in < ell.t_required_in && ell.t_required_in < tori.t_required_in);
+  // CASTI Guidebook Example 8.1 cross-check: standard torispherical reproduces the published 1.350 in.
+  const casti = _v1233({ design_pressure_psi: 150, inside_diameter_in: 121.8, allowable_stress_psi: 12000, joint_efficiency: 1.0, corrosion_allowance_in: 0, head_type: "torispherical" });
+  assert.ok(Math.abs(casti.t_required_in - 1.3491) < 1e-3);
+  // A pressure that drives a denominator non-positive errors rather than returning nonsense.
+  assert.ok("error" in _v1233({ ...base, design_pressure_psi: 200000 }));
+  // Error seams.
+  assert.ok("error" in _v1233({ ...base, head_type: "conical" }));
+  assert.ok("error" in _v1233({ ...base, design_pressure_psi: 0 }));
+  assert.ok("error" in _v1233({ ...base, inside_diameter_in: 0 }));
+  assert.ok("error" in _v1233({ ...base, allowable_stress_psi: 0 }));
+  assert.ok("error" in _v1233({ ...base, joint_efficiency: 0 }));
+  assert.ok("error" in _v1233({ ...base, joint_efficiency: 1.2 }));
+  assert.ok("error" in _v1233({ ...base, corrosion_allowance_in: -1 }));
+  assert.ok("error" in _v1233({ ...base, design_pressure_psi: Infinity }));
+});
+
 import { computeChipSealMcleod as _v1114 } from "../../calc-construction.js";
 
 test("bounds: spec-v1114 computeChipSealMcleod pins all four McLeod equations, the flakiness effect, the aggregate-is-geometric invariant, the inverse traffic direction, and error seams", () => {

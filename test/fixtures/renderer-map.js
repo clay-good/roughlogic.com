@@ -189,6 +189,7 @@ export const RENDERER_MAP = {
   "radiator-edr-output": { module: "../../calc-pipefit.js", exportName: "PIPEFIT_RENDERERS" },
   "pipe-pressure-rating": { module: "../../calc-pipefit.js", exportName: "PIPEFIT_RENDERERS" },
   "asme-shell-thickness": { module: "../../calc-pipefit.js", exportName: "PIPEFIT_RENDERERS" },
+  "asme-head-thickness": { module: "../../calc-pipefit.js", exportName: "PIPEFIT_RENDERERS" },
   "pipe-filled-support-load": { module: "../../calc-pipefit.js", exportName: "PIPEFIT_RENDERERS" },
   "hanger-rod-sizing": { module: "../../calc-pipefit.js", exportName: "PIPEFIT_RENDERERS" },
   "condensate-return-sizing": { module: "../../calc-pipefit.js", exportName: "PIPEFIT_RENDERERS" },

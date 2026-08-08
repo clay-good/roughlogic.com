@@ -16554,6 +16554,18 @@ export const CITATIONS = {
       { name: "Longitudinal-joint case only", value: "the circumferential-joint (longitudinal stress) equation is omitted rather than shipped unverified", source: "stated scope limit" },
     ],
   },
+  "asme-head-thickness": {
+    formula: "2:1 ellipsoidal: t = P D / (2 S E - 0.2 P). Hemispherical: t = P R / (2 S E - 0.2 P), R = D/2. Standard flanged-and-dished torispherical (L = D, r = 0.06 L): t = 0.885 P L / (S E - 0.1 P). D is the inside diameter; the corrosion allowance is added after.",
+    edition: "ASME BPVC Section VIII Division 1, UG-32, formed-head thickness under internal pressure, by section number; no allowable-stress or joint-efficiency table is reproduced - both are entered.",
+    freeAccess: "The UG-32 head equations are reproduced across published engineering references; both the equations and the 0.885 standard-F&D coefficient were confirmed against the CASTI Guidebook to ASME Section VIII Div 1 (Eq 8.1 and worked Example 8.1) and a second independent source. The BPVC itself is available through ASME.",
+    governance: GOVERNANCE.general,
+    editionNote: "The head thickness the UG-27 asme-shell-thickness tile names as out of scope. For the same vessel the hemispherical head is thinnest (the strongest shape), the 2:1 ellipsoidal about twice that, and the standard torispherical the thickest - a cheap dished head trades wall for a shallow profile. D is the INSIDE diameter in the corroded condition and E the joint efficiency; the corrosion allowance is ADDED after the strength calculation. The 0.885 torispherical coefficient is for the standard L = D, r = 0.06 L head; other L/r ratios use the M factor of Appendix 1-4 and ellipsoidal ratios other than 2:1 use the K factor - both outside this tile. Knuckle thinning during forming, the minimum-thickness-after-forming rule, staying/stiffening, and external pressure are separate. The allowable stress must come from the code's table at the DESIGN temperature. ASME BPVC Section VIII and the vessel engineer govern - a check, not a stamped design.",
+    assumptions: [
+      { name: "Inside diameter, corroded", value: "D is the inside diameter in the corroded condition; the allowance is added to the computed thickness", source: "ASME BPVC VIII-1 UG-32" },
+      { name: "Standard heads", value: "2:1 ellipsoidal (K = 1) and standard F&D torispherical (L = D, r = 0.06 L, M = 1.77); other ratios use the K / M factors of Appendix 1-4", source: "ASME BPVC VIII-1 UG-32 / Appendix 1-4" },
+      { name: "Coefficients verified", value: "all three forms and the 0.885 coefficient confirmed vs CASTI Guidebook Eq 8.1 / Example 8.1 and a second source", source: "CASTI Guidebook to ASME Section VIII Div 1" },
+    ],
+  },
   "chip-seal-mcleod": {
     formula: "ALD H = M/(1.139285 + 0.011506 FI); voids V = 1 - W/(62.4 G); aggregate C = 46.8 (1 - 0.4 V) H G E lb/SY; binder B = (2.244 H T V + S + A)/R gal/SY.",
     edition: "The McLeod seal-coat design method as published in a US state DOT test procedure (public domain), by name; all four equations are quoted verbatim from that source rather than recalled.",

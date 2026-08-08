@@ -861,7 +861,7 @@ const _TILES = [
   ["steam-trap-sizing", "B"], ["steam-boiler-blowdown", "B"],
   ["boiler-horsepower", "B"], ["radiator-edr-output", "B"],
   ["steam-prv-napier", "B"], ["steam-prv-area-for-capacity", "B"],
-  ["pipe-pressure-rating", "B"], ["asme-shell-thickness", "B"],
+  ["pipe-pressure-rating", "B"], ["asme-shell-thickness", "B"], ["asme-head-thickness", "B"],
   ["pipe-filled-support-load", "B"],
   ["hanger-rod-sizing", "B"],
   // spec-v199 radiant (calc-plumbing.js); spec-v200..v203 pipefit (calc-pipefit.js)
