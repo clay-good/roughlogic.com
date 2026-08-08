@@ -20596,6 +20596,34 @@ test("bounds: spec-v705 computeMasonryAnchorEmbedment pins lbe = sqrt(T/(1.25 pi
   assert.ok("error" in _v705({ required_tension_lb: Infinity, fm_psi: 1500, ab_in2: 0.442, fy_psi: 36000 }));
 });
 
+// ===================== spec-v1232 masonry anchor bolt in shear (calc-masonry.js) =====================
+import { computeMasonryAnchorShear as _v1232 } from "../../calc-masonry.js";
+test("bounds: spec-v1232 computeMasonryAnchorShear pins the four TMS 402 modes, the governing switch, and error seams", () => {
+  // 3/4in A307, 1,500 psi, 5 in embed 4 in from edge: breakout governs at 1,217 lb.
+  const r = _v1232({ fm_psi: 1500, lb_in: 5, lbe_in: 4, ab_in2: 0.442, fy_psi: 36000 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.apv_in2 - Math.PI * 16 / 2) < 1e-9, `Apv = pi lbe^2/2: ${r.apv_in2}`);
+  assert.ok(Math.abs(r.bvb_lb - 1.25 * (Math.PI * 16 / 2) * Math.sqrt(1500)) < 1e-9);
+  assert.ok(Math.abs(r.bvc_lb - 350 * Math.pow(1500 * 0.442, 0.25)) < 1e-9);
+  assert.ok(Math.abs(r.bvpry_lb - 2.0 * (1.25 * (Math.PI * 25) * Math.sqrt(1500))) < 1e-9);
+  assert.ok(Math.abs(r.bvs_lb - 0.36 * 0.442 * 36000) < 1e-9);
+  assert.ok(Math.abs(r.bv_lb - 1216.7) < 1 && r.governing_mode === "masonry breakout");
+  assert.strictEqual(r.bv_lb, Math.min(r.bvb_lb, r.bvc_lb, r.bvpry_lb, r.bvs_lb));
+  // Away from an edge, masonry crushing governs (breakout climbs with lbe^2).
+  const far = _v1232({ fm_psi: 1500, lb_in: 8, lbe_in: 10, ab_in2: 0.442, fy_psi: 36000 });
+  assert.ok(far.governing_mode === "masonry crushing" && Math.abs(far.bv_lb - 1776.4) < 1);
+  // Very shallow embedment drops the pryout branch enough to govern.
+  const shallow = _v1232({ fm_psi: 1500, lb_in: 1.5, lbe_in: 12, ab_in2: 0.442, fy_psi: 36000 });
+  assert.strictEqual(shallow.governing_mode, "anchor pryout");
+  // Error seams: non-positive f'm, embedment, edge distance, area, yield, non-finite.
+  assert.ok("error" in _v1232({ fm_psi: 0, lb_in: 5, lbe_in: 4, ab_in2: 0.442, fy_psi: 36000 }));
+  assert.ok("error" in _v1232({ fm_psi: 1500, lb_in: 0, lbe_in: 4, ab_in2: 0.442, fy_psi: 36000 }));
+  assert.ok("error" in _v1232({ fm_psi: 1500, lb_in: 5, lbe_in: 0, ab_in2: 0.442, fy_psi: 36000 }));
+  assert.ok("error" in _v1232({ fm_psi: 1500, lb_in: 5, lbe_in: 4, ab_in2: 0, fy_psi: 36000 }));
+  assert.ok("error" in _v1232({ fm_psi: 1500, lb_in: 5, lbe_in: 4, ab_in2: 0.442, fy_psi: 0 }));
+  assert.ok("error" in _v1232({ fm_psi: Infinity, lb_in: 5, lbe_in: 4, ab_in2: 0.442, fy_psi: 36000 }));
+});
+
 // ===================== spec-v551 masonry unit-strength f'm (calc-masonry.js) =====================
 import { computeMasonryPrismFm as _v551 } from "../../calc-masonry.js";
 

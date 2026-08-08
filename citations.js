@@ -17705,6 +17705,18 @@ export const CITATIONS = {
       { name: "Tension only", value: "axial tension only; anchor shear (pryout) and combined shear-tension are separate checks", source: "TMS 402" },
     ],
   },
+  "masonry-anchor-shear": {
+    formula: "Bv = least of: masonry breakout Bvb = 1.25 x Apv x sqrt(f'm), Apv = pi x lbe^2 / 2; masonry crushing Bvc = 350 x (f'm x Ab)^(1/4); anchor pryout Bvpry = 2.0 x Bab, Bab = 1.25 x (pi lb^2) x sqrt(f'm); bolt steel Bvs = 0.36 x Ab x fy.",
+    edition: "TMS 402-16 (Building Code Requirements for Masonry Structures, ACI 530 / ASCE 5) allowable-stress anchor-bolt shear provisions (Section 8.1.5.2), as compiled in the Masonry Designers' Guide and CMHA TEK notes, by name.",
+    freeAccess: "CMHA TEK 12-03 anchor-bolt design notes are free public CMHA technical notes; the crushing coefficient 350 x (f'm Ab)^(1/4) is verified directly against NCMA TEK 12-03A, and the breakout / pryout / steel arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The shear companion the masonry-anchor-bolt / -embedment tension pair names as a separate check. The allowable shear is the LEAST of four modes: masonry breakout Bvb (edge-controlled, Apv = pi lbe^2 / 2 the half-cone toward the free edge), masonry crushing Bvc = 350 x (f'm Ab)^(1/4) (localized bearing, usually governs away from edges), anchor pryout Bvpry = 2.0 x Bab (very shallow embedment only), and bolt steel Bvs = 0.36 x Ab x fy (stout well-embedded interior bolt). The 0.36 shear-steel coefficient is the edition-stable 0.6 x the tension-steel 0.6 (TEK 12-03A had 0.12 = 0.6 x 0.2). The full half-cone Apv is an upper bound - overlapping cones or an open cell reduce it, and below 12 bolt diameters of edge distance TMS 402 further reduces the breakout branch toward zero at lbe = 1 in (not applied here). Combined tension and shear use the unity check ba/Ba + bv/Bv <= 1 separately. A design aid, not a substitute for the engineer of record's stamped design.",
+    assumptions: [
+      { name: "Four modes, least governs", value: "Bvb (breakout), Bvc (crushing), Bvpry (pryout), Bvs (steel); Bv = min", source: "TMS 402-16 Section 8.1.5.2" },
+      { name: "Crushing coefficient", value: "Bvc = 350 x (f'm x Ab)^(1/4), verified vs NCMA TEK 12-03A (stable across editions)", source: "NCMA TEK 12-03A / TMS 402" },
+      { name: "Full half-cone", value: "Apv = pi x lbe^2 / 2 assumes a full breakout half-cone; edge/overlap reductions and the < 12 db reduction are separate", source: "TMS 402" },
+    ],
+  },
   "cmu-shear-wall": {
     formula: "Fvm = 0.5 x ((4.0 - 1.75 x M/(V dv)) x sqrt(f'm)) + 0.25 x (P/An); Fvs = 0.5 x (Av Fs dv)/(An s); Fv = Fvm + Fvs, capped at 3 sqrt(f'm) (M/(V dv) <= 0.25) grading to 2 sqrt(f'm) (>= 1.0); Va = Fv An.",
     edition: "TMS 402-16 (ACI 530 / ASCE 5) allowable-stress in-plane shear provisions, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C, by name.",

@@ -440,6 +440,66 @@ MASONRY_RENDERERS["masonry-anchor-embedment"] = _simpleRenderer({
   compute: computeMasonryAnchorEmbedment,
 });
 
+// ===================== spec-v1232: masonry anchor bolt in SHEAR (Group E) =====================
+// The shear companion the masonry-anchor-bolt / -embedment tension pair names as "a separate
+// check." TMS 402-16 ASD (Section 8.1.5.2): the allowable shear is the LEAST of four modes --
+// masonry breakout Bvb = 1.25 x Apv x sqrt(f'm) with Apv = pi x lbe^2 / 2 (the half-cone toward
+// the free edge, lbe = edge distance); masonry crushing Bvc = 350 x (f'm x Ab)^(1/4); anchor
+// pryout Bvpry = 2.0 x Bab where Bab = 1.25 x Apt x sqrt(f'm) is the tension breakout on the
+// embedment (Apt = pi x lb^2); and steel Bvs = 0.36 x Ab x fy. The crushing 350 coefficient is
+// verified directly from NCMA TEK 12-03A (stable across editions); the 0.36 shear-steel
+// coefficient is the edition-stable 0.6 x the tension-steel 0.6 (TEK 12-03A had 0.12 = 0.6 x 0.2).
+// dims: in { fm_psi: M L^-1 T^-2, lb_in: L, lbe_in: L, ab_in2: L^2, fy_psi: M L^-1 T^-2 } out: { apv_in2: L^2, bvb_lb: M L T^-2, bvc_lb: M L T^-2, bvpry_lb: M L T^-2, bvs_lb: M L T^-2, bv_lb: M L T^-2 }
+export function computeMasonryAnchorShear({ fm_psi = 1500, lb_in = 5, lbe_in = 4, ab_in2 = 0.442, fy_psi = 36000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const fm = Number(fm_psi) || 0;
+  const lb = Number(lb_in) || 0;
+  const lbe = Number(lbe_in) || 0;
+  const ab = Number(ab_in2) || 0;
+  const fy = Number(fy_psi) || 0;
+  if (!(fm > 0)) return { error: "Masonry strength f'm must be positive (psi)." };
+  if (!(lb > 0)) return { error: "Effective embedment lb must be positive (in)." };
+  if (!(lbe > 0)) return { error: "Edge distance lbe must be positive (in)." };
+  if (!(ab > 0)) return { error: "Bolt area Ab must be positive (in^2)." };
+  if (!(fy > 0)) return { error: "Bolt yield fy must be positive (psi)." };
+  const apv_in2 = Math.PI * lbe * lbe / 2;
+  const apt_in2 = Math.PI * lb * lb;
+  const bvb_lb = 1.25 * apv_in2 * Math.sqrt(fm);
+  const bvc_lb = 350 * Math.pow(fm * ab, 0.25);
+  const bab_lb = 1.25 * apt_in2 * Math.sqrt(fm);
+  const bvpry_lb = 2.0 * bab_lb;
+  const bvs_lb = 0.36 * ab * fy;
+  const bv_lb = Math.min(bvb_lb, bvc_lb, bvpry_lb, bvs_lb);
+  const modes = [["masonry breakout", bvb_lb], ["masonry crushing", bvc_lb], ["anchor pryout", bvpry_lb], ["bolt steel", bvs_lb]];
+  const governing_mode = modes.reduce((a, b) => (b[1] < a[1] ? b : a))[0];
+  if (![apv_in2, bvb_lb, bvc_lb, bvpry_lb, bvs_lb, bv_lb].every(Number.isFinite)) return { error: "Shear capacity is not a finite value." };
+  return {
+    apv_in2, bvb_lb, bvc_lb, bvpry_lb, bvs_lb, bv_lb, governing_mode,
+    note: "TMS 402-16 allowable-stress design of a headed anchor bolt in shear in grouted masonry: the allowable is the LEAST of four modes. Masonry breakout Bvb = 1.25 x Apv x sqrt(f'm), with Apv = pi x lbe^2 / 2 the projected half-cone toward the free edge (lbe = edge distance), governs only when the bolt is near an edge. Masonry crushing Bvc = 350 x (f'm x Ab)^(1/4), localized bearing of the shank on the block, usually governs away from edges. Anchor pryout Bvpry = 2.0 x Bab (Bab = the tension breakout on the embedment) governs only at very shallow embedment. Bolt steel Bvs = 0.36 x Ab x fy governs for a stout, well-embedded, interior bolt. Overlapping cones or an open cell reduce Apv (the full-half-cone value is an upper bound), and when lbe is below 12 bolt diameters TMS 402 further reduces the breakout branch toward zero at lbe = 1 in -- not applied here, so verify the edge branch separately for a shallow edge distance. Combined tension and shear use the unity check ba/Ba + bv/Bv <= 1 (a separate step). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  };
+}
+export const masonryAnchorShearExample = { inputs: { fm_psi: 1500, lb_in: 5, lbe_in: 4, ab_in2: 0.442, fy_psi: 36000 } };
+MASONRY_RENDERERS["masonry-anchor-shear"] = _simpleRenderer({
+  citation: "Citation: TMS 402-16 ASD headed anchor bolt shear (Section 8.1.5.2): allowable = least of masonry breakout Bvb = 1.25 x Apv x sqrt(f'm) (Apv = pi lbe^2 / 2, lbe = edge distance), masonry crushing Bvc = 350 x (f'm Ab)^(1/4), anchor pryout Bvpry = 2.0 x Bab (Bab = 1.25 x pi lb^2 x sqrt(f'm)), and bolt steel Bvs = 0.36 x Ab x fy. Crushing coefficient verified vs NCMA TEK 12-03A. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: masonryAnchorShearExample.inputs,
+  fields: [
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", default: 1500 },
+    { key: "lb_in", label: "Effective embedment lb (in)", kind: "number", default: 5 },
+    { key: "lbe_in", label: "Edge distance lbe (in)", kind: "number", default: 4 },
+    { key: "ab_in2", label: "Bolt tensile area Ab (in^2, 3/4in = 0.442)", kind: "number", default: 0.442 },
+    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number", default: 36000 },
+  ],
+  outputs: [
+    { key: "bv", id: "mas-out-bv", label: "Allowable shear Bv", value: (r) => fmt(r.bv_lb, 0) + " lb (" + r.governing_mode + " governs)" },
+    { key: "bvb", id: "mas-out-bvb", label: "Masonry breakout Bvb", value: (r) => fmt(r.bvb_lb, 0) + " lb (Apv = " + fmt(r.apv_in2, 1) + " in^2)" },
+    { key: "bvc", id: "mas-out-bvc", label: "Masonry crushing Bvc", value: (r) => fmt(r.bvc_lb, 0) + " lb" },
+    { key: "bvpry", id: "mas-out-bvpry", label: "Anchor pryout Bvpry", value: (r) => fmt(r.bvpry_lb, 0) + " lb" },
+    { key: "bvs", id: "mas-out-bvs", label: "Bolt steel Bvs", value: (r) => fmt(r.bvs_lb, 0) + " lb" },
+    { key: "n", id: "mas-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMasonryAnchorShear,
+});
+
 // ===================== spec-v551: masonry unit-strength f'm (Group E) =====================
 // The upstream f'm the whole CMU wall bench (cmu-wall-axial / -flexure / -shear-wall /
 // masonry-anchor-bolt) consumes but none derives. TMS 602-16 Table 2 unit-strength

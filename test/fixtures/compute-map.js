@@ -1523,6 +1523,7 @@ export const COMPUTE_MAP = {
   "glulam-volume-factor": { module: "../../calc-construction.js", fn: "computeGlulamVolumeFactor" },
   "masonry-anchor-bolt": { module: "../../calc-masonry.js", fn: "computeMasonryAnchorBolt" },
   "masonry-anchor-embedment": { module: "../../calc-masonry.js", fn: "computeMasonryAnchorEmbedment" },
+  "masonry-anchor-shear": { module: "../../calc-masonry.js", fn: "computeMasonryAnchorShear" },
   "rc-development-length": { module: "../../calc-concrete.js", fn: "computeRcDevelopmentLength" },
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio (3 tiles, new calc-geotech.js)
   "soil-bearing-capacity": { module: "../../calc-geotech.js", fn: "computeSoilBearingCapacity" },

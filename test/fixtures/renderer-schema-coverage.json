@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1604,
-  "covered_count": 1176,
+  "total_tiles": 1605,
+  "covered_count": 1177,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -593,6 +593,7 @@
     "markup",
     "masonry-anchor-bolt",
     "masonry-anchor-embedment",
+    "masonry-anchor-shear",
     "masonry-control-joint-layout",
     "masonry-coursing",
     "masonry-joint-reinforcement",

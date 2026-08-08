@@ -925,6 +925,7 @@ export const RENDERER_MAP = {
   "masonry-limited-access-zone": { module: "../../calc-masonry.js", exportName: "MASONRY_RENDERERS" },
   "masonry-anchor-bolt": { module: "../../calc-masonry.js", exportName: "MASONRY_RENDERERS" },
   "masonry-anchor-embedment": { module: "../../calc-masonry.js", exportName: "MASONRY_RENDERERS" },
+  "masonry-anchor-shear": { module: "../../calc-masonry.js", exportName: "MASONRY_RENDERERS" },
   "masonry-prism-fm": { module: "../../calc-masonry.js", exportName: "MASONRY_RENDERERS" },
   "diaphragm-shear": { module: "../../calc-lateral.js", exportName: "LATERAL_RENDERERS" },
   "shearwall-overturning": { module: "../../calc-lateral.js", exportName: "LATERAL_RENDERERS" },

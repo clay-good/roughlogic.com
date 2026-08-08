@@ -68412,6 +68412,60 @@
    }
   },
   {
+   "tile_id": "masonry-anchor-shear",
+   "source_publisher": "TMS 402-16 ASD (Section 8.1.5.2)",
+   "source_title": "Bv = least of breakout / crushing / pryout / steel",
+   "source_edition_or_year": "spec-v1232 worked example (machine-verified; crushing 350 coeff vs NCMA TEK 12-03A)",
+   "source_section_or_page": "3/4in A307, 1,500 psi, 5 in embed 4 in from edge: Bvb 1,217 (governs), Bvc 1,776, Bvpry 7,605, Bvs 5,728",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "fm_psi": 1500,
+    "lb_in": 5,
+    "lbe_in": 4,
+    "ab_in2": 0.442,
+    "fy_psi": 36000
+   },
+   "outputs": {
+    "bv_lb": {
+     "value": 1216.6,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "bvc_lb": {
+     "value": 1776.4,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-anchor-shear",
+   "source_publisher": "TMS 402-16 ASD (crushing-governs cross-check)",
+   "source_title": "away from an edge, masonry crushing governs",
+   "source_edition_or_year": "spec-v1232 worked example (machine-verified)",
+   "source_section_or_page": "same 3/4in bolt, 8 in embed 10 in from edge: breakout climbs to 4,866 lb so Bvc = 1,776 lb governs",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "fm_psi": 1500,
+    "lb_in": 8,
+    "lbe_in": 10,
+    "ab_in2": 0.442,
+    "fy_psi": 36000
+   },
+   "outputs": {
+    "bv_lb": {
+     "value": 1776.4,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cross-connection-air-gap",
    "source_publisher": "IPC 608.15.1 / ASME A112.1.2",
    "source_title": "1 in opening, not near a wall -> 2 in air gap (3 in near a wall)",

@@ -56837,6 +56837,26 @@
       "kind": "question"
     },
     {
+      "term": "masonry anchor bolt shear capacity",
+      "target": "masonry-anchor-shear",
+      "kind": "industry"
+    },
+    {
+      "term": "anchor bolt pryout crushing shear masonry",
+      "target": "masonry-anchor-shear",
+      "kind": "question"
+    },
+    {
+      "term": "tms 402 anchor shear breakout",
+      "target": "masonry-anchor-shear",
+      "kind": "industry"
+    },
+    {
+      "term": "allowable shear on cmu anchor bolt",
+      "target": "masonry-anchor-shear",
+      "kind": "question"
+    },
+    {
       "term": "block shear wall capacity",
       "target": "cmu-shear-wall",
       "kind": "question"
