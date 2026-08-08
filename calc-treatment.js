@@ -181,6 +181,58 @@ function renderSluiceGateFlow(inputRegion, outputRegion, citationEl) {
 }
 TREATMENT_RENDERERS["sluice-gate-flow"] = renderSluiceGateFlow;
 
+// spec-v1241: broad-crested weir free-flow discharge -- the critical-flow weir that completes the
+// weir family (the sharp-crested trio V-notch/rectangular/Cipolletti is already covered). At the
+// crest the flow passes through critical depth, so Q = Cd (2/3)^1.5 sqrt(g) L H^1.5; the theoretical
+// coefficient (2/3)^1.5 sqrt(g) = 3.089 (ft units), well below the 3.33 sharp-crested Francis value,
+// and Cd ~ 0.85-0.95 for losses. First-principles critical-flow hydraulics / USBR Water Measurement
+// Manual. g = 32.2 ft/s^2.
+// dims: in { crest_length_ft: L, head_ft: L, discharge_coeff: dimensionless } out: { effective_coeff: dimensionless, flow_cfs: L^3 T^-1, flow_gpm: L^3 T^-1, flow_mgd: L^3 T^-1 }
+export function computeBroadCrestedWeir({ crest_length_ft = 0, head_ft = 0, discharge_coeff = 0 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  const L = Number(crest_length_ft) || 0;
+  const H = Number(head_ft) || 0;
+  if (!(L > 0)) return { error: "Crest length must be positive (ft)." };
+  if (!(H > 0)) return { error: "Head over crest must be positive (ft)." };
+  const Cd = discharge_coeff > 0 ? discharge_coeff : 0.9;
+  if (!(Cd > 0 && Cd <= 1)) return { error: "Discharge coefficient must be over 0 and up to 1.0 (about 0.85-0.95 for a well-rounded broad crest)." };
+  const g = 32.2; // ft/s^2
+  const K = Math.pow(2 / 3, 1.5) * Math.sqrt(g); // theoretical critical-flow coefficient = 3.0888
+  const effective_coeff = Cd * K;
+  const cfs = effective_coeff * L * Math.pow(H, 1.5);
+  const gpm = cfs * 448.831;
+  const mgd = gpm * 1440 / 1e6;
+  if (![effective_coeff, cfs, gpm, mgd].every(Number.isFinite)) return { error: "Broad-crested-weir math is not a finite value." };
+  return {
+    effective_coeff, flow_cfs: cfs, flow_gpm: gpm, flow_mgd: mgd,
+    note: "The free-flow discharge over a broad-crested weir, the critical-flow member that completes the weir family alongside the sharp-crested V-notch, rectangular, and Cipolletti weirs. A broad, level crest long enough (in the flow direction) to force the flow through CRITICAL depth on the crest gives Q = Cd (2/3)^1.5 sqrt(g) L H^1.5, where L is the crest width across the channel, H is the upstream head above the crest, and g = 32.2 ft/s^2. The theoretical coefficient (2/3)^1.5 sqrt(g) = 3.089 is well below the 3.33 of a sharp-crested (Francis) weir -- a broad crest passes less flow at the same head -- and the discharge coefficient Cd (about 0.85-0.95 for a well-rounded upstream nose) trims it further for boundary-layer and approach losses, so the effective coefficient here is about 2.6-2.9. A 10 ft crest at 1 ft of head with Cd 0.90 passes about 27.8 cfs. Broad-crested weirs are the workhorse for spillways, embankment and road-overtopping checks, and long-throated flumes because the rating is stable and the crest tolerates debris and submergence better than a sharp edge. This is the FREE-flow rating (modular flow, critical depth on the crest); heavy downstream submergence reduces it and the approach-velocity head is neglected. An operations aid; the USBR Water Measurement Manual, the weir's calibration, and the operator or engineer of record govern.",
+  };
+}
+export const broadCrestedWeirExample = { inputs: { crest_length_ft: 10, head_ft: 1, discharge_coeff: 0 } };
+function renderBroadCrestedWeir(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: broad-crested (critical-flow) weir free-flow discharge Q = Cd (2/3)^1.5 sqrt(g) L H^1.5, theoretical coefficient (2/3)^1.5 sqrt(g) = 3.089 (ft units, below the 3.33 sharp-crested Francis value), Cd ~ 0.85-0.95, per first-principles critical-flow hydraulics and the USBR Water Measurement Manual (public domain). Free-flow (modular) only; the approach-velocity head is neglected. Free at usbr.gov/tsc/techreferences/mands/wmm.";
+  const L = makeNumber("Crest length L, across channel (ft)", "bcw-l", { step: "any", min: "0", value: "10" }); L.input.value = "10";
+  const H = makeNumber("Head over crest H (ft)", "bcw-h", { step: "any", min: "0", value: "1" }); H.input.value = "1";
+  const coeff = makeNumber("Discharge coeff Cd (0 = default 0.90)", "bcw-c", { step: "any", min: "0", max: "1" });
+  for (const f of [L, H, coeff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { L.input.value = "10"; H.input.value = "1"; coeff.input.value = ""; update(); });
+  const oCfs = makeOutputLine(outputRegion, "Flow (cfs)", "bcw-out-cfs");
+  const oGpm = makeOutputLine(outputRegion, "Flow (GPM / MGD)", "bcw-out-gpm");
+  const oC = makeOutputLine(outputRegion, "Effective coefficient (Cd x 3.089)", "bcw-out-c");
+  const oNote = makeOutputLine(outputRegion, "Note", "bcw-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeBroadCrestedWeir({ crest_length_ft: readNum(L.input), head_ft: readNum(H.input), discharge_coeff: readNum(coeff.input) });
+    if (r.error) { oCfs.textContent = r.error; oGpm.textContent = ""; oC.textContent = "-"; oNote.textContent = ""; return; }
+    oCfs.textContent = fmt(r.flow_cfs, 2) + " cfs";
+    oGpm.textContent = fmt(r.flow_gpm, 0) + " GPM (" + fmt(r.flow_mgd, 2) + " MGD)";
+    oC.textContent = fmt(r.effective_coeff, 3) + " (sharp-crested is 3.33)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [L.input, H.input, coeff.input]) f.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["broad-crested-weir"] = renderBroadCrestedWeir;
+
 // --- spec-v658 M: weir head from a target flow (inverse of weir-flow) ---
 // V-notch H = (Q/C)^(1/2.48); rect suppressed H = (Q/(C L))^(2/3); rect
 // contracted solves L-0.2H by a few fixed-point passes seeded from suppressed.

@@ -98,7 +98,7 @@ const _TILES = [
   ["search-probability", "P"],
   ["brine-cure", "O"], ["bakers-percentage", "O"], ["dough-water-temperature", "O"],
   ["power-distro", "N"],
-  ["weir-flow", "M"], ["cipolletti-weir", "M"], ["sluice-gate-flow", "M"], ["weir-head-from-flow", "M"],
+  ["weir-flow", "M"], ["cipolletti-weir", "M"], ["sluice-gate-flow", "M"], ["broad-crested-weir", "M"], ["weir-head-from-flow", "M"],
   ["langelier-index", "M"],
   ["chemical-feed-pump", "M"],
   ["clarifier-surface-loading", "M"], ["clarifier-area-for-loading", "M"], ["bod-tss-loading-removal", "M"], ["design-flow-peaking", "M"], ["tds-from-conductivity", "M"], ["conductivity-from-tds", "M"],

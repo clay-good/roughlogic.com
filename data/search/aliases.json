@@ -926,6 +926,21 @@
       "kind": "question"
     },
     {
+      "term": "broad crested weir",
+      "target": "broad-crested-weir",
+      "kind": "industry"
+    },
+    {
+      "term": "spillway weir discharge",
+      "target": "broad-crested-weir",
+      "kind": "question"
+    },
+    {
+      "term": "critical flow weir crest",
+      "target": "broad-crested-weir",
+      "kind": "question"
+    },
+    {
       "term": "v-notch weir",
       "target": "weir-flow",
       "kind": "redirect"

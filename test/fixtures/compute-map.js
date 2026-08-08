@@ -59,6 +59,7 @@ export const COMPUTE_MAP = {
   "weir-flow": { module: "../../calc-treatment.js", fn: "computeWeirFlow" },
   "cipolletti-weir": { module: "../../calc-treatment.js", fn: "computeCipollettiWeir" },
   "sluice-gate-flow": { module: "../../calc-treatment.js", fn: "computeSluiceGateFlow" },
+  "broad-crested-weir": { module: "../../calc-treatment.js", fn: "computeBroadCrestedWeir" },
   "weir-head-from-flow": { module: "../../calc-treatment.js", fn: "computeWeirHeadFromFlow" },
   "langelier-index": { module: "../../calc-treatment.js", fn: "computeLangelierIndex" },
   "chemical-feed-pump": { module: "../../calc-treatment.js", fn: "computeChemicalFeedPump" },

@@ -10378,6 +10378,33 @@ test("bounds: spec-v658 computeWeirHeadFromFlow inverts the weir equations (clos
 });
 
 import { computeCipollettiWeir as _v1227 } from "../../calc-treatment.js";
+import { computeBroadCrestedWeir as _v1241 } from "../../calc-treatment.js";
+test("bounds: spec-v1241 computeBroadCrestedWeir pins Q = Cd (2/3)^1.5 sqrt(g) L H^1.5, the below-sharp-crested coefficient, the H^1.5 scaling, and error seams", () => {
+  const g = 32.2, K = Math.pow(2 / 3, 1.5) * Math.sqrt(g);
+  assert.ok(Math.abs(K - 3.0888) < 5e-4); // theoretical coefficient
+  // 10 ft crest, 1 ft head, default Cd 0.90: effective coeff 2.78, Q 27.8 cfs.
+  const r = _v1241({ crest_length_ft: 10, head_ft: 1, discharge_coeff: 0 });
+  assert.ok(Math.abs(r.effective_coeff - 0.9 * K) < 1e-12);
+  assert.ok(Math.abs(r.effective_coeff - 2.78) < 5e-3);
+  assert.ok(Math.abs(r.flow_cfs - 0.9 * K * 10 * Math.pow(1, 1.5)) < 1e-9);
+  assert.ok(Math.abs(r.flow_cfs - 27.8) < 0.05);
+  assert.ok(Math.abs(r.flow_gpm - r.flow_cfs * 448.831) < 1e-6);
+  // The broad-crested effective coefficient is below the 3.33 sharp-crested (Francis) value.
+  assert.ok(r.effective_coeff < 3.33);
+  // Flow scales linearly with crest length and as H^1.5.
+  const wide = _v1241({ crest_length_ft: 20, head_ft: 1, discharge_coeff: 0 });
+  assert.ok(Math.abs(wide.flow_cfs - 2 * r.flow_cfs) < 1e-9);
+  const deep = _v1241({ crest_length_ft: 10, head_ft: 2, discharge_coeff: 0 });
+  assert.ok(Math.abs(deep.flow_cfs - r.flow_cfs * Math.pow(2, 1.5)) < 1e-9);
+  // An overridden Cd is used verbatim.
+  const cd95 = _v1241({ crest_length_ft: 10, head_ft: 1, discharge_coeff: 0.95 });
+  assert.ok(Math.abs(cd95.effective_coeff - 0.95 * K) < 1e-12);
+  // Error seams: non-positive length/head, Cd out of range, non-finite.
+  assert.ok("error" in _v1241({ crest_length_ft: 0, head_ft: 1 }));
+  assert.ok("error" in _v1241({ crest_length_ft: 10, head_ft: 0 }));
+  assert.ok("error" in _v1241({ crest_length_ft: 10, head_ft: 1, discharge_coeff: 1.5 }));
+  assert.ok("error" in _v1241({ crest_length_ft: Infinity, head_ft: 1 }));
+});
 import { computeSluiceGateFlow as _v1240 } from "../../calc-treatment.js";
 test("bounds: spec-v1240 computeSluiceGateFlow pins Cd = Cc/sqrt(1+Cc a/y1), Q = Cd b a sqrt(2 g y1), the shear scaling, and error seams", () => {
   const g = 32.2, Cc = 0.61;

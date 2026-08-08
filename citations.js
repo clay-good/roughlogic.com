@@ -696,6 +696,18 @@ export const CITATIONS = {
       { name: "Free-flow condition", value: "the tailwater must not drown the contracted jet; y1 is the upstream depth above the floor", source: "USBR Water Measurement Manual" },
     ],
   },
+  "broad-crested-weir": {
+    formula: "Q = Cd (2/3)^1.5 sqrt(g) L H^1.5, g = 32.2 ft/s^2; theoretical coefficient (2/3)^1.5 sqrt(g) = 3.0888 (ft units); effective C = Cd x 3.0888, Cd ~ 0.85-0.95. 1 cfs = 448.831 GPM; MGD = GPM x 1440 / 1e6.",
+    edition: "First-principles critical-flow open-channel hydraulics - the broad-crested weir discharge - and the USBR Water Measurement Manual (public domain), by name.",
+    freeAccess: "Free at usbr.gov/tsc/techreferences/mands/wmm; the critical-flow (2/3)^1.5 sqrt(g) = 3.089 coefficient is a first-principles constant and the user may override Cd with a site calibration.",
+    governance: GOVERNANCE.general,
+    editionNote: "The free-flow discharge over a broad-crested weir, the critical-flow member that completes the weir family alongside the sharp-crested V-notch, rectangular, and Cipolletti weirs. A broad, level crest long enough in the flow direction forces the flow through CRITICAL depth on the crest, giving Q = Cd (2/3)^1.5 sqrt(g) L H^1.5, with L the crest width across the channel, H the upstream head above the crest, and g = 32.2 ft/s^2. The theoretical coefficient (2/3)^1.5 sqrt(g) = 3.089 is well below the 3.33 of a sharp-crested (Francis) weir -- a broad crest passes less flow at the same head -- and the discharge coefficient Cd (about 0.85-0.95 for a well-rounded upstream nose) trims it further for boundary-layer and approach losses, so the effective coefficient is about 2.6-2.9. A 10 ft crest at 1 ft of head with Cd 0.90 passes about 27.8 cfs. Broad-crested weirs run spillways, embankment and road-overtopping checks, and long-throated flumes because the rating is stable and the crest tolerates debris and submergence. This is the FREE-flow (modular) rating with critical depth on the crest; heavy downstream submergence reduces it and the approach-velocity head is neglected. An operations aid; the USBR Water Measurement Manual, the weir's calibration, and the operator or engineer of record govern.",
+    assumptions: [
+      { name: "Critical-flow discharge", value: "Q = Cd (2/3)^1.5 sqrt(g) L H^1.5; theoretical coefficient 3.089 (ft)", source: "critical-flow hydraulics / USBR Water Measurement Manual" },
+      { name: "Discharge coefficient", value: "Cd ~ 0.85-0.95 (editable); effective coefficient 2.6-2.9, below the 3.33 sharp-crested value", source: "USBR Water Measurement Manual" },
+      { name: "Free-flow, modular", value: "critical depth on the crest; heavy submergence reduces it, approach-velocity head neglected", source: "critical-flow theory" },
+    ],
+  },
   "weir-head-from-flow": {
     formula: "90-degree V-notch: H = (Q/C)^(1/2.48), C=2.49. Suppressed rectangular: H = (Q/(C L))^(2/3), C=3.33. Contracted rectangular: L-0.2H solved by fixed-point from the suppressed seed. 1 cfs = 448.831 GPM.",
     edition: "Per the USBR Water Measurement Manual (public domain) - the V-notch and Francis rectangular-weir equations solved for the head, the inverse of the weir-flow tile, by name.",
