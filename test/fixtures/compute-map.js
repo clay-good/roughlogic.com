@@ -1216,6 +1216,7 @@ export const COMPUTE_MAP = {
   // spec-v308..v310 geotechnical depth-2 batch (3 tiles)
   "soil-consolidation-settlement": { module: "../../calc-geotech.js", fn: "computeSoilConsolidationSettlement" },
   "overconsolidated-settlement": { module: "../../calc-geotech.js", fn: "computeOverconsolidatedSettlement" },
+  "secondary-compression-settlement": { module: "../../calc-geotech.js", fn: "computeSecondaryCompression" },
   "settlement-limit-load": { module: "../../calc-geotech.js", fn: "computeSettlementLimitLoad" },
   "footing-eccentric-pressure": { module: "../../calc-geotech.js", fn: "computeFootingEccentricPressure" },
   "boussinesq-surcharge-wall": { module: "../../calc-geotech.js", fn: "computeBoussinesqSurchargeWall" },

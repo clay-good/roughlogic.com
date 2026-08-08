@@ -16593,6 +16593,34 @@ test("bounds: spec-v308 computeSoilConsolidationSettlement pins the settlement, 
   assert.ok("error" in _v308({ cc: Infinity, h_ft: 10, e0: 0.9, sig0_psf: 2000, dsig_psf: 1000 }));
 });
 
+import { computeSecondaryCompression as _v1206 } from "../../calc-geotech.js";
+
+test("bounds: spec-v1206 computeSecondaryCompression pins the creep settlement, the log-time growth, the C-alpha-eps identity, and error seams", () => {
+  const ex = { c_alpha: 0.02, h_ft: 10, ep: 0.85, t1_yr: 1, t2_yr: 50 };
+  const r = _v1206(ex);
+  // Ss = (Ca/(1+ep)) H log10(t2/t1) = (0.02/1.85) x 10 x log10(50) = 2.204 in.
+  assert.ok(Math.abs(r.c_alpha_eps - 0.02 / 1.85) < 1e-12);
+  assert.ok(Math.abs(r.ss_ft - (0.02 / 1.85) * 10 * Math.log10(50)) < 1e-12);
+  assert.ok(Math.abs(r.ss_in - r.ss_ft * 12) < 1e-12);
+  assert.ok(Math.abs(r.ss_in - 2.204) < 0.01);
+  // Log-time growth: 1->100 yr (log10 = 2) is exactly double the settlement of 1->10 yr (log10 = 1).
+  const to10 = _v1206({ ...ex, t2_yr: 10 }).ss_in;
+  const to100 = _v1206({ ...ex, t2_yr: 100 }).ss_in;
+  assert.ok(Math.abs(to100 - 2 * to10) < 1e-9);
+  // Doubling C-alpha doubles the settlement; a thicker layer scales linearly.
+  assert.ok(Math.abs(_v1206({ ...ex, c_alpha: 0.04 }).ss_in - 2 * r.ss_in) < 1e-9);
+  assert.ok(Math.abs(_v1206({ ...ex, h_ft: 20 }).ss_in - 2 * r.ss_in) < 1e-9);
+  // Error seams: t2 must exceed t1, positive inputs, finite.
+  assert.ok("error" in _v1206({}));
+  assert.ok("error" in _v1206({ ...ex, t2_yr: 1 }));
+  assert.ok("error" in _v1206({ ...ex, t2_yr: 0.5 }));
+  assert.ok("error" in _v1206({ ...ex, c_alpha: 0 }));
+  assert.ok("error" in _v1206({ ...ex, h_ft: 0 }));
+  assert.ok("error" in _v1206({ ...ex, t1_yr: 0 }));
+  assert.ok("error" in _v1206({ ...ex, ep: -1 }));
+  assert.ok("error" in _v1206({ ...ex, c_alpha: Infinity }));
+});
+
 import { computeOverconsolidatedSettlement as _v1202, computeSoilConsolidationSettlement as _v1202nc } from "../../calc-geotech.js";
 
 test("bounds: spec-v1202 computeOverconsolidatedSettlement pins the two branches, the NC reduction, monotonicity, and error seams", () => {

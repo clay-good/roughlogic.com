@@ -18162,6 +18162,26 @@
       "kind": "industry"
     },
     {
+      "term": "secondary compression settlement",
+      "target": "secondary-compression-settlement",
+      "kind": "industry"
+    },
+    {
+      "term": "creep settlement of clay",
+      "target": "secondary-compression-settlement",
+      "kind": "question"
+    },
+    {
+      "term": "c alpha secondary consolidation",
+      "target": "secondary-compression-settlement",
+      "kind": "industry"
+    },
+    {
+      "term": "long term settlement after primary consolidation",
+      "target": "secondary-compression-settlement",
+      "kind": "question"
+    },
+    {
       "term": "recompression index settlement",
       "target": "overconsolidated-settlement",
       "kind": "question"

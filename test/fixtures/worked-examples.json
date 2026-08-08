@@ -52786,6 +52786,46 @@
    }
   },
   {
+   "tile_id": "secondary-compression-settlement",
+   "source_publisher": "Das, Principles of Geotechnical Engineering / Holtz-Kovacs / Mesri",
+   "source_title": "Secondary compression: 10 ft clay, C-alpha 0.02, ep 0.85, 1 to 50 yr -> 2.20 in (spec-v1206)",
+   "source_edition_or_year": "standard secondary-consolidation relation",
+   "source_section_or_page": "C-alpha-eps = C-alpha/(1+ep) = 0.02/1.85 = 0.010811. Ss = C-alpha-eps x H x log10(t2/t1) = 0.010811 x 10 x log10(50/1) = 0.010811 x 10 x 1.69897 = 0.1837 ft = 2.204 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-07",
+   "inputs": {
+    "c_alpha": 0.02,
+    "h_ft": 10,
+    "ep": 0.85,
+    "t1_yr": 1,
+    "t2_yr": 50
+   },
+   "outputs": {
+    "ss_in": { "value": 2.204, "tolerance": { "abs": 0.01 } },
+    "ss_ft": { "value": 0.1837, "tolerance": { "abs": 0.001 } },
+    "c_alpha_eps": { "value": 0.010811, "tolerance": { "abs": 0.0001 } }
+   }
+  },
+  {
+   "tile_id": "secondary-compression-settlement",
+   "source_publisher": "standard secondary-consolidation relation",
+   "source_title": "cross-check: creep grows with the log of the time ratio (1 to 100 yr doubles the log term)",
+   "source_edition_or_year": "Ss proportional to log10(t2/t1)",
+   "source_section_or_page": "The same clay from 1 to 100 years: log10(100) = 2.0 exactly, so Ss = 0.010811 x 10 x 2.0 = 0.21622 ft = 2.595 in -- 18% more than the 50-year value for double the time, the decelerating log-time creep.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-07",
+   "inputs": {
+    "c_alpha": 0.02,
+    "h_ft": 10,
+    "ep": 0.85,
+    "t1_yr": 1,
+    "t2_yr": 100
+   },
+   "outputs": {
+    "ss_in": { "value": 2.595, "tolerance": { "abs": 0.01 } }
+   }
+  },
+  {
    "tile_id": "overconsolidated-settlement",
    "source_publisher": "Terzaghi primary consolidation, OC clay (Das / NAVFAC)",
    "source_title": "10 ft OC clay: a load crossing sigma'p settles 2.53 in, a smaller load below it only 0.31 in (spec-v1202)",

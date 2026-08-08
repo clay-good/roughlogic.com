@@ -779,6 +779,42 @@ GEOTECH_RENDERERS["overconsolidated-settlement"] = _simpleRenderer({
   compute: computeOverconsolidatedSettlement,
 });
 
+// dims: in { c_alpha: dimensionless, h_ft: L, ep: dimensionless, t1_yr: T, t2_yr: T } out: { ss_in: L, ss_ft: L, c_alpha_eps: dimensionless }
+export function computeSecondaryCompression({ c_alpha = 0, h_ft = 0, ep = 0, t1_yr = 0, t2_yr = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(c_alpha > 0)) return { error: "The secondary compression index C-alpha must be positive." };
+  if (!(h_ft > 0)) return { error: "Layer thickness must be positive (ft)." };
+  if (!(1 + ep > 0)) return { error: "The void ratio at end of primary must give a positive (1 + ep)." };
+  if (!(t1_yr > 0)) return { error: "The time to end of primary consolidation must be positive (yr)." };
+  if (!(t2_yr > t1_yr)) return { error: "The time of interest must be later than the end of primary consolidation (t2 > t1)." };
+  const c_alpha_eps = c_alpha / (1 + ep);                       // modified secondary compression index
+  const ss_ft = c_alpha_eps * h_ft * Math.log10(t2_yr / t1_yr);
+  const ss_in = ss_ft * 12;
+  if (![ss_ft, ss_in, c_alpha_eps].every(Number.isFinite)) return { error: "Secondary-compression math is not a finite value." };
+  return {
+    ss_ft, ss_in, c_alpha_eps,
+    note: "Secondary compression (creep) settlement, the slow settlement that continues AFTER primary consolidation is complete -- the part the primary-consolidation tiles leave out and the part that governs the long-term movement of organic and highly plastic clays. Ss = (C-alpha/(1+ep)) H log10(t2/t1), where C-alpha is the secondary compression index (the slope of void ratio versus log-time from the oedometer's tail), ep the void ratio at the end of primary consolidation, H the layer thickness, t1 the time primary consolidation completes, and t2 the time of interest. A 10 ft clay with C-alpha 0.02, ep 0.85, from the end of primary at 1 year out to 50 years, creeps another 2.2 in. Because it grows with the LOG of the time ratio, most of it accrues in the first decades but it never truly stops. C-alpha is roughly 0.04 (inorganic) to 0.05 (organic) times the compression index Cc (Mesri). Independent of the primary settlement and its time rate (consolidation-time-rate); add it to the primary total for the long-term settlement. A design aid; the oedometer data and the geotechnical engineer of record govern.",
+  };
+}
+export const secondaryCompressionExample = { inputs: { c_alpha: 0.02, h_ft: 10, ep: 0.85, t1_yr: 1, t2_yr: 50 } };
+GEOTECH_RENDERERS["secondary-compression-settlement"] = _simpleRenderer({
+  citation: "Citation: Secondary compression (creep) settlement Ss = (C-alpha/(1+ep)) H log10(t2/t1), the post-primary consolidation settlement, as compiled in Das / Holtz-Kovacs / Mesri, by name. C-alpha (secondary compression index) and ep (void ratio at end of primary) are from a consolidation (oedometer) test; C-alpha/Cc is about 0.04 inorganic to 0.05 organic (Mesri). Independent of the primary settlement and its time rate. A design aid; the oedometer data and the geotechnical engineer of record govern.",
+  example: secondaryCompressionExample.inputs,
+  fields: [
+    { key: "c_alpha", label: "Secondary compression index C-alpha", kind: "number" },
+    { key: "h_ft", label: "Clay layer thickness H (ft)", kind: "number" },
+    { key: "ep", label: "Void ratio at end of primary ep", kind: "number" },
+    { key: "t1_yr", label: "Time to end of primary t1 (yr)", kind: "number" },
+    { key: "t2_yr", label: "Time of interest t2 (yr)", kind: "number" },
+  ],
+  outputs: [
+    { key: "ss", id: "scs-out-ss", label: "Secondary compression settlement Ss", value: (r) => fmt(r.ss_in, 2) + " in (" + fmt(r.ss_ft, 4) + " ft)" },
+    { key: "cae", id: "scs-out-cae", label: "Modified secondary index C-alpha-eps", value: (r) => fmt(r.c_alpha_eps, 4) },
+    { key: "n", id: "scs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSecondaryCompression,
+});
+
 // dims: in { sc_allow_in: L, cc: dimensionless, h_ft: L, e0: dimensionless, sig0_psf: M L^-1 T^-2 } out: { dsig_psf: M L^-1 T^-2, final_stress_psf: M L^-1 T^-2, stress_ratio: dimensionless }
 export function computeSettlementLimitLoad({ sc_allow_in = 0, cc = 0, h_ft = 0, e0 = 0, sig0_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

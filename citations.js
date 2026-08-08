@@ -14361,6 +14361,19 @@ export const CITATIONS = {
       { name: "Reduction", value: "reduces to the NC-clay tile at OCR = sigma'p/sigma'0 = 1", source: "consistency check" },
     ],
   },
+  "secondary-compression-settlement": {
+    formula: "C-alpha-eps = C-alpha/(1+ep); Ss_ft = C-alpha-eps H log10(t2/t1); Ss_in = 12 Ss_ft.",
+    edition: "The secondary compression (creep) settlement Ss = (C-alpha/(1+ep)) H log10(t2/t1), the settlement after primary consolidation, as compiled in the Das, Holtz-Kovacs, and Mesri references, by name.",
+    freeAccess: "The secondary-compression relation is standard soil-mechanics theory in every geotechnical text; no proprietary table is used, and C-alpha and ep are the user's own oedometer results.",
+    governance: GOVERNANCE.general,
+    editionNote: "Secondary compression (creep) is the slow settlement that continues after primary consolidation is complete, and the primary-consolidation tiles leave it out. It governs the long-term movement of organic and highly plastic clays. Ss = (C-alpha/(1+ep)) H log10(t2/t1), where C-alpha is the secondary compression index (the slope of void ratio versus log-time from the oedometer tail), ep the void ratio at the end of primary consolidation, H the layer thickness, t1 the time primary consolidation completes, and t2 the time of interest. Because it grows with the log of the time ratio, most of it accrues in the first decades but it never truly stops. C-alpha is roughly 0.04 (inorganic) to 0.05 (organic) times the compression index Cc (Mesri's ratio). It is independent of the primary settlement and its time rate; add it to the primary total for the long-term settlement. A design aid; the oedometer data and the geotechnical engineer of record govern.",
+    assumptions: [
+      { name: "Settlement", value: "Ss = (C-alpha/(1+ep)) H log10(t2/t1)", source: "Das / Holtz-Kovacs / Mesri" },
+      { name: "Modified index", value: "C-alpha-eps = C-alpha/(1+ep), the strain-based secondary index", source: "soil-mechanics practice" },
+      { name: "Indices", value: "C-alpha and ep from a consolidation (oedometer) test; C-alpha/Cc about 0.04-0.05", source: "Mesri" },
+      { name: "Scope", value: "post-primary creep only; independent of the primary settlement and its time rate", source: "consistency with the primary tiles" },
+    ],
+  },
   "soil-consolidation-settlement": {
     formula: "Sc_ft = (Cc H / (1 + e0)) log10((sigma'0 + d_sigma) / sigma'0); Sc_in = 12 Sc_ft.",
     edition: "The Terzaghi primary consolidation settlement of a normally-consolidated clay Sc = (Cc H/(1 + e0)) log10((sigma'0 + d_sigma)/sigma'0), with the compression index Cc, as compiled in the Das and NAVFAC references, by name.",
