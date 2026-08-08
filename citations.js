@@ -7246,6 +7246,18 @@ export const CITATIONS = {
       { name: "Scope", value: "ideal gas only (van der Waals / Z for real gases); density needs the molar mass", source: "scope of this tile" },
     ],
   },
+  "van-der-waals": {
+    formula: "(P + a n^2/V^2)(V - n b) = nRT, solved for pressure: P = nRT/(V - n b) - a n^2/V^2; R = 0.0820573 L*atm/(mol*K), T in kelvin; a in L^2*atm/mol^2, b in L/mol per gas; compressibility Z = PV/(nRT); deviation vs ideal = (P_real - P_ideal)/P_ideal.",
+    edition: "The van der Waals equation of state (van der Waals, 1873); a and b constants from the CRC Handbook of Chemistry & Physics. First principles.",
+    freeAccess: "The van der Waals equation is public first-principles chemistry; the a and b constants are published in the public-domain CRC Handbook; moles, volume, and temperature are the user's own measurements.",
+    governance: GOVERNANCE.lab,
+    editionNote: "The van der Waals equation of state (P + a n^2/V^2)(V - n b) = nRT, the real-gas correction the ideal gas law leaves out, solved for pressure to give P = nRT/(V - n b) - a n^2/V^2, where the b term is the volume the molecules themselves occupy and the a term is the attraction between them. The compressibility factor Z = PV/(nRT) is 1 for an ideal gas; below 1 the attraction dominates (the gas is easier to compress than ideal, typical near condensation) and above 1 the excluded volume dominates (harder to compress, typical at very high pressure). Z drifts furthest from 1 at high pressure and low temperature, exactly where the ideal gas law misreads a sealed vessel or a compressed-gas cylinder. The a and b constants are the CRC Handbook values for each listed gas. A first-principles chemistry aid; near the critical point or the two-phase region a fuller equation of state and the real measurement govern.",
+    assumptions: [
+      { name: "van der Waals EOS", value: "(P + a n^2/V^2)(V - n b) = nRT; R = 0.0820573 L*atm/(mol*K); T in kelvin", source: "van der Waals, 1873" },
+      { name: "a and b constants", value: "per-gas attraction (a) and excluded-volume (b) constants", source: "CRC Handbook of Chemistry & Physics (public domain)" },
+      { name: "Scope", value: "single-phase gas; near the critical point or two-phase region a fuller EOS governs", source: "scope of this tile" },
+    ],
+  },
   "arrhenius-equation": {
     formula: "k = A exp(-Ea/RT); two-point Ea = R ln(k2/k1)/(1/T1 - 1/T2), R = 8.314 J/(mol*K), T in kelvin; A = k1 exp(Ea/(R T1)); Q10 = (k2/k1)^(10/dT_C).",
     edition: "The Arrhenius equation (Arrhenius, 1889); standard physical-chemistry kinetics. First principles.",

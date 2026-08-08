@@ -311,6 +311,55 @@ export function computeIdealGasLaw({ solve_for = "moles", pressure_atm = 0, volu
 }
 export const idealGasLawExample = { inputs: { solve_for: "volume", pressure_atm: 1, volume_l: 0, moles: 1, temperature_c: 25 } };
 
+// --- spec-v1258: van der Waals real-gas pressure and compressibility Z ---
+// The ideal-gas-law note names its own missing member: "Real gases deviate at high
+// pressure or near condensation (a van der Waals or compressibility Z correction is
+// separate)." This adds that correction. The van der Waals equation of state
+// (P + a n^2/V^2)(V - n b) = n R T, solved for pressure, gives P_real = n R T/(V - n b)
+// - a n^2/V^2; the a (attraction) and b (excluded-volume) constants are tabulated per
+// gas from the public-domain CRC Handbook. Z = P V/(n R T) reports the deviation from
+// ideal. R = 0.0820573 L*atm/(mol*K), a in L^2*atm/mol^2, b in L/mol, T in kelvin.
+const _VDW_CONSTANTS = {
+  // gas: [a (L^2*atm/mol^2), b (L/mol)] -- CRC Handbook of Chemistry & Physics, van der Waals constants
+  helium: [0.0346, 0.0238],
+  hydrogen: [0.2476, 0.02661],
+  nitrogen: [1.370, 0.0387],
+  oxygen: [1.382, 0.03186],
+  air: [1.358, 0.0364],
+  "carbon-dioxide": [3.640, 0.04267],
+  methane: [2.283, 0.04278],
+  ammonia: [4.225, 0.03707],
+  "water-vapor": [5.536, 0.03049],
+};
+// dims: in { gas: dimensionless, moles: N, volume_l: L^3, temperature_c: T } out: { pressure_real_atm: M L^-1 T^-2, pressure_ideal_atm: M L^-1 T^-2, z_factor: dimensionless, deviation_pct: dimensionless, molar_volume_l: L^3, temperature_k: T }
+export function computeVanDerWaals({ gas = "carbon-dioxide", moles = 0, volume_l = 0, temperature_c = 25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R = 0.0820573; // L*atm/(mol*K)
+  const c = _VDW_CONSTANTS[gas];
+  if (!c) return { error: "Gas must be one of the listed gases (helium, nitrogen, carbon-dioxide, ...)." };
+  const n = Number(moles) || 0;
+  const V = Number(volume_l) || 0;
+  const Tc = Number(temperature_c);
+  if (!(n > 0)) return { error: "Moles must be positive (mol)." };
+  if (!(V > 0)) return { error: "Volume must be positive (L)." };
+  if (!Number.isFinite(Tc)) return { error: "Temperature must be a number (C)." };
+  const Tk = Tc + 273.15;
+  if (!(Tk > 0)) return { error: "Temperature must be above absolute zero (-273.15 C)." };
+  const [a, b] = c;
+  if (!(V > n * b)) return { error: "Volume is at or below the molecules' own excluded volume (n b); the gas is too compressed for this model." };
+  const pReal = (n * R * Tk) / (V - n * b) - (a * n * n) / (V * V);
+  const pIdeal = (n * R * Tk) / V;
+  if (!(pReal > 0)) return { error: "Real-gas pressure is not positive at this density; the state is outside the model's valid range." };
+  const z = (pReal * V) / (n * R * Tk);
+  const deviationPct = ((pReal - pIdeal) / pIdeal) * 100;
+  const molarVolume = V / n;
+  const out = { pressure_real_atm: pReal, pressure_ideal_atm: pIdeal, z_factor: z, deviation_pct: deviationPct, molar_volume_l: molarVolume, temperature_k: Tk };
+  if (![pReal, pIdeal, z, deviationPct, molarVolume].every(Number.isFinite)) return { error: "Van der Waals math is not a finite value." };
+  out.note = "The van der Waals equation of state (P + a n^2/V^2)(V - n b) = n R T, the real-gas correction the ideal gas law leaves out -- solved for pressure it gives P = n R T/(V - n b) - a n^2/V^2, where the b term is the volume the molecules themselves occupy and the a term is the pull between them. The compressibility factor Z = PV/(nRT) is 1 for an ideal gas; below 1 the attraction dominates (the gas is easier to compress than ideal, typical near condensation) and above 1 the excluded volume dominates (harder to compress, typical at very high pressure). Z drifts furthest from 1 at high pressure and low temperature, which is exactly where the ideal gas law misreads a sealed vessel or a compressed-gas cylinder. The a and b constants are the CRC Handbook values for each gas. A first-principles chemistry aid; near the critical point or two-phase region a fuller EOS and the real measurement govern.";
+  return out;
+}
+export const vanDerWaalsExample = { inputs: { gas: "carbon-dioxide", moles: 1, volume_l: 1, temperature_c: 0 } };
+
 // --- spec-v1229: Arrhenius rate/temperature dependence ---
 // The lab kinetics set (doubling-time, growth-projected-count, michaelis-menten) has no rate-vs-temperature
 // member. This adds the Arrhenius equation via its two-point form: from two rate constants at two
@@ -746,6 +795,42 @@ function renderIdealGasLaw(inputRegion, outputRegion, citationEl) {
   solve.select.addEventListener("change", update);
 }
 
+function renderVanDerWaals(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: van der Waals equation of state (P + a n^2/V^2)(V - n b) = nRT, solved for pressure; a and b constants per gas from the CRC Handbook of Chemistry & Physics; R = 0.0820573 L*atm/(mol*K), T in kelvin. Compressibility Z = PV/(nRT). First principles. Near the critical point a fuller EOS governs.";
+  inputRegion.appendChild(makeNotice(LAB_NOTICE));
+  const gas = makeSelect("Gas", "vdw-gas", [
+    { value: "helium", label: "Helium" },
+    { value: "hydrogen", label: "Hydrogen" },
+    { value: "nitrogen", label: "Nitrogen" },
+    { value: "oxygen", label: "Oxygen" },
+    { value: "air", label: "Air" },
+    { value: "carbon-dioxide", label: "Carbon dioxide", selected: true },
+    { value: "methane", label: "Methane" },
+    { value: "ammonia", label: "Ammonia" },
+    { value: "water-vapor", label: "Water vapor" },
+  ]);
+  const n = makeNumber("Moles (mol)", "vdw-n", { step: "any", min: "0", value: "1" }); n.input.value = "1";
+  const v = makeNumber("Volume (L)", "vdw-v", { step: "any", min: "0", value: "1" }); v.input.value = "1";
+  const t = makeNumber("Temperature (C)", "vdw-t", { step: "any", value: "0" }); t.input.value = "0";
+  for (const f of [gas, n, v, t]) inputRegion.appendChild(f.wrap);
+  const oReal = makeOutputLine(outputRegion, "Real pressure (van der Waals)", "vdw-out-real");
+  const oIdeal = makeOutputLine(outputRegion, "Ideal pressure (PV=nRT)", "vdw-out-ideal");
+  const oZ = makeOutputLine(outputRegion, "Compressibility Z / deviation", "vdw-out-z");
+  const oNote = makeOutputLine(outputRegion, "Note", "vdw-out-note");
+  const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
+  const update = debounce(() => {
+    const r = computeVanDerWaals({ gas: gas.select.value, moles: rd(n.input), volume_l: rd(v.input), temperature_c: t.input.value === "" ? 0 : Number(t.input.value) });
+    if (r.error) { oReal.textContent = r.error; oIdeal.textContent = "-"; oZ.textContent = "-"; oNote.textContent = ""; return; }
+    oReal.textContent = fmt(r.pressure_real_atm, 4) + " atm";
+    oIdeal.textContent = fmt(r.pressure_ideal_atm, 4) + " atm";
+    oZ.textContent = "Z " + fmt(r.z_factor, 4) + " (" + (r.deviation_pct >= 0 ? "+" : "") + fmt(r.deviation_pct, 2) + "% vs ideal)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { gas.select.value = "carbon-dioxide"; n.input.value = "1"; v.input.value = "1"; t.input.value = "0"; update(); });
+  for (const f of [n, v, t]) f.input.addEventListener("input", update);
+  gas.select.addEventListener("change", update);
+}
+
 function renderArrheniusEquation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Arrhenius equation k = A exp(-Ea/RT), two-point form Ea = R ln(k2/k1)/(1/T1 - 1/T2), R = 8.314 J/(mol*K), temperatures in kelvin (Arrhenius, 1889). Q10 = (k2/k1)^(10/dT). Assumes a single mechanism over the interval. First principles.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
@@ -1000,6 +1085,7 @@ export const LAB_RENDERERS = {
   "molecular-weight": renderMolecularWeight,
   "mass-moles": renderMassMoles,
   "ideal-gas-law": renderIdealGasLaw,
+  "van-der-waals": renderVanDerWaals,
   "arrhenius-equation": renderArrheniusEquation,
   "clausius-clapeyron": renderClausiusClapeyron,
   "osmolarity": renderOsmolarity,

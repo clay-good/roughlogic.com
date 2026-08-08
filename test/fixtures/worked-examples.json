@@ -1348,6 +1348,64 @@
    }
   },
   {
+   "tile_id": "van-der-waals",
+   "source_publisher": "van der Waals equation of state (CRC Handbook constants)",
+   "source_title": "CO2, 1 mol in 1 L at 0 C -> P_real 19.77 atm, Z 0.882 (spec-v1258)",
+   "source_edition_or_year": "P = nRT/(V - nb) - a n^2/V^2; a = 3.640, b = 0.04267 for CO2",
+   "source_section_or_page": "P = (1 x 0.0820573 x 273.15)/(1 - 0.04267) - 3.640/1 = 23.413 - 3.640 = 19.773 atm; ideal 22.414 atm; Z = 19.773/22.414 = 0.882 (attraction dominates near condensation).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "gas": "carbon-dioxide",
+    "moles": 1,
+    "volume_l": 1,
+    "temperature_c": 0
+   },
+   "outputs": {
+    "pressure_real_atm": {
+     "value": 19.773,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "z_factor": {
+     "value": 0.882,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "van-der-waals",
+   "source_publisher": "van der Waals equation of state (CRC Handbook constants)",
+   "source_title": "helium, 1 mol in 1 L at 0 C -> Z slightly above 1 (excluded volume dominates)",
+   "source_edition_or_year": "a = 0.0346, b = 0.0238 for He",
+   "source_section_or_page": "P = (0.0820573 x 273.15)/(1 - 0.0238) - 0.0346/1 = 22.961 - 0.0346 = 22.926 atm; ideal 22.414 atm; Z = 22.926/22.414 = 1.023 (a weakly-attracting gas reads harder to compress than ideal).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "gas": "helium",
+    "moles": 1,
+    "volume_l": 1,
+    "temperature_c": 0
+   },
+   "outputs": {
+    "pressure_real_atm": {
+     "value": 22.926,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "z_factor": {
+     "value": 1.023,
+     "tolerance": {
+      "abs": 0.003
+     }
+    }
+   }
+  },
+  {
    "tile_id": "arrhenius-equation",
    "source_publisher": "Arrhenius equation (physical chemistry, 1889)",
    "source_title": "rate doubles from 25 to 35 C -> Ea 52.95 kJ/mol, A 1.89e9, Q10 2.0 (spec-v1229)",

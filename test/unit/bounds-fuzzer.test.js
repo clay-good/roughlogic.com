@@ -3828,6 +3828,7 @@ import {
   computeMolecularWeight,
   computeMassMoles,
   computeIdealGasLaw,
+  computeVanDerWaals,
   computeArrheniusEquation,
   computeClausiusClapeyron,
   computeOsmolarity,
@@ -3953,6 +3954,32 @@ test("bounds: spec-v1228 computeIdealGasLaw pins PV=nRT solved four ways, round-
   assert.ok("error" in computeIdealGasLaw({ solve_for: "temperature", pressure_atm: 1, volume_l: 10, moles: 0 }));
   assert.ok("error" in computeIdealGasLaw({ solve_for: "bogus", pressure_atm: 1, volume_l: 10, moles: 1 }));
   assert.ok("error" in computeIdealGasLaw({ solve_for: "moles", pressure_atm: Infinity, volume_l: 10, temperature_c: 25 }));
+});
+
+test("bounds: spec-v1258 computeVanDerWaals pins CO2 real pressure/Z, ideal limit, sign of deviation, and error seams", () => {
+  const R = 0.0820573;
+  // CO2, 1 mol in 1 L at 0 C: P_real = nRT/(V-nb) - a n^2/V^2 = 22.414/0.95733 - 3.640 = 19.773 atm.
+  const co2 = computeVanDerWaals({ gas: "carbon-dioxide", moles: 1, volume_l: 1, temperature_c: 0 });
+  assert.ok(Math.abs(co2.pressure_real_atm - 19.773) < 0.01);
+  assert.ok(Math.abs(co2.pressure_ideal_atm - R * 273.15) < 1e-9);
+  assert.ok(Math.abs(co2.z_factor - 0.882) < 0.002);
+  // Attraction dominates for CO2 near condensation: Z < 1 and deviation negative.
+  assert.ok(co2.z_factor < 1 && co2.deviation_pct < 0);
+  // Helium in the same state: excluded volume dominates, Z slightly above 1.
+  const he = computeVanDerWaals({ gas: "helium", moles: 1, volume_l: 1, temperature_c: 0 });
+  assert.ok(he.z_factor > 1 && he.deviation_pct > 0);
+  // Low-density limit approaches ideal: Z -> 1 as volume grows.
+  const dilute = computeVanDerWaals({ gas: "nitrogen", moles: 1, volume_l: 1000, temperature_c: 25 });
+  assert.ok(Math.abs(dilute.z_factor - 1) < 0.001);
+  // molar volume = V/n.
+  assert.ok(Math.abs(computeVanDerWaals({ gas: "air", moles: 2, volume_l: 10, temperature_c: 25 }).molar_volume_l - 5) < 1e-9);
+  // Error seams: unknown gas, non-positive moles/volume, sub-absolute-zero, over-compressed (V <= nb), non-finite.
+  assert.ok("error" in computeVanDerWaals({ gas: "xenon", moles: 1, volume_l: 1, temperature_c: 0 }));
+  assert.ok("error" in computeVanDerWaals({ gas: "air", moles: 0, volume_l: 1, temperature_c: 0 }));
+  assert.ok("error" in computeVanDerWaals({ gas: "air", moles: 1, volume_l: 0, temperature_c: 0 }));
+  assert.ok("error" in computeVanDerWaals({ gas: "air", moles: 1, volume_l: 1, temperature_c: -300 }));
+  assert.ok("error" in computeVanDerWaals({ gas: "carbon-dioxide", moles: 30, volume_l: 1, temperature_c: 0 }));
+  assert.ok("error" in computeVanDerWaals({ gas: "air", moles: Infinity, volume_l: 1, temperature_c: 0 }));
 });
 
 test("bounds: spec-v1229 computeArrheniusEquation pins Ea from two points, A, Q10, and error seams", () => {

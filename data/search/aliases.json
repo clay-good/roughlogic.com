@@ -85071,6 +85071,31 @@
       "kind": "question"
     },
     {
+      "term": "van der waals equation",
+      "target": "van-der-waals",
+      "kind": "industry"
+    },
+    {
+      "term": "real gas law",
+      "target": "van-der-waals",
+      "kind": "industry"
+    },
+    {
+      "term": "compressibility factor",
+      "target": "van-der-waals",
+      "kind": "industry"
+    },
+    {
+      "term": "z factor of a gas",
+      "target": "van-der-waals",
+      "kind": "question"
+    },
+    {
+      "term": "real gas pressure correction at high pressure",
+      "target": "van-der-waals",
+      "kind": "question"
+    },
+    {
       "term": "arrhenius equation",
       "target": "arrhenius-equation",
       "kind": "industry"

@@ -2485,6 +2485,7 @@ cross-check.
 | calc-lab.js | `computeResuspension` | `{ mass_g = 0, target_concentration = 0 }` | _ | _ | _ |
 | calc-lab.js | `computeSerialDilution` | `{ starting_concentration = 0, dilution_factor = 10, volume_per_tube = 0.001, ...` | _ | _ | _ |
 | calc-lab.js | `computeSubstrateForVelocity` | `{ km = 0, target_percent = 0 } = {}` | _ | _ | _ |
+| calc-lab.js | `computeVanDerWaals` | `{ gas = "carbon-dioxide", moles = 0, volume_l = 0, temperature_c = 25 } = {}` | _ | _ | _ |
 | calc-lab.js | `renderOd600CellCount` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-lateral.js | `computeDiaphragmCollectorForce` | `{ unit_shear_plf = 0, collector_len_ft = 0, omega0 = 2.5 } = {}` | _ | _ | _ |
 | calc-lateral.js | `computeDiaphragmShear` | `{ w_plf = 0, l_ft = 0, b_ft = 0 } = {}` | _ | _ | _ |
@@ -3292,7 +3293,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1878.
+Row count: 1879.
 
 <!-- END function-corpus-v14 -->
 
@@ -4970,7 +4971,7 @@ per spec-v14 §13.1 second paragraph.
 | `wip-percent-complete` | Work-in-Progress Percent Complete and Over/Under Billing | construction accounting (cost-to-cost...; spec-v390 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `workers-comp-emr-premium` | Workers-Comp Premium and Experience Mod | workers-comp rating (NCCI-style); spec-v445 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group T Lab (26 tiles)
+### Group T Lab (27 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5000,6 +5001,7 @@ per spec-v14 §13.1 second paragraph.
 | `resuspension-volume` | Resuspension Volume | Project (first-principles); 0.05 g lyophilized / 10 mg/mL target -> 0.005 (5 mL) resu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `serial-dilution` | Serial Dilution Planner | Project (first-principles); 1.0 stock / DF 10 / volume 0.001 / 5 steps -> transfer 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `substrate-for-velocity` | Substrate for a Target Fraction of Vmax (Michaelis-Menten Inverse) | Enzyme kinetics (Michaelis-Menten equ...; spec-v635 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `van-der-waals` | Van der Waals Real-Gas Pressure & Z Factor | van der Waals equation of state (CRC ...; P = (1 x 0.0820573 x 273.15)/(1 - 0.04267) - 3.640/1 = 23... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
 ### Group X Real Estate (35 tiles)
 
@@ -5108,6 +5110,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1630. Fixture-covered or reference-cadence: 1630 / 1630.
+Tile count: 1631. Fixture-covered or reference-cadence: 1631 / 1631.
 
 <!-- END tile-index-v14 -->

@@ -212,6 +212,7 @@ export const COMPUTE_MAP = {
   "molecular-weight": { module: "../../calc-lab.js", fn: "computeMolecularWeight" },
   "mass-moles": { module: "../../calc-lab.js", fn: "computeMassMoles" },
   "ideal-gas-law": { module: "../../calc-lab.js", fn: "computeIdealGasLaw" },
+  "van-der-waals": { module: "../../calc-lab.js", fn: "computeVanDerWaals" },
   "arrhenius-equation": { module: "../../calc-lab.js", fn: "computeArrheniusEquation" },
   "clausius-clapeyron": { module: "../../calc-lab.js", fn: "computeClausiusClapeyron" },
   "osmolarity": { module: "../../calc-lab.js", fn: "computeOsmolarity" },
