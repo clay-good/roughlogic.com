@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1596,
-  "covered_count": 1172,
+  "total_tiles": 1597,
+  "covered_count": 1173,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -379,6 +379,7 @@
     "expansion-tank",
     "extension-ladder-overlap",
     "extinguisher-coverage",
+    "eyring-reverberation",
     "fan-affinity-laws",
     "fan-motor-max-airflow",
     "fan-sheave-for-target-cfm",

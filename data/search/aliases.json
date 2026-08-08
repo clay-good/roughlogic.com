@@ -8659,6 +8659,21 @@
       "kind": "industry"
     },
     {
+      "term": "eyring reverberation",
+      "target": "eyring-reverberation",
+      "kind": "industry"
+    },
+    {
+      "term": "eyring norris rt60",
+      "target": "eyring-reverberation",
+      "kind": "industry"
+    },
+    {
+      "term": "reverberation high absorption treated room",
+      "target": "eyring-reverberation",
+      "kind": "question"
+    },
+    {
       "term": "room modes",
       "target": "room-acoustics",
       "kind": "industry"

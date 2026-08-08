@@ -1898,6 +1898,7 @@ import {
   computeSPLAtmospheric,
   computeRoomAcoustics,
   computeRoomAbsorptionTarget,
+  computeEyringReverberation,
   computeSPLDistanceForLevel,
 } from "../../calc-stage.js";
 
@@ -4814,6 +4815,28 @@ test("bounds: calc-stage computeRoomAcoustics pins rt60 = 0.049 * V / A and mode
   assert.ok("error" in computeRoomAcoustics({ volume_ft3: 5000, total_sabins: 500, length_ft: 20, width_ft: -1, height_ft: 10 }));
   assert.ok("error" in computeRoomAcoustics({ volume_ft3: 5000, total_sabins: 500, length_ft: 20, width_ft: 15, height_ft: 10, sabine_coeff: 0 }));
   assert.ok("error" in computeRoomAcoustics({ volume_ft3: 5000, total_sabins: 500, length_ft: 20, width_ft: 15, height_ft: 10, speed_of_sound_fts: 0 }));
+});
+
+test("bounds: spec-v1224 computeEyringReverberation pins RT60 = 0.049 V/(-S ln(1-a)), the Sabine comparison/convergence, and error seams", () => {
+  // 5000 ft^3, 1300 ft^2, a_bar 0.30: Eyring 0.528 s, Sabine 0.628 s, 390 sabins.
+  const r = computeEyringReverberation({ volume_ft3: 5000, surface_area_ft2: 1300, avg_absorption: 0.30 });
+  assert.ok(Math.abs(r.rt60_eyring_s - 0.049 * 5000 / (-1300 * Math.log(0.70))) < 1e-9);
+  assert.ok(Math.abs(r.rt60_eyring_s - 0.528) < 0.005);
+  assert.ok(Math.abs(r.rt60_sabine_s - 0.049 * 5000 / 390) < 1e-9 && Math.abs(r.rt60_sabine_s - 0.628) < 0.005);
+  assert.ok(Math.abs(r.total_sabins - 390) < 1e-9);
+  // At high absorption Eyring is SHORTER than Sabine.
+  assert.ok(r.rt60_eyring_s < r.rt60_sabine_s);
+  // At low absorption the two converge (within ~3%).
+  const lo = computeEyringReverberation({ volume_ft3: 5000, surface_area_ft2: 1300, avg_absorption: 0.05 });
+  assert.ok(Math.abs(lo.rt60_eyring_s - lo.rt60_sabine_s) / lo.rt60_sabine_s < 0.03);
+  // More absorption -> shorter RT60.
+  assert.ok(computeEyringReverberation({ volume_ft3: 5000, surface_area_ft2: 1300, avg_absorption: 0.5 }).rt60_eyring_s < r.rt60_eyring_s);
+  // Error seams: non-positive V/S, a_bar out of (0,1), non-finite.
+  assert.ok("error" in computeEyringReverberation({ volume_ft3: 0, surface_area_ft2: 1300, avg_absorption: 0.3 }));
+  assert.ok("error" in computeEyringReverberation({ volume_ft3: 5000, surface_area_ft2: 0, avg_absorption: 0.3 }));
+  assert.ok("error" in computeEyringReverberation({ volume_ft3: 5000, surface_area_ft2: 1300, avg_absorption: 0 }));
+  assert.ok("error" in computeEyringReverberation({ volume_ft3: 5000, surface_area_ft2: 1300, avg_absorption: 1 }));
+  assert.ok("error" in computeEyringReverberation({ volume_ft3: Infinity, surface_area_ft2: 1300, avg_absorption: 0.3 }));
 });
 
 test("bounds: calc-stage computeRoomAbsorptionTarget pins A_required = 0.049 * V / RT60 and round-trips through computeRoomAcoustics across the venue sweep, and rejects non-positive inputs", () => {

@@ -1311,6 +1311,50 @@ const renderRoomAcoustics = _r({
 });
 STAGE_RENDERERS["room-acoustics"] = renderRoomAcoustics;
 
+// --- spec-v1224 N: Eyring-Norris reverberation time (high-absorption companion to Sabine) ---
+// The room-acoustics tile is Sabine only (RT60 = 0.049 V/A); Sabine over-predicts when the average
+// absorption is high. Eyring-Norris RT60 = 0.049 V / (-S ln(1 - a_bar)), a_bar = A/S the average
+// absorption coefficient. Reduces to Sabine as a_bar -> 0.
+// dims: in { volume_ft3: L^3, surface_area_ft2: L^2, avg_absorption: dimensionless, sabine_coeff: dimensionless } out: { rt60_eyring_s: T, rt60_sabine_s: T, total_sabins: L^2 }
+export function computeEyringReverberation({ volume_ft3 = 0, surface_area_ft2 = 0, avg_absorption = 0, sabine_coeff = 0.049 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const V = Number(volume_ft3) || 0;
+  const S = Number(surface_area_ft2) || 0;
+  const aBar = Number(avg_absorption) || 0;
+  const k = (sabine_coeff === undefined || sabine_coeff === null || sabine_coeff === "") ? 0.049 : Number(sabine_coeff);
+  if (!(V > 0)) return { error: "Room volume must be positive (ft^3)." };
+  if (!(S > 0)) return { error: "Total surface area must be positive (ft^2)." };
+  if (!(aBar > 0 && aBar < 1)) return { error: "Average absorption coefficient must be between 0 and 1 (exclusive); at 1 the room is anechoic and RT60 is zero." };
+  if (!(k > 0)) return { error: "Sabine coefficient must be positive." };
+  const total_sabins = S * aBar;
+  const rt60_eyring_s = k * V / (-S * Math.log(1 - aBar));
+  const rt60_sabine_s = k * V / total_sabins;
+  if (![rt60_eyring_s, rt60_sabine_s, total_sabins].every(Number.isFinite)) return { error: "Reverberation math is not a finite value." };
+  return {
+    rt60_eyring_s, rt60_sabine_s, total_sabins,
+    note: "The Eyring-Norris reverberation time RT60 = 0.049 V / (-S ln(1 - a_bar)), the form used when the average absorption is high and the Sabine estimate over-predicts. V is the room volume, S the total interior surface area, and a_bar = A/S the average absorption coefficient (total sabins divided by total surface). Sabine (RT60 = 0.049 V / A) treats absorption as if sound is removed continuously; Eyring models it as removed on each reflection, which is more realistic in a well-treated (or small, hard-then-treated) room, so Eyring returns a SHORTER RT60 than Sabine whenever a_bar is more than a few tenths -- a 5,000 ft^3 room with 1,300 ft^2 of surface at a_bar 0.30 is 0.53 s by Eyring versus 0.63 s by Sabine. As a_bar approaches zero the -ln(1 - a_bar) term approaches a_bar and the two converge, so a lightly-treated live room reads nearly the same either way; the gap opens as treatment is added. Use Eyring for studios, control rooms, and heavily-treated spaces; Sabine is the quick estimate for a live room. Frequency-average coefficients hide the band-by-band picture; the acoustician and the venue govern the treatment design.",
+  };
+}
+const eyringReverberationExample = { inputs: { volume_ft3: 5000, surface_area_ft2: 1300, avg_absorption: 0.30 } };
+const renderEyringReverberation = _r({
+  citation: "Citation: Eyring-Norris reverberation equation RT60 = 0.049 V / (-S ln(1 - a_bar)), a_bar the average absorption coefficient (C.F. Eyring, J. Acoust. Soc. Am. 1930; public domain; imperial 0.049 coefficient, editable). The high-absorption companion to Sabine RT60 = 0.049 V / A, to which it reduces as a_bar -> 0. The acoustician and the venue govern treatment.",
+  example: eyringReverberationExample.inputs,
+  fields: [
+    { key: "volume_ft3", label: "Room volume (ft^3)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "surface_area_ft2", label: "Total surface area (ft^2)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "avg_absorption", label: "Average absorption coefficient (0-1)", kind: "number", attrs: { step: "any", min: "0", max: "1" } },
+    { key: "sabine_coeff", label: "Sabine coefficient (default 0.049)", kind: "number", default: 0.049, attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "ey", id: "ey-out-ey", label: "RT60 (Eyring)", value: (r) => fmt(r.rt60_eyring_s, 2) + " s" },
+    { key: "sa", id: "ey-out-sa", label: "RT60 (Sabine, for comparison)", value: (r) => fmt(r.rt60_sabine_s, 2) + " s" },
+    { key: "sab", id: "ey-out-sab", label: "Total absorption", value: (r) => fmt(r.total_sabins, 0) + " sabins" },
+    { key: "n", id: "ey-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeEyringReverberation,
+});
+STAGE_RENDERERS["eyring-reverberation"] = renderEyringReverberation;
+
 // --- spec-v664 N: absorption needed for a target RT60 (inverse of room-acoustics) ---
 // dims: in { volume_ft3: L^3, target_rt60_s: T, existing_sabins: L^2, sabine_coeff: dimensionless } out: { required_sabins: L^2, additional_sabins: L^2 }
 export function computeRoomAbsorptionTarget({ volume_ft3 = 0, target_rt60_s = 0, existing_sabins = 0, sabine_coeff = 0.049 } = {}) {

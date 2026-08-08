@@ -27744,6 +27744,62 @@
    }
   },
   {
+   "tile_id": "eyring-reverberation",
+   "source_publisher": "C.F. Eyring reverberation equation (J. Acoust. Soc. Am. 1930, public domain)",
+   "source_title": "5,000 ft^3, 1,300 ft^2, a_bar 0.30 -> 0.53 s (Eyring) vs 0.63 s (Sabine) (spec-v1224)",
+   "source_edition_or_year": "RT60 = 0.049 V / (-S ln(1 - a_bar))",
+   "source_section_or_page": "A = 1300 x 0.30 = 390 sabins; Eyring = 0.049 x 5000 / (-1300 ln(0.70)) = 245/463.68 = 0.528 s; Sabine = 245/390 = 0.628 s -- Eyring shorter at high absorption.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "volume_ft3": 5000,
+    "surface_area_ft2": 1300,
+    "avg_absorption": 0.30
+   },
+   "outputs": {
+    "rt60_eyring_s": {
+     "value": 0.528,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "rt60_sabine_s": {
+     "value": 0.628,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "total_sabins": {
+     "value": 390,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "eyring-reverberation",
+   "source_publisher": "Eyring-Norris (low-absorption convergence to Sabine)",
+   "source_title": "cross-check: at a_bar 0.05 Eyring 3.67 s and Sabine 3.77 s nearly agree",
+   "source_edition_or_year": "-ln(1 - a_bar) -> a_bar as a_bar -> 0",
+   "source_section_or_page": "at a_bar 0.05: Eyring = 245/(1300 x 0.051293) = 3.674 s; Sabine = 245/65 = 3.769 s -- the two converge in a lightly-treated live room and diverge as treatment is added.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "volume_ft3": 5000,
+    "surface_area_ft2": 1300,
+    "avg_absorption": 0.05
+   },
+   "outputs": {
+    "rt60_eyring_s": {
+     "value": 3.674,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "room-acoustics",
    "source_publisher": "W.C. Sabine reverberation equation (public domain); axial room-mode relation f = c / (2 x L).",
    "source_title": "RT60 = 0.049 x V / A; first axial mode = 1130 / (2 x dimension), c = 1130 ft/s.",

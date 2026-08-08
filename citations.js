@@ -11752,6 +11752,18 @@ export const CITATIONS = {
       { name: "Speed of sound", value: "1130 ft/s at room temperature (default, editable)", source: "First-principles acoustics" },
     ],
   },
+  "eyring-reverberation": {
+    formula: "RT60 = 0.049 x V / (-S x ln(1 - a_bar)), a_bar = total_sabins / S = A/S; Sabine RT60 = 0.049 x V / A for comparison.",
+    edition: "C.F. Eyring (Eyring-Norris) reverberation equation (J. Acoust. Soc. Am. 1930; public domain); the high-absorption companion to Sabine.",
+    freeAccess: "The Eyring-Norris equation is public-domain acoustics; a_bar (the average absorption coefficient) and the surface area are the user's own room take-off, and the 0.049 imperial coefficient is an editable field.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Eyring-Norris reverberation time RT60 = 0.049 V / (-S ln(1 - a_bar)), where V is the room volume, S the total interior surface area, and a_bar = A/S the average absorption coefficient (total sabins over total surface). It is the form used when the average absorption is high and the Sabine estimate (RT60 = 0.049 V / A) over-predicts: Sabine treats absorption as continuous, while Eyring models it as occurring on each reflection, so Eyring returns a shorter RT60 whenever a_bar exceeds a few tenths -- a 5,000 ft^3 room with 1,300 ft^2 of surface at a_bar 0.30 is 0.53 s by Eyring versus 0.63 s by Sabine. As a_bar approaches zero, -ln(1 - a_bar) approaches a_bar and the two equations converge, so a lightly-treated live room reads nearly the same either way and the gap opens as treatment is added. Use Eyring for studios, control rooms, and heavily-treated spaces; Sabine is the quick estimate for a live room. Frequency-average coefficients hide the band-by-band picture; the acoustician and the venue govern the treatment design.",
+    assumptions: [
+      { name: "Eyring-Norris equation", value: "RT60 = 0.049 V / (-S ln(1 - a_bar)); reduces to Sabine as a_bar -> 0", source: "Eyring (1930)" },
+      { name: "Average absorption", value: "a_bar = total sabins / total surface area, 0 < a_bar < 1", source: "room acoustics" },
+      { name: "When to use", value: "Eyring for high-absorption (well-treated) rooms; Sabine over-predicts there", source: "acoustics practice" },
+    ],
+  },
   "room-absorption-target": {
     formula: "A_required = 0.049 x V / RT60_target (sabins); A_additional = max(0, A_required - A_existing).",
     edition: "W.C. Sabine reverberation equation (public domain) solved for the required absorption, the inverse of the room-acoustics tile.",

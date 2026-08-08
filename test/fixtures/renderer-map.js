@@ -1418,6 +1418,7 @@ export const RENDERER_MAP = {
   "projector-brightness": { module: "../../calc-stage.js", exportName: "STAGE_RENDERERS" },
   "projector-max-screen-size": { module: "../../calc-stage.js", exportName: "STAGE_RENDERERS" },
   "room-acoustics": { module: "../../calc-stage.js", exportName: "STAGE_RENDERERS" },
+  "eyring-reverberation": { module: "../../calc-stage.js", exportName: "STAGE_RENDERERS" },
   "room-absorption-target": { module: "../../calc-stage.js", exportName: "STAGE_RENDERERS" },
   "counterweight-arbor-load": { module: "../../calc-stage.js", exportName: "STAGE_RENDERERS" },
   "led-tape-run": { module: "../../calc-stage.js", exportName: "STAGE_RENDERERS" },

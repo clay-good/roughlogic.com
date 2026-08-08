@@ -3058,6 +3058,7 @@ cross-check.
 | calc-stage.js | `computeCounterweightArborLoad` | `{ batten_weight_lb = 0, attached_load_lb = 0, purchase_type = "single", brick...` | _ | _ | _ |
 | calc-stage.js | `computeDMX` | `{ fixtures = [] }` | _ | _ | _ |
 | calc-stage.js | `computeDecibelConverter` | `{ mode, p1, p2, v1, v2, level_db, ref_type, levels }` | _ | _ | _ |
+| calc-stage.js | `computeEyringReverberation` | `{ volume_ft3 = 0, surface_area_ft2 = 0, avg_absorption = 0, sabine_coeff = 0....` | _ | _ | _ |
 | calc-stage.js | `computeLedTapeMaxRun` | `{ power_per_ft_w = 0, supply_voltage_v = 0, resistance_per_ft = 0, drop_toler...` | _ | _ | _ |
 | calc-stage.js | `computeLedTapeRun` | `{ power_per_ft_w = 0, run_length_ft = 0, supply_voltage_v = 0, resistance_per...` | _ | _ | _ |
 | calc-stage.js | `computeLedVideoWall` | `{ cab_w_px = 0, cab_h_px = 0, pixel_pitch_mm = 0, cols = 0, rows = 0, cab_wei...` | _ | _ | _ |
@@ -3258,7 +3259,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1844.
+Row count: 1845.
 
 <!-- END function-corpus-v14 -->
 
@@ -4785,7 +4786,7 @@ per spec-v14 §13.1 second paragraph.
 | `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `well-max-yield` | Well Sustainable Yield from Specific Capacity | AWWA / USGS (inverse); 1.0 GPM/ft, 30 ft allowable drawdown -> 30 GPM (round-tri... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group N Stage (24 tiles)
+### Group N Stage (25 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4794,6 +4795,7 @@ per spec-v14 §13.1 second paragraph.
 | `counterweight-arbor-load` | Counterweight Fly System Balance | Theatrical counterweight rigging (sin...; 100 lb batten + 400 lb load, single, 30 lb bricks, 200 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `decibel-converter` | Decibel Converter | ANSI S1.1 (by name); P2/P1 = 2 -> 3.0103 dB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dmx-planner` | DMX-512 Address and Universe Planner | USITT DMX512-A / project bundled DMX ...; 12 PARs @ 8 ch starting at 1 + 4 movers @ 24 ch starting ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `eyring-reverberation` | Eyring Reverberation Time (RT60, High Absorption) | C.F. Eyring reverberation equation (J...; A = 1300 x 0.30 = 390 sabins; Eyring = 0.049 x 5000 / (-1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `led-tape-max-run` | LED Tape Max Run Before the Far End Dims | Constant-voltage LED strip voltage dr...; 4.4 W/ft, 12 V, 0.05 ohm/ft, 10% -> 11.44 ft max end-fed run | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `led-tape-run` | LED Tape PSU and Voltage-Drop Run | Constant-voltage LED strip loading an...; 4.4 W/ft, 16 ft, 12 V, 0.05 ohm/ft -> 70.4 W load, 88 W P... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `led-video-wall` | LED Video Wall Build | LED panel maker's spec sheet (native ...; spec-v92 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5040,6 +5042,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1596. Fixture-covered or reference-cadence: 1596 / 1596.
+Tile count: 1597. Fixture-covered or reference-cadence: 1597 / 1597.
 
 <!-- END tile-index-v14 -->
