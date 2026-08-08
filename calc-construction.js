@@ -6709,6 +6709,50 @@ const _renderWindGustEffectFactor = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["wind-gust-effect-factor"] = _renderWindGustEffectFactor;
 
+// ===================== spec-v1212: ASCE 7 velocity pressure exposure coefficient Kz =====================
+// The wind-pressure and wind-cc-pressure tiles take Kz as an input, and computeWindPressure's own comment
+// names the gap: the built-in exposure kz is "only a fallback -- enter Kz for the actual mean roof height,"
+// a flat 3-value stub fixed at 30 ft (B 0.70, C 0.98, D 1.16). This computes the real height-dependent
+// value. ASCE 7 §26.10.1 Eq. 26.10-1: Kz = 2.01 (z/zg)^(2/alpha) for 15 ft <= z <= zg, held at the z = 15 ft
+// value below 15 ft, with the Table 26.10-1 exposure constants alpha and zg (3 pairs, inlined like the
+// gust-factor tile's Table 26.11-1 set). At z = 30 ft this reproduces the stub's 0.70/0.98/1.16 exactly.
+const WIND_KZ_EXPOSURE = { B: { alpha: 7.0, zg: 1200 }, C: { alpha: 9.5, zg: 900 }, D: { alpha: 11.5, zg: 700 } };
+// dims: in { exposure: dimensionless, z_ft: L } out: { kz: dimensionless, z_used_ft: L, zg_ft: L, alpha: dimensionless }
+export function computeWindKz({ exposure = "C", z_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const k = WIND_KZ_EXPOSURE[exposure];
+  if (!k) return { error: "Exposure must be B, C, or D." };
+  const z = Number(z_ft) || 0;
+  if (!(z > 0)) return { error: "Height z must be positive (ft)." };
+  const zUsed = Math.max(z, 15);
+  const kz = 2.01 * Math.pow(zUsed / k.zg, 2 / k.alpha);
+  if (!Number.isFinite(kz)) return { error: "Kz math is not a finite value." };
+  return {
+    kz, z_used_ft: zUsed, zg_ft: k.zg, alpha: k.alpha, floored: z < 15, above_zg: z > k.zg,
+    note: "The ASCE 7 §26.10.1 velocity pressure exposure coefficient Kz, the height- and exposure-dependent factor the wind-pressure and wind-cc-pressure tiles take as an input but only stub with a flat 30 ft value. Kz = 2.01 (z/zg)^(2/alpha) for 15 ft <= z <= zg, held at the z = 15 ft value below 15 ft, with the Table 26.10-1 constants alpha and zg by exposure (B: 7.0/1200 ft, C: 9.5/900 ft, D: 11.5/700 ft). It scales the velocity pressure qz = 0.00256 Kz Kzt Kd Ke V^2, so it rises with height (a taller building sees faster wind) and with a smoother exposure. At the standard 30 ft it returns 0.70 (B), 0.98 (C), and 1.16 (D) -- the values the tiles hard-code -- but a 50 ft eave in Exposure C is 1.09, about 11% more pressure the 30 ft stub misses. Use Kz at each height z for the windward wall and Kh (Kz at the mean roof height) for the leeward, side, and roof surfaces and for all components and cladding. Above the gradient height zg the tabulated range ends and the value is flagged. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const windKzExample = { inputs: { exposure: "C", z_ft: 50 } };
+const _renderWindKz = _simpleRenderer({
+  citation: "Citation: ASCE 7 §26.10.1 velocity pressure exposure coefficient Kz = 2.01 (z/zg)^(2/alpha) for 15 ft <= z <= zg (held at the z = 15 ft value below 15 ft), with the Table 26.10-1 exposure constants (B 7.0/1200, C 9.5/900, D 11.5/700), by name. Scales qz = 0.00256 Kz Kzt Kd Ke V^2; reproduces the 30 ft 0.70/0.98/1.16 stub. A design aid, not a substitute for the engineer of record.",
+  example: windKzExample.inputs,
+  fields: [
+    { key: "exposure", label: "Exposure category", kind: "select", default: "C", options: [
+      { value: "B", label: "B (urban/suburban, wooded)" },
+      { value: "C", label: "C (open terrain)" },
+      { value: "D", label: "D (flat/unobstructed, water)" },
+    ] },
+    { key: "z_ft", label: "Height above ground z (ft; mean roof height for Kh)", kind: "number", default: 50 },
+  ],
+  outputs: [
+    { key: "kz", id: "wkz-out-kz", label: "Exposure coefficient Kz", value: (r) => fmt(r.kz, 3) + (r.floored ? " (held at the z = 15 ft floor)" : "") + (r.above_zg ? " (above zg -- outside the tabulated range)" : "") },
+    { key: "params", id: "wkz-out-params", label: "z used / zg / alpha", value: (r) => fmt(r.z_used_ft, 0) + " ft / " + fmt(r.zg_ft, 0) + " ft / " + fmt(r.alpha, 1) },
+    { key: "n", id: "wkz-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWindKz,
+});
+CONSTRUCTION_RENDERERS["wind-velocity-pressure-exposure-coefficient"] = _renderWindKz;
+
 // ===================== spec-v332..v334: wood-fastener withdrawal batch =====================
 // The NDS withdrawal design equations the typical-value fastener-pullout tile
 // only tabulates: the nail (12.2.3), the lag screw (12.2.1), and the wood screw

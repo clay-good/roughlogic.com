@@ -17457,6 +17457,26 @@
       "kind": "industry"
     },
     {
+      "term": "velocity pressure exposure coefficient",
+      "target": "wind-velocity-pressure-exposure-coefficient",
+      "kind": "industry"
+    },
+    {
+      "term": "kz wind exposure coefficient",
+      "target": "wind-velocity-pressure-exposure-coefficient",
+      "kind": "industry"
+    },
+    {
+      "term": "kz at mean roof height",
+      "target": "wind-velocity-pressure-exposure-coefficient",
+      "kind": "question"
+    },
+    {
+      "term": "asce 7 kz kh",
+      "target": "wind-velocity-pressure-exposure-coefficient",
+      "kind": "industry"
+    },
+    {
       "term": "gust effect factor",
       "target": "wind-gust-effect-factor",
       "kind": "industry"

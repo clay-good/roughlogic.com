@@ -51503,6 +51503,48 @@
    }
   },
   {
+   "tile_id": "wind-velocity-pressure-exposure-coefficient",
+   "source_publisher": "ASCE 7 §26.10.1 velocity pressure exposure coefficient",
+   "source_title": "Exposure C, 50 ft -> Kz 1.094 (about 11% above the 0.98 the 30 ft stub would use) (spec-v1212)",
+   "source_edition_or_year": "ASCE 7 Table 26.10-1 (Exposure C: alpha 9.5, zg 900 ft)",
+   "source_section_or_page": "Kz = 2.01*(50/900)^(2/9.5) = 2.01*(0.055556)^0.21053 = 2.01*0.54413 = 1.0937.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "exposure": "C",
+    "z_ft": 50
+   },
+   "outputs": {
+    "kz": {
+     "value": 1.094,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wind-velocity-pressure-exposure-coefficient",
+   "source_publisher": "ASCE 7 §26.10.1 (reproduces the repo's 30 ft stub)",
+   "source_title": "cross-check: Exposure C at 30 ft returns 0.982, matching the hard-coded 0.98 stub",
+   "source_edition_or_year": "ASCE 7 Table 26.10-1",
+   "source_section_or_page": "Kz = 2.01*(30/900)^(2/9.5) = 2.01*0.48870 = 0.9823, the value computeWindPressure hard-codes for Exposure C. Below 15 ft Kz is held at the z = 15 ft value.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "exposure": "C",
+    "z_ft": 30
+   },
+   "outputs": {
+    "kz": {
+     "value": 0.982,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wind-solid-sign",
    "source_publisher": "ASCE 7-22 Section 29.3 (solid freestanding walls and signs)",
    "source_title": "F = qh G Cf As; Case B moment M = F x 0.2 x B",

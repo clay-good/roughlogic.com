@@ -14099,6 +14099,18 @@ export const CITATIONS = {
       { name: "Scope", value: "rigid buildings only; a flexible building needs Gf with the resonant response R", source: "ASCE 7 §26.11.5" },
     ],
   },
+  "wind-velocity-pressure-exposure-coefficient": {
+    formula: "Kz = 2.01 (z/zg)^(2/alpha) for 15 ft <= z <= zg; Kz = 2.01 (15/zg)^(2/alpha) for z < 15 ft. Table 26.10-1: B alpha 7.0 zg 1200, C 9.5/900, D 11.5/700.",
+    edition: "The ASCE 7 §26.10.1 velocity pressure exposure coefficient Kz, with the Table 26.10-1 terrain exposure constants (alpha, zg), by name.",
+    freeAccess: "ASCE 7 is available through the ASCE Library at ascelibrary.org; the §26.10 exposure-coefficient equation and the Table 26.10-1 constants are public. The height z is the user's own building dimension.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ASCE 7 §26.10.1 velocity pressure exposure coefficient Kz, the height- and exposure-dependent factor the wind-pressure and wind-cc-pressure tiles take as an input but only stub with a flat 30 ft value. Kz = 2.01 (z/zg)^(2/alpha) for 15 ft <= z <= the gradient height zg, held at the z = 15 ft value below 15 ft, with the Table 26.10-1 constants alpha and zg by exposure (B 7.0/1200 ft, C 9.5/900 ft, D 11.5/700 ft). It scales the velocity pressure qz = 0.00256 Kz Kzt Kd Ke V^2, so it rises with height and with a smoother exposure. At the standard 30 ft it returns 0.70 (B), 0.98 (C), and 1.16 (D) -- the values the tiles hard-code -- while a 50 ft eave in Exposure C is 1.09, about 11% more pressure. Kz is used at each height z for the windward wall and Kh (Kz at the mean roof height) for the leeward, side, and roof surfaces and for all components and cladding. Above the gradient height the tabulated range ends. A design aid, not a substitute for the structural engineer of record.",
+    assumptions: [
+      { name: "Exposure coefficient", value: "Kz = 2.01 (z/zg)^(2/alpha), held at the z = 15 ft value below 15 ft", source: "ASCE 7 §26.10.1 Eq. 26.10-1" },
+      { name: "Exposure constants", value: "B alpha 7.0 zg 1200; C 9.5/900; D 11.5/700", source: "ASCE 7 Table 26.10-1" },
+      { name: "Use", value: "Kz per height z for windward, Kh (mean roof height) for leeward/side/roof and all C&C", source: "ASCE 7 Ch. 27/30" },
+    ],
+  },
   "steel-h1-interaction": {
     formula: "ratio = Pr/Pc; ratio >= 0.2: I = Pr/Pc + (8/9)(Mrx/Mcx + Mry/Mcy); ratio < 0.2: I = Pr/(2Pc) + (Mrx/Mcx + Mry/Mcy); pass when I <= 1.0.",
     edition: "The AISC 360-22 Section H1.1 combined-force (axial plus flexure) bilinear interaction equations, consistent for ASD or LRFD, by name.",

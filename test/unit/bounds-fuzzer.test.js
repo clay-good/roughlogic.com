@@ -16354,6 +16354,34 @@ test("bounds: spec-v1211 computeWindGustEffectFactor pins the rigid G, the inter
   assert.ok("error" in _v1211({ exposure: "C", h_ft: Infinity, b_ft: 100 }));
 });
 
+import { computeWindKz as _v1212 } from "../../calc-construction.js";
+
+test("bounds: spec-v1212 computeWindKz pins the exposure formula, the repo stub reproduction, the 15 ft floor, the trends, and error seams", () => {
+  // Kz = 2.01 (z/zg)^(2/alpha). Exposure C, 50 ft.
+  const r = _v1212({ exposure: "C", z_ft: 50 });
+  assert.ok(Math.abs(r.kz - 2.01 * Math.pow(50 / 900, 2 / 9.5)) < 1e-12);
+  assert.ok(Math.abs(r.kz - 1.094) < 0.002 && r.z_used_ft === 50 && r.floored === false);
+  // Reproduces the hard-coded 30 ft stub exactly: B 0.70, C 0.98, D 1.16.
+  assert.ok(Math.abs(_v1212({ exposure: "B", z_ft: 30 }).kz - 0.70) < 0.005);
+  assert.ok(Math.abs(_v1212({ exposure: "C", z_ft: 30 }).kz - 0.98) < 0.005);
+  assert.ok(Math.abs(_v1212({ exposure: "D", z_ft: 30 }).kz - 1.16) < 0.005);
+  // Below 15 ft is held at the z = 15 ft value (floored).
+  const low = _v1212({ exposure: "C", z_ft: 10 });
+  assert.ok(low.z_used_ft === 15 && low.floored === true);
+  assert.ok(Math.abs(low.kz - _v1212({ exposure: "C", z_ft: 15 }).kz) < 1e-12);
+  // Kz rises with height and with a smoother exposure (D > C > B at the same height).
+  assert.ok(_v1212({ exposure: "C", z_ft: 100 }).kz > r.kz);
+  const at60 = 60;
+  assert.ok(_v1212({ exposure: "D", z_ft: at60 }).kz > _v1212({ exposure: "C", z_ft: at60 }).kz);
+  assert.ok(_v1212({ exposure: "C", z_ft: at60 }).kz > _v1212({ exposure: "B", z_ft: at60 }).kz);
+  // Above zg is flagged.
+  assert.ok(_v1212({ exposure: "D", z_ft: 800 }).above_zg === true);
+  // Error seams: bad exposure, non-positive height, non-finite.
+  assert.ok("error" in _v1212({ exposure: "A", z_ft: 30 }));
+  assert.ok("error" in _v1212({ exposure: "C", z_ft: 0 }));
+  assert.ok("error" in _v1212({ exposure: "C", z_ft: Infinity }));
+});
+
 // ===================== spec-v299..v301 reinforced-concrete depth-2 batch =====================
 import { computeRcSlabMinThickness as _v299, computeRcDoublyReinforced as _v300, computeRcShearFriction as _v301 } from "../../calc-concrete.js";
 import { computeRcSlabMaxSpanForThickness as _v707 } from "../../calc-concrete.js";

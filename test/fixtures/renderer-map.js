@@ -681,6 +681,7 @@ export const RENDERER_MAP = {
   "snow-drift-load": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wind-mwfrs-pressure": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wind-gust-effect-factor": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
+  "wind-velocity-pressure-exposure-coefficient": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "rain-on-snow-surcharge": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "sliding-snow-load": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "snow-guard-layout": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
