@@ -7827,6 +7827,18 @@ export const CITATIONS = {
       { name: "Scope", value: "monotonic (not linear) association; small-n p-value is approximate; perfect fit flagged, not left non-finite", source: "scope of this tile" },
     ],
   },
+  "two-proportion-z-test": {
+    formula: "p_pool = (x1 + x2)/(n1 + n2); z = (p1 - p2) / sqrt(p_pool (1 - p_pool)(1/n1 + 1/n2)); two-sided p = 2(1 - normCdf(|z|)). Difference CI uses the unpooled SE sqrt(p1(1-p1)/n1 + p2(1-p2)/n2).",
+    edition: "OpenIntro Statistics 4th ed. Chapter 6 (inference for two proportions) by name; the standard-normal CDF via the error function. Verified against statsmodels.stats.proportion.proportions_ztest (pooled).",
+    freeAccess: "OpenIntro Statistics free at openintro.org; the pooled two-proportion z-test is public-domain textbook statistics.",
+    governance: GOVERNANCE.education,
+    editionNote: "Compares two sample proportions, each a count of successes out of a total (conversion A vs B, defect rate, pass rate). Under the null that the two true proportions are equal, the counts are pooled to estimate the common rate p_pool and the test statistic z = (p1 - p2)/sqrt(p_pool(1-p_pool)(1/n1 + 1/n2)) is referred to the standard normal. The hypothesis test uses the POOLED standard error (valid under the null), while the reported confidence interval on the difference uses the UNPOOLED standard error, which is the usual convention. The normal approximation needs about 5 successes AND 5 failures in each group; below that (flagged) Fisher's exact test is preferred. A statistics aid; the study design governs.",
+    assumptions: [
+      { name: "Pooled test statistic", value: "p_pool = (x1+x2)/(n1+n2); z = (p1-p2)/sqrt(p_pool(1-p_pool)(1/n1+1/n2))", source: "OpenIntro Statistics Ch. 6" },
+      { name: "Difference CI", value: "unpooled SE sqrt(p1(1-p1)/n1 + p2(1-p2)/n2) (interval convention differs from the test)", source: "OpenIntro Statistics Ch. 6" },
+      { name: "Approximation floor", value: "about 5 successes and 5 failures per group; else Fisher's exact test", source: "normal-approximation validity" },
+    ],
+  },
   "chi-square-gof": {
     formula: "Chi-square statistic = sum((observed - expected)^2 / expected) over k categories, on k - 1 degrees of freedom. p-value = 1 - chi2Cdf(chi-square, k - 1). Expected proportions are scaled to the observed total. Reject H0 (the observed counts follow the expected distribution) when p < alpha.",
     edition: "OpenIntro Statistics 4th ed. Chapter 6 (inference for categorical data) by name; the chi-square CDF via the regularized lower incomplete gamma function per Numerical Recipes in C 2nd ed. §6.2.",

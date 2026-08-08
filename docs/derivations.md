@@ -1972,6 +1972,7 @@ cross-check.
 | calc-edu.js | `computeSpearman` | `{ x_values, y_values, alpha = 0.05 } = {}` | _ | _ | _ |
 | calc-edu.js | `computeStandardsBasedGrade` | `{ rows }` | _ | _ | _ |
 | calc-edu.js | `computeStatistics` | `{ values }` | _ | _ | _ |
+| calc-edu.js | `computeTwoProportionZTest` | `{ x1 = 0, n1 = 0, x2 = 0, n2 = 0, tail = "two", alpha = 0.05 } = {}` | _ | _ | _ |
 | calc-edu.js | `computeTwoSampleTTest` | `{ mean1 = 0, sd1 = 0, n1 = 0, mean2 = 0, sd2 = 0, n2 = 0, tail = "two", alpha...` | _ | _ | _ |
 | calc-edu.js | `countSentences` | `text` | _ | _ | _ |
 | calc-edu.js | `countSigFigs` | `raw` | _ | _ | _ |
@@ -3298,7 +3299,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1884.
+Row count: 1885.
 
 <!-- END function-corpus-v14 -->
 
@@ -5050,7 +5051,7 @@ per spec-v14 §13.1 second paragraph.
 | `section-121-exclusion` | Home-Sale Capital-Gains Exclusion (§121) | 26 USC 121 / IRS Pub 523 (public); Worked example MFJ: sale $850k, costs $45k, basis $300k +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seller-net-sheet` | Seller Net Proceeds Sheet | TILA-RESPA Closing Disclosure (12 CFR...; $400,000 sale, $250,000 payoff, 5.5% commission, 0.5% tra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Y Educators (28 tiles)
+### Group Y Educators (29 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5081,6 +5082,7 @@ per spec-v14 §13.1 second paragraph.
 | `spearman-rank-correlation` | Spearman Rank Correlation (rho) | scipy.stats.spearmanr (cross-verified); scipy.stats.spearmanr returns statistic=0.628060456318677... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `two-proportion-z-test` | Two-Proportion z-Test | statsmodels proportions_ztest / scipy...; p_pool = 75/200 = 0.375; SE = sqrt(0.375*0.625*0.02) = 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group Z (unnamed) (32 tiles)
@@ -5120,6 +5122,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1636. Fixture-covered or reference-cadence: 1636 / 1636.
+Tile count: 1637. Fixture-covered or reference-cadence: 1637 / 1637.
 
 <!-- END tile-index-v14 -->

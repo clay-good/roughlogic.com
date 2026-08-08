@@ -406,6 +406,26 @@
       "kind": "question"
     },
     {
+      "term": "two proportion z test",
+      "target": "two-proportion-z-test",
+      "kind": "industry"
+    },
+    {
+      "term": "compare two proportions",
+      "target": "two-proportion-z-test",
+      "kind": "question"
+    },
+    {
+      "term": "difference in conversion rates significance",
+      "target": "two-proportion-z-test",
+      "kind": "question"
+    },
+    {
+      "term": "ab test proportion significance",
+      "target": "two-proportion-z-test",
+      "kind": "question"
+    },
+    {
       "term": "spearman rank correlation",
       "target": "spearman-rank-correlation",
       "kind": "industry"

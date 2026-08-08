@@ -285,7 +285,7 @@ const CAPS = {
   // 2026-05-16 when the Y.3 / Y.13 / Y.14 third expansion landed.
   // Bumped 26000 -> 30000 on 2026-06-05 for the spec-v17 Y.4
   // pearson-correlation tile; built module ~25.1 KB gzipped.
-  "calc-edu.js": 40000, // spec-v1261 one-way-anova 2026-08-08 (37000->40000): the ANOVA tile (variance partition + F-distribution p via betainc, long note) took the module past 34,027 B (92.0%); raised with campaign-tail headroom; lazy-loaded, not in the home-view payload // v763 2026-07-14 sample-size-for-margin (35000)
+  "calc-edu.js": 44000, // spec-v1264 two-proportion-z-test 2026-08-08 (40000->44000): the stats-family run (anova, chi-square-independence, spearman, two-proportion-z) took the module past 38,678 B (96.7%); raised with campaign-tail headroom; lazy-loaded, not in the home-view payload // spec-v1261 one-way-anova 2026-08-08 (37000->40000): the ANOVA tile (variance partition + F-distribution p via betainc, long note) took the module past 34,027 B (92.0%); raised with campaign-tail headroom; lazy-loaded, not in the home-view payload // v763 2026-07-14 sample-size-for-margin (35000)
 
   // pure-math.js: the shared physics/statistics kernel, lazy-loaded by
   // the calc-*.js modules (not in the home payload). Given an explicit

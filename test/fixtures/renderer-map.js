@@ -1612,6 +1612,7 @@ export const RENDERER_MAP = {
   "one-way-anova": { module: "../../calc-edu.js", exportName: "EDU_RENDERERS" },
   "chi-square-independence": { module: "../../calc-edu.js", exportName: "EDU_RENDERERS" },
   "spearman-rank-correlation": { module: "../../calc-edu.js", exportName: "EDU_RENDERERS" },
+  "two-proportion-z-test": { module: "../../calc-edu.js", exportName: "EDU_RENDERERS" },
   "cg-load-share": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },
   "crane-net-capacity": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },
   "crane-ground-bearing": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },

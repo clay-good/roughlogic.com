@@ -10697,6 +10697,7 @@ import { computeFinalGradeNeeded as _y1, computeCategoryWeightedGrade as _y2, co
 import { computeOneWayAnova as _v1261 } from "../../calc-edu.js";
 import { computeChiSquareIndependence as _v1262 } from "../../calc-edu.js";
 import { computeSpearman as _v1263 } from "../../calc-edu.js";
+import { computeTwoProportionZTest as _v1264 } from "../../calc-edu.js";
 test("bounds: spec-v1236 computeOneSampleTTest pins t = (x_bar-mu0)/(s/sqrt(n)), df, tails, and error seams", () => {
   // mean 16.1, SD 0.3, n 25 vs target 16.0: t = 1.667, df 24, two-sided p ~ 0.1086.
   const r = _v1236({ sample_mean: 16.1, sample_sd: 0.3, n: 25, hypothesized_mean: 16.0, tail: "two" });
@@ -10741,6 +10742,31 @@ test("bounds: spec-v1261 computeOneWayAnova pins the variance partition, F, the 
   assert.ok("error" in _v1261({ groups_text: "5 5 5\n5 5 5" }));
   assert.ok("error" in _v1261({ groups_text: "" }));
   assert.ok("error" in _v1261({ groups_text: 42 }));
+});
+test("bounds: spec-v1264 computeTwoProportionZTest pins the pooled z, the scipy-checked p, one/two tails, and error seams", () => {
+  // 45/100 vs 30/100: p_pool=0.375, SE=sqrt(0.375*0.625*0.02)=0.0684653, z=2.190890; scipy p=0.028460.
+  const r = _v1264({ x1: 45, n1: 100, x2: 30, n2: 100 });
+  const pPool = 75 / 200, se = Math.sqrt(pPool * (1 - pPool) * (1 / 100 + 1 / 100));
+  assert.ok(Math.abs(r.z_stat - 0.15 / se) < 1e-12);
+  assert.ok(Math.abs(r.z_stat - 2.190890) < 1e-4 && Math.abs(r.p_value - 0.028460) < 1e-4);
+  assert.ok(Math.abs(r.p1 - 0.45) < 1e-12 && Math.abs(r.p2 - 0.30) < 1e-12 && Math.abs(r.diff - 0.15) < 1e-12);
+  assert.ok(r.significant === true);
+  // One-sided p is exactly half the two-sided p.
+  const one = _v1264({ x1: 45, n1: 100, x2: 30, n2: 100, tail: "one" });
+  assert.ok(Math.abs(one.p_value - r.p_value / 2) < 1e-9);
+  // No real difference: 20/200 vs 15/180 -> z=0.560981, p=0.574810 (scipy), not significant.
+  const ns = _v1264({ x1: 20, n1: 200, x2: 15, n2: 180 });
+  assert.ok(Math.abs(ns.z_stat - 0.560981) < 1e-4 && Math.abs(ns.p_value - 0.574810) < 1e-4 && ns.significant === false);
+  // Equal proportions give z = 0, p = 1.
+  const eq = _v1264({ x1: 40, n1: 100, x2: 40, n2: 100 });
+  assert.ok(eq.z_stat === 0 && Math.abs(eq.p_value - 1) < 1e-6); // normCdf(0) via erf is ~0.5 to ~1e-9
+  // A tiny cell raises a warning but still computes.
+  assert.ok(_v1264({ x1: 2, n1: 50, x2: 1, n2: 50 }).warnings.length > 0);
+  // Error seams: successes above the total, zero total, both 0% (zero pooled SE), non-finite.
+  assert.ok("error" in _v1264({ x1: 150, n1: 100, x2: 30, n2: 100 }));
+  assert.ok("error" in _v1264({ x1: 0, n1: 0, x2: 1, n2: 10 }));
+  assert.ok("error" in _v1264({ x1: 0, n1: 100, x2: 0, n2: 100 }));
+  assert.ok("error" in _v1264({ x1: NaN, n1: 100, x2: 30, n2: 100 }));
 });
 test("bounds: spec-v1263 computeSpearman pins rho as Pearson-on-ranks, the tie handling, the scipy-checked p, perfect fit, and error seams", () => {
   // n=10, cross-checked against scipy.stats.spearmanr: rho=0.6280604563186774, p=0.05184120984456854.

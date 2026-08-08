@@ -23,7 +23,7 @@
 // to a Group Y tile per the spec-v10 §H.1 per-tile-cap discipline.
 
 import { DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeTextarea, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
-import { tcdf, chi2Cdf, betainc } from "./pure-math.js";
+import { tcdf, chi2Cdf, betainc, normCdf } from "./pure-math.js";
 
 // --- Tokenizers ---
 //
@@ -2605,3 +2605,69 @@ function renderSpearman(inputRegion, outputRegion, citationEl) {
   for (const f of [X.input, Y.input]) f.addEventListener("input", update);
 }
 EDU_RENDERERS["spearman-rank-correlation"] = renderSpearman;
+
+// --- spec-v1264: two-proportion z-test (`two-proportion-z-test`) ---
+// The hypothesis-test family (t-tests, chi-square, ANOVA) had no test for comparing two proportions -- the
+// standard question when each group is a count of successes out of a total (conversion rate A vs B, defect rate
+// line 1 vs line 2, pass rate this year vs last). The pooled two-proportion z-test: p_pool = (x1+x2)/(n1+n2),
+// z = (p1 - p2) / sqrt(p_pool (1-p_pool)(1/n1 + 1/n2)); p from the standard-normal CDF. Verified against
+// statsmodels.stats.proportion.proportions_ztest (pooled).
+// dims: in { x1: dimensionless, n1: dimensionless, x2: dimensionless, n2: dimensionless, tail: dimensionless, alpha: dimensionless } out: { p1: dimensionless, p2: dimensionless, diff: dimensionless, z_stat: dimensionless, p_value: dimensionless }
+export function computeTwoProportionZTest({ x1 = 0, n1 = 0, x2 = 0, n2 = 0, tail = "two", alpha = 0.05 } = {}) {
+  const s1 = Number(x1), t1 = Number(n1), s2 = Number(x2), t2 = Number(n2);
+  if (![s1, t1, s2, t2].every(Number.isFinite)) return { error: "Successes and totals must be finite numbers." };
+  if (!(t1 > 0) || !(t2 > 0)) return { error: "Each group total n must be positive." };
+  if (s1 < 0 || s2 < 0 || s1 > t1 || s2 > t2) return { error: "Successes must be between 0 and the group total." };
+  const p1 = s1 / t1, p2 = s2 / t2;
+  const pPool = (s1 + s2) / (t1 + t2);
+  const se = Math.sqrt(pPool * (1 - pPool) * (1 / t1 + 1 / t2));
+  if (!(se > 0)) return { error: "Pooled standard error is zero (both proportions 0% or both 100%) - z is not defined." };
+  const z = (p1 - p2) / se;
+  const cdf = normCdf(Math.abs(z));
+  const pTwo = 2 * (1 - cdf);
+  const pOne = 1 - cdf;
+  const p_value = tail === "one" ? pOne : pTwo;
+  const a = Number.isFinite(Number(alpha)) && Number(alpha) > 0 && Number(alpha) < 1 ? Number(alpha) : 0.05;
+  // 95%-style CI on the difference uses the UNPOOLED standard error (standard practice).
+  const seUnpooled = Math.sqrt(p1 * (1 - p1) / t1 + p2 * (1 - p2) / t2);
+  const zCrit = tail === "one" ? 1.6448536269514722 : 1.959963984540054;
+  const ciLow = (p1 - p2) - zCrit * seUnpooled;
+  const ciHigh = (p1 - p2) + zCrit * seUnpooled;
+  if (![z, p_value].every(Number.isFinite)) return { error: "Two-proportion z math is not a finite value." };
+  const warnings = [];
+  if (s1 < 5 || (t1 - s1) < 5 || s2 < 5 || (t2 - s2) < 5) warnings.push("A cell with fewer than 5 successes or failures makes the normal approximation rough; consider Fisher's exact test.");
+  return {
+    p1, p2, diff: p1 - p2, pooled_p: pPool,
+    z_stat: z, p_value, alpha: a, significant: p_value < a,
+    ci_low: ciLow, ci_high: ciHigh, warnings,
+    note: "The two-proportion z-test, the count-based member of the hypothesis-test family: it compares two sample proportions -- each a number of successes out of a total (conversion A vs B, defect rate line 1 vs line 2, pass rate this year vs last). Under the null that the two true proportions are equal, the counts are pooled into p_pool = (x1+x2)/(n1+n2) to estimate the shared rate, and z = (p1 - p2) / sqrt(p_pool (1-p_pool)(1/n1 + 1/n2)) is compared to the standard normal. A small p says the two rates really differ. The reported confidence interval on the difference uses the unpooled standard error (the usual convention for the interval). The normal approximation needs at least about 5 successes AND 5 failures in each group, flagged as a warning otherwise; below that Fisher's exact test is preferred. A statistics aid; the study design governs.",
+  };
+}
+export const twoProportionZTestExample = { inputs: { x1: 45, n1: 100, x2: 30, n2: 100, tail: "two", alpha: 0.05 } };
+function renderTwoProportionZTest(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: pooled two-proportion z-test per OpenIntro Statistics Chapter 6 (inference for two proportions), by name: p_pool = (x1+x2)/(n1+n2), z = (p1-p2)/sqrt(p_pool(1-p_pool)(1/n1+1/n2)); p from the standard-normal CDF; the difference CI uses the unpooled SE. Verified against statsmodels proportions_ztest. Free at openintro.org.";
+  const x1 = makeNumber("Group 1 successes x1", "tp-x1", { step: "1", min: "0", value: "45" }); x1.input.value = "45";
+  const n1 = makeNumber("Group 1 total n1", "tp-n1", { step: "1", min: "1", value: "100" }); n1.input.value = "100";
+  const x2 = makeNumber("Group 2 successes x2", "tp-x2", { step: "1", min: "0", value: "30" }); x2.input.value = "30";
+  const n2 = makeNumber("Group 2 total n2", "tp-n2", { step: "1", min: "1", value: "100" }); n2.input.value = "100";
+  const tail = makeSelect("Tail", "tp-tail", [{ value: "two", label: "Two-sided", selected: true }, { value: "one", label: "One-sided" }]);
+  for (const f of [x1, n1, x2, n2, tail]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { x1.input.value = "45"; n1.input.value = "100"; x2.input.value = "30"; n2.input.value = "100"; tail.select.value = "two"; update(); });
+  const oP = makeOutputLine(outputRegion, "Proportions p1 / p2 / difference", "tp-out-p");
+  const oZ = makeOutputLine(outputRegion, "z-statistic / p-value", "tp-out-z");
+  const oCI = makeOutputLine(outputRegion, "Difference 95% CI (unpooled)", "tp-out-ci");
+  const oW = makeOutputLine(outputRegion, "Warnings", "tp-out-w");
+  const oNote = makeOutputLine(outputRegion, "Note", "tp-out-note");
+  function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
+  const update = debounce(() => {
+    const r = computeTwoProportionZTest({ x1: readNum(x1.input), n1: readNum(n1.input), x2: readNum(x2.input), n2: readNum(n2.input), tail: tail.select.value });
+    if (r.error) { oP.textContent = r.error; oZ.textContent = ""; oCI.textContent = ""; oW.textContent = ""; oNote.textContent = ""; return; }
+    oP.textContent = fmt(r.p1, 4) + " / " + fmt(r.p2, 4) + " / " + fmt(r.diff, 4);
+    oZ.textContent = "z = " + fmt(r.z_stat, 3) + ", p = " + fmt(r.p_value, 4) + " (" + (r.significant ? "significant" : "not significant") + " at alpha)";
+    oCI.textContent = "[" + fmt(r.ci_low, 4) + ", " + fmt(r.ci_high, 4) + "]";
+    oW.textContent = r.warnings.length ? r.warnings.join(" ") : "none";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [x1.input, n1.input, x2.input, n2.input, tail.select]) f.addEventListener("input", update);
+}
+EDU_RENDERERS["two-proportion-z-test"] = renderTwoProportionZTest;
