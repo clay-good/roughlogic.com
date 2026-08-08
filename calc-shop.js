@@ -367,6 +367,67 @@ function _v650renderTaperDiameter(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["taper-diameter"] = _v650renderTaperDiameter;
 
+// spec-v1247: dovetail slide measurement over two rods. The shop metrology set has thread measurement
+// over wires (thread-measure-wire) and the gear-tooth caliper, but no dovetail check. Two rods of
+// diameter D seated in the acute corners: offset k = D(1 + cot(alpha/2)); male over-pins = flat + k,
+// female over-pins = flat - k. Pure trig (Machinery's Handbook, "Checking a Dovetail"). alpha is the
+// included dovetail angle (commonly 60 deg).
+// dims: in { dovetail_type: dimensionless, known: dimensionless, dimension_in: L, pin_dia_in: L, angle_deg: dimensionless } out: { offset_in: L, over_pins_in: L, flat_in: L }
+export function computeDovetailOverPins({ dovetail_type = "male", known = "flat", dimension_in = 0, pin_dia_in = 0, angle_deg = 60 } = {}) {
+  const _g = _finiteGuard({ dimension_in, pin_dia_in, angle_deg }); if (_g) return _g;
+  const dim = Number(dimension_in) || 0;
+  const D = Number(pin_dia_in) || 0;
+  const a = Number(angle_deg) || 0;
+  const type = String(dovetail_type);
+  const solveFor = String(known);
+  if (type !== "male" && type !== "female") return { error: "Dovetail type must be male or female." };
+  if (solveFor !== "flat" && solveFor !== "over_pins") return { error: "Known dimension must be flat or over_pins." };
+  if (!(dim > 0)) return { error: "The known dimension must be positive (in)." };
+  if (!(D > 0)) return { error: "Pin/rod diameter must be positive (in)." };
+  if (!(a > 0 && a < 180)) return { error: "Dovetail included angle must be between 0 and 180 degrees (commonly 60)." };
+  const cot = 1 / Math.tan((a / 2) * Math.PI / 180);
+  const offset_in = D * (1 + cot);
+  let over_pins_in, flat_in;
+  if (solveFor === "flat") {
+    flat_in = dim;
+    over_pins_in = type === "male" ? dim + offset_in : dim - offset_in;
+  } else {
+    over_pins_in = dim;
+    flat_in = type === "male" ? dim - offset_in : dim + offset_in;
+  }
+  if (!(over_pins_in > 0) || !(flat_in > 0)) return { error: "The computed dimension is not positive - check the pin diameter, angle, and which dimension is known." };
+  if (![offset_in, over_pins_in, flat_in].every(Number.isFinite)) return { error: "Dovetail math is not a finite value." };
+  return {
+    offset_in, over_pins_in, flat_in, cot_half: cot,
+    note: "The dovetail-slide check over two rods, the metrology companion to thread measurement over wires. Two gauge rods of diameter D are seated against the flanks in the acute corners of the dovetail and measured across; the offset from the reference flat to that over-rods measurement is k = D(1 + cot(alpha/2)), where alpha is the included dovetail angle (commonly 60 degrees, so cot(30) = 1.732 and k = 2.732 D). For a MALE (external) dovetail the rods sit outside the flat, so the over-rods measurement = flat width + k; for a FEMALE (internal) dovetail they sit inside the opening, so over-rods = opening width - k. A 60-degree male dovetail with a 2.000 in base and 0.500 in rods measures 3.366 in over the rods. Solve either way: enter the drawing flat to get the mic reading to inspect to, or enter the measured over-rods value to back out the actual flat. Use a rod small enough that it contacts the flank below the corner, not on the edge. First-principles trigonometry (Machinery's Handbook); the print tolerance and a verified gauge govern.",
+  };
+}
+export const dovetailOverPinsExample = { inputs: { dovetail_type: "male", known: "flat", dimension_in: 2.0, pin_dia_in: 0.5, angle_deg: 60 } };
+function renderDovetailOverPins(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: dovetail measurement over two rods - offset k = D(1 + cot(alpha/2)); male over-rods = flat + k, female over-rods = flat - k, alpha the included angle (commonly 60 deg). First-principles trigonometry as in Machinery's Handbook (Industrial Press), 'Checking a Dovetail Slide', by name; public domain. Use a rod that contacts the flank below the corner; the print tolerance and a verified gauge govern.";
+  const type = makeSelect("Dovetail type", "dvt-type", [{ value: "male", label: "Male (external)" }, { value: "female", label: "Female (internal)" }]);
+  const known = makeSelect("Known dimension", "dvt-known", [{ value: "flat", label: "Flat width -> find over-rods" }, { value: "over_pins", label: "Measured over-rods -> find flat" }]);
+  const dim = makeNumber("Known dimension (in)", "dvt-dim", { step: "any", min: "0", value: "2.0" }); dim.input.value = "2.0";
+  const pin = makeNumber("Rod / pin diameter (in)", "dvt-pin", { step: "any", min: "0", value: "0.5" }); pin.input.value = "0.5";
+  const ang = makeNumber("Included dovetail angle (deg, commonly 60)", "dvt-ang", { step: "any", min: "0", value: "60" }); ang.input.value = "60";
+  for (const f of [type, known, dim, pin, ang]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { type.select.value = "male"; known.select.value = "flat"; dim.input.value = "2.0"; pin.input.value = "0.5"; ang.input.value = "60"; update(); });
+  const oResult = makeOutputLine(outputRegion, "Over-rods / flat", "dvt-out-res");
+  const oOffset = makeOutputLine(outputRegion, "Offset k = D(1 + cot(a/2))", "dvt-out-k");
+  const oNote = makeOutputLine(outputRegion, "Note", "dvt-out-note");
+  const update = debounce(() => {
+    const r = computeDovetailOverPins({ dovetail_type: type.select.value, known: known.select.value, dimension_in: _readNum(dim.input), pin_dia_in: _readNum(pin.input), angle_deg: _readNum(ang.input) });
+    if (r.error) { oResult.textContent = r.error; oOffset.textContent = "-"; oNote.textContent = ""; return; }
+    oResult.textContent = "over-rods " + fmt(r.over_pins_in, 4) + " in / flat " + fmt(r.flat_in, 4) + " in";
+    oOffset.textContent = fmt(r.offset_in, 4) + " in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  type.select.addEventListener("input", update);
+  known.select.addEventListener("input", update);
+  for (const f of [dim.input, pin.input, ang.input]) f.addEventListener("input", update);
+}
+SHOP_RENDERERS["dovetail-over-pins"] = renderDovetailOverPins;
+
 // =====================================================================
 // spec-v805 tailstock-setover - lathe tailstock offset for taper turning.
 // S = OAL x (D - d) / (2 L): the whole part swings about the headstock

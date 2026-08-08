@@ -12081,6 +12081,30 @@ test("bounds: spec-v40 taper-calc pins TPF/angle + rejects bad inputs", () => {
 });
 
 import { computeTaperDiameter as _v650 } from "../../calc-shop.js";
+import { computeDovetailOverPins as _v1247 } from "../../calc-shop.js";
+test("bounds: spec-v1247 computeDovetailOverPins pins k = D(1+cot(a/2)), the male/female sign, the round-trip, and error seams", () => {
+  // 60-deg male, 2.000 in flat, 0.500 in rods: k 1.36603, over-rods 3.36603.
+  const r = _v1247({ dovetail_type: "male", known: "flat", dimension_in: 2.0, pin_dia_in: 0.5, angle_deg: 60 });
+  const k = 0.5 * (1 + 1 / Math.tan(30 * Math.PI / 180));
+  assert.ok(Math.abs(r.offset_in - k) < 1e-9);
+  assert.ok(Math.abs(r.offset_in - 1.36603) < 1e-4);
+  assert.ok(Math.abs(r.over_pins_in - (2.0 + k)) < 1e-9 && Math.abs(r.over_pins_in - 3.36603) < 1e-4);
+  // Inverse recovers the flat from the over-rods reading.
+  const inv = _v1247({ dovetail_type: "male", known: "over_pins", dimension_in: r.over_pins_in, pin_dia_in: 0.5, angle_deg: 60 });
+  assert.ok(Math.abs(inv.flat_in - 2.0) < 1e-9);
+  // Female subtracts the offset instead of adding it.
+  const fem = _v1247({ dovetail_type: "female", known: "flat", dimension_in: 2.5, pin_dia_in: 0.5, angle_deg: 60 });
+  assert.ok(Math.abs(fem.over_pins_in - (2.5 - k)) < 1e-9 && Math.abs(fem.over_pins_in - 1.13397) < 1e-4);
+  // A larger rod increases the offset.
+  assert.ok(_v1247({ dovetail_type: "male", known: "flat", dimension_in: 2.0, pin_dia_in: 0.625, angle_deg: 60 }).offset_in > r.offset_in);
+  // Error seams: bad type, non-positive dimension/pin, angle out of range, a computed non-positive result, non-finite.
+  assert.ok("error" in _v1247({ dovetail_type: "x", known: "flat", dimension_in: 2, pin_dia_in: 0.5, angle_deg: 60 }));
+  assert.ok("error" in _v1247({ dovetail_type: "male", known: "flat", dimension_in: 0, pin_dia_in: 0.5, angle_deg: 60 }));
+  assert.ok("error" in _v1247({ dovetail_type: "male", known: "flat", dimension_in: 2, pin_dia_in: 0, angle_deg: 60 }));
+  assert.ok("error" in _v1247({ dovetail_type: "male", known: "flat", dimension_in: 2, pin_dia_in: 0.5, angle_deg: 0 }));
+  assert.ok("error" in _v1247({ dovetail_type: "female", known: "flat", dimension_in: 1.0, pin_dia_in: 0.5, angle_deg: 60 }));
+  assert.ok("error" in _v1247({ dovetail_type: "male", known: "flat", dimension_in: Infinity, pin_dia_in: 0.5, angle_deg: 60 }));
+});
 
 test("bounds: spec-v650 computeTaperDiameter inverts the taper, round-trips it, solves either end, and pins error seams", () => {
   const r = _v650({ known_dia_in: 1.0, known_end: "large", taper_per_foot: 0.6, length_in: 3 });

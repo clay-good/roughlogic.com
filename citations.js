@@ -10928,6 +10928,17 @@ export const CITATIONS = {
       { name: "Compound angle", value: "angle per side = atan(TPF/24), a function of TPF alone", source: "taper geometry" },
     ],
   },
+  "dovetail-over-pins": {
+    formula: "offset k = D(1 + cot(alpha/2)); male over-rods = flat + k, female over-rods = flat - k (inverse: male flat = over-rods - k, female flat = over-rods + k). alpha the included dovetail angle, D the rod diameter.",
+    edition: "Dovetail slide measurement over rods - first-principles trigonometry as in Machinery's Handbook (Industrial Press), 'Checking a Dovetail Slide', by name; public domain.",
+    freeAccess: "Pure trigonometry, public; the dovetail-over-rods rule is a standard Machinery's Handbook shop-inspection method.",
+    governance: GOVERNANCE.general,
+    editionNote: "The dovetail-slide check over two rods, the metrology companion to thread measurement over wires. Two gauge rods of diameter D seated against the flanks in the acute corners are measured across; the offset from the reference flat to that over-rods measurement is k = D(1 + cot(alpha/2)), alpha the included dovetail angle (commonly 60 degrees, cot(30) = 1.732, k = 2.732 D). For a MALE (external) dovetail the rods sit outside the flat so the over-rods measurement = flat width + k; for a FEMALE (internal) dovetail they sit inside so over-rods = opening width - k. A 60-degree male dovetail with a 2.000 in base and 0.500 in rods measures 3.366 in over the rods. The tile solves either direction. Use a rod small enough to contact the flank below the corner, not on the edge. First-principles trigonometry; the print tolerance and a verified gauge govern.",
+    assumptions: [
+      { name: "Offset", value: "k = D(1 + cot(alpha/2)), alpha the included dovetail angle", source: "Machinery's Handbook, Checking a Dovetail" },
+      { name: "Male / female", value: "male over-rods = flat + k; female over-rods = flat - k", source: "dovetail geometry" },
+    ],
+  },
   "dividing-head": {
     formula: "Turns per division = ratio / N (40/N on a standard 40:1 head). For a hole circle of H holes the move is the fractional part x H holes, reported when that product is a whole number.",
     edition: "Simple (plain) indexing on a 40:1 dividing head - first-principles ratio arithmetic as in Machinery's Handbook (Industrial Press), by name; public domain.",

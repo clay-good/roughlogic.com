@@ -18833,6 +18833,60 @@
    }
   },
   {
+   "tile_id": "dovetail-over-pins",
+   "source_publisher": "Machinery's Handbook (Checking a Dovetail Slide)",
+   "source_title": "60-deg male dovetail, 2.000 in flat, 0.500 in rods -> 3.366 in over rods (spec-v1247)",
+   "source_edition_or_year": "offset k = D(1 + cot(alpha/2))",
+   "source_section_or_page": "k = 0.500 x (1 + cot(30 deg)) = 0.500 x (1 + 1.73205) = 1.36603; male over-rods = 2.000 + 1.36603 = 3.36603 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "dovetail_type": "male",
+    "known": "flat",
+    "dimension_in": 2.0,
+    "pin_dia_in": 0.5,
+    "angle_deg": 60
+   },
+   "outputs": {
+    "offset_in": {
+     "value": 1.36603,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "over_pins_in": {
+     "value": 3.36603,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dovetail-over-pins",
+   "source_publisher": "Dovetail check (female / inverse cross-check)",
+   "source_title": "female subtracts the offset, and the inverse recovers the flat",
+   "source_edition_or_year": "female over-rods = flat - k; male flat = over-rods - k",
+   "source_section_or_page": "female 2.500 in opening, 0.500 in rods, 60 deg: over-rods = 2.500 - 1.36603 = 1.13397 in. Male inverse: a 3.36603 in reading backs out flat = 3.36603 - 1.36603 = 2.000 in.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "dovetail_type": "female",
+    "known": "flat",
+    "dimension_in": 2.5,
+    "pin_dia_in": 0.5,
+    "angle_deg": 60
+   },
+   "outputs": {
+    "over_pins_in": {
+     "value": 1.13397,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dividing-head",
    "source_publisher": "First-principles indexing arithmetic + Machinery's Handbook",
    "source_title": "turns = ratio / N; holes = fraction x circle",

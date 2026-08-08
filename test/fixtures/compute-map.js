@@ -753,6 +753,7 @@ export const COMPUTE_MAP = {
   "feed-for-surface-finish": { module: "../../calc-shop.js", fn: "computeFeedForSurfaceFinish" },
   "taper-calc": { module: "../../calc-shop.js", fn: "computeTaperCalc" },
   "taper-diameter": { module: "../../calc-shop.js", fn: "computeTaperDiameter" },
+  "dovetail-over-pins": { module: "../../calc-shop.js", fn: "computeDovetailOverPins" },
   "dividing-head": { module: "../../calc-shop.js", fn: "computeDividingHead" },
   "thread-measure-wire": { module: "../../calc-shop.js", fn: "computeThreadMeasureWire" },
   "thread-pitch-dia-from-wires": { module: "../../calc-shop.js", fn: "computeThreadPitchDiaFromWires" },

@@ -1131,6 +1131,7 @@ export const RENDERER_MAP = {
   "feed-for-surface-finish": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "taper-calc": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "taper-diameter": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
+  "dovetail-over-pins": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "tailstock-setover": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "dividing-head": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "thread-measure-wire": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },

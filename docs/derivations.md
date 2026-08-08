@@ -3012,6 +3012,7 @@ cross-check.
 | calc-shop.js | `computeConeFlatPattern` | `{ base_radius_in = 0, height_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCylinderStorageSeparation` | `{ separation_ft = 0, barrier_present = "no", barrier_height_ft = 0, barrier_n...` | _ | _ | _ |
 | calc-shop.js | `computeDividingHead` | `{ divisions = 0, worm_ratio = 40, circles = "" } = {}` | _ | _ | _ |
+| calc-shop.js | `computeDovetailOverPins` | `{ dovetail_type = "male", known = "flat", dimension_in = 0, pin_dia_in = 0, a...` | _ | _ | _ |
 | calc-shop.js | `computeFeedForSurfaceFinish` | `{ target_finish_uin = 0, finish_basis = "ra", nose_radius_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeMachiningTime` | `{ feed_mode = "rpm-ipr", cut_length_in = 0, rpm = 0, feed_ipr_in = 0, feed_ip...` | _ | _ | _ |
 | calc-shop.js | `computeMaterialRemovalRate` | `{ mode = "milling", woc_in = 0, doc_in = 0, feed_ipm_in = 0, sfm = 0, feed_ip...` | _ | _ | _ |
@@ -3281,7 +3282,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1867.
+Row count: 1868.
 
 <!-- END function-corpus-v14 -->
 
@@ -4563,7 +4564,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (104 tiles)
+### Group K Mechanic (105 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4596,6 +4597,7 @@ per spec-v14 §13.1 second paragraph.
 | `density-altitude` | Density Altitude and Pressure Altitude | FAA density-altitude method (ISA laps...; spec-v500 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `displacement-cr` | Engine Displacement and Compression Ratio | Project (first-principles) over stand...; 4.0 bore / 3.48 stroke / 8 cyl / 64 cc chamber / 4.1 gask... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dividing-head` | Dividing-Head Simple Indexing | First-principles indexing arithmetic ...; N 9 on a 40:1 head -> 4 turns + 4/9; on a 54-hole circle ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `dovetail-over-pins` | Dovetail Slide Measurement Over Rods | Machinery's Handbook (Checking a Dove...; k = 0.500 x (1 + cot(30 deg)) = 0.500 x (1 + 1.73205) = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drill-point-angle-from-length` | Drill Point Angle from Tip Length | First-principles drill-point geometry...; 0.5-in drill, 0.15-in tip -> 118.1-deg point (59.0-deg lip) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drill-point-depth` | Drill Point Depth | First-principles drill-point geometry...; 0.5-in drill, 118-deg point, 1.0-in full depth -> 0.1502-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `driveshaft-crit` | Driveshaft Critical Speed | Project (first-principles) over Spice...; 3.5 in OD / 0.083 in wall / 48 in long / steel -> 9823 rp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5086,6 +5088,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1619. Fixture-covered or reference-cadence: 1619 / 1619.
+Tile count: 1620. Fixture-covered or reference-cadence: 1620 / 1620.
 
 <!-- END tile-index-v14 -->
