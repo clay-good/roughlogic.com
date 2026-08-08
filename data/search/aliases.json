@@ -18742,6 +18742,21 @@
       "kind": "adjacent"
     },
     {
+      "term": "b1 moment amplifier",
+      "target": "steel-b1-amplifier",
+      "kind": "industry"
+    },
+    {
+      "term": "steel moment magnification braced",
+      "target": "steel-b1-amplifier",
+      "kind": "question"
+    },
+    {
+      "term": "aisc appendix 8 b1 amplified first order",
+      "target": "steel-b1-amplifier",
+      "kind": "industry"
+    },
+    {
       "term": "beam column interaction",
       "target": "steel-h1-interaction",
       "kind": "industry"

@@ -1240,6 +1240,7 @@ export const COMPUTE_MAP = {
   "cogo-inverse-locate": { module: "../../calc-survey.js", fn: "computeCogoInverseLocate" },
   // spec-v314..v316 steel beam-column-and-connection depth batch (3 tiles)
   "steel-h1-interaction": { module: "../../calc-steel.js", fn: "computeSteelH1Interaction" },
+  "steel-b1-amplifier": { module: "../../calc-steel.js", fn: "computeSteelB1Amplifier" },
   "steel-effective-length-k": { module: "../../calc-steel.js", fn: "computeSteelEffectiveLengthK" },
   "steel-column-stiffness-ratio-g": { module: "../../calc-steel.js", fn: "computeSteelColumnStiffnessRatioG" },
   "steel-bolt-tension-shear": { module: "../../calc-steel.js", fn: "computeSteelBoltTensionShear" },

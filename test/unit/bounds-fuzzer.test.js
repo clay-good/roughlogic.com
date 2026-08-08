@@ -17093,6 +17093,33 @@ test("bounds: spec-v314 computeSteelH1Interaction pins both branches, the biaxia
   assert.ok("error" in _v314({ pr_kip: Infinity, pc_kip: 400, mrx_kft: 80, mcx_kft: 200 }));
 });
 
+import { computeSteelB1Amplifier as _v1216 } from "../../calc-steel.js";
+
+test("bounds: spec-v1216 computeSteelB1Amplifier pins B1, Pe1, Cm, the LRFD/ASD alpha, the >= 1 floor, instability, and error seams", () => {
+  // W10x49 (I 272), Pr 400 kip, 16 ft braced, transverse load, LRFD.
+  const r = _v1216({ pr_kip: 400, i_in4: 272, lc1_ft: 16, transverse_load: "yes", m1_m2: 0, method: "LRFD" });
+  assert.ok(Math.abs(r.pe1_kip - Math.PI * Math.PI * 29000 * 272 / Math.pow(16 * 12, 2)) < 1e-6);
+  assert.ok(Math.abs(r.pe1_kip - 2112) < 3 && r.cm === 1.0 && r.alpha === 1.0);
+  assert.ok(Math.abs(r.b1 - 1.0 / (1 - 400 / r.pe1_kip)) < 1e-9 && Math.abs(r.b1 - 1.234) < 0.005);
+  // ASD alpha 1.6 amplifies more than LRFD alpha 1.0.
+  const asd = _v1216({ pr_kip: 400, i_in4: 272, lc1_ft: 16, transverse_load: "yes", m1_m2: 0, method: "ASD" });
+  assert.ok(asd.alpha === 1.6 && asd.b1 > r.b1 && Math.abs(asd.b1 - 1.435) < 0.005);
+  // Cm from M1/M2: single curvature (-1) -> Cm 1.0; reverse curvature (+1) -> Cm 0.2 (floors B1 at 1.0 here).
+  assert.ok(Math.abs(_v1216({ pr_kip: 400, i_in4: 272, lc1_ft: 16, transverse_load: "no", m1_m2: -1, method: "LRFD" }).cm - 1.0) < 1e-12);
+  const rev = _v1216({ pr_kip: 400, i_in4: 272, lc1_ft: 16, transverse_load: "no", m1_m2: 1, method: "LRFD" });
+  assert.ok(Math.abs(rev.cm - 0.2) < 1e-9 && rev.b1 === 1.0);
+  // A longer unbraced length lowers Pe1 and raises B1.
+  assert.ok(_v1216({ pr_kip: 400, i_in4: 272, lc1_ft: 24, transverse_load: "yes", m1_m2: 0, method: "LRFD" }).b1 > r.b1);
+  // alpha Pr >= Pe1 is an instability error (denominator <= 0).
+  assert.ok("error" in _v1216({ pr_kip: 3000, i_in4: 272, lc1_ft: 16, transverse_load: "yes", m1_m2: 0, method: "LRFD" }));
+  // Error seams: bad flags, out-of-range M1/M2, non-positive inputs, non-finite.
+  assert.ok("error" in _v1216({ pr_kip: 400, i_in4: 272, lc1_ft: 16, transverse_load: "maybe", method: "LRFD" }));
+  assert.ok("error" in _v1216({ pr_kip: 400, i_in4: 272, lc1_ft: 16, transverse_load: "no", m1_m2: 2, method: "LRFD" }));
+  assert.ok("error" in _v1216({ pr_kip: 0, i_in4: 272, lc1_ft: 16, method: "LRFD" }));
+  assert.ok("error" in _v1216({ pr_kip: 400, i_in4: 272, lc1_ft: 16, method: "SD" }));
+  assert.ok("error" in _v1216({ pr_kip: 400, i_in4: Infinity, lc1_ft: 16, method: "LRFD" }));
+});
+
 test("bounds: spec-v315 computeSteelEffectiveLengthK pins sway vs braced, the fixed-limit trend, and error seams", () => {
   const s = _v315({ ga: 1, gb: 2, frame: "sway" });
   assert.ok(Math.abs(s.k_factor - 1.47) < 0.01);

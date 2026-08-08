@@ -53946,6 +53946,62 @@
    }
   },
   {
+   "tile_id": "steel-b1-amplifier",
+   "source_publisher": "AISC 360-22 Appendix 8.2.1 moment amplifier",
+   "source_title": "W10x49 (I 272), Pr 400 kip, 16 ft braced, transverse load, LRFD -> B1 1.234 (spec-v1216)",
+   "source_edition_or_year": "AISC 360-22 Eqs. A-8-3/A-8-5",
+   "source_section_or_page": "Pe1 = pi^2 (29000)(272) / (16*12)^2 = 2112 kip; Cm = 1.0 (transverse load); alpha = 1.0 (LRFD); B1 = 1.0/(1 - 400/2112) = 1.0/0.8106 = 1.234.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "pr_kip": 400,
+    "i_in4": 272,
+    "lc1_ft": 16,
+    "transverse_load": "yes",
+    "m1_m2": 0,
+    "method": "LRFD"
+   },
+   "outputs": {
+    "b1": {
+     "value": 1.234,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "pe1_kip": {
+     "value": 2112,
+     "tolerance": {
+      "abs": 3
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-b1-amplifier",
+   "source_publisher": "AISC 360-22 Appendix 8.2.1 (ASD basis)",
+   "source_title": "cross-check: same member on the ASD basis (alpha 1.6) amplifies more, B1 1.435",
+   "source_edition_or_year": "AISC 360-22 Eq. A-8-3 (alpha = 1.6 ASD)",
+   "source_section_or_page": "alpha Pr/Pe1 = 1.6*400/2112 = 0.303; B1 = 1.0/(1 - 0.303) = 1.0/0.697 = 1.435 -- the ASD alpha of 1.6 makes the amplification larger than LRFD's 1.234.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "pr_kip": 400,
+    "i_in4": 272,
+    "lc1_ft": 16,
+    "transverse_load": "yes",
+    "m1_m2": 0,
+    "method": "ASD"
+   },
+   "outputs": {
+    "b1": {
+     "value": 1.435,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-h1-interaction",
    "source_publisher": "AISC 360-22 H1.1",
    "source_title": "Pr 100 / Pc 400, Mrx 80 / Mcx 200 -> ratio 0.25, interaction 0.61 passes",

@@ -14124,6 +14124,18 @@ export const CITATIONS = {
       { name: "Use", value: "Kz per height z for windward, Kh (mean roof height) for leeward/side/roof and all C&C", source: "ASCE 7 Ch. 27/30" },
     ],
   },
+  "steel-b1-amplifier": {
+    formula: "Pe1 = pi^2 E I / (K1 L)^2 (E = 29,000 ksi); Cm = 0.6 - 0.4 (M1/M2) or 1.0 (transverse load); alpha = 1.0 LRFD / 1.6 ASD; B1 = max(1, Cm / (1 - alpha Pr / Pe1)).",
+    edition: "The AISC 360-22 Appendix 8.2.1 nonsway (braced) beam-column moment amplifier B1, with the Cm end-moment factor and the in-plane elastic buckling load Pe1, by name.",
+    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); the Appendix 8 amplified first-order provisions are public. Pr, I, K1 L, and the end-moment ratio are the user's own analysis inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AISC 360-22 Appendix 8.2.1 beam-column nonsway (braced) moment amplifier B1 = Cm / (1 - alpha Pr / Pe1), taken not less than 1.0, the second-order P-delta magnifier the steel-h1-interaction tile assumes is already in Mr. Pr is the required axial compression; Pe1 = pi^2 EI* / (K1 L)^2 is the elastic critical buckling load in the plane of bending (E = 29,000 ksi, K1 <= 1.0 for the braced condition, conservatively 1.0); alpha = 1.0 (LRFD) or 1.6 (ASD); and Cm = 0.6 - 0.4 (M1/M2) for a member with no transverse load between supports (M1/M2 negative for single curvature, so Cm rises to 1.0; positive for reverse curvature, so Cm falls to 0.2) or 1.0 when there is transverse load. It multiplies the first-order Mnt to give the required Mr for the H1.1 interaction (Mr = B1 Mnt + B2 Mlt; this is the B1 term). Pe1 uses the nominal EI; the direct analysis method reduces it to 0.8 tau_b EI. When alpha Pr reaches Pe1 the member is unstable in this plane. In-plane (P-delta) amplification only -- the sidesway B2 (P-Delta) is separate. A design aid, not a substitute for the structural engineer of record.",
+    assumptions: [
+      { name: "Amplifier", value: "B1 = Cm / (1 - alpha Pr / Pe1) >= 1", source: "AISC 360-22 Eq. A-8-3" },
+      { name: "Buckling load", value: "Pe1 = pi^2 EI / (K1 L)^2, E = 29,000 ksi, K1 <= 1.0 braced (nominal EI; DAM uses 0.8 tau_b EI)", source: "AISC 360-22 Eq. A-8-5" },
+      { name: "End-moment factor", value: "Cm = 0.6 - 0.4 (M1/M2) (no transverse load) or 1.0 (transverse load); alpha = 1.0 LRFD / 1.6 ASD", source: "AISC 360-22 Eq. A-8-4" },
+    ],
+  },
   "steel-h1-interaction": {
     formula: "ratio = Pr/Pc; ratio >= 0.2: I = Pr/Pc + (8/9)(Mrx/Mcx + Mry/Mcy); ratio < 0.2: I = Pr/(2Pc) + (Mrx/Mcx + Mry/Mcy); pass when I <= 1.0.",
     edition: "The AISC 360-22 Section H1.1 combined-force (axial plus flexure) bilinear interaction equations, consistent for ASD or LRFD, by name.",

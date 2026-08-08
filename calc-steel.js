@@ -818,6 +818,65 @@ STEEL_RENDERERS["steel-h1-interaction"] = _simpleRenderer({
   compute: computeSteelH1Interaction,
 });
 
+// ===================== spec-v1216: AISC beam-column nonsway moment amplifier B1 =====================
+// The steel-h1-interaction tile "assumes the second-order Mr is already supplied," and steel has no
+// moment magnifier (concrete has rc-slender-column-magnify, wood has the 1 - fc/FcE magnifier). This adds
+// the steel one. AISC 360 Appendix 8.2.1: B1 = Cm / (1 - alpha Pr / Pe1) >= 1, the P-delta amplifier for
+// the nonsway (braced) moment, with Cm = 0.6 - 0.4 (M1/M2) (no transverse load) or 1.0 (transverse load),
+// Pe1 = pi^2 EI* / (K1 L)^2 the in-plane elastic buckling load (E = 29,000 ksi, EI* = EI nominal here;
+// the direct analysis method reduces it to 0.8 tau_b EI), and alpha = 1.0 (LRFD) / 1.6 (ASD).
+// dims: in { pr_kip: M L T^-2, i_in4: L^4, lc1_ft: L, transverse_load: dimensionless, m1_m2: dimensionless, method: dimensionless } out: { b1: dimensionless, pe1_kip: M L T^-2, cm: dimensionless }
+export function computeSteelB1Amplifier({ pr_kip = 0, i_in4 = 0, lc1_ft = 0, transverse_load = "no", m1_m2 = 0, method = "LRFD" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Pr = Number(pr_kip) || 0;
+  const I = Number(i_in4) || 0;
+  const Lc1 = Number(lc1_ft) || 0;
+  const ratio12 = Number(m1_m2) || 0;
+  if (!(Pr > 0)) return { error: "Required axial force Pr must be positive (kip)." };
+  if (!(I > 0)) return { error: "In-plane moment of inertia I must be positive (in^4)." };
+  if (!(Lc1 > 0)) return { error: "Effective length K1 L in the plane must be positive (ft)." };
+  if (transverse_load !== "yes" && transverse_load !== "no") return { error: "Transverse load must be 'yes' or 'no'." };
+  if (method !== "LRFD" && method !== "ASD") return { error: "Method must be LRFD or ASD." };
+  if (transverse_load === "no" && !(ratio12 >= -1 && ratio12 <= 1)) return { error: "M1/M2 must be between -1 (single curvature) and +1 (reverse curvature)." };
+  const Lc1_in = Lc1 * 12;
+  const pe1_kip = Math.PI * Math.PI * _E_STEEL * I / (Lc1_in * Lc1_in);
+  const cm = transverse_load === "yes" ? 1.0 : 0.6 - 0.4 * ratio12;
+  const alpha = method === "LRFD" ? 1.0 : 1.6;
+  const denom = 1 - alpha * Pr / pe1_kip;
+  if (!(denom > 0)) return { error: "alpha Pr / Pe1 >= 1: the required axial load reaches the in-plane elastic buckling load, so the member is unstable in this plane -- increase the section or shorten the unbraced length." };
+  const b1 = Math.max(1, cm / denom);
+  if (![pe1_kip, cm, b1].every(Number.isFinite)) return { error: "B1 math is not a finite value." };
+  return {
+    b1, pe1_kip, cm, alpha, axial_ratio: alpha * Pr / pe1_kip,
+    note: "The AISC 360 Appendix 8.2.1 beam-column nonsway (braced) moment amplifier B1, the second-order P-delta magnifier the steel-h1-interaction tile assumes is already in Mr. B1 = Cm / (1 - alpha Pr / Pe1), taken not less than 1.0, where Pr is the required axial compression, Pe1 = pi^2 EI* / (K1 L)^2 is the elastic critical buckling load in the plane of bending (E = 29,000 ksi; K1 <= 1.0 for the braced condition, conservatively 1.0), alpha = 1.0 (LRFD) or 1.6 (ASD), and Cm = 0.6 - 0.4 (M1/M2) for a member with no transverse load between supports (M1/M2 the ratio of the smaller to larger end moment, negative for single curvature so Cm rises to 1.0, positive for reverse curvature so Cm falls to 0.2) or Cm = 1.0 when there is transverse load. A W10x49 (I 272 in^4) carrying Pr 400 kip over a 16 ft braced length with transverse load amplifies its moment 1.23x (LRFD); the same on the ASD basis (alpha 1.6) amplifies 1.43x. It multiplies the first-order Mnt to give the Mr the H1.1 interaction needs (Mr = B1 Mnt + B2 Mlt; this is the B1 term). Pe1 here uses the nominal EI; the direct analysis method reduces it to 0.8 tau_b EI. In-plane (P-delta) amplification only -- the sidesway B2 (P-Delta) and the out-of-plane checks are separate. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const steelB1AmplifierExample = { inputs: { pr_kip: 400, i_in4: 272, lc1_ft: 16, transverse_load: "yes", m1_m2: 0, method: "LRFD" } };
+STEEL_RENDERERS["steel-b1-amplifier"] = _simpleRenderer({
+  citation: "Citation: AISC 360 Appendix 8.2.1 nonsway moment amplifier B1 = Cm / (1 - alpha Pr / Pe1) >= 1, with Pe1 = pi^2 EI / (K1 L)^2 (E = 29,000 ksi), Cm = 0.6 - 0.4 (M1/M2) or 1.0 with transverse load, alpha = 1.0 (LRFD) / 1.6 (ASD), by name. In-plane P-delta amplification only; the direct analysis method reduces EI to 0.8 tau_b EI. A design aid, not a substitute for the engineer of record.",
+  example: steelB1AmplifierExample.inputs,
+  fields: [
+    { key: "pr_kip", label: "Required axial compression Pr (kip)", kind: "number", default: 400 },
+    { key: "i_in4", label: "In-plane moment of inertia I (in^4)", kind: "number", default: 272 },
+    { key: "lc1_ft", label: "Effective length in the plane K1 L (ft, K1 <= 1)", kind: "number", default: 16 },
+    { key: "transverse_load", label: "Transverse load between supports?", kind: "select", default: "no", options: [
+      { value: "no", label: "No (Cm from the end-moment ratio)" },
+      { value: "yes", label: "Yes (Cm = 1.0)" },
+    ] },
+    { key: "m1_m2", label: "End-moment ratio, smaller/larger (- single curvature, + reverse; no transverse load)", kind: "number", default: 0 },
+    { key: "method", label: "Design basis", kind: "select", default: "LRFD", options: [
+      { value: "LRFD", label: "LRFD (alpha = 1.0)" },
+      { value: "ASD", label: "ASD (alpha = 1.6)" },
+    ] },
+  ],
+  outputs: [
+    { key: "b1", id: "sb1-out-b1", label: "Moment amplifier B1", value: (r) => fmt(r.b1, 3) },
+    { key: "pe1", id: "sb1-out-pe1", label: "Pe1 / Cm / alpha Pr/Pe1", value: (r) => fmt(r.pe1_kip, 0) + " kip / " + fmt(r.cm, 2) + " / " + fmt(r.axial_ratio, 3) },
+    { key: "n", id: "sb1-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelB1Amplifier,
+});
+
 // dims: in { ga: dimensionless, gb: dimensionless, frame: dimensionless } out: { k_factor: dimensionless }
 export function computeSteelEffectiveLengthK({ ga = 0, gb = 0, frame = "sway" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

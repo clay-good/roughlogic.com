@@ -819,6 +819,7 @@ export const RENDERER_MAP = {
   "slip-critical-with-tension": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-fillet-weld-size": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-h1-interaction": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
+  "steel-b1-amplifier": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-effective-length-k": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-column-stiffness-ratio-g": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-bolt-tension-shear": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
