@@ -62,7 +62,7 @@ const FIELD_METER = new Set([
 const _TILES = [
   ["final-grade-needed", "Y"],
   ["category-weighted-grade", "Y"],
-  ["two-sample-t-test", "Y"], ["paired-t-test", "Y"], ["one-sample-t-test", "Y"],
+  ["two-sample-t-test", "Y"], ["paired-t-test", "Y"], ["one-sample-t-test", "Y"], ["one-way-anova", "Y"],
   ["gross-rent-multiplier", "X"],
   ["pmi-cancellation-date", "X"],
   ["seller-net-sheet", "X"],

@@ -23,7 +23,7 @@
 // to a Group Y tile per the spec-v10 §H.1 per-tile-cap discipline.
 
 import { DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeTextarea, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
-import { tcdf, chi2Cdf } from "./pure-math.js";
+import { tcdf, chi2Cdf, betainc } from "./pure-math.js";
 
 // --- Tokenizers ---
 //
@@ -2397,3 +2397,65 @@ function renderOneSampleTTest(inputRegion, outputRegion, citationEl) {
   for (const f of [xb.input, sd.input, n.input, mu0.input, tail.select]) f.addEventListener("input", update);
 }
 EDU_RENDERERS["one-sample-t-test"] = renderOneSampleTTest;
+
+// --- spec-v1261: one-way ANOVA (`one-way-anova`) ---
+// The inferential-stats family has one/two/paired t-tests and chi-square GOF but no way to compare
+// THREE OR MORE group means at once -- one-way ANOVA is that missing generalization of the two-sample
+// t-test. Partition the total variation: between-groups SSB = sum n_i (mean_i - grand)^2 (df = k-1) and
+// within-groups SSW = sum sum (x - mean_i)^2 (df = N-k); F = (SSB/df_b)/(SSW/df_w). The upper-tail p-value
+// comes from the F distribution via the bundled regularized incomplete beta: p = I_{df_w/(df_w+df_b F)}(df_w/2, df_b/2).
+// eta^2 = SSB/SST is the effect size. Verified against scipy.stats.f_oneway.
+// dims: in { groups_text: dimensionless } out: { f_stat: dimensionless, df_between: dimensionless, df_within: dimensionless, p_value: dimensionless, ss_between: dimensionless, ss_within: dimensionless, ms_between: dimensionless, ms_within: dimensionless, eta_squared: dimensionless, groups: dimensionless, n_total: dimensionless }
+export function computeOneWayAnova({ groups_text = "" } = {}) {
+  if (typeof groups_text !== "string") return { error: "Provide the group data as text, one group per line." };
+  const groups = groups_text.split("\n").map((l) => l.trim()).filter((l) => l.length > 0)
+    .map((l) => l.split(/[\s,]+/).map(Number).filter((v) => Number.isFinite(v)))
+    .filter((g) => g.length > 0);
+  const k = groups.length;
+  if (k < 2) return { error: "Enter at least two groups (one group per line, values separated by spaces or commas)." };
+  const counts = groups.map((g) => g.length);
+  const N = counts.reduce((a, b) => a + b, 0);
+  if (N - k < 1) return { error: "Need more observations than groups (the within-group df N - k must be at least 1)." };
+  const groupMeans = groups.map((g) => g.reduce((a, b) => a + b, 0) / g.length);
+  const grand = groups.reduce((a, g) => a + g.reduce((x, y) => x + y, 0), 0) / N;
+  let ssb = 0;
+  for (let i = 0; i < k; i++) ssb += counts[i] * Math.pow(groupMeans[i] - grand, 2);
+  let ssw = 0;
+  for (let i = 0; i < k; i++) for (const x of groups[i]) ssw += Math.pow(x - groupMeans[i], 2);
+  const dfb = k - 1, dfw = N - k;
+  if (!(ssw > 0)) return { error: "No within-group variation (each group's values are identical) - F is not defined." };
+  const msb = ssb / dfb, msw = ssw / dfw;
+  const F = msb / msw;
+  const p = betainc(dfw / (dfw + dfb * F), dfw / 2, dfb / 2);
+  const sst = ssb + ssw;
+  const eta2 = sst > 0 ? ssb / sst : 0;
+  if (![F, p, msb, msw].every(Number.isFinite)) return { error: "ANOVA math is not a finite value." };
+  return {
+    f_stat: F, df_between: dfb, df_within: dfw, p_value: p,
+    ss_between: ssb, ss_within: ssw, ms_between: msb, ms_within: msw,
+    eta_squared: eta2, groups: k, n_total: N,
+    significant: p < 0.05,
+    note: "One-way ANOVA, the member the t-test family was missing: it tests whether three or more group means differ by more than chance, the way the two-sample t-test does for two. The total spread is split into between-group variation SSB = sum n_i (mean_i - grand)^2 and within-group variation SSW = sum (x - group mean)^2; F = (SSB/(k-1)) / (SSW/(N-k)) is the ratio of the two, and a large F (small p) says at least one group mean stands out. The p-value is the upper tail of the F distribution with k-1 and N-k degrees of freedom, from the bundled special-function helper. eta^2 = SSB/SST is the share of variance explained (0.01 small, 0.06 medium, 0.14 large). ANOVA assumes roughly normal groups with similar variances and only flags THAT a difference exists, not which pair -- a post-hoc test (Tukey HSD) locates it. A first-principles statistics aid; the study design governs.",
+  };
+}
+export const oneWayAnovaExample = { inputs: { groups_text: "88 90 92 85 91\n79 82 80 78 84\n93 95 91 90 94" } };
+function renderOneWayAnova(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: one-way ANOVA per OpenIntro Statistics Chapter 7 (comparing many means), by name: F = MSB/MSW with df k-1 and N-k; the F-distribution p-value reuses the bundled regularized-incomplete-beta helper. Verified against scipy.stats.f_oneway. Free at openintro.org.";
+  const t = makeTextarea("Groups (one group per line; values separated by spaces or commas)", "anova-t", { placeholder: "88 90 92 85 91\n79 82 80 78 84\n93 95 91 90 94", rows: "5" });
+  inputRegion.appendChild(t.wrap);
+  attachExampleButton(inputRegion, () => { t.input.value = "88 90 92 85 91\n79 82 80 78 84\n93 95 91 90 94"; update(); });
+  const oF = makeOutputLine(outputRegion, "F-statistic / df", "anova-out-f");
+  const oP = makeOutputLine(outputRegion, "p-value / significance", "anova-out-p");
+  const oE = makeOutputLine(outputRegion, "Effect size (eta squared)", "anova-out-e");
+  const oNote = makeOutputLine(outputRegion, "Note", "anova-out-note");
+  const update = debounce(() => {
+    const r = computeOneWayAnova({ groups_text: t.input.value });
+    if (r.error) { oF.textContent = r.error; oP.textContent = ""; oE.textContent = ""; oNote.textContent = ""; return; }
+    oF.textContent = "F = " + fmt(r.f_stat, 3) + " (df " + r.df_between + ", " + r.df_within + "); " + r.groups + " groups, N = " + r.n_total;
+    oP.textContent = "p = " + fmt(r.p_value, 4) + " (" + (r.significant ? "significant" : "not significant") + " at 0.05)";
+    oE.textContent = "eta^2 = " + fmt(r.eta_squared, 3);
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  t.input.addEventListener("input", update);
+}
+EDU_RENDERERS["one-way-anova"] = renderOneWayAnova;

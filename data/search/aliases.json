@@ -406,6 +406,31 @@
       "kind": "question"
     },
     {
+      "term": "one way anova",
+      "target": "one-way-anova",
+      "kind": "industry"
+    },
+    {
+      "term": "analysis of variance",
+      "target": "one-way-anova",
+      "kind": "industry"
+    },
+    {
+      "term": "compare three or more group means",
+      "target": "one-way-anova",
+      "kind": "question"
+    },
+    {
+      "term": "f test between groups",
+      "target": "one-way-anova",
+      "kind": "question"
+    },
+    {
+      "term": "which of several groups differ",
+      "target": "one-way-anova",
+      "kind": "question"
+    },
+    {
       "term": "paired t test",
       "target": "paired-t-test",
       "kind": "industry"

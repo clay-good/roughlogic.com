@@ -22513,6 +22513,58 @@
    }
   },
   {
+   "tile_id": "one-way-anova",
+   "source_publisher": "scipy.stats.f_oneway (cross-verified)",
+   "source_title": "three groups 88 90 92 85 91 / 79 82 80 78 84 / 93 95 91 90 94 -> F 32.236, p 1.49e-5 (spec-v1261)",
+   "source_edition_or_year": "F = MSB/MSW, df 2 and 12",
+   "source_section_or_page": "SSB/2 over SSW/12; scipy.stats.f_oneway returns F=32.235955, p=1.4930551e-05; eta^2 = SSB/SST = 0.843.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "groups_text": "88 90 92 85 91\n79 82 80 78 84\n93 95 91 90 94"
+   },
+   "outputs": {
+    "f_stat": {
+     "value": 32.236,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "eta_squared": {
+     "value": 0.843,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "one-way-anova",
+   "source_publisher": "one-way ANOVA (hand-computed, scipy cross-checked)",
+   "source_title": "1 2 3 / 2 3 4 / 4 5 6 -> F 7.000, p 0.027, eta^2 0.700",
+   "source_edition_or_year": "SSB 14, SSW 6, df 2 and 6",
+   "source_section_or_page": "group means 2/3/5, grand 3.333; SSB = 3(1.778+0.111+2.778)=14, SSW=6; F=(14/2)/(6/6)=7.0; p from F(2,6)=0.027 (scipy 0.026999...); eta^2=14/20=0.7.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "groups_text": "1 2 3\n2 3 4\n4 5 6"
+   },
+   "outputs": {
+    "f_stat": {
+     "value": 7.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "p_value": {
+     "value": 0.027,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "two-sample-t-test",
    "source_publisher": "OpenIntro Statistics Ch. 7 (Welch's two-sample t)",
    "source_title": "t = (m1-m2)/sqrt(s1^2/n1 + s2^2/n2); Welch df",

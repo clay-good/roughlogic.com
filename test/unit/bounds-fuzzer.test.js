@@ -10694,6 +10694,7 @@ test("bounds: spec-v1231 computeSumOfYearsDigitsDepreciation pins schedule, salv
 import { computePrimerTm as _t1, computeCfuPlateCount as _t2 } from "../../calc-lab.js";
 import { computeGrossRentMultiplier as _x1, computePmiCancellationDate as _x2, computeSellerNetSheet as _x3 } from "../../calc-realestate.js";
 import { computeFinalGradeNeeded as _y1, computeCategoryWeightedGrade as _y2, computeTwoSampleTTest as _y3, computePairedTTest as _v1234, computeOneSampleTTest as _v1236 } from "../../calc-edu.js";
+import { computeOneWayAnova as _v1261 } from "../../calc-edu.js";
 test("bounds: spec-v1236 computeOneSampleTTest pins t = (x_bar-mu0)/(s/sqrt(n)), df, tails, and error seams", () => {
   // mean 16.1, SD 0.3, n 25 vs target 16.0: t = 1.667, df 24, two-sided p ~ 0.1086.
   const r = _v1236({ sample_mean: 16.1, sample_sd: 0.3, n: 25, hypothesized_mean: 16.0, tail: "two" });
@@ -10714,6 +10715,30 @@ test("bounds: spec-v1236 computeOneSampleTTest pins t = (x_bar-mu0)/(s/sqrt(n)),
   assert.ok("error" in _v1236({ sample_mean: 1, sample_sd: -1, n: 5, hypothesized_mean: 0 }));
   assert.ok("error" in _v1236({ sample_mean: 5, sample_sd: 0, n: 5, hypothesized_mean: 0 }));
   assert.ok("error" in _v1236({ sample_mean: Infinity, sample_sd: 1, n: 5, hypothesized_mean: 0 }));
+});
+test("bounds: spec-v1261 computeOneWayAnova pins the variance partition, F, the scipy-checked p, eta^2, and error seams", () => {
+  // Three groups 1 2 3 / 2 3 4 / 4 5 6: means 2/3/5, grand 3.333; SSB 14, SSW 6; F=(14/2)/(6/6)=7.0; scipy p=0.0270; eta^2=0.7.
+  const r = _v1261({ groups_text: "1 2 3\n2 3 4\n4 5 6" });
+  assert.ok(Math.abs(r.ss_between - 14) < 1e-9 && Math.abs(r.ss_within - 6) < 1e-9);
+  assert.ok(r.df_between === 2 && r.df_within === 6);
+  assert.ok(Math.abs(r.f_stat - 7.0) < 1e-9);
+  assert.ok(Math.abs(r.p_value - 0.027) < 1e-3);
+  assert.ok(Math.abs(r.eta_squared - 0.7) < 1e-9);
+  assert.ok(r.groups === 3 && r.n_total === 9 && r.significant === true);
+  // Cross-checked against scipy.stats.f_oneway: F=32.235955, p=1.4930551e-05.
+  const s = _v1261({ groups_text: "88 90 92 85 91\n79 82 80 78 84\n93 95 91 90 94" });
+  assert.ok(Math.abs(s.f_stat - 32.235955) < 1e-3 && Math.abs(s.p_value - 1.4930551e-5) < 1e-7);
+  // Identical group means give F ~ 0 and a p near 1.
+  const flat = _v1261({ groups_text: "1 2 3\n1 2 3\n1 2 3" });
+  assert.ok(Math.abs(flat.f_stat) < 1e-9 && Math.abs(flat.p_value - 1) < 1e-9 && flat.significant === false);
+  // Comma separators parse the same as spaces.
+  assert.ok(Math.abs(_v1261({ groups_text: "1,2,3\n2,3,4\n4,5,6" }).f_stat - 7.0) < 1e-9);
+  // Error seams: fewer than two groups, N-k < 1, no within-group variance, non-string.
+  assert.ok("error" in _v1261({ groups_text: "1 2 3 4 5" }));
+  assert.ok("error" in _v1261({ groups_text: "1\n2" })); // N=2, k=2, dfw=0
+  assert.ok("error" in _v1261({ groups_text: "5 5 5\n5 5 5" }));
+  assert.ok("error" in _v1261({ groups_text: "" }));
+  assert.ok("error" in _v1261({ groups_text: 42 }));
 });
 test("bounds: spec-v1234 computePairedTTest pins t = d_bar/(s_d/sqrt(n)), df, the two/one-tail p, and error seams", () => {
   // mean diff 2.5, SD 3.0, n 20: t = 2.5/(3/sqrt(20)) = 3.727, df 19, two-sided p ~ 0.00143.

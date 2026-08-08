@@ -134,6 +134,18 @@ export const CITATIONS = {
       { name: "Target value", value: "mu0 is a fixed hypothesized/spec mean, not a second sample", source: "OpenIntro Ch. 7" },
     ],
   },
+  "one-way-anova": {
+    formula: "SSB = sum n_i (mean_i - grand)^2 (df = k-1); SSW = sum sum (x - mean_i)^2 (df = N-k); F = (SSB/(k-1)) / (SSW/(N-k)); upper-tail p = I(x; df_w/2, df_b/2) the regularized incomplete beta with x = df_w/(df_w + df_b F); eta^2 = SSB/(SSB+SSW).",
+    edition: "Per OpenIntro Statistics Chapter 7 (comparing many means with ANOVA), by name; the F-distribution p-value reuses the bundled regularized-incomplete-beta helper. Verified against scipy.stats.f_oneway.",
+    freeAccess: "Free at openintro.org; the F-test and its partition of variance are public-domain textbook statistics.",
+    governance: GOVERNANCE.general,
+    editionNote: "One-way ANOVA generalizes the two-sample t-test to three or more groups. It partitions the total variation into a between-group part SSB = sum n_i (mean_i - grand)^2 on k-1 df and a within-group part SSW = sum (x - group mean)^2 on N-k df; the ratio of their mean squares F = (SSB/(k-1))/(SSW/(N-k)) is large when the group means are spread far apart relative to the scatter inside the groups. The p-value is the upper tail of the F distribution with those two df, computed from the bundled regularized incomplete beta. eta^2 = SSB/SST is the effect size (share of variance explained: ~0.01 small, 0.06 medium, 0.14 large). ANOVA assumes roughly normal groups with similar variances and reports only THAT at least one mean differs, not which - a post-hoc test such as Tukey HSD locates the difference. A statistics aid; the study design governs.",
+    assumptions: [
+      { name: "Variance partition", value: "SST = SSB + SSW; F = MSB/MSW with df k-1 and N-k", source: "OpenIntro Ch. 7" },
+      { name: "F-distribution p-value", value: "p = I(x; df_w/2, df_b/2) the regularized incomplete beta, x = df_w/(df_w+df_b F)", source: "F-distribution CDF identity" },
+      { name: "Scope", value: "flags that a difference exists, not which pair (needs a Tukey HSD post-hoc); assumes normal groups, equal variances", source: "scope of this tile" },
+    ],
+  },
   "paired-t-test": {
     formula: "On the n paired differences d_i: t = d_bar / (s_d / sqrt(n)) on df = n - 1, where d_bar and s_d are the mean and standard deviation of the differences; p from the Student-t CDF.",
     edition: "Per OpenIntro Statistics Chapter 7 (inference for paired data) - the paired t-test is a one-sample t on the differences, by name; the t-CDF reuses the bundled special-function helper.",
