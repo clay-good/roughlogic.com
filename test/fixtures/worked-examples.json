@@ -27788,6 +27788,56 @@
    }
   },
   {
+   "tile_id": "solar-azimuth-angle",
+   "source_publisher": "NOAA / Duffie & Beckman solar geometry (Cooper's declination)",
+   "source_title": "40 deg N, summer solstice (day 172), 9 a.m. (H -45) -> azimuth 99.8 deg (E), altitude 48.8 (spec-v1248)",
+   "source_edition_or_year": "azimuth = 180 + atan2(cos(dec) sin(H), cos(H) cos(dec) sin(lat) - sin(dec) cos(lat))",
+   "source_section_or_page": "dec = 23.45; H = -45 deg; from-south gamma = atan2(cos23.45 sin(-45), cos(-45) cos23.45 sin40 - sin23.45 cos40) = -80.2 deg; compass = 180 - 80.2 = 99.8 deg (east of south, morning).",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "latitude_deg": 40,
+    "day_of_year": 172,
+    "hours_from_solar_noon": -3
+   },
+   "outputs": {
+    "azimuth_deg": {
+     "value": 99.81,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "altitude_deg": {
+     "value": 48.83,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "solar-azimuth-angle",
+   "source_publisher": "Solar azimuth (solar-noon cross-check)",
+   "source_title": "at solar noon the northern-hemisphere sun bears due south (180 deg)",
+   "source_edition_or_year": "H = 0 -> gamma = 0 -> compass 180",
+   "source_section_or_page": "same site at noon (H 0): the from-south azimuth is exactly 0, so the compass bearing is 180 deg (due south), with the noon altitude 73.45 deg.",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "latitude_deg": 40,
+    "day_of_year": 172,
+    "hours_from_solar_noon": 0
+   },
+   "outputs": {
+    "azimuth_deg": {
+     "value": 180,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "deck-board-takeoff",
    "source_publisher": "First-principles deck-surface takeoff",
    "source_title": "boards = ceil((width_in + gap) / (face + gap)); screws = boards x joists x 2",

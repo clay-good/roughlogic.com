@@ -13967,6 +13967,18 @@ export const CITATIONS = {
       { name: "Scope", value: "true solar time, flat horizon; refraction and the equation of time are separate", source: "scope of this tile" },
     ],
   },
+  "solar-azimuth-angle": {
+    formula: "dec = 23.45 sin(360 (284 + n)/365); H = 15 (hours from solar noon); azimuth-from-south gamma = atan2(cos(dec) sin(H), cos(H) cos(dec) sin(lat) - sin(dec) cos(lat)); compass bearing = (180 + gamma) mod 360.",
+    edition: "The solar azimuth (compass bearing) from the NOAA / Duffie & Beckman solar-geometry relations, with the declination from Cooper's equation, by name.",
+    freeAccess: "The solar-position equations are public-domain solar geometry (NOAA); the latitude, date, and time are the user's own site inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The solar azimuth, the sun's compass bearing (degrees clockwise from true north: 90 = east, 180 = south, 270 = west), the companion the window-overhang-shade tile and any shadow-direction study need alongside the altitude that solar-altitude-angle produces. It uses the robust two-argument form azimuth-from-south gamma = atan2(cos(dec) sin(H), cos(H) cos(dec) sin(lat) - sin(dec) cos(lat)), then compass bearing = 180 + gamma, with the declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365) and the hour angle H = 15 x (hours from solar noon), negative in the morning. At solar noon in the northern hemisphere the sun bears due south (180 deg); before noon it is to the east (< 180) and after noon to the west (> 180), and at 40 deg N on the summer solstice the sunrise sun sits well north of east. The shadow points in the opposite direction (bearing +/- 180). True solar time and a flat horizon are assumed; the equation of time (from solar-times) and atmospheric refraction are separate. A site-planning geometry; the actual sun path governs.",
+    assumptions: [
+      { name: "Azimuth", value: "gamma = atan2(cos(dec) sin(H), cos(H) cos(dec) sin(lat) - sin(dec) cos(lat)); compass = 180 + gamma", source: "NOAA / Duffie & Beckman solar geometry" },
+      { name: "Declination / hour angle", value: "dec = 23.45 sin(360 (284 + n)/365) (Cooper); H = 15 x (hours from solar noon)", source: "solar geometry" },
+      { name: "Scope", value: "compass bearing clockwise from true north; true solar time, flat horizon; refraction and equation of time separate", source: "scope of this tile" },
+    ],
+  },
   "pv-max-ambient-for-power": {
     formula: "T_cell = 25 + (target_power/P_stc - 1) x 100/gamma; max_ambient = T_cell - (NOCT - 20) x G/800. The inverse of P = P_stc x (1 + gamma/100 x (T_cell - 25)) and T_cell = T_amb + (NOCT - 20) x G/800.",
     edition: "The PV NOCT cell-temperature model and the datasheet power temperature coefficient, by name, solved for the ambient temperature.",

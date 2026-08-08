@@ -24207,6 +24207,27 @@ test("bounds: spec-v790 computeShadowLength pins shadow = h/tan(altitude), monot
   assert.ok("error" in _v790({ object_height_ft: 10, sun_altitude_deg: 95 }));
 });
 
+import { computeSolarAzimuth as _v1248 } from "../../calc-solar.js";
+test("bounds: spec-v1248 computeSolarAzimuth pins due-south noon, morning/afternoon symmetry, the compass label, and error seams", () => {
+  // 40 N, summer solstice, solar noon -> due south (180 deg).
+  const noon = _v1248({ latitude_deg: 40, day_of_year: 172, hours_from_solar_noon: 0 });
+  assert.ok(Math.abs(noon.azimuth_deg - 180) < 1e-6 && noon.compass === "S");
+  // Morning is east of south (< 180), afternoon west (> 180), symmetric about 180.
+  const am = _v1248({ latitude_deg: 40, day_of_year: 172, hours_from_solar_noon: -3 });
+  const pm = _v1248({ latitude_deg: 40, day_of_year: 172, hours_from_solar_noon: 3 });
+  assert.ok(am.azimuth_deg < 180 && pm.azimuth_deg > 180);
+  assert.ok(Math.abs((180 - am.azimuth_deg) - (pm.azimuth_deg - 180)) < 1e-9);
+  assert.ok(Math.abs(am.azimuth_deg - 99.81) < 0.1 && Math.abs(am.altitude_deg - pm.altitude_deg) < 1e-9);
+  // Azimuth is always in [0, 360).
+  for (const h of [-6, -1, 0, 1, 6]) { const r = _v1248({ latitude_deg: 40, day_of_year: 172, hours_from_solar_noon: h }); assert.ok(r.azimuth_deg >= 0 && r.azimuth_deg < 360); }
+  // A summer sunrise at 40 N is north of due east (bearing < 90).
+  assert.ok(_v1248({ latitude_deg: 40, day_of_year: 172, hours_from_solar_noon: -6.5 }).azimuth_deg < 90);
+  // Error seams: latitude out of range, day out of range, hours out of range, non-finite.
+  assert.ok("error" in _v1248({ latitude_deg: 100, day_of_year: 172, hours_from_solar_noon: 0 }));
+  assert.ok("error" in _v1248({ latitude_deg: 40, day_of_year: 0, hours_from_solar_noon: 0 }));
+  assert.ok("error" in _v1248({ latitude_deg: 40, day_of_year: 172, hours_from_solar_noon: 20 }));
+  assert.ok("error" in _v1248({ latitude_deg: Infinity, day_of_year: 172, hours_from_solar_noon: 0 }));
+});
 import { computeSolarAltitude as _v1213 } from "../../calc-solar.js";
 
 test("bounds: spec-v1213 computeSolarAltitude pins the noon and hour-angle altitude, the solstice extremes, the below-horizon flag, and error seams", () => {

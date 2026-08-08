@@ -1585,6 +1585,62 @@ function renderSolarAltitude(inputRegion, outputRegion, citationEl) {
 }
 SOLAR_RENDERERS["solar-altitude-angle"] = renderSolarAltitude;
 
+// spec-v1248: solar azimuth (compass bearing of the sun). The companion to solar-altitude-angle:
+// window-overhang-shade and shadow-DIRECTION studies need the azimuth, but solar-altitude produces
+// only elevation and solar-times gives neither. Compass azimuth (clockwise from north) via the robust
+// atan2 form gamma_s = atan2(cos(dec) sin(H), cos(H) cos(dec) sin(lat) - sin(dec) cos(lat)) measured
+// from south (+west), then compass = 180 + gamma_s. Reduces to due south (180) at solar noon in the
+// northern hemisphere. NOAA / Duffie & Beckman spherical trig.
+// dims: in { latitude_deg: dimensionless, day_of_year: dimensionless, hours_from_solar_noon: dimensionless } out: { azimuth_deg: dimensionless, altitude_deg: dimensionless, declination_deg: dimensionless, hour_angle_deg: dimensionless }
+export function computeSolarAzimuth({ latitude_deg = 0, day_of_year = 172, hours_from_solar_noon = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const lat = Number(latitude_deg) || 0;
+  const n = Number(day_of_year) || 0;
+  const hrs = Number(hours_from_solar_noon) || 0;
+  if (!(lat >= -90 && lat <= 90)) return { error: "Latitude must be between -90 and 90 degrees." };
+  if (!(n >= 1 && n <= 366)) return { error: "Day of year must be between 1 and 366." };
+  if (!(hrs >= -12 && hrs <= 12)) return { error: "Hours from solar noon must be between -12 and 12." };
+  const rad = Math.PI / 180;
+  const declination_deg = 23.45 * Math.sin(360 * (284 + n) / 365 * rad);
+  const hour_angle_deg = 15 * hrs;
+  const phi = lat * rad, dec = declination_deg * rad, H = hour_angle_deg * rad;
+  const sinAlt = Math.sin(phi) * Math.sin(dec) + Math.cos(phi) * Math.cos(dec) * Math.cos(H);
+  const altitude_deg = Math.asin(Math.max(-1, Math.min(1, sinAlt))) / rad;
+  // azimuth from south, +west; then to compass (clockwise from north)
+  const gammaS = Math.atan2(Math.cos(dec) * Math.sin(H), Math.cos(H) * Math.cos(dec) * Math.sin(phi) - Math.sin(dec) * Math.cos(phi));
+  let azimuth_deg = (180 + gammaS / rad) % 360;
+  if (azimuth_deg < 0) azimuth_deg += 360;
+  const dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+  const compass = dirs[Math.round(azimuth_deg / 22.5) % 16];
+  if (![azimuth_deg, altitude_deg, declination_deg, hour_angle_deg].every(Number.isFinite)) return { error: "Solar-azimuth math is not a finite value." };
+  return {
+    azimuth_deg, altitude_deg, declination_deg, hour_angle_deg, compass, below_horizon: altitude_deg <= 0,
+    note: "The solar azimuth, the sun's compass bearing (degrees clockwise from true north: 90 = due east, 180 = due south, 270 = due west), the companion the window-overhang-shade tile and any shadow-DIRECTION study need alongside the altitude that solar-altitude-angle produces. It uses the robust two-argument form azimuth-from-south gamma = atan2(cos(dec) sin(H), cos(H) cos(dec) sin(lat) - sin(dec) cos(lat)), then compass bearing = 180 + gamma, with the declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365) and the hour angle H = 15 x (hours from solar noon), negative in the morning. At solar noon in the northern hemisphere the sun bears due south (180 deg); before noon it is to the east (bearing < 180) and after noon to the west (> 180). At 40 deg N on the summer solstice the sunrise sun sits well north of east (bearing ~ 58 deg) and swings to due south at noon. The shadow points in the opposite direction (bearing +/- 180). This is the compass bearing paired with the altitude to place the sun in the sky or aim a fixed panel; true solar time and a flat horizon are assumed, and the equation of time (from solar-times) and refraction are separate. A site-planning geometry; the actual sun path governs.",
+  };
+}
+export const solarAzimuthExample = { inputs: { latitude_deg: 40, day_of_year: 172, hours_from_solar_noon: -3 } };
+function renderSolarAzimuth(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: solar azimuth (compass bearing, clockwise from true north): from-south azimuth gamma = atan2(cos(dec) sin(H), cos(H) cos(dec) sin(lat) - sin(dec) cos(lat)), compass = 180 + gamma; declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365), hour angle H = 15 (hours from solar noon) (NOAA / Duffie & Beckman solar geometry). At solar noon the northern-hemisphere sun bears due south (180 deg). True solar time and a flat horizon assumed; the equation of time and refraction are separate. The actual sun path governs.";
+  const lat = makeNumber("Latitude (deg, + north)", "sazi-lat", { step: "any" }); lat.input.value = "40";
+  const doy = makeNumber("Day of year (1-365; 172 = summer solstice)", "sazi-doy", { step: "1", min: "1", max: "366" }); doy.input.value = "172";
+  const hrs = makeNumber("Hours from solar noon (- morning, + afternoon)", "sazi-hrs", { step: "any", min: "-12", max: "12" }); hrs.input.value = "-3";
+  for (const f of [lat, doy, hrs]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { lat.input.value = "40"; doy.input.value = "172"; hrs.input.value = "-3"; update(); });
+  const oAzi = makeOutputLine(outputRegion, "Solar azimuth (compass bearing)", "sazi-out-azi");
+  const oAlt = makeOutputLine(outputRegion, "Solar altitude (for reference)", "sazi-out-alt");
+  const oNote = makeOutputLine(outputRegion, "Note", "sazi-out-n");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeSolarAzimuth({ latitude_deg: readNum(lat.input), day_of_year: readNum(doy.input), hours_from_solar_noon: readNum(hrs.input) });
+    if (r.error) { oAzi.textContent = r.error; oAlt.textContent = "-"; oNote.textContent = ""; return; }
+    oAzi.textContent = fmt(r.azimuth_deg, 1) + " deg (" + r.compass + ")";
+    oAlt.textContent = fmt(r.altitude_deg, 1) + " deg" + (r.below_horizon ? " (sun below the horizon)" : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [lat, doy, hrs]) f.input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["solar-azimuth-angle"] = renderSolarAzimuth;
+
 // pv-rail-clamp-takeoff (spec-v896): PV racking rail, clamp, and splice takeoff.
 // dims: in { rows: dimensionless, modules_per_row: dimensionless, module_width_ft: L, gap_ft: L, rails_per_row: dimensionless, rail_stock_ft: L } out: { run_len_ft: L, rail_lf: L, mid_clamps: dimensionless, end_clamps: dimensionless, splices: dimensionless }
 export function computePvRailClampTakeoff({ rows = 2, modules_per_row = 12, module_width_ft = 3.42, gap_ft = 0, rails_per_row = 2, rail_stock_ft = 14 } = {}) {

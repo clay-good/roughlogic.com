@@ -520,7 +520,7 @@ const _TILES = [
   ["draft-beer-line-balance", "O"],
   ["rolling-sphere-protection", "A"],
   ["deck-board-takeoff", "E"],
-  ["shadow-length", "A"], ["solar-altitude-angle", "A"],
+  ["shadow-length", "A"], ["solar-altitude-angle", "A"], ["solar-azimuth-angle", "A"],
   ["engine-bmep", "K"],
   ["compressor-displacement", "C"], ["compressor-volumetric-efficiency", "C"],
   ["fresh-concrete-temp", "E"],

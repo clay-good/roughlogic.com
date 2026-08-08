@@ -43466,6 +43466,21 @@
       "kind": "industry"
     },
     {
+      "term": "solar azimuth angle",
+      "target": "solar-azimuth-angle",
+      "kind": "industry"
+    },
+    {
+      "term": "sun compass bearing",
+      "target": "solar-azimuth-angle",
+      "kind": "question"
+    },
+    {
+      "term": "which direction is the sun",
+      "target": "solar-azimuth-angle",
+      "kind": "question"
+    },
+    {
       "term": "winter design sun elevation",
       "target": "solar-altitude-angle",
       "kind": "question"

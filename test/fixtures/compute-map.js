@@ -1006,6 +1006,7 @@ export const COMPUTE_MAP = {
   "deck-board-takeoff": { module: "../../calc-finish.js", fn: "computeDeckBoardTakeoff" },
   "shadow-length": { module: "../../calc-solar.js", fn: "computeShadowLength" },
   "solar-altitude-angle": { module: "../../calc-solar.js", fn: "computeSolarAltitude" },
+  "solar-azimuth-angle": { module: "../../calc-solar.js", fn: "computeSolarAzimuth" },
   "engine-bmep": { module: "../../calc-mechanic.js", fn: "computeEngineBmep" },
   "compressor-displacement": { module: "../../calc-refrigerant.js", fn: "computeCompressorDisplacement" },
   "compressor-volumetric-efficiency": { module: "../../calc-refrigerant.js", fn: "computeCompressorVolumetricEfficiency" },
