@@ -1452,6 +1452,52 @@
    }
   },
   {
+   "tile_id": "clausius-clapeyron",
+   "source_publisher": "Clausius-Clapeyron (physical chemistry)",
+   "source_title": "water 760 mmHg/100 C, 525.9 mmHg/90 C -> dHvap ~ 41.5 kJ/mol (spec-v1235)",
+   "source_edition_or_year": "dHvap = R ln(P2/P1)/(1/T1 - 1/T2), R = 8.314",
+   "source_section_or_page": "dHvap = 8.314 x ln(525.9/760)/(1/373.15 - 1/363.15) = 41,483 J/mol = 41.48 kJ/mol, close to the tabulated 40.7",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "pressure1": 760,
+    "temp1_c": 100,
+    "pressure2": 525.9,
+    "temp2_c": 90
+   },
+   "outputs": {
+    "enthalpy_kj_mol": {
+     "value": 41.48,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "clausius-clapeyron",
+   "source_publisher": "Clausius-Clapeyron (unit-agnostic cross-check)",
+   "source_title": "the same points in kPa give the same enthalpy (only the ratio enters)",
+   "source_edition_or_year": "dHvap depends on P2/P1 only",
+   "source_section_or_page": "101.325 kPa/100 C and 70.11 kPa/90 C is the identical ratio, returning the same ~41.5 kJ/mol",
+   "verified_by": "rl",
+   "verified_on": "2026-08-08",
+   "inputs": {
+    "pressure1": 101.325,
+    "temp1_c": 100,
+    "pressure2": 70.11,
+    "temp2_c": 90
+   },
+   "outputs": {
+    "enthalpy_kj_mol": {
+     "value": 41.49,
+     "tolerance": {
+      "abs": 0.15
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rcf-rpm",
    "source_publisher": "Project (first-principles)",
    "source_title": "RCF = 1.118e-5 * r_cm * RPM^2",

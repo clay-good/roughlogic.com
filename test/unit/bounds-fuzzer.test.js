@@ -3827,6 +3827,7 @@ import {
   computeMassMoles,
   computeIdealGasLaw,
   computeArrheniusEquation,
+  computeClausiusClapeyron,
   computeNernstEquation,
   computeRcf,
   computeResuspension,
@@ -3991,6 +3992,28 @@ test("bounds: spec-v1230 computeNernstEquation pins cell potential, slope, and e
   assert.ok("error" in computeNernstEquation({ standard_potential_v: 1, electrons_n: 2, reaction_quotient: 0 }));
   assert.ok("error" in computeNernstEquation({ standard_potential_v: 1, electrons_n: 2, reaction_quotient: Infinity }));
   assert.ok("error" in computeNernstEquation({ standard_potential_v: 1, electrons_n: 2, reaction_quotient: 1, temperature_c: -273.15 }));
+});
+
+test("bounds: spec-v1235 computeClausiusClapeyron pins dHvap from two P/T points, the unit-agnostic ratio, and error seams", () => {
+  const R = 8.314;
+  // water 760 mmHg/100 C, 525.9 mmHg/90 C -> dHvap ~ 41.5 kJ/mol.
+  const r = computeClausiusClapeyron({ pressure1: 760, temp1_c: 100, pressure2: 525.9, temp2_c: 90 });
+  assert.ok(Math.abs(r.enthalpy_j_mol - R * Math.log(525.9 / 760) / (1 / 373.15 - 1 / 363.15)) < 1e-6);
+  assert.ok(Math.abs(r.enthalpy_kj_mol - 41.48) < 0.05);
+  assert.ok(Math.abs(r.slope_k - (-r.enthalpy_j_mol / R)) < 1e-9);
+  // Unit-agnostic: only the ratio matters, so kPa at the same ratio gives the same enthalpy.
+  const kpa = computeClausiusClapeyron({ pressure1: 101.325, temp1_c: 100, pressure2: 70.11, temp2_c: 90 });
+  assert.ok(Math.abs(kpa.enthalpy_kj_mol - r.enthalpy_kj_mol) < 0.05);
+  // Scaling both pressures by the same factor leaves the ratio, hence dHvap, unchanged.
+  const scaled = computeClausiusClapeyron({ pressure1: 76, temp1_c: 100, pressure2: 52.59, temp2_c: 90 });
+  assert.ok(Math.abs(scaled.enthalpy_kj_mol - r.enthalpy_kj_mol) < 1e-9);
+  // A falling pressure with rising temperature would give a negative enthalpy (unphysical, reported not errored).
+  assert.ok(computeClausiusClapeyron({ pressure1: 760, temp1_c: 90, pressure2: 525.9, temp2_c: 100 }).enthalpy_j_mol < 0);
+  // Error seams: non-positive pressure, equal temperatures, non-finite.
+  assert.ok("error" in computeClausiusClapeyron({ pressure1: 0, temp1_c: 100, pressure2: 500, temp2_c: 90 }));
+  assert.ok("error" in computeClausiusClapeyron({ pressure1: 760, temp1_c: 100, pressure2: 0, temp2_c: 90 }));
+  assert.ok("error" in computeClausiusClapeyron({ pressure1: 760, temp1_c: 100, pressure2: 525.9, temp2_c: 100 }));
+  assert.ok("error" in computeClausiusClapeyron({ pressure1: 760, temp1_c: 100, pressure2: Infinity, temp2_c: 90 }));
 });
 
 test("bounds: calc-lab computeMassMoles rejects non-positive MW or under-/over-specified inputs (documented)", () => {

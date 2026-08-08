@@ -1235,7 +1235,7 @@ const TOOL_MODULES = (() => {
   ]);
   // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
   declare("./calc-lab.js", "LAB_RENDERERS", [
-    "molarity-dilution", "serial-dilution", "molecular-weight", "mass-moles", "ideal-gas-law", "arrhenius-equation", "nernst-equation",
+    "molarity-dilution", "serial-dilution", "molecular-weight", "mass-moles", "ideal-gas-law", "arrhenius-equation", "clausius-clapeyron", "nernst-equation",
     "rcf-rpm", "resuspension-volume", "pcr-master-mix", "beer-lambert",
     "henderson-hasselbalch", "hemocytometer",
     // v23

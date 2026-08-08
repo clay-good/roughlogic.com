@@ -341,6 +341,34 @@ export function computeArrheniusEquation({ k1 = 0, temp1_c = 0, k2 = 0, temp2_c 
 }
 export const arrheniusEquationExample = { inputs: { k1: 1.0, temp1_c: 25, k2: 2.0, temp2_c: 35 } };
 
+// The enthalpy of vaporization from two vapor-pressure / temperature points, the
+// phase-equilibrium member the lab phys-chem set (ideal gas, Arrhenius, Nernst) leaves out.
+// Clausius-Clapeyron: ln(P2/P1) = -(dHvap/R)(1/T2 - 1/T1), so dHvap = R ln(P2/P1)/(1/T1 - 1/T2).
+// Only the pressure RATIO enters, so any consistent pressure unit works. R = 8.314 J/(mol*K).
+// dims: in { pressure1: dimensionless, temp1_c: T, pressure2: dimensionless, temp2_c: T } out: { enthalpy_j_mol: dimensionless, enthalpy_kj_mol: dimensionless }
+export function computeClausiusClapeyron({ pressure1 = 0, temp1_c = 0, pressure2 = 0, temp2_c = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R = 8.314; // J/(mol*K)
+  const P1 = Number(pressure1) || 0;
+  const P2 = Number(pressure2) || 0;
+  const t1c = Number(temp1_c);
+  const t2c = Number(temp2_c);
+  if (!(P1 > 0) || !(P2 > 0)) return { error: "Both vapor pressures P1 and P2 must be positive (any consistent unit; only the ratio matters)." };
+  if (!Number.isFinite(t1c) || !Number.isFinite(t2c)) return { error: "Both temperatures must be numbers (C)." };
+  const T1 = t1c + 273.15;
+  const T2 = t2c + 273.15;
+  if (!(T1 > 0) || !(T2 > 0)) return { error: "Temperatures must be above absolute zero (-273.15 C)." };
+  if (t1c === t2c) return { error: "The two temperatures must differ." };
+  const enthalpy_j_mol = R * Math.log(P2 / P1) / (1 / T1 - 1 / T2);
+  const slope_k = -enthalpy_j_mol / R; // d(ln P)/d(1/T)
+  if (![enthalpy_j_mol, slope_k].every(Number.isFinite)) return { error: "Clausius-Clapeyron math is not a finite value." };
+  return {
+    enthalpy_j_mol, enthalpy_kj_mol: enthalpy_j_mol / 1000, slope_k,
+    note: "The molar enthalpy of vaporization from two vapor-pressure/temperature points, the phase-equilibrium member the lab phys-chem set (ideal gas, Arrhenius, Nernst) leaves out. The Clausius-Clapeyron equation ln(P2/P1) = -(dHvap/R)(1/T2 - 1/T1) rearranges to dHvap = R ln(P2/P1) / (1/T1 - 1/T2), with R = 8.314 J/(mol*K) and the temperatures in kelvin. Only the pressure RATIO enters, so any consistent pressure unit (kPa, mmHg, atm, psi) gives the same enthalpy. Water going from 760 mmHg at 100 C to 525.9 mmHg at 90 C returns about 41.5 kJ/mol, close to the tabulated 40.7 kJ/mol (the small excess is the constant-enthalpy, ideal-vapor, negligible-liquid-volume approximation over a 10 C interval). The slope of a ln(P) vs 1/T plot is -dHvap/R. To predict a vapor pressure at a third temperature or a boiling point at a new pressure, apply the same equation with the enthalpy found here. Assumes dHvap constant over the interval and an ideal vapor; a first-principles chemistry aid, the measured data govern.",
+  };
+}
+export const clausiusClapeyronExample = { inputs: { pressure1: 760, temp1_c: 100, pressure2: 525.9, temp2_c: 90 } };
+
 // --- spec-v1230: Nernst equation (cell / electrode potential) ---
 // The lab chemistry set has no electrochemistry member. This adds the Nernst equation
 // E = E0 - (RT/nF) ln Q, R = 8.314 J/(mol*K), F = 96485 C/mol; at 25 C the slope RT ln(10)/(nF) is
@@ -714,6 +742,29 @@ function renderArrheniusEquation(inputRegion, outputRegion, citationEl) {
   for (const f of [k1, t1, k2, t2]) f.input.addEventListener("input", update);
 }
 
+function renderClausiusClapeyron(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Clausius-Clapeyron equation ln(P2/P1) = -(dHvap/R)(1/T2 - 1/T1), so dHvap = R ln(P2/P1)/(1/T1 - 1/T2), R = 8.314 J/(mol*K), temperatures in kelvin. Only the pressure ratio enters, so any consistent unit works. Assumes constant dHvap and an ideal vapor. First principles.";
+  inputRegion.appendChild(makeNotice(LAB_NOTICE));
+  const p1 = makeNumber("Vapor pressure P1 (any unit)", "cc-p1", { step: "any", min: "0", value: "760" }); p1.input.value = "760";
+  const t1 = makeNumber("Temperature 1 (C)", "cc-t1", { step: "any", value: "100" }); t1.input.value = "100";
+  const p2 = makeNumber("Vapor pressure P2 (same unit as P1)", "cc-p2", { step: "any", min: "0", value: "525.9" }); p2.input.value = "525.9";
+  const t2 = makeNumber("Temperature 2 (C)", "cc-t2", { step: "any", value: "90" }); t2.input.value = "90";
+  for (const f of [p1, t1, p2, t2]) inputRegion.appendChild(f.wrap);
+  const oH = makeOutputLine(outputRegion, "Enthalpy of vaporization dHvap", "cc-out-h");
+  const oS = makeOutputLine(outputRegion, "ln(P) vs 1/T slope", "cc-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "cc-out-note");
+  const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
+  const update = debounce(() => {
+    const r = computeClausiusClapeyron({ pressure1: rd(p1.input), temp1_c: t1.input.value === "" ? 0 : Number(t1.input.value), pressure2: rd(p2.input), temp2_c: t2.input.value === "" ? 0 : Number(t2.input.value) });
+    if (r.error) { oH.textContent = r.error; oS.textContent = "-"; oNote.textContent = ""; return; }
+    oH.textContent = fmt(r.enthalpy_kj_mol, 2) + " kJ/mol (" + fmt(r.enthalpy_j_mol, 0) + " J/mol)";
+    oS.textContent = fmt(r.slope_k, 1) + " K";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { p1.input.value = "760"; t1.input.value = "100"; p2.input.value = "525.9"; t2.input.value = "90"; update(); });
+  for (const f of [p1, t1, p2, t2]) f.input.addEventListener("input", update);
+}
+
 function renderNernstEquation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Nernst equation E = E0 - (RT/nF) ln Q, R = 8.314 J/(mol*K), F = 96485 C/mol; at 25 C the slope is 0.05916/n V per decade of Q (Nernst; standard electrochemistry). Uses activities approximated by concentrations; excludes junction potential and overpotential. First principles.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
@@ -901,6 +952,7 @@ export const LAB_RENDERERS = {
   "mass-moles": renderMassMoles,
   "ideal-gas-law": renderIdealGasLaw,
   "arrhenius-equation": renderArrheniusEquation,
+  "clausius-clapeyron": renderClausiusClapeyron,
   "nernst-equation": renderNernstEquation,
   "rcf-rpm": renderRcf,
   "resuspension-volume": renderResuspend,

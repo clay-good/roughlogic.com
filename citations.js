@@ -7187,6 +7187,18 @@ export const CITATIONS = {
       { name: "Scope", value: "single mechanism over the interval (a curved Arrhenius plot signals a mechanism change)", source: "scope of this tile" },
     ],
   },
+  "clausius-clapeyron": {
+    formula: "ln(P2/P1) = -(dHvap/R)(1/T2 - 1/T1), so dHvap = R ln(P2/P1) / (1/T1 - 1/T2); R = 8.314 J/(mol*K), T in kelvin. Only the pressure ratio enters. Slope of ln(P) vs 1/T is -dHvap/R.",
+    edition: "The Clausius-Clapeyron equation; standard physical chemistry / thermodynamics. First principles.",
+    freeAccess: "The Clausius-Clapeyron equation and the gas constant R are public first-principles chemistry; the vapor pressures and temperatures are the user's own measurements.",
+    governance: GOVERNANCE.lab,
+    editionNote: "The molar enthalpy of vaporization from two vapor-pressure/temperature points, the phase-equilibrium member the lab phys-chem set (ideal gas, Arrhenius, Nernst) leaves out. Because only the pressure ratio P2/P1 enters, any consistent unit (kPa, mmHg, atm, psi) gives the same enthalpy. Water from 760 mmHg at 100 C to 525.9 mmHg at 90 C returns about 41.5 kJ/mol against the tabulated 40.7; the small excess is the constant-enthalpy, ideal-vapor, negligible-liquid-volume approximation over the interval. The slope of a ln(P) vs 1/T plot is -dHvap/R. Apply the same equation with the enthalpy found here to predict a vapor pressure at a third temperature or a boiling point at a new pressure. A first-principles chemistry aid; the measured data govern.",
+    assumptions: [
+      { name: "Clausius-Clapeyron", value: "dHvap = R ln(P2/P1)/(1/T1 - 1/T2), T in kelvin", source: "Clausius-Clapeyron" },
+      { name: "Unit-agnostic", value: "only the pressure ratio enters; P1 and P2 may be in any consistent unit", source: "ratio form" },
+      { name: "Scope", value: "assumes constant dHvap and an ideal vapor over the interval (a curved ln(P) vs 1/T signals variation)", source: "scope of this tile" },
+    ],
+  },
   "nernst-equation": {
     formula: "E = E0 - (RT/nF) ln Q; R = 8.314 J/(mol*K), F = 96485 C/mol, T in kelvin. At 25 C the slope is 0.05916/n V per decade of Q. Nernst slope = RT ln(10)/(nF).",
     edition: "The Nernst equation (Nernst, 1889); standard electrochemistry. First principles.",

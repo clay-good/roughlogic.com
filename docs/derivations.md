@@ -2455,6 +2455,7 @@ cross-check.
 | calc-lab.js | `computeArrheniusEquation` | `{ k1 = 0, temp1_c = 0, k2 = 0, temp2_c = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeBeerLambert` | `{ absorbance = 0, path_length_cm = 1, epsilon = 0 }` | _ | _ | _ |
 | calc-lab.js | `computeCfuPlateCount` | `{ colonies = 0, dilution_factor = 0, volume_ml = 0, low = 25, high = 250 } = {}` | _ | _ | _ |
+| calc-lab.js | `computeClausiusClapeyron` | `{ pressure1 = 0, temp1_c = 0, pressure2 = 0, temp2_c = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeDilution` | `{ c1, v1, c2, v2 }` | _ | _ | _ |
 | calc-lab.js | `computeDoublingTime` | `{ initial_count = 0, final_count = 0, elapsed_time = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeGelPercentAgarose` | `{ target_bp_high = 0, gel_percent = 0, buffer_volume_ml = 0 } = {}` | _ | _ | _ |
@@ -3269,7 +3270,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1855.
+Row count: 1856.
 
 <!-- END function-corpus-v14 -->
 
@@ -4927,13 +4928,14 @@ per spec-v14 §13.1 second paragraph.
 | `wip-percent-complete` | Work-in-Progress Percent Complete and Over/Under Billing | construction accounting (cost-to-cost...; spec-v390 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `workers-comp-emr-premium` | Workers-Comp Premium and Experience Mod | workers-comp rating (NCCI-style); spec-v445 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group T Lab (24 tiles)
+### Group T Lab (25 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `arrhenius-equation` | Arrhenius Activation Energy (Rate vs Temperature) | Arrhenius equation (physical chemistr...; Ea = 8.314 x ln(2)/(1/298.15 - 1/308.15) = 8.314 x 0.6931... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `beer-lambert` | Beer-Lambert Concentration | Project (first-principles); Beer-Lambert law | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cfu-plate-count` | CFU/mL Viable Plate Count | FDA BAM Ch. 3 (Aerobic Plate Count) /...; 150 colonies, 10^-5 dilution, 0.1 mL -> 1.5e8 CFU/mL | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `clausius-clapeyron` | Clausius-Clapeyron (Enthalpy of Vaporization) | Clausius-Clapeyron (physical chemistry); dHvap = 8.314 x ln(525.9/760)/(1/373.15 - 1/363.15) = 41,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `doubling-time` | Cell Culture Doubling Time | Exponential-growth / population-doubl...; 1e5 to 8e5 cells/mL in 24 h -> 8.0 h doubling, 0.087 /h, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gel-percent-agarose` | Agarose Gel Percent | Sambrook & Russell, Molecular Cloning; 10 kb max -> 0.8%; 100 mL -> 0.8 g | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `growth-projected-count` | Projected Cell Count from Doubling Time | Exponential-growth kinetics (solved f...; 1e5 cells, 8 h doubling, 24 h -> 8e5 (3 doublings, 8x) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5062,6 +5064,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1607. Fixture-covered or reference-cadence: 1607 / 1607.
+Tile count: 1608. Fixture-covered or reference-cadence: 1608 / 1608.
 
 <!-- END tile-index-v14 -->

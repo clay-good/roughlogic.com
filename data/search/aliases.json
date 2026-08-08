@@ -84787,6 +84787,21 @@
       "kind": "industry"
     },
     {
+      "term": "clausius clapeyron equation",
+      "target": "clausius-clapeyron",
+      "kind": "industry"
+    },
+    {
+      "term": "enthalpy of vaporization from vapor pressure",
+      "target": "clausius-clapeyron",
+      "kind": "question"
+    },
+    {
+      "term": "heat of vaporization two points",
+      "target": "clausius-clapeyron",
+      "kind": "question"
+    },
+    {
       "term": "nernst equation",
       "target": "nernst-equation",
       "kind": "industry"
