@@ -1357,6 +1357,17 @@ input[aria-invalid="true"] {
   line-height: 1.5;
   margin: 0 0 var(--space-3);
 }
+/* Shell prose can carry long unbroken tokens (formulas like
+   p_pool(1-p_pool)(1/n1+1/n2), dotted library paths like
+   statsmodels.stats.proportion.proportions_ztest) that have no natural
+   break point and would push the zero-JS shell past the 320px floor.
+   Let these paragraphs break anywhere so the shared template absorbs any
+   tile's string length -- see scripts/check-shell-mobile.mjs. */
+.shell-page .shell-lead,
+.shell-page .shell-formula,
+.shell-page .shell-source {
+  overflow-wrap: anywhere;
+}
 .shell-page .shell-run {
   margin: var(--space-3) 0;
 }
