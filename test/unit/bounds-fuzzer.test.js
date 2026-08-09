@@ -9939,7 +9939,7 @@ import {
   computeRefrigerantVelocity, renderRefrigerantVelocity,
   computeRefrigerantLineSize, renderRefrigerantLineSize,
   renderPitotTraverseCfm, renderPitotTraverseAverage,
-  renderDpFlowMeter,
+  renderDpFlowMeter, renderGasDpFlowMeter,
 } from "../../calc-velocity.js";
 
 test("bounds: calc-hvac computeDuctVelocityPressure pins V = 4005*sqrt(VP) + inverse + rejects non-positive/Infinity", () => {
@@ -10042,7 +10042,7 @@ test("bounds: calc-edu computeCurveGradeScaler pins flat/sqrt/linear + clamp + r
 });
 
 test("bounds: v23 export-function renderers are callable functions (DOM-bound sentinel)", () => {
-  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderRefrigerantLineSize, renderPitotTraverseCfm, renderPitotTraverseAverage, renderDpFlowMeter, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
+  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderRefrigerantLineSize, renderPitotTraverseCfm, renderPitotTraverseAverage, renderDpFlowMeter, renderGasDpFlowMeter, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
     assert.strictEqual(typeof fn, "function", "render symbol must be a function");
   }
 });
@@ -37262,4 +37262,28 @@ test("bounds: spec-v1273 computeSteelB2Amplifier pins AISC App. 8.2.2 B2, RM, th
   assert.ok("error" in _v1273({ pstory_kip: 2000, pmf_kip: 1200, h_kip: 100, l_ft: 14, drift_in: 0, method: "LRFD" }));
   assert.ok("error" in _v1273({ pstory_kip: 2000, pmf_kip: 1200, h_kip: 100, l_ft: 14, drift_in: 0.5, method: "X" }));
   assert.ok("error" in _v1273({ pstory_kip: Infinity, pmf_kip: 1200, h_kip: 100, l_ft: 14, drift_in: 0.5, method: "LRFD" }));
+});
+
+import { computeGasDpFlowMeter as _v1274 } from "../../calc-velocity.js";
+test("bounds: spec-v1274 computeGasDpFlowMeter pins the ISO 5167 expansibility factor, sqrt(dP) mass flow, the p2/p1<0.75 flag, ideal-gas density, and error seams", () => {
+  // Air (SG 1, kappa 1.4), 2 in orifice in 4 in line, 100 psia, 60 F, 1 psi dP: eps 0.99735, 747.6 scfm, mass 57.06 lb/min.
+  const r = _v1274({ pipe_id_in: 4, bore_in: 2, p1_psia: 100, dp_psi: 1, temp_f: 60, gas_sg: 1.0, kappa: 1.4, cd: 0.61 });
+  assert.ok(Math.abs(r.expansion_factor - 0.997349) < 1e-4);
+  assert.ok(Math.abs(r.scfm - 747.6) < 1.0);
+  assert.ok(Math.abs(r.mass_flow_lb_min - 57.06) < 0.1);
+  assert.ok(Math.abs(r.beta_ratio - 0.5) < 1e-9);
+  assert.ok(r.low_pressure_ratio === false);
+  // The expansion factor falls below 1 as the pressure ratio drops: a 10x larger dP thins the gas more.
+  const big = _v1274({ pipe_id_in: 4, bore_in: 2, p1_psia: 100, dp_psi: 10, temp_f: 60, gas_sg: 1.0, kappa: 1.4, cd: 0.61 });
+  assert.ok(big.expansion_factor < r.expansion_factor && Math.abs(big.expansion_factor - 0.97313) < 1e-4);
+  // p2/p1 below 0.75 is flagged (dP 30 of 100 psia -> ratio 0.70).
+  assert.ok(_v1274({ pipe_id_in: 4, bore_in: 2, p1_psia: 100, dp_psi: 30, temp_f: 60, gas_sg: 1.0, kappa: 1.4, cd: 0.61 }).low_pressure_ratio === true);
+  // Denser gas (higher SG) and colder gas both raise the density and the mass flow.
+  assert.ok(_v1274({ pipe_id_in: 4, bore_in: 2, p1_psia: 100, dp_psi: 1, temp_f: 60, gas_sg: 1.52, kappa: 1.13, cd: 0.61 }).mass_flow_lb_min > r.mass_flow_lb_min);
+  // Error seams: dP >= upstream absolute pressure, kappa <= 1, bore >= pipe, non-positive SG, non-finite.
+  assert.ok("error" in _v1274({ pipe_id_in: 4, bore_in: 2, p1_psia: 1, dp_psi: 5, temp_f: 60, gas_sg: 1.0, kappa: 1.4, cd: 0.61 }));
+  assert.ok("error" in _v1274({ pipe_id_in: 4, bore_in: 2, p1_psia: 100, dp_psi: 1, temp_f: 60, gas_sg: 1.0, kappa: 1.0, cd: 0.61 }));
+  assert.ok("error" in _v1274({ pipe_id_in: 4, bore_in: 5, p1_psia: 100, dp_psi: 1, temp_f: 60, gas_sg: 1.0, kappa: 1.4, cd: 0.61 }));
+  assert.ok("error" in _v1274({ pipe_id_in: 4, bore_in: 2, p1_psia: 100, dp_psi: 1, temp_f: 60, gas_sg: 0, kappa: 1.4, cd: 0.61 }));
+  assert.ok("error" in _v1274({ pipe_id_in: 4, bore_in: 2, p1_psia: Infinity, dp_psi: 1, temp_f: 60, gas_sg: 1.0, kappa: 1.4, cd: 0.61 }));
 });

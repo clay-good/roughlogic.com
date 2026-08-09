@@ -15973,6 +15973,19 @@ export const CITATIONS = {
       { name: "Scope", value: "incompressible liquid only; a gas needs an expansion factor Y", source: "scope of this tile" },
     ],
   },
+  "gas-dp-flow-meter": {
+    formula: "eps = 1 - (0.351 + 0.256 beta^4 + 0.93 beta^8)(1 - (p2/p1)^(1/kappa)); qm = (Cd/sqrt(1-beta^4)) eps (pi/4) d^2 sqrt(2 gc dP rho1); rho1 = p1 MW/(R T), MW = 28.97 SG; scfm at 14.696 psia, 60 F.",
+    edition: "The ISO 5167-2 orifice-plate expansibility (expansion) factor and the compressible-flow mass-flow equation, cited by name; the underlying flow physics is public and the meter's calibration governs the precise discharge coefficient.",
+    freeAccess: "The expansibility-factor correlation and the compressible orifice-flow equation are the published ISO 5167-2 form; the discharge coefficient (0.61 orifice) is editable and the meter's own calibration governs, and the gas properties (specific gravity, isentropic exponent) are standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "Compressible-gas flow through an orifice plate from the differential pressure across it, the case the dp-flow-meter tile (incompressible liquid) names as separate. A gas expands and thins as it drops through the restriction, so the incompressible equation is multiplied by the ISO 5167-2 expansibility factor eps = 1 - (0.351 + 0.256 beta^4 + 0.93 beta^8)(1 - (p2/p1)^(1/kappa)), which falls below 1 as the pressure ratio p2/p1 drops. The mass flow is qm = (Cd/sqrt(1 - beta^4)) eps (pi/4) d^2 sqrt(2 gc dP rho1), with the upstream density rho1 from the ideal-gas law rho = p1 MW/(R T) (MW = 28.97 x specific gravity relative to air). Results are the mass flow and the actual (acfm) and standard (scfm, referenced to 14.696 psia and 60 F) volumetric flow. The upstream pressure is entered as absolute (psia = psig + 14.7) and the differential in psi (1 psi = 27.68 in w.c.); the isentropic exponent kappa is about 1.4 for air and diatomic gases, 1.3 for natural gas, 1.13 for propane. The expansibility correlation is the orifice-plate form and holds for p2/p1 >= 0.75 (the tile flags below that, where the flow may approach choking); the venturi/nozzle expansion form and a precise Cd (a function of beta and Reynolds number) come from ISO 5167 and the meter's calibration. A field / sizing estimate; the calibrated meter governs.",
+    assumptions: [
+      { name: "Expansibility factor", value: "eps = 1 - (0.351 + 0.256 beta^4 + 0.93 beta^8)(1 - (p2/p1)^(1/kappa)); orifice plate, p2/p1 >= 0.75", source: "ISO 5167-2" },
+      { name: "Mass flow", value: "qm = (Cd/sqrt(1 - beta^4)) eps (pi/4) d^2 sqrt(2 gc dP rho1)", source: "ISO 5167-2 / Bernoulli" },
+      { name: "Upstream density", value: "rho1 = p1 MW/(R T) ideal gas, MW = 28.97 x SG; scfm at 14.696 psia, 60 F", source: "ideal-gas law" },
+      { name: "Scope", value: "orifice-plate expansion form; Cd editable and the calibrated meter governs", source: "scope of this tile" },
+    ],
+  },
   "outside-air-percent-temps": {
     formula: "%OA = 100 (T_ra - T_ma) / (T_ra - T_oa).",
     edition: "The mixed-air temperature balance for the outside-air fraction from ASHRAE / AABC-NEBB field practice, by name.",
