@@ -1293,6 +1293,7 @@ export const COMPUTE_MAP = {
   "steel-b1-amplifier": { module: "../../calc-steel.js", fn: "computeSteelB1Amplifier" },
   "steel-effective-length-k": { module: "../../calc-steel.js", fn: "computeSteelEffectiveLengthK" },
   "steel-column-stiffness-ratio-g": { module: "../../calc-steel.js", fn: "computeSteelColumnStiffnessRatioG" },
+  "steel-tau-b-stiffness-reduction": { module: "../../calc-steel.js", fn: "computeSteelTauBStiffnessReduction" },
   "steel-bolt-tension-shear": { module: "../../calc-steel.js", fn: "computeSteelBoltTensionShear" },
   // spec-v317..v319 machining depth batch (3 tiles)
   "radial-chip-thinning": { module: "../../calc-machining.js", fn: "computeRadialChipThinning" },

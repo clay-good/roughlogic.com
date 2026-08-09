@@ -56606,6 +56606,70 @@
    }
   },
   {
+   "tile_id": "steel-tau-b-stiffness-reduction",
+   "source_publisher": "AISC 360-22 Section C2.3 (direct-analysis stiffness reduction)",
+   "source_title": "W10x49 (Ag 14.4, Fy 50, Py 720 kip), Pr 400 kip LRFD -> ratio 0.556 > 0.5, tau_b 0.9877, 0.8 tau_b 0.7901 (spec-v1272)",
+   "source_edition_or_year": "spec-v1272 worked example",
+   "source_section_or_page": "Py=50*14.4=720; ratio=1.0*400/720=0.5556; tau_b=4*0.5556*(1-0.5556)=0.98765; 0.8*tau_b=0.79012",
+   "verified_by": "rl",
+   "verified_on": "2026-08-09",
+   "inputs": {
+    "pr_kip": 400,
+    "fy_ksi": 50,
+    "ag_in2": 14.4,
+    "method": "LRFD"
+   },
+   "outputs": {
+    "tau_b": {
+     "value": 0.98765,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "flexural_stiffness_factor": {
+     "value": 0.79012,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "ratio": {
+     "value": 0.55556,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-tau-b-stiffness-reduction",
+   "source_publisher": "AISC 360-22 Section C2.3 (tau_b = 1.0 below half of yield)",
+   "source_title": "cross-check: the same W10x49 at Pr 300 kip is at ratio 0.417 <= 0.5, so tau_b 1.0 and the reduction is the flat 0.8",
+   "source_edition_or_year": "spec-v1272 worked example",
+   "source_section_or_page": "ratio=300/720=0.41667 <= 0.5 -> tau_b=1.0; 0.8*tau_b=0.8",
+   "verified_by": "rl",
+   "verified_on": "2026-08-09",
+   "inputs": {
+    "pr_kip": 300,
+    "fy_ksi": 50,
+    "ag_in2": 14.4,
+    "method": "LRFD"
+   },
+   "outputs": {
+    "tau_b": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "flexural_stiffness_factor": {
+     "value": 0.8,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-column-stiffness-ratio-g",
    "source_publisher": "AISC 360 Commentary App. 7 / Salmon & Johnson (alignment-chart stiffness ratio)",
    "source_title": "Two columns (Ix 800, 12 ft) over two girders (Ix 1200, 24 ft), rigid -> G 1.333 (spec-v1210)",

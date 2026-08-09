@@ -19291,6 +19291,31 @@
       "kind": "industry"
     },
     {
+      "term": "tau b stiffness reduction",
+      "target": "steel-tau-b-stiffness-reduction",
+      "kind": "industry"
+    },
+    {
+      "term": "direct analysis method stiffness reduction",
+      "target": "steel-tau-b-stiffness-reduction",
+      "kind": "industry"
+    },
+    {
+      "term": "what is tau b in aisc",
+      "target": "steel-tau-b-stiffness-reduction",
+      "kind": "question"
+    },
+    {
+      "term": "0.8 tau b ei reduced stiffness",
+      "target": "steel-tau-b-stiffness-reduction",
+      "kind": "industry"
+    },
+    {
+      "term": "inelastic stiffness reduction factor column",
+      "target": "steel-tau-b-stiffness-reduction",
+      "kind": "question"
+    },
+    {
       "term": "stiffness ratio g column",
       "target": "steel-column-stiffness-ratio-g",
       "kind": "industry"

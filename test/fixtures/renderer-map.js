@@ -839,6 +839,7 @@ export const RENDERER_MAP = {
   "steel-b1-amplifier": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-effective-length-k": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-column-stiffness-ratio-g": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
+  "steel-tau-b-stiffness-reduction": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-bolt-tension-shear": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "shear-stud-strength": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "composite-beam-flexure": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },

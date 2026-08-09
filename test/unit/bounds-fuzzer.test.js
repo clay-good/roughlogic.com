@@ -37211,3 +37211,28 @@ test("bounds: spec-v1271 computeParticleSettlingVelocity pins Stokes' law, d^2 s
   assert.ok("error" in _v1271({ particle_diameter_mm: 0.05, particle_sg: 2.65, water_temp_f: 212 }));
   assert.ok("error" in _v1271({ particle_diameter_mm: Infinity, particle_sg: 2.65, water_temp_f: 68 }));
 });
+
+import { computeSteelTauBStiffnessReduction as _v1272 } from "../../calc-steel.js";
+test("bounds: spec-v1272 computeSteelTauBStiffnessReduction pins AISC C2.3 tau_b, the 0.5 threshold, the 0.8 factor, LRFD/ASD alpha, and error seams", () => {
+  // W10x49: Py = 50*14.4 = 720 kip. Pr 400 LRFD: ratio 0.5556 -> tau_b = 4*0.5556*0.4444 = 0.98765.
+  const r = _v1272({ pr_kip: 400, fy_ksi: 50, ag_in2: 14.4, method: "LRFD" });
+  assert.ok(Math.abs(r.py_kip - 720) < 1e-9);
+  assert.ok(Math.abs(r.ratio - 0.555556) < 1e-5);
+  assert.ok(Math.abs(r.tau_b - 0.987654) < 1e-5);
+  assert.ok(Math.abs(r.flexural_stiffness_factor - 0.8 * r.tau_b) < 1e-12);
+  // At or below alpha Pr / Py = 0.5, tau_b is exactly 1.0 (flat 0.8 reduction only).
+  const lo = _v1272({ pr_kip: 300, fy_ksi: 50, ag_in2: 14.4, method: "LRFD" });
+  assert.ok(lo.tau_b === 1.0 && Math.abs(lo.flexural_stiffness_factor - 0.8) < 1e-12);
+  // ASD alpha = 1.6: a lighter Pr reaches the same ratio/tau_b as the LRFD case at 1.6x the load.
+  const asd = _v1272({ pr_kip: 250, fy_ksi: 50, ag_in2: 14.4, method: "ASD" });
+  assert.ok(Math.abs(asd.ratio - 0.555556) < 1e-5 && Math.abs(asd.tau_b - r.tau_b) < 1e-9);
+  // tau_b decreases monotonically above the threshold as axial load rises toward Py.
+  assert.ok(_v1272({ pr_kip: 500, fy_ksi: 50, ag_in2: 14.4, method: "LRFD" }).tau_b < r.tau_b);
+  // Error seams: alpha Pr above Py, non-positive Pr / Fy / Ag, bad method, non-finite.
+  assert.ok("error" in _v1272({ pr_kip: 800, fy_ksi: 50, ag_in2: 14.4, method: "LRFD" }));
+  assert.ok("error" in _v1272({ pr_kip: 0, fy_ksi: 50, ag_in2: 14.4, method: "LRFD" }));
+  assert.ok("error" in _v1272({ pr_kip: 400, fy_ksi: 0, ag_in2: 14.4, method: "LRFD" }));
+  assert.ok("error" in _v1272({ pr_kip: 400, fy_ksi: 50, ag_in2: 0, method: "LRFD" }));
+  assert.ok("error" in _v1272({ pr_kip: 400, fy_ksi: 50, ag_in2: 14.4, method: "X" }));
+  assert.ok("error" in _v1272({ pr_kip: Infinity, fy_ksi: 50, ag_in2: 14.4, method: "LRFD" }));
+});

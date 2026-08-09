@@ -1027,6 +1027,56 @@ STEEL_RENDERERS["steel-column-stiffness-ratio-g"] = _simpleRenderer({
   compute: computeSteelColumnStiffnessRatioG,
 });
 
+// The direct analysis method (AISC 360 Chapter C) reduces member stiffness before the
+// second-order analysis: 0.8 on every EA and EI, and an additional tau_b on the flexural
+// EI of members that resist the frame's stability. The B1, K, and G tiles all name "0.8
+// tau_b EI" but none computes tau_b. This does. AISC 360-22 Eq. C2-2:
+//   tau_b = 1.0                              when alpha Pr / Py <= 0.5
+//   tau_b = 4 (alpha Pr / Py)(1 - alpha Pr / Py)   when alpha Pr / Py > 0.5
+// with Py = Fy Ag, alpha = 1.0 (LRFD) / 1.6 (ASD). The reduced flexural stiffness is
+// EI* = 0.8 tau_b EI (axial EA* = 0.8 EA). AISC permits tau_b = 1.0 for all members if an
+// extra notional load of 0.001 alpha Yi is added at each level.
+// dims: in { pr_kip: M L T^-2, fy_ksi: M L^-1 T^-2, ag_in2: L^2, method: dimensionless } out: { py_kip: M L T^-2, ratio: dimensionless, tau_b: dimensionless, flexural_stiffness_factor: dimensionless }
+export function computeSteelTauBStiffnessReduction({ pr_kip = 0, fy_ksi = 50, ag_in2 = 0, method = "LRFD" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (method !== "LRFD" && method !== "ASD") return { error: "Method must be LRFD or ASD." };
+  if (!(pr_kip > 0)) return { error: "Required axial compression Pr must be positive (kip)." };
+  if (!(fy_ksi > 0)) return { error: "Yield strength Fy must be positive (ksi)." };
+  if (!(ag_in2 > 0)) return { error: "Gross area Ag must be positive (in^2)." };
+  const alpha = method === "LRFD" ? 1.0 : 1.6;
+  const py_kip = fy_ksi * ag_in2;
+  const ratio = alpha * pr_kip / py_kip;
+  if (ratio > 1) return { error: "alpha Pr exceeds Py (the axial demand is above yield): reduce Pr or increase the section; tau_b is defined only for alpha Pr / Py <= 1." };
+  const tau_b = ratio <= 0.5 ? 1.0 : 4 * ratio * (1 - ratio);
+  const flexural_stiffness_factor = 0.8 * tau_b;
+  if (![py_kip, ratio, tau_b, flexural_stiffness_factor].every(Number.isFinite)) return { error: "Stiffness-reduction math is not a finite value." };
+  return {
+    py_kip, ratio, tau_b, flexural_stiffness_factor, alpha, method,
+    note: "The inelastic stiffness-reduction factor tau_b for the AISC 360 direct analysis method (Chapter C), the piece the B1-amplifier, effective-length-K, and stiffness-ratio-G tiles all name as '0.8 tau_b EI' but none computes. The DAM reduces every member stiffness by 0.8 (both EA and EI) and reduces the FLEXURAL stiffness of stability-resisting members by a further tau_b: for alpha Pr / Py <= 0.5, tau_b = 1.0; above 0.5, tau_b = 4 (alpha Pr/Py)(1 - alpha Pr/Py), where Py = Fy Ag and alpha = 1.0 (LRFD) or 1.6 (ASD). A W10x49 (Ag 14.4 in^2, Fy 50) is Py 720 kip; at Pr 400 kip (LRFD) the ratio is 0.556, so tau_b = 0.988 and the reduced flexural stiffness is 0.8 x 0.988 = 0.79 EI. Below half of yield (Pr 300 kip here) tau_b stays 1.0 and the reduction is just the flat 0.8. tau_b drops toward 0 as the axial load approaches Py, softening a heavily loaded column so the analysis captures its real second-order drift. AISC also permits tau_b = 1.0 for all members if an additional notional load of 0.001 alpha Yi is applied at each level. Applies to the flexural EI in a second-order (DAM) analysis; it is not a strength check. A design aid, not the engineer of record's stamped design.",
+  };
+}
+export const steelTauBStiffnessReductionExample = { inputs: { pr_kip: 400, fy_ksi: 50, ag_in2: 14.4, method: "LRFD" } };
+STEEL_RENDERERS["steel-tau-b-stiffness-reduction"] = _simpleRenderer({
+  citation: "Citation: AISC 360-22 Section C2.3 direct-analysis stiffness reduction, tau_b = 1.0 for alpha Pr/Py <= 0.5 else 4(alpha Pr/Py)(1 - alpha Pr/Py), with Py = Fy Ag and alpha = 1.0 (LRFD) / 1.6 (ASD); reduced flexural stiffness EI* = 0.8 tau_b EI, by name. Feeds the B1, K, and G stability tiles. A design aid, not the engineer of record's stamped design.",
+  example: steelTauBStiffnessReductionExample.inputs,
+  fields: [
+    { key: "pr_kip", label: "Required axial compression Pr (kip)", kind: "number", default: 400 },
+    { key: "fy_ksi", label: "Yield strength Fy (ksi)", kind: "number", default: 50 },
+    { key: "ag_in2", label: "Gross area Ag (in^2)", kind: "number", default: 14.4 },
+    { key: "method", label: "Design basis", kind: "select", default: "LRFD", options: [
+      { value: "LRFD", label: "LRFD (alpha = 1.0)" },
+      { value: "ASD", label: "ASD (alpha = 1.6)" },
+    ] },
+  ],
+  outputs: [
+    { key: "tb", id: "stb-out-tb", label: "Stiffness reduction tau_b", value: (r) => fmt(r.tau_b, 4) },
+    { key: "ff", id: "stb-out-ff", label: "Flexural stiffness factor 0.8 tau_b", value: (r) => fmt(r.flexural_stiffness_factor, 4) + " EI" },
+    { key: "rt", id: "stb-out-rt", label: "alpha Pr / Py", value: (r) => fmt(r.ratio, 3) + " (Py " + fmt(r.py_kip, 0) + " kip)" },
+    { key: "n", id: "stb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelTauBStiffnessReduction,
+});
+
 // dims: in { fnt_ksi: M L^-1 T^-2, fnv_ksi: M L^-1 T^-2, ab_in2: L^2, frv_ksi: M L^-1 T^-2, method: dimensionless } out: { fpnt_ksi: M L^-1 T^-2, avail_tension_kip: M L T^-2 }
 export function computeSteelBoltTensionShear({ fnt_ksi = 90, fnv_ksi = 54, ab_in2 = 0, frv_ksi = 0, method = "LRFD" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

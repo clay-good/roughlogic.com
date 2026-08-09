@@ -645,7 +645,7 @@ const _TILES = [
   ["grid-to-ground", "P"],
   ["cogo-inverse-locate", "P"],
   // spec-v314..v316 steel beam-column-and-connection depth batch
-  ["steel-h1-interaction", "E"], ["steel-b1-amplifier", "E"], ["steel-effective-length-k", "E"], ["steel-column-stiffness-ratio-g", "E"], ["steel-bolt-tension-shear", "E"],
+  ["steel-h1-interaction", "E"], ["steel-b1-amplifier", "E"], ["steel-effective-length-k", "E"], ["steel-column-stiffness-ratio-g", "E"], ["steel-tau-b-stiffness-reduction", "E"], ["steel-bolt-tension-shear", "E"],
   // spec-v317..v319 machining depth batch (calc-machining.js Group K)
   ["radial-chip-thinning", "K"], ["boring-bar-deflection", "K"], ["boring-bar-max-overhang", "K"], ["ballnose-scallop-height", "K"], ["ballnose-feed-cusp", "K"],
   // spec-v320..v322 refrigeration-cycle batch (calc-refrigerant.js Group C)

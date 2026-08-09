@@ -14716,6 +14716,19 @@ export const CITATIONS = {
       { name: "Feeds", value: "supplies GA or GB to the steel-effective-length-k tile", source: "scope of this tile" },
     ],
   },
+  "steel-tau-b-stiffness-reduction": {
+    formula: "Py = Fy Ag; ratio = alpha Pr / Py (alpha = 1.0 LRFD / 1.6 ASD); tau_b = 1.0 for ratio <= 0.5 else 4 ratio (1 - ratio); reduced flexural stiffness EI* = 0.8 tau_b EI.",
+    edition: "The AISC 360-22 Section C2.3 direct-analysis-method inelastic stiffness-reduction factor tau_b, with the flat 0.8 stiffness factor, by name.",
+    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); the C2.3 stiffness-reduction provision is in the published specification. Pr, Fy, and Ag are the user's own demand and section data.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AISC 360-22 Section C2.3 inelastic stiffness-reduction factor tau_b for the direct analysis method (DAM), the piece the B1-amplifier, effective-length-K, and stiffness-ratio-G tiles all reference as '0.8 tau_b EI' but none computes. The DAM reduces every member stiffness by a flat 0.8 (both EA and EI) and reduces the FLEXURAL stiffness of members that contribute to stability by an additional tau_b: tau_b = 1.0 when alpha Pr / Py <= 0.5, and tau_b = 4 (alpha Pr / Py)(1 - alpha Pr / Py) when it exceeds 0.5, where Py = Fy Ag is the axial yield strength and alpha = 1.0 (LRFD) or 1.6 (ASD). The reduced flexural stiffness used in the second-order analysis is EI* = 0.8 tau_b EI. tau_b falls toward zero as the axial demand approaches yield, softening a heavily loaded column so the analysis captures its real second-order drift, and the code permits taking tau_b = 1.0 for all members if an additional notional load of 0.001 alpha Yi is applied at each level. This is an analysis stiffness input, not a member strength check. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "tau_b", value: "1.0 for alpha Pr/Py <= 0.5, else 4(alpha Pr/Py)(1 - alpha Pr/Py)", source: "AISC 360-22 Eq. C2-2" },
+      { name: "Stiffness reduction", value: "flat 0.8 on EA and EI, plus tau_b on the flexural EI; EI* = 0.8 tau_b EI", source: "AISC 360-22 C2.3" },
+      { name: "alpha", value: "1.0 (LRFD) / 1.6 (ASD); Py = Fy Ag", source: "AISC 360-22 C2.3" },
+      { name: "Feeds", value: "supplies 0.8 tau_b EI to the B1, K, and G stability tiles", source: "scope of this tile" },
+    ],
+  },
   "steel-bolt-tension-shear": {
     formula: "k = (LRFD) Fnt/(0.75 Fnv), (ASD) 2.00 Fnt/Fnv; F'nt = min(1.3 Fnt - k frv, Fnt) (floored at 0); available tension = 0.75 F'nt Ab (LRFD) or F'nt Ab/2.00 (ASD).",
     edition: "The AISC 360-22 Section J3.7 reduced tensile stress for a bearing-type bolt in combined tension and shear, with the Table J3.2 nominal stresses, by name.",
