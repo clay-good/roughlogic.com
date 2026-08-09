@@ -16587,6 +16587,18 @@ export const CITATIONS = {
       { name: "Strength reduction", value: "phi = 0.65 for bearing", source: "ACI 318-19 21.2" },
     ],
   },
+  "concrete-immediate-deflection": {
+    formula: "delta = K w L^4 / (Ec Ie); Ec = 57000 sqrt(f'c). K = 5/384 simply supported UDL, 1/384 fixed-fixed UDL, 1/8 cantilever UDL, ~1/185 propped cantilever UDL. L/delta is checked against ACI Table 24.2.2 (L/180, L/240, L/360, L/480).",
+    edition: "ACI 318-19 §24.2.3 immediate deflection by elastic analysis with the effective (Bischoff) moment of inertia Ie (§24.2.3.5), and Ec = 57000 sqrt(f'c) (§19.2.2.1), by name; the elastic beam coefficients K are standard mechanics-of-materials results.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the §24.2.3 deflection provisions and the §19.2.2.1 modulus are in the published code. Ie, f'c, load, span, and support case are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "ACI 318-19 §24.2.3 immediate (short-term) elastic deflection of a reinforced-concrete beam: delta = K w L^4 / (Ec Ie), the value the effective-inertia tile points to and the long-term tile takes as its input. K is the support/loading coefficient (5/384 simply supported under a uniform load, 1/384 fixed both ends, 1/8 cantilever, ~1/185 propped cantilever), Ec = 57000 sqrt(f'c) is the normalweight modulus (§19.2.2.1), and Ie is the effective (Bischoff) moment of inertia from concrete-effective-inertia. Enter w as the service load per foot for the load case whose deflection you want. The span/deflection ratio L/delta is what the ACI Table 24.2.2 serviceability limits (L/180, L/240, L/360, L/480) are checked against. Feed this immediate deflection into concrete-longterm-defl for creep and shrinkage. Uses the effective inertia at the section of maximum moment; a prismatic member is assumed. A design aid; the engineer of record's stamped design governs.",
+    assumptions: [
+      { name: "Deflection", value: "delta = K w L^4 / (Ec Ie); Ec = 57000 sqrt(f'c)", source: "ACI 318-19 §24.2.3, §19.2.2.1" },
+      { name: "Support coefficient K", value: "5/384 simple UDL, 1/384 fixed-fixed UDL, 1/8 cantilever UDL, ~1/185 propped cantilever UDL", source: "elastic beam theory" },
+      { name: "Serviceability / scope", value: "L/delta checked against ACI Table 24.2.2 (L/180 to L/480); prismatic member, uniform load (point load is separate)", source: "ACI 318-19 Table 24.2.2" },
+    ],
+  },
   "concrete-longterm-defl": {
     formula: "xi = 2.0 (>=60 mo) / 1.4 (>=12) / 1.2 (>=6) / 1.0 (else); lambda = xi / (1 + 50 rho'); additional = lambda x immediate; total = immediate + additional.",
     edition: "The ACI 318-19 24.2.4.1.1 additional time-dependent (creep and shrinkage) deflection multiplier lambda = xi / (1 + 50 rho'), with the 24.2.4.1.3 time factor xi, by name.",

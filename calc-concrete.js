@@ -1356,6 +1356,61 @@ CONCRETE_RENDERERS["concrete-longterm-defl"] = _simpleRenderer({
   compute: computeConcreteLongtermDefl,
 });
 
+// ===================== spec-v1279: immediate elastic deflection from Ie (ACI 318-19 §24.2.3) =====================
+// The effective-inertia (Ie) tile stops at Ie and its note says "the immediate
+// deflection is then (a load-case coefficient) w L^4 / (Ec Ie)"; the long-term
+// tile then TAKES that immediate deflection as a hand-entered input. Nothing
+// computed the deflection itself. This fills the middle of the chain
+// (cracking-moment -> effective-inertia -> immediate-deflection -> longterm-defl):
+// the standard elastic beam deflection delta = K w L^4 / (Ec Ie), with K the
+// support/loading coefficient and Ec = 57000 sqrt(f'c). Ie comes from the Ie tile.
+const _DEFL_COEFF = {
+  simple_udl:     { k: 5 / 384, label: "Simply supported, uniform load (5/384)" },
+  fixed_udl:      { k: 1 / 384, label: "Fixed both ends, uniform load (1/384)" },
+  propped_udl:    { k: 1 / 185, label: "Propped cantilever, uniform load (~1/185)" },
+  cantilever_udl: { k: 1 / 8,   label: "Cantilever, uniform load (1/8)" },
+};
+// dims: in { ie_in4: L^4, fc_psi: M L^-1 T^-2, w_klf: M T^-2, span_ft: L, support: dimensionless } out: { ec_ksi: M L^-1 T^-2, immediate_defl_in: L, span_over_defl: dimensionless, coefficient: dimensionless }
+export function computeConcreteImmediateDeflection({ ie_in4 = 0, fc_psi = 4000, w_klf = 0, span_ft = 0, support = "simple_udl" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const C = _DEFL_COEFF[support];
+  if (!C) return { error: "Unknown support / loading case." };
+  if (!(ie_in4 > 0)) return { error: "Effective inertia Ie must be positive (in^4)." };
+  if (!(fc_psi > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (!(w_klf > 0)) return { error: "Service load w must be positive (kip/ft)." };
+  if (!(span_ft > 0)) return { error: "Span must be positive (ft)." };
+  const ec_ksi = 57000 * Math.sqrt(fc_psi) / 1000;   // ACI 318-19 Eq 19.2.2.1.a, normalweight
+  const w_kin = w_klf / 12;                            // kip/in
+  const L_in = span_ft * 12;
+  const immediate_defl_in = C.k * w_kin * Math.pow(L_in, 4) / (ec_ksi * ie_in4);
+  const span_over_defl = L_in / immediate_defl_in;
+  if (![ec_ksi, immediate_defl_in, span_over_defl].every(Number.isFinite)) return { error: "Immediate-deflection math is not a finite value." };
+  return {
+    ec_ksi, coefficient: C.k, immediate_defl_in, span_over_defl,
+    note: "ACI 318-19 §24.2.3 immediate (short-term) elastic deflection of a reinforced-concrete beam: delta = K w L^4 / (Ec Ie), the value the effective-inertia tile points to and the long-term tile takes as its input. K is the support/loading coefficient (5/384 simply supported under uniform load, 1/384 fixed both ends, 1/8 cantilever, ~1/185 propped cantilever), Ec = 57000 sqrt(f'c) is the normalweight modulus (§19.2.2.1), and Ie is the effective (Bischoff) moment of inertia from concrete-effective-inertia. Enter w as the service load per foot (kip/ft) for the load case whose deflection you want (dead alone, or dead plus the sustained fraction of live for the creep input). The span/deflection ratio L/delta is what the ACI Table 24.2.2 serviceability limits (L/180, L/240, L/360, L/480) are checked against. Feed this immediate deflection into concrete-longterm-defl for creep and shrinkage. Uses the effective inertia at the section of maximum moment; a prismatic member is assumed. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const concreteImmediateDeflectionExample = { inputs: { ie_in4: 4662, fc_psi: 4000, w_klf: 0.8, span_ft: 24, support: "simple_udl" } };
+
+CONCRETE_RENDERERS["concrete-immediate-deflection"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 §24.2.3 immediate deflection delta = K w L^4 / (Ec Ie), with Ec = 57000 sqrt(f'c) (§19.2.2.1) and Ie the effective (Bischoff) moment of inertia (§24.2.3.5). K is the elastic beam coefficient for the support/loading (5/384 simply supported UDL, 1/384 fixed-fixed UDL, 1/8 cantilever UDL, ~1/185 propped cantilever UDL). The span/deflection ratio is checked against the ACI Table 24.2.2 limits (L/180, L/240, L/360, L/480). Standard elastic beam theory with the ACI effective inertia. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: concreteImmediateDeflectionExample.inputs,
+  fields: [
+    { key: "ie_in4", label: "Effective inertia Ie (in^4, from the Ie tile)", kind: "number", default: 4662 },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "w_klf", label: "Service load w (kip/ft)", kind: "number", default: 0.8 },
+    { key: "span_ft", label: "Span L (ft)", kind: "number", default: 24 },
+    { key: "support", label: "Support and loading", kind: "select", options: Object.keys(_DEFL_COEFF).map((k) => ({ value: k, label: _DEFL_COEFF[k].label })), default: "simple_udl" },
+  ],
+  outputs: [
+    { key: "d", id: "cid-out-d", label: "Immediate deflection", value: (r) => fmt(r.immediate_defl_in, 3) + " in" },
+    { key: "ratio", id: "cid-out-ratio", label: "Span / deflection", value: (r) => "L/" + fmt(r.span_over_defl, 0) },
+    { key: "ec", id: "cid-out-ec", label: "Modulus Ec", value: (r) => fmt(r.ec_ksi, 0) + " ksi" },
+    { key: "n", id: "cid-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteImmediateDeflection,
+});
+
 // ===================== spec-v548: cast-in anchor tension concrete breakout (ACI 318-19 Ch. 17) =====================
 
 // dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless } out: { nb_lb: M L T^-2, ncb_lb: M L T^-2, phi_ncb_lb: M L T^-2 }

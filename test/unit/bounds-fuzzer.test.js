@@ -11106,6 +11106,33 @@ test("bounds: spec-v1278 computeBoxCulvertHeadwater pins the governing = max(inl
   assert.ok("error" in _v1278({ span_in: 72, rise_in: 48, flow_cfs: 150, slope: 0.01, length_ft: 100, config: "bogus" }));
   assert.ok("error" in _v1278({ span_in: Infinity, rise_in: 48, flow_cfs: 150, slope: 0.01, length_ft: 100, config: "wingwall_30_75" }));
 });
+import { computeConcreteImmediateDeflection as _v1279 } from "../../calc-concrete.js";
+test("bounds: spec-v1279 computeConcreteImmediateDeflection pins delta = K w L^4 / (Ec Ie), the support coefficients, span/deflection, and error seams", () => {
+  // Ie 4662, f'c 4000, 0.8 klf, 24 ft simple span.
+  const r = _v1279({ ie_in4: 4662, fc_psi: 4000, w_klf: 0.8, span_ft: 24, support: "simple_udl" });
+  assert.ok(Math.abs(r.immediate_defl_in - 0.35534) < 1e-3 && Math.abs(r.ec_ksi - 3604.9965) < 1e-2);
+  // Exact formula: delta = K w L^4 / (Ec Ie) with w in kip/in, L in in, Ec in ksi.
+  const Ec = 57000 * Math.sqrt(4000) / 1000, w = 0.8 / 12, L = 24 * 12;
+  assert.ok(Math.abs(r.immediate_defl_in - (5 / 384) * w * Math.pow(L, 4) / (Ec * 4662)) < 1e-12);
+  // Span/deflection ratio is L/delta.
+  assert.ok(Math.abs(r.span_over_defl - L / r.immediate_defl_in) < 1e-6);
+  // Fixed-fixed is exactly 1/5 of simple span (coefficient 1/384 vs 5/384).
+  const f = _v1279({ ie_in4: 4662, fc_psi: 4000, w_klf: 0.8, span_ft: 24, support: "fixed_udl" });
+  assert.ok(Math.abs(f.immediate_defl_in - r.immediate_defl_in / 5) < 1e-9);
+  // Cantilever (1/8) deflects far more than the simple span at the same span/load.
+  const c = _v1279({ ie_in4: 4662, fc_psi: 4000, w_klf: 0.8, span_ft: 24, support: "cantilever_udl" });
+  assert.ok(c.immediate_defl_in > r.immediate_defl_in);
+  // Deflection scales with L^4: doubling the span multiplies deflection by 16.
+  const d2 = _v1279({ ie_in4: 4662, fc_psi: 4000, w_klf: 0.8, span_ft: 48, support: "simple_udl" });
+  assert.ok(Math.abs(d2.immediate_defl_in / r.immediate_defl_in - 16) < 1e-6);
+  // Error seams: non-positive Ie/f'c/load/span, unknown support, non-finite.
+  assert.ok("error" in _v1279({ ie_in4: 0, fc_psi: 4000, w_klf: 0.8, span_ft: 24, support: "simple_udl" }));
+  assert.ok("error" in _v1279({ ie_in4: 4662, fc_psi: 0, w_klf: 0.8, span_ft: 24, support: "simple_udl" }));
+  assert.ok("error" in _v1279({ ie_in4: 4662, fc_psi: 4000, w_klf: 0, span_ft: 24, support: "simple_udl" }));
+  assert.ok("error" in _v1279({ ie_in4: 4662, fc_psi: 4000, w_klf: 0.8, span_ft: 0, support: "simple_udl" }));
+  assert.ok("error" in _v1279({ ie_in4: 4662, fc_psi: 4000, w_klf: 0.8, span_ft: 24, support: "bogus" }));
+  assert.ok("error" in _v1279({ ie_in4: Infinity, fc_psi: 4000, w_klf: 0.8, span_ft: 24, support: "simple_udl" }));
+});
 test("bounds: spec-v53 linear-interpolation pins y + slope + extrapolation flag + reject non-finite", () => {
   // (0,10),(10,30), x=4 -> y=18, slope 2, within range
   const a = _cli({ x1: 0, y1: 10, x2: 10, y2: 30, x: 4 });

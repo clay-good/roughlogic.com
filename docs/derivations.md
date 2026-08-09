@@ -1545,6 +1545,7 @@ cross-check.
 | calc-concrete.js | `computeConcreteDepthForCrackingMoment` | `{ target_mcr_kipft = 0, b_in = 0, fc_psi = 4000, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteEffectiveInertia` | `{ b_in = 0, h_in = 0, d_in = 0, as_in2 = 0, fc_psi = 4000, ma_kipft = 0, lamb...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteElasticModulus` | `{ fc_psi = 4000, wc_pcf = 145 } = {}` | _ | _ | _ |
+| calc-concrete.js | `computeConcreteImmediateDeflection` | `{ ie_in4 = 0, fc_psi = 4000, w_klf = 0, span_ft = 0, support = "simple_udl" }...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteIsolationJoint` | `{ slab_length_ft = 40, slab_width_ft = 30, num_columns = 6, column_perimeter_...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteLongtermDefl` | `{ immediate_defl_in = 0, duration_months = 60, comp_steel_ratio = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteModulusOfRupture` | `{ fc_psi = 4000, lambda = 1.0 } = {}` | _ | _ | _ |
@@ -3315,7 +3316,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1901.
+Row count: 1902.
 
 <!-- END function-corpus-v14 -->
 
@@ -3954,7 +3955,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (461 tiles)
+### Group E Construction (462 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4038,6 +4039,7 @@ per spec-v14 §13.1 second paragraph.
 | `concrete-effective-inertia` | Concrete Effective Moment of Inertia Ie (ACI 318-19 Bischoff) | ACI 318-19 24.2.3.5 (Bischoff effecti...; Mcr = 31.62 kip-ft; Ma 60 > (2/3)Mcr so cracked; Ie = 401... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-elastic-modulus` | Concrete Modulus of Elasticity Ec (ACI 318-19 19.2.2) | ACI 318-19 19.2.2; spec-v378 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-evaporation-rate` | Concrete Surface Evaporation Rate and Plastic-Shrinkage Risk (ACI 305) | ACI 305 Hot Weather Concreting / Menz...; spec-v246 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `concrete-immediate-deflection` | Concrete Immediate Deflection from Ie (ACI 318-19) | ACI 318-19 §24.2.3; Ec = 57000 sqrt(4000) = 3,604,997 psi = 3605 ksi. w = 0.8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-isolation-joint` | Concrete Isolation-Joint Filler Takeoff | isolation-joint filler takeoff (ACI 3...; perimeter = 2*(40+30) = 140; columns = 6*4 = 24; filler =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-longterm-defl` | Long-Term Deflection Multiplier (ACI 318-19 24.2.4) | ACI 318-19 24.2.4.1.1; spec-v497 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-maturity` | Concrete Maturity and Equivalent Age (ASTM C1074) | ASTM C1074 maturity method (Nurse-Sau...; spec-v476 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5139,6 +5141,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1651. Fixture-covered or reference-cadence: 1651 / 1651.
+Tile count: 1652. Fixture-covered or reference-cadence: 1652 / 1652.
 
 <!-- END tile-index-v14 -->
