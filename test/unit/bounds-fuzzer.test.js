@@ -11049,6 +11049,34 @@ test("bounds: spec-v1276 computeBoxCulvertOutletControl pins the HDS-5 box full-
   assert.ok("error" in _v1276({ span_in: 72, rise_in: 48, flow_cfs: 150, length_ft: 120, config: "bogus" }));
   assert.ok("error" in _v1276({ span_in: Infinity, rise_in: 48, flow_cfs: 150, length_ft: 120, config: "wingwall_30_75" }));
 });
+import { computeCulvertHeadwater as _v1277 } from "../../calc-drainage.js";
+import { computeCulvertInletControl as _v1277i, computeCulvertOutletControl as _v1277o } from "../../calc-drainage.js";
+test("bounds: spec-v1277 computeCulvertHeadwater pins the governing = max(inlet, outlet) selection, control flag, delegation, and error seams", () => {
+  // Steep 1% concrete pipe: inlet control governs.
+  const a = _v1277({ diameter_in: 36, flow_cfs: 50, slope: 0.01, length_ft: 100, manning_n: 0.012, tw_ft: 2, config: "concrete_square_headwall" });
+  assert.ok(a.control === "inlet" && Math.abs(a.governing_hw_ft - 3.9864) < 1e-3);
+  assert.ok(Math.abs(a.hw_over_d - a.governing_hw_ft / a.d_ft) < 1e-9);
+  // Governing is exactly the max of the two, and matches the delegated computes bit for bit.
+  const inl = _v1277i({ diameter_in: 36, flow_cfs: 50, slope: 0.01, config: "concrete_square_headwall" });
+  const out = _v1277o({ diameter_in: 36, flow_cfs: 50, length_ft: 100, slope: 0.01, manning_n: 0.012, tw_ft: 2, config: "concrete_square_headwall" });
+  assert.ok(a.inlet_hw_ft === inl.hw_ft && a.outlet_hw_ft === out.hw_ft);
+  assert.ok(a.governing_hw_ft === Math.max(inl.hw_ft, out.hw_ft));
+  // Flatter, rougher, longer barrel under a deep tailwater: outlet control governs.
+  const b = _v1277({ diameter_in: 36, flow_cfs: 50, slope: 0.005, length_ft: 150, manning_n: 0.024, tw_ft: 4, config: "cmp_headwall" });
+  assert.ok(b.control === "outlet" && Math.abs(b.governing_hw_ft - 7.27226) < 2e-3 && b.governing_hw_ft > b.inlet_hw_ft);
+  // The governing headwater never dips below either individual control at any flow.
+  for (const q of [10, 30, 60, 100, 160]) {
+    const r = _v1277({ diameter_in: 36, flow_cfs: q, slope: 0.01, length_ft: 100, manning_n: 0.012, tw_ft: 2, config: "concrete_square_headwall" });
+    assert.ok(r.governing_hw_ft >= r.inlet_hw_ft - 1e-9 && r.governing_hw_ft >= r.outlet_hw_ft - 1e-9);
+  }
+  // Error seams propagate from the delegated computes; unknown config; non-finite.
+  assert.ok("error" in _v1277({ diameter_in: 0, flow_cfs: 50, slope: 0.01, length_ft: 100, config: "concrete_square_headwall" }));
+  assert.ok("error" in _v1277({ diameter_in: 36, flow_cfs: 0, slope: 0.01, length_ft: 100, config: "concrete_square_headwall" }));
+  assert.ok("error" in _v1277({ diameter_in: 36, flow_cfs: 50, slope: 0.01, length_ft: 0, config: "concrete_square_headwall" }));
+  assert.ok("error" in _v1277({ diameter_in: 36, flow_cfs: 50, slope: -0.01, length_ft: 100, config: "concrete_square_headwall" }));
+  assert.ok("error" in _v1277({ diameter_in: 36, flow_cfs: 50, slope: 0.01, length_ft: 100, config: "bogus" }));
+  assert.ok("error" in _v1277({ diameter_in: Infinity, flow_cfs: 50, slope: 0.01, length_ft: 100, config: "concrete_square_headwall" }));
+});
 test("bounds: spec-v53 linear-interpolation pins y + slope + extrapolation flag + reject non-finite", () => {
   // (0,10),(10,30), x=4 -> y=18, slope 2, within range
   const a = _cli({ x1: 0, y1: 10, x2: 10, y2: 30, x: 4 });

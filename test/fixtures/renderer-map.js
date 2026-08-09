@@ -325,6 +325,7 @@ export const RENDERER_MAP = {
   "box-culvert-inlet-control": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },
   "culvert-outlet-control": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },
   "box-culvert-outlet-control": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },
+  "culvert-headwater": { module: "../../calc-drainage.js", exportName: "DRAINAGE_RENDERERS" },
   "gas-pipe-sizing": { module: "../../calc-gas.js", exportName: "GAS_RENDERERS" },
   "gas-leak-rate": { module: "../../calc-gas.js", exportName: "GAS_RENDERERS" },
   "gas-leak-hole-diameter": { module: "../../calc-gas.js", exportName: "GAS_RENDERERS" },

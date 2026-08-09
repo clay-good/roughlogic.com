@@ -1420,3 +1420,77 @@ function renderBoxCulvertOutletControl(inputRegion, outputRegion, citationEl) {
   cfg.select.addEventListener("change", update);
 }
 DRAINAGE_RENDERERS["box-culvert-outlet-control"] = renderBoxCulvertOutletControl;
+
+// ===================== spec-v1277: FHWA HDS-5 governing culvert headwater =====================
+// All four culvert tiles (inlet/outlet x circular/box) end with the same line:
+// "the ACTUAL headwater is the GREATER of inlet and outlet control." None of
+// them computed BOTH and picked the governing value - the number a designer
+// actually reads off. This capstone runs the two circular checks together and
+// reports the larger headwater and which control governs. It delegates to the
+// landed computeCulvertInletControl and computeCulvertOutletControl (one inlet
+// edge maps to both the Table A.1 K/M/c/Y constants and the Ke entrance loss),
+// so there is no duplicated physics here.
+// dims: in { diameter_in: L, flow_cfs: L^3 T^-1, slope: dimensionless, length_ft: L, manning_n: dimensionless, tw_ft: L, config: dimensionless } out: { d_ft: L, inlet_hw_ft: L, outlet_hw_ft: L, governing_hw_ft: L, hw_over_d: dimensionless, outlet_velocity_fps: L T^-1 }
+export function computeCulvertHeadwater({ diameter_in = 0, flow_cfs = 0, slope = 0, length_ft = 0, manning_n = 0.012, tw_ft = 0, config = "concrete_square_headwall" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!_CULVERT_INLET[config] || !_CULVERT_OUTLET_KE[config]) return { error: "Unknown culvert inlet configuration." };
+  const inlet = computeCulvertInletControl({ diameter_in, flow_cfs, slope, config });
+  if (inlet.error) return inlet;
+  const outlet = computeCulvertOutletControl({ diameter_in, flow_cfs, length_ft, slope, manning_n, tw_ft, config });
+  if (outlet.error) return outlet;
+  const inletGoverns = inlet.hw_ft >= outlet.hw_ft;
+  const governing = inletGoverns ? inlet.hw_ft : outlet.hw_ft;
+  const D = inlet.d_ft;
+  if (![inlet.hw_ft, outlet.hw_ft, governing].every(Number.isFinite)) return { error: "Governing headwater is not a finite value; check the inputs." };
+  return {
+    d_ft: D, inlet_hw_ft: inlet.hw_ft, outlet_hw_ft: outlet.hw_ft,
+    governing_hw_ft: governing, control: inletGoverns ? "inlet" : "outlet",
+    hw_over_d: governing / D, inlet_regime: inlet.regime, outlet_velocity_fps: outlet.v_fps,
+    config_label: inlet.config_label,
+    note: "FHWA HDS-5 GOVERNING culvert headwater for a circular barrel: runs the two checks that every culvert design needs and reports the one that governs. INLET control (the inlet's size and edge set the ponding) and OUTLET control (the barrel length, roughness, and tailwater set it) are computed independently, and the ACTUAL design headwater is the GREATER of the two - the number a designer reads off - with the control type flagged. Inlet control usually governs on steep barrels with a good entrance; outlet control takes over on long, rough, or flat barrels and under a high tailwater. This delegates to the inlet-control and outlet-control tiles (one inlet edge maps to both the Table A.1 constants and the Ke entrance loss). If HW/D climbs above about 1.5, check the allowable headwater against the roadway/overtopping elevation. HW is measured above the inlet invert; circular barrels only (a box uses the box tiles). A design aid; the HDS-5 nomographs carry about +/-10%, and the engineer of record and the DOT drainage manual govern.",
+  };
+}
+export const culvertHeadwaterExample = { inputs: { diameter_in: 36, flow_cfs: 50, slope: 0.01, length_ft: 100, manning_n: 0.012, tw_ft: 2, config: "concrete_square_headwall" } };
+
+function renderCulvertHeadwater(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: FHWA HDS-5, Hydraulic Design of Highway Culverts, 3rd ed. (FHWA-HIF-12-026), Appendix A inlet-control equations and the Chapter 3 full-flow outlet-control energy equation, computed together; the design headwater is the greater of the two, per the HDS-5 procedure. Delegates to the inlet-control and outlet-control tiles. A public-domain US DOT reference. A design aid; the engineer of record and the DOT drainage manual govern.";
+  attachExampleButton(inputRegion, () => { dia.input.value = "36"; q.input.value = "50"; s.input.value = "0.01"; len.input.value = "100"; n.input.value = "0.012"; tw.input.value = "2"; cfg.select.value = "concrete_square_headwall"; update(); });
+  const dia = makeNumber("Culvert diameter (in)", "chw-d", { step: "any", min: "0" });
+  const q = makeNumber("Design discharge Q (cfs)", "chw-q", { step: "any", min: "0" });
+  const s = makeNumber("Barrel slope So (ft/ft)", "chw-s", { step: "any", min: "0", value: "0.01" });
+  const len = makeNumber("Barrel length L (ft)", "chw-l", { step: "any", min: "0" });
+  const n = makeNumber("Manning n (0.012 concrete, 0.024 CMP)", "chw-n", { step: "any", min: "0", value: "0.012" });
+  const tw = makeNumber("Tailwater TW above outlet invert (ft)", "chw-tw", { step: "any", min: "0" });
+  const cfg = makeSelect("Shape and inlet edge", "chw-cfg", Object.keys(_CULVERT_INLET).map((k) => ({ value: k, label: _CULVERT_INLET[k].label })));
+  for (const f of [dia, q, s, len, n, tw]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(cfg.wrap);
+  const oGov = makeOutputLine(outputRegion, "Governing headwater HW", "chw-out-gov");
+  const oCtl = makeOutputLine(outputRegion, "Control", "chw-out-ctl");
+  const oIn = makeOutputLine(outputRegion, "Inlet control HW", "chw-out-in");
+  const oOut = makeOutputLine(outputRegion, "Outlet control HW", "chw-out-out");
+  const oNote = makeOutputLine(outputRegion, "Note", "chw-out-n");
+  const update = debounce(() => {
+    const r = computeCulvertHeadwater({
+      diameter_in: Number(dia.input.value) || 0,
+      flow_cfs: Number(q.input.value) || 0,
+      slope: s.input.value === "" ? 0 : Number(s.input.value) || 0,
+      length_ft: Number(len.input.value) || 0,
+      manning_n: Number(n.input.value) || 0,
+      tw_ft: tw.input.value === "" ? 0 : Number(tw.input.value) || 0,
+      config: cfg.select.value,
+    });
+    if (r.error) {
+      oGov.textContent = r.error;
+      for (const o of [oCtl, oIn, oOut, oNote]) o.textContent = "-";
+      return;
+    }
+    oGov.textContent = fmt(r.governing_hw_ft, 2) + " ft above the inlet invert (HW/D " + fmt(r.hw_over_d, 2) + (r.hw_over_d > 1.5 ? "; over 1.5 -- check the allowable headwater" : "") + ")";
+    oCtl.textContent = r.control === "inlet" ? "INLET control governs (" + r.inlet_regime + ")" : "OUTLET control governs (barrel velocity " + fmt(r.outlet_velocity_fps, 1) + " fps)";
+    oIn.textContent = fmt(r.inlet_hw_ft, 2) + " ft" + (r.control === "inlet" ? " (governs)" : "");
+    oOut.textContent = fmt(r.outlet_hw_ft, 2) + " ft" + (r.control === "outlet" ? " (governs)" : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [dia, q, s, len, n, tw]) f.input.addEventListener("input", update);
+  cfg.select.addEventListener("change", update);
+}
+DRAINAGE_RENDERERS["culvert-headwater"] = renderCulvertHeadwater;

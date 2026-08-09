@@ -18521,6 +18521,36 @@
       "kind": "question"
     },
     {
+      "term": "governing culvert headwater",
+      "target": "culvert-headwater",
+      "kind": "industry"
+    },
+    {
+      "term": "culvert design headwater",
+      "target": "culvert-headwater",
+      "kind": "industry"
+    },
+    {
+      "term": "greater of inlet and outlet control",
+      "target": "culvert-headwater",
+      "kind": "industry"
+    },
+    {
+      "term": "which controls the culvert inlet or outlet",
+      "target": "culvert-headwater",
+      "kind": "question"
+    },
+    {
+      "term": "how high will water pond at my culvert overall",
+      "target": "culvert-headwater",
+      "kind": "question"
+    },
+    {
+      "term": "culvert headwater check",
+      "target": "culvert-headwater",
+      "kind": "adjacent"
+    },
+    {
       "term": "rational method time",
       "target": "time-of-concentration",
       "kind": "adjacent"

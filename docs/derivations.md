@@ -1899,6 +1899,7 @@ cross-check.
 | calc-drainage.js | `computeBoxCulvertInletControl` | `{ span_in = 0, rise_in = 0, flow_cfs = 0, slope = 0, config = "wingwall_30_75...` | _ | _ | _ |
 | calc-drainage.js | `computeBoxCulvertOutletControl` | `{ span_in = 0, rise_in = 0, flow_cfs = 0, length_ft = 0, slope = 0, manning_n...` | _ | _ | _ |
 | calc-drainage.js | `computeCompositeCurveNumber` | `{ pervious_cn = 0, impervious_pct = 0, connection = "connected", unconnected_...` | _ | _ | _ |
+| calc-drainage.js | `computeCulvertHeadwater` | `{ diameter_in = 0, flow_cfs = 0, slope = 0, length_ft = 0, manning_n = 0.012,...` | _ | _ | _ |
 | calc-drainage.js | `computeCulvertInletControl` | `{ diameter_in = 0, flow_cfs = 0, slope = 0, config = "concrete_groove_headwal...` | _ | _ | _ |
 | calc-drainage.js | `computeCulvertOutletControl` | `{ diameter_in = 0, flow_cfs = 0, length_ft = 0, slope = 0, manning_n = 0.012,...` | _ | _ | _ |
 | calc-drainage.js | `computeCurveNumberRunoff` | `{ rainfall_in = 0, curve_number = 0, area_acres = 0 } = {}` | _ | _ | _ |
@@ -3313,7 +3314,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1899.
+Row count: 1900.
 
 <!-- END function-corpus-v14 -->
 
@@ -3592,7 +3593,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (139 tiles)
+### Group B Plumbing (140 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3615,6 +3616,7 @@ per spec-v14 §13.1 second paragraph.
 | `composite-curve-number` | Composite Curve Number (Impervious Area) | USDA NRCS TR-55 (1986), Chapter 2; Figure 2-4: CNc = CNp + (Pimp/100)(98 - CNp)(1 - 0.5 R) =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `condensate-return-sizing` | Condensate Return Line Size From the Flash Steam | Continuity; ASHRAE / Spirax Sarco ret...; spec-v200 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cross-connection-air-gap` | Cross-Connection Air Gap (IPC 608.15.1) | IPC 608.15.1 / ASME A112.1.2; spec-v450 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `culvert-headwater` | Governing Culvert Headwater (HDS-5) | FHWA HDS-5 (FHWA-HIF-12-026); HW_inlet = 3.986 ft (unsubmerged inlet control) vs HW_out... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `culvert-inlet-control` | Culvert Headwater by Inlet Control (HDS-5) | FHWA HDS-5 (FHWA-HIF-12-026), Appendix A; D = 3 ft, A = pi 3^2/4 = 7.0686 ft2, flow factor Q/(A sqr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `culvert-outlet-control` | Culvert Headwater by Outlet Control (HDS-5) | FHWA HDS-5 (FHWA-HIF-12-026), Chapter...; D = 3 ft, A = pi 3^2/4 = 7.0686 ft2, R = D/4 = 0.75 ft, V... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `curve-number-runoff` | Curve Number Runoff Depth (SCS/NRCS) | USDA NRCS TR-55 (1986), Chapter 2; S = 1000/80 - 10 = 2.5 in; Ia = 0.2 x 2.5 = 0.5 in; Q = (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5135,6 +5137,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1649. Fixture-covered or reference-cadence: 1649 / 1649.
+Tile count: 1650. Fixture-covered or reference-cadence: 1650 / 1650.
 
 <!-- END tile-index-v14 -->
