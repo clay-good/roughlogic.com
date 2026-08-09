@@ -18451,6 +18451,46 @@
       "kind": "question"
     },
     {
+      "term": "culvert outlet control",
+      "target": "culvert-outlet-control",
+      "kind": "industry"
+    },
+    {
+      "term": "culvert barrel friction headwater",
+      "target": "culvert-outlet-control",
+      "kind": "industry"
+    },
+    {
+      "term": "HDS-5 outlet control",
+      "target": "culvert-outlet-control",
+      "kind": "industry"
+    },
+    {
+      "term": "full flow culvert headwater",
+      "target": "culvert-outlet-control",
+      "kind": "adjacent"
+    },
+    {
+      "term": "culvert head loss with tailwater",
+      "target": "culvert-outlet-control",
+      "kind": "adjacent"
+    },
+    {
+      "term": "culvert entrance loss coefficient Ke",
+      "target": "culvert-outlet-control",
+      "kind": "adjacent"
+    },
+    {
+      "term": "does the culvert flow full and drown out",
+      "target": "culvert-outlet-control",
+      "kind": "question"
+    },
+    {
+      "term": "headwater from culvert length and roughness",
+      "target": "culvert-outlet-control",
+      "kind": "question"
+    },
+    {
       "term": "rational method time",
       "target": "time-of-concentration",
       "kind": "adjacent"

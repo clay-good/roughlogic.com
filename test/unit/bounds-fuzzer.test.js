@@ -10969,6 +10969,46 @@ test("bounds: spec-v1270 computeBoxCulvertInletControl pins the HDS-5 box regime
   assert.ok("error" in _v1270({ span_in: 72, rise_in: 48, flow_cfs: 150, config: "bogus" }));
   assert.ok("error" in _v1270({ span_in: Infinity, rise_in: 48, flow_cfs: 150, config: "wingwall_30_75" }));
 });
+import { computeCulvertOutletControl as _v1275 } from "../../calc-drainage.js";
+test("bounds: spec-v1275 computeCulvertOutletControl pins the HDS-5 full-flow energy equation, entrance/friction/exit stack, ho, monotonicity, and error seams", () => {
+  // 36 in concrete pipe, 100 ft on 1%, square-edge headwall (Ke 0.5), 50 cfs, 2 ft TW.
+  const r = _v1275({ diameter_in: 36, flow_cfs: 50, length_ft: 100, slope: 0.01, manning_n: 0.012, tw_ft: 2, config: "concrete_square_headwall" });
+  assert.ok(Math.abs(r.hw_ft - 3.2921) < 1e-3 && Math.abs(r.head_loss_ft - 1.64156) < 1e-3);
+  // Friction multiple is exactly 29 n^2 L / R^(4/3), R = D/4.
+  const D = 3, R = D / 4;
+  assert.ok(Math.abs(r.friction_coeff - 29 * 0.012 * 0.012 * 100 / Math.pow(R, 4 / 3)) < 1e-9);
+  // Total head loss stacks exit (1) + entrance (Ke) + friction, times the velocity head.
+  assert.ok(Math.abs(r.head_loss_ft - (1 + r.ke + r.friction_coeff) * r.velocity_head_ft) < 1e-9);
+  // HW = H + ho - So L identity.
+  assert.ok(Math.abs(r.hw_ft - (r.head_loss_ft + r.ho_ft - 0.01 * 100)) < 1e-9);
+  // ho is the larger of the tailwater and (dc + D)/2; here (dc+D)/2 governs.
+  assert.ok(Math.abs(r.ho_ft - Math.max(2, (r.dc_ft + D) / 2)) < 1e-9 && r.ho_ft > 2);
+  // A high tailwater takes over the outlet head.
+  const hiTW = _v1275({ diameter_in: 36, flow_cfs: 50, length_ft: 100, slope: 0.01, manning_n: 0.012, tw_ft: 4, config: "concrete_square_headwall" });
+  assert.ok(Math.abs(hiTW.ho_ft - 4) < 1e-9);
+  // Cross-check: the same barrel as CMP (n 0.024, projecting Ke 0.9) heads up more.
+  const cmp = _v1275({ diameter_in: 36, flow_cfs: 50, length_ft: 100, slope: 0.01, manning_n: 0.024, tw_ft: 2, config: "cmp_projecting" });
+  assert.ok(Math.abs(cmp.hw_ft - 5.0313) < 1e-3 && cmp.hw_ft > r.hw_ft);
+  // Headwater rises monotonically with discharge.
+  let prev = -Infinity;
+  for (const q of [20, 40, 60, 90, 130]) {
+    const hw = _v1275({ diameter_in: 36, flow_cfs: q, length_ft: 100, slope: 0.01, manning_n: 0.012, tw_ft: 2, config: "concrete_square_headwall" }).hw_ft;
+    assert.ok(hw > prev); prev = hw;
+  }
+  // A rougher barrel (higher n) loses more head and raises HW at the same flow.
+  const smooth = _v1275({ diameter_in: 36, flow_cfs: 50, length_ft: 100, slope: 0.01, manning_n: 0.012, tw_ft: 2, config: "concrete_square_headwall" }).hw_ft;
+  const rough = _v1275({ diameter_in: 36, flow_cfs: 50, length_ft: 100, slope: 0.01, manning_n: 0.030, tw_ft: 2, config: "concrete_square_headwall" }).hw_ft;
+  assert.ok(rough > smooth);
+  // Error seams: non-positive diameter/flow/length/n, negative slope/tailwater, unknown config, non-finite.
+  assert.ok("error" in _v1275({ diameter_in: 0, flow_cfs: 50, length_ft: 100, config: "concrete_square_headwall" }));
+  assert.ok("error" in _v1275({ diameter_in: 36, flow_cfs: 0, length_ft: 100, config: "concrete_square_headwall" }));
+  assert.ok("error" in _v1275({ diameter_in: 36, flow_cfs: 50, length_ft: 0, config: "concrete_square_headwall" }));
+  assert.ok("error" in _v1275({ diameter_in: 36, flow_cfs: 50, length_ft: 100, manning_n: 0, config: "concrete_square_headwall" }));
+  assert.ok("error" in _v1275({ diameter_in: 36, flow_cfs: 50, length_ft: 100, slope: -0.01, config: "concrete_square_headwall" }));
+  assert.ok("error" in _v1275({ diameter_in: 36, flow_cfs: 50, length_ft: 100, tw_ft: -1, config: "concrete_square_headwall" }));
+  assert.ok("error" in _v1275({ diameter_in: 36, flow_cfs: 50, length_ft: 100, config: "bogus" }));
+  assert.ok("error" in _v1275({ diameter_in: Infinity, flow_cfs: 50, length_ft: 100, config: "concrete_square_headwall" }));
+});
 test("bounds: spec-v53 linear-interpolation pins y + slope + extrapolation flag + reject non-finite", () => {
   // (0,10),(10,30), x=4 -> y=18, slope 2, within range
   const a = _cli({ x1: 0, y1: 10, x2: 10, y2: 30, x: 4 });

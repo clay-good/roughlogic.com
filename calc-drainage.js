@@ -1212,3 +1212,112 @@ function renderBoxCulvertInletControl(inputRegion, outputRegion, citationEl) {
   cfg.select.addEventListener("change", update);
 }
 DRAINAGE_RENDERERS["box-culvert-inlet-control"] = renderBoxCulvertInletControl;
+
+// ===================== spec-v1275: FHWA HDS-5 culvert headwater by outlet control =====================
+// The two inlet-control tiles (spec-v1269 circular, spec-v1270 box) each say
+// their answer is only ONE of the two required checks and that "outlet control
+// (barrel friction, tailwater, length) is a separate calculation." Neither
+// computes it. Outlet control is the case where the barrel itself (its length,
+// roughness, and the tailwater) - not the inlet edge - sets the headwater. For
+// a barrel flowing full, HDS-5 gives the energy equation HW = H + ho - So L,
+// where the total head loss H = [1 + Ke + 29 n^2 L / R^(4/3)] V^2/2g stacks the
+// exit (1), entrance (Ke), and full-flow Manning friction terms. The 29 is the
+// US-customary constant 2g/1.486^2. Circular barrels only, reusing the same
+// critical-depth geometry the inlet-control tile uses.
+const _CULVERT_OUTLET_KE = {
+  concrete_groove_projecting: { ke: 0.2, label: "Concrete pipe, groove end projecting" },
+  concrete_groove_headwall:   { ke: 0.2, label: "Concrete pipe, groove end with headwall" },
+  concrete_square_headwall:   { ke: 0.5, label: "Concrete pipe, square edge with headwall" },
+  beveled_ring:               { ke: 0.2, label: "Beveled ring (45 or 33.7 deg bevels)" },
+  cmp_headwall:               { ke: 0.5, label: "Corrugated metal (CMP), headwall" },
+  cmp_mitered:                { ke: 0.7, label: "Corrugated metal (CMP), mitered to slope" },
+  cmp_projecting:             { ke: 0.9, label: "Corrugated metal (CMP), projecting" },
+};
+
+// dims: in { diameter_in: L, flow_cfs: L^3 T^-1, length_ft: L, slope: dimensionless, manning_n: dimensionless, tw_ft: L, config: dimensionless } out: { d_ft: L, barrel_area_ft2: L^2, v_fps: L T^-1, velocity_head_ft: L, head_loss_ft: L, dc_ft: L, ho_ft: L, hw_ft: L, friction_coeff: dimensionless, ke: dimensionless }
+export function computeCulvertOutletControl({ diameter_in = 0, flow_cfs = 0, length_ft = 0, slope = 0, manning_n = 0.012, tw_ft = 0, config = "concrete_square_headwall" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const C = _CULVERT_OUTLET_KE[config];
+  if (!C) return { error: "Unknown culvert inlet configuration." };
+  if (!(diameter_in > 0)) return { error: "Culvert diameter must be positive (in)." };
+  if (!(flow_cfs > 0)) return { error: "Discharge must be positive (cfs)." };
+  if (!(length_ft > 0)) return { error: "Barrel length must be positive (ft)." };
+  if (!(manning_n > 0)) return { error: "Manning n must be positive." };
+  if (!(slope >= 0)) return { error: "Barrel slope must be zero or positive (ft/ft)." };
+  if (!(tw_ft >= 0)) return { error: "Tailwater depth must be zero or positive (ft)." };
+  const G = 32.2;
+  const D = diameter_in / 12;
+  const A = Math.PI * D * D / 4;                 // full barrel area, ft^2
+  const R = D / 4;                               // hydraulic radius flowing full, ft
+  const Q = flow_cfs;
+  const V = Q / A;                               // full-barrel velocity, fps
+  const vHead = V * V / (2 * G);
+  // Full-flow Manning friction loss as a multiple of the velocity head:
+  // 29 n^2 L / R^(4/3), where 29 = 2 g / 1.486^2 (US-customary units).
+  const friction = 29 * manning_n * manning_n * length_ft / Math.pow(R, 4 / 3);
+  const H = (1 + C.ke + friction) * vHead;       // entrance + friction + exit losses
+  // Critical depth in the circular barrel (same solve as inlet control), capped at D.
+  const areaOf = (th) => (D * D / 8) * (th - Math.sin(th));
+  const topOf = (th) => D * Math.sin(th / 2);
+  let lo = 1e-9, hi = 2 * Math.PI * (1 - 1e-9);
+  for (let i = 0; i < 200; i++) {
+    const mid = (lo + hi) / 2;
+    if (G * Math.pow(areaOf(mid), 3) - Q * Q * topOf(mid) < 0) lo = mid; else hi = mid;
+  }
+  const thetaC = (lo + hi) / 2;
+  let dc = (D / 2) * (1 - Math.cos(thetaC / 2));
+  if (dc > D) dc = D;
+  const ho = Math.max(tw_ft, (dc + D) / 2);      // outlet water-surface head above the outlet invert
+  const hw = H + ho - slope * length_ft;         // headwater above the inlet invert
+  if (![H, dc, ho, hw].every(Number.isFinite)) return { error: "Outlet-control headwater is not a finite value; check the inputs." };
+  return {
+    d_ft: D, barrel_area_ft2: A, r_ft: R, v_fps: V, velocity_head_ft: vHead,
+    friction_coeff: friction, head_loss_ft: H, ke: C.ke, dc_ft: dc, ho_ft: ho,
+    tw_ft, hw_ft: hw, barrel_full: hw >= D, config_label: C.label,
+    note: "FHWA HDS-5 culvert headwater by OUTLET control for a circular barrel flowing full - the companion to the two inlet-control tiles and the OTHER of the two required checks. Here the barrel itself (its length L, Manning roughness n, and the tailwater TW), not the inlet edge, sets the ponding. The full-flow energy equation is HW = H + ho - So L, with the total head loss H = [1 + Ke + 29 n^2 L / R^(4/3)] V^2/2g stacking the exit loss (the 1), the entrance loss Ke (the HDS-5 table value for the inlet type), and the Manning friction loss (the 29 is 2g/1.486^2 in US-customary units); V = Q/A and R = D/4 are the full-barrel values. The outlet head ho is the greater of the tailwater and (dc + D)/2, with dc the circular critical depth. So L is the fall of the barrel invert over its length. The ACTUAL design headwater is the GREATER of this outlet-control value and the inlet-control value (culvert-inlet-control); if HW comes out below the barrel crown the full-flow assumption is only approximate. HW is measured above the inlet invert. A design aid; the HDS-5 nomographs carry about +/-10%, and the engineer of record and the DOT drainage manual govern.",
+  };
+}
+export const culvertOutletControlExample = { inputs: { diameter_in: 36, flow_cfs: 50, length_ft: 100, slope: 0.01, manning_n: 0.012, tw_ft: 2, config: "concrete_square_headwall" } };
+
+function renderCulvertOutletControl(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: FHWA HDS-5, Hydraulic Design of Highway Culverts, 3rd ed. (FHWA-HIF-12-026), Appendix A / Chapter 3 full-flow outlet-control energy equation H = [1 + Ke + 29 n^2 L / R^(4/3)] V^2/2g and HW = H + ho - So L, with the Table entrance-loss coefficients Ke and the circular critical depth from g A^3 = Q^2 T. Outlet control only (inlet control is a separate check); the actual headwater is the greater of the two. A public-domain US DOT reference. A design aid; the engineer of record and the DOT drainage manual govern.";
+  attachExampleButton(inputRegion, () => { dia.input.value = "36"; q.input.value = "50"; len.input.value = "100"; s.input.value = "0.01"; n.input.value = "0.012"; tw.input.value = "2"; cfg.select.value = "concrete_square_headwall"; update(); });
+  const dia = makeNumber("Culvert diameter (in)", "coc-d", { step: "any", min: "0" });
+  const q = makeNumber("Design discharge Q (cfs)", "coc-q", { step: "any", min: "0" });
+  const len = makeNumber("Barrel length L (ft)", "coc-l", { step: "any", min: "0" });
+  const s = makeNumber("Barrel slope So (ft/ft)", "coc-s", { step: "any", min: "0", value: "0.01" });
+  const n = makeNumber("Manning n (0.012 concrete, 0.024 CMP)", "coc-n", { step: "any", min: "0", value: "0.012" });
+  const tw = makeNumber("Tailwater TW above outlet invert (ft)", "coc-tw", { step: "any", min: "0" });
+  const cfg = makeSelect("Inlet configuration (sets Ke)", "coc-cfg", Object.keys(_CULVERT_OUTLET_KE).map((k) => ({ value: k, label: _CULVERT_OUTLET_KE[k].label })));
+  for (const f of [dia, q, len, s, n, tw]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(cfg.wrap);
+  const oHW = makeOutputLine(outputRegion, "Headwater HW (outlet control)", "coc-out-hw");
+  const oH = makeOutputLine(outputRegion, "Total head loss H", "coc-out-h");
+  const oV = makeOutputLine(outputRegion, "Full-barrel velocity", "coc-out-v");
+  const oHo = makeOutputLine(outputRegion, "Outlet head ho", "coc-out-ho");
+  const oNote = makeOutputLine(outputRegion, "Note", "coc-out-n");
+  const update = debounce(() => {
+    const r = computeCulvertOutletControl({
+      diameter_in: Number(dia.input.value) || 0,
+      flow_cfs: Number(q.input.value) || 0,
+      length_ft: Number(len.input.value) || 0,
+      slope: s.input.value === "" ? 0 : Number(s.input.value) || 0,
+      manning_n: Number(n.input.value) || 0,
+      tw_ft: tw.input.value === "" ? 0 : Number(tw.input.value) || 0,
+      config: cfg.select.value,
+    });
+    if (r.error) {
+      oHW.textContent = r.error;
+      for (const o of [oH, oV, oHo, oNote]) o.textContent = "-";
+      return;
+    }
+    oHW.textContent = fmt(r.hw_ft, 2) + " ft above the inlet invert" + (r.barrel_full ? "" : " -- below the crown; full-flow form is approximate here");
+    oH.textContent = fmt(r.head_loss_ft, 2) + " ft (Ke " + fmt(r.ke, 2) + ", friction multiple " + fmt(r.friction_coeff, 2) + " x velocity head)";
+    oV.textContent = fmt(r.v_fps, 2) + " fps (velocity head " + fmt(r.velocity_head_ft, 2) + " ft)";
+    oHo.textContent = fmt(r.ho_ft, 2) + " ft (max of tailwater and (dc + D)/2; dc " + fmt(r.dc_ft, 2) + " ft)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [dia, q, len, s, n, tw]) f.input.addEventListener("input", update);
+  cfg.select.addEventListener("change", update);
+}
+DRAINAGE_RENDERERS["culvert-outlet-control"] = renderCulvertOutletControl;

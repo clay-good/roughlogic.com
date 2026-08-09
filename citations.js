@@ -16168,6 +16168,18 @@ export const CITATIONS = {
       { name: "Slope / scope", value: "Ks = -0.5 (mitered +0.7); circular barrels only; inlet control only (outlet control is a separate check)", source: "HDS-5 Appendix A" },
     ],
   },
+  "culvert-outlet-control": {
+    formula: "Full-flow outlet control: H = [1 + Ke + 29 n^2 L / R^(4/3)] V^2/2g; HW = H + ho - So L. A = pi D^2/4, R = D/4, V = Q/A; ho = max(TW, (dc + D)/2), dc the circular critical depth from g A^3 = Q^2 T. The 29 = 2g/1.486^2 (US-customary). HW is measured above the inlet invert.",
+    edition: "FHWA HDS-5, Hydraulic Design of Highway Culverts, 3rd ed. (FHWA-HIF-12-026, 2012), Chapter 3 / Appendix A full-flow outlet-control energy equation and the Table entrance-loss coefficients Ke, by name; the friction constant 29 = 2g/1.486^2 and the critical-depth solve (Froude = 1) are verified in the compute.",
+    freeAccess: "HDS-5 is a public-domain FHWA publication (FHWA-HIF-12-026); the outlet-control energy equation and the Ke entrance-loss values are reproduced from it. Diameter, discharge, length, slope, Manning n, tailwater, and the inlet configuration are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "FHWA HDS-5 culvert headwater by OUTLET control for a circular barrel flowing full - the companion to the two inlet-control tiles and the OTHER of the two required checks. Here the barrel itself (its length L, Manning roughness n, and the tailwater TW), not the inlet edge, sets the ponding. The full-flow energy equation is HW = H + ho - So L, with the total head loss H = [1 + Ke + 29 n^2 L / R^(4/3)] V^2/2g stacking the exit loss (the 1), the entrance loss Ke (the HDS-5 table value for the inlet type), and the Manning friction loss (the 29 is 2g/1.486^2 in US-customary units); V = Q/A and R = D/4 are the full-barrel values. The outlet head ho is the greater of the tailwater and (dc + D)/2, with dc the circular critical depth. So L is the fall of the barrel invert over its length. The ACTUAL design headwater is the GREATER of this outlet-control value and the inlet-control value; if HW comes out below the barrel crown the full-flow assumption is only approximate. HW is measured above the inlet invert. A design aid; the HDS-5 nomographs carry about +/-10%, and the engineer of record and the DOT drainage manual govern.",
+    assumptions: [
+      { name: "Total head loss", value: "H = [1 + Ke + 29 n^2 L / R^(4/3)] V^2/2g (exit + entrance + friction)", source: "HDS-5 Chapter 3 outlet control" },
+      { name: "Headwater", value: "HW = H + ho - So L; ho = max(TW, (dc + D)/2)", source: "HDS-5 outlet-control energy equation" },
+      { name: "Entrance loss Ke / scope", value: "Ke 0.2 groove/beveled, 0.5 square headwall, 0.7 mitered, 0.9 projecting; circular barrels flowing full; outlet control only (inlet control is separate)", source: "HDS-5 Table entrance-loss coefficients" },
+    ],
+  },
   "box-culvert-inlet-control": {
     formula: "Box inlet control HW/D: unsubmerged Form 1 (wingwall flares) HW/D = Hc/D + K[Q/(A sqrt D)]^M + Ks S; Form 2 (headwalls) HW/D = K[Q/(A sqrt D)]^M + Ks S; submerged HW/D = c[Q/(A sqrt D)]^2 + Y + Ks S; Ks = -0.5. D = rise, A = span x rise; rectangular critical depth dc = (Q^2/(g B^2))^(1/3), Hc = 1.5 dc. HW = (HW/D) D.",
     edition: "FHWA HDS-5, Hydraulic Design of Highway Culverts, 3rd ed. (FHWA-HIF-12-026, 2012), Appendix A equations A.1/A.2/A.3 and the Table A.1 concrete-box constants (Chart 8 wingwall flares Form 1; Chart 10 headwall chamfers/bevels Form 2), by name; the equation assembly verified against the HDS-5 Appendix A worked values and the rectangular critical depth against its closed form Hc = 1.5 dc.",
