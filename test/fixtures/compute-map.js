@@ -409,6 +409,7 @@ export const COMPUTE_MAP = {
   "culvert-inlet-control": { module: "../../calc-drainage.js", fn: "computeCulvertInletControl" },
   "box-culvert-inlet-control": { module: "../../calc-drainage.js", fn: "computeBoxCulvertInletControl" },
   "culvert-outlet-control": { module: "../../calc-drainage.js", fn: "computeCulvertOutletControl" },
+  "box-culvert-outlet-control": { module: "../../calc-drainage.js", fn: "computeBoxCulvertOutletControl" },
   "tr55-graphical-peak-discharge": { module: "../../calc-drainage.js", fn: "computeTr55GraphicalPeakDischarge" },
   "tr55-detention-storage": { module: "../../calc-drainage.js", fn: "computeTr55DetentionStorage" },
   "drainage-invert": { module: "../../calc-plumbing.js", fn: "computeDrainageInvert" },

@@ -11009,6 +11009,46 @@ test("bounds: spec-v1275 computeCulvertOutletControl pins the HDS-5 full-flow en
   assert.ok("error" in _v1275({ diameter_in: 36, flow_cfs: 50, length_ft: 100, config: "bogus" }));
   assert.ok("error" in _v1275({ diameter_in: Infinity, flow_cfs: 50, length_ft: 100, config: "concrete_square_headwall" }));
 });
+import { computeBoxCulvertOutletControl as _v1276 } from "../../calc-drainage.js";
+test("bounds: spec-v1276 computeBoxCulvertOutletControl pins the HDS-5 box full-flow energy equation, box geometry, rectangular dc, monotonicity, and error seams", () => {
+  // 6x4 ft box, 120 ft on 0.5%, 30-75 deg wingwall flares (Ke 0.4), 150 cfs, 3 ft TW.
+  const r = _v1276({ span_in: 72, rise_in: 48, flow_cfs: 150, length_ft: 120, slope: 0.005, manning_n: 0.012, tw_ft: 3, config: "wingwall_30_75" });
+  assert.ok(Math.abs(r.hw_ft - 3.83128) < 1e-3 && Math.abs(r.head_loss_ft - 1.08755) < 1e-3);
+  // Box geometry: A = span x rise, R = A / (2(span+rise)), not D/4.
+  const B = 6, D = 4, A = B * D, R = A / (2 * (B + D));
+  assert.ok(Math.abs(r.barrel_area_ft2 - A) < 1e-9 && Math.abs(r.r_ft - R) < 1e-9);
+  // Friction multiple is exactly 29 n^2 L / R^(4/3).
+  assert.ok(Math.abs(r.friction_coeff - 29 * 0.012 * 0.012 * 120 / Math.pow(R, 4 / 3)) < 1e-9);
+  // Rectangular closed-form critical depth dc = (Q^2/(g B^2))^(1/3).
+  assert.ok(Math.abs(r.dc_ft - Math.cbrt(150 * 150 / (32.2 * B * B))) < 1e-9);
+  // Loss stack and HW identity.
+  assert.ok(Math.abs(r.head_loss_ft - (1 + r.ke + r.friction_coeff) * r.velocity_head_ft) < 1e-9);
+  assert.ok(Math.abs(r.hw_ft - (r.head_loss_ft + r.ho_ft - 0.005 * 120)) < 1e-9);
+  assert.ok(Math.abs(r.ho_ft - Math.max(3, (r.dc_ft + D) / 2)) < 1e-9);
+  // Cross-check: 8x5 box with bevels (Ke 0.2) at 300 cfs.
+  const bev = _v1276({ span_in: 96, rise_in: 60, flow_cfs: 300, length_ft: 120, slope: 0.005, manning_n: 0.012, tw_ft: 3, config: "headwall_bevel" });
+  assert.ok(Math.abs(bev.hw_ft - 4.95537) < 1e-3);
+  // Headwater rises monotonically with discharge.
+  let prev = -Infinity;
+  for (const q of [60, 120, 200, 320, 500]) {
+    const hw = _v1276({ span_in: 72, rise_in: 48, flow_cfs: q, length_ft: 120, slope: 0.005, manning_n: 0.012, tw_ft: 3, config: "wingwall_30_75" }).hw_ft;
+    assert.ok(hw > prev); prev = hw;
+  }
+  // A square headwall (higher Ke) heads up more than the beveled edge at the same flow.
+  const square = _v1276({ span_in: 72, rise_in: 48, flow_cfs: 400, length_ft: 120, slope: 0.005, manning_n: 0.012, tw_ft: 3, config: "headwall_square" }).hw_ft;
+  const bevel = _v1276({ span_in: 72, rise_in: 48, flow_cfs: 400, length_ft: 120, slope: 0.005, manning_n: 0.012, tw_ft: 3, config: "headwall_bevel" }).hw_ft;
+  assert.ok(square > bevel);
+  // Error seams: non-positive span/rise/flow/length/n, negative slope/tailwater, unknown config, non-finite.
+  assert.ok("error" in _v1276({ span_in: 0, rise_in: 48, flow_cfs: 150, length_ft: 120, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1276({ span_in: 72, rise_in: 0, flow_cfs: 150, length_ft: 120, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1276({ span_in: 72, rise_in: 48, flow_cfs: 0, length_ft: 120, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1276({ span_in: 72, rise_in: 48, flow_cfs: 150, length_ft: 0, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1276({ span_in: 72, rise_in: 48, flow_cfs: 150, length_ft: 120, manning_n: 0, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1276({ span_in: 72, rise_in: 48, flow_cfs: 150, length_ft: 120, slope: -0.01, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1276({ span_in: 72, rise_in: 48, flow_cfs: 150, length_ft: 120, tw_ft: -1, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1276({ span_in: 72, rise_in: 48, flow_cfs: 150, length_ft: 120, config: "bogus" }));
+  assert.ok("error" in _v1276({ span_in: Infinity, rise_in: 48, flow_cfs: 150, length_ft: 120, config: "wingwall_30_75" }));
+});
 test("bounds: spec-v53 linear-interpolation pins y + slope + extrapolation flag + reject non-finite", () => {
   // (0,10),(10,30), x=4 -> y=18, slope 2, within range
   const a = _cli({ x1: 0, y1: 10, x2: 10, y2: 30, x: 4 });
