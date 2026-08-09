@@ -1572,6 +1572,73 @@ function _v943renderOilWaterSeparatorSizing(inputRegion, outputRegion, citationE
 }
 TREATMENT_RENDERERS["oil-water-separator-sizing"] = _v943renderOilWaterSeparatorSizing;
 
+// ===================== spec-v1271: discrete-particle settling velocity (Stokes' law) =====================
+// dims: in { args: dimensionless } out: { settling_velocity_mm_s: dimensionless, settling_velocity_ft_min: dimensionless, reynolds: dimensionless }
+export function computeParticleSettlingVelocity({ particle_diameter_mm = 0.05, particle_sg = 2.65, water_temp_f = 68 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  if (!(particle_diameter_mm > 0)) return { error: "Particle diameter must be positive (mm)." };
+  if (!(particle_sg > 1)) return { error: "Particle specific gravity must be greater than 1: a denser-than-water particle settles, a lighter one floats (for a rising oil droplet see oil-water-separator-sizing)." };
+  if (!(water_temp_f > 32 && water_temp_f < 212)) return { error: "Water temperature must be between 32 and 212 F (liquid water)." };
+  const t_c = (water_temp_f - 32) / 1.8;
+  const t_k = t_c + 273.15;
+  // Dynamic viscosity of water (N s/m^2), Vogel correlation (Davis & Cornwell):
+  // mu = 2.414e-5 x 10^(247.8/(T_K - 140)); reproduces the standard table (1.002e-3 at 20 C).
+  const mu = 2.414e-5 * Math.pow(10, 247.8 / (t_k - 140));
+  // Density of water (kg/m^3), quadratic fit to the standard table over 0-40 C.
+  const rho_w = 999.84 + 0.0275 * t_c - 0.00545 * t_c * t_c;
+  const rho_p = particle_sg * 1000;
+  const d_m = particle_diameter_mm / 1000;
+  // Stokes' law: terminal settling velocity of a sphere in the laminar regime.
+  const vs_ms = 9.81 * (rho_p - rho_w) * d_m * d_m / (18 * mu);
+  const reynolds = rho_w * vs_ms * d_m / mu;
+  const settling_velocity_mm_s = vs_ms * 1000;
+  const settling_velocity_ft_min = vs_ms * 3.28084 * 60;
+  if (![settling_velocity_mm_s, settling_velocity_ft_min, reynolds].every(Number.isFinite)) return { error: "Settling-velocity math is not a finite value." };
+  const regime = reynolds < 1
+    ? "Stokes (laminar) -- valid"
+    : reynolds <= 1000
+      ? "transition -- Stokes over-predicts (use CD-based)"
+      : "Newton (turbulent) -- Stokes invalid";
+  return {
+    settling_velocity_mm_s,
+    settling_velocity_ft_min,
+    reynolds,
+    regime,
+    note: "The terminal settling velocity of a discrete spherical particle in still water by Stokes' law, Vs = g (rho_p - rho_w) d^2 / (18 mu) -- the workhorse of grit-chamber and Type I sedimentation-basin design. Water density and viscosity are computed from the temperature (colder water is more viscous and settles particles more slowly). A 0.05 mm silt grain (SG 2.65) at 68 F settles about 2.25 mm/s (0.44 ft/min) at a particle Reynolds number of 0.11, safely in the Stokes regime. Stokes' law holds only while Re = rho_w Vs d / mu is below about 1; a 0.5 mm sand grain reaches Re ~ 112, so the tile FLAGS it -- there the real velocity is lower and the transition (CD-based) or Newton's law applies. The overflow rate of an ideal clarifier equals this critical settling velocity: a particle is removed when its Vs meets or exceeds the surface loading. A discrete (Type I) settling screen only: flocculent, hindered, and compression settling, non-spherical shape, and short-circuiting are separate. First-principles (Stokes 1851; Davis & Cornwell, Introduction to Environmental Engineering)." ,
+  };
+}
+
+export const particleSettlingVelocityExample = { inputs: { particle_diameter_mm: 0.05, particle_sg: 2.65, water_temp_f: 68 } };
+
+function _v1271renderParticleSettlingVelocity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: discrete-particle settling velocity by Stokes' law, Vs = g(rho_p - rho_w)d^2/(18 mu) (first-principles; Davis & Cornwell). Water density and viscosity from temperature; valid only for particle Reynolds number below about 1 (the tile flags the transition/Newton regime). A discrete (Type I) settling screen; the engineer governs the basin.";
+  const d = makeNumber("Particle diameter (mm)", "psv-d", { step: "any", min: "0", value: "0.05" });
+  d.input.value = "0.05";
+  const sg = makeNumber("Particle specific gravity", "psv-sg", { step: "any", min: "0", value: "2.65" });
+  sg.input.value = "2.65";
+  const tf = makeNumber("Water temperature (F)", "psv-tf", { step: "any", value: "68" });
+  tf.input.value = "68";
+  for (const f of [d, sg, tf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { d.input.value = "0.05"; sg.input.value = "2.65"; tf.input.value = "68"; update(); });
+  const oVs = makeOutputLine(outputRegion, "Settling velocity", "psv-out-vs");
+  const oVsF = makeOutputLine(outputRegion, "Settling velocity (ft/min)", "psv-out-vsf");
+  const oRe = makeOutputLine(outputRegion, "Particle Reynolds number", "psv-out-re");
+  const oReg = makeOutputLine(outputRegion, "Flow regime", "psv-out-reg");
+  const update = debounce(() => {
+    const r = computeParticleSettlingVelocity({
+      particle_diameter_mm: d.input.value === "" ? 0.05 : Number(d.input.value), particle_sg: sg.input.value === "" ? 2.65 : Number(sg.input.value),
+      water_temp_f: tf.input.value === "" ? 68 : Number(tf.input.value),
+    });
+    if (r.error) { oVs.textContent = r.error; oVsF.textContent = "-"; oRe.textContent = "-"; oReg.textContent = "-"; return; }
+    oVs.textContent = fmt(r.settling_velocity_mm_s, 3) + " mm/s";
+    oVsF.textContent = fmt(r.settling_velocity_ft_min, 3) + " ft/min";
+    oRe.textContent = fmt(r.reynolds, 3);
+    oReg.textContent = r.regime;
+  }, DEBOUNCE_MS);
+  for (const f of [d, sg, tf]) f.input.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["particle-settling-velocity"] = _v1271renderParticleSettlingVelocity;
+
 // ===================== spec-v969: pool calcium hardness increase (calcium chloride dose) =====================
 // dims: in { gallons: dimensionless, ppm_increase: dimensionless, product_purity_pct: dimensionless } out: { calcium_chloride_lb: dimensionless, calcium_chloride_oz: dimensionless }
 export function computePoolCalciumHardnessDose({ gallons = 20000, ppm_increase = 20, product_purity_pct = 77 } = {}) {

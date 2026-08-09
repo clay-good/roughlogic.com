@@ -3176,6 +3176,7 @@ cross-check.
 | calc-treatment.js | `computeFlocculatorPaddlePower` | `{ paddle_radius_ft = 0, wheel_rpm = 0, paddle_area_ft2 = 0, drag_coeff = 1.8,...` | _ | _ | _ |
 | calc-treatment.js | `computeLangelierIndex` | `{ ph = 0, temp = 0, temp_unit = "C", ca_mgl = 0, alk_mgl = 0, tds_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeOilWaterSeparatorSizing` | `{ flow_gpm = 50, oil_sg = 0.85, droplet_micron = 150, water_viscosity_cp = 1....` | _ | _ | _ |
+| calc-treatment.js | `computeParticleSettlingVelocity` | `{ particle_diameter_mm = 0.05, particle_sg = 2.65, water_temp_f = 68 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolAlkalinityAdjust` | `{ gallons = 0, current_ta_ppm = 0, target_ta_ppm = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolCalciumHardnessDose` | `{ gallons = 20000, ppm_increase = 20, product_purity_pct = 77 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolChlorineDose` | `{ ppm = 0, gallons = 0, product = "cal-hypo-65", avail = 0 } = {}` | _ | _ | _ |
@@ -3306,7 +3307,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1892.
+Row count: 1893.
 
 <!-- END function-corpus-v14 -->
 
@@ -4791,7 +4792,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (65 tiles)
+### Group M Water and wastewater (66 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4829,6 +4830,7 @@ per spec-v14 §13.1 second paragraph.
 | `lab-dilution` | Lab Dilution and Serial Dilution | Project (first-principles) over stand...; C1=1000 / C2=50 / V2=100 -> V1=5, diluent=95 (computed by... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `langelier-index` | Langelier Saturation Index | Langelier (1936) / Standard Methods (...; pH 7.5, 25 C, Ca 200, alk 150, TDS 320 -> LSI ~+0.04 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `oil-water-separator-sizing` | Gravity Oil/Water Separator Surface Area (API 421) | API Publication 421 (gravity oil/wate...; Vt=9.81*(rho_w-rho_o)*d^2/(18*mu) SI -> 0.3285 ft/min; ar... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `particle-settling-velocity` | Discrete-Particle Settling Velocity (Stokes' Law) | Stokes' law (Davis & Cornwell, Introd...; mu=2.414e-5*10^(247.8/(293.15-140))=1.0019e-3; rho_w=998.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-alkalinity-adjust` | Pool Total Alkalinity Adjustment | NSPF CPO Handbook / ANSI-APSP-ICC dos...; spec-v93 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pool-calcium-hardness-dose` | Pool Calcium Hardness Increase (Calcium Chloride) | Pool calcium hardness increase (calci...; lb = 20*20000*8.34e-6*(110.98/100.09)/0.77 = 3.336*1.1088... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-chlorine-dose` | Pool Free-Chlorine Dose by Product | pool-care practice; spec-v353 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5135,6 +5137,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1643. Fixture-covered or reference-cadence: 1643 / 1643.
+Tile count: 1644. Fixture-covered or reference-cadence: 1644 / 1644.
 
 <!-- END tile-index-v14 -->

@@ -62580,6 +62580,62 @@
    }
   },
   {
+   "tile_id": "particle-settling-velocity",
+   "source_publisher": "Stokes' law (Davis & Cornwell, Introduction to Environmental Engineering)",
+   "source_title": "0.05 mm silt, SG 2.65, 68 F water -> 2.247 mm/s (0.442 ft/min), Re 0.112 (Stokes regime valid)",
+   "source_edition_or_year": "spec-v1271 worked example",
+   "source_section_or_page": "mu=2.414e-5*10^(247.8/(293.15-140))=1.0019e-3; rho_w=998.21; Vs=9.81*(2650-998.21)*(5e-5)^2/(18*mu)=2.246e-3 m/s; Re=rho_w*Vs*d/mu=0.112",
+   "verified_by": "rl",
+   "verified_on": "2026-08-09",
+   "inputs": {
+    "particle_diameter_mm": 0.05,
+    "particle_sg": 2.65,
+    "water_temp_f": 68
+   },
+   "outputs": {
+    "settling_velocity_mm_s": {
+     "value": 2.247,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "settling_velocity_ft_min": {
+     "value": 0.442,
+     "tolerance": {
+      "abs": 0.002
+     }
+    },
+    "reynolds": {
+     "value": 0.112,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "particle-settling-velocity",
+   "source_publisher": "Stokes' law (particle Reynolds-number regime check)",
+   "source_title": "cross-check: a 0.5 mm sand grain (10x the diameter) reaches Re ~ 112, outside the Stokes regime (the tile flags it)",
+   "source_edition_or_year": "spec-v1271 worked example",
+   "source_section_or_page": "10x diameter scales Vs by 100x (d^2) and Re by 1000x: Re=111.9 > 1, so Stokes over-predicts",
+   "verified_by": "rl",
+   "verified_on": "2026-08-09",
+   "inputs": {
+    "particle_diameter_mm": 0.5,
+    "particle_sg": 2.65,
+    "water_temp_f": 68
+   },
+   "outputs": {
+    "reynolds": {
+     "value": 111.9,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gutter-downspout-takeoff",
    "source_publisher": "Gutter takeoff identity (first-principles)",
    "source_title": "140 ft eave, 2,400 sf roof, 800 sf/downspout, 10 ft wall, 2 ft hangers -> 3 downspouts, 30 LF pipe, 70 hangers",

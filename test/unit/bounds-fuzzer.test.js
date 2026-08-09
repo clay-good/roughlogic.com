@@ -37186,3 +37186,28 @@ test("bounds: spec-v1183 computeRampDetailCheck pins the cross slope, the betwee
   assert.ok("error" in _v1183({ ...base, run_width_in: 0 }));
   assert.ok("error" in _v1183({ ...base, clear_width_in: Infinity }));
 });
+
+import { computeParticleSettlingVelocity as _v1271 } from "../../calc-treatment.js";
+test("bounds: spec-v1271 computeParticleSettlingVelocity pins Stokes' law, d^2 scaling, the Reynolds regime flag, temperature, sign, and error seams", () => {
+  // 0.05 mm silt, SG 2.65, 68 F: mu=1.0019e-3, rho_w=998.21 -> Vs=2.246e-3 m/s = 2.246 mm/s, Re=0.112 (Stokes valid).
+  const r = _v1271({ particle_diameter_mm: 0.05, particle_sg: 2.65, water_temp_f: 68 });
+  assert.ok(Math.abs(r.settling_velocity_mm_s - 2.2466) < 2e-3);
+  assert.ok(Math.abs(r.settling_velocity_ft_min - 0.44227) < 2e-3);
+  assert.ok(Math.abs(r.reynolds - 0.11190) < 2e-3);
+  assert.ok(r.regime.startsWith("Stokes"));
+  assert.ok(Math.abs(r.settling_velocity_ft_min - r.settling_velocity_mm_s / 1000 * 3.28084 * 60) < 1e-9);
+  // Velocity scales as d^2: 10x diameter -> 100x velocity and 1000x Reynolds -> out of the Stokes regime (flagged).
+  const big = _v1271({ particle_diameter_mm: 0.5, particle_sg: 2.65, water_temp_f: 68 });
+  assert.ok(Math.abs(big.settling_velocity_mm_s / r.settling_velocity_mm_s - 100) < 1e-6);
+  assert.ok(Math.abs(big.reynolds - 111.9) < 0.5);
+  assert.ok(big.regime.startsWith("transition"));
+  // Denser particle settles faster; colder (more viscous) water settles slower.
+  assert.ok(_v1271({ particle_diameter_mm: 0.05, particle_sg: 5.0, water_temp_f: 68 }).settling_velocity_mm_s > r.settling_velocity_mm_s);
+  assert.ok(_v1271({ particle_diameter_mm: 0.05, particle_sg: 2.65, water_temp_f: 39 }).settling_velocity_mm_s < r.settling_velocity_mm_s);
+  // Error seams: non-positive diameter, SG <= 1 (floats), temperature out of the liquid range, non-finite.
+  assert.ok("error" in _v1271({ particle_diameter_mm: 0, particle_sg: 2.65, water_temp_f: 68 }));
+  assert.ok("error" in _v1271({ particle_diameter_mm: 0.05, particle_sg: 1.0, water_temp_f: 68 }));
+  assert.ok("error" in _v1271({ particle_diameter_mm: 0.05, particle_sg: 2.65, water_temp_f: 32 }));
+  assert.ok("error" in _v1271({ particle_diameter_mm: 0.05, particle_sg: 2.65, water_temp_f: 212 }));
+  assert.ok("error" in _v1271({ particle_diameter_mm: Infinity, particle_sg: 2.65, water_temp_f: 68 }));
+});

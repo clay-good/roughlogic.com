@@ -331,6 +331,12 @@
       "match": "Distance end 2 to obstruction (km)",
       "family": "RF / Fresnel-zone geometry (spec-v1250)",
       "justification": "Fresnel-zone radius is metric-native: the 17.32 constant (sqrt(300)) is defined for km and GHz, and RF path surveys state distances in km; no US-customary form of the Fresnel-zone equation is in common use."
+    },
+    {
+      "module": "calc-treatment.js",
+      "match": "Particle diameter (mm)",
+      "family": "water/wastewater sedimentation practice (spec-v1271)",
+      "justification": "Settling-particle and grit sizes are stated in mm and micron in US water/wastewater and environmental-engineering practice (grit-chamber and sedimentation design, the same ASTM grain-size convention already allowlisted for calc-earthwork D10/D30/D60); there is no US-customary equivalent for a particle diameter."
     }
   ]
 }

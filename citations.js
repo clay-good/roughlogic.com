@@ -9683,6 +9683,17 @@ export const CITATIONS = {
       { name: "Free oil only", value: "emulsified / dissolved oil does not gravity-separate; needs coalescing / DAF / downstream treatment", source: "API 421 / practice" },
     ],
   },
+  "particle-settling-velocity": {
+    formula: "settling_velocity Vs = g x (rho_p - rho_w) x d^2 / (18 mu) (Stokes, SI, reported in mm/s and ft/min); reynolds Re = rho_w x Vs x d / mu; Stokes valid for Re < ~1. Water mu from the Vogel correlation and rho_w from a table fit, both by temperature.",
+    edition: "Stokes' law for discrete-particle (Type I) settling, first-principles; Davis & Cornwell, Introduction to Environmental Engineering, by name. The engineer governs the basin.",
+    freeAccess: "Stokes' law and the particle Reynolds number are public physics; the water viscosity and density correlations are standard published fits; the particle size and density come from the grit or floc being settled.",
+    governance: GOVERNANCE.water,
+    editionNote: "The terminal settling velocity of a discrete spherical particle falling through still water by Stokes' law, Vs = g (rho_p - rho_w) d^2 / (18 mu), the basis of grit-chamber and Type I sedimentation-basin design. The water dynamic viscosity is computed from temperature by the Vogel correlation (mu = 2.414e-5 x 10^(247.8/(T_K - 140)), which reproduces the standard table) and the water density from a quadratic fit to the standard table, so colder, more viscous water settles particles more slowly. Stokes' law assumes creeping (laminar) flow around the particle and holds only while the particle Reynolds number Re = rho_w Vs d / mu stays below about 1; above that the drag rises faster than Stokes predicts and the transition (CD-based) or Newton's-law velocity is lower, so the tile reports Re and flags the regime. The overflow rate of an ideal clarifier equals this critical settling velocity: a particle is fully removed when its settling velocity meets or exceeds the surface loading rate. This is a discrete (Type I) settling screen only -- flocculent settling (which accelerates as particles coalesce), hindered and compression settling at high solids, non-spherical particle shape, and basin short-circuiting are all separate. First-principles (Stokes 1851); the engineer of record governs the unit.",
+    assumptions: [
+      { name: "Stokes settling", value: "Vs = g(rho_p - rho_w)d^2/(18 mu) for a discrete sphere in the laminar (Re < ~1) regime", source: "Stokes' law / Davis & Cornwell" },
+      { name: "Regime check", value: "Re = rho_w Vs d / mu; above ~1 the transition/Newton law applies and the tile flags it", source: "sedimentation practice" },
+    ],
+  },
   "gutter-downspout-takeoff": {
     formula: "gutter_lf = eave_length_ft; downspouts = ceil(roof_area_sf / max_area_per_downspout_sf); downspout_pipe_lf = downspouts x wall_height_ft; hangers = ceil(eave_length_ft / hanger_spacing_ft).",
     edition: "Gutter takeoff identity by name (gutter runs the eave; downspouts from the roof area over the per-downspout area; pipe and hangers from height and spacing); first-principles arithmetic.",
