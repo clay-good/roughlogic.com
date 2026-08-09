@@ -83,10 +83,13 @@ test("--check mode passes against the on-disk generated file", () => {
 });
 
 test("generator is deterministic: regenerating produces the same bytes", async () => {
-  // Read current bytes, re-run the generator (emit), confirm byte-equal.
+  // Regenerate to stdout (NOT to disk) and confirm byte-equal with the
+  // committed file. Emitting to stdout avoids truncating the shared
+  // on-disk artifact that citation-runtime-audit.test.js reads
+  // concurrently under `node --test` (the truncate window caused an
+  // intermittent "Unexpected end of JSON input").
   const before = await readFile(GEN, "utf8");
-  const r = spawnSync(process.execPath, [SCRIPT], { encoding: "utf8" });
+  const r = spawnSync(process.execPath, [SCRIPT, "--stdout"], { encoding: "utf8" });
   assert.equal(r.status, 0, "stderr=" + r.stderr);
-  const after = await readFile(GEN, "utf8");
-  assert.equal(after, before, "regeneration changed bytes (non-deterministic)");
+  assert.equal(r.stdout, before, "regeneration changed bytes (non-deterministic)");
 });
