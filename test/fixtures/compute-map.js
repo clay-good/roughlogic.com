@@ -411,6 +411,7 @@ export const COMPUTE_MAP = {
   "culvert-outlet-control": { module: "../../calc-drainage.js", fn: "computeCulvertOutletControl" },
   "box-culvert-outlet-control": { module: "../../calc-drainage.js", fn: "computeBoxCulvertOutletControl" },
   "culvert-headwater": { module: "../../calc-drainage.js", fn: "computeCulvertHeadwater" },
+  "box-culvert-headwater": { module: "../../calc-drainage.js", fn: "computeBoxCulvertHeadwater" },
   "tr55-graphical-peak-discharge": { module: "../../calc-drainage.js", fn: "computeTr55GraphicalPeakDischarge" },
   "tr55-detention-storage": { module: "../../calc-drainage.js", fn: "computeTr55DetentionStorage" },
   "drainage-invert": { module: "../../calc-plumbing.js", fn: "computeDrainageInvert" },

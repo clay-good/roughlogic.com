@@ -11077,6 +11077,35 @@ test("bounds: spec-v1277 computeCulvertHeadwater pins the governing = max(inlet,
   assert.ok("error" in _v1277({ diameter_in: 36, flow_cfs: 50, slope: 0.01, length_ft: 100, config: "bogus" }));
   assert.ok("error" in _v1277({ diameter_in: Infinity, flow_cfs: 50, slope: 0.01, length_ft: 100, config: "concrete_square_headwall" }));
 });
+import { computeBoxCulvertHeadwater as _v1278 } from "../../calc-drainage.js";
+import { computeBoxCulvertInletControl as _v1278i, computeBoxCulvertOutletControl as _v1278o } from "../../calc-drainage.js";
+test("bounds: spec-v1278 computeBoxCulvertHeadwater pins the governing = max(inlet, outlet) selection, config mapping, delegation, and error seams", () => {
+  // Steep 1% box with flared wingwalls: inlet control governs.
+  const a = _v1278({ span_in: 72, rise_in: 48, flow_cfs: 150, slope: 0.01, length_ft: 100, manning_n: 0.012, tw_ft: 2, config: "wingwall_30_75" });
+  assert.ok(a.control === "inlet" && Math.abs(a.governing_hw_ft - 4.33618) < 1e-3);
+  assert.ok(Math.abs(a.hw_over_d - a.governing_hw_ft / a.rise_ft) < 1e-9);
+  // Governing matches the delegated box computes bit for bit (config maps to the right key in each).
+  const inl = _v1278i({ span_in: 72, rise_in: 48, flow_cfs: 150, slope: 0.01, config: "wingwall_30_75" });
+  const out = _v1278o({ span_in: 72, rise_in: 48, flow_cfs: 150, length_ft: 100, slope: 0.01, manning_n: 0.012, tw_ft: 2, config: "wingwall_30_75" });
+  assert.ok(a.inlet_hw_ft === inl.hw_ft && a.outlet_hw_ft === out.hw_ft && a.governing_hw_ft === Math.max(inl.hw_ft, out.hw_ft));
+  // The bevel config maps to different keys in the two computes (headwall_bevel45 inlet -> headwall_bevel outlet).
+  const bev = _v1278({ span_in: 72, rise_in: 48, flow_cfs: 150, slope: 0.004, length_ft: 200, manning_n: 0.02, tw_ft: 4, config: "headwall_bevel45" });
+  assert.ok(bev.control === "outlet" && Math.abs(bev.governing_hw_ft - 5.03141) < 2e-3 && bev.governing_hw_ft > bev.inlet_hw_ft);
+  const bevOut = _v1278o({ span_in: 72, rise_in: 48, flow_cfs: 150, length_ft: 200, slope: 0.004, manning_n: 0.02, tw_ft: 4, config: "headwall_bevel" });
+  assert.ok(bev.outlet_hw_ft === bevOut.hw_ft);
+  // Governing never dips below either individual control at any flow.
+  for (const q of [40, 100, 180, 300, 500]) {
+    const r = _v1278({ span_in: 72, rise_in: 48, flow_cfs: q, slope: 0.01, length_ft: 100, manning_n: 0.012, tw_ft: 2, config: "wingwall_30_75" });
+    assert.ok(r.governing_hw_ft >= r.inlet_hw_ft - 1e-9 && r.governing_hw_ft >= r.outlet_hw_ft - 1e-9);
+  }
+  // Error seams propagate; unknown config; non-finite.
+  assert.ok("error" in _v1278({ span_in: 0, rise_in: 48, flow_cfs: 150, slope: 0.01, length_ft: 100, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1278({ span_in: 72, rise_in: 48, flow_cfs: 0, slope: 0.01, length_ft: 100, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1278({ span_in: 72, rise_in: 48, flow_cfs: 150, slope: 0.01, length_ft: 0, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1278({ span_in: 72, rise_in: 48, flow_cfs: 150, slope: -0.01, length_ft: 100, config: "wingwall_30_75" }));
+  assert.ok("error" in _v1278({ span_in: 72, rise_in: 48, flow_cfs: 150, slope: 0.01, length_ft: 100, config: "bogus" }));
+  assert.ok("error" in _v1278({ span_in: Infinity, rise_in: 48, flow_cfs: 150, slope: 0.01, length_ft: 100, config: "wingwall_30_75" }));
+});
 test("bounds: spec-v53 linear-interpolation pins y + slope + extrapolation flag + reject non-finite", () => {
   // (0,10),(10,30), x=4 -> y=18, slope 2, within range
   const a = _cli({ x1: 0, y1: 10, x2: 10, y2: 30, x: 4 });

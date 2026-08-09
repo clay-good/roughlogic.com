@@ -1494,3 +1494,86 @@ function renderCulvertHeadwater(inputRegion, outputRegion, citationEl) {
   cfg.select.addEventListener("change", update);
 }
 DRAINAGE_RENDERERS["culvert-headwater"] = renderCulvertHeadwater;
+
+// ===================== spec-v1278: FHWA HDS-5 governing box culvert headwater =====================
+// The box companion to culvert-headwater: the box inlet- and outlet-control
+// tiles each say "the actual headwater is the greater of inlet and outlet
+// control," but nothing ran both for a box and reported the governing value.
+// This delegates to computeBoxCulvertInletControl and computeBoxCulvertOutletControl.
+// The box inlet-edge names differ slightly between the two computes (the inlet
+// tile keys its Table A.1 rows, the outlet tile keys its Ke rows), so one map
+// pairs each physical inlet with the right key in each.
+const _BOX_HW_CONFIG = {
+  wingwall_30_75:    { inlet: "wingwall_30_75",    outlet: "wingwall_30_75",  label: "Wingwall flares 30 to 75 deg" },
+  wingwall_90_15:    { inlet: "wingwall_90_15",    outlet: "wingwall_90_15",  label: "Wingwall flares 90 and 15 deg" },
+  wingwall_0:        { inlet: "wingwall_0",        outlet: "wingwall_0",      label: "Wingwall flares 0 deg (extended sides)" },
+  headwall_chamfer:  { inlet: "headwall_chamfer",  outlet: "headwall_square", label: "90 deg headwall, 3/4 in chamfers" },
+  headwall_bevel45:  { inlet: "headwall_bevel45",  outlet: "headwall_bevel",  label: "90 deg headwall, 45 deg bevels" },
+  headwall_bevel337: { inlet: "headwall_bevel337", outlet: "headwall_bevel",  label: "90 deg headwall, 33.7 deg bevels" },
+};
+// dims: in { span_in: L, rise_in: L, flow_cfs: L^3 T^-1, slope: dimensionless, length_ft: L, manning_n: dimensionless, tw_ft: L, config: dimensionless } out: { rise_ft: L, inlet_hw_ft: L, outlet_hw_ft: L, governing_hw_ft: L, hw_over_d: dimensionless, outlet_velocity_fps: L T^-1 }
+export function computeBoxCulvertHeadwater({ span_in = 0, rise_in = 0, flow_cfs = 0, slope = 0, length_ft = 0, manning_n = 0.012, tw_ft = 0, config = "wingwall_30_75" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const M = _BOX_HW_CONFIG[config];
+  if (!M) return { error: "Unknown box culvert inlet configuration." };
+  const inlet = computeBoxCulvertInletControl({ span_in, rise_in, flow_cfs, slope, config: M.inlet });
+  if (inlet.error) return inlet;
+  const outlet = computeBoxCulvertOutletControl({ span_in, rise_in, flow_cfs, length_ft, slope, manning_n, tw_ft, config: M.outlet });
+  if (outlet.error) return outlet;
+  const inletGoverns = inlet.hw_ft >= outlet.hw_ft;
+  const governing = inletGoverns ? inlet.hw_ft : outlet.hw_ft;
+  const D = inlet.rise_ft;
+  if (![inlet.hw_ft, outlet.hw_ft, governing].every(Number.isFinite)) return { error: "Governing headwater is not a finite value; check the inputs." };
+  return {
+    rise_ft: D, inlet_hw_ft: inlet.hw_ft, outlet_hw_ft: outlet.hw_ft,
+    governing_hw_ft: governing, control: inletGoverns ? "inlet" : "outlet",
+    hw_over_d: governing / D, outlet_velocity_fps: outlet.v_fps, config_label: M.label,
+    note: "FHWA HDS-5 GOVERNING headwater for a rectangular concrete BOX culvert - the box companion to the circular governing tile. It runs the two checks every box design needs and reports the one that governs. INLET control (the inlet's size and edge set the ponding) and OUTLET control (the barrel length, roughness, and tailwater set it) are computed independently, and the ACTUAL design headwater is the GREATER of the two, with the control type flagged. Inlet control usually governs on steep barrels with a good entrance; outlet control takes over on long, rough, or flat barrels and under a high tailwater. This delegates to the box inlet-control and box outlet-control tiles (one inlet edge maps to the right key in each). D is the box RISE. If HW/D climbs above about 1.5, check the allowable headwater against the roadway/overtopping elevation. HW is measured above the inlet invert. A design aid; the HDS-5 nomographs carry about +/-10%, and the engineer of record and the DOT drainage manual govern.",
+  };
+}
+export const boxCulvertHeadwaterExample = { inputs: { span_in: 72, rise_in: 48, flow_cfs: 150, slope: 0.01, length_ft: 100, manning_n: 0.012, tw_ft: 2, config: "wingwall_30_75" } };
+
+function renderBoxCulvertHeadwater(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: FHWA HDS-5, Hydraulic Design of Highway Culverts, 3rd ed. (FHWA-HIF-12-026), the box inlet-control (Appendix A) and outlet-control (Chapter 3 full-flow energy equation) procedures run together; the design headwater is the greater of the two, per the HDS-5 procedure. Delegates to the box inlet-control and box outlet-control tiles. A public-domain US DOT reference. A design aid; the engineer of record and the DOT drainage manual govern.";
+  attachExampleButton(inputRegion, () => { sp.input.value = "72"; ri.input.value = "48"; q.input.value = "150"; s.input.value = "0.01"; len.input.value = "100"; n.input.value = "0.012"; tw.input.value = "2"; cfg.select.value = "wingwall_30_75"; update(); });
+  const sp = makeNumber("Box span (in)", "bchw-b", { step: "any", min: "0" });
+  const ri = makeNumber("Box rise (in)", "bchw-d", { step: "any", min: "0" });
+  const q = makeNumber("Design discharge Q (cfs)", "bchw-q", { step: "any", min: "0" });
+  const s = makeNumber("Barrel slope So (ft/ft)", "bchw-s", { step: "any", min: "0", value: "0.01" });
+  const len = makeNumber("Barrel length L (ft)", "bchw-l", { step: "any", min: "0" });
+  const n = makeNumber("Manning n (0.012 concrete)", "bchw-n", { step: "any", min: "0", value: "0.012" });
+  const tw = makeNumber("Tailwater TW above outlet invert (ft)", "bchw-tw", { step: "any", min: "0" });
+  const cfg = makeSelect("Inlet edge treatment", "bchw-cfg", Object.keys(_BOX_HW_CONFIG).map((k) => ({ value: k, label: _BOX_HW_CONFIG[k].label })));
+  for (const f of [sp, ri, q, s, len, n, tw]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(cfg.wrap);
+  const oGov = makeOutputLine(outputRegion, "Governing headwater HW", "bchw-out-gov");
+  const oCtl = makeOutputLine(outputRegion, "Control", "bchw-out-ctl");
+  const oIn = makeOutputLine(outputRegion, "Inlet control HW", "bchw-out-in");
+  const oOut = makeOutputLine(outputRegion, "Outlet control HW", "bchw-out-out");
+  const oNote = makeOutputLine(outputRegion, "Note", "bchw-out-n");
+  const update = debounce(() => {
+    const r = computeBoxCulvertHeadwater({
+      span_in: Number(sp.input.value) || 0,
+      rise_in: Number(ri.input.value) || 0,
+      flow_cfs: Number(q.input.value) || 0,
+      slope: s.input.value === "" ? 0 : Number(s.input.value) || 0,
+      length_ft: Number(len.input.value) || 0,
+      manning_n: Number(n.input.value) || 0,
+      tw_ft: tw.input.value === "" ? 0 : Number(tw.input.value) || 0,
+      config: cfg.select.value,
+    });
+    if (r.error) {
+      oGov.textContent = r.error;
+      for (const o of [oCtl, oIn, oOut, oNote]) o.textContent = "-";
+      return;
+    }
+    oGov.textContent = fmt(r.governing_hw_ft, 2) + " ft above the inlet invert (HW/D " + fmt(r.hw_over_d, 2) + (r.hw_over_d > 1.5 ? "; over 1.5 -- check the allowable headwater" : "") + ")";
+    oCtl.textContent = r.control === "inlet" ? "INLET control governs" : "OUTLET control governs (barrel velocity " + fmt(r.outlet_velocity_fps, 1) + " fps)";
+    oIn.textContent = fmt(r.inlet_hw_ft, 2) + " ft" + (r.control === "inlet" ? " (governs)" : "");
+    oOut.textContent = fmt(r.outlet_hw_ft, 2) + " ft" + (r.control === "outlet" ? " (governs)" : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [sp, ri, q, s, len, n, tw]) f.input.addEventListener("input", update);
+  cfg.select.addEventListener("change", update);
+}
+DRAINAGE_RENDERERS["box-culvert-headwater"] = renderBoxCulvertHeadwater;

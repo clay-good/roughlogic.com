@@ -18551,6 +18551,26 @@
       "kind": "adjacent"
     },
     {
+      "term": "governing box culvert headwater",
+      "target": "box-culvert-headwater",
+      "kind": "industry"
+    },
+    {
+      "term": "box culvert design headwater",
+      "target": "box-culvert-headwater",
+      "kind": "industry"
+    },
+    {
+      "term": "which controls the box culvert inlet or outlet",
+      "target": "box-culvert-headwater",
+      "kind": "question"
+    },
+    {
+      "term": "greater of inlet and outlet for a box culvert",
+      "target": "box-culvert-headwater",
+      "kind": "adjacent"
+    },
+    {
       "term": "rational method time",
       "target": "time-of-concentration",
       "kind": "adjacent"

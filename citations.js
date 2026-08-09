@@ -16168,6 +16168,18 @@ export const CITATIONS = {
       { name: "Slope / scope", value: "Ks = -0.5 (mitered +0.7); circular barrels only; inlet control only (outlet control is a separate check)", source: "HDS-5 Appendix A" },
     ],
   },
+  "box-culvert-headwater": {
+    formula: "HW_design = max(HW_inlet, HW_outlet) for a box. HW_inlet from HDS-5 Appendix A box inlet-control equations; HW_outlet from the Chapter 3 full-flow energy equation HW = H + ho - So L with box geometry. The control type is whichever headwater is greater. D = box rise; HW is measured above the inlet invert.",
+    edition: "FHWA HDS-5, Hydraulic Design of Highway Culverts, 3rd ed. (FHWA-HIF-12-026, 2012), the box inlet-control (Appendix A) and outlet-control (Chapter 3) procedures run together, by name; the design headwater is the greater of the two per the HDS-5 procedure. Delegates to the verified box-culvert-inlet-control and box-culvert-outlet-control computes.",
+    freeAccess: "HDS-5 is a public-domain FHWA publication (FHWA-HIF-12-026); the box inlet- and outlet-control procedures are reproduced from it. Span, rise, discharge, slope, length, Manning n, tailwater, and the inlet configuration are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "FHWA HDS-5 GOVERNING headwater for a rectangular concrete BOX culvert - the box companion to the circular governing tile. It runs the two checks every box design needs and reports the one that governs. INLET control (the inlet's size and edge set the ponding) and OUTLET control (the barrel length, roughness, and tailwater set it) are computed independently, and the ACTUAL design headwater is the GREATER of the two, with the control type flagged. Inlet control usually governs on steep barrels with a good entrance; outlet control takes over on long, rough, or flat barrels and under a high tailwater. This delegates to the box inlet-control and box outlet-control tiles (one inlet edge maps to the right key in each). D is the box RISE. If HW/D climbs above about 1.5, check the allowable headwater against the roadway/overtopping elevation. HW is measured above the inlet invert. A design aid; the HDS-5 nomographs carry about +/-10%, and the engineer of record and the DOT drainage manual govern.",
+    assumptions: [
+      { name: "Governing headwater", value: "HW_design = max(HW_inlet, HW_outlet); control = whichever is larger", source: "HDS-5 inlet/outlet control procedure" },
+      { name: "Box inlet control", value: "HDS-5 Appendix A box equations (Form 1 flares / Form 2 headwalls) with Table A.1 constants", source: "HDS-5 Appendix A (box-culvert-inlet-control)" },
+      { name: "Box outlet control / scope", value: "full-flow HW = H + ho - So L, A = span x rise; box barrels (a circular pipe uses culvert-headwater)", source: "HDS-5 Chapter 3 (box-culvert-outlet-control)" },
+    ],
+  },
   "culvert-headwater": {
     formula: "HW_design = max(HW_inlet, HW_outlet). HW_inlet from HDS-5 Appendix A inlet-control equations; HW_outlet from the Chapter 3 full-flow energy equation HW = H + ho - So L. The control type is whichever headwater is greater. HW is measured above the inlet invert.",
     edition: "FHWA HDS-5, Hydraulic Design of Highway Culverts, 3rd ed. (FHWA-HIF-12-026, 2012), the inlet-control (Appendix A) and outlet-control (Chapter 3) procedures run together, by name; the design headwater is the greater of the two per the HDS-5 procedure. Delegates to the verified culvert-inlet-control and culvert-outlet-control computes.",

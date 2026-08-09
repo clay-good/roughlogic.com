@@ -185,7 +185,7 @@ const _TILES = [
   ["trap-arm", "B"], ["pipe-expansion", "B"], ["tankless-gpm", "B"],
   ["gas-leak-rate", "B"], ["gas-leak-hole-diameter", "B"], ["stormwater-rational", "B"], ["stormwater-max-drainage-area", "B"], ["manning-slope", "B"], ["manning-pipe-capacity", "B"],
   // spec-v1011 circular-pipe partial-flow depth
-  ["pipe-partial-flow-depth", "B"], ["tr55-time-of-concentration", "B"], ["curve-number-runoff", "B"], ["composite-curve-number", "B"], ["tr55-graphical-peak-discharge", "B"], ["tr55-detention-storage", "B"], ["culvert-inlet-control", "B"], ["box-culvert-inlet-control", "B"], ["culvert-outlet-control", "B"], ["box-culvert-outlet-control", "B"], ["culvert-headwater", "B"],
+  ["pipe-partial-flow-depth", "B"], ["tr55-time-of-concentration", "B"], ["curve-number-runoff", "B"], ["composite-curve-number", "B"], ["tr55-graphical-peak-discharge", "B"], ["tr55-detention-storage", "B"], ["culvert-inlet-control", "B"], ["box-culvert-inlet-control", "B"], ["culvert-outlet-control", "B"], ["box-culvert-outlet-control", "B"], ["culvert-headwater", "B"], ["box-culvert-headwater", "B"],
   ["drainage-invert", "B"],
   ["hydrostatic-test", "B"], ["grease-trap", "B"], ["grease-interceptor-flow-capacity", "B"], ["glycol-mix", "B"], ["hydronic-system-volume", "B"],
   ["expansion-tank", "B"], ["backflow-loss", "B"], ["water-hammer-surge", "B"],
