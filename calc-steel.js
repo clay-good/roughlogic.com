@@ -922,6 +922,60 @@ STEEL_RENDERERS["steel-b1-amplifier"] = _simpleRenderer({
   compute: computeSteelB1Amplifier,
 });
 
+// The B1 tile's own note names the gap: "the sidesway B2 (P-Delta) ... are separate." The AISC 360
+// Appendix 8.2.2 sway amplifier completes the amplified-first-order pair Mr = B1 Mnt + B2 Mlt:
+//   B2 = 1 / (1 - alpha Pstory / Pe,story) >= 1
+//   Pe,story = RM (H L / dH)     RM = 1 - 0.15 (Pmf / Pstory)     alpha = 1.0 (LRFD) / 1.6 (ASD)
+// where Pstory is the total vertical load on the story, Pmf the vertical load on the moment-frame columns
+// (0 for a braced frame, so RM = 1.0), H the story shear producing the first-order interstory drift dH, and
+// L the story height. A story quantity, unlike the member-level B1.
+// dims: in { pstory_kip: M L T^-2, pmf_kip: M L T^-2, h_kip: M L T^-2, l_ft: L, drift_in: L, method: dimensionless } out: { b2: dimensionless, pe_story_kip: M L T^-2, rm: dimensionless }
+export function computeSteelB2Amplifier({ pstory_kip = 0, pmf_kip = 0, h_kip = 0, l_ft = 0, drift_in = 0, method = "LRFD" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (method !== "LRFD" && method !== "ASD") return { error: "Method must be LRFD or ASD." };
+  if (!(pstory_kip > 0)) return { error: "Total story vertical load Pstory must be positive (kip)." };
+  if (!(pmf_kip >= 0)) return { error: "Moment-frame column load Pmf cannot be negative (kip); use 0 for a braced frame." };
+  if (pmf_kip > pstory_kip) return { error: "Pmf cannot exceed Pstory (the moment-frame columns carry part of the story load)." };
+  if (!(h_kip > 0)) return { error: "Story shear H must be positive (kip)." };
+  if (!(l_ft > 0)) return { error: "Story height L must be positive (ft)." };
+  if (!(drift_in > 0)) return { error: "First-order interstory drift under H must be positive (in)." };
+  const alpha = method === "LRFD" ? 1.0 : 1.6;
+  const rm = 1 - 0.15 * (pmf_kip / pstory_kip);
+  const l_in = l_ft * 12;
+  const pe_story_kip = rm * h_kip * l_in / drift_in;
+  const axial_ratio = alpha * pstory_kip / pe_story_kip;
+  const denom = 1 - axial_ratio;
+  if (!(denom > 0)) return { error: "alpha Pstory / Pe,story >= 1: the story reaches its sidesway buckling load, so it is unstable -- add bracing or stiffen the moment frame." };
+  const b2 = Math.max(1, 1 / denom);
+  if (![b2, pe_story_kip, rm].every(Number.isFinite)) return { error: "B2 math is not a finite value." };
+  return {
+    b2, pe_story_kip, rm, alpha, axial_ratio,
+    note: "The AISC 360 Appendix 8.2.2 sidesway (P-Delta) moment amplifier B2, the story-level companion the B1 tile names as separate: Mr = B1 Mnt + B2 Mlt, and this is the B2 term applied to the sway moment Mlt. B2 = 1 / (1 - alpha Pstory / Pe,story), taken not less than 1.0, where Pstory is the TOTAL vertical load on the story (all columns, not just the moment frame), Pe,story = RM (H L / dH) is the story sidesway elastic buckling strength, RM = 1 - 0.15 (Pmf / Pstory) with Pmf the vertical load on the moment-frame columns (0 for a braced frame, so RM = 1.0), H the story shear that produces the first-order interstory drift dH, L the story height, and alpha = 1.0 (LRFD) or 1.6 (ASD). A story carrying Pstory 2,000 kip (Pmf 1,200) that drifts 0.5 in under a 100 kip shear over a 14 ft height has RM 0.91, Pe,story 30,576 kip, and B2 1.07 (LRFD); doubling the drift to 1.0 in halves Pe,story and raises B2 to about 1.15. Because B2 depends on the whole story's gravity load against its lateral stiffness, a flexible (high-drift) story amplifies every column's sway moment, which is why the drift limit, not any one member, often governs. AISC flags B2 > 1.7 (or 1.5 by the older provision) as a story too flexible for the amplified-first-order method. Uses the reduced (0.8 tau_b) stiffness in the drift dH per the direct analysis method. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const steelB2AmplifierExample = { inputs: { pstory_kip: 2000, pmf_kip: 1200, h_kip: 100, l_ft: 14, drift_in: 0.5, method: "LRFD" } };
+STEEL_RENDERERS["steel-b2-amplifier"] = _simpleRenderer({
+  citation: "Citation: AISC 360 Appendix 8.2.2 sidesway moment amplifier B2 = 1 / (1 - alpha Pstory / Pe,story) >= 1, with Pe,story = RM (H L / dH), RM = 1 - 0.15 (Pmf / Pstory), alpha = 1.0 (LRFD) / 1.6 (ASD), by name. The story-level companion to the B1 tile (Mr = B1 Mnt + B2 Mlt). A design aid, not a substitute for the engineer of record.",
+  example: steelB2AmplifierExample.inputs,
+  fields: [
+    { key: "pstory_kip", label: "Total story vertical load Pstory (kip)", kind: "number", default: 2000 },
+    { key: "pmf_kip", label: "Moment-frame column load Pmf (kip, 0 = braced frame)", kind: "number", default: 1200 },
+    { key: "h_kip", label: "Story shear H producing the drift (kip)", kind: "number", default: 100 },
+    { key: "l_ft", label: "Story height L (ft)", kind: "number", default: 14 },
+    { key: "drift_in", label: "First-order interstory drift under H (in)", kind: "number", default: 0.5 },
+    { key: "method", label: "Design basis", kind: "select", default: "LRFD", options: [
+      { value: "LRFD", label: "LRFD (alpha = 1.0)" },
+      { value: "ASD", label: "ASD (alpha = 1.6)" },
+    ] },
+  ],
+  outputs: [
+    { key: "b2", id: "sb2-out-b2", label: "Sway moment amplifier B2", value: (r) => fmt(r.b2, 3) },
+    { key: "pe", id: "sb2-out-pe", label: "Pe,story / RM / alpha Pstory/Pe", value: (r) => fmt(r.pe_story_kip, 0) + " kip / " + fmt(r.rm, 3) + " / " + fmt(r.axial_ratio, 3) },
+    { key: "n", id: "sb2-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelB2Amplifier,
+});
+
 // dims: in { ga: dimensionless, gb: dimensionless, frame: dimensionless } out: { k_factor: dimensionless }
 export function computeSteelEffectiveLengthK({ ga = 0, gb = 0, frame = "sway" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

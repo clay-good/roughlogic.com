@@ -37236,3 +37236,30 @@ test("bounds: spec-v1272 computeSteelTauBStiffnessReduction pins AISC C2.3 tau_b
   assert.ok("error" in _v1272({ pr_kip: 400, fy_ksi: 50, ag_in2: 14.4, method: "X" }));
   assert.ok("error" in _v1272({ pr_kip: Infinity, fy_ksi: 50, ag_in2: 14.4, method: "LRFD" }));
 });
+
+import { computeSteelB2Amplifier as _v1273 } from "../../calc-steel.js";
+test("bounds: spec-v1273 computeSteelB2Amplifier pins AISC App. 8.2.2 B2, RM, the drift/Pe,story relation, LRFD/ASD alpha, the >=1 floor, and error seams", () => {
+  // Pstory 2000 (Pmf 1200), H 100, L 14 ft, drift 0.5 in, LRFD: RM 0.91, Pe,story 30576, B2 1.0700.
+  const r = _v1273({ pstory_kip: 2000, pmf_kip: 1200, h_kip: 100, l_ft: 14, drift_in: 0.5, method: "LRFD" });
+  assert.ok(Math.abs(r.rm - 0.91) < 1e-9);
+  assert.ok(Math.abs(r.pe_story_kip - 30576) < 1e-6);
+  assert.ok(Math.abs(r.b2 - 1.069989) < 1e-4);
+  // Pe,story is inversely proportional to drift: doubling dH halves Pe,story and raises B2.
+  const d2 = _v1273({ pstory_kip: 2000, pmf_kip: 1200, h_kip: 100, l_ft: 14, drift_in: 1.0, method: "LRFD" });
+  assert.ok(Math.abs(d2.pe_story_kip - r.pe_story_kip / 2) < 1e-6 && d2.b2 > r.b2);
+  // A braced frame (Pmf 0) gives RM = 1.0.
+  assert.ok(_v1273({ pstory_kip: 2000, pmf_kip: 0, h_kip: 100, l_ft: 14, drift_in: 0.5, method: "LRFD" }).rm === 1.0);
+  // ASD alpha 1.6 amplifies more than LRFD at the same story.
+  assert.ok(_v1273({ pstory_kip: 2000, pmf_kip: 1200, h_kip: 100, l_ft: 14, drift_in: 0.5, method: "ASD" }).b2 > r.b2);
+  // B2 is floored at 1.0 (a very stiff, low-drift story).
+  assert.ok(_v1273({ pstory_kip: 100, pmf_kip: 0, h_kip: 500, l_ft: 14, drift_in: 0.1, method: "LRFD" }).b2 >= 1);
+  // Error seams: story unstable (alpha Pstory >= Pe,story), Pmf > Pstory, non-positive inputs, non-finite.
+  assert.ok("error" in _v1273({ pstory_kip: 40000, pmf_kip: 0, h_kip: 100, l_ft: 14, drift_in: 0.5, method: "LRFD" }));
+  assert.ok("error" in _v1273({ pstory_kip: 1000, pmf_kip: 2000, h_kip: 100, l_ft: 14, drift_in: 0.5, method: "LRFD" }));
+  assert.ok("error" in _v1273({ pstory_kip: 0, pmf_kip: 0, h_kip: 100, l_ft: 14, drift_in: 0.5, method: "LRFD" }));
+  assert.ok("error" in _v1273({ pstory_kip: 2000, pmf_kip: 1200, h_kip: 0, l_ft: 14, drift_in: 0.5, method: "LRFD" }));
+  assert.ok("error" in _v1273({ pstory_kip: 2000, pmf_kip: 1200, h_kip: 100, l_ft: 0, drift_in: 0.5, method: "LRFD" }));
+  assert.ok("error" in _v1273({ pstory_kip: 2000, pmf_kip: 1200, h_kip: 100, l_ft: 14, drift_in: 0, method: "LRFD" }));
+  assert.ok("error" in _v1273({ pstory_kip: 2000, pmf_kip: 1200, h_kip: 100, l_ft: 14, drift_in: 0.5, method: "X" }));
+  assert.ok("error" in _v1273({ pstory_kip: Infinity, pmf_kip: 1200, h_kip: 100, l_ft: 14, drift_in: 0.5, method: "LRFD" }));
+});

@@ -56444,6 +56444,68 @@
    }
   },
   {
+   "tile_id": "steel-b2-amplifier",
+   "source_publisher": "AISC 360-22 Appendix 8.2.2 sidesway moment amplifier",
+   "source_title": "Pstory 2000 (Pmf 1200), H 100 kip, L 14 ft, drift 0.5 in, LRFD -> RM 0.91, Pe,story 30576 kip, B2 1.070 (spec-v1273)",
+   "source_edition_or_year": "spec-v1273 worked example",
+   "source_section_or_page": "RM=1-0.15*(1200/2000)=0.91; Pe=0.91*100*(14*12)/0.5=30576; B2=1/(1-1.0*2000/30576)=1.0700",
+   "verified_by": "rl",
+   "verified_on": "2026-08-09",
+   "inputs": {
+    "pstory_kip": 2000,
+    "pmf_kip": 1200,
+    "h_kip": 100,
+    "l_ft": 14,
+    "drift_in": 0.5,
+    "method": "LRFD"
+   },
+   "outputs": {
+    "b2": {
+     "value": 1.070,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pe_story_kip": {
+     "value": 30576,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "rm": {
+     "value": 0.91,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-b2-amplifier",
+   "source_publisher": "AISC 360-22 Appendix 8.2.2 (drift sensitivity)",
+   "source_title": "cross-check: doubling the drift to 1.0 in halves Pe,story to 15288 kip and raises B2 to 1.150",
+   "source_edition_or_year": "spec-v1273 worked example",
+   "source_section_or_page": "Pe=0.91*100*168/1.0=15288; B2=1/(1-2000/15288)=1.1505",
+   "verified_by": "rl",
+   "verified_on": "2026-08-09",
+   "inputs": {
+    "pstory_kip": 2000,
+    "pmf_kip": 1200,
+    "h_kip": 100,
+    "l_ft": 14,
+    "drift_in": 1.0,
+    "method": "LRFD"
+   },
+   "outputs": {
+    "b2": {
+     "value": 1.1505,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-b1-amplifier",
    "source_publisher": "AISC 360-22 Appendix 8.2.1 moment amplifier",
    "source_title": "W10x49 (I 272), Pr 400 kip, 16 ft braced, transverse load, LRFD -> B1 1.234 (spec-v1216)",

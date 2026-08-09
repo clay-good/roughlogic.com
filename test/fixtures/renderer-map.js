@@ -837,6 +837,7 @@ export const RENDERER_MAP = {
   "steel-fillet-weld-size": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-h1-interaction": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-b1-amplifier": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
+  "steel-b2-amplifier": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-effective-length-k": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-column-stiffness-ratio-g": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },
   "steel-tau-b-stiffness-reduction": { module: "../../calc-steel.js", exportName: "STEEL_RENDERERS" },

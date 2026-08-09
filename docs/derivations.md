@@ -3126,6 +3126,7 @@ cross-check.
 | calc-steel.js | `computeSlipCriticalWithTension` | `{ mu = 0.30, tb_kip = 0, ns = 1, n = 1, hf = 1.0, du = 1.13, applied_tension_...` | _ | _ | _ |
 | calc-steel.js | `computeStaggeredNetWidth` | `{ plate_width_in = 0, thickness_in = 0, bolt_dia_in = 0, hole_allowance_in = ...` | _ | _ | _ |
 | calc-steel.js | `computeSteelB1Amplifier` | `{ pr_kip = 0, i_in4 = 0, lc1_ft = 0, transverse_load = "no", m1_m2 = 0, metho...` | _ | _ | _ |
+| calc-steel.js | `computeSteelB2Amplifier` | `{ pstory_kip = 0, pmf_kip = 0, h_kip = 0, l_ft = 0, drift_in = 0, method = "L...` | _ | _ | _ |
 | calc-steel.js | `computeSteelBeamFlexure` | `{ fy = 50, zx = 0, mu = 0 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelBeamLtb` | `{ fy = 50, zx = 0, sx = 0, ry = 0, rts = 0, j = 0, ho = 0, lb_ft = 0, cb = 1....` | _ | _ | _ |
 | calc-steel.js | `computeSteelBeamShear` | `{ fy = 50, d = 0, tw = 0, cv1 = 1.0, omega_v = 1.50, vu = 0 } = {}` | _ | _ | _ |
@@ -3308,7 +3309,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1894.
+Row count: 1895.
 
 <!-- END function-corpus-v14 -->
 
@@ -3955,7 +3956,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (460 tiles)
+### Group E Construction (461 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4334,6 +4335,7 @@ per spec-v14 §13.1 second paragraph.
 | `stair-stringer-layout` | Stair Stringer Layout (with code check) | IRC R311 (residential stair geometry;...; 108 in rise / 6.75 in preferred riser -> 16 risers / 6.75... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stairs` | Stair Calculator | Project (first-principles); IRC R311.7 stair geometry; 7.5 in preferred riser | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `steel-b1-amplifier` | Beam-Column Nonsway Moment Amplifier B1 (AISC 360 App. 8) | AISC 360-22 Appendix 8.2.1 moment amp...; Pe1 = pi^2 (29000)(272) / (16*12)^2 = 2112 kip; Cm = 1.0 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `steel-b2-amplifier` | Beam-Column Sidesway Moment Amplifier B2 (AISC 360 App. 8) | AISC 360-22 Appendix 8.2.2 sidesway m...; RM=1-0.15*(1200/2000)=0.91; Pe=0.91*100*(14*12)/0.5=30576... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-beam-flexure` | Steel Beam Flexural Capacity (AISC 360 Ch. F, Compact + Braced) | AISC 360-22 Chapter F / Steel Constru...; spec-v254 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-beam-ltb` | Steel Beam Lateral-Torsional Buckling (AISC 360 F2) | AISC 360-22 Section F2 (AISC Manual W...; spec-v281 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-beam-shear` | Steel Beam Web Shear Capacity (AISC 360 Ch. G) | AISC 360-22 Chapter G / Steel Constru...; spec-v255 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5139,6 +5141,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1645. Fixture-covered or reference-cadence: 1645 / 1645.
+Tile count: 1646. Fixture-covered or reference-cadence: 1646 / 1646.
 
 <!-- END tile-index-v14 -->

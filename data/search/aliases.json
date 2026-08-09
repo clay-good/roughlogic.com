@@ -19226,6 +19226,26 @@
       "kind": "industry"
     },
     {
+      "term": "b2 sway moment amplifier",
+      "target": "steel-b2-amplifier",
+      "kind": "industry"
+    },
+    {
+      "term": "sidesway moment amplification p-delta",
+      "target": "steel-b2-amplifier",
+      "kind": "industry"
+    },
+    {
+      "term": "story drift moment amplifier b2",
+      "target": "steel-b2-amplifier",
+      "kind": "question"
+    },
+    {
+      "term": "amplified first order sway aisc",
+      "target": "steel-b2-amplifier",
+      "kind": "industry"
+    },
+    {
       "term": "steel moment magnification braced",
       "target": "steel-b1-amplifier",
       "kind": "question"

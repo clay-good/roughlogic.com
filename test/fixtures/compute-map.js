@@ -1291,6 +1291,7 @@ export const COMPUTE_MAP = {
   // spec-v314..v316 steel beam-column-and-connection depth batch (3 tiles)
   "steel-h1-interaction": { module: "../../calc-steel.js", fn: "computeSteelH1Interaction" },
   "steel-b1-amplifier": { module: "../../calc-steel.js", fn: "computeSteelB1Amplifier" },
+  "steel-b2-amplifier": { module: "../../calc-steel.js", fn: "computeSteelB2Amplifier" },
   "steel-effective-length-k": { module: "../../calc-steel.js", fn: "computeSteelEffectiveLengthK" },
   "steel-column-stiffness-ratio-g": { module: "../../calc-steel.js", fn: "computeSteelColumnStiffnessRatioG" },
   "steel-tau-b-stiffness-reduction": { module: "../../calc-steel.js", fn: "computeSteelTauBStiffnessReduction" },

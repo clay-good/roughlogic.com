@@ -14679,6 +14679,18 @@ export const CITATIONS = {
       { name: "End-moment factor", value: "Cm = 0.6 - 0.4 (M1/M2) (no transverse load) or 1.0 (transverse load); alpha = 1.0 LRFD / 1.6 ASD", source: "AISC 360-22 Eq. A-8-4" },
     ],
   },
+  "steel-b2-amplifier": {
+    formula: "RM = 1 - 0.15 (Pmf / Pstory); Pe,story = RM (H L / dH); alpha = 1.0 LRFD / 1.6 ASD; B2 = max(1, 1 / (1 - alpha Pstory / Pe,story)).",
+    edition: "The AISC 360-22 Appendix 8.2.2 sidesway (P-Delta) beam-column moment amplifier B2, with the story elastic sidesway buckling strength Pe,story and the RM factor, by name.",
+    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); the Appendix 8 amplified first-order provisions are public. Pstory, Pmf, the story shear, the drift, and the height are the user's own analysis results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AISC 360-22 Appendix 8.2.2 beam-column sidesway (P-Delta) moment amplifier B2 = 1 / (1 - alpha Pstory / Pe,story), taken not less than 1.0, the story-level companion the B1 tile names as separate. It multiplies the first-order sway moment Mlt in the amplified pair Mr = B1 Mnt + B2 Mlt. Pstory is the TOTAL vertical load on the story (all columns, not just the moment frame); Pe,story = RM (H L / dH) is the elastic sidesway buckling strength of the story, with RM = 1 - 0.15 (Pmf / Pstory), Pmf the vertical load on the moment-frame columns in the story (0 for a braced frame, so RM = 1.0), H the story shear producing the first-order interstory drift dH, and L the story height; alpha = 1.0 (LRFD) or 1.6 (ASD). The drift dH is computed with the reduced (0.8 tau_b) stiffness of the direct analysis method. Because B2 sets on the whole story's gravity load against its lateral stiffness, a flexible (high-drift) story amplifies every column's sway moment, so the story drift limit often governs; AISC flags a story with B2 above about 1.7 as too flexible for the amplified-first-order method. When alpha Pstory reaches Pe,story the story is unstable in sidesway. A design aid, not a substitute for the structural engineer of record.",
+    assumptions: [
+      { name: "Amplifier", value: "B2 = 1 / (1 - alpha Pstory / Pe,story) >= 1", source: "AISC 360-22 Eq. A-8-6" },
+      { name: "Story buckling strength", value: "Pe,story = RM (H L / dH), RM = 1 - 0.15 (Pmf / Pstory)", source: "AISC 360-22 Eq. A-8-7 / A-8-8" },
+      { name: "Basis", value: "Pstory is the total story gravity load; alpha = 1.0 LRFD / 1.6 ASD; dH uses the 0.8 tau_b reduced stiffness", source: "AISC 360-22 App. 8.2.2" },
+    ],
+  },
   "steel-h1-interaction": {
     formula: "ratio = Pr/Pc; ratio >= 0.2: I = Pr/Pc + (8/9)(Mrx/Mcx + Mry/Mcy); ratio < 0.2: I = Pr/(2Pc) + (Mrx/Mcx + Mry/Mcy); pass when I <= 1.0.",
     edition: "The AISC 360-22 Section H1.1 combined-force (axial plus flexure) bilinear interaction equations, consistent for ASD or LRFD, by name.",
