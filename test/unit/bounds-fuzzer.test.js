@@ -9939,7 +9939,7 @@ import {
   computeRefrigerantVelocity, renderRefrigerantVelocity,
   computeRefrigerantLineSize, renderRefrigerantLineSize,
   renderPitotTraverseCfm, renderPitotTraverseAverage,
-  renderDpFlowMeter, renderGasDpFlowMeter,
+  renderDpFlowMeter, renderGasDpFlowMeter, renderOrificePressureLoss,
 } from "../../calc-velocity.js";
 
 test("bounds: calc-hvac computeDuctVelocityPressure pins V = 4005*sqrt(VP) + inverse + rejects non-positive/Infinity", () => {
@@ -10042,7 +10042,7 @@ test("bounds: calc-edu computeCurveGradeScaler pins flat/sqrt/linear + clamp + r
 });
 
 test("bounds: v23 export-function renderers are callable functions (DOM-bound sentinel)", () => {
-  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderRefrigerantLineSize, renderPitotTraverseCfm, renderPitotTraverseAverage, renderDpFlowMeter, renderGasDpFlowMeter, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
+  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderRefrigerantLineSize, renderPitotTraverseCfm, renderPitotTraverseAverage, renderDpFlowMeter, renderGasDpFlowMeter, renderOrificePressureLoss, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
     assert.strictEqual(typeof fn, "function", "render symbol must be a function");
   }
 });
@@ -11132,6 +11132,36 @@ test("bounds: spec-v1279 computeConcreteImmediateDeflection pins delta = K w L^4
   assert.ok("error" in _v1279({ ie_in4: 4662, fc_psi: 4000, w_klf: 0.8, span_ft: 0, support: "simple_udl" }));
   assert.ok("error" in _v1279({ ie_in4: 4662, fc_psi: 4000, w_klf: 0.8, span_ft: 24, support: "bogus" }));
   assert.ok("error" in _v1279({ ie_in4: Infinity, fc_psi: 4000, w_klf: 0.8, span_ft: 24, support: "simple_udl" }));
+});
+import { computeOrificePressureLoss as _v1280 } from "../../calc-velocity.js";
+test("bounds: spec-v1280 computeOrificePressureLoss pins the ISO 5167 loss ratio, the beta dependence, recovery, and error seams", () => {
+  // 2 in orifice in a 4 in line (beta 0.5), 1 psi, Cd 0.61.
+  const r = _v1280({ pipe_id_in: 4, bore_in: 2, dp_psi: 1, cd: 0.61 });
+  assert.ok(Math.abs(r.loss_fraction - 0.73073) < 1e-4 && Math.abs(r.beta_ratio - 0.5) < 1e-9);
+  // Exact ISO 5167 formula.
+  const beta = 0.5, b4 = Math.pow(beta, 4), Cd = 0.61, root = Math.sqrt(1 - b4 * (1 - Cd * Cd)), cb2 = Cd * beta * beta;
+  assert.ok(Math.abs(r.loss_fraction - (root - cb2) / (root + cb2)) < 1e-12);
+  // Loss + recovered = dP; in w.c. is psi x 27.68.
+  assert.ok(Math.abs(r.permanent_loss_psi + r.recovered_psi - 1) < 1e-9);
+  assert.ok(Math.abs(r.permanent_loss_inwc - r.permanent_loss_psi * 27.68) < 1e-9);
+  assert.ok(Math.abs(r.recovered_fraction - (1 - r.loss_fraction)) < 1e-12);
+  // Loss fraction rises as beta (bore) shrinks -- the central orifice trade.
+  let prev = -Infinity;
+  for (const d of [3.2, 2.8, 2.4, 2.0, 1.6, 1.2, 0.8]) {
+    const f = _v1280({ pipe_id_in: 4, bore_in: d, dp_psi: 1, cd: 0.61 }).loss_fraction;
+    assert.ok(f > prev); prev = f;   // decreasing bore -> increasing loss
+  }
+  // Loss fraction is proportional in dP: doubling dP doubles the permanent loss.
+  const d2 = _v1280({ pipe_id_in: 4, bore_in: 2, dp_psi: 2, cd: 0.61 });
+  assert.ok(Math.abs(d2.permanent_loss_psi - 2 * r.permanent_loss_psi) < 1e-9);
+  // Error seams: non-positive D/d/dP, bore >= pipe, Cd out of range, non-finite.
+  assert.ok("error" in _v1280({ pipe_id_in: 0, bore_in: 2, dp_psi: 1, cd: 0.61 }));
+  assert.ok("error" in _v1280({ pipe_id_in: 4, bore_in: 0, dp_psi: 1, cd: 0.61 }));
+  assert.ok("error" in _v1280({ pipe_id_in: 4, bore_in: 4, dp_psi: 1, cd: 0.61 }));
+  assert.ok("error" in _v1280({ pipe_id_in: 4, bore_in: 2, dp_psi: 0, cd: 0.61 }));
+  assert.ok("error" in _v1280({ pipe_id_in: 4, bore_in: 2, dp_psi: 1, cd: 1.5 }));
+  assert.ok("error" in _v1280({ pipe_id_in: 4, bore_in: 2, dp_psi: 1, cd: 0 }));
+  assert.ok("error" in _v1280({ pipe_id_in: Infinity, bore_in: 2, dp_psi: 1, cd: 0.61 }));
 });
 test("bounds: spec-v53 linear-interpolation pins y + slope + extrapolation flag + reject non-finite", () => {
   // (0,10),(10,30), x=4 -> y=18, slope 2, within range

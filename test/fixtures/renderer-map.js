@@ -459,6 +459,7 @@ export const RENDERER_MAP = {
   "pitot-traverse-average": { module: "../../calc-velocity.js", exportName: "VELOCITY_RENDERERS" },
   "dp-flow-meter": { module: "../../calc-velocity.js", exportName: "VELOCITY_RENDERERS" },
   "gas-dp-flow-meter": { module: "../../calc-velocity.js", exportName: "VELOCITY_RENDERERS" },
+  "orifice-pressure-loss": { module: "../../calc-velocity.js", exportName: "VELOCITY_RENDERERS" },
   "psychrometric": { module: "../../calc-restoration.js", exportName: "RESTORATION_RENDERERS" },
   "drying-goal": { module: "../../calc-restoration.js", exportName: "RESTORATION_RENDERERS" },
   "dehumidifier": { module: "../../calc-restoration.js", exportName: "RESTORATION_RENDERERS" },

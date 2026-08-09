@@ -23916,6 +23916,36 @@
       "kind": "question"
     },
     {
+      "term": "orifice permanent pressure loss",
+      "target": "orifice-pressure-loss",
+      "kind": "industry"
+    },
+    {
+      "term": "unrecovered pressure loss orifice",
+      "target": "orifice-pressure-loss",
+      "kind": "industry"
+    },
+    {
+      "term": "orifice plate head loss",
+      "target": "orifice-pressure-loss",
+      "kind": "industry"
+    },
+    {
+      "term": "ISO 5167 pressure loss",
+      "target": "orifice-pressure-loss",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much pressure does an orifice plate cost me",
+      "target": "orifice-pressure-loss",
+      "kind": "question"
+    },
+    {
+      "term": "does a venturi save pressure vs an orifice",
+      "target": "orifice-pressure-loss",
+      "kind": "question"
+    },
+    {
       "term": "pitot traverse",
       "target": "pitot-traverse-cfm",
       "kind": "industry"

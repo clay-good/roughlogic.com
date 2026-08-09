@@ -425,3 +425,63 @@ export function renderGasDpFlowMeter(inputRegion, outputRegion, citationEl) {
   for (const f of [D, d, p1, dp, tF, sg, kap, cd]) f.input.addEventListener("input", update);
 }
 VELOCITY_RENDERERS["gas-dp-flow-meter"] = renderGasDpFlowMeter;
+
+// ===================== spec-v1280: orifice permanent (unrecovered) pressure loss (ISO 5167) =====================
+// The dp-flow-meter tiles compute the FLOW from the differential pressure but not the PERMANENT pressure loss --
+// the dp-flow-meter note only remarks that "a venturi ... recovers most of the pressure." The differential dP
+// measured across the taps is largely recovered downstream as the jet re-expands; what is NOT recovered is the
+// permanent head loss the pump or fan must make up. ISO 5167-1/2 gives the square-edge orifice loss as a fraction
+// of the measured dP:  dW/dP = (sqrt(1 - beta^4 (1 - Cd^2)) - Cd beta^2) / (sqrt(1 - beta^4 (1 - Cd^2)) + Cd beta^2).
+// A smaller bore (lower beta) meters a wider range but wastes far more pressure. Orifice plates only -- a classical
+// venturi recovers most of the dP (its loss is a separate, much smaller diffuser calculation).
+// dims: in { pipe_id_in: L, bore_in: L, dp_psi: M L^-1 T^-2, cd: dimensionless } out: { beta_ratio: dimensionless, loss_fraction: dimensionless, permanent_loss_psi: M L^-1 T^-2, permanent_loss_inwc: M L^-1 T^-2, recovered_psi: M L^-1 T^-2 }
+export function computeOrificePressureLoss({ pipe_id_in = 0, bore_in = 0, dp_psi = 0, cd = 0.61 } = {}) {
+  const D = Number(pipe_id_in), d = Number(bore_in), dp = Number(dp_psi), Cd = Number(cd);
+  if (![D, d, dp, Cd].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
+  if (!(D > 0)) return { error: "Pipe inside diameter must be positive (in)." };
+  if (!(d > 0)) return { error: "Bore / orifice diameter must be positive (in)." };
+  if (!(d < D)) return { error: "The bore diameter must be smaller than the pipe inside diameter." };
+  if (!(dp > 0)) return { error: "Differential pressure must be positive (psi)." };
+  if (!(Cd > 0) || Cd > 1.0) return { error: "Orifice discharge coefficient must be between 0 and 1.0 (square-edge orifice ~0.61)." };
+  const beta = d / D;
+  const b4 = Math.pow(beta, 4);
+  const root = Math.sqrt(1 - b4 * (1 - Cd * Cd));
+  const cb2 = Cd * beta * beta;
+  const loss_fraction = (root - cb2) / (root + cb2);
+  const permanent_loss_psi = loss_fraction * dp;
+  const permanent_loss_inwc = permanent_loss_psi * 27.68;
+  const recovered_psi = dp - permanent_loss_psi;
+  if (![loss_fraction, permanent_loss_psi, permanent_loss_inwc, recovered_psi, beta].every(Number.isFinite)) return { error: "Orifice pressure-loss math is not a finite value." };
+  return {
+    beta_ratio: beta, loss_fraction, permanent_loss_psi, permanent_loss_inwc, recovered_psi, recovered_fraction: 1 - loss_fraction,
+    note: "The PERMANENT (unrecovered) pressure loss across a square-edge orifice plate -- the head the pump or fan actually pays, which the dp-flow-meter tiles (flow only) leave out. The differential pressure measured across the taps is mostly recovered downstream as the jet re-expands; only a fraction stays lost. ISO 5167-1/2 gives that fraction as dW/dP = (sqrt(1 - beta^4 (1 - Cd^2)) - Cd beta^2) / (sqrt(1 - beta^4 (1 - Cd^2)) + Cd beta^2), where beta = bore / pipe ID and Cd is the orifice discharge coefficient (about 0.61). A 2 in orifice in a 4 in line (beta 0.5) loses about 73% of the differential; shrink the bore to 1.2 in (beta 0.3) and the loss climbs to 90%, while opening it to 2.8 in (beta 0.7) drops it to 51% -- so a small bore meters a wide flow range but wastes the most pressure, the central trade in sizing an orifice. Square-edge orifice plates only: a classical venturi recovers most of the differential (its permanent loss, roughly 10-20% of dP, comes from the divergent cone and is a separate calculation), and a flow nozzle sits between the two. 1 psi = 27.68 in w.c. A sizing estimate; the manufacturer's or ISO 5167 loss data governs.",
+  };
+}
+export const orificePressureLossExample = { inputs: { pipe_id_in: 4, bore_in: 2, dp_psi: 1, cd: 0.61 } };
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderOrificePressureLoss(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ISO 5167-1/2 permanent pressure loss for a square-edge orifice, dW/dP = (sqrt(1 - beta^4 (1 - Cd^2)) - Cd beta^2) / (sqrt(1 - beta^4 (1 - Cd^2)) + Cd beta^2), beta = d/D, by name. Orifice plates only (a venturi recovers most of the dP -- a separate calculation). 1 psi = 27.68 in w.c. The manufacturer's or ISO 5167 loss data governs.";
+  const D = _v23h_makeNumber("Pipe inside diameter (in)", "opl-D", { step: "any", min: "0" }); D.input.value = "4";
+  const d = _v23h_makeNumber("Bore / orifice diameter (in)", "opl-d", { step: "any", min: "0" }); d.input.value = "2";
+  const dp = _v23h_makeNumber("Differential pressure across taps (psi)", "opl-dp", { step: "any", min: "0" }); dp.input.value = "1";
+  const cd = _v23h_makeNumber("Orifice discharge coefficient Cd (~0.61)", "opl-cd", { step: "any", min: "0" }); cd.input.value = "0.61";
+  for (const f of [D, d, dp, cd]) inputRegion.appendChild(f.wrap);
+  const oL = _v23h_makeOut(outputRegion, "Permanent pressure loss", "opl-out-l");
+  const oF = _v23h_makeOut(outputRegion, "Loss fraction of dP", "opl-out-f");
+  const oR = _v23h_makeOut(outputRegion, "Recovered downstream", "opl-out-r");
+  const oB = _v23h_makeOut(outputRegion, "Beta ratio (d/D)", "opl-out-b");
+  const oNote = _v23h_makeOut(outputRegion, "Note", "opl-out-n");
+  function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
+  const update = _v23h_debounce(() => {
+    const r = computeOrificePressureLoss({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), dp_psi: readNum(dp.input), cd: readNum(cd.input) });
+    if (r.error) { oL.textContent = r.error; oF.textContent = "-"; oR.textContent = "-"; oB.textContent = "-"; oNote.textContent = ""; return; }
+    oL.textContent = _v23h_fmt(r.permanent_loss_psi, 3) + " psi (" + _v23h_fmt(r.permanent_loss_inwc, 1) + " in w.c.)";
+    oF.textContent = _v23h_fmt(r.loss_fraction * 100, 1) + "% lost";
+    oR.textContent = _v23h_fmt(r.recovered_psi, 3) + " psi (" + _v23h_fmt(r.recovered_fraction * 100, 1) + "% recovered)";
+    oB.textContent = _v23h_fmt(r.beta_ratio, 3);
+    oNote.textContent = r.note;
+  }, _V23H_DEB);
+  _v23h_attachEx(inputRegion, () => { D.input.value = "4"; d.input.value = "2"; dp.input.value = "1"; cd.input.value = "0.61"; update(); });
+  for (const f of [D, d, dp, cd]) f.input.addEventListener("input", update);
+}
+VELOCITY_RENDERERS["orifice-pressure-loss"] = renderOrificePressureLoss;

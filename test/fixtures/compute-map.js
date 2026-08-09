@@ -1355,6 +1355,7 @@ export const COMPUTE_MAP = {
   "pitot-traverse-cfm": { module: "../../calc-velocity.js", fn: "computePitotTraverseCfm" },
   "dp-flow-meter": { module: "../../calc-velocity.js", fn: "computeDpFlowMeter" },
   "gas-dp-flow-meter": { module: "../../calc-velocity.js", fn: "computeGasDpFlowMeter" },
+  "orifice-pressure-loss": { module: "../../calc-velocity.js", fn: "computeOrificePressureLoss" },
   "pitot-traverse-average": { module: "../../calc-velocity.js", fn: "computePitotTraverseAverage" },
   "outside-air-percent-temps": { module: "../../calc-hvacservice.js", fn: "computeOutsideAirPercentTemps" },
   "colebrook-friction-factor": { module: "../../calc-hvac.js", fn: "computeColebrookFrictionFactor" },

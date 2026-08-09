@@ -15973,6 +15973,18 @@ export const CITATIONS = {
       { name: "Scope", value: "incompressible liquid only; a gas needs an expansion factor Y", source: "scope of this tile" },
     ],
   },
+  "orifice-pressure-loss": {
+    formula: "dW/dP = (sqrt(1 - beta^4 (1 - Cd^2)) - Cd beta^2) / (sqrt(1 - beta^4 (1 - Cd^2)) + Cd beta^2); permanent loss = (dW/dP) dP; recovered = dP - loss. beta = d/D; 1 psi = 27.68 in w.c.",
+    edition: "The ISO 5167-1/2 permanent (unrecovered) pressure-loss ratio for a square-edge orifice plate, cited by name; the underlying loss physics is public and the manufacturer's or ISO 5167 loss data governs.",
+    freeAccess: "The permanent pressure-loss ratio is the published ISO 5167-1/2 form; the orifice discharge coefficient (~0.61) is editable. Pipe diameter, bore, and differential pressure are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The PERMANENT (unrecovered) pressure loss across a square-edge orifice plate, the head the pump or fan actually pays, which the dp-flow-meter tiles (flow only) leave out. The differential pressure measured across the taps is mostly recovered downstream as the jet re-expands; only a fraction stays lost. ISO 5167-1/2 gives that fraction as dW/dP = (sqrt(1 - beta^4 (1 - Cd^2)) - Cd beta^2) / (sqrt(1 - beta^4 (1 - Cd^2)) + Cd beta^2), where beta = bore/pipe ID and Cd is the orifice discharge coefficient (about 0.61). A smaller bore (lower beta) meters a wider flow range but wastes far more pressure, the central trade in sizing an orifice. Square-edge orifice plates only: a classical venturi recovers most of the differential (its permanent loss, roughly 10-20% of dP, comes from the divergent cone and is a separate calculation), and a flow nozzle sits between the two. 1 psi = 27.68 in w.c. A sizing estimate; the manufacturer's or ISO 5167 loss data governs.",
+    assumptions: [
+      { name: "Loss ratio", value: "dW/dP = (sqrt(1 - beta^4(1 - Cd^2)) - Cd beta^2)/(sqrt(1 - beta^4(1 - Cd^2)) + Cd beta^2)", source: "ISO 5167-1/2" },
+      { name: "Beta effect", value: "smaller beta (bore) = more permanent loss; beta 0.5 ~73%, beta 0.3 ~90%, beta 0.7 ~51%", source: "ISO 5167-1/2" },
+      { name: "Scope", value: "square-edge orifice only; a venturi recovers most of the dP (separate); Cd editable, ~0.61", source: "scope of this tile" },
+    ],
+  },
   "gas-dp-flow-meter": {
     formula: "eps = 1 - (0.351 + 0.256 beta^4 + 0.93 beta^8)(1 - (p2/p1)^(1/kappa)); qm = (Cd/sqrt(1-beta^4)) eps (pi/4) d^2 sqrt(2 gc dP rho1); rho1 = p1 MW/(R T), MW = 28.97 SG; scfm at 14.696 psia, 60 F.",
     edition: "The ISO 5167-2 orifice-plate expansibility (expansion) factor and the compressible-flow mass-flow equation, cited by name; the underlying flow physics is public and the meter's calibration governs the precise discharge coefficient.",
