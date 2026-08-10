@@ -37842,3 +37842,24 @@ test("bounds: spec-v1294 computeBandBrakeTorque pins the Eytelwein tension ratio
   assert.ok("error" in _v1294({ slack_tension_lbf: 50, wrap_angle_deg: 270, friction_coefficient: 0.3, drum_radius_in: 0 }));
   assert.ok("error" in _v1294({ slack_tension_lbf: Infinity, wrap_angle_deg: 270, friction_coefficient: 0.3, drum_radius_in: 6 }));
 });
+
+import { computeCentrifugalForce as _v1295 } from "../../calc-mechanic.js";
+test("bounds: spec-v1295 computeCentrifugalForce pins the force, the g-multiple, the rim speed, the square-of-speed scaling, and error seams", () => {
+  // 2 lb at 6 in, 1800 rpm: F 1104 lbf, 552 g, rim 94.2 ft/s (5655 ft/min).
+  const r = _v1295({ weight_lb: 2, radius_in: 6, speed_rpm: 1800 });
+  assert.ok(Math.abs(r.centrifugal_force_lbf - 1104.3) < 1 && Math.abs(r.acceleration_g - 552.2) < 0.5);
+  assert.ok(Math.abs(r.rim_speed_fps - 94.2) < 0.2 && Math.abs(r.rim_speed_fpm - 5655) < 5);
+  // Force grows with the square of rpm: doubling to 3600 rpm quadruples the force.
+  const dbl = _v1295({ weight_lb: 2, radius_in: 6, speed_rpm: 3600 });
+  assert.ok(Math.abs(dbl.centrifugal_force_lbf / r.centrifugal_force_lbf - 4) < 1e-6);
+  // Force scales linearly with weight and with radius.
+  assert.ok(Math.abs(_v1295({ weight_lb: 4, radius_in: 6, speed_rpm: 1800 }).centrifugal_force_lbf / r.centrifugal_force_lbf - 2) < 1e-6);
+  assert.ok(Math.abs(_v1295({ weight_lb: 2, radius_in: 12, speed_rpm: 1800 }).centrifugal_force_lbf / r.centrifugal_force_lbf - 2) < 1e-6);
+  // The g-multiple is independent of the weight (a = omega^2 r/g).
+  assert.ok(Math.abs(_v1295({ weight_lb: 10, radius_in: 6, speed_rpm: 1800 }).acceleration_g - r.acceleration_g) < 1e-6);
+  // Error seams: non-positive weight/radius/speed, non-finite.
+  assert.ok("error" in _v1295({ weight_lb: 0, radius_in: 6, speed_rpm: 1800 }));
+  assert.ok("error" in _v1295({ weight_lb: 2, radius_in: 0, speed_rpm: 1800 }));
+  assert.ok("error" in _v1295({ weight_lb: 2, radius_in: 6, speed_rpm: 0 }));
+  assert.ok("error" in _v1295({ weight_lb: Infinity, radius_in: 6, speed_rpm: 1800 }));
+});

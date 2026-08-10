@@ -180,6 +180,7 @@ export const COMPUTE_MAP = {
   "vehicle-road-load-power": { module: "../../calc-mechanic.js", fn: "computeVehicleRoadLoadPower" },
   "planetary-gear-ratio": { module: "../../calc-mechanic.js", fn: "computePlanetaryGearRatio" },
   "band-brake-torque": { module: "../../calc-mechanic.js", fn: "computeBandBrakeTorque" },
+  "centrifugal-force": { module: "../../calc-mechanic.js", fn: "computeCentrifugalForce" },
   "gear-dynamic-tooth-stress": { module: "../../calc-mechanic.js", fn: "computeGearDynamicToothStress" },
   "trap-seal-loss": { module: "../../calc-plumbing.js", fn: "computeTrapSealLoss" },
   "water-meter-sizing": { module: "../../calc-plumbing.js", fn: "computeWaterMeterSizing" },

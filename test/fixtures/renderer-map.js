@@ -1231,6 +1231,7 @@ export const RENDERER_MAP = {
   "vehicle-road-load-power": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "planetary-gear-ratio": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "band-brake-torque": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
+  "centrifugal-force": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "hp-from-torque": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "volumetric-efficiency": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "gear-mph-rpm": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },

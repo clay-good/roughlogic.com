@@ -1355,6 +1355,51 @@ MECHANIC_RENDERERS["band-brake-torque"] = _simpleRenderer({
   compute: computeBandBrakeTorque,
 });
 
+// --- spec-v1295 K: centrifugal force of a rotating mass (`centrifugal-force`) ---
+// flywheel-energy stores rotational KE but nothing computes the centrifugal force a rotating mass
+// throws outward - the force that bursts a grinding wheel, shakes an unbalanced rotor, stresses a
+// flywheel rim. F = (W/g) omega^2 r, climbing with the SQUARE of speed. Also the g-multiple and rim speed.
+// dims: in { weight_lb: M L T^-2, radius_in: L, speed_rpm: T^-1 } out: { centrifugal_force_lbf: M L T^-2, acceleration_g: dimensionless, rim_speed_fps: L T^-1, rim_speed_fpm: L T^-1 }
+export function computeCentrifugalForce({ weight_lb = 0, radius_in = 0, speed_rpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const W = Number(weight_lb) || 0;
+  const rIn = Number(radius_in) || 0;
+  const N = Number(speed_rpm) || 0;
+  if (!(W > 0)) return { error: "Weight must be positive (lb)." };
+  if (!(rIn > 0)) return { error: "Radius must be positive (in)." };
+  if (!(N > 0)) return { error: "Rotational speed must be positive (rpm)." };
+  const g = 32.174; // ft/s^2
+  const r = rIn / 12; // ft
+  const omega = (2 * Math.PI * N) / 60; // rad/s
+  const centrifugal_force_lbf = (W / g) * omega * omega * r;
+  const acceleration_g = (omega * omega * r) / g;
+  const rim_speed_fps = omega * r;
+  const rim_speed_fpm = rim_speed_fps * 60;
+  if (![centrifugal_force_lbf, acceleration_g, rim_speed_fps].every(Number.isFinite) || !(centrifugal_force_lbf > 0)) return { error: "Centrifugal-force math is not a finite value; check the inputs." };
+  return {
+    centrifugal_force_lbf, acceleration_g, rim_speed_fps, rim_speed_fpm, angular_velocity_rad_s: omega,
+    note: "Centrifugal (centripetal) force of a concentrated mass at a radius, F = (W/g) omega^2 r, with omega = 2 pi N/60 the angular velocity, g = 32.174 ft/s^2, and r the radius to the mass center. The acceleration in g's is a = omega^2 r/g and the rim (tangential) speed is v = omega r. The force climbs with the SQUARE of speed, so doubling the rpm quadruples the force - which is why a small imbalance is harmless at idle and violent at speed, and why a chipped grinding wheel that is safe by hand can burst at operating rpm. Use the mass and the radius of the center of gravity for a distributed rotor. The burst stress of a rim or disk, the bearing reaction from an imbalance couple, and the critical (whirl) speed are separate. A design aid; Machinery's Handbook and the equipment maker govern.",
+  };
+}
+export const centrifugalForceExample = { inputs: { weight_lb: 2, radius_in: 6, speed_rpm: 1800 } };
+
+MECHANIC_RENDERERS["centrifugal-force"] = _simpleRenderer({
+  citation: "Citation: centrifugal (centripetal) force F = (W/g) omega^2 r with omega = 2 pi N/60, g = 32.174 ft/s^2 (standard dynamics; Machinery's Handbook); the acceleration in g's is omega^2 r/g and the rim speed is v = omega r. A design aid; the equipment maker governs.",
+  example: centrifugalForceExample.inputs,
+  fields: [
+    { key: "weight_lb", label: "Mass weight W (lb)", kind: "number" },
+    { key: "radius_in", label: "Radius to mass center r (in)", kind: "number" },
+    { key: "speed_rpm", label: "Rotational speed (rpm)", kind: "number" },
+  ],
+  outputs: [
+    { key: "f", id: "cff-out-f", label: "Centrifugal force", value: (r) => fmt(r.centrifugal_force_lbf, 1) + " lbf" },
+    { key: "g", id: "cff-out-g", label: "Acceleration", value: (r) => fmt(r.acceleration_g, 1) + " g" },
+    { key: "v", id: "cff-out-v", label: "Rim (tangential) speed", value: (r) => fmt(r.rim_speed_fps, 1) + " ft/s (" + fmt(r.rim_speed_fpm, 0) + " ft/min)" },
+    { key: "n", id: "cff-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCentrifugalForce,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================

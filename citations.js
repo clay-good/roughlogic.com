@@ -11734,6 +11734,18 @@ export const CITATIONS = {
       { name: "Scope", value: "tension ratio and torque only; lever geometry, self-energizing, band stress, heat are separate", source: "scope of this tile" },
     ],
   },
+  "centrifugal-force": {
+    formula: "omega = 2 pi N / 60; F = (W/g) omega^2 r (g = 32.174 ft/s^2, r in ft); a_g = omega^2 r / g; v = omega r.",
+    edition: "The centrifugal (centripetal) force F = (W/g) omega^2 r and rim speed v = omega r (standard dynamics; Machinery's Handbook), by name.",
+    freeAccess: "The centrifugal-force relation is a standard published dynamics result; the weight, radius, and speed are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The centrifugal (centripetal) force of a concentrated mass at a radius, F = (W/g) omega^2 r, with omega = 2 pi N/60 the angular velocity, g = 32.174 ft/s^2, and r the radius to the mass center. The acceleration in g's is a = omega^2 r/g and the rim (tangential) speed is v = omega r. The force climbs with the SQUARE of speed, so doubling the rpm quadruples the force - which is why a small imbalance is harmless at idle and violent at speed, and why a chipped grinding wheel that is safe by hand can burst at operating rpm. Use the mass and the radius of the center of gravity for a distributed rotor. The burst stress of a rim or disk, the bearing reaction from an imbalance couple, and the critical (whirl) speed are separate. A design aid; Machinery's Handbook and the equipment maker govern.",
+    assumptions: [
+      { name: "Centrifugal force", value: "F = (W/g) omega^2 r for a concentrated mass at radius r", source: "dynamics" },
+      { name: "Speed square", value: "force grows with the square of rpm; a_g = omega^2 r/g", source: "dynamics" },
+      { name: "Scope", value: "concentrated mass; burst stress, imbalance couple, whirl speed are separate", source: "scope of this tile" },
+    ],
+  },
   "gear-identification": {
     formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
     edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",

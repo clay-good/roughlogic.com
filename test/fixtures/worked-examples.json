@@ -87271,6 +87271,62 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "centrifugal-force",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "2 lb mass at 6 in, 1800 rpm",
+   "source_edition_or_year": "dynamics / Machinery Handbook",
+   "source_section_or_page": "F = (W/g) omega^2 r",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "weight_lb": 2,
+    "radius_in": 6,
+    "speed_rpm": 1800
+   },
+   "outputs": {
+    "centrifugal_force_lbf": {
+     "value": 1104.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "acceleration_g": {
+     "value": 552.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "centrifugal-force",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Grinding wheel rim, 5 lb at 5 in, 3600 rpm",
+   "source_edition_or_year": "dynamics / Machinery Handbook",
+   "source_section_or_page": "F = (W/g) omega^2 r",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "weight_lb": 5,
+    "radius_in": 5,
+    "speed_rpm": 3600
+   },
+   "outputs": {
+    "centrifugal_force_lbf": {
+     "value": 9202.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rim_speed_fpm": {
+     "value": 9425,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }
