@@ -37747,3 +37747,27 @@ test("bounds: spec-v1290 computeEulerJohnsonColumn pins the Johnson/Euler split,
   assert.ok("error" in _v1290({ modulus_psi: 30000000, yield_strength_psi: 40000, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 20, end_condition: "free-free" }));
   assert.ok("error" in _v1290({ modulus_psi: Infinity, yield_strength_psi: 40000, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 20, end_condition: "pinned-pinned" }));
 });
+
+import { computeAerodynamicDragForce as _v1291 } from "../../calc-mechanic.js";
+test("bounds: spec-v1291 computeAerodynamicDragForce pins the drag force, the drag power, the cube-law speed scaling, and error seams", () => {
+  // Car at 70 mph, 24 ft^2, Cd 0.30, standard air: F 90.2 lbf, P 16.84 hp.
+  const r = _v1291({ speed_mph: 70, frontal_area_ft2: 24, drag_coefficient: 0.30, air_density_lb_ft3: 0.0765 });
+  assert.ok(Math.abs(r.drag_force_lbf - 90.2) < 0.5);
+  assert.ok(Math.abs(r.drag_power_hp - 16.84) < 0.1);
+  assert.ok(Math.abs(r.drag_power_kw - r.drag_power_hp * 0.745699872) < 1e-6);
+  // Drag force scales with the square of speed; drag power with the cube.
+  const at80 = _v1291({ speed_mph: 80, frontal_area_ft2: 24, drag_coefficient: 0.30, air_density_lb_ft3: 0.0765 });
+  assert.ok(Math.abs(at80.drag_force_lbf / r.drag_force_lbf - Math.pow(80 / 70, 2)) < 1e-6);
+  assert.ok(Math.abs(at80.drag_power_hp / r.drag_power_hp - Math.pow(80 / 70, 3)) < 1e-6);
+  // Halving the drag coefficient halves the force and power.
+  const slippery = _v1291({ speed_mph: 70, frontal_area_ft2: 24, drag_coefficient: 0.15, air_density_lb_ft3: 0.0765 });
+  assert.ok(Math.abs(slippery.drag_force_lbf / r.drag_force_lbf - 0.5) < 1e-9);
+  // Thinner (high-altitude) air lowers the drag.
+  assert.ok(_v1291({ speed_mph: 70, frontal_area_ft2: 24, drag_coefficient: 0.30, air_density_lb_ft3: 0.058 }).drag_force_lbf < r.drag_force_lbf);
+  // Error seams: non-positive speed/area/Cd/density, non-finite.
+  assert.ok("error" in _v1291({ speed_mph: 0, frontal_area_ft2: 24, drag_coefficient: 0.30, air_density_lb_ft3: 0.0765 }));
+  assert.ok("error" in _v1291({ speed_mph: 70, frontal_area_ft2: 0, drag_coefficient: 0.30, air_density_lb_ft3: 0.0765 }));
+  assert.ok("error" in _v1291({ speed_mph: 70, frontal_area_ft2: 24, drag_coefficient: 0, air_density_lb_ft3: 0.0765 }));
+  assert.ok("error" in _v1291({ speed_mph: 70, frontal_area_ft2: 24, drag_coefficient: 0.30, air_density_lb_ft3: 0 }));
+  assert.ok("error" in _v1291({ speed_mph: Infinity, frontal_area_ft2: 24, drag_coefficient: 0.30, air_density_lb_ft3: 0.0765 }));
+});

@@ -1151,6 +1151,55 @@ MECHANIC_RENDERERS["gear-contact-stress"] = _simpleRenderer({
   compute: computeGearContactStress,
 });
 
+// --- spec-v1291 K: aerodynamic drag force and power (`aerodynamic-drag-force`) ---
+// The bluff-body drag the Stokes settling tile (creeping flow) leaves out: F = 1/2 rho V^2 Cd A,
+// the reason a vehicle needs so much more power at highway speed (drag power grows with the cube
+// of speed). rho is the mass density (weight density / g); V in ft/s. Power P = F V to hp/kW.
+// dims: in { speed_mph: L T^-1, frontal_area_ft2: L^2, drag_coefficient: dimensionless, air_density_lb_ft3: M L^-3 } out: { drag_force_lbf: M L T^-2, drag_power_hp: M L^2 T^-3, drag_power_kw: M L^2 T^-3, dynamic_pressure_psf: M L^-1 T^-2 }
+export function computeAerodynamicDragForce({ speed_mph = 0, frontal_area_ft2 = 0, drag_coefficient = 0, air_density_lb_ft3 = 0.0765 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Vmph = Number(speed_mph) || 0;
+  const A = Number(frontal_area_ft2) || 0;
+  const Cd = Number(drag_coefficient) || 0;
+  const rhoW = Number(air_density_lb_ft3) || 0;
+  if (!(Vmph > 0)) return { error: "Speed must be positive (mph)." };
+  if (!(A > 0)) return { error: "Frontal area must be positive (ft^2)." };
+  if (!(Cd > 0)) return { error: "Drag coefficient must be positive." };
+  if (!(rhoW > 0)) return { error: "Air density must be positive (lb/ft^3)." };
+  const g = 32.174; // ft/s^2
+  const V = Vmph * 1.46667; // ft/s
+  const rhoMass = rhoW / g; // slug/ft^3
+  const dynamic_pressure_psf = 0.5 * rhoMass * V * V;
+  const drag_force_lbf = dynamic_pressure_psf * Cd * A;
+  const drag_power_ftlb_s = drag_force_lbf * V;
+  const drag_power_hp = drag_power_ftlb_s / 550;
+  const drag_power_kw = drag_power_hp * 0.745699872;
+  if (![drag_force_lbf, drag_power_hp, drag_power_kw, dynamic_pressure_psf].every(Number.isFinite) || !(drag_force_lbf > 0)) return { error: "Drag math is not a finite value; check the inputs." };
+  return {
+    drag_force_lbf, drag_power_hp, drag_power_kw, dynamic_pressure_psf, speed_fps: V,
+    note: "Aerodynamic drag force F = 1/2 rho V^2 Cd A for a bluff body in steady air, with the mass density rho = (weight density)/g (g = 32.174 ft/s^2), V the speed, Cd the drag coefficient, and A the frontal area; the power to overcome it is P = F V. Cd is the shape factor (a modern car ~0.30, a pickup ~0.45, a semi tractor-trailer ~0.6-0.8, a motorcycle and rider ~0.6, a flat plate ~1.28, a sphere ~0.47, a streamlined body ~0.04). Because power grows with the CUBE of speed, the aero power at 80 mph is about 1.5x that at 70 - the reason high-speed cruising is so thirsty. This is the aero drag only; rolling resistance, driveline loss, grade, headwind, lift, and compressibility are separate parts of the road load. The drag coefficient and frontal area are the user's (from the vehicle or a wind-tunnel value). A planning estimate; the manufacturer's road-load data governs.",
+  };
+}
+export const aerodynamicDragForceExample = { inputs: { speed_mph: 70, frontal_area_ft2: 24, drag_coefficient: 0.30, air_density_lb_ft3: 0.0765 } };
+
+MECHANIC_RENDERERS["aerodynamic-drag-force"] = _simpleRenderer({
+  citation: "Citation: aerodynamic drag F = 1/2 rho V^2 Cd A (standard fluid mechanics; SAE road-load), with the mass density rho = (weight density)/g, and the drag power P = F V. Cd and frontal area are the user's (car ~0.30, pickup ~0.45, semi ~0.6-0.8). Aero drag only; rolling resistance and driveline loss are separate. A planning estimate; the manufacturer's road-load data governs.",
+  example: aerodynamicDragForceExample.inputs,
+  fields: [
+    { key: "speed_mph", label: "Speed V (mph)", kind: "number" },
+    { key: "frontal_area_ft2", label: "Frontal area A (ft^2)", kind: "number" },
+    { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" },
+    { key: "air_density_lb_ft3", label: "Air density (lb/ft^3)", kind: "number", attrs: { step: "any", value: "0.0765" } },
+  ],
+  outputs: [
+    { key: "f", id: "adf-out-f", label: "Drag force", value: (r) => fmt(r.drag_force_lbf, 1) + " lbf" },
+    { key: "p", id: "adf-out-p", label: "Power to overcome drag", value: (r) => fmt(r.drag_power_hp, 2) + " hp (" + fmt(r.drag_power_kw, 2) + " kW)" },
+    { key: "q", id: "adf-out-q", label: "Dynamic pressure", value: (r) => fmt(r.dynamic_pressure_psf, 2) + " lb/ft^2 (at " + fmt(r.speed_fps, 1) + " ft/s)" },
+    { key: "n", id: "adf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAerodynamicDragForce,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================

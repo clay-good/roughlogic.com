@@ -2859,6 +2859,51 @@
    "kind": "question"
   },
   {
+   "term": "aerodynamic drag force",
+   "target": "aerodynamic-drag-force",
+   "kind": "industry"
+  },
+  {
+   "term": "drag force calculator",
+   "target": "aerodynamic-drag-force",
+   "kind": "industry"
+  },
+  {
+   "term": "vehicle drag power",
+   "target": "aerodynamic-drag-force",
+   "kind": "industry"
+  },
+  {
+   "term": "air resistance force",
+   "target": "aerodynamic-drag-force",
+   "kind": "industry"
+  },
+  {
+   "term": "drag coefficient horsepower",
+   "target": "aerodynamic-drag-force",
+   "kind": "adjacent"
+  },
+  {
+   "term": "cd frontal area drag",
+   "target": "aerodynamic-drag-force",
+   "kind": "adjacent"
+  },
+  {
+   "term": "power to overcome wind resistance",
+   "target": "aerodynamic-drag-force",
+   "kind": "adjacent"
+  },
+  {
+   "term": "how much power for highway speed",
+   "target": "aerodynamic-drag-force",
+   "kind": "question"
+  },
+  {
+   "term": "how much drag on my car",
+   "target": "aerodynamic-drag-force",
+   "kind": "question"
+  },
+  {
    "term": "hp torque rpm",
    "target": "hp-from-torque",
    "kind": "redirect"

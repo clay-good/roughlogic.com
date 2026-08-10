@@ -1227,6 +1227,7 @@ export const RENDERER_MAP = {
   "gear-tooth-bending-stress": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "gear-dynamic-tooth-stress": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "gear-contact-stress": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
+  "aerodynamic-drag-force": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "hp-from-torque": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "volumetric-efficiency": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "gear-mph-rpm": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },

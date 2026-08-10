@@ -87033,6 +87033,58 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "aerodynamic-drag-force",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Car at 70 mph, aero drag and power",
+   "source_edition_or_year": "fluid mechanics / SAE road-load",
+   "source_section_or_page": "F = 1/2 rho V^2 Cd A",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "speed_mph": 70,
+    "frontal_area_ft2": 24,
+    "drag_coefficient": 0.3,
+    "air_density_lb_ft3": 0.0765
+   },
+   "outputs": {
+    "drag_force_lbf": {
+     "value": 90.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "drag_power_hp": {
+     "value": 16.84,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "aerodynamic-drag-force",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same car at 80 mph (cube-law power jump)",
+   "source_edition_or_year": "fluid mechanics / SAE road-load",
+   "source_section_or_page": "F = 1/2 rho V^2 Cd A",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "speed_mph": 80,
+    "frontal_area_ft2": 24,
+    "drag_coefficient": 0.3,
+    "air_density_lb_ft3": 0.0765
+   },
+   "outputs": {
+    "drag_power_hp": {
+     "value": 25.14,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
   }
  ]
 }

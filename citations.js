@@ -11686,6 +11686,18 @@ export const CITATIONS = {
       { name: "Static stress only", value: "no AGMA Ko/Kv/Ks/Km/Cf factors; allowable is the material's", source: "scope of this tile" },
     ],
   },
+  "aerodynamic-drag-force": {
+    formula: "F = 1/2 rho V^2 Cd A; rho = (weight density)/g (g = 32.174 ft/s^2); V in ft/s (mph x 1.46667); P = F V; hp = F V / 550.",
+    edition: "The aerodynamic drag equation F = 1/2 rho V^2 Cd A and the drag power P = F V (standard fluid mechanics; SAE road-load), by name.",
+    freeAccess: "The drag equation and drag power are standard fluid-mechanics results; the drag coefficient, frontal area, speed, and air density are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The aerodynamic drag force F = 1/2 rho V^2 Cd A for a bluff body in steady air, with the mass density rho = (weight density)/g (g = 32.174 ft/s^2), V the speed, Cd the drag coefficient, and A the frontal area; the power to overcome it is P = F V. Cd is the shape factor (a modern car ~0.30, a pickup ~0.45, a semi tractor-trailer ~0.6-0.8, a motorcycle and rider ~0.6, a flat plate ~1.28, a sphere ~0.47, a streamlined body ~0.04). Because power grows with the CUBE of speed, the aero power at 80 mph is about 1.5x that at 70 - the reason high-speed cruising is so thirsty. This is the aero drag only; rolling resistance, driveline loss, grade, headwind, lift, and compressibility are separate parts of the road load. The drag coefficient and frontal area are the user's (from the vehicle or a wind-tunnel value). A planning estimate; the manufacturer's road-load data governs.",
+    assumptions: [
+      { name: "Drag equation", value: "F = 1/2 rho V^2 Cd A, bluff body in steady incompressible air", source: "fluid mechanics" },
+      { name: "Drag power", value: "P = F V; grows with the cube of speed", source: "SAE road-load" },
+      { name: "Scope", value: "aero drag only; rolling resistance, driveline, grade, headwind are separate", source: "scope of this tile" },
+    ],
+  },
   "gear-identification": {
     formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
     edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",

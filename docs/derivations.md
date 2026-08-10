@@ -2600,6 +2600,7 @@ cross-check.
 | calc-masonry.js | `computeMasonryPrismFm` | `{ unit_type = "concrete", unit_strength_psi = 2000, mortar_type = "ms" } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryWallWeight` | `{ hollow_psf = 0, grout_adder = 0, cell_spacing = 8, grout_spacing = 0, heigh...` | _ | _ | _ |
 | calc-mechanic.js | `computeAbycDcWire` | `{ current_a = 0, run_length_ft = 0, system_voltage_v = 0, drop_pct = 3 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeAerodynamicDragForce` | `{ speed_mph = 0, frontal_area_ft2 = 0, drag_coefficient = 0, air_density_lb_f...` | _ | _ | _ |
 | calc-mechanic.js | `computeAircraftWeightBalance` | `{ empty_weight_lb = 0, empty_arm_in = 0, front_weight_lb = 0, front_arm_in = ...` | _ | _ | _ |
 | calc-mechanic.js | `computeAlternatorChargingLoad` | `{ total_load_a = 0, alternator_a = 0, idle_frac = 0.5, cruise_frac = 0.9 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeAnchorRodeScope` | `{ water_depth_ft = 0, bow_height_ft = 0, scope_ratio = 7, boat_loa_ft = 0 } = {}` | _ | _ | _ |
@@ -3328,7 +3329,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1914.
+Row count: 1915.
 
 <!-- END function-corpus-v14 -->
 
@@ -4623,12 +4624,13 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (114 tiles)
+### Group K Mechanic (115 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `abyc-dc-wire` | ABYC E-11 Marine DC Wire Sizing | ABYC E-11 DC wire sizing by voltage drop; spec-v517 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `acme-thread-depth` | Acme (29-degree) Thread Depth and Dimensions | General-purpose Acme thread (Machiner...; pitch = 1/5 = 0.200; depth = 0.200/2 + 0.010 = 0.110; pit... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `aerodynamic-drag-force` | Aerodynamic Drag Force and Power | Project (first-principles); F = 1/2 rho V^2 Cd A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `aircraft-weight-balance` | Aircraft Weight and Balance (CG Envelope) | station-moment weight and balance (FA...; spec-v516 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `alternator-charging-load` | Alternator Charging Load Balance | automotive-electrical practice; spec-v464 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `anchor-rode-scope` | Anchor Rode Scope and Swing Radius | anchor rode scope and swing radius (s...; spec-v505 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5164,6 +5166,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1663. Fixture-covered or reference-cadence: 1663 / 1663.
+Tile count: 1664. Fixture-covered or reference-cadence: 1664 / 1664.
 
 <!-- END tile-index-v14 -->
