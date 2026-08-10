@@ -1454,6 +1454,45 @@ MECHANIC_RENDERERS["torsion-spring-rate"] = _simpleRenderer({
   compute: computeTorsionSpringRate,
 });
 
+// --- spec-v1299 K: universal joint (Cardan) speed variation (`universal-joint-speed`) ---
+// The driveline bench has whirl (driveshaft-crit/max-length) but not the Cardan error: the twice-per-rev
+// speed fluctuation a single U-joint introduces at an angle. Output ranges between omega cos(beta) and
+// omega/cos(beta); fluctuation = 1/cos(beta) - cos(beta). Why driveline angles are kept small and equal.
+// dims: in { joint_angle_deg: dimensionless, input_speed_rpm: T^-1 } out: { max_output_rpm: T^-1, min_output_rpm: T^-1, fluctuation_pct: dimensionless }
+export function computeUniversalJointSpeed({ joint_angle_deg = 0, input_speed_rpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const beta = Number(joint_angle_deg) || 0;
+  const rpm = Number(input_speed_rpm) || 0;
+  if (!(beta > 0 && beta <= 85)) return { error: "Joint angle must be between 0 and 85 degrees." };
+  if (!(rpm > 0)) return { error: "Input speed must be positive (rpm)." };
+  const cb = Math.cos((beta * Math.PI) / 180);
+  const max_output_rpm = rpm / cb;
+  const min_output_rpm = rpm * cb;
+  const fluctuation_pct = (1 / cb - cb) * 100;
+  if (![max_output_rpm, min_output_rpm, fluctuation_pct].every(Number.isFinite) || !(cb > 0)) return { error: "Universal-joint math is not a finite value; check the inputs." };
+  return {
+    max_output_rpm, min_output_rpm, fluctuation_pct, velocity_ratio_max: 1 / cb, velocity_ratio_min: cb,
+    note: "Cardan (Hooke) universal-joint speed variation. A single U-joint at operating angle beta makes its output run ahead of and then behind the input twice per revolution: the output speed ranges between omega cos(beta) (slowest, at 90 and 270 degrees of input) and omega/cos(beta) (fastest, at 0 and 180 degrees), a peak-to-peak fluctuation of (1/cos(beta) - cos(beta)) = sin(beta) tan(beta) of the input speed. The swing grows fast with angle - about +/-1.5% at 10 degrees but nearly 29% peak-to-peak at 30 degrees - which is why U-joint working angles are held to a few degrees. A second joint phased 90 degrees at an equal angle (a double-Cardan or a matched two-joint shaft) reverses the error so the far output turns uniformly again. The induced torque pulsation and inertial (secondary) shaking couple, the cancellation math for a specific double-Cardan geometry, and true constant-velocity (CV) joints are separate. Match and phase the joints on a real shaft. A design aid; Machinery's Handbook / Shigley and the driveline maker govern.",
+  };
+}
+export const universalJointSpeedExample = { inputs: { joint_angle_deg: 10, input_speed_rpm: 1000 } };
+
+MECHANIC_RENDERERS["universal-joint-speed"] = _simpleRenderer({
+  citation: "Citation: Cardan (Hooke) universal-joint velocity relation (Machinery's Handbook; Shigley): the output speed ranges between omega cos(beta) and omega/cos(beta), a fluctuation of 1/cos(beta) - cos(beta) of the input, twice per revolution at angle beta. A second joint phased 90 degrees at an equal angle cancels it. A design aid; the driveline maker governs.",
+  example: universalJointSpeedExample.inputs,
+  fields: [
+    { key: "joint_angle_deg", label: "Joint operating angle beta (deg)", kind: "number" },
+    { key: "input_speed_rpm", label: "Input speed (rpm)", kind: "number" },
+  ],
+  outputs: [
+    { key: "f", id: "ujs-out-f", label: "Speed fluctuation (peak-to-peak)", value: (r) => fmt(r.fluctuation_pct, 2) + "% of input" },
+    { key: "r", id: "ujs-out-r", label: "Output speed range", value: (r) => fmt(r.min_output_rpm, 1) + " to " + fmt(r.max_output_rpm, 1) + " rpm (twice per rev)" },
+    { key: "v", id: "ujs-out-v", label: "Velocity ratio range", value: (r) => fmt(r.velocity_ratio_min, 4) + " to " + fmt(r.velocity_ratio_max, 4) },
+    { key: "n", id: "ujs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeUniversalJointSpeed,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================

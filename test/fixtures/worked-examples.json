@@ -87513,6 +87513,60 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "universal-joint-speed",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "U-joint at 10 degrees, 1000 rpm",
+   "source_edition_or_year": "Machinery Handbook / Shigley",
+   "source_section_or_page": "Cardan velocity",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "joint_angle_deg": 10,
+    "input_speed_rpm": 1000
+   },
+   "outputs": {
+    "max_output_rpm": {
+     "value": 1015.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "min_output_rpm": {
+     "value": 984.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fluctuation_pct": {
+     "value": 3.06,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "universal-joint-speed",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Steep 30-degree angle explodes the swing",
+   "source_edition_or_year": "Machinery Handbook / Shigley",
+   "source_section_or_page": "Cardan velocity",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "joint_angle_deg": 30,
+    "input_speed_rpm": 1000
+   },
+   "outputs": {
+    "fluctuation_pct": {
+     "value": 28.87,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
   }
  ]
 }

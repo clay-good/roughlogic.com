@@ -2669,6 +2669,7 @@ cross-check.
 | calc-mechanic.js | `computeTurboPressureRatio` | `{ boost_psi = 0, ambient_psia = 14.7, inlet_temp_f = 0, compressor_eff_pct = ...` | _ | _ | _ |
 | calc-mechanic.js | `computeTurnRadiusBank` | `{ airspeed_kt = 0, bank_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeUjointOperatingAngle` | `{ input_angle_deg = 10, output_angle_deg = 10 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeUniversalJointSpeed` | `{ joint_angle_deg = 0, input_speed_rpm = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeValveFlowCoefficient` | `{ solve_for = "flow", fluid = "liquid", specific_gravity = 1, cv = 0, flow_gp...` | _ | _ | _ |
 | calc-mechanic.js | `computeVehicleRoadLoadPower` | `{ speed_mph = 0, vehicle_weight_lb = 0, frontal_area_ft2 = 0, drag_coefficien...` | _ | _ | _ |
 | calc-mechanic.js | `computeVolumetricEfficiency` | `{ displacement_ci = 0, rpm = 0, cycle = "four", actual_cfm = 0, ve_pct = 0 } ...` | _ | _ | _ |
@@ -3336,7 +3337,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1922.
+Row count: 1923.
 
 <!-- END function-corpus-v14 -->
 
@@ -4631,7 +4632,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (122 tiles)
+### Group K Mechanic (123 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4751,6 +4752,7 @@ per spec-v14 §13.1 second paragraph.
 | `turn-radius-bank` | Coordinated Turn Radius and Rate | FAA Airplane Flying Handbook (coordin...; 120 kt at 30 deg bank -> 2208 ft radius, 5.25 deg/s rate ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `turning-surface-finish` | Theoretical Surface Finish | First-principles scallop geometry + M...; f 0.005 IPR, r 1/32 in -> Rt 100 uin, Ra 25 uin | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ujoint-operating-angle` | Driveline U-Joint Operating Angle and Cancellation | Cardan (Hooke) U-joint kinematics + c...; variation = 1/cos(10) - cos(10) = 1.01543 - 0.98481 = 0.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `universal-joint-speed` | Universal Joint (Cardan) Speed Variation | Project (first-principles); Cardan velocity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `valve-flow-coefficient` | Valve Flow Coefficient (Cv) | ISA-75.01 / Crane TP-410 (control-val...; Cv 10, dP 25 psi, SG 1 -> Q = 10 * sqrt(25) = 50 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vehicle-road-load-power` | Vehicle Road-Load Force and Power | Project (first-principles); F_total = aero + rolling + grade | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5180,6 +5182,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1671. Fixture-covered or reference-cadence: 1671 / 1671.
+Tile count: 1672. Fixture-covered or reference-cadence: 1672 / 1672.
 
 <!-- END tile-index-v14 -->

@@ -37933,3 +37933,26 @@ test("bounds: spec-v1298 computeRackAndPinion pins the pitch diameter, travel, l
   assert.ok("error" in _v1298({ pinion_teeth: 20, diametral_pitch_1_in: 10, pinion_torque_in_lb: 100, pinion_rpm: 0 }));
   assert.ok("error" in _v1298({ pinion_teeth: Infinity, diametral_pitch_1_in: 10, pinion_torque_in_lb: 100, pinion_rpm: 500 }));
 });
+
+import { computeUniversalJointSpeed as _v1299 } from "../../calc-mechanic.js";
+test("bounds: spec-v1299 computeUniversalJointSpeed pins the Cardan output range, the fluctuation growth with angle, the symmetry, and error seams", () => {
+  // 10 deg, 1000 rpm: max 1015.4, min 984.8, fluctuation 3.06%.
+  const r = _v1299({ joint_angle_deg: 10, input_speed_rpm: 1000 });
+  assert.ok(Math.abs(r.max_output_rpm - 1015.4) < 0.2 && Math.abs(r.min_output_rpm - 984.8) < 0.2);
+  assert.ok(Math.abs(r.fluctuation_pct - 3.06) < 0.05);
+  // The velocity ratio limits are reciprocals (1/cos and cos), so max*min output = input^2.
+  assert.ok(Math.abs(r.max_output_rpm * r.min_output_rpm - 1000 * 1000) < 1e-3);
+  assert.ok(Math.abs(r.velocity_ratio_max * r.velocity_ratio_min - 1) < 1e-9);
+  // Fluctuation grows fast with angle: 30 deg is ~29%, far above the 10 deg value.
+  const steep = _v1299({ joint_angle_deg: 30, input_speed_rpm: 1000 });
+  assert.ok(Math.abs(steep.fluctuation_pct - 28.87) < 0.1 && steep.fluctuation_pct > 9 * r.fluctuation_pct);
+  // A tiny angle gives almost no fluctuation.
+  assert.ok(_v1299({ joint_angle_deg: 1, input_speed_rpm: 1000 }).fluctuation_pct < 0.05);
+  // Output range scales with input speed.
+  assert.ok(Math.abs(_v1299({ joint_angle_deg: 10, input_speed_rpm: 2000 }).max_output_rpm / r.max_output_rpm - 2) < 1e-9);
+  // Error seams: angle out of range (0 or >85), non-positive speed, non-finite.
+  assert.ok("error" in _v1299({ joint_angle_deg: 0, input_speed_rpm: 1000 }));
+  assert.ok("error" in _v1299({ joint_angle_deg: 90, input_speed_rpm: 1000 }));
+  assert.ok("error" in _v1299({ joint_angle_deg: 10, input_speed_rpm: 0 }));
+  assert.ok("error" in _v1299({ joint_angle_deg: Infinity, input_speed_rpm: 1000 }));
+});

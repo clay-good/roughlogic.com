@@ -3109,6 +3109,46 @@
    "kind": "question"
   },
   {
+   "term": "universal joint speed variation",
+   "target": "universal-joint-speed",
+   "kind": "industry"
+  },
+  {
+   "term": "cardan joint error",
+   "target": "universal-joint-speed",
+   "kind": "industry"
+  },
+  {
+   "term": "u-joint angle vibration",
+   "target": "universal-joint-speed",
+   "kind": "industry"
+  },
+  {
+   "term": "driveshaft angle speed fluctuation",
+   "target": "universal-joint-speed",
+   "kind": "adjacent"
+  },
+  {
+   "term": "hooke joint velocity",
+   "target": "universal-joint-speed",
+   "kind": "adjacent"
+  },
+  {
+   "term": "double cardan cancellation",
+   "target": "universal-joint-speed",
+   "kind": "adjacent"
+  },
+  {
+   "term": "why do u joints vibrate at angle",
+   "target": "universal-joint-speed",
+   "kind": "question"
+  },
+  {
+   "term": "max u joint working angle",
+   "target": "universal-joint-speed",
+   "kind": "question"
+  },
+  {
    "term": "hp torque rpm",
    "target": "hp-from-torque",
    "kind": "redirect"

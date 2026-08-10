@@ -11782,6 +11782,18 @@ export const CITATIONS = {
       { name: "Scope", value: "rate/torque/stress; coil tightening, end-arm bending, fatigue are separate", source: "scope of this tile" },
     ],
   },
+  "universal-joint-speed": {
+    formula: "max output = omega/cos(beta); min output = omega cos(beta); fluctuation = 1/cos(beta) - cos(beta) = sin(beta) tan(beta), twice per revolution.",
+    edition: "The Cardan (Hooke) universal-joint velocity relation, output speed ranging between omega cos(beta) and omega/cos(beta) (Machinery's Handbook; Shigley, Mechanical Engineering Design), by name.",
+    freeAccess: "The Cardan velocity relation is a standard published kinematics result; the joint angle and input speed are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Cardan (Hooke) universal-joint speed variation. A single U-joint at operating angle beta makes its output run ahead of and then behind the input twice per revolution: the output speed ranges between omega cos(beta) (slowest, at 90 and 270 degrees of input) and omega/cos(beta) (fastest, at 0 and 180 degrees), a peak-to-peak fluctuation of (1/cos(beta) - cos(beta)) = sin(beta) tan(beta) of the input speed. The swing grows fast with angle - about +/-1.5% at 10 degrees but nearly 29% peak-to-peak at 30 degrees - which is why U-joint working angles are held to a few degrees. A second joint phased 90 degrees at an equal angle (a double-Cardan or a matched two-joint shaft) reverses the error so the far output turns uniformly again. The induced torque pulsation and inertial (secondary) shaking couple, the cancellation math for a specific double-Cardan geometry, and true constant-velocity (CV) joints are separate. Match and phase the joints on a real shaft. A design aid; Machinery's Handbook / Shigley and the driveline maker govern.",
+    assumptions: [
+      { name: "Velocity relation", value: "output between omega cos(beta) and omega/cos(beta), twice per rev", source: "Cardan / Hooke" },
+      { name: "Fluctuation", value: "1/cos(beta) - cos(beta) = sin(beta) tan(beta), grows fast with angle", source: "kinematics" },
+      { name: "Scope", value: "single-joint kinematics; torque pulsation, double-Cardan cancellation, CV joints are separate", source: "scope of this tile" },
+    ],
+  },
   "gear-identification": {
     formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
     edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",
