@@ -1303,6 +1303,7 @@ export const RENDERER_MAP = {
   "fatigue-safety-factor": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "endurance-limit-marin": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "power-screw-torque": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
+  "disk-clutch-torque": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "countersink-depth": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "countersink-diameter-from-depth": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "keyseat-key-size": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },

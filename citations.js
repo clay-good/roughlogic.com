@@ -11022,6 +11022,18 @@ export const CITATIONS = {
       { name: "Scope", value: "single screw; buckling, thread stress, and wear are separate; half-angle taken directly", source: "scope of this tile" },
     ],
   },
+  "disk-clutch-torque": {
+    formula: "Uniform wear: T = F mu N (ro + ri)/2. Uniform pressure: T = (2/3) F mu N (ro^3 - ri^3)/(ro^2 - ri^2). Max pressure (uniform wear): p_max = F/(2 pi ri (ro - ri)). N = friction interfaces (single plate = 2).",
+    edition: "The disk-clutch friction torque under the uniform-wear and uniform-pressure assumptions (Shigley, Mechanical Engineering Design, Ch. 16 -- clutches and brakes), by name.",
+    freeAccess: "The clutch-torque equations are standard published machine-design results; the clamp force, friction coefficient, radii, and surface count are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The friction torque a disk clutch or plate (disk) brake can transmit before slipping, from the axial clamp force F, facing friction mu, outer/inner friction radii ro/ri, and the number of friction interfaces N (a single-plate clutch clamps both faces, N = 2). Uniform WEAR T = F mu N (ro + ri)/2 is the design standard: a facing wears fastest where pressure x velocity is highest, so p x r drives to a constant and the pressure peaks at the inner radius, p_max = F/(2 pi ri (ro - ri)); this gives the lower, conservative torque. Uniform PRESSURE T = (2/3) F mu N (ro^3 - ri^3)/(ro^2 - ri^2) applies to a fresh, rigid facing and runs a little higher. The two converge as the friction ring narrows. The actuating force F is an input (spring or hydraulic cylinder); heat and energy of engagement, facing wear life, cone and band brakes, and self-energizing effects are separate. A design aid; Shigley and the facing maker govern.",
+    assumptions: [
+      { name: "Uniform wear", value: "T = F mu N (ro + ri)/2, the conservative design value; p max at ri", source: "Shigley Ch. 16" },
+      { name: "Uniform pressure", value: "T = (2/3) F mu N (ro^3 - ri^3)/(ro^2 - ri^2), fresh rigid facing", source: "Shigley Ch. 16" },
+      { name: "Scope", value: "static torque from F; heat, wear life, band/cone brakes are separate", source: "scope of this tile" },
+    ],
+  },
   "bolt-proof-load": {
     formula: "At = 0.7854 x (D - 0.9743/n)^2; proof_load = At x proof_strength; yield_load = At x yield_strength; tensile_load = At x tensile_strength; rec_clamp = 0.75 x proof_load.",
     edition: "The SAE J429 inch-series bolt strength model (tensile stress area x grade strength), with the ASME B1.1 tensile stress area, by name; the joint design, torque method, and preload requirement govern.",

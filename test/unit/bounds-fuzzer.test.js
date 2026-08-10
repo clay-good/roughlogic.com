@@ -37695,3 +37695,27 @@ test("bounds: spec-v1288 computePowerScrewTorque pins the raise/lower torque, ef
   assert.ok("error" in _v1288({ axial_load_lbf: 1000, mean_diameter_in: 0.05, lead_in: 5.0, thread_friction: 0.9, collar_friction: 0.0, collar_diameter_in: 0.0, thread_form: "acme" }));
   assert.ok("error" in _v1288({ axial_load_lbf: Infinity, mean_diameter_in: 1.0, lead_in: 0.2, thread_friction: 0.15, collar_friction: 0.15, collar_diameter_in: 1.5, thread_form: "acme" }));
 });
+
+import { computeDiskClutchTorque as _v1289 } from "../../calc-machining.js";
+test("bounds: spec-v1289 computeDiskClutchTorque pins the uniform-wear and uniform-pressure torques, the max pressure, the N-surface scaling, and error seams", () => {
+  // 1000 lbf, mu 0.3, ro 3, ri 2, N 1: wear 750, pressure 760 in-lbf, p_max 79.6 psi.
+  const r = _v1289({ clamp_force_lbf: 1000, friction_coefficient: 0.3, outer_radius_in: 3, inner_radius_in: 2, friction_surfaces: 1 });
+  assert.ok(Math.abs(r.uniform_wear_torque_in_lbf - 750) < 0.5);
+  assert.ok(Math.abs(r.uniform_pressure_torque_in_lbf - 760) < 0.5);
+  assert.ok(Math.abs(r.max_pressure_psi - 79.6) < 0.2);
+  // Uniform wear is the conservative (lower) design value.
+  assert.ok(r.uniform_wear_torque_in_lbf < r.uniform_pressure_torque_in_lbf);
+  // A single-plate clutch (both faces, N = 2) exactly doubles the torque.
+  const two = _v1289({ clamp_force_lbf: 1000, friction_coefficient: 0.3, outer_radius_in: 3, inner_radius_in: 2, friction_surfaces: 2 });
+  assert.ok(Math.abs(two.uniform_wear_torque_in_lbf - 1500) < 1e-6);
+  // As the friction ring narrows the two models converge.
+  const thin = _v1289({ clamp_force_lbf: 1000, friction_coefficient: 0.3, outer_radius_in: 3, inner_radius_in: 2.9, friction_surfaces: 1 });
+  assert.ok(Math.abs(thin.uniform_wear_torque_in_lbf - thin.uniform_pressure_torque_in_lbf) < 1.0);
+  // Error seams: non-positive force/friction/radius, inner >= outer, N < 1, non-finite.
+  assert.ok("error" in _v1289({ clamp_force_lbf: 0, friction_coefficient: 0.3, outer_radius_in: 3, inner_radius_in: 2, friction_surfaces: 1 }));
+  assert.ok("error" in _v1289({ clamp_force_lbf: 1000, friction_coefficient: 0, outer_radius_in: 3, inner_radius_in: 2, friction_surfaces: 1 }));
+  assert.ok("error" in _v1289({ clamp_force_lbf: 1000, friction_coefficient: 0.3, outer_radius_in: 2, inner_radius_in: 2, friction_surfaces: 1 }));
+  assert.ok("error" in _v1289({ clamp_force_lbf: 1000, friction_coefficient: 0.3, outer_radius_in: 3, inner_radius_in: 3.5, friction_surfaces: 1 }));
+  assert.ok("error" in _v1289({ clamp_force_lbf: 1000, friction_coefficient: 0.3, outer_radius_in: 3, inner_radius_in: 2, friction_surfaces: 0 }));
+  assert.ok("error" in _v1289({ clamp_force_lbf: Infinity, friction_coefficient: 0.3, outer_radius_in: 3, inner_radius_in: 2, friction_surfaces: 1 }));
+});

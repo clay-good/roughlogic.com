@@ -86911,6 +86911,66 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "disk-clutch-torque",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Single friction face, uniform wear vs pressure",
+   "source_edition_or_year": "Shigley Ch.16",
+   "source_section_or_page": "disk clutch torque",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "clamp_force_lbf": 1000,
+    "friction_coefficient": 0.3,
+    "outer_radius_in": 3,
+    "inner_radius_in": 2,
+    "friction_surfaces": 1
+   },
+   "outputs": {
+    "uniform_wear_torque_in_lbf": {
+     "value": 750,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "uniform_pressure_torque_in_lbf": {
+     "value": 760,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_pressure_psi": {
+     "value": 79.6,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "disk-clutch-torque",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Single-plate clutch clamps both faces (N=2)",
+   "source_edition_or_year": "Shigley Ch.16",
+   "source_section_or_page": "disk clutch torque",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "clamp_force_lbf": 1000,
+    "friction_coefficient": 0.3,
+    "outer_radius_in": 3,
+    "inner_radius_in": 2,
+    "friction_surfaces": 2
+   },
+   "outputs": {
+    "uniform_wear_torque_in_lbf": {
+     "value": 1500,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

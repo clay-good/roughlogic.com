@@ -1153,6 +1153,62 @@ function renderPowerScrewTorque(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["power-screw-torque"] = renderPowerScrewTorque;
 
+// ===================== spec-v1289: disk clutch / brake friction torque (Shigley Ch. 16) =====================
+// The power-transmission bench has belts, gears, and the power screw but nothing for the friction torque a disk
+// clutch or plate brake transmits from its clamping force. Standard Shigley Ch. 16, both models:
+//   Uniform wear:     T = F mu N (ro + ri)/2          (p max at inner radius; the conservative design value)
+//   Uniform pressure: T = (2/3) F mu N (ro^3 - ri^3)/(ro^2 - ri^2)
+//   Max contact pressure (uniform wear): p_max = F/(2 pi ri (ro - ri))
+// dims: in { clamp_force_lbf: M L T^-2, friction_coefficient: dimensionless, outer_radius_in: L, inner_radius_in: L, friction_surfaces: dimensionless } out: { uniform_wear_torque_in_lbf: M L^2 T^-2, uniform_pressure_torque_in_lbf: M L^2 T^-2, max_pressure_psi: M L^-1 T^-2 }
+export function computeDiskClutchTorque({ clamp_force_lbf = 0, friction_coefficient = 0.3, outer_radius_in = 0, inner_radius_in = 0, friction_surfaces = 1 } = {}) {
+  const _g = _finiteGuard({ clamp_force_lbf, friction_coefficient, outer_radius_in, inner_radius_in, friction_surfaces }); if (_g) return _g;
+  const F = Number(clamp_force_lbf) || 0;
+  const mu = Number(friction_coefficient) || 0;
+  const ro = Number(outer_radius_in) || 0;
+  const ri = Number(inner_radius_in) || 0;
+  const N = Number(friction_surfaces) || 0;
+  if (!(F > 0)) return { error: "Clamp force F must be positive (lbf)." };
+  if (!(mu > 0)) return { error: "Friction coefficient must be positive." };
+  if (!(ro > 0)) return { error: "Outer radius ro must be positive (in)." };
+  if (!(ri > 0)) return { error: "Inner radius ri must be positive (in)." };
+  if (!(ri < ro)) return { error: "Inner radius must be less than the outer radius (in)." };
+  if (!(N >= 1)) return { error: "Number of friction surfaces must be at least 1." };
+  const uniform_wear_torque_in_lbf = F * mu * N * (ro + ri) / 2;
+  const uniform_pressure_torque_in_lbf = (2 / 3) * F * mu * N * (Math.pow(ro, 3) - Math.pow(ri, 3)) / (Math.pow(ro, 2) - Math.pow(ri, 2));
+  const max_pressure_psi = F / (2 * Math.PI * ri * (ro - ri));
+  if (![uniform_wear_torque_in_lbf, uniform_pressure_torque_in_lbf, max_pressure_psi].every(Number.isFinite) || !(uniform_wear_torque_in_lbf > 0)) return { error: "Clutch-torque math is not a finite value; check the inputs." };
+  return {
+    uniform_wear_torque_in_lbf, uniform_pressure_torque_in_lbf, max_pressure_psi, friction_surfaces: N,
+    note: "The friction torque a disk clutch or plate (disk) brake can transmit before slipping, from the axial clamp force F, facing friction mu, outer/inner friction radii ro/ri, and the number of friction interfaces N (a single-plate clutch clamps both faces, N = 2). Uniform WEAR T = F mu N (ro + ri)/2 is the design standard: a facing wears fastest where pressure x velocity is highest, so p x r drives to a constant and the pressure peaks at the inner radius, p_max = F/(2 pi ri (ro - ri)); this gives the lower, conservative torque. Uniform PRESSURE T = (2/3) F mu N (ro^3 - ri^3)/(ro^2 - ri^2) applies to a fresh, rigid facing and runs a little higher. The two converge as the friction ring narrows. The actuating force F is an input (spring or hydraulic cylinder); heat and energy of engagement, facing wear life, cone and band brakes, and self-energizing effects are separate. A design aid; Shigley and the facing maker govern.",
+  };
+}
+export const diskClutchTorqueExample = { inputs: { clamp_force_lbf: 1000, friction_coefficient: 0.3, outer_radius_in: 3, inner_radius_in: 2, friction_surfaces: 1 } };
+function renderDiskClutchTorque(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: disk-clutch friction torque (Shigley, Mechanical Engineering Design, Ch. 16): uniform wear T = F mu N (ro + ri)/2 (p max at the inner radius, the design value), uniform pressure T = (2/3) F mu N (ro^3 - ri^3)/(ro^2 - ri^2), and max contact pressure p_max = F/(2 pi ri (ro - ri)). N is the number of friction interfaces. A design aid; Shigley and the facing maker govern.";
+  const F = makeNumber("Axial clamp force F (lbf)", "dct-f", { step: "any", min: "0" }); F.input.value = "1000";
+  const mu = makeNumber("Friction coefficient", "dct-mu", { step: "any", min: "0" }); mu.input.value = "0.3";
+  const ro = makeNumber("Outer friction radius ro (in)", "dct-ro", { step: "any", min: "0" }); ro.input.value = "3";
+  const ri = makeNumber("Inner friction radius ri (in)", "dct-ri", { step: "any", min: "0" }); ri.input.value = "2";
+  const N = makeNumber("Friction surfaces N (single plate = 2)", "dct-n", { step: "1", min: "1" }); N.input.value = "1";
+  for (const f of [F, mu, ro, ri, N]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { F.input.value = "1000"; mu.input.value = "0.3"; ro.input.value = "3"; ri.input.value = "2"; N.input.value = "1"; update(); });
+  const oW = makeOutputLine(outputRegion, "Torque (uniform wear, design)", "dct-out-w");
+  const oP = makeOutputLine(outputRegion, "Torque (uniform pressure)", "dct-out-p");
+  const oPr = makeOutputLine(outputRegion, "Max contact pressure", "dct-out-pr");
+  const oNote = makeOutputLine(outputRegion, "Note", "dct-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeDiskClutchTorque({ clamp_force_lbf: readNum(F.input), friction_coefficient: readNum(mu.input), outer_radius_in: readNum(ro.input), inner_radius_in: readNum(ri.input), friction_surfaces: readNum(N.input) });
+    if (r.error) { oW.textContent = r.error; oP.textContent = "-"; oPr.textContent = "-"; oNote.textContent = ""; return; }
+    oW.textContent = fmt(r.uniform_wear_torque_in_lbf, 1) + " in-lbf (" + fmt(r.uniform_wear_torque_in_lbf / 12, 1) + " ft-lbf)";
+    oP.textContent = fmt(r.uniform_pressure_torque_in_lbf, 1) + " in-lbf";
+    oPr.textContent = fmt(r.max_pressure_psi, 1) + " psi (at the inner radius)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [F, mu, ro, ri, N]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["disk-clutch-torque"] = renderDiskClutchTorque;
+
 // ===================== spec-v509: countersink diameter and cutting depth =====================
 // dims: in { countersink_dia_in: L, included_angle_deg: dimensionless, pilot_hole_dia_in: L } out: { z_in: L, z_full_in: L }
 export function computeCountersinkDepth({ countersink_dia_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}) {
