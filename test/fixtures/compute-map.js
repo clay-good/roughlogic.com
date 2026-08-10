@@ -172,6 +172,7 @@ export const COMPUTE_MAP = {
   "screw-conveyor": { module: "../../calc-mechanic.js", fn: "computeScrewConveyor" },
   "screw-conveyor-rpm": { module: "../../calc-mechanic.js", fn: "computeScrewConveyorRpm" },
   "helical-spring-rate": { module: "../../calc-mechanic.js", fn: "computeHelicalSpringRate" },
+  "spring-natural-frequency": { module: "../../calc-mechanic.js", fn: "computeSpringNaturalFrequency" },
   "spring-wire-stress": { module: "../../calc-mechanic.js", fn: "computeSpringWireStress" },
   "gear-tooth-bending-stress": { module: "../../calc-mechanic.js", fn: "computeGearToothBendingStress" },
   "gear-contact-stress": { module: "../../calc-mechanic.js", fn: "computeGearContactStress" },

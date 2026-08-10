@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1656,
-  "covered_count": 1205,
+  "total_tiles": 1657,
+  "covered_count": 1206,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -983,6 +983,7 @@
     "sprayer-field-capacity",
     "spreader-beam",
     "spreader-beam-min-height",
+    "spring-natural-frequency",
     "spring-wire-stress",
     "sprinkler-gpm-for-precip",
     "sprinkler-head-layout",

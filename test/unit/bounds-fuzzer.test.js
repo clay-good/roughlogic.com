@@ -37562,3 +37562,29 @@ test("bounds: spec-v1283 computeConcreteCrackedInertiaTee pins the flanged Icr, 
   assert.ok("error" in _v1283({ b_in: 48, hf_in: 4, bw_in: 12, d_in: 17.5, as_in2: 6.0, fc_psi: 0 }));
   assert.ok("error" in _v1283({ b_in: 48, hf_in: 4, bw_in: 12, d_in: 17.5, as_in2: Infinity, fc_psi: 4000 }));
 });
+
+import { computeSpringNaturalFrequency as _v1284 } from "../../calc-mechanic.js";
+import { computeHelicalSpringRate as _v1284sib } from "../../calc-mechanic.js";
+test("bounds: spec-v1284 computeSpringNaturalFrequency pins the surge frequency, the exact rate cross-pin to helical-spring-rate, material stiffness ordering, and error seams", () => {
+  // 0.080 in hard-drawn, 0.75 in coil, 8 active coils: fn 250 Hz, k 17.45 lb/in, W 0.0269 lb.
+  const r = _v1284({ wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, active_coils: 8, material: "hard-drawn" });
+  assert.ok(Math.abs(r.natural_frequency_hz - 250.3) < 0.5);
+  assert.ok(Math.abs(r.natural_frequency_cpm - r.natural_frequency_hz * 60) < 1e-6);
+  assert.ok(Math.abs(r.active_weight_lb - 0.02691) < 1e-4);
+  // The rate matches helical-spring-rate EXACTLY for the same wire (shared k = G d^4/(8 D^3 Na)).
+  const rate = _v1284sib({ wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, active_coils: 8, material: "hard-drawn" });
+  assert.ok(Math.abs(r.spring_rate_lb_in - rate.spring_rate_lb_in) < 1e-9);
+  // Music wire is stiffer (higher G) so surges higher; phosphor bronze (softer, denser) surges lower.
+  const music = _v1284({ wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, active_coils: 8, material: "music-wire" });
+  const bronze = _v1284({ wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, active_coils: 8, material: "phosphor-bronze" });
+  assert.ok(music.natural_frequency_hz > r.natural_frequency_hz && r.natural_frequency_hz > bronze.natural_frequency_hz);
+  assert.ok(Math.abs(music.natural_frequency_hz - 254.0) < 0.6 && Math.abs(bronze.natural_frequency_hz - 170.3) < 0.6);
+  // More active coils lowers both the rate and the surge frequency (softer, heavier active mass).
+  assert.ok(_v1284({ wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, active_coils: 16, material: "hard-drawn" }).natural_frequency_hz < r.natural_frequency_hz);
+  // Error seams: unknown material, non-positive wire, coil not larger than wire, non-positive coils, non-finite.
+  assert.ok("error" in _v1284({ wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, active_coils: 8, material: "titanium" }));
+  assert.ok("error" in _v1284({ wire_diameter_in: 0, mean_coil_diameter_in: 0.75, active_coils: 8, material: "hard-drawn" }));
+  assert.ok("error" in _v1284({ wire_diameter_in: 0.80, mean_coil_diameter_in: 0.75, active_coils: 8, material: "hard-drawn" }));
+  assert.ok("error" in _v1284({ wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, active_coils: 0, material: "hard-drawn" }));
+  assert.ok("error" in _v1284({ wire_diameter_in: Infinity, mean_coil_diameter_in: 0.75, active_coils: 8, material: "hard-drawn" }));
+});

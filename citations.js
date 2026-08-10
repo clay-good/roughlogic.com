@@ -3436,6 +3436,19 @@ export const CITATIONS = {
     ],
   },
 
+  "spring-natural-frequency": {
+    formula: "fn = (1/2) sqrt(k g / W); k = G d^4/(8 D^3 Na); W = pi^2 d^2 D Na gamma / 4; g = 386.4 in/s^2. gamma by material: steel 0.284, stainless 0.286, phosphor bronze 0.320 lb/in^3. Higher modes are integer multiples of fn.",
+    edition: "The fundamental surge frequency of a helical compression spring held between flat parallel plates, per Shigley's Mechanical Engineering Design and Machinery's Handbook, by name; the rate k is identical to the helical-spring-rate tile and the wire weight density gamma is a published material constant.",
+    freeAccess: "The surge-frequency formula is a public machine-design result; the rate and the per-material weight density are published constants. Wire and coil dimensions and material are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The fundamental natural (surge) frequency of a round-wire helical compression spring held between flat parallel plates: fn = (1/2) sqrt(k g / W), with the rate k = G d^4/(8 D^3 Na) (identical to the helical-spring-rate tile) and the weight of the ACTIVE coils W = pi^2 d^2 D Na gamma / 4, gamma the wire weight density (steel 0.284, stainless 0.286, phosphor bronze 0.320 lb/in^3) and g = 386.4 in/s^2. The higher surge modes are integer multiples 2 fn, 3 fn... A spring cycled near fn surges: the coils bunch into a travelling wave, the working force spikes, and the spring can float off the cam or fatigue. For a valve spring keep fn well above the valvetrain forcing harmonics (a common target is fn at least 13-20 times the highest significant cam-acceleration harmonic). Damping, variable-pitch or conical springs, preload, and the actual harmonic content are not modeled. A screen; Machinery's Handbook / Shigley and the spring maker govern.",
+    assumptions: [
+      { name: "Surge frequency", value: "fn = (1/2) sqrt(k g / W), both ends against flat parallel plates", source: "Shigley / Machinery's Handbook" },
+      { name: "Active-coil weight", value: "W = pi^2 d^2 D Na gamma / 4, gamma the wire weight density", source: "geometry + material density" },
+      { name: "Rate cross-pin", value: "k = G d^4/(8 D^3 Na), identical to helical-spring-rate", source: "Machinery's Handbook / Shigley" },
+    ],
+  },
+
   "spring-wire-stress": {
     formula: "C = D/d; Kw = (4C - 1)/(4C - 4) + 0.615/C; tau_uncorrected = 8 F D / (pi d^3); tau = Kw x tau_uncorrected; Ls = Nt d (ground ends) or (Nt + 1) d (unground); travel = L0 - Ls; slenderness = L0/D, stable under 5.26 for squared-and-ground ends on parallel flat plates.",
     edition: "The standard round-wire helical-compression-spring wire shear stress with the Wahl correction factor, the Shigley end-condition solid-height table, and the absolute-stability slenderness limit, per Machinery's Handbook and Shigley's Mechanical Engineering Design, by name.",

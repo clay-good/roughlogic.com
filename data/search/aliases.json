@@ -2589,6 +2589,46 @@
    "kind": "industry"
   },
   {
+   "term": "spring natural frequency",
+   "target": "spring-natural-frequency",
+   "kind": "industry"
+  },
+  {
+   "term": "spring surge frequency",
+   "target": "spring-natural-frequency",
+   "kind": "industry"
+  },
+  {
+   "term": "valve spring surge",
+   "target": "spring-natural-frequency",
+   "kind": "industry"
+  },
+  {
+   "term": "spring resonance frequency",
+   "target": "spring-natural-frequency",
+   "kind": "industry"
+  },
+  {
+   "term": "coil spring natural frequency",
+   "target": "spring-natural-frequency",
+   "kind": "adjacent"
+  },
+  {
+   "term": "spring float rpm",
+   "target": "spring-natural-frequency",
+   "kind": "adjacent"
+  },
+  {
+   "term": "will my valve spring surge",
+   "target": "spring-natural-frequency",
+   "kind": "question"
+  },
+  {
+   "term": "what rpm does a spring resonate",
+   "target": "spring-natural-frequency",
+   "kind": "question"
+  },
+  {
    "term": "wahl factor",
    "target": "spring-wire-stress",
    "kind": "industry"

@@ -1222,6 +1222,7 @@ export const RENDERER_MAP = {
   "screw-conveyor": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "screw-conveyor-rpm": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "helical-spring-rate": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
+  "spring-natural-frequency": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "spring-wire-stress": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "gear-tooth-bending-stress": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "gear-dynamic-tooth-stress": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },

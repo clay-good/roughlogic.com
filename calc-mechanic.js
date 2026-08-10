@@ -847,11 +847,12 @@ MECHANIC_RENDERERS["screw-conveyor-rpm"] = _simpleRenderer({
 // Rate k = G d^4 / (8 D^3 Na), G the wire shear modulus, d the wire diameter,
 // D the mean coil diameter, Na the number of ACTIVE coils. Spring index D/d.
 export const SPRING_MATERIALS = {
-  "music-wire": { label: "Music wire (ASTM A228)", G_psi: 11850000 },
-  "hard-drawn": { label: "Hard-drawn steel (ASTM A227)", G_psi: 11500000 },
-  "chrome-silicon": { label: "Chrome-silicon (ASTM A401)", G_psi: 11200000 },
-  "stainless-302": { label: "Stainless 302/304 (ASTM A313)", G_psi: 10000000 },
-  "phosphor-bronze": { label: "Phosphor bronze (ASTM B159)", G_psi: 6000000 },
+  // gamma_lb_in3 = wire weight density (spec-v1284, used by the surge-frequency tile; the rate tile reads only G_psi)
+  "music-wire": { label: "Music wire (ASTM A228)", G_psi: 11850000, gamma_lb_in3: 0.284 },
+  "hard-drawn": { label: "Hard-drawn steel (ASTM A227)", G_psi: 11500000, gamma_lb_in3: 0.284 },
+  "chrome-silicon": { label: "Chrome-silicon (ASTM A401)", G_psi: 11200000, gamma_lb_in3: 0.284 },
+  "stainless-302": { label: "Stainless 302/304 (ASTM A313)", G_psi: 10000000, gamma_lb_in3: 0.286 },
+  "phosphor-bronze": { label: "Phosphor bronze (ASTM B159)", G_psi: 6000000, gamma_lb_in3: 0.320 },
 };
 
 // dims: in { wire_diameter_in: L, mean_coil_diameter_in: L, active_coils: dimensionless, material: dimensionless } out: { spring_rate_lb_in: M T^-2, spring_index: dimensionless, shear_modulus_psi: M L^-1 T^-2 }
@@ -894,6 +895,57 @@ MECHANIC_RENDERERS["helical-spring-rate"] = _simpleRenderer({
     { key: "n", id: "hsr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHelicalSpringRate,
+});
+
+// --- spec-v1284 K: helical spring natural (surge) frequency (`spring-natural-frequency`) ---
+// The fifth standard spring check the family leaves out: rate (helical-spring-rate) and Wahl
+// stress / solid height / buckling (spring-wire-stress) are built, but not the surge frequency.
+// A spring cycled near its resonance surges - the coils bunch in a travelling wave, the force
+// spikes, and the spring floats off the cam or fatigues. Shigley closed form for a spring held
+// between flat parallel plates: fn = (1/2) sqrt(k g / W), with the same rate k = G d^4/(8 D^3 Na)
+// as helical-spring-rate and the weight of the active coils W = pi^2 d^2 D Na gamma / 4
+// (gamma = wire weight density). The rate cross-pins exactly to the helical-spring-rate tile.
+// dims: in { wire_diameter_in: L, mean_coil_diameter_in: L, active_coils: dimensionless, material: dimensionless } out: { spring_rate_lb_in: M T^-2, active_weight_lb: M L T^-2, natural_frequency_hz: T^-1, natural_frequency_cpm: T^-1 }
+export function computeSpringNaturalFrequency({ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, material = "music-wire" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const d = Number(wire_diameter_in) || 0;
+  const D = Number(mean_coil_diameter_in) || 0;
+  const Na = Number(active_coils) || 0;
+  const m = SPRING_MATERIALS[material];
+  if (!m) return { error: "Unknown spring material." };
+  if (!(d > 0)) return { error: "Wire diameter must be positive (in)." };
+  if (!(D > d)) return { error: "Mean coil diameter must be greater than the wire diameter (in)." };
+  if (!(Na > 0)) return { error: "Active coils must be positive." };
+  const G = m.G_psi;
+  const gamma = m.gamma_lb_in3;
+  const g = 386.4; // in/s^2
+  const spring_rate_lb_in = (G * Math.pow(d, 4)) / (8 * Math.pow(D, 3) * Na);
+  const active_weight_lb = (Math.PI * Math.PI * d * d * D * Na * gamma) / 4;
+  const natural_frequency_hz = 0.5 * Math.sqrt((spring_rate_lb_in * g) / active_weight_lb);
+  const natural_frequency_cpm = natural_frequency_hz * 60;
+  const spring_index = D / d;
+  return {
+    spring_rate_lb_in, active_weight_lb, natural_frequency_hz, natural_frequency_cpm, spring_index,
+    note: "Fundamental natural (surge) frequency of a helical compression spring held between flat parallel plates, fn = (1/2) sqrt(k g / W), with the rate k = G d^4/(8 D^3 Na) (identical to helical-spring-rate) and the weight of the ACTIVE coils W = pi^2 d^2 D Na gamma / 4, gamma the wire weight density (steel 0.284, stainless 0.286, phosphor bronze 0.320 lb/in^3) and g = 386.4 in/s^2. The higher surge modes are integer multiples 2 fn, 3 fn... A spring cycled near fn surges: the coils bunch into a travelling wave, the working force spikes, and the spring can float off the cam or fatigue. For a valve spring keep fn well above the valvetrain forcing harmonics - a common target is fn at least 13-20 times the highest significant cam-acceleration harmonic. Damping, variable-pitch/conical springs, preload, and the actual harmonic content are not modeled. A screen; Machinery's Handbook / Shigley and the spring maker govern.",
+  };
+}
+export const springNaturalFrequencyExample = { inputs: { wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, active_coils: 8, material: "hard-drawn" } };
+MECHANIC_RENDERERS["spring-natural-frequency"] = _simpleRenderer({
+  citation: "Citation: helical spring fundamental surge frequency fn = (1/2) sqrt(k g / W) for a spring between flat parallel plates (Shigley, Mechanical Engineering Design; Machinery's Handbook), with the rate k = G d^4/(8 D^3 Na) and the active-coil weight W = pi^2 d^2 D Na gamma / 4, gamma the wire weight density by material and g = 386.4 in/s^2. The rate is identical to the helical-spring-rate tile. Higher modes are integer multiples. A screen; the spring maker governs.",
+  example: springNaturalFrequencyExample.inputs,
+  fields: [
+    { key: "wire_diameter_in", label: "Wire diameter d (in)", kind: "number" },
+    { key: "mean_coil_diameter_in", label: "Mean coil diameter D = OD - d (in)", kind: "number" },
+    { key: "active_coils", label: "Active coils Na", kind: "number" },
+    { key: "material", label: "Wire material", kind: "select", default: "music-wire", options: Object.keys(SPRING_MATERIALS).map((k) => ({ value: k, label: SPRING_MATERIALS[k].label })) },
+  ],
+  outputs: [
+    { key: "fn", id: "snf-out-fn", label: "Surge frequency fn", value: (r) => fmt(r.natural_frequency_hz, 0) + " Hz (" + fmt(r.natural_frequency_cpm, 0) + " cycles/min)" },
+    { key: "k", id: "snf-out-k", label: "Spring rate", value: (r) => fmt(r.spring_rate_lb_in, 2) + " lb/in (matches helical-spring-rate)" },
+    { key: "w", id: "snf-out-w", label: "Active-coil weight W", value: (r) => fmt(r.active_weight_lb, 4) + " lb (spring index D/d = " + fmt(r.spring_index, 2) + ")" },
+    { key: "n", id: "snf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSpringNaturalFrequency,
 });
 
 // dims: in { wire_diameter_in: L, mean_coil_diameter_in: L, force_lb: M L T^-2, total_coils: dimensionless, free_length_in: L, end_type: dimensionless } out: { spring_index: dimensionless, wahl_factor: dimensionless, tau_uncorrected_psi: M L^-1 T^-2, tau_psi: M L^-1 T^-2, solid_height_in: L, max_deflection_in: L, slenderness: dimensionless }

@@ -946,7 +946,7 @@ const TOOL_MODULES = (() => {
     "tire-contact-patch",
     // v23
     "valve-flow-coefficient", "screw-conveyor", "screw-conveyor-rpm",
-    "helical-spring-rate",
+    "helical-spring-rate", "spring-natural-frequency",
     // spec-v1010 Wahl wire stress + solid height + buckling
     "spring-wire-stress",
     "gear-tooth-bending-stress", "gear-dynamic-tooth-stress", "gear-contact-stress",

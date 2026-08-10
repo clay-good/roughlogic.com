@@ -86615,6 +86615,64 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "spring-natural-frequency",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Hard-drawn valve-spring surge frequency",
+   "source_edition_or_year": "Shigley / Machinery Handbook",
+   "source_section_or_page": "fn = (1/2) sqrt(k g / W)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "wire_diameter_in": 0.08,
+    "mean_coil_diameter_in": 0.75,
+    "active_coils": 8,
+    "material": "hard-drawn"
+   },
+   "outputs": {
+    "natural_frequency_hz": {
+     "value": 250.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "spring_rate_lb_in": {
+     "value": 17.45,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spring-natural-frequency",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Music wire, same geometry (stiffer -> higher fn)",
+   "source_edition_or_year": "Shigley / Machinery Handbook",
+   "source_section_or_page": "fn = (1/2) sqrt(k g / W)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "wire_diameter_in": 0.08,
+    "mean_coil_diameter_in": 0.75,
+    "active_coils": 8,
+    "material": "music-wire"
+   },
+   "outputs": {
+    "natural_frequency_hz": {
+     "value": 254.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "spring_rate_lb_in": {
+     "value": 17.98,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

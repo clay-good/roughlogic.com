@@ -383,7 +383,7 @@ const _TILES = [
   ["wall-bracing-length", "E"], ["deck-ledger-fasteners", "E"],
   ["cargo-securement-wll", "J"], ["fuel-tax-ifta", "J"],
   ["screw-conveyor", "K"], ["screw-conveyor-rpm", "K"],
-  ["helical-spring-rate", "K"],
+  ["helical-spring-rate", "K"], ["spring-natural-frequency", "K"],
   // spec-v1010 spring wire stress (Wahl), solid height, buckling screen
   ["spring-wire-stress", "K"],
   ["gear-tooth-bending-stress", "K"], ["gear-dynamic-tooth-stress", "K"], ["gear-contact-stress", "K"],
