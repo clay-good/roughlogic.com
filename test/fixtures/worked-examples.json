@@ -87149,6 +87149,70 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "planetary-gear-ratio",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Ring fixed, sun to carrier reduction",
+   "source_edition_or_year": "Machinery Handbook / Shigley",
+   "source_section_or_page": "Willis epicyclic ratio",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "sun_teeth": 30,
+    "ring_teeth": 72,
+    "input_speed_rpm": 3400,
+    "configuration": "ring-fixed-sun-carrier"
+   },
+   "outputs": {
+    "gear_ratio": {
+     "value": 3.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "output_speed_rpm": {
+     "value": 1000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "planet_teeth": {
+     "value": 21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "planetary-gear-ratio",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Carrier fixed, sun to ring reversal",
+   "source_edition_or_year": "Machinery Handbook / Shigley",
+   "source_section_or_page": "Willis epicyclic ratio",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "sun_teeth": 30,
+    "ring_teeth": 72,
+    "input_speed_rpm": 3400,
+    "configuration": "carrier-fixed-sun-ring"
+   },
+   "outputs": {
+    "gear_ratio": {
+     "value": -2.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "output_speed_rpm": {
+     "value": -1416.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

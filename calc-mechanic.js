@@ -1254,6 +1254,62 @@ MECHANIC_RENDERERS["vehicle-road-load-power"] = _simpleRenderer({
   compute: computeVehicleRoadLoadPower,
 });
 
+// --- spec-v1293 K: planetary (epicyclic) gear ratio (`planetary-gear-ratio`) ---
+// gear-cascade handles a fixed-axis train (stage ratios multiply); a planetary set (sun, planets,
+// ring, carrier) does not, because two members move and the ratio depends on which is held. Willis
+// (superposition) ratios for the six standard single-stage configurations, R0 = Nr/Ns.
+const PLANETARY_CONFIGS = {
+  "ring-fixed-sun-carrier": { label: "Ring fixed, sun in -> carrier out (reduction)", ratio: (R0) => 1 + R0 },
+  "sun-fixed-ring-carrier": { label: "Sun fixed, ring in -> carrier out (reduction)", ratio: (R0) => (R0 + 1) / R0 },
+  "ring-fixed-carrier-sun": { label: "Ring fixed, carrier in -> sun out (overdrive)", ratio: (R0) => 1 / (1 + R0) },
+  "sun-fixed-carrier-ring": { label: "Sun fixed, carrier in -> ring out (overdrive)", ratio: (R0) => R0 / (1 + R0) },
+  "carrier-fixed-sun-ring": { label: "Carrier fixed, sun in -> ring out (reversal)", ratio: (R0) => -R0 },
+  "carrier-fixed-ring-sun": { label: "Carrier fixed, ring in -> sun out (reversal)", ratio: (R0) => -1 / R0 },
+};
+// dims: in { sun_teeth: dimensionless, ring_teeth: dimensionless, input_speed_rpm: T^-1, configuration: dimensionless } out: { gear_ratio: dimensionless, output_speed_rpm: T^-1, planet_teeth: dimensionless }
+export function computePlanetaryGearRatio({ sun_teeth = 0, ring_teeth = 0, input_speed_rpm = 0, configuration = "ring-fixed-sun-carrier" } = {}) {
+  const _g = _finiteGuard({ sun_teeth, ring_teeth, input_speed_rpm }); if (_g) return _g;
+  const Ns = Number(sun_teeth) || 0;
+  const Nr = Number(ring_teeth) || 0;
+  const nin = Number(input_speed_rpm) || 0;
+  const cfg = PLANETARY_CONFIGS[configuration];
+  if (!(Ns > 0)) return { error: "Sun teeth must be positive." };
+  if (!(Nr > 0)) return { error: "Ring teeth must be positive." };
+  if (!(Nr > Ns)) return { error: "Ring teeth must be greater than the sun teeth (Nr > Ns)." };
+  if (!(nin > 0)) return { error: "Input speed must be positive (rpm)." };
+  if (!cfg) return { error: "Unknown configuration." };
+  const R0 = Nr / Ns;
+  const gear_ratio = cfg.ratio(R0);
+  const output_speed_rpm = nin / gear_ratio;
+  const planet_teeth = (Nr - Ns) / 2;
+  const planet_integer = Number.isInteger(planet_teeth);
+  if (![gear_ratio, output_speed_rpm].every(Number.isFinite) || gear_ratio === 0) return { error: "Planetary math is not a finite value; check the inputs." };
+  const planet_flag = planet_integer ? null : "Ring minus sun is odd, so the planet teeth Np = (Nr - Ns)/2 is not an integer; a standard concentric set needs Nr - Ns even.";
+  return {
+    gear_ratio, output_speed_rpm, planet_teeth, basic_ratio_R0: R0, reversed: gear_ratio < 0, planet_flag,
+    note: "Single-stage planetary (epicyclic) gear ratio by the Willis superposition method, with the sun teeth Ns, ring teeth Nr, basic ratio R0 = Nr/Ns, and the planet teeth Np = (Nr - Ns)/2 from the concentric constraint Nr = Ns + 2 Np. The ratio (input speed / output speed) depends on which member is HELD: ring fixed with the sun driving the carrier gives 1 + R0 (reduction, same direction); a carrier-fixed set reverses (ratio -R0 with the sun driving the ring); driving the carrier gives an overdrive (ratio below 1). A negative ratio means the output turns opposite the input. Same gears, different held member, completely different drive - the thing a fixed-axis cascade (gear-cascade) cannot capture. Compound and multi-stage planetaries, torque split among the planets, efficiency, and the equal-spacing assembly constraint on the planet count are separate; tooth strength is the gear-stress tiles. A design aid; Machinery's Handbook / Shigley and the gear maker govern.",
+  };
+}
+export const planetaryGearRatioExample = { inputs: { sun_teeth: 30, ring_teeth: 72, input_speed_rpm: 3400, configuration: "ring-fixed-sun-carrier" } };
+
+MECHANIC_RENDERERS["planetary-gear-ratio"] = _simpleRenderer({
+  citation: "Citation: epicyclic (planetary) gear-train ratio by the Willis superposition method (Machinery's Handbook; Shigley, Mechanical Engineering Design), with R0 = Nr/Ns and the six standard held-member configurations; planet teeth Np = (Nr - Ns)/2 from Nr = Ns + 2 Np. A negative ratio reverses the output. A design aid; the gear maker governs.",
+  example: planetaryGearRatioExample.inputs,
+  fields: [
+    { key: "sun_teeth", label: "Sun teeth Ns", kind: "number" },
+    { key: "ring_teeth", label: "Ring teeth Nr", kind: "number" },
+    { key: "input_speed_rpm", label: "Input speed (rpm)", kind: "number" },
+    { key: "configuration", label: "Configuration (held member, in -> out)", kind: "select", default: "ring-fixed-sun-carrier", options: Object.keys(PLANETARY_CONFIGS).map((k) => ({ value: k, label: PLANETARY_CONFIGS[k].label })) },
+  ],
+  outputs: [
+    { key: "r", id: "pgr-out-r", label: "Overall gear ratio", value: (r) => fmt(r.gear_ratio, 4) + ":1" + (r.reversed ? " (output reversed)" : "") },
+    { key: "o", id: "pgr-out-o", label: "Output speed", value: (r) => fmt(r.output_speed_rpm, 1) + " rpm" + (r.reversed ? " (opposite direction)" : " (same direction)") },
+    { key: "p", id: "pgr-out-p", label: "Planet teeth Np", value: (r) => (r.planet_flag ? r.planet_flag : fmt(r.planet_teeth, 0) + " (Nr = Ns + 2 Np; R0 = " + fmt(r.basic_ratio_R0, 3) + ")") },
+    { key: "n", id: "pgr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePlanetaryGearRatio,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================

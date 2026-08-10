@@ -37796,3 +37796,26 @@ test("bounds: spec-v1292 computeVehicleRoadLoadPower pins the aero+rolling+grade
   assert.ok("error" in _v1292({ speed_mph: 70, vehicle_weight_lb: 3500, frontal_area_ft2: 24, drag_coefficient: 0.30, rolling_coefficient: -0.01, grade_pct: 0, air_density_lb_ft3: 0.0765 }));
   assert.ok("error" in _v1292({ speed_mph: Infinity, vehicle_weight_lb: 3500, frontal_area_ft2: 24, drag_coefficient: 0.30, rolling_coefficient: 0.012, grade_pct: 0, air_density_lb_ft3: 0.0765 }));
 });
+
+import { computePlanetaryGearRatio as _v1293 } from "../../calc-mechanic.js";
+test("bounds: spec-v1293 computePlanetaryGearRatio pins the Willis ratios, the held-member reversal, the planet-tooth constraint, and error seams", () => {
+  // Sun 30, ring 72, 3400 rpm, ring fixed sun->carrier: R0 2.4, ratio 3.4, out 1000 rpm, Np 21.
+  const r = _v1293({ sun_teeth: 30, ring_teeth: 72, input_speed_rpm: 3400, configuration: "ring-fixed-sun-carrier" });
+  assert.ok(Math.abs(r.gear_ratio - 3.4) < 1e-6 && Math.abs(r.output_speed_rpm - 1000) < 1e-6);
+  assert.ok(r.planet_teeth === 21 && Math.abs(r.basic_ratio_R0 - 2.4) < 1e-9 && r.reversed === false);
+  // Carrier fixed, sun -> ring reverses: ratio -R0 = -2.4, output negative.
+  const rev = _v1293({ sun_teeth: 30, ring_teeth: 72, input_speed_rpm: 3400, configuration: "carrier-fixed-sun-ring" });
+  assert.ok(Math.abs(rev.gear_ratio + 2.4) < 1e-6 && rev.reversed === true && rev.output_speed_rpm < 0);
+  // Driving the carrier is an overdrive (ratio below 1, output faster than input).
+  const od = _v1293({ sun_teeth: 30, ring_teeth: 72, input_speed_rpm: 3400, configuration: "ring-fixed-carrier-sun" });
+  assert.ok(od.gear_ratio < 1 && od.output_speed_rpm > 3400);
+  // An odd ring-minus-sun flags a non-integer planet count.
+  const odd = _v1293({ sun_teeth: 30, ring_teeth: 73, input_speed_rpm: 3400, configuration: "ring-fixed-sun-carrier" });
+  assert.ok(odd.planet_flag && odd.planet_flag.indexOf("even") >= 0);
+  // Error seams: non-positive sun/ring, ring not greater than sun, non-positive speed, unknown config, non-finite.
+  assert.ok("error" in _v1293({ sun_teeth: 0, ring_teeth: 72, input_speed_rpm: 3400, configuration: "ring-fixed-sun-carrier" }));
+  assert.ok("error" in _v1293({ sun_teeth: 72, ring_teeth: 72, input_speed_rpm: 3400, configuration: "ring-fixed-sun-carrier" }));
+  assert.ok("error" in _v1293({ sun_teeth: 30, ring_teeth: 72, input_speed_rpm: 0, configuration: "ring-fixed-sun-carrier" }));
+  assert.ok("error" in _v1293({ sun_teeth: 30, ring_teeth: 72, input_speed_rpm: 3400, configuration: "double-planet" }));
+  assert.ok("error" in _v1293({ sun_teeth: Infinity, ring_teeth: 72, input_speed_rpm: 3400, configuration: "ring-fixed-sun-carrier" }));
+});

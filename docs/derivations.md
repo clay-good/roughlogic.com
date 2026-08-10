@@ -2645,6 +2645,7 @@ cross-check.
 | calc-mechanic.js | `computeMaxRpmFromPistonSpeed` | `{ stroke_in = 0, mps_limit_fpm = 4000 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeMeanPistonSpeed` | `{ stroke_in = 0, rpm = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computePaintMixRatio` | `{ paint_volume_oz = 0, part_paint = 4, part_hardener = 1, part_reducer = 0 } ...` | _ | _ | _ |
+| calc-mechanic.js | `computePlanetaryGearRatio` | `{ sun_teeth = 0, ring_teeth = 0, input_speed_rpm = 0, configuration = "ring-f...` | _ | _ | _ |
 | calc-mechanic.js | `computePropPitchSelection` | `{ current_pitch_in = 0, current_wot_rpm = 0, target_wot_rpm = 0, rpm_per_inch...` | _ | _ | _ |
 | calc-mechanic.js | `computePropSlip` | `{ rpm = 0, gear_ratio = 1, pitch_in = 0, gps_speed_kt = 0 }` | _ | _ | _ |
 | calc-mechanic.js | `computeReserveCapacityAmpHours` | `{ rc_minutes = 0 } = {}` | _ | _ | _ |
@@ -3330,7 +3331,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1916.
+Row count: 1917.
 
 <!-- END function-corpus-v14 -->
 
@@ -4625,7 +4626,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (116 tiles)
+### Group K Mechanic (117 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4705,6 +4706,7 @@ per spec-v14 §13.1 second paragraph.
 | `max-rpm-from-piston-speed` | Max RPM from a Piston-Speed Limit | Mean piston speed (engine building), ...; spec-v660 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mean-piston-speed` | Mean Piston Speed and RPM-Limit Reading | Mean piston speed (engine building); spec-v324 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `paint-mix-ratio` | 2K Paint Mix Ratio | Paint manufacturer technical data she...; spec-v100 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `planetary-gear-ratio` | Planetary (Epicyclic) Gear Ratio | Project (first-principles); Willis epicyclic ratio | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `power-screw-torque` | Power-Screw Torque, Efficiency, and Self-Locking | Project (first-principles); T_raise/T_lower power screw | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `prop-pitch-selection` | Marine Propeller Pitch Selection | outboard prop selection practice; spec-v462 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `prop-slip` | Marine Prop Slip | Project (first-principles); theoretical_kt = (4500/1.85) * 19 / 1215.2 = 38.03; slip ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5168,6 +5170,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1665. Fixture-covered or reference-cadence: 1665 / 1665.
+Tile count: 1666. Fixture-covered or reference-cadence: 1666 / 1666.
 
 <!-- END tile-index-v14 -->

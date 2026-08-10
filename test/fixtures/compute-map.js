@@ -178,6 +178,7 @@ export const COMPUTE_MAP = {
   "gear-contact-stress": { module: "../../calc-mechanic.js", fn: "computeGearContactStress" },
   "aerodynamic-drag-force": { module: "../../calc-mechanic.js", fn: "computeAerodynamicDragForce" },
   "vehicle-road-load-power": { module: "../../calc-mechanic.js", fn: "computeVehicleRoadLoadPower" },
+  "planetary-gear-ratio": { module: "../../calc-mechanic.js", fn: "computePlanetaryGearRatio" },
   "gear-dynamic-tooth-stress": { module: "../../calc-mechanic.js", fn: "computeGearDynamicToothStress" },
   "trap-seal-loss": { module: "../../calc-plumbing.js", fn: "computeTrapSealLoss" },
   "water-meter-sizing": { module: "../../calc-plumbing.js", fn: "computeWaterMeterSizing" },

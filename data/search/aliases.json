@@ -2949,6 +2949,46 @@
    "kind": "question"
   },
   {
+   "term": "planetary gear ratio",
+   "target": "planetary-gear-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "epicyclic gear ratio",
+   "target": "planetary-gear-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "sun planet ring gear",
+   "target": "planetary-gear-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "planetary gearset ratio",
+   "target": "planetary-gear-ratio",
+   "kind": "industry"
+  },
+  {
+   "term": "willis equation gear",
+   "target": "planetary-gear-ratio",
+   "kind": "adjacent"
+  },
+  {
+   "term": "carrier output gear ratio",
+   "target": "planetary-gear-ratio",
+   "kind": "adjacent"
+  },
+  {
+   "term": "planet gear teeth count",
+   "target": "planetary-gear-ratio",
+   "kind": "adjacent"
+  },
+  {
+   "term": "what is my planetary gear ratio",
+   "target": "planetary-gear-ratio",
+   "kind": "question"
+  },
+  {
    "term": "hp torque rpm",
    "target": "hp-from-torque",
    "kind": "redirect"

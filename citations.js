@@ -11710,6 +11710,18 @@ export const CITATIONS = {
       { name: "Scope", value: "steady speed at the wheels; acceleration, driveline efficiency, headwind are separate", source: "scope of this tile" },
     ],
   },
+  "planetary-gear-ratio": {
+    formula: "R0 = Nr/Ns; Np = (Nr - Ns)/2. Held-member ratios: ring fixed sun->carrier 1+R0; sun fixed ring->carrier (R0+1)/R0; ring fixed carrier->sun 1/(1+R0); sun fixed carrier->ring R0/(1+R0); carrier fixed sun->ring -R0; carrier fixed ring->sun -1/R0.",
+    edition: "The epicyclic (planetary) gear-train ratio by the Willis superposition method (Machinery's Handbook; Shigley, Mechanical Engineering Design), by name.",
+    freeAccess: "The Willis epicyclic ratio relations are standard published gear-train results; the tooth counts, input speed, and held-member configuration are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-stage planetary (epicyclic) gear ratio by the Willis superposition method, with the sun teeth Ns, ring teeth Nr, basic ratio R0 = Nr/Ns, and the planet teeth Np = (Nr - Ns)/2 from the concentric constraint Nr = Ns + 2 Np. The ratio (input speed / output speed) depends on which member is HELD: ring fixed with the sun driving the carrier gives 1 + R0 (reduction, same direction); a carrier-fixed set reverses (ratio -R0 with the sun driving the ring); driving the carrier gives an overdrive (ratio below 1). A negative ratio means the output turns opposite the input. Same gears, different held member, completely different drive - the thing a fixed-axis cascade (gear-cascade) cannot capture. Compound and multi-stage planetaries, torque split among the planets, efficiency, and the equal-spacing assembly constraint on the planet count are separate; tooth strength is the gear-stress tiles. A design aid; Machinery's Handbook / Shigley and the gear maker govern.",
+    assumptions: [
+      { name: "Willis method", value: "ratio by superposition, R0 = Nr/Ns, six standard held-member configurations", source: "Machinery's Handbook / Shigley" },
+      { name: "Planet teeth", value: "Np = (Nr - Ns)/2 from Nr = Ns + 2 Np; Nr - Ns must be even", source: "concentric constraint" },
+      { name: "Scope", value: "single stage; compound/multi-stage, torque split, efficiency, and assembly count are separate", source: "scope of this tile" },
+    ],
+  },
   "gear-identification": {
     formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
     edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",
