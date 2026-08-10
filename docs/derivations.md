@@ -1542,6 +1542,7 @@ cross-check.
 | calc-concrete.js | `computeConcreteCorbelBracket` | `{ factored_shear_lb = 0, horiz_tension_lb = 0, shear_span_av_in = 0, eff_dept...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteCrackControlSpacing` | `{ fs_psi = 40000, cc_in = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteCrackedInertiaDoubly` | `{ b_in = 0, d_in = 0, as_in2 = 0, fc_psi = 4000, asp_in2 = 0, dp_in = 2.5 } = {}` | _ | _ | _ |
+| calc-concrete.js | `computeConcreteCrackedInertiaTee` | `{ b_in = 0, hf_in = 0, bw_in = 0, d_in = 0, as_in2 = 0, fc_psi = 4000 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteCrackingMoment` | `{ b_in = 0, h_in = 0, fc_psi = 4000, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteDepthForCrackingMoment` | `{ target_mcr_kipft = 0, b_in = 0, fc_psi = 4000, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteEffectiveInertia` | `{ b_in = 0, h_in = 0, d_in = 0, as_in2 = 0, fc_psi = 4000, ma_kipft = 0, lamb...` | _ | _ | _ |
@@ -3320,7 +3321,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1906.
+Row count: 1907.
 
 <!-- END function-corpus-v14 -->
 
@@ -3960,7 +3961,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (463 tiles)
+### Group E Construction (464 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4040,6 +4041,7 @@ per spec-v14 §13.1 second paragraph.
 | `concrete-corbel-bracket` | Concrete Corbel / Bracket Design (ACI 318-19 16.5) | ACI 318-19 Section 16.5 (brackets and...; Vu 40k, av 4, d 12, h 14, b 14, fc 4000, fy 60k -> Nuc 8k... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-crack-control-spacing` | Crack-Control Bar Spacing (ACI 318-19 24.3.2) | ACI 318-19 24.3.2; spec-v395 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-cracked-inertia-doubly` | Doubly-Reinforced Cracked Moment of Inertia Icr (ACI 318-19) | ACI 318-19 + Wight & MacGregor; Ec = 57000 sqrt(4000) = 3,604,997 psi, n = 29e6/3.605e6 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `concrete-cracked-inertia-tee` | Flanged (T-Beam) Cracked Moment of Inertia Icr (ACI 318-19) | Project (first-principles); web case: bw c^2/2 + (b-bw)hf(c-hf/2) = n As(d-c) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-cracking-moment` | Concrete Cracking Moment Mcr (ACI 318-19) | ACI 318-19 (Mcr = fr Ig/yt, 19.2.3 mo...; spec-v651 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-depth-for-cracking-moment` | Concrete Section Depth for a Target Cracking Moment | ACI 318-19 (Mcr = fr b h^2/6, solved ...; spec-v752 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `concrete-effective-inertia` | Concrete Effective Moment of Inertia Ie (ACI 318-19 Bischoff) | ACI 318-19 24.2.3.5 (Bischoff effecti...; Mcr = 31.62 kip-ft; Ma 60 > (2/3)Mcr so cracked; Ie = 401... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5148,6 +5150,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1655. Fixture-covered or reference-cadence: 1655 / 1655.
+Tile count: 1656. Fixture-covered or reference-cadence: 1656 / 1656.
 
 <!-- END tile-index-v14 -->

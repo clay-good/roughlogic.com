@@ -86553,6 +86553,68 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "concrete-cracked-inertia-tee",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "T-beam cracked Icr, neutral axis in the web",
+   "source_edition_or_year": "ACI 318-19 \u00a719.2.2.1 + cracked transformed section",
+   "source_section_or_page": "web case: bw c^2/2 + (b-bw)hf(c-hf/2) = n As(d-c)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "b_in": 48,
+    "hf_in": 4,
+    "bw_in": 12,
+    "d_in": 17.5,
+    "as_in2": 6.0,
+    "fc_psi": 4000
+   },
+   "outputs": {
+    "icr_in4": {
+     "value": 9528,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "kd_in": {
+     "value": 5.08,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-cracked-inertia-tee",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Rectangular limit (bw=b) matches singly-reinforced Icr",
+   "source_edition_or_year": "ACI 318-19 \u00a719.2.2.1 + cracked transformed section",
+   "source_section_or_page": "reduces to concrete-effective-inertia",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "b_in": 12,
+    "hf_in": 4,
+    "bw_in": 12,
+    "d_in": 17.5,
+    "as_in2": 3.0,
+    "fc_psi": 4000
+   },
+   "outputs": {
+    "icr_in4": {
+     "value": 4017,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "kd_in": {
+     "value": 6.62,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

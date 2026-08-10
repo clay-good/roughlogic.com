@@ -672,7 +672,7 @@ const TOOL_MODULES = (() => {
     // spec-v491 rebar compression development length (ACI 318-19 §25.4.9)
     "rc-compression-dev-length",
     // spec-v497 long-term deflection multiplier (ACI 318-19 §24.2.4.1)
-    "concrete-effective-inertia", "concrete-longterm-defl", "concrete-immediate-deflection", "concrete-cracked-inertia-doubly",
+    "concrete-effective-inertia", "concrete-longterm-defl", "concrete-immediate-deflection", "concrete-cracked-inertia-doubly", "concrete-cracked-inertia-tee",
     // spec-v548
     "concrete-anchor-breakout",
     "concrete-anchor-pullout",

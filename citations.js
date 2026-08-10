@@ -16623,6 +16623,18 @@ export const CITATIONS = {
       { name: "Limit / scope", value: "As' = 0 reduces to the singly-reinforced Icr; rectangular section only (a T-beam is separate)", source: "scope of this tile" },
     ],
   },
+  "concrete-cracked-inertia-tee": {
+    formula: "Flange trial (rectangle b): b c^2/2 = n As(d - c), valid if c <= hf, Icr = b c^3/3 + n As(d - c)^2. Web case: bw c^2/2 + (b - bw) hf(c - hf/2) = n As(d - c), Icr = bw c^3/3 + (b - bw)[hf^3/12 + hf(c - hf/2)^2] + n As(d - c)^2. n = Es/Ec, Ec = 57000 sqrt(f'c). bw = b reduces to the singly-reinforced rectangular Icr.",
+    edition: "ACI 318-19 §19.2.2.1 modulus Ec = 57000 sqrt(f'c) with the standard elastic cracked flanged (T-beam) transformed-section analysis (Wight & MacGregor, Reinforced Concrete; PCA Notes on ACI 318), by name; verified against the singly-reinforced rectangular limit (bw = b) of concrete-effective-inertia.",
+    freeAccess: "The cracked-transformed-section equations are standard mechanics of reinforced concrete; ACI 318 (the Ec definition) is readable free through the ACI online reading room at concrete.org. Flange width, flange thickness, web width, depth, steel area, and f'c are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cracked transformed moment of inertia Icr and neutral-axis depth kd for a FLANGED (T-beam) concrete section with tension steel only, the case both concrete-effective-inertia (singly rectangular) and concrete-cracked-inertia-doubly name as separate. Once the section cracks the tension concrete is ignored: the compression zone is the full flange width b down to the flange thickness hf, then only the web width bw below, and the tension steel is transformed with n As at depth d. If the neutral axis lands within the flange (c <= hf) the section behaves as a rectangle of width b, b c^2/2 = n As(d - c) and Icr = b c^3/3 + n As(d - c)^2; if it falls in the web, bw c^2/2 + (b - bw) hf(c - hf/2) = n As(d - c) and Icr = bw c^3/3 + (b - bw)[hf^3/12 + hf(c - hf/2)^2] + n As(d - c)^2, with n = Es/Ec and Ec = 57000 sqrt(f'c). The wide compression flange raises the neutral axis and stiffens the cracked section, so a slab acting with the beam sharply cuts deflection. With bw = b (or the neutral axis inside the flange) it returns exactly the singly-reinforced rectangular Icr the concrete-effective-inertia tile uses; take the effective flange width b from t-beam-effective-flange-width. A design aid; the engineer of record's stamped design governs.",
+    assumptions: [
+      { name: "Neutral axis", value: "flange: b c^2/2 = n As(d - c); web: bw c^2/2 + (b - bw) hf(c - hf/2) = n As(d - c)", source: "elastic cracked transformed section" },
+      { name: "Cracked inertia", value: "web: Icr = bw c^3/3 + (b - bw)[hf^3/12 + hf(c - hf/2)^2] + n As(d - c)^2; n = Es/Ec, Ec = 57000 sqrt(f'c)", source: "ACI 318-19 §19.2.2.1 + mechanics" },
+      { name: "Limit / scope", value: "bw = b reduces to the singly-reinforced rectangular Icr; tension steel only (a doubly-reinforced T is separate)", source: "scope of this tile" },
+    ],
+  },
   "concrete-immediate-deflection": {
     formula: "delta = K w L^4 / (Ec Ie); Ec = 57000 sqrt(f'c). K = 5/384 simply supported UDL, 1/384 fixed-fixed UDL, 1/8 cantilever UDL, ~1/185 propped cantilever UDL. L/delta is checked against ACI Table 24.2.2 (L/180, L/240, L/360, L/480).",
     edition: "ACI 318-19 §24.2.3 immediate deflection by elastic analysis with the effective (Bischoff) moment of inertia Ie (§24.2.3.5), and Ec = 57000 sqrt(f'c) (§19.2.2.1), by name; the elastic beam coefficients K are standard mechanics-of-materials results.",

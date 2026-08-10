@@ -37536,3 +37536,29 @@ test("bounds: spec-v1282 computeGearContactStress pins the Hertzian contact stre
   assert.ok("error" in _v1282({ transmitted_load_lb: 500, diametral_pitch_1_in: 8, pinion_teeth: 20, gear_teeth: 60, face_width_in: 1.5, pressure_angle_deg: 20, elastic_coefficient_cp: 0 }));
   assert.ok("error" in _v1282({ transmitted_load_lb: Infinity, diametral_pitch_1_in: 8, pinion_teeth: 20, gear_teeth: 60, face_width_in: 1.5, pressure_angle_deg: 20, elastic_coefficient_cp: 2300 }));
 });
+
+import { computeConcreteCrackedInertiaTee as _v1283 } from "../../calc-concrete.js";
+test("bounds: spec-v1283 computeConcreteCrackedInertiaTee pins the flanged Icr, the flange/web neutral-axis switch, the bw=b singly-reinforced limit, and error seams", () => {
+  // 48 in flange, 4 in thick, 12 in web, d 17.5, As 6.0, f'c 4000: neutral axis in the web at 5.08 in, Icr 9,528 in^4.
+  const r = _v1283({ b_in: 48, hf_in: 4, bw_in: 12, d_in: 17.5, as_in2: 6.0, fc_psi: 4000 });
+  assert.ok(Math.abs(r.icr_in4 - 9528) < 5);
+  assert.ok(Math.abs(r.kd_in - 5.084) < 1e-2);
+  assert.ok(r.neutral_axis_in === "web");
+  assert.ok(Math.abs(r.n - 8.044) < 1e-2);
+  // Lighter steel keeps the neutral axis inside the flange (rectangular behavior of width b).
+  const inFlange = _v1283({ b_in: 48, hf_in: 4, bw_in: 12, d_in: 17.5, as_in2: 3.0, fc_psi: 4000 });
+  assert.ok(inFlange.neutral_axis_in === "flange" && Math.abs(inFlange.kd_in - 3.722) < 1e-2 && Math.abs(inFlange.icr_in4 - 5406) < 5);
+  // Setting the web equal to the flange (bw = b) reduces EXACTLY to the singly-reinforced rectangular Icr (4,017 in^4).
+  const rect = _v1283({ b_in: 12, hf_in: 4, bw_in: 12, d_in: 17.5, as_in2: 3.0, fc_psi: 4000 });
+  assert.ok(Math.abs(rect.icr_in4 - 4017.2) < 1.0 && Math.abs(rect.kd_in - 6.616) < 1e-2);
+  // The wide flange stiffens the section: the flanged Icr exceeds the bare-web (bw=b) Icr for the same bars.
+  const bare = _v1283({ b_in: 12, hf_in: 4, bw_in: 12, d_in: 17.5, as_in2: 6.0, fc_psi: 4000 });
+  assert.ok(r.icr_in4 > bare.icr_in4);
+  // Error seams: web wider than flange, d not above hf, non-positive width/steel/f'c, non-finite.
+  assert.ok("error" in _v1283({ b_in: 12, hf_in: 4, bw_in: 24, d_in: 17.5, as_in2: 6.0, fc_psi: 4000 }));
+  assert.ok("error" in _v1283({ b_in: 48, hf_in: 20, bw_in: 12, d_in: 17.5, as_in2: 6.0, fc_psi: 4000 }));
+  assert.ok("error" in _v1283({ b_in: 0, hf_in: 4, bw_in: 12, d_in: 17.5, as_in2: 6.0, fc_psi: 4000 }));
+  assert.ok("error" in _v1283({ b_in: 48, hf_in: 4, bw_in: 12, d_in: 17.5, as_in2: 0, fc_psi: 4000 }));
+  assert.ok("error" in _v1283({ b_in: 48, hf_in: 4, bw_in: 12, d_in: 17.5, as_in2: 6.0, fc_psi: 0 }));
+  assert.ok("error" in _v1283({ b_in: 48, hf_in: 4, bw_in: 12, d_in: 17.5, as_in2: Infinity, fc_psi: 4000 }));
+});

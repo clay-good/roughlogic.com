@@ -30599,6 +30599,51 @@
    "kind": "question"
   },
   {
+   "term": "t-beam cracked moment of inertia",
+   "target": "concrete-cracked-inertia-tee",
+   "kind": "industry"
+  },
+  {
+   "term": "flanged cracked inertia",
+   "target": "concrete-cracked-inertia-tee",
+   "kind": "industry"
+  },
+  {
+   "term": "t-beam icr",
+   "target": "concrete-cracked-inertia-tee",
+   "kind": "industry"
+  },
+  {
+   "term": "t-beam transformed section",
+   "target": "concrete-cracked-inertia-tee",
+   "kind": "industry"
+  },
+  {
+   "term": "cracked inertia t-beam",
+   "target": "concrete-cracked-inertia-tee",
+   "kind": "adjacent"
+  },
+  {
+   "term": "t-beam deflection inertia",
+   "target": "concrete-cracked-inertia-tee",
+   "kind": "adjacent"
+  },
+  {
+   "term": "flanged section cracked icr",
+   "target": "concrete-cracked-inertia-tee",
+   "kind": "adjacent"
+  },
+  {
+   "term": "what is the cracked inertia of a t-beam",
+   "target": "concrete-cracked-inertia-tee",
+   "kind": "question"
+  },
+  {
+   "term": "does the slab help beam deflection",
+   "target": "concrete-cracked-inertia-tee",
+   "kind": "question"
+  },
+  {
    "term": "anchor breakout",
    "target": "concrete-anchor-breakout",
    "kind": "industry"

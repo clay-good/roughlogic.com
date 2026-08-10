@@ -887,6 +887,7 @@ export const RENDERER_MAP = {
   "concrete-longterm-defl": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "concrete-immediate-deflection": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "concrete-cracked-inertia-doubly": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
+  "concrete-cracked-inertia-tee": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "concrete-anchor-breakout": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "concrete-anchor-pullout": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "concrete-anchor-shear-breakout": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },

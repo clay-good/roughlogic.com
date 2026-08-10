@@ -1466,6 +1466,72 @@ CONCRETE_RENDERERS["concrete-cracked-inertia-doubly"] = _simpleRenderer({
   compute: computeConcreteCrackedInertiaDoubly,
 });
 
+// ===================== spec-v1283: flanged (T-beam) cracked moment of inertia Icr (ACI 318-19) =====================
+// concrete-effective-inertia (singly rectangular) names "a T-beam ... uses the appropriate transformed Icr" and
+// concrete-cracked-inertia-doubly names "a T-beam uses the flanged transformed section." This is that flanged case,
+// completing the singly / doubly / flanged trio. The compression zone is the full flange width b down to hf, then
+// only the web width bw below; tension steel is transformed with n As. The neutral axis lands in the flange or the
+// web, decided automatically. With bw = b (or the neutral axis inside the flange) it reduces EXACTLY to the
+// singly-reinforced rectangular Icr the effective-inertia tile returns. Pairs with t-beam-effective-flange-width,
+// which supplies the effective flange width b.
+// dims: in { b_in: L, hf_in: L, bw_in: L, d_in: L, as_in2: L^2, fc_psi: M L^-1 T^-2 } out: { n: dimensionless, ec_psi: M L^-1 T^-2, kd_in: L, icr_in4: L^4 }
+export function computeConcreteCrackedInertiaTee({ b_in = 0, hf_in = 0, bw_in = 0, d_in = 0, as_in2 = 0, fc_psi = 4000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const b = Number(b_in), hf = Number(hf_in), bw = Number(bw_in), d = Number(d_in), As = Number(as_in2), fc = Number(fc_psi);
+  if (!(b > 0)) return { error: "Effective flange width b must be positive (in)." };
+  if (!(hf > 0)) return { error: "Flange thickness hf must be positive (in)." };
+  if (!(bw > 0)) return { error: "Web width bw must be positive (in)." };
+  if (!(bw <= b)) return { error: "Web width bw cannot exceed the flange width b (in)." };
+  if (!(d > hf)) return { error: "Effective depth d must be greater than the flange thickness hf (in)." };
+  if (!(As > 0)) return { error: "Tension steel area As must be positive (in^2)." };
+  if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  const Es = 29000000;
+  const Ec = 57000 * Math.sqrt(fc);          // ACI 318-19 Eq 19.2.2.1.a, normalweight
+  const n = Es / Ec;
+  // Trial 1: neutral axis inside the flange, rectangle of width b: b c^2/2 + n As c - n As d = 0.
+  let kd = (-(n * As) + Math.sqrt(n * As * (n * As) + 2 * b * n * As * d)) / b;
+  let neutral_axis_in = "flange";
+  let icr;
+  if (kd <= hf) {
+    icr = b * Math.pow(kd, 3) / 3 + n * As * Math.pow(d - kd, 2);
+  } else {
+    // Neutral axis in the web: bw c^2/2 + (b - bw) hf (c - hf/2) = n As (d - c).
+    // (bw/2) c^2 + [(b-bw) hf + n As] c - [(b-bw) hf^2/2 + n As d] = 0
+    const A = bw / 2;
+    const B = (b - bw) * hf + n * As;
+    const C = (b - bw) * hf * hf / 2 + n * As * d;
+    kd = (-B + Math.sqrt(B * B + 4 * A * C)) / (2 * A);
+    neutral_axis_in = "web";
+    icr = bw * Math.pow(kd, 3) / 3 + (b - bw) * (Math.pow(hf, 3) / 12 + hf * Math.pow(kd - hf / 2, 2)) + n * As * Math.pow(d - kd, 2);
+  }
+  if (![n, Ec, kd, icr].every(Number.isFinite) || !(kd > 0) || !(kd < d)) return { error: "Cracked-section math is not a finite value; check the inputs." };
+  return {
+    n, ec_psi: Ec, kd_in: kd, icr_in4: icr, neutral_axis_in, rho_w: As / (bw * d),
+    note: "The cracked transformed moment of inertia Icr and neutral-axis depth kd for a FLANGED (T-beam) concrete section with tension steel only - the case both concrete-effective-inertia (singly rectangular) and concrete-cracked-inertia-doubly name as separate. Once the section cracks the tension concrete is ignored: the compression zone is the full flange width b down to the flange thickness hf, then only the web width bw below, and the tension steel is transformed with n As at depth d. If the neutral axis lands within the flange (c <= hf) the section behaves as a rectangle of width b, b c^2/2 = n As(d - c) and Icr = b c^3/3 + n As(d - c)^2; if it falls in the web, bw c^2/2 + (b - bw) hf (c - hf/2) = n As(d - c) and Icr = bw c^3/3 + (b - bw)[hf^3/12 + hf(c - hf/2)^2] + n As(d - c)^2, with n = Es/Ec and Ec = 57000 sqrt(f'c). The wide compression flange raises the neutral axis and stiffens the cracked section, so a slab acting with the beam sharply cuts deflection. With bw = b (or the neutral axis inside the flange) it returns exactly the singly-reinforced rectangular Icr the concrete-effective-inertia tile uses; take the effective flange width b from t-beam-effective-flange-width, and feed this Icr into a deflection check. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const concreteCrackedInertiaTeeExample = { inputs: { b_in: 48, hf_in: 4, bw_in: 12, d_in: 17.5, as_in2: 6.0, fc_psi: 4000 } };
+
+CONCRETE_RENDERERS["concrete-cracked-inertia-tee"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 cracked transformed section for a flanged (T-beam) beam with tension steel: neutral axis in the flange (b c^2/2 = n As(d - c), Icr = b c^3/3 + n As(d - c)^2) or in the web (bw c^2/2 + (b - bw) hf(c - hf/2) = n As(d - c), Icr = bw c^3/3 + (b - bw)[hf^3/12 + hf(c - hf/2)^2] + n As(d - c)^2), with n = Es/Ec and Ec = 57000 sqrt(f'c) (§19.2.2.1). Standard elastic cracked flanged-section mechanics (Wight & MacGregor; PCA Notes on ACI 318); bw = b reduces to the singly-reinforced rectangular Icr. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: concreteCrackedInertiaTeeExample.inputs,
+  fields: [
+    { key: "b_in", label: "Effective flange width b (in)", kind: "number", default: 48 },
+    { key: "hf_in", label: "Flange thickness hf (in)", kind: "number", default: 4 },
+    { key: "bw_in", label: "Web width bw (in)", kind: "number", default: 12 },
+    { key: "d_in", label: "Effective depth d to tension steel (in)", kind: "number", default: 17.5 },
+    { key: "as_in2", label: "Tension steel area As (in^2)", kind: "number", default: 6.0 },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+  ],
+  outputs: [
+    { key: "icr", id: "cit-out-icr", label: "Cracked inertia Icr", value: (r) => fmt(r.icr_in4, 0) + " in^4" },
+    { key: "kd", id: "cit-out-kd", label: "Neutral-axis depth kd", value: (r) => fmt(r.kd_in, 2) + " in (neutral axis in the " + r.neutral_axis_in + ")" },
+    { key: "n", id: "cit-out-n", label: "Modular ratio n", value: (r) => fmt(r.n, 2) + " (Ec " + fmt(r.ec_psi / 1000, 0) + " ksi)" },
+    { key: "note", id: "cit-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteCrackedInertiaTee,
+});
+
 // ===================== spec-v548: cast-in anchor tension concrete breakout (ACI 318-19 Ch. 17) =====================
 
 // dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless } out: { nb_lb: M L T^-2, ncb_lb: M L T^-2, phi_ncb_lb: M L T^-2 }
