@@ -37719,3 +37719,31 @@ test("bounds: spec-v1289 computeDiskClutchTorque pins the uniform-wear and unifo
   assert.ok("error" in _v1289({ clamp_force_lbf: 1000, friction_coefficient: 0.3, outer_radius_in: 3, inner_radius_in: 2, friction_surfaces: 0 }));
   assert.ok("error" in _v1289({ clamp_force_lbf: Infinity, friction_coefficient: 0.3, outer_radius_in: 3, inner_radius_in: 2, friction_surfaces: 1 }));
 });
+
+import { computeEulerJohnsonColumn as _v1290 } from "../../calc-machining.js";
+test("bounds: spec-v1290 computeEulerJohnsonColumn pins the Johnson/Euler split, the transition slenderness, end-condition scaling, and error seams", () => {
+  // Steel strut E 30e6, Sy 40 ksi, I 0.05, A 1, L 20, pinned: SR 89.4 < 121.7 -> Johnson, Pcr 29,192 lbf.
+  const j = _v1290({ modulus_psi: 30000000, yield_strength_psi: 40000, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 20, end_condition: "pinned-pinned" });
+  assert.ok(Math.abs(j.critical_load_lbf - 29192) < 5 && j.mode.indexOf("Johnson") >= 0);
+  assert.ok(Math.abs(j.slenderness_ratio - 89.4) < 0.2 && Math.abs(j.transition_slenderness - 121.7) < 0.2);
+  assert.ok(Math.abs(j.radius_of_gyration_in - 0.2236) < 1e-3);
+  // Stretch to L 50 (SR 224 > transition) -> Euler at 5,922 lbf.
+  const e = _v1290({ modulus_psi: 30000000, yield_strength_psi: 40000, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 50, end_condition: "pinned-pinned" });
+  assert.ok(Math.abs(e.critical_load_lbf - 5922) < 5 && e.mode.indexOf("Euler") >= 0);
+  // Euler load scales as 1/L^2: doubling the length quarters the load.
+  const e2 = _v1290({ modulus_psi: 30000000, yield_strength_psi: 40000, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 100, end_condition: "pinned-pinned" });
+  assert.ok(Math.abs(e2.critical_load_lbf / e.critical_load_lbf - 0.25) < 1e-6);
+  // A fixed-free end (K = 2) is far weaker than fixed-fixed (K = 0.5) at the same length.
+  const ff = _v1290({ modulus_psi: 30000000, yield_strength_psi: 40000, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 50, end_condition: "fixed-free" });
+  const clamped = _v1290({ modulus_psi: 30000000, yield_strength_psi: 40000, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 50, end_condition: "fixed-fixed" });
+  assert.ok(ff.critical_load_lbf < clamped.critical_load_lbf);
+  // Johnson caps below the squash load A Sy (a very short column approaches but never exceeds it).
+  const short = _v1290({ modulus_psi: 30000000, yield_strength_psi: 40000, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 2, end_condition: "pinned-pinned" });
+  assert.ok(short.critical_load_lbf < 1.0 * 40000 && short.critical_load_lbf > 0.9 * 40000);
+  // Error seams: non-positive E/Sy/I/A/L, unknown end condition, non-finite.
+  assert.ok("error" in _v1290({ modulus_psi: 0, yield_strength_psi: 40000, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 20, end_condition: "pinned-pinned" }));
+  assert.ok("error" in _v1290({ modulus_psi: 30000000, yield_strength_psi: 0, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 20, end_condition: "pinned-pinned" }));
+  assert.ok("error" in _v1290({ modulus_psi: 30000000, yield_strength_psi: 40000, moment_of_inertia_in4: 0, area_in2: 1.0, length_in: 20, end_condition: "pinned-pinned" }));
+  assert.ok("error" in _v1290({ modulus_psi: 30000000, yield_strength_psi: 40000, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 20, end_condition: "free-free" }));
+  assert.ok("error" in _v1290({ modulus_psi: Infinity, yield_strength_psi: 40000, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 20, end_condition: "pinned-pinned" }));
+});

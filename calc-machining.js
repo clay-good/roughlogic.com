@@ -1209,6 +1209,81 @@ function renderDiskClutchTorque(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["disk-clutch-torque"] = renderDiskClutchTorque;
 
+// ===================== spec-v1290: Euler-Johnson column critical buckling load (Shigley Ch. 4) =====================
+// The catalog buckles wood (NDS), concrete (ACI), and AISC steel columns, but has no general Euler-Johnson check for
+// a machine member (lead screw, push rod, link, strut); power-screw-torque names "column buckling of a long screw"
+// as separate. Euler for long columns, the J.B. Johnson parabola for intermediate, split at the transition
+// slenderness SR_D = pi sqrt(2 E/Sy): the parabola caps the short-column load at the squash load A Sy where the
+// Euler hyperbola would wrongly run to infinity.
+const COLUMN_END_K = {
+  "pinned-pinned": { k: 1.0, label: "Pinned-pinned (K = 1.0)" },
+  "fixed-free": { k: 2.0, label: "Fixed-free / cantilever (K = 2.0)" },
+  "fixed-fixed": { k: 0.5, label: "Fixed-fixed (K = 0.5)" },
+  "fixed-pinned": { k: 0.7, label: "Fixed-pinned (K = 0.7)" },
+};
+// dims: in { modulus_psi: M L^-1 T^-2, yield_strength_psi: M L^-1 T^-2, moment_of_inertia_in4: L^4, area_in2: L^2, length_in: L, end_condition: dimensionless } out: { critical_load_lbf: M L T^-2, critical_stress_psi: M L^-1 T^-2, slenderness_ratio: dimensionless, transition_slenderness: dimensionless, radius_of_gyration_in: L }
+export function computeEulerJohnsonColumn({ modulus_psi = 30000000, yield_strength_psi = 0, moment_of_inertia_in4 = 0, area_in2 = 0, length_in = 0, end_condition = "pinned-pinned" } = {}) {
+  const _g = _finiteGuard({ modulus_psi, yield_strength_psi, moment_of_inertia_in4, area_in2, length_in }); if (_g) return _g;
+  const E = Number(modulus_psi) || 0;
+  const Sy = Number(yield_strength_psi) || 0;
+  const I = Number(moment_of_inertia_in4) || 0;
+  const A = Number(area_in2) || 0;
+  const L = Number(length_in) || 0;
+  const end = COLUMN_END_K[end_condition];
+  if (!(E > 0)) return { error: "Modulus of elasticity E must be positive (psi)." };
+  if (!(Sy > 0)) return { error: "Yield strength Sy must be positive (psi)." };
+  if (!(I > 0)) return { error: "Moment of inertia I must be positive (in^4)." };
+  if (!(A > 0)) return { error: "Cross-section area A must be positive (in^2)." };
+  if (!(L > 0)) return { error: "Length L must be positive (in)." };
+  if (!end) return { error: "End condition must be pinned-pinned, fixed-free, fixed-fixed, or fixed-pinned." };
+  const K = end.k;
+  const radius_of_gyration_in = Math.sqrt(I / A);
+  const slenderness_ratio = (K * L) / radius_of_gyration_in;
+  const transition_slenderness = Math.PI * Math.sqrt((2 * E) / Sy);
+  let critical_load_lbf, mode;
+  if (slenderness_ratio >= transition_slenderness) {
+    critical_load_lbf = (Math.PI * Math.PI * E * I) / Math.pow(K * L, 2); // Euler
+    mode = "Euler (long column, elastic buckling)";
+  } else {
+    critical_load_lbf = A * (Sy - Math.pow((Sy * slenderness_ratio) / (2 * Math.PI), 2) / E); // J.B. Johnson
+    mode = "Johnson (intermediate column)";
+  }
+  const critical_stress_psi = critical_load_lbf / A;
+  if (![critical_load_lbf, critical_stress_psi, slenderness_ratio, transition_slenderness].every(Number.isFinite) || !(critical_load_lbf > 0)) return { error: "Column-buckling math is not a finite value; check the inputs." };
+  return {
+    critical_load_lbf, critical_stress_psi, slenderness_ratio, transition_slenderness, radius_of_gyration_in, effective_length_factor: K, mode,
+    note: "Concentric critical buckling load of a straight, prismatic column by the Euler and J.B. Johnson formulas (Shigley Ch. 4). The radius of gyration r = sqrt(I/A) and the effective slenderness SR = K L/r set the behavior against the transition SR_D = pi sqrt(2 E/Sy). A long column (SR >= SR_D) buckles elastically, Pcr = pi^2 E I/(K L)^2 (Euler), and the load drops with the square of the length. An intermediate column (SR < SR_D) follows the Johnson parabola Pcr = A[Sy - (Sy SR/(2 pi))^2/E], which is tangent to the Euler curve at SR_D and to the squash load A Sy at SR = 0, so it correctly caps the short-column load where the Euler hyperbola would run to infinity. K is the end-condition factor (pinned-pinned 1.0, fixed-free 2.0, fixed-fixed 0.5, fixed-pinned 0.7, theoretical). Concentric load only; the secant formula (eccentric load), local/flange buckling, and code-specific steel/wood/concrete provisions are separate. Apply a safety factor to Pcr. A design aid; Shigley and the engineer of record govern.",
+  };
+}
+export const eulerJohnsonColumnExample = { inputs: { modulus_psi: 30000000, yield_strength_psi: 40000, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 20, end_condition: "pinned-pinned" } };
+function renderEulerJohnsonColumn(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Euler-Johnson column buckling (Shigley, Mechanical Engineering Design, Ch. 4): SR = K L/sqrt(I/A), transition SR_D = pi sqrt(2 E/Sy); Euler Pcr = pi^2 E I/(K L)^2 for SR >= SR_D, J.B. Johnson Pcr = A[Sy - (Sy SR/(2 pi))^2/E] below it. K by end condition. Concentric load; apply a safety factor. A design aid; Shigley and the engineer of record govern.";
+  const E = makeNumber("Modulus E (psi)", "ejc-e", { step: "any", min: "0" }); E.input.value = "30000000";
+  const Sy = makeNumber("Yield strength Sy (psi)", "ejc-sy", { step: "any", min: "0" }); Sy.input.value = "40000";
+  const I = makeNumber("Moment of inertia I (in^4)", "ejc-i", { step: "any", min: "0" }); I.input.value = "0.05";
+  const A = makeNumber("Cross-section area A (in^2)", "ejc-a", { step: "any", min: "0" }); A.input.value = "1.0";
+  const L = makeNumber("Unbraced length L (in)", "ejc-l", { step: "any", min: "0" }); L.input.value = "20";
+  const end = makeSelect("End condition", "ejc-end", Object.keys(COLUMN_END_K).map((k) => ({ value: k, label: COLUMN_END_K[k].label, selected: k === "pinned-pinned" })));
+  for (const f of [E, Sy, I, A, L, end]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { E.input.value = "30000000"; Sy.input.value = "40000"; I.input.value = "0.05"; A.input.value = "1.0"; L.input.value = "20"; end.select.value = "pinned-pinned"; update(); });
+  const oP = makeOutputLine(outputRegion, "Critical buckling load Pcr", "ejc-out-p");
+  const oS = makeOutputLine(outputRegion, "Critical stress", "ejc-out-s");
+  const oSR = makeOutputLine(outputRegion, "Slenderness / transition", "ejc-out-sr");
+  const oNote = makeOutputLine(outputRegion, "Note", "ejc-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeEulerJohnsonColumn({ modulus_psi: readNum(E.input), yield_strength_psi: readNum(Sy.input), moment_of_inertia_in4: readNum(I.input), area_in2: readNum(A.input), length_in: readNum(L.input), end_condition: end.select.value });
+    if (r.error) { oP.textContent = r.error; oS.textContent = "-"; oSR.textContent = "-"; oNote.textContent = ""; return; }
+    oP.textContent = fmt(r.critical_load_lbf, 0) + " lbf (" + r.mode + ")";
+    oS.textContent = fmt(r.critical_stress_psi, 0) + " psi";
+    oSR.textContent = "SR = " + fmt(r.slenderness_ratio, 1) + " vs transition " + fmt(r.transition_slenderness, 1) + " (r = " + fmt(r.radius_of_gyration_in, 3) + " in, K = " + fmt(r.effective_length_factor, 2) + ")";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [E, Sy, I, A, L]) f.input.addEventListener("input", update);
+  end.select.addEventListener("change", update);
+}
+MACHINING_RENDERERS["euler-johnson-column"] = renderEulerJohnsonColumn;
+
 // ===================== spec-v509: countersink diameter and cutting depth =====================
 // dims: in { countersink_dia_in: L, included_angle_deg: dimensionless, pilot_hole_dia_in: L } out: { z_in: L, z_full_in: L }
 export function computeCountersinkDepth({ countersink_dia_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}) {

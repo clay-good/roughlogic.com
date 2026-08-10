@@ -98479,6 +98479,51 @@
    "kind": "question"
   },
   {
+   "term": "euler column buckling",
+   "target": "euler-johnson-column",
+   "kind": "industry"
+  },
+  {
+   "term": "johnson column formula",
+   "target": "euler-johnson-column",
+   "kind": "industry"
+  },
+  {
+   "term": "euler critical buckling load",
+   "target": "euler-johnson-column",
+   "kind": "industry"
+  },
+  {
+   "term": "column buckling calculator",
+   "target": "euler-johnson-column",
+   "kind": "industry"
+  },
+  {
+   "term": "slenderness ratio buckling",
+   "target": "euler-johnson-column",
+   "kind": "adjacent"
+  },
+  {
+   "term": "strut buckling load",
+   "target": "euler-johnson-column",
+   "kind": "adjacent"
+  },
+  {
+   "term": "euler johnson transition",
+   "target": "euler-johnson-column",
+   "kind": "adjacent"
+  },
+  {
+   "term": "will my strut buckle",
+   "target": "euler-johnson-column",
+   "kind": "question"
+  },
+  {
+   "term": "what load buckles a column",
+   "target": "euler-johnson-column",
+   "kind": "question"
+  },
+  {
    "term": "countersink size from plunge depth",
    "target": "countersink-diameter-from-depth",
    "kind": "question"

@@ -11034,6 +11034,18 @@ export const CITATIONS = {
       { name: "Scope", value: "static torque from F; heat, wear life, band/cone brakes are separate", source: "scope of this tile" },
     ],
   },
+  "euler-johnson-column": {
+    formula: "r = sqrt(I/A); SR = K L/r; SR_D = pi sqrt(2 E/Sy). Euler (SR >= SR_D): Pcr = pi^2 E I/(K L)^2. J.B. Johnson (SR < SR_D): Pcr = A[Sy - (Sy SR/(2 pi))^2/E]. K = 1.0/2.0/0.5/0.7 pinned/fixed-free/fixed-fixed/fixed-pinned.",
+    edition: "The Euler critical load and the J.B. Johnson parabolic formula for intermediate columns with the transition slenderness (Shigley, Mechanical Engineering Design, Ch. 4 -- columns), by name.",
+    freeAccess: "The Euler and Johnson column formulas are standard published mechanics results; the modulus, yield, section properties, length, and end condition are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The concentric critical buckling load of a straight, prismatic column by the Euler and J.B. Johnson formulas. The radius of gyration r = sqrt(I/A) and the effective slenderness SR = K L/r set the behavior against the transition SR_D = pi sqrt(2 E/Sy). A long column (SR >= SR_D) buckles elastically, Pcr = pi^2 E I/(K L)^2 (Euler), and the load drops with the square of the length. An intermediate column (SR < SR_D) follows the Johnson parabola Pcr = A[Sy - (Sy SR/(2 pi))^2/E], which is tangent to the Euler curve at SR_D and to the squash load A Sy at SR = 0, so it correctly caps the short-column load where the Euler hyperbola would run to infinity. K is the end-condition factor (pinned-pinned 1.0, fixed-free 2.0, fixed-fixed 0.5, fixed-pinned 0.7, theoretical). Concentric load only; the secant formula (eccentric load), local/flange buckling, and code-specific steel/wood/concrete provisions are separate. Apply a safety factor to Pcr. A design aid; Shigley and the engineer of record govern.",
+    assumptions: [
+      { name: "Euler / Johnson split", value: "Euler for SR >= SR_D = pi sqrt(2 E/Sy), Johnson parabola below", source: "Shigley Ch. 4" },
+      { name: "End condition", value: "K = 1.0 pinned, 2.0 fixed-free, 0.5 fixed-fixed, 0.7 fixed-pinned (theoretical)", source: "Shigley Ch. 4" },
+      { name: "Scope", value: "concentric load; secant/eccentric, local buckling, and code provisions are separate", source: "scope of this tile" },
+    ],
+  },
   "bolt-proof-load": {
     formula: "At = 0.7854 x (D - 0.9743/n)^2; proof_load = At x proof_strength; yield_load = At x yield_strength; tensile_load = At x tensile_strength; rec_clamp = 0.75 x proof_load.",
     edition: "The SAE J429 inch-series bolt strength model (tensile stress area x grade strength), with the ASME B1.1 tensile stress area, by name; the joint design, torque method, and preload requirement govern.",
