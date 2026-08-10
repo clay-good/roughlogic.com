@@ -87737,6 +87737,58 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "flange-coupling-torque",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Six-bolt flange coupling torque capacity",
+   "source_edition_or_year": "Machinery Handbook / Shigley",
+   "source_section_or_page": "T = n(pi/4 d^2 tau)(BCD/2)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "bolt_count": 6,
+    "bolt_diameter_in": 0.5,
+    "allowable_shear_psi": 10000,
+    "bolt_circle_diameter_in": 5
+   },
+   "outputs": {
+    "torque_capacity_in_lb": {
+     "value": 29452,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "shear_per_bolt_lbf": {
+     "value": 1963.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flange-coupling-torque",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Larger eight-bolt coupling",
+   "source_edition_or_year": "Machinery Handbook / Shigley",
+   "source_section_or_page": "T = n(pi/4 d^2 tau)(BCD/2)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "bolt_count": 8,
+    "bolt_diameter_in": 0.75,
+    "allowable_shear_psi": 12000,
+    "bolt_circle_diameter_in": 8
+   },
+   "outputs": {
+    "torque_capacity_in_lb": {
+     "value": 169646,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

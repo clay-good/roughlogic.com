@@ -99024,6 +99024,41 @@
    "kind": "question"
   },
   {
+   "term": "flange coupling torque",
+   "target": "flange-coupling-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "coupling torque capacity",
+   "target": "flange-coupling-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "rigid coupling bolt shear",
+   "target": "flange-coupling-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "bolt circle torque",
+   "target": "flange-coupling-torque",
+   "kind": "adjacent"
+  },
+  {
+   "term": "shaft coupling bolts",
+   "target": "flange-coupling-torque",
+   "kind": "adjacent"
+  },
+  {
+   "term": "how much torque can a coupling transmit",
+   "target": "flange-coupling-torque",
+   "kind": "question"
+  },
+  {
+   "term": "flange coupling bolt sizing",
+   "target": "flange-coupling-torque",
+   "kind": "question"
+  },
+  {
    "term": "countersink size from plunge depth",
    "target": "countersink-diameter-from-depth",
    "kind": "question"

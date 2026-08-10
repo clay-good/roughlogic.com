@@ -2568,6 +2568,7 @@ cross-check.
 | calc-machining.js | `computeEnduranceLimitMarin` | `{ ultimate_strength_psi = 0, surface_finish = "machined", diameter_in = 1, lo...` | _ | _ | _ |
 | calc-machining.js | `computeEulerJohnsonColumn` | `{ modulus_psi = 30000000, yield_strength_psi = 0, moment_of_inertia_in4 = 0, ...` | _ | _ | _ |
 | calc-machining.js | `computeFatigueSafetyFactor` | `{ alternating_stress_psi = 0, mean_stress_psi = 0, endurance_limit_psi = 0, u...` | _ | _ | _ |
+| calc-machining.js | `computeFlangeCouplingTorque` | `{ bolt_count = 0, bolt_diameter_in = 0, allowable_shear_psi = 0, bolt_circle_...` | _ | _ | _ |
 | calc-machining.js | `computeGearChordalThickness` | `{ diametral_pitch = 0, teeth = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeGearIdentification` | `{ teeth = 0, outside_dia_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeGearUndercutBacklash` | `{ pressure_angle_deg = 20, teeth = 0, addendum_coefficient = 1.0, center_dist...` | _ | _ | _ |
@@ -3340,7 +3341,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1926.
+Row count: 1927.
 
 <!-- END function-corpus-v14 -->
 
@@ -4635,7 +4636,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (126 tiles)
+### Group K Mechanic (127 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4687,6 +4688,7 @@ per spec-v14 §13.1 second paragraph.
 | `euler-johnson-column` | Euler-Johnson Column Buckling | Project (first-principles); Euler / J.B. Johnson | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fatigue-safety-factor` | Fluctuating-Stress Fatigue Safety Factor (Goodman/Soderberg/Gerber) | Project (first-principles); Goodman/Soderberg/Gerber + Langer | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `feed-for-surface-finish` | Feed for a Target Turned Finish | First-principles scallop geometry (in...; 25 uin Ra target, 1/32 in nose radius -> 0.005 IPR (round... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `flange-coupling-torque` | Rigid Flange Coupling Torque Capacity | Project (first-principles); T = n(pi/4 d^2 tau)(BCD/2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flywheel-energy` | Flywheel Kinetic Energy and Speed Fluctuation | Flywheel kinetic energy and speed flu...; I = 100/32.174 x 1 = 3.108; omega = 1000 x pi/30 = 104.72... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fuel-range` | Fuel Energy and Range | Project (first-principles); range = 18 * 28 * 1.0 = 504 mi; total_btu = 18 * 112000 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gear-chordal-thickness` | Gear-Tooth Chordal Thickness (Caliper) | Machinery's Handbook / AGMA (gear-too...; half-angle 2.25 deg; tc = 4 sin(2.25) = 0.15704; ac = 0.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5188,6 +5190,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1675. Fixture-covered or reference-cadence: 1675 / 1675.
+Tile count: 1676. Fixture-covered or reference-cadence: 1676 / 1676.
 
 <!-- END tile-index-v14 -->

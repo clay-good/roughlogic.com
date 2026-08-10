@@ -38027,3 +38027,22 @@ test("bounds: spec-v1302 computeImpactLoadFactor pins the energy-method factor, 
   assert.ok("error" in _v1302({ weight_lb: 1000, drop_height_in: 2, static_deflection_in: 0 }));
   assert.ok("error" in _v1302({ weight_lb: Infinity, drop_height_in: 2, static_deflection_in: 0.10 }));
 });
+
+import { computeFlangeCouplingTorque as _v1303 } from "../../calc-machining.js";
+test("bounds: spec-v1303 computeFlangeCouplingTorque pins the torque capacity, per-bolt shear, the linear scalings, and error seams", () => {
+  // 6 bolts, d 0.5, tau 10000, BCD 5: Ab 0.1963, per-bolt 1963.5 lbf, T 29,452 in-lbf.
+  const r = _v1303({ bolt_count: 6, bolt_diameter_in: 0.5, allowable_shear_psi: 10000, bolt_circle_diameter_in: 5 });
+  assert.ok(Math.abs(r.shear_area_per_bolt_in2 - 0.19635) < 1e-4 && Math.abs(r.shear_per_bolt_lbf - 1963.5) < 0.5);
+  assert.ok(Math.abs(r.torque_capacity_in_lb - 29452) < 2 && Math.abs(r.torque_capacity_ft_lb - 2454) < 1);
+  // Capacity scales linearly with bolt count and with bolt-circle radius.
+  assert.ok(Math.abs(_v1303({ bolt_count: 12, bolt_diameter_in: 0.5, allowable_shear_psi: 10000, bolt_circle_diameter_in: 5 }).torque_capacity_in_lb / r.torque_capacity_in_lb - 2) < 1e-9);
+  assert.ok(Math.abs(_v1303({ bolt_count: 6, bolt_diameter_in: 0.5, allowable_shear_psi: 10000, bolt_circle_diameter_in: 10 }).torque_capacity_in_lb / r.torque_capacity_in_lb - 2) < 1e-9);
+  // Capacity scales with the square of bolt diameter (area).
+  assert.ok(Math.abs(_v1303({ bolt_count: 6, bolt_diameter_in: 1.0, allowable_shear_psi: 10000, bolt_circle_diameter_in: 5 }).torque_capacity_in_lb / r.torque_capacity_in_lb - 4) < 1e-6);
+  // Error seams: fewer than 2 bolts, non-positive diameter/shear/BCD, non-finite.
+  assert.ok("error" in _v1303({ bolt_count: 1, bolt_diameter_in: 0.5, allowable_shear_psi: 10000, bolt_circle_diameter_in: 5 }));
+  assert.ok("error" in _v1303({ bolt_count: 6, bolt_diameter_in: 0, allowable_shear_psi: 10000, bolt_circle_diameter_in: 5 }));
+  assert.ok("error" in _v1303({ bolt_count: 6, bolt_diameter_in: 0.5, allowable_shear_psi: 0, bolt_circle_diameter_in: 5 }));
+  assert.ok("error" in _v1303({ bolt_count: 6, bolt_diameter_in: 0.5, allowable_shear_psi: 10000, bolt_circle_diameter_in: 0 }));
+  assert.ok("error" in _v1303({ bolt_count: Infinity, bolt_diameter_in: 0.5, allowable_shear_psi: 10000, bolt_circle_diameter_in: 5 }));
+});

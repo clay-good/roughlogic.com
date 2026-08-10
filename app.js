@@ -1019,7 +1019,7 @@ const TOOL_MODULES = (() => {
     // spec-v401 spur gear tooth geometry
     "spur-gear-geometry", "worm-gear-geometry", "gear-undercut-backlash", "gear-identification", "gear-chordal-thickness",
     // spec-v504 rolling-bearing L10 rating life (ISO 281)
-    "bearing-l10-life", "bearing-max-load", "bearing-equivalent-load", "fatigue-safety-factor", "endurance-limit-marin", "power-screw-torque", "disk-clutch-torque", "euler-johnson-column", "thick-wall-cylinder-stress", "rack-and-pinion", "plain-bearing-pressure-pv",
+    "bearing-l10-life", "bearing-max-load", "bearing-equivalent-load", "fatigue-safety-factor", "endurance-limit-marin", "power-screw-torque", "disk-clutch-torque", "euler-johnson-column", "thick-wall-cylinder-stress", "rack-and-pinion", "plain-bearing-pressure-pv", "flange-coupling-torque",
     // spec-v509 countersink diameter and cutting depth
     "countersink-depth", "countersink-diameter-from-depth",
     // spec-v513 shaft key and keyseat size (ANSI B17.1)

@@ -1168,6 +1168,7 @@ export const COMPUTE_MAP = {
   "thick-wall-cylinder-stress": { module: "../../calc-machining.js", fn: "computeThickWallCylinderStress" },
   "rack-and-pinion": { module: "../../calc-machining.js", fn: "computeRackAndPinion" },
   "plain-bearing-pressure-pv": { module: "../../calc-machining.js", fn: "computePlainBearingPressurePv" },
+  "flange-coupling-torque": { module: "../../calc-machining.js", fn: "computeFlangeCouplingTorque" },
   "anchor-rode-scope": { module: "../../calc-mechanic.js", fn: "computeAnchorRodeScope" },
   "turbo-pressure-ratio": { module: "../../calc-mechanic.js", fn: "computeTurboPressureRatio" },
   "turbo-max-boost-for-charge-temp": { module: "../../calc-mechanic.js", fn: "computeTurboMaxBoostForChargeTemp" },

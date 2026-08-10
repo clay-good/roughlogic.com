@@ -1445,6 +1445,55 @@ function renderPlainBearingPressurePv(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["plain-bearing-pressure-pv"] = renderPlainBearingPressurePv;
 
+// ===================== spec-v1303: rigid flange coupling torque capacity =====================
+// flange-bolt-torque is the wrench torque to tighten a bolt; this is the TORQUE a rigid flange coupling transmits
+// through its bolt circle. The bolts act in single shear at the bolt-circle radius: T = n (pi/4 d^2 tau) (BCD/2).
+// dims: in { bolt_count: dimensionless, bolt_diameter_in: L, allowable_shear_psi: M L^-1 T^-2, bolt_circle_diameter_in: L } out: { torque_capacity_in_lb: M L^2 T^-2, torque_capacity_ft_lb: M L^2 T^-2, shear_per_bolt_lbf: M L T^-2, shear_area_per_bolt_in2: L^2 }
+export function computeFlangeCouplingTorque({ bolt_count = 0, bolt_diameter_in = 0, allowable_shear_psi = 0, bolt_circle_diameter_in = 0 } = {}) {
+  const _g = _finiteGuard({ bolt_count, bolt_diameter_in, allowable_shear_psi, bolt_circle_diameter_in }); if (_g) return _g;
+  const n = Number(bolt_count) || 0;
+  const d = Number(bolt_diameter_in) || 0;
+  const tau = Number(allowable_shear_psi) || 0;
+  const bcd = Number(bolt_circle_diameter_in) || 0;
+  if (!(n >= 2)) return { error: "Number of bolts must be at least 2." };
+  if (!(d > 0)) return { error: "Bolt diameter must be positive (in)." };
+  if (!(tau > 0)) return { error: "Allowable bolt shear stress must be positive (psi)." };
+  if (!(bcd > 0)) return { error: "Bolt-circle diameter must be positive (in)." };
+  const shear_area_per_bolt_in2 = (Math.PI / 4) * d * d;
+  const shear_per_bolt_lbf = shear_area_per_bolt_in2 * tau;
+  const R = bcd / 2;
+  const torque_capacity_in_lb = n * shear_per_bolt_lbf * R;
+  const torque_capacity_ft_lb = torque_capacity_in_lb / 12;
+  if (![torque_capacity_in_lb, shear_per_bolt_lbf, shear_area_per_bolt_in2].every(Number.isFinite) || !(torque_capacity_in_lb > 0)) return { error: "Coupling-torque math is not a finite value; check the inputs." };
+  return {
+    torque_capacity_in_lb, torque_capacity_ft_lb, shear_per_bolt_lbf, shear_area_per_bolt_in2, bolt_circle_radius_in: R,
+    note: "Torque a rigid flange coupling can transmit through its bolt circle, the bolts sharing the load equally in single shear at the bolt-circle radius: T = n (pi/4 d^2 tau) (BCD/2), with n the bolt count, d the bolt (or fitted-bolt body) diameter, tau the allowable bolt shear stress, and BCD the bolt-circle diameter. The capacity scales with the number of bolts, the bolt area, and the radius, so adding bolts, growing the circle, or using bigger bolts all raise it. Fitted (body-bound) bolts carry the torque directly in shear; friction-only (clearance) bolts rely on clamp force and are less certain - this is the shear basis. Also check the per-bolt shear against the flange bearing, the shaft key, and the hub, since the weakest link governs. The flange bearing stress, the shaft key, hub burst, friction-drive capacity, and misalignment (a flexible coupling) are separate. Use the allowable shear for the bolt grade with a safety factor. A design aid; Machinery's Handbook / Shigley and the coupling maker govern.",
+  };
+}
+export const flangeCouplingTorqueExample = { inputs: { bolt_count: 6, bolt_diameter_in: 0.5, allowable_shear_psi: 10000, bolt_circle_diameter_in: 5 } };
+function renderFlangeCouplingTorque(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: rigid flange coupling torque capacity, bolts in single shear at the bolt-circle radius: T = n (pi/4 d^2 tau) (BCD/2) (Machinery's Handbook; Shigley, Mechanical Engineering Design). Fitted bolts carry torque in shear; also check flange bearing, key, and hub. A design aid; the coupling maker governs.";
+  const n = makeNumber("Number of bolts n", "fct-n", { step: "1", min: "0" }); n.input.value = "6";
+  const d = makeNumber("Bolt diameter d (in)", "fct-d", { step: "any", min: "0" }); d.input.value = "0.5";
+  const tau = makeNumber("Allowable bolt shear stress (psi)", "fct-tau", { step: "any", min: "0" }); tau.input.value = "10000";
+  const bcd = makeNumber("Bolt-circle diameter BCD (in)", "fct-bcd", { step: "any", min: "0" }); bcd.input.value = "5";
+  for (const f of [n, d, tau, bcd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { n.input.value = "6"; d.input.value = "0.5"; tau.input.value = "10000"; bcd.input.value = "5"; update(); });
+  const oT = makeOutputLine(outputRegion, "Torque capacity", "fct-out-t");
+  const oB = makeOutputLine(outputRegion, "Shear per bolt", "fct-out-b");
+  const oNote = makeOutputLine(outputRegion, "Note", "fct-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeFlangeCouplingTorque({ bolt_count: readNum(n.input), bolt_diameter_in: readNum(d.input), allowable_shear_psi: readNum(tau.input), bolt_circle_diameter_in: readNum(bcd.input) });
+    if (r.error) { oT.textContent = r.error; oB.textContent = "-"; oNote.textContent = ""; return; }
+    oT.textContent = fmt(r.torque_capacity_in_lb, 0) + " in-lbf (" + fmt(r.torque_capacity_ft_lb, 0) + " ft-lbf)";
+    oB.textContent = fmt(r.shear_per_bolt_lbf, 1) + " lbf (bolt shear area " + fmt(r.shear_area_per_bolt_in2, 4) + " in^2)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [n, d, tau, bcd]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["flange-coupling-torque"] = renderFlangeCouplingTorque;
+
 // ===================== spec-v509: countersink diameter and cutting depth =====================
 // dims: in { countersink_dia_in: L, included_angle_deg: dimensionless, pilot_hole_dia_in: L } out: { z_in: L, z_full_in: L }
 export function computeCountersinkDepth({ countersink_dia_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}) {

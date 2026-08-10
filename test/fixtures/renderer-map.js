@@ -1317,6 +1317,7 @@ export const RENDERER_MAP = {
   "thick-wall-cylinder-stress": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "rack-and-pinion": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "plain-bearing-pressure-pv": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
+  "flange-coupling-torque": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "countersink-depth": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "countersink-diameter-from-depth": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "keyseat-key-size": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },

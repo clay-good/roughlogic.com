@@ -11082,6 +11082,18 @@ export const CITATIONS = {
       { name: "Scope", value: "static pressure/PV screen; hydrodynamic film, temperature rise, material limits are the maker's", source: "scope of this tile" },
     ],
   },
+  "flange-coupling-torque": {
+    formula: "Ab = pi/4 d^2; per-bolt shear = Ab tau; R = BCD/2; T = n (Ab tau) R.",
+    edition: "The rigid flange-coupling torque capacity, bolts in single shear at the bolt-circle radius (Machinery's Handbook; Shigley, Mechanical Engineering Design), by name.",
+    freeAccess: "The flange-coupling torque relation is a standard published machine-design result; the bolt count, diameter, allowable shear, and bolt-circle diameter are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Torque a rigid flange coupling can transmit through its bolt circle, the bolts sharing the load equally in single shear at the bolt-circle radius: T = n (pi/4 d^2 tau) (BCD/2), with n the bolt count, d the bolt (or fitted-bolt body) diameter, tau the allowable bolt shear stress, and BCD the bolt-circle diameter. The capacity scales with the number of bolts, the bolt area, and the radius, so adding bolts, growing the circle, or using bigger bolts all raise it. Fitted (body-bound) bolts carry the torque directly in shear; friction-only (clearance) bolts rely on clamp force and are less certain - this is the shear basis. Also check the per-bolt shear against the flange bearing, the shaft key, and the hub, since the weakest link governs. The flange bearing stress, the shaft key, hub burst, friction-drive capacity, and misalignment (a flexible coupling) are separate. Use the allowable shear for the bolt grade with a safety factor. A design aid; Machinery's Handbook / Shigley and the coupling maker govern.",
+    assumptions: [
+      { name: "Torque capacity", value: "T = n (pi/4 d^2 tau)(BCD/2), bolts in single shear sharing equally", source: "Machinery's Handbook / Shigley" },
+      { name: "Fitted bolts", value: "fitted (body-bound) bolts carry torque in shear; clearance bolts rely on clamp friction", source: "coupling design" },
+      { name: "Scope", value: "bolt shear only; flange bearing, key, hub, flexible-coupling misalignment are separate", source: "scope of this tile" },
+    ],
+  },
   "bolt-proof-load": {
     formula: "At = 0.7854 x (D - 0.9743/n)^2; proof_load = At x proof_strength; yield_load = At x yield_strength; tensile_load = At x tensile_strength; rec_clamp = 0.75 x proof_load.",
     edition: "The SAE J429 inch-series bolt strength model (tensile stress area x grade strength), with the ASME B1.1 tensile stress area, by name; the joint design, torque method, and preload requirement govern.",
