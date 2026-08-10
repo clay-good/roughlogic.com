@@ -37888,3 +37888,26 @@ test("bounds: spec-v1296 computeTorsionSpringRate pins the rate, torque, Wahl be
   assert.ok("error" in _v1296({ wire_diameter_in: 0.1875, mean_coil_diameter_in: 1.5, active_coils: 30, deflection_deg: -10, material: "music-wire" }));
   assert.ok("error" in _v1296({ wire_diameter_in: Infinity, mean_coil_diameter_in: 1.5, active_coils: 30, deflection_deg: 90, material: "music-wire" }));
 });
+
+import { computeThickWallCylinderStress as _v1297 } from "../../calc-machining.js";
+test("bounds: spec-v1297 computeThickWallCylinderStress pins the Lame bore/outer hoop, longitudinal, radial, the thin-wall comparison, and error seams", () => {
+  // 3000 psi, ri 2, t 0.5 (ro 2.5): hoop bore 13,667, outer 10,667, long 5,333, radial -3,000; thin-wall 12,000, D/t 8.
+  const r = _v1297({ pressure_psi: 3000, inner_radius_in: 2, wall_thickness_in: 0.5 });
+  assert.ok(Math.abs(r.hoop_bore_psi - 13667) < 2 && Math.abs(r.hoop_outer_psi - 10667) < 2);
+  assert.ok(Math.abs(r.longitudinal_psi - 5333) < 2 && r.radial_bore_psi === -3000);
+  assert.ok(Math.abs(r.thin_wall_estimate_psi - 12000) < 1e-6 && Math.abs(r.d_over_t - 8) < 1e-9);
+  // The hoop stress is always largest at the bore and drops toward the outer wall.
+  assert.ok(r.hoop_bore_psi > r.hoop_outer_psi);
+  // The thin-wall estimate runs below the true bore stress for a thick wall.
+  assert.ok(r.thin_wall_estimate_psi < r.hoop_bore_psi);
+  // As the wall gets very thin the Lame bore stress approaches the thin-wall estimate.
+  const thin = _v1297({ pressure_psi: 3000, inner_radius_in: 20, wall_thickness_in: 0.2 });
+  assert.ok(Math.abs(thin.hoop_bore_psi / thin.thin_wall_estimate_psi - 1) < 0.02 && thin.d_over_t > 20);
+  // Bore hoop scales linearly with pressure.
+  assert.ok(Math.abs(_v1297({ pressure_psi: 6000, inner_radius_in: 2, wall_thickness_in: 0.5 }).hoop_bore_psi / r.hoop_bore_psi - 2) < 1e-9);
+  // Error seams: non-positive pressure/radius/thickness, non-finite.
+  assert.ok("error" in _v1297({ pressure_psi: 0, inner_radius_in: 2, wall_thickness_in: 0.5 }));
+  assert.ok("error" in _v1297({ pressure_psi: 3000, inner_radius_in: 0, wall_thickness_in: 0.5 }));
+  assert.ok("error" in _v1297({ pressure_psi: 3000, inner_radius_in: 2, wall_thickness_in: 0 }));
+  assert.ok("error" in _v1297({ pressure_psi: Infinity, inner_radius_in: 2, wall_thickness_in: 0.5 }));
+});

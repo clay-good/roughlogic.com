@@ -87387,6 +87387,68 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "thick-wall-cylinder-stress",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Hydraulic cylinder tube, Lame bore stress",
+   "source_edition_or_year": "Shigley / Roark",
+   "source_section_or_page": "Lame thick-wall",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "pressure_psi": 3000,
+    "inner_radius_in": 2,
+    "wall_thickness_in": 0.5
+   },
+   "outputs": {
+    "hoop_bore_psi": {
+     "value": 13667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "hoop_outer_psi": {
+     "value": 10667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "thin_wall_estimate_psi": {
+     "value": 12000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thick-wall-cylinder-stress",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Longitudinal and radial at the bore",
+   "source_edition_or_year": "Shigley / Roark",
+   "source_section_or_page": "Lame thick-wall",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "pressure_psi": 3000,
+    "inner_radius_in": 2,
+    "wall_thickness_in": 0.5
+   },
+   "outputs": {
+    "longitudinal_psi": {
+     "value": 5333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "radial_bore_psi": {
+     "value": -3000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

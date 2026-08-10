@@ -11046,6 +11046,18 @@ export const CITATIONS = {
       { name: "Scope", value: "concentric load; secant/eccentric, local buckling, and code provisions are separate", source: "scope of this tile" },
     ],
   },
+  "thick-wall-cylinder-stress": {
+    formula: "ro = ri + t; sigma_hoop(bore) = P(ro^2+ri^2)/(ro^2-ri^2); sigma_hoop(outer) = 2P ri^2/(ro^2-ri^2); sigma_radial(bore) = -P; sigma_long(closed) = P ri^2/(ro^2-ri^2); thin-wall P D/(2t) shown for comparison.",
+    edition: "The Lame thick-wall cylinder equations for internal pressure (Shigley, Mechanical Engineering Design; Roark's Formulas for Stress and Strain), by name; the companion below D/t = 20 to the hoop-stress-thin-wall tile.",
+    freeAccess: "The Lame equations are standard published elasticity results; the pressure, inner radius, and wall thickness are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Lame thick-wall cylinder stresses under internal pressure P, for inner radius ri and outer radius ro = ri + t. The tangential (hoop) stress is largest at the BORE, sigma_hoop(bore) = P(ro^2 + ri^2)/(ro^2 - ri^2), and falls to 2P ri^2/(ro^2 - ri^2) at the outer wall, so a thick cylinder yields from the inside out. The radial stress at the bore equals the pressure in compression (-P), and the longitudinal stress for capped ends is P ri^2/(ro^2 - ri^2). The thin-wall estimate P D/(2t) (using the inner diameter) is shown for comparison; for D/t below 20 it runs low - about 14% low at D/t = 8 - which is why a high-pressure tube must use Lame rather than the thin-wall formula. Single-material cylinder, internal pressure only; external pressure, interference (press) fit, compound or autofrettaged tubes, end-cap details, and buckling are separate. Apply a safety factor against the material yield with a suitable failure theory. A design aid; Shigley / Roark and the engineer of record govern.",
+    assumptions: [
+      { name: "Lame equations", value: "hoop max at the bore, P(ro^2+ri^2)/(ro^2-ri^2); internal pressure only", source: "Shigley / Roark" },
+      { name: "Thin-wall comparison", value: "P D/(2t) runs low for D/t < 20 (the hoop-stress-thin-wall regime)", source: "elasticity" },
+      { name: "Scope", value: "single material, internal pressure; external pressure, press fit, compound tubes are separate", source: "scope of this tile" },
+    ],
+  },
   "bolt-proof-load": {
     formula: "At = 0.7854 x (D - 0.9743/n)^2; proof_load = At x proof_strength; yield_load = At x yield_strength; tensile_load = At x tensile_strength; rec_clamp = 0.75 x proof_load.",
     edition: "The SAE J429 inch-series bolt strength model (tensile stress area x grade strength), with the ASME B1.1 tensile stress area, by name; the joint design, torque method, and preload requirement govern.",

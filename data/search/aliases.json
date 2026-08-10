@@ -98774,6 +98774,46 @@
    "kind": "question"
   },
   {
+   "term": "thick wall cylinder stress",
+   "target": "thick-wall-cylinder-stress",
+   "kind": "industry"
+  },
+  {
+   "term": "lame equation cylinder",
+   "target": "thick-wall-cylinder-stress",
+   "kind": "industry"
+  },
+  {
+   "term": "hydraulic cylinder tube stress",
+   "target": "thick-wall-cylinder-stress",
+   "kind": "industry"
+  },
+  {
+   "term": "thick wall pipe hoop stress",
+   "target": "thick-wall-cylinder-stress",
+   "kind": "industry"
+  },
+  {
+   "term": "bore stress pressure vessel",
+   "target": "thick-wall-cylinder-stress",
+   "kind": "adjacent"
+  },
+  {
+   "term": "thick wall pressure vessel",
+   "target": "thick-wall-cylinder-stress",
+   "kind": "adjacent"
+  },
+  {
+   "term": "gun barrel stress",
+   "target": "thick-wall-cylinder-stress",
+   "kind": "adjacent"
+  },
+  {
+   "term": "hoop stress thick wall",
+   "target": "thick-wall-cylinder-stress",
+   "kind": "question"
+  },
+  {
    "term": "countersink size from plunge depth",
    "target": "countersink-diameter-from-depth",
    "kind": "question"

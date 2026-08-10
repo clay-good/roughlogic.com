@@ -1284,6 +1284,59 @@ function renderEulerJohnsonColumn(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["euler-johnson-column"] = renderEulerJohnsonColumn;
 
+// ===================== spec-v1297: thick-wall cylinder stress (Lame) =====================
+// hoop-stress-thin-wall gives P D/(2t) "valid for D/t >= 20"; below that (a hydraulic-cylinder tube, thick pipe,
+// gun barrel) the wall is thick, the stress varies through it, and the peak sits at the BORE. Lame equations for
+// internal pressure: sigma_hoop(bore) = P(ro^2+ri^2)/(ro^2-ri^2), sigma_hoop(outer) = 2P ri^2/(ro^2-ri^2),
+// sigma_radial(bore) = -P, sigma_long(closed) = P ri^2/(ro^2-ri^2). The thin-wall estimate is shown for comparison.
+// dims: in { pressure_psi: M L^-1 T^-2, inner_radius_in: L, wall_thickness_in: L } out: { hoop_bore_psi: M L^-1 T^-2, hoop_outer_psi: M L^-1 T^-2, radial_bore_psi: M L^-1 T^-2, longitudinal_psi: M L^-1 T^-2, thin_wall_estimate_psi: M L^-1 T^-2 }
+export function computeThickWallCylinderStress({ pressure_psi = 0, inner_radius_in = 0, wall_thickness_in = 0 } = {}) {
+  const _g = _finiteGuard({ pressure_psi, inner_radius_in, wall_thickness_in }); if (_g) return _g;
+  const P = Number(pressure_psi) || 0;
+  const ri = Number(inner_radius_in) || 0;
+  const t = Number(wall_thickness_in) || 0;
+  if (!(P > 0)) return { error: "Internal pressure must be positive (psi)." };
+  if (!(ri > 0)) return { error: "Inner radius must be positive (in)." };
+  if (!(t > 0)) return { error: "Wall thickness must be positive (in)." };
+  const ro = ri + t;
+  const denom = ro * ro - ri * ri;
+  const hoop_bore_psi = (P * (ro * ro + ri * ri)) / denom;
+  const hoop_outer_psi = (2 * P * ri * ri) / denom;
+  const radial_bore_psi = -P;
+  const longitudinal_psi = (P * ri * ri) / denom;
+  const d_over_t = (2 * ri) / t;
+  const thin_wall_estimate_psi = (P * (2 * ri)) / (2 * t); // P D/(2t) with D = ID
+  if (![hoop_bore_psi, hoop_outer_psi, longitudinal_psi, thin_wall_estimate_psi].every(Number.isFinite) || !(hoop_bore_psi > 0)) return { error: "Thick-wall math is not a finite value; check the inputs." };
+  return {
+    hoop_bore_psi, hoop_outer_psi, radial_bore_psi, longitudinal_psi, thin_wall_estimate_psi, d_over_t, outer_radius_in: ro,
+    note: "Lame thick-wall cylinder stresses under internal pressure P, for inner radius ri and outer radius ro = ri + t. The tangential (hoop) stress is largest at the BORE, sigma_hoop(bore) = P(ro^2 + ri^2)/(ro^2 - ri^2), and falls to 2P ri^2/(ro^2 - ri^2) at the outer wall, so a thick cylinder yields from the inside out. The radial stress at the bore equals the pressure in compression (-P), and the longitudinal stress for capped ends is P ri^2/(ro^2 - ri^2). The thin-wall estimate P D/(2t) (using the inner diameter) is shown for comparison; for D/t below 20 it runs low - about 14% low at D/t = 8 - which is why a high-pressure tube must use Lame rather than the thin-wall formula. Single-material cylinder, internal pressure only; external pressure, interference (press) fit, compound or autofrettaged tubes, end-cap details, and buckling are separate. Apply a safety factor against the material yield with a suitable failure theory. A design aid; Shigley / Roark and the engineer of record govern.",
+  };
+}
+export const thickWallCylinderStressExample = { inputs: { pressure_psi: 3000, inner_radius_in: 2, wall_thickness_in: 0.5 } };
+function renderThickWallCylinderStress(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Lame thick-wall cylinder stress for internal pressure (Shigley, Mechanical Engineering Design; Roark's Formulas for Stress and Strain): sigma_hoop(bore) = P(ro^2+ri^2)/(ro^2-ri^2), sigma_hoop(outer) = 2P ri^2/(ro^2-ri^2), sigma_radial(bore) = -P, sigma_long(closed) = P ri^2/(ro^2-ri^2). The thin-wall P D/(2t) is shown for comparison. A design aid; the engineer of record governs.";
+  const P = makeNumber("Internal pressure P (psi)", "twc-p", { step: "any", min: "0" }); P.input.value = "3000";
+  const ri = makeNumber("Inner radius ri (in)", "twc-ri", { step: "any", min: "0" }); ri.input.value = "2";
+  const t = makeNumber("Wall thickness t (in)", "twc-t", { step: "any", min: "0" }); t.input.value = "0.5";
+  for (const f of [P, ri, t]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { P.input.value = "3000"; ri.input.value = "2"; t.input.value = "0.5"; update(); });
+  const oH = makeOutputLine(outputRegion, "Hoop stress (bore / outer)", "twc-out-h");
+  const oL = makeOutputLine(outputRegion, "Longitudinal / radial (bore)", "twc-out-l");
+  const oT = makeOutputLine(outputRegion, "Thin-wall estimate (for comparison)", "twc-out-t");
+  const oNote = makeOutputLine(outputRegion, "Note", "twc-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeThickWallCylinderStress({ pressure_psi: readNum(P.input), inner_radius_in: readNum(ri.input), wall_thickness_in: readNum(t.input) });
+    if (r.error) { oH.textContent = r.error; oL.textContent = "-"; oT.textContent = "-"; oNote.textContent = ""; return; }
+    oH.textContent = fmt(r.hoop_bore_psi, 0) + " / " + fmt(r.hoop_outer_psi, 0) + " psi (max at the bore)";
+    oL.textContent = fmt(r.longitudinal_psi, 0) + " psi longitudinal, " + fmt(r.radial_bore_psi, 0) + " psi radial";
+    oT.textContent = fmt(r.thin_wall_estimate_psi, 0) + " psi (D/t = " + fmt(r.d_over_t, 1) + (r.d_over_t < 20 ? ", thick-wall: thin-wall runs low" : ", thin-wall OK") + ")";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [P, ri, t]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["thick-wall-cylinder-stress"] = renderThickWallCylinderStress;
+
 // ===================== spec-v509: countersink diameter and cutting depth =====================
 // dims: in { countersink_dia_in: L, included_angle_deg: dimensionless, pilot_hole_dia_in: L } out: { z_in: L, z_full_in: L }
 export function computeCountersinkDepth({ countersink_dia_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}) {
