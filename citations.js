@@ -11842,6 +11842,18 @@ export const CITATIONS = {
       { name: "Scope", value: "plasticity, damping, member mass, and rope/sling dynamics are separate", source: "scope of this tile" },
     ],
   },
+  "hydraulic-accumulator-volume": {
+    formula: "P = P_gauge + 14.7; dV = V0[(P0/P1)^(1/n) - (P0/P2)^(1/n)]; n = 1 isothermal, 1.4 adiabatic. Precharge P0 <= min working P1.",
+    edition: "The gas-charged hydraulic accumulator usable-volume relation with absolute pressures (Machinery's Handbook; NFPA fluid-power practice; Boyle's law, isothermal n = 1 / adiabatic n = 1.4), by name.",
+    freeAccess: "The accumulator gas-law relation is standard published fluid-power design; the accumulator size, precharge, and working pressures are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Usable (deliverable) oil volume of a gas-charged bladder or piston hydraulic accumulator, dV = V0[(P0/P1)^(1/n) - (P0/P2)^(1/n)] with ABSOLUTE pressures (gauge + 14.7): V0 the accumulator (nominal gas) size, P0 the precharge, P1 the minimum working pressure, and P2 the maximum. Below the precharge the accumulator holds no oil, so the precharge must sit at or just below P1 (a common rule is P0 = 0.9 P1). The gas process sets the exponent: a slow cycle is isothermal (n = 1) and stores the most oil; a fast cycle is adiabatic (n = 1.4), where the heated gas stores less; the truth is between. Widen the pressure band or precharge closer to the minimum to get more usable oil, or step up to a bigger accumulator. Temperature correction of the precharge, real-gas effects at very high pressure, response time, and the shock/pulsation duty are separate. Keep the precharge and pressures within the accumulator's rating. A design aid; Machinery's Handbook / NFPA fluid-power practice and the accumulator maker govern.",
+    assumptions: [
+      { name: "Gas law", value: "dV = V0[(P0/P1)^(1/n) - (P0/P2)^(1/n)], absolute pressures, n = 1 or 1.4", source: "Boyle's law / fluid-power design" },
+      { name: "Precharge", value: "P0 at or below the minimum working pressure (common rule 0.9 P1)", source: "accumulator practice" },
+      { name: "Scope", value: "usable volume only; precharge temperature correction, real-gas, response time are separate", source: "scope of this tile" },
+    ],
+  },
   "gear-identification": {
     formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
     edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",

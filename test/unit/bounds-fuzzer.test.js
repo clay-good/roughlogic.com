@@ -38046,3 +38046,23 @@ test("bounds: spec-v1303 computeFlangeCouplingTorque pins the torque capacity, p
   assert.ok("error" in _v1303({ bolt_count: 6, bolt_diameter_in: 0.5, allowable_shear_psi: 10000, bolt_circle_diameter_in: 0 }));
   assert.ok("error" in _v1303({ bolt_count: Infinity, bolt_diameter_in: 0.5, allowable_shear_psi: 10000, bolt_circle_diameter_in: 5 }));
 });
+
+import { computeHydraulicAccumulatorVolume as _v1304 } from "../../calc-mechanic.js";
+test("bounds: spec-v1304 computeHydraulicAccumulatorVolume pins the isothermal/adiabatic usable volume, the process ordering, and error seams", () => {
+  // 1 gal, P0 1500, P1 1600, P2 3000 psig, isothermal: 0.4356 gal (43.6%).
+  const iso = _v1304({ accumulator_size_gal: 1, precharge_psig: 1500, min_pressure_psig: 1600, max_pressure_psig: 3000, gas_process: "isothermal" });
+  assert.ok(Math.abs(iso.usable_volume_gal - 0.4356) < 5e-3 && Math.abs(iso.utilization_pct - 43.6) < 0.5 && iso.polytropic_n === 1);
+  // Adiabatic (heated gas) stores less than isothermal for the same accumulator and pressures.
+  const adi = _v1304({ accumulator_size_gal: 1, precharge_psig: 1500, min_pressure_psig: 1600, max_pressure_psig: 3000, gas_process: "adiabatic" });
+  assert.ok(Math.abs(adi.usable_volume_gal - 0.3437) < 5e-3 && adi.usable_volume_gal < iso.usable_volume_gal && adi.polytropic_n === 1.4);
+  // Usable volume scales linearly with accumulator size.
+  assert.ok(Math.abs(_v1304({ accumulator_size_gal: 2, precharge_psig: 1500, min_pressure_psig: 1600, max_pressure_psig: 3000, gas_process: "isothermal" }).usable_volume_gal / iso.usable_volume_gal - 2) < 1e-9);
+  // A wider pressure band delivers more usable oil.
+  assert.ok(_v1304({ accumulator_size_gal: 1, precharge_psig: 1500, min_pressure_psig: 1600, max_pressure_psig: 5000, gas_process: "isothermal" }).usable_volume_gal > iso.usable_volume_gal);
+  // Error seams: non-positive size/pressures, precharge above min, max not above min, unknown process, non-finite.
+  assert.ok("error" in _v1304({ accumulator_size_gal: 0, precharge_psig: 1500, min_pressure_psig: 1600, max_pressure_psig: 3000, gas_process: "isothermal" }));
+  assert.ok("error" in _v1304({ accumulator_size_gal: 1, precharge_psig: 1700, min_pressure_psig: 1600, max_pressure_psig: 3000, gas_process: "isothermal" }));
+  assert.ok("error" in _v1304({ accumulator_size_gal: 1, precharge_psig: 1500, min_pressure_psig: 3000, max_pressure_psig: 1600, gas_process: "isothermal" }));
+  assert.ok("error" in _v1304({ accumulator_size_gal: 1, precharge_psig: 1500, min_pressure_psig: 1600, max_pressure_psig: 3000, gas_process: "polytropic" }));
+  assert.ok("error" in _v1304({ accumulator_size_gal: Infinity, precharge_psig: 1500, min_pressure_psig: 1600, max_pressure_psig: 3000, gas_process: "isothermal" }));
+});

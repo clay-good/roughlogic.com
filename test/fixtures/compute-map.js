@@ -185,6 +185,7 @@ export const COMPUTE_MAP = {
   "universal-joint-speed": { module: "../../calc-mechanic.js", fn: "computeUniversalJointSpeed" },
   "slider-crank-piston-position": { module: "../../calc-mechanic.js", fn: "computeSliderCrankPistonPosition" },
   "impact-load-factor": { module: "../../calc-mechanic.js", fn: "computeImpactLoadFactor" },
+  "hydraulic-accumulator-volume": { module: "../../calc-mechanic.js", fn: "computeHydraulicAccumulatorVolume" },
   "gear-dynamic-tooth-stress": { module: "../../calc-mechanic.js", fn: "computeGearDynamicToothStress" },
   "trap-seal-loss": { module: "../../calc-plumbing.js", fn: "computeTrapSealLoss" },
   "water-meter-sizing": { module: "../../calc-plumbing.js", fn: "computeWaterMeterSizing" },

@@ -2640,6 +2640,7 @@ cross-check.
 | calc-mechanic.js | `computeHpFromTorque` | `{ solve_for = "hp", torque_lbft = 0, rpm = 0, hp = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHullDisplacement` | `{ lwl_ft = 30, bwl_ft = 10, draft_ft = 4, block_coefficient = 0.5, water_dens...` | _ | _ | _ |
 | calc-mechanic.js | `computeHullSpeed` | `{ lwl_ft = 0, actual_speed_kn = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeHydraulicAccumulatorVolume` | `{ accumulator_size_gal = 0, precharge_psig = 0, min_pressure_psig = 0, max_pr...` | _ | _ | _ |
 | calc-mechanic.js | `computeHydraulicDriveFlowLimit` | `{ drive_hp = 0, psi = 0, efficiency = 0.85 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHydraulicLineVelocity` | `{ flow_gpm = 0, inside_dia_in = 0, line_type = "pressure", max_velocity_overr...` | _ | _ | _ |
 | calc-mechanic.js | `computeHydraulicMotorTorqueSpeed` | `{ psi = 0, disp_in3 = 0, gpm = 0, mech_eff = 0.90, vol_eff = 0.95 } = {}` | _ | _ | _ |
@@ -3341,7 +3342,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1927.
+Row count: 1928.
 
 <!-- END function-corpus-v14 -->
 
@@ -4636,7 +4637,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (127 tiles)
+### Group K Mechanic (128 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4704,6 +4705,7 @@ per spec-v14 §13.1 second paragraph.
 | `hp-from-torque` | Horsepower from Torque and RPM | Classical mechanical power (Watt) + S...; 400 lb-ft at 5000 RPM -> 380.8 HP | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hull-displacement` | Hull Displacement and Block Coefficient | Hull displacement (Archimedes + block...; vol = 30*10*4*0.5 = 600; wt = 600*64 = 38400; long tons =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hull-speed` | Displacement Hull Speed and Speed/Length Ratio | displacement hull-speed relation (Fro...; spec-v502 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `hydraulic-accumulator-volume` | Hydraulic Accumulator Usable Oil Volume | Project (first-principles); dV = V0[(P0/P1)^(1/n)-(P0/P2)^(1/n)] | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-drive-flow-limit` | Hydraulic Flow Limit from Drive Power | fluid-power engineering (inverse); 13.73 drive HP, 2000 psi, 0.85 efficiency -> 10 GPM (roun... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-line-velocity` | Hydraulic Line Fluid Velocity and Minimum ID | hydraulic design practice; 20 gpm through 0.625-in ID pressure line -> A 0.30680 in^... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-motor-torque-speed` | Hydraulic Motor Torque and Speed | fluid-power engineering; spec-v397 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5190,6 +5192,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1676. Fixture-covered or reference-cadence: 1676 / 1676.
+Tile count: 1677. Fixture-covered or reference-cadence: 1677 / 1677.
 
 <!-- END tile-index-v14 -->

@@ -1578,6 +1578,56 @@ MECHANIC_RENDERERS["impact-load-factor"] = _simpleRenderer({
   compute: computeImpactLoadFactor,
 });
 
+// --- spec-v1304 K: hydraulic accumulator usable oil volume (`hydraulic-accumulator-volume`) ---
+// The catalog sizes a compressed-AIR receiver but not a hydraulic accumulator, which sizes on the gas law
+// between precharge and working pressures: dV = V0[(P0/P1)^(1/n) - (P0/P2)^(1/n)], absolute pressures,
+// n = 1 isothermal (slow) / 1.4 adiabatic (fast). Precharge must sit at or below the minimum working pressure.
+// dims: in { accumulator_size_gal: L^3, precharge_psig: M L^-1 T^-2, min_pressure_psig: M L^-1 T^-2, max_pressure_psig: M L^-1 T^-2, gas_process: dimensionless } out: { usable_volume_gal: L^3, utilization_pct: dimensionless }
+export function computeHydraulicAccumulatorVolume({ accumulator_size_gal = 0, precharge_psig = 0, min_pressure_psig = 0, max_pressure_psig = 0, gas_process = "isothermal" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const V0 = Number(accumulator_size_gal) || 0;
+  const P0g = Number(precharge_psig) || 0;
+  const P1g = Number(min_pressure_psig) || 0;
+  const P2g = Number(max_pressure_psig) || 0;
+  if (!(V0 > 0)) return { error: "Accumulator size must be positive (gal)." };
+  if (!(P0g > 0)) return { error: "Precharge pressure must be positive (psig)." };
+  if (!(P1g > 0)) return { error: "Minimum working pressure must be positive (psig)." };
+  if (!(P2g > P1g)) return { error: "Maximum working pressure must be greater than the minimum (psig)." };
+  if (P0g > P1g) return { error: "Precharge must be at or below the minimum working pressure (psig)." };
+  if (gas_process !== "isothermal" && gas_process !== "adiabatic") return { error: "Gas process must be isothermal or adiabatic." };
+  const n = gas_process === "adiabatic" ? 1.4 : 1;
+  const P0 = P0g + 14.7, P1 = P1g + 14.7, P2 = P2g + 14.7;
+  const usable_volume_gal = V0 * (Math.pow(P0 / P1, 1 / n) - Math.pow(P0 / P2, 1 / n));
+  const utilization_pct = (usable_volume_gal / V0) * 100;
+  if (![usable_volume_gal, utilization_pct].every(Number.isFinite) || !(usable_volume_gal > 0)) return { error: "Accumulator math is not a finite value; check the inputs." };
+  return {
+    usable_volume_gal, utilization_pct, polytropic_n: n,
+    note: "Usable (deliverable) oil volume of a gas-charged bladder or piston hydraulic accumulator, dV = V0[(P0/P1)^(1/n) - (P0/P2)^(1/n)] with ABSOLUTE pressures (gauge + 14.7): V0 the accumulator (nominal gas) size, P0 the precharge, P1 the minimum working pressure, and P2 the maximum. Below the precharge the accumulator holds no oil, so the precharge must sit at or just below P1 (a common rule is P0 = 0.9 P1). The gas process sets the exponent: a slow cycle is isothermal (n = 1) and stores the most oil; a fast cycle is adiabatic (n = 1.4), where the heated gas stores less; the truth is between. Widen the pressure band or precharge closer to the minimum to get more usable oil, or step up to a bigger accumulator. Temperature correction of the precharge, real-gas effects at very high pressure, response time, and the shock/pulsation duty are separate. Keep the precharge and pressures within the accumulator's rating. A design aid; Machinery's Handbook / NFPA fluid-power practice and the accumulator maker govern.",
+  };
+}
+export const hydraulicAccumulatorVolumeExample = { inputs: { accumulator_size_gal: 1, precharge_psig: 1500, min_pressure_psig: 1600, max_pressure_psig: 3000, gas_process: "isothermal" } };
+
+MECHANIC_RENDERERS["hydraulic-accumulator-volume"] = _simpleRenderer({
+  citation: "Citation: hydraulic accumulator usable oil volume dV = V0[(P0/P1)^(1/n) - (P0/P2)^(1/n)] with absolute pressures (Machinery's Handbook; NFPA fluid-power practice; Boyle's law n = 1 isothermal, 1.4 adiabatic). The precharge sits at or below the minimum working pressure. A design aid; the accumulator maker governs.",
+  example: hydraulicAccumulatorVolumeExample.inputs,
+  fields: [
+    { key: "accumulator_size_gal", label: "Accumulator size V0 (gal)", kind: "number" },
+    { key: "precharge_psig", label: "Gas precharge P0 (psig)", kind: "number" },
+    { key: "min_pressure_psig", label: "Minimum working pressure P1 (psig)", kind: "number" },
+    { key: "max_pressure_psig", label: "Maximum working pressure P2 (psig)", kind: "number" },
+    { key: "gas_process", label: "Gas process", kind: "select", default: "isothermal", options: [
+      { value: "isothermal", label: "Isothermal (slow cycle, n = 1)" },
+      { value: "adiabatic", label: "Adiabatic (fast cycle, n = 1.4)" },
+    ] },
+  ],
+  outputs: [
+    { key: "v", id: "hav-out-v", label: "Usable oil volume", value: (r) => fmt(r.usable_volume_gal, 4) + " gal (" + fmt(r.usable_volume_gal * 231, 1) + " in^3)" },
+    { key: "u", id: "hav-out-u", label: "Utilization", value: (r) => fmt(r.utilization_pct, 1) + "% of the nominal size (n = " + fmt(r.polytropic_n, 1) + ")" },
+    { key: "n", id: "hav-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHydraulicAccumulatorVolume,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================

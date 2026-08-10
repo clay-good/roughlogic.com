@@ -87789,6 +87789,60 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "hydraulic-accumulator-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1-gal accumulator, slow (isothermal) cycle",
+   "source_edition_or_year": "Machinery Handbook / NFPA",
+   "source_section_or_page": "dV = V0[(P0/P1)^(1/n)-(P0/P2)^(1/n)]",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "accumulator_size_gal": 1,
+    "precharge_psig": 1500,
+    "min_pressure_psig": 1600,
+    "max_pressure_psig": 3000,
+    "gas_process": "isothermal"
+   },
+   "outputs": {
+    "usable_volume_gal": {
+     "value": 0.4356,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "utilization_pct": {
+     "value": 43.6,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydraulic-accumulator-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Fast (adiabatic) cycle stores less",
+   "source_edition_or_year": "Machinery Handbook / NFPA",
+   "source_section_or_page": "dV = V0[(P0/P1)^(1/n)-(P0/P2)^(1/n)]",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "accumulator_size_gal": 1,
+    "precharge_psig": 1500,
+    "min_pressure_psig": 1600,
+    "max_pressure_psig": 3000,
+    "gas_process": "adiabatic"
+   },
+   "outputs": {
+    "usable_volume_gal": {
+     "value": 0.3437,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
   }
  ]
 }
