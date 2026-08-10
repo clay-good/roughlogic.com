@@ -2564,6 +2564,7 @@ cross-check.
 | calc-machining.js | `computeCuttingSpeed` | `{ surface_speed_sfm = 0, diameter_in = 0, num_flutes = 0, chip_load_in = 0 } ...` | _ | _ | _ |
 | calc-machining.js | `computeDrillPointAngleFromLength` | `{ diameter_in = 0, point_length_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeDrillPointDepth` | `{ diameter_in = 0, point_angle_deg = 118, full_depth_in = 0 } = {}` | _ | _ | _ |
+| calc-machining.js | `computeEnduranceLimitMarin` | `{ ultimate_strength_psi = 0, surface_finish = "machined", diameter_in = 1, lo...` | _ | _ | _ |
 | calc-machining.js | `computeFatigueSafetyFactor` | `{ alternating_stress_psi = 0, mean_stress_psi = 0, endurance_limit_psi = 0, u...` | _ | _ | _ |
 | calc-machining.js | `computeGearChordalThickness` | `{ diametral_pitch = 0, teeth = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeGearIdentification` | `{ teeth = 0, outside_dia_in = 0 } = {}` | _ | _ | _ |
@@ -3324,7 +3325,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1910.
+Row count: 1911.
 
 <!-- END function-corpus-v14 -->
 
@@ -4619,7 +4620,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (110 tiles)
+### Group K Mechanic (111 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4660,6 +4661,7 @@ per spec-v14 §13.1 second paragraph.
 | `driveshaft-max-length` | Driveshaft Max Length for an Operating Speed | Project (first-principles, inverse) o...; 3.5 in OD / 0.083 in wall / steel, running at the 6,385.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dynamic-compression-ratio` | Dynamic Compression Ratio | dynamic compression ratio (slider-cra...; Vc = 47.833/(10.5-1) = 5.035; piston@IVC = 3.036; Veff = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dyno-correction-sae` | SAE J1349 Dyno Correction Factor | SAE J1349 dyno correction factor; spec-v515 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `endurance-limit-marin` | Corrected Endurance Limit (Shigley Marin Factors) | Project (first-principles); Se = ka kb kc kd ke Se | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `engine-bmep` | Engine BMEP (Brake Mean Effective Pressure) | Brake mean effective pressure (SAE; H...; 350 CID at 400 lb-ft (4-stroke) -> 150.8 x 400 / 350 = 17... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `engine-fuel-burn-gph` | Engine Fuel Burn from Horsepower (BSFC) | BSFC engine-performance practice; spec-v463 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `et-horsepower` | Horsepower from Quarter-Mile ET | Hale quarter-mile ET relation (invers...; spec-v662 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5156,6 +5158,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1659. Fixture-covered or reference-cadence: 1659 / 1659.
+Tile count: 1660. Fixture-covered or reference-cadence: 1660 / 1660.
 
 <!-- END tile-index-v14 -->

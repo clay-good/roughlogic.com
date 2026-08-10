@@ -994,6 +994,87 @@ function renderFatigueSafetyFactor(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["fatigue-safety-factor"] = renderFatigueSafetyFactor;
 
+// ===================== spec-v1287: corrected endurance limit (Shigley Marin factors) =====================
+// fatigue-safety-factor takes the CORRECTED endurance limit Se as an input and names building it "from the Marin
+// factors" as separate. This is that step: Se = ka kb kc kd ke Se', the Shigley Ch.6 correction that turns the
+// ultimate strength into the real endurance limit, feeding the fatigue tile. Se' = 0.5 Sut (steel, Sut <= 200 ksi).
+// The a/b surface constants use Sut in kpsi; output is in psi so it drops straight into fatigue-safety-factor.
+const MARIN_SURFACE = {
+  ground: { a: 1.34, b: -0.085, label: "Ground" },
+  machined: { a: 2.70, b: -0.265, label: "Machined / cold-drawn" },
+  "hot-rolled": { a: 14.4, b: -0.718, label: "Hot-rolled" },
+  "as-forged": { a: 39.9, b: -0.995, label: "As-forged" },
+};
+const MARIN_RELIABILITY = { "50": 1.0, "90": 0.897, "95": 0.868, "99": 0.814, "99.9": 0.753 };
+const MARIN_KC = { bending: 1.0, axial: 0.85, torsion: 0.59 };
+// dims: in { ultimate_strength_psi: M L^-1 T^-2, surface_finish: dimensionless, diameter_in: L, load_type: dimensionless, reliability_pct: dimensionless, temperature_factor_kd: dimensionless } out: { endurance_limit_psi: M L^-1 T^-2, uncorrected_se_psi: M L^-1 T^-2, ka: dimensionless, kb: dimensionless, kc: dimensionless, ke: dimensionless }
+export function computeEnduranceLimitMarin({ ultimate_strength_psi = 0, surface_finish = "machined", diameter_in = 1, load_type = "bending", reliability_pct = "99", temperature_factor_kd = 1 } = {}) {
+  const _g = _finiteGuard({ ultimate_strength_psi, diameter_in, temperature_factor_kd }); if (_g) return _g;
+  const Sut = Number(ultimate_strength_psi) || 0;
+  const d = Number(diameter_in) || 0;
+  const kd = Number(temperature_factor_kd) || 0;
+  const surf = MARIN_SURFACE[surface_finish];
+  const kc = MARIN_KC[load_type];
+  const ke = MARIN_RELIABILITY[String(reliability_pct)];
+  if (!(Sut > 0)) return { error: "Ultimate strength Sut must be positive (psi)." };
+  if (!surf) return { error: "Surface finish must be ground, machined, hot-rolled, or as-forged." };
+  if (kc === undefined) return { error: "Load type must be bending, axial, or torsion." };
+  if (ke === undefined) return { error: "Reliability must be 50, 90, 95, 99, or 99.9 (%)." };
+  if (!(kd > 0)) return { error: "Temperature factor kd must be positive." };
+  const Sut_ksi = Sut / 1000;
+  const uncorrected_se_psi = Sut_ksi <= 200 ? 0.5 * Sut : 100000; // steel rotating-beam limit, capped at 100 ksi
+  const ka = surf.a * Math.pow(Sut_ksi, surf.b);
+  let kb;
+  if (load_type === "axial") {
+    kb = 1; // size factor does not apply to axial loading
+  } else {
+    if (!(d >= 0.11 && d <= 10)) return { error: "Diameter must be 0.11-10 in for the bending/torsion size factor (axial ignores it)." };
+    kb = d <= 2 ? 0.879 * Math.pow(d, -0.107) : 0.91 * Math.pow(d, -0.157);
+  }
+  const endurance_limit_psi = ka * kb * kc * kd * ke * uncorrected_se_psi;
+  if (![ka, kb, kc, ke, endurance_limit_psi].every(Number.isFinite) || !(endurance_limit_psi > 0)) return { error: "Endurance-limit math is not a finite value; check the inputs." };
+  return {
+    endurance_limit_psi, uncorrected_se_psi, ka, kb, kc, kd, ke,
+    note: "The corrected endurance limit Se = ka kb kc kd ke Se' (Shigley Ch. 6 Marin equation), the input the fatigue-safety-factor tile needs. Se' is the rotating-beam limit, 0.5 Sut for steel with Sut <= 200 ksi (capped at 100 ksi above that). ka = a (Sut in kpsi)^b corrects for surface finish (ground 1.34/-0.085, machined 2.70/-0.265, hot-rolled 14.4/-0.718, as-forged 39.9/-0.995); kb is the size factor 0.879 d^-0.107 (0.11-2 in) or 0.91 d^-0.157 (2-10 in) for rotating bending/torsion, and 1 for axial loading; kc is the load factor (1 bending, 0.85 axial, 0.59 torsion); kd the temperature factor (1 at room temperature); ke the reliability factor (0.897 at 90%, 0.814 at 99%). The five factors typically cut the raw 0.5 Sut roughly in half, which is why a part sized on Se' alone can be fatigue-unsafe. Feed Se into fatigue-safety-factor. Steel; non-steel materials, stress concentration (Kf), and finite-life S-N reductions are separate. A design aid; Shigley and the engineer of record govern.",
+  };
+}
+export const enduranceLimitMarinExample = { inputs: { ultimate_strength_psi: 105000, surface_finish: "machined", diameter_in: 1, load_type: "bending", reliability_pct: "99", temperature_factor_kd: 1 } };
+function renderEnduranceLimitMarin(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: corrected endurance limit Se = ka kb kc kd ke Se' with the Shigley Marin factors (Mechanical Engineering Design, Ch. 6): Se' = 0.5 Sut (steel, Sut <= 200 ksi); ka = a Sut_ksi^b by surface finish; kb the size factor; kc the load factor (1/0.85/0.59); kd temperature; ke reliability. Steel; feed Se into fatigue-safety-factor. A design aid; Shigley and the engineer of record govern.";
+  const sut = makeNumber("Ultimate strength Sut (psi)", "elm-sut", { step: "any", min: "0" }); sut.input.value = "105000";
+  const surf = makeSelect("Surface finish", "elm-surf", Object.keys(MARIN_SURFACE).map((k) => ({ value: k, label: MARIN_SURFACE[k].label, selected: k === "machined" })));
+  const d = makeNumber("Diameter d (in)", "elm-d", { step: "any", min: "0" }); d.input.value = "1";
+  const load = makeSelect("Load type", "elm-load", [
+    { value: "bending", label: "Rotating bending (kc = 1)", selected: true },
+    { value: "axial", label: "Axial (kc = 0.85, kb = 1)" },
+    { value: "torsion", label: "Torsion (kc = 0.59)" },
+  ]);
+  const rel = makeSelect("Reliability", "elm-rel", [
+    { value: "50", label: "50% (ke = 1.00)" },
+    { value: "90", label: "90% (ke = 0.897)" },
+    { value: "95", label: "95% (ke = 0.868)" },
+    { value: "99", label: "99% (ke = 0.814)", selected: true },
+    { value: "99.9", label: "99.9% (ke = 0.753)" },
+  ]);
+  const kd = makeNumber("Temperature factor kd", "elm-kd", { step: "any", min: "0" }); kd.input.value = "1";
+  for (const f of [sut, surf, d, load, rel, kd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sut.input.value = "105000"; surf.select.value = "machined"; d.input.value = "1"; load.select.value = "bending"; rel.select.value = "99"; kd.input.value = "1"; update(); });
+  const oSe = makeOutputLine(outputRegion, "Corrected endurance limit Se", "elm-out-se");
+  const oFac = makeOutputLine(outputRegion, "Marin factors", "elm-out-fac");
+  const oNote = makeOutputLine(outputRegion, "Note", "elm-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeEnduranceLimitMarin({ ultimate_strength_psi: readNum(sut.input), surface_finish: surf.select.value, diameter_in: readNum(d.input), load_type: load.select.value, reliability_pct: rel.select.value, temperature_factor_kd: readNum(kd.input) });
+    if (r.error) { oSe.textContent = r.error; oFac.textContent = "-"; oNote.textContent = ""; return; }
+    oSe.textContent = fmt(r.endurance_limit_psi, 0) + " psi (from Se' = " + fmt(r.uncorrected_se_psi, 0) + " psi)";
+    oFac.textContent = "ka = " + fmt(r.ka, 3) + ", kb = " + fmt(r.kb, 3) + ", kc = " + fmt(r.kc, 2) + ", kd = " + fmt(r.kd, 2) + ", ke = " + fmt(r.ke, 3);
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [sut, d, kd]) f.input.addEventListener("input", update);
+  for (const f of [surf, load, rel]) f.select.addEventListener("change", update);
+}
+MACHINING_RENDERERS["endurance-limit-marin"] = renderEnduranceLimitMarin;
+
 // ===================== spec-v509: countersink diameter and cutting depth =====================
 // dims: in { countersink_dia_in: L, included_angle_deg: dimensionless, pilot_hole_dia_in: L } out: { z_in: L, z_full_in: L }
 export function computeCountersinkDepth({ countersink_dia_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}) {

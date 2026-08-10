@@ -98354,6 +98354,51 @@
    "kind": "question"
   },
   {
+   "term": "corrected endurance limit",
+   "target": "endurance-limit-marin",
+   "kind": "industry"
+  },
+  {
+   "term": "marin factors",
+   "target": "endurance-limit-marin",
+   "kind": "industry"
+  },
+  {
+   "term": "endurance limit calculator",
+   "target": "endurance-limit-marin",
+   "kind": "industry"
+  },
+  {
+   "term": "marin equation",
+   "target": "endurance-limit-marin",
+   "kind": "adjacent"
+  },
+  {
+   "term": "surface finish factor ka",
+   "target": "endurance-limit-marin",
+   "kind": "adjacent"
+  },
+  {
+   "term": "size factor kb fatigue",
+   "target": "endurance-limit-marin",
+   "kind": "adjacent"
+  },
+  {
+   "term": "reliability factor ke",
+   "target": "endurance-limit-marin",
+   "kind": "adjacent"
+  },
+  {
+   "term": "fatigue strength from ultimate",
+   "target": "endurance-limit-marin",
+   "kind": "industry"
+  },
+  {
+   "term": "what is the endurance limit of steel",
+   "target": "endurance-limit-marin",
+   "kind": "question"
+  },
+  {
    "term": "countersink size from plunge depth",
    "target": "countersink-diameter-from-depth",
    "kind": "question"

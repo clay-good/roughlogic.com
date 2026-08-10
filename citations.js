@@ -10998,6 +10998,18 @@ export const CITATIONS = {
       { name: "Scope", value: "uniaxial, infinite life; notch Kf, finite-life S-N, and multiaxial combination are separate", source: "scope of this tile" },
     ],
   },
+  "endurance-limit-marin": {
+    formula: "Se = ka kb kc kd ke Se'; Se' = 0.5 Sut (steel, Sut<=200 ksi, else 100 ksi); ka = a Sut_ksi^b (ground 1.34/-0.085, machined 2.70/-0.265, hot-rolled 14.4/-0.718, forged 39.9/-0.995); kb = 0.879 d^-0.107 (0.11-2 in) / 0.91 d^-0.157 (2-10 in) bending, 1 axial; kc = 1/0.85/0.59; ke = 0.897/0.868/0.814/0.753 at 90/95/99/99.9%.",
+    edition: "The Marin modification factors and the rotating-beam endurance limit Se' = 0.5 Sut (Shigley, Mechanical Engineering Design, Ch. 6 -- Marin surface, size, load, temperature, and reliability factors), by name; feeds the fatigue-safety-factor tile.",
+    freeAccess: "The Marin equation and its factor tables are standard published machine-design results; the ultimate strength, diameter, finish, load type, and reliability are the designer's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The corrected endurance limit Se = ka kb kc kd ke Se' (Shigley Ch. 6 Marin equation), the input the fatigue-safety-factor tile needs. Se' is the rotating-beam limit, 0.5 Sut for steel with Sut <= 200 ksi (capped at 100 ksi above that). ka = a (Sut in kpsi)^b corrects for surface finish (ground 1.34/-0.085, machined 2.70/-0.265, hot-rolled 14.4/-0.718, as-forged 39.9/-0.995); kb is the size factor 0.879 d^-0.107 (0.11-2 in) or 0.91 d^-0.157 (2-10 in) for rotating bending/torsion and 1 for axial loading; kc is the load factor (1 bending, 0.85 axial, 0.59 torsion); kd the temperature factor (1 at room temperature); ke the reliability factor (0.897 at 90%, 0.814 at 99%). The five factors typically cut the raw 0.5 Sut roughly in half, which is why a part sized on Se' alone can be fatigue-unsafe. Feed Se into fatigue-safety-factor. Steel; non-steel materials, stress concentration (Kf), and finite-life S-N reductions are separate. A design aid; Shigley and the engineer of record govern.",
+    assumptions: [
+      { name: "Rotating-beam limit", value: "Se' = 0.5 Sut for steel, Sut <= 200 ksi (else 100 ksi)", source: "Shigley Ch. 6" },
+      { name: "Marin factors", value: "ka surface, kb size, kc load, kd temperature, ke reliability", source: "Shigley Tables 6-2/6-4/6-5" },
+      { name: "Scope", value: "steel; notch Kf and finite-life S-N are separate; feeds fatigue-safety-factor", source: "scope of this tile" },
+    ],
+  },
   "bolt-proof-load": {
     formula: "At = 0.7854 x (D - 0.9743/n)^2; proof_load = At x proof_strength; yield_load = At x yield_strength; tensile_load = At x tensile_strength; rec_clamp = 0.75 x proof_load.",
     edition: "The SAE J429 inch-series bolt strength model (tensile stress area x grade strength), with the ASME B1.1 tensile stress area, by name; the joint design, torque method, and preload requirement govern.",

@@ -86779,6 +86779,68 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "endurance-limit-marin",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Machined steel shaft, rotating bending, 99% reliability",
+   "source_edition_or_year": "Shigley Ch.6",
+   "source_section_or_page": "Se = ka kb kc kd ke Se",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "ultimate_strength_psi": 105000,
+    "surface_finish": "machined",
+    "diameter_in": 1,
+    "load_type": "bending",
+    "reliability_pct": "99",
+    "temperature_factor_kd": 1
+   },
+   "outputs": {
+    "endurance_limit_psi": {
+     "value": 29548,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ka": {
+     "value": 0.7866,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "endurance-limit-marin",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Axial loading sets kb=1, kc=0.85",
+   "source_edition_or_year": "Shigley Ch.6",
+   "source_section_or_page": "Se = ka kb kc kd ke Se",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "ultimate_strength_psi": 100000,
+    "surface_finish": "machined",
+    "diameter_in": 1,
+    "load_type": "axial",
+    "reliability_pct": "50",
+    "temperature_factor_kd": 1
+   },
+   "outputs": {
+    "endurance_limit_psi": {
+     "value": 33865,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "kb": {
+     "value": 1.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

@@ -37641,3 +37641,32 @@ test("bounds: spec-v1286 computeFatigueSafetyFactor pins Goodman/Soderberg/Gerbe
   assert.ok("error" in _v1286({ alternating_stress_psi: 25000, mean_stress_psi: 30000, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "morrow" }));
   assert.ok("error" in _v1286({ alternating_stress_psi: Infinity, mean_stress_psi: 30000, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "goodman" }));
 });
+
+import { computeEnduranceLimitMarin as _v1287 } from "../../calc-machining.js";
+import { computeFatigueSafetyFactor as _v1287sib } from "../../calc-machining.js";
+test("bounds: spec-v1287 computeEnduranceLimitMarin pins Se and the Marin factors, the axial kb=1 case, the chain into fatigue-safety-factor, and error seams", () => {
+  // Sut 105 ksi machined, d 1 in, rotating bending, 99%: ka 0.787, kb 0.879, kc 1, ke 0.814, Se 29,548 psi.
+  const r = _v1287({ ultimate_strength_psi: 105000, surface_finish: "machined", diameter_in: 1, load_type: "bending", reliability_pct: "99", temperature_factor_kd: 1 });
+  assert.ok(Math.abs(r.endurance_limit_psi - 29548) < 10);
+  assert.ok(Math.abs(r.uncorrected_se_psi - 52500) < 1e-6);
+  assert.ok(Math.abs(r.ka - 0.7866) < 1e-3 && Math.abs(r.kb - 0.879) < 1e-3 && r.kc === 1 && Math.abs(r.ke - 0.814) < 1e-6);
+  // Axial loading forces kb = 1 and kc = 0.85.
+  const ax = _v1287({ ultimate_strength_psi: 100000, surface_finish: "machined", diameter_in: 1, load_type: "axial", reliability_pct: "50", temperature_factor_kd: 1 });
+  assert.ok(ax.kb === 1 && ax.kc === 0.85 && Math.abs(ax.endurance_limit_psi - 33865) < 10);
+  // The corrected Se drops straight into fatigue-safety-factor and makes an "OK on Se'" part fatigue-unsafe.
+  const chained = _v1287sib({ alternating_stress_psi: 25000, mean_stress_psi: 30000, endurance_limit_psi: r.endurance_limit_psi, ultimate_strength_psi: 105000, yield_strength_psi: 80000, criterion: "goodman" });
+  assert.ok(chained.fatigue_n < 1 && Math.abs(chained.fatigue_n - 0.882) < 1e-2);
+  // Se above 200 ksi Sut is capped at 100 ksi rotating-beam limit (before factors).
+  const hi = _v1287({ ultimate_strength_psi: 260000, surface_finish: "ground", diameter_in: 1, load_type: "bending", reliability_pct: "50", temperature_factor_kd: 1 });
+  assert.ok(Math.abs(hi.uncorrected_se_psi - 100000) < 1e-6);
+  // Rougher surface (hot-rolled) gives a smaller ka and so a lower Se than machined.
+  const rough = _v1287({ ultimate_strength_psi: 105000, surface_finish: "hot-rolled", diameter_in: 1, load_type: "bending", reliability_pct: "99", temperature_factor_kd: 1 });
+  assert.ok(rough.ka < r.ka && rough.endurance_limit_psi < r.endurance_limit_psi);
+  // Error seams: non-positive Sut, diameter out of range for bending, unknown surface/load/reliability, non-positive kd, non-finite.
+  assert.ok("error" in _v1287({ ultimate_strength_psi: 0, surface_finish: "machined", diameter_in: 1, load_type: "bending", reliability_pct: "99", temperature_factor_kd: 1 }));
+  assert.ok("error" in _v1287({ ultimate_strength_psi: 105000, surface_finish: "machined", diameter_in: 20, load_type: "bending", reliability_pct: "99", temperature_factor_kd: 1 }));
+  assert.ok("error" in _v1287({ ultimate_strength_psi: 105000, surface_finish: "polished", diameter_in: 1, load_type: "bending", reliability_pct: "99", temperature_factor_kd: 1 }));
+  assert.ok("error" in _v1287({ ultimate_strength_psi: 105000, surface_finish: "machined", diameter_in: 1, load_type: "shear", reliability_pct: "99", temperature_factor_kd: 1 }));
+  assert.ok("error" in _v1287({ ultimate_strength_psi: 105000, surface_finish: "machined", diameter_in: 1, load_type: "bending", reliability_pct: "80", temperature_factor_kd: 1 }));
+  assert.ok("error" in _v1287({ ultimate_strength_psi: Infinity, surface_finish: "machined", diameter_in: 1, load_type: "bending", reliability_pct: "99", temperature_factor_kd: 1 }));
+});
