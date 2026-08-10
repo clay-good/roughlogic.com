@@ -2989,6 +2989,46 @@
    "kind": "question"
   },
   {
+   "term": "band brake torque",
+   "target": "band-brake-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "capstan equation",
+   "target": "band-brake-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "eytelwein belt friction",
+   "target": "band-brake-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "rope around a bollard holding force",
+   "target": "band-brake-torque",
+   "kind": "adjacent"
+  },
+  {
+   "term": "capstan holding force",
+   "target": "band-brake-torque",
+   "kind": "adjacent"
+  },
+  {
+   "term": "belt friction tension ratio",
+   "target": "band-brake-torque",
+   "kind": "adjacent"
+  },
+  {
+   "term": "wraps of rope to hold a load",
+   "target": "band-brake-torque",
+   "kind": "question"
+  },
+  {
+   "term": "how much does a band brake hold",
+   "target": "band-brake-torque",
+   "kind": "question"
+  },
+  {
    "term": "hp torque rpm",
    "target": "hp-from-torque",
    "kind": "redirect"

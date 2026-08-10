@@ -2604,6 +2604,7 @@ cross-check.
 | calc-mechanic.js | `computeAircraftWeightBalance` | `{ empty_weight_lb = 0, empty_arm_in = 0, front_weight_lb = 0, front_arm_in = ...` | _ | _ | _ |
 | calc-mechanic.js | `computeAlternatorChargingLoad` | `{ total_load_a = 0, alternator_a = 0, idle_frac = 0.5, cruise_frac = 0.9 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeAnchorRodeScope` | `{ water_depth_ft = 0, bow_height_ft = 0, scope_ratio = 7, boat_loa_ft = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeBandBrakeTorque` | `{ slack_tension_lbf = 0, wrap_angle_deg = 0, friction_coefficient = 0, drum_r...` | _ | _ | _ |
 | calc-mechanic.js | `computeBeltDeflectionTension` | `{ center_distance_in = 0, large_sheave_dia_in = 0, small_sheave_dia_in = 0, m...` | _ | _ | _ |
 | calc-mechanic.js | `computeBoltStretch` | `{ diameter_in = 0, grip_length_in = 0, stretch_thou = 0, material = "steel", ...` | _ | _ | _ |
 | calc-mechanic.js | `computeBrakePadLife` | `{ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 1, pad_thickne...` | _ | _ | _ |
@@ -3331,7 +3332,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1917.
+Row count: 1918.
 
 <!-- END function-corpus-v14 -->
 
@@ -4626,7 +4627,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (117 tiles)
+### Group K Mechanic (118 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4638,6 +4639,7 @@ per spec-v14 §13.1 second paragraph.
 | `anchor-rode-scope` | Anchor Rode Scope and Swing Radius | anchor rode scope and swing radius (s...; spec-v505 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ballnose-feed-cusp` | Ballnose Feed-Direction Cusp and the Governing Finish | ballnose cusp geometry (CAM / mold ma...; R = 0.25 in. Across the passes at a 0.030 in stepover: h ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ballnose-scallop-height` | Ballnose Milling Scallop Height from Stepover | Ballnose scallop geometry; spec-v319 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `band-brake-torque` | Band Brake / Capstan Torque | Project (first-principles); T1 = T2 e^(mu theta) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bearing-equivalent-load` | Rolling-Bearing Dynamic Equivalent Load P (ISO 281) | Project (first-principles); P = X Fr + Y Fa | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bearing-l10-life` | Rolling-Bearing L10 Rating Life (ISO 281) | ISO 281 basic rating life; spec-v504 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bearing-max-load` | Max Bearing Load for a Target L10 Life | ISO 281 basic rating life (inverse); spec-v672 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5170,6 +5172,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1666. Fixture-covered or reference-cadence: 1666 / 1666.
+Tile count: 1667. Fixture-covered or reference-cadence: 1667 / 1667.
 
 <!-- END tile-index-v14 -->

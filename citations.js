@@ -11722,6 +11722,18 @@ export const CITATIONS = {
       { name: "Scope", value: "single stage; compound/multi-stage, torque split, efficiency, and assembly count are separate", source: "scope of this tile" },
     ],
   },
+  "band-brake-torque": {
+    formula: "theta in radians; T1 = T2 e^(mu theta); tension ratio = e^(mu theta); T_brake = (T1 - T2) r.",
+    edition: "The Eytelwein / capstan belt-friction relation T1 = T2 e^(mu theta) and the band-brake torque T = (T1 - T2) r (Shigley, Mechanical Engineering Design, Ch. 16; capstan equation), by name.",
+    freeAccess: "The capstan/Eytelwein relation and the band-brake torque are standard published mechanics results; the tensions, wrap angle, friction, and drum radius are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Band brake / capstan torque from the Eytelwein (belt-friction) relation T1 = T2 e^(mu theta): the tight-side tension T1 grows exponentially from the applied slack-side tension T2 with the friction mu and the wrap angle theta (radians), and the braking torque on the drum is T = (T1 - T2) r. The ratio e^(mu theta) climbs fast with wrap - a 270-degree wrap at mu 0.3 multiplies the pull by 4.1, a full turn by 6.6 - which is why a couple of turns of rope on a bollard hold a boat and a light lever pull stops a heavy drum. A band brake whose anchored end is the tight side is self-energizing (rotation tightens it). The lever geometry that sets the actuating force, the self-energizing sign, the band stress and width, and the heat of braking are separate; the friction coefficient is the user's (band lining on the drum). A design aid; Shigley and the brake maker govern.",
+    assumptions: [
+      { name: "Eytelwein", value: "T1 = T2 e^(mu theta), theta the wrap angle in radians", source: "capstan equation" },
+      { name: "Brake torque", value: "T = (T1 - T2) r on the drum", source: "Shigley Ch. 16" },
+      { name: "Scope", value: "tension ratio and torque only; lever geometry, self-energizing, band stress, heat are separate", source: "scope of this tile" },
+    ],
+  },
   "gear-identification": {
     formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
     edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",

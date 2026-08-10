@@ -37819,3 +37819,26 @@ test("bounds: spec-v1293 computePlanetaryGearRatio pins the Willis ratios, the h
   assert.ok("error" in _v1293({ sun_teeth: 30, ring_teeth: 72, input_speed_rpm: 3400, configuration: "double-planet" }));
   assert.ok("error" in _v1293({ sun_teeth: Infinity, ring_teeth: 72, input_speed_rpm: 3400, configuration: "ring-fixed-sun-carrier" }));
 });
+
+import { computeBandBrakeTorque as _v1294 } from "../../calc-mechanic.js";
+test("bounds: spec-v1294 computeBandBrakeTorque pins the Eytelwein tension ratio, the braking torque, the exponential wrap growth, and error seams", () => {
+  // T2 50, 270 deg, mu 0.3, r 6: ratio 4.111, T1 205.6, torque 933 in-lbf.
+  const r = _v1294({ slack_tension_lbf: 50, wrap_angle_deg: 270, friction_coefficient: 0.3, drum_radius_in: 6 });
+  assert.ok(Math.abs(r.tension_ratio - 4.111) < 1e-3 && Math.abs(r.tight_tension_lbf - 205.6) < 0.2);
+  assert.ok(Math.abs(r.brake_torque_in_lbf - 933) < 1 && Math.abs(r.brake_torque_ft_lbf - 77.8) < 0.2);
+  // The ratio grows exponentially with wrap: a full turn (360 deg) gives e^(0.3*2pi) = 6.586.
+  const full = _v1294({ slack_tension_lbf: 50, wrap_angle_deg: 360, friction_coefficient: 0.3, drum_radius_in: 6 });
+  assert.ok(Math.abs(full.tension_ratio - 6.586) < 1e-3 && full.brake_torque_in_lbf > r.brake_torque_in_lbf);
+  // Zero friction gives a ratio of 1 and no braking torque (a frictionless band cannot grip).
+  const frictionless = _v1294({ slack_tension_lbf: 50, wrap_angle_deg: 270, friction_coefficient: 0, drum_radius_in: 6 });
+  assert.ok(Math.abs(frictionless.tension_ratio - 1) < 1e-9 && Math.abs(frictionless.brake_torque_in_lbf) < 1e-9);
+  // Torque scales linearly with drum radius.
+  const big = _v1294({ slack_tension_lbf: 50, wrap_angle_deg: 270, friction_coefficient: 0.3, drum_radius_in: 12 });
+  assert.ok(Math.abs(big.brake_torque_in_lbf / r.brake_torque_in_lbf - 2) < 1e-6);
+  // Error seams: non-positive slack tension/wrap/radius, negative friction, non-finite.
+  assert.ok("error" in _v1294({ slack_tension_lbf: 0, wrap_angle_deg: 270, friction_coefficient: 0.3, drum_radius_in: 6 }));
+  assert.ok("error" in _v1294({ slack_tension_lbf: 50, wrap_angle_deg: 0, friction_coefficient: 0.3, drum_radius_in: 6 }));
+  assert.ok("error" in _v1294({ slack_tension_lbf: 50, wrap_angle_deg: 270, friction_coefficient: -0.1, drum_radius_in: 6 }));
+  assert.ok("error" in _v1294({ slack_tension_lbf: 50, wrap_angle_deg: 270, friction_coefficient: 0.3, drum_radius_in: 0 }));
+  assert.ok("error" in _v1294({ slack_tension_lbf: Infinity, wrap_angle_deg: 270, friction_coefficient: 0.3, drum_radius_in: 6 }));
+});

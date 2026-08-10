@@ -87213,6 +87213,64 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "band-brake-torque",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "270-degree band brake torque",
+   "source_edition_or_year": "Shigley Ch.16 / capstan",
+   "source_section_or_page": "T1 = T2 e^(mu theta)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "slack_tension_lbf": 50,
+    "wrap_angle_deg": 270,
+    "friction_coefficient": 0.3,
+    "drum_radius_in": 6
+   },
+   "outputs": {
+    "tension_ratio": {
+     "value": 4.111,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tight_tension_lbf": {
+     "value": 205.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "brake_torque_in_lbf": {
+     "value": 933,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "band-brake-torque",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Full-turn wrap raises the ratio to 6.6",
+   "source_edition_or_year": "Shigley Ch.16 / capstan",
+   "source_section_or_page": "T1 = T2 e^(mu theta)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "slack_tension_lbf": 50,
+    "wrap_angle_deg": 360,
+    "friction_coefficient": 0.3,
+    "drum_radius_in": 6
+   },
+   "outputs": {
+    "tension_ratio": {
+     "value": 6.586,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

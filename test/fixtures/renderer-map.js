@@ -1230,6 +1230,7 @@ export const RENDERER_MAP = {
   "aerodynamic-drag-force": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "vehicle-road-load-power": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "planetary-gear-ratio": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
+  "band-brake-torque": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "hp-from-torque": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "volumetric-efficiency": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "gear-mph-rpm": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },

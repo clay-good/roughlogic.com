@@ -1310,6 +1310,51 @@ MECHANIC_RENDERERS["planetary-gear-ratio"] = _simpleRenderer({
   compute: computePlanetaryGearRatio,
 });
 
+// --- spec-v1294 K: band brake / capstan torque (`band-brake-torque`) ---
+// disk-clutch-torque names "band brakes are separate." The Eytelwein/capstan relation
+// T1 = T2 e^(mu theta) is the physics behind a band brake, a rope around a bollard, and a capstan.
+// Braking torque T = (T1 - T2) r. The tension ratio climbs fast with wrap angle.
+// dims: in { slack_tension_lbf: M L T^-2, wrap_angle_deg: dimensionless, friction_coefficient: dimensionless, drum_radius_in: L } out: { tight_tension_lbf: M L T^-2, tension_ratio: dimensionless, brake_torque_in_lbf: M L^2 T^-2, brake_torque_ft_lbf: M L^2 T^-2 }
+export function computeBandBrakeTorque({ slack_tension_lbf = 0, wrap_angle_deg = 0, friction_coefficient = 0, drum_radius_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const T2 = Number(slack_tension_lbf) || 0;
+  const wrap = Number(wrap_angle_deg) || 0;
+  const mu = Number(friction_coefficient) || 0;
+  const r = Number(drum_radius_in) || 0;
+  if (!(T2 > 0)) return { error: "Slack-side (actuating) tension must be positive (lbf)." };
+  if (!(wrap > 0)) return { error: "Wrap angle must be positive (deg)." };
+  if (mu < 0) return { error: "Friction coefficient cannot be negative." };
+  if (!(r > 0)) return { error: "Drum radius must be positive (in)." };
+  const theta = (wrap * Math.PI) / 180;
+  const tension_ratio = Math.exp(mu * theta);
+  const tight_tension_lbf = T2 * tension_ratio;
+  const brake_torque_in_lbf = (tight_tension_lbf - T2) * r;
+  const brake_torque_ft_lbf = brake_torque_in_lbf / 12;
+  if (![tension_ratio, tight_tension_lbf, brake_torque_in_lbf].every(Number.isFinite) || !(brake_torque_in_lbf >= 0)) return { error: "Band-brake math is not a finite value; check the inputs." };
+  return {
+    tight_tension_lbf, tension_ratio, brake_torque_in_lbf, brake_torque_ft_lbf, wrap_angle_deg: wrap,
+    note: "Band brake / capstan torque from the Eytelwein (belt-friction) relation T1 = T2 e^(mu theta): the tight-side tension T1 grows exponentially from the applied slack-side tension T2 with the friction mu and the wrap angle theta (radians), and the braking torque on the drum is T = (T1 - T2) r. The ratio e^(mu theta) climbs fast with wrap - a 270-degree wrap at mu 0.3 multiplies the pull by 4.1, a full turn by 6.6 - which is why a couple of turns of rope on a bollard hold a boat and a light lever pull stops a heavy drum. A band brake whose anchored end is the tight side is self-energizing (rotation tightens it). The lever geometry that sets the actuating force, the self-energizing sign, the band stress and width, and the heat of braking are separate; the friction coefficient is the user's (band lining on the drum). A design aid; Shigley and the brake maker govern.",
+  };
+}
+export const bandBrakeTorqueExample = { inputs: { slack_tension_lbf: 50, wrap_angle_deg: 270, friction_coefficient: 0.3, drum_radius_in: 6 } };
+
+MECHANIC_RENDERERS["band-brake-torque"] = _simpleRenderer({
+  citation: "Citation: band brake / capstan torque from the Eytelwein belt-friction relation T1 = T2 e^(mu theta) (Shigley, Mechanical Engineering Design, Ch. 16; capstan equation), with the braking torque T = (T1 - T2) r. The friction coefficient and lever geometry are the user's. A design aid; the brake maker governs.",
+  example: bandBrakeTorqueExample.inputs,
+  fields: [
+    { key: "slack_tension_lbf", label: "Slack-side (actuating) tension T2 (lbf)", kind: "number" },
+    { key: "wrap_angle_deg", label: "Wrap angle (deg)", kind: "number" },
+    { key: "friction_coefficient", label: "Band-to-drum friction coefficient", kind: "number" },
+    { key: "drum_radius_in", label: "Drum radius (in)", kind: "number" },
+  ],
+  outputs: [
+    { key: "t", id: "bbt-out-t", label: "Braking torque", value: (r) => fmt(r.brake_torque_in_lbf, 0) + " in-lbf (" + fmt(r.brake_torque_ft_lbf, 1) + " ft-lbf)" },
+    { key: "t1", id: "bbt-out-t1", label: "Tight-side tension T1", value: (r) => fmt(r.tight_tension_lbf, 1) + " lbf (ratio e^(mu*theta) = " + fmt(r.tension_ratio, 3) + ")" },
+    { key: "n", id: "bbt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBandBrakeTorque,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================
