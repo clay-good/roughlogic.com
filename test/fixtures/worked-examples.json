@@ -86841,6 +86841,76 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "power-screw-torque",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Acme lead screw with collar, raise/lower/efficiency",
+   "source_edition_or_year": "Shigley Ch.8",
+   "source_section_or_page": "T_raise/T_lower power screw",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "axial_load_lbf": 1000,
+    "mean_diameter_in": 1.0,
+    "lead_in": 0.2,
+    "thread_friction": 0.15,
+    "collar_friction": 0.15,
+    "collar_diameter_in": 1.5,
+    "thread_form": "acme"
+   },
+   "outputs": {
+    "raise_torque_in_lbf": {
+     "value": 222.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "lower_torque_in_lbf": {
+     "value": 157.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "efficiency_pct": {
+     "value": 14.3,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "power-screw-torque",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same screw with a thrust bearing (no collar): efficiency doubles",
+   "source_edition_or_year": "Shigley Ch.8",
+   "source_section_or_page": "T_raise/T_lower power screw",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "axial_load_lbf": 1000,
+    "mean_diameter_in": 1.0,
+    "lead_in": 0.2,
+    "thread_friction": 0.15,
+    "collar_friction": 0.0,
+    "collar_diameter_in": 0.0,
+    "thread_form": "acme"
+   },
+   "outputs": {
+    "raise_torque_in_lbf": {
+     "value": 110.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "efficiency_pct": {
+     "value": 28.8,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
   }
  ]
 }

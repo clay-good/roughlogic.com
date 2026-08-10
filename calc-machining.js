@@ -1075,6 +1075,84 @@ function renderEnduranceLimitMarin(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["endurance-limit-marin"] = renderEnduranceLimitMarin;
 
+// ===================== spec-v1288: power-screw torque, efficiency, and self-locking (Shigley Ch. 8) =====================
+// acme-thread-depth / stub-acme-thread-depth give lead-screw GEOMETRY and name the use ("vises, presses, lead
+// screws"), but the mechanics - the torque to raise or lower a load and whether the screw back-drives - was never
+// built. Standard Shigley power-screw equations with the thread half-angle correction and the collar term:
+//   T_raise = (F dm/2)(l + pi mu dm sec_a)/(pi dm - mu l sec_a) + F muc dc/2
+//   T_lower = (F dm/2)(pi mu dm sec_a - l)/(pi dm + mu l sec_a) + F muc dc/2
+//   efficiency = F l/(2 pi T_raise); self-locking if pi mu dm sec_a > l.
+const SCREW_THREAD_HALF_ANGLE = { square: 0, acme: 14.5, unified: 30 };
+// dims: in { axial_load_lbf: M L T^-2, mean_diameter_in: L, lead_in: L, thread_friction: dimensionless, collar_friction: dimensionless, collar_diameter_in: L, thread_form: dimensionless } out: { raise_torque_in_lbf: M L^2 T^-2, lower_torque_in_lbf: M L^2 T^-2, efficiency_pct: dimensionless, lead_angle_deg: dimensionless }
+export function computePowerScrewTorque({ axial_load_lbf = 0, mean_diameter_in = 0, lead_in = 0, thread_friction = 0.15, collar_friction = 0.15, collar_diameter_in = 0, thread_form = "acme" } = {}) {
+  const _g = _finiteGuard({ axial_load_lbf, mean_diameter_in, lead_in, thread_friction, collar_friction, collar_diameter_in }); if (_g) return _g;
+  const F = Number(axial_load_lbf) || 0;
+  const dm = Number(mean_diameter_in) || 0;
+  const l = Number(lead_in) || 0;
+  const mu = Number(thread_friction) || 0;
+  const muc = Number(collar_friction) || 0;
+  const dc = Number(collar_diameter_in) || 0;
+  const halfAngle = SCREW_THREAD_HALF_ANGLE[thread_form];
+  if (!(F > 0)) return { error: "Axial load F must be positive (lbf)." };
+  if (!(dm > 0)) return { error: "Mean thread diameter dm must be positive (in)." };
+  if (!(l > 0)) return { error: "Lead l (pitch x starts) must be positive (in)." };
+  if (mu < 0) return { error: "Thread friction coefficient cannot be negative." };
+  if (muc < 0) return { error: "Collar friction coefficient cannot be negative." };
+  if (dc < 0) return { error: "Collar mean diameter cannot be negative (in)." };
+  if (halfAngle === undefined) return { error: "Thread form must be square, acme, or unified." };
+  const sec_a = 1 / Math.cos((halfAngle * Math.PI) / 180);
+  const raiseDen = Math.PI * dm - mu * l * sec_a;
+  if (!(raiseDen > 0)) return { error: "Thread friction is too high for this lead: the raising-torque denominator is non-positive." };
+  const collar = (F * muc * dc) / 2;
+  const raise_thread = (F * dm / 2) * (l + Math.PI * mu * dm * sec_a) / raiseDen;
+  const lower_thread = (F * dm / 2) * (Math.PI * mu * dm * sec_a - l) / (Math.PI * dm + mu * l * sec_a);
+  const raise_torque_in_lbf = raise_thread + collar;
+  const lower_torque_in_lbf = lower_thread + collar;
+  const efficiency_pct = (F * l) / (2 * Math.PI * raise_torque_in_lbf) * 100;
+  const lead_angle_deg = Math.atan(l / (Math.PI * dm)) * 180 / Math.PI;
+  const self_locking = lower_thread > 0;
+  if (![raise_torque_in_lbf, lower_torque_in_lbf, efficiency_pct, lead_angle_deg].every(Number.isFinite) || !(raise_torque_in_lbf > 0)) return { error: "Power-screw math is not a finite value; check the inputs." };
+  return {
+    raise_torque_in_lbf, lower_torque_in_lbf, efficiency_pct, lead_angle_deg, self_locking, thread_half_angle_deg: halfAngle,
+    note: "Power-screw torque to raise and lower an axial load F on a screw of mean diameter dm and lead l (pitch x starts), with thread friction mu and a collar (thrust-face) of mean diameter dc at friction muc. T_raise = (F dm/2)(l + pi mu dm sec_a)/(pi dm - mu l sec_a) + F muc dc/2 and T_lower uses (pi mu dm sec_a - l)/(pi dm + mu l sec_a), where sec_a = 1/cos of the thread half-angle (square 0, Acme 14.5, Unified 30 deg). Efficiency = F l/(2 pi T_raise). The screw is SELF-LOCKING (holds the load with no brake) when the lowering thread torque is positive, i.e. pi mu dm sec_a > l; a steep lead or slick thread back-drives. The collar term is added to both directions and often dominates - use a thrust bearing (dc small) to recover efficiency. Single power screw; column buckling of a long screw, thread bearing/shear stress, and wear life are separate. A design aid; Shigley and the maker govern.",
+  };
+}
+export const powerScrewTorqueExample = { inputs: { axial_load_lbf: 1000, mean_diameter_in: 1.0, lead_in: 0.2, thread_friction: 0.15, collar_friction: 0.15, collar_diameter_in: 1.5, thread_form: "acme" } };
+function renderPowerScrewTorque(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: power-screw raising/lowering torque (Shigley, Mechanical Engineering Design, Ch. 8): T_raise = (F dm/2)(l + pi mu dm sec_a)/(pi dm - mu l sec_a) + F muc dc/2, T_lower with (pi mu dm sec_a - l)/(pi dm + mu l sec_a), sec_a = 1/cos of the thread half-angle (square 0, Acme 14.5, Unified 30 deg). Efficiency = F l/(2 pi T_raise); self-locking if pi mu dm sec_a > l. A design aid; Shigley and the maker govern.";
+  const F = makeNumber("Axial load F (lbf)", "pst-f", { step: "any", min: "0" }); F.input.value = "1000";
+  const dm = makeNumber("Mean thread diameter dm (in)", "pst-dm", { step: "any", min: "0" }); dm.input.value = "1.0";
+  const l = makeNumber("Lead l = pitch x starts (in)", "pst-l", { step: "any", min: "0" }); l.input.value = "0.2";
+  const mu = makeNumber("Thread friction coefficient", "pst-mu", { step: "any", min: "0" }); mu.input.value = "0.15";
+  const muc = makeNumber("Collar friction coefficient", "pst-muc", { step: "any", min: "0" }); muc.input.value = "0.15";
+  const dc = makeNumber("Collar mean diameter dc (in, 0 = thrust bearing)", "pst-dc", { step: "any", min: "0" }); dc.input.value = "1.5";
+  const form = makeSelect("Thread form", "pst-form", [
+    { value: "square", label: "Square (half-angle 0)" },
+    { value: "acme", label: "Acme (half-angle 14.5 deg)", selected: true },
+    { value: "unified", label: "Unified / 60 deg (half-angle 30 deg)" },
+  ]);
+  for (const f of [F, dm, l, mu, muc, dc, form]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { F.input.value = "1000"; dm.input.value = "1.0"; l.input.value = "0.2"; mu.input.value = "0.15"; muc.input.value = "0.15"; dc.input.value = "1.5"; form.select.value = "acme"; update(); });
+  const oR = makeOutputLine(outputRegion, "Torque to raise the load", "pst-out-r");
+  const oL = makeOutputLine(outputRegion, "Torque to lower the load", "pst-out-l");
+  const oE = makeOutputLine(outputRegion, "Efficiency", "pst-out-e");
+  const oS = makeOutputLine(outputRegion, "Self-locking", "pst-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "pst-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computePowerScrewTorque({ axial_load_lbf: readNum(F.input), mean_diameter_in: readNum(dm.input), lead_in: readNum(l.input), thread_friction: readNum(mu.input), collar_friction: readNum(muc.input), collar_diameter_in: readNum(dc.input), thread_form: form.select.value });
+    if (r.error) { oR.textContent = r.error; oL.textContent = "-"; oE.textContent = "-"; oS.textContent = "-"; oNote.textContent = ""; return; }
+    oR.textContent = fmt(r.raise_torque_in_lbf, 1) + " in-lbf";
+    oL.textContent = fmt(r.lower_torque_in_lbf, 1) + " in-lbf" + (r.lower_torque_in_lbf < 0 ? " (negative: the load back-drives the screw)" : "");
+    oE.textContent = fmt(r.efficiency_pct, 1) + "% (lead angle " + fmt(r.lead_angle_deg, 2) + " deg)";
+    oS.textContent = r.self_locking ? "Yes - holds the load with no brake" : "No - the load runs the screw back down";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [F, dm, l, mu, muc, dc]) f.input.addEventListener("input", update);
+  form.select.addEventListener("change", update);
+}
+MACHINING_RENDERERS["power-screw-torque"] = renderPowerScrewTorque;
+
 // ===================== spec-v509: countersink diameter and cutting depth =====================
 // dims: in { countersink_dia_in: L, included_angle_deg: dimensionless, pilot_hole_dia_in: L } out: { z_in: L, z_full_in: L }
 export function computeCountersinkDepth({ countersink_dia_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}) {

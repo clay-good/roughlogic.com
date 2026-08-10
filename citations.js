@@ -11010,6 +11010,18 @@ export const CITATIONS = {
       { name: "Scope", value: "steel; notch Kf and finite-life S-N are separate; feeds fatigue-safety-factor", source: "scope of this tile" },
     ],
   },
+  "power-screw-torque": {
+    formula: "sec_a = 1/cos(alpha) (square 0, Acme 14.5, Unified 30 deg); T_raise = (F dm/2)(l + pi mu dm sec_a)/(pi dm - mu l sec_a) + F muc dc/2; T_lower with (pi mu dm sec_a - l)/(pi dm + mu l sec_a); efficiency = F l/(2 pi T_raise); self-locking if pi mu dm sec_a > l.",
+    edition: "The power-screw raising and lowering torque with the thread half-angle correction and the collar-friction term (Shigley, Mechanical Engineering Design, Ch. 8 -- power screws), by name.",
+    freeAccess: "The power-screw torque equations are standard published machine-design results; the load, thread geometry, and friction coefficients are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The torque to raise and lower an axial load F on a power screw of mean diameter dm and lead l (pitch x number of starts), with thread friction mu and a collar (thrust face) of mean diameter dc at friction muc. T_raise = (F dm/2)(l + pi mu dm sec_a)/(pi dm - mu l sec_a) + F muc dc/2 and T_lower uses (pi mu dm sec_a - l)/(pi dm + mu l sec_a), where sec_a = 1/cos of the thread half-angle (square 0, Acme 14.5, Unified 30 deg). The efficiency is F l/(2 pi T_raise). The screw is SELF-LOCKING (holds the load with no brake) when the lowering thread torque is positive, i.e. pi mu dm sec_a > l; a steep lead or slick thread back-drives. The collar term is added to both directions and often dominates, so a thrust bearing (small dc) recovers efficiency. Single power screw; column buckling of a long screw, thread bearing/shear stress, and wear life are separate. The thread half-angle is taken directly (the small lead-angle correction to the normal plane is neglected, as in the standard textbook form). A design aid; Shigley and the maker govern.",
+    assumptions: [
+      { name: "Torque equations", value: "T_raise/T_lower with sec_a = 1/cos(thread half-angle) and the collar term F muc dc/2", source: "Shigley Ch. 8" },
+      { name: "Self-locking", value: "self-locking when pi mu dm sec_a > l (positive lowering thread torque)", source: "Shigley Ch. 8" },
+      { name: "Scope", value: "single screw; buckling, thread stress, and wear are separate; half-angle taken directly", source: "scope of this tile" },
+    ],
+  },
   "bolt-proof-load": {
     formula: "At = 0.7854 x (D - 0.9743/n)^2; proof_load = At x proof_strength; yield_load = At x yield_strength; tensile_load = At x tensile_strength; rec_clamp = 0.75 x proof_load.",
     edition: "The SAE J429 inch-series bolt strength model (tensile stress area x grade strength), with the ASME B1.1 tensile stress area, by name; the joint design, torque method, and preload requirement govern.",

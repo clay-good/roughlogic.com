@@ -1153,6 +1153,7 @@ export const COMPUTE_MAP = {
   "bearing-equivalent-load": { module: "../../calc-machining.js", fn: "computeBearingEquivalentLoad" },
   "fatigue-safety-factor": { module: "../../calc-machining.js", fn: "computeFatigueSafetyFactor" },
   "endurance-limit-marin": { module: "../../calc-machining.js", fn: "computeEnduranceLimitMarin" },
+  "power-screw-torque": { module: "../../calc-machining.js", fn: "computePowerScrewTorque" },
   "anchor-rode-scope": { module: "../../calc-mechanic.js", fn: "computeAnchorRodeScope" },
   "turbo-pressure-ratio": { module: "../../calc-mechanic.js", fn: "computeTurboPressureRatio" },
   "turbo-max-boost-for-charge-temp": { module: "../../calc-mechanic.js", fn: "computeTurboMaxBoostForChargeTemp" },

@@ -98399,6 +98399,46 @@
    "kind": "question"
   },
   {
+   "term": "power screw torque",
+   "target": "power-screw-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "lead screw torque",
+   "target": "power-screw-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "screw jack torque",
+   "target": "power-screw-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "acme screw torque",
+   "target": "power-screw-torque",
+   "kind": "industry"
+  },
+  {
+   "term": "screw efficiency self locking",
+   "target": "power-screw-torque",
+   "kind": "adjacent"
+  },
+  {
+   "term": "torque to raise a load",
+   "target": "power-screw-torque",
+   "kind": "adjacent"
+  },
+  {
+   "term": "is my lead screw self locking",
+   "target": "power-screw-torque",
+   "kind": "question"
+  },
+  {
+   "term": "how much torque to turn a screw jack",
+   "target": "power-screw-torque",
+   "kind": "question"
+  },
+  {
    "term": "countersink size from plunge depth",
    "target": "countersink-diameter-from-depth",
    "kind": "question"

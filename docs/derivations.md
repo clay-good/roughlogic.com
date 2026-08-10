@@ -2572,6 +2572,7 @@ cross-check.
 | calc-machining.js | `computeGrindingWheelRpm` | `{ wheel_diameter_in = 7, rated_max_sfpm = 6500, grinder_rpm = 3450 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeKeyseatKeySize` | `{ shaft_diameter_in = 0, torque_in_lb = 0, key_length_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeKnurlBlankDiameter` | `{ target_diameter_in = 0.75, knurl_tpi = 21 } = {}` | _ | _ | _ |
+| calc-machining.js | `computePowerScrewTorque` | `{ axial_load_lbf = 0, mean_diameter_in = 0, lead_in = 0, thread_friction = 0....` | _ | _ | _ |
 | calc-machining.js | `computeRadialChipThinning` | `{ ae_in = 0, d_in = 0, fz_target = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeReamingDrillAllowance` | `{ reamer_diameter_in = 0.5, allowance_override_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeSpindleMaxMrr` | `{ available_motor_hp = 0, unit_power_hp = 1.0, efficiency_pct = 80 } = {}` | _ | _ | _ |
@@ -3325,7 +3326,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1911.
+Row count: 1912.
 
 <!-- END function-corpus-v14 -->
 
@@ -4620,7 +4621,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (111 tiles)
+### Group K Mechanic (112 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4697,6 +4698,7 @@ per spec-v14 §13.1 second paragraph.
 | `max-rpm-from-piston-speed` | Max RPM from a Piston-Speed Limit | Mean piston speed (engine building), ...; spec-v660 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mean-piston-speed` | Mean Piston Speed and RPM-Limit Reading | Mean piston speed (engine building); spec-v324 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `paint-mix-ratio` | 2K Paint Mix Ratio | Paint manufacturer technical data she...; spec-v100 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `power-screw-torque` | Power-Screw Torque, Efficiency, and Self-Locking | Project (first-principles); T_raise/T_lower power screw | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `prop-pitch-selection` | Marine Propeller Pitch Selection | outboard prop selection practice; spec-v462 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `prop-slip` | Marine Prop Slip | Project (first-principles); theoretical_kt = (4500/1.85) * 19 / 1215.2 = 38.03; slip ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `radial-chip-thinning` | Radial Chip Thinning Feed Compensation | Radial chip thinning geometry; spec-v317 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5158,6 +5160,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1660. Fixture-covered or reference-cadence: 1660 / 1660.
+Tile count: 1661. Fixture-covered or reference-cadence: 1661 / 1661.
 
 <!-- END tile-index-v14 -->

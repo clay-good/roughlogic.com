@@ -37670,3 +37670,28 @@ test("bounds: spec-v1287 computeEnduranceLimitMarin pins Se and the Marin factor
   assert.ok("error" in _v1287({ ultimate_strength_psi: 105000, surface_finish: "machined", diameter_in: 1, load_type: "bending", reliability_pct: "80", temperature_factor_kd: 1 }));
   assert.ok("error" in _v1287({ ultimate_strength_psi: Infinity, surface_finish: "machined", diameter_in: 1, load_type: "bending", reliability_pct: "99", temperature_factor_kd: 1 }));
 });
+
+import { computePowerScrewTorque as _v1288 } from "../../calc-machining.js";
+test("bounds: spec-v1288 computePowerScrewTorque pins the raise/lower torque, efficiency, self-locking, the collar penalty, and error seams", () => {
+  // 1000 lbf, dm 1, lead 0.2 Acme, mu 0.15, collar 1.5 at 0.15: T_raise 223, T_lower 158 in-lbf, eff 14.3%, self-locking.
+  const r = _v1288({ axial_load_lbf: 1000, mean_diameter_in: 1.0, lead_in: 0.2, thread_friction: 0.15, collar_friction: 0.15, collar_diameter_in: 1.5, thread_form: "acme" });
+  assert.ok(Math.abs(r.raise_torque_in_lbf - 222.9) < 0.5 && Math.abs(r.lower_torque_in_lbf - 157.7) < 0.5);
+  assert.ok(Math.abs(r.efficiency_pct - 14.3) < 0.2 && r.self_locking === true);
+  assert.ok(Math.abs(r.lead_angle_deg - 3.64) < 0.05);
+  // Dropping the collar (thrust bearing) nearly doubles efficiency and lowers the raising torque.
+  const noCollar = _v1288({ axial_load_lbf: 1000, mean_diameter_in: 1.0, lead_in: 0.2, thread_friction: 0.15, collar_friction: 0.0, collar_diameter_in: 0.0, thread_form: "acme" });
+  assert.ok(Math.abs(noCollar.raise_torque_in_lbf - 110.4) < 0.5 && Math.abs(noCollar.efficiency_pct - 28.8) < 0.3);
+  // A steep lead with a slick thread is not self-locking (the load back-drives): lower thread torque goes negative.
+  const steep = _v1288({ axial_load_lbf: 1000, mean_diameter_in: 1.0, lead_in: 1.5, thread_friction: 0.08, collar_friction: 0.0, collar_diameter_in: 0.0, thread_form: "square" });
+  assert.ok(steep.self_locking === false && steep.lower_torque_in_lbf < 0);
+  // A square thread (half-angle 0) is slightly more efficient than Acme at the same friction (no wedging).
+  const sq = _v1288({ axial_load_lbf: 1000, mean_diameter_in: 1.0, lead_in: 0.2, thread_friction: 0.15, collar_friction: 0.0, collar_diameter_in: 0.0, thread_form: "square" });
+  assert.ok(sq.efficiency_pct > noCollar.efficiency_pct);
+  // Error seams: non-positive load/dm/lead, negative friction, unknown form, friction too high (denominator <= 0), non-finite.
+  assert.ok("error" in _v1288({ axial_load_lbf: 0, mean_diameter_in: 1.0, lead_in: 0.2, thread_friction: 0.15, collar_friction: 0.15, collar_diameter_in: 1.5, thread_form: "acme" }));
+  assert.ok("error" in _v1288({ axial_load_lbf: 1000, mean_diameter_in: 1.0, lead_in: 0, thread_friction: 0.15, collar_friction: 0.15, collar_diameter_in: 1.5, thread_form: "acme" }));
+  assert.ok("error" in _v1288({ axial_load_lbf: 1000, mean_diameter_in: 1.0, lead_in: 0.2, thread_friction: -0.1, collar_friction: 0.15, collar_diameter_in: 1.5, thread_form: "acme" }));
+  assert.ok("error" in _v1288({ axial_load_lbf: 1000, mean_diameter_in: 1.0, lead_in: 0.2, thread_friction: 0.15, collar_friction: 0.15, collar_diameter_in: 1.5, thread_form: "buttress" }));
+  assert.ok("error" in _v1288({ axial_load_lbf: 1000, mean_diameter_in: 0.05, lead_in: 5.0, thread_friction: 0.9, collar_friction: 0.0, collar_diameter_in: 0.0, thread_form: "acme" }));
+  assert.ok("error" in _v1288({ axial_load_lbf: Infinity, mean_diameter_in: 1.0, lead_in: 0.2, thread_friction: 0.15, collar_friction: 0.15, collar_diameter_in: 1.5, thread_form: "acme" }));
+});
