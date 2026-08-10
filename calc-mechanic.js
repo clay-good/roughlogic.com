@@ -847,12 +847,13 @@ MECHANIC_RENDERERS["screw-conveyor-rpm"] = _simpleRenderer({
 // Rate k = G d^4 / (8 D^3 Na), G the wire shear modulus, d the wire diameter,
 // D the mean coil diameter, Na the number of ACTIVE coils. Spring index D/d.
 export const SPRING_MATERIALS = {
-  // gamma_lb_in3 = wire weight density (spec-v1284, used by the surge-frequency tile; the rate tile reads only G_psi)
-  "music-wire": { label: "Music wire (ASTM A228)", G_psi: 11850000, gamma_lb_in3: 0.284 },
-  "hard-drawn": { label: "Hard-drawn steel (ASTM A227)", G_psi: 11500000, gamma_lb_in3: 0.284 },
-  "chrome-silicon": { label: "Chrome-silicon (ASTM A401)", G_psi: 11200000, gamma_lb_in3: 0.284 },
-  "stainless-302": { label: "Stainless 302/304 (ASTM A313)", G_psi: 10000000, gamma_lb_in3: 0.286 },
-  "phosphor-bronze": { label: "Phosphor bronze (ASTM B159)", G_psi: 6000000, gamma_lb_in3: 0.320 },
+  // gamma_lb_in3 = wire weight density (spec-v1284, surge-frequency tile); E_psi = Young's modulus (spec-v1296,
+  // torsion-spring tile, which loads the wire in bending). The compression-rate tile reads only G_psi.
+  "music-wire": { label: "Music wire (ASTM A228)", G_psi: 11850000, gamma_lb_in3: 0.284, E_psi: 29500000 },
+  "hard-drawn": { label: "Hard-drawn steel (ASTM A227)", G_psi: 11500000, gamma_lb_in3: 0.284, E_psi: 28800000 },
+  "chrome-silicon": { label: "Chrome-silicon (ASTM A401)", G_psi: 11200000, gamma_lb_in3: 0.284, E_psi: 29500000 },
+  "stainless-302": { label: "Stainless 302/304 (ASTM A313)", G_psi: 10000000, gamma_lb_in3: 0.286, E_psi: 28000000 },
+  "phosphor-bronze": { label: "Phosphor bronze (ASTM B159)", G_psi: 6000000, gamma_lb_in3: 0.320, E_psi: 15000000 },
 };
 
 // dims: in { wire_diameter_in: L, mean_coil_diameter_in: L, active_coils: dimensionless, material: dimensionless } out: { spring_rate_lb_in: M T^-2, spring_index: dimensionless, shear_modulus_psi: M L^-1 T^-2 }
@@ -1398,6 +1399,59 @@ MECHANIC_RENDERERS["centrifugal-force"] = _simpleRenderer({
     { key: "n", id: "cff-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCentrifugalForce,
+});
+
+// --- spec-v1296 K: helical torsion spring rate and torque (`torsion-spring-rate`) ---
+// The spring family covers the compression coil but not the torsion spring (garage-door counterbalance,
+// clothespin, hinge return). A torsion spring loads its wire in BENDING, so its rate uses E (not G):
+// k' = d^4 E/(10.8 D Na) in-lb per turn; torque T = k'(deg/360); bending stress sigma = Kb 32 T/(pi d^3),
+// Kb = (4C^2 - C - 1)/(4C(C - 1)) the Wahl round-wire bending factor.
+// dims: in { wire_diameter_in: L, mean_coil_diameter_in: L, active_coils: dimensionless, deflection_deg: dimensionless, material: dimensionless } out: { rate_in_lb_per_turn: M L^2 T^-2, rate_in_lb_per_deg: M L^2 T^-2, torque_in_lb: M L^2 T^-2, bending_stress_psi: M L^-1 T^-2 }
+export function computeTorsionSpringRate({ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, deflection_deg = 0, material = "music-wire" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const d = Number(wire_diameter_in) || 0;
+  const D = Number(mean_coil_diameter_in) || 0;
+  const Na = Number(active_coils) || 0;
+  const deg = Number(deflection_deg) || 0;
+  const m = SPRING_MATERIALS[material];
+  if (!m) return { error: "Unknown spring material." };
+  if (!(d > 0)) return { error: "Wire diameter must be positive (in)." };
+  if (!(D > d)) return { error: "Mean coil diameter must be greater than the wire diameter (in)." };
+  if (!(Na > 0)) return { error: "Active coils must be positive." };
+  if (deg < 0) return { error: "Deflection cannot be negative (deg)." };
+  const E = m.E_psi;
+  const C = D / d;
+  const rate_in_lb_per_turn = (Math.pow(d, 4) * E) / (10.8 * D * Na);
+  const rate_in_lb_per_deg = rate_in_lb_per_turn / 360;
+  const torque_in_lb = rate_in_lb_per_turn * (deg / 360);
+  const wahl_kb = (4 * C * C - C - 1) / (4 * C * (C - 1));
+  const bending_stress_psi = (wahl_kb * 32 * torque_in_lb) / (Math.PI * Math.pow(d, 3));
+  const index_flag = C < 4 ? "Spring index D/d < 4: hard to coil and high stress concentration." : C > 14 ? "Spring index D/d > 14: loose, prone to tangling." : null;
+  if (![rate_in_lb_per_turn, torque_in_lb, bending_stress_psi, wahl_kb].every(Number.isFinite) || !(rate_in_lb_per_turn > 0)) return { error: "Torsion-spring math is not a finite value; check the inputs." };
+  return {
+    rate_in_lb_per_turn, rate_in_lb_per_deg, torque_in_lb, bending_stress_psi, spring_index: C, wahl_kb, youngs_modulus_psi: E, index_flag,
+    note: "Helical torsion spring rate k' = d^4 E/(10.8 D Na), in-lbf per revolution, using the Young's modulus E because a torsion spring loads its wire in BENDING (not the shear a compression spring sees). The torque at a wind-up of deg degrees is T = k'(deg/360), and the maximum bending stress is sigma = Kb 32 T/(pi d^3) with the Wahl round-wire bending factor Kb = (4C^2 - C - 1)/(4C(C - 1)), C = D/d the spring index. The rate is a torque per turn: wind a fraction of a turn for a hinge return, several turns for a garage-door counterbalance. Torque and stress scale linearly with wind-up, so a full turn is four times the 90-degree value. Compare the stress to the material's allowable bending stress (often 0.7-0.9 Sut for torsion springs). The slight rise in rate as the coil tightens on wind-up (and possible binding on the arbor), end-arm bending, and fatigue life are separate. A design aid; Machinery's Handbook / Shigley and the spring maker govern.",
+  };
+}
+export const torsionSpringRateExample = { inputs: { wire_diameter_in: 0.1875, mean_coil_diameter_in: 1.5, active_coils: 30, deflection_deg: 90, material: "music-wire" } };
+
+MECHANIC_RENDERERS["torsion-spring-rate"] = _simpleRenderer({
+  citation: "Citation: helical torsion spring rate k' = d^4 E/(10.8 D Na) in-lbf per turn (Young's modulus E, the wire is in bending), torque T = k'(deg/360), and bending stress sigma = Kb 32 T/(pi d^3) with the Wahl factor Kb = (4C^2 - C - 1)/(4C(C - 1)) (Shigley, Mechanical Engineering Design, Ch. 10; Machinery's Handbook). Compare to the material's allowable bending stress; the spring maker governs.",
+  example: torsionSpringRateExample.inputs,
+  fields: [
+    { key: "wire_diameter_in", label: "Wire diameter d (in)", kind: "number" },
+    { key: "mean_coil_diameter_in", label: "Mean coil diameter D (in)", kind: "number" },
+    { key: "active_coils", label: "Active coils Na", kind: "number" },
+    { key: "deflection_deg", label: "Wind-up deflection (deg)", kind: "number" },
+    { key: "material", label: "Wire material", kind: "select", default: "music-wire", options: Object.keys(SPRING_MATERIALS).map((k) => ({ value: k, label: SPRING_MATERIALS[k].label })) },
+  ],
+  outputs: [
+    { key: "k", id: "tsr-out-k", label: "Rate", value: (r) => fmt(r.rate_in_lb_per_turn, 2) + " in-lbf/turn (" + fmt(r.rate_in_lb_per_deg, 4) + " in-lbf/deg)" },
+    { key: "t", id: "tsr-out-t", label: "Torque at deflection", value: (r) => fmt(r.torque_in_lb, 2) + " in-lbf" },
+    { key: "s", id: "tsr-out-s", label: "Max bending stress", value: (r) => fmt(r.bending_stress_psi, 0) + " psi (index D/d = " + fmt(r.spring_index, 2) + ", Kb = " + fmt(r.wahl_kb, 3) + ")" + (r.index_flag ? " - " + r.index_flag : "") },
+    { key: "n", id: "tsr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTorsionSpringRate,
 });
 
 // ===========================================================================

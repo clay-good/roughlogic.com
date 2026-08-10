@@ -87327,6 +87327,66 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "torsion-spring-rate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Music-wire torsion spring, 90 deg wind-up",
+   "source_edition_or_year": "Shigley Ch.10 / Machinery Handbook",
+   "source_section_or_page": "k = d^4 E/(10.8 D Na)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "wire_diameter_in": 0.1875,
+    "mean_coil_diameter_in": 1.5,
+    "active_coils": 30,
+    "deflection_deg": 90,
+    "material": "music-wire"
+   },
+   "outputs": {
+    "rate_in_lb_per_turn": {
+     "value": 75.02,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "torque_in_lb": {
+     "value": 18.76,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bending_stress_psi": {
+     "value": 31958,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "torsion-spring-rate",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Full turn is four times the 90-degree torque",
+   "source_edition_or_year": "Shigley Ch.10 / Machinery Handbook",
+   "source_section_or_page": "k = d^4 E/(10.8 D Na)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "wire_diameter_in": 0.1875,
+    "mean_coil_diameter_in": 1.5,
+    "active_coils": 30,
+    "deflection_deg": 360,
+    "material": "music-wire"
+   },
+   "outputs": {
+    "torque_in_lb": {
+     "value": 75.02,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

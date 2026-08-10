@@ -37863,3 +37863,28 @@ test("bounds: spec-v1295 computeCentrifugalForce pins the force, the g-multiple,
   assert.ok("error" in _v1295({ weight_lb: 2, radius_in: 6, speed_rpm: 0 }));
   assert.ok("error" in _v1295({ weight_lb: Infinity, radius_in: 6, speed_rpm: 1800 }));
 });
+
+import { computeTorsionSpringRate as _v1296 } from "../../calc-mechanic.js";
+test("bounds: spec-v1296 computeTorsionSpringRate pins the rate, torque, Wahl bending stress, linear wind-up scaling, and error seams", () => {
+  // 0.1875 music-wire, D 1.5, Na 30, 90 deg: k' 75.0 in-lb/turn, T 18.76, sigma ~31,958 psi, C 8, Kb 1.10.
+  const r = _v1296({ wire_diameter_in: 0.1875, mean_coil_diameter_in: 1.5, active_coils: 30, deflection_deg: 90, material: "music-wire" });
+  assert.ok(Math.abs(r.rate_in_lb_per_turn - 75.02) < 0.1 && Math.abs(r.torque_in_lb - 18.76) < 0.05);
+  assert.ok(Math.abs(r.bending_stress_psi - 31958) < 50 && Math.abs(r.spring_index - 8) < 1e-9 && Math.abs(r.wahl_kb - 1.1027) < 1e-3);
+  assert.ok(Math.abs(r.rate_in_lb_per_deg - r.rate_in_lb_per_turn / 360) < 1e-9);
+  // Torque and stress scale linearly with wind-up: a full turn (360 deg) is four times the 90-degree value.
+  const full = _v1296({ wire_diameter_in: 0.1875, mean_coil_diameter_in: 1.5, active_coils: 30, deflection_deg: 360, material: "music-wire" });
+  assert.ok(Math.abs(full.torque_in_lb - 4 * r.torque_in_lb) < 1e-6 && Math.abs(full.bending_stress_psi - 4 * r.bending_stress_psi) < 1e-3);
+  // Zero deflection gives zero torque but a finite rate.
+  const zero = _v1296({ wire_diameter_in: 0.1875, mean_coil_diameter_in: 1.5, active_coils: 30, deflection_deg: 0, material: "music-wire" });
+  assert.ok(zero.torque_in_lb === 0 && zero.rate_in_lb_per_turn > 0);
+  // Phosphor bronze (lower E) is a softer torsion spring than music wire.
+  const bronze = _v1296({ wire_diameter_in: 0.1875, mean_coil_diameter_in: 1.5, active_coils: 30, deflection_deg: 90, material: "phosphor-bronze" });
+  assert.ok(bronze.rate_in_lb_per_turn < r.rate_in_lb_per_turn);
+  // Error seams: unknown material, non-positive wire, coil not larger than wire, non-positive coils, negative deflection, non-finite.
+  assert.ok("error" in _v1296({ wire_diameter_in: 0.1875, mean_coil_diameter_in: 1.5, active_coils: 30, deflection_deg: 90, material: "inconel" }));
+  assert.ok("error" in _v1296({ wire_diameter_in: 0, mean_coil_diameter_in: 1.5, active_coils: 30, deflection_deg: 90, material: "music-wire" }));
+  assert.ok("error" in _v1296({ wire_diameter_in: 1.5, mean_coil_diameter_in: 1.5, active_coils: 30, deflection_deg: 90, material: "music-wire" }));
+  assert.ok("error" in _v1296({ wire_diameter_in: 0.1875, mean_coil_diameter_in: 1.5, active_coils: 0, deflection_deg: 90, material: "music-wire" }));
+  assert.ok("error" in _v1296({ wire_diameter_in: 0.1875, mean_coil_diameter_in: 1.5, active_coils: 30, deflection_deg: -10, material: "music-wire" }));
+  assert.ok("error" in _v1296({ wire_diameter_in: Infinity, mean_coil_diameter_in: 1.5, active_coils: 30, deflection_deg: 90, material: "music-wire" }));
+});

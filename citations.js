@@ -11746,6 +11746,18 @@ export const CITATIONS = {
       { name: "Scope", value: "concentrated mass; burst stress, imbalance couple, whirl speed are separate", source: "scope of this tile" },
     ],
   },
+  "torsion-spring-rate": {
+    formula: "k' = d^4 E/(10.8 D Na) in-lbf/turn; T = k'(deg/360); C = D/d; Kb = (4C^2 - C - 1)/(4C(C - 1)); sigma = Kb 32 T/(pi d^3). E by material (music wire 29.5e6, phosphor bronze 15.0e6 psi).",
+    edition: "The helical torsion-spring rate k' = d^4 E/(10.8 D Na) and the Wahl round-wire bending correction (Shigley, Mechanical Engineering Design, Ch. 10; Machinery's Handbook), by name; the wire is in bending so the Young's modulus E is used.",
+    freeAccess: "The torsion-spring rate and Wahl factor are standard published spring-design results; the per-material Young's modulus is a published constant. Wire and coil dimensions, deflection, and material are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The helical torsion spring rate k' = d^4 E/(10.8 D Na), in-lbf per revolution, using the Young's modulus E because a torsion spring loads its wire in BENDING (not the shear a compression spring sees). The torque at a wind-up of deg degrees is T = k'(deg/360), and the maximum bending stress is sigma = Kb 32 T/(pi d^3) with the Wahl round-wire bending factor Kb = (4C^2 - C - 1)/(4C(C - 1)), C = D/d the spring index. The rate is a torque per turn: wind a fraction of a turn for a hinge return, several turns for a garage-door counterbalance. Torque and stress scale linearly with wind-up, so a full turn is four times the 90-degree value. Compare the stress to the material's allowable bending stress (often 0.7-0.9 Sut for torsion springs). The slight rise in rate as the coil tightens on wind-up (and possible binding on the arbor), end-arm bending, and fatigue life are separate. A design aid; Machinery's Handbook / Shigley and the spring maker govern.",
+    assumptions: [
+      { name: "Rate", value: "k' = d^4 E/(10.8 D Na) in-lbf/turn, wire in bending (Young's modulus E)", source: "Shigley Ch. 10" },
+      { name: "Bending stress", value: "sigma = Kb 32 T/(pi d^3), Kb the Wahl round-wire bending factor", source: "Shigley / Machinery's Handbook" },
+      { name: "Scope", value: "rate/torque/stress; coil tightening, end-arm bending, fatigue are separate", source: "scope of this tile" },
+    ],
+  },
   "gear-identification": {
     formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
     edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",

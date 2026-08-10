@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1668,
-  "covered_count": 1214,
+  "total_tiles": 1669,
+  "covered_count": 1215,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -1093,6 +1093,7 @@
     "tire-gearing",
     "tire-load-check",
     "torque-adapter-correction",
+    "torsion-spring-rate",
     "tr55-detention-storage",
     "tr55-graphical-peak-discharge",
     "tr55-time-of-concentration",

@@ -3069,6 +3069,46 @@
    "kind": "question"
   },
   {
+   "term": "torsion spring rate",
+   "target": "torsion-spring-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "torsion spring torque",
+   "target": "torsion-spring-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "garage door spring torque",
+   "target": "torsion-spring-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "helical torsion spring",
+   "target": "torsion-spring-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "spring wind up torque",
+   "target": "torsion-spring-rate",
+   "kind": "adjacent"
+  },
+  {
+   "term": "coil spring bending stress",
+   "target": "torsion-spring-rate",
+   "kind": "adjacent"
+  },
+  {
+   "term": "in-lb per turn spring",
+   "target": "torsion-spring-rate",
+   "kind": "adjacent"
+  },
+  {
+   "term": "how much torque from a torsion spring",
+   "target": "torsion-spring-rate",
+   "kind": "question"
+  },
+  {
    "term": "hp torque rpm",
    "target": "hp-from-torque",
    "kind": "redirect"
