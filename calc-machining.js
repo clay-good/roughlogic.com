@@ -1337,6 +1337,61 @@ function renderThickWallCylinderStress(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["thick-wall-cylinder-stress"] = renderThickWallCylinderStress;
 
+// ===================== spec-v1298: rack and pinion travel, speed, and force =====================
+// The gear family has spur/worm/planetary geometry but not the rack and pinion (rotary to linear: CNC gantry,
+// sliding gate, steering rack, linear actuator). PD = N/Pd; travel per rev = pi PD; travel per tooth = pi/Pd;
+// linear speed = pi PD rpm; rack force F = 2T/PD. A bigger pinion moves faster but pushes softer at the same torque.
+// dims: in { pinion_teeth: dimensionless, diametral_pitch_1_in: L^-1, pinion_torque_in_lb: M L^2 T^-2, pinion_rpm: T^-1 } out: { pitch_diameter_in: L, travel_per_rev_in: L, travel_per_tooth_in: L, linear_speed_in_min: L T^-1, rack_force_lbf: M L T^-2 }
+export function computeRackAndPinion({ pinion_teeth = 0, diametral_pitch_1_in = 0, pinion_torque_in_lb = 0, pinion_rpm = 0 } = {}) {
+  const _g = _finiteGuard({ pinion_teeth, diametral_pitch_1_in, pinion_torque_in_lb, pinion_rpm }); if (_g) return _g;
+  const N = Number(pinion_teeth) || 0;
+  const Pd = Number(diametral_pitch_1_in) || 0;
+  const T = Number(pinion_torque_in_lb) || 0;
+  const rpm = Number(pinion_rpm) || 0;
+  if (!(N >= 6)) return { error: "Pinion teeth must be at least 6." };
+  if (!(Pd > 0)) return { error: "Diametral pitch must be positive (teeth per inch)." };
+  if (!(T > 0)) return { error: "Pinion torque must be positive (in-lbf)." };
+  if (!(rpm > 0)) return { error: "Pinion speed must be positive (rpm)." };
+  const pitch_diameter_in = N / Pd;
+  const travel_per_rev_in = Math.PI * pitch_diameter_in;
+  const travel_per_tooth_in = Math.PI / Pd;
+  const linear_speed_in_min = travel_per_rev_in * rpm;
+  const linear_speed_ft_min = linear_speed_in_min / 12;
+  const rack_force_lbf = (2 * T) / pitch_diameter_in;
+  if (![pitch_diameter_in, travel_per_rev_in, linear_speed_in_min, rack_force_lbf].every(Number.isFinite) || !(rack_force_lbf > 0)) return { error: "Rack-and-pinion math is not a finite value; check the inputs." };
+  return {
+    pitch_diameter_in, travel_per_rev_in, travel_per_tooth_in, linear_speed_in_min, linear_speed_ft_min, rack_force_lbf,
+    note: "Rack and pinion kinematics and force. The pinion pitch diameter is PD = N/Pd (teeth N, diametral pitch Pd); the rack advances one pitch circumference per pinion turn, so travel per revolution = pi PD and travel per tooth = the circular pitch pi/Pd. The linear speed is pi PD x rpm (in/min, divide by 12 for ft/min), and the tangential push force is F = 2 T/PD, the torque divided by the pitch radius. A bigger pinion moves the rack faster but pushes softer for the same torque - the speed-for-force trade in picking a pinion. Ideal kinematics and static force only; tooth bending/contact stress (the gear-stress tiles), mesh efficiency, backlash, acceleration (inertia), and the rack support are separate. A design aid; Machinery's Handbook and the drive maker govern.",
+  };
+}
+export const rackAndPinionExample = { inputs: { pinion_teeth: 20, diametral_pitch_1_in: 10, pinion_torque_in_lb: 100, pinion_rpm: 500 } };
+function renderRackAndPinion(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: rack-and-pinion kinematics and force (Machinery's Handbook): pitch diameter PD = N/Pd, travel per revolution = pi PD, travel per tooth = pi/Pd, linear speed = pi PD x rpm, rack force F = 2 T/PD. Ideal kinematics and static force; tooth stress, backlash, and inertia are separate. A design aid; the drive maker governs.";
+  const N = makeNumber("Pinion teeth N", "rap-n", { step: "1", min: "0" }); N.input.value = "20";
+  const Pd = makeNumber("Diametral pitch Pd (teeth per in)", "rap-pd", { step: "any", min: "0" }); Pd.input.value = "10";
+  const T = makeNumber("Pinion torque T (in-lbf)", "rap-t", { step: "any", min: "0" }); T.input.value = "100";
+  const rpm = makeNumber("Pinion speed (rpm)", "rap-rpm", { step: "any", min: "0" }); rpm.input.value = "500";
+  for (const f of [N, Pd, T, rpm]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { N.input.value = "20"; Pd.input.value = "10"; T.input.value = "100"; rpm.input.value = "500"; update(); });
+  const oPD = makeOutputLine(outputRegion, "Pinion pitch diameter", "rap-out-pd");
+  const oTr = makeOutputLine(outputRegion, "Travel (per rev / per tooth)", "rap-out-tr");
+  const oV = makeOutputLine(outputRegion, "Linear speed", "rap-out-v");
+  const oF = makeOutputLine(outputRegion, "Rack push force", "rap-out-f");
+  const oNote = makeOutputLine(outputRegion, "Note", "rap-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeRackAndPinion({ pinion_teeth: readNum(N.input), diametral_pitch_1_in: readNum(Pd.input), pinion_torque_in_lb: readNum(T.input), pinion_rpm: readNum(rpm.input) });
+    if (r.error) { oPD.textContent = r.error; oTr.textContent = "-"; oV.textContent = "-"; oF.textContent = "-"; oNote.textContent = ""; return; }
+    oPD.textContent = fmt(r.pitch_diameter_in, 3) + " in";
+    oTr.textContent = fmt(r.travel_per_rev_in, 3) + " in/rev, " + fmt(r.travel_per_tooth_in, 4) + " in/tooth";
+    oV.textContent = fmt(r.linear_speed_in_min, 0) + " in/min (" + fmt(r.linear_speed_ft_min, 1) + " ft/min)";
+    oF.textContent = fmt(r.rack_force_lbf, 1) + " lbf";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [N, Pd, T, rpm]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["rack-and-pinion"] = renderRackAndPinion;
+
 // ===================== spec-v509: countersink diameter and cutting depth =====================
 // dims: in { countersink_dia_in: L, included_angle_deg: dimensionless, pilot_hole_dia_in: L } out: { z_in: L, z_full_in: L }
 export function computeCountersinkDepth({ countersink_dia_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}) {

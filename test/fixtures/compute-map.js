@@ -1163,6 +1163,7 @@ export const COMPUTE_MAP = {
   "disk-clutch-torque": { module: "../../calc-machining.js", fn: "computeDiskClutchTorque" },
   "euler-johnson-column": { module: "../../calc-machining.js", fn: "computeEulerJohnsonColumn" },
   "thick-wall-cylinder-stress": { module: "../../calc-machining.js", fn: "computeThickWallCylinderStress" },
+  "rack-and-pinion": { module: "../../calc-machining.js", fn: "computeRackAndPinion" },
   "anchor-rode-scope": { module: "../../calc-mechanic.js", fn: "computeAnchorRodeScope" },
   "turbo-pressure-ratio": { module: "../../calc-mechanic.js", fn: "computeTurboPressureRatio" },
   "turbo-max-boost-for-charge-temp": { module: "../../calc-mechanic.js", fn: "computeTurboMaxBoostForChargeTemp" },

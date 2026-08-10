@@ -37911,3 +37911,25 @@ test("bounds: spec-v1297 computeThickWallCylinderStress pins the Lame bore/outer
   assert.ok("error" in _v1297({ pressure_psi: 3000, inner_radius_in: 2, wall_thickness_in: 0 }));
   assert.ok("error" in _v1297({ pressure_psi: Infinity, inner_radius_in: 2, wall_thickness_in: 0.5 }));
 });
+
+import { computeRackAndPinion as _v1298 } from "../../calc-machining.js";
+test("bounds: spec-v1298 computeRackAndPinion pins the pitch diameter, travel, linear speed, the speed-for-force trade, and error seams", () => {
+  // 20 teeth, 10 pitch, 100 in-lbf, 500 rpm: PD 2, travel/rev 6.283, force 100 lbf, speed 3142 in/min.
+  const r = _v1298({ pinion_teeth: 20, diametral_pitch_1_in: 10, pinion_torque_in_lb: 100, pinion_rpm: 500 });
+  assert.ok(Math.abs(r.pitch_diameter_in - 2.0) < 1e-9 && Math.abs(r.travel_per_rev_in - 6.2832) < 1e-3);
+  assert.ok(Math.abs(r.travel_per_tooth_in - Math.PI / 10) < 1e-9 && Math.abs(r.rack_force_lbf - 100) < 1e-6);
+  assert.ok(Math.abs(r.linear_speed_in_min - 3141.6) < 0.5 && Math.abs(r.linear_speed_ft_min - 261.8) < 0.1);
+  // A pinion twice as big (same torque/rpm) moves twice as fast but pushes half as hard.
+  const big = _v1298({ pinion_teeth: 40, diametral_pitch_1_in: 10, pinion_torque_in_lb: 100, pinion_rpm: 500 });
+  assert.ok(Math.abs(big.linear_speed_ft_min / r.linear_speed_ft_min - 2) < 1e-6 && Math.abs(big.rack_force_lbf / r.rack_force_lbf - 0.5) < 1e-9);
+  // Travel per tooth depends only on the diametral pitch (the circular pitch), not the tooth count.
+  assert.ok(Math.abs(_v1298({ pinion_teeth: 50, diametral_pitch_1_in: 10, pinion_torque_in_lb: 100, pinion_rpm: 500 }).travel_per_tooth_in - r.travel_per_tooth_in) < 1e-9);
+  // Force scales with torque.
+  assert.ok(Math.abs(_v1298({ pinion_teeth: 20, diametral_pitch_1_in: 10, pinion_torque_in_lb: 200, pinion_rpm: 500 }).rack_force_lbf / r.rack_force_lbf - 2) < 1e-9);
+  // Error seams: too few teeth, non-positive pitch/torque/rpm, non-finite.
+  assert.ok("error" in _v1298({ pinion_teeth: 4, diametral_pitch_1_in: 10, pinion_torque_in_lb: 100, pinion_rpm: 500 }));
+  assert.ok("error" in _v1298({ pinion_teeth: 20, diametral_pitch_1_in: 0, pinion_torque_in_lb: 100, pinion_rpm: 500 }));
+  assert.ok("error" in _v1298({ pinion_teeth: 20, diametral_pitch_1_in: 10, pinion_torque_in_lb: 0, pinion_rpm: 500 }));
+  assert.ok("error" in _v1298({ pinion_teeth: 20, diametral_pitch_1_in: 10, pinion_torque_in_lb: 100, pinion_rpm: 0 }));
+  assert.ok("error" in _v1298({ pinion_teeth: Infinity, diametral_pitch_1_in: 10, pinion_torque_in_lb: 100, pinion_rpm: 500 }));
+});

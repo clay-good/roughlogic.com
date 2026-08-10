@@ -1312,6 +1312,7 @@ export const RENDERER_MAP = {
   "disk-clutch-torque": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "euler-johnson-column": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "thick-wall-cylinder-stress": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
+  "rack-and-pinion": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "countersink-depth": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "countersink-diameter-from-depth": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "keyseat-key-size": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },

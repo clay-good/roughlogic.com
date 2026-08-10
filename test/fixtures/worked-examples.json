@@ -87449,6 +87449,70 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "rack-and-pinion",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "20-tooth 10-pitch pinion travel and force",
+   "source_edition_or_year": "Machinery Handbook",
+   "source_section_or_page": "rack and pinion",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "pinion_teeth": 20,
+    "diametral_pitch_1_in": 10,
+    "pinion_torque_in_lb": 100,
+    "pinion_rpm": 500
+   },
+   "outputs": {
+    "pitch_diameter_in": {
+     "value": 2.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "travel_per_rev_in": {
+     "value": 6.2832,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rack_force_lbf": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rack-and-pinion",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Larger 30-tooth 8-pitch pinion",
+   "source_edition_or_year": "Machinery Handbook",
+   "source_section_or_page": "rack and pinion",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "pinion_teeth": 30,
+    "diametral_pitch_1_in": 8,
+    "pinion_torque_in_lb": 250,
+    "pinion_rpm": 300
+   },
+   "outputs": {
+    "pitch_diameter_in": {
+     "value": 3.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "rack_force_lbf": {
+     "value": 133.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

@@ -11058,6 +11058,18 @@ export const CITATIONS = {
       { name: "Scope", value: "single material, internal pressure; external pressure, press fit, compound tubes are separate", source: "scope of this tile" },
     ],
   },
+  "rack-and-pinion": {
+    formula: "PD = N/Pd; travel per rev = pi PD; travel per tooth = pi/Pd; linear speed = pi PD x rpm; rack force F = 2 T/PD.",
+    edition: "The rack-and-pinion kinematics (linear travel = pi x pitch diameter per revolution) and the tangential force F = 2 T/PD (Machinery's Handbook), by name.",
+    freeAccess: "The rack-and-pinion travel and force relations are standard published gear-drive results; the tooth count, diametral pitch, torque, and speed are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Rack and pinion kinematics and force. The pinion pitch diameter is PD = N/Pd (teeth N, diametral pitch Pd); the rack advances one pitch circumference per pinion turn, so travel per revolution = pi PD and travel per tooth = the circular pitch pi/Pd. The linear speed is pi PD x rpm (in/min, divide by 12 for ft/min), and the tangential push force is F = 2 T/PD, the torque divided by the pitch radius. A bigger pinion moves the rack faster but pushes softer for the same torque - the speed-for-force trade in picking a pinion. Ideal kinematics and static force only; tooth bending/contact stress (the gear-stress tiles), mesh efficiency, backlash, acceleration (inertia), and the rack support are separate. A design aid; Machinery's Handbook and the drive maker govern.",
+    assumptions: [
+      { name: "Kinematics", value: "travel per rev = pi PD, per tooth = pi/Pd; linear speed = pi PD rpm", source: "Machinery's Handbook" },
+      { name: "Force", value: "F = 2 T/PD, tangential push from pinion torque", source: "Machinery's Handbook" },
+      { name: "Scope", value: "ideal kinematics/static force; tooth stress, backlash, inertia are separate", source: "scope of this tile" },
+    ],
+  },
   "bolt-proof-load": {
     formula: "At = 0.7854 x (D - 0.9743/n)^2; proof_load = At x proof_strength; yield_load = At x yield_strength; tensile_load = At x tensile_strength; rec_clamp = 0.75 x proof_load.",
     edition: "The SAE J429 inch-series bolt strength model (tensile stress area x grade strength), with the ASME B1.1 tensile stress area, by name; the joint design, torque method, and preload requirement govern.",
