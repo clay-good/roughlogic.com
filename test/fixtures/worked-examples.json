@@ -87567,6 +87567,56 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "slider-crank-piston-position",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "SBC piston at 90 deg ATDC (past mid-stroke)",
+   "source_edition_or_year": "Machinery Handbook",
+   "source_section_or_page": "slider-crank displacement",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "stroke_in": 3.48,
+    "rod_length_in": 5.7,
+    "crank_angle_deg": 90
+   },
+   "outputs": {
+    "position_from_tdc_in": {
+     "value": 2.0121,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "percent_of_stroke": {
+     "value": 57.8,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "slider-crank-piston-position",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "BDC at 180 deg equals the full stroke",
+   "source_edition_or_year": "Machinery Handbook",
+   "source_section_or_page": "slider-crank displacement",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "stroke_in": 3.48,
+    "rod_length_in": 5.7,
+    "crank_angle_deg": 180
+   },
+   "outputs": {
+    "position_from_tdc_in": {
+     "value": 3.48,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

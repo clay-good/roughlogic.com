@@ -1493,6 +1493,51 @@ MECHANIC_RENDERERS["universal-joint-speed"] = _simpleRenderer({
   compute: computeUniversalJointSpeed,
 });
 
+// --- spec-v1300 K: slider-crank piston position (`slider-crank-piston-position`) ---
+// The engine bench has mean-piston-speed (average) but not the instantaneous piston position at a crank
+// angle - the slider-crank geometry for degreeing a cam, port timing, or piston-to-valve clearance.
+// x = r + L - (r cos(theta) + sqrt(L^2 - r^2 sin^2(theta))), r = stroke/2. The rod swing puts the piston
+// PAST mid-stroke at 90 deg. dims: in { stroke_in: L, rod_length_in: L, crank_angle_deg: dimensionless } out: { position_from_tdc_in: L, percent_of_stroke: dimensionless, rod_angularity_shift_in: L }
+export function computeSliderCrankPistonPosition({ stroke_in = 0, rod_length_in = 0, crank_angle_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const stroke = Number(stroke_in) || 0;
+  const L = Number(rod_length_in) || 0;
+  const theta_deg = Number(crank_angle_deg);
+  if (!(stroke > 0)) return { error: "Stroke must be positive (in)." };
+  const r = stroke / 2;
+  if (!(L > r)) return { error: "Rod length must be greater than the crank radius (stroke/2) (in)." };
+  if (!(theta_deg >= 0 && theta_deg <= 360)) return { error: "Crank angle must be between 0 and 360 degrees." };
+  const th = (theta_deg * Math.PI) / 180;
+  const position_from_tdc_in = r + L - (r * Math.cos(th) + Math.sqrt(L * L - r * r * Math.sin(th) * Math.sin(th)));
+  const simple = r * (1 - Math.cos(th));
+  const rod_angularity_shift_in = position_from_tdc_in - simple;
+  const percent_of_stroke = (position_from_tdc_in / stroke) * 100;
+  const rod_stroke_ratio = L / stroke;
+  if (![position_from_tdc_in, percent_of_stroke, rod_angularity_shift_in].every(Number.isFinite)) return { error: "Slider-crank math is not a finite value; check the inputs." };
+  return {
+    position_from_tdc_in, percent_of_stroke, rod_angularity_shift_in, rod_stroke_ratio, simple_position_in: simple,
+    note: "Exact piston position of a centered slider-crank at a crank angle theta after top dead center: x = r + L - (r cos(theta) + sqrt(L^2 - r^2 sin^2(theta))), with the crank radius r = stroke/2 and the connecting-rod length L. At TDC (theta 0) x = 0; at BDC (theta 180) x = stroke. Because the rod swings, the piston moves faster leaving TDC and is already PAST mid-stroke at 90 degrees - the pure-sinusoid position r(1 - cos theta) misses this, and the shorter the rod (smaller rod/stroke ratio) the bigger the shift. Use it to degree a cam, set port timing, or check piston-to-valve and deck clearance against crank angle. Centered (non-offset) slider-crank; piston velocity and acceleration, a wrist-pin offset, rod stretch, and the gas/inertia loads are separate. A design aid; Machinery's Handbook and the engine builder govern.",
+  };
+}
+export const sliderCrankPistonPositionExample = { inputs: { stroke_in: 3.48, rod_length_in: 5.7, crank_angle_deg: 90 } };
+
+MECHANIC_RENDERERS["slider-crank-piston-position"] = _simpleRenderer({
+  citation: "Citation: exact slider-crank piston displacement x = r + L - (r cos(theta) + sqrt(L^2 - r^2 sin^2(theta))), r = stroke/2 (Machinery's Handbook; standard kinematics). The rod angularity puts the piston past mid-stroke at 90 degrees; the pure sinusoid r(1 - cos theta) is shown for comparison. A design aid; the engine builder governs.",
+  example: sliderCrankPistonPositionExample.inputs,
+  fields: [
+    { key: "stroke_in", label: "Stroke (in)", kind: "number" },
+    { key: "rod_length_in", label: "Connecting-rod length center-to-center (in)", kind: "number" },
+    { key: "crank_angle_deg", label: "Crank angle after TDC (deg)", kind: "number" },
+  ],
+  outputs: [
+    { key: "x", id: "scp-out-x", label: "Piston position below TDC", value: (r) => fmt(r.position_from_tdc_in, 4) + " in (" + fmt(r.percent_of_stroke, 1) + "% of stroke)" },
+    { key: "d", id: "scp-out-d", label: "Rod-angularity shift", value: (r) => (r.rod_angularity_shift_in >= 0 ? "+" : "") + fmt(r.rod_angularity_shift_in, 4) + " in vs the simple sinusoid (" + fmt(r.simple_position_in, 4) + " in)" },
+    { key: "r", id: "scp-out-r", label: "Rod / stroke ratio", value: (r) => fmt(r.rod_stroke_ratio, 2) },
+    { key: "n", id: "scp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSliderCrankPistonPosition,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================

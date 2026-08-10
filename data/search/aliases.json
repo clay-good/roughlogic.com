@@ -3149,6 +3149,46 @@
    "kind": "question"
   },
   {
+   "term": "piston position crank angle",
+   "target": "slider-crank-piston-position",
+   "kind": "industry"
+  },
+  {
+   "term": "slider crank piston position",
+   "target": "slider-crank-piston-position",
+   "kind": "industry"
+  },
+  {
+   "term": "piston position from tdc",
+   "target": "slider-crank-piston-position",
+   "kind": "industry"
+  },
+  {
+   "term": "degree a cam piston position",
+   "target": "slider-crank-piston-position",
+   "kind": "adjacent"
+  },
+  {
+   "term": "rod angularity piston",
+   "target": "slider-crank-piston-position",
+   "kind": "adjacent"
+  },
+  {
+   "term": "piston to valve clearance angle",
+   "target": "slider-crank-piston-position",
+   "kind": "adjacent"
+  },
+  {
+   "term": "where is the piston at 90 degrees",
+   "target": "slider-crank-piston-position",
+   "kind": "question"
+  },
+  {
+   "term": "piston travel per crank degree",
+   "target": "slider-crank-piston-position",
+   "kind": "question"
+  },
+  {
    "term": "hp torque rpm",
    "target": "hp-from-torque",
    "kind": "redirect"

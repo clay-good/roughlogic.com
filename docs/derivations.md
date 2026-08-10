@@ -2657,6 +2657,7 @@ cross-check.
 | calc-mechanic.js | `computeSailboatPerformanceRatios` | `{ sail_area_sqft = 500, displacement_lb = 10000, lwl_ft = 30 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeScrewConveyor` | `{ screw_diameter_in = 0, shaft_diameter_in = 0, pitch_in = 0, rpm = 0, loadin...` | _ | _ | _ |
 | calc-mechanic.js | `computeScrewConveyorRpm` | `{ target_ft3_hr = 0, screw_diameter_in = 0, shaft_diameter_in = 0, pitch_in =...` | _ | _ | _ |
+| calc-mechanic.js | `computeSliderCrankPistonPosition` | `{ stroke_in = 0, rod_length_in = 0, crank_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeSpringNaturalFrequency` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, material...` | _ | _ | _ |
 | calc-mechanic.js | `computeSpringWireStress` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, force_lb = 0, total_coils ...` | _ | _ | _ |
 | calc-mechanic.js | `computeTireContactPatch` | `{ corner_load_lb = 0, inflation_pressure_psi = 0 } = {}` | _ | _ | _ |
@@ -3337,7 +3338,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1923.
+Row count: 1924.
 
 <!-- END function-corpus-v14 -->
 
@@ -4632,7 +4633,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (123 tiles)
+### Group K Mechanic (124 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4727,6 +4728,7 @@ per spec-v14 §13.1 second paragraph.
 | `sailboat-performance-ratios` | Sailboat Performance Ratios (SA/D and DLR) | Sailboat performance ratios (SA/D and...; SA/D = 500 / (10000/64)^(2/3) = 500/29.0 = 17.24; DLR = (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `screw-conveyor` | Screw / Auger Conveyor Capacity | CEMA Screw Conveyor standard (Book No...; 9 in screw, 2.5 in shaft, 9 in pitch, 40 RPM, 0.30 loadin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `screw-conveyor-rpm` | Screw Conveyor Speed for a Target Capacity | CEMA Screw Conveyor standard (Book No...; 220.157 ft^3/hr, 9 in screw, 2.5 in shaft, 9 in pitch, 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `slider-crank-piston-position` | Slider-Crank Piston Position | Project (first-principles); slider-crank displacement | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spindle-max-mrr` | Max Material Removal Rate from Spindle Power | first-principles specific-cutting-ene...; 5 hp motor, 80% eff, unit power 1.0 (carbon steel) -> 4.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spindle-power-torque` | Cutting Power and Spindle Torque | first-principles specific-cutting-ene...; 3.0 in3/min steel, 80% eff, 800 rpm -> 3.0 cutting hp, 3.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spring-natural-frequency` | Helical Spring Natural (Surge) Frequency | Project (first-principles); fn = (1/2) sqrt(k g / W) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5182,6 +5184,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1672. Fixture-covered or reference-cadence: 1672 / 1672.
+Tile count: 1673. Fixture-covered or reference-cadence: 1673 / 1673.
 
 <!-- END tile-index-v14 -->

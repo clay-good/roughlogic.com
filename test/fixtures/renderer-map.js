@@ -1234,6 +1234,7 @@ export const RENDERER_MAP = {
   "centrifugal-force": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "torsion-spring-rate": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "universal-joint-speed": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
+  "slider-crank-piston-position": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "hp-from-torque": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "volumetric-efficiency": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "gear-mph-rpm": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },

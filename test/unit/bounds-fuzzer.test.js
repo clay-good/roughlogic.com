@@ -37956,3 +37956,27 @@ test("bounds: spec-v1299 computeUniversalJointSpeed pins the Cardan output range
   assert.ok("error" in _v1299({ joint_angle_deg: 10, input_speed_rpm: 0 }));
   assert.ok("error" in _v1299({ joint_angle_deg: Infinity, input_speed_rpm: 1000 }));
 });
+
+import { computeSliderCrankPistonPosition as _v1300 } from "../../calc-mechanic.js";
+test("bounds: spec-v1300 computeSliderCrankPistonPosition pins the TDC/BDC endpoints, the 90-deg past-mid-stroke, the rod-angularity shift, and error seams", () => {
+  // 3.48 stroke, 5.7 rod, 90 deg: x 2.012 in (57.8% of stroke), shift +0.272 vs simple 1.740.
+  const r = _v1300({ stroke_in: 3.48, rod_length_in: 5.7, crank_angle_deg: 90 });
+  assert.ok(Math.abs(r.position_from_tdc_in - 2.0121) < 1e-3 && Math.abs(r.percent_of_stroke - 57.8) < 0.1);
+  assert.ok(Math.abs(r.rod_angularity_shift_in - 0.2721) < 1e-3 && Math.abs(r.simple_position_in - 1.74) < 1e-3);
+  assert.ok(Math.abs(r.rod_stroke_ratio - 1.6379) < 1e-3);
+  // TDC (0) is exactly 0 and BDC (180) is exactly the stroke, with no rod-angularity shift at either.
+  const tdc = _v1300({ stroke_in: 3.48, rod_length_in: 5.7, crank_angle_deg: 0 });
+  const bdc = _v1300({ stroke_in: 3.48, rod_length_in: 5.7, crank_angle_deg: 180 });
+  assert.ok(Math.abs(tdc.position_from_tdc_in) < 1e-9 && Math.abs(bdc.position_from_tdc_in - 3.48) < 1e-9);
+  assert.ok(Math.abs(tdc.rod_angularity_shift_in) < 1e-9 && Math.abs(bdc.rod_angularity_shift_in) < 1e-9);
+  // A shorter rod (smaller rod/stroke) gives a bigger rod-angularity shift at 90 deg.
+  const shortRod = _v1300({ stroke_in: 3.48, rod_length_in: 4.5, crank_angle_deg: 90 });
+  assert.ok(shortRod.rod_angularity_shift_in > r.rod_angularity_shift_in);
+  // The piston is past mid-stroke at 90 deg (percent > 50).
+  assert.ok(r.percent_of_stroke > 50);
+  // Error seams: non-positive stroke, rod not longer than crank radius, angle out of range, non-finite.
+  assert.ok("error" in _v1300({ stroke_in: 0, rod_length_in: 5.7, crank_angle_deg: 90 }));
+  assert.ok("error" in _v1300({ stroke_in: 3.48, rod_length_in: 1.0, crank_angle_deg: 90 }));
+  assert.ok("error" in _v1300({ stroke_in: 3.48, rod_length_in: 5.7, crank_angle_deg: 400 }));
+  assert.ok("error" in _v1300({ stroke_in: 3.48, rod_length_in: Infinity, crank_angle_deg: 90 }));
+});

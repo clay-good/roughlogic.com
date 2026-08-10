@@ -11794,6 +11794,18 @@ export const CITATIONS = {
       { name: "Scope", value: "single-joint kinematics; torque pulsation, double-Cardan cancellation, CV joints are separate", source: "scope of this tile" },
     ],
   },
+  "slider-crank-piston-position": {
+    formula: "r = stroke/2; x = r + L - (r cos(theta) + sqrt(L^2 - r^2 sin^2(theta))); simple = r(1 - cos theta); rod/stroke = L/stroke.",
+    edition: "The exact slider-crank piston displacement x = r + L - (r cos(theta) + sqrt(L^2 - r^2 sin^2(theta))) (Machinery's Handbook; standard mechanism kinematics), by name.",
+    freeAccess: "The slider-crank displacement is a standard published kinematics result; the stroke, rod length, and crank angle are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Exact piston position of a centered slider-crank at a crank angle theta after top dead center: x = r + L - (r cos(theta) + sqrt(L^2 - r^2 sin^2(theta))), with the crank radius r = stroke/2 and the connecting-rod length L. At TDC (theta 0) x = 0; at BDC (theta 180) x = stroke. Because the rod swings, the piston moves faster leaving TDC and is already PAST mid-stroke at 90 degrees - the pure-sinusoid position r(1 - cos theta) misses this, and the shorter the rod (smaller rod/stroke ratio) the bigger the shift. Use it to degree a cam, set port timing, or check piston-to-valve and deck clearance against crank angle. Centered (non-offset) slider-crank; piston velocity and acceleration, a wrist-pin offset, rod stretch, and the gas/inertia loads are separate. A design aid; Machinery's Handbook and the engine builder govern.",
+    assumptions: [
+      { name: "Displacement", value: "x = r + L - (r cos + sqrt(L^2 - r^2 sin^2)), centered slider-crank", source: "Machinery's Handbook" },
+      { name: "Rod angularity", value: "piston is past mid-stroke at 90 deg; effect grows as rod/stroke shrinks", source: "kinematics" },
+      { name: "Scope", value: "position only; velocity/acceleration, pin offset, rod stretch, loads are separate", source: "scope of this tile" },
+    ],
+  },
   "gear-identification": {
     formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
     edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",
