@@ -16599,6 +16599,18 @@ export const CITATIONS = {
       { name: "Strength reduction", value: "phi = 0.65 for bearing", source: "ACI 318-19 21.2" },
     ],
   },
+  "concrete-cracked-inertia-doubly": {
+    formula: "Neutral axis c: b c^2/2 + (n-1) As'(c - d') = n As(d - c). Icr = b c^3/3 + (n-1) As'(c - d')^2 + n As(d - c)^2. n = Es/Ec, Ec = 57000 sqrt(f'c), Es = 29,000,000 psi. As' = 0 reduces to the singly-reinforced Icr.",
+    edition: "ACI 318-19 §19.2.2.1 modulus Ec = 57000 sqrt(f'c) with the standard elastic cracked-transformed-section analysis of a doubly-reinforced rectangular beam (Wight & MacGregor, Reinforced Concrete; PCA Notes on ACI 318), by name; verified against the singly-reinforced limit (As' = 0) of concrete-effective-inertia.",
+    freeAccess: "The cracked-transformed-section equations are standard mechanics of reinforced concrete; ACI 318 (the Ec definition) is readable free through the ACI online reading room at concrete.org. Width, depth, steel areas, and f'c are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cracked transformed moment of inertia Icr and neutral-axis depth kd for a DOUBLY-reinforced rectangular concrete section, the case the effective-inertia tile (singly-reinforced) names as separate. Once the section cracks the tension concrete is ignored and it becomes a transformed area of the compression concrete (b above the neutral axis), the tension steel (n As at d), and the compression steel ((n-1) As' at d', the n-1 crediting the concrete it displaces). The neutral axis c solves b c^2/2 + (n-1) As'(c - d') = n As(d - c), and Icr = b c^3/3 + (n-1) As'(c - d')^2 + n As(d - c)^2, with n = Es/Ec and Ec = 57000 sqrt(f'c). Adding compression steel raises the neutral axis and stiffens the cracked section, so Icr grows and long-term deflection drops. With As' = 0 this returns exactly the singly-reinforced Icr the concrete-effective-inertia tile uses. Rectangular section, elastic cracked analysis. A design aid; the engineer of record's stamped design governs.",
+    assumptions: [
+      { name: "Neutral axis", value: "b c^2/2 + (n-1) As'(c - d') = n As(d - c)", source: "elastic cracked transformed section" },
+      { name: "Cracked inertia", value: "Icr = b c^3/3 + (n-1) As'(c - d')^2 + n As(d - c)^2; n = Es/Ec, Ec = 57000 sqrt(f'c)", source: "ACI 318-19 §19.2.2.1 + mechanics" },
+      { name: "Limit / scope", value: "As' = 0 reduces to the singly-reinforced Icr; rectangular section only (a T-beam is separate)", source: "scope of this tile" },
+    ],
+  },
   "concrete-immediate-deflection": {
     formula: "delta = K w L^4 / (Ec Ie); Ec = 57000 sqrt(f'c). K = 5/384 simply supported UDL, 1/384 fixed-fixed UDL, 1/8 cantilever UDL, ~1/185 propped cantilever UDL. L/delta is checked against ACI Table 24.2.2 (L/180, L/240, L/360, L/480).",
     edition: "ACI 318-19 §24.2.3 immediate deflection by elastic analysis with the effective (Bischoff) moment of inertia Ie (§24.2.3.5), and Ec = 57000 sqrt(f'c) (§19.2.2.1), by name; the elastic beam coefficients K are standard mechanics-of-materials results.",

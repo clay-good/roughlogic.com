@@ -1411,6 +1411,61 @@ CONCRETE_RENDERERS["concrete-immediate-deflection"] = _simpleRenderer({
   compute: computeConcreteImmediateDeflection,
 });
 
+// ===================== spec-v1281: doubly-reinforced cracked moment of inertia Icr (ACI 318-19) =====================
+// concrete-effective-inertia computes the cracked inertia Icr for a SINGLY-reinforced section and its own note
+// says "a T-beam or doubly-reinforced section uses the appropriate transformed Icr." This adds the doubly-
+// reinforced rectangular case: compression steel As' at depth d' raises the cracked neutral axis and stiffens
+// the section. Cracked transformed section (concrete in compression only, tension concrete ignored):
+//   locate the neutral axis c from  b c^2/2 + (n-1) As' (c - d') = n As (d - c)
+//   Icr = b c^3/3 + (n-1) As' (c - d')^2 + n As (d - c)^2,  n = Es/Ec, Ec = 57000 sqrt(f'c).
+// With As' = 0 it reduces EXACTLY to the singly-reinforced Icr the effective-inertia tile returns.
+// dims: in { b_in: L, d_in: L, as_in2: L^2, fc_psi: M L^-1 T^-2, asp_in2: L^2, dp_in: L } out: { n: dimensionless, ec_psi: M L^-1 T^-2, kd_in: L, icr_in4: L^4 }
+export function computeConcreteCrackedInertiaDoubly({ b_in = 0, d_in = 0, as_in2 = 0, fc_psi = 4000, asp_in2 = 0, dp_in = 2.5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const b = Number(b_in), d = Number(d_in), As = Number(as_in2), fc = Number(fc_psi), Asp = Number(asp_in2), dp = Number(dp_in);
+  if (!(b > 0)) return { error: "Section width b must be positive (in)." };
+  if (!(d > 0)) return { error: "Effective depth d must be positive (in)." };
+  if (!(As > 0)) return { error: "Tension steel area As must be positive (in^2)." };
+  if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (Asp < 0) return { error: "Compression steel area As' cannot be negative (in^2)." };
+  if (Asp > 0 && !(dp > 0)) return { error: "Compression steel depth d' must be positive when As' > 0 (in)." };
+  if (Asp > 0 && !(dp < d)) return { error: "Compression steel depth d' must be less than the effective depth d (in)." };
+  const Es = 29000000;
+  const Ec = 57000 * Math.sqrt(fc);          // ACI 318-19 Eq 19.2.2.1.a, normalweight
+  const n = Es / Ec;
+  // b c^2/2 + (n-1) As' (c - d') - n As (d - c) = 0  ->  (b/2) c^2 + B c - C = 0
+  const B = (n - 1) * Asp + n * As;
+  const C = (n - 1) * Asp * dp + n * As * d;
+  const kd = (-B + Math.sqrt(B * B + 2 * b * C)) / b;
+  const icr = b * Math.pow(kd, 3) / 3 + (n - 1) * Asp * Math.pow(kd - dp, 2) + n * As * Math.pow(d - kd, 2);
+  if (![n, Ec, kd, icr].every(Number.isFinite) || !(kd > 0) || !(kd < d)) return { error: "Cracked-section math is not a finite value; check the inputs." };
+  return {
+    n, ec_psi: Ec, kd_in: kd, icr_in4: icr, rho: As / (b * d), rho_prime: Asp / (b * d),
+    note: "The cracked transformed moment of inertia Icr and neutral-axis depth kd for a DOUBLY-reinforced rectangular concrete section - the case the effective-inertia tile (singly-reinforced) names as separate. Below the cracking moment the section is uncracked; once it cracks the tension concrete is ignored and the section is a transformed area of the compression concrete (b above the neutral axis), the tension steel (n As at d), and the compression steel ((n-1) As' at d', the n-1 crediting the concrete it displaces). The neutral axis c solves b c^2/2 + (n-1) As' (c - d') = n As (d - c), and Icr = b c^3/3 + (n-1) As' (c - d')^2 + n As (d - c)^2, with n = Es/Ec and Ec = 57000 sqrt(f'c). Adding compression steel raises the neutral axis and stiffens the cracked section, so Icr grows and long-term deflection drops. With As' = 0 this returns exactly the singly-reinforced Icr the concrete-effective-inertia tile uses; feed this Icr into that tile (or a deflection check) for a doubly-reinforced beam. Rectangular section, elastic cracked analysis (no creep in Icr itself). A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const concreteCrackedInertiaDoublyExample = { inputs: { b_in: 12, d_in: 17.5, as_in2: 3.0, fc_psi: 4000, asp_in2: 1.0, dp_in: 2.5 } };
+
+CONCRETE_RENDERERS["concrete-cracked-inertia-doubly"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 cracked transformed section for a doubly-reinforced rectangular beam: neutral axis from b c^2/2 + (n-1) As'(c - d') = n As(d - c), Icr = b c^3/3 + (n-1) As'(c - d')^2 + n As(d - c)^2, with n = Es/Ec and Ec = 57000 sqrt(f'c) (§19.2.2.1). Standard elastic cracked-section mechanics (Wight & MacGregor; PCA Notes on ACI 318); As' = 0 reduces to the singly-reinforced Icr. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: concreteCrackedInertiaDoublyExample.inputs,
+  fields: [
+    { key: "b_in", label: "Section width b (in)", kind: "number", default: 12 },
+    { key: "d_in", label: "Effective depth d to tension steel (in)", kind: "number", default: 17.5 },
+    { key: "as_in2", label: "Tension steel area As (in^2)", kind: "number", default: 3.0 },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "asp_in2", label: "Compression steel area As' (in^2, 0 if none)", kind: "number", default: 1.0 },
+    { key: "dp_in", label: "Compression steel depth d' (in)", kind: "number", default: 2.5 },
+  ],
+  outputs: [
+    { key: "icr", id: "cid2-out-icr", label: "Cracked inertia Icr", value: (r) => fmt(r.icr_in4, 0) + " in^4" },
+    { key: "kd", id: "cid2-out-kd", label: "Neutral-axis depth kd", value: (r) => fmt(r.kd_in, 2) + " in" },
+    { key: "n", id: "cid2-out-n", label: "Modular ratio n", value: (r) => fmt(r.n, 2) + " (Ec " + fmt(r.ec_psi / 1000, 0) + " ksi)" },
+    { key: "note", id: "cid2-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteCrackedInertiaDoubly,
+});
+
 // ===================== spec-v548: cast-in anchor tension concrete breakout (ACI 318-19 Ch. 17) =====================
 
 // dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless } out: { nb_lb: M L T^-2, ncb_lb: M L T^-2, phi_ncb_lb: M L T^-2 }

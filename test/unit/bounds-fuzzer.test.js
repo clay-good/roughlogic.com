@@ -11163,6 +11163,36 @@ test("bounds: spec-v1280 computeOrificePressureLoss pins the ISO 5167 loss ratio
   assert.ok("error" in _v1280({ pipe_id_in: 4, bore_in: 2, dp_psi: 1, cd: 0 }));
   assert.ok("error" in _v1280({ pipe_id_in: Infinity, bore_in: 2, dp_psi: 1, cd: 0.61 }));
 });
+import { computeConcreteCrackedInertiaDoubly as _v1281 } from "../../calc-concrete.js";
+import { computeConcreteEffectiveInertia as _v1281ei } from "../../calc-concrete.js";
+test("bounds: spec-v1281 computeConcreteCrackedInertiaDoubly pins Icr, the neutral axis, the As'=0 singly-reinforced limit, compression-steel stiffening, and error seams", () => {
+  // 12x20, d 17.5, As 3.0, f'c 4000, As' 1.0 at d' 2.5.
+  const r = _v1281({ b_in: 12, d_in: 17.5, as_in2: 3.0, fc_psi: 4000, asp_in2: 1.0, dp_in: 2.5 });
+  assert.ok(Math.abs(r.icr_in4 - 4128.9) < 1 && Math.abs(r.kd_in - 6.35) < 0.01);
+  // Neutral axis satisfies the first-moment balance b c^2/2 + (n-1)As'(c-d') = n As(d-c).
+  const n = r.n, c = r.kd_in;
+  assert.ok(Math.abs(12 * c * c / 2 + (n - 1) * 1.0 * (c - 2.5) - n * 3.0 * (17.5 - c)) < 1e-6);
+  // With As' = 0 it reduces EXACTLY to the singly-reinforced Icr the effective-inertia tile computes.
+  const singly = _v1281({ b_in: 12, d_in: 17.5, as_in2: 3.0, fc_psi: 4000, asp_in2: 0, dp_in: 2.5 });
+  const ei = _v1281ei({ b_in: 12, h_in: 20, d_in: 17.5, as_in2: 3.0, fc_psi: 4000, ma_kipft: 60, lambda: 1.0 });
+  assert.ok(Math.abs(singly.icr_in4 - ei.icr_in4) < 1e-6);
+  // Adding compression steel raises the neutral axis (smaller kd) and stiffens the section (larger Icr).
+  assert.ok(r.icr_in4 > singly.icr_in4 && r.kd_in < singly.kd_in);
+  // More compression steel -> monotonically larger Icr.
+  let prev = -Infinity;
+  for (const asp of [0, 0.5, 1.0, 2.0, 3.0]) {
+    const icr = _v1281({ b_in: 12, d_in: 17.5, as_in2: 3.0, fc_psi: 4000, asp_in2: asp, dp_in: 2.5 }).icr_in4;
+    assert.ok(icr > prev); prev = icr;
+  }
+  // Error seams: non-positive b/d/As/f'c, negative As', d' >= d with As' > 0, non-finite.
+  assert.ok("error" in _v1281({ b_in: 0, d_in: 17.5, as_in2: 3.0, fc_psi: 4000 }));
+  assert.ok("error" in _v1281({ b_in: 12, d_in: 0, as_in2: 3.0, fc_psi: 4000 }));
+  assert.ok("error" in _v1281({ b_in: 12, d_in: 17.5, as_in2: 0, fc_psi: 4000 }));
+  assert.ok("error" in _v1281({ b_in: 12, d_in: 17.5, as_in2: 3.0, fc_psi: 0 }));
+  assert.ok("error" in _v1281({ b_in: 12, d_in: 17.5, as_in2: 3.0, fc_psi: 4000, asp_in2: -1 }));
+  assert.ok("error" in _v1281({ b_in: 12, d_in: 17.5, as_in2: 3.0, fc_psi: 4000, asp_in2: 1.0, dp_in: 20 }));
+  assert.ok("error" in _v1281({ b_in: Infinity, d_in: 17.5, as_in2: 3.0, fc_psi: 4000 }));
+});
 test("bounds: spec-v53 linear-interpolation pins y + slope + extrapolation flag + reject non-finite", () => {
   // (0,10),(10,30), x=4 -> y=18, slope 2, within range
   const a = _cli({ x1: 0, y1: 10, x2: 10, y2: 30, x: 4 });

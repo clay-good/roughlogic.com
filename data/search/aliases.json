@@ -29136,6 +29136,31 @@
       "kind": "question"
     },
     {
+      "term": "doubly reinforced cracked moment of inertia",
+      "target": "concrete-cracked-inertia-doubly",
+      "kind": "industry"
+    },
+    {
+      "term": "cracked section Icr compression steel",
+      "target": "concrete-cracked-inertia-doubly",
+      "kind": "industry"
+    },
+    {
+      "term": "transformed cracked section neutral axis",
+      "target": "concrete-cracked-inertia-doubly",
+      "kind": "adjacent"
+    },
+    {
+      "term": "Icr with top bars",
+      "target": "concrete-cracked-inertia-doubly",
+      "kind": "adjacent"
+    },
+    {
+      "term": "does compression steel reduce concrete deflection",
+      "target": "concrete-cracked-inertia-doubly",
+      "kind": "question"
+    },
+    {
       "term": "anchor breakout",
       "target": "concrete-anchor-breakout",
       "kind": "industry"

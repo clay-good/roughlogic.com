@@ -1122,6 +1122,7 @@ export const COMPUTE_MAP = {
   "rc-compression-dev-length": { module: "../../calc-concrete.js", fn: "computeRcCompressionDevLength" },
   "concrete-longterm-defl": { module: "../../calc-concrete.js", fn: "computeConcreteLongtermDefl" },
   "concrete-immediate-deflection": { module: "../../calc-concrete.js", fn: "computeConcreteImmediateDeflection" },
+  "concrete-cracked-inertia-doubly": { module: "../../calc-concrete.js", fn: "computeConcreteCrackedInertiaDoubly" },
   "concrete-anchor-breakout": { module: "../../calc-concrete.js", fn: "computeConcreteAnchorBreakout" },
   "concrete-anchor-pullout": { module: "../../calc-concrete.js", fn: "computeConcreteAnchorPullout" },
   "concrete-anchor-shear-breakout": { module: "../../calc-concrete.js", fn: "computeConcreteAnchorShearBreakout" },
