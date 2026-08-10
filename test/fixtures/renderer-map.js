@@ -1224,6 +1224,7 @@ export const RENDERER_MAP = {
   "spring-wire-stress": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "gear-tooth-bending-stress": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "gear-dynamic-tooth-stress": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
+  "gear-contact-stress": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "hp-from-torque": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "volumetric-efficiency": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "gear-mph-rpm": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },

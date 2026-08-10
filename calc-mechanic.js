@@ -1039,6 +1039,66 @@ MECHANIC_RENDERERS["gear-tooth-bending-stress"] = _simpleRenderer({
   compute: computeGearToothBendingStress,
 });
 
+// --- spec-v1282 K: gear tooth contact stress / surface durability (`gear-contact-stress`) ---
+// The pitting failure mode gear-tooth-bending-stress and gear-dynamic-tooth-stress
+// leave out. Both compute BENDING (root breakage); the Barth tile's own note ends
+// "pitting often governs before bending does." Surface durability is the Hertzian
+// contact stress at the pitch point (Buckingham; Shigley): sigma_c = Cp sqrt(Wt/(F dp I)),
+// with elastic coefficient Cp (~2300 sqrt(psi) steel/steel), pinion pitch diameter
+// dp = Np/Pd, face width F, and the AGMA geometry factor for pitting resistance of an
+// external spur mesh, I = (cos phi sin phi / 2) mG/(mG+1), mG = Ng/Np the gear ratio.
+// Static value only: the AGMA 2001 Ko/Kv/Ks/Km/Cf factors are all 1. Contact stress runs
+// far above the Lewis bending stress on the same tooth, so pitting frequently governs.
+// dims: in { transmitted_load_lb: M L T^-2, diametral_pitch_1_in: L^-1, pinion_teeth: dimensionless, gear_teeth: dimensionless, face_width_in: L, pressure_angle_deg: dimensionless, elastic_coefficient_cp: dimensionless } out: { contact_stress_psi: M L^-1 T^-2, geometry_factor_I: dimensionless, pinion_pitch_diameter_in: L, gear_ratio_mG: dimensionless }
+export function computeGearContactStress({ transmitted_load_lb = 0, diametral_pitch_1_in = 0, pinion_teeth = 0, gear_teeth = 0, face_width_in = 0, pressure_angle_deg = 20, elastic_coefficient_cp = 2300 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Wt = Number(transmitted_load_lb) || 0;
+  const Pd = Number(diametral_pitch_1_in) || 0;
+  const Np = Number(pinion_teeth) || 0;
+  const Ng = Number(gear_teeth) || 0;
+  const F = Number(face_width_in) || 0;
+  const phi = Number(pressure_angle_deg) || 0;
+  const Cp = Number(elastic_coefficient_cp) || 0;
+  if (!(Wt > 0)) return { error: "Transmitted (tangential) load must be positive (lb)." };
+  if (!(Pd > 0)) return { error: "Diametral pitch must be positive (teeth per inch)." };
+  if (!(Np >= 6)) return { error: "Pinion teeth must be at least 6." };
+  if (!(Ng >= Np)) return { error: "Gear teeth must be at least the pinion teeth (mG >= 1)." };
+  if (!(F > 0)) return { error: "Face width must be positive (in)." };
+  if (!(phi > 0 && phi < 45)) return { error: "Pressure angle must be between 0 and 45 deg." };
+  if (!(Cp > 0)) return { error: "Elastic coefficient Cp must be positive (sqrt-psi)." };
+  const dp = Np / Pd;
+  const mG = Ng / Np;
+  const phi_rad = (phi * Math.PI) / 180;
+  const geometry_factor_I = (Math.cos(phi_rad) * Math.sin(phi_rad) / 2) * (mG / (mG + 1));
+  const contact_stress_psi = Cp * Math.sqrt(Wt / (F * dp * geometry_factor_I));
+  return {
+    contact_stress_psi, geometry_factor_I, pinion_pitch_diameter_in: dp, gear_ratio_mG: mG,
+    note: "Hertzian gear contact stress (surface durability / pitting): sigma_c = Cp sqrt(Wt / (F dp I)), with elastic coefficient Cp (about 2300 sqrt-psi for steel on steel), pinion pitch diameter dp = Np/Pd, face width F, and the AGMA geometry factor I = (cos phi sin phi / 2) mG/(mG+1) for an external spur mesh, mG = Ng/Np. This is the STATIC contact stress: the AGMA 2001 application (Ko), dynamic (Kv), size (Ks), load-distribution (Km), and surface-condition (Cf) factors are all 1. Contact stress runs far above the Lewis bending stress on the same tooth, so surface pitting often governs the durability limit before root breakage does. Compare against the allowable contact stress for the material, hardness, life, and reliability; AGMA 2001 and the gear maker govern.",
+  };
+}
+export const gearContactStressExample = { inputs: { transmitted_load_lb: 500, diametral_pitch_1_in: 8, pinion_teeth: 20, gear_teeth: 60, face_width_in: 1.5, pressure_angle_deg: 20, elastic_coefficient_cp: 2300 } };
+
+MECHANIC_RENDERERS["gear-contact-stress"] = _simpleRenderer({
+  citation: "Citation: Hertzian gear contact stress for surface durability (J. O. Buckingham; Shigley, Mechanical Engineering Design; AGMA surface-durability geometry): sigma_c = Cp sqrt(Wt / (F dp I)), with elastic coefficient Cp = sqrt(1/(pi ((1-v1^2)/E1 + (1-v2^2)/E2))) (about 2300 sqrt-psi steel on steel), pinion pitch diameter dp = Np/Pd, and geometry factor I = (cos phi sin phi / 2) mG/(mG+1) for an external spur mesh, mG = Ng/Np. Static value only - the AGMA 2001 Ko/Kv/Ks/Km/Cf factors are 1, and the allowable contact stress is the material's. The gear maker and AGMA govern.",
+  example: gearContactStressExample.inputs,
+  fields: [
+    { key: "transmitted_load_lb", label: "Transmitted (tangential) load Wt (lb)", kind: "number" },
+    { key: "diametral_pitch_1_in", label: "Diametral pitch Pd (teeth per in)", kind: "number" },
+    { key: "pinion_teeth", label: "Pinion teeth Np", kind: "number" },
+    { key: "gear_teeth", label: "Gear teeth Ng", kind: "number" },
+    { key: "face_width_in", label: "Face width F (in)", kind: "number" },
+    { key: "pressure_angle_deg", label: "Pressure angle phi (deg)", kind: "number", attrs: { step: "any", value: "20" } },
+    { key: "elastic_coefficient_cp", label: "Elastic coefficient Cp (sqrt-psi)", kind: "number", attrs: { step: "any", value: "2300" } },
+  ],
+  outputs: [
+    { key: "s", id: "gcs-out-s", label: "Contact stress", value: (r) => fmt(r.contact_stress_psi, 0) + " psi" },
+    { key: "i", id: "gcs-out-i", label: "Geometry factor I", value: (r) => "I = " + fmt(r.geometry_factor_I, 4) + " (external spur, pitting resistance)" },
+    { key: "dp", id: "gcs-out-dp", label: "Pinion pitch diameter dp", value: (r) => fmt(r.pinion_pitch_diameter_in, 3) + " in (gear ratio mG = " + fmt(r.gear_ratio_mG, 3) + ")" },
+    { key: "n", id: "gcs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGearContactStress,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================

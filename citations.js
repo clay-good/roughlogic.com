@@ -11589,6 +11589,18 @@ export const CITATIONS = {
       { name: "Tooth system", value: "20 deg full depth, 14.5 deg full depth, or 20 deg stub", source: "standard involute proportions" },
     ],
   },
+  "gear-contact-stress": {
+    formula: "sigma_c = Cp sqrt(Wt / (F dp I)); dp = Np/Pd; I = (cos phi sin phi / 2) mG/(mG+1), mG = Ng/Np (external spur); Cp about 2300 sqrt-psi steel on steel.",
+    edition: "Hertzian gear contact stress for surface durability (J. O. Buckingham; Shigley, Mechanical Engineering Design) with the AGMA surface-durability geometry factor I, by name.",
+    freeAccess: "The Hertzian contact-stress form and the external-spur geometry factor are standard published gear-durability theory (public domain / Shigley / Machinery's Handbook).",
+    governance: GOVERNANCE.general,
+    editionNote: "Surface durability is the pitting failure mode that the Lewis and Barth bending tiles leave out; the Barth tile's own note ends 'pitting often governs before bending does.' The Hertzian contact stress at the pitch point is sigma_c = Cp sqrt(Wt / (F dp I)), with elastic coefficient Cp = sqrt(1/(pi ((1-v1^2)/E1 + (1-v2^2)/E2))) (about 2300 sqrt-psi for steel on steel), pinion pitch diameter dp = Np/Pd, face width F, and the AGMA geometry factor I = (cos phi sin phi / 2) mG/(mG+1) for an external spur mesh, mG = Ng/Np. This is the STATIC contact stress: the AGMA 2001 application (Ko), dynamic (Kv), size (Ks), load-distribution (Km), and surface-condition (Cf) factors are all 1. Contact stress runs far above the Lewis bending stress on the same tooth, so surface pitting frequently governs before root breakage. Compare against the allowable contact stress for the material, hardness, life, and reliability; AGMA 2001 and the gear maker govern.",
+    assumptions: [
+      { name: "Elastic coefficient", value: "Cp about 2300 sqrt-psi for steel on steel; input for other pairs", source: "Buckingham / Shigley" },
+      { name: "Geometry factor", value: "I = (cos phi sin phi / 2) mG/(mG+1) for an external spur mesh", source: "AGMA surface durability" },
+      { name: "Static stress only", value: "no AGMA Ko/Kv/Ks/Km/Cf factors; allowable is the material's", source: "scope of this tile" },
+    ],
+  },
   "gear-identification": {
     formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
     edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",

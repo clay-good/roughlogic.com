@@ -37511,3 +37511,28 @@ test("bounds: spec-v1274 computeGasDpFlowMeter pins the ISO 5167 expansibility f
   assert.ok("error" in _v1274({ pipe_id_in: 4, bore_in: 2, p1_psia: 100, dp_psi: 1, temp_f: 60, gas_sg: 0, kappa: 1.4, cd: 0.61 }));
   assert.ok("error" in _v1274({ pipe_id_in: 4, bore_in: 2, p1_psia: Infinity, dp_psi: 1, temp_f: 60, gas_sg: 1.0, kappa: 1.4, cd: 0.61 }));
 });
+
+import { computeGearContactStress as _v1282 } from "../../calc-mechanic.js";
+test("bounds: spec-v1282 computeGearContactStress pins the Hertzian contact stress, the external-spur geometry factor, sqrt(load) scaling, and error seams", () => {
+  // 500 lb, 8-pitch, 20-tooth pinion on a 60-tooth gear, 1.5 in face, 20 deg, Cp 2300: sigma_c 76,500 psi, I 0.1205, dp 2.5, mG 3.
+  const r = _v1282({ transmitted_load_lb: 500, diametral_pitch_1_in: 8, pinion_teeth: 20, gear_teeth: 60, face_width_in: 1.5, pressure_angle_deg: 20, elastic_coefficient_cp: 2300 });
+  assert.ok(Math.abs(r.contact_stress_psi - 76500) < 1.0);
+  assert.ok(Math.abs(r.geometry_factor_I - 0.120523) < 1e-5);
+  assert.ok(Math.abs(r.pinion_pitch_diameter_in - 2.5) < 1e-9);
+  assert.ok(Math.abs(r.gear_ratio_mG - 3) < 1e-9);
+  // Contact stress scales with sqrt(load): doubling Wt multiplies the stress by sqrt(2).
+  const dbl = _v1282({ transmitted_load_lb: 1000, diametral_pitch_1_in: 8, pinion_teeth: 20, gear_teeth: 60, face_width_in: 1.5, pressure_angle_deg: 20, elastic_coefficient_cp: 2300 });
+  assert.ok(Math.abs(dbl.contact_stress_psi / r.contact_stress_psi - Math.SQRT2) < 1e-6);
+  // A 1:1 mesh (mG = 1) has the smallest geometry factor and so a higher stress than a speed-reducing ratio.
+  const one = _v1282({ transmitted_load_lb: 500, diametral_pitch_1_in: 8, pinion_teeth: 20, gear_teeth: 20, face_width_in: 1.5, pressure_angle_deg: 20, elastic_coefficient_cp: 2300 });
+  assert.ok(Math.abs(one.geometry_factor_I - 0.080348) < 1e-5 && one.contact_stress_psi > r.contact_stress_psi);
+  // Contact stress runs far above the Lewis bending stress on the same tooth (pitting governs).
+  assert.ok(r.contact_stress_psi > 5 * _v1015({ transmitted_load_lb: 500, diametral_pitch_1_in: 8, face_width_in: 1.5, number_of_teeth: 20, tooth_system: "20-full-depth" }).bending_stress_psi);
+  // Error seams: non-positive load, gear teeth below pinion, too-few pinion teeth, pressure angle out of range, non-positive Cp, non-finite.
+  assert.ok("error" in _v1282({ transmitted_load_lb: 0, diametral_pitch_1_in: 8, pinion_teeth: 20, gear_teeth: 60, face_width_in: 1.5, pressure_angle_deg: 20, elastic_coefficient_cp: 2300 }));
+  assert.ok("error" in _v1282({ transmitted_load_lb: 500, diametral_pitch_1_in: 8, pinion_teeth: 20, gear_teeth: 10, face_width_in: 1.5, pressure_angle_deg: 20, elastic_coefficient_cp: 2300 }));
+  assert.ok("error" in _v1282({ transmitted_load_lb: 500, diametral_pitch_1_in: 8, pinion_teeth: 4, gear_teeth: 60, face_width_in: 1.5, pressure_angle_deg: 20, elastic_coefficient_cp: 2300 }));
+  assert.ok("error" in _v1282({ transmitted_load_lb: 500, diametral_pitch_1_in: 8, pinion_teeth: 20, gear_teeth: 60, face_width_in: 1.5, pressure_angle_deg: 60, elastic_coefficient_cp: 2300 }));
+  assert.ok("error" in _v1282({ transmitted_load_lb: 500, diametral_pitch_1_in: 8, pinion_teeth: 20, gear_teeth: 60, face_width_in: 1.5, pressure_angle_deg: 20, elastic_coefficient_cp: 0 }));
+  assert.ok("error" in _v1282({ transmitted_load_lb: Infinity, diametral_pitch_1_in: 8, pinion_teeth: 20, gear_teeth: 60, face_width_in: 1.5, pressure_angle_deg: 20, elastic_coefficient_cp: 2300 }));
+});

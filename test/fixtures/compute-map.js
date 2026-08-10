@@ -174,6 +174,7 @@ export const COMPUTE_MAP = {
   "helical-spring-rate": { module: "../../calc-mechanic.js", fn: "computeHelicalSpringRate" },
   "spring-wire-stress": { module: "../../calc-mechanic.js", fn: "computeSpringWireStress" },
   "gear-tooth-bending-stress": { module: "../../calc-mechanic.js", fn: "computeGearToothBendingStress" },
+  "gear-contact-stress": { module: "../../calc-mechanic.js", fn: "computeGearContactStress" },
   "gear-dynamic-tooth-stress": { module: "../../calc-mechanic.js", fn: "computeGearDynamicToothStress" },
   "trap-seal-loss": { module: "../../calc-plumbing.js", fn: "computeTrapSealLoss" },
   "water-meter-sizing": { module: "../../calc-plumbing.js", fn: "computeWaterMeterSizing" },
