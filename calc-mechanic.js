@@ -1200,6 +1200,60 @@ MECHANIC_RENDERERS["aerodynamic-drag-force"] = _simpleRenderer({
   compute: computeAerodynamicDragForce,
 });
 
+// --- spec-v1292 K: vehicle road-load force and power (`vehicle-road-load-power`) ---
+// aerodynamic-drag-force computes only the aero term and names "rolling resistance, driveline
+// loss, grade... are separate parts of the road load." This is the full road load: aero + rolling
+// + grade, and the tractive power to hold a steady speed. The aero term DELEGATES to
+// computeAerodynamicDragForce so the two never drift.
+// dims: in { speed_mph: L T^-1, vehicle_weight_lb: M L T^-2, frontal_area_ft2: L^2, drag_coefficient: dimensionless, rolling_coefficient: dimensionless, grade_pct: dimensionless, air_density_lb_ft3: M L^-3 } out: { total_force_lbf: M L T^-2, road_load_power_hp: M L^2 T^-3, road_load_power_kw: M L^2 T^-3, aero_force_lbf: M L T^-2, rolling_force_lbf: M L T^-2, grade_force_lbf: M L T^-2 }
+export function computeVehicleRoadLoadPower({ speed_mph = 0, vehicle_weight_lb = 0, frontal_area_ft2 = 0, drag_coefficient = 0, rolling_coefficient = 0.012, grade_pct = 0, air_density_lb_ft3 = 0.0765 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Vmph = Number(speed_mph) || 0;
+  const W = Number(vehicle_weight_lb) || 0;
+  const Crr = Number(rolling_coefficient) || 0;
+  const grade = Number(grade_pct) || 0;
+  if (!(Vmph > 0)) return { error: "Speed must be positive (mph)." };
+  if (!(W > 0)) return { error: "Vehicle weight must be positive (lb)." };
+  if (Crr < 0) return { error: "Rolling-resistance coefficient cannot be negative." };
+  // Delegate the aero term to the aerodynamic-drag-force tile so the two cannot drift.
+  const aero = computeAerodynamicDragForce({ speed_mph: Vmph, frontal_area_ft2, drag_coefficient, air_density_lb_ft3 });
+  if (aero.error) return { error: aero.error };
+  const V = Vmph * 1.46667; // ft/s
+  const aero_force_lbf = aero.drag_force_lbf;
+  const rolling_force_lbf = Crr * W;
+  const grade_force_lbf = W * Math.sin(Math.atan(grade / 100));
+  const total_force_lbf = aero_force_lbf + rolling_force_lbf + grade_force_lbf;
+  const road_load_power_hp = (total_force_lbf * V) / 550;
+  const road_load_power_kw = road_load_power_hp * 0.745699872;
+  if (![total_force_lbf, road_load_power_hp, road_load_power_kw].every(Number.isFinite)) return { error: "Road-load math is not a finite value; check the inputs." };
+  return {
+    total_force_lbf, road_load_power_hp, road_load_power_kw, aero_force_lbf, rolling_force_lbf, grade_force_lbf, speed_fps: V,
+    note: "Steady-speed vehicle road load: the tractive force is aero drag F_aero = 1/2 rho V^2 Cd A (delegated to the aerodynamic-drag-force tile) plus rolling resistance F_roll = Crr W plus the grade load F_grade = W sin(atan(grade%/100)), and the power to hold the speed is P = F_total V. Rolling resistance is nearly constant with speed (Crr ~ 0.010-0.015 on pavement); aero grows with the square of speed and its power with the cube; grade adds a fixed pull of the weight times the slope. The three-way breakdown shows which dominates - at highway speed on the level the wind leads, but even a modest grade quickly takes over. This is the power AT THE WHEELS; divide by the driveline efficiency for engine/motor power, and add the mass x acceleration term for launch. Headwind and air-density change with altitude/temperature are separate. A planning estimate; the manufacturer's coastdown road-load data governs.",
+  };
+}
+export const vehicleRoadLoadPowerExample = { inputs: { speed_mph: 70, vehicle_weight_lb: 3500, frontal_area_ft2: 24, drag_coefficient: 0.30, rolling_coefficient: 0.012, grade_pct: 0, air_density_lb_ft3: 0.0765 } };
+
+MECHANIC_RENDERERS["vehicle-road-load-power"] = _simpleRenderer({
+  citation: "Citation: vehicle road-load force and power (SAE J2263 / J1263 road-load): F_total = 1/2 rho V^2 Cd A + Crr W + W sin(atan(grade%/100)), P = F_total V. The aero term is the aerodynamic-drag-force tile. Power at the wheels; divide by driveline efficiency for engine power. A planning estimate; the manufacturer's coastdown data governs.",
+  example: vehicleRoadLoadPowerExample.inputs,
+  fields: [
+    { key: "speed_mph", label: "Speed V (mph)", kind: "number" },
+    { key: "vehicle_weight_lb", label: "Vehicle weight W (lb)", kind: "number" },
+    { key: "frontal_area_ft2", label: "Frontal area A (ft^2)", kind: "number" },
+    { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" },
+    { key: "rolling_coefficient", label: "Rolling-resistance coefficient Crr", kind: "number", attrs: { step: "any", value: "0.012" } },
+    { key: "grade_pct", label: "Grade (%)", kind: "number", attrs: { step: "any", value: "0" } },
+    { key: "air_density_lb_ft3", label: "Air density (lb/ft^3)", kind: "number", attrs: { step: "any", value: "0.0765" } },
+  ],
+  outputs: [
+    { key: "p", id: "vrl-out-p", label: "Road-load power (at the wheels)", value: (r) => fmt(r.road_load_power_hp, 2) + " hp (" + fmt(r.road_load_power_kw, 2) + " kW)" },
+    { key: "f", id: "vrl-out-f", label: "Total tractive force", value: (r) => fmt(r.total_force_lbf, 1) + " lbf" },
+    { key: "b", id: "vrl-out-b", label: "Force breakdown", value: (r) => "aero " + fmt(r.aero_force_lbf, 1) + " + rolling " + fmt(r.rolling_force_lbf, 1) + " + grade " + fmt(r.grade_force_lbf, 1) + " lbf" },
+    { key: "n", id: "vrl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeVehicleRoadLoadPower,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================

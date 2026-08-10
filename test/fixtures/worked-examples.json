@@ -87085,6 +87085,70 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "vehicle-road-load-power",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Car at 70 mph on the level",
+   "source_edition_or_year": "SAE J2263 road-load",
+   "source_section_or_page": "F_total = aero + rolling + grade",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "speed_mph": 70,
+    "vehicle_weight_lb": 3500,
+    "frontal_area_ft2": 24,
+    "drag_coefficient": 0.3,
+    "rolling_coefficient": 0.012,
+    "grade_pct": 0,
+    "air_density_lb_ft3": 0.0765
+   },
+   "outputs": {
+    "total_force_lbf": {
+     "value": 132.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "road_load_power_hp": {
+     "value": 24.68,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vehicle-road-load-power",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same car on a 5% grade (grade dominates)",
+   "source_edition_or_year": "SAE J2263 road-load",
+   "source_section_or_page": "F_total = aero + rolling + grade",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "speed_mph": 70,
+    "vehicle_weight_lb": 3500,
+    "frontal_area_ft2": 24,
+    "drag_coefficient": 0.3,
+    "rolling_coefficient": 0.012,
+    "grade_pct": 5,
+    "air_density_lb_ft3": 0.0765
+   },
+   "outputs": {
+    "total_force_lbf": {
+     "value": 307.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "road_load_power_hp": {
+     "value": 57.31,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
   }
  ]
 }

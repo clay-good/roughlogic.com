@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1664,
-  "covered_count": 1210,
+  "total_tiles": 1665,
+  "covered_count": 1211,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -1139,6 +1139,7 @@
     "vav-box-airflow",
     "vbelt-drive",
     "vehicle-load",
+    "vehicle-road-load-power",
     "vent-terminal-check",
     "vessel-head-volume",
     "vfd-energy-savings",

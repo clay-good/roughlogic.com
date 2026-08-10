@@ -2664,6 +2664,7 @@ cross-check.
 | calc-mechanic.js | `computeTurnRadiusBank` | `{ airspeed_kt = 0, bank_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeUjointOperatingAngle` | `{ input_angle_deg = 10, output_angle_deg = 10 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeValveFlowCoefficient` | `{ solve_for = "flow", fluid = "liquid", specific_gravity = 1, cv = 0, flow_gp...` | _ | _ | _ |
+| calc-mechanic.js | `computeVehicleRoadLoadPower` | `{ speed_mph = 0, vehicle_weight_lb = 0, frontal_area_ft2 = 0, drag_coefficien...` | _ | _ | _ |
 | calc-mechanic.js | `computeVolumetricEfficiency` | `{ displacement_ci = 0, rpm = 0, cycle = "four", actual_cfm = 0, ve_pct = 0 } ...` | _ | _ | _ |
 | calc-mechanic.js | `computeWaterlineForHullSpeed` | `{ target_hull_speed_kn = 0, coefficient = 1.34 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeWheelOffsetBackspacing` | `{ rim_width_in = 0, offset_mm = 0, backspacing_in = 0 } = {}` | _ | _ | _ |
@@ -3329,7 +3330,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1915.
+Row count: 1916.
 
 <!-- END function-corpus-v14 -->
 
@@ -4624,7 +4625,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (115 tiles)
+### Group K Mechanic (116 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4739,6 +4740,7 @@ per spec-v14 §13.1 second paragraph.
 | `turning-surface-finish` | Theoretical Surface Finish | First-principles scallop geometry + M...; f 0.005 IPR, r 1/32 in -> Rt 100 uin, Ra 25 uin | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ujoint-operating-angle` | Driveline U-Joint Operating Angle and Cancellation | Cardan (Hooke) U-joint kinematics + c...; variation = 1/cos(10) - cos(10) = 1.01543 - 0.98481 = 0.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `valve-flow-coefficient` | Valve Flow Coefficient (Cv) | ISA-75.01 / Crane TP-410 (control-val...; Cv 10, dP 25 psi, SG 1 -> Q = 10 * sqrt(25) = 50 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `vehicle-road-load-power` | Vehicle Road-Load Force and Power | Project (first-principles); F_total = aero + rolling + grade | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `waterline-for-hull-speed` | Waterline Length for a Target Hull Speed | displacement hull-speed relation (Fro...; 8 kn target displacement hull -> 35.6 ft waterline | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5166,6 +5168,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1664. Fixture-covered or reference-cadence: 1664 / 1664.
+Tile count: 1665. Fixture-covered or reference-cadence: 1665 / 1665.
 
 <!-- END tile-index-v14 -->

@@ -11698,6 +11698,18 @@ export const CITATIONS = {
       { name: "Scope", value: "aero drag only; rolling resistance, driveline, grade, headwind are separate", source: "scope of this tile" },
     ],
   },
+  "vehicle-road-load-power": {
+    formula: "F_total = 1/2 rho V^2 Cd A + Crr W + W sin(atan(grade%/100)); P = F_total V; hp = F_total V / 550. Aero term from aerodynamic-drag-force.",
+    edition: "The vehicle road-load equation (aerodynamic drag + rolling resistance + grade) and the tractive power (SAE J2263 / J1263 coastdown road-load), by name; the aero term is delegated to aerodynamic-drag-force.",
+    freeAccess: "The road-load equation is a standard published vehicle-dynamics result; the drag coefficient, frontal area, rolling coefficient, weight, and grade are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Steady-speed vehicle road load: the tractive force is aero drag F_aero = 1/2 rho V^2 Cd A (delegated to the aerodynamic-drag-force tile) plus rolling resistance F_roll = Crr W plus the grade load F_grade = W sin(atan(grade%/100)), and the power to hold the speed is P = F_total V. Rolling resistance is nearly constant with speed (Crr ~ 0.010-0.015 on pavement); aero grows with the square of speed and its power with the cube; grade adds a fixed pull of the weight times the slope. The three-way breakdown shows which dominates - at highway speed on the level the wind leads, but even a modest grade quickly takes over. This is the power AT THE WHEELS; divide by the driveline efficiency for engine/motor power, and add the mass x acceleration term for launch. Headwind and air-density change with altitude/temperature are separate. A planning estimate; the manufacturer's coastdown road-load data governs.",
+    assumptions: [
+      { name: "Road load", value: "F_total = aero + Crr W + W sin(atan(grade%/100)); P = F_total V", source: "SAE J2263 / J1263" },
+      { name: "Aero delegation", value: "aero term computed by aerodynamic-drag-force (no drift)", source: "cross-tile chain" },
+      { name: "Scope", value: "steady speed at the wheels; acceleration, driveline efficiency, headwind are separate", source: "scope of this tile" },
+    ],
+  },
   "gear-identification": {
     formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
     edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",

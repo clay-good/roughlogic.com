@@ -2904,6 +2904,51 @@
    "kind": "question"
   },
   {
+   "term": "vehicle road load",
+   "target": "vehicle-road-load-power",
+   "kind": "industry"
+  },
+  {
+   "term": "road load power",
+   "target": "vehicle-road-load-power",
+   "kind": "industry"
+  },
+  {
+   "term": "tractive power",
+   "target": "vehicle-road-load-power",
+   "kind": "industry"
+  },
+  {
+   "term": "rolling resistance power",
+   "target": "vehicle-road-load-power",
+   "kind": "industry"
+  },
+  {
+   "term": "horsepower to hold speed",
+   "target": "vehicle-road-load-power",
+   "kind": "adjacent"
+  },
+  {
+   "term": "aero plus rolling plus grade",
+   "target": "vehicle-road-load-power",
+   "kind": "adjacent"
+  },
+  {
+   "term": "power to climb a grade",
+   "target": "vehicle-road-load-power",
+   "kind": "adjacent"
+  },
+  {
+   "term": "how much power to cruise at 70",
+   "target": "vehicle-road-load-power",
+   "kind": "question"
+  },
+  {
+   "term": "how much horsepower does my car need",
+   "target": "vehicle-road-load-power",
+   "kind": "question"
+  },
+  {
    "term": "hp torque rpm",
    "target": "hp-from-torque",
    "kind": "redirect"

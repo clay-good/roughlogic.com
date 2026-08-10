@@ -37771,3 +37771,28 @@ test("bounds: spec-v1291 computeAerodynamicDragForce pins the drag force, the dr
   assert.ok("error" in _v1291({ speed_mph: 70, frontal_area_ft2: 24, drag_coefficient: 0.30, air_density_lb_ft3: 0 }));
   assert.ok("error" in _v1291({ speed_mph: Infinity, frontal_area_ft2: 24, drag_coefficient: 0.30, air_density_lb_ft3: 0.0765 }));
 });
+
+import { computeVehicleRoadLoadPower as _v1292 } from "../../calc-mechanic.js";
+import { computeAerodynamicDragForce as _v1292sib } from "../../calc-mechanic.js";
+test("bounds: spec-v1292 computeVehicleRoadLoadPower pins the aero+rolling+grade breakdown, the aero cross-pin, the grade term, and error seams", () => {
+  // 3500 lb car at 70 mph, 24 ft^2, Cd 0.30, Crr 0.012, level: F_total 132.2 lbf, P 24.68 hp.
+  const r = _v1292({ speed_mph: 70, vehicle_weight_lb: 3500, frontal_area_ft2: 24, drag_coefficient: 0.30, rolling_coefficient: 0.012, grade_pct: 0, air_density_lb_ft3: 0.0765 });
+  assert.ok(Math.abs(r.total_force_lbf - 132.2) < 0.5 && Math.abs(r.road_load_power_hp - 24.68) < 0.1);
+  assert.ok(Math.abs(r.rolling_force_lbf - 42.0) < 1e-6 && Math.abs(r.grade_force_lbf) < 1e-9);
+  // The aero term matches aerodynamic-drag-force EXACTLY (delegated, no drift).
+  const aero = _v1292sib({ speed_mph: 70, frontal_area_ft2: 24, drag_coefficient: 0.30, air_density_lb_ft3: 0.0765 });
+  assert.ok(Math.abs(r.aero_force_lbf - aero.drag_force_lbf) < 1e-9);
+  // A 5% grade adds W sin(atan(0.05)) ~ 174.8 lbf and drives the total to 307 lbf / 57 hp.
+  const grade = _v1292({ speed_mph: 70, vehicle_weight_lb: 3500, frontal_area_ft2: 24, drag_coefficient: 0.30, rolling_coefficient: 0.012, grade_pct: 5, air_density_lb_ft3: 0.0765 });
+  assert.ok(Math.abs(grade.grade_force_lbf - 174.8) < 0.5 && Math.abs(grade.total_force_lbf - 307.0) < 0.5);
+  assert.ok(Math.abs(grade.road_load_power_hp - 57.31) < 0.2);
+  // Rolling resistance is constant with speed; at low speed it dominates the (tiny) aero term.
+  const slow = _v1292({ speed_mph: 15, vehicle_weight_lb: 3500, frontal_area_ft2: 24, drag_coefficient: 0.30, rolling_coefficient: 0.012, grade_pct: 0, air_density_lb_ft3: 0.0765 });
+  assert.ok(slow.rolling_force_lbf > slow.aero_force_lbf);
+  // Error seams: non-positive speed/weight/area/Cd, negative Crr, non-finite.
+  assert.ok("error" in _v1292({ speed_mph: 0, vehicle_weight_lb: 3500, frontal_area_ft2: 24, drag_coefficient: 0.30, rolling_coefficient: 0.012, grade_pct: 0, air_density_lb_ft3: 0.0765 }));
+  assert.ok("error" in _v1292({ speed_mph: 70, vehicle_weight_lb: 0, frontal_area_ft2: 24, drag_coefficient: 0.30, rolling_coefficient: 0.012, grade_pct: 0, air_density_lb_ft3: 0.0765 }));
+  assert.ok("error" in _v1292({ speed_mph: 70, vehicle_weight_lb: 3500, frontal_area_ft2: 24, drag_coefficient: 0, rolling_coefficient: 0.012, grade_pct: 0, air_density_lb_ft3: 0.0765 }));
+  assert.ok("error" in _v1292({ speed_mph: 70, vehicle_weight_lb: 3500, frontal_area_ft2: 24, drag_coefficient: 0.30, rolling_coefficient: -0.01, grade_pct: 0, air_density_lb_ft3: 0.0765 }));
+  assert.ok("error" in _v1292({ speed_mph: Infinity, vehicle_weight_lb: 3500, frontal_area_ft2: 24, drag_coefficient: 0.30, rolling_coefficient: 0.012, grade_pct: 0, air_density_lb_ft3: 0.0765 }));
+});
