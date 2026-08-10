@@ -1151,6 +1151,7 @@ export const COMPUTE_MAP = {
   "bearing-l10-life": { module: "../../calc-machining.js", fn: "computeBearingL10Life" },
   "bearing-max-load": { module: "../../calc-machining.js", fn: "computeBearingMaxLoad" },
   "bearing-equivalent-load": { module: "../../calc-machining.js", fn: "computeBearingEquivalentLoad" },
+  "fatigue-safety-factor": { module: "../../calc-machining.js", fn: "computeFatigueSafetyFactor" },
   "anchor-rode-scope": { module: "../../calc-mechanic.js", fn: "computeAnchorRodeScope" },
   "turbo-pressure-ratio": { module: "../../calc-mechanic.js", fn: "computeTurboPressureRatio" },
   "turbo-max-boost-for-charge-temp": { module: "../../calc-mechanic.js", fn: "computeTurboMaxBoostForChargeTemp" },

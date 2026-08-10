@@ -10986,6 +10986,18 @@ export const CITATIONS = {
       { name: "Scope", value: "deep-groove ball, rotating inner ring V = 1; other bearing types use maker factors", source: "scope of this tile" },
     ],
   },
+  "fatigue-safety-factor": {
+    formula: "Goodman 1/n = sa/Se + sm/Sut; Soderberg 1/n = sa/Se + sm/Sy; Gerber n sa/Se + (n sm/Sut)^2 = 1; Langer ny = Sy/(sa + sm); governing = min(n, ny).",
+    edition: "The modified-Goodman, Soderberg, and Gerber fluctuating-stress fatigue criteria with the Langer first-cycle-yield line (Shigley, Mechanical Engineering Design; Juvinall, Engineering Considerations of Stress, Strain, and Strength), by name.",
+    freeAccess: "The three fatigue criteria and the Langer line are standard published machine-design results; the corrected endurance limit Se, the strengths, and the stresses are the designer's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The infinite-life fatigue safety factor for a uniaxial fluctuating stress with alternating amplitude sigma_a and mean sigma_m. Modified Goodman 1/n = sa/Se + sm/Sut is the standard design line; Soderberg 1/n = sa/Se + sm/Sy is the most conservative (it never yields); Gerber n sa/Se + (n sm/Sut)^2 = 1 is the least conservative and the best fit to test data. Se is the CORRECTED endurance limit (Se' ~= 0.5 Sut for steel with Sut < 200 ksi, times the Marin surface/size/load/temperature/reliability factors) and is taken as an input so the tile needs no material tables. The Langer line ny = Sy/(sa + sm) catches first-cycle yielding, which can govern at high mean stress; the reported governing factor is the smaller of the two. With sigma_m = 0 (fully reversed) every criterion gives n = Se/sigma_a. Uniaxial stress, infinite life; building Se from the Marin factors, notch sensitivity (Kf), finite-life S-N counting, and multiaxial combination are separate. A design aid; Shigley / Juvinall and the engineer of record govern.",
+    assumptions: [
+      { name: "Criteria", value: "Goodman/Soderberg/Gerber fatigue lines + Langer first-cycle yield", source: "Shigley / Juvinall" },
+      { name: "Endurance limit", value: "Se is the corrected (Marin-factored) endurance limit, taken as an input", source: "scope of this tile" },
+      { name: "Scope", value: "uniaxial, infinite life; notch Kf, finite-life S-N, and multiaxial combination are separate", source: "scope of this tile" },
+    ],
+  },
   "bolt-proof-load": {
     formula: "At = 0.7854 x (D - 0.9743/n)^2; proof_load = At x proof_strength; yield_load = At x yield_strength; tensile_load = At x tensile_strength; rec_clamp = 0.75 x proof_load.",
     edition: "The SAE J429 inch-series bolt strength model (tensile stress area x grade strength), with the ASME B1.1 tensile stress area, by name; the joint design, torque method, and preload requirement govern.",

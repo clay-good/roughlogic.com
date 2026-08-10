@@ -1300,6 +1300,7 @@ export const RENDERER_MAP = {
   "bearing-l10-life": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "bearing-max-load": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "bearing-equivalent-load": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
+  "fatigue-safety-factor": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "countersink-depth": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "countersink-diameter-from-depth": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "keyseat-key-size": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },

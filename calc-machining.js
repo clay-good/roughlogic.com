@@ -917,6 +917,83 @@ function renderBearingEquivalentLoad(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["bearing-equivalent-load"] = renderBearingEquivalentLoad;
 
+// ===================== spec-v1286: fluctuating-stress fatigue safety factor (Goodman/Soderberg/Gerber) =====================
+// The machine-design bench has the static checks (shaft-torsion, combined-stress-axial-bending, spring/gear
+// stresses) but nothing for fatigue under a fluctuating load, which is how rotating shafts, springs, and fasteners
+// actually fail. Standard alternating/mean-stress safety factor on the three failure lines, plus the Langer
+// first-cycle-yield check. The corrected endurance limit Se is an INPUT so no Marin-factor tables are needed.
+//   Goodman:   1/n = sa/Se + sm/Sut
+//   Soderberg: 1/n = sa/Se + sm/Sy
+//   Gerber:    n sa/Se + (n sm/Sut)^2 = 1  (solved for n)
+//   Langer:    ny = Sy/(sa + sm);  governing = min(n, ny)
+// dims: in { alternating_stress_psi: M L^-1 T^-2, mean_stress_psi: M L^-1 T^-2, endurance_limit_psi: M L^-1 T^-2, ultimate_strength_psi: M L^-1 T^-2, yield_strength_psi: M L^-1 T^-2, criterion: dimensionless } out: { fatigue_n: dimensionless, langer_ny: dimensionless, governing_n: dimensionless }
+export function computeFatigueSafetyFactor({ alternating_stress_psi = 0, mean_stress_psi = 0, endurance_limit_psi = 0, ultimate_strength_psi = 0, yield_strength_psi = 0, criterion = "goodman" } = {}) {
+  const _g = _finiteGuard({ alternating_stress_psi, mean_stress_psi, endurance_limit_psi, ultimate_strength_psi, yield_strength_psi }); if (_g) return _g;
+  const sa = Number(alternating_stress_psi) || 0;
+  const sm = Number(mean_stress_psi) || 0;
+  const Se = Number(endurance_limit_psi) || 0;
+  const Sut = Number(ultimate_strength_psi) || 0;
+  const Sy = Number(yield_strength_psi) || 0;
+  const crit = String(criterion);
+  if (sa < 0) return { error: "Alternating stress cannot be negative (psi)." };
+  if (sm < 0) return { error: "Mean stress cannot be negative (psi); this tile treats the tensile-mean case." };
+  if (!(sa + sm > 0)) return { error: "The total stress (alternating + mean) must be positive (psi)." };
+  if (!(Se > 0)) return { error: "Corrected endurance limit Se must be positive (psi)." };
+  if (!(Sut > 0)) return { error: "Ultimate strength Sut must be positive (psi)." };
+  if (!(Sy > 0)) return { error: "Yield strength Sy must be positive (psi)." };
+  if (crit !== "goodman" && crit !== "soderberg" && crit !== "gerber") return { error: "Criterion must be goodman, soderberg, or gerber." };
+  let fatigue_n;
+  if (crit === "goodman") {
+    fatigue_n = 1 / (sa / Se + sm / Sut);
+  } else if (crit === "soderberg") {
+    fatigue_n = 1 / (sa / Se + sm / Sy);
+  } else { // gerber: (sm^2/Sut^2) n^2 + (sa/Se) n - 1 = 0
+    const a = (sm * sm) / (Sut * Sut);
+    const b = sa / Se;
+    fatigue_n = a === 0 ? Se / sa : (-b + Math.sqrt(b * b + 4 * a)) / (2 * a);
+  }
+  const langer_ny = Sy / (sa + sm);
+  const governing_n = Math.min(fatigue_n, langer_ny);
+  if (![fatigue_n, langer_ny, governing_n].every(Number.isFinite) || !(fatigue_n > 0)) return { error: "Fatigue math is not a finite value; check the inputs." };
+  const governs = governing_n === langer_ny && langer_ny < fatigue_n ? "first-cycle yield (Langer)" : "fatigue";
+  return {
+    fatigue_n, langer_ny, governing_n, governs,
+    note: "Infinite-life fatigue safety factor for a uniaxial fluctuating stress, with the alternating amplitude sigma_a and the mean (midrange) sigma_m. Modified Goodman 1/n = sa/Se + sm/Sut is the standard design line; Soderberg 1/n = sa/Se + sm/Sy is the most conservative (it never yields); Gerber n sa/Se + (n sm/Sut)^2 = 1 is the least conservative and the best fit to test data. Se is the CORRECTED endurance limit (Se' ~= 0.5 Sut for steel with Sut < 200 ksi, times the Marin surface/size/load/temperature/reliability factors) and is an input here so the tile needs no material tables. The Langer line ny = Sy/(sa + sm) catches first-cycle yielding, which can govern at high mean stress; the reported governing factor is the smaller of the two. With sigma_m = 0 (fully reversed) every criterion gives n = Se/sigma_a. Uniaxial stress, infinite life; building Se from the Marin factors, notch sensitivity (Kf), finite-life S-N counting, and multiaxial combination are separate. A design aid; Shigley / Juvinall and the engineer of record govern.",
+  };
+}
+export const fatigueSafetyFactorExample = { inputs: { alternating_stress_psi: 25000, mean_stress_psi: 30000, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "goodman" } };
+function renderFatigueSafetyFactor(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: fluctuating-stress fatigue criteria (Shigley, Mechanical Engineering Design; Juvinall): modified Goodman 1/n = sa/Se + sm/Sut, Soderberg 1/n = sa/Se + sm/Sy, Gerber n sa/Se + (n sm/Sut)^2 = 1, with the Langer first-cycle-yield line ny = Sy/(sa + sm). Se is the corrected endurance limit (an input). Infinite-life, uniaxial; the engineer of record governs.";
+  const sa = makeNumber("Alternating stress sigma_a (psi)", "fat-sa", { step: "any", min: "0" }); sa.input.value = "25000";
+  const sm = makeNumber("Mean stress sigma_m (psi)", "fat-sm", { step: "any", min: "0" }); sm.input.value = "30000";
+  const se = makeNumber("Corrected endurance limit Se (psi)", "fat-se", { step: "any", min: "0" }); se.input.value = "40000";
+  const sut = makeNumber("Ultimate strength Sut (psi)", "fat-sut", { step: "any", min: "0" }); sut.input.value = "100000";
+  const sy = makeNumber("Yield strength Sy (psi)", "fat-sy", { step: "any", min: "0" }); sy.input.value = "80000";
+  const crit = makeSelect("Criterion", "fat-crit", [
+    { value: "goodman", label: "Modified Goodman (standard)", selected: true },
+    { value: "soderberg", label: "Soderberg (conservative)" },
+    { value: "gerber", label: "Gerber (best data fit)" },
+  ]);
+  for (const f of [sa, sm, se, sut, sy, crit]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sa.input.value = "25000"; sm.input.value = "30000"; se.input.value = "40000"; sut.input.value = "100000"; sy.input.value = "80000"; crit.select.value = "goodman"; update(); });
+  const oN = makeOutputLine(outputRegion, "Fatigue safety factor n", "fat-out-n");
+  const oNy = makeOutputLine(outputRegion, "First-cycle yield factor n_y", "fat-out-ny");
+  const oGov = makeOutputLine(outputRegion, "Governing", "fat-out-gov");
+  const oNote = makeOutputLine(outputRegion, "Note", "fat-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeFatigueSafetyFactor({ alternating_stress_psi: readNum(sa.input), mean_stress_psi: readNum(sm.input), endurance_limit_psi: readNum(se.input), ultimate_strength_psi: readNum(sut.input), yield_strength_psi: readNum(sy.input), criterion: crit.select.value });
+    if (r.error) { oN.textContent = r.error; oNy.textContent = "-"; oGov.textContent = "-"; oNote.textContent = ""; return; }
+    oN.textContent = fmt(r.fatigue_n, 2);
+    oNy.textContent = fmt(r.langer_ny, 2);
+    oGov.textContent = "n = " + fmt(r.governing_n, 2) + " (" + r.governs + (r.governing_n < 1 ? "; UNSAFE, n < 1" : "") + ")";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [sa, sm, se, sut, sy]) f.input.addEventListener("input", update);
+  crit.select.addEventListener("change", update);
+}
+MACHINING_RENDERERS["fatigue-safety-factor"] = renderFatigueSafetyFactor;
+
 // ===================== spec-v509: countersink diameter and cutting depth =====================
 // dims: in { countersink_dia_in: L, included_angle_deg: dimensionless, pilot_hole_dia_in: L } out: { z_in: L, z_full_in: L }
 export function computeCountersinkDepth({ countersink_dia_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}) {

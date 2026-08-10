@@ -86723,6 +86723,62 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "fatigue-safety-factor",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Modified Goodman fatigue factor",
+   "source_edition_or_year": "Shigley / Juvinall",
+   "source_section_or_page": "Goodman/Soderberg/Gerber + Langer",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "alternating_stress_psi": 25000,
+    "mean_stress_psi": 30000,
+    "endurance_limit_psi": 40000,
+    "ultimate_strength_psi": 100000,
+    "yield_strength_psi": 80000,
+    "criterion": "goodman"
+   },
+   "outputs": {
+    "fatigue_n": {
+     "value": 1.081,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "langer_ny": {
+     "value": 1.455,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fatigue-safety-factor",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Gerber (best data fit) on the same stresses",
+   "source_edition_or_year": "Shigley / Juvinall",
+   "source_section_or_page": "Goodman/Soderberg/Gerber + Langer",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "alternating_stress_psi": 25000,
+    "mean_stress_psi": 30000,
+    "endurance_limit_psi": 40000,
+    "ultimate_strength_psi": 100000,
+    "yield_strength_psi": 80000,
+    "criterion": "gerber"
+   },
+   "outputs": {
+    "fatigue_n": {
+     "value": 1.341,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

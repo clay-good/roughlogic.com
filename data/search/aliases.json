@@ -98304,6 +98304,56 @@
    "kind": "question"
   },
   {
+   "term": "fatigue safety factor",
+   "target": "fatigue-safety-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "goodman fatigue criterion",
+   "target": "fatigue-safety-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "soderberg fatigue",
+   "target": "fatigue-safety-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "gerber fatigue line",
+   "target": "fatigue-safety-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "modified goodman diagram",
+   "target": "fatigue-safety-factor",
+   "kind": "adjacent"
+  },
+  {
+   "term": "mean and alternating stress",
+   "target": "fatigue-safety-factor",
+   "kind": "adjacent"
+  },
+  {
+   "term": "endurance limit safety factor",
+   "target": "fatigue-safety-factor",
+   "kind": "adjacent"
+  },
+  {
+   "term": "fluctuating stress fatigue",
+   "target": "fatigue-safety-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "will my shaft fail in fatigue",
+   "target": "fatigue-safety-factor",
+   "kind": "question"
+  },
+  {
+   "term": "what is the goodman safety factor",
+   "target": "fatigue-safety-factor",
+   "kind": "question"
+  },
+  {
    "term": "countersink size from plunge depth",
    "target": "countersink-diameter-from-depth",
    "kind": "question"

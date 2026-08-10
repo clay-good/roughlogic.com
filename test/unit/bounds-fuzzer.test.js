@@ -37616,3 +37616,28 @@ test("bounds: spec-v1285 computeBearingEquivalentLoad pins P = X Fr + Y Fa, the 
   assert.ok("error" in _v1285({ radial_load_lbf: 1000, thrust_load_lbf: 500, static_rating_lbf: 0 }));
   assert.ok("error" in _v1285({ radial_load_lbf: Infinity, thrust_load_lbf: 500, static_rating_lbf: 5000 }));
 });
+
+import { computeFatigueSafetyFactor as _v1286 } from "../../calc-machining.js";
+test("bounds: spec-v1286 computeFatigueSafetyFactor pins Goodman/Soderberg/Gerber, the Langer yield line, the fully-reversed limit, criterion ordering, and error seams", () => {
+  // sa 25, sm 30 ksi, Se 40, Sut 100, Sy 80 ksi: Goodman n 1.08, Langer ny 1.45 (fatigue governs).
+  const g = _v1286({ alternating_stress_psi: 25000, mean_stress_psi: 30000, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "goodman" });
+  assert.ok(Math.abs(g.fatigue_n - 1.081) < 1e-3 && Math.abs(g.langer_ny - 1.455) < 1e-3);
+  assert.ok(Math.abs(g.governing_n - 1.081) < 1e-3 && g.governs === "fatigue");
+  const s = _v1286({ alternating_stress_psi: 25000, mean_stress_psi: 30000, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "soderberg" });
+  const ge = _v1286({ alternating_stress_psi: 25000, mean_stress_psi: 30000, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "gerber" });
+  assert.ok(Math.abs(s.fatigue_n - 1.0) < 1e-3 && Math.abs(ge.fatigue_n - 1.341) < 1e-3);
+  // Ordering: Soderberg <= Goodman <= Gerber (conservative to least conservative) at the same stresses.
+  assert.ok(s.fatigue_n <= g.fatigue_n + 1e-9 && g.fatigue_n <= ge.fatigue_n + 1e-9);
+  // Fully reversed (sm = 0): every criterion gives n = Se/sa = 40/20 = 2.0.
+  const rev = _v1286({ alternating_stress_psi: 20000, mean_stress_psi: 0, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "gerber" });
+  assert.ok(Math.abs(rev.fatigue_n - 2.0) < 1e-6);
+  // High mean stress makes first-cycle yield (Langer) govern.
+  const hi = _v1286({ alternating_stress_psi: 5000, mean_stress_psi: 75000, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "goodman" });
+  assert.ok(hi.governing_n === hi.langer_ny && hi.governs.indexOf("Langer") >= 0);
+  // Error seams: negative stress, zero total stress, non-positive strengths, unknown criterion, non-finite.
+  assert.ok("error" in _v1286({ alternating_stress_psi: -1, mean_stress_psi: 30000, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "goodman" }));
+  assert.ok("error" in _v1286({ alternating_stress_psi: 0, mean_stress_psi: 0, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "goodman" }));
+  assert.ok("error" in _v1286({ alternating_stress_psi: 25000, mean_stress_psi: 30000, endurance_limit_psi: 0, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "goodman" }));
+  assert.ok("error" in _v1286({ alternating_stress_psi: 25000, mean_stress_psi: 30000, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "morrow" }));
+  assert.ok("error" in _v1286({ alternating_stress_psi: Infinity, mean_stress_psi: 30000, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "goodman" }));
+});
