@@ -37980,3 +37980,27 @@ test("bounds: spec-v1300 computeSliderCrankPistonPosition pins the TDC/BDC endpo
   assert.ok("error" in _v1300({ stroke_in: 3.48, rod_length_in: 5.7, crank_angle_deg: 400 }));
   assert.ok("error" in _v1300({ stroke_in: 3.48, rod_length_in: Infinity, crank_angle_deg: 90 }));
 });
+
+import { computePlainBearingPressurePv as _v1301 } from "../../calc-machining.js";
+test("bounds: spec-v1301 computePlainBearingPressurePv pins the projected pressure, surface velocity, PV factor, the >50k flag, and error seams", () => {
+  // W 800, D 1.0, L 1.5, 300 rpm: P 533.3 psi, V 78.5 ft/min, PV 41,888 (under 50k).
+  const r = _v1301({ radial_load_lbf: 800, journal_diameter_in: 1.0, bearing_length_in: 1.5, speed_rpm: 300 });
+  assert.ok(Math.abs(r.projected_pressure_psi - 533.3) < 0.5 && Math.abs(r.surface_velocity_fpm - 78.5) < 0.2);
+  assert.ok(Math.abs(r.pv_factor - 41888) < 5 && r.pv_flag.indexOf("within") >= 0);
+  // PV is the product of pressure and velocity.
+  assert.ok(Math.abs(r.pv_factor - r.projected_pressure_psi * r.surface_velocity_fpm) < 1e-6);
+  // Doubling the speed doubles V and PV and trips the >50k flag.
+  const fast = _v1301({ radial_load_lbf: 800, journal_diameter_in: 1.0, bearing_length_in: 1.5, speed_rpm: 600 });
+  assert.ok(Math.abs(fast.pv_factor / r.pv_factor - 2) < 1e-6 && fast.pv_flag.indexOf("above") >= 0);
+  // Pressure uses the projected area L*D: a longer bearing lowers the pressure and PV.
+  const long = _v1301({ radial_load_lbf: 800, journal_diameter_in: 1.0, bearing_length_in: 3.0, speed_rpm: 300 });
+  assert.ok(Math.abs(long.projected_pressure_psi - r.projected_pressure_psi / 2) < 1e-6);
+  // Velocity depends on diameter and speed, not load or length.
+  assert.ok(Math.abs(_v1301({ radial_load_lbf: 2000, journal_diameter_in: 1.0, bearing_length_in: 5.0, speed_rpm: 300 }).surface_velocity_fpm - r.surface_velocity_fpm) < 1e-9);
+  // Error seams: non-positive load/diameter/length/speed, non-finite.
+  assert.ok("error" in _v1301({ radial_load_lbf: 0, journal_diameter_in: 1.0, bearing_length_in: 1.5, speed_rpm: 300 }));
+  assert.ok("error" in _v1301({ radial_load_lbf: 800, journal_diameter_in: 0, bearing_length_in: 1.5, speed_rpm: 300 }));
+  assert.ok("error" in _v1301({ radial_load_lbf: 800, journal_diameter_in: 1.0, bearing_length_in: 0, speed_rpm: 300 }));
+  assert.ok("error" in _v1301({ radial_load_lbf: 800, journal_diameter_in: 1.0, bearing_length_in: 1.5, speed_rpm: 0 }));
+  assert.ok("error" in _v1301({ radial_load_lbf: Infinity, journal_diameter_in: 1.0, bearing_length_in: 1.5, speed_rpm: 300 }));
+});

@@ -1392,6 +1392,59 @@ function renderRackAndPinion(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["rack-and-pinion"] = renderRackAndPinion;
 
+// ===================== spec-v1301: plain (sleeve) bearing pressure and PV =====================
+// The catalog sizes ROLLING bearings by rating life but has nothing for a plain (sleeve/journal) bearing or bronze
+// bushing, which is sized on projected pressure P = W/(L D) and the PV factor P*V (V = pi D N/12 ft/min) - the
+// product that governs frictional heat and wear against the material's PV limit (~50,000 for oil-impregnated bronze).
+// dims: in { radial_load_lbf: M L T^-2, journal_diameter_in: L, bearing_length_in: L, speed_rpm: T^-1 } out: { projected_pressure_psi: M L^-1 T^-2, surface_velocity_fpm: L T^-1, pv_factor: M T^-3 }
+export function computePlainBearingPressurePv({ radial_load_lbf = 0, journal_diameter_in = 0, bearing_length_in = 0, speed_rpm = 0 } = {}) {
+  const _g = _finiteGuard({ radial_load_lbf, journal_diameter_in, bearing_length_in, speed_rpm }); if (_g) return _g;
+  const W = Number(radial_load_lbf) || 0;
+  const D = Number(journal_diameter_in) || 0;
+  const L = Number(bearing_length_in) || 0;
+  const N = Number(speed_rpm) || 0;
+  if (!(W > 0)) return { error: "Radial load must be positive (lbf)." };
+  if (!(D > 0)) return { error: "Journal diameter must be positive (in)." };
+  if (!(L > 0)) return { error: "Bearing length must be positive (in)." };
+  if (!(N > 0)) return { error: "Shaft speed must be positive (rpm)." };
+  const projected_pressure_psi = W / (L * D);
+  const surface_velocity_fpm = (Math.PI * D * N) / 12;
+  const pv_factor = projected_pressure_psi * surface_velocity_fpm;
+  if (![projected_pressure_psi, surface_velocity_fpm, pv_factor].every(Number.isFinite) || !(pv_factor > 0)) return { error: "Plain-bearing math is not a finite value; check the inputs." };
+  const pv_flag = pv_factor > 50000
+    ? "PV above ~50,000 psi-ft/min: past the oil-impregnated sintered-bronze limit; use a pressure-lubricated bronze/babbitt or lengthen the bearing."
+    : "PV within the ~50,000 psi-ft/min oil-impregnated-bronze guidepost (confirm against the bushing's rated PV).";
+  return {
+    projected_pressure_psi, surface_velocity_fpm, pv_factor, pv_flag,
+    note: "Plain (sleeve/journal) bearing sizing on projected pressure and PV, not rating life. The projected pressure P = W/(L D) uses the projected area L x D (journal diameter D, bearing length L), not the wrapped area; the journal surface velocity is V = pi D N/12 ft/min; and the PV factor is their product, the value that governs the frictional heat and wear. PV must stay under the bearing material's rated limit - roughly 50,000 psi-ft/min for oil-impregnated sintered bronze, higher for pressure-lubricated bronze/babbitt, much lower for dry plastics. Keep the pressure under the material's crush limit and the velocity under its speed limit as well. The hydrodynamic film (Sommerfeld number), the actual temperature rise, minimum film thickness, and the specific material limits are the bushing maker's. Rolling bearings use rating life (bearing-l10-life). A design aid; Machinery's Handbook and the bearing maker govern.",
+  };
+}
+export const plainBearingPressurePvExample = { inputs: { radial_load_lbf: 800, journal_diameter_in: 1.0, bearing_length_in: 1.5, speed_rpm: 300 } };
+function renderPlainBearingPressurePv(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: plain-bearing projected pressure P = W/(L D), surface velocity V = pi D N/12 ft/min, and the PV factor P*V vs the material limit (~50,000 psi-ft/min oil-impregnated bronze) (Machinery's Handbook). Sizing basis for a sleeve/journal bearing or bronze bushing; the bushing maker's rated PV governs.";
+  const W = makeNumber("Radial load W (lbf)", "pbp-w", { step: "any", min: "0" }); W.input.value = "800";
+  const D = makeNumber("Journal diameter D (in)", "pbp-d", { step: "any", min: "0" }); D.input.value = "1.0";
+  const L = makeNumber("Bearing length L (in)", "pbp-l", { step: "any", min: "0" }); L.input.value = "1.5";
+  const N = makeNumber("Shaft speed (rpm)", "pbp-n", { step: "any", min: "0" }); N.input.value = "300";
+  for (const f of [W, D, L, N]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { W.input.value = "800"; D.input.value = "1.0"; L.input.value = "1.5"; N.input.value = "300"; update(); });
+  const oP = makeOutputLine(outputRegion, "Projected pressure P", "pbp-out-p");
+  const oV = makeOutputLine(outputRegion, "Surface velocity V", "pbp-out-v");
+  const oPV = makeOutputLine(outputRegion, "PV factor", "pbp-out-pv");
+  const oNote = makeOutputLine(outputRegion, "Note", "pbp-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computePlainBearingPressurePv({ radial_load_lbf: readNum(W.input), journal_diameter_in: readNum(D.input), bearing_length_in: readNum(L.input), speed_rpm: readNum(N.input) });
+    if (r.error) { oP.textContent = r.error; oV.textContent = "-"; oPV.textContent = "-"; oNote.textContent = ""; return; }
+    oP.textContent = fmt(r.projected_pressure_psi, 1) + " psi";
+    oV.textContent = fmt(r.surface_velocity_fpm, 1) + " ft/min";
+    oPV.textContent = fmt(r.pv_factor, 0) + " psi-ft/min - " + r.pv_flag;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [W, D, L, N]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["plain-bearing-pressure-pv"] = renderPlainBearingPressurePv;
+
 // ===================== spec-v509: countersink diameter and cutting depth =====================
 // dims: in { countersink_dia_in: L, included_angle_deg: dimensionless, pilot_hole_dia_in: L } out: { z_in: L, z_full_in: L }
 export function computeCountersinkDepth({ countersink_dia_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}) {

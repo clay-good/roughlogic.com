@@ -98934,6 +98934,51 @@
    "kind": "question"
   },
   {
+   "term": "plain bearing pressure",
+   "target": "plain-bearing-pressure-pv",
+   "kind": "industry"
+  },
+  {
+   "term": "bushing pv factor",
+   "target": "plain-bearing-pressure-pv",
+   "kind": "industry"
+  },
+  {
+   "term": "sleeve bearing pv",
+   "target": "plain-bearing-pressure-pv",
+   "kind": "industry"
+  },
+  {
+   "term": "journal bearing pressure",
+   "target": "plain-bearing-pressure-pv",
+   "kind": "industry"
+  },
+  {
+   "term": "bronze bushing sizing",
+   "target": "plain-bearing-pressure-pv",
+   "kind": "adjacent"
+  },
+  {
+   "term": "pv limit bearing",
+   "target": "plain-bearing-pressure-pv",
+   "kind": "adjacent"
+  },
+  {
+   "term": "projected bearing pressure",
+   "target": "plain-bearing-pressure-pv",
+   "kind": "adjacent"
+  },
+  {
+   "term": "will my bushing overheat",
+   "target": "plain-bearing-pressure-pv",
+   "kind": "question"
+  },
+  {
+   "term": "how to size a sleeve bearing",
+   "target": "plain-bearing-pressure-pv",
+   "kind": "question"
+  },
+  {
    "term": "countersink size from plunge depth",
    "target": "countersink-diameter-from-depth",
    "kind": "question"

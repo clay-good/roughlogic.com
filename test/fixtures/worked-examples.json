@@ -87617,6 +87617,70 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "plain-bearing-pressure-pv",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Bronze bushing PV screen",
+   "source_edition_or_year": "Machinery Handbook",
+   "source_section_or_page": "P=W/(LD), PV=P*V",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "radial_load_lbf": 800,
+    "journal_diameter_in": 1.0,
+    "bearing_length_in": 1.5,
+    "speed_rpm": 300
+   },
+   "outputs": {
+    "projected_pressure_psi": {
+     "value": 533.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "surface_velocity_fpm": {
+     "value": 78.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pv_factor": {
+     "value": 41888,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "plain-bearing-pressure-pv",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Larger slower journal",
+   "source_edition_or_year": "Machinery Handbook",
+   "source_section_or_page": "P=W/(LD), PV=P*V",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "radial_load_lbf": 1200,
+    "journal_diameter_in": 2.0,
+    "bearing_length_in": 2.0,
+    "speed_rpm": 600
+   },
+   "outputs": {
+    "projected_pressure_psi": {
+     "value": 300,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pv_factor": {
+     "value": 94248,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
   }
  ]
 }

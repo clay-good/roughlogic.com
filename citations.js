@@ -11070,6 +11070,18 @@ export const CITATIONS = {
       { name: "Scope", value: "ideal kinematics/static force; tooth stress, backlash, inertia are separate", source: "scope of this tile" },
     ],
   },
+  "plain-bearing-pressure-pv": {
+    formula: "P = W/(L D) (projected area); V = pi D N/12 ft/min; PV = P V. Oil-impregnated sintered bronze PV limit ~50,000 psi-ft/min.",
+    edition: "The plain-bearing projected pressure P = W/(L D), surface velocity V = pi D N/12, and the PV factor with the bearing-material PV limits (Machinery's Handbook), by name; the plain-bearing counterpart to the rolling-bearing rating-life tiles.",
+    freeAccess: "The projected pressure, surface velocity, and PV factor are standard published plain-bearing results; the load, diameter, length, and speed are the user's inputs, and the rated PV comes from the bushing material.",
+    governance: GOVERNANCE.general,
+    editionNote: "Plain (sleeve/journal) bearing sizing on projected pressure and PV, not rating life. The projected pressure P = W/(L D) uses the projected area L x D (journal diameter D, bearing length L), not the wrapped area; the journal surface velocity is V = pi D N/12 ft/min; and the PV factor is their product, the value that governs the frictional heat and wear. PV must stay under the bearing material's rated limit - roughly 50,000 psi-ft/min for oil-impregnated sintered bronze, higher for pressure-lubricated bronze/babbitt, much lower for dry plastics. Keep the pressure under the material's crush limit and the velocity under its speed limit as well. The hydrodynamic film (Sommerfeld number), the actual temperature rise, minimum film thickness, and the specific material limits are the bushing maker's. Rolling bearings use rating life (bearing-l10-life). A design aid; Machinery's Handbook and the bearing maker govern.",
+    assumptions: [
+      { name: "Projected pressure", value: "P = W/(L D), projected area L x D not wrapped area", source: "Machinery's Handbook" },
+      { name: "PV factor", value: "PV = P V, must stay under the material's rated PV (~50,000 for oil-impregnated bronze)", source: "bearing-material data" },
+      { name: "Scope", value: "static pressure/PV screen; hydrodynamic film, temperature rise, material limits are the maker's", source: "scope of this tile" },
+    ],
+  },
   "bolt-proof-load": {
     formula: "At = 0.7854 x (D - 0.9743/n)^2; proof_load = At x proof_strength; yield_load = At x yield_strength; tensile_load = At x tensile_strength; rec_clamp = 0.75 x proof_load.",
     edition: "The SAE J429 inch-series bolt strength model (tensile stress area x grade strength), with the ASME B1.1 tensile stress area, by name; the joint design, torque method, and preload requirement govern.",
