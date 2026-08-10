@@ -443,7 +443,7 @@ const _TILES = [
   // spec-v801 sprocket pitch diameter (ANSI B29.1)
   ["sprocket-pitch-diameter", "K"], ["cylinder-storage-separation", "E"],
   // spec-v504 rolling-bearing L10 rating life (ISO 281)
-  ["bearing-l10-life", "K"], ["bearing-max-load", "K"],
+  ["bearing-l10-life", "K"], ["bearing-max-load", "K"], ["bearing-equivalent-load", "K"],
   // spec-v509 countersink diameter and cutting depth
   ["countersink-depth", "K"],
   ["countersink-diameter-from-depth", "K"],

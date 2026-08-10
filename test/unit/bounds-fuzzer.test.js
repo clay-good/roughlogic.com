@@ -37588,3 +37588,31 @@ test("bounds: spec-v1284 computeSpringNaturalFrequency pins the surge frequency,
   assert.ok("error" in _v1284({ wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, active_coils: 0, material: "hard-drawn" }));
   assert.ok("error" in _v1284({ wire_diameter_in: Infinity, mean_coil_diameter_in: 0.75, active_coils: 8, material: "hard-drawn" }));
 });
+
+import { computeBearingEquivalentLoad as _v1285 } from "../../calc-machining.js";
+import { computeBearingL10Life as _v1285sib } from "../../calc-machining.js";
+test("bounds: spec-v1285 computeBearingEquivalentLoad pins P = X Fr + Y Fa, the ISO 281 table interpolation, the Fa=0 -> P=Fr cross-pin to bearing-l10-life, and error seams", () => {
+  // Fr 1000, Fa 500, C0 5000 deep-groove ball: Fa/C0 0.10 -> e 0.29, Y 1.5; Fa/Fr 0.5 > e -> P 1310 lbf.
+  const r = _v1285({ radial_load_lbf: 1000, thrust_load_lbf: 500, static_rating_lbf: 5000 });
+  assert.ok(Math.abs(r.equivalent_load_lbf - 1310) < 1.0);
+  assert.ok(Math.abs(r.e_ratio - 0.29) < 1e-3 && Math.abs(r.y_factor - 1.5) < 1e-3 && r.x_factor === 0.56);
+  assert.ok(r.thrust_governs === true);
+  // Fa = 0 gives P = Fr exactly, the input the bearing-l10-life example (P=1000) feeds in for its 1,190 hr result.
+  const noThrust = _v1285({ radial_load_lbf: 1000, thrust_load_lbf: 0, static_rating_lbf: 5000 });
+  assert.ok(noThrust.equivalent_load_lbf === 1000 && noThrust.x_factor === 1 && noThrust.y_factor === 0);
+  const chained = _v1285sib({ dynamic_rating_lbf: 5000, equivalent_load_lbf: noThrust.equivalent_load_lbf, speed_rpm: 1750, bearing_type: "ball" });
+  assert.ok(Math.abs(chained.l10_hr - 1190) < 5);
+  // A small thrust below the e-ratio does not raise P above the radial load (radial still governs).
+  const small = _v1285({ radial_load_lbf: 1000, thrust_load_lbf: 100, static_rating_lbf: 5000 });
+  assert.ok(small.equivalent_load_lbf === 1000 && small.thrust_governs === false);
+  // More thrust raises P monotonically once above e.
+  assert.ok(_v1285({ radial_load_lbf: 1000, thrust_load_lbf: 800, static_rating_lbf: 5000 }).equivalent_load_lbf > r.equivalent_load_lbf);
+  // The table clamps at the ends: a very high Fa/C0 uses the last row (e 0.44, Y 1.0).
+  const high = _v1285({ radial_load_lbf: 1000, thrust_load_lbf: 4000, static_rating_lbf: 5000 });
+  assert.ok(Math.abs(high.e_ratio - 0.44) < 1e-9 && Math.abs(high.y_factor - 1.0) < 1e-9);
+  // Error seams: non-positive radial, negative thrust, non-positive C0, non-finite.
+  assert.ok("error" in _v1285({ radial_load_lbf: 0, thrust_load_lbf: 500, static_rating_lbf: 5000 }));
+  assert.ok("error" in _v1285({ radial_load_lbf: 1000, thrust_load_lbf: -1, static_rating_lbf: 5000 }));
+  assert.ok("error" in _v1285({ radial_load_lbf: 1000, thrust_load_lbf: 500, static_rating_lbf: 0 }));
+  assert.ok("error" in _v1285({ radial_load_lbf: Infinity, thrust_load_lbf: 500, static_rating_lbf: 5000 }));
+});

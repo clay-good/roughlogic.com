@@ -846,6 +846,77 @@ function renderBearingMaxLoad(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["bearing-max-load"] = renderBearingMaxLoad;
 
+// ===================== spec-v1285: rolling-bearing dynamic equivalent load P (ISO 281) =====================
+// Both bearing-l10-life and bearing-max-load take the equivalent dynamic load P as a GIVEN input; combining the
+// actual radial load Fr and thrust Fa into that single P is the standard ISO 281 step upstream of both, and no
+// tile produced it. For a single-row deep-groove ball bearing, P = X Fr + Y Fa, where the e-ratio and the thrust
+// factor Y are interpolated from the standard ISO 281 / SKF table on Fa/C0 (C0 the basic static load rating). Below
+// the e-ratio the pure radial load governs (X = 1, Y = 0, P = Fr); above it X = 0.56 and Y applies. With Fa = 0 the
+// result is exactly P = Fr, chaining cleanly into bearing-l10-life.
+// ISO 281 single-row deep-groove ball table: rows of [Fa/C0, e, Y] (X = 0.56 for Fa/Fr > e).
+const BEARING_XY_TABLE = [
+  [0.025, 0.22, 2.0], [0.04, 0.24, 1.8], [0.07, 0.27, 1.6],
+  [0.13, 0.31, 1.4], [0.25, 0.37, 1.2], [0.50, 0.44, 1.0],
+];
+// dims: in { radial_load_lbf: M L T^-2, thrust_load_lbf: M L T^-2, static_rating_lbf: M L T^-2 } out: { equivalent_load_lbf: M L T^-2, e_ratio: dimensionless, x_factor: dimensionless, y_factor: dimensionless }
+export function computeBearingEquivalentLoad({ radial_load_lbf = 0, thrust_load_lbf = 0, static_rating_lbf = 0 } = {}) {
+  const _g = _finiteGuard({ radial_load_lbf, thrust_load_lbf, static_rating_lbf }); if (_g) return _g;
+  const Fr = Number(radial_load_lbf) || 0;
+  const Fa = Number(thrust_load_lbf) || 0;
+  const C0 = Number(static_rating_lbf) || 0;
+  if (!(Fr > 0)) return { error: "Radial load Fr must be positive (lbf)." };
+  if (Fa < 0) return { error: "Thrust (axial) load Fa cannot be negative (lbf)." };
+  if (!(C0 > 0)) return { error: "Basic static load rating C0 must be positive (lbf)." };
+  const ratio = Fa / C0;
+  // Interpolate e and Y from the ISO 281 table on Fa/C0 (clamped at the ends).
+  let e, Y;
+  if (ratio <= BEARING_XY_TABLE[0][0]) { e = BEARING_XY_TABLE[0][1]; Y = BEARING_XY_TABLE[0][2]; }
+  else if (ratio >= BEARING_XY_TABLE[BEARING_XY_TABLE.length - 1][0]) { e = BEARING_XY_TABLE[BEARING_XY_TABLE.length - 1][1]; Y = BEARING_XY_TABLE[BEARING_XY_TABLE.length - 1][2]; }
+  else {
+    for (let i = 0; i < BEARING_XY_TABLE.length - 1; i++) {
+      const [x0, e0, y0] = BEARING_XY_TABLE[i];
+      const [x1, e1, y1] = BEARING_XY_TABLE[i + 1];
+      if (ratio >= x0 && ratio <= x1) {
+        const f = (ratio - x0) / (x1 - x0);
+        e = e0 + f * (e1 - e0);
+        Y = y0 + f * (y1 - y0);
+        break;
+      }
+    }
+  }
+  const thrust_governs = Fa / Fr > e;
+  const x_factor = thrust_governs ? 0.56 : 1;
+  const y_factor = thrust_governs ? Y : 0;
+  const equivalent_load_lbf = x_factor * Fr + y_factor * Fa;
+  if (![e, Y, equivalent_load_lbf].every(Number.isFinite) || !(equivalent_load_lbf > 0)) return { error: "Equivalent-load math is not a finite value." };
+  return {
+    equivalent_load_lbf, e_ratio: e, x_factor, y_factor, thrust_governs, fa_over_fr: Fa / Fr,
+    note: "ISO 281 dynamic equivalent load for a single-row deep-groove ball bearing, P = X Fr + Y Fa, the input the bearing-l10-life and bearing-max-load tiles need but do not compute. The thrust factor Y and the e-ratio come from the standard ISO 281 / SKF table interpolated on Fa/C0 (C0 the basic static load rating). If the thrust-to-radial ratio Fa/Fr is at or below e the pure radial load governs (X = 1, Y = 0, so P = Fr); above e the bearing carries the thrust as extra equivalent load with X = 0.56 and the interpolated Y. With Fa = 0 the result is exactly P = Fr, which feeds bearing-l10-life directly. Single-row radial deep-groove ball bearings, rotating inner ring (V = 1); angular-contact, tapered-, and spherical-roller bearings use the maker's bearing-specific factors. A planning estimate; ISO 281 and the bearing maker's catalogue govern.",
+  };
+}
+export const bearingEquivalentLoadExample = { inputs: { radial_load_lbf: 1000, thrust_load_lbf: 500, static_rating_lbf: 5000 } };
+function renderBearingEquivalentLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ISO 281 dynamic equivalent load P = X Fr + Y Fa for a single-row deep-groove ball bearing, with the e-ratio and thrust factor Y interpolated from the standard ISO 281 / SKF table on Fa/C0 (X = 0.56 above e; X = 1, Y = 0 at or below e). Feed P into bearing-l10-life. A planning estimate; ISO 281 and the bearing maker's catalogue govern.";
+  const fr = makeNumber("Radial load Fr (lbf)", "beq-fr", { step: "any", min: "0" }); fr.input.value = "1000";
+  const fa = makeNumber("Thrust (axial) load Fa (lbf)", "beq-fa", { step: "any", min: "0" }); fa.input.value = "500";
+  const c0 = makeNumber("Basic static load rating C0 (lbf)", "beq-c0", { step: "any", min: "0" }); c0.input.value = "5000";
+  for (const f of [fr, fa, c0]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fr.input.value = "1000"; fa.input.value = "500"; c0.input.value = "5000"; update(); });
+  const oP = makeOutputLine(outputRegion, "Equivalent dynamic load P", "beq-out-p");
+  const oXY = makeOutputLine(outputRegion, "Factors used", "beq-out-xy");
+  const oNote = makeOutputLine(outputRegion, "Note", "beq-out-n");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeBearingEquivalentLoad({ radial_load_lbf: readNum(fr.input), thrust_load_lbf: readNum(fa.input), static_rating_lbf: readNum(c0.input) });
+    if (r.error) { oP.textContent = r.error; oXY.textContent = "-"; oNote.textContent = ""; return; }
+    oP.textContent = fmt(r.equivalent_load_lbf, 0) + " lbf";
+    oXY.textContent = "X = " + fmt(r.x_factor, 2) + ", Y = " + fmt(r.y_factor, 2) + ", e = " + fmt(r.e_ratio, 3) + (r.thrust_governs ? " (thrust governs)" : " (radial governs, P = Fr)");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [fr, fa, c0]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["bearing-equivalent-load"] = renderBearingEquivalentLoad;
+
 // ===================== spec-v509: countersink diameter and cutting depth =====================
 // dims: in { countersink_dia_in: L, included_angle_deg: dimensionless, pilot_hole_dia_in: L } out: { z_in: L, z_full_in: L }
 export function computeCountersinkDepth({ countersink_dia_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}) {

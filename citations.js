@@ -10974,6 +10974,18 @@ export const CITATIONS = {
       { name: "10% definition", value: "L10 is the life at which 10% have failed, not the average (L50 is ~5x)", source: "ABMA 9 & 11" },
     ],
   },
+  "bearing-equivalent-load": {
+    formula: "P = X Fr + Y Fa. Single-row deep-groove ball: interpolate e and Y from the ISO 281 / SKF table on Fa/C0 ([0.025,0.22,2.0]...[0.50,0.44,1.0]); if Fa/Fr <= e then X = 1, Y = 0 (P = Fr), else X = 0.56.",
+    edition: "The ISO 281 dynamic equivalent load P = X Fr + Y Fa with the standard single-row deep-groove ball-bearing X/Y/e table vs Fa/C0 (ISO 281; SKF General Catalogue; Shigley's Mechanical Engineering Design), by name; feeds the bearing-l10-life and bearing-max-load tiles.",
+    freeAccess: "The equivalent-load relation and the deep-groove ball X/Y/e table are published ISO 281 / catalogue data; the radial and thrust loads and the static rating C0 come from the application and the bearing catalog.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ISO 281 dynamic equivalent load for a single-row deep-groove ball bearing, P = X Fr + Y Fa, the input the bearing-l10-life and bearing-max-load tiles need but do not compute. The thrust factor Y and the e-ratio are interpolated from the standard ISO 281 / SKF table on Fa/C0, C0 the basic static load rating. If the thrust-to-radial ratio Fa/Fr is at or below e the pure radial load governs (X = 1, Y = 0, so P = Fr); above e the bearing carries the thrust as extra equivalent load with X = 0.56 and the interpolated Y. With Fa = 0 the result is exactly P = Fr, which feeds bearing-l10-life directly. Single-row radial deep-groove ball bearings, rotating inner ring (V = 1); angular-contact, tapered-, and spherical-roller bearings use the maker's bearing-specific factors. A planning estimate; ISO 281 and the bearing maker's catalogue govern.",
+    assumptions: [
+      { name: "Equivalent load", value: "P = X Fr + Y Fa; X = 0.56 for Fa/Fr > e, else X = 1 and Y = 0", source: "ISO 281" },
+      { name: "X/Y/e table", value: "single-row deep-groove ball, e and Y interpolated on Fa/C0 (0.025->0.50)", source: "ISO 281 / SKF catalogue" },
+      { name: "Scope", value: "deep-groove ball, rotating inner ring V = 1; other bearing types use maker factors", source: "scope of this tile" },
+    ],
+  },
   "bolt-proof-load": {
     formula: "At = 0.7854 x (D - 0.9743/n)^2; proof_load = At x proof_strength; yield_load = At x yield_strength; tensile_load = At x tensile_strength; rec_clamp = 0.75 x proof_load.",
     edition: "The SAE J429 inch-series bolt strength model (tensile stress area x grade strength), with the ASME B1.1 tensile stress area, by name; the joint design, torque method, and preload requirement govern.",

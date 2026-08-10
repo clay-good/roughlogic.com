@@ -98264,6 +98264,46 @@
    "kind": "question"
   },
   {
+   "term": "bearing equivalent load",
+   "target": "bearing-equivalent-load",
+   "kind": "industry"
+  },
+  {
+   "term": "bearing dynamic equivalent load",
+   "target": "bearing-equivalent-load",
+   "kind": "industry"
+  },
+  {
+   "term": "bearing p from radial and thrust",
+   "target": "bearing-equivalent-load",
+   "kind": "industry"
+  },
+  {
+   "term": "bearing x y factor",
+   "target": "bearing-equivalent-load",
+   "kind": "industry"
+  },
+  {
+   "term": "combined radial axial bearing load",
+   "target": "bearing-equivalent-load",
+   "kind": "adjacent"
+  },
+  {
+   "term": "bearing thrust load factor",
+   "target": "bearing-equivalent-load",
+   "kind": "adjacent"
+  },
+  {
+   "term": "iso 281 equivalent load",
+   "target": "bearing-equivalent-load",
+   "kind": "adjacent"
+  },
+  {
+   "term": "what is p for bearing life",
+   "target": "bearing-equivalent-load",
+   "kind": "question"
+  },
+  {
    "term": "countersink size from plunge depth",
    "target": "countersink-diameter-from-depth",
    "kind": "question"

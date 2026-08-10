@@ -86673,6 +86673,56 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "bearing-equivalent-load",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Deep-groove ball, thrust governs",
+   "source_edition_or_year": "ISO 281 / SKF",
+   "source_section_or_page": "P = X Fr + Y Fa",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "radial_load_lbf": 1000,
+    "thrust_load_lbf": 500,
+    "static_rating_lbf": 5000
+   },
+   "outputs": {
+    "equivalent_load_lbf": {
+     "value": 1310,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "e_ratio": {
+     "value": 0.29,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bearing-equivalent-load",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "No thrust: P = Fr cross-pin to bearing-l10-life",
+   "source_edition_or_year": "ISO 281 / SKF",
+   "source_section_or_page": "P = X Fr + Y Fa",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "radial_load_lbf": 1000,
+    "thrust_load_lbf": 0,
+    "static_rating_lbf": 5000
+   },
+   "outputs": {
+    "equivalent_load_lbf": {
+     "value": 1000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }
