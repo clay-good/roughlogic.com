@@ -11818,6 +11818,18 @@ export const CITATIONS = {
       { name: "Scope", value: "position only; velocity/acceleration, pin offset, rod stretch, loads are separate", source: "scope of this tile" },
     ],
   },
+  "impact-load-factor": {
+    formula: "n = 1 + sqrt(1 + 2h/delta_st); impact force = n W; impact deflection = n delta_st. At h = 0, n = 2.",
+    edition: "The energy-method impact factor n = 1 + sqrt(1 + 2h/delta_st) for a load dropped onto an elastic member (Roark's Formulas for Stress and Strain; standard mechanics of materials), by name.",
+    freeAccess: "The energy-method impact factor is a standard published mechanics result; the weight, drop height, and static deflection are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Energy-method impact (amplification) factor for a load dropped or suddenly applied onto an elastic member: n = 1 + sqrt(1 + 2h/delta_st), with the falling weight W, the free-fall drop height h before it engages the member, and the static deflection delta_st the member shows under W applied slowly (W/k for stiffness k). The peak force is n W and the peak deflection is n delta_st. The factor is the price of suddenness: at h = 0 (a load released while just touching) it is exactly 2, and it climbs with the square root of the drop divided by how much the catch gives, so a stiff catch (tiny delta_st) makes even a small drop brutal - the reason a load must never be dropped onto a slack sling or a rigid stop, and why a shock-absorbing lanyard or a bit of rope stretch (a larger delta_st) sharply cuts the peak. Elastic, no energy loss (all drop energy goes into elastic strain); plastic deformation, damping, the member's own mass, repeated (fatigue) impact, and rope/sling dynamics are separate. A design aid; Roark and the engineer of record govern.",
+    assumptions: [
+      { name: "Impact factor", value: "n = 1 + sqrt(1 + 2h/delta_st); n = 2 at h = 0 (suddenly applied)", source: "Roark / mechanics of materials" },
+      { name: "Energy method", value: "elastic, no energy loss; all drop energy goes into elastic strain", source: "energy conservation" },
+      { name: "Scope", value: "plasticity, damping, member mass, and rope/sling dynamics are separate", source: "scope of this tile" },
+    ],
+  },
   "gear-identification": {
     formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
     edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",

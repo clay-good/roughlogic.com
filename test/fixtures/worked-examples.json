@@ -87681,6 +87681,62 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "impact-load-factor",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Dropped load impact factor",
+   "source_edition_or_year": "Roark / mechanics",
+   "source_section_or_page": "n = 1 + sqrt(1 + 2h/dst)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "weight_lb": 1000,
+    "drop_height_in": 2,
+    "static_deflection_in": 0.1
+   },
+   "outputs": {
+    "impact_factor": {
+     "value": 7.403,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "impact_force_lbf": {
+     "value": 7403,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "impact-load-factor",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Suddenly applied (no drop) gives factor 2",
+   "source_edition_or_year": "Roark / mechanics",
+   "source_section_or_page": "n = 1 + sqrt(1 + 2h/dst)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "weight_lb": 1000,
+    "drop_height_in": 0,
+    "static_deflection_in": 0.1
+   },
+   "outputs": {
+    "impact_factor": {
+     "value": 2.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "impact_force_lbf": {
+     "value": 2000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

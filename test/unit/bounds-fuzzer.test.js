@@ -38004,3 +38004,26 @@ test("bounds: spec-v1301 computePlainBearingPressurePv pins the projected pressu
   assert.ok("error" in _v1301({ radial_load_lbf: 800, journal_diameter_in: 1.0, bearing_length_in: 1.5, speed_rpm: 0 }));
   assert.ok("error" in _v1301({ radial_load_lbf: Infinity, journal_diameter_in: 1.0, bearing_length_in: 1.5, speed_rpm: 300 }));
 });
+
+import { computeImpactLoadFactor as _v1302 } from "../../calc-mechanic.js";
+test("bounds: spec-v1302 computeImpactLoadFactor pins the energy-method factor, the h=0 factor of 2, the stiff-catch amplification, and error seams", () => {
+  // W 1000, h 2, dst 0.10: n 7.403, force 7403 lbf, deflection 0.7403 in.
+  const r = _v1302({ weight_lb: 1000, drop_height_in: 2, static_deflection_in: 0.10 });
+  assert.ok(Math.abs(r.impact_factor - 7.403) < 1e-3 && Math.abs(r.impact_force_lbf - 7403) < 1);
+  assert.ok(Math.abs(r.impact_deflection_in - 0.7403) < 1e-3);
+  // A suddenly applied load (h = 0) gives exactly n = 2.
+  const sudden = _v1302({ weight_lb: 1000, drop_height_in: 0, static_deflection_in: 0.10 });
+  assert.ok(Math.abs(sudden.impact_factor - 2) < 1e-9 && sudden.impact_force_lbf === 2000);
+  // A stiffer catch (smaller static deflection) amplifies a given drop more.
+  const stiff = _v1302({ weight_lb: 1000, drop_height_in: 2, static_deflection_in: 0.05 });
+  assert.ok(stiff.impact_factor > r.impact_factor);
+  // Impact force scales linearly with weight at a fixed factor.
+  assert.ok(Math.abs(_v1302({ weight_lb: 2000, drop_height_in: 2, static_deflection_in: 0.10 }).impact_force_lbf / r.impact_force_lbf - 2) < 1e-9);
+  // The deflection is always the factor times the static deflection.
+  assert.ok(Math.abs(r.impact_deflection_in - r.impact_factor * 0.10) < 1e-9);
+  // Error seams: non-positive weight, negative drop, non-positive deflection, non-finite.
+  assert.ok("error" in _v1302({ weight_lb: 0, drop_height_in: 2, static_deflection_in: 0.10 }));
+  assert.ok("error" in _v1302({ weight_lb: 1000, drop_height_in: -1, static_deflection_in: 0.10 }));
+  assert.ok("error" in _v1302({ weight_lb: 1000, drop_height_in: 2, static_deflection_in: 0 }));
+  assert.ok("error" in _v1302({ weight_lb: Infinity, drop_height_in: 2, static_deflection_in: 0.10 }));
+});

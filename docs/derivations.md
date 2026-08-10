@@ -2644,6 +2644,7 @@ cross-check.
 | calc-mechanic.js | `computeHydraulicMotorTorqueSpeed` | `{ psi = 0, disp_in3 = 0, gpm = 0, mech_eff = 0.90, vol_eff = 0.95 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHydraulicPumpFlow` | `{ disp_in3 = 0, rpm = 0, vol_eff = 0.95 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHydraulicPumpHorsepower` | `{ gpm = 0, psi = 0, efficiency = 0.85 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeImpactLoadFactor` | `{ weight_lb = 0, drop_height_in = 0, static_deflection_in = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeInjectorFlowAtPressure` | `{ rated_flow_ccmin = 0, rated_pressure_psi = 43.5, rail_pressure_psi = 43.5, ...` | _ | _ | _ |
 | calc-mechanic.js | `computeInjectorMaxHp` | `{ inj_flow = 0, flow_unit = "lbh", n_cyl = 0, duty = 0.80, bsfc = 0.50 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeInjectorSize` | `{ hp = 0, bsfc = 0.50, n_cyl = 0, duty = 0.80 } = {}` | _ | _ | _ |
@@ -3339,7 +3340,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1925.
+Row count: 1926.
 
 <!-- END function-corpus-v14 -->
 
@@ -4634,7 +4635,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (125 tiles)
+### Group K Mechanic (126 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4706,6 +4707,7 @@ per spec-v14 §13.1 second paragraph.
 | `hydraulic-motor-torque-speed` | Hydraulic Motor Torque and Speed | fluid-power engineering; spec-v397 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-pump-flow` | Hydraulic Pump Output Flow | fluid-power engineering; spec-v642 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-pump-horsepower` | Hydraulic Pump Drive Horsepower | fluid-power engineering; spec-v396 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `impact-load-factor` | Impact Load Factor (Falling / Suddenly Applied Load) | Project (first-principles); n = 1 + sqrt(1 + 2h/dst) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `injector-flow-at-pressure` | Injector Static Flow at a Different Rail Pressure | orifice flow physics; 550 cc/min rated at 43.5 psi, returnless rail at 43.5 psi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `injector-max-hp` | Injector Max Horsepower Capacity | Fuel injector power capacity (inverse...; spec-v661 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `injector-size` | Fuel Injector Size from Horsepower, BSFC, and Duty Cycle | Fuel injector sizing (HP x BSFC / (n ...; spec-v323 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5186,6 +5188,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1674. Fixture-covered or reference-cadence: 1674 / 1674.
+Tile count: 1675. Fixture-covered or reference-cadence: 1675 / 1675.
 
 <!-- END tile-index-v14 -->

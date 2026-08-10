@@ -1538,6 +1538,46 @@ MECHANIC_RENDERERS["slider-crank-piston-position"] = _simpleRenderer({
   compute: computeSliderCrankPistonPosition,
 });
 
+// --- spec-v1302 K: impact load factor, energy method (`impact-load-factor`) ---
+// No general impact factor for a dropped/suddenly-applied load (fall-arrest is PPE, tree-rigging-shock is
+// arborist rope). Energy method: n = 1 + sqrt(1 + 2h/delta_st); impact force = nW; even h=0 gives n=2.
+// dims: in { weight_lb: M L T^-2, drop_height_in: L, static_deflection_in: L } out: { impact_factor: dimensionless, impact_force_lbf: M L T^-2, impact_deflection_in: L }
+export function computeImpactLoadFactor({ weight_lb = 0, drop_height_in = 0, static_deflection_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const W = Number(weight_lb) || 0;
+  const h = Number(drop_height_in);
+  const dst = Number(static_deflection_in) || 0;
+  if (!(W > 0)) return { error: "Weight must be positive (lb)." };
+  if (h < 0) return { error: "Drop height cannot be negative (in)." };
+  if (!(dst > 0)) return { error: "Static deflection must be positive (in)." };
+  const impact_factor = 1 + Math.sqrt(1 + (2 * h) / dst);
+  const impact_force_lbf = impact_factor * W;
+  const impact_deflection_in = impact_factor * dst;
+  if (![impact_factor, impact_force_lbf, impact_deflection_in].every(Number.isFinite) || !(impact_factor >= 2)) return { error: "Impact math is not a finite value; check the inputs." };
+  return {
+    impact_factor, impact_force_lbf, impact_deflection_in,
+    note: "Energy-method impact (amplification) factor for a load dropped or suddenly applied onto an elastic member: n = 1 + sqrt(1 + 2h/delta_st), with the falling weight W, the free-fall drop height h before it engages the member, and the static deflection delta_st the member shows under W applied slowly (W/k for stiffness k). The peak force is n W and the peak deflection is n delta_st. The factor is the price of suddenness: at h = 0 (a load released while just touching) it is exactly 2, and it climbs with the square root of the drop divided by how much the catch gives, so a stiff catch (tiny delta_st) makes even a small drop brutal - the reason a load must never be dropped onto a slack sling or a rigid stop, and why a shock-absorbing lanyard or a bit of rope stretch (a larger delta_st) sharply cuts the peak. Elastic, no energy loss (all drop energy goes into elastic strain); plastic deformation, damping, the member's own mass, repeated (fatigue) impact, and rope/sling dynamics are separate. A design aid; Roark and the engineer of record govern.",
+  };
+}
+export const impactLoadFactorExample = { inputs: { weight_lb: 1000, drop_height_in: 2, static_deflection_in: 0.10 } };
+
+MECHANIC_RENDERERS["impact-load-factor"] = _simpleRenderer({
+  citation: "Citation: energy-method impact factor n = 1 + sqrt(1 + 2h/delta_st) for a load dropped onto an elastic member, with the impact force n W and deflection n delta_st (Roark's Formulas for Stress and Strain; mechanics of materials). At h = 0 the factor is 2. Elastic, no energy loss; the engineer of record governs.",
+  example: impactLoadFactorExample.inputs,
+  fields: [
+    { key: "weight_lb", label: "Falling weight W (lb)", kind: "number" },
+    { key: "drop_height_in", label: "Free-fall drop height h (in)", kind: "number" },
+    { key: "static_deflection_in", label: "Static deflection under W, delta_st (in)", kind: "number" },
+  ],
+  outputs: [
+    { key: "n", id: "ilf-out-n", label: "Impact factor", value: (r) => fmt(r.impact_factor, 3) + " x static" },
+    { key: "f", id: "ilf-out-f", label: "Peak impact force", value: (r) => fmt(r.impact_force_lbf, 0) + " lbf" },
+    { key: "d", id: "ilf-out-d", label: "Peak impact deflection", value: (r) => fmt(r.impact_deflection_in, 4) + " in" },
+    { key: "note", id: "ilf-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeImpactLoadFactor,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================

@@ -3189,6 +3189,51 @@
    "kind": "question"
   },
   {
+   "term": "impact load factor",
+   "target": "impact-load-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "impact force falling load",
+   "target": "impact-load-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "shock load factor",
+   "target": "impact-load-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "suddenly applied load",
+   "target": "impact-load-factor",
+   "kind": "adjacent"
+  },
+  {
+   "term": "dropped load impact",
+   "target": "impact-load-factor",
+   "kind": "adjacent"
+  },
+  {
+   "term": "dynamic amplification factor",
+   "target": "impact-load-factor",
+   "kind": "adjacent"
+  },
+  {
+   "term": "snatch load force",
+   "target": "impact-load-factor",
+   "kind": "adjacent"
+  },
+  {
+   "term": "how hard does a dropped load hit",
+   "target": "impact-load-factor",
+   "kind": "question"
+  },
+  {
+   "term": "impact force from a drop",
+   "target": "impact-load-factor",
+   "kind": "question"
+  },
+  {
    "term": "hp torque rpm",
    "target": "hp-from-torque",
    "kind": "redirect"
