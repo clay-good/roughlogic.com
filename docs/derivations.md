@@ -3080,6 +3080,7 @@ cross-check.
 | calc-shop.js | `computeMaterialRemovalRate` | `{ mode = "milling", woc_in = 0, doc_in = 0, feed_ipm_in = 0, sfm = 0, feed_ip...` | _ | _ | _ |
 | calc-shop.js | `computeOvalTankVolume` | `{ width_in = 0, height_in = 0, length_in = 0, depth_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeParabolicSegment` | `{ base_span = 0, rise_height = 0 } = {}` | _ | _ | _ |
+| calc-shop.js | `computeParaboloidVolume` | `{ base_diameter_ft = 0, height_ft = 0, fill_depth_ft = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computePressBrakeMaxThickness` | `{ available_tonnage_tons = 0, die_opening_in = 0, bend_length_ft = 0, uts_ksi...` | _ | _ | _ |
 | calc-shop.js | `computePressBrakeTonnage` | `{ thickness_in = 0, bend_length_ft = 0, die_opening_in = 0, uts_ksi = 60 } = {}` | _ | _ | _ |
 | calc-shop.js | `computePressFitInterferenceForForce` | `{ target_holding_lb = 0, shaft_dia_in = 0, hub_od_in = 0, modulus_psi = 30e6,...` | _ | _ | _ |
@@ -3366,7 +3367,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1952.
+Row count: 1953.
 
 <!-- END function-corpus-v14 -->
 
@@ -4532,7 +4533,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (89 tiles)
+### Group G Cross-trade (90 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4575,6 +4576,7 @@ per spec-v14 §13.1 second paragraph.
 | `oval-tank-volume` | Oval (Obround) Tank Volume from Dipstick | Project (first-principles); stadium cross-section, piecewise segment fill | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `overtime` | Overtime Hours | Project (first-principles); Standard FLSA / state DOL overtime schedule | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `parabolic-segment` | Parabolic Segment Area and Arc Length | Project (first-principles); area (2/3)bh; parabolic arc | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `paraboloid-volume` | Paraboloid of Revolution Volume | Project (first-principles); V(y)=pi R^2 y^2/(2H); half-height reads a quarter full | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `per-diem` | Per-Diem (GSA) | U.S. General Services Administration ...; TX state-default M&IE -> $69/day; table lookup, exercises... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-fitting-takeout` | Fitting Take-Out Cut Length | NCCER Pipefitting / standard fitter's...; 24 in C-to-C, two 1 in threaded 90 ells (take-out 1.5 in,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-miter-cut` | Multi-Piece Miter Elbow Layout | NCCER Pipefitting / standard fabricat...; 3-piece 90 deg miter -> 22.5 deg at each of two cuts; 12.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5240,6 +5242,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1701. Fixture-covered or reference-cadence: 1701 / 1701.
+Tile count: 1702. Fixture-covered or reference-cadence: 1702 / 1702.
 
 <!-- END tile-index-v14 -->

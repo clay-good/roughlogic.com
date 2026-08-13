@@ -38477,6 +38477,29 @@ test("bounds: spec-v1323 computeSphericalZoneVolume pins the prismatoid volume, 
   assert.ok("error" in _v1323({ base_radius_1_ft: Infinity, base_radius_2_ft: 3, zone_height_ft: 2 }));
 });
 
+import { computeParaboloidVolume as _v1329 } from "../../calc-shop.js";
+test("bounds: spec-v1329 computeParaboloidVolume pins the half-cylinder full volume, the square-of-depth fill, clamping, and error seams", () => {
+  // D 4 (R 2), H 3: full V = 0.5*pi*4*3 = 6*pi = 18.8496 ft^3, and exactly half the cylinder pi*R^2*H.
+  const p = _v1329({ base_diameter_ft: 4, height_ft: 3, fill_depth_ft: 1.5 });
+  assert.ok(Math.abs(p.full_ft3 - 18.8496) < 1e-3 && Math.abs(p.full_ft3 - 0.5 * Math.PI * 2 * 2 * 3) < 1e-9);
+  assert.ok(Math.abs(p.full_gal - p.full_ft3 * 7.480519) < 1e-6);
+  // Fills as the square of depth: half the height is a quarter full.
+  assert.ok(Math.abs(p.fill_ft3 - 4.7124) < 1e-3 && Math.abs(p.percent_full - 25) < 1e-6);
+  assert.ok(Math.abs(p.radius_at_level - 2 * Math.sqrt(0.5)) < 1e-9);
+  // Full fill (y = H) returns the full volume; y beyond H clamps to full.
+  const pf = _v1329({ base_diameter_ft: 4, height_ft: 3, fill_depth_ft: 3 });
+  assert.ok(Math.abs(pf.fill_ft3 - pf.full_ft3) < 1e-9 && Math.abs(pf.percent_full - 100) < 1e-9);
+  const pOver = _v1329({ base_diameter_ft: 4, height_ft: 3, fill_depth_ft: 99 });
+  assert.ok(Math.abs(pOver.fill_ft3 - pf.full_ft3) < 1e-9);
+  // Zero fill reads zero.
+  assert.ok(_v1329({ base_diameter_ft: 4, height_ft: 3, fill_depth_ft: 0 }).fill_ft3 === 0);
+  // Error seams: non-positive diameter/height, negative fill, non-finite.
+  assert.ok("error" in _v1329({ base_diameter_ft: 0, height_ft: 3, fill_depth_ft: 1 }));
+  assert.ok("error" in _v1329({ base_diameter_ft: 4, height_ft: 0, fill_depth_ft: 1 }));
+  assert.ok("error" in _v1329({ base_diameter_ft: 4, height_ft: 3, fill_depth_ft: -1 }));
+  assert.ok("error" in _v1329({ base_diameter_ft: Infinity, height_ft: 3, fill_depth_ft: 1 }));
+});
+
 import { computeOvalTankVolume as _v1324 } from "../../calc-shop.js";
 test("bounds: spec-v1324 computeOvalTankVolume pins the 275-gal tank, the exact-half symmetry, the segment seams, clamping, and error seams", () => {
   // 27 x 44 x 60 in oval oil tank: 268 gal full (nominal 275).

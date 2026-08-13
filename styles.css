@@ -1356,6 +1356,11 @@ input[aria-invalid="true"] {
 .shell-page .shell-h1 {
   font-size: 1.75rem;
   margin: 0 0 var(--space-2);
+  /* A tile title may carry a long unbreakable slash-joined token (e.g.
+     "(Goodman/Soderberg/Gerber)") that would push the zero-JS shell past the
+     320px floor; break it, same as the shell prose classes below and the
+     live app's .view-title. */
+  overflow-wrap: anywhere;
 }
 .shell-page .shell-lead {
   font-size: 1.0625rem;

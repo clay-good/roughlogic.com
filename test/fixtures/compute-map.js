@@ -815,6 +815,7 @@ export const COMPUTE_MAP = {
   "circular-sector": { module: "../../calc-shop.js", fn: "computeCircularSector" },
   "tank-volume-dished-heads": { module: "../../calc-shop.js", fn: "computeTankVolumeDishedHeads" },
   "spherical-zone-volume": { module: "../../calc-shop.js", fn: "computeSphericalZoneVolume" },
+  "paraboloid-volume": { module: "../../calc-shop.js", fn: "computeParaboloidVolume" },
   "oval-tank-volume": { module: "../../calc-shop.js", fn: "computeOvalTankVolume" },
   "cone-bottom-tank-volume": { module: "../../calc-shop.js", fn: "computeConeBottomTankVolume" },
   "tapered-tank-volume": { module: "../../calc-shop.js", fn: "computeTaperedTankVolume" },

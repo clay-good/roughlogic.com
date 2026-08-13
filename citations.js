@@ -11837,6 +11837,18 @@ export const CITATIONS = {
       { name: "Scope", value: "one base zero is the spherical cap; the lateral surface and an off-axis/ellipsoidal zone are separate", source: "scope of this tile" },
     ],
   },
+  "paraboloid-volume": {
+    formula: "Full V = (1/2) pi R^2 H (half the enclosing cylinder); apex-up partial fill V(y) = pi R^2 y^2/(2H), with the wetted radius r(y) = R sqrt(y/H); percent full = (y/H)^2.",
+    edition: "The paraboloid of revolution volume - standard solid geometry (Pappus's theorem / integration) as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure solid geometry, public; the base diameter, height, and fill depth are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Volume of a paraboloid of revolution - the solid a plane parabolic segment cannot give: the full volume is V = (1/2) pi R^2 H, exactly half the cylinder of the same base radius R and height H that boxes it (halfway between the cone's 1/3 and the cylinder's 1). Because a parabola runs the axial coordinate z in proportion to r^2, filling from the apex the wetted radius grows as r(y) = R sqrt(y/H) and the liquid volume as V(y) = pi R^2 y^2/(2H), so it fills as the SQUARE of the depth and a stick at half the height reads only a quarter full (percent = (y/H)^2). Use it for a spun-cast dish, a parabolic reflector blank, a dished or parabolic vessel bottom, or the free surface a spinning liquid takes. Reported in cubic feet and US gallons. A circular dish is the spherical-cap-volume tile; a cone is frustum-volume with a zero top; an off-axis or tilted paraboloid is separate. A shop and takeoff aid; verify critical dimensions on the work.",
+    assumptions: [
+      { name: "Full volume", value: "V = (1/2) pi R^2 H, half the enclosing cylinder", source: "solid geometry (Pappus)" },
+      { name: "Partial fill", value: "V(y) = pi R^2 y^2/(2H) from the apex, r(y) = R sqrt(y/H); fills as the square of depth", source: "integration of the parabola z ~ r^2" },
+      { name: "Scope", value: "solid of revolution about the axis; an off-axis or tilted paraboloid is separate", source: "scope of this tile" },
+    ],
+  },
   "oval-tank-volume": {
     formula: "r = W/2, s = H - W; wetted area = seg(h) for h<=r, pi r^2/2 + W(h-r) for h<=r+s, else (pi r^2 + W s) - seg(H-h); volume = area x length. seg(t) = r^2 acos((r-t)/r) - (r-t) sqrt(2 r t - t^2).",
     edition: "Horizontal oval (obround) tank partial gauging - the cross-section is a stadium (rectangle capped by two semicircles) and the wetted area is a piecewise circular-segment build-up; standard plane/solid geometry with the circular-segment relation as in Machinery's Handbook (Industrial Press), by name; public domain.",

@@ -38344,6 +38344,36 @@
    "kind": "adjacent"
   },
   {
+   "term": "paraboloid volume",
+   "target": "paraboloid-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "paraboloid of revolution volume",
+   "target": "paraboloid-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "volume of a parabolic dish",
+   "target": "paraboloid-volume",
+   "kind": "question"
+  },
+  {
+   "term": "spun cast dish volume",
+   "target": "paraboloid-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "parabolic reflector blank volume",
+   "target": "paraboloid-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "spinning liquid surface volume",
+   "target": "paraboloid-volume",
+   "kind": "adjacent"
+  },
+  {
    "term": "oval oil tank volume",
    "target": "oval-tank-volume",
    "kind": "industry"

@@ -88927,6 +88927,68 @@
    }
   },
   {
+   "tile_id": "paraboloid-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Paraboloid dish D 4 ft, H 3 ft filled 1.5 ft from the apex",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "V(y)=pi R^2 y^2/(2H); half-height reads a quarter full",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "base_diameter_ft": 4,
+    "height_ft": 3,
+    "fill_depth_ft": 1.5
+   },
+   "outputs": {
+    "full_ft3": {
+     "value": 18.8496,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fill_ft3": {
+     "value": 4.7124,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "percent_full": {
+     "value": 25.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "paraboloid-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Paraboloid full volume is half the enclosing cylinder (D 10 ft, H 6 ft)",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "V=(1/2)pi R^2 H; cylinder pi(5^2)(6)=471.24, half=235.62",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "base_diameter_ft": 10,
+    "height_ft": 6,
+    "fill_depth_ft": 6
+   },
+   "outputs": {
+    "full_ft3": {
+     "value": 235.6194,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "full_gal": {
+     "value": 1762.56,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "oval-tank-volume",
    "source_publisher": "Project (first-principles)",
    "source_title": "275-gallon oval oil tank, half full (27 x 44 x 60 in, 22 in)",

@@ -2032,6 +2032,59 @@ function _v1326renderTaperedTankVolume(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["tapered-tank-volume"] = _v1326renderTaperedTankVolume;
 
+// spec-v1329: paraboloid of revolution volume. The parabolic-segment tile is the PLANE figure and names "the volume
+// of a parabolic dish" as separate; this is that solid of revolution - a spun-cast dish, a parabolic reflector blank,
+// a dished/parabolic vessel bottom, or the free surface of a spinning liquid. Full V = (1/2) pi R^2 H, exactly half
+// the enclosing cylinder. A parabola has z proportional to r^2, so filling apex-up the wetted radius grows as
+// r(y) = R sqrt(y/H) and the volume as V(y) = pi R^2 y^2/(2H): it fills as the SQUARE of the depth (percent = (y/H)^2).
+// dims: in { base_diameter_ft: L, height_ft: L, fill_depth_ft: L } out: { full_ft3: L^3, fill_ft3: L^3, percent_full: dimensionless }
+export function computeParaboloidVolume({ base_diameter_ft = 0, height_ft = 0, fill_depth_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const GAL_PER_FT3 = 7.480519;
+  const D = Number(base_diameter_ft) || 0;
+  const H = Number(height_ft) || 0;
+  let y = Number(fill_depth_ft) || 0;
+  if (!(D > 0)) return { error: "Base diameter must be positive." };
+  if (!(H > 0)) return { error: "Height (rim to apex) must be positive." };
+  if (y < 0) return { error: "Fill depth cannot be negative." };
+  const R = D / 2;
+  const full_ft3 = 0.5 * Math.PI * R * R * H;
+  const capped = Math.min(y, H);
+  const fill_ft3 = Math.PI * R * R * capped * capped / (2 * H);
+  const radius_at_level = R * Math.sqrt(capped / H);
+  const percent_full = full_ft3 > 0 ? (fill_ft3 / full_ft3) * 100 : 0;
+  if (![full_ft3, fill_ft3, radius_at_level].every(Number.isFinite) || !(full_ft3 > 0)) return { error: "Paraboloid math is not a finite value; check the inputs." };
+  return {
+    full_ft3, full_gal: full_ft3 * GAL_PER_FT3,
+    fill_ft3, fill_gal: fill_ft3 * GAL_PER_FT3,
+    radius_at_level, percent_full,
+    note: "Volume of a paraboloid of revolution - the solid the parabolic-segment tile (a plane area) names as separate: a spun-cast dish or parabolic reflector blank, a dished or parabolic vessel bottom, or the paraboloid the free surface of a spinning liquid takes. The full volume is V = (1/2) pi R^2 H, EXACTLY half the cylinder of the same base and height that boxes it (halfway between the cone's 1/3 and the cylinder's 1). Because a parabola runs z proportional to r^2, filling from the apex the wetted radius grows as r(y) = R sqrt(y/H) and the liquid volume as V(y) = pi R^2 y^2/(2H) - it fills as the SQUARE of the depth, so a stick reading half the height holds only a quarter of the volume (percent full = (y/H)^2). A base diameter D = 4 ft, height H = 3 ft dish holds 18.85 ft^3 (141.0 gal) full, and 4.71 ft^3 (35.3 gal) at a 1.5 ft apex depth (25%). A circular dish (spherical cap) is the spherical-cap-volume tile; a cone is frustum-volume with a zero top; a torispherical (ASME F&D) head is vessel-head-volume. Solid of revolution about the axis; an off-axis or tilted paraboloid is separate. A shop and takeoff aid; verify critical dimensions on the work.",
+  };
+}
+export const paraboloidVolumeExample = { inputs: { base_diameter_ft: 4, height_ft: 3, fill_depth_ft: 1.5 } };
+function _v1329renderParaboloidVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: paraboloid of revolution volume V = (1/2) pi R^2 H (half the enclosing cylinder) and the apex-up partial fill V(y) = pi R^2 y^2/(2H) with r(y) = R sqrt(y/H). First-principles solid geometry (Pappus / integration; Machinery's Handbook), by name; public domain. A shop and takeoff aid; verify critical dimensions on the work.";
+  const D = makeNumber("Base (rim) diameter (ft)", "pbv-d", { step: "any", min: "0" }); D.input.value = "4";
+  const H = makeNumber("Height, rim to apex (ft)", "pbv-h", { step: "any", min: "0" }); H.input.value = "3";
+  const y = makeNumber("Fill depth from the apex (ft, optional)", "pbv-y", { step: "any", min: "0" }); y.input.value = "1.5";
+  for (const f of [D, H, y]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D.input.value = "4"; H.input.value = "3"; y.input.value = "1.5"; update(); });
+  const oV = makeOutputLine(outputRegion, "Full volume", "pbv-out-v");
+  const oFill = makeOutputLine(outputRegion, "Fill volume / percent full", "pbv-out-fill");
+  const oR = makeOutputLine(outputRegion, "Liquid-surface radius at that depth", "pbv-out-r");
+  const oNote = makeOutputLine(outputRegion, "Note", "pbv-out-n");
+  const update = debounce(() => {
+    const res = computeParaboloidVolume({ base_diameter_ft: Number(D.input.value) || 0, height_ft: Number(H.input.value) || 0, fill_depth_ft: Number(y.input.value) || 0 });
+    if (res.error) { oV.textContent = res.error; oFill.textContent = "-"; oR.textContent = "-"; oNote.textContent = ""; return; }
+    oV.textContent = fmt(res.full_ft3, 3) + " ft^3 (" + fmt(res.full_gal, 1) + " gal)";
+    oFill.textContent = fmt(res.fill_ft3, 3) + " ft^3 (" + fmt(res.fill_gal, 1) + " gal), " + fmt(res.percent_full, 1) + "% full";
+    oR.textContent = fmt(res.radius_at_level, 3) + " ft";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [D, H, y]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["paraboloid-volume"] = _v1329renderParaboloidVolume;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {
