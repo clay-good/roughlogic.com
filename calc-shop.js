@@ -1363,6 +1363,50 @@ function _v1313renderRegularPolygon(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["regular-polygon"] = _v1313renderRegularPolygon;
 
+// spec-v1314: ellipse area and perimeter. No ellipse geometry in the catalog. area = pi a b (exact); the perimeter
+// has no elementary closed form, so use Ramanujan's approximation pi[3(a+b) - sqrt((3a+b)(a+3b))]. a=major/2,
+// b=minor/2. Equal axes collapse to a circle (pi r^2, 2 pi r).
+// dims: in { major_axis: L, minor_axis: L } out: { area: L^2, perimeter: L, semi_major: L, semi_minor: L, eccentricity: dimensionless }
+export function computeEllipseAreaPerimeter({ major_axis = 0, minor_axis = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const major = Number(major_axis) || 0;
+  const minor = Number(minor_axis) || 0;
+  if (!(major > 0)) return { error: "Major axis must be positive." };
+  if (!(minor > 0)) return { error: "Minor axis must be positive." };
+  const a = major / 2, b = minor / 2;
+  const area = Math.PI * a * b;
+  const perimeter = Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
+  const semiMax = Math.max(a, b), semiMin = Math.min(a, b);
+  const eccentricity = Math.sqrt(1 - (semiMin * semiMin) / (semiMax * semiMax));
+  if (![area, perimeter, eccentricity].every(Number.isFinite) || !(area > 0)) return { error: "Ellipse math is not a finite value; check the inputs." };
+  return {
+    area, perimeter, semi_major: a, semi_minor: b, eccentricity,
+    note: "Area and perimeter of an ellipse from the full major (long) and minor (short) axis lengths, with the semi-axes a = major/2 and b = minor/2. The area is exact, pi a b; the perimeter has no elementary closed form, so this uses Ramanujan's approximation pi[3(a+b) - sqrt((3a+b)(a+3b))], which is within a few parts per million for any ordinary oval. The eccentricity sqrt(1 - (b/a)^2) (with a the larger semi-axis) measures how far from round it is. When the two axes are equal the ellipse is a circle: the area becomes pi r^2 and the perimeter 2 pi r. Use it for an elliptical bed or border, a running-track lane, an oval tabletop or arch, or an elliptical head footprint. A partial (segment) area, an elliptical tank's partial-fill volume, and a true elliptic-integral perimeter are separate. Plane figure only. A shop and layout aid; verify critical dimensions on the work.",
+  };
+}
+export const ellipseAreaPerimeterExample = { inputs: { major_axis: 10, minor_axis: 6 } };
+function _v1314renderEllipseAreaPerimeter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ellipse area pi a b (exact) and Ramanujan's perimeter approximation pi[3(a+b) - sqrt((3a+b)(a+3b))] (standard geometry; Ramanujan 1914), a=major/2, b=minor/2. Equal axes give a circle. A shop and layout aid; verify critical dimensions on the work.";
+  const M = makeNumber("Major axis (long width)", "elp-m", { step: "any", min: "0" }); M.input.value = "10";
+  const m = makeNumber("Minor axis (short width)", "elp-n", { step: "any", min: "0" }); m.input.value = "6";
+  for (const f of [M, m]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { M.input.value = "10"; m.input.value = "6"; update(); });
+  const oA = makeOutputLine(outputRegion, "Area", "elp-out-a");
+  const oP = makeOutputLine(outputRegion, "Perimeter (Ramanujan)", "elp-out-p");
+  const oE = makeOutputLine(outputRegion, "Semi-axes / eccentricity", "elp-out-e");
+  const oNote = makeOutputLine(outputRegion, "Note", "elp-out-n");
+  const update = debounce(() => {
+    const res = computeEllipseAreaPerimeter({ major_axis: Number(M.input.value) || 0, minor_axis: Number(m.input.value) || 0 });
+    if (res.error) { oA.textContent = res.error; oP.textContent = "-"; oE.textContent = "-"; oNote.textContent = ""; return; }
+    oA.textContent = fmt(res.area, 4) + " (square units)";
+    oP.textContent = fmt(res.perimeter, 4);
+    oE.textContent = "a = " + fmt(res.semi_major, 3) + ", b = " + fmt(res.semi_minor, 3) + ", e = " + fmt(res.eccentricity, 4) + (res.eccentricity < 1e-9 ? " (a circle)" : "");
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [M, m]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["ellipse-area-perimeter"] = _v1314renderEllipseAreaPerimeter;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {

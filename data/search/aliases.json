@@ -37959,6 +37959,46 @@
    "kind": "question"
   },
   {
+   "term": "ellipse area",
+   "target": "ellipse-area-perimeter",
+   "kind": "industry"
+  },
+  {
+   "term": "ellipse perimeter",
+   "target": "ellipse-area-perimeter",
+   "kind": "industry"
+  },
+  {
+   "term": "oval area perimeter",
+   "target": "ellipse-area-perimeter",
+   "kind": "industry"
+  },
+  {
+   "term": "elliptical bed area",
+   "target": "ellipse-area-perimeter",
+   "kind": "adjacent"
+  },
+  {
+   "term": "ramanujan ellipse",
+   "target": "ellipse-area-perimeter",
+   "kind": "adjacent"
+  },
+  {
+   "term": "running track lane length",
+   "target": "ellipse-area-perimeter",
+   "kind": "adjacent"
+  },
+  {
+   "term": "area of an oval",
+   "target": "ellipse-area-perimeter",
+   "kind": "question"
+  },
+  {
+   "term": "perimeter of an ellipse",
+   "target": "ellipse-area-perimeter",
+   "kind": "question"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"

@@ -88365,6 +88365,66 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "ellipse-area-perimeter",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "10 x 6 oval",
+   "source_edition_or_year": "geometry / Ramanujan 1914",
+   "source_section_or_page": "area pi a b; Ramanujan perimeter",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "major_axis": 10,
+    "minor_axis": 6
+   },
+   "outputs": {
+    "area": {
+     "value": 47.1239,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "perimeter": {
+     "value": 25.527,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "eccentricity": {
+     "value": 0.8,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ellipse-area-perimeter",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Equal axes collapse to a circle",
+   "source_edition_or_year": "geometry / Ramanujan 1914",
+   "source_section_or_page": "area pi a b; Ramanujan perimeter",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "major_axis": 8,
+    "minor_axis": 8
+   },
+   "outputs": {
+    "area": {
+     "value": 50.2655,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "perimeter": {
+     "value": 25.1327,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

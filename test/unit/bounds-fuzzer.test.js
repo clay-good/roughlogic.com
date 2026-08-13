@@ -38259,3 +38259,25 @@ test("bounds: spec-v1313 computeRegularPolygon pins the hexagon/octagon geometry
   assert.ok("error" in _v1313({ num_sides: 6, side_length: 0 }));
   assert.ok("error" in _v1313({ num_sides: 6, side_length: Infinity }));
 });
+
+import { computeEllipseAreaPerimeter as _v1314 } from "../../calc-shop.js";
+test("bounds: spec-v1314 computeEllipseAreaPerimeter pins the area, Ramanujan perimeter, eccentricity, the circle collapse, and error seams", () => {
+  // 10 x 6: area 47.12, perimeter 25.53, e 0.8, a 5, b 3.
+  const r = _v1314({ major_axis: 10, minor_axis: 6 });
+  assert.ok(Math.abs(r.area - 47.1239) < 1e-3 && Math.abs(r.perimeter - 25.527) < 1e-2);
+  assert.ok(Math.abs(r.eccentricity - 0.8) < 1e-4 && r.semi_major === 5 && r.semi_minor === 3);
+  // Area is exactly pi * a * b.
+  assert.ok(Math.abs(r.area - Math.PI * 5 * 3) < 1e-9);
+  // Equal axes collapse to a circle: area pi r^2, perimeter 2 pi r, eccentricity 0.
+  const circle = _v1314({ major_axis: 8, minor_axis: 8 });
+  assert.ok(Math.abs(circle.area - Math.PI * 16) < 1e-9 && Math.abs(circle.perimeter - 2 * Math.PI * 4) < 1e-9 && circle.eccentricity < 1e-9);
+  // Area scales with the product of the axes (doubling both quadruples the area).
+  assert.ok(Math.abs(_v1314({ major_axis: 20, minor_axis: 12 }).area / r.area - 4) < 1e-9);
+  // Orientation-independent: swapping major and minor gives the same area and perimeter.
+  const swap = _v1314({ major_axis: 6, minor_axis: 10 });
+  assert.ok(Math.abs(swap.area - r.area) < 1e-9 && Math.abs(swap.perimeter - r.perimeter) < 1e-9);
+  // Error seams: non-positive major or minor, non-finite.
+  assert.ok("error" in _v1314({ major_axis: 0, minor_axis: 6 }));
+  assert.ok("error" in _v1314({ major_axis: 10, minor_axis: 0 }));
+  assert.ok("error" in _v1314({ major_axis: Infinity, minor_axis: 6 }));
+});

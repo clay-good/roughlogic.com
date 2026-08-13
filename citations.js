@@ -11695,6 +11695,18 @@ export const CITATIONS = {
       { name: "Scope", value: "regular convex polygons; irregular shapes, miter, and bolt patterns are separate", source: "scope of this tile" },
     ],
   },
+  "ellipse-area-perimeter": {
+    formula: "a = major/2, b = minor/2; area = pi a b (exact); perimeter ~= pi[3(a+b) - sqrt((3a+b)(a+3b))] (Ramanujan); eccentricity = sqrt(1 - (b/a)^2).",
+    edition: "The ellipse area pi a b and Ramanujan's perimeter approximation pi[3(a+b) - sqrt((3a+b)(a+3b))] (standard geometry; Ramanujan 1914), by name; public domain.",
+    freeAccess: "Pure plane geometry, public; the major and minor axes are user-supplied measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "Area and perimeter of an ellipse from the full major (long) and minor (short) axis lengths, with the semi-axes a = major/2 and b = minor/2. The area is exact, pi a b; the perimeter has no elementary closed form, so this uses Ramanujan's approximation pi[3(a+b) - sqrt((3a+b)(a+3b))], which is within a few parts per million for any ordinary oval. The eccentricity sqrt(1 - (b/a)^2) (with a the larger semi-axis) measures how far from round it is. When the two axes are equal the ellipse is a circle: the area becomes pi r^2 and the perimeter 2 pi r. Use it for an elliptical bed or border, a running-track lane, an oval tabletop or arch, or an elliptical head footprint. A partial (segment) area, an elliptical tank's partial-fill volume, and a true elliptic-integral perimeter are separate. Plane figure only. A shop and layout aid; verify critical dimensions on the work.",
+    assumptions: [
+      { name: "Area exact", value: "area = pi a b, a and b the semi-axes", source: "plane geometry" },
+      { name: "Ramanujan perimeter", value: "pi[3(a+b) - sqrt((3a+b)(a+3b))], a few ppm for ordinary ovals; not exact", source: "Ramanujan 1914" },
+      { name: "Circle limit", value: "equal axes give a circle (pi r^2, 2 pi r)", source: "geometry" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",
