@@ -11743,6 +11743,18 @@ export const CITATIONS = {
       { name: "Scope", value: "right rectangular frustum; round frustum is separate, as are oblique pyramids", source: "scope of this tile" },
     ],
   },
+  "torus-volume": {
+    formula: "R = Dc/2, r = dt/2; V = 2 pi^2 R r^2; surface area = 4 pi^2 R r. Requires dt <= Dc.",
+    edition: "The torus volume V = 2 pi^2 R r^2 and surface area 4 pi^2 R r (Pappus's theorem; standard solid geometry as in Machinery's Handbook, Industrial Press), by name; public domain.",
+    freeAccess: "Pure solid geometry, public; the centerline and tube diameters are user-supplied measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "Volume and surface area of a ring (doughnut) torus of circular cross-section - an O-ring, an inner tube or toroidal float, a doughnut-shaped tank, or a coil of tubing - by Pappus's theorem: V = 2 pi^2 R r^2 and surface area = 4 pi^2 R r, with the ring centerline radius R = Dc/2 (through the middle of the tube all the way around) and the tube radius r = dt/2. The volume is the tube cross-section pi r^2 swept around the ring path of circumference 2 pi R; the surface is the tube circumference 2 pi r swept the same way. The tube must be no fatter than the ring (dt <= Dc) or the doughnut closes its hole (a horn or spindle torus). Volume is reported in cubic inches, cubic feet, and US gallons. A partial fill of a toroidal tank, an elliptical or square tube cross-section, and wall thickness are separate. A takeoff aid; verify against the drawing.",
+    assumptions: [
+      { name: "Pappus", value: "V = 2 pi^2 R r^2, SA = 4 pi^2 R r (cross-section swept around the ring path)", source: "Pappus's theorem" },
+      { name: "Ring torus", value: "tube no fatter than the ring (dt <= Dc); otherwise horn/spindle torus", source: "geometry" },
+      { name: "Scope", value: "circular tube, full torus; partial fill, non-circular tube, wall thickness are separate", source: "scope of this tile" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",

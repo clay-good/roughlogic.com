@@ -38346,3 +38346,23 @@ test("bounds: spec-v1317 computePyramidFrustumVolume pins the prismatoid volume,
   assert.ok("error" in _v1317({ bottom_length_ft: 6, bottom_width_ft: 6, top_length_ft: 2, top_width_ft: 2, height_ft: 0 }));
   assert.ok("error" in _v1317({ bottom_length_ft: Infinity, bottom_width_ft: 6, top_length_ft: 2, top_width_ft: 2, height_ft: 4 }));
 });
+
+import { computeTorusVolume as _v1318 } from "../../calc-shop.js";
+test("bounds: spec-v1318 computeTorusVolume pins the Pappus volume/surface, the scalings, and error seams", () => {
+  // Dc 12, dt 2: V 118.4 in^3, SA 236.9 in^2.
+  const r = _v1318({ center_diameter_in: 12, tube_diameter_in: 2 });
+  assert.ok(Math.abs(r.volume_in3 - 118.435) < 1e-2 && Math.abs(r.surface_area_in2 - 236.87) < 1e-2);
+  assert.ok(Math.abs(r.volume_gal - r.volume_in3 / 231) < 1e-9);
+  // Volume = 2 pi^2 R r^2 exactly.
+  assert.ok(Math.abs(r.volume_in3 - 2 * Math.PI * Math.PI * 6 * 1 * 1) < 1e-9);
+  // Volume scales linearly with ring diameter and with the square of the tube diameter.
+  assert.ok(Math.abs(_v1318({ center_diameter_in: 24, tube_diameter_in: 2 }).volume_in3 / r.volume_in3 - 2) < 1e-9);
+  assert.ok(Math.abs(_v1318({ center_diameter_in: 12, tube_diameter_in: 4 }).volume_in3 / r.volume_in3 - 4) < 1e-6);
+  // Surface area scales linearly with both diameters.
+  assert.ok(Math.abs(_v1318({ center_diameter_in: 12, tube_diameter_in: 4 }).surface_area_in2 / r.surface_area_in2 - 2) < 1e-6);
+  // Error seams: non-positive center/tube diameter, tube exceeding the ring, non-finite.
+  assert.ok("error" in _v1318({ center_diameter_in: 0, tube_diameter_in: 2 }));
+  assert.ok("error" in _v1318({ center_diameter_in: 12, tube_diameter_in: 0 }));
+  assert.ok("error" in _v1318({ center_diameter_in: 12, tube_diameter_in: 14 }));
+  assert.ok("error" in _v1318({ center_diameter_in: Infinity, tube_diameter_in: 2 }));
+});

@@ -88587,6 +88587,60 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "torus-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "12 in ring, 2 in tube",
+   "source_edition_or_year": "Pappus / solid geometry",
+   "source_section_or_page": "V=2 pi^2 R r^2",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "center_diameter_in": 12,
+    "tube_diameter_in": 2
+   },
+   "outputs": {
+    "volume_in3": {
+     "value": 118.435,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "surface_area_in2": {
+     "value": 236.87,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "torus-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "36 in ring, 6 in tube",
+   "source_edition_or_year": "Pappus / solid geometry",
+   "source_section_or_page": "V=2 pi^2 R r^2",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "center_diameter_in": 36,
+    "tube_diameter_in": 6
+   },
+   "outputs": {
+    "volume_in3": {
+     "value": 3197.752,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "volume_gal": {
+     "value": 13.843,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
   }
  ]
 }

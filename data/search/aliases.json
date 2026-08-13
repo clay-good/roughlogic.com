@@ -38119,6 +38119,51 @@
    "kind": "question"
   },
   {
+   "term": "torus volume",
+   "target": "torus-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "doughnut volume",
+   "target": "torus-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "o-ring volume",
+   "target": "torus-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "torus surface area",
+   "target": "torus-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "toroidal tank volume",
+   "target": "torus-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "inner tube volume",
+   "target": "torus-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "pappus theorem torus",
+   "target": "torus-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "volume of a doughnut",
+   "target": "torus-volume",
+   "kind": "question"
+  },
+  {
+   "term": "o ring material volume",
+   "target": "torus-volume",
+   "kind": "question"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"

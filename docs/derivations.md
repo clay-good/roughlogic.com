@@ -3092,6 +3092,7 @@ cross-check.
 | calc-shop.js | `computeThreadMeasureWire` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, pitch_diameter_in = 0, wir...` | _ | _ | _ |
 | calc-shop.js | `computeThreadPitchDiaFromWires` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, measurement_over_wires_in ...` | _ | _ | _ |
 | calc-shop.js | `computeToleranceStackRss` | `{ nominal_gap_in = 0, tolerances = "" } = {}` | _ | _ | _ |
+| calc-shop.js | `computeTorusVolume` | `{ center_diameter_in = 0, tube_diameter_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeTurningSurfaceFinish` | `{ feed_ipr_in = 0, nose_radius_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeWeldDutyCycle` | `{ rated_amps = 0, rated_duty_pct = 0, target_amps = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computeBatteryCRate` | `{ nameplate_kwh = 0, c_rate = 0.5, dod = 0.90, inverter_kw = 0 } = {}` | _ | _ | _ |
@@ -3355,7 +3356,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1941.
+Row count: 1942.
 
 <!-- END function-corpus-v14 -->
 
@@ -4519,7 +4520,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (80 tiles)
+### Group G Cross-trade (81 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4593,6 +4594,7 @@ per spec-v14 §13.1 second paragraph.
 | `timesheet` | Daily Multi-Job Timesheet | Project (first-principles) over IRS s...; Five jobs / 47.5 total hours / 40 reg + 7.5 OT / $25 rate... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tip-out` | Tip Out | Project (first-principles); $600 pool, 8/4/4 hours -> 16 total hours, 50% / 25% / 25%... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tolerance-stack-rss` | Tolerance Stack-Up: Worst-Case and RSS | mechanical design / GD&T; spec-v399 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `torus-volume` | Torus (Doughnut) Volume and Surface Area | Project (first-principles); V=2 pi^2 R r^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trench-slope` | OSHA Trench Sloping | OSHA; Type A 0.75:1; Type B 1:1; Type C 1.5:1 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `triangle-asa` | Triangle Solver (Two Angles and the Included Side) | Project (first-principles); law of sines | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `triangle-sas` | Triangle Solver (Two Sides and the Included Angle) | Project (first-principles); law of cosines | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5218,6 +5220,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1690. Fixture-covered or reference-cadence: 1690 / 1690.
+Tile count: 1691. Fixture-covered or reference-cadence: 1691 / 1691.
 
 <!-- END tile-index-v14 -->

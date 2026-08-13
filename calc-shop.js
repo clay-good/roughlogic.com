@@ -1544,6 +1544,49 @@ function _v1317renderPyramidFrustumVolume(inputRegion, outputRegion, citationEl)
 }
 SHOP_RENDERERS["pyramid-frustum-volume"] = _v1317renderPyramidFrustumVolume;
 
+// spec-v1318: torus (doughnut) volume and surface area. Catalog has cylinder/cone/frustum/pyramid/sphere but no
+// torus - an O-ring, inner tube/float, doughnut tank, or coil of tubing. Pappus: V = 2 pi^2 R r^2, SA = 4 pi^2 R r,
+// R = Dc/2 (ring centerline radius), r = dt/2 (tube radius). Tube must be no fatter than the ring (dt <= Dc).
+// dims: in { center_diameter_in: L, tube_diameter_in: L } out: { volume_in3: L^3, volume_ft3: L^3, volume_gal: L^3, surface_area_in2: L^2 }
+export function computeTorusVolume({ center_diameter_in = 0, tube_diameter_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Dc = Number(center_diameter_in) || 0;
+  const dt = Number(tube_diameter_in) || 0;
+  if (!(Dc > 0)) return { error: "Ring centerline diameter must be positive (in)." };
+  if (!(dt > 0)) return { error: "Tube diameter must be positive (in)." };
+  if (!(dt <= Dc)) return { error: "Tube diameter cannot exceed the ring centerline diameter (the doughnut would close its hole)." };
+  const R = Dc / 2, r = dt / 2;
+  const volume_in3 = 2 * Math.PI * Math.PI * R * r * r;
+  const volume_ft3 = volume_in3 / 1728;
+  const volume_gal = volume_in3 / 231;
+  const surface_area_in2 = 4 * Math.PI * Math.PI * R * r;
+  if (![volume_in3, surface_area_in2].every(Number.isFinite) || !(volume_in3 > 0)) return { error: "Torus math is not a finite value; check the inputs." };
+  return {
+    volume_in3, volume_ft3, volume_gal, surface_area_in2,
+    note: "Volume and surface area of a ring (doughnut) torus of circular cross-section - an O-ring, an inner tube or toroidal float, a doughnut-shaped tank, or a coil of tubing - by Pappus's theorem: V = 2 pi^2 R r^2 and surface area = 4 pi^2 R r, with the ring centerline radius R = Dc/2 (through the middle of the tube all the way around) and the tube radius r = dt/2. The volume is the tube cross-section pi r^2 swept around the ring path of circumference 2 pi R; the surface is the tube circumference 2 pi r swept the same way. The tube must be no fatter than the ring (dt <= Dc) or the doughnut closes its hole (a horn or spindle torus). Volume is reported in cubic inches, cubic feet, and US gallons. A partial fill of a toroidal tank, an elliptical or square tube cross-section, and wall thickness are separate. A takeoff aid; verify against the drawing.",
+  };
+}
+export const torusVolumeExample = { inputs: { center_diameter_in: 12, tube_diameter_in: 2 } };
+function _v1318renderTorusVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: torus volume V = 2 pi^2 R r^2 and surface area 4 pi^2 R r (Pappus's theorem; standard solid geometry; Machinery's Handbook), R = Dc/2 (ring centerline radius), r = dt/2 (tube radius). A takeoff aid; verify against the drawing.";
+  const Dc = makeNumber("Ring centerline diameter Dc (in)", "trv-dc", { step: "any", min: "0" }); Dc.input.value = "12";
+  const dt = makeNumber("Tube diameter dt (in)", "trv-dt", { step: "any", min: "0" }); dt.input.value = "2";
+  for (const f of [Dc, dt]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { Dc.input.value = "12"; dt.input.value = "2"; update(); });
+  const oV = makeOutputLine(outputRegion, "Volume", "trv-out-v");
+  const oS = makeOutputLine(outputRegion, "Surface area", "trv-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "trv-out-n");
+  const update = debounce(() => {
+    const res = computeTorusVolume({ center_diameter_in: Number(Dc.input.value) || 0, tube_diameter_in: Number(dt.input.value) || 0 });
+    if (res.error) { oV.textContent = res.error; oS.textContent = "-"; oNote.textContent = ""; return; }
+    oV.textContent = fmt(res.volume_in3, 3) + " in^3 (" + fmt(res.volume_ft3, 4) + " ft^3, " + fmt(res.volume_gal, 3) + " gal)";
+    oS.textContent = fmt(res.surface_area_in2, 2) + " in^2";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [Dc, dt]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["torus-volume"] = _v1318renderTorusVolume;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {
