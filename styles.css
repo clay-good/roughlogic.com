@@ -479,6 +479,11 @@ main {
   letter-spacing: -0.015em;
   margin: 0 0 var(--space-2);
   color: var(--fg);
+  /* A tile title may carry a long unbreakable slash-joined token (e.g.
+     "(Goodman/Soderberg/Gerber)") whose intrinsic width sets the block's
+     min-content size and pushes the view-region past a 320 px viewport on
+     CI's wider-metric Linux WebKit; let it break anywhere, same as .view-desc. */
+  overflow-wrap: anywhere;
 }
 
 .view-desc {
