@@ -88875,6 +88875,56 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "spherical-zone-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Spherical zone r1 4 ft, r2 3 ft, h 2 ft",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "prismatoid rule V=(pi h/6)(3r1^2+3r2^2+h^2)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "base_radius_1_ft": 4,
+    "base_radius_2_ft": 3,
+    "zone_height_ft": 2
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 82.7286,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "volume_gal": {
+     "value": 618.85,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spherical-zone-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Top base zero reduces to the spherical cap (R 5 ft, h 3 ft)",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "r1 = sqrt(2Rh - h^2) = sqrt(21)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "base_radius_1_ft": 4.58257569,
+    "base_radius_2_ft": 0,
+    "zone_height_ft": 3
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 113.0973,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

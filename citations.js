@@ -11802,6 +11802,17 @@ export const CITATIONS = {
       { name: "Scope", value: "2:1 elliptical or hemispherical heads; flat heads are the tank-volume tile, torispherical is a close approximation", source: "scope of this tile" },
     ],
   },
+  "spherical-zone-volume": {
+    formula: "V = (pi h/6)(3 r1^2 + 3 r2^2 + h^2), r1/r2 the two circular face radii and h the perpendicular distance between the planes (prismatoid rule); one base zero gives the spherical cap.",
+    edition: "The spherical zone (segment of two bases) volume by the prismatoid rule - standard solid geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure solid geometry, public; the two face radii and the zone height are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Volume of a spherical zone - the slice of a sphere between two parallel planes (a spherical segment of two bases), the band a spherical cap alone cannot give: V = (pi h/6)(3 r1^2 + 3 r2^2 + h^2), with r1 and r2 the radii of the two flat circular faces and h the perpendicular distance between them. It is the prismatoid rule, so it needs only the two face radii and the height, not the parent sphere's radius. Use it for the liquid between two levels in a spherical tank (the incremental volume from one dipstick reading to the next), a spherical band, or a dome zone. When one base is zero it collapses to the spherical cap (the spherical-cap-volume tile). Reported in cubic feet and US gallons. The lateral zone surface 2 pi R h needs the sphere radius and is separate, as is an ellipsoidal or off-axis zone. A takeoff aid; verify against the tank chart or drawing.",
+    assumptions: [
+      { name: "Zone volume", value: "V = (pi h/6)(3 r1^2 + 3 r2^2 + h^2), the prismatoid rule (no sphere radius needed)", source: "solid geometry" },
+      { name: "Scope", value: "one base zero is the spherical cap; the lateral surface and an off-axis/ellipsoidal zone are separate", source: "scope of this tile" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",

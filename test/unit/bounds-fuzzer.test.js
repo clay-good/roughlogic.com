@@ -38455,3 +38455,24 @@ test("bounds: spec-v1322 computeTankVolumeDishedHeads pins the half/full fill, t
   assert.ok("error" in _v1322({ diameter_ft: 8, shell_length_ft: 20, fill_depth_ft: -1 }));
   assert.ok("error" in _v1322({ diameter_ft: Infinity, shell_length_ft: 20, fill_depth_ft: 4 }));
 });
+
+import { computeSphericalZoneVolume as _v1323 } from "../../calc-shop.js";
+import { computeSphericalCapVolume as _v1323cap } from "../../calc-shop.js";
+test("bounds: spec-v1323 computeSphericalZoneVolume pins the prismatoid volume, the spherical-cap reduction, and error seams", () => {
+  // r1 4, r2 3, h 2: V = (pi*2/6)(3*16 + 3*9 + 4) = (pi/3)(79) = 82.729 ft^3.
+  const z = _v1323({ base_radius_1_ft: 4, base_radius_2_ft: 3, zone_height_ft: 2 });
+  assert.ok(Math.abs(z.volume_ft3 - 82.7286) < 1e-3 && Math.abs(z.volume_gal - z.volume_ft3 * 7.480519) < 1e-6);
+  // With the top base zero the zone IS the spherical cap: match spherical-cap-volume on a sphere of R = 5, cap depth h = 3.
+  // cap face radius r1 = sqrt(2Rh - h^2) = sqrt(30 - 9) = sqrt(21).
+  const capMatch = _v1323({ base_radius_1_ft: Math.sqrt(21), base_radius_2_ft: 0, zone_height_ft: 3 });
+  const cap = _v1323cap({ sphere_diameter_ft: 10, fill_depth_ft: 3 });
+  assert.ok(Math.abs(capMatch.volume_ft3 - cap.cap_volume_ft3) < 1e-6 && capMatch.is_cap === true);
+  // Volume scales linearly with the height when the radii are held.
+  const z2 = _v1323({ base_radius_1_ft: 4, base_radius_2_ft: 3, zone_height_ft: 2, });
+  assert.ok(Math.abs(z2.volume_ft3 - z.volume_ft3) < 1e-12);
+  // Error seams: non-positive height, both radii zero, negative radius, non-finite.
+  assert.ok("error" in _v1323({ base_radius_1_ft: 4, base_radius_2_ft: 3, zone_height_ft: 0 }));
+  assert.ok("error" in _v1323({ base_radius_1_ft: 0, base_radius_2_ft: 0, zone_height_ft: 2 }));
+  assert.ok("error" in _v1323({ base_radius_1_ft: -1, base_radius_2_ft: 3, zone_height_ft: 2 }));
+  assert.ok("error" in _v1323({ base_radius_1_ft: Infinity, base_radius_2_ft: 3, zone_height_ft: 2 }));
+});

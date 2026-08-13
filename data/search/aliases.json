@@ -38319,6 +38319,31 @@
    "kind": "question"
   },
   {
+   "term": "spherical zone volume",
+   "target": "spherical-zone-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "spherical segment of two bases",
+   "target": "spherical-zone-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "volume of a sphere slice between two planes",
+   "target": "spherical-zone-volume",
+   "kind": "question"
+  },
+  {
+   "term": "spherical tank volume between two levels",
+   "target": "spherical-zone-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "spherical band volume",
+   "target": "spherical-zone-volume",
+   "kind": "adjacent"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"

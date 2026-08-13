@@ -1792,6 +1792,48 @@ function _v1322renderTankVolumeDishedHeads(inputRegion, outputRegion, citationEl
 }
 SHOP_RENDERERS["tank-volume-dished-heads"] = _v1322renderTankVolumeDishedHeads;
 
+// spec-v1323: spherical zone (segment of two bases) volume - the slice of a sphere between two parallel planes, the
+// gap the spherical-cap note flags ("a spherical zone between two levels ... are separate"). By the prismatoid rule
+// V = (pi h/6)(3 r1^2 + 3 r2^2 + h^2), with r1, r2 the two circular face radii and h the perpendicular distance
+// between them - needs no sphere radius. When the top base r2 = 0 it is the spherical cap.
+// dims: in { base_radius_1_ft: L, base_radius_2_ft: L, zone_height_ft: L } out: { volume_ft3: L^3, volume_gal: L^3 }
+export function computeSphericalZoneVolume({ base_radius_1_ft = 0, base_radius_2_ft = 0, zone_height_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const r1 = Number(base_radius_1_ft) || 0;
+  const r2 = Number(base_radius_2_ft) || 0;
+  const h = Number(zone_height_ft) || 0;
+  if (r1 < 0 || r2 < 0) return { error: "Base radii cannot be negative (ft)." };
+  if (!(h > 0)) return { error: "Zone height must be positive (ft)." };
+  if (!(r1 > 0 || r2 > 0)) return { error: "At least one base radius must be positive (ft)." };
+  const volume_ft3 = (Math.PI * h / 6) * (3 * r1 * r1 + 3 * r2 * r2 + h * h);
+  const volume_gal = volume_ft3 * 7.480519;
+  if (![volume_ft3, volume_gal].every(Number.isFinite) || !(volume_ft3 > 0)) return { error: "Spherical-zone math is not a finite value; check the inputs." };
+  const is_cap = r1 === 0 || r2 === 0;
+  return {
+    volume_ft3, volume_gal, is_cap,
+    note: "Volume of a spherical zone - the slice of a sphere between two parallel planes (a spherical segment of two bases), the band a spherical-cap alone cannot give: V = (pi h/6)(3 r1^2 + 3 r2^2 + h^2), with r1 and r2 the radii of the two flat circular faces and h the perpendicular distance between them. It is the prismatoid rule, so it needs only the two face radii and the height - not the parent sphere's radius. Use it for the liquid between two levels in a spherical tank (the incremental volume from one dipstick reading to the next), a barrel-shaped spherical band, or a dome zone. When one base is zero it collapses to the spherical cap (the spherical-cap-volume tile); a full sphere is the two-base zone with both faces at the equator taken as caps. Reported in cubic feet and US gallons. The lateral (zone) surface 2 pi R h needs the sphere radius and is separate, as is an ellipsoidal or off-axis zone. A takeoff aid; verify against the tank chart or drawing.",
+  };
+}
+export const sphericalZoneVolumeExample = { inputs: { base_radius_1_ft: 4, base_radius_2_ft: 3, zone_height_ft: 2 } };
+function _v1323renderSphericalZoneVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: spherical zone (segment of two bases) volume V = (pi h/6)(3 r1^2 + 3 r2^2 + h^2) by the prismatoid rule (standard solid geometry; Machinery's Handbook), r1/r2 the face radii and h the height between the planes; needs no sphere radius. One base zero gives the spherical cap. A takeoff aid; verify against the tank chart or drawing.";
+  const r1 = makeNumber("Lower base radius r1 (ft)", "spz-r1", { step: "any", min: "0" }); r1.input.value = "4";
+  const r2 = makeNumber("Upper base radius r2 (ft)", "spz-r2", { step: "any", min: "0" }); r2.input.value = "3";
+  const h = makeNumber("Zone height h, between the planes (ft)", "spz-h", { step: "any", min: "0" }); h.input.value = "2";
+  for (const f of [r1, r2, h]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { r1.input.value = "4"; r2.input.value = "3"; h.input.value = "2"; update(); });
+  const oV = makeOutputLine(outputRegion, "Zone volume", "spz-out-v");
+  const oNote = makeOutputLine(outputRegion, "Note", "spz-out-n");
+  const update = debounce(() => {
+    const res = computeSphericalZoneVolume({ base_radius_1_ft: Number(r1.input.value) || 0, base_radius_2_ft: Number(r2.input.value) || 0, zone_height_ft: Number(h.input.value) || 0 });
+    if (res.error) { oV.textContent = res.error; oNote.textContent = ""; return; }
+    oV.textContent = fmt(res.volume_ft3, 3) + " ft^3 (" + fmt(res.volume_gal, 1) + " gal)" + (res.is_cap ? " - a spherical cap (one base is zero)" : "");
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [r1, r2, h]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["spherical-zone-volume"] = _v1323renderSphericalZoneVolume;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {
