@@ -88425,6 +88425,66 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "spherical-cap-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Spherical tank partial fill",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "V=(pi h^2/3)(3R-h)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "sphere_diameter_ft": 10,
+    "fill_depth_ft": 3
+   },
+   "outputs": {
+    "cap_volume_ft3": {
+     "value": 113.097,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cap_volume_gal": {
+     "value": 846.0,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "percent_full": {
+     "value": 21.6,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spherical-cap-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Hemisphere is exactly half",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "V=(pi h^2/3)(3R-h)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "sphere_diameter_ft": 10,
+    "fill_depth_ft": 5
+   },
+   "outputs": {
+    "percent_full": {
+     "value": 50.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cap_volume_ft3": {
+     "value": 261.799,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

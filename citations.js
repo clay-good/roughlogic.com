@@ -11707,6 +11707,18 @@ export const CITATIONS = {
       { name: "Circle limit", value: "equal axes give a circle (pi r^2, 2 pi r)", source: "geometry" },
     ],
   },
+  "spherical-cap-volume": {
+    formula: "R = D/2; V_cap = (pi h^2/3)(3R - h); V_full = (4/3) pi R^3; percent full = V_cap/V_full. h=R hemisphere, h=D full sphere.",
+    edition: "The spherical-cap volume V = (pi h^2/3)(3R - h) and the full-sphere volume (4/3) pi R^3 - standard solid geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure solid geometry, public; the sphere diameter and fill depth are user-supplied measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "Volume of a spherical cap - the partial fill of a spherical tank, the volume of a dome or a dished tank bottom, or a hemispherical vessel: V = (pi h^2/3)(3R - h) for a fill depth h measured from the bottom of the sphere up to the liquid line (or the height of a dome), with R = D/2. The full sphere is (4/3) pi R^3. At h = R the cap is a hemisphere (exactly half the sphere); at h = D it is the full sphere. A sphere is narrow near the bottom, so a shallow fill holds far less than a straight-sided estimate - 3 ft in a 10 ft sphere is 21.6% full, not 30% - which is why a spherical or dished-bottom tank needs this formula. Reported in cubic feet and US gallons for a dipstick or a takeoff. A spherical zone between two levels, an ellipsoidal (2:1) tank head, and the surface area are separate. A takeoff / dipstick aid; verify against the tank chart or drawing.",
+    assumptions: [
+      { name: "Cap volume", value: "V = (pi h^2/3)(3R - h); h from the bottom of the sphere", source: "solid geometry" },
+      { name: "Limits", value: "h = R is a hemisphere (half), h = D the full sphere (4/3 pi R^3)", source: "solid geometry" },
+      { name: "Scope", value: "cap only; spherical zone, ellipsoidal head, and surface area are separate", source: "scope of this tile" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",

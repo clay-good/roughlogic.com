@@ -37999,6 +37999,51 @@
    "kind": "question"
   },
   {
+   "term": "spherical cap volume",
+   "target": "spherical-cap-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "sphere partial volume",
+   "target": "spherical-cap-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "dome volume",
+   "target": "spherical-cap-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "spherical tank dipstick",
+   "target": "spherical-cap-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "dished tank bottom volume",
+   "target": "spherical-cap-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "hemisphere volume",
+   "target": "spherical-cap-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "partial fill sphere",
+   "target": "spherical-cap-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "how much liquid in a spherical tank",
+   "target": "spherical-cap-volume",
+   "kind": "question"
+  },
+  {
+   "term": "volume of a dome",
+   "target": "spherical-cap-volume",
+   "kind": "question"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"

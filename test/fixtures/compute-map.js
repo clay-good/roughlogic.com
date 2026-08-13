@@ -806,6 +806,7 @@ export const COMPUTE_MAP = {
   "frustum-volume": { module: "../../calc-shop.js", fn: "computeFrustumVolume" },
   "regular-polygon": { module: "../../calc-shop.js", fn: "computeRegularPolygon" },
   "ellipse-area-perimeter": { module: "../../calc-shop.js", fn: "computeEllipseAreaPerimeter" },
+  "spherical-cap-volume": { module: "../../calc-shop.js", fn: "computeSphericalCapVolume" },
   "spur-gear-geometry": { module: "../../calc-machining.js", fn: "computeSpurGearGeometry" },
   "worm-gear-geometry": { module: "../../calc-machining.js", fn: "computeWormGearGeometry" },
   "gear-undercut-backlash": { module: "../../calc-machining.js", fn: "computeGearUndercutBacklash" },

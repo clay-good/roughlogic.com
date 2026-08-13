@@ -1407,6 +1407,50 @@ function _v1314renderEllipseAreaPerimeter(inputRegion, outputRegion, citationEl)
 }
 SHOP_RENDERERS["ellipse-area-perimeter"] = _v1314renderEllipseAreaPerimeter;
 
+// spec-v1315: spherical cap / dome / partial-fill volume. Catalog has cylinder/cone/frustum but no sphere.
+// V_cap = (pi h^2/3)(3R - h) for a fill depth h up from the bottom; V_full = (4/3) pi R^3. h=R is a hemisphere,
+// h=D the full sphere. Reported in ft^3 and gallons for a dipstick/takeoff of a spherical or dished tank/dome.
+// dims: in { sphere_diameter_ft: L, fill_depth_ft: L } out: { cap_volume_ft3: L^3, cap_volume_gal: L^3, full_sphere_ft3: L^3, percent_full: dimensionless }
+export function computeSphericalCapVolume({ sphere_diameter_ft = 0, fill_depth_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D = Number(sphere_diameter_ft) || 0;
+  const h = Number(fill_depth_ft) || 0;
+  if (!(D > 0)) return { error: "Sphere diameter must be positive (ft)." };
+  if (!(h > 0)) return { error: "Fill depth must be positive (ft)." };
+  if (!(h <= D)) return { error: "Fill depth cannot exceed the sphere diameter (ft)." };
+  const R = D / 2;
+  const cap_volume_ft3 = (Math.PI * h * h * (3 * R - h)) / 3;
+  const cap_volume_gal = cap_volume_ft3 * 7.480519;
+  const full_sphere_ft3 = (4 / 3) * Math.PI * R * R * R;
+  const percent_full = (cap_volume_ft3 / full_sphere_ft3) * 100;
+  if (![cap_volume_ft3, full_sphere_ft3, percent_full].every(Number.isFinite) || !(cap_volume_ft3 > 0)) return { error: "Spherical-cap math is not a finite value; check the inputs." };
+  const is_hemisphere = Math.abs(h - R) < 1e-9;
+  return {
+    cap_volume_ft3, cap_volume_gal, full_sphere_ft3, percent_full, is_hemisphere,
+    note: "Volume of a spherical cap - the partial fill of a spherical tank, the volume of a dome or a dished tank bottom, or a hemispherical vessel: V = (pi h^2/3)(3R - h) for a fill depth h measured from the bottom of the sphere up to the liquid line (or the height of a dome), with R = D/2. The full sphere is (4/3) pi R^3. At h = R the cap is a hemisphere (exactly half the sphere); at h = D it is the full sphere. A sphere is narrow near the bottom, so a shallow fill holds far less than a straight-sided estimate - 3 ft in a 10 ft sphere is 21.6% full, not 30% - which is why a spherical or dished-bottom tank needs this formula. Reported in cubic feet and US gallons for a dipstick or a takeoff. A spherical zone between two levels, an ellipsoidal (2:1) tank head, and the surface area are separate. A takeoff / dipstick aid; verify against the tank chart or drawing.",
+  };
+}
+export const sphericalCapVolumeExample = { inputs: { sphere_diameter_ft: 10, fill_depth_ft: 3 } };
+function _v1315renderSphericalCapVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: spherical cap volume V = (pi h^2/3)(3R - h) with the full sphere (4/3) pi R^3 (standard solid geometry; Machinery's Handbook). h = R is a hemisphere. A takeoff / dipstick aid; verify against the tank chart or drawing.";
+  const D = makeNumber("Sphere diameter D (ft)", "scv-d", { step: "any", min: "0" }); D.input.value = "10";
+  const h = makeNumber("Fill depth / cap height h (ft)", "scv-h", { step: "any", min: "0" }); h.input.value = "3";
+  for (const f of [D, h]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D.input.value = "10"; h.input.value = "3"; update(); });
+  const oV = makeOutputLine(outputRegion, "Cap / fill volume", "scv-out-v");
+  const oF = makeOutputLine(outputRegion, "Full sphere / percent full", "scv-out-f");
+  const oNote = makeOutputLine(outputRegion, "Note", "scv-out-n");
+  const update = debounce(() => {
+    const res = computeSphericalCapVolume({ sphere_diameter_ft: Number(D.input.value) || 0, fill_depth_ft: Number(h.input.value) || 0 });
+    if (res.error) { oV.textContent = res.error; oF.textContent = "-"; oNote.textContent = ""; return; }
+    oV.textContent = fmt(res.cap_volume_ft3, 3) + " ft^3 (" + fmt(res.cap_volume_gal, 1) + " gal)" + (res.is_hemisphere ? " - a hemisphere" : "");
+    oF.textContent = fmt(res.full_sphere_ft3, 3) + " ft^3 full, " + fmt(res.percent_full, 1) + "% full";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [D, h]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["spherical-cap-volume"] = _v1315renderSphericalCapVolume;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {

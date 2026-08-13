@@ -38281,3 +38281,25 @@ test("bounds: spec-v1314 computeEllipseAreaPerimeter pins the area, Ramanujan pe
   assert.ok("error" in _v1314({ major_axis: 10, minor_axis: 0 }));
   assert.ok("error" in _v1314({ major_axis: Infinity, minor_axis: 6 }));
 });
+
+import { computeSphericalCapVolume as _v1315 } from "../../calc-shop.js";
+test("bounds: spec-v1315 computeSphericalCapVolume pins the cap volume, hemisphere/full limits, the below-average shallow fill, and error seams", () => {
+  // D 10, h 3: cap 113.1 ft^3, 846 gal, 21.6% full.
+  const r = _v1315({ sphere_diameter_ft: 10, fill_depth_ft: 3 });
+  assert.ok(Math.abs(r.cap_volume_ft3 - 113.097) < 1e-2 && Math.abs(r.cap_volume_gal - 846) < 1 && Math.abs(r.percent_full - 21.6) < 0.1);
+  // A shallow fill holds less than the naive height-fraction guess (3/10 = 30%).
+  assert.ok(r.percent_full < 30);
+  // At h = R the cap is exactly a hemisphere (half the sphere).
+  const hemi = _v1315({ sphere_diameter_ft: 10, fill_depth_ft: 5 });
+  assert.ok(hemi.is_hemisphere === true && Math.abs(hemi.percent_full - 50) < 1e-9);
+  // At h = D the cap is the whole sphere.
+  const full = _v1315({ sphere_diameter_ft: 10, fill_depth_ft: 10 });
+  assert.ok(Math.abs(full.percent_full - 100) < 1e-9 && Math.abs(full.cap_volume_ft3 - full.full_sphere_ft3) < 1e-6);
+  // Full sphere volume is (4/3) pi R^3.
+  assert.ok(Math.abs(r.full_sphere_ft3 - (4 / 3) * Math.PI * 125) < 1e-6);
+  // Error seams: non-positive diameter/depth, depth exceeding diameter, non-finite.
+  assert.ok("error" in _v1315({ sphere_diameter_ft: 0, fill_depth_ft: 3 }));
+  assert.ok("error" in _v1315({ sphere_diameter_ft: 10, fill_depth_ft: 0 }));
+  assert.ok("error" in _v1315({ sphere_diameter_ft: 10, fill_depth_ft: 11 }));
+  assert.ok("error" in _v1315({ sphere_diameter_ft: Infinity, fill_depth_ft: 3 }));
+});

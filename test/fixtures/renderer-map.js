@@ -1177,6 +1177,7 @@ export const RENDERER_MAP = {
   "frustum-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "regular-polygon": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "ellipse-area-perimeter": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
+  "spherical-cap-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "press-fit-pressure": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "press-fit-interference-for-force": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "roller-chain-length": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
