@@ -38344,6 +38344,31 @@
    "kind": "adjacent"
   },
   {
+   "term": "cylindrical wedge volume",
+   "target": "cylindrical-wedge-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "cylindrical ungula volume",
+   "target": "cylindrical-wedge-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "volume of a cylinder cut by an angled plane",
+   "target": "cylindrical-wedge-volume",
+   "kind": "question"
+  },
+  {
+   "term": "mitered round pipe cut volume",
+   "target": "cylindrical-wedge-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "wedge of liquid in a tilted cylinder",
+   "target": "cylindrical-wedge-volume",
+   "kind": "adjacent"
+  },
+  {
    "term": "paraboloid volume",
    "target": "paraboloid-volume",
    "kind": "industry"

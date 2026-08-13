@@ -1187,6 +1187,7 @@ export const RENDERER_MAP = {
   "annulus-area": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "circular-sector": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "paraboloid-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
+  "cylindrical-wedge-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "tank-volume-dished-heads": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "spherical-zone-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "oval-tank-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },

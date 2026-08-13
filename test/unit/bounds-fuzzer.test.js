@@ -38500,6 +38500,28 @@ test("bounds: spec-v1329 computeParaboloidVolume pins the half-cylinder full vol
   assert.ok("error" in _v1329({ base_diameter_ft: Infinity, height_ft: 3, fill_depth_ft: 1 }));
 });
 
+import { computeCylindricalWedgeVolume as _v1330 } from "../../calc-shop.js";
+test("bounds: spec-v1330 computeCylindricalWedgeVolume pins the (2/3)R^2 H closed form, the 21.2% cylinder fraction, and error seams", () => {
+  // D 4 (R 2), H 3: V = (2/3)(4)(3) = 8 ft^3 exactly = D^2 H/6, and no pi.
+  const w = _v1330({ base_diameter_ft: 4, height_ft: 3 });
+  assert.ok(Math.abs(w.volume_ft3 - 8) < 1e-9 && Math.abs(w.volume_ft3 - 4 * 4 * 3 / 6) < 1e-9);
+  assert.ok(Math.abs(w.volume_gal - w.volume_ft3 * 7.480519) < 1e-6);
+  // The wedge is 2/(3 pi) = 21.22% of the full enclosing cylinder, for any D and H.
+  assert.ok(Math.abs(w.percent_of_cylinder - 200 / (3 * Math.PI)) < 1e-9);
+  const w2 = _v1330({ base_diameter_ft: 6, height_ft: 2 });
+  assert.ok(Math.abs(w2.volume_ft3 - 12) < 1e-9 && Math.abs(w2.percent_of_cylinder - 200 / (3 * Math.PI)) < 1e-9);
+  // Semicircular base area = pi R^2 / 2.
+  assert.ok(Math.abs(w.base_area_ft2 - 0.5 * Math.PI * 4) < 1e-9);
+  // Volume is linear in the height and quadratic in the diameter.
+  assert.ok(Math.abs(_v1330({ base_diameter_ft: 4, height_ft: 6 }).volume_ft3 - 2 * w.volume_ft3) < 1e-9);
+  assert.ok(Math.abs(_v1330({ base_diameter_ft: 8, height_ft: 3 }).volume_ft3 - 4 * w.volume_ft3) < 1e-9);
+  // Error seams: non-positive diameter/height, non-finite.
+  assert.ok("error" in _v1330({ base_diameter_ft: 0, height_ft: 3 }));
+  assert.ok("error" in _v1330({ base_diameter_ft: 4, height_ft: 0 }));
+  assert.ok("error" in _v1330({ base_diameter_ft: 4, height_ft: -1 }));
+  assert.ok("error" in _v1330({ base_diameter_ft: Infinity, height_ft: 3 }));
+});
+
 import { computeOvalTankVolume as _v1324 } from "../../calc-shop.js";
 test("bounds: spec-v1324 computeOvalTankVolume pins the 275-gal tank, the exact-half symmetry, the segment seams, clamping, and error seams", () => {
   // 27 x 44 x 60 in oval oil tank: 268 gal full (nominal 275).

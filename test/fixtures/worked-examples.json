@@ -88927,6 +88927,60 @@
    }
   },
   {
+   "tile_id": "cylindrical-wedge-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Cylindrical wedge (ungula) D 4 ft, H 3 ft",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "V=(2/3)R^2 H=D^2 H/6=8 ft^3; no pi",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "base_diameter_ft": 4,
+    "height_ft": 3
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 8.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "volume_gal": {
+     "value": 59.844,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cylindrical-wedge-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Wedge is 2/(3 pi) = 21.2% of the enclosing cylinder (D 6 ft, H 2 ft)",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "V=(2/3)(3^2)(2)=12 ft^3; cylinder pi(9)(2)=56.55",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "base_diameter_ft": 6,
+    "height_ft": 2
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 12.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "percent_of_cylinder": {
+     "value": 21.2207,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "paraboloid-volume",
    "source_publisher": "Project (first-principles)",
    "source_title": "Paraboloid dish D 4 ft, H 3 ft filled 1.5 ft from the apex",

@@ -816,6 +816,7 @@ export const COMPUTE_MAP = {
   "tank-volume-dished-heads": { module: "../../calc-shop.js", fn: "computeTankVolumeDishedHeads" },
   "spherical-zone-volume": { module: "../../calc-shop.js", fn: "computeSphericalZoneVolume" },
   "paraboloid-volume": { module: "../../calc-shop.js", fn: "computeParaboloidVolume" },
+  "cylindrical-wedge-volume": { module: "../../calc-shop.js", fn: "computeCylindricalWedgeVolume" },
   "oval-tank-volume": { module: "../../calc-shop.js", fn: "computeOvalTankVolume" },
   "cone-bottom-tank-volume": { module: "../../calc-shop.js", fn: "computeConeBottomTankVolume" },
   "tapered-tank-volume": { module: "../../calc-shop.js", fn: "computeTaperedTankVolume" },

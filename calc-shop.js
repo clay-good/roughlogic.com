@@ -2085,6 +2085,52 @@ function _v1329renderParaboloidVolume(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["paraboloid-volume"] = _v1329renderParaboloidVolume;
 
+// spec-v1330: cylindrical wedge (ungula) volume. The circular-sector tile names "a cylindrical-wedge volume is
+// separate"; this is that solid - a right circular cylinder sliced by a plane through a DIAMETER of the base, rising
+// to a height H at the far side (base is a semicircle). By integrating the sloping top z = (H/R) y over the
+// semicircle, V = (H/R) * (first moment 2R^3/3) = (2/3) R^2 H = D^2 H / 6. Uses: a mitered round pipe/duct end cut,
+// the wedge of liquid in a tilted horizontal cylinder just touching the bottom at one end, a cam or bar-stock wedge.
+// dims: in { base_diameter_ft: L, height_ft: L } out: { volume_ft3: L^3, volume_gal: L^3, base_area_ft2: L^2 }
+export function computeCylindricalWedgeVolume({ base_diameter_ft = 0, height_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const GAL_PER_FT3 = 7.480519;
+  const D = Number(base_diameter_ft) || 0;
+  const H = Number(height_ft) || 0;
+  if (!(D > 0)) return { error: "Base diameter must be positive." };
+  if (!(H > 0)) return { error: "Height (rise at the far side) must be positive." };
+  const R = D / 2;
+  const volume_ft3 = (2 / 3) * R * R * H; // = D^2 H / 6
+  const base_area_ft2 = 0.5 * Math.PI * R * R; // the semicircular base
+  const cylinder_ft3 = Math.PI * R * R * H; // the full enclosing cylinder, for the fraction
+  const percent_of_cylinder = cylinder_ft3 > 0 ? (volume_ft3 / cylinder_ft3) * 100 : 0;
+  if (![volume_ft3, base_area_ft2].every(Number.isFinite) || !(volume_ft3 > 0)) return { error: "Cylindrical-wedge math is not a finite value; check the inputs." };
+  return {
+    volume_ft3, volume_gal: volume_ft3 * GAL_PER_FT3,
+    base_area_ft2, percent_of_cylinder,
+    note: "Volume of a cylindrical wedge (an ungula) - the solid the circular-sector tile names as separate: a right circular cylinder of diameter D sliced by a plane through a DIAMETER of the base, rising to a height H at the far side, so the base is a semicircle. The volume is a clean V = (2/3) R^2 H = D^2 H/6, with NO pi in it (the pi from the circular base cancels against the integral of the sloping top). A D = 4 ft, H = 3 ft wedge holds (2/3)(2^2)(3) = 8.00 ft^3 (59.8 gal), which is 2/(3 pi) = 21.2% of the 37.70 ft^3 cylinder that boxes it. Use it for a mitered round pipe or duct end cut, the wedge of liquid in a horizontal cylindrical tank tilted just until the liquid reaches the bottom at one end, a cam, or a bar-stock wedge. This is the through-the-diameter wedge; an oblique cut on a chord off-center, or one that clears the far wall (a full slanted cylinder), is separate. A shop and takeoff aid; verify critical dimensions on the work.",
+  };
+}
+export const cylindricalWedgeVolumeExample = { inputs: { base_diameter_ft: 4, height_ft: 3 } };
+function _v1330renderCylindricalWedgeVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: cylindrical wedge (ungula) volume V = (2/3) R^2 H = D^2 H/6 for a cylinder cut by a plane through a base diameter (base a semicircle, rise H at the far side). First-principles solid geometry (integration of the sloping top over the semicircle; Machinery's Handbook), by name; public domain. A shop and takeoff aid; verify critical dimensions on the work.";
+  const D = makeNumber("Base (cylinder) diameter (ft)", "cwv-d", { step: "any", min: "0" }); D.input.value = "4";
+  const H = makeNumber("Wedge height at the far side (ft)", "cwv-h", { step: "any", min: "0" }); H.input.value = "3";
+  for (const f of [D, H]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D.input.value = "4"; H.input.value = "3"; update(); });
+  const oV = makeOutputLine(outputRegion, "Wedge volume", "cwv-out-v");
+  const oB = makeOutputLine(outputRegion, "Semicircular base area / percent of the full cylinder", "cwv-out-b");
+  const oNote = makeOutputLine(outputRegion, "Note", "cwv-out-n");
+  const update = debounce(() => {
+    const res = computeCylindricalWedgeVolume({ base_diameter_ft: Number(D.input.value) || 0, height_ft: Number(H.input.value) || 0 });
+    if (res.error) { oV.textContent = res.error; oB.textContent = "-"; oNote.textContent = ""; return; }
+    oV.textContent = fmt(res.volume_ft3, 3) + " ft^3 (" + fmt(res.volume_gal, 1) + " gal)";
+    oB.textContent = fmt(res.base_area_ft2, 3) + " ft^2, " + fmt(res.percent_of_cylinder, 1) + "% of the enclosing cylinder";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [D, H]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["cylindrical-wedge-volume"] = _v1330renderCylindricalWedgeVolume;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {

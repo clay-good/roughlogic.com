@@ -11837,6 +11837,17 @@ export const CITATIONS = {
       { name: "Scope", value: "one base zero is the spherical cap; the lateral surface and an off-axis/ellipsoidal zone are separate", source: "scope of this tile" },
     ],
   },
+  "cylindrical-wedge-volume": {
+    formula: "V = (2/3) R^2 H = D^2 H/6 for a cylinder cut by a plane through a base diameter (base a semicircle, rise H at the far side); no pi (the base pi cancels the sloping-top integral).",
+    edition: "The cylindrical wedge (ungula) volume - standard solid geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure solid geometry, public; the base diameter and the wedge height are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Volume of a cylindrical wedge (an ungula) - the solid a plane circular sector cannot give: a right circular cylinder of diameter D sliced by a plane through a diameter of the base, rising to a height H at the far side, so the base is a semicircle. Integrating the sloping top z = (H/R) y over that semicircle gives V = (H/R)(2R^3/3) = (2/3) R^2 H = D^2 H/6 - a clean closed form with NO pi, because the pi of the circular base cancels the integral of the linear top. It is 2/(3 pi) = 21.2% of the full cylinder that boxes it. Reported in cubic feet and US gallons, with the semicircular base area. Use it for a mitered round pipe or duct end cut, the wedge of liquid in a horizontal cylindrical tank tilted just until the liquid touches the bottom at one end, a cam, or a bar-stock wedge. The through-the-diameter wedge; an off-center chord cut, or a slant that clears the far wall, is separate. A shop and takeoff aid; verify critical dimensions on the work.",
+    assumptions: [
+      { name: "Wedge volume", value: "V = (2/3) R^2 H = D^2 H/6, the through-the-diameter cylindrical ungula", source: "solid geometry (integration)" },
+      { name: "Scope", value: "base a semicircle (plane through the diameter); an off-center chord cut or a far-wall-clearing slant is separate", source: "scope of this tile" },
+    ],
+  },
   "paraboloid-volume": {
     formula: "Full V = (1/2) pi R^2 H (half the enclosing cylinder); apex-up partial fill V(y) = pi R^2 y^2/(2H), with the wetted radius r(y) = R sqrt(y/H); percent full = (y/H)^2.",
     edition: "The paraboloid of revolution volume - standard solid geometry (Pappus's theorem / integration) as in Machinery's Handbook (Industrial Press), by name; public domain.",
