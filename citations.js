@@ -11938,6 +11938,17 @@ export const CITATIONS = {
       { name: "Chord and rise", value: "the chord (span) and the perpendicular rise at midspan are user-supplied measurements of the same arc", source: "circle geometry" },
     ],
   },
+  "triangle-sas": {
+    formula: "c = sqrt(a^2 + b^2 - 2ab cos C); A = acos((b^2 + c^2 - a^2)/(2bc)); B = 180 - C - A; area = (1/2) ab sin C. C = 90 gives c = sqrt(a^2 + b^2).",
+    edition: "The law of cosines c^2 = a^2 + b^2 - 2ab cos(C) with the SAS area (1/2) ab sin(C) - first-principles plane trigonometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure plane trigonometry, public; the two sides and the included angle are user-supplied measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "Oblique-triangle solve from two sides and the INCLUDED angle (SAS). The third side is the law of cosines c = sqrt(a^2 + b^2 - 2ab cos C); the angle opposite a is A = acos((b^2 + c^2 - a^2)/(2bc)), the angle opposite b is B = 180 - C - A, and the area is (1/2) ab sin C. When C = 90 degrees this reduces to the Pythagorean theorem c = sqrt(a^2 + b^2). The sides carry whatever length unit you enter and the result is in the same unit; use it for a corner brace, a hip or valley rafter, a guy from a known spread, or a survey leg. The other cases - SSS (three sides, for the angles), ASA/AAS (a side and two angles), and the ambiguous SSA - are separate. Plane triangles only. A layout aid; verify critical dimensions on the work.",
+    assumptions: [
+      { name: "Law of cosines", value: "c = sqrt(a^2 + b^2 - 2ab cos C); collapses to Pythagoras at C = 90", source: "plane trigonometry" },
+      { name: "SAS only", value: "two sides + included angle; SSS, ASA/AAS, and ambiguous SSA are separate", source: "scope of this tile" },
+    ],
+  },
   "circular-segment-area": {
     formula: "R = (chord^2/4 + rise^2)/(2 x rise); theta = 2 x acos((R - rise)/R); segment area A = (1/2) R^2 (theta - sin theta) = R^2 acos((R-h)/R) - (R-h) sqrt(2 R h - h^2).",
     edition: "Area of a circular segment (the region between a chord and its arc) - first-principles circle geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",

@@ -811,6 +811,7 @@ export const COMPUTE_MAP = {
   "tank-volume": { module: "../../calc-cross.js", fn: "computeTankVolume" },
   "linear-interpolation": { module: "../../calc-cross.js", fn: "computeLinearInterpolation" },
   "circular-arc": { module: "../../calc-layout.js", fn: "computeCircularArc" },
+  "triangle-sas": { module: "../../calc-layout.js", fn: "computeTriangleSas" },
   "circular-segment-area": { module: "../../calc-layout.js", fn: "computeCircularSegmentArea" },
   "circular-arc-rise-from-radius": { module: "../../calc-layout.js", fn: "computeCircularArcRiseFromRadius" },
   "circle-from-3-points": { module: "../../calc-layout.js", fn: "computeCircleFrom3Points" },

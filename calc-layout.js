@@ -117,6 +117,54 @@ function _v27renderCenterOfGravity2Point(inputRegion, outputRegion, citationEl) 
 }
 LAYOUT_RENDERERS["center-of-gravity-2point"] = _v27renderCenterOfGravity2Point;
 
+// spec-v1309: oblique-triangle solver, SAS (two sides + included angle). The everyday layout question -
+// two sides and the angle between them, what is the third side - is the law of cosines. c = sqrt(a^2 + b^2 -
+// 2ab cos C); the other angles from the law of cosines; area = (1/2) ab sin C. C = 90 collapses to Pythagoras.
+// dims: in { side_a: L, side_b: L, included_angle_deg: dimensionless } out: { side_c: L, angle_a_deg: dimensionless, angle_b_deg: dimensionless, area: L^2 }
+export function computeTriangleSas({ side_a = 0, side_b = 0, included_angle_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const a = Number(side_a) || 0;
+  const b = Number(side_b) || 0;
+  const C = Number(included_angle_deg);
+  if (!(a > 0)) return { error: "Side a must be positive." };
+  if (!(b > 0)) return { error: "Side b must be positive." };
+  if (!(C > 0 && C < 180)) return { error: "Included angle must be between 0 and 180 degrees." };
+  const Crad = (C * Math.PI) / 180;
+  const side_c = Math.sqrt(a * a + b * b - 2 * a * b * Math.cos(Crad));
+  const cosA = (b * b + side_c * side_c - a * a) / (2 * b * side_c);
+  const angle_a_deg = (Math.acos(Math.min(1, Math.max(-1, cosA))) * 180) / Math.PI;
+  const angle_b_deg = 180 - C - angle_a_deg;
+  const area = 0.5 * a * b * Math.sin(Crad);
+  if (![side_c, angle_a_deg, angle_b_deg, area].every(Number.isFinite) || !(side_c > 0)) return { error: "Triangle math is not a finite value; check the inputs." };
+  return {
+    side_c, angle_a_deg, angle_b_deg, area, is_right: Math.abs(C - 90) < 1e-9,
+    note: "Oblique-triangle solve from two sides and the INCLUDED angle (SAS). The third side is the law of cosines c = sqrt(a^2 + b^2 - 2ab cos C); the angle opposite a is A = acos((b^2 + c^2 - a^2)/(2bc)), the angle opposite b is B = 180 - C - A, and the area is (1/2) ab sin C. When C = 90 degrees this reduces to the Pythagorean theorem c = sqrt(a^2 + b^2). The sides carry whatever length unit you enter and the result is in the same unit; use it for a corner brace, a hip or valley rafter, a guy from a known spread, or a survey leg. The other cases - SSS (three sides, for the angles), ASA/AAS (a side and two angles), and the ambiguous SSA - are separate. Plane triangles only. A layout aid; verify critical dimensions on the work.",
+  };
+}
+export const triangleSasExample = { inputs: { side_a: 10, side_b: 8, included_angle_deg: 60 } };
+function renderTriangleSas(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: law of cosines c = sqrt(a^2 + b^2 - 2ab cos C) with the SAS area (1/2) ab sin C (standard trigonometry); C = 90 collapses to the Pythagorean theorem. A layout aid; verify critical dimensions on the work.";
+  const a = makeNumber("Side a", "tsas-a", { step: "any", min: "0" }); a.input.value = "10";
+  const b = makeNumber("Side b", "tsas-b", { step: "any", min: "0" }); b.input.value = "8";
+  const C = makeNumber("Included angle C (deg)", "tsas-c", { step: "any", min: "0" }); C.input.value = "60";
+  for (const f of [a, b, C]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { a.input.value = "10"; b.input.value = "8"; C.input.value = "60"; update(); });
+  const oC = makeOutputLine(outputRegion, "Third side c", "tsas-out-c");
+  const oA = makeOutputLine(outputRegion, "Angles (A / B)", "tsas-out-a");
+  const oR = makeOutputLine(outputRegion, "Area", "tsas-out-r");
+  const oNote = makeOutputLine(outputRegion, "Note", "tsas-out-note");
+  const update = debounce(() => {
+    const r = computeTriangleSas({ side_a: Number(a.input.value) || 0, side_b: Number(b.input.value) || 0, included_angle_deg: Number(C.input.value) || 0 });
+    if (r.error) { oC.textContent = r.error; oA.textContent = "-"; oR.textContent = "-"; oNote.textContent = ""; return; }
+    oC.textContent = fmt(r.side_c, 4) + (r.is_right ? " (right angle: Pythagorean)" : "");
+    oA.textContent = fmt(r.angle_a_deg, 2) + " deg opposite a / " + fmt(r.angle_b_deg, 2) + " deg opposite b";
+    oR.textContent = fmt(r.area, 4) + " (square units)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [a, b, C]) f.input.addEventListener("input", update);
+}
+LAYOUT_RENDERERS["triangle-sas"] = renderTriangleSas;
+
 // --- v32 G: Bolt circle / circle-of-holes layout (`bolt-circle`) ---
 // R = dia/2; hole i at angle start + i*(360/N): x = cx + R*cos, y = cy + R*sin;
 // adjacent center-to-center chord = 2*R*sin(180/N).

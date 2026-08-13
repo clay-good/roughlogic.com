@@ -38147,3 +38147,27 @@ test("bounds: spec-v1308 computeTerminalVelocity pins the balance speed, the sca
   assert.ok("error" in _v1308({ weight_lb: 180, frontal_area_ft2: 7, drag_coefficient: 0.7, air_density_lb_ft3: 0 }));
   assert.ok("error" in _v1308({ weight_lb: Infinity, frontal_area_ft2: 7, drag_coefficient: 0.7, air_density_lb_ft3: 0.0765 }));
 });
+
+import { computeTriangleSas as _v1309 } from "../../calc-layout.js";
+test("bounds: spec-v1309 computeTriangleSas pins the law-of-cosines third side, angles, area, the Pythagorean collapse, and error seams", () => {
+  // a 10, b 8, C 60: c 9.165, A 70.89, B 49.11, area 34.64.
+  const r = _v1309({ side_a: 10, side_b: 8, included_angle_deg: 60 });
+  assert.ok(Math.abs(r.side_c - 9.1652) < 1e-3 && Math.abs(r.angle_a_deg - 70.89) < 0.05 && Math.abs(r.angle_b_deg - 49.11) < 0.05);
+  assert.ok(Math.abs(r.area - 34.641) < 1e-2 && r.is_right === false);
+  // Angles sum to 180 with the included angle.
+  assert.ok(Math.abs(r.angle_a_deg + r.angle_b_deg + 60 - 180) < 1e-9);
+  // A right included angle collapses to the Pythagorean theorem and flags is_right.
+  const right = _v1309({ side_a: 3, side_b: 4, included_angle_deg: 90 });
+  assert.ok(Math.abs(right.side_c - 5) < 1e-9 && right.is_right === true);
+  // A larger included angle gives a longer third side (obtuse opens the far side).
+  assert.ok(_v1309({ side_a: 10, side_b: 8, included_angle_deg: 120 }).side_c > r.side_c);
+  // Symmetry: swapping a and b swaps the opposite angles but keeps c and area.
+  const swap = _v1309({ side_a: 8, side_b: 10, included_angle_deg: 60 });
+  assert.ok(Math.abs(swap.side_c - r.side_c) < 1e-9 && Math.abs(swap.angle_a_deg - r.angle_b_deg) < 1e-9);
+  // Error seams: non-positive sides, angle 0 or >=180, non-finite.
+  assert.ok("error" in _v1309({ side_a: 0, side_b: 8, included_angle_deg: 60 }));
+  assert.ok("error" in _v1309({ side_a: 10, side_b: 0, included_angle_deg: 60 }));
+  assert.ok("error" in _v1309({ side_a: 10, side_b: 8, included_angle_deg: 0 }));
+  assert.ok("error" in _v1309({ side_a: 10, side_b: 8, included_angle_deg: 180 }));
+  assert.ok("error" in _v1309({ side_a: Infinity, side_b: 8, included_angle_deg: 60 }));
+});

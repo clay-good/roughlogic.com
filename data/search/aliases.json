@@ -77329,6 +77329,51 @@
    "kind": "question"
   },
   {
+   "term": "triangle solver",
+   "target": "triangle-sas",
+   "kind": "industry"
+  },
+  {
+   "term": "law of cosines",
+   "target": "triangle-sas",
+   "kind": "industry"
+  },
+  {
+   "term": "two sides and angle third side",
+   "target": "triangle-sas",
+   "kind": "industry"
+  },
+  {
+   "term": "oblique triangle",
+   "target": "triangle-sas",
+   "kind": "industry"
+  },
+  {
+   "term": "third side of a triangle",
+   "target": "triangle-sas",
+   "kind": "adjacent"
+  },
+  {
+   "term": "corner brace length",
+   "target": "triangle-sas",
+   "kind": "adjacent"
+  },
+  {
+   "term": "hip rafter length angle",
+   "target": "triangle-sas",
+   "kind": "adjacent"
+  },
+  {
+   "term": "find the third side of a triangle",
+   "target": "triangle-sas",
+   "kind": "question"
+  },
+  {
+   "term": "length across a corner at an angle",
+   "target": "triangle-sas",
+   "kind": "question"
+  },
+  {
    "term": "find center of circle from three marks",
    "target": "circle-from-3-points",
    "kind": "question"
