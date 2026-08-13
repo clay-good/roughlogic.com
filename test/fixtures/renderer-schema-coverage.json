@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1685,
-  "covered_count": 1227,
+  "total_tiles": 1686,
+  "covered_count": 1228,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -840,6 +840,7 @@
     "refrigerant-charging",
     "refrigerant-lineset-charge-adjust",
     "refrigeration-cop",
+    "regular-polygon",
     "reineke-sdi",
     "relative-compaction",
     "rent-roll-vacancy",

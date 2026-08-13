@@ -1316,6 +1316,53 @@ function _v1312renderFrustumVolume(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["frustum-volume"] = _v1312renderFrustumVolume;
 
+// spec-v1313: regular polygon geometry. polygon-miter gives the cut angle and bolt-circle places holes, but not
+// the apothem / across-flats / across-corners / area. apothem = s/(2 tan(pi/n)); circumradius = s/(2 sin(pi/n));
+// area = n s^2/(4 tan(pi/n)); interior angle = (n-2)180/n. across-flats = 2 apothem, across-corners = 2 circumradius.
+// dims: in { num_sides: dimensionless, side_length: L } out: { interior_angle_deg: dimensionless, apothem: L, circumradius: L, across_flats: L, across_corners: L, perimeter: L, area: L^2 }
+export function computeRegularPolygon({ num_sides = 0, side_length = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n = Number(num_sides) || 0;
+  const s = Number(side_length) || 0;
+  if (!(n >= 3)) return { error: "Number of sides must be at least 3." };
+  if (!Number.isInteger(n)) return { error: "Number of sides must be a whole number." };
+  if (!(s > 0)) return { error: "Side length must be positive." };
+  const interior_angle_deg = ((n - 2) * 180) / n;
+  const apothem = s / (2 * Math.tan(Math.PI / n));
+  const circumradius = s / (2 * Math.sin(Math.PI / n));
+  const across_flats = 2 * apothem;
+  const across_corners = 2 * circumradius;
+  const perimeter = n * s;
+  const area = (n * s * s) / (4 * Math.tan(Math.PI / n));
+  if (![interior_angle_deg, apothem, circumradius, area].every(Number.isFinite) || !(area > 0)) return { error: "Polygon math is not a finite value; check the inputs." };
+  return {
+    interior_angle_deg, apothem, circumradius, across_flats, across_corners, perimeter, area,
+    note: "Geometry of a regular (equal-sided, equal-angled) convex polygon of n sides and side length s. The interior angle is (n-2)180/n; the apothem (center to the middle of a side, the inradius of the circle that just touches each side) is a = s/(2 tan(pi/n)); the circumradius (center to a corner) is R = s/(2 sin(pi/n)); the across-flats is 2a (the wrench size of a nut or the width of hex stock) and the across-corners is 2R (the diagonal); the perimeter is n s and the area is n s^2/(4 tan(pi/n)) = (1/2)(perimeter)(apothem). Use it to cut hex or octagon stock, lay out a polygonal frame or tank footprint, or check a wrench opening. Irregular polygons, the miter/bevel to cut it (polygon-miter), and a bolt pattern on it (bolt-circle) are separate. Plane figures only. A shop and layout aid; verify critical dimensions on the work.",
+  };
+}
+export const regularPolygonExample = { inputs: { num_sides: 6, side_length: 2 } };
+function _v1313renderRegularPolygon(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: regular-polygon geometry (standard plane geometry; Machinery's Handbook): apothem s/(2 tan(pi/n)), circumradius s/(2 sin(pi/n)), area n s^2/(4 tan(pi/n)), interior angle (n-2)180/n; across-flats = 2 apothem, across-corners = 2 circumradius. A shop and layout aid; verify critical dimensions on the work.";
+  const n = makeNumber("Number of sides n", "rpg-n", { step: "1", min: "3" }); n.input.value = "6";
+  const s = makeNumber("Side length s", "rpg-s", { step: "any", min: "0" }); s.input.value = "2";
+  for (const f of [n, s]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { n.input.value = "6"; s.input.value = "2"; update(); });
+  const oA = makeOutputLine(outputRegion, "Across flats / corners", "rpg-out-a");
+  const oR = makeOutputLine(outputRegion, "Apothem / circumradius", "rpg-out-r");
+  const oI = makeOutputLine(outputRegion, "Interior angle / area", "rpg-out-i");
+  const oNote = makeOutputLine(outputRegion, "Note", "rpg-out-n");
+  const update = debounce(() => {
+    const res = computeRegularPolygon({ num_sides: Number(n.input.value) || 0, side_length: Number(s.input.value) || 0 });
+    if (res.error) { oA.textContent = res.error; oR.textContent = "-"; oI.textContent = "-"; oNote.textContent = ""; return; }
+    oA.textContent = fmt(res.across_flats, 4) + " across flats / " + fmt(res.across_corners, 4) + " across corners";
+    oR.textContent = fmt(res.apothem, 4) + " apothem / " + fmt(res.circumradius, 4) + " circumradius (perimeter " + fmt(res.perimeter, 3) + ")";
+    oI.textContent = fmt(res.interior_angle_deg, 2) + " deg interior, area " + fmt(res.area, 4) + " (square units)";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [n, s]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["regular-polygon"] = _v1313renderRegularPolygon;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {

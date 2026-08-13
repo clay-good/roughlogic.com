@@ -88305,6 +88305,66 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "regular-polygon",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Hexagon, 2 in side",
+   "source_edition_or_year": "plane geometry",
+   "source_section_or_page": "apothem/across-flats/area",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "num_sides": 6,
+    "side_length": 2
+   },
+   "outputs": {
+    "across_flats": {
+     "value": 3.4641,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "across_corners": {
+     "value": 4.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area": {
+     "value": 10.3923,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "regular-polygon",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Octagon, 2 in side",
+   "source_edition_or_year": "plane geometry",
+   "source_section_or_page": "apothem/across-flats/area",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "num_sides": 8,
+    "side_length": 2
+   },
+   "outputs": {
+    "interior_angle_deg": {
+     "value": 135.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "across_flats": {
+     "value": 4.8284,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

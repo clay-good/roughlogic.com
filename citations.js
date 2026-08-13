@@ -11683,6 +11683,18 @@ export const CITATIONS = {
       { name: "Limits", value: "d=0 gives a full cone, d=D a cylinder; offset/pyramidal shapes are separate", source: "scope of this tile" },
     ],
   },
+  "regular-polygon": {
+    formula: "interior angle = (n-2)180/n; apothem = s/(2 tan(pi/n)); circumradius = s/(2 sin(pi/n)); across-flats = 2 apothem; across-corners = 2 circumradius; area = n s^2/(4 tan(pi/n)).",
+    edition: "The regular-polygon relations (apothem, circumradius, across-flats/corners, area) - standard plane geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure plane geometry, public; the side count and side length are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Geometry of a regular (equal-sided, equal-angled) convex polygon of n sides and side length s. The interior angle is (n-2)180/n; the apothem (center to the middle of a side, the inradius of the circle that just touches each side) is a = s/(2 tan(pi/n)); the circumradius (center to a corner) is R = s/(2 sin(pi/n)); the across-flats is 2a (the wrench size of a nut or the width of hex stock) and the across-corners is 2R (the diagonal); the perimeter is n s and the area is n s^2/(4 tan(pi/n)) = (1/2)(perimeter)(apothem). Use it to cut hex or octagon stock, lay out a polygonal frame or tank footprint, or check a wrench opening. Irregular polygons, the miter/bevel to cut it (polygon-miter), and a bolt pattern on it (bolt-circle) are separate. Plane figures only. A shop and layout aid; verify critical dimensions on the work.",
+    assumptions: [
+      { name: "Apothem / circumradius", value: "a = s/(2 tan(pi/n)), R = s/(2 sin(pi/n)); across-flats = 2a, across-corners = 2R", source: "plane geometry" },
+      { name: "Area", value: "n s^2/(4 tan(pi/n)) = (1/2)(perimeter)(apothem)", source: "plane geometry" },
+      { name: "Scope", value: "regular convex polygons; irregular shapes, miter, and bolt patterns are separate", source: "scope of this tile" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",

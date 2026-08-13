@@ -804,6 +804,7 @@ export const COMPUTE_MAP = {
   "tolerance-stack-rss": { module: "../../calc-shop.js", fn: "computeToleranceStackRss" },
   "cone-flat-pattern": { module: "../../calc-shop.js", fn: "computeConeFlatPattern" },
   "frustum-volume": { module: "../../calc-shop.js", fn: "computeFrustumVolume" },
+  "regular-polygon": { module: "../../calc-shop.js", fn: "computeRegularPolygon" },
   "spur-gear-geometry": { module: "../../calc-machining.js", fn: "computeSpurGearGeometry" },
   "worm-gear-geometry": { module: "../../calc-machining.js", fn: "computeWormGearGeometry" },
   "gear-undercut-backlash": { module: "../../calc-machining.js", fn: "computeGearUndercutBacklash" },

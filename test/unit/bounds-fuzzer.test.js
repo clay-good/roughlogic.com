@@ -38238,3 +38238,24 @@ test("bounds: spec-v1312 computeFrustumVolume pins the frustum volume, unit conv
   assert.ok("error" in _v1312({ large_diameter_ft: 6, small_diameter_ft: 2, height_ft: 0 }));
   assert.ok("error" in _v1312({ large_diameter_ft: Infinity, small_diameter_ft: 2, height_ft: 4 }));
 });
+
+import { computeRegularPolygon as _v1313 } from "../../calc-shop.js";
+test("bounds: spec-v1313 computeRegularPolygon pins the hexagon/octagon geometry, the across-flats/corners, area, and error seams", () => {
+  // Hexagon, s 2: interior 120, apothem 1.732, R 2, flats 3.464, corners 4, area 10.39.
+  const hex = _v1313({ num_sides: 6, side_length: 2 });
+  assert.ok(Math.abs(hex.interior_angle_deg - 120) < 1e-9 && Math.abs(hex.apothem - 1.7321) < 1e-3);
+  assert.ok(Math.abs(hex.across_flats - 3.4641) < 1e-3 && Math.abs(hex.across_corners - 4.0) < 1e-6 && Math.abs(hex.area - 10.3923) < 1e-3);
+  // Across-flats = 2*apothem, across-corners = 2*circumradius, area = (1/2) perimeter * apothem.
+  assert.ok(Math.abs(hex.across_flats - 2 * hex.apothem) < 1e-9 && Math.abs(hex.across_corners - 2 * hex.circumradius) < 1e-9);
+  assert.ok(Math.abs(hex.area - 0.5 * hex.perimeter * hex.apothem) < 1e-6);
+  // Octagon interior angle is 135 deg.
+  assert.ok(Math.abs(_v1313({ num_sides: 8, side_length: 2 }).interior_angle_deg - 135) < 1e-9);
+  // A square (n=4) has across-flats = side and across-corners = side*sqrt(2).
+  const sq = _v1313({ num_sides: 4, side_length: 5 });
+  assert.ok(Math.abs(sq.across_flats - 5) < 1e-6 && Math.abs(sq.across_corners - 5 * Math.SQRT2) < 1e-6 && Math.abs(sq.area - 25) < 1e-6);
+  // Error seams: fewer than 3 sides, non-integer sides, non-positive side, non-finite.
+  assert.ok("error" in _v1313({ num_sides: 2, side_length: 2 }));
+  assert.ok("error" in _v1313({ num_sides: 6.5, side_length: 2 }));
+  assert.ok("error" in _v1313({ num_sides: 6, side_length: 0 }));
+  assert.ok("error" in _v1313({ num_sides: 6, side_length: Infinity }));
+});
