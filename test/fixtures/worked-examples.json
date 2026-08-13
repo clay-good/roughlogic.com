@@ -88697,6 +88697,60 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "annulus-area",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "NPS 6 sch 40 pipe metal area",
+   "source_edition_or_year": "plane geometry",
+   "source_section_or_page": "(pi/4)(D^2-d^2)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "outer_diameter": 6.625,
+    "inner_diameter": 6.065
+   },
+   "outputs": {
+    "ring_area": {
+     "value": 5.5814,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bore_area": {
+     "value": 28.8903,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wall_thickness": {
+     "value": 0.28,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "annulus-area",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Washer ring area",
+   "source_edition_or_year": "plane geometry",
+   "source_section_or_page": "(pi/4)(D^2-d^2)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "outer_diameter": 6,
+    "inner_diameter": 4
+   },
+   "outputs": {
+    "ring_area": {
+     "value": 15.708,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

@@ -38386,3 +38386,26 @@ test("bounds: spec-v1319 computeEllipsoidVolume pins pi L W H/6, the half-ellips
   assert.ok("error" in _v1319({ length_ft: 10, width_ft: 6, height_ft: 0 }));
   assert.ok("error" in _v1319({ length_ft: Infinity, width_ft: 6, height_ft: 4 }));
 });
+
+import { computeAnnulusArea as _v1320 } from "../../calc-shop.js";
+test("bounds: spec-v1320 computeAnnulusArea pins the ring area, outer/bore split, wall thickness, the full-circle limit, and error seams", () => {
+  // NPS 6 sch 40: D 6.625, d 6.065 -> ring 5.58, bore 28.89, wall 0.280.
+  const r = _v1320({ outer_diameter: 6.625, inner_diameter: 6.065 });
+  assert.ok(Math.abs(r.ring_area - 5.5814) < 1e-3 && Math.abs(r.bore_area - 28.8903) < 1e-3 && Math.abs(r.wall_thickness - 0.28) < 1e-6);
+  // Ring = outer - bore exactly.
+  assert.ok(Math.abs(r.ring_area - (r.outer_area - r.bore_area)) < 1e-9);
+  // d = 0 gives a full circle (ring = outer, bore 0).
+  const solid = _v1320({ outer_diameter: 6, inner_diameter: 0 });
+  assert.ok(Math.abs(solid.ring_area - (Math.PI / 4) * 36) < 1e-9 && solid.bore_area === 0);
+  // Ring area = pi(R^2 - r^2).
+  const w = _v1320({ outer_diameter: 6, inner_diameter: 4 });
+  assert.ok(Math.abs(w.ring_area - Math.PI * (9 - 4)) < 1e-9);
+  // A thinner wall (inner closer to outer) has a smaller ring area.
+  assert.ok(_v1320({ outer_diameter: 6, inner_diameter: 5.5 }).ring_area < w.ring_area);
+  // Error seams: non-positive outer, negative inner, inner not smaller than outer, non-finite.
+  assert.ok("error" in _v1320({ outer_diameter: 0, inner_diameter: 4 }));
+  assert.ok("error" in _v1320({ outer_diameter: 6, inner_diameter: -1 }));
+  assert.ok("error" in _v1320({ outer_diameter: 6, inner_diameter: 6 }));
+  assert.ok("error" in _v1320({ outer_diameter: 6, inner_diameter: 7 }));
+  assert.ok("error" in _v1320({ outer_diameter: Infinity, inner_diameter: 4 }));
+});

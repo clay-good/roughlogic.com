@@ -38204,6 +38204,51 @@
    "kind": "question"
   },
   {
+   "term": "annulus area",
+   "target": "annulus-area",
+   "kind": "industry"
+  },
+  {
+   "term": "ring area",
+   "target": "annulus-area",
+   "kind": "industry"
+  },
+  {
+   "term": "pipe metal area",
+   "target": "annulus-area",
+   "kind": "industry"
+  },
+  {
+   "term": "pipe cross section area",
+   "target": "annulus-area",
+   "kind": "industry"
+  },
+  {
+   "term": "washer area",
+   "target": "annulus-area",
+   "kind": "adjacent"
+  },
+  {
+   "term": "area between two circles",
+   "target": "annulus-area",
+   "kind": "adjacent"
+  },
+  {
+   "term": "tube wall area",
+   "target": "annulus-area",
+   "kind": "adjacent"
+  },
+  {
+   "term": "metal area of a pipe",
+   "target": "annulus-area",
+   "kind": "question"
+  },
+  {
+   "term": "area of a ring",
+   "target": "annulus-area",
+   "kind": "question"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"

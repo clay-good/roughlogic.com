@@ -1631,6 +1631,50 @@ function _v1319renderEllipsoidVolume(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["ellipsoid-volume"] = _v1319renderEllipsoidVolume;
 
+// spec-v1320: annulus (ring) area. Catalog has full-circle/ellipse/polygon area but no annulus - the metal
+// cross-section of a pipe/tube, a washer/gasket/ring-flange face, or a circular border. ring = (pi/4)(D^2 - d^2).
+// d = 0 gives a full circle. Also outer/bore areas and wall thickness.
+// dims: in { outer_diameter: L, inner_diameter: L } out: { ring_area: L^2, outer_area: L^2, bore_area: L^2, wall_thickness: L }
+export function computeAnnulusArea({ outer_diameter = 0, inner_diameter = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D = Number(outer_diameter) || 0;
+  const d = Number(inner_diameter) || 0;
+  if (!(D > 0)) return { error: "Outer diameter must be positive." };
+  if (d < 0) return { error: "Inner diameter cannot be negative." };
+  if (!(d < D)) return { error: "Inner diameter must be smaller than the outer diameter." };
+  const outer_area = (Math.PI / 4) * D * D;
+  const bore_area = (Math.PI / 4) * d * d;
+  const ring_area = outer_area - bore_area;
+  const wall_thickness = (D - d) / 2;
+  if (![ring_area, outer_area, bore_area].every(Number.isFinite) || !(ring_area > 0)) return { error: "Annulus math is not a finite value; check the inputs." };
+  return {
+    ring_area, outer_area, bore_area, wall_thickness,
+    note: "Area of a flat annulus (the ring between two concentric circles): ring = (pi/4)(D^2 - d^2) = pi(R^2 - r^2), the outer circle minus the hole. It is the metal cross-section of a pipe or tube (the number you multiply by the material density for weight per length, or by the allowable stress for tension capacity), the face area of a washer, gasket, or ring flange, and the area of a circular border or track. The bore area (pi/4) d^2 is the flow area, and the wall thickness is (D - d)/2. When d = 0 it is a full circle. An eccentric ring, a partial (sector) ring, and the volume of a tube (ring area x length) are separate. Plane figure only. A shop and layout aid; verify critical dimensions on the work.",
+  };
+}
+export const annulusAreaExample = { inputs: { outer_diameter: 6.625, inner_diameter: 6.065 } };
+function _v1320renderAnnulusArea(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: annulus (ring) area (pi/4)(D^2 - d^2) = pi(R^2 - r^2) (standard plane geometry; Machinery's Handbook). The ring is the metal in a tube wall, a washer, or a flange face; d = 0 gives a full circle. A shop and layout aid; verify critical dimensions on the work.";
+  const D = makeNumber("Outer diameter D", "ana-d", { step: "any", min: "0" }); D.input.value = "6.625";
+  const d = makeNumber("Inner (bore) diameter d", "ana-id", { step: "any", min: "0" }); d.input.value = "6.065";
+  for (const f of [D, d]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D.input.value = "6.625"; d.input.value = "6.065"; update(); });
+  const oR = makeOutputLine(outputRegion, "Ring (annulus) area", "ana-out-r");
+  const oB = makeOutputLine(outputRegion, "Outer / bore area", "ana-out-b");
+  const oW = makeOutputLine(outputRegion, "Wall thickness", "ana-out-w");
+  const oNote = makeOutputLine(outputRegion, "Note", "ana-out-n");
+  const update = debounce(() => {
+    const res = computeAnnulusArea({ outer_diameter: Number(D.input.value) || 0, inner_diameter: Number(d.input.value) || 0 });
+    if (res.error) { oR.textContent = res.error; oB.textContent = "-"; oW.textContent = "-"; oNote.textContent = ""; return; }
+    oR.textContent = fmt(res.ring_area, 4) + " (square units)";
+    oB.textContent = fmt(res.outer_area, 4) + " outer / " + fmt(res.bore_area, 4) + " bore (flow area)";
+    oW.textContent = fmt(res.wall_thickness, 4);
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [D, d]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["annulus-area"] = _v1320renderAnnulusArea;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {

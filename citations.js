@@ -11767,6 +11767,18 @@ export const CITATIONS = {
       { name: "Scope", value: "full/half volume; partial fill, surface area, and truncated shapes are separate", source: "scope of this tile" },
     ],
   },
+  "annulus-area": {
+    formula: "ring area = (pi/4)(D^2 - d^2) = pi(R^2 - r^2); outer = (pi/4) D^2; bore = (pi/4) d^2; wall = (D - d)/2. d=0 -> full circle.",
+    edition: "The annulus (ring) area (pi/4)(D^2 - d^2) - standard plane geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure plane geometry, public; the outer and inner diameters are user-supplied measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "Area of a flat annulus (the ring between two concentric circles): ring = (pi/4)(D^2 - d^2) = pi(R^2 - r^2), the outer circle minus the hole. It is the metal cross-section of a pipe or tube (the number you multiply by the material density for weight per length, or by the allowable stress for tension capacity), the face area of a washer, gasket, or ring flange, and the area of a circular border or track. The bore area (pi/4) d^2 is the flow area, and the wall thickness is (D - d)/2. When d = 0 it is a full circle. An eccentric ring, a partial (sector) ring, and the volume of a tube (ring area x length) are separate. Plane figure only. A shop and layout aid; verify critical dimensions on the work.",
+    assumptions: [
+      { name: "Ring area", value: "(pi/4)(D^2 - d^2) = outer circle minus the bore", source: "plane geometry" },
+      { name: "Pipe metal", value: "the ring is the pipe/tube metal cross-section; bore is the flow area", source: "geometry" },
+      { name: "Scope", value: "concentric flat ring; eccentric/sector rings and tube volume are separate", source: "scope of this tile" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",
