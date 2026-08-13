@@ -88983,6 +88983,64 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "cone-bottom-tank-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "6 ft cone-bottom tank (3 ft cone, 8 ft side) at 6 ft depth",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "cone (h^3) + cylinder",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "diameter_ft": 6,
+    "cone_height_ft": 3,
+    "cylinder_height_ft": 8,
+    "depth_ft": 6
+   },
+   "outputs": {
+    "volume_gal": {
+     "value": 846.03,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "percent_full": {
+     "value": 44.44,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cone-bottom-tank-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same tank full (11 ft)",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "full = (1/3)pi R^2 Hc + pi R^2 Hcyl",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "diameter_ft": 6,
+    "cone_height_ft": 3,
+    "cylinder_height_ft": 8,
+    "depth_ft": 11
+   },
+   "outputs": {
+    "full_gal": {
+     "value": 1903.56,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "percent_full": {
+     "value": 100.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

@@ -38374,6 +38374,31 @@
    "kind": "adjacent"
   },
   {
+   "term": "cone bottom tank volume",
+   "target": "cone-bottom-tank-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "conical bottom tank gallons",
+   "target": "cone-bottom-tank-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "hopper bottom tank volume from level",
+   "target": "cone-bottom-tank-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "poly tank gallons at depth",
+   "target": "cone-bottom-tank-volume",
+   "kind": "question"
+  },
+  {
+   "term": "cone bottom tank dipstick",
+   "target": "cone-bottom-tank-volume",
+   "kind": "adjacent"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"

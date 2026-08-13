@@ -1900,6 +1900,72 @@ function _v1324renderOvalTankVolume(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["oval-tank-volume"] = _v1324renderOvalTankVolume;
 
+// spec-v1325: cone-bottom (conical-bottom) VERTICAL tank partial volume from the apex up - the poly/process/hopper
+// tank tank-volume (flat-bottom cylinder) does not cover. Two regions from the bottom apex: a cone whose radius
+// grows linearly r(h) = R h/Hc so V = (pi R^2/(3 Hc^2)) h^3 up to the cone height Hc, then the full cone plus a
+// straight cylinder pi R^2 (h - Hc). The cone empties fast near the tip (h^3), the trap a straight-side guess misses.
+// dims: in { diameter_ft: L, cone_height_ft: L, cylinder_height_ft: L, depth_ft: L } out: { volume_gal: L^3, volume_ft3: L^3, full_gal: L^3, full_ft3: L^3, percent_full: dimensionless }
+export function computeConeBottomTankVolume({ diameter_ft = 0, cone_height_ft = 0, cylinder_height_ft = 0, depth_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D = Number(diameter_ft) || 0;
+  const Hc = Number(cone_height_ft) || 0;
+  const Hcyl = Number(cylinder_height_ft) || 0;
+  let h = Number(depth_ft) || 0;
+  if (!(D > 0)) return { error: "Tank diameter must be positive (ft)." };
+  if (!(Hc > 0)) return { error: "Cone (bottom) height must be positive (ft)." };
+  if (!(Hcyl > 0)) return { error: "Cylinder (straight side) height must be positive (ft)." };
+  if (h < 0) return { error: "Liquid depth cannot be negative (ft)." };
+  const R = D / 2;
+  const total_height = Hc + Hcyl;
+  let clamped = false;
+  if (h > total_height) { h = total_height; clamped = true; }
+  const cone_full = Math.PI * R * R * Hc / 3;
+  let volume_ft3;
+  if (h <= 0) volume_ft3 = 0;
+  else if (h <= Hc) volume_ft3 = (Math.PI * R * R / (3 * Hc * Hc)) * h * h * h; // cone from the apex, r(h) = R h/Hc
+  else volume_ft3 = cone_full + Math.PI * R * R * (h - Hc);                     // full cone + straight cylinder
+  const full_ft3 = cone_full + Math.PI * R * R * Hcyl;
+  const GAL_PER_FT3 = 7.480519;
+  const percent_full = full_ft3 > 0 ? (volume_ft3 / full_ft3) * 100 : 0;
+  if (![volume_ft3, full_ft3, percent_full].every(Number.isFinite) || !(full_ft3 > 0)) return { error: "Cone-bottom-tank math is not a finite value; check the inputs." };
+  const in_cone = h > 0 && h <= Hc;
+  const notes = [];
+  notes.push("Partial volume of a VERTICAL cone-bottom (conical / hopper bottom) tank from a dipstick depth measured up from the bottom apex - the poly, process, or feed tank the flat-bottom tank-volume tile does not cover. Below the cone height Hc the liquid fills a cone whose radius grows with height, r(h) = R h/Hc, so the volume is (pi R^2/(3 Hc^2)) h^3 - it climbs slowly near the tip and fast near the top of the cone; above Hc it is the full cone (1/3) pi R^2 Hc plus a straight cylinder pi R^2 (h - Hc). Because the cone empties as the cube of the depth, a dipstick low in the cone reads far less than a straight-side guess. Reported in cubic feet and US gallons with the percent full.");
+  notes.push(in_cone
+    ? "The liquid level is within the conical bottom - the volume grows as h^3, so small stick changes near the tip are tiny volumes."
+    : "The liquid level is up in the straight cylinder - each inch is a full pi R^2 slice.");
+  notes.push("Enter the inside diameter, the cone (bottom) height, the straight-side (cylinder) height, and the depth from the apex, all in feet. A right cone concentric with the cylinder, apex down; a flat-bottom tank is the tank-volume tile. US gallons; the tank's own chart governs.");
+  if (clamped) notes.push("Depth exceeded the tank height; reporting the full tank.");
+  return {
+    volume_gal: volume_ft3 * GAL_PER_FT3, volume_ft3,
+    full_gal: full_ft3 * GAL_PER_FT3, full_ft3, percent_full, notes,
+  };
+}
+export const coneBottomTankVolumeExample = { inputs: { diameter_ft: 6, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: 6 } };
+function _v1325renderConeBottomTankVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: cone-bottom vertical tank partial volume - a cone from the apex, V = (pi R^2/(3 Hc^2)) h^3 up to the cone height, then the full cone (1/3) pi R^2 Hc plus a straight cylinder pi R^2 (h - Hc). First-principles solid geometry (cone + cylinder; Machinery's Handbook), by name; public domain. A dipstick / takeoff aid; the tank's own chart governs.";
+  const D = makeNumber("Tank diameter D (ft)", "cbt-d", { step: "any", min: "0" }); D.input.value = "6";
+  const Hc = makeNumber("Cone (bottom) height (ft)", "cbt-hc", { step: "any", min: "0" }); Hc.input.value = "3";
+  const Hcyl = makeNumber("Cylinder (straight side) height (ft)", "cbt-hy", { step: "any", min: "0" }); Hcyl.input.value = "8";
+  const d = makeNumber("Liquid depth from the apex (ft)", "cbt-dep", { step: "any", min: "0" }); d.input.value = "6";
+  for (const f of [D, Hc, Hcyl, d]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D.input.value = "6"; Hc.input.value = "3"; Hcyl.input.value = "8"; d.input.value = "6"; update(); });
+  const oV = makeOutputLine(outputRegion, "Liquid volume", "cbt-out-v");
+  const oP = makeOutputLine(outputRegion, "Percent full", "cbt-out-p");
+  const oF = makeOutputLine(outputRegion, "Full tank", "cbt-out-f");
+  const oNote = makeOutputLine(outputRegion, "Notes", "cbt-out-n");
+  const update = debounce(() => {
+    const res = computeConeBottomTankVolume({ diameter_ft: Number(D.input.value) || 0, cone_height_ft: Number(Hc.input.value) || 0, cylinder_height_ft: Number(Hcyl.input.value) || 0, depth_ft: Number(d.input.value) || 0 });
+    if (res.error) { oV.textContent = res.error; oP.textContent = "-"; oF.textContent = "-"; oNote.textContent = ""; return; }
+    oV.textContent = fmt(res.volume_gal, 1) + " gal (" + fmt(res.volume_ft3, 2) + " ft^3)";
+    oP.textContent = fmt(res.percent_full, 1) + "%";
+    oF.textContent = fmt(res.full_gal, 1) + " gal";
+    oNote.textContent = res.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [D, Hc, Hcyl, d]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["cone-bottom-tank-volume"] = _v1325renderConeBottomTankVolume;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {

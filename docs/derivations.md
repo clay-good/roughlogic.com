@@ -3065,6 +3065,7 @@ cross-check.
 | calc-shop.js | `computeCarbonEquivalent` | `{ c = 0, mn = 0, cr = 0, mo = 0, v = 0, ni = 0, cu = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCircularSector` | `{ radius = 0, angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCompoundMiter` | `{ spring_angle_deg = 38, corner_angle_deg = 90 } = {}` | _ | _ | _ |
+| calc-shop.js | `computeConeBottomTankVolume` | `{ diameter_ft = 0, cone_height_ft = 0, cylinder_height_ft = 0, depth_ft = 0 }...` | _ | _ | _ |
 | calc-shop.js | `computeConeFlatPattern` | `{ base_radius_in = 0, height_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCylinderStorageSeparation` | `{ separation_ft = 0, barrier_present = "no", barrier_height_ft = 0, barrier_n...` | _ | _ | _ |
 | calc-shop.js | `computeDividingHead` | `{ divisions = 0, worm_ratio = 40, circles = "" } = {}` | _ | _ | _ |
@@ -3362,7 +3363,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1948.
+Row count: 1949.
 
 <!-- END function-corpus-v14 -->
 
@@ -4526,7 +4527,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (87 tiles)
+### Group G Cross-trade (88 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4540,6 +4541,7 @@ per spec-v14 §13.1 second paragraph.
 | `circular-arc-rise-from-radius` | Arc Rise (Sagitta) from Radius and Chord | First-principles circle geometry (sag...; chord 24 in, radius 20 in -> rise 4.0 in, central angle 7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `circular-sector` | Circular Sector (Pie Slice) Area and Arc | Project (first-principles); area (1/2)r^2 theta | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `circular-segment-area` | Circular Segment Area (from Chord and Rise) | First-principles circle geometry (Mac...; R = (144 + 16)/8 = 20; theta = 2 acos(16/20) = 1.28700 ra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `cone-bottom-tank-volume` | Cone-Bottom Tank Volume from Dipstick | Project (first-principles); cone (h^3) + cylinder | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cone-flat-pattern` | Cone Flat-Pattern Development (Radial Line) | sheet-metal radial-line layout; spec-v400 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `decimal-to-fraction` | Decimal to Fraction | First-principles tape-measure arithmetic; 2.375 in to nearest 1/16 -> 2-3/8 in (whole 2, 3/8), error 0 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dilution` | Dilution / Mixing Ratio | Project (first-principles); C1*V1 = C2*V2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5232,6 +5234,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1697. Fixture-covered or reference-cadence: 1697 / 1697.
+Tile count: 1698. Fixture-covered or reference-cadence: 1698 / 1698.
 
 <!-- END tile-index-v14 -->

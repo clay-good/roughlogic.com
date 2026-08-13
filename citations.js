@@ -11825,6 +11825,18 @@ export const CITATIONS = {
       { name: "Scope", value: "vertical oval with flat ends; a round tank is the tank-volume tile; the tank chart governs custody", source: "scope of this tile" },
     ],
   },
+  "cone-bottom-tank-volume": {
+    formula: "R = D/2; volume = (pi R^2/(3 Hc^2)) h^3 for h <= Hc, else (1/3) pi R^2 Hc + pi R^2 (h - Hc); full = (1/3) pi R^2 Hc + pi R^2 Hcyl.",
+    edition: "Cone-bottom vertical tank partial gauging - a right cone from the apex plus a straight cylinder; standard solid geometry (cone + cylinder) as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Public-domain solid geometry; the diameter, cone height, cylinder height, and depth are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Partial volume of a vertical cone-bottom (conical / hopper bottom) tank from a dipstick depth measured up from the bottom apex - the poly, process, or feed tank the flat-bottom tank-volume tile does not cover. Below the cone height Hc the liquid fills a cone whose radius grows with height, r(h) = R h/Hc, so the volume is (pi R^2/(3 Hc^2)) h^3; above Hc it is the full cone (1/3) pi R^2 Hc plus a straight cylinder pi R^2 (h - Hc). Because the cone empties as the cube of the depth, a dipstick low in the cone reads far less than a straight-side guess. Enter the inside diameter, the cone (bottom) height, the straight-side (cylinder) height, and the depth from the apex, all in feet. A right cone concentric with the cylinder, apex down; a flat-bottom tank is the tank-volume tile, and the tank's own chart governs. Reported in cubic feet and US gallons with the percent full.",
+    assumptions: [
+      { name: "Cone region", value: "V = (pi R^2/(3 Hc^2)) h^3, a right cone from the apex with r(h) = R h/Hc", source: "solid geometry" },
+      { name: "Cylinder region", value: "full cone + pi R^2 (h - Hc) above the cone height", source: "solid geometry" },
+      { name: "Scope", value: "right cone concentric with the cylinder, apex down; a flat-bottom tank is the tank-volume tile", source: "scope of this tile" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",

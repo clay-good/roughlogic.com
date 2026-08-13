@@ -38503,3 +38503,31 @@ test("bounds: spec-v1324 computeOvalTankVolume pins the 275-gal tank, the exact-
   assert.ok("error" in _v1324({ width_in: 27, height_in: 44, length_in: 60, depth_in: -1 }));
   assert.ok("error" in _v1324({ width_in: Infinity, height_in: 44, length_in: 60, depth_in: 22 }));
 });
+
+import { computeConeBottomTankVolume as _v1325 } from "../../calc-shop.js";
+test("bounds: spec-v1325 computeConeBottomTankVolume pins the cone h^3 law, the seam continuity, the full tank, clamping, and error seams", () => {
+  const P = Math.PI, R = 3;
+  // 6 ft dia, 3 ft cone, 8 ft cylinder: full = (1/3)pi R^2 Hc + pi R^2 Hcyl.
+  const full = _v1325({ diameter_ft: 6, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: 11 });
+  const expectFull = (P * R * R * 3 / 3 + P * R * R * 8) * 7.480519;
+  assert.ok(Math.abs(full.full_gal - expectFull) < 1e-6 && Math.abs(full.percent_full - 100) < 1e-9);
+  // At the cone height the volume is exactly the full cone (1/3) pi R^2 Hc.
+  const atCone = _v1325({ diameter_ft: 6, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: 3 });
+  assert.ok(Math.abs(atCone.volume_ft3 - P * R * R * 3 / 3) < 1e-9);
+  // Cube law inside the cone: half the cone height is one-eighth of the cone volume.
+  const half = _v1325({ diameter_ft: 6, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: 1.5 });
+  assert.ok(Math.abs(half.volume_ft3 - atCone.volume_ft3 / 8) < 1e-9);
+  // Continuity at the cone/cylinder seam.
+  const seamMinus = _v1325({ diameter_ft: 6, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: 3 - 1e-6 });
+  const seamPlus = _v1325({ diameter_ft: 6, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: 3 + 1e-6 });
+  assert.ok(Math.abs(seamMinus.volume_ft3 - seamPlus.volume_ft3) < 1e-4);
+  // Empty reads zero; depth beyond the total height clamps to the full tank.
+  assert.ok(_v1325({ diameter_ft: 6, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: 0 }).volume_ft3 === 0);
+  assert.ok(Math.abs(_v1325({ diameter_ft: 6, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: 99 }).percent_full - 100) < 1e-9);
+  // Error seams: non-positive dims, negative depth, non-finite.
+  assert.ok("error" in _v1325({ diameter_ft: 0, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: 6 }));
+  assert.ok("error" in _v1325({ diameter_ft: 6, cone_height_ft: 0, cylinder_height_ft: 8, depth_ft: 6 }));
+  assert.ok("error" in _v1325({ diameter_ft: 6, cone_height_ft: 3, cylinder_height_ft: 0, depth_ft: 6 }));
+  assert.ok("error" in _v1325({ diameter_ft: 6, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: -1 }));
+  assert.ok("error" in _v1325({ diameter_ft: Infinity, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: 6 }));
+});
