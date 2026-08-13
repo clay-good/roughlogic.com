@@ -77374,6 +77374,41 @@
    "kind": "question"
   },
   {
+   "term": "triangle three sides angles",
+   "target": "triangle-sss",
+   "kind": "industry"
+  },
+  {
+   "term": "sss triangle solver",
+   "target": "triangle-sss",
+   "kind": "industry"
+  },
+  {
+   "term": "herons formula area",
+   "target": "triangle-sss",
+   "kind": "industry"
+  },
+  {
+   "term": "check square 3 4 5",
+   "target": "triangle-sss",
+   "kind": "industry"
+  },
+  {
+   "term": "angle from three sides",
+   "target": "triangle-sss",
+   "kind": "adjacent"
+  },
+  {
+   "term": "is my corner square",
+   "target": "triangle-sss",
+   "kind": "question"
+  },
+  {
+   "term": "triangle area from three sides",
+   "target": "triangle-sss",
+   "kind": "question"
+  },
+  {
    "term": "find center of circle from three marks",
    "target": "circle-from-3-points",
    "kind": "question"

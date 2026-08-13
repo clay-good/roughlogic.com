@@ -165,6 +165,57 @@ function renderTriangleSas(inputRegion, outputRegion, citationEl) {
 }
 LAYOUT_RENDERERS["triangle-sas"] = renderTriangleSas;
 
+// spec-v1310: oblique-triangle solver, SSS (three sides -> angles). The companion to triangle-sas: three
+// measured sides, find the angles (law of cosines) and the area (Heron). A right angle opposite the longest
+// side means the corner is square (the 3-4-5 check, generalized). Sides must satisfy the triangle inequality.
+// dims: in { side_a: L, side_b: L, side_c: L } out: { angle_a_deg: dimensionless, angle_b_deg: dimensionless, angle_c_deg: dimensionless, area: L^2 }
+export function computeTriangleSss({ side_a = 0, side_b = 0, side_c = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const a = Number(side_a) || 0;
+  const b = Number(side_b) || 0;
+  const c = Number(side_c) || 0;
+  if (!(a > 0)) return { error: "Side a must be positive." };
+  if (!(b > 0)) return { error: "Side b must be positive." };
+  if (!(c > 0)) return { error: "Side c must be positive." };
+  if (!(a + b > c && a + c > b && b + c > a)) return { error: "These three sides cannot form a triangle (each side must be less than the sum of the other two)." };
+  const deg = (x) => (Math.acos(Math.min(1, Math.max(-1, x))) * 180) / Math.PI;
+  const angle_a_deg = deg((b * b + c * c - a * a) / (2 * b * c));
+  const angle_b_deg = deg((a * a + c * c - b * b) / (2 * a * c));
+  const angle_c_deg = 180 - angle_a_deg - angle_b_deg;
+  const s = (a + b + c) / 2;
+  const area = Math.sqrt(s * (s - a) * (s - b) * (s - c));
+  if (![angle_a_deg, angle_b_deg, angle_c_deg, area].every(Number.isFinite) || !(area > 0)) return { error: "Triangle math is not a finite value; check the inputs." };
+  const largest = Math.max(angle_a_deg, angle_b_deg, angle_c_deg);
+  const is_right = Math.abs(largest - 90) < 1e-6;
+  return {
+    angle_a_deg, angle_b_deg, angle_c_deg, area, is_right,
+    note: "Oblique-triangle solve from three measured sides (SSS). Each angle is the law of cosines, A = acos((b^2 + c^2 - a^2)/(2bc)) opposite side a and likewise for B and C, and the area is Heron's formula sqrt(s(s-a)(s-b)(s-c)) with the semiperimeter s = (a+b+c)/2. A right angle (90 degrees) opposite the longest side means the corner is square - the framer's 3-4-5 tape check made general. The three sides must satisfy the triangle inequality (each less than the sum of the other two) or no triangle exists. Use it to check square, read a brace or lot-line angle from three lengths, or area a triangular patch. The SAS case is triangle-sas; ASA/AAS and the ambiguous SSA are separate. Plane triangles only. A layout aid; verify critical dimensions on the work.",
+  };
+}
+export const triangleSssExample = { inputs: { side_a: 10, side_b: 8, side_c: 9.165 } };
+function renderTriangleSss(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: law of cosines solved for the angles, A = acos((b^2 + c^2 - a^2)/(2bc)), with Heron's area sqrt(s(s-a)(s-b)(s-c)) (standard trigonometry). A right angle opposite the longest side is a square corner (3-4-5). A layout aid; verify critical dimensions on the work.";
+  const a = makeNumber("Side a", "tsss-a", { step: "any", min: "0" }); a.input.value = "10";
+  const b = makeNumber("Side b", "tsss-b", { step: "any", min: "0" }); b.input.value = "8";
+  const c = makeNumber("Side c", "tsss-c", { step: "any", min: "0" }); c.input.value = "9.165";
+  for (const f of [a, b, c]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { a.input.value = "10"; b.input.value = "8"; c.input.value = "9.165"; update(); });
+  const oA = makeOutputLine(outputRegion, "Angles (A / B / C)", "tsss-out-a");
+  const oR = makeOutputLine(outputRegion, "Area", "tsss-out-r");
+  const oS = makeOutputLine(outputRegion, "Square corner?", "tsss-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "tsss-out-note");
+  const update = debounce(() => {
+    const r = computeTriangleSss({ side_a: Number(a.input.value) || 0, side_b: Number(b.input.value) || 0, side_c: Number(c.input.value) || 0 });
+    if (r.error) { oA.textContent = r.error; oR.textContent = "-"; oS.textContent = "-"; oNote.textContent = ""; return; }
+    oA.textContent = fmt(r.angle_a_deg, 2) + " / " + fmt(r.angle_b_deg, 2) + " / " + fmt(r.angle_c_deg, 2) + " deg (opposite a / b / c)";
+    oR.textContent = fmt(r.area, 4) + " (square units)";
+    oS.textContent = r.is_right ? "Yes - a 90 deg angle is opposite the longest side (square)" : "No right angle (not a square corner)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [a, b, c]) f.input.addEventListener("input", update);
+}
+LAYOUT_RENDERERS["triangle-sss"] = renderTriangleSss;
+
 // --- v32 G: Bolt circle / circle-of-holes layout (`bolt-circle`) ---
 // R = dia/2; hole i at angle start + i*(360/N): x = cx + R*cos, y = cy + R*sin;
 // adjacent center-to-center chord = 2*R*sin(180/N).

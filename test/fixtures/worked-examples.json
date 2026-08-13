@@ -88125,6 +88125,68 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "triangle-sss",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Three sides 10, 8, 9.165",
+   "source_edition_or_year": "plane trigonometry",
+   "source_section_or_page": "law of cosines / Heron",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "side_a": 10,
+    "side_b": 8,
+    "side_c": 9.165
+   },
+   "outputs": {
+    "angle_a_deg": {
+     "value": 70.89,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "angle_c_deg": {
+     "value": 60.0,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "area": {
+     "value": 34.641,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-sss",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "3-4-5 checks a square corner",
+   "source_edition_or_year": "plane trigonometry",
+   "source_section_or_page": "law of cosines / Heron",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "side_a": 3,
+    "side_b": 4,
+    "side_c": 5
+   },
+   "outputs": {
+    "angle_c_deg": {
+     "value": 90.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area": {
+     "value": 6.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

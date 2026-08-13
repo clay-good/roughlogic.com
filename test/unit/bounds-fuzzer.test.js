@@ -38171,3 +38171,25 @@ test("bounds: spec-v1309 computeTriangleSas pins the law-of-cosines third side, 
   assert.ok("error" in _v1309({ side_a: 10, side_b: 8, included_angle_deg: 180 }));
   assert.ok("error" in _v1309({ side_a: Infinity, side_b: 8, included_angle_deg: 60 }));
 });
+
+import { computeTriangleSss as _v1310 } from "../../calc-layout.js";
+import { computeTriangleSas as _v1310sib } from "../../calc-layout.js";
+test("bounds: spec-v1310 computeTriangleSss pins the law-of-cosines angles, Heron area, the 3-4-5 square check, the SAS cross-pin, and error seams", () => {
+  // Sides 10, 8, 9.165: A 70.89, B 49.11, C 60.0, area 34.64.
+  const r = _v1310({ side_a: 10, side_b: 8, side_c: 9.165 });
+  assert.ok(Math.abs(r.angle_a_deg - 70.89) < 0.05 && Math.abs(r.angle_c_deg - 60.0) < 0.05);
+  assert.ok(Math.abs(r.area - 34.641) < 1e-2);
+  // Angles sum to 180.
+  assert.ok(Math.abs(r.angle_a_deg + r.angle_b_deg + r.angle_c_deg - 180) < 1e-9);
+  // 3-4-5 is a right triangle (90 deg opposite the 5) with area 6.
+  const rt = _v1310({ side_a: 3, side_b: 4, side_c: 5 });
+  assert.ok(Math.abs(rt.angle_c_deg - 90) < 1e-6 && rt.is_right === true && Math.abs(rt.area - 6) < 1e-9);
+  // Cross-pin: the SAS solve of two of these sides at their included angle reproduces the third side.
+  const sas = _v1310sib({ side_a: 10, side_b: 8, included_angle_deg: r.angle_c_deg });
+  assert.ok(Math.abs(sas.side_c - 9.165) < 1e-2);
+  // Error seams: non-positive side, triangle-inequality violation, non-finite.
+  assert.ok("error" in _v1310({ side_a: 0, side_b: 8, side_c: 9 }));
+  assert.ok("error" in _v1310({ side_a: 3, side_b: 4, side_c: 8 }));
+  assert.ok("error" in _v1310({ side_a: 3, side_b: 4, side_c: 7 }));
+  assert.ok("error" in _v1310({ side_a: Infinity, side_b: 8, side_c: 9 }));
+});

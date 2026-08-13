@@ -11949,6 +11949,17 @@ export const CITATIONS = {
       { name: "SAS only", value: "two sides + included angle; SSS, ASA/AAS, and ambiguous SSA are separate", source: "scope of this tile" },
     ],
   },
+  "triangle-sss": {
+    formula: "A = acos((b^2 + c^2 - a^2)/(2bc)) and likewise B, C; s = (a+b+c)/2; area = sqrt(s(s-a)(s-b)(s-c)) (Heron). Triangle inequality required.",
+    edition: "The law of cosines solved for the angles with Heron's area formula - first-principles plane trigonometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure plane trigonometry, public; the three sides are user-supplied measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "Oblique-triangle solve from three measured sides (SSS). Each angle is the law of cosines, A = acos((b^2 + c^2 - a^2)/(2bc)) opposite side a and likewise for B and C, and the area is Heron's formula sqrt(s(s-a)(s-b)(s-c)) with the semiperimeter s = (a+b+c)/2. A right angle (90 degrees) opposite the longest side means the corner is square - the framer's 3-4-5 tape check made general. The three sides must satisfy the triangle inequality (each less than the sum of the other two) or no triangle exists. The SAS case is triangle-sas; ASA/AAS and the ambiguous SSA are separate. Plane triangles only. A layout aid; verify critical dimensions on the work.",
+    assumptions: [
+      { name: "Law of cosines + Heron", value: "angles from acos((b^2+c^2-a^2)/(2bc)); area = sqrt(s(s-a)(s-b)(s-c))", source: "plane trigonometry" },
+      { name: "Triangle inequality", value: "each side must be less than the sum of the other two", source: "geometry" },
+    ],
+  },
   "circular-segment-area": {
     formula: "R = (chord^2/4 + rise^2)/(2 x rise); theta = 2 x acos((R - rise)/R); segment area A = (1/2) R^2 (theta - sin theta) = R^2 acos((R-h)/R) - (R-h) sqrt(2 R h - h^2).",
     edition: "Area of a circular segment (the region between a chord and its arc) - first-principles circle geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",

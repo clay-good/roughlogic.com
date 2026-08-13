@@ -1147,6 +1147,7 @@ export const RENDERER_MAP = {
   "circular-arc-rise-from-radius": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },
   "circular-segment-area": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },
   "triangle-sas": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },
+  "triangle-sss": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },
   "circle-from-3-points": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },
   "polygon-miter": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },
   "equal-spacing": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },
