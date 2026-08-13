@@ -89041,6 +89041,64 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "tapered-tank-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "4->10 ft taper over 12 ft, at 6 ft level",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "frustum up to the level",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "bottom_diameter_ft": 4,
+    "top_diameter_ft": 10,
+    "height_ft": 12,
+    "depth_ft": 6
+   },
+   "outputs": {
+    "volume_gal": {
+     "value": 1092.78,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "percent_full": {
+     "value": 29.81,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tapered-tank-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same tank full (12 ft) = frustum volume",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "full = (pi H/3)(R1^2 + R1 R2 + R2^2)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "bottom_diameter_ft": 4,
+    "top_diameter_ft": 10,
+    "height_ft": 12,
+    "depth_ft": 12
+   },
+   "outputs": {
+    "full_gal": {
+     "value": 3666.12,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "percent_full": {
+     "value": 100.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

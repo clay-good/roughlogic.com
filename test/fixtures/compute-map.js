@@ -817,6 +817,7 @@ export const COMPUTE_MAP = {
   "spherical-zone-volume": { module: "../../calc-shop.js", fn: "computeSphericalZoneVolume" },
   "oval-tank-volume": { module: "../../calc-shop.js", fn: "computeOvalTankVolume" },
   "cone-bottom-tank-volume": { module: "../../calc-shop.js", fn: "computeConeBottomTankVolume" },
+  "tapered-tank-volume": { module: "../../calc-shop.js", fn: "computeTaperedTankVolume" },
   "spur-gear-geometry": { module: "../../calc-machining.js", fn: "computeSpurGearGeometry" },
   "worm-gear-geometry": { module: "../../calc-machining.js", fn: "computeWormGearGeometry" },
   "gear-undercut-backlash": { module: "../../calc-machining.js", fn: "computeGearUndercutBacklash" },

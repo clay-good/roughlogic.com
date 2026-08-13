@@ -38399,6 +38399,31 @@
    "kind": "adjacent"
   },
   {
+   "term": "tapered tank volume at depth",
+   "target": "tapered-tank-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "frustum tank gallons at level",
+   "target": "tapered-tank-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "tapered silo volume from height",
+   "target": "tapered-tank-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "how many gallons in a tapered bin",
+   "target": "tapered-tank-volume",
+   "kind": "question"
+  },
+  {
+   "term": "conical frustum tank partial volume",
+   "target": "tapered-tank-volume",
+   "kind": "adjacent"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"

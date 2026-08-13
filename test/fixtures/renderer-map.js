@@ -1188,6 +1188,7 @@ export const RENDERER_MAP = {
   "spherical-zone-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "oval-tank-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "cone-bottom-tank-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
+  "tapered-tank-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "press-fit-pressure": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "press-fit-interference-for-force": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "roller-chain-length": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },

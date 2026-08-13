@@ -11837,6 +11837,17 @@ export const CITATIONS = {
       { name: "Scope", value: "right cone concentric with the cylinder, apex down; a flat-bottom tank is the tank-volume tile", source: "scope of this tile" },
     ],
   },
+  "tapered-tank-volume": {
+    formula: "r(h) = R1 + (R2 - R1) h/H; volume = (pi h/3)(R1^2 + R1 r(h) + r(h)^2); full = (pi H/3)(R1^2 + R1 R2 + R2^2).",
+    edition: "Tapered (frustum) tank partial gauging - the liquid up to a level is itself a cone frustum; standard solid geometry (frustum of a cone) as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Public-domain solid geometry; the bottom and top diameters, the height, and the depth are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Partial volume of a straight-tapered (frustum) tank or bin from a dipstick depth - a tapered silo, a hopper, or a process tank whose diameter changes from bottom to top, the shape frustum-volume gives only when full. The radius grows linearly with height, r(h) = R1 + (R2 - R1) h/H, so the liquid up to depth h is itself a frustum, V = (pi h/3)(R1^2 + R1 r(h) + r(h)^2), with R1 the bottom radius and R2 the top radius. It handles a widening bin (fills fastest near the top) or a narrowing hopper (fills fastest near the bottom); when the two diameters are equal it collapses to a straight cylinder. Enter the inside bottom diameter, top diameter, height, and the depth from the bottom, all in feet. A right (concentric) frustum with flat top and bottom; a bottom cone under a cylinder is the cone-bottom-tank-volume tile. Reported in cubic feet and US gallons with the percent full.",
+    assumptions: [
+      { name: "Partial volume", value: "V = (pi h/3)(R1^2 + R1 r(h) + r(h)^2), a frustum up to the level with r(h) linear", source: "solid geometry" },
+      { name: "Scope", value: "right frustum, flat top/bottom; equal diameters give a cylinder; a cone-under-cylinder is the cone-bottom tile", source: "scope of this tile" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",

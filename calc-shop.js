@@ -1966,6 +1966,72 @@ function _v1325renderConeBottomTankVolume(inputRegion, outputRegion, citationEl)
 }
 SHOP_RENDERERS["cone-bottom-tank-volume"] = _v1325renderConeBottomTankVolume;
 
+// spec-v1326: tapered (frustum) tank / bin partial volume from a level - a straight-tapered silo, hopper, or process
+// tank whose diameter changes top to bottom, which frustum-volume gives only FULL. Radius grows linearly with
+// height r(h) = R1 + (R2 - R1) h/H, and the liquid up to h is itself a frustum: V = (pi h/3)(R1^2 + R1 r(h) + r(h)^2).
+// Handles a widening bin (R2>R1) or a narrowing hopper (R2<R1); equal diameters collapse to a cylinder.
+// dims: in { bottom_diameter_ft: L, top_diameter_ft: L, height_ft: L, depth_ft: L } out: { volume_gal: L^3, volume_ft3: L^3, full_gal: L^3, full_ft3: L^3, percent_full: dimensionless }
+export function computeTaperedTankVolume({ bottom_diameter_ft = 0, top_diameter_ft = 0, height_ft = 0, depth_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D1 = Number(bottom_diameter_ft) || 0;
+  const D2 = Number(top_diameter_ft) || 0;
+  const H = Number(height_ft) || 0;
+  let h = Number(depth_ft) || 0;
+  if (!(D1 > 0)) return { error: "Bottom diameter must be positive (ft)." };
+  if (!(D2 > 0)) return { error: "Top diameter must be positive (ft)." };
+  if (!(H > 0)) return { error: "Tank height must be positive (ft)." };
+  if (h < 0) return { error: "Liquid depth cannot be negative (ft)." };
+  const R1 = D1 / 2, R2 = D2 / 2;
+  let clamped = false;
+  if (h > H) { h = H; clamped = true; }
+  const rAt = (z) => R1 + (R2 - R1) * (z / H);
+  const frustum = (z) => { const r = rAt(z); return Math.PI * z / 3 * (R1 * R1 + R1 * r + r * r); };
+  const volume_ft3 = h <= 0 ? 0 : frustum(h);
+  const full_ft3 = Math.PI * H / 3 * (R1 * R1 + R1 * R2 + R2 * R2);
+  const GAL_PER_FT3 = 7.480519;
+  const percent_full = full_ft3 > 0 ? (volume_ft3 / full_ft3) * 100 : 0;
+  if (![volume_ft3, full_ft3, percent_full].every(Number.isFinite) || !(full_ft3 > 0)) return { error: "Tapered-tank math is not a finite value; check the inputs." };
+  const r_at_level = rAt(Math.max(0, Math.min(h, H)));
+  const widening = R2 > R1;
+  const notes = [];
+  notes.push("Partial volume of a straight-TAPERED (frustum) tank or bin from a dipstick depth - a tapered silo, a hopper, or a process tank whose diameter changes from bottom to top, the shape frustum-volume gives only when full. The radius grows linearly with height, r(h) = R1 + (R2 - R1) h/H, so the liquid up to depth h is itself a frustum, V = (pi h/3)(R1^2 + R1 r(h) + r(h)^2), with R1 = bottom radius and R2 = top radius. It handles a widening bin or a narrowing hopper; when the two diameters are equal it collapses to a straight cylinder. Reported in cubic feet and US gallons with the percent full.");
+  notes.push(widening
+    ? "Widening upward (R2 > R1): each higher inch adds more volume than the one below, so the gauge is non-linear - the top of the tank fills fastest."
+    : (R2 < R1
+      ? "Narrowing upward (R2 < R1, a hopper): each higher inch adds less than the one below, so the bottom fills fastest."
+      : "Straight sides (equal diameters): a plain cylinder, each inch the same volume."));
+  notes.push("Enter the inside bottom diameter, top diameter, height, and the depth from the bottom, all in feet. A right (concentric) frustum with flat top and bottom; a bottom cone under a cylinder is the cone-bottom-tank-volume tile. US gallons; the tank's own chart governs.");
+  if (clamped) notes.push("Depth exceeded the tank height; reporting the full tank.");
+  return {
+    volume_gal: volume_ft3 * GAL_PER_FT3, volume_ft3,
+    full_gal: full_ft3 * GAL_PER_FT3, full_ft3, percent_full, radius_at_level: r_at_level, notes,
+  };
+}
+export const taperedTankVolumeExample = { inputs: { bottom_diameter_ft: 4, top_diameter_ft: 10, height_ft: 12, depth_ft: 6 } };
+function _v1326renderTaperedTankVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: tapered (frustum) tank partial volume - the liquid up to depth h is a frustum, V = (pi h/3)(R1^2 + R1 r(h) + r(h)^2) with r(h) = R1 + (R2 - R1) h/H. First-principles solid geometry (frustum of a cone; Machinery's Handbook), by name; public domain. A dipstick / takeoff aid; the tank's own chart governs.";
+  const D1 = makeNumber("Bottom diameter (ft)", "ttk-d1", { step: "any", min: "0" }); D1.input.value = "4";
+  const D2 = makeNumber("Top diameter (ft)", "ttk-d2", { step: "any", min: "0" }); D2.input.value = "10";
+  const H = makeNumber("Tank height (ft)", "ttk-h", { step: "any", min: "0" }); H.input.value = "12";
+  const d = makeNumber("Liquid depth from the bottom (ft)", "ttk-dep", { step: "any", min: "0" }); d.input.value = "6";
+  for (const f of [D1, D2, H, d]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D1.input.value = "4"; D2.input.value = "10"; H.input.value = "12"; d.input.value = "6"; update(); });
+  const oV = makeOutputLine(outputRegion, "Liquid volume", "ttk-out-v");
+  const oP = makeOutputLine(outputRegion, "Percent full", "ttk-out-p");
+  const oF = makeOutputLine(outputRegion, "Full tank", "ttk-out-f");
+  const oNote = makeOutputLine(outputRegion, "Notes", "ttk-out-n");
+  const update = debounce(() => {
+    const res = computeTaperedTankVolume({ bottom_diameter_ft: Number(D1.input.value) || 0, top_diameter_ft: Number(D2.input.value) || 0, height_ft: Number(H.input.value) || 0, depth_ft: Number(d.input.value) || 0 });
+    if (res.error) { oV.textContent = res.error; oP.textContent = "-"; oF.textContent = "-"; oNote.textContent = ""; return; }
+    oV.textContent = fmt(res.volume_gal, 1) + " gal (" + fmt(res.volume_ft3, 2) + " ft^3)";
+    oP.textContent = fmt(res.percent_full, 1) + "%";
+    oF.textContent = fmt(res.full_gal, 1) + " gal";
+    oNote.textContent = res.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [D1, D2, H, d]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["tapered-tank-volume"] = _v1326renderTaperedTankVolume;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {

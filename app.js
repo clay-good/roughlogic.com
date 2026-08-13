@@ -906,7 +906,7 @@ const TOOL_MODULES = (() => {
     // spec-v54: Group E carpentry compound miter
     "compound-miter",
     // spec-v399..v400 fabrication shop-math
-    "tolerance-stack-rss", "cone-flat-pattern", "frustum-volume", "regular-polygon", "ellipse-area-perimeter", "spherical-cap-volume", "parabolic-segment", "pyramid-frustum-volume", "torus-volume", "ellipsoid-volume", "annulus-area", "circular-sector", "tank-volume-dished-heads", "spherical-zone-volume", "oval-tank-volume", "cone-bottom-tank-volume",
+    "tolerance-stack-rss", "cone-flat-pattern", "frustum-volume", "regular-polygon", "ellipse-area-perimeter", "spherical-cap-volume", "parabolic-segment", "pyramid-frustum-volume", "torus-volume", "ellipsoid-volume", "annulus-area", "circular-sector", "tank-volume-dished-heads", "spherical-zone-volume", "oval-tank-volume", "cone-bottom-tank-volume", "tapered-tank-volume",
     // spec-v511 interference press-fit pressure and holding force
     "press-fit-pressure", "press-fit-interference-for-force",
     // spec-v512 roller chain length in pitches (ANSI B29.1)

@@ -3096,6 +3096,7 @@ cross-check.
 | calc-shop.js | `computeTapDrillSize` | `{ thread_standard = "inch", major_dia_in = 0, tpi = 0, pitch_mm = 0, thread_p...` | _ | _ | _ |
 | calc-shop.js | `computeTaperCalc` | `{ large_dia_in = 0, small_dia_in = 0, length_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeTaperDiameter` | `{ known_dia_in = 0, known_end = "large", taper_per_foot = 0, length_in = 0 } ...` | _ | _ | _ |
+| calc-shop.js | `computeTaperedTankVolume` | `{ bottom_diameter_ft = 0, top_diameter_ft = 0, height_ft = 0, depth_ft = 0 } ...` | _ | _ | _ |
 | calc-shop.js | `computeThreadMeasureWire` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, pitch_diameter_in = 0, wir...` | _ | _ | _ |
 | calc-shop.js | `computeThreadPitchDiaFromWires` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, measurement_over_wires_in ...` | _ | _ | _ |
 | calc-shop.js | `computeToleranceStackRss` | `{ nominal_gap_in = 0, tolerances = "" } = {}` | _ | _ | _ |
@@ -3363,7 +3364,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1949.
+Row count: 1950.
 
 <!-- END function-corpus-v14 -->
 
@@ -4527,7 +4528,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (88 tiles)
+### Group G Cross-trade (89 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4601,6 +4602,7 @@ per spec-v14 §13.1 second paragraph.
 | `swing-fall-geometry` | Swing Fall Geometry (Pendulum Drop and Arc) | pendulum geometry; asin(10/20) = exactly 30 deg; drop 20 - sqrt(400-100) = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tank-volume` | Tank Volume (Dipstick) | First-principles circular-segment geo...; 24 in dia x 48 in horizontal, depth 12 in (half) -> 47.00... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tank-volume-dished-heads` | Horizontal Tank Volume with Dished Heads (Dipstick) | Project (first-principles); shell segment + head cap (b/R = 1/2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `tapered-tank-volume` | Tapered (Frustum) Tank Volume from Level | Project (first-principles); frustum up to the level | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thread-measure-wire` | Three-Wire Thread Measurement | First-principles three-wire geometry ...; 1/2-13 UNC, E 0.45 in -> best wire 0.044412 in, M 0.51661... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thread-pitch` | Thread Pitch and Lead | First-principles 60-degree thread geo...; 1/4-20 UNC: 20 TPI -> 0.050 in pitch, 0.043301 in sharp-V... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thread-pitch-dia-from-wires` | Pitch Diameter from Three-Wire Measurement | First-principles three-wire geometry ...; 1/2-13 UNC, M 0.49 in over best wires -> E 0.423383 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5234,6 +5236,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1698. Fixture-covered or reference-cadence: 1698 / 1698.
+Tile count: 1699. Fixture-covered or reference-cadence: 1699 / 1699.
 
 <!-- END tile-index-v14 -->

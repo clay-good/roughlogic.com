@@ -38531,3 +38531,26 @@ test("bounds: spec-v1325 computeConeBottomTankVolume pins the cone h^3 law, the 
   assert.ok("error" in _v1325({ diameter_ft: 6, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: -1 }));
   assert.ok("error" in _v1325({ diameter_ft: Infinity, cone_height_ft: 3, cylinder_height_ft: 8, depth_ft: 6 }));
 });
+
+import { computeTaperedTankVolume as _v1326 } from "../../calc-shop.js";
+test("bounds: spec-v1326 computeTaperedTankVolume pins the frustum fill, the full = frustum limit, the cylinder degenerate, clamping, and error seams", () => {
+  const P = Math.PI;
+  // 4 ft bottom -> 10 ft top over 12 ft, at 6 ft: 1,092.8 gal, 29.8% full.
+  const t = _v1326({ bottom_diameter_ft: 4, top_diameter_ft: 10, height_ft: 12, depth_ft: 6 });
+  assert.ok(Math.abs(t.volume_gal - 1092.78) < 0.5 && Math.abs(t.percent_full - 29.81) < 0.05);
+  // Full equals the frustum volume (pi H/3)(R1^2 + R1 R2 + R2^2).
+  const full = _v1326({ bottom_diameter_ft: 4, top_diameter_ft: 10, height_ft: 12, depth_ft: 12 });
+  assert.ok(Math.abs(full.full_ft3 - P * 12 / 3 * (4 + 10 + 25)) < 1e-9 && Math.abs(full.percent_full - 100) < 1e-9);
+  // Equal diameters degenerate to a straight cylinder pi R^2 h.
+  const cyl = _v1326({ bottom_diameter_ft: 6, top_diameter_ft: 6, height_ft: 10, depth_ft: 4 });
+  assert.ok(Math.abs(cyl.volume_ft3 - P * 9 * 4) < 1e-9);
+  // Empty reads zero; depth beyond the height clamps to full.
+  assert.ok(_v1326({ bottom_diameter_ft: 4, top_diameter_ft: 10, height_ft: 12, depth_ft: 0 }).volume_ft3 === 0);
+  assert.ok(Math.abs(_v1326({ bottom_diameter_ft: 4, top_diameter_ft: 10, height_ft: 12, depth_ft: 99 }).percent_full - 100) < 1e-9);
+  // Error seams: non-positive dims, negative depth, non-finite.
+  assert.ok("error" in _v1326({ bottom_diameter_ft: 0, top_diameter_ft: 10, height_ft: 12, depth_ft: 6 }));
+  assert.ok("error" in _v1326({ bottom_diameter_ft: 4, top_diameter_ft: 0, height_ft: 12, depth_ft: 6 }));
+  assert.ok("error" in _v1326({ bottom_diameter_ft: 4, top_diameter_ft: 10, height_ft: 0, depth_ft: 6 }));
+  assert.ok("error" in _v1326({ bottom_diameter_ft: 4, top_diameter_ft: 10, height_ft: 12, depth_ft: -1 }));
+  assert.ok("error" in _v1326({ bottom_diameter_ft: Infinity, top_diameter_ft: 10, height_ft: 12, depth_ft: 6 }));
+});
