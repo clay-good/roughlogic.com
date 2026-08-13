@@ -3030,6 +3030,7 @@ cross-check.
 | calc-rigging.js | `computeWireRopeClips` | `{ rope_diameter_in = 0.75 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeWireRopeDiameterForWll` | `{ wll_required_tons = 0, construction_factor = 46, design_factor = 5 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeWireRopeStrength` | `{ diameter_in = 0, construction_factor = 46, design_factor = 5 } = {}` | _ | _ | _ |
+| calc-rigging.js | `computeWireRopeStretch` | `{ load_lb = 0, length_ft = 0, rope_diameter_in = 0, effective_modulus_psi = 1...` | _ | _ | _ |
 | calc-septic.js | `computeLeachFieldAggregate` | `{ num_trenches = 3, trench_length_ft = 60, trench_width_in = 24, stone_depth_...` | _ | _ | _ |
 | calc-septic.js | `computeSepticDoseTank` | `{ daily_flow_gpd, doses_per_day = 4, drainback_gal = 0 } = {}` | _ | _ | _ |
 | calc-septic.js | `computeSepticDrainfield` | `{ design_flow_gpd = 0, application_rate_gpd_per_ft2 = 0, trench_width_ft = 3,...` | _ | _ | _ |
@@ -3342,7 +3343,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1928.
+Row count: 1929.
 
 <!-- END function-corpus-v14 -->
 
@@ -5155,7 +5156,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-proportion-z-test` | Two-Proportion z-Test | statsmodels proportions_ztest / scipy...; p_pool = 75/200 = 0.375; SE = sqrt(0.375*0.625*0.02) = 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Z (unnamed) (32 tiles)
+### Group Z (unnamed) (33 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5191,7 +5192,8 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-clips` | Wire-Rope Clip Count and Spacing (OSHA Table H-2) | wire-rope clip requirements (OSHA Tab...; OSHA Table H-2: 3/4 in -> 4 clips; spacing = 6 x 0.75 = 4... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1677. Fixture-covered or reference-cadence: 1677 / 1677.
+Tile count: 1678. Fixture-covered or reference-cadence: 1678 / 1678.
 
 <!-- END tile-index-v14 -->

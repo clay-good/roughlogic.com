@@ -758,7 +758,7 @@ const _TILES = [
   ["aeration-oxygen-demand", "M"],
   // spec-v117 rigging load / wire-rope (Group Z)
   ["multi-leg-sling", "Z"],
-  ["wire-rope-strength", "Z"], ["wire-rope-diameter-for-wll", "Z"],
+  ["wire-rope-strength", "Z"], ["wire-rope-diameter-for-wll", "Z"], ["wire-rope-stretch", "Z"],
   // spec-v484 spanned cable sag and tension (Group Z)
   ["spanline-sag-tension", "Z"], ["spanline-sag-for-tension", "Z"],
   ["bridle-leg-tension", "Z"],

@@ -1086,6 +1086,58 @@ function renderWireRopeDiameterForWll(inputRegion, outputRegion, citationEl) {
 }
 RIGGING_RENDERERS["wire-rope-diameter-for-wll"] = renderWireRopeDiameterForWll;
 
+// spec-v1305: wire rope elastic stretch. The rigging bench sizes rope by strength but not by how
+// much it stretches under load - the elastic elongation for a level pick, a two-crane share, or
+// hoist-rope travel. dL = P L / (A_m E_r), metallic area A_m = F d^2 (F ~ 0.40 for 6x19/6x37 IWRC),
+// E_r ~ 12e6 psi (a seated rope, below solid steel). Elastic only; constructional (seating) stretch is separate.
+// dims: in { load_lb: M L T^-2, length_ft: L, rope_diameter_in: L, effective_modulus_psi: M L^-1 T^-2, metallic_area_factor: dimensionless } out: { stretch_in: L, stretch_pct: dimensionless, metallic_area_in2: L^2 }
+export function computeWireRopeStretch({ load_lb = 0, length_ft = 0, rope_diameter_in = 0, effective_modulus_psi = 12000000, metallic_area_factor = 0.40 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const P = Number(load_lb) || 0;
+  const Lft = Number(length_ft) || 0;
+  const d = Number(rope_diameter_in) || 0;
+  const E = Number(effective_modulus_psi) || 0;
+  const F = Number(metallic_area_factor) || 0;
+  if (!(P > 0)) return { error: "Line load must be positive (lb)." };
+  if (!(Lft > 0)) return { error: "Rope length must be positive (ft)." };
+  if (!(d > 0)) return { error: "Rope diameter must be positive (in)." };
+  if (!(E > 0)) return { error: "Effective rope modulus must be positive (psi)." };
+  if (!(F > 0 && F <= 1)) return { error: "Metallic-area factor must be between 0 and 1." };
+  const metallic_area_in2 = F * d * d;
+  const L_in = Lft * 12;
+  const stretch_in = (P * L_in) / (metallic_area_in2 * E);
+  const stretch_pct = (stretch_in / L_in) * 100;
+  if (![metallic_area_in2, stretch_in, stretch_pct].every(Number.isFinite) || !(stretch_in > 0)) return { error: "Wire-rope-stretch math is not a finite value; check the inputs." };
+  return {
+    stretch_in, stretch_pct, metallic_area_in2,
+    note: "ELASTIC (recoverable) stretch of a wire rope under a line load, dL = P L / (A_m E_r), with the metallic (steel) area A_m = F d^2 (fill factor F ~ 0.40 for 6x19 or 6x37 IWRC), the effective rope modulus E_r (about 12,000,000 psi for a seated 6-strand rope - lower than solid steel because the rope is a bundle of helixes), and the length L in inches. A 100 ft rope can stretch the better part of a foot under a working load, which matters on a level pick or when two cranes share a load. Separately, a BRAND-NEW rope also takes an initial constructional (seating) stretch of roughly 0.5-0.75% of length the first time it is loaded as the strands nest, which is permanent and not included here. Thermal change, rotation/torque effects, and the true per-construction modulus and fill factor (use the maker's data) are separate. Never exceed the rope's rated load. A rigging estimate; the wire rope maker and the qualified rigger govern.",
+  };
+}
+export const wireRopeStretchExample = { inputs: { load_lb: 10000, length_ft: 100, rope_diameter_in: 0.5, effective_modulus_psi: 12000000, metallic_area_factor: 0.40 } };
+function renderWireRopeStretch(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: wire-rope elastic elongation dL = P L / (A_m E_r) with the metallic area A_m = F d^2 (fill factor F ~ 0.40 for 6x19/6x37 IWRC) and the effective rope modulus E_r ~ 12e6 psi for a seated rope (Wire Rope Users Manual). Elastic stretch only; the initial constructional (seating) stretch (~0.5-0.75%) is separate. A rigging estimate; the rope maker governs.";
+  const P = makeNumber("Line load (lb)", "wrs-p", { step: "any", min: "0", value: "10000" });
+  const L = makeNumber("Rope length under load (ft)", "wrs-l", { step: "any", min: "0", value: "100" });
+  const d = makeNumber("Rope diameter (in)", "wrs-d", { step: "any", min: "0", value: "0.5" });
+  const E = makeNumber("Effective rope modulus (psi)", "wrs-e", { step: "any", min: "0", value: "12000000" });
+  const F = makeNumber("Metallic-area factor (fill factor)", "wrs-f", { step: "any", min: "0", value: "0.40" });
+  P.input.value = "10000"; L.input.value = "100"; d.input.value = "0.5"; E.input.value = "12000000"; F.input.value = "0.40";
+  for (const f of [P, L, d, E, F]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { P.input.value = "10000"; L.input.value = "100"; d.input.value = "0.5"; E.input.value = "12000000"; F.input.value = "0.40"; update(); });
+  const oS = makeOutputLine(outputRegion, "Elastic stretch", "wrs-out-s");
+  const oP = makeOutputLine(outputRegion, "Stretch (% of length)", "wrs-out-p");
+  const oN = makeOutputLine(outputRegion, "Note", "wrs-out-n");
+  const update = debounce(() => {
+    const r = computeWireRopeStretch({ load_lb: Number(P.input.value) || 0, length_ft: Number(L.input.value) || 0, rope_diameter_in: Number(d.input.value) || 0, effective_modulus_psi: Number(E.input.value) || 0, metallic_area_factor: Number(F.input.value) || 0 });
+    if (r.error) { oS.textContent = r.error; oP.textContent = "-"; oN.textContent = "-"; return; }
+    oS.textContent = fmt(r.stretch_in, 2) + " in (metallic area " + fmt(r.metallic_area_in2, 4) + " in^2)";
+    oP.textContent = fmt(r.stretch_pct, 3) + "% (plus ~0.5-0.75% one-time seating on new rope)";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [P, L, d, E, F]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["wire-rope-stretch"] = renderWireRopeStretch;
+
 // --- spanline-sag-tension: Sag and Tension on a Horizontally Spanned Cable ---
 //
 // Shallow-parabola statics: a uniform load w over a span L sagging d at

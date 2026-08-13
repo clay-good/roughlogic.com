@@ -87843,6 +87843,60 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "wire-rope-stretch",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1/2 in rope, 100 ft, 10000 lb",
+   "source_edition_or_year": "Wire Rope Users Manual",
+   "source_section_or_page": "dL = P L /(A_m E_r)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "load_lb": 10000,
+    "length_ft": 100,
+    "rope_diameter_in": 0.5,
+    "effective_modulus_psi": 12000000,
+    "metallic_area_factor": 0.4
+   },
+   "outputs": {
+    "stretch_in": {
+     "value": 10.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "stretch_pct": {
+     "value": 0.833,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wire-rope-stretch",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Bigger 3/4 in rope halves-plus the stretch",
+   "source_edition_or_year": "Wire Rope Users Manual",
+   "source_section_or_page": "dL = P L /(A_m E_r)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "load_lb": 10000,
+    "length_ft": 100,
+    "rope_diameter_in": 0.75,
+    "effective_modulus_psi": 12000000,
+    "metallic_area_factor": 0.4
+   },
+   "outputs": {
+    "stretch_in": {
+     "value": 4.444,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

@@ -94044,6 +94044,46 @@
    "kind": "question"
   },
   {
+   "term": "wire rope stretch",
+   "target": "wire-rope-stretch",
+   "kind": "industry"
+  },
+  {
+   "term": "wire rope elongation",
+   "target": "wire-rope-stretch",
+   "kind": "industry"
+  },
+  {
+   "term": "cable stretch under load",
+   "target": "wire-rope-stretch",
+   "kind": "industry"
+  },
+  {
+   "term": "crane rope stretch",
+   "target": "wire-rope-stretch",
+   "kind": "adjacent"
+  },
+  {
+   "term": "hoist rope elongation",
+   "target": "wire-rope-stretch",
+   "kind": "adjacent"
+  },
+  {
+   "term": "constructional stretch wire rope",
+   "target": "wire-rope-stretch",
+   "kind": "adjacent"
+  },
+  {
+   "term": "how much does wire rope stretch",
+   "target": "wire-rope-stretch",
+   "kind": "question"
+  },
+  {
+   "term": "cable elongation for level pick",
+   "target": "wire-rope-stretch",
+   "kind": "question"
+  },
+  {
    "term": "tension in a tight cable span",
    "target": "spanline-sag-tension",
    "kind": "question"

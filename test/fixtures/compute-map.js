@@ -1505,6 +1505,7 @@ export const COMPUTE_MAP = {
   "multi-leg-sling": { module: "../../calc-rigging.js", fn: "computeMultiLegSling" },
   "wire-rope-strength": { module: "../../calc-rigging.js", fn: "computeWireRopeStrength" },
   "wire-rope-diameter-for-wll": { module: "../../calc-rigging.js", fn: "computeWireRopeDiameterForWll" },
+  "wire-rope-stretch": { module: "../../calc-rigging.js", fn: "computeWireRopeStretch" },
   "spanline-sag-tension": { module: "../../calc-rigging.js", fn: "computeSpanlineSagTension" },
   "spanline-sag-for-tension": { module: "../../calc-rigging.js", fn: "computeSpanlineSagForTension" },
   "bridle-leg-tension": { module: "../../calc-rigging.js", fn: "computeBridleLegTension" },

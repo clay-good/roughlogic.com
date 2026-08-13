@@ -38066,3 +38066,25 @@ test("bounds: spec-v1304 computeHydraulicAccumulatorVolume pins the isothermal/a
   assert.ok("error" in _v1304({ accumulator_size_gal: 1, precharge_psig: 1500, min_pressure_psig: 1600, max_pressure_psig: 3000, gas_process: "polytropic" }));
   assert.ok("error" in _v1304({ accumulator_size_gal: Infinity, precharge_psig: 1500, min_pressure_psig: 1600, max_pressure_psig: 3000, gas_process: "isothermal" }));
 });
+
+import { computeWireRopeStretch as _v1305 } from "../../calc-rigging.js";
+test("bounds: spec-v1305 computeWireRopeStretch pins the elastic elongation, the diameter^2 and modulus scalings, and error seams", () => {
+  // 10000 lb, 100 ft, 0.5 in, E 12e6, F 0.40: A_m 0.10 in^2, stretch 10 in (0.833%).
+  const r = _v1305({ load_lb: 10000, length_ft: 100, rope_diameter_in: 0.5, effective_modulus_psi: 12000000, metallic_area_factor: 0.40 });
+  assert.ok(Math.abs(r.metallic_area_in2 - 0.10) < 1e-9 && Math.abs(r.stretch_in - 10.0) < 1e-6);
+  assert.ok(Math.abs(r.stretch_pct - 0.8333) < 1e-3);
+  // Stretch scales linearly with load and with length.
+  assert.ok(Math.abs(_v1305({ load_lb: 20000, length_ft: 100, rope_diameter_in: 0.5, effective_modulus_psi: 12000000, metallic_area_factor: 0.40 }).stretch_in / r.stretch_in - 2) < 1e-9);
+  assert.ok(Math.abs(_v1305({ load_lb: 10000, length_ft: 200, rope_diameter_in: 0.5, effective_modulus_psi: 12000000, metallic_area_factor: 0.40 }).stretch_in / r.stretch_in - 2) < 1e-9);
+  // Stretch scales with 1/diameter^2 (a 3/4 in rope stretches (0.5/0.75)^2 as much).
+  const big = _v1305({ load_lb: 10000, length_ft: 100, rope_diameter_in: 0.75, effective_modulus_psi: 12000000, metallic_area_factor: 0.40 });
+  assert.ok(Math.abs(big.stretch_in / r.stretch_in - Math.pow(0.5 / 0.75, 2)) < 1e-6);
+  // A stiffer (higher-modulus) rope stretches less; the percent is independent of load-length product only through dL.
+  assert.ok(_v1305({ load_lb: 10000, length_ft: 100, rope_diameter_in: 0.5, effective_modulus_psi: 15000000, metallic_area_factor: 0.40 }).stretch_in < r.stretch_in);
+  // Error seams: non-positive load/length/diameter/modulus, fill factor out of (0,1], non-finite.
+  assert.ok("error" in _v1305({ load_lb: 0, length_ft: 100, rope_diameter_in: 0.5, effective_modulus_psi: 12000000, metallic_area_factor: 0.40 }));
+  assert.ok("error" in _v1305({ load_lb: 10000, length_ft: 0, rope_diameter_in: 0.5, effective_modulus_psi: 12000000, metallic_area_factor: 0.40 }));
+  assert.ok("error" in _v1305({ load_lb: 10000, length_ft: 100, rope_diameter_in: 0, effective_modulus_psi: 12000000, metallic_area_factor: 0.40 }));
+  assert.ok("error" in _v1305({ load_lb: 10000, length_ft: 100, rope_diameter_in: 0.5, effective_modulus_psi: 12000000, metallic_area_factor: 1.5 }));
+  assert.ok("error" in _v1305({ load_lb: Infinity, length_ft: 100, rope_diameter_in: 0.5, effective_modulus_psi: 12000000, metallic_area_factor: 0.40 }));
+});

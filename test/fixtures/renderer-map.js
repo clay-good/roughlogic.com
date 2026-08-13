@@ -1675,6 +1675,7 @@ export const RENDERER_MAP = {
   "multi-leg-sling": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },
   "wire-rope-strength": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },
   "wire-rope-diameter-for-wll": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },
+  "wire-rope-stretch": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },
   "spanline-sag-tension": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },
   "spanline-sag-for-tension": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },
   "bridle-leg-tension": { module: "../../calc-rigging.js", exportName: "RIGGING_RENDERERS" },

@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1677,
-  "covered_count": 1219,
+  "total_tiles": 1678,
+  "covered_count": 1220,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -1206,6 +1206,7 @@
     "wire-rope-clips",
     "wire-rope-diameter-for-wll",
     "wire-rope-strength",
+    "wire-rope-stretch",
     "wireway-fill",
     "wobbe-index",
     "wood-beam-bending",

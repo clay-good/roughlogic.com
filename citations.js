@@ -14053,6 +14053,18 @@ export const CITATIONS = {
       { name: "Estimate only", value: "round up to a standard size and use the certified breaking strength for any real lift; never use unmarked or uncertified rope", source: "manufacturer certification" },
     ],
   },
+  "wire-rope-stretch": {
+    formula: "A_m = F d^2 (F ~ 0.40 for 6x19/6x37 IWRC); dL = P L / (A_m E_r), L in inches, E_r ~ 12e6 psi seated rope; stretch % = dL/L.",
+    edition: "The wire-rope elastic elongation dL = P L / (A_m E_r) with the metallic area A_m = F d^2 and the effective rope modulus (Wire Rope Users Manual), by name.",
+    freeAccess: "The elastic-elongation relation is a standard published wire-rope result; the effective modulus and fill factor are the maker's data. An ESTIMATE - the manufacturer's rope data governs.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The ELASTIC (recoverable) stretch of a wire rope under a line load, dL = P L / (A_m E_r), with the metallic (steel) area A_m = F d^2 (fill factor F ~ 0.40 for 6x19 or 6x37 IWRC), the effective rope modulus E_r (about 12,000,000 psi for a seated 6-strand rope - lower than solid steel because the rope is a bundle of helixes), and the length L in inches. A 100 ft rope can stretch the better part of a foot under a working load, which matters on a level pick or when two cranes share a load. Separately, a BRAND-NEW rope also takes an initial constructional (seating) stretch of roughly 0.5-0.75% of length the first time it is loaded as the strands nest, which is permanent and not included here. Thermal change, rotation/torque effects, and the true per-construction modulus and fill factor (use the maker's data) are separate. Never exceed the rope's rated load. A rigging estimate; the wire rope maker and the qualified rigger govern.",
+    assumptions: [
+      { name: "Elastic elongation", value: "dL = P L / (A_m E_r), recoverable stretch only", source: "Wire Rope Users Manual" },
+      { name: "Rope constants", value: "A_m = F d^2 (F ~ 0.40 IWRC); E_r ~ 12e6 psi seated rope - use the maker's per-construction values", source: "Wire Rope Users Manual" },
+      { name: "Constructional stretch", value: "a new rope seats another ~0.5-0.75% (permanent), separate from the elastic stretch", source: "rope construction" },
+    ],
+  },
   "spanline-sag-tension": {
     formula: "H = w x L^2 / (8 x d); T_support = H x sqrt(1 + (4 d / L)^2); length = L + 8 d^2 / (3 L); slack = length - L; sag_ratio = d / L.",
     edition: "Shallow-cable parabola statics (by name) with ASME B30.9 / Wire Rope Users Manual rigging practice; first-principles, no edition cycle.",
