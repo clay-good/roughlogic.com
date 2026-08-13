@@ -38409,3 +38409,24 @@ test("bounds: spec-v1320 computeAnnulusArea pins the ring area, outer/bore split
   assert.ok("error" in _v1320({ outer_diameter: 6, inner_diameter: 7 }));
   assert.ok("error" in _v1320({ outer_diameter: Infinity, inner_diameter: 4 }));
 });
+
+import { computeCircularSector as _v1321 } from "../../calc-shop.js";
+test("bounds: spec-v1321 computeCircularSector pins the area/arc/chord, the full-circle limit, the angle scaling, and error seams", () => {
+  // r 5, 60 deg: area 13.09, arc 5.236, chord 5.0.
+  const r = _v1321({ radius: 5, angle_deg: 60 });
+  assert.ok(Math.abs(r.area - 13.09) < 1e-2 && Math.abs(r.arc_length - 5.236) < 1e-3 && Math.abs(r.chord - 5.0) < 1e-3);
+  assert.ok(Math.abs(r.perimeter - (r.arc_length + 10)) < 1e-9);
+  // Area and arc scale straight with the angle (double the angle doubles both).
+  const d120 = _v1321({ radius: 5, angle_deg: 120 });
+  assert.ok(Math.abs(d120.area / r.area - 2) < 1e-9 && Math.abs(d120.arc_length / r.arc_length - 2) < 1e-9);
+  // A full 360 deg gives the circle: area pi r^2, arc 2 pi r, chord 0.
+  const full = _v1321({ radius: 5, angle_deg: 360 });
+  assert.ok(Math.abs(full.area - Math.PI * 25) < 1e-9 && Math.abs(full.arc_length - 2 * Math.PI * 5) < 1e-9 && Math.abs(full.chord) < 1e-9);
+  // Area scales with the square of the radius.
+  assert.ok(Math.abs(_v1321({ radius: 10, angle_deg: 60 }).area / r.area - 4) < 1e-9);
+  // Error seams: non-positive radius, angle 0 or >360, non-finite.
+  assert.ok("error" in _v1321({ radius: 0, angle_deg: 60 }));
+  assert.ok("error" in _v1321({ radius: 5, angle_deg: 0 }));
+  assert.ok("error" in _v1321({ radius: 5, angle_deg: 361 }));
+  assert.ok("error" in _v1321({ radius: Infinity, angle_deg: 60 }));
+});

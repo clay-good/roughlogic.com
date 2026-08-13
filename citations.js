@@ -11779,6 +11779,17 @@ export const CITATIONS = {
       { name: "Scope", value: "concentric flat ring; eccentric/sector rings and tube volume are separate", source: "scope of this tile" },
     ],
   },
+  "circular-sector": {
+    formula: "theta = angle x pi/180; area = (1/2) r^2 theta = (angle/360) pi r^2; arc = r theta; chord = 2 r sin(theta/2); perimeter = arc + 2 r.",
+    edition: "The circular sector area (1/2) r^2 theta and arc length r theta - standard plane geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure plane geometry, public; the radius and central angle are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Circular sector - the pie slice bounded by two radii and the arc, set by a radius r and a central angle. The area is (1/2) r^2 theta = (angle/360) pi r^2 and the arc length is r theta (theta in radians), so both scale straight with the fraction angle/360 of the whole circle; a full 360 degrees gives the circle (pi r^2, 2 pi r). The chord 2 r sin(theta/2) is the straight distance across the open mouth, and the perimeter is the arc plus the two radii. Use it for a curved patio or bed, a sprinkler coverage wedge, a gear or cam sector, or a fan of pavers. The segment (bounded by a chord and the arc) is the circular-segment-area tile; the volume of a cylindrical wedge is separate. Plane figure only. A shop and layout aid; verify critical dimensions on the work.",
+    assumptions: [
+      { name: "Sector area/arc", value: "area = (1/2) r^2 theta, arc = r theta; the fraction angle/360 of the circle", source: "plane geometry" },
+      { name: "Scope", value: "sector (two radii + arc); the segment (chord + arc) is separate", source: "scope of this tile" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",

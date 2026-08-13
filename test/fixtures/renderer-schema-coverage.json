@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1693,
-  "covered_count": 1235,
+  "total_tiles": 1694,
+  "covered_count": 1236,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -163,6 +163,7 @@
     "circle-from-3-points",
     "circular-arc",
     "circular-arc-rise-from-radius",
+    "circular-sector",
     "circular-segment-area",
     "cistern-storage-days",
     "cleanout-layout",

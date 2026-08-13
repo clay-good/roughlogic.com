@@ -812,6 +812,7 @@ export const COMPUTE_MAP = {
   "torus-volume": { module: "../../calc-shop.js", fn: "computeTorusVolume" },
   "ellipsoid-volume": { module: "../../calc-shop.js", fn: "computeEllipsoidVolume" },
   "annulus-area": { module: "../../calc-shop.js", fn: "computeAnnulusArea" },
+  "circular-sector": { module: "../../calc-shop.js", fn: "computeCircularSector" },
   "spur-gear-geometry": { module: "../../calc-machining.js", fn: "computeSpurGearGeometry" },
   "worm-gear-geometry": { module: "../../calc-machining.js", fn: "computeWormGearGeometry" },
   "gear-undercut-backlash": { module: "../../calc-machining.js", fn: "computeGearUndercutBacklash" },

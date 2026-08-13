@@ -1675,6 +1675,49 @@ function _v1320renderAnnulusArea(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["annulus-area"] = _v1320renderAnnulusArea;
 
+// spec-v1321: circular sector (pie slice) area and arc. circular-segment-area is the chord-and-arc region; this is
+// the two-radii-and-arc sector. area = (1/2) r^2 theta = (angle/360) pi r^2; arc = r theta; chord = 2 r sin(theta/2).
+// dims: in { radius: L, angle_deg: dimensionless } out: { area: L^2, arc_length: L, chord: L, perimeter: L }
+export function computeCircularSector({ radius = 0, angle_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const r = Number(radius) || 0;
+  const ang = Number(angle_deg);
+  if (!(r > 0)) return { error: "Radius must be positive." };
+  if (!(ang > 0 && ang <= 360)) return { error: "Central angle must be between 0 and 360 degrees." };
+  const rad = (ang * Math.PI) / 180;
+  const area = 0.5 * r * r * rad;
+  const arc_length = r * rad;
+  const chord = 2 * r * Math.sin(rad / 2);
+  const perimeter = arc_length + 2 * r;
+  if (![area, arc_length, chord, perimeter].every(Number.isFinite) || !(area > 0)) return { error: "Sector math is not a finite value; check the inputs." };
+  return {
+    area, arc_length, chord, perimeter,
+    note: "Circular sector - the pie slice bounded by two radii and the arc, set by a radius r and a central angle. The area is (1/2) r^2 theta = (angle/360) pi r^2 and the arc length is r theta (theta in radians), so both scale straight with the fraction angle/360 of the whole circle; a full 360 degrees gives the circle (pi r^2, 2 pi r). The chord 2 r sin(theta/2) is the straight distance across the open mouth, and the perimeter is the arc plus the two radii. Use it for a curved patio or bed, a sprinkler coverage wedge, a gear or cam sector, or a fan of pavers. The segment (bounded by a chord and the arc) is the circular-segment-area tile; the volume of a cylindrical wedge is separate. Plane figure only. A shop and layout aid; verify critical dimensions on the work.",
+  };
+}
+export const circularSectorExample = { inputs: { radius: 5, angle_deg: 60 } };
+function _v1321renderCircularSector(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: circular sector area (1/2) r^2 theta = (angle/360) pi r^2 and arc length r theta, chord 2 r sin(theta/2) (standard plane geometry; Machinery's Handbook). The segment is a separate tile. A shop and layout aid; verify critical dimensions on the work.";
+  const r = makeNumber("Radius r", "csec-r", { step: "any", min: "0" }); r.input.value = "5";
+  const a = makeNumber("Central angle (deg)", "csec-a", { step: "any", min: "0" }); a.input.value = "60";
+  for (const f of [r, a]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { r.input.value = "5"; a.input.value = "60"; update(); });
+  const oA = makeOutputLine(outputRegion, "Sector area", "csec-out-a");
+  const oL = makeOutputLine(outputRegion, "Arc length / chord", "csec-out-l");
+  const oP = makeOutputLine(outputRegion, "Perimeter (arc + 2 radii)", "csec-out-p");
+  const oNote = makeOutputLine(outputRegion, "Note", "csec-out-n");
+  const update = debounce(() => {
+    const res = computeCircularSector({ radius: Number(r.input.value) || 0, angle_deg: Number(a.input.value) || 0 });
+    if (res.error) { oA.textContent = res.error; oL.textContent = "-"; oP.textContent = "-"; oNote.textContent = ""; return; }
+    oA.textContent = fmt(res.area, 4) + " (square units)";
+    oL.textContent = fmt(res.arc_length, 4) + " arc, " + fmt(res.chord, 4) + " chord";
+    oP.textContent = fmt(res.perimeter, 4);
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [r, a]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["circular-sector"] = _v1321renderCircularSector;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {

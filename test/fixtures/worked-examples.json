@@ -88751,6 +88751,66 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "circular-sector",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "60-degree sector",
+   "source_edition_or_year": "plane geometry",
+   "source_section_or_page": "area (1/2)r^2 theta",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "radius": 5,
+    "angle_deg": 60
+   },
+   "outputs": {
+    "area": {
+     "value": 13.09,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "arc_length": {
+     "value": 5.236,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "chord": {
+     "value": 5.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "circular-sector",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Full circle at 360 degrees",
+   "source_edition_or_year": "plane geometry",
+   "source_section_or_page": "area (1/2)r^2 theta",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "radius": 5,
+    "angle_deg": 360
+   },
+   "outputs": {
+    "area": {
+     "value": 78.5398,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "arc_length": {
+     "value": 31.4159,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

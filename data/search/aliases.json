@@ -38249,6 +38249,41 @@
    "kind": "question"
   },
   {
+   "term": "circular sector area",
+   "target": "circular-sector",
+   "kind": "industry"
+  },
+  {
+   "term": "pie slice area",
+   "target": "circular-sector",
+   "kind": "industry"
+  },
+  {
+   "term": "sector arc length",
+   "target": "circular-sector",
+   "kind": "industry"
+  },
+  {
+   "term": "wedge area circle",
+   "target": "circular-sector",
+   "kind": "adjacent"
+  },
+  {
+   "term": "sprinkler coverage wedge",
+   "target": "circular-sector",
+   "kind": "adjacent"
+  },
+  {
+   "term": "area of a circle slice",
+   "target": "circular-sector",
+   "kind": "question"
+  },
+  {
+   "term": "sector of a circle",
+   "target": "circular-sector",
+   "kind": "question"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"
