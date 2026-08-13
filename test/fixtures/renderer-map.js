@@ -1174,6 +1174,7 @@ export const RENDERER_MAP = {
   "compound-miter": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "tolerance-stack-rss": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "cone-flat-pattern": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
+  "frustum-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "press-fit-pressure": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "press-fit-interference-for-force": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "roller-chain-length": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },

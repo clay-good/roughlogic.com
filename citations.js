@@ -11671,6 +11671,18 @@ export const CITATIONS = {
       { name: "Neutral line", value: "add seam/lap and bend allowance; verify on a test piece", source: "scope of this tile" },
     ],
   },
+  "frustum-volume": {
+    formula: "V = (pi h/12)(D^2 + D d + d^2); L = sqrt(h^2 + (R-r)^2), R=D/2, r=d/2; lateral area = pi(R+r)L. d=0 -> full cone, d=D -> cylinder.",
+    edition: "The conical frustum volume V = (pi h/12)(D^2 + D d + d^2) and lateral surface pi(R+r)L - standard solid geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure solid geometry, public; the two diameters and the height are user-supplied measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "Volume, slant height, and lateral (side-only) surface of a right conical frustum - a truncated cone, the shape of a hopper, a bucket, a tapered footing or pier, a flat-topped stockpile, or a round-to-round transition. The volume is V = (pi h/12)(D^2 + D d + d^2) with the large and small diameters D and d and the height h; setting d = 0 gives a full cone (V = pi D^2 h/12) and d = D a cylinder. It is reported in cubic feet, US gallons, and cubic yards so it serves a liquid fill, a concrete pour, or a material takeoff. Note it is more than the average-diameter guess: the frustum formula, not the mean diameter, is the right one. The slant height is L = sqrt(h^2 + (R-r)^2) and the lateral area is pi(R+r)L (the sloped wall, no ends). The end-disk areas, wall thickness, an eccentric (offset) cone, and a pyramidal (flat-sided) hopper are separate. A takeoff aid; verify against the drawing.",
+    assumptions: [
+      { name: "Frustum volume", value: "V = (pi h/12)(D^2 + D d + d^2); more than the mean-diameter guess", source: "solid geometry" },
+      { name: "Slant / lateral", value: "L = sqrt(h^2 + (R-r)^2); lateral area = pi(R+r)L (no ends)", source: "solid geometry" },
+      { name: "Limits", value: "d=0 gives a full cone, d=D a cylinder; offset/pyramidal shapes are separate", source: "scope of this tile" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",

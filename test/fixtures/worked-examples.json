@@ -88249,6 +88249,62 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "frustum-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Hopper frustum volume",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "V=(pi h/12)(D^2+Dd+d^2)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "large_diameter_ft": 6,
+    "small_diameter_ft": 2,
+    "height_ft": 4
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 54.45,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "volume_gal": {
+     "value": 407.3,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "lateral_area_ft2": {
+     "value": 56.2,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "frustum-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Full cone (top diameter 0)",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "V=(pi h/12)(D^2+Dd+d^2)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "large_diameter_ft": 6,
+    "small_diameter_ft": 0,
+    "height_ft": 4
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 37.699,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

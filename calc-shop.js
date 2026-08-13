@@ -1269,6 +1269,53 @@ function _v400renderConeFlatPattern(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["cone-flat-pattern"] = _v400renderConeFlatPattern;
 
+// spec-v1312: frustum (truncated cone) volume and surface. cone-flat-pattern develops the pattern but not the
+// VOLUME of a hopper/bucket/tapered footing/transition. V = (pi h/12)(D^2 + D d + d^2); slant L = sqrt(h^2 +
+// (R-r)^2); lateral area = pi(R+r)L. d = 0 gives a full cone; d = D a cylinder. Reported in ft^3, gal, yd^3.
+// dims: in { large_diameter_ft: L, small_diameter_ft: L, height_ft: L } out: { volume_ft3: L^3, volume_gal: L^3, volume_yd3: L^3, slant_height_ft: L, lateral_area_ft2: L^2 }
+export function computeFrustumVolume({ large_diameter_ft = 0, small_diameter_ft = 0, height_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D = Number(large_diameter_ft) || 0;
+  const d = Number(small_diameter_ft) || 0;
+  const h = Number(height_ft) || 0;
+  if (!(D > 0)) return { error: "Large diameter must be positive (ft)." };
+  if (d < 0) return { error: "Small diameter cannot be negative (ft)." };
+  if (!(d <= D)) return { error: "Small diameter cannot exceed the large diameter (ft)." };
+  if (!(h > 0)) return { error: "Height must be positive (ft)." };
+  const volume_ft3 = (Math.PI * h * (D * D + D * d + d * d)) / 12;
+  const volume_gal = volume_ft3 * 7.480519;
+  const volume_yd3 = volume_ft3 / 27;
+  const R = D / 2, r = d / 2;
+  const slant_height_ft = Math.sqrt(h * h + (R - r) * (R - r));
+  const lateral_area_ft2 = Math.PI * (R + r) * slant_height_ft;
+  if (![volume_ft3, slant_height_ft, lateral_area_ft2].every(Number.isFinite) || !(volume_ft3 > 0)) return { error: "Frustum math is not a finite value; check the inputs." };
+  return {
+    volume_ft3, volume_gal, volume_yd3, slant_height_ft, lateral_area_ft2,
+    note: "Volume, slant height, and lateral (side-only) surface of a right conical frustum - a truncated cone, the shape of a hopper, a bucket, a tapered footing or pier, a flat-topped stockpile, or a round-to-round transition. The volume is V = (pi h/12)(D^2 + D d + d^2) with the large and small diameters D and d and the height h; setting d = 0 gives a full cone (V = pi D^2 h/12) and d = D a cylinder. It is reported in cubic feet, US gallons, and cubic yards so it serves a liquid fill, a concrete pour, or a material takeoff. Note it is more than the average-diameter guess: the frustum formula, not the mean diameter, is the right one. The slant height is L = sqrt(h^2 + (R-r)^2) and the lateral area is pi(R+r)L (the sloped wall, no ends). The end-disk areas, wall thickness, an eccentric (offset) cone, and a pyramidal (flat-sided) hopper are separate. A takeoff aid; verify against the drawing.",
+  };
+}
+export const frustumVolumeExample = { inputs: { large_diameter_ft: 6, small_diameter_ft: 2, height_ft: 4 } };
+function _v1312renderFrustumVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: conical frustum volume V = (pi h/12)(D^2 + D d + d^2) with slant height sqrt(h^2 + (R-r)^2) and lateral surface pi(R+r)L (standard solid geometry; Machinery's Handbook). d = 0 gives a full cone. A takeoff aid; verify against the drawing.";
+  const D = makeNumber("Large diameter D (ft)", "frv-d", { step: "any", min: "0" }); D.input.value = "6";
+  const d = makeNumber("Small diameter d (ft, 0 = full cone)", "frv-sd", { step: "any", min: "0" }); d.input.value = "2";
+  const h = makeNumber("Height h (ft)", "frv-h", { step: "any", min: "0" }); h.input.value = "4";
+  for (const f of [D, d, h]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D.input.value = "6"; d.input.value = "2"; h.input.value = "4"; update(); });
+  const oV = makeOutputLine(outputRegion, "Volume", "frv-out-v");
+  const oS = makeOutputLine(outputRegion, "Slant height / lateral area", "frv-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "frv-out-n");
+  const update = debounce(() => {
+    const res = computeFrustumVolume({ large_diameter_ft: Number(D.input.value) || 0, small_diameter_ft: Number(d.input.value) || 0, height_ft: Number(h.input.value) || 0 });
+    if (res.error) { oV.textContent = res.error; oS.textContent = "-"; oNote.textContent = ""; return; }
+    oV.textContent = fmt(res.volume_ft3, 2) + " ft^3 (" + fmt(res.volume_gal, 1) + " gal, " + fmt(res.volume_yd3, 3) + " yd^3)";
+    oS.textContent = fmt(res.slant_height_ft, 3) + " ft slant, " + fmt(res.lateral_area_ft2, 2) + " ft^2 side";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [D, d, h]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["frustum-volume"] = _v1312renderFrustumVolume;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {

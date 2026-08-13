@@ -37869,6 +37869,51 @@
    "kind": "question"
   },
   {
+   "term": "frustum volume",
+   "target": "frustum-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "truncated cone volume",
+   "target": "frustum-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "hopper volume",
+   "target": "frustum-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "tapered tank volume",
+   "target": "frustum-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "conical frustum",
+   "target": "frustum-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "bucket volume cone",
+   "target": "frustum-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "round to round transition volume",
+   "target": "frustum-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "volume of a hopper",
+   "target": "frustum-volume",
+   "kind": "question"
+  },
+  {
+   "term": "how much does a tapered cone hold",
+   "target": "frustum-volume",
+   "kind": "question"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"

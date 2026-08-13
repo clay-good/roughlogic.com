@@ -38215,3 +38215,26 @@ test("bounds: spec-v1311 computeTriangleAsa pins the law-of-sines sides, the fam
   assert.ok("error" in _v1311({ angle_a_deg: 70, angle_b_deg: 49, included_side_c: 0 }));
   assert.ok("error" in _v1311({ angle_a_deg: Infinity, angle_b_deg: 49, included_side_c: 9 }));
 });
+
+import { computeFrustumVolume as _v1312 } from "../../calc-shop.js";
+test("bounds: spec-v1312 computeFrustumVolume pins the frustum volume, unit conversions, the full-cone/cylinder limits, and error seams", () => {
+  // D 6, d 2, h 4: V 54.45 ft^3, 407.3 gal, 2.017 yd^3, slant 4.472, lateral 56.2.
+  const r = _v1312({ large_diameter_ft: 6, small_diameter_ft: 2, height_ft: 4 });
+  assert.ok(Math.abs(r.volume_ft3 - 54.45) < 0.05 && Math.abs(r.volume_gal - 407.3) < 0.5 && Math.abs(r.volume_yd3 - 2.017) < 1e-2);
+  assert.ok(Math.abs(r.slant_height_ft - 4.472) < 1e-3 && Math.abs(r.lateral_area_ft2 - 56.2) < 0.1);
+  // d = 0 gives a full cone V = pi D^2 h/12.
+  const cone = _v1312({ large_diameter_ft: 6, small_diameter_ft: 0, height_ft: 4 });
+  assert.ok(Math.abs(cone.volume_ft3 - (Math.PI * 36 * 4) / 12) < 1e-6);
+  // d = D gives a cylinder V = pi D^2 h/4.
+  const cyl = _v1312({ large_diameter_ft: 6, small_diameter_ft: 6, height_ft: 4 });
+  assert.ok(Math.abs(cyl.volume_ft3 - (Math.PI * 36 * 4) / 4) < 1e-6);
+  // The frustum holds more than the mean-diameter cylinder guess.
+  const meanGuess = (Math.PI * 4 * 4 * 4) / 4; // pi * D_mean^2 * h / 4 with D_mean = 4
+  assert.ok(r.volume_ft3 > meanGuess);
+  // Error seams: non-positive large diameter, negative small, small > large, non-positive height, non-finite.
+  assert.ok("error" in _v1312({ large_diameter_ft: 0, small_diameter_ft: 2, height_ft: 4 }));
+  assert.ok("error" in _v1312({ large_diameter_ft: 6, small_diameter_ft: -1, height_ft: 4 }));
+  assert.ok("error" in _v1312({ large_diameter_ft: 6, small_diameter_ft: 8, height_ft: 4 }));
+  assert.ok("error" in _v1312({ large_diameter_ft: 6, small_diameter_ft: 2, height_ft: 0 }));
+  assert.ok("error" in _v1312({ large_diameter_ft: Infinity, small_diameter_ft: 2, height_ft: 4 }));
+});
