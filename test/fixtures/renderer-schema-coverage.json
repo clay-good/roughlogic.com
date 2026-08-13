@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1694,
-  "covered_count": 1236,
+  "total_tiles": 1695,
+  "covered_count": 1237,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -1078,6 +1078,7 @@
     "tank-drain-time",
     "tank-mix",
     "tank-volume",
+    "tank-volume-dished-heads",
     "tankless-gpm",
     "tap-drill-size",
     "taper-diameter",

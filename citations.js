@@ -11790,6 +11790,18 @@ export const CITATIONS = {
       { name: "Scope", value: "sector (two radii + arc); the segment (chord + arc) is separate", source: "scope of this tile" },
     ],
   },
+  "tank-volume-dished-heads": {
+    formula: "shell = [R^2 acos((R-h)/R) - (R-h) sqrt(2Rh-h^2)] L; heads = (b/R)(pi h^2/3)(3R-h), b = R/2 (2:1 elliptical) or R (hemispherical); full = pi R^2 L + (b/R)(4/3) pi R^3.",
+    edition: "Horizontal-tank partial gauging - the straight shell is the circular-segment prism and the two dished heads form an ellipsoid whose partial fill is an affine-scaled spherical cap; standard tank-gauging geometry as in Machinery's Handbook (Industrial Press) and API 2551 manual-tank-strapping practice, by name; public domain.",
+    freeAccess: "Public-domain solid geometry; the diameter, shell length, depth, and head type are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Partial volume of a horizontal cylindrical tank with dished (curved) heads from a dipstick depth - the head-type correction the flat-end tank-volume tile leaves out. The straight shell is the circular-segment prism, area = R^2 acos((R-h)/R) - (R-h) sqrt(2Rh-h^2) times the seam-to-seam shell length; the two curved heads together form an ellipsoid of revolution, so their partial fill is the spherical cap scaled by the head depth, V_heads = (b/R)(pi h^2/3)(3R-h), with b = R/2 for a 2:1 semi-elliptical (ASME dished) head and b = R for a hemispherical head. Enter the straight-shell length, not the overall length - the heads are added on. A torispherical (ASME flanged-and-dished) head is slightly shallower than a true 2:1 ellipse, so this is a close estimate; the tank's strapping chart governs custody transfer. Reported in cubic feet and US gallons with the percent full.",
+    assumptions: [
+      { name: "Shell partial volume", value: "circular-segment prism, area x shell length (the flat-end tank-volume result)", source: "plane/solid geometry" },
+      { name: "Head partial volume", value: "(b/R)(pi h^2/3)(3R-h), b = R/2 elliptical or R hemispherical", source: "affine-scaled spherical cap" },
+      { name: "Scope", value: "2:1 elliptical or hemispherical heads; flat heads are the tank-volume tile, torispherical is a close approximation", source: "scope of this tile" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",

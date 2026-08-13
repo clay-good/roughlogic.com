@@ -38430,3 +38430,28 @@ test("bounds: spec-v1321 computeCircularSector pins the area/arc/chord, the full
   assert.ok("error" in _v1321({ radius: 5, angle_deg: 361 }));
   assert.ok("error" in _v1321({ radius: Infinity, angle_deg: 60 }));
 });
+
+import { computeTankVolumeDishedHeads as _v1322 } from "../../calc-shop.js";
+import { computeTankVolume as _v1322flat } from "../../calc-cross.js";
+test("bounds: spec-v1322 computeTankVolumeDishedHeads pins the half/full fill, the shell cross-pin, the head-type scaling, and error seams", () => {
+  // 8 ft dia, 20 ft shell, 4 ft (half) depth, 2:1 elliptical heads: 4261.5 gal, exactly 50% full.
+  const ell = _v1322({ diameter_ft: 8, shell_length_ft: 20, fill_depth_ft: 4, head_type: "elliptical" });
+  assert.ok(Math.abs(ell.volume_gal - 4261.5) < 1.0 && Math.abs(ell.percent_full - 50) < 1e-6);
+  // The straight shell equals the flat-end tank-volume tile exactly (same circular-segment prism).
+  const flat = _v1322flat({ orientation: "horizontal", linear_unit: "ft", diameter: 8, length: 20, depth: 4 });
+  assert.ok(Math.abs(ell.shell_volume_ft3 - flat.volume_ft3) < 1e-6);
+  // Hemispherical heads hold exactly twice the head volume of 2:1 elliptical at the same depth (b/R: 1 vs 1/2).
+  const hemi = _v1322({ diameter_ft: 8, shell_length_ft: 20, fill_depth_ft: 4, head_type: "hemispherical" });
+  assert.ok(Math.abs(hemi.heads_volume_ft3 - 2 * ell.heads_volume_ft3) < 1e-9 && ell.shell_volume_ft3 === hemi.shell_volume_ft3);
+  // Filled to the full diameter the liquid volume equals the full-tank volume (100%).
+  const full = _v1322({ diameter_ft: 8, shell_length_ft: 20, fill_depth_ft: 8, head_type: "elliptical" });
+  assert.ok(Math.abs(full.volume_ft3 - full.full_ft3) < 1e-6 && Math.abs(full.percent_full - 100) < 1e-6);
+  // Empty tank reads zero; depth beyond the diameter clamps to the full tank.
+  assert.ok(_v1322({ diameter_ft: 8, shell_length_ft: 20, fill_depth_ft: 0, head_type: "elliptical" }).volume_ft3 === 0);
+  assert.ok(Math.abs(_v1322({ diameter_ft: 8, shell_length_ft: 20, fill_depth_ft: 99, head_type: "elliptical" }).percent_full - 100) < 1e-6);
+  // Error seams: non-positive diameter or shell, negative depth, non-finite.
+  assert.ok("error" in _v1322({ diameter_ft: 0, shell_length_ft: 20, fill_depth_ft: 4 }));
+  assert.ok("error" in _v1322({ diameter_ft: 8, shell_length_ft: 0, fill_depth_ft: 4 }));
+  assert.ok("error" in _v1322({ diameter_ft: 8, shell_length_ft: 20, fill_depth_ft: -1 }));
+  assert.ok("error" in _v1322({ diameter_ft: Infinity, shell_length_ft: 20, fill_depth_ft: 4 }));
+});

@@ -38284,6 +38284,41 @@
    "kind": "question"
   },
   {
+   "term": "horizontal tank volume dished heads",
+   "target": "tank-volume-dished-heads",
+   "kind": "industry"
+  },
+  {
+   "term": "tank volume with elliptical heads",
+   "target": "tank-volume-dished-heads",
+   "kind": "industry"
+  },
+  {
+   "term": "dipstick to gallons dished head tank",
+   "target": "tank-volume-dished-heads",
+   "kind": "industry"
+  },
+  {
+   "term": "hemispherical head tank partial fill",
+   "target": "tank-volume-dished-heads",
+   "kind": "adjacent"
+  },
+  {
+   "term": "ASME 2 to 1 head tank capacity",
+   "target": "tank-volume-dished-heads",
+   "kind": "adjacent"
+  },
+  {
+   "term": "how many gallons in a horizontal tank with curved ends",
+   "target": "tank-volume-dished-heads",
+   "kind": "question"
+  },
+  {
+   "term": "propane tank volume from level",
+   "target": "tank-volume-dished-heads",
+   "kind": "question"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"

@@ -88811,6 +88811,70 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "tank-volume-dished-heads",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "8 ft x 20 ft horizontal tank, 2:1 elliptical heads, half full",
+   "source_edition_or_year": "tank-gauging geometry",
+   "source_section_or_page": "shell segment + head cap (b/R = 1/2)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "diameter_ft": 8,
+    "shell_length_ft": 20,
+    "fill_depth_ft": 4,
+    "head_type": "elliptical"
+   },
+   "outputs": {
+    "volume_gal": {
+     "value": 4261.47,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "percent_full": {
+     "value": 50.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "heads_volume_ft3": {
+     "value": 67.02,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tank-volume-dished-heads",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same tank with hemispherical heads, half full",
+   "source_edition_or_year": "tank-gauging geometry",
+   "source_section_or_page": "head cap (b/R = 1)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "diameter_ft": 8,
+    "shell_length_ft": 20,
+    "fill_depth_ft": 4,
+    "head_type": "hemispherical"
+   },
+   "outputs": {
+    "volume_gal": {
+     "value": 4762.82,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "percent_full": {
+     "value": 50.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

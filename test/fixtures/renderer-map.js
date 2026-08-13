@@ -1184,6 +1184,7 @@ export const RENDERER_MAP = {
   "ellipsoid-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "annulus-area": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "circular-sector": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
+  "tank-volume-dished-heads": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "press-fit-pressure": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "press-fit-interference-for-force": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "roller-chain-length": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },

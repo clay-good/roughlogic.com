@@ -1718,6 +1718,80 @@ function _v1321renderCircularSector(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["circular-sector"] = _v1321renderCircularSector;
 
+// spec-v1322: partial volume of a HORIZONTAL cylindrical tank with DISHED heads - the head-type correction the
+// flat-end tank-volume tile names but leaves out. The straight shell is the circular-segment prism (same as
+// tank-volume); each dished head adds volume that back-to-back forms an ellipsoid of revolution, so its partial
+// fill is an affine-scaled spherical cap: V_heads = (b/R)(pi h^2/3)(3R - h), where b is the head depth (R/2 for a
+// 2:1 elliptical head, R for a hemispherical head). Full heads give (b/R)(4/3) pi R^3. Flat heads add nothing.
+// dims: in { diameter_ft: L, shell_length_ft: L, fill_depth_ft: L } out: { volume_ft3: L^3, volume_gal: L^3, shell_volume_ft3: L^3, heads_volume_ft3: L^3, full_ft3: L^3, full_gal: L^3, percent_full: dimensionless }
+export function computeTankVolumeDishedHeads({ diameter_ft = 0, shell_length_ft = 0, fill_depth_ft = 0, head_type = "elliptical" } = {}) {
+  const _g = _finiteGuard({ diameter_ft, shell_length_ft, fill_depth_ft }); if (_g) return _g;
+  const D = Number(diameter_ft) || 0;
+  const L = Number(shell_length_ft) || 0;
+  let h = Number(fill_depth_ft) || 0;
+  if (!(D > 0)) return { error: "Tank diameter must be positive (ft)." };
+  if (!(L > 0)) return { error: "Straight-shell length must be positive (ft)." };
+  if (h < 0) return { error: "Liquid depth cannot be negative (ft)." };
+  const ht = String(head_type) === "hemispherical" ? "hemispherical" : "elliptical";
+  const k = ht === "hemispherical" ? 1 : 0.5; // head-depth ratio b/R: hemispherical b=R, 2:1 elliptical b=R/2
+  const R = D / 2;
+  let clamped = false;
+  if (h > D) { h = D; clamped = true; }
+  // Straight shell: circular-segment cross-section swept along the length (same as the flat-end tank-volume tile).
+  const seg = R * R * Math.acos((R - h) / R) - (R - h) * Math.sqrt(Math.max(0, 2 * R * h - h * h));
+  const shell_volume_ft3 = seg * L;
+  // Two dished heads = one ellipsoid of revolution; its partial fill is the spherical cap scaled by b/R.
+  const heads_volume_ft3 = k * (Math.PI * h * h * (3 * R - h)) / 3;
+  const volume_ft3 = shell_volume_ft3 + heads_volume_ft3;
+  const full_ft3 = Math.PI * R * R * L + k * (4 / 3) * Math.PI * R * R * R;
+  const GAL_PER_FT3 = 7.480519;
+  const volume_gal = volume_ft3 * GAL_PER_FT3;
+  const full_gal = full_ft3 * GAL_PER_FT3;
+  const percent_full = full_ft3 > 0 ? (volume_ft3 / full_ft3) * 100 : 0;
+  if (![volume_ft3, full_ft3, percent_full].every(Number.isFinite) || !(full_ft3 > 0)) return { error: "Tank math is not a finite value; check the inputs." };
+  const notes = [];
+  notes.push("Partial volume of a HORIZONTAL cylindrical tank with dished (curved) heads from a liquid depth (dipstick) reading - the head-type correction the flat-end tank-volume tile leaves out. The straight shell is the circular-segment prism, area = R^2 acos((R-h)/R) - (R-h) sqrt(2Rh-h^2) times the shell length L (the flat-end result). The two curved heads together form an ellipsoid of revolution, so their partial fill is the spherical cap scaled by the head depth: V_heads = (b/R)(pi h^2/3)(3R - h), with b = R/2 for a 2:1 elliptical (ASME F&D-like) head and b = R for a hemispherical head. Enter the STRAIGHT-shell length (seam to seam), not the overall length - the heads are added on. Reported in cubic feet and US gallons with the percent full.");
+  notes.push(ht === "hemispherical"
+    ? "Hemispherical heads (b = R): the two heads add a full sphere of volume, the most a pair of heads can hold."
+    : "2:1 semi-elliptical heads (b = R/2): the two heads add half of a sphere's volume, the common ASME dished head.");
+  if (clamped) notes.push("Depth exceeded the tank diameter; reporting the full tank.");
+  notes.push("Flat heads add nothing (use the tank-volume tile). Use the actual inside dimensions; a torispherical (ASME F&D) head is slightly shallower than a true 2:1 ellipse, so this is a close estimate - the tank's strapping chart governs custody transfer. US gallons.");
+  return {
+    volume_ft3, volume_gal, shell_volume_ft3, heads_volume_ft3, full_ft3, full_gal, percent_full,
+    head_type: ht, notes,
+  };
+}
+export const tankVolumeDishedHeadsExample = { inputs: { diameter_ft: 8, shell_length_ft: 20, fill_depth_ft: 4, head_type: "elliptical" } };
+function _v1322renderTankVolumeDishedHeads(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: horizontal-tank partial volume with dished heads - the straight shell is the circular-segment prism A = R^2 acos((R-h)/R) - (R-h) sqrt(2Rh-h^2) times length; the two heads form an ellipsoid, so their partial fill is the spherical cap (pi h^2/3)(3R-h) scaled by the head depth b/R (R/2 for a 2:1 elliptical head, R for a hemispherical). Standard tank-gauging geometry (Machinery's Handbook; API 2551 strapping practice), by name; public domain. A close estimate; the tank's strapping chart governs.";
+  const head = makeSelect("Head type", "tvdh-head", [
+    { value: "elliptical", label: "2:1 semi-elliptical (ASME dished)" },
+    { value: "hemispherical", label: "Hemispherical" },
+  ]);
+  const D = makeNumber("Tank diameter D (ft)", "tvdh-d", { step: "any", min: "0" }); D.input.value = "8";
+  const L = makeNumber("Straight-shell length L, seam to seam (ft)", "tvdh-l", { step: "any", min: "0" }); L.input.value = "20";
+  const h = makeNumber("Liquid depth (dipstick, ft)", "tvdh-h", { step: "any", min: "0" }); h.input.value = "4";
+  for (const f of [head, D, L, h]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { head.select.value = "elliptical"; D.input.value = "8"; L.input.value = "20"; h.input.value = "4"; update(); });
+  const oV = makeOutputLine(outputRegion, "Liquid volume", "tvdh-out-v");
+  const oP = makeOutputLine(outputRegion, "Percent full", "tvdh-out-p");
+  const oS = makeOutputLine(outputRegion, "Shell / heads split", "tvdh-out-s");
+  const oF = makeOutputLine(outputRegion, "Full tank", "tvdh-out-f");
+  const oNote = makeOutputLine(outputRegion, "Notes", "tvdh-out-n");
+  const update = debounce(() => {
+    const res = computeTankVolumeDishedHeads({ diameter_ft: Number(D.input.value) || 0, shell_length_ft: Number(L.input.value) || 0, fill_depth_ft: Number(h.input.value) || 0, head_type: head.select.value });
+    if (res.error) { oV.textContent = res.error; oP.textContent = "-"; oS.textContent = "-"; oF.textContent = "-"; oNote.textContent = ""; return; }
+    oV.textContent = fmt(res.volume_gal, 1) + " gal (" + fmt(res.volume_ft3, 2) + " ft^3)";
+    oP.textContent = fmt(res.percent_full, 1) + "%";
+    oS.textContent = fmt(res.shell_volume_ft3, 2) + " ft^3 shell + " + fmt(res.heads_volume_ft3, 2) + " ft^3 heads";
+    oF.textContent = fmt(res.full_gal, 1) + " gal (" + fmt(res.full_ft3, 2) + " ft^3)";
+    oNote.textContent = res.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [D, L, h]) f.input.addEventListener("input", update);
+  head.select.addEventListener("change", update);
+}
+SHOP_RENDERERS["tank-volume-dished-heads"] = _v1322renderTankVolumeDishedHeads;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {
