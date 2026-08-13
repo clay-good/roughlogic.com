@@ -11854,6 +11854,18 @@ export const CITATIONS = {
       { name: "Scope", value: "usable volume only; precharge temperature correction, real-gas, response time are separate", source: "scope of this tile" },
     ],
   },
+  "projectile-range": {
+    formula: "R = v^2 sin(2 theta)/g; H = v^2 sin^2(theta)/(2g); t = 2 v sin(theta)/g; g = 32.174 ft/s^2. Range peaks at 45 deg; complementary angles give equal range.",
+    edition: "The level-ground projectile relations R = v^2 sin(2 theta)/g, H = v^2 sin^2(theta)/(2g), t = 2 v sin(theta)/g (standard kinematics), by name.",
+    freeAccess: "The projectile relations are standard published kinematics; the launch speed and angle are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Still-air, level-ground trajectory of a point projectile launched at speed v and angle theta above horizontal: horizontal range R = v^2 sin(2 theta)/g, maximum height H = v^2 sin^2(theta)/(2g), and time of flight t = 2 v sin(theta)/g, with g = 32.174 ft/s^2. The range peaks at 45 degrees; any two complementary angles (for example 30 and 60 degrees) give the SAME range but different heights and hang times, the trade a nozzle operator or a sprinkler layout makes between reach, height, and coverage. Air resistance is NEGLECTED, so a real water stream or light object falls short of these numbers - they are the still-air upper bound. A launch height above the landing plane, wind, and stream break-up are separate. Use it for reach and clearance estimates, not a ballistic or aerodynamic calculation. A planning estimate; field conditions govern.",
+    assumptions: [
+      { name: "Range/height/time", value: "R = v^2 sin(2 theta)/g, H = v^2 sin^2(theta)/(2g), t = 2 v sin(theta)/g", source: "kinematics" },
+      { name: "Optimal angle", value: "range peaks at 45 deg; complementary angles give equal range", source: "kinematics" },
+      { name: "No drag", value: "still-air upper bound; air resistance shortens a real stream, launch height/wind are separate", source: "scope of this tile" },
+    ],
+  },
   "gear-identification": {
     formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
     edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",

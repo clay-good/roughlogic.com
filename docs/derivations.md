@@ -2654,6 +2654,7 @@ cross-check.
 | calc-mechanic.js | `computeMeanPistonSpeed` | `{ stroke_in = 0, rpm = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computePaintMixRatio` | `{ paint_volume_oz = 0, part_paint = 4, part_hardener = 1, part_reducer = 0 } ...` | _ | _ | _ |
 | calc-mechanic.js | `computePlanetaryGearRatio` | `{ sun_teeth = 0, ring_teeth = 0, input_speed_rpm = 0, configuration = "ring-f...` | _ | _ | _ |
+| calc-mechanic.js | `computeProjectileRange` | `{ velocity_fps = 0, angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computePropPitchSelection` | `{ current_pitch_in = 0, current_wot_rpm = 0, target_wot_rpm = 0, rpm_per_inch...` | _ | _ | _ |
 | calc-mechanic.js | `computePropSlip` | `{ rpm = 0, gear_ratio = 1, pitch_in = 0, gps_speed_kt = 0 }` | _ | _ | _ |
 | calc-mechanic.js | `computeReserveCapacityAmpHours` | `{ rc_minutes = 0 } = {}` | _ | _ | _ |
@@ -3343,7 +3344,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1929.
+Row count: 1930.
 
 <!-- END function-corpus-v14 -->
 
@@ -4638,7 +4639,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (128 tiles)
+### Group K Mechanic (129 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4726,6 +4727,7 @@ per spec-v14 §13.1 second paragraph.
 | `plain-bearing-pressure-pv` | Plain (Sleeve) Bearing Pressure and PV | Project (first-principles); P=W/(LD), PV=P*V | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `planetary-gear-ratio` | Planetary (Epicyclic) Gear Ratio | Project (first-principles); Willis epicyclic ratio | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `power-screw-torque` | Power-Screw Torque, Efficiency, and Self-Locking | Project (first-principles); T_raise/T_lower power screw | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `projectile-range` | Projectile Range, Height, and Flight Time | Project (first-principles); R = v^2 sin(2 theta)/g | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `prop-pitch-selection` | Marine Propeller Pitch Selection | outboard prop selection practice; spec-v462 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `prop-slip` | Marine Prop Slip | Project (first-principles); theoretical_kt = (4500/1.85) * 19 / 1215.2 = 38.03; slip ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rack-and-pinion` | Rack and Pinion Travel, Speed, and Force | Project (first-principles); rack and pinion | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5194,6 +5196,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1678. Fixture-covered or reference-cadence: 1678 / 1678.
+Tile count: 1679. Fixture-covered or reference-cadence: 1679 / 1679.
 
 <!-- END tile-index-v14 -->

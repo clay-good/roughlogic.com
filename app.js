@@ -949,7 +949,7 @@ const TOOL_MODULES = (() => {
     "helical-spring-rate", "spring-natural-frequency",
     // spec-v1010 Wahl wire stress + solid height + buckling
     "spring-wire-stress",
-    "gear-tooth-bending-stress", "gear-dynamic-tooth-stress", "gear-contact-stress", "aerodynamic-drag-force", "vehicle-road-load-power", "planetary-gear-ratio", "band-brake-torque", "centrifugal-force", "torsion-spring-rate", "universal-joint-speed", "slider-crank-piston-position", "impact-load-factor", "hydraulic-accumulator-volume",
+    "gear-tooth-bending-stress", "gear-dynamic-tooth-stress", "gear-contact-stress", "aerodynamic-drag-force", "vehicle-road-load-power", "planetary-gear-ratio", "band-brake-torque", "centrifugal-force", "torsion-spring-rate", "universal-joint-speed", "slider-crank-piston-position", "impact-load-factor", "hydraulic-accumulator-volume", "projectile-range",
 
     // v20
     "hp-from-torque", "volumetric-efficiency", "gear-mph-rpm",

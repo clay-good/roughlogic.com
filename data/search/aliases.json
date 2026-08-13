@@ -3269,6 +3269,51 @@
    "kind": "question"
   },
   {
+   "term": "projectile range",
+   "target": "projectile-range",
+   "kind": "industry"
+  },
+  {
+   "term": "projectile motion",
+   "target": "projectile-range",
+   "kind": "industry"
+  },
+  {
+   "term": "trajectory range and height",
+   "target": "projectile-range",
+   "kind": "industry"
+  },
+  {
+   "term": "fire stream reach",
+   "target": "projectile-range",
+   "kind": "adjacent"
+  },
+  {
+   "term": "sprinkler throw distance",
+   "target": "projectile-range",
+   "kind": "adjacent"
+  },
+  {
+   "term": "conveyor discharge trajectory",
+   "target": "projectile-range",
+   "kind": "adjacent"
+  },
+  {
+   "term": "launch angle for max range",
+   "target": "projectile-range",
+   "kind": "adjacent"
+  },
+  {
+   "term": "how far will a stream reach",
+   "target": "projectile-range",
+   "kind": "question"
+  },
+  {
+   "term": "best angle for distance",
+   "target": "projectile-range",
+   "kind": "question"
+  },
+  {
    "term": "hp torque rpm",
    "target": "hp-from-torque",
    "kind": "redirect"

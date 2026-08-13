@@ -38088,3 +38088,24 @@ test("bounds: spec-v1305 computeWireRopeStretch pins the elastic elongation, the
   assert.ok("error" in _v1305({ load_lb: 10000, length_ft: 100, rope_diameter_in: 0.5, effective_modulus_psi: 12000000, metallic_area_factor: 1.5 }));
   assert.ok("error" in _v1305({ load_lb: Infinity, length_ft: 100, rope_diameter_in: 0.5, effective_modulus_psi: 12000000, metallic_area_factor: 0.40 }));
 });
+
+import { computeProjectileRange as _v1306 } from "../../calc-mechanic.js";
+test("bounds: spec-v1306 computeProjectileRange pins the range/height/time, the 45-deg peak, complementary-angle equality, and error seams", () => {
+  // v 80 ft/s, 45 deg: R 198.9, H 49.7, t 3.52.
+  const r = _v1306({ velocity_fps: 80, angle_deg: 45 });
+  assert.ok(Math.abs(r.range_ft - 198.9) < 0.3 && Math.abs(r.max_height_ft - 49.7) < 0.2 && Math.abs(r.flight_time_s - 3.52) < 0.02);
+  // Range peaks at 45 degrees: both 44 and 46 give a shorter range.
+  assert.ok(_v1306({ velocity_fps: 80, angle_deg: 44 }).range_ft < r.range_ft && _v1306({ velocity_fps: 80, angle_deg: 46 }).range_ft < r.range_ft);
+  // Complementary angles (30 and 60) give the same range.
+  const a30 = _v1306({ velocity_fps: 80, angle_deg: 30 });
+  const a60 = _v1306({ velocity_fps: 80, angle_deg: 60 });
+  assert.ok(Math.abs(a30.range_ft - a60.range_ft) < 1e-6 && a60.max_height_ft > a30.max_height_ft);
+  assert.ok(a30.complementary_angle_deg === 60);
+  // Range scales with the square of speed.
+  assert.ok(Math.abs(_v1306({ velocity_fps: 160, angle_deg: 45 }).range_ft / r.range_ft - 4) < 1e-6);
+  // Error seams: non-positive speed, angle 0 or >=90, non-finite.
+  assert.ok("error" in _v1306({ velocity_fps: 0, angle_deg: 45 }));
+  assert.ok("error" in _v1306({ velocity_fps: 80, angle_deg: 0 }));
+  assert.ok("error" in _v1306({ velocity_fps: 80, angle_deg: 90 }));
+  assert.ok("error" in _v1306({ velocity_fps: Infinity, angle_deg: 45 }));
+});

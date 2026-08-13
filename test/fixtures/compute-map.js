@@ -186,6 +186,7 @@ export const COMPUTE_MAP = {
   "slider-crank-piston-position": { module: "../../calc-mechanic.js", fn: "computeSliderCrankPistonPosition" },
   "impact-load-factor": { module: "../../calc-mechanic.js", fn: "computeImpactLoadFactor" },
   "hydraulic-accumulator-volume": { module: "../../calc-mechanic.js", fn: "computeHydraulicAccumulatorVolume" },
+  "projectile-range": { module: "../../calc-mechanic.js", fn: "computeProjectileRange" },
   "gear-dynamic-tooth-stress": { module: "../../calc-mechanic.js", fn: "computeGearDynamicToothStress" },
   "trap-seal-loss": { module: "../../calc-plumbing.js", fn: "computeTrapSealLoss" },
   "water-meter-sizing": { module: "../../calc-plumbing.js", fn: "computeWaterMeterSizing" },

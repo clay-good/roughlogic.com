@@ -87897,6 +87897,66 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "projectile-range",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Fire stream at 45 degrees, max range",
+   "source_edition_or_year": "kinematics",
+   "source_section_or_page": "R = v^2 sin(2 theta)/g",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "velocity_fps": 80,
+    "angle_deg": 45
+   },
+   "outputs": {
+    "range_ft": {
+     "value": 198.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_height_ft": {
+     "value": 49.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "flight_time_s": {
+     "value": 3.52,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "projectile-range",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same speed at 30 degrees (lower, shorter)",
+   "source_edition_or_year": "kinematics",
+   "source_section_or_page": "R = v^2 sin(2 theta)/g",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "velocity_fps": 80,
+    "angle_deg": 30
+   },
+   "outputs": {
+    "range_ft": {
+     "value": 172.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_height_ft": {
+     "value": 24.9,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
   }
  ]
 }
