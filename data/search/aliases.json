@@ -38424,6 +38424,31 @@
    "kind": "adjacent"
   },
   {
+   "term": "windrow stockpile volume",
+   "target": "windrow-stockpile-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "compost windrow cubic yards",
+   "target": "windrow-stockpile-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "salt sand pile tonnage",
+   "target": "windrow-stockpile-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "elongated stockpile volume",
+   "target": "windrow-stockpile-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "how many yards in a long gravel pile",
+   "target": "windrow-stockpile-volume",
+   "kind": "question"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"

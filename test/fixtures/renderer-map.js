@@ -543,6 +543,7 @@ export const RENDERER_MAP = {
   "chip-seal-mcleod": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "aggregate": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "stockpile-volume": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
+  "windrow-stockpile-volume": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "mortar-mix": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "concrete-mix-design": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "bolt-torque": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },

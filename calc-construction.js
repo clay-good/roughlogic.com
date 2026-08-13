@@ -7675,6 +7675,52 @@ const _v818renderStockpileVolume = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["stockpile-volume"] = _v818renderStockpileVolume;
 
+// ----- spec-v1327: Elongated (Windrow) Stockpile Volume and Tonnage (Group E) -----
+// The conical stockpile-volume tile handles a pile dumped in one spot; a pile dumped or graded along a LINE - a
+// compost windrow, a DOT salt/sand pile, an aggregate windrow - is a triangular prism with a cone split across its
+// two ends. height = (W/2) tan(repose); cross-section = (1/2) W h; volume = prism (area x ridge length) + one full
+// cone at the ends. Ridge length 0 collapses to the conical pile.
+// dims: in { base_width_ft: L, ridge_length_ft: L, repose_angle_deg: dimensionless, density_pcf: dimensionless } out: { height_ft: L, volume_ft3: L^3, volume_cy: L^3, tons: dimensionless }
+export function computeWindrowStockpileVolume({ base_width_ft = 0, ridge_length_ft = 0, repose_angle_deg = 37, density_pcf = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(base_width_ft > 0)) return { error: "Base width must be positive (ft)." };
+  if (ridge_length_ft < 0) return { error: "Ridge length cannot be negative (ft)." };
+  if (!(density_pcf > 0)) return { error: "Density must be positive (pcf)." };
+  if (!(repose_angle_deg > 0) || repose_angle_deg >= 90) return { error: "Repose angle must be between 0 and 90 degrees (exclusive)." };
+  const radius_ft = base_width_ft / 2;
+  const height_ft = radius_ft * Math.tan((repose_angle_deg * Math.PI) / 180);
+  const cross_section_ft2 = 0.5 * base_width_ft * height_ft;         // triangular cross-section
+  const prism_ft3 = cross_section_ft2 * ridge_length_ft;            // straight triangular run
+  const ends_ft3 = (1 / 3) * Math.PI * radius_ft * radius_ft * height_ft; // two half-cones = one cone
+  const volume_ft3 = prism_ft3 + ends_ft3;
+  const volume_cy = volume_ft3 / 27;
+  const tons = (volume_ft3 * density_pcf) / 2000;
+  if (![radius_ft, height_ft, cross_section_ft2, volume_ft3, volume_cy, tons].every(Number.isFinite)) return { error: "Windrow math is not a finite value." };
+  return {
+    radius_ft, height_ft, cross_section_ft2, prism_ft3, ends_ft3, volume_ft3, volume_cy, tons,
+    note: "An elongated stockpile - a windrow dumped or graded along a line - modeled as a triangular prism (the straight ridge run) with the two tapered ends together making one full cone; height = (width/2) tan(repose), so the pile rises to its natural repose. Set the ridge length to 0 and it collapses to the conical stockpile-volume pile. The angle of repose depends on the material and its moisture (roughly 30-40 degrees for granular material) and steepens as the material gets damp or angular; an irregular base, a flat (bulldozed) top, or a pile pushed against a wall all change it. A survey volume governs for payment.",
+  };
+}
+export const windrowStockpileVolumeExample = { inputs: { base_width_ft: 20, ridge_length_ft: 50, repose_angle_deg: 37, density_pcf: 100 } };
+const _v1327renderWindrowStockpileVolume = _simpleRenderer({
+  citation: "Citation: elongated-stockpile geometry by name - a triangular prism plus a full cone at the ends. height = (width/2) x tan(repose angle); cross-section = 1/2 x width x height; volume = cross-section x ridge length + 1/3 x pi x (width/2)^2 x height; tonnage = volume x bulk density / 2000. The pile is idealized (clean repose slopes, level ground); a survey governs for payment.",
+  example: windrowStockpileVolumeExample.inputs,
+  fields: [
+    { key: "base_width_ft", label: "Base width (ft)", kind: "number" },
+    { key: "ridge_length_ft", label: "Ridge (straight run) length (ft)", kind: "number" },
+    { key: "repose_angle_deg", label: "Angle of repose (degrees)", kind: "number", default: 37 },
+    { key: "density_pcf", label: "Loose bulk density (pcf)", kind: "number", default: 100 },
+  ],
+  outputs: [
+    { key: "v", id: "wsp-out-v", label: "Volume", value: (r) => _fmtC(r.volume_cy, 0) + " cy (" + _fmtC(r.volume_ft3, 0) + " ft^3)" },
+    { key: "t", id: "wsp-out-t", label: "Tonnage", value: (r) => _fmtC(r.tons, 0) + " tons" },
+    { key: "h", id: "wsp-out-h", label: "Pile height", value: (r) => _fmtC(r.height_ft, 1) + " ft" },
+    { key: "n", id: "wsp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWindrowStockpileVolume,
+});
+CONSTRUCTION_RENDERERS["windrow-stockpile-volume"] = _v1327renderWindrowStockpileVolume;
+
 // ----- spec-v819: Welded-Wire Reinforcement (Mesh) Sheet Takeoff (Group E) -----
 //
 // Slab mesh is lapped one full square at the sides and ends, so the effective

@@ -818,6 +818,7 @@ export const COMPUTE_MAP = {
   "oval-tank-volume": { module: "../../calc-shop.js", fn: "computeOvalTankVolume" },
   "cone-bottom-tank-volume": { module: "../../calc-shop.js", fn: "computeConeBottomTankVolume" },
   "tapered-tank-volume": { module: "../../calc-shop.js", fn: "computeTaperedTankVolume" },
+  "windrow-stockpile-volume": { module: "../../calc-construction.js", fn: "computeWindrowStockpileVolume" },
   "spur-gear-geometry": { module: "../../calc-machining.js", fn: "computeSpurGearGeometry" },
   "worm-gear-geometry": { module: "../../calc-machining.js", fn: "computeWormGearGeometry" },
   "gear-undercut-backlash": { module: "../../calc-machining.js", fn: "computeGearUndercutBacklash" },

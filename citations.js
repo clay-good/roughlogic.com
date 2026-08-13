@@ -5078,6 +5078,18 @@ export const CITATIONS = {
       { name: "Bulk density", value: "100 pcf default loose (the material governs); a survey governs for payment", source: "materials practice" },
     ],
   },
+  "windrow-stockpile-volume": {
+    formula: "radius = width/2; height = radius x tan(repose x pi/180); cross_section = 1/2 x width x height; volume = cross_section x ridge_length + (1/3) pi radius^2 height; volume_cy = volume/27; tons = volume x density/2000.",
+    edition: "Elongated-stockpile geometry by name - a triangular prism (the straight ridge run) plus one full cone across the two tapered ends; first-principles geometry with the angle-of-repose relation.",
+    freeAccess: "The prism, cone, and angle-of-repose relations are public geometry and soil-mechanics practice.",
+    governance: GOVERNANCE.general,
+    editionNote: "An elongated stockpile - a windrow dumped or graded along a line - modeled as a triangular prism with the two tapered ends together making one full cone; height = (width/2) tan(repose). Set the ridge length to 0 and it collapses to the conical stockpile-volume pile. The angle of repose depends on the material and its moisture (roughly 30-40 degrees for granular material) and steepens as the material gets damp or angular; an irregular base, a flat (bulldozed) top, or a pile pushed against a wall all change it. A survey volume governs for payment.",
+    assumptions: [
+      { name: "Shape", value: "triangular prism (ridge run) + one full cone at the ends; ridge length 0 gives the conical pile", source: "solid geometry" },
+      { name: "Angle of repose", value: "37 degrees default (granular material runs ~30-40 degrees); moisture and angularity steepen it", source: "soil-mechanics practice" },
+      { name: "Bulk density", value: "100 pcf default loose (the material governs); a survey governs for payment", source: "materials practice" },
+    ],
+  },
   "mortar-mix": {
     formula: "Bag yields per PCA / NCMA: 1 bag (94 lb Type N) yields ~3.0 ft³ mortar; joint volume from joint_thickness × wall_area_per_bag; brick / 8-inch CMU joint-thickness adjustment.",
     edition: "PCA (Portland Cement Association) Design and Control of Concrete Mixtures by name; ASTM C270 mortar specs by name.",

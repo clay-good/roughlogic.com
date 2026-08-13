@@ -1801,6 +1801,7 @@ cross-check.
 | calc-construction.js | `computeWindPressure` | `{ V_mph, exposure = "C", Kz = 0, Kzt = 1.0, Kd = 0.85, G = 0.85 }` | _ | _ | _ |
 | calc-construction.js | `computeWindSolidSign` | `{ velocity_pressure_psf = 0, gust_factor = 0.85, force_coefficient = 0, solid...` | _ | _ | _ |
 | calc-construction.js | `computeWindSpeedFromVelocityPressure` | `{ velocity_pressure_psf = 0 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeWindrowStockpileVolume` | `{ base_width_ft = 0, ridge_length_ft = 0, repose_angle_deg = 37, density_pcf ...` | _ | _ | _ |
 | calc-construction.js | `computeWoodBeamBending` | `{ fb_star_psi = 0, emin_psi = 620000, b_in = 0, d_in = 0, le_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeWoodBeamCompressionNotch` | `{ fv_prime_psi = 0, b_in = 0, d_in = 0, dn_in = 0, e_in = 0, v_applied_lb = 0...` | _ | _ | _ |
 | calc-construction.js | `computeWoodBeamShear` | `{ fv_prime_psi = 0, b_in = 0, d_in = 0, dn_in = 0, v_applied_lb = 0 } = {}` | _ | _ | _ |
@@ -3364,7 +3365,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1950.
+Row count: 1951.
 
 <!-- END function-corpus-v14 -->
 
@@ -4004,7 +4005,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (464 tiles)
+### Group E Construction (465 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4460,6 +4461,7 @@ per spec-v14 §13.1 second paragraph.
 | `wind-solid-sign` | Wind Force on Solid Freestanding Wall / Sign | ASCE 7-22 Section 29.3 (solid freesta...; qh 17 psf, G 0.85, Cf 1.35, As 64 ft^2, B 8 ft -> F 1248 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wind-speed-from-velocity-pressure` | Basic Wind Speed from Velocity Pressure | ASCE; 25 psf bare velocity pressure -> 98.8 mph equivalent basi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-velocity-pressure-exposure-coefficient` | Velocity Pressure Exposure Coefficient Kz (ASCE 7 §26.10) | ASCE 7 §26.10.1 velocity pressure exp...; Kz = 2.01*(50/900)^(2/9.5) = 2.01*(0.055556)^0.21053 = 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `windrow-stockpile-volume` | Windrow (Elongated) Stockpile Volume and Tonnage | Project (first-principles); triangular prism + end cone | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-feed-deposition` | Wire Feed Speed to Deposition Rate | first-principles wire-volume geometry...; 0.035 in wire, 300 in/min, 0.92 eff -> 4.91 lb/hr melt, 4... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-feed-speed-for-deposition` | Wire Feed Speed for a Target Deposition Rate | first-principles wire-volume geometry...; 6 lb/hr, 0.035 in wire, 0.92 eff -> ~398 in/min, 6.52 lb/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-beam-bending` | Wood Bending Member (NDS Beam Stability Factor CL and Adjusted Fb') | NDS 3.3.3 (National Design Specificat...; spec-v263 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5236,6 +5238,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1699. Fixture-covered or reference-cadence: 1699 / 1699.
+Tile count: 1700. Fixture-covered or reference-cadence: 1700 / 1700.
 
 <!-- END tile-index-v14 -->

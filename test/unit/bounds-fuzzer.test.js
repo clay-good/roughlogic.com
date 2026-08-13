@@ -38554,3 +38554,24 @@ test("bounds: spec-v1326 computeTaperedTankVolume pins the frustum fill, the ful
   assert.ok("error" in _v1326({ bottom_diameter_ft: 4, top_diameter_ft: 10, height_ft: 12, depth_ft: -1 }));
   assert.ok("error" in _v1326({ bottom_diameter_ft: Infinity, top_diameter_ft: 10, height_ft: 12, depth_ft: 6 }));
 });
+
+import { computeWindrowStockpileVolume as _v1327 } from "../../calc-construction.js";
+import { computeStockpileVolume as _v1327cone } from "../../calc-construction.js";
+test("bounds: spec-v1327 computeWindrowStockpileVolume pins the prism+cone volume, the conical reduction, and error seams", () => {
+  // 20 ft wide, 50 ft ridge, 37 deg, 100 pcf: 169 cy, 228 tons, 7.5 ft tall.
+  const w = _v1327({ base_width_ft: 20, ridge_length_ft: 50, repose_angle_deg: 37, density_pcf: 100 });
+  assert.ok(Math.abs(w.volume_cy - 168.8) < 0.5 && Math.abs(w.tons - 227.8) < 0.5 && Math.abs(w.height_ft - 7.54) < 0.02);
+  // Ridge length 0 collapses to the conical stockpile-volume of the same base diameter (width).
+  const w0 = _v1327({ base_width_ft: 60, ridge_length_ft: 0, repose_angle_deg: 37, density_pcf: 100 });
+  const cone = _v1327cone({ base_diameter_ft: 60, repose_angle_deg: 37, density_pcf: 100 });
+  assert.ok(Math.abs(w0.volume_ft3 - cone.volume_ft3) < 1e-9);
+  // The straight ridge run adds a linear amount: doubling the ridge length adds exactly the prism volume again.
+  const w2 = _v1327({ base_width_ft: 20, ridge_length_ft: 100, repose_angle_deg: 37, density_pcf: 100 });
+  assert.ok(Math.abs((w2.volume_ft3 - w.volume_ft3) - w.prism_ft3) < 1e-6);
+  // Error seams: non-positive width, negative ridge, bad repose, non-positive density, non-finite.
+  assert.ok("error" in _v1327({ base_width_ft: 0, ridge_length_ft: 50, repose_angle_deg: 37, density_pcf: 100 }));
+  assert.ok("error" in _v1327({ base_width_ft: 20, ridge_length_ft: -1, repose_angle_deg: 37, density_pcf: 100 }));
+  assert.ok("error" in _v1327({ base_width_ft: 20, ridge_length_ft: 50, repose_angle_deg: 90, density_pcf: 100 }));
+  assert.ok("error" in _v1327({ base_width_ft: 20, ridge_length_ft: 50, repose_angle_deg: 37, density_pcf: 0 }));
+  assert.ok("error" in _v1327({ base_width_ft: Infinity, ridge_length_ft: 50, repose_angle_deg: 37, density_pcf: 100 }));
+});

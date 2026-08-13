@@ -89099,6 +89099,41 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "windrow-stockpile-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "20 ft-wide windrow, 50 ft ridge, 37 deg, 100 pcf",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "triangular prism + end cone",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "base_width_ft": 20,
+    "ridge_length_ft": 50,
+    "repose_angle_deg": 37,
+    "density_pcf": 100
+   },
+   "outputs": {
+    "volume_cy": {
+     "value": 168.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tons": {
+     "value": 227.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "height_ft": {
+     "value": 7.54,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }
