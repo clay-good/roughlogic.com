@@ -38449,6 +38449,26 @@
    "kind": "question"
   },
   {
+   "term": "flat top stockpile volume",
+   "target": "flat-top-stockpile-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "truncated cone pile tonnage",
+   "target": "flat-top-stockpile-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "radial stacker pile volume",
+   "target": "flat-top-stockpile-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "flat topped aggregate pile cubic yards",
+   "target": "flat-top-stockpile-volume",
+   "kind": "question"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"

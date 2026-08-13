@@ -7721,6 +7721,49 @@ const _v1327renderWindrowStockpileVolume = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["windrow-stockpile-volume"] = _v1327renderWindrowStockpileVolume;
 
+// ----- spec-v1328: Flat-Top (Truncated-Cone) Stockpile Volume and Tonnage (Group E) -----
+// stockpile-volume is a SHARP cone; a radial stacker or a bulldozer leaves a FLAT top, making a truncated cone
+// (frustum). height comes from the repose slope across the ring width: h = (Rb - Rt) tan(repose). volume is the
+// frustum (pi h/3)(Rb^2 + Rb Rt + Rt^2). Top diameter 0 collapses to the conical stockpile-volume pile.
+// dims: in { base_diameter_ft: L, top_diameter_ft: L, repose_angle_deg: dimensionless, density_pcf: dimensionless } out: { height_ft: L, volume_ft3: L^3, volume_cy: L^3, tons: dimensionless }
+export function computeFlatTopStockpileVolume({ base_diameter_ft = 0, top_diameter_ft = 0, repose_angle_deg = 37, density_pcf = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(base_diameter_ft > 0)) return { error: "Base diameter must be positive (ft)." };
+  if (top_diameter_ft < 0) return { error: "Top diameter cannot be negative (ft)." };
+  if (!(top_diameter_ft < base_diameter_ft)) return { error: "Top diameter must be smaller than the base diameter (a flat top narrower than the base)." };
+  if (!(density_pcf > 0)) return { error: "Density must be positive (pcf)." };
+  if (!(repose_angle_deg > 0) || repose_angle_deg >= 90) return { error: "Repose angle must be between 0 and 90 degrees (exclusive)." };
+  const Rb = base_diameter_ft / 2, Rt = top_diameter_ft / 2;
+  const height_ft = (Rb - Rt) * Math.tan((repose_angle_deg * Math.PI) / 180);
+  const volume_ft3 = (Math.PI * height_ft / 3) * (Rb * Rb + Rb * Rt + Rt * Rt);
+  const volume_cy = volume_ft3 / 27;
+  const tons = (volume_ft3 * density_pcf) / 2000;
+  if (![height_ft, volume_ft3, volume_cy, tons].every(Number.isFinite) || !(volume_ft3 > 0)) return { error: "Flat-top stockpile math is not a finite value." };
+  return {
+    height_ft, volume_ft3, volume_cy, tons,
+    note: "A flat-topped stockpile - the truncated cone (frustum) a radial stacker or a bulldozer leaves when it cannot peak the pile - from the base diameter, the flat-top diameter, and the angle of repose: the side slope sets the height h = (base_radius - top_radius) x tan(repose), and the volume is the frustum (pi h/3)(Rb^2 + Rb Rt + Rt^2). Set the top diameter to 0 and it collapses to the sharp conical stockpile-volume pile. The angle of repose depends on the material and its moisture (roughly 30-40 degrees for granular material) and steepens as the material gets damp or angular; an irregular base or a non-level top change it. A survey volume governs for payment.",
+  };
+}
+export const flatTopStockpileVolumeExample = { inputs: { base_diameter_ft: 80, top_diameter_ft: 20, repose_angle_deg: 37, density_pcf: 100 } };
+const _v1328renderFlatTopStockpileVolume = _simpleRenderer({
+  citation: "Citation: truncated-cone (frustum) stockpile geometry by name. height = (base_radius - top_radius) x tan(repose angle); volume = (pi h/3)(Rb^2 + Rb Rt + Rt^2); tonnage = volume x bulk density / 2000. Top diameter 0 gives the sharp cone. The pile is idealized (clean repose slope, level base and top); a survey governs for payment.",
+  example: flatTopStockpileVolumeExample.inputs,
+  fields: [
+    { key: "base_diameter_ft", label: "Base diameter (ft)", kind: "number" },
+    { key: "top_diameter_ft", label: "Flat-top diameter (ft)", kind: "number" },
+    { key: "repose_angle_deg", label: "Angle of repose (degrees)", kind: "number", default: 37 },
+    { key: "density_pcf", label: "Loose bulk density (pcf)", kind: "number", default: 100 },
+  ],
+  outputs: [
+    { key: "v", id: "ftsp-out-v", label: "Volume", value: (r) => _fmtC(r.volume_cy, 0) + " cy (" + _fmtC(r.volume_ft3, 0) + " ft^3)" },
+    { key: "t", id: "ftsp-out-t", label: "Tonnage", value: (r) => _fmtC(r.tons, 0) + " tons" },
+    { key: "h", id: "ftsp-out-h", label: "Pile height", value: (r) => _fmtC(r.height_ft, 1) + " ft" },
+    { key: "n", id: "ftsp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFlatTopStockpileVolume,
+});
+CONSTRUCTION_RENDERERS["flat-top-stockpile-volume"] = _v1328renderFlatTopStockpileVolume;
+
 // ----- spec-v819: Welded-Wire Reinforcement (Mesh) Sheet Takeoff (Group E) -----
 //
 // Slab mesh is lapped one full square at the sides and ends, so the effective

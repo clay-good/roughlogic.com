@@ -5090,6 +5090,18 @@ export const CITATIONS = {
       { name: "Bulk density", value: "100 pcf default loose (the material governs); a survey governs for payment", source: "materials practice" },
     ],
   },
+  "flat-top-stockpile-volume": {
+    formula: "Rb = base_diameter/2, Rt = top_diameter/2; height = (Rb - Rt) x tan(repose x pi/180); volume = (pi height/3)(Rb^2 + Rb Rt + Rt^2); volume_cy = volume/27; tons = volume x density/2000.",
+    edition: "Truncated-cone (frustum) stockpile geometry by name (angle-of-repose flat-topped pile); first-principles geometry.",
+    freeAccess: "The frustum-volume and angle-of-repose relations are public geometry and soil-mechanics practice.",
+    governance: GOVERNANCE.general,
+    editionNote: "A flat-topped stockpile - the truncated cone (frustum) a radial stacker or a bulldozer leaves when it cannot peak the pile - from the base diameter, the flat-top diameter, and the angle of repose: the side slope sets the height h = (base_radius - top_radius) tan(repose), and the volume is the frustum (pi h/3)(Rb^2 + Rb Rt + Rt^2). Set the top diameter to 0 and it collapses to the sharp conical stockpile-volume pile. The angle of repose depends on the material and its moisture (roughly 30-40 degrees for granular material) and steepens as the material gets damp or angular; an irregular base or a non-level top change it. A survey volume governs for payment.",
+    assumptions: [
+      { name: "Shape", value: "truncated cone (frustum); height from the repose slope; top diameter 0 gives the sharp cone", source: "solid geometry" },
+      { name: "Angle of repose", value: "37 degrees default (granular material runs ~30-40 degrees); moisture and angularity steepen it", source: "soil-mechanics practice" },
+      { name: "Bulk density", value: "100 pcf default loose (the material governs); a survey governs for payment", source: "materials practice" },
+    ],
+  },
   "mortar-mix": {
     formula: "Bag yields per PCA / NCMA: 1 bag (94 lb Type N) yields ~3.0 ft³ mortar; joint volume from joint_thickness × wall_area_per_bag; brick / 8-inch CMU joint-thickness adjustment.",
     edition: "PCA (Portland Cement Association) Design and Control of Concrete Mixtures by name; ASTM C270 mortar specs by name.",

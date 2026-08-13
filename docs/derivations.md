@@ -1655,6 +1655,7 @@ cross-check.
 | calc-construction.js | `computeFenceEstimate` | `{ length_ft = 0, post_spacing_ft = 8, rails_per_section = 2, picket_width_in ...` | _ | _ | _ |
 | calc-construction.js | `computeFilletWeldStrength` | `{ mode = "capacity-from-size", leg_in = 0, length_in = 0, electrode = "E70", ...` | _ | _ | _ |
 | calc-construction.js | `computeFlammableCabinetStorage` | `{ cat123_gallons = 0, cat4_gallons = 0, cabinets_available = 0, per_cabinet_c...` | _ | _ | _ |
+| calc-construction.js | `computeFlatTopStockpileVolume` | `{ base_diameter_ft = 0, top_diameter_ft = 0, repose_angle_deg = 37, density_p...` | _ | _ | _ |
 | calc-construction.js | `computeFloodOpeningArea` | `{ enclosed_area_sf = 0, opening_type = "non-engineered", net_free_area_per_op...` | _ | _ | _ |
 | calc-construction.js | `computeFloorLevelChange` | `{ level_change_in = 0, bevel_run_in = 0, carpet_pile_in = 0, opening_size_in ...` | _ | _ | _ |
 | calc-construction.js | `computeFootingArea` | `{ column_load_lb, soil_class, applied_moment_lbft = 0 }` | _ | _ | _ |
@@ -3365,7 +3366,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1951.
+Row count: 1952.
 
 <!-- END function-corpus-v14 -->
 
@@ -4005,7 +4006,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (465 tiles)
+### Group E Construction (466 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4163,6 +4164,7 @@ per spec-v14 §13.1 second paragraph.
 | `fineness-modulus` | Aggregate Fineness Modulus (ASTM C136) | ASTM C136 / C125 (aggregate fineness ...; cumulative retained 2/12/32/57/82/95 -> sum 280 -> FM 2.8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fireplace-flue-area` | Masonry Fireplace Flue Area (IRC R1003.15.1) | International Code Council; 'Square chimney flues shall have a minimum net cross-sect... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flammable-cabinet-storage` | Flammable Liquid Cabinet Storage (OSHA 1926.152(b)) | Occupational Safety and Health Admini...; 'Not more than 60 gallons of Category 1, 2 and/or 3 flamm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `flat-top-stockpile-volume` | Flat-Top (Truncated-Cone) Stockpile Volume and Tonnage | Project (first-principles); truncated cone (frustum) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flexible-pipe-deflection` | Buried Flexible Pipe Deflection (Modified Iowa) | Modified Iowa (Spangler) deflection f...; Wc = 12*120/144 = 10 psi; deflection = 1.5*0.1*10/(0.149*... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flood-opening-area` | NFIP Flood Opening Area (44 CFR 60.3) | Federal Emergency Management Agency; 'A minimum of two openings having a total net area of not... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `floor-level-change` | Changes in Level and Floor Surfaces (2010 ADA Standards 302, 303) | US Department of Justice / US Access ...; 303.3: 'Changes in level between 1/4 inch high minimum an... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5238,6 +5240,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1700. Fixture-covered or reference-cadence: 1700 / 1700.
+Tile count: 1701. Fixture-covered or reference-cadence: 1701 / 1701.
 
 <!-- END tile-index-v14 -->

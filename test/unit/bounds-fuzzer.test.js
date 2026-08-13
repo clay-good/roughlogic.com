@@ -38575,3 +38575,21 @@ test("bounds: spec-v1327 computeWindrowStockpileVolume pins the prism+cone volum
   assert.ok("error" in _v1327({ base_width_ft: 20, ridge_length_ft: 50, repose_angle_deg: 37, density_pcf: 0 }));
   assert.ok("error" in _v1327({ base_width_ft: Infinity, ridge_length_ft: 50, repose_angle_deg: 37, density_pcf: 100 }));
 });
+
+import { computeFlatTopStockpileVolume as _v1328 } from "../../calc-construction.js";
+test("bounds: spec-v1328 computeFlatTopStockpileVolume pins the frustum volume, the conical reduction, and error seams", () => {
+  // 80 ft base, 20 ft top, 37 deg, 100 pcf: 1,841 cy, 2,486 tons, 22.6 ft tall.
+  const p = _v1328({ base_diameter_ft: 80, top_diameter_ft: 20, repose_angle_deg: 37, density_pcf: 100 });
+  assert.ok(Math.abs(p.volume_cy - 1841.3) < 1 && Math.abs(p.tons - 2485.7) < 1 && Math.abs(p.height_ft - 22.61) < 0.05);
+  // Top diameter 0 collapses to the sharp conical stockpile-volume of the same base.
+  const flat0 = _v1328({ base_diameter_ft: 80, top_diameter_ft: 0, repose_angle_deg: 37, density_pcf: 100 });
+  const cone = _v1327cone({ base_diameter_ft: 80, repose_angle_deg: 37, density_pcf: 100 });
+  assert.ok(Math.abs(flat0.volume_ft3 - cone.volume_ft3) < 1e-9);
+  // Error seams: non-positive base, top >= base, negative top, bad repose, non-positive density, non-finite.
+  assert.ok("error" in _v1328({ base_diameter_ft: 0, top_diameter_ft: 20, repose_angle_deg: 37, density_pcf: 100 }));
+  assert.ok("error" in _v1328({ base_diameter_ft: 80, top_diameter_ft: 80, repose_angle_deg: 37, density_pcf: 100 }));
+  assert.ok("error" in _v1328({ base_diameter_ft: 80, top_diameter_ft: -1, repose_angle_deg: 37, density_pcf: 100 }));
+  assert.ok("error" in _v1328({ base_diameter_ft: 80, top_diameter_ft: 20, repose_angle_deg: 90, density_pcf: 100 }));
+  assert.ok("error" in _v1328({ base_diameter_ft: 80, top_diameter_ft: 20, repose_angle_deg: 37, density_pcf: 0 }));
+  assert.ok("error" in _v1328({ base_diameter_ft: Infinity, top_diameter_ft: 20, repose_angle_deg: 37, density_pcf: 100 }));
+});

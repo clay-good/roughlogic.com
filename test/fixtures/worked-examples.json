@@ -89134,6 +89134,41 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "flat-top-stockpile-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "80 ft base, 20 ft flat top, 37 deg, 100 pcf",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "truncated cone (frustum)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "base_diameter_ft": 80,
+    "top_diameter_ft": 20,
+    "repose_angle_deg": 37,
+    "density_pcf": 100
+   },
+   "outputs": {
+    "volume_cy": {
+     "value": 1841.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tons": {
+     "value": 2485.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "height_ft": {
+     "value": 22.61,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }
