@@ -11960,6 +11960,17 @@ export const CITATIONS = {
       { name: "Triangle inequality", value: "each side must be less than the sum of the other two", source: "geometry" },
     ],
   },
+  "triangle-asa": {
+    formula: "C = 180 - A - B; a = c sin(A)/sin(C); b = c sin(B)/sin(C); area = (1/2) a b sin(C). A + B < 180 required.",
+    edition: "The law of sines a/sin(A) = c/sin(C) with C = 180 - A - B - first-principles plane trigonometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure plane trigonometry, public; the two angles and the baseline are user-supplied measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "Oblique-triangle solve from two angles and the INCLUDED side (ASA) - the plane-triangulation case. The two angles A and B are turned at the ends of the known baseline c (the side between them), the third (far) angle is C = 180 - A - B, and the distances to the far point are the law of sines a = c sin A/sin C (opposite A) and b = c sin B/sin C (opposite B), with the area (1/2) a b sin C. The two angles must sum to less than 180 degrees or the sight lines never meet. This is how a surveyor or layout hand reaches a distance to an inaccessible corner, tower, or bank - two angles off a measured baseline, no tape to the point. The SAS and SSS cases are triangle-sas and triangle-sss; the ambiguous SSA (two sides and a non-included angle) is separate. Plane triangles only. A layout aid; verify critical dimensions on the work.",
+    assumptions: [
+      { name: "Law of sines", value: "C = 180 - A - B, then a = c sin A/sin C, b = c sin B/sin C", source: "plane trigonometry" },
+      { name: "Angle sum", value: "A + B must be under 180 degrees (the sight lines must meet)", source: "geometry" },
+    ],
+  },
   "circular-segment-area": {
     formula: "R = (chord^2/4 + rise^2)/(2 x rise); theta = 2 x acos((R - rise)/R); segment area A = (1/2) R^2 (theta - sin theta) = R^2 acos((R-h)/R) - (R-h) sqrt(2 R h - h^2).",
     edition: "Area of a circular segment (the region between a chord and its arc) - first-principles circle geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",

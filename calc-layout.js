@@ -216,6 +216,54 @@ function renderTriangleSss(inputRegion, outputRegion, citationEl) {
 }
 LAYOUT_RENDERERS["triangle-sss"] = renderTriangleSss;
 
+// spec-v1311: oblique-triangle solver, ASA (two angles + included side) - the triangulation case.
+// A measured baseline c and the two angles A, B turned at its ends: C = 180 - A - B, then law of sines
+// a = c sin A/sin C, b = c sin B/sin C. Completes the triangle-solver family (SAS/SSS/ASA).
+// dims: in { angle_a_deg: dimensionless, angle_b_deg: dimensionless, included_side_c: L } out: { angle_c_deg: dimensionless, side_a: L, side_b: L, area: L^2 }
+export function computeTriangleAsa({ angle_a_deg = 0, angle_b_deg = 0, included_side_c = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const A = Number(angle_a_deg) || 0;
+  const B = Number(angle_b_deg) || 0;
+  const c = Number(included_side_c) || 0;
+  if (!(A > 0)) return { error: "Angle A must be positive (deg)." };
+  if (!(B > 0)) return { error: "Angle B must be positive (deg)." };
+  if (!(A + B < 180)) return { error: "Angles A and B must sum to less than 180 degrees (the sight lines must meet)." };
+  if (!(c > 0)) return { error: "Included side (baseline) c must be positive." };
+  const angle_c_deg = 180 - A - B;
+  const sinC = Math.sin((angle_c_deg * Math.PI) / 180);
+  const side_a = (c * Math.sin((A * Math.PI) / 180)) / sinC;
+  const side_b = (c * Math.sin((B * Math.PI) / 180)) / sinC;
+  const area = 0.5 * side_a * side_b * sinC;
+  if (![angle_c_deg, side_a, side_b, area].every(Number.isFinite) || !(side_a > 0)) return { error: "Triangle math is not a finite value; check the inputs." };
+  return {
+    angle_c_deg, side_a, side_b, area,
+    note: "Oblique-triangle solve from two angles and the INCLUDED side (ASA) - the plane-triangulation case. The two angles A and B are turned at the ends of the known baseline c (the side between them), the third (far) angle is C = 180 - A - B, and the distances to the far point are the law of sines a = c sin A/sin C (opposite A) and b = c sin B/sin C (opposite B), with the area (1/2) a b sin C. The two angles must sum to less than 180 degrees or the sight lines never meet. This is how a surveyor or layout hand reaches a distance to an inaccessible corner, tower, or bank - two angles off a measured baseline, no tape to the point. The SAS and SSS cases are triangle-sas and triangle-sss; the ambiguous SSA (two sides and a non-included angle) is separate. Plane triangles only. A layout aid; verify critical dimensions on the work.",
+  };
+}
+export const triangleAsaExample = { inputs: { angle_a_deg: 70.89, angle_b_deg: 49.11, included_side_c: 9.165 } };
+function renderTriangleAsa(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: law of sines a = c sin A/sin C with C = 180 - A - B (standard trigonometry) - the ASA triangulation solve from a baseline and two angles. A layout aid; verify critical dimensions on the work.";
+  const A = makeNumber("Angle A (deg)", "tasa-a", { step: "any", min: "0" }); A.input.value = "70.89";
+  const B = makeNumber("Angle B (deg)", "tasa-b", { step: "any", min: "0" }); B.input.value = "49.11";
+  const c = makeNumber("Included side (baseline) c", "tasa-c", { step: "any", min: "0" }); c.input.value = "9.165";
+  for (const f of [A, B, c]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { A.input.value = "70.89"; B.input.value = "49.11"; c.input.value = "9.165"; update(); });
+  const oC = makeOutputLine(outputRegion, "Third angle C", "tasa-out-c");
+  const oS = makeOutputLine(outputRegion, "Sides (a / b)", "tasa-out-s");
+  const oR = makeOutputLine(outputRegion, "Area", "tasa-out-r");
+  const oNote = makeOutputLine(outputRegion, "Note", "tasa-out-note");
+  const update = debounce(() => {
+    const r = computeTriangleAsa({ angle_a_deg: Number(A.input.value) || 0, angle_b_deg: Number(B.input.value) || 0, included_side_c: Number(c.input.value) || 0 });
+    if (r.error) { oC.textContent = r.error; oS.textContent = "-"; oR.textContent = "-"; oNote.textContent = ""; return; }
+    oC.textContent = fmt(r.angle_c_deg, 2) + " deg";
+    oS.textContent = fmt(r.side_a, 4) + " opposite A / " + fmt(r.side_b, 4) + " opposite B";
+    oR.textContent = fmt(r.area, 4) + " (square units)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [A, B, c]) f.input.addEventListener("input", update);
+}
+LAYOUT_RENDERERS["triangle-asa"] = renderTriangleAsa;
+
 // --- v32 G: Bolt circle / circle-of-holes layout (`bolt-circle`) ---
 // R = dia/2; hole i at angle start + i*(360/N): x = cx + R*cos, y = cy + R*sin;
 // adjacent center-to-center chord = 2*R*sin(180/N).

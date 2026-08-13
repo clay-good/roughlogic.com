@@ -88187,6 +88187,68 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "triangle-asa",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Triangulation from a baseline and two angles",
+   "source_edition_or_year": "plane trigonometry",
+   "source_section_or_page": "law of sines",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "angle_a_deg": 70.89,
+    "angle_b_deg": 49.11,
+    "included_side_c": 9.165
+   },
+   "outputs": {
+    "angle_c_deg": {
+     "value": 60.0,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "side_a": {
+     "value": 10.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "side_b": {
+     "value": 8.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "triangle-asa",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Isosceles right (45/45) from a 10 baseline",
+   "source_edition_or_year": "plane trigonometry",
+   "source_section_or_page": "law of sines",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "angle_a_deg": 45,
+    "angle_b_deg": 45,
+    "included_side_c": 10
+   },
+   "outputs": {
+    "angle_c_deg": {
+     "value": 90.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "side_a": {
+     "value": 7.071,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

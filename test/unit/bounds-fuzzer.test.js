@@ -38193,3 +38193,25 @@ test("bounds: spec-v1310 computeTriangleSss pins the law-of-cosines angles, Hero
   assert.ok("error" in _v1310({ side_a: 3, side_b: 4, side_c: 7 }));
   assert.ok("error" in _v1310({ side_a: Infinity, side_b: 8, side_c: 9 }));
 });
+
+import { computeTriangleAsa as _v1311 } from "../../calc-layout.js";
+import { computeTriangleSss as _v1311sib } from "../../calc-layout.js";
+test("bounds: spec-v1311 computeTriangleAsa pins the law-of-sines sides, the family cross-pin, the angle-sum guard, and error seams", () => {
+  // A 70.89, B 49.11, c 9.165: C 60, a 10.0, b 8.0, area 34.64.
+  const r = _v1311({ angle_a_deg: 70.89, angle_b_deg: 49.11, included_side_c: 9.165 });
+  assert.ok(Math.abs(r.angle_c_deg - 60.0) < 0.05 && Math.abs(r.side_a - 10.0) < 5e-3 && Math.abs(r.side_b - 8.0) < 5e-3);
+  assert.ok(Math.abs(r.area - 34.641) < 1e-2);
+  // Cross-pin: feeding the resulting three sides into the SSS solver returns the input angles.
+  const sss = _v1311sib({ side_a: r.side_a, side_b: r.side_b, side_c: 9.165 });
+  assert.ok(Math.abs(sss.angle_a_deg - 70.89) < 0.1 && Math.abs(sss.angle_b_deg - 49.11) < 0.1);
+  // Isosceles right: 45/45 off a 10 baseline gives a 90-deg apex and equal 7.071 legs.
+  const iso = _v1311({ angle_a_deg: 45, angle_b_deg: 45, included_side_c: 10 });
+  assert.ok(Math.abs(iso.angle_c_deg - 90) < 1e-9 && Math.abs(iso.side_a - 7.071) < 1e-3 && Math.abs(iso.side_a - iso.side_b) < 1e-9);
+  // A bigger baseline scales both sides proportionally.
+  assert.ok(Math.abs(_v1311({ angle_a_deg: 70.89, angle_b_deg: 49.11, included_side_c: 18.33 }).side_a / r.side_a - 2) < 1e-6);
+  // Error seams: non-positive angle, angles summing to >= 180, non-positive baseline, non-finite.
+  assert.ok("error" in _v1311({ angle_a_deg: 0, angle_b_deg: 49, included_side_c: 9 }));
+  assert.ok("error" in _v1311({ angle_a_deg: 120, angle_b_deg: 60, included_side_c: 9 }));
+  assert.ok("error" in _v1311({ angle_a_deg: 70, angle_b_deg: 49, included_side_c: 0 }));
+  assert.ok("error" in _v1311({ angle_a_deg: Infinity, angle_b_deg: 49, included_side_c: 9 }));
+});
