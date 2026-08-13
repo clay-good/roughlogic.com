@@ -188,6 +188,7 @@ export const COMPUTE_MAP = {
   "hydraulic-accumulator-volume": { module: "../../calc-mechanic.js", fn: "computeHydraulicAccumulatorVolume" },
   "projectile-range": { module: "../../calc-mechanic.js", fn: "computeProjectileRange" },
   "free-fall-drop": { module: "../../calc-mechanic.js", fn: "computeFreeFallDrop" },
+  "terminal-velocity": { module: "../../calc-mechanic.js", fn: "computeTerminalVelocity" },
   "gear-dynamic-tooth-stress": { module: "../../calc-mechanic.js", fn: "computeGearDynamicToothStress" },
   "trap-seal-loss": { module: "../../calc-plumbing.js", fn: "computeTrapSealLoss" },
   "water-meter-sizing": { module: "../../calc-plumbing.js", fn: "computeWaterMeterSizing" },

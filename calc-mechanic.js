@@ -1707,6 +1707,49 @@ MECHANIC_RENDERERS["free-fall-drop"] = _simpleRenderer({
   compute: computeFreeFallDrop,
 });
 
+// --- spec-v1308 K: terminal velocity from weight, area, and drag (`terminal-velocity`) ---
+// free-fall-drop gives the no-drag speed and aerodynamic-drag-force gives drag at a speed; this is where
+// they balance. At terminal velocity W = 1/2 rho V^2 Cd A, so V_t = sqrt(2 W/(rho_mass Cd A)). The cap that
+// free-fall ignores for a light/bluff object. rho_mass = rho_weight/g, g = 32.174 ft/s^2.
+// dims: in { weight_lb: M L T^-2, frontal_area_ft2: L^2, drag_coefficient: dimensionless, air_density_lb_ft3: M L^-3 } out: { terminal_velocity_fps: L T^-1, terminal_velocity_mph: L T^-1 }
+export function computeTerminalVelocity({ weight_lb = 0, frontal_area_ft2 = 0, drag_coefficient = 0, air_density_lb_ft3 = 0.0765 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const W = Number(weight_lb) || 0;
+  const A = Number(frontal_area_ft2) || 0;
+  const Cd = Number(drag_coefficient) || 0;
+  const rhoW = Number(air_density_lb_ft3) || 0;
+  if (!(W > 0)) return { error: "Weight must be positive (lb)." };
+  if (!(A > 0)) return { error: "Frontal area must be positive (ft^2)." };
+  if (!(Cd > 0)) return { error: "Drag coefficient must be positive." };
+  if (!(rhoW > 0)) return { error: "Air density must be positive (lb/ft^3)." };
+  const g = 32.174; // ft/s^2
+  const rhoMass = rhoW / g; // slug/ft^3
+  const terminal_velocity_fps = Math.sqrt((2 * W) / (rhoMass * Cd * A));
+  const terminal_velocity_mph = terminal_velocity_fps * 0.681818182;
+  if (![terminal_velocity_fps, terminal_velocity_mph].every(Number.isFinite) || !(terminal_velocity_fps > 0)) return { error: "Terminal-velocity math is not a finite value; check the inputs." };
+  return {
+    terminal_velocity_fps, terminal_velocity_mph,
+    note: "Terminal velocity, the steady speed where the aerodynamic drag 1/2 rho V^2 Cd A exactly balances the weight W and the object stops accelerating: V_t = sqrt(2 W/(rho_mass Cd A)), with the mass air density rho_mass = (weight density)/g (g = 32.174 ft/s^2), the frontal area A, and the drag coefficient Cd. Heavy, compact, slick objects (small A, small Cd, big W) fall fast; light, bluff ones settle slowly. A 180 lb skydiver at 7 ft^2 and Cd 0.7 terminals at the familiar 120 mph. This is the CEILING that free-fall-drop (no drag) ignores - a compact tool over a short jobsite drop is still accelerating (free-fall is right), but a sheet of plywood or a person tops out and falls no faster no matter the height. The distance and time to REACH terminal (an exponential approach), tumbling that changes Cd and A, compressibility, and altitude density change are separate. Pair with free-fall-drop and aerodynamic-drag-force. A planning estimate; field conditions govern.",
+  };
+}
+export const terminalVelocityExample = { inputs: { weight_lb: 180, frontal_area_ft2: 7, drag_coefficient: 0.7, air_density_lb_ft3: 0.0765 } };
+
+MECHANIC_RENDERERS["terminal-velocity"] = _simpleRenderer({
+  citation: "Citation: terminal-velocity balance W = 1/2 rho V^2 Cd A solved for V (standard fluid mechanics): V_t = sqrt(2 W/(rho_mass Cd A)), rho_mass = (weight density)/g. The distance/time to reach terminal, tumbling, and density change are separate. A planning estimate; field conditions govern.",
+  example: terminalVelocityExample.inputs,
+  fields: [
+    { key: "weight_lb", label: "Object weight W (lb)", kind: "number" },
+    { key: "frontal_area_ft2", label: "Frontal area A (ft^2)", kind: "number" },
+    { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" },
+    { key: "air_density_lb_ft3", label: "Air density (lb/ft^3)", kind: "number", attrs: { step: "any", value: "0.0765" } },
+  ],
+  outputs: [
+    { key: "v", id: "tv-out-v", label: "Terminal velocity", value: (r) => fmt(r.terminal_velocity_fps, 1) + " ft/s (" + fmt(r.terminal_velocity_mph, 1) + " mph)" },
+    { key: "n", id: "tv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTerminalVelocity,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================

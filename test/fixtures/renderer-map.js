@@ -1239,6 +1239,7 @@ export const RENDERER_MAP = {
   "hydraulic-accumulator-volume": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "projectile-range": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "free-fall-drop": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
+  "terminal-velocity": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "hp-from-torque": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "volumetric-efficiency": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "gear-mph-rpm": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },

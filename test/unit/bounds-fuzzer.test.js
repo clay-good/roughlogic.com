@@ -38128,3 +38128,22 @@ test("bounds: spec-v1307 computeFreeFallDrop pins the impact speed, fall time, e
   assert.ok("error" in _v1307({ drop_height_ft: 50, object_weight_lb: -1 }));
   assert.ok("error" in _v1307({ drop_height_ft: Infinity, object_weight_lb: 5 }));
 });
+
+import { computeTerminalVelocity as _v1308 } from "../../calc-mechanic.js";
+test("bounds: spec-v1308 computeTerminalVelocity pins the balance speed, the scalings, the skydiver benchmark, and error seams", () => {
+  // W 180, A 7, Cd 0.7, standard air: 175.8 ft/s (119.9 mph) - the ~120 mph skydiver value.
+  const r = _v1308({ weight_lb: 180, frontal_area_ft2: 7, drag_coefficient: 0.7, air_density_lb_ft3: 0.0765 });
+  assert.ok(Math.abs(r.terminal_velocity_fps - 175.8) < 0.3 && Math.abs(r.terminal_velocity_mph - 119.9) < 0.3);
+  // Terminal velocity scales with sqrt(weight): 4x weight doubles it.
+  assert.ok(Math.abs(_v1308({ weight_lb: 720, frontal_area_ft2: 7, drag_coefficient: 0.7, air_density_lb_ft3: 0.0765 }).terminal_velocity_fps / r.terminal_velocity_fps - 2) < 1e-6);
+  // It scales with 1/sqrt(area) and 1/sqrt(Cd): 4x area halves it.
+  assert.ok(Math.abs(_v1308({ weight_lb: 180, frontal_area_ft2: 28, drag_coefficient: 0.7, air_density_lb_ft3: 0.0765 }).terminal_velocity_fps / r.terminal_velocity_fps - 0.5) < 1e-6);
+  // Thinner (high-altitude) air raises the terminal velocity.
+  assert.ok(_v1308({ weight_lb: 180, frontal_area_ft2: 7, drag_coefficient: 0.7, air_density_lb_ft3: 0.058 }).terminal_velocity_fps > r.terminal_velocity_fps);
+  // Error seams: non-positive weight/area/Cd/density, non-finite.
+  assert.ok("error" in _v1308({ weight_lb: 0, frontal_area_ft2: 7, drag_coefficient: 0.7, air_density_lb_ft3: 0.0765 }));
+  assert.ok("error" in _v1308({ weight_lb: 180, frontal_area_ft2: 0, drag_coefficient: 0.7, air_density_lb_ft3: 0.0765 }));
+  assert.ok("error" in _v1308({ weight_lb: 180, frontal_area_ft2: 7, drag_coefficient: 0, air_density_lb_ft3: 0.0765 }));
+  assert.ok("error" in _v1308({ weight_lb: 180, frontal_area_ft2: 7, drag_coefficient: 0.7, air_density_lb_ft3: 0 }));
+  assert.ok("error" in _v1308({ weight_lb: Infinity, frontal_area_ft2: 7, drag_coefficient: 0.7, air_density_lb_ft3: 0.0765 }));
+});

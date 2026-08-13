@@ -11878,6 +11878,18 @@ export const CITATIONS = {
       { name: "Scope", value: "impact deceleration force, horizontal launch, and bounce are separate", source: "scope of this tile" },
     ],
   },
+  "terminal-velocity": {
+    formula: "rho_mass = rho_weight/g; V_t = sqrt(2 W/(rho_mass Cd A)) (drag balances weight, W = 1/2 rho V^2 Cd A). g = 32.174 ft/s^2.",
+    edition: "The terminal-velocity balance W = 1/2 rho V^2 Cd A solved for V (standard fluid mechanics), by name; the drag-limited counterpart to free-fall-drop.",
+    freeAccess: "The terminal-velocity relation is a standard published fluid-mechanics result; the weight, frontal area, drag coefficient, and air density are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Terminal velocity, the steady speed where the aerodynamic drag 1/2 rho V^2 Cd A exactly balances the weight W and the object stops accelerating: V_t = sqrt(2 W/(rho_mass Cd A)), with the mass air density rho_mass = (weight density)/g (g = 32.174 ft/s^2), the frontal area A, and the drag coefficient Cd. Heavy, compact, slick objects (small A, small Cd, big W) fall fast; light, bluff ones settle slowly. A 180 lb skydiver at 7 ft^2 and Cd 0.7 terminals at the familiar 120 mph. This is the CEILING that free-fall-drop (no drag) ignores - a compact tool over a short jobsite drop is still accelerating (free-fall is right), but a sheet of plywood or a person tops out and falls no faster no matter the height. The distance and time to REACH terminal (an exponential approach), tumbling that changes Cd and A, compressibility, and altitude density change are separate. Pair with free-fall-drop and aerodynamic-drag-force. A planning estimate; field conditions govern.",
+    assumptions: [
+      { name: "Balance", value: "V_t = sqrt(2 W/(rho_mass Cd A)), drag equals weight at terminal", source: "fluid mechanics" },
+      { name: "Constant Cd", value: "steady terminal for a constant drag coefficient in still air", source: "scope of this tile" },
+      { name: "Scope", value: "distance/time to reach terminal, tumbling, and altitude density change are separate", source: "scope of this tile" },
+    ],
+  },
   "gear-identification": {
     formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
     edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",

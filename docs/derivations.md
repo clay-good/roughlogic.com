@@ -2666,6 +2666,7 @@ cross-check.
 | calc-mechanic.js | `computeSliderCrankPistonPosition` | `{ stroke_in = 0, rod_length_in = 0, crank_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeSpringNaturalFrequency` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, material...` | _ | _ | _ |
 | calc-mechanic.js | `computeSpringWireStress` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, force_lb = 0, total_coils ...` | _ | _ | _ |
+| calc-mechanic.js | `computeTerminalVelocity` | `{ weight_lb = 0, frontal_area_ft2 = 0, drag_coefficient = 0, air_density_lb_f...` | _ | _ | _ |
 | calc-mechanic.js | `computeTireContactPatch` | `{ corner_load_lb = 0, inflation_pressure_psi = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeTireGearing` | `{ original_size = "", new_size = "", axle_ratio = 0, top_gear_ratio = 1, targ...` | _ | _ | _ |
 | calc-mechanic.js | `computeTorqueAdapterCorrection` | `{ target_torque_ftlb = 0, wrench_length_in = 0, adapter_length_in = 0, adapte...` | _ | _ | _ |
@@ -3345,7 +3346,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1931.
+Row count: 1932.
 
 <!-- END function-corpus-v14 -->
 
@@ -4640,7 +4641,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (130 tiles)
+### Group K Mechanic (131 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4754,6 +4755,7 @@ per spec-v14 §13.1 second paragraph.
 | `taper-calc` | Taper per Foot and Angle | First-principles taper trigonometry +...; D 1.0, d 0.75, L 3.0 -> TPF 1.0 in/ft, angle/side 2.38594... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `taper-diameter` | Taper Missing Diameter (Lathe Setup) | First-principles taper trigonometry (...; spec-v650 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `taylor-tool-life` | Taylor Tool-Life vs Cutting Speed | Taylor tool-life equation (F.W. Taylor); T = (300/200)^(1/0.2) = 1.5^5 = 7.594 min; V = 300/15^0.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `terminal-velocity` | Terminal Velocity (Aerodynamic Drag) | Project (first-principles); V_t=sqrt(2W/(rho Cd A)) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thick-wall-cylinder-stress` | Thick-Wall Cylinder Stress (Lame) | Project (first-principles); Lame thick-wall | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thread-single-depth` | Single-Point Thread Cutting Depth | Single-point thread cutting depth (60...; pitch = 1/13 = 0.0769; depth = 0.6134 x 0.0769 = 0.0472; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tire-contact-patch` | Tire Contact Patch from Load and Pressure | first-order pneumatic-tire relation A...; spec-v808 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5198,6 +5200,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1680. Fixture-covered or reference-cadence: 1680 / 1680.
+Tile count: 1681. Fixture-covered or reference-cadence: 1681 / 1681.
 
 <!-- END tile-index-v14 -->

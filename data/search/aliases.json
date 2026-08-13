@@ -3359,6 +3359,46 @@
    "kind": "question"
   },
   {
+   "term": "terminal velocity",
+   "target": "terminal-velocity",
+   "kind": "industry"
+  },
+  {
+   "term": "terminal velocity drag",
+   "target": "terminal-velocity",
+   "kind": "industry"
+  },
+  {
+   "term": "falling object terminal speed",
+   "target": "terminal-velocity",
+   "kind": "industry"
+  },
+  {
+   "term": "skydiver terminal velocity",
+   "target": "terminal-velocity",
+   "kind": "adjacent"
+  },
+  {
+   "term": "max fall speed",
+   "target": "terminal-velocity",
+   "kind": "adjacent"
+  },
+  {
+   "term": "drag limited fall speed",
+   "target": "terminal-velocity",
+   "kind": "adjacent"
+  },
+  {
+   "term": "how fast can an object fall",
+   "target": "terminal-velocity",
+   "kind": "question"
+  },
+  {
+   "term": "what is terminal velocity of a tool",
+   "target": "terminal-velocity",
+   "kind": "question"
+  },
+  {
    "term": "hp torque rpm",
    "target": "hp-from-torque",
    "kind": "redirect"

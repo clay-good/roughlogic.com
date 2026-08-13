@@ -88017,6 +88017,58 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "terminal-velocity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Skydiver terminal velocity (~120 mph)",
+   "source_edition_or_year": "fluid mechanics",
+   "source_section_or_page": "V_t=sqrt(2W/(rho Cd A))",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "weight_lb": 180,
+    "frontal_area_ft2": 7,
+    "drag_coefficient": 0.7,
+    "air_density_lb_ft3": 0.0765
+   },
+   "outputs": {
+    "terminal_velocity_fps": {
+     "value": 175.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "terminal_velocity_mph": {
+     "value": 119.9,
+     "tolerance": {
+      "pct": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "terminal-velocity",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Compact tool terminals faster",
+   "source_edition_or_year": "fluid mechanics",
+   "source_section_or_page": "V_t=sqrt(2W/(rho Cd A))",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "weight_lb": 5,
+    "frontal_area_ft2": 0.1,
+    "drag_coefficient": 1.0,
+    "air_density_lb_ft3": 0.0765
+   },
+   "outputs": {
+    "terminal_velocity_fps": {
+     "value": 205.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

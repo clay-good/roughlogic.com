@@ -386,7 +386,7 @@ const _TILES = [
   ["helical-spring-rate", "K"], ["spring-natural-frequency", "K"],
   // spec-v1010 spring wire stress (Wahl), solid height, buckling screen
   ["spring-wire-stress", "K"],
-  ["gear-tooth-bending-stress", "K"], ["gear-dynamic-tooth-stress", "K"], ["gear-contact-stress", "K"], ["aerodynamic-drag-force", "K"], ["vehicle-road-load-power", "K"], ["planetary-gear-ratio", "K"], ["band-brake-torque", "K"], ["centrifugal-force", "K"], ["torsion-spring-rate", "K"], ["universal-joint-speed", "K"], ["slider-crank-piston-position", "K"], ["impact-load-factor", "K"], ["hydraulic-accumulator-volume", "K"], ["projectile-range", "K"], ["free-fall-drop", "K"],
+  ["gear-tooth-bending-stress", "K"], ["gear-dynamic-tooth-stress", "K"], ["gear-contact-stress", "K"], ["aerodynamic-drag-force", "K"], ["vehicle-road-load-power", "K"], ["planetary-gear-ratio", "K"], ["band-brake-torque", "K"], ["centrifugal-force", "K"], ["torsion-spring-rate", "K"], ["universal-joint-speed", "K"], ["slider-crank-piston-position", "K"], ["impact-load-factor", "K"], ["hydraulic-accumulator-volume", "K"], ["projectile-range", "K"], ["free-fall-drop", "K"], ["terminal-velocity", "K"],
   ["pesticide-rei-phi", "L"],
   ["backflow-test-psi", "M"],
   ["gel-percent-agarose", "T"],
