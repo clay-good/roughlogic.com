@@ -38164,6 +38164,46 @@
    "kind": "question"
   },
   {
+   "term": "ellipsoid volume",
+   "target": "ellipsoid-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "oval tank volume",
+   "target": "ellipsoid-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "oblong tank volume",
+   "target": "ellipsoid-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "egg shape volume",
+   "target": "ellipsoid-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "spheroid volume",
+   "target": "ellipsoid-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "dished head volume ellipsoid",
+   "target": "ellipsoid-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "volume of an oval tank",
+   "target": "ellipsoid-volume",
+   "kind": "question"
+  },
+  {
+   "term": "volume of an ellipsoid",
+   "target": "ellipsoid-volume",
+   "kind": "question"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"

@@ -1587,6 +1587,50 @@ function _v1318renderTorusVolume(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["torus-volume"] = _v1318renderTorusVolume;
 
+// spec-v1319: ellipsoid volume. Catalog has a sphere but no general ellipsoid - an oval/oblong tank, a stretched
+// dome, an ellipsoidal float. V = (4/3) pi a b c = pi L W H/6 (a,b,c the semi-axes). Half-ellipsoid = a dished
+// head/dome. Equal axes collapse to a sphere.
+// dims: in { length_ft: L, width_ft: L, height_ft: L } out: { volume_ft3: L^3, volume_gal: L^3, half_volume_ft3: L^3 }
+export function computeEllipsoidVolume({ length_ft = 0, width_ft = 0, height_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(length_ft) || 0;
+  const W = Number(width_ft) || 0;
+  const H = Number(height_ft) || 0;
+  if (!(L > 0)) return { error: "Length must be positive (ft)." };
+  if (!(W > 0)) return { error: "Width must be positive (ft)." };
+  if (!(H > 0)) return { error: "Height must be positive (ft)." };
+  const volume_ft3 = (Math.PI * L * W * H) / 6;
+  const volume_gal = volume_ft3 * 7.480519;
+  const half_volume_ft3 = volume_ft3 / 2;
+  if (![volume_ft3, half_volume_ft3].every(Number.isFinite) || !(volume_ft3 > 0)) return { error: "Ellipsoid math is not a finite value; check the inputs." };
+  const is_sphere = Math.abs(L - W) < 1e-9 && Math.abs(W - H) < 1e-9;
+  return {
+    volume_ft3, volume_gal, half_volume_ft3, is_sphere,
+    note: "Volume of an ellipsoid - the oblong, egg-like solid of an oval or elliptical tank, a stretched dome, or an ellipsoidal float - V = (4/3) pi a b c = pi L W H/6, with the three semi-axes a = L/2, b = W/2, c = H/2 from the full axis lengths L (long), W (wide), and H (tall). When the three axes are equal it becomes a sphere, (4/3) pi r^3. The half-ellipsoid, V/2, is the shape of a 2:1 dished tank head or an oval dome, so the tile reports it too. Volume is reported in cubic feet and US gallons for a takeoff or a fill. A partial fill to a depth, the surface area (no elementary closed form), and an offset or truncated ellipsoid are separate. A takeoff aid; verify against the drawing.",
+  };
+}
+export const ellipsoidVolumeExample = { inputs: { length_ft: 10, width_ft: 6, height_ft: 4 } };
+function _v1319renderEllipsoidVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ellipsoid volume V = (4/3) pi a b c = pi L W H/6 (standard solid geometry; Machinery's Handbook), a,b,c the semi-axes. Equal axes give a sphere; half is a dished head/dome. A takeoff aid; verify against the drawing.";
+  const L = makeNumber("Length L (ft)", "elv-l", { step: "any", min: "0" }); L.input.value = "10";
+  const W = makeNumber("Width W (ft)", "elv-w", { step: "any", min: "0" }); W.input.value = "6";
+  const H = makeNumber("Height H (ft)", "elv-h", { step: "any", min: "0" }); H.input.value = "4";
+  for (const f of [L, W, H]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { L.input.value = "10"; W.input.value = "6"; H.input.value = "4"; update(); });
+  const oV = makeOutputLine(outputRegion, "Ellipsoid volume", "elv-out-v");
+  const oH = makeOutputLine(outputRegion, "Half-ellipsoid (dome / head)", "elv-out-h");
+  const oNote = makeOutputLine(outputRegion, "Note", "elv-out-n");
+  const update = debounce(() => {
+    const res = computeEllipsoidVolume({ length_ft: Number(L.input.value) || 0, width_ft: Number(W.input.value) || 0, height_ft: Number(H.input.value) || 0 });
+    if (res.error) { oV.textContent = res.error; oH.textContent = "-"; oNote.textContent = ""; return; }
+    oV.textContent = fmt(res.volume_ft3, 3) + " ft^3 (" + fmt(res.volume_gal, 1) + " gal)" + (res.is_sphere ? " - a sphere" : "");
+    oH.textContent = fmt(res.half_volume_ft3, 3) + " ft^3";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [L, W, H]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["ellipsoid-volume"] = _v1319renderEllipsoidVolume;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {

@@ -11755,6 +11755,18 @@ export const CITATIONS = {
       { name: "Scope", value: "circular tube, full torus; partial fill, non-circular tube, wall thickness are separate", source: "scope of this tile" },
     ],
   },
+  "ellipsoid-volume": {
+    formula: "a=L/2, b=W/2, c=H/2; V = (4/3) pi a b c = pi L W H/6; half-ellipsoid = V/2. Equal axes -> sphere (4/3) pi r^3.",
+    edition: "The ellipsoid volume V = (4/3) pi a b c - standard solid geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure solid geometry, public; the three axis lengths are user-supplied measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "Volume of an ellipsoid - the oblong, egg-like solid of an oval or elliptical tank, a stretched dome, or an ellipsoidal float - V = (4/3) pi a b c = pi L W H/6, with the three semi-axes a = L/2, b = W/2, c = H/2 from the full axis lengths L (long), W (wide), and H (tall). When the three axes are equal it becomes a sphere, (4/3) pi r^3. The half-ellipsoid, V/2, is the shape of a 2:1 dished tank head or an oval dome, so the tile reports it too. Volume is reported in cubic feet and US gallons for a takeoff or a fill. A partial fill to a depth, the surface area (no elementary closed form), and an offset or truncated ellipsoid are separate. A takeoff aid; verify against the drawing.",
+    assumptions: [
+      { name: "Ellipsoid volume", value: "V = (4/3) pi a b c = pi L W H/6, a/b/c the semi-axes", source: "solid geometry" },
+      { name: "Limits", value: "equal axes give a sphere; half-ellipsoid is a dished head/dome", source: "solid geometry" },
+      { name: "Scope", value: "full/half volume; partial fill, surface area, and truncated shapes are separate", source: "scope of this tile" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",

@@ -38366,3 +38366,23 @@ test("bounds: spec-v1318 computeTorusVolume pins the Pappus volume/surface, the 
   assert.ok("error" in _v1318({ center_diameter_in: 12, tube_diameter_in: 14 }));
   assert.ok("error" in _v1318({ center_diameter_in: Infinity, tube_diameter_in: 2 }));
 });
+
+import { computeEllipsoidVolume as _v1319 } from "../../calc-shop.js";
+test("bounds: spec-v1319 computeEllipsoidVolume pins pi L W H/6, the half-ellipsoid, the sphere collapse, and error seams", () => {
+  // 10 x 6 x 4: V 125.66 ft^3, 940 gal, half 62.83.
+  const r = _v1319({ length_ft: 10, width_ft: 6, height_ft: 4 });
+  assert.ok(Math.abs(r.volume_ft3 - 125.664) < 1e-2 && Math.abs(r.volume_gal - 940) < 1 && Math.abs(r.half_volume_ft3 - 62.832) < 1e-2);
+  assert.ok(Math.abs(r.volume_ft3 - (Math.PI * 10 * 6 * 4) / 6) < 1e-9 && r.is_sphere === false);
+  // Equal axes give a sphere (4/3) pi r^3.
+  const sph = _v1319({ length_ft: 8, width_ft: 8, height_ft: 8 });
+  assert.ok(sph.is_sphere === true && Math.abs(sph.volume_ft3 - (4 / 3) * Math.PI * 64) < 1e-6);
+  // Volume scales with the product of the three axes.
+  assert.ok(Math.abs(_v1319({ length_ft: 20, width_ft: 6, height_ft: 4 }).volume_ft3 / r.volume_ft3 - 2) < 1e-9);
+  // The half-ellipsoid is exactly half.
+  assert.ok(Math.abs(r.half_volume_ft3 - r.volume_ft3 / 2) < 1e-9);
+  // Error seams: non-positive length/width/height, non-finite.
+  assert.ok("error" in _v1319({ length_ft: 0, width_ft: 6, height_ft: 4 }));
+  assert.ok("error" in _v1319({ length_ft: 10, width_ft: 0, height_ft: 4 }));
+  assert.ok("error" in _v1319({ length_ft: 10, width_ft: 6, height_ft: 0 }));
+  assert.ok("error" in _v1319({ length_ft: Infinity, width_ft: 6, height_ft: 4 }));
+});

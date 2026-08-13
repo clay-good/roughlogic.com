@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1691,
-  "covered_count": 1233,
+  "total_tiles": 1692,
+  "covered_count": 1234,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -371,6 +371,7 @@
     "elastic-settlement-allowable-pressure",
     "elevation-pressure-loss",
     "ellipse-area-perimeter",
+    "ellipsoid-volume",
     "endurance-limit-marin",
     "engine-bmep",
     "engine-fuel-burn-gph",

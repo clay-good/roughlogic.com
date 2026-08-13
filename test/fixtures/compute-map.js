@@ -810,6 +810,7 @@ export const COMPUTE_MAP = {
   "parabolic-segment": { module: "../../calc-shop.js", fn: "computeParabolicSegment" },
   "pyramid-frustum-volume": { module: "../../calc-shop.js", fn: "computePyramidFrustumVolume" },
   "torus-volume": { module: "../../calc-shop.js", fn: "computeTorusVolume" },
+  "ellipsoid-volume": { module: "../../calc-shop.js", fn: "computeEllipsoidVolume" },
   "spur-gear-geometry": { module: "../../calc-machining.js", fn: "computeSpurGearGeometry" },
   "worm-gear-geometry": { module: "../../calc-machining.js", fn: "computeWormGearGeometry" },
   "gear-undercut-backlash": { module: "../../calc-machining.js", fn: "computeGearUndercutBacklash" },

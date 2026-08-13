@@ -3068,6 +3068,7 @@ cross-check.
 | calc-shop.js | `computeDividingHead` | `{ divisions = 0, worm_ratio = 40, circles = "" } = {}` | _ | _ | _ |
 | calc-shop.js | `computeDovetailOverPins` | `{ dovetail_type = "male", known = "flat", dimension_in = 0, pin_dia_in = 0, a...` | _ | _ | _ |
 | calc-shop.js | `computeEllipseAreaPerimeter` | `{ major_axis = 0, minor_axis = 0 } = {}` | _ | _ | _ |
+| calc-shop.js | `computeEllipsoidVolume` | `{ length_ft = 0, width_ft = 0, height_ft = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeFeedForSurfaceFinish` | `{ target_finish_uin = 0, finish_basis = "ra", nose_radius_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeFrustumVolume` | `{ large_diameter_ft = 0, small_diameter_ft = 0, height_ft = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeMachiningTime` | `{ feed_mode = "rpm-ipr", cut_length_in = 0, rpm = 0, feed_ipr_in = 0, feed_ip...` | _ | _ | _ |
@@ -3356,7 +3357,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1942.
+Row count: 1943.
 
 <!-- END function-corpus-v14 -->
 
@@ -4520,7 +4521,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (81 tiles)
+### Group G Cross-trade (82 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4536,6 +4537,7 @@ per spec-v14 §13.1 second paragraph.
 | `decimal-to-fraction` | Decimal to Fraction | First-principles tape-measure arithmetic; 2.375 in to nearest 1/16 -> 2-3/8 in (whole 2, 3/8), error 0 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dilution` | Dilution / Mixing Ratio | Project (first-principles); C1*V1 = C2*V2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ellipse-area-perimeter` | Ellipse Area and Perimeter | Project (first-principles); area pi a b; Ramanujan perimeter | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `ellipsoid-volume` | Ellipsoid Volume (Oblong / Oval Solid) | Project (first-principles); V=(4/3)pi abc | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `equal-spacing` | Equal Spacing Layout | First-principles equal-spacing layout...; 60 in run, 1.5 in balusters, 4 in max gap -> 11 balusters... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `extension-ladder-overlap` | Extension Ladder Overlap and True Working Height | OCWR extension-ladder fast facts (OSH...; 24 ft, 2 sections -> 3 ft overlap, 21.0 ft working length... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fall-protection-clearance` | Fall Protection Clearance | 29 CFR 1926.502 (fall-protection syst...; 6 ft shock-absorbing lanyard / 5 ft worker height / 1 ft ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5220,6 +5222,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1691. Fixture-covered or reference-cadence: 1691 / 1691.
+Tile count: 1692. Fixture-covered or reference-cadence: 1692 / 1692.
 
 <!-- END tile-index-v14 -->
