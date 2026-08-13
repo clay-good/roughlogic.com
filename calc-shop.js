@@ -1491,6 +1491,59 @@ function _v1316renderParabolicSegment(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["parabolic-segment"] = _v1316renderParabolicSegment;
 
+// spec-v1317: truncated pyramid (rectangular frustum) volume. frustum-volume is the round cone; this is the
+// rectangular case - a tapered concrete pier/footing pedestal or a rectangular hopper. Prismatoid formula
+// V = (h/3)(A1 + A2 + sqrt(A1 A2)). Top 0x0 = full pyramid; equal top/bottom = a prism.
+// dims: in { bottom_length_ft: L, bottom_width_ft: L, top_length_ft: L, top_width_ft: L, height_ft: L } out: { volume_ft3: L^3, volume_yd3: L^3, volume_gal: L^3 }
+export function computePyramidFrustumVolume({ bottom_length_ft = 0, bottom_width_ft = 0, top_length_ft = 0, top_width_ft = 0, height_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Lb = Number(bottom_length_ft) || 0;
+  const Wb = Number(bottom_width_ft) || 0;
+  const Lt = Number(top_length_ft) || 0;
+  const Wt = Number(top_width_ft) || 0;
+  const h = Number(height_ft) || 0;
+  if (!(Lb > 0)) return { error: "Bottom length must be positive (ft)." };
+  if (!(Wb > 0)) return { error: "Bottom width must be positive (ft)." };
+  if (Lt < 0) return { error: "Top length cannot be negative (ft)." };
+  if (Wt < 0) return { error: "Top width cannot be negative (ft)." };
+  if (!(Lt <= Lb)) return { error: "Top length cannot exceed the bottom length (ft)." };
+  if (!(Wt <= Wb)) return { error: "Top width cannot exceed the bottom width (ft)." };
+  if (!(h > 0)) return { error: "Height must be positive (ft)." };
+  const A1 = Lb * Wb;
+  const A2 = Lt * Wt;
+  const volume_ft3 = (h / 3) * (A1 + A2 + Math.sqrt(A1 * A2));
+  const volume_yd3 = volume_ft3 / 27;
+  const volume_gal = volume_ft3 * 7.480519;
+  if (![volume_ft3, volume_yd3].every(Number.isFinite) || !(volume_ft3 > 0)) return { error: "Truncated-pyramid math is not a finite value; check the inputs." };
+  return {
+    volume_ft3, volume_yd3, volume_gal, bottom_area_ft2: A1, top_area_ft2: A2,
+    note: "Volume of a right truncated rectangular pyramid (a rectangular frustum) - the shape of a tapered concrete pier or spread-footing pedestal, a rectangular hopper or bin, or a round-to-rectangular transition's rectangular part - by the prismatoid formula V = (h/3)(A1 + A2 + sqrt(A1 A2)), with A1 the bottom area (Lb x Wb) and A2 the top area (Lt x Wt). The sqrt(A1 A2) middle term is what makes it exact: averaging the two areas or footprints understates the volume. A top of 0 x 0 gives a full pyramid (V = A1 h/3); equal top and bottom give a rectangular prism (A1 h). Reported in cubic feet, cubic yards, and gallons for a concrete pour or a material takeoff. The round (conical) frustum is the frustum-volume tile; an offset (oblique) pyramid, wall thickness, and surface area are separate. A takeoff aid; verify against the drawing.",
+  };
+}
+export const pyramidFrustumVolumeExample = { inputs: { bottom_length_ft: 6, bottom_width_ft: 6, top_length_ft: 2, top_width_ft: 2, height_ft: 4 } };
+function _v1317renderPyramidFrustumVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: truncated-pyramid (rectangular frustum) volume V = (h/3)(A1 + A2 + sqrt(A1 A2)) - the prismatoid formula (standard solid geometry; Machinery's Handbook). Top 0x0 gives a full pyramid. A takeoff aid; verify against the drawing.";
+  const Lb = makeNumber("Bottom length (ft)", "pfv-lb", { step: "any", min: "0" }); Lb.input.value = "6";
+  const Wb = makeNumber("Bottom width (ft)", "pfv-wb", { step: "any", min: "0" }); Wb.input.value = "6";
+  const Lt = makeNumber("Top length (ft)", "pfv-lt", { step: "any", min: "0" }); Lt.input.value = "2";
+  const Wt = makeNumber("Top width (ft)", "pfv-wt", { step: "any", min: "0" }); Wt.input.value = "2";
+  const h = makeNumber("Height (ft)", "pfv-h", { step: "any", min: "0" }); h.input.value = "4";
+  for (const f of [Lb, Wb, Lt, Wt, h]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { Lb.input.value = "6"; Wb.input.value = "6"; Lt.input.value = "2"; Wt.input.value = "2"; h.input.value = "4"; update(); });
+  const oV = makeOutputLine(outputRegion, "Volume", "pfv-out-v");
+  const oA = makeOutputLine(outputRegion, "Bottom / top area", "pfv-out-a");
+  const oNote = makeOutputLine(outputRegion, "Note", "pfv-out-n");
+  const update = debounce(() => {
+    const res = computePyramidFrustumVolume({ bottom_length_ft: Number(Lb.input.value) || 0, bottom_width_ft: Number(Wb.input.value) || 0, top_length_ft: Number(Lt.input.value) || 0, top_width_ft: Number(Wt.input.value) || 0, height_ft: Number(h.input.value) || 0 });
+    if (res.error) { oV.textContent = res.error; oA.textContent = "-"; oNote.textContent = ""; return; }
+    oV.textContent = fmt(res.volume_ft3, 3) + " ft^3 (" + fmt(res.volume_yd3, 3) + " yd^3, " + fmt(res.volume_gal, 1) + " gal)";
+    oA.textContent = fmt(res.bottom_area_ft2, 2) + " ft^2 bottom / " + fmt(res.top_area_ft2, 2) + " ft^2 top";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [Lb, Wb, Lt, Wt, h]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["pyramid-frustum-volume"] = _v1317renderPyramidFrustumVolume;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {

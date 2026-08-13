@@ -11731,6 +11731,18 @@ export const CITATIONS = {
       { name: "Scope", value: "parabolic segment; circular segment and true catenary are separate", source: "scope of this tile" },
     ],
   },
+  "pyramid-frustum-volume": {
+    formula: "A1 = Lb x Wb; A2 = Lt x Wt; V = (h/3)(A1 + A2 + sqrt(A1 A2)). Top 0x0 -> full pyramid (A1 h/3); equal top/bottom -> prism (A1 h).",
+    edition: "The truncated-pyramid volume V = (h/3)(A1 + A2 + sqrt(A1 A2)) - the prismatoid formula, standard solid geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure solid geometry, public; the bottom and top dimensions and the height are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Volume of a right truncated rectangular pyramid (a rectangular frustum) - the shape of a tapered concrete pier or spread-footing pedestal, a rectangular hopper or bin, or a round-to-rectangular transition's rectangular part - by the prismatoid formula V = (h/3)(A1 + A2 + sqrt(A1 A2)), with A1 the bottom area (Lb x Wb) and A2 the top area (Lt x Wt). The sqrt(A1 A2) middle term is what makes it exact: averaging the two areas or footprints understates the volume. A top of 0 x 0 gives a full pyramid (V = A1 h/3); equal top and bottom give a rectangular prism (A1 h). Reported in cubic feet, cubic yards, and gallons for a concrete pour or a material takeoff. The round (conical) frustum is the frustum-volume tile; an offset (oblique) pyramid, wall thickness, and surface area are separate. A takeoff aid; verify against the drawing.",
+    assumptions: [
+      { name: "Prismatoid formula", value: "V = (h/3)(A1 + A2 + sqrt(A1 A2)); the sqrt term makes it exact", source: "solid geometry" },
+      { name: "Limits", value: "top 0x0 gives a full pyramid, equal top/bottom a prism", source: "solid geometry" },
+      { name: "Scope", value: "right rectangular frustum; round frustum is separate, as are oblique pyramids", source: "scope of this tile" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",

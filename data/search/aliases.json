@@ -38079,6 +38079,46 @@
    "kind": "question"
   },
   {
+   "term": "truncated pyramid volume",
+   "target": "pyramid-frustum-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "rectangular frustum volume",
+   "target": "pyramid-frustum-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "tapered footing volume",
+   "target": "pyramid-frustum-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "pier cap concrete volume",
+   "target": "pyramid-frustum-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "rectangular hopper volume",
+   "target": "pyramid-frustum-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "pyramid frustum",
+   "target": "pyramid-frustum-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "concrete for a tapered pier",
+   "target": "pyramid-frustum-volume",
+   "kind": "question"
+  },
+  {
+   "term": "volume of a rectangular hopper",
+   "target": "pyramid-frustum-volume",
+   "kind": "question"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"

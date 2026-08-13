@@ -88533,6 +88533,60 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "pyramid-frustum-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Tapered concrete pier",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "V=(h/3)(A1+A2+sqrt(A1 A2))",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "bottom_length_ft": 6,
+    "bottom_width_ft": 6,
+    "top_length_ft": 2,
+    "top_width_ft": 2,
+    "height_ft": 4
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 69.333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "volume_yd3": {
+     "value": 2.568,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pyramid-frustum-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Full pyramid (top 0x0)",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "V=(h/3)(A1+A2+sqrt(A1 A2))",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "bottom_length_ft": 6,
+    "bottom_width_ft": 6,
+    "top_length_ft": 0,
+    "top_width_ft": 0,
+    "height_ft": 4
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 48.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

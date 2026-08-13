@@ -808,6 +808,7 @@ export const COMPUTE_MAP = {
   "ellipse-area-perimeter": { module: "../../calc-shop.js", fn: "computeEllipseAreaPerimeter" },
   "spherical-cap-volume": { module: "../../calc-shop.js", fn: "computeSphericalCapVolume" },
   "parabolic-segment": { module: "../../calc-shop.js", fn: "computeParabolicSegment" },
+  "pyramid-frustum-volume": { module: "../../calc-shop.js", fn: "computePyramidFrustumVolume" },
   "spur-gear-geometry": { module: "../../calc-machining.js", fn: "computeSpurGearGeometry" },
   "worm-gear-geometry": { module: "../../calc-machining.js", fn: "computeWormGearGeometry" },
   "gear-undercut-backlash": { module: "../../calc-machining.js", fn: "computeGearUndercutBacklash" },
