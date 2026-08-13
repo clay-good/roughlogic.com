@@ -88925,6 +88925,64 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "oval-tank-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "275-gallon oval oil tank, half full (27 x 44 x 60 in, 22 in)",
+   "source_edition_or_year": "plane/solid geometry",
+   "source_section_or_page": "stadium cross-section, piecewise segment fill",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "width_in": 27,
+    "height_in": 44,
+    "length_in": 60,
+    "depth_in": 22
+   },
+   "outputs": {
+    "volume_gal": {
+     "value": 133.97,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "percent_full": {
+     "value": 50.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "oval-tank-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Same tank full (44 in)",
+   "source_edition_or_year": "plane/solid geometry",
+   "source_section_or_page": "full area (pi r^2 + W s) x length",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "width_in": 27,
+    "height_in": 44,
+    "length_in": 60,
+    "depth_in": 44
+   },
+   "outputs": {
+    "full_gal": {
+     "value": 267.94,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "percent_full": {
+     "value": 100.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

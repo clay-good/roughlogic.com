@@ -1834,6 +1834,72 @@ function _v1323renderSphericalZoneVolume(inputRegion, outputRegion, citationEl) 
 }
 SHOP_RENDERERS["spherical-zone-volume"] = _v1323renderSphericalZoneVolume;
 
+// spec-v1324: oval (obround / stadium) tank partial volume from a dipstick depth - the iconic 275-gallon residential
+// heating-oil tank, whose cross-section is a rectangle capped top and bottom by semicircles (r = W/2, straight run
+// s = H - W). tank-volume does the round tank; nothing did the oval. Fill area is piecewise: a bottom circular
+// segment up to r, then the semicircle plus a rectangle, then the full area minus the empty top segment. x length.
+// dims: in { width_in: L, height_in: L, length_in: L, depth_in: L } out: { volume_gal: L^3, volume_in3: L^3, volume_ft3: L^3, full_gal: L^3, percent_full: dimensionless }
+export function computeOvalTankVolume({ width_in = 0, height_in = 0, length_in = 0, depth_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const W = Number(width_in) || 0;
+  const H = Number(height_in) || 0;
+  const L = Number(length_in) || 0;
+  let h = Number(depth_in) || 0;
+  if (!(W > 0)) return { error: "Tank width (across the flats) must be positive (in)." };
+  if (!(H > 0)) return { error: "Tank height must be positive (in)." };
+  if (!(L > 0)) return { error: "Tank length must be positive (in)." };
+  if (h < 0) return { error: "Liquid depth cannot be negative (in)." };
+  if (H < W) return { error: "Height must be at least the width (the rounded ends are the top and bottom); for a wider-than-tall tank rotate the dimensions, and for a round tank use the tank-volume tile." };
+  const r = W / 2;      // semicircle radius (rounded top and bottom)
+  const s = H - W;      // straight middle run (H = 2r + s = W + s)
+  let clamped = false;
+  if (h > H) { h = H; clamped = true; }
+  const seg = (t) => r * r * Math.acos((r - t) / r) - (r - t) * Math.sqrt(Math.max(0, 2 * r * t - t * t));
+  const full_area = Math.PI * r * r + W * s;
+  let area;
+  if (h <= 0) area = 0;
+  else if (h <= r) area = seg(h);                          // bottom rounded end: circular segment
+  else if (h <= r + s) area = Math.PI * r * r / 2 + W * (h - r); // half-round + rectangle
+  else area = full_area - seg(H - h);                       // full minus the empty top segment
+  const volume_in3 = area * L;
+  const full_in3 = full_area * L;
+  const IN3_PER_GAL = 231, IN3_PER_FT3 = 1728;
+  const percent_full = full_in3 > 0 ? (volume_in3 / full_in3) * 100 : 0;
+  if (![volume_in3, full_in3, percent_full].every(Number.isFinite) || !(full_in3 > 0)) return { error: "Oval-tank math is not a finite value; check the inputs." };
+  const notes = [];
+  notes.push("Partial volume of a horizontal OVAL (obround) tank from a dipstick depth - the residential heating-oil tank whose ends are rounded top and bottom, the shape the round tank-volume tile does not cover. The cross-section is a rectangle of width W and straight height s = H - W capped by two semicircles of radius r = W/2, so the full area is pi r^2 + W s. Filling from the bottom the wetted area is a circular segment through the bottom rounded end (up to r), then the half-round plus a growing rectangle, then the full area minus the empty top segment; times the tank length gives the volume. A 27 in wide, 44 in tall, 60 in long tank holds 268 gallons full (the nominal '275'), and by symmetry the half-height mark is exactly half. Reported in gallons, cubic feet, and cubic inches with the percent full.");
+  notes.push("Enter the inside width across the flats, the inside height (rounded top to bottom), the inside length, and the dipstick depth, all in inches. A vertical oval (rounded top and bottom); a round tank is the tank-volume tile. Flat heads assumed; the tank's own chart governs. US gallons (231 in^3).");
+  if (clamped) notes.push("Depth exceeded the tank height; reporting the full tank.");
+  return {
+    volume_gal: volume_in3 / IN3_PER_GAL, volume_in3, volume_ft3: volume_in3 / IN3_PER_FT3,
+    full_gal: full_in3 / IN3_PER_GAL, percent_full, notes,
+  };
+}
+export const ovalTankVolumeExample = { inputs: { width_in: 27, height_in: 44, length_in: 60, depth_in: 22 } };
+function _v1324renderOvalTankVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: horizontal oval (obround / stadium) tank partial volume - cross-section a rectangle capped by two semicircles (r = W/2, straight run s = H - W); the wetted area is a circular segment through the bottom end, then the half-round plus a rectangle, then the full area minus the empty top segment, times the length. First-principles plane/solid geometry (the circular-segment relation as in Machinery's Handbook), by name; public domain. A close estimate with flat ends; the tank's own chart governs.";
+  const W = makeNumber("Width across the flats W (in)", "ovt-w", { step: "any", min: "0" }); W.input.value = "27";
+  const H = makeNumber("Height, rounded top to bottom H (in)", "ovt-h", { step: "any", min: "0" }); H.input.value = "44";
+  const L = makeNumber("Tank length L (in)", "ovt-l", { step: "any", min: "0" }); L.input.value = "60";
+  const d = makeNumber("Liquid depth (dipstick, in)", "ovt-d", { step: "any", min: "0" }); d.input.value = "22";
+  for (const f of [W, H, L, d]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { W.input.value = "27"; H.input.value = "44"; L.input.value = "60"; d.input.value = "22"; update(); });
+  const oV = makeOutputLine(outputRegion, "Liquid volume", "ovt-out-v");
+  const oP = makeOutputLine(outputRegion, "Percent full", "ovt-out-p");
+  const oF = makeOutputLine(outputRegion, "Full tank", "ovt-out-f");
+  const oNote = makeOutputLine(outputRegion, "Notes", "ovt-out-n");
+  const update = debounce(() => {
+    const res = computeOvalTankVolume({ width_in: Number(W.input.value) || 0, height_in: Number(H.input.value) || 0, length_in: Number(L.input.value) || 0, depth_in: Number(d.input.value) || 0 });
+    if (res.error) { oV.textContent = res.error; oP.textContent = "-"; oF.textContent = "-"; oNote.textContent = ""; return; }
+    oV.textContent = fmt(res.volume_gal, 1) + " gal (" + fmt(res.volume_ft3, 2) + " ft^3)";
+    oP.textContent = fmt(res.percent_full, 1) + "%";
+    oF.textContent = fmt(res.full_gal, 1) + " gal";
+    oNote.textContent = res.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [W, H, L, d]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["oval-tank-volume"] = _v1324renderOvalTankVolume;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {

@@ -3075,6 +3075,7 @@ cross-check.
 | calc-shop.js | `computeFrustumVolume` | `{ large_diameter_ft = 0, small_diameter_ft = 0, height_ft = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeMachiningTime` | `{ feed_mode = "rpm-ipr", cut_length_in = 0, rpm = 0, feed_ipr_in = 0, feed_ip...` | _ | _ | _ |
 | calc-shop.js | `computeMaterialRemovalRate` | `{ mode = "milling", woc_in = 0, doc_in = 0, feed_ipm_in = 0, sfm = 0, feed_ip...` | _ | _ | _ |
+| calc-shop.js | `computeOvalTankVolume` | `{ width_in = 0, height_in = 0, length_in = 0, depth_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeParabolicSegment` | `{ base_span = 0, rise_height = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computePressBrakeMaxThickness` | `{ available_tonnage_tons = 0, die_opening_in = 0, bend_length_ft = 0, uts_ksi...` | _ | _ | _ |
 | calc-shop.js | `computePressBrakeTonnage` | `{ thickness_in = 0, bend_length_ft = 0, die_opening_in = 0, uts_ksi = 60 } = {}` | _ | _ | _ |
@@ -3361,7 +3362,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1947.
+Row count: 1948.
 
 <!-- END function-corpus-v14 -->
 
@@ -4525,7 +4526,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (86 tiles)
+### Group G Cross-trade (87 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4564,6 +4565,7 @@ per spec-v14 §13.1 second paragraph.
 | `mileage-cost` | Mileage and Fuel Cost | Project (first-principles); Standard fleet-cost arithmetic | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `niosh-lifting` | NIOSH Lifting Equation | NIOSH; 30 lb load / H=12 in / V=30 in / D=20 in / 0 deg asym / 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `noise-dose` | OSHA 1910.95 Noise Dose and TWA | OSHA; T = 8 / 2^((L-90)/5); D = sum(C/T)*100; TWA = 16.61 log10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `oval-tank-volume` | Oval (Obround) Tank Volume from Dipstick | Project (first-principles); stadium cross-section, piecewise segment fill | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `overtime` | Overtime Hours | Project (first-principles); Standard FLSA / state DOL overtime schedule | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `parabolic-segment` | Parabolic Segment Area and Arc Length | Project (first-principles); area (2/3)bh; parabolic arc | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `per-diem` | Per-Diem (GSA) | U.S. General Services Administration ...; TX state-default M&IE -> $69/day; table lookup, exercises... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -5230,6 +5232,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1696. Fixture-covered or reference-cadence: 1696 / 1696.
+Tile count: 1697. Fixture-covered or reference-cadence: 1697 / 1697.
 
 <!-- END tile-index-v14 -->

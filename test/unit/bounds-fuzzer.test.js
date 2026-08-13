@@ -38476,3 +38476,30 @@ test("bounds: spec-v1323 computeSphericalZoneVolume pins the prismatoid volume, 
   assert.ok("error" in _v1323({ base_radius_1_ft: -1, base_radius_2_ft: 3, zone_height_ft: 2 }));
   assert.ok("error" in _v1323({ base_radius_1_ft: Infinity, base_radius_2_ft: 3, zone_height_ft: 2 }));
 });
+
+import { computeOvalTankVolume as _v1324 } from "../../calc-shop.js";
+test("bounds: spec-v1324 computeOvalTankVolume pins the 275-gal tank, the exact-half symmetry, the segment seams, clamping, and error seams", () => {
+  // 27 x 44 x 60 in oval oil tank: 268 gal full (nominal 275).
+  const full = _v1324({ width_in: 27, height_in: 44, length_in: 60, depth_in: 44 });
+  assert.ok(Math.abs(full.full_gal - 267.94) < 0.5 && Math.abs(full.percent_full - 100) < 1e-9);
+  // Vertical symmetry: the half-height dipstick is exactly half full.
+  const half = _v1324({ width_in: 27, height_in: 44, length_in: 60, depth_in: 22 });
+  assert.ok(Math.abs(half.percent_full - 50) < 1e-9 && Math.abs(half.volume_gal - full.full_gal / 2) < 1e-6);
+  // The piecewise area is continuous at the two seams (bottom rounded end r, and r + s).
+  const r = 27 / 2, s = 44 - 27;
+  const atR = _v1324({ width_in: 27, height_in: 44, length_in: 60, depth_in: r });
+  const atRminus = _v1324({ width_in: 27, height_in: 44, length_in: 60, depth_in: r - 1e-6 });
+  const atRplus = _v1324({ width_in: 27, height_in: 44, length_in: 60, depth_in: r + 1e-6 });
+  assert.ok(Math.abs(atR.volume_in3 - atRminus.volume_in3) < 1e-2 && Math.abs(atR.volume_in3 - atRplus.volume_in3) < 1e-2);
+  const atTop = _v1324({ width_in: 27, height_in: 44, length_in: 60, depth_in: r + s });
+  const atTopPlus = _v1324({ width_in: 27, height_in: 44, length_in: 60, depth_in: r + s + 1e-6 });
+  assert.ok(Math.abs(atTop.volume_in3 - atTopPlus.volume_in3) < 1e-2);
+  // Empty reads zero; depth beyond the height clamps to the full tank.
+  assert.ok(_v1324({ width_in: 27, height_in: 44, length_in: 60, depth_in: 0 }).volume_in3 === 0);
+  assert.ok(Math.abs(_v1324({ width_in: 27, height_in: 44, length_in: 60, depth_in: 99 }).percent_full - 100) < 1e-9);
+  // Error seams: non-positive dims, height below width, negative depth, non-finite.
+  assert.ok("error" in _v1324({ width_in: 0, height_in: 44, length_in: 60, depth_in: 22 }));
+  assert.ok("error" in _v1324({ width_in: 27, height_in: 20, length_in: 60, depth_in: 10 }));
+  assert.ok("error" in _v1324({ width_in: 27, height_in: 44, length_in: 60, depth_in: -1 }));
+  assert.ok("error" in _v1324({ width_in: Infinity, height_in: 44, length_in: 60, depth_in: 22 }));
+});

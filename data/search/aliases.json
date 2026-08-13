@@ -38344,6 +38344,36 @@
    "kind": "adjacent"
   },
   {
+   "term": "oval oil tank volume",
+   "target": "oval-tank-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "275 gallon oil tank gauge",
+   "target": "oval-tank-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "obround tank dipstick gallons",
+   "target": "oval-tank-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "heating oil tank gallons from inches",
+   "target": "oval-tank-volume",
+   "kind": "question"
+  },
+  {
+   "term": "how much oil is in my tank",
+   "target": "oval-tank-volume",
+   "kind": "question"
+  },
+  {
+   "term": "stadium cross section tank volume",
+   "target": "oval-tank-volume",
+   "kind": "adjacent"
+  },
+  {
    "term": "how big does an air gap need to be",
    "target": "cross-connection-air-gap",
    "kind": "question"

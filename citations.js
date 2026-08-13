@@ -11813,6 +11813,18 @@ export const CITATIONS = {
       { name: "Scope", value: "one base zero is the spherical cap; the lateral surface and an off-axis/ellipsoidal zone are separate", source: "scope of this tile" },
     ],
   },
+  "oval-tank-volume": {
+    formula: "r = W/2, s = H - W; wetted area = seg(h) for h<=r, pi r^2/2 + W(h-r) for h<=r+s, else (pi r^2 + W s) - seg(H-h); volume = area x length. seg(t) = r^2 acos((r-t)/r) - (r-t) sqrt(2 r t - t^2).",
+    edition: "Horizontal oval (obround) tank partial gauging - the cross-section is a stadium (rectangle capped by two semicircles) and the wetted area is a piecewise circular-segment build-up; standard plane/solid geometry with the circular-segment relation as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Public-domain geometry; the tank width, height, length, and dipstick depth are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Partial volume of a horizontal oval (obround) tank from a dipstick depth - the residential 275-gallon heating-oil tank, whose ends are rounded top and bottom, the shape the round tank-volume tile does not cover. The cross-section is a rectangle of width W and straight height s = H - W capped by two semicircles of radius r = W/2, so the full area is pi r^2 + W s. Filling from the bottom the wetted area is a circular segment through the bottom rounded end (up to height r), then the half-round plus a growing rectangle (up to r + s), then the full area minus the empty top segment; times the tank length gives the volume. A 27 in wide, 44 in tall, 60 in long tank holds 268 gallons full (the nominal '275'), and by symmetry the half-height mark is exactly half. Enter the inside dimensions in inches. A vertical oval with flat ends; a round tank is the tank-volume tile, and the tank's own chart governs custody. Reported in gallons, cubic feet, and cubic inches with the percent full.",
+    assumptions: [
+      { name: "Cross-section", value: "stadium: rectangle W x (H-W) capped by two semicircles r = W/2 (rounded top and bottom)", source: "plane geometry" },
+      { name: "Wetted area", value: "piecewise circular segment -> half-round + rectangle -> full minus empty top segment", source: "circular-segment relation" },
+      { name: "Scope", value: "vertical oval with flat ends; a round tank is the tank-volume tile; the tank chart governs custody", source: "scope of this tile" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",
