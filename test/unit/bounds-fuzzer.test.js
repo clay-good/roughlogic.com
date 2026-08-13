@@ -38109,3 +38109,22 @@ test("bounds: spec-v1306 computeProjectileRange pins the range/height/time, the 
   assert.ok("error" in _v1306({ velocity_fps: 80, angle_deg: 90 }));
   assert.ok("error" in _v1306({ velocity_fps: Infinity, angle_deg: 45 }));
 });
+
+import { computeFreeFallDrop as _v1307 } from "../../calc-mechanic.js";
+test("bounds: spec-v1307 computeFreeFallDrop pins the impact speed, fall time, energy, the sqrt/linear scalings, the optional weight, and error seams", () => {
+  // h 50, W 5: v 56.72 ft/s (38.67 mph), t 1.763 s, KE 250 ft-lbf.
+  const r = _v1307({ drop_height_ft: 50, object_weight_lb: 5 });
+  assert.ok(Math.abs(r.impact_speed_fps - 56.72) < 0.05 && Math.abs(r.impact_speed_mph - 38.67) < 0.05);
+  assert.ok(Math.abs(r.fall_time_s - 1.763) < 1e-3 && r.impact_energy_ftlb === 250);
+  // Speed grows with the square root of height (4x height doubles the speed).
+  assert.ok(Math.abs(_v1307({ drop_height_ft: 200, object_weight_lb: 5 }).impact_speed_fps / r.impact_speed_fps - 2) < 1e-6);
+  // Energy grows in direct proportion to height (2x height doubles the energy).
+  assert.ok(Math.abs(_v1307({ drop_height_ft: 100, object_weight_lb: 5 }).impact_energy_ftlb / r.impact_energy_ftlb - 2) < 1e-9);
+  // Impact energy is null when no weight is given, but speed and time still compute.
+  const noW = _v1307({ drop_height_ft: 50, object_weight_lb: 0 });
+  assert.ok(noW.impact_energy_ftlb === null && Math.abs(noW.impact_speed_fps - r.impact_speed_fps) < 1e-9);
+  // Error seams: non-positive height, negative weight, non-finite.
+  assert.ok("error" in _v1307({ drop_height_ft: 0, object_weight_lb: 5 }));
+  assert.ok("error" in _v1307({ drop_height_ft: 50, object_weight_lb: -1 }));
+  assert.ok("error" in _v1307({ drop_height_ft: Infinity, object_weight_lb: 5 }));
+});

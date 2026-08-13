@@ -1668,6 +1668,45 @@ MECHANIC_RENDERERS["projectile-range"] = _simpleRenderer({
   compute: computeProjectileRange,
 });
 
+// --- spec-v1307 K: free-fall drop time, impact speed, and energy (`free-fall-drop`) ---
+// Personal fall-arrest tiles exist but not the dropped-OBJECT hazard (DROPS): how fast a tool hits and
+// with how much energy. v = sqrt(2 g h), t = sqrt(2 h/g), KE = W h. Still air (no drag). g = 32.174 ft/s^2.
+// dims: in { drop_height_ft: L, object_weight_lb: M L T^-2 } out: { impact_speed_fps: L T^-1, impact_speed_mph: L T^-1, fall_time_s: T, impact_energy_ftlb: M L^2 T^-2 }
+export function computeFreeFallDrop({ drop_height_ft = 0, object_weight_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const h = Number(drop_height_ft) || 0;
+  const W = Number(object_weight_lb) || 0;
+  if (!(h > 0)) return { error: "Drop height must be positive (ft)." };
+  if (W < 0) return { error: "Object weight cannot be negative (lb)." };
+  const g = 32.174; // ft/s^2
+  const impact_speed_fps = Math.sqrt(2 * g * h);
+  const impact_speed_mph = impact_speed_fps * 0.681818182;
+  const fall_time_s = Math.sqrt((2 * h) / g);
+  const impact_energy_ftlb = W > 0 ? W * h : null;
+  if (![impact_speed_fps, fall_time_s].every(Number.isFinite) || !(impact_speed_fps > 0)) return { error: "Free-fall math is not a finite value; check the inputs." };
+  return {
+    impact_speed_fps, impact_speed_mph, fall_time_s, impact_energy_ftlb,
+    note: "Still-air free fall from a height h: the impact speed is v = sqrt(2 g h), the time to fall is t = sqrt(2 h/g), and the impact (kinetic) energy at the bottom is KE = W h (= m g h) when an object weight is given, with g = 32.174 ft/s^2. Speed grows with the square ROOT of height (fast at first, then slowly), while the energy grows in direct proportion to height. A 5 lb tool dropped 50 ft hits at about 39 mph with 250 ft-lbf - easily fatal, the reason for hard hats, toe boards, tethers, and a cleared drop zone (the DROPS problem). Air resistance is NEGLECTED - fine for a dense, compact object over jobsite heights, optimistic for a light or bluff one that reaches its terminal velocity. The deceleration force on impact (which depends on how far the object and surface give - see impact-load-factor), a horizontal launch (projectile-range), and bounce are separate. A safety-planning estimate; the competent person and the site safety plan govern.",
+  };
+}
+export const freeFallDropExample = { inputs: { drop_height_ft: 50, object_weight_lb: 5 } };
+
+MECHANIC_RENDERERS["free-fall-drop"] = _simpleRenderer({
+  citation: "Citation: still-air free-fall kinematics (standard mechanics): impact speed v = sqrt(2 g h), fall time t = sqrt(2 h/g), impact energy KE = W h (= m g h), g = 32.174 ft/s^2. Air drag (terminal velocity), impact deceleration force, and horizontal launch are separate. A safety-planning estimate; the competent person governs.",
+  example: freeFallDropExample.inputs,
+  fields: [
+    { key: "drop_height_ft", label: "Drop height h (ft)", kind: "number" },
+    { key: "object_weight_lb", label: "Object weight W (lb, optional for energy)", kind: "number" },
+  ],
+  outputs: [
+    { key: "v", id: "ffd-out-v", label: "Impact speed", value: (r) => fmt(r.impact_speed_fps, 1) + " ft/s (" + fmt(r.impact_speed_mph, 1) + " mph)" },
+    { key: "t", id: "ffd-out-t", label: "Time to fall", value: (r) => fmt(r.fall_time_s, 2) + " s" },
+    { key: "e", id: "ffd-out-e", label: "Impact energy", value: (r) => r.impact_energy_ftlb != null ? fmt(r.impact_energy_ftlb, 0) + " ft-lbf" : "enter a weight for the impact energy" },
+    { key: "n", id: "ffd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFreeFallDrop,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================

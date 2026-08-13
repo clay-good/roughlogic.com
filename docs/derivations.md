@@ -2630,6 +2630,7 @@ cross-check.
 | calc-mechanic.js | `computeEngineFuelBurnGph` | `{ horsepower = 0, bsfc_lb_hp_hr = 0, density_lb_gal = 0, tank_gal = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeEtHorsepower` | `{ weight_lb = 0, et_s = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeFlywheelEnergy` | `{ weight_lb = 100, radius_of_gyration_ft = 1, rpm = 1000, energy_fluctuation_...` | _ | _ | _ |
+| calc-mechanic.js | `computeFreeFallDrop` | `{ drop_height_ft = 0, object_weight_lb = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeFuelRange` | `{ fuel = "gasoline_E10", tank_gal = 0, mpg = 0, mpg_basis = "gasoline_E10", l...` | _ | _ | _ |
 | calc-mechanic.js | `computeGearContactStress` | `{ transmitted_load_lb = 0, diametral_pitch_1_in = 0, pinion_teeth = 0, gear_t...` | _ | _ | _ |
 | calc-mechanic.js | `computeGearDynamicToothStress` | `{ horsepower = 0, rpm = 0, number_of_teeth = 0, diametral_pitch_1_in = 0, fac...` | _ | _ | _ |
@@ -3344,7 +3345,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1930.
+Row count: 1931.
 
 <!-- END function-corpus-v14 -->
 
@@ -4639,7 +4640,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (129 tiles)
+### Group K Mechanic (130 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4693,6 +4694,7 @@ per spec-v14 §13.1 second paragraph.
 | `feed-for-surface-finish` | Feed for a Target Turned Finish | First-principles scallop geometry (in...; 25 uin Ra target, 1/32 in nose radius -> 0.005 IPR (round... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flange-coupling-torque` | Rigid Flange Coupling Torque Capacity | Project (first-principles); T = n(pi/4 d^2 tau)(BCD/2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flywheel-energy` | Flywheel Kinetic Energy and Speed Fluctuation | Flywheel kinetic energy and speed flu...; I = 100/32.174 x 1 = 3.108; omega = 1000 x pi/30 = 104.72... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `free-fall-drop` | Free-Fall Drop Time, Impact Speed, and Energy | Project (first-principles); v=sqrt(2gh) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fuel-range` | Fuel Energy and Range | Project (first-principles); range = 18 * 28 * 1.0 = 504 mi; total_btu = 18 * 112000 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gear-chordal-thickness` | Gear-Tooth Chordal Thickness (Caliper) | Machinery's Handbook / AGMA (gear-too...; half-angle 2.25 deg; tc = 4 sin(2.25) = 0.15704; ac = 0.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gear-contact-stress` | Gear Tooth Contact Stress (Surface Durability) | Project (first-principles); sigma_c = Cp sqrt(Wt/(F dp I)) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5196,6 +5198,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1679. Fixture-covered or reference-cadence: 1679 / 1679.
+Tile count: 1680. Fixture-covered or reference-cadence: 1680 / 1680.
 
 <!-- END tile-index-v14 -->

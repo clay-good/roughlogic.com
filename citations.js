@@ -11866,6 +11866,18 @@ export const CITATIONS = {
       { name: "No drag", value: "still-air upper bound; air resistance shortens a real stream, launch height/wind are separate", source: "scope of this tile" },
     ],
   },
+  "free-fall-drop": {
+    formula: "v = sqrt(2 g h); t = sqrt(2 h/g); KE = W h (= m g h); g = 32.174 ft/s^2. v_mph = v_fps x 0.6818.",
+    edition: "The free-fall relations v = sqrt(2 g h), t = sqrt(2 h/g), and the impact energy KE = W h (standard kinematics; energy conservation), by name.",
+    freeAccess: "The free-fall relations are standard published kinematics; the drop height and object weight are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Still-air free fall from a height h: the impact speed is v = sqrt(2 g h), the time to fall is t = sqrt(2 h/g), and the impact (kinetic) energy at the bottom is KE = W h (= m g h) when an object weight is given, with g = 32.174 ft/s^2. Speed grows with the square ROOT of height (fast at first, then slowly), while the energy grows in direct proportion to height. A 5 lb tool dropped 50 ft hits at about 39 mph with 250 ft-lbf - easily fatal, the reason for hard hats, toe boards, tethers, and a cleared drop zone (the DROPS problem). Air resistance is NEGLECTED - fine for a dense, compact object over jobsite heights, optimistic for a light or bluff one that reaches its terminal velocity. The deceleration force on impact (which depends on how far the object and surface give - see impact-load-factor), a horizontal launch (projectile-range), and bounce are separate. A safety-planning estimate; the competent person and the site safety plan govern.",
+    assumptions: [
+      { name: "Free fall", value: "v = sqrt(2 g h), t = sqrt(2 h/g), KE = W h; still air", source: "kinematics / energy conservation" },
+      { name: "No drag", value: "neglects air resistance (terminal velocity); optimistic for a light or bluff object", source: "scope of this tile" },
+      { name: "Scope", value: "impact deceleration force, horizontal launch, and bounce are separate", source: "scope of this tile" },
+    ],
+  },
   "gear-identification": {
     formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
     edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",

@@ -87957,6 +87957,66 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "free-fall-drop",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "5 lb tool dropped 50 ft",
+   "source_edition_or_year": "kinematics",
+   "source_section_or_page": "v=sqrt(2gh)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "drop_height_ft": 50,
+    "object_weight_lb": 5
+   },
+   "outputs": {
+    "impact_speed_fps": {
+     "value": 56.72,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fall_time_s": {
+     "value": 1.763,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "impact_energy_ftlb": {
+     "value": 250,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "free-fall-drop",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Double the height doubles the energy",
+   "source_edition_or_year": "kinematics",
+   "source_section_or_page": "v=sqrt(2gh)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "drop_height_ft": 100,
+    "object_weight_lb": 10
+   },
+   "outputs": {
+    "impact_speed_fps": {
+     "value": 80.22,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "impact_energy_ftlb": {
+     "value": 1000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }
