@@ -1178,6 +1178,7 @@ export const RENDERER_MAP = {
   "regular-polygon": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "ellipse-area-perimeter": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "spherical-cap-volume": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
+  "parabolic-segment": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "press-fit-pressure": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "press-fit-interference-for-force": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },
   "roller-chain-length": { module: "../../calc-shop.js", exportName: "SHOP_RENDERERS" },

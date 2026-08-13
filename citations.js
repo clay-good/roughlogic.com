@@ -11719,6 +11719,18 @@ export const CITATIONS = {
       { name: "Scope", value: "cap only; spherical zone, ellipsoidal head, and surface area are separate", source: "scope of this tile" },
     ],
   },
+  "parabolic-segment": {
+    formula: "area = (2/3) b h; root = sqrt(b^2 + 16 h^2); arc length = (1/2) root + (b^2/(8h)) ln((4h + root)/b). Rise->0 gives the chord.",
+    edition: "The parabolic segment area (2/3) b h (Archimedes) and the exact parabolic arc length - standard geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure plane geometry, public; the span and rise are user-supplied measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "Area and arc length of a parabolic segment - a symmetric parabola of span (chord) b and rise h at midspan, the shape of a parabolic arch, a road or deck crown, the sag of a uniformly loaded cable, or a reflector cross-section. The area is exactly (2/3) b h, two-thirds of the b x h rectangle that boxes the segment (Archimedes' result), so it always beats the triangle (1/2) and loses to the rectangle. The arc length of the curved edge is (1/2) sqrt(b^2 + 16 h^2) + (b^2/(8h)) ln((4h + sqrt(b^2 + 16 h^2))/b); as the rise goes to zero it approaches the chord b. Use it to lay out the form, take off the sheathing, or cut the rib. A circular segment is the circular-segment-area tile; a true catenary (a hanging chain, slightly different from a parabola) and the volume of a parabolic dish are separate. Plane figure only. A shop and layout aid; verify critical dimensions on the work.",
+    assumptions: [
+      { name: "Area", value: "(2/3) b h, exactly two-thirds of the b x h box (Archimedes)", source: "plane geometry" },
+      { name: "Arc length", value: "(1/2) sqrt(b^2+16h^2) + (b^2/(8h)) ln((4h+sqrt(b^2+16h^2))/b); -> chord as rise->0", source: "plane geometry" },
+      { name: "Scope", value: "parabolic segment; circular segment and true catenary are separate", source: "scope of this tile" },
+    ],
+  },
   "spur-gear-geometry": {
     formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
     edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",

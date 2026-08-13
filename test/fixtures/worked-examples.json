@@ -88485,6 +88485,54 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "parabolic-segment",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Parabolic arch, 20 span, 5 rise",
+   "source_edition_or_year": "geometry / Archimedes",
+   "source_section_or_page": "area (2/3)bh; parabolic arc",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "base_span": 20,
+    "rise_height": 5
+   },
+   "outputs": {
+    "area": {
+     "value": 66.6667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "arc_length": {
+     "value": 22.9559,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "parabolic-segment",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Steeper rise lengthens the arc",
+   "source_edition_or_year": "geometry / Archimedes",
+   "source_section_or_page": "area (2/3)bh; parabolic arc",
+   "verified_by": "rl",
+   "verified_on": "2026-08-10",
+   "inputs": {
+    "base_span": 20,
+    "rise_height": 10
+   },
+   "outputs": {
+    "area": {
+     "value": 133.333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

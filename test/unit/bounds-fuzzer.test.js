@@ -38303,3 +38303,23 @@ test("bounds: spec-v1315 computeSphericalCapVolume pins the cap volume, hemisphe
   assert.ok("error" in _v1315({ sphere_diameter_ft: 10, fill_depth_ft: 11 }));
   assert.ok("error" in _v1315({ sphere_diameter_ft: Infinity, fill_depth_ft: 3 }));
 });
+
+import { computeParabolicSegment as _v1316 } from "../../calc-shop.js";
+test("bounds: spec-v1316 computeParabolicSegment pins the 2/3 area, the exact arc length, the chord limit, and error seams", () => {
+  // b 20, h 5: area 66.67, arc 22.96 over a 20 chord.
+  const r = _v1316({ base_span: 20, rise_height: 5 });
+  assert.ok(Math.abs(r.area - 66.6667) < 1e-3 && Math.abs(r.arc_length - 22.9559) < 1e-3 && r.chord === 20);
+  // Area is exactly 2/3 of the b*h box (and always > triangle 1/2, < rectangle).
+  assert.ok(Math.abs(r.area - (2 / 3) * 20 * 5) < 1e-9 && r.area > 0.5 * 20 * 5 && r.area < 20 * 5);
+  // The arc is always at least the chord.
+  assert.ok(r.arc_length >= r.chord);
+  // Area scales linearly with rise; a taller rise also lengthens the arc.
+  const tall = _v1316({ base_span: 20, rise_height: 10 });
+  assert.ok(Math.abs(tall.area / r.area - 2) < 1e-9 && tall.arc_length > r.arc_length);
+  // A nearly-flat segment has an arc length approaching the chord.
+  assert.ok(Math.abs(_v1316({ base_span: 20, rise_height: 0.001 }).arc_length - 20) < 1e-3);
+  // Error seams: non-positive base or rise, non-finite.
+  assert.ok("error" in _v1316({ base_span: 0, rise_height: 5 }));
+  assert.ok("error" in _v1316({ base_span: 20, rise_height: 0 }));
+  assert.ok("error" in _v1316({ base_span: Infinity, rise_height: 5 }));
+});

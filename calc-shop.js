@@ -1451,6 +1451,46 @@ function _v1315renderSphericalCapVolume(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["spherical-cap-volume"] = _v1315renderSphericalCapVolume;
 
+// spec-v1316: parabolic segment area and arc length. circular-segment-area covers a circular arc; this is the
+// PARABOLIC segment (arch, road crown, cable sag, reflector). area = (2/3) b h (Archimedes, 2/3 of the b*h box);
+// exact arc = (1/2)sqrt(b^2+16h^2) + (b^2/(8h)) ln((4h+sqrt(b^2+16h^2))/b). Rise->0 gives the chord.
+// dims: in { base_span: L, rise_height: L } out: { area: L^2, arc_length: L, chord: L }
+export function computeParabolicSegment({ base_span = 0, rise_height = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const b = Number(base_span) || 0;
+  const h = Number(rise_height) || 0;
+  if (!(b > 0)) return { error: "Base (span) must be positive." };
+  if (!(h > 0)) return { error: "Height (rise) must be positive." };
+  const area = (2 / 3) * b * h;
+  const root = Math.sqrt(b * b + 16 * h * h);
+  const arc_length = 0.5 * root + (b * b / (8 * h)) * Math.log((4 * h + root) / b);
+  if (![area, arc_length].every(Number.isFinite) || !(area > 0) || !(arc_length >= b - 1e-9)) return { error: "Parabolic-segment math is not a finite value; check the inputs." };
+  return {
+    area, arc_length, chord: b,
+    note: "Area and arc length of a parabolic segment - a symmetric parabola of span (chord) b and rise h at midspan, the shape of a parabolic arch, a road or deck crown, the sag of a uniformly loaded cable, or a reflector cross-section. The area is exactly (2/3) b h, two-thirds of the b x h rectangle that boxes the segment (Archimedes' result), so it always beats the triangle (1/2) and loses to the rectangle. The arc length of the curved edge is (1/2) sqrt(b^2 + 16 h^2) + (b^2/(8h)) ln((4h + sqrt(b^2 + 16 h^2))/b); as the rise goes to zero it approaches the chord b. Use it to lay out the form, take off the sheathing, or cut the rib. A circular segment is the circular-segment-area tile; a true catenary (a hanging chain, slightly different from a parabola) and the volume of a parabolic dish are separate. Plane figure only. A shop and layout aid; verify critical dimensions on the work.",
+  };
+}
+export const parabolicSegmentExample = { inputs: { base_span: 20, rise_height: 5 } };
+function _v1316renderParabolicSegment(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: parabolic segment area (2/3) b h (Archimedes) and exact arc length (1/2)sqrt(b^2+16h^2) + (b^2/(8h)) ln((4h+sqrt(b^2+16h^2))/b) (standard geometry; Machinery's Handbook). A shop and layout aid; verify critical dimensions on the work.";
+  const b = makeNumber("Base / span b", "pbs-b", { step: "any", min: "0" }); b.input.value = "20";
+  const h = makeNumber("Rise / height h (at midspan)", "pbs-h", { step: "any", min: "0" }); h.input.value = "5";
+  for (const f of [b, h]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { b.input.value = "20"; h.input.value = "5"; update(); });
+  const oA = makeOutputLine(outputRegion, "Segment area", "pbs-out-a");
+  const oL = makeOutputLine(outputRegion, "Curved arc length", "pbs-out-l");
+  const oNote = makeOutputLine(outputRegion, "Note", "pbs-out-n");
+  const update = debounce(() => {
+    const res = computeParabolicSegment({ base_span: Number(b.input.value) || 0, rise_height: Number(h.input.value) || 0 });
+    if (res.error) { oA.textContent = res.error; oL.textContent = "-"; oNote.textContent = ""; return; }
+    oA.textContent = fmt(res.area, 4) + " (square units, = 2/3 of the b x h box)";
+    oL.textContent = fmt(res.arc_length, 4) + " over a " + fmt(res.chord, 3) + " chord";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [b, h]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["parabolic-segment"] = _v1316renderParabolicSegment;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {
