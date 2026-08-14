@@ -7369,6 +7369,31 @@
    "kind": "adjacent"
   },
   {
+   "term": "belt center distance",
+   "target": "belt-center-distance",
+   "kind": "industry"
+  },
+  {
+   "term": "sheave center distance for a standard belt",
+   "target": "belt-center-distance",
+   "kind": "question"
+  },
+  {
+   "term": "pulley center distance from belt length",
+   "target": "belt-center-distance",
+   "kind": "question"
+  },
+  {
+   "term": "motor slide base spacing",
+   "target": "belt-center-distance",
+   "kind": "adjacent"
+  },
+  {
+   "term": "belt wrap angle",
+   "target": "belt-center-distance",
+   "kind": "adjacent"
+  },
+  {
    "term": "v-belt",
    "target": "vbelt-drive",
    "kind": "industry"

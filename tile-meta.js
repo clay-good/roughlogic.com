@@ -276,7 +276,7 @@ const _TILES = [
   ["wind-chill", "G"], ["wind-chill-wind-speed", "G"], ["ladder-angle", "G"], ["extension-ladder-overlap", "G"], ["portable-ladder-setup", "G"], ["swing-fall-geometry", "G"], ["pulley-ma-gen", "G"],
   ["ramp-slope", "G"], ["rainwater-yield", "G"], ["rainwater-catchment-area", "G"], ["timesheet", "G"],
   ["fall-protection-clearance", "G"], ["vehicle-load", "G"], ["noise-dose", "G"], ["hearing-protector-nrr", "G"], ["silica-table-1", "G"], ["lifeline-tension", "G"],
-  ["pump-tdh", "G"], ["hydraulic-cylinder", "G"], ["vbelt-drive", "G"], ["belt-hp-transmitted", "G"], ["gear-cascade", "G"],
+  ["pump-tdh", "G"], ["hydraulic-cylinder", "G"], ["vbelt-drive", "G"], ["belt-center-distance", "G"], ["belt-hp-transmitted", "G"], ["gear-cascade", "G"],
 
   ["color-codes", "H"], ["knot-reference", "H"], ["inspection-checklist", "H"],
   ["emergency-contacts", "H"], ["tool-maintenance", "H"], ["hand-signals", "H"],

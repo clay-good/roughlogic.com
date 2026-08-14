@@ -150,6 +150,7 @@ export const COMPUTE_MAP = {
   "pump-tdh": { module: "../../calc-cross.js", fn: "computePumpTdh" },
   "hydraulic-cylinder": { module: "../../calc-cross.js", fn: "computeHydraulicCylinder" },
   "vbelt-drive": { module: "../../calc-cross.js", fn: "computeVbeltDrive" },
+  "belt-center-distance": { module: "../../calc-cross.js", fn: "computeBeltCenterDistance" },
   "gear-cascade": { module: "../../calc-cross.js", fn: "computeGearCascade" },
   "freight-density": { module: "../../calc-trucking.js", fn: "computeFreightDensity" },
   "voltage-drop": { module: "../../calc-electrical.js", fn: "computeVoltageDrop" },

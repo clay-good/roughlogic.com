@@ -88877,6 +88877,62 @@
    }
   },
   {
+   "tile_id": "belt-center-distance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "10 in / 4 in sheaves on a 62.44 in belt -> 20 in centers",
+   "source_edition_or_year": "ANSI/RMA IP-20 inverse",
+   "source_section_or_page": "C=[A+sqrt(A^2-2(D-d)^2)]/4; cross-checks vbelt-drive forward",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "large_pitch_diameter_in": 10,
+    "small_pitch_diameter_in": 4,
+    "belt_pitch_length_in": 62.44
+   },
+   "outputs": {
+    "center_distance_in": {
+     "value": 19.9994,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wrap_small_deg": {
+     "value": 162.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "belt-center-distance",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Equal sheaves (6 in / 6 in) give 180 deg wrap; L 48.85 in -> 15 in",
+   "source_edition_or_year": "ANSI/RMA IP-20 inverse",
+   "source_section_or_page": "D=d: L=2C+pi D, so C=(L-pi D)/2; wrap exactly 180 deg",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "large_pitch_diameter_in": 6,
+    "small_pitch_diameter_in": 6,
+    "belt_pitch_length_in": 48.85
+   },
+   "outputs": {
+    "center_distance_in": {
+     "value": 15.0002,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "wrap_small_deg": {
+     "value": 180.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spherical-zone-volume",
    "source_publisher": "Project (first-principles)",
    "source_title": "Spherical zone r1 4 ft, r2 3 ft, h 2 ft",

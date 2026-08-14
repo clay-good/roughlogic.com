@@ -1105,6 +1105,7 @@ export const RENDERER_MAP = {
   "pump-tdh": { module: "../../calc-cross.js", exportName: "CROSS_RENDERERS" },
   "hydraulic-cylinder": { module: "../../calc-cross.js", exportName: "CROSS_RENDERERS" },
   "vbelt-drive": { module: "../../calc-cross.js", exportName: "CROSS_RENDERERS" },
+  "belt-center-distance": { module: "../../calc-cross.js", exportName: "CROSS_RENDERERS" },
   "belt-hp-transmitted": { module: "../../calc-cross.js", exportName: "CROSS_RENDERERS" },
   "gear-cascade": { module: "../../calc-cross.js", exportName: "CROSS_RENDERERS" },
   "rolling-offset": { module: "../../calc-cross.js", exportName: "CROSS_RENDERERS" },

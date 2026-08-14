@@ -2347,6 +2347,19 @@ export const CITATIONS = {
     ],
   },
 
+  "belt-center-distance": {
+    formula: "A = L - (pi/2)(D+d); C = [A + sqrt(A^2 - 2(D-d)^2)]/4 (inverse of L = 2C + (pi/2)(D+d) + (D-d)^2/(4C)); wrap on small sheave = 180 - 2 asin((D-d)/2C) deg.",
+    edition: "The center distance for a standard belt - the inverse of the ANSI/RMA IP-20 / IP-22 belt-length equation, as in the Gates Industrial Drive Design Manual (public).",
+    freeAccess: "Standard drive geometry; the sheave pitch diameters and the belt pitch length come from the user. Free at gates.com/literature.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Solves the belt-length equation for the center distance so a standard (stock) belt fits a chosen sheave pair, and reports the small-sheave wrap angle (the V-belt HP rating is tabulated at 180 degrees and derates below it). The result is the nominal center; a real drive needs RMA/ISO take-up allowance to install the belt and to tension and follow stretch. The + root is the physical (larger) solution. A design aid; the manufacturer's drive tables govern the final selection.",
+    assumptions: [
+      { name: "Center distance", value: "C = [A + sqrt(A^2 - 2(D-d)^2)]/4, the larger (+) root of the belt-length quadratic", source: "inverse of ANSI/RMA IP-20 / IP-22" },
+      { name: "Wrap angle", value: "small-sheave wrap 180 - 2 asin((D-d)/2C); below 180 deg the V-belt HP rating derates", source: "Gates Industrial Drive Design Manual" },
+      { name: "Scope", value: "nominal center distance; RMA/ISO take-up (install slack and tension/stretch allowance) is separate", source: "scope of this tile" },
+    ],
+  },
+
   "belt-hp-transmitted": {
     formula: "V = pi D N / 12 (ft/min); Te = T1 - T2; P = Te V / 33000 (hp).",
     edition: "The belt power relation P = (T1 - T2) V / 33000, first-principles as in Machinery's Handbook / the Gates Industrial Drive Design Manual, by name.",

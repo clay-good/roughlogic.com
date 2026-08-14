@@ -2437,6 +2437,70 @@ function renderVbeltDrive(inputRegion, outputRegion, citationEl) {
 CROSS_RENDERERS["vbelt-drive"] = renderVbeltDrive;
 
 // =====================================================================
+// spec-v1332 belt-center-distance - the INVERSE of the belt-length
+// equation the vbelt-drive / belt-pulley tiles run forward. Those take the
+// center distance and give the belt length; but belts come in standard
+// (stock) lengths, so once you pick one you must solve for the center
+// distance to set the motor slide base. L = 2C + (pi/2)(D+d) + (D-d)^2/(4C)
+// is quadratic in C: with A = L - (pi/2)(D+d), 8C^2 - 4AC + (D-d)^2 = 0, so
+// C = [A + sqrt(A^2 - 2(D-d)^2)]/4 (the + root is the physical, larger center).
+// Also reports the wrap angle on the small sheave, which derates V-belt HP
+// capacity below 180 degrees.
+// =====================================================================
+// dims: in { large_pitch_diameter_in: L, small_pitch_diameter_in: L, belt_pitch_length_in: L } out: { center_distance_in: L, wrap_small_deg: dimensionless, wrap_large_deg: dimensionless }
+export function computeBeltCenterDistance({ large_pitch_diameter_in = 0, small_pitch_diameter_in = 0, belt_pitch_length_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const a = Number(large_pitch_diameter_in) || 0;
+  const b = Number(small_pitch_diameter_in) || 0;
+  const L = Number(belt_pitch_length_in) || 0;
+  if (!(a > 0)) return { error: "Large sheave pitch diameter must be positive (in)." };
+  if (!(b > 0)) return { error: "Small sheave pitch diameter must be positive (in)." };
+  if (!(L > 0)) return { error: "Belt pitch length must be positive (in)." };
+  const D = Math.max(a, b); // larger sheave
+  const d = Math.min(a, b); // smaller sheave
+  const A = L - (Math.PI / 2) * (D + d);
+  if (!(A > 0)) return { error: "Belt is too short to wrap these sheaves; the belt length must exceed the sheave circumference terms. Use a longer belt or smaller sheaves." };
+  const disc = A * A - 2 * (D - d) * (D - d);
+  if (disc < 0) return { error: "No real center distance: the belt is too short for this pair of sheaves. Use the next longer standard belt." };
+  const center_distance_in = (A + Math.sqrt(disc)) / 4;
+  if (!(center_distance_in > 0)) return { error: "Center-distance math is not a finite value; check the inputs." };
+  const sinHalf = (D - d) / (2 * center_distance_in);
+  const half_deg = Math.asin(Math.min(1, Math.max(-1, sinHalf))) * 180 / Math.PI;
+  const wrap_small_deg = 180 - 2 * half_deg;
+  const wrap_large_deg = 180 + 2 * half_deg;
+  if (![center_distance_in, wrap_small_deg, wrap_large_deg].every(Number.isFinite)) return { error: "Center-distance math is not a finite value; check the inputs." };
+  const warnings = [];
+  if (wrap_small_deg < 120) warnings.push("Wrap on the small sheave is below 120 degrees; the V-belt HP rating derates sharply and slip risk rises - increase the center distance or the small sheave, or add belts.");
+  return {
+    center_distance_in, wrap_small_deg, wrap_large_deg,
+    note: "The center distance to run a standard (stock) belt - the inverse of the belt-length equation the vbelt-drive and belt-pulley tiles run forward. You pick sheaves and a belt from the shelf; this sets the shaft spacing. From L = 2C + (pi/2)(D+d) + (D-d)^2/(4C), with A = L - (pi/2)(D+d), the center distance is C = [A + sqrt(A^2 - 2(D-d)^2)]/4. The wrap angle on the SMALL sheave, 180 - 2 asin((D-d)/2C), is reported because a V-belt's HP rating is tabulated at 180 degrees and derates below it (about 20% down at 120 degrees). Use pitch diameters and the belt PITCH length (datum length is close for standard belts). A drive still needs take-up: the RMA/ISO allowance to move the motor IN to slip the belt on and OUT to tension and to follow stretch (roughly +/- a few percent of C, from the belt-section table) - this is the nominal center, not the slot length. A design aid; the drive manufacturer's tables govern the final selection.",
+    warnings,
+  };
+}
+export const beltCenterDistanceExample = { inputs: { large_pitch_diameter_in: 10, small_pitch_diameter_in: 4, belt_pitch_length_in: 62.44 } };
+function renderBeltCenterDistance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: center distance for a standard belt - the inverse of L = 2C + (pi/2)(D+d) + (D-d)^2/(4C) (ANSI/RMA IP-20 / IP-22), C = [A + sqrt(A^2 - 2(D-d)^2)]/4 with A = L - (pi/2)(D+d); wrap on the small sheave = 180 - 2 asin((D-d)/2C). Standard drive geometry (Gates Industrial Drive Design Manual, free at gates.com/literature). A design aid; the manufacturer's tables govern.";
+  const D = makeNumber("Large sheave pitch diameter (in)", "bcd-d", { step: "any", min: "0" }); D.input.value = "10";
+  const d = makeNumber("Small sheave pitch diameter (in)", "bcd-sd", { step: "any", min: "0" }); d.input.value = "4";
+  const L = makeNumber("Belt pitch length (in, standard)", "bcd-l", { step: "any", min: "0" }); L.input.value = "62.44";
+  for (const f of [D, d, L]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D.input.value = "10"; d.input.value = "4"; L.input.value = "62.44"; update(); });
+  const oC = makeOutputLine(outputRegion, "Center distance (in)", "bcd-out-c");
+  const oW = makeOutputLine(outputRegion, "Wrap angle, small sheave / large sheave", "bcd-out-w");
+  const oNote = makeOutputLine(outputRegion, "Note", "bcd-out-n");
+  function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
+  const update = debounce(() => {
+    const r = computeBeltCenterDistance({ large_pitch_diameter_in: readNum(D.input), small_pitch_diameter_in: readNum(d.input), belt_pitch_length_in: readNum(L.input) });
+    if (r.error) { oC.textContent = r.error; oW.textContent = ""; oNote.textContent = ""; return; }
+    oC.textContent = fmt(r.center_distance_in, 3) + " in";
+    oW.textContent = fmt(r.wrap_small_deg, 1) + " deg / " + fmt(r.wrap_large_deg, 1) + " deg" + (r.warnings.length ? " - " + r.warnings.join(" ") : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [D.input, d.input, L.input]) f.addEventListener("input", update);
+}
+CROSS_RENDERERS["belt-center-distance"] = renderBeltCenterDistance;
+
+// =====================================================================
 // spec-v807 belt-hp-transmitted - power a belt drive transmits from the
 // tight- and slack-side tensions and the belt speed.
 // P = (T1 - T2) V / 33000, with belt speed V = pi D N / 12.

@@ -6566,6 +6566,7 @@ import {
   computePumpTdh,
   computeHydraulicCylinder,
   computeVbeltDrive,
+  computeBeltCenterDistance,
   computeGearCascade,
 } from "../../calc-cross.js";
 import {
@@ -7206,6 +7207,29 @@ test("bounds: calc-cross computeVbeltDrive pins the ratio, driven diameter, and 
   // Rejections.
   assert.ok("error" in computeVbeltDrive({ driver_rpm: 0, driven_rpm: 875, driver_hp: 10, driver_pitch_diameter_in: 4, center_distance_in: 20 }));
   assert.ok("error" in computeVbeltDrive({ driver_rpm: 1750, driven_rpm: 875, driver_hp: 10, driver_pitch_diameter_in: 4, center_distance_in: 20, belt_section: "Z" }));
+});
+
+test("bounds: spec-v1332 computeBeltCenterDistance inverts the belt-length equation and pins the wrap angle", () => {
+  // 10 in / 4 in sheaves. Forward: L at C=20 is 2*20 + (pi/2)*14 + 36/80 = 62.4411 in.
+  const D = 10, d = 4;
+  const L = 2 * 20 + (Math.PI / 2) * (D + d) + ((D - d) ** 2) / (4 * 20);
+  const r = computeBeltCenterDistance({ large_pitch_diameter_in: D, small_pitch_diameter_in: d, belt_pitch_length_in: L });
+  assert.ok(Math.abs(r.center_distance_in - 20) < 1e-6); // exact inverse
+  // Wrap on the small sheave = 180 - 2 asin((D-d)/2C).
+  const wexp = 180 - 2 * Math.asin((D - d) / (2 * 20)) * 180 / Math.PI;
+  assert.ok(Math.abs(r.wrap_small_deg - wexp) < 1e-6 && Math.abs(r.wrap_large_deg - (360 - r.wrap_small_deg)) < 1e-9);
+  // Argument order does not matter (small/large auto-sorted).
+  const swapped = computeBeltCenterDistance({ large_pitch_diameter_in: d, small_pitch_diameter_in: D, belt_pitch_length_in: L });
+  assert.ok(Math.abs(swapped.center_distance_in - r.center_distance_in) < 1e-12);
+  // Equal sheaves give exactly 180 deg wrap and C = (L - pi D)/2.
+  const eqL = 2 * 15 + Math.PI * 6;
+  const eq = computeBeltCenterDistance({ large_pitch_diameter_in: 6, small_pitch_diameter_in: 6, belt_pitch_length_in: eqL });
+  assert.ok(Math.abs(eq.center_distance_in - 15) < 1e-6 && Math.abs(eq.wrap_small_deg - 180) < 1e-9);
+  // Error seams: non-positive dims, and a belt too short (no real root).
+  assert.ok("error" in computeBeltCenterDistance({ large_pitch_diameter_in: 0, small_pitch_diameter_in: 4, belt_pitch_length_in: L }));
+  assert.ok("error" in computeBeltCenterDistance({ large_pitch_diameter_in: 10, small_pitch_diameter_in: 4, belt_pitch_length_in: 0 }));
+  assert.ok("error" in computeBeltCenterDistance({ large_pitch_diameter_in: 10, small_pitch_diameter_in: 4, belt_pitch_length_in: 22 }));
+  assert.ok("error" in computeBeltCenterDistance({ large_pitch_diameter_in: Infinity, small_pitch_diameter_in: 4, belt_pitch_length_in: L }));
 });
 
 test("bounds: calc-cross computeGearCascade pins the product-of-ratios cascade and torque efficiency power", () => {
