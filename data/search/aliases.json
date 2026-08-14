@@ -3154,6 +3154,26 @@
    "kind": "industry"
   },
   {
+   "term": "inclined plane force",
+   "target": "inclined-plane-force",
+   "kind": "industry"
+  },
+  {
+   "term": "force to push a load up a ramp",
+   "target": "inclined-plane-force",
+   "kind": "question"
+  },
+  {
+   "term": "ramp winch pull force",
+   "target": "inclined-plane-force",
+   "kind": "adjacent"
+  },
+  {
+   "term": "will the load slide angle of repose",
+   "target": "inclined-plane-force",
+   "kind": "question"
+  },
+  {
    "term": "toggle clamp force",
    "target": "toggle-mechanism-force",
    "kind": "industry"

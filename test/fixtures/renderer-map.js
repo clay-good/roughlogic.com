@@ -1261,6 +1261,7 @@ export const RENDERER_MAP = {
   "slider-crank-piston-position": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "scotch-yoke-motion": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "toggle-mechanism-force": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
+  "inclined-plane-force": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "impact-load-factor": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "hydraulic-accumulator-volume": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "projectile-range": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },

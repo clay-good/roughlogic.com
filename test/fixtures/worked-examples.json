@@ -87569,6 +87569,68 @@
    }
   },
   {
+   "tile_id": "inclined-plane-force",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "1000 lb on a 20 deg ramp, mu 0.3: 624 lb to push up",
+   "source_edition_or_year": "inclined-plane statics",
+   "source_section_or_page": "F=W(sin+mu cos); slides above atan(mu)=16.7 deg",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "weight_lb": 1000,
+    "incline_angle_deg": 20,
+    "friction_coefficient": 0.3
+   },
+   "outputs": {
+    "force_up_lb": {
+     "value": 623.93,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "normal_force_lb": {
+     "value": 939.69,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ideal_mechanical_advantage": {
+     "value": 2.9238,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "inclined-plane-force",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Frictionless limit (mu 0): push force = W sin theta, ideal MA = 1/sin",
+   "source_edition_or_year": "inclined-plane statics",
+   "source_section_or_page": "mu=0 -> F=W sin30=500 lb, MA=1/sin30=2",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "weight_lb": 1000,
+    "incline_angle_deg": 30,
+    "friction_coefficient": 0
+   },
+   "outputs": {
+    "force_up_lb": {
+     "value": 500.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ideal_mechanical_advantage": {
+     "value": 2.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "toggle-mechanism-force",
    "source_publisher": "Project (first-principles)",
    "source_title": "50 lb at 10 deg toggle -> 142 lb (MA 2.84)",

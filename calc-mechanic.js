@@ -1636,6 +1636,56 @@ MECHANIC_RENDERERS["toggle-mechanism-force"] = _simpleRenderer({
   compute: computeToggleMechanismForce,
 });
 
+// --- spec-v1335 K: inclined-plane push/hold force (`inclined-plane-force`) ---
+// The simple-machine the MA bench skips: the force to move a load along an incline (skidding a crate up a loading
+// ramp, sizing a winch pull for a ramp, checking whether a load slides). Along the incline, F_up = W(sin th + mu cos
+// th) to move up, W(sin th - mu cos th) is the net down-slope pull gravity wins by (positive => slides on its own).
+// Ideal (frictionless) MA = 1/sin th = ramp length/rise; the self-slide threshold is the repose angle atan(mu).
+// dims: in { weight_lb: M L T^-2, incline_angle_deg: dimensionless, friction_coefficient: dimensionless } out: { force_up_lb: M L T^-2, normal_force_lb: M L T^-2, ideal_mechanical_advantage: dimensionless }
+export function computeInclinedPlaneForce({ weight_lb = 0, incline_angle_deg = 0, friction_coefficient = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const W = Number(weight_lb) || 0;
+  const theta_deg = Number(incline_angle_deg);
+  const mu = Number(friction_coefficient) || 0;
+  if (!(W > 0)) return { error: "Weight must be positive (lb)." };
+  if (!(theta_deg > 0 && theta_deg < 90)) return { error: "Incline angle must be between 0 and 90 degrees." };
+  if (mu < 0) return { error: "Friction coefficient cannot be negative." };
+  const th = (theta_deg * Math.PI) / 180;
+  const s = Math.sin(th), c = Math.cos(th);
+  const normal_force_lb = W * c;
+  const force_up_lb = W * (s + mu * c);
+  const gravity_minus_friction_lb = W * (s - mu * c); // >0 the load slides down on its own; <0 self-locking
+  const slides_on_own = s > mu * c; // tan theta > mu
+  const restraint_or_push_lb = Math.abs(gravity_minus_friction_lb);
+  const ideal_mechanical_advantage = 1 / s; // ramp length / rise, frictionless
+  const actual_mechanical_advantage = W / force_up_lb;
+  const repose_angle_deg = (Math.atan(mu) * 180) / Math.PI;
+  if (![force_up_lb, normal_force_lb, ideal_mechanical_advantage, actual_mechanical_advantage].every(Number.isFinite) || !(force_up_lb > 0)) return { error: "Inclined-plane math is not a finite value; check the inputs." };
+  return {
+    force_up_lb, normal_force_lb, gravity_minus_friction_lb, restraint_or_push_lb, slides_on_own,
+    ideal_mechanical_advantage, actual_mechanical_advantage, repose_angle_deg,
+    note: "The force to move a load along an inclined plane - the simple machine the pulley/rope/toggle MA tiles skip: skidding a crate up a loading ramp, sizing a winch or come-along pull for a ramp, or checking whether a parked load will slide. Along the incline the force to push UP at steady speed is F = W(sin theta + mu cos theta), the weight's own down-slope pull (W sin theta) plus friction (mu times the normal W cos theta); the ideal frictionless advantage is 1/sin theta, which equals the ramp length divided by its rise, so a longer, shallower ramp trades distance for force. Whether the load holds by itself is set by the angle of repose atan(mu): below it friction wins and the load is self-locking (it takes a push to send it DOWN); above it the load slides on its own and must be restrained. A 1,000 lb crate on a 20-degree ramp at mu 0.3 takes 624 lb to push up (actual advantage 1.6), sits above its 16.7-degree repose angle so it slides, and needs 60 lb to hold. Rigid load, uniform dry friction, force parallel to the incline; rolling resistance, a winch/tackle reeving (see the pulley and rope MA tiles), tipping, and dynamic starting friction are separate. A planning aid; the rigging plan and a competent person govern.",
+  };
+}
+export const inclinedPlaneForceExample = { inputs: { weight_lb: 1000, incline_angle_deg: 20, friction_coefficient: 0.3 } };
+
+MECHANIC_RENDERERS["inclined-plane-force"] = _simpleRenderer({
+  citation: "Citation: inclined-plane statics - force up the incline F = W(sin theta + mu cos theta), normal W cos theta, net down-slope pull W(sin theta - mu cos theta), ideal MA 1/sin theta = length/rise, self-slide at the repose angle atan(mu) (standard mechanics; Machinery's Handbook). Force parallel to the incline, dry friction. A planning aid; the rigging plan governs.",
+  example: inclinedPlaneForceExample.inputs,
+  fields: [
+    { key: "weight_lb", label: "Load weight (lb)", kind: "number" },
+    { key: "incline_angle_deg", label: "Incline angle (deg)", kind: "number" },
+    { key: "friction_coefficient", label: "Friction coefficient mu", kind: "number" },
+  ],
+  outputs: [
+    { key: "u", id: "inc-out-u", label: "Force to push up the incline", value: (r) => fmt(r.force_up_lb, 1) + " lb (actual advantage " + fmt(r.actual_mechanical_advantage, 2) + " vs ideal " + fmt(r.ideal_mechanical_advantage, 2) + ")" },
+    { key: "h", id: "inc-out-h", label: "Holding", value: (r) => r.slides_on_own ? ("slides on its own (above the " + fmt(r.repose_angle_deg, 1) + " deg repose angle) - needs " + fmt(r.restraint_or_push_lb, 1) + " lb to hold or lower at steady speed") : ("self-locking (below the " + fmt(r.repose_angle_deg, 1) + " deg repose angle) - needs " + fmt(r.restraint_or_push_lb, 1) + " lb to push it DOWN") },
+    { key: "n", id: "inc-out-n", label: "Normal force", value: (r) => fmt(r.normal_force_lb, 1) + " lb" },
+    { key: "t", id: "inc-out-t", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeInclinedPlaneForce,
+});
+
 // --- spec-v1302 K: impact load factor, energy method (`impact-load-factor`) ---
 // No general impact factor for a dropped/suddenly-applied load (fall-arrest is PPE, tree-rigging-shock is
 // arborist rope). Energy method: n = 1 + sqrt(1 + 2h/delta_st); impact force = nW; even h=0 gives n=2.

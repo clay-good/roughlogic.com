@@ -12079,6 +12079,18 @@ export const CITATIONS = {
       { name: "Scope", value: "position only; velocity/acceleration, pin offset, rod stretch, loads are separate", source: "scope of this tile" },
     ],
   },
+  "inclined-plane-force": {
+    formula: "F_up = W(sin theta + mu cos theta); normal = W cos theta; net down-slope = W(sin theta - mu cos theta); ideal MA = 1/sin theta = length/rise; self-slide at atan(mu).",
+    edition: "Inclined-plane statics - force up the incline W(sin theta + mu cos theta) and the angle of repose atan(mu) (standard mechanics; Machinery's Handbook), by name.",
+    freeAccess: "Inclined-plane statics is a standard published result; the weight, angle, and friction coefficient are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The force to move a load along an inclined plane. Pushing UP at steady speed takes F = W(sin theta + mu cos theta) - the weight's own down-slope component W sin theta plus dry friction mu times the normal force W cos theta. The ideal (frictionless) mechanical advantage is 1/sin theta, which equals the ramp length divided by its rise, so a longer, shallower ramp trades travel for force. Whether the load holds by itself is set by the angle of repose atan(mu): below it friction wins and the load is self-locking (it takes a push to move it DOWN), above it the load slides on its own and must be restrained. Rigid load, uniform dry friction, force parallel to the incline; rolling resistance, tackle reeving (the pulley and rope tiles), tipping, and the higher static/starting friction are separate. A planning aid; the rigging plan and a competent person govern.",
+    assumptions: [
+      { name: "Push-up force", value: "F = W(sin theta + mu cos theta), force parallel to the incline", source: "Machinery's Handbook" },
+      { name: "Self-locking", value: "self-locking below the angle of repose atan(mu); slides above it", source: "friction mechanics" },
+      { name: "Scope", value: "rigid load, dry friction; rolling resistance, tackle reeving, tipping, starting friction are separate", source: "scope of this tile" },
+    ],
+  },
   "toggle-mechanism-force": {
     formula: "F_out = F_in / (2 tan theta), theta the angle of each link from the straight (lockup) line; output travel per unit input travel = 2 tan theta; MA = 1/(2 tan theta).",
     edition: "The symmetric toggle-linkage mechanical advantage F_out = F_in/(2 tan theta) (Machinery's Handbook; standard statics of the toggle joint), by name.",

@@ -38028,6 +38028,27 @@ test("bounds: spec-v1333 computeScotchYokeMotion pins the SHM peaks, the end/mid
   assert.ok("error" in _v1333({ crank_radius_in: Infinity, crank_rpm: 300, crank_angle_deg: 45 }));
 });
 
+import { computeInclinedPlaneForce as _v1335 } from "../../calc-mechanic.js";
+test("bounds: spec-v1335 computeInclinedPlaneForce pins the push-up force, the repose self-slide flag, the frictionless limit, and error seams", () => {
+  // 1000 lb, 20 deg, mu 0.3: F_up = 1000(sin20 + 0.3 cos20) = 623.93 lb; normal 939.69; slides (tan20 > 0.3).
+  const r = _v1335({ weight_lb: 1000, incline_angle_deg: 20, friction_coefficient: 0.3 });
+  assert.ok(Math.abs(r.force_up_lb - 623.93) < 0.1 && Math.abs(r.normal_force_lb - 939.69) < 0.1);
+  assert.ok(r.slides_on_own === true && Math.abs(r.restraint_or_push_lb - 60.11) < 0.1);
+  assert.ok(Math.abs(r.repose_angle_deg - 16.699) < 1e-2 && Math.abs(r.ideal_mechanical_advantage - 2.9238) < 1e-3);
+  // Below the repose angle the load is self-locking (does not slide).
+  const lock = _v1335({ weight_lb: 1000, incline_angle_deg: 10, friction_coefficient: 0.3 });
+  assert.ok(lock.slides_on_own === false); // tan10 = 0.176 < 0.3
+  // Frictionless limit: F_up = W sin theta, ideal MA = 1/sin theta, and it always slides (mu = 0).
+  const fl = _v1335({ weight_lb: 1000, incline_angle_deg: 30, friction_coefficient: 0 });
+  assert.ok(Math.abs(fl.force_up_lb - 500) < 1e-6 && Math.abs(fl.ideal_mechanical_advantage - 2) < 1e-9 && fl.slides_on_own === true);
+  // Error seams: non-positive weight, angle at/past 0-90 bounds, negative mu, non-finite.
+  assert.ok("error" in _v1335({ weight_lb: 0, incline_angle_deg: 20, friction_coefficient: 0.3 }));
+  assert.ok("error" in _v1335({ weight_lb: 1000, incline_angle_deg: 0, friction_coefficient: 0.3 }));
+  assert.ok("error" in _v1335({ weight_lb: 1000, incline_angle_deg: 90, friction_coefficient: 0.3 }));
+  assert.ok("error" in _v1335({ weight_lb: 1000, incline_angle_deg: 20, friction_coefficient: -0.1 }));
+  assert.ok("error" in _v1335({ weight_lb: Infinity, incline_angle_deg: 20, friction_coefficient: 0.3 }));
+});
+
 import { computeToggleMechanismForce as _v1334 } from "../../calc-mechanic.js";
 test("bounds: spec-v1334 computeToggleMechanismForce pins F_out=F_in/(2 tan theta), the travel trade-off, the near-lockup warning, and error seams", () => {
   // 50 lb at 10 deg: MA = 1/(2 tan10) = 2.8356; F_out = 141.78 lb.
