@@ -808,6 +808,7 @@ export function computeStoppingSightDistance({
   grade = 0.0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  grade = Number(grade);
   const v = Number(speed_mph) || 0;
   const t = Number(reaction_time_s);
   const f = Number(friction);
@@ -1361,6 +1362,7 @@ TRUCKING_RENDERERS["axle-load-distribution"] = renderAxleLoadDistribution;
 // dims: in { linehaul_revenue: dimensionless, loaded_miles: L, deadhead_miles: L, fuel_price: dimensionless, mpg: dimensionless, variable_cpm: dimensionless, fixed_per_day: dimensionless, days: dimensionless, tolls: dimensionless, other_costs: dimensionless } out: { net_profit: dimensionless, profit_per_loaded_mile: dimensionless }
 export function computeLoadProfitability({ linehaul_revenue = 0, loaded_miles = 0, deadhead_miles = 0, fuel_price = 0, mpg = 0, variable_cpm = 0, fixed_per_day = 0, days = 0, tolls = 0, other_costs = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  deadhead_miles = Number(deadhead_miles); tolls = Number(tolls); other_costs = Number(other_costs);
   if (linehaul_revenue < 0 || deadhead_miles < 0 || variable_cpm < 0 || fixed_per_day < 0 || tolls < 0 || other_costs < 0) return { error: "Revenue, mileage, and cost inputs must be non-negative." };
   if (!(loaded_miles > 0)) return { error: "Loaded miles must be positive." };
   if (!(mpg > 0)) return { error: "Fuel economy (MPG) must be positive." };
@@ -1447,6 +1449,7 @@ TRUCKING_RENDERERS["fuel-surcharge"] = renderFuelSurcharge;
 // dims: in { tire_set_cost: dimensionless, tire_life_mi: L, pm_cost: dimensionless, pm_interval_mi: L, major_reserve_cpm: dimensionless, monthly_miles: L } out: { total_cpm: dimensionless, monthly_reserve: dimensionless }
 export function computeMaintenanceReserve({ tire_set_cost = 0, tire_life_mi = 0, pm_cost = 0, pm_interval_mi = 0, major_reserve_cpm = 0, monthly_miles = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  major_reserve_cpm = Number(major_reserve_cpm);
   if (major_reserve_cpm < 0 || monthly_miles < 0) return { error: "Reserve and mileage inputs must be non-negative." };
   if (!(tire_set_cost > 0)) return { error: "Tire set cost must be positive." };
   if (!(tire_life_mi > 0)) return { error: "Tire life must be positive." };

@@ -182,6 +182,7 @@ export const unitConverterExample = {
 // dims: in { unit_price: dimensionless, quantity: dimensionless, tax_rate_percent: dimensionless, delivery_fee: dimensionless } out: { total: dimensionless, tax: dimensionless, subtotal: dimensionless }
 export function computeMaterialCost({ unit_price, quantity, tax_rate_percent = 0, delivery_fee = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  delivery_fee = Number(delivery_fee);
   if (quantity < 0 || unit_price < 0) return { error: "Inputs must be non-negative." };
   // DR-24: a negative tax rate or delivery fee drops the total below subtotal.
   if (tax_rate_percent < 0 || delivery_fee < 0) return { error: "Tax rate and delivery fee cannot be negative." };
@@ -201,6 +202,7 @@ export const materialCostExample = {
 // dims: in { cost: dimensionless, mode: dimensionless, value: dimensionless } out: { price: dimensionless, margin: dimensionless }
 export function computeMarkup({ cost, mode, value }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  value = Number(value);
   if (cost <= 0) return { error: "Cost must be positive." };
   if (mode === "markup_percent") {
     const m = value / 100;
@@ -279,6 +281,7 @@ export const STATE_TAX_RATES = {
 // dims: in { state: dimensionless, subtotal: dimensionless, custom_rate_percent: dimensionless } out: { tax: dimensionless, total: dimensionless }
 export function computeSalesTax({ state, subtotal, custom_rate_percent = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  subtotal = Number(subtotal);
   let rate;
   if (custom_rate_percent !== null && custom_rate_percent !== undefined) {
     rate = custom_rate_percent;
@@ -300,6 +303,7 @@ export const salesTaxExample = {
 // dims: in { total_amount: dimensionless, members: dimensionless } out: { per_member: dimensionless }
 export function computeTipOut({ total_amount, members }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  total_amount = Number(total_amount);
   if (!Array.isArray(members) || members.length === 0) return { error: "Provide at least one crew member." };
   const total_hours = members.reduce((s, m) => s + (Number(m.hours) || 0), 0);
   if (total_hours <= 0) return { error: "Total hours must be positive." };
@@ -1185,6 +1189,7 @@ export const nioshLiftingExample = {
 
 // dims: in { T_F: T, RH_percent: dimensionless, solar: dimensionless } out: { heat_index_F: T, band: dimensionless }
 export function computeHeatStress({ T_F = 0, RH_percent = 0, solar = false }) {
+  T_F = Number(T_F);
   if (!(T_F >= -50 && T_F <= 200)) return { error: "Temperature out of range." };
   if (!(RH_percent >= 0 && RH_percent <= 100)) return { error: "RH must be 0-100." };
   // Rothfusz simple form (US units), valid for T >= 80 F.
@@ -1407,6 +1412,7 @@ export const timesheetExample = {
 // dims: in { wheelbase_in: L, payload_lb: M, payload_position_from_cab_in: L, gvwr_lb: M, front_gawr_lb: M, rear_gawr_lb: M, curb_front_lb: M, curb_rear_lb: M } out: { front_axle_lb: M, rear_axle_lb: M, gvw_lb: M, pass: dimensionless }
 export function computeVehicleLoad({ wheelbase_in = 0, payload_lb = 0, payload_position_from_cab_in = 0, gvwr_lb = null, front_gawr_lb = null, rear_gawr_lb = null, curb_front_lb = 0, curb_rear_lb = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  curb_front_lb = Number(curb_front_lb); curb_rear_lb = Number(curb_rear_lb);
   if (!(wheelbase_in > 0)) return { error: "Wheelbase must be positive." };
   if (!(payload_lb >= 0)) return { error: "Payload must be non-negative." };
   if (!(payload_position_from_cab_in >= 0)) return { error: "Payload position must be non-negative." };
@@ -1785,6 +1791,7 @@ export function computeFallProtectionClearance({
   actual_clearance_ft = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  worker_height_ft = Number(worker_height_ft); harness_stretch_ft = Number(harness_stretch_ft); safety_factor_ft = Number(safety_factor_ft);
   const c = FALL_PROTECTION_DECEL[connector];
   if (!c) return { error: "Unknown connector type." };
   const free_fall = free_fall_ft_override !== null && Number(free_fall_ft_override) >= 0 ? Number(free_fall_ft_override) : c.free_fall_ft;

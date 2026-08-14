@@ -516,6 +516,7 @@ export const inventoryTurnoverExample = { inputs: { cogs: 2000000, beginning_inv
 //  convention); contributions are signed copies of the inputs.)
 export function computeCashConversionCycle({ dso = 0, dio = 0, dpo = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  dso = Number(dso); dio = Number(dio); dpo = Number(dpo);
   if (!(dso >= 0) || !(dio >= 0) || !(dpo >= 0)) return { error: "Days values cannot be negative." };
   const ccc = dio + dso - dpo;
   return { ccc_days: ccc, dso, dio, dpo, dio_contribution: dio, dso_contribution: dso, dpo_contribution: -dpo };

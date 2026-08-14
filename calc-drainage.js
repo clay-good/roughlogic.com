@@ -1237,6 +1237,7 @@ const _CULVERT_OUTLET_KE = {
 // dims: in { diameter_in: L, flow_cfs: L^3 T^-1, length_ft: L, slope: dimensionless, manning_n: dimensionless, tw_ft: L, config: dimensionless } out: { d_ft: L, barrel_area_ft2: L^2, v_fps: L T^-1, velocity_head_ft: L, head_loss_ft: L, dc_ft: L, ho_ft: L, hw_ft: L, friction_coeff: dimensionless, ke: dimensionless }
 export function computeCulvertOutletControl({ diameter_in = 0, flow_cfs = 0, length_ft = 0, slope = 0, manning_n = 0.012, tw_ft = 0, config = "concrete_square_headwall" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  tw_ft = Number(tw_ft);
   const C = _CULVERT_OUTLET_KE[config];
   if (!C) return { error: "Unknown culvert inlet configuration." };
   if (!(diameter_in > 0)) return { error: "Culvert diameter must be positive (in)." };
@@ -1342,6 +1343,7 @@ const _BOX_OUTLET_KE = {
 // dims: in { span_in: L, rise_in: L, flow_cfs: L^3 T^-1, length_ft: L, slope: dimensionless, manning_n: dimensionless, tw_ft: L, config: dimensionless } out: { span_ft: L, rise_ft: L, barrel_area_ft2: L^2, r_ft: L, v_fps: L T^-1, velocity_head_ft: L, head_loss_ft: L, dc_ft: L, ho_ft: L, hw_ft: L, friction_coeff: dimensionless, ke: dimensionless }
 export function computeBoxCulvertOutletControl({ span_in = 0, rise_in = 0, flow_cfs = 0, length_ft = 0, slope = 0, manning_n = 0.012, tw_ft = 0, config = "wingwall_30_75" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  tw_ft = Number(tw_ft);
   const C = _BOX_OUTLET_KE[config];
   if (!C) return { error: "Unknown box culvert inlet configuration." };
   if (!(span_in > 0)) return { error: "Box span must be positive (in)." };

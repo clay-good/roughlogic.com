@@ -271,6 +271,7 @@ function _standardOcpdAtOrBelow(a) {
 // dims: in { largest_flc_a: I, sum_other_flc_a: I, largest_branch_ocpd_a: I } out: { min_feeder_ampacity_a: I, max_feeder_ocpd_a: I, standard_feeder_ocpd_a: I }
 export function computeMultiMotorFeeder({ largest_flc_a = 0, sum_other_flc_a = 0, largest_branch_ocpd_a = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  sum_other_flc_a = Number(sum_other_flc_a); largest_branch_ocpd_a = Number(largest_branch_ocpd_a);
   if (!(largest_flc_a >= 0)) return { error: "Largest motor full-load current cannot be negative (A)." };
   if (!(sum_other_flc_a >= 0)) return { error: "Sum of other motor full-load currents cannot be negative (A)." };
   if (!(largest_branch_ocpd_a >= 0)) return { error: "Largest branch overcurrent device rating cannot be negative (A)." };

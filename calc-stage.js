@@ -140,6 +140,7 @@ export const trussExample = {
 // base-token shortcut; speed of sound is length / time.)
 export function computeTimeAlignment({ d_main_ft = 0, d_delay_ft = 0, ambient_C = 20, haas_offset_ms = 15 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  haas_offset_ms = Number(haas_offset_ms);
   if (!(d_main_ft >= 0)) return { error: "Main distance must be non-negative." };
   if (!(d_delay_ft >= 0)) return { error: "Delay distance must be non-negative." };
   const d_main_m = d_main_ft * 0.3048;

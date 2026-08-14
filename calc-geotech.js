@@ -601,6 +601,7 @@ GEOTECH_RENDERERS["pile-length-for-capacity"] = _simpleRenderer({
 // dims: in { beta_deg: dimensionless, phi_deg: dimensionless, c_psf: M L^-1 T^-2, gamma_pcf: M L^-2 T^-2, h_ft: L } out: { driving_psf: M L^-1 T^-2, resisting_psf: M L^-1 T^-2, fs_slope: dimensionless }
 export function computeSlopeStabilityInfinite({ beta_deg = 0, phi_deg = 0, c_psf = 0, gamma_pcf = 120, h_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  c_psf = Number(c_psf);
   if (!(beta_deg > 0 && beta_deg < 90)) return { error: "Slope angle must be between 0 and 90 degrees (exclusive)." };
   if (!(phi_deg >= 0 && phi_deg < 90)) return { error: "Friction angle must be at least 0 and below 90 degrees." };
   if (c_psf < 0) return { error: "Effective cohesion cannot be negative (psf)." };
@@ -643,6 +644,7 @@ GEOTECH_RENDERERS["slope-stability-infinite"] = _simpleRenderer({
 // dims: in { beta_deg: dimensionless, phi_deg: dimensionless, c_psf: M L^-1 T^-2, gamma_sat: M L^-2 T^-2, h_ft: L } out: { driving_psf: M L^-1 T^-2, resisting_psf: M L^-1 T^-2, fs_seep: dimensionless, fs_dry: dimensionless }
 export function computeSlopeStabilitySeepage({ beta_deg = 0, phi_deg = 0, c_psf = 0, gamma_sat = 125, h_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  c_psf = Number(c_psf);
   if (!(beta_deg > 0 && beta_deg < 90)) return { error: "Slope angle must be between 0 and 90 degrees (exclusive)." };
   if (!(phi_deg >= 0 && phi_deg < 90)) return { error: "Friction angle must be at least 0 and below 90 degrees." };
   if (c_psf < 0) return { error: "Effective cohesion cannot be negative (psf)." };
@@ -729,6 +731,7 @@ GEOTECH_RENDERERS["soil-consolidation-settlement"] = _simpleRenderer({
 // dims: in { cc: dimensionless, cr: dimensionless, h_ft: L, e0: dimensionless, sig0_psf: M L^-1 T^-2, sigp_psf: M L^-1 T^-2, dsig_psf: M L^-1 T^-2 } out: { sc_ft: L, sc_in: L, ocr: dimensionless }
 export function computeOverconsolidatedSettlement({ cc = 0, cr = 0, h_ft = 0, e0 = 0, sig0_psf = 0, sigp_psf = 0, dsig_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  dsig_psf = Number(dsig_psf);
   if (!(cc > 0)) return { error: "The compression index Cc must be positive." };
   if (!(cr > 0)) return { error: "The recompression index Cr must be positive (typically Cr is about 0.1 to 0.2 of Cc)." };
   if (cr > cc) return { error: "The recompression index Cr cannot exceed the compression index Cc." };
@@ -1146,6 +1149,7 @@ GEOTECH_RENDERERS["spt-required-n60"] = _simpleRenderer({
 // dims: in { gamma_moist_pcf: M L^-2 T^-2, gamma_sat_pcf: M L^-2 T^-2, depth_ft: L, water_table_depth_ft: L, surcharge_psf: M L^-1 T^-2 } out: { total_stress_psf: M L^-1 T^-2, pore_pressure_psf: M L^-1 T^-2, effective_stress_psf: M L^-1 T^-2, gamma_buoy_pcf: M L^-2 T^-2, depth_below_wt_ft: L }
 export function computeSoilVerticalEffectiveStress({ gamma_moist_pcf = 120, gamma_sat_pcf = 125, depth_ft = 0, water_table_depth_ft = 0, surcharge_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  surcharge_psf = Number(surcharge_psf);
   if (!(gamma_moist_pcf > 0)) return { error: "Moist unit weight must be positive (pcf)." };
   if (!(gamma_sat_pcf > _GAMMA_W)) return { error: "Saturated unit weight must exceed the water unit weight (62.4 pcf)." };
   if (!(depth_ft > 0)) return { error: "Depth must be positive (ft)." };

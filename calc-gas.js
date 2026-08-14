@@ -137,6 +137,7 @@ GAS_RENDERERS["gas-pipe-sizing"] = renderGasPipeSizing;
 // dims: in { orifice_diameter_in: L, upstream_psi: M L^-1 T^-2, gas: dimensionless, c: dimensionless } out: { leak_rate_scfh: L^3 T^-1 }
 export function computeGasLeakRate({ orifice_diameter_in, upstream_psi, gas, c = 0.7 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  c = Number(c);
   const props = GAS_PROPERTIES[gas];
   if (!props) return { error: "Unknown gas." };
   const d = Number(orifice_diameter_in) || 0;

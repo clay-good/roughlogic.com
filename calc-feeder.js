@@ -349,6 +349,7 @@ const _CLO_STD_240_6 = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110
 // dims: in { l_cont_A: I, l_noncont_A: I, rated_100: dimensionless } out: { A_min: I, ocpd_A: I, mult: dimensionless }
 export function computeContinuousLoadOcpd({ l_cont_A = 0, l_noncont_A = 0, rated_100 = false } = {}) {
   const _g = _finiteGuard({ l_cont_A, l_noncont_A }); if (_g) return _g;
+  l_noncont_A = Number(l_noncont_A);
   if (l_cont_A < 0 || l_noncont_A < 0) return { error: "Loads cannot be negative (A)." };
   if (!(l_cont_A + l_noncont_A > 0)) return { error: "Total load must be positive (A)." };
   const mult = rated_100 ? 1.00 : 1.25;

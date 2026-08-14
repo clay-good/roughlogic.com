@@ -140,6 +140,7 @@ export const areaExample = {
 // dims: in { thickness_in: L, width_in: L, length_ft: L, count: dimensionless } out: { board_feet: L^3, total_board_feet: L^3 }
 export function computeBoardFootage({ thickness_in, width_in, length_ft, count = 1 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  count = Number(count);
   // BF = (T * W * L_in) / 144, where L_in = length_ft * 12. Equivalent: (T * W * L_ft) / 12.
   const bf_each = (thickness_in * width_in * length_ft) / 12;
   const total_bf = bf_each * count;
@@ -156,6 +157,7 @@ export const boardFootageExample = {
 // dims: in { shape: dimensionless, waste_factor: dimensionless, d: dimensionless } out: { volume_yd3: L^3, bags_60: dimensionless, bags_80: dimensionless }
 export function computeConcreteVolume({ shape, waste_factor = 0.10, ...d }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  waste_factor = Number(waste_factor);
   let cubic_ft = 0;
   if (shape === "slab") {
     const t_ft = (d.thickness_in || 0) / 12;
@@ -374,6 +376,7 @@ export const pulloutExample = {
 // dims: in { load_type: dimensionless, load_value: dimensionless, length_ft: L, E_psi: M L^-1 T^-2, b_in: L, d_in: L } out: { max_moment: M L^2 T^-2, deflection_in: L, max_stress_psi: M L^-1 T^-2 }
 export function computeBeamLoading({ load_type, load_value, length_ft, E_psi, b_in, d_in }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  length_ft = Number(length_ft);
   // DR-04 (RC-1): zero depth -> I = 0 -> deflection 5wL^4/(384 E I) = Infinity;
   // zero E is the same. Guard the section/material geometry before solving.
   if (!(b_in > 0) || !(d_in > 0) || !(E_psi > 0)) {
@@ -763,6 +766,7 @@ export function renderMaterialQuantity(inputRegion, outputRegion, citationEl) {
 // dims: in { total_rise_in: L, total_run_in: L, tread_cut_depth_in: L } out: { stringer_in: L, board_feet: L^3 }
 export function computeStairStringer({ total_rise_in, total_run_in, tread_cut_depth_in = 1 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  tread_cut_depth_in = Number(tread_cut_depth_in);
   const r = Number(total_rise_in) || 0;
   const run = Number(total_run_in) || 0;
   if (r <= 0 || run <= 0) return { error: "Provide positive rise and run." };
@@ -1071,6 +1075,7 @@ function renderWindSpeedFromVelocityPressure(inputRegion, outputRegion, citation
 // dims: in { Pg_psf: M L^-1 T^-2, Ce: dimensionless, Ct: dimensionless, Is: dimensionless, Cs: dimensionless, drift_upwind_length_ft: L } out: { Pf_psf: M L^-1 T^-2, Ps_psf: M L^-1 T^-2, drift_height_ft: L }
 export function computeSnowLoad({ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0, Cs = 1.0, drift_upwind_length_ft = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  Ce = Number(Ce); Ct = Number(Ct); Is = Number(Is);
   const Pg = Number(Pg_psf) || 0;
   if (Pg <= 0) return { error: "Ground snow load must be positive." };
   const Pf = 0.7 * Ce * Ct * Is * Pg;
@@ -1419,6 +1424,7 @@ export const SHEET_AREAS_FT2 = { "4x8": 32, "4x10": 40, "4x12": 48 };
 // dims: in { wall_area_ft2: L^2, ceiling_area_ft2: L^2, sheet_size: dimensionless, waste_percent: dimensionless } out: { sheets: dimensionless }
 export function computeDrywall({ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_size = "4x8", waste_percent = 10 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  wall_area_ft2 = Number(wall_area_ft2); ceiling_area_ft2 = Number(ceiling_area_ft2);
   if (!(wall_area_ft2 >= 0 && ceiling_area_ft2 >= 0)) return { error: "Areas must be non-negative." };
   const sheetA = SHEET_AREAS_FT2[sheet_size];
   if (!sheetA) return { error: "Unknown sheet size." };
@@ -1443,6 +1449,7 @@ export const SHINGLE_BUNDLES_PER_SQUARE = { "3-tab": 3, architectural: 3, premiu
 // dims: in { roof_area_ft2: L^2, pitch_rise: dimensionless, shingle_product: dimensionless, perimeter_ft: L } out: { squares: dimensionless, bundles: dimensionless }
 export function computeRoofingSquares({ roof_area_ft2 = 0, pitch_rise = 0, shingle_product = "architectural", perimeter_ft = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  perimeter_ft = Number(perimeter_ft);
   if (!(roof_area_ft2 > 0)) return { error: "Roof area must be positive." };
   if (!(pitch_rise >= 0 && pitch_rise <= 24)) return { error: "Pitch rise must be 0-24 inches per 12." };
   const bundlesPerSquare = SHINGLE_BUNDLES_PER_SQUARE[shingle_product];
@@ -2348,6 +2355,7 @@ export function computePlywoodSpan({
   live_load_psf = 0, dead_load_psf = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  panel_thickness_in = Number(panel_thickness_in);
   const rating = APA_SPAN_RATINGS[span_rating];
   if (!rating) return { error: "Unknown span rating." };
   const branch = rating[application];
@@ -4563,6 +4571,7 @@ CONSTRUCTION_RENDERERS["guard-handrail-check"] = renderGuardHandrailCheck;
 // dims: in { occupancy: dimensionless, riser_height_in: L, tread_depth_in: L, stair_width_in: L } out: { max_riser: L, min_tread: L, min_width: L, two_r_plus_t: L }
 export function computeStairCodeCheck({ occupancy = "commercial", riser_height_in = 0, tread_depth_in = 0, stair_width_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  tread_depth_in = Number(tread_depth_in);
   if (riser_height_in < 0 || tread_depth_in < 0 || stair_width_in < 0) {
     return { error: "Riser, tread, and width must be non-negative (in)." };
   }
@@ -4695,6 +4704,7 @@ CONSTRUCTION_RENDERERS["masonry-coursing"] = renderMasonryCoursing;
 // dims: in { perimeter_in: L, height_in: L, roll_width_in: L, roll_len_in: L, repeat_in: L } out: { strips_needed: dimensionless, strip_len_in: L, strips_per_roll: dimensionless, rolls: dimensionless }
 export function computeWallpaperRolls({ perimeter_in = 0, height_in = 0, roll_width_in = 0, roll_len_in = 0, repeat_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  repeat_in = Number(repeat_in);
   if (!(perimeter_in > 0)) return { error: "Wall perimeter must be positive (in)." };
   if (!(height_in > 0)) return { error: "Wall height must be positive (in)." };
   if (!(roll_width_in > 0)) return { error: "Roll width must be positive (in)." };
@@ -4839,6 +4849,7 @@ CONSTRUCTION_RENDERERS["metal-roof-panels"] = renderMetalRoofPanels;
 // dims: in { ridge_lf: L, hip_lf: L, cap_lf_per_bundle: L, cap_exposure_in: L, squares: dimensionless, shingles_per_sq: dimensionless, nails_per_shingle: dimensionless, nails_per_lb: dimensionless } out: { cap_len_lf: L, cap_bundles: dimensionless, field_nails: dimensionless, cap_pieces: dimensionless, cap_nails: dimensionless, total_nails: dimensionless, nail_lbs: dimensionless }
 export function computeRidgeCapFasteners({ ridge_lf = 0, hip_lf = 0, cap_lf_per_bundle = 20, cap_exposure_in = 5, squares = 0, shingles_per_sq = 64, nails_per_shingle = 4, nails_per_lb = 150 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  ridge_lf = Number(ridge_lf); hip_lf = Number(hip_lf);
   if (ridge_lf < 0) return { error: "Ridge length cannot be negative." };
   if (hip_lf < 0) return { error: "Hip length cannot be negative." };
   if (!(cap_lf_per_bundle > 0)) return { error: "Cap coverage per bundle must be positive." };
@@ -6939,6 +6950,7 @@ CONSTRUCTION_RENDERERS["wood-screw-withdrawal"] = _renderWoodScrewWithdrawal;
 // dims: in { L_ft: L, P_lb: M L T^-2, w_plf: M T^-2, E_psi: M L^-1 T^-2, I_in4: L^4 } out: { M_lbft: M L^2 T^-2, V_lb: M L T^-2, delta_in: L }
 export function computeCantileverBeam({ L_ft = 0, P_lb = 0, w_plf = 0, E_psi = 29e6, I_in4 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  P_lb = Number(P_lb);
   if (!(L_ft > 0)) return { error: "Cantilever length must be positive (ft)." };
   if (!(E_psi > 0)) return { error: "Modulus of elasticity must be positive (psi)." };
   if (!(I_in4 > 0)) return { error: "Moment of inertia must be positive (in^4)." };
@@ -7040,6 +7052,7 @@ CONSTRUCTION_RENDERERS["section-properties"] = _renderSectionProperties;
 // dims: in { P_lb: M L T^-2, M_lbin: M L^2 T^-2, A_in2: L^2, c_in: L, I_in4: L^4, e_in: L } out: { sigma_axial: M L^-1 T^-2, sigma_bend: M L^-1 T^-2, sigma_max: M L^-1 T^-2, sigma_min: M L^-1 T^-2 }
 export function computeCombinedStressAxialBending({ P_lb = 0, M_lbin = 0, A_in2 = 0, c_in = 0, I_in4 = 0, e_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  M_lbin = Number(M_lbin);
   if (!(A_in2 > 0)) return { error: "Cross-sectional area must be positive (in^2)." };
   if (!(c_in > 0)) return { error: "Extreme-fiber distance c must be positive (in)." };
   if (!(I_in4 > 0)) return { error: "Moment of inertia must be positive (in^4)." };

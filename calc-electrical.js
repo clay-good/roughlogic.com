@@ -229,6 +229,7 @@ export const BOX_FILL_PER_CONDUCTOR_IN3 = {
 // dims: in { box_volume_in3: L^3, conductors_by_size: dimensionless, devices: dimensionless, internal_clamps: dimensionless, largest_awg_for_clamp_and_device: dimensionless } out: { fill_in3: L^3, free_in3: L^3, pass: dimensionless }
 export function computeBoxFill({ box_volume_in3, conductors_by_size, devices = 0, internal_clamps = false, largest_awg_for_clamp_and_device = "14" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  box_volume_in3 = Number(box_volume_in3);
   let fill = 0;
   for (const [awg, count] of Object.entries(conductors_by_size)) {
     const v = BOX_FILL_PER_CONDUCTOR_IN3[awg];
@@ -4321,6 +4322,7 @@ ELECTRICAL_RENDERERS["egc-upsize-proportional"] = renderEgcUpsizeProportional;
 // dims: in { configuration: dimensionless, line_voltage_v: M L^2 T^-3 I^-1, line_current_a: I, power_factor: dimensionless } out: { phase_voltage_v: M L^2 T^-3 I^-1, phase_current_a: I, power_va: M L^2 T^-3, power_w: M L^2 T^-3 }
 export function computeDeltaWyeLinePhase({ configuration = "wye", line_voltage_v = 0, line_current_a = 0, power_factor = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  line_voltage_v = Number(line_voltage_v);
   if (configuration !== "wye" && configuration !== "delta") return { error: "Configuration must be wye or delta." };
   if (!(line_voltage_v >= 0)) return { error: "Line voltage cannot be negative (V)." };
   if (!(line_current_a >= 0)) return { error: "Line current cannot be negative (A)." };

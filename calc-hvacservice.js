@@ -504,6 +504,7 @@ HVACSERVICE_RENDERERS["furnace-temp-rise"] = _simpleRenderer({
 // dims: in { input_btuh: M L^2 T^-3, efficiency_pct: dimensionless, cfm: L^3 T^-1, return_air_F: T, rise_min_F: T, rise_max_F: T } out: { output_btuh: M L^2 T^-3, delta_T_F: T, supply_air_F: T }
 export function computeFurnaceAirflowToRise({ input_btuh = 0, efficiency_pct = 80, cfm = 0, return_air_F = 70, rise_min_F = 40, rise_max_F = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  return_air_F = Number(return_air_F);
   if (!(input_btuh > 0)) return { error: "Furnace input must be positive (BTU/hr)." };
   if (!(efficiency_pct > 0)) return { error: "Efficiency must be positive (percent)." };
   if (!(cfm > 0)) return { error: "Blower airflow must be positive (CFM)." };

@@ -296,6 +296,7 @@ export const pumpSizingExample = {
 // dims: in { elevation_change_ft: L, friction_loss_psi: M L^-1 T^-2, fluid_density_lb_ft3: M L^-3 } out: { total_pressure_loss_psi: M L^-1 T^-2 }
 export function computeStaticPressureLossPiping({ elevation_change_ft, friction_loss_psi = 0, fluid_density_lb_ft3 = 62.4 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  friction_loss_psi = Number(friction_loss_psi);
   // DR-09: a non-positive density is non-physical (yields zero/negative head).
   if (!(fluid_density_lb_ft3 > 0)) return { error: "Fluid density must be positive." };
   const elev_psi = (elevation_change_ft * fluid_density_lb_ft3) / 144;
@@ -583,6 +584,7 @@ export const PDI_WH_ARRESTOR_SIZES = [
 // dims: in { wsfu: dimensionless, length_ft: L, internal_diameter_in: L, system_pressure_psi: M L^-1 T^-2 } out: { aa_size: dimensionless, pre_charge_psi: M L^-1 T^-2 }
 export function computeWaterHammerArrestor({ wsfu, length_ft = 0, internal_diameter_in = 0, system_pressure_psi = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  internal_diameter_in = Number(internal_diameter_in);
   const w = Number(wsfu) || 0;
   if (w <= 0) return { error: "Provide a positive WSFU total." };
   const row = PDI_WH_ARRESTOR_SIZES.find((r) => w <= r.max_wsfu);
@@ -1191,6 +1193,7 @@ function rhoAt(F) {
 // dims: in { system_volume_gal: L^3, fill_temperature_F: T, max_temperature_F: T, fill_pressure_psi: M L^-1 T^-2, relief_pressure_psi: M L^-1 T^-2 } out: { tank_gal: L^3 }
 export function computeExpansionTank({ system_volume_gal = 0, fill_temperature_F = 60, max_temperature_F = 200, fill_pressure_psi = 12, relief_pressure_psi = 30 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  fill_pressure_psi = Number(fill_pressure_psi);
   if (!(system_volume_gal > 0)) return { error: "System volume must be positive." };
   if (!(max_temperature_F > fill_temperature_F)) return { error: "Max temperature must exceed fill temperature." };
   if (!(relief_pressure_psi > fill_pressure_psi)) return { error: "Relief pressure must exceed fill pressure." };

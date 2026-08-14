@@ -76,6 +76,7 @@ export const pacingExample = { inputs: { calibration_distance_ft: 200, calibrati
 //  §7.1 convention. The direction toggle is a categorical token.)
 export function computeBearingConversion({ declination_deg = 0, bearing_deg = 0, direction = "magnetic_to_true" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  declination_deg = Number(declination_deg); bearing_deg = Number(bearing_deg);
   if (declination_deg < -180 || declination_deg > 180) return { error: "Declination out of range." };
   if (bearing_deg < 0 || bearing_deg > 360) return { error: "Bearing out of range." };
   let result;

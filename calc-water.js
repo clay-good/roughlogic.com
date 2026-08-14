@@ -1474,6 +1474,7 @@ WATER_RENDERERS["backflow-test-psi"] = renderBackflowTestPSI;
 // dims: in { applied_mg_l: M L^-3, measured_residual_mg_l: M L^-3, target_residual_mg_l: M L^-3 } out: { demand_mg_l: M L^-3, dose_for_target_mg_l: M L^-3 }
 export function computeChlorineDemand({ applied_mg_l = 0, measured_residual_mg_l = 0, target_residual_mg_l = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  target_residual_mg_l = Number(target_residual_mg_l);
   if (!(applied_mg_l > 0)) return { error: "Applied chlorine must be positive (mg/L)." };
   if (measured_residual_mg_l < 0) return { error: "Measured residual must be non-negative (mg/L)." };
   if (target_residual_mg_l < 0) return { error: "Target residual must be non-negative (mg/L)." };

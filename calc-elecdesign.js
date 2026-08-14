@@ -87,6 +87,7 @@ export const ELECDESIGN_RENDERERS = {};
 // dims: in { pull_type: dimensionless, largest_raceway_in: L, other_raceways_in: L } out: { straight_min: L, angle_min: L, between: L, governing: L }
 export function computePullBoxSizing({ pull_type = "straight", largest_raceway_in = 0, other_raceways_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  other_raceways_in = Number(other_raceways_in);
   if (other_raceways_in < 0) return { error: "The same-row other-raceways sum must be non-negative." };
   if (!(largest_raceway_in > 0)) return { error: "Largest raceway trade size must be positive." };
   const straight_min = 8 * largest_raceway_in;

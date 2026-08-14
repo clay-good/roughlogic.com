@@ -1536,6 +1536,7 @@ export function computeNPSHa({
   npsh_required_ft = null,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  source_elevation_relative_ft = Number(source_elevation_relative_ft); friction_loss_ft = Number(friction_loss_ft);
   if (!(water_temp_F >= 32)) return { error: "Water temperature must be at or above 32 F." };
   if (friction_loss_ft < 0) return { error: "Friction loss cannot be negative." };
   const H_atm = H_ATM_AT_ELEVATION_FT(elevation_ft);
@@ -3172,6 +3173,7 @@ function _rEnv(spec) {
 // (R-value carries hr-sq-ft-degF/Btu; treated dimensionless per spec-v14 for the U=1/R reciprocal and area-weighting core.)
 export function computeAssemblyRValue({ cavity_r = 0, continuous_r = 0, stud_depth_in = 0, framing_factor = 0.25, air_films_r = 0.85, finish_layers_r = 1.05 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  cavity_r = Number(cavity_r); continuous_r = Number(continuous_r); air_films_r = Number(air_films_r); finish_layers_r = Number(finish_layers_r);
   if (cavity_r < 0 || continuous_r < 0 || air_films_r < 0 || finish_layers_r < 0) return { error: "R-values must be non-negative." };
   if (!(stud_depth_in > 0)) return { error: "Stud depth must be positive." };
   if (!(framing_factor >= 0 && framing_factor < 1)) return { error: "Framing factor must be at least 0 and less than 1." };
@@ -3518,6 +3520,7 @@ HVAC_RENDERERS["air-pressure-setpoint-savings"] = _rEnv({
 // dims: in { cfm: L^3 T^-1, t_oa_F: T, t_ra_F: T, eps_s: dimensionless } out: { dT_F: T, t_leave_F: T, Q_s_btuh: M L^2 T^-3, Q_noerv_btuh: M L^2 T^-3, Q_resid_btuh: M L^2 T^-3 }
 export function computeErvSensibleRecovery({ cfm = 0, t_oa_F = 0, t_ra_F = 0, eps_s = 0.75 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  t_oa_F = Number(t_oa_F);
   if (!(cfm > 0)) return { error: "Ventilation airflow must be positive (cfm)." };
   if (!(eps_s >= 0 && eps_s <= 1)) return { error: "Sensible effectiveness must be between 0 and 1." };
   const dT_F = t_ra_F - t_oa_F;
@@ -3593,6 +3596,7 @@ HVAC_RENDERERS["mua-tempering-load"] = _rEnv({
 // dims: in { n: dimensionless, co2_set_ppm: dimensionless, co2_oa_ppm: dimensionless, gen_cfm: L^3 T^-1 } out: { Q_person_cfm: L^3 T^-1, Q_total_cfm: L^3 T^-1, co2_check_ppm: dimensionless }
 export function computeDcvCo2Ventilation({ n = 0, co2_set_ppm = 0, co2_oa_ppm = 400, gen_cfm = 0.0106 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  co2_oa_ppm = Number(co2_oa_ppm);
   if (!(n > 0)) return { error: "Occupancy must be positive." };
   if (!(gen_cfm > 0)) return { error: "Per-person CO2 generation must be positive (cfm)." };
   if (co2_oa_ppm < 0) return { error: "Outdoor CO2 must be non-negative (ppm)." };

@@ -58,6 +58,7 @@ export const fireFrictionExample = {
 //        out: { pdp_psi: M L^-1 T^-2, elevation_psi: M L^-1 T^-2 }
 export function computePDP({ nozzle_pressure_psi, friction_loss_psi, elevation_ft = 0, appliance_loss_psi = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  nozzle_pressure_psi = Number(nozzle_pressure_psi); friction_loss_psi = Number(friction_loss_psi); appliance_loss_psi = Number(appliance_loss_psi);
   // DR-08: pressures and losses cannot be negative (elevation may be, for a
   // downhill lay). One validation pass for the unguarded pressure inputs.
   if (!(nozzle_pressure_psi >= 0) || !(friction_loss_psi >= 0) || !(appliance_loss_psi >= 0)) {
@@ -80,6 +81,7 @@ export const pdpExample = {
 //        out: { flow_gpm: L^3 T^-1, coefficient_of_discharge: dimensionless, reaction_lb: M L T^-2 }
 export function computeHydrantFlow({ pitot_psi, outlet_diameter_in, c = 0.9 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  c = Number(c);
   // v23 EN.12: smooth-bore outlet reaction NR = 1.57 * d^2 * NP (IFSTA),
   // treating the pitot pressure as the nozzle pressure. Finite-guarded so a
   // perturbed pitot / diameter never leaks a non-finite field.

@@ -817,6 +817,7 @@ KITCHEN_RENDERERS["food-cost-percentage"] = renderFoodCostPercentage;
 // dims: in { food_cost: dimensionless, beverage_cost: dimensionless, labor_cost: dimensionless, total_sales: dimensionless } out: { prime_cost: dimensionless, prime_cost_pct: dimensionless }
 export function computePrimeCost({ food_cost = 0, beverage_cost = 0, labor_cost = 0, total_sales = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  food_cost = Number(food_cost); beverage_cost = Number(beverage_cost); labor_cost = Number(labor_cost);
   if (food_cost < 0 || beverage_cost < 0 || labor_cost < 0) return { error: "Cost inputs must be non-negative." };
   if (!(total_sales > 0)) return { error: "Total sales must be positive." };
   const cogs_total = food_cost + beverage_cost;
@@ -853,6 +854,7 @@ KITCHEN_RENDERERS["prime-cost"] = renderPrimeCost;
 // dims: in { bottle_cost: dimensionless, bottle_size_ml: L, pour_size_oz: L, target_pour_cost_pct: dimensionless, other_cost_per_drink: dimensionless } out: { pours_per_bottle: dimensionless, suggested_price: dimensionless }
 export function computePourCost({ bottle_cost = 0, bottle_size_ml = 0, pour_size_oz = 0, target_pour_cost_pct = 0, other_cost_per_drink = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  other_cost_per_drink = Number(other_cost_per_drink);
   if (other_cost_per_drink < 0) return { error: "Per-drink add must be non-negative." };
   if (!(bottle_cost > 0)) return { error: "Bottle cost must be positive." };
   if (!(bottle_size_ml > 0)) return { error: "Bottle size must be positive." };

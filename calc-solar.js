@@ -53,6 +53,7 @@ export function computePVStringSizing({
   inverter_mppt_min_V, inverter_mppt_max_V, inverter_vdc_max_V,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  inverter_mppt_max_V = Number(inverter_mppt_max_V);
   if (!module_voc_V || !module_vmp_V) return { error: "Module Voc and Vmp are required." };
   const coeff = Math.abs(Number(voc_temp_coeff_pct_per_C) || 0);
   const cold_voc = module_voc_V * (1 + coeff * (25 - record_low_C) / 100);

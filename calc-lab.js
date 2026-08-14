@@ -573,6 +573,7 @@ export const pcrExample = {
 //  `(N^-1 L^2) * (N L^-3) * L = dimensionless` is consistent.)
 export function computeBeerLambert({ absorbance = 0, path_length_cm = 1, epsilon = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  absorbance = Number(absorbance);
   if (!(absorbance >= 0)) return { error: "Absorbance cannot be negative." };
   if (!(path_length_cm > 0)) return { error: "Path length must be positive." };
   if (!(epsilon > 0)) return { error: "Molar extinction coefficient must be positive." };

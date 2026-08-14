@@ -134,6 +134,7 @@ FIRESPRINKLER_RENDERERS["fire-pump-curve"] = _simpleRenderer({
 // dims: in { density: L T^-1, design_area: L^2, hose_gpm: L^3 T^-1, duration_min: T } out: { sprinkler_gpm: L^3 T^-1, total_gpm: L^3 T^-1, volume_gal: L^3 }
 export function computeSprinklerSystemDemand({ density = 0.20, design_area = 1500, hose_gpm = 250, duration_min = 90 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  hose_gpm = Number(hose_gpm);
   if (!(density > 0)) return { error: "Design density must be positive (gpm/ft^2)." };
   if (!(design_area > 0)) return { error: "Design area must be positive (ft^2)." };
   if (hose_gpm < 0) return { error: "Hose allowance cannot be negative (gpm)." };
