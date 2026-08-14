@@ -11837,6 +11837,18 @@ export const CITATIONS = {
       { name: "Scope", value: "one base zero is the spherical cap; the lateral surface and an off-axis/ellipsoidal zone are separate", source: "scope of this tile" },
     ],
   },
+  "barrel-volume": {
+    formula: "Parabolic staves V = (pi L/15)(2D^2 + Dd + 3/4 d^2) (exact for a parabolic profile); circular-arc staves V = (pi L/12)(2D^2 + d^2) (Kepler); both collapse to the cylinder when D = d.",
+    edition: "The barrel / cask volume - standard solid geometry (Kepler's barrel rule) as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure solid geometry, public; the bung diameter, head diameter, and length are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Volume of a barrel or cask - the bulged-side shape a straight-wall cylinder tile cannot give: a barrel, cask, bulged steel drum, or rain barrel that swells to a larger middle (bung) diameter D than its ends (head diameter d) over a length L. Two standard closed forms bracket it: parabolic staves V = (pi L/15)(2D^2 + Dd + 3/4 d^2), exact when the stave profile is a parabola, and circular-arc staves V = (pi L/12)(2D^2 + d^2), Kepler's classic approximation for a circular profile. A real barrel's staves fall between the two, typically under 1% apart, so the pair brackets the true volume. Both reduce exactly to the straight cylinder pi(D/2)^2 L when D = d. Enter inside dimensions in inches; reported in US gallons and cubic feet. The staved geometry is idealized; a strapping chart or a water fill governs custody transfer.",
+    assumptions: [
+      { name: "Parabolic staves", value: "V = (pi L/15)(2D^2 + Dd + 3/4 d^2), exact for a parabolic profile", source: "solid geometry (integration)" },
+      { name: "Circular staves", value: "V = (pi L/12)(2D^2 + d^2), Kepler's barrel rule", source: "Kepler; Machinery's Handbook" },
+      { name: "Scope", value: "bung diameter >= head diameter (bulges outward); both forms collapse to the cylinder when D = d", source: "scope of this tile" },
+    ],
+  },
   "cylindrical-wedge-volume": {
     formula: "V = (2/3) R^2 H = D^2 H/6 for a cylinder cut by a plane through a base diameter (base a semicircle, rise H at the far side); no pi (the base pi cancels the sloping-top integral).",
     edition: "The cylindrical wedge (ungula) volume - standard solid geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",

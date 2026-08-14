@@ -2131,6 +2131,55 @@ function _v1330renderCylindricalWedgeVolume(inputRegion, outputRegion, citationE
 }
 SHOP_RENDERERS["cylindrical-wedge-volume"] = _v1330renderCylindricalWedgeVolume;
 
+// spec-v1331: barrel / cask volume (bulged sides). The tank-volume family assumes STRAIGHT cylinder walls; a barrel,
+// cask, bulged steel drum, or rain barrel swells to a larger middle (bung) diameter than its ends (heads). Two
+// standard closed forms from the bung diameter D, head diameter d, and length L: parabolic staves (EXACT for a
+// parabolic profile) V = (pi L/15)(2 D^2 + D d + (3/4) d^2), and circular-arc staves (Kepler's approximation)
+// V = (pi L/12)(2 D^2 + d^2). Both collapse to the straight cylinder when D = d. Real barrels sit between the two,
+// within ~0.5%. Inches in; gallons + ft^3 out.
+// dims: in { bung_diameter_in: L, head_diameter_in: L, length_in: L } out: { parabolic_gal: L^3, circular_gal: L^3, parabolic_in3: L^3 }
+export function computeBarrelVolume({ bung_diameter_in = 0, head_diameter_in = 0, length_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const IN3_PER_GAL = 231;
+  const IN3_PER_FT3 = 1728;
+  const D = Number(bung_diameter_in) || 0;
+  const d = Number(head_diameter_in) || 0;
+  const L = Number(length_in) || 0;
+  if (!(D > 0)) return { error: "Bung (middle) diameter must be positive." };
+  if (!(d > 0)) return { error: "Head (end) diameter must be positive." };
+  if (!(L > 0)) return { error: "Length must be positive." };
+  if (d > D) return { error: "Head diameter cannot exceed the bung (middle) diameter; a barrel bulges outward. Swap the values or use tapered-tank-volume for a frustum." };
+  const parabolic_in3 = (Math.PI * L / 15) * (2 * D * D + D * d + 0.75 * d * d);
+  const circular_in3 = (Math.PI * L / 12) * (2 * D * D + d * d);
+  if (![parabolic_in3, circular_in3].every(Number.isFinite) || !(parabolic_in3 > 0)) return { error: "Barrel math is not a finite value; check the inputs." };
+  return {
+    parabolic_in3, parabolic_gal: parabolic_in3 / IN3_PER_GAL, parabolic_ft3: parabolic_in3 / IN3_PER_FT3,
+    circular_gal: circular_in3 / IN3_PER_GAL,
+    note: "Volume of a barrel or cask - the bulged-side shape the straight-wall tank-volume tile cannot do: a barrel, cask, bulged steel drum, or rain barrel that swells to a larger middle (bung) diameter D than its ends (head diameter d) over a length L. Two standard closed forms: parabolic staves (EXACT if the profile is a parabola) V = (pi L/15)(2 D^2 + D d + 3/4 d^2), and circular-arc staves (Kepler's classic approximation) V = (pi L/12)(2 D^2 + d^2). A real barrel's staves sit between the two, so the pair brackets the true volume - here they differ by well under 1%. Both collapse exactly to the straight cylinder pi(D/2)^2 L when D = d, so a nearly straight drum reads like a cylinder. A D = 27 in bung, d = 24 in head, L = 36 in barrel holds 82.8 gal (parabolic) to 83.0 gal (circular). Enter inside dimensions in inches. The staved geometry is idealized; a strapping chart or a water fill governs custody. US gallons (231 in^3).",
+  };
+}
+export const barrelVolumeExample = { inputs: { bung_diameter_in: 27, head_diameter_in: 24, length_in: 36 } };
+function _v1331renderBarrelVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: barrel / cask volume - parabolic staves V = (pi L/15)(2D^2 + Dd + 3/4 d^2) and circular-arc staves (Kepler) V = (pi L/12)(2D^2 + d^2), from the bung (middle) diameter D, head (end) diameter d, and length L. Standard solid geometry (Machinery's Handbook; Kepler's barrel rule), by name; public domain. A takeoff aid; a strapping chart or water fill governs custody.";
+  const D = makeNumber("Bung (middle) diameter (in)", "brl-d", { step: "any", min: "0" }); D.input.value = "27";
+  const d = makeNumber("Head (end) diameter (in)", "brl-hd", { step: "any", min: "0" }); d.input.value = "24";
+  const L = makeNumber("Length (in)", "brl-l", { step: "any", min: "0" }); L.input.value = "36";
+  for (const f of [D, d, L]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D.input.value = "27"; d.input.value = "24"; L.input.value = "36"; update(); });
+  const oV = makeOutputLine(outputRegion, "Volume (parabolic staves, exact)", "brl-out-v");
+  const oC = makeOutputLine(outputRegion, "Volume (circular-arc estimate)", "brl-out-c");
+  const oNote = makeOutputLine(outputRegion, "Note", "brl-out-n");
+  const update = debounce(() => {
+    const res = computeBarrelVolume({ bung_diameter_in: Number(D.input.value) || 0, head_diameter_in: Number(d.input.value) || 0, length_in: Number(L.input.value) || 0 });
+    if (res.error) { oV.textContent = res.error; oC.textContent = "-"; oNote.textContent = ""; return; }
+    oV.textContent = fmt(res.parabolic_gal, 2) + " gal (" + fmt(res.parabolic_ft3, 3) + " ft^3, " + fmt(res.parabolic_in3, 0) + " in^3)";
+    oC.textContent = fmt(res.circular_gal, 2) + " gal";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [D, d, L]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["barrel-volume"] = _v1331renderBarrelVolume;
+
 // ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
 // dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
 export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {

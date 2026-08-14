@@ -88927,6 +88927,62 @@
    }
   },
   {
+   "tile_id": "barrel-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Barrel bung 27 in, head 24 in, length 36 in (parabolic staves)",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "V=(pi L/15)(2D^2+Dd+3/4 d^2); matches numeric integral",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "bung_diameter_in": 27,
+    "head_diameter_in": 24,
+    "length_in": 36
+   },
+   "outputs": {
+    "parabolic_gal": {
+     "value": 82.84,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "circular_gal": {
+     "value": 82.99,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "barrel-volume",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Straight sides (bung = head = 24 in, L 36 in) collapses to the cylinder",
+   "source_edition_or_year": "solid geometry",
+   "source_section_or_page": "D=d gives pi(12^2)(36)=16286 in^3 = 70.50 gal",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "bung_diameter_in": 24,
+    "head_diameter_in": 24,
+    "length_in": 36
+   },
+   "outputs": {
+    "parabolic_gal": {
+     "value": 70.502,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "circular_gal": {
+     "value": 70.502,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cylindrical-wedge-volume",
    "source_publisher": "Project (first-principles)",
    "source_title": "Cylindrical wedge (ungula) D 4 ft, H 3 ft",

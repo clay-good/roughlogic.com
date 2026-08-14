@@ -38344,6 +38344,31 @@
    "kind": "adjacent"
   },
   {
+   "term": "barrel volume",
+   "target": "barrel-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "cask volume",
+   "target": "barrel-volume",
+   "kind": "industry"
+  },
+  {
+   "term": "volume of a bulged drum",
+   "target": "barrel-volume",
+   "kind": "question"
+  },
+  {
+   "term": "rain barrel capacity",
+   "target": "barrel-volume",
+   "kind": "adjacent"
+  },
+  {
+   "term": "kepler barrel rule",
+   "target": "barrel-volume",
+   "kind": "adjacent"
+  },
+  {
    "term": "cylindrical wedge volume",
    "target": "cylindrical-wedge-volume",
    "kind": "industry"

@@ -3064,6 +3064,7 @@ cross-check.
 | calc-service.js | `computeTprDischarge` | `{ heater_input, valve_rating, outlet_size = 0.75 } = {}` | _ | _ | _ |
 | calc-service.js | `computeVfdEnergySavings` | `{ full_load_kw = 0, frac_a = 1.0, hours_a = 0, frac_b = 0.75, hours_b = 0, fr...` | _ | _ | _ |
 | calc-shop.js | `computeAnnulusArea` | `{ outer_diameter = 0, inner_diameter = 0 } = {}` | _ | _ | _ |
+| calc-shop.js | `computeBarrelVolume` | `{ bung_diameter_in = 0, head_diameter_in = 0, length_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCarbonEquivalent` | `{ c = 0, mn = 0, cr = 0, mo = 0, v = 0, ni = 0, cu = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCircularSector` | `{ radius = 0, angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCompoundMiter` | `{ spring_angle_deg = 38, corner_angle_deg = 90 } = {}` | _ | _ | _ |
@@ -3368,7 +3369,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1954.
+Row count: 1955.
 
 <!-- END function-corpus-v14 -->
 
@@ -4534,11 +4535,12 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (91 tiles)
+### Group G Cross-trade (92 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `annulus-area` | Annulus (Ring) Area | Project (first-principles); (pi/4)(D^2-d^2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `barrel-volume` | Barrel / Cask Volume (Bulged Sides) | Project (first-principles); V=(pi L/15)(2D^2+Dd+3/4 d^2); matches numeric integral | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `belt-hp-transmitted` | Belt Power from Tension and Speed | belt-drive power relation (Machinery'...; spec-v807 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bolt-circle` | Bolt Circle Layout | First-principles circle-of-holes trig...; 8-in bolt circle, 6 holes, start 0 deg -> R 4, spacing 60... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bolt-proof-load` | Bolt Proof, Yield, and Tensile Load (SAE J429) | SAE J429 (ASME B1.1 tensile stress area); spec-v503 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5244,6 +5246,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1703. Fixture-covered or reference-cadence: 1703 / 1703.
+Tile count: 1704. Fixture-covered or reference-cadence: 1704 / 1704.
 
 <!-- END tile-index-v14 -->

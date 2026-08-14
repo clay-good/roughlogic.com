@@ -38500,6 +38500,26 @@ test("bounds: spec-v1329 computeParaboloidVolume pins the half-cylinder full vol
   assert.ok("error" in _v1329({ base_diameter_ft: Infinity, height_ft: 3, fill_depth_ft: 1 }));
 });
 
+import { computeBarrelVolume as _v1331 } from "../../calc-shop.js";
+test("bounds: spec-v1331 computeBarrelVolume pins the parabolic/circular forms, the cylinder collapse, the bracket, and error seams", () => {
+  // Bung 27, head 24, L 36 in: parabolic (pi 36/15)(2*729+648+0.75*576)=19136 in^3 = 82.84 gal.
+  const b = _v1331({ bung_diameter_in: 27, head_diameter_in: 24, length_in: 36 });
+  assert.ok(Math.abs(b.parabolic_gal - 82.84) < 0.05 && Math.abs(b.parabolic_in3 - b.parabolic_gal * 231) < 1e-6);
+  assert.ok(Math.abs(b.parabolic_ft3 - b.parabolic_in3 / 1728) < 1e-9);
+  // The circular-arc estimate brackets it from above (Kepler), within ~0.5%.
+  assert.ok(b.circular_gal > b.parabolic_gal && (b.circular_gal - b.parabolic_gal) / b.parabolic_gal < 0.01);
+  // Straight sides (D = d) collapse BOTH forms to the cylinder pi(D/2)^2 L.
+  const straight = _v1331({ bung_diameter_in: 24, head_diameter_in: 24, length_in: 36 });
+  const cyl_gal = Math.PI * 12 * 12 * 36 / 231;
+  assert.ok(Math.abs(straight.parabolic_gal - cyl_gal) < 1e-6 && Math.abs(straight.circular_gal - cyl_gal) < 1e-6);
+  // Error seams: non-positive dims, head > bung (not a barrel), non-finite.
+  assert.ok("error" in _v1331({ bung_diameter_in: 0, head_diameter_in: 24, length_in: 36 }));
+  assert.ok("error" in _v1331({ bung_diameter_in: 27, head_diameter_in: 0, length_in: 36 }));
+  assert.ok("error" in _v1331({ bung_diameter_in: 27, head_diameter_in: 24, length_in: 0 }));
+  assert.ok("error" in _v1331({ bung_diameter_in: 24, head_diameter_in: 27, length_in: 36 }));
+  assert.ok("error" in _v1331({ bung_diameter_in: Infinity, head_diameter_in: 24, length_in: 36 }));
+});
+
 import { computeCylindricalWedgeVolume as _v1330 } from "../../calc-shop.js";
 test("bounds: spec-v1330 computeCylindricalWedgeVolume pins the (2/3)R^2 H closed form, the 21.2% cylinder fraction, and error seams", () => {
   // D 4 (R 2), H 3: V = (2/3)(4)(3) = 8 ft^3 exactly = D^2 H/6, and no pi.
