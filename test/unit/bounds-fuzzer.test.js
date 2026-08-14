@@ -38005,6 +38005,29 @@ test("bounds: spec-v1300 computeSliderCrankPistonPosition pins the TDC/BDC endpo
   assert.ok("error" in _v1300({ stroke_in: 3.48, rod_length_in: Infinity, crank_angle_deg: 90 }));
 });
 
+import { computeScotchYokeMotion as _v1333 } from "../../calc-mechanic.js";
+test("bounds: spec-v1333 computeScotchYokeMotion pins the SHM peaks, the end/mid-stroke identities, and error seams", () => {
+  // r 2 in, 300 rpm: omega = 31.4159 rad/s; stroke 4 in; peak v = r*omega = 62.83 in/s = 5.236 ft/s; peak a = r*omega^2 = 1973.9 in/s^2 = 5.113 g.
+  const s = _v1333({ crank_radius_in: 2, crank_rpm: 300, crank_angle_deg: 45 });
+  assert.ok(Math.abs(s.stroke_in - 4) < 1e-9 && Math.abs(s.peak_velocity_fps - 5.236) < 1e-3);
+  assert.ok(Math.abs(s.peak_velocity_ips - 62.8319) < 1e-3 && Math.abs(s.peak_accel_g - 5.1126) < 1e-3);
+  // At 45 deg: x = r(1-cos45) = 0.5858 in, v = r*omega*sin45 = 44.43 in/s, a = r*omega^2*cos45 = 3.615 g.
+  assert.ok(Math.abs(s.position_in - 0.5858) < 1e-3 && Math.abs(s.velocity_ips - 44.4288) < 1e-3 && Math.abs(s.accel_g - 3.6152) < 1e-3);
+  // End of stroke (theta 0): position 0, velocity 0, acceleration at its PEAK; mid-stroke (theta 90): position r, velocity at PEAK, acceleration 0.
+  const end = _v1333({ crank_radius_in: 2, crank_rpm: 300, crank_angle_deg: 0 });
+  assert.ok(Math.abs(end.position_in) < 1e-9 && Math.abs(end.velocity_ips) < 1e-9 && Math.abs(end.accel_g - s.peak_accel_g) < 1e-9);
+  const mid = _v1333({ crank_radius_in: 2, crank_rpm: 300, crank_angle_deg: 90 });
+  assert.ok(Math.abs(mid.position_in - 2) < 1e-9 && Math.abs(mid.velocity_ips - s.peak_velocity_ips) < 1e-9 && Math.abs(mid.accel_g) < 1e-9);
+  // Acceleration scales with the SQUARE of rpm: doubling rpm quadruples the peak g.
+  const dbl = _v1333({ crank_radius_in: 2, crank_rpm: 600, crank_angle_deg: 0 });
+  assert.ok(Math.abs(dbl.peak_accel_g - 4 * s.peak_accel_g) < 1e-6);
+  // Error seams: non-positive radius/rpm, angle out of range, non-finite.
+  assert.ok("error" in _v1333({ crank_radius_in: 0, crank_rpm: 300, crank_angle_deg: 45 }));
+  assert.ok("error" in _v1333({ crank_radius_in: 2, crank_rpm: 0, crank_angle_deg: 45 }));
+  assert.ok("error" in _v1333({ crank_radius_in: 2, crank_rpm: 300, crank_angle_deg: 400 }));
+  assert.ok("error" in _v1333({ crank_radius_in: Infinity, crank_rpm: 300, crank_angle_deg: 45 }));
+});
+
 import { computePlainBearingPressurePv as _v1301 } from "../../calc-machining.js";
 test("bounds: spec-v1301 computePlainBearingPressurePv pins the projected pressure, surface velocity, PV factor, the >50k flag, and error seams", () => {
   // W 800, D 1.0, L 1.5, 300 rpm: P 533.3 psi, V 78.5 ft/min, PV 41,888 (under 50k).

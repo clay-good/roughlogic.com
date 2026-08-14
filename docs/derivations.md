@@ -2667,6 +2667,7 @@ cross-check.
 | calc-mechanic.js | `computeReserveCapacityAmpHours` | `{ rc_minutes = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeSacrificialAnodeLife` | `{ anode_material = "zinc", anode_mass_lb = 0, current_draw_a = 0, utilization...` | _ | _ | _ |
 | calc-mechanic.js | `computeSailboatPerformanceRatios` | `{ sail_area_sqft = 500, displacement_lb = 10000, lwl_ft = 30 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeScotchYokeMotion` | `{ crank_radius_in = 0, crank_rpm = 0, crank_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeScrewConveyor` | `{ screw_diameter_in = 0, shaft_diameter_in = 0, pitch_in = 0, rpm = 0, loadin...` | _ | _ | _ |
 | calc-mechanic.js | `computeScrewConveyorRpm` | `{ target_ft3_hr = 0, screw_diameter_in = 0, shaft_diameter_in = 0, pitch_in =...` | _ | _ | _ |
 | calc-mechanic.js | `computeSliderCrankPistonPosition` | `{ stroke_in = 0, rod_length_in = 0, crank_angle_deg = 0 } = {}` | _ | _ | _ |
@@ -3370,7 +3371,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1956.
+Row count: 1957.
 
 <!-- END function-corpus-v14 -->
 
@@ -4689,7 +4690,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (131 tiles)
+### Group K Mechanic (132 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4788,6 +4789,7 @@ per spec-v14 §13.1 second paragraph.
 | `roller-chain-length` | Roller Chain Length in Pitches (ANSI B29.1) | ANSI B29.1 roller-chain length; spec-v512 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sacrificial-anode-life` | Sacrificial Anode Service Life | Sacrificial-anode life by Faraday's l...; 5 lb zinc (354 A-h/lb), 0.85 utilization, 0.15 A -> 1.14 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sailboat-performance-ratios` | Sailboat Performance Ratios (SA/D and DLR) | Sailboat performance ratios (SA/D and...; SA/D = 500 / (10000/64)^(2/3) = 500/29.0 = 17.24; DLR = (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `scotch-yoke-motion` | Scotch-Yoke Simple Harmonic Motion | Project (first-principles); peak v = r*omega, peak a = r*omega^2; omega = 2 pi N/60 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `screw-conveyor` | Screw / Auger Conveyor Capacity | CEMA Screw Conveyor standard (Book No...; 9 in screw, 2.5 in shaft, 9 in pitch, 40 RPM, 0.30 loadin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `screw-conveyor-rpm` | Screw Conveyor Speed for a Target Capacity | CEMA Screw Conveyor standard (Book No...; 220.157 ft^3/hr, 9 in screw, 2.5 in shaft, 9 in pitch, 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slider-crank-piston-position` | Slider-Crank Piston Position | Project (first-principles); slider-crank displacement | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5248,6 +5250,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1705. Fixture-covered or reference-cadence: 1705 / 1705.
+Tile count: 1706. Fixture-covered or reference-cadence: 1706 / 1706.
 
 <!-- END tile-index-v14 -->

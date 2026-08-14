@@ -12079,6 +12079,18 @@ export const CITATIONS = {
       { name: "Scope", value: "position only; velocity/acceleration, pin offset, rod stretch, loads are separate", source: "scope of this tile" },
     ],
   },
+  "scotch-yoke-motion": {
+    formula: "omega = 2 pi N/60; x = r(1 - cos theta); v = r omega sin theta; a = r omega^2 cos theta; stroke = 2r; peak speed = r omega (mid-stroke); peak accel = r omega^2 (ends).",
+    edition: "The scotch-yoke simple harmonic motion x = r(1 - cos theta), v = r omega sin theta, a = r omega^2 cos theta (Machinery's Handbook; standard mechanism kinematics), by name.",
+    freeAccess: "Simple harmonic motion is a standard published kinematics result; the crank radius, speed, and angle are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "A scotch yoke - a crank pin riding in a slotted yoke - converts steady rotation into EXACT simple harmonic (pure sinusoidal) linear motion with no connecting rod: x = r(1 - cos theta) from one end, v = r omega sin theta, a = r omega^2 cos theta, where r is the crank radius and omega = 2 pi N/60. It is the pure sinusoid the slider-crank only approximates (no rod-angularity shift; symmetric about mid-stroke; the slider is exactly at mid-stroke at 90 degrees). The stroke is 2r; the speed peaks at r omega at mid-stroke and the acceleration peaks at r omega^2 at each END, so the reciprocating inertia force (that acceleration times the moving mass) grows with the square of the rpm. Used for reciprocating pumps and compressors, valve and gate actuators, and sine-motion shaker or vibration-test rigs. Ideal rigid mechanism; friction, the yoke side thrust, clearance, and the driven-load force are separate. A design aid; Machinery's Handbook and the machine builder govern.",
+    assumptions: [
+      { name: "Motion", value: "x = r(1 - cos theta), v = r omega sin theta, a = r omega^2 cos theta - exact simple harmonic motion", source: "Machinery's Handbook" },
+      { name: "Peaks", value: "peak speed r omega at mid-stroke; peak acceleration r omega^2 at the ends (sets the inertia load)", source: "kinematics" },
+      { name: "Scope", value: "ideal rigid mechanism; friction, yoke side thrust, clearance, and driven load are separate", source: "scope of this tile" },
+    ],
+  },
   "impact-load-factor": {
     formula: "n = 1 + sqrt(1 + 2h/delta_st); impact force = n W; impact deflection = n delta_st. At h = 0, n = 2.",
     edition: "The energy-method impact factor n = 1 + sqrt(1 + 2h/delta_st) for a load dropped onto an elastic member (Roark's Formulas for Stress and Strain; standard mechanics of materials), by name.",

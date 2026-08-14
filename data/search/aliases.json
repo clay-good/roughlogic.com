@@ -3154,6 +3154,26 @@
    "kind": "industry"
   },
   {
+   "term": "scotch yoke",
+   "target": "scotch-yoke-motion",
+   "kind": "industry"
+  },
+  {
+   "term": "scotch yoke velocity acceleration",
+   "target": "scotch-yoke-motion",
+   "kind": "question"
+  },
+  {
+   "term": "simple harmonic motion mechanism",
+   "target": "scotch-yoke-motion",
+   "kind": "adjacent"
+  },
+  {
+   "term": "sine motion drive",
+   "target": "scotch-yoke-motion",
+   "kind": "adjacent"
+  },
+  {
    "term": "slider crank piston position",
    "target": "slider-crank-piston-position",
    "kind": "industry"

@@ -1538,6 +1538,61 @@ MECHANIC_RENDERERS["slider-crank-piston-position"] = _simpleRenderer({
   compute: computeSliderCrankPistonPosition,
 });
 
+// --- spec-v1333 K: scotch-yoke motion (`scotch-yoke-motion`) ---
+// The slider-crank tile's note calls out "the pure-sinusoid position r(1 - cos theta)" as the thing rod obliquity
+// makes it deviate from, and names "piston velocity and acceleration" as separate. A scotch yoke IS that pure
+// mechanism: a crank pin riding in a slotted yoke gives EXACT simple harmonic motion with no connecting rod, so
+// x = r(1 - cos theta), v = r omega sin theta, a = r omega^2 cos theta. Used for reciprocating pumps and
+// compressors, valve/gate actuators, and sine-motion shaker or vibration-test rigs. Peak speed r*omega at mid-stroke,
+// peak acceleration r*omega^2 at each end (which sets the reciprocating inertia load).
+// dims: in { crank_radius_in: L, crank_rpm: T^-1, crank_angle_deg: dimensionless } out: { stroke_in: L, peak_velocity_fps: L T^-1, peak_accel_g: dimensionless }
+export function computeScotchYokeMotion({ crank_radius_in = 0, crank_rpm = 0, crank_angle_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const G_IN_S2 = 386.0886; // 1 g in in/s^2 (32.174 ft/s^2 x 12)
+  const r = Number(crank_radius_in) || 0;
+  const N = Number(crank_rpm) || 0;
+  const theta_deg = Number(crank_angle_deg);
+  if (!(r > 0)) return { error: "Crank radius must be positive (in)." };
+  if (!(N > 0)) return { error: "Crank speed must be positive (rpm)." };
+  if (!(theta_deg >= 0 && theta_deg <= 360)) return { error: "Crank angle must be between 0 and 360 degrees." };
+  const w = (2 * Math.PI * N) / 60; // rad/s
+  const th = (theta_deg * Math.PI) / 180;
+  const stroke_in = 2 * r;
+  const peak_velocity_ips = r * w;
+  const peak_velocity_fps = peak_velocity_ips / 12;
+  const peak_accel_ips2 = r * w * w;
+  const peak_accel_g = peak_accel_ips2 / G_IN_S2;
+  const position_in = r * (1 - Math.cos(th)); // from one end, 0 at theta 0 to stroke at 180
+  const percent_of_stroke = (position_in / stroke_in) * 100;
+  const velocity_ips = r * w * Math.sin(th);
+  const accel_ips2 = r * w * w * Math.cos(th);
+  const accel_g = accel_ips2 / G_IN_S2;
+  if (![stroke_in, peak_velocity_fps, peak_accel_g, position_in, velocity_ips, accel_g].every(Number.isFinite)) return { error: "Scotch-yoke math is not a finite value; check the inputs." };
+  return {
+    stroke_in, peak_velocity_fps, peak_velocity_ips, peak_accel_g, peak_accel_ips2,
+    position_in, percent_of_stroke, velocity_ips, accel_g,
+    note: "A scotch yoke - a crank pin riding in a slotted yoke - converts steady rotation into EXACT simple harmonic (pure sinusoidal) linear motion, with no connecting rod: x = r(1 - cos theta) from one end, velocity v = r omega sin theta, acceleration a = r omega^2 cos theta, where r is the crank radius and omega = 2 pi N/60. This is the pure sinusoid the slider-crank only approximates - there is no rod-angularity shift, so the motion is symmetric about mid-stroke and the piston reaches exactly mid-stroke at 90 degrees. The stroke is 2r; the speed peaks at r omega at mid-stroke (theta 90/270) and is zero at the ends, while the acceleration peaks at r omega^2 at each END (theta 0/180) and is zero at mid-stroke - that end acceleration times the reciprocating mass is the inertia force the frame and bearings carry, and it climbs with the SQUARE of rpm. Used for reciprocating pumps and compressors, valve and gate actuators, and sine-motion shaker or vibration-test tables. Rigid ideal mechanism; friction, the yoke side thrust, clearance, and the driven-load force are separate. A design aid; Machinery's Handbook and the machine builder govern.",
+  };
+}
+export const scotchYokeMotionExample = { inputs: { crank_radius_in: 2, crank_rpm: 300, crank_angle_deg: 45 } };
+
+MECHANIC_RENDERERS["scotch-yoke-motion"] = _simpleRenderer({
+  citation: "Citation: scotch-yoke simple harmonic motion x = r(1 - cos theta), v = r omega sin theta, a = r omega^2 cos theta, omega = 2 pi N/60 (Machinery's Handbook; standard kinematics). Peak speed r omega at mid-stroke, peak acceleration r omega^2 at the ends. A design aid; the machine builder governs.",
+  example: scotchYokeMotionExample.inputs,
+  fields: [
+    { key: "crank_radius_in", label: "Crank radius r (in, half the stroke)", kind: "number" },
+    { key: "crank_rpm", label: "Crank speed (rpm)", kind: "number" },
+    { key: "crank_angle_deg", label: "Crank angle (deg)", kind: "number" },
+  ],
+  outputs: [
+    { key: "s", id: "syk-out-s", label: "Stroke / peak velocity", value: (r) => fmt(r.stroke_in, 3) + " in stroke; peak " + fmt(r.peak_velocity_fps, 2) + " ft/s (" + fmt(r.peak_velocity_ips, 1) + " in/s) at mid-stroke" },
+    { key: "a", id: "syk-out-a", label: "Peak acceleration (at the ends)", value: (r) => fmt(r.peak_accel_g, 2) + " g (" + fmt(r.peak_accel_ips2, 0) + " in/s^2)" },
+    { key: "t", id: "syk-out-t", label: "At this crank angle", value: (r) => "x = " + fmt(r.position_in, 3) + " in (" + fmt(r.percent_of_stroke, 1) + "% of stroke), v = " + fmt(r.velocity_ips, 1) + " in/s, a = " + fmt(r.accel_g, 2) + " g" },
+    { key: "n", id: "syk-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeScotchYokeMotion,
+});
+
 // --- spec-v1302 K: impact load factor, energy method (`impact-load-factor`) ---
 // No general impact factor for a dropped/suddenly-applied load (fall-arrest is PPE, tree-rigging-shock is
 // arborist rope). Energy method: n = 1 + sqrt(1 + 2h/delta_st); impact force = nW; even h=0 gives n=2.

@@ -87569,6 +87569,74 @@
    }
   },
   {
+   "tile_id": "scotch-yoke-motion",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "2 in crank at 300 rpm: 4 in stroke, 5.24 ft/s peak, 5.11 g peak",
+   "source_edition_or_year": "SHM kinematics",
+   "source_section_or_page": "peak v = r*omega, peak a = r*omega^2; omega = 2 pi N/60",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "crank_radius_in": 2,
+    "crank_rpm": 300,
+    "crank_angle_deg": 45
+   },
+   "outputs": {
+    "stroke_in": {
+     "value": 4.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "peak_velocity_fps": {
+     "value": 5.236,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "peak_accel_g": {
+     "value": 5.1126,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "scotch-yoke-motion",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Instantaneous values at 45 deg (position, velocity, acceleration)",
+   "source_edition_or_year": "SHM kinematics",
+   "source_section_or_page": "x=r(1-cos), v=r*omega*sin, a=r*omega^2*cos at theta=45",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "crank_radius_in": 2,
+    "crank_rpm": 300,
+    "crank_angle_deg": 45
+   },
+   "outputs": {
+    "position_in": {
+     "value": 0.5858,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "velocity_ips": {
+     "value": 44.4288,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "accel_g": {
+     "value": 3.6152,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "slider-crank-piston-position",
    "source_publisher": "Project (first-principles)",
    "source_title": "SBC piston at 90 deg ATDC (past mid-stroke)",
