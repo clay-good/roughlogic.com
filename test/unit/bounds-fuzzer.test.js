@@ -38028,6 +38028,30 @@ test("bounds: spec-v1333 computeScotchYokeMotion pins the SHM peaks, the end/mid
   assert.ok("error" in _v1333({ crank_radius_in: Infinity, crank_rpm: 300, crank_angle_deg: 45 }));
 });
 
+import { computeWedgeForce as _v1336 } from "../../calc-mechanic.js";
+test("bounds: spec-v1336 computeWedgeForce pins the friction MA, the frictionless cot(b) limit, the self-locking flag, and error seams", () => {
+  // 100 lb, 30 deg included (b=15), mu 0.3: MA = (cos15 - 0.3 sin15)/(sin15 + 0.3 cos15) = 1.619; split 161.9 lb.
+  const w = _v1336({ driving_force_lb: 100, included_angle_deg: 30, friction_coefficient: 0.3 });
+  assert.ok(Math.abs(w.mechanical_advantage - 1.619) < 1e-2 && Math.abs(w.spreading_force_lb - 161.9) < 0.5);
+  // Self-locks: 15 deg half-angle < atan(0.3) = 16.7 deg friction angle.
+  assert.ok(w.self_locking === true && Math.abs(w.friction_angle_deg - 16.699) < 1e-2 && Math.abs(w.half_angle_deg - 15) < 1e-9);
+  // Frictionless limit: MA = cot(b), and it never self-locks (mu = 0).
+  const fl = _v1336({ driving_force_lb: 100, included_angle_deg: 30, friction_coefficient: 0 });
+  assert.ok(Math.abs(fl.mechanical_advantage - 1 / Math.tan(15 * Math.PI / 180)) < 1e-9 && Math.abs(fl.spreading_force_lb - 373.21) < 0.1 && fl.self_locking === false);
+  assert.ok(Math.abs(fl.mechanical_advantage - fl.ideal_mechanical_advantage) < 1e-9);
+  // A slicker surface (smaller mu) drops the self-lock: 15 deg half-angle > atan(0.2) = 11.3 deg.
+  const slick = _v1336({ driving_force_lb: 100, included_angle_deg: 30, friction_coefficient: 0.2 });
+  assert.ok(slick.self_locking === false);
+  // A wedge too blunt for the friction jams (num <= 0): included 170 is out of range, but a large-angle high-mu jams -> error via num<=0. Use included 80 with mu 1.2 (b=40, cot? cos40-1.2 sin40 = 0.766-0.771 < 0).
+  assert.ok("error" in _v1336({ driving_force_lb: 100, included_angle_deg: 80, friction_coefficient: 1.2 }));
+  // Error seams: non-positive drive, angle out of range, negative mu, non-finite.
+  assert.ok("error" in _v1336({ driving_force_lb: 0, included_angle_deg: 30, friction_coefficient: 0.3 }));
+  assert.ok("error" in _v1336({ driving_force_lb: 100, included_angle_deg: 0, friction_coefficient: 0.3 }));
+  assert.ok("error" in _v1336({ driving_force_lb: 100, included_angle_deg: 90, friction_coefficient: 0.3 }));
+  assert.ok("error" in _v1336({ driving_force_lb: 100, included_angle_deg: 30, friction_coefficient: -0.1 }));
+  assert.ok("error" in _v1336({ driving_force_lb: Infinity, included_angle_deg: 30, friction_coefficient: 0.3 }));
+});
+
 import { computeInclinedPlaneForce as _v1335 } from "../../calc-mechanic.js";
 test("bounds: spec-v1335 computeInclinedPlaneForce pins the push-up force, the repose self-slide flag, the frictionless limit, and error seams", () => {
   // 1000 lb, 20 deg, mu 0.3: F_up = 1000(sin20 + 0.3 cos20) = 623.93 lb; normal 939.69; slides (tan20 > 0.3).

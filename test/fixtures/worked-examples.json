@@ -87569,6 +87569,62 @@
    }
   },
   {
+   "tile_id": "wedge-force",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "100 lb drive, 30 deg wedge, mu 0.3: 162 lb split, self-locks",
+   "source_edition_or_year": "wedge statics",
+   "source_section_or_page": "MA=(cos b - mu sin b)/(sin b + mu cos b), b=15 deg",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "driving_force_lb": 100,
+    "included_angle_deg": 30,
+    "friction_coefficient": 0.3
+   },
+   "outputs": {
+    "spreading_force_lb": {
+     "value": 161.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ideal_mechanical_advantage": {
+     "value": 3.7321,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wedge-force",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Frictionless limit: MA = cot(half-angle) (30 deg wedge -> 3.73x)",
+   "source_edition_or_year": "wedge statics",
+   "source_section_or_page": "mu=0 -> spreading = P cot 15 = 373 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "driving_force_lb": 100,
+    "included_angle_deg": 30,
+    "friction_coefficient": 0
+   },
+   "outputs": {
+    "spreading_force_lb": {
+     "value": 373.21,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "mechanical_advantage": {
+     "value": 3.7321,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "inclined-plane-force",
    "source_publisher": "Project (first-principles)",
    "source_title": "1000 lb on a 20 deg ramp, mu 0.3: 624 lb to push up",

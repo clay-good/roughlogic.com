@@ -3154,6 +3154,26 @@
    "kind": "industry"
   },
   {
+   "term": "wedge splitting force",
+   "target": "wedge-force",
+   "kind": "industry"
+  },
+  {
+   "term": "log splitter wedge force",
+   "target": "wedge-force",
+   "kind": "question"
+  },
+  {
+   "term": "wedge mechanical advantage",
+   "target": "wedge-force",
+   "kind": "industry"
+  },
+  {
+   "term": "will a shim stay put self locking",
+   "target": "wedge-force",
+   "kind": "question"
+  },
+  {
    "term": "inclined plane force",
    "target": "inclined-plane-force",
    "kind": "industry"

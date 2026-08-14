@@ -1686,6 +1686,57 @@ MECHANIC_RENDERERS["inclined-plane-force"] = _simpleRenderer({
   compute: computeInclinedPlaneForce,
 });
 
+// --- spec-v1336 K: wedge splitting force and self-locking (`wedge-force`) ---
+// The last classic simple machine: a wedge splits, lifts, or shims. A driving force P along the centerline of a
+// symmetric wedge of included angle alpha (half-angle b = alpha/2) drives normal + friction forces on the two faces;
+// the useful spreading force per side is N(cos b - mu sin b) and P = 2 N(sin b + mu cos b), so the mechanical
+// advantage is (cos b - mu sin b)/(sin b + mu cos b). Frictionless it is cot b, but wedges live on friction: the
+// self-locking property (a driven wedge or shim STAYS put) holds when the half-angle is under the friction angle,
+// b < atan(mu). Distinct in use from the toggle (a clamp linkage) and the inclined plane (a load sliding up a ramp).
+// dims: in { driving_force_lb: M L T^-2, included_angle_deg: dimensionless, friction_coefficient: dimensionless } out: { spreading_force_lb: M L T^-2, mechanical_advantage: dimensionless, self_locking: dimensionless }
+export function computeWedgeForce({ driving_force_lb = 0, included_angle_deg = 0, friction_coefficient = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const P = Number(driving_force_lb) || 0;
+  const alpha = Number(included_angle_deg);
+  const mu = Number(friction_coefficient) || 0;
+  if (!(P > 0)) return { error: "Driving force must be positive (lb)." };
+  if (!(alpha > 0 && alpha < 90)) return { error: "Included wedge angle must be between 0 and 90 degrees." };
+  if (mu < 0) return { error: "Friction coefficient cannot be negative." };
+  const b = ((alpha / 2) * Math.PI) / 180; // half-angle per face
+  const sb = Math.sin(b), cb = Math.cos(b);
+  const denom = sb + mu * cb; // driving factor
+  const num = cb - mu * sb; // useful (spreading) factor
+  if (!(num > 0)) return { error: "The wedge is too blunt for this friction: friction on the faces exceeds the spreading geometry, so it jams instead of splitting. Use a sharper wedge or reduce the friction." };
+  const mechanical_advantage = num / denom;
+  const spreading_force_lb = P * mechanical_advantage;
+  const ideal_mechanical_advantage = cb / sb; // frictionless, = cot(b)
+  const self_locking = Math.tan(b) < mu; // b < atan(mu)
+  const friction_angle_deg = (Math.atan(mu) * 180) / Math.PI;
+  const half_angle_deg = alpha / 2;
+  if (![spreading_force_lb, mechanical_advantage, ideal_mechanical_advantage].every(Number.isFinite) || !(spreading_force_lb > 0)) return { error: "Wedge math is not a finite value; check the inputs." };
+  return {
+    spreading_force_lb, mechanical_advantage, ideal_mechanical_advantage, self_locking, friction_angle_deg, half_angle_deg,
+    note: "The splitting, lifting, or shimming force of a wedge - the last of the classic simple machines, the one the pulley/rope/toggle/incline MA tiles do not cover: a splitting maul or log-splitter wedge, a wedge jack, a machine-leveling wedge, or a shim. A driving force P along the centerline of a symmetric wedge of included angle alpha (half-angle b = alpha/2) becomes a spreading force on each face; with dry friction the advantage is (cos b - mu sin b)/(sin b + mu cos b). Frictionless that is cot b - a sharp wedge multiplies hugely - but a wedge lives on friction: a big share of the drive is spent overcoming it (a 30-degree wedge at mu 0.3 delivers 1.6x, not the frictionless 3.7x), and that same friction is what lets a driven wedge or shim STAY put. It self-locks when the half-angle is under the friction angle, b < atan(mu): a 15-degree half-angle holds under mu 0.3 (friction angle 16.7 degrees) but backs out under a slicker mu 0.2 (11.3 degrees). A blunt wedge (large angle) can multiply less than 1 or jam entirely. Ideal rigid wedge, uniform dry friction, quasi-static; the splitting resistance of the material, impact driving, and the wedge strength are separate. A planning aid; Machinery's Handbook and the tool maker govern.",
+  };
+}
+export const wedgeForceExample = { inputs: { driving_force_lb: 100, included_angle_deg: 30, friction_coefficient: 0.3 } };
+
+MECHANIC_RENDERERS["wedge-force"] = _simpleRenderer({
+  citation: "Citation: wedge statics - spreading force per face N(cos b - mu sin b) with P = 2 N(sin b + mu cos b), so MA = (cos b - mu sin b)/(sin b + mu cos b), b the half-angle; frictionless MA = cot b; self-locks when b < atan(mu) (standard mechanics; Machinery's Handbook). Quasi-static, dry friction. A planning aid; the tool maker governs.",
+  example: wedgeForceExample.inputs,
+  fields: [
+    { key: "driving_force_lb", label: "Driving force along the wedge (lb)", kind: "number" },
+    { key: "included_angle_deg", label: "Included (total) wedge angle (deg)", kind: "number" },
+    { key: "friction_coefficient", label: "Friction coefficient mu", kind: "number" },
+  ],
+  outputs: [
+    { key: "f", id: "wdg-out-f", label: "Spreading (splitting/lifting) force", value: (r) => fmt(r.spreading_force_lb, 1) + " lb (advantage " + fmt(r.mechanical_advantage, 2) + " vs frictionless " + fmt(r.ideal_mechanical_advantage, 2) + ")" },
+    { key: "l", id: "wdg-out-l", label: "Self-locking", value: (r) => r.self_locking ? ("yes - stays put once driven (the " + fmt(r.half_angle_deg, 1) + " deg half-angle is under the " + fmt(r.friction_angle_deg, 1) + " deg friction angle)") : ("no - backs out under load (the " + fmt(r.half_angle_deg, 1) + " deg half-angle exceeds the " + fmt(r.friction_angle_deg, 1) + " deg friction angle); hold or retain it") },
+    { key: "n", id: "wdg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWedgeForce,
+});
+
 // --- spec-v1302 K: impact load factor, energy method (`impact-load-factor`) ---
 // No general impact factor for a dropped/suddenly-applied load (fall-arrest is PPE, tree-rigging-shock is
 // arborist rope). Energy method: n = 1 + sqrt(1 + 2h/delta_st); impact force = nW; even h=0 gives n=2.

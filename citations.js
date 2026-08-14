@@ -12079,6 +12079,18 @@ export const CITATIONS = {
       { name: "Scope", value: "position only; velocity/acceleration, pin offset, rod stretch, loads are separate", source: "scope of this tile" },
     ],
   },
+  "wedge-force": {
+    formula: "b = alpha/2; MA = (cos b - mu sin b)/(sin b + mu cos b); spreading = P x MA; frictionless MA = cot b; self-locks when b < atan(mu).",
+    edition: "Wedge statics - spreading force (cos b - mu sin b)/(sin b + mu cos b) and self-locking at b < atan(mu) (standard mechanics; Machinery's Handbook), by name.",
+    freeAccess: "Wedge statics is a standard published result; the driving force, wedge angle, and friction coefficient are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The splitting, lifting, or shimming force of a symmetric wedge of included angle alpha (half-angle b = alpha/2). A driving force P along the centerline gives a spreading force P(cos b - mu sin b)/(sin b + mu cos b) on the output. Frictionless the advantage is cot b, but a wedge lives on friction: a large share of the drive is spent overcoming it, and that same friction is what makes a driven wedge or shim self-locking - it stays put when the half-angle is under the friction angle, b < atan(mu). A blunt wedge can multiply less than 1 or jam. Ideal rigid wedge, uniform dry friction, quasi-static; the material's splitting resistance, impact (dynamic) driving, and the wedge strength are separate. A planning aid; Machinery's Handbook and the tool maker govern.",
+    assumptions: [
+      { name: "Advantage", value: "MA = (cos b - mu sin b)/(sin b + mu cos b), b the half-angle; frictionless cot b", source: "Machinery's Handbook" },
+      { name: "Self-locking", value: "self-locks (stays driven) when b < atan(mu); backs out otherwise", source: "friction mechanics" },
+      { name: "Scope", value: "rigid wedge, dry quasi-static friction; splitting resistance, impact driving, wedge strength are separate", source: "scope of this tile" },
+    ],
+  },
   "inclined-plane-force": {
     formula: "F_up = W(sin theta + mu cos theta); normal = W cos theta; net down-slope = W(sin theta - mu cos theta); ideal MA = 1/sin theta = length/rise; self-slide at atan(mu).",
     edition: "Inclined-plane statics - force up the incline W(sin theta + mu cos theta) and the angle of repose atan(mu) (standard mechanics; Machinery's Handbook), by name.",

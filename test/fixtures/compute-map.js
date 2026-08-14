@@ -188,6 +188,7 @@ export const COMPUTE_MAP = {
   "scotch-yoke-motion": { module: "../../calc-mechanic.js", fn: "computeScotchYokeMotion" },
   "toggle-mechanism-force": { module: "../../calc-mechanic.js", fn: "computeToggleMechanismForce" },
   "inclined-plane-force": { module: "../../calc-mechanic.js", fn: "computeInclinedPlaneForce" },
+  "wedge-force": { module: "../../calc-mechanic.js", fn: "computeWedgeForce" },
   "impact-load-factor": { module: "../../calc-mechanic.js", fn: "computeImpactLoadFactor" },
   "hydraulic-accumulator-volume": { module: "../../calc-mechanic.js", fn: "computeHydraulicAccumulatorVolume" },
   "projectile-range": { module: "../../calc-mechanic.js", fn: "computeProjectileRange" },

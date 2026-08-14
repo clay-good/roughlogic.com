@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 1708,
-  "covered_count": 1249,
+  "total_tiles": 1709,
+  "covered_count": 1250,
   "covered": [
     "aav-install-check",
     "abv-from-gravity",
@@ -1197,6 +1197,7 @@
     "water-meter-sizing",
     "water-service-pressure-check",
     "waterline-for-hull-speed",
+    "wedge-force",
     "weir-flow",
     "weir-head-from-flow",
     "weld-cost-per-foot",

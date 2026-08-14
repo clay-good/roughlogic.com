@@ -2691,6 +2691,7 @@ cross-check.
 | calc-mechanic.js | `computeVehicleRoadLoadPower` | `{ speed_mph = 0, vehicle_weight_lb = 0, frontal_area_ft2 = 0, drag_coefficien...` | _ | _ | _ |
 | calc-mechanic.js | `computeVolumetricEfficiency` | `{ displacement_ci = 0, rpm = 0, cycle = "four", actual_cfm = 0, ve_pct = 0 } ...` | _ | _ | _ |
 | calc-mechanic.js | `computeWaterlineForHullSpeed` | `{ target_hull_speed_kn = 0, coefficient = 1.34 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeWedgeForce` | `{ driving_force_lb = 0, included_angle_deg = 0, friction_coefficient = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeWheelOffsetBackspacing` | `{ rim_width_in = 0, offset_mm = 0, backspacing_in = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `parseTireSize` | `str` | _ | _ | _ |
 | calc-metalair.js | `computeCompressionRatio` | `{ suction_psig = 0, discharge_psig = 0, atmospheric_psia = 14.696 } = {}` | _ | _ | _ |
@@ -3373,7 +3374,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1959.
+Row count: 1960.
 
 <!-- END function-corpus-v14 -->
 
@@ -4692,7 +4693,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (134 tiles)
+### Group K Mechanic (135 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4828,6 +4829,7 @@ per spec-v14 §13.1 second paragraph.
 | `vehicle-road-load-power` | Vehicle Road-Load Force and Power | Project (first-principles); F_total = aero + rolling + grade | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `waterline-for-hull-speed` | Waterline Length for a Target Hull Speed | displacement hull-speed relation (Fro...; 8 kn target displacement hull -> 35.6 ft waterline | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `wedge-force` | Wedge Splitting Force and Self-Locking | Project (first-principles); MA=(cos b - mu sin b)/(sin b + mu cos b), b=15 deg | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `worm-gear-geometry` | Worm and Worm-Wheel Geometry | Machinery's Handbook (worm gearing); lead = 0.5 x 1 = 0.5 in; lead angle = atan(0.5/(pi x 2)) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
@@ -5254,6 +5256,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1708. Fixture-covered or reference-cadence: 1708 / 1708.
+Tile count: 1709. Fixture-covered or reference-cadence: 1709 / 1709.
 
 <!-- END tile-index-v14 -->
