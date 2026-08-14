@@ -38028,6 +38028,29 @@ test("bounds: spec-v1333 computeScotchYokeMotion pins the SHM peaks, the end/mid
   assert.ok("error" in _v1333({ crank_radius_in: Infinity, crank_rpm: 300, crank_angle_deg: 45 }));
 });
 
+import { computeToggleMechanismForce as _v1334 } from "../../calc-mechanic.js";
+test("bounds: spec-v1334 computeToggleMechanismForce pins F_out=F_in/(2 tan theta), the travel trade-off, the near-lockup warning, and error seams", () => {
+  // 50 lb at 10 deg: MA = 1/(2 tan10) = 2.8356; F_out = 141.78 lb.
+  const t = _v1334({ input_force_lb: 50, toggle_angle_deg: 10 });
+  assert.ok(Math.abs(t.mechanical_advantage - 2.8356) < 1e-3 && Math.abs(t.output_force_lb - 141.78) < 0.05);
+  // Velocity ratio is the reciprocal of the MA (output travel per unit input travel).
+  assert.ok(Math.abs(t.velocity_ratio - 1 / t.mechanical_advantage) < 1e-9);
+  // The advantage climbs as the angle shrinks toward lockup.
+  const t5 = _v1334({ input_force_lb: 50, toggle_angle_deg: 5 });
+  assert.ok(t5.mechanical_advantage > t.mechanical_advantage && Math.abs(t5.output_force_lb - 285.75) < 0.1);
+  // At 45 deg MA is exactly 0.5 (F_out = half the input).
+  const t45 = _v1334({ input_force_lb: 100, toggle_angle_deg: 45 });
+  assert.ok(Math.abs(t45.mechanical_advantage - 0.5) < 1e-9 && Math.abs(t45.output_force_lb - 50) < 1e-9);
+  // Below 2 deg the near-lockup warning fires.
+  assert.ok(_v1334({ input_force_lb: 50, toggle_angle_deg: 1 }).warnings.length > 0);
+  assert.ok(_v1334({ input_force_lb: 50, toggle_angle_deg: 10 }).warnings.length === 0);
+  // Error seams: non-positive force, angle at or past the 0/90 bounds, non-finite.
+  assert.ok("error" in _v1334({ input_force_lb: 0, toggle_angle_deg: 10 }));
+  assert.ok("error" in _v1334({ input_force_lb: 50, toggle_angle_deg: 0 }));
+  assert.ok("error" in _v1334({ input_force_lb: 50, toggle_angle_deg: 90 }));
+  assert.ok("error" in _v1334({ input_force_lb: 50, toggle_angle_deg: Infinity }));
+});
+
 import { computePlainBearingPressurePv as _v1301 } from "../../calc-machining.js";
 test("bounds: spec-v1301 computePlainBearingPressurePv pins the projected pressure, surface velocity, PV factor, the >50k flag, and error seams", () => {
   // W 800, D 1.0, L 1.5, 300 rpm: P 533.3 psi, V 78.5 ft/min, PV 41,888 (under 50k).

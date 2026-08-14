@@ -87569,6 +87569,60 @@
    }
   },
   {
+   "tile_id": "toggle-mechanism-force",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "50 lb at 10 deg toggle -> 142 lb (MA 2.84)",
+   "source_edition_or_year": "toggle-joint statics",
+   "source_section_or_page": "F_out = F_in/(2 tan theta)",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "input_force_lb": 50,
+    "toggle_angle_deg": 10
+   },
+   "outputs": {
+    "mechanical_advantage": {
+     "value": 2.8356,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "output_force_lb": {
+     "value": 141.78,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "toggle-mechanism-force",
+   "source_publisher": "Project (first-principles)",
+   "source_title": "Advantage climbs near lockup: 50 lb at 5 deg -> 286 lb (MA 5.72)",
+   "source_edition_or_year": "toggle-joint statics",
+   "source_section_or_page": "MA = 1/(2 tan theta) diverges as theta -> 0",
+   "verified_by": "rl",
+   "verified_on": "2026-08-13",
+   "inputs": {
+    "input_force_lb": 50,
+    "toggle_angle_deg": 5
+   },
+   "outputs": {
+    "mechanical_advantage": {
+     "value": 5.715,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "output_force_lb": {
+     "value": 285.75,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "scotch-yoke-motion",
    "source_publisher": "Project (first-principles)",
    "source_title": "2 in crank at 300 rpm: 4 in stroke, 5.24 ft/s peak, 5.11 g peak",

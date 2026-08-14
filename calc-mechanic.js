@@ -1593,6 +1593,49 @@ MECHANIC_RENDERERS["scotch-yoke-motion"] = _simpleRenderer({
   compute: computeScotchYokeMotion,
 });
 
+// --- spec-v1334 K: toggle mechanism mechanical advantage (`toggle-mechanism-force`) ---
+// The MA family has pulley (pulley-ma-gen), rope (rope-ma), and chain hoist (chain-lever-hoist) but not the TOGGLE -
+// the linkage in a hold-down clamp, a knee/toggle press, a rivet squeezer, or an injection-mold clamp. Two equal
+// links pinned at a knee driven perpendicular to the output line: F_out = F_in/(2 tan theta), where theta is each
+// link's angle from the straight (lockup) line. As theta -> 0 the advantage diverges (why a toggle clamp holds hard
+// at lockup) but the output travel per unit input travel -> 0, and any over-travel past lockup releases it.
+// dims: in { input_force_lb: M L T^-2, toggle_angle_deg: dimensionless } out: { mechanical_advantage: dimensionless, output_force_lb: M L T^-2, velocity_ratio: dimensionless }
+export function computeToggleMechanismForce({ input_force_lb = 0, toggle_angle_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const P = Number(input_force_lb) || 0;
+  const theta_deg = Number(toggle_angle_deg);
+  if (!(P > 0)) return { error: "Input force must be positive (lb)." };
+  if (!(theta_deg > 0 && theta_deg < 90)) return { error: "Toggle angle must be between 0 and 90 degrees (measured from the straight lockup line)." };
+  const th = (theta_deg * Math.PI) / 180;
+  const mechanical_advantage = 1 / (2 * Math.tan(th));
+  const output_force_lb = P * mechanical_advantage;
+  const velocity_ratio = 2 * Math.tan(th); // output travel per unit input travel = 1/MA
+  if (![mechanical_advantage, output_force_lb, velocity_ratio].every(Number.isFinite) || !(mechanical_advantage > 0)) return { error: "Toggle math is not a finite value; check the inputs." };
+  const warnings = [];
+  if (theta_deg < 2) warnings.push("Below about 2 degrees the ideal advantage runs away (over " + Math.round(mechanical_advantage) + "x), but joint friction, link stiffness, and clearance cap the real clamp force well short of it - and over-travel past lockup releases the clamp. Size the links and pins for the actual working force, not the theoretical peak.");
+  return {
+    mechanical_advantage, output_force_lb, velocity_ratio,
+    note: "Mechanical advantage of a symmetric toggle linkage - the mechanism in a hold-down clamp, a knee (toggle) press, a rivet or crimp squeezer, or an injection-mold clamp, the one the pulley/rope/chain MA tiles do not cover. Two equal links meet at a knee driven perpendicular to the output line; each link sits at an angle theta from the straight (lockup) line, and the output force is F_out = F_in/(2 tan theta). Near lockup (theta small) the advantage runs toward infinity - a light hand force at the handle becomes a large clamping force - which is exactly why a toggle clamp snaps hard and stays put at over-center. The catch is the reciprocal: the output MOVES only 2 tan theta per unit of input travel, so the huge force comes with almost no stroke, and pushing PAST lockup (theta going negative) releases the clamp instead of tightening it. At 50 lb in and theta 10 degrees the output is 142 lb (MA 2.84); at 5 degrees it is 286 lb (MA 5.72). Ideal frictionless linkage; joint friction, link buckling, pin shear, and the over-center holding geometry are separate. A design aid; Machinery's Handbook and the clamp maker govern.",
+    warnings,
+  };
+}
+export const toggleMechanismForceExample = { inputs: { input_force_lb: 50, toggle_angle_deg: 10 } };
+
+MECHANIC_RENDERERS["toggle-mechanism-force"] = _simpleRenderer({
+  citation: "Citation: symmetric toggle-linkage mechanical advantage F_out = F_in/(2 tan theta), theta the angle of each link from the straight (lockup) line; output travel per unit input travel = 2 tan theta (Machinery's Handbook; standard statics of the toggle joint). The advantage diverges at lockup; friction and link strength cap the real force. A design aid; the clamp maker governs.",
+  example: toggleMechanismForceExample.inputs,
+  fields: [
+    { key: "input_force_lb", label: "Input force at the knee (lb)", kind: "number" },
+    { key: "toggle_angle_deg", label: "Toggle angle from lockup (deg)", kind: "number" },
+  ],
+  outputs: [
+    { key: "f", id: "tgl-out-f", label: "Output (clamping) force", value: (r) => fmt(r.output_force_lb, 1) + " lb" },
+    { key: "m", id: "tgl-out-m", label: "Mechanical advantage", value: (r) => fmt(r.mechanical_advantage, 3) + " : 1  (output moves " + fmt(r.velocity_ratio, 3) + " per unit of input travel)" },
+    { key: "w", id: "tgl-out-w", label: "Note", value: (r) => (r.warnings && r.warnings.length ? r.warnings.join(" ") + " " : "") + r.note },
+  ],
+  compute: computeToggleMechanismForce,
+});
+
 // --- spec-v1302 K: impact load factor, energy method (`impact-load-factor`) ---
 // No general impact factor for a dropped/suddenly-applied load (fall-arrest is PPE, tree-rigging-shock is
 // arborist rope). Energy method: n = 1 + sqrt(1 + 2h/delta_st); impact force = nW; even h=0 gives n=2.

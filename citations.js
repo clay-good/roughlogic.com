@@ -12079,6 +12079,18 @@ export const CITATIONS = {
       { name: "Scope", value: "position only; velocity/acceleration, pin offset, rod stretch, loads are separate", source: "scope of this tile" },
     ],
   },
+  "toggle-mechanism-force": {
+    formula: "F_out = F_in / (2 tan theta), theta the angle of each link from the straight (lockup) line; output travel per unit input travel = 2 tan theta; MA = 1/(2 tan theta).",
+    edition: "The symmetric toggle-linkage mechanical advantage F_out = F_in/(2 tan theta) (Machinery's Handbook; standard statics of the toggle joint), by name.",
+    freeAccess: "The toggle-joint force relation is a standard published statics result; the input force and toggle angle are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Mechanical advantage of a symmetric toggle linkage - the mechanism in a hold-down clamp, a knee (toggle) press, a rivet or crimp squeezer, or an injection-mold clamp. Two equal links meet at a knee driven perpendicular to the output line; each link sits at an angle theta from the straight (lockup) line, and F_out = F_in/(2 tan theta). Near lockup (theta small) the advantage diverges - a light hand force becomes a large clamp force, why a toggle clamp snaps hard and holds at over-center - but the output moves only 2 tan theta per unit of input travel (huge force, almost no stroke), and pushing PAST lockup releases the clamp. Ideal frictionless linkage; joint friction, link buckling, pin shear, and the over-center holding geometry are separate. A design aid; Machinery's Handbook and the clamp maker govern.",
+    assumptions: [
+      { name: "Advantage", value: "F_out = F_in/(2 tan theta) for a symmetric toggle; diverges at lockup (theta -> 0)", source: "Machinery's Handbook" },
+      { name: "Travel trade-off", value: "output travel per unit input travel = 2 tan theta = 1/MA; over-travel past lockup releases", source: "kinematics" },
+      { name: "Scope", value: "ideal frictionless linkage; friction, link buckling, pin shear are separate", source: "scope of this tile" },
+    ],
+  },
   "scotch-yoke-motion": {
     formula: "omega = 2 pi N/60; x = r(1 - cos theta); v = r omega sin theta; a = r omega^2 cos theta; stroke = 2r; peak speed = r omega (mid-stroke); peak accel = r omega^2 (ends).",
     edition: "The scotch-yoke simple harmonic motion x = r(1 - cos theta), v = r omega sin theta, a = r omega^2 cos theta (Machinery's Handbook; standard mechanism kinematics), by name.",

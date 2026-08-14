@@ -2676,6 +2676,7 @@ cross-check.
 | calc-mechanic.js | `computeTerminalVelocity` | `{ weight_lb = 0, frontal_area_ft2 = 0, drag_coefficient = 0, air_density_lb_f...` | _ | _ | _ |
 | calc-mechanic.js | `computeTireContactPatch` | `{ corner_load_lb = 0, inflation_pressure_psi = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeTireGearing` | `{ original_size = "", new_size = "", axle_ratio = 0, top_gear_ratio = 1, targ...` | _ | _ | _ |
+| calc-mechanic.js | `computeToggleMechanismForce` | `{ input_force_lb = 0, toggle_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeTorqueAdapterCorrection` | `{ target_torque_ftlb = 0, wrench_length_in = 0, adapter_length_in = 0, adapte...` | _ | _ | _ |
 | calc-mechanic.js | `computeTorsionSpringRate` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, deflecti...` | _ | _ | _ |
 | calc-mechanic.js | `computeTrapSpeedHorsepower` | `{ weight_lb = 0, trap_mph = 0 } = {}` | _ | _ | _ |
@@ -3371,7 +3372,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1957.
+Row count: 1958.
 
 <!-- END function-corpus-v14 -->
 
@@ -4690,7 +4691,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (132 tiles)
+### Group K Mechanic (133 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4810,6 +4811,7 @@ per spec-v14 §13.1 second paragraph.
 | `thread-single-depth` | Single-Point Thread Cutting Depth | Single-point thread cutting depth (60...; pitch = 1/13 = 0.0769; depth = 0.6134 x 0.0769 = 0.0472; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tire-contact-patch` | Tire Contact Patch from Load and Pressure | first-order pneumatic-tire relation A...; spec-v808 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tire-gearing` | Tire Size and Effective Gear Ratio | Project (first-principles) over Tire ...; P265/70R17 -> 33x12.50R17 / 3.73 axle / 0.84 top gear / 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `toggle-mechanism-force` | Toggle Mechanism Clamping Force | Project (first-principles); F_out = F_in/(2 tan theta) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `torque-adapter-correction` | Torque Wrench Extension / Crowfoot Correction | Standard torque-adapter correction (S...; spec-v485 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `torsion-spring-rate` | Helical Torsion Spring Rate and Torque | Project (first-principles); k = d^4 E/(10.8 D Na) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trap-speed-horsepower` | Horsepower from Quarter-Mile Trap Speed | Hale quarter-mile trap-speed relation; spec-v325 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5250,6 +5252,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1706. Fixture-covered or reference-cadence: 1706 / 1706.
+Tile count: 1707. Fixture-covered or reference-cadence: 1707 / 1707.
 
 <!-- END tile-index-v14 -->

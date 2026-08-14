@@ -186,6 +186,7 @@ export const COMPUTE_MAP = {
   "universal-joint-speed": { module: "../../calc-mechanic.js", fn: "computeUniversalJointSpeed" },
   "slider-crank-piston-position": { module: "../../calc-mechanic.js", fn: "computeSliderCrankPistonPosition" },
   "scotch-yoke-motion": { module: "../../calc-mechanic.js", fn: "computeScotchYokeMotion" },
+  "toggle-mechanism-force": { module: "../../calc-mechanic.js", fn: "computeToggleMechanismForce" },
   "impact-load-factor": { module: "../../calc-mechanic.js", fn: "computeImpactLoadFactor" },
   "hydraulic-accumulator-volume": { module: "../../calc-mechanic.js", fn: "computeHydraulicAccumulatorVolume" },
   "projectile-range": { module: "../../calc-mechanic.js", fn: "computeProjectileRange" },

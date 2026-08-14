@@ -3154,6 +3154,26 @@
    "kind": "industry"
   },
   {
+   "term": "toggle clamp force",
+   "target": "toggle-mechanism-force",
+   "kind": "industry"
+  },
+  {
+   "term": "toggle mechanism mechanical advantage",
+   "target": "toggle-mechanism-force",
+   "kind": "industry"
+  },
+  {
+   "term": "knee joint press force",
+   "target": "toggle-mechanism-force",
+   "kind": "question"
+  },
+  {
+   "term": "over center clamp",
+   "target": "toggle-mechanism-force",
+   "kind": "adjacent"
+  },
+  {
    "term": "scotch yoke",
    "target": "scotch-yoke-motion",
    "kind": "industry"
