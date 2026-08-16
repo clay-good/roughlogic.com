@@ -90,7 +90,8 @@ export const ropeMAExample = { inputs: { rig: "4:1", efficiency: 0.9, load_lb: 6
 
 // --- Utility 161: Sling Angle Load Multiplier ---
 //
-// L = W / (n * sin(theta/2)) for basket / vertical.
+// L = W / (n * cos(theta/2)) for basket / vertical (included apex angle:
+// each leg sits theta/2 off vertical, so tension rises as the legs spread).
 // Choker reduction factor 0.75 typical. ASME B30.9 cited by section.
 
 // spec-v27 EN: standard wire-rope D/d bend-efficiency curve (sling diameter
@@ -205,7 +206,7 @@ function renderRopeMA(inputRegion, outputRegion, citationEl) {
 }
 
 function renderSlingAngle(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Notice: Departmental SOPs and incident command govern all rigging and lifting operations. Citation: ASME B30.9 by section number only. L = W / (n * sin(theta/2)).";
+  citationEl.textContent = "Notice: Departmental SOPs and incident command govern all rigging and lifting operations. Citation: ASME B30.9 by section number only. L = W / (n * cos(theta/2)).";
   _aeF(inputRegion, () => fillExample(slingAngleExample.inputs));
   const w = _mnF("Load (lb)", "sa-w", { step: "any", min: "0" });
   const c = _msF("Sling configuration", "sa-c", [{ value: "vertical", label: "Vertical" }, { value: "basket", label: "Basket" }, { value: "bridle", label: "Bridle" }, { value: "choker", label: "Choker" }]);
