@@ -7814,15 +7814,18 @@ test("monotonicity: computeBoltTorque torque_ft_lb is strictly increasing in dia
   assert.ok(Math.abs(b.torque_ft_lb - 2 * a.torque_ft_lb) < 1e-9,
     `2x PF: T = ${b.torque_ft_lb} != 2 * ${a.torque_ft_lb}`);
   // Grade ordering pin: ASTM_A307 (36000) < SAE_2 (55000) < SAE_5 (85000)
-  // < ASTM_A325 (92000) < SAE_8 = ASTM_A490 (120000).
+  // = ASTM_A325 (85000, A325 is the SAE Grade 5 equivalent, 85 ksi proof)
+  // < SAE_8 = ASTM_A490 (120000).
   const a307 = computeBoltTorque({ grade: "ASTM_A307", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
   const sae2 = computeBoltTorque({ grade: "SAE_2", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
   const sae5 = computeBoltTorque({ grade: "SAE_5", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
   const a325 = computeBoltTorque({ grade: "ASTM_A325", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
   const sae8 = computeBoltTorque({ grade: "SAE_8", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
   const a490 = computeBoltTorque({ grade: "ASTM_A490", diameter_in: 0.5, lubrication: "dry", preload_fraction: 0.75 });
-  assert.ok(a307.torque_ft_lb < sae2.torque_ft_lb && sae2.torque_ft_lb < sae5.torque_ft_lb && sae5.torque_ft_lb < a325.torque_ft_lb && a325.torque_ft_lb < sae8.torque_ft_lb,
+  assert.ok(a307.torque_ft_lb < sae2.torque_ft_lb && sae2.torque_ft_lb < sae5.torque_ft_lb && sae5.torque_ft_lb <= a325.torque_ft_lb && a325.torque_ft_lb < sae8.torque_ft_lb,
     `grade ordering: ${a307.torque_ft_lb} ${sae2.torque_ft_lb} ${sae5.torque_ft_lb} ${a325.torque_ft_lb} ${sae8.torque_ft_lb}`);
+  assert.ok(Math.abs(sae5.torque_ft_lb - a325.torque_ft_lb) < 1e-9,
+    `SAE_5 / A325 tie (both 85 ksi proof): ${sae5.torque_ft_lb} != ${a325.torque_ft_lb}`);
   assert.ok(Math.abs(sae8.torque_ft_lb - a490.torque_ft_lb) < 1e-9,
     `SAE_8 / A490 tie: ${sae8.torque_ft_lb} != ${a490.torque_ft_lb}`);
   // Lubrication-K ordering pin: dry 0.20 > oiled 0.18 > antiseize 0.15.

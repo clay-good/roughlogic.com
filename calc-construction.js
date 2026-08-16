@@ -1640,7 +1640,7 @@ export const concreteMixDesignExample = { inputs: { strength_psi: 4000, exposure
 
 export const BOLT_PROOF_LOADS_PSI = {
   SAE_2: 55000, SAE_5: 85000, SAE_8: 120000,
-  ASTM_A307: 36000, ASTM_A325: 92000, ASTM_A490: 120000,
+  ASTM_A307: 36000, ASTM_A325: 85000, ASTM_A490: 120000,
 };
 
 export const TORQUE_K_FACTOR = { dry: 0.20, oiled: 0.18, antiseize: 0.15 };
