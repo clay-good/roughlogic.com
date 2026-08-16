@@ -589,6 +589,13 @@ label {
   margin-bottom: 6px;
   color: var(--fg);
   font-size: 1.02rem;
+  /* A multiline-input label carries a format hint with no natural break
+     point ("Cables: count,diameter(in),large|small per line"); commas and
+     pipes are not break opportunities, so the token's intrinsic width sets
+     the field's min-content size and pushes the view past a 320px viewport
+     on a wider-metric font (CI's Linux WebKit). Break anywhere, same as
+     .view-title / .view-desc and the shell prose classes. */
+  overflow-wrap: anywhere;
 }
 
 input[type="number"],
