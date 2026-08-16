@@ -259,7 +259,7 @@ main {
 .home-lede {
   margin: 0 auto var(--space-6);
   max-width: 54ch;
-  font-size: 1.08rem;
+  font-size: 1.18rem;
   line-height: 1.65;
   color: var(--fg-muted);
 }
@@ -487,7 +487,7 @@ main {
 }
 
 .view-desc {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   color: var(--fg-muted);
   margin: 0 0 var(--space-4);
   /* A tile description may carry a long unbreakable formula token (e.g.
@@ -504,7 +504,7 @@ main {
   border-radius: var(--radius);
   padding: 14px 18px;
   margin-bottom: var(--space-4);
-  font-size: 0.92rem;
+  font-size: 0.98rem;
   color: var(--fg-muted);
 }
 
@@ -533,7 +533,7 @@ main {
 }
 
 .citation {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: var(--fg-dim);
   font-style: italic;
   margin-bottom: var(--space-3);
@@ -588,7 +588,7 @@ label {
   font-weight: 600;
   margin-bottom: 6px;
   color: var(--fg);
-  font-size: 0.92rem;
+  font-size: 1.02rem;
 }
 
 input[type="number"],
@@ -601,7 +601,7 @@ textarea {
   color: var(--fg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-family: inherit;
   transition: border-color 0.18s ease, background 0.18s ease;
 }
@@ -663,7 +663,7 @@ input[aria-invalid="true"] {
 
 .output-region p {
   margin: 0 0 var(--space-2);
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: var(--fg);
   display: flex;
   align-items: center;
@@ -680,7 +680,8 @@ input[aria-invalid="true"] {
 .out-value {
   color: var(--fg);
   font-family: var(--font-mono);
-  font-size: 0.98rem;
+  font-size: 1.15rem;
+  font-weight: 600;
   /* A long unbreakable result token (a binary base-conversion string, a
      long hex pin, a multi-segment code) must wrap inside the flex output
      line rather than push the view-region wider than the viewport. The
@@ -796,10 +797,56 @@ input[aria-invalid="true"] {
   transform: translateY(-1px);
 }
 
+/* The proof block. Every citation, reference row, and source stamp lives
+   inside it, collapsed by default, so a tile reads as title -> inputs ->
+   answer and the receipts are one click away instead of a wall of prose
+   above the calculator. */
+.proof {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-4);
+  background: var(--bg-tertiary);
+}
+
+/* `display: list-item` (not flex) so the browser keeps drawing the
+   disclosure triangle: a summary styled as a flex container loses its
+   marker in Chromium, and the block then reads as an inert heading. */
+.proof > summary {
+  cursor: pointer;
+  padding: 16px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--fg-muted);
+  display: list-item;
+  list-style-position: inside;
+}
+
+.proof > summary:hover { color: var(--fg); }
+
+.proof[open] > summary { border-bottom: 1px solid var(--border); }
+
+.proof > *:not(summary) {
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+.proof > .citation { margin-top: var(--space-3); }
+
+.proof > .sources-region:last-child { padding-bottom: var(--space-3); }
+
 .sources-region {
   margin-top: var(--space-4);
   padding-top: var(--space-3);
   border-top: 1px solid var(--border);
+}
+
+/* An empty sources-region (tile with no structured citation entry and no
+   data-source stamp) would otherwise draw a stray rule inside the proof
+   block. */
+.sources-region:empty {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
 }
 
 .data-source-stamp {
@@ -1094,6 +1141,23 @@ input[aria-invalid="true"] {
     color: black !important;
     text-decoration: underline !important;
   }
+  /* A printed page has no disclosure to click, so the proof must print in
+     full. app.js also sets `open` on beforeprint; this covers browsers that
+     print without firing the event. */
+  .proof, .shell-proof {
+    background: white !important;
+    color: black !important;
+    border-color: #999 !important;
+  }
+  .proof::details-content,
+  .shell-proof::details-content {
+    content-visibility: visible;
+    block-size: auto;
+  }
+  .proof > summary,
+  .shell-proof > summary {
+    list-style: none;
+  }
 }
 
 /* ============================================================
@@ -1354,7 +1418,7 @@ input[aria-invalid="true"] {
   text-decoration: underline;
 }
 .shell-page .shell-h1 {
-  font-size: 1.75rem;
+  font-size: 2.1rem;
   margin: 0 0 var(--space-2);
   /* A tile title may carry a long unbreakable slash-joined token (e.g.
      "(Goodman/Soderberg/Gerber)") that would push the zero-JS shell past the
@@ -1363,7 +1427,7 @@ input[aria-invalid="true"] {
   overflow-wrap: anywhere;
 }
 .shell-page .shell-lead {
-  font-size: 1.0625rem;
+  font-size: 1.1875rem;
   line-height: 1.5;
   margin: 0 0 var(--space-3);
 }
@@ -1420,6 +1484,66 @@ input[aria-invalid="true"] {
 .shell-page .shell-related a:focus {
   text-decoration: underline;
 }
+/* The worked example: `key = value` rows for what a reader types and what
+   comes back. Same numbers the live tool's "Test with example" button loads,
+   and the same field names the MCP `calculate` tool takes. */
+.shell-page .shell-io-label {
+  font-weight: 600;
+  margin: var(--space-3) 0 var(--space-2);
+}
+.shell-page .shell-io {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+  font-size: 1.0625rem;
+}
+.shell-page .shell-io li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  overflow-wrap: anywhere;
+}
+.shell-page .shell-io code {
+  font-family: var(--font-mono);
+  color: var(--fg-muted);
+  overflow-wrap: anywhere;
+}
+.shell-page .shell-io b { color: var(--fg); }
+
+/* An assumption is a name + value with its source underneath, so the
+   source does not read as a third sibling on the same line. */
+.shell-page .shell-assume li {
+  display: block;
+  margin-bottom: var(--space-2);
+}
+.shell-page .shell-assume small {
+  display: block;
+  color: var(--fg-muted);
+  font-size: 0.9375rem;
+}
+
+/* Formula, source, and assumptions, collapsed. Zero-JS: the <details>
+   disclosure is native, so the shell keeps its no-script guarantee. */
+.shell-page .shell-proof {
+  margin: var(--space-4) 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 var(--space-3);
+}
+.shell-page .shell-proof > summary {
+  cursor: pointer;
+  padding: var(--space-3) 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  display: list-item;
+  list-style-position: inside;
+}
+.shell-page .shell-proof .shell-io {
+  margin-bottom: var(--space-3);
+}
+
 .shell-page .shell-related-desc {
   color: var(--fg-muted);
   font-size: 0.9375rem;

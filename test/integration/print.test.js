@@ -63,10 +63,9 @@ for (const route of ROUTES) {
     // content is stable, removing the print-emulation race while keeping
     // the same DOM-content invariant.
 
-    // (1) Citation footer present and non-empty. The view inserts two
-    // `.citation` paragraphs (the inline citation and the v6 sources
-    // note); both share the class. We assert the first one carries
-    // text, which is the spec's "Citation: ..." line.
+    // (1) Citation present and non-empty. It lives inside the collapsed
+    // `details.proof` block; toHaveText reads textContent, so the assertion
+    // holds whether or not the disclosure is expanded.
     await expect(page.locator("#view-region .citation").first(), "citation footer is empty for " + route.name).toHaveText(/\S/);
 
     // (2) View h1 carries the tool name.

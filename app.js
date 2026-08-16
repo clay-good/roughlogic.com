@@ -1556,6 +1556,13 @@ const state = {
 // Boot.
 document.addEventListener("DOMContentLoaded", boot);
 
+// A printed page has no disclosure to click, so expand the proof block
+// before the print snapshot is taken. The @media print rules cover the
+// browsers that print without firing this event.
+window.addEventListener("beforeprint", () => {
+  for (const d of document.querySelectorAll("details.proof")) d.open = true;
+});
+
 function boot() {
   bindSearch();
   bindShortcuts();
@@ -1730,9 +1737,12 @@ function renderToolView(id, params) {
   else notice.textContent = NOTICE_DEFAULT;
   view.appendChild(notice);
 
+  // The inline citation is written by every renderer. It is long-form
+  // reference prose, so it lives inside the collapsed proof block below the
+  // answer rather than above the inputs, where it used to push the
+  // calculator off the first screen.
   const citation = document.createElement("p");
   citation.className = "citation";
-  view.appendChild(citation);
 
   const inputRegion = document.createElement("section");
   inputRegion.className = "input-region";
@@ -1745,14 +1755,21 @@ function renderToolView(id, params) {
   outputRegion.setAttribute("aria-label", "Output");
   view.appendChild(outputRegion);
 
+  // One collapsed block holds the whole proof: the inline citation, the
+  // structured reference rows, and the data-source stamp. Closed by default
+  // so the page reads as question -> answer; one click shows the receipts.
+  const proof = document.createElement("details");
+  proof.className = "proof";
+  const proofSummary = document.createElement("summary");
+  proofSummary.textContent = "Show the formula, sources, and assumptions";
+  proof.appendChild(proofSummary);
+  proof.appendChild(citation);
+
   const sources = document.createElement("section");
   sources.className = "sources-region";
   sources.setAttribute("aria-label", "Sources");
-  const sourcesNote = document.createElement("p");
-  sourcesNote.className = "citation";
-  sourcesNote.textContent = "Every formula is drawn from published standards and engineering references.";
-  sources.appendChild(sourcesNote);
-  view.appendChild(sources);
+  proof.appendChild(sources);
+  view.appendChild(proof);
 
   // v6 §3 / §7: lazy-load the structured citation map. When the tile id has
   // a structured CITATIONS entry, mount the six-line reference block under
@@ -2383,8 +2400,8 @@ function mountCrashPanel(view, toolId) {
   const body = document.createElement("p");
   body.textContent = "Reload to retry, or paste your URL into a new tab to recover state. The URL is preserved.";
   panel.appendChild(body);
-  // Insert near the top of the view, just under the citation if it exists.
-  const after = view.querySelector(".citation") || view.firstChild;
-  if (after && after.nextSibling) view.insertBefore(panel, after.nextSibling);
+  // Insert near the top of the view, just above the inputs.
+  const inputs = view.querySelector(".input-region");
+  if (inputs) view.insertBefore(panel, inputs);
   else view.appendChild(panel);
 }

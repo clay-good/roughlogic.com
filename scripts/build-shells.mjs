@@ -104,6 +104,45 @@ function escapeHtml(s) {
     .replace(/'/g, "&#39;");
 }
 
+// Load the worked-example registry (test/fixtures/worked-examples.json) and
+// index it by tile id. Every tile carries at least one verified row -- the
+// check-worked-examples lint is fail-on-missing -- so the shell can print the
+// exact inputs a reader types and the exact outputs they get back, instead of
+// describing the calculation in the abstract. Keyed to the first row per tile.
+async function loadWorkedExamples() {
+  const raw = JSON.parse(await readFile(resolve(ROOT, "test/fixtures/worked-examples.json"), "utf8"));
+  const rows = Array.isArray(raw) ? raw : (raw.examples || raw.rows || []);
+  const byTile = new Map();
+  for (const row of rows) {
+    if (row && row.tile_id && !byTile.has(row.tile_id)) byTile.set(row.tile_id, row);
+  }
+  return byTile;
+}
+
+// Render a fixture value as the literal a reader would type. Outputs are
+// `{ value, tolerance }` wrappers; inputs are bare primitives. Anything
+// structured (an array of course loads, a nested object) is emitted as
+// compact JSON, which is exactly what the MCP callers pass.
+function exampleValue(v) {
+  const raw = (v && typeof v === "object" && !Array.isArray(v) && "value" in v) ? v.value : v;
+  if (raw === null || raw === undefined) return "";
+  if (typeof raw === "object") return JSON.stringify(raw);
+  return String(raw);
+}
+
+// A `key = value` row list. Doubles as the human worked example and as the
+// field-name contract the MCP `calculate` tool expects.
+function exampleRows(obj) {
+  return Object.entries(obj || {})
+    .map(([k, v]) => {
+      const val = exampleValue(v);
+      if (val === "") return "";
+      return `      <li><code>${escapeHtml(k)}</code> <b>${escapeHtml(val)}</b></li>`;
+    })
+    .filter(Boolean)
+    .join("\n");
+}
+
 // Parse the TOOLS array out of tools-data.js by regex (spec-v17 §H.2
 // extracted the catalog registry out of app.js into a lazy-loaded
 // tools-data.js). Matches the same shape scripts/check-tile-meta.mjs
@@ -376,7 +415,7 @@ function shellFooter() {
   ].join("\n");
 }
 
-function tileShell(tool, tools, groupNames, relatedMap) {
+function tileShell(tool, tools, groupNames, relatedMap, examples) {
   const professionNoun = PROFESSION_NOUN[tool.trades[0]] || "Trades";
   const groupLabel = groupNames[tool.group] || tool.group;
   const groupSlug = GROUP_SLUG[tool.group] || tool.group.toLowerCase();
@@ -401,6 +440,15 @@ function tileShell(tool, tools, groupNames, relatedMap) {
   const relatedItems = related.map((r) => (
     `      <li><a href="../${escapeHtml(r.id)}/">${escapeHtml(r.name)}</a></li>`
   )).join("\n");
+  // The verified worked example: the exact inputs a reader types and the
+  // exact answer they get back. Same numbers the "Test with example" button
+  // loads in the live calculator, so the static page and the tool agree.
+  const example = (examples && examples.get(tool.id)) || null;
+  const inputRows = example ? exampleRows(example.inputs) : "";
+  const outputRows = example ? exampleRows(example.outputs) : "";
+  const assumptionRows = (citation && Array.isArray(citation.assumptions) ? citation.assumptions : [])
+    .map((a) => `      <li><span>${escapeHtml(a.name)}</span> <b>${escapeHtml(a.value)}</b><small>${escapeHtml(a.source)}</small></li>`)
+    .join("\n");
   const body = [
     '<body class="shell-page">',
     header,
@@ -417,17 +465,31 @@ function tileShell(tool, tools, groupNames, relatedMap) {
     '  <p class="shell-run">',
     `    <a class="shell-run-link" href="../../#${escapeHtml(tool.id)}">Run the calculator</a>`,
     '  </p>',
+    inputRows ? [
+      '  <section class="shell-section" aria-label="Example">',
+      '    <h2>Example</h2>',
+      '    <p class="shell-io-label">You enter</p>',
+      '    <ul class="shell-io">',
+      inputRows,
+      '    </ul>',
+      outputRows ? '    <p class="shell-io-label">You get</p>' : '',
+      outputRows ? '    <ul class="shell-io">' : '',
+      outputRows,
+      outputRows ? '    </ul>' : '',
+      '  </section>',
+    ].filter(Boolean).join("\n") : '',
     citation ? [
-      '  <section class="shell-section" aria-label="Formula and source">',
-      '    <h2>Formula and source</h2>',
+      '  <details class="shell-proof" aria-label="Formula and source">',
+      '    <summary>Show the formula, source, and assumptions</summary>',
       `    <p class="shell-formula">${escapeHtml(citation.formula)}</p>`,
       `    <p class="shell-source">${escapeHtml(citation.edition)}</p>`,
-      '  </section>',
-    ].join("\n") : '',
-    '  <section class="shell-section" aria-label="Audience">',
-    '    <h2>Audience</h2>',
-    `    <p>This tile is built for ${escapeHtml(professionNoun.toLowerCase())} and the adjacent professions in the ${escapeHtml(groupLabel)} group. The interactive calculator runs entirely in your browser. No account, no fee, no advertising, no tracking.</p>`,
-    '  </section>',
+      citation.freeAccess ? `    <p class="shell-source">${escapeHtml(citation.freeAccess)}</p>` : '',
+      citation.governance ? `    <p class="shell-source">${escapeHtml(citation.governance)}</p>` : '',
+      assumptionRows ? '    <ul class="shell-io shell-assume">' : '',
+      assumptionRows,
+      assumptionRows ? '    </ul>' : '',
+      '  </details>',
+    ].filter(Boolean).join("\n") : '',
     relatedItems ? [
       '  <section class="shell-section" aria-label="Related tools">',
       '    <h2>Related tools</h2>',
@@ -436,10 +498,6 @@ function tileShell(tool, tools, groupNames, relatedMap) {
       '    </ul>',
       '  </section>',
     ].join("\n") : '',
-    '  <section class="shell-section" aria-label="Posture">',
-    '    <h2>Posture</h2>',
-    '    <p>Rough Logic answers the math question the working professional asks on the job. The site is a calm, fast, ad-free, account-free, ever-free reference. It does not interpret code. It does not replace the licensed professional. It does not store your inputs. The Authority Having Jurisdiction governs all installations and inspections.</p>',
-    '  </section>',
     '</main>',
     footer,
     '</body>',
@@ -563,11 +621,12 @@ async function main() {
   // to "first 5 in same group".
   const relatedMod = await import(resolve(ROOT, "scripts/related-tiles.mjs"));
   const relatedMap = relatedMod.RELATED || {};
+  const examples = await loadWorkedExamples();
 
   let shellCount = 0;
   // Per-tile shells.
   for (const tool of tools) {
-    const html = tileShell(tool, tools, groupNames, relatedMap);
+    const html = tileShell(tool, tools, groupNames, relatedMap, examples);
     const out = resolve(DIST, "tools", tool.id, "index.html");
     await mkdir(dirname(out), { recursive: true });
     await writeFile(out, html, "utf8");

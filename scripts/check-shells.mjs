@@ -268,7 +268,8 @@ async function lintShell(path, kind, errors) {
 
   // spec-v45: every tile shell prerenders the cited formula + source-stamp so
   // crawlers (and offline readers) get the reference content, not just the tile
-  // name. The Audience and Posture blocks are boilerplate; this is the math.
+  // name. It rides in a collapsed <details> so the page still reads as
+  // title -> example -> answer, with the receipts one click away.
   if (kind === "tile") {
     if (!/aria-label="Formula and source"/.test(html)) {
       errors.push(where + ": missing the 'Formula and source' section (spec-v45 prerendered citation).");

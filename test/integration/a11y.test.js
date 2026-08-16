@@ -372,7 +372,7 @@ test("Group H reference views do not render an empty input-region panel", async 
   // Without `.input-region:empty { display: none }`, an empty 50 px
   // bordered box appears above the actual content. Regression guard.
   await page.goto("/index.html#color-codes");
-  await page.waitForSelector(".citation", { timeout: 5000 });
+  await page.waitForSelector("details.proof summary", { timeout: 5000 });
   await page.waitForTimeout(300);
   const height = await page.locator(".input-region").evaluate((el) => el.getBoundingClientRect().height);
   expect(height).toBe(0);
@@ -453,7 +453,7 @@ for (const route of ["", "#loan-amortization", "#macrs-depreciation", "#color-co
       await page.locator(".input-region button").first().click();
       await page.waitForTimeout(120);
     } else if (route === "#color-codes") {
-      await page.waitForSelector(".citation", { timeout: 5000 });
+      await page.waitForSelector("details.proof summary", { timeout: 5000 });
     }
     await page.waitForTimeout(200);
     const overflow = await page.evaluate(() => {
