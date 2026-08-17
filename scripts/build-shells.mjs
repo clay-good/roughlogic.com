@@ -104,6 +104,62 @@ function escapeHtml(s) {
     .replace(/'/g, "&#39;");
 }
 
+// Abbreviations that end in a period mid-sentence. Splitting after one of
+// these would cut a description in half at "Rev. Proc." or "approx. 3 in.".
+const ABBREV = new Set([
+  "e.g", "i.e", "vs", "etc", "approx", "no", "fig", "ref", "sec", "ch", "vol",
+  "rev", "proc", "pub", "std", "ed", "min", "max", "avg", "est", "dia", "temp",
+  "in", "ft", "yd", "lb", "oz", "gal", "qt", "pt", "hr", "wt", "st", "mt",
+  "dr", "mr", "ms", "jr", "sr", "inc", "co", "corp", "u.s", "u.k",
+]);
+
+// The first sentence of a tile description, for the surfaces that need a
+// scannable one-liner (the shell lead, the group-hub list). Descriptions run
+// to a 401-character median and a 1,457-character max, so rendering them whole
+// in a list turns a group index into a wall of prose. The full text still
+// renders on the tile's own page, one click away.
+//
+// A period only ends a sentence when it is followed by whitespace and then an
+// uppercase letter or a digit, and when the word before it is not a known
+// abbreviation -- so "0.75", "e.g. the", and "3 in. of head" all stay put.
+// A candidate shorter than MIN_LEAD keeps extending, so a description opening
+// with a short clause does not collapse to three words.
+const MIN_LEAD = 40;
+function firstSentence(desc) {
+  const s = String(desc).trim();
+  const re = /\.\s+(?=[A-Z0-9])/g;
+  let m;
+  while ((m = re.exec(s))) {
+    const end = m.index + 1;
+    if (end < MIN_LEAD) continue;
+    const before = s.slice(0, m.index);
+    const word = (before.match(/([A-Za-z.]+)$/) || ["", ""])[1].toLowerCase();
+    if (ABBREV.has(word)) continue;
+    return s.slice(0, end);
+  }
+  return s;
+}
+
+// The description minus its first sentence, or "" when there is only one.
+function restOfDescription(desc) {
+  const s = String(desc).trim();
+  const lead = firstSentence(s);
+  return s.slice(lead.length).trim();
+}
+
+// A group hub lists every tile in the group, so each row has to stay one
+// scannable line even when the tile's opening sentence runs long (these pack
+// clauses behind colons and semicolons and reach 370 characters). Trim to a
+// word boundary; the full description is on the tile page the row links to.
+const GROUP_ROW_CAP = 150;
+function rowSummary(desc) {
+  const s = firstSentence(desc);
+  if (s.length <= GROUP_ROW_CAP) return s;
+  const cut = s.slice(0, GROUP_ROW_CAP);
+  const sp = cut.lastIndexOf(" ");
+  return (sp > 60 ? cut.slice(0, sp) : cut).replace(/[.,;:\s-]+$/, "") + "...";
+}
+
 // Load the worked-example registry (test/fixtures/worked-examples.json) and
 // index it by tile id. Every tile carries at least one verified row -- the
 // check-worked-examples lint is fail-on-missing -- so the shell can print the
@@ -443,6 +499,10 @@ function tileShell(tool, tools, groupNames, relatedMap, examples) {
   // The verified worked example: the exact inputs a reader types and the
   // exact answer they get back. Same numbers the "Test with example" button
   // loads in the live calculator, so the static page and the tool agree.
+  // Everything after the opening sentence. Kept on the page (it is real
+  // reference content, and crawlers should still see it) but moved below the
+  // worked example, so the reader gets the point and the Run button first.
+  const detail = restOfDescription(tool.desc);
   const example = (examples && examples.get(tool.id)) || null;
   const inputRows = example ? exampleRows(example.inputs) : "";
   const outputRows = example ? exampleRows(example.outputs) : "";
@@ -461,7 +521,7 @@ function tileShell(tool, tools, groupNames, relatedMap, examples) {
     '    </ol>',
     '  </nav>',
     `  <h1 class="shell-h1">${escapeHtml(tool.name)}</h1>`,
-    `  <p class="shell-lead">${escapeHtml(tool.desc)}</p>`,
+    `  <p class="shell-lead">${escapeHtml(firstSentence(tool.desc))}</p>`,
     '  <p class="shell-run">',
     `    <a class="shell-run-link" href="../../#${escapeHtml(tool.id)}">Run the calculator</a>`,
     '  </p>',
@@ -478,6 +538,12 @@ function tileShell(tool, tools, groupNames, relatedMap, examples) {
       outputRows ? '    </ul>' : '',
       '  </section>',
     ].filter(Boolean).join("\n") : '',
+    detail ? [
+      '  <section class="shell-section" aria-label="Details">',
+      '    <h2>Details</h2>',
+      `    <p class="shell-detail">${escapeHtml(detail)}</p>`,
+      '  </section>',
+    ].join("\n") : '',
     citation ? [
       '  <details class="shell-proof" aria-label="Formula and source">',
       '    <summary>Show the formula, source, and assumptions</summary>',
@@ -535,7 +601,7 @@ function groupShell(group, tools, groupNames) {
   const header = shellHeader(2);
   const footer = shellFooter();
   const items = tilesInGroup.map((t) => (
-    `      <li><a href="../../tools/${escapeHtml(t.id)}/">${escapeHtml(t.name)}</a><span class="shell-related-desc"> - ${escapeHtml(t.desc)}</span></li>`
+    `      <li><a href="../../tools/${escapeHtml(t.id)}/">${escapeHtml(t.name)}</a><span class="shell-related-desc"> - ${escapeHtml(rowSummary(t.desc))}</span></li>`
   )).join("\n");
   const body = [
     '<body class="shell-page">',
@@ -548,7 +614,7 @@ function groupShell(group, tools, groupNames) {
     '    </ol>',
     '  </nav>',
     `  <h1 class="shell-h1">${escapeHtml(groupLabel)}</h1>`,
-    `  <p class="shell-lead">${escapeHtml(tilesInGroup.length)} calculators and reference tools for ${escapeHtml(groupLabel.toLowerCase())}. Every tool runs entirely in your browser. No account. No fee. No advertising. No tracking.</p>`,
+    `  <p class="shell-lead">${escapeHtml(tilesInGroup.length)} calculators for ${escapeHtml(groupLabel.toLowerCase())}. Every one runs in your browser. Free, no account.</p>`,
     `  <p class="shell-run"><a class="shell-run-link" href="../../#group=${escapeHtml(group)}">Open the live group view</a></p>`,
     '  <section class="shell-section" aria-label="Tools in this group">',
     '    <h2>Tools in this group</h2>',

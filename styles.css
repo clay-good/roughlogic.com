@@ -1446,8 +1446,14 @@ input[aria-invalid="true"] {
    tile's string length -- see scripts/check-shell-mobile.mjs. */
 .shell-page .shell-lead,
 .shell-page .shell-formula,
-.shell-page .shell-source {
+.shell-page .shell-source,
+.shell-page .shell-detail {
   overflow-wrap: anywhere;
+}
+.shell-page .shell-detail {
+  margin: 0;
+  color: var(--fg-muted);
+  line-height: 1.6;
 }
 .shell-page .shell-run {
   margin: var(--space-3) 0;
