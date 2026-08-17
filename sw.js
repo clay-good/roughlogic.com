@@ -24,6 +24,7 @@ const SHELL_ASSETS = [
   "./tools-data.js",
   "./pure-math.js",
   "./routing.js",
+  "./text-lead.js",
   "./hash-state.js",
   "./data-stamp.js",
   "./clipboard.js",

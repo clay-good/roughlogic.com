@@ -23,6 +23,7 @@ const FILES = [
   "manual-j-worker.js",
   "pure-math.js",
   "routing.js",
+  "text-lead.js",
   "hash-state.js",
   "data-stamp.js",
   "clipboard.js",

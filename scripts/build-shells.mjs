@@ -24,6 +24,7 @@ import { existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { CITATIONS } from "../citations.js";
+import { firstSentence, restOfDescription } from "../text-lead.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = resolve(ROOT, "dist");
@@ -102,49 +103,6 @@ function escapeHtml(s) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-}
-
-// Abbreviations that end in a period mid-sentence. Splitting after one of
-// these would cut a description in half at "Rev. Proc." or "approx. 3 in.".
-const ABBREV = new Set([
-  "e.g", "i.e", "vs", "etc", "approx", "no", "fig", "ref", "sec", "ch", "vol",
-  "rev", "proc", "pub", "std", "ed", "min", "max", "avg", "est", "dia", "temp",
-  "in", "ft", "yd", "lb", "oz", "gal", "qt", "pt", "hr", "wt", "st", "mt",
-  "dr", "mr", "ms", "jr", "sr", "inc", "co", "corp", "u.s", "u.k",
-]);
-
-// The first sentence of a tile description, for the surfaces that need a
-// scannable one-liner (the shell lead, the group-hub list). Descriptions run
-// to a 401-character median and a 1,457-character max, so rendering them whole
-// in a list turns a group index into a wall of prose. The full text still
-// renders on the tile's own page, one click away.
-//
-// A period only ends a sentence when it is followed by whitespace and then an
-// uppercase letter or a digit, and when the word before it is not a known
-// abbreviation -- so "0.75", "e.g. the", and "3 in. of head" all stay put.
-// A candidate shorter than MIN_LEAD keeps extending, so a description opening
-// with a short clause does not collapse to three words.
-const MIN_LEAD = 40;
-function firstSentence(desc) {
-  const s = String(desc).trim();
-  const re = /\.\s+(?=[A-Z0-9])/g;
-  let m;
-  while ((m = re.exec(s))) {
-    const end = m.index + 1;
-    if (end < MIN_LEAD) continue;
-    const before = s.slice(0, m.index);
-    const word = (before.match(/([A-Za-z.]+)$/) || ["", ""])[1].toLowerCase();
-    if (ABBREV.has(word)) continue;
-    return s.slice(0, end);
-  }
-  return s;
-}
-
-// The description minus its first sentence, or "" when there is only one.
-function restOfDescription(desc) {
-  const s = String(desc).trim();
-  const lead = firstSentence(s);
-  return s.slice(lead.length).trim();
 }
 
 // A group hub lists every tile in the group, so each row has to stay one

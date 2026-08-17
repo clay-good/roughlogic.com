@@ -497,6 +497,16 @@ main {
   overflow-wrap: anywhere;
 }
 
+/* The rest of the description, below the answer. Same role as the shell's
+   .shell-detail: real reference prose the reader reaches after the result. */
+.view-detail {
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
+  margin: var(--space-4) 0 0;
+  overflow-wrap: anywhere;
+}
+
 .inline-notice {
   background: var(--bg-tertiary);
   border: 1px solid var(--border-light);
@@ -808,6 +818,36 @@ input[aria-invalid="true"] {
    inside it, collapsed by default, so a tile reads as title -> inputs ->
    answer and the receipts are one click away instead of a wall of prose
    above the calculator. */
+/* A prose "Note" output row (ui-fields.makeNoteLine): collapsed inside the
+   answer area so the numbers stay on one screen. Same disclosure affordance as
+   .proof, one size down. */
+.note-row {
+  margin: var(--space-2) 0 0;
+}
+
+.note-row > summary {
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--fg-muted);
+  display: list-item;
+  list-style-position: inside;
+  min-height: var(--touch-min);
+  line-height: var(--touch-min);
+}
+
+.note-row > summary:hover { color: var(--fg); }
+
+.note-row .note-value {
+  display: block;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--fg-muted);
+  padding-bottom: var(--space-2);
+}
+
 .proof {
   border: 1px solid var(--border);
   border-radius: var(--radius);

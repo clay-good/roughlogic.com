@@ -18,7 +18,7 @@
 2. Type your numbers. The answer updates as you type. There is no submit button.
 3. Tap **Copy** to take a value with you.
 
-Each tile opens prefilled with a worked example, so you can see the shape of the answer before you touch anything, then replace the numbers with yours. **Test with example** puts the reference case back. **Show the formula, sources, and assumptions** expands the proof.
+Every field shows an example value as its placeholder, so you can see the expected unit and magnitude before you type. **Test with example** fills the whole reference case at once, and a tile opened from its own page arrives with that case already loaded. **Show the formula, sources, and assumptions** expands the proof.
 
 **A worked example.** [Voltage Drop](https://roughlogic.com/tools/voltage-drop/):
 

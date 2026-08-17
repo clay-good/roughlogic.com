@@ -8,6 +8,7 @@
 // when the user opens a tool.
 import { verifyManifestIntegrity } from "./integrity.js";
 import { parseHashRoute } from "./routing.js";
+import { firstSentence, restOfDescription } from "./text-lead.js";
 
 // Recents (utility 120) was removed in v11; see specs/spec-v11.md.
 
@@ -1717,9 +1718,13 @@ function renderToolView(id, params) {
   h1.textContent = tool.name;
   view.appendChild(h1);
 
+  // Lead with the opening sentence only, the same one the static shell prints.
+  // Descriptions run to 1,457 characters; rendering one whole above the fields
+  // buries the calculator under prose the reader has not asked for yet. The
+  // remainder goes below the answer, as `detail`.
   const lead = document.createElement("p");
   lead.className = "view-desc";
-  lead.textContent = tool.desc;
+  lead.textContent = firstSentence(tool.desc);
   view.appendChild(lead);
 
   const notice = document.createElement("div");
@@ -1735,7 +1740,8 @@ function renderToolView(id, params) {
   else if (tool.group === "Y") notice.textContent = NOTICE_EDUCATION;
   else if (tool.trades.includes(FIRE_GROUND_TRADE)) notice.textContent = NOTICE_FIRE;
   else notice.textContent = NOTICE_DEFAULT;
-  view.appendChild(notice);
+  // Appended below the answer, not above the fields. It is standing boilerplate
+  // -- what governs, not what to do -- and it reads the same on every tile.
 
   // The inline citation is written by every renderer. It is long-form
   // reference prose, so it lives inside the collapsed proof block below the
@@ -1754,6 +1760,18 @@ function renderToolView(id, params) {
   outputRegion.setAttribute("aria-live", "polite");
   outputRegion.setAttribute("aria-label", "Output");
   view.appendChild(outputRegion);
+
+  // Everything after the opening sentence: scope, caveats, what the tile does
+  // not cover. Real reference content, so it stays on the page, but below the
+  // answer -- the same order the static shell uses.
+  const detailText = restOfDescription(tool.desc);
+  if (detailText) {
+    const detail = document.createElement("p");
+    detail.className = "view-detail";
+    detail.textContent = detailText;
+    view.appendChild(detail);
+  }
+  view.appendChild(notice);
 
   // One collapsed block holds the whole proof: the inline citation, the
   // structured reference rows, and the data-source stamp. Closed by default
