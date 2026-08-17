@@ -523,7 +523,11 @@ function tileShell(tool, tools, groupNames, relatedMap, examples) {
     `  <h1 class="shell-h1">${escapeHtml(tool.name)}</h1>`,
     `  <p class="shell-lead">${escapeHtml(firstSentence(tool.desc))}</p>`,
     '  <p class="shell-run">',
-    `    <a class="shell-run-link" href="../../#${escapeHtml(tool.id)}">Run the calculator</a>`,
+    // `?example=1` makes renderToolView load the same worked example this page
+    // prints, so a reader who just read "awg 12 -> 24.4 A" lands on a
+    // calculator already showing it, ready to be edited. Tiles with no example
+    // button ignore the param.
+    `    <a class="shell-run-link" href="../../#${escapeHtml(tool.id)}${example ? "?example=1" : ""}">Run the calculator</a>`,
     '  </p>',
     inputRows ? [
       '  <section class="shell-section" aria-label="Example">',
