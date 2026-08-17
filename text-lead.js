@@ -38,9 +38,34 @@ export function firstSentence(desc) {
   return s;
 }
 
-// The description minus its first sentence, or "" when there is only one.
+// An opening sentence is not automatically a short one: 530 of them run past
+// 200 characters and the longest is 615, because these descriptions pack the
+// whole scope into one sentence behind a colon or a dash ("The bathroom
+// rough-in check, in four numbers: 15 in from a fixture centerline to ...").
+// A lead like that is the wall of text the one-sentence rule was meant to
+// avoid. So when the sentence runs long, cut it at its first real clause
+// boundary and let the full text carry the rest below the answer.
+const LEAD_CAP = 160;
+const CLAUSE = /(: | -- |; )/g;
+
+export function leadSentence(desc) {
+  const s = firstSentence(desc);
+  if (s.length <= LEAD_CAP) return s;
+  CLAUSE.lastIndex = 0;
+  let m;
+  while ((m = CLAUSE.exec(s))) {
+    if (m.index >= MIN_LEAD) return s.slice(0, m.index).replace(/[,;:\s-]+$/, "") + ".";
+  }
+  return s;
+}
+
+// The prose that belongs below the answer. When the lead is the whole opening
+// sentence, that is everything after it. When the lead is a clause-cut summary
+// of a longer sentence, it is the whole description: a Details block has to
+// read as prose, and starting one mid-sentence in lower case reads as a bug.
 export function restOfDescription(desc) {
   const s = String(desc).trim();
-  const lead = firstSentence(s);
-  return s.slice(lead.length).trim();
+  const sentence = firstSentence(s);
+  if (leadSentence(s) !== sentence) return s;
+  return s.slice(sentence.length).trim();
 }

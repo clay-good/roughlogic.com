@@ -156,12 +156,25 @@ export function attachExampleButton(host, fillFn) {
   btn.type = "button";
   btn.className = "example-btn";
   btn.textContent = "Test with example";
-  btn.addEventListener("click", fillFn);
   host.insertBefore(btn, host.firstChild);
+  // Whether an answer was already on its way in before priming started. A
+  // deep-linked tile gets real input events from applyHashState, and the
+  // ?example=1 path clicks this button -- both are meant to show a result.
+  // Anything else opens without one. Capture phase, so a renderer that fires
+  // non-bubbling events is still seen.
+  let seeded = false;
+  const mark = () => { seeded = true; };
+  btn.addEventListener("click", () => { mark(); fillFn(); });
+  host.addEventListener("input", mark, true);
+  host.addEventListener("change", mark, true);
   // Deferred: many tiles attach the button before they build their fields,
   // and the view applies deep-linked values right after the renderer returns.
   // A microtask runs after both, still before the first paint.
-  queueMicrotask(() => primeExamplePlaceholders(host, fillFn));
+  queueMicrotask(() => {
+    host.removeEventListener("input", mark, true);
+    host.removeEventListener("change", mark, true);
+    primeExamplePlaceholders(host, fillFn, seeded);
+  });
   return btn;
 }
 
@@ -172,7 +185,7 @@ export function attachExampleButton(host, fillFn) {
 // rendered fields, copy what it wrote into placeholders, and put every field
 // back exactly as it was. Fields that already hold a value -- a tile default or
 // a deep-linked one -- keep it and get no placeholder.
-function primeExamplePlaceholders(host, fillFn) {
+function primeExamplePlaceholders(host, fillFn, seeded) {
   // The view can already be gone by the time the microtask runs -- a fast
   // hash change, or a catalog-wide sweep. Priming a detached region is pure
   // cost, so skip it.
@@ -180,11 +193,11 @@ function primeExamplePlaceholders(host, fillFn) {
   const els = Array.from(host.querySelectorAll("input, select, textarea"));
   if (!els.length) return;
   const before = els.map((el) => ({ el, value: el.value, checked: el.checked }));
-  // A tile opened blank must still read blank once priming is done. A tile
-  // opened with deep-linked or default values is meant to show its answer, so
-  // leave that answer alone.
-  const startedBlank = before.every((snap) => !isTextish(snap.el) || !snap.value);
-  const restoreOutputs = startedBlank ? snapshotOutputs(host) : () => {};
+  // A tile that was not going to show an answer must not start showing one.
+  // That includes tiles whose fields carry defaults: computing off a default
+  // nobody chose would put a confident verdict on screen before the reader has
+  // typed anything.
+  const restoreOutputs = seeded ? () => {} : snapshotOutputs(host);
   try {
     fillFn();
   } catch {
@@ -213,16 +226,17 @@ function primeExamplePlaceholders(host, fillFn) {
     el.dispatchEvent(new Event("change", { bubbles: false }));
   }
   // The filler's compute is debounced, so it lands well after the restore
-  // above. Watch the answer region and undo any write until it settles: a tile
-  // opened blank has to stay blank, and reverting inside the observer callback
-  // means no intermediate frame is ever painted or observable.
-  const stillBlank = () => before.every((snap) => !isTextish(snap.el) || !snap.el.value);
-  restoreOutputs(stillBlank);
+  // above. Watch the answer region and undo any write until it settles;
+  // reverting inside the observer callback means no intermediate frame is ever
+  // painted or observable. Once a field differs from what priming put back,
+  // the reader has typed and the answer on screen is theirs.
+  const untouched = () => before.every((snap) => snap.el.value === snap.value && snap.el.checked === snap.checked);
+  restoreOutputs(untouched);
   const out = outputRegionFor(host);
-  if (startedBlank && out && typeof MutationObserver === "function") {
-    const obs = new MutationObserver(() => restoreOutputs(stillBlank));
+  if (!seeded && out && typeof MutationObserver === "function") {
+    const obs = new MutationObserver(() => restoreOutputs(untouched));
     obs.observe(out, { childList: true, subtree: true, characterData: true });
-    setTimeout(() => { restoreOutputs(stillBlank); obs.disconnect(); }, DEBOUNCE_MS * 4);
+    setTimeout(() => { restoreOutputs(untouched); obs.disconnect(); }, DEBOUNCE_MS * 4);
   }
 }
 
@@ -236,7 +250,7 @@ function outputRegionFor(host) {
 }
 
 // Capture the answer region's current text so priming can put it back. The
-// returned restore takes a predicate: once the reader has typed something, the
+// returned restore takes a predicate: once the reader has changed a field, the
 // answer on screen is theirs and must be left alone. Returns a no-op when the
 // tile has no sibling output region.
 function snapshotOutputs(host) {
@@ -245,8 +259,8 @@ function snapshotOutputs(host) {
   const leaves = Array.from(out.querySelectorAll("*"))
     .filter((el) => !el.firstElementChild)
     .map((el) => ({ el, text: el.textContent }));
-  return (stillBlank) => {
-    if (stillBlank && !stillBlank()) return;
+  return (untouched) => {
+    if (untouched && !untouched()) return;
     for (const leaf of leaves) {
       if (leaf.el.textContent !== leaf.text) leaf.el.textContent = leaf.text;
     }

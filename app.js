@@ -8,7 +8,7 @@
 // when the user opens a tool.
 import { verifyManifestIntegrity } from "./integrity.js";
 import { parseHashRoute } from "./routing.js";
-import { firstSentence, restOfDescription } from "./text-lead.js";
+import { leadSentence, restOfDescription } from "./text-lead.js";
 
 // Recents (utility 120) was removed in v11; see specs/spec-v11.md.
 
@@ -1724,7 +1724,7 @@ function renderToolView(id, params) {
   // remainder goes below the answer, as `detail`.
   const lead = document.createElement("p");
   lead.className = "view-desc";
-  lead.textContent = firstSentence(tool.desc);
+  lead.textContent = leadSentence(tool.desc);
   view.appendChild(lead);
 
   const notice = document.createElement("div");

@@ -24,7 +24,7 @@ import { existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { CITATIONS } from "../citations.js";
-import { firstSentence, restOfDescription } from "../text-lead.js";
+import { leadSentence, restOfDescription } from "../text-lead.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = resolve(ROOT, "dist");
@@ -111,7 +111,7 @@ function escapeHtml(s) {
 // word boundary; the full description is on the tile page the row links to.
 const GROUP_ROW_CAP = 150;
 function rowSummary(desc) {
-  const s = firstSentence(desc);
+  const s = leadSentence(desc);
   if (s.length <= GROUP_ROW_CAP) return s;
   const cut = s.slice(0, GROUP_ROW_CAP);
   const sp = cut.lastIndexOf(" ");
@@ -479,7 +479,7 @@ function tileShell(tool, tools, groupNames, relatedMap, examples) {
     '    </ol>',
     '  </nav>',
     `  <h1 class="shell-h1">${escapeHtml(tool.name)}</h1>`,
-    `  <p class="shell-lead">${escapeHtml(firstSentence(tool.desc))}</p>`,
+    `  <p class="shell-lead">${escapeHtml(leadSentence(tool.desc))}</p>`,
     '  <p class="shell-run">',
     // `?example=1` makes renderToolView load the same worked example this page
     // prints, so a reader who just read "awg 12 -> 24.4 A" lands on a
