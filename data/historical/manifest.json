@@ -1,9 +1,9 @@
 {
   "name": "historical",
-  "version": "2026-08-03",
-  "fetched": "2026-08-03",
-  "edition": "BLS PPI / EIA / USDA NASS / FRED federal series; build-fetched 2026-08-03. Build fails if any shard's latest point is more than 30 days behind the build date.",
-  "asOf": "2026-08-03",
+  "version": "2026-08-17",
+  "fetched": "2026-08-17",
+  "edition": "BLS PPI / EIA / USDA NASS / FRED federal series; build-fetched 2026-08-17. Build fails if any shard's latest point is more than 30 days behind the build date.",
+  "asOf": "2026-08-17",
   "refresh_cadence": "monthly",
   "shards": [
     {
@@ -54,12 +54,12 @@
     {
       "file": "commodities/gasoline.json",
       "name": "EIA PET.EMM_EPMR_PTE_NUS_DPG.M (USD/gal)",
-      "gzip_size_bytes": 459
+      "gzip_size_bytes": 457
     },
     {
       "file": "commodities/natural-gas.json",
       "name": "EIA NG.N3050US3.M (USD/Mcf)",
-      "gzip_size_bytes": 465
+      "gzip_size_bytes": 466
     },
     {
       "file": "commodities/wheat.json",
@@ -69,7 +69,7 @@
     {
       "file": "commodities/corn.json",
       "name": "USDA NASS PMAIZMTUSDM (USD/bushel)",
-      "gzip_size_bytes": 450
+      "gzip_size_bytes": 451
     },
     {
       "file": "commodities/soybeans.json",
@@ -78,19 +78,19 @@
     }
   ],
   "hashes": {
-    "commodities/copper.json": "611f55c4b5a8c24b325a71bb8e1314bb55d982fa3b508a98fe669886a78a0fd7",
-    "commodities/aluminum.json": "caf661344f4cc6ee1da85d54136ba6fc9580586b0bdda13569e5a5b1c46f3bf3",
-    "commodities/structural-steel.json": "2b82bf98842beea8c7d80017e92ae2ce7d4e344498b5afa3dd5f01f6126c1e78",
-    "commodities/rebar.json": "9f3b3dc5350b871fd01c6a1893cc6ec18b0c8081c94ddc09629f25a13511d721",
-    "commodities/framing-lumber.json": "873c0fe5811662f86150d0de0a17e280f9fff0b2a09d88b04068437085991e95",
-    "commodities/osb.json": "6085f2f5b988bf799619f1d0b0be7cc45c648a2ca7f4a3aae6d97c45ecc47902",
-    "commodities/drywall.json": "27b323979d937c59ab01e0e3ff445927c78a2ef8e5e7c5afd889b397b1d1bb81",
-    "commodities/asphalt.json": "30b855ead778fc62fb4b8ca75d5a6d18cde7939a16c07d3f22b6f4fc3a29e393",
-    "commodities/diesel.json": "5b22b211a05a8e6737f98a3754b9f683ec057b3744163858af736265bd2e790b",
-    "commodities/gasoline.json": "4d7405698b8de52baded727fae0ec04a37b2f714cbcfea784b59cc03a6735af1",
-    "commodities/natural-gas.json": "30bc84e2504f32ad3c9f89d5667c8927ff8a7a77f31676f835e257f0741a7205",
-    "commodities/wheat.json": "4730dc29e6a0f9e004c2fb6b970bd3df2ce2f4a780ed99afbf3194911045119a",
-    "commodities/corn.json": "11de410794e5d909b2b1248d733827cba894c5242600d8a2253c04eedf3a277e",
-    "commodities/soybeans.json": "59ec4ee77f933c83cde016d335899b15bd7156afe4ff15973e70e64483d9792e"
+    "commodities/copper.json": "ef3ff692db79ce8a1acca4f7e33a4d894eaae961ec1c8f9c06aec9b0f47566d1",
+    "commodities/aluminum.json": "6051d45aedc9eb4fd5d3029259d1270c254e37d4305d878feca85e2a26a5dfe7",
+    "commodities/structural-steel.json": "5e06365dbc3f14b4f145183c289f14b155f231acd65de36be8dab0f2e61fecd3",
+    "commodities/rebar.json": "3098233fd2e331ff49e6a71c936dd4d2eba406f5a0340de5df690f627ad46d78",
+    "commodities/framing-lumber.json": "4c1a230a1ac86d94a052fd0396b7cd2d61d68ca2a25f8ef78dba3634467c2b31",
+    "commodities/osb.json": "5ef27b5a2fd97d4aa0a5eb4e182631b629ac99cdac11ec407395c0a4a3e0c569",
+    "commodities/drywall.json": "4b7ee36776632611ec4b226647ee26613274a15226b7e5292e34924c002c4706",
+    "commodities/asphalt.json": "90890ceff2f85684ce69585f6a0ef579d79b026a27e783fe4b53dccfecee5331",
+    "commodities/diesel.json": "7742c438574fc4fb1fff28bc15a0e2ff00b1e06b0974117fb6286469c1a5cfcf",
+    "commodities/gasoline.json": "f852d5e5bbace02692ddb753b0fa07fcc75cfadd7a3f4333faf2dd4bac51e731",
+    "commodities/natural-gas.json": "2bee50f2fddc18992db3c2805258501cf7b33dc98d948127907e327247780840",
+    "commodities/wheat.json": "00bef461237bea7690480d79e10adbe560f25e6b622d31c2de2222dc82ccb946",
+    "commodities/corn.json": "80e6286ff04697525ed57d4e6f1e8a5148e7549099d2517cf4641320058e4dd1",
+    "commodities/soybeans.json": "fddbfb39e9d804ab008c02f02caeeb089a89611d3b5b37e3e1f18203888d9516"
   }
 }
