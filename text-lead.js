@@ -48,16 +48,59 @@ export function firstSentence(desc) {
 // boundary and let the full text carry the rest below the answer.
 const LEAD_CAP = 160;
 const CLAUSE = /(: | -- |; )/g;
+const COMMA = /, /g;
+
+// Every boundary at or past MIN_LEAD, so a lead never collapses to a
+// three-word fragment.
+function seams(s, re) {
+  re.lastIndex = 0;
+  const out = [];
+  let m;
+  while ((m = re.exec(s))) {
+    if (m.index >= MIN_LEAD && balanced(s.slice(0, m.index))) out.push(m.index);
+  }
+  return out;
+}
+
+// A seam inside a parenthetical is not a seam. Cutting at the comma in
+// "(100% of the first 10 kVA, 50% above)" leaves a lead that ends on an
+// unclosed bracket, which reads as a truncation bug rather than a summary.
+function balanced(prefix) {
+  let depth = 0;
+  for (const ch of prefix) {
+    if (ch === "(") depth++;
+    else if (ch === ")") depth = Math.max(0, depth - 1);
+  }
+  return depth === 0;
+}
+
+// The fullest seam that still fits the cap, or -1.
+function widest(list) {
+  const fits = list.filter((i) => i <= LEAD_CAP);
+  return fits.length ? Math.max(...fits) : -1;
+}
 
 export function leadSentence(desc) {
   const s = firstSentence(desc);
   if (s.length <= LEAD_CAP) return s;
-  CLAUSE.lastIndex = 0;
-  let m;
-  while ((m = CLAUSE.exec(s))) {
-    if (m.index >= MIN_LEAD) return s.slice(0, m.index).replace(/[,;:\s-]+$/, "") + ".";
+  const clause = seams(s, CLAUSE);
+  const comma = seams(s, COMMA);
+  // A clause boundary is the best cut: it ends a complete thought. Take the
+  // last one that fits, so the lead says as much as it can within the cap.
+  let at = widest(clause);
+  // Sentences that open "Bluff-body aerodynamic drag: F = 1/2 rho V^2 Cd A,
+  // the reason ..." put their only colon before MIN_LEAD and their next
+  // clause seam 340 characters out. Neither fits, so fall back to a comma,
+  // which is still a real grammatical seam.
+  if (at < 0) at = widest(comma);
+  // Nothing fits the cap: take the earliest seam of any kind rather than
+  // shipping the whole sentence, which is what the cap exists to prevent.
+  if (at < 0) {
+    const all = clause.concat(comma);
+    if (!all.length) return s;
+    at = Math.min(...all);
   }
-  return s;
+  return s.slice(0, at).replace(/[,;:\s-]+$/, "") + ".";
 }
 
 // The prose that belongs below the answer. When the lead is the whole opening

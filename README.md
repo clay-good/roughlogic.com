@@ -18,7 +18,7 @@
 2. Type your numbers. The answer updates as you type. There is no submit button.
 3. Tap **Copy** to take a value with you.
 
-Every field shows an example value as its placeholder, so you can see the expected unit and magnitude before you type. **Test with example** fills the whole reference case at once, and a tile opened from its own page arrives with that case already loaded. **Show the formula, sources, and assumptions** expands the proof.
+Every field shows an example value as its placeholder, so you can see the expected unit and magnitude before you type. **Test with example** fills the whole reference case at once, and a calculator opened from its own page arrives with that case already loaded. **Show the formula, sources, and assumptions** expands the proof.
 
 **A worked example.** [Voltage Drop](https://roughlogic.com/tools/voltage-drop/):
 
@@ -31,7 +31,7 @@ Every field shows an example value as its placeholder, so you can see the expect
 | `current_A` | 20 | | |
 | `source_voltage_V` | 240 | | |
 
-Grounded in `Vd = 2 · K · I · L / CM`, NEC Ch. 9 conductor properties. Every tile's page shows this same block: the inputs, the outputs, and the source.
+Grounded in `Vd = 2 · K · I · L / CM`, NEC Ch. 9 conductor properties. Every calculator's page shows this same block: the inputs, the outputs, and the source.
 
 Your inputs live in the URL, so a calculator is bookmarkable and shareable with its numbers preloaded. After the first load it works with no signal. No account, no email, no tracking, ever.
 
@@ -58,7 +58,7 @@ The whole catalog is available to AI agents (Claude Code, Claude Desktop, Cursor
 | **L** | Agriculture & Forestry | | |
 | **M** | Water & Wastewater Operations | | |
 
-One tile is one formula on one screen. Every formula is transcribed in [docs/derivations.md](docs/derivations.md) and every citation in [docs/data-sources.md](docs/data-sources.md).
+One calculator is one formula on one screen. (In the source and the gate names below, a calculator is called a *tile*.) Every formula is transcribed in [docs/derivations.md](docs/derivations.md) and every citation in [docs/data-sources.md](docs/data-sources.md).
 
 ## Why you can trust the answers
 
