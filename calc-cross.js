@@ -802,8 +802,8 @@ export function computeDilution({ concentrate_percent, target_percent, final_vol
 }
 
 export const dilutionExample = {
-  inputs: { concentrate_percent: 100, target_percent: 10, final_volume: 5 },
-  expected: { concentrate_volume: 0.5, diluent_volume: 4.5 },
+  inputs: { concentrate_percent: 10, target_percent: 5, final_volume: 100 },
+  expected: { concentrate_volume: 50, diluent_volume: 50 },
 };
 
 // --- Utility 112: Slope from Digital Level ---
@@ -1047,7 +1047,7 @@ export function renderDilution(inputRegion, outputRegion, citationEl) {
   const t = makeNumber("Target strength (%)", "di-t", { step: "any", min: "0", max: "100" });
   const v = makeNumber("Final volume", "di-v", { step: "any", min: "0" });
   for (const f of [c, t, v]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { c.input.value = "100"; t.input.value = "10"; v.input.value = "5"; update(); });
+  attachExampleButton(inputRegion, () => { c.input.value = "10"; t.input.value = "5"; v.input.value = "100"; update(); });
   const oC = makeOutputLine(outputRegion, "Concentrate volume", "di-out-c");
   const oD = makeOutputLine(outputRegion, "Diluent volume", "di-out-d");
   const update = debounce(() => {
@@ -1214,7 +1214,7 @@ export function computeHeatStress({ T_F = 0, RH_percent = 0, solar = false }) {
   return { heat_index_F: HI, WBGT_F, work_min_per_hr: work_min, rest_min_per_hr: rest_min };
 }
 
-export const heatStressExample = { inputs: { T_F: 92, RH_percent: 70, solar: true } };
+export const heatStressExample = { inputs: { T_F: 95, RH_percent: 60, solar: false } };
 
 // --- Utility 165: Wind Chill Exposure ---
 
@@ -1234,7 +1234,7 @@ export function computeWindChill({ T_F = 0, wind_mph = 0 }) {
   return { wind_chill_F: WC, frostbite_minutes };
 }
 
-export const windChillExample = { inputs: { T_F: 5, wind_mph: 25 } };
+export const windChillExample = { inputs: { T_F: 10, wind_mph: 20 } };
 
 // wind-chill-wind-speed: inverse of wind-chill. The forward tile gives the wind chill from the temperature and wind speed;
 // the inverse recovers the wind speed that produces a target (or reported) wind chill at a known air temperature. From
@@ -1280,7 +1280,7 @@ export function computeLadderAngle({ ladder_length_ft = 0, working_height_ft = 0
 
 // Example chosen so the ladder is leaned correctly at ~75.5 deg:
 // sin(75.5 deg) = 0.968, so a 24 ft ladder reaches ~23.2 ft when set right.
-export const ladderAngleExample = { inputs: { ladder_length_ft: 24, working_height_ft: 23 } };
+export const ladderAngleExample = { inputs: { ladder_length_ft: 16, working_height_ft: 12 } };
 
 // --- Utility 167: Pulley System Mechanical Advantage (general) ---
 

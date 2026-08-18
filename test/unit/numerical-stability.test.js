@@ -965,14 +965,14 @@ test("computeBalancePoint: bit-stable balance_point_F at the spec example", () =
   assert.equal(bits(r.balance_point_F), "403fe82629577415", `balance_point_F=${r.balance_point_F}`);
 });
 
-test("computeWindChill: bit-stable wind_chill_F at the spec example (T=5 F, wind=25 mph)", () => {
+test("computeWindChill: bit-stable wind_chill_F at the spec example (T=10 F, wind=20 mph)", () => {
   // Group G. NWS 2001 piecewise-power-law: WC = 35.74 + 0.6215*T -
-  // 35.75*v^0.16 + 0.4275*T*v^0.16 = -17.408... F. Pins the 0.16
+  // 35.75*v^0.16 + 0.4275*T*v^0.16 = -8.876... F. Pins the 0.16
   // wind-speed exponent against a future swap to the 0.15 or 0.20 form
   // that surfaced in earlier NWS revisions; complements the §10.3
   // monotonicity-in-wind-speed sweep already in place.
   const r = computeWindChill(windChillExample.inputs);
-  assert.equal(bits(r.wind_chill_F), "c03168a78dfd7df7", `wind_chill_F=${r.wind_chill_F}`);
+  assert.equal(bits(r.wind_chill_F), "c021c09ffb174bc8", `wind_chill_F=${r.wind_chill_F}`);
 });
 
 test("computeStoppingSightDistance: bit-stable perception + braking + total at the spec example (55 mph, mu=0.35, t=2.5 s)", () => {
@@ -985,15 +985,15 @@ test("computeStoppingSightDistance: bit-stable perception + braking + total at t
   assert.equal(bits(r.total_ssd_ft), "407ea38618618618", `total_ssd=${r.total_ssd_ft}`);
 });
 
-test("computeStraightLine: bit-stable depreciation + accumulated + book at the spec example ($50k, $5k salvage, 10 yr, year 3)", () => {
-  // Group R. annual = (cost - salvage) / life = 45000/10 = 4500 (exact);
-  // accumulated = annual * year = 13500 (exact); book = cost - accum =
-  // 36500 (exact). Pins the salvage-subtraction order against a future
+test("computeStraightLine: bit-stable depreciation + accumulated + book at the spec example ($10k, $1k salvage, 5 yr, year 1)", () => {
+  // Group R. annual = (cost - salvage) / life = 9000/5 = 1800 (exact);
+  // accumulated = annual * year = 1800 (exact); book = cost - accum =
+  // 8200 (exact). Pins the salvage-subtraction order against a future
   // refactor that dropped the salvage term.
   const r = computeStraightLine(straightLineExample.inputs);
-  assert.equal(bits(r.annual_depreciation), "40b1940000000000", `annual=${r.annual_depreciation}`);
-  assert.equal(bits(r.accumulated_depreciation), "40ca5e0000000000", `accum=${r.accumulated_depreciation}`);
-  assert.equal(bits(r.book_value), "40e1d28000000000", `book_value=${r.book_value}`);
+  assert.equal(bits(r.annual_depreciation), "409c200000000000", `annual=${r.annual_depreciation}`);
+  assert.equal(bits(r.accumulated_depreciation), "409c200000000000", `accum=${r.accumulated_depreciation}`);
+  assert.equal(bits(r.book_value), "40c0040000000000", `book_value=${r.book_value}`);
 });
 
 test("computeStatistics: bit-stable mean + median + sd_sample at the spec example", () => {
@@ -1077,13 +1077,13 @@ import { computeSeerEer, seerEerExample } from "../../calc-hvac.js";
 import { computeSnowLoad, snowLoadExample } from "../../calc-construction.js";
 import { computeRequiredFireFlow, requiredFireFlowExample } from "../../calc-fire.js";
 
-test("computeOhmsLaw: bit-stable R + P at the spec example (V=12, I=2)", () => {
-  // Group A. R = V/I = 6 (exact); P = V*I = 24 (exact). The pure
+test("computeOhmsLaw: bit-stable R + P at the spec example (V=120, I=10)", () => {
+  // Group A. R = V/I = 12 (exact); P = V*I = 1200 (exact). The pure
   // arithmetic chain; pins the V/I/R/P solver against a future refactor
   // that broke the inverse direction.
   const r = computeOhmsLaw(ohmsLawExample.inputs);
-  assert.equal(bits(r.R), "4018000000000000", `R=${r.R}`);
-  assert.equal(bits(r.P), "4038000000000000", `P=${r.P}`);
+  assert.equal(bits(r.R), "4028000000000000", `R=${r.R}`);
+  assert.equal(bits(r.P), "4092c00000000000", `P=${r.P}`);
 });
 
 test("computeRecircPumpHead: bit-stable head_ft + pressure_psi at the spec example", () => {

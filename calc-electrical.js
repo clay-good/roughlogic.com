@@ -71,8 +71,8 @@ export function computeOhmsLaw({ V, I, R, P }) {
 }
 
 export const ohmsLawExample = {
-  inputs: { V: 12, I: 2, R: null, P: null },
-  expected: { V: 12, I: 2, R: 6, P: 24 },
+  inputs: { V: 120, I: 10, R: null, P: null },
+  expected: { V: 120, I: 10, R: 12, P: 1200 },
 };
 
 // --- Utility 2: Wire Ampacity ---
@@ -129,8 +129,8 @@ export function computeVoltageDrop({ phase, material, awg, length_ft, current_A,
 }
 
 export const voltageDropExample = {
-  inputs: { phase: "single", material: "copper", awg: "12", length_ft: 100, current_A: 20, source_voltage_V: 120 },
-  expectedRange: { drop_V: { min: 7, max: 9 }, percent: { min: 5, max: 8 } },
+  inputs: { phase: "single", material: "copper", awg: "10", length_ft: 150, current_A: 20, source_voltage_V: 240 },
+  expectedRange: { drop_V: { min: 7, max: 8 }, percent: { min: 2.5, max: 3.5 } },
 };
 
 // --- Utility 4: Conduit Fill ---
@@ -423,7 +423,7 @@ import {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderOhmsLaw(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: Ohm's Law (V = I*R) and power equations (P = V*I).";
-  attachExampleButton(inputRegion, () => fillExample({ V: 12, I: 2 }));
+  attachExampleButton(inputRegion, () => fillExample({ V: 120, I: 10 }));
 
   const fields = {
     V: makeNumber("Voltage (V)", "ol-v", { step: "any" }),
@@ -542,7 +542,7 @@ export function renderWireAmpacity(inputRegion, outputRegion, citationEl, params
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderVoltageDrop(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: V_drop = 2*K*I*D / cmils (single phase); sqrt(3) replaces 2 for three phase. K is the conductor resistivity in ohm*cmil/ft.";
-  attachExampleButton(inputRegion, () => fillExample({ phase: "single", material: "copper", awg: "12", length_ft: 100, current_A: 20, source_voltage_V: 120 }));
+  attachExampleButton(inputRegion, () => fillExample({ phase: "single", material: "copper", awg: "10", length_ft: 150, current_A: 20, source_voltage_V: 240 }));
 
   const phase = makeSelect("Phase", "vd-phase", [{ value: "single", label: "Single" }, { value: "three", label: "Three" }]);
   const mat = makeSelect("Material", "vd-mat", [{ value: "copper", label: "Copper" }, { value: "aluminum", label: "Aluminum" }]);

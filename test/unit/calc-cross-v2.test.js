@@ -356,10 +356,10 @@ test("Geometry: polygon perimeter sums sides", () => {
 
 // --- Utility 111: Dilution ---
 
-test("Dilution: 100% concentrate, 10% target, 5 final -> 0.5 / 4.5", () => {
+test("Dilution: 10% concentrate, 5% target, 100 final -> 50 / 50", () => {
   const r = computeDilution(dilutionExample.inputs);
-  assert.equal(r.concentrate_volume, 0.5);
-  assert.equal(r.diluent_volume, 4.5);
+  assert.equal(r.concentrate_volume, 50);
+  assert.equal(r.diluent_volume, 50);
 });
 
 test("Dilution: target > concentrate returns error", () => {

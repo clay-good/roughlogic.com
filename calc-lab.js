@@ -268,7 +268,7 @@ export function computeMassMoles({ mass_g, moles, molecular_weight }) {
   return { error: "Provide exactly one of mass_g or moles." };
 }
 
-export const massMolesExample = { inputs: { mass_g: 5, molecular_weight: 58.44 } };
+export const massMolesExample = { inputs: { mass_g: 10, molecular_weight: 58.44 } };
 
 // --- spec-v1228: ideal gas law (PV = nRT) ---
 // The lab basic-chemistry set has mass-moles, molecular-weight, and molarity-dilution but no gas law --
@@ -500,7 +500,7 @@ export function computeRcf({ rotor_radius_mm = 0, rpm, rcf }) {
   return { error: "Provide one of rpm or rcf." };
 }
 
-export const rcfExample = { inputs: { rotor_radius_mm: 84, rpm: 14000 } };
+export const rcfExample = { inputs: { rotor_radius_mm: 85, rpm: 10000 } };
 
 // --- 260: Resuspension Volume ---
 
@@ -759,7 +759,7 @@ function renderMassMoles(inputRegion, outputRegion, citationEl) {
     out.textContent = fmt(r.mass_g, 4) + " g = " + fmt(r.moles, 6) + " mol (MW " + fmt(r.molecular_weight, 4) + " g/mol)";
   }, DEBOUNCE_MS);
   for (const fl of [mass, moles, mw]) fl.input.addEventListener("input", update);
-  attachExampleButton(inputRegion, () => { mass.input.value = 5; moles.input.value = 0; mw.input.value = 58.44; update(); });
+  attachExampleButton(inputRegion, () => { mass.input.value = 10; moles.input.value = 0; mw.input.value = 58.44; update(); });
 }
 
 function renderIdealGasLaw(inputRegion, outputRegion, citationEl) {
@@ -945,7 +945,7 @@ function renderRcf(inputRegion, outputRegion, citationEl) {
   }, DEBOUNCE_MS);
   for (const f of [r, rpm, rcf]) f.input.addEventListener("input", update);
   rotor.select.addEventListener("change", update);
-  attachExampleButton(inputRegion, () => { rotor.select.value = "eppendorf_5424_FA453011"; r.input.value = 84; rpm.input.value = 14000; rcf.input.value = 0; update(); });
+  attachExampleButton(inputRegion, () => { rotor.select.value = ""; r.input.value = 85; rpm.input.value = 10000; rcf.input.value = 0; update(); });
 }
 
 function renderResuspend(inputRegion, outputRegion, citationEl) {

@@ -81,7 +81,7 @@ export function computeFilterLoading({ filter_area_ft2 = 0, flow_gpm = 0, backwa
   return { loading_gpm_per_ft2: loading, backwash_gpm, category };
 }
 
-export const filterLoadingExample = { inputs: { filter_area_ft2: 200, flow_gpm: 800, backwash_rate_gpm_ft2: 15 } };
+export const filterLoadingExample = { inputs: { filter_area_ft2: 100, flow_gpm: 300, backwash_rate_gpm_ft2: 15 } };
 
 // filter-area-for-loading: inverse of filter-loading. The forward tile gives the loading rate from the area; the inverse
 // sizes the filter area for a target loading rate at the design flow, area = flow_gpm / target_loading. It reports the

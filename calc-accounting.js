@@ -135,7 +135,7 @@ export function computeStraightLine({ cost = 0, salvage = 0, life_years = 0, yea
   return { annual_depreciation: annual, accumulated_depreciation: accumulated, book_value, life_years, year_of_interest: y };
 }
 
-export const straightLineExample = { inputs: { cost: 50000, salvage: 5000, life_years: 10, year_of_interest: 3 } };
+export const straightLineExample = { inputs: { cost: 10000, salvage: 1000, life_years: 5, year_of_interest: 1 } };
 
 // --- 235: MACRS Depreciation ---
 //
@@ -678,7 +678,7 @@ function renderStraightLine(inputRegion, outputRegion, citationEl) {
   }, DEBOUNCE_MS);
   for (const f of [cost, salvage, life, yoi]) f.input.addEventListener("input", update);
   attachExampleButton(inputRegion, () => {
-    cost.input.value = 50000; salvage.input.value = 5000; life.input.value = 10; yoi.input.value = 3;
+    cost.input.value = 10000; salvage.input.value = 1000; life.input.value = 5; yoi.input.value = 1;
     update();
   });
 }

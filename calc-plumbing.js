@@ -682,8 +682,8 @@ export function computeTrapArm({ pipe_diameter_in, slope_in_per_ft = 0.25 }) {
 }
 
 export const trapArmExample = {
-  inputs: { pipe_diameter_in: 1.5, slope_in_per_ft: 0.25 },
-  expected: { table_max_ft: 5 },
+  inputs: { pipe_diameter_in: 2, slope_in_per_ft: 0.25 },
+  expected: { table_max_ft: 8 },
 };
 
 // --- Utility 76: Pipe Thermal Expansion (delta-L = alpha * L * delta-T) ---
@@ -712,8 +712,8 @@ export function computePipeExpansion({ material, length_ft, delta_T_F }) {
 }
 
 export const pipeExpansionExample = {
-  inputs: { material: "copper", length_ft: 100, delta_T_F: 80 },
-  expectedRange: { delta_L_in: { min: 0.7, max: 1.0 } },
+  inputs: { material: "copper", length_ft: 100, delta_T_F: 100 },
+  expectedRange: { delta_L_in: { min: 1.0716, max: 1.1844 } },
 };
 
 // --- Utility 77: Tankless Water Heater GPM ---
@@ -874,7 +874,7 @@ export function renderTrapArm(inputRegion, outputRegion, citationEl) {
   const slope = makeNumber("Slope (in/ft)", "ta-s", { step: "any", min: "0", value: "0.25" });
   slope.input.value = "0.25";
   for (const f of [dia, slope]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { dia.select.value = "1.5"; slope.input.value = "0.25"; update(); });
+  attachExampleButton(inputRegion, () => { dia.select.value = "2"; slope.input.value = "0.25"; update(); });
   const oM = makeOutputLine(outputRegion, "Maximum length", "ta-out-m");
   const oT = makeOutputLine(outputRegion, "Table max", "ta-out-t");
   const update = debounce(() => {
@@ -896,7 +896,7 @@ export function renderPipeExpansion(inputRegion, outputRegion, citationEl) {
   const len = makeNumber("Length (ft)", "pe-l", { step: "any", min: "0" });
   const dT = makeNumber("Temperature change (°F)", "pe-t", { step: "any" });
   for (const f of [mat, len, dT]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { mat.select.value = "copper"; len.input.value = "100"; dT.input.value = "80"; update(); });
+  attachExampleButton(inputRegion, () => { mat.select.value = "copper"; len.input.value = "100"; dT.input.value = "100"; update(); });
   const oL = makeOutputLine(outputRegion, "Expansion", "pe-out-l");
   const oA = makeOutputLine(outputRegion, "Coefficient", "pe-out-a");
   const update = debounce(() => {
@@ -1048,7 +1048,7 @@ export function computeHydrostaticTest({ working_pressure_psi = 0, system_volume
 }
 
 export const hydrostaticTestExample = {
-  inputs: { working_pressure_psi: 80, system_volume_gal: 200, material: "water" },
+  inputs: { working_pressure_psi: 100, system_volume_gal: 200, material: "water" },
 };
 
 // --- Utility 135: Grease Trap Sizing ---
@@ -1069,7 +1069,7 @@ export function computeGreaseTrap({ peak_flow_gpm = 0, retention_minutes = 30, l
 }
 
 export const greaseTrapExample = {
-  inputs: { peak_flow_gpm: 25, retention_minutes: 30, loading_factor: 1.25 },
+  inputs: { peak_flow_gpm: 50, retention_minutes: 30, loading_factor: 1.25 },
 };
 
 // grease-interceptor-flow-capacity: inverse of grease-trap. The forward tile sizes
@@ -1163,7 +1163,7 @@ export function computeGlycolMix({ system_volume_gal = 0, target_burst_F = 32, g
 }
 
 export const glycolMixExample = {
-  inputs: { system_volume_gal: 100, target_burst_F: 0, glycol_type: "propylene" },
+  inputs: { system_volume_gal: 50, target_burst_F: -10, glycol_type: "propylene" },
 };
 
 // --- Utility 137: Hydronic Expansion Tank ---

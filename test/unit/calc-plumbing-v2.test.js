@@ -134,10 +134,10 @@ test("Recirc pump: PEX vs steel head differs (different C)", () => {
 
 // --- Utility 74: Septic Tank ---
 
-test("Septic tank: 3 bedrooms -> 450 gpd, 1000 gal floor", () => {
+test("Septic tank: 4 bedrooms -> 600 gpd, 1200 gal", () => {
   const r = computeSepticTank(septicTankExample.inputs);
-  assert.equal(r.daily_flow_gpd, 450);
-  assert.equal(r.minimum_tank_gallons, 1000);
+  assert.equal(r.daily_flow_gpd, 600);
+  assert.equal(r.minimum_tank_gallons, 1200);
 });
 
 test("Septic tank: 5 bedrooms -> 750 gpd, 1500 gal", () => {
@@ -190,9 +190,9 @@ test("Septic tank: explicit large gpd scales", () => {
 
 // --- Utility 75: Trap Arm Length ---
 
-test("Trap arm: 1.5 in -> table max 5 ft", () => {
+test("Trap arm: example (2 in) -> table max 8 ft", () => {
   const r = computeTrapArm(trapArmExample.inputs);
-  assert.equal(r.table_max_ft, 5);
+  assert.equal(r.table_max_ft, 8);
 });
 
 test("Trap arm: 2 in -> table max 8 ft", () => {
@@ -244,10 +244,10 @@ test("Trap arm: 4 in -> table max 16 ft", () => {
 
 // --- Utility 76: Pipe Thermal Expansion ---
 
-test("Pipe expansion: copper 100 ft, 80 F -> ~0.9 in", () => {
-  // 9.4e-6 * 100 * 12 * 80 = 0.9024 in.
+test("Pipe expansion: copper 100 ft, 100 F -> ~1.13 in", () => {
+  // 9.4e-6 * 100 * 12 * 100 = 1.128 in.
   const r = computePipeExpansion(pipeExpansionExample.inputs);
-  assert.ok(close(r.delta_L_in, 0.9024, 0.005));
+  assert.ok(close(r.delta_L_in, 1.128, 0.005));
 });
 
 test("Pipe expansion: PEX expands more than copper for same dT", () => {

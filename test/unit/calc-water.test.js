@@ -28,7 +28,7 @@ test("Pounds: linear in flow", () => { const a = computePoundsFormula({ flow_mgd
 
 // 211 Filter loading
 test("Filter: example yields finite loading", () => { const r = computeFilterLoading(filterLoadingExample.inputs); assert.ok(r.loading_gpm_per_ft2 > 0); });
-test("Filter: 800 GPM / 200 ft^2 = 4 gpm/ft^2", () => { const r = computeFilterLoading(filterLoadingExample.inputs); assert.equal(r.loading_gpm_per_ft2, 4); });
+test("Filter: 300 GPM / 100 ft^2 = 3 gpm/ft^2", () => { const r = computeFilterLoading(filterLoadingExample.inputs); assert.equal(r.loading_gpm_per_ft2, 3); });
 test("Filter: 4 gpm/ft^2 in rapid sand or high-rate band", () => { const r = computeFilterLoading(filterLoadingExample.inputs); assert.match(r.category, /rapid|high-rate/); });
 test("Filter: backwash flow = rate * area", () => { const r = computeFilterLoading({ filter_area_ft2: 100, flow_gpm: 200, backwash_rate_gpm_ft2: 15 }); assert.equal(r.backwash_gpm, 1500); });
 test("Filter: zero area errors", () => { const r = computeFilterLoading({ filter_area_ft2: 0, flow_gpm: 200, backwash_rate_gpm_ft2: 15 }); assert.ok(r.error); });

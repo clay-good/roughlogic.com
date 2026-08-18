@@ -239,7 +239,7 @@ export function computeNeutralImbalance({ I_A = 0, I_B = 0, I_C = 0, harmonic_lo
   return { neutral_A: I_N, imbalance_percent, harmonic_warning };
 }
 
-export const neutralImbalanceExample = { inputs: { I_A: 50, I_B: 45, I_C: 40, harmonic_loads: false } };
+export const neutralImbalanceExample = { inputs: { I_A: 100, I_B: 100, I_C: 100, harmonic_loads: false } };
 
 // --- 220: SPL and Inverse Square Law ---
 

@@ -191,9 +191,9 @@ test("Hydrostatic: scales linearly with working pressure", () => {
 
 // --- 135 Grease trap ---
 
-test("Grease trap: example yields volume ~ 938 gal recommended 1000", () => {
+test("Grease trap: example yields volume ~ 1875 gal, recommended >= that", () => {
   const r = computeGreaseTrap(greaseTrapExample.inputs);
-  assert.ok(close(r.volume_gal, 25 * 30 * 1.25));
+  assert.ok(close(r.volume_gal, 50 * 30 * 1.25));
   assert.ok(r.recommended_nominal_gal >= r.volume_gal);
 });
 

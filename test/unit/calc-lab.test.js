@@ -44,12 +44,12 @@ test("MW: nested parens NaCl is just two atoms", () => { const r = computeMolecu
 test("MW: every common element bundled", () => { for (const sym of ["H", "C", "N", "O", "Na", "K", "Mg", "Ca", "Fe", "Cu", "Zn", "Cl", "P", "S"]) assert.ok(IUPAC_ATOMIC_WEIGHTS[sym], "missing " + sym); });
 
 // 258 Mass-moles
-test("MassMoles: 5 g NaCl / 58.44 ≈ 0.0856 mol", () => { const r = computeMassMoles(massMolesExample.inputs); assert.ok(closeRel(r.moles, 5/58.44, 0.001)); });
+test("MassMoles: 10 g NaCl / 58.44 ≈ 0.1711 mol", () => { const r = computeMassMoles(massMolesExample.inputs); assert.ok(closeRel(r.moles, 10/58.44, 0.001)); });
 test("MassMoles: 0.1 mol * 18 g/mol = 1.8 g", () => { const r = computeMassMoles({ moles: 0.1, molecular_weight: 18.015 }); assert.ok(close(r.mass_g, 1.8015, 0.001)); });
 test("MassMoles: needs exactly one of mass/moles", () => { assert.ok(computeMassMoles({ mass_g: 1, moles: 1, molecular_weight: 18 }).error); });
 
 // 259 RCF
-test("RCF: example 84 mm @ 14000 rpm ≈ 18412 g", () => { const r = computeRcf(rcfExample.inputs); assert.ok(closeRel(r.rcf, 1.118e-5 * 8.4 * 14000 * 14000, 0.001)); });
+test("RCF: example 85 mm @ 10000 rpm ≈ 9503 g", () => { const r = computeRcf(rcfExample.inputs); assert.ok(closeRel(r.rcf, 1.118e-5 * 8.5 * 10000 * 10000, 0.001)); });
 test("RCF: round-trip RCF -> RPM -> RCF", () => { const a = computeRcf({ rotor_radius_mm: 100, rpm: 10000 }); const b = computeRcf({ rotor_radius_mm: 100, rcf: a.rcf }); assert.ok(closeRel(b.rpm, 10000, 0.0001)); });
 test("RCF: zero radius errors", () => { assert.ok(computeRcf({ rotor_radius_mm: 0, rpm: 10000 }).error); });
 test("RCF: every bundled rotor has manufacturer + radius", () => { for (const v of Object.values(CENTRIFUGE_ROTORS)) { assert.ok(v.manufacturer); assert.ok(v.radius_mm > 0); } });

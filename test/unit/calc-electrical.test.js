@@ -38,12 +38,12 @@ const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 
 // --- Utility 1: Ohm's Law ---
 
-test("Ohm's Law example: V=12, I=2 -> R=6, P=24", () => {
+test("Ohm's Law example: V=120, I=10 -> R=12, P=1200", () => {
   const r = computeOhmsLaw(ohmsLawExample.inputs);
-  assert.equal(r.V, 12);
-  assert.equal(r.I, 2);
-  assert.equal(r.R, 6);
-  assert.equal(r.P, 24);
+  assert.equal(r.V, 120);
+  assert.equal(r.I, 10);
+  assert.equal(r.R, 12);
+  assert.equal(r.P, 1200);
 });
 
 test("Ohm's Law: V and R given -> I and P derived", () => {
@@ -104,7 +104,7 @@ test("Wire ampacity: aluminum lower than copper at same conditions", () => {
 
 // --- Utility 3: Voltage Drop ---
 
-test("Voltage drop example: AWG 12 copper, 100 ft, 20 A, 120 V single phase", () => {
+test("Voltage drop example: AWG 10 copper, 150 ft, 20 A, 240 V single phase", () => {
   const r = computeVoltageDrop(voltageDropExample.inputs);
   const e = voltageDropExample.expectedRange;
   assert.ok(r.drop_V > e.drop_V.min && r.drop_V < e.drop_V.max, "drop " + r.drop_V);

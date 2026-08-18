@@ -59,8 +59,8 @@ export function computeSepticTank({ bedrooms, gallons_per_day }) {
 }
 
 export const septicTankExample = {
-  inputs: { bedrooms: 3 },
-  expected: { daily_flow_gpd: 450, minimum_tank_gallons: 1000 },
+  inputs: { bedrooms: 4 },
+  expected: { daily_flow_gpd: 600, minimum_tank_gallons: 1200 },
 };
 
 // --- 240: Septic Drainfield Trench Length ---
@@ -231,7 +231,7 @@ export function renderSepticTank(inputRegion, outputRegion, citationEl) {
   const gpd = makeNumber("Daily flow gpd (overrides bedrooms if > 0)", "st-g", { step: "any", min: "0", value: "0" });
   gpd.input.value = "0";
   for (const f of [beds, gpd]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { beds.input.value = "3"; gpd.input.value = "0"; update(); });
+  attachExampleButton(inputRegion, () => { beds.input.value = "4"; gpd.input.value = "0"; update(); });
   const oG = makeOutputLine(outputRegion, "Daily flow", "st-out-g");
   const oT = makeOutputLine(outputRegion, "Minimum tank gallons", "st-out-t");
   const update = debounce(() => {

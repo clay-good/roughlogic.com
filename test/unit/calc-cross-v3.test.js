@@ -55,7 +55,7 @@ test("Heat: rest 0 below threshold", () => { const r = computeHeatStress({ T_F: 
 test("Heat: 86F WBGT triggers 30/30", () => { const r = computeHeatStress({ T_F: 100, RH_percent: 60, wind_mph: 0, solar: false }); assert.ok(r.work_min_per_hr <= 45); });
 
 // 165 Wind chill
-test("Wind chill: 5F 25mph yields wind chill in [-20, -10]", () => { const r = computeWindChill(windChillExample.inputs); assert.ok(r.wind_chill_F >= -20 && r.wind_chill_F <= -10); });
+test("Wind chill: 10F 20mph yields wind chill in [-15, -5]", () => { const r = computeWindChill(windChillExample.inputs); assert.ok(r.wind_chill_F >= -15 && r.wind_chill_F <= -5); });
 test("Wind chill: T > 50 errors", () => { const r = computeWindChill({ T_F: 60, wind_mph: 10 }); assert.ok(r.error); });
 test("Wind chill: wind < 3 mph returns ambient", () => { const r = computeWindChill({ T_F: 5, wind_mph: 1 }); assert.equal(r.wind_chill_F, 5); });
 test("Wind chill: stronger wind colder WC", () => { const a = computeWindChill({ T_F: 5, wind_mph: 10 }); const b = computeWindChill({ T_F: 5, wind_mph: 30 }); assert.ok(b.wind_chill_F < a.wind_chill_F); });
@@ -67,7 +67,7 @@ test("Wind chill: -45 to -55 ~ 5 min frostbite", () => { const r = computeWindCh
 test("Wind chill: extreme yields 2 min frostbite", () => { const r = computeWindChill({ T_F: -60, wind_mph: 50 }); assert.equal(r.frostbite_minutes, 2); });
 
 // 166 Ladder angle
-test("Ladder: example placed at ~75.5 deg passes", () => { const r = computeLadderAngle(ladderAngleExample.inputs); assert.ok(Math.abs(r.set_angle_deg - 75.5) <= 3); assert.equal(r.pass, true); });
+test("Ladder: example (16 ft / 12 ft) placed at ~48.6 deg does not pass", () => { const r = computeLadderAngle(ladderAngleExample.inputs); assert.ok(Math.abs(r.set_angle_deg - 48.59) <= 0.5); assert.equal(r.pass, false); });
 test("Ladder: zero working returns no pass", () => { const r = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 0 }); assert.equal(r.pass, false); });
 test("Ladder: working > length errors", () => { const r = computeLadderAngle({ ladder_length_ft: 10, working_height_ft: 20 }); assert.ok(r.error); });
 test("Ladder: zero length errors", () => { const r = computeLadderAngle({ ladder_length_ft: 0, working_height_ft: 5 }); assert.ok(r.error); });
