@@ -62,7 +62,7 @@ export function computePacing({ calibration_distance_ft = 0, calibration_paces =
   return { pace_length_ft, distance_ft, distance_m, terrain_factor: tf, ref_per_100m };
 }
 
-export const pacingExample = { inputs: { calibration_distance_ft: 200, calibration_paces: 75, current_paces: 250, terrain: "rolling" } };
+export const pacingExample = { inputs: { calibration_distance_ft: 100, calibration_paces: 38, current_paces: 120, terrain: "flat" } };
 
 // --- 228: Magnetic Declination and Bearing Conversion ---
 //

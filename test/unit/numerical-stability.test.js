@@ -1271,15 +1271,15 @@ test("computeTrussCapacity: bit-stable equivalent_udl + total_point_load + safet
   assert.equal(bits(r.safety_factor), "401ccccccccccccc", `safety_factor=${r.safety_factor}`);
 });
 
-test("computePanConversion: bit-stable total_qt + capacity_qt + servings_per_pan at the spec example (50 servings, 4 oz, full 4 in pan)", () => {
-  // Group O. total_qt = servings * portion_oz / 32 = 50*4/32 = 6.25
-  // (exact). servings_per_pan = pan_capacity_oz / portion_oz = 432/4 =
-  // 108 (exact integer). Pins both the oz-to-qt conversion (32 oz/qt)
+test("computePanConversion: bit-stable total_qt + capacity_qt + servings_per_pan at the spec example (120 servings, 6 oz, full 4 in pan)", () => {
+  // Group O. total_qt = servings * portion_oz / 32 = 120*6/32 = 22.5
+  // (exact). servings_per_pan = pan_capacity_oz / portion_oz = 432/6 =
+  // 72 (exact integer). Pins both the oz-to-qt conversion (32 oz/qt)
   // and the pan-capacity lookup-multiplication chain.
   const r = computePanConversion(panConversionExample.inputs);
-  assert.equal(bits(r.total_qt), "4019000000000000", `total_qt=${r.total_qt}`);
+  assert.equal(bits(r.total_qt), "4036800000000000", `total_qt=${r.total_qt}`);
   assert.equal(bits(r.capacity_qt), "402b000000000000", `capacity_qt=${r.capacity_qt}`);
-  assert.equal(bits(r.servings_per_pan), "405b000000000000", `servings_per_pan=${r.servings_per_pan}`);
+  assert.equal(bits(r.servings_per_pan), "4052000000000000", `servings_per_pan=${r.servings_per_pan}`);
 });
 
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {

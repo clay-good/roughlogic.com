@@ -47,11 +47,11 @@ test("Pallet: light pallet cubes out", () => { const r = computePalletLoadout({ 
 test("Pallet: unknown trailer errors", () => { const r = computePalletLoadout({ ...palletLoadoutExample.inputs, trailer: "spaceship" }); assert.ok(r.error); });
 test("Pallet: zero case dimension errors", () => { const r = computePalletLoadout({ ...palletLoadoutExample.inputs, case_length_in: 0 }); assert.ok(r.error); });
 test("Pallet: case dimensions drive the pallet-cube feasibility check (were a dead input)", () => {
-  // 16x12x10 in cases, 36 per 48x40x48 pallet -> 40 ft^3 fits (75% of the pallet cube).
+  // 12x10x8 in cases, 48 per 48x40x48 pallet -> 26.67 ft^3 fits (50% of the pallet cube).
   const ok = computePalletLoadout({ ...palletLoadoutExample.inputs });
   assert.equal(ok.cases_fit_pallet_cube, true);
-  assert.ok(Math.abs(ok.cases_cube_ft3 - 40) < 1e-9);
-  assert.ok(Math.abs(ok.pallet_cube_utilization_pct - 75) < 1e-6);
+  assert.ok(Math.abs(ok.cases_cube_ft3 - 80 / 3) < 1e-9);
+  assert.ok(Math.abs(ok.pallet_cube_utilization_pct - 50) < 1e-6);
   // Oversized cases the same count cannot physically fit the pallet cube.
   const tooBig = computePalletLoadout({ ...palletLoadoutExample.inputs, case_length_in: 40, case_width_in: 40, case_height_in: 40 });
   assert.equal(tooBig.cases_fit_pallet_cube, false);

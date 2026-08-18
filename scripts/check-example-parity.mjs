@@ -35,9 +35,18 @@ const rows = JSON.parse(readFileSync(resolve(ROOT, "test/fixtures/worked-example
 const fixture = new Map();
 for (const r of rows) if (!fixture.has(r.tile_id)) fixture.set(r.tile_id, r);
 
+// Compared at the precision a reader can actually see, not at machine epsilon.
+// An inverse tile's fixture carries the full-precision round-trip of its forward
+// counterpart (`sight_distance_ft: 490.225`, `d_ft: 1.333333`) while the tool
+// states the same case rounded for a human (`490`, `1.3333`). That is one worked
+// example shown to two decimal conventions, not two examples, and flagging it
+// would bury the real defects -- a tile that prints 600 and loads 800. 0.1% is
+// tighter than any rounding in the catalog and still catches every real
+// divergence; the closest genuine one (0.015452 vs 0.015) is 3% out.
+const DISPLAY_TOLERANCE = 0.001;
 const same = (a, b) =>
   (typeof a === "number" && typeof b === "number")
-    ? Math.abs(a - b) <= Math.max(Math.abs(b) * 1e-6, 1e-12)
+    ? Math.abs(a - b) <= Math.max(Math.abs(b) * DISPLAY_TOLERANCE, 1e-12)
     : String(a) === String(b);
 
 const diverged = [];

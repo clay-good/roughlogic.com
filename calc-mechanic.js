@@ -374,7 +374,7 @@ export function computeTireGearing({ original_size = "", new_size = "", axle_rat
   };
 }
 
-export const tireGearingExample = { inputs: { original_size: "265/70R17", new_size: "285/75R17", axle_ratio: 3.55, top_gear_ratio: 0.69, target_rpm: 1800 } };
+export const tireGearingExample = { inputs: { original_size: "P265/70R17", new_size: "33x12.50R17", axle_ratio: 3.73, top_gear_ratio: 0.84, target_rpm: 1800 } };
 
 // --- 202: Brake Pad Lifespan and Heat Capacity ---
 

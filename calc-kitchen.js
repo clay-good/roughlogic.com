@@ -213,7 +213,7 @@ export function computePanConversion({ target_qt = 0, target_servings = 0, porti
   return { total_qt, capacity_qt: cap, pans_needed, servings_per_pan, cooling_warning };
 }
 
-export const panConversionExample = { inputs: { target_qt: 0, target_servings: 50, portion_oz: 4, pan_size: "full", pan_depth_in: 4 } };
+export const panConversionExample = { inputs: { target_qt: 0, target_servings: 120, portion_oz: 6, pan_size: "full", pan_depth_in: 4 } };
 
 // --- Renderers ---
 

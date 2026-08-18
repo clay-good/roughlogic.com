@@ -213,7 +213,7 @@ export function computePalletLoadout({
 }
 
 export const palletLoadoutExample = {
-  inputs: { case_length_in: 16, case_width_in: 12, case_height_in: 10, case_weight_lb: 8, cases_per_pallet: 36, pallet_length_in: 48, pallet_width_in: 40, pallet_height_in: 48, trailer: "dry_van_53", pinwheel: false },
+  inputs: { case_length_in: 12, case_width_in: 10, case_height_in: 8, case_weight_lb: 25, cases_per_pallet: 48, pallet_length_in: 48, pallet_width_in: 40, pallet_height_in: 48, trailer: "dry_van_53", pinwheel: false },
 };
 
 // --- Utility 191: Hours of Service Math (FMCSA 49 CFR 395) ---

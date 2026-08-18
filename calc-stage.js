@@ -891,7 +891,7 @@ export function computeDecibelConverter({ mode, p1, p2, v1, v2, level_db, ref_ty
   }
   return { error: "Mode must be power-ratio, voltage-ratio, reference-level, or combine." };
 }
-export const decibelConverterExample = { inputs: { mode: "combine", p1: 1, p2: 2, v1: 1, v2: 2, level_db: 4, ref_type: "dBu", levels: [90, 90] } };
+export const decibelConverterExample = { inputs: { mode: "power-ratio", p1: 1, p2: 2, v1: 1, v2: 2, level_db: 4, ref_type: "dBu", levels: [90,90] } };
 
 function renderDecibelConverter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per ANSI S1.1 acoustical-terminology decibel definitions (power 10log, field-quantity 20log) and the standard reference levels (dBu 0.775 V, dBV 1 V, dBSPL 20 uPa), by name; public. Complements spl-distance.";
@@ -915,7 +915,7 @@ function renderDecibelConverter(inputRegion, outputRegion, citationEl) {
   list.input.type = "text"; list.input.value = "90, 90";
   for (const f of [mode, p1, p2, v1, v2, level, ref, list]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
-    mode.select.value = "combine"; p1.input.value = "1"; p2.input.value = "2"; v1.input.value = "1"; v2.input.value = "2";
+    mode.select.value = "power-ratio"; p1.input.value = "1"; p2.input.value = "2"; v1.input.value = "1"; v2.input.value = "2";
     level.input.value = "4"; ref.select.value = "dBu"; list.input.value = "90, 90"; update();
   });
   const oResult = makeOutputLine(outputRegion, "Result", "dbc-out-result");

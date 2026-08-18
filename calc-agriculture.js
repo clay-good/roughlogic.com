@@ -192,7 +192,7 @@ export function computeDrawbarPull({ power_hp = 0, power_basis = "drawbar", spee
     note: "The drawbar pull a tractor can develop at a working speed for a given power, the inverse of the drawbar-power tile: from drawbar_hp = pull x speed / 375, pull = 375 x drawbar_hp / speed. A PTO rating is converted to drawbar first with the ASABE D497 tractive efficiency (drawbar_hp = pto_hp x efficiency; concrete 0.87, firm soil 0.72, tilled soil 0.55, sand 0.50), because a soft surface wastes engine power as slip. Pull rises as speed drops, which is why heavy tillage is pulled in a low gear. This is the steady-state drawbar pull the power supports; traction (weight x soil coefficient) can limit the usable pull below this, and the ballast, tires, and conditions govern the real number."
   };
 }
-export const drawbarPullExample = { inputs: { power_hp: 54, power_basis: "drawbar", speed_mph: 4.5, surface: "firm_soil" } };
+export const drawbarPullExample = { inputs: { power_hp: 75, power_basis: "pto", speed_mph: 4.5, surface: "firm_soil" } };
 
 // --- 207: Irrigation Sprinkler Uniformity ---
 
@@ -295,7 +295,7 @@ export function computeCropYield({
   return { yield_bu_per_acre: bu_per_acre, std_moisture_pct: stdMoist, harvest_loss_pct: loss_pct };
 }
 
-export const cropYieldExample = { inputs: { crop: "corn", rows_per_pass: 6, row_spacing_in: 30, measured_length_ft: 100, weight_in_strip_lb: 220, current_moisture_pct: 18, ground_loss_lb_in_area: 0, ground_loss_area_ft2: 0 } };
+export const cropYieldExample = { inputs: { crop: "corn", rows_per_pass: 2, row_spacing_in: 30, measured_length_ft: 50, weight_in_strip_lb: 8, current_moisture_pct: 18, ground_loss_lb_in_area: 0, ground_loss_area_ft2: 0 } };
 
 // --- Renderers (compact factory) ---
 
