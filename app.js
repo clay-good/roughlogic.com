@@ -1764,14 +1764,22 @@ function renderToolView(id, params) {
   outputRegion.setAttribute("aria-label", "Output");
   view.appendChild(outputRegion);
 
-  // Everything after the opening sentence: scope, caveats, what the tile does
-  // not cover. Real reference content, so it stays on the page, but below the
-  // answer -- the same order the static shell uses.
+  // Everything after the opening sentence: scope, caveats, what the calculator
+  // does not cover. Real reference content, so it stays on the page -- but the
+  // reader has already had the one-line summary and the answer by now, so it
+  // collapses like the proof block below it and the visible page stays title,
+  // inputs, answer. Same treatment, same order, as the static shell.
   const detailText = restOfDescription(tool.desc);
   if (detailText) {
-    const detail = document.createElement("p");
-    detail.className = "view-detail";
-    detail.textContent = detailText;
+    const detail = document.createElement("details");
+    detail.className = "proof view-detail-block";
+    const detailSummary = document.createElement("summary");
+    detailSummary.textContent = "More about this calculator";
+    const detailBody = document.createElement("p");
+    detailBody.className = "view-detail";
+    detailBody.textContent = detailText;
+    detail.appendChild(detailSummary);
+    detail.appendChild(detailBody);
     view.appendChild(detail);
   }
   view.appendChild(notice);

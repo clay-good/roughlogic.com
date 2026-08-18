@@ -540,11 +540,15 @@ function tileShell(tool, tools, groupNames, relatedMap, examples) {
       outputRows ? '    </ul>' : '',
       '  </section>',
     ].filter(Boolean).join("\n") : '',
+    // Scope, limits, and what the calculator does not cover. Real reference
+    // content, but the reader has already had the one-line summary and a
+    // worked example by this point, so it collapses like the proof does and
+    // the visible page stays title, one line, Run, example.
     detail ? [
-      '  <section class="shell-section" aria-label="Details">',
-      '    <h2>Details</h2>',
+      '  <details class="shell-detail-block" aria-label="Details">',
+      '    <summary>More about this calculator</summary>',
       `    <p class="shell-detail">${escapeHtml(detail)}</p>`,
-      '  </section>',
+      '  </details>',
     ].join("\n") : '',
     citation ? [
       '  <details class="shell-proof" aria-label="Formula and source">',
