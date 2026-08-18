@@ -151,8 +151,8 @@ FIRESPRINKLER_RENDERERS["sprinkler-system-demand"] = _simpleRenderer({
   citation: "Citation: NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022: sprinkler demand = density x design area, total demand = sprinkler demand + inside/outside hose-stream allowance, stored volume = total demand x duration. Hazard-class defaults are editable: Light 0.10 gpm/ft^2 over 1,500 ft^2 with 100 gpm hose for 30 min; Ordinary Group 1 0.15 / 1,500 / 250 / 60-90; Ordinary Group 2 0.20 / 1,500 / 250 / 60-90. This is the area/density (pipe-schedule-style) screening demand -- a full hydraulic calculation to the most-remote area including friction and elevation yields the governing demand and is a separate analysis. The density / area / duration come from the applicable NFPA 13 density-area curve for the actual commodity and storage arrangement; storage and special occupancies (ESFR, high-piled, in-rack) use their own criteria. A design aid, not a stamped hydraulic submittal -- a qualified fire-protection engineer and the AHJ govern.",
   example: sprinklerSystemDemandExample.inputs,
   fields: [
-    { key: "density", label: "Design density (gpm/ft^2)", kind: "number", default: 0.20 },
-    { key: "design_area", label: "Hydraulic design area (ft^2)", kind: "number", default: 1500 },
+    { key: "density", label: "Design density (gpm/ft²)", kind: "number", default: 0.20 },
+    { key: "design_area", label: "Hydraulic design area (ft²)", kind: "number", default: 1500 },
     { key: "hose_gpm", label: "Hose-stream allowance (gpm)", kind: "number", default: 250 },
     { key: "duration_min", label: "Required supply duration (min)", kind: "number", default: 90 },
   ],
@@ -192,7 +192,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-protection-area-for-supply"] = _simpleRendere
   example: sprinklerProtectionAreaForSupplyExample.inputs,
   fields: [
     { key: "available_supply_gpm", label: "Available water supply (gpm)", kind: "number", default: 550 },
-    { key: "density", label: "Design density (gpm/ft^2)", kind: "number", default: 0.20 },
+    { key: "density", label: "Design density (gpm/ft²)", kind: "number", default: 0.20 },
     { key: "hose_gpm", label: "Hose-stream allowance (gpm)", kind: "number", default: 250 },
   ],
   outputs: [
@@ -231,7 +231,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-head-layout"] = _simpleRenderer({
   fields: [
     { key: "room_length", label: "Room length (ft)", kind: "number" },
     { key: "room_width", label: "Room width (ft)", kind: "number" },
-    { key: "area_per_head", label: "Max protection area per head (ft^2)", kind: "number", default: 130 },
+    { key: "area_per_head", label: "Max protection area per head (ft²)", kind: "number", default: 130 },
     { key: "max_spacing", label: "Max spacing between heads (ft)", kind: "number", default: 15 },
   ],
   outputs: [

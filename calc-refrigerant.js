@@ -397,7 +397,7 @@ export const REFRIGERANT_OAT_PRESETS = [
 export function renderRefrigerantPT(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Manufacturer-published P-T tables for common refrigerants. Each refrigerant attributes its publishing manufacturer.";
   const ref = makeSelect("Refrigerant", "rp-r", Object.keys(REFRIGERANTS).map((k) => ({ value: k, label: k })));
-  const mode = makeSelect("Input", "rp-m", [{ value: "pressure", label: "Pressure (psig)" }, { value: "temperature", label: "Temperature (F)" }]);
+  const mode = makeSelect("Input", "rp-m", [{ value: "pressure", label: "Pressure (psig)" }, { value: "temperature", label: "Temperature (°F)" }]);
   const value = makeNumber("Value", "rp-v", { step: "any" });
   // v8 §C.3: optional outdoor air temp + indoor wet-bulb so the renderer
   // can also surface the typical target superheat for those conditions.
@@ -452,11 +452,11 @@ export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
   const ref = makeSelect("Refrigerant", "ss-r", Object.keys(REFRIGERANTS).map((k) => ({ value: k, label: k })));
   const mode = makeSelect("Mode", "ss-m", [{ value: "superheat", label: "Superheat" }, { value: "subcool", label: "Subcool" }]);
   const press = makeNumber("System pressure (psig)", "ss-p", { step: "any" });
-  const temp = makeNumber("Line temperature (F)", "ss-t", { step: "any" });
+  const temp = makeNumber("Line temperature (°F)", "ss-t", { step: "any" });
   // v23 EN.2: optional fixed-orifice target-superheat from indoor wet-bulb +
   // outdoor dry-bulb, with a pass / overcharge / undercharge verdict.
   const iwb = makeNumber("Indoor wet-bulb (F, fixed-orifice target)", "ss-iwb", { step: "any", min: "0" });
-  const odb = makeNumber("Outdoor dry-bulb (F)", "ss-odb", { step: "any" });
+  const odb = makeNumber("Outdoor dry-bulb (°F)", "ss-odb", { step: "any" });
   // spec-v27 EN: optional TXV/EEV target-subcooling charge verdict.
   const tsc = makeNumber("Target subcool (F, TXV/EEV)", "ss-tsc", { step: "any", min: "0" });
   for (const f of [ref, mode, press, temp, iwb, odb, tsc]) inputRegion.appendChild(f.wrap);
@@ -661,8 +661,8 @@ function _v321renderRefrigerationCop(inputRegion, outputRegion, citationEl) {
   const h1 = makeNumber("Suction enthalpy h1 (Btu/lb)", "rc-h1", { step: "any" });
   const h2 = makeNumber("Discharge enthalpy h2 (Btu/lb)", "rc-h2", { step: "any" });
   const h4 = makeNumber("Evaporator-inlet enthalpy h4 (Btu/lb)", "rc-h4", { step: "any" });
-  const te = makeNumber("Evaporator saturation temp (F)", "rc-te", { step: "any" });
-  const tc = makeNumber("Condenser saturation temp (F)", "rc-tc", { step: "any" });
+  const te = makeNumber("Evaporator saturation temp (°F)", "rc-te", { step: "any" });
+  const tc = makeNumber("Condenser saturation temp (°F)", "rc-tc", { step: "any" });
   for (const f of [h1, h2, h4, te, tc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { h1.input.value = "180"; h2.input.value = "205"; h4.input.value = "120"; te.input.value = "40"; tc.input.value = "120"; update(); });
   const oCop = makeOutputLine(outputRegion, "Cycle COP (EER)", "rc-out-cop");
@@ -796,8 +796,8 @@ export const walkInCoolerLoadExample = { inputs: { u_factor: 0.05, area_ft2: 800
 function _v432renderWalkInCoolerLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Walk-in cooler heat load (ASHRAE Refrigeration / box-load practice): transmission = U x area x deltaT, plus infiltration + product + internal loads, times a safety factor (~1.10). Size the evaporator for an ~18-hour run. A sizing aid; the box-load method and equipment ratings govern.";
   const u = makeNumber("Panel U-factor (4 in ~0.05, 6 in ~0.03)", "wic-u", { step: "any", min: "0" }); u.input.value = "0.05";
-  const area = makeNumber("Envelope area (ft^2)", "wic-a", { step: "any", min: "0" }); area.input.value = "800";
-  const dt = makeNumber("Ambient-to-box deltaT (F)", "wic-dt", { step: "any", min: "0" }); dt.input.value = "60";
+  const area = makeNumber("Envelope area (ft²)", "wic-a", { step: "any", min: "0" }); area.input.value = "800";
+  const dt = makeNumber("Ambient-to-box deltaT (°F)", "wic-dt", { step: "any", min: "0" }); dt.input.value = "60";
   const infil = makeNumber("Infiltration/door load (Btu/hr)", "wic-inf", { step: "any", min: "0" }); infil.input.value = "3000";
   const prod = makeNumber("Product load (Btu/hr)", "wic-prod", { step: "any", min: "0" }); prod.input.value = "5000";
   const internal = makeNumber("Internal load: lights/motors/people (Btu/hr)", "wic-int", { step: "any", min: "0" }); internal.input.value = "1500";
@@ -852,8 +852,8 @@ function _v433renderProductPullDownLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Product pull-down load (ASHRAE Refrigeration): above freezing Q = m cp deltaT; for a freezer Q = sensible-to-freezing + m x latent heat of fusion + sensible-of-frozen; rate = Q / pull-down hours. A sizing aid; the product property tables govern.";
   const mass = makeNumber("Product mass (lb)", "ppd-m", { step: "any", min: "0" }); mass.input.value = "2000";
   const cpa = makeNumber("Specific heat above freezing (Btu/lb-F)", "ppd-cpa", { step: "any", min: "0" }); cpa.input.value = "0.9";
-  const tEnter = makeNumber("Entering temperature (F)", "ppd-te", { step: "any" }); tEnter.input.value = "80";
-  const tStore = makeNumber("Storage (target) temperature (F)", "ppd-ts", { step: "any" }); tStore.input.value = "35";
+  const tEnter = makeNumber("Entering temperature (°F)", "ppd-te", { step: "any" }); tEnter.input.value = "80";
+  const tStore = makeNumber("Storage (target) temperature (°F)", "ppd-ts", { step: "any" }); tStore.input.value = "35";
   const tFreeze = makeNumber("Freezing point (F, optional for freezers)", "ppd-tf", { step: "any" }); tFreeze.input.value = "";
   const hif = makeNumber("Latent heat of fusion (Btu/lb, optional)", "ppd-hif", { step: "any", min: "0" }); hif.input.value = "";
   const cpb = makeNumber("Specific heat below freezing (Btu/lb-F, optional)", "ppd-cpb", { step: "any", min: "0" }); cpb.input.value = "";
@@ -898,8 +898,8 @@ function _v698renderProductPullDownTime(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Product pull-down time (ASHRAE Refrigeration): hours = Q / capacity, with Q = m cp deltaT above freezing, or sensible-to-freezing + m x latent heat of fusion + sensible-of-frozen for a freezer. A sizing aid; the product property tables govern.";
   const mass = makeNumber("Product mass (lb)", "ppt-m", { step: "any", min: "0" }); mass.input.value = "2000";
   const cpa = makeNumber("Specific heat above freezing (Btu/lb-F)", "ppt-cpa", { step: "any", min: "0" }); cpa.input.value = "0.9";
-  const tEnter = makeNumber("Entering temperature (F)", "ppt-te", { step: "any" }); tEnter.input.value = "80";
-  const tStore = makeNumber("Storage (target) temperature (F)", "ppt-ts", { step: "any" }); tStore.input.value = "35";
+  const tEnter = makeNumber("Entering temperature (°F)", "ppt-te", { step: "any" }); tEnter.input.value = "80";
+  const tStore = makeNumber("Storage (target) temperature (°F)", "ppt-ts", { step: "any" }); tStore.input.value = "35";
   const tFreeze = makeNumber("Freezing point (F, optional for freezers)", "ppt-tf", { step: "any" }); tFreeze.input.value = "";
   const hif = makeNumber("Latent heat of fusion (Btu/lb, optional)", "ppt-hif", { step: "any", min: "0" }); hif.input.value = "";
   const cpb = makeNumber("Specific heat below freezing (Btu/lb-F, optional)", "ppt-cpb", { step: "any", min: "0" }); cpb.input.value = "";
@@ -942,8 +942,8 @@ export function computeEvaporatorTdDtd({ box_temp_f = 0, sst_f = 0 } = {}) {
 export const evaporatorTdDtdExample = { inputs: { box_temp_f: 35, sst_f: 25 } };
 function _v434renderEvaporatorTdDtd(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Evaporator design TD (DTD) = box temperature - saturated suction temperature, which sets the box humidity: a small TD holds high RH (produce), a large TD dries the air (packaged/frozen). A selection aid; the coil manufacturer's rating at the design TD governs.";
-  const box = makeNumber("Box (room) temperature (F)", "etd-box", { step: "any" }); box.input.value = "35";
-  const sst = makeNumber("Saturated suction temperature (F)", "etd-sst", { step: "any" }); sst.input.value = "25";
+  const box = makeNumber("Box (room) temperature (°F)", "etd-box", { step: "any" }); box.input.value = "35";
+  const sst = makeNumber("Saturated suction temperature (°F)", "etd-sst", { step: "any" }); sst.input.value = "25";
   for (const f of [box, sst]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { box.input.value = "35"; sst.input.value = "25"; update(); });
   const oD = makeOutputLine(outputRegion, "Design TD (DTD)", "etd-out-d");
@@ -989,7 +989,7 @@ function _v586renderFlashGasSubcool(inputRegion, outputRegion, citationEl) {
   const lift = makeNumber("Vertical liquid lift (ft, evap above condenser)", "fgs-lift", { step: "any", min: "0", value: "40" }); lift.input.value = "40";
   const friction = makeNumber("Liquid-line friction drop (psi)", "fgs-fric", { step: "any", min: "0", value: "15" }); friction.input.value = "15";
   const grad = makeNumber("Static gradient (psi/ft, 0.43 R-410A liquid)", "fgs-grad", { step: "any", min: "0", value: "0.43" }); grad.input.value = "0.43";
-  const slope = makeNumber("P-T slope near condensing (psi/degF, ~5 R-410A)", "fgs-slope", { step: "any", min: "0", value: "5" }); slope.input.value = "5";
+  const slope = makeNumber("P-T slope near condensing (psi/°F, ~5 R-410A)", "fgs-slope", { step: "any", min: "0", value: "5" }); slope.input.value = "5";
   for (const f of [lift, friction, grad, slope]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { lift.input.value = "40"; friction.input.value = "15"; grad.input.value = "0.43"; slope.input.value = "5"; update(); });
   const oLift = makeOutputLine(outputRegion, "Static-lift pressure drop", "fgs-out-lift");

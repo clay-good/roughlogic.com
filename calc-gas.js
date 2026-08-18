@@ -220,7 +220,7 @@ export const gasLeakHoleDiameterExample = {
 };
 function renderGasLeakHoleDiameter(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: d = sqrt( 4 Q / (3550 * c * pi * sqrt(dP / SG)) ), the orifice-flow leak approximation Q = 3550 c A sqrt(dP/SG) solved for the diameter. An estimate of the effective hole size, not a code leak-test method. Estimation only.";
-  const q = makeNumber("Measured leak rate (ft^3/hr)", "glh-q", { step: "any", min: "0" });
+  const q = makeNumber("Measured leak rate (ft³/hr)", "glh-q", { step: "any", min: "0" });
   const psi = makeNumber("Upstream gauge pressure (psi)", "glh-p", { step: "any", min: "0" });
   const c = makeNumber("Discharge coefficient", "glh-c", { step: "any", min: "0", max: "1", value: "0.7" });
   c.input.value = "0.7";
@@ -578,7 +578,7 @@ export const wobbeIndexExample = { inputs: { hhv_btu_ft3: 1000, specific_gravity
 
 function _v977renderWobbeIndex(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Wobbe index of a fuel gas (AGA / ISO 13686 interchangeability), by name. WI = HHV / sqrt(specific gravity). Two gases of equal Wobbe deliver the same heat input through the same orifice at the same pressure. NG ~1,291, propane ~2,040. Captures orifice/heat-input, not flame speed; the supplier's analysis, the appliance listing, and the conversion kit govern.";
-  const hv = makeNumber("Higher heating value (BTU/ft^3)", "wob-hv", { step: "any", min: "0", value: "1000" });
+  const hv = makeNumber("Higher heating value (BTU/ft³)", "wob-hv", { step: "any", min: "0", value: "1000" });
   hv.input.value = "1000";
   const sg = makeNumber("Specific gravity (vs air)", "wob-sg", { step: "any", min: "0", value: "0.60" });
   sg.input.value = "0.60";

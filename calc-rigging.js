@@ -191,7 +191,7 @@ export function computeCraneGroundBearing({ reaction_lb, bearing_area_ft2, allow
 function renderCraneGroundBearing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: OSHA 29 CFR 1926 Subpart CC and the manufacturer's outrigger-reaction chart by name. gbp = reaction / area; required area = reaction / allowable. Estimate - a geotech source and a qualified person govern.";
   const reaction = makeNumber("Worst-corner reaction (lb)", "cgb-reaction", { step: "any", min: "0" });
-  const area = makeNumber("Float / pad / track contact area (ft^2)", "cgb-area", { step: "any", min: "0" });
+  const area = makeNumber("Float / pad / track contact area (ft²)", "cgb-area", { step: "any", min: "0" });
   const allowable = makeNumber("Allowable soil bearing (psf)", "cgb-allow", { step: "any", min: "0" });
   for (const f of [reaction, area, allowable]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { reaction.input.value = "60000"; area.input.value = "4"; allowable.input.value = "3000"; update(); });
@@ -308,7 +308,7 @@ export function computeWindOnLoad({ sail_area_ft2, wind_mph, shape_coef = 1.6, l
 
 function renderWindOnLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASCE velocity-pressure constant q = 0.00256 V^2 (the same the wind-pressure tile uses) and OSHA 1926 Subpart CC by name. wind force = q x sail area x shape coefficient. Estimate - the in-service wind limit governs.";
-  const area = makeNumber("Projected sail area (ft^2)", "wol-area", { step: "any", min: "0" });
+  const area = makeNumber("Projected sail area (ft²)", "wol-area", { step: "any", min: "0" });
   const wind = makeNumber("Sustained wind at the load (mph)", "wol-wind", { step: "any", min: "0" });
   const shape = makeNumber("Shape coefficient (flat panel ~1.2-2.0)", "wol-shape", { step: "any", min: "0", value: "1.6" });
   shape.input.value = "1.6";
@@ -364,7 +364,7 @@ function renderMaxWindSpeedForLift(inputRegion, outputRegion, citationEl) {
   const swing = makeNumber("Max allowable swing (deg, ~5 planning)", "mws-swing", { step: "any", min: "0", value: "5" });
   swing.input.value = "5";
   const weight = makeNumber("Load weight (lb)", "mws-weight", { step: "any", min: "0" });
-  const area = makeNumber("Projected sail area (ft^2)", "mws-area", { step: "any", min: "0" });
+  const area = makeNumber("Projected sail area (ft²)", "mws-area", { step: "any", min: "0" });
   const shape = makeNumber("Shape coefficient (flat panel ~1.2-2.0)", "mws-shape", { step: "any", min: "0", value: "1.6" });
   shape.input.value = "1.6";
   for (const f of [swing, weight, area, shape]) inputRegion.appendChild(f.wrap);
@@ -1021,7 +1021,7 @@ export const wireRopeStrengthExample = { inputs: { diameter_in: 0.5, constructio
 function renderWireRopeStrength(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Wire Rope Users Manual rule-of-thumb by name. MBS = factor x d^2 (factor ~46 tons/in^2 for IPS 6x19, editable); WLL = MBS / design factor (5:1 typical). ESTIMATE - the manufacturer's certified rating governs; never use unmarked rope.";
   const dia = makeNumber("Rope nominal diameter (in)", "wrs-dia", { step: "any", min: "0", value: "0.5" });
-  const cf = makeNumber("Construction factor (tons/in^2)", "wrs-cf", { step: "any", min: "0", value: "46" });
+  const cf = makeNumber("Construction factor (tons/in²)", "wrs-cf", { step: "any", min: "0", value: "46" });
   const df = makeNumber("Design factor (safety factor)", "wrs-df", { step: "any", min: "0", value: "5" });
   dia.input.value = "0.5"; cf.input.value = "46"; df.input.value = "5";
   for (const f of [dia, cf, df]) inputRegion.appendChild(f.wrap);
@@ -1067,7 +1067,7 @@ export const wireRopeDiameterForWllExample = { inputs: { wll_required_tons: 5, c
 function renderWireRopeDiameterForWll(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Wire Rope Users Manual rule-of-thumb solved for the diameter: d = sqrt(WLL x design factor / construction factor), from MBS = factor x d^2 (factor ~46 tons/in^2 for IPS 6x19, editable) and WLL = MBS / design factor (5:1 typical). ESTIMATE - the manufacturer's certified rating governs; never use unmarked rope.";
   const wll = makeNumber("Required working load limit (tons)", "wrd-wll", { step: "any", min: "0", value: "5" });
-  const cf = makeNumber("Construction factor (tons/in^2)", "wrd-cf", { step: "any", min: "0", value: "46" });
+  const cf = makeNumber("Construction factor (tons/in²)", "wrd-cf", { step: "any", min: "0", value: "46" });
   const df = makeNumber("Design factor (safety factor)", "wrd-df", { step: "any", min: "0", value: "5" });
   wll.input.value = "5"; cf.input.value = "46"; df.input.value = "5";
   for (const f of [wll, cf, df]) inputRegion.appendChild(f.wrap);

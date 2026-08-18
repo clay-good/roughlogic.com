@@ -113,7 +113,7 @@ STEEL_RENDERERS["steel-beam-flexure"] = _simpleRenderer({
   example: steelBeamFlexureExample.inputs,
   fields: [
     { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", default: 50 },
-    { key: "zx", label: "Plastic section modulus Zx (in^3)", kind: "number" },
+    { key: "zx", label: "Plastic section modulus Zx (in³)", kind: "number" },
     { key: "mu", label: "Required moment Mu (kip-ft, 0 to skip)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -172,9 +172,9 @@ STEEL_RENDERERS["shear-flow-connector-spacing"] = _simpleRenderer({
   example: shearFlowConnectorSpacingExample.inputs,
   fields: [
     { key: "shear_kip", label: "Transverse shear V at the section (kip)", kind: "number", default: 50 },
-    { key: "area_in2", label: "Connected element area A (in^2)", kind: "number", default: 6 },
+    { key: "area_in2", label: "Connected element area A (in²)", kind: "number", default: 6 },
     { key: "ybar_in", label: "Connected element centroid distance from NA, y_bar (in)", kind: "number", default: 8 },
-    { key: "inertia_in4", label: "Moment of inertia of whole section I (in^4)", kind: "number", default: 800 },
+    { key: "inertia_in4", label: "Moment of inertia of whole section I (in⁴)", kind: "number", default: 800 },
     { key: "connector_kip", label: "Capacity per connector R (kip)", kind: "number", default: 10 },
     { key: "connectors_per_row", label: "Connectors per row n (2 = a pair of lines)", kind: "number", default: 2 },
   ],
@@ -279,7 +279,7 @@ STEEL_RENDERERS["steel-column-capacity"] = _simpleRenderer({
     { key: "k", label: "Effective-length factor K", kind: "number", default: 1.0 },
     { key: "l_ft", label: "Unbraced length L (ft)", kind: "number" },
     { key: "r_in", label: "Radius of gyration r (in)", kind: "number" },
-    { key: "ag", label: "Gross area Ag (in^2)", kind: "number" },
+    { key: "ag", label: "Gross area Ag (in²)", kind: "number" },
     { key: "pu", label: "Required axial load Pu (kips, 0 to skip)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -378,7 +378,7 @@ STEEL_RENDERERS["bolt-shear-bearing"] = _simpleRenderer({
   example: boltShearBearingExample.inputs,
   fields: [
     { key: "d_in", label: "Bolt diameter d (in)", kind: "number", default: 0.75 },
-    { key: "ab_in2", label: "Bolt area Ab (in^2)", kind: "number", default: 0.4418 },
+    { key: "ab_in2", label: "Bolt area Ab (in²)", kind: "number", default: 0.4418 },
     { key: "fnv_ksi", label: "Bolt shear stress Fnv (ksi)", kind: "number", default: 54 },
     { key: "nplanes", label: "Shear planes (1 single, 2 double)", kind: "number", default: 1 },
     { key: "t_in", label: "Connected ply thickness t (in)", kind: "number", default: 0.5 },
@@ -536,11 +536,11 @@ STEEL_RENDERERS["steel-beam-ltb"] = _simpleRenderer({
   example: steelBeamLtbExample.inputs,
   fields: [
     { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", default: 50 },
-    { key: "zx", label: "Plastic section modulus Zx (in^3)", kind: "number" },
-    { key: "sx", label: "Elastic section modulus Sx (in^3)", kind: "number" },
+    { key: "zx", label: "Plastic section modulus Zx (in³)", kind: "number" },
+    { key: "sx", label: "Elastic section modulus Sx (in³)", kind: "number" },
     { key: "ry", label: "Weak-axis radius of gyration ry (in)", kind: "number" },
     { key: "rts", label: "Effective radius for LTB rts (in)", kind: "number" },
-    { key: "j", label: "Torsional constant J (in^4)", kind: "number" },
+    { key: "j", label: "Torsional constant J (in⁴)", kind: "number" },
     { key: "ho", label: "Distance between flange centroids ho (in)", kind: "number" },
     { key: "lb_ft", label: "Unbraced length Lb (ft)", kind: "number" },
     { key: "cb", label: "LTB modification factor Cb", kind: "number", default: 1.0 },
@@ -653,7 +653,7 @@ STEEL_RENDERERS["steel-tension-member"] = _simpleRenderer({
   citation: "Citation: AISC 360-22 D2 gross yielding Pn = Fy Ag (Omega = 1.67 / phi = 0.90) and D3 net rupture Pn = Fu Ae, Ae = U An, with U = 1 - xbar/L (Table D3.1 Case 2) and An = Ag - nh dh t, by name. Single hole line, entered or Case-2 U. Block shear and bolt checks are separate tiles. A design aid, not a substitute for the engineer of record.",
   example: steelTensionMemberExample.inputs,
   fields: [
-    { key: "ag_in2", label: "Gross area Ag (in^2)", kind: "number" },
+    { key: "ag_in2", label: "Gross area Ag (in²)", kind: "number" },
     { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", default: 36 },
     { key: "fu", label: "Tensile stress Fu (ksi)", kind: "number", default: 58 },
     { key: "nh", label: "Hole lines across the section (0 if welded)", kind: "number", attrs: { step: "1", min: "0" } },
@@ -902,7 +902,7 @@ STEEL_RENDERERS["steel-b1-amplifier"] = _simpleRenderer({
   example: steelB1AmplifierExample.inputs,
   fields: [
     { key: "pr_kip", label: "Required axial compression Pr (kip)", kind: "number", default: 400 },
-    { key: "i_in4", label: "In-plane moment of inertia I (in^4)", kind: "number", default: 272 },
+    { key: "i_in4", label: "In-plane moment of inertia I (in⁴)", kind: "number", default: 272 },
     { key: "lc1_ft", label: "Effective length in the plane K1 L (ft, K1 <= 1)", kind: "number", default: 16 },
     { key: "transverse_load", label: "Transverse load between supports?", kind: "select", default: "no", options: [
       { value: "no", label: "No (Cm from the end-moment ratio)" },
@@ -1057,13 +1057,13 @@ STEEL_RENDERERS["steel-column-stiffness-ratio-g"] = _simpleRenderer({
   citation: "Citation: AISC alignment-chart joint stiffness ratio G = sum(EI/L)_columns / sum(EI/L)_girders (E cancels for all-steel frames, so sum(I/L)), with the standard girder far-end modifiers (braced 1.5 pinned / 2.0 fixed; moment 0.5 pinned / 0.67 fixed; 1.0 rigid), as compiled in AISC 360 Commentary Appendix 7 / Salmon & Johnson, by name. Feeds the steel-effective-length-k tile as GA or GB; G = 10 at a pin, 1 at a fixed base. A design aid, not a substitute for the engineer of record.",
   example: steelColumnStiffnessRatioGExample.inputs,
   fields: [
-    { key: "ic1", label: "Column 1 moment of inertia Ix (in^4)", kind: "number", default: 800 },
+    { key: "ic1", label: "Column 1 moment of inertia Ix (in⁴)", kind: "number", default: 800 },
     { key: "lc1", label: "Column 1 length (ft)", kind: "number", default: 12 },
-    { key: "ic2", label: "Column 2 Ix (in^4, continuing column; 0 to skip)", kind: "number", default: 800 },
+    { key: "ic2", label: "Column 2 Ix (in⁴, continuing column; 0 to skip)", kind: "number", default: 800 },
     { key: "lc2", label: "Column 2 length (ft, 0 to skip)", kind: "number", default: 12 },
-    { key: "ig1", label: "Girder 1 moment of inertia Ix (in^4)", kind: "number", default: 1200 },
+    { key: "ig1", label: "Girder 1 moment of inertia Ix (in⁴)", kind: "number", default: 1200 },
     { key: "lg1", label: "Girder 1 length (ft)", kind: "number", default: 24 },
-    { key: "ig2", label: "Girder 2 Ix (in^4, 0 to skip)", kind: "number", default: 1200 },
+    { key: "ig2", label: "Girder 2 Ix (in⁴, 0 to skip)", kind: "number", default: 1200 },
     { key: "lg2", label: "Girder 2 length (ft, 0 to skip)", kind: "number", default: 24 },
     { key: "girder_far_end", label: "Girder far-end condition", kind: "select", default: "rigid", options: [
       { value: "rigid", label: "Rigid both ends (x1.0)" },
@@ -1116,7 +1116,7 @@ STEEL_RENDERERS["steel-tau-b-stiffness-reduction"] = _simpleRenderer({
   fields: [
     { key: "pr_kip", label: "Required axial compression Pr (kip)", kind: "number", default: 400 },
     { key: "fy_ksi", label: "Yield strength Fy (ksi)", kind: "number", default: 50 },
-    { key: "ag_in2", label: "Gross area Ag (in^2)", kind: "number", default: 14.4 },
+    { key: "ag_in2", label: "Gross area Ag (in²)", kind: "number", default: 14.4 },
     { key: "method", label: "Design basis", kind: "select", default: "LRFD", options: [
       { value: "LRFD", label: "LRFD (alpha = 1.0)" },
       { value: "ASD", label: "ASD (alpha = 1.6)" },
@@ -1155,7 +1155,7 @@ STEEL_RENDERERS["steel-bolt-tension-shear"] = _simpleRenderer({
   fields: [
     { key: "fnt_ksi", label: "Nominal tensile stress Fnt (ksi, 90 A325)", kind: "number", default: 90 },
     { key: "fnv_ksi", label: "Nominal shear stress Fnv (ksi, 54 N / 68 X)", kind: "number", default: 54 },
-    { key: "ab_in2", label: "Nominal bolt area Ab (in^2)", kind: "number" },
+    { key: "ab_in2", label: "Nominal bolt area Ab (in²)", kind: "number" },
     { key: "frv_ksi", label: "Required shear stress frv (ksi = V/Ab)", kind: "number" },
     { key: "method", label: "Method", kind: "select", options: [
       { value: "LRFD", label: "LRFD (phi = 0.75)" },
@@ -1203,7 +1203,7 @@ STEEL_RENDERERS["shear-stud-strength"] = _simpleRenderer({
   citation: "Citation: AISC 360-22 §I8.2a: nominal shear-stud strength Qn = 0.5 Asc sqrt(f'c Ec) <= Rg Rp Asc Fu, with Rg (group) and Rp (position) from Table I8.1; the number of studs each side = V' / Qn rounded up. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: shearStudStrengthExample.inputs,
   fields: [
-    { key: "asc_in2", label: "Stud area Asc (in^2)", kind: "number", default: 0.442 },
+    { key: "asc_in2", label: "Stud area Asc (in²)", kind: "number", default: 0.442 },
     { key: "fc_psi", label: "Slab f'c (psi)", kind: "number", default: 4000 },
     { key: "ec_psi", label: "Concrete modulus Ec (psi)", kind: "number", default: 3644000 },
     { key: "fu_ksi", label: "Stud tensile Fu (ksi)", kind: "number", default: 65 },
@@ -1257,7 +1257,7 @@ STEEL_RENDERERS["composite-beam-flexure"] = _simpleRenderer({
   citation: "Citation: AISC 360-22 §I3.2a: composite beam flexural strength with the PNA in the slab -- C = As Fy, a = C/(0.85 f'c be), Mn = C(d/2 + tslab - a/2), phi Mn = 0.90 Mn, valid while a <= slab thickness (full composite). Beyond that the PNA is in the steel and the general method applies. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: compositeBeamFlexureExample.inputs,
   fields: [
-    { key: "as_in2", label: "Steel area As (in^2)", kind: "number", default: 8.0 },
+    { key: "as_in2", label: "Steel area As (in²)", kind: "number", default: 8.0 },
     { key: "fy_ksi", label: "Steel yield Fy (ksi)", kind: "number", default: 50 },
     { key: "d_in", label: "Steel depth d (in)", kind: "number", default: 16 },
     { key: "tslab_in", label: "Slab thickness (in)", kind: "number", default: 4 },
@@ -1302,7 +1302,7 @@ STEEL_RENDERERS["steel-camber"] = _simpleRenderer({
   fields: [
     { key: "w_kip_ft", label: "Uniform dead load (kip/ft)", kind: "number", default: 1.0 },
     { key: "span_ft", label: "Simple span (ft)", kind: "number", default: 40 },
-    { key: "moi_in4", label: "Moment of inertia I (in^4)", kind: "number", default: 2100 },
+    { key: "moi_in4", label: "Moment of inertia I (in⁴)", kind: "number", default: 2100 },
     { key: "e_ksi", label: "Modulus E (ksi)", kind: "number", default: 29000 },
     { key: "fraction", label: "Camber fraction of DL deflection", kind: "number", default: 0.80 },
   ],
@@ -1566,7 +1566,7 @@ STEEL_RENDERERS["steel-panel-zone-axial"] = _simpleRenderer({
     { key: "fy_ksi", label: "Column yield Fy (ksi)", kind: "number", default: 50 },
     { key: "col_depth_dc_in", label: "Column depth dc (in)", kind: "number" },
     { key: "col_web_tw_in", label: "Column web tw (in)", kind: "number" },
-    { key: "col_area_ag_in2", label: "Column gross area Ag (in^2)", kind: "number" },
+    { key: "col_area_ag_in2", label: "Column gross area Ag (in²)", kind: "number" },
     { key: "pr_kip", label: "Axial demand Pr at the joint (kip)", kind: "number" },
     { key: "pz_in_analysis", label: "Panel-zone deformation in the analysis?", kind: "select", options: [{ value: "no", label: "No (J10-9 / J10-10)", selected: true }, { value: "yes", label: "Yes (J10-11 / J10-12)" }] },
     { key: "col_flange_bcf_in", label: "Column flange width bcf (in, yes-branch)", kind: "number", default: 0 },

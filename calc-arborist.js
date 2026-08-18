@@ -335,7 +335,7 @@ export const basalAreaPrismExample = { inputs: { baf: 10, in_tree_count: 8, dbh_
 
 function _v563renderBasalAreaPrism(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: prism (variable-radius / angle-gauge) point sampling, per USDA Forest Service mensuration and Bitterlich variable-radius plots, by name. basal_area_per_acre = BAF x in-tree count; per-tree basal area = 0.005454 x DBH^2; trees per acre = BAF / per-tree BA. The prism counts by angular size, not distance; the basal area per acre is independent of plot radius. A field estimate; a qualified cruise and the forester govern.";
-  const baf = makeNumber("Basal-area factor (BAF, ft^2/ac)", "bap-baf", { step: "any", min: "0", value: "10" }); baf.input.value = "10";
+  const baf = makeNumber("Basal-area factor (BAF, ft²/ac)", "bap-baf", { step: "any", min: "0", value: "10" }); baf.input.value = "10";
   const count = makeNumber("Trees counted 'in'", "bap-count", { step: "1", min: "0", value: "8" }); count.input.value = "8";
   const dbh = makeNumber("Tree DBH (in, for the expansion)", "bap-dbh", { step: "any", min: "0", value: "14" }); dbh.input.value = "14";
   for (const f of [baf, count, dbh]) inputRegion.appendChild(f.wrap);
@@ -776,7 +776,7 @@ export const crownPruningDoseExample = { inputs: { live_foliage: 100, removed_fo
 
 function _v567renderCrownPruningDose(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ANSI A300 Part 1 live-crown removal limit (ISA Best Management Practices), by name. removal_pct = removed / live x 100, compared to the class cap: mature <= 25% in a single season, young ~15%, over-mature ~10%, stressed 0%. The 25% is the mature maximum, not a target; lion's-tailing violates A300 even under the percent cap. A planning aid; a qualified arborist governs.";
-  const live = makeNumber("Live crown / foliage before pruning (ft^2 or %)", "cpd-live", { step: "any", min: "0", value: "100" }); live.input.value = "100";
+  const live = makeNumber("Live crown / foliage before pruning (ft² or %)", "cpd-live", { step: "any", min: "0", value: "100" }); live.input.value = "100";
   const removed = makeNumber("Foliage proposed for removal (same units)", "cpd-removed", { step: "any", min: "0", value: "15" }); removed.input.value = "15";
   const cls = makeSelect("Maturity class", "cpd-cls", [
     { value: "young", label: "Young (~15% cap)" },
@@ -879,7 +879,7 @@ function renderFirewoodCord(inputRegion, outputRegion, citationEl) {
   const d = makeNumber("Stack depth / log length (ft)", "fwc-d", { step: "any", min: "0", value: "4" });
   d.input.value = "4";
   for (const f of [l, h, d]) inputRegion.appendChild(f.wrap);
-  const oC = makeOutputLine(outputRegion, "Cords (full cord = 128 ft^3)", "fwc-out-c");
+  const oC = makeOutputLine(outputRegion, "Cords (full cord = 128 ft³)", "fwc-out-c");
   const oV = makeOutputLine(outputRegion, "Stacked volume", "fwc-out-v");
   const oNote = makeOutputLine(outputRegion, "Note", "fwc-out-note");
   const update = debounce(() => {

@@ -117,8 +117,8 @@ export function renderPVStringSizing(inputRegion, outputRegion, citationEl, para
   const voc = makeNumber("Module Voc (V)", "pv-voc", { step: "any", min: "0" });
   const vmp = makeNumber("Module Vmp (V)", "pv-vmp", { step: "any", min: "0" });
   const coeff = makeNumber("Voc temp coeff (% per C, magnitude)", "pv-coeff", { step: "any" });
-  const tlow = makeNumber("Record low temp (C)", "pv-tlow", { step: "any" });
-  const thigh = makeNumber("Record high temp (C)", "pv-thigh", { step: "any" });
+  const tlow = makeNumber("Record low temp (°C)", "pv-tlow", { step: "any" });
+  const thigh = makeNumber("Record high temp (°C)", "pv-thigh", { step: "any" });
   const mppt_min = makeNumber("Inverter MPPT min (V)", "pv-mppt-min", { step: "any", min: "0" });
   const mppt_max = makeNumber("Inverter MPPT max (V)", "pv-mppt-max", { step: "any", min: "0" });
   const vdc_max = makeNumber("Inverter Vdc max (V)", "pv-vdc-max", { step: "any", min: "0" });
@@ -1141,8 +1141,8 @@ export function computePvCellTemperaturePower({ T_amb_C = 0, G_wm2 = 0, NOCT_C =
 const pvCellTemperaturePowerExample = { inputs: { T_amb_C: 30, G_wm2: 800, NOCT_C: 45, P_stc_W: 400, gamma: -0.35 } };
 function renderPvCellTemperaturePower(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: PV NOCT cell-temperature model T_cell = T_amb + (NOCT - 20) x G/800 and the datasheet power temperature coefficient (about -0.35%/C for crystalline silicon), by name. Temperature derate only (no soiling/wiring/inverter/shading). A design aid; the module datasheet governs.";
-  const Ta = makeNumber("Ambient temperature (C)", "pctp-ta", { step: "any", value: "30" }); Ta.input.value = "30";
-  const G = makeNumber("Plane-of-array irradiance (W/m^2)", "pctp-g", { step: "any", min: "0", value: "800" }); G.input.value = "800";
+  const Ta = makeNumber("Ambient temperature (°C)", "pctp-ta", { step: "any", value: "30" }); Ta.input.value = "30";
+  const G = makeNumber("Plane-of-array irradiance (W/m²)", "pctp-g", { step: "any", min: "0", value: "800" }); G.input.value = "800";
   const noct = makeNumber("NOCT (C, datasheet, default 45)", "pctp-noct", { step: "any", min: "0", value: "45" }); noct.input.value = "45";
   const Pstc = makeNumber("Module STC power (W)", "pctp-p", { step: "any", min: "0", value: "400" }); Pstc.input.value = "400";
   const g = makeNumber("Power temp coefficient (%/C, e.g. -0.35)", "pctp-gamma", { step: "any", value: "-0.35" }); g.input.value = "-0.35";
@@ -1195,7 +1195,7 @@ function renderPvMaxAmbientForPower(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: PV NOCT cell-temperature model and the datasheet power temperature coefficient (about -0.35%/C for crystalline silicon), by name, solved for the ambient: T_cell = 25 + (P/P_stc - 1) x 100/gamma, T_amb = T_cell - (NOCT - 20) x G/800. Temperature derate only (no soiling/wiring/inverter/shading). A design aid; the module datasheet governs.";
   const Ptgt = makeNumber("Target power (W)", "pma-pt", { step: "any", min: "0", value: "358" }); Ptgt.input.value = "358";
   const Pstc = makeNumber("Module STC power (W)", "pma-p", { step: "any", min: "0", value: "400" }); Pstc.input.value = "400";
-  const G = makeNumber("Plane-of-array irradiance (W/m^2)", "pma-g", { step: "any", min: "0", value: "800" }); G.input.value = "800";
+  const G = makeNumber("Plane-of-array irradiance (W/m²)", "pma-g", { step: "any", min: "0", value: "800" }); G.input.value = "800";
   const noct = makeNumber("NOCT (C, datasheet, default 45)", "pma-noct", { step: "any", min: "0", value: "45" }); noct.input.value = "45";
   const g = makeNumber("Power temp coefficient (%/C, e.g. -0.35)", "pma-gamma", { step: "any", value: "-0.35" }); g.input.value = "-0.35";
   for (const f of [Ptgt, Pstc, G, noct, g]) inputRegion.appendChild(f.wrap);
@@ -1740,7 +1740,7 @@ function _v897renderPvBallastWeight(inputRegion, outputRegion, citationEl) {
   bl.input.value = "40";
   const rk = makeNumber("Total racking weight (lb)", "pbw-rk", { step: "any", min: "0", value: "150" });
   rk.input.value = "150";
-  const ar = makeNumber("Array footprint area (ft^2)", "pbw-ar", { step: "any", min: "0", value: "630" });
+  const ar = makeNumber("Array footprint area (ft²)", "pbw-ar", { step: "any", min: "0", value: "630" });
   ar.input.value = "630";
   const al = makeNumber("Allowable added pressure (psf)", "pbw-al", { step: "any", min: "0", value: "5" });
   al.input.value = "5";
@@ -1945,9 +1945,9 @@ export const bifacialPvGainExample = { inputs: { front_poa_wm2: 1000, rear_poa_w
 
 function _v983renderBifacialPvGain(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: bifacial PV rear-side gain, by name. gain = bifaciality x (rear irradiance / front irradiance); effective power = front x (1 + gain). Bifaciality (phi) ~0.65-0.90 from the datasheet; rear irradiance climbs with ground albedo, mounting height, and row spacing. The datasheet bifaciality, the site albedo, and a bifacial ray-trace govern the real yield.";
-  const fp = makeNumber("Front plane-of-array irradiance (W/m^2)", "bpg-fp", { step: "any", min: "0", value: "1000" });
+  const fp = makeNumber("Front plane-of-array irradiance (W/m²)", "bpg-fp", { step: "any", min: "0", value: "1000" });
   fp.input.value = "1000";
-  const rp = makeNumber("Rear plane-of-array irradiance (W/m^2)", "bpg-rp", { step: "any", min: "0", value: "150" });
+  const rp = makeNumber("Rear plane-of-array irradiance (W/m²)", "bpg-rp", { step: "any", min: "0", value: "150" });
   rp.input.value = "150";
   const bf = makeNumber("Bifaciality coefficient (0-1, from datasheet)", "bpg-bf", { step: "any", min: "0", max: "1", value: "0.75" });
   bf.input.value = "0.75";

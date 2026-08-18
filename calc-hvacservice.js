@@ -351,8 +351,8 @@ HVACSERVICE_RENDERERS["nitrogen-pressure-test"] = _simpleRenderer({
   example: nitrogenPressureExample.inputs,
   fields: [
     { key: "start_psig", label: "Test pressure at start (psig)", kind: "number" },
-    { key: "start_temp_F", label: "Temperature at start (F)", kind: "number" },
-    { key: "end_temp_F", label: "Temperature at end (F)", kind: "number" },
+    { key: "start_temp_F", label: "Temperature at start (°F)", kind: "number" },
+    { key: "end_temp_F", label: "Temperature at end (°F)", kind: "number" },
     { key: "end_psig", label: "Gauge pressure at end (psig)", kind: "number" },
     { key: "atm_psi", label: "Atmospheric pressure (psi)", kind: "number", default: 14.7 },
     { key: "tolerance_psi", label: "Leak tolerance (psi)", kind: "number", default: 1 },
@@ -481,12 +481,12 @@ HVACSERVICE_RENDERERS["furnace-temp-rise"] = _simpleRenderer({
   citation: "Citation: first-principles sensible-heat relation Qs = 1.08 x CFM x delta-T solved for airflow, with output = input x efficiency (public); the 1.08 sea-level air factor and the default 80% efficiency are editable. The rating-plate temperature-rise range and the equipment manufacturer govern.",
   example: furnaceTempRiseExample.inputs,
   fields: [
-    { key: "return_air_F", label: "Return-air temp (F)", kind: "number" },
-    { key: "supply_air_F", label: "Supply-air temp (F)", kind: "number" },
+    { key: "return_air_F", label: "Return-air temp (°F)", kind: "number" },
+    { key: "supply_air_F", label: "Supply-air temp (°F)", kind: "number" },
     { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
     { key: "efficiency_pct", label: "Efficiency (%)", kind: "number", default: 80 },
-    { key: "rise_min_F", label: "Plate min rise (F)", kind: "number", default: 40 },
-    { key: "rise_max_F", label: "Plate max rise (F)", kind: "number", default: 70 },
+    { key: "rise_min_F", label: "Plate min rise (°F)", kind: "number", default: 40 },
+    { key: "rise_max_F", label: "Plate max rise (°F)", kind: "number", default: 70 },
   ],
   outputs: [
     { key: "d", id: "ftr-out-d", label: "Temperature rise", value: (r) => fmt(r.delta_T_F, 1) + " F" },
@@ -529,9 +529,9 @@ HVACSERVICE_RENDERERS["furnace-airflow-to-rise"] = _simpleRenderer({
     { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
     { key: "efficiency_pct", label: "Efficiency (%)", kind: "number", default: 80 },
     { key: "cfm", label: "Blower airflow (CFM)", kind: "number" },
-    { key: "return_air_F", label: "Return-air temp (F)", kind: "number", default: 70 },
-    { key: "rise_min_F", label: "Plate min rise (F)", kind: "number", default: 40 },
-    { key: "rise_max_F", label: "Plate max rise (F)", kind: "number", default: 70 },
+    { key: "return_air_F", label: "Return-air temp (°F)", kind: "number", default: 70 },
+    { key: "rise_min_F", label: "Plate min rise (°F)", kind: "number", default: 40 },
+    { key: "rise_max_F", label: "Plate max rise (°F)", kind: "number", default: 70 },
   ],
   outputs: [
     { key: "d", id: "far-out-d", label: "Predicted temperature rise", value: (r) => fmt(r.delta_T_F, 1) + " F" },
@@ -570,7 +570,7 @@ HVACSERVICE_RENDERERS["blower-door-ach50"] = _simpleRenderer({
   example: blowerDoorAch50Example.inputs,
   fields: [
     { key: "cfm50", label: "Blower-door reading CFM50 (cfm)", kind: "number" },
-    { key: "volume_ft3", label: "Conditioned volume (ft^3)", kind: "number" },
+    { key: "volume_ft3", label: "Conditioned volume (ft³)", kind: "number" },
     { key: "n_factor", label: "LBL N-factor (ACH50 -> natural)", kind: "number", default: 17 },
     { key: "target_ach50", label: "Target ACH50 (IECC limit)", kind: "number", default: 3 },
   ],
@@ -607,7 +607,7 @@ HVACSERVICE_RENDERERS["ashrae-622-ventilation"] = _simpleRenderer({
   citation: "Citation: ASHRAE 62.2-2019 §4.1 whole-house ventilation Qtot = 0.03 x Afloor + 7.5 x (Nbr + 1), and the fan flow Qfan = Qtot - Qinf (by name). The infiltration credit comes from the measured air-tightness; the conservative default is zero credit. Local kitchen/bath exhaust is a separate 62.2 requirement. A sizing aid, not a compliance certificate.",
   example: ashrae622VentilationExample.inputs,
   fields: [
-    { key: "floor_area_ft2", label: "Conditioned floor area (ft^2)", kind: "number" },
+    { key: "floor_area_ft2", label: "Conditioned floor area (ft²)", kind: "number" },
     { key: "bedrooms", label: "Bedrooms (Nbr)", kind: "number" },
     { key: "infil_credit_cfm", label: "Infiltration credit Qinf (cfm)", kind: "number", default: 0 },
   ],
@@ -641,7 +641,7 @@ HVACSERVICE_RENDERERS["infiltration-load"] = _simpleRenderer({
   example: infiltrationLoadExample.inputs,
   fields: [
     { key: "cfm", label: "Infiltration airflow (cfm)", kind: "number" },
-    { key: "delta_t_f", label: "Design indoor-outdoor delta-T (F)", kind: "number" },
+    { key: "delta_t_f", label: "Design indoor-outdoor delta-T (°F)", kind: "number" },
     { key: "delta_gr", label: "Humidity-ratio diff (grains/lb)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -674,9 +674,9 @@ HVACSERVICE_RENDERERS["outside-air-percent-temps"] = _simpleRenderer({
   citation: "Citation: The mixed-air temperature balance %OA = 100 (T_ra - T_ma) / (T_ra - T_oa) (ASHRAE / AABC-NEBB field practice), the standard field check of the outside-air damper fraction against the design minimum. Needs well-mixed, shielded dry-bulb readings; a small return-to-outdoor spread (under ~10 F) makes it sensitive to sensor error. A field aid, not a substitute for a direct airflow measurement.",
   example: outsideAirPercentTempsExample.inputs,
   fields: [
-    { key: "t_ra_f", label: "Return-air temperature T_ra (F)", kind: "number", default: 75 },
-    { key: "t_ma_f", label: "Mixed-air temperature T_ma (F)", kind: "number", default: 68 },
-    { key: "t_oa_f", label: "Outdoor-air temperature T_oa (F)", kind: "number", default: 40 },
+    { key: "t_ra_f", label: "Return-air temperature T_ra (°F)", kind: "number", default: 75 },
+    { key: "t_ma_f", label: "Mixed-air temperature T_ma (°F)", kind: "number", default: 68 },
+    { key: "t_oa_f", label: "Outdoor-air temperature T_oa (°F)", kind: "number", default: 40 },
   ],
   outputs: [
     { key: "pct", id: "oapt-out-pct", label: "Outside-air fraction", value: (r) => fmt(r.pct_oa, 1) + "% OA" },
@@ -709,8 +709,8 @@ HVACSERVICE_RENDERERS["duct-leakage-cfm25"] = _simpleRenderer({
   example: ductLeakageCfm25Example.inputs,
   fields: [
     { key: "leakage_cfm25", label: "Measured total leakage at 25 Pa (CFM25)", kind: "number", default: 80 },
-    { key: "cfa_ft2", label: "Conditioned floor area (ft^2)", kind: "number", default: 2000 },
-    { key: "limit", label: "Limit (CFM25 per 100 ft^2, default 4)", kind: "number", default: 4 },
+    { key: "cfa_ft2", label: "Conditioned floor area (ft²)", kind: "number", default: 2000 },
+    { key: "limit", label: "Limit (CFM25 per 100 ft², default 4)", kind: "number", default: 4 },
   ],
   outputs: [
     { key: "norm", id: "dlc-out-norm", label: "Normalized leakage", value: (r) => fmt(r.normalized, 2) + " CFM25 / 100 ft^2" },
@@ -874,8 +874,8 @@ export const chimneyDraftExample = { inputs: { stack_height_ft: 30, ambient_temp
 function _v585renderChimneyDraft(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A design aid, not a venting sign-off; the venting standard (NFPA 211) and the appliance instructions govern. Citation: ASHRAE Handbook HVAC Systems (chimney/vent) / NFPA 211 theoretical chimney draft, by name. D_t = 0.52 x B x H x (1/T_o - 1/T_m) with temperatures in Rankine and D_t in inches of water column; D_net = factor x D_t (factor 0.5 to 0.8). The barometric pressure must be altitude-corrected (thinner air at elevation cuts the draft), and T_m is the mean flue temperature, not the outlet.";
   const H = makeNumber("Stack height (ft)", "chd-h", { step: "any", min: "0", value: "30" }); H.input.value = "30";
-  const to = makeNumber("Ambient temperature (F)", "chd-to", { step: "any", value: "60" }); to.input.value = "60";
-  const tm = makeNumber("Mean flue-gas temperature (F)", "chd-tm", { step: "any", value: "400" }); tm.input.value = "400";
+  const to = makeNumber("Ambient temperature (°F)", "chd-to", { step: "any", value: "60" }); to.input.value = "60";
+  const tm = makeNumber("Mean flue-gas temperature (°F)", "chd-tm", { step: "any", value: "400" }); tm.input.value = "400";
   const B = makeNumber("Barometric pressure (psia, altitude-corrected)", "chd-b", { step: "any", min: "0", value: "14.7" }); B.input.value = "14.7";
   const factor = makeNumber("Net-available factor (0.5-0.8)", "chd-f", { step: "any", min: "0", value: "0.6" }); factor.input.value = "0.6";
   for (const f of [H, to, tm, B, factor]) inputRegion.appendChild(f.wrap);
@@ -925,8 +925,8 @@ export const chimneyHeightForDraftExample = { inputs: { target_draft_net_inwc: 0
 function renderChimneyHeightForDraft(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A design aid, not a venting sign-off; the venting standard (NFPA 211) and the appliance instructions govern. Citation: ASHRAE Handbook HVAC Systems (chimney/vent) / NFPA 211 theoretical chimney draft solved for the height: H = D_net_target / (net_factor x 0.52 x B x (1/T_o - 1/T_m)), temperatures in Rankine, D in inches of water column. Enter the NET draft the appliance needs (net_factor 0.5 to 0.8 accounts for flow and fitting losses). The barometric pressure must be altitude-corrected (thinner air at elevation cuts the draft), and T_m is the mean flue temperature, not the outlet.";
   const dt = makeNumber("Target net draft (in wc)", "chhd-dt", { step: "any", min: "0", value: "0.1046" }); dt.input.value = "0.1046";
-  const to = makeNumber("Ambient temperature (F)", "chhd-to", { step: "any", value: "60" }); to.input.value = "60";
-  const tm = makeNumber("Mean flue-gas temperature (F)", "chhd-tm", { step: "any", value: "400" }); tm.input.value = "400";
+  const to = makeNumber("Ambient temperature (°F)", "chhd-to", { step: "any", value: "60" }); to.input.value = "60";
+  const tm = makeNumber("Mean flue-gas temperature (°F)", "chhd-tm", { step: "any", value: "400" }); tm.input.value = "400";
   const B = makeNumber("Barometric pressure (psia, altitude-corrected)", "chhd-b", { step: "any", min: "0", value: "14.7" }); B.input.value = "14.7";
   const factor = makeNumber("Net-available factor (0.5-0.8)", "chhd-f", { step: "any", min: "0", value: "0.6" }); factor.input.value = "0.6";
   for (const f of [dt, to, tm, B, factor]) inputRegion.appendChild(f.wrap);
@@ -981,8 +981,8 @@ function _v594renderFlueGasCombustionEff(inputRegion, outputRegion, citationEl) 
     { value: "oil2", label: "#2 fuel oil" },
   ]);
   const o2 = makeNumber("Flue-gas O2 (%, dry, undiluted)", "fgce-o2", { step: "any", min: "0", max: "20.9", value: "5" }); o2.input.value = "5";
-  const ts = makeNumber("Stack temperature (F)", "fgce-ts", { step: "any", value: "400" }); ts.input.value = "400";
-  const ta = makeNumber("Combustion-air temperature (F)", "fgce-ta", { step: "any", value: "70" }); ta.input.value = "70";
+  const ts = makeNumber("Stack temperature (°F)", "fgce-ts", { step: "any", value: "400" }); ts.input.value = "400";
+  const ta = makeNumber("Combustion-air temperature (°F)", "fgce-ta", { step: "any", value: "70" }); ta.input.value = "70";
   inputRegion.appendChild(fuel.wrap);
   for (const f of [o2, ts, ta]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fuel.select.value = "natural_gas"; o2.input.value = "5"; ts.input.value = "400"; ta.input.value = "70"; update(); });

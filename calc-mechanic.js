@@ -791,7 +791,7 @@ const renderScrewConveyor = _simpleRenderer({
     { key: "pitch_in", label: "Pitch (in)", kind: "number" },
     { key: "rpm", label: "Screw speed (RPM)", kind: "number" },
     { key: "loading_fraction", label: "Trough loading fraction (CEMA class)", kind: "number" },
-    { key: "bulk_density_lb_ft3", label: "Bulk density (lb/ft^3, optional)", kind: "number" },
+    { key: "bulk_density_lb_ft3", label: "Bulk density (lb/ft³, optional)", kind: "number" },
   ],
   outputs: [
     { key: "cap", id: "scv-out-cap", label: "Volumetric capacity", value: (r) => fmt(r.capacity_ft3_hr, 1) + " ft^3/hr" + (r.over_loaded ? " (loading high - verify CEMA class)" : "") },
@@ -830,7 +830,7 @@ MECHANIC_RENDERERS["screw-conveyor-rpm"] = _simpleRenderer({
   citation: "Citation: CEMA Screw Conveyor standard (Book No. 350) capacity method solved for speed: rpm = target / (flight_area x (pitch/12) x 60 x loading). Divide a mass rate by the bulk density for the volumetric target. CEMA caps speed by screw diameter. Estimate; CEMA and the manufacturer govern.",
   example: screwConveyorRpmExample.inputs,
   fields: [
-    { key: "target_ft3_hr", label: "Target capacity (ft^3/hr)", kind: "number" },
+    { key: "target_ft3_hr", label: "Target capacity (ft³/hr)", kind: "number" },
     { key: "screw_diameter_in", label: "Screw diameter (in)", kind: "number" },
     { key: "shaft_diameter_in", label: "Shaft / pipe diameter (in)", kind: "number" },
     { key: "pitch_in", label: "Pitch (in)", kind: "number" },
@@ -1188,9 +1188,9 @@ MECHANIC_RENDERERS["aerodynamic-drag-force"] = _simpleRenderer({
   example: aerodynamicDragForceExample.inputs,
   fields: [
     { key: "speed_mph", label: "Speed V (mph)", kind: "number" },
-    { key: "frontal_area_ft2", label: "Frontal area A (ft^2)", kind: "number" },
+    { key: "frontal_area_ft2", label: "Frontal area A (ft²)", kind: "number" },
     { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" },
-    { key: "air_density_lb_ft3", label: "Air density (lb/ft^3)", kind: "number", attrs: { step: "any", value: "0.0765" } },
+    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { step: "any", value: "0.0765" } },
   ],
   outputs: [
     { key: "f", id: "adf-out-f", label: "Drag force", value: (r) => fmt(r.drag_force_lbf, 1) + " lbf" },
@@ -1240,11 +1240,11 @@ MECHANIC_RENDERERS["vehicle-road-load-power"] = _simpleRenderer({
   fields: [
     { key: "speed_mph", label: "Speed V (mph)", kind: "number" },
     { key: "vehicle_weight_lb", label: "Vehicle weight W (lb)", kind: "number" },
-    { key: "frontal_area_ft2", label: "Frontal area A (ft^2)", kind: "number" },
+    { key: "frontal_area_ft2", label: "Frontal area A (ft²)", kind: "number" },
     { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" },
     { key: "rolling_coefficient", label: "Rolling-resistance coefficient Crr", kind: "number", attrs: { step: "any", value: "0.012" } },
     { key: "grade_pct", label: "Grade (%)", kind: "number", attrs: { step: "any", value: "0" } },
-    { key: "air_density_lb_ft3", label: "Air density (lb/ft^3)", kind: "number", attrs: { step: "any", value: "0.0765" } },
+    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { step: "any", value: "0.0765" } },
   ],
   outputs: [
     { key: "p", id: "vrl-out-p", label: "Road-load power (at the wheels)", value: (r) => fmt(r.road_load_power_hp, 2) + " hp (" + fmt(r.road_load_power_kw, 2) + " kW)" },
@@ -1938,9 +1938,9 @@ MECHANIC_RENDERERS["terminal-velocity"] = _simpleRenderer({
   example: terminalVelocityExample.inputs,
   fields: [
     { key: "weight_lb", label: "Object weight W (lb)", kind: "number" },
-    { key: "frontal_area_ft2", label: "Frontal area A (ft^2)", kind: "number" },
+    { key: "frontal_area_ft2", label: "Frontal area A (ft²)", kind: "number" },
     { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" },
-    { key: "air_density_lb_ft3", label: "Air density (lb/ft^3)", kind: "number", attrs: { step: "any", value: "0.0765" } },
+    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { step: "any", value: "0.0765" } },
   ],
   outputs: [
     { key: "v", id: "tv-out-v", label: "Terminal velocity", value: (r) => fmt(r.terminal_velocity_fps, 1) + " ft/s (" + fmt(r.terminal_velocity_mph, 1) + " mph)" },
@@ -2465,7 +2465,7 @@ MECHANIC_RENDERERS["hydraulic-motor-torque-speed"] = _simpleRenderer({
   example: hydraulicMotorTorqueSpeedExample.inputs,
   fields: [
     { key: "psi", label: "Pressure differential (psi)", kind: "number", default: 2000 },
-    { key: "disp_in3", label: "Motor displacement (in^3/rev)", kind: "number", default: 2.0 },
+    { key: "disp_in3", label: "Motor displacement (in³/rev)", kind: "number", default: 2.0 },
     { key: "gpm", label: "Supply flow (gpm)", kind: "number", default: 10 },
     { key: "mech_eff", label: "Mechanical efficiency (0-1)", kind: "number", default: 0.90 },
     { key: "vol_eff", label: "Volumetric efficiency (0-1)", kind: "number", default: 0.95 },
@@ -2501,7 +2501,7 @@ MECHANIC_RENDERERS["hydraulic-pump-flow"] = _simpleRenderer({
   citation: "Citation: Hydraulic pump delivered flow (fluid-power engineering): theoretical flow = displacement x rpm / 231 (231 in^3 per gallon), delivered flow = theoretical x volumetric efficiency, the inverse of the hydraulic-motor speed relation. A sizing aid; the pump manufacturer's data govern.",
   example: hydraulicPumpFlowExample.inputs,
   fields: [
-    { key: "disp_in3", label: "Pump displacement (in^3/rev)", kind: "number", default: 2.0 },
+    { key: "disp_in3", label: "Pump displacement (in³/rev)", kind: "number", default: 2.0 },
     { key: "rpm", label: "Drive speed (rpm)", kind: "number", default: 1800 },
     { key: "vol_eff", label: "Volumetric efficiency (0-1)", kind: "number", default: 0.95 },
   ],
@@ -2534,7 +2534,7 @@ MECHANIC_RENDERERS["cooling-system-flow"] = _simpleRenderer({
   example: coolingSystemFlowExample.inputs,
   fields: [
     { key: "q_btuh", label: "Heat rejection to coolant (Btu/hr)", kind: "number", default: 150000 },
-    { key: "dt_f", label: "Coolant temperature rise (deg F)", kind: "number", default: 10 },
+    { key: "dt_f", label: "Coolant temperature rise (°F)", kind: "number", default: 10 },
     { key: "coolant", label: "Coolant", kind: "select", options: [
       { value: "water", label: "Water (c=500)" },
       { value: "glycol50", label: "50/50 glycol (c=427)" },
@@ -2734,7 +2734,7 @@ MECHANIC_RENDERERS["density-altitude"] = _simpleRenderer({
   fields: [
     { key: "field_elevation_ft", label: "Field / station elevation (ft)", kind: "number", default: 5000 },
     { key: "altimeter_in_hg", label: "Altimeter setting (in Hg)", kind: "number", default: 29.92 },
-    { key: "oat_f", label: "Outside air temperature (deg F)", kind: "number", default: 95 },
+    { key: "oat_f", label: "Outside air temperature (°F)", kind: "number", default: 95 },
   ],
   outputs: [
     { key: "pa", id: "da-out-pa", label: "Pressure altitude", value: (r) => fmt(r.pa_ft, 0) + " ft" },
@@ -2980,7 +2980,7 @@ MECHANIC_RENDERERS["turbo-pressure-ratio"] = _simpleRenderer({
   fields: [
     { key: "boost_psi", label: "Target boost (psi, gauge)", kind: "number", default: 15 },
     { key: "ambient_psia", label: "Ambient pressure (psia, 14.7 at sea level)", kind: "number", default: 14.7 },
-    { key: "inlet_temp_f", label: "Compressor inlet air temp (deg F)", kind: "number", default: 80 },
+    { key: "inlet_temp_f", label: "Compressor inlet air temp (°F)", kind: "number", default: 80 },
     { key: "compressor_eff_pct", label: "Compressor isentropic efficiency (%)", kind: "number", default: 70 },
   ],
   outputs: [
@@ -3024,8 +3024,8 @@ MECHANIC_RENDERERS["turbo-max-boost-for-charge-temp"] = _simpleRenderer({
   citation: "Citation: turbocharger charge-air-temperature model solved for the boost: PR = [1 + efficiency x (T_out/T_in - 1)]^(1/0.283), boost = ambient x (PR - 1), temperatures absolute (compressor-map sizing; ideal-gas adiabatic compression). Compressor-outlet temperature (ignores any intercooler); gamma = 1.4 assumed. A planning estimate; the compressor map and engine build govern.",
   example: turboMaxBoostForChargeTempExample.inputs,
   fields: [
-    { key: "max_charge_temp_f", label: "Charge-air temperature limit (deg F)", kind: "number", default: 250 },
-    { key: "inlet_temp_f", label: "Compressor inlet air temp (deg F)", kind: "number", default: 80 },
+    { key: "max_charge_temp_f", label: "Charge-air temperature limit (°F)", kind: "number", default: 250 },
+    { key: "inlet_temp_f", label: "Compressor inlet air temp (°F)", kind: "number", default: 80 },
     { key: "compressor_eff_pct", label: "Compressor isentropic efficiency (%)", kind: "number", default: 70 },
     { key: "ambient_psia", label: "Ambient pressure (psia, 14.7 at sea level)", kind: "number", default: 14.7 },
   ],
@@ -3197,7 +3197,7 @@ MECHANIC_RENDERERS["brake-pedal-hydraulic"] = _simpleRenderer({
     { key: "pedal_ratio", label: "Pedal ratio", kind: "number", default: 5 },
     { key: "booster_factor", label: "Booster factor (1.0 = manual)", kind: "number", default: 1 },
     { key: "mc_bore_in", label: "Master-cylinder bore (in)", kind: "number", default: 0.875 },
-    { key: "caliper_area_in2", label: "Caliper piston area per corner (in^2)", kind: "number", default: 4 },
+    { key: "caliper_area_in2", label: "Caliper piston area per corner (in²)", kind: "number", default: 4 },
     { key: "pad_friction", label: "Pad friction coefficient (~0.4)", kind: "number", default: 0.4 },
     { key: "rotor_radius_in", label: "Effective rotor radius (in)", kind: "number", default: 4.5 },
   ],
@@ -3249,7 +3249,7 @@ MECHANIC_RENDERERS["dyno-correction-sae"] = _simpleRenderer({
   fields: [
     { key: "observed_hp", label: "Observed power (hp)", kind: "number", default: 400 },
     { key: "baro_inhg", label: "Barometric pressure (in Hg, absolute)", kind: "number", default: 28.94 },
-    { key: "air_temp_f", label: "Inlet air temperature (deg F)", kind: "number", default: 86 },
+    { key: "air_temp_f", label: "Inlet air temperature (°F)", kind: "number", default: 86 },
     { key: "humidity_pct", label: "Relative humidity (%)", kind: "number", default: 0 },
   ],
   outputs: [

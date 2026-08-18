@@ -41,6 +41,9 @@ const METRIC_LABEL_TOKENS = new Set([
   "m", "km", "cm", "mm", "kg", "g", "c", "deg c", "degrees c",
   "kpa", "hpa", "mbar", "bar", "l", "l/min", "ml", "m3", "m^3",
   "m/s", "m2", "m^2", "km/h", "kph", "meters", "metres",
+  // Superscript / degree spellings of the same units, so the labels that
+  // now read "m²" and "°C" stay as visible to this gate as "m^2" and "C".
+  "m²", "m³", "°c", "degc",
 ]);
 
 // Select-default detection: metric token in the defaulted option's

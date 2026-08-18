@@ -431,7 +431,7 @@ const renderTimeAlignment = _r({
   fields: [
     { key: "d_main_ft", label: "Distance from mains (ft)", kind: "number" },
     { key: "d_delay_ft", label: "Distance from delay (ft)", kind: "number" },
-    { key: "ambient_F", label: "Ambient temp (F)", kind: "number", default: 68 },
+    { key: "ambient_F", label: "Ambient temp (°F)", kind: "number", default: 68 },
     { key: "haas_offset_ms", label: "Haas offset (ms)", kind: "number", default: 15 },
   ],
   outputs: [
@@ -664,7 +664,7 @@ function renderSPLAtmospheric(inputRegion, outputRegion, citationEl) {
   const dref = makeNumber("Reference distance (ft; typically 3.28)", "spa-dref", { step: "any", min: "0", value: "3.28" });
   dref.input.value = "3.28";
   const dfar = makeNumber("Target distance (ft)", "spa-dfar", { step: "any", min: "0" });
-  const tF = makeNumber("Air temperature (F)", "spa-t", { step: "any", value: "68" });
+  const tF = makeNumber("Air temperature (°F)", "spa-t", { step: "any", value: "68" });
   tF.input.value = "68";
   const rh = makeNumber("Relative humidity (percent)", "spa-rh", { step: "any", min: "0", max: "100", value: "50" });
   rh.input.value = "50";
@@ -1293,7 +1293,7 @@ const renderRoomAcoustics = _r({
   citation: "Citation: Sabine reverberation equation RT60 = 0.049 x V / A (W.C. Sabine, public domain; imperial 0.049 coefficient, editable). First axial room mode per dimension = c / (2 x length), c = 1130 ft/s (editable). The acoustician and the venue govern treatment and sub placement.",
   example: roomAcousticsExample.inputs,
   fields: [
-    { key: "volume_ft3", label: "Room volume (ft^3)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "volume_ft3", label: "Room volume (ft³)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "total_sabins", label: "Total absorption (sabins)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "length_ft", label: "Room length (ft)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "width_ft", label: "Room width (ft)", kind: "number", attrs: { step: "any", min: "0" } },
@@ -1341,8 +1341,8 @@ const renderEyringReverberation = _r({
   citation: "Citation: Eyring-Norris reverberation equation RT60 = 0.049 V / (-S ln(1 - a_bar)), a_bar the average absorption coefficient (C.F. Eyring, J. Acoust. Soc. Am. 1930; public domain; imperial 0.049 coefficient, editable). The high-absorption companion to Sabine RT60 = 0.049 V / A, to which it reduces as a_bar -> 0. The acoustician and the venue govern treatment.",
   example: eyringReverberationExample.inputs,
   fields: [
-    { key: "volume_ft3", label: "Room volume (ft^3)", kind: "number", attrs: { step: "any", min: "0" } },
-    { key: "surface_area_ft2", label: "Total surface area (ft^2)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "volume_ft3", label: "Room volume (ft³)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "surface_area_ft2", label: "Total surface area (ft²)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "avg_absorption", label: "Average absorption coefficient (0-1)", kind: "number", attrs: { step: "any", min: "0", max: "1" } },
     { key: "sabine_coeff", label: "Sabine coefficient (default 0.049)", kind: "number", default: 0.049, attrs: { step: "any", min: "0" } },
   ],
@@ -1385,7 +1385,7 @@ const renderMassLawTL = _r({
   citation: "Citation: field-incidence limp-mass law TL = 20 log10(m f) - 47 dB (normal incidence - 42), m the surface mass in kg/m^2 and f in Hz; +6 dB per doubling of mass or frequency (first-principles panel acoustics, Bies & Hansen / FHWA highway-noise guidance). Surface mass entered in lb/ft^2, converted at 1 lb/ft^2 = 4.88243 kg/m^2. Idealized mass law only -- excludes the coincidence dip, stiffness region, and flanking, and is not the ASTM E413 STC rating; the acoustician governs.",
   example: massLawTLExample.inputs,
   fields: [
-    { key: "surface_mass_psf", label: "Surface mass (lb/ft^2; 1/2in gypsum ~2.0)", kind: "number", attrs: { step: "any", min: "0" }, default: 2.0 },
+    { key: "surface_mass_psf", label: "Surface mass (lb/ft²; 1/2in gypsum ~2.0)", kind: "number", attrs: { step: "any", min: "0" }, default: 2.0 },
     { key: "frequency_hz", label: "Frequency (Hz)", kind: "number", attrs: { step: "any", min: "0" }, default: 500 },
     { key: "incidence", label: "Incidence", kind: "select", options: [{ value: "field", label: "Field / random (-47)" }, { value: "normal", label: "Normal (-42)" }] },
   ],
@@ -1424,7 +1424,7 @@ const renderSpeedOfSoundAir = _r({
   citation: "Citation: speed of sound in dry air c = 331.3 sqrt(1 + T_C/273.15) m/s, from c = sqrt(gamma R T / M) (kinetic theory; NIST), converted to ft/s (x 3.28084); propagation delay = 1000/c ms per foot. 1,126 ft/s at 68 F, the ~1,130 ft/s rule of thumb. Dry air; humidity is a small second-order correction. A first-principles aid; the system tuning governs.",
   example: speedOfSoundAirExample.inputs,
   fields: [
-    { key: "temperature_f", label: "Air temperature (F)", kind: "number", attrs: { step: "any" }, default: 68 },
+    { key: "temperature_f", label: "Air temperature (°F)", kind: "number", attrs: { step: "any" }, default: 68 },
   ],
   outputs: [
     { key: "ft", id: "sos-out-ft", label: "Speed of sound", value: (r) => fmt(r.speed_ftps, 1) + " ft/s (" + fmt(r.speed_mps, 1) + " m/s)" },
@@ -1459,7 +1459,7 @@ const renderRoomAbsorptionTarget = _r({
   citation: "Citation: Sabine reverberation equation solved for absorption A_required = 0.049 x V / RT60_target (W.C. Sabine, public domain; imperial 0.049 coefficient, editable), and the additional treatment = required - existing. One sabin = 1 ft^2 of perfect absorption. The acoustician and the venue govern treatment.",
   example: roomAbsorptionTargetExample.inputs,
   fields: [
-    { key: "volume_ft3", label: "Room volume (ft^3)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "volume_ft3", label: "Room volume (ft³)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "target_rt60_s", label: "Target RT60 (s)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "existing_sabins", label: "Existing absorption (sabins, 0 = none)", kind: "number", default: 0, attrs: { step: "any", min: "0" } },
     { key: "sabine_coeff", label: "Sabine coefficient (default 0.049)", kind: "number", default: 0.049, attrs: { step: "any", min: "0" } },

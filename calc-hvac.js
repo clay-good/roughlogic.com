@@ -656,9 +656,9 @@ export const evaporativeCoolerEffectivenessExample = { inputs: { dry_bulb_F: 95,
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function renderEvaporativeCoolerEffectiveness(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: direct-evaporative (swamp) cooler leaving dry-bulb T_out = T_db - saturation_effectiveness x (T_db - T_wb), the standard ASHRAE Fundamentals saturation-effectiveness relation. Pad effectiveness ~0.80-0.90 for rigid media, less for aspen; the leaving air rides the constant-wet-bulb line so its RH is high. Direct single-stage only. A shop estimate; the equipment data govern.";
-  const db = makeNumber("Entering dry-bulb (F)", "ece-db", { step: "any", value: "95" });
+  const db = makeNumber("Entering dry-bulb (°F)", "ece-db", { step: "any", value: "95" });
   db.input.value = "95";
-  const wb = makeNumber("Entering wet-bulb (F)", "ece-wb", { step: "any", value: "65" });
+  const wb = makeNumber("Entering wet-bulb (°F)", "ece-wb", { step: "any", value: "65" });
   wb.input.value = "65";
   const eff = makeNumber("Pad saturation effectiveness (0-1)", "ece-eff", { step: "any", min: "0", max: "1", value: "0.85" });
   eff.input.value = "0.85";
@@ -707,8 +707,8 @@ export function computeIndirectEvaporativeCooling({ dry_bulb_F, secondary_wet_bu
 export const indirectEvaporativeCoolingExample = { inputs: { dry_bulb_F: 95, secondary_wet_bulb_F: 65, effectiveness: 0.65 } };
 function renderIndirectEvaporativeCooling(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: indirect-evaporative cooler leaving dry-bulb T_out = T_ent - indirect_effectiveness x (T_ent - T_wb,secondary), the ASHRAE Handbook (HVAC Systems & Equipment, Ch. 41) sensible-effectiveness relation. The product air is cooled sensibly (no added moisture) toward the secondary stream's wet-bulb; indirect effectiveness ~0.5-0.75. A shop estimate; the equipment data govern.";
-  const db = makeNumber("Entering product dry-bulb (F)", "iec-db", { step: "any", value: "95" }); db.input.value = "95";
-  const wb = makeNumber("Secondary-stream wet-bulb (F)", "iec-wb", { step: "any", value: "65" }); wb.input.value = "65";
+  const db = makeNumber("Entering product dry-bulb (°F)", "iec-db", { step: "any", value: "95" }); db.input.value = "95";
+  const wb = makeNumber("Secondary-stream wet-bulb (°F)", "iec-wb", { step: "any", value: "65" }); wb.input.value = "65";
   const eff = makeNumber("Indirect effectiveness (0-1, ~0.5-0.75)", "iec-eff", { step: "any", min: "0", max: "1", value: "0.65" }); eff.input.value = "0.65";
   for (const f of [db, wb, eff]) inputRegion.appendChild(f.wrap);
   const oT = makeOutputLine(outputRegion, "Leaving dry-bulb (dry, no moisture added)", "iec-out-t");
@@ -732,10 +732,10 @@ function renderIndirectEvaporativeCooling(inputRegion, outputRegion, citationEl)
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderApproachDeltaT(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Approach = T_sat_cond - T_outdoor; delta-T = T_return - T_supply. Bands from public engineering practice.";
-  const od = makeNumber("Outdoor air (F)", "ad-od", { step: "any" });
-  const sat = makeNumber("Condenser saturation (F)", "ad-sat", { step: "any" });
-  const supply = makeNumber("Supply air (F)", "ad-supply", { step: "any" });
-  const ret = makeNumber("Return air (F)", "ad-return", { step: "any" });
+  const od = makeNumber("Outdoor air (°F)", "ad-od", { step: "any" });
+  const sat = makeNumber("Condenser saturation (°F)", "ad-sat", { step: "any" });
+  const supply = makeNumber("Supply air (°F)", "ad-supply", { step: "any" });
+  const ret = makeNumber("Return air (°F)", "ad-return", { step: "any" });
   for (const f of [od, sat, supply, ret]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { od.input.value = "90"; sat.input.value = "105"; supply.input.value = "55"; ret.input.value = "75"; update(); });
   const oA = makeOutputLine(outputRegion, "Approach", "ad-out-a");
@@ -762,9 +762,9 @@ export function renderOutdoorAirMix(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Mixed air dry-bulb is OA_fraction-weighted; mixed humidity ratio is mass-weighted via the psychrometric helpers.";
   // v10 §B.3 wiring: simplified-screening banner (ASHRAE 62.1 disclaimer).
   renderLimitationBanner(inputRegion, getLimitationCopy("outdoor-air-mix"));
-  const rt = makeNumber("Return air temp (F)", "om-rt", { step: "any" });
+  const rt = makeNumber("Return air temp (°F)", "om-rt", { step: "any" });
   const rh = makeNumber("Return RH (%)", "om-rh", { step: "any", min: "0", max: "100" });
-  const ot = makeNumber("Outdoor air temp (F)", "om-ot", { step: "any" });
+  const ot = makeNumber("Outdoor air temp (°F)", "om-ot", { step: "any" });
   const oh = makeNumber("Outdoor RH (%)", "om-oh", { step: "any", min: "0", max: "100" });
   const f = makeNumber("OA fraction (0-1)", "om-f", { step: "any", min: "0", max: "1" });
   for (const x of [rt, rh, ot, oh, f]) inputRegion.appendChild(x.wrap);
@@ -810,8 +810,8 @@ export function renderEquivalentLength(inputRegion, outputRegion, citationEl) {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderWetBulbPsychrometer(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard psychrometric wet-bulb relation e = e_s(Tw) - A * P * (Td - Tw); A ~ 0.000662 1/C at sea level.";
-  const td = makeNumber("Dry-bulb (F)", "wb-td", { step: "any" });
-  const tw = makeNumber("Wet-bulb (F)", "wb-tw", { step: "any" });
+  const td = makeNumber("Dry-bulb (°F)", "wb-td", { step: "any" });
+  const tw = makeNumber("Wet-bulb (°F)", "wb-tw", { step: "any" });
   for (const f of [td, tw]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { td.input.value = "80"; tw.input.value = "67"; update(); });
   const oRH = makeOutputLine(outputRegion, "Relative humidity", "wb-out-rh");
@@ -834,10 +834,10 @@ export function renderWetBulbPsychrometer(inputRegion, outputRegion, citationEl)
 export function renderInsulationThickness(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Cylindrical conduction Q = 2*pi*k*L*dT / ln(r2/r1) iterated against an outside film coefficient (~1.65 BTU/hr/ft^2/F still air).";
   const od = makeNumber("Pipe OD (in)", "it-od", { step: "any", min: "0" });
-  const ts = makeNumber("Pipe surface (F)", "it-ts", { step: "any" });
-  const amb = makeNumber("Ambient (F)", "it-amb", { step: "any" });
-  const lim = makeNumber("Outer surface limit (F)", "it-lim", { step: "any" });
-  const k = makeNumber("Insulation k (BTU*in/hr*ft^2*F)", "it-k", { step: "any", min: "0", value: "0.27" });
+  const ts = makeNumber("Pipe surface (°F)", "it-ts", { step: "any" });
+  const amb = makeNumber("Ambient (°F)", "it-amb", { step: "any" });
+  const lim = makeNumber("Outer surface limit (°F)", "it-lim", { step: "any" });
+  const k = makeNumber("Insulation k (BTU*in/hr*ft²*F)", "it-k", { step: "any", min: "0", value: "0.27" });
   k.input.value = "0.27";
   for (const f of [od, ts, amb, lim, k]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
@@ -940,10 +940,10 @@ export function renderManualJCooling(inputRegion, outputRegion, citationEl) {
   // above the inputs. Canonical copy lives in limitation-banner.js so
   // a future language tweak is one-file.
   renderLimitationBanner(inputRegion, getLimitationCopy("manual-j-cooling"));
-  const fa = makeNumber("Floor area (ft^2)", "mjc-fa", { step: "any", min: "0" });
-  const wa = makeNumber("Above-grade wall area (ft^2)", "mjc-wa", { step: "any", min: "0" });
-  const win = makeNumber("Window area (ft^2)", "mjc-win", { step: "any", min: "0" });
-  const ca = makeNumber("Ceiling area (ft^2)", "mjc-ca", { step: "any", min: "0" });
+  const fa = makeNumber("Floor area (ft²)", "mjc-fa", { step: "any", min: "0" });
+  const wa = makeNumber("Above-grade wall area (ft²)", "mjc-wa", { step: "any", min: "0" });
+  const win = makeNumber("Window area (ft²)", "mjc-win", { step: "any", min: "0" });
+  const ca = makeNumber("Ceiling area (ft²)", "mjc-ca", { step: "any", min: "0" });
   const ins = makeSelect("Insulation level", "mjc-ins", [
     { value: "poor", label: "Poor" }, { value: "average", label: "Average", selected: true }, { value: "good", label: "Good" },
   ]);
@@ -952,8 +952,8 @@ export function renderManualJCooling(inputRegion, outputRegion, citationEl) {
   ]);
   const occ = makeNumber("Occupants", "mjc-occ", { step: "1", min: "0", value: "2" });
   occ.input.value = "2";
-  const od = makeNumber("Outdoor design temp (F)", "mjc-od", { step: "any" });
-  const id = makeNumber("Indoor design temp (F)", "mjc-id", { step: "any", value: "75" });
+  const od = makeNumber("Outdoor design temp (°F)", "mjc-od", { step: "any" });
+  const id = makeNumber("Indoor design temp (°F)", "mjc-id", { step: "any", value: "75" });
   id.input.value = "75";
   const orh = makeNumber("Outdoor RH (percent)", "mjc-orh", { step: "any", min: "0", max: "100", value: "50" });
   orh.input.value = "50";
@@ -1009,18 +1009,18 @@ export function renderManualJHeating(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Simplified screening estimate from envelope conductance and infiltration. Code-compliant load calc requires ACCA Manual J (8th ed.). Licensed HVAC designer and AHJ govern. Free at codes.iccsafe.org for IMC references.";
   // v10 §B.3 wiring: render the simplified-screening limitation banner.
   renderLimitationBanner(inputRegion, getLimitationCopy("manual-j-heating"));
-  const fa = makeNumber("Floor area (ft^2)", "mjh-fa", { step: "any", min: "0" });
-  const wa = makeNumber("Above-grade wall area (ft^2)", "mjh-wa", { step: "any", min: "0" });
-  const win = makeNumber("Window area (ft^2)", "mjh-win", { step: "any", min: "0" });
-  const ca = makeNumber("Ceiling area (ft^2)", "mjh-ca", { step: "any", min: "0" });
+  const fa = makeNumber("Floor area (ft²)", "mjh-fa", { step: "any", min: "0" });
+  const wa = makeNumber("Above-grade wall area (ft²)", "mjh-wa", { step: "any", min: "0" });
+  const win = makeNumber("Window area (ft²)", "mjh-win", { step: "any", min: "0" });
+  const ca = makeNumber("Ceiling area (ft²)", "mjh-ca", { step: "any", min: "0" });
   const ins = makeSelect("Insulation level", "mjh-ins", [
     { value: "poor", label: "Poor" }, { value: "average", label: "Average", selected: true }, { value: "good", label: "Good" },
   ]);
   const wt = makeSelect("Window type", "mjh-wt", [
     { value: "single", label: "Single pane" }, { value: "double", label: "Double pane", selected: true }, { value: "triple", label: "Triple pane" },
   ]);
-  const od = makeNumber("Outdoor design temp (F)", "mjh-od", { step: "any" });
-  const id = makeNumber("Indoor design temp (F)", "mjh-id", { step: "any", value: "70" });
+  const od = makeNumber("Outdoor design temp (°F)", "mjh-od", { step: "any" });
+  const id = makeNumber("Indoor design temp (°F)", "mjh-id", { step: "any", value: "70" });
   id.input.value = "70";
   for (const f of [fa, wa, win, ca, ins, wt, od, id]) inputRegion.appendChild(f.wrap);
 
@@ -1181,9 +1181,9 @@ export function renderSeerEer(inputRegion, outputRegion, citationEl) {
 export function renderBalancePoint(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Linear capacity and load model. Balance point is the outdoor temperature at which heat-pump heating capacity equals building heat loss.";
   const cap = makeNumber("Heating capacity at design (BTU/hr)", "bp-c", { step: "any", min: "0" });
-  const dT = makeNumber("Design outdoor temperature (F)", "bp-d", { step: "any" });
+  const dT = makeNumber("Design outdoor temperature (°F)", "bp-d", { step: "any" });
   const load = makeNumber("Building heat loss (BTU/hr)", "bp-l", { step: "any", min: "0" });
-  const indoor = makeNumber("Indoor design temperature (F)", "bp-i", { step: "any", value: "65" });
+  const indoor = makeNumber("Indoor design temperature (°F)", "bp-i", { step: "any", value: "65" });
   indoor.input.value = "65";
   for (const f of [cap, dT, load, indoor]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cap.input.value = "30000"; dT.input.value = "17"; load.input.value = "50000"; indoor.input.value = "65"; update(); });
@@ -1245,7 +1245,7 @@ export function renderCfmPerTon(inputRegion, outputRegion, citationEl) {
 export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IMC 2021 §304 (combustion air). 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. This is the FREE AREA; each opening's smallest dimension must also be at least 3 in (IFGC 304.6 -- a long narrow opening is blocked by leaves and lint), which a free-area figure cannot enforce. AHJ governs. Free at codes.iccsafe.org.";
   const btu = makeNumber("Appliance BTU input", "ca-b", { step: "any", min: "0" });
-  const vol = makeNumber("Room volume (ft^3)", "ca-v", { step: "any", min: "0" });
+  const vol = makeNumber("Room volume (ft³)", "ca-v", { step: "any", min: "0" });
   for (const f of [btu, vol]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { btu.input.value = "100000"; vol.input.value = "4000"; update(); });
   const oReq = makeOutputLine(outputRegion, "Required volume", "ca-out-req");
@@ -1265,7 +1265,7 @@ export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderCombustionAirMaxInput(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IMC 2021 §304 (combustion air), the standard volume method solved for input. A space is adequate by volume at 50 ft^3 per 1000 BTU/hr, so the max appliance input is (room volume / 50) * 1000; above it, combustion-air openings are required. AHJ governs. Free at codes.iccsafe.org.";
-  const vol = makeNumber("Room volume (ft^3)", "cam-v", { step: "any", min: "0" });
+  const vol = makeNumber("Room volume (ft³)", "cam-v", { step: "any", min: "0" });
   inputRegion.appendChild(vol.wrap);
   attachExampleButton(inputRegion, () => { vol.input.value = "4000"; update(); });
   const oMax = makeOutputLine(outputRegion, "Max appliance input (by volume)", "cam-out-max");
@@ -1679,7 +1679,7 @@ function renderGeothermalLoop(inputRegion, outputRegion, citationEl) {
 function renderBaseboardOutput(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Manufacturer-attributed BTU-per-foot baseboard tables interpolated by water temperature. Attribution included with output.";
   attachExampleButton(inputRegion, () => fillExample(baseboardOutputExample.inputs));
-  const t = makeNumber("Avg water temp (F)", "bo-t", { step: "any", min: "0" });
+  const t = makeNumber("Avg water temp (°F)", "bo-t", { step: "any", min: "0" });
   const fw = makeNumber("Flow (gpm)", "bo-f", { step: "any", min: "0", value: "1" }); fw.input.value = "1";
   const l = makeNumber("Length (ft)", "bo-l", { step: "any", min: "0" });
   const m = makeSelect("Model", "bo-m", Object.keys(BASEBOARD_OUTPUT).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
@@ -1705,7 +1705,7 @@ function renderBaseboardLengthForLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: manufacturer-attributed BTU-per-foot baseboard tables interpolated by water temperature, solved for length: length = target_load / (btu_per_ft x flow_factor). Attribution included with output. A sizing aid; the manufacturer rating and the room heat loss govern.";
   attachExampleButton(inputRegion, () => { q.input.value = "4800"; t.input.value = "180"; fw.input.value = "1"; m.select.value = "slant_fin_baseline"; update(); });
   const q = makeNumber("Target room load (BTU/hr)", "bll-q", { step: "any", min: "0" });
-  const t = makeNumber("Avg water temp (F)", "bll-t", { step: "any", min: "0" });
+  const t = makeNumber("Avg water temp (°F)", "bll-t", { step: "any", min: "0" });
   const fw = makeNumber("Flow (gpm)", "bll-f", { step: "any", min: "0", value: "1" }); fw.input.value = "1";
   const m = makeSelect("Model", "bll-m", Object.keys(BASEBOARD_OUTPUT).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   for (const f of [q, t, fw, m]) inputRegion.appendChild(f.wrap);
@@ -1726,7 +1726,7 @@ function renderNPSHa(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NPSHa = H_atm - H_vapor +/- H_static - H_friction (feet). Atmospheric head from elevation lapse; vapor pressure from public engineering table.";
   attachExampleButton(inputRegion, () => fillExample(npshaExample.inputs));
   const e = makeNumber("Site elevation (ft)", "np-e", { step: "any", value: "0" });
-  const w = makeNumber("Water temperature (F)", "np-w", { step: "any", value: "60" });
+  const w = makeNumber("Water temperature (°F)", "np-w", { step: "any", value: "60" });
   const s = makeNumber("Source elevation vs pump (ft, + above)", "np-s", { step: "any" });
   const f = makeNumber("Suction friction loss (ft)", "np-f", { step: "any", min: "0" });
   const r = makeNumber("NPSH required (ft, optional)", "np-r", { step: "any", min: "0" });
@@ -2303,9 +2303,9 @@ export function renderOutdoorAirVentilation(inputRegion, outputRegion, citationE
     Object.keys(OA_OCCUPANCY_PRESETS).map((k) => ({ value: k, label: OA_OCCUPANCY_PRESETS[k].label })),
   );
   const rp = makeNumber("Rp (cfm per person)", "oav-rp", { step: "any", min: "0" });
-  const ra = makeNumber("Ra (cfm per ft^2)", "oav-ra", { step: "any", min: "0" });
+  const ra = makeNumber("Ra (cfm per ft²)", "oav-ra", { step: "any", min: "0" });
   const ppl = makeNumber("People (Pz)", "oav-people", { step: "1", min: "0" });
-  const area = makeNumber("Floor area (ft^2; Az)", "oav-area", { step: "any", min: "0" });
+  const area = makeNumber("Floor area (ft²; Az)", "oav-area", { step: "any", min: "0" });
   const ez = makeNumber("Air-distribution effectiveness (E_z; default 1.0)", "oav-ez", { step: "any", min: "0", value: "1.0" });
   ez.input.value = "1.0";
   for (const f of [preset, rp, ra, ppl, area, ez]) inputRegion.appendChild(f.wrap);
@@ -2328,7 +2328,7 @@ export function renderOutdoorAirVentilation(inputRegion, outputRegion, citationE
   const oVbz = makeOutputLine(outputRegion, "Vbz breathing-zone outdoor air (cfm)", "oav-out-vbz");
   const oVoz = makeOutputLine(outputRegion, "Voz zone outdoor airflow (cfm)", "oav-out-voz");
   const oPP = makeOutputLine(outputRegion, "Per-person (cfm/person)", "oav-out-pp");
-  const oPF = makeOutputLine(outputRegion, "Per area (cfm/ft^2)", "oav-out-pf");
+  const oPF = makeOutputLine(outputRegion, "Per area (cfm/ft²)", "oav-out-pf");
   const oW = makeOutputLine(outputRegion, "Notes", "oav-out-w");
 
   function readNum(input) {
@@ -2477,7 +2477,7 @@ function renderHoodExhaust(inputRegion, outputRegion, citationEl) {
   const oQ = makeOutputLine(outputRegion, "Exhaust airflow Q (cfm)", "he-out-q");
   const oC = makeOutputLine(outputRegion, "Multiplier (cfm/ft of length)", "he-out-c");
   const oM = makeOutputLine(outputRegion, "Makeup air (cfm; 80%)", "he-out-m");
-  const oA = makeOutputLine(outputRegion, "Duct area (in^2; at chosen velocity)", "he-out-a");
+  const oA = makeOutputLine(outputRegion, "Duct area (in²; at chosen velocity)", "he-out-a");
   const oS = makeOutputLine(outputRegion, "Grease-duct slope reminder", "he-out-s");
   const oW = makeOutputLine(outputRegion, "Notes", "he-out-w");
 
@@ -2621,11 +2621,11 @@ function renderSHRLatent(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per ASHRAE Fundamentals 2021 Chapter 1 (psychrometrics) and Chapter 18 (nonresidential cooling and heating load calculations). Sea-level coefficients (1.08 sensible, 4840 latent) per ASHRAE Handbook; altitude correction via the standard atmosphere density ratio. Field measurement is the verdict; the rated total capacity is one input among several. Free at ashrae.org for TOC; full handbook is licensed.";
 
   const qt = makeNumber("Total cooling capacity (Btu/hr; nameplate or measured)", "shr-qt", { step: "any", min: "0" });
-  const tra = makeNumber("Return-air dry-bulb (F)", "shr-tra", { step: "any", value: "75" });
+  const tra = makeNumber("Return-air dry-bulb (°F)", "shr-tra", { step: "any", value: "75" });
   tra.input.value = "75";
-  const twb = makeNumber("Return-air wet-bulb (F)", "shr-twb", { step: "any", value: "63" });
+  const twb = makeNumber("Return-air wet-bulb (°F)", "shr-twb", { step: "any", value: "63" });
   twb.input.value = "63";
-  const tsa = makeNumber("Supply-air dry-bulb (F)", "shr-tsa", { step: "any", value: "55" });
+  const tsa = makeNumber("Supply-air dry-bulb (°F)", "shr-tsa", { step: "any", value: "55" });
   tsa.input.value = "55";
   const cfm = makeNumber("Register CFM", "shr-cfm", { step: "any", min: "0" });
   const alt = makeNumber("Altitude (ft; default 0)", "shr-alt", { step: "any", value: "0" });
@@ -2714,7 +2714,7 @@ function renderEconomizerSavingsHours(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASHRAE sensible-heat relation Q = 1.08 * CFM * dT (public); air-side economizer changeover per ASHRAE Standard 90.1, by name. Estimate; design conditions govern. The 1.08 factor is sea-level standard air. ASHRAE 90.1 free read-only at ashrae.org.";
   const cfm = makeNumber("Supply airflow (CFM)", "esh-cfm", { step: "any", min: "0", value: "4000" });
   cfm.input.value = "4000";
-  const dt = makeNumber("Mix-to-supply delta-T (F)", "esh-dt", { step: "any", value: "20" });
+  const dt = makeNumber("Mix-to-supply delta-T (°F)", "esh-dt", { step: "any", value: "20" });
   dt.input.value = "20";
   const hrs = makeNumber("Economizer-eligible hours", "esh-hrs", { step: "any", min: "0", max: "8760", value: "1500" });
   hrs.input.value = "1500";
@@ -2773,9 +2773,9 @@ function renderPipeHeatLossRadial(inputRegion, outputRegion, citationEl) {
   th.input.value = "1";
   const k = makeNumber("Insulation k-value (BTU-in/hr-ft2-F)", "phlr-k", { step: "any", min: "0", value: "0.25" });
   k.input.value = "0.25";
-  const hot = makeNumber("Fluid / surface temperature (F)", "phlr-hot", { step: "any", value: "200" });
+  const hot = makeNumber("Fluid / surface temperature (°F)", "phlr-hot", { step: "any", value: "200" });
   hot.input.value = "200";
-  const amb = makeNumber("Ambient temperature (F)", "phlr-amb", { step: "any", value: "70" });
+  const amb = makeNumber("Ambient temperature (°F)", "phlr-amb", { step: "any", value: "70" });
   amb.input.value = "70";
   const len = makeNumber("Pipe length (ft)", "phlr-len", { step: "any", min: "0", value: "1" });
   len.input.value = "1";
@@ -2828,8 +2828,8 @@ function renderInsulationThicknessForHeatLoss(inputRegion, outputRegion, citatio
   citationEl.textContent = "Citation: Fourier conduction through a cylindrical shell (public heat-transfer formula) solved for the thickness: thickness = (od/2) x (exp(2*pi*(k/12)*(hot - amb)/q) - 1); insulation k-values per ASHRAE Fundamentals / ASTM C335, by name (user-supplied). Targets a heat-loss budget, not a surface temperature. k is at the mean insulation temperature; conduction only (ignores the outer air film, so conservative).";
   const od = makeNumber("Pipe outer diameter (in)", "itl-od", { step: "any", min: "0", value: "2" }); od.input.value = "2";
   const k = makeNumber("Insulation k (BTU-in/hr-ft2-F)", "itl-k", { step: "any", min: "0", value: "0.25" }); k.input.value = "0.25";
-  const hot = makeNumber("Hot surface temp (F)", "itl-hot", { step: "any", value: "200" }); hot.input.value = "200";
-  const amb = makeNumber("Ambient temp (F)", "itl-amb", { step: "any", value: "70" }); amb.input.value = "70";
+  const hot = makeNumber("Hot surface temp (°F)", "itl-hot", { step: "any", value: "200" }); hot.input.value = "200";
+  const amb = makeNumber("Ambient temp (°F)", "itl-amb", { step: "any", value: "70" }); amb.input.value = "70";
   const q = makeNumber("Target heat loss (BTU/hr per ft)", "itl-q", { step: "any", min: "0", value: "40" }); q.input.value = "40";
   for (const f of [od, k, hot, amb, q]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { od.input.value = "2"; k.input.value = "0.25"; hot.input.value = "200"; amb.input.value = "70"; q.input.value = "40"; update(); });
@@ -3358,7 +3358,7 @@ HVAC_RENDERERS["heat-pump-cold-capacity"] = _rEnv({
   fields: [
     { key: "cap_47_btuh", label: "Rated capacity at 47 F (Btu/h)", kind: "number" },
     { key: "cap_17_btuh", label: "Rated capacity at 17 F (Btu/h)", kind: "number" },
-    { key: "design_temp_f", label: "Outdoor design temp (F)", kind: "number" },
+    { key: "design_temp_f", label: "Outdoor design temp (°F)", kind: "number" },
     { key: "design_load_btuh", label: "Design heating load (Btu/h)", kind: "number" },
   ],
   outputs: [
@@ -3539,8 +3539,8 @@ HVAC_RENDERERS["erv-sensible-recovery"] = _rEnv({
   example: ervSensibleRecoveryExample.inputs,
   fields: [
     { key: "cfm", label: "Balanced ventilation airflow (cfm)", kind: "number" },
-    { key: "t_oa_F", label: "Outdoor air temperature (F)", kind: "number" },
-    { key: "t_ra_F", label: "Return/exhaust air temperature (F)", kind: "number", default: 70 },
+    { key: "t_oa_F", label: "Outdoor air temperature (°F)", kind: "number" },
+    { key: "t_ra_F", label: "Return/exhaust air temperature (°F)", kind: "number", default: 70 },
     { key: "eps_s", label: "Rated sensible effectiveness (0-1)", kind: "number", default: 0.75 },
   ],
   outputs: [
@@ -3576,8 +3576,8 @@ HVAC_RENDERERS["mua-tempering-load"] = _rEnv({
   example: muaTemperingLoadExample.inputs,
   fields: [
     { key: "cfm", label: "Makeup airflow (cfm, = exhaust)", kind: "number" },
-    { key: "t_oa_F", label: "Outdoor air temperature (F)", kind: "number" },
-    { key: "t_target_F", label: "Target supply temperature (F)", kind: "number", default: 65 },
+    { key: "t_oa_F", label: "Outdoor air temperature (°F)", kind: "number" },
+    { key: "t_target_F", label: "Target supply temperature (°F)", kind: "number", default: 65 },
     { key: "eta", label: "Heater thermal efficiency (0-1)", kind: "number", default: 0.80 },
     { key: "w_oa_gr", label: "Outdoor humidity ratio (gr/lb, optional)", kind: "number" },
     { key: "w_target_gr", label: "Target humidity ratio (gr/lb, optional)", kind: "number" },
@@ -3656,7 +3656,7 @@ HVAC_RENDERERS["reynolds-number-pipe"] = _rEnv({
   fields: [
     { key: "v_fps", label: "Mean flow velocity (ft/s)", kind: "number" },
     { key: "d_in", label: "Inside diameter (in)", kind: "number" },
-    { key: "nu", label: "Kinematic viscosity (ft^2/s)", kind: "number", default: 1.21e-5 },
+    { key: "nu", label: "Kinematic viscosity (ft²/s)", kind: "number", default: 1.21e-5 },
   ],
   outputs: [
     { key: "re", id: "rnp-out-re", label: "Reynolds number", value: (r) => fmt(r.re, 0) },
@@ -3901,8 +3901,8 @@ HVAC_RENDERERS["wall-condensation-gradient"] = _rEnv({
   fields: [
     { key: "r_inside", label: "R-value warm side to the plane", kind: "number" },
     { key: "r_outside", label: "R-value beyond the plane", kind: "number" },
-    { key: "t_in_f", label: "Indoor air temperature (F)", kind: "number", default: 70 },
-    { key: "t_out_f", label: "Outdoor air temperature (F)", kind: "number" },
+    { key: "t_in_f", label: "Indoor air temperature (°F)", kind: "number", default: 70 },
+    { key: "t_out_f", label: "Outdoor air temperature (°F)", kind: "number" },
     { key: "rh_in_pct", label: "Indoor relative humidity (%)", kind: "number", default: 40 },
   ],
   outputs: [
@@ -3942,7 +3942,7 @@ HVAC_RENDERERS["duct-heat-gain"] = _rEnv({
   example: ductHeatGainExample.inputs,
   fields: [
     { key: "R_duct", label: "Duct insulation R (h-ft2-F/Btu)", kind: "number" },
-    { key: "A_ft2", label: "Duct surface area (ft^2)", kind: "number" },
+    { key: "A_ft2", label: "Duct surface area (ft²)", kind: "number" },
     { key: "dT_F", label: "Ambient minus in-duct temp (F, signed)", kind: "number" },
     { key: "cfm", label: "Airflow (cfm)", kind: "number" },
   ],
@@ -3991,7 +3991,7 @@ function _renderGrilleFaceVelocity(inputRegion, outputRegion, citationEl) {
   const cfm = makeNumber("Airflow (cfm)", "gfv-cfm", { step: "any", min: "0" }); cfm.input.value = "400";
   const ratio = makeNumber("Free-area ratio (0-1, default 0.75)", "gfv-ratio", { step: "any", min: "0", max: "1" }); ratio.input.value = "0.75";
   const vtar = makeNumber("Target face velocity (fpm)", "gfv-vtar", { step: "any", min: "0" }); vtar.input.value = "500";
-  const agr = makeNumber("Gross grille area (ft^2)", "gfv-agr", { step: "any", min: "0" });
+  const agr = makeNumber("Gross grille area (ft²)", "gfv-agr", { step: "any", min: "0" });
   for (const f of [cfm, ratio, vtar, agr]) inputRegion.appendChild(f.wrap);
   const oOut = makeOutputLine(outputRegion, "Result", "gfv-out");
   const oBand = makeOutputLine(outputRegion, "Velocity band", "gfv-out-band");
@@ -4075,7 +4075,7 @@ function _renderAdpiSelection(inputRegion, outputRegion, citationEl) {
     { value: "perforated", label: "Perforated / louvered ceiling (T0.25)" },
   ]);
   type.select.value = "circular-ceiling";
-  const load = makeSelect("Room cooling load (Btu/hr-ft^2)", "adpi-load", [
+  const load = makeSelect("Room cooling load (Btu/hr-ft²)", "adpi-load", [
     { value: "20", label: "20 (light)" }, { value: "40", label: "40" }, { value: "60", label: "60" }, { value: "80", label: "80 (heavy)" },
   ]);
   load.select.value = "40";
@@ -4222,7 +4222,7 @@ HVAC_RENDERERS["air-density-correction"] = _rEnv({
   example: airDensityCorrectionExample.inputs,
   fields: [
     { key: "elev_ft", label: "Site elevation (ft)", kind: "number" },
-    { key: "T_F", label: "Air temperature (F)", kind: "number", default: 70 },
+    { key: "T_F", label: "Air temperature (°F)", kind: "number", default: 70 },
     { key: "acfm", label: "Actual airflow ACFM (cfm, optional)", kind: "number" },
     { key: "rated_sp", label: "Sea-level rated fan static (in-wc, optional)", kind: "number" },
   ],
@@ -4259,7 +4259,7 @@ HVAC_RENDERERS["moist-air-enthalpy"] = _rEnv({
   citation: "Citation: Moist-air enthalpy (ASHRAE Handbook - Fundamentals): h = 0.240 t + W (1061 + 0.444 t) Btu per lb dry air, with t the dry-bulb (F) and W the humidity ratio (lb water / lb dry air). 0.240 = dry-air specific heat, 1061 = latent heat at the 0 F datum, 0.444 = water-vapor specific heat. Total heat content of one air state; pair with outdoor-air-mix or a psychrometric chart for W. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
   example: moistAirEnthalpyExample.inputs,
   fields: [
-    { key: "t_db_f", label: "Dry-bulb temperature (F)", kind: "number", default: 80 },
+    { key: "t_db_f", label: "Dry-bulb temperature (°F)", kind: "number", default: 80 },
     { key: "w_lb_lb", label: "Humidity ratio W (lb water / lb dry air)", kind: "number", default: 0.0112 },
   ],
   outputs: [
@@ -4352,9 +4352,9 @@ HVAC_RENDERERS["coil-bypass-factor"] = _rEnv({
   citation: "Citation: Coil bypass / contact factor (ASHRAE Handbook - Fundamentals): BF = (t_lvg - t_adp) / (t_ent - t_adp), CF = 1 - BF, with the apparatus dew point (ADP) the effective coil-surface temperature. BF is the fraction of air bypassing the coil unconditioned; a lower BF dehumidifies better. Leaving air lies between the ADP and the entering temperature. A design aid; the coil rating governs.",
   example: coilBypassFactorExample.inputs,
   fields: [
-    { key: "t_ent_f", label: "Entering-air dry-bulb (F)", kind: "number", default: 80 },
-    { key: "t_lvg_f", label: "Leaving-air dry-bulb (F)", kind: "number", default: 55 },
-    { key: "t_adp_f", label: "Apparatus dew point ADP (F)", kind: "number", default: 50 },
+    { key: "t_ent_f", label: "Entering-air dry-bulb (°F)", kind: "number", default: 80 },
+    { key: "t_lvg_f", label: "Leaving-air dry-bulb (°F)", kind: "number", default: 55 },
+    { key: "t_adp_f", label: "Apparatus dew point ADP (°F)", kind: "number", default: 50 },
   ],
   outputs: [
     { key: "bf", id: "cbf-out-bf", label: "Bypass factor BF", value: (r) => fmt(r.bf, 3) },
@@ -4395,8 +4395,8 @@ HVAC_RENDERERS["fan-affinity-laws"] = _rEnv({
   outputs: [
     { key: "r", id: "fal-out-r", label: "Speed ratio r = N2/N1", value: (r) => fmt(r.r, 4) },
     { key: "q", id: "fal-out-q", label: "New airflow Q2 = Q1 r", value: (r) => fmt(r.q2_cfm, 0) + " cfm" },
-    { key: "sp", id: "fal-out-sp", label: "New static SP2 = SP1 r^2", value: (r) => fmt(r.sp2_inwg, 2) + " in wg" },
-    { key: "bhp", id: "fal-out-bhp", label: "New power BHP2 = BHP1 r^3", value: (r) => fmt(r.bhp2_hp, 2) + " hp" },
+    { key: "sp", id: "fal-out-sp", label: "New static SP2 = SP1 r²", value: (r) => fmt(r.sp2_inwg, 2) + " in wg" },
+    { key: "bhp", id: "fal-out-bhp", label: "New power BHP2 = BHP1 r³", value: (r) => fmt(r.bhp2_hp, 2) + " hp" },
     { key: "n", id: "fal-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeFanAffinityLaws,
@@ -4540,9 +4540,9 @@ function _v442renderRadiantFloorOutput(inputRegion, outputRegion, citationEl) {
     { value: "q_to_surface", label: "Surface temperature for a target output" },
   ]);
   inputRegion.appendChild(mode.wrap);
-  const surf = makeNumber("Floor mean surface temperature (F)", "rfo-surf", { step: "any" }); surf.input.value = "85";
-  const room = makeNumber("Room air temperature (F)", "rfo-room", { step: "any" }); room.input.value = "70";
-  const qt = makeNumber("Target output (Btu/hr-ft^2)", "rfo-qt", { step: "any", min: "0" }); qt.input.value = "30";
+  const surf = makeNumber("Floor mean surface temperature (°F)", "rfo-surf", { step: "any" }); surf.input.value = "85";
+  const room = makeNumber("Room air temperature (°F)", "rfo-room", { step: "any" }); room.input.value = "70";
+  const qt = makeNumber("Target output (Btu/hr-ft²)", "rfo-qt", { step: "any", min: "0" }); qt.input.value = "30";
   for (const f of [surf, room, qt]) inputRegion.appendChild(f.wrap);
   const oQ = makeOutputLine(outputRegion, "Heat output", "rfo-out-q");
   const oS = makeOutputLine(outputRegion, "Mean surface temperature", "rfo-out-s");
@@ -4597,11 +4597,11 @@ HVAC_RENDERERS["snowmelt-load"] = _rEnv({
   example: snowmeltLoadExample.inputs,
   fields: [
     { key: "s_inhr", label: "Snowfall rate, water equiv (in/hr)", kind: "number", attrs: { step: "any", min: "0" } },
-    { key: "t_air_f", label: "Design air temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "t_air_f", label: "Design air temperature (°F)", kind: "number", attrs: { step: "any" } },
     { key: "wind_mph", label: "Design wind speed (mph)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "rh_pct", label: "Relative humidity (%)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "ar", label: "Snow-free area ratio A_r (0 / 0.5 / 1)", kind: "number", default: 0.5, attrs: { step: "any", min: "0" } },
-    { key: "area_ft2", label: "Heated slab area (ft^2)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "area_ft2", label: "Heated slab area (ft²)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "back_loss_pct", label: "Back + edge losses (%)", kind: "number", default: 20, attrs: { step: "any", min: "0" } },
   ],
   outputs: [
@@ -4645,8 +4645,8 @@ function _v443renderEconomizerEnthalpyChangeover(inputRegion, outputRegion, cita
   inputRegion.appendChild(mode.wrap);
   const hoa = makeNumber("Outdoor-air enthalpy (Btu/lb)", "eco-hoa", { step: "any" }); hoa.input.value = "24";
   const hra = makeNumber("Return-air enthalpy (Btu/lb)", "eco-hra", { step: "any" }); hra.input.value = "28";
-  const toa = makeNumber("Outdoor dry-bulb (F)", "eco-toa", { step: "any" }); toa.input.value = "70";
-  const sp = makeNumber("Fixed high-limit setpoint (F)", "eco-sp", { step: "any" }); sp.input.value = "65";
+  const toa = makeNumber("Outdoor dry-bulb (°F)", "eco-toa", { step: "any" }); toa.input.value = "70";
+  const sp = makeNumber("Fixed high-limit setpoint (°F)", "eco-sp", { step: "any" }); sp.input.value = "65";
   for (const f of [hoa, hra, toa, sp]) inputRegion.appendChild(f.wrap);
   const oE = makeOutputLine(outputRegion, "Economizer", "eco-out-e");
   const oM = makeOutputLine(outputRegion, "Margin to changeover", "eco-out-m");
@@ -4722,15 +4722,15 @@ function renderPipeInsulationForCondensation(inputRegion, outputRegion, citation
   citationEl.textContent = "Citation: minimum condensation-control thickness for a cold pipe: the outer-surface energy balance h (2 pi r2/12)(Tamb - Tdp) = 2 pi k (Tdp - Tpipe)/ln(r2/r1), solved for the radius where the jacket sits exactly at the ambient dew point (dew point from the saturation-vapor-pressure psychrometrics this catalog already pins). The industry practice is to round UP to the next stock wall: a surface at the dew point is on the edge of sweating. Assumes still air and an intact vapor retarder; design-day RH governs, not the average. Manufacturer condensation tables (e.g. the insulation maker's design guide) and the mechanical code govern - a sizing aid, not a substitute for them.";
   const od = makeNumber("Pipe OD (in)", "pifc-od", { step: "any", value: "1" });
   od.input.value = "1";
-  const tp = makeNumber("Cold-pipe surface temp (F)", "pifc-tp", { step: "any", value: "40" });
+  const tp = makeNumber("Cold-pipe surface temp (°F)", "pifc-tp", { step: "any", value: "40" });
   tp.input.value = "40";
-  const ta = makeNumber("Ambient dry-bulb (F)", "pifc-ta", { step: "any", value: "75" });
+  const ta = makeNumber("Ambient dry-bulb (°F)", "pifc-ta", { step: "any", value: "75" });
   ta.input.value = "75";
   const rh = makeNumber("Ambient RH (%, design-day)", "pifc-rh", { step: "any", min: "1", max: "99", value: "50" });
   rh.input.value = "50";
-  const k = makeNumber("Insulation k (BTU-in/hr-ft^2-F)", "pifc-k", { step: "any", value: "0.27" });
+  const k = makeNumber("Insulation k (BTU-in/hr-ft²-F)", "pifc-k", { step: "any", value: "0.27" });
   k.input.value = "0.27";
-  const h = makeNumber("Outside film coeff (BTU/hr-ft^2-F)", "pifc-h", { step: "any", value: "1.65" });
+  const h = makeNumber("Outside film coeff (BTU/hr-ft²-F)", "pifc-h", { step: "any", value: "1.65" });
   h.input.value = "1.65";
   for (const f of [od, tp, ta, rh, k, h]) inputRegion.appendChild(f.wrap);
   const oD = makeOutputLine(outputRegion, "Ambient dew point", "pifc-out-dew");
@@ -4811,7 +4811,7 @@ function renderCompressedAirPressureDrop(inputRegion, outputRegion, citationEl) 
   L.input.value = "100";
   const p = makeNumber("Line pressure (psig)", "capd-p", { step: "any", value: "100" });
   p.input.value = "100";
-  const t = makeNumber("Air temperature (F)", "capd-t", { step: "any", value: "68" });
+  const t = makeNumber("Air temperature (°F)", "capd-t", { step: "any", value: "68" });
   t.input.value = "68";
   const e = makeNumber("Pipe roughness (ft)", "capd-e", { step: "any", value: "0.00015" });
   e.input.value = "0.00015";
@@ -4984,13 +4984,13 @@ export const economicInsulationThicknessExample = { inputs: { delta_t_f: 250, ba
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function renderEconomicInsulationThickness(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: economic (least-cost) insulation thickness. Total annual cost = energy through the assembly plus the annualized installed cost of the insulation: energy $ = dT/(R0 + t/k) x hours x $/MMBtu / (1e6 x efficiency), capital $ = price per inch per ft^2 x t x CRF, with the capital recovery factor CRF = i/(1-(1+i)^-n). Setting the derivative to zero gives the closed form t_opt = k(sqrt(C/(k x price x CRF)) - R0) where C = dT x hours x $/MMBtu / (1e6 x efficiency); this was verified against a brute-force scan. A COST optimum, not a performance requirement - it is thinner than a surface-temperature or condensation limit would require, and those are separate tiles. Flat-surface geometry; a pipe optimum runs thicker because curvature adds area with each inch. Installed cost, fuel price, and the owner's hurdle rate govern.";
-  const dt = makeNumber("Temperature difference (F)", "eit-dt", { step: "any", value: "250" }); dt.input.value = "250";
+  const dt = makeNumber("Temperature difference (°F)", "eit-dt", { step: "any", value: "250" }); dt.input.value = "250";
   const r0 = makeNumber("Bare surface R-value (film, ~0.5)", "eit-r0", { step: "any", value: "0.5" }); r0.input.value = "0.5";
-  const kk = makeNumber("Insulation k (BTU-in/hr-ft^2-F)", "eit-k", { step: "any", value: "0.27" }); kk.input.value = "0.27";
+  const kk = makeNumber("Insulation k (BTU-in/hr-ft²-F)", "eit-k", { step: "any", value: "0.27" }); kk.input.value = "0.27";
   const hr = makeNumber("Operating hours (h/yr)", "eit-hr", { step: "any", value: "8000" }); hr.input.value = "8000";
   const en = makeNumber("Energy cost ($/MMBtu)", "eit-en", { step: "any", value: "12" }); en.input.value = "12";
   const ef = makeNumber("System efficiency (0-1)", "eit-ef", { step: "any", value: "0.8" }); ef.input.value = "0.8";
-  const pr = makeNumber("Installed cost ($ per in per ft^2)", "eit-pr", { step: "any", value: "3" }); pr.input.value = "3";
+  const pr = makeNumber("Installed cost ($ per in per ft²)", "eit-pr", { step: "any", value: "3" }); pr.input.value = "3";
   const lf = makeNumber("Service life (years)", "eit-lf", { step: "any", value: "10" }); lf.input.value = "10";
   const dr = makeNumber("Discount rate (0.08 = 8%, 0 = straight line)", "eit-dr", { step: "any", value: "0.08" }); dr.input.value = "0.08";
   for (const f of [dt, r0, kk, hr, en, ef, pr, lf, dr]) inputRegion.appendChild(f.wrap);

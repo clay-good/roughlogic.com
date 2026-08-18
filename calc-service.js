@@ -85,9 +85,9 @@ function renderGasApplianceDemand(inputRegion, outputRegion, citationEl) {
   const list = makeTextarea("Appliances, one per line as name,BTU/hr (or just BTU/hr)", "gad-list", { rows: "4" });
   list.input.value = DEFAULT;
   const fuel = makeSelect("Fuel", "gad-fuel", [
-    { value: "natural_gas", label: "Natural gas (~1,000 BTU/ft^3)", selected: true }, { value: "propane", label: "Propane (~2,516 BTU/ft^3)" },
+    { value: "natural_gas", label: "Natural gas (~1,000 BTU/ft³)", selected: true }, { value: "propane", label: "Propane (~2,516 BTU/ft³)" },
   ]);
-  const hv = makeNumber("Heating value override (BTU/ft^3, optional)", "gad-hv", { step: "any", min: "0" });
+  const hv = makeNumber("Heating value override (BTU/ft³, optional)", "gad-hv", { step: "any", min: "0" });
   for (const f of [list, fuel, hv]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { list.input.value = DEFAULT; fuel.select.value = "natural_gas"; hv.input.value = ""; update(); });
   const oTotal = makeOutputLine(outputRegion, "Total connected load", "gad-out-total");
@@ -568,9 +568,9 @@ export const commercialLightingLoadExample = { inputs: { floor_area_ft2: 5000, u
 
 function _v180renderCommercialLightingLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 Table 220.12 (general-lighting unit load), 220.14(I) (180 VA per receptacle strap), and 220.44 (receptacle demand factor over 10 kVA). The 125% continuous factor is applied at the OCPD; the energy code may set the lighting load. The AHJ governs. Free at nfpa.org/freeaccess.";
-  const area = makeNumber("Gross floor area (ft^2)", "cll-area", { step: "any", min: "0", value: "5000" });
+  const area = makeNumber("Gross floor area (ft²)", "cll-area", { step: "any", min: "0", value: "5000" });
   area.input.value = "5000";
-  const unit = makeNumber("Unit load (VA/ft^2, Table 220.12)", "cll-unit", { step: "any", min: "0", value: "3" });
+  const unit = makeNumber("Unit load (VA/ft², Table 220.12)", "cll-unit", { step: "any", min: "0", value: "3" });
   unit.input.value = "3";
   const count = makeNumber("General-use receptacle straps", "cll-count", { step: "1", min: "0", value: "60" });
   count.input.value = "60";

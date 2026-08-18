@@ -52,7 +52,7 @@
     },
     {
       "module": "calc-electrical.js",
-      "match": "(deg C)",
+      "match": "(°C)",
       "family": "NEC/IEEE electrical",
       "justification": "ICEA P-32-382 conductor short-circuit limits are published in deg C."
     },
@@ -112,7 +112,7 @@
     },
     {
       "module": "calc-lowvoltage.js",
-      "match": "cable temperature (deg C)",
+      "match": "cable temperature (°C)",
       "family": "standards defined in SI",
       "justification": "TIA-568 temperature derating tables are published in deg C."
     },
@@ -196,13 +196,13 @@
     },
     {
       "module": "calc-solar.js",
-      "match": "temp (C)",
+      "match": "temp (°C)",
       "family": "power and billing (solar datasheet)",
       "justification": "Module datasheets publish record temps and coefficients in deg C."
     },
     {
       "module": "calc-solar.js",
-      "match": "temperature (C)",
+      "match": "temperature (°C)",
       "family": "power and billing (solar datasheet)",
       "justification": "Cell/ambient temperature model inputs are datasheet deg C."
     },
@@ -226,13 +226,13 @@
     },
     {
       "module": "calc-solar.js",
-      "match": "W/m^2",
+      "match": "W/m²",
       "family": "power and billing (solar datasheet)",
       "justification": "Plane-of-array irradiance is published in W/m^2."
     },
     {
       "module": "calc-restoration.js",
-      "match": "spores/m^3",
+      "match": "spores/m³",
       "family": "lab and IH practice",
       "justification": "Spore-trap lab reports count spores per cubic meter."
     },
@@ -304,7 +304,7 @@
     },
     {
       "module": "calc-water.js",
-      "match": "Water temperature (C; 0.5 - 25)",
+      "match": "Water temperature (°C; 0.5 - 25)",
       "family": "water/wastewater operations",
       "justification": "SWTR CT tables are published against deg C water temperature."
     },
@@ -337,6 +337,12 @@
       "match": "Particle diameter (mm)",
       "family": "water/wastewater sedimentation practice (spec-v1271)",
       "justification": "Settling-particle and grit sizes are stated in mm and micron in US water/wastewater and environmental-engineering practice (grit-chamber and sedimentation design, the same ASTM grain-size convention already allowlisted for calc-earthwork D10/D30/D60); there is no US-customary equivalent for a particle diameter."
+    },
+    {
+      "module": "calc-motor.js",
+      "match": "Marked temperature rise",
+      "family": "electrical / motors",
+      "justification": "The motor nameplate itself marks temperature rise in °C, and NEC 430.32(A)(1) states its 40 °C threshold in °C. The tradesperson reads this number off the nameplate in this unit."
     }
   ]
 }

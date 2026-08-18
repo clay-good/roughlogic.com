@@ -869,7 +869,7 @@ function _renderCeilingSpeakerCoverage(inputRegion, outputRegion, citationEl) {
   const ch = makeNumber("Ceiling height (ft)", "csc-ch", { step: "any", min: "0" }); ch.input.value = "10";
   const ea = makeNumber("Listener ear height (ft, seated ~4)", "csc-ea", { step: "any", min: "0" }); ea.input.value = "4";
   const co = makeNumber("Speaker coverage angle (deg, ~90)", "csc-co", { step: "any", min: "0" }); co.input.value = "90";
-  const ar = makeNumber("Room area (ft^2)", "csc-ar", { step: "any", min: "0" }); ar.input.value = "1200";
+  const ar = makeNumber("Room area (ft²)", "csc-ar", { step: "any", min: "0" }); ar.input.value = "1200";
   const ly = makeSelect("Layout", "csc-ly", [
     { value: "edge_to_edge", label: "Edge-to-edge (minimum count)", selected: true }, { value: "minimum_overlap", label: "Minimum overlap (even coverage)" },
   ]);
@@ -958,8 +958,8 @@ function _renderStructuredCablingChannel(inputRegion, outputRegion, citationEl) 
   citationEl.textContent = "Citation: Structured cabling channel (TIA-568): 100 m total = 90 m permanent link + up to 10 m cords; above 20 deg C the max permanent link de-rates ~0.4%/deg C (UTP). Passes if the link is within its de-rated max and the channel is within 100 m. A design aid; the cable's published de-rating and the adopted TIA-568 edition govern.";
   const pl = makeNumber("Permanent-link length (m)", "scc-pl", { step: "any", min: "0" }); pl.input.value = "85";
   const cd = makeNumber("Total patch + equipment cords (m)", "scc-cd", { step: "any", min: "0" }); cd.input.value = "8";
-  const tc = makeNumber("Installed cable temperature (deg C)", "scc-tc", { step: "any" }); tc.input.value = "20";
-  const dr = makeNumber("De-rate per deg C above 20 (0.004 UTP)", "scc-dr", { step: "any", min: "0" }); dr.input.value = "0.004";
+  const tc = makeNumber("Installed cable temperature (°C)", "scc-tc", { step: "any" }); tc.input.value = "20";
+  const dr = makeNumber("De-rate per °C above 20 (0.004 UTP)", "scc-dr", { step: "any", min: "0" }); dr.input.value = "0.004";
   for (const f of [pl, cd, tc, dr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pl.input.value = "85"; cd.input.value = "8"; tc.input.value = "20"; dr.input.value = "0.004"; update(); });
   const oPl = makeOutputLine(outputRegion, "Permanent link vs de-rated max", "scc-out-pl");
@@ -1350,8 +1350,8 @@ function _v947renderRtdResistanceToTemp(inputRegion, outputRegion, citationEl) {
   r0.input.value = "100";
   for (const f of [rm, r0]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rm.input.value = "119.397"; r0.input.value = "100"; update(); });
-  const oC = makeOutputLine(outputRegion, "Temperature (C)", "rtd-out-c");
-  const oF = makeOutputLine(outputRegion, "Temperature (F)", "rtd-out-f");
+  const oC = makeOutputLine(outputRegion, "Temperature (°C)", "rtd-out-c");
+  const oF = makeOutputLine(outputRegion, "Temperature (°F)", "rtd-out-f");
   const update = debounce(() => {
     const r = computeRtdResistanceToTemp({
       resistance_ohms: rm.input.value === "" ? 119.397 : Number(rm.input.value), r0_ohms: r0.input.value === "" ? 100 : Number(r0.input.value),
@@ -1502,8 +1502,8 @@ function _v950renderThermistorBetaTemp(inputRegion, outputRegion, citationEl) {
   rt.input.value = "25";
   for (const f of [rm, r0, bk, rt]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rm.input.value = "20000"; r0.input.value = "10000"; bk.input.value = "3950"; rt.input.value = "25"; update(); });
-  const oC = makeOutputLine(outputRegion, "Temperature (C)", "th-out-c");
-  const oF = makeOutputLine(outputRegion, "Temperature (F)", "th-out-f");
+  const oC = makeOutputLine(outputRegion, "Temperature (°C)", "th-out-c");
+  const oF = makeOutputLine(outputRegion, "Temperature (°F)", "th-out-f");
   const update = debounce(() => {
     const r = computeThermistorBetaTemp({
       resistance_ohms: rm.input.value === "" ? 20000 : Number(rm.input.value), r0_ohms: r0.input.value === "" ? 10000 : Number(r0.input.value),
@@ -1551,8 +1551,8 @@ function renderThermistorSteinhartHart(inputRegion, outputRegion, citationEl) {
   const c = makeNumber("Coefficient C", "sh-c", { step: "any", value: "0.000000085663516" }); c.input.value = "0.000000085663516";
   for (const f of [rm, a, b, c]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rm.input.value = "10000"; a.input.value = "0.001125308852122"; b.input.value = "0.000234711863267"; c.input.value = "0.000000085663516"; update(); });
-  const oC = makeOutputLine(outputRegion, "Temperature (C)", "sh-out-c");
-  const oF = makeOutputLine(outputRegion, "Temperature (F)", "sh-out-f");
+  const oC = makeOutputLine(outputRegion, "Temperature (°C)", "sh-out-c");
+  const oF = makeOutputLine(outputRegion, "Temperature (°F)", "sh-out-f");
   const oNote = makeOutputLine(outputRegion, "Note", "sh-out-n");
   const update = debounce(() => {
     const r = computeThermistorSteinhartHart({

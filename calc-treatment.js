@@ -664,7 +664,7 @@ TREATMENT_RENDERERS["pool-heater-btu"] = _rPool({
   example: poolHeaterBtuExample.inputs,
   fields: [
     { key: "gallons", label: "Pool volume (gallons)", default: 20000 },
-    { key: "dT_F", label: "Temperature rise (F)", default: 10 },
+    { key: "dT_F", label: "Temperature rise (°F)", default: 10 },
     { key: "output", label: "Heater output (Btu/h)", default: 400000 },
     { key: "eff", label: "Efficiency (0.80 gas; COP-equiv HP)", default: 0.80 },
   ],
@@ -702,7 +702,7 @@ TREATMENT_RENDERERS["pool-heater-size"] = _rPool({
   example: poolHeaterSizeExample.inputs,
   fields: [
     { key: "gallons", label: "Pool volume (gallons)", default: 20000 },
-    { key: "dT_F", label: "Temperature rise (F)", default: 10 },
+    { key: "dT_F", label: "Temperature rise (°F)", default: 10 },
     { key: "target_hours", label: "Target heat-up time (h)", default: 5.2 },
     { key: "eff", label: "Efficiency (0.80 gas; COP-equiv HP)", default: 0.80 },
   ],
@@ -860,7 +860,7 @@ export const clarifierSurfaceLoadingExample = { inputs: { flow_mgd: 1.0, surface
 function renderClarifierSurfaceLoading(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Clarifier hydraulic and solids loading (Ten States Standards / Metcalf & Eddy, Wastewater Engineering): surface overflow rate = flow/area (gpd/ft^2), weir overflow rate = flow/weir length (gpd/ft), solids loading = flow x MLSS x 8.34 / area (lb/ft^2/day). The state design criteria govern the limits. An operations aid; the operator of record and the primacy agency govern compliance.";
   const flow = makeNumber("Flow (MGD)", "csl-flow", { step: "any", min: "0" }); flow.input.value = "1.0";
-  const area = makeNumber("Surface area (ft^2)", "csl-area", { step: "any", min: "0" }); area.input.value = "1256.6";
+  const area = makeNumber("Surface area (ft²)", "csl-area", { step: "any", min: "0" }); area.input.value = "1256.6";
   const weir = makeNumber("Total weir length (ft)", "csl-weir", { step: "any", min: "0" }); weir.input.value = "125.7";
   const mlss = makeNumber("MLSS (mg/L, secondary only)", "csl-mlss", { step: "any", min: "0" }); mlss.input.value = "2500";
   for (const f of [flow, area, weir, mlss]) inputRegion.appendChild(f.wrap);
@@ -903,7 +903,7 @@ export const clarifierAreaForLoadingExample = { inputs: { flow_mgd: 1.0, target_
 function renderClarifierAreaForLoading(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Clarifier hydraulic loading (Ten States Standards / Metcalf & Eddy, Wastewater Engineering): surface overflow rate = flow/area, solved for the area: area = flow x 1e6 / SOR; equivalent circular diameter = sqrt(4 x area / pi). The state design criteria govern the limits. An operations aid; the operator of record and the primacy agency govern compliance.";
   const flow = makeNumber("Design flow (MGD)", "cal-flow", { step: "any", min: "0" }); flow.input.value = "1.0";
-  const sor = makeNumber("Target surface overflow rate (gpd/ft^2, ~700-1000)", "cal-sor", { step: "any", min: "0" }); sor.input.value = "800";
+  const sor = makeNumber("Target surface overflow rate (gpd/ft², ~700-1000)", "cal-sor", { step: "any", min: "0" }); sor.input.value = "800";
   for (const f of [flow, sor]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { flow.input.value = "1.0"; sor.input.value = "800"; update(); });
   const oArea = makeOutputLine(outputRegion, "Required surface area", "cal-out-area");
@@ -1063,11 +1063,11 @@ const renderDigesterVsLoading = _rPool({
     { key: "feed_flow_gpd", label: "Sludge feed flow (gpd)", kind: "number" },
     { key: "percent_ts", label: "Total solids (%)", kind: "number" },
     { key: "percent_vs", label: "Volatile fraction of TS (%)", kind: "number" },
-    { key: "digester_ft3", label: "Digester volume (ft^3)", kind: "number" },
+    { key: "digester_ft3", label: "Digester volume (ft³)", kind: "number" },
   ],
   outputs: [
     { key: "vs", id: "dvl-out-vs", label: "Volatile solids fed", value: (r) => fmt(r.vs_fed_lb_day, 0) + " lb/day" },
-    { key: "l", id: "dvl-out-l", label: "VSLR (per 1,000 ft^3)", value: (r) => fmt(r.vslr, 0) + " lb VS/day - " + (r.over_limit ? "OVER ~400, digester may sour" : r.in_band ? "in the 100-400 healthy band" : "below the high-rate band") },
+    { key: "l", id: "dvl-out-l", label: "VSLR (per 1,000 ft³)", value: (r) => fmt(r.vslr, 0) + " lb VS/day - " + (r.over_limit ? "OVER ~400, digester may sour" : r.in_band ? "in the 100-400 healthy band" : "below the high-rate band") },
     { key: "d", id: "dvl-out-d", label: "Hydraulic detention time", value: (r) => fmt(r.dt_days, 1) + " days" },
     { key: "n", id: "dvl-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -1142,7 +1142,7 @@ const renderDigesterGasProduction = _rPool({
   fields: [
     { key: "vs_fed_lb_day", label: "Volatile solids fed (lb/day)", kind: "number" },
     { key: "vs_reduction_pct", label: "VS reduction (%, typical 50-60)", kind: "number" },
-    { key: "gas_yield_ft3_lb", label: "Gas yield (ft^3 per lb VS destroyed)", kind: "number", default: 15 },
+    { key: "gas_yield_ft3_lb", label: "Gas yield (ft³ per lb VS destroyed)", kind: "number", default: 15 },
     { key: "methane_pct", label: "Methane fraction of gas (%)", kind: "number", default: 65 },
   ],
   outputs: [
@@ -1209,7 +1209,7 @@ const renderFlocculationGValue = _rPool({
   fields: [
     { key: "power_input_hp", label: "Net power to the water P (hp)", kind: "number" },
     { key: "basin_volume_gal", label: "Mixing basin volume V (gal)", kind: "number" },
-    { key: "water_temp_f", label: "Water temperature (F)", kind: "number", default: 59 },
+    { key: "water_temp_f", label: "Water temperature (°F)", kind: "number", default: 59 },
     { key: "detention_time_s", label: "Detention time (s)", kind: "number" },
   ],
   outputs: [
@@ -1277,7 +1277,7 @@ const renderTaperedFlocculationG = _rPool({
     { key: "stage2_g_per_s", label: "Stage 2 target G (per s)", kind: "number" },
     { key: "stage3_g_per_s", label: "Stage 3 target G (per s, 0 for 2-stage)", kind: "number", default: 0 },
     { key: "stage_volume_gal", label: "Each stage volume (gal)", kind: "number" },
-    { key: "water_temp_f", label: "Water temperature (F)", kind: "number", default: 59 },
+    { key: "water_temp_f", label: "Water temperature (°F)", kind: "number", default: 59 },
     { key: "total_detention_min", label: "Total detention time (min)", kind: "number" },
   ],
   outputs: [
@@ -1329,7 +1329,7 @@ function renderFlocculatorPaddlePower(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Camp paddle flocculator power (water-treatment design practice), by name. v_tip = 2 x pi x radius x rpm / 60; v_rel = v_tip x (1 - k); P = 0.5 x Cd x 1.937 x area x v_rel^3 (ft-lb/s, x 1.35582 for W, / 550 for hp). The power goes as the cube of the relative velocity; the water slips (rotates with the paddles) so v_rel is only (1 - k) of the tip speed - ignoring the slip roughly doubles the power. Cd (about 1.8, 1.0 to 1.8 reported) and k (about 0.25, 0.25 to 0.40 reported) are user inputs because references disagree. This power feeds flocculation-g-value.";
   const r = makeNumber("Paddle radius to blade centroid (ft)", "fpp-r", { step: "any", min: "0", value: "6" }); r.input.value = "6";
   const n = makeNumber("Wheel speed (rpm)", "fpp-n", { step: "any", min: "0", value: "3" }); n.input.value = "3";
-  const a = makeNumber("Total paddle-blade area (ft^2)", "fpp-a", { step: "any", min: "0", value: "40" }); a.input.value = "40";
+  const a = makeNumber("Total paddle-blade area (ft²)", "fpp-a", { step: "any", min: "0", value: "40" }); a.input.value = "40";
   const cd = makeNumber("Drag coefficient Cd (about 1.8)", "fpp-cd", { step: "any", min: "0", value: "1.8" }); cd.input.value = "1.8";
   const k = makeNumber("Slip factor k (about 0.25)", "fpp-k", { step: "any", min: "0", max: "1", value: "0.25" }); k.input.value = "0.25";
   for (const f of [r, n, a, cd, k]) inputRegion.appendChild(f.wrap);
@@ -1379,7 +1379,7 @@ function renderChlorineCylinderWithdrawal(inputRegion, outputRegion, citationEl)
     { value: "cylinder", label: "150-lb cylinder (~40 lb/day)", selected: true },
     { value: "ton", label: "1-ton container (~400 lb/day)" },
   ]);
-  const temp = makeNumber("Chlorine room temperature (F)", "ccw-temp", { step: "any", value: "70" }); temp.input.value = "70";
+  const temp = makeNumber("Chlorine room temperature (°F)", "ccw-temp", { step: "any", value: "70" }); temp.input.value = "70";
   for (const f of [feed, type, temp]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { feed.input.value = "100"; type.select.value = "cylinder"; temp.input.value = "70"; update(); });
   const oPer = makeOutputLine(outputRegion, "Per-container ceiling", "ccw-out-per");
@@ -1616,7 +1616,7 @@ function _v1271renderParticleSettlingVelocity(inputRegion, outputRegion, citatio
   d.input.value = "0.05";
   const sg = makeNumber("Particle specific gravity", "psv-sg", { step: "any", min: "0", value: "2.65" });
   sg.input.value = "2.65";
-  const tf = makeNumber("Water temperature (F)", "psv-tf", { step: "any", value: "68" });
+  const tf = makeNumber("Water temperature (°F)", "psv-tf", { step: "any", value: "68" });
   tf.input.value = "68";
   for (const f of [d, sg, tf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { d.input.value = "0.05"; sg.input.value = "2.65"; tf.input.value = "68"; update(); });

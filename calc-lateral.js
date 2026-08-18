@@ -117,7 +117,7 @@ LATERAL_RENDERERS["diaphragm-shear"] = _simpleRenderer({
   outputs: [
     { key: "ve", id: "dsh-out-ve", label: "End reaction V", value: (r) => fmt(r.v_end_lb, 0) + " lb" },
     { key: "vp", id: "dsh-out-vp", label: "Max unit shear v = wL/(2b)", value: (r) => fmt(r.v_plf, 0) + " plf" },
-    { key: "mm", id: "dsh-out-mm", label: "Max moment M = wL^2/8", value: (r) => fmt(r.m_ftlb, 0) + " lb-ft" },
+    { key: "mm", id: "dsh-out-mm", label: "Max moment M = wL²/8", value: (r) => fmt(r.m_ftlb, 0) + " lb-ft" },
     { key: "ch", id: "dsh-out-ch", label: "Chord force T = C = M/b", value: (r) => fmt(r.chord_lb, 0) + " lb (" + fmt(r.chord_kip, 1) + " kip)" },
   ],
   compute: computeDiaphragmShear,
@@ -193,7 +193,7 @@ LATERAL_RENDERERS["shearwall-deflection"] = _simpleRenderer({
     { key: "h_ft", label: "Wall height h (ft)", kind: "number" },
     { key: "b_ft", label: "Wall length b (ft)", kind: "number" },
     { key: "e_psi", label: "End-post modulus E (psi)", kind: "number", default: 1600000 },
-    { key: "a_in2", label: "End-post area A (in^2)", kind: "number" },
+    { key: "a_in2", label: "End-post area A (in²)", kind: "number" },
     { key: "ga_kin", label: "Apparent shear stiffness Ga (kips/in)", kind: "number" },
     { key: "da_in", label: "Anchorage elongation da (in)", kind: "number", default: 0 },
   ],

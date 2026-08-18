@@ -403,7 +403,7 @@ export function renderQuadratic(inputRegion, outputRegion, citationEl) {
     update();
   });
   const oKind = makeOutputLine(outputRegion, "Root kind", "qd-out-kind");
-  const oDisc = makeOutputLine(outputRegion, "Discriminant (b^2 - 4ac)", "qd-out-disc");
+  const oDisc = makeOutputLine(outputRegion, "Discriminant (b² - 4ac)", "qd-out-disc");
   const oRoots = makeOutputLine(outputRegion, "Roots", "qd-out-roots");
   const oVertex = makeOutputLine(outputRegion, "Vertex (x, y)", "qd-out-vertex");
   const update = debounce(() => {
@@ -1741,7 +1741,7 @@ export function renderLinearRegression(inputRegion, outputRegion, citationEl) {
   });
 
   const oEq = makeOutputLine(outputRegion, "Fitted line", "lr-out-eq");
-  const oFit = makeOutputLine(outputRegion, "R^2 / residual std error", "lr-out-fit");
+  const oFit = makeOutputLine(outputRegion, "R² / residual std error", "lr-out-fit");
   const oSlope = makeOutputLine(outputRegion, "Slope test (slope = 0)", "lr-out-slope");
   const oPred = makeOutputLine(outputRegion, "Prediction", "lr-out-pred");
   const oNote = makeOutputLine(outputRegion, "Notes", "lr-out-note");
@@ -1855,7 +1855,7 @@ export function renderPearson(inputRegion, outputRegion, citationEl) {
     X.input.value = "1, 2, 3, 4, 5"; Y.input.value = "2, 4, 5, 4, 5"; A.select.value = "0.05"; update();
   });
 
-  const oR = makeOutputLine(outputRegion, "Pearson r / R^2", "pc-out-r");
+  const oR = makeOutputLine(outputRegion, "Pearson r / R²", "pc-out-r");
   const oT = makeOutputLine(outputRegion, "t-statistic / df", "pc-out-t");
   const oP = makeOutputLine(outputRegion, "p-value / verdict", "pc-out-p");
   const oNote = makeOutputLine(outputRegion, "Notes", "pc-out-note");

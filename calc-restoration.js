@@ -285,7 +285,7 @@ import {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderPsychrometric(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: August-Roche-Magnus saturation vapor pressure approximation; standard psychrometric definitions.";
-  const T = makeNumber("Temperature (F)", "py-t", { step: "any" });
+  const T = makeNumber("Temperature (°F)", "py-t", { step: "any" });
   const RH = makeNumber("Relative humidity (percent)", "py-rh", { step: "any", min: "0", max: "100" });
   // v593: US-facing in Hg field, converted at this boundary into the hPa-native
   // compute (29.92 in Hg = 1013.21 hPa; 1 in Hg = 33.8638866667 hPa).
@@ -310,9 +310,9 @@ export function renderPsychrometric(inputRegion, outputRegion, citationEl) {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderDryingGoal(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard restoration rule of thumb. Target indoor GPP at least 5 to 10 grains below outdoor GPP for effective drying.";
-  const oT = makeNumber("Outdoor temperature (F)", "dg-ot", { step: "any" });
+  const oT = makeNumber("Outdoor temperature (°F)", "dg-ot", { step: "any" });
   const oR = makeNumber("Outdoor RH (percent)", "dg-or", { step: "any", min: "0", max: "100" });
-  const iT = makeNumber("Indoor temperature (F)", "dg-it", { step: "any", value: "72" });
+  const iT = makeNumber("Indoor temperature (°F)", "dg-it", { step: "any", value: "72" });
   iT.input.value = "72";
   const m = makeNumber("Margin (GPP below outdoor)", "dg-m", { step: "any", min: "0", value: "10" });
   m.input.value = "10";
@@ -340,7 +340,7 @@ export function renderDryingGoal(inputRegion, outputRegion, citationEl) {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderDehumidifier(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AHAM rating method (80 F / 60 percent RH) and an engineering field method scaled by job conditions. References IICRC S500.";
-  const v = makeNumber("Room volume (ft^3)", "dh-v", { step: "any", min: "0" });
+  const v = makeNumber("Room volume (ft³)", "dh-v", { step: "any", min: "0" });
   const c = makeSelect("Water class", "dh-c", [
     { value: "1", label: "Class 1" }, { value: "2", label: "Class 2", selected: true }, { value: "3", label: "Class 3" }, { value: "4", label: "Class 4" },
   ]);
@@ -364,7 +364,7 @@ export function renderDehumidifier(inputRegion, outputRegion, citationEl) {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderAirMovers(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IICRC S500 consensus practice (referenced; not reproduced). Coverage in ft^2 per air mover varies by water class.";
-  const a = makeNumber("Affected area (ft^2)", "am-a", { step: "any", min: "0" });
+  const a = makeNumber("Affected area (ft²)", "am-a", { step: "any", min: "0" });
   const c = makeSelect("Water class", "am-c", [
     { value: "1", label: "Class 1" }, { value: "2", label: "Class 2", selected: true }, { value: "3", label: "Class 3" }, { value: "4", label: "Class 4" },
   ]);
@@ -434,7 +434,7 @@ export function renderDryingTimes(inputRegion, outputRegion, citationEl) {
 export function renderMold(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Public mold-growth research literature summarized in original plain English. Risk increases with sustained elevated RH on a food source.";
   const rh = makeNumber("Relative humidity (percent)", "mr-rh", { step: "any", min: "0", max: "100" });
-  const T = makeNumber("Temperature (F)", "mr-t", { step: "any" });
+  const T = makeNumber("Temperature (°F)", "mr-t", { step: "any" });
   const h = makeNumber("Hours of elevated humidity", "mr-h", { step: "any", min: "0" });
   for (const f of [rh, T, h]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rh.input.value = "75"; T.input.value = "75"; h.input.value = "48"; update(); });
@@ -602,7 +602,7 @@ export const thermalDeltaTExample = {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderStandingWater(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: 1 ft^3 = 7.48052 gal. gallons = area_ft^2 * depth_in / 12 * 7.48052. Water at 60 F ~ 62.4 lb/ft^3.";
-  const a = makeNumber("Affected area (ft^2)", "sw-a", { step: "any", min: "0" });
+  const a = makeNumber("Affected area (ft²)", "sw-a", { step: "any", min: "0" });
   const d = makeNumber("Standing depth (in)", "sw-d", { step: "any", min: "0" });
   for (const f of [a, d]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { a.input.value = "500"; d.input.value = "1"; update(); });
@@ -624,7 +624,7 @@ export function renderStandingWater(inputRegion, outputRegion, citationEl) {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderNAMSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Required CFM = room volume * ACH / 60. Typical NAM unit sizes 500 / 1000 / 2000 CFM (manufacturer technical bulletins).";
-  const v = makeNumber("Room volume (ft^3)", "nam-v", { step: "any", min: "0" });
+  const v = makeNumber("Room volume (ft³)", "nam-v", { step: "any", min: "0" });
   const ach = makeNumber("Target air changes per hour", "nam-ach", { step: "any", min: "0", value: "6" });
   ach.input.value = "6";
   for (const f of [v, ach]) inputRegion.appendChild(f.wrap);
@@ -1246,7 +1246,7 @@ const renderDryingChamberCO2 = _v23SimpleRenderer({
   citation: "Citation: Per the ASHRAE 62.1 ventilation-rate mass-balance basis (Q_fresh = generation / (C_indoor - C_outdoor); ACH = Q*60 / V). Complements the chamber-turnover tile (which sizes air movers, not fresh air). IICRC S500 governs the drying plan.",
   example: dryingChamberCO2Example.inputs,
   fields: [
-    { key: "containment_volume_ft3", label: "Containment volume (ft^3)", kind: "number" },
+    { key: "containment_volume_ft3", label: "Containment volume (ft³)", kind: "number" },
     { key: "co2_generation_cfm", label: "CO2 generation (cfm of CO2)", kind: "number" },
     { key: "target_indoor_ppm", label: "Target indoor CO2 (ppm)", kind: "number", default: 1000 },
     { key: "outdoor_ppm", label: "Outdoor CO2 (ppm)", kind: "number", default: 420 },
@@ -1672,7 +1672,7 @@ export const woodEmcExample = { inputs: { temperature_F: 70, rh_pct: 50 } };
 
 function renderWoodEmc(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: USDA Forest Products Laboratory Wood Handbook (Hailwood-Horrobin sorption equation, by name, not reproduced) with its four temperature polynomials W, K, K1, K2 (T in degrees F). The exact EMC varies by species; the IICRC S500 dry standard and the unaffected reference reading govern.";
-  const temp = makeNumber("Air temperature (F)", "emc-t", { step: "any", value: "70" });
+  const temp = makeNumber("Air temperature (°F)", "emc-t", { step: "any", value: "70" });
   const rh = makeNumber("Relative humidity (%)", "emc-rh", { step: "any", min: "0", max: "100", value: "50" });
   temp.input.value = "70"; rh.input.value = "50";
   for (const f of [temp, rh]) inputRegion.appendChild(f.wrap);
@@ -1784,7 +1784,7 @@ export const ceilingWaterLoadExample = { inputs: { pooled_area_ft2: 20, avg_dept
 
 function renderCeilingWaterLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Hydrostatic load load_psf = (depth_in/12) * 62.4, with water at ~62.4 lb/ft^3 and 7.48052 gal/ft^3. IICRC S500 safety practice, by name. The threshold is an editable drain-first screen, NOT a code capacity - the fastening, span, and a structural engineer govern.";
-  const area = makeNumber("Bulging / saturated ceiling area (ft^2)", "cwl-a", { step: "any", min: "0" });
+  const area = makeNumber("Bulging / saturated ceiling area (ft²)", "cwl-a", { step: "any", min: "0" });
   const depth = makeNumber("Average trapped water depth (in)", "cwl-d", { step: "any", min: "0" });
   const thr = makeNumber("Drain-first screen load (psf, editable)", "cwl-t", { step: "any", min: "0", value: "5" });
   thr.input.value = "5";
@@ -2071,9 +2071,9 @@ export const boundWaterExample = { inputs: { material_volume_ft3: 10, dry_densit
 
 function renderBoundWater(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Gravimetric water-mass relation (ANSI/IICRC S500), by name. Moisture content is dry-weight basis (consistent with wood-emc). Dry density and material moisture vary by species and product; meter readings and the restorer's judgment govern. This is a planning estimate, not a gravimetric measurement.";
-  const vol = makeNumber("Material volume (ft^3, area x thickness)", "bw-vol", { step: "any", min: "0", value: "10" });
+  const vol = makeNumber("Material volume (ft³, area x thickness)", "bw-vol", { step: "any", min: "0", value: "10" });
   vol.input.value = "10";
-  const density = makeNumber("Oven-dry density (lb/ft^3; softwood ~32, gypsum ~40)", "bw-den", { step: "any", min: "0", value: "32" });
+  const density = makeNumber("Oven-dry density (lb/ft³; softwood ~32, gypsum ~40)", "bw-den", { step: "any", min: "0", value: "32" });
   density.input.value = "32";
   const cur = makeNumber("Current moisture content (percent)", "bw-cur", { step: "any", min: "0", value: "40" });
   cur.input.value = "40";
@@ -2289,9 +2289,9 @@ export const hydroxylSizingExample = { inputs: { structure_volume_ft3: 12000, un
 
 function renderHydroxylSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Volume-and-coverage sizing (ANSI/IICRC S700), by name. Hydroxyl generators are safe for occupied spaces but work more slowly than ozone, commonly running continuously for several days. Coverage ratings and run times are manufacturer-specific. Severe odor still requires source removal and cleaning first. The manufacturer and S700 govern.";
-  const vol = makeNumber("Structure volume (ft^3)", "hx-vol", { step: "any", min: "0", value: "12000" });
+  const vol = makeNumber("Structure volume (ft³)", "hx-vol", { step: "any", min: "0", value: "12000" });
   vol.input.value = "12000";
-  const coverage = makeNumber("Coverage per generator (ft^3/unit)", "hx-cov", { step: "any", min: "0", value: "6000" });
+  const coverage = makeNumber("Coverage per generator (ft³/unit)", "hx-cov", { step: "any", min: "0", value: "6000" });
   coverage.input.value = "6000";
   const days = makeNumber("Anticipated continuous run time (days)", "hx-days", { step: "any", min: "0", value: "3" });
   days.input.value = "3";
@@ -2441,7 +2441,7 @@ function renderEquipmentHeatLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Watt-to-heat conversion (3.412 BTU/hr per watt) and the 1.08 standard-air sensible-heat relation (ANSI/IICRC S500), by name. Every watt of equipment draw becomes sensible heat in the chamber; an overheated chamber leaves the efficient-evaporation band. Envelope losses and the building HVAC govern; this is a screen.";
   const watts = makeNumber("Total equipment draw (watts)", "eh-watts", { step: "any", min: "0", value: "4000" });
   watts.input.value = "4000";
-  const rise = makeNumber("Acceptable temperature rise (degF)", "eh-rise", { step: "any", min: "0", value: "10" });
+  const rise = makeNumber("Acceptable temperature rise (°F)", "eh-rise", { step: "any", min: "0", value: "10" });
   rise.input.value = "10";
   const exhaust = makeNumber("Ventilation / AC airflow (cfm, 0 = sealed)", "eh-exhaust", { step: "any", min: "0", value: "600" });
   exhaust.input.value = "600";
@@ -2562,15 +2562,15 @@ export const sootCleaningTakeoffExample = { inputs: { affected_sf: 1200, sponge_
 
 function renderSootCleaningTakeoff(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Dry-sponge soot cleaning takeoff and the 300 ft^2/gal primer coverage (ANSI/IICRC S700 fire and smoke restoration), by name. The RESIDUE TYPE governs the method - dry sponging is for dry smoke; protein, wet, and fuel-oil residues need wet cleaning instead. A quantity screen, not a cleaning protocol.";
-  const area = makeNumber("Soot-affected wall + ceiling area (ft^2)", "st-area", { step: "any", min: "0", value: "1200" });
+  const area = makeNumber("Soot-affected wall + ceiling area (ft²)", "st-area", { step: "any", min: "0", value: "1200" });
   area.input.value = "1200";
-  const cov = makeNumber("Area per chem sponge before fouling (ft^2)", "st-cov", { step: "any", min: "0", value: "100" });
+  const cov = makeNumber("Area per chem sponge before fouling (ft²)", "st-cov", { step: "any", min: "0", value: "100" });
   cov.input.value = "100";
-  const prod = makeNumber("Dry-sponging production rate (ft^2/hr)", "st-prod", { step: "any", min: "0", value: "150" });
+  const prod = makeNumber("Dry-sponging production rate (ft²/hr)", "st-prod", { step: "any", min: "0", value: "150" });
   prod.input.value = "150";
   const seal = makeCheckbox("Odor-seal primer to follow", "st-seal");
   seal.input.checked = true;
-  const primer = makeNumber("Primer coverage (ft^2/gal)", "st-primer", { step: "any", min: "0", value: "300" });
+  const primer = makeNumber("Primer coverage (ft²/gal)", "st-primer", { step: "any", min: "0", value: "300" });
   primer.input.value = "300";
   for (const f of [area, cov, prod, seal, primer]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { area.input.value = "1200"; cov.input.value = "100"; prod.input.value = "150"; seal.input.checked = true; primer.input.value = "300"; update(); });
@@ -2613,9 +2613,9 @@ export const ozoneShockTreatmentExample = { inputs: { structure_volume_ft3: 8000
 
 function renderOzoneShockTreatment(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Volume-based ozone deodorization sizing (ANSI/IICRC S700) and the 0.1 ppm OSHA ozone limit, by name. DANGER: ozone is a respiratory toxin - the space must be unoccupied, sealed, and aired below 0.1 ppm before reentry; a hydroxyl generator is the occupied-space alternative. This sizes equipment; it is not authority to run ozone in an occupied space.";
-  const vol = makeNumber("Volume to deodorize (ft^3 = area x ceiling height)", "oz-vol", { step: "any", min: "0", value: "8000" });
+  const vol = makeNumber("Volume to deodorize (ft³ = area x ceiling height)", "oz-vol", { step: "any", min: "0", value: "8000" });
   vol.input.value = "8000";
-  const rated = makeNumber("Generator rated treatable volume (ft^3)", "oz-rated", { step: "any", min: "0", value: "2000" });
+  const rated = makeNumber("Generator rated treatable volume (ft³)", "oz-rated", { step: "any", min: "0", value: "2000" });
   rated.input.value = "2000";
   const time = makeNumber("Shock duration (hours)", "oz-time", { step: "any", min: "0", value: "24" });
   time.input.value = "24";
@@ -2698,9 +2698,9 @@ export const thermalFogDeodorizationExample = { inputs: { structure_volume_ft3: 
 
 function renderThermalFogDeodorization(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Volume-based fogging dosage (ANSI/IICRC S700) and the 128 fl oz/gal constant, by name. The product LABEL rate and dwell govern. A thermal fogger produces a HOT fog - the space is unoccupied and a fire watch applies; ULV is the cold alternative. Sizes quantity only.";
-  const vol = makeNumber("Volume to treat (ft^3 = area x ceiling height)", "tf-vol", { step: "any", min: "0", value: "8000" });
+  const vol = makeNumber("Volume to treat (ft³ = area x ceiling height)", "tf-vol", { step: "any", min: "0", value: "8000" });
   vol.input.value = "8000";
-  const dose = makeNumber("Label dose rate (oz per 1,000 ft^3)", "tf-dose", { step: "any", min: "0", value: "5" });
+  const dose = makeNumber("Label dose rate (oz per 1,000 ft³)", "tf-dose", { step: "any", min: "0", value: "5" });
   dose.input.value = "5";
   const passes = makeNumber("Fogging passes", "tf-passes", { step: "any", min: "1", value: "1" });
   passes.input.value = "1";
@@ -2746,15 +2746,15 @@ export const contentsPackoutInventoryExample = { inputs: { floor_area_ft2: 200, 
 
 function renderContentsPackoutInventory(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Volume-based pack-out estimating method (restoration estimating practice; ANSI/IICRC S500/S700), by name. The actual inventory and the box mix GOVERN; the densities are starting rules of thumb. This is an estimating screen.";
-  const area = makeNumber("Affected floor area (ft^2)", "pk-area", { step: "any", min: "0", value: "200" });
+  const area = makeNumber("Affected floor area (ft²)", "pk-area", { step: "any", min: "0", value: "200" });
   area.input.value = "200";
-  const density = makeNumber("Contents volume per floor area (ft^3/ft^2)", "pk-density", { step: "any", min: "0", value: "2" });
+  const density = makeNumber("Contents volume per floor area (ft³/ft²)", "pk-density", { step: "any", min: "0", value: "2" });
   density.input.value = "2";
-  const box = makeNumber("Usable volume per box (ft^3)", "pk-box", { step: "any", min: "0", value: "3" });
+  const box = makeNumber("Usable volume per box (ft³)", "pk-box", { step: "any", min: "0", value: "3" });
   box.input.value = "3";
   const stack = makeNumber("Warehouse stacking allowance", "pk-stack", { step: "any", min: "0", value: "1.5" });
   stack.input.value = "1.5";
-  const truck = makeNumber("Box-truck cargo volume (ft^3)", "pk-truck", { step: "any", min: "0", value: "1000" });
+  const truck = makeNumber("Box-truck cargo volume (ft³)", "pk-truck", { step: "any", min: "0", value: "1000" });
   truck.input.value = "1000";
   for (const f of [area, density, box, stack, truck]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { area.input.value = "200"; density.input.value = "2"; box.input.value = "3"; stack.input.value = "1.5"; truck.input.value = "1000"; update(); });
@@ -2805,9 +2805,9 @@ export function computeSurfaceCondensationRisk({ air_temp_f = 0, air_rh_pct = 0,
 
 function renderSurfaceCondensationRisk(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Magnus dew-point relation and the keep-surfaces-above-dew-point rule (ANSI/IICRC S500), by name. The Magnus form is an approximation and the IR-read surface temperature GOVERNS; psychrometric is the chamber reference. A screen.";
-  const at = makeNumber("Chamber air temp (degF)", "scr-at", { step: "any", value: "80" });
+  const at = makeNumber("Chamber air temp (°F)", "scr-at", { step: "any", value: "80" });
   const rh = makeNumber("Chamber relative humidity (%)", "scr-rh", { step: "any", min: "0", max: "100", value: "50" });
-  const st = makeNumber("Coldest surface temp (degF, IR read)", "scr-st", { step: "any", value: "50" });
+  const st = makeNumber("Coldest surface temp (°F, IR read)", "scr-st", { step: "any", value: "50" });
   for (const f of [at, rh, st]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { at.input.value = "80"; rh.input.value = "50"; st.input.value = "50"; update(); });
   const oDew = makeOutputLine(outputRegion, "Dew point", "scr-out-dew");
@@ -2850,8 +2850,8 @@ export function computeSporeIoRatio({ indoor_spores_m3 = 0, outdoor_spores_m3 = 
 
 function renderSporeIoRatio(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Indoor/outdoor spore ratio and the marker-genera principle (ANSI/IICRC S520), by name. An independent environmental professional interprets clearance; a ratio at or under 1 alone does not clear a project. A screen, not a certificate.";
-  const ind = makeNumber("Indoor spore concentration (spores/m^3)", "sio-ind", { step: "any", min: "0", value: "800" });
-  const out = makeNumber("Outdoor control (spores/m^3)", "sio-out", { step: "any", min: "0", value: "1500" });
+  const ind = makeNumber("Indoor spore concentration (spores/m³)", "sio-ind", { step: "any", min: "0", value: "800" });
+  const out = makeNumber("Outdoor control (spores/m³)", "sio-out", { step: "any", min: "0", value: "1500" });
   const mark = makeCheckbox("Water-damage marker (Stachybotrys / Chaetomium) elevated indoors", "sio-mark", false);
   for (const f of [ind, out]) inputRegion.appendChild(f.wrap);
   inputRegion.appendChild(mark.wrap);
@@ -2897,8 +2897,8 @@ export function computeHardwoodFloorDryingMat({ floor_area_ft2 = 0, mat_coverage
 
 function renderHardwoodFloorDryingMat(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Hardwood floor drying-mat system sizing (ANSI/IICRC S500 Class 4 specialty drying), by name. The mat-system manufacturer's coverage and unit ratings GOVERN; subfloor construction and finish affect feasibility. A sizing screen.";
-  const area = makeNumber("Wet hardwood floor area (ft^2)", "hfm-area", { step: "any", min: "0", value: "120" });
-  const cov = makeNumber("Coverage per mat (ft^2)", "hfm-cov", { step: "any", min: "0", value: "6" });
+  const area = makeNumber("Wet hardwood floor area (ft²)", "hfm-area", { step: "any", min: "0", value: "120" });
+  const cov = makeNumber("Coverage per mat (ft²)", "hfm-cov", { step: "any", min: "0", value: "6" });
   const per = makeNumber("Mats per suction unit", "hfm-per", { step: "any", min: "0", value: "16" });
   for (const f of [area, cov, per]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { area.input.value = "120"; cov.input.value = "6"; per.input.value = "16"; update(); });
@@ -2943,8 +2943,8 @@ export function computeMoldCleaningLabor({ affected_sf = 0, production_sf_per_hr
 
 function renderMoldCleaningLabor(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Source-removal multi-pass cleaning labor method (ANSI/IICRC S520), by name. The Condition, substrate, and access GOVERN the production rate; non-cleanable porous materials are removed, not cleaned. A labor screen.";
-  const area = makeNumber("Cleanable affected surface (ft^2)", "mcl-area", { step: "any", min: "0", value: "500" });
-  const prod = makeNumber("Production rate (ft^2/hr per pass)", "mcl-prod", { step: "any", min: "0", value: "100" });
+  const area = makeNumber("Cleanable affected surface (ft²)", "mcl-area", { step: "any", min: "0", value: "500" });
+  const prod = makeNumber("Production rate (ft²/hr per pass)", "mcl-prod", { step: "any", min: "0", value: "100" });
   const pass = makeNumber("Cleaning passes (vac / wipe / vac)", "mcl-pass", { step: "any", min: "1", value: "2" });
   const crew = makeNumber("Crew size", "mcl-crew", { step: "any", min: "0", value: "2" });
   for (const f of [area, prod, pass, crew]) inputRegion.appendChild(f.wrap);

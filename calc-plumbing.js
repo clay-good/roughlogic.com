@@ -894,7 +894,7 @@ export function renderPipeExpansion(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Linear thermal expansion dL = alpha * L * dT. Coefficients (per F) from NIST and manufacturer technical bulletins.";
   const mat = makeSelect("Material", "pe-m", Object.keys(PIPE_EXPANSION_ALPHA_PER_F).map((m) => ({ value: m, label: m })));
   const len = makeNumber("Length (ft)", "pe-l", { step: "any", min: "0" });
-  const dT = makeNumber("Temperature change (F)", "pe-t", { step: "any" });
+  const dT = makeNumber("Temperature change (°F)", "pe-t", { step: "any" });
   for (const f of [mat, len, dT]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { mat.select.value = "copper"; len.input.value = "100"; dT.input.value = "80"; update(); });
   const oL = makeOutputLine(outputRegion, "Expansion", "pe-out-l");
@@ -925,7 +925,7 @@ export function renderTanklessGPM(inputRegion, outputRegion, citationEl) {
   const tgpm = makeNumber("Target flow (gpm, for inverse)", "tl-tg", { step: "any", min: "0" });
   const zone = makeSelect("Climate zone", "tl-z", Object.keys(TANKLESS_INLET_F_BY_ZONE).map((z) => ({ value: z, label: z.replace(/_/g, " ") })));
   const ovr = makeNumber("Inlet override (F, winter worst-case; blank = zone)", "tl-ov", { step: "any", min: "0" });
-  const out = makeNumber("Target outlet (F)", "tl-o", { step: "any", min: "0", value: "110" });
+  const out = makeNumber("Target outlet (°F)", "tl-o", { step: "any", min: "0", value: "110" });
   out.input.value = "110";
   for (const f of [solve, kbtu, tgpm, zone, ovr, out]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { solve.select.value = "kbtu"; kbtu.input.value = ""; tgpm.input.value = "5"; zone.select.value = "5A_Chicago_IL"; ovr.input.value = "40"; out.input.value = "110"; update(); });
@@ -1263,7 +1263,7 @@ export const backflowLossExample = {
 export function renderStormwaterRational(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Rational method Q = C * i * A (cfs / acres / in-per-hr). Public engineering practice. Runoff coefficients bundled per surface from public engineering tables.";
   attachExampleButton(inputRegion, () => fillExample(stormwaterRationalExample.inputs));
-  const a = makeNumber("Catchment area (ft^2)", "sw-a", { step: "any", min: "0" });
+  const a = makeNumber("Catchment area (ft²)", "sw-a", { step: "any", min: "0" });
   const s = makeSelect("Surface", "sw-s", Object.keys(RUNOFF_COEFFICIENTS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   const r = makeNumber("Rainfall intensity (in/hr)", "sw-r", { step: "any", min: "0" });
   for (const f of [a, s, r]) inputRegion.appendChild(f.wrap);
@@ -1374,7 +1374,7 @@ export function renderGlycolMix(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Manufacturer freeze-point curves (Dow Dowfrost / Dowtherm). Attribution included with output.";
   attachExampleButton(inputRegion, () => fillExample(glycolMixExample.inputs));
   const sv = makeNumber("System volume (gal)", "gm-sv", { step: "any", min: "0" });
-  const tb = makeNumber("Target protection (F)", "gm-tb", { step: "any" });
+  const tb = makeNumber("Target protection (°F)", "gm-tb", { step: "any" });
   const gt = makeSelect("Glycol type", "gm-gt", [{ value: "propylene", label: "Propylene (food/HVAC)" }, { value: "ethylene", label: "Ethylene (industrial)" }]);
   // v23 EN.6: burst-vs-freeze protection toggle.
   const pm = makeSelect("Protection mode", "gm-pm", [{ value: "freeze", label: "Freeze (full flow protection)" }, { value: "burst", label: "Burst (line-rupture only, less glycol)" }]);
@@ -1400,8 +1400,8 @@ export function renderExpansionTank(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: V_tank = V_sys * ((rho_cold/rho_hot) - 1) / (1 - (P_i/P_f)) using public expansion-tank derivation. Water densities interpolated from public engineering tables.";
   attachExampleButton(inputRegion, () => fillExample(expansionTankExample.inputs));
   const sv = makeNumber("System water volume (gal)", "et-sv", { step: "any", min: "0" });
-  const ft = makeNumber("Fill temp (F)", "et-ft", { step: "any", value: "60" }); ft.input.value = "60";
-  const mt = makeNumber("Max water temp (F)", "et-mt", { step: "any", value: "200" }); mt.input.value = "200";
+  const ft = makeNumber("Fill temp (°F)", "et-ft", { step: "any", value: "60" }); ft.input.value = "60";
+  const mt = makeNumber("Max water temp (°F)", "et-mt", { step: "any", value: "200" }); mt.input.value = "200";
   const fp = makeNumber("Fill pressure (psi)", "et-fp", { step: "any", value: "12" }); fp.input.value = "12";
   const rp = makeNumber("Relief pressure (psi)", "et-rp", { step: "any", value: "30" }); rp.input.value = "30";
   for (const f of [sv, ft, mt, fp, rp]) inputRegion.appendChild(f.wrap);
@@ -2018,11 +2018,11 @@ function _v9p_renderRecircLoopSizing(inputRegion, outputRegion, citationEl) {
   );
   const ins = makeNumber("Insulation thickness (in; 0 / 0.5 / 1 / 1.5)", "rls-ins", { step: "any", min: "0", value: "1" });
   ins.input.value = "1";
-  const hot = makeNumber("Hot supply temperature (F)", "rls-hot", { step: "any", value: "120" });
+  const hot = makeNumber("Hot supply temperature (°F)", "rls-hot", { step: "any", value: "120" });
   hot.input.value = "120";
-  const amb = makeNumber("Ambient temperature surrounding pipe (F)", "rls-amb", { step: "any", value: "65" });
+  const amb = makeNumber("Ambient temperature surrounding pipe (°F)", "rls-amb", { step: "any", value: "65" });
   amb.input.value = "65";
-  const dt = makeNumber("Set-point delta (F)", "rls-dt", { step: "any", min: "0", value: "10" });
+  const dt = makeNumber("Set-point delta (°F)", "rls-dt", { step: "any", min: "0", value: "10" });
   dt.input.value = "10";
   const fuel = makeSelect("Heating fuel (for annual cost)", "rls-fuel", [
     { value: "gas", label: "Natural gas ($/therm)", selected: true },
@@ -2199,8 +2199,8 @@ function _v16p_renderWaterHeaterRecovery(inputRegion, outputRegion, citationEl) 
   const btu = makeNumber("Gas input rating (BTU/hr)", "whr-btu", { step: "any", min: "0", value: "40000" });
   const kw = makeNumber("Electric element rating (kW)", "whr-kw", { step: "any", min: "0", value: "4.5" });
   const eff = makeNumber("Recovery efficiency (blank = default)", "whr-eff", { step: "any", min: "0", max: "1.05" });
-  const tin = makeNumber("Incoming water temp (F)", "whr-tin", { step: "any", value: "50" });
-  const tset = makeNumber("Set-point temp (F)", "whr-tset", { step: "any", value: "120" });
+  const tin = makeNumber("Incoming water temp (°F)", "whr-tin", { step: "any", value: "50" });
+  const tset = makeNumber("Set-point temp (°F)", "whr-tset", { step: "any", value: "120" });
   const tank = makeNumber("Tank size (gal)", "whr-tank", { step: "any", min: "0", value: "40" });
   // v23 EN.5: peak-demand sizing cross-check (fixtures x draw, gph).
   const peak = makeNumber("Peak demand (gph, optional)", "whr-peak", { step: "any", min: "0" });
@@ -2293,8 +2293,8 @@ function renderWaterHeaterInput(inputRegion, outputRegion, citationEl) {
   ]);
   const rec = makeNumber("Target recovery rate (gph)", "whi-rec", { step: "any", min: "0", value: "54.9" });
   const eff = makeNumber("Recovery efficiency (blank = default)", "whi-eff", { step: "any", min: "0", max: "1.05" });
-  const tin = makeNumber("Incoming water temp (F)", "whi-tin", { step: "any", value: "50" });
-  const tset = makeNumber("Set-point temp (F)", "whi-tset", { step: "any", value: "120" });
+  const tin = makeNumber("Incoming water temp (°F)", "whi-tin", { step: "any", value: "50" });
+  const tset = makeNumber("Set-point temp (°F)", "whi-tset", { step: "any", value: "120" });
   for (const f of [type, rec, eff, tin, tset]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { type.select.value = "gas_atmospheric"; rec.input.value = "54.9"; eff.input.value = "0.80"; tin.input.value = "50"; tset.input.value = "120"; update(); });
   const oInput = makeOutputLine(outputRegion, "Required input rating", "whi-out-input");
@@ -2406,8 +2406,8 @@ function _v16p_renderWhExpansionTank(inputRegion, outputRegion, citationEl) {
   const vol = makeNumber("Water heater capacity (gal)", "xt-vol", { step: "any", min: "0", value: "40" });
   const pin = makeNumber("Incoming pressure (psi)", "xt-pin", { step: "any", min: "0", value: "60" });
   const prel = makeNumber("Relief setting (psi)", "xt-prel", { step: "any", min: "0", value: "150" });
-  const tin = makeNumber("Incoming water temp (F)", "xt-tin", { step: "any", value: "50" });
-  const tset = makeNumber("Set-point temp (F)", "xt-tset", { step: "any", value: "120" });
+  const tin = makeNumber("Incoming water temp (°F)", "xt-tin", { step: "any", value: "50" });
+  const tset = makeNumber("Set-point temp (°F)", "xt-tset", { step: "any", value: "120" });
   const af = makeNumber("Acceptance factor (manufacturer)", "xt-af", { step: "any", min: "0", max: "1", value: "0.46" });
   for (const f of [vol, pin, prel, tin, tset, af]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
@@ -3044,9 +3044,9 @@ function renderThermalExpansionVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Water density vs. temperature, NIST / standard steam tables (public domain). dV = V*(rho_cold/rho_hot - 1), interpolated within 32-212 F. Distinct from the expansion-tank sizing tiles - this outputs the raw expansion volume only. Free at nist.gov.";
   const vol = makeNumber("System water volume (gal)", "tev-v", { step: "any", min: "0", value: "50" });
   vol.input.value = "50";
-  const cold = makeNumber("Cold inlet temperature (F)", "tev-c", { step: "any", value: "50" });
+  const cold = makeNumber("Cold inlet temperature (°F)", "tev-c", { step: "any", value: "50" });
   cold.input.value = "50";
-  const hot = makeNumber("Set hot temperature (F)", "tev-h", { step: "any", value: "140" });
+  const hot = makeNumber("Set hot temperature (°F)", "tev-h", { step: "any", value: "140" });
   hot.input.value = "140";
   const sys = makeSelect("System type", "tev-sys", [{ value: "closed", label: "Closed (needs expansion control)", selected: true }, { value: "open", label: "Open" }]);
   for (const f of [vol, cold, hot, sys]) inputRegion.appendChild(f.wrap);
@@ -3207,11 +3207,11 @@ function _v26renderMixedWaterTemp(inputRegion, outputRegion, citationEl) {
     { value: "find-mix-ratio", label: "Find mix ratio for a target" },
     { value: "find-hot-flow", label: "Find hot flow for a target" },
   ]);
-  const th = makeNumber("Hot supply temp (F)", "mwt-th", { step: "any" });
-  const tc = makeNumber("Cold supply temp (F)", "mwt-tc", { step: "any" });
+  const th = makeNumber("Hot supply temp (°F)", "mwt-th", { step: "any" });
+  const tc = makeNumber("Cold supply temp (°F)", "mwt-tc", { step: "any" });
   const qh = makeNumber("Hot flow (gpm)", "mwt-qh", { step: "any", min: "0" });
   const qc = makeNumber("Cold flow (gpm)", "mwt-qc", { step: "any", min: "0" });
-  const tt = makeNumber("Target delivered temp (F)", "mwt-tt", { step: "any" });
+  const tt = makeNumber("Target delivered temp (°F)", "mwt-tt", { step: "any" });
   for (const f of [mode, th, tc, qh, qc, tt]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { mode.select.value = "find-blend"; th.input.value = "140"; tc.input.value = "60"; qh.input.value = "1"; qc.input.value = "1"; tt.input.value = ""; update(); });
 
@@ -3606,7 +3606,7 @@ function renderWaterHeaterStorageSizing(inputRegion, outputRegion, citationEl) {
   const tank = makeNumber("Tank capacity (gal)", "whss-tank", { step: "any", min: "0", value: "50" });
   const input = makeNumber("Input rate (BTU/hr)", "whss-in", { step: "any", min: "0", value: "40000" });
   const eff = makeNumber("Recovery efficiency (%)", "whss-eff", { step: "any", min: "0", value: "80" });
-  const rise = makeNumber("Temperature rise (F)", "whss-rise", { step: "any", min: "0", value: "90" });
+  const rise = makeNumber("Temperature rise (°F)", "whss-rise", { step: "any", min: "0", value: "90" });
   const usable = makeNumber("Usable-storage fraction", "whss-usable", { step: "any", min: "0", value: "0.70" });
   const peak = makeNumber("Peak-hour demand (gal)", "whss-peak", { step: "any", min: "0", value: "80" });
   tank.input.value = "50"; input.input.value = "40000"; eff.input.value = "80"; rise.input.value = "90"; usable.input.value = "0.70"; peak.input.value = "80";
@@ -3739,12 +3739,12 @@ export const radiantLoopSizingExample = { inputs: { floor_area_ft2: 300, spacing
 
 function renderRadiantLoopSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Radiant floor loop sizing - tube footage = area x 12 / spacing; loops = ceil(footage / max loop length); flow GPM = Q / (500 x delta-T), split across the loops - first-principles, with the radiant-panel practice per ASHRAE HVAC Systems and Equipment (radiant panel chapter) and the Radiant Panel Association, by name. The manufacturer's tubing tables and the room-by-room heat loss govern the final layout; this sizes footage, loops, and flow from a uniform load, not the panel surface-temperature or downward-loss design.";
-  const area = makeNumber("Heated floor area (ft^2)", "rl-area", { step: "any", min: "0" });
+  const area = makeNumber("Heated floor area (ft²)", "rl-area", { step: "any", min: "0" });
   const spacing = makeNumber("Tube on-center spacing (in)", "rl-sp", { step: "any", min: "0", value: "9" });
   const load = makeNumber("Design heat load (Btu/hr)", "rl-load", { step: "any", min: "0" });
   const maxLoop = makeNumber("Max loop length (ft)", "rl-ml", { step: "any", min: "0", value: "300" });
   maxLoop.input.value = "300";
-  const dt = makeNumber("Supply-to-return delta-T (F)", "rl-dt", { step: "any", min: "0", value: "20" });
+  const dt = makeNumber("Supply-to-return delta-T (°F)", "rl-dt", { step: "any", min: "0", value: "20" });
   dt.input.value = "20";
   for (const f of [area, spacing, load, maxLoop, dt]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { area.input.value = "300"; spacing.input.value = "6"; load.input.value = "9000"; maxLoop.input.value = "300"; dt.input.value = "20"; update(); });
@@ -3902,7 +3902,7 @@ export const tankDrainTimeExample = { inputs: { tank_area_ft2: 100, d_in: 6, cd:
 function _v630renderTankDrainTime(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: falling-head (Torricelli) drain time t = 2 A_t (sqrt(h1) - sqrt(h2)) / (Cd A_o sqrt(2 g)), g = 32.2 ft/s^2, Cd ~ 0.6 sharp-edged, prismatic tank, head above the orifice, by name. Integrates the orifice equation over the falling head; the flow slows as sqrt(h). A design aid; the engineer of record governs.";
   attachExampleButton(inputRegion, () => { at.input.value = "100"; d.input.value = "6"; cd.input.value = "0.60"; h1.input.value = "9"; h2.input.value = "0"; update(); });
-  const at = makeNumber("Tank cross-section area (ft^2)", "tdt-at", { step: "any", min: "0" });
+  const at = makeNumber("Tank cross-section area (ft²)", "tdt-at", { step: "any", min: "0" });
   const d = makeNumber("Orifice diameter (in)", "tdt-d", { step: "any", min: "0" });
   const cd = makeNumber("Discharge coefficient Cd", "tdt-cd", { step: "any", min: "0" });
   cd.input.value = "0.60";
@@ -4138,7 +4138,7 @@ export const velocityHeadExample = { inputs: { V_fps: 10, gamma: 62.4, rho: 1.94
 function _v371renderVelocityHead(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: velocity head h_v = V^2/(2g) (g = 32.2 ft/s^2) and dynamic pressure q = 1/2 rho V^2, first-principles fluid mechanics. Both scale with V^2. The code velocity limits (~5-8 ft/s water) and the engineer of record govern.";
   const V = makeNumber("Flow velocity (ft/s)", "vh-v", { step: "any", min: "0" }); V.input.value = "10";
-  const rho = makeNumber("Fluid density (slug/ft^3, 1.94 water)", "vh-rho", { step: "any", min: "0" }); rho.input.value = "1.94";
+  const rho = makeNumber("Fluid density (slug/ft³, 1.94 water)", "vh-rho", { step: "any", min: "0" }); rho.input.value = "1.94";
   for (const f of [V, rho]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { V.input.value = "10"; rho.input.value = "1.94"; update(); });
   const oHv = makeOutputLine(outputRegion, "Velocity head", "vh-out-hv");
@@ -4215,7 +4215,7 @@ function _v373renderBernoulliHead(inputRegion, outputRegion, citationEl) {
   const P = makeNumber("Gauge pressure (psi)", "bh-p", { step: "any" }); P.input.value = "30";
   const V = makeNumber("Velocity (ft/s)", "bh-v", { step: "any", min: "0" }); V.input.value = "6";
   const z = makeNumber("Elevation (ft)", "bh-z", { step: "any" }); z.input.value = "10";
-  const g = makeNumber("Fluid specific weight (lb/ft^3, 62.4 water)", "bh-g", { step: "any", min: "0" }); g.input.value = "62.4";
+  const g = makeNumber("Fluid specific weight (lb/ft³, 62.4 water)", "bh-g", { step: "any", min: "0" }); g.input.value = "62.4";
   for (const f of [P, V, z, g]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { P.input.value = "30"; V.input.value = "6"; z.input.value = "10"; g.input.value = "62.4"; update(); });
   const oComp = makeOutputLine(outputRegion, "Pressure / velocity / elevation head", "bh-out-comp");
@@ -4303,7 +4303,7 @@ export function computeThrustBlockMaxPressure({ bearing_area_ft2 = 0, od_in = 0,
 export const thrustBlockMaxPressureExample = { inputs: { bearing_area_ft2: 4.13, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 } };
 function _v745renderThrustBlockMaxPressure(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: AWWA M41 (Ductile-Iron Pipe and Fittings) thrust-block method -- T = 2 P A sin(theta/2), Ab = T / soil, solved for the pressure: P = Ab x soil / (2 A sin(theta/2)). Compare against the test/surge pressure and a geotechnical soil-bearing value. Checks the bearing face only; the engineer of record governs the block design.";
-  const Ab = makeNumber("Bearing-face area (ft^2)", "tbm-a", { step: "any", min: "0" }); Ab.input.value = "4.13";
+  const Ab = makeNumber("Bearing-face area (ft²)", "tbm-a", { step: "any", min: "0" }); Ab.input.value = "4.13";
   const od = makeNumber("Pipe outside diameter (in)", "tbm-od", { step: "any", min: "0" }); od.input.value = "8.625";
   const bend = makeNumber("Bend angle (deg)", "tbm-b", { step: "any", min: "0" }); bend.input.value = "90";
   const soil = makeNumber("Allowable soil bearing (psf)", "tbm-s", { step: "any", min: "0" }); soil.input.value = "2000";
@@ -4740,7 +4740,7 @@ function _v1135renderVentTerminalCheck(inputRegion, outputRegion, citationEl) {
   const h = makeNumber("Height above the roof (in)", "vtc-h", { step: "any", min: "0" }); h.input.value = "6";
   const sn = makeNumber("Anticipated snow accumulation (in)", "vtc-sn", { step: "any", min: "0" }); sn.input.value = "18";
   const ru = makeSelect("Roof used for anything but weather protection?", "vtc-ru", [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes - 7 ft applies" }]);
-  const dt = makeNumber("97.5% outdoor design temperature (degF)", "vtc-dt", { step: "any" }); dt.input.value = "-10";
+  const dt = makeNumber("97.5% outdoor design temperature (°F)", "vtc-dt", { step: "any" }); dt.input.value = "-10";
   const di = makeNumber("Vent diameter through the roof (in)", "vtc-di", { step: "any", min: "0" }); di.input.value = "2";
   const ic = makeNumber("Size increase made this far inside the thermal envelope (in; 0 = none)", "vtc-ic", { step: "any", min: "0" }); ic.input.value = "6";
   const hz = makeNumber("Horizontal distance to the nearest door, openable window, or intake (ft)", "vtc-hz", { step: "any", min: "0" }); hz.input.value = "4";

@@ -501,7 +501,7 @@ const renderCropYield = _r({
     { key: "weight_in_strip_lb", label: "Weight in strip (lb)", kind: "number" },
     { key: "current_moisture_pct", label: "Current moisture %", kind: "number" },
     { key: "ground_loss_lb_in_area", label: "Ground-loss weight (lb, optional)", kind: "number" },
-    { key: "ground_loss_area_ft2", label: "Ground-loss area (ft^2, optional)", kind: "number" },
+    { key: "ground_loss_area_ft2", label: "Ground-loss area (ft², optional)", kind: "number" },
   ],
   outputs: [
     { key: "y", id: "cy-out-y", label: "Yield (bu/acre, std moisture)", value: (r) => fmt(r.yield_bu_per_acre, 1) },
@@ -1256,7 +1256,7 @@ function renderBunkerSiloCapacity(inputRegion, outputRegion, citationEl) {
   h.input.value = "8";
   const L = makeNumber("Length (ft)", "bsc-l", { step: "any", min: "0", value: "100" });
   L.input.value = "100";
-  const rho = makeNumber("As-fed density (lb/ft^3)", "bsc-rho", { step: "any", min: "0", value: "44" });
+  const rho = makeNumber("As-fed density (lb/ft³)", "bsc-rho", { step: "any", min: "0", value: "44" });
   rho.input.value = "44";
   for (const f of [b, t, h, L, rho]) inputRegion.appendChild(f.wrap);
   const oT = makeOutputLine(outputRegion, "Forage capacity", "bsc-out-tons");
@@ -1798,7 +1798,7 @@ function renderGrowingDegreeDays(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the USDA / NWS growing-degree-day method and McMaster & Wilhelm (1997), 'Growing degree-days: one equation, two interpretations,' Agric. & Forest Meteorology 87, by name. Corn 50/86 F base/cutoff is the land-grant extension convention. Free at university extension sites.";
   const data = makeText("Daily Tmax/Tmin pairs (e.g. 92/64, 90/62)", "gdd-data", { value: "92/64" });
   data.input.value = "92/64";
-  const base = makeNumber("Base temperature (F)", "gdd-base", { step: "any", value: "50" }); base.input.value = "50";
+  const base = makeNumber("Base temperature (°F)", "gdd-base", { step: "any", value: "50" }); base.input.value = "50";
   const cutoff = makeNumber("Upper cutoff (F, 0 = none)", "gdd-cut", { step: "any", min: "0", value: "86" }); cutoff.input.value = "86";
   const method = makeSelect("Method", "gdd-method", [{ value: "standard", label: "Standard" }, { value: "modified", label: "Modified (cap/floor)", selected: true }]);
   for (const f of [data, base, cutoff, method]) inputRegion.appendChild(f.wrap);
@@ -1912,10 +1912,10 @@ function renderLivestockWaterRequirement(inputRegion, outputRegion, citationEl) 
   citationEl.textContent = "Citation: Per NRC Nutrient Requirements of Beef Cattle / Dairy Cattle water-intake guidance and the USDA NRCS National Range and Pasture Handbook water section, by name; per-class gallon breakpoints user-supplied (table values, not reproduced). Distinct from thi-livestock. Free NRCS guidance at nrcs.usda.gov.";
   const method = makeSelect("Method", "lwr-method", [{ value: "table", label: "Temperature table (interpolate)", selected: true }, { value: "intake", label: "Intake ratio (water per DMI)" }]);
   const head = makeNumber("Head count", "lwr-head", { step: "1", min: "1", value: "50" }); head.input.value = "50";
-  const temp = makeNumber("Air temperature (F)", "lwr-temp", { step: "any", value: "80" }); temp.input.value = "80";
-  const tl = makeNumber("Low breakpoint temp (F)", "lwr-tl", { step: "any", value: "40" }); tl.input.value = "40";
+  const temp = makeNumber("Air temperature (°F)", "lwr-temp", { step: "any", value: "80" }); temp.input.value = "80";
+  const tl = makeNumber("Low breakpoint temp (°F)", "lwr-tl", { step: "any", value: "40" }); tl.input.value = "40";
   const gl = makeNumber("Gallons/head at low temp", "lwr-gl", { step: "any", min: "0", value: "8" }); gl.input.value = "8";
-  const th = makeNumber("High breakpoint temp (F)", "lwr-th", { step: "any", value: "90" }); th.input.value = "90";
+  const th = makeNumber("High breakpoint temp (°F)", "lwr-th", { step: "any", value: "90" }); th.input.value = "90";
   const gh = makeNumber("Gallons/head at high temp", "lwr-gh", { step: "any", min: "0", value: "20" }); gh.input.value = "20";
   const dmi = makeNumber("Dry-matter intake (lb, intake method)", "lwr-dmi", { step: "any", min: "0" });
   const ratio = makeNumber("Water per lb DMI (gal-lb basis)", "lwr-ratio", { step: "any", min: "0", value: "3.5" }); ratio.input.value = "3.5";
@@ -2307,7 +2307,7 @@ const renderSprinklerPrecipRate = _v23SimpleRenderer({
   example: sprinklerPrecipRateExample.inputs,
   fields: [
     { key: "zone_gpm", label: "Zone flow, all heads (gpm)", kind: "number" },
-    { key: "zone_ft2", label: "Zone area covered (ft^2)", kind: "number" },
+    { key: "zone_ft2", label: "Zone area covered (ft²)", kind: "number" },
   ],
   outputs: [
     { key: "pr", id: "spr-out-pr", label: "Precipitation rate", value: (r) => fmt(r.precip_in_hr, 2) + " in/hr" },
@@ -2339,7 +2339,7 @@ const renderSprinklerGpmForPrecip = _v23SimpleRenderer({
   example: sprinklerGpmForPrecipExample.inputs,
   fields: [
     { key: "target_precip_in_hr", label: "Target precipitation rate (in/hr)", kind: "number" },
-    { key: "zone_ft2", label: "Zone area covered (ft^2)", kind: "number" },
+    { key: "zone_ft2", label: "Zone area covered (ft²)", kind: "number" },
   ],
   outputs: [
     { key: "gpm", id: "sgp-out-gpm", label: "Required zone flow", value: (r) => fmt(r.required_gpm, 1) + " gpm" },
@@ -2451,7 +2451,7 @@ const renderPlantSpacingCount = _v23SimpleRenderer({
   citation: "Citation: first-principles square- and triangular-grid relations with nursery / landscape estimating references for the staggered-grid 0.866 = sqrt(3)/2 factor (by name). square = area / spacing^2; triangular = area / (0.866 x spacing^2), about 15% more. Spacing from the mature spread or planting plan; this is a takeoff aid, not a horticultural plan.",
   example: plantSpacingCountExample.inputs,
   fields: [
-    { key: "bed_ft2", label: "Bed area to plant (ft^2)", kind: "number" },
+    { key: "bed_ft2", label: "Bed area to plant (ft²)", kind: "number" },
     { key: "spacing_in", label: "On-center spacing (in)", kind: "number" },
   ],
   outputs: [
@@ -2485,10 +2485,10 @@ const renderSodTakeoff = _v23SimpleRenderer({
   citation: "Citation: first-principles area-plus-waste takeoff relation with turfgrass producer / landscape estimating references (by name). order = lawn x (1 + waste/100); slabs = ceil(order / slab); pallets = ceil(order / pallet). Slab/pallet coverage vary by farm (defaults ~10 / ~450 ft^2, editable); this is an ordering aid, not an agronomic spec.",
   example: sodTakeoffExample.inputs,
   fields: [
-    { key: "lawn_ft2", label: "Lawn area to sod (ft^2)", kind: "number" },
+    { key: "lawn_ft2", label: "Lawn area to sod (ft²)", kind: "number" },
     { key: "waste_pct", label: "Cut / edge waste (%)", kind: "number", default: 5 },
-    { key: "slab_ft2", label: "Slab coverage (ft^2)", kind: "number", default: 10 },
-    { key: "pallet_ft2", label: "Pallet coverage (ft^2)", kind: "number", default: 450 },
+    { key: "slab_ft2", label: "Slab coverage (ft²)", kind: "number", default: 10 },
+    { key: "pallet_ft2", label: "Pallet coverage (ft²)", kind: "number", default: 450 },
   ],
   outputs: [
     { key: "o", id: "sod-out-o", label: "Order area", value: (r) => fmt(r.order_ft2, 0) + " ft^2 (" + fmt(r.order_syd, 1) + " syd)" },
@@ -2691,11 +2691,11 @@ export function computeMulchTopsoilVolume({ area_ft2 = 0, depth_in = 0, bulk_den
 export const mulchTopsoilVolumeExample = { inputs: { area_ft2: 1000, depth_in: 3, bulk_density: 1.1, bag_ft3: 2, load_yd3: 10, waste_pct: 0 } };
 function renderMulchTopsoilVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Bulk landscape material take-off (first-principles volume): cubic yards = area x depth / 324 (depth in inches), bags = ceil(yd^3 x 27 / bag size), tons = yd^3 x bulk density, truckloads = ceil(yd^3 / load). Bulk densities: mulch ~0.5, topsoil ~1.1, gravel ~1.4 ton/yd^3. A quantity aid; the supplier's bag/load size and product density govern.";
-  const area = makeNumber("Area (ft^2)", "mtv-area", { step: "any", min: "0", value: "1000" });
+  const area = makeNumber("Area (ft²)", "mtv-area", { step: "any", min: "0", value: "1000" });
   const depth = makeNumber("Depth (in)", "mtv-depth", { step: "any", min: "0", value: "3" });
-  const dens = makeNumber("Bulk density (ton/yd^3: mulch 0.5, topsoil 1.1, gravel 1.4)", "mtv-dens", { step: "any", min: "0", value: "1.1" });
-  const bag = makeNumber("Bag size (ft^3, default 2)", "mtv-bag", { step: "any", min: "0", value: "2" });
-  const load = makeNumber("Truck load (yd^3, default 10)", "mtv-load", { step: "any", min: "0", value: "10" });
+  const dens = makeNumber("Bulk density (ton/yd³: mulch 0.5, topsoil 1.1, gravel 1.4)", "mtv-dens", { step: "any", min: "0", value: "1.1" });
+  const bag = makeNumber("Bag size (ft³, default 2)", "mtv-bag", { step: "any", min: "0", value: "2" });
+  const load = makeNumber("Truck load (yd³, default 10)", "mtv-load", { step: "any", min: "0", value: "10" });
   const waste = makeNumber("Waste/compaction allowance (%)", "mtv-waste", { step: "any", min: "0", value: "0" });
   for (const f of [area, depth, dens, bag, load, waste]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { area.input.value = "1000"; depth.input.value = "3"; dens.input.value = "1.1"; bag.input.value = "2"; load.input.value = "10"; waste.input.value = "0"; update(); });
@@ -3468,8 +3468,8 @@ AGRICULTURE_RENDERERS["reference-et0"] = _r({
       { value: "jul", label: "July" }, { value: "aug", label: "August" }, { value: "sep", label: "September" },
       { value: "oct", label: "October" }, { value: "nov", label: "November" }, { value: "dec", label: "December" },
     ] },
-    { key: "tmax_f", label: "Daily high Tmax (F)", kind: "number", default: 86, attrs: { step: "any" } },
-    { key: "tmin_f", label: "Daily low Tmin (F)", kind: "number", default: 59, attrs: { step: "any" } },
+    { key: "tmax_f", label: "Daily high Tmax (°F)", kind: "number", default: 86, attrs: { step: "any" } },
+    { key: "tmin_f", label: "Daily low Tmin (°F)", kind: "number", default: 59, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "e", id: "et0-out-e", label: "Reference ET0", value: (r) => fmt(r.et0_in_day, 3) + " in/day (" + fmt(r.et0_mm_day, 2) + " mm/day)" },

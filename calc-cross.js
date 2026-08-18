@@ -1541,7 +1541,7 @@ const renderHeatStress = _simpleRendererG({
   citation: "Citation: NWS Rothfusz heat index; WBGT public approximation; OSHA work/rest cycle guidance generally.",
   example: heatStressExample.inputs,
   fields: [
-    { key: "T_F", label: "Dry-bulb temp (F)", kind: "number" },
+    { key: "T_F", label: "Dry-bulb temp (°F)", kind: "number" },
     { key: "RH_percent", label: "Relative humidity (%)", kind: "number" },
     { key: "solar", label: "Direct sun exposure", kind: "checkbox" },
   ],
@@ -1557,7 +1557,7 @@ const renderWindChill = _simpleRendererG({
   citation: "Citation: NWS 2001 wind chill formula; frostbite-time piecewise from public NWS exposure curves.",
   example: windChillExample.inputs,
   fields: [
-    { key: "T_F", label: "Ambient temp (F)", kind: "number" },
+    { key: "T_F", label: "Ambient temp (°F)", kind: "number" },
     { key: "wind_mph", label: "Wind (mph)", kind: "number" },
   ],
   outputs: [
@@ -1572,7 +1572,7 @@ const renderWindChillWindSpeed = _simpleRendererG({
   example: windChillWindSpeedExample.inputs,
   fields: [
     { key: "T_F", label: "Ambient temp (F, <= 50)", kind: "number" },
-    { key: "target_wc_F", label: "Target / reported wind chill (F)", kind: "number" },
+    { key: "target_wc_F", label: "Target / reported wind chill (°F)", kind: "number" },
   ],
   outputs: [
     { key: "w", id: "wcw-out-w", label: "Wind speed", value: (r) => _fmtG(r.wind_mph, 1) + " mph" },
@@ -2263,7 +2263,7 @@ function renderHydraulicCylinder(inputRegion, outputRegion, citationEl) {
   });
 
   const oForce = makeOutputLine(outputRegion, "Force (lb)", "hc-out-f");
-  const oArea = makeOutputLine(outputRegion, "Effective area (in^2)", "hc-out-a");
+  const oArea = makeOutputLine(outputRegion, "Effective area (in²)", "hc-out-a");
   const oSpeed = makeOutputLine(outputRegion, "Speed (in/s)", "hc-out-v");
   const oOil = makeOutputLine(outputRegion, "Oil per stroke (gal)", "hc-out-o");
   const oCycle = makeOutputLine(outputRegion, "Cycle time (s)", "hc-out-t");
@@ -3548,10 +3548,10 @@ CROSS_RENDERERS["radiant-heat-exchange"] = _simpleRendererG({
   citation: "Citation: Stefan-Boltzmann net radiant exchange q = eps F sigma A (T_s^4 - T_surr^4), sigma = 0.1714e-8 BTU/(hr ft^2 R^4), temperatures in absolute Rankine (NIST / first-principles radiation), by name. Radiation only -- add convection and conduction for the total. eps ~ 0.05 bright metal, ~0.9 paint/nonmetals; F = 1 for a small object in a large room. The real emissivity, geometry, and full heat balance govern.",
   example: radiantHeatExchangeExample.inputs,
   fields: [
-    { key: "area_ft2", label: "Radiating surface area (ft^2)", kind: "number", default: 10 },
+    { key: "area_ft2", label: "Radiating surface area (ft²)", kind: "number", default: 10 },
     { key: "emissivity", label: "Surface emissivity (shiny metal ~0.05, paint/nonmetal ~0.9)", kind: "number", default: 0.9 },
-    { key: "surface_temp_f", label: "Surface temperature (F)", kind: "number", default: 200 },
-    { key: "surroundings_temp_f", label: "Surroundings / facing-surface temperature (F)", kind: "number", default: 70 },
+    { key: "surface_temp_f", label: "Surface temperature (°F)", kind: "number", default: 200 },
+    { key: "surroundings_temp_f", label: "Surroundings / facing-surface temperature (°F)", kind: "number", default: 70 },
     { key: "view_factor", label: "View factor to surroundings (1 = fully surrounded)", kind: "number", default: 1 },
   ],
   outputs: [

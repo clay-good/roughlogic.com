@@ -518,6 +518,19 @@ main {
   color: var(--fg-muted);
 }
 
+/* The governs-the-work notice that every tile carries. It sits below the
+   answer, next to .view-detail, and it is the same sentence on all 1,709
+   pages -- so it reads as a quiet footnote rather than a card. The boxed
+   .inline-notice treatment is reserved for the tile-specific limitation
+   banner, which actually says something the reader has not seen before. */
+.view-notice {
+  margin: var(--space-3) 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--fg-dim);
+  overflow-wrap: anywhere;
+}
+
 /* v10 §B.1 limitation-banner: visually distinct from the citation
    footer and the result-area context band. Reuses .inline-notice as a
    base and thickens the left rule so the "what this is NOT" message

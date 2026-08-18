@@ -612,7 +612,7 @@ export function computeRiprapTonnage({ area_sf = 0, thickness_ft = 0, unit_wt_pc
 
 function _v824renderRiprapTonnage(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: layer take-off identity by name. volume (cy) = area x thickness / 27; tons = area x thickness x unit weight / 2000. Order to the placed density (voids), not the solid rock.";
-  const area = makeNumber("Plan area of the riprap layer (ft^2)", "rrt-area", { step: "any", min: "0" });
+  const area = makeNumber("Plan area of the riprap layer (ft²)", "rrt-area", { step: "any", min: "0" });
   const thick = makeNumber("Layer thickness (ft, at least 1.5 x D50)", "rrt-thick", { step: "any", min: "0" });
   const uw = makeNumber("Stone unit weight (pcf)", "rrt-uw", { step: "any", min: "0", value: "165" });
   uw.input.value = "165";
@@ -804,7 +804,7 @@ export function computeErosionBlanketCoverage({ area_sf = 0, overlap_pct = 10, r
 
 function _v828renderErosionBlanketCoverage(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: lapped-roll takeoff identity by name. rolls = ceil(area x (1 + overlap) / roll area); staples = ceil(area (sy) x staples per sy). The manufacturer's guide sets the overlap and staple pattern.";
-  const area = makeNumber("Slope area to cover (ft^2)", "ebc-area", { step: "any", min: "0" });
+  const area = makeNumber("Slope area to cover (ft²)", "ebc-area", { step: "any", min: "0" });
   const overlap = makeNumber("Side/end overlap allowance (%)", "ebc-overlap", { step: "any", min: "0", value: "10" });
   overlap.input.value = "10";
   const w = makeNumber("Blanket roll width (ft)", "ebc-w", { step: "any", min: "0", value: "8" });

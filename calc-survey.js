@@ -393,12 +393,12 @@ export const tapingCorrectionsExample = { inputs: { l_ft: 100, t_f: 95, t0_f: 68
 function renderTapingCorrections(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: steel-tape corrections temperature Ct = alpha (T - T0) L (alpha 6.45e-6 /degF), slope Ch = -h^2/(2L), tension Cp = (P - P0) L/(A E), sag Cs = -w^2 L^3/(24 P^2), per the standard surveying references (Ghilani/Wolf), by name. Approximate slope, unsupported sag. A computational aid; the tape calibration governs.";
   const l = makeNumber("Measured length L (ft)", "tap-l", { step: "any", min: "0" });
-  const t = makeNumber("Field temperature (degF)", "tap-t", { step: "any" }); t.input.value = "68";
-  const t0 = makeNumber("Standardization temperature (degF)", "tap-t0", { step: "any" }); t0.input.value = "68";
+  const t = makeNumber("Field temperature (°F)", "tap-t", { step: "any" }); t.input.value = "68";
+  const t0 = makeNumber("Standardization temperature (°F)", "tap-t0", { step: "any" }); t0.input.value = "68";
   const h = makeNumber("Elevation difference over span (ft, optional)", "tap-h", { step: "any" });
   const p = makeNumber("Applied pull P (lb, optional)", "tap-p", { step: "any" });
   const p0 = makeNumber("Standardization pull P0 (lb, optional)", "tap-p0", { step: "any" });
-  const a = makeNumber("Tape cross-section A (in^2, optional)", "tap-a", { step: "any", min: "0" });
+  const a = makeNumber("Tape cross-section A (in², optional)", "tap-a", { step: "any", min: "0" });
   const w = makeNumber("Tape weight per foot (lb/ft, optional)", "tap-w", { step: "any" });
   for (const f of [l, t, t0, h, p, p0, a, w]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { l.input.value = "100"; t.input.value = "95"; t0.input.value = "68"; h.input.value = "3"; p.input.value = ""; p0.input.value = ""; a.input.value = ""; w.input.value = ""; update(); });
@@ -806,7 +806,7 @@ function renderTapingNormalTension(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: normal tension, the pull at which the tension and sag corrections to a suspended steel tape cancel. Derived, not tabulated: setting (P - P0) L / (A E) = w^2 L^3 / (24 P^2) and substituting the span weight W = w L eliminates the length and leaves P^2 (P - P0) = A E W^2 / 24, whose square root is the textbook implicit form P = 0.204 W sqrt(A E) / sqrt(P - P0) (0.204 = 1/sqrt(24)). Solved here by bisection on the cubic. The component corrections match the taping-corrections tile exactly. Steel modulus 29,000,000 psi by default; tape area and weight per foot come from the tape's specification. Does not address temperature or standardization error, and normal tension may exceed a practical or rated pull. A field aid; the tape calibration and the survey's procedure govern.";
   const l = makeNumber("Unsupported span L (ft)", "tnt-l", { step: "any", min: "0" }); l.input.value = "100";
   const w = makeNumber("Tape weight per foot (lb/ft)", "tnt-w", { step: "any", min: "0" }); w.input.value = "0.02";
-  const a = makeNumber("Tape cross-section A (in^2)", "tnt-a", { step: "any", min: "0" }); a.input.value = "0.006";
+  const a = makeNumber("Tape cross-section A (in²)", "tnt-a", { step: "any", min: "0" }); a.input.value = "0.006";
   const p0 = makeNumber("Standardization pull P0 (lb)", "tnt-p0", { step: "any", min: "0" }); p0.input.value = "10";
   const pa = makeNumber("Pull you actually used (lb, optional)", "tnt-pa", { step: "any", min: "0" }); pa.input.value = "20";
   for (const f of [l, w, a, p0, pa]) inputRegion.appendChild(f.wrap);

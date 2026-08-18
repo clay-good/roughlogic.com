@@ -103,8 +103,8 @@ function _renderColdSpring(inputRegion, outputRegion, citationEl) {
     { value: "cpvc", label: "CPVC" }, { value: "pex", label: "PEX" },
   ]);
   const len = makeNumber("Run length (ft)", "cs-len", { step: "any", min: "0" });
-  const ti = makeNumber("Install temperature (F)", "cs-ti", { step: "any" });
-  const to = makeNumber("Operating temperature (F)", "cs-to", { step: "any" });
+  const ti = makeNumber("Install temperature (°F)", "cs-ti", { step: "any" });
+  const to = makeNumber("Operating temperature (°F)", "cs-to", { step: "any" });
   const csp = makeNumber("Cold-spring factor (%)", "cs-csp", { step: "any", min: "0", max: "100", value: "50" });
   csp.input.value = "50";
   for (const f of [mat, len, ti, to, csp]) inputRegion.appendChild(f.wrap);
@@ -157,7 +157,7 @@ export const racewayExpansionExample = { inputs: { run_length_ft: 100, temp_rang
 function _renderRacewayExpansion(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: PVC raceway thermal expansion and expansion-fitting sizing - dL = alpha * L * dT with the NEC Table 352.44 coefficient (3.38e-5 in/in/F), an expansion fitting required where the change is 0.25 in or greater in a straight run - per NEC Article 352.44 and Table 352.44 (rigid PVC conduit), by name; first-principles linear expansion. Set the fitting piston per the manufacturer's temperature chart at the install temperature. The AHJ-adopted NEC edition governs.";
   const len = makeNumber("Conduit run length (ft)", "rx-len", { step: "any", min: "0" });
-  const dT = makeNumber("Temperature range (F)", "rx-dt", { step: "any", min: "0" });
+  const dT = makeNumber("Temperature range (°F)", "rx-dt", { step: "any", min: "0" });
   const travel = makeNumber("Fitting rated travel (in)", "rx-travel", { step: "any", min: "0", value: "6" });
   travel.input.value = "6";
   for (const f of [len, dT, travel]) inputRegion.appendChild(f.wrap);
@@ -826,7 +826,7 @@ function _renderFlangeRating(inputRegion, outputRegion, citationEl) {
     { value: "600", label: "Class 600" }, { value: "900", label: "Class 900" },
     { value: "1500", label: "Class 1500" }, { value: "2500", label: "Class 2500" },
   ]);
-  const t = makeNumber("Service temperature (F)", "fr-t", { step: "any", value: "100" });
+  const t = makeNumber("Service temperature (°F)", "fr-t", { step: "any", value: "100" });
   for (const f of [cls, t]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cls.select.value = "150"; t.input.value = "400"; update(); });
   const oRate = makeOutputLine(outputRegion, "Max allowable working pressure", "fr-out-rate");
@@ -994,7 +994,7 @@ export function computeSteamPrvNapier({ orifice_area_in2 = 0, upstream_p_psia = 
 export const steamPrvNapierExample = { inputs: { orifice_area_in2: 0.5, upstream_p_psia: 100, downstream_p_psia: 30, discharge_coeff: 0.9 } };
 function _renderSteamPrvNapier(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: A sizing aid, not a relief-valve certification; ASME/API and the valve manufacturer govern. Citation: Napier's formula / ASME/API 520 / Grashof steam orifice / PRV capacity, by name. Choked when P2 < 0.58 x P1; capacity W = 51.43 x Cd x A x P1 (saturated, choked). When choked the capacity depends only on the upstream pressure. Napier is for saturated steam (superheat needs a Ksh factor); a liquid Cv (square-root in pressure drop) is wrong for choked steam, which is linear in P1. Apply the discharge coefficient (~0.6 sharp orifice, ~1 nozzle).";
-  const A = makeNumber("Orifice / seat area (in^2)", "spn-a", { step: "any", min: "0", value: "0.5" }); A.input.value = "0.5";
+  const A = makeNumber("Orifice / seat area (in²)", "spn-a", { step: "any", min: "0", value: "0.5" }); A.input.value = "0.5";
   const P1 = makeNumber("Upstream absolute pressure (psia)", "spn-p1", { step: "any", min: "0", value: "100" }); P1.input.value = "100";
   const P2 = makeNumber("Downstream absolute pressure (psia)", "spn-p2", { step: "any", min: "0", value: "30" }); P2.input.value = "30";
   const Cd = makeNumber("Discharge coefficient Cd (~0.6 orifice, ~1 nozzle)", "spn-cd", { step: "any", min: "0", max: "1", value: "0.9" }); Cd.input.value = "0.9";

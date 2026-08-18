@@ -475,8 +475,8 @@ FINISH_RENDERERS["gutter-downspout-takeoff"] = _simpleRenderer({
   example: gutterDownspoutTakeoffExample.inputs,
   fields: [
     { key: "eave_length_ft", label: "Total eave / gutter length (ft)", kind: "number", default: 140 },
-    { key: "roof_area_sf", label: "Tributary roof area (ft^2)", kind: "number", default: 2400 },
-    { key: "max_area_per_downspout_sf", label: "Max area per downspout (ft^2)", kind: "number", default: 800 },
+    { key: "roof_area_sf", label: "Tributary roof area (ft²)", kind: "number", default: 2400 },
+    { key: "max_area_per_downspout_sf", label: "Max area per downspout (ft²)", kind: "number", default: 800 },
     { key: "wall_height_ft", label: "Downspout drop height (ft)", kind: "number", default: 10 },
     { key: "hanger_spacing_ft", label: "Gutter hanger spacing (ft)", kind: "number", default: 2 },
   ],
@@ -518,10 +518,10 @@ FINISH_RENDERERS["soffit-ridge-vent-count"] = _simpleRenderer({
   citation: "Citation: vent-count identity by name. total NFA = attic area / ratio x 144; intake = exhaust = total / 2; soffit vents = ceil(intake / per-vent NFA); ridge = ceil(exhaust / ridge NFA per ft). The ratio comes from the IRC; the product NFA from the manufacturer.",
   example: soffitRidgeVentCountExample.inputs,
   fields: [
-    { key: "attic_area_sf", label: "Attic floor area (ft^2)", kind: "number", default: 1500 },
+    { key: "attic_area_sf", label: "Attic floor area (ft²)", kind: "number", default: 1500 },
     { key: "vent_ratio", label: "NFA ratio denominator (1/N)", kind: "number", default: 300 },
-    { key: "soffit_vent_nfa_in2", label: "NFA per soffit vent (in^2)", kind: "number", default: 26 },
-    { key: "ridge_nfa_per_ft_in2", label: "NFA per foot of ridge vent (in^2/ft)", kind: "number", default: 18 },
+    { key: "soffit_vent_nfa_in2", label: "NFA per soffit vent (in²)", kind: "number", default: 26 },
+    { key: "ridge_nfa_per_ft_in2", label: "NFA per foot of ridge vent (in²/ft)", kind: "number", default: 18 },
   ],
   outputs: [
     { key: "n", id: "srv-out-n", label: "Total net free area", value: (r) => fmt(r.total_nfa_in2, 0) + " in^2 (" + fmt(r.intake_nfa_in2, 0) + " each way)" },

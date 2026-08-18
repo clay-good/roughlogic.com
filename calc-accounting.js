@@ -1102,8 +1102,8 @@ function renderMileageRollup(inputRegion, outputRegion, citationEl) {
 function renderHomeOffice(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per IRS Publication 587 (Business Use of Your Home) and Form 8829. Simplified method: $5/ft^2 up to 300 ft^2 ($1,500 cap, Rev. Proc. 2013-13). Actual method: (office ft^2 / home ft^2) x total home expenses. The tile reports the higher of the two. Free at irs.gov.";
   inputRegion.appendChild(makeNotice(TAX_LAW_NOTICE));
-  const office = makeNumber("Home-office area (ft^2)", "ho-office", { step: "any", min: "0", value: "200" });
-  const home = makeNumber("Total home area (ft^2)", "ho-home", { step: "any", min: "0", value: "2000" });
+  const office = makeNumber("Home-office area (ft²)", "ho-office", { step: "any", min: "0", value: "200" });
+  const home = makeNumber("Total home area (ft²)", "ho-home", { step: "any", min: "0", value: "2000" });
   const expenses = makeNumber("Total home expenses ($/yr)", "ho-exp", { step: "any", min: "0", value: "24000" });
   for (const f of [office, home, expenses]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {

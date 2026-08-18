@@ -1260,8 +1260,8 @@ function renderEulerJohnsonColumn(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Euler-Johnson column buckling (Shigley, Mechanical Engineering Design, Ch. 4): SR = K L/sqrt(I/A), transition SR_D = pi sqrt(2 E/Sy); Euler Pcr = pi^2 E I/(K L)^2 for SR >= SR_D, J.B. Johnson Pcr = A[Sy - (Sy SR/(2 pi))^2/E] below it. K by end condition. Concentric load; apply a safety factor. A design aid; Shigley and the engineer of record govern.";
   const E = makeNumber("Modulus E (psi)", "ejc-e", { step: "any", min: "0" }); E.input.value = "30000000";
   const Sy = makeNumber("Yield strength Sy (psi)", "ejc-sy", { step: "any", min: "0" }); Sy.input.value = "40000";
-  const I = makeNumber("Moment of inertia I (in^4)", "ejc-i", { step: "any", min: "0" }); I.input.value = "0.05";
-  const A = makeNumber("Cross-section area A (in^2)", "ejc-a", { step: "any", min: "0" }); A.input.value = "1.0";
+  const I = makeNumber("Moment of inertia I (in⁴)", "ejc-i", { step: "any", min: "0" }); I.input.value = "0.05";
+  const A = makeNumber("Cross-section area A (in²)", "ejc-a", { step: "any", min: "0" }); A.input.value = "1.0";
   const L = makeNumber("Unbraced length L (in)", "ejc-l", { step: "any", min: "0" }); L.input.value = "20";
   const end = makeSelect("End condition", "ejc-end", Object.keys(COLUMN_END_K).map((k) => ({ value: k, label: COLUMN_END_K[k].label, selected: k === "pinned-pinned" })));
   for (const f of [E, Sy, I, A, L, end]) inputRegion.appendChild(f.wrap);

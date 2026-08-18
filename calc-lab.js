@@ -769,12 +769,12 @@ function renderIdealGasLaw(inputRegion, outputRegion, citationEl) {
     { value: "moles", label: "Moles n" },
     { value: "pressure", label: "Pressure P (atm)" },
     { value: "volume", label: "Volume V (L)", selected: true },
-    { value: "temperature", label: "Temperature T (C)" },
+    { value: "temperature", label: "Temperature T (°C)" },
   ]);
   const p = makeNumber("Pressure (atm)", "igl-p", { step: "any", min: "0", value: "1" }); p.input.value = "1";
   const v = makeNumber("Volume (L)", "igl-v", { step: "any", min: "0" });
   const n = makeNumber("Moles (mol)", "igl-n", { step: "any", min: "0", value: "1" }); n.input.value = "1";
-  const t = makeNumber("Temperature (C)", "igl-t", { step: "any", value: "25" }); t.input.value = "25";
+  const t = makeNumber("Temperature (°C)", "igl-t", { step: "any", value: "25" }); t.input.value = "25";
   for (const f of [solve, p, v, n, t]) inputRegion.appendChild(f.wrap);
   const oRes = makeOutputLine(outputRegion, "Result", "igl-out-res");
   const oMv = makeOutputLine(outputRegion, "Molar volume", "igl-out-mv");
@@ -812,7 +812,7 @@ function renderVanDerWaals(inputRegion, outputRegion, citationEl) {
   ]);
   const n = makeNumber("Moles (mol)", "vdw-n", { step: "any", min: "0", value: "1" }); n.input.value = "1";
   const v = makeNumber("Volume (L)", "vdw-v", { step: "any", min: "0", value: "1" }); v.input.value = "1";
-  const t = makeNumber("Temperature (C)", "vdw-t", { step: "any", value: "0" }); t.input.value = "0";
+  const t = makeNumber("Temperature (°C)", "vdw-t", { step: "any", value: "0" }); t.input.value = "0";
   for (const f of [gas, n, v, t]) inputRegion.appendChild(f.wrap);
   const oReal = makeOutputLine(outputRegion, "Real pressure (van der Waals)", "vdw-out-real");
   const oIdeal = makeOutputLine(outputRegion, "Ideal pressure (PV=nRT)", "vdw-out-ideal");
@@ -836,9 +836,9 @@ function renderArrheniusEquation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Arrhenius equation k = A exp(-Ea/RT), two-point form Ea = R ln(k2/k1)/(1/T1 - 1/T2), R = 8.314 J/(mol*K), temperatures in kelvin (Arrhenius, 1889). Q10 = (k2/k1)^(10/dT). Assumes a single mechanism over the interval. First principles.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
   const k1 = makeNumber("Rate constant k1", "arr-k1", { step: "any", min: "0", value: "1" }); k1.input.value = "1";
-  const t1 = makeNumber("Temperature 1 (C)", "arr-t1", { step: "any", value: "25" }); t1.input.value = "25";
+  const t1 = makeNumber("Temperature 1 (°C)", "arr-t1", { step: "any", value: "25" }); t1.input.value = "25";
   const k2 = makeNumber("Rate constant k2", "arr-k2", { step: "any", min: "0", value: "2" }); k2.input.value = "2";
-  const t2 = makeNumber("Temperature 2 (C)", "arr-t2", { step: "any", value: "35" }); t2.input.value = "35";
+  const t2 = makeNumber("Temperature 2 (°C)", "arr-t2", { step: "any", value: "35" }); t2.input.value = "35";
   for (const f of [k1, t1, k2, t2]) inputRegion.appendChild(f.wrap);
   const oEa = makeOutputLine(outputRegion, "Activation energy Ea", "arr-out-ea");
   const oA = makeOutputLine(outputRegion, "Pre-exponential A / Q10", "arr-out-a");
@@ -859,9 +859,9 @@ function renderClausiusClapeyron(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Clausius-Clapeyron equation ln(P2/P1) = -(dHvap/R)(1/T2 - 1/T1), so dHvap = R ln(P2/P1)/(1/T1 - 1/T2), R = 8.314 J/(mol*K), temperatures in kelvin. Only the pressure ratio enters, so any consistent unit works. Assumes constant dHvap and an ideal vapor. First principles.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
   const p1 = makeNumber("Vapor pressure P1 (any unit)", "cc-p1", { step: "any", min: "0", value: "760" }); p1.input.value = "760";
-  const t1 = makeNumber("Temperature 1 (C)", "cc-t1", { step: "any", value: "100" }); t1.input.value = "100";
+  const t1 = makeNumber("Temperature 1 (°C)", "cc-t1", { step: "any", value: "100" }); t1.input.value = "100";
   const p2 = makeNumber("Vapor pressure P2 (same unit as P1)", "cc-p2", { step: "any", min: "0", value: "525.9" }); p2.input.value = "525.9";
-  const t2 = makeNumber("Temperature 2 (C)", "cc-t2", { step: "any", value: "90" }); t2.input.value = "90";
+  const t2 = makeNumber("Temperature 2 (°C)", "cc-t2", { step: "any", value: "90" }); t2.input.value = "90";
   for (const f of [p1, t1, p2, t2]) inputRegion.appendChild(f.wrap);
   const oH = makeOutputLine(outputRegion, "Enthalpy of vaporization dHvap", "cc-out-h");
   const oS = makeOutputLine(outputRegion, "ln(P) vs 1/T slope", "cc-out-s");
@@ -883,7 +883,7 @@ function renderOsmolarity(inputRegion, outputRegion, citationEl) {
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
   const c = makeNumber("Molar concentration C (mol/L)", "osm-c", { step: "any", min: "0", value: "0.154" }); c.input.value = "0.154";
   const i = makeNumber("van't Hoff factor i (1 glucose, 2 NaCl, 3 CaCl2)", "osm-i", { step: "any", min: "0", value: "2" }); i.input.value = "2";
-  const t = makeNumber("Temperature (C)", "osm-t", { step: "any", value: "37" }); t.input.value = "37";
+  const t = makeNumber("Temperature (°C)", "osm-t", { step: "any", value: "37" }); t.input.value = "37";
   for (const f of [c, i, t]) inputRegion.appendChild(f.wrap);
   const oOsm = makeOutputLine(outputRegion, "Osmolarity", "osm-out-osm");
   const oPi = makeOutputLine(outputRegion, "Osmotic pressure", "osm-out-pi");
@@ -906,7 +906,7 @@ function renderNernstEquation(inputRegion, outputRegion, citationEl) {
   const e0 = makeNumber("Standard potential E0 (V)", "ns-e0", { step: "any", value: "1.10" }); e0.input.value = "1.10";
   const n = makeNumber("Electrons transferred n", "ns-n", { step: "any", min: "0", value: "2" }); n.input.value = "2";
   const q = makeNumber("Reaction quotient Q", "ns-q", { step: "any", min: "0", value: "0.01" }); q.input.value = "0.01";
-  const t = makeNumber("Temperature (C)", "ns-t", { step: "any", value: "25" }); t.input.value = "25";
+  const t = makeNumber("Temperature (°C)", "ns-t", { step: "any", value: "25" }); t.input.value = "25";
   for (const f of [e0, n, q, t]) inputRegion.appendChild(f.wrap);
   const oE = makeOutputLine(outputRegion, "Cell / electrode potential E", "ns-out-e");
   const oS = makeOutputLine(outputRegion, "Nernst slope (per decade of Q)", "ns-out-s");

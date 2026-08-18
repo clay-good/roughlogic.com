@@ -344,9 +344,9 @@ const renderFilterLoading = _r({
   citation: "Citation: AWWA general practice by name only. Loading rate = flow / area. Backwash flow = backwash rate * area.",
   example: filterLoadingExample.inputs,
   fields: [
-    { key: "filter_area_ft2",       label: "Filter area (ft^2)", kind: "number" },
+    { key: "filter_area_ft2",       label: "Filter area (ft²)", kind: "number" },
     { key: "flow_gpm",              label: "Flow (GPM)", kind: "number" },
-    { key: "backwash_rate_gpm_ft2", label: "Backwash rate (gpm/ft^2)", kind: "number", default: 15 },
+    { key: "backwash_rate_gpm_ft2", label: "Backwash rate (gpm/ft²)", kind: "number", default: 15 },
   ],
   outputs: [
     { key: "l", id: "fl-out-l", label: "Loading rate", value: (r) => fmt(r.loading_gpm_per_ft2, 2) + " gpm/ft^2" },
@@ -361,8 +361,8 @@ const renderFilterAreaForLoading = _r({
   example: filterAreaForLoadingExample.inputs,
   fields: [
     { key: "flow_gpm",               label: "Design flow (GPM)", kind: "number" },
-    { key: "target_loading_gpm_ft2", label: "Target loading rate (gpm/ft^2)", kind: "number" },
-    { key: "backwash_rate_gpm_ft2",  label: "Backwash rate (gpm/ft^2)", kind: "number", default: 15 },
+    { key: "target_loading_gpm_ft2", label: "Target loading rate (gpm/ft²)", kind: "number" },
+    { key: "backwash_rate_gpm_ft2",  label: "Backwash rate (gpm/ft²)", kind: "number", default: 15 },
   ],
   outputs: [
     { key: "a", id: "fal-out-a", label: "Required filter area", value: (r) => fmt(r.required_area_ft2, 1) + " ft^2" },
@@ -379,7 +379,7 @@ const renderDetentionTime = _r({
     { key: "tank_volume_gal", label: "Tank volume (gal)", kind: "number" },
     { key: "flow_gpm",        label: "Flow (GPM)", kind: "number" },
     { key: "target_minutes",  label: "Target (min, optional)", kind: "number" },
-    { key: "surface_area_ft2", label: "Surface area (ft^2, optional)", kind: "number" },
+    { key: "surface_area_ft2", label: "Surface area (ft², optional)", kind: "number" },
     { key: "weir_length_ft",  label: "Weir length (ft, optional)", kind: "number" },
   ],
   outputs: [
@@ -840,7 +840,7 @@ function renderDisinfectionCT(inputRegion, outputRegion, citationEl) {
 
   const c = makeNumber("Free chlorine residual (mg/L)", "ct-c", { step: "any", min: "0" });
   const t10 = makeNumber("Contact time t10 (min; basin 10-percentile)", "ct-t10", { step: "any", min: "0" });
-  const t = makeNumber("Water temperature (C; 0.5 - 25)", "ct-t", { step: "any", value: "5" });
+  const t = makeNumber("Water temperature (°C; 0.5 - 25)", "ct-t", { step: "any", value: "5" });
   t.input.value = "5";
   const p = makeNumber("pH (6.0 - 9.0)", "ct-p", { step: "any", value: "7.0" });
   p.input.value = "7.0";
@@ -1195,7 +1195,7 @@ export const coolingWaterMakeupExample = {
 function _v16w_renderCoolingWaterMakeup(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: evaporation = recirculation x delta-T / 1000; blowdown = evaporation / (COC - 1); drift = recirculation x drift fraction; makeup = evaporation + blowdown + drift. Per the Cooling Technology Institute (CTI) publications and ASHRAE Systems and Equipment 2020 Ch. 40 (cooling towers). Free at cti.org and ashrae.org for the TOCs.";
   const recirc = makeNumber("Recirculation flow (GPM)", "cm-recirc", { step: "any", min: "0", value: "1000" });
-  const dT = makeNumber("Cooling range delta-T (F)", "cm-dt", { step: "any", min: "0", value: "10" });
+  const dT = makeNumber("Cooling range delta-T (°F)", "cm-dt", { step: "any", min: "0", value: "10" });
   const coc = makeNumber("Cycles of concentration", "cm-coc", { step: "any", min: "0", value: "4" });
   const drift = makeNumber("Drift fraction (e.g. 0.002)", "cm-drift", { step: "any", min: "0", value: "0.002" });
   for (const f of [recirc, dT, coc, drift]) inputRegion.appendChild(f.wrap);
@@ -1524,9 +1524,9 @@ const renderUvDose = _v23SimpleRenderer({
   citation: "Citation: USEPA UV Disinfection Guidance Manual (by name, not reproduced). Dose = intensity x time (mW.s/cm^2 = mJ/cm^2); common validated target 40 mJ/cm^2 (editable). The validated reactor dose and the state primacy agency govern.",
   example: uvDoseExample.inputs,
   fields: [
-    { key: "intensity_mw_cm2", label: "UV intensity (mW/cm^2)", kind: "number", default: 10 },
+    { key: "intensity_mw_cm2", label: "UV intensity (mW/cm²)", kind: "number", default: 10 },
     { key: "exposure_time_s", label: "Exposure time (s)", kind: "number", default: 5 },
-    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm^2)", kind: "number", default: 40 },
+    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm²)", kind: "number", default: 40 },
   ],
   outputs: [
     { key: "d", id: "uvd-out-d", label: "Delivered dose", value: (r) => fmt(r.dose_mj_cm2, 1) + " mJ/cm^2" },
@@ -1559,8 +1559,8 @@ const renderUvRequiredExposure = _v23SimpleRenderer({
   citation: "Citation: USEPA UV Disinfection Guidance Manual (by name, not reproduced). Dose = intensity x time (mW.s/cm^2 = mJ/cm^2) solved for the missing operand: required time = dose / intensity, or required intensity = dose / time; common validated target 40 mJ/cm^2 (editable). The validated reactor dose and the state primacy agency govern.",
   example: uvRequiredExposureExample.inputs,
   fields: [
-    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm^2)", kind: "number", default: 40 },
-    { key: "intensity_mw_cm2", label: "UV intensity (mW/cm^2, 0 = solve for it)", kind: "number", default: 10 },
+    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm²)", kind: "number", default: 40 },
+    { key: "intensity_mw_cm2", label: "UV intensity (mW/cm², 0 = solve for it)", kind: "number", default: 10 },
     { key: "exposure_time_s", label: "Exposure time (s, 0 = solve for it)", kind: "number", default: 0 },
   ],
   outputs: [

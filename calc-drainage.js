@@ -104,7 +104,7 @@ export const roofDrainSizingExample = {
 
 function renderRoofDrainSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IPC 2021 Section 1106 (Tables 1106.2 vertical conductors, 1106.3 horizontal storm drains, 1106.6 roof drains) by name; the capacity tables ship as editable conservative breakpoints, not a transcribed table. Storm flow gpm = area x rainfall x 0.0104.";
-  const area = makeNumber("Roof area served (ft^2, horizontally projected)", "rd-area", { step: "any", min: "0" });
+  const area = makeNumber("Roof area served (ft², horizontally projected)", "rd-area", { step: "any", min: "0" });
   const rain = makeNumber("Design rainfall, 100-yr / 1-hr (in/hr)", "rd-rain", { step: "any", min: "0" });
   const slope = makeSelect("Horizontal storm-drain slope", "rd-slope", [
     { value: "1/8", label: "1/8 in per ft" }, { value: "1/4", label: "1/4 in per ft", selected: true }, { value: "1/2", label: "1/2 in per ft" },
@@ -351,7 +351,7 @@ export const drywellInfiltrationExample = { inputs: { runoff_volume_ft3: 200, vo
 
 function _v976renderDrywellInfiltration(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: dry well / infiltration trench (soakaway) sizing, by name. excavation = runoff / void ratio; footprint = excavation / depth; draindown ~ 12 x depth x void / infiltration rate. Void from the aggregate (~0.35 open stone), infiltration from a field perc test (not a default), runoff from the design storm. An overflow path is required; the perc test, the stormwater code, and the AHJ / geotech govern.";
-  const rv = makeNumber("Runoff (storage) volume (ft^3)", "dwi-rv", { step: "any", min: "0", value: "200" });
+  const rv = makeNumber("Runoff (storage) volume (ft³)", "dwi-rv", { step: "any", min: "0", value: "200" });
   rv.input.value = "200";
   const vr = makeNumber("Aggregate void ratio (~0.35)", "dwi-vr", { step: "any", min: "0", value: "0.35" });
   vr.input.value = "0.35";
@@ -859,7 +859,7 @@ function renderTr55GraphicalPeakDischarge(inputRegion, outputRegion, citationEl)
   const tc = makeNumber("Time of concentration Tc (hr, 0.1 to 10)", "tpd-tc", { step: "any", min: "0", value: "1.53" }); tc.input.value = "1.53";
   const cn = makeNumber("Curve number CN (above 40)", "tpd-cn", { step: "any", min: "0", max: "100", value: "75" }); cn.input.value = "75";
   const p = makeNumber("Design rainfall P, 24-hr (in)", "tpd-p", { step: "any", min: "0", value: "6" }); p.input.value = "6";
-  const area = makeNumber("Drainage area (mi^2)", "tpd-area", { step: "any", min: "0", value: "0.39" }); area.input.value = "0.39";
+  const area = makeNumber("Drainage area (mi²)", "tpd-area", { step: "any", min: "0", value: "0.39" }); area.input.value = "0.39";
   const type = makeSelect("Rainfall distribution", "tpd-type", [
     { value: "I", label: "Type I" }, { value: "IA", label: "Type IA" }, { value: "II", label: "Type II", selected: true }, { value: "III", label: "Type III" },
   ]);
@@ -928,7 +928,7 @@ function renderTr55DetentionStorage(inputRegion, outputRegion, citationEl) {
   const qi = makeNumber("Peak inflow qi (cfs)", "tds-qi", { step: "any", min: "0", value: "360" }); qi.input.value = "360";
   const qo = makeNumber("Allowable peak outflow qo (cfs)", "tds-qo", { step: "any", min: "0", value: "180" }); qo.input.value = "180";
   const q = makeNumber("Runoff depth Q (in)", "tds-q", { step: "any", min: "0", value: "3.4" }); q.input.value = "3.4";
-  const area = makeNumber("Drainage area (mi^2)", "tds-area", { step: "any", min: "0", value: "0.117" }); area.input.value = "0.117";
+  const area = makeNumber("Drainage area (mi²)", "tds-area", { step: "any", min: "0", value: "0.117" }); area.input.value = "0.117";
   const type = makeSelect("Rainfall distribution", "tds-type", [
     { value: "I", label: "Type I" }, { value: "IA", label: "Type IA" }, { value: "II", label: "Type II", selected: true }, { value: "III", label: "Type III" },
   ]);

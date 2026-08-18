@@ -253,7 +253,7 @@ export const foamMaxCoverageAreaExample = {
 function renderFoamMaxCoverageArea(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Foam concentrate = area * application rate * foam percentage * duration, solved for the area: max area = concentrate / (rate * pct * duration). Application rate and duration from the fuel type and departmental SOP.";
   const conc = makeNumber("Available concentrate (gal)", "fma-c", { step: "any", min: "0" });
-  const r = makeNumber("Application rate (gpm/ft^2)", "fma-r", { step: "any", min: "0", value: "0.10" });
+  const r = makeNumber("Application rate (gpm/ft²)", "fma-r", { step: "any", min: "0", value: "0.10" });
   r.input.value = "0.10";
   const pct = makeNumber("Foam concentrate (percent)", "fma-pct", { step: "any", min: "0", max: "10", value: "3" });
   pct.input.value = "3";
@@ -387,7 +387,7 @@ export function renderHydrantFlow(inputRegion, outputRegion, citationEl) {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderRequiredFireFlow(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per IFC 2021 Table B105.1 (ISO needed-fire-flow method). NFF = C * O * X * P; C = 18 * F * sqrt(A). AHJ governs. Free at codes.iccsafe.org.";
-  const A = makeNumber("Structure area (ft^2)", "rff-a", { step: "any", min: "0" });
+  const A = makeNumber("Structure area (ft²)", "rff-a", { step: "any", min: "0" });
   const cls = makeSelect("Construction class", "rff-c", Object.keys(ISO_CONSTRUCTION_FACTORS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   const O = makeNumber("Occupancy factor", "rff-o", { step: "any", min: "0", value: "1.0" });
   O.input.value = "1.0";
@@ -396,7 +396,7 @@ export function renderRequiredFireFlow(inputRegion, outputRegion, citationEl) {
   const Pf = makeNumber("Communication factor", "rff-p", { step: "any", min: "0", value: "1.0" });
   Pf.input.value = "1.0";
   // v23 EN.11: optional structure volume for the Iowa rate-of-flow method.
-  const Vol = makeNumber("Structure volume (ft^3, for Iowa method)", "rff-v", { step: "any", min: "0" });
+  const Vol = makeNumber("Structure volume (ft³, for Iowa method)", "rff-v", { step: "any", min: "0" });
   for (const f of [A, cls, O, X, Pf, Vol]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { A.input.value = "5000"; cls.select.value = "ordinary"; O.input.value = "1.0"; X.input.value = "1.0"; Pf.input.value = "1.0"; Vol.input.value = "40000"; update(); });
   const oN = makeOutputLine(outputRegion, "Needed fire flow (ISO)", "rff-out");
@@ -463,8 +463,8 @@ export function renderAerialLadder(inputRegion, outputRegion, citationEl) {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderFoam(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Foam volume = area * application rate * foam percentage * duration. Application rate from departmental SOP.";
-  const A = makeNumber("Fire area (ft^2)", "fo-a", { step: "any", min: "0" });
-  const r = makeNumber("Application rate (gpm/ft^2)", "fo-r", { step: "any", min: "0", value: "0.10" });
+  const A = makeNumber("Fire area (ft²)", "fo-a", { step: "any", min: "0" });
+  const r = makeNumber("Application rate (gpm/ft²)", "fo-r", { step: "any", min: "0", value: "0.10" });
   r.input.value = "0.10";
   const pct = makeNumber("Foam concentrate (percent)", "fo-pct", { step: "any", min: "0", max: "10", value: "3" });
   pct.input.value = "3";
@@ -701,8 +701,8 @@ export function renderReverseLayFriction(inputRegion, outputRegion, citationEl) 
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderSprinklerDensity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per NFPA 13-2022 Table 12.1 (hazard density). total_gpm = area * density (gpm/ft^2). AHJ governs. Free at nfpa.org/freeaccess.";
-  const a = makeNumber("Area of operation (ft^2)", "sd-a", { step: "any", min: "0" });
-  const d = makeNumber("Density (gpm/ft^2)", "sd-d", { step: "any", min: "0", value: "" });
+  const a = makeNumber("Area of operation (ft²)", "sd-a", { step: "any", min: "0" });
+  const d = makeNumber("Density (gpm/ft²)", "sd-d", { step: "any", min: "0", value: "" });
   const cat = makeSelect("Hazard category (default if density blank)", "sd-c", [
     { value: "", label: "(none)" },
     ...Object.keys(SPRINKLER_HAZARD_MIN_DENSITY).map((k) => ({ value: k, label: k.replace(/_/g, " ") })),
@@ -1162,7 +1162,7 @@ export const nfpa1142Example = {
 function renderNFPA1142(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per NFPA 1142-2022 (Standard on Water Supplies for Suburban and Rural Firefighting) §5. AHJ governs final water-supply requirement. Free at nfpa.org/freeaccess.";
 
-  const v = makeNumber("Building volume (ft^3; footprint x avg ceiling)", "nfpa-v", { step: "any", min: "0" });
+  const v = makeNumber("Building volume (ft³; footprint x avg ceiling)", "nfpa-v", { step: "any", min: "0" });
   const occ = makeSelect("Occupancy Hazard Classification (NFPA 1142 §5.2, OHC 3-7)", "nfpa-occ",
     Object.keys(NFPA1142_OCCUPANCY).map((k) => ({ value: k, label: NFPA1142_OCCUPANCY[k].label, selected: k === "7" })),
   );
@@ -1308,7 +1308,7 @@ function _v9f_renderConfinedSpaceVent(inputRegion, outputRegion, citationEl) {
     update();
   });
 
-  const oV = makeOutputLine(outputRegion, "Volume (ft^3)", "csv-out-v");
+  const oV = makeOutputLine(outputRegion, "Volume (ft³)", "csv-out-v");
   const oM = makeOutputLine(outputRegion, "Minutes to purge", "csv-out-m");
   const oA = makeOutputLine(outputRegion, "Steady-state ACH", "csv-out-a");
   const oT = makeOutputLine(outputRegion, "Target air-changes used", "csv-out-t");

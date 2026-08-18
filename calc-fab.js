@@ -301,7 +301,7 @@ function _v26renderFlangeBoltTorque(inputRegion, outputRegion, citationEl) {
     { value: "UNC", label: "UNC (coarse)", selected: true }, { value: "8UN", label: "8UN (large flange)" },
   ]);
   const count = makeNumber("Bolt count", "fbt-count", { step: "1", min: "2", value: "8" });
-  const at = makeNumber("Tensile area (in^2, optional override)", "fbt-at", { step: "any", min: "0" });
+  const at = makeNumber("Tensile area (in², optional override)", "fbt-at", { step: "any", min: "0" });
   const pct = makeNumber("Target preload (% of yield)", "fbt-pct", { step: "any", min: "0", value: "50" });
   const yld = makeNumber("Bolt yield (ksi, B7 = 105)", "fbt-yld", { step: "any", min: "0", value: "105" });
   const k = makeNumber("Nut factor K", "fbt-k", { step: "any", min: "0", value: "0.18" });
@@ -766,9 +766,9 @@ FAB_RENDERERS["oxyfuel-cutting-gas"] = _v85renderOxyfuelCuttingGas;
 function _v85renderWeldPreheatFuel(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: specific heat of carbon steel (about 0.11 Btu/lb-degF) and the heating value of propane (about 21,600 Btu/lb, 91,500 Btu/gal), by name. Heat = mass x specific heat x temperature rise; fuel = heat / efficiency. Hot-work hazards govern; follow the maker's instructions and your site's hot-work permit. Preheat temperature comes from carbon-equivalent or the WPS.";
   const steel = makeNumber("Steel mass to preheat (lb)", "wpf-steel", { step: "any", min: "0" });
-  const start = makeNumber("Start temperature (degF)", "wpf-start", { step: "any", value: "70" });
+  const start = makeNumber("Start temperature (°F)", "wpf-start", { step: "any", value: "70" });
   start.input.value = "70";
-  const preheat = makeNumber("Preheat temperature (degF)", "wpf-pre", { step: "any" });
+  const preheat = makeNumber("Preheat temperature (°F)", "wpf-pre", { step: "any" });
   const eff = makeNumber("Torch-to-part efficiency (%)", "wpf-eff", { step: "any", min: "0", value: "25" });
   eff.input.value = "25";
   for (const f of [steel, start, preheat, eff]) inputRegion.appendChild(f.wrap);
@@ -1195,9 +1195,9 @@ function _v134renderShrinkFit(inputRegion, outputRegion, citationEl) {
   const interference = makeNumber("Diametral interference (in)", "shf-int", { step: "any", min: "0" });
   const clearance = makeNumber("Assembly clearance (in)", "shf-clr", { step: "any", min: "0", value: "0.002" });
   clearance.input.value = "0.002";
-  const alpha = makeNumber("CTE (per degF)", "shf-alpha", { step: "any", min: "0", value: "0.0000065" });
+  const alpha = makeNumber("CTE (per °F)", "shf-alpha", { step: "any", min: "0", value: "0.0000065" });
   alpha.input.value = "0.0000065";
-  const ambient = makeNumber("Ambient temperature (degF)", "shf-amb", { step: "any", value: "70" });
+  const ambient = makeNumber("Ambient temperature (°F)", "shf-amb", { step: "any", value: "70" });
   ambient.input.value = "70";
   for (const f of [dia, interference, clearance, alpha, ambient]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { dia.input.value = "4.0"; interference.input.value = "0.004"; clearance.input.value = "0.002"; alpha.input.value = "0.0000065"; ambient.input.value = "70"; update(); });
@@ -1243,8 +1243,8 @@ export function computeWeldDilution({ A_base = 0, A_filler = 0 } = {}) {
 export const weldDilutionExample = { inputs: { A_base: 0.03, A_filler: 0.05 } };
 function _v356renderWeldDilution(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: weld dilution = A_base / (A_base + A_filler), the standard welding-metallurgy definition (by name). Sets how far the base metal shifts the deposit chemistry; overlays are kept low-dilution. The WPS and the filler-metal data govern.";
-  const ab = makeNumber("Melted base-metal (penetration) area (in^2)", "wd-ab", { step: "any", min: "0" });
-  const af = makeNumber("Filler (reinforcement) area (in^2)", "wd-af", { step: "any", min: "0" });
+  const ab = makeNumber("Melted base-metal (penetration) area (in²)", "wd-ab", { step: "any", min: "0" });
+  const af = makeNumber("Filler (reinforcement) area (in²)", "wd-af", { step: "any", min: "0" });
   for (const f of [ab, af]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ab.input.value = "0.03"; af.input.value = "0.05"; update(); });
   const oDil = makeOutputLine(outputRegion, "Dilution (base-metal share)", "wd-out-dil");
@@ -1340,11 +1340,11 @@ export function computeWeldPassesArcTime({ A_groove = 0, length_in = 0, a_pass =
 export const weldPassesArcTimeExample = { inputs: { A_groove: 0.15, length_in: 12, a_pass: 0.03, dep_rate: 8, density: 0.283, op_factor: 0.40 } };
 function _v357renderWeldPassesArcTime(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: passes = ceil(groove area / area per pass); deposited weight = area x length x density (steel ~0.283 lb/in^3); arc time = weight / deposition rate; total = arc / operator factor. Standard welding-cost estimating (by name). The WPS and the shop's measured rates govern.";
-  const ag = makeNumber("Groove cross-sectional area (in^2)", "wpa-ag", { step: "any", min: "0" });
+  const ag = makeNumber("Groove cross-sectional area (in²)", "wpa-ag", { step: "any", min: "0" });
   const len = makeNumber("Weld length (in)", "wpa-len", { step: "any", min: "0" });
-  const ap = makeNumber("Area deposited per pass (in^2)", "wpa-ap", { step: "any", min: "0" });
+  const ap = makeNumber("Area deposited per pass (in²)", "wpa-ap", { step: "any", min: "0" });
   const dr = makeNumber("Deposition rate (lb/h)", "wpa-dr", { step: "any", min: "0" });
-  const dens = makeNumber("Weld-metal density (lb/in^3, default 0.283)", "wpa-dens", { step: "any", min: "0" });
+  const dens = makeNumber("Weld-metal density (lb/in³, default 0.283)", "wpa-dens", { step: "any", min: "0" });
   const of = makeNumber("Operator/duty factor (0-1, optional)", "wpa-of", { step: "any", min: "0", max: "1" });
   for (const f of [ag, len, ap, dr, dens, of]) inputRegion.appendChild(f.wrap);
   dens.input.value = "0.283";

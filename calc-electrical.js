@@ -491,7 +491,7 @@ export function renderWireAmpacity(inputRegion, outputRegion, citationEl, params
     { value: "75", label: "75 C", selected: true },
     { value: "90", label: "90 C" },
   ]);
-  const amb = makeNumber("Ambient temperature (C)", "wa-amb", { step: "any", value: "30" });
+  const amb = makeNumber("Ambient temperature (°C)", "wa-amb", { step: "any", value: "30" });
   amb.input.value = "30";
   // v8 §C.1: ambient preset chips. Cuts the common case from four taps to one.
   // Each chip sets the ambient field and re-runs compute. Chips honor the
@@ -645,7 +645,7 @@ export function renderBoxFill(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: per NEC 2023 §314.16 (volume allowances by conductor size; devices count twice the largest conductor; internal clamps count once). AHJ governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ vol: 22.5, awg: "12", count: 6, devices: 1, clamps: true }));
 
-  const vol = makeNumber("Box volume (in^3)", "bf-vol", { step: "any", min: "0" });
+  const vol = makeNumber("Box volume (in³)", "bf-vol", { step: "any", min: "0" });
   const awg = makeSelect("Conductor AWG", "bf-awg", [
     { value: "18", label: "18" }, { value: "16", label: "16" }, { value: "14", label: "14" },
     { value: "12", label: "12" }, { value: "10", label: "10" }, { value: "8", label: "8" }, { value: "6", label: "6" },
@@ -858,7 +858,7 @@ export function renderConductorResistance(inputRegion, outputRegion, citationEl,
   const mat = makeSelect("Material", "cr-mat", [{ value: "copper", label: "Copper" }, { value: "aluminum", label: "Aluminum" }]);
   const awg = makeSelect("AWG", "cr-awg", awgOptions());
   const len = makeNumber("Length (ft)", "cr-len", { step: "any", min: "0" });
-  const T = makeNumber("Temperature (C)", "cr-t", { step: "any" });
+  const T = makeNumber("Temperature (°C)", "cr-t", { step: "any" });
   for (const f of [mat, awg, len, T]) inputRegion.appendChild(f.wrap);
 
   const outR = makeOutputLine(outputRegion, "Resistance", "cr-out");
@@ -1142,7 +1142,7 @@ export function renderServiceLoad(inputRegion, outputRegion, citationEl, params)
   renderLimitationBanner(inputRegion, getLimitationCopy("service-load"));
   attachExampleButton(inputRegion, () => fillExample(serviceLoadExample.inputs));
 
-  const area = makeNumber("Conditioned area (ft^2)", "sl-area", { step: "any", min: "0" });
+  const area = makeNumber("Conditioned area (ft²)", "sl-area", { step: "any", min: "0" });
   const sa = makeNumber("Small-appliance circuits (min 2)", "sl-sa", { step: "1", min: "0", value: "2" });
   sa.input.value = "2";
   const ld = makeNumber("Laundry circuits", "sl-ld", { step: "1", min: "0", value: "1" });
@@ -1296,7 +1296,7 @@ export function renderLightingDensity(inputRegion, outputRegion, citationEl, par
   citationEl.textContent = "Citation: per ASHRAE 90.1-2022 Table 9.5.1 (lighting power density by occupancy). AHJ governs adopted edition. Free at ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards.";
   attachExampleButton(inputRegion, () => fillExample(lightingDensityExample.inputs));
 
-  const area = makeNumber("Area (ft^2)", "ld-area", { step: "any", min: "0" });
+  const area = makeNumber("Area (ft²)", "ld-area", { step: "any", min: "0" });
   const cls = makeSelect("Occupancy class", "ld-cls", Object.keys(LIGHTING_DENSITY_W_PER_FT2).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   for (const f of [area, cls]) inputRegion.appendChild(f.wrap);
 
@@ -1967,13 +1967,13 @@ function renderPoEBudget(inputRegion, outputRegion, citationEl, params) {
   ]);
   const len = makeNumber("Run length (ft)", "poe-len", { step: "any", min: "0", value: "100" });
   len.input.value = "100";
-  const amb = makeNumber("Ambient temp (C)", "poe-amb", { step: "any", value: "25" });
+  const amb = makeNumber("Ambient temp (°C)", "poe-amb", { step: "any", value: "25" });
   amb.input.value = "25";
   for (const f of [cls, cat, len, amb]) inputRegion.appendChild(f.wrap);
 
   const oP = makeOutputLine(outputRegion, "Power available at PD", "poe-out-p");
   const oV = makeOutputLine(outputRegion, "Voltage at PD", "poe-out-v");
-  const oL = makeOutputLine(outputRegion, "Cable I^2*R loss", "poe-out-l");
+  const oL = makeOutputLine(outputRegion, "Cable I²*R loss", "poe-out-l");
   const oF = makeOutputLine(outputRegion, "Status", "poe-out-f");
 
   function fillExample(v) { cls.select.value = v.poe_class; cat.select.value = v.category; len.input.value = v.run_length_ft; amb.input.value = v.ambient_C; update(); }
@@ -2655,12 +2655,12 @@ ELECTRICAL_RENDERERS["panel-rebalance"] = _v8e_renderPanelRebalance;
 
 const _LEE_THRESHOLD_CAL_CM2 = 1.2;
 const _PPE_BANDS = [
-  { min: 0,  max: 1.2, label: "No PPE required (Lee screen below 1.2 cal/cm^2 second-degree threshold)" },
-  { min: 1.2, max: 4,  label: "CAT 1 (4 cal/cm^2 minimum arc-rated PPE)" },
-  { min: 4,   max: 8,  label: "CAT 2 (8 cal/cm^2 minimum)" },
-  { min: 8,   max: 25, label: "CAT 3 (25 cal/cm^2 minimum)" },
-  { min: 25,  max: 40, label: "CAT 4 (40 cal/cm^2 minimum)" },
-  { min: 40,  max: Infinity, label: "No standard PPE rated above 40 cal/cm^2; remote operation or de-energize" },
+  { min: 0,  max: 1.2, label: "No PPE required (Lee screen below 1.2 cal/cm² second-degree threshold)" },
+  { min: 1.2, max: 4,  label: "CAT 1 (4 cal/cm² minimum arc-rated PPE)" },
+  { min: 4,   max: 8,  label: "CAT 2 (8 cal/cm² minimum)" },
+  { min: 8,   max: 25, label: "CAT 3 (25 cal/cm² minimum)" },
+  { min: 25,  max: 40, label: "CAT 4 (40 cal/cm² minimum)" },
+  { min: 40,  max: Infinity, label: "No standard PPE rated above 40 cal/cm²; remote operation or de-energize" },
 ];
 
 // dims: in { args: dimensionless } out: { incident_energy_cal_cm2: dimensionless, ppe_category: dimensionless }
@@ -2747,7 +2747,7 @@ export function renderArcFlashScreen(inputRegion, outputRegion, citationEl) {
     d.input.value = "18"; cfg.select.value = "open_air"; update();
   });
 
-  const oE = makeOutputLine(outputRegion, "Incident energy (cal/cm^2)", "af-out-e");
+  const oE = makeOutputLine(outputRegion, "Incident energy (cal/cm²)", "af-out-e");
   const oB = makeOutputLine(outputRegion, "Arc-flash boundary (in)", "af-out-b");
   const oP = makeOutputLine(outputRegion, "PPE band (NFPA 70E)", "af-out-p");
   const oW = makeOutputLine(outputRegion, "Notes", "af-out-w");
@@ -3062,7 +3062,7 @@ export function renderGroundingElectrode(inputRegion, outputRegion, citationEl) 
   const dc = makeNumber("Ring conductor diameter (in; ring)", "ge-dc", { step: "any", min: "0" });
   const sR = makeNumber("Ring burial depth (ft; ring)", "ge-sR", { step: "any", min: "0", value: "2.5" });
   sR.input.value = "2.5";
-  const pA = makeNumber("Plate area (ft^2; plate)", "ge-pA", { step: "any", min: "0" });
+  const pA = makeNumber("Plate area (ft²; plate)", "ge-pA", { step: "any", min: "0" });
   const pS = makeNumber("Plate burial depth (ft; plate)", "ge-pS", { step: "any", min: "0", value: "2.5" });
   pS.input.value = "2.5";
   const ucd = makeNumber("Ufer concrete diameter (in; Ufer)", "ge-ucd", { step: "any", min: "0", value: "6" });
@@ -3538,7 +3538,7 @@ export function renderAmbientAmpacityAdjust(inputRegion, outputRegion, citationE
     { value: "75", label: "75 C", selected: true },
     { value: "90", label: "90 C" },
   ]);
-  const amb = makeNumber("Ambient temperature (C)", "aa-amb", { step: "any", value: "50" });
+  const amb = makeNumber("Ambient temperature (°C)", "aa-amb", { step: "any", value: "50" });
   amb.input.value = "50";
   const count = makeNumber("Current-carrying conductors", "aa-n", { step: "1", min: "1", value: "12" });
   count.input.value = "12";
@@ -3703,7 +3703,7 @@ export const serviceLoadOptionalExample = {
 export function renderServiceLoadOptional(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per NEC 2023 220.82 (optional dwelling load calculation): general load demand = first 10 kVA at 100% + remainder at 40%; 220.82(C) adds the larger of heating vs cooling at 100%. Compared against the standard 220.42 method; size to the larger. AHJ governs the adopted edition. Free at nfpa.org/freeaccess for the NEC table of contents.";
 
-  const area = makeNumber("Dwelling area (ft^2)", "slo-area", { step: "any", min: "0", value: "2400" });
+  const area = makeNumber("Dwelling area (ft²)", "slo-area", { step: "any", min: "0", value: "2400" });
   area.input.value = "2400";
   const sa = makeNumber("Small-appliance circuits", "slo-sa", { step: "1", min: "0", value: "2" });
   sa.input.value = "2";
@@ -3827,7 +3827,7 @@ export function renderLuxFootcandle(inputRegion, outputRegion, citationEl) {
   fc.input.value = "100";
   const lx = makeNumber("Lux (convert mode)", "lxfc-lux", { step: "any", min: "0" });
   const lumens = makeNumber("Total luminaire lumens (room mode)", "lxfc-lm", { step: "any", min: "0" });
-  const area = makeNumber("Room area (ft^2, room mode)", "lxfc-area", { step: "any", min: "0" });
+  const area = makeNumber("Room area (ft², room mode)", "lxfc-area", { step: "any", min: "0" });
   const cu = makeNumber("Coefficient of utilization (0-1)", "lxfc-cu", { step: "any", min: "0", max: "1", value: "0.7" });
   cu.input.value = "0.7";
   const llf = makeNumber("Light-loss factor (0-1)", "lxfc-llf", { step: "any", min: "0", max: "1", value: "0.8" });
@@ -4177,9 +4177,9 @@ function renderConductorShortCircuitWithstand(inputRegion, outputRegion, citatio
   const time = makeNumber("Clearing time (s)", "csw-time", { step: "any", min: "0", value: "0.1" });
   time.input.value = "0.1";
   const mat = makeSelect("Material", "csw-mat", [{ value: "copper", label: "Copper (K=0.0297, B=234)" }, { value: "aluminum", label: "Aluminum (K=0.0125, B=228)" }]);
-  const ti = makeNumber("Initial temperature (deg C)", "csw-ti", { step: "any", value: "75" });
+  const ti = makeNumber("Initial temperature (°C)", "csw-ti", { step: "any", value: "75" });
   ti.input.value = "75";
-  const tf = makeNumber("Insulation short-circuit limit (deg C)", "csw-tf", { step: "any", value: "250" });
+  const tf = makeNumber("Insulation short-circuit limit (°C)", "csw-tf", { step: "any", value: "250" });
   tf.input.value = "250";
   for (const f of [area, fault, time, mat, ti, tf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { area.input.value = "26240"; fault.input.value = "10000"; time.input.value = "0.1"; mat.select.value = "copper"; ti.input.value = "75"; tf.input.value = "250"; update(); });
@@ -4219,7 +4219,7 @@ export const conduitThermalExpansionExample = { inputs: { run_length_ft: 100, te
 function renderConduitThermalExpansion(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 352.44 (expansion fittings for rigid PVC conduit). delta_L = coefficient x length x temperature swing; the bundled 3.38e-5 in/in/deg-F PVC coefficient underlies NEC Table 352.44. A fitting is required at the 1/4-inch trigger. The AHJ and the manufacturer govern. Free read-only at nfpa.org/freeaccess.";
   const len = makeNumber("Straight run between anchors (ft)", "cte-len", { step: "any", min: "0" });
-  const dt = makeNumber("Temperature swing (deg F)", "cte-dt", { step: "any" });
+  const dt = makeNumber("Temperature swing (°F)", "cte-dt", { step: "any" });
   const coeff = makeNumber("PVC coefficient (in/in/deg-F)", "cte-coeff", { step: "any", min: "0", value: "0.0000338" });
   coeff.input.value = "0.0000338";
   const trig = makeNumber("Fitting trigger (in)", "cte-trig", { step: "any", min: "0", value: "0.25" });
@@ -4263,7 +4263,7 @@ export const conduitExpansionMaxRunExample = { inputs: { temp_change_f: 50, coef
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function renderConduitExpansionMaxRun(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 352.44 (expansion fittings for rigid PVC conduit), solved for the run length. L_max = trigger / (coefficient x 12 x temperature swing); the bundled 3.38e-5 in/in/deg-F PVC coefficient underlies NEC Table 352.44. The AHJ and the manufacturer govern. Free read-only at nfpa.org/freeaccess.";
-  const dt = makeNumber("Temperature swing (deg F)", "cxmr-dt", { step: "any" });
+  const dt = makeNumber("Temperature swing (°F)", "cxmr-dt", { step: "any" });
   const coeff = makeNumber("PVC coefficient (in/in/deg-F)", "cxmr-coeff", { step: "any", min: "0", value: "0.0000338" });
   coeff.input.value = "0.0000338";
   const trig = makeNumber("Fitting trigger (in)", "cxmr-trig", { step: "any", min: "0", value: "0.25" });
@@ -4484,13 +4484,13 @@ function _v170renderWirewayFill(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 376.22 (metal wireways) - conductor fill no more than 20% of the interior cross-section, and the 30 current-carrying conductor threshold for 310.15(C)(1) ampacity adjustment. The same 20% rule applies to auxiliary gutters (366.22). The AHJ governs. Free at nfpa.org/freeaccess.";
   const w = makeNumber("Interior width (in)", "ww-w", { step: "any", min: "0" });
   const h = makeNumber("Interior height (in)", "ww-h", { step: "any", min: "0" });
-  const ca = makeNumber("Total conductor area (in^2, Ch.9 Table 5)", "ww-ca", { step: "any", min: "0" });
+  const ca = makeNumber("Total conductor area (in², Ch.9 Table 5)", "ww-ca", { step: "any", min: "0" });
   const n = makeNumber("Current-carrying conductors", "ww-n", { step: "1", min: "0" });
   for (const f of [w, h, ca, n]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { w.input.value = "4"; h.input.value = "4"; ca.input.value = "2.5"; n.input.value = "18"; update(); });
 
-  const oInt = makeOutputLine(outputRegion, "Interior area (in^2)", "ww-out-int");
-  const oAllow = makeOutputLine(outputRegion, "Allowed fill (20%, in^2)", "ww-out-allow");
+  const oInt = makeOutputLine(outputRegion, "Interior area (in²)", "ww-out-int");
+  const oAllow = makeOutputLine(outputRegion, "Allowed fill (20%, in²)", "ww-out-allow");
   const oUsed = makeOutputLine(outputRegion, "Used fill", "ww-out-used");
   const oCount = makeOutputLine(outputRegion, "Conductor count", "ww-out-count");
   const oNote = makeOutputLine(outputRegion, "Note", "ww-out-note");
@@ -5293,7 +5293,7 @@ function _v518renderBatteryHydrogenVent(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IEEE 1635 / IEEE-ASHRAE Guide 21 battery-room hydrogen ventilation (NFPA 855 4% LEL): Q = 0.054 x I x N cfm (N = individual 2 V CELLS, not jars), ACH = Q x 60 / room volume; holds the average hydrogen below 1% (75% margin under the 4% LEL). A design aid; the applicable code and room design govern.";
   const n = makeNumber("Cell count (individual 2 V cells, NOT jars)", "bhv-n", { step: "1", min: "1" }); n.input.value = "24";
   const i = makeNumber("Maximum charge current (A)", "bhv-i", { step: "any", min: "0" }); i.input.value = "20";
-  const vol = makeNumber("Room volume (ft^3)", "bhv-v", { step: "any", min: "0" }); vol.input.value = "800";
+  const vol = makeNumber("Room volume (ft³)", "bhv-v", { step: "any", min: "0" }); vol.input.value = "800";
   for (const f of [n, i, vol]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { n.input.value = "24"; i.input.value = "20"; vol.input.value = "800"; update(); });
   const oQ = makeOutputLine(outputRegion, "Required exhaust airflow", "bhv-out-q");
@@ -5496,7 +5496,7 @@ function _v804renderAwgWireGeometry(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { awg.select.value = "12"; update(); });
   const oDin = makeOutputLine(outputRegion, "Diameter", "awgg-out-din");
   const oCm = makeOutputLine(outputRegion, "Area (circular mils)", "awgg-out-cm");
-  const oMm2 = makeOutputLine(outputRegion, "Area (mm^2)", "awgg-out-mm2");
+  const oMm2 = makeOutputLine(outputRegion, "Area (mm²)", "awgg-out-mm2");
   const oNote = makeOutputLine(outputRegion, "Note", "awgg-out-n");
   const update = debounce(() => {
     const r = computeAwgWireGeometry({ awg: awg.select.value });
@@ -6221,7 +6221,7 @@ function _v1109renderMwbcVoltageDrop(inputRegion, outputRegion, citationEl) {
   lb.input.value = "4";
   const sv = makeNumber("Source volts, line to neutral", "mwbc-sv", { step: "any", min: "0", value: "120" });
   sv.input.value = "120";
-  const tc = makeNumber("Conductor temperature (C)", "mwbc-tc", { step: "any", value: "75" });
+  const tc = makeNumber("Conductor temperature (°C)", "mwbc-tc", { step: "any", value: "75" });
   tc.input.value = "75";
   for (const f of [aw, mt, ln, la, lb, sv, tc]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { aw.select.value = "12"; mt.select.value = "copper"; ln.input.value = "100"; la.input.value = "16"; lb.input.value = "4"; sv.input.value = "120"; tc.input.value = "75"; update(); });

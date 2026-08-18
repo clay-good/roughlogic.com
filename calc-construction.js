@@ -407,9 +407,9 @@ export const ASSEMBLY_DEFAULTS = {
   drywall_4x8:     { coverage_ft2_per_unit: 32, waste: 0.10, unit_label: "sheet (4x8)" },
   drywall_4x12:    { coverage_ft2_per_unit: 48, waste: 0.10, unit_label: "sheet (4x12)" },
   paint_one_coat:  { coverage_ft2_per_unit: 350, waste: 0.10, unit_label: "gallon" },
-  flooring_lvp:    { coverage_ft2_per_unit: 24,  waste: 0.10, unit_label: "carton (24 ft^2)" },
-  roofing_3tab:    { coverage_ft2_per_unit: 33.3, waste: 0.15, unit_label: "bundle (33.3 ft^2)" },
-  siding_lap_8in:  { coverage_ft2_per_unit: 25,  waste: 0.10, unit_label: "carton (25 ft^2)" },
+  flooring_lvp:    { coverage_ft2_per_unit: 24,  waste: 0.10, unit_label: "carton (24 ft²)" },
+  roofing_3tab:    { coverage_ft2_per_unit: 33.3, waste: 0.15, unit_label: "bundle (33.3 ft²)" },
+  siding_lap_8in:  { coverage_ft2_per_unit: 25,  waste: 0.10, unit_label: "carton (25 ft²)" },
 };
 
 // dims: in { assembly: dimensionless, area_ft2: L^2 } out: { units: dimensionless }
@@ -741,7 +741,7 @@ export function renderBeamLoading(inputRegion, outputRegion, citationEl) {
 export function renderMaterialQuantity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Common-assembly coverage and waste factors are engineering rules of thumb. Verify against the specific manufacturer's published coverage.";
   const a = makeSelect("Assembly", "mq-a", Object.keys(ASSEMBLY_DEFAULTS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
-  const area = makeNumber("Area (ft^2)", "mq-area", { step: "any", min: "0" });
+  const area = makeNumber("Area (ft²)", "mq-area", { step: "any", min: "0" });
   for (const f of [a, area]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { a.select.value = "drywall_4x8"; area.input.value = "1000"; update(); });
   const oU = makeOutputLine(outputRegion, "Units (with waste)", "mq-out-u");
@@ -1157,7 +1157,7 @@ export function renderJoistDeflection(inputRegion, outputRegion, citationEl) {
   const w = makeNumber("Uniform load (plf)", "jd-w", { step: "any", min: "0" });
   const L = makeNumber("Span (ft)", "jd-l", { step: "any", min: "0" });
   const E = makeNumber("E (psi)", "jd-e", { step: "any", min: "0" });
-  const I = makeNumber("I (in^4)", "jd-i", { step: "any", min: "0" });
+  const I = makeNumber("I (in⁴)", "jd-i", { step: "any", min: "0" });
   for (const f of [w, L, E, I]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { w.input.value = "50"; L.input.value = "12"; E.input.value = "1600000"; I.input.value = "47.6"; update(); });
   const oD = makeOutputLine(outputRegion, "Mid-span deflection", "jd-out-d");
@@ -1205,7 +1205,7 @@ export function renderFootingArea(inputRegion, outputRegion, citationEl) {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderTileCount(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: tile count = ceil(area_ft^2 * 144 / (w*h)) plus waste; grout volume estimated from joint perimeter * width * tile thickness.";
-  const a = makeNumber("Area (ft^2)", "tc-a", { step: "any", min: "0" });
+  const a = makeNumber("Area (ft²)", "tc-a", { step: "any", min: "0" });
   const w = makeNumber("Tile width (in)", "tc-w", { step: "any", min: "0" });
   const h = makeNumber("Tile height (in)", "tc-h", { step: "any", min: "0" });
   const j = makeNumber("Grout joint width (in)", "tc-j", { step: "any", min: "0", value: "0.125" });
@@ -1234,7 +1234,7 @@ export function renderTileCount(inputRegion, outputRegion, citationEl) {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPaintCoverage(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: gallons = area / (coverage * surface_factor). 350 ft^2/gal smooth, 250 textured, 175 rough.";
-  const a = makeNumber("Area (ft^2)", "pc-a", { step: "any", min: "0" });
+  const a = makeNumber("Area (ft²)", "pc-a", { step: "any", min: "0" });
   const c = makeNumber("Coats", "pc-c", { step: "1", min: "1", value: "2" });
   c.input.value = "2";
   const prim = makeCheckbox("Primer needed", "pc-p");
@@ -1292,7 +1292,7 @@ export function renderExcavation(inputRegion, outputRegion, citationEl) {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderMasonryCount(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: count = ceil(wall_area / face_area * 1.05). Face area uses (w + mortar) * (h + mortar).";
-  const a = makeNumber("Wall area (ft^2)", "mc-a", { step: "any", min: "0" });
+  const a = makeNumber("Wall area (ft²)", "mc-a", { step: "any", min: "0" });
   const u = makeSelect("Unit type", "mc-u", Object.keys(MASONRY_UNIT_FACE_IN).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   const m = makeNumber("Mortar joint (in)", "mc-m", { step: "any", min: "0", value: "0.375" });
   m.input.value = "0.375";
@@ -1888,8 +1888,8 @@ const renderDrywall = _simpleRenderer({
   citation: "Citation: Public engineering practice (0.053 gal mud / ft^2; 1.0 lf tape / ft^2; 28-32 screws / sheet).",
   example: drywallExample.inputs,
   fields: [
-    { key: "wall_area_ft2", label: "Wall area (ft^2)", kind: "number" },
-    { key: "ceiling_area_ft2", label: "Ceiling area (ft^2)", kind: "number" },
+    { key: "wall_area_ft2", label: "Wall area (ft²)", kind: "number" },
+    { key: "ceiling_area_ft2", label: "Ceiling area (ft²)", kind: "number" },
     { key: "sheet_size", label: "Sheet size", kind: "select", options: [{ value: "4x8", label: "4x8" }, { value: "4x10", label: "4x10" }, { value: "4x12", label: "4x12" }] },
     { key: "waste_percent", label: "Waste (%)", kind: "number", default: 10 },
   ],
@@ -1906,7 +1906,7 @@ const renderRoofingSquares = _simpleRenderer({
   citation: "Citation: Roofing squares (1 sq = 100 ft^2). Bundles per square per shingle product (3 for 3-tab/architectural, 4 for premium). Manufacturer benchmarks generally.",
   example: roofingSquaresExample.inputs,
   fields: [
-    { key: "roof_area_ft2", label: "Roof area (ft^2)", kind: "number" },
+    { key: "roof_area_ft2", label: "Roof area (ft²)", kind: "number" },
     { key: "pitch_rise", label: "Pitch rise (in / 12)", kind: "number" },
     { key: "shingle_product", label: "Shingle product", kind: "select", options: [{ value: "3-tab", label: "3-tab" }, { value: "architectural", label: "Architectural" }, { value: "premium", label: "Premium" }] },
     { key: "perimeter_ft", label: "Perimeter (ft)", kind: "number" },
@@ -1924,7 +1924,7 @@ const renderAsphaltTonnage = _simpleRenderer({
   citation: "Citation: Tons = volume * density / 2000. Default density 145 pcf for hot mix. Optional paving width yields paving distance and per-truck length.",
   example: asphaltTonnageExample.inputs,
   fields: [
-    { key: "area_ft2", label: "Paved area (ft^2)", kind: "number" },
+    { key: "area_ft2", label: "Paved area (ft²)", kind: "number" },
     { key: "depth_in", label: "Compacted depth (in)", kind: "number" },
     { key: "density_pcf", label: "Mix density (pcf)", kind: "number", default: 145 },
     // v8 §C.4: optional paving width activates paving-distance + per-truck length.
@@ -1988,7 +1988,7 @@ const _v815renderAsphaltTackCoatQuantity = _simpleRenderer({
   citation: "Citation: coverage identity by name. emulsion gallons = area / 9 (sy) x residual rate / residue fraction; residual gallons = area / 9 x residual rate. The DOT spec sets the residual rate; the supplier's data sheet sets the residue fraction.",
   example: asphaltTackCoatQuantityExample.inputs,
   fields: [
-    { key: "area_sf", label: "Area to shoot (ft^2)", kind: "number" },
+    { key: "area_sf", label: "Area to shoot (ft²)", kind: "number" },
     { key: "residual_rate_gal_sy", label: "Residual application rate (gal/sy)", kind: "number", default: 0.04 },
     { key: "residue_pct", label: "Emulsion asphalt residue (%)", kind: "number", default: 60 },
   ],
@@ -2005,7 +2005,7 @@ const renderAggregate = _simpleRenderer({
   citation: "Citation: Cubic yards from area * depth / 27; tons from volume * pcf / 2000. Densities from public engineering tables.",
   example: aggregateExample.inputs,
   fields: [
-    { key: "area_ft2", label: "Area (ft^2)", kind: "number" },
+    { key: "area_ft2", label: "Area (ft²)", kind: "number" },
     { key: "depth_in", label: "Depth (in)", kind: "number" },
     { key: "material", label: "Material", kind: "select", options: Object.keys(AGGREGATE_DENSITIES_PCF).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
   ],
@@ -2042,10 +2042,10 @@ const renderConcreteMixDesign = _simpleRenderer({
   ],
   outputs: [
     { key: "wc", id: "cmd-out-wc", label: "Water-to-cement", value: (r) => _fmtC(r.wc_ratio, 3) },
-    { key: "w", id: "cmd-out-w", label: "Water (lb/yd^3)", value: (r) => _fmtC(r.water_lb_yd3, 0) },
-    { key: "c", id: "cmd-out-c", label: "Cement (bags/yd^3)", value: (r) => _fmtC(r.cement_bags_yd3, 2) },
-    { key: "ca", id: "cmd-out-ca", label: "Coarse agg (lb/yd^3)", value: (r) => _fmtC(r.coarse_lb_yd3, 0) },
-    { key: "fa", id: "cmd-out-fa", label: "Fine agg (lb/yd^3)", value: (r) => _fmtC(r.fine_lb_yd3, 0) },
+    { key: "w", id: "cmd-out-w", label: "Water (lb/yd³)", value: (r) => _fmtC(r.water_lb_yd3, 0) },
+    { key: "c", id: "cmd-out-c", label: "Cement (bags/yd³)", value: (r) => _fmtC(r.cement_bags_yd3, 2) },
+    { key: "ca", id: "cmd-out-ca", label: "Coarse agg (lb/yd³)", value: (r) => _fmtC(r.coarse_lb_yd3, 0) },
+    { key: "fa", id: "cmd-out-fa", label: "Fine agg (lb/yd³)", value: (r) => _fmtC(r.fine_lb_yd3, 0) },
   ],
   compute: computeConcreteMixDesign,
 });
@@ -2107,7 +2107,7 @@ const renderWeldUsage = _simpleRenderer({
   example: weldUsageExample.inputs,
   fields: [
     { key: "process", label: "Process", kind: "select", options: ["SMAW", "GMAW", "FCAW", "GTAW"].map((v) => ({ value: v, label: v })) },
-    { key: "weld_cross_section_in2", label: "Weld cross-section (in^2)", kind: "number" },
+    { key: "weld_cross_section_in2", label: "Weld cross-section (in²)", kind: "number" },
     { key: "weld_length_in", label: "Weld length (in)", kind: "number" },
     { key: "deposition_rate_lb_per_min", label: "Deposition rate (lb/min)", kind: "number", default: 4 },
   ],
@@ -2115,7 +2115,7 @@ const renderWeldUsage = _simpleRenderer({
     { key: "d", id: "wu-out-d", label: "Deposit (lb)", value: (r) => _fmtC(r.deposit_lb, 2) },
     { key: "c", id: "wu-out-c", label: "Consumable (lb)", value: (r) => _fmtC(r.consumable_lb, 2) },
     { key: "m", id: "wu-out-m", label: "Time (min)", value: (r) => _fmtC(r.minutes, 1) },
-    { key: "g", id: "wu-out-g", label: "Shielding gas (ft^3)", value: (r) => _fmtC(r.gas_ft3, 1) },
+    { key: "g", id: "wu-out-g", label: "Shielding gas (ft³)", value: (r) => _fmtC(r.gas_ft3, 1) },
   ],
   compute: computeWeldUsage,
 });
@@ -2125,11 +2125,11 @@ const renderDemoDebris = _simpleRenderer({
   example: demoDebrisExample.inputs,
   fields: [
     { key: "structure_type", label: "Structure type", kind: "select", options: Object.keys(DEMO_DEBRIS_PCF).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
-    { key: "volume_yd3", label: "Volume (yd^3)", kind: "number" },
+    { key: "volume_yd3", label: "Volume (yd³)", kind: "number" },
   ],
   outputs: [
     { key: "t", id: "dd-out-t", label: "Tons", value: (r) => _fmtC(r.tons, 1) },
-    { key: "d", id: "dd-out-d", label: "Recommended dumpster (yd^3)", value: (r) => String(r.dumpster_yd3) },
+    { key: "d", id: "dd-out-d", label: "Recommended dumpster (yd³)", value: (r) => String(r.dumpster_yd3) },
   ],
   compute: computeDemoDebris,
 });
@@ -2139,7 +2139,7 @@ const renderFormworkPressure = _simpleRenderer({
   example: formworkPressureExample.inputs,
   fields: [
     { key: "pour_rate_ft_per_hr", label: "Pour rate (ft/hr)", kind: "number" },
-    { key: "concrete_temp_F", label: "Concrete temperature (F)", kind: "number" },
+    { key: "concrete_temp_F", label: "Concrete temperature (°F)", kind: "number" },
     { key: "weight_factor", label: "Weight factor", kind: "select", options: Object.keys(ACI_C_W).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
     { key: "unit_weight_pcf", label: "Unit weight (pcf)", kind: "number", default: 150 },
     { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
@@ -3918,7 +3918,7 @@ function renderMetalWeight(inputRegion, outputRegion, citationEl) {
     { value: "aluminum-6061", label: "Aluminum 6061 (0.098)" }, { value: "copper", label: "Copper (0.323)" },
     { value: "brass", label: "Brass (0.307)" }, { value: "custom", label: "Custom density" },
   ]);
-  const dens = makeNumber("Density (lb/in^3)", "mw-dens", { step: "any", min: "0", value: "0.2836" });
+  const dens = makeNumber("Density (lb/in³)", "mw-dens", { step: "any", min: "0", value: "0.2836" });
   dens.input.value = "0.2836";
   for (const f of [len, qty, alloy, dens]) inputRegion.appendChild(f.wrap);
   const oArea = makeOutputLine(outputRegion, "Cross-section area", "mw-out-area");
@@ -4229,7 +4229,7 @@ function _v69renderCoatingCoverageDft(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: SSPC / AMPP PA 2 (dry-film thickness) and the 1604 ft^2-mil/gal coverage constant by name. theoretical = 1604 x volume-solids / DFT; practical applies the loss factor; WFT = DFT / volume-solids. The product data sheet governs.";
   const solids = makeNumber("Volume solids (%, from the data sheet)", "cc-solids", { step: "any", min: "0" });
   const dft = makeNumber("Target dry-film thickness (mils)", "cc-dft", { step: "any", min: "0" });
-  const area = makeNumber("Area to coat (ft^2)", "cc-area", { step: "any", min: "0" });
+  const area = makeNumber("Area to coat (ft²)", "cc-area", { step: "any", min: "0" });
   const loss = makeNumber("Application loss (%, spray ~35)", "cc-loss", { step: "any", min: "0", value: "35" });
   loss.input.value = "35";
   for (const f of [solids, dft, area, loss]) inputRegion.appendChild(f.wrap);
@@ -4308,8 +4308,8 @@ function _v69renderAbrasiveBlast(inputRegion, outputRegion, citationEl) {
   ]);
   const pressure = makeNumber("Blast pressure (psi)", "ab-press", { step: "any", min: "0", value: "100" });
   pressure.input.value = "100";
-  const area = makeNumber("Area to blast (ft^2)", "ab-area", { step: "any", min: "0" });
-  const lbPerFt2 = makeNumber("Abrasive per ft^2 (lb, heavy-prep ~8)", "ab-lb", { step: "any", min: "0", value: "8" });
+  const area = makeNumber("Area to blast (ft²)", "ab-area", { step: "any", min: "0" });
+  const lbPerFt2 = makeNumber("Abrasive per ft² (lb, heavy-prep ~8)", "ab-lb", { step: "any", min: "0", value: "8" });
   lbPerFt2.input.value = "8";
   for (const f of [bore, pressure, area, lbPerFt2]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { bore.select.value = "0.375"; pressure.input.value = "100"; area.input.value = "3000"; lbPerFt2.input.value = "8"; update(); });
@@ -4649,8 +4649,8 @@ const renderCmuGroutVolume = _simpleRenderer({
     { key: "wall_len_ft", label: "Wall length (ft)", kind: "number" },
     { key: "wall_ht_ft", label: "Wall height (ft)", kind: "number" },
     { key: "core_spacing_in", label: "Grouted-core spacing oc (in)", kind: "number" },
-    { key: "core_area_in2", label: "Core cross-section (in^2, ~24 for 8 in)", kind: "number", default: 24 },
-    { key: "bond_area_in2", label: "Bond-beam cross-section (in^2, 0 = none)", kind: "number", default: 30 },
+    { key: "core_area_in2", label: "Core cross-section (in², ~24 for 8 in)", kind: "number", default: 24 },
+    { key: "bond_area_in2", label: "Bond-beam cross-section (in², 0 = none)", kind: "number", default: 30 },
   ],
   outputs: [
     { key: "c", id: "cgv-out-c", label: "Grouted cores", value: (r) => String(r.cores) },
@@ -4836,7 +4836,7 @@ const renderMetalRoofPanels = _simpleRenderer({
   outputs: [
     { key: "p", id: "mrp-out-p", label: "Panels", value: (r) => String(r.panels) },
     { key: "lf", id: "mrp-out-lf", label: "Total panel (lf)", value: (r) => _fmtC(r.total_panel_lf, 0) },
-    { key: "a", id: "mrp-out-a", label: "Plane area (ft^2)", value: (r) => _fmtC(r.plane_area_ft2, 0) },
+    { key: "a", id: "mrp-out-a", label: "Plane area (ft²)", value: (r) => _fmtC(r.plane_area_ft2, 0) },
     { key: "sq", id: "mrp-out-sq", label: "Squares", value: (r) => _fmtC(r.squares, 1) },
     { key: "f", id: "mrp-out-f", label: "Fasteners", value: (r) => String(r.fasteners) },
   ],
@@ -4922,7 +4922,7 @@ CONSTRUCTION_RENDERERS["rain-load-ponding"] = _simpleRenderer({
   fields: [
     { key: "static_head_in", label: "Static head to secondary inlet ds (in)", kind: "number" },
     { key: "hydraulic_head_in", label: "Hydraulic head at design flow dh (in)", kind: "number" },
-    { key: "roof_area_ft2", label: "Tributary roof area (ft^2, optional)", kind: "number", default: 0 },
+    { key: "roof_area_ft2", label: "Tributary roof area (ft², optional)", kind: "number", default: 0 },
     { key: "rainfall_in_hr", label: "Design rainfall (in/hr, optional)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -5983,8 +5983,8 @@ const _renderConcreteEvaporationRate = _simpleRenderer({
   citation: "Citation: ACI 305 (Hot Weather Concreting) nomograph and the Menzel/NRMCA evaporation equation: E [kg/m^2/hr] = 5 x [(Tc + 18)^2.5 - (RH/100)(Ta + 18)^2.5](V + 4) x 10^-6, with Tc, Ta in C and V in km/h (converted from F and mph; 1 kg/m^2/hr = 0.2048 lb/ft^2/hr). Take precautions above 0.2 lb/ft^2/hr (~1.0 kg/m^2/hr); use the lower 0.1 lb/ft^2/hr caution for low-bleed mixes (low w/c, silica fume, high-early cement). The concrete temperature, not the air, drives the vapor term; a low-bleed mix cracks below the nominal threshold. A field screen, not a curing specification (curing follows ACI 308).",
   example: concreteEvaporationRateExample.inputs,
   fields: [
-    { key: "air_temp_f", label: "Air temperature (F)", kind: "number", attrs: { step: "any" } },
-    { key: "concrete_temp_f", label: "Concrete temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "air_temp_f", label: "Air temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "concrete_temp_f", label: "Concrete temperature (°F)", kind: "number", attrs: { step: "any" } },
     { key: "rh_pct", label: "Relative humidity (%)", kind: "number" },
     { key: "wind_mph", label: "Wind speed (mph)", kind: "number" },
   ],
@@ -6075,12 +6075,12 @@ const _renderConcreteMaturity = _simpleRenderer({
   citation: "Citation: ASTM C1074 maturity method. Nurse-Saul time-temperature factor M = Sum (Ta - T0) x dt in deg C-hr, evaluated here over one constant-temperature interval; recommended datum T0 = 0 C (32 F) for Type I cement without admixtures cured 0 to 40 C, otherwise per the C1074 datum procedure. Arrhenius equivalent age te = exp(-Q x (1/Ta - 1/Tr)) x t with temperatures in kelvin; Q = 5000 K for Type I without admixtures and Tr = 20 C (68 F) traditional per C1074 (23 C also permissible; both editable). The strength a TTF represents comes only from the lab-calibrated strength-maturity curve for the project's own mix (the C1074 procedure); compare the field TTF to that calibrated target. Intervals at or below the datum accrue no maturity. A scheduling estimate that supplements, not replaces, acceptance cylinders; the engineer of record and the project specification govern.",
   example: concreteMaturityExample.inputs,
   fields: [
-    { key: "concrete_temp_f", label: "Average concrete temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "concrete_temp_f", label: "Average concrete temperature (°F)", kind: "number", attrs: { step: "any" } },
     { key: "hours", label: "Elapsed curing time (hours)", kind: "number", attrs: { step: "any" } },
-    { key: "datum_f", label: "Datum temperature T0 (F)", kind: "number", default: 32, attrs: { step: "any" } },
+    { key: "datum_f", label: "Datum temperature T0 (°F)", kind: "number", default: 32, attrs: { step: "any" } },
     { key: "q_kelvin", label: "Arrhenius constant Q (K)", kind: "number", default: 5000 },
-    { key: "ref_temp_f", label: "Reference temperature Tr (F)", kind: "number", default: 68, attrs: { step: "any" } },
-    { key: "target_ttf_c", label: "Target TTF (deg C-hr, 0 = none)", kind: "number", default: 1600 },
+    { key: "ref_temp_f", label: "Reference temperature Tr (°F)", kind: "number", default: 68, attrs: { step: "any" } },
+    { key: "target_ttf_c", label: "Target TTF (°C-hr, 0 = none)", kind: "number", default: 1600 },
   ],
   outputs: [
     { key: "mc", id: "cmat-out-mc", label: "Maturity index (TTF)", value: (r) => _fmtC(r.M_c, 0) + " deg C-hr" },
@@ -6117,12 +6117,12 @@ const _renderAllowableArea = _simpleRenderer({
   citation: "Citation: IBC 2021 §506.2 (Aa = At + NS x If), §506.3.1 (If = 0 unless F/P >= 0.25 on open space 20 ft or wider), §506.3.2 (If = [F/P - 0.25] x W/30), §506.3.3 (W capped at 30 ft in the equation). At and NS come from Table 506.2 for the actual occupancy group and construction type in the correct sprinkler column (NS nonsprinklered, S1 single-story sprinklered, SM multistory). A mixed-occupancy or multistory building uses the §506.2.2 / §508.4 sum-of-ratios and the §506.2.3 story multiplier instead of this single-occupancy single-story form. A feasibility aid, not a code-official determination.",
   example: allowableAreaExample.inputs,
   fields: [
-    { key: "tabular_area", label: "Tabular area At (ft^2, correct column)", kind: "number" },
-    { key: "ns_area", label: "Nonsprinklered area NS (ft^2)", kind: "number" },
+    { key: "tabular_area", label: "Tabular area At (ft², correct column)", kind: "number" },
+    { key: "ns_area", label: "Nonsprinklered area NS (ft²)", kind: "number" },
     { key: "frontage_ft", label: "Open-frontage length F (ft)", kind: "number" },
     { key: "perimeter_ft", label: "Total perimeter P (ft)", kind: "number" },
     { key: "open_width_ft", label: "Open-space width W (ft)", kind: "number", default: 30 },
-    { key: "actual_area", label: "Proposed story area (ft^2)", kind: "number" },
+    { key: "actual_area", label: "Proposed story area (ft²)", kind: "number" },
   ],
   outputs: [
     { key: "if", id: "ala-out-if", label: "Frontage factor If", value: (r) => _fmtC(r.frontage_if, 3) },
@@ -6575,8 +6575,8 @@ const _renderWoodCombinedBendingAxial = _simpleRenderer({
   fields: [
     { key: "p_lb", label: "Axial compression P (lb)", kind: "number" },
     { key: "m_inlb", label: "Bending moment M (in-lb)", kind: "number" },
-    { key: "a_in2", label: "Area A (in^2)", kind: "number" },
-    { key: "s_in3", label: "Section modulus S (in^3)", kind: "number" },
+    { key: "a_in2", label: "Area A (in²)", kind: "number" },
+    { key: "s_in3", label: "Section modulus S (in³)", kind: "number" },
     { key: "fc_adj_psi", label: "Adjusted Fc' (with Cp, psi)", kind: "number" },
     { key: "fb_adj_psi", label: "Adjusted Fb' (with CL, psi)", kind: "number" },
     { key: "emin_adj_psi", label: "Adjusted Emin' (psi)", kind: "number", default: 580000 },
@@ -6975,7 +6975,7 @@ const _renderCantileverBeam = _simpleRenderer({
     { key: "P_lb", label: "Tip point load P (lb, optional)", kind: "number" },
     { key: "w_plf", label: "Uniform load w (lb/ft, optional)", kind: "number" },
     { key: "E_psi", label: "Modulus E (psi; 29e6 steel, 1.6e6 wood)", kind: "number", default: 29000000 },
-    { key: "I_in4", label: "Moment of inertia I (in^4)", kind: "number" },
+    { key: "I_in4", label: "Moment of inertia I (in⁴)", kind: "number" },
   ],
   outputs: [
     { key: "m", id: "cb-out-m", label: "Max moment (at support)", value: (r) => fmt(r.M_lbft, 0) + " lb-ft" },
@@ -7078,9 +7078,9 @@ const _renderCombinedStressAxialBending = _simpleRenderer({
     { key: "P_lb", label: "Axial force P (lb, + compression)", kind: "number" },
     { key: "M_lbin", label: "Bending moment M (lb-in)", kind: "number" },
     { key: "e_in", label: "OR eccentricity e (in; sets M = P e)", kind: "number" },
-    { key: "A_in2", label: "Area A (in^2)", kind: "number" },
+    { key: "A_in2", label: "Area A (in²)", kind: "number" },
     { key: "c_in", label: "Extreme-fiber distance c (in)", kind: "number" },
-    { key: "I_in4", label: "Moment of inertia I (in^4)", kind: "number" },
+    { key: "I_in4", label: "Moment of inertia I (in⁴)", kind: "number" },
   ],
   outputs: [
     { key: "ax", id: "cs-out-ax", label: "Axial stress P/A", value: (r) => fmt(r.sigma_axial, 0) + " psi" },
@@ -7218,7 +7218,7 @@ const _renderThermalStressRestrained = _simpleRenderer({
     { key: "E_psi", label: "Modulus E (psi; 29e6 steel, 10e6 alum)", kind: "number", default: 29000000 },
     { key: "alpha", label: "Thermal expansion alpha (/F; 6.5e-6 steel)", kind: "number" },
     { key: "dT_F", label: "Temperature change dT (F, + heating)", kind: "number" },
-    { key: "A_in2", label: "Cross-section area A (in^2, for force)", kind: "number" },
+    { key: "A_in2", label: "Cross-section area A (in², for force)", kind: "number" },
     { key: "L_in", label: "Length L (in, for free expansion)", kind: "number" },
     { key: "restraint", label: "Restraint factor (0-1, default 1)", kind: "number", default: 1 },
   ],
@@ -7543,11 +7543,11 @@ const _v431renderReadyMixConcreteOrder = _simpleRenderer({
   citation: "Citation: Ready-mix concrete order (concrete-supply practice): ordered = in-place volume x (1 + waste%), trucks = ceil(ordered / truck capacity), short-load fee when the order is below the plant minimum. A quantity aid; the supplier's truck size, minimum, and short-load/standby fees govern.",
   example: readyMixConcreteOrderExample.inputs,
   fields: [
-    { key: "volume_yd3", label: "Required in-place volume (yd^3)", kind: "number", default: 42 },
+    { key: "volume_yd3", label: "Required in-place volume (yd³)", kind: "number", default: 42 },
     { key: "waste_pct", label: "Waste/over-order allowance (%)", kind: "number", default: 8 },
-    { key: "load_yd3", label: "Truck capacity (yd^3, default 10)", kind: "number", default: 10 },
-    { key: "min_yd3", label: "Plant minimum before short-load fee (yd^3)", kind: "number", default: 10 },
-    { key: "price_per_yd3", label: "Concrete price ($/yd^3, optional)", kind: "number", default: 0 },
+    { key: "load_yd3", label: "Truck capacity (yd³, default 10)", kind: "number", default: 10 },
+    { key: "min_yd3", label: "Plant minimum before short-load fee (yd³)", kind: "number", default: 10 },
+    { key: "price_per_yd3", label: "Concrete price ($/yd³, optional)", kind: "number", default: 0 },
   ],
   outputs: [
     { key: "o", id: "rmc-out-o", label: "Order / trucks", value: (r) => fmt(r.ordered_yd3, 2) + " yd^3 -> " + r.trucks + " truck(s), last load " + fmt(r.last_load_yd3, 2) + " yd^3" },
@@ -7585,7 +7585,7 @@ const _v816renderShotcreteReboundQuantity = _simpleRenderer({
   citation: "Citation: rebound gross-up identity by name. shot volume = in-place volume / (1 - rebound fraction), where in-place = area x thickness/12 / 27 and rebound = shot minus in-place over shot. The applicator's field rebound governs.",
   example: shotcreteReboundQuantityExample.inputs,
   fields: [
-    { key: "area_sf", label: "Area to shoot (ft^2)", kind: "number" },
+    { key: "area_sf", label: "Area to shoot (ft²)", kind: "number" },
     { key: "thickness_in", label: "In-place section thickness (in)", kind: "number" },
     { key: "rebound_pct", label: "Rebound loss (% of material shot)", kind: "number", default: 20 },
   ],
@@ -7809,7 +7809,7 @@ const _v819renderWeldedWireMesh = _simpleRenderer({
   citation: "Citation: lapped-coverage identity by name. effective sheet = (width - side lap/12) x (length - end lap/12); sheets = ceil(slab area x (1 + waste) / effective sheet). Mesh is lapped one full square at the sides and ends; the structural drawings set the style.",
   example: weldedWireMeshExample.inputs,
   fields: [
-    { key: "slab_area_sf", label: "Slab area to reinforce (ft^2)", kind: "number" },
+    { key: "slab_area_sf", label: "Slab area to reinforce (ft²)", kind: "number" },
     { key: "sheet_width_ft", label: "Mesh sheet width (ft)", kind: "number", default: 5 },
     { key: "sheet_length_ft", label: "Mesh sheet length (ft)", kind: "number", default: 10 },
     { key: "side_lap_in", label: "Side lap (in)", kind: "number", default: 6 },
@@ -7855,7 +7855,7 @@ const _v814renderConcretePourRate = _simpleRenderer({
   example: concretePourRateExample.inputs,
   fields: [
     { key: "placement_rate_cyhr", label: "Crew placement rate (cy/hr)", kind: "number" },
-    { key: "form_plan_area_ft2", label: "Form plan footprint (ft^2, wall = length x thickness)", kind: "number" },
+    { key: "form_plan_area_ft2", label: "Form plan footprint (ft², wall = length x thickness)", kind: "number" },
     { key: "total_volume_cy", label: "Total pour volume (cy)", kind: "number" },
     { key: "truck_load_cy", label: "Ready-mix truck load (cy)", kind: "number", default: 10 },
   ],
@@ -7894,9 +7894,9 @@ const _v439renderInsulationBattCoverage = _simpleRenderer({
   citation: "Citation: Batt insulation takeoff (manufacturer label coverage): net area x (1 + waste%), divided by the coverage per batt and per bag, each rounded up. Coverage depends on R-value and cavity width (an R-13 15 in batt covers ~10.67 ft^2). A quantity aid; the label coverage governs.",
   example: insulationBattCoverageExample.inputs,
   fields: [
-    { key: "area_ft2", label: "Net cavity area (ft^2, less openings)", kind: "number", default: 500 },
-    { key: "coverage_per_batt", label: "Coverage per batt (ft^2, e.g. 10.67 for R-13 15 in)", kind: "number", default: 10.67 },
-    { key: "coverage_per_bag", label: "Coverage per bag (ft^2, from the label)", kind: "number", default: 88 },
+    { key: "area_ft2", label: "Net cavity area (ft², less openings)", kind: "number", default: 500 },
+    { key: "coverage_per_batt", label: "Coverage per batt (ft², e.g. 10.67 for R-13 15 in)", kind: "number", default: 10.67 },
+    { key: "coverage_per_bag", label: "Coverage per bag (ft², from the label)", kind: "number", default: 88 },
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -8091,8 +8091,8 @@ const _v467renderPoweredAtticVentilator = _simpleRenderer({
   citation: "Citation: Powered attic ventilator sizing: fan ~0.7 CFM per ft^2 of attic floor (about 10 ACH), +~15% for a dark roof; matching intake net free area ~1 ft^2 per 300 CFM. Balanced passive ventilation is often preferred and some codes restrict powered fans. A sizing aid; the fan manufacturer's data and the local code govern.",
   example: poweredAtticVentilatorExample.inputs,
   fields: [
-    { key: "attic_area_ft2", label: "Attic floor area (ft^2)", kind: "number", default: 1500 },
-    { key: "cfm_per_ft2", label: "Airflow factor (CFM per ft^2)", kind: "number", default: 0.7 },
+    { key: "attic_area_ft2", label: "Attic floor area (ft²)", kind: "number", default: 1500 },
+    { key: "cfm_per_ft2", label: "Airflow factor (CFM per ft²)", kind: "number", default: 0.7 },
     { key: "dark_roof", label: "Dark roof (~15% increase)?", kind: "select", default: "no", options: [{ value: "no", label: "No (light/average roof)" }, { value: "yes", label: "Yes (dark roof)" }] },
   ],
   outputs: [
@@ -8287,7 +8287,7 @@ const _v546renderWindSolidSign = _simpleRenderer({
     { key: "velocity_pressure_psf", label: "Velocity pressure qh (psf)", kind: "number" },
     { key: "gust_factor", label: "Gust factor G", kind: "number", default: 0.85 },
     { key: "force_coefficient", label: "Force coefficient Cf (net, Fig 29.3-1)", kind: "number" },
-    { key: "solid_area_ft2", label: "Solid area As (ft^2)", kind: "number" },
+    { key: "solid_area_ft2", label: "Solid area As (ft²)", kind: "number" },
     { key: "width_ft", label: "Width B (ft)", kind: "number" },
   ],
   outputs: [
@@ -8382,8 +8382,8 @@ const _v797renderConcreteYield = _simpleRenderer({
   example: concreteYieldExample.inputs,
   fields: [
     { key: "total_batch_mass_lb", label: "Total batch mass (lb, sum of all materials)", kind: "number", default: 3993 },
-    { key: "measured_unit_weight_lb_ft3", label: "Measured fresh unit weight (lb/ft^3, per C138)", kind: "number", default: 148 },
-    { key: "design_volume_yd3", label: "Design (batched) volume (yd^3)", kind: "number", default: 1 },
+    { key: "measured_unit_weight_lb_ft3", label: "Measured fresh unit weight (lb/ft³, per C138)", kind: "number", default: 148 },
+    { key: "design_volume_yd3", label: "Design (batched) volume (yd³)", kind: "number", default: 1 },
     { key: "cement_mass_lb", label: "Cementitious in the batch (lb, 0 to skip)", kind: "number", default: 564 },
   ],
   outputs: [
@@ -8500,7 +8500,7 @@ const _v803renderAsceLiveLoadReduction = _simpleRenderer({
   example: asceLiveLoadReductionExample.inputs,
   fields: [
     { key: "unreduced_load_psf", label: "Unreduced live load L0 (psf)", kind: "number", default: 50 },
-    { key: "tributary_area_ft2", label: "Tributary area AT (ft^2)", kind: "number", default: 400 },
+    { key: "tributary_area_ft2", label: "Tributary area AT (ft²)", kind: "number", default: 400 },
     { key: "member_type", label: "Member type (KLL, Table 4.7-1)", kind: "select", options: [
       { value: "interior_column", label: "Interior column (KLL 4)" },
       { value: "exterior_column", label: "Exterior column, no cantilever slab (KLL 4)" },
@@ -8604,7 +8604,7 @@ const _v851renderDuctMetalWeight = _simpleRenderer({
     { key: "width_in", label: "Duct width (in)", kind: "number", default: 24 },
     { key: "height_in", label: "Duct height (in)", kind: "number", default: 12 },
     { key: "length_ft", label: "Run length (ft)", kind: "number", default: 100 },
-    { key: "lb_per_sf", label: "Sheet weight for the gauge (lb/ft^2)", kind: "number", default: 1.156 },
+    { key: "lb_per_sf", label: "Sheet weight for the gauge (lb/ft²)", kind: "number", default: 1.156 },
     { key: "seam_factor", label: "Seam / reinforcement allowance", kind: "number", default: 1.15 },
   ],
   outputs: [
@@ -8704,7 +8704,7 @@ const _v859renderDuctWrapTakeoff = _simpleRenderer({
     { key: "height_in", label: "Duct height (in)", kind: "number", default: 12 },
     { key: "length_ft", label: "Run length (ft)", kind: "number", default: 40 },
     { key: "overlap_waste_factor", label: "Overlap + waste multiplier", kind: "number", default: 1.15 },
-    { key: "roll_coverage_sf", label: "Installed coverage per roll (ft^2)", kind: "number", default: 100 },
+    { key: "roll_coverage_sf", label: "Installed coverage per roll (ft²)", kind: "number", default: 100 },
   ],
   outputs: [
     { key: "r", id: "dwt-out-r", label: "Wrap rolls to order", value: (r) => _fmtC(r.rolls, 0) + " rolls" },
@@ -8786,8 +8786,8 @@ const _v862renderRoofUnderlaymentRolls = _simpleRenderer({
   citation: "Citation: roll-count identity by name. rolls = ceil(roof area x (1 + lap + waste) / roll coverage). Full-deck field underlayment (synthetic ~10 squares/roll, 15-lb felt ~4); distinct from the eave/valley ice-barrier-coverage.",
   example: roofUnderlaymentRollsExample.inputs,
   fields: [
-    { key: "roof_area_sf", label: "Roof deck area (ft^2)", kind: "number", default: 2500 },
-    { key: "roll_coverage_sf", label: "Coverage per roll (ft^2, ~1000 synthetic, ~400 felt)", kind: "number", default: 1000 },
+    { key: "roof_area_sf", label: "Roof deck area (ft²)", kind: "number", default: 2500 },
+    { key: "roll_coverage_sf", label: "Coverage per roll (ft², ~1000 synthetic, ~400 felt)", kind: "number", default: 1000 },
     { key: "lap_waste_pct", label: "Lap + waste allowance (percent)", kind: "number", default: 10 },
   ],
   outputs: [
@@ -8831,7 +8831,7 @@ const _v863renderMembraneRoofTakeoff = _simpleRenderer({
   citation: "Citation: membrane-takeoff identity by name. usable width = roll width - side lap; rolls = ceil(area x (1 + waste) / (usable width x roll length)); seam = area / usable width. The usable width nets out the side lap; the seam sizes the welding.",
   example: membraneRoofTakeoffExample.inputs,
   fields: [
-    { key: "roof_area_sf", label: "Roof area (ft^2)", kind: "number", default: 8000 },
+    { key: "roof_area_sf", label: "Roof area (ft²)", kind: "number", default: 8000 },
     { key: "roll_width_ft", label: "Membrane roll width (ft)", kind: "number", default: 10 },
     { key: "roll_length_ft", label: "Membrane roll length (ft)", kind: "number", default: 100 },
     { key: "sidelap_in", label: "Side lap (in)", kind: "number", default: 6 },
@@ -8881,7 +8881,7 @@ const _v864renderTaperedRoofInsulation = _simpleRenderer({
     { key: "run_ft", label: "Taper run length to drain (ft)", kind: "number", default: 40 },
     { key: "slope_in_per_ft", label: "Taper slope (in/ft)", kind: "number", default: 0.25 },
     { key: "start_thk_in", label: "Thickness at the low (start) edge (in)", kind: "number", default: 0.5 },
-    { key: "area_sf", label: "Field area (ft^2)", kind: "number", default: 2000 },
+    { key: "area_sf", label: "Field area (ft²)", kind: "number", default: 2000 },
     { key: "r_per_in", label: "Insulation R per inch", kind: "number", default: 5.7 },
   ],
   outputs: [
@@ -8921,9 +8921,9 @@ const _v865renderSheathingTakeoff = _simpleRenderer({
   citation: "Citation: sheathing-takeoff identity by name. sheets = ceil(area x (1 + waste) / sheet area); nails = sheets x nails-per-sheet. The nails-per-sheet comes from the nailing schedule on the plans (~60 for a 6/12 pattern, far more for a shear panel).",
   example: sheathingTakeoffExample.inputs,
   fields: [
-    { key: "area_sf", label: "Area to sheathe (ft^2)", kind: "number", default: 1600 },
+    { key: "area_sf", label: "Area to sheathe (ft²)", kind: "number", default: 1600 },
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 8 },
-    { key: "sheet_sf", label: "Panel area (ft^2, 32 for a 4x8)", kind: "number", default: 32 },
+    { key: "sheet_sf", label: "Panel area (ft², 32 for a 4x8)", kind: "number", default: 32 },
     { key: "nails_per_sheet", label: "Nails per panel from the schedule", kind: "number", default: 60 },
   ],
   outputs: [
@@ -8967,7 +8967,7 @@ const _v866renderConstructionAdhesiveTubes = _simpleRenderer({
   example: constructionAdhesiveTubesExample.inputs,
   fields: [
     { key: "total_lf", label: "Total bead length (ft)", kind: "number", default: 1200 },
-    { key: "tube_volume_in3", label: "Cartridge volume (in^3, ~50.6 for 28 oz)", kind: "number", default: 50.6 },
+    { key: "tube_volume_in3", label: "Cartridge volume (in³, ~50.6 for 28 oz)", kind: "number", default: 50.6 },
     { key: "bead_dia_in", label: "Bead diameter (in)", kind: "number", default: 0.375 },
   ],
   outputs: [
@@ -9239,7 +9239,7 @@ const _v872renderSealantJointYield = _simpleRenderer({
   example: sealantJointYieldExample.inputs,
   fields: [
     { key: "joint_lf", label: "Joint length (ft)", kind: "number", default: 500 },
-    { key: "cartridge_in3", label: "Cartridge volume (in^3, ~20.5 for 10.1 oz)", kind: "number", default: 20.5 },
+    { key: "cartridge_in3", label: "Cartridge volume (in³, ~20.5 for 10.1 oz)", kind: "number", default: 20.5 },
     { key: "joint_width_in", label: "Joint width (in)", kind: "number", default: 0.375 },
     { key: "joint_depth_in", label: "Joint depth (in)", kind: "number", default: 0.25 },
   ],
@@ -9281,7 +9281,7 @@ const _v873renderSelfLevelerBags = _simpleRenderer({
   citation: "Citation: bag-count identity by name. neat bags = area x average thickness / bag yield (square-foot-inches); bags = ceil(neat x (1 + waste)). The bag yield is the product's coverage at a reference thickness; use the average pour thickness from a survey.",
   example: selfLevelerBagsExample.inputs,
   fields: [
-    { key: "area_sf", label: "Area to pour (ft^2)", kind: "number", default: 500 },
+    { key: "area_sf", label: "Area to pour (ft²)", kind: "number", default: 500 },
     { key: "avg_thickness_in", label: "Average pour thickness (in)", kind: "number", default: 0.25 },
     { key: "bag_yield_sf_in", label: "Bag yield (square-foot-inches)", kind: "number", default: 6.25 },
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 5 },
@@ -9325,7 +9325,7 @@ const _v874renderCarpetTakeoff = _simpleRenderer({
   citation: "Citation: carpet takeoff identity by name. gross = area x (1 + waste); square yards = gross / 9; linear feet = gross / roll width. Carpet is sold by the square yard off 12 ft (or 15 ft) rolls; the seam plan governs the waste.",
   example: carpetTakeoffExample.inputs,
   fields: [
-    { key: "area_sf", label: "Area to carpet (ft^2)", kind: "number", default: 900 },
+    { key: "area_sf", label: "Area to carpet (ft²)", kind: "number", default: 900 },
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 10 },
     { key: "roll_width_ft", label: "Carpet roll width (ft)", kind: "number", default: 12 },
   ],
@@ -9370,7 +9370,7 @@ const _v875renderSfrmTakeoff = _simpleRenderer({
   citation: "Citation: SFRM takeoff identity by name. volume = area x thickness / 12; weight = volume x density; bags = ceil(weight / bag weight x (1 + waste)). The design thickness comes from the UL/ULC assembly for the required rating; SFRM carries high rebound waste.",
   example: sfrmTakeoffExample.inputs,
   fields: [
-    { key: "area_sf", label: "Area to spray (ft^2)", kind: "number", default: 5000 },
+    { key: "area_sf", label: "Area to spray (ft²)", kind: "number", default: 5000 },
     { key: "thickness_in", label: "Design thickness (in)", kind: "number", default: 1.5 },
     { key: "density_pcf", label: "Material density (pcf)", kind: "number", default: 15 },
     { key: "bag_lb", label: "Bag weight (lb)", kind: "number", default: 44 },
@@ -9414,7 +9414,7 @@ const _v876renderSprayFoamBoardFeet = _simpleRenderer({
   citation: "Citation: board-feet identity by name. board-feet = area x thickness; sets = ceil(board-feet x (1 + waste) / set yield). A board-foot is one square foot one inch thick; the set yield comes from the product (closed-cell ~4,800 bd-ft, open-cell far more).",
   example: sprayFoamBoardFeetExample.inputs,
   fields: [
-    { key: "area_sf", label: "Area to spray (ft^2)", kind: "number", default: 2000 },
+    { key: "area_sf", label: "Area to spray (ft²)", kind: "number", default: 2000 },
     { key: "thickness_in", label: "Applied thickness (in)", kind: "number", default: 3 },
     { key: "yield_bd_ft_per_set", label: "Board-feet per set (~4800 closed-cell)", kind: "number", default: 4800 },
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 10 },
@@ -9459,7 +9459,7 @@ const _v877renderMetalDeckTakeoff = _simpleRenderer({
   citation: "Citation: deck-takeoff identity by name. cover area = cover width x sheet length; sheets = ceil(area x (1 + waste) / cover area); side lap = area / cover width. The cover width is the net coverage; the fastening follows the SDI and the drawings.",
   example: metalDeckTakeoffExample.inputs,
   fields: [
-    { key: "area_sf", label: "Deck area (ft^2)", kind: "number", default: 10000 },
+    { key: "area_sf", label: "Deck area (ft²)", kind: "number", default: 10000 },
     { key: "cover_width_in", label: "Net cover width (in)", kind: "number", default: 36 },
     { key: "sheet_length_ft", label: "Sheet length (ft)", kind: "number", default: 30 },
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 5 },
@@ -9565,7 +9565,7 @@ const _v879renderAnchorEpoxyVolume = _simpleRenderer({
     { key: "hole_dia_in", label: "Drilled hole diameter (in)", kind: "number", default: 0.75 },
     { key: "bar_dia_in", label: "Anchor / rebar diameter (in)", kind: "number", default: 0.625 },
     { key: "embed_in", label: "Embedment depth (in)", kind: "number", default: 6 },
-    { key: "cartridge_in3", label: "Cartridge volume (in^3)", kind: "number", default: 15.3 },
+    { key: "cartridge_in3", label: "Cartridge volume (in³)", kind: "number", default: 15.3 },
     { key: "waste_pct", label: "Nozzle-purge waste (percent)", kind: "number", default: 10 },
   ],
   outputs: [
@@ -9614,9 +9614,9 @@ const _v880renderBaseplateGroutVolume = _simpleRenderer({
   fields: [
     { key: "plate_length_in", label: "Base plate length (in)", kind: "number", default: 18 },
     { key: "plate_width_in", label: "Base plate width (in)", kind: "number", default: 18 },
-    { key: "column_area_in2", label: "Column steel footprint (in^2)", kind: "number", default: 64 },
+    { key: "column_area_in2", label: "Column steel footprint (in²)", kind: "number", default: 64 },
     { key: "grout_thickness_in", label: "Grout bed thickness (in)", kind: "number", default: 1.5 },
-    { key: "bag_yield_ft3", label: "Bag yield (ft^3)", kind: "number", default: 0.45 },
+    { key: "bag_yield_ft3", label: "Bag yield (ft³)", kind: "number", default: 0.45 },
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 10 },
   ],
   outputs: [
@@ -9742,8 +9742,8 @@ const _v883renderSidingTakeoff = _simpleRenderer({
   citation: "Citation: siding-takeoff identity by name. net = wall - openings; squares = net x (1 + waste/100) / 100; linear = net / (exposure/12). A square is 100 sf; the lap linear footage follows the exposure.",
   example: sidingTakeoffExample.inputs,
   fields: [
-    { key: "wall_area_sf", label: "Gross wall area (ft^2)", kind: "number", default: 2000 },
-    { key: "opening_area_sf", label: "Openings to deduct (ft^2)", kind: "number", default: 0 },
+    { key: "wall_area_sf", label: "Gross wall area (ft²)", kind: "number", default: 2000 },
+    { key: "opening_area_sf", label: "Openings to deduct (ft²)", kind: "number", default: 0 },
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 12 },
     { key: "exposure_in", label: "Lap exposure / reveal (in)", kind: "number", default: 4 },
   ],
@@ -9783,7 +9783,7 @@ const _v884renderStuccoCoverage = _simpleRenderer({
   citation: "Citation: stucco bag-count identity by name. bags = ceil(area x thickness / bag yield x (1 + waste/100)). A three-coat system is about 7/8 in over metal lath; the bag yield is the product's coverage in square-foot-inches.",
   example: stuccoCoverageExample.inputs,
   fields: [
-    { key: "area_sf", label: "Area to plaster (ft^2)", kind: "number", default: 1000 },
+    { key: "area_sf", label: "Area to plaster (ft²)", kind: "number", default: 1000 },
     { key: "total_thickness_in", label: "Total coat thickness (in)", kind: "number", default: 0.875 },
     { key: "bag_yield_sf_in", label: "Bag yield (square-foot-inches)", kind: "number", default: 10.1 },
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 10 },
@@ -9823,8 +9823,8 @@ const _v885renderVaporBarrierRolls = _simpleRenderer({
   citation: "Citation: roll-takeoff identity by name. rolls = ceil(area x (1 + overlap + waste) / roll coverage); seam tape = area / roll width. Under-slab vapor retarders follow ASTM E1745; the laps are taped.",
   example: vaporBarrierRollsExample.inputs,
   fields: [
-    { key: "area_sf", label: "Slab area (ft^2)", kind: "number", default: 3000 },
-    { key: "roll_coverage_sf", label: "Coverage per roll (ft^2)", kind: "number", default: 1000 },
+    { key: "area_sf", label: "Slab area (ft²)", kind: "number", default: 3000 },
+    { key: "roll_coverage_sf", label: "Coverage per roll (ft²)", kind: "number", default: 1000 },
     { key: "overlap_waste_pct", label: "Overlap + waste (%)", kind: "number", default: 10 },
     { key: "roll_width_ft", label: "Roll width (ft)", kind: "number", default: 10 },
   ],
@@ -10000,11 +10000,11 @@ const _v889renderGlassVacuumLift = _simpleRenderer({
   citation: "Citation: lifter identity by name. weight = area x thickness x density; cups = ceil(weight x safety factor / cup working load). Soda-lime glass weighs about 13 lb/ft^2 per inch; the safety factor and cup WLL come from the lifter manufacturer.",
   example: glassVacuumLiftExample.inputs,
   fields: [
-    { key: "area_sf", label: "Lite / unit area (ft^2)", kind: "number", default: 32 },
+    { key: "area_sf", label: "Lite / unit area (ft²)", kind: "number", default: 32 },
     { key: "glass_thickness_in", label: "Total glass thickness, all lites (in)", kind: "number", default: 0.5 },
     { key: "safety_factor", label: "Lifter safety factor", kind: "number", default: 4 },
     { key: "cup_wll_lb", label: "Per-cup working load (lb)", kind: "number", default: 150 },
-    { key: "glass_density_psf_in", label: "Glass weight (lb/ft^2 per in)", kind: "number", default: 13.0 },
+    { key: "glass_density_psf_in", label: "Glass weight (lb/ft² per in)", kind: "number", default: 13.0 },
   ],
   outputs: [
     { key: "w", id: "gvl-out-w", label: "Glass weight", value: (r) => _fmtC(r.weight_lb, 0) + " lb" },
@@ -10041,8 +10041,8 @@ const _v891renderPolymericSandBags = _simpleRenderer({
   citation: "Citation: bag-count identity by name. bags = ceil(area x (1 + waste/100) / coverage per bag). The coverage per bag comes from the product chart and drops sharply with wider joints and larger pavers.",
   example: polymericSandBagsExample.inputs,
   fields: [
-    { key: "area_sf", label: "Paver surface area (ft^2)", kind: "number", default: 400 },
-    { key: "coverage_per_bag_sf", label: "Coverage per bag (ft^2)", kind: "number", default: 75 },
+    { key: "area_sf", label: "Paver surface area (ft²)", kind: "number", default: 400 },
+    { key: "coverage_per_bag_sf", label: "Coverage per bag (ft²)", kind: "number", default: 75 },
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
   ],
   outputs: [
@@ -10080,8 +10080,8 @@ const _v892renderRigidFoamBoardCount = _simpleRenderer({
   citation: "Citation: board-count identity by name. boards = ceil(area x (1 + waste/100) / board area) x layers. The layers cover a multi-layer install with offset seams for the continuous-insulation requirement.",
   example: rigidFoamBoardCountExample.inputs,
   fields: [
-    { key: "area_sf", label: "Area to insulate (ft^2)", kind: "number", default: 1600 },
-    { key: "board_area_sf", label: "Board area (ft^2)", kind: "number", default: 32 },
+    { key: "area_sf", label: "Area to insulate (ft²)", kind: "number", default: 1600 },
+    { key: "board_area_sf", label: "Board area (ft²)", kind: "number", default: 32 },
     { key: "layers", label: "Number of layers", kind: "number", default: 1 },
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 8 },
   ],
@@ -10164,10 +10164,10 @@ const _v895renderHousewrapRolls = _simpleRenderer({
   citation: "Citation: takeoff identity by name. rolls = ceil(area x (1 + overlap + waste) / roll coverage); cap fasteners = ceil(area x fasteners per sf); seam tape = area / roll width. The WRB is the drainage plane behind the cladding.",
   example: housewrapRollsExample.inputs,
   fields: [
-    { key: "wall_area_sf", label: "Wall area (ft^2)", kind: "number", default: 4000 },
-    { key: "roll_coverage_sf", label: "Coverage per roll (ft^2)", kind: "number", default: 1350 },
+    { key: "wall_area_sf", label: "Wall area (ft²)", kind: "number", default: 4000 },
+    { key: "roll_coverage_sf", label: "Coverage per roll (ft²)", kind: "number", default: 1350 },
     { key: "overlap_waste_pct", label: "Overlap + waste (%)", kind: "number", default: 10 },
-    { key: "fasteners_per_sf", label: "Cap fasteners per ft^2", kind: "number", default: 0.5 },
+    { key: "fasteners_per_sf", label: "Cap fasteners per ft²", kind: "number", default: 0.5 },
     { key: "roll_width_ft", label: "Roll width / height (ft)", kind: "number", default: 9 },
   ],
   outputs: [
@@ -10259,7 +10259,7 @@ const _v904renderCurbGutterVolume = _simpleRenderer({
   citation: "Citation: linear-pour identity by name. volume = cross-section x length / 27 x (1 + waste/100); cy per 100 LF = cross-section x 100 / 27. The cross-section comes from the DOT or municipal standard detail.",
   example: curbGutterVolumeExample.inputs,
   fields: [
-    { key: "cross_section_ft2", label: "Curb + gutter cross-section (ft^2)", kind: "number", default: 2.0 },
+    { key: "cross_section_ft2", label: "Curb + gutter cross-section (ft²)", kind: "number", default: 2.0 },
     { key: "length_ft", label: "Run length (ft)", kind: "number", default: 300 },
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 8 },
   ],
@@ -10298,7 +10298,7 @@ const _v905renderRebarChairCount = _simpleRenderer({
   citation: "Citation: chair-count identity by name. chairs = ceil(slab area / support spacing^2 x (1 + waste/100)). The spacing enters squared; the support spacing (~3 to 4 ft) comes from the spec and CRSI practice.",
   example: rebarChairCountExample.inputs,
   fields: [
-    { key: "slab_area_sf", label: "Slab / mat area (ft^2)", kind: "number", default: 1000 },
+    { key: "slab_area_sf", label: "Slab / mat area (ft²)", kind: "number", default: 1000 },
     { key: "support_spacing_ft", label: "Chair spacing each way (ft)", kind: "number", default: 4 },
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
   ],

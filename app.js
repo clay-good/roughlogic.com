@@ -1520,15 +1520,18 @@ const EMPTY_IDS = [];
 
 const FIRE_GROUND_TRADE = "fire";
 
-// Inline notices.
-const NOTICE_DEFAULT = "This is a math aid for verification. Local codes, manufacturer specifications, and the authority having jurisdiction govern all installations and inspections.";
-const NOTICE_FIRE = "This is a math aid for verification. Departmental SOPs and incident command govern all fireground operations.";
+// Inline notices. One short line each: who governs the real decision.
+// The static shells already carry this as a quiet footer line
+// (build-shells.mjs shellFooter), so the live view matches that weight --
+// the notice sits above the inputs but must never outrank the calculator.
+const NOTICE_DEFAULT = "Math aid only. Local code, manufacturer specs, and the AHJ govern the work.";
+const NOTICE_FIRE = "Math aid only. Department SOPs and incident command govern the fireground.";
 const NOTICE_HISTORICAL = "Reference only. Prices change; ask your supplier for a current quote.";
-const NOTICE_TAX_LAW = "Estimate only. Tax law changes. Confirm with the current IRS publication or a licensed CPA before filing.";
-const NOTICE_LEGAL = "This is legal information, not legal advice. Statutes and court rules change. Verify with current state code and a licensed attorney before relying on this for a filing or a deadline.";
-const NOTICE_LAB = "Verify protocol against your lab's SOP before pipetting. A miscalculated dilution can ruin a run or a sample.";
-const NOTICE_REAL_ESTATE = "Estimate only. Lender governs final underwriting and rate / fee disclosure; appraiser governs the value of record. State law and the agency's program guidelines may impose stricter limits than the published thresholds.";
-const NOTICE_EDUCATION = "Estimate only. The classroom teacher governs final text selection, grade placement, and assessment decisions. Readability formulas and similar metrics have known edge-case noise.";
+const NOTICE_TAX_LAW = "Estimate only. Confirm with the current IRS publication or a CPA before filing.";
+const NOTICE_LEGAL = "Legal information, not legal advice. Verify with current state code and an attorney.";
+const NOTICE_LAB = "Check your lab's SOP before pipetting. A bad dilution ruins the run.";
+const NOTICE_REAL_ESTATE = "Estimate only. The lender governs underwriting; the appraiser governs value.";
+const NOTICE_EDUCATION = "Estimate only. The classroom teacher governs placement and assessment calls.";
 
 // Leader-key shortcut targets.
 const SHORTCUTS = {
@@ -1728,7 +1731,7 @@ function renderToolView(id, params) {
   view.appendChild(lead);
 
   const notice = document.createElement("div");
-  notice.className = "inline-notice";
+  notice.className = "view-notice";
   notice.setAttribute("role", "note");
   // v5 Step 61 per-id overrides for Group H references that span trades.
   if (tool.id === "sales-tax-nexus") notice.textContent = NOTICE_LEGAL;

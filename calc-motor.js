@@ -341,7 +341,7 @@ function renderMotorOverloadSizing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 430.32(A)(1) running-overload sizing on the nameplate FLA (125% for marked SF >= 1.15 or rise <= 40 degC, else 115%) with the 430.32(C) 140%/130% will-not-start ceiling, by name. The separate device from the 430.52 branch protection. The AHJ governs.";
   const fla = makeNumber("Nameplate full-load current FLA (A)", "mos-fla", { step: "any", min: "0" });
   const sf = makeNumber("Marked service factor (blank if unmarked)", "mos-sf", { step: "any", min: "0" });
-  const rise = makeNumber("Marked temperature rise (degC, blank if unmarked)", "mos-rise", { step: "any", min: "0" });
+  const rise = makeNumber("Marked temperature rise (°C, blank if unmarked)", "mos-rise", { step: "any", min: "0" });
   for (const f of [fla, sf, rise]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fla.input.value = "26"; sf.input.value = "1.15"; rise.input.value = "40"; update(); });
   const oClass = makeOutputLine(outputRegion, "430.32(A)(1) class", "mos-out-class");
@@ -545,7 +545,7 @@ function renderReducedVoltageStarter(inputRegion, outputRegion, citationEl) {
   const lra = makeNumber("Across-the-line LRA (A)", "rvs-lra", { step: "any", min: "0" }); lra.input.value = "600";
   const lrt = makeNumber("Across-the-line torque basis (%)", "rvs-lrt", { step: "any", min: "0" }); lrt.input.value = "100";
   const type = makeSelect("Starter type", "rvs-type", [
-    { value: "autotransformer", label: "Autotransformer (line = tap^2)", selected: true },
+    { value: "autotransformer", label: "Autotransformer (line = tap²)", selected: true },
     { value: "wye-delta", label: "Wye-delta (fixed 1/3)" },
     { value: "solid-state", label: "Solid-state / reactor (line = tap)" },
   ]);
@@ -691,7 +691,7 @@ export const motorAccelerationTimeExample = { inputs: { inertia_lbft2: 100, spee
 
 function _v944renderMotorAccelerationTime(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: motor across-the-line acceleration time by name. t = WK^2 x dN / (308 x T_net), the rotational F = m x a, with WK^2 the reflected inertia (lb-ft^2), dN the speed change (rpm), and T_net the average net accelerating torque (lb-ft). The motor's speed-torque and thermal-limit curves and the reflected load inertia govern.";
-  const wk = makeNumber("Total inertia WK^2 (lb-ft^2)", "mat-wk", { step: "any", min: "0", value: "100" });
+  const wk = makeNumber("Total inertia WK² (lb-ft²)", "mat-wk", { step: "any", min: "0", value: "100" });
   wk.input.value = "100";
   const dn = makeNumber("Speed change (rpm)", "mat-dn", { step: "any", min: "0", value: "1750" });
   dn.input.value = "1750";

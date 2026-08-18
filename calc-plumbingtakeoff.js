@@ -71,7 +71,7 @@ function _v856renderSolderJointQuantity(inputRegion, outputRegion, citationEl) {
   wj.input.value = "0.75";
   const wd = makeNumber("Solder wire diameter (in)", "sjq-wd", { step: "any", min: "0", value: "0.125" });
   wd.input.value = "0.125";
-  const dn = makeNumber("Solder density (lb/in^3)", "sjq-dn", { step: "any", min: "0", value: "0.30" });
+  const dn = makeNumber("Solder density (lb/in³)", "sjq-dn", { step: "any", min: "0", value: "0.30" });
   dn.input.value = "0.30";
   const sp = makeNumber("Spool weight (lb)", "sjq-sp", { step: "any", min: "0", value: "1" });
   sp.input.value = "1";
@@ -405,13 +405,13 @@ function _v987renderSolarThermalCollector(inputRegion, outputRegion, citationEl)
   citationEl.textContent = "Citation: solar thermal flat-plate collector output (ASHRAE 93 / Hottel-Whillier-Bliss efficiency line), by name. eta = optical efficiency - loss coeff x (inlet - ambient)/irradiance; useful heat = irradiance x eta x area. The SRCC-rated intercept and slope, the incidence angle, flow rate, and glazing govern.";
   const oe = makeNumber("Optical efficiency (y-intercept, ~0.70)", "stc-oe", { step: "any", min: "0", max: "1", value: "0.70" });
   oe.input.value = "0.70";
-  const lc = makeNumber("Loss coefficient (Btu/hr-ft^2-F, slope)", "stc-lc", { step: "any", min: "0", value: "0.85" });
+  const lc = makeNumber("Loss coefficient (Btu/hr-ft²-F, slope)", "stc-lc", { step: "any", min: "0", value: "0.85" });
   lc.input.value = "0.85";
-  const it = makeNumber("Fluid inlet temp (F)", "stc-it", { step: "any", value: "120" });
+  const it = makeNumber("Fluid inlet temp (°F)", "stc-it", { step: "any", value: "120" });
   it.input.value = "120";
-  const at = makeNumber("Ambient air temp (F)", "stc-at", { step: "any", value: "70" });
+  const at = makeNumber("Ambient air temp (°F)", "stc-at", { step: "any", value: "70" });
   at.input.value = "70";
-  const ir = makeNumber("Solar irradiance (Btu/hr-ft^2)", "stc-ir", { step: "any", min: "0", value: "300" });
+  const ir = makeNumber("Solar irradiance (Btu/hr-ft²)", "stc-ir", { step: "any", min: "0", value: "300" });
   ir.input.value = "300";
   const ar = makeNumber("Collector area (sq ft)", "stc-ar", { step: "any", min: "0", value: "40" });
   ar.input.value = "40";

@@ -550,12 +550,12 @@ export const earthworkEndAreaExample = { inputs: { areas: [100, 100], interval_f
 
 function renderEarthworkEndArea(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Average-end-area and prismoidal earthwork volumes per FHWA and state-DOT earthwork references and FM 5-233. Cut and fill are not netted here. The project earthwork report governs the paid quantity.";
-  const areas = makeNumber("End areas (ft^2, comma-separated)", "ewa-areas", { type: "text" });
+  const areas = makeNumber("End areas (ft², comma-separated)", "ewa-areas", { type: "text" });
   areas.input.type = "text";
   areas.input.value = "100, 100";
   const interval = makeNumber("Station interval (ft)", "ewa-int", { step: "any", min: "0", value: "100" });
   interval.input.value = "100";
-  const mid = makeNumber("Middle area (ft^2, optional prismoidal)", "ewa-mid", { step: "any", min: "0" });
+  const mid = makeNumber("Middle area (ft², optional prismoidal)", "ewa-mid", { step: "any", min: "0" });
   const swell = makeNumber("Swell/shrink factor (optional)", "ewa-swell", { step: "any", min: "0" });
   for (const f of [areas, interval, mid, swell]) inputRegion.appendChild(f.wrap);
   const oTot = makeOutputLine(outputRegion, "Total volume", "ewa-out-tot");

@@ -966,7 +966,7 @@ GEOTECH_RENDERERS["consolidation-time-rate"] = _simpleRenderer({
   example: consolidationTimeRateExample.inputs,
   fields: [
     { key: "u_percent", label: "Target degree of consolidation U (%)", kind: "number", default: 90 },
-    { key: "cv_ft2_day", label: "Coefficient of consolidation cv (ft^2/day)", kind: "number", default: 0.1 },
+    { key: "cv_ft2_day", label: "Coefficient of consolidation cv (ft²/day)", kind: "number", default: 0.1 },
     { key: "hdr_ft", label: "Drainage path Hdr (ft)", kind: "number", default: 10 },
   ],
   outputs: [
@@ -1001,7 +1001,7 @@ GEOTECH_RENDERERS["consolidation-degree"] = _simpleRenderer({
   citation: "Citation: Terzaghi 1-D consolidation degree from elapsed time - Tv = cv t / Hdr^2, then U = 100 sqrt(4 Tv / pi) for Tv <= 0.283 (U <= 60%), else U = 100 - 10^((1.781 - Tv)/0.933); the inverse of the consolidation-time tile. Hdr is the longest drainage path (full layer for single, half for double drainage). A design aid; the engineer of record and the site cv govern.",
   example: consolidationDegreeExample.inputs,
   fields: [
-    { key: "cv_ft2_day", label: "Coefficient of consolidation cv (ft^2/day)", kind: "number", default: 0.1 },
+    { key: "cv_ft2_day", label: "Coefficient of consolidation cv (ft²/day)", kind: "number", default: 0.1 },
     { key: "hdr_ft", label: "Drainage path Hdr (ft)", kind: "number", default: 10 },
     { key: "t_days", label: "Elapsed time (days)", kind: "number", default: 848 },
   ],
