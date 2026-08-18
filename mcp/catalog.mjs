@@ -25,6 +25,11 @@ try { ({ RELATED } = await import("../scripts/related-tiles.mjs")); } catch { RE
 // fallback; schemaIfConsistent still degrades any entry whose keys diverge.
 let BESPOKE_SCHEMAS = {};
 try { ({ BESPOKE_SCHEMAS } = await import("../test/fixtures/bespoke-schemas.js")); } catch { BESPOKE_SCHEMAS = {}; }
+// Display-only field labels for renderers that earn no schema. Read by
+// inputLabels() alone -- never by describe(), which must keep advertising only
+// the input set run() can honor.
+let BESPOKE_LABELS = {};
+try { ({ BESPOKE_LABELS } = await import("../test/fixtures/bespoke-labels.js")); } catch { BESPOKE_LABELS = {}; }
 // spec-v1185: literal citation strings extracted from bespoke renderers, so
 // describe can attribute a result even when the tile carries no schema citation.
 let RENDERER_CITATIONS = {};
@@ -391,18 +396,20 @@ export async function inputLabels(id) {
   const { COMPUTE_MAP, RENDERER_MAP, modCache } = await load();
   const reg = COMPUTE_MAP[id];
   if (!reg) return {};
+  // The statically-extracted labels are the floor; a consistent renderer schema
+  // overrides them, since it is the renderer's own descriptor rather than a
+  // parse of it.
+  const out = { ...(BESPOKE_LABELS[id] || {}) };
   try {
     const fn = await importCompute(reg, modCache);
     const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
-    if (!schema) return {};
-    const out = {};
-    for (const f of schema.inputs) {
-      if (f && f.key && typeof f.label === "string" && f.label.trim()) out[f.key] = f.label.trim();
+    if (schema) {
+      for (const f of schema.inputs) {
+        if (f && f.key && typeof f.label === "string" && f.label.trim()) out[f.key] = f.label.trim();
+      }
     }
-    return out;
-  } catch {
-    return {};
-  }
+  } catch { /* keep whatever the extracted labels gave us */ }
+  return out;
 }
 
 export async function run({ id, inputs } = {}) {
