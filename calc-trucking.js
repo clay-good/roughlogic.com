@@ -74,7 +74,7 @@ export function computeDIM({ length_in = 0, width_in = 0, height_in = 0, actual_
   };
 }
 
-export const dimExample = { inputs: { length_in: 24, width_in: 18, height_in: 12, actual_weight_lb: 20, carrier: "UPS_Daily" } };
+export const dimExample = { inputs: { length_in: 12, width_in: 12, height_in: 12, actual_weight_lb: 5, carrier: "UPS_Daily" } };
 
 // --- Utility 189: Freight Density and NMFC Class ---
 //
@@ -1384,7 +1384,7 @@ export function computeLoadProfitability({ linehaul_revenue = 0, loaded_miles = 
     note: "Deadhead miles burn fuel and hours but earn nothing, so judge a load on total miles, not the loaded miles the rate is quoted on. The all-in cost per mile is your break-even and consumes the same fixed and variable structure cost-per-mile builds. A load that pays well per loaded mile can still lose money after a long deadhead. Count the days the load ties up the truck against the loads you turn down to take it.",
   };
 }
-const loadProfitabilityExample = { inputs: { linehaul_revenue: 2200, loaded_miles: 900, deadhead_miles: 150, fuel_price: 4.0, mpg: 6.5, variable_cpm: 0.20, fixed_per_day: 250, days: 2, tolls: 40, other_costs: 0 } };
+export const loadProfitabilityExample = { inputs: { linehaul_revenue: 2200, loaded_miles: 900, deadhead_miles: 150, fuel_price: 4.0, mpg: 6.5, variable_cpm: 0.20, fixed_per_day: 250, days: 2, tolls: 40, other_costs: 0 } };
 const renderLoadProfitability = _simpleRenderer({
   citation: "Citation: First-principles owner-operator load economics. Net = revenue - (fuel + variable + fixed + tolls + accessorials); profit per loaded mile decides the load.",
   example: loadProfitabilityExample.inputs,
@@ -1429,7 +1429,7 @@ export function computeFuelSurcharge({ current_fuel_price = 0, base_fuel_price =
     note: "The standard surcharge pegs a base price and pays the difference above it divided by an assumed MPG, so a lower MPG peg pays a higher surcharge (it assumes a thirstier truck). The DOE/EIA national average diesel price, updated weekly, is the common index, but the contract names the index that governs. Below the pegged base the surcharge is zero. A surcharge only protects you if the contract has one - negotiate it before you sign.",
   };
 }
-const fuelSurchargeExample = { inputs: { current_fuel_price: 4.25, base_fuel_price: 3.0, mpg_peg: 6.0, loaded_miles: 900 } };
+export const fuelSurchargeExample = { inputs: { current_fuel_price: 4.25, base_fuel_price: 3.0, mpg_peg: 6.0, loaded_miles: 900 } };
 const renderFuelSurcharge = _simpleRenderer({
   citation: "Citation: Standard pegged fuel-surcharge identity (DOE/EIA weekly national average diesel index, by name). FSC/mi = (current - base) / MPG peg.",
   example: fuelSurchargeExample.inputs,
@@ -1467,7 +1467,7 @@ export function computeMaintenanceReserve({ tire_set_cost = 0, tire_life_mi = 0,
     note: "Maintenance is not free miles, so set the cents aside now. Tires and routine PM are predictable and divide cleanly into a per-mile cost; the major-component reserve covers the big failures (clutch, turbo, injectors, in-frame) that average to a few cents a mile over the truck's life. This reserve per mile is part of the variable cost cost-per-mile and load-profitability consume. Keep the reserve in a separate account so it is there when the bill is.",
   };
 }
-const maintenanceReserveExample = { inputs: { tire_set_cost: 4000, tire_life_mi: 80000, pm_cost: 350, pm_interval_mi: 25000, major_reserve_cpm: 0.10, monthly_miles: 10000 } };
+export const maintenanceReserveExample = { inputs: { tire_set_cost: 4000, tire_life_mi: 80000, pm_cost: 350, pm_interval_mi: 25000, major_reserve_cpm: 0.10, monthly_miles: 10000 } };
 const renderMaintenanceReserve = _simpleRenderer({
   citation: "Citation: First-principles owner-operator reserve discipline. CPM = tire set / tire life + PM cost / PM interval + major-component reserve.",
   example: maintenanceReserveExample.inputs,
@@ -1519,7 +1519,7 @@ export function computeGcwrCheck({ gcwr_lb = 0, tractor_weight_lb = 0, trailer_w
     note: "The combined power-unit plus trailer weight must stay at or below both the manufacturer's rated gross combination weight (GCWR, the structural / drivetrain limit) and the federal 80,000 lb gross cap (49 CFR 658.17, editable for a state or permit limit). The binding limit is the smaller of the two. Axle and bridge-formula limits are separate checks; a permit or the AHJ governs any over-limit move.",
   };
 }
-const gcwrCheckExample = { inputs: { gcwr_lb: 80000, tractor_weight_lb: 18000, trailer_weight_lb: 60000, federal_max_lb: 80000 } };
+export const gcwrCheckExample = { inputs: { gcwr_lb: 80000, tractor_weight_lb: 18000, trailer_weight_lb: 60000, federal_max_lb: 80000 } };
 const renderGcwrCheck = _simpleRenderer({
   citation: "Citation: 49 CFR 393.75 (tires) / 658.17 (80,000 lb federal gross) and the manufacturer's GCWR rating plate (by section, not reproduced). The binding limit is the smaller of the GCWR and the federal cap. A permit or the AHJ governs an over-limit move. Free at ecfr.gov.",
   example: gcwrCheckExample.inputs,
@@ -1558,7 +1558,7 @@ export function computeTireLoadCheck({ axle_weight_lb = 0, tires_on_axle = 2, ti
     note: "Axle tire capacity is the marked max load per tire times the tires on the axle. Use the sidewall's single rating in a steer (single) position and the dual rating in a dual position - they differ. The tire marking, the inflation pressure at which it is rated, and the AHJ govern; this is a load check, not a substitute for the axle's own gross axle weight rating (GAWR).",
   };
 }
-const tireLoadCheckExample = { inputs: { axle_weight_lb: 12000, tires_on_axle: 2, tire_max_load_lb: 6175 } };
+export const tireLoadCheckExample = { inputs: { axle_weight_lb: 12000, tires_on_axle: 2, tire_max_load_lb: 6175 } };
 const renderTireLoadCheck = _simpleRenderer({
   citation: "Citation: 49 CFR 393.75 (tire load) and the DOT sidewall max-load marking (by section, not reproduced). Capacity = tires x marked max load per tire; use the single vs dual rating to match the position. The marking and the AHJ govern. Free at ecfr.gov.",
   example: tireLoadCheckExample.inputs,
@@ -1597,7 +1597,7 @@ export function computeDetentionDemurrageBilling({ free_hours = 0, actual_hours 
     note: "Detention (or demurrage) billing: the chargeable hours = the time at the facility beyond the free time (max of zero), the detention charge = those hours x the detention rate, and the opportunity cost = those hours x what the truck earns per hour on the road. The detention rate rarely covers the lost revenue (a truck sitting is not driving the next load), so a large gap is the case for a higher rate or a stricter free-time clause. This bills the entered numbers; the carrier's tariff and the signed rate confirmation govern the actual charge.",
   };
 }
-const detentionDemurrageBillingExample = { inputs: { free_hours: 2, actual_hours: 5, rate_usd_hr: 50, truck_rev_usd_hr: 80 } };
+export const detentionDemurrageBillingExample = { inputs: { free_hours: 2, actual_hours: 5, rate_usd_hr: 50, truck_rev_usd_hr: 80 } };
 const renderDetentionDemurrageBilling = _simpleRenderer({
   citation: "Citation: Detention/demurrage billing (carrier tariff / rate-confirmation practice): chargeable hours = max(0, actual - free), charge = hours x detention rate, opportunity cost = hours x on-road revenue per hour. A billing aid; the carrier's tariff and the signed rate confirmation govern the actual charge.",
   example: detentionDemurrageBillingExample.inputs,
@@ -1638,7 +1638,7 @@ export function computeDriverPayCpmVsPercentage({ cpm_usd = 0, pct = 0, miles = 
     note: "Driver pay, cents-per-mile vs percentage-of-linehaul: CPM pay = rate x miles, percentage pay = (percent) x linehaul revenue, and the two are equal at a break-even load rate = CPM / (percent as a decimal), in dollars per mile of linehaul. Above the break-even rate the percentage deal pays more (the driver shares the upside of a high-paying load); below it, cents-per-mile pays more (it protects the driver on cheap freight). This compares one load or one settlement period; the actual pay plan, accessorials, and empty-mile pay govern.",
   };
 }
-const driverPayCpmVsPercentageExample = { inputs: { cpm_usd: 0.60, pct: 25, miles: 1000, linehaul_usd: 2500 } };
+export const driverPayCpmVsPercentageExample = { inputs: { cpm_usd: 0.60, pct: 25, miles: 1000, linehaul_usd: 2500 } };
 const renderDriverPayCpmVsPercentage = _simpleRenderer({
   citation: "Citation: Driver pay comparison (carrier settlement practice): CPM pay = rate x miles, percentage pay = percent x linehaul, break-even load rate = CPM / (percent decimal) per mile. Above break-even the percentage pays more; below it, cents-per-mile does. A comparison aid; the pay plan and accessorials govern.",
   example: driverPayCpmVsPercentageExample.inputs,
@@ -1678,7 +1678,7 @@ export function computeInvoiceFactoringCost({ invoice_usd = 0, advance_pct = 90,
     note: "Invoice factoring cost and effective APR: the factor advances a percentage of the freight bill now (typically 90-97%), keeps a fee (typically 1-5%), and pays the reserve (invoice - advance - fee) when the customer pays. The effective annual rate = (fee% / advance%) x (365 / days the cash is out) x 100, because a flat fee on money out for only a few weeks annualizes to a high rate. The faster the customer pays, the more expensive the same fee. This estimates the cost from the entered terms; the factoring agreement (recourse vs non-recourse, minimums, and reserve release) governs.",
   };
 }
-const invoiceFactoringCostExample = { inputs: { invoice_usd: 2000, advance_pct: 90, fee_pct: 3, days_to_pay: 30 } };
+export const invoiceFactoringCostExample = { inputs: { invoice_usd: 2000, advance_pct: 90, fee_pct: 3, days_to_pay: 30 } };
 const renderInvoiceFactoringCost = _simpleRenderer({
   citation: "Citation: Invoice factoring cost (freight-factoring practice): advance = invoice x advance%, fee = invoice x fee%, reserve = invoice - advance - fee, effective APR = (fee%/advance%) x (365/days) x 100. A cost aid; the factoring agreement (recourse, minimums, reserve release) governs.",
   example: invoiceFactoringCostExample.inputs,
@@ -1728,7 +1728,7 @@ export function computeTrailerTongueWeight({ trailer_gross_weight_lb = 0, tongue
     note: "Tongue weight is the down-force the loaded trailer puts on the hitch ball, and its share of the trailer's gross weight is what keeps the rig tracking straight: the industry bands are 10-15% for a conventional (bumper-pull) hitch and 15-25% for a gooseneck or fifth wheel. Below the band the load sits too far behind the axle and the trailer sways (fishtails), the classic single-vehicle trailer wreck; above it the hitch and the tow vehicle's rear axle are overloaded while the steer axle lightens, robbing steering and braking. Adjust by moving cargo forward (more tongue) or rearward (less). The bands are rules of thumb; the specific vehicle, hitch, and trailer manufacturer ratings and the tow vehicle's payload and rear-axle GAWR govern. Weigh the tongue with the trailer level and loaded as it will tow; a scale reading, not a guess.",
   };
 }
-const trailerTongueWeightExample = { inputs: { trailer_gross_weight_lb: 7000, tongue_weight_lb: 700, hitch_type: "conventional", hitch_rating_lb: 0 } };
+export const trailerTongueWeightExample = { inputs: { trailer_gross_weight_lb: 7000, tongue_weight_lb: 700, hitch_type: "conventional", hitch_rating_lb: 0 } };
 const renderTrailerTongueWeight = _simpleRenderer({
   citation: "Citation: standard towing tongue-weight guidance (NHTSA / SAE J2807 and the hitch/vehicle manufacturer ratings): tongue% = tongue / gross x 100, target 10-15% conventional and 15-25% gooseneck/fifth wheel. Too little causes sway; too much overloads the hitch and unloads the steer axle. A setup screen; the manufacturer ratings and a scale govern.",
   example: trailerTongueWeightExample.inputs,

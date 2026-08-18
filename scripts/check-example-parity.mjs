@@ -78,7 +78,11 @@ for (const [id, reg] of Object.entries(COMPUTE_MAP)) {
   const mod = modCache.get(reg.module);
   const stem = reg.fn.replace(/^compute/, "");
   const name = stem.charAt(0).toLowerCase() + stem.slice(1) + "Example";
-  const ex = mod[name];
+  // The convention lower-cases only the first letter of the compute stem, which
+  // an acronym breaks: computeDIM -> `dIMExample`, but the module writes
+  // `dimExample`. Fall back to a case-insensitive match on the same name rather
+  // than leaving 33 tiles uncompared over their spelling.
+  const ex = mod[name] || mod[Object.keys(mod).find((k) => k.toLowerCase() === name.toLowerCase())];
   if (!ex || !ex.inputs) { unresolved++; continue; }
   compared++;
   const diffs = [];

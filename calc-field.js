@@ -283,7 +283,7 @@ export function computeUTM({ direction = "latlon_to_utm", lat_deg = 0, lon_deg =
   return { error: "Unknown direction." };
 }
 
-export const utmExample = { inputs: { direction: "latlon_to_utm", lat_deg: 39.7392, lon_deg: -104.9903, zone: 0, hemisphere: "N", easting: 0, northing: 0 } };
+export const utmExample = { inputs: { direction: "latlon_to_utm", lat_deg: 40, lon_deg: -105, zone: 0, hemisphere: "N", easting: 0, northing: 0 } };
 
 // --- 232: Sunrise / Sunset (NOAA solar-position algorithm) ---
 

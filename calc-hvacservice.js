@@ -102,7 +102,7 @@ export function computeCondensateDrain({ tons = 0, pints_per_ton_hr = 3, run_ft 
     note: "Condensate production tracks the LATENT load and indoor humidity - the per-ton rate here is a field estimate (about 2 to 4 pints per ton-hour is common in humid cooling), not a code value. The drain-size steps come from IMC 307.2.2 by equipment capacity; the line slopes not less than 1/8 in per foot toward the discharge (IMC 307.2.5). A draw-through coil needs a proper trap to break the negative pressure. The AHJ and the equipment manual govern.",
   };
 }
-const condensateDrainExample = { inputs: { tons: 3, pints_per_ton_hr: 3, run_ft: 20, slope_in_per_ft: 0.125 } };
+export const condensateDrainExample = { inputs: { tons: 3, pints_per_ton_hr: 3, run_ft: 20, slope_in_per_ft: 0.125 } };
 HVACSERVICE_RENDERERS["condensate-drain"] = _simpleRenderer({
   citation: "Citation: IMC 307.2.2 condensate drain-size-by-capacity steps and the 307.2.5 not-less-than-1/8-in-per-foot slope (by name); 8 pints per gallon. The per-ton condensate rate is an editable field estimate, not a code value.",
   example: condensateDrainExample.inputs,
@@ -142,7 +142,7 @@ export function computeRecoveryCylinder({ water_capacity_lb = 0, refrig_density_
     note: "The 80% rule leaves room for liquid expansion with temperature - never fill past it. Water capacity (WC) and tare are stamped on the cylinder, and the NET refrigerant is the gross on the scale minus the tare. Liquid density varies with refrigerant and temperature, so read it from the property sheet. Never mix refrigerants in a recovery cylinder, and use only a cylinder rated and in-date for recovery. EPA Section 608 governs handling.",
   };
 }
-const recoveryCylinderExample = { inputs: { water_capacity_lb: 50, refrig_density_lb_gal: 9.0, current_net_lb: 30, fill_fraction: 0.8 } };
+export const recoveryCylinderExample = { inputs: { water_capacity_lb: 50, refrig_density_lb_gal: 9.0, current_net_lb: 30, fill_fraction: 0.8 } };
 HVACSERVICE_RENDERERS["recovery-cylinder"] = _simpleRenderer({
   citation: "Citation: DOT / AHRI 700 / EPA Section 608 recovery-cylinder practice (by name) - the 80% maximum fill, the stamped water-capacity (WC) and tare basis, and the never-mix-refrigerants rule; 8.34 lb per gallon water basis for specific gravity.",
   example: recoveryCylinderExample.inputs,
@@ -195,7 +195,7 @@ export function computeHvacEquipmentCircuit({ compressor_rla_A = 0, fan_fla_A = 
     note: "NEC 440.33: the minimum circuit ampacity (MCA) is 125% of the largest motor's RLA plus the sum of the other loads - size the conductor to carry at least the MCA. NEC 440.22(A): the maximum overcurrent device (MOCP) is 175% of the largest RLA plus the others, taken to the next standard size DOWN; only if that size will not let the equipment start may it go to 225%. RLA is the nameplate rated-load amps (not LRA). The equipment nameplate's stamped MCA/MOCP and the AHJ govern.",
   };
 }
-const hvacEquipmentCircuitExample = { inputs: { compressor_rla_A: 20, fan_fla_A: 1.5, other_load_A: 0, installed_breaker_A: 35 } };
+export const hvacEquipmentCircuitExample = { inputs: { compressor_rla_A: 20, fan_fla_A: 1.5, other_load_A: 0, installed_breaker_A: 35 } };
 HVACSERVICE_RENDERERS["hvac-equipment-circuit"] = _simpleRenderer({
   citation: "Citation: NEC 2023 (NFPA 70) 440.33 minimum circuit ampacity (125% of the largest motor + others) and 440.22(A) maximum overcurrent protection (175% to the next standard size down, 225% to start), with NEC 240.6(A) standard device sizes (by name). The nameplate MCA/MOCP and the AHJ govern. Free read-only at nfpa.org/freeaccess.",
   example: hvacEquipmentCircuitExample.inputs,
@@ -396,7 +396,7 @@ export function computeGasMeterClock({ sec_per_rev = 0, dial_size_cf = 0, heatin
     note: "Clock the meter with EVERY other gas appliance off (pilots included): time one full revolution of a known test dial, then cfh = (3600 / seconds-per-rev) x dial size, and the firing rate is cfh x the fuel heating value. The default 1030 BTU/cf is a typical natural-gas value - the gas utility's actual heating value governs (it varies by supply); for LP set it to about 2500 BTU/cf. Compare the clocked rate to the rating-plate input and adjust manifold pressure only within the manufacturer's stamped range. The equipment manual and the licensed tech govern.",
   };
 }
-const gasMeterClockExample = { inputs: { sec_per_rev: 37, dial_size_cf: 1, heating_value_btu_cf: 1030, nameplate_input_btuh: 100000 } };
+export const gasMeterClockExample = { inputs: { sec_per_rev: 37, dial_size_cf: 1, heating_value_btu_cf: 1030, nameplate_input_btuh: 100000 } };
 HVACSERVICE_RENDERERS["gas-meter-clock"] = _simpleRenderer({
   citation: "Citation: first-principles meter-clocking arithmetic - cfh = (3600 / seconds-per-rev) x dial size; firing rate = cfh x heating value (public). The default 1030 BTU/cf natural-gas (about 2500 for LP) heating value is an editable field; the gas utility's actual heating value and the equipment rating plate govern.",
   example: gasMeterClockExample.inputs,
@@ -433,7 +433,7 @@ export function computeGasMeterClockTarget({ target_input_btuh = 0, dial_size_cf
     note: "The inverse of the meter-clocking tile: the seconds-per-revolution a known test dial SHOULD take if the appliance is firing at its target/nameplate rate, so you know the stopwatch reading to expect before you clock the meter. From cfh = (3600 / seconds-per-rev) x dial and rate = cfh x heating value, the on-rate time is sec = 3600 x dial x heating value / target rate. A faster revolution than this means overfired, a slower one underfired; the reported window is the +/-5% on-rate band. Clock with EVERY other gas appliance off (pilots included). The default 1030 BTU/cf is a typical natural-gas value; for LP set it to about 2500. The gas utility's actual heating value and the equipment rating plate govern; the licensed tech adjusts manifold pressure only within the stamped range.",
   };
 }
-const gasMeterClockTargetExample = { inputs: { target_input_btuh: 100000, dial_size_cf: 1, heating_value_btu_cf: 1030 } };
+export const gasMeterClockTargetExample = { inputs: { target_input_btuh: 100000, dial_size_cf: 1, heating_value_btu_cf: 1030 } };
 HVACSERVICE_RENDERERS["gas-meter-clock-target"] = _simpleRenderer({
   citation: "Citation: first-principles meter-clocking arithmetic solved for the on-rate time - seconds-per-rev = 3600 x dial size x heating value / target firing rate (public), the inverse of the meter-clock tile. The default 1030 BTU/cf natural-gas (about 2500 for LP) heating value is editable; the gas utility's actual heating value and the equipment rating plate govern.",
   example: gasMeterClockTargetExample.inputs,
@@ -476,7 +476,7 @@ export function computeFurnaceTempRise({ return_air_F = 0, supply_air_F = 0, inp
     note: "The temperature rise is supply-air minus return-air dry-bulb, read in the plenums clear of radiant view of the heat exchanger. The rating plate stamps the allowed rise range (commonly 40 to 70 F) - it is the governing limit; the derived CFM comes from the sensible-heat relation Qs = 1.08 x CFM x delta-T solved for airflow, with output = input x efficiency (default 80%, an editable nameplate value). The 1.08 factor is sea-level standard air; at altitude or with high humidity it falls, and the rating-plate range still governs. The equipment manufacturer and the licensed tech govern.",
   };
 }
-const furnaceTempRiseExample = { inputs: { return_air_F: 70, supply_air_F: 120, input_btuh: 100000, efficiency_pct: 80, rise_min_F: 40, rise_max_F: 70 } };
+export const furnaceTempRiseExample = { inputs: { return_air_F: 70, supply_air_F: 120, input_btuh: 100000, efficiency_pct: 80, rise_min_F: 40, rise_max_F: 70 } };
 HVACSERVICE_RENDERERS["furnace-temp-rise"] = _simpleRenderer({
   citation: "Citation: first-principles sensible-heat relation Qs = 1.08 x CFM x delta-T solved for airflow, with output = input x efficiency (public); the 1.08 sea-level air factor and the default 80% efficiency are editable. The rating-plate temperature-rise range and the equipment manufacturer govern.",
   example: furnaceTempRiseExample.inputs,
@@ -521,7 +521,7 @@ export function computeFurnaceAirflowToRise({ input_btuh = 0, efficiency_pct = 8
     note: "The inverse of the temperature-rise tile: pick a blower airflow (a tap or a target CFM) and predict the temperature rise it produces, so the blower can be set before measuring. From the sensible-heat relation Qs = 1.08 x CFM x delta-T, the rise = output / (1.08 x CFM) with output = input x efficiency, and the supply-air temperature = return + rise. A lower airflow raises the rise (risking overheat and high-limit trips); a higher airflow lowers it (risking cold, clammy supply air and heat-exchanger condensation). The rating-plate rise range (commonly 40 to 70 F) is the governing limit. The 1.08 factor is sea-level standard air; at altitude or high humidity it falls. The equipment manufacturer and the licensed tech govern.",
   };
 }
-const furnaceAirflowToRiseExample = { inputs: { input_btuh: 100000, efficiency_pct: 80, cfm: 1200, return_air_F: 70, rise_min_F: 40, rise_max_F: 70 } };
+export const furnaceAirflowToRiseExample = { inputs: { input_btuh: 100000, efficiency_pct: 80, cfm: 1200, return_air_F: 70, rise_min_F: 40, rise_max_F: 70 } };
 HVACSERVICE_RENDERERS["furnace-airflow-to-rise"] = _simpleRenderer({
   citation: "Citation: first-principles sensible-heat relation Qs = 1.08 x CFM x delta-T solved for the rise, with output = input x efficiency (public), the inverse of the furnace temperature-rise tile; the 1.08 sea-level air factor and the default 80% efficiency are editable. The rating-plate temperature-rise range and the equipment manufacturer govern.",
   example: furnaceAirflowToRiseExample.inputs,
@@ -564,7 +564,7 @@ export function computeBlowerDoorAch50({ cfm50 = 0, volume_ft3 = 0, n_factor = 1
     note: "ACH50 = CFM50 x 60 / conditioned volume normalizes the blower-door reading to air changes per hour at 50 Pa; the IECC R402.4.1.2 limit is <= 3 ACH50 in climate zones 3-8 and <= 5 in zones 1-2 (the editable target). The natural air change divides ACH50 by the LBL N-factor (default 17), which depends on climate zone, building height, and wind shielding - a sheltered one-story and an exposed three-story differ by roughly a factor of two. Volume is the conditioned volume, not the floor area. A field normalization, not a rater's signed test report. ASTM E779 / E1827 are the test methods.",
   };
 }
-const blowerDoorAch50Example = { inputs: { cfm50: 960, volume_ft3: 12800, n_factor: 17, target_ach50: 3 } };
+export const blowerDoorAch50Example = { inputs: { cfm50: 960, volume_ft3: 12800, n_factor: 17, target_ach50: 3 } };
 HVACSERVICE_RENDERERS["blower-door-ach50"] = _simpleRenderer({
   citation: "Citation: ACH50 = CFM50 x 60 / conditioned volume (the blower-door normalization) and the LBL natural-infiltration divide-by-N rule (by name); IECC R402.4.1.2 sets the air-leakage limit in ACH50 (<= 3 in CZ 3-8, <= 5 in CZ 1-2); ASTM E779 / E1827 are the test methods. The N-factor varies with climate zone, building height, and wind shielding. A field normalization, not a rater's signed report.",
   example: blowerDoorAch50Example.inputs,
@@ -602,7 +602,7 @@ export function computeAshrae622Ventilation({ floor_area_ft2 = 0, bedrooms = 0, 
     note: "ASHRAE 62.2-2019 Eq. 4.1a: Qtot = 0.03 x CFA + 7.5 x (Nbr + 1) sets the total required ventilation from floor area and bedrooms only (occupants assumed Nbr + 1); the fan flow is Qtot minus the infiltration credit. The conservative default is zero credit - size the fan to the full Qtot. The credit comes from the measured air-tightness (the blower-door natural infiltration) per the 62.2 infiltration method. Local kitchen and bath exhaust is a separate 62.2 requirement this tile does not cover. A sizing aid, not a 62.2 compliance certificate.",
   };
 }
-const ashrae622VentilationExample = { inputs: { floor_area_ft2: 2000, bedrooms: 3, infil_credit_cfm: 0 } };
+export const ashrae622VentilationExample = { inputs: { floor_area_ft2: 2000, bedrooms: 3, infil_credit_cfm: 0 } };
 HVACSERVICE_RENDERERS["ashrae-622-ventilation"] = _simpleRenderer({
   citation: "Citation: ASHRAE 62.2-2019 §4.1 whole-house ventilation Qtot = 0.03 x Afloor + 7.5 x (Nbr + 1), and the fan flow Qfan = Qtot - Qinf (by name). The infiltration credit comes from the measured air-tightness; the conservative default is zero credit. Local kitchen/bath exhaust is a separate 62.2 requirement. A sizing aid, not a compliance certificate.",
   example: ashrae622VentilationExample.inputs,
@@ -635,7 +635,7 @@ export function computeInfiltrationLoad({ cfm = 0, delta_t_f = 0, delta_gr = 0 }
     note: "ASHRAE air-side equations: sensible Qs = 1.08 x CFM x delta-T and latent Ql = 0.68 x CFM x delta-grains. The 1.08 and 0.68 are sea-level standard-air constants (an altitude correction is a separate adjustment). The airflow is the natural infiltration from a blower-door test or a design estimate; enter the design dry-bulb difference and, for cooling, the indoor-outdoor humidity-ratio difference in grains/lb (zero for a heating load, so the latent term drops out). This is the infiltration component only - envelope conduction, solar, and internal gains are separate Manual J line items. A design-load aid, not a stamped Manual J.",
   };
 }
-const infiltrationLoadExample = { inputs: { cfm: 56.5, delta_t_f: 70, delta_gr: 0 } };
+export const infiltrationLoadExample = { inputs: { cfm: 56.5, delta_t_f: 70, delta_gr: 0 } };
 HVACSERVICE_RENDERERS["infiltration-load"] = _simpleRenderer({
   citation: "Citation: ASHRAE Handbook of Fundamentals air-side sensible Qs = 1.08 x CFM x delta-T and latent Ql = 0.68 x CFM x delta-grains (by name). The 1.08 and 0.68 are sea-level standard-air constants. The airflow is the natural infiltration from a blower-door test or a design estimate. The infiltration component of the load only, not a stamped Manual J.",
   example: infiltrationLoadExample.inputs,
@@ -669,7 +669,7 @@ export function computeOutsideAirPercentTemps({ t_ra_f = 0, t_ma_f = 0, t_oa_f =
     note: "Measured outside-air fraction from a mixed-air temperature balance: %OA = 100 (T_ra - T_ma) / (T_ra - T_oa). The mixed-air temperature is the flow-weighted blend of return and outside air, so its position between the two reads the damper's actual outside-air fraction - the field check against the design minimum ventilation. Use well-mixed, shielded dry-bulb readings; a return-to-outdoor spread under about 10 F makes the result sensitive to sensor error. A field aid; a direct airflow measurement is more reliable.",
   };
 }
-const outsideAirPercentTempsExample = { inputs: { t_ra_f: 75, t_ma_f: 68, t_oa_f: 40 } };
+export const outsideAirPercentTempsExample = { inputs: { t_ra_f: 75, t_ma_f: 68, t_oa_f: 40 } };
 HVACSERVICE_RENDERERS["outside-air-percent-temps"] = _simpleRenderer({
   citation: "Citation: The mixed-air temperature balance %OA = 100 (T_ra - T_ma) / (T_ra - T_oa) (ASHRAE / AABC-NEBB field practice), the standard field check of the outside-air damper fraction against the design minimum. Needs well-mixed, shielded dry-bulb readings; a small return-to-outdoor spread (under ~10 F) makes it sensitive to sensor error. A field aid, not a substitute for a direct airflow measurement.",
   example: outsideAirPercentTempsExample.inputs,

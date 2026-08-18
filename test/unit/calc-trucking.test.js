@@ -16,7 +16,7 @@ import {
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 
 // 188 DIM
-test("DIM: example UPS Daily 24x18x12 -> 37.3 lb", () => { const r = computeDIM(dimExample.inputs); assert.ok(close(r.dim_lb, (24 * 18 * 12) / 139, 0.01)); });
+test("DIM: example UPS Daily 12x12x12 -> 12.43 lb", () => { const r = computeDIM(dimExample.inputs); assert.ok(close(r.dim_lb, (12 * 12 * 12) / 139, 0.01)); });
 test("DIM: billable = max(DIM, actual)", () => { const r = computeDIM({ length_in: 12, width_in: 12, height_in: 12, actual_weight_lb: 50, carrier: "UPS_Daily" }); assert.equal(r.billable_lb, 50); });
 test("DIM: USPS divisor 166", () => { const r = computeDIM({ length_in: 24, width_in: 18, height_in: 12, actual_weight_lb: 1, carrier: "USPS" }); assert.equal(r.divisor, 166); });
 test("DIM: unknown carrier errors", () => { const r = computeDIM({ length_in: 12, width_in: 12, height_in: 12, actual_weight_lb: 10, carrier: "Acme" }); assert.ok(r.error); });

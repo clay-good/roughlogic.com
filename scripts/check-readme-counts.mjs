@@ -93,6 +93,13 @@ async function main() {
   checked += checkPattern(agents, /([\d,]+) calculators\*\* for/g, live.tiles, "tile count (AGENTS.md)", errors);
   checked += checkPattern(agents, /([\d,]+) calc modules/g, live.modules, "calc-* module count (AGENTS.md)", errors);
 
+  // The headline count a reader meets first, in the root README's opening
+  // sentence and in the MCP server's. Both had drifted to "more than 1,000"
+  // against a live 1,709; anchor them so the front-door number cannot rot.
+  checked += checkPattern(readme, /is ([\d,]+) small, single-purpose calculators/g, live.tiles, "tile count (README lede)", errors);
+  const mcpReadme = await readFile(resolve(ROOT, "mcp", "README.md"), "utf8");
+  checked += checkPattern(mcpReadme, /\*\*([\d,]+) trades calculators\*\*/g, live.tiles, "tile count (mcp/README.md)", errors);
+
   // Tile count: the /tools/ shell-diagram node and the prose "(N)".
   // ("static shells" also labels the /groups/ node, so anchor on the path.)
   checked += checkPattern(readme, /\/tools\/&lt;id&gt;\/index\.html\\n(\d+) static shells/g, live.tiles, "tile count", errors);

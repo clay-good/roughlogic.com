@@ -3192,7 +3192,7 @@ export function computeAssemblyRValue({ cavity_r = 0, continuous_r = 0, stud_dep
     note: "A framed wall has two heat paths - through the studs (about R-1.25 per inch of softwood, so a 2x4 stud is only about R-4.4) and through the insulated cavity - so the wall performs below its center-of-cavity R. Average the U-values weighted by the framing fraction (about a quarter of a 16 in on-center wall is framing), never the R-values, which overstates the wall. Continuous insulation outside the studs counts on both paths, so it buys more than its nominal R. Air films and finishes are editable ASHRAE-table defaults.",
   };
 }
-const assemblyRValueExample = { inputs: { cavity_r: 13, continuous_r: 0, stud_depth_in: 3.5, framing_factor: 0.25, air_films_r: 0.85, finish_layers_r: 1.05 } };
+export const assemblyRValueExample = { inputs: { cavity_r: 13, continuous_r: 0, stud_depth_in: 3.5, framing_factor: 0.25, air_films_r: 0.85, finish_layers_r: 1.05 } };
 HVAC_RENDERERS["assembly-r-value"] = _rEnv({
   citation: "Citation: ASHRAE Handbook of Fundamentals parallel-path (isothermal-planes) method (by name). U_assembly = ff x U_framing + (1-ff) x U_cavity; R = 1/U. Framing ~1.25 R/inch.",
   example: assemblyRValueExample.inputs,
@@ -3228,7 +3228,7 @@ export function computeBlownInsulationCoverage({ area_sqft = 0, bags_per_1000 = 
     note: "Blown-insulation coverage is brand-specific, so read the bag's own bags per 1,000 sq ft at this R-value and its minimum settled thickness - both must be met, because a machine can hit the thickness while blowing too few bags (under-dense, and it will settle short). Cellulose runs about R-3.5 per inch and blown fiberglass about R-2.5, so a target R sets the depth. Settling is already in the chart's settled-thickness column. Mark the joists to the target depth so the crew blows it even.",
   };
 }
-const blownInsulationCoverageExample = { inputs: { area_sqft: 1200, bags_per_1000: 36, r_per_inch: 3.5, target_r: 38 } };
+export const blownInsulationCoverageExample = { inputs: { area_sqft: 1200, bags_per_1000: 36, r_per_inch: 3.5, target_r: 38 } };
 HVAC_RENDERERS["blown-insulation-coverage"] = _rEnv({
   citation: "Citation: Manufacturer blown-insulation coverage charts (bags per 1,000 sq ft and minimum settled thickness at the target R, by name). Cellulose ~R-3.5/in, blown FG ~R-2.5/in.",
   example: blownInsulationCoverageExample.inputs,
@@ -3277,7 +3277,7 @@ export function computeHeatPumpSeasonalEnergy({ seasonal_load_mmbtu = 0, hspf = 
     note: "AHRI 210/240 HSPF (season Btu delivered per Wh input) and the standard fuel-cost comparison (gas therms = load / AFUE, resistance at COP 1). The HSPF is the rated regional value (Region IV; a colder region delivers less, and the field seasonal COP depends on the actual climate and controls). The seasonal heating load comes from a Manual J plus degree-days or metered history, and the gas comparison uses the delivered efficiency AFUE, not the steady-state efficiency. An operating-cost estimate, not a metered bill.",
   };
 }
-const heatPumpSeasonalEnergyExample = { inputs: { seasonal_load_mmbtu: 60, hspf: 9, rate_kwh: 0.15, afue: 0.95, rate_therm: 1.50 } };
+export const heatPumpSeasonalEnergyExample = { inputs: { seasonal_load_mmbtu: 60, hspf: 9, rate_kwh: 0.15, afue: 0.95, rate_therm: 1.50 } };
 HVAC_RENDERERS["heat-pump-seasonal-energy"] = _rEnv({
   citation: "Citation: AHRI 210/240 HSPF (season Btu delivered per Wh) and the standard fuel-cost comparison gas therms = load / AFUE, resistance at COP 1 (by name). HSPF is the rated regional value; the gas side uses the delivered AFUE. An operating-cost estimate, not a metered bill.",
   example: heatPumpSeasonalEnergyExample.inputs,
@@ -3316,7 +3316,7 @@ export function computeDualFuelBalancePoint({ rate_kwh = 0, rate_therm = 0, afue
     note: "Delivered-Btu fuel-cost comparison: heat-pump $/MMBtu = 293.07 / COP x rate_kwh, gas $/MMBtu = 10 / AFUE x rate_therm, switchover COP where the two are equal. The switchover COP maps to an outdoor temperature only through the specific unit's COP-vs-temperature curve (from AHRI ratings or the heat-pump-cold-capacity tile). The comparison is on operating cost only (it ignores equipment wear, defrost, and comfort), and the gas side uses the delivered AFUE. An economic setpoint aid, not a controls-commissioning procedure.",
   };
 }
-const dualFuelBalancePointExample = { inputs: { rate_kwh: 0.15, rate_therm: 1.50, afue: 0.95, cop_now: 2.5 } };
+export const dualFuelBalancePointExample = { inputs: { rate_kwh: 0.15, rate_therm: 1.50, afue: 0.95, cop_now: 2.5 } };
 HVAC_RENDERERS["dual-fuel-balance-point"] = _rEnv({
   citation: "Citation: delivered-Btu fuel-cost comparison heat-pump $/MMBtu = 293.07 / COP x rate_kwh, gas $/MMBtu = 10 / AFUE x rate_therm, switchover COP where equal (by name). The switchover COP maps to a temperature only through the unit's COP curve. An economic setpoint aid, not a controls procedure.",
   example: dualFuelBalancePointExample.inputs,
@@ -3352,7 +3352,7 @@ export function computeHeatPumpColdCapacity({ cap_47_btuh = 0, cap_17_btuh = 0, 
     note: "AHRI 210/240 low-temperature rating points (the 47 F and 17 F integrated heating capacities) with a linear capacity-versus-temperature interpolation. The two rated points come from the manufacturer's expanded performance data - a cold-climate / variable-capacity unit holds capacity far better than a linear extrapolation of a single-speed unit suggests, so prefer a published low-temperature data point over extrapolation when a conversion hinges on it. The design load and design temperature come from a Manual J; defrost and cycling trim the field capacity. A sizing check, not a performance guarantee.",
   };
 }
-const heatPumpColdCapacityExample = { inputs: { cap_47_btuh: 36000, cap_17_btuh: 22000, design_temp_f: 5, design_load_btuh: 30000 } };
+export const heatPumpColdCapacityExample = { inputs: { cap_47_btuh: 36000, cap_17_btuh: 22000, design_temp_f: 5, design_load_btuh: 30000 } };
 HVAC_RENDERERS["heat-pump-cold-capacity"] = _rEnv({
   citation: "Citation: AHRI 210/240 low-temperature rating points (47 F and 17 F integrated heating capacities) and a linear capacity-versus-temperature interpolation (by name). Prefer a published low-temperature data point over extrapolation. A sizing check, not a performance guarantee.",
   example: heatPumpColdCapacityExample.inputs,
@@ -3401,7 +3401,7 @@ export function computeAirLeakCost({ compressor_cfm = 0, load_min = 0, unload_mi
     note: "US DOE Compressed Air Challenge load/unload leak test: leak fraction = t_load / (t_load + t_unload), leak flow = fraction x compressor cfm, with the compressed-air specific-power convention (18-22 kW per 100 cfm at 100 psig for a rotary-screw system). The test is run with all production draw off so the only demand is the leaks; the loaded capacity is the compressor's actual delivered cfm at the operating pressure (not the nameplate); the specific power is the whole system's wire-to-air figure at its pressure; the run hours are the hours the compressor is energized. An estimate from a stopwatch test, not a metered audit.",
   };
 }
-const airLeakCostExample = { inputs: { compressor_cfm: 500, load_min: 3, unload_min: 12, specific_power: 22, run_hours: 8760, rate_kwh: 0.10 } };
+export const airLeakCostExample = { inputs: { compressor_cfm: 500, load_min: 3, unload_min: 12, specific_power: 22, run_hours: 8760, rate_kwh: 0.10 } };
 HVAC_RENDERERS["air-leak-cost"] = _rEnv({
   citation: "Citation: US DOE Compressed Air Challenge load/unload leak test (leak fraction = t_load / (t_load + t_unload), leak flow = fraction x cfm) and the 18-22 kW per 100 cfm specific-power convention (by name). Run with production off. An estimate from a stopwatch test, not a metered audit.",
   example: airLeakCostExample.inputs,
@@ -3442,7 +3442,7 @@ export function computeCompressedAirPower({ free_air_cfm = 0, inlet_psia = 14.7,
     note: "Single-stage adiabatic (isentropic) compression power: hp = 0.004364 x P1 x Q x (k/(k-1)) x [(P2/P1)^((k-1)/k) - 1], with P in psia, Q in cfm free air, k = 1.4. This is the ideal single-stage isentropic work - a real compressor needs more, so the overall efficiency divides the ideal down to the wire, and multi-staging with intercooling beats single stage above roughly 100 psig. The free-air flow is referenced to intake conditions and the discharge is the absolute pressure at the compressor. A sizing and cost estimate, not a compressor selection.",
   };
 }
-const compressedAirPowerExample = { inputs: { free_air_cfm: 100, inlet_psia: 14.7, discharge_psig: 100, overall_eff: 0.75, run_hours: 4000, rate_kwh: 0.10 } };
+export const compressedAirPowerExample = { inputs: { free_air_cfm: 100, inlet_psia: 14.7, discharge_psig: 100, overall_eff: 0.75, run_hours: 4000, rate_kwh: 0.10 } };
 HVAC_RENDERERS["compressed-air-power"] = _rEnv({
   citation: "Citation: single-stage adiabatic (isentropic) compression power hp = 0.004364 x P1 x Q x (k/(k-1)) x [(P2/P1)^((k-1)/k) - 1], P in psia, Q in cfm free air, k = 1.4 (by name). Ideal work divided by the overall efficiency; multi-stage beats single stage above ~100 psig. A sizing and cost estimate, not a compressor selection.",
   example: compressedAirPowerExample.inputs,
@@ -3485,7 +3485,7 @@ export function computeAirPressureSetpointSavings({ current_psig = 0, reduced_ps
     note: "Isentropic compression-power ratio: percent saved = 1 - [(P_reduced/P1)^((k-1)/k) - 1] / [(P_current/P1)^((k-1)/k) - 1], which reproduces the DOE rule of roughly 0.5 percent of compressor energy per psi of reduction. The reduced setpoint must still hold the minimum pressure the tools need after system pressure drop (the point of a leak and piping fix is to allow the drop). The saving is on the compression energy that actually falls with pressure (an unloaded or modulating compressor may not capture all of it), and the ratio assumes single-stage isentropic behavior. An energy-savings estimate, not a metered result.",
   };
 }
-const airPressureSetpointSavingsExample = { inputs: { current_psig: 120, reduced_psig: 105, inlet_psia: 14.7, input_kw: 50, run_hours: 6000, rate_kwh: 0.10 } };
+export const airPressureSetpointSavingsExample = { inputs: { current_psig: 120, reduced_psig: 105, inlet_psia: 14.7, input_kw: 50, run_hours: 6000, rate_kwh: 0.10 } };
 HVAC_RENDERERS["air-pressure-setpoint-savings"] = _rEnv({
   citation: "Citation: isentropic compression-power ratio percent saved = 1 - [(P_reduced/P1)^((k-1)/k) - 1] / [(P_current/P1)^((k-1)/k) - 1], reproducing the DOE ~0.5 percent per psi rule (by name). The reduced setpoint must still hold the minimum tool pressure. An energy-savings estimate, not a metered result.",
   example: airPressureSetpointSavingsExample.inputs,
@@ -3534,7 +3534,7 @@ export function computeErvSensibleRecovery({ cfm = 0, t_oa_F = 0, t_ra_F = 0, ep
     note: "ASHRAE Standard 84 / AHRI 1060 sensible effectiveness: T_leaving = T_oa + eps_s x (T_ra - T_oa); recovered sensible load Q_s = 1.08 x CFM x eps_s x (T_ra - T_oa) with the sea-level constant 1.08 = 60 x 0.075 x 0.24. A positive Q_s is heating recovered in winter, a negative Q_s is sensible cooling relieved in summer; equal outdoor and return temperatures recover nothing (zero, not an error). Assumes balanced (equal supply and exhaust) airflow at the manufacturer's rated effectiveness - no part-load, frosting, or defrost derate, no latent (enthalpy) recovery, and no fan or pressure-drop penalty. A design aid, not the manufacturer's certified performance data.",
   };
 }
-const ervSensibleRecoveryExample = { inputs: { cfm: 200, t_oa_F: 10, t_ra_F: 70, eps_s: 0.75 } };
+export const ervSensibleRecoveryExample = { inputs: { cfm: 200, t_oa_F: 10, t_ra_F: 70, eps_s: 0.75 } };
 HVAC_RENDERERS["erv-sensible-recovery"] = _rEnv({
   citation: "Citation: ASHRAE Standard 84 / AHRI 1060 sensible-effectiveness definition (eps_s = (T_leaving - T_oa) / (T_ra - T_oa)) and the recovered sensible load Q_s = 1.08 x CFM x eps_s x dT (by name). Balanced flow at the rated effectiveness, sensible only. A design aid, not the manufacturer's certified data.",
   example: ervSensibleRecoveryExample.inputs,
@@ -3571,7 +3571,7 @@ export function computeMuaTemperingLoad({ cfm = 0, t_oa_F = 0, t_target_F = 0, e
     note: "ASHRAE Fundamentals psychrometric loads at sea level: sensible Q_s = 1.08 x CFM x dT, latent Q_l = 0.68 x CFM x dW (gr/lb), total Q_t = Q_s + Q_l; the gas/heater input is the sensible load over the thermal efficiency. IMC 508 requires makeup air roughly equal to the exhaust. Leave both humidity ratios at zero for a heating-only MUA (latent = 0). Sea-level air density (no altitude derate), makeup CFM equal to the exhaust, delivery at the target temperature; duct and cabinet losses, fan heat, and hood capture efficiency excluded. A design aid, not the mechanical engineer's stamped design.",
   };
 }
-const muaTemperingLoadExample = { inputs: { cfm: 2000, t_oa_F: 20, t_target_F: 65, eta: 0.80 } };
+export const muaTemperingLoadExample = { inputs: { cfm: 2000, t_oa_F: 20, t_target_F: 65, eta: 0.80 } };
 HVAC_RENDERERS["mua-tempering-load"] = _rEnv({
   citation: "Citation: ASHRAE Fundamentals sensible Q_s = 1.08 x CFM x dT and latent Q_l = 0.68 x CFM x dW (gr/lb) tempering loads with the IMC 508 makeup-air-equals-exhaust requirement (by name). Sea-level constants, neutral supply target, no duct losses. A design aid, not the engineer's stamped design.",
   example: muaTemperingLoadExample.inputs,
@@ -3611,7 +3611,7 @@ export function computeDcvCo2Ventilation({ n = 0, co2_set_ppm = 0, co2_oa_ppm = 
     note: "Steady-state single-zone CO2 mass balance: C_in = C_oa + N / Q, solved for the per-person outdoor airflow Q = N / (C_set - C_oa) with the concentrations as volume fractions; the sedentary office generation rate is about 0.0106 cfm per person. This is the equilibrium (fully mixed) airflow that eventually holds the setpoint, not the transient buildup or decay time; one zone at one occupancy and a fixed metabolic rate. ASHRAE 62.1 treats CO2 as an indicator of occupant bioeffluents - the Ventilation Rate Procedure and the engineer of record govern the minimum outdoor air. A design and commissioning aid.",
   };
 }
-const dcvCo2VentilationExample = { inputs: { n: 20, co2_set_ppm: 1100, co2_oa_ppm: 400, gen_cfm: 0.0106 } };
+export const dcvCo2VentilationExample = { inputs: { n: 20, co2_set_ppm: 1100, co2_oa_ppm: 400, gen_cfm: 0.0106 } };
 HVAC_RENDERERS["dcv-co2-ventilation"] = _rEnv({
   citation: "Citation: steady-state single-zone CO2 mass balance C_in = C_oa + N/Q, solved as Q = N / (C_set - C_oa), with the ASHRAE 62.1 CO2-as-indicator note and a sedentary generation of about 0.0106 cfm/person (by name). Equilibrium airflow, one fully mixed zone. The ASHRAE 62.1 rate procedure governs the minimum.",
   example: dcvCo2VentilationExample.inputs,
@@ -3650,7 +3650,7 @@ export function computeReynoldsNumberPipe({ v_fps = 0, d_in = 0, nu = 1.21e-5 } 
     note: "Reynolds number Re = V D / nu (= rho V D / mu), the velocity times diameter over kinematic viscosity, sorting full pipe flow into laminar (below ~2,300), transitional (~2,300 to 4,000), and turbulent (above ~4,000). Nearly all trade piping is turbulent, which is why the friction tiles' Hazen-Williams and Colebrook forms apply. A 60 degF water kinematic viscosity is about 1.21e-5 ft^2/s (1.13 centistokes); the value is temperature- and fluid-dependent, so provide it for the fluid and temperature at hand. Circular full pipe; this does not itself compute the friction factor or head loss. An engineering aid; the fluid property data at the operating condition govern.",
   };
 }
-const reynoldsNumberPipeExample = { inputs: { v_fps: 6, d_in: 2, nu: 1.21e-5 } };
+export const reynoldsNumberPipeExample = { inputs: { v_fps: 6, d_in: 2, nu: 1.21e-5 } };
 HVAC_RENDERERS["reynolds-number-pipe"] = _rEnv({
   citation: "Citation: Reynolds number Re = V D / nu, the pipe-flow transition bands (laminar below ~2,300, turbulent above ~4,000), and a 60 degF water kinematic viscosity of about 1.21e-5 ft^2/s, by name. Full circular pipe; the friction factor is separate. An engineering aid; the fluid property data govern.",
   example: reynoldsNumberPipeExample.inputs,
@@ -3681,7 +3681,7 @@ export function computeHydronicGpmDeltat({ load = 0, unit_tons = 0, dt_f = 0, fa
     note: "Water-side heat transport Q = 500 x GPM x dT (500 = 8.33 lb/gal x 60 min/h x 1.0 Btu/lb-degF for water), rearranged to the design flow GPM = Q / (500 dT); for chilled water the shortcut is GPM = 24 tons/dT (12,000/500 = 24). The delta-T is the lever: a wide design delta-T shrinks the flow, pump, and pipe for the same load. Pure water at the sea-level factor (adjust for glycol via the fluid factor, about 485 at 30% propylene glycol); assumes the full load is carried by the entered delta-T (no bypass or primary/secondary decoupling), and does not size the pump head, the pipe, or the coil. A design aid; the mechanical engineer of record's design governs.",
   };
 }
-const hydronicGpmDeltatExample = { inputs: { load: 10, unit_tons: 1, dt_f: 10, factor: 500 } };
+export const hydronicGpmDeltatExample = { inputs: { load: 10, unit_tons: 1, dt_f: 10, factor: 500 } };
 HVAC_RENDERERS["hydronic-gpm-deltat"] = _rEnv({
   citation: "Citation: hydronic flow GPM = Q / (500 dT) from Q = 500 GPM dT (500 = 8.33 x 60 x 1.0 for water), the chilled-water form GPM = 24 tons/dT, and the glycol-lowered factor, by name. Pure water, full load on the delta-T; the pump head is separate. A design aid; the mechanical engineer of record governs.",
   example: hydronicGpmDeltatExample.inputs,
@@ -3712,7 +3712,7 @@ export function computePumpSpecificSpeed({ n_rpm = 0, q_gpm = 0, h_ft = 0 } = {}
     note: "US pump specific speed Ns = N sqrt(Q) / H^(3/4) (N rpm, Q gpm at the best-efficiency point, H ft per stage - divide total head by the number of stages), the dimensionless-in-practice index that classifies the impeller geometry a duty calls for: roughly radial below ~2,000, mixed flow ~2,000 to 4,500, axial above ~4,500. The head-to-flow ratio, not the size, sets the wheel type; the H^(3/4) denominator makes a low-head high-flow duty jump families. The customary dimensional US form (not the dimensionless or metric nq); this does not compute the suction specific speed Nss (a separate NPSH-margin index) or select a specific pump. An engineering aid; the pump manufacturer's curves govern.",
   };
 }
-const pumpSpecificSpeedExample = { inputs: { n_rpm: 1750, q_gpm: 500, h_ft: 100 } };
+export const pumpSpecificSpeedExample = { inputs: { n_rpm: 1750, q_gpm: 500, h_ft: 100 } };
 HVAC_RENDERERS["pump-specific-speed"] = _rEnv({
   citation: "Citation: US pump specific speed Ns = N sqrt(Q) / H^(3/4) (rpm, gpm at BEP, ft/stage) and the impeller-type bands (radial below ~2,000, mixed ~2,000-4,500, axial above ~4,500), Hydraulic Institute convention, by name. US dimensional form; the suction specific speed Nss is separate. An engineering aid; the manufacturer's curves govern.",
   example: pumpSpecificSpeedExample.inputs,
@@ -3742,7 +3742,7 @@ export function computePumpSuctionSpecificSpeed({ n_rpm = 0, q_gpm = 0, npshr_ft
     note: "US pump suction specific speed Nss = N sqrt(Q) / NPSHr^(3/4) (N rpm, Q gpm at the best-efficiency point - use half the total for a double-suction impeller - NPSHr the required NPSH in ft), the same definitional form as the specific speed Ns but with the required NPSH in place of head: it indexes how hard the pump works its suction. The Hydraulic Institute design guideline caps Nss near 8,500; above it (and especially above ~11,000) a pump shows suction-recirculation damage and shorter life at part-load. The customary dimensional US form; this is a screening index, not an NPSH-margin calculation (NPSHa vs NPSHr) or a pump selection. An engineering aid; the pump manufacturer's curves and a real NPSH-margin check govern.",
   };
 }
-const pumpSuctionSpecificSpeedExample = { inputs: { n_rpm: 1750, q_gpm: 2000, npshr_ft: 25 } };
+export const pumpSuctionSpecificSpeedExample = { inputs: { n_rpm: 1750, q_gpm: 2000, npshr_ft: 25 } };
 HVAC_RENDERERS["pump-suction-specific-speed"] = _rEnv({
   citation: "Citation: US pump suction specific speed Nss = N sqrt(Q) / NPSHr^(3/4) (rpm, gpm at BEP, ft) and the Hydraulic Institute design guidelines (~8,500 traditional limit, ~11,000 reliability threshold), by name. Q is the BEP flow (half the total for a double-suction impeller); US dimensional form. A screening index, not an NPSH-margin calculation; the manufacturer's curves govern.",
   example: pumpSuctionSpecificSpeedExample.inputs,
@@ -3786,7 +3786,7 @@ export function computeBuildingUa({ assemblies, cfm_inf = 0, dt_f = 0 } = {}) {
     note: "Whole-building heat-loss coefficient UA = sum(A_i/R_i) + 1.08 x CFM, in Btu/h per degF, with the infiltration conductance from the sensible-air constant 1.08 = 60 x 0.075 x 0.24 and the design load Q = UA x dT. It sums the entered assemblies and a single infiltration airflow (convert ACH50 to natural infiltration via an LBL/N-factor first, or enter the natural cfm), uses clear-field assembly R-values (thermal bridging is captured only to the extent each R_i already accounts for it), and does not add the latent, ground-coupling, or solar terms. An energy-audit aid, not a stamped Manual J; the ACCA Manual J / RESNET analysis governs.",
   };
 }
-const buildingUaExample = { inputs: { assemblies: [{ area: 1200, r: 17 }, { area: 1500, r: 38 }, { area: 200, r: 3 }, { area: 1500, r: 19 }], cfm_inf: 50, dt_f: 70 } };
+export const buildingUaExample = { inputs: { assemblies: [{ area: 1200, r: 17 }, { area: 1500, r: 38 }, { area: 200, r: 3 }, { area: 1500, r: 19 }], cfm_inf: 50, dt_f: 70 } };
 function _v329renderBuildingUa(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: whole-building heat-loss coefficient UA = sum(A/R) + 1.08 x CFM, the infiltration conductance from 1.08 = 60 x 0.075 x 0.24, and the design load Q = UA x dT, ASHRAE Fundamentals / RESNET basis, by name. Sensible only; enter the natural infiltration cfm. An energy-audit aid, not a stamped Manual J.";
   const asm = makeTextarea("Assemblies, one per line as area_ft2,R-value", "bua-asm", { rows: "4" });
@@ -3843,7 +3843,7 @@ export function computeDegreeDayEnergy({ ua_btuhf = 0, hdd = 0, eff = 0.80, fuel
     note: "Degree-day annual heating energy Q = 24 x HDD x UA (base-65 degF heating degree-days), the fuel = Q/efficiency, and the cost = fuel x unit price, with 1 therm = 100,000 Btu, 1 gal fuel oil ~ 138,500 Btu, and 1 kWh = 3,412 Btu. The energy scales directly with UA, so a 20% envelope improvement is a 20% lower bill. This is the base-65 steady-state degree-day method - a variable-base method with the building's actual balance point is more accurate, and it ignores internal and solar gains that lower the true balance point; it takes UA and local HDD as entered and adds no cooling, latent, or domestic-hot-water energy. An estimate, not a utility-bill-calibrated model; actual consumption depends on occupancy, weather, and gains.",
   };
 }
-const degreeDayEnergyExample = { inputs: { ua_btuhf: 500, hdd: 5000, eff: 0.80, fuel: "gas", price: 1.20 } };
+export const degreeDayEnergyExample = { inputs: { ua_btuhf: 500, hdd: 5000, eff: 0.80, fuel: "gas", price: 1.20 } };
 function _v330renderDegreeDayEnergy(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: degree-day annual heating energy Q = 24 x HDD x UA (base-65 degF), fuel = Q/efficiency, with 1 therm = 100,000 Btu / 1 gal oil ~ 138,500 Btu / 1 kWh = 3,412 Btu, ASHRAE degree-day / RESNET basis, by name. Steady-state, no gains, heating only. An estimate, not a calibrated model.";
   const ua = makeNumber("Heat-loss coefficient UA (Btu/h-F)", "dde-ua", { step: "any", min: "0" });
@@ -3895,7 +3895,7 @@ export function computeWallCondensationGradient({ r_inside = 0, r_outside = 0, t
     note: "One-dimensional steady-state wall condensation screen: temperature drops across an assembly in proportion to R-value, so the interface temperature is T_plane = T_in - (R_inside/R_total)(T_in - T_out), and condensation forms wherever that plane sits at or below the interior air's Magnus dew point. Warming the plane - by adding continuous exterior insulation, which raises R_outside and shifts the ratio - keeps the structural sheathing above the dew point, the whole point of the ratio rule. This is a 1-D steady-state gradient (no thermal bridging, air movement, or vapor-diffusion/transient moisture accumulation, which a Glaser or hygrothermal model adds), uses the interior air's dew point moderated by any vapor retarder, and is a screen. A building-science aid, not a substitute for a hygrothermal (WUFI-type) analysis; the assembly's vapor control governs.",
   };
 }
-const wallCondensationGradientExample = { inputs: { r_inside: 13.5, r_outside: 4, t_in_f: 70, t_out_f: 20, rh_in_pct: 40 } };
+export const wallCondensationGradientExample = { inputs: { r_inside: 13.5, r_outside: 4, t_in_f: 70, t_out_f: 20, rh_in_pct: 40 } };
 HVAC_RENDERERS["wall-condensation-gradient"] = _rEnv({
   citation: "Citation: R-proportional interface temperature T_plane = T_in - (R_inside/R_total)(T_in - T_out), the Magnus dew point of the indoor air, and the condensation criterion T_plane <= T_dew, by name. 1-D steady-state screen, no vapor diffusion. A building-science aid, not a hygrothermal analysis.",
   example: wallCondensationGradientExample.inputs,
@@ -3937,7 +3937,7 @@ export function computeDuctHeatGain({ R_duct = 0, A_ft2 = 0, dT_F = 0, cfm = 0 }
     note: "Conductive duct heat gain/loss through unconditioned space: U = 1/R, Q = U A dT with dT the ambient-minus-in-duct temperature (positive = the duct gains heat, e.g. a cold supply in a hot attic), and the resulting air temperature change dT_air = Q / (1.08 x cfm). Doubling the duct R-value halves the loss - the linear return that pays for attic-duct insulation - and halving the airflow doubles the per-cfm temperature swing. Steady-state conduction only; no radiant gain, air leakage, or latent transfer. A design aid; the ductwork design and the ambient conditions govern.",
   };
 }
-const ductHeatGainExample = { inputs: { R_duct: 4, A_ft2: 100, dT_F: 65, cfm: 1000 } };
+export const ductHeatGainExample = { inputs: { R_duct: 4, A_ft2: 100, dT_F: 65, cfm: 1000 } };
 HVAC_RENDERERS["duct-heat-gain"] = _rEnv({
   citation: "Citation: Conductive duct heat gain Q = U A dT with U = 1/R (ASHRAE Handbook - Fundamentals / duct-design method), and the air temperature change dT_air = Q / (1.08 x cfm). Steady-state conduction, no leakage or radiant gain. A design aid; the ductwork design governs.",
   example: ductHeatGainExample.inputs,
@@ -3980,7 +3980,7 @@ export function computeGrilleFaceVelocity({ mode = "velocity", cfm = 0, ratio = 
   else band = "high (> 700 fpm; noise and draft risk)";
   return { mode: "velocity", V_face, band, A_gross_req_ft2: null };
 }
-const grilleFaceVelocityExample = { inputs: { mode: "size", cfm: 400, ratio: 0.75, V_target: 500 } };
+export const grilleFaceVelocityExample = { inputs: { mode: "size", cfm: 400, ratio: 0.75, V_target: 500 } };
 
 function _renderGrilleFaceVelocity(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Grille/register sizing from the free area: face velocity V = cfm / (gross area x free-area ratio), or the required gross area = cfm / (target velocity x ratio). Supply grilles run about 400-700 fpm, returns slower (quieter), which is why a return is larger than a supply for the same airflow. The manufacturer's published free-area ratio and throw data govern the selection.";
@@ -4063,7 +4063,7 @@ export function computeAdpiSelection({ diffuser_type = "circular-ceiling", cooli
     note: "ASHRAE Handbook -- Fundamentals Space Air Diffusion, ADPI Selection Guide: the outlet's throw-to-characteristic-length ratio T/L predicts the Air Diffusion Performance Index (the fraction of occupied-zone points inside the draft-comfort envelope). Each outlet type and cooling load has a T/L for maximum ADPI and a band over which ADPI stays above the published threshold; a heavier load caps the achievable ADPI regardless of throw. Enter the manufacturer's isothermal catalog throw to the outlet's terminal velocity (" + throwBasis + " for this type) and the characteristic length L (to the wall or the midplane between outlets, per the ASHRAE footnote, adjusted from the 9 ft tabulated ceiling). Cooling mode only; the light-troffer row, heating, and the noise-criterion selection are separate. A selection aid, not a stamped air-distribution design.",
   };
 }
-const adpiSelectionExample = { inputs: { diffuser_type: "circular-ceiling", cooling_load: 40, throw_ft: 8, char_length_ft: 10 } };
+export const adpiSelectionExample = { inputs: { diffuser_type: "circular-ceiling", cooling_load: 40, throw_ft: 8, char_length_ft: 10 } };
 
 function _renderAdpiSelection(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASHRAE Handbook -- Fundamentals, Space Air Diffusion, ADPI Selection Guide (throw per ASHRAE Standard 70, ADPI per Standard 113; the Miller / Nevins Kansas State research). T/L predicts the Air Diffusion Performance Index; each outlet type and cooling load has a max-ADPI T/L and an above-threshold band. Isothermal catalog throw to the outlet's terminal velocity (50 fpm most; 100 fpm ceiling slots). Cooling mode; a selection aid, the manufacturer's data and the design engineer govern.";
@@ -4134,7 +4134,7 @@ export function computeVibrationIsolation({ equipment_rpm = 0, static_deflection
     note: "ASHRAE Handbook -- Fundamentals, Sound and Vibration: the single-degree-of-freedom vibration isolator. The isolated system's natural frequency fn = 3.13 / sqrt(static deflection in inches) Hz (= (1/2pi) sqrt(g/deflection)); the disturbing frequency is the running speed rpm/60 Hz (the lowest forcing frequency, which isolates worst); the transmissibility T = 1 / |(f/fn)^2 - 1| is the fraction of the shaking force that still reaches the structure, and the isolation efficiency is (1 - T). Isolation requires the frequency ratio to exceed sqrt(2) = 1.414; below that the mount amplifies the vibration (true resonance at a ratio of 1), and the fix is a stiffer isolator (less deflection raises fn). The undamped idealization (damping trims high-frequency isolation slightly but tames the resonant peak). The deflection is the isolator's rated value under the actual load; the equipment unbalance, floor stiffness, seismic restraint, and the isolator selection are the mechanical engineer's. A design aid, not a stamped vibration-isolation design.",
   };
 }
-const vibrationIsolationExample = { inputs: { equipment_rpm: 900, static_deflection_in: 1 } };
+export const vibrationIsolationExample = { inputs: { equipment_rpm: 900, static_deflection_in: 1 } };
 
 function _renderVibrationIsolation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASHRAE Handbook -- Fundamentals, Sound and Vibration (single-DOF isolator). Natural frequency fn = 3.13/sqrt(static deflection in inches) Hz; disturbing frequency = rpm/60; transmissibility T = 1/|(f/fn)^2 - 1|; isolation efficiency = (1 - T). Isolation needs a frequency ratio over sqrt(2) = 1.414, else the mount amplifies (resonance at 1). Undamped idealization; the rated isolator deflection under load governs. A design aid, not a stamped vibration-isolation design.";
@@ -4180,7 +4180,7 @@ export function computeIsolatorDeflection({ equipment_rpm = 0, target_efficiency
     note: "ASHRAE / Den Hartog single-degree-of-freedom isolator inverted for the required static deflection: from the target transmissibility T = 1 - efficiency, the required frequency ratio is sqrt(1 + 1/T) (always > sqrt(2), so the mount isolates rather than amplifies), the required natural frequency is fn = (rpm/60)/ratio, and the required static deflection is (3.13/fn)^2 in (fn = 3.13/sqrt(deflection), the inverse of the forward tile). The softer the mount (more deflection, lower fn), the better the isolation. Undamped idealization; the result is the isolator's rated deflection under the actual load. The isolator selection, floor stiffness, and seismic restraint are the mechanical engineer's. A design aid, not a stamped vibration-isolation design.",
   };
 }
-const isolatorDeflectionExample = { inputs: { equipment_rpm: 900, target_efficiency: 90 } };
+export const isolatorDeflectionExample = { inputs: { equipment_rpm: 900, target_efficiency: 90 } };
 HVAC_RENDERERS["isolator-deflection"] = _rEnv({
   citation: "Citation: ASHRAE / Den Hartog single-DOF isolator inverted -- required static deflection = (3.13/fn)^2 in with fn = (rpm/60)/sqrt(1 + 1/T), T = 1 - efficiency, by name. The frequency ratio always exceeds sqrt(2). Undamped idealization; the isolator selection and floor stiffness are the mechanical engineer's. A design aid, not a stamped design.",
   example: isolatorDeflectionExample.inputs,
@@ -4217,7 +4217,7 @@ export function computeAirDensityCorrection({ elev_ft = 0, T_F = 70, acfm = 0, r
     note: "Air density factor DF vs standard air (0.075 lb/ft^3, 70 F sea level): the altitude factor (1 - 6.73e-6 x elev)^5.258 and the temperature factor 530/(460 + T), multiplied. Thinner air (high altitude or hot air) carries less mass per cfm, so SCFM = ACFM x DF, the sensible constant 1.08 scales to 1.08 x DF, and a sea-level-rated fan delivers rated_sp x DF of static. A 5,000 ft site runs about 16% thinner; 120 F rooftop air is about 9% thinner even at sea level, which is why summer rooftop capacity lags the rating. A correction factor; the fan curve and the equipment ratings at the actual condition govern.",
   };
 }
-const airDensityCorrectionExample = { inputs: { elev_ft: 5000, T_F: 70, acfm: 1000, rated_sp: 0.5 } };
+export const airDensityCorrectionExample = { inputs: { elev_ft: 5000, T_F: 70, acfm: 1000, rated_sp: 0.5 } };
 HVAC_RENDERERS["air-density-correction"] = _rEnv({
   citation: "Citation: Air density correction (ASHRAE Handbook - Fundamentals): altitude factor (1 - 6.73e-6 x elev)^5.258, temperature factor 530/(460 + T_F), density factor DF = their product; SCFM = ACFM x DF, corrected sensible constant 1.08 x DF, delivered fan static = rated x DF. A correction factor; the fan curve and equipment ratings govern.",
   example: airDensityCorrectionExample.inputs,
@@ -4255,7 +4255,7 @@ export function computeMoistAirEnthalpy({ t_db_f = 0, w_lb_lb = 0 } = {}) {
     note: "ASHRAE I-P moist-air enthalpy h = 0.240 t + W (1061 + 0.444 t) Btu per lb dry air: 0.240 is the dry-air specific heat, 1061 the latent heat of vaporization at the 0 F datum, 0.444 the water-vapor specific heat. The humidity ratio W (lb water / lb dry air) is the moisture input - pair with outdoor-air-mix or a psychrometric chart to get W from RH. This is the total heat content of one air state; a cooling coil removes the difference between two of these. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
   };
 }
-const moistAirEnthalpyExample = { inputs: { t_db_f: 80, w_lb_lb: 0.0112 } };
+export const moistAirEnthalpyExample = { inputs: { t_db_f: 80, w_lb_lb: 0.0112 } };
 HVAC_RENDERERS["moist-air-enthalpy"] = _rEnv({
   citation: "Citation: Moist-air enthalpy (ASHRAE Handbook - Fundamentals): h = 0.240 t + W (1061 + 0.444 t) Btu per lb dry air, with t the dry-bulb (F) and W the humidity ratio (lb water / lb dry air). 0.240 = dry-air specific heat, 1061 = latent heat at the 0 F datum, 0.444 = water-vapor specific heat. Total heat content of one air state; pair with outdoor-air-mix or a psychrometric chart for W. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
   example: moistAirEnthalpyExample.inputs,
@@ -4286,7 +4286,7 @@ export function computeDrybulbFromEnthalpy({ enthalpy_btu = 0, w_lb_lb = 0 } = {
     note: "The dry-bulb temperature of a moist-air state from its enthalpy and humidity ratio, the inverse of the moist-air-enthalpy tile: solving h = 0.240 t + W (1061 + 0.444 t) for t gives t = (h - 1061 W) / (0.240 + 0.444 W) deg F. Use it to recover the dry-bulb of a coil's entering or leaving state when a psychrometric analysis gives the enthalpy and the humidity ratio but not the temperature directly. 0.240 is the dry-air specific heat, 1061 the latent heat at the 0 F datum, and 0.444 the water-vapor specific heat (ASHRAE I-P, sea level). The humidity ratio must come from the chart or the RH; this returns the dry-bulb of one state, not the wet-bulb or dew point. A design aid, not a substitute for a measured chart state or equipment ratings.",
   };
 }
-const drybulbFromEnthalpyExample = { inputs: { enthalpy_btu: 31.48, w_lb_lb: 0.0112 } };
+export const drybulbFromEnthalpyExample = { inputs: { enthalpy_btu: 31.48, w_lb_lb: 0.0112 } };
 HVAC_RENDERERS["drybulb-from-enthalpy"] = _rEnv({
   citation: "Citation: Moist-air enthalpy (ASHRAE Handbook - Fundamentals) solved for the dry-bulb: t = (h - 1061 W) / (0.240 + 0.444 W) deg F, the inverse of h = 0.240 t + W (1061 + 0.444 t). 0.240 = dry-air specific heat, 1061 = latent heat at the 0 F datum, 0.444 = water-vapor specific heat. The humidity ratio comes from the chart or RH. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
   example: drybulbFromEnthalpyExample.inputs,
@@ -4316,7 +4316,7 @@ export function computeCoolingCoilTotalLoad({ cfm = 0, h_ent_btu = 0, h_lvg_btu 
     note: "Total coil load Q = 4.5 x CFM x (h_ent - h_lvg) Btu/hr, where 4.5 = 60 min/hr x 0.075 lb/ft^3 standard air density. This is the whole heat the coil removes - sensible drop plus condensed moisture (latent) - not the dry-bulb-only 1.08 x CFM x deltaT, which misses the latent load. Feed the entering and leaving enthalpies from moist-air-enthalpy. tons = Q / 12000. A leaving enthalpy above entering returns a negative Q (the coil is heating). A design aid; the equipment ratings govern.",
   };
 }
-const coolingCoilTotalLoadExample = { inputs: { cfm: 2000, h_ent_btu: 31.48, h_lvg_btu: 22.97 } };
+export const coolingCoilTotalLoadExample = { inputs: { cfm: 2000, h_ent_btu: 31.48, h_lvg_btu: 22.97 } };
 HVAC_RENDERERS["cooling-coil-total-load"] = _rEnv({
   citation: "Citation: Cooling-coil total load (ASHRAE Handbook - Fundamentals): Q = 4.5 x CFM x (h_ent - h_lvg) Btu/hr, with 4.5 = 60 x 0.075 (standard air) and enthalpies from moist-air-enthalpy; tons = Q / 12000. Captures the full sensible-plus-latent heat the coil removes, unlike the dry-bulb 1.08 x CFM x deltaT. A leaving enthalpy above entering gives a negative Q (heating). A design aid; equipment ratings govern.",
   example: coolingCoilTotalLoadExample.inputs,
@@ -4348,7 +4348,7 @@ export function computeCoilBypassFactor({ t_ent_f = 0, t_lvg_f = 0, t_adp_f = 0 
     note: "Bypass factor BF = (t_lvg - t_adp) / (t_ent - t_adp), contact factor CF = 1 - BF, where the apparatus dew point (ADP) is the effective coil-surface temperature the air is driven toward. BF is the fraction of air that slips past the coil unconditioned; a lower BF (deeper, slower coil) contacts more air and dehumidifies better. Leaving air cannot be colder than the ADP or warmer than entering. A design aid; the coil rating and ADP selection govern.",
   };
 }
-const coilBypassFactorExample = { inputs: { t_ent_f: 80, t_lvg_f: 55, t_adp_f: 50 } };
+export const coilBypassFactorExample = { inputs: { t_ent_f: 80, t_lvg_f: 55, t_adp_f: 50 } };
 HVAC_RENDERERS["coil-bypass-factor"] = _rEnv({
   citation: "Citation: Coil bypass / contact factor (ASHRAE Handbook - Fundamentals): BF = (t_lvg - t_adp) / (t_ent - t_adp), CF = 1 - BF, with the apparatus dew point (ADP) the effective coil-surface temperature. BF is the fraction of air bypassing the coil unconditioned; a lower BF dehumidifies better. Leaving air lies between the ADP and the entering temperature. A design aid; the coil rating governs.",
   example: coilBypassFactorExample.inputs,
@@ -4382,7 +4382,7 @@ export function computeFanAffinityLaws({ q1_cfm = 0, sp1_inwg = 0, bhp1_hp = 0, 
     note: "Fan affinity laws for a fixed fan changing speed: airflow scales with speed (Q2 = Q1 r), static pressure with the square (SP2 = SP1 r^2), and brake horsepower with the cube (BHP2 = BHP1 r^3), where r = N2/N1. The cube law is why a small speed cut saves large power (a 25% slowdown cuts power ~58%), the core of VFD energy savings. Valid for the same fan on its system curve; it does not account for motor/drive efficiency shifts, belt losses, or a changed system curve. A field aid; the fan curve and equipment ratings govern.",
   };
 }
-const fanAffinityLawsExample = { inputs: { q1_cfm: 10000, sp1_inwg: 1.0, bhp1_hp: 5.0, n1: 900, n2: 1200 } };
+export const fanAffinityLawsExample = { inputs: { q1_cfm: 10000, sp1_inwg: 1.0, bhp1_hp: 5.0, n1: 900, n2: 1200 } };
 HVAC_RENDERERS["fan-affinity-laws"] = _rEnv({
   citation: "Citation: Fan affinity laws (AMCA / ASHRAE Handbook - Fundamentals) for a fixed fan at a changed speed: Q2 = Q1 (N2/N1), SP2 = SP1 (N2/N1)^2, BHP2 = BHP1 (N2/N1)^3. The cube-law power relation is the basis of VFD energy savings. Valid for the same fan on the same system curve; it does not capture motor/drive efficiency changes or a shifted system curve. A field aid; the fan curve and equipment ratings govern.",
   example: fanAffinityLawsExample.inputs,
@@ -4421,7 +4421,7 @@ export function computeColebrookFrictionFactor({ reynolds = 0, rel_roughness = 0
     note: "Darcy-Weisbach friction factor f: laminar (Re < 2300) is exactly 64/Re, independent of roughness; turbulent uses the Swamee-Jain explicit fit to the Colebrook equation, f = 0.25 / [log10(eps/D / 3.7 + 5.74 / Re^0.9)]^2, within ~1% of Moody-chart values for 5000 < Re < 1e8 and eps/D < 0.05. The 2300-4000 transition band is physically indeterminate; the turbulent estimate is flagged there. Feeds the head-loss h = f (L/D) V^2/(2g). A design aid; the system analysis governs.",
   };
 }
-const colebrookFrictionFactorExample = { inputs: { reynolds: 100000, rel_roughness: 0.0003 } };
+export const colebrookFrictionFactorExample = { inputs: { reynolds: 100000, rel_roughness: 0.0003 } };
 HVAC_RENDERERS["colebrook-friction-factor"] = _rEnv({
   citation: "Citation: Darcy friction factor -- laminar f = 64/Re, and the Swamee-Jain (1976) explicit approximation to the Colebrook-White equation f = 0.25 / [log10(eps/D / 3.7 + 5.74 / Re^0.9)]^2 for turbulent flow (within ~1% of the Colebrook/Moody value over 5000 < Re < 1e8, eps/D <= 0.05). The 2300-4000 transition is indeterminate. Feeds the Darcy-Weisbach head loss h = f (L/D) V^2/(2g). A design aid; the system analysis governs.",
   example: colebrookFrictionFactorExample.inputs,
@@ -4456,7 +4456,7 @@ export function computeManualDFrictionRate({ blower_esp_inwg = 0, component_drop
     note: "ACCA Manual D friction rate: the available static pressure ASP = blower rated external static at design CFM - the sum of component drops (coil, filter, registers/grilles, dampers, balancing), and the design friction rate FR = ASP x 100 / total effective length (in wg per 100 ft). The TEL is the longest supply-plus-return path including the equivalent lengths of the fittings, not the physical run. A typical FR target is 0.06-0.10; a lower rate needs larger ducts. A design aid; a full Manual D duct layout governs.",
   };
 }
-const manualDFrictionRateExample = { inputs: { blower_esp_inwg: 0.60, component_drop_inwg: 0.42, tel_ft: 180 } };
+export const manualDFrictionRateExample = { inputs: { blower_esp_inwg: 0.60, component_drop_inwg: 0.42, tel_ft: 180 } };
 HVAC_RENDERERS["manual-d-friction-rate"] = _rEnv({
   citation: "Citation: ACCA Manual D friction rate: available static pressure ASP = blower rated ESP - total component drops, design friction rate FR = ASP x 100 / total effective length (in wg per 100 ft). The TEL includes the fitting equivalent lengths, not just the physical run. A design aid; the full Manual D layout governs.",
   example: manualDFrictionRateExample.inputs,
@@ -4492,7 +4492,7 @@ export function computeErvTotalEnthalpyRecovery({ cfm = 0, effectiveness = 0, h_
     note: "ERV total (enthalpy) recovery: Q = 4.5 x CFM x effectiveness x (h_outdoor - h_return) Btu/hr, and the air leaving the wheel toward the space is h_supply = h_outdoor - effectiveness x (h_outdoor - h_return). In summer the outdoor air is more energetic than the return, so the wheel pre-cools and dries the incoming air (a positive Q, a cooling recovery that offloads the coil); in winter it pre-warms and humidifies it (a negative Q, a heating recovery). The effectiveness is the wheel's total-energy rating at the design airflow. Feed the two enthalpies from moist-air-enthalpy. A design aid; the ERV manufacturer's rated effectiveness governs.",
   };
 }
-const ervTotalEnthalpyRecoveryExample = { inputs: { cfm: 1000, effectiveness: 0.75, h_outdoor: 38, h_return: 28 } };
+export const ervTotalEnthalpyRecoveryExample = { inputs: { cfm: 1000, effectiveness: 0.75, h_outdoor: 38, h_return: 28 } };
 HVAC_RENDERERS["erv-total-enthalpy-recovery"] = _rEnv({
   citation: "Citation: ERV total (enthalpy) recovery (ASHRAE Handbook - Fundamentals / AHRI 1060): Q = 4.5 x CFM x effectiveness x (h_outdoor - h_return) Btu/hr, supply enthalpy = h_outdoor - effectiveness x (h_outdoor - h_return). Positive Q is a summer cooling recovery, negative a winter heating recovery. A design aid; the ERV's rated effectiveness governs.",
   example: ervTotalEnthalpyRecoveryExample.inputs,

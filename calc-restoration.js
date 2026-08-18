@@ -570,7 +570,7 @@ export function computeHEPALife({ cfm, hours_per_day, particulate_category = "me
 }
 
 export const hepaLifeExample = {
-  inputs: { cfm: 600, hours_per_day: 24, particulate_category: "medium" },
+  inputs: { cfm: 1000, hours_per_day: 8, particulate_category: "medium", job_days: 5, filter_cost_usd: 80 },
   expectedRange: { days: { min: 1, max: 5 } },
 };
 
@@ -668,7 +668,7 @@ export function renderHEPALife(inputRegion, outputRegion, citationEl) {
   const jd = makeNumber("Job duration (days, optional)", "hl-jd", { step: "any", min: "0" });
   const fc = makeNumber("Filter cost ($, optional)", "hl-fc", { step: "any", min: "0" });
   for (const f of [cfm, hpd, cap, cat, jd, fc]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { cfm.input.value = "600"; hpd.input.value = "24"; cap.input.value = "1500"; cat.select.value = "medium"; update(); });
+  attachExampleButton(inputRegion, () => { cfm.input.value = "1000"; hpd.input.value = "8"; cap.input.value = "1500"; cat.select.value = "medium"; jd.input.value = "5"; fc.input.value = "80"; update(); });
   const oD = makeOutputLine(outputRegion, "Estimated filter life", "hl-out-d");
   const oG = makeOutputLine(outputRegion, "Loading rate", "hl-out-g");
   const oFJ = makeOutputLine(outputRegion, "Filters for full job (if days supplied)", "hl-out-fj");

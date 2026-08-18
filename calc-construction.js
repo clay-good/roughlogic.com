@@ -4354,7 +4354,7 @@ export function computeFenceEstimate({ length_ft = 0, post_spacing_ft = 8, rails
     note: "For a straight run the posts are the sections plus one; every corner, end, and gate post is an extra you add by eye from the layout. Rails are the sections times the rails per section (2 for most privacy and picket fence, 3 for tall or ranch rail). Pickets divide the run by the picket width plus the gap. Add a waste allowance and order full bundles - this is the material count, post-hole-concrete sizes the footing.",
   };
 }
-const fenceEstimateExample = { inputs: { length_ft: 120, post_spacing_ft: 8, rails_per_section: 3, picket_width_in: 5.5, picket_gap_in: 0.25 } };
+export const fenceEstimateExample = { inputs: { length_ft: 120, post_spacing_ft: 8, rails_per_section: 3, picket_width_in: 5.5, picket_gap_in: 0.25 } };
 const renderFenceEstimate = _simpleRenderer({
   citation: "Citation: Standard fence-layout identities (posts = sections + 1, rails = sections x rails/section, pickets = run / (width + gap)). Field-judgment extras for corners/ends/gates.",
   example: fenceEstimateExample.inputs,
@@ -4397,7 +4397,7 @@ export function computePostHoleConcrete({ num_posts = 0, hole_diameter_in = 0, h
     note: "The concrete per hole is the cylinder volume less what the post displaces, so set the post side to net it out. A 60-lb bag yields about 0.45 cu ft and an 80-lb bag about 0.60 cu ft of mixed concrete - match the yield to the bag you buy. The rule of thumb sets the hole depth at about a third of the post's above-grade height and below the frost line, with the diameter about three times the post width. Round bags up and add a bag or two for spillage.",
   };
 }
-const postHoleConcreteExample = { inputs: { num_posts: 16, hole_diameter_in: 10, hole_depth_in: 30, post_side_in: 3.5, bag_yield_cuft: 0.45 } };
+export const postHoleConcreteExample = { inputs: { num_posts: 16, hole_diameter_in: 10, hole_depth_in: 30, post_side_in: 3.5, bag_yield_cuft: 0.45 } };
 const renderPostHoleConcrete = _simpleRenderer({
   citation: "Citation: Cylinder-volume geometry less post displacement; bagged-concrete yields ~0.45 cu ft (60-lb) / 0.60 cu ft (80-lb). 1728 cu in/cu ft, 27 cu ft/cu yd.",
   example: postHoleConcreteExample.inputs,
@@ -4452,7 +4452,7 @@ export function computeControlJointSpacing({ slab_thickness_in = 0, spacing_fact
     note: "Cut contraction joints at about two to three times the slab thickness in feet (a 4 in slab joints every 8-12 ft), capped near 15-18 ft so a panel does not crack mid-bay. Keep panels close to square (under about 1.5 to 1) - a long, narrow panel cracks across the middle. Cut at least a quarter of the slab depth, early (within the first few hours). This is a crack-control rule of thumb; the structural drawings govern a designed slab.",
   };
 }
-const controlJointSpacingExample = { inputs: { slab_thickness_in: 4, spacing_factor: 2.5, max_spacing_ft: 18, slab_length_ft: 40, slab_width_ft: 24 } };
+export const controlJointSpacingExample = { inputs: { slab_thickness_in: 4, spacing_factor: 2.5, max_spacing_ft: 18, slab_length_ft: 40, slab_width_ft: 24 } };
 const renderControlJointSpacing = _simpleRenderer({
   citation: "Citation: ACI 302.1R / 360R slab-on-ground joint guidance (by name). Spacing ~ 2-3 ft per inch of thickness (capped); depth >= 1/4 slab; panels kept under ~1.5:1.",
   example: controlJointSpacingExample.inputs,
@@ -4492,7 +4492,7 @@ export function computeRebarLapSplice({ bar_size = "#5", lap_factor = 48, min_la
     note: "A tension lap overlaps two bars so the load transfers through the concrete; the field rule is about 40-48 bar diameters for typical Grade 60 bar in 4,000 psi normal-weight concrete (a Class B lap is roughly 1.3 times the development length). Never lap less than 12 in. Epoxy-coated bar, top bars, lightweight concrete, and bars bunched close together all lengthen the lap - treat this as a starting figure and confirm against the structural drawings. Stagger adjacent splices.",
   };
 }
-const rebarLapSpliceExample = { inputs: { bar_size: "#5", lap_factor: 48, min_lap_in: 12 } };
+export const rebarLapSpliceExample = { inputs: { bar_size: "#5", lap_factor: 48, min_lap_in: 12 } };
 const renderRebarLapSplice = _simpleRenderer({
   citation: "Citation: ACI 318 development-and-splice basis (Class B tension lap ~1.3 x development length, by name). Field rule 40-48 bar diameters, never less than 12 in.",
   example: rebarLapSpliceExample.inputs,
@@ -4541,7 +4541,7 @@ export function computeGuardHandrailCheck({ occupancy = "residential", surface_h
     note: "A guard is required where the walking surface is more than 30 in above the grade or floor below. Minimum guard height is 36 in residential (IRC R312.1.2) and 42 in commercial (IBC 1015.3). Infill openings must reject a 4 in sphere (4-3/8 in on the stair side triangle), and a stair handrail sits 34-38 in above the nosings (IRC R311.7.8.1). These are dimensional minimums; the AHJ-adopted code and edition govern, and the assembly must also carry the 200 lb load.",
   };
 }
-const guardHandrailCheckExample = { inputs: { occupancy: "residential", surface_height_in: 48, measured_guard_in: 36, measured_infill_gap_in: 3.5, at_stairs: "no", measured_handrail_in: 36 } };
+export const guardHandrailCheckExample = { inputs: { occupancy: "residential", surface_height_in: 48, measured_guard_in: 36, measured_infill_gap_in: 3.5, at_stairs: "no", measured_handrail_in: 36 } };
 const renderGuardHandrailCheck = _simpleRenderer({
   citation: "Citation: IRC R312 (guards) / R311.7.8 (handrails) and IBC 1015 (by section, not reproduced). Guard required over 30 in; 36 in residential / 42 in commercial; 4 in sphere infill (4-3/8 in stair triangle); 34-38 in handrail. A 200 lb load applies regardless; the AHJ governs. Free at codes.iccsafe.org.",
   example: guardHandrailCheckExample.inputs,
@@ -4592,7 +4592,7 @@ export function computeStairCodeCheck({ occupancy = "commercial", riser_height_i
     note: "Dimensional stair limits for the selected occupancy: IBC 2021 §1011.5.2 caps the commercial riser at 7 in (4 in minimum) and floors the tread at 11 in, with §1011.2 requiring 44 in of width (36 in where the occupant load is under 50); IRC 2021 R311.7.5 allows a 7-3/4 in residential riser and a 10 in tread at 36 in of width (R311.7.1). The tread is the horizontal run excluding the nosing. 2R + T between 24 and 25 in is a design comfort rule of thumb, not a code pass/fail. The 3/8 in riser/tread uniformity limit over a flight, the nosing profile, the landings, and winder/spiral geometry are separate checks; the egress width the occupant load requires is the egress-capacity tile. A design aid, not a code-official determination; the AHJ and the adopted code and edition govern.",
   };
 }
-const stairCodeCheckExample = { inputs: { occupancy: "commercial", riser_height_in: 7, tread_depth_in: 11, stair_width_in: 44 } };
+export const stairCodeCheckExample = { inputs: { occupancy: "commercial", riser_height_in: 7, tread_depth_in: 11, stair_width_in: 44 } };
 const renderStairCodeCheck = _simpleRenderer({
   citation: "Citation: IBC 2021 §1011.5.2 (commercial riser 4-7 in, tread 11 in min) / §1011.2 (44 in width, 36 in where occupant load under 50) and IRC 2021 R311.7.5 (residential riser 7-3/4 in max, tread 10 in min) / R311.7.1 (36 in width), by section. 2R + T of 24-25 in is a comfort rule of thumb, not code. Uniformity, nosing, landings, and winders are separate checks; the AHJ governs. Free at codes.iccsafe.org.",
   example: stairCodeCheckExample.inputs,
@@ -4641,7 +4641,7 @@ export function computeCmuGroutVolume({ wall_len_ft = 0, wall_ht_ft = 0, core_sp
     note: "Grouted cores = floor(wall length x 12 / core spacing) + 1 (both ends grouted). Vertical grout = cores x wall height x core cross-section / 144 (in^2 to ft^2). Bond-beam grout = wall length x bond cross-section / 144, one continuous top course (0 for none). Total in ft^3 and cubic yards (/27); order grout with a waste and pump allowance on top. The grouted-cell spacing and the cross-section areas come from the structural drawings and the unit data, and the engineer of record governs the reinforcement - this is a material takeoff, not a structural design.",
   };
 }
-const cmuGroutVolumeExample = { inputs: { wall_len_ft: 20, wall_ht_ft: 8, core_spacing_in: 24, core_area_in2: 24, bond_area_in2: 30 } };
+export const cmuGroutVolumeExample = { inputs: { wall_len_ft: 20, wall_ht_ft: 8, core_spacing_in: 24, core_area_in2: 24, bond_area_in2: 30 } };
 const renderCmuGroutVolume = _simpleRenderer({
   citation: "Citation: first-principles core-count and grout-volume relations with TMS 602 / ACI 530.1 (Specification for Masonry Structures) and the NCMA TEK grout references (by name). cores = floor(len x 12 / spacing) + 1; vert = cores x ht x area/144; bond = len x area/144; total/27 = yd^3. The EOR governs the reinforcement; this is a material takeoff, not a structural design.",
   example: cmuGroutVolumeExample.inputs,
@@ -4680,7 +4680,7 @@ export function computeMasonryCoursing({ target_in = 0, unit_in = 7.625, joint_i
     note: "Course height = unit height + one bed joint (modular defaults: CMU 7.625 + 0.375 = 8.0 in; modular brick 2.25 + 0.4167 = 2.6667 in, so three courses = 8 in). Courses = round(target / course); built height = courses x course; off-module = target minus built (+ means the target sits above the nearest course). On module when |off| < 1/16 in. Off module, the wall top or opening forces a cut course or a fudged joint. The unit and joint dimensions are nominal/modular and the actual product and the mason's joint govern - this is a layout aid, not a stamped elevation.",
   };
 }
-const masonryCoursingExample = { inputs: { target_in: 96, unit_in: 7.625, joint_in: 0.375 } };
+export const masonryCoursingExample = { inputs: { target_in: 96, unit_in: 7.625, joint_in: 0.375 } };
 const renderMasonryCoursing = _simpleRenderer({
   citation: "Citation: first-principles coursing relation with the Brick Industry Association (BIA) Technical Notes on modular masonry and the NCMA TEK dimensioning references (by name). course = unit + joint; courses = round(target / course); off = target - courses x course; on module when |off| < 1/16 in. Nominal dimensions; the actual product and the mason's joint govern - a coursing check, not a stamped elevation.",
   example: masonryCoursingExample.inputs,
@@ -4723,7 +4723,7 @@ export function computeWallpaperRolls({ perimeter_in = 0, height_in = 0, roll_wi
 // spec-v593: defaults and the example fill are the US double-roll bolt
 // (27 in x 27 ft = 324 in); the Euro sizes stay named in the labels as the
 // alternative. Compute unchanged (inches in, counts out).
-const wallpaperRollsExample = { inputs: { perimeter_in: 624, height_in: 108, roll_width_in: 27, roll_len_in: 324, repeat_in: 19 } };
+export const wallpaperRollsExample = { inputs: { perimeter_in: 624, height_in: 108, roll_width_in: 20.5, roll_len_in: 396, repeat_in: 19 } };
 const renderWallpaperRolls = _simpleRenderer({
   citation: "Citation: first-principles strips-and-rolls relations with wallcovering industry estimating practice (the strip method and the one-repeat-per-strip waste rule, by name). strips = ceil(perimeter / width); strip length = height + repeat; strips/roll = floor(roll length / strip length); rolls = ceil(strips / strips per roll). Roll dimensions are the product's bolt size; openings are a manual credit - an ordering aid, not an installation layout.",
   example: wallpaperRollsExample.inputs,
@@ -4915,7 +4915,7 @@ export function computeRainLoadPonding({ static_head_in = 0, hydraulic_head_in =
     note: "ASCE 7 Ch. 8: rain load R = 5.2 x (ds + dh), where ds is the static head to the secondary (overflow) inlet and dh is the hydraulic head above it at design flow (5.2 psf per inch of water). The hydraulic head dh comes from the secondary drain or scupper's flow capacity at the design flow (a manufacturer or weir relation, entered here, not a bundled chart). The optional design flow Q = 0.0104 x area x rainfall (IPC) uses the 100-year hourly intensity for the site. A roof too flexible to shed the water must also pass the ASCE 7 §8.4 ponding-instability check. A load and flow aid, not a stamped roof-drainage design.",
   };
 }
-const rainLoadPondingExample = { inputs: { static_head_in: 2, hydraulic_head_in: 1, roof_area_ft2: 2000, rainfall_in_hr: 3 } };
+export const rainLoadPondingExample = { inputs: { static_head_in: 2, hydraulic_head_in: 1, roof_area_ft2: 2000, rainfall_in_hr: 3 } };
 CONSTRUCTION_RENDERERS["rain-load-ponding"] = _simpleRenderer({
   citation: "Citation: ASCE 7 Ch. 8 rain load R = 5.2 x (ds + dh), the static head ds to the secondary inlet plus the hydraulic head dh above it at design flow, and the IPC roof-drainage design flow Q = 0.0104 x area x rainfall (by name). The hydraulic head comes from the secondary drain/scupper capacity; the design rainfall is the 100-year hourly intensity. A flat roof must also pass the §8.4 ponding-instability check. A load and flow aid, not a stamped design.",
   example: rainLoadPondingExample.inputs,
@@ -4958,7 +4958,7 @@ export function computeAsce7LoadCombinations({ dead_psf = 0, live_psf = 0, snow_
     note: "ASCE 7 §2.4.1 basic ASD load combinations: D; D+L; D+(Lr or S or R); D+0.75L+0.75(Lr or S or R); D+0.6W; D+0.75L+0.75(0.6W)+0.75(Lr or S or R); 0.6D+0.6W. The governing gravity demand is the largest (it sizes the member); a controlling case below zero is a net uplift the connection must resist. Wind is signed: positive downward, negative uplift. The roof load entered as snow stands in for the governing of roof-live / snow / rain; the dead in the 0.6D combinations is the reliably-present dead only. The basic ASD set (seismic E and the LRFD strength set are separate). A load-combination aid, not a member design.",
   };
 }
-const asce7LoadCombinationsExample = { inputs: { dead_psf: 15, live_psf: 0, snow_psf: 30, wind_psf: -25 } };
+export const asce7LoadCombinationsExample = { inputs: { dead_psf: 15, live_psf: 0, snow_psf: 30, wind_psf: -25 } };
 CONSTRUCTION_RENDERERS["asce7-load-combinations"] = _simpleRenderer({
   citation: "Citation: ASCE 7 §2.4.1 basic ASD load combinations (D; D+L; D+(Lr or S or R); D+0.75L+0.75(Lr or S or R); D+0.6W; D+0.75L+0.75(0.6W)+0.75(Lr or S or R); 0.6D+0.6W), by name. The governing gravity demand sizes the member; a controlling case below zero is a net uplift. Wind is signed (+ down, - uplift). Basic ASD set only. A load-combination aid, not a member design.",
   example: asce7LoadCombinationsExample.inputs,
@@ -5000,7 +5000,7 @@ export function computeSeismicBaseShear({ weight_kip = 0, sds = 0, sd1 = 0, r_fa
     note: "ASCE 7 §12.8 equivalent lateral force: Cs = SDS / (R / Ie), capped at SD1 / (T x (R / Ie)) for T <= TL, with the minimum max(0.044 x SDS x Ie, 0.01); the base shear V = Cs x W. SDS and SD1 are the site's design spectral accelerations from the USGS seismic design maps (entered, not a bundled hazard map); R is from ASCE 7 Table 12.2-1 for the chosen lateral system; the long-period transition TL is assumed not to govern. The equivalent-lateral-force base shear for a regular building, not a modal or response-history analysis and not the vertical distribution. A licensed engineer governs.",
   };
 }
-const seismicBaseShearExample = { inputs: { weight_kip: 200, sds: 1.0, sd1: 0.6, r_factor: 6.5, ie: 1.0, period_s: 0.3 } };
+export const seismicBaseShearExample = { inputs: { weight_kip: 200, sds: 1.0, sd1: 0.6, r_factor: 6.5, ie: 1.0, period_s: 0.3 } };
 CONSTRUCTION_RENDERERS["seismic-base-shear"] = _simpleRenderer({
   citation: "Citation: ASCE 7 §12.8 equivalent lateral force Cs = SDS / (R / Ie), capped at SD1 / (T x (R / Ie)) for T <= TL, minimum max(0.044 x SDS x Ie, 0.01), base shear V = Cs x W (by name). SDS / SD1 are from the USGS seismic design maps; R is from Table 12.2-1. The ELF base shear for a regular building, not a modal analysis. A licensed engineer governs.",
   example: seismicBaseShearExample.inputs,
@@ -5065,7 +5065,7 @@ export function computeSeismicApproximatePeriod({ system = "other", hn_ft = 0, s
     note: "The ASCE 7 §12.8.2.1 approximate fundamental period Ta, the period the seismic-base-shear, vertical-distribution, and overturning tiles take as an input but no tile computed. Ta = Ct hn^x (Eq. 12.8-7), where hn is the structural height (base to roof, ft) and Ct/x are the Table 12.8-2 coefficients: steel moment frames 0.028/0.8, concrete moment frames 0.016/0.9, steel eccentrically braced and buckling-restrained braced frames 0.03/0.75, and all other structural systems 0.02/0.75. A 120 ft steel moment frame gives Ta = 0.028 x 120^0.8 = 1.29 s. Ta is always permitted and is conservative (a shorter period lands higher on the response spectrum, so a larger Cs); a period T computed from a rational (modal or Rayleigh) analysis may be used but not more than Cu Ta, the upper limit from Table 12.8-1 (Cu falls from 1.7 at SD1 <= 0.1 to 1.4 at SD1 >= 0.4) -- enter SD1 to see it. The moment-frame Ct/x apply only where the frame resists 100% of the seismic force and is not enclosed by stiffer components. A design aid, not a substitute for a licensed engineer's design.",
   };
 }
-const seismicApproximatePeriodExample = { inputs: { system: "steel_mrf", hn_ft: 120, sd1: 0.6 } };
+export const seismicApproximatePeriodExample = { inputs: { system: "steel_mrf", hn_ft: 120, sd1: 0.6 } };
 CONSTRUCTION_RENDERERS["seismic-approximate-period"] = _simpleRenderer({
   citation: "Citation: ASCE 7 §12.8.2.1 approximate fundamental period Ta = Ct hn^x (Eq. 12.8-7), with the Table 12.8-2 coefficients (steel MRF 0.028/0.8, concrete MRF 0.016/0.9, EBF/BRBF 0.03/0.75, other 0.02/0.75) and the Cu Ta upper limit from Table 12.8-1, by name. Feeds the seismic-base-shear tile as the period. A design aid, not a substitute for a licensed engineer's design.",
   example: seismicApproximatePeriodExample.inputs,

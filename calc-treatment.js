@@ -489,7 +489,7 @@ export function computePoolAlkalinityAdjust({ gallons = 0, current_ta_ppm = 0, t
     note: "Set total alkalinity (the buffer) before pH, because a stable TA keeps pH from bouncing. About 1.5 lb of sodium bicarbonate per 10,000 gal raises TA ~10 ppm; about 25 fl oz of 31.45% (20 Baume) muriatic acid per 10,000 gal lowers it ~10 ppm (acid lowers pH too). Target TA is typically 80-120 ppm. These are starting doses - add in portions, circulate, and retest. Always add acid to water, never water to acid.",
   };
 }
-const poolAlkalinityAdjustExample = { inputs: { gallons: 20000, current_ta_ppm: 60, target_ta_ppm: 100 } };
+export const poolAlkalinityAdjustExample = { inputs: { gallons: 20000, current_ta_ppm: 60, target_ta_ppm: 100 } };
 const renderPoolAlkalinityAdjust = _rPool({
   citation: "Citation: NSPF CPO Handbook / ANSI-APSP-ICC dosing tables (by name). ~1.5 lb sodium bicarbonate or ~25 fl oz 31.45% muriatic acid per 10,000 gal per 10 ppm.",
   example: poolAlkalinityAdjustExample.inputs,
@@ -526,7 +526,7 @@ export function computePoolCyaDose({ gallons = 0, current_cya_ppm = 0, target_cy
     note: "Cyanuric acid (stabilizer / conditioner) protects free chlorine from the sun, but too much locks up chlorine and forces a higher free-chlorine target. About 13 oz of cyanuric acid per 10,000 gal raises CYA ~10 ppm. CYA comes down only by dilution, so to halve it you replace about half the water. Target CYA is typically 30-50 ppm for an outdoor chlorine pool. Add stabilizer slowly through the skimmer - it dissolves slowly and can etch plaster.",
   };
 }
-const poolCyaDoseExample = { inputs: { gallons: 15000, current_cya_ppm: 20, target_cya_ppm: 40 } };
+export const poolCyaDoseExample = { inputs: { gallons: 15000, current_cya_ppm: 20, target_cya_ppm: 40 } };
 const renderPoolCyaDose = _rPool({
   citation: "Citation: NSPF CPO Handbook / ANSI-APSP-ICC (by name). ~13 oz (0.81 lb) cyanuric acid per 10,000 gal per 10 ppm; lower only by dilution (drained fraction = 1 - target/current).",
   example: poolCyaDoseExample.inputs,
@@ -560,7 +560,7 @@ export function computePoolSaltDose({ gallons = 0, current_salt_ppm = 0, target_
     note: "A salt-chlorine generator needs the salt at the level on the cell's spec plate, typically about 3,000-3,500 ppm. The salt to add is the volume x 8.34 lb/gal x ppm rise / a million. Salt leaves only by splash-out, backwash, and dilution, so to lower it you replace water. Use pool-grade NaCl (99%+), broadcast it, brush it off the floor, and run the pump - do not run the generator until it has dissolved. Too little underproduces chlorine; too much can corrode fittings.",
   };
 }
-const poolSaltDoseExample = { inputs: { gallons: 20000, current_salt_ppm: 2000, target_salt_ppm: 3200 } };
+export const poolSaltDoseExample = { inputs: { gallons: 20000, current_salt_ppm: 2000, target_salt_ppm: 3200 } };
 const renderPoolSaltDose = _rPool({
   citation: "Citation: Mass-balance identity gallons x 8.34 lb/gal x ppm / 1,000,000 (NSPF CPO / ANSI-APSP-ICC, by name). Lower only by dilution; pool salt sold in 40-lb bags.",
   example: poolSaltDoseExample.inputs,
@@ -606,7 +606,7 @@ export function computePoolChlorineDose({ ppm = 0, gallons = 0, product = "cal-h
     note: "Free-chlorine dose: pounds of chlorine = ppm x (gallons/1,000,000) x 8.34, divided by the product's available-chlorine fraction to get the product weight, then expressed as dry ounces or (for liquid, ~10 lb/gal) fluid ounces. A weaker product needs proportionally more weight - liquid 12.5% takes five times the weight of 65% cal-hypo for the same chlorine - the cost/handling trade between a cheap heavy jug and a concentrated scoop. Dose to a target free-chlorine level; test and retest, and follow the product label. A pool-care aid, not a substitute for the label directions.",
   };
 }
-const poolChlorineDoseExample = { inputs: { ppm: 2, gallons: 15000, product: "cal-hypo-65", avail: 0 } };
+export const poolChlorineDoseExample = { inputs: { ppm: 2, gallons: 15000, product: "cal-hypo-65", avail: 0 } };
 function renderPoolChlorineDose(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: free-chlorine dose = ppm x (gallons/1,000,000) x 8.34 lb, divided by the product available-chlorine fraction; liquid ~10 lb/gal. Product strengths: liquid 12.5%, cal-hypo 65%, dichlor 56%, trichlor 90%. Dose to a target and retest; the product label governs.";
   const ppm = makeNumber("Target free-chlorine rise (ppm)", "pcd-ppm", { step: "any", min: "0" }); ppm.input.value = "2";
@@ -658,7 +658,7 @@ export function computePoolHeaterBtu({ gallons = 0, dT_F = 0, output = 0, eff = 
     note: "Pool heat-up: energy Btu = gallons x 8.34 lb/gal x temperature rise (1 Btu warms 1 lb of water 1 F), and the heat-up time = energy / (heater output x efficiency). A gas heater at ~80% warms fast; a heat pump (enter its COP-equivalent Btu/h) is far slower but cheaper to run, which is why a heat pump is left on to hold temperature rather than for a quick warm-up. Ignores cover, evaporation, and standby losses, so real heat-up runs longer. A sizing estimate; the equipment ratings and site conditions govern.",
   };
 }
-const poolHeaterBtuExample = { inputs: { gallons: 20000, dT_F: 10, output: 400000, eff: 0.80 } };
+export const poolHeaterBtuExample = { inputs: { gallons: 20000, dT_F: 10, output: 400000, eff: 0.80 } };
 TREATMENT_RENDERERS["pool-heater-btu"] = _rPool({
   citation: "Citation: pool heat-up energy Btu = gallons x 8.34 x temperature rise; time = energy / (output x efficiency). Gas ~80%; enter a heat pump's COP-equivalent Btu/h. Ignores cover/evaporation/standby losses. A sizing estimate; the equipment ratings govern.",
   example: poolHeaterBtuExample.inputs,
@@ -696,7 +696,7 @@ export function computePoolHeaterSize({ gallons = 0, dT_F = 0, target_hours = 0,
     note: "The heater output needed to warm a pool by a temperature rise in a target time, the inverse of the pool-heater-btu tile: output = (gallons x 8.34 x rise) / (target_hours x efficiency). At about 80% a gas heater is sized off this directly; for a heat pump enter its COP-equivalent Btu/h (the output required will look large because a heat pump is left on to hold temperature, not for a quick warm-up). This is the raw heat-up size and ignores cover, evaporation, and standby losses, so add margin. A sizing estimate; the equipment ratings and site conditions govern."
   };
 }
-const poolHeaterSizeExample = { inputs: { gallons: 20000, dT_F: 10, target_hours: 5.2125, eff: 0.80 } };
+export const poolHeaterSizeExample = { inputs: { gallons: 20000, dT_F: 10, target_hours: 5.2125, eff: 0.80 } };
 TREATMENT_RENDERERS["pool-heater-size"] = _rPool({
   citation: "Citation: pool heater sizing solved for output: output = (gallons x 8.34 x rise) / (target_hours x efficiency), from time = energy / (output x efficiency). Gas ~80%; enter a heat pump's COP-equivalent Btu/h. Ignores cover/evaporation/standby losses. A sizing estimate; the equipment ratings govern.",
   example: poolHeaterSizeExample.inputs,
@@ -746,7 +746,7 @@ export function computePoolVolume({ shape = "rectangle", length_ft = 0, width_ft
     note: "Pool volume = surface area x average depth x 7.48052 gal/ft^3, with average depth = (shallow + deep)/2 for a linearly sloping floor. Rectangle area = L x W, round = pi (D/2)^2, oval = (pi/4) L x W. A pool with a deep-end hopper, spa, or steps holds a bit less than the straight prism; measure or estimate the average depth carefully, since every chemical dose is figured per this gallonage. A field estimate; a metered fill or a plan takeoff is more exact.",
   };
 }
-const poolVolumeExample = { inputs: { shape: "rectangle", length_ft: 32, width_ft: 16, shallow_ft: 3, deep_ft: 8 } };
+export const poolVolumeExample = { inputs: { shape: "rectangle", length_ft: 32, width_ft: 16, shallow_ft: 3, deep_ft: 8 } };
 
 function renderPoolVolume(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: pool water volume - gallons = surface area x average depth x 7.48052 gal/ft^3, average depth = (shallow + deep)/2. Rectangle area = L x W, round = pi (D/2)^2, oval = (pi/4) L x W. First-principles geometry with the standard 7.48052 gal/ft^3 conversion, per the NSPF CPO Handbook pool-volume method, by name. A field estimate; a metered fill or plan takeoff is more exact.";
@@ -815,7 +815,7 @@ export function computeBreakpointChlorination({ total_ppm = 0, free_ppm = 0, rat
     note: "Breakpoint (superchlorination) shock: combined chlorine (chloramines) = total - free, and the free-chlorine dose to reach breakpoint = ratio x combined (the ratio is commonly ~10:1). Chloramines cause the 'chlorine smell' and eye irritation; a partial dose below breakpoint makes it worse, so shock all the way. A heavier chloramine load needs a proportionally heavier shock, the reason letting combined chlorine build is expensive to clear. Optional volume and product strength convert the ppm dose to product weight. A pool-care aid; the product label and testing govern.",
   };
 }
-const breakpointChlorinationExample = { inputs: { total_ppm: 1.5, free_ppm: 1.0, ratio: 10, gallons: 15000, avail: 65 } };
+export const breakpointChlorinationExample = { inputs: { total_ppm: 1.5, free_ppm: 1.0, ratio: 10, gallons: 15000, avail: 65 } };
 TREATMENT_RENDERERS["breakpoint-chlorination"] = _rPool({
   citation: "Citation: breakpoint chlorination: combined chlorine = total - free, breakpoint dose = ratio x combined (commonly ~10:1). Shock past breakpoint (a partial dose worsens chloramines). Optional volume/product convert ppm to weight. A pool-care aid; the label and testing govern.",
   example: breakpointChlorinationExample.inputs,

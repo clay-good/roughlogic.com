@@ -255,7 +255,7 @@ export function computeMasonryWallWeight({ hollow_psf = 0, grout_adder = 0, cell
     note: "Masonry wall dead load: the hollow (ungrouted) wall weight (NCMA table, by thickness and unit density) plus a grout adder prorated by the grout spacing - fully grouted at cell spacing, none if ungrouted, and in between for partial grout (grout_term = adder x cell/spacing, capped at the full adder). Fully grouting can add ~40% to the wall weight and its load on the footing, the trade between reinforcement/strength and dead load. Line load = wall psf x height; total = wall psf x area. A design aid; the NCMA weight tables and the engineer of record govern." ,
   };
 }
-const masonryWallWeightExample = { inputs: { hollow_psf: 55, grout_adder: 29, cell_spacing: 8, grout_spacing: 48, height_ft: 10, area_ft2: 0 } };
+export const masonryWallWeightExample = { inputs: { hollow_psf: 55, grout_adder: 29, cell_spacing: 8, grout_spacing: 48, height_ft: 10, area_ft2: 0 } };
 MASONRY_RENDERERS["masonry-wall-weight"] = _simpleRenderer({
   citation: "Citation: masonry wall dead load from NCMA weight tables: wall psf = hollow weight + grout adder x (cell spacing / grout spacing, capped at full); line load = psf x height. The NCMA TEK weight tables and the engineer of record govern.",
   example: masonryWallWeightExample.inputs,
@@ -299,7 +299,7 @@ export function computeBrickVeneerAnchorSpacing({ area_ft2 = 0, area_per = 2.67,
     note: "Brick-veneer anchor count per TMS 402 / IBC 1405: one anchor per no more than the entered wall area (2.67 ft^2 typical, 2.0 ft^2 for high wind/seismic demand), with maximum spacing of 32 in horizontal and 24 in vertical. The count = ceil(area / area-per-anchor). A tighter demand limit adds anchors on a denser grid. If the max horizontal x vertical grid (here " + ((mh * mv) / 144).toFixed(2) + " ft^2) is smaller than the area limit, the spacing caps govern the count. A detailing aid; TMS 402 / IBC and the engineer of record govern.",
   };
 }
-const brickVeneerAnchorSpacingExample = { inputs: { area_ft2: 200, area_per: 2.67, max_horiz_in: 32, max_vert_in: 24 } };
+export const brickVeneerAnchorSpacingExample = { inputs: { area_ft2: 200, area_per: 2.67, max_horiz_in: 32, max_vert_in: 24 } };
 MASONRY_RENDERERS["brick-veneer-anchor-spacing"] = _simpleRenderer({
   citation: "Citation: brick-veneer anchor spacing per TMS 402 / IBC 1405: one anchor per <= 2.67 ft^2 (2.0 ft^2 high-demand), max 32 in horizontal / 24 in vertical. Count = ceil(area / area-per-anchor). TMS 402 / IBC and the engineer of record govern.",
   example: brickVeneerAnchorSpacingExample.inputs,
@@ -336,7 +336,7 @@ export function computeMasonryLintelLoading({ span_ft = 0, wall_psf = 0, wall_h_
     note: "Masonry lintel arching load: for masonry above an opening, the lintel carries only the triangular dead load within a 45-degree triangle (height = span/2) IF enough wall is above (wall above >= span/2). W = 0.5 x span x (span/2) x wall psf, an equivalent UDL of W/span. If the wall above is shorter than the triangle (a lintel near the top of the wall or under a beam bearing), arching is not developed and the lintel carries the full rectangle span x height x psf - MORE load than the arched case, which is why the arching reduction is not always available. Dead load only; add the floor/roof/superimposed loads separately. A design aid; the engineer of record governs.",
   };
 }
-const masonryLintelLoadingExample = { inputs: { span_ft: 6, wall_psf: 60, wall_h_above: 5 } };
+export const masonryLintelLoadingExample = { inputs: { span_ft: 6, wall_psf: 60, wall_h_above: 5 } };
 MASONRY_RENDERERS["masonry-lintel-loading"] = _simpleRenderer({
   citation: "Citation: masonry lintel arching load: the triangular dead load in a 45-degree triangle (height span/2) when the wall above >= span/2, else the full rectangle. W = 0.5 x span x (span/2) x wall psf. Dead load only; the engineer of record governs.",
   example: masonryLintelLoadingExample.inputs,
@@ -689,7 +689,7 @@ export function computeMasonryLintelBearing({ clear_span_ft = 0, lintel_depth_in
       + "Effective span is the clear span plus the lintel depth, capped at the distance between support centers. The allowable bearing stress is YOUR input from the governing code edition and f'm - published secondary sources disagree on the coefficient (one-fourth versus one-third of f'm), so this tile does not pick one. Uniform load only; chain it from masonry-lintel-loading for the arching dead load and add the floor, roof, and superimposed loads. Bearing is one check: lintel flexure, shear, and deflection are separate, and so is the bearing capacity of the masonry BELOW the lintel end. TMS 402 and the engineer of record govern.",
   };
 }
-const masonryLintelBearingExample = { inputs: { clear_span_ft: 6, lintel_depth_in: 8, support_center_ft: 0, udl_plf: 500, bearing_width_in: 7.625, allowable_bearing_psi: 500 } };
+export const masonryLintelBearingExample = { inputs: { clear_span_ft: 6, lintel_depth_in: 8, support_center_ft: 0, udl_plf: 500, bearing_width_in: 7.625, allowable_bearing_psi: 500 } };
 MASONRY_RENDERERS["masonry-lintel-bearing"] = _simpleRenderer({
   citation: "Citation: TMS 402 (MSJC) lintel bearing - effective span is the clear span plus the member depth but not more than the distance between support centers (2.3.3.4.1), and the end bearing shall not be less than 4 in (2.3.3.4.3). Required bearing length = end reaction / (allowable bearing stress x bearing width), and the governing length is the greater of that and the 4-in minimum. The allowable bearing stress is entered by the user from the governing code edition and f'm - this tile deliberately ships no coefficient, because published secondary sources disagree (one-fourth versus one-third of f'm). Bearing only: lintel flexure, shear, deflection, and the capacity of the masonry below the bearing are separate checks. TMS 402 and the engineer of record govern.",
   example: masonryLintelBearingExample.inputs,

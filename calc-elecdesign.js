@@ -99,7 +99,7 @@ export function computePullBoxSizing({ pull_type = "straight", largest_raceway_i
     note: "NEC 314.28(A)(1) sets a straight-pull length of at least 8x the largest raceway. 314.28(A)(2) sets the distance from each raceway entry to the opposite wall on an angle or U pull at 6x the largest raceway plus the sum of the other raceways in that same row. The distance between raceway entries enclosing the same conductor must be at least 6x the larger raceway. These are minimums - the box's listed dimensions, conductor bending space, and the AHJ govern.",
   };
 }
-const pullBoxSizingExample = { inputs: { pull_type: "straight", largest_raceway_in: 3, other_raceways_in: 0 } };
+export const pullBoxSizingExample = { inputs: { pull_type: "straight", largest_raceway_in: 3, other_raceways_in: 0 } };
 ELECDESIGN_RENDERERS["pull-box-sizing"] = _simpleRenderer({
   citation: "Citation: NEC (NFPA 70) 314.28(A)(1) straight-pull (8x) and 314.28(A)(2) angle/U-pull (6x + same-row others) minimums, plus the 6x between-entries rule for the same conductor (by name). Minimums only; the listed box and the AHJ govern.",
   example: pullBoxSizingExample.inputs,
@@ -140,7 +140,7 @@ export function computeLumenMethod({ target_fc = 0, area_sqft = 0, lumens_per_lu
     note: "The lumen method sizes the AVERAGE maintained level over the work plane, not a point value or uniformity. The coefficient of utilization comes from the fixture's photometric report at the room's cavity ratio and surface reflectances; the light-loss factor is the product of lamp-lumen depreciation and luminaire-dirt depreciation for the maintenance interval. Round up so the design meets the target at end of life. A photometric layout governs spacing and uniformity.",
   };
 }
-const lumenMethodExample = { inputs: { target_fc: 50, area_sqft: 1200, lumens_per_lum: 5000, cu: 0.7, llf: 0.8 } };
+export const lumenMethodExample = { inputs: { target_fc: 50, area_sqft: 1200, lumens_per_lum: 5000, cu: 0.7, llf: 0.8 } };
 ELECDESIGN_RENDERERS["lumen-method"] = _simpleRenderer({
   citation: "Citation: IES lumen method (by name) - number of luminaires = target footcandles x area / (lumens x CU x LLF), rounded up; CU from the photometric report, LLF = lamp-lumen x dirt depreciation. Sizes the average maintained level; a photometric layout governs spacing.",
   example: lumenMethodExample.inputs,
@@ -184,7 +184,7 @@ export function computePointIlluminance({ intensity_cd = 0, mount_height_ft = 0,
     note: "IES point method (inverse-square + cosine law): E = I x cos(angle) / d^2, with d = mounting height / cos(angle), so E = I x cos^3(angle) / h^2. This is the DIRECT horizontal illuminance from one source, ignoring interreflection; lux = fc x 10.764. A design relies on the manufacturer's photometric file and the IES target level.",
   };
 }
-const pointIlluminanceExample = { inputs: { intensity_cd: 1000, mount_height_ft: 10, angle_deg: 0 } };
+export const pointIlluminanceExample = { inputs: { intensity_cd: 1000, mount_height_ft: 10, angle_deg: 0 } };
 ELECDESIGN_RENDERERS["point-illuminance"] = _simpleRenderer({
   citation: "Citation: IES point method (by name) - horizontal illuminance at a point from a source of known candlepower by the inverse-square and cosine laws: E_fc = I x cos^3(angle) / height^2. Direct illuminance from one source, ignoring interreflection; lux = fc x 10.764. The photometric file and the IES target govern.",
   example: pointIlluminanceExample.inputs,
@@ -224,7 +224,7 @@ export function computeLuminaireHeightForIlluminance({ intensity_cd = 0, target_
     note: "IES point method solved for the height: from E = I x cos^3(angle) / h^2, h = sqrt( I x cos^3(angle) / E ). This is the mounting height above the work plane that lands the target horizontal illuminance at a point directly at the given angle from nadir; a higher mount spreads the same candela over more area, so it lowers the illuminance (mounting lower raises it). This is the DIRECT illuminance from one source, ignoring interreflection and any other luminaires; the real design sums many sources and applies the light-loss factor. Enter the candela toward the point from the manufacturer's photometric file at the aiming angle, and check the result against the IES target level and the layout. A design aid; the photometric file and the IES target govern.",
   };
 }
-const luminaireHeightForIlluminanceExample = { inputs: { intensity_cd: 1000, target_fc: 10, angle_deg: 0 } };
+export const luminaireHeightForIlluminanceExample = { inputs: { intensity_cd: 1000, target_fc: 10, angle_deg: 0 } };
 ELECDESIGN_RENDERERS["luminaire-height-for-illuminance"] = _simpleRenderer({
   citation: "Citation: IES point method (by name) solved for the height - from E_fc = I x cos^3(angle) / height^2, height = sqrt( I x cos^3(angle) / E ). Direct illuminance from one source, ignoring interreflection. Enter the candela from the photometric file; the photometric file and the IES target govern.",
   example: luminaireHeightForIlluminanceExample.inputs,
@@ -262,7 +262,7 @@ export function computePointMethodRequiredCandela({ target_illuminance = 0, illu
     note: "The luminous intensity a fixture must aim toward a point to hit a target illuminance, the inverse of the point-illuminance tile: from E = I x cos^3(angle) / height^2 (the IES point method, inverse-square + cosine), I = E x height^2 / cos^3(angle) with E in footcandles (lux / 10.764). The candela climbs steeply off-nadir - the cos^3 in the denominator means a point 30 deg to the side needs about 54% more candlepower than the point straight below for the same footcandles, which is why the aiming angle and the fixture's candela at that angle (from its photometric file) matter as much as its rating. This is the direct component from one source, ignoring interreflection. The photometric file and the IES target level govern."
   };
 }
-const pointMethodRequiredCandelaExample = { inputs: { target_illuminance: 10, illuminance_unit: "fc", mount_height_ft: 10, angle_deg: 0 } };
+export const pointMethodRequiredCandelaExample = { inputs: { target_illuminance: 10, illuminance_unit: "fc", mount_height_ft: 10, angle_deg: 0 } };
 ELECDESIGN_RENDERERS["point-method-required-candela"] = _simpleRenderer({
   citation: "Citation: IES point method solved for intensity: I = E x height^2 / cos^3(angle), from E_fc = I x cos^3(angle) / height^2 (inverse-square + cosine). E in footcandles (lux / 10.764). Direct component from one source, ignoring interreflection. The photometric file and the IES target govern.",
   example: pointMethodRequiredCandelaExample.inputs,
@@ -307,7 +307,7 @@ export function computeLightingLightLossFactor({ LLD = 0, LDD = 0, BF = 0, LBO =
     note: "Light-loss factor LLF = the product of the entered depreciation factors: lamp lumen depreciation (LLD), luminaire dirt depreciation (LDD), ballast/driver factor (BF), lamp burnout (LBO), room-surface dirt (RSDD), and temperature/voltage/tilt. Maintained lumens = initial x LLF, the output the design must hit at the end of the cleaning/relamp cycle, not day one. A cleaner room and a better lamp raise the LLF, so the same footcandle target needs fewer fixtures - the payoff a lumped 0.8 guess hides. A design aid; the IES recovery-factor tables and the maintenance schedule govern.",
   };
 }
-const lightingLightLossFactorExample = { inputs: { LLD: 0.85, LDD: 0.90, BF: 0.95, LBO: 0, RSDD: 0, other: 0, initial_lm: 4000 } };
+export const lightingLightLossFactorExample = { inputs: { LLD: 0.85, LDD: 0.90, BF: 0.95, LBO: 0, RSDD: 0, other: 0, initial_lm: 4000 } };
 ELECDESIGN_RENDERERS["lighting-light-loss-factor"] = _simpleRenderer({
   citation: "Citation: light-loss factor LLF = product of the IES recovery factors (LLD, LDD, BF, LBO, RSDD, temperature/voltage/tilt); maintained lumens = initial x LLF. The IES recovery-factor tables and the maintenance schedule govern.",
   example: lightingLightLossFactorExample.inputs,
@@ -354,7 +354,7 @@ export function computeLightingUniformityRatio({ readings = [], target_avgmin = 
     note: "Illuminance uniformity from a grid of readings: average-to-minimum (avg/min), maximum-to-minimum (max/min), and the minimum-to-average uniformity U0 = min/avg. Common targets run 3:1 max/min for offices and tighter for tasks. The same rough average can hide a patchy layout - a bright-under, dark-between-fixtures pattern that only the ratio reveals - which is why a uniformity check catches what an average number never does. A design aid; the IES recommended practice for the space type governs the target.",
   };
 }
-const lightingUniformityRatioExample = { inputs: { readings: "50, 45, 60, 55, 40", target_maxmin: 3 } };
+export const lightingUniformityRatioExample = { inputs: { readings: "50, 45, 60, 55, 40", target_maxmin: 3 } };
 function _v366renderLightingUniformityRatio(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: illuminance uniformity ratios (avg/min, max/min) and U0 = min/avg from a reading grid, per IES measurement/recommended practice. Common target ~3:1 max/min for offices. The IES RP for the space type governs.";
   const readings = makeTextarea("Illuminance readings (fc or lux, comma or space separated)", "lur-readings", { rows: "3" });
@@ -400,7 +400,7 @@ export function computeEgressLightingCheck({ avg_fc = 0, min_fc = 0, max_fc = 0,
     note: "Egress/means-of-egress lighting check per NFPA 101 / IBC: normally the path averages at least 1.0 fc with a minimum of 0.1 fc; at the end of the 90-minute emergency (battery/generator) period the floor drops to 0.6 fc average and 0.06 fc minimum, and the maximum-to-minimum ratio must not exceed 40:1 (no over-bright spot beside a dark one). A single dark spot below the minimum fails the path even when the average holds - the reason a spot check, not just an average, is required. A design aid; the adopted NFPA 101 / IBC edition and the AHJ govern.",
   };
 }
-const egressLightingCheckExample = { inputs: { avg_fc: 1.2, min_fc: 0.15, max_fc: 3.0, mode: "normal" } };
+export const egressLightingCheckExample = { inputs: { avg_fc: 1.2, min_fc: 0.15, max_fc: 3.0, mode: "normal" } };
 ELECDESIGN_RENDERERS["egress-lighting-check"] = _simpleRenderer({
   citation: "Citation: egress lighting minimums per NFPA 101 / IBC: normal 1.0 fc avg / 0.1 fc min; emergency 90-min end 0.6 fc avg / 0.06 fc min; max/min <= 40:1. The adopted NFPA 101 / IBC edition and the AHJ govern.",
   example: egressLightingCheckExample.inputs,
@@ -600,7 +600,7 @@ export function computeSccrCombination({ component_sccrs_ka = [], feeder_ir_ka =
     note: "The panel SCCR is the lowest-rated power-circuit component (one 5 kA contactor caps the panel), not the main device; the feeder overcurrent device's interrupting rating also bounds it. A current-limiting fuse or breaker ahead of a weak component can raise the combination rating through its let-through energy (a listed combination) - re-enter that component at its qualified rating. NEC 409.110 requires the SCCR to be marked and to meet or exceed the available fault. UL 508A and the AHJ govern.",
   };
 }
-const sccrCombinationExample = { inputs: { component_sccrs_ka: "65, 5, 5, 10", feeder_ir_ka: 0, available_fault_ka: 22 } };
+export const sccrCombinationExample = { inputs: { component_sccrs_ka: "65, 5, 5, 10", feeder_ir_ka: 0, available_fault_ka: 22 } };
 function renderSccrCombination(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: UL 508A Supplement SB industrial-control-panel SCCR (weakest-link method); NEC 409.110 / 110.10. The panel SCCR = min(component SCCRs, feeder OCPD interrupting rating), and it must meet or exceed the available fault current. One low-rated component caps the whole panel; a current-limiting fuse ahead of a weak component can raise the combination through its let-through. UL 508A and the AHJ govern.";
   const comps = makeTextarea("Component SCCRs (kA, comma or space separated)", "sccr-comps", { rows: "2" });

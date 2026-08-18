@@ -1157,15 +1157,15 @@ test("computeOvertime: bit-stable regular + OT + gross at the spec example (50 h
   assert.equal(bits(r.gross_pay), "4099c80000000000", `gross_pay=${r.gross_pay}`);
 });
 
-test("computeDIM: bit-stable dim_lb + breakeven_in3 + current_in3 at the spec example (24 x 18 x 12 in, UPS_Daily)", () => {
-  // Group J. dim_lb = L*W*H / divisor = 5184 / 139 = 37.294... lb.
-  // current_in3 = 5184 (exact integer); breakeven_in3 = actual_weight *
-  // divisor = 20 * 139 = 2780 (exact integer). Pins the UPS daily-rate
+test("computeDIM: bit-stable dim_lb + breakeven_in3 + current_in3 at the spec example (12 x 12 x 12 in, UPS_Daily)", () => {
+  // Group J. dim_lb = L*W*H / divisor = 1728 / 139 = 12.431... lb.
+  // current_in3 = 1728 (exact integer); breakeven_in3 = actual_weight *
+  // divisor = 5 * 139 = 695 (exact integer). Pins the UPS daily-rate
   // 139 divisor and the L*W*H cubic-volume identity.
   const r = computeDIM(dimExample.inputs);
-  assert.equal(bits(r.dim_lb), "4042a5c1619c8bf9", `dim_lb=${r.dim_lb}`);
-  assert.equal(bits(r.breakeven_in3), "40a5b80000000000", `breakeven_in3=${r.breakeven_in3}`);
-  assert.equal(bits(r.current_in3), "40b4400000000000", `current_in3=${r.current_in3}`);
+  assert.equal(bits(r.dim_lb), "4028dd01d77b654c", `dim_lb=${r.dim_lb}`);
+  assert.equal(bits(r.breakeven_in3), "4085b80000000000", `breakeven_in3=${r.breakeven_in3}`);
+  assert.equal(bits(r.current_in3), "409b000000000000", `current_in3=${r.current_in3}`);
 });
 
 test("computePoundsFormula: bit-stable pure_lb_day + product_lb_day at the spec example (5 MGD, 2.5 mg/L, 100% chlorine gas)", () => {

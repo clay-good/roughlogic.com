@@ -2139,7 +2139,7 @@ export function computePaintMixRatio({ paint_volume_oz = 0, part_paint = 4, part
     note: "2K mix ratios are by volume, and the first number is the base/color - a 4:1 adds one part hardener to four of paint (20%), a 4:1:1 adds a part each of hardener and reducer. Measure the color first and add the rest by parts off a mixing stick or graduated cup. Most products want a short induction (sweat-in) of about 10-30 minutes after mixing and have a pot life of roughly 1-4 hours at 70 F that shortens with heat and extra hardener. The product data sheet governs the exact ratio, induction, and pot life.",
   };
 }
-const paintMixRatioExample = { inputs: { paint_volume_oz: 16, part_paint: 4, part_hardener: 1, part_reducer: 1 } };
+export const paintMixRatioExample = { inputs: { paint_volume_oz: 16, part_paint: 4, part_hardener: 1, part_reducer: 1 } };
 const renderPaintMixRatio = _simpleRenderer({
   citation: "Citation: Paint manufacturer technical data sheet (mix ratio by volume; induction and pot life off the TDS, by name). 29.5735 mL per US fluid ounce.",
   example: paintMixRatioExample.inputs,

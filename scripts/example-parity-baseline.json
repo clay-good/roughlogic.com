@@ -1,9 +1,11 @@
 {
-  "_comment": "Tiles whose printed worked example still disagrees with the tool's own example. Ratcheted: check-example-parity fails on any tile NOT listed here. Fixing a tile means deleting its id. Never add an id without fixing something else first.",
+  "_comment": "Tiles whose printed worked example still disagrees with the tool's own example. Ratcheted: check-example-parity fails on any tile NOT listed here. Fixing a tile means deleting its id. Never add an id without fixing something else first -- the only exception is widening the gate's reach, which can surface a divergence that was always there. Every entry here is now the deliberate case where the FIXTURE is the worse example to show: air-receiver (its receiver sizes to 0 ft3), dmx-planner (two fixture rows whose own source line describes twelve), duct-friction-static (no fittings at all), hiking-time (metric, against the catalog US-defaults rule), hos-math (an hours-of-service example with no duty events), recipe-scale (one ingredient), time-alignment (the delay speaker farther from the listener than the main, inverting the delay), traverse-closure (an open two-course traverse).",
   "tiles": [
     "air-receiver",
+    "dmx-planner",
     "duct-friction-static",
     "hiking-time",
+    "hos-math",
     "recipe-scale",
     "time-alignment",
     "traverse-closure"

@@ -1138,7 +1138,7 @@ export function computePvCellTemperaturePower({ T_amb_C = 0, G_wm2 = 0, NOCT_C =
     note: "PV cell temperature from the NOCT model T_cell = T_amb + (NOCT - 20) x G/800, and the temperature-derated power P = P_stc x (1 + gamma/100 x (T_cell - 25)) with gamma the datasheet power coefficient (about -0.35%/C for silicon). Cells run well above air temperature in sun, so a hot midsummer module makes less than its cool-morning nameplate - the reason spring often out-produces a hotter summer. This is the temperature derate only; it does not include soiling, wiring, inverter, or shading losses (see the performance-ratio tile). A design aid; the module datasheet governs.",
   };
 }
-const pvCellTemperaturePowerExample = { inputs: { T_amb_C: 30, G_wm2: 800, NOCT_C: 45, P_stc_W: 400, gamma: -0.35 } };
+export const pvCellTemperaturePowerExample = { inputs: { T_amb_C: 30, G_wm2: 800, NOCT_C: 45, P_stc_W: 400, gamma: -0.35 } };
 function renderPvCellTemperaturePower(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: PV NOCT cell-temperature model T_cell = T_amb + (NOCT - 20) x G/800 and the datasheet power temperature coefficient (about -0.35%/C for crystalline silicon), by name. Temperature derate only (no soiling/wiring/inverter/shading). A design aid; the module datasheet governs.";
   const Ta = makeNumber("Ambient temperature (°C)", "pctp-ta", { step: "any", value: "30" }); Ta.input.value = "30";
@@ -1190,7 +1190,7 @@ export function computePvMaxAmbientForPower({ target_power_W = 0, P_stc_W = 0, G
     note: "Highest ambient temperature the module still makes the target power: T_cell = 25 + (P/P_stc - 1) x 100/gamma, then T_amb = T_cell - (NOCT - 20) x G/800, the inverse of the NOCT cell-temperature and power-derate model. Because the power coefficient is negative, a hotter cell makes less power, so this is a ceiling - above this ambient the module falls below the target. Cells run well above air temperature in sun (the NOCT rise), so the max ambient is well below the cell temperature. A target above the module's STC nameplate gives a max ambient below 25 C cell (a cold-day-only output). Temperature derate only (no soiling, wiring, inverter, or shading losses); the module datasheet governs.",
   };
 }
-const pvMaxAmbientForPowerExample = { inputs: { target_power_W: 358, P_stc_W: 400, G_wm2: 800, NOCT_C: 45, gamma: -0.35 } };
+export const pvMaxAmbientForPowerExample = { inputs: { target_power_W: 358, P_stc_W: 400, G_wm2: 800, NOCT_C: 45, gamma: -0.35 } };
 function renderPvMaxAmbientForPower(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: PV NOCT cell-temperature model and the datasheet power temperature coefficient (about -0.35%/C for crystalline silicon), by name, solved for the ambient: T_cell = 25 + (P/P_stc - 1) x 100/gamma, T_amb = T_cell - (NOCT - 20) x G/800. Temperature derate only (no soiling/wiring/inverter/shading). A design aid; the module datasheet governs.";
   const Ptgt = makeNumber("Target power (W)", "pma-pt", { step: "any", min: "0", value: "358" }); Ptgt.input.value = "358";
@@ -1234,7 +1234,7 @@ export function computePvPerformanceRatio(inputs = {}) {
     note: "Performance ratio PR = product of (1 - loss_i) over the entered derate factors (soiling, temperature, wiring, inverter, mismatch, shading, availability, nameplate tolerance, LID, connections). Because the losses compound multiplicatively, attacking the two or three largest factors moves the PR far more than trimming an already-small loss. This PR feeds the energy-yield estimate; a typical rooftop stack lands near 0.75-0.82. A screening stack, not a measured performance ratio (which comes from metered production vs. modeled irradiance). A design aid.",
   };
 }
-const pvPerformanceRatioExample = { inputs: { soiling: 2, temperature: 8, wiring_dc: 2, inverter: 4, mismatch: 2, shading: 3 } };
+export const pvPerformanceRatioExample = { inputs: { soiling: 2, temperature: 8, wiring_dc: 2, inverter: 4, mismatch: 2, shading: 3 } };
 function renderPvPerformanceRatio(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: PV performance ratio as the product of (1 - loss) over the NREL/PVWatts-style derate stack (soiling, temperature, wiring, inverter, mismatch, shading, availability, nameplate, LID, connections), by name. A screening stack, not a metered performance ratio. A design aid.";
   const fields = [
@@ -1299,7 +1299,7 @@ export function computePvStringFusing({ Isc_A = 0, max_fuse_A = 0, n_strings = 1
     note: "PV source-circuit overcurrent per NEC 690.9(B): the fuse must be at least 1.56 x Isc (1.25 continuous x 1.25 PV) and is rounded UP to the next NEC 240.6(A) standard rating, then checked against the module label's maximum series fuse rating. Overcurrent protection is required only where three or more source circuits are paralleled (690.9(A)); with one or two, a fault has no back-feed path large enough to require a fuse. If the selected fuse exceeds the module maximum, fewer strings per combiner or a different module is needed. A design aid; the NEC and the AHJ govern.",
   };
 }
-const pvStringFusingExample = { inputs: { Isc_A: 10, max_fuse_A: 20, n_strings: 4 } };
+export const pvStringFusingExample = { inputs: { Isc_A: 10, max_fuse_A: 20, n_strings: 4 } };
 function renderPvStringFusing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 690.9(B) PV source-circuit overcurrent: OCPD >= 1.56 x Isc (1.25 x 1.25), rounded up to a 240.6(A) standard rating, checked against the module label maximum series fuse; fuses required with 3+ paralleled source circuits (690.9(A)), by name. A design aid; the NEC and the AHJ govern.";
   const isc = makeNumber("Module Isc (A)", "psf-isc", { step: "any", min: "0", value: "10" }); isc.input.value = "10";
@@ -1470,7 +1470,7 @@ export function computeSolarEgc69045({ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsiz
       + " The EGC is never smaller than 14 AWG. NEC 690.45 waives the 250.122(B) proportional-upsize rule, so enlarging the circuit conductors for voltage drop does NOT require enlarging the EGC" + (vdUp ? " - the conductors were upsized here, but the EGC stays as sized." : ".") + " The NEC and the AHJ govern.",
   };
 }
-const solarEgc69045Example = { inputs: { ocpd_rating_a: 20, pv_isc_a: 0, vd_upsized: "no" } };
+export const solarEgc69045Example = { inputs: { ocpd_rating_a: 20, pv_isc_a: 0, vd_upsized: "no" } };
 
 function renderSolarEgc69045(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 690.45 equipment grounding conductors for PV systems with Table 250.122: the EGC is sized from the governing overcurrent rating (or, where there is no OCPD, from the PV short-circuit current), never smaller than 14 AWG, and 690.45 waives the 250.122(B) proportional upsize so enlarging the circuit conductors for voltage drop does not enlarge the EGC. The NEC and the AHJ govern.";

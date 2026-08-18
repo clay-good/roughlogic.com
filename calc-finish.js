@@ -108,7 +108,7 @@ export function computeThinsetCoverage({ area_sqft = 0, trowel = "quarter_three_
     note: "Thin-set coverage is set by the trowel notch, not the tile - a 1/4 in square notch spreads about 95 sq ft per 50-lb bag, a 1/4 x 3/8 in notch about 63, and a 1/2 in notch about 45. Large or uneven tile wants a deeper notch and back-buttering, which cuts coverage further. The code wants about 80% mortar contact in dry areas and 95% in wet or exterior, so do not stretch a bag. This is the setting mortar - tile-count gives the tile and grout, mortar-mix is masonry mortar.",
   };
 }
-const thinsetCoverageExample = { inputs: { area_sqft: 200, trowel: "quarter_three_eighths", coverage_per_bag: 0, bag_weight_lb: 50, waste_pct: 10 } };
+export const thinsetCoverageExample = { inputs: { area_sqft: 200, trowel: "quarter_three_eighths", coverage_per_bag: 0, bag_weight_lb: 50, waste_pct: 10 } };
 FINISH_RENDERERS["thinset-coverage"] = _simpleRenderer({
   citation: "Citation: Manufacturer thin-set coverage charts (Custom Building Products / Mapei / Laticrete, by name); ANSI A108 mortar-contact minimum. Coverage is per 50-lb bag by square-notch trowel.",
   example: thinsetCoverageExample.inputs,
@@ -157,7 +157,7 @@ export function computeFlooringTakeoff({ room_length_ft = 0, room_width_ft = 0, 
     note: "Order the field area plus a waste allowance set by the pattern - about 10% straight, 15% on a 45-degree diagonal, 17% for herringbone, because every angled plank gets a miter cut and the drop-offs do not reuse. Add a few points more for many doorways and obstacles. Floating floors need a 1/4 to 3/8 in expansion gap at the perimeter. If the last row would come out narrower than about a third of a plank, rip the first row so the room starts and ends on matching widths.",
   };
 }
-const flooringTakeoffExample = { inputs: { room_length_ft: 15, room_width_ft: 12, box_coverage_sqft: 20, pattern: "straight", waste_pct: 0, plank_width_in: 7.5 } };
+export const flooringTakeoffExample = { inputs: { room_length_ft: 15, room_width_ft: 12, box_coverage_sqft: 20, pattern: "straight", waste_pct: 0, plank_width_in: 7.5 } };
 FINISH_RENDERERS["flooring-takeoff"] = _simpleRenderer({
   citation: "Citation: Published flooring waste rules of thumb (10% straight / 15% diagonal / 17% herringbone) and the standard last-row balancing rule (rip the first row when the last would be under a third of a plank).",
   example: flooringTakeoffExample.inputs,
@@ -200,7 +200,7 @@ export function computePaverPatio({ area_sqft = 0, paver_length_in = 0, paver_wi
     note: "Pavers per square foot are 144 over the face area in square inches (a 4 x 8 in paver is 4.5 per sq ft). Add about 5% for cuts on a straight pattern and nearer 10% for herringbone, diagonals, and curves. The base carries the load - about 4-6 in compacted for a walkway or patio and 8-12 in for a driveway, over about 1 in of bedding sand. Cubic yards are the area times the depth in inches over 324. Aggregate is ordered loose, so add roughly 10-15% over these in-place volumes for compaction.",
   };
 }
-const paverPatioExample = { inputs: { area_sqft: 200, paver_length_in: 8, paver_width_in: 4, base_depth_in: 6, sand_depth_in: 1, waste_pct: 5 } };
+export const paverPatioExample = { inputs: { area_sqft: 200, paver_length_in: 8, paver_width_in: 4, base_depth_in: 6, sand_depth_in: 1, waste_pct: 5 } };
 FINISH_RENDERERS["paver-patio"] = _simpleRenderer({
   citation: "Citation: ICPI interlocking-paver base and bedding guidance (by name). Pavers/sq ft = 144 / face area; cu yd = area x depth(in) / 324.",
   example: paverPatioExample.inputs,
@@ -242,7 +242,7 @@ export function computeRetainingWallBlock({ wall_length_ft = 0, exposed_height_f
     note: "Bury the first course about 1 in for every 1 ft of wall height (at least one full course) so the wall has a footing in the ground. Lay a compacted leveling pad about 2 ft wide and 6 in deep of crushed stone. Backfill a drainage zone of clean gravel about 12 in wide behind the block for the full height, with a perforated drain at the toe vented to daylight. Cap the top course with adhesive. A wall over about 4 ft, or any wall with a slope or load above it, needs an engineered design with geogrid - this tile counts material, it does not design the wall.",
   };
 }
-const retainingWallBlockExample = { inputs: { wall_length_ft: 30, exposed_height_ft: 3, block_length_in: 18, block_height_in: 8 } };
+export const retainingWallBlockExample = { inputs: { wall_length_ft: 30, exposed_height_ft: 3, block_length_in: 18, block_height_in: 8 } };
 FINISH_RENDERERS["retaining-wall-block"] = _simpleRenderer({
   citation: "Citation: Segmental retaining-wall maker guidance (Allan Block / Versa-Lok, by name). Bury ~1 in per ft of height; 2 ft x 6 in base pad; 12 in drainage zone. Over 4 ft needs an engineered design.",
   example: retainingWallBlockExample.inputs,
@@ -284,7 +284,7 @@ export function computeAtticVentilation({ attic_floor_area_sqft = 0, ratio = "15
     note: "The IRC wants a net free vent area of 1/150 of the attic floor, dropping to 1/300 only when intake and exhaust are balanced (about half and half, with 40-50% of the area as upper vents near the ridge) and a vapor retarder is present. Split the area evenly between low intake (soffit) and high exhaust (ridge), and never let exhaust exceed intake or it will pull air from the house. Vents are rated in net free area (sq in) on the label, far less than the gross opening. 144 sq in per sq ft.",
   };
 }
-const atticVentilationExample = { inputs: { attic_floor_area_sqft: 1500, ratio: "150", intake_vent_nfa_sqin: 9, ridge_nfa_per_lf_sqin: 18 } };
+export const atticVentilationExample = { inputs: { attic_floor_area_sqft: 1500, ratio: "150", intake_vent_nfa_sqin: 9, ridge_nfa_per_lf_sqin: 18 } };
 FINISH_RENDERERS["attic-ventilation"] = _simpleRenderer({
   citation: "Citation: IRC R806 attic-ventilation rule (1/150, reducible to 1/300 with a balanced split + vapor retarder, by name). 144 sq in per sq ft; vents rated in net free area.",
   example: atticVentilationExample.inputs,
@@ -325,7 +325,7 @@ export function computeGutterDownspout({ roof_area_sqft = 0, pitch_factor = "1.0
     note: "Scale the plan roof area by the pitch (a steeper roof catches more wind-driven rain - about 1.05 at 4/12 up to 1.30 at 12/12) and by the local rainfall intensity against a 5 in/hr reference. A 5 in K-style gutter handles roughly 5,500 sq ft of adjusted area and a 6 in handles more. Size one square inch of downspout per about 100 sq ft of roof (a 2x3 is 6 sq in, a 3x4 is 12). Put at least two outlets on any run longer than about 60 ft.",
   };
 }
-const gutterDownspoutExample = { inputs: { roof_area_sqft: 1200, pitch_factor: "1.10", rainfall_in_hr: 5, downspout_sqin: 12 } };
+export const gutterDownspoutExample = { inputs: { roof_area_sqft: 1200, pitch_factor: "1.10", rainfall_in_hr: 5, downspout_sqin: 12 } };
 FINISH_RENDERERS["gutter-downspout"] = _simpleRenderer({
   citation: "Citation: SMACNA / standard residential gutter method (by name). Adjusted area = plan area x pitch factor x (rainfall / 5 in/hr); 1 sq in of downspout per ~100 sq ft of roof.",
   example: gutterDownspoutExample.inputs,
@@ -380,7 +380,7 @@ export function computeDeckBoardTakeoff({ deck_width_ft = 0, deck_length_ft = 0,
     note: "Deck surface takeoff: the boards run the length, so the count across the width is ceil((width + gap) / (board face + gap)) -- the gap falls between boards, not after the last. Lineal feet = boards x length x (1 + waste); order full-length boards for a clean look (butt joints must land on a joist and are staggered), and the waste covers cutoffs, culls, and the crook you set aside. Joists carrying the deck run across the width at the given spacing, so their count along the length is ceil(length x 12 / spacing) + 1, and two deck screws (or hidden clips) per board at every joist gives boards x joists x 2 fasteners. This is the surface only -- it does not size the joists, beam, posts, or footings, which come from the span tables and the load. A takeoff estimate; the deck plan and the lumber on the rack govern.",
   };
 }
-const deckBoardTakeoffExample = { inputs: { deck_width_ft: 12, deck_length_ft: 16, board_face_width_in: 5.5, gap_in: 0.25, joist_spacing_in: 16, waste_pct: 10 } };
+export const deckBoardTakeoffExample = { inputs: { deck_width_ft: 12, deck_length_ft: 16, board_face_width_in: 5.5, gap_in: 0.25, joist_spacing_in: 16, waste_pct: 10 } };
 FINISH_RENDERERS["deck-board-takeoff"] = _simpleRenderer({
   citation: "Citation: deck board and fastener takeoff (first-principles carpentry takeoff): boards = ceil((width_in + gap) / (face + gap)); lineal_ft = boards x length x (1 + waste); joists = ceil(length x 12 / spacing) + 1; screws = boards x joists x 2. The gap falls between boards, not after the last; butt joints land on a joist and are staggered. Sizes the surface only, not the joists / beam / posts / footings. A takeoff estimate; the deck plan governs.",
   example: deckBoardTakeoffExample.inputs,
@@ -469,7 +469,7 @@ export function computeGutterDownspoutTakeoff({ eave_length_ft = 140, roof_area_
   };
 }
 
-const gutterDownspoutTakeoffExample = { inputs: { eave_length_ft: 140, roof_area_sf: 2400, max_area_per_downspout_sf: 800, wall_height_ft: 10, hanger_spacing_ft: 2 } };
+export const gutterDownspoutTakeoffExample = { inputs: { eave_length_ft: 140, roof_area_sf: 2400, max_area_per_downspout_sf: 800, wall_height_ft: 10, hanger_spacing_ft: 2 } };
 FINISH_RENDERERS["gutter-downspout-takeoff"] = _simpleRenderer({
   citation: "Citation: takeoff identity by name. gutter = eave; downspouts = ceil(roof area / max area per downspout); pipe = downspouts x wall height; hangers = ceil(eave / spacing). The area per downspout comes from gutter-downspout.",
   example: gutterDownspoutTakeoffExample.inputs,
@@ -513,7 +513,7 @@ export function computeSoffitRidgeVentCount({ attic_area_sf = 1500, vent_ratio =
   };
 }
 
-const soffitRidgeVentCountExample = { inputs: { attic_area_sf: 1500, vent_ratio: 300, soffit_vent_nfa_in2: 26, ridge_nfa_per_ft_in2: 18 } };
+export const soffitRidgeVentCountExample = { inputs: { attic_area_sf: 1500, vent_ratio: 300, soffit_vent_nfa_in2: 26, ridge_nfa_per_ft_in2: 18 } };
 FINISH_RENDERERS["soffit-ridge-vent-count"] = _simpleRenderer({
   citation: "Citation: vent-count identity by name. total NFA = attic area / ratio x 144; intake = exhaust = total / 2; soffit vents = ceil(intake / per-vent NFA); ridge = ceil(exhaust / ridge NFA per ft). The ratio comes from the IRC; the product NFA from the manufacturer.",
   example: soffitRidgeVentCountExample.inputs,

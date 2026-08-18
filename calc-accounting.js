@@ -241,7 +241,7 @@ export function computeSETax({ net_se_earnings = 0, w2_ss_wages = 0, tax_year = 
   };
 }
 
-export const seTaxExample = { inputs: { net_se_earnings: 60000, w2_ss_wages: 0, tax_year: 2025, filing_status: "single" } };
+export const seTaxExample = { inputs: { net_se_earnings: 80000, w2_ss_wages: 0, tax_year: 2025, filing_status: "single" } };
 
 // --- 238: Quarterly Estimated Tax Worksheet ---
 //
@@ -804,7 +804,7 @@ function renderSeTax(inputRegion, outputRegion, citationEl) {
   }, DEBOUNCE_MS);
   for (const el of [ne.input, w2.input, yr.select, fs.select]) el.addEventListener("input", update);
   attachExampleButton(inputRegion, () => {
-    ne.input.value = 60000; w2.input.value = 0; yr.select.value = "2025"; fs.select.value = "single"; update();
+    ne.input.value = 80000; w2.input.value = 0; yr.select.value = "2025"; fs.select.value = "single"; update();
   });
 }
 

@@ -1135,7 +1135,7 @@ export function computeLedVideoWall({ cab_w_px = 0, cab_h_px = 0, pixel_pitch_mm
     note: "Resolution is fixed by the pixel count, while the pitch sets the physical size and the closest a viewer should sit - the ~1 m per 1 mm of pitch rule means a 2.6 mm wall reads cleanly from roughly 8.5 ft back. Peak power is the spec-sheet draw at full white, but real content averages roughly 30-40% of that, so size the average for the breaker math (power-distro) and the peak for the worst case. The weight drives the rigging. Confirm pixel count, pitch, weight, and peak watts on the maker's spec sheet.",
   };
 }
-const ledVideoWallExample = { inputs: { cab_w_px: 168, cab_h_px: 168, pixel_pitch_mm: 2.6, cols: 10, rows: 6, cab_weight_lb: 18, cab_max_watts: 200, avg_power_factor: 0.35 } };
+export const ledVideoWallExample = { inputs: { cab_w_px: 168, cab_h_px: 168, pixel_pitch_mm: 2.6, cols: 10, rows: 6, cab_weight_lb: 18, cab_max_watts: 200, avg_power_factor: 0.35 } };
 const renderLedVideoWall = _r({
   citation: "Citation: LED panel maker's spec sheet (native pixel count, pitch, per-cabinet weight, peak watts, by name). Size = pixels x pitch; minimum viewing distance ~ 1 m per 1 mm pitch.",
   example: ledVideoWallExample.inputs,
@@ -1177,7 +1177,7 @@ export function computeProjectorBrightness({ screen_w_ft = 0, screen_h_ft = 0, s
     note: "Screen brightness in foot-lamberts is the lumens hitting the screen times the gain over the screen area, so a bigger screen needs proportionally more lumens. About 16 fL is the dark-room baseline; an ambient or lit room wants roughly 30-50. Size 20-30% over the minimum for lamp aging and a dirty filter. A high-gain screen is brighter on-axis but narrows the good seats. The throw distance is the throw ratio times the screen width - check it against the room and the lens range.",
   };
 }
-const projectorBrightnessExample = { inputs: { screen_w_ft: 16, screen_h_ft: 9, screen_gain: 1.0, target_foot_lamberts: 16, throw_ratio: 1.5 } };
+export const projectorBrightnessExample = { inputs: { screen_w_ft: 16, screen_h_ft: 9, screen_gain: 1.0, target_foot_lamberts: 16, throw_ratio: 1.5 } };
 const renderProjectorBrightness = _r({
   citation: "Citation: Standard AV screen-luminance identity foot-lamberts = lumens x gain / area (SMPTE-style targets, by name). Required lumens = target fL x area / gain.",
   example: projectorBrightnessExample.inputs,
@@ -1224,7 +1224,7 @@ export function computeProjectorMaxScreenSize({ available_lumens = 0, screen_gai
     note: "The largest screen the projector lights to the target brightness: max area = lumens x gain / target foot-lamberts, then the width, height, and diagonal at the aspect ratio. About 16 fL is the dark-room baseline; a lit or ambient room wants 30-50, which shrinks the screen. Size the projector 20-30% over the minimum for lamp aging and a dirty filter, so plan for a screen a step smaller than this ceiling. A high-gain screen covers more area on-axis but narrows the good seats. Check the throw distance and lens range against the room separately.",
   };
 }
-const projectorMaxScreenSizeExample = { inputs: { available_lumens: 5000, screen_gain: 1.0, target_foot_lamberts: 16, aspect_w: 16, aspect_h: 9 } };
+export const projectorMaxScreenSizeExample = { inputs: { available_lumens: 5000, screen_gain: 1.0, target_foot_lamberts: 16, aspect_w: 16, aspect_h: 9 } };
 const renderProjectorMaxScreenSize = _r({
   citation: "Citation: Standard AV screen-luminance identity foot-lamberts = lumens x gain / area (SMPTE-style targets, by name) solved for the area: max area = lumens x gain / target fL, then width / height / diagonal at the aspect ratio.",
   example: projectorMaxScreenSizeExample.inputs,
@@ -1292,7 +1292,7 @@ export function computeRoomAcoustics({
   };
 }
 
-const roomAcousticsExample = { inputs: { volume_ft3: 5000, total_sabins: 500, length_ft: 20, width_ft: 15, height_ft: 10 } };
+export const roomAcousticsExample = { inputs: { volume_ft3: 5000, total_sabins: 500, length_ft: 20, width_ft: 15, height_ft: 10 } };
 const renderRoomAcoustics = _r({
   citation: "Citation: Sabine reverberation equation RT60 = 0.049 x V / A (W.C. Sabine, public domain; imperial 0.049 coefficient, editable). First axial room mode per dimension = c / (2 x length), c = 1130 ft/s (editable). The acoustician and the venue govern treatment and sub placement.",
   example: roomAcousticsExample.inputs,
@@ -1340,7 +1340,7 @@ export function computeEyringReverberation({ volume_ft3 = 0, surface_area_ft2 = 
     note: "The Eyring-Norris reverberation time RT60 = 0.049 V / (-S ln(1 - a_bar)), the form used when the average absorption is high and the Sabine estimate over-predicts. V is the room volume, S the total interior surface area, and a_bar = A/S the average absorption coefficient (total sabins divided by total surface). Sabine (RT60 = 0.049 V / A) treats absorption as if sound is removed continuously; Eyring models it as removed on each reflection, which is more realistic in a well-treated (or small, hard-then-treated) room, so Eyring returns a SHORTER RT60 than Sabine whenever a_bar is more than a few tenths -- a 5,000 ft^3 room with 1,300 ft^2 of surface at a_bar 0.30 is 0.53 s by Eyring versus 0.63 s by Sabine. As a_bar approaches zero the -ln(1 - a_bar) term approaches a_bar and the two converge, so a lightly-treated live room reads nearly the same either way; the gap opens as treatment is added. Use Eyring for studios, control rooms, and heavily-treated spaces; Sabine is the quick estimate for a live room. Frequency-average coefficients hide the band-by-band picture; the acoustician and the venue govern the treatment design.",
   };
 }
-const eyringReverberationExample = { inputs: { volume_ft3: 5000, surface_area_ft2: 1300, avg_absorption: 0.30 } };
+export const eyringReverberationExample = { inputs: { volume_ft3: 5000, surface_area_ft2: 1300, avg_absorption: 0.30 } };
 const renderEyringReverberation = _r({
   citation: "Citation: Eyring-Norris reverberation equation RT60 = 0.049 V / (-S ln(1 - a_bar)), a_bar the average absorption coefficient (C.F. Eyring, J. Acoust. Soc. Am. 1930; public domain; imperial 0.049 coefficient, editable). The high-absorption companion to Sabine RT60 = 0.049 V / A, to which it reduces as a_bar -> 0. The acoustician and the venue govern treatment.",
   example: eyringReverberationExample.inputs,
@@ -1384,7 +1384,7 @@ export function computeMassLawTL({ surface_mass_psf = 0, frequency_hz = 0, incid
     note: "The single-panel mass-law transmission loss, the partition-attenuation member the room-acoustics family (reverberation, levels, absorption) leaves out. A limp, non-rigid panel resists airborne sound in proportion to its mass per unit area and the frequency: TL = 20 log10(m f) - 47 dB for random (field) incidence, or - 42 for normal incidence, with m the surface mass in kg/m^2 (entered here in lb/ft^2 and converted at 1 lb/ft^2 = 4.88 kg/m^2) and f in Hz. The signature is +6 dB per doubling of either mass or frequency (the mass law), so heavier walls and higher pitches are attenuated more. A single layer of 1/2 in gypsum (~2 lb/ft^2) gives about 27 dB at 500 Hz. This is the idealized mass law only: it does NOT capture the coincidence (critical-frequency) dip where TL falls sharply, the stiffness-controlled low-frequency region, cavity/stud resonances, flanking, or leaks, and it is NOT the ASTM E413 Sound Transmission Class (STC), which is a single-number rating fit to the whole third-octave TL spectrum. Use it to compare bare single-leaf partitions and to see the mass and frequency trends; a lab-tested assembly rating and the acoustician govern.",
   };
 }
-const massLawTLExample = { inputs: { surface_mass_psf: 2.0, frequency_hz: 500, incidence: "field" } };
+export const massLawTLExample = { inputs: { surface_mass_psf: 2.0, frequency_hz: 500, incidence: "field" } };
 const renderMassLawTL = _r({
   citation: "Citation: field-incidence limp-mass law TL = 20 log10(m f) - 47 dB (normal incidence - 42), m the surface mass in kg/m^2 and f in Hz; +6 dB per doubling of mass or frequency (first-principles panel acoustics, Bies & Hansen / FHWA highway-noise guidance). Surface mass entered in lb/ft^2, converted at 1 lb/ft^2 = 4.88243 kg/m^2. Idealized mass law only -- excludes the coincidence dip, stiffness region, and flanking, and is not the ASTM E413 STC rating; the acoustician governs.",
   example: massLawTLExample.inputs,
@@ -1423,7 +1423,7 @@ export function computeSpeedOfSoundAir({ temperature_f = 68 } = {}) {
     note: "The speed of sound in dry air from the temperature, c = 331.3 sqrt(1 + T_C/273.15) m/s (from c = sqrt(gamma R T / M) with gamma 1.4 and air's molar mass), converted to ft/s. It is the propagation speed the time-alignment and ceiling-speaker-coverage tiles assume as a fixed ~1130 ft/s -- but it swings about 6% from a freezing morning to a hot afternoon: 1,087 ft/s at 32 F, 1,126 ft/s at 68 F (the usual 1,130 rule of thumb), and 1,155 ft/s at 95 F. That shift matters for a delay tower: at a fixed distance the required delay is inversely proportional to c, so re-timing an outdoor system for the day's temperature keeps the arrivals aligned. The propagation delay is 1000 / c ms per foot (about 0.888 ms/ft at 68 F). This is dry air; humidity raises c slightly (a small second-order term) and altitude alone does not change it (temperature does). A first-principles aid; the measured system tuning governs.",
   };
 }
-const speedOfSoundAirExample = { inputs: { temperature_f: 68 } };
+export const speedOfSoundAirExample = { inputs: { temperature_f: 68 } };
 const renderSpeedOfSoundAir = _r({
   citation: "Citation: speed of sound in dry air c = 331.3 sqrt(1 + T_C/273.15) m/s, from c = sqrt(gamma R T / M) (kinetic theory; NIST), converted to ft/s (x 3.28084); propagation delay = 1000/c ms per foot. 1,126 ft/s at 68 F, the ~1,130 ft/s rule of thumb. Dry air; humidity is a small second-order correction. A first-principles aid; the system tuning governs.",
   example: speedOfSoundAirExample.inputs,
@@ -1458,7 +1458,7 @@ export function computeRoomAbsorptionTarget({ volume_ft3 = 0, target_rt60_s = 0,
     note: "The total absorption (sabins) a room needs to hit a target RT60, the inverse of the Sabine RT60 = 0.049 x V / A relation: A_required = 0.049 x V / RT60_target. If you enter the room's current absorption, it also gives the additional treatment to ADD (required - existing, floored at zero). One sabin is one square foot of perfect absorption, so the added sabins convert to treated area by dividing by the material's absorption coefficient (a panel at coefficient 0.8 covers required/0.8 square feet). Speech wants a short RT60 (~0.4-0.8 s in a small room); music runs longer. This sizes the absorption; it does not move the axial room modes (geometry sets those - see room-acoustics) or place the treatment. The acoustician and the venue govern.",
   };
 }
-const roomAbsorptionTargetExample = { inputs: { volume_ft3: 5000, target_rt60_s: 0.6, existing_sabins: 250, sabine_coeff: 0.049 } };
+export const roomAbsorptionTargetExample = { inputs: { volume_ft3: 5000, target_rt60_s: 0.6, existing_sabins: 250, sabine_coeff: 0.049 } };
 const renderRoomAbsorptionTarget = _r({
   citation: "Citation: Sabine reverberation equation solved for absorption A_required = 0.049 x V / RT60_target (W.C. Sabine, public domain; imperial 0.049 coefficient, editable), and the additional treatment = required - existing. One sabin = 1 ft^2 of perfect absorption. The acoustician and the venue govern treatment.",
   example: roomAbsorptionTargetExample.inputs,
@@ -1501,7 +1501,7 @@ export function computeCounterweightArborLoad({ batten_weight_lb = 0, attached_l
     note: "A double-purchase system needs two pounds of counterweight per pound on the batten (and the arbor travels half as far), so reversing the ratio lets the pipe run away. Load the arbor only when the batten is at the loading rail - an out-of-weight batten is the classic fly-rail hazard. Arbor capacity is finite. The venue rigging inspection and the AHJ govern.",
   };
 }
-const counterweightArborLoadExample = { inputs: { batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "single", brick_weight_lb: 30, existing_cw_lb: 200 } };
+export const counterweightArborLoadExample = { inputs: { batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "single", brick_weight_lb: 30, existing_cw_lb: 200 } };
 const renderCounterweightArborLoad = _r({
   citation: "Notice: Load the arbor only when the batten is at the loading rail; the venue rigging inspection and the AHJ govern. Citation: theatrical counterweight rigging (single/double purchase), by name. required = (batten + load) x purchase_ratio (1 single, 2 double); out_of_weight = required - existing; bricks = ceil(|out_of_weight| / brick_weight). A double-purchase arbor needs twice the counterweight and travels half the distance.",
   example: counterweightArborLoadExample.inputs,
@@ -1551,7 +1551,7 @@ export function computeLedTapeRun({ power_per_ft_w = 0, run_length_ft = 0, suppl
     note: "A single end-fed run dims and color-shifts at the far end because the copper trace drops voltage (12 V strips typically wall out around 16-20 ft, 24 V roughly double). Oversizing the PSU does not fix the drop - power-inject or feed both ends instead. The drop uses the uniform-load approximation (half the full-current drop). The PSU wants about 20% headroom for inrush and lifespan. The strip datasheet governs.",
   };
 }
-const ledTapeRunExample = { inputs: { power_per_ft_w: 4.4, run_length_ft: 16, supply_voltage_v: 12, resistance_per_ft: 0.05, headroom_pct: 20, drop_tolerance_pct: 10 } };
+export const ledTapeRunExample = { inputs: { power_per_ft_w: 4.4, run_length_ft: 16, supply_voltage_v: 12, resistance_per_ft: 0.05, headroom_pct: 20, drop_tolerance_pct: 10 } };
 const renderLedTapeRun = _r({
   citation: "Notice: The strip datasheet governs; verify against the manufacturer's spec. Citation: constant-voltage LED strip loading and voltage drop, by name. load = power_per_ft x length; psu = load / (1 - headroom); current = load / voltage; end_drop = current x (resistance_per_ft x length) / 2; end_voltage = voltage - end_drop. A single end-fed run dims at the far end (12 V walls out ~16-20 ft, 24 V ~double); oversizing the PSU does not fix it - power-inject or feed both ends.",
   example: ledTapeRunExample.inputs,
@@ -1595,7 +1595,7 @@ export function computeLedTapeMaxRun({ power_per_ft_w = 0, supply_voltage_v = 0,
     note: "The longest single end-fed run before the far end dims past the tolerance, the inverse of the led-tape-run tile: len_max = voltage x sqrt(2 x (tolerance/100) / (power_per_ft x resistance_per_ft)). A 12 V strip typically walls out around 16-20 ft, a 24 V strip roughly double (the run scales with the voltage). Oversizing the PSU does not extend it - power-inject or feed both ends instead. Uses the uniform-load approximation (half the full-current drop). The strip datasheet governs.",
   };
 }
-const ledTapeMaxRunExample = { inputs: { power_per_ft_w: 4.4, supply_voltage_v: 12, resistance_per_ft: 0.05, drop_tolerance_pct: 10 } };
+export const ledTapeMaxRunExample = { inputs: { power_per_ft_w: 4.4, supply_voltage_v: 12, resistance_per_ft: 0.05, drop_tolerance_pct: 10 } };
 const renderLedTapeMaxRun = _r({
   citation: "Notice: The strip datasheet governs; verify against the manufacturer's spec. Citation: constant-voltage LED strip voltage drop solved for the run length. drop_pct = power_per_ft x resistance_per_ft x length^2 / (2 x voltage^2) x 100; len_max = voltage x sqrt(2 x (tolerance/100) / (power_per_ft x resistance_per_ft)). A 12 V strip walls out ~16-20 ft, 24 V ~double; oversizing the PSU does not extend it - power-inject or feed both ends.",
   example: ledTapeMaxRunExample.inputs,

@@ -235,7 +235,7 @@ export function computeCuttingFluidConcentration({ brix_reading = 0, refractomet
     note: "Read the concentration as the Brix times the coolant's refractometer factor (on the data sheet, usually between 1 and 4 - do not assume Brix is the concentration). Keep the sump in the maker's range, often about 6-10% for general machining - too lean invites rust and bacteria (and the sour smell), too rich leaves residue and can irritate skin. The concentrate figure here is the neat deficit, but in practice add it as pre-mixed coolant, never neat concentrate straight into the sump. Skim tramp oil and check the Brix at the same spot and temperature each time.",
   };
 }
-const cuttingFluidConcentrationExample = { inputs: { brix_reading: 3.0, refractometer_factor: 2.0, sump_volume_gal: 50, target_pct: 8 } };
+export const cuttingFluidConcentrationExample = { inputs: { brix_reading: 3.0, refractometer_factor: 2.0, sump_volume_gal: 50, target_pct: 8 } };
 function renderCuttingFluidConcentration(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Metalworking-fluid refractometer method (concentration % = Brix x factor; factor and range off the coolant data sheet, by name).";
   const brix = makeNumber("Refractometer Brix", "cfc-brix", { step: "any", min: "0" });

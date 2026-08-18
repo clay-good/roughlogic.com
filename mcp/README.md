@@ -1,7 +1,7 @@
 # roughlogic MCP server
 
 A local, zero-dependency [Model Context Protocol](https://modelcontextprotocol.io)
-server that exposes the roughlogic catalog of **1,000+ trades calculators**
+server that exposes the roughlogic catalog of **1,709 trades calculators**
 (electrical, plumbing, HVAC, construction, restoration, and more) to any MCP
 client — Claude Code, Claude Desktop, Cursor, and the like.
 
@@ -72,7 +72,7 @@ claude mcp add roughlogic -- node /absolute/path/to/roughlogic.com/mcp/server.mj
 }
 ```
 
-Restart the client; the three tools appear under the `roughlogic` server.
+Restart the client; the four tools appear under the `roughlogic` server.
 
 ## Sharing it
 

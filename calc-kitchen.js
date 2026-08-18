@@ -795,7 +795,7 @@ export function computeFoodCostPercentage({ beginning_inventory = 0, purchases =
     note: "Actual food cost from the inventory count - the gap a per-plate recipe cost (plate-cost) cannot see: waste, theft, over-portioning, spoilage, vendor price creep. Full-service food cost often runs 28-35% of food sales; your target is your own. Count and value inventory the same way every period. A variance over about 1-2 points is worth a walk through the walk-in.",
   };
 }
-const foodCostPercentageExample = { inputs: { beginning_inventory: 12000, purchases: 30000, ending_inventory: 10000, food_sales: 120000, theoretical_cost_pct: 30 } };
+export const foodCostPercentageExample = { inputs: { beginning_inventory: 12000, purchases: 30000, ending_inventory: 10000, food_sales: 120000, theoretical_cost_pct: 30 } };
 const renderFoodCostPercentage = _r({
   citation: "Citation: Standard restaurant-accounting identity COGS = beginning inventory + purchases - ending inventory (NRA / restaurant P&L practice, by name). Food cost % = COGS / food sales.",
   example: foodCostPercentageExample.inputs,
@@ -833,7 +833,7 @@ export function computePrimeCost({ food_cost = 0, beverage_cost = 0, labor_cost 
     note: "Prime cost (COGS plus labor) is the cost you control - rent, utilities, and the other fixed costs come out of what is left. The rule of thumb keeps prime at or below about 60% of sales full-service (nearer 55% limited-service); much above 65% leaves little for profit. Labor here is all-in (wages, payroll taxes, benefits). Track it weekly - by month-end the labor is already spent.",
   };
 }
-const primeCostExample = { inputs: { food_cost: 32000, beverage_cost: 8000, labor_cost: 42000, total_sales: 140000 } };
+export const primeCostExample = { inputs: { food_cost: 32000, beverage_cost: 8000, labor_cost: 42000, total_sales: 140000 } };
 const renderPrimeCost = _r({
   citation: "Citation: Standard restaurant P&L prime-cost definition prime cost = COGS + total labor (NRA / restaurant-accounting practice, by name). Percents are of total sales.",
   example: primeCostExample.inputs,
@@ -873,7 +873,7 @@ export function computePourCost({ bottle_cost = 0, bottle_size_ml = 0, pour_size
     note: "Pour cost is the drink's cost over its price; spirits typically run 18-24% (beer and wine higher). A free-pour bartender easily gives away a half-ounce on a 1.5-oz spec, which quietly wrecks the pour cost - a jigger or measured pourer pays for itself. The bottle size is the usable volume; fold mixers, garnish, ice, and spillage into the optional per-drink add; round the suggested price to a sensible menu number.",
   };
 }
-const pourCostExample = { inputs: { bottle_cost: 24, bottle_size_ml: 750, pour_size_oz: 1.5, target_pour_cost_pct: 20, other_cost_per_drink: 0.25 } };
+export const pourCostExample = { inputs: { bottle_cost: 24, bottle_size_ml: 750, pour_size_oz: 1.5, target_pour_cost_pct: 20, other_cost_per_drink: 0.25 } };
 const renderPourCost = _r({
   citation: "Citation: First-principles bar cost control. Pours per bottle = bottle size / (pour x 29.5735 mL/oz); suggested price = drink cost / target pour cost.",
   example: pourCostExample.inputs,
@@ -924,7 +924,7 @@ export function computeMenuEngineering({ units_sold = 0, menu_price = 0, food_co
     note: "The margin axis is contribution-margin dollars, not food-cost percent - a low-food-cost item can still be a Dog if it earns few dollars. Popularity is judged against the menu-average share times the 0.70 rule. The classification needs the full sales mix, not a single dish. The operator's cost and pricing data govern.",
   };
 }
-const menuEngineeringExample = { inputs: { units_sold: 200, menu_price: 12, food_cost: 4, total_units: 1000, item_count: 10, average_margin: 6 } };
+export const menuEngineeringExample = { inputs: { units_sold: 200, menu_price: 12, food_cost: 4, total_units: 1000, item_count: 10, average_margin: 6 } };
 const renderMenuEngineering = _r({
   citation: "Citation: Kasavana & Smith menu-engineering model, by name. contribution_margin = price - food_cost; popularity_share = units_sold / total_units; popularity_threshold = (1 / item_count) x 0.70; quadrant from margin vs average and popularity vs threshold. The margin axis is contribution-margin dollars, not food-cost percent. Needs the full sales mix; the operator's data govern.",
   example: menuEngineeringExample.inputs,
@@ -973,7 +973,7 @@ export function computeKitchenSanitizerPpm({ sanitizer_type = "chlorine", active
       + "Chlorine's required concentration rises as water gets colder or more alkaline (the Food Code table steps ppm up by temperature and pH, so a fixed dose can under-sanitize); quats are inactivated by hot or hard water. Confirm the concentration with test strips and observe the minimum contact time (" + band.contact + "). The EPA-registered product label is the legal authority.",
   };
 }
-const kitchenSanitizerPpmExample = { inputs: { sanitizer_type: "chlorine", active_pct: 5.25, target_ppm: 100, batch_gallons: 3 } };
+export const kitchenSanitizerPpmExample = { inputs: { sanitizer_type: "chlorine", active_pct: 5.25, target_ppm: 100, batch_gallons: 3 } };
 const renderKitchenSanitizerPpm = _r({
   citation: "Citation: FDA Food Code Sec. 4-501.114 sanitizing-solution concentrations, by name. oz_per_gal = 128 x target_ppm / (active_pct x 10000); total_oz = oz_per_gal x gallons. Food Code bands: chlorine 50-100 ppm, quat ~200 ppm per label, iodine 12.5-25 ppm. Chlorine's required ppm rises with colder or more alkaline water; quats weaken in hot or hard water. Confirm with test strips; the EPA-registered product label is the legal authority.",
   example: kitchenSanitizerPpmExample.inputs,
@@ -1022,7 +1022,7 @@ export function computeDrinkAbvDilution({ total_volume_oz = 0, weighted_abv_pct 
     note: "Ice-melt dilution is not optional - shaking adds about 25-30% water, stirring 20-25%, lowering the ABV 15-25% and balancing the drink; a strength figure that ignores the melt overstates the pour. The serving temperature and ice type shift the actual dilution. Responsible-service practice governs (0.6 fl oz pure alcohol = one US standard drink).",
   };
 }
-const drinkAbvDilutionExample = { inputs: { total_volume_oz: 3, weighted_abv_pct: 32.67, method: "stirred", dilution_pct: 25 } };
+export const drinkAbvDilutionExample = { inputs: { total_volume_oz: 3, weighted_abv_pct: 32.67, method: "stirred", dilution_pct: 25 } };
 const renderDrinkAbvDilution = _r({
   citation: "Citation: Cocktail dilution model (per Dave Arnold, Liquid Intelligence, by name). pure_alcohol = total_volume x weighted_abv / 100; dilution_water = total_volume x method_pct / 100; final_abv = pure_alcohol / (total + dilution) x 100; standard_drinks = pure_alcohol / 0.6. Ice-melt dilution is not optional (shaken ~28%, stirred ~23%, rocks ~15%, neat 0%); a strength figure that ignores the melt overstates the pour. Responsible-service practice governs.",
   example: drinkAbvDilutionExample.inputs,
@@ -1066,7 +1066,7 @@ export function computeOverrunPercent({ mix_weight_lb = 0, finished_weight_lb = 
       + "Overrun is the volume of air whipped into the mix, measured here by weighing equal volumes of mix and finished product. This " + fmt(overrun_pct, 0) + "% overrun sits in the " + band + " range (gelato and premium run low, economy and soft-serve run high near 100%). Air fraction is the share of the finished volume that is air. Overrun also depends on freezer type, fat and solids, and draw temperature; the weighed cup is the shop measurement of record.",
   };
 }
-const overrunPercentExample = { inputs: { mix_weight_lb: 9.0, finished_weight_lb: 4.5 } };
+export const overrunPercentExample = { inputs: { mix_weight_lb: 9.0, finished_weight_lb: 4.5 } };
 const renderOverrunPercent = _r({
   citation: "Citation: Ice cream overrun by weight (Goff & Hartel, Ice Cream, 7th ed., by name; FDA 21 CFR 135.110 standard of identity). overrun% = (weight of mix - weight of finished) / weight of finished x 100 for equal volumes; air% = (mix - finished) / mix x 100. Federal standard: finished ice cream must weigh at least 4.5 lb/gal and contain at least 1.6 lb of total solids per gallon. Overrun bands: gelato/premium ~20-35%, standard ~50-90%, economy/soft-serve ~90-100%. The weighed cup governs; freezer type, fat, solids, and draw temperature all move the number.",
   example: overrunPercentExample.inputs,
@@ -1113,7 +1113,7 @@ export function computeDraftBeerLineBalance({ applied_pressure_psi = 0, rise_ft 
       + "Draft-beer line balancing (Brewers Association Draught Beer Quality Manual): at balance the applied CO2 pressure equals the total restriction -- the line (restriction R per foot times length), plus 0.5 psi per foot of vertical rise, plus about 1 psi at the faucet. Solve for length: line = (pressure - 0.5 x rise - 1) / R. Set the applied pressure to the beer's carbonation level first (that is fixed by style and temperature); then choose the line to balance it so the pour is not foamy (too short/fast) or flat and slow (too long). Restriction values are nominal for the listed tubing at cellar temperature; measure the actual pour rate (a 12-16 second fill of a 12 oz glass, about 1 gal in 60-90 s) and trim the line to tune it. A design aid; the dispense system and the beer govern.",
   };
 }
-const draftBeerLineBalanceExample = { inputs: { applied_pressure_psi: 12, rise_ft: 4, tubing_type: "vinyl_316" } };
+export const draftBeerLineBalanceExample = { inputs: { applied_pressure_psi: 12, rise_ft: 4, tubing_type: "vinyl_316" } };
 const renderDraftBeerLineBalance = _r({
   citation: "Citation: draft-beer line balancing (Brewers Association Draught Beer Quality Manual): at balance the applied CO2 pressure = line restriction (R x length) + rise (0.5 psi/ft) + faucet (~1 psi); line = (pressure - 0.5 x rise - 1) / R. Restriction R (psi/ft): 3/16\" vinyl 3.0, 1/4\" vinyl 0.85, 3/16\" barrier 2.2, 5/16\" vinyl 0.4 (nominal, cellar temp). Set the applied pressure to the carbonation level, then balance the line; measure the pour rate and trim. A design aid; the dispense system governs.",
   example: draftBeerLineBalanceExample.inputs,

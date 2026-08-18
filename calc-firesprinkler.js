@@ -309,7 +309,7 @@ export function computeSmokeDetectorSpacingCount({ room_length_ft = 60, room_wid
   };
 }
 
-const smokeDetectorSpacingCountExample = { inputs: { room_length_ft: 60, room_width_ft: 40, listed_spacing_ft: 30 } };
+export const smokeDetectorSpacingCountExample = { inputs: { room_length_ft: 60, room_width_ft: 40, listed_spacing_ft: 30 } };
 FIRESPRINKLER_RENDERERS["smoke-detector-spacing-count"] = _simpleRenderer({
   citation: "Citation: NFPA 72 spot-detector grid by name. rows = ceil(length / spacing); columns = ceil(width / spacing); detectors = rows x columns; wall maximum = spacing / 2. The 0.7-times-spacing rule confirms every point is covered.",
   example: smokeDetectorSpacingCountExample.inputs,

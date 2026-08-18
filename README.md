@@ -2,7 +2,7 @@
 
 **Field math for the trades. Free, fast, no ads, no accounts, works offline.**
 
-[roughlogic.com](https://roughlogic.com) is more than 1,000 small, single-purpose calculators for electricians, plumbers, HVAC techs, carpenters, restoration techs, firefighters, surveyors, and dozens of other trades. Everything runs in your browser. Every answer comes from a published formula and cites its source.
+[roughlogic.com](https://roughlogic.com) is 1,709 small, single-purpose calculators for electricians, plumbers, HVAC techs, carpenters, restoration techs, firefighters, surveyors, and dozens of other trades. Everything runs in your browser. Every answer comes from a published formula and cites its source.
 
 <p align="center">
   <img src="docs/img/home-mobile.png" width="240" alt="roughlogic home view on a phone: a headline, a one-paragraph description, a single search bar, and a browse-by-trade index">
