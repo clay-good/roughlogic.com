@@ -26,6 +26,18 @@ async function exists(p) {
   try { await access(p); return true; } catch { return false; }
 }
 
+async function waitForServer(timeoutMs = 30000) {
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    try {
+      const r = await fetch(BASE + "/", { method: "HEAD" });
+      if (r.ok || r.status === 404) return;
+    } catch { /* not listening yet */ }
+    if (Date.now() > deadline) throw new Error(`check-shell-mobile: ${BASE} never came up within ${timeoutMs} ms.`);
+    await new Promise((r) => setTimeout(r, 250));
+  }
+}
+
 async function main() {
   if (!(await exists("dist/tools")) || !(await exists("dist/groups"))) {
     console.log("check-shell-mobile: dist/ shells not present; run `npm run build` first. Skipping.");
@@ -43,7 +55,11 @@ async function main() {
   }
 
   const server = spawn("npx", ["-y", "http-server", "-p", String(PORT), "-c-1", "dist"], { stdio: "ignore" });
-  await new Promise((r) => setTimeout(r, 2500));
+  // `npx` resolves (and on a cold cache downloads) http-server before the
+  // listener exists, which takes well over two seconds on a cold machine. A
+  // fixed sleep raced that and failed the whole gate with ERR_CONNECTION_REFUSED
+  // on the first route, so poll the port until it actually answers.
+  await waitForServer();
   try {
     const tools = (await readdir("dist/tools", { withFileTypes: true }))
       .filter((d) => d.isDirectory()).map((d) => `/tools/${d.name}/`);

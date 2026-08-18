@@ -105,3 +105,38 @@ test("no public lead prints a raw tile id", () => {
   }
   assert.deepEqual(offenders, []);
 });
+
+// The prose below the answer is public too -- it renders in the shell Details
+// block and the live detail paragraph. It was cleaned in the same pass as the
+// leads; these two assertions keep it clean.
+
+test("no description body prints a raw tile id", () => {
+  const slugs = TOOLS.map((t) => t.id).filter((id) => (id.match(/-/g) || []).length >= 2);
+  // Terms that are real trade vocabulary as well as tile ids.
+  const vocabulary = new Set(["cash-on-cash", "mean-piston-speed", "required-fire-flow"]);
+  const offenders = [];
+  for (const t of TOOLS) {
+    const body = restOfDescription(t.desc);
+    if (!body) continue;
+    for (const id of slugs) {
+      if (id === t.id || vocabulary.has(id)) continue;
+      if (new RegExp("(^|[^a-z-])" + id + "([^a-z-]|$)").test(body)) offenders.push(t.id + " -> " + id);
+    }
+  }
+  assert.deepEqual(offenders, []);
+});
+
+test("no description body calls a calculator a tile or a sibling", () => {
+  const jargon = /\b(tile|tiles|sibling|siblings|never covered|the catalog)\b/i;
+  // Ceramic tile is the actual subject in these; ADPI's "catalog throw" is the
+  // diffuser manufacturer's catalog, not ours.
+  const exempt = new Set([
+    "tile-count", "thinset-coverage", "cement-board-takeoff", "flooring-takeoff",
+    "pool-tile-coping-perimeter", "suspended-ceiling-grid", "shower-compartment-check",
+    "adpi-diffuser-selection",
+  ]);
+  const offenders = TOOLS
+    .filter((t) => !exempt.has(t.id) && jargon.test(restOfDescription(t.desc)))
+    .map((t) => t.id);
+  assert.deepEqual(offenders, []);
+});
