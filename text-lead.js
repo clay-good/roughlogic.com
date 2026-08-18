@@ -17,6 +17,7 @@
 const ABBREV = new Set([
   "e.g", "i.e", "vs", "etc", "approx", "no", "fig", "ref", "sec", "ch", "vol",
   "rev", "proc", "pub", "std", "ed", "min", "max", "avg", "est", "dia", "temp",
+  "eq", "eqs", "tbl", "art", "sects", "para", "cl",
   "in", "ft", "yd", "lb", "oz", "gal", "qt", "pt", "hr", "wt", "st", "mt",
   "dr", "mr", "ms", "jr", "sr", "inc", "co", "corp", "u.s", "u.k",
 ]);
