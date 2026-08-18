@@ -395,7 +395,7 @@ export function computeBeamLoading({ load_type, load_value, length_ft, E_psi, b_
 }
 
 export const beamLoadingExample = {
-  inputs: { load_type: "uniform", load_value: 100, length_ft: 10, E_psi: 1600000, b_in: 1.5, d_in: 9.25 },
+  inputs: { load_type: "uniform", load_value: 200, length_ft: 12, E_psi: 1600000, b_in: 5.5, d_in: 9.5 },
 };
 
 // --- Utility 50: Material Quantity ---
@@ -718,7 +718,7 @@ export function renderBeamLoading(inputRegion, outputRegion, citationEl) {
   const d = makeNumber("Section depth d (in)", "bl-d", { step: "any", min: "0", value: "9.25" });
   d.input.value = "9.25";
   for (const f of [lt, lv, len, E, b, d]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { lt.select.value = "uniform"; lv.input.value = "100"; len.input.value = "10"; E.input.value = "1600000"; b.input.value = "1.5"; d.input.value = "9.25"; update(); });
+  attachExampleButton(inputRegion, () => { lt.select.value = "uniform"; lv.input.value = "200"; len.input.value = "12"; E.input.value = "1600000"; b.input.value = "5.5"; d.input.value = "9.5"; update(); });
   const oM = makeOutputLine(outputRegion, "Maximum moment", "bl-out-m");
   const oD = makeOutputLine(outputRegion, "Maximum deflection", "bl-out-d");
   const update = debounce(() => {
@@ -778,8 +778,8 @@ export function computeStairStringer({ total_rise_in, total_run_in, tread_cut_de
 }
 
 export const stairStringerExample = {
-  inputs: { total_rise_in: 108, total_run_in: 126 },
-  expectedRange: { stringer_in: { min: 165, max: 167 } },
+  inputs: { total_rise_in: 108, total_run_in: 144 },
+  expectedRange: { stringer_in: { min: 171, max: 189 } },
 };
 
 // --- Utility 91: Joist Mid-Span Deflection ---
@@ -1137,7 +1137,7 @@ export function renderStairStringer(inputRegion, outputRegion, citationEl) {
   const rise = makeNumber("Total rise (in)", "ss-r", { step: "any", min: "0" });
   const run = makeNumber("Total run (in)", "ss-rn", { step: "any", min: "0" });
   for (const f of [rise, run]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { rise.input.value = "108"; run.input.value = "126"; update(); });
+  attachExampleButton(inputRegion, () => { rise.input.value = "108"; run.input.value = "144"; update(); });
   const oI = makeOutputLine(outputRegion, "Stringer length", "ss-out-i");
   const oF = makeOutputLine(outputRegion, "Stringer feet", "ss-out-f");
   const oB = makeOutputLine(outputRegion, "Board feet (2x12 stringer)", "ss-out-b");
@@ -1743,7 +1743,7 @@ export function computeSpeedsAndFeeds({ tool = "drill", material = "steel", diam
   return { sfm: m.sfm, chipload_ipt: m.chipload_ipt, rpm, ipm };
 }
 
-export const speedsAndFeedsExample = { inputs: { tool: "end_mill", material: "aluminum", diameter_in: 0.5, flutes: 2 } };
+export const speedsAndFeedsExample = { inputs: { tool: "drill", material: "steel", diameter_in: 0.5, flutes: 2 } };
 
 // --- Utility 156: Welding Rod and Wire Usage ---
 
@@ -2402,7 +2402,7 @@ export function computeHelicalPile({ shaft = "1.5_inch_solid", torque_ft_lb = 0,
 }
 
 export const helicalPileExample = {
-  inputs: { shaft: "1.5_inch_solid", torque_ft_lb: 4500, factor_of_safety: 2.0 },
+  inputs: { shaft: "1.5_inch_solid", torque_ft_lb: 5000, factor_of_safety: 2 },
 };
 
 // dims: in { shaft: dimensionless, target_capacity_lb: M L T^-2, capacity_basis: dimensionless, factor_of_safety: dimensionless } out: { torque_ft_lb: M L^2 T^-2 }
@@ -2426,7 +2426,7 @@ export function computeHelicalPileTorque({ shaft = "1.5_inch_solid", target_capa
     note: "The installation torque a helical pile must reach to confirm a target capacity, the inverse of the helical-pile tile: from ultimate = Kt x torque and allowable = ultimate / FS, torque = (allowable x FS) / Kt = ultimate / Kt. This is the field-acceptance torque the crew watches on the drive-head gauge as the pile advances; reaching it verifies the correlated capacity. Kt is a shaft-specific empirical torque-to-capacity factor (larger shafts have a lower Kt), and the correlation is an installation check, not a substitute for a load test. The engineer of record specifies the project Kt, the factor of safety, and the acceptance torque; a load test governs the true capacity."
   };
 }
-export const helicalPileTorqueExample = { inputs: { shaft: "1.5_inch_solid", target_capacity_lb: 22500, capacity_basis: "allowable", factor_of_safety: 2.0 } };
+export const helicalPileTorqueExample = { inputs: { shaft: "1.5_inch_solid", target_capacity_lb: 25000, capacity_basis: "allowable", factor_of_safety: 2 } };
 
 // --- 251: Crane Lift Plan Quick-Math ---
 
@@ -2461,7 +2461,7 @@ export function computeCraneLiftCheck({
 }
 
 export const craneLiftCheckExample = {
-  inputs: { load_lb: 8000, rigging_lb: 600, block_lb: 250, jib_deduct_lb: 0, sling_legs: 4, sling_angle_deg: 60, chart_capacity_lb: 12000 },
+  inputs: { load_lb: 8000, rigging_lb: 200, block_lb: 250, jib_deduct_lb: 0, sling_legs: 2, sling_angle_deg: 60, chart_capacity_lb: 12000 },
 };
 
 // --- v7 renderers (all use _simple* helpers) ---
@@ -2635,7 +2635,7 @@ function _v7c_renderHelicalPile(inputRegion, outputRegion, citationEl) {
 
 function renderHelicalPileTorque(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: torque correlation solved for the acceptance torque: torque = (allowable x FS) / Kt = ultimate / Kt, from ultimate = Kt x torque. Kt benchmarks from data/construction/helical-pile-kt.json (manufacturer-attributed). Engineer of record governs the design capacity and acceptance; a load test governs the true capacity.";
-  _v7c_attachEx(inputRegion, () => { sh.select.value = "1.5_inch_solid"; cap.input.value = "22500"; basis.select.value = "allowable"; fs.input.value = "2.0"; update(); });
+  _v7c_attachEx(inputRegion, () => { sh.select.value = "1.5_inch_solid"; cap.input.value = "25000"; basis.select.value = "allowable"; fs.input.value = "2.0"; update(); });
   const sh = _v7c_makeSelect("Shaft type", "hpt-sh", Object.keys(HELICAL_PILE_KT).map((k) => ({ value: k, label: HELICAL_PILE_KT[k].description + " (Kt=" + HELICAL_PILE_KT[k].Kt + ")" })));
   const cap = _v7c_makeNumber("Target capacity (lb)", "hpt-cap", { step: "any", min: "0" });
   const basis = _v7c_makeSelect("Capacity basis", "hpt-basis", [{ value: "allowable", label: "Allowable (design)" }, { value: "ultimate", label: "Ultimate" }]);
@@ -4137,7 +4137,7 @@ export function computeFilletWeldStrength({ mode = "capacity-from-size", leg_in 
   return { mode, method: M, electrode, F_Exx_ksi: Fexx, throat_in, stress_ksi, strength_per_in_lb, capacity_lb, length_in: L, min_fillet_in: minF, max_fillet_in: maxF, size_in_range: size_ok, utilization, notes };
 }
 
-export const filletWeldStrengthExample = { inputs: { mode: "capacity-from-size", leg_in: 0.25, length_in: 6, electrode: "E70", base_thickness_in: 0.5, method: "ASD" } };
+export const filletWeldStrengthExample = { inputs: { mode: "capacity-from-size", leg_in: 0.25, length_in: 6, electrode: "E70", base_thickness_in: 0.75, method: "ASD" } };
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v27renderFilletWeldStrength(inputRegion, outputRegion, citationEl) {
@@ -4158,7 +4158,7 @@ function _v27renderFilletWeldStrength(inputRegion, outputRegion, citationEl) {
   const thk = _v27makeNumber("Thinner part thickness (in, optional)", "fws-thk", { step: "any", min: "0" });
   const load = _v27makeNumber("Applied load (lb, optional)", "fws-load", { step: "any", min: "0" });
   for (const f of [mode, method, elec, leg, len, thk, load]) inputRegion.appendChild(f.wrap);
-  _v27attachEx(inputRegion, () => { mode.select.value = "capacity-from-size"; method.select.value = "ASD"; elec.select.value = "E70"; leg.input.value = "0.25"; len.input.value = "6"; thk.input.value = "0.5"; load.input.value = ""; update(); });
+  _v27attachEx(inputRegion, () => { mode.select.value = "capacity-from-size"; method.select.value = "ASD"; elec.select.value = "E70"; leg.input.value = "0.25"; len.input.value = "6"; thk.input.value = "0.75"; load.input.value = ""; update(); });
 
   const oThroat = _v27makeOut(outputRegion, "Throat / unit strength", "fws-out-throat");
   const oCap = _v27makeOut(outputRegion, "Capacity / required leg", "fws-out-cap");
@@ -10411,7 +10411,7 @@ export function computeJoistCantileverCheck({ backspan_ft = 10, overhang_ft = 2 
     note: "The 1:4 joist-cantilever ratio rule: a joist may overhang its support by no more than one quarter of its backspan (the span from that support back to the next), per IRC R507.6 for decks and R502.3.3 for floors. A 10 ft backspan allows a 2.5 ft cantilever; a 3 ft overhang on that backspan EXCEEDS the limit and needs a longer backspan (>= 12 ft). The prescriptive tables also cap the absolute overhang and require the cantilever be checked for uplift and for the load it carries (a roof or a wall bearing on the tip is a separate engineered case). This is the RATIO screen; the prescriptive span tables, the connection at the support, and the AHJ-adopted code govern -- and a beam or roof landing on the cantilever tip is an engineered condition.",
   };
 }
-export const joistCantileverCheckExample = { inputs: { backspan_ft: 10, overhang_ft: 2 } };
+export const joistCantileverCheckExample = { inputs: { backspan_ft: 10, overhang_ft: 3 } };
 
 CONSTRUCTION_RENDERERS["joist-cantilever-check"] = _simpleRenderer({
   citation: "Citation: IRC R507.6 / R502.3.3 joist cantilever ratio by name. cantilever_max = backspan / 4; within limit when overhang <= max. The prescriptive span tables, the tip load, and the AHJ-adopted code govern; a beam/roof on the tip is an engineered case.",

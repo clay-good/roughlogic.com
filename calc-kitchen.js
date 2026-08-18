@@ -109,7 +109,7 @@ export function computeYieldEP({ ap_weight = 0, trim_weight = 0, cooking_loss_pc
   return { yield_pct, ep_weight, after_trim_weight: after_trim, ep_cost_per_lb };
 }
 
-export const yieldEPExample = { inputs: { ap_weight: 10, trim_weight: 1.5, cooking_loss_pct: 15, ap_cost_per_lb: 8.50 } };
+export const yieldEPExample = { inputs: { ap_weight: 10, trim_weight: 1.5, cooking_loss_pct: 15, ap_cost_per_lb: 8 } };
 
 // --- 224: Food Safety Cooling Curve ---
 
@@ -142,7 +142,7 @@ export function computeCoolingCurve({ start_F = 135, ambient_F = 70, container =
   return { phase1_minutes: phase1_min, phase2_minutes: phase2_min, phase1_pass, phase2_pass };
 }
 
-export const coolingCurveExample = { inputs: { start_F: 165, ambient_F: 70, container: "full_pan_4in", product_type: "thick_liquid" } };
+export const coolingCurveExample = { inputs: { start_F: 135, ambient_F: 70, container: "full_pan_4in", product_type: "thick_liquid" } };
 
 // --- 225: Plate Cost and Menu Pricing ---
 

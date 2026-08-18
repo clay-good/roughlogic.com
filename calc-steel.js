@@ -754,7 +754,7 @@ export function computeSteelBoltSlipCritical({ mu = 0.30, tb_kip = 0, ns = 1, n 
     note: "AISC 360-22 J3.8 slip resistance of a pretensioned high-strength bolt: Rn = mu Du hf Tb ns, with mu = 0.30 (Class A unpainted mill scale) / 0.50 (Class B blast-cleaned), Du = 1.13, hf = 1.0 with no fillers or fillers developed, Tb from Table J3.1, and phi = 1.00 / Omega = 1.50 for STANDARD holes (oversized and slotted holes reduce phi / raise Omega). The strength-level bolt shear and bearing (bolt-shear-bearing) must ALSO be satisfied; the tension-slip interaction (J3.9) and the pretensioning method (turn-of-nut, DTI) are separate. A design aid, not a substitute for the engineer of record.",
   };
 }
-export const steelBoltSlipCriticalExample = { inputs: { mu: 0.30, tb_kip: 28, ns: 1, n: 1, hf: 1.0, du: 1.13 } };
+export const steelBoltSlipCriticalExample = { inputs: { mu: 0.3, tb_kip: 28, ns: 1, n: 4, hf: 1, du: 1.13 } };
 
 STEEL_RENDERERS["steel-bolt-slip-critical"] = _simpleRenderer({
   citation: "Citation: AISC 360-22 J3.8 slip-critical resistance Rn = mu Du hf Tb ns (mu 0.30 Class A / 0.50 Class B, Du = 1.13, Tb per Table J3.1), phi = 1.00 / Omega = 1.50 standard holes, by name. Bolt shear/bearing must also be checked. A design aid, not a substitute for the engineer of record.",

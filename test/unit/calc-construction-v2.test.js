@@ -33,9 +33,9 @@ const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 
 // --- Utility 90: Stair Stringer ---
 
-test("Stringer: 108 in rise, 126 in run -> ~166 in", () => {
+test("Stringer: 108 in rise, 144 in run -> ~180 in", () => {
   const r = computeStairStringer(stairStringerExample.inputs);
-  assert.ok(r.stringer_in > 165 && r.stringer_in < 167);
+  assert.ok(r.stringer_in > 179 && r.stringer_in < 181);
 });
 
 test("Stringer: rise 0 returns error", () => {

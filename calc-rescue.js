@@ -56,7 +56,7 @@ export function computeConfinedSpacePurge({ volume_ft3 = 0, blower_cfm = 0, targ
   return { minutes };
 }
 
-export const confinedSpacePurgeExample = { inputs: { volume_ft3: 1000, blower_cfm: 200, target_purges: 7 } };
+export const confinedSpacePurgeExample = { inputs: { volume_ft3: 2000, blower_cfm: 1000, target_purges: 7 } };
 
 // --- Utility 160: Rope Rescue Mechanical Advantage ---
 //
@@ -161,7 +161,7 @@ export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", incl
   };
 }
 
-export const slingAngleExample = { inputs: { load_lb: 2000, sling_config: "basket", included_angle_deg: 60, n_legs: 2 } };
+export const slingAngleExample = { inputs: { load_lb: 4000, sling_config: "vertical", included_angle_deg: 60, n_legs: 2 } };
 
 // --- v3 renderers ---
 

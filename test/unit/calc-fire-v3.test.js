@@ -13,7 +13,7 @@ import {
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 
 // 159 Confined space purge
-test("Purge: example 1000 ft^3 / 200 cfm / 7 -> 35 min", () => { const r = computeConfinedSpacePurge(confinedSpacePurgeExample.inputs); assert.ok(close(r.minutes, 35, 0.01)); });
+test("Purge: example 2000 ft^3 / 1000 cfm / 7 -> 14 min", () => { const r = computeConfinedSpacePurge(confinedSpacePurgeExample.inputs); assert.ok(close(r.minutes, 14, 0.01)); });
 test("Purge: bigger volume -> more time", () => { const a = computeConfinedSpacePurge({ volume_ft3: 500, blower_cfm: 200, target_purges: 7 }); const b = computeConfinedSpacePurge({ volume_ft3: 2000, blower_cfm: 200, target_purges: 7 }); assert.ok(b.minutes > a.minutes); });
 test("Purge: more cfm -> less time", () => { const a = computeConfinedSpacePurge({ volume_ft3: 1000, blower_cfm: 100, target_purges: 7 }); const b = computeConfinedSpacePurge({ volume_ft3: 1000, blower_cfm: 500, target_purges: 7 }); assert.ok(b.minutes < a.minutes); });
 test("Purge: zero volume errors", () => { const r = computeConfinedSpacePurge({ volume_ft3: 0, blower_cfm: 200, target_purges: 7 }); assert.ok(r.error); });

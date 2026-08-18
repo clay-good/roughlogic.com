@@ -262,7 +262,7 @@ export function computeCompareRefrigerants({ refrigerant_a, refrigerant_b, press
 }
 
 export const compareRefrigerantsExample = {
-  inputs: { refrigerant_a: "R-410A", refrigerant_b: "R-32", pressure_psig: 100 },
+  inputs: { refrigerant_a: "R-410A", refrigerant_b: "R-32", pressure_psig: 118 },
   expected: { mode: "pressure_to_temp" },
 };
 
@@ -502,7 +502,7 @@ export function renderCompareRefrigerants(inputRegion, outputRegion, citationEl)
   ]);
   const v = makeNumber("Value", "cmp-v", { step: "any" });
   for (const f of [a, b, mode, v]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { a.select.value = "R-410A"; b.select.value = "R-32"; mode.select.value = "pressure"; v.input.value = "100"; update(); });
+  attachExampleButton(inputRegion, () => { a.select.value = "R-410A"; b.select.value = "R-32"; mode.select.value = "pressure"; v.input.value = "118"; update(); });
   const oA = makeOutputLine(outputRegion, "Refrigerant A", "cmp-out-a");
   const oAttrA = makeOutputLine(outputRegion, "A source", "cmp-out-a-src");
   const oB = makeOutputLine(outputRegion, "Refrigerant B", "cmp-out-b");

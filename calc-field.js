@@ -138,7 +138,7 @@ export function computeSlopeAvalanche({ rise_ft = 0, run_ft = 0, measured_angle_
   };
 }
 
-export const slopeAvalancheExample = { inputs: { rise_ft: 0, run_ft: 0, measured_angle_deg: 38 } };
+export const slopeAvalancheExample = { inputs: { rise_ft: 0, run_ft: 0, measured_angle_deg: 32 } };
 
 // --- 230: Backcountry Water and Caloric Requirement ---
 

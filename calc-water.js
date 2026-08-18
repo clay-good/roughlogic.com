@@ -57,7 +57,7 @@ export function computePoundsFormula({ flow_mgd = 0, dose_mg_l = 0, chemical = "
   return { pure_lb_day, product_lb_day, purity_pct: c.pct, chemical_label: c.label };
 }
 
-export const poundsFormulaExample = { inputs: { flow_mgd: 5, dose_mg_l: 2.5, chemical: "sodium_hypochlorite" } };
+export const poundsFormulaExample = { inputs: { flow_mgd: 5, dose_mg_l: 2.5, chemical: "chlorine_gas" } };
 
 // --- 211: Filter Loading Rate and Backwash ---
 
@@ -226,7 +226,7 @@ export function computePumpEfficiency({ flow_gpm = 0, tdh_ft = 0, motor_kW = 0, 
   return { whp, bhp, wire_to_water_pct, category };
 }
 
-export const pumpEfficiencyExample = { inputs: { flow_gpm: 1500, tdh_ft: 100, motor_kW: 60, motor_eff: 0.93, drive_eff: 1.0 } };
+export const pumpEfficiencyExample = { inputs: { flow_gpm: 500, tdh_ft: 120, motor_kW: 25, motor_eff: 0.92, drive_eff: 1 } };
 
 // --- 215: Solids Retention Time and F/M Ratio ---
 

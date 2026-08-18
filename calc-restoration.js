@@ -185,8 +185,8 @@ export function computeAirMovers({ affected_area_ft2, water_class = "2" }) {
 }
 
 export const airMoversExample = {
-  inputs: { affected_area_ft2: 800, water_class: "2" },
-  expected: { air_mover_count: 8 },
+  inputs: { affected_area_ft2: 600, water_class: "2" },
+  expected: { air_mover_count: 6 },
 };
 
 // --- Utility 36: Class and Category of Water Loss Reference ---
@@ -369,7 +369,7 @@ export function renderAirMovers(inputRegion, outputRegion, citationEl) {
     { value: "1", label: "Class 1" }, { value: "2", label: "Class 2", selected: true }, { value: "3", label: "Class 3" }, { value: "4", label: "Class 4" },
   ]);
   for (const f of [a, c]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { a.input.value = "800"; c.select.value = "2"; update(); });
+  attachExampleButton(inputRegion, () => { a.input.value = "600"; c.select.value = "2"; update(); });
   const oC = makeOutputLine(outputRegion, "Air mover count", "am-out-c");
   const oCFM = makeOutputLine(outputRegion, "Total CFM", "am-out-cfm");
   // v8 §C.6: placement-pattern + placement-note rows per IICRC S500 §12 typical.
@@ -749,7 +749,7 @@ export function computeContainmentAirBalance({
 }
 
 export const containmentAirBalanceExample = {
-  inputs: { target_dp_in_wc: 0.02, leakage_area_in2: 12 },
+  inputs: { target_dp_in_wc: 0.02, leakage_area_in2: 8 },
 };
 
 // --- Utility 146: Drying Chamber Air Turnover ---

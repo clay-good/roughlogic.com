@@ -1927,7 +1927,7 @@ export function computeCoolingTower({ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm =
 }
 
 export const coolingTowerExample = {
-  inputs: { T_in_F: 95, T_out_F: 85, T_wb_F: 78, gpm: 600, fan_kW: 7.5 },
+  inputs: { T_in_F: 95, T_out_F: 85, T_wb_F: 75, gpm: 300, fan_kW: 15 },
 };
 
 // --- 245: Pipe / Duct Insulation Bare vs. Insulated Heat Loss ---
@@ -2173,7 +2173,7 @@ export function computeDuctLeakage({
 }
 
 export const ductLeakageExample = {
-  inputs: { design_cfm: 1200, measured_cfm: 1140, duct_surface_ft2: 600, test_pressure_inwc: 1.0, design_class: 6 },
+  inputs: { design_cfm: 1000, measured_cfm: 60, duct_surface_ft2: 300, test_pressure_inwc: 1, design_class: 6 },
 };
 
 function _v8h_renderDuctLeakage(inputRegion, outputRegion, citationEl) {

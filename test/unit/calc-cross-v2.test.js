@@ -249,9 +249,9 @@ test("Overtime: 80 hr breakdown", () => {
 
 // --- Utility 109: Per-Diem ---
 
-test("Per-diem: DC lodging $257", () => {
+test("Per-diem: example (TX m_and_ie) $69", () => {
   const r = computePerDiem(perDiemExample.inputs);
-  assert.equal(r.rate_dollars, 257);
+  assert.equal(r.rate_dollars, 69);
 });
 
 test("Per-diem: DC m_and_ie $79", () => {

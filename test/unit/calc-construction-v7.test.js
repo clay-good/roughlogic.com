@@ -193,9 +193,9 @@ test("249 APA_SPAN_RATINGS covers the five bundled ratings", () => {
 
 test("250 example yields ultimate = Kt × torque", () => {
   const r = computeHelicalPile(helicalPileExample.inputs);
-  // 1.5 in solid → Kt 10; 4500 ft·lb → 45000 lb ultimate
+  // 1.5 in solid → Kt 10; 5000 ft·lb → 50000 lb ultimate
   assert.equal(r.Kt, 10);
-  assert.equal(r.ultimate_lb, 45000);
+  assert.equal(r.ultimate_lb, 50000);
 });
 
 test("250 allowable = ultimate / FS", () => {

@@ -31,7 +31,7 @@ test("SL: salvage > cost errors", () => { assert.ok(computeStraightLine({ cost: 
 test("SL: year clamped to life", () => { const r = computeStraightLine({ cost: 1000, salvage: 0, life_years: 5, year_of_interest: 99 }); assert.equal(r.year_of_interest, 5); });
 
 // 235 MACRS
-test("MACRS: example matches Pub 946 5-yr year-1", () => { const r = computeMacrs(macrsExample.inputs); assert.ok(close(r.year_depreciation, 2000, 0.5)); });
+test("MACRS: example matches Pub 946 5-yr year-1 (20% of $50k)", () => { const r = computeMacrs(macrsExample.inputs); assert.ok(close(r.year_depreciation, 10000, 0.5)); });
 test("MACRS: 5-yr table totals to 100%", () => { const sum = MACRS_TABLES.half_year[5].reduce((a, b) => a + b, 0); assert.ok(close(sum, 100, 0.01)); });
 test("MACRS: 7-yr table totals to 100%", () => { const sum = MACRS_TABLES.half_year[7].reduce((a, b) => a + b, 0); assert.ok(close(sum, 100, 0.02)); });
 test("MACRS: 5-yr full schedule totals to cost", () => { const r = computeMacrs({ cost: 10000, class_life: 5, year_of_interest: 6 }); const tot = r.schedule.reduce((a, b) => a + b.depreciation, 0); assert.ok(close(tot, 10000, 0.5)); });

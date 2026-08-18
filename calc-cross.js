@@ -736,8 +736,8 @@ export function computePerDiem({ state, type = "lodging" }) {
 }
 
 export const perDiemExample = {
-  inputs: { state: "DC", type: "lodging" },
-  expected: { rate_dollars: 257 },
+  inputs: { state: "TX", type: "m_and_ie" },
+  expected: { rate_dollars: 69 },
 };
 
 // --- Utility 110: Geometry Pack ---
@@ -979,7 +979,7 @@ export function renderPerDiem(inputRegion, outputRegion, citationEl) {
     { value: "lodging", label: "Lodging" }, { value: "m_and_ie", label: "M&IE" },
   ]);
   for (const f of [s, t]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { s.select.value = "DC"; t.select.value = "lodging"; update(); });
+  attachExampleButton(inputRegion, () => { s.select.value = "TX"; t.select.value = "m_and_ie"; update(); });
   const oR = makeOutputLine(outputRegion, "Per-diem rate", "pd-out-r");
   const update = debounce(() => {
     const r = computePerDiem({ state: s.select.value, type: t.select.value });
@@ -1342,7 +1342,7 @@ export function computeRainwaterYield({ catchment_ft2 = 0, monthly_in = [], annu
 }
 
 export const rainwaterYieldExample = {
-  inputs: { catchment_ft2: 1500, monthly_in: [3, 3, 4, 4, 4, 3, 2, 2, 2, 3, 4, 4], efficiency: 0.62 },
+  inputs: { catchment_ft2: 1000, monthly_in: [3, 3, 4, 4, 4, 3, 2, 2, 2, 3, 4, 4], efficiency: 0.62 },
 };
 
 // --- spec-v675: catchment area for a target rainwater harvest (inverse of rainwater-yield) ---
@@ -1431,7 +1431,7 @@ export function computeVehicleLoad({ wheelbase_in = 0, payload_lb = 0, payload_p
 }
 
 export const vehicleLoadExample = {
-  inputs: { wheelbase_in: 140, payload_lb: 1500, payload_position_from_cab_in: 84, gvwr_lb: 9500, front_gawr_lb: 4500, rear_gawr_lb: 6200, curb_front_lb: 3200, curb_rear_lb: 2400 },
+  inputs: { wheelbase_in: 140, payload_lb: 1000, payload_position_from_cab_in: 60, gvwr_lb: 8800, front_gawr_lb: 4400, rear_gawr_lb: 5500, curb_front_lb: 2500, curb_rear_lb: 2300 },
 };
 
 // --- v3 renderers (compact) ---

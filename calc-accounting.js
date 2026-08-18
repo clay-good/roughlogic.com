@@ -169,7 +169,7 @@ export function computeMacrs({ cost = 0, class_life = 5, convention = "half_year
   return { schedule, year_of_interest: snapshot.year, year_depreciation: snapshot.depreciation, accumulated_depreciation: snapshot.accumulated, book_value: snapshot.book_value };
 }
 
-export const macrsExample = { inputs: { cost: 10000, class_life: 5, convention: "half_year", year_of_interest: 1 }, expected: { year_depreciation: 2000 } };
+export const macrsExample = { inputs: { cost: 50000, class_life: 5, convention: "half_year", year_of_interest: 1 }, expected: { year_depreciation: 10000 } };
 
 // --- 236: Section 179 and Bonus Depreciation Estimator ---
 
@@ -203,7 +203,7 @@ export function computeSection179({ cost = 0, business_use_pct = 100, taxable_in
   };
 }
 
-export const section179Example = { inputs: { cost: 60000, business_use_pct: 100, taxable_income: 200000, tax_year: 2025 } };
+export const section179Example = { inputs: { cost: 50000, business_use_pct: 100, taxable_income: 200000, tax_year: 2025 } };
 
 // --- 237: Self-Employment Tax (Schedule SE) ---
 //
@@ -735,7 +735,7 @@ function renderMacrs(inputRegion, outputRegion, citationEl) {
   }, DEBOUNCE_MS);
   for (const el of [cost.input, cls.select, yoi.input]) el.addEventListener("input", update);
   attachExampleButton(inputRegion, () => {
-    cost.input.value = 10000; cls.select.value = "5"; yoi.input.value = "1"; update();
+    cost.input.value = 50000; cls.select.value = "5"; yoi.input.value = "1"; update();
   });
 }
 
@@ -767,7 +767,7 @@ function renderSection179(inputRegion, outputRegion, citationEl) {
   }, DEBOUNCE_MS);
   for (const el of [cost.input, buPct.input, ti.input, yr.select]) el.addEventListener("input", update);
   attachExampleButton(inputRegion, () => {
-    cost.input.value = 60000; buPct.input.value = 100; ti.input.value = 200000; yr.select.value = "2025"; update();
+    cost.input.value = 50000; buPct.input.value = 100; ti.input.value = 200000; yr.select.value = "2025"; update();
   });
 }
 

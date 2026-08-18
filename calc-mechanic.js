@@ -171,7 +171,7 @@ export function computeBoltStretch({ diameter_in = 0, grip_length_in = 0, stretc
   return { clamp_load_lb: F_lb, cross_check_torque_ft_lb, modulus_psi: E };
 }
 
-export const boltStretchExample = { inputs: { diameter_in: 0.5, grip_length_in: 4, stretch_thou: 5, material: "steel", k_factor: 0.18 } };
+export const boltStretchExample = { inputs: { diameter_in: 0.5, grip_length_in: 3, stretch_thou: 5, material: "steel", k_factor: 0.18 } };
 
 // --- 199: Driveshaft Critical Speed ---
 //
@@ -430,7 +430,7 @@ export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0
   return { ke_J, ke_kJ, rotor_temp_rise_C, wear_per_stop_mm, stops_until_worn, miles_until_worn, pad_label: w.label, cost_per_100k_miles_usd, front_bias_pct: frontPct, wear_rate_used: wear_rate, front_miles_until_worn, rear_miles_until_worn };
 }
 
-export const brakePadLifeExample = { inputs: { vehicle_weight_lb: 3500, speed_delta_mph: 30, stops_per_mile: 0.4, pad_thickness_mm: 12, pad_material: "ceramic", rotor_mass_lb: 18 } };
+export const brakePadLifeExample = { inputs: { vehicle_weight_lb: 4000, speed_delta_mph: 30, stops_per_mile: 1, pad_thickness_mm: 12, pad_material: "ceramic", rotor_mass_lb: 18 } };
 
 // --- Renderers ---
 

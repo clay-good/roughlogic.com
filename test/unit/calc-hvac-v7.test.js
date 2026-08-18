@@ -181,8 +181,8 @@ test("refrigerant P-T (psig pt_pairs): every refrigerant is strictly monotone in
 test("244 example yields finite outputs", () => {
   const r = computeCoolingTower(coolingTowerExample.inputs);
   assert.equal(r.range_F, 10);
-  assert.equal(r.approach_F, 7);
-  assert.equal(r.heat_rejection_BTU_hr, 600 * 500 * 10);
+  assert.equal(r.approach_F, 10);
+  assert.equal(r.heat_rejection_BTU_hr, 300 * 500 * 10);
 });
 
 test("244 range_F = T_in - T_out", () => {
@@ -227,8 +227,8 @@ test("244 approach_flag bands fire", () => {
 
 // spec-v16 C.4: thermal efficiency = range / (range + approach).
 test("244 (C.4) efficiency = range / (range + approach) = range / (T_in - T_wb)", () => {
-  const r = computeCoolingTower(coolingTowerExample.inputs); // 95/85/78 -> range 10, approach 7
-  assert.ok(close(r.efficiency, 10 / 17, 1e-9));
+  const r = computeCoolingTower(coolingTowerExample.inputs); // 95/85/75 -> range 10, approach 10
+  assert.ok(close(r.efficiency, 10 / 20, 1e-9));
   // A tighter approach raises the efficiency toward the wet-bulb floor.
   const tighter = computeCoolingTower({ T_in_F: 95, T_out_F: 81, T_wb_F: 78, gpm: 600 }); // range 14, approach 3
   assert.ok(tighter.efficiency > r.efficiency);

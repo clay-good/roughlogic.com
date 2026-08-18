@@ -1051,15 +1051,15 @@ test("computeRiggingCheck: bit-stable tension_per_leg + safety_factor at the spe
   assert.equal(bits(r.safety_factor), "4002914d3a641ee3", `safety_factor=${r.safety_factor}`);
 });
 
-test("computeYieldEP: bit-stable yield_pct + ep_weight + ep_cost_per_lb at the spec example (10 lb AP, 1.5 trim, 15% cooking loss, $8.50)", () => {
+test("computeYieldEP: bit-stable yield_pct + ep_weight + ep_cost_per_lb at the spec example (10 lb AP, 1.5 trim, 15% cooking loss, $8.00)", () => {
   // Group O. yield_pct = (1 - trim/ap) * (1 - cooking_loss) * 100 =
   // 0.85 * 0.85 = 72.25%. ep_cost_per_lb = ap_cost / yield_pct =
-  // $8.50 / 0.7225 = $11.764... Pins the two-stage yield chain (trim
+  // $8.00 / 0.7225 = $11.072... Pins the two-stage yield chain (trim
   // first, then cooking loss).
   const r = computeYieldEP(yieldEPExample.inputs);
   assert.equal(bits(r.yield_pct), "40520fffffffffff", `yield_pct=${r.yield_pct}`);
   assert.equal(bits(r.ep_weight), "401ce66666666666", `ep_weight=${r.ep_weight}`);
-  assert.equal(bits(r.ep_cost_per_lb), "4027878787878789", `ep_cost_per_lb=${r.ep_cost_per_lb}`);
+  assert.equal(bits(r.ep_cost_per_lb), "4026253443526172", `ep_cost_per_lb=${r.ep_cost_per_lb}`);
 });
 
 // --- Phase E ratchet 2026-05-25 (ninth batch): five third-pin depth tests --
@@ -1136,14 +1136,14 @@ import { computeDIM, dimExample } from "../../calc-trucking.js";
 import { computePoundsFormula, poundsFormulaExample } from "../../calc-water.js";
 import { computeLTV, ltvExample } from "../../calc-realestate.js";
 
-test("computeAirMovers: bit-stable air_mover_count + total_cfm at the spec example (800 ft^2, water_class=2)", () => {
-  // Group D. IICRC S500 step function: 800/100 = 8 units (exact);
-  // total_cfm = 8 * 2500 = 20000 (exact integer). Pins both the
+test("computeAirMovers: bit-stable air_mover_count + total_cfm at the spec example (600 ft^2, water_class=2)", () => {
+  // Group D. IICRC S500 step function: 600/100 = 6 units (exact);
+  // total_cfm = 6 * 2500 = 15000 (exact integer). Pins both the
   // ft^2-per-unit step at water_class=2 and the typical-unit CFM
   // attribution.
   const r = computeAirMovers(airMoversExample.inputs);
-  assert.equal(bits(r.air_mover_count), "4020000000000000", `air_mover_count=${r.air_mover_count}`);
-  assert.equal(bits(r.total_cfm), "40d3880000000000", `total_cfm=${r.total_cfm}`);
+  assert.equal(bits(r.air_mover_count), "4018000000000000", `air_mover_count=${r.air_mover_count}`);
+  assert.equal(bits(r.total_cfm), "40cd4c0000000000", `total_cfm=${r.total_cfm}`);
 });
 
 test("computeOvertime: bit-stable regular + OT + gross at the spec example (50 hrs at $30/hr, 1.5x OT, 60-hr DT threshold)", () => {
@@ -1168,14 +1168,14 @@ test("computeDIM: bit-stable dim_lb + breakeven_in3 + current_in3 at the spec ex
   assert.equal(bits(r.current_in3), "40b4400000000000", `current_in3=${r.current_in3}`);
 });
 
-test("computePoundsFormula: bit-stable pure_lb_day + product_lb_day at the spec example (5 MGD, 2.5 mg/L, 12.5% NaOCl)", () => {
+test("computePoundsFormula: bit-stable pure_lb_day + product_lb_day at the spec example (5 MGD, 2.5 mg/L, 100% chlorine gas)", () => {
   // Group M. AWWA pounds formula: lb/day = 8.34 * MGD * mg/L = 8.34 * 5
-  // * 2.5 = 104.25 (exact). product = pure / purity = 104.25 / 0.125 =
-  // 834 (exact). Pins the 8.34 lb/gal water-density and the purity
+  // * 2.5 = 104.25 (exact). product = pure / purity = 104.25 / 1.00 =
+  // 104.25 (exact). Pins the 8.34 lb/gal water-density and the purity
   // division.
   const r = computePoundsFormula(poundsFormulaExample.inputs);
   assert.equal(bits(r.pure_lb_day), "405a100000000000", `pure_lb_day=${r.pure_lb_day}`);
-  assert.equal(bits(r.product_lb_day), "408a100000000000", `product_lb_day=${r.product_lb_day}`);
+  assert.equal(bits(r.product_lb_day), "405a100000000000", `product_lb_day=${r.product_lb_day}`);
 });
 
 test("computeLTV: bit-stable ltv_percent at the spec example ($320k loan, $400k value)", () => {
@@ -1198,14 +1198,14 @@ import { computeMacrs, macrsExample } from "../../calc-accounting.js";
 import { computeMolecularWeight, mwExample } from "../../calc-lab.js";
 import { computeQuadratic, quadraticExample } from "../../calc-edu.js";
 
-test("computeMacrs: bit-stable year_depreciation + book_value at the spec example ($10k, 5-year, half-year, year 1)", () => {
+test("computeMacrs: bit-stable year_depreciation + book_value at the spec example ($50k, 5-year, half-year, year 1)", () => {
   // Group R. IRS Publication 946 Table A-1 5-year half-year: year 1 =
-  // 20% * $10k = $2000 (exact); book = $8000 (exact). Pins both the
+  // 20% * $50k = $10,000 (exact); book = $40,000 (exact). Pins both the
   // first-year half-year-convention percentage and the linear-in-cost
   // arithmetic.
   const r = computeMacrs(macrsExample.inputs);
-  assert.equal(bits(r.year_depreciation), "409f400000000000", `year_depreciation=${r.year_depreciation}`);
-  assert.equal(bits(r.book_value), "40bf400000000000", `book_value=${r.book_value}`);
+  assert.equal(bits(r.year_depreciation), "40c3880000000000", `year_depreciation=${r.year_depreciation}`);
+  assert.equal(bits(r.book_value), "40e3880000000000", `book_value=${r.book_value}`);
 });
 
 test("computeMolecularWeight: bit-stable mw at the spec example ((NH4)2SO4)", () => {
@@ -1241,14 +1241,14 @@ import { computeSeedRate, seedRateExample } from "../../calc-agriculture.js";
 import { computeTrussCapacity, trussExample } from "../../calc-stage.js";
 import { computePanConversion, panConversionExample } from "../../calc-kitchen.js";
 
-test("computeBoltStretch: bit-stable clamp_load + cross_check_torque at the spec example (0.5 in, 4 in grip, 5 thou stretch, steel, k=0.18)", () => {
+test("computeBoltStretch: bit-stable clamp_load + cross_check_torque at the spec example (0.5 in, 3 in grip, 5 thou stretch, steel, k=0.18)", () => {
   // Group K. clamp_load = stretch_in * E * area / grip_length; torque
   // cross-check = k * d * clamp_load / 12. Pins both the Hooke's-Law
   // form and the rule-of-thumb torque relationship with the k-factor
   // (the 0.18 lubricated assumption).
   const r = computeBoltStretch(boltStretchExample.inputs);
-  assert.equal(bits(r.clamp_load_lb), "40b4c94000000000", `clamp_load=${r.clamp_load_lb}`);
-  assert.equal(bits(r.cross_check_torque_ft_lb), "4043f46666666666", `torque=${r.cross_check_torque_ft_lb}`);
+  assert.equal(bits(r.clamp_load_lb), "40bbb70000000000", `clamp_load=${r.clamp_load_lb}`);
+  assert.equal(bits(r.cross_check_torque_ft_lb), "404a9b3333333333", `torque=${r.cross_check_torque_ft_lb}`);
 });
 
 test("computeSeedRate: bit-stable seeds_per_acre + lbs_per_acre + cost_per_acre at the spec example (30 in rows, 32k target, 1500 seeds/lb, 95% germ, $4.50)", () => {

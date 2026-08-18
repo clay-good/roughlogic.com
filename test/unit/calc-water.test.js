@@ -15,7 +15,7 @@ import {
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 
 // 210 Pounds formula
-test("Pounds: example yields finite", () => { const r = computePoundsFormula(poundsFormulaExample.inputs); assert.ok(r.pure_lb_day > 0); assert.ok(r.product_lb_day > r.pure_lb_day); });
+test("Pounds: example yields finite (chlorine gas is 100% pure, so product = pure)", () => { const r = computePoundsFormula(poundsFormulaExample.inputs); assert.ok(r.pure_lb_day > 0); assert.equal(r.product_lb_day, r.pure_lb_day); });
 test("Pounds: 5 MGD * 2 mg/L * 8.34 = 83.4 lb/day", () => { const r = computePoundsFormula({ flow_mgd: 5, dose_mg_l: 2, chemical: "chlorine_gas" }); assert.ok(close(r.pure_lb_day, 83.4, 0.01)); });
 test("Pounds: 12.5% bleach needs 8x product feed", () => { const r = computePoundsFormula({ flow_mgd: 1, dose_mg_l: 1, chemical: "sodium_hypochlorite" }); assert.ok(close(r.product_lb_day / r.pure_lb_day, 8, 0.01)); });
 test("Pounds: 100% chlorine product equals pure", () => { const r = computePoundsFormula({ flow_mgd: 1, dose_mg_l: 1, chemical: "chlorine_gas" }); assert.equal(r.product_lb_day, r.pure_lb_day); });
