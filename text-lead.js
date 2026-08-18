@@ -23,6 +23,8 @@ const ABBREV = new Set([
 ]);
 
 const MIN_LEAD = 40;
+// Floor for the bracket-cut last resort (see wordCut).
+const BRACKET_MIN = 24;
 
 export function firstSentence(desc) {
   const s = String(desc).trim();
@@ -46,7 +48,7 @@ export function firstSentence(desc) {
 // A lead like that is the wall of text the one-sentence rule was meant to
 // avoid. So when the sentence runs long, cut it at its first real clause
 // boundary and let the full text carry the rest below the answer.
-const LEAD_CAP = 160;
+const LEAD_CAP = 120;
 const CLAUSE = /(: | -- |; )/g;
 const COMMA = /, /g;
 
@@ -86,10 +88,48 @@ function widest(list) {
 function wordCut(s) {
   // Budget for the ellipsis, so the string the reader sees honors the cap
   // rather than the slice that precedes it.
-  for (let i = LEAD_CAP - 3; i >= MIN_LEAD; i--) {
+  const limit = LEAD_CAP - 3;
+  for (let i = limit; i >= MIN_LEAD; i--) {
     if (s[i] === " " && balanced(s.slice(0, i))) return i;
   }
-  return -1;
+  // Every word boundary in range sits inside a parenthetical -- one aside can
+  // span the whole window ("The feeder conductor ampacity (125% of the largest
+  // motor full-load current plus the sum of the rest, NEC 430.24) and ..."), so
+  // there is no balanced space to cut on. Cut at the aside's opening bracket
+  // instead: still inside the cap, still balanced, and it ends on the clause
+  // the aside was about to qualify.
+  // A lower floor than MIN_LEAD here on purpose: this is the last step before
+  // shipping the entire sentence, and "Turns the wetted-surface field read..."
+  // at 34 characters serves a reader better than the same thought at 239.
+  const open = lastUnclosed(s.slice(0, limit + 1));
+  return open >= BRACKET_MIN ? open : -1;
+}
+
+// A word cut lands wherever the cap falls, which is often just after the word
+// that was about to introduce the next thought ("... NEC 430.24) and..."). The
+// dangling conjunction adds nothing but a stumble, so drop it along with any
+// trailing punctuation.
+const DANGLING = /(?:^|\s)(?:and|or|plus|with|for|the|a|an|of|to|in|on|by|from|at|as|into|than|that|which|when|per|is|are|its|their|but|if|so)$/i;
+function trimDangling(s) {
+  let out = s.replace(/[,;:\s-]+$/, "");
+  // One pass is enough in practice ("of the" is two words but the first trim
+  // leaves "of", which the second catches), so loop until stable but bounded.
+  for (let i = 0; i < 3; i++) {
+    const next = out.replace(DANGLING, "").replace(/[,;:\s-]+$/, "");
+    if (next === out || next.length < BRACKET_MIN) break;
+    out = next;
+  }
+  return out;
+}
+
+// Index of the last "(" that the prefix never closes, or -1.
+function lastUnclosed(prefix) {
+  const stack = [];
+  for (let i = 0; i < prefix.length; i++) {
+    if (prefix[i] === "(") stack.push(i);
+    else if (prefix[i] === ")") stack.pop();
+  }
+  return stack.length ? stack[stack.length - 1] : -1;
 }
 
 // Where the lead was cut out of the opening sentence, and on what. The seam
@@ -124,7 +164,7 @@ function leadCut(desc) {
   // text is one tap away in Details, which repeats the whole sentence.
   if (at < 0 || at > LEAD_CAP) {
     const cut = wordCut(sentence);
-    if (cut > 0) return { sentence, lead: sentence.slice(0, cut).replace(/[,;:\s-]+$/, "") + "...", at: cut };
+    if (cut > 0) return { sentence, lead: trimDangling(sentence.slice(0, cut)) + "...", at: cut };
     if (at < 0) return { sentence, lead: sentence, at: -1 };
   }
   return { sentence, lead: sentence.slice(0, at).replace(/[,;:\s-]+$/, "") + ".", at };
