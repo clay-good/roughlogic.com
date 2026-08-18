@@ -172,3 +172,45 @@ test("a tile whose renderer wraps compute with unit conversion degrades to the r
   assert.ok(keys.includes("baro_mbar"), "advertises the compute param, not the renderer field key");
   assert.ok(!keys.includes("baro_inhg"));
 });
+
+test("a number that spells a select option is accepted and normalized to that option", async () => {
+  // pan-conversion's pan_depth_in is a <select> whose options are the strings
+  // "2.5" / "4" / "6". Its own worked-example fixture records the input as the
+  // number 4, so a strict includes() rejected the tile's published example
+  // through the documented run path -- as it did for seven tiles.
+  const out = await run({
+    id: "pan-conversion",
+    inputs: { target_servings: 120, portion_oz: 6, pan_size: "full", pan_depth_in: 4 },
+  });
+  assert.equal(out.inputs.pan_depth_in, "4", "normalized to the option the compute is written against");
+  assert.equal(typeof out.inputs.pan_depth_in, "string");
+  assert.ok(!out.result.error, "the compute runs on the normalized value");
+});
+
+test("a select value outside the option set is still rejected by name", async () => {
+  await assert.rejects(
+    () => run({ id: "pan-conversion", inputs: { pan_depth_in: 9 } }),
+    /invalid value for "pan_depth_in": 9\. Allowed: "2\.5", "4", "6"\./,
+  );
+});
+
+test("every tile's own worked example runs clean through the MCP run path", async () => {
+  // The end-to-end version of the two cases above: whatever an agent reads off
+  // describe() and replays must not be rejected by run().
+  const { readFile } = await import("node:fs/promises");
+  const { fileURLToPath } = await import("node:url");
+  const path = fileURLToPath(new URL("../fixtures/worked-examples.json", import.meta.url));
+  const rows = JSON.parse(await readFile(path, "utf8")).rows;
+  const seen = new Set();
+  const failures = [];
+  for (const r of rows) {
+    if (seen.has(r.tile_id)) continue;
+    seen.add(r.tile_id);
+    try {
+      await run({ id: r.tile_id, inputs: r.inputs });
+    } catch (e) {
+      failures.push(`${r.tile_id}: ${e.message}`);
+    }
+  }
+  assert.deepEqual(failures, [], "no tile may reject its own published example");
+});

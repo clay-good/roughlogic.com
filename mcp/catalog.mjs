@@ -185,19 +185,36 @@ function validateNumbers(schema, inputs) {
 // Validate any input whose field is a `select` against that field's options
 // (spec-v1184). A bad enum throws with the allowed values named, instead of
 // silently coercing to a wrong answer. Numbers and free fields are untouched.
+//
+// A select's options are always strings (a <select> has no other kind of
+// value), but plenty of them are strings that *spell* numbers: "4" inches of
+// pan depth, "95" percent confidence, "60" ksi. An agent reading a field named
+// `pan_depth_in` and an allowed value of "4" naturally sends the number 4, and
+// a strict `includes` rejected it -- as it rejected seven tiles' own published
+// worked examples, whose fixtures record those inputs as numbers. So a value
+// that matches an option in string form is accepted and normalized TO that
+// option, because the compute behind a select is written against the string the
+// browser's <select> hands it. Returns the inputs to use.
 function validateSelects(schema, inputs) {
-  if (!schema || !inputs) return;
+  if (!schema || !inputs) return inputs;
   const byKey = new Map(schema.inputs.map((f) => [f.key, f]));
+  let normalized = inputs;
   for (const [key, value] of Object.entries(inputs)) {
     const field = byKey.get(key);
     if (!field || field.kind !== "select") continue;
     const allowed = selectValues(field);
-    if (allowed && !allowed.includes(value)) {
+    if (!allowed) continue;
+    if (allowed.includes(value)) continue;
+    const match = allowed.find((v) => String(v) === String(value));
+    if (match === undefined) {
       throw new Error(
         `invalid value for "${key}": ${JSON.stringify(value)}. Allowed: ${allowed.map((v) => JSON.stringify(v)).join(", ")}.`,
       );
     }
+    if (normalized === inputs) normalized = { ...inputs };
+    normalized[key] = match;
   }
+  return normalized;
 }
 
 // Resolve and import the calc module for a wired tile, caching by URL.
@@ -432,7 +449,7 @@ export async function run({ id, inputs } = {}) {
   // for caller-supplied inputs (the worked example is already valid) and only
   // where the tile's renderer exposes a schema.
   const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
-  if (!usedExample) validateSelects(schema, args);
+  if (!usedExample) args = validateSelects(schema, args);
   const result = fn({ ...(args || {}) });
   const out = { id, inputs: args || {}, usedExample, result };
   // spec-v1189: alongside the raw result, the rendered outputs a person sees —
