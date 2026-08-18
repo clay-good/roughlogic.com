@@ -57,10 +57,41 @@ test("a seam inside a parenthetical is never chosen", () => {
   assert.equal(depth, 0, "lead ends on an unclosed bracket: " + lead);
 });
 
-test("restOfDescription keeps every word when the lead is a clause cut", () => {
+test("a colon-cut lead is not printed twice: Details starts after the colon", () => {
   const d =
     "The specific-energy diagram of an open channel: E = y + q^2/(2 g y^2) is the flow " +
     "energy measured from the bed, and for one discharge the same E passes at two alternate depths.";
+  const lead = leadSentence(d);
+  const rest = restOfDescription(d);
+  assert.equal(lead, "The specific-energy diagram of an open channel.");
+  assert.ok(!rest.startsWith("The specific-energy diagram"), "Details repeats the lead: " + rest);
+  assert.ok(rest.startsWith("E = y + q^2"), rest);
+  // Nothing is lost from the page: the lead carries the summary, Details the rest.
+  assert.equal(lead.replace(/\.$/, "") + ": " + rest, d);
+});
+
+test("a colon-cut Details opens as a sentence, but never re-cases a variable", () => {
+  const prose =
+    "The most microinverters or AC modules on one AC branch circuit: their combined " +
+    "continuous output, as a continuous load, cannot exceed 80% of the branch overcurrent " +
+    "device rating per NEC 210.20(A), which is what caps the string length.";
+  assert.ok(restOfDescription(prose).startsWith("Their combined"), restOfDescription(prose));
+
+  // `d` is the AWG diameter, not the first word of a sentence.
+  const formula =
+    "The bare-conductor size behind a gauge number, from the AWG definition: " +
+    "d = 0.005 x 92^((36 - n)/39) inches, so every 6 gauges roughly doubles the diameter " +
+    "and #12 AWG lands at 0.0808 in, which is the number the ampacity tables are built on.";
+  assert.ok(restOfDescription(formula).startsWith("d = 0.005"), restOfDescription(formula));
+});
+
+test("a non-colon clause cut still repeats the sentence, rather than open mid-thought", () => {
+  // Dropping the lead here would leave Details opening on ", plus per-set load
+  // adequacy" -- a fragment. Only a colon seam yields a standalone clause.
+  const d =
+    "Total ampacity of N paralleled conductor sets with the NEC more-than-three " +
+    "current-carrying-conductor derate applied, plus per-set load adequacy for 1/0 AWG " +
+    "and larger sets, which is where the paralleling rule starts to apply at all.";
   assert.equal(restOfDescription(d), d);
 });
 
@@ -121,6 +152,22 @@ test("no description body prints a raw tile id", () => {
     for (const id of slugs) {
       if (id === t.id || vocabulary.has(id)) continue;
       if (new RegExp("(^|[^a-z-])" + id + "([^a-z-]|$)").test(body)) offenders.push(t.id + " -> " + id);
+    }
+  }
+  assert.deepEqual(offenders, []);
+});
+
+// The two raw-slug assertions above only scan ids carrying two or more hyphens,
+// because a one-hyphen id is usually ordinary trade vocabulary too ("three-phase",
+// "lumen-method"). That left a hole: "(see conduit-fill)" reads as a slug and shipped
+// on a public page. A cross-reference is the one place the intent is unambiguous, so
+// check every id there regardless of shape.
+test("no description points a reader at a raw slug", () => {
+  const ids = new Set(TOOLS.map((t) => t.id));
+  const offenders = [];
+  for (const t of TOOLS) {
+    for (const m of t.desc.matchAll(/\bsee ([a-z0-9]+(?:-[a-z0-9]+)+)/g)) {
+      if (ids.has(m[1])) offenders.push(t.id + " -> see " + m[1]);
     }
   }
   assert.deepEqual(offenders, []);

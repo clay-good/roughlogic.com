@@ -80,11 +80,15 @@ function widest(list) {
   return fits.length ? Math.max(...fits) : -1;
 }
 
-export function leadSentence(desc) {
-  const s = firstSentence(desc);
-  if (s.length <= LEAD_CAP) return s;
-  const clause = seams(s, CLAUSE);
-  const comma = seams(s, COMMA);
+// Where the lead was cut out of the opening sentence, and on what. The seam
+// kind decides what the Details block can start from, so both callers read it
+// from one place: { sentence, lead, at } with at = -1 when the whole opening
+// sentence is the lead.
+function leadCut(desc) {
+  const sentence = firstSentence(desc);
+  if (sentence.length <= LEAD_CAP) return { sentence, lead: sentence, at: -1 };
+  const clause = seams(sentence, CLAUSE);
+  const comma = seams(sentence, COMMA);
   // A clause boundary is the best cut: it ends a complete thought. Take the
   // last one that fits, so the lead says as much as it can within the cap.
   let at = widest(clause);
@@ -97,19 +101,42 @@ export function leadSentence(desc) {
   // shipping the whole sentence, which is what the cap exists to prevent.
   if (at < 0) {
     const all = clause.concat(comma);
-    if (!all.length) return s;
+    if (!all.length) return { sentence, lead: sentence, at: -1 };
     at = Math.min(...all);
   }
-  return s.slice(0, at).replace(/[,;:\s-]+$/, "") + ".";
+  return { sentence, lead: sentence.slice(0, at).replace(/[,;:\s-]+$/, "") + ".", at };
 }
 
-// The prose that belongs below the answer. When the lead is the whole opening
-// sentence, that is everything after it. When the lead is a clause-cut summary
-// of a longer sentence, it is the whole description: a Details block has to
-// read as prose, and starting one mid-sentence in lower case reads as a bug.
+export function leadSentence(desc) {
+  return leadCut(desc).lead;
+}
+
+// Upper-case the opening letter so the block reads as prose -- unless it opens
+// on a symbol the reader is meant to match against the formula below it
+// ("d = 0.005 x 92^((36 - n)/39) inches"), where re-casing renames the
+// variable, or on a token too short to be an ordinary word.
+function openAsSentence(t) {
+  if (/^[A-Za-z_][\w.]*\s*=/.test(t)) return t;
+  const first = (t.match(/^[a-z]+/) || [""])[0];
+  if (first.length < 3) return t;
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+// The prose that belongs below the answer.
+//
+// When the lead is the whole opening sentence, that is everything after it.
+// When the lead is a clause-cut summary, what follows depends on the seam. A
+// COLON splits a sentence into a summary and a self-contained explanation, so
+// Details starts after the colon and the page states its opening line once.
+// Every other seam leaves a fragment behind ("plus per-set load adequacy",
+// "-- and those are not independent numbers"), so there the whole sentence
+// repeats rather than ship a Details block that opens mid-thought.
 export function restOfDescription(desc) {
   const s = String(desc).trim();
-  const sentence = firstSentence(s);
-  if (leadSentence(s) !== sentence) return s;
-  return s.slice(sentence.length).trim();
+  const { sentence, at } = leadCut(s);
+  const tail = s.slice(sentence.length).trim();
+  if (at < 0) return tail;
+  if (s.slice(at, at + 2) !== ": ") return s;
+  const rest = (sentence.slice(at + 2).trim() + (tail ? " " + tail : "")).trim();
+  return rest ? openAsSentence(rest) : s;
 }
