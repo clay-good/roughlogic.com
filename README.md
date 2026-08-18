@@ -31,7 +31,7 @@ Every field shows an example value as its placeholder, so you can see the expect
 | `current_A` | 20 | | |
 | `source_voltage_V` | 240 | | |
 
-Grounded in `Vd = 2 · K · I · L / CM`, NEC Ch. 9 conductor properties. Every calculator's page shows this same block: the inputs, the outputs, and the source.
+Grounded in `Vd = 2 · K · I · L / CM`, NEC Ch. 9 conductor properties. Every calculator's page shows this same block: the inputs, the outputs, and the source. On the page each input is named the way the calculator names it (`length_ft` reads *Length one-way (ft)*), with the machine field name alongside when it differs.
 
 Your inputs live in the URL, so a calculator is bookmarkable and shareable with its numbers preloaded. After the first load it works with no signal. No account, no email, no tracking, ever.
 

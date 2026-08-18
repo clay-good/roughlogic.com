@@ -1597,6 +1597,18 @@ input[aria-invalid="true"] {
   overflow-wrap: anywhere;
 }
 .shell-page .shell-io b { color: var(--fg); }
+/* A labeled example row reads "Length one-way (ft)  150  length_ft": the label
+   is what a person scans, the value is the point, and the machine key trails
+   both at reference size, because it is the name the MCP tool takes, not
+   something a reader has to parse to use the calculator. */
+.shell-page .shell-io li > span {
+  color: var(--fg);
+  overflow-wrap: anywhere;
+}
+.shell-page .shell-io li > span ~ code {
+  font-size: 0.9375rem;
+  color: var(--fg-dim);
+}
 
 /* An assumption is a name + value with its source underneath, so the
    source does not read as a third sibling on the same line. */

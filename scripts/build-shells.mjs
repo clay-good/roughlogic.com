@@ -181,14 +181,31 @@ function readableNumber(n) {
   return Number(n.toPrecision(6));
 }
 
-// A `key = value` row list. Doubles as the human worked example and as the
-// field-name contract the MCP `calculate` tool expects.
-function exampleRows(obj) {
+// Case- and separator-insensitive comparison, for deciding whether a field
+// label and its machine key say the same thing ("AWG" / "awg").
+function squash(s) {
+  return String(s).toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+// A worked-example row list. A reader who has never seen the calculator has to
+// know what a number *is* before the example teaches them anything, so each row
+// leads with the field label the live calculator prints above that input
+// ("Length one-way (ft)"). The machine key stays on the row, small and dimmed,
+// because it is the field-name contract the MCP `run_calculator` tool takes and
+// the two surfaces must stay visibly identical. `labels` is empty for a tile
+// whose renderer carries no schema; those rows fall back to the key alone.
+function exampleRows(obj, labels) {
   return Object.entries(obj || {})
     .map(([k, v]) => {
       const val = exampleValue(v);
       if (val === "") return "";
-      return `      <li><code>${escapeHtml(k)}</code> <b>${escapeHtml(val)}</b></li>`;
+      const label = labels && labels[k];
+      if (!label) return `      <li><code>${escapeHtml(k)}</code> <b>${escapeHtml(val)}</b></li>`;
+      // "AWG 10 awg": when the label is the key in prettier casing, the trailing
+      // key teaches a reader nothing and costs a third token on the row.
+      const same = squash(label) === squash(k);
+      const key = same ? "" : ` <code>${escapeHtml(k)}</code>`;
+      return `      <li><span>${escapeHtml(label)}</span> <b>${escapeHtml(val)}</b>${key}</li>`;
     })
     .filter(Boolean)
     .join("\n");
@@ -466,7 +483,7 @@ function shellFooter() {
   ].join("\n");
 }
 
-function tileShell(tool, tools, groupNames, relatedMap, examples) {
+function tileShell(tool, tools, groupNames, relatedMap, examples, labels) {
   const professionNoun = PROFESSION_NOUN[tool.trades[0]] || "Trades";
   const groupLabel = groupNames[tool.group] || tool.group;
   const groupSlug = GROUP_SLUG[tool.group] || tool.group.toLowerCase();
@@ -499,8 +516,11 @@ function tileShell(tool, tools, groupNames, relatedMap, examples) {
   // worked example, so the reader gets the point and the Run button first.
   const detail = restOfDescription(tool.desc);
   const example = (examples && examples.get(tool.id)) || null;
-  const inputRows = example ? exampleRows(example.inputs) : "";
-  const outputRows = example ? exampleRows(example.outputs) : "";
+  // Only the inputs carry labels: a renderer schema's `outputs` entries are
+  // display-line ids ("fr", "asp"), not the compute result keys the fixture
+  // records, so there is no honest mapping for the "You get" side.
+  const inputRows = example ? exampleRows(example.inputs, labels) : "";
+  const outputRows = example ? exampleRows(example.outputs, null) : "";
   const assumptionRows = (citation && Array.isArray(citation.assumptions) ? citation.assumptions : [])
     .map((a) => `      <li><span>${escapeHtml(a.name)}</span> <b>${escapeHtml(a.value)}</b><small>${escapeHtml(a.source)}</small></li>`)
     .join("\n");
@@ -694,11 +714,16 @@ async function main() {
   const relatedMod = await import(resolve(ROOT, "scripts/related-tiles.mjs"));
   const relatedMap = relatedMod.RELATED || {};
   const examples = await loadWorkedExamples();
+  // The field labels the browser prints above each input, resolved through the
+  // same MCP catalog layer the agent surface reads, so the label on a shell and
+  // the label in the calculator can never drift. ~140 ms for the whole catalog.
+  const { inputLabels } = await import(resolve(ROOT, "mcp/catalog.mjs"));
 
   let shellCount = 0;
   // Per-tile shells.
   for (const tool of tools) {
-    const html = tileShell(tool, tools, groupNames, relatedMap, examples);
+    const labels = await inputLabels(tool.id);
+    const html = tileShell(tool, tools, groupNames, relatedMap, examples, labels);
     const out = resolve(DIST, "tools", tool.id, "index.html");
     await mkdir(dirname(out), { recursive: true });
     await writeFile(out, html, "utf8");

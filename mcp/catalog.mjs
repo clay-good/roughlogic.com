@@ -380,6 +380,31 @@ export async function describe({ id } = {}) {
   return out;
 }
 
+// The human field labels the browser prints above each input ("Length one-way
+// (ft)"), keyed by the field name `run` takes. The static tile shells read this
+// so the worked example on a page names its inputs the way the calculator does,
+// instead of showing only the machine key. Tiles whose renderer carries no
+// schema -- or whose schema keys diverge from the compute params, the same
+// consistency rule `describe` applies -- return {} and the shell falls back to
+// the key. Never throws: a shell build must not fail on an unknown id.
+export async function inputLabels(id) {
+  const { COMPUTE_MAP, RENDERER_MAP, modCache } = await load();
+  const reg = COMPUTE_MAP[id];
+  if (!reg) return {};
+  try {
+    const fn = await importCompute(reg, modCache);
+    const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
+    if (!schema) return {};
+    const out = {};
+    for (const f of schema.inputs) {
+      if (f && f.key && typeof f.label === "string" && f.label.trim()) out[f.key] = f.label.trim();
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
 export async function run({ id, inputs } = {}) {
   const { COMPUTE_MAP, RENDERER_MAP, examples, modCache, byId } = await load();
   if (!byId.has(id)) throw new Error(`unknown calculator id: ${id}`);
