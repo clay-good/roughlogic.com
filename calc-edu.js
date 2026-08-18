@@ -2583,13 +2583,13 @@ export function computeSpearman({ x_values, y_values, alpha = 0.05 } = {}) {
     note: "Spearman's rank correlation rho, the nonparametric companion to Pearson's r: it is Pearson's r computed on the RANKS of the two series rather than their raw values (tied values take the average rank). Because it works on ranks it measures any MONOTONIC relationship, not just a straight-line one, and it shrugs off outliers and non-normal data - the right tool for ordinal ratings or a curved but steadily-rising trend. rho runs from -1 (perfectly decreasing) through 0 (no monotonic trend) to +1 (perfectly increasing). The two-sided p-value tests rho = 0 with t = rho sqrt((n-2)/(1-rho^2)) on n-2 df, the same approximation scipy.stats.spearmanr uses; for very small samples it is only approximate. A statistics aid; the study design governs.",
   };
 }
-export const spearmanExample = { inputs: { x_values: "1, 2, 3, 4, 5", y_values: "2, 4, 5, 4, 5", alpha: 0.05 } };
+export const spearmanExample = { inputs: { x_values: "1, 2, 3, 4, 5, 6, 7, 8, 9, 10", y_values: "3, 1, 4, 1, 5, 9, 2, 6, 5, 8", alpha: 0.05 } };
 function renderSpearman(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Spearman's rank correlation per OpenIntro Statistics (nonparametric association), by name: rho is Pearson's r on the average-tied ranks; two-sided p from t = rho sqrt((n-2)/(1-rho^2)) on n-2 df, reusing the bundled Student-t CDF. Verified against scipy.stats.spearmanr. Free at openintro.org.";
-  const X = makeTextarea("X series (values separated by commas, spaces, or new lines)", "spr-x", { placeholder: "1, 2, 3, 4, 5", rows: "3" });
-  const Y = makeTextarea("Y series (same count as X)", "spr-y", { placeholder: "2, 4, 5, 4, 5", rows: "3" });
+  const X = makeTextarea("X series (values separated by commas, spaces, or new lines)", "spr-x", { placeholder: "1, 2, 3, 4, 5, 6, 7, 8, 9, 10", rows: "3" });
+  const Y = makeTextarea("Y series (same count as X)", "spr-y", { placeholder: "3, 1, 4, 1, 5, 9, 2, 6, 5, 8", rows: "3" });
   for (const f of [X, Y]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { X.input.value = "1, 2, 3, 4, 5"; Y.input.value = "2, 4, 5, 4, 5"; update(); });
+  attachExampleButton(inputRegion, () => { X.input.value = "1, 2, 3, 4, 5, 6, 7, 8, 9, 10"; Y.input.value = "3, 1, 4, 1, 5, 9, 2, 6, 5, 8"; update(); });
   const oR = makeOutputLine(outputRegion, "Spearman rho / strength", "spr-out-r");
   const oP = makeOutputLine(outputRegion, "p-value / significance", "spr-out-p");
   const oW = makeOutputLine(outputRegion, "Warnings", "spr-out-w");

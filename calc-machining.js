@@ -475,7 +475,7 @@ export function computeBoringBarMaxOverhang({ d_in = 0, f_lb = 0, allowable_defl
     note: "The longest overhang a boring bar or tool can stick out before its tip deflection reaches the allowable, the inverse of the boring-bar-deflection tile: from delta = F L^3 / (3 E I) with I = pi d^4 / 64, L_max = (3 E I delta / F)^(1/3). Deflection is only half the story: check the reported L/d against the chatter limit (a steel bar is stable to about 4:1, solid carbide to 6:1-8:1). If the deflection-limited overhang exceeds the chatter L/d, chatter governs and the real max overhang is the shorter one. Because deflection scales with L^3, this length is a hard wall - a little more stickout blows the tolerance. Static solid-round cantilever; a real cut adds dynamic/regenerative chatter this does not model. A shop aid; the tool and setup govern."
   };
 }
-export const boringBarMaxOverhangExample = { inputs: { d_in: 0.75, f_lb: 100, allowable_deflection_in: 0.015, e_psi: 30e6 } };
+export const boringBarMaxOverhangExample = { inputs: { d_in: 0.75, f_lb: 100, allowable_deflection_in: 0.0154524, e_psi: 30e6 } };
 
 function renderBoringBarMaxOverhang(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: cantilever deflection solved for overhang: L_max = (3 E I delta / F)^(1/3), I = pi d^4/64, E = 30e6 psi steel / ~90e6 carbide, with the practical L/d chatter limits, by name. Static solid-round model, not a stability-lobe analysis. A shop aid; the tool and setup govern.";
@@ -484,7 +484,7 @@ function renderBoringBarMaxOverhang(inputRegion, outputRegion, citationEl) {
   const delta = makeNumber("Allowable tip deflection (in)", "bbmo-delta", { step: "any", min: "0" });
   const e = makeNumber("Modulus E (psi: 30e6 steel, ~90e6 carbide)", "bbmo-e", { step: "any", min: "0" }); e.input.value = "30000000";
   for (const x of [d, f, delta, e]) inputRegion.appendChild(x.wrap);
-  attachExampleButton(inputRegion, () => { d.input.value = "0.75"; f.input.value = "100"; delta.input.value = "0.015"; e.input.value = "30000000"; update(); });
+  attachExampleButton(inputRegion, () => { d.input.value = "0.75"; f.input.value = "100"; delta.input.value = "0.0154524"; e.input.value = "30000000"; update(); });
   const oL = makeOutputLine(outputRegion, "Max overhang (deflection-limited)", "bbmo-out-l");
   const oLd = makeOutputLine(outputRegion, "L/d at that overhang", "bbmo-out-ld");
   const oNote = makeOutputLine(outputRegion, "Note", "bbmo-out-note");

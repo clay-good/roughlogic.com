@@ -20,7 +20,7 @@ const close = (a, b, tol = 0.001) => Math.abs(a - b) <= tol;
 const closeRel = (a, b, tol = 0.001) => Math.abs(a - b) / Math.abs(b) <= tol;
 
 // 255 Dilution
-test("Dilution: example solves V1", () => { const r = computeDilution(dilutionExample.inputs); assert.ok(close(r.v1, 0.001)); });
+test("Dilution: example solves V1", () => { const r = computeDilution(dilutionExample.inputs); assert.ok(close(r.v1, 0.005)); });
 test("Dilution: solve C2 from C1V1V2", () => { const r = computeDilution({ c1: 2, v1: 0.005, c2: 0, v2: 0.020 }); assert.ok(close(r.c2, 0.5)); });
 test("Dilution: diluent volume = V2 - V1", () => { const r = computeDilution({ c1: 1, v1: 0, c2: 0.1, v2: 0.010 }); assert.ok(close(r.diluent_volume, 0.009)); });
 test("Dilution: too few knowns errors", () => { assert.ok(computeDilution({ c1: 1, v1: 0, c2: 0, v2: 0 }).error); });

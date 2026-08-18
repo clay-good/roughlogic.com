@@ -1867,7 +1867,7 @@ export function computeCranePowerLineClearance({ option = "default", voltage_kv 
   return { route, required_clearance_ft, default_clearance_ft, default_assumed, table_a_ft, table_a_saving_ft, table_a_helps, over_1000kv, determinable, clearance_ok, clearance_shortfall_ft, default_is_unsafe, boom_reaches, passes, note };
 }
 
-export const cranePowerLineClearanceExample = { inputs: { option: "default", voltage_kv: 0, actual_clearance_ft: 12, boom_length_ft: 80 } };
+export const cranePowerLineClearanceExample = { inputs: { option: "table-a", voltage_kv: 12, actual_clearance_ft: 12, boom_length_ft: 80 } };
 
 function _v1157renderCranePowerLineClearance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: OSHA 29 CFR 1926.1408, a US federal regulation in the public domain. For power lines up to 350 kV the employer must either confirm from the utility owner or operator that the line has been deenergized and visibly grounded at the worksite; or ensure that no part of the equipment, load line, or load - including rigging and lifting accessories - gets closer than 20 feet to the line while implementing the encroachment-prevention measures of paragraph (b); or determine the line's voltage and use the Table A minimum clearance distance while implementing those same measures. Table A: up to 50 kV, 10 ft; over 50 to 200 kV, 15 ft; over 200 to 350 kV, 20 ft; over 350 to 500 kV, 25 ft; over 500 to 750 kV, 35 ft; over 750 to 1,000 kV, 45 ft; over 1,000 kV, as established by the utility owner or operator or a registered professional engineer who is a qualified person with respect to electrical power transmission and distribution. Not checked: the encroachment-prevention measures themselves, the planning meeting and work-zone identification, assembly and disassembly near power lines, travel with no load, or the utility's voltage confirmation. A screen, not a lift plan; Subpart CC, the utility, and the qualified person govern.";
@@ -1880,7 +1880,7 @@ function _v1157renderCranePowerLineClearance(inputRegion, outputRegion, citation
   const ac = makeNumber("Actual clearance held (ft)", "cpc-ac", { step: "any", min: "0" }); ac.input.value = "12";
   const bl = makeNumber("Boom length (ft; 0 to skip)", "cpc-bl", { step: "any", min: "0" }); bl.input.value = "80";
   inputRegion.appendChild(op.wrap); inputRegion.appendChild(kv.wrap); inputRegion.appendChild(ac.wrap); inputRegion.appendChild(bl.wrap);
-  attachExampleButton(inputRegion, () => { op.select.value = "default"; kv.input.value = "0"; ac.input.value = "12"; bl.input.value = "80"; update(); });
+  attachExampleButton(inputRegion, () => { op.select.value = "table-a"; kv.input.value = "12"; ac.input.value = "12"; bl.input.value = "80"; update(); });
   const oR = makeOutputLine(outputRegion, "Required clearance", "cpc-out-r");
   const oV = makeOutputLine(outputRegion, "Verdict", "cpc-out-v");
   const oT = makeOutputLine(outputRegion, "What determining the voltage buys", "cpc-out-t");

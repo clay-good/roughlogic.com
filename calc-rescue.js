@@ -450,7 +450,7 @@ export function computeFallArrestClearance({ free_fall_distance_ft = 0, decelera
     note: "Required fall clearance below the anchor for a personal fall-arrest system: RFC = free-fall distance + deceleration distance + worker height (harness D-ring to the feet) + a safety margin. Enter each explicitly - the free-fall distance depends on the anchor position relative to the D-ring (a foot-level anchor gives a large free fall, an overhead anchor a small one) and on the connector length; the deceleration distance is the energy absorber's stroke, which ANSI Z359.1 caps at 3.5 ft for a shock-absorbing lanyard (a self-retracting lifeline is much less); the worker height D-ring-to-feet is about 5 ft; and the safety margin (commonly 2-3 ft) keeps the feet off the lower level. If the available clearance below the anchor is less than RFC, the worker contacts the level before the system arrests the fall. A planning aid; the equipment manufacturer's instructions and a qualified/competent person govern per ANSI Z359 and OSHA 1926 Subpart M.",
   };
 }
-export const fallArrestClearanceExample = { inputs: { free_fall_distance_ft: 6, deceleration_distance_ft: 3.5, worker_height_ft: 5, safety_margin_ft: 3, available_clearance_ft: 0 } };
+export const fallArrestClearanceExample = { inputs: { free_fall_distance_ft: 6, deceleration_distance_ft: 3.5, worker_height_ft: 5, safety_margin_ft: 3, available_clearance_ft: 20 } };
 
 function renderFallArrestClearance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: the equipment manufacturer's instructions and a qualified / competent person govern all fall protection per ANSI Z359.1 and OSHA 1926 Subpart M; a planning aid. Citation: required fall clearance RFC = free-fall distance + deceleration distance + worker height (D-ring to feet) + safety margin. Deceleration distance is capped at 3.5 ft for a shock-absorbing lanyard (Z359); the free-fall distance depends on the anchor position and connector length.";
@@ -468,7 +468,7 @@ function renderFallArrestClearance(inputRegion, outputRegion, citationEl) {
   const oR = _moF(outputRegion, "Required clearance below anchor", "fac-out-r");
   const oM = _moF(outputRegion, "Margin vs available", "fac-out-m");
   const oN = _moF(outputRegion, "Note", "fac-out-n");
-  function fillExample(x) { ffd.input.value = x.free_fall_distance_ft; dd.input.value = x.deceleration_distance_ft; hh.input.value = x.worker_height_ft; sf.input.value = x.safety_margin_ft; av.input.value = ""; update(); }
+  function fillExample(x) { ffd.input.value = x.free_fall_distance_ft; dd.input.value = x.deceleration_distance_ft; hh.input.value = x.worker_height_ft; sf.input.value = x.safety_margin_ft; av.input.value = x.available_clearance_ft; update(); }
   const update = _debF(() => {
     const r = computeFallArrestClearance({ free_fall_distance_ft: Number(ffd.input.value) || 0, deceleration_distance_ft: Number(dd.input.value) || 0, worker_height_ft: Number(hh.input.value) || 0, safety_margin_ft: Number(sf.input.value) || 0, available_clearance_ft: Number(av.input.value) || 0 });
     if (r.error) { oR.textContent = r.error; oM.textContent = "-"; oN.textContent = ""; return; }

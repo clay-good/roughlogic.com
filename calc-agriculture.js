@@ -220,7 +220,7 @@ export function computeUniformity({ catch_volumes = [] }) {
   return { mean, CU: cu, DU: du, pass_CU_85: cu >= 85, pass_DU_75: du >= 75 };
 }
 
-export const uniformityExample = { inputs: { catch_volumes: [1.05, 0.95, 1.10, 0.98, 1.02, 0.93, 1.07, 0.99] } };
+export const uniformityExample = { inputs: { catch_volumes: [100, 95, 98, 102, 105, 99, 97, 101] } };
 
 // --- 208: Soil Bulk Density and Compaction ---
 

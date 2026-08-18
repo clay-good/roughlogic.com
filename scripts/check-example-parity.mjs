@@ -44,10 +44,27 @@ for (const r of rows) if (!fixture.has(r.tile_id)) fixture.set(r.tile_id, r);
 // tighter than any rounding in the catalog and still catches every real
 // divergence; the closest genuine one (0.015452 vs 0.015) is 3% out.
 const DISPLAY_TOLERANCE = 0.001;
-const same = (a, b) =>
-  (typeof a === "number" && typeof b === "number")
-    ? Math.abs(a - b) <= Math.max(Math.abs(b) * DISPLAY_TOLERANCE, 1e-12)
-    : String(a) === String(b);
+const close = (a, b) => Math.abs(a - b) <= Math.max(Math.abs(b) * DISPLAY_TOLERANCE, 1e-12);
+
+// A multi-value field is a comma list on one side and an array on the other
+// whenever the renderer takes a textarea ("0.005, 0.005, 0.005") and the
+// fixture pins the parsed form ([0.005, 0.005, 0.005]). Same example, two
+// spellings of the same list; compare it element-wise.
+function numberList(v) {
+  if (Array.isArray(v) && v.every((x) => typeof x === "number")) return v;
+  if (typeof v === "string" && /^[\s\d.,+eE-]+$/.test(v)) {
+    const parts = v.split(",").map((x) => Number(x.trim()));
+    if (parts.length > 1 && parts.every(Number.isFinite)) return parts;
+  }
+  return null;
+}
+
+const same = (a, b) => {
+  if (typeof a === "number" && typeof b === "number") return close(a, b);
+  const la = numberList(a), lb = numberList(b);
+  if (la && lb) return la.length === lb.length && la.every((x, i) => close(x, lb[i]));
+  return String(a) === String(b);
+};
 
 const diverged = [];
 let compared = 0;

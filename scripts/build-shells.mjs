@@ -495,7 +495,10 @@ function tileShell(tool, tools, groupNames, relatedMap, examples) {
     // prints, so a reader who just read "awg 12 -> 24.4 A" lands on a
     // calculator already showing it, ready to be edited. Tiles with no example
     // button ignore the param.
-    `    <a class="shell-run-link" href="../../#${escapeHtml(tool.id)}${example ? "?example=1" : ""}">Run the calculator</a>`,
+    // 17 tiles are reference pages with nothing to enter (LOTO steps, water-loss
+    // classes). "Run the calculator" promises them a calculator; say what they
+    // actually get.
+    `    <a class="shell-run-link" href="../../#${escapeHtml(tool.id)}${example ? "?example=1" : ""}">${inputRows ? "Run the calculator" : "Open the reference"}</a>`,
     '  </p>',
     inputRows ? [
       '  <section class="shell-section" aria-label="Example">',

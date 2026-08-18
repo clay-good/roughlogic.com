@@ -1400,10 +1400,13 @@ export function computeTimesheet({ jobs = [], regular_rate = 0, weekly_overtime_
 export const timesheetExample = {
   inputs: {
     jobs: [
-      { start_hr: 8, end_hr: 12, lunch_min: 0, miles: 10 },
-      { start_hr: 13, end_hr: 17, lunch_min: 0, miles: 5 },
+      { start_hr: 7, end_hr: 17, lunch_min: 30, miles: 30 },
+      { start_hr: 7, end_hr: 18, lunch_min: 30, miles: 50 },
+      { start_hr: 7, end_hr: 17, lunch_min: 30, miles: 40 },
+      { start_hr: 7, end_hr: 17, lunch_min: 30, miles: 30 },
+      { start_hr: 7, end_hr: 16, lunch_min: 30, miles: 20 },
     ],
-    regular_rate: 35,
+    regular_rate: 25,
   },
 };
 
@@ -1672,7 +1675,8 @@ function renderTimesheet(inputRegion, outputRegion, citationEl) {
   _aeG(inputRegion, () => fillExample(timesheetExample.inputs));
   const list = document.createElement("div"); inputRegion.appendChild(list);
   const rows = [];
-  for (let i = 0; i < 4; i++) {
+  // Five day rows: a timesheet week, and the length of the worked example.
+  for (let i = 0; i < 5; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
     const s = document.createElement("input"); s.type = "number"; s.step = "any"; s.inputMode = "decimal"; s.placeholder = "Start (hr 0-24)"; s.setAttribute("aria-label", "Day " + (i + 1) + " start hour");
     const e = document.createElement("input"); e.type = "number"; e.step = "any"; e.inputMode = "decimal"; e.placeholder = "End (hr 0-24)"; e.setAttribute("aria-label", "Day " + (i + 1) + " end hour");

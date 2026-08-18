@@ -9718,28 +9718,32 @@
    "source_publisher": "ACCA Manual D / ASHRAE Fundamentals",
    "source_title": "Total external static pressure: TESP = sum(element dp)",
    "source_edition_or_year": "ACCA Manual D / ASHRAE Fundamentals duct-design chapter (filter, coil, duct, register, etc. additive)",
-   "source_section_or_page": "filter 0.25 + coil 0.30 + duct 0.20 -> 0.75 in WC TESP",
+   "source_section_or_page": "filter 0.10 + coil 0.30 + supply duct 0.20 + return duct 0.10 -> 0.70 in WC TESP",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
     "elements": [
      {
-      "name": "filter",
-      "dp_in_wc": 0.25
+      "name": "Filter",
+      "dp_in_wc": 0.1
      },
      {
-      "name": "coil",
+      "name": "Coil",
       "dp_in_wc": 0.3
      },
      {
-      "name": "duct",
+      "name": "Supply duct",
       "dp_in_wc": 0.2
+     },
+     {
+      "name": "Return duct",
+      "dp_in_wc": 0.1
      }
     ]
    },
    "outputs": {
     "total_in_wc": {
-     "value": 0.75,
+     "value": 0.7,
      "tolerance": {
       "abs": 0.001
      }
@@ -10041,32 +10045,32 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Molarity dilution: C1*V1 = C2*V2; diluent_volume = V2 - V1",
    "source_edition_or_year": "n/a; standard solution-prep identity",
-   "source_section_or_page": "C1 = 1.0 M / C2 = 0.1 M / V2 = 50 mL -> V1 = 5 mL stock + 45 mL diluent",
+   "source_section_or_page": "C1 = 1.0 M / C2 = 0.1 M / V2 = 0.05 L (50 mL) -> V1 = 0.005 L stock + 0.045 L diluent",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
     "c1": 1,
     "v1": null,
     "c2": 0.1,
-    "v2": 50
+    "v2": 0.05
    },
    "outputs": {
     "v1": {
-     "value": 5,
+     "value": 0.005,
      "tolerance": {
-      "abs": 0.001
+      "abs": 1e-06
      }
     },
     "v2": {
-     "value": 50,
+     "value": 0.05,
      "tolerance": {
-      "abs": 0.001
+      "abs": 1e-06
      }
     },
     "diluent_volume": {
-     "value": 45,
+     "value": 0.045,
      "tolerance": {
-      "abs": 0.001
+      "abs": 1e-06
      }
     }
    }

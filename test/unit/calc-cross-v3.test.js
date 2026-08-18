@@ -115,7 +115,7 @@ test("Rainwater: negative annual errors", () => { const r = computeRainwaterYiel
 test("Rainwater: empty monthly returns 0", () => { const r = computeRainwaterYield({ catchment_ft2: 1000, monthly_in: [], efficiency: 0.62 }); assert.equal(r.annual_gal, 0); });
 
 // 171 Timesheet
-test("Timesheet: example yields 8 hours", () => { const r = computeTimesheet(timesheetExample.inputs); assert.equal(r.total_hours, 8); });
+test("Timesheet: example yields a 47.5-hour week with 7.5 hr OT", () => { const r = computeTimesheet(timesheetExample.inputs); assert.equal(r.total_hours, 47.5); assert.equal(r.regular_hours, 40); assert.equal(r.overtime_hours, 7.5); });
 test("Timesheet: no jobs errors", () => { const r = computeTimesheet({ jobs: [], regular_rate: 30 }); assert.ok(r.error); });
 test("Timesheet: end < start errors", () => { const r = computeTimesheet({ jobs: [{ start_hr: 13, end_hr: 8, lunch_min: 0, miles: 0 }], regular_rate: 30 }); assert.ok(r.error); });
 test("Timesheet: lunch deducted", () => { const r = computeTimesheet({ jobs: [{ start_hr: 8, end_hr: 17, lunch_min: 60, miles: 0 }], regular_rate: 0 }); assert.equal(r.total_hours, 8); });

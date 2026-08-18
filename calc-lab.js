@@ -115,7 +115,7 @@ export function computeDilution({ c1, v1, c2, v2 }) {
   return { ...out, diluent_volume };
 }
 
-export const dilutionExample = { inputs: { c1: 1.0, v1: 0, c2: 0.1, v2: 0.010 }, expected: { v1: 0.001 } };
+export const dilutionExample = { inputs: { c1: 1.0, v1: 0, c2: 0.1, v2: 0.05 }, expected: { v1: 0.005 } };
 
 // --- 256: Serial Dilution Planner ---
 
@@ -685,7 +685,7 @@ function renderDilution(inputRegion, outputRegion, citationEl) {
     dil.textContent = r.diluent_volume === null ? r.flag : fmt(r.diluent_volume, 4) + " L";
   }, DEBOUNCE_MS);
   for (const f of [c1, v1, c2, v2]) f.input.addEventListener("input", update);
-  attachExampleButton(inputRegion, () => { c1.input.value = 1.0; v1.input.value = 0; c2.input.value = 0.1; v2.input.value = 0.010; update(); });
+  attachExampleButton(inputRegion, () => { c1.input.value = 1.0; v1.input.value = 0; c2.input.value = 0.1; v2.input.value = 0.05; update(); });
 }
 
 function renderSerialDilution(inputRegion, outputRegion, citationEl) {
