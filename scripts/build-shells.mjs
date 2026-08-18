@@ -140,8 +140,18 @@ async function loadWorkedExamples() {
 function exampleValue(v) {
   const raw = (v && typeof v === "object" && !Array.isArray(v) && "value" in v) ? v.value : v;
   if (raw === null || raw === undefined) return "";
-  if (typeof raw === "object") return JSON.stringify(raw);
+  if (typeof raw === "object") return JSON.stringify(raw, (k, x) => (typeof x === "number" ? readableNumber(x) : x));
+  if (typeof raw === "number") return String(readableNumber(raw));
   return String(raw);
+}
+
+// An inverse tile's fixture holds the full-precision output of its forward
+// counterpart, so the raw literal reads "target_rpm 6385.22978372389" -- a
+// number nobody types. Six significant digits is past every tolerance in the
+// registry (5e-6 relative) and reads as a number.
+function readableNumber(n) {
+  if (!Number.isFinite(n) || Number.isInteger(n)) return n;
+  return Number(n.toPrecision(6));
 }
 
 // A `key = value` row list. Doubles as the human worked example and as the

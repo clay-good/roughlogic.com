@@ -106,8 +106,7 @@
     "shape": "footing",
     "length_ft": 20,
     "width_ft": 10,
-    "thickness_in": 4,
-    "waste_factor": 0
+    "thickness_in": 4
    },
    "outputs": {
     "cubic_yards": {
@@ -1116,8 +1115,7 @@
    "inputs": {
     "fixed_costs": 50000,
     "variable_cost_per_unit": 8,
-    "sale_price_per_unit": 20,
-    "target_units": 0
+    "sale_price_per_unit": 20
    },
    "outputs": {
     "contribution_margin": {
@@ -1304,7 +1302,6 @@
    "inputs": {
     "solve_for": "volume",
     "pressure_atm": 1,
-    "volume_l": 0,
     "moles": 1,
     "temperature_c": 25
    },
@@ -1335,7 +1332,6 @@
     "solve_for": "moles",
     "pressure_atm": 1,
     "volume_l": 22.414,
-    "moles": 0,
     "temperature_c": 0
    },
    "outputs": {
@@ -2392,8 +2388,7 @@
    "inputs": {
     "nozzle_pressure_psi": 100,
     "friction_loss_psi": 25,
-    "elevation_ft": 20,
-    "appliance_loss_psi": 0
+    "elevation_ft": 20
    },
    "outputs": {
     "pdp_psi": {
@@ -2781,7 +2776,6 @@
    "inputs": {
     "speed_mph": 55,
     "friction_coefficient": 0.7,
-    "grade_percent": 0,
     "reaction_time_s": 1.5
    },
    "outputs": {
@@ -3702,8 +3696,7 @@
     "return_db_F": 75,
     "return_wb_F": 63,
     "supply_db_F": 55,
-    "cfm": 1200,
-    "altitude_ft": 0
+    "cfm": 1200
    },
    "outputs": {
     "Q_sensible_btu_hr": {
@@ -3982,8 +3975,7 @@
    "inputs": {
     "speed_mph": 55,
     "reaction_time_s": 2.5,
-    "friction": 0.35,
-    "grade": 0
+    "friction": 0.35
    },
    "outputs": {
     "perception_reaction_ft": {
@@ -4017,8 +4009,7 @@
    "inputs": {
     "sight_distance_ft": 490.225,
     "reaction_time_s": 2.5,
-    "friction": 0.35,
-    "grade": 0
+    "friction": 0.35
    },
    "outputs": {
     "design_speed_mph": {
@@ -4062,8 +4053,7 @@
    "verified_on": "2026-07-14",
    "inputs": {
     "turn_radius_ft": 50,
-    "wheelbase1_ft": 20,
-    "wheelbase2_ft": 0
+    "wheelbase1_ft": 20
    },
    "outputs": {
     "off_tracking_ft": {
@@ -4092,8 +4082,7 @@
     "turn_radius_ft": 50,
     "wheelbase1_ft": 20,
     "wheelbase2_ft": 40,
-    "vehicle_width_ft": 8.5,
-    "front_swingout_ft": 0
+    "vehicle_width_ft": 8.5
    },
    "outputs": {
     "swept_path_width_ft": {
@@ -4121,9 +4110,7 @@
    "inputs": {
     "turn_radius_ft": 50,
     "wheelbase1_ft": 20,
-    "wheelbase2_ft": 0,
-    "vehicle_width_ft": 8.5,
-    "front_swingout_ft": 0
+    "vehicle_width_ft": 8.5
    },
    "outputs": {
     "swept_path_width_ft": {
@@ -4252,7 +4239,6 @@
    "inputs": {
     "main_breaker_a": 200,
     "busbar_rating_a": 200,
-    "pv_existing_a": 0,
     "pv_proposed_a": 40,
     "method": "opposite_end_load_side"
    },
@@ -4746,8 +4732,7 @@
     "start_soc_pct": 20,
     "target_soc_pct": 80,
     "electricity_rate": 0.45,
-    "efficiency_pct": 92,
-    "miles_per_kwh": 0
+    "efficiency_pct": 92
    },
    "outputs": {
     "grid_energy_kwh": {
@@ -4846,7 +4831,6 @@
    "verified_on": "2026-07-10",
    "inputs": {
     "ocpd_rating_a": 20,
-    "pv_isc_a": 0,
     "vd_upsized": "no"
    },
    "outputs": {
@@ -4873,7 +4857,6 @@
    "verified_by": "rl",
    "verified_on": "2026-07-10",
    "inputs": {
-    "ocpd_rating_a": 0,
     "pv_isc_a": 10,
     "vd_upsized": "yes"
    },
@@ -4945,7 +4928,6 @@
     "water_heater_kw": 4.5,
     "hvac_heating_kw": 9,
     "hvac_cooling_kw": 5,
-    "ev_charger_a": 0,
     "service_voltage": 240
    },
    "outputs": {
@@ -8190,7 +8172,6 @@
     "pipe_OD_in": 2.375,
     "surface_T_F": 200,
     "ambient_T_F": 70,
-    "air_velocity_fpm": 0,
     "insulation": "fiberglass",
     "thickness_in": 1.5,
     "jacket_emissivity": 0.9
@@ -8662,7 +8643,6 @@
     "H_in": 12,
     "V_in": 30,
     "D_in": 20,
-    "asymmetry_deg": 0,
     "frequency_per_min": 1,
     "duration_hr": 1,
     "coupling": "good"
@@ -8692,7 +8672,6 @@
    "verified_on": "2026-05-11",
    "inputs": {
     "row_width_in": 30,
-    "in_row_spacing_in": 0,
     "target_pop_per_acre": 32000,
     "seeds_per_lb": 1500,
     "germination_pct": 95,
@@ -8987,8 +8966,7 @@
    "verified_on": "2026-07-18",
    "inputs": {
     "ep_quantity_needed": 20,
-    "yield_pct": 75,
-    "unit_weight": 0
+    "yield_pct": 75
    },
    "outputs": {
     "ap_quantity": {
@@ -9009,8 +8987,7 @@
    "verified_on": "2026-07-18",
    "inputs": {
     "ep_quantity_needed": 10,
-    "yield_pct": 88,
-    "unit_weight": 0
+    "yield_pct": 88
    },
    "outputs": {
     "ap_quantity": {
@@ -9147,8 +9124,6 @@
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
-    "rise_ft": 0,
-    "run_ft": 0,
     "measured_angle_deg": 32
    },
    "outputs": {
@@ -9354,8 +9329,7 @@
    "verified_on": "2026-06-06",
    "inputs": {
     "mode": "convert",
-    "footcandles": 100,
-    "lux": 0
+    "footcandles": 100
    },
    "outputs": {
     "footcandles": {
@@ -9383,9 +9357,7 @@
    "inputs": {
     "i_single_A": 200,
     "n_sets": 3,
-    "total_ccc": 0,
     "ambient_factor": 1,
-    "i_load_A": 0,
     "conductor_size": "3/0"
    },
    "outputs": {
@@ -9420,8 +9392,7 @@
    "inputs": {
     "ia_A": 100,
     "ib_A": 80,
-    "ic_A": 60,
-    "triplen_pct": 0
+    "ic_A": 60
    },
    "outputs": {
     "neutral_A": {
@@ -9486,8 +9457,7 @@
    "verified_on": "2026-06-06",
    "inputs": {
     "solve_for": "velocity",
-    "vp_inwc": 0.25,
-    "velocity_fpm": 0
+    "vp_inwc": 0.25
    },
    "outputs": {
     "velocity_fpm": {
@@ -9560,7 +9530,6 @@
    "inputs": {
     "nozzle_type": "smooth",
     "bore_in": 1,
-    "flow_gpm": 0,
     "nozzle_pressure_psi": 50
    },
    "outputs": {
@@ -9583,8 +9552,7 @@
    "inputs": {
     "solve_for": "flow",
     "k_factor": 5.6,
-    "pressure_psi": 7,
-    "flow_gpm": 0
+    "pressure_psi": 7
    },
    "outputs": {
     "flow_gpm": {
@@ -9608,8 +9576,7 @@
     "fluid": "liquid",
     "specific_gravity": 1,
     "cv": 10,
-    "dp_psi": 25,
-    "flow_gpm": 0
+    "dp_psi": 25
    },
    "outputs": {
     "flow_gpm": {
@@ -9652,9 +9619,7 @@
    "verified_on": "2026-06-06",
    "inputs": {
     "method": "sqrt",
-    "raw_score": 49,
-    "param": 0,
-    "class_mean": 0
+    "raw_score": 49
    },
    "outputs": {
     "curved": {
@@ -10433,7 +10398,6 @@
    "verified_on": "2026-05-11",
    "inputs": {
     "net_se_earnings": 80000,
-    "w2_ss_wages": 0,
     "tax_year": 2025,
     "filing_status": "single"
    },
@@ -10523,8 +10487,7 @@
     "stories": 2,
     "construction_class": 2,
     "occupancy_factor": 1,
-    "exposure_distance_ft": 50,
-    "exposure_communication_factor": 0
+    "exposure_distance_ft": 50
    },
    "outputs": {
     "F_factor": {
@@ -10570,7 +10533,6 @@
    "inputs": {
     "run_ft": 14,
     "pitch": 6,
-    "pitch_irregular": 0,
     "overhang_in": 12,
     "jack_oc_in": 16
    },
@@ -11259,7 +11221,6 @@
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
-    "elevation_ft": 0,
     "water_temp_F": 60,
     "source_elevation_relative_ft": 5,
     "friction_loss_ft": 2,
@@ -11669,7 +11630,6 @@
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
-    "target_qt": 0,
     "target_servings": 120,
     "portion_oz": 6,
     "pan_size": "full",
@@ -13052,8 +13012,7 @@
     "chamber_cc": 64,
     "gasket_bore_in": 4.1,
     "gasket_thickness_in": 0.04,
-    "deck_clearance_in": 0.005,
-    "dome_dish_cc": 0
+    "deck_clearance_in": 0.005
    },
    "outputs": {
     "displacement_in3": {
@@ -13096,8 +13055,7 @@
     "target_cr": 10.73,
     "gasket_bore_in": 4.1,
     "gasket_thickness_in": 0.04,
-    "deck_clearance_in": 0.005,
-    "dome_dish_cc": 0
+    "deck_clearance_in": 0.005
    },
    "outputs": {
     "chamber_cc": {
@@ -13122,8 +13080,7 @@
     "target_cr": 9.0,
     "gasket_bore_in": 4.1,
     "gasket_thickness_in": 0.04,
-    "deck_clearance_in": 0.005,
-    "dome_dish_cc": 0
+    "deck_clearance_in": 0.005
    },
    "outputs": {
     "chamber_cc": {
@@ -13223,7 +13180,6 @@
    "verified_on": "2026-05-11",
    "inputs": {
     "c1": 1000,
-    "v1": 0,
     "c2": 50,
     "v2": 100,
     "mode": "single"
@@ -13908,7 +13864,6 @@
     "term_years": 30,
     "property_tax_pct": 1.2,
     "insurance_annual": 1800,
-    "hoa_monthly": 0,
     "maintenance_pct": 1,
     "appreciation_pct": 3,
     "rent_monthly": 2200,
@@ -14095,8 +14050,7 @@
    "inputs": {
     "principal": 320000,
     "apr_percent": 6.5,
-    "term_years": 30,
-    "extra_monthly_principal": 0
+    "term_years": 30
    },
    "outputs": {
     "monthly_principal_and_interest": {
@@ -14430,9 +14384,7 @@
     "apr_percent": 6.5,
     "term_years": 30,
     "annual_property_tax": 4800,
-    "annual_insurance": 1800,
-    "monthly_hoa": 0,
-    "monthly_pmi": 0
+    "annual_insurance": 1800
    },
    "outputs": {
     "monthly_principal_and_interest": {
@@ -15067,7 +15019,6 @@
    "inputs": {
     "header_span_ft": 6,
     "tributary_width_ft": 14,
-    "floors_above": 0,
     "ground_snow_psf": 30,
     "species_grade": "SPF_No2"
    },
@@ -15703,8 +15654,7 @@
     "cfm": 1000,
     "supply_db_F": 70,
     "entering_rh_pct": 20,
-    "target_rh_pct": 40,
-    "altitude_ft": 0
+    "target_rh_pct": 40
    },
    "outputs": {
     "addition_lb_hr": {
@@ -17128,8 +17078,7 @@
     "phi": 20,
     "c_psf": 300,
     "gamma": 115,
-    "h_ft": 20,
-    "q": 0
+    "h_ft": 20
    },
    "outputs": {
     "ka": {
@@ -17193,12 +17142,9 @@
    "inputs": {
     "phi": 35,
     "delta": 17.5,
-    "theta": 0,
-    "alpha": 0,
     "gamma": 120,
     "h_ft": 12,
-    "kh": 0.15,
-    "kv": 0
+    "kh": 0.15
    },
    "outputs": {
     "kae": {
@@ -17406,7 +17352,6 @@
    "verified_on": "2026-06-06",
    "inputs": {
     "target_bp_high": 10000,
-    "gel_percent": 0,
     "buffer_volume_ml": 100
    },
    "outputs": {
@@ -17862,8 +17807,7 @@
     "load_lb": 4000,
     "width_in": 3,
     "fc_perp_psi": 625,
-    "cb": 1,
-    "provided_length_in": 0
+    "cb": 1
    },
    "outputs": {
     "req_length_in": {
@@ -17921,9 +17865,7 @@
    "verified_on": "2026-06-06",
    "inputs": {
     "span_ft": 16,
-    "w_plf": 200,
-    "point_lb": 0,
-    "a_ft": 0
+    "w_plf": 200
    },
    "outputs": {
     "r_left_lb": {
@@ -17979,8 +17921,7 @@
    "verified_on": "2026-06-06",
    "inputs": {
     "volume_gal": 3000,
-    "flow_gpm": 250,
-    "resupply_gpm": 0
+    "flow_gpm": 250
    },
    "outputs": {
     "duration_min": {
@@ -18039,8 +17980,7 @@
    "inputs": {
     "loaded_mi": 800,
     "deadhead_mi": 120,
-    "revenue": 1840,
-    "surcharge": 0
+    "revenue": 1840
    },
    "outputs": {
     "deadhead_pct": {
@@ -18439,10 +18379,7 @@
    "verified_on": "2026-06-10",
    "inputs": {
     "bolt_circle_dia_in": 8,
-    "num_holes": 6,
-    "start_angle_deg": 0,
-    "center_x_in": 0,
-    "center_y_in": 0
+    "num_holes": 6
    },
    "outputs": {
     "radius_in": {
@@ -18521,8 +18458,7 @@
    "inputs": {
     "solve_for": "angle",
     "bar_length_in": 5,
-    "stack_height_in": 2.5,
-    "target_angle_deg": 0
+    "stack_height_in": 2.5
    },
    "outputs": {
     "angle_deg": {
@@ -18556,7 +18492,6 @@
    "inputs": {
     "thread_standard": "inch",
     "tpi": 20,
-    "pitch_mm": 0,
     "starts": 1
    },
    "outputs": {
@@ -18673,7 +18608,6 @@
     "cut_length_in": 6,
     "rpm": 500,
     "feed_ipr_in": 0.01,
-    "feed_ipm_in": 0,
     "passes": 4
    },
    "outputs": {
@@ -18715,10 +18649,7 @@
     "mode": "milling",
     "woc_in": 0.5,
     "doc_in": 0.1,
-    "feed_ipm_in": 10,
-    "sfm": 0,
-    "feed_ipr_in": 0,
-    "drill_dia_in": 0
+    "feed_ipm_in": 10
    },
    "outputs": {
     "mrr_in3": {
@@ -19009,9 +18940,7 @@
    "inputs": {
     "thread_standard": "inch",
     "tpi": 13,
-    "pitch_mm": 0,
-    "pitch_diameter_in": 0.45,
-    "wire_dia_in": 0
+    "pitch_diameter_in": 0.45
    },
    "outputs": {
     "best_wire_in": {
@@ -19039,9 +18968,7 @@
    "inputs": {
     "thread_standard": "inch",
     "tpi": 13,
-    "pitch_mm": 0,
-    "measurement_over_wires_in": 0.49,
-    "wire_dia_in": 0
+    "measurement_over_wires_in": 0.49
    },
    "outputs": {
     "best_wire_in": {
@@ -19069,9 +18996,6 @@
    "inputs": {
     "shape": "round",
     "diameter_in": 0.5,
-    "side_a_in": 0,
-    "side_b_in": 0,
-    "perimeter_in": 0,
     "thickness_in": 0.25,
     "shear_strength_psi": 50000
    },
@@ -19246,12 +19170,7 @@
    "verified_on": "2026-06-11",
    "inputs": {
     "c": 0.25,
-    "mn": 0.8,
-    "cr": 0,
-    "mo": 0,
-    "v": 0,
-    "ni": 0,
-    "cu": 0
+    "mn": 0.8
    },
    "outputs": {
     "carbon_equivalent": {
@@ -19274,7 +19193,6 @@
     "thread_standard": "inch",
     "major_dia_in": 0.25,
     "tpi": 20,
-    "pitch_mm": 0,
     "thread_percent": 75
    },
    "outputs": {
@@ -19372,7 +19290,6 @@
    "verified_by": "rl",
    "verified_on": "2026-06-12",
    "inputs": {
-    "x1": 0,
     "y1": 10,
     "x2": 10,
     "y2": 30,
@@ -20129,11 +20046,7 @@
    "verified_by": "rl",
    "verified_on": "2026-06-12",
    "inputs": {
-    "x1": 0,
-    "y1": 0,
     "x2": 4,
-    "y2": 0,
-    "x3": 0,
     "y3": 3
    },
    "outputs": {
@@ -20227,8 +20140,7 @@
     "run_in": 60,
     "item_width_in": 1.5,
     "mode": "max-gap",
-    "max_gap_in": 4,
-    "count": 0
+    "max_gap_in": 4
    },
    "outputs": {
     "count": {
@@ -20354,8 +20266,7 @@
    "inputs": {
     "feed_a_pct": 9,
     "feed_b_pct": 44,
-    "target_pct": 16,
-    "batch_lb": 0
+    "target_pct": 16
    },
    "outputs": {
     "pct_a": {
@@ -20418,8 +20329,7 @@
     "depth_in": 3,
     "bulk_density": 1.1,
     "bag_ft3": 2,
-    "load_yd3": 10,
-    "waste_pct": 0
+    "load_yd3": 10
    },
    "outputs": {
     "yd3": {
@@ -20455,8 +20365,7 @@
     "depth_in": 3,
     "bulk_density": 0.5,
     "bag_ft3": 2,
-    "load_yd3": 10,
-    "waste_pct": 0
+    "load_yd3": 10
    },
    "outputs": {
     "tons": {
@@ -20480,8 +20389,7 @@
     "lb_per_bushel": 56,
     "mi_percent": 20,
     "mf_percent": 15,
-    "btu_per_lb": 1500,
-    "price_per_gal": 0
+    "btu_per_lb": 1500
    },
    "outputs": {
     "water_lb": {
@@ -20511,8 +20419,7 @@
     "lb_per_bushel": 56,
     "mi_percent": 20,
     "mf_percent": 17.5,
-    "btu_per_lb": 1500,
-    "price_per_gal": 0
+    "btu_per_lb": 1500
    },
    "outputs": {
     "water_lb": {
@@ -20570,9 +20477,7 @@
    "inputs": {
     "crop_n_need_lb_acre": 150,
     "total_n_lb_ton": 10,
-    "availability_pct": 70,
-    "p2o5_lb_ton": 0,
-    "k2o_lb_ton": 0
+    "availability_pct": 70
    },
    "outputs": {
     "rate_ton_acre": {
@@ -20699,7 +20604,6 @@
    "verified_on": "2026-07-10",
    "inputs": {
     "daily_manure_ft3": 150,
-    "wastewater_ft3": 0,
     "bedding_ft3": 20,
     "storage_days": 120,
     "surface_area_ft2": 8000,
@@ -20744,13 +20648,8 @@
    "verified_on": "2026-07-10",
    "inputs": {
     "daily_manure_ft3": 150,
-    "wastewater_ft3": 0,
     "bedding_ft3": 20,
-    "storage_days": 120,
-    "surface_area_ft2": 0,
-    "net_precip_in": 0,
-    "storm_in": 0,
-    "freeboard_in": 0
+    "storage_days": 120
    },
    "outputs": {
     "total_ft3": {
@@ -20857,8 +20756,7 @@
    "verified_on": "2026-08-08",
    "inputs": {
     "crest_length_ft": 3,
-    "head_ft": 0.5,
-    "coeff": 0
+    "head_ft": 0.5
    },
    "outputs": {
     "flow_cfs": {
@@ -20891,8 +20789,7 @@
    "verified_on": "2026-08-08",
    "inputs": {
     "crest_length_ft": 6,
-    "head_ft": 0.5,
-    "coeff": 0
+    "head_ft": 0.5
    },
    "outputs": {
     "flow_cfs": {
@@ -20914,8 +20811,7 @@
    "inputs": {
     "gate_opening_ft": 1,
     "gate_width_ft": 5,
-    "upstream_depth_ft": 6,
-    "contraction_coeff": 0
+    "upstream_depth_ft": 6
    },
    "outputs": {
     "discharge_coeff": {
@@ -20943,8 +20839,7 @@
    "inputs": {
     "gate_opening_ft": 0.2,
     "gate_width_ft": 5,
-    "upstream_depth_ft": 6,
-    "contraction_coeff": 0
+    "upstream_depth_ft": 6
    },
    "outputs": {
     "discharge_coeff": {
@@ -20965,8 +20860,7 @@
    "verified_on": "2026-08-08",
    "inputs": {
     "crest_length_ft": 10,
-    "head_ft": 1,
-    "discharge_coeff": 0
+    "head_ft": 1
    },
    "outputs": {
     "effective_coeff": {
@@ -20993,8 +20887,7 @@
    "verified_on": "2026-08-08",
    "inputs": {
     "crest_length_ft": 10,
-    "head_ft": 2,
-    "discharge_coeff": 0
+    "head_ft": 2
    },
    "outputs": {
     "flow_cfs": {
@@ -21015,9 +20908,7 @@
    "verified_on": "2026-06-06",
    "inputs": {
     "weir_type": "vnotch90",
-    "head_ft": 0.5,
-    "crest_length_ft": 0,
-    "coeff": 0
+    "head_ft": 0.5
    },
    "outputs": {
     "flow_cfs": {
@@ -21044,9 +20935,7 @@
    "verified_on": "2026-07-13",
    "inputs": {
     "weir_type": "vnotch90",
-    "target_flow_cfs": 0.446,
-    "crest_length_ft": 0,
-    "coeff": 0
+    "target_flow_cfs": 0.446
    },
    "outputs": {
     "head_ft": {
@@ -21068,8 +20957,7 @@
    "inputs": {
     "weir_type": "rect_contracted",
     "target_flow_cfs": 9.324,
-    "crest_length_ft": 3,
-    "coeff": 0
+    "crest_length_ft": 3
    },
    "outputs": {
     "head_ft": {
@@ -21214,8 +21102,7 @@
    "inputs": {
     "flow_mgd": 2.0,
     "surface_ft2": 1256.6,
-    "weir_len_ft": 125.7,
-    "mlss_mgl": 0
+    "weir_len_ft": 125.7
    },
    "outputs": {
     "sor_gpd_ft2": {
@@ -21485,11 +21372,9 @@
    "verified_on": "2026-06-06",
    "inputs": {
     "mode": "equilibrium",
-    "water_g": 0,
     "salt_g": 25,
     "meat_g": 1000,
-    "cure_g": 2.5,
-    "target_pct": 0
+    "cure_g": 2.5
    },
    "outputs": {
     "concentration_pct": {
@@ -21518,8 +21403,7 @@
     "desired_dough_temp_f": 75,
     "flour_temp_f": 68,
     "room_temp_f": 72,
-    "friction_factor_f": 24,
-    "preferment_temp_f": 0
+    "friction_factor_f": 24
    },
    "outputs": {
     "water_temp_f": {
@@ -21579,7 +21463,6 @@
     "hydration_pct": 65,
     "salt_pct": 2,
     "yeast_pct": 1,
-    "other_pct": 0,
     "pieces": 4
    },
    "outputs": {
@@ -21684,7 +21567,6 @@
    "verified_on": "2026-07-09",
    "inputs": {
     "sweep_width_m": 100,
-    "track_spacing_m": 0,
     "target_pod": 0.8
    },
    "outputs": {
@@ -21708,7 +21590,6 @@
     "pre_weight_lb": 180,
     "post_weight_lb": 177,
     "fluid_oz": 20,
-    "urine_oz": 0,
     "duration_hr": 2
    },
    "outputs": {
@@ -21750,7 +21631,6 @@
     "pre_weight_lb": 180,
     "post_weight_lb": 180,
     "fluid_oz": 68,
-    "urine_oz": 0,
     "duration_hr": 2
    },
    "outputs": {
@@ -21973,10 +21853,7 @@
    "verified_on": "2026-06-06",
    "inputs": {
     "cost": 60,
-    "price": 0,
-    "markup_pct": 50,
-    "margin_pct": 0,
-    "units": 0
+    "markup_pct": 50
    },
    "outputs": {
     "price": {
@@ -22445,8 +22322,7 @@
    "inputs": {
     "price": 300000,
     "gross_rent": 36000,
-    "rent_basis": "annual",
-    "market_grm": 0
+    "rent_basis": "annual"
    },
    "outputs": {
     "grm_annual": {
@@ -22505,11 +22381,7 @@
     "payoff": 250000,
     "commission_pct": 5.5,
     "transfer_tax_pct": 0.5,
-    "fees": 2500,
-    "concessions": 0,
-    "annual_tax": 0,
-    "days_seller_owes": 0,
-    "other": 0
+    "fees": 2500
    },
    "outputs": {
     "net_proceeds": {
@@ -23447,8 +23319,7 @@
    "inputs": {
     "existing_elev_ft": 104.5,
     "design_elev_ft": 100,
-    "slope_ratio_h": 2,
-    "offset_at_hinge_ft": 0
+    "slope_ratio_h": 2
    },
    "outputs": {
     "cut_fill_ft": {
@@ -23572,8 +23443,7 @@
     "throw_distance": 30,
     "distance_unit": "ft",
     "source": "candela",
-    "candela": 100000,
-    "lumens": 0
+    "candela": 100000
    },
    "outputs": {
     "beam_diameter_ft": {
@@ -23701,9 +23571,7 @@
       "azimuth_deg": 90,
       "distance": 100
      }
-    ],
-    "n0": 0,
-    "e0": 0
+    ]
    },
    "outputs": {
     "sum_lat": {
@@ -23961,7 +23829,6 @@
     "street_pressure": 60,
     "fixture_height": 30,
     "meter_loss": 8,
-    "bfp_loss": 0,
     "friction_loss": 12,
     "fixture_min": 8
    },
@@ -24521,7 +24388,6 @@
     "attenuation_db_km": 3,
     "connector_count": 2,
     "loss_per_connector_db": 0.75,
-    "splice_count": 0,
     "max_channel_loss_db": 2.6
    },
    "outputs": {
@@ -24723,8 +24589,7 @@
     "max_channel_loss_db": 2.6,
     "attenuation_db_km": 3,
     "connector_count": 2,
-    "loss_per_connector_db": 0.75,
-    "splice_count": 0
+    "loss_per_connector_db": 0.75
    },
    "outputs": {
     "max_length_m": {
@@ -24747,8 +24612,7 @@
     "max_channel_loss_db": 2.6,
     "attenuation_db_km": 0.4,
     "connector_count": 2,
-    "loss_per_connector_db": 0.75,
-    "splice_count": 0
+    "loss_per_connector_db": 0.75
    },
    "outputs": {
     "max_length_m": {
@@ -25304,7 +25168,6 @@
    "inputs": {
     "gross_chart_lb": 30000,
     "hook_block_lb": 800,
-    "jib_attach_lb": 0,
     "wire_rope_lb": 400,
     "below_hook_lb": 600,
     "load_weight_lb": 22000
@@ -25664,7 +25527,6 @@
    "inputs": {
     "load_lb": 12000,
     "roll_coef": 0.03,
-    "incline_deg": 0,
     "skate_cap_lb": 5000
    },
    "outputs": {
@@ -27025,8 +26887,7 @@
    "verified_on": "2026-06-16",
    "inputs": {
     "daily_flow_gpd": 450,
-    "doses_per_day": 6,
-    "drainback_gal": 0
+    "doses_per_day": 6
    },
    "outputs": {
     "net_dose_gal": {
@@ -28439,8 +28300,7 @@
    "verified_on": "2026-08-08",
    "inputs": {
     "latitude_deg": 40,
-    "day_of_year": 355,
-    "hours_from_solar_noon": 0
+    "day_of_year": 355
    },
    "outputs": {
     "altitude_deg": {
@@ -28523,8 +28383,7 @@
    "verified_on": "2026-08-08",
    "inputs": {
     "latitude_deg": 40,
-    "day_of_year": 172,
-    "hours_from_solar_noon": 0
+    "day_of_year": 172
    },
    "outputs": {
     "azimuth_deg": {
@@ -29080,8 +28939,7 @@
     "variable_cpm": 0.2,
     "fixed_per_day": 250,
     "days": 2,
-    "tolls": 40,
-    "other_costs": 0
+    "tolls": 40
    },
    "outputs": {
     "net_profit": {
@@ -30026,7 +29884,6 @@
    "inputs": {
     "area_sqft": 200,
     "trowel": "quarter_three_eighths",
-    "coverage_per_bag": 0,
     "bag_weight_lb": 50,
     "waste_pct": 10
    },
@@ -30058,7 +29915,6 @@
     "room_width_ft": 12,
     "box_coverage_sqft": 20,
     "pattern": "straight",
-    "waste_pct": 0,
     "plank_width_in": 7.5
    },
    "outputs": {
@@ -30292,7 +30148,6 @@
    "verified_on": "2026-06-18",
    "inputs": {
     "cavity_r": 13,
-    "continuous_r": 0,
     "stud_depth_in": 3.5,
     "framing_factor": 0.25,
     "air_films_r": 0.85,
@@ -30676,8 +30531,7 @@
    "verified_on": "2026-06-19",
    "inputs": {
     "pull_type": "straight",
-    "largest_raceway_in": 3,
-    "other_raceways_in": 0
+    "largest_raceway_in": 3
    },
    "outputs": {
     "governing": {
@@ -30958,7 +30812,6 @@
    "inputs": {
     "tons": 30,
     "pints_per_ton_hr": 3,
-    "run_ft": 0,
     "slope_in_per_ft": 0.125
    },
    "outputs": {
@@ -31028,7 +30881,6 @@
    "inputs": {
     "water_capacity_lb": 50,
     "refrig_density_lb_gal": 12,
-    "current_net_lb": 0,
     "fill_fraction": 0.8
    },
    "outputs": {
@@ -31074,7 +30926,6 @@
    "inputs": {
     "compressor_rla_A": 20,
     "fan_fla_A": 1.5,
-    "other_load_A": 0,
     "installed_breaker_A": 35
    },
    "outputs": {
@@ -31114,9 +30965,7 @@
    "verified_on": "2026-06-20",
    "inputs": {
     "compressor_rla_A": 32,
-    "fan_fla_A": 2.3,
-    "other_load_A": 0,
-    "installed_breaker_A": 0
+    "fan_fla_A": 2.3
    },
    "outputs": {
     "mca_A": {
@@ -33132,8 +32981,7 @@
    "verified_on": "2026-07-13",
    "inputs": {
     "target_dose_mj_cm2": 40,
-    "intensity_mw_cm2": 10,
-    "exposure_time_s": 0
+    "intensity_mw_cm2": 10
    },
    "outputs": {
     "required_time_s": {
@@ -33154,7 +33002,6 @@
    "verified_on": "2026-07-13",
    "inputs": {
     "target_dose_mj_cm2": 40,
-    "intensity_mw_cm2": 0,
     "exposure_time_s": 8
    },
    "outputs": {
@@ -33210,8 +33057,7 @@
    "verified_on": "2026-07-10",
    "inputs": {
     "flow_mgd": 2,
-    "bod_mg_l": 100,
-    "ss_mg_l": 0
+    "bod_mg_l": 100
    },
    "outputs": {
     "pe_governing": {
@@ -33438,7 +33284,6 @@
    "inputs": {
     "bod_removed_lb_day": 2000,
     "oxygen_factor": 1.1,
-    "nh3_nitrified_lb_day": 0,
     "sote_pct": 20
    },
    "outputs": {
@@ -35048,7 +34893,6 @@
    "verified_on": "2026-06-30",
    "inputs": {
     "ridge_lf": 40,
-    "hip_lf": 0,
     "cap_lf_per_bundle": 20,
     "cap_exposure_in": 5,
     "squares": 24,
@@ -35232,8 +35076,7 @@
    "verified_on": "2026-06-30",
    "inputs": {
     "floor_area_ft2": 2000,
-    "bedrooms": 3,
-    "infil_credit_cfm": 0
+    "bedrooms": 3
    },
    "outputs": {
     "q_tot": {
@@ -35288,8 +35131,7 @@
    "verified_on": "2026-06-30",
    "inputs": {
     "cfm": 56.5,
-    "delta_t_f": 70,
-    "delta_gr": 0
+    "delta_t_f": 70
    },
    "outputs": {
     "q_sensible": {
@@ -35694,7 +35536,6 @@
    "verified_on": "2026-06-30",
    "inputs": {
     "dead_psf": 15,
-    "live_psf": 0,
     "snow_psf": 30,
     "wind_psf": -25
    },
@@ -35730,7 +35571,6 @@
    "inputs": {
     "dead_psf": 20,
     "live_psf": 40,
-    "snow_psf": 0,
     "wind_psf": 30
    },
    "outputs": {
@@ -35792,8 +35632,7 @@
    "verified_on": "2026-08-08",
    "inputs": {
     "system": "other",
-    "hn_ft": 48,
-    "sd1": 0
+    "hn_ft": 48
    },
    "outputs": {
     "ta_s": {
@@ -35878,8 +35717,7 @@
     "projection_in": 24,
     "gap_in": 6,
     "glass_height_in": 48,
-    "solar_altitude_deg": 70,
-    "surface_solar_azimuth_deg": 0
+    "solar_altitude_deg": 70
    },
    "outputs": {
     "profile_angle_deg": {
@@ -35920,8 +35758,7 @@
     "projection_in": 24,
     "gap_in": 6,
     "glass_height_in": 48,
-    "solar_altitude_deg": 30,
-    "surface_solar_azimuth_deg": 0
+    "solar_altitude_deg": 30
    },
    "outputs": {
     "profile_angle_deg": {
@@ -36332,7 +36169,6 @@
    "inputs": {
     "min_on_time_min": 10,
     "source_min_btu": 60000,
-    "zone_min_load_btu": 0,
     "delta_t_f": 20
    },
    "outputs": {
@@ -36378,7 +36214,6 @@
    "inputs": {
     "min_on_time_min": 10,
     "source_min_btu": 60000,
-    "zone_min_load_btu": 0,
     "delta_t_f": 20,
     "pipe_id_in": 1.5,
     "loop_length_ft": 200
@@ -36415,7 +36250,6 @@
    "inputs": {
     "min_on_time_min": 10,
     "source_min_btu": 60000,
-    "zone_min_load_btu": 0,
     "delta_t_f": 20,
     "pipe_id_in": 2,
     "loop_length_ft": 1000
@@ -36666,8 +36500,7 @@
    "inputs": {
     "floor_wet_fraction": 1.0,
     "wall_wet_fraction": 0.3,
-    "wick_height_ft": 1.5,
-    "low_evap_materials": 0
+    "wick_height_ft": 1.5
    },
    "outputs": {
     "water_class": {
@@ -36689,8 +36522,7 @@
    "inputs": {
     "floor_wet_fraction": 1.0,
     "wall_wet_fraction": 0.3,
-    "wick_height_ft": 3.0,
-    "low_evap_materials": 0
+    "wick_height_ft": 3.0
    },
    "outputs": {
     "water_class": {
@@ -37190,7 +37022,6 @@
     "joint_factor": 1,
     "y_coeff": 0.4,
     "mill_tol_frac": 0.125,
-    "allowance_in": 0,
     "mode": "allowable_pressure"
    },
    "outputs": {
@@ -37216,7 +37047,6 @@
     "joint_factor": 1,
     "y_coeff": 0.4,
     "design_p": 300,
-    "allowance_in": 0,
     "mode": "required_wall"
    },
    "outputs": {
@@ -37241,7 +37071,6 @@
     "wall_in": 0.237,
     "pipe_density": 490,
     "fluid_density": 62.4,
-    "insul_thk_in": 0,
     "insul_density": 6,
     "spacing_ft": 14
    },
@@ -38711,7 +38540,6 @@
    "verified_on": "2026-06-23",
    "inputs": {
     "load_lb": 12000,
-    "ecc_in": 0,
     "weld_len_in": 10,
     "separation_in": 4,
     "allow_per_16": 928
@@ -39173,8 +39001,7 @@
    "verified_by": "rl",
    "verified_on": "2026-07-18",
    "inputs": {
-    "reamer_diameter_in": 0.5,
-    "allowance_override_in": 0
+    "reamer_diameter_in": 0.5
    },
    "outputs": {
     "allowance_used_in": {
@@ -39200,8 +39027,7 @@
    "verified_by": "rl",
    "verified_on": "2026-07-18",
    "inputs": {
-    "reamer_diameter_in": 0.75,
-    "allowance_override_in": 0
+    "reamer_diameter_in": 0.75
    },
    "outputs": {
     "drill_diameter_in": {
@@ -39412,8 +39238,7 @@
    "verified_on": "2026-07-18",
    "inputs": {
     "wall_run_ft": 16,
-    "shingle_exposure_in": 7.5,
-    "waste_pct": 0
+    "shingle_exposure_in": 7.5
    },
    "outputs": {
     "step_flashing_pieces": {
@@ -39878,9 +39703,7 @@
    "verified_on": "2026-08-08",
    "inputs": {
     "signal_ma": 12,
-    "flow_low": 0,
-    "flow_high": 500,
-    "low_flow_cutoff_pct": 0
+    "flow_high": 500
    },
    "outputs": {
     "flow_percent": {
@@ -39913,9 +39736,7 @@
    "verified_on": "2026-08-08",
    "inputs": {
     "signal_ma": 8,
-    "flow_low": 0,
-    "flow_high": 500,
-    "low_flow_cutoff_pct": 0
+    "flow_high": 500
    },
    "outputs": {
     "flow_percent": {
@@ -39942,7 +39763,6 @@
    "verified_on": "2026-07-18",
    "inputs": {
     "signal_ma": 12,
-    "range_low": 0,
     "range_high": 100
    },
    "outputs": {
@@ -40435,7 +40255,6 @@
    "inputs": {
     "hp_run": 20,
     "run_time_s": 10,
-    "hp_idle": 0,
     "idle_time_s": 20,
     "cooling_factor": 3
    },
@@ -40459,7 +40278,6 @@
    "inputs": {
     "hp_run": 20,
     "run_time_s": 10,
-    "hp_idle": 0,
     "idle_time_s": 20,
     "cooling_factor": 1
    },
@@ -41363,8 +41181,7 @@
    "inputs": {
     "slab_area_sf": 2500,
     "coats": 1,
-    "coverage_sf_per_gal": 200,
-    "waste_pct": 0
+    "coverage_sf_per_gal": 200
    },
    "outputs": {
     "gallons_needed": {
@@ -41615,7 +41432,6 @@
    "inputs": {
     "supply_design_f": 180,
     "supply_min_f": 80,
-    "oa_design_f": 0,
     "oa_noheat_f": 65,
     "oa_current_f": 30
    },
@@ -41645,7 +41461,6 @@
    "inputs": {
     "supply_design_f": 180,
     "supply_min_f": 80,
-    "oa_design_f": 0,
     "oa_noheat_f": 65,
     "oa_current_f": 70
    },
@@ -41706,8 +41521,7 @@
    "verified_by": "rl",
    "verified_on": "2026-07-18",
    "inputs": {
-    "n_target_lb_per_ac": 120,
-    "tank_gal": 0
+    "n_target_lb_per_ac": 120
    },
    "outputs": {
     "product_lb_per_ac": {
@@ -41870,8 +41684,7 @@
    "verified_on": "2026-07-18",
    "inputs": {
     "track_width_in": 96,
-    "cg_height_in": 60,
-    "curve_radius_ft": 0
+    "cg_height_in": 60
    },
    "outputs": {
     "srt_g": {
@@ -41990,8 +41803,7 @@
    "verified_on": "2026-07-18",
    "inputs": {
     "inside_diameter_in": 48,
-    "head_type": "elliptical",
-    "straight_flange_in": 0
+    "head_type": "elliptical"
    },
    "outputs": {
     "head_volume_in3": {
@@ -42018,8 +41830,7 @@
    "verified_on": "2026-07-18",
    "inputs": {
     "inside_diameter_in": 48,
-    "head_type": "hemispherical",
-    "straight_flange_in": 0
+    "head_type": "hemispherical"
    },
    "outputs": {
     "head_volume_gal": {
@@ -42720,7 +42531,6 @@
    "verified_on": "2026-06-24",
    "inputs": {
     "measured_ambient_f": 95,
-    "height_above_roof_in": 0,
     "base_ampacity_a": 55
    },
    "outputs": {
@@ -42973,8 +42783,7 @@
    "verified_by": "rl",
    "verified_on": "2026-06-24",
    "inputs": {
-    "max_unbalanced_a": 250,
-    "nonlinear_excluded": 0
+    "max_unbalanced_a": 250
    },
    "outputs": {
     "neutral_demand_a": {
@@ -43084,8 +42893,7 @@
    "verified_on": "2026-06-24",
    "inputs": {
     "intensity_cd": 1000,
-    "mount_height_ft": 10,
-    "angle_deg": 0
+    "mount_height_ft": 10
    },
    "outputs": {
     "e_fc": {
@@ -43118,8 +42926,7 @@
    "verified_on": "2026-07-14",
    "inputs": {
     "intensity_cd": 1000,
-    "target_fc": 10,
-    "angle_deg": 0
+    "target_fc": 10
    },
    "outputs": {
     "mount_height_ft": {
@@ -43175,8 +42982,7 @@
    "inputs": {
     "target_illuminance": 10,
     "illuminance_unit": "fc",
-    "mount_height_ft": 10,
-    "angle_deg": 0
+    "mount_height_ft": 10
    },
    "outputs": {
     "required_cd": {
@@ -43261,8 +43067,7 @@
    "verified_by": "rl",
    "verified_on": "2026-06-24",
    "inputs": {
-    "wiring_method": "EMT",
-    "trade_size_in": 0
+    "wiring_method": "EMT"
    },
    "outputs": {
     "secure_within_in": {
@@ -43288,8 +43093,7 @@
    "verified_by": "rl",
    "verified_on": "2026-06-24",
    "inputs": {
-    "wiring_method": "NM cable (Romex)",
-    "trade_size_in": 0
+    "wiring_method": "NM cable (Romex)"
    },
    "outputs": {
     "secure_within_in": {
@@ -43464,8 +43268,7 @@
    "verified_on": "2026-06-24",
    "inputs": {
     "load_a_va": 9000,
-    "load_b_va": 6000,
-    "both_can_run": 0
+    "load_b_va": 6000
    },
    "outputs": {
     "counted_va": {
@@ -43520,8 +43323,7 @@
    "verified_on": "2026-06-24",
    "inputs": {
     "module_isc_a": 10,
-    "parallel_strings": 2,
-    "ocpd_a": 0
+    "parallel_strings": 2
    },
    "outputs": {
     "max_current_a": {
@@ -43554,8 +43356,7 @@
    "verified_on": "2026-06-24",
    "inputs": {
     "module_isc_a": 10,
-    "parallel_strings": 1,
-    "ocpd_a": 0
+    "parallel_strings": 1
    },
    "outputs": {
     "max_current_a": {
@@ -43901,9 +43702,7 @@
     "bend1_deg": 90,
     "bend2_deg": 90,
     "bend3_deg": 45,
-    "bend4_deg": 45,
-    "bend5_deg": 0,
-    "bend6_deg": 0
+    "bend4_deg": 45
    },
    "outputs": {
     "total_deg": {
@@ -44243,8 +44042,7 @@
    "verified_on": "2026-06-26",
    "inputs": {
     "water_category": "cat1",
-    "component": "carpet",
-    "delaminated": 0
+    "component": "carpet"
    },
    "outputs": {
     "decision": {
@@ -44265,8 +44063,7 @@
    "verified_on": "2026-06-26",
    "inputs": {
     "water_category": "cat3",
-    "component": "carpet",
-    "delaminated": 0
+    "component": "carpet"
    },
    "outputs": {
     "decision": {
@@ -44288,8 +44085,7 @@
    "inputs": {
     "origin_category": "cat1",
     "elapsed_hours": 72,
-    "warm_environment": 1,
-    "contacted_contaminant": 0
+    "warm_environment": 1
    },
    "outputs": {
     "likely_category": {
@@ -44311,7 +44107,6 @@
    "inputs": {
     "origin_category": "cat1",
     "elapsed_hours": 1,
-    "warm_environment": 0,
     "contacted_contaminant": 1
    },
    "outputs": {
@@ -44965,8 +44760,7 @@
    "verified_on": "2026-07-01",
    "inputs": {
     "indoor_spores_m3": 800,
-    "outdoor_spores_m3": 1500,
-    "indoor_marker": 0
+    "outdoor_spores_m3": 1500
    },
    "outputs": {
     "io_ratio": {
@@ -44993,8 +44787,7 @@
    "verified_on": "2026-07-01",
    "inputs": {
     "indoor_spores_m3": 2400,
-    "outdoor_spores_m3": 1500,
-    "indoor_marker": 0
+    "outdoor_spores_m3": 1500
    },
    "outputs": {
     "io_ratio": {
@@ -45185,7 +44978,6 @@
     "frac_b": 0.8,
     "hours_b": 1000,
     "frac_c": 0.6,
-    "hours_c": 0,
     "rate_kwh": 0.12
    },
    "outputs": {
@@ -45285,7 +45077,6 @@
     "watts_new": 44,
     "annual_hours": 4000,
     "rate_kwh": 0.12,
-    "demand_per_kw_mo": 0,
     "install_cost": 8000
    },
    "outputs": {
@@ -45863,8 +45654,7 @@
    "inputs": {
     "nameplate_kwh": 40,
     "c_rate": 1,
-    "dod": 0.9,
-    "inverter_kw": 0
+    "dod": 0.9
    },
    "outputs": {
     "c_rate_power_kw": {
@@ -46325,7 +46115,6 @@
     "occupant_load": 160,
     "wc_ratio": 75,
     "wc_ratio_over": 75,
-    "wc_tier": 0,
     "lav_ratio": 200,
     "fountain_ratio": 500,
     "distribution": 0.5
@@ -47458,8 +47247,7 @@
     "ls_in": 1.5,
     "gm": 0.5,
     "gs": 0.5,
-    "fyb_psi": 45000,
-    "theta_deg": 0
+    "fyb_psi": 45000
    },
    "outputs": {
     "z_im": {
@@ -47594,8 +47382,7 @@
    "verified_on": "2026-07-02",
    "inputs": {
     "fy": 50,
-    "zx": 37.2,
-    "mu": 0
+    "zx": 37.2
    },
    "outputs": {
     "mn_kipft": {
@@ -47737,8 +47524,7 @@
     "d": 17.99,
     "tw": 0.355,
     "cv1": 1.0,
-    "omega_v": 1.5,
-    "vu": 0
+    "omega_v": 1.5
    },
    "outputs": {
     "aw": {
@@ -47780,8 +47566,7 @@
     "d": 12.22,
     "tw": 0.23,
     "cv1": 1.0,
-    "omega_v": 1.5,
-    "vu": 0
+    "omega_v": 1.5
    },
    "outputs": {
     "aw": {
@@ -47818,8 +47603,7 @@
     "k": 1.0,
     "l_ft": 14,
     "r_in": 2.01,
-    "ag": 13.3,
-    "pu": 0
+    "ag": 13.3
    },
    "outputs": {
     "slender": {
@@ -47868,8 +47652,7 @@
     "k": 1.0,
     "l_ft": 24,
     "r_in": 2.01,
-    "ag": 13.3,
-    "pu": 0
+    "ag": 13.3
    },
    "outputs": {
     "slender": {
@@ -48494,8 +48277,7 @@
    "inputs": {
     "rated_gpm": 500,
     "rated_psi": 100,
-    "churn_psi": 148,
-    "overload_psi": 0
+    "churn_psi": 148
    },
    "outputs": {
     "churn_limit_psi": {
@@ -48523,7 +48305,6 @@
    "inputs": {
     "rated_gpm": 500,
     "rated_psi": 100,
-    "churn_psi": 0,
     "overload_psi": 60
    },
    "outputs": {
@@ -49095,7 +48876,6 @@
    "verified_by": "rl",
    "verified_on": "2026-07-02",
    "inputs": {
-    "c": 0,
     "phi": 32,
     "gamma": 120,
     "b_ft": 6,
@@ -49152,7 +48932,6 @@
    "verified_on": "2026-07-02",
    "inputs": {
     "c": 2000,
-    "phi": 0,
     "gamma": 115,
     "b_ft": 5,
     "df_ft": 3,
@@ -49203,8 +48982,7 @@
    "inputs": {
     "phi": 30,
     "gamma": 120,
-    "h_ft": 10,
-    "q": 0
+    "h_ft": 10
    },
    "outputs": {
     "ka": {
@@ -49291,8 +49069,7 @@
    "inputs": {
     "phi": 30,
     "gamma": 120,
-    "h_ft": 10,
-    "q": 0
+    "h_ft": 10
    },
    "outputs": {
     "k0": {
@@ -49367,8 +49144,7 @@
    "inputs": {
     "phi": 30,
     "gamma_sat": 125,
-    "h_ft": 10,
-    "q": 0
+    "h_ft": 10
    },
    "outputs": {
     "pw": {
@@ -49513,8 +49289,6 @@
    "inputs": {
     "phi": 30,
     "delta": 20,
-    "theta": 0,
-    "alpha": 0,
     "gamma": 120,
     "h_ft": 10
    },
@@ -49556,7 +49330,6 @@
    "inputs": {
     "phi": 30,
     "delta": 20,
-    "theta": 0,
     "alpha": 15,
     "gamma": 120,
     "h_ft": 10
@@ -49593,8 +49366,7 @@
     "gamma_s": 110,
     "gamma_c": 150,
     "phi": 30,
-    "mu": 0.5,
-    "q": 0
+    "mu": 0.5
    },
    "outputs": {
     "sum_v": {
@@ -49960,8 +49732,7 @@
     "gamma_moist_pcf": 120,
     "gamma_sat_pcf": 125,
     "depth_ft": 20,
-    "water_table_depth_ft": 10,
-    "surcharge_psf": 0
+    "water_table_depth_ft": 10
    },
    "outputs": {
     "total_stress_psf": {
@@ -50001,9 +49772,7 @@
    "inputs": {
     "gamma_moist_pcf": 120,
     "gamma_sat_pcf": 125,
-    "depth_ft": 20,
-    "water_table_depth_ft": 0,
-    "surcharge_psf": 0
+    "depth_ft": 20
    },
    "outputs": {
     "total_stress_psf": {
@@ -50354,7 +50123,6 @@
     "fm_psi": 1500,
     "b_in": 7.625,
     "dv_in": 96,
-    "p_lb": 0,
     "mvd": 1.0,
     "av_in2": 0.2,
     "s_in": 48,
@@ -50938,7 +50706,6 @@
    "verified_on": "2026-07-03",
    "inputs": {
     "cfm": 2000,
-    "t_oa_F": 0,
     "t_target_F": 65,
     "eta": 0.8,
     "w_oa_gr": 60,
@@ -51589,7 +51356,6 @@
    "verified_by": "rl",
    "verified_on": "2026-07-09",
    "inputs": {
-    "nameplate_current_a": 0,
     "gen_kw": 150,
     "voltage_v": 480,
     "phase": 3,
@@ -51626,7 +51392,6 @@
    "verified_by": "rl",
    "verified_on": "2026-07-09",
    "inputs": {
-    "nameplate_current_a": 0,
     "gen_kw": 150,
     "voltage_v": 480,
     "phase": 3,
@@ -51758,7 +51523,6 @@
    "inputs": {
     "charger_count": 4,
     "per_charger_a": 40,
-    "evems_limit_a": 0,
     "apply_125_setpoint": true
    },
    "outputs": {
@@ -52084,8 +51848,7 @@
     "dh_in": 0.875,
     "nh": 1,
     "xbar_in": 1.18,
-    "l_in": 6,
-    "u_in": 0
+    "l_in": 6
    },
    "outputs": {
     "an_in2": {
@@ -52134,9 +51897,6 @@
     "fu": 58,
     "t_in": 0.5,
     "dh_in": 0.875,
-    "nh": 0,
-    "xbar_in": 0,
-    "l_in": 0,
     "u_in": 1.0
    },
    "outputs": {
@@ -52420,8 +52180,7 @@
    "verified_on": "2026-07-09",
    "inputs": {
     "immediate_defl_in": 0.4,
-    "duration_months": 60,
-    "comp_steel_ratio": 0
+    "duration_months": 60
    },
    "outputs": {
     "xi": {
@@ -52618,7 +52377,6 @@
    "verified_on": "2026-07-09",
    "inputs": {
     "factored_shear_lb": 40000,
-    "horiz_tension_lb": 0,
     "shear_span_av_in": 4,
     "eff_depth_d_in": 12,
     "height_h_in": 14,
@@ -52658,7 +52416,6 @@
    "verified_on": "2026-07-09",
    "inputs": {
     "factored_shear_lb": 40000,
-    "horiz_tension_lb": 0,
     "shear_span_av_in": 8,
     "eff_depth_d_in": 12,
     "height_h_in": 14,
@@ -52794,7 +52551,6 @@
     "bw_in": 12,
     "d_in": 16,
     "as_in2": 1.0,
-    "vu_kip": 0,
     "lambda": 1.0
    },
    "outputs": {
@@ -52831,7 +52587,6 @@
     "bw_in": 12,
     "d_in": 10,
     "as_in2": 1.0,
-    "vu_kip": 0,
     "lambda": 1.0
    },
    "outputs": {
@@ -53324,7 +53079,6 @@
    "inputs": {
     "beta_deg": 20,
     "phi_deg": 32,
-    "c_psf": 0,
     "gamma_pcf": 120,
     "h_ft": 8
    },
@@ -53348,7 +53102,6 @@
    "inputs": {
     "beta_deg": 18,
     "phi_deg": 32,
-    "c_psf": 0,
     "gamma_sat": 125,
     "h_ft": 8
    },
@@ -53544,8 +53297,6 @@
     "t_lb": 3000,
     "b_in": 1.5,
     "d_in": 5.5,
-    "dh_in": 0,
-    "nh": 0,
     "ft_psi": 575,
     "cd_f": 1.15,
     "cf_f": 1.3
@@ -53937,8 +53688,7 @@
    "verified_on": "2026-07-03",
    "inputs": {
     "lu_ft": 100,
-    "pg_psf": 30,
-    "hc_ft": 0
+    "pg_psf": 30
    },
    "outputs": {
     "gamma_pcf": {
@@ -53977,8 +53727,7 @@
    "verified_on": "2026-07-03",
    "inputs": {
     "lu_ft": 100,
-    "pg_psf": 50,
-    "hc_ft": 0
+    "pg_psf": 50
    },
    "outputs": {
     "gamma_pcf": {
@@ -55106,8 +54855,7 @@
     "curve_number": 75,
     "rainfall_in": 6.0,
     "area_mi2": 0.39,
-    "rainfall_type": "II",
-    "pond_pct": 0
+    "rainfall_type": "II"
    },
    "outputs": {
     "qp_cfs": {
@@ -55411,8 +55159,7 @@
     "tank_area_ft2": 100,
     "d_in": 6,
     "cd": 0.6,
-    "h1_ft": 9,
-    "h2_ft": 0
+    "h1_ft": 9
    },
    "outputs": {
     "t_s": {
@@ -55792,7 +55539,6 @@
    "verified_on": "2026-07-03",
    "inputs": {
     "load": 100000,
-    "unit_tons": 0,
     "dt_f": 20,
     "factor": 500
    },
@@ -56447,7 +56193,6 @@
    "verified_on": "2026-07-03",
    "inputs": {
     "s_ft": 1.5,
-    "theta_deg": 0,
     "k_f": 100
    },
    "outputs": {
@@ -56511,8 +56256,7 @@
    "inputs": {
     "l_ft": 100,
     "t_f": 40,
-    "t0_f": 68,
-    "h_ft": 0
+    "t0_f": 68
    },
    "outputs": {
     "ct_ft": {
@@ -56616,11 +56360,8 @@
    "verified_by": "rl",
    "verified_on": "2026-08-08",
    "inputs": {
-    "n0_ft": 0,
-    "e0_ft": 0,
     "dist0_ft": 40,
     "n1_ft": 100,
-    "e1_ft": 0,
     "dist1_ft": 60
    },
    "outputs": {
@@ -56649,9 +56390,7 @@
    "inputs": {
     "angle_mode": "zenith",
     "slope_distance_ft": 250,
-    "angle_deg": 86,
-    "hi_ft": 0,
-    "hr_ft": 0
+    "angle_deg": 86
    },
    "outputs": {
     "horizontal_ft": {
@@ -56826,7 +56565,6 @@
     "i_in4": 272,
     "lc1_ft": 16,
     "transverse_load": "yes",
-    "m1_m2": 0,
     "method": "LRFD"
    },
    "outputs": {
@@ -56857,7 +56595,6 @@
     "i_in4": 272,
     "lc1_ft": 16,
     "transverse_load": "yes",
-    "m1_m2": 0,
     "method": "ASD"
    },
    "outputs": {
@@ -56881,9 +56618,7 @@
     "pr_kip": 100,
     "pc_kip": 400,
     "mrx_kft": 80,
-    "mcx_kft": 200,
-    "mry_kft": 0,
-    "mcy_kft": 0
+    "mcx_kft": 200
    },
    "outputs": {
     "ratio": {
@@ -56912,9 +56647,7 @@
     "pr_kip": 50,
     "pc_kip": 400,
     "mrx_kft": 80,
-    "mcx_kft": 200,
-    "mry_kft": 0,
-    "mcy_kft": 0
+    "mcx_kft": 200
    },
    "outputs": {
     "ratio": {
@@ -57155,7 +56888,6 @@
     "fnt_ksi": 90,
     "fnv_ksi": 54,
     "ab_in2": 0.442,
-    "frv_ksi": 0,
     "method": "LRFD"
    },
    "outputs": {
@@ -57350,8 +57082,7 @@
    "inputs": {
     "r_in": 0.25,
     "mode": "scallop-from-stepover",
-    "s_in": 0.03,
-    "h_in": 0
+    "s_in": 0.03
    },
    "outputs": {
     "out_in": {
@@ -57373,7 +57104,6 @@
    "inputs": {
     "r_in": 0.25,
     "mode": "stepover-from-scallop",
-    "s_in": 0,
     "h_in": 0.00045
    },
    "outputs": {
@@ -57559,8 +57289,7 @@
    "verified_on": "2026-07-14",
    "inputs": {
     "q_evap": 60000,
-    "target_thr": 100000,
-    "unit_tons": 0
+    "target_thr": 100000
    },
    "outputs": {
     "cop": {
@@ -57930,7 +57659,6 @@
    "verified_on": "2026-07-23",
    "inputs": {
     "field_wet_pcf": 115,
-    "w_pct": 0,
     "gamma_dmin_pcf": 90,
     "gamma_dmax_pcf": 115
    },
@@ -58715,7 +58443,6 @@
     "length_ft": 800,
     "friction_coeff": 0.3,
     "bend_factor": 1.5,
-    "fluid_drag_lb": 0,
     "pipe_safe_pull_lb": 20000
    },
    "outputs": {
@@ -58746,7 +58473,6 @@
     "length_ft": 1500,
     "friction_coeff": 0.3,
     "bend_factor": 1.5,
-    "fluid_drag_lb": 0,
     "pipe_safe_pull_lb": 20000
    },
    "outputs": {
@@ -59547,9 +59273,7 @@
    "inputs": {
     "equipment_rate_per_hr": 150,
     "operator_rate_per_hr": 65,
-    "support_rate_per_hr": 0,
-    "production_cy_per_hr": 656,
-    "total_cy": 0
+    "production_cy_per_hr": 656
    },
    "outputs": {
     "hourly_cost": {
@@ -59577,9 +59301,7 @@
    "inputs": {
     "equipment_rate_per_hr": 150,
     "operator_rate_per_hr": 65,
-    "support_rate_per_hr": 0,
-    "production_cy_per_hr": 400,
-    "total_cy": 0
+    "production_cy_per_hr": 400
    },
    "outputs": {
     "unit_cost_per_cy": {
@@ -60361,8 +60083,7 @@
    "inputs": {
     "duct_lb_per_ft": 5.5,
     "spacing_ft": 8,
-    "run_ft": 40,
-    "hanger_swl_lb": 0
+    "run_ft": 40
    },
    "outputs": {
     "load_per_hanger_lb": {
@@ -60390,8 +60111,7 @@
    "inputs": {
     "duct_lb_per_ft": 9,
     "spacing_ft": 10,
-    "run_ft": 40,
-    "hanger_swl_lb": 0
+    "run_ft": 40
    },
    "outputs": {
     "load_per_hanger_lb": {
@@ -62359,8 +62079,7 @@
     "run_ft": 400,
     "spacing_ft": 4,
     "num_cables": 50,
-    "cable_lb_per_ft": 0.035,
-    "hook_wll_lb": 0
+    "cable_lb_per_ft": 0.035
    },
    "outputs": {
     "hooks": {
@@ -62695,7 +62414,6 @@
     "rows": 2,
     "modules_per_row": 12,
     "module_width_ft": 3.42,
-    "gap_ft": 0,
     "rails_per_row": 2,
     "rail_stock_ft": 14
    },
@@ -62738,7 +62456,6 @@
     "rows": 1,
     "modules_per_row": 12,
     "module_width_ft": 3.42,
-    "gap_ft": 0,
     "rails_per_row": 2,
     "rail_stock_ft": 14
    },
@@ -64647,7 +64364,6 @@
    "inputs": {
     "L_ft": 6,
     "P_lb": 2000,
-    "w_plf": 0,
     "E_psi": 29000000,
     "I_in4": 53
    },
@@ -64682,7 +64398,6 @@
    "verified_on": "2026-07-03",
    "inputs": {
     "L_ft": 6,
-    "P_lb": 0,
     "w_plf": 300,
     "E_psi": 29000000,
     "I_in4": 53
@@ -64713,9 +64428,7 @@
    "inputs": {
     "shape": "rectangle",
     "b_in": 1.5,
-    "h_in": 7.25,
-    "d_in": 0,
-    "di_in": 0
+    "h_in": 7.25
    },
    "outputs": {
     "A_in2": {
@@ -64754,10 +64467,7 @@
    "verified_on": "2026-07-03",
    "inputs": {
     "shape": "round",
-    "b_in": 0,
-    "h_in": 0,
-    "d_in": 2,
-    "di_in": 0
+    "d_in": 2
    },
    "outputs": {
     "A_in2": {
@@ -64793,8 +64503,7 @@
     "M_lbin": 30000,
     "A_in2": 30.25,
     "c_in": 2.75,
-    "I_in4": 76.3,
-    "e_in": 0
+    "I_in4": 76.3
    },
    "outputs": {
     "sigma_axial": {
@@ -64830,8 +64539,7 @@
     "M_lbin": 15000,
     "A_in2": 30.25,
     "c_in": 2.75,
-    "I_in4": 76.3,
-    "e_in": 0
+    "I_in4": 76.3
    },
    "outputs": {
     "sigma_min": {
@@ -64949,8 +64657,7 @@
    "inputs": {
     "arv": 300000,
     "repairs": 40000,
-    "rule_pct": 70,
-    "fee": 0
+    "rule_pct": 70
    },
    "outputs": {
     "mao": {
@@ -65073,9 +64780,7 @@
    "inputs": {
     "arv_usd": 200000,
     "total_invested_usd": 140000,
-    "refi_ltv_pct": 75,
-    "existing_payoff_usd": 0,
-    "annual_cash_flow_usd": 0
+    "refi_ltv_pct": 75
    },
    "outputs": {
     "new_loan_usd": {
@@ -65110,7 +64815,6 @@
     "arv_usd": 200000,
     "total_invested_usd": 160000,
     "refi_ltv_pct": 75,
-    "existing_payoff_usd": 0,
     "annual_cash_flow_usd": 2400
    },
    "outputs": {
@@ -65170,7 +64874,6 @@
     "cash_invested_usd": 50000,
     "annual_cash_flow_usd": 3000,
     "principal_paydown_usd": 2500,
-    "appreciation_usd": 0,
     "tax_savings_usd": 1500
    },
    "outputs": {
@@ -65199,8 +64902,7 @@
    "inputs": {
     "face_rent": 40,
     "term_periods": 120,
-    "free_periods": 10,
-    "one_time_credit": 0
+    "free_periods": 10
    },
    "outputs": {
     "ner": {
@@ -65251,8 +64953,7 @@
    "inputs": {
     "target_ner": 30,
     "term_periods": 120,
-    "free_periods": 20,
-    "one_time_credit": 0
+    "free_periods": 20
    },
    "outputs": {
     "face_rent": {
@@ -65780,10 +65481,7 @@
    "verified_by": "rl",
    "verified_on": "2026-07-03",
    "inputs": {
-    "elev_ft": 0,
-    "T_F": 120,
-    "acfm": 0,
-    "rated_sp": 0
+    "T_F": 120
    },
    "outputs": {
     "DF": {
@@ -65845,8 +65543,7 @@
    "verified_by": "rl",
    "verified_on": "2026-07-03",
    "inputs": {
-    "t_db_f": 80,
-    "w_lb_lb": 0
+    "t_db_f": 80
    },
    "outputs": {
     "h": {
@@ -65893,8 +65590,7 @@
    "verified_by": "rl",
    "verified_on": "2026-07-13",
    "inputs": {
-    "enthalpy_btu": 19.2,
-    "w_lb_lb": 0
+    "enthalpy_btu": 19.2
    },
    "outputs": {
     "t_db_f": {
@@ -66696,8 +66392,7 @@
    "verified_on": "2026-07-10",
    "inputs": {
     "site_elevation_ft": 3000,
-    "pump_factor": 0.667,
-    "suction_losses_ft": 0
+    "pump_factor": 0.667
    },
    "outputs": {
     "theoretical_lift_ft": {
@@ -66724,8 +66419,7 @@
    "verified_on": "2026-07-10",
    "inputs": {
     "site_elevation_ft": 8000,
-    "pump_factor": 0.667,
-    "suction_losses_ft": 0
+    "pump_factor": 0.667
    },
    "outputs": {
     "attainable_lift_ft": {
@@ -66952,8 +66646,7 @@
    "inputs": {
     "direct_cost_usd": 10000,
     "overhead_pct": 10,
-    "profit_pct": 10,
-    "current_contract_usd": 0
+    "profit_pct": 10
    },
    "outputs": {
     "additive_price": {
@@ -67393,8 +67086,7 @@
    "inputs": {
     "ppm": 2,
     "gallons": 15000,
-    "product": "cal-hypo-65",
-    "avail": 0
+    "product": "cal-hypo-65"
    },
    "outputs": {
     "lb_cl": {
@@ -67422,8 +67114,7 @@
    "inputs": {
     "ppm": 2,
     "gallons": 15000,
-    "product": "liquid-12.5",
-    "avail": 0
+    "product": "liquid-12.5"
    },
    "outputs": {
     "liq_floz": {
@@ -67609,9 +67300,7 @@
    "inputs": {
     "total_ppm": 2.4,
     "free_ppm": 1.2,
-    "ratio": 10,
-    "gallons": 0,
-    "avail": 0
+    "ratio": 10
    },
    "outputs": {
     "dose_ppm": {
@@ -67680,7 +67369,6 @@
    "verified_on": "2026-08-08",
    "inputs": {
     "dilution_pct": 30,
-    "base_pct": 0,
     "filler_pct": 23
    },
    "outputs": {
@@ -67776,8 +67464,7 @@
     "length_in": 12,
     "a_pass": 0.03,
     "dep_rate": 8,
-    "density": 0.283,
-    "op_factor": 0
+    "density": 0.283
    },
    "outputs": {
     "passes": {
@@ -67851,7 +67538,6 @@
    "inputs": {
     "T_lbin": 12000,
     "d_in": 1.5,
-    "di_in": 0,
     "L_in": 24,
     "G_psi": 11500000
    },
@@ -67902,7 +67588,6 @@
    "inputs": {
     "T_lbin": 12000,
     "d_in": 2,
-    "di_in": 0,
     "L_in": 24,
     "G_psi": 11500000
    },
@@ -67970,8 +67655,6 @@
     "E_psi": 10000000,
     "alpha": 1.3e-05,
     "dT_F": 100,
-    "A_in2": 0,
-    "L_in": 0,
     "restraint": 1
    },
    "outputs": {
@@ -68075,8 +67758,7 @@
    "inputs": {
     "P_psi": 200,
     "D_in": 10,
-    "t_in": 0.5,
-    "S_allow": 0
+    "t_in": 0.5
    },
    "outputs": {
     "sigma_h_psi": {
@@ -68431,9 +68113,7 @@
    "inputs": {
     "annual_overhead": 200000,
     "basis": "per-hour",
-    "billable_hours": 8000,
-    "annual_direct": 0,
-    "job_direct": 0
+    "billable_hours": 8000
    },
    "outputs": {
     "rate_hr": {
@@ -68455,7 +68135,6 @@
    "inputs": {
     "annual_overhead": 200000,
     "basis": "markup",
-    "billable_hours": 0,
     "annual_direct": 500000,
     "job_direct": 10000
    },
@@ -68486,9 +68165,6 @@
     "LLD": 0.85,
     "LDD": 0.9,
     "BF": 0.95,
-    "LBO": 0,
-    "RSDD": 0,
-    "other": 0,
     "initial_lm": 4000
    },
    "outputs": {
@@ -68517,11 +68193,7 @@
    "inputs": {
     "LLD": 0.95,
     "LDD": 0.95,
-    "BF": 0.98,
-    "LBO": 0,
-    "RSDD": 0,
-    "other": 0,
-    "initial_lm": 0
+    "BF": 0.98
    },
    "outputs": {
     "LLF": {
@@ -68776,7 +68448,6 @@
    "verified_on": "2026-07-10",
    "inputs": {
     "component_sccrs_ka": "65, 5, 5, 10",
-    "feeder_ir_ka": 0,
     "available_fault_ka": 22
    },
    "outputs": {
@@ -68798,7 +68469,6 @@
    "verified_on": "2026-07-10",
    "inputs": {
     "component_sccrs_ka": "65, 65, 10",
-    "feeder_ir_ka": 0,
     "available_fault_ka": 22
    },
    "outputs": {
@@ -68823,8 +68493,7 @@
     "grout_adder": 29,
     "cell_spacing": 8,
     "grout_spacing": 48,
-    "height_ft": 10,
-    "area_ft2": 0
+    "height_ft": 10
    },
    "outputs": {
     "wall_psf": {
@@ -68854,8 +68523,7 @@
     "grout_adder": 29,
     "cell_spacing": 8,
     "grout_spacing": 8,
-    "height_ft": 10,
-    "area_ft2": 0
+    "height_ft": 10
    },
    "outputs": {
     "wall_psf": {
@@ -69114,7 +68782,6 @@
    "inputs": {
     "P_psi": 60,
     "V_fps": 2,
-    "z_ft": 0,
     "gamma": 62.4
    },
    "outputs": {
@@ -69361,8 +69028,7 @@
    "inputs": {
     "trailer_gross_weight_lb": 7000,
     "tongue_weight_lb": 700,
-    "hitch_type": "conventional",
-    "hitch_rating_lb": 0
+    "hitch_type": "conventional"
    },
    "outputs": {
     "tongue_pct": {
@@ -69396,8 +69062,7 @@
    "inputs": {
     "trailer_gross_weight_lb": 7000,
     "tongue_weight_lb": 490,
-    "hitch_type": "conventional",
-    "hitch_rating_lb": 0
+    "hitch_type": "conventional"
    },
    "outputs": {
     "tongue_pct": {
@@ -69418,7 +69083,6 @@
    "verified_on": "2026-07-09",
    "inputs": {
     "diesel_gal": 200,
-    "trip_miles": 0,
     "mpg": 6.5,
     "dose_pct": 2.5,
     "def_tank_gal": 13
@@ -69454,7 +69118,6 @@
    "verified_on": "2026-07-09",
    "inputs": {
     "diesel_gal": 200,
-    "trip_miles": 0,
     "mpg": 6.5,
     "dose_pct": 3.0,
     "def_tank_gal": 13
@@ -69719,8 +69382,7 @@
    "verified_on": "2026-07-04",
    "inputs": {
     "bar_size": "5",
-    "total_len_ft": 500,
-    "price_per_lb": 0
+    "total_len_ft": 500
    },
    "outputs": {
     "weight_lb": {
@@ -69747,8 +69409,7 @@
    "verified_on": "2026-07-04",
    "inputs": {
     "bar_size": "8",
-    "total_len_ft": 500,
-    "price_per_lb": 0
+    "total_len_ft": 500
    },
    "outputs": {
     "weight_lb": {
@@ -69771,8 +69432,7 @@
     "volume_yd3": 42,
     "waste_pct": 8,
     "load_yd3": 10,
-    "min_yd3": 10,
-    "price_per_yd3": 0
+    "min_yd3": 10
    },
    "outputs": {
     "ordered_yd3": {
@@ -69807,8 +69467,7 @@
     "volume_yd3": 6,
     "waste_pct": 8,
     "load_yd3": 10,
-    "min_yd3": 10,
-    "price_per_yd3": 0
+    "min_yd3": 10
    },
    "outputs": {
     "ordered_yd3": {
@@ -69919,7 +69578,6 @@
     "mass_lb": 2000,
     "cp_above": 0.9,
     "t_enter_f": 80,
-    "t_storage_f": 0,
     "t_freeze_f": 28,
     "hif_btu_lb": 120,
     "cp_below": 0.45,
@@ -70050,7 +69708,6 @@
    "verified_by": "rl",
    "verified_on": "2026-07-10",
    "inputs": {
-    "vertical_lift_ft": 0,
     "friction_dp_psi": 15,
     "static_gradient": 0.43,
     "pt_slope": 5
@@ -70075,8 +69732,7 @@
    "inputs": {
     "area_ft2": 500,
     "coverage_per_batt": 10.67,
-    "coverage_per_bag": 88,
-    "waste_pct": 0
+    "coverage_per_bag": 88
    },
    "outputs": {
     "batts": {
@@ -70104,8 +69760,7 @@
    "inputs": {
     "area_ft2": 500,
     "coverage_per_batt": 10.67,
-    "coverage_per_bag": 67,
-    "waste_pct": 0
+    "coverage_per_bag": 67
    },
    "outputs": {
     "bags": {
@@ -70128,8 +69783,7 @@
     "perimeter_ft": 70,
     "openings_ft": 6,
     "waste_pct": 10,
-    "stock_len_ft": 16,
-    "spring_deg": 0
+    "stock_len_ft": 16
    },
    "outputs": {
     "net_ft": {
@@ -70245,8 +69899,7 @@
    "inputs": {
     "mode": "surface_to_q",
     "t_surface_f": 85,
-    "t_room_f": 70,
-    "q_target": 0
+    "t_room_f": 70
    },
    "outputs": {
     "q_btuh_ft2": {
@@ -70895,8 +70548,7 @@
    "verified_on": "2026-07-04",
    "inputs": {
     "opening_in": 0.5,
-    "near_wall": false,
-    "measured_in": 0
+    "near_wall": false
    },
    "outputs": {
     "air_gap_in": {
@@ -71372,7 +71024,6 @@
    "verified_on": "2026-07-10",
    "inputs": {
     "measured_o2_pct": 4,
-    "measured_co2_pct": 0,
     "co2max_pct": 11.7
    },
    "outputs": {
@@ -71393,7 +71044,6 @@
    "verified_by": "rl",
    "verified_on": "2026-07-10",
    "inputs": {
-    "measured_o2_pct": 0,
     "measured_co2_pct": 9,
     "co2max_pct": 11.7
    },
@@ -71642,8 +71292,7 @@
    "inputs": {
     "horsepower": 300,
     "bsfc_lb_hp_hr": 0.5,
-    "density_lb_gal": 6.1,
-    "tank_gal": 0
+    "density_lb_gal": 6.1
    },
    "outputs": {
     "gph": {
@@ -71717,8 +71366,7 @@
    "inputs": {
     "target_torque_ftlb": 100,
     "wrench_length_in": 18,
-    "adapter_length_in": 3,
-    "adapter_angle_deg": 0
+    "adapter_length_in": 3
    },
    "outputs": {
     "wrench_setting_ftlb": {
@@ -71862,8 +71510,7 @@
    "verified_by": "rl",
    "verified_on": "2026-08-08",
    "inputs": {
-    "cas_kt": 120,
-    "density_altitude_ft": 0
+    "cas_kt": 120
    },
    "outputs": {
     "tas_kt": {
@@ -71885,9 +71532,7 @@
    "inputs": {
     "runway_heading_deg": 360,
     "wind_dir_deg": 30,
-    "wind_speed_kt": 20,
-    "gust_kt": 0,
-    "max_demo_xwind_kt": 0
+    "wind_speed_kt": 20
    },
    "outputs": {
     "angle_deg": {
@@ -71921,9 +71566,7 @@
    "inputs": {
     "runway_heading_deg": 360,
     "wind_dir_deg": 150,
-    "wind_speed_kt": 20,
-    "gust_kt": 0,
-    "max_demo_xwind_kt": 0
+    "wind_speed_kt": 20
    },
    "outputs": {
     "crosswind_kt": {
@@ -71980,8 +71623,7 @@
    "inputs": {
     "weight_lb": 200,
     "radius_of_gyration_ft": 1.5,
-    "rpm": 600,
-    "energy_fluctuation_ftlb": 0
+    "rpm": 600
    },
    "outputs": {
     "kinetic_energy_ftlb": {
@@ -72117,8 +71759,7 @@
    "verified_by": "rl",
    "verified_on": "2026-07-09",
    "inputs": {
-    "lwl_ft": 25,
-    "actual_speed_kn": 0
+    "lwl_ft": 25
    },
    "outputs": {
     "hull_speed_kn": {
@@ -72420,8 +72061,7 @@
    "verified_on": "2026-07-09",
    "inputs": {
     "rim_width_in": 8,
-    "offset_mm": 45,
-    "backspacing_in": 0
+    "offset_mm": 45
    },
    "outputs": {
     "overall_width_in": {
@@ -72454,7 +72094,6 @@
    "verified_on": "2026-07-09",
    "inputs": {
     "rim_width_in": 8,
-    "offset_mm": 0,
     "backspacing_in": 6.27
    },
    "outputs": {
@@ -72541,8 +72180,7 @@
    "inputs": {
     "observed_hp": 400,
     "baro_mbar": 980,
-    "air_temp_c": 30,
-    "humidity_pct": 0
+    "air_temp_c": 30
    },
    "outputs": {
     "cf": {
@@ -72570,8 +72208,7 @@
    "inputs": {
     "observed_hp": 400,
     "baro_mbar": 970,
-    "air_temp_c": 35,
-    "humidity_pct": 0
+    "air_temp_c": 35
    },
    "outputs": {
     "cf": {
@@ -72595,7 +72232,6 @@
     "empty_arm_in": 39,
     "front_weight_lb": 340,
     "front_arm_in": 37,
-    "rear_weight_lb": 0,
     "rear_arm_in": 71,
     "fuel_weight_lb": 180,
     "fuel_arm_in": 48,
@@ -72633,7 +72269,6 @@
     "empty_arm_in": 39,
     "front_weight_lb": 200,
     "front_arm_in": 37,
-    "rear_weight_lb": 0,
     "rear_arm_in": 71,
     "fuel_weight_lb": 100,
     "fuel_arm_in": 48,
@@ -72880,8 +72515,7 @@
    "verified_on": "2026-07-04",
    "inputs": {
     "pg_psf": 15,
-    "importance": 1.0,
-    "pf_computed": 0
+    "importance": 1.0
    },
    "outputs": {
     "pm_psf": {
@@ -72902,8 +72536,7 @@
    "verified_on": "2026-07-04",
    "inputs": {
     "pg_psf": 25,
-    "importance": 1.1,
-    "pf_computed": 0
+    "importance": 1.1
    },
    "outputs": {
     "pm_psf": {
@@ -73089,9 +72722,7 @@
    "inputs": {
     "capacitance_uf": 100,
     "initial_voltage": 600,
-    "safe_voltage": 50,
-    "time_limit_s": 0,
-    "resistor_ohm": 0
+    "safe_voltage": 50
    },
    "outputs": {
     "r_max_ohm": {
@@ -73125,9 +72756,7 @@
    "inputs": {
     "capacitance_uf": 1,
     "initial_voltage": 4160,
-    "safe_voltage": 50,
-    "time_limit_s": 0,
-    "resistor_ohm": 0
+    "safe_voltage": 50
    },
    "outputs": {
     "r_max_ohm": {
@@ -73758,7 +73387,6 @@
    "verified_on": "2026-07-10",
    "inputs": {
     "vacuum_inhg": 10,
-    "site_elevation_ft": 0,
     "pump_factor": 0.667
    },
    "outputs": {
@@ -74374,7 +74002,6 @@
    "verified_on": "2026-07-10",
    "inputs": {
     "daily_manure_ft3": 150,
-    "wastewater_ft3": 0,
     "bedding_ft3": 20,
     "storage_days": 120,
     "surface_area_ft2": 8000,
@@ -74413,7 +74040,6 @@
    "verified_on": "2026-07-10",
    "inputs": {
     "daily_manure_ft3": 150,
-    "wastewater_ft3": 0,
     "bedding_ft3": 20,
     "storage_days": 120,
     "surface_area_ft2": 12000,
@@ -75287,8 +74913,7 @@
    "inputs": {
     "leg_tension_lb": 1444,
     "leg_angle_deg": 22.62,
-    "vertical_wll_lb": 4000,
-    "side_pull_lb": 0
+    "vertical_wll_lb": 4000
    },
    "outputs": {
     "vertical_lb": {
@@ -75324,7 +74949,6 @@
     "head_bearing_area_in2": 0.654,
     "fc_psi": 4000,
     "embedment_in": 10,
-    "perp_edge_in": 0,
     "lambda": 1
    },
    "outputs": {
@@ -75404,8 +75028,6 @@
     "embedment_in": 6,
     "fc_psi": 4000,
     "edge_distance_in": 6,
-    "perp_edge_in": 0,
-    "member_thickness_in": 0,
     "cracking": "cracked",
     "lambda": 1
    },
@@ -76058,7 +75680,6 @@
    "inputs": {
     "outside_corners": 3,
     "corner_height_ft": 9,
-    "wrapped_openings": 0,
     "opening_width_ft": 3,
     "opening_height_ft": 7,
     "stock_length_ft": 8,
@@ -76228,8 +75849,6 @@
    "verified_on": "2026-07-27",
    "inputs": {
     "single_hang_ft": 10,
-    "double_hang_ft": 0,
-    "linen_wall_ft": 0,
     "linen_shelf_count": 4,
     "bracket_spacing_in": 32,
     "stock_length_ft": 8
@@ -76269,8 +75888,7 @@
     "thickness_cm": 3,
     "run_length_ft": 8,
     "bracket_spacing_in": 24,
-    "density_pcf": 170,
-    "unsupported_limit_override_in": 0
+    "density_pcf": 170
    },
    "outputs": {
     "thickness_limit_in": {
@@ -76337,8 +75955,7 @@
     "thickness_cm": 3,
     "run_length_ft": 6,
     "bracket_spacing_in": 24,
-    "density_pcf": 170,
-    "unsupported_limit_override_in": 0
+    "density_pcf": 170
    },
    "outputs": {
     "one_third_limit_in": {
@@ -76436,7 +76053,6 @@
    "verified_by": "rl",
    "verified_on": "2026-07-27",
    "inputs": {
-    "bottom_width_ft": 0,
     "side_slope_z": 3,
     "depth_ft": 1.5,
     "n": 0.035,
@@ -76480,7 +76096,6 @@
    "inputs": {
     "clear_span_ft": 6,
     "lintel_depth_in": 8,
-    "support_center_ft": 0,
     "udl_plf": 500,
     "bearing_width_in": 7.625,
     "allowable_bearing_psi": 500
@@ -76529,7 +76144,6 @@
    "inputs": {
     "clear_span_ft": 16,
     "lintel_depth_in": 16,
-    "support_center_ft": 0,
     "udl_plf": 4000,
     "bearing_width_in": 7.625,
     "allowable_bearing_psi": 150
@@ -76699,8 +76313,7 @@
    "inputs": {
     "configuration": "blow-through",
     "static_pressure_in_wc": 1.5,
-    "pipe_diameter_in": 1.0,
-    "insulation_in": 0
+    "pipe_diameter_in": 1.0
    },
    "outputs": {
     "h_in": {
@@ -76834,8 +76447,7 @@
    "inputs": {
     "flow_gpm": 20,
     "inside_dia_in": 0.625,
-    "line_type": "pressure",
-    "max_velocity_override_fps": 0
+    "line_type": "pressure"
    },
    "outputs": {
     "area_in2": {
@@ -76881,8 +76493,7 @@
    "inputs": {
     "flow_gpm": 20,
     "inside_dia_in": 0.625,
-    "line_type": "suction",
-    "max_velocity_override_fps": 0
+    "line_type": "suction"
    },
    "outputs": {
     "velocity_fps": {
@@ -76915,8 +76526,7 @@
    "verified_on": "2026-07-27",
    "inputs": {
     "nominal_length_ft": 24,
-    "sections": 2,
-    "overlap_override_ft": 0
+    "sections": 2
    },
    "outputs": {
     "overlap_ft": {
@@ -76961,8 +76571,7 @@
    "verified_on": "2026-07-27",
    "inputs": {
     "nominal_length_ft": 60,
-    "sections": 3,
-    "overlap_override_ft": 0
+    "sections": 3
    },
    "outputs": {
     "overlap_ft": {
@@ -77065,8 +76674,7 @@
    "verified_on": "2026-07-27",
    "inputs": {
     "road_type": "expressway",
-    "sign_count": 3,
-    "speed_mph": 0
+    "sign_count": 3
    },
    "outputs": {
     "a_ft": {
@@ -77259,8 +76867,7 @@
    "verified_on": "2026-07-27",
    "inputs": {
     "horizontal_offset_ft": 2,
-    "anchor_height_ft": 20,
-    "base_required_clearance_ft": 0
+    "anchor_height_ft": 20
    },
    "outputs": {
     "swing_angle_deg": {
@@ -77477,10 +77084,6 @@
    "verified_on": "2026-07-27",
    "inputs": {
     "base_wall_ft": 12,
-    "wall_cab_ft": 0,
-    "tall_ft": 0,
-    "appliance_openings_ft": 0,
-    "corners": 0,
     "cabinet_depth_in": 24,
     "filler_per_corner_in": 3,
     "standard_width_in": 24,
@@ -77701,7 +77304,6 @@
    "verified_on": "2026-07-28",
    "inputs": {
     "rim_height_in": 34,
-    "counter_height_in": 0,
     "metering_seconds": 10,
     "tub_length_in": 60,
     "permanent_seat": "no",
@@ -77966,10 +77568,8 @@
    "inputs": {
     "market_value": 180000,
     "improvement_cost": 95000,
-    "prior_costs": 0,
     "threshold_pct": 50,
     "land_value": 220000,
-    "excluded_code_cost": 0,
     "historic_structure": "no"
    },
    "outputs": {
@@ -78018,8 +77618,6 @@
     "improvement_cost": 60000,
     "prior_costs": 40000,
     "threshold_pct": 50,
-    "land_value": 0,
-    "excluded_code_cost": 0,
     "historic_structure": "no"
    },
    "outputs": {
@@ -78359,8 +77957,7 @@
     "total_rise_in": 108.5,
     "open_risers": "no",
     "nosing_projection_in": 1,
-    "leading_edge_radius_in": 0.25,
-    "riser_slope_deg": 0
+    "leading_edge_radius_in": 0.25
    },
    "outputs": {
     "riser_deficit_in": {
@@ -78415,8 +78012,7 @@
     "total_rise_in": 108.5,
     "open_risers": "no",
     "nosing_projection_in": 1,
-    "leading_edge_radius_in": 0.25,
-    "riser_slope_deg": 0
+    "leading_edge_radius_in": 0.25
    },
    "outputs": {
     "riser_deficit_in": {
@@ -79255,7 +78851,6 @@
     "d_in": 17.5,
     "as_in2": 3.0,
     "fc_psi": 4000,
-    "asp_in2": 0,
     "dp_in": 2.5
    },
    "outputs": {
@@ -79343,8 +78938,7 @@
     "arrest_force_lb": 1800,
     "workers": 1,
     "safety_factor": 2,
-    "anchorage_capacity_lb": 5000,
-    "target_tension_lb": 0
+    "anchorage_capacity_lb": 5000
    },
    "outputs": {
     "cable_tension_lb": {
@@ -79391,7 +78985,6 @@
     "enclosed_area_sf": 1200,
     "opening_type": "non-engineered",
     "net_free_area_per_opening_sqin": 51,
-    "coverage_sf_per_opening": 0,
     "openings_provided": 8,
     "bottom_height_in": 16
    },
@@ -79440,7 +79033,6 @@
     "enclosed_area_sf": 200,
     "opening_type": "non-engineered",
     "net_free_area_per_opening_sqin": 250,
-    "coverage_sf_per_opening": 0,
     "openings_provided": 1,
     "bottom_height_in": 8
    },
@@ -79580,8 +79172,6 @@
     "clearance_in": 1.5,
     "grip_shape": "circular",
     "diameter_in": 2.5,
-    "perimeter_in": 0,
-    "cross_section_in": 0,
     "flight_type": "stair",
     "tread_depth_in": 11,
     "top_extension_in": 12,
@@ -79627,8 +79217,6 @@
     "clearance_in": 1.5,
     "grip_shape": "circular",
     "diameter_in": 1.5,
-    "perimeter_in": 0,
-    "cross_section_in": 0,
     "flight_type": "stair",
     "tread_depth_in": 13,
     "top_extension_in": 12,
@@ -79681,11 +79269,7 @@
     "approach": "parallel",
     "alcove_depth_in": 20,
     "turning_type": "circular",
-    "turning_diameter_in": 60,
-    "t_square_in": 0,
-    "t_arm_width_in": 0,
-    "t_arm_clear_in": 0,
-    "t_base_clear_in": 0
+    "turning_diameter_in": 60
    },
    "outputs": {
     "cfs_short_side_in": {
@@ -79734,7 +79318,6 @@
     "approach": "parallel",
     "alcove_depth_in": 20,
     "turning_type": "t-shaped",
-    "turning_diameter_in": 0,
     "t_square_in": 60,
     "t_arm_width_in": 36,
     "t_arm_clear_in": 12,
@@ -79778,8 +79361,6 @@
    "inputs": {
     "level_change_in": 0.5,
     "bevel_run_in": 0.5,
-    "carpet_pile_in": 0,
-    "opening_size_in": 0,
     "opening_elongated": "no",
     "opening_perpendicular": "yes",
     "ramp_run_per_rise": 12
@@ -79822,8 +79403,6 @@
    "inputs": {
     "level_change_in": 0.625,
     "bevel_run_in": 2,
-    "carpet_pile_in": 0,
-    "opening_size_in": 0,
     "opening_elongated": "no",
     "opening_perpendicular": "yes",
     "ramp_run_per_rise": 12
@@ -80025,8 +79604,7 @@
     "task": "iv",
     "location": "indoors",
     "hours_per_shift": 2,
-    "controls_fully_implemented": "yes",
-    "apf_provided": 0
+    "controls_fully_implemented": "yes"
    },
    "outputs": {
     "required_apf": {
@@ -80172,14 +79750,10 @@
    "inputs": {
     "leaf_width_in": 32,
     "door_thickness_in": 1.75,
-    "measured_clear_width_in": 0,
     "opening_depth_in": 5,
     "is_alteration": "no",
-    "latch_stop_projection_in": 0,
     "threshold_height_in": 0.5,
-    "threshold_beveled": "no",
-    "series_spacing_in": 0,
-    "series_door_width_in": 0
+    "threshold_beveled": "no"
    },
    "outputs": {
     "estimated_clear_width_in": {
@@ -80225,10 +79799,8 @@
    "inputs": {
     "leaf_width_in": 36,
     "door_thickness_in": 1.75,
-    "measured_clear_width_in": 0,
     "opening_depth_in": 30,
     "is_alteration": "no",
-    "latch_stop_projection_in": 0,
     "threshold_height_in": 0.5,
     "threshold_beveled": "no",
     "series_spacing_in": 60,
@@ -80288,9 +79860,6 @@
     "pinch_length_in": 30,
     "separation_length_in": 48,
     "turn_present": "no",
-    "turn_element_width_in": 0,
-    "approach_width_in": 0,
-    "at_turn_width_in": 0,
     "route_length_ft": 250
    },
    "outputs": {
@@ -80331,9 +79900,6 @@
    "inputs": {
     "clear_width_in": 36,
     "pinch_present": "no",
-    "pinch_width_in": 0,
-    "pinch_length_in": 0,
-    "separation_length_in": 0,
     "turn_present": "yes",
     "turn_element_width_in": 36,
     "approach_width_in": 36,
@@ -80381,8 +79947,7 @@
     "projection_in": 6,
     "corridor_width_in": 44,
     "required_route_width_in": 36,
-    "vertical_clearance_in": 80,
-    "barrier_edge_height_in": 0
+    "vertical_clearance_in": 80
    },
    "outputs": {
     "max_projection_in": {
@@ -80521,7 +80086,6 @@
     "approach": "forward",
     "obstructed": "yes",
     "obstruction_depth_in": 26,
-    "obstruction_height_in": 0,
     "element_height_in": 40
    },
    "outputs": {
@@ -80658,9 +80222,7 @@
     "wheelchair_width_in": 60,
     "wheelchair_depth_in": 56,
     "wc_mounting": "floor-mounted",
-    "ambulatory_provided": "no",
-    "ambulatory_width_in": 0,
-    "ambulatory_depth_in": 0
+    "ambulatory_provided": "no"
    },
    "outputs": {
     "required_wheelchair_depth_in": {
@@ -80705,7 +80267,6 @@
    "verified_on": "2026-07-28",
    "inputs": {
     "compartment_count": 6,
-    "urinal_count": 0,
     "water_closet_count": 6,
     "wheelchair_width_in": 60,
     "wheelchair_depth_in": 60,
@@ -80752,8 +80313,7 @@
    "inputs": {
     "total_spaces": 100,
     "facility_count": 1,
-    "provided_accessible": 4,
-    "provided_van": 0
+    "provided_accessible": 4
    },
    "outputs": {
     "required_accessible": {
@@ -80969,8 +80529,7 @@
    "inputs": {
     "option": "default",
     "voltage_kv": 500,
-    "actual_clearance_ft": 25,
-    "boom_length_ft": 0
+    "actual_clearance_ft": 25
    },
    "outputs": {
     "required_clearance_ft": {
@@ -81186,7 +80745,6 @@
    "inputs": {
     "material": "brick",
     "stack_height_ft": 5,
-    "taper_provided_in": 0,
     "block_height_in": 8,
     "block_length_in": 16,
     "handled_manually": "no"
@@ -81229,7 +80787,6 @@
    "inputs": {
     "material": "block",
     "stack_height_ft": 8,
-    "taper_provided_in": 0,
     "block_height_in": 8,
     "block_length_in": 16,
     "handled_manually": "no"
@@ -81265,7 +80822,6 @@
    "verified_on": "2026-07-28",
    "inputs": {
     "cat123_gallons": 200,
-    "cat4_gallons": 0,
     "cabinets_available": 4,
     "per_cabinet_cat123_gal": 60,
     "per_cabinet_cat4_gal": 120,
@@ -81361,9 +80917,7 @@
     "riser_height_in": 10.67,
     "tread_depth_in": 11,
     "riser_variation_in": 0.5,
-    "tread_variation_in": 0.125,
-    "stairrail_height_in": 0,
-    "landing_depth_in": 0
+    "tread_variation_in": 0.125
    },
    "outputs": {
     "angle_deg": {
@@ -81400,9 +80954,7 @@
     "riser_height_in": 8,
     "tread_depth_in": 18,
     "riser_variation_in": 0.125,
-    "tread_variation_in": 0.125,
-    "stairrail_height_in": 0,
-    "landing_depth_in": 0
+    "tread_variation_in": 0.125
    },
    "outputs": {
     "angle_deg": {
@@ -81521,7 +81073,6 @@
     "workers_attached": 2,
     "anchorage_capacity_lb": 5000,
     "design_route": "prescriptive",
-    "design_load_lb": 0,
     "arresting_force_lb": 1600,
     "deceleration_distance_ft": 3.5,
     "free_fall_ft": 6
@@ -81708,7 +81259,6 @@
     "midrail_height_in": 22.5,
     "toeboard_height_in": 3,
     "toprail_capacity_lb": 150,
-    "midrail_capacity_lb": 0,
     "scaffold_type": "other",
     "midrail_tolerance_in": 3
    },
@@ -81752,9 +81302,6 @@
     "well_projection_in": 30,
     "well_depth_in": 60,
     "has_ladder": "no",
-    "ladder_inside_width_in": 0,
-    "ladder_projection_in": 0,
-    "ladder_spacing_in": 0,
     "opening_fully_opens": "yes"
    },
    "outputs": {
@@ -81885,8 +81432,7 @@
     "min_fixture_pressure_psi": 20,
     "has_check_or_backflow": "yes",
     "has_storage_water_heater": "yes",
-    "expansion_control_present": "no",
-    "prv_setpoint_psi": 0
+    "expansion_control_present": "no"
    },
    "outputs": {
     "over_by_psi": {
@@ -82112,7 +81658,6 @@
    "inputs": {
     "floor_area_sf": 40000,
     "hazard_class": "A",
-    "travel_distance_ft": 0,
     "area_cap_sf": 11250
    },
    "outputs": {
@@ -82165,7 +81710,6 @@
    "inputs": {
     "floor_area_sf": 40000,
     "hazard_class": "K",
-    "travel_distance_ft": 0,
     "area_cap_sf": 11250
    },
    "outputs": {
@@ -82217,7 +81761,6 @@
    "verified_on": "2026-07-27",
    "inputs": {
     "sleeping_areas": 2,
-    "bedrooms_with_appliance": 0,
     "has_fuel_appliance": "no",
     "has_attached_garage": "yes",
     "stories": 2,
@@ -82551,7 +82094,6 @@
    "verified_on": "2026-07-27",
    "inputs": {
     "clear_perpendicular_in": 48,
-    "clear_latch_side_in": 0,
     "door_clear_width_in": 32,
     "side": "push",
     "min_pull_perpendicular_in": 60,
@@ -82603,7 +82145,6 @@
     "horizontal_run_ft": 240,
     "max_spacing_ft": 100,
     "direction_changes": 9,
-    "changes_grouped_away": 0,
     "stack_count": 2,
     "pipe_size_in": 4,
     "clear_space_in": 18,
@@ -82654,7 +82195,6 @@
     "horizontal_run_ft": 80,
     "max_spacing_ft": 100,
     "direction_changes": 3,
-    "changes_grouped_away": 0,
     "stack_count": 1,
     "pipe_size_in": 4,
     "clear_space_in": 12,
@@ -83151,8 +82691,6 @@
     "front_clearance_in": 24,
     "adjacent_center_in": 30,
     "fixture_count": 2,
-    "compartment_width_in": 0,
-    "compartment_depth_in": 0,
     "min_side_in": 15,
     "min_center_in": 30,
     "min_front_in": 21
@@ -83202,7 +82740,6 @@
     "center_to_left_in": 14,
     "center_to_right_in": 15,
     "front_clearance_in": 18,
-    "adjacent_center_in": 0,
     "fixture_count": 3,
     "compartment_width_in": 30,
     "compartment_depth_in": 56,
@@ -83243,8 +82780,7 @@
     "clear_width_in": 20,
     "clear_height_in": 24,
     "sill_height_in": 40,
-    "location": "above-grade",
-    "min_area_override_sf": 0
+    "location": "above-grade"
    },
    "outputs": {
     "clear_area_sqin": {
@@ -83303,8 +82839,7 @@
     "clear_width_in": 34,
     "clear_height_in": 24,
     "sill_height_in": 44,
-    "location": "grade-floor",
-    "min_area_override_sf": 0
+    "location": "grade-floor"
    },
    "outputs": {
     "clear_area_sqin": {
@@ -83799,8 +83334,7 @@
    "inputs": {
     "cut_list": "62,4\n38,6\n27,9\n14.5,12",
     "stock_length_in": 240,
-    "kerf_in": 0,
-    "end_trim_in": 0
+    "kerf_in": 0
    },
    "outputs": {
     "sticks": {
@@ -84038,8 +83572,7 @@
     "tooth_system": "20-full-depth",
     "y_diametral_override": 0.4,
     "tooth_cut": "cut",
-    "is_idler": "no",
-    "sut_psi": 0
+    "is_idler": "no"
    },
    "outputs": {
     "pitch_diameter_in": {
@@ -84101,7 +83634,6 @@
     "diametral_pitch_1_in": 8,
     "face_width_in": 0.5,
     "tooth_system": "20-full-depth",
-    "y_diametral_override": 0,
     "tooth_cut": "cut",
     "is_idler": "yes",
     "sut_psi": 60000
@@ -84151,7 +83683,6 @@
     "overturning_moment_kipft": 5422,
     "dead_load_kip": 900,
     "footprint_width_ft": 20,
-    "arm_override_ft": 0,
     "sds": 1.0,
     "design_method": "lrfd",
     "apply_soil_reduction": "yes",
@@ -84226,7 +83757,6 @@
     "overturning_moment_kipft": 5422,
     "dead_load_kip": 900,
     "footprint_width_ft": 20,
-    "arm_override_ft": 0,
     "sds": 1.0,
     "design_method": "asd",
     "apply_soil_reduction": "yes",
@@ -84289,7 +83819,6 @@
     "ln_in": 240,
     "sw_in": 24,
     "beam_type": "interior",
-    "be_override_in": 0,
     "mu_kipft": 700
    },
    "outputs": {
@@ -84372,9 +83901,7 @@
     "d_in": 24,
     "ln_in": 240,
     "sw_in": 48,
-    "beam_type": "interior",
-    "be_override_in": 0,
-    "mu_kipft": 0
+    "beam_type": "interior"
    },
    "outputs": {
     "be_in": {
@@ -84421,7 +83948,6 @@
     "room_length_ft": 30,
     "room_width_ft": 20,
     "roll_width_ft": 12,
-    "pattern_repeat_in": 0,
     "waste_pct": 5,
     "min_fill_strip_in": 6
    },
@@ -84629,7 +84155,6 @@
     "tape_weight_plf": 0.02,
     "tape_area_in2": 0.006,
     "standard_pull_lb": 10,
-    "applied_pull_lb": 0,
     "e_psi": 29000000
    },
    "outputs": {
@@ -84670,8 +84195,7 @@
    "inputs": {
     "mode": "azimuth_to_bearing",
     "azimuth_deg": 138.5,
-    "quadrant": "NE",
-    "quadrant_angle_deg": 0
+    "quadrant": "NE"
    },
    "outputs": {
     "azimuth_deg": {
@@ -84698,7 +84222,6 @@
    "verified_on": "2026-08-04",
    "inputs": {
     "mode": "bearing_to_azimuth",
-    "azimuth_deg": 0,
     "quadrant": "SW",
     "quadrant_angle_deg": 30
    },
@@ -84729,7 +84252,6 @@
     "wall_height_ft": 8,
     "block_depth_in": 9,
     "block_height_in": 8,
-    "base_course_buried_in": 0,
     "ncma_suggested_max_in": 24,
     "grid_length_basis": 0.6
    },
@@ -84796,7 +84318,6 @@
     "wall_height_ft": 8,
     "block_depth_in": 10,
     "block_height_in": 6,
-    "base_course_buried_in": 0,
     "ncma_suggested_max_in": 24,
     "grid_length_basis": 0.6
    },
@@ -85213,9 +84734,7 @@
    "inputs": {
     "pressure_angle_deg": 25,
     "teeth": 14,
-    "addendum_coefficient": 1.0,
-    "center_distance_change_in": 0,
-    "diametral_pitch": 0
+    "addendum_coefficient": 1.0
    },
    "outputs": {
     "min_teeth_exact": {
@@ -85556,8 +85075,7 @@
     "ns": 1,
     "n": 4,
     "hf": 1.0,
-    "du": 1.13,
-    "applied_tension_kip": 0
+    "du": 1.13
    },
    "outputs": {
     "ksc": {
@@ -85685,7 +85203,6 @@
     "inside_diameter_in": 121.8,
     "allowable_stress_psi": 12000,
     "joint_efficiency": 1.0,
-    "corrosion_allowance_in": 0,
     "head_type": "torispherical"
    },
    "outputs": {
@@ -85744,7 +85261,6 @@
     "wastage_factor": 1.05,
     "traffic_factor": 0.75,
     "surface_factor_gal_sy": 0.02,
-    "absorption_gal_sy": 0,
     "residual_asphalt": 0.67
    },
    "outputs": {
@@ -85796,7 +85312,6 @@
     "wastage_factor": 1.05,
     "traffic_factor": 0.6,
     "surface_factor_gal_sy": 0.02,
-    "absorption_gal_sy": 0,
     "residual_asphalt": 0.67
    },
    "outputs": {
@@ -85978,7 +85493,6 @@
     "eave_length_ft": 80,
     "rake_run_ft": 14,
     "rake_count": 4,
-    "pitch_rise_per_12": 0,
     "stock_length_ft": 10,
     "lap_in": 2,
     "waste_pct": 10
@@ -86112,10 +85626,7 @@
     "col_web_tw_in": 0.5,
     "col_area_ag_in2": 26.5,
     "pr_kip": 600,
-    "pz_in_analysis": "no",
-    "col_flange_bcf_in": 0,
-    "col_flange_tcf_in": 0,
-    "beam_depth_db_in": 0
+    "pz_in_analysis": "no"
    },
    "outputs": {
     "py_kip": {
@@ -86398,7 +85909,6 @@
    "inputs": {
     "stage1_g_per_s": 40,
     "stage2_g_per_s": 20,
-    "stage3_g_per_s": 0,
     "stage_volume_m3": 150,
     "water_temp_c": 5,
     "total_detention_min": 20
@@ -86712,7 +86222,6 @@
    "verified_on": "2026-08-10",
    "inputs": {
     "radial_load_lbf": 1000,
-    "thrust_load_lbf": 0,
     "static_rating_lbf": 5000
    },
    "outputs": {
@@ -86893,8 +86402,6 @@
     "mean_diameter_in": 1.0,
     "lead_in": 0.2,
     "thread_friction": 0.15,
-    "collar_friction": 0.0,
-    "collar_diameter_in": 0.0,
     "thread_form": "acme"
    },
    "outputs": {
@@ -87100,7 +86607,6 @@
     "frontal_area_ft2": 24,
     "drag_coefficient": 0.3,
     "rolling_coefficient": 0.012,
-    "grade_pct": 0,
     "air_density_lb_ft3": 0.0765
    },
    "outputs": {
@@ -87606,8 +87112,7 @@
    "verified_on": "2026-08-13",
    "inputs": {
     "driving_force_lb": 100,
-    "included_angle_deg": 30,
-    "friction_coefficient": 0
+    "included_angle_deg": 30
    },
    "outputs": {
     "spreading_force_lb": {
@@ -87668,8 +87173,7 @@
    "verified_on": "2026-08-13",
    "inputs": {
     "weight_lb": 1000,
-    "incline_angle_deg": 30,
-    "friction_coefficient": 0
+    "incline_angle_deg": 30
    },
    "outputs": {
     "force_up_lb": {
@@ -87960,7 +87464,6 @@
    "verified_on": "2026-08-10",
    "inputs": {
     "weight_lb": 1000,
-    "drop_height_in": 0,
     "static_deflection_in": 0.1
    },
    "outputs": {
@@ -88534,7 +88037,6 @@
    "verified_on": "2026-08-10",
    "inputs": {
     "large_diameter_ft": 6,
-    "small_diameter_ft": 0,
     "height_ft": 4
    },
    "outputs": {
@@ -88815,8 +88317,6 @@
    "inputs": {
     "bottom_length_ft": 6,
     "bottom_width_ft": 6,
-    "top_length_ft": 0,
-    "top_width_ft": 0,
     "height_ft": 4
    },
    "outputs": {
@@ -89210,7 +88710,6 @@
    "verified_on": "2026-08-13",
    "inputs": {
     "base_radius_1_ft": 4.58257569,
-    "base_radius_2_ft": 0,
     "zone_height_ft": 3
    },
    "outputs": {
