@@ -9,7 +9,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, makeRowField,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -653,8 +653,9 @@ function renderHOS(inputRegion, outputRegion, citationEl) {
     for (const v of ["drive", "on_duty", "sleeper", "off_duty"]) {
       const o = document.createElement("option"); o.value = v; o.textContent = v.replace("_", " "); k.appendChild(o);
     }
-    const h = document.createElement("input"); h.type = "number"; h.step = "any"; h.min = "0"; h.inputMode = "decimal"; h.placeholder = "Hours"; h.setAttribute("aria-label", "Hours for segment " + (i + 1));
-    wrap.appendChild(k); wrap.appendChild(h); eventsList.appendChild(wrap);
+    const hF = makeRowField("Segment " + (i + 1) + " hours", "hos-s" + i + "-h", { step: "any", min: "0" });
+    const h = hF.input;
+    wrap.appendChild(k); wrap.appendChild(hF.wrap); eventsList.appendChild(wrap);
     k.addEventListener("input", update); h.addEventListener("input", update);
     rows.push({ k, h });
   }
@@ -697,9 +698,10 @@ function renderBridgeFormula(inputRegion, outputRegion, citationEl) {
   const rows = [];
   for (let i = 0; i < 6; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const aw = document.createElement("input"); aw.type = "number"; aw.step = "any"; aw.min = "0"; aw.inputMode = "decimal"; aw.placeholder = "Axle " + (i + 1) + " weight (lb)"; aw.setAttribute("aria-label", "Axle " + (i + 1) + " weight (lb)");
-    const ag = document.createElement("input"); ag.type = "number"; ag.step = "any"; ag.min = "0"; ag.inputMode = "decimal"; ag.placeholder = "Spacing to next (ft)"; ag.setAttribute("aria-label", "Axle " + (i + 1) + " spacing to next (ft)");
-    wrap.appendChild(aw); wrap.appendChild(ag); list.appendChild(wrap);
+    const awF = makeRowField("Axle " + (i + 1) + " weight (lb)", "br-a" + i + "-w", { step: "any", min: "0" });
+    const agF = makeRowField("Axle " + (i + 1) + " spacing to next (ft)", "br-a" + i + "-s", { step: "any", min: "0" });
+    const aw = awF.input, ag = agF.input;
+    wrap.appendChild(awF.wrap); wrap.appendChild(agF.wrap); list.appendChild(wrap);
     aw.addEventListener("input", update); ag.addEventListener("input", update);
     rows.push({ aw, ag });
   }

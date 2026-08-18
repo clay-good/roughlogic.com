@@ -884,7 +884,7 @@ export function renderEvaporativeCooling(inputRegion, outputRegion, citationEl) 
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox, makeTextarea,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, makeRowField,
 } from "./ui-fields.js";
 // v8 §D.2 shared context-band helper.
 import { formatContextBand } from "./context-band.js";
@@ -1619,9 +1619,10 @@ function renderAirReceiver(inputRegion, outputRegion, citationEl) {
   const rows = [];
   for (let i = 0; i < 3; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const cf = document.createElement("input"); cf.type = "number"; cf.step = "any"; cf.min = "0"; cf.inputMode = "decimal"; cf.placeholder = "Tool CFM"; cf.setAttribute("aria-label", "Tool " + (i + 1) + " CFM");
-    const dc = document.createElement("input"); dc.type = "number"; dc.step = "any"; dc.min = "0"; dc.max = "1"; dc.inputMode = "decimal"; dc.placeholder = "Duty cycle 0..1"; dc.setAttribute("aria-label", "Tool " + (i + 1) + " duty cycle (0 to 1)");
-    wrap.appendChild(cf); wrap.appendChild(dc); list.appendChild(wrap);
+    const cfF = makeRowField("Tool " + (i + 1) + " CFM", "ar-t" + i + "-cfm", { step: "any", min: "0" });
+    const dcF = makeRowField("Tool " + (i + 1) + " duty cycle (0 to 1)", "ar-t" + i + "-duty", { step: "any", min: "0", max: "1" });
+    const cf = cfF.input, dc = dcF.input;
+    wrap.appendChild(cfF.wrap); wrap.appendChild(dcF.wrap); list.appendChild(wrap);
     cf.addEventListener("input", update); dc.addEventListener("input", update);
     rows.push({ cf, dc });
   }

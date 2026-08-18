@@ -1441,7 +1441,7 @@ export const vehicleLoadExample = {
 
 import {
   DEBOUNCE_MS as _DG, debounce as _debG, makeNumber as _mnG, makeSelect as _msG, makeCheckbox as _mcG,
-  makeOutputLine as _moG, attachExampleButton as _aeG, fmt as _fmtG,
+  makeOutputLine as _moG, attachExampleButton as _aeG, fmt as _fmtG, makeRowField as _mrG,
 } from "./ui-fields.js";
 
 function _simpleRendererG(spec) {
@@ -1678,11 +1678,13 @@ function renderTimesheet(inputRegion, outputRegion, citationEl) {
   // Five day rows: a timesheet week, and the length of the worked example.
   for (let i = 0; i < 5; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const s = document.createElement("input"); s.type = "number"; s.step = "any"; s.inputMode = "decimal"; s.placeholder = "Start (hr 0-24)"; s.setAttribute("aria-label", "Day " + (i + 1) + " start hour");
-    const e = document.createElement("input"); e.type = "number"; e.step = "any"; e.inputMode = "decimal"; e.placeholder = "End (hr 0-24)"; e.setAttribute("aria-label", "Day " + (i + 1) + " end hour");
-    const l = document.createElement("input"); l.type = "number"; l.step = "any"; l.min = "0"; l.inputMode = "decimal"; l.placeholder = "Lunch (min)"; l.setAttribute("aria-label", "Day " + (i + 1) + " lunch minutes");
-    const m = document.createElement("input"); m.type = "number"; m.step = "any"; m.min = "0"; m.inputMode = "decimal"; m.placeholder = "Miles"; m.setAttribute("aria-label", "Day " + (i + 1) + " miles driven");
-    wrap.appendChild(s); wrap.appendChild(e); wrap.appendChild(l); wrap.appendChild(m);
+    const day = "Day " + (i + 1) + " ";
+    const sF = _mrG(day + "start (hr 0-24)", "ts-d" + i + "-s", { step: "any" });
+    const eF = _mrG(day + "end (hr 0-24)", "ts-d" + i + "-e", { step: "any" });
+    const lF = _mrG(day + "lunch (min)", "ts-d" + i + "-l", { step: "any", min: "0" });
+    const mF = _mrG(day + "miles", "ts-d" + i + "-m", { step: "any", min: "0" });
+    const s = sF.input, e = eF.input, l = lF.input, m = mF.input;
+    for (const f of [sF, eF, lF, mF]) wrap.appendChild(f.wrap);
     list.appendChild(wrap);
     [s, e, l, m].forEach((el) => el.addEventListener("input", update));
     rows.push({ s, e, l, m });
@@ -1968,17 +1970,10 @@ function renderNoiseDose(inputRegion, outputRegion, citationEl) {
   const ROW_COUNT = 6;
   for (let i = 0; i < ROW_COUNT; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const lbl = document.createElement("label");
-    lbl.textContent = "Row " + (i + 1) + " (dBA, hr)";
-    wrap.appendChild(lbl);
-    const lvl = document.createElement("input");
-    lvl.type = "number"; lvl.step = "any"; lvl.min = "0"; lvl.id = "nd-l" + i; lvl.inputMode = "decimal";
-    lvl.placeholder = "level dBA"; lvl.setAttribute("aria-label", "Row " + (i + 1) + " noise level (dBA)");
-    wrap.appendChild(lvl);
-    const hr = document.createElement("input");
-    hr.type = "number"; hr.step = "any"; hr.min = "0"; hr.id = "nd-h" + i; hr.inputMode = "decimal";
-    hr.placeholder = "hours"; hr.setAttribute("aria-label", "Row " + (i + 1) + " hours at this level");
-    wrap.appendChild(hr);
+    const lvlF = _mrG("Row " + (i + 1) + " noise level (dBA)", "nd-l" + i, { step: "any", min: "0" });
+    const hrF = _mrG("Row " + (i + 1) + " hours at this level", "nd-h" + i, { step: "any", min: "0" });
+    const lvl = lvlF.input, hr = hrF.input;
+    wrap.appendChild(lvlF.wrap); wrap.appendChild(hrF.wrap);
     inputRegion.appendChild(wrap);
     rowDivs.push({ lvl, hr });
   }

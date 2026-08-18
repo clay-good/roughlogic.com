@@ -3,7 +3,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText, makeCheckbox,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, makeRowField,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -446,8 +446,9 @@ function renderUniformity(inputRegion, outputRegion, citationEl) {
   const rows = [];
   for (let i = 0; i < 12; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const v = document.createElement("input"); v.type = "number"; v.step = "any"; v.min = "0"; v.inputMode = "decimal"; v.placeholder = "Catch can " + (i + 1); v.setAttribute("aria-label", "Catch can " + (i + 1) + " volume");
-    wrap.appendChild(v); list.appendChild(wrap);
+    const vF = makeRowField("Catch can " + (i + 1) + " volume", "iu-can" + i, { step: "any", min: "0" });
+    const v = vF.input;
+    wrap.appendChild(vF.wrap); list.appendChild(wrap);
     v.addEventListener("input", update);
     rows.push(v);
   }

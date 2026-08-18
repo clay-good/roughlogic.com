@@ -653,6 +653,22 @@ input[type="checkbox"] {
   flex: none;
 }
 
+/* A repeated-row field (ui-fields.makeRowField). Same label-over-input
+   shape as .field, one step down in weight and spacing, because a
+   five-day timesheet stacks twenty of them and the row caption should
+   not compete with the tile's own field labels. */
+.input-region .row-field { margin-bottom: var(--space-2); }
+.input-region .row-field:last-child { margin-bottom: 0; }
+.input-region .row-field label {
+  /* Full reading size: a row caption is read at arm's length on a bright
+     site like everything else. The step down from a tile's own field label
+     is carried by weight and color, not by shrinking the text. */
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--fg-muted);
+}
+
 /* A checkbox field (ui-fields.makeCheckbox -> .field-check). A bare 20px
    checkbox is well below the 48px touch-target floor every other control
    carries. Lay the box and its htmlFor-linked label in one row whose label

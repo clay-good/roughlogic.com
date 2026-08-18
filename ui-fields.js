@@ -39,6 +39,29 @@ export function makeNumber(label, id, attrs = {}) {
   return { wrap, input };
 }
 
+// A repeated row -- a timesheet day, a catch can, a panel circuit -- builds
+// its inputs by hand and leans on the placeholder to say what each box is.
+// The placeholder disappears the instant a value lands, and "Test with
+// example" fills every box at once, so the first thing a user does is erase
+// every label on the screen and leave a column of bare numbers. This is
+// makeNumber's layout at a smaller weight: a caption that stays put.
+export function makeRowField(label, id, attrs = {}) {
+  const wrap = document.createElement("div");
+  wrap.className = "row-field";
+  const lab = document.createElement("label");
+  lab.htmlFor = id;
+  lab.textContent = label;
+  const input = document.createElement("input");
+  input.type = "number";
+  input.id = id;
+  input.inputMode = "decimal";
+  input.autocomplete = "off";
+  for (const [k, v] of Object.entries(attrs)) input.setAttribute(k, String(v));
+  wrap.appendChild(lab);
+  wrap.appendChild(input);
+  return { wrap, input };
+}
+
 export function makeText(label, id, attrs = {}) {
   const wrap = document.createElement("div");
   wrap.className = "field";

@@ -3,7 +3,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, makeRowField,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -282,13 +282,14 @@ function renderRecipeScale(inputRegion, outputRegion, citationEl) {
     for (const k of Object.keys(INGREDIENT_DENSITIES_G_PER_CUP)) {
       const o = document.createElement("option"); o.value = k; o.textContent = k.replace(/_/g, " "); ing.appendChild(o);
     }
-    const qty = document.createElement("input"); qty.type = "number"; qty.step = "any"; qty.min = "0"; qty.inputMode = "decimal"; qty.placeholder = "Qty"; qty.setAttribute("aria-label", "Quantity for ingredient " + (i + 1));
+    const qtyF = makeRowField("Ingredient " + (i + 1) + " quantity", "rs-i" + i + "-qty", { step: "any", min: "0" });
+    const qty = qtyF.input;
     const unit = document.createElement("select");
     unit.setAttribute("aria-label", "Unit for ingredient " + (i + 1));
     for (const u of ["cup", "tbsp", "tsp", "egg", "g", "oz", "ml"]) {
       const o = document.createElement("option"); o.value = u; o.textContent = u; unit.appendChild(o);
     }
-    wrap.appendChild(ing); wrap.appendChild(qty); wrap.appendChild(unit);
+    wrap.appendChild(ing); wrap.appendChild(qtyF.wrap); wrap.appendChild(unit);
     list.appendChild(wrap);
     [ing, qty, unit].forEach((el) => el.addEventListener("input", update));
     rows.push({ ing, qty, unit });
@@ -360,10 +361,12 @@ function renderPlateCost(inputRegion, outputRegion, citationEl) {
   const rows = [];
   for (let i = 0; i < 6; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const n = document.createElement("input"); n.type = "text"; n.placeholder = "Ingredient"; n.setAttribute("aria-label", "Ingredient " + (i + 1) + " name");
-    const lbs = document.createElement("input"); lbs.type = "number"; lbs.step = "any"; lbs.min = "0"; lbs.inputMode = "decimal"; lbs.placeholder = "Lbs"; lbs.setAttribute("aria-label", "Ingredient " + (i + 1) + " weight (lb)");
-    const c = document.createElement("input"); c.type = "number"; c.step = "any"; c.min = "0"; c.inputMode = "decimal"; c.placeholder = "$/lb"; c.setAttribute("aria-label", "Ingredient " + (i + 1) + " cost per lb");
-    wrap.appendChild(n); wrap.appendChild(lbs); wrap.appendChild(c);
+    const ing = "Ingredient " + (i + 1) + " ";
+    const nF = makeRowField(ing + "name", "pc-i" + i + "-n", { type: "text", inputmode: "text" });
+    const lbsF = makeRowField(ing + "weight (lb)", "pc-i" + i + "-lb", { step: "any", min: "0" });
+    const cF = makeRowField(ing + "cost ($/lb)", "pc-i" + i + "-c", { step: "any", min: "0" });
+    const n = nF.input, lbs = lbsF.input, c = cF.input;
+    for (const f of [nF, lbsF, cF]) wrap.appendChild(f.wrap);
     list.appendChild(wrap);
     [n, lbs, c].forEach((el) => el.addEventListener("input", update));
     rows.push({ n, lbs, c });

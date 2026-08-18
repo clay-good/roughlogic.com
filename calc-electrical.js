@@ -415,7 +415,7 @@ export const egcSizeExample = {
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, makeRowField,
 } from "./ui-fields.js";
 
 // Each render function assumes the input/output regions have been cleared.
@@ -1816,8 +1816,9 @@ function renderPhaseBalance(inputRegion, outputRegion, citationEl, params) {
     for (const v of ["A", "B", "C"]) {
       const o = document.createElement("option"); o.value = v; o.textContent = "Phase " + v; if (v === phaseVal) o.selected = true; ph.appendChild(o);
     }
-    const ld = document.createElement("input"); ld.type = "number"; ld.step = "any"; ld.min = "0"; ld.inputMode = "decimal"; ld.placeholder = "Load (W)"; ld.value = loadVal; ld.setAttribute("aria-label", "Load in watts for circuit " + circuitNum);
-    wrap.appendChild(ph); wrap.appendChild(ld);
+    const ldF = makeRowField("Circuit " + circuitNum + " load (W)", "pb-c" + circuitNum + "-load", { step: "any", min: "0" });
+    const ld = ldF.input; ld.value = loadVal;
+    wrap.appendChild(ph); wrap.appendChild(ldF.wrap);
     list.appendChild(wrap);
     // Defer the `update` reference: addRow() runs in the for-loop below
     // before `const update` is initialized, so passing `update` directly
@@ -1878,9 +1879,10 @@ function renderMultiLoadVD(inputRegion, outputRegion, citationEl, params) {
   const rows = [];
   for (let i = 0; i < 3; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const d = document.createElement("input"); d.type = "number"; d.step = "any"; d.min = "0"; d.inputMode = "decimal"; d.placeholder = "Distance (ft)"; d.setAttribute("aria-label", "Run " + (i + 1) + " distance (ft)");
-    const c = document.createElement("input"); c.type = "number"; c.step = "any"; c.min = "0"; c.inputMode = "decimal"; c.placeholder = "Load current (A)"; c.setAttribute("aria-label", "Run " + (i + 1) + " load current (A)");
-    wrap.appendChild(d); wrap.appendChild(c); list.appendChild(wrap);
+    const dF = makeRowField("Run " + (i + 1) + " distance (ft)", "ml-r" + i + "-dist", { step: "any", min: "0" });
+    const cF = makeRowField("Run " + (i + 1) + " load current (A)", "ml-r" + i + "-amps", { step: "any", min: "0" });
+    const d = dF.input, c = cF.input;
+    wrap.appendChild(dF.wrap); wrap.appendChild(cF.wrap); list.appendChild(wrap);
     d.addEventListener("input", update); c.addEventListener("input", update);
     rows.push({ d, c });
   }

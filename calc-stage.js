@@ -3,7 +3,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, makeRowField,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -391,9 +391,10 @@ function renderTrussCapacity(inputRegion, outputRegion, citationEl) {
   const rows = [];
   for (let i = 0; i < 4; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const w = document.createElement("input"); w.type = "number"; w.step = "any"; w.inputMode = "decimal"; w.placeholder = "Weight (lb)"; w.setAttribute("aria-label", "Point " + (i + 1) + " weight (lb)");
-    const p = document.createElement("input"); p.type = "number"; p.step = "any"; p.inputMode = "decimal"; p.placeholder = "Position (ft)"; p.setAttribute("aria-label", "Point " + (i + 1) + " position (ft)");
-    wrap.appendChild(w); wrap.appendChild(p); list.appendChild(wrap);
+    const wF = makeRowField("Point " + (i + 1) + " weight (lb)", "tr-p" + i + "-w", { step: "any" });
+    const pF = makeRowField("Point " + (i + 1) + " position (ft)", "tr-p" + i + "-x", { step: "any" });
+    const w = wF.input, p = pF.input;
+    wrap.appendChild(wF.wrap); wrap.appendChild(pF.wrap); list.appendChild(wrap);
     w.addEventListener("input", update); p.addEventListener("input", update);
     rows.push({ w, p });
   }
@@ -449,11 +450,14 @@ function renderDMX(inputRegion, outputRegion, citationEl) {
   const rows = [];
   for (let i = 0; i < 8; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
-    const n = document.createElement("input"); n.type = "text"; n.placeholder = "Fixture name"; n.setAttribute("aria-label", "Fixture " + (i + 1) + " name");
-    const u = document.createElement("input"); u.type = "number"; u.step = "1"; u.min = "1"; u.inputMode = "numeric"; u.placeholder = "Universe"; u.value = "1"; u.setAttribute("aria-label", "Fixture " + (i + 1) + " universe");
-    const s = document.createElement("input"); s.type = "number"; s.step = "1"; s.min = "1"; s.max = "512"; s.inputMode = "numeric"; s.placeholder = "Start"; s.setAttribute("aria-label", "Fixture " + (i + 1) + " start address");
-    const c = document.createElement("input"); c.type = "number"; c.step = "1"; c.min = "1"; c.inputMode = "numeric"; c.placeholder = "Channels"; c.setAttribute("aria-label", "Fixture " + (i + 1) + " channel count");
-    wrap.appendChild(n); wrap.appendChild(u); wrap.appendChild(s); wrap.appendChild(c);
+    const fx = "Fixture " + (i + 1) + " ";
+    const nF = makeRowField(fx + "name", "dmx-f" + i + "-n", { type: "text", inputmode: "text" });
+    const uF = makeRowField(fx + "universe", "dmx-f" + i + "-u", { step: "1", min: "1", inputmode: "numeric" });
+    const sF = makeRowField(fx + "start address", "dmx-f" + i + "-s", { step: "1", min: "1", max: "512", inputmode: "numeric" });
+    const cF = makeRowField(fx + "channel count", "dmx-f" + i + "-c", { step: "1", min: "1", inputmode: "numeric" });
+    const n = nF.input, u = uF.input, s = sF.input, c = cF.input;
+    u.value = "1";
+    for (const f of [nF, uF, sF, cF]) wrap.appendChild(f.wrap);
     list.appendChild(wrap);
     [n, u, s, c].forEach((el) => el.addEventListener("input", update));
     rows.push({ n, u, s, c });

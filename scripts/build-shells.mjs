@@ -136,13 +136,40 @@ async function loadWorkedExamples() {
 // Render a fixture value as the literal a reader would type. Outputs are
 // `{ value, tolerance }` wrappers; inputs are bare primitives. Anything
 // structured (an array of course loads, a nested object) is emitted as
-// compact JSON, which is exactly what the MCP callers pass.
+// compact JSON, which is exactly what the MCP callers pass -- unless that
+// JSON is too long to read, in which case it degrades to its shape.
 function exampleValue(v) {
   const raw = (v && typeof v === "object" && !Array.isArray(v) && "value" in v) ? v.value : v;
   if (raw === null || raw === undefined) return "";
-  if (typeof raw === "object") return JSON.stringify(raw, (k, x) => (typeof x === "number" ? readableNumber(x) : x));
+  if (typeof raw === "object") return structuredValue(raw);
   if (typeof raw === "number") return String(readableNumber(raw));
   return String(raw);
+}
+
+// The longest structured literal in the registry runs 2,630 characters: the
+// `historical-pricing` page told a reader to enter a whole BLS price shard,
+// values and all. Past this width the row stops being an example and becomes
+// a wall, so it degrades to the shape -- how many rows, and which fields --
+// which is what a reader needs from it anyway.
+const STRUCTURED_CAP = 120;
+function structuredValue(raw) {
+  const json = JSON.stringify(raw, (k, x) => (typeof x === "number" ? readableNumber(x) : x));
+  if (json.length <= STRUCTURED_CAP) return json;
+  if (Array.isArray(raw)) {
+    const first = JSON.stringify(raw[0], (k, x) => (typeof x === "number" ? readableNumber(x) : x));
+    const rest = raw.length - 1;
+    const head = first && first.length <= STRUCTURED_CAP ? first : shapeOf(raw[0]);
+    return rest > 0 ? `[${head}, and ${rest} more]` : `[${head}]`;
+  }
+  return shapeOf(raw);
+}
+
+// A value-free rendering of an object: the field names, no quotes, so it
+// cannot be mistaken for something to paste.
+function shapeOf(x) {
+  if (x === null || typeof x !== "object") return String(x);
+  if (Array.isArray(x)) return `[${x.length} items]`;
+  return `{${Object.keys(x).join(", ")}}`;
 }
 
 // An inverse tile's fixture holds the full-precision output of its forward
