@@ -2,7 +2,7 @@
 
 **Field math for the trades. Free, fast, no ads, no accounts, works offline.**
 
-[roughlogic.com](https://roughlogic.com) is 1,709 small, single-purpose calculators for electricians, plumbers, HVAC techs, carpenters, restoration techs, firefighters, surveyors, and dozens of other trades. Everything runs in your browser. Every answer comes from a published formula and cites its source.
+[roughlogic.com](https://roughlogic.com) is 1709 small, single-purpose calculators for electricians, plumbers, HVAC techs, carpenters, restoration techs, firefighters, surveyors, and dozens of other trades. Everything runs in your browser. Every answer comes from a published formula and cites its source.
 
 <p align="center">
   <img src="docs/img/home-mobile.png" width="240" alt="roughlogic home view on a phone: a headline, a one-paragraph description, a single search bar, and a browse-by-trade index">
@@ -14,30 +14,39 @@
 
 ## Use it
 
-1. Open [roughlogic.com](https://roughlogic.com) and search for what you need, or browse by trade.
+1. Search for what you need, or browse by trade.
 2. Type your numbers. The answer updates as you type. There is no submit button.
 3. Tap **Copy** to take a value with you.
 
-Every field shows an example value as its placeholder, so you can see the expected unit and magnitude before you type. **Test with example** fills the whole reference case at once, and a calculator opened from its own page arrives with that case already loaded. **Show the formula, sources, and assumptions** expands the proof.
+Every field shows an example value as its placeholder, so you can see the expected unit and magnitude before you type over it.
 
-**A worked example.** [Voltage Drop](https://roughlogic.com/tools/voltage-drop/):
+**Every calculator's page is the same four things**, in this order:
+
+| | |
+|---|---|
+| **Title + one line** | what it does |
+| **Run the calculator** | opens it with the example already loaded |
+| **Example** | the exact inputs and the exact answer |
+| **Two collapsed blocks** | the formula, source, and assumptions; and the scope and limits |
+
+Here is that Example block, from [Voltage Drop](https://roughlogic.com/tools/voltage-drop/):
 
 | You enter | | You get | |
 |---|---|---|---|
-| `phase` | single | `drop_V` | 7.45 |
-| `material` | copper | `percent` | 3.1 |
-| `awg` | 10 | | |
-| `length_ft` | 150 | | |
-| `current_A` | 20 | | |
-| `source_voltage_V` | 240 | | |
+| Phase | single | `drop_V` | 7.45 |
+| Material | copper | `percent` | 3.1 |
+| AWG | 10 | | |
+| Length one-way (ft) `length_ft` | 150 | | |
+| Current (A) | 20 | | |
+| Source voltage (V) | 240 | | |
 
-Grounded in `Vd = 2 · K · I · L / CM`, NEC Ch. 9 conductor properties. Every calculator's page shows this same block: the inputs, the outputs, and the source. On the page each input is named the way the calculator names it (`length_ft` reads *Length one-way (ft)*), with the machine field name alongside when it differs.
+Grounded in `Vd = 2 · K · I · L / CM`, NEC Ch. 9 conductor properties. Inputs are named the way the calculator names them, with the machine field name alongside when it differs; that name is what an AI agent passes.
 
 Your inputs live in the URL, so a calculator is bookmarkable and shareable with its numbers preloaded. After the first load it works with no signal. No account, no email, no tracking, ever.
 
 ## Use it from an AI agent
 
-The whole catalog is available to AI agents (Claude Code, Claude Desktop, Cursor) through a local, zero-dependency [MCP](https://modelcontextprotocol.io) server that runs on your machine over stdio. No hosting, no network. Four tools (`search_calculators`, `describe_calculator`, `run_calculator`, `run_calculators`) read straight from this repo, so the agent surface can never drift from the site. The field names are the ones in the table above. See [mcp/README.md](mcp/README.md).
+The whole catalog is available to AI agents (Claude Code, Claude Desktop, Cursor) through a local, zero-dependency [MCP](https://modelcontextprotocol.io) server that runs on your machine over stdio. No hosting, no network. Four tools (`search_calculators`, `describe_calculator`, `run_calculator`, `run_calculators`) read straight from this repo, so the agent surface can never drift from the site. See [mcp/README.md](mcp/README.md).
 
 ## What's in the catalog
 
@@ -82,28 +91,11 @@ CI adds four parallel jobs per push: lint + unit tests + data-integrity verifica
 
 A 100% client-side static site. No server, no database, no accounts, no analytics, no runtime third-party dependency.
 
-```mermaid
-flowchart TD
-    subgraph browser["Browser (everything runs here)"]
-        shell["index.html + styles.css + app.js<br/>router · search · theme · URL-hash state"]
-        modules["57 per-group calculator modules<br/>(calc-*.js, dynamic-imported on first open)"]
-        sw["Service Worker (sw.js)<br/>caches shell + data shards, keyed to build hash"]
-        data[("data/ - sharded JSON<br/>largest shard &lt; 1 MB gzipped")]
-        shell --> modules --> data
-        shell -. registers .-> sw
-        sw -. serves offline .-> shell
-    end
+The browser loads `index.html` + `styles.css` + `app.js` (router, search, theme, URL-hash state), which dynamic-imports one of 57 per-group calculator modules (`calc-*.js`) on first open, which reads the sharded JSON in `data/`. A service worker (`sw.js`) caches the shell and data shards keyed to the build hash, so the site works offline after the first load.
 
-    subgraph build["Build time only (CI - never in production)"]
-        bd["build-data.mjs<br/>NIST · NOAA · NCEI WMM · FHFA · HUD · bulletins"]
-        bs["build-shells.mjs<br/>one static shell per tile & per group + sitemap"]
-    end
+At build time only (never in production), `build-data.mjs` refreshes the integrity-hashed data shards from NIST, NOAA, NCEI WMM, FHFA, HUD, and published bulletins, and `build-shells.mjs` emits one zero-JS crawlable static shell per tile (1709) and per group, plus a sitemap that carries 1731 URLs.
 
-    bd -->|"integrity-hashed shards"| data
-    bs -->|"zero-JS crawlable pages"| shell
-```
-
-The home payload gzips to well under the 100 KB budget. Opening a calculator dynamic-imports only that trade's module and only the data shards it needs. `build-shells.mjs` emits one zero-JS static shell per tile (1709) and per group, each a complete reference page with the worked example, the formula, and the source. See [docs/architecture.md](docs/architecture.md) and [docs/seo.md](docs/seo.md).
+The home payload gzips to well under the 100 KB budget. Opening a calculator dynamic-imports only that trade's module and only the data shards it needs. See [docs/architecture.md](docs/architecture.md) and [docs/seo.md](docs/seo.md).
 
 ## Develop
 

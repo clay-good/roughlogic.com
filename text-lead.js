@@ -80,6 +80,18 @@ function widest(list) {
   return fits.length ? Math.max(...fits) : -1;
 }
 
+// The last word boundary that fits the cap and does not leave an open bracket.
+// Returns -1 when the first word already overruns the cap, which no
+// description does today but a future one could.
+function wordCut(s) {
+  // Budget for the ellipsis, so the string the reader sees honors the cap
+  // rather than the slice that precedes it.
+  for (let i = LEAD_CAP - 3; i >= MIN_LEAD; i--) {
+    if (s[i] === " " && balanced(s.slice(0, i))) return i;
+  }
+  return -1;
+}
+
 // Where the lead was cut out of the opening sentence, and on what. The seam
 // kind decides what the Details block can start from, so both callers read it
 // from one place: { sentence, lead, at } with at = -1 when the whole opening
@@ -101,8 +113,19 @@ function leadCut(desc) {
   // shipping the whole sentence, which is what the cap exists to prevent.
   if (at < 0) {
     const all = clause.concat(comma);
-    if (!all.length) return { sentence, lead: sentence, at: -1 };
-    at = Math.min(...all);
+    at = all.length ? Math.min(...all) : -1;
+  }
+  // Both fallbacks above can still miss: 8 opening sentences carry no seam at
+  // all, and for 29 more the earliest seam sits past the cap (one runs 250
+  // characters to its first comma). Either way the reader gets the wall of
+  // text the cap exists to prevent, on the one line the page is built around.
+  // So the last resort is the cap itself, at the nearest word boundary, with
+  // an ellipsis because the sentence really is cut mid-thought -- the full
+  // text is one tap away in Details, which repeats the whole sentence.
+  if (at < 0 || at > LEAD_CAP) {
+    const cut = wordCut(sentence);
+    if (cut > 0) return { sentence, lead: sentence.slice(0, cut).replace(/[,;:\s-]+$/, "") + "...", at: cut };
+    if (at < 0) return { sentence, lead: sentence, at: -1 };
   }
   return { sentence, lead: sentence.slice(0, at).replace(/[,;:\s-]+$/, "") + ".", at };
 }
