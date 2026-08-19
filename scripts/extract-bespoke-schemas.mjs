@@ -92,6 +92,30 @@ function parseComputeCall(body) {
   return map;
 }
 
+// A looser field parser, for LABELS ONLY (never for BESPOKE_SCHEMAS).
+//
+// parseFields above must resolve a select's literal {value,label} options,
+// because a schema advertises that enum to run(). A label needs none of that --
+// only the field's own label and the variable holding it. So this pass takes
+// any `NAME = makeX("Label", "id", ...)` regardless of what follows, which
+// picks up two families the strict parser drops: selects whose options come
+// from a function (`makeSelect("AWG size", "awgg-awg", awgOptions())`), and the
+// text/textarea/row factories it never modelled at all.
+// The `[\w$]*` before `make` matters: several modules namespace their copy of
+// the factory (`_v26makeNumber`, `_v8w_makeNumber`), and anchoring on a bare
+// `make` skipped every one of those renderers.
+const LOOSE_FACTORY = /\b([A-Za-z_$][\w$]*)\s*=\s*[\w$]*make(?:Number|Select|Text|Textarea|RowField)\(\s*("(?:[^"\\]|\\.)*")\s*,/g;
+function parseFieldsLoose(body) {
+  const fields = new Map();
+  for (const m of body.matchAll(LOOSE_FACTORY)) {
+    if (fields.has(m[1])) continue;
+    let label;
+    try { label = JSON.parse(m[2]); } catch { continue; }
+    fields.set(m[1], { label });
+  }
+  return fields;
+}
+
 // A looser key->field map, for LABELS ONLY (never for BESPOKE_SCHEMAS).
 //
 // parseComputeCall above insists on `key: VAR.input.value`, because a schema
@@ -166,10 +190,11 @@ async function main() {
     // below. Strict wins where both resolve.
     if (params) {
       const loose = parseComputeCallLoose(body);
+      const looseFields = parseFieldsLoose(body);
       const labelMap = {};
       for (const { name: key } of params) {
         const ref = callMap.get(key) || loose.get(key);
-        const field = ref && fields.get(ref.var);
+        const field = ref && (fields.get(ref.var) || looseFields.get(ref.var));
         if (field && typeof field.label === "string" && field.label.trim()) labelMap[key] = field.label.trim();
       }
       // A label two params share cannot identify either of them: refrigerant-pt
