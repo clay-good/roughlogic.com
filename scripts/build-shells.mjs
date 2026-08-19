@@ -22,7 +22,7 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { CITATIONS } from "../citations.js";
 import { leadSentence, restOfDescription } from "../text-lead.js";
 
@@ -187,6 +187,77 @@ function squash(s) {
   return String(s).toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
+// Unit tokens a field name may END with, used to read a key like
+// `tank_volume_gal` back as "Tank volume (gal)" when the calculator itself
+// never captioned it. Case matters where the catalog uses case to
+// disambiguate: `_A` is amps, `_F` is degrees.
+const KEY_UNITS = new Map(Object.entries({
+  gal: "gal", gpm: "GPM", gph: "GPH", gpd: "GPD", cfm: "CFM", cfs: "cfs", cfh: "CFH", mgd: "MGD", scfm: "SCFM",
+  ft: "ft", in: "in", mm: "mm", cm: "cm", mi: "mi", yd: "yd", cy: "cy", km: "km",
+  psi: "psi", psig: "psig", psid: "psid", psf: "psf", ksi: "ksi", ksf: "ksf", pcf: "pcf", plf: "plf", klf: "klf",
+  lb: "lb", lbs: "lb", kip: "kip", kips: "kip", ton: "ton", tons: "ton", kg: "kg",
+  hp: "hp", kw: "kW", kwh: "kWh", kva: "kVA", btuh: "Btu/h", btu: "Btu", mbh: "MBH",
+  amps: "A", volts: "V", ohms: "ohms", hz: "Hz",
+  deg: "deg", pct: "%", percent: "%",
+  hr: "hr", hrs: "hr", yr: "yr", years: "yr", months: "months", days: "days",
+  ft2: "ft\u00b2", ft3: "ft\u00b3", sqin: "sq in", sqft: "ft\u00b2", in2: "in\u00b2", in3: "in\u00b3", in4: "in\u2074",
+  fpm: "fpm", fps: "fps", mph: "mph", rpm: "RPM", kt: "kt", sabins: "sabins",
+  kipft: "kip-ft", ftlb: "ft-lb", inlb: "in-lb", ftkip: "ft-kip", sy: "SY", therms: "therms", acres: "acres",
+}));
+const KEY_UNITS_CASED = new Map(Object.entries({ A: "A", V: "V", F: "\u00b0F", C: "\u00b0C", W: "W" }));
+// A denominator ("lb_hr" = lb/hr) is only ever the LAST token of a key.
+const KEY_PER_UNITS = new Map(Object.entries({ min: "min", day: "day", s: "s", hr: "hr", sf: "ft\u00b2" }));
+const KEY_ACRONYMS = new Set(["awg", "nec", "ada", "ocpd", "fla", "mca", "mocp", "rh", "cg", "tds", "bod", "tss",
+  "srt", "hrt", "vslr", "sor", "wor", "apf", "uv", "led", "hvac", "pdp", "gpp", "wsfu", "dfu", "ach", "shr",
+  "eer", "cop", "stc", "emt", "pvc", "rmc", "imc", "cmu", "srw", "spt", "cbr", "usc", "aashto", "asd", "lrfd",
+  "asce", "aisc", "aci", "nds", "du"]);
+
+// Read a machine field name back as English. This claims nothing the key does
+// not already say -- it only spaces the words out and spells the unit -- so it
+// is safe where a real caption is missing. Returns null when the key is too
+// short or too cryptic to gain anything ("va", "ecc"), and those rows keep
+// printing the key itself rather than a worse guess.
+export function humanizeKey(key) {
+  const parts = String(key).split("_").filter(Boolean);
+  // A one-word key is already English ("ratio", "efficiency"); it only needs
+  // to be capitalized so it reads as a caption beside the others. Anything
+  // shorter is a symbol ("df", "ka") and says more as itself.
+  if (parts.length === 1) return /^[a-z]{4,}$/.test(parts[0]) ? parts[0].charAt(0).toUpperCase() + parts[0].slice(1) : null;
+  if (parts.length < 2) return null;
+  const units = [];
+  while (parts.length > 1) {
+    const raw = parts[parts.length - 1];
+    const first = units.length === 0;
+    let u = first ? KEY_UNITS_CASED.get(raw) : undefined;
+    if (u === undefined && !/^[A-Z]$/.test(raw)) u = KEY_UNITS.get(raw.toLowerCase());
+    // A per-unit denominator reached anywhere but the end is an ordinary word:
+    // `conductor_min_A` is a minimum in amps, `theta_s_deg` is the variable.
+    if (u === undefined && first) u = KEY_PER_UNITS.get(raw.toLowerCase());
+    if (u === undefined) break;
+    units.unshift(u);
+    parts.pop();
+  }
+  // "Rimpull per ton, in lb": the name already spent the word `per`, so the
+  // token before it belongs to the name and not to a quotient.
+  if (units.length > 1 && parts[parts.length - 1] === "per") { parts.push(units.shift()); }
+  if (!parts.length) return null;
+  let unit = units.filter((u, i) => i === 0 || u !== units[i - 1]).join("/");
+  // in_lb / ft_lb is a torque, not a quotient.
+  if (unit === "in/lb") unit = "in-lb";
+  if (unit === "ft/lb") unit = "ft-lb";
+  const words = parts.map((p, i) => {
+    const l = p.toLowerCase();
+    if (KEY_ACRONYMS.has(l)) return l.toUpperCase();
+    if (/^[A-Z]/.test(p) && p.length <= 3) return p;
+    return i === 0 ? l.charAt(0).toUpperCase() + l.slice(1) : l;
+  });
+  const base = words.join(" ");
+  // A symbol alone says nothing ("fc"), but a symbol with its unit does:
+  // "Fc (psi)" beats "fc_psi", so a spelled unit lowers the bar.
+  if (base.length < (unit ? 1 : 3)) return null;
+  return unit ? `${base} (${unit})` : base;
+}
+
 // A worked-example row list. A reader who has never seen the calculator has to
 // know what a number *is* before the example teaches them anything, so each row
 // leads with the field label the live calculator prints above that input
@@ -206,7 +277,14 @@ function exampleRows(obj, labels) {
       // lines on a phone ("Height above the branch or fixture drain (in)" / "4
       // height_above_drain_in"). It moves to one quiet line inside the
       // collapsed proof block, where an agent or a crawler still finds it.
-      if (!label) return `      <li><code>${escapeHtml(k)}</code> <b>${escapeHtml(val)}</b></li>`;
+      if (!label) {
+        // No caption: read the key itself back as English rather than making
+        // the reader parse snake_case. The key is still published verbatim on
+        // the "Field names used by the API" line inside the collapsed proof.
+        const readable = humanizeKey(k);
+        if (readable) return `      <li><span>${escapeHtml(readable)}</span> <b>${escapeHtml(val)}</b></li>`;
+        return `      <li><code>${escapeHtml(k)}</code> <b>${escapeHtml(val)}</b></li>`;
+      }
       return `      <li><span>${escapeHtml(label)}</span> <b>${escapeHtml(val)}</b></li>`;
     })
     .filter(Boolean)
@@ -771,4 +849,6 @@ async function main() {
   );
 }
 
-await main();
+// Run only when invoked as a script, so a unit test can import humanizeKey
+// without kicking off a full shell build.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();
