@@ -92,6 +92,22 @@ function parseComputeCall(body) {
   return map;
 }
 
+// A looser key->field map, for LABELS ONLY (never for BESPOKE_SCHEMAS).
+//
+// parseComputeCall above insists on `key: VAR.input.value`, because a schema
+// feeds run() and a mis-parse there would advertise an input run cannot honor.
+// But most renderers the strict pass gives up on simply route the field through
+// a reader first -- `span_ft: readNum(span.input)`, `w_plf: num(w.input)` --
+// which is the same linkage wearing a helper. A label is only ever displayed,
+// so that is enough to name the field, and 187 tiles were skipped for it.
+function parseComputeCallLoose(body) {
+  const map = new Map();
+  for (const m of body.matchAll(/([A-Za-z_$][\w$]*)\s*[:=]\s*[A-Za-z_$][\w$]*\(\s*([A-Za-z_$][\w$]*)\.(select|input)\b/g)) {
+    if (!map.has(m[1])) map.set(m[1], { var: m[2] });
+  }
+  return map;
+}
+
 async function computeParams(reg) {
   const mod = await import(new URL(reg.module, CMAP_URL).href);
   const fn = mod[reg.fn];
@@ -144,8 +160,27 @@ async function main() {
     const body = rf.toString();
     const fields = parseFields(body);
     const callMap = parseComputeCall(body);
-    if (!callMap || callMap.size === 0) { stats.skip_no_call++; continue; }
     const params = await computeParams(COMPUTE_MAP[id]);
+    // Labels first, and from the loose map as well: they are display-only, so
+    // they are collected even for the tiles the strict schema pass rejects
+    // below. Strict wins where both resolve.
+    if (params) {
+      const loose = parseComputeCallLoose(body);
+      const labelMap = {};
+      for (const { name: key } of params) {
+        const ref = callMap.get(key) || loose.get(key);
+        const field = ref && fields.get(ref.var);
+        if (field && typeof field.label === "string" && field.label.trim()) labelMap[key] = field.label.trim();
+      }
+      // A label two params share cannot identify either of them: refrigerant-pt
+      // has one "Value" box feeding pressure_psig or temperature_F depending on
+      // a mode select, and "Value 122" says less than "pressure_psig 122".
+      const uses = new Map();
+      for (const v of Object.values(labelMap)) uses.set(v, (uses.get(v) || 0) + 1);
+      for (const [k, v] of Object.entries(labelMap)) if (uses.get(v) > 1) delete labelMap[k];
+      if (Object.keys(labelMap).length) labels[id] = labelMap;
+    }
+    if (!callMap || callMap.size === 0) { stats.skip_no_call++; continue; }
     if (!params) { stats.skip_no_call++; continue; }
 
     // Include every compute param we can confidently map to a parsed field
@@ -155,26 +190,6 @@ async function main() {
     // a silent-wrong-value risk we refuse to introduce.
     let typeMismatch = false, hasSelect = false, anyUnmapped = false;
     const inputs = [];
-    // The field labels alone, collected under looser rules than the schema
-    // above. A label is only ever *displayed* (the static shells print it beside
-    // the worked-example value); it is never passed to a compute, so the
-    // value-type guards that refuse a whole tile below -- a Number()-coerced
-    // select, a param no field supplies -- have nothing to say about it. The
-    // key->label linkage is the same one the shipped schemas already rely on.
-    const labelMap = {};
-    for (const { name: key } of params) {
-      const ref = callMap.get(key);
-      const field = ref && fields.get(ref.var);
-      if (field && typeof field.label === "string" && field.label.trim()) labelMap[key] = field.label.trim();
-    }
-    // A label that two params share cannot identify either of them: refrigerant-pt
-    // has one "Value" box that feeds pressure_psig or temperature_F depending on a
-    // mode select, and "Value 122" on a page says less than "pressure_psig 122".
-    // Drop the ambiguous ones and let those rows fall back to the key.
-    const labelUses = new Map();
-    for (const v of Object.values(labelMap)) labelUses.set(v, (labelUses.get(v) || 0) + 1);
-    for (const [k, v] of Object.entries(labelMap)) if (labelUses.get(v) > 1) delete labelMap[k];
-    if (Object.keys(labelMap).length) labels[id] = labelMap;
     for (const { name: key, defType, defValue } of params) {
       const ref = callMap.get(key);
       if (!ref) { anyUnmapped = true; continue; } // param not sourced from a field
