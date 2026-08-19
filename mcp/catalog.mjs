@@ -30,6 +30,8 @@ try { ({ BESPOKE_SCHEMAS } = await import("../test/fixtures/bespoke-schemas.js")
 // the input set run() can honor.
 let BESPOKE_LABELS = {};
 try { ({ BESPOKE_LABELS } = await import("../test/fixtures/bespoke-labels.js")); } catch { BESPOKE_LABELS = {}; }
+let BESPOKE_OUTPUT_LABELS = {};
+try { ({ BESPOKE_OUTPUT_LABELS } = await import("../test/fixtures/bespoke-output-labels.js")); } catch { BESPOKE_OUTPUT_LABELS = {}; }
 // spec-v1185: literal citation strings extracted from bespoke renderers, so
 // describe can attribute a result even when the tile carries no schema citation.
 let RENDERER_CITATIONS = {};
@@ -426,6 +428,27 @@ export async function inputLabels(id) {
       }
     }
   } catch { /* keep whatever the extracted labels gave us */ }
+  return out;
+}
+
+// The answer-side counterpart of inputLabels: the caption the calculator prints
+// above each output, keyed by the compute result key. A renderer schema's own
+// output descriptors win where they name a real result key; the extracted
+// captions cover the hand-written renderers, which are most of the catalog.
+export async function outputLabels(id) {
+  const { COMPUTE_MAP, RENDERER_MAP, modCache } = await load();
+  const reg = COMPUTE_MAP[id];
+  if (!reg) return {};
+  const out = { ...(BESPOKE_OUTPUT_LABELS[id] || {}) };
+  try {
+    const fn = await importCompute(reg, modCache);
+    const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
+    if (schema && Array.isArray(schema.outputs)) {
+      for (const o of schema.outputs) {
+        if (o && o.key && typeof o.label === "string" && o.label.trim()) out[o.key] = o.label.trim();
+      }
+    }
+  } catch { /* keep whatever the extracted captions gave us */ }
   return out;
 }
 

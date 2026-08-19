@@ -200,12 +200,14 @@ function exampleRows(obj, labels) {
       const val = exampleValue(v);
       if (val === "") return "";
       const label = labels && labels[k];
+      // A named row prints the name and the number, nothing else. The raw field
+      // name is the API's, not the reader's: it used to trail 5,396 of the
+      // 6,791 example rows in the catalog, wrapping a two-token row onto three
+      // lines on a phone ("Height above the branch or fixture drain (in)" / "4
+      // height_above_drain_in"). It moves to one quiet line inside the
+      // collapsed proof block, where an agent or a crawler still finds it.
       if (!label) return `      <li><code>${escapeHtml(k)}</code> <b>${escapeHtml(val)}</b></li>`;
-      // "AWG 10 awg": when the label is the key in prettier casing, the trailing
-      // key teaches a reader nothing and costs a third token on the row.
-      const same = squash(label) === squash(k);
-      const key = same ? "" : ` <code>${escapeHtml(k)}</code>`;
-      return `      <li><span>${escapeHtml(label)}</span> <b>${escapeHtml(val)}</b>${key}</li>`;
+      return `      <li><span>${escapeHtml(label)}</span> <b>${escapeHtml(val)}</b></li>`;
     })
     .filter(Boolean)
     .join("\n");
@@ -483,7 +485,7 @@ function shellFooter() {
   ].join("\n");
 }
 
-function tileShell(tool, tools, groupNames, relatedMap, examples, labels) {
+function tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLabels) {
   const professionNoun = PROFESSION_NOUN[tool.trades[0]] || "Trades";
   const groupLabel = groupNames[tool.group] || tool.group;
   const groupSlug = GROUP_SLUG[tool.group] || tool.group.toLowerCase();
@@ -516,11 +518,15 @@ function tileShell(tool, tools, groupNames, relatedMap, examples, labels) {
   // worked example, so the reader gets the point and the Run button first.
   const detail = restOfDescription(tool.desc);
   const example = (examples && examples.get(tool.id)) || null;
-  // Only the inputs carry labels: a renderer schema's `outputs` entries are
-  // display-line ids ("fr", "asp"), not the compute result keys the fixture
-  // records, so there is no honest mapping for the "You get" side.
   const inputRows = example ? exampleRows(example.inputs, labels) : "";
-  const outputRows = example ? exampleRows(example.outputs, null) : "";
+  // The field names `run_calculator` accepts and the result keys it returns,
+  // for the rows that now print a plain-language name instead. One line, inside
+  // the collapsed proof.
+  const namedKeys = example
+    ? [...Object.keys(example.inputs || {}).filter((k) => labels && labels[k]),
+       ...Object.keys(example.outputs || {}).filter((k) => outLabels && outLabels[k])]
+    : [];
+  const outputRows = example ? exampleRows(example.outputs, outLabels) : "";
   const assumptionRows = (citation && Array.isArray(citation.assumptions) ? citation.assumptions : [])
     .map((a) => `      <li><span>${escapeHtml(a.name)}</span> <b>${escapeHtml(a.value)}</b><small>${escapeHtml(a.source)}</small></li>`)
     .join("\n");
@@ -577,6 +583,7 @@ function tileShell(tool, tools, groupNames, relatedMap, examples, labels) {
       `    <p class="shell-source">${escapeHtml(citation.edition)}</p>`,
       citation.freeAccess ? `    <p class="shell-source">${escapeHtml(citation.freeAccess)}</p>` : '',
       citation.governance ? `    <p class="shell-source">${escapeHtml(citation.governance)}</p>` : '',
+      namedKeys.length ? `    <p class="shell-source">Field names used by the API: ${namedKeys.map((k) => `<code>${escapeHtml(k)}</code>`).join(", ")}</p>` : '',
       assumptionRows ? '    <ul class="shell-io shell-assume">' : '',
       assumptionRows,
       assumptionRows ? '    </ul>' : '',
@@ -717,13 +724,14 @@ async function main() {
   // The field labels the browser prints above each input, resolved through the
   // same MCP catalog layer the agent surface reads, so the label on a shell and
   // the label in the calculator can never drift. ~140 ms for the whole catalog.
-  const { inputLabels } = await import(resolve(ROOT, "mcp/catalog.mjs"));
+  const { inputLabels, outputLabels } = await import(resolve(ROOT, "mcp/catalog.mjs"));
 
   let shellCount = 0;
   // Per-tile shells.
   for (const tool of tools) {
     const labels = await inputLabels(tool.id);
-    const html = tileShell(tool, tools, groupNames, relatedMap, examples, labels);
+    const outLabels = await outputLabels(tool.id);
+    const html = tileShell(tool, tools, groupNames, relatedMap, examples, labels, outLabels);
     const out = resolve(DIST, "tools", tool.id, "index.html");
     await mkdir(dirname(out), { recursive: true });
     await writeFile(out, html, "utf8");

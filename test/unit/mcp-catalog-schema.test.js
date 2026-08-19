@@ -228,3 +228,24 @@ test("every tile's own worked example runs clean through the MCP run path", asyn
   }
   assert.deepEqual(failures, [], "no tile may reject its own published example");
 });
+
+// The answer side of a worked example used to print the compute's raw result
+// keys ("drop_V 7.45") because a renderer schema's output descriptors are
+// display-line ids, not result keys. The captions the calculator itself prints
+// above each output line are the honest source, and they are now extracted the
+// same way the input labels are.
+test("outputLabels names a result key with the caption the calculator prints", async () => {
+  const { outputLabels } = await import("../../mcp/catalog.mjs");
+  const vd = await outputLabels("voltage-drop");
+  assert.equal(vd.drop_V, "Voltage drop");
+  assert.equal(vd.percent, "Percent drop");
+  // A line that shows two results is captioned for the one it leads with.
+  const sd = await outputLabels("sprinkler-density");
+  assert.equal(sd.total_gpm, "Total gpm");
+  assert.equal(sd.density_gpm_per_ft2, undefined, "the second value on that line stays keyed");
+  // An error branch never names the key it happens to print.
+  for (const id of ["voltage-drop", "sprinkler-density", "acme-thread-depth"]) {
+    const m = await outputLabels(id);
+    assert.equal(m.error, undefined, `${id} must not label the error key`);
+  }
+});
