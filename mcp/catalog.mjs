@@ -431,6 +431,33 @@ export async function inputLabels(id) {
   return out;
 }
 
+// Which compute result key a schema output descriptor actually captions.
+//
+// A declarative renderer's `outputs[].key` is the id of a DISPLAY LINE ("v",
+// "h"), not a result key, so taking it at face value names almost nothing --
+// and occasionally names the wrong thing. The honest source is the line's own
+// formatter, `value: (r) => fmt(r.tank_volume_gal, 0) + " gal"`, which says in
+// its body exactly which result the caption sits above.
+//
+// Two shapes are trusted, and only those two:
+//   - the line shows ONE result, so the caption can only belong to it;
+//   - the line shows several ("12 x 8 = 96 panels") but the author's own
+//     display id repeats the leading key, which is them naming it.
+// A multi-value line with an unconfirmed id is captioned for the whole line
+// rather than any one number ("Panel grid" is not the name of `panels_l`), so
+// it names nothing. Schemas written by hand carry no formatter; there the key
+// IS the result key, and it is used as-is.
+function schemaOutputKey(o) {
+  if (typeof o.format !== "function") return o.key || null;
+  const refs = [...new Set([...o.format.toString().matchAll(/\br\.([A-Za-z_$][\w$]*)/g)].map((m) => m[1]))]
+    // `r.error` / `r.message` is the failure branch borrowing a line whose
+    // caption belongs to the value it shows when things go right.
+    .filter((k) => k !== "error" && k !== "message");
+  if (refs.length === 0) return null;
+  if (refs.length > 1 && o.key !== refs[0]) return null;
+  return refs[0];
+}
+
 // The answer-side counterpart of inputLabels: the caption the calculator prints
 // above each output, keyed by the compute result key. A renderer schema's own
 // output descriptors win where they name a real result key; the extracted
@@ -444,8 +471,22 @@ export async function outputLabels(id) {
     const fn = await importCompute(reg, modCache);
     const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
     if (schema && Array.isArray(schema.outputs)) {
+      const claimed = new Map();
       for (const o of schema.outputs) {
-        if (o && o.key && typeof o.label === "string" && o.label.trim()) out[o.key] = o.label.trim();
+        if (!o || typeof o.label !== "string" || !o.label.trim()) continue;
+        const key = schemaOutputKey(o);
+        if (!key) continue;
+        const label = o.label.trim();
+        // Two lines writing the same result disagree about what it is called;
+        // the bare key says less than a coin flip between them.
+        if (claimed.has(key)) { if (claimed.get(key) !== label) claimed.set(key, null); continue; }
+        claimed.set(key, label);
+      }
+      // One caption over two different numbers names neither of them.
+      const uses = new Map();
+      for (const label of claimed.values()) if (label) uses.set(label, (uses.get(label) || 0) + 1);
+      for (const [key, label] of claimed) {
+        if (label && uses.get(label) === 1) out[key] = label;
       }
     }
   } catch { /* keep whatever the extracted captions gave us */ }

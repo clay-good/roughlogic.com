@@ -249,3 +249,49 @@ test("outputLabels names a result key with the caption the calculator prints", a
     assert.equal(m.error, undefined, `${id} must not label the error key`);
   }
 });
+
+// A declarative renderer describes each output line by its DISPLAY id ("v",
+// "cf"), so reading `outputs[].key` as a result key named almost nothing --
+// and once named the wrong number. The line's own formatter says which result
+// the caption sits above.
+test("outputLabels reads a declarative renderer's formatter, not its display id", async () => {
+  const { outputLabels } = await import("../../mcp/catalog.mjs");
+  // `{ key: "F", label: "Clamp load", value: (r) => fmt(r.F_lb, ...) }`: the
+  // display id is "F", the caption belongs to `F_lb`.
+  const bt = await outputLabels("bolt-torque");
+  assert.equal(bt.F_lb, "Clamp load");
+  assert.equal(bt.torque_ft_lb, "Torque");
+  assert.equal(bt.F, undefined, "a display id is not a result key");
+  const cmd = await outputLabels("concrete-mix-design");
+  assert.equal(cmd.wc_ratio, "Water-to-cement");
+  assert.equal(cmd.water_lb_yd3, "Water (lb/yd³)");
+  // "12 x 8 = 96 panels" is captioned for the whole line, and its display id
+  // ("panels") does not repeat the value the line leads with ("panels_l"), so
+  // the caption names nothing rather than calling 96 the "Panel grid".
+  const sc = await outputLabels("concrete-sawcut-footage");
+  assert.equal(sc.panels, undefined, "an unconfirmed multi-value line names nothing");
+  assert.equal(sc.panels_l, undefined);
+  // But when the author's own display id repeats the leading key, that is them
+  // naming it: "12 bags (11.6 before rounding)" is the bag count.
+  const st = await outputLabels("stucco-coverage");
+  assert.equal(st.bags, "Plaster bags");
+});
+
+// A ratchet, not a target: the share of worked-example answer rows that print
+// a name instead of a bare API key. Reading the formatters took it from 1,942
+// to 2,870 of 4,844 rows. It may only go up.
+test("worked-example answer rows are named, not keyed", async () => {
+  const { outputLabels } = await import("../../mcp/catalog.mjs");
+  const { readFile } = await import("node:fs/promises");
+  const raw = JSON.parse(await readFile(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8"));
+  const rows = Array.isArray(raw) ? raw : (raw.examples || raw.rows || []);
+  const seen = new Set();
+  let total = 0, named = 0;
+  for (const row of rows) {
+    if (!row || !row.tile_id || seen.has(row.tile_id)) continue;
+    seen.add(row.tile_id);
+    const labels = await outputLabels(row.tile_id);
+    for (const k of Object.keys(row.outputs || {})) { total += 1; if (labels[k]) named += 1; }
+  }
+  assert.ok(named >= 2870, `named answer rows fell to ${named} of ${total}; the floor is 2,870`);
+});
