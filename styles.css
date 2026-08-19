@@ -100,7 +100,19 @@ a {
 a:hover { text-decoration-color: var(--fg); }
 
 a:focus, button:focus, select:focus, input:focus, textarea:focus,
-[tabindex]:focus {
+[tabindex]:not([tabindex="-1"]):focus {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* A tabindex="-1" element is never reachable by Tab. The one the app uses is
+   the view <h1>, focused by script on every route change so a screen reader
+   announces the new calculator -- which also drew a 2px box around the title
+   on arrival, for every user, saying nothing to any of them. Ring it only when
+   the browser judges the focus worth showing (:focus-visible stays true for a
+   keyboard-driven focus and false for a scripted or click one), so the
+   announcement still happens and the heading is left alone. */
+[tabindex="-1"]:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
