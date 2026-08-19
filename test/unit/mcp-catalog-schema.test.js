@@ -52,7 +52,7 @@ test("describe outputs carry label + unit but never leak the format closure", as
 });
 
 test("a bespoke-renderer tile has no rendered outputs and does not crash", async () => {
-  const r = await run({ id: "wire-ampacity" }); // bespoke, numeric-select excluded (no schema)
+  const r = await run({ id: "anchor-embedment" }); // bespoke, options do not resolve statically (no schema)
   assert.ok(!("outputs" in r));
   assert.ok(r.result && typeof r.result === "object");
 });
@@ -154,8 +154,22 @@ test("extracted bespoke schemas expose enum options and validate (spec-v1184 gro
   assert.match(d.citation.text, /NEC/);
 });
 
+test("a numeric-select tile publishes its enum as numbers, and run honors both forms", async () => {
+  // wire-ampacity's renderer does `Number(sel.select.value)`, so the compute
+  // wants a number. The extractor publishes the enum as numbers rather than
+  // withholding it, and run() snaps a string form onto the same option.
+  const d = await describe({ id: "wire-ampacity" });
+  assert.equal(d.inputs_source, "renderer");
+  const rating = d.inputs.find((i) => i.key === "insulation_rating_C");
+  assert.deepEqual(rating.options.map((o) => o.value), [60, 75, 90]);
+  const asNumber = await run({ id: "wire-ampacity", inputs: { awg: "12", material: "copper", insulation_rating_C: 75 } });
+  const asString = await run({ id: "wire-ampacity", inputs: { awg: "12", material: "copper", insulation_rating_C: "75" } });
+  assert.deepEqual(asString.result, asNumber.result);
+  await assert.rejects(() => run({ id: "wire-ampacity", inputs: { insulation_rating_C: 105 } }), /Allowed/);
+});
+
 test("a bespoke-renderer tile degrades to compute introspection, no crash", async () => {
-  const d = await describe({ id: "wire-ampacity" }); // bespoke, numeric-select excluded (no schema)
+  const d = await describe({ id: "anchor-embedment" }); // bespoke, options do not resolve statically
   assert.equal(d.inputs_source, "compute");
   assert.ok(Array.isArray(d.inputs) && d.inputs.length > 0);
   assert.ok(d.inputs.every((i) => typeof i.name === "string"));

@@ -8,7 +8,9 @@
 //   - the compute() call is a direct object literal,
 //   - no select value is Number()-coerced (that string→number mismatch would feed
 //     a wrong-typed value to run(); those tiles are skipped),
-//   - select options are a literal [{value,label}] array (dynamic options skipped).
+//   - select options resolve to a real [{value,label}] list -- either a literal
+//     array or an expression evaluated against the module's own exports
+//     (anything that will not resolve is skipped rather than guessed at).
 // Anything less confident is skipped (the tile keeps degrading to compute
 // introspection). And mcp/catalog.mjs `schemaIfConsistent` degrades any emitted
 // schema whose keys do not match the compute params, so a mis-parse is harmless.
@@ -47,13 +49,88 @@ function parseOptions(src) {
   return opts;
 }
 
+// Globals a pure options-builder never needs. Shadowed as `undefined` inside the
+// evaluator so an expression that reaches for the DOM, the network, or the
+// filesystem throws instead of running.
+const DENIED_GLOBALS = [
+  "document", "window", "globalThis", "self", "fetch", "process", "require",
+  "Function", "localStorage", "sessionStorage", "XMLHttpRequest",
+  "navigator", "location", "setTimeout", "setInterval",
+];
+
+// `eval` and `arguments` cannot be shadowed by a parameter in strict mode, so
+// an expression naming either is rejected outright instead.
+const DENIED_TOKENS = /\b(eval|arguments)\b/;
+
+// Evaluate a makeSelect options expression against its own module's exports.
+//
+// Roughly a third of the bespoke renderers build their dropdown from a
+// module-level table -- `Object.keys(SPRINKLER_HAZARD_MIN_DENSITY).map(...)`,
+// `[{value:"",label:"(none)"}].concat(...)`. Scraping those with a regex either
+// finds nothing or, worse, finds only the literal head and reports a truncated
+// enum (inventory-turnover advertised `[""]` while the page offered nine
+// industries). Evaluating the expression with the module namespace bound gives
+// the exact values the browser renders.
+//
+// Safety: the only bindings are the module's own exports plus a few pure
+// builtins. Every other identifier -- a module-local helper, a DOM global -- is
+// unbound and throws ReferenceError, so the field degrades to "dynamic, no
+// enum" rather than to a guess.
+function evalOptions(expr, ns) {
+  if (DENIED_TOKENS.test(expr)) return null;
+  const names = [];
+  const values = [];
+  for (const [k, v] of Object.entries(ns)) {
+    if (!/^[A-Za-z_$][\w$]*$/.test(k)) continue;
+    names.push(k); values.push(v);
+  }
+  for (const g of DENIED_GLOBALS) {
+    if (names.includes(g)) continue;
+    names.push(g); values.push(undefined);
+  }
+  let out;
+  try {
+    out = new Function(...names, `"use strict"; return (${expr});`)(...values);
+  } catch { return null; }
+  if (!Array.isArray(out) || out.length === 0) return null;
+  const opts = [];
+  for (const o of out) {
+    if (!o || typeof o !== "object") return null;
+    if (typeof o.value !== "string" && typeof o.value !== "number") return null;
+    if (typeof o.label !== "string" && typeof o.label !== "number") return null;
+    opts.push({ value: String(o.value), label: String(o.label) });
+  }
+  return opts;
+}
+
+// Extract the balanced Nth (0-based) argument of the call that starts at `from`
+// (the index just past the opening paren). Returns the raw source text.
+function argAt(src, from, n) {
+  let i = from, depth = 1, cur = "", parts = [];
+  for (; i < src.length && depth > 0; i++) {
+    const c = src[i];
+    if ("([{".includes(c)) depth++;
+    else if (")]}".includes(c)) { depth--; if (depth === 0) break; }
+    if (c === "," && depth === 1) { parts.push(cur); cur = ""; } else cur += c;
+  }
+  parts.push(cur);
+  return parts[n] === undefined ? null : parts[n].trim();
+}
+
 // Find `NAME = makeSelect("label", "id", OPTS)` / `makeNumber("label","id",ATTRS)`
 // declarations in a render function body, keyed by the local variable NAME.
-function parseFields(body) {
+// `ns` is the renderer module's namespace, used to resolve non-literal OPTS.
+function parseFields(body, ns) {
   const fields = new Map();
-  // makeSelect with a literal options array (skip dynamic like awgOptions()).
-  for (const m of body.matchAll(/\b([A-Za-z_$][\w$]*)\s*=\s*makeSelect\(\s*("(?:[^"\\]|\\.)*")\s*,\s*("(?:[^"\\]|\\.)*")\s*,\s*(\[[\s\S]*?\])\s*\)/g)) {
-    fields.set(m[1], { kind: "select", label: JSON.parse(m[2]), options: parseOptions(m[4]) });
+  // makeSelect: the options argument is balanced-parsed, then evaluated against
+  // the module namespace; a literal array falls back to the regex scrape.
+  const re = /\b([A-Za-z_$][\w$]*)\s*=\s*makeSelect\(\s*("(?:[^"\\]|\\.)*")\s*,\s*("(?:[^"\\]|\\.)*")\s*,/g;
+  let m;
+  while ((m = re.exec(body))) {
+    const expr = argAt(body, m.index + m[0].length, 0);
+    if (expr === null) continue;
+    const options = (ns ? evalOptions(expr, ns) : null) || parseOptions(expr);
+    fields.set(m[1], { kind: "select", label: JSON.parse(m[2]), options });
   }
   // makeNumber(label, id[, attrs]) -- three args (the id is required); attrs is
   // the optional 4th capture.
@@ -182,7 +259,7 @@ async function main() {
     if (!rf) continue;
     if (rf.schema) { stats.alreadySchema++; continue; }
     const body = rf.toString();
-    const fields = parseFields(body);
+    const fields = parseFields(body, rmod);
     const callMap = parseComputeCall(body);
     const params = await computeParams(COMPUTE_MAP[id]);
     // Labels first, and from the loose map as well: they are display-only, so
@@ -218,15 +295,24 @@ async function main() {
     for (const { name: key, defType, defValue } of params) {
       const ref = callMap.get(key);
       if (!ref) { anyUnmapped = true; continue; } // param not sourced from a field
-      const field = fields.get(ref.var);
+      let field = fields.get(ref.var);
       if (!field) { anyUnmapped = true; continue; }
       if (field.kind === "select") {
-        // A string-select feeding a param that is coerced with Number() or whose
-        // compute default is a number/boolean is a type mismatch: run() would
-        // pass the string option verbatim and the compute would reject or
-        // mis-handle it. Refuse the whole tile.
-        if (ref.coerced || defType === "number" || defType === "boolean") { typeMismatch = true; break; }
+        if (defType === "boolean") { typeMismatch = true; break; }
         if (!field.options || field.options.length === 0) { anyUnmapped = true; continue; } // dynamic options — omit
+        if (ref.coerced) {
+          // The renderer itself does `Number(sel.select.value)`, so the compute
+          // wants a number. Publish the enum as numbers and run() hands over
+          // exactly what the page does. If any option is not a finite number
+          // the two paths would diverge, so refuse the whole tile.
+          if (!field.options.every((o) => o.value !== "" && Number.isFinite(Number(o.value)))) { typeMismatch = true; break; }
+          field = { ...field, options: field.options.map((o) => ({ value: Number(o.value), label: o.label })) };
+        } else if (defType === "number") {
+          // Uncoerced: the page submits the option string. A numeric compute
+          // default says it wanted a number — the mismatch is the renderer's,
+          // and guessing either way could feed a wrong value. Refuse.
+          typeMismatch = true; break;
+        }
         hasSelect = true;
       }
       inputs.push({ key, label: field.label, kind: field.kind, options: field.kind === "select" ? field.options : null, default: defValue ?? null, attrs: field.attrs ?? null });
